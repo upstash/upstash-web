@@ -1,0 +1,13 @@
+.table {
+}
+
+.featureTitle {
+  text-align: left;
+  align-items: flex-start;
+  color: var(--c-text-light);
+}
+
+.divider {
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.05);
+}

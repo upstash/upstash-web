@@ -1,0 +1,49 @@
+
+  <!DOCTYPE html>
+  <html lang="en">
+    <head>
+    <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>Upstash Terms and Conditions></title>
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+      <link href="//cdn.auth0.com/styleguide/latest/lib/logos/img/favicon.png" rel="shortcut icon">
+      <style>
+        body { padding-top: 20px; padding-bottom: 20px; }
+        .jumbotron { text-align: center; border-bottom: 1px solid #e5e5e5; }
+        .jumbotron .btn { margin-top:10px; font-size: 14px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="jumbotron">
+
+          <img src="logo.png" style="margin-bottom: 20px;" />
+          <form action="" id="myform"  method="post">
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" name="confirm" value="yes"> Check here to indicate that you have read and agree to the Upstash
+                <a href="terms.html" target="_blank">Term of Service</a> and
+                <a href="privacy.html" target="_blank">Privacy Policy</a>
+              </label>
+            </div>
+            <input type="submit" class="btn btn-sm" style="background-color: #E40C34; color: white; " value="Continue">
+          </form>
+        </div>
+      </div>
+      <script>
+function gup( name, url ) {
+    if (!url) url = location.href;
+    name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+    var regexS = "[\\?&]"+name+"=([^&#]*)";
+    var regex = new RegExp( regexS );
+    var results = regex.exec( url );
+    return results == null ? null : results[1];
+}
+document.getElementById("myform").action = "https://auth.upstash.com/continue?state="+gup('state');
+</script>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    </body
+  </html>
+

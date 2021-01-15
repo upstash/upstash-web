@@ -1,0 +1,13 @@
+.section {
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 120px;
+
+  @media (--t) {
+    padding-bottom: 160px;
+  }
+}
+
+.bg {
+  top: calc(var(--demo-bubble-size) / 2);
+}

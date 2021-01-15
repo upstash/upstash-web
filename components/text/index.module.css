@@ -1,0 +1,78 @@
+.h1 {
+  line-height: 1;
+  letter-spacing: -2px;
+}
+
+.h2 {
+  line-height: 1.1;
+}
+
+.h4 {
+  line-height: 1.3;
+}
+
+/* font-weight */
+
+.fw-normal {
+  font-weight: var(--fw-normal);
+}
+
+.fw-medium {
+  font-weight: var(--fw-medium);
+}
+
+.fw-bold {
+  font-weight: var(--fw-bold);
+}
+
+.fw-black {
+  font-weight: var(--fw-black);
+}
+
+/* font-size */
+
+.fs-mini {
+  font-size: var(--fs-mini);
+}
+
+.fs-body {
+  font-size: var(--fs-body);
+}
+
+.fs-large {
+  font-size: var(--fs-large);
+}
+
+.fs-h4 {
+  font-size: var(--fs-4);
+}
+
+.fs-h2 {
+  font-size: var(--fs-2);
+}
+
+.fs-h1 {
+  font-size: var(--fs-1);
+}
+
+/* color */
+
+.c-primary {
+  color: var(--c-primary);
+}
+
+.c-bg {
+  color: var(--c-bg);
+}
+
+.c-bgLight {
+  color: var(--c-bg-light);
+}
+
+.c-text {
+  color: var(--c-text);
+}
+
+.c-textLight {
+  color: var(--c-text-light);
+}
