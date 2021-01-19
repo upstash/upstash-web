@@ -1,32 +1,55 @@
 export const PRICES = {
-  free: {
-    commandsLimit: 'Max 5000 Commands Daily',
-    maxDataSizePerDB: '256 MB',
-    maxConcurrentConnections: '20',
-    persistence: true,
-    encryption: true,
-    multiZoneReplication: false,
-    per100kCommands: 'Free'
+  commandsLimit: {
+    title: 'Commands Limit',
+    description: 'asd',
+    free: 'Max 5000 Commands Daily',
+    standard: 'Unlimited',
+    premium: 'Unlimited'
   },
-  standart: {
-    commandsLimit: 'Unlimited',
-    maxDataSizePerDB: '10 GB',
-    maxConcurrentConnections: '1000',
-    persistence: true,
-    encryption: true,
-    multiZoneReplication: false,
-    per100kCommands: '$0.4 per 100K commands plus disk storage cost'
+  maxDataSizePerDB: {
+    title: 'Max Data Size Per DB',
+    description: 'asd',
+    free: '256 MB',
+    standard: '10 GB',
+    premium: '50 GB'
   },
-  premium: {
-    commandsLimit: 'Unlimited',
-    maxDataSizePerDB: '50 GB',
-    maxConcurrentConnections: '5000',
-    persistence: true,
-    encryption: true,
-    multiZoneReplication: true,
-    per100kCommands: '$0.75 per 100K commands plus disk storage cost'
+  maxConcurrentConnections: {
+    title: 'Max Concurrent Connections',
+    description: 'asd',
+    free: '20',
+    standard: '1000',
+    premium: '5000'
+  },
+  persistence: {
+    title: 'Persistence',
+    description: 'asd',
+    free: true,
+    standard: true,
+    premium: true
+  },
+  encryption: {
+    title: 'Encryption (TLS)',
+    description: 'asd',
+    free: true,
+    standard: true,
+    premium: true
+  },
+  multiZoneReplication: {
+    title: 'Multi Zone Replication',
+    description: 'asd',
+    free: false,
+    standard: false,
+    premium: true
+  },
+  price: {
+    title: 'Price',
+    description: 'asd',
+    free: 'Free',
+    standard: '$0.4 per 100K commands plus disk storage cost',
+    premium: '$0.75 per 100K commands plus disk storage cost'
   }
 }
+
 
 export const HIGHLIGHT_THEME = {
   hljs: {

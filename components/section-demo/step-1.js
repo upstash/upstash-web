@@ -54,7 +54,7 @@ function Login({ loading, onCreateDB }) {
     <Stack>
       {isLoading && <p>Loading...</p>}
 
-      {error && <div>Oops... {error.message}</div>}
+      {error && <div style={{ marginBottom: 16 }}>Oops... {error.message}</div>}
 
       {isAuthenticated ? (
         <Stack gap={24} className={styles.loggedIn}>
@@ -75,6 +75,7 @@ function Login({ loading, onCreateDB }) {
             </div>
           </div>
           <Button
+            theme="primary"
             className={styles.loggedInButton}
             isLoading={loading}
             onClick={onCreateDB}

@@ -9,7 +9,7 @@ import styles from './mobileTable.module.css'
 function MobileTable({ className }) {
   return (
     <div className={cn(styles.table, className)}>
-      {Object.keys(PRICES).map((key) => {
+      {['free', 'standard', 'premium'].map((key) => {
         return (
           <div key={key} className={styles.col}>
             <TableCol first>
@@ -19,34 +19,36 @@ function MobileTable({ className }) {
                 }}
               >
                 {key === 'free' && 'Free'}
-                {key === 'standart' && 'Standard'}
+                {key === 'standard' && 'Standard'}
                 {key === 'premium' && 'Premium'}
               </Title>
             </TableCol>
             <TableCol>
-              <TableColTitle>Commands Limit</TableColTitle>
-              <Text>{PRICES[key].commandsLimit}</Text>
+              <TableColTitle>{PRICES.commandsLimit.title}</TableColTitle>
+              <Text>{PRICES.commandsLimit[key]}</Text>
             </TableCol>
             <TableCol>
-              <TableColTitle>Max Data Size Per DB</TableColTitle>
-              <Text>{PRICES[key].maxDataSizePerDB}</Text>
+              <TableColTitle>{PRICES.maxDataSizePerDB.title}</TableColTitle>
+              <Text>{PRICES.maxDataSizePerDB[key]}</Text>
             </TableCol>
             <TableCol>
-              <TableColTitle>Max Concurrent Connections</TableColTitle>
-              <Text>{PRICES[key].maxConcurrentConnections}</Text>
+              <TableColTitle>
+                {PRICES.maxConcurrentConnections.title}
+              </TableColTitle>
+              <Text>{PRICES.maxConcurrentConnections[key]}</Text>
             </TableCol>
-            <TableCol check={PRICES[key].persistence}>
-              <TableColTitle>Persistence</TableColTitle>
+            <TableCol check={PRICES.persistence[key]}>
+              <TableColTitle>{PRICES.persistence.title}</TableColTitle>
             </TableCol>
-            <TableCol check={PRICES[key].encryption}>
-              <TableColTitle>Encryption (TLS)</TableColTitle>
+            <TableCol check={PRICES.encryption[key]}>
+              <TableColTitle>{PRICES.encryption.title}</TableColTitle>
             </TableCol>
-            <TableCol check={PRICES[key].multiZoneReplication}>
-              <TableColTitle>Multi Zone Replication</TableColTitle>
+            <TableCol check={PRICES.multiZoneReplication[key]}>
+              <TableColTitle>{PRICES.multiZoneReplication.title}</TableColTitle>
             </TableCol>
             <TableCol>
-              <TableColTitle>100K commands</TableColTitle>
-              <Text>{PRICES[key].per100kCommands}</Text>
+              <TableColTitle>{PRICES.price.title}</TableColTitle>
+              <Text>{PRICES.price[key]}</Text>
             </TableCol>
             <TableCol last>
               {key === 'free' && (
