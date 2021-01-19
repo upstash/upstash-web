@@ -1,9 +1,9 @@
 import { Text, Title } from '../text'
-import { TableCol, TableColTitle } from './table'
+import { TableCol } from './table'
 import { Col, Grid } from '../grid'
 import cn from 'classnames'
 import Button from '../button'
-import { PRICES, PRICES } from '../../constants'
+import { PRICES } from '../../constants'
 
 import styles from './desktopTable.module.css'
 
