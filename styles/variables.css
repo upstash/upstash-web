@@ -2,6 +2,9 @@
   --c-primary: #00fff0;
   --c-bg: #111;
   --c-bg-light: #27282c;
+  --c-bg-40: rgba(255, 255, 255, 0.4);
+  --c-bg-10: rgba(255, 255, 255, 0.1);
+  --c-bg-003: rgba(255, 255, 255, 0.03);
   --c-text: rgba(255, 255, 255, 1);
   --c-text-light: rgba(255, 255, 255, 0.6);
   --c-success: #00bb6b;

@@ -10,7 +10,11 @@
   },
   "dependencies": {
     "@auth0/auth0-react": "^1.2.0",
+    "@chakra-ui/react": "^1.1.5",
+    "@emotion/react": "^11.1.4",
+    "@emotion/styled": "^11.0.0",
     "classnames": "^2.2.6",
+    "framer-motion": "^3.2.1",
     "next": "^10.0.4",
     "next-compose-plugins": "^2.2.1",
     "next-pwa": "^5.0.1",
@@ -18,6 +22,7 @@
     "react-copy-to-clipboard": "^5.0.2",
     "react-dom": "^17.0.1",
     "react-syntax-highlighter": "^15.4.3",
+    "react-tooltip": "^4.2.13",
     "unique-names-generator": "^4.3.1"
   },
   "devDependencies": {

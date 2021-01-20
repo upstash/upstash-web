@@ -1,11 +1,12 @@
+import styles from './desktopTable.module.css'
+
 import { Text, Title } from '../text'
 import { TableCol } from './table'
 import { Col, Grid } from '../grid'
 import cn from 'classnames'
 import Button from '../button'
 import { PRICES } from '../../constants'
-
-import styles from './desktopTable.module.css'
+import * as Icon from '../icons'
 
 function DesktopTable({ className }) {
   return (
@@ -35,7 +36,10 @@ function DesktopTable({ className }) {
 
       <Col>
         <TableCol className={styles.featureTitle}>
-          <Text>{PRICES.commandsLimit.title}</Text>
+          <Text>
+            {PRICES.commandsLimit.title}
+            <Icon.Info style={{ fontSize: 24 }} data-tip="hello world" />
+          </Text>
         </TableCol>
       </Col>
       <Col>

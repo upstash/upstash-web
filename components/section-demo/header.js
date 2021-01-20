@@ -1,20 +1,31 @@
-import { Title, Text } from '../text'
-
-import styles from './header.module.css'
+import { Flex, Box, Heading, Text } from '@chakra-ui/react'
 
 function SectionDemoHeader({ number, title, desc }) {
   return (
-    <header className={styles.header}>
-      <div className={styles.number}>{number}</div>
-      <Title tag="h4" className={styles.title}>
+    <Box as="header">
+      <Flex
+        align="center"
+        justify="center"
+        boxSize="40px"
+        bg="white"
+        borderRadius="full"
+        mx="auto"
+      >
+        <Text fontSize={['md', 'xl']} color="gray.800" fontWeight="bold">
+          {number}
+        </Text>
+      </Flex>
+
+      <Heading tag="h4" fontSize="2xl" mt={2}>
         {title}
-      </Title>
+      </Heading>
+
       {desc && (
-        <Text size="large" color="textLight" className={styles.desc}>
+        <Text fontSize={['md', 'xl']} color="gray.400" mt={2}>
           {desc}
         </Text>
       )}
-    </header>
+    </Box>
   )
 }
 

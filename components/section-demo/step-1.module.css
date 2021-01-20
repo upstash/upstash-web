@@ -1,6 +1,5 @@
 .step1 {
-  --c-bg-10: rgba(255, 255, 255, 0.1);
-  --c-bg-40: rgba(255, 255, 255, 0.4);
+
 }
 
 .form {
@@ -11,34 +10,6 @@
   padding: 32px;
   border-radius: var(--radius-m);
   background-color: var(--c-bg-light);
-}
-
-.label {
-  font-size: 12px;
-  line-height: 1;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: var(--c-bg-40);
-}
-
-.input {
-  border: 0;
-  height: var(--finger);
-  font-weight: var(--fw-medium);
-  padding-left: 32px;
-  padding-right: 32px;
-  color: var(--c-text);
-  background: var(--c-bg-10);
-  border-radius: var(--radius);
-  text-align: center;
-
-  &:focus {
-    color: var(--c-bg);
-    background: var(--c-text);
-  }
-  &:disabled {
-    cursor: not-allowed;
-  }
 }
 
 .loggedIn {

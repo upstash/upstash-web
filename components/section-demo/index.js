@@ -1,21 +1,29 @@
-import cn from 'classnames'
-import Container from '../container'
 import Bg from '../bg'
 import Header from './header'
 import Stack from '../stack'
 import Step1 from './step-1'
 import Step2 from './step-2'
 import Step3 from './step-3'
+import { Container, Box } from '@chakra-ui/react'
 
-import styles from './index.module.css'
-
-function SectionDemo({ children, className, ...props }) {
+function SectionDemo(props) {
   return (
-    <section className={cn(styles.section, className)} {...props}>
-      <Bg className={styles.bg} />
-      <Container>
+    <Box
+      as="section"
+      pos="relative"
+      overflow="hidden"
+      marginTop="32px"
+      py={['80px', '160px']}
+      textAlign="center"
+      {...props}
+    >
+      <Bg />
+
+      <Container maxW="5xl">
+        {/* */}
+
         <Stack gap={80} gapT={120}>
-          <div>
+          <Box>
             <Stack gap={40} gapT={60}>
               <Header
                 number="1"
@@ -24,9 +32,9 @@ function SectionDemo({ children, className, ...props }) {
               />
               <Step1 />
             </Stack>
-          </div>
+          </Box>
 
-          <div>
+          <Box>
             <Stack gap={40} gapT={60}>
               <Header
                 number="2"
@@ -35,15 +43,17 @@ function SectionDemo({ children, className, ...props }) {
               />
               <Step2 />
             </Stack>
-          </div>
+          </Box>
 
-          {/*<div>*/}
-          {/*  <Header number="3" title="And More" />*/}
-          {/*  <Step3 />*/}
-          {/*</div>*/}
+          <Box>
+            <Header number="3" title="And More" />
+            <Step3 />
+          </Box>
         </Stack>
+
+        {/*  */}
       </Container>
-    </section>
+    </Box>
   )
 }
 

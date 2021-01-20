@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-function SvgCheck(props) {
+function SvgInfo(props) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -12,12 +12,13 @@ function SvgCheck(props) {
       strokeWidth={1.5}
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="check_svg__feather check_svg__feather-check"
+      className="info_svg__feather info_svg__feather-info"
       {...props}
     >
-      <path d="M20 6L9 17l-5-5" />
+      <circle cx={12} cy={12} r={10} />
+      <path d="M12 16v-4M12 8h.01" />
     </svg>
   )
 }
 
-export default SvgCheck
+export default SvgInfo

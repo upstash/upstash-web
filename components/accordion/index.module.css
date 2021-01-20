@@ -5,6 +5,7 @@
   position: relative;
   cursor: pointer;
   padding: 24px;
+  border-radius: var(--radius-m);
 
   @media (--t) {
     padding: 32px;
@@ -12,6 +13,10 @@
 
   :global(.collapse) {
     display: none;
+  }
+
+  &:hover {
+    background-color: var(--c-bg-shadow);
   }
 }
 
@@ -33,14 +38,14 @@
 .item:first-child:before {
   display: none;
 }
+
 .item:last-child:after {
   bottom: 0;
 }
 
 .active {
   cursor: default;
-  background-color: var(--c-bg-light);
-  border-radius: var(--radius-m);
+  background-color: var(--c-bg-light) !important;
   box-shadow: var(--c-box-shadow);
 
   :global(.collapse) {

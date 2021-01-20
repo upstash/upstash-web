@@ -1,6 +1,5 @@
 import styles from './step-1.module.css'
 import { useState, useEffect } from 'react'
-import { Text } from '../text'
 import { useAuth0 } from '@auth0/auth0-react'
 import Stack from '../stack'
 import Button from '../button'
@@ -11,6 +10,7 @@ import {
   animals,
   names
 } from 'unique-names-generator'
+import { Input, Label } from '../form'
 
 const databaseNameConfig = {
   dictionaries: [adjectives, animals, names],
@@ -19,18 +19,6 @@ const databaseNameConfig = {
 }
 
 const DB_NAME = uniqueNamesGenerator(databaseNameConfig)
-
-function Input({ ...props }) {
-  return <input className={styles.input} type="text" {...props} />
-}
-
-function Label({ children, ...props }) {
-  return (
-    <Text tag="label" className={styles.label} {...props}>
-      {children}
-    </Text>
-  )
-}
 
 function Login({ loading, onCreateDB }) {
   const {

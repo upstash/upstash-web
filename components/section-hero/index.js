@@ -1,34 +1,35 @@
-import cn from 'classnames'
-import Container from '../container'
-import Button from '../button'
-import { Text, Title } from '../text'
+import { Container, Button, Box, Heading, Text } from '@chakra-ui/react'
 
-import styles from './index.module.css'
-
-function SectionHero({ children, className, ...props }) {
+function SectionHero() {
   return (
-    <section className={cn(styles.section, className)} {...props}>
-      <Container>
-        <Title tag="h1">
+    <Box as="section" py={['100px', '120px']} textAlign="center">
+      <Container maxW="5xl">
+        <Heading
+          as="h1"
+          fontSize={['60px', '110px']}
+          fontWeight="extrabold"
+          lineHeight="none"
+          letterSpacing="tight"
+        >
           Serverless <br />
           Database <br />
           for Redis
-        </Title>
+        </Heading>
 
-        <div className={styles.alt}>
-          <Text size="large">
-            Run Upstash Database without thinking about the servers.
+        <Box mt="24px" fontSize={['md', '2xl']} color="gray.400">
+          <Text>
+            Run Lambda Store Database without thinking about the servers.
           </Text>
-          <Text className={styles.alt2} size="large">
+          <Text d={['none', 'block']}>
             Start for free, then just pay for what you use.
           </Text>
-        </div>
+        </Box>
 
-        <Button className={styles.cta} href="/" theme="primary">
+        <Button href="/" mt="40px" size="lg" colorScheme="yellow">
           Get started for free
         </Button>
       </Container>
-    </section>
+    </Box>
   )
 }
 

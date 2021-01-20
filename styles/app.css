@@ -54,3 +54,18 @@ code {
   font-family: var(--ff-mono);
   line-height: 1.5;
 }
+
+.customTooltip {
+  padding: 8px 16px !important;
+  font-size: 1rem !important;
+  background-color: var(--c-bg-light) !important;
+  border-radius: var(--radius) !important;
+}
+
+.customTooltip.place-top {
+  &:before {
+    border-top-color: var(--c-bg-light) !important;
+    border-top-style: solid !important;
+    border-top-width: 10px !important;
+  }
+}
