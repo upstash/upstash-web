@@ -1,5 +1,4 @@
-import styles from './index.module.css'
-import { Text } from '../text'
+import { Flex, Text } from '@chakra-ui/react'
 
 export function LogoIcon() {
   return (
@@ -24,11 +23,11 @@ export function LogoIcon() {
 
 export default function Logo() {
   return (
-    <a href="/" className={styles.logo}>
+    <Flex as="a" href="/" d="inline-flex" align="center" justify="center">
       <LogoIcon />
-      <Text weight="bold" className={styles.text}>
+      <Text ml={2} fontWeight="bold">
         Upstash
       </Text>
-    </a>
+    </Flex>
   )
 }

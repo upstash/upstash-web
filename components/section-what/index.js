@@ -26,11 +26,11 @@ function SectionWhat({ children, className, ...props }) {
               </Accordion.Header>
               <Accordion.Collapse>
                 <Text>
-                  Upstash has been designed to be serverless from day 1.
-                  You create the database without knowing about the backend
-                  servers. We maintain it, we deal with any issue if anything
-                  happens. With the `pay-as-you-go` pricing, you only pay when
-                  you actively use the database. Your cost does not increase
+                  Upstash has been designed to be serverless from day 1. You
+                  create the database without knowing about the backend servers.
+                  We maintain it, we deal with any issue if anything happens.
+                  With the `pay-as-you-go` pricing, you only pay when you
+                  actively use the database. Your cost does not increase
                   proportionally to your data size. See Serverless Model for
                   more information.
                 </Text>
@@ -48,11 +48,11 @@ function SectionWhat({ children, className, ...props }) {
               </Accordion.Header>
               <Accordion.Collapse>
                 <Text>
-                  Upstash has been designed to be serverless from day 1.
-                  You create the database without knowing about the backend
-                  servers. We maintain it, we deal with any issue if anything
-                  happens. With the `pay-as-you-go` pricing, you only pay when
-                  you actively use the database. Your cost does not increase
+                  Upstash has been designed to be serverless from day 1. You
+                  create the database without knowing about the backend servers.
+                  We maintain it, we deal with any issue if anything happens.
+                  With the `pay-as-you-go` pricing, you only pay when you
+                  actively use the database. Your cost does not increase
                   proportionally to your data size. See Serverless Model for
                   more information.
                 </Text>
@@ -70,11 +70,11 @@ function SectionWhat({ children, className, ...props }) {
               </Accordion.Header>
               <Accordion.Collapse>
                 <Text>
-                  Upstash has been designed to be serverless from day 1.
-                  You create the database without knowing about the backend
-                  servers. We maintain it, we deal with any issue if anything
-                  happens. With the `pay-as-you-go` pricing, you only pay when
-                  you actively use the database. Your cost does not increase
+                  Upstash has been designed to be serverless from day 1. You
+                  create the database without knowing about the backend servers.
+                  We maintain it, we deal with any issue if anything happens.
+                  With the `pay-as-you-go` pricing, you only pay when you
+                  actively use the database. Your cost does not increase
                   proportionally to your data size. See Serverless Model for
                   more information.
                 </Text>
@@ -92,11 +92,11 @@ function SectionWhat({ children, className, ...props }) {
               </Accordion.Header>
               <Accordion.Collapse>
                 <Text>
-                  Upstash has been designed to be serverless from day 1.
-                  You create the database without knowing about the backend
-                  servers. We maintain it, we deal with any issue if anything
-                  happens. With the `pay-as-you-go` pricing, you only pay when
-                  you actively use the database. Your cost does not increase
+                  Upstash has been designed to be serverless from day 1. You
+                  create the database without knowing about the backend servers.
+                  We maintain it, we deal with any issue if anything happens.
+                  With the `pay-as-you-go` pricing, you only pay when you
+                  actively use the database. Your cost does not increase
                   proportionally to your data size. See Serverless Model for
                   more information.
                 </Text>

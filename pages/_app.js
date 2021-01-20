@@ -7,6 +7,7 @@ import { Auth0Provider } from '@auth0/auth0-react'
 import FontFace from '../components/font-face'
 import Footer from '../components/footer'
 import Header from '../components/header'
+import MobileMenu from '../components/mobile-menu'
 
 export default function MyApp({ Component, pageProps }) {
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -22,7 +23,8 @@ export default function MyApp({ Component, pageProps }) {
           <meta name="viewport" content="width=device-width, initial-scale=1" />
         </Head>
 
-        <Header />
+        <Header onOpen={onOpen} />
+        <MobileMenu isOpen={isOpen} onOpen={onOpen} onClose={onClose} />
 
         <main>
           <Component {...pageProps} />
