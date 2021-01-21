@@ -24,7 +24,7 @@ function Footer() {
       as="footer"
       pos="relative"
       overflow="hidden"
-      py={['80px', '100px']}
+      py={['80px', '120px']}
       textAlign="center"
     >
       <Bg />

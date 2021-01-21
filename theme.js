@@ -21,9 +21,7 @@ const theme = extendTheme({
     heading: 'Inter, sans-serif',
     body: 'Inter, sans-serif'
   },
-  colors: {
-    brand: '#4162ff'
-  },
+  colors: {},
   components: {
     Button: {
       baseStyle: {

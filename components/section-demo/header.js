@@ -21,7 +21,7 @@ function SectionDemoHeader({ number, title, desc }) {
       </Heading>
 
       {desc && (
-        <Text fontSize={['md', 'xl']} color="gray.400" mt={2}>
+        <Text fontSize={['md', 'xl']} color="gray.500" mt={2}>
           {desc}
         </Text>
       )}

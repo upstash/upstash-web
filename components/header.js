@@ -28,7 +28,7 @@ function Header({ onOpen }) {
             colSpan={2}
             d={['none', 'flex']}
             justifyContent="center"
-            color="gray.400"
+            color="gray.500"
           >
             <Stack
               as="nav"

@@ -2,7 +2,7 @@ import cn from 'classnames'
 import Container from '../container'
 import Bg from '../bg'
 import { Text, Title } from '../text'
-import Accordion from '../accordion'
+import Accordion from '../-accordion'
 import Link from '../link'
 import Stack from '../stack'
 

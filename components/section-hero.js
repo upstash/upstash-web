@@ -4,6 +4,8 @@ function SectionHero() {
   return (
     <Box as="section" py={['100px', '120px']} textAlign="center">
       <Container maxW="5xl">
+        {/**/}
+
         <Heading
           as="h1"
           fontSize={['60px', '110px']}
@@ -16,7 +18,7 @@ function SectionHero() {
           for Redis
         </Heading>
 
-        <Box mt="24px" fontSize={['md', '2xl']} color="gray.400">
+        <Box mt="24px" fontSize={['md', '2xl']} color="gray.500">
           <Text>
             Run Lambda Store Database without thinking about the servers.
           </Text>
@@ -28,6 +30,8 @@ function SectionHero() {
         <Button href="/" mt="40px" size="lg" colorScheme="yellow">
           Get started for free
         </Button>
+
+        {/**/}
       </Container>
     </Box>
   )
