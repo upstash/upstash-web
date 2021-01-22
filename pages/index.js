@@ -13,12 +13,12 @@ function HomePage() {
         <title>Home Page</title>
       </Head>
 
-      {/*<SectionHero />*/}
-      {/*<SectionDemo />*/}
-      {/*<SectionWhat />*/}
+      <SectionHero />
+      <SectionDemo />
+      <SectionWhat />
       <SectionSupport />
-      {/*<SectionPricing />*/}
-      {/*<SectionFaq />*/}
+      <SectionPricing />
+      <SectionFaq />
     </>
   )
 }

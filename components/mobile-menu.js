@@ -1,4 +1,3 @@
-import * as Icon from './icons'
 import {
   Modal,
   Button,
@@ -7,8 +6,7 @@ import {
   ModalBody,
   StackDivider,
   Flex,
-  Box,
-  IconButton,
+  CloseButton,
   Spacer,
   VStack
 } from '@chakra-ui/react'
@@ -21,17 +19,15 @@ function MobileMenu({ isOpen, onClose }) {
       <ModalOverlay />
       <ModalContent>
         <ModalBody p={6}>
+          {/**/}
+
           <Flex align="center">
             <Logo />
-
             <Spacer />
-
-            <IconButton size="lg" bg="transparent" onClick={onClose}>
-              <Box as={Icon.X} fontSize="24px" />
-            </IconButton>
+            <CloseButton size="lg" onClick={onClose} />
           </Flex>
 
-          <VStack mt={4} spacing="24px" align="stretch">
+          <VStack mt={5} spacing="24px" align="stretch">
             <Button
               size="lg"
               colorScheme="yellow"
@@ -39,6 +35,7 @@ function MobileMenu({ isOpen, onClose }) {
             >
               Console
             </Button>
+
             <VStack divider={<StackDivider />} align="stretch">
               <CustomLink h={10} href="/">
                 <Flex>Pricing</Flex>
@@ -55,6 +52,8 @@ function MobileMenu({ isOpen, onClose }) {
               </CustomLink>
             </VStack>
           </VStack>
+
+          {/**/}
         </ModalBody>
       </ModalContent>
     </Modal>

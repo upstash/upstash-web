@@ -25,14 +25,12 @@ export default function MyApp({ Component, pageProps }) {
 
         <Header onOpen={onOpen} />
         <MobileMenu isOpen={isOpen} onOpen={onOpen} onClose={onClose} />
-
         <main>
           <Component {...pageProps} />
         </main>
-
         <Footer />
-        <FontFace />
 
+        <FontFace />
         <ReactTooltip
           className="customTooltip"
           place="top"

@@ -1,8 +1,8 @@
-import styles from './step-1.module.css'
+import styles from './section-demo-step-1.module.css'
 import { useState, useEffect } from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
-import Stack from '../stack'
-import Button from '../button'
+import Stack from './stack'
+import Button from './button'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import {
   uniqueNamesGenerator,
@@ -10,7 +10,7 @@ import {
   animals,
   names
 } from 'unique-names-generator'
-import { Input, Label } from '../form'
+import { Input, Label } from './form'
 
 const databaseNameConfig = {
   dictionaries: [adjectives, animals, names],

@@ -1,56 +1,61 @@
-import cn from 'classnames'
-import Container from '../container'
+import { Box, Container, VStack, Text, Heading } from '@chakra-ui/react'
 import Bg from '../bg'
-import Stack from '../stack'
-import { Text, Title } from '../text'
 import MobileTable from './mobileTable'
 import DesktopTable from './desktopTable'
-import Link from '../link'
-
+import CustomLink from '../custom-link'
 import styles from './index.module.css'
 
-function SectionPricing({ children, className, ...props }) {
+function SectionPricing() {
   return (
-    <section className={cn(styles.section, className)} {...props}>
+    <Box
+      as="section"
+      pos="relative"
+      overflow="hidden"
+      py={['100px', '140px']}
+      textAlign="center"
+    >
       <Bg />
 
-      <Container>
-        <Stack gap={40} gapT={80}>
-          <Stack gap={16}>
-            <Title tag="h2">Plans & Pricing</Title>
-            <div>
-              <Text size="large" color="textLight">
-                Flexible pricing solutions for your business
-              </Text>
-            </div>
-          </Stack>
+      <Container maxW="5xl">
+        {/**/}
 
+        <Box as="header">
+          <Heading tag="h2" size="2xl">
+            Plans & Pricing
+          </Heading>
+          <Text fontSize="lg" mt={2} color="gray.500">
+            Flexible pricing solutions for your business
+          </Text>
+        </Box>
+
+        <Box mt={[10, 20]}>
           <MobileTable className={styles.mobileTable} />
           <DesktopTable className={styles.desktopTable} />
+        </Box>
 
-          <Stack gap={8}>
-            <Text color="textLight">
-              Disk storage cost is $0.15 per GB per month for all database
-              types.
-            </Text>
-            <Text color="textLight">
-              See{' '}
-              <Link external primary href="/">
-                reserved plans
-              </Link>{' '}
-              pricing for high throughput use cases.
-            </Text>
-            <Text color="textLight">
-              See{' '}
-              <Link external primary href="/">
-                database types
-              </Link>{' '}
-              for more information on databases.
-            </Text>
-          </Stack>
-        </Stack>
+        <VStack spacing={2} mt={14}>
+          <Text>
+            Disk storage cost is $0.15 per GB per month for all database types.
+          </Text>
+          <Text>
+            See{' '}
+            <CustomLink isExternal href="/">
+              reserved plans
+            </CustomLink>{' '}
+            pricing for high throughput use cases.
+          </Text>
+          <Text>
+            See{' '}
+            <CustomLink isExternal href="/">
+              database types
+            </CustomLink>{' '}
+            for more information on databases.
+          </Text>
+        </VStack>
+
+        {/**/}
       </Container>
-    </section>
+    </Box>
   )
 }
 

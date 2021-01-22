@@ -6,6 +6,10 @@ const config = {
   initialColorMode: 'dark'
 }
 
+export const sizes = {
+  bubble: 40
+}
+
 const theme = extendTheme({
   styles: {
     global: {
@@ -14,9 +18,7 @@ const theme = extendTheme({
       }
     }
   },
-  sizes: {
-    bubble: 40
-  },
+  sizes,
   fonts: {
     heading: 'Inter, sans-serif',
     body: 'Inter, sans-serif'

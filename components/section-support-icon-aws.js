@@ -1,4 +1,4 @@
-export default function IconAws() {
+export default function SectionSupportIconAws() {
   return (
     <svg width="58" height="60" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path

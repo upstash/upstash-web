@@ -1,9 +1,9 @@
-import styles from './step-2.module.css'
+import { Box } from '@chakra-ui/react'
 // import { useContext } from 'react'
 // import StoreContext from '../../store'
 import SyntaxHighlighter from 'react-syntax-highlighter'
 // import { atomOneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism'
-import { HIGHLIGHT_THEME } from '../../constants'
+import { HIGHLIGHT_THEME } from '../constants'
 
 const Component = () => {
   // const store = useContext(StoreContext)
@@ -38,9 +38,9 @@ client.set('foo','bar');`
 
 function Step2() {
   return (
-    <div className={styles.box}>
+    <Box w="full" maxW={800} mx="auto">
       <Component />
-    </div>
+    </Box>
   )
 }
 

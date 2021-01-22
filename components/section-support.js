@@ -1,14 +1,7 @@
-import {
-  Container,
-  SimpleGrid,
-  Heading,
-  Text,
-  Box,
-  Accordion
-} from '@chakra-ui/react'
-import IconRedis from './icon-redis'
-import IconNext from './icon-next'
-import IconAws from './icon-aws'
+import { Container, SimpleGrid, Heading, Text, Box } from '@chakra-ui/react'
+import SectionSupportIconRedis from './section-support-icon-redis'
+import SectionSupportIconNext from './section-support-icon-next'
+import SectionSupportIconAws from './section-support-icon-aws'
 import SupportCard from './section-support-card'
 
 function SectionSupport() {
@@ -31,7 +24,7 @@ function SectionSupport() {
 
         <SimpleGrid mt={[10, 20]} columns={[1, 1, 3]} spacing={6}>
           <SupportCard theme="next">
-            <IconNext />
+            <SectionSupportIconNext />
             <Text>
               Check out docs to <br />
               <Text tag="b" fontWeight="bold">
@@ -41,7 +34,7 @@ function SectionSupport() {
           </SupportCard>
           {/**/}
           <SupportCard theme="aws">
-            <IconAws />
+            <SectionSupportIconAws />
             <Text>
               Check out docs to <br />
               <Text tag="b" fontWeight="bold">
@@ -51,7 +44,7 @@ function SectionSupport() {
           </SupportCard>
           {/**/}
           <SupportCard theme="redis">
-            <IconRedis />
+            <SectionSupportIconRedis />
             <Text>
               Check out docs to <br />
               <Text tag="b" fontWeight="bold">

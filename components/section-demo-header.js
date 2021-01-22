@@ -6,7 +6,7 @@ function SectionDemoHeader({ number, title, desc }) {
       <Flex
         align="center"
         justify="center"
-        boxSize="40px"
+        boxSize="bubble"
         bg="white"
         borderRadius="full"
         mx="auto"

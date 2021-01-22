@@ -1,10 +1,11 @@
-import Bg from '../bg'
-import Header from './header'
-import Stack from '../stack'
-import Step1 from './step-1'
-import Step2 from './step-2'
-import Step3 from './step-3'
 import { Container, Box } from '@chakra-ui/react'
+import Bg from './bg'
+import Header from './section-demo-header'
+import Stack from './stack'
+import Step1 from './section-demo-step-1'
+import Step2 from './section-demo-step-2'
+import Step3 from './section-demo-step-3'
+import { sizes } from '../theme'
 
 function SectionDemo(props) {
   return (
@@ -13,11 +14,11 @@ function SectionDemo(props) {
       pos="relative"
       overflow="hidden"
       marginTop="32px"
-      py={['80px', '160px']}
+      pb={['80px', '160px']}
       textAlign="center"
       {...props}
     >
-      <Bg />
+      <Bg top={`${sizes.bubble / 2}px`} />
 
       <Container maxW="5xl">
         {/* */}

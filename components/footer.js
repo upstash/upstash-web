@@ -31,13 +31,13 @@ function Footer() {
 
       <Container maxW="5xl">
         <VStack spacing={['32px', '40px']}>
-          {/* logo */}
+          {/**/}
 
           <Box>
             <Logo />
           </Box>
 
-          {/* social */}
+          {/**/}
 
           <HStack spacing="16px">
             <IconButton as={Link} isRound aria-label="Upstash on Twitter">
@@ -54,7 +54,7 @@ function Footer() {
             </IconButton>
           </HStack>
 
-          {/* links */}
+          {/**/}
 
           <Stack
             direction={['column', 'row']}
@@ -74,6 +74,8 @@ function Footer() {
               Subcontractors
             </CustomLink>
           </Stack>
+
+          {/**/}
 
           <Grid templateColumns={['1fr', 'repeat(6, 1fr)']} gap="32px">
             <GridItem colStart={[1, 2]} colEnd={[1, 6]}>

@@ -1,4 +1,4 @@
-export default function IconRedis() {
+export default function SectionSupportIconRedis() {
   return (
     <svg width="70" height="60" fill="none" xmlns="http://www.w3.org/2000/svg">
       <g clipPath="url(#clipRedis)">
