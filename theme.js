@@ -15,6 +15,9 @@ const theme = extendTheme({
     global: {
       html: {
         fontSize: '17px'
+      },
+      body: {
+        bg: '#050505'
       }
     }
   },
@@ -23,7 +26,9 @@ const theme = extendTheme({
     heading: 'Inter, sans-serif',
     body: 'Inter, sans-serif'
   },
-  colors: {},
+  colors: {
+    primary: '#00E9A3'
+  },
   components: {
     Button: {
       baseStyle: {

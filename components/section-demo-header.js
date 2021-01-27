@@ -11,7 +11,7 @@ function SectionDemoHeader({ number, title, desc }) {
         borderRadius="full"
         mx="auto"
       >
-        <Text fontSize={['md', 'xl']} color="gray.800" fontWeight="bold">
+        <Text fontSize={['md', 'xl']} color="black" fontWeight="bold">
           {number}
         </Text>
       </Flex>
@@ -21,7 +21,7 @@ function SectionDemoHeader({ number, title, desc }) {
       </Heading>
 
       {desc && (
-        <Text fontSize={['md', 'xl']} color="gray.500" mt={2}>
+        <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
           {desc}
         </Text>
       )}

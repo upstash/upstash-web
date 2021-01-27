@@ -23,7 +23,7 @@ function SectionPricing() {
           <Heading tag="h2" size="2xl">
             Plans & Pricing
           </Heading>
-          <Text fontSize="lg" mt={2} color="gray.500">
+          <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
             Flexible pricing solutions for your business
           </Text>
         </Box>

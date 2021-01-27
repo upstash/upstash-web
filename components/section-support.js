@@ -15,7 +15,7 @@ function SectionSupport() {
             Supports any <br />
             Modern Framework
           </Heading>
-          <Text fontSize="lg" mt={2} color="gray.500">
+          <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
             UpStash simplifies database access, saves repetitive CRUD
             boilerplate and increases type safety It's the perfect database
             toolkit for building robust and scalable web APIs.

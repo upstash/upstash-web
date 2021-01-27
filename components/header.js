@@ -2,6 +2,7 @@ import {
   Container,
   IconButton,
   Grid,
+  Button,
   GridItem,
   Box,
   Stack
@@ -28,7 +29,7 @@ function Header({ onOpen }) {
             colSpan={2}
             d={['none', 'flex']}
             justifyContent="center"
-            color="gray.500"
+            color="whiteAlpha.600"
           >
             <Stack
               as="nav"
@@ -48,9 +49,16 @@ function Header({ onOpen }) {
 
           {/* console */}
           <GridItem d={['none', 'flex']} justifyContent="flex-end">
-            <CustomLink isExternal href="https://console.lambda.store">
+            <Button
+              as={CustomLink}
+              isExternal
+              href="https://console.lambda.store"
+              _hover={{
+                textDecoration: 'none'
+              }}
+            >
               Console
-            </CustomLink>
+            </Button>
           </GridItem>
 
           {/* mobile */}

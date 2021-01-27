@@ -1,4 +1,4 @@
-import { Container, Button, Box, Heading, Text } from '@chakra-ui/react'
+import { Link, Container, Button, Box, Heading, Text } from '@chakra-ui/react'
 
 function SectionHero() {
   return (
@@ -18,7 +18,7 @@ function SectionHero() {
           for Redis
         </Heading>
 
-        <Box mt="24px" fontSize={['md', '2xl']} color="gray.500">
+        <Box mt="24px" fontSize={['md', '2xl']} color="whiteAlpha.600">
           <Text>
             Run Lambda Store Database without thinking about the servers.
           </Text>
@@ -27,7 +27,17 @@ function SectionHero() {
           </Text>
         </Box>
 
-        <Button href="/" mt="40px" size="lg" colorScheme="yellow">
+        <Button
+          as={Link}
+          href="/"
+          mt="40px"
+          size="lg"
+          color="black"
+          bg="primary"
+          _hover={{
+            textDecoration: 'none'
+          }}
+        >
           Get started for free
         </Button>
 

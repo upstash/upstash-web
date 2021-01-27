@@ -12,7 +12,7 @@ function SectionFaq() {
           <Heading tag="h2" size="2xl">
             FAQ
           </Heading>
-          <Text fontSize="lg" mt={2} color="gray.500">
+          <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
             Frequently Asked Questions
           </Text>
         </Box>
@@ -75,6 +75,12 @@ function SectionFaq() {
 
           {/**/}
         </Accordion>
+
+        <Box mt={6}>
+          <CustomLink isExternal color="primary" href="/">
+            See more FAQs
+          </CustomLink>
+        </Box>
 
         {/**/}
       </Container>

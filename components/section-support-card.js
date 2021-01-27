@@ -20,6 +20,11 @@ export default function SupportCard({ theme, children, ...props }) {
       bg={color.bg}
       color={color.color}
       borderRadius="2xl"
+      _hover={{
+        color: color.color,
+        textDecoration: 'none',
+        transform: 'scale(1.02)'
+      }}
       {...props}
     >
       {children}

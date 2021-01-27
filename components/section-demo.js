@@ -1,7 +1,6 @@
-import { Container, Box } from '@chakra-ui/react'
+import { Container, Box, VStack } from '@chakra-ui/react'
 import Bg from './bg'
 import Header from './section-demo-header'
-import Stack from './stack'
 import Step1 from './section-demo-step-1'
 import Step2 from './section-demo-step-2'
 import Step3 from './section-demo-step-3'
@@ -23,34 +22,36 @@ function SectionDemo(props) {
       <Container maxW="5xl">
         {/* */}
 
-        <Stack gap={80} gapT={120}>
-          <Box>
-            <Stack gap={40} gapT={60}>
-              <Header
-                number="1"
-                title="Create"
-                desc="Create your serverless database in seconds."
-              />
+        <VStack spacing={[12, 20]} align="stretch">
+          <VStack spacing={[8, 10]} align="stretch">
+            <Header
+              number="1"
+              title="Create"
+              desc="Create your serverless database in seconds."
+            />
+            <Box>
               <Step1 />
-            </Stack>
-          </Box>
+            </Box>
+          </VStack>
 
-          <Box>
-            <Stack gap={40} gapT={60}>
-              <Header
-                number="2"
-                title="Connect"
-                desc="Only pay for successful transactions."
-              />
+          <VStack spacing={[8, 12]} align="stretch">
+            <Header
+              number="2"
+              title="Connect"
+              desc="Only pay for successful transactions."
+            />
+            <Box>
               <Step2 />
-            </Stack>
-          </Box>
+            </Box>
+          </VStack>
 
-          <Box>
+          <VStack spacing={[8, 12]} align="stretch">
             <Header number="3" title="And More" />
-            <Step3 />
-          </Box>
-        </Stack>
+            <Box>
+              <Step3 />
+            </Box>
+          </VStack>
+        </VStack>
 
         {/*  */}
       </Container>

@@ -157,7 +157,7 @@ function Step1() {
   }
 
   return (
-    <div className={styles.step1}>
+    <div>
       {db ? (
         <Result db={db} />
       ) : (

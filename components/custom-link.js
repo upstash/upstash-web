@@ -3,10 +3,19 @@ import { Link, Flex, Box } from '@chakra-ui/react'
 
 function CustomLink({ isExternal, children, noIcon = false, ...props }) {
   return (
-    <Flex d="inline-flex" as={Link} align="center" isExternal {...props}>
+    <Flex
+      as={Link}
+      isExternal
+      d="inline-flex"
+      align="center"
+      _hover={{
+        color: 'primary'
+      }}
+      {...props}
+    >
       {children}
       {isExternal && !noIcon && (
-        <Box as={Icon.ArrowUpRight} fontSize="22px" opacity={0.5} />
+        <Box as={Icon.ArrowUpRight} ml="2px" fontSize="22px" opacity={0.5} />
       )}
     </Flex>
   )

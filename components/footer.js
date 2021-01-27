@@ -40,16 +40,36 @@ function Footer() {
           {/**/}
 
           <HStack spacing="16px">
-            <IconButton as={Link} isRound aria-label="Upstash on Twitter">
+            <IconButton
+              as={Link}
+              size="lg"
+              isRound
+              aria-label="Upstash on Twitter"
+            >
               <Box as={Icon.Twitter} fontSize={20} />
             </IconButton>
-            <IconButton as={Link} isRound aria-label="Upstash on Twitter">
+            <IconButton
+              as={Link}
+              size="lg"
+              isRound
+              aria-label="Upstash on Twitter"
+            >
               <Box as={Icon.Medium} fontSize={20} />
             </IconButton>
-            <IconButton as={Link} isRound aria-label="Upstash on Twitter">
+            <IconButton
+              as={Link}
+              size="lg"
+              isRound
+              aria-label="Upstash on Twitter"
+            >
               <Box as={Icon.Devto} fontSize={20} />
             </IconButton>
-            <IconButton as={Link} isRound aria-label="Upstash on Twitter">
+            <IconButton
+              as={Link}
+              size="lg"
+              isRound
+              aria-label="Upstash on Twitter"
+            >
               <Box as={Icon.Gitter} fontSize={20} />
             </IconButton>
           </HStack>
@@ -79,7 +99,7 @@ function Footer() {
 
           <Grid templateColumns={['1fr', 'repeat(6, 1fr)']} gap="32px">
             <GridItem colStart={[1, 2]} colEnd={[1, 6]}>
-              <Text fontSize="xs" color="gray.600">
+              <Text fontSize="xs" color="whiteAlpha.400">
                 * Redis is a trademark of Redis Labs Ltd. Any rights therein are
                 reserved to Redis Labs Ltd. Any use by Lambda Store is for
                 referential purposes only and does not indicate any sponsorship,
