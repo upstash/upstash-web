@@ -17,13 +17,11 @@ function SectionSupport({ children, className, ...props }) {
         <Stack gap={40} gapT={80}>
           <Stack gap={16}>
             <Title tag="h2">
-              Supports any <br />
-              Modern Framework
+              Best Choice for Jamstack
             </Title>
             <Text size="large" color="textLight">
-              UpStash simplifies database access, saves repetitive CRUD
-              boilerplate and increases type safety It's the perfect database
-              toolkit for building robust and scalable web APIs.
+              Low latency data, ease of use and pay-per-request pricing makes
+              Upstash a perfect choice for Jamstack and Serverless world.
             </Text>
           </Stack>
 
@@ -32,9 +30,9 @@ function SectionSupport({ children, className, ...props }) {
               <SupportBox theme="next">
                 <IconNext />
                 <Text>
-                  Check out docs to <br />
+                  Check out docs for <br />
                   <Text tag="b" weight="medium">
-                    Next
+                    Next.js
                   </Text>
                 </Text>
               </SupportBox>
@@ -43,7 +41,7 @@ function SectionSupport({ children, className, ...props }) {
               <SupportBox theme="aws">
                 <IconAws />
                 <Text>
-                  Check out docs to <br />
+                  Check out docs for <br />
                   <Text tag="b" weight="medium">
                     AWS Lambda
                   </Text>
@@ -54,7 +52,7 @@ function SectionSupport({ children, className, ...props }) {
               <SupportBox theme="redis">
                 <IconRedis />
                 <Text>
-                  Check out docs to <br />
+                  Check out docs for <br />
                   <Text tag="b" weight="medium">
                     Redis
                   </Text>

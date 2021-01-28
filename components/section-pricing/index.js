@@ -20,7 +20,7 @@ function SectionPricing({ children, className, ...props }) {
             <Title tag="h2">Plans & Pricing</Title>
             <div>
               <Text size="large" color="textLight">
-                Flexible pricing solutions for your business
+                Flexible pricing for all usecases
               </Text>
             </div>
           </Stack>
@@ -30,7 +30,7 @@ function SectionPricing({ children, className, ...props }) {
 
           <Stack gap={8}>
             <Text color="textLight">
-              Disk storage cost is $0.15 per GB per month for all database
+              Disk storage cost is $0.25 per GB per month for all database
               types.
             </Text>
             <Text color="textLight">
@@ -38,7 +38,7 @@ function SectionPricing({ children, className, ...props }) {
               <Link external primary href="/">
                 reserved plans
               </Link>{' '}
-              pricing for high throughput use cases.
+               for high throughput use cases.
             </Text>
             <Text color="textLight">
               See{' '}

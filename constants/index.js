@@ -1,6 +1,6 @@
 export const PRICES = {
   free: {
-    commandsLimit: 'Max 5000 Commands Daily',
+    commandsLimit: 'Max 10.000 Commands Daily',
     maxDataSizePerDB: '256 MB',
     maxConcurrentConnections: '20',
     persistence: true,
@@ -15,16 +15,16 @@ export const PRICES = {
     persistence: true,
     encryption: true,
     multiZoneReplication: false,
-    per100kCommands: '$0.4 per 100K commands plus disk storage cost'
+    per100kCommands: '$0.2 per 100K commands plus disk storage cost'
   },
   premium: {
     commandsLimit: 'Unlimited',
-    maxDataSizePerDB: '50 GB',
-    maxConcurrentConnections: '5000',
+    maxDataSizePerDB: '500 GB',
+    maxConcurrentConnections: '10.000',
     persistence: true,
     encryption: true,
     multiZoneReplication: true,
-    per100kCommands: '$0.75 per 100K commands plus disk storage cost'
+    per100kCommands: '$0.4 per 100K commands plus disk storage cost'
   }
 }
 

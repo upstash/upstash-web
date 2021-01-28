@@ -17,15 +17,12 @@ function SectionHero({ children, className, ...props }) {
 
         <div className={styles.alt}>
           <Text size="large">
-            Run Upstash Database without thinking about the servers.
-          </Text>
-          <Text className={styles.alt2} size="large">
-            Start for free, then just pay for what you use.
+            Fast. Simple. Serverless.
           </Text>
         </div>
 
         <Button className={styles.cta} href="/" theme="primary">
-          Get started for free
+          Get Started for Free
         </Button>
       </Container>
     </section>

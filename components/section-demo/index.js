@@ -20,7 +20,7 @@ function SectionDemo({ children, className, ...props }) {
               <Header
                 number="1"
                 title="Create"
-                desc="Create your serverless database in seconds."
+                desc="Create your database in seconds."
               />
               <Step1 />
             </Stack>
@@ -31,7 +31,7 @@ function SectionDemo({ children, className, ...props }) {
               <Header
                 number="2"
                 title="Connect"
-                desc="Only pay for successful transactions."
+                desc="Connect with any Redis client from anywhere."
               />
               <Step2 />
             </Stack>

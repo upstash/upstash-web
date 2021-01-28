@@ -230,12 +230,12 @@ function DesktopTable({ className }) {
       </Col>
       <Col>
         <TableCol>
-          <Button>Login</Button>
+          <Button>Sign Up</Button>
         </TableCol>
       </Col>
       <Col>
         <TableCol>
-          <Button>Login</Button>
+          <Button>Sign Up</Button>
         </TableCol>
       </Col>
     </Grid>
