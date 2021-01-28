@@ -24,7 +24,7 @@ function SectionPricing() {
             Plans & Pricing
           </Heading>
           <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
-            Flexible pricing solutions for your business
+            Flexible pricing for all usecases
           </Text>
         </Box>
 

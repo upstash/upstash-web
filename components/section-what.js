@@ -40,13 +40,14 @@ function SectionWhat() {
               mb={6}
             />
             <Heading tag="h4" fontSize="2xl">
-              Serverless
+              No Ops
             </Heading>
             <Box mt={4}>
               <Text color="whiteAlpha.600">
-                Lambda Store has been designed to be serverless from day 1. You
-                create the database without knowing about the backend servers.
-                We maintain it, we deal with any issue if anything happens.
+                Upstash has been designed to be Serverless from day 1. You start
+                using the database, knowing nothing about the servers. We
+                maintain it, we scale it, we deal with any issue. You focus on
+                what you are building.
               </Text>
             </Box>
             <Box mt={4}>
@@ -64,63 +65,64 @@ function SectionWhat() {
               mb={6}
             />
             <Heading tag="h4" fontSize="2xl">
-              Redis® Compatible
-            </Heading>
-            <Box mt={4}>
-              <Text color="whiteAlpha.600">
-                We implemented serverless data structures compatible with the
-                Redis® API. You will enjoy Lambda Store without thinking how to
-                maintain servers or how to replicate your data to keep your
-                cluster available.
-              </Text>
-            </Box>
-            <Box mt={4}>
-              <CustomLink isExternal>See more</CustomLink>
-            </Box>
-          </Box>
-
-          <Box bg="whiteAlpha.100" borderRadius="2xl" p={10}>
-            <Box
-              as={SectionWhatIcon3}
-              d="inline-flex"
-              w="80px"
-              h="80px"
-              color="primary"
-              mb={6}
-            />
-            <Heading tag="h4" fontSize="2xl">
-              Pay As You Go
-            </Heading>
-            <Box mt={4}>
-              <Text color="whiteAlpha.600">
-                Lambda Store has a free tier, so you can start using Lambda
-                Store without entering your credit card. Free tier has a limit
-                of 5000 commands per day and 256 MB total data storage.
-              </Text>
-            </Box>
-            <Box mt={4}>
-              <CustomLink isExternal>See more</CustomLink>
-            </Box>
-          </Box>
-
-          <Box bg="whiteAlpha.100" borderRadius="2xl" p={10}>
-            <Box
-              as={SectionWhatIcon3}
-              d="inline-flex"
-              w="80px"
-              h="80px"
-              color="primary"
-              mb={6}
-            />
-            <Heading tag="h4" fontSize="2xl">
               Low Latency For Low Cost
             </Heading>
             <Box mt={4}>
               <Text color="whiteAlpha.600">
-                If you are running AWS Lambda functions, each extra millisecond
-                costs you. That's why we optimize Lambda Store for low latency.
-                Keeping the data in memory provides us the advantage against our
-                alternatives like DynamoDB.
+                In Serverless world, extra millisecond is a cost. That's why we
+                optimize Upstash for low latency. In-memory-data makes Upstash
+                faster than DynamoDB and Fauna. Pay-per-request model makes
+                Upstash more affordable than ElastiCache and RedisLabs.
+              </Text>
+            </Box>
+            <Box mt={4}>
+              <CustomLink isExternal>See more</CustomLink>
+            </Box>
+          </Box>
+
+          <Box bg="whiteAlpha.100" borderRadius="2xl" p={10}>
+            <Box
+              as={SectionWhatIcon3}
+              d="inline-flex"
+              w="80px"
+              h="80px"
+              color="primary"
+              mb={6}
+            />
+            <Heading tag="h4" fontSize="2xl">
+              Simple Pricing, No Surprises
+            </Heading>
+            <Box mt={4}>
+              <Text color="whiteAlpha.600">
+                In Upstash pricing model, you pay per request. If you are not
+                using the database, you are not paying. The max monthly
+                (ceiling) price, guarantees that you will not pay more than
+                ceiling price (that is $120 per month for Standard databases).
+              </Text>
+            </Box>
+            <Box mt={4}>
+              <CustomLink isExternal>See more</CustomLink>
+            </Box>
+          </Box>
+
+          <Box bg="whiteAlpha.100" borderRadius="2xl" p={10}>
+            <Box
+              as={SectionWhatIcon3}
+              d="inline-flex"
+              w="80px"
+              h="80px"
+              color="primary"
+              mb={6}
+            />
+            <Heading tag="h4" fontSize="2xl">
+              Redis® Compatible
+            </Heading>
+            <Box mt={4}>
+              <Text color="whiteAlpha.600">
+                We have implemented data structures compatible with the Redis®
+                API. Upstash works with all Redis clients, so you can run your
+                legacy code without changing a line. Upstash provides you low
+                latency and high availability minimizing operational burden.
               </Text>
             </Box>
             <Box mt={4}>

@@ -12,13 +12,11 @@ function SectionSupport() {
 
         <Box as="header">
           <Heading tag="h2" size="2xl">
-            Supports any <br />
-            Modern Framework
+            Best Choice for Jamstack
           </Heading>
           <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
-            UpStash simplifies database access, saves repetitive CRUD
-            boilerplate and increases type safety It's the perfect database
-            toolkit for building robust and scalable web APIs.
+            Low latency data, ease of use and pay-per-request pricing makes
+            Upstash a perfect choice for Jamstack and Serverless world.
           </Text>
         </Box>
 

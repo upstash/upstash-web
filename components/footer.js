@@ -37,8 +37,6 @@ function Footer() {
             <Logo />
           </Box>
 
-          {/**/}
-
           <HStack spacing="16px">
             <IconButton
               as={Link}
@@ -74,8 +72,6 @@ function Footer() {
             </IconButton>
           </HStack>
 
-          {/**/}
-
           <Stack
             direction={['column', 'row']}
             align="center"
@@ -95,11 +91,9 @@ function Footer() {
             </CustomLink>
           </Stack>
 
-          {/**/}
-
           <Grid templateColumns={['1fr', 'repeat(6, 1fr)']} gap="32px">
             <GridItem colStart={[1, 2]} colEnd={[1, 6]}>
-              <Text fontSize="xs" color="whiteAlpha.400">
+              <Text fontSize="xs" color="whiteAlpha.500">
                 * Redis is a trademark of Redis Labs Ltd. Any rights therein are
                 reserved to Redis Labs Ltd. Any use by Lambda Store is for
                 referential purposes only and does not indicate any sponsorship,

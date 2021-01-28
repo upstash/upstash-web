@@ -27,7 +27,7 @@ function SectionDemo(props) {
             <Header
               number="1"
               title="Create"
-              desc="Create your serverless database in seconds."
+              desc="Create your database in seconds."
             />
             <Box>
               <Step1 />
@@ -38,7 +38,7 @@ function SectionDemo(props) {
             <Header
               number="2"
               title="Connect"
-              desc="Only pay for successful transactions."
+              desc="Connect with any Redis client from anywhere."
             />
             <Box>
               <Step2 />

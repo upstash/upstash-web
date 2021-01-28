@@ -19,12 +19,7 @@ function SectionHero() {
         </Heading>
 
         <Box mt="24px" fontSize={['md', '2xl']} color="whiteAlpha.600">
-          <Text>
-            Run Lambda Store Database without thinking about the servers.
-          </Text>
-          <Text d={['none', 'block']}>
-            Start for free, then just pay for what you use.
-          </Text>
+          <Text>Fast. Simple. Serverless.</Text>
         </Box>
 
         <Button

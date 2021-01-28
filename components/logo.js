@@ -42,10 +42,10 @@ export default function Logo() {
       <Text
         ml={2}
         fontWeight="semibold"
-        fontSize="1.1rem"
+        fontSize="1.4rem"
         letterSpacing="-.5px"
       >
-        Upstash
+        upstash
       </Text>
     </Flex>
   )
