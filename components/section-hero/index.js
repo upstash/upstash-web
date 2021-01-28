@@ -12,7 +12,7 @@ function SectionHero({ children, className, ...props }) {
         <Title tag="h1">
           Serverless <br />
           Database <br />
-          for Redis
+          for Redis<span className={styles.trademark}>®</span>
         </Title>
 
         <div className={styles.alt}>

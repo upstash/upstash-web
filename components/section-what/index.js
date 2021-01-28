@@ -15,14 +15,13 @@ function SectionWhat({ children, className, ...props }) {
       <Container>
         <Stack gap={40} gapT={80}>
           <Title tag="h2">
-            Rails Moment of <br />
-            Serverless Database
+            Rails Moment of <br/> Serverless Database
           </Title>
 
           <Accordion>
             <Accordion.Item>
               <Accordion.Header>
-                <Title tag="h4">No Ops</Title>
+                <Title tag="h4">Serverless</Title>
               </Accordion.Header>
               <Accordion.Collapse>
                 <Text>

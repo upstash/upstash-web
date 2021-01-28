@@ -9,6 +9,11 @@
   }
 }
 
+.trademark {
+  font-size: 18pt;
+  vertical-align: text-top;
+}
+
 .alt {
   margin-top: 24px;
   color: var(--c-text-light);
