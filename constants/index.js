@@ -2,7 +2,7 @@ export const PRICES = {
   commandsLimit: {
     title: 'Commands Limit',
     description: 'asd',
-    free: 'Max 5000 Commands Daily',
+    free: 'Max 10.000 Commands Daily',
     standard: 'Unlimited',
     premium: 'Unlimited'
   },
@@ -11,14 +11,14 @@ export const PRICES = {
     description: 'asd',
     free: '256 MB',
     standard: '10 GB',
-    premium: '50 GB'
+    premium: '500 GB'
   },
   maxConcurrentConnections: {
     title: 'Max Concurrent Connections',
     description: 'asd',
     free: '20',
     standard: '1000',
-    premium: '5000'
+    premium: '10.000'
   },
   persistence: {
     title: 'Persistence',
@@ -45,8 +45,8 @@ export const PRICES = {
     title: 'Price',
     description: 'asd',
     free: 'Free',
-    standard: '$0.4 per 100K commands plus disk storage cost',
-    premium: '$0.75 per 100K commands plus disk storage cost'
+    standard: '$0.2 per 100K commands plus disk storage cost',
+    premium: '$0.4 per 100K commands plus disk storage cost'
   }
 }
 

@@ -12,72 +12,67 @@ function SectionFaq() {
           <Heading tag="h2" size="2xl">
             FAQ
           </Heading>
-          <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
-            Frequently Asked Questions
-          </Text>
+          <Container maxW="3xl">
+            <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
+              Frequently Asked Questions
+            </Text>
+          </Container>
         </Box>
 
         <Accordion mt={[10, 20]}>
           {/**/}
 
-          <FaqAccordionItem title="What are the use cases?">
+          <FaqAccordionItem title="What does it mean Serverless Database?">
             <Text>
-              Upstash works for all the common usecases for Redis®. You can use
-              Upstash in your serverless stack. In addition, you can use Upstash
-              as storage (or caching) for your serverless functions.
+              You do not have to plan and provision servers. You do not deal
+              with configuring or maintaining any server. You just use the
+              service and pay per request. You do not pay if you are not using.
             </Text>
-            <CustomLink isExternal>See more</CustomLink>
           </FaqAccordionItem>
 
           {/**/}
 
-          <FaqAccordionItem title="Do you support Redis Cluster?">
+          <FaqAccordionItem title="My stack is not serverless. Can I use Upstash?">
             <Text>
-              Upstash works for all the common usecases for Redis®. You can use
-              Upstash in your serverless stack. In addition, you can use Upstash
-              as storage (or caching) for your serverless functions.
+              Absolutely. Your application can be running on an EC2 Instance or
+              a container, still you can use Upstash.
             </Text>
-            <CustomLink isExternal>See more</CustomLink>
           </FaqAccordionItem>
 
           {/**/}
 
-          <FaqAccordionItem title="Which regions do you support in AWS?">
+          <FaqAccordionItem title="How do you compare Upstash with Elasticache and RedisLabs?">
             <Text>
-              Upstash works for all the common usecases for Redis®. You can use
-              Upstash in your serverless stack. In addition, you can use Upstash
-              as storage (or caching) for your serverless functions.
+              With ElastiCache or Redislabs you pay even you do not utilize the
+              database. Their price is based on provisioned memory size. Upstash
+              pricing is pay per request.
             </Text>
-            <CustomLink isExternal>See more</CustomLink>
           </FaqAccordionItem>
 
           {/**/}
 
-          <FaqAccordionItem title="I have database with 10GB data, I pay nothing if I do not use it. Is that correct?">
+          <FaqAccordionItem title="What about Dynamodb and Fauna?">
             <Text>
-              Upstash works for all the common usecases for Redis®. You can use
-              Upstash in your serverless stack. In addition, you can use Upstash
-              as storage (or caching) for your serverless functions.
+              DynamoDB can not compete with Upstash on latency. In Upstash the
+              latency of a read query is submillisecond while it is up to 10
+              msec in DynamoDB. Besides latency, you will miss the simplicity
+              and elegance of Redis API much if you are working with DynamoDB.
+              Moreover your investment into the DynamoDB worthies only if you
+              are on AWS meanwhile Redis is everywhere.
             </Text>
-            <CustomLink isExternal>See more</CustomLink>
-          </FaqAccordionItem>
-
-          {/**/}
-
-          <FaqAccordionItem title="When I upgrade my free database, do I lose data?">
             <Text>
-              Upstash works for all the common usecases for Redis®. You can use
-              Upstash in your serverless stack. In addition, you can use Upstash
-              as storage (or caching) for your serverless functions.
+              Fauna's latency is even worse than Dynamodb because they replicate
+              the data to multiple regions in a strongly consistent way. If your
+              use case is very consistency sensitive, then Fauna is good.
+              Otherwise, it is slow and expensive.
             </Text>
-            <CustomLink isExternal>See more</CustomLink>
           </FaqAccordionItem>
 
           {/**/}
         </Accordion>
 
         <Box mt={6}>
-          <CustomLink isExternal color="primary" href="/">
+          <CustomLink isExternal href="/">
             See more FAQs
           </CustomLink>
         </Box>

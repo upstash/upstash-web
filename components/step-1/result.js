@@ -1,30 +1,7 @@
 import { useState, useEffect } from 'react'
-import {
-  Box,
-  Button,
-  VStack,
-  Text,
-  useClipboard,
-  useToast
-} from '@chakra-ui/react'
+import { Box, VStack, useClipboard, useToast } from '@chakra-ui/react'
 import { Label } from '../label'
-import * as Icon from '../icons'
-
-function CopyText({ value, onClick }) {
-  return (
-    <Button
-      as={Text}
-      onClick={() => onClick(value)}
-      userSelect="auto"
-      cursor="pointer"
-      bg="transparent"
-      _hover={{ bg: 'transparent' }}
-    >
-      <Text>{value}</Text>
-      <Box as={Icon.Copy} ml={2} opacity={0.4} />
-    </Button>
-  )
-}
+import CopyText from './copy-text'
 
 function Result({ db }) {
   const toast = useToast()
@@ -40,8 +17,10 @@ function Result({ db }) {
     if (text === '') return
     onCopy()
     toast({
-      description: 'Copied!',
-      position: 'top-right',
+      status: 'success',
+      title: 'Copied!',
+      position: 'top',
+
       duration: 1500
     })
   }, [text])
@@ -52,7 +31,7 @@ function Result({ db }) {
       maxW={600}
       mx="auto"
       p={8}
-      bg="purple.100"
+      bg="purple.200"
       color="black"
       borderRadius="2xl"
     >

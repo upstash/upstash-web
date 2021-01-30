@@ -24,9 +24,11 @@ function SectionWhat() {
             Rails moment of <br />
             Serverless Database
           </Heading>
+          {/*<Container maxW="3xl">*/}
           {/*<Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>*/}
           {/*  Frequently Asked Questions*/}
           {/*</Text>*/}
+          {/*</Container>*/}
         </Box>
 
         <SimpleGrid mt={[10, 20]} columns={[1, 1, 2]} spacing={[6, 8]}>
@@ -36,11 +38,11 @@ function SectionWhat() {
               d="inline-flex"
               w="80px"
               h="80px"
-              color="primary"
+              color="purple.300"
               mb={6}
             />
             <Heading tag="h4" fontSize="2xl">
-              No Ops
+              Serverless
             </Heading>
             <Box mt={4}>
               <Text color="whiteAlpha.600">
@@ -61,7 +63,7 @@ function SectionWhat() {
               d="inline-flex"
               w="80px"
               h="80px"
-              color="primary"
+              color="purple.300"
               mb={6}
             />
             <Heading tag="h4" fontSize="2xl">
@@ -86,7 +88,7 @@ function SectionWhat() {
               d="inline-flex"
               w="80px"
               h="80px"
-              color="primary"
+              color="purple.300"
               mb={6}
             />
             <Heading tag="h4" fontSize="2xl">
@@ -111,7 +113,7 @@ function SectionWhat() {
               d="inline-flex"
               w="80px"
               h="80px"
-              color="primary"
+              color="purple.300"
               mb={6}
             />
             <Heading tag="h4" fontSize="2xl">

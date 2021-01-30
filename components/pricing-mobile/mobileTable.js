@@ -1,5 +1,5 @@
 import { Text, Title } from '../text'
-import { TableCol, TableColTitle } from './table'
+import { TableCol, TableColTitle } from '../section-pricing/table'
 import Button from '../button'
 import { PRICES } from '../../constants'
 import cn from 'classnames'

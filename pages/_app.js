@@ -1,8 +1,6 @@
-import '../styles/variables.css'
 import theme from '../theme'
 import Head from 'next/head'
 import { ChakraProvider, useDisclosure } from '@chakra-ui/react'
-import ReactTooltip from 'react-tooltip'
 import { Auth0Provider } from '@auth0/auth0-react'
 import FontFace from '../components/font-face'
 import Footer from '../components/footer'
@@ -31,12 +29,6 @@ export default function MyApp({ Component, pageProps }) {
         <Footer />
 
         <FontFace />
-        <ReactTooltip
-          className="customTooltip"
-          place="top"
-          type="dark"
-          effect="solid"
-        />
       </ChakraProvider>
     </Auth0Provider>
   )

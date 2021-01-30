@@ -14,10 +14,12 @@ function SectionSupport() {
           <Heading tag="h2" size="2xl">
             Best Choice for Jamstack
           </Heading>
-          <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
-            Low latency data, ease of use and pay-per-request pricing makes
-            Upstash a perfect choice for Jamstack and Serverless world.
-          </Text>
+          <Container maxW="3xl">
+            <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
+              Low latency data, ease of use and pay-per-request pricing makes
+              Upstash a perfect choice for Jamstack and Serverless world.
+            </Text>
+          </Container>
         </Box>
 
         <SimpleGrid mt={[10, 20]} columns={[1, 1, 3]} spacing={6}>

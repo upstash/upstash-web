@@ -21,9 +21,11 @@ function SectionPricing() {
           <Heading tag="h2" size="2xl">
             Plans & Pricing
           </Heading>
-          <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
-            Flexible pricing for all usecases
-          </Text>
+          <Container maxW="3xl">
+            <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
+              Flexible pricing for all usecases
+            </Text>
+          </Container>
         </Box>
 
         <Box mt={[10, 20]}>
@@ -32,14 +34,14 @@ function SectionPricing() {
 
         <VStack spacing={2} mt={14}>
           <Text>
-            Disk storage cost is $0.15 per GB per month for all database types.
+            Disk storage cost is $0.25 per GB per month for all database types.
           </Text>
           <Text>
             See{' '}
             <CustomLink isExternal href="/">
               reserved plans
             </CustomLink>{' '}
-            pricing for high throughput use cases.
+            for high throughput use cases.
           </Text>
           <Text>
             See{' '}

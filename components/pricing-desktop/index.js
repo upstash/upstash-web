@@ -163,8 +163,7 @@ function DesktopTable() {
       </Col>
       <Col highlight style={{ borderRadius: '0 0 16px 16px' }}>
         <Button
-          color="black"
-          bg="primary"
+          colorScheme="purple"
           _hover={{
             textDecoration: 'none'
           }}

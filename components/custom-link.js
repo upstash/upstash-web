@@ -8,8 +8,9 @@ function CustomLink({ isExternal, children, noIcon = false, ...props }) {
       isExternal
       d="inline-flex"
       align="center"
+      color="purple.300"
       _hover={{
-        color: 'primary'
+        color: 'purple.400'
       }}
       {...props}
     >

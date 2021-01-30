@@ -27,9 +27,9 @@ function SectionHero() {
           href="/"
           mt="40px"
           size="lg"
-          color="black"
-          bg="primary"
+          bg="purple.500"
           _hover={{
+            bg: 'purple.600',
             textDecoration: 'none'
           }}
         >
