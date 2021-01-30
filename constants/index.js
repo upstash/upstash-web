@@ -101,10 +101,6 @@ export const HIGHLIGHT_THEME = {
 }
 
 export const SUPPORT_LANG = {
-  REDIS_CLI: {
-    name: 'redis-cli',
-    language: 'bash'
-  },
   NODE_REDIS: {
     name: 'node-redis',
     language: 'javascript'
@@ -128,6 +124,10 @@ export const SUPPORT_LANG = {
   REDIGO: {
     name: 'redigo',
     language: 'go'
+  },
+  REDIS_CLI: {
+    name: 'redis-cli',
+    language: 'bash'
   }
 }
 

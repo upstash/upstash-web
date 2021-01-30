@@ -5,7 +5,7 @@ import Tab from './tab'
 import Editor from './editor'
 
 function Step2({ db }) {
-  const initialLang = SUPPORT_LANG.REDIS_CLI
+  const initialLang = SUPPORT_LANG.NODE_REDIS
   const [name, nameSet] = useState(initialLang.name)
   const [language, languageSet] = useState(initialLang.language)
 

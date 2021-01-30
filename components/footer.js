@@ -76,31 +76,32 @@ function Footer() {
             direction={['column', 'row']}
             align="center"
             spacing={['16px', '24px']}
+            color="whiteAlpha.700"
           >
-            <CustomLink isExternal href="/">
+            <CustomLink href="/" isExternal color="inherit">
               Contact Us
             </CustomLink>
-            <CustomLink isExternal href="/">
+            <CustomLink href="/" isExternal color="inherit">
               Privacy Policy
             </CustomLink>
-            <CustomLink isExternal href="/">
+            <CustomLink href="/" isExternal color="inherit">
               Terms of Service
             </CustomLink>
-            <CustomLink isExternal href="/">
+            <CustomLink href="/" isExternal color="inherit">
               Subcontractors
             </CustomLink>
           </Stack>
 
-          <Grid templateColumns={['1fr', 'repeat(6, 1fr)']} gap="32px">
-            <GridItem colStart={[1, 2]} colEnd={[1, 6]}>
+          <Box w="full">
+            <Container maxW="xl">
               <Text fontSize="xs" color="whiteAlpha.500">
                 * Redis is a trademark of Redis Labs Ltd. Any rights therein are
                 reserved to Redis Labs Ltd. Any use by Lambda Store is for
                 referential purposes only and does not indicate any sponsorship,
                 endorsement or affiliation between Redis and Lambda Store.
               </Text>
-            </GridItem>
-          </Grid>
+            </Container>
+          </Box>
 
           {/*<Button size="lg" onClick={toggleColorMode}>*/}
           {/*  {isDark ? 'Light Theme' : 'Dark Theme'}*/}

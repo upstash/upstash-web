@@ -39,8 +39,8 @@ function SectionDemo(props) {
       <Container maxW="5xl">
         {/* */}
 
-        <VStack spacing={[12, 28]} align="stretch">
-          <VStack spacing={[8, 10]} align="stretch">
+        <VStack spacing={[16, 40]} align="stretch">
+          <VStack spacing={[8, 12]} align="stretch">
             <Header
               number="1"
               title="Create"

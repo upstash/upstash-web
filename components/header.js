@@ -37,11 +37,21 @@ function Header({ onOpen }) {
               spacing="24px"
               justify="center"
             >
-              <CustomLink href="/">Pricing</CustomLink>
-              <CustomLink href="https://docs.lambda.store/" isExternal>
+              <CustomLink href="/" color="inherit">
+                Pricing
+              </CustomLink>
+              <CustomLink
+                href="https://docs.lambda.store/"
+                isExternal
+                color="inherit"
+              >
                 Docs
               </CustomLink>
-              <CustomLink href="https://medium.com/lambda-store" isExternal>
+              <CustomLink
+                href="https://medium.com/lambda-store"
+                isExternal
+                color="inherit"
+              >
                 Blog
               </CustomLink>
             </Stack>
@@ -53,6 +63,7 @@ function Header({ onOpen }) {
               as={CustomLink}
               isExternal
               href="https://console.lambda.store"
+              color="white"
               _hover={{
                 textDecoration: 'none'
               }}
