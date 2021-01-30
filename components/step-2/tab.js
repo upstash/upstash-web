@@ -20,7 +20,7 @@ export default function Tab({ name, onChange }) {
       {Object.keys(SUPPORT_LANG).map((lang) => {
         const SELECTED_LANG = SUPPORT_LANG[lang]
         return (
-          <WrapItem>
+          <WrapItem key={lang}>
             <TabButton
               selectedName={name}
               name={SELECTED_LANG.name}

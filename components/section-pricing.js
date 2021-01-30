@@ -1,9 +1,7 @@
 import { Box, Container, VStack, Text, Heading } from '@chakra-ui/react'
-import Bg from '../bg'
-import MobileTable from './mobileTable'
-import DesktopTable from './desktopTable'
-import CustomLink from '../custom-link'
-import styles from './index.module.css'
+import Bg from './bg'
+import DesktopTable from './pricing-desktop'
+import CustomLink from './custom-link'
 
 function SectionPricing() {
   return (
@@ -29,8 +27,7 @@ function SectionPricing() {
         </Box>
 
         <Box mt={[10, 20]}>
-          <MobileTable className={styles.mobileTable} />
-          <DesktopTable className={styles.desktopTable} />
+          <DesktopTable />
         </Box>
 
         <VStack spacing={2} mt={14}>
