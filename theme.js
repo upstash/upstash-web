@@ -18,6 +18,7 @@ const theme = extendTheme({
       },
       body: {
         bg: '#050505'
+        // color: '#fff'
       }
     }
   },
