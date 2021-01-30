@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Container, Box, VStack } from '@chakra-ui/react'
 import Bg from './bg'
 import Header from './section-demo-header'
@@ -7,6 +8,22 @@ import Step3 from './step-3'
 import { sizes } from '../theme'
 
 function SectionDemo(props) {
+  const [loading, loadingSet] = useState(false)
+  const [db, dbSet] = useState()
+
+  const onCreateDB = async () => {
+    loadingSet(true)
+    const response = await fetch('/api/create', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: ''
+      }),
+      headers: { 'Content-type': 'application/json; charset=UTF-8' }
+    })
+    const data = await response.json()
+    dbSet(data)
+  }
+
   return (
     <Box
       as="section"
@@ -30,7 +47,7 @@ function SectionDemo(props) {
               desc="Create your database in seconds."
             />
             <Box>
-              <Step1 />
+              <Step1 db={db} loading={loading} onCreateDB={onCreateDB} />
             </Box>
           </VStack>
 
@@ -41,7 +58,7 @@ function SectionDemo(props) {
               desc="Connect with any Redis client from anywhere."
             />
             <Box>
-              <Step2 />
+              <Step2 db={db} />
             </Box>
           </VStack>
 

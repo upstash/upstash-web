@@ -4,7 +4,7 @@ import { SUPPORT_LANG } from '../../constants'
 import Tab from './tab'
 import Editor from './editor'
 
-function Step2() {
+function Step2({ db }) {
   const initialLang = SUPPORT_LANG.REDIS_CLI
   const [name, nameSet] = useState(initialLang.name)
   const [language, languageSet] = useState(initialLang.language)
@@ -19,7 +19,7 @@ function Step2() {
       <Tab name={name} onChange={onChange} />
 
       <Box mt={4} p={6} bg="whiteAlpha.200" borderRadius="xl">
-        <Editor name={name} language={language} />
+        <Editor db={db} name={name} language={language} />
       </Box>
     </Box>
   )

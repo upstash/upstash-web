@@ -1,7 +1,9 @@
 import SyntaxHighlighter from 'react-syntax-highlighter'
 import { codeGernerator, HIGHLIGHT_THEME } from '../../constants'
 
-export default function Editor({ name, language }) {
+export default function Editor({ db, name, language }) {
+  const CODE = codeGernerator(name, db)
+
   return (
     <SyntaxHighlighter
       language={language}
@@ -11,7 +13,7 @@ export default function Editor({ name, language }) {
       }}
       style={HIGHLIGHT_THEME}
     >
-      {codeGernerator(name)}
+      {CODE}
     </SyntaxHighlighter>
   )
 }

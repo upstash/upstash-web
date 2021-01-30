@@ -134,22 +134,22 @@ export const SUPPORT_LANG = {
 export function codeGernerator(
   name,
   db = {
-    host: 'DATABASE-ENDPOINT',
+    endpoint: 'DATABASE-ENDPOINT',
     port: 'DATABASE-PORT',
     password: 'DATABASE-PASSWORD'
   }
 ) {
-  const { host, port, password } = db
+  const { endpoint, port, password } = db
 
   switch (name) {
     case SUPPORT_LANG.REDIS_CLI.name:
-      return `redis-cli -u redis://${password}@${host}:${port}`
+      return `redis-cli -u redis://${password}@${endpoint}:${port}`
 
     case SUPPORT_LANG.NODE_REDIS.name:
       return `const redis = require("redis");
 
 var client = redis.createClient ({
-  host : '${host}',
+  host : '${endpoint}',
   port : '${port}',
   password: '${password}'
 });
@@ -162,13 +162,13 @@ client.set('foo','bar');`
 
     case SUPPORT_LANG.IO_REDIS.name:
       return `const Redis = require("ioredis");
-let client = new Redis("redis://:${password}@${host}:${port}");
+let client = new Redis("redis://:${password}@${endpoint}:${port}");
 client.set('foo', 'bar');`
 
     case SUPPORT_LANG.REDIS_PY.name:
       return `import redis
 r = redis.Redis(
-  host= '${host}',
+  host= '${endpoint}',
   port= '${port}',
   password= '${password}')
 r.set('foo','bar')
@@ -176,7 +176,7 @@ print(r.get('foo'))`
 
     case SUPPORT_LANG.JEDIS.name:
       return `public static void main(String[] args) {
-  Jedis jedis = new Jedis("${host}", ${port});
+  Jedis jedis = new Jedis("${endpoint}", ${port});
   jedis.auth("${password}");
   jedis.set("foo", "bar");
   String value = jedis.get("foo");
@@ -186,7 +186,7 @@ print(r.get('foo'))`
       return `var ctx = context.Background()
 
 func main() {
-  opt, _ := redis.ParseURL("redis://:${password}@${host}:${port}")
+  opt, _ := redis.ParseURL("redis://:${password}@${endpoint}:${port}")
   client := redis.NewClient(opt)
   client.Set(ctx, "foo", "bar", 0)
   val := client.Get(ctx, "foo").Val()

@@ -1,27 +1,9 @@
 import { Box } from '@chakra-ui/react'
-import { useState } from 'react'
 
 import Result from './result'
 import Form from './form'
 
-function Step1() {
-  const [loading, loadingSet] = useState(false)
-  const [db, dbSet] = useState(null)
-
-  const onCreateDB = async () => {
-    loadingSet(true)
-    const response = await fetch('/api/create', {
-      method: 'POST',
-      body: JSON.stringify({
-        name: ''
-      }),
-      headers: { 'Content-type': 'application/json; charset=UTF-8' }
-    })
-    const data = await response.json()
-    // console.log(data)
-    dbSet(data)
-  }
-
+function Step1({ db, loading, onCreateDB }) {
   return (
     <Box>
       {db ? (
