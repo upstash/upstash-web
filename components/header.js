@@ -29,7 +29,7 @@ function Header({ onOpen }) {
             colSpan={2}
             d={['none', 'flex']}
             justifyContent="center"
-            color="whiteAlpha.600"
+            color="whiteAlpha.700"
           >
             <Stack
               as="nav"

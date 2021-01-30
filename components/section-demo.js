@@ -1,9 +1,9 @@
 import { Container, Box, VStack } from '@chakra-ui/react'
 import Bg from './bg'
 import Header from './section-demo-header'
-import Step1 from './section-demo-step-1'
-import Step2 from './section-demo-step-2'
-import Step3 from './section-demo-step-3'
+import Step1 from './step-1'
+import Step2 from './step-2'
+import Step3 from './step-3'
 import { sizes } from '../theme'
 
 function SectionDemo(props) {
@@ -22,7 +22,7 @@ function SectionDemo(props) {
       <Container maxW="5xl">
         {/* */}
 
-        <VStack spacing={[12, 20]} align="stretch">
+        <VStack spacing={[12, 28]} align="stretch">
           <VStack spacing={[8, 10]} align="stretch">
             <Header
               number="1"

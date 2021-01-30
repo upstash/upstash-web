@@ -18,7 +18,7 @@ function SectionHero() {
           for Redis
         </Heading>
 
-        <Box mt="24px" fontSize={['md', '2xl']} color="whiteAlpha.600">
+        <Box mt="24px" fontSize={['md', '2xl']} color="whiteAlpha.700">
           <Text>Fast. Simple. Serverless.</Text>
         </Box>
 

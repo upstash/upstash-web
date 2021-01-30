@@ -40,6 +40,7 @@ export default function Logo() {
     >
       <LogoIcon />
       <Text
+        as="span"
         ml={2}
         fontWeight="semibold"
         fontSize="1.4rem"

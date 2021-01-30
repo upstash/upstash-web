@@ -7,7 +7,7 @@ import {
 } from 'unique-names-generator'
 import { useEffect } from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
-import { Label } from '../form'
+import { Label } from '../label'
 import User from './user'
 import Error from './error'
 

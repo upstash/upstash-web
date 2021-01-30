@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-function SvgLogOut(props) {
+function SvgCopy(props) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -12,12 +12,13 @@ function SvgLogOut(props) {
       strokeWidth={1.5}
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="log-out_svg__feather log-out_svg__feather-log-out"
+      className="copy_svg__feather copy_svg__feather-copy"
       {...props}
     >
-      <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" />
+      <rect x={9} y={9} width={13} height={13} rx={2} ry={2} />
+      <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
     </svg>
   )
 }
 
-export default SvgLogOut
+export default SvgCopy

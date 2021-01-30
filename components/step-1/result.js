@@ -1,27 +1,58 @@
-import { Box, VStack, useClipboard } from '@chakra-ui/react'
-import { Label } from '../form'
+import { useState, useEffect } from 'react'
+import { Box, Button, VStack, Text, useClipboard } from '@chakra-ui/react'
+import { Label } from '../label'
+import * as Icon from '../icons'
+
+function CopyText({ value, onClick }) {
+  return (
+    <Button
+      as={Text}
+      onClick={() => onClick(value)}
+      userSelect="auto"
+      bg="transparent"
+      _hover={{ bg: 'transparent' }}
+    >
+      <Text>{value}</Text>
+      <Box as={Icon.Copy} ml={2} opacity={0.4} />
+    </Button>
+  )
+}
 
 function Result({ db }) {
-  const { hasCopied, onCopy } = useClipboard('')
+  const [text, textSet] = useState(null)
+  const { onCopy } = useClipboard(text)
+
+  useEffect(() => {
+    if (text === null) return
+    onCopy()
+  }, [text])
 
   return (
-    <Box bg="whiteAlpha.500" color="black">
-      <VStack gap={8}>
+    <Box
+      w="full"
+      maxW={600}
+      mx="auto"
+      p={8}
+      bg="purple.100"
+      color="black"
+      borderRadius="2xl"
+    >
+      <VStack spacing={4}>
         <Box>
-          <Label>endpoint</Label>
-          <Box>{db.endpoint}</Box>
+          <Label>Endpoint</Label>
+          <CopyText value={db.endpoint} onClick={(value) => textSet(value)} />
         </Box>
         <Box>
-          <Label>password</Label>
-          <Box>{db.password}</Box>
+          <Label>Password</Label>
+          <CopyText value={db.password} onClick={(value) => textSet(value)} />
         </Box>
         <Box>
           <Label>Region</Label>
-          <Box>{db.region}</Box>
+          <CopyText value={db.region} onClick={(value) => textSet(value)} />
         </Box>
         <Box>
           <Label>port</Label>
-          <Box>{db.port}</Box>
+          <CopyText value={db.port} onClick={(value) => textSet(value)} />
         </Box>
       </VStack>
     </Box>

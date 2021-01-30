@@ -1,8 +1,8 @@
 import { Box } from '@chakra-ui/react'
 import { useState } from 'react'
 
-import Result from './step-1/result'
-import Form from './step-1/form'
+import Result from './result'
+import Form from './form'
 
 function Step1() {
   const [loading, loadingSet] = useState(false)

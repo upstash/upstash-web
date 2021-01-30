@@ -3,7 +3,7 @@ import { Box } from '@chakra-ui/react'
 // import StoreContext from '../../store'
 import SyntaxHighlighter from 'react-syntax-highlighter'
 // import { atomOneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism'
-import { HIGHLIGHT_THEME } from '../constants'
+import { HIGHLIGHT_THEME } from '../../constants'
 
 const Component = () => {
   // const store = useContext(StoreContext)

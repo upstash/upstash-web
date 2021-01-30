@@ -1,5 +1,6 @@
 export { default as ArrowUpRight } from './ArrowUpRight'
 export { default as Check } from './Check'
+export { default as Copy } from './Copy'
 export { default as Devto } from './Devto'
 export { default as Gitter } from './Gitter'
 export { default as Info } from './Info'
