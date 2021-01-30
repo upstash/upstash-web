@@ -1,45 +1,26 @@
+import { useState } from 'react'
 import { Box } from '@chakra-ui/react'
-// import { useContext } from 'react'
-// import StoreContext from '../../store'
-import SyntaxHighlighter from 'react-syntax-highlighter'
-// import { atomOneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism'
-import { HIGHLIGHT_THEME } from '../../constants'
-
-const Component = () => {
-  // const store = useContext(StoreContext)
-
-  const codeString = `const redis = require("redis");
-
-var client = redis.createClient ({
-  host : 'DATABASE-ENDPOINT',
-  port : 'DATABASE-PORT',
-  password: 'DATABASE-PASSWORD'
-});
-
-client.on("error", function(err) {
-  throw err;
-});
-
-client.set('foo','bar');`
-
-  return (
-    <SyntaxHighlighter
-      language="javascript"
-      showLineNumbers
-      lineNumberStyle={{
-        color: '#555'
-      }}
-      style={HIGHLIGHT_THEME}
-    >
-      {codeString}
-    </SyntaxHighlighter>
-  )
-}
+import { SUPPORT_LANG } from '../../constants'
+import Tab from './tab'
+import Editor from './editor'
 
 function Step2() {
+  const initialLang = SUPPORT_LANG.REDIS_CLI
+  const [name, nameSet] = useState(initialLang.name)
+  const [language, languageSet] = useState(initialLang.language)
+
+  const onChange = (name, language) => {
+    nameSet(name)
+    languageSet(language)
+  }
+
   return (
     <Box w="full" maxW={800} mx="auto">
-      <Component />
+      <Tab name={name} onChange={onChange} />
+
+      <Box mt={4} p={6} bg="whiteAlpha.200" borderRadius="xl">
+        <Editor name={name} language={language} />
+      </Box>
     </Box>
   )
 }
