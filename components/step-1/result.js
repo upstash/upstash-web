@@ -1,5 +1,12 @@
 import { useState, useEffect } from 'react'
-import { Box, Button, VStack, Text, useClipboard } from '@chakra-ui/react'
+import {
+  Box,
+  Button,
+  VStack,
+  Text,
+  useClipboard,
+  useToast
+} from '@chakra-ui/react'
 import { Label } from '../label'
 import * as Icon from '../icons'
 
@@ -9,6 +16,7 @@ function CopyText({ value, onClick }) {
       as={Text}
       onClick={() => onClick(value)}
       userSelect="auto"
+      cursor="pointer"
       bg="transparent"
       _hover={{ bg: 'transparent' }}
     >
@@ -19,12 +27,23 @@ function CopyText({ value, onClick }) {
 }
 
 function Result({ db }) {
-  const [text, textSet] = useState(null)
+  const toast = useToast()
+
+  const [text, textSet] = useState('')
   const { onCopy } = useClipboard(text)
 
+  const onClick = (value) => {
+    textSet(value)
+  }
+
   useEffect(() => {
-    if (text === null) return
+    if (text === '') return
     onCopy()
+    toast({
+      description: 'Copied!',
+      position: 'top-right',
+      duration: 1500
+    })
   }, [text])
 
   return (
@@ -40,19 +59,19 @@ function Result({ db }) {
       <VStack spacing={4}>
         <Box>
           <Label>Endpoint</Label>
-          <CopyText value={db.endpoint} onClick={(value) => textSet(value)} />
+          <CopyText value={db.endpoint} onClick={onClick} />
         </Box>
         <Box>
           <Label>Password</Label>
-          <CopyText value={db.password} onClick={(value) => textSet(value)} />
+          <CopyText value={db.password} onClick={onClick} />
         </Box>
         <Box>
           <Label>Region</Label>
-          <CopyText value={db.region} onClick={(value) => textSet(value)} />
+          <CopyText value={db.region} onClick={onClick} />
         </Box>
         <Box>
           <Label>port</Label>
-          <CopyText value={db.port} onClick={(value) => textSet(value)} />
+          <CopyText value={db.port} onClick={onClick} />
         </Box>
       </VStack>
     </Box>
