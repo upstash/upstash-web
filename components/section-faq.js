@@ -25,7 +25,7 @@ function SectionFaq() {
           </Container>
         </Box>
 
-        <Accordion mt={[10, 20]}>
+        <Accordion defaultIndex={0} mt={[10, 20]}>
           {/**/}
 
           <FaqAccordionItem title="What does it mean Serverless Database?">
