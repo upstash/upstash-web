@@ -3,6 +3,7 @@ import CustomLink from './custom-link'
 import SectionWhatIcon1 from './section-what-icon-1'
 import SectionWhatIcon2 from './section-what-icon-2'
 import SectionWhatIcon3 from './section-what-icon-3'
+import SectionWhatIcon4 from './section-what-icon-4'
 import Bg from './bg'
 
 function SectionWhat() {
@@ -24,11 +25,6 @@ function SectionWhat() {
             Rails moment of <br />
             Serverless Database
           </Heading>
-          {/*<Container maxW="3xl">*/}
-          {/*<Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>*/}
-          {/*  Frequently Asked Questions*/}
-          {/*</Text>*/}
-          {/*</Container>*/}
         </Box>
 
         <SimpleGrid mt={[10, 20]} columns={[1, 1, 2]} spacing={[6, 8]}>
@@ -38,7 +34,7 @@ function SectionWhat() {
               d="inline-flex"
               w="80px"
               h="80px"
-              color="purple.300"
+              color="purple.200"
               mb={6}
             />
             <Heading tag="h4" fontSize={['xl', '2xl']}>
@@ -63,7 +59,7 @@ function SectionWhat() {
               d="inline-flex"
               w="80px"
               h="80px"
-              color="purple.300"
+              color="purple.200"
               mb={6}
             />
             <Heading tag="h4" fontSize={['xl', '2xl']}>
@@ -88,7 +84,7 @@ function SectionWhat() {
               d="inline-flex"
               w="80px"
               h="80px"
-              color="purple.300"
+              color="purple.200"
               mb={6}
             />
             <Heading tag="h4" fontSize={['xl', '2xl']}>
@@ -109,11 +105,11 @@ function SectionWhat() {
 
           <Box bg="whiteAlpha.100" borderRadius="2xl" p={10}>
             <Box
-              as={SectionWhatIcon3}
+              as={SectionWhatIcon4}
               d="inline-flex"
               w="80px"
               h="80px"
-              color="purple.300"
+              color="purple.200"
               mb={6}
             />
             <Heading tag="h4" fontSize={['xl', '2xl']}>
