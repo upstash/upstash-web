@@ -62,22 +62,12 @@ function Footer() {
             <IconButton
               as={Link}
               isExternal
-              href={SOCIAL_LINKS.devto}
+              href={SOCIAL_LINKS.discord}
               size="lg"
               isRound
-              aria-label="Upstash on Dev.to"
+              aria-label="Upstash on Discord"
             >
-              <Box as={Icon.Devto} fontSize={20} />
-            </IconButton>
-            <IconButton
-              as={Link}
-              isExternal
-              href={SOCIAL_LINKS.gitter}
-              size="lg"
-              isRound
-              aria-label="Upstash on Gitter"
-            >
-              <Box as={Icon.Gitter} fontSize={20} />
+              <Box as={Icon.Discord} fontSize={20} />
             </IconButton>
           </HStack>
 

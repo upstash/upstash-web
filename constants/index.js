@@ -20,8 +20,7 @@ export const LINKS = {
 export const SOCIAL_LINKS = {
   medium: 'https://medium.com/upstash',
   twitter: 'https://twitter.com/Lambda__Store',
-  devto: 'https://dev.to/lambdastore',
-  gitter: 'https://gitter.im/LambdaStore/community'
+  discord: 'https://dev.to/lambdastore'
 }
 
 export const PRICES = {
