@@ -45,6 +45,7 @@ function Form({ auth0, loading, onCreateDB }) {
       <VStack spacing={1} mt={4} align="stretch">
         <Label htmlFor="db-region">Region</Label>
         <Select
+          id="db-region"
           defaultValue="us-east-1"
           variant="filled"
           bg="whiteAlpha.300"

@@ -5,6 +5,7 @@ import SectionWhatIcon2 from './section-what-icon-2'
 import SectionWhatIcon3 from './section-what-icon-3'
 import SectionWhatIcon4 from './section-what-icon-4'
 import Bg from './bg'
+import { LINKS } from '../constants'
 
 function SectionWhat() {
   return (
@@ -49,7 +50,9 @@ function SectionWhat() {
               </Text>
             </Box>
             <Box mt={4}>
-              <CustomLink isExternal>See more</CustomLink>
+              <CustomLink isExternal href={LINKS.serverless}>
+                See more
+              </CustomLink>
             </Box>
           </Box>
 
@@ -74,7 +77,9 @@ function SectionWhat() {
               </Text>
             </Box>
             <Box mt={4}>
-              <CustomLink isExternal>See more</CustomLink>
+              <CustomLink isExternal href={LINKS.compare}>
+                See more
+              </CustomLink>
             </Box>
           </Box>
 
@@ -99,7 +104,9 @@ function SectionWhat() {
               </Text>
             </Box>
             <Box mt={4}>
-              <CustomLink isExternal>See more</CustomLink>
+              <CustomLink isExternal href={LINKS.pricing}>
+                See more
+              </CustomLink>
             </Box>
           </Box>
 
@@ -124,7 +131,9 @@ function SectionWhat() {
               </Text>
             </Box>
             <Box mt={4}>
-              <CustomLink isExternal>See more</CustomLink>
+              <CustomLink isExternal href={LINKS.redisCompatibility}>
+                See more
+              </CustomLink>
             </Box>
           </Box>
         </SimpleGrid>

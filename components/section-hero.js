@@ -1,4 +1,5 @@
 import { Link, Container, Button, Box, Heading, Text } from '@chakra-ui/react'
+import { LINKS } from '../constants'
 
 function SectionHero() {
   return (
@@ -24,7 +25,7 @@ function SectionHero() {
 
         <Button
           as={Link}
-          href="/"
+          href={LINKS.console}
           mt="40px"
           size="lg"
           bg="purple.500"

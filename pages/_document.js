@@ -27,8 +27,10 @@ class MyDocument extends Document {
 
           {/* base */}
           <meta charSet="utf-8" />
+          <meta name="robots" content="follow, index" />
           <meta httpEquiv="x-ua-compatible" content="ie=edge" />
           <meta name="description" content={meta.description} />
+          <link rel="canonical" href={meta.url} />
 
           {/* facebook */}
           <meta property="og:url" content={meta.url} />
@@ -45,11 +47,6 @@ class MyDocument extends Document {
           {/* icons */}
 
           <link href="/static/icons/site.webmanifest" rel="manifest" />
-          <link
-            rel="preconnect"
-            href="https://cdn.usefathom.com"
-            crossOrigin=""
-          />
           <link
             href="/static/icons/apple-touch-icon.png"
             rel="apple-touch-icon"

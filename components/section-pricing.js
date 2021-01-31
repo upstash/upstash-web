@@ -2,11 +2,13 @@ import { Box, Container, VStack, Text, Heading } from '@chakra-ui/react'
 import Bg from './bg'
 import DesktopTable from './pricing-desktop'
 import CustomLink from './custom-link'
+import { LINKS } from '../constants'
 
 function SectionPricing() {
   return (
     <Box
       as="section"
+      id="section-pricing"
       pos="relative"
       overflow="hidden"
       py={['100px', '140px']}
@@ -38,14 +40,14 @@ function SectionPricing() {
           </Text>
           <Text>
             See{' '}
-            <CustomLink isExternal href="/">
+            <CustomLink isExternal href={LINKS.reservedPricing}>
               reserved plans
             </CustomLink>{' '}
             for high throughput use cases.
           </Text>
           <Text>
             See{' '}
-            <CustomLink isExternal href="/">
+            <CustomLink isExternal href={LINKS.databaseTypes}>
               database types
             </CustomLink>{' '}
             for more information on databases.

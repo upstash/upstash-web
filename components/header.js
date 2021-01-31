@@ -10,6 +10,7 @@ import {
 import CustomLink from './custom-link'
 import * as Icon from './icons'
 import Logo from './logo'
+import { LINKS, SOCIAL_LINKS } from '../constants'
 
 function Header({ onOpen }) {
   return (
@@ -37,21 +38,13 @@ function Header({ onOpen }) {
               spacing="24px"
               justify="center"
             >
-              <CustomLink href="/" color="inherit">
+              <CustomLink href="#section-pricing" color="inherit">
                 Pricing
               </CustomLink>
-              <CustomLink
-                href="https://docs.lambda.store/"
-                isExternal
-                color="inherit"
-              >
+              <CustomLink isExternal href={LINKS.docs} color="inherit">
                 Docs
               </CustomLink>
-              <CustomLink
-                href="https://medium.com/lambda-store"
-                isExternal
-                color="inherit"
-              >
+              <CustomLink isExternal href={SOCIAL_LINKS.medium} color="inherit">
                 Blog
               </CustomLink>
             </Stack>
@@ -61,8 +54,7 @@ function Header({ onOpen }) {
           <GridItem d={['none', 'flex']} justifyContent="flex-end">
             <Button
               as={CustomLink}
-              isExternal
-              href="https://console.lambda.store"
+              href={LINKS.console}
               color="white"
               _hover={{
                 textDecoration: 'none'

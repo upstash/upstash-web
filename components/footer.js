@@ -14,6 +14,7 @@ import CustomLink from './custom-link'
 import Bg from './bg'
 import * as Icon from './icons'
 import Logo from './logo'
+import { LINKS, SOCIAL_LINKS } from '../constants'
 
 function Footer() {
   // const { colorMode, toggleColorMode } = useColorMode()
@@ -40,6 +41,8 @@ function Footer() {
           <HStack spacing="16px">
             <IconButton
               as={Link}
+              isExternal
+              href={SOCIAL_LINKS.twitter}
               size="lg"
               isRound
               aria-label="Upstash on Twitter"
@@ -48,25 +51,31 @@ function Footer() {
             </IconButton>
             <IconButton
               as={Link}
+              isExternal
+              href={SOCIAL_LINKS.medium}
               size="lg"
               isRound
-              aria-label="Upstash on Twitter"
+              aria-label="Upstash on Medium"
             >
               <Box as={Icon.Medium} fontSize={20} />
             </IconButton>
             <IconButton
               as={Link}
+              isExternal
+              href={SOCIAL_LINKS.devto}
               size="lg"
               isRound
-              aria-label="Upstash on Twitter"
+              aria-label="Upstash on Dev.to"
             >
               <Box as={Icon.Devto} fontSize={20} />
             </IconButton>
             <IconButton
               as={Link}
+              isExternal
+              href={SOCIAL_LINKS.gitter}
               size="lg"
               isRound
-              aria-label="Upstash on Twitter"
+              aria-label="Upstash on Gitter"
             >
               <Box as={Icon.Gitter} fontSize={20} />
             </IconButton>
@@ -78,16 +87,16 @@ function Footer() {
             spacing={['16px', '24px']}
             color="whiteAlpha.700"
           >
-            <CustomLink href="/" isExternal color="inherit">
+            <CustomLink isExternal href={LINKS.support} color="inherit">
               Contact Us
             </CustomLink>
-            <CustomLink href="/" isExternal color="inherit">
+            <CustomLink isExternal href={LINKS.privacy} color="inherit">
               Privacy Policy
             </CustomLink>
-            <CustomLink href="/" isExternal color="inherit">
+            <CustomLink isExternal href={LINKS.terms} color="inherit">
               Terms of Service
             </CustomLink>
-            <CustomLink href="/" isExternal color="inherit">
+            <CustomLink isExternal href={LINKS.subcontractors} color="inherit">
               Subcontractors
             </CustomLink>
           </Stack>

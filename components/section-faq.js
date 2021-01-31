@@ -1,6 +1,7 @@
 import { Container, Heading, Text, Box, Accordion } from '@chakra-ui/react'
 import FaqAccordionItem from './section-faq-accordion-item'
 import CustomLink from './custom-link'
+import { LINKS } from '../constants'
 
 function SectionFaq() {
   return (
@@ -77,7 +78,7 @@ function SectionFaq() {
         </Accordion>
 
         <Box mt={6}>
-          <CustomLink isExternal href="/">
+          <CustomLink isExternal href={LINKS.faq}>
             See more FAQs
           </CustomLink>
         </Box>

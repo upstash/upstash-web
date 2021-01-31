@@ -1,3 +1,29 @@
+export const LINKS = {
+  docs: 'https://docs.lambda.store/',
+  console: 'https://console.lambda.store',
+  support: 'https://docs.lambda.store/docs/help/support',
+  privacy: 'https://lambda.store/terms/privacy.html',
+  terms: 'https://lambda.store/terms/terms.html',
+  subcontractors: 'https://lambda.store/terms/subcontractors.html',
+  serverless:
+    'https://docs.lambda.store/docs/overall/compare/#what-makes-lambda-store-different',
+  compare: 'https://docs.lambda.store/docs/overall/compare/',
+  pricing: 'https://docs.lambda.store/docs/account/pricing/',
+  redisCompatibility:
+    'https://docs.lambda.store/docs/overall/rediscompatibility/',
+  reservedPricing:
+    'https://docs.lambda.store/docs/account/pricing#reserved-pricing',
+  databaseTypes: 'https://docs.lambda.store/docs/overall/databasetypes',
+  faq: 'https://docs.lambda.store/docs/help/faq'
+}
+
+export const SOCIAL_LINKS = {
+  medium: 'https://medium.com/upstash',
+  twitter: 'https://twitter.com/Lambda__Store',
+  devto: 'https://dev.to/lambdastore',
+  gitter: 'https://gitter.im/LambdaStore/community'
+}
+
 export const PRICES = {
   commandsLimit: {
     title: 'Commands Limit',
