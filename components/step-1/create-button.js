@@ -1,10 +1,9 @@
 import { Box, VStack, Button, Spinner } from '@chakra-ui/react'
 import { useEffect } from 'react'
-import { useAuth0 } from '@auth0/auth0-react'
 import User from './user'
 import Error from './error'
 
-export default function CreateButton({ loading, onCreateDB }) {
+export default function CreateButton({ auth0, loading, onCreateDB }) {
   const {
     isLoading,
     isAuthenticated,
@@ -13,7 +12,7 @@ export default function CreateButton({ loading, onCreateDB }) {
     loginWithPopup,
     logout,
     getIdTokenClaims
-  } = useAuth0()
+  } = auth0
 
   useEffect(() => {
     async function getToken() {

@@ -1,9 +1,11 @@
-import { Box, Text } from '@chakra-ui/react'
+import { Box, Button } from '@chakra-ui/react'
 
 function Step3() {
   return (
     <Box>
-      <Text>Deneme</Text>
+      <Button colorScheme="purple" size="lg">
+        Go to Console
+      </Button>
     </Box>
   )
 }

@@ -6,8 +6,11 @@ import Step1 from './step-1'
 import Step2 from './step-2'
 import Step3 from './step-3'
 import { sizes } from '../theme'
+import { useAuth0 } from '@auth0/auth0-react'
 
 function SectionDemo(props) {
+  const auth0 = useAuth0()
+
   const [loading, loadingSet] = useState(false)
   const [db, dbSet] = useState()
 
@@ -39,7 +42,7 @@ function SectionDemo(props) {
       <Container maxW="5xl">
         {/* */}
 
-        <VStack spacing={[20, 40]} align="stretch">
+        <VStack spacing={[20, 32]} align="stretch">
           <VStack spacing={[8, 12]} align="stretch">
             <Header
               number="1"
@@ -47,7 +50,12 @@ function SectionDemo(props) {
               desc="Create your database in seconds."
             />
             <Box>
-              <Step1 db={db} loading={loading} onCreateDB={onCreateDB} />
+              <Step1
+                auth0={auth0}
+                db={db}
+                loading={loading}
+                onCreateDB={onCreateDB}
+              />
             </Box>
           </VStack>
 
@@ -62,12 +70,18 @@ function SectionDemo(props) {
             </Box>
           </VStack>
 
-          <VStack spacing={[8, 12]} align="stretch">
-            <Header number="3" title="And More" />
-            <Box>
-              <Step3 />
-            </Box>
-          </VStack>
+          {db && (
+            <VStack spacing={[8, 12]} align="stretch">
+              <Header
+                number="3"
+                title="And More"
+                desc="The console awaits you for more"
+              />
+              <Box>
+                <Step3 />
+              </Box>
+            </VStack>
+          )}
         </VStack>
 
         {/*  */}

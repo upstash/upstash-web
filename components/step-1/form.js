@@ -16,7 +16,7 @@ const databaseNameConfig = {
 
 const DB_NAME = uniqueNamesGenerator(databaseNameConfig)
 
-function Form({ loading, onCreateDB }) {
+function Form({ auth0, loading, onCreateDB }) {
   return (
     <Box
       mx="auto"
@@ -67,7 +67,7 @@ function Form({ loading, onCreateDB }) {
 
       {/* create */}
       <Box mt={6}>
-        <CreateButton loading={loading} onCreateDB={onCreateDB} />
+        <CreateButton auth0={auth0} loading={loading} onCreateDB={onCreateDB} />
       </Box>
     </Box>
   )

@@ -16,12 +16,12 @@ function SectionDemoHeader({ number, title, desc }) {
         </Text>
       </Flex>
 
-      <Heading tag="h4" fontSize="2xl" mt={2}>
+      <Heading tag="h4" fontSize="2xl" mt={3}>
         {title}
       </Heading>
 
       {desc && (
-        <Text fontSize={['md', 'xl']} color="whiteAlpha.700" mt={3}>
+        <Text fontSize={['md', 'xl']} color="whiteAlpha.700" mt={1}>
           {desc}
         </Text>
       )}
