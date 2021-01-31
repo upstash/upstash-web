@@ -17,6 +17,7 @@
     "preact": "^10.5.12",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
+    "react-dom-confetti": "^0.2.0",
     "react-syntax-highlighter": "^15.4.3",
     "unique-names-generator": "^4.3.1"
   },

@@ -28,9 +28,9 @@ function SectionHero() {
           href={LINKS.console}
           mt="40px"
           size="lg"
-          bg="purple.500"
+          color="black"
+          bg="primary"
           _hover={{
-            bg: 'purple.600',
             textDecoration: 'none'
           }}
         >

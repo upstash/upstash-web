@@ -13,9 +13,9 @@ function CustomLink({
       isExternal={isExternal}
       d="inline-flex"
       align="center"
-      color="purple.300"
+      color="primary"
       _hover={{
-        color: 'purple.400'
+        color: 'primary'
       }}
       {...props}
     >

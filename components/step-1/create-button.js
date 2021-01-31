@@ -36,8 +36,10 @@ export default function CreateButton({ auth0, loading, onCreateDB }) {
           <User logout={logout} {...user} />
 
           <Button
-            colorScheme="purple"
             w="full"
+            color="black"
+            bg="primary"
+            _hover={{}}
             isLoading={loading}
             onClick={onCreateDB}
           >
@@ -45,7 +47,13 @@ export default function CreateButton({ auth0, loading, onCreateDB }) {
           </Button>
         </VStack>
       ) : (
-        <Button colorScheme="purple" w="full" onClick={loginWithPopup}>
+        <Button
+          w="full"
+          color="black"
+          bg="primary"
+          _hover={{}}
+          onClick={loginWithPopup}
+        >
           Login and Create
         </Button>
       )}
