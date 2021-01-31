@@ -5,7 +5,11 @@ function TabButton({ selectedName, name, language, onChange, children }) {
   return (
     <Button
       size="sm"
-      colorScheme={selectedName === name ? 'purple' : null}
+      color={selectedName === name ? 'black' : null}
+      bg={selectedName === name ? 'primary' : null}
+      _hover={{
+        color: selectedName === name ? 'black' : null
+      }}
       variant={selectedName === name ? 'solid' : 'outline'}
       onClick={() => onChange(name, language)}
     >

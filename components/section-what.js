@@ -35,7 +35,7 @@ function SectionWhat() {
               d="inline-flex"
               w="80px"
               h="80px"
-              color="purple.200"
+              color="whiteAlpha.800"
               mb={6}
             />
             <Heading tag="h4" fontSize={['xl', '2xl']}>
@@ -62,7 +62,7 @@ function SectionWhat() {
               d="inline-flex"
               w="80px"
               h="80px"
-              color="purple.200"
+              color="whiteAlpha.800"
               mb={6}
             />
             <Heading tag="h4" fontSize={['xl', '2xl']}>
@@ -89,7 +89,7 @@ function SectionWhat() {
               d="inline-flex"
               w="80px"
               h="80px"
-              color="purple.200"
+              color="whiteAlpha.800"
               mb={6}
             />
             <Heading tag="h4" fontSize={['xl', '2xl']}>
@@ -116,7 +116,7 @@ function SectionWhat() {
               d="inline-flex"
               w="80px"
               h="80px"
-              color="purple.200"
+              color="whiteAlpha.800"
               mb={6}
             />
             <Heading tag="h4" fontSize={['xl', '2xl']}>

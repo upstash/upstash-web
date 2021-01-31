@@ -5,10 +5,11 @@ function Step3() {
   return (
     <Box>
       <Button
-        colorScheme="purple"
         size="lg"
         as={Link}
         href={LINKS.console}
+        color="black"
+        bg="primary"
         _hover={{
           textDecoration: 'none'
         }}
