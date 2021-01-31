@@ -3,6 +3,7 @@ import { PRICES } from '../../constants'
 import Col from './col'
 import ColCheck from './col-check'
 import ColDescription from './col-description'
+import CustomTooltip from './col-tooltip'
 
 function DesktopTable() {
   return (
@@ -11,17 +12,17 @@ function DesktopTable() {
 
       <Col />
       <Col>
-        <Heading tag="h5" size="lg">
+        <Heading tag="h5" fontSize="2xl">
           Free
         </Heading>
       </Col>
       <Col highlight style={{ borderRadius: '16px 16px 0 0' }}>
-        <Heading tag="h5" size="lg">
+        <Heading tag="h5" fontSize="2xl">
           Standard
         </Heading>
       </Col>
       <Col>
-        <Heading tag="h5" size="lg">
+        <Heading tag="h5" fontSize="2xl">
           Premium
         </Heading>
       </Col>
@@ -30,8 +31,11 @@ function DesktopTable() {
         <Box height="1px" bg="whiteAlpha.100" />
       </GridItem>
 
-      <ColDescription tooltip="Deneme olsun bu">
-        <Text as="span">{PRICES.commandsLimit.title}</Text>
+      <ColDescription>
+        <Text as="span">
+          {PRICES.commandsLimit.title}
+          <CustomTooltip>{PRICES.commandsLimit.description}</CustomTooltip>
+        </Text>
       </ColDescription>
       <Col>
         <Text as="span">{PRICES.commandsLimit.free}</Text>
@@ -47,8 +51,11 @@ function DesktopTable() {
         <Box height="1px" bg="whiteAlpha.100" />
       </GridItem>
 
-      <ColDescription tooltip="Deneme olsun bu">
-        <Text as="span">{PRICES.maxDataSizePerDB.title}</Text>
+      <ColDescription>
+        <Text as="span">
+          {PRICES.maxDataSizePerDB.title}
+          <CustomTooltip>{PRICES.maxDataSizePerDB.description}</CustomTooltip>
+        </Text>
       </ColDescription>
       <Col>
         <Text as="span">{PRICES.maxDataSizePerDB.free}</Text>
@@ -64,8 +71,13 @@ function DesktopTable() {
         <Box height="1px" bg="whiteAlpha.100" />
       </GridItem>
 
-      <ColDescription tooltip="Deneme olsun bu">
-        <Text as="span">{PRICES.maxConcurrentConnections.title}</Text>
+      <ColDescription>
+        <Text as="span">
+          {PRICES.maxConcurrentConnections.title}
+          <CustomTooltip>
+            {PRICES.maxConcurrentConnections.description}
+          </CustomTooltip>
+        </Text>
       </ColDescription>
       <Col>
         <Text as="span">{PRICES.maxConcurrentConnections.free}</Text>
@@ -81,8 +93,11 @@ function DesktopTable() {
         <Box height="1px" bg="whiteAlpha.100" />
       </GridItem>
 
-      <ColDescription tooltip="Deneme olsun bu">
-        <Text as="span">{PRICES.persistence.title}</Text>
+      <ColDescription>
+        <Text as="span">
+          {PRICES.persistence.title}
+          <CustomTooltip>{PRICES.persistence.description}</CustomTooltip>
+        </Text>
       </ColDescription>
       <Col>
         <ColCheck check={PRICES.persistence.free} />
@@ -98,8 +113,11 @@ function DesktopTable() {
         <Box height="1px" bg="whiteAlpha.100" />
       </GridItem>
 
-      <ColDescription tooltip="Deneme olsun bu">
-        <Text as="span">{PRICES.encryption.title}</Text>
+      <ColDescription>
+        <Text as="span">
+          {PRICES.encryption.title}
+          <CustomTooltip>{PRICES.encryption.description}</CustomTooltip>
+        </Text>
       </ColDescription>
       <Col>
         <ColCheck check={PRICES.encryption.free} />
@@ -109,23 +127,6 @@ function DesktopTable() {
       </Col>
       <Col>
         <ColCheck check={PRICES.encryption.free} />
-      </Col>
-
-      <GridItem colSpan={4}>
-        <Box height="1px" bg="whiteAlpha.100" />
-      </GridItem>
-
-      <ColDescription tooltip="Deneme olsun bu">
-        <Text as="span">{PRICES.multiZoneReplication.title}</Text>
-      </ColDescription>
-      <Col>
-        <ColCheck check={PRICES.multiZoneReplication.free} />
-      </Col>
-      <Col highlight>
-        <ColCheck check={PRICES.multiZoneReplication.free} />
-      </Col>
-      <Col>
-        <ColCheck check={PRICES.multiZoneReplication.free} />
       </Col>
 
       <GridItem colSpan={4}>
@@ -133,8 +134,28 @@ function DesktopTable() {
       </GridItem>
 
       <ColDescription>
-        <Text as="span">{PRICES.price.title}</Text>
+        <Text as="span">
+          {PRICES.multiZoneReplication.title}
+          <CustomTooltip>
+            {PRICES.multiZoneReplication.description}
+          </CustomTooltip>
+        </Text>
       </ColDescription>
+      <Col>
+        <ColCheck check={PRICES.multiZoneReplication.free} />
+      </Col>
+      <Col highlight>
+        <ColCheck check={PRICES.multiZoneReplication.free} />
+      </Col>
+      <Col>
+        <ColCheck check={PRICES.multiZoneReplication.free} />
+      </Col>
+
+      <GridItem colSpan={4}>
+        <Box height="1px" bg="whiteAlpha.100" />
+      </GridItem>
+
+      <ColDescription />
       <Col>
         <Text as="span">{PRICES.price.free}</Text>
       </Col>
