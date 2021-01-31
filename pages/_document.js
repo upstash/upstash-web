@@ -1,5 +1,4 @@
 import Document, { Html, Head, Main, NextScript } from 'next/document'
-import SiteConfig from '../site.config'
 
 class MyDocument extends Document {
   static async getInitialProps(ctx) {
@@ -8,8 +7,15 @@ class MyDocument extends Document {
   }
 
   render() {
+    const meta = {
+      tittle: 'Upstash',
+      description: 'Serverless Database for Redis®',
+      url: 'https://upstash.com',
+      googleAnalytic: 'UA-163316783-1'
+    }
+
     return (
-      <Html lang={SiteConfig.lang}>
+      <Html lang="en">
         <Head>
           <link
             rel="preload"
@@ -22,37 +28,64 @@ class MyDocument extends Document {
           {/* base */}
           <meta charSet="utf-8" />
           <meta httpEquiv="x-ua-compatible" content="ie=edge" />
-          <meta name="description" content={SiteConfig.description} />
-
-          {/* favicon */}
-          <link rel="icon" href="/favicon.ico" />
-          <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-          <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-          <link rel="manifest" href="/manifest.webmanifest" />
+          <meta name="description" content={meta.description} />
 
           {/* facebook */}
-          <meta property="og:url" content={SiteConfig.siteUrl} />
+          <meta property="og:url" content={meta.url} />
           <meta property="og:type" content="website" />
-          <meta property="og:title" content={SiteConfig.title} />
-          <meta property="og:description" content={SiteConfig.description} />
+          <meta property="og:title" content={meta.title} />
+          <meta property="og:description" content={meta.description} />
 
           {/* twitter */}
           <meta name="twitter:card" content="summary" />
-          <meta name="twitter:url" content={SiteConfig.siteUrl} />
-          <meta name="twitter:title" content={SiteConfig.title} />
-          <meta name="twitter:description" content={SiteConfig.description} />
+          <meta name="twitter:url" content={meta.url} />
+          <meta name="twitter:title" content={meta.title} />
+          <meta name="twitter:description" content={meta.description} />
+
+          {/* icons */}
+
+          <link href="/static/icons/site.webmanifest" rel="manifest" />
+          <link
+            rel="preconnect"
+            href="https://cdn.usefathom.com"
+            crossOrigin=""
+          />
+          <link
+            href="/static/icons/apple-touch-icon.png"
+            rel="apple-touch-icon"
+            sizes="180x180"
+          />
+          <link
+            href="/static/icons/favicon-32x32.png"
+            rel="icon"
+            sizes="32x32"
+            type="image/png"
+          />
+          <link
+            href="/static/icons/favicon-16x16.png"
+            rel="icon"
+            sizes="16x16"
+            type="image/png"
+          />
+          <link
+            color="#050505"
+            href="/static/icons/safari-pinned-tab.svg"
+            rel="mask-icon"
+          />
+          <meta content="#050505" name="theme-color" />
+          <meta content="#050505" name="msapplication-TileColor" />
 
           {/* analytic */}
-          {SiteConfig.googleAnalytic && (
+          {process.env.NODE_ENV !== 'development' && (
             <>
               <script
                 async
-                src={`https://www.googletagmanager.com/gtag/js?id=${SiteConfig.googleAnalytic}`}
+                src={`https://www.googletagmanager.com/gtag/js?id=${meta.googleAnalytic}`}
               />
               <script
                 type="text/javascript"
                 dangerouslySetInnerHTML={{
-                  __html: `window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', '${SiteConfig.googleAnalytic}');`
+                  __html: `window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', '${meta.googleAnalytic}');`
                 }}
               />
             </>
