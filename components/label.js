@@ -8,7 +8,7 @@ export function Label({ children, ...props }) {
       lineHeight="none"
       letterSpacing="wider"
       textTransform="uppercase"
-      opacity={0.5}
+      opacity={0.4}
       {...props}
     >
       {children}

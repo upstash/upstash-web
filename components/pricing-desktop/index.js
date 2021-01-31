@@ -1,5 +1,13 @@
-import { Box, Button, Heading, Grid, GridItem, Text } from '@chakra-ui/react'
-import { PRICES } from '../../constants'
+import {
+  Box,
+  Link,
+  Button,
+  Heading,
+  Grid,
+  GridItem,
+  Text
+} from '@chakra-ui/react'
+import { LINKS, PRICES } from '../../constants'
 import Col from './col'
 import ColCheck from './col-check'
 import ColDescription from './col-description'
@@ -173,6 +181,8 @@ function DesktopTable() {
       <Col />
       <Col>
         <Button
+          as={Link}
+          href={LINKS.console}
           color="black"
           bg="white"
           _hover={{
@@ -184,7 +194,10 @@ function DesktopTable() {
       </Col>
       <Col highlight style={{ borderRadius: '0 0 16px 16px' }}>
         <Button
-          colorScheme="purple"
+          as={Link}
+          href={LINKS.console}
+          color="black"
+          bg="primary"
           _hover={{
             textDecoration: 'none'
           }}
@@ -194,6 +207,8 @@ function DesktopTable() {
       </Col>
       <Col>
         <Button
+          as={Link}
+          href={LINKS.console}
           color="black"
           bg="white"
           _hover={{

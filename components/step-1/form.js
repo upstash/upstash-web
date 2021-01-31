@@ -29,7 +29,9 @@ function Form({ auth0, loading, onCreateDB }) {
       {/* name */}
 
       <VStack spacing={1} align="stretch">
-        <Label htmlFor="db-name">Database Name</Label>
+        <Box>
+          <Label htmlFor="db-name">Database Name</Label>
+        </Box>
         <Input
           id="db-name"
           defaultValue={DB_NAME}
@@ -43,7 +45,9 @@ function Form({ auth0, loading, onCreateDB }) {
 
       {/* region */}
       <VStack spacing={1} mt={4} align="stretch">
-        <Label htmlFor="db-region">Region</Label>
+        <Box>
+          <Label htmlFor="db-region">Region</Label>
+        </Box>
         <Select
           id="db-region"
           defaultValue="us-east-1"
