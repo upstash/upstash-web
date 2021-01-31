@@ -6,7 +6,12 @@ import SupportCard from './section-support-card'
 
 function SectionSupport() {
   return (
-    <Box as="section" py={['100px', '140px']} textAlign="center">
+    <Box
+      as="section"
+      pt={['50px', '70px']}
+      pb={['100px', '220px']}
+      textAlign="center"
+    >
       <Container maxW="5xl">
         {/**/}
 

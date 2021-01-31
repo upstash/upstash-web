@@ -41,7 +41,7 @@ function SectionWhat() {
               color="purple.300"
               mb={6}
             />
-            <Heading tag="h4" fontSize="2xl">
+            <Heading tag="h4" fontSize={['xl', '2xl']}>
               Serverless
             </Heading>
             <Box mt={4}>
@@ -66,7 +66,7 @@ function SectionWhat() {
               color="purple.300"
               mb={6}
             />
-            <Heading tag="h4" fontSize="2xl">
+            <Heading tag="h4" fontSize={['xl', '2xl']}>
               Low Latency For Low Cost
             </Heading>
             <Box mt={4}>
@@ -91,7 +91,7 @@ function SectionWhat() {
               color="purple.300"
               mb={6}
             />
-            <Heading tag="h4" fontSize="2xl">
+            <Heading tag="h4" fontSize={['xl', '2xl']}>
               Simple Pricing, No Surprises
             </Heading>
             <Box mt={4}>
@@ -116,7 +116,7 @@ function SectionWhat() {
               color="purple.300"
               mb={6}
             />
-            <Heading tag="h4" fontSize="2xl">
+            <Heading tag="h4" fontSize={['xl', '2xl']}>
               Redis® Compatible
             </Heading>
             <Box mt={4}>

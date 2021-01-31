@@ -4,7 +4,12 @@ import CustomLink from './custom-link'
 
 function SectionFaq() {
   return (
-    <Box as="section" py={['100px', '140px']} textAlign="center">
+    <Box
+      as="section"
+      pt={['100px', '80px']}
+      pb={['100px', '220px']}
+      textAlign="center"
+    >
       <Container maxW="5xl">
         {/**/}
 
