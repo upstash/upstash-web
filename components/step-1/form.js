@@ -29,40 +29,31 @@ function Form({ auth0, loading, onCreateDB }) {
       {/* name */}
 
       <VStack spacing={1} align="stretch">
-        <Box>
-          <Label htmlFor="db-name">Database Name</Label>
-        </Box>
-        <Box>
-          <Input
-            id="db-name"
-            defaultValue={DB_NAME}
-            variant="filled"
-            bg="whiteAlpha.300"
-            _hover={{
-              bg: 'whiteAlpha.400'
-            }}
-          />
-        </Box>
+        <Label htmlFor="db-name">Database Name</Label>
+        <Input
+          id="db-name"
+          defaultValue={DB_NAME}
+          variant="filled"
+          bg="whiteAlpha.300"
+          _hover={{
+            bg: 'whiteAlpha.400'
+          }}
+        />
       </VStack>
 
       {/* region */}
       <VStack spacing={1} mt={4} align="stretch">
-        <Box>
-          <Label htmlFor="db-region">Region</Label>
-        </Box>
-        <Box>
-          <Select
-            variant="filled"
-            bg="whiteAlpha.300"
-            _hover={{
-              bg: 'whiteAlpha.400'
-            }}
-          >
-            <option value="us-east-1" selected>
-              US-EAST-1 (N. Virginia)
-            </option>
-          </Select>
-        </Box>
+        <Label htmlFor="db-region">Region</Label>
+        <Select
+          defaultValue="us-east-1"
+          variant="filled"
+          bg="whiteAlpha.300"
+          _hover={{
+            bg: 'whiteAlpha.400'
+          }}
+        >
+          <option value="us-east-1">US-EAST-1 (N. Virginia)</option>
+        </Select>
       </VStack>
 
       {/* create */}

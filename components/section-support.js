@@ -32,7 +32,7 @@ function SectionSupport() {
             <SectionSupportIconNext />
             <Text>
               Check out docs to <br />
-              <Text tag="b" fontWeight="bold">
+              <Text as="b" fontWeight="bold">
                 Next
               </Text>
             </Text>
@@ -42,7 +42,7 @@ function SectionSupport() {
             <SectionSupportIconAws />
             <Text>
               Check out docs to <br />
-              <Text tag="b" fontWeight="bold">
+              <Text as="b" fontWeight="bold">
                 AWS Lambda
               </Text>
             </Text>
@@ -52,7 +52,7 @@ function SectionSupport() {
             <SectionSupportIconRedis />
             <Text>
               Check out docs to <br />
-              <Text tag="b" fontWeight="bold">
+              <Text as="b" fontWeight="bold">
                 Redis
               </Text>
             </Text>

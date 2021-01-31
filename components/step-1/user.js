@@ -12,7 +12,7 @@ function User({ logout, name, picture }) {
       color="black"
       borderRadius="full"
     >
-      <Avatar src={picture} size="sm" />
+      <Avatar src={picture} name={name} size="sm" />
       <Text ml="3">{name}</Text>
       <IconButton
         isRound
