@@ -1,20 +1,20 @@
 export const LINKS = {
-  docs: 'https://docs.lambda.store/',
-  console: 'https://console.lambda.store',
-  support: 'https://docs.lambda.store/docs/help/support',
-  privacy: 'https://lambda.store/terms/privacy.html',
-  terms: 'https://lambda.store/terms/terms.html',
-  subcontractors: 'https://lambda.store/terms/subcontractors.html',
+  docs: 'https://docs.upstash.com/',
+  console: 'https://console.upstash.com',
+  support: 'https://docs.upstash.com/docs/help/support',
+  privacy: 'https://upstash.com/terms/privacy.html',
+  terms: 'https://upstash.com/terms/terms.html',
+  subcontractors: 'https://upstash.com/terms/subcontractors.html',
   serverless:
-    'https://docs.lambda.store/docs/overall/compare/#what-makes-lambda-store-different',
-  compare: 'https://docs.lambda.store/docs/overall/compare/',
-  pricing: 'https://docs.lambda.store/docs/account/pricing/',
+    'https://docs.upstash.com/docs/overall/compare/#what-makes-lambda-store-different',
+  compare: 'https://docs.upstash.com/docs/overall/compare/',
+  pricing: 'https://docs.upstash.com/docs/account/pricing/',
   redisCompatibility:
-    'https://docs.lambda.store/docs/overall/rediscompatibility/',
+    'https://docs.upstash.com/docs/overall/rediscompatibility/',
   reservedPricing:
-    'https://docs.lambda.store/docs/account/pricing#reserved-pricing',
-  databaseTypes: 'https://docs.lambda.store/docs/overall/databasetypes',
-  faq: 'https://docs.lambda.store/docs/help/faq'
+    'https://docs.upstash.com/docs/account/pricing#reserved-pricing',
+  databaseTypes: 'https://docs.upstash.com/docs/overall/databasetypes',
+  faq: 'https://docs.upstash.com/docs/help/faq'
 }
 
 export const SOCIAL_LINKS = {

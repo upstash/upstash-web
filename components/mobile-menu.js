@@ -31,7 +31,7 @@ function MobileMenu({ isOpen, onClose }) {
             <Button
               size="lg"
               colorScheme="yellow"
-              href="https://console.lambda.store"
+              href="https://console.upstash.com"
             >
               Console
             </Button>
@@ -40,7 +40,7 @@ function MobileMenu({ isOpen, onClose }) {
               <CustomLink h={10} href="/">
                 <Flex>Pricing</Flex>
               </CustomLink>
-              <CustomLink h={10} isExternal href="https://docs.lambda.store/">
+              <CustomLink h={10} isExternal href="https://docs.upstash.com/">
                 <Flex grow={1}>Docs</Flex>
               </CustomLink>
               <CustomLink
