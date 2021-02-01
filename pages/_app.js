@@ -14,6 +14,7 @@ export default function MyApp({ Component, pageProps }) {
     <Auth0Provider
       clientId={process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID}
       domain={process.env.NEXT_PUBLIC_AUTH0_DOMAIN}
+      audience={process.env.NEXT_PUBLIC_AUDIENCE}
       redirectUri={process.env.NEXT_PUBLIC_REDIRECT_URI}
     >
       <ChakraProvider theme={theme}>
