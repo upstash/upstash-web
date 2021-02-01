@@ -20,7 +20,7 @@ export default function FaqAccordionItem({ title, children }) {
             p={0}
           >
             <AccordionButton px={6} pb={6} pt={isExpanded ? 8 : 6}>
-              <Heading as="h4" fontSize={['md', 'xl']} fontWeight="semibold">
+              <Heading as="h4" fontSize={['md', 'xl']} fontWeight="medium">
                 {title}
               </Heading>
               <AccordionIcon fontSize={32} color="whiteAlpha.400" />
