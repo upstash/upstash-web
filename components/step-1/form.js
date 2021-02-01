@@ -70,6 +70,8 @@ function Form({ auth0, loading, onCreateDB }) {
           isDisabled={isMobile}
         >
           <option value="us-east-1">US-EAST-1 (N. Virginia)</option>
+          <option value="us-east-1">US-WEST-1 (N. California)</option>
+          <option value="us-east-1">EU-WEST-1 (Ireland)</option>
         </Select>
       </VStack>
 
