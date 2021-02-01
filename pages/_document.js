@@ -1,5 +1,4 @@
 import Document, { Html, Head, Main, NextScript } from 'next/document'
-import SiteConfig from '../site.config'
 
 class MyDocument extends Document {
   static async getInitialProps(ctx) {
@@ -8,67 +7,86 @@ class MyDocument extends Document {
   }
 
   render() {
+    const meta = {
+      tittle: 'Upstash',
+      description: 'Serverless Database for Redis®',
+      url: 'https://upstash.com',
+      googleAnalytic: 'UA-163316783-1'
+    }
+
     return (
-      <Html lang={SiteConfig.lang}>
+      <Html lang="en">
         <Head>
+          <link
+            rel="preload"
+            href="/fonts/Inter-Regular.woff2"
+            as="font"
+            type="font/woff2"
+            crossOrigin="anonymous"
+          />
+
           {/* base */}
           <meta charSet="utf-8" />
+          <meta name="robots" content="follow, index" />
           <meta httpEquiv="x-ua-compatible" content="ie=edge" />
-          <meta name="description" content={SiteConfig.description} />
+          <meta name="description" content={meta.description} />
+          <link rel="canonical" href={meta.url} />
+
+          {/* facebook */}
+          <meta property="og:url" content={meta.url} />
+          <meta property="og:type" content="website" />
+          <meta property="og:title" content={meta.title} />
+          <meta property="og:description" content={meta.description} />
+
+          {/* twitter */}
+          <meta name="twitter:card" content="summary" />
+          <meta name="twitter:url" content={meta.url} />
+          <meta name="twitter:title" content={meta.title} />
+          <meta name="twitter:description" content={meta.description} />
+
+          {/* icons */}
+
+          <link href="/static/icons/site.webmanifest" rel="manifest" />
+          <link
+            href="/static/icons/apple-touch-icon.png"
+            rel="apple-touch-icon"
+            sizes="180x180"
+          />
+          <link
+            href="/static/icons/favicon-32x32.png"
+            rel="icon"
+            sizes="32x32"
+            type="image/png"
+          />
+          <link
+            href="/static/icons/favicon-16x16.png"
+            rel="icon"
+            sizes="16x16"
+            type="image/png"
+          />
+          <link
+            color="#050505"
+            href="/static/icons/safari-pinned-tab.svg"
+            rel="mask-icon"
+          />
+          <meta content="#050505" name="theme-color" />
+          <meta content="#050505" name="msapplication-TileColor" />
 
           {/* analytic */}
-          {SiteConfig.googleAnalytic && (
+          {process.env.NODE_ENV !== 'development' && (
             <>
               <script
                 async
-                src={`https://www.googletagmanager.com/gtag/js?id=${SiteConfig.googleAnalytic}`}
+                src={`https://www.googletagmanager.com/gtag/js?id=${meta.googleAnalytic}`}
               />
               <script
                 type="text/javascript"
                 dangerouslySetInnerHTML={{
-                  __html: `window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', '${SiteConfig.googleAnalytic}');`
+                  __html: `window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', '${meta.googleAnalytic}');`
                 }}
               />
             </>
           )}
-
-          {/* pwa */}
-          <link rel="manifest" href="/manifest.json" />
-          <meta name="theme-color" content="#fff" />
-          <meta name="application-name" content={SiteConfig.title} />
-          <meta name="apple-mobile-web-app-title" content={SiteConfig.title} />
-          <meta name="apple-mobile-web-app-capable" content="yes" />
-          <meta
-            name="apple-mobile-web-app-status-bar-style"
-            content="default"
-          />
-          <link
-            rel="apple-touch-icon"
-            sizes="180x180"
-            href="/icons/apple-touch-icon.png"
-          />
-          <link
-            rel="icon"
-            href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤯</text></svg>"
-          />
-
-          <link rel="preconnect" href="https://fonts.gstatic.com" />
-          <link
-            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400&display=swap"
-            rel="stylesheet"
-          />
-
-          {/* facebook */}
-          <meta property="og:url" content={SiteConfig.siteUrl} />
-          <meta property="og:type" content="website" />
-          <meta property="og:title" content={SiteConfig.title} />
-          <meta property="og:description" content={SiteConfig.description} />
-
-          {/* twitter */}
-          <meta name="twitter:card" content="summary" />
-          <meta name="twitter:url" content={SiteConfig.siteUrl} />
-          <meta name="twitter:title" content={SiteConfig.title} />
-          <meta name="twitter:description" content={SiteConfig.description} />
         </Head>
         <body>
           <Main />

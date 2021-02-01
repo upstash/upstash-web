@@ -1,5 +1,4 @@
 import Head from 'next/head'
-import Layout from '../components/layout'
 import SectionHero from '../components/section-hero'
 import SectionDemo from '../components/section-demo'
 import SectionWhat from '../components/section-what'
@@ -9,7 +8,7 @@ import SectionFaq from '../components/section-faq'
 
 function HomePage() {
   return (
-    <Layout>
+    <>
       <Head>
         <title>Home Page</title>
       </Head>
@@ -20,7 +19,7 @@ function HomePage() {
       <SectionSupport />
       <SectionPricing />
       <SectionFaq />
-    </Layout>
+    </>
   )
 }
 

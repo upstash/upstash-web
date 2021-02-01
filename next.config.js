@@ -1,18 +1,25 @@
-const withPlugins = require('next-compose-plugins')
-const withPWA = require('next-pwa')
+const { PHASE_DEVELOPMENT_SERVER } = require('next/constants')
 
-const isDev = process.env.NODE_ENV !== 'production'
+module.exports = (phase) => {
+  const isDev = phase === PHASE_DEVELOPMENT_SERVER
 
-const nextConfig = {
-  env: {
-    BASE_URL: isDev
-      ? 'http://localhost:3000/'
-      : 'https://upstash-landing-page.vercel.app/'
-  },
-  pwa: {
-    dest: 'public',
-    disable: isDev
+  return {
+    env: {
+      BASE_URL: isDev
+        ? 'http://localhost:3000/'
+        : 'https://upstash-landing-page.vercel.app/'
+    }
+    // webpack: (config, { dev, isServer }) => {
+    //   // Replace React with Preact only in client production build
+    //   if (!dev && !isServer) {
+    //     Object.assign(config.resolve.alias, {
+    //       react: 'preact/compat',
+    //       'react-dom/test-utils': 'preact/test-utils',
+    //       'react-dom': 'preact/compat'
+    //     })
+    //   }
+    //
+    //   return config
+    // }
   }
 }
-
-module.exports = withPlugins([], withPWA(nextConfig))
