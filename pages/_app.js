@@ -22,14 +22,14 @@ export default function MyApp({ Component, pageProps }) {
           <meta name="viewport" content="width=device-width, initial-scale=1" />
         </Head>
 
+        <FontFace />
+
         <Header onOpen={onOpen} />
         <MobileMenu isOpen={isOpen} onOpen={onOpen} onClose={onClose} />
         <main>
           <Component {...pageProps} />
         </main>
         <Footer />
-
-        <FontFace />
       </ChakraProvider>
     </Auth0Provider>
   )
