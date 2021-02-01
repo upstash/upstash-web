@@ -23,8 +23,7 @@ function SectionWhat() {
 
         <Box as="header">
           <Heading tag="h2" size="2xl">
-            Rails moment of <br />
-            Serverless Database
+            Rails moment of Database
           </Heading>
         </Box>
 

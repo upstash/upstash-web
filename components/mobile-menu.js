@@ -46,7 +46,7 @@ function MobileMenu({ isOpen, onClose }) {
               <CustomLink
                 h={10}
                 isExternal
-                href="https://medium.com/lambda-store"
+                href="https://medium.com/upstash"
               >
                 <Flex grow={1}>Blog</Flex>
               </CustomLink>

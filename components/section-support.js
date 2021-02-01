@@ -31,9 +31,9 @@ function SectionSupport() {
           <SupportCard theme="next">
             <SectionSupportIconNext />
             <Text>
-              Check out docs to <br />
+              Check out docs for <br />
               <Text as="b" fontWeight="bold">
-                Next
+                Next.js
               </Text>
             </Text>
           </SupportCard>
@@ -41,7 +41,7 @@ function SectionSupport() {
           <SupportCard theme="aws">
             <SectionSupportIconAws />
             <Text>
-              Check out docs to <br />
+              Check out docs for <br />
               <Text as="b" fontWeight="bold">
                 AWS Lambda
               </Text>
@@ -51,7 +51,7 @@ function SectionSupport() {
           <SupportCard theme="redis">
             <SectionSupportIconRedis />
             <Text>
-              Check out docs to <br />
+              Check out docs for <br />
               <Text as="b" fontWeight="bold">
                 Redis
               </Text>

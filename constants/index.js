@@ -6,7 +6,7 @@ export const LINKS = {
   terms: 'https://upstash.com/terms/terms.html',
   subcontractors: 'https://upstash.com/terms/subcontractors.html',
   serverless:
-    'https://docs.upstash.com/docs/overall/compare/#what-makes-lambda-store-different',
+    'https://docs.upstash.com/docs/overall/compare/',
   compare: 'https://docs.upstash.com/docs/overall/compare/',
   pricing: 'https://docs.upstash.com/docs/account/pricing/',
   redisCompatibility:
@@ -19,59 +19,59 @@ export const LINKS = {
 
 export const SOCIAL_LINKS = {
   medium: 'https://medium.com/upstash',
-  twitter: 'https://twitter.com/Lambda__Store',
-  discord: 'https://dev.to/lambdastore'
+  twitter: 'https://twitter.com/upstash',
+  discord: 'https://dev.to/upstash'
 }
 
 export const PRICES = {
   commandsLimit: {
     title: 'Commands Limit',
-    description: 'asd',
+    description: 'This is the maximum number of requests/commands that your database can receive and process per day.',
     free: 'Max 10.000 Commands Daily',
     standard: 'Unlimited',
     premium: 'Unlimited'
   },
   maxDataSizePerDB: {
     title: 'Max Data Size Per DB',
-    description: 'asd',
+    description: 'This is the total data size that you can store in your database.',
     free: '256 MB',
     standard: '10 GB',
     premium: '500 GB'
   },
   maxConcurrentConnections: {
     title: 'Max Concurrent Connections',
-    description: 'asd',
+    description: 'This is the maximum allowed number of concurrent connections (clients) at a moment. This cap does not essentially limit the number of requests that can be submitted per second, but defines the maximum number of open TCP connections to the database.',
     free: '20',
     standard: '1000',
     premium: '10.000'
   },
   persistence: {
     title: 'Persistence',
-    description: 'asd',
+    description: 'Upstash has its own persistence layer that integrates with block storage services of cloud providers. This provides fault tolerance to all database types including the free.',
     free: true,
     standard: true,
     premium: true
   },
   encryption: {
     title: 'Encryption (TLS)',
-    description: 'asd',
+    description: 'Encryption the data transfer between server and client. Recommended for production usage.',
     free: true,
     standard: true,
     premium: true
   },
   multiZoneReplication: {
     title: 'Multi Zone Replication',
-    description: 'asd',
+    description: 'Upstash replicates data to multiple zones for Premium type of databases. This provides high availability and minumum failover time.',
     free: false,
     standard: false,
     premium: true
   },
   price: {
     title: 'Price',
-    description: 'asd',
+    description: 'Pricing is based on per request/command. Operational commands like AUTH, INFO, PING, QUIT, COMMAND are not billed.',
     free: 'Free',
-    standard: '$0.2 per 100K commands plus disk storage cost',
-    premium: '$0.4 per 100K commands plus disk storage cost'
+    standard: '$0.2 per 100K commands plus disk storage cost. Max monthly (price ceiling) $120',
+    premium: '$0.4 per 100K commands plus disk storage cost. Max monthly (price ceiling) $240'
   }
 }
 

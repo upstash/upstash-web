@@ -25,7 +25,7 @@ function SectionPricing() {
           </Heading>
           <Container maxW="3xl">
             <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
-              Flexible pricing for all usecases
+              Flexible pricing for different use cases
             </Text>
           </Container>
         </Box>
