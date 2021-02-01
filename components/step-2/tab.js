@@ -2,15 +2,16 @@ import { Button, Wrap, WrapItem } from '@chakra-ui/react'
 import { SUPPORT_LANG } from '../../constants'
 
 function TabButton({ selectedName, name, language, onChange, children }) {
+  const isActive = selectedName === name
   return (
     <Button
       size="sm"
-      color={selectedName === name ? 'black' : null}
-      bg={selectedName === name ? 'primary' : null}
+      color={isActive ? 'black' : null}
+      bg={isActive ? 'white' : null}
       _hover={{
-        color: selectedName === name ? 'black' : null
+        color: isActive ? 'black' : null
       }}
-      variant={selectedName === name ? 'solid' : 'outline'}
+      variant={isActive ? 'solid' : 'outline'}
       onClick={() => onChange(name, language)}
     >
       {children}
