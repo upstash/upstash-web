@@ -87,7 +87,8 @@ export const HIGHLIGHT_THEME = {
   hljs: {
     textAlign: 'left',
     display: 'block',
-    overflowX: 'auto'
+    overflowX: 'auto',
+    fontSize: '0.92rem'
   },
   'hljs-subst': {
     color: '#444'

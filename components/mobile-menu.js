@@ -8,16 +8,18 @@ import {
   Flex,
   CloseButton,
   Spacer,
-  VStack
+  VStack,
+  Stack
 } from '@chakra-ui/react'
 import CustomLink from './custom-link'
 import Logo from './logo'
+import { LINKS, SOCIAL_LINKS } from '../constants'
 
 function MobileMenu({ isOpen, onClose }) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} motionPreset="slideInBottom">
-      <ModalOverlay />
-      <ModalContent>
+      <ModalOverlay bg="whiteAlpha.200" />
+      <ModalContent bg="black">
         <ModalBody p={6}>
           {/**/}
 
@@ -29,21 +31,24 @@ function MobileMenu({ isOpen, onClose }) {
 
           <VStack mt={5} spacing="24px" align="stretch">
             <Button
-              size="lg"
-              colorScheme="yellow"
               href="https://console.upstash.com"
+              size="lg"
+              color="black"
+              bg="primary"
             >
               Console
             </Button>
 
-            <VStack divider={<StackDivider />} align="stretch">
-              <CustomLink h={10} href="/">
-                <Flex>Pricing</Flex>
-              </CustomLink>
-              <CustomLink h={10} isExternal href="https://docs.upstash.com/">
+            <VStack divider={<StackDivider />} align="stretch" color="white">
+              <CustomLink isExternal href={LINKS.docs} h={10} color="inherit">
                 <Flex grow={1}>Docs</Flex>
               </CustomLink>
-              <CustomLink h={10} isExternal href="https://medium.com/upstash">
+              <CustomLink
+                isExternal
+                href={SOCIAL_LINKS.medium}
+                h={10}
+                color="inherit"
+              >
                 <Flex grow={1}>Blog</Flex>
               </CustomLink>
             </VStack>
