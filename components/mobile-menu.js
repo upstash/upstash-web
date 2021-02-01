@@ -43,11 +43,7 @@ function MobileMenu({ isOpen, onClose }) {
               <CustomLink h={10} isExternal href="https://docs.upstash.com/">
                 <Flex grow={1}>Docs</Flex>
               </CustomLink>
-              <CustomLink
-                h={10}
-                isExternal
-                href="https://medium.com/upstash"
-              >
+              <CustomLink h={10} isExternal href="https://medium.com/upstash">
                 <Flex grow={1}>Blog</Flex>
               </CustomLink>
             </VStack>
