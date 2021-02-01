@@ -17,8 +17,7 @@ const theme = extendTheme({
         fontSize: '17px'
       },
       body: {
-        bg: '#050505'
-        // color: '#fff'
+        bg: 'mainBlack'
       }
     }
   },
@@ -28,6 +27,7 @@ const theme = extendTheme({
     body: 'Inter, sans-serif'
   },
   colors: {
+    mainBlack: '#050505',
     primary: '#00E9A3'
   },
   components: {

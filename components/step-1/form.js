@@ -1,4 +1,12 @@
-import { Box, VStack, Input, Select } from '@chakra-ui/react'
+import {
+  Box,
+  VStack,
+  Input,
+  Select,
+  Text,
+  Button,
+  useMediaQuery
+} from '@chakra-ui/react'
 import {
   uniqueNamesGenerator,
   adjectives,
@@ -17,6 +25,8 @@ const databaseNameConfig = {
 const DB_NAME = uniqueNamesGenerator(databaseNameConfig)
 
 function Form({ auth0, loading, onCreateDB }) {
+  const [isMobile] = useMediaQuery('(max-width: 30em)')
+
   return (
     <Box
       mx="auto"
@@ -40,6 +50,7 @@ function Form({ auth0, loading, onCreateDB }) {
           _hover={{
             bg: 'whiteAlpha.400'
           }}
+          isDisabled={isMobile}
         />
       </VStack>
 
@@ -56,6 +67,7 @@ function Form({ auth0, loading, onCreateDB }) {
           _hover={{
             bg: 'whiteAlpha.400'
           }}
+          isDisabled={isMobile}
         >
           <option value="us-east-1">US-EAST-1 (N. Virginia)</option>
         </Select>
@@ -63,7 +75,18 @@ function Form({ auth0, loading, onCreateDB }) {
 
       {/* create */}
       <Box mt={6}>
-        <CreateButton auth0={auth0} loading={loading} onCreateDB={onCreateDB} />
+        <Box d={['none', 'block']}>
+          <CreateButton
+            auth0={auth0}
+            loading={loading}
+            onCreateDB={onCreateDB}
+          />
+        </Box>
+        <Box d={['block', 'none']}>
+          <Button w="full" color="black" bg="primary" isDisabled>
+            Login and Create
+          </Button>
+        </Box>
       </Box>
     </Box>
   )
