@@ -18,7 +18,7 @@ function Step2({ db }) {
     <Box w="full" maxW={800} mx="auto">
       <Tab name={name} onChange={onChange} />
 
-      <Box mt={8} p={6} bg="whiteAlpha.200" borderRadius="xl">
+      <Box mt={8} p={6} bg="whiteAlpha.200" borderRadius="2xl">
         <Editor db={db} name={name} language={language} />
       </Box>
     </Box>
