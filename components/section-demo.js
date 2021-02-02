@@ -24,7 +24,6 @@ function SectionDemo(props) {
         let profile = localStorage.getItem('profile');
         let temp = process.env.NEXT_PUBLIC_CONSOLE_URL + "callback?profile=" + profile
             + "&token=" + token
-        alert(temp)
         urlSet(temp)
 
         const postData = {
