@@ -18,8 +18,8 @@ import { Label } from '../label'
 import CreateButton from './create-button'
 
 const databaseNameConfig = {
-  dictionaries: [adjectives, animals, names],
-  separator: '-',
+  dictionaries: [adjectives, animals],
+  separator: '_',
   style: 'lowerCase'
 }
 
