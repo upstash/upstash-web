@@ -77,9 +77,9 @@ export const PRICES = {
       'Pricing is based on per request/command. Operational commands like AUTH, INFO, PING, QUIT, COMMAND are not billed.',
     free: 'Free',
     standard:
-      '$0.2 per 100K commands plus disk storage cost. Max monthly (price ceiling) $120',
+      '$0.2 per 100K commands, up to $120 monthly max.',
     premium:
-      '$0.4 per 100K commands plus disk storage cost. Max monthly (price ceiling) $240'
+      '$0.4 per 100K commands, up to $240 monthly max.'
   }
 }
 
