@@ -5,7 +5,7 @@ module.exports = withPWA({
   env: {
     BASE_URL: isDev
       ? 'http://localhost:3000/'
-      : 'https://upstash-landing-page.vercel.app/'
+      : 'https://upstash.com/'
   },
   pwa: {
     dest: 'public',
