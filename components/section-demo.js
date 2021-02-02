@@ -20,10 +20,10 @@ function SectionDemo(props) {
     const onCreateDB = async (region, dbName) => {
         loadingSet(true)
         let url = process.env.NEXT_PUBLIC_API_URL
-        let token = localStorage.getItem('accessToken')
-        let profile = localStorage.getItem('profile');
-        let temp = process.env.NEXT_PUBLIC_CONSOLE_URL + "callback?profile=" + profile
-            + "&token=" + token
+        let token = btoa(localStorage.getItem('accessToken'));
+        let profile = btoa(localStorage.getItem('profile'));
+        
+        let temp = process.env.NEXT_PUBLIC_CONSOLE_URL + "callback?profile=" + profile + "&token=" + token;
         urlSet(temp)
 
         const postData = {
