@@ -13,6 +13,7 @@ import {
   animals,
   names
 } from 'unique-names-generator'
+import React, { useRef } from 'react'
 import { Label } from '../label'
 import CreateButton from './create-button'
 
@@ -24,8 +25,10 @@ const databaseNameConfig = {
 
 const DB_NAME = uniqueNamesGenerator(databaseNameConfig)
 
-function Form({ auth0, loading, onCreateDB }) {
+function Form({ auth0, loading, onCreateDB, apierror }) {
   const [isMobile] = useMediaQuery('(max-width: 30em)')
+  const regionSelect = useRef(null)
+  const dbName = useRef(null)
 
   return (
     <Box
@@ -51,6 +54,7 @@ function Form({ auth0, loading, onCreateDB }) {
             bg: 'whiteAlpha.400'
           }}
           isDisabled={isMobile}
+          ref={dbName}
         />
       </VStack>
 
@@ -68,10 +72,11 @@ function Form({ auth0, loading, onCreateDB }) {
             bg: 'whiteAlpha.400'
           }}
           isDisabled={isMobile}
+          ref={regionSelect}
         >
           <option value="us-east-1">US-EAST-1 (N. Virginia)</option>
-          <option value="us-east-1">US-WEST-1 (N. California)</option>
-          <option value="us-east-1">EU-WEST-1 (Ireland)</option>
+          <option value="us-west-1">US-WEST-1 (N. California)</option>
+          <option value="eu-west-1">EU-WEST-1 (Ireland)</option>
         </Select>
       </VStack>
 
@@ -81,7 +86,8 @@ function Form({ auth0, loading, onCreateDB }) {
           <CreateButton
             auth0={auth0}
             loading={loading}
-            onCreateDB={onCreateDB}
+            apierror={apierror}
+            onCreateDB={() => onCreateDB(regionSelect.current.value, dbName.current.value)}
           />
         </Box>
         <Box d={['block', 'none']}>

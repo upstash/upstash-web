@@ -1,13 +1,13 @@
 import { Box, Button, Link } from '@chakra-ui/react'
 import { LINKS } from '../../constants'
 
-function Step3() {
+function Step3({ url }) {
   return (
     <Box>
       <Button
         size="lg"
         as={Link}
-        href={LINKS.console}
+        href={url}
         color="black"
         bg="primary"
         _hover={{

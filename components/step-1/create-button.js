@@ -5,7 +5,7 @@ import Error from './error'
 import CustomLink from "../custom-link";
 import {LINKS} from "../../constants";
 
-export default function CreateButton({auth0, loading, onCreateDB}) {
+export default function CreateButton({auth0, loading, onCreateDB, apierror}) {
     const {
         isLoading,
         isAuthenticated,
@@ -18,9 +18,11 @@ export default function CreateButton({auth0, loading, onCreateDB}) {
 
     useEffect(() => {
         async function getToken() {
-            if (isAuthenticated) console.log(await getAccessTokenSilently())
+            if (isAuthenticated) {
+                localStorage.setItem('accessToken', await getAccessTokenSilently());
+                localStorage.setItem('profile', await JSON.stringify(user));
+            }
         }
-
         !isLoading && getToken()
     }, [isLoading, getAccessTokenSilently])
 
@@ -32,7 +34,8 @@ export default function CreateButton({auth0, loading, onCreateDB}) {
                 </Box>
             )}
 
-            {error && <Error/>}
+            {error && <Error message={"Authentication failed."}/>}
+            {apierror && <Error message={apierror}/>}
 
             {isAuthenticated ? (
                 <VStack spacing={6} align="stretch">
@@ -58,7 +61,7 @@ export default function CreateButton({auth0, loading, onCreateDB}) {
                         _hover={{}}
                         onClick={loginWithPopup}
                     >
-                        Log in and Create
+                        Log in to Create
                     </Button>
                     <Box fontSize="9pt">
                         By clicking Log in, you agree to our 

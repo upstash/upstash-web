@@ -4,7 +4,7 @@ function Error({ message }) {
   return (
     <Alert status="error" borderRadius="md">
       <AlertIcon />
-      <AlertDescription>Oops... {message}</AlertDescription>
+      <AlertDescription>{message}</AlertDescription>
     </Alert>
   )
 }
