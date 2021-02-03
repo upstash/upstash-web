@@ -76,10 +76,8 @@ export const PRICES = {
     description:
       'Pricing is based on per request/command. Operational commands like AUTH, INFO, PING, QUIT, COMMAND are not billed.',
     free: 'Free',
-    standard:
-      '$0.2 per 100K commands, up to $120 monthly max.',
-    premium:
-      '$0.4 per 100K commands, up to $240 monthly max.'
+    standard: '$0.2 per 100K commands, up to $120 monthly max.',
+    premium: '$0.4 per 100K commands, up to $240 monthly max.'
   }
 }
 
@@ -106,7 +104,7 @@ export const HIGHLIGHT_THEME = {
   'hljs-name': {},
   'hljs-type': {},
   'hljs-string': {
-    color: '#D1ADFF'
+    color: '#00E9A3'
   },
   'hljs-number': {},
   'hljs-selector-id': {},
