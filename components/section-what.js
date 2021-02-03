@@ -43,9 +43,9 @@ function SectionWhat() {
             <Box mt={4}>
               <Text color="whiteAlpha.600">
                 Upstash has been designed to be Serverless from day 1. You start
-                using the database, knowing nothing about the servers. We
-                maintain it, we scale it, we deal with any issue. You focus on
-                what you are building.
+                using the database, knowing nothing about the servers.
+                Our K8S based fault tolerant infrastructure handles the scalability and failures.
+                You focus on what you are building.
               </Text>
             </Box>
             <Box mt={4}>

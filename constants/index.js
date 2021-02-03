@@ -137,10 +137,6 @@ export const SUPPORT_LANG = {
     name: 'node-redis',
     language: 'javascript'
   },
-  IO_REDIS: {
-    name: 'io-redis',
-    language: 'javascript'
-  },
   REDIS_PY: {
     name: 'redis-py',
     language: 'python'
@@ -151,10 +147,6 @@ export const SUPPORT_LANG = {
   },
   GO_REDIS: {
     name: 'go-redis',
-    language: 'go'
-  },
-  REDIGO: {
-    name: 'redigo',
     language: 'go'
   },
   REDIS_CLI: {
@@ -192,11 +184,6 @@ client.on("error", function(err) {
 
 client.set('foo','bar');`
 
-    case SUPPORT_LANG.IO_REDIS.name:
-      return `const Redis = require("ioredis");
-let client = new Redis("redis://:${password}@${endpoint}:${port}");
-client.set('foo', 'bar');`
-
     case SUPPORT_LANG.REDIS_PY.name:
       return `import redis
 r = redis.Redis(
@@ -223,22 +210,6 @@ func main() {
   client.Set(ctx, "foo", "bar", 0)
   val := client.Get(ctx, "foo").Val()
   print(val)
-}`
-
-    case SUPPORT_LANG.REDIGO.name:
-      return `func main() {
-  c, err := redis.Dial("tcp", "${password}:${port}")
-  if err != nil {
-      panic(err)
-  }
-  _, err = c.Do("AUTH", "${password}")
-  if err != nil {
-      panic(err)
-  }
-  _, err = c.Do("SET", "foo", "bar")
-  if err != nil {
-      panic(err)
-  }
 }`
 
     default:
