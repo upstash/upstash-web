@@ -53,9 +53,9 @@ function Header({ onOpen }) {
           {/* console */}
           <GridItem d={['none', 'flex']} justifyContent="flex-end">
             <Button
-              as={CustomLink}
               href={LINKS.console}
-              color="white"
+              color="black"
+              bg="primary"
               _hover={{
                 textDecoration: 'none'
               }}

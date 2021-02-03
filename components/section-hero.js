@@ -16,7 +16,7 @@ function SectionHero() {
         >
           Serverless <br />
           Database <br />
-          for Redis<span style={{fontSize: "14pt", verticalAlign: "top", marginTop: "30px"}}>®</span>
+          for Redis<span style={{fontSize: "14pt", verticalAlign: "top", paddingTop: "30px"}}>®</span>
         </Heading>
 
         <Box mt="24px" fontSize={['md', '2xl']} color="whiteAlpha.700">
