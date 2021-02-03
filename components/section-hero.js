@@ -3,7 +3,7 @@ import { LINKS } from '../constants'
 
 function SectionHero() {
   return (
-    <Box as="section" py={['100px', '120px']} textAlign="center">
+    <Box as="section" py={['100px', '100px']} textAlign="center">
       <Container maxW="5xl">
         {/**/}
 
@@ -16,7 +16,16 @@ function SectionHero() {
         >
           Serverless <br />
           Database <br />
-          for Redis<span style={{fontSize: "14pt", verticalAlign: "top", paddingTop: "30px"}}>®</span>
+          for Redis
+          <span
+            style={{
+              fontSize: '14pt',
+              verticalAlign: 'top',
+              paddingTop: '30px'
+            }}
+          >
+            ®
+          </span>
         </Heading>
 
         <Box mt="24px" fontSize={['md', '2xl']} color="whiteAlpha.700">
