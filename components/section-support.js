@@ -3,6 +3,7 @@ import SectionSupportIconRedis from './section-support-icon-redis'
 import SectionSupportIconNext from './section-support-icon-next'
 import SectionSupportIconAws from './section-support-icon-aws'
 import SupportCard from './section-support-card'
+import {LINKS} from "../constants";
 
 function SectionSupport() {
   return (
@@ -28,33 +29,36 @@ function SectionSupport() {
         </Box>
 
         <SimpleGrid mt={[10, 20]} columns={[1, 1, 3]} spacing={6}>
-          <SupportCard theme="next">
+          <SupportCard theme="next" >
             <SectionSupportIconNext />
             <Text>
               Check out docs for <br />
               <Text as="b" fontWeight="bold">
                 Next.js
               </Text>
+              <br /> Integration
             </Text>
           </SupportCard>
           {/**/}
-          <SupportCard theme="aws">
+          <SupportCard theme="aws" href={LINKS.aws}>
             <SectionSupportIconAws />
             <Text>
               Check out docs for <br />
               <Text as="b" fontWeight="bold">
                 AWS Lambda
               </Text>
+              <br /> Integration
             </Text>
           </SupportCard>
           {/**/}
-          <SupportCard theme="redis">
+          <SupportCard theme="redis" href={LINKS.redisCompatibility} >
             <SectionSupportIconRedis />
             <Text>
-              Check out docs for <br />
+              Check out docs <br />
               <Text as="b" fontWeight="bold">
-                Redis
-              </Text>
+                Redis API
+              </Text> <br />
+              Compatibility
             </Text>
           </SupportCard>
           {/**/}

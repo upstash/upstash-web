@@ -8,6 +8,8 @@ export const LINKS = {
   serverless: 'https://docs.upstash.com/docs/overall/compare/',
   compare: 'https://docs.upstash.com/docs/overall/compare/',
   pricing: 'https://docs.upstash.com/docs/account/pricing/',
+  aws: 'https://docs.upstash.com/docs/howto/connectfromawslambda',
+  nextjs: '#',
   redisCompatibility:
     'https://docs.upstash.com/docs/overall/rediscompatibility/',
   reservedPricing:
