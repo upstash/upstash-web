@@ -95,7 +95,7 @@ function Footer() {
                     <Box w="full">
                         <Container maxW="xl">
                             <Text fontSize="s" color="whiteAlpha.900">
-                                © {new Date().getFullYear()} Upstash, Inc. <br/>Delaware registered, California based company.
+                                © {new Date().getFullYear()} Upstash, Inc. Based in California.
                             </Text>
                         </Container>
                     </Box>
