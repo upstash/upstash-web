@@ -41,10 +41,10 @@ function SectionWhat() {
             </Heading>
             <Box mt={4}>
               <Text color="whiteAlpha.600">
-                In Upstash pricing model, you pay per request. It costs you
-                nothing to run if nobody is using it. The max monthly (ceiling)
-                price, guarantees that you will not pay more than ceiling price
-                (that is $120 per month for Standard databases).
+                Upstash costs you nothing to run if nobody is using it thanks to
+                pey-per-request pricing. The max monthly (ceiling) price
+                guarantees that you will not pay more than ceiling price (that
+                is $120 per month for Standard databases).
               </Text>
             </Box>
             <Box mt={4}>
@@ -96,9 +96,9 @@ function SectionWhat() {
             <Box mt={4}>
               <Text color="whiteAlpha.600">
                 Multi tier storage blends the performance of memory with
-                durability of the disk. Upstash persists all entries to the
-                block storage in addition to memory. This enables many other
-                usecases beyond caching.
+                durability of the disk. Upstash instantly persists all entries
+                to the block storage in addition to memory. This enables many
+                other use cases beyond caching.
               </Text>
             </Box>
             <Box mt={4}>
