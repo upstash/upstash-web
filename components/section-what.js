@@ -42,7 +42,7 @@ function SectionWhat() {
             <Box mt={4}>
               <Text color="whiteAlpha.600">
                 Upstash costs you nothing to run if nobody is using it thanks to
-                pey-per-request pricing. The max monthly (ceiling) price
+                pay-per-request pricing. The max monthly (ceiling) price
                 guarantees that you will not pay more than ceiling price (that
                 is $120 per month for Standard databases).
               </Text>
