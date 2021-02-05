@@ -26,7 +26,7 @@ function SectionPricing() {
           </Heading>
           <Container maxW="3xl">
             <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
-              Flexible pricing for different use cases
+              It costs you nothing if nobody is using.
             </Text>
           </Container>
         </Box>
@@ -46,17 +46,24 @@ function SectionPricing() {
           </Text>
           <Text>
             See{' '}
-            <CustomLink isExternal href={LINKS.reservedPricing}>
+            <CustomLink isExternal noIcon href={LINKS.reservedPricing}>
               reserved plans
             </CustomLink>{' '}
             for high throughput use cases.
           </Text>
           <Text>
             See{' '}
-            <CustomLink isExternal href={LINKS.databaseTypes}>
+            <CustomLink isExternal noIcon href={LINKS.databaseTypes}>
               database types
             </CustomLink>{' '}
             for more information on databases.
+          </Text>
+          <Text>
+            Talk to{' '}
+            <CustomLink isExternal noIcon href={LINKS.support}>
+              us
+            </CustomLink>{' '}
+            for advanced needs.
           </Text>
         </VStack>
 
