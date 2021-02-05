@@ -8,10 +8,11 @@ class MyDocument extends Document {
 
   render() {
     const meta = {
-      tittle: 'Upstash',
-      description: 'Serverless Database for Redis®',
+      title: 'Upstash: Serverless Database for Redis®',
+      description:
+        'Run Serverless Database without thinking about the servers. It costs you nothing if nobody is using.',
       url: 'https://upstash.com',
-      googleAnalytic: 'UA-163316783-1'
+      googleAnalytic: 'G-QW5KRSTDM0'
     }
 
     return (

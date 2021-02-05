@@ -10,7 +10,7 @@ function HomePage() {
   return (
     <>
       <Head>
-        <title>Home Page</title>
+        <title>Upstash: Serverless Database for Redis®</title>
       </Head>
 
       <SectionHero />
