@@ -9,7 +9,7 @@ export const LINKS = {
   compare: 'https://docs.upstash.com/docs/overall/compare/',
   pricing: 'https://docs.upstash.com/docs/account/pricing/',
   aws: 'https://docs.upstash.com/docs/howto/connectfromawslambda',
-  nextjs: '#',
+  nextjs: 'https://docs.upstash.com/docs/tutorials/nextjs_with_redis',
   redisCompatibility:
     'https://docs.upstash.com/docs/overall/rediscompatibility/',
   reservedPricing:

@@ -3,7 +3,7 @@ import SectionSupportIconRedis from './section-support-icon-redis'
 import SectionSupportIconNext from './section-support-icon-next'
 import SectionSupportIconAws from './section-support-icon-aws'
 import SupportCard from './section-support-card'
-import {LINKS} from "../constants";
+import { LINKS } from '../constants'
 
 function SectionSupport() {
   return (
@@ -29,7 +29,7 @@ function SectionSupport() {
         </Box>
 
         <SimpleGrid mt={[10, 20]} columns={[1, 1, 3]} spacing={6}>
-          <SupportCard theme="next" >
+          <SupportCard theme="next" href={LINKS.nextjs}>
             <SectionSupportIconNext />
             <Text>
               Check out docs for <br />
@@ -51,13 +51,14 @@ function SectionSupport() {
             </Text>
           </SupportCard>
           {/**/}
-          <SupportCard theme="redis" href={LINKS.redisCompatibility} >
+          <SupportCard theme="redis" href={LINKS.redisCompatibility}>
             <SectionSupportIconRedis />
             <Text>
               Check out docs <br />
               <Text as="b" fontWeight="bold">
                 Redis API
-              </Text> <br />
+              </Text>{' '}
+              <br />
               Compatibility
             </Text>
           </SupportCard>
