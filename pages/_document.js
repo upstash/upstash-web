@@ -8,7 +8,7 @@ class MyDocument extends Document {
 
   render() {
     const meta = {
-      title: 'Upstash: Serverless Database for Redis®',
+      title: 'Upstash: Serverless Database for Redis',
       description:
         'Run Serverless Database without thinking about the servers. It costs you nothing if nobody is using.',
       url: 'https://upstash.com',
@@ -109,7 +109,6 @@ class MyDocument extends Document {
               />
             </>
           )}
-
           <script
             type="text/javascript"
             id="hs-script-loader"
