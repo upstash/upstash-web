@@ -37,7 +37,7 @@ function SectionWhat() {
               mb={6}
             />
             <Heading tag="h4" fontSize={['xl', '2xl']}>
-              Simple Pricing, No Surprises
+              Serverless Pricing, No Surprises
             </Heading>
             <Box mt={4}>
               <Text color="whiteAlpha.600">

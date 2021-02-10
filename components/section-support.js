@@ -18,12 +18,12 @@ function SectionSupport() {
 
         <Box as="header">
           <Heading tag="h2" size="2xl">
-            Best Choice for Jamstack
+            Best Choice for the Jamstack
           </Heading>
           <Container maxW="3xl">
             <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
               Low latency data, ease of use and pay-per-request pricing makes
-              Upstash a perfect choice for Jamstack and Serverless world.
+              Upstash a perfect choice for the Jamstack and Serverless world.
             </Text>
           </Container>
         </Box>
