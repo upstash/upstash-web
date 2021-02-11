@@ -12,8 +12,12 @@ import Col from './col'
 import ColCheck from './col-check'
 import ColDescription from './col-description'
 import CustomTooltip from './col-tooltip'
+import { useContext } from 'react'
+import StoreContext from '../../store'
 
 function DesktopTable() {
+  const store = useContext(StoreContext)
+
   return (
     <Grid templateColumns="repeat(4, 1fr)">
       {/**/}
@@ -182,7 +186,7 @@ function DesktopTable() {
       <Col>
         <Button
           as={Link}
-          href={LINKS.console}
+          href={store.dbUrl}
           color="black"
           bg="white"
           _hover={{
@@ -195,7 +199,7 @@ function DesktopTable() {
       <Col highlight style={{ borderRadius: '0 0 16px 16px' }}>
         <Button
           as={Link}
-          href={LINKS.console}
+          href={store.dbUrl}
           color="black"
           bg="primary"
           _hover={{
@@ -208,7 +212,7 @@ function DesktopTable() {
       <Col>
         <Button
           as={Link}
-          href={LINKS.console}
+          href={store.dbUrl}
           color="black"
           bg="white"
           _hover={{

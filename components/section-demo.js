@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import { Container, Box, VStack } from '@chakra-ui/react'
 import Bg from './bg'
 import Header from './section-demo-header'
@@ -7,18 +7,19 @@ import Step2 from './step-2'
 import Step3 from './step-3'
 import { sizes } from '../theme'
 import { useAuth0 } from '@auth0/auth0-react'
+import StoreContext from '../store'
 
 function SectionDemo(props) {
   const auth0 = useAuth0()
+  const store = useContext(StoreContext)
 
   const [loading, loadingSet] = useState(false)
   const [db, dbSet] = useState()
   const [apierror, apierrorSet] = useState(null)
-  const [url, urlSet] = useState(process.env.NEXT_PUBLIC_CONSOLE_URL)
 
   const onCreateDB = async (region, dbName) => {
     loadingSet(true)
-    let url = process.env.NEXT_PUBLIC_API_URL
+    let api_url = process.env.NEXT_PUBLIC_API_URL
     let token = localStorage.getItem('accessToken')
     let profile = localStorage.getItem('profile')
 
@@ -28,7 +29,7 @@ function SectionDemo(props) {
       btoa(profile) +
       '&token=' +
       btoa(token)
-    urlSet(temp)
+    store.dbUrlSet(temp)
 
     const postData = {
       database_name: dbName,
@@ -38,7 +39,8 @@ function SectionDemo(props) {
       consistent: false
     }
     console.log(postData)
-    const response = await fetch(url + 'databases', {
+
+    const response = await fetch(api_url + 'databases', {
       method: 'POST',
       body: JSON.stringify(postData),
       headers: {
@@ -109,7 +111,7 @@ function SectionDemo(props) {
                 desc="The console awaits you for more"
               />
               <Box>
-                <Step3 url={url} />
+                <Step3 url={store.dbUrl} />
               </Box>
             </VStack>
           )}
