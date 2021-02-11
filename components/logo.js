@@ -1,4 +1,4 @@
-import { Flex, Link } from '@chakra-ui/react'
+import { Link } from '@chakra-ui/react'
 
 export function LogoIcon() {
   return (
