@@ -1,5 +1,4 @@
 import { Box, Button, Link } from '@chakra-ui/react'
-import { LINKS } from '../../constants'
 
 function Step3({ url }) {
   return (

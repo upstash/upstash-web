@@ -17,7 +17,8 @@ const theme = extendTheme({
         fontSize: '17px'
       },
       body: {
-        bg: 'mainBlack'
+        bg: 'mainBlack',
+        color: 'white'
       }
     }
   },
