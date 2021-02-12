@@ -63,8 +63,6 @@ function Header({ onOpen }) {
             <Button
               as={Link}
               href={LINKS.console}
-              color="black"
-              bg="white"
               _hover={{
                 textDecoration: 'none'
               }}

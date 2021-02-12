@@ -28,30 +28,31 @@ function SectionFaq() {
         <Accordion defaultIndex={0} mt={[10, 20]}>
           {/**/}
 
-          <FaqAccordionItem title="What does it mean Serverless Database?">
+          <FaqAccordionItem title="What is a Serverless Database?">
             <Text>
-              You do not have to plan and provision servers. You do not deal
-              with configuring or maintaining any server. You just use the
-              service and pay per request. You do not pay if you are not using.
+              With servers/instances, you pay per-hour or a fixed price. With
+              Serverless, you pay per-request. This means you're not charged
+              when the database isn't in use. Upstash configures and manages the
+              database for you.
             </Text>
           </FaqAccordionItem>
 
           {/**/}
 
-          <FaqAccordionItem title="My stack is not serverless. Can I use Upstash?">
+          <FaqAccordionItem title="My app is not serverless. Can I still use Upstash?">
             <Text>
-              Absolutely. Your application can be running on an EC2 Instance or
-              a container, still you can use Upstash.
+              Yes! You can use whatever architecture you like, you can still use
+              Upstash as your database.
             </Text>
           </FaqAccordionItem>
 
           {/**/}
 
-          <FaqAccordionItem title="How do you compare Upstash with Elasticache and RedisLabs?">
+          <FaqAccordionItem title="How does Upstash compare to Elasticache and RedisLabs?">
             <Text>
-              With ElastiCache or Redislabs you pay even you do not utilize the
-              database. Their price is based on provisioned memory size. Upstash
-              pricing is pay per request.
+              With ElastiCache and Redislabs, you pay a fixed price even when
+              not using your database. Their price is based on instance-hour.
+              Upstash pricing is pay per request.
             </Text>
           </FaqAccordionItem>
 
@@ -59,18 +60,12 @@ function SectionFaq() {
 
           <FaqAccordionItem title="What about Dynamodb and Fauna?">
             <Text>
-              DynamoDB can not compete with Upstash on latency. In Upstash the
-              latency of a read query is submillisecond while it is up to 10
-              msec in DynamoDB. Besides latency, you will miss the simplicity
-              and elegance of Redis API much if you are working with DynamoDB.
-              Moreover your investment into the DynamoDB worthies only if you
-              are on AWS meanwhile Redis is everywhere.
-            </Text>
-            <Text>
-              Fauna's latency is even worse than Dynamodb because they replicate
-              the data to multiple regions in a strongly consistent way. If your
-              use case is very consistency sensitive, then Fauna is good.
-              Otherwise, it is slow and expensive.
+              Upstash has lower latency than DynamoDB and Fauna. Upstash is
+              easier to use just like the Redis API. For more information, see
+              our documentation{' '}
+              <CustomLink isExternal noIcon href={LINKS.compare}>
+                comparing vendors.
+              </CustomLink>
             </Text>
           </FaqAccordionItem>
 

@@ -5,7 +5,7 @@ export const LINKS = {
   privacy: 'static/legal/privacy.html',
   terms: 'static/legal/terms.html',
   subcontractors: 'static/legal/subcontractors.html',
-  serverless: 'https://docs.upstash.com/docs/overall/compare/',
+  consistency: 'https://docs.upstash.com/docs/overall/consistency',
   compare: 'https://docs.upstash.com/docs/overall/compare/',
   pricing: 'https://docs.upstash.com/docs/account/pricing/',
   aws: 'https://docs.upstash.com/docs/howto/connectfromawslambda',
@@ -20,7 +20,7 @@ export const LINKS = {
 
 export const SOCIAL_LINKS = {
   medium: 'https://medium.com/upstash',
-  twitter: 'https://twitter.com/upstash',
+  twitter: 'https://twitter.com/UpstashCom',
   discord: 'https://discord.gg/w9SenAtbme'
 }
 
@@ -29,7 +29,7 @@ export const PRICES = {
     title: 'Commands Limit',
     description:
       'This is the maximum number of requests/commands that your database can receive and process per day.',
-    free: 'Max 10.000 Commands Daily',
+    free: 'Max 10,000 Commands Daily',
     standard: 'Unlimited',
     premium: 'Unlimited'
   },
@@ -47,7 +47,7 @@ export const PRICES = {
       'This is the maximum allowed number of concurrent connections (clients) at a moment. This cap does not essentially limit the number of requests that can be submitted per second, but defines the maximum number of open TCP connections to the database.',
     free: '20',
     standard: '1000',
-    premium: '10.000'
+    premium: '10,000'
   },
   persistence: {
     title: 'Persistence',

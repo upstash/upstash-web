@@ -26,7 +26,7 @@ function SectionPricing() {
           </Heading>
           <Container maxW="3xl">
             <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
-              It costs you nothing if nobody is using.
+              Pay only for what you use with per-request pricing.
             </Text>
           </Container>
         </Box>

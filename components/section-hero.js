@@ -37,7 +37,7 @@ function SectionHero() {
             textDecoration: 'none'
           }}
         >
-          Get started for free
+          Start free in 30 seconds
         </Button>
 
         {/**/}

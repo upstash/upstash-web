@@ -22,8 +22,9 @@ function SectionWhat() {
         {/**/}
 
         <Box as="header">
-          <Heading tag="h2" size="2xl">
-            Designed for the Serverless Era
+          <Heading tag="h3">
+            The modern database <br />
+            for performance-focused engineers.
           </Heading>
         </Box>
         <SimpleGrid mt={[10, 20]} columns={[1, 1, 2]} spacing={[6, 8]}>
@@ -41,15 +42,15 @@ function SectionWhat() {
             </Heading>
             <Box mt={4}>
               <Text color="whiteAlpha.600">
-                Upstash costs you nothing to run if nobody is using it thanks to
-                pay-per-request pricing. The max monthly (ceiling) price
-                guarantees that you will not pay more than ceiling price (that
-                is $120 per month for Standard databases).
+                Start free, then pay only for what you use with per-request
+                pricing. Forget your expensive server/instance. Use Upstash as
+                much as you need, you'll never pay more than $120/month for
+                standard databases, guaranteed.
               </Text>
             </Box>
             <Box mt={4}>
               <CustomLink isExternal href={LINKS.pricing}>
-                See more
+                Start saving
               </CustomLink>
             </Box>
           </Box>
@@ -68,15 +69,14 @@ function SectionWhat() {
             </Heading>
             <Box mt={4}>
               <Text color="whiteAlpha.600">
-                In Serverless world, extra millisecond is a cost. That's why we
-                optimized Upstash for low latency. Multi tier storage makes
-                Upstash faster than DynamoDB and Fauna. Pay-per-request model
-                makes Upstash more affordable than ElastiCache and RedisLabs.
+                We optimized Upstash for low latency. Multi-tier storage makes
+                Upstash faster than DynamoDB/Fauna, and more affordable than
+                ElastiCache/RedisLabs.
               </Text>
             </Box>
             <Box mt={4}>
               <CustomLink isExternal href={LINKS.compare}>
-                See more
+                Compare vendors
               </CustomLink>
             </Box>
           </Box>
@@ -91,19 +91,19 @@ function SectionWhat() {
               mb={6}
             />
             <Heading tag="h4" fontSize={['xl', '2xl']}>
-              Memory + Disk = Fast + Durable
+              Fast, Durable Storage
             </Heading>
             <Box mt={4}>
               <Text color="whiteAlpha.600">
-                Multi tier storage blends the performance of memory with
-                durability of the disk. Upstash instantly persists all entries
-                to the block storage in addition to memory. This enables many
-                other use cases beyond caching.
+                Blend the performance of in-memory with the durability of disk
+                storage enabling many use cases beyond caching. You can enable
+                Strong Consistency mode to have guaranteed replicated, durable
+                writes.
               </Text>
             </Box>
             <Box mt={4}>
-              <CustomLink isExternal href={LINKS.serverless}>
-                See more
+              <CustomLink isExternal href={LINKS.consistency}>
+                Learn more
               </CustomLink>
             </Box>
           </Box>
@@ -123,14 +123,14 @@ function SectionWhat() {
             <Box mt={4}>
               <Text color="whiteAlpha.600">
                 Upstash is compatible with the majority of the Redis API. It
-                works with all Redis clients, so you can run your legacy code
-                without changing a line. In addition to Redis, GraphQL API is
-                coming soon.
+                works with all Redis clients, so you can run your existing code
+                without changing a line. In addition to Redis, our GraphQL API
+                is coming soon.
               </Text>
             </Box>
             <Box mt={4}>
               <CustomLink isExternal href={LINKS.redisCompatibility}>
-                See more
+                View API
               </CustomLink>
             </Box>
           </Box>
