@@ -88,7 +88,7 @@ export const HIGHLIGHT_THEME = {
     textAlign: 'left',
     display: 'block',
     overflowX: 'auto',
-    fontSize: '0.92rem'
+    fontSize: '0.84rem'
   },
   'hljs-subst': {
     color: '#444'
@@ -157,15 +157,10 @@ export const SUPPORT_LANG = {
   }
 }
 
-export function codeGernerator(
-  name,
-  db = {
-    endpoint: 'DATABASE-ENDPOINT',
-    port: 'DATABASE-PORT',
-    password: 'DATABASE-PASSWORD'
-  }
-) {
-  const { endpoint, port, password } = db
+export function codeGernerator(name) {
+  const endpoint = 'my-serverless.db.upstash.io'
+  const port = '30652'
+  const password = '1234567890'
 
   switch (name) {
     case SUPPORT_LANG.REDIS_CLI.name:

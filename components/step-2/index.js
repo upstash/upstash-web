@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Box, Button, useClipboard, useToast } from '@chakra-ui/react'
 import { codeGernerator, HIGHLIGHT_THEME, SUPPORT_LANG } from '../../constants'
 import SyntaxHighlighter from 'react-syntax-highlighter'
-import Tab from './tab'
+// import Tab from './tab'
 import * as Icon from '../icons'
 
 function Step2({ db }) {
@@ -16,7 +16,7 @@ function Step2({ db }) {
   const initialLang = SUPPORT_LANG.NODE_REDIS
   const [name, nameSet] = useState(initialLang.name)
   const [language, languageSet] = useState(initialLang.language)
-  const code = codeGernerator(name, db)
+  const code = codeGernerator(name)
 
   const onChange = (name, language) => {
     nameSet(name)
@@ -36,22 +36,15 @@ function Step2({ db }) {
   }, [text])
 
   return (
-    <Box w="full" maxW={800} mx="auto">
-      <Tab name={name} onChange={onChange} />
+    <Box>
+      {/*<Tab name={name} onChange={onChange} />*/}
 
-      <Box
-        mt={8}
-        p={6}
-        pt={8}
-        pos="relative"
-        bg="whiteAlpha.200"
-        borderRadius="2xl"
-      >
+      <Box px={3} py={4} pos="relative" borderRadius="2xl">
         {/* copy button */}
         <Button
           pos="absolute"
-          right={6}
-          top={6}
+          right={2}
+          top={2}
           size="xs"
           onClick={() => textSet(code)}
         >
@@ -64,7 +57,7 @@ function Step2({ db }) {
           language={language}
           showLineNumbers
           lineNumberStyle={{
-            color: '#444'
+            color: '#555'
           }}
           style={HIGHLIGHT_THEME}
         >
