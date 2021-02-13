@@ -48,18 +48,25 @@ function Step2() {
   return (
     <Window>
       <WindowHeader>
-        <Box ml={4} pt="6px">
+        <Box ml={4} pt="8px">
           <Menu>
             <MenuButton
               as={Button}
-              h="34px"
+              h="32px"
               borderBottomLeftRadius="0"
               borderBottomRightRadius="0"
               color="whiteAlpha.700"
               bg="blackAlpha.500"
-              fontSize="sm"
+              fontSize="xs"
             >
-              {initialLang.name}
+              {name}
+              <Box
+                as={Icon.ChevronDown}
+                ml={1}
+                fontSize="sm"
+                opacity={0.6}
+                display="inline-flex"
+              />
             </MenuButton>
             <MenuList bg="white" borderColor="white" color="black">
               {Object.keys(SUPPORT_LANG).map((lang) => {

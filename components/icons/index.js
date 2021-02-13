@@ -1,5 +1,6 @@
 export { default as ArrowUpRight } from './ArrowUpRight'
 export { default as Check } from './Check'
+export { default as ChevronDown } from './ChevronDown'
 export { default as Copy } from './Copy'
 export { default as Discord } from './Discord'
 export { default as Info } from './Info'
