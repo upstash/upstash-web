@@ -6,7 +6,7 @@ function SectionHero() {
   const store = useContext(StoreContext)
 
   return (
-    <Box as="section" py={['100px', '100px']} textAlign="center">
+    <Box as="section" py={['80px', '100px']} textAlign="center">
       <Container maxW="5xl">
         {/**/}
 

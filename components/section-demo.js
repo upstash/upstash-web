@@ -10,7 +10,7 @@ function SectionDemo(props) {
       as="section"
       pos="relative"
       overflow="hidden"
-      pb="220px"
+      pb={['120px', '220px']}
       textAlign="center"
       {...props}
     >
