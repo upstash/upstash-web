@@ -1,10 +1,7 @@
 import { Link, Container, Button, Box, Heading, Text } from '@chakra-ui/react'
-import { useContext } from 'react'
-import StoreContext from '../store'
+import { LINKS } from '../constants'
 
 function SectionHero() {
-  const store = useContext(StoreContext)
-
   return (
     <Box as="section" py={['80px', '100px']} textAlign="center">
       <Container maxW="5xl">
@@ -31,7 +28,7 @@ function SectionHero() {
 
         <Button
           as={Link}
-          href={store.dbUrl}
+          href={LINKS.console}
           mt="40px"
           size="lg"
           color="black"

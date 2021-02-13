@@ -12,12 +12,8 @@ import CustomLink from './custom-link'
 import * as Icon from './icons'
 import Logo from './logo'
 import { LINKS, SOCIAL_LINKS } from '../constants'
-import { useContext } from 'react'
-import StoreContext from '../store'
 
 function Header({ onOpen }) {
-  const store = useContext(StoreContext)
-
   return (
     <Box as="header" mt={[10, 14]}>
       <Container maxW="5xl">
@@ -66,7 +62,7 @@ function Header({ onOpen }) {
           <GridItem d={['none', 'flex']} justifyContent="flex-end">
             <Button
               as={Link}
-              href={store.dbUrl}
+              href={LINKS.console}
               _hover={{
                 textDecoration: 'none'
               }}
