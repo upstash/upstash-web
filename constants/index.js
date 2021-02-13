@@ -136,23 +136,23 @@ export const HIGHLIGHT_THEME = {
 
 export const SUPPORT_LANG = {
   NODE_REDIS: {
-    name: 'node-redis',
+    name: 'Node',
     language: 'javascript'
   },
   REDIS_PY: {
-    name: 'redis-py',
+    name: 'Python',
     language: 'python'
   },
   JEDIS: {
-    name: 'jedis',
+    name: 'Java',
     language: 'java'
   },
   GO_REDIS: {
-    name: 'go-redis',
+    name: 'Go',
     language: 'go'
   },
   REDIS_CLI: {
-    name: 'redis-cli',
+    name: 'CLI',
     language: 'bash'
   }
 }
