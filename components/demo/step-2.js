@@ -61,7 +61,7 @@ function Step2() {
             >
               {initialLang.name}
             </MenuButton>
-            <MenuList>
+            <MenuList bg="white" borderColor="white" color="black">
               {Object.keys(SUPPORT_LANG).map((lang) => {
                 const SELECTED_LANG = SUPPORT_LANG[lang]
                 return (

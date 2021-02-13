@@ -1,8 +1,14 @@
 import { Box, Flex } from '@chakra-ui/react'
 
-function Window({ children }) {
+function Window({ children, ...props }) {
   return (
-    <Box bg="mainBlack" borderRadius="xl" boxShadow="lg">
+    <Box
+      overflow="hidden"
+      bg="mainBlack"
+      borderRadius="xl"
+      boxShadow="lg"
+      {...props}
+    >
       <Flex
         direction="column"
         height="100%"

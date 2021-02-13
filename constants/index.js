@@ -158,7 +158,7 @@ export const SUPPORT_LANG = {
 }
 
 export function codeGernerator(name) {
-  const endpoint = 'my-serverless.db.upstash.io'
+  const endpoint = 'my-serverless-db.upstash.io'
   const port = '30652'
   const password = '1234567890'
 

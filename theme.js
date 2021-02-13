@@ -6,9 +6,7 @@ const config = {
   initialColorMode: 'dark'
 }
 
-export const sizes = {
-  bubble: 40
-}
+export const sizes = {}
 
 const theme = extendTheme({
   styles: {

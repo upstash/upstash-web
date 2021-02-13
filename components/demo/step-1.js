@@ -32,7 +32,7 @@ function FormItem({ label, input, ...props }) {
 
 function Step1() {
   return (
-    <Window>
+    <Window d={['none', 'none', 'block']}>
       <WindowHeader>
         <Box
           pos="absolute"
