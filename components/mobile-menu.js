@@ -14,12 +14,8 @@ import {
 import CustomLink from './custom-link'
 import Logo from './logo'
 import { LINKS, SOCIAL_LINKS } from '../constants'
-import { useContext } from 'react'
-import StoreContext from '../store'
 
 function MobileMenu({ isOpen, onClose }) {
-  const store = useContext(StoreContext)
-
   return (
     <Modal isOpen={isOpen} onClose={onClose} motionPreset="slideInBottom">
       <ModalOverlay bg="whiteAlpha.200" />
@@ -36,7 +32,7 @@ function MobileMenu({ isOpen, onClose }) {
           <VStack mt={5} spacing="24px" align="stretch">
             <Button
               as={Link}
-              href={store.dbUrl}
+              href={LINKS.console}
               color="black"
               bg="primary"
               size="lg"

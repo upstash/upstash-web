@@ -14,7 +14,7 @@ function HomePage() {
       </Head>
 
       <SectionHero />
-      {/*<SectionDemo />*/}
+      <SectionDemo />
       <SectionWhat />
       <SectionSupport />
       <SectionPricing />
