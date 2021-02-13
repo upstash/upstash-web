@@ -22,11 +22,12 @@ function SectionWhat() {
         {/**/}
 
         <Box as="header">
-          <Heading tag="h3">
+          <Heading tag="h3" size="2xl">
             The modern database <br />
             for performance-focused engineers.
           </Heading>
         </Box>
+
         <SimpleGrid mt={[10, 20]} columns={[1, 1, 2]} spacing={[6, 8]}>
           <Box bg="whiteAlpha.100" borderRadius="2xl" p={10}>
             <Box

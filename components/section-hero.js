@@ -1,5 +1,4 @@
 import { Link, Container, Button, Box, Heading, Text } from '@chakra-ui/react'
-import { LINKS } from '../constants'
 import { useContext } from 'react'
 import StoreContext from '../store'
 
