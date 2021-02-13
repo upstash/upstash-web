@@ -4,7 +4,7 @@ import SectionWhatIcon1 from './section-what-icon-1'
 import SectionWhatIcon2 from './section-what-icon-2'
 import SectionWhatIcon3 from './section-what-icon-3'
 import SectionWhatIcon4 from './section-what-icon-4'
-import Bg from './bg'
+// import Bg from './bg'
 import { LINKS } from '../constants'
 
 function SectionWhat() {
@@ -13,10 +13,10 @@ function SectionWhat() {
       as="section"
       pos="relative"
       overflow="hidden"
-      py={['100px', '140px']}
+      pb={['100px', '140px']}
       textAlign="center"
     >
-      <Bg />
+      {/*<Bg />*/}
 
       <Container maxW="5xl">
         {/**/}

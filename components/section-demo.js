@@ -1,7 +1,7 @@
 import { Container, Box, SimpleGrid } from '@chakra-ui/react'
-// import Bg from './bg'
 import Step1 from './demo/step-1'
 import Step2 from './demo/step-2'
+import Bg from './bg'
 
 function SectionDemo(props) {
   return (
@@ -13,7 +13,7 @@ function SectionDemo(props) {
       textAlign="center"
       {...props}
     >
-      {/*<Bg top="40px" />*/}
+      <Bg top="140px" />
 
       <Container maxW="5xl">
         <SimpleGrid columns={2} spacing={8}>

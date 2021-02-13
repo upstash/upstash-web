@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react'
 import {
   Box,
   Button,
@@ -6,7 +5,6 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
-  Text,
   useClipboard,
   useToast
 } from '@chakra-ui/react'
@@ -15,6 +13,7 @@ import SyntaxHighlighter from 'react-syntax-highlighter'
 import * as Icon from '../icons'
 import Window from './window'
 import WindowHeader from './window-header'
+import { useState, useEffect } from 'react'
 
 function Step2() {
   const toast = useToast()
@@ -56,6 +55,7 @@ function Step2() {
               h="34px"
               borderBottomLeftRadius="0"
               borderBottomRightRadius="0"
+              color="whiteAlpha.700"
               bg="blackAlpha.500"
               fontSize="sm"
             >
@@ -96,8 +96,7 @@ function Step2() {
           size="xs"
           onClick={() => textSet(code)}
         >
-          <Box as={Icon.Copy} mr={2} />
-          Copy
+          <Box as={Icon.Copy} color="whiteAlpha.600" />
         </Button>
 
         {/* code */}

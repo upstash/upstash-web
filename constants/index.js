@@ -136,7 +136,7 @@ export const HIGHLIGHT_THEME = {
 
 export const SUPPORT_LANG = {
   NODE_REDIS: {
-    name: 'Node',
+    name: 'Nodejs',
     language: 'javascript'
   },
   REDIS_PY: {
