@@ -20,7 +20,7 @@ export const LINKS = {
 
 export const SOCIAL_LINKS = {
   medium: 'https://medium.com/upstash',
-  twitter: 'https://twitter.com/UpstashCom',
+  twitter: 'https://twitter.com/upstash',
   discord: 'https://discord.gg/w9SenAtbme'
 }
 

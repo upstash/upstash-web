@@ -45,9 +45,9 @@ function Header({ onOpen }) {
               <CustomLink isExternal href={LINKS.docs} color="inherit">
                 Docs
               </CustomLink>
-              {/*<CustomLink isExternal href={SOCIAL_LINKS.medium} color="inherit">*/}
-              {/*  Blog*/}
-              {/*</CustomLink>*/}
+              <CustomLink isExternal href={SOCIAL_LINKS.medium} color="inherit">
+                Blog
+              </CustomLink>
               <CustomLink
                 isExternal
                 href={SOCIAL_LINKS.discord}
