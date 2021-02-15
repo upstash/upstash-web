@@ -77,7 +77,7 @@ export const PRICES = {
     title: 'Price',
     description:
       'Pricing is based on per request/command. Operational commands like AUTH, INFO, PING, QUIT, COMMAND are not billed.',
-    free: 'Free',
+    free: 'Free (No credit card required)',
     standard: '$0.2 per 100K commands, up to $120 monthly max.',
     premium: '$0.4 per 100K commands, up to $240 monthly max.'
   }

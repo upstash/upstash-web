@@ -21,7 +21,7 @@ function DesktopTable() {
       <Col />
       <Col>
         <Heading tag="h5" fontSize="2xl">
-          Free (No credit card required)
+          Free
         </Heading>
       </Col>
       <Col highlight style={{ borderRadius: '16px 16px 0 0' }}>
