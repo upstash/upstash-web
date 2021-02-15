@@ -23,7 +23,7 @@ function SectionDemo(props) {
         </SimpleGrid>
 
         <SimpleGrid columns={[1, 1, 2]} spacing={[6, 8]} mt={6}>
-          <Title number="1">Create a database in 20 seconds</Title>
+          <Title number="1">Create a database in a few seconds</Title>
           <Title number="2">Read/Write latency &lt;2 ms</Title>
         </SimpleGrid>
       </Container>
