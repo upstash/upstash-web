@@ -11,7 +11,9 @@ class MyDocument extends Document {
       title: 'Upstash: Serverless Database for Redis',
       description:
         'Run Serverless Database without thinking about the servers. It costs you nothing if nobody is using.',
-      url: 'https://upstash.com',
+      url: process.env.BASE_URL,
+      imagePath: 'static/logo/square-dark.png',
+      imageSize: 1024,
       googleAnalytic: 'G-QW5KRSTDM0'
     }
 
@@ -59,12 +61,19 @@ class MyDocument extends Document {
           <meta property="og:type" content="website" />
           <meta property="og:title" content={meta.title} />
           <meta property="og:description" content={meta.description} />
+          <meta property="og:image" content={meta.url + meta.imagePath} />
+          <meta property="og:image:type" content="image/png" />
+          <meta property="og:image:width" content={meta.imageSize} />
+          <meta property="og:image:height" content={meta.imageSize} />
 
           {/* twitter */}
           <meta name="twitter:card" content="summary" />
           <meta name="twitter:url" content={meta.url} />
           <meta name="twitter:title" content={meta.title} />
           <meta name="twitter:description" content={meta.description} />
+          <meta name="twitter:image" content={meta.url + meta.imagePath} />
+          <meta name="twitter:width" content={meta.imageSize} />
+          <meta name="twitter:height" content={meta.imageSize} />
 
           {/* icons */}
 
