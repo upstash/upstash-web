@@ -72,8 +72,8 @@ class MyDocument extends Document {
           <meta name="twitter:title" content={meta.title} />
           <meta name="twitter:description" content={meta.description} />
           <meta name="twitter:image" content={meta.url + meta.imagePath} />
-          <meta name="twitter:width" content={meta.imageSize} />
-          <meta name="twitter:height" content={meta.imageSize} />
+          <meta name="twitter:image:width" content={meta.imageSize} />
+          <meta name="twitter:image:height" content={meta.imageSize} />
 
           {/* icons */}
 
