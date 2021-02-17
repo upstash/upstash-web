@@ -10,7 +10,7 @@ class MyDocument extends Document {
     const meta = {
       title: 'Upstash: Serverless Database for Redis',
       description:
-        'Run Serverless Database without thinking about the servers. It costs you nothing if nobody is using.',
+        'Upstash: The Serverless Database with Redis API. It is the perfect database for the serverless applications thanks to its per-request pricing, ease of use and durable storage optimized for low latency data.',
       url: 'https://upstash.com',
       googleAnalytic: 'G-QW5KRSTDM0'
     }
