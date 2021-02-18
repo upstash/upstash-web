@@ -23,8 +23,9 @@ function SectionHero() {
         </Heading>
 
         <Box mt="24px" fontSize={['md', '2xl']} color="whiteAlpha.700">
-          <Text>Durable Storage</Text>
+          <Text>Low Latency Data</Text>
           <Text>Per-Request Pricing with Cap</Text>
+          <Text>Durable Storage</Text>
         </Box>
 
         <Button
