@@ -23,8 +23,7 @@ function SectionWhat() {
 
         <Box as="header">
           <Heading tag="h3" size="2xl">
-            The modern database <br />
-            for performance-focused engineers.
+            Designed for the Serverless Era
           </Heading>
         </Box>
 
