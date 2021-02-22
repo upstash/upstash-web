@@ -48,13 +48,6 @@ function Header({ onOpen }) {
               <CustomLink isExternal href={SOCIAL_LINKS.medium} color="inherit">
                 Blog
               </CustomLink>
-              <CustomLink
-                isExternal
-                href={SOCIAL_LINKS.discord}
-                color="inherit"
-              >
-                Discord
-              </CustomLink>
             </Stack>
           </GridItem>
 
