@@ -10,8 +10,9 @@ class MyDocument extends Document {
     const meta = {
       title: 'Upstash: Serverless Database for Redis',
       description:
-        'Upstash: The Serverless Database with Redis API. It is the perfect database for the serverless applications thanks to its per-request pricing, ease of use and durable storage optimized for low latency data.',
+        'Serverless Redis with per-request pricing, ease of use and durable storage optimized for low latency data.',
       url: process.env.BASE_URL,
+      twitterAccount: '@upstash',
       imagePath: 'static/logo/square-dark.png',
       coverImagePath: 'static/logo/cover.jpg',
       imageSize: 1024,
@@ -65,8 +66,10 @@ class MyDocument extends Document {
           <meta property="og:description" content={meta.description} />
 
           {/* twitter */}
-          <meta name="twitter:card" content="summary" />
+          <meta name="twitter:card" content="summary_large_image" />
           <meta name="twitter:url" content={meta.url} />
+          <meta name="twitter:site" content={meta.twitterAccount} />
+          <meta name="twitter:author" content={meta.twitterAccount} />
           <meta name="twitter:title" content={meta.title} />
           <meta name="twitter:image" content={meta.coverImagePath} />
           <meta name="twitter:description" content={meta.description} />
