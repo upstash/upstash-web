@@ -13,8 +13,8 @@ class MyDocument extends Document {
         'Serverless Redis with per-request pricing, ease of use and durable storage optimized for low latency data.',
       url: process.env.BASE_URL,
       twitterAccount: '@upstash',
-      imagePath: 'static/logo/square-dark.png',
-      coverImagePath: 'static/logo/cover.jpg',
+      imagePath: 'https://upstash.com/static/logo/square-dark.png',
+      coverImagePath: 'https://upstash.com/static/logo/cover.jpg',
       imageSize: 1024,
       googleAnalytic: 'G-QW5KRSTDM0'
     }
