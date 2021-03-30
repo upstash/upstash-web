@@ -124,8 +124,8 @@ function SectionWhat() {
               <Text color="whiteAlpha.600">
                 Upstash is compatible with the majority of the Redis API. It
                 works with all Redis clients, so you can run your existing code
-                without changing a line. In addition to Redis, our GraphQL API
-                is coming soon.
+                without changing a line. In addition to Redis, you can use GraphQL API
+                for connecting your database too.
               </Text>
             </Box>
             <Box mt={4}>
