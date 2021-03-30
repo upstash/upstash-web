@@ -46,7 +46,7 @@ function MobileMenu({ isOpen, onClose }) {
               </CustomLink>
               <CustomLink
                 isExternal
-                href={SOCIAL_LINKS.medium}
+                href={SOCIAL_LINKS.blog}
                 h={10}
                 color="inherit"
               >

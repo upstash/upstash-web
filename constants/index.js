@@ -19,6 +19,7 @@ export const LINKS = {
 }
 
 export const SOCIAL_LINKS = {
+  blog: 'https://blog.upstash.com',
   medium: 'https://medium.com/upstash',
   twitter: 'https://twitter.com/upstash',
   discord: 'https://discord.gg/w9SenAtbme'
@@ -179,7 +180,8 @@ client.on("error", function(err) {
   throw err;
 });
 
-client.set('foo','bar');`
+client.set('foo','bar');
+client.quit();`
 
     case SUPPORT_LANG.REDIS_PY.name:
       return `import redis

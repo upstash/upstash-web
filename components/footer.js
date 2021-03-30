@@ -47,7 +47,7 @@ function Footer() {
             <IconButton
               as={Link}
               isExternal
-              href={SOCIAL_LINKS.medium}
+              href={SOCIAL_LINKS.blog}
               size="lg"
               isRound
               aria-label="Upstash on Medium"
