@@ -1,17 +1,18 @@
 export const LINKS = {
-  docs: 'https://docs.upstash.com/',
+  docs: 'https://docs.upstash.com',
   console: 'https://console.upstash.com',
   support: 'https://docs.upstash.com/docs/help/support',
   privacy: 'static/legal/privacy.html',
   terms: 'static/legal/terms.html',
   subcontractors: 'static/legal/subcontractors.html',
   consistency: 'https://docs.upstash.com/docs/overall/consistency',
-  compare: 'https://docs.upstash.com/docs/overall/compare/',
-  pricing: 'https://docs.upstash.com/docs/account/pricing/',
+  compare: 'https://docs.upstash.com/docs/overall/compare',
+  pricing: 'https://docs.upstash.com/docs/account/pricing',
   aws: 'https://docs.upstash.com/docs/howto/connectfromawslambda',
   nextjs: 'https://docs.upstash.com/docs/tutorials/nextjs_with_redis',
   redisCompatibility:
-    'https://docs.upstash.com/docs/overall/rediscompatibility/',
+    'https://docs.upstash.com/docs/overall/rediscompatibility',
+  graphqlCompatibility: 'https://docs.upstash.com/graphql/aboutgraphqlapi',
   reservedPricing:
     'https://docs.upstash.com/docs/account/pricing#reserved-pricing',
   databaseTypes: 'https://docs.upstash.com/docs/overall/databasetypes',

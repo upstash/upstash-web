@@ -4,6 +4,7 @@ import SectionSupportIconNext from './section-support-icon-next'
 import SectionSupportIconAws from './section-support-icon-aws'
 import SupportCard from './section-support-card'
 import { LINKS } from '../constants'
+import SectionSupportIconGraphql from './section-support-icon-graphql'
 
 function SectionSupport() {
   return (
@@ -28,7 +29,7 @@ function SectionSupport() {
           </Container>
         </Box>
 
-        <SimpleGrid mt={[10, 20]} columns={[1, 1, 3]} spacing={6}>
+        <SimpleGrid mt={[10, 20]} columns={[1, 2, 4]} spacing={6}>
           <SupportCard theme="next" href={LINKS.nextjs}>
             <SectionSupportIconNext />
             <Text>
@@ -60,6 +61,17 @@ function SectionSupport() {
               </Text>{' '}
               <br />
               Compatibility
+            </Text>
+          </SupportCard>
+          {/**/}
+          <SupportCard theme="graphql" href={LINKS.graphqlCompatibility}>
+            <SectionSupportIconGraphql />
+            <Text>
+              Check out docs for
+              <br />
+              <Text as="b" fontWeight="bold">
+                GraphQL API
+              </Text>
             </Text>
           </SupportCard>
           {/**/}

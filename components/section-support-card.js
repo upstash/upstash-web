@@ -4,7 +4,8 @@ import CustomLink from './custom-link'
 const THEME = {
   next: { bg: '#fff', color: '#000' },
   aws: { bg: '#ffe8d3', color: '#7b512d' },
-  redis: { bg: '#ffdada', color: '#791514' }
+  redis: { bg: '#ffdada', color: '#791514' },
+  graphql: { bg: '#ffe3f6', color: '#910062' }
 }
 
 export default function SupportCard({ theme, children, ...props }) {

@@ -1,6 +1,11 @@
 export default function SectionSupportIconRedis() {
   return (
-    <svg width="70" height="60" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      width={70}
+      viewBox="0 0 70 60"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <g clipPath="url(#clipRedis)">
         <path
           d="M66.293 45.897c-3.632 1.894-22.446 9.63-26.451 11.717-4.006 2.09-6.23 2.07-9.395.556-3.164-1.512-23.186-9.6-26.792-11.324-1.803-.861-2.75-1.589-2.75-2.275v-6.88s26.065-5.674 30.273-7.184c4.208-1.51 5.668-1.564 9.248-.252 3.582 1.312 24.994 5.175 28.533 6.471l-.001 6.782c0 .68-.816 1.427-2.665 2.39z"
