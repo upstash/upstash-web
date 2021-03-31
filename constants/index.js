@@ -47,7 +47,7 @@ export const PRICES = {
     title: 'Max Concurrent Connections',
     description:
       'This is the maximum allowed number of concurrent connections (clients) at a moment. This cap does not essentially limit the number of requests that can be submitted per second, but defines the maximum number of open TCP connections to the database.',
-    free: '100',
+    free: '1000',
     standard: '1000',
     premium: '10,000'
   },
