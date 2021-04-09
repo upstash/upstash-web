@@ -4,7 +4,6 @@ export const LINKS = {
   support: 'https://docs.upstash.com/docs/help/support',
   privacy: 'static/legal/privacy.html',
   terms: 'static/legal/terms.html',
-  subcontractors: 'static/legal/subcontractors.html',
   consistency: 'https://docs.upstash.com/docs/overall/consistency',
   compare: 'https://docs.upstash.com/docs/overall/compare',
   pricing: 'https://docs.upstash.com/docs/account/pricing',

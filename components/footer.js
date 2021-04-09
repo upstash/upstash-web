@@ -81,9 +81,6 @@ function Footer() {
             <CustomLink isExternal href={LINKS.terms} color="inherit">
               Terms of Service
             </CustomLink>
-            <CustomLink isExternal href={LINKS.subcontractors} color="inherit">
-              Subcontractors
-            </CustomLink>
           </Stack>
 
           <Box>
