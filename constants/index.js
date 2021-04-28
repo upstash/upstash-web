@@ -5,6 +5,7 @@ export const LINKS = {
   privacy: 'static/legal/privacy.html',
   terms: 'static/legal/terms.html',
   consistency: 'https://docs.upstash.com/docs/overall/consistency',
+  durability: 'https://docs.upstash.com/docs/overall/durability',
   compare: 'https://docs.upstash.com/docs/overall/compare',
   pricing: 'https://docs.upstash.com/docs/account/pricing',
   aws: 'https://docs.upstash.com/docs/howto/connectfromawslambda',

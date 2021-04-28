@@ -102,7 +102,7 @@ function SectionWhat() {
               </Text>
             </Box>
             <Box mt={4}>
-              <CustomLink isExternal href={LINKS.consistency}>
+              <CustomLink isExternal href={LINKS.durability}>
                 Learn more
               </CustomLink>
             </Box>
