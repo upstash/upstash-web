@@ -4,19 +4,19 @@ export const LINKS = {
   support: 'https://docs.upstash.com/docs/help/support',
   privacy: 'static/legal/privacy.html',
   terms: 'static/legal/terms.html',
-  consistency: 'https://docs.upstash.com/docs/overall/consistency',
-  durability: 'https://docs.upstash.com/docs/overall/durability',
-  compare: 'https://docs.upstash.com/docs/overall/compare',
-  pricing: 'https://docs.upstash.com/docs/account/pricing',
-  aws: 'https://docs.upstash.com/docs/howto/connectfromawslambda',
-  nextjs: 'https://docs.upstash.com/docs/tutorials/nextjs_with_redis',
+  consistency: 'https://docs.upstash.com/overall/consistency',
+  durability: 'https://docs.upstash.com/overall/durability',
+  compare: 'https://docs.upstash.com/overall/compare',
+  pricing: 'https://docs.upstash.com/account/pricing',
+  aws: 'https://docs.upstash.com/howto/connectfromawslambda',
+  nextjs: 'https://docs.upstash.com/tutorials/nextjs_with_redis',
   redisCompatibility:
-    'https://docs.upstash.com/docs/overall/rediscompatibility',
+    'https://docs.upstash.com/overall/rediscompatibility',
   graphqlCompatibility: 'https://docs.upstash.com/graphql/aboutgraphqlapi',
   reservedPricing:
-    'https://docs.upstash.com/docs/account/pricing#reserved-pricing',
-  databaseTypes: 'https://docs.upstash.com/docs/overall/databasetypes',
-  faq: 'https://docs.upstash.com/docs/help/faq'
+    'https://docs.upstash.com/account/pricing#reserved-pricing',
+  databaseTypes: 'https://docs.upstash.com/overall/databasetypes',
+  faq: 'https://docs.upstash.com/help/faq'
 }
 
 export const SOCIAL_LINKS = {
