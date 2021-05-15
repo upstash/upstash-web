@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import SectionHero from '../components/section-hero'
 import SectionDemo from '../components/section-demo'
+import SectionInvestors from '../components/section-investors'
 import SectionWhat from '../components/section-what'
 import SectionSupport from '../components/section-support'
 import SectionPricing from '../components/section-pricing'
@@ -16,6 +17,7 @@ function HomePage() {
       <SectionHero />
       <SectionDemo />
       <SectionWhat />
+      <SectionInvestors />
       <SectionSupport />
       <SectionPricing />
       <SectionFaq />

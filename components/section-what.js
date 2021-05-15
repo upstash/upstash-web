@@ -13,7 +13,8 @@ function SectionWhat() {
       as="section"
       pos="relative"
       overflow="hidden"
-      pb={['100px', '140px']}
+      mt={['100px', '140px']}
+      mb={['100px', '220px']}
       textAlign="center"
     >
       {/*<Bg />*/}
@@ -124,8 +125,8 @@ function SectionWhat() {
               <Text color="whiteAlpha.600">
                 Upstash is compatible with the majority of the Redis API. It
                 works with all Redis clients, so you can run your existing code
-                without changing a line. In addition to Redis, you can use GraphQL API
-                for connecting your database too.
+                without changing a line. In addition to Redis, you can use
+                GraphQL API for connecting your database too.
               </Text>
             </Box>
             <Box mt={4}>

@@ -6,7 +6,7 @@ function Window({ children, ...props }) {
       overflow="hidden"
       bg="mainBlack"
       borderRadius="xl"
-      boxShadow="lg"
+      boxShadow="dark-lg"
       {...props}
     >
       <Flex

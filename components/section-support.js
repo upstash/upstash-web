@@ -8,12 +8,7 @@ import SectionSupportIconGraphql from './section-support-icon-graphql'
 
 function SectionSupport() {
   return (
-    <Box
-      as="section"
-      pt={['50px', '70px']}
-      pb={['100px', '220px']}
-      textAlign="center"
-    >
+    <Box as="section" my={['100px', '220px']} textAlign="center">
       <Container maxW="5xl">
         {/**/}
 

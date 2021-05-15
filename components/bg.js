@@ -9,7 +9,7 @@ function Bg(props) {
       top={0}
       width={[1200, 3000]}
       h={[800, 1400]}
-      background="linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 40%)"
+      background="linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 40%)"
       borderRadius="100%"
       {...props}
     />
