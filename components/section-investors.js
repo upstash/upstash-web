@@ -53,7 +53,7 @@ function SectionInvestors(props) {
           >
             <Investor
               name="Robin Vasan"
-              title="Enterprise Seed, Early Stage Investor"
+              title="Founder, Mango Capital"
               src="/investors/robin.jpeg"
             />
           </WrapItem>
@@ -63,8 +63,8 @@ function SectionInvestors(props) {
           >
             <Investor
               name="Naval Ravikant"
-              title="Founder of AngelList. Investor in Twitter, Uber"
-              src="/investors/naval.jpeg"
+              title="Founder, AngelList"
+              src="/investors/naval.png"
             />
           </WrapItem>
           <WrapItem
@@ -73,7 +73,7 @@ function SectionInvestors(props) {
           >
             <Investor
               name="Guillermo Rauch"
-              title="CEO @vercel"
+              title="CEO, Vercel"
               src="/investors/rauchg.jpeg"
             />
           </WrapItem>
@@ -83,8 +83,8 @@ function SectionInvestors(props) {
           >
             <Investor
               name="Matias Woloski"
-              title="Co-Founder @auth0"
-              src="/investors/woloski.jpeg"
+              title="Co-Founder Auth0"
+              src="/investors/matias.png"
             />
           </WrapItem>
           <WrapItem
