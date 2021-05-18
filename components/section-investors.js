@@ -83,7 +83,7 @@ function SectionInvestors(props) {
           >
             <Investor
               name="Matias Woloski"
-              title="Co-Founder Auth0"
+              title="Founder, Auth0"
               src="/investors/matias.png"
             />
           </WrapItem>
@@ -93,7 +93,7 @@ function SectionInvestors(props) {
           >
             <Investor
               name="Max Stoiber"
-              title="Creator of styled-components, Investor"
+              title="Creator of styled-components"
               src="/investors/mxstbr.jpeg"
             />
           </WrapItem>
