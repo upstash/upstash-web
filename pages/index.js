@@ -1,11 +1,12 @@
 import Head from 'next/head'
 import SectionHero from '../components/section-hero'
 import SectionDemo from '../components/section-demo'
-import SectionInvestors from '../components/section-investors'
+import Investors from '../components/investors'
 import SectionWhat from '../components/section-what'
 import SectionSupport from '../components/section-support'
 import SectionPricing from '../components/section-pricing'
 import SectionFaq from '../components/section-faq'
+import Section from '../components/section'
 
 function HomePage() {
   return (
@@ -17,7 +18,9 @@ function HomePage() {
       <SectionHero />
       <SectionDemo />
       <SectionWhat />
-      <SectionInvestors />
+      <Section>
+        <Investors />
+      </Section>
       <SectionSupport />
       <SectionPricing />
       <SectionFaq />

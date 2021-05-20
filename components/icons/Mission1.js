@@ -1,4 +1,4 @@
-export default function SectionWhatIcon2(props) {
+export default function Mission1(props) {
   return (
     <svg
       version="1.1"
@@ -8,7 +8,6 @@ export default function SectionWhatIcon2(props) {
     >
       <path
         fill="currentColor"
-        id="global--assets-and-recovery--01_1_"
         d="M19,29.36c-3.401,0-6.596-1.506-8.764-4.131l0.556-0.459c2.03,2.459,5.022,3.869,8.208,3.869
 	c5.867,0,10.64-4.772,10.64-10.64c0-5.867-4.772-10.64-10.64-10.64c-3.186,0-6.177,1.411-8.208,3.87l-0.555-0.459
 	c2.091-2.532,5.137-4.022,8.403-4.125V5.36H16c-0.199,0-0.36-0.161-0.36-0.36V3c0-0.199,0.161-0.36,0.36-0.36h6

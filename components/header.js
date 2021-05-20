@@ -12,8 +12,13 @@ import CustomLink from './custom-link'
 import * as Icon from './icons'
 import Logo from './logo'
 import { LINKS, SOCIAL_LINKS } from '../constants'
+import { useRouter } from 'next/router'
+import NextLink from './link'
 
 function Header({ onOpen }) {
+  const { pathname } = useRouter()
+  const isAboutPage = pathname === '/about'
+
   return (
     <Box as="header" mt={[10, 14]}>
       <Container maxW="5xl">
@@ -39,17 +44,19 @@ function Header({ onOpen }) {
               spacing="24px"
               justify="center"
             >
-              <CustomLink href="#section-pricing" color="inherit">
-                Pricing
-              </CustomLink>
+              {!isAboutPage && (
+                <CustomLink href="#section-pricing" color="inherit">
+                  Pricing
+                </CustomLink>
+              )}
+              <NextLink href="/about" color="inherit">
+                About
+              </NextLink>
               <CustomLink isExternal href={LINKS.docs} color="inherit">
                 Docs
               </CustomLink>
               <CustomLink isExternal href={SOCIAL_LINKS.blog} color="inherit">
                 Blog
-              </CustomLink>
-              <CustomLink isExternal href={SOCIAL_LINKS.discord} color="inherit">
-                Discord
               </CustomLink>
             </Stack>
           </GridItem>

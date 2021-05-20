@@ -1,4 +1,4 @@
-export default function SectionWhatIcon1(props) {
+export default function What1(props) {
   return (
     <svg
       version="1.1"
