@@ -51,6 +51,14 @@ export const PRICES = {
     standard: '1000',
     premium: '10,000'
   },
+  strongConsistency: {
+    title: 'Strong Consistency',
+    description:
+        'With strong consistency, writes are guaranteed to be durable and replicated when the client receives a success response.',
+    free: true,
+    standard: true,
+    premium: true
+  },
   persistence: {
     title: 'Persistence',
     description:
