@@ -13,8 +13,8 @@ export const LINKS = {
   redisCompatibility:
     'https://docs.upstash.com/overall/rediscompatibility',
   graphqlCompatibility: 'https://docs.upstash.com/graphql/aboutgraphqlapi',
-  reservedPricing:
-    'https://docs.upstash.com/account/pricing#reserved-pricing',
+  enterprisePricing:
+    'https://docs.upstash.com/overall/enterprise',
   databaseTypes: 'https://docs.upstash.com/overall/databasetypes',
   faq: 'https://docs.upstash.com/help/faq'
 }
