@@ -21,17 +21,17 @@ function DesktopTable() {
             <Col/>
             <Col>
                 <Heading tag="h5" fontSize="2xl">
-                    Free
+                    Community
                 </Heading>
             </Col>
             <Col highlight style={{borderRadius: '16px 16px 0 0'}}>
                 <Heading tag="h5" fontSize="2xl">
-                    Standard
+                    Pro
                 </Heading>
             </Col>
             <Col>
                 <Heading tag="h5" fontSize="2xl">
-                    Premium
+                    Enterprise
                 </Heading>
             </Col>
 
@@ -46,13 +46,13 @@ function DesktopTable() {
                 </Text>
             </ColDescription>
             <Col>
-                <Text as="span">{PRICES.commandsLimit.free}</Text>
+                <Text as="span">{PRICES.commandsLimit.community}</Text>
             </Col>
             <Col highlight>
-                <Text as="span">{PRICES.commandsLimit.standard}</Text>
+                <Text as="span">{PRICES.commandsLimit.pro}</Text>
             </Col>
             <Col>
-                <Text as="span">{PRICES.commandsLimit.premium}</Text>
+                <Text as="span">{PRICES.commandsLimit.enterprise}</Text>
             </Col>
 
             <GridItem colSpan={4}>
@@ -66,13 +66,13 @@ function DesktopTable() {
                 </Text>
             </ColDescription>
             <Col>
-                <ColCheck check={PRICES.strongConsistency.free}/>
+                <ColCheck check={PRICES.strongConsistency.community}/>
             </Col>
             <Col highlight>
-                <ColCheck check={PRICES.strongConsistency.standard}/>
+                <ColCheck check={PRICES.strongConsistency.pro}/>
             </Col>
             <Col>
-                <ColCheck check={PRICES.strongConsistency.premium}/>
+                <ColCheck check={PRICES.strongConsistency.enterprise}/>
             </Col>
 
             <GridItem colSpan={4}>
@@ -86,13 +86,13 @@ function DesktopTable() {
                 </Text>
             </ColDescription>
             <Col>
-                <ColCheck check={PRICES.persistence.free}/>
+                <ColCheck check={PRICES.persistence.community}/>
             </Col>
             <Col highlight>
-                <ColCheck check={PRICES.persistence.standard}/>
+                <ColCheck check={PRICES.persistence.pro}/>
             </Col>
             <Col>
-                <ColCheck check={PRICES.persistence.premium}/>
+                <ColCheck check={PRICES.persistence.enterprise}/>
             </Col>
 
             <GridItem colSpan={4}>
@@ -106,13 +106,13 @@ function DesktopTable() {
                 </Text>
             </ColDescription>
             <Col>
-                <ColCheck check={PRICES.encryption.free}/>
+                <ColCheck check={PRICES.encryption.community}/>
             </Col>
             <Col highlight>
-                <ColCheck check={PRICES.encryption.standard}/>
+                <ColCheck check={PRICES.encryption.pro}/>
             </Col>
             <Col>
-                <ColCheck check={PRICES.encryption.premium}/>
+                <ColCheck check={PRICES.encryption.enterprise}/>
             </Col>
 
             <GridItem colSpan={4}>
@@ -128,13 +128,35 @@ function DesktopTable() {
                 </Text>
             </ColDescription>
             <Col>
-                <ColCheck check={PRICES.multiZoneReplication.free}/>
+                <ColCheck check={PRICES.multiZoneReplication.community}/>
             </Col>
             <Col highlight>
-                <ColCheck check={PRICES.multiZoneReplication.standard}/>
+                <ColCheck check={PRICES.multiZoneReplication.pro}/>
             </Col>
             <Col>
-                <ColCheck check={PRICES.multiZoneReplication.premium}/>
+                <ColCheck check={PRICES.multiZoneReplication.enterprise}/>
+            </Col>
+
+            <GridItem colSpan={4}>
+                <Box height="1px" bg="whiteAlpha.100"/>
+            </GridItem>
+
+            <ColDescription>
+                <Text as="span">
+                    {PRICES.vpcPeering.title}
+                    <CustomTooltip>
+                        {PRICES.vpcPeering.description}
+                    </CustomTooltip>
+                </Text>
+            </ColDescription>
+            <Col>
+                <ColCheck check={PRICES.vpcPeering.community}/>
+            </Col>
+            <Col highlight>
+                <ColCheck check={PRICES.vpcPeering.pro}/>
+            </Col>
+            <Col>
+                <ColCheck check={PRICES.vpcPeering.enterprise}/>
             </Col>
 
             <GridItem colSpan={4}>
@@ -143,13 +165,13 @@ function DesktopTable() {
 
             <ColDescription/>
             <Col>
-                <Text as="span">{PRICES.price.free}</Text>
+                <Text as="span">{PRICES.price.community}</Text>
             </Col>
             <Col highlight>
-                <Text as="span">{PRICES.price.standard}</Text>
+                <Text as="span">{PRICES.price.pro}</Text>
             </Col>
             <Col>
-                <Text as="span">{PRICES.price.premium}</Text>
+                <Text as="span">{PRICES.price.enterprise}</Text>
             </Col>
 
             <GridItem colSpan={4}>
