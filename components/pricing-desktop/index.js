@@ -165,13 +165,28 @@ function DesktopTable() {
 
       <ColDescription />
       <Col>
-        <Text as="span">{PRICES.price.free}</Text>
+        <div>
+          <Text as="p">{PRICES.price.free}</Text>
+          <Text as="span" fontSize="xs" color="whiteAlpha.600">
+            {PRICES.price.freeDetail}
+          </Text>
+        </div>
       </Col>
       <Col highlight>
-        <Text as="span">{PRICES.price.standard}</Text>
+        <div>
+          <Text as="p">{PRICES.price.standard}</Text>
+          <Text as="span" fontSize="xs" color="whiteAlpha.600">
+            {PRICES.price.standardDetail}
+          </Text>
+        </div>
       </Col>
       <Col>
-        <Text as="span">{PRICES.price.premium}</Text>
+        <div>
+          <Text as="p">{PRICES.price.premium}</Text>
+          <Text as="span" fontSize="xs" color="whiteAlpha.600">
+            {PRICES.price.premiumDetail}
+          </Text>
+        </div>
       </Col>
 
       <GridItem colSpan={4}>

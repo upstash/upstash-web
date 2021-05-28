@@ -1,17 +1,6 @@
-import {
-  Box,
-  Link,
-  Button,
-  Flex,
-  VStack,
-  Heading,
-  Text
-} from '@chakra-ui/react'
+import { Button, Flex, VStack, Heading, Text } from '@chakra-ui/react'
 import { PRICES } from '../../constants'
-import Col from '../pricing-desktop/col'
 import ColCheck from '../pricing-desktop/col-check'
-import ColDescription from '../pricing-desktop/col-description'
-import CustomTooltip from '../pricing-desktop/col-tooltip'
 
 function Title({ children }) {
   return (
@@ -78,7 +67,12 @@ function MobileTable() {
 
             <Flex direction="column" align="center">
               <Title>{PRICES.price.title}</Title>
-              <Text>{PRICES.price[key]}</Text>
+              <div>
+                <Text as="p">{PRICES.price[key]}</Text>
+                <Text as="span" fontSize="xs" color="whiteAlpha.600">
+                  {PRICES.price[`${key}Detail`]}
+                </Text>
+              </div>
             </Flex>
 
             <Flex direction="column" align="center">
