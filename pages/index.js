@@ -7,6 +7,9 @@ import SectionSupport from '../components/section-support'
 import SectionPricing from '../components/section-pricing'
 import SectionFaq from '../components/section-faq'
 import Section from '../components/section'
+import { LINKS } from '../constants'
+import { Box } from '@chakra-ui/react'
+import Link from '../components/link'
 
 function HomePage() {
   return (
@@ -20,6 +23,9 @@ function HomePage() {
       <SectionWhat />
       <Section>
         <Investors />
+        <Box mt={16}>
+          <Link href="/about">See more About</Link>
+        </Box>
       </Section>
       <SectionSupport />
       <SectionPricing />
