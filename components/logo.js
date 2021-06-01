@@ -1,3 +1,4 @@
+import NextLink from 'next/link'
 import { Link } from '@chakra-ui/react'
 
 export function LogoIcon() {
@@ -44,8 +45,10 @@ export function LogoIcon() {
 
 export default function Logo() {
   return (
-    <Link href="/">
-      <LogoIcon />
+    <Link as={NextLink} href="/">
+      <a>
+        <LogoIcon />
+      </a>
     </Link>
   )
 }

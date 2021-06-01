@@ -1,9 +1,9 @@
 import { Container, Heading, Text, Box, SimpleGrid } from '@chakra-ui/react'
 import CustomLink from './custom-link'
-import SectionWhatIcon1 from './section-what-icon-1'
-import SectionWhatIcon2 from './section-what-icon-2'
-import SectionWhatIcon3 from './section-what-icon-3'
-import SectionWhatIcon4 from './section-what-icon-4'
+import What1 from './icons/What1'
+import What2 from './icons/What2'
+import What3 from './icons/What3'
+import What4 from './icons/What4'
 // import Bg from './bg'
 import { LINKS } from '../constants'
 
@@ -31,7 +31,7 @@ function SectionWhat() {
         <SimpleGrid mt={[10, 20]} columns={[1, 1, 2]} spacing={[6, 8]}>
           <Box bg="whiteAlpha.100" borderRadius="2xl" p={10}>
             <Box
-              as={SectionWhatIcon3}
+              as={What3}
               d="inline-flex"
               w="80px"
               h="80px"
@@ -58,7 +58,7 @@ function SectionWhat() {
 
           <Box bg="whiteAlpha.100" borderRadius="2xl" p={10}>
             <Box
-              as={SectionWhatIcon2}
+              as={What2}
               d="inline-flex"
               w="80px"
               h="80px"
@@ -84,7 +84,7 @@ function SectionWhat() {
 
           <Box bg="whiteAlpha.100" borderRadius="2xl" p={10}>
             <Box
-              as={SectionWhatIcon1}
+              as={What1}
               d="inline-flex"
               w="80px"
               h="80px"
@@ -111,7 +111,7 @@ function SectionWhat() {
 
           <Box bg="whiteAlpha.100" borderRadius="2xl" p={10}>
             <Box
-              as={SectionWhatIcon4}
+              as={What4}
               d="inline-flex"
               w="80px"
               h="80px"

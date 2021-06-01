@@ -208,12 +208,21 @@ function DesktopTable() {
             <ColDescription/>
             <Col>
                 <Text as="span">{PRICES.price.free}</Text>
+                <Text as="span" fontSize="xs" color="whiteAlpha.600">
+                  {PRICES.price.freeDetail}
+                </Text>
             </Col>
             <Col highlight>
                 <Text as="span">{PRICES.price.payg}</Text>
+                <Text as="span" fontSize="xs" color="whiteAlpha.600">
+                  {PRICES.price.paygDetail}
+                </Text>
             </Col>
             <Col>
                 <Text as="span">{PRICES.price.enterprise}</Text>
+                <Text as="span" fontSize="xs" color="whiteAlpha.600">
+                  {PRICES.price.enterpriseDetail}
+                </Text>
             </Col>
 
             <GridItem colSpan={4}>

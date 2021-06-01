@@ -10,8 +10,7 @@ export const LINKS = {
   pricing: 'https://docs.upstash.com/account/pricing',
   aws: 'https://docs.upstash.com/howto/connectfromawslambda',
   nextjs: 'https://docs.upstash.com/tutorials/nextjs_with_redis',
-  redisCompatibility:
-    'https://docs.upstash.com/overall/rediscompatibility',
+  redisCompatibility: 'https://docs.upstash.com/overall/rediscompatibility',
   graphqlCompatibility: 'https://docs.upstash.com/graphql/aboutgraphqlapi',
   enterprisePricing:
     'https://docs.upstash.com/overall/enterprise',
@@ -249,3 +248,78 @@ func main() {
       return ''
   }
 }
+
+export const INVESTORS = [
+  {
+    name: 'Robin Vasan',
+    title: 'Founder, Mango Capital',
+    src: '/investors/robin.jpeg',
+    url: 'https://www.linkedin.com/in/robinvasan/'
+  },
+  {
+    name: 'Naval Ravikant',
+    title: 'Founder, AngelList',
+    src: '/investors/naval.png',
+    url: 'https://twitter.com/woloski'
+  },
+  {
+    name: 'Guillermo Rauch',
+    title: 'CEO, Vercel',
+    src: '/investors/rauchg.jpeg',
+    url: 'https://twitter.com/rauchg'
+  },
+  {
+    name: 'Matias Woloski',
+    title: 'Founder, Auth0',
+    src: '/investors/matias.png',
+    url: 'https://twitter.com/woloski'
+  },
+  {
+    name: 'Max Stoiber',
+    title: 'Creator of styled-components',
+    src: '/investors/mxstbr.jpeg',
+    url: 'https://twitter.com/mxstbr'
+  },
+  {
+    name: 'Nuno Job',
+    title: 'Ground Control Ventures',
+    src: '/investors/dscape.jpeg',
+    url: 'https://twitter.com/dscape'
+  },
+  {
+    name: 'Andreas Klinger',
+    title: 'Remote First Capital',
+    src: '/investors/andreasklinger.jpeg',
+    url: 'https://twitter.com/andreasklinger'
+  },
+  {
+    name: 'Joseph Abebe',
+    title: 'Investor/Advisor (ex-Slack)',
+    src: '/investors/josephaabebe.jpeg',
+    url: 'https://twitter.com/josephaabebe'
+  },
+  {
+    name: 'Martin Gontovnikas ',
+    title: 'Co-Founder, HyperGrowth Partners',
+    src: '/investors/mgonto.jpeg',
+    url: 'https://twitter.com/mgonto'
+  },
+  {
+    name: 'Jeff Fagnan',
+    title: 'Founder, Accomplice',
+    src: '/investors/jfagnan.webp',
+    url: 'https://angel.co/p/jfagnan'
+  },
+  {
+    name: 'Jake Zeller',
+    title: 'Partner, AngelList',
+    src: '/investors/jake_zeller.jpeg',
+    url: 'https://twitter.com/jake_zeller'
+  },
+  {
+    name: 'Dilek Dayinlarli',
+    title: 'Partner, ScaleX Ventures',
+    src: '/investors/dilekdayinlarli.jpeg',
+    url: 'https://twitter.com/dilekdayinlarli'
+  }
+]
