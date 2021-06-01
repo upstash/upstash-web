@@ -9,18 +9,18 @@ import Mission3 from '../components/icons/Mission3'
 
 const MISSIONS = [
   {
-    title: 'Easy',
-    desc: 'Building and deploying should be as easy as a single tap.',
+    title: 'Fast',
+    desc: 'We know each millisecond is important for you.',
     icon: <Box as={Mission1} w={16} mx="auto" color="primary" />
   },
   {
-    title: 'Universal',
-    desc: 'To connect the world, sites should be fast from everywhere.',
+    title: 'Simple',
+    desc: 'Keep the things as simple as possible but not simpler.',
     icon: <Box as={Mission2} w={16} mx="auto" color="primary" />
   },
   {
-    title: 'Accessible',
-    desc: 'Great care in user experience and design enables everyone.',
+    title: 'Robust',
+    desc: 'We win your trust with robustness.',
     icon: <Box as={Mission3} w={16} mx="auto" color="primary" />
   }
 ]
@@ -50,12 +50,12 @@ function HomePage() {
       <Box as="section" py={['100px', '160px']} textAlign="center">
         <Container maxW="3xl">
           <Heading as="h1" fontWeight="extrabold" size="3xl">
-            We enable developers to build and publish wonderful things
+              Make Databases Easiest Part of Your Job
           </Heading>
 
           <Box mt="24px" fontSize={['md', '2xl']} color="whiteAlpha.700">
-            <Text>We build products for developers and designers.</Text>
-            <Text>And those who aspire to become one.</Text>
+            <Text>We manage everything for you and provide data as a serverless service.
+                You focus on your more important things.</Text>
           </Box>
         </Container>
 

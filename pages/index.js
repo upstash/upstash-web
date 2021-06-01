@@ -24,7 +24,7 @@ function HomePage() {
       <Section>
         <Investors />
         <Box mt={16}>
-          <Link href="/about">See more About</Link>
+          <Link href="/about">See the full list</Link>
         </Box>
       </Section>
       <SectionSupport />

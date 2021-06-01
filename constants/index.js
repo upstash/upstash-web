@@ -260,7 +260,7 @@ export const INVESTORS = [
     name: 'Naval Ravikant',
     title: 'Founder, AngelList',
     src: '/investors/naval.png',
-    url: 'https://twitter.com/woloski'
+    url: 'https://twitter.com/naval'
   },
   {
     name: 'Guillermo Rauch',
