@@ -21,12 +21,12 @@ function DesktopTable() {
             <Col/>
             <Col>
                 <Heading tag="h5" fontSize="2xl">
-                    Community
+                    Free
                 </Heading>
             </Col>
             <Col highlight style={{borderRadius: '16px 16px 0 0'}}>
                 <Heading tag="h5" fontSize="2xl">
-                    Pro
+                    Pay as you go
                 </Heading>
             </Col>
             <Col>
@@ -46,10 +46,10 @@ function DesktopTable() {
                 </Text>
             </ColDescription>
             <Col>
-                <Text as="span">{PRICES.commandsLimit.community}</Text>
+                <Text as="span">{PRICES.commandsLimit.free}</Text>
             </Col>
             <Col highlight>
-                <Text as="span">{PRICES.commandsLimit.pro}</Text>
+                <Text as="span">{PRICES.commandsLimit.payg}</Text>
             </Col>
             <Col>
                 <Text as="span">{PRICES.commandsLimit.enterprise}</Text>
@@ -66,10 +66,10 @@ function DesktopTable() {
                 </Text>
             </ColDescription>
             <Col>
-                <ColCheck check={PRICES.strongConsistency.community}/>
+                <ColCheck check={PRICES.strongConsistency.free}/>
             </Col>
             <Col highlight>
-                <ColCheck check={PRICES.strongConsistency.pro}/>
+                <ColCheck check={PRICES.strongConsistency.payg}/>
             </Col>
             <Col>
                 <ColCheck check={PRICES.strongConsistency.enterprise}/>
@@ -86,10 +86,10 @@ function DesktopTable() {
                 </Text>
             </ColDescription>
             <Col>
-                <ColCheck check={PRICES.persistence.community}/>
+                <ColCheck check={PRICES.persistence.free}/>
             </Col>
             <Col highlight>
-                <ColCheck check={PRICES.persistence.pro}/>
+                <ColCheck check={PRICES.persistence.payg}/>
             </Col>
             <Col>
                 <ColCheck check={PRICES.persistence.enterprise}/>
@@ -106,13 +106,33 @@ function DesktopTable() {
                 </Text>
             </ColDescription>
             <Col>
-                <ColCheck check={PRICES.encryption.community}/>
+                <ColCheck check={PRICES.encryption.free}/>
             </Col>
             <Col highlight>
-                <ColCheck check={PRICES.encryption.pro}/>
+                <ColCheck check={PRICES.encryption.payg}/>
             </Col>
             <Col>
                 <ColCheck check={PRICES.encryption.enterprise}/>
+            </Col>
+
+            <GridItem colSpan={4}>
+                <Box height="1px" bg="whiteAlpha.100"/>
+            </GridItem>
+
+            <ColDescription>
+                <Text as="span">
+                    {PRICES.graphqlRestApi.title}
+                    <CustomTooltip>{PRICES.graphqlRestApi.description}</CustomTooltip>
+                </Text>
+            </ColDescription>
+            <Col>
+                <ColCheck check={PRICES.graphqlRestApi.free}/>
+            </Col>
+            <Col highlight>
+                <ColCheck check={PRICES.graphqlRestApi.payg}/>
+            </Col>
+            <Col>
+                <ColCheck check={PRICES.graphqlRestApi.enterprise}/>
             </Col>
 
             <GridItem colSpan={4}>
@@ -128,10 +148,10 @@ function DesktopTable() {
                 </Text>
             </ColDescription>
             <Col>
-                <ColCheck check={PRICES.multiZoneReplication.community}/>
+                <ColCheck check={PRICES.multiZoneReplication.free}/>
             </Col>
             <Col highlight>
-                <ColCheck check={PRICES.multiZoneReplication.pro}/>
+                <ColCheck check={PRICES.multiZoneReplication.payg}/>
             </Col>
             <Col>
                 <ColCheck check={PRICES.multiZoneReplication.enterprise}/>
@@ -150,10 +170,10 @@ function DesktopTable() {
                 </Text>
             </ColDescription>
             <Col>
-                <ColCheck check={PRICES.vpcPeering.community}/>
+                <ColCheck check={PRICES.vpcPeering.free}/>
             </Col>
             <Col highlight>
-                <ColCheck check={PRICES.vpcPeering.pro}/>
+                <ColCheck check={PRICES.vpcPeering.payg}/>
             </Col>
             <Col>
                 <ColCheck check={PRICES.vpcPeering.enterprise}/>
@@ -163,12 +183,34 @@ function DesktopTable() {
                 <Box height="1px" bg="whiteAlpha.100"/>
             </GridItem>
 
-            <ColDescription/>
+            <ColDescription>
+                <Text as="span">
+                    {PRICES.support.title}
+                    <CustomTooltip>
+                        {PRICES.support.description}
+                    </CustomTooltip>
+                </Text>
+            </ColDescription>
             <Col>
-                <Text as="span">{PRICES.price.community}</Text>
+                <ColCheck check={PRICES.support.free}/>
             </Col>
             <Col highlight>
-                <Text as="span">{PRICES.price.pro}</Text>
+                <Text as="span">{PRICES.support.payg}</Text>
+            </Col>
+            <Col>
+                <Text as="span">{PRICES.support.enterprise}</Text>
+            </Col>
+
+            <GridItem colSpan={4}>
+                <Box height="1px" bg="whiteAlpha.100"/>
+            </GridItem>
+
+            <ColDescription/>
+            <Col>
+                <Text as="span">{PRICES.price.free}</Text>
+            </Col>
+            <Col highlight>
+                <Text as="span">{PRICES.price.payg}</Text>
             </Col>
             <Col>
                 <Text as="span">{PRICES.price.enterprise}</Text>
@@ -208,14 +250,14 @@ function DesktopTable() {
             <Col>
                 <Button
                     as={Link}
-                    href={LINKS.console}
+                    href={LINKS.support}
                     color="black"
                     bg="white"
                     _hover={{
                         textDecoration: 'none'
                     }}
                 >
-                    Login
+                    Contact Us
                 </Button>
             </Col>
 

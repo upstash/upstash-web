@@ -31,80 +31,88 @@ export const PRICES = {
     title: 'Commands Limit',
     description:
       'This is the maximum number of requests/commands that your database can receive and process per day.',
-    community: 'Max 10,000 Commands Daily',
-    pro: 'Unlimited',
+    free: 'Max 10,000 Commands Daily',
+    payg: 'Unlimited',
     enterprise: 'Unlimited'
   },
   maxDataSizePerDB: {
     title: 'Max Data Size Per DB',
     description:
       'This is the total data size that you can store in your database.',
-    community: '256 MB',
-    pro: '10 GB',
+    free: '256 MB',
+    payg: '10 GB',
     enterprise: '500 GB'
   },
   maxConcurrentConnections: {
     title: 'Max Concurrent Connections',
     description:
       'This is the maximum allowed number of concurrent connections (clients) at a moment. This cap does not essentially limit the number of requests that can be submitted per second, but defines the maximum number of open TCP connections to the database.',
-    community: '1000',
-    pro: '1000',
+    free: '1000',
+    payg: '1000',
     enterprise: '10,000'
   },
   strongConsistency: {
     title: 'Strong Consistency',
     description:
         'With strong consistency, writes are guaranteed to be durable and replicated when the client receives a success response.',
-    community: true,
-    pro: true,
+    free: true,
+    payg: true,
     enterprise: true
   },
   persistence: {
     title: 'Persistence',
     description:
       'Upstash has its own persistence layer that integrates with block storage services of cloud providers. This provides fault tolerance to all database types including the free.',
-    community: true,
-    pro: true,
+    free: true,
+    payg: true,
     enterprise: true
   },
   encryption: {
     title: 'Encryption (TLS)',
     description:
       'Encryption the data transfer between server and client. Recommended for production usage.',
-    community: true,
-    pro: true,
+    free: true,
+    payg: true,
     enterprise: true
   },
   multiZoneReplication: {
     title: 'Multi Zone Replication',
     description:
       'Upstash replicates data to multiple zones for Premium type of databases. This provides high availability and minumum failover time. Enabling multi zone replication doubles the price.',
-    community: false,
-    pro: true,
+    free: false,
+    payg: true,
     enterprise: true
   },
   vpcPeering: {
     title: 'VPC Peering',
     description:
         'VPC Peering enables you to connect to Upstash from your own VPC using private IP. Database and your application can run in the same subnet which also cancels out data transfer costs.',
-    community: false,
-    pro: false,
+    free: false,
+    payg: false,
+    enterprise: true
+  },
+  graphqlRestApi: {
+    title: 'REST/GraphQL API',
+    description:
+        'REST/GraphQL API provides HTTP based, connectionless access to the Upstash databases.',
+    free: true,
+    payg: true,
     enterprise: true
   },
   support: {
     title: 'Professional Support',
     description:
         'Professional Support includes dedicated service desk and Slack channel with response time SLAs.',
-    community: false,
-    pro: false,
-    enterprise: true
+    free: false,
+    payg: 'Optional',
+    enterprise: 'Included'
   },
   price: {
     title: 'Price',
     description:
       'Pricing is based on per request/command. Operational commands like AUTH, INFO, PING, QUIT, COMMAND are not billed.',
-    community: 'Free (No credit card required)',
-    pro: '$0.2 per 100K commands, up to $120 monthly max.',
+    free: 'Free (No credit card required)',
+    payg: '$0.2 per 100K commands, up to $120 monthly max.',
     enterprise: 'Custom'
   }
 }

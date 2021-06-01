@@ -42,7 +42,7 @@ function SectionPricing() {
 
         <VStack spacing={2} mt={14}>
           <Text>
-            Disk storage cost is $0.25 per GB per month for all database types.
+            Disk storage cost is $0.25 per GB per month.
           </Text>
           <Text>
             Enabling Multi Zone Replication doubles both request and storage price.
