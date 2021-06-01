@@ -12,7 +12,8 @@ export const LINKS = {
   nextjs: 'https://docs.upstash.com/tutorials/nextjs_with_redis',
   redisCompatibility: 'https://docs.upstash.com/overall/rediscompatibility',
   graphqlCompatibility: 'https://docs.upstash.com/graphql/aboutgraphqlapi',
-  reservedPricing: 'https://docs.upstash.com/account/pricing#reserved-pricing',
+  enterprisePricing:
+    'https://docs.upstash.com/overall/enterprise',
   databaseTypes: 'https://docs.upstash.com/overall/databasetypes',
   faq: 'https://docs.upstash.com/help/faq'
 }
@@ -30,61 +31,91 @@ export const PRICES = {
     description:
       'This is the maximum number of requests/commands that your database can receive and process per day.',
     free: 'Max 10,000 Commands Daily',
-    standard: 'Unlimited',
-    premium: 'Unlimited'
+    payg: 'Unlimited',
+    enterprise: 'Unlimited'
   },
   maxDataSizePerDB: {
     title: 'Max Data Size Per DB',
     description:
       'This is the total data size that you can store in your database.',
     free: '256 MB',
-    standard: '10 GB',
-    premium: '500 GB'
+    payg: '10 GB',
+    enterprise: '500 GB'
   },
   maxConcurrentConnections: {
     title: 'Max Concurrent Connections',
     description:
       'This is the maximum allowed number of concurrent connections (clients) at a moment. This cap does not essentially limit the number of requests that can be submitted per second, but defines the maximum number of open TCP connections to the database.',
     free: '1000',
-    standard: '1000',
-    premium: '10,000'
+    payg: '1000',
+    enterprise: '10,000'
+  },
+  strongConsistency: {
+    title: 'Strong Consistency',
+    description:
+        'With strong consistency, writes are guaranteed to be durable and replicated when the client receives a success response.',
+    free: true,
+    payg: true,
+    enterprise: true
   },
   persistence: {
     title: 'Persistence',
     description:
       'Upstash has its own persistence layer that integrates with block storage services of cloud providers. This provides fault tolerance to all database types including the free.',
     free: true,
-    standard: true,
-    premium: true
+    payg: true,
+    enterprise: true
   },
   encryption: {
     title: 'Encryption (TLS)',
     description:
       'Encryption the data transfer between server and client. Recommended for production usage.',
     free: true,
-    standard: true,
-    premium: true
+    payg: true,
+    enterprise: true
   },
   multiZoneReplication: {
     title: 'Multi Zone Replication',
     description:
-      'Upstash replicates data to multiple zones for Premium type of databases. This provides high availability and minumum failover time.',
+      'Upstash replicates data to multiple zones for Premium type of databases. This provides high availability and minumum failover time. Enabling multi zone replication doubles the price.',
     free: false,
-    standard: false,
-    premium: true
+    payg: true,
+    enterprise: true
+  },
+  vpcPeering: {
+    title: 'VPC Peering',
+    description:
+        'VPC Peering enables you to connect to Upstash from your own VPC using private IP. Database and your application can run in the same subnet which also cancels out data transfer costs.',
+    free: false,
+    payg: false,
+    enterprise: true
+  },
+  graphqlRestApi: {
+    title: 'REST/GraphQL API',
+    description:
+        'REST/GraphQL API provides HTTP based, connectionless access to the Upstash databases.',
+    free: true,
+    payg: true,
+    enterprise: true
+  },
+  support: {
+    title: 'Professional Support',
+    description:
+        'Professional Support includes dedicated service desk and Slack channel with response time SLAs.',
+    free: false,
+    payg: 'Optional',
+    enterprise: 'Included'
   },
   price: {
     title: 'Price',
     description:
       'Pricing is based on per request/command. Operational commands like AUTH, INFO, PING, QUIT, COMMAND are not billed.',
-    free: 'Free',
-    freeDetail: '(No credit card required)',
-    standard: '$0.2 per 100K commands',
-    standardDetail: '(up to $120 monthly max.)',
-    premium: '$0.4 per 100K commands',
-    premiumDetail: '(up to $240 monthly max.)'
+    free: 'Free (No credit card required)',
+    payg: '$0.2 per 100K commands, up to $120 monthly max.',
+    enterprise: 'Custom'
   }
 }
+
 
 export const HIGHLIGHT_THEME = {
   hljs: {

@@ -32,22 +32,12 @@ function MobileTable() {
           >
             <Heading as="h4" fontSize="2xl">
               {key === 'free' && 'Free'}
-              {key === 'standard' && 'Standard'}
-              {key === 'premium' && 'Premium'}
+              {key === 'payg' && 'Pay as you go'}
+              {key === 'enterprise' && 'Enterprise'}
             </Heading>
             <Flex direction="column" align="center">
               <Title>{PRICES.commandsLimit.title}</Title>
               <Text>{PRICES.commandsLimit[key]}</Text>
-            </Flex>
-
-            <Flex direction="column" align="center">
-              <Title>{PRICES.maxDataSizePerDB.title}</Title>
-              <Text>{PRICES.maxDataSizePerDB[key]}</Text>
-            </Flex>
-
-            <Flex direction="column" align="center">
-              <Title>{PRICES.maxConcurrentConnections.title}</Title>
-              <Text>{PRICES.maxConcurrentConnections[key]}</Text>
             </Flex>
 
             <Flex direction="column" align="center">
