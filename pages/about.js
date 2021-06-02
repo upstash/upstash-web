@@ -54,8 +54,14 @@ function HomePage() {
           </Heading>
 
           <Box mt="24px" fontSize={['md', '2xl']} color="whiteAlpha.700">
-            <Text>We manage everything for you and provide data as a serverless service.
-                You focus on your more important things.</Text>
+              <Text>We manage everything for you.
+              </Text>
+              <Text>
+                  You focus on your more important things.
+                  </Text>
+              <Text>
+                  With per-request pricing, you pay only for what you use.
+                  </Text>
           </Box>
         </Container>
 
