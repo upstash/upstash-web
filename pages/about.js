@@ -50,14 +50,14 @@ function HomePage() {
       <Box as="section" py={['100px', '160px']} textAlign="center">
         <Container maxW="3xl">
           <Heading as="h1" fontWeight="extrabold" size="3xl">
-              Make Databases Easiest Part of Your Job
+              Make Data Easiest Part of Your Job
           </Heading>
 
           <Box mt="24px" fontSize={['md', '2xl']} color="whiteAlpha.700">
               <Text>We manage everything for you.
               </Text>
               <Text>
-                  You focus on your more important things.
+                  You focus on more important things.
                   </Text>
               <Text>
                   With per-request pricing, you pay only for what you use.
