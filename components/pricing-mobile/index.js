@@ -21,7 +21,7 @@ function Title({ children }) {
 function MobileTable() {
   return (
     <VStack spacing={10} align="stretch">
-      {['free', 'standard', 'premium'].map((key) => {
+      {['free', 'payg', 'enterprise'].map((key) => {
         return (
           <VStack
             key={key}
@@ -35,9 +35,15 @@ function MobileTable() {
               {key === 'payg' && 'Pay as you go'}
               {key === 'enterprise' && 'Enterprise'}
             </Heading>
+
             <Flex direction="column" align="center">
               <Title>{PRICES.commandsLimit.title}</Title>
               <Text>{PRICES.commandsLimit[key]}</Text>
+            </Flex>
+
+            <Flex direction="column" align="center">
+              <Title>{PRICES.strongConsistency.title}</Title>
+              <ColCheck check={PRICES.strongConsistency[key]} />
             </Flex>
 
             <Flex direction="column" align="center">
@@ -51,8 +57,27 @@ function MobileTable() {
             </Flex>
 
             <Flex direction="column" align="center">
+              <Title>{PRICES.graphqlRestApi.title}</Title>
+              <ColCheck check={PRICES.graphqlRestApi[key]} />
+            </Flex>
+
+            <Flex direction="column" align="center">
               <Title>{PRICES.multiZoneReplication.title}</Title>
               <ColCheck check={PRICES.multiZoneReplication[key]} />
+            </Flex>
+
+            <Flex direction="column" align="center">
+              <Title>{PRICES.vpcPeering.title}</Title>
+              <ColCheck check={PRICES.vpcPeering[key]} />
+            </Flex>
+
+            <Flex direction="column" align="center">
+              <Title>{PRICES.support.title}</Title>
+              {typeof PRICES.support[key] === 'boolean' ? (
+                <ColCheck check={PRICES.support[key]} />
+              ) : (
+                <Text>{PRICES.support[key]}</Text>
+              )}
             </Flex>
 
             <Flex direction="column" align="center">
