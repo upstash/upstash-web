@@ -119,13 +119,13 @@ function SectionWhat() {
               mb={6}
             />
             <Heading tag="h4" fontSize={['xl', '2xl']}>
-              Edge CDN and REST API
+              Edge Caching and REST API
             </Heading>
             <Box mt={4}>
               <Text color="whiteAlpha.600">
                 Upstash has REST API that enables access to Redis from
                 serverless and Edge functions like Cloudflare Workers and Fastly Compute@Edge.
-                Thanks to Edge CDN, you can cache your REST calls for the global low latency.
+                Thanks to Edge Caching, you can cache your REST calls for the global low latency.
               </Text>
             </Box>
             <Box mt={4}>
