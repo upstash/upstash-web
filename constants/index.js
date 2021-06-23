@@ -10,6 +10,7 @@ export const LINKS = {
   pricing: 'https://docs.upstash.com/account/pricing',
   aws: 'https://docs.upstash.com/howto/connectfromawslambda',
   nextjs: 'https://docs.upstash.com/tutorials/nextjs_with_redis',
+  restApi: 'https://docs.upstash.com/features/restapi',
   redisCompatibility: 'https://docs.upstash.com/overall/rediscompatibility',
   graphqlCompatibility: 'https://docs.upstash.com/graphql/aboutgraphqlapi',
   enterprisePricing:

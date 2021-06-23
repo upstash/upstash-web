@@ -119,18 +119,17 @@ function SectionWhat() {
               mb={6}
             />
             <Heading tag="h4" fontSize={['xl', '2xl']}>
-              Redis® and REST/GraphQL API
+              Edge CDN and REST API
             </Heading>
             <Box mt={4}>
               <Text color="whiteAlpha.600">
-                Upstash is compatible with the majority of the Redis API. It
-                works with all Redis clients, so you can run your existing code
-                without changing a line. In addition to Redis, you can use
-                GraphQL or REST API for connecting your database too.
+                Upstash has REST API that enables access to Redis from
+                serverless and Edge functions like Cloudflare Workers and Fastly Compute@Edge.
+                Thanks to Edge CDN, you can cache your REST calls for the global low latency.
               </Text>
             </Box>
             <Box mt={4}>
-              <CustomLink isExternal href={LINKS.redisCompatibility}>
+              <CustomLink isExternal href={LINKS.restApi}>
                 View API
               </CustomLink>
             </Box>

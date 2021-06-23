@@ -2,28 +2,29 @@ import { Box, SimpleGrid, Container, Heading, Text } from '@chakra-ui/react'
 import Section from '../components/section'
 import Bg from '../components/bg'
 import Mission1 from '../components/icons/Mission1'
-import Mission2 from '../components/icons/Mission2'
+import Durable from '../components/icons/Durable'
 import Mission3 from '../components/icons/Mission3'
 import SupportCard from '../components/section-support-card'
 import SectionSupportIconNext from '../components/section-support-icon-next'
 import Head from 'next/head'
 import CodeBlock from '../components/code-block'
+import Redis from "../components/icons/Redis";
 
 const FEATURES = [
   {
     title: 'Fast',
-    desc: 'We know each millisecond is important for you.',
+    desc: 'Speed up your Next.js app with Low Latency Redis.',
     icon: <Box as={Mission1} w={16} mx="auto" color="primary" />
   },
   {
-    title: 'Simple',
-    desc: 'Keep the things as simple as possible but not simpler.',
-    icon: <Box as={Mission2} w={16} mx="auto" color="primary" />
+    title: 'Durable',
+    desc: 'Upstash persists your data to the block storage by default.',
+    icon: <Box as={Durable} w={16} mx="auto" color="primary" />
   },
   {
-    title: 'Robust',
-    desc: 'We win your trust with robustness.',
-    icon: <Box as={Mission3} w={16} mx="auto" color="primary" />
+    title: 'Redis',
+    desc: 'Upstash adapted the most loved database to the cloud and serverless.',
+    icon: <Box as={Redis} w={16} mx="auto" color="primary" />
   }
 ]
 
@@ -46,17 +47,19 @@ function HomePage() {
   return (
     <>
       <Head>
-        <title>Nextjs - Upstash</title>
+        <title>Upstash: Best Database for Next.js Application</title>
       </Head>
 
-      <Box as="section" py={['100px', '160px']} textAlign="center">
+      <Box as="section" py={['70px', '100px']} textAlign="center">
         <Container maxW="3xl">
-          <Heading as="h1" fontWeight="extrabold" size="3xl">
-            Hero title
+          <Heading as="h1" fontWeight="extrabold" fontSize={['90px']}>
+            Serverless <br/>
+            Database <br/>
+            for Next.js
           </Heading>
 
           <Box mt="24px" fontSize={['md', '2xl']} color="whiteAlpha.700">
-            <Text>Hero description</Text>
+            <Text> Redis with Per Request Pricing and REST API </Text>
           </Box>
         </Container>
 
@@ -74,11 +77,11 @@ function HomePage() {
 
         <Box as="header">
           <Heading tag="h2" size="2xl">
-            Title
+            Integrate
           </Heading>
           <Container maxW="3xl">
             <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
-              Description
+              Database and
             </Text>
           </Container>
         </Box>
