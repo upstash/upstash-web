@@ -3,12 +3,11 @@ import Section from '../components/section'
 import Bg from '../components/bg'
 import Mission1 from '../components/icons/Mission1'
 import Durable from '../components/icons/Durable'
-import Mission3 from '../components/icons/Mission3'
 import SupportCard from '../components/section-support-card'
 import SectionSupportIconNext from '../components/section-support-icon-next'
 import Head from 'next/head'
 import CodeBlock from '../components/code-block'
-import Redis from "../components/icons/Redis";
+import Redis from '../components/icons/Redis'
 
 const FEATURES = [
   {
@@ -50,20 +49,43 @@ function HomePage() {
         <title>Upstash: Best Database for Next.js Application</title>
       </Head>
 
-      <Box as="section" py={['70px', '100px']} textAlign="center">
-        <Container maxW="3xl">
-          <Heading as="h1" fontWeight="extrabold" fontSize={['90px']}>
-            Serverless <br/>
-            Database <br/>
-            for Next.js
-          </Heading>
+      <Box as="section" py={['70px', '100px']}>
+        <Container maxW="5xl">
+          <SimpleGrid columns={[1, 2]} spacing={10} alignItems="center">
+            <div>
+              <Heading as="h1" fontWeight="extrabold" size="3xl">
+                Serverless <br />
+                Database <br />
+                for Next.js
+              </Heading>
 
-          <Box mt="24px" fontSize={['md', '2xl']} color="whiteAlpha.700">
-            <Text> Redis with Per Request Pricing and REST API </Text>
-          </Box>
+              <Box mt="24px" fontSize={['md', 'xl']} color="whiteAlpha.700">
+                <Text>Redis with Per Request Pricing and REST API</Text>
+                <Text>
+                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad
+                  natus perferendis sunt voluptates? Adipisci amet aperiam
+                  asperiores dicta ea, illo in inventore minus molestias nihil
+                  quo sint sit tenetur velit?
+                </Text>
+              </Box>
+            </div>
+            <div>
+              <img
+                src="/assets/upstash-next.svg"
+                alt="Serverless Database for Next.js"
+              />
+            </div>
+          </SimpleGrid>
         </Container>
 
-        <Container maxW="4xl" mt={20}>
+        <Container
+          maxW="5xl"
+          mt={20}
+          p={10}
+          textAlign="center"
+          bgColor="whiteAlpha.200"
+          borderRadius="2xl"
+        >
           <SimpleGrid columns={[1, 3]} spacing={10}>
             {FEATURES.map((mission) => {
               return <FeatureItem key={mission.title} {...mission} />
