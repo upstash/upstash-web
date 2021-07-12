@@ -17,7 +17,7 @@ import NextLink from './link'
 
 function Header({ onOpen }) {
   const { pathname } = useRouter()
-  const isAboutPage = pathname === '/about'
+  const isSubPage = pathname === '/about' || pathname === '/nextjs'
 
   return (
     <Box as="header" mt={[10, 14]}>
@@ -44,10 +44,15 @@ function Header({ onOpen }) {
               spacing="24px"
               justify="center"
             >
-              {!isAboutPage && (
+              {!isSubPage && (
                 <CustomLink href="#section-pricing" color="inherit">
                   Pricing
                 </CustomLink>
+              )}
+              {isSubPage && (
+                  <CustomLink href="https://upstash.com/#section-pricing" color="inherit">
+                    Pricing
+                  </CustomLink>
               )}
               <NextLink href="/about" color="inherit">
                 About
