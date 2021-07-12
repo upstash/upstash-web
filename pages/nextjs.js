@@ -198,7 +198,7 @@ export async function getServerSideProps() {
                             </Text>
                         </SupportCard>
                         {/**/}
-                        <SupportCard theme="next" href={''}>
+                        <SupportCard theme="next" href={'https://blog.upstash.com/roadmap-application'}>
                             <SectionSupportIconNext/>
                             <Text>
                                 <b> Roadmap Voting App</b>
@@ -207,7 +207,7 @@ export async function getServerSideProps() {
                             </Text>
                         </SupportCard>
                         {/**/}
-                        <SupportCard theme="next" href={''}>
+                        <SupportCard theme="next" href={'https://blog.upstash.com/nextjs-todo'}>
                             <SectionSupportIconNext/>
                             <Text>
                                 <b> TODO App</b>
