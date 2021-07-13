@@ -65,7 +65,7 @@ export async function getServerSideProps() {
   `;
 
     let code2 = `
-  export default function Home({ data }) {
+export default function Home({ data }) {
   return (
       <div>
             View Count: <b>{data}</b>
