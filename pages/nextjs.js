@@ -87,7 +87,7 @@ export async function getServerSideProps() {
     return (
         <>
             <Head>
-                <title>Upstash: Best Database for Next.js Application</title>
+                <title>Upstash: The Best Database for Next.js</title>
             </Head>
 
             <Box as="section" py={['70px', '100px']}>
