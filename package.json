@@ -8,18 +8,18 @@
     "icon": "svgr icons -d components/icons --icon"
   },
   "dependencies": {
-    "@chakra-ui/react": "^1.1.5",
-    "@emotion/react": "^11.1.4",
-    "@emotion/styled": "^11.0.0",
-    "framer-motion": "^3.2.1",
-    "next": "^11.0.0",
-    "next-pwa": "^5.2.21",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "react-syntax-highlighter": "^15.4.3"
+    "@chakra-ui/react": "^1.6.5",
+    "@emotion/react": "^11.4.0",
+    "@emotion/styled": "^11.3.0",
+    "framer-motion": "^3.10.6",
+    "next": "^11.0.1",
+    "next-pwa": "^5.2.24",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-syntax-highlighter": "^15.4.4"
   },
   "devDependencies": {
     "@svgr/cli": "^5.5.0",
-    "prettier": "^2.2.1"
+    "prettier": "^2.3.2"
   }
 }
