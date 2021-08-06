@@ -21,7 +21,7 @@ function SectionPricing() {
         {/**/}
 
         <Box as="header">
-          <Heading tag="h2" size="2xl">
+          <Heading as="h2" size="2xl">
             Plans & Pricing
           </Heading>
           <Container maxW="3xl">

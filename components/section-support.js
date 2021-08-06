@@ -13,7 +13,7 @@ function SectionSupport() {
         {/**/}
 
         <Box as="header">
-          <Heading tag="h2" size="2xl">
+          <Heading as="h2" size="2xl">
             Best Choice for the Jamstack
           </Heading>
           <Container maxW="3xl">

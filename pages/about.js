@@ -30,7 +30,7 @@ function MissionItem({ title, desc, icon }) {
     <Box>
       {icon}
 
-      <Heading tag="h3" size="md" mt={5}>
+      <Heading as="h3" size="md" mt={5}>
         {title}
       </Heading>
       <Text mt={3} color="whiteAlpha.600">

@@ -20,17 +20,17 @@ function DesktopTable() {
 
       <Col />
       <Col>
-        <Heading tag="h5" fontSize="2xl">
+        <Heading as="h5" fontSize="2xl">
           Free
         </Heading>
       </Col>
       <Col highlight style={{ borderRadius: '16px 16px 0 0' }}>
-        <Heading tag="h5" fontSize="2xl">
+        <Heading as="h5" fontSize="2xl">
           Pay as you go
         </Heading>
       </Col>
       <Col>
-        <Heading tag="h5" fontSize="2xl">
+        <Heading as="h5" fontSize="2xl">
           Enterprise
         </Heading>
       </Col>

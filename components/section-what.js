@@ -23,7 +23,7 @@ function SectionWhat() {
         {/**/}
 
         <Box as="header">
-          <Heading tag="h3" size="2xl">
+          <Heading as="h3" size="2xl">
             Designed for the Serverless Era
           </Heading>
         </Box>
@@ -38,7 +38,7 @@ function SectionWhat() {
               color="whiteAlpha.800"
               mb={6}
             />
-            <Heading tag="h4" fontSize={['xl', '2xl']}>
+            <Heading as="h4" fontSize={['xl', '2xl']}>
               Per-Request Pricing with Cap
             </Heading>
             <Box mt={4}>
@@ -65,7 +65,7 @@ function SectionWhat() {
               color="whiteAlpha.800"
               mb={6}
             />
-            <Heading tag="h4" fontSize={['xl', '2xl']}>
+            <Heading as="h4" fontSize={['xl', '2xl']}>
               Low Latency
             </Heading>
             <Box mt={4}>
@@ -91,7 +91,7 @@ function SectionWhat() {
               color="whiteAlpha.800"
               mb={6}
             />
-            <Heading tag="h4" fontSize={['xl', '2xl']}>
+            <Heading as="h4" fontSize={['xl', '2xl']}>
               Fast, Durable Storage
             </Heading>
             <Box mt={4}>
@@ -118,7 +118,7 @@ function SectionWhat() {
               color="whiteAlpha.800"
               mb={6}
             />
-            <Heading tag="h4" fontSize={['xl', '2xl']}>
+            <Heading as="h4" fontSize={['xl', '2xl']}>
               Edge Caching and REST API
             </Heading>
             <Box mt={4}>

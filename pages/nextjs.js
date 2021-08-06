@@ -33,7 +33,7 @@ function FeatureItem({title, desc, icon}) {
         <Box>
             {icon}
 
-            <Heading tag="h3" size="md" mt={5}>
+            <Heading as="h3" size="md" mt={5}>
                 {title}
             </Heading>
             <Text mt={3} color="whiteAlpha.600">
@@ -152,7 +152,7 @@ export async function getServerSideProps() {
                 <Bg/>
 
                 <Box as="header">
-                    <Heading tag="h2" size="2xl">
+                    <Heading as="h2" size="2xl">
                         Boost Your Next.js App
                     </Heading>
                     <Container maxW="3xl">
@@ -178,7 +178,7 @@ export async function getServerSideProps() {
                 <Bg/>
 
                 <Box as="header">
-                    <Heading tag="h2" size="2xl">
+                    <Heading as="h2" size="2xl">
                         Community Resources
                     </Heading>
                     <Container maxW="3xl">

@@ -13,11 +13,11 @@ import { INVESTORS } from '../constants'
 function Investor({ name, title, src, url }) {
   return (
     <Box>
-      <Link href={url} isExternal>
+      <Link href={url} isExternal tabIndex="-1">
         <Avatar name={name} src={src} size="lg" />
       </Link>
 
-      <Heading tag="h5" size="md" mt={4}>
+      <Heading as="h5" size="md" mt={4}>
         <Link href={url} isExternal>
           {name}
         </Link>
@@ -37,7 +37,7 @@ function Investors({ fullList = false, ...props }) {
       {/**/}
 
       <Box as="header">
-        <Heading tag="h2" size="xl">
+        <Heading as="h2" size="xl">
           Our investors
         </Heading>
         <Container maxW="3xl">
