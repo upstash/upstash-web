@@ -62,24 +62,24 @@ function Header({ onOpen }) {
                 About
               </NextLink>
 
-              <NextLink href="/careers" color="inherit">
-                Careers
-                {/*<Flex*/}
-                {/*  alignItems="center"*/}
-                {/*  justify="center"*/}
-                {/*  ml={1}*/}
-                {/*  px={1}*/}
-                {/*  h={4}*/}
-                {/*  minW={4}*/}
-                {/*  borderRadius="full"*/}
-                {/*  bg="primary"*/}
-                {/*  color="black"*/}
-                {/*  fontWeight="semibold"*/}
-                {/*  fontSize="xs"*/}
-                {/*>*/}
-                {/*  2*/}
-                {/*</Flex>*/}
-              </NextLink>
+              {/*<NextLink href="/careers" color="inherit">*/}
+              {/*  Careers*/}
+              {/*  <Flex*/}
+              {/*    alignItems="center"*/}
+              {/*    justify="center"*/}
+              {/*    ml={1}*/}
+              {/*    px={1}*/}
+              {/*    h={4}*/}
+              {/*    minW={4}*/}
+              {/*    borderRadius="full"*/}
+              {/*    bg="primary"*/}
+              {/*    color="black"*/}
+              {/*    fontWeight="semibold"*/}
+              {/*    fontSize="xs"*/}
+              {/*  >*/}
+              {/*    2*/}
+              {/*  </Flex>*/}
+              {/*</NextLink>*/}
 
               <CustomLink isExternal href={LINKS.docs} color="inherit">
                 Docs
