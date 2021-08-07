@@ -8,12 +8,10 @@ import {
   Container,
   Heading,
   HStack,
-  Link,
   Stack,
   Tag,
   Text
 } from '@chakra-ui/react'
-import { LINKS } from '../../constants'
 
 function CareerDetailPage({ job }) {
   console.log(job)
@@ -72,7 +70,7 @@ function CareerDetailPage({ job }) {
 
           <Button
             as="a"
-            href="mailto:hr@upstash.com"
+            href="mailto:jobs@upstash.com"
             mt={8}
             color="black"
             bg="primary"
