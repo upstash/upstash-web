@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import {
   Box,
+  Button,
   Container,
   Flex,
   Heading,
@@ -8,24 +9,15 @@ import {
   Text,
   VStack
 } from '@chakra-ui/react'
-import Bg from '../components/bg'
-import Section from '../components/section'
-import CareerCard from '../components/career-card'
+import Bg from '../../components/bg'
+import Section from '../../components/section'
+import CareerCard from '../../components/career-card'
+import { getAllNodes } from 'next-mdx'
 
-const JOBS = [
-  {
-    title: 'Redis Engineer',
-    description: 'We know each millisecond is important for you.',
-    skills: ['aws-lambda', 'redis', 'docker', 'linux']
-  },
-  {
-    title: 'Full Stack Engineer',
-    description: 'Building well designed web app for orthodontists',
-    skills: ['react', 'redux', 'rest', 'design-system']
-  }
-]
+function CareerPage({ jobs }) {
+  console.log(jobs)
+  const hasJobs = jobs.length > 0
 
-function CareerPage() {
   return (
     <>
       <Head>
@@ -42,21 +34,23 @@ function CareerPage() {
             fontWeight="normal"
             as="h4"
             mt="5"
+            lineHeight=""
             fontSize={['md', 'xl']}
             color="whiteAlpha.600"
           >
-            Upstash is a Serverless Database with Redis API.
+            Kolay, hızlı ve developer dostu ürünler geliştiriyoruz. Bu süreçte
+            bizimle beraber harika ürünler geliştirmek isteyen yeni takım
+            arkadaşlarına her zaman ihtiyacımız oluyor.
           </Heading>
 
           <Flex
             justify="center"
             alignItems="center"
-            mt="5"
-            fontSize={['md', 'xl']}
+            mt="8"
             color="whiteAlpha.600"
           >
             <Text>
-              Size:{' '}
+              Company Size:{' '}
               <Text as="span" color="white">
                 1-5 People
               </Text>
@@ -70,8 +64,10 @@ function CareerPage() {
             </Text>
           </Flex>
 
-          {JOBS.length > 0 ? (
+          {hasJobs ? (
             <Flex
+              as="a"
+              href="#list"
               d="inline-flex"
               justify="center"
               alignItems="center"
@@ -88,15 +84,16 @@ function CareerPage() {
                 justify="center"
                 ml={2}
                 mr={-1}
-                px={2}
-                h={6}
-                minW={6}
+                px={1}
+                h={5}
+                minW={5}
                 borderRadius="full"
                 bg="white"
                 color="black"
-                fontWeight="bold"
+                fontSize="sm"
+                fontWeight="semibold"
               >
-                {JOBS.length}
+                {jobs.length}
               </Flex>
             </Flex>
           ) : (
@@ -116,8 +113,8 @@ function CareerPage() {
         </Container>
       </Box>
 
-      {JOBS.length > 0 && (
-        <Section py={['100px', '140px']}>
+      {hasJobs && (
+        <Section id="list" py={['100px', '120px']}>
           <Bg />
 
           <Container maxW="2xl">
@@ -131,8 +128,15 @@ function CareerPage() {
               align="stretch"
               divider={<StackDivider borderColor="whiteAlpha.300" />}
             >
-              {JOBS.map((job) => {
-                return <CareerCard key={job.title} {...job} />
+              {jobs.map((job) => {
+                return (
+                  <CareerCard
+                    key={job.slug}
+                    {...job.frontMatter}
+                    slug={job.slug}
+                    url={job.url}
+                  />
+                )
               })}
             </VStack>
           </Container>
@@ -140,6 +144,16 @@ function CareerPage() {
       )}
     </>
   )
+}
+
+export async function getStaticProps() {
+  const jobs = await getAllNodes('post')
+
+  return {
+    props: {
+      jobs
+    }
+  }
 }
 
 export default CareerPage

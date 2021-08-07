@@ -7,7 +7,6 @@ import SectionSupport from '../components/section-support'
 import SectionPricing from '../components/section-pricing'
 import SectionFaq from '../components/section-faq'
 import Section from '../components/section'
-import { LINKS } from '../constants'
 import { Box } from '@chakra-ui/react'
 import Link from '../components/link'
 

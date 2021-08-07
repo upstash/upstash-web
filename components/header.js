@@ -6,7 +6,8 @@ import {
   GridItem,
   Box,
   Stack,
-  Link
+  Link,
+  Flex
 } from '@chakra-ui/react'
 import CustomLink from './custom-link'
 import * as Icon from './icons'
@@ -44,22 +45,46 @@ function Header({ onOpen }) {
               spacing="24px"
               justify="center"
             >
-              {!isSubPage && (
+              {isSubPage ? (
+                <CustomLink
+                  href="https://upstash.com/#section-pricing"
+                  color="inherit"
+                >
+                  Pricing
+                </CustomLink>
+              ) : (
                 <CustomLink href="#section-pricing" color="inherit">
                   Pricing
                 </CustomLink>
               )}
-              {isSubPage && (
-                  <CustomLink href="https://upstash.com/#section-pricing" color="inherit">
-                    Pricing
-                  </CustomLink>
-              )}
+
               <NextLink href="/about" color="inherit">
                 About
               </NextLink>
+
+              <NextLink href="/careers" color="inherit">
+                Careers
+                {/*<Flex*/}
+                {/*  alignItems="center"*/}
+                {/*  justify="center"*/}
+                {/*  ml={1}*/}
+                {/*  px={1}*/}
+                {/*  h={4}*/}
+                {/*  minW={4}*/}
+                {/*  borderRadius="full"*/}
+                {/*  bg="primary"*/}
+                {/*  color="black"*/}
+                {/*  fontWeight="semibold"*/}
+                {/*  fontSize="xs"*/}
+                {/*>*/}
+                {/*  2*/}
+                {/*</Flex>*/}
+              </NextLink>
+
               <CustomLink isExternal href={LINKS.docs} color="inherit">
                 Docs
               </CustomLink>
+
               <CustomLink isExternal href={SOCIAL_LINKS.blog} color="inherit">
                 Blog
               </CustomLink>
