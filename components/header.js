@@ -62,6 +62,14 @@ function Header({ onOpen }) {
                 About
               </NextLink>
 
+              <CustomLink isExternal href={LINKS.docs} color="inherit">
+                Docs
+              </CustomLink>
+
+              <CustomLink isExternal href={SOCIAL_LINKS.blog} color="inherit">
+                Blog
+              </CustomLink>
+
               <NextLink href="/careers" color="inherit">
                 Careers
                 <Flex
@@ -81,13 +89,6 @@ function Header({ onOpen }) {
                 </Flex>
               </NextLink>
 
-              <CustomLink isExternal href={LINKS.docs} color="inherit">
-                Docs
-              </CustomLink>
-
-              <CustomLink isExternal href={SOCIAL_LINKS.blog} color="inherit">
-                Blog
-              </CustomLink>
             </Stack>
           </GridItem>
 
