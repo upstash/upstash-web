@@ -8,12 +8,10 @@ import {
   Container,
   Heading,
   HStack,
-  Link,
   Stack,
   Tag,
   Text
 } from '@chakra-ui/react'
-import { LINKS } from '../../constants'
 
 function CareerDetailPage({ job }) {
   console.log(job)
