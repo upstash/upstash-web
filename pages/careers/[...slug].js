@@ -72,7 +72,7 @@ function CareerDetailPage({ job }) {
 
           <Button
             as="a"
-            href="mailto:hr@upstash.com"
+            href="mailto:jobs@upstash.com"
             mt={8}
             color="black"
             bg="primary"
