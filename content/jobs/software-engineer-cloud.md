@@ -46,6 +46,14 @@ We are looking for new team members to explore and develop the next generation d
 - Experience with monitoring/logging solutions in Kubernetes
 - Deep level understanding of Linux
 
+<br/>
+
+### What we offer
+
+- Competitive salary
+- Stock options
+- Work from anywhere in the world
+- Budget for events and tech talks
 
 <br/>
 

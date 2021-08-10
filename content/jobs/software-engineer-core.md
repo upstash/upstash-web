@@ -47,6 +47,15 @@ We are looking for new team members to explore and develop the next generation d
 
 <br/>
 
+### What we offer
+
+- Competitive salary
+- Stock options
+- Work from anywhere in the world
+- Budget for events and tech talks
+
+<br/>
+
 ### How to apply
 
 Click on "Apply Now" (or email us at jobs@upstash.com) and tell us why you're excited to join Upstash! To give the team a better understanding of who you are as a whole person, let us know what you are passionate about, and share an example of a project, job, or skill that you’ve picked up on your own. You can attach your resume or give a link to your Linkedin profile.
