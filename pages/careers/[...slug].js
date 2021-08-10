@@ -14,7 +14,6 @@ import {
 } from '@chakra-ui/react'
 
 function CareerDetailPage({ job }) {
-  console.log(job)
   const { title, excerpt, skills, experience, type, location } = job.frontMatter
 
   const content = useHydrate(job, {
