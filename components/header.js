@@ -18,7 +18,7 @@ import NextLink from './link'
 
 function Header({ onOpen }) {
   const { pathname } = useRouter()
-  const isSubPage = pathname === '/about' || pathname === '/nextjs'
+  const isSubPage = pathname !== '/'
 
   return (
     <Box as="header" mt={[10, 14]}>
