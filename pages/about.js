@@ -50,7 +50,7 @@ function HomePage() {
       <Box as="section" py={['100px', '160px']} textAlign="center">
         <Container maxW="3xl">
           <Heading as="h1" fontWeight="extrabold" size="3xl">
-              Make Data Easiest Part of Your Job
+              Make Data the Easiest Part of Your Job
           </Heading>
 
           <Box mt="24px" fontSize={['md', '2xl']} color="whiteAlpha.700">
