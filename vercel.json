@@ -1,0 +1,12 @@
+{
+  "redirects": [
+    {
+      "source": "/discord",
+      "destination": "https://discord.com/invite/w9SenAtbme"
+    },
+    {
+      "source": "/report",
+      "destination": "https://github.com/upstash/issues/issues/new"
+    }
+  ]
+}
