@@ -4,7 +4,7 @@ import SectionSupportIconNext from './section-support-icon-next'
 import SectionSupportIconAws from './section-support-icon-aws'
 import SupportCard from './section-support-card'
 import { LINKS } from '../constants'
-import SectionSupportIconGraphql from './section-support-icon-graphql'
+import SectionSupportIconRest from "./section-support-icon-rest";
 
 function SectionSupport() {
   return (
@@ -59,13 +59,13 @@ function SectionSupport() {
             </Text>
           </SupportCard>
           {/**/}
-          <SupportCard theme="graphql" href={LINKS.graphqlCompatibility}>
-            <SectionSupportIconGraphql />
+          <SupportCard theme="graphql" href={LINKS.restApi}>
+            <SectionSupportIconRest />
             <Text>
               Check out docs for
               <br />
               <Text as="b" fontWeight="bold">
-                GraphQL API
+                REST API
               </Text>
             </Text>
           </SupportCard>
