@@ -1,24 +1,25 @@
 import {Box, SimpleGrid, Container, Heading, Text, Button, Link} from '@chakra-ui/react'
 import Section from '../components/section'
 import Bg from '../components/bg'
-import Mission1 from '../components/icons/Mission1'
+import Global from '../components/icons/Global'
 import Durable from '../components/icons/Durable'
 import SupportCard from '../components/section-support-card'
-import SectionSupportIconNext from '../components/section-support-icon-next'
 import Head from 'next/head'
 import CodeBlock from '../components/code-block'
 import Redis from '../components/icons/Redis'
+import Checklist from '../components/icons/Checklist'
+import Analytics from '../components/icons/Analytics'
 import {LINKS} from "../constants";
 
 const FEATURES = [
     {
-        title: 'Fast',
-        desc: 'Speed up your Next.js apps with Low Latency Redis.',
-        icon: <Box as={Mission1} w={16} mx="auto" color="primary"/>
+        title: 'Globally Fast',
+        desc: 'Upstash replicates data worldwide for global low latency.',
+        icon: <Box as={Global} w={16} mx="auto" color="primary"/>
     },
     {
-        title: 'Durable',
-        desc: 'Upstash persists your data to the block storage by default.',
+        title: 'REST API',
+        desc: 'Access your Redis from edge functions with the Upstash REST API.',
         icon: <Box as={Durable} w={16} mx="auto" color="primary"/>
     },
     {
@@ -45,49 +46,23 @@ function FeatureItem({title, desc, icon}) {
 
 function HomePage() {
     let code1 = `
-import styles from '../styles/Home.module.css'
-import Redis from 'ioredis'
+addEventListener("fetch", event => {
+  event.respondWith(handleRequest(event.request))
+})
 
-let redis = new Redis("redis://:3assd1e9bdfbe41bf23edd165f6afda@us1-destined-deer-34130.upstash.io:34130")
-
-export default function Home({ data }) {
-  return (
-      <div>
-            View Count: <b>{data}</b>
-      </div>
-  )
-}
-
-export async function getServerSideProps() {
-  const data = await redis.incr('counter')
-  return { props: { data } }
+async function handleRequest(request) {
+let res = await fetch("https://us1-cool-tiger-31312.upstash.io/incr/counter\\?_token\\=AXpWASQgN2QxMWRlYzdfgjdmNWM1MmE1ZDE3NTMwMzYzYjAzYWI=")
+text = await res.text()
+return new Response("view count:" +JSON.parse(text).result)
 }
   `;
 
-    let code2 = `
-export default function Home({ data }) {
-  return (
-      <div>
-            View Count: <b>{data}</b>
-      </div>
-  )
-}
 
-export async function getServerSideProps() {
-    let data = await fetch("https://us1-destined-deer-34130.upstash.io/incr/counter", {
-        headers: {
-            Authorization: "Bearer AYW2ACZDYtZGFjNzYxNjg3ZTc4M2UyZfFjOWfkfWJmMjNlZGQzNjVhNmFmZGE="
-        }
-    }).then(response => response.json())
-        .then(data => data.result);
-  return { props: { data } }
-}
-  `;
 
     return (
         <>
             <Head>
-                <title>Upstash: The Best Database for Next.js</title>
+                <title>Upstash: The Best Database for Cloudflare Workers</title>
             </Head>
 
             <Box as="section" py={['70px', '100px']}>
@@ -95,9 +70,9 @@ export async function getServerSideProps() {
                     <SimpleGrid columns={[1, 2]} spacing={10} alignItems="center">
                         <div>
                             <Heading as="h1" fontWeight="extrabold" size="2xl">
-                                The Best <br/>
+                                Global <br/>
                                 Database <br/>
-                                for Next.js
+                                for Cloudflare Workers
                             </Heading>
 
                             <Box mt="24px" fontSize={['md', 'xl']} color="whiteAlpha.700">
@@ -105,8 +80,8 @@ export async function getServerSideProps() {
                                     Serverless Database with Redis API and per request pricing.
                                     <br/>
                                     <br/>
-                                    Redis/REST API together with durable storage makes
-                                    Upstash a perfect database for your Next.js applications.
+                                    Global Replication together with Redis/REST API makes
+                                    Upstash a perfect database for Cloudflare Workers.
                                 </Text>
                                 <Button
                                     as={Link}
@@ -126,8 +101,8 @@ export async function getServerSideProps() {
                         </div>
                         <div>
                             <img
-                                src="/assets/upstash-next.svg"
-                                alt="Serverless Database for Next.js"
+                                src="/assets/upstash_cloudflare_workers.png"
+                                alt="Serverless Database for Cloudflare Workers"
                             />
                         </div>
                     </SimpleGrid>
@@ -154,23 +129,18 @@ export async function getServerSideProps() {
 
                 <Box as="header">
                     <Heading as="h2" size="2xl">
-                        Boost Your Next.js App
+                        Global Store for Edge Functions
                     </Heading>
                     <Container maxW="3xl">
                         <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
-                            Add Redis to your application in seconds
+                            Add Redis to your Cloudflare Workers function in seconds
                         </Text>
                     </Container>
                 </Box>
 
                 <Container maxW="4xl" mt={12}>
-                    <CodeBlock fileName="Using Redis Client">
+                    <CodeBlock fileName="Using REST Client">
                         {code1}
-                    </CodeBlock>
-                </Container>
-                <Container maxW="4xl" mt={12}>
-                    <CodeBlock fileName="Using REST">
-                        {code2}
                     </CodeBlock>
                 </Container>
             </Section>
@@ -191,31 +161,31 @@ export async function getServerSideProps() {
 
                 <Container maxW="5xl">
                     <SimpleGrid mt={[10, 20]} columns={[1, 3]} spacing={6}>
-                        <SupportCard theme="next" href={'https://docs.upstash.com/tutorials/nextjs_with_redis'}>
-                            <SectionSupportIconNext/>
+                        <SupportCard theme="next" href={'https://docs.upstash.com/howto/getstartedcloudflareworkers'}>
+                            <Box as={Redis} w={20} mx="auto" color="primary"/>
                             <Text>
-                                <br/> <b> Next.js with Redis </b>
+                                <br/> <b> Cloudflare Workers with Redis </b>
                                 <br/>Getting Started Guide
                             </Text>
                         </SupportCard>
                         {/**/}
-                        <SupportCard theme="next" href={'https://blog.upstash.com/roadmap-application'}>
-                            <SectionSupportIconNext/>
+                        <SupportCard theme="next" href={'https://blog.upstash.com/redis-cloudflare-workers'}>
+                            <Box as={Analytics} w={20} mx="auto" color="primary"/>
                             <Text>
-                                <b> Roadmap Voting App</b>
-                                <br/> for Next.js, Redis
-                                <br/> authentication with Auth0
+                                <br/><b> Analytics at Edge</b>
+                                <br/> with Redis and
+                                CF Workers
                             </Text>
                         </SupportCard>
                         {/**/}
-                        <SupportCard theme="next" href={'https://blog.upstash.com/nextjs-todo'}>
-                            <SectionSupportIconNext/>
+                        <SupportCard theme="next" href={'https://blog.upstash.com/edge-guard'}>
+                            <Box as={Checklist} w={20} mx="auto" color="primary"/>
                             <Text>
-                                <b> TODO App</b>
+                                <br/> <b> Build IP Allow List </b>
                                 <br/>
-                                Using Next.js and
+                                Using Upstash Redis and
                                 <br/>
-                                Upstash REST API
+                                Edge Functions
                             </Text>
                         </SupportCard>
                         {/**/}
