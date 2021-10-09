@@ -24,8 +24,8 @@ const FEATURES = [
         icon: <Box as={API} w={16} mx="auto" color="primary"/>
     },
     {
-        title: 'Redis',
-        desc: 'The most loved database adapted to the cloud and serverless.',
+        title: 'Edge Caching',
+        desc: 'Cache your data at edge locations (CDN).',
         icon: <Box as={Redis} w={16} mx="auto" color="primary"/>
     }
 ]
@@ -78,11 +78,13 @@ return new Response("view count:" +JSON.parse(text).result)
 
                             <Box mt="24px" fontSize={['md', 'xl']} color="whiteAlpha.700">
                                 <Text>
-                                    Serverless Database with Redis API and per request pricing.
+                                    Serverless Database with Redis/REST API and per request pricing.
                                     <br/>
                                     <br/>
-                                    <CustomLink href="https://blog.upstash.com/global-database"> Global Replication </CustomLink>{" "}
-                                    together with Redis/REST API makes
+                                    <CustomLink href="https://docs.upstash.com/features/globaldatabase"> Global Replication </CustomLink>{" "}
+                                    together with
+                                    <CustomLink href="https://docs.upstash.com/features/edgecaching"> Edge Caching </CustomLink>{" "}
+                                    makes
                                     Upstash a perfect database for Cloudflare Workers.
                                 </Text>
                                 <Button
