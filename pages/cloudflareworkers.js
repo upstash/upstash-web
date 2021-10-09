@@ -2,7 +2,7 @@ import {Box, SimpleGrid, Container, Heading, Text, Button, Link} from '@chakra-u
 import Section from '../components/section'
 import Bg from '../components/bg'
 import Global from '../components/icons/Global'
-import Durable from '../components/icons/Durable'
+import API from '../components/icons/API'
 import SupportCard from '../components/section-support-card'
 import Head from 'next/head'
 import CodeBlock from '../components/code-block'
@@ -10,6 +10,7 @@ import Redis from '../components/icons/Redis'
 import Checklist from '../components/icons/Checklist'
 import Analytics from '../components/icons/Analytics'
 import {LINKS} from "../constants";
+import CustomLink from "../components/custom-link";
 
 const FEATURES = [
     {
@@ -20,7 +21,7 @@ const FEATURES = [
     {
         title: 'REST API',
         desc: 'Access your Redis from edge functions with the Upstash REST API.',
-        icon: <Box as={Durable} w={16} mx="auto" color="primary"/>
+        icon: <Box as={API} w={16} mx="auto" color="primary"/>
     },
     {
         title: 'Redis',
@@ -80,7 +81,8 @@ return new Response("view count:" +JSON.parse(text).result)
                                     Serverless Database with Redis API and per request pricing.
                                     <br/>
                                     <br/>
-                                    Global Replication together with Redis/REST API makes
+                                    <CustomLink href="https://blog.upstash.com/global-database"> Global Replication </CustomLink>{" "}
+                                    together with Redis/REST API makes
                                     Upstash a perfect database for Cloudflare Workers.
                                 </Text>
                                 <Button
