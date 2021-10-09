@@ -82,7 +82,7 @@ return new Response("view count:" +JSON.parse(text).result)
                                     <br/>
                                     <br/>
                                     <CustomLink href="https://docs.upstash.com/features/globaldatabase"> Global Replication </CustomLink>{" "}
-                                    together with
+                                    together with{" "}
                                     <CustomLink href="https://docs.upstash.com/features/edgecaching"> Edge Caching </CustomLink>{" "}
                                     makes
                                     Upstash a perfect database for Cloudflare Workers.
