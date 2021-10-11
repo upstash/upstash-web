@@ -123,8 +123,9 @@ function SectionWhat() {
             </Heading>
             <Box mt={4}>
               <Text color="whiteAlpha.600">
-                Upstash REST API enables access from Edge functions like Cloudflare Workers and Fastly Compute@Edge.
-                With Global Database and Edge Caching, you can access your database from anywhere with low latency.              </Text>
+                Upstash REST API enables access from Cloudflare Workers and Fastly Compute@Edge.
+                With Global Database and Edge Caching, you can access your database from anywhere with very low latency.
+              </Text>
             </Box>
             <Box mt={4}>
               <CustomLink isExternal href={LINKS.restApi}>
