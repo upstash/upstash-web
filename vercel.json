@@ -7,6 +7,10 @@
     {
       "source": "/report",
       "destination": "https://github.com/upstash/issues/issues/new"
+    },
+    {
+      "source": "/redis-api-compatibility",
+      "destination": "https://docs.upstash.com/features/restapi#rest---redis-api-compatibility"
     }
   ]
 }
