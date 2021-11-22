@@ -71,7 +71,7 @@ export const PRICES = {
   encryption: {
     title: 'Encryption (TLS)',
     description:
-      'Encryption the data transfer between server and client. Recommended for production usage.',
+      'Encrypts the data between server and client. Recommended for production.',
     free: true,
     payg: true,
     enterprise: true
