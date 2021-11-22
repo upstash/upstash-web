@@ -1,7 +1,7 @@
-import {Link, Container, Button, Box, Heading, Text} from '@chakra-ui/react'
-import {LINKS} from '../constants'
+import { Link, Container, Button, Box, Heading, Text } from '@chakra-ui/react'
+import { LINKS } from '../constants'
 
-function SectionHero() {
+function SectionHeroRedis() {
     return (
         <Box as="section" py={['80px', '100px']} textAlign="center">
             <Container maxW="5xl">
@@ -14,31 +14,19 @@ function SectionHero() {
                     lineHeight="none"
                     letterSpacing="tight"
                 >
-                    Serverless <br/>
-                    Data
-                    <br/>
-                    For Kafka
-                    
-                    <br/>
-
+                    Serverless <br />
+                    Database <br />
+                    for Redis
+                    <Text as="span" verticalAlign="super" fontSize=".4em">
+                        ®
+                    </Text>
                 </Heading>
 
                 <Box mt="24px" fontSize={['md', '2xl']} color="whiteAlpha.700">
                     <Text>Global Low Latency</Text>
                     <Text>Per-Request Pricing with Cap</Text>
+                    <Text>Durable Storage</Text>
                 </Box>
-                <Box mt="24px" fontSize={['md', '4xl']} >
-                    <Text as="span" margin="20px" verticalAlign="super" color="#00E699" >
-                        #redis
-                    </Text>
-                    <Text as="span" margin="20px" verticalAlign="super" color="#00E699" >
-                        #kafka
-                    </Text>
-                    <Text as="span" margin="20px" verticalAlign="super" color="#00E699" >
-                        #edge
-                    </Text>
-                </Box>
-
 
                 <Button
                     as={Link}
@@ -60,4 +48,4 @@ function SectionHero() {
     )
 }
 
-export default SectionHero
+export default SectionHeroRedis
