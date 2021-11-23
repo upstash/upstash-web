@@ -69,13 +69,13 @@ function SectionWhat() {
             </Heading>
             <Box mt={4}>
               <Text color="whiteAlpha.600">
-                Upstash REST API enables access from Cloudflare Workers and Fastly Compute@Edge.
-                With Global Database and Edge Caching, you can access your database from anywhere with very low latency.
+                True Serverless Kafka where price scales to zero. With per-request-pricing you only pay what you use.
+                Built-in REST API allows you to produce and consume your Kafka topics from anywhere.
               </Text>
             </Box>
             <Box mt={4}>
-              <CustomLink isExternal href={LINKS.restApi}>
-                View API
+              <CustomLink isExternal href={LINKS.kafkaDocs}>
+                Learn More
               </CustomLink>
             </Box>
           </Box>
@@ -121,7 +121,7 @@ function SectionWhat() {
             <Box mt={4}>
               <Text color="whiteAlpha.600">
                 Upstash REST API enables access from Cloudflare Workers and Fastly Compute@Edge.
-                With Global Database and Edge Caching, you can access your database from anywhere with very low latency.
+                With Global Database, you can access your database from anywhere with very low latency.
               </Text>
             </Box>
             <Box mt={4}>

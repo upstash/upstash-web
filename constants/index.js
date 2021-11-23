@@ -12,6 +12,7 @@ export const LINKS = {
   aws: 'https://docs.upstash.com/howto/connectfromawslambda',
   nextjs: 'https://docs.upstash.com/tutorials/nextjs_with_redis',
   restApi: 'https://docs.upstash.com/features/restapi',
+  kafkaDocs: 'https://docs.upstash.com/kafka/',
   redisCompatibility: 'https://docs.upstash.com/overall/rediscompatibility',
   graphqlCompatibility: 'https://docs.upstash.com/graphql/aboutgraphqlapi',
   enterprisePricing:
@@ -93,9 +94,9 @@ export const PRICES = {
     enterprise: true
   },
   graphqlRestApi: {
-    title: 'REST/GraphQL API',
+    title: 'REST API',
     description:
-        'REST/GraphQL API provides HTTP based, connectionless access to the Upstash databases.',
+        'REST API provides HTTP based, connectionless access to the Upstash databases.',
     free: true,
     payg: true,
     enterprise: true
