@@ -1,9 +1,9 @@
 import { Container, SimpleGrid, Heading, Text, Box } from '@chakra-ui/react'
-import SectionSupportIconCFW from './section-support-icon-cfw'
-import SectionSupportIconNext from './section-support-icon-next'
-import SectionSupportIconAws from './section-support-icon-aws'
-import SupportCard from './section-support-card'
-import SectionSupportIconRest from './section-support-icon-rest'
+import SectionSupportIconRedis from '../section-support-icon-redis'
+import SectionSupportIconNext from '../section-support-icon-next'
+import SectionSupportIconAws from '../section-support-icon-aws'
+import SupportCard from '../section-support-card'
+import SectionSupportIconRest from '../section-support-icon-rest'
 
 function SectionSupport() {
   return (
@@ -13,7 +13,7 @@ function SectionSupport() {
 
         <Box as="header">
           <Heading as="h2" size="2xl">
-            Best Choice for the Serverless
+            Best Choice for the Jamstack
           </Heading>
           <Container maxW="3xl">
             <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
@@ -27,7 +27,7 @@ function SectionSupport() {
           <SupportCard
             bgColor="#fff"
             textColor="#000"
-            href="https://docs.upstash.com/redis/tutorials/nextjs_with_redis"
+            href="'https://docs.upstash.com/tutorials/nextjs_with_redis'"
           >
             <SectionSupportIconNext />
             <Text>
@@ -41,7 +41,7 @@ function SectionSupport() {
 
           <SupportCard
             bgColor="#ffe8d3"
-            textColor="#6a3c13"
+            textColor="#7b512d"
             href="https://docs.upstash.com/redis/howto/getstartedawslambda"
           >
             <SectionSupportIconAws />
@@ -55,19 +55,18 @@ function SectionSupport() {
           </SupportCard>
 
           <SupportCard
-            bgColor="#e1d9ff"
-            textColor="#422f8b"
-            href="https://upstash.com/cloudflareworkers"
+            bgColor="#ffdada"
+            textColor="#791514"
+            href="https://docs.upstash.com/redis/overall/rediscompatibility"
           >
-            <SectionSupportIconCFW />
+            <SectionSupportIconRedis />
             <Text>
-              Check out our
-              <br />
+              Check out docs <br />
               <Text as="b" fontWeight="bold">
-                Cloudflare Workers
+                Redis API
               </Text>{' '}
               <br />
-              Page
+              Compatibility
             </Text>
           </SupportCard>
 

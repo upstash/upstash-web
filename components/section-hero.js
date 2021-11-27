@@ -76,8 +76,8 @@ function SectionHero() {
             </Box>
             redis
           </LinkNext>
-          <LinkNext
-            href="/kafka"
+          <Box
+            as="span"
             color="primary"
             d="inline-flex"
             alignItems="center"
@@ -86,9 +86,9 @@ function SectionHero() {
               #
             </Box>
             kafka{' '}
-          </LinkNext>
-          <LinkNext
-            href="/edge"
+          </Box>
+          <Box
+            as="span"
             color="primary"
             d="inline-flex"
             alignItems="center"
@@ -97,7 +97,7 @@ function SectionHero() {
               #
             </Box>
             edge
-          </LinkNext>
+          </Box>
         </HStack>
 
         {/**/}

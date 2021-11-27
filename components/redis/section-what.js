@@ -1,24 +1,21 @@
 import { Container, Heading, Text, Box, SimpleGrid } from '@chakra-ui/react'
-import CustomLink from './custom-link'
-import What1 from './icons/What1'
-import What2 from './icons/What2'
-import What3 from './icons/What3'
-import What4 from './icons/What4'
-// import Bg from './bg'
-import { LINKS } from '../constants'
+import CustomLink from '../custom-link'
+import What1 from '../icons/What1'
+import What2 from '../icons/What2'
+import What3 from '../icons/What3'
+import What4 from '../icons/What4'
+import { LINKS } from '../../constants'
 
-function SectionWhatRedis() {
+function SectionWhat() {
   return (
     <Box
       as="section"
       pos="relative"
       overflow="hidden"
-      mt={['100px', '140px']}
+      mt={['100px']}
       mb={['100px', '220px']}
       textAlign="center"
     >
-      {/*<Bg />*/}
-
       <Container maxW="5xl">
         {/**/}
 
@@ -123,8 +120,9 @@ function SectionWhatRedis() {
             </Heading>
             <Box mt={4}>
               <Text color="whiteAlpha.600">
-                Upstash REST API enables access from Cloudflare Workers and Fastly Compute@Edge.
-                With Global Database and Edge Caching, you can access your database from anywhere with very low latency.
+                Upstash REST API enables access from Cloudflare Workers and
+                Fastly Compute@Edge. With Global Database and Edge Caching, you
+                can access your database from anywhere with very low latency.
               </Text>
             </Box>
             <Box mt={4}>
@@ -141,4 +139,4 @@ function SectionWhatRedis() {
   )
 }
 
-export default SectionWhatRedis
+export default SectionWhat

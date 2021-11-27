@@ -7,12 +7,11 @@ import {
   Badge
 } from '@chakra-ui/react'
 import CustomLink from './custom-link'
+import GlobalNetwork from './icons/GlobalNetwork'
 import What1 from './icons/What1'
-import What2 from './icons/What2'
 import What3 from './icons/What3'
 import What4 from './icons/What4'
 import { LINKS } from '../constants'
-import Bg from './bg'
 
 function SectionWhat() {
   return (
@@ -23,8 +22,6 @@ function SectionWhat() {
       mb={['100px', '220px']}
       textAlign="center"
     >
-      {/*<Bg top="140px" />*/}
-
       <Container maxW="5xl">
         {/**/}
 
@@ -114,7 +111,7 @@ function SectionWhat() {
 
           <Box bg="whiteAlpha.100" borderRadius="2xl" p={10}>
             <Box
-              as={What2}
+              as={GlobalNetwork}
               d="inline-flex"
               w="80px"
               h="80px"

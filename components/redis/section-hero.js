@@ -1,7 +1,7 @@
 import { Link, Container, Button, Box, Heading, Text } from '@chakra-ui/react'
-import { LINKS } from '../constants'
+import { LINKS } from '../../constants'
 
-function SectionHeroRedis() {
+function SectionHero() {
     return (
         <Box as="section" py={['80px', '100px']} textAlign="center">
             <Container maxW="5xl">
@@ -48,4 +48,4 @@ function SectionHeroRedis() {
     )
 }
 
-export default SectionHeroRedis
+export default SectionHero

@@ -1,7 +1,7 @@
 export default function SectionSupportIconAws() {
   return (
     <svg
-      width={58}
+      height={60}
       viewBox="0 0 58 60"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
