@@ -66,7 +66,7 @@ function SectionHero() {
           fontSize={['md', '2xl']}
         >
           <LinkNext
-            href="/edge"
+            href="/redis"
             color="primary"
             d="inline-flex"
             alignItems="center"
@@ -77,7 +77,7 @@ function SectionHero() {
             redis
           </LinkNext>
           <LinkNext
-            href="/edge"
+            href="/kafka"
             color="primary"
             d="inline-flex"
             alignItems="center"
