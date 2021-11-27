@@ -1,8 +1,8 @@
 import { Button, Flex, VStack, Heading, Text } from '@chakra-ui/react'
 import { PRICES } from '../../constants'
-import ColCheck from '../pricing-desktop/col-check'
+import ColCheck from '../redis-pricing-desktop/col-check'
 
-function Title({ children }) {
+export function Title({ children }) {
   return (
     <Heading
       as="h5"
@@ -18,7 +18,7 @@ function Title({ children }) {
   )
 }
 
-function MobileTable() {
+export default function RedisMobileTable() {
   return (
     <VStack spacing={10} align="stretch">
       {['free', 'payg', 'enterprise'].map((key) => {
@@ -107,5 +107,3 @@ function MobileTable() {
     </VStack>
   )
 }
-
-export default MobileTable

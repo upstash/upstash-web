@@ -112,18 +112,21 @@ class MyDocument extends Document {
               <script
                 type="text/javascript"
                 dangerouslySetInnerHTML={{
-                  __html: `window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', '${meta.googleAnalytic}');`
+                  __html: ` window.dataLayer = window.dataLayer || [];
+                            function gtag(){ dataLayer.push(arguments); }
+                            gtag('js', new Date());
+                            gtag('config', 'G-QW5KRSTDM0');`
                 }}
+              />
+              <script
+                type="text/javascript"
+                id="hs-script-loader"
+                async
+                defer
+                src="//js.hs-scripts.com/6849390.js"
               />
             </>
           )}
-          <script
-            type="text/javascript"
-            id="hs-script-loader"
-            async
-            defer
-            src="//js.hs-scripts.com/6849390.js"
-          ></script>
         </Head>
         <body>
           <Main />

@@ -8,12 +8,12 @@ import {
   Text
 } from '@chakra-ui/react'
 import { LINKS, PRICES } from '../../constants'
-import Col from './col'
-import ColCheck from './col-check'
-import ColDescription from './col-description'
-import CustomTooltip from './col-tooltip'
+import Col from '../redis-pricing-desktop/col'
+import ColCheck from '../redis-pricing-desktop/col-check'
+import ColDescription from '../redis-pricing-desktop/col-description'
+import CustomTooltip from '../redis-pricing-desktop/col-tooltip'
 
-function DesktopTable() {
+export default function KafkaDesktopTable() {
   return (
     <Grid templateColumns="repeat(4, 1fr)">
       {/**/}
@@ -261,5 +261,3 @@ function DesktopTable() {
     </Grid>
   )
 }
-
-export default DesktopTable
