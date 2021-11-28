@@ -8,12 +8,12 @@ import {
   Text
 } from '@chakra-ui/react'
 import { LINKS, PRICES } from '../../constants'
-import Col from './col'
-import ColCheck from './col-check'
-import ColDescription from './col-description'
-import CustomTooltip from './col-tooltip'
+import Col from '../redis-pricing-desktop/col'
+import ColCheck from '../redis-pricing-desktop/col-check'
+import ColDescription from '../redis-pricing-desktop/col-description'
+import CustomTooltip from '../redis-pricing-desktop/col-tooltip'
 
-function DesktopTable() {
+export default function KafkaDesktopTable() {
   return (
     <Grid templateColumns="repeat(4, 1fr)">
       {/**/}
@@ -41,18 +41,18 @@ function DesktopTable() {
 
       <ColDescription>
         <Text as="span">
-          {PRICES.commandsLimit.title}
-          <CustomTooltip>{PRICES.commandsLimit.description}</CustomTooltip>
+          {PRICES.messagesLimit.title}
+          <CustomTooltip>{PRICES.messagesLimit.description}</CustomTooltip>
         </Text>
       </ColDescription>
       <Col>
-        <Text as="span">{PRICES.commandsLimit.free}</Text>
+        <Text as="span">{PRICES.messagesLimit.free}</Text>
       </Col>
       <Col highlight>
-        <Text as="span">{PRICES.commandsLimit.payg}</Text>
+        <Text as="span">{PRICES.messagesLimit.payg}</Text>
       </Col>
       <Col>
-        <Text as="span">{PRICES.commandsLimit.enterprise}</Text>
+        <Text as="span">{PRICES.messagesLimit.enterprise}</Text>
       </Col>
 
       <GridItem colSpan={4}>
@@ -61,18 +61,41 @@ function DesktopTable() {
 
       <ColDescription>
         <Text as="span">
-          {PRICES.strongConsistency.title}
-          <CustomTooltip>{PRICES.strongConsistency.description}</CustomTooltip>
+          {PRICES.maxRetentionSizeLimit.title}
+          <CustomTooltip>
+            {PRICES.maxRetentionSizeLimit.description}
+          </CustomTooltip>
         </Text>
       </ColDescription>
       <Col>
-        <ColCheck check={PRICES.strongConsistency.free} />
+        <Text as="span">{PRICES.maxRetentionSizeLimit.free}</Text>
       </Col>
       <Col highlight>
-        <ColCheck check={PRICES.strongConsistency.payg} />
+        <Text as="span">{PRICES.maxRetentionSizeLimit.payg}</Text>
       </Col>
       <Col>
-        <ColCheck check={PRICES.strongConsistency.enterprise} />
+        <Text as="span">{PRICES.maxRetentionSizeLimit.enterprise}</Text>
+      </Col>
+      <GridItem colSpan={4}>
+        <Box height="1px" bg="whiteAlpha.100" />
+      </GridItem>
+
+      <ColDescription>
+        <Text as="span">
+          {PRICES.maxRetentionTimeLimit.title}
+          <CustomTooltip>
+            {PRICES.maxRetentionTimeLimit.description}
+          </CustomTooltip>
+        </Text>
+      </ColDescription>
+      <Col>
+        <Text as="span">{PRICES.maxRetentionTimeLimit.free}</Text>
+      </Col>
+      <Col highlight>
+        <Text as="span">{PRICES.maxRetentionTimeLimit.payg}</Text>
+      </Col>
+      <Col>
+        <Text as="span">{PRICES.maxRetentionTimeLimit.enterprise}</Text>
       </Col>
 
       <GridItem colSpan={4}>
@@ -81,38 +104,20 @@ function DesktopTable() {
 
       <ColDescription>
         <Text as="span">
-          {PRICES.persistence.title}
-          <CustomTooltip>{PRICES.persistence.description}</CustomTooltip>
+          {PRICES.maxNumberOfPartitionsLimit.title}
+          <CustomTooltip>
+            {PRICES.maxNumberOfPartitionsLimit.description}
+          </CustomTooltip>
         </Text>
       </ColDescription>
       <Col>
-        <ColCheck check={PRICES.persistence.free} />
+        <Text as="span">{PRICES.maxNumberOfPartitionsLimit.free}</Text>
       </Col>
       <Col highlight>
-        <ColCheck check={PRICES.persistence.payg} />
+        <Text as="span">{PRICES.maxNumberOfPartitionsLimit.payg}</Text>
       </Col>
       <Col>
-        <ColCheck check={PRICES.persistence.enterprise} />
-      </Col>
-
-      <GridItem colSpan={4}>
-        <Box height="1px" bg="whiteAlpha.100" />
-      </GridItem>
-
-      <ColDescription>
-        <Text as="span">
-          {PRICES.encryption.title}
-          <CustomTooltip>{PRICES.encryption.description}</CustomTooltip>
-        </Text>
-      </ColDescription>
-      <Col>
-        <ColCheck check={PRICES.encryption.free} />
-      </Col>
-      <Col highlight>
-        <ColCheck check={PRICES.encryption.payg} />
-      </Col>
-      <Col>
-        <ColCheck check={PRICES.encryption.enterprise} />
+        <Text as="span">{PRICES.maxNumberOfPartitionsLimit.enterprise}</Text>
       </Col>
 
       <GridItem colSpan={4}>
@@ -141,20 +146,20 @@ function DesktopTable() {
 
       <ColDescription>
         <Text as="span">
-          {PRICES.multiZoneReplication.title}
+          {PRICES.multiZoneReplicationKafka.title}
           <CustomTooltip>
-            {PRICES.multiZoneReplication.description}
+            {PRICES.multiZoneReplicationKafka.description}
           </CustomTooltip>
         </Text>
       </ColDescription>
       <Col>
-        <ColCheck check={PRICES.multiZoneReplication.free} />
+        <ColCheck check={PRICES.multiZoneReplicationKafka.free} />
       </Col>
       <Col highlight>
-        <ColCheck check={PRICES.multiZoneReplication.payg} />
+        <ColCheck check={PRICES.multiZoneReplicationKafka.payg} />
       </Col>
       <Col>
-        <ColCheck check={PRICES.multiZoneReplication.enterprise} />
+        <ColCheck check={PRICES.multiZoneReplicationKafka.enterprise} />
       </Col>
 
       <GridItem colSpan={4}>
@@ -201,15 +206,44 @@ function DesktopTable() {
         <Box height="1px" bg="whiteAlpha.100" />
       </GridItem>
 
-      <ColDescription />
+      <ColDescription>
+        <Text as="span">
+          {PRICES.priceKafkaSingleZone.title}
+          <CustomTooltip>
+            {PRICES.priceKafkaSingleZone.description}
+          </CustomTooltip>
+        </Text>
+      </ColDescription>
       <Col>
-        <Text as="span">{PRICES.price.free}</Text>
+        <Text as="span">{PRICES.priceKafkaSingleZone.free}</Text>
       </Col>
       <Col highlight>
-        <Text as="span">{PRICES.price.payg}</Text>
+        <Text as="span">{PRICES.priceKafkaSingleZone.payg}</Text>
       </Col>
       <Col>
-        <Text as="span">{PRICES.price.enterprise}</Text>
+        <Text as="span">{PRICES.priceKafkaSingleZone.enterprise}</Text>
+      </Col>
+
+      <GridItem colSpan={4}>
+        <Box height="1px" bg="whiteAlpha.100" />
+      </GridItem>
+
+      <ColDescription>
+        <Text as="span">
+          {PRICES.priceKafkaMultiZone.title}
+          <CustomTooltip>
+            {PRICES.priceKafkaMultiZone.description}
+          </CustomTooltip>
+        </Text>
+      </ColDescription>
+      <Col>
+        <Text as="span">{PRICES.priceKafkaMultiZone.free}</Text>
+      </Col>
+      <Col highlight>
+        <Text as="span">{PRICES.priceKafkaMultiZone.payg}</Text>
+      </Col>
+      <Col>
+        <Text as="span">{PRICES.priceKafkaMultiZone.enterprise}</Text>
       </Col>
 
       <GridItem colSpan={4}>
@@ -261,5 +295,3 @@ function DesktopTable() {
     </Grid>
   )
 }
-
-export default DesktopTable

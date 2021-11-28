@@ -98,7 +98,9 @@ function Footer() {
                 endorsement or affiliation between Redis and Upstash.
               </Text>
               <Text fontSize="xs" color="whiteAlpha.500">
-                ** Cloudflare, the Cloudflare logo, and Cloudflare Workers are trademarks and/or registered trademarks of Cloudflare, Inc. in the United States and other jurisdictions.
+                ** Cloudflare, the Cloudflare logo, and Cloudflare Workers are
+                trademarks and/or registered trademarks of Cloudflare, Inc. in
+                the United States and other jurisdictions.
               </Text>
             </Container>
           </Box>

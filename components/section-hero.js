@@ -1,5 +1,18 @@
-import { Link, Container, Button, Box, Heading, Text } from '@chakra-ui/react'
+import {
+  Link,
+  HStack,
+  Container,
+  Badge,
+  Button,
+  Box,
+  Heading,
+  Text
+} from '@chakra-ui/react'
 import { LINKS } from '../constants'
+import React from 'react'
+import Typist from 'react-typist'
+import LinkNext from '../components/link'
+import * as Icon from './icons'
 
 function SectionHero() {
   return (
@@ -14,18 +27,30 @@ function SectionHero() {
           lineHeight="none"
           letterSpacing="tight"
         >
-          Serverless <br />
-          Database <br />
-          for Redis
-          <Text as="span" verticalAlign="super" fontSize=".4em">
-            ®
-          </Text>
+          <div>Serverless</div>
+          <div>Data</div>
+          <Typist avgTypingDelay={100}>
+            <span>for Redis</span>
+            <Typist.Backspace count={5} delay={3000} />
+            <span>Kafka</span>
+            <Typist.Backspace count={5} delay={3000} />
+            <span>Redis</span>
+            <Typist.Backspace count={5} delay={3000} />
+            <span>Kafka</span>
+            <Typist.Backspace count={5} delay={3000} />
+            <span>Redis</span>
+            <Typist.Backspace count={5} delay={3000} />
+            <span>Kafka</span>
+            <Typist.Backspace count={5} delay={3000} />
+            <span>Redis</span>
+            <Typist.Backspace count={5} delay={3000} />
+            <span>Kafka</span>
+          </Typist>
         </Heading>
 
         <Box mt="24px" fontSize={['md', '2xl']} color="whiteAlpha.700">
           <Text>Global Low Latency</Text>
           <Text>Per-Request Pricing with Cap</Text>
-          <Text>Durable Storage</Text>
         </Box>
 
         <Button
@@ -41,6 +66,37 @@ function SectionHero() {
         >
           Start free in 30 seconds
         </Button>
+
+        <HStack
+          mt="40px"
+          spacing="24px"
+          justifyContent="center"
+          fontSize={['md', '2xl']}
+        >
+          <LinkNext
+            href="/redis"
+            color="primary"
+            d="inline-flex"
+            alignItems="center"
+          >
+            <Box as="span" opacity={0.3}>
+              #
+            </Box>
+            redis
+          </LinkNext>
+          <Box as="span" color="primary" d="inline-flex" alignItems="center">
+            <Box as="span" opacity={0.3}>
+              #
+            </Box>
+            kafka{' '}
+          </Box>
+          <Box as="span" color="primary" d="inline-flex" alignItems="center">
+            <Box as="span" opacity={0.3}>
+              #
+            </Box>
+            edge
+          </Box>
+        </HStack>
 
         {/**/}
       </Container>

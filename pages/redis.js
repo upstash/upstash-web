@@ -1,10 +1,11 @@
 import Head from 'next/head'
-import SectionHero from '../components/section-hero'
+import SectionHero from '../components/redis/section-hero'
+import SectionDemo from '../components/redis/section-demo'
 import Investors from '../components/investors'
-import SectionWhat from '../components/section-what'
-import SectionSupport from '../components/section-support'
-import SectionPricing from '../components/section-pricing'
-import SectionFaq from '../components/section-faq'
+import SectionWhat from '../components/redis/section-what'
+import SectionSupport from '../components/redis/section-support'
+import SectionPricing from '../components/redis/section-pricing'
+import SectionFaq from '../components/redis/section-faq'
 import Section from '../components/section'
 import { Box } from '@chakra-ui/react'
 import Link from '../components/link'
@@ -17,6 +18,7 @@ function HomePage() {
       </Head>
 
       <SectionHero />
+      <SectionDemo />
       <SectionWhat />
       <Section>
         <Investors />

@@ -1,24 +1,9 @@
 import { Button, Flex, VStack, Heading, Text } from '@chakra-ui/react'
 import { PRICES } from '../../constants'
-import ColCheck from '../pricing-desktop/col-check'
+import ColCheck from '../redis-pricing-desktop/col-check'
+import { Title } from '../redis-pricing-mobile'
 
-function Title({ children }) {
-  return (
-    <Heading
-      as="h5"
-      fontSize="xs"
-      fontWeight="normal"
-      letterSpacing="wider"
-      textTransform="uppercase"
-      color="whiteAlpha.600"
-      mb={1}
-    >
-      {children}
-    </Heading>
-  )
-}
-
-function MobileTable() {
+export default function KafkaMobileTable() {
   return (
     <VStack spacing={10} align="stretch">
       {['free', 'payg', 'enterprise'].map((key) => {
@@ -37,23 +22,23 @@ function MobileTable() {
             </Heading>
 
             <Flex direction="column" align="center">
-              <Title>{PRICES.commandsLimit.title}</Title>
-              <Text>{PRICES.commandsLimit[key]}</Text>
+              <Title>{PRICES.messagesLimit.title}</Title>
+              <Text>{PRICES.messagesLimit[key]}</Text>
             </Flex>
 
             <Flex direction="column" align="center">
-              <Title>{PRICES.strongConsistency.title}</Title>
-              <ColCheck check={PRICES.strongConsistency[key]} />
+              <Title>{PRICES.maxRetentionSizeLimit.title}</Title>
+              <Text>{PRICES.maxRetentionSizeLimit[key]}</Text>
             </Flex>
 
             <Flex direction="column" align="center">
-              <Title>{PRICES.persistence.title}</Title>
-              <ColCheck check={PRICES.persistence[key]} />
+              <Title>{PRICES.maxRetentionTimeLimit.title}</Title>
+              <Text>{PRICES.maxRetentionTimeLimit[key]}</Text>
             </Flex>
 
             <Flex direction="column" align="center">
-              <Title>{PRICES.encryption.title}</Title>
-              <ColCheck check={PRICES.encryption[key]} />
+              <Title>{PRICES.maxNumberOfPartitionsLimit.title}</Title>
+              <Text>{PRICES.maxNumberOfPartitionsLimit[key]}</Text>
             </Flex>
 
             <Flex direction="column" align="center">
@@ -62,8 +47,8 @@ function MobileTable() {
             </Flex>
 
             <Flex direction="column" align="center">
-              <Title>{PRICES.multiZoneReplication.title}</Title>
-              <ColCheck check={PRICES.multiZoneReplication[key]} />
+              <Title>{PRICES.multiZoneReplicationKafka.title}</Title>
+              <ColCheck check={PRICES.multiZoneReplicationKafka[key]} />
             </Flex>
 
             <Flex direction="column" align="center">
@@ -81,12 +66,16 @@ function MobileTable() {
             </Flex>
 
             <Flex direction="column" align="center">
-              <Title>{PRICES.price.title}</Title>
+              <Title>{PRICES.priceKafkaSingleZone.title}</Title>
               <div>
-                <Text as="p">{PRICES.price[key]}</Text>
-                <Text as="span" fontSize="xs" color="whiteAlpha.600">
-                  {PRICES.price[`${key}Detail`]}
-                </Text>
+                <Text as="p">{PRICES.priceKafkaSingleZone[key]}</Text>
+              </div>
+            </Flex>
+
+            <Flex direction="column" align="center">
+              <Title>{PRICES.priceKafkaMultiZone.title}</Title>
+              <div>
+                <Text as="p">{PRICES.priceKafkaMultiZone[key]}</Text>
               </div>
             </Flex>
 
@@ -107,5 +96,3 @@ function MobileTable() {
     </VStack>
   )
 }
-
-export default MobileTable

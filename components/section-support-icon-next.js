@@ -1,7 +1,7 @@
 export default function SectionSupportIconNext() {
   return (
     <svg
-      width={100}
+      height={60}
       viewBox="0 0 100 60"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

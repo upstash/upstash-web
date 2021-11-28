@@ -1,16 +1,12 @@
 import { VStack } from '@chakra-ui/react'
 import CustomLink from './custom-link'
 
-const THEME = {
-  next: { bg: '#fff', color: '#000' },
-  aws: { bg: '#ffe8d3', color: '#7b512d' },
-  redis: { bg: '#ffdada', color: '#791514' },
-  graphql: { bg: '#ffe3f6', color: '#910062' }
-}
-
-export default function SupportCard({ theme, children, ...props }) {
-  const color = THEME[theme]
-
+export default function SupportCard({
+  bgColor,
+  textColor,
+  children,
+  ...props
+}) {
   return (
     <VStack
       as={CustomLink}
@@ -18,11 +14,11 @@ export default function SupportCard({ theme, children, ...props }) {
       isExternal
       p={8}
       spacing={4}
-      bg={color.bg}
-      color={color.color}
+      bg={bgColor}
+      color={textColor}
       borderRadius="2xl"
       _hover={{
-        color: color.color,
+        color: textColor,
         textDecoration: 'none',
         transform: 'scale(1.02)'
       }}
