@@ -71,7 +71,7 @@ function SectionHero() {
           mt="40px"
           spacing="24px"
           justifyContent="center"
-          fontSize={['md', '2xl']}
+          fontSize={['lg', '2xl']}
         >
           <LinkNext
             href="/redis"
