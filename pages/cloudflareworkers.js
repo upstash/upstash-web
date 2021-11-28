@@ -116,7 +116,7 @@ return new Response("view count:" +JSON.parse(text).result)
             </div>
             <div>
               <img
-                src="/assets/upstash_cloudflare_workers.png"
+                src="/assets/upstash-cloudflare-workers.svg"
                 alt="Serverless Database for Cloudflare Workers"
               />
             </div>
