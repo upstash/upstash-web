@@ -50,8 +50,11 @@ function SectionFaq() {
 
           <FaqAccordionItem title="Can I use Upstash as a database?">
             <Text>
-              Definitely, yes. Some users are worried that Redis data will be lost when a server crashes. This is not the case for Upstash thanks to Durable Storage. Data is reloaded to memory from block storage in case of a server crash. For more information, see
-              our documentation{' '}
+              Definitely, yes. Some users are worried that Redis data will be
+              lost when a server crashes. This is not the case for Upstash
+              thanks to Durable Storage. Data is reloaded to memory from block
+              storage in case of a server crash. For more information, see our
+              documentation{' '}
               <CustomLink isExternal noIcon href={LINKS.durability}>
                 durable storage.
               </CustomLink>

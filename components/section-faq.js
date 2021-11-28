@@ -32,8 +32,8 @@ function SectionFaq() {
             <Text>
               With servers/instances, you pay per-hour or a fixed price. With
               Serverless, you pay per-request. This means you're not charged
-              when your data isn't in use. And Upstash configures and manages the
-              everything for you.
+              when your data isn't in use. And Upstash configures and manages
+              the everything for you.
             </Text>
           </FaqAccordionItem>
 
@@ -50,8 +50,11 @@ function SectionFaq() {
 
           <FaqAccordionItem title="Can I use Upstash Redis as a database?">
             <Text>
-              Definitely, yes. Some users are worried that Redis data will be lost when a server crashes. This is not the case for Upstash thanks to Durable Storage. Data is reloaded to memory from block storage in case of a server crash. For more information, see
-              our documentation{' '}
+              Definitely, yes. Some users are worried that Redis data will be
+              lost when a server crashes. This is not the case for Upstash
+              thanks to Durable Storage. Data is reloaded to memory from block
+              storage in case of a server crash. For more information, see our
+              documentation{' '}
               <CustomLink isExternal noIcon href={LINKS.durability}>
                 durable storage.
               </CustomLink>
@@ -72,8 +75,10 @@ function SectionFaq() {
 
           <FaqAccordionItem title="How does Upstash Kafka compare to Confluent and AWS MSK?">
             <Text>
-              Both Confluent and AWS MSK have fixed cost, that means you pay a fixed amount even if you are not accessing your Kafka cluster.
-              Upstash Kafka pricing is based on per messages. So you do not pay if you are not using the cluster.
+              Both Confluent and AWS MSK have fixed cost, that means you pay a
+              fixed amount even if you are not accessing your Kafka cluster.
+              Upstash Kafka pricing is based on per messages. So you do not pay
+              if you are not using the cluster.
             </Text>
           </FaqAccordionItem>
 
@@ -81,7 +86,10 @@ function SectionFaq() {
 
           <FaqAccordionItem title="When should I prefer REST API over the Kafka/Redis clients?">
             <Text>
-              If your application runs on serverless or edge functions (AWS Lambda, Cloudflare Workers) then using REST protocol will free your from any connection problem which are common in serverless functions.
+              If your application runs on serverless or edge functions (AWS
+              Lambda, Cloudflare Workers) then using REST protocol will free
+              your from any connection problem which are common in serverless
+              functions.
             </Text>
           </FaqAccordionItem>
 

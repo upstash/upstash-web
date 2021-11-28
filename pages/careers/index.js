@@ -35,8 +35,8 @@ function CareerPage({ jobs }) {
             fontSize={['md', 'xl']}
             color="whiteAlpha.600"
           >
-            Help us build the cutting edge data platform for the serverless era. <br/>
-
+            Help us build the cutting edge data platform for the serverless era.{' '}
+            <br />
           </Heading>
 
           {hasJobs ? (

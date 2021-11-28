@@ -29,8 +29,16 @@ function SectionHero() {
         >
           <div>Serverless</div>
           <div>Data</div>
-          <Typist avgTypingDelay={130}>
+          <Typist avgTypingDelay={100}>
             <span>for Redis</span>
+            <Typist.Backspace count={5} delay={3000} />
+            <span>Kafka</span>
+            <Typist.Backspace count={5} delay={3000} />
+            <span>Redis</span>
+            <Typist.Backspace count={5} delay={3000} />
+            <span>Kafka</span>
+            <Typist.Backspace count={5} delay={3000} />
+            <span>Redis</span>
             <Typist.Backspace count={5} delay={3000} />
             <span>Kafka</span>
             <Typist.Backspace count={5} delay={3000} />
@@ -76,23 +84,13 @@ function SectionHero() {
             </Box>
             redis
           </LinkNext>
-          <Box
-            as="span"
-            color="primary"
-            d="inline-flex"
-            alignItems="center"
-          >
+          <Box as="span" color="primary" d="inline-flex" alignItems="center">
             <Box as="span" opacity={0.3}>
               #
             </Box>
             kafka{' '}
           </Box>
-          <Box
-            as="span"
-            color="primary"
-            d="inline-flex"
-            alignItems="center"
-          >
+          <Box as="span" color="primary" d="inline-flex" alignItems="center">
             <Box as="span" opacity={0.3}>
               #
             </Box>
