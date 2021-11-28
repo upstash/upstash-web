@@ -22,23 +22,23 @@ export default function KafkaMobileTable() {
             </Heading>
 
             <Flex direction="column" align="center">
-              <Title>{PRICES.commandsLimit.title}</Title>
-              <Text>{PRICES.commandsLimit[key]}</Text>
+              <Title>{PRICES.messagesLimit.title}</Title>
+              <Text>{PRICES.messagesLimit[key]}</Text>
             </Flex>
 
             <Flex direction="column" align="center">
-              <Title>{PRICES.strongConsistency.title}</Title>
-              <ColCheck check={PRICES.strongConsistency[key]} />
+              <Title>{PRICES.maxRetentionSizeLimit.title}</Title>
+              <Text>{PRICES.maxRetentionSizeLimit[key]}</Text>
             </Flex>
 
             <Flex direction="column" align="center">
-              <Title>{PRICES.persistence.title}</Title>
-              <ColCheck check={PRICES.persistence[key]} />
+              <Title>{PRICES.maxRetentionTimeLimit.title}</Title>
+              <Text>{PRICES.maxRetentionTimeLimit[key]}</Text>
             </Flex>
 
             <Flex direction="column" align="center">
-              <Title>{PRICES.encryption.title}</Title>
-              <ColCheck check={PRICES.encryption[key]} />
+              <Title>{PRICES.maxNumberOfPartitionsLimit.title}</Title>
+              <Text>{PRICES.maxNumberOfPartitionsLimit[key]}</Text>
             </Flex>
 
             <Flex direction="column" align="center">
@@ -47,8 +47,8 @@ export default function KafkaMobileTable() {
             </Flex>
 
             <Flex direction="column" align="center">
-              <Title>{PRICES.multiZoneReplication.title}</Title>
-              <ColCheck check={PRICES.multiZoneReplication[key]} />
+              <Title>{PRICES.multiZoneReplicationKafka.title}</Title>
+              <ColCheck check={PRICES.multiZoneReplicationKafka[key]} />
             </Flex>
 
             <Flex direction="column" align="center">
@@ -66,12 +66,16 @@ export default function KafkaMobileTable() {
             </Flex>
 
             <Flex direction="column" align="center">
-              <Title>{PRICES.price.title}</Title>
+              <Title>{PRICES.priceKafkaSingleZone.title}</Title>
               <div>
-                <Text as="p">{PRICES.price[key]}</Text>
-                <Text as="span" fontSize="xs" color="whiteAlpha.600">
-                  {PRICES.price[`${key}Detail`]}
-                </Text>
+                <Text as="p">{PRICES.priceKafkaSingleZone[key]}</Text>
+              </div>
+            </Flex>
+
+            <Flex direction="column" align="center">
+              <Title>{PRICES.priceKafkaMultiZone.title}</Title>
+              <div>
+                <Text as="p">{PRICES.priceKafkaMultiZone[key]}</Text>
               </div>
             </Flex>
 

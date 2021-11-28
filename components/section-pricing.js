@@ -60,7 +60,10 @@ function SectionPricing() {
               borderLeftRadius="md"
               borderRightWidth={0}
               isActive={price === 'redis'}
-              onClick={() => setPrice('redis')}
+              onClick={() => {
+                console.log('redis')
+                setPrice('redis')
+              }}
             >
               Redis
             </PriceButton>
@@ -68,7 +71,10 @@ function SectionPricing() {
               borderRightRadius="md"
               borderLeftWidth={0}
               isActive={price === 'kafka'}
-              onClick={() => setPrice('kafka')}
+              onClick={() => {
+                console.log('kafka')
+                setPrice('kafka')
+              }}
             >
               Kafka
             </PriceButton>
