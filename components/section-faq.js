@@ -28,12 +28,12 @@ function SectionFaq() {
         <Accordion defaultIndex={0} mt={[10, 20]}>
           {/**/}
 
-          <FaqAccordionItem title="What is a Serverless Database?">
+          <FaqAccordionItem title="What is a Serverless Data?">
             <Text>
               With servers/instances, you pay per-hour or a fixed price. With
               Serverless, you pay per-request. This means you're not charged
-              when the database isn't in use. Upstash configures and manages the
-              database for you.
+              when your data isn't in use. And Upstash configures and manages the
+              everything for you.
             </Text>
           </FaqAccordionItem>
 
@@ -42,13 +42,13 @@ function SectionFaq() {
           <FaqAccordionItem title="My app is not serverless. Can I still use Upstash?">
             <Text>
               Yes! You can use whatever architecture you like, you can still use
-              Upstash as your database.
+              Upstash Redis and Kafka.
             </Text>
           </FaqAccordionItem>
 
           {/**/}
 
-          <FaqAccordionItem title="Can I use Upstash as a database?">
+          <FaqAccordionItem title="Can I use Upstash Redis as a database?">
             <Text>
               Definitely, yes. Some users are worried that Redis data will be lost when a server crashes. This is not the case for Upstash thanks to Durable Storage. Data is reloaded to memory from block storage in case of a server crash. For more information, see
               our documentation{' '}
@@ -60,7 +60,7 @@ function SectionFaq() {
 
           {/**/}
 
-          <FaqAccordionItem title="How does Upstash compare to Elasticache and RedisLabs?">
+          <FaqAccordionItem title="How does Upstash Redis compare to Elasticache and RedisLabs?">
             <Text>
               With ElastiCache and Redislabs, you pay a fixed price even when
               not using your database. Their price is based on instance-hour.
@@ -70,14 +70,18 @@ function SectionFaq() {
 
           {/**/}
 
-          <FaqAccordionItem title="What about Dynamodb and Fauna?">
+          <FaqAccordionItem title="How does Upstash Kafka compare to Confluent and AWS MSK?">
             <Text>
-              Upstash has lower latency than DynamoDB and Fauna. Upstash is
-              easier to use just like the Redis API. For more information, see
-              our documentation{' '}
-              <CustomLink isExternal noIcon href={LINKS.compare}>
-                comparing vendors.
-              </CustomLink>
+              Both Confluent and AWS MSK have fixed cost, that means you pay a fixed amount even if you are not accessing your Kafka cluster.
+              Upstash Kafka pricing is based on per messages. So you do not pay if you are not using the cluster.
+            </Text>
+          </FaqAccordionItem>
+
+          {/**/}
+
+          <FaqAccordionItem title="When should I prefer REST API over the Kafka/Redis clients?">
+            <Text>
+              If your application runs on serverless or edge functions (AWS Lambda, Cloudflare Workers) then using REST protocol will free your from any connection problem which are common in serverless functions.
             </Text>
           </FaqAccordionItem>
 

@@ -7,8 +7,10 @@ export const LINKS = {
   terms: 'static/legal/terms.html',
   consistency: 'https://docs.upstash.com/overall/consistency',
   durability: 'https://docs.upstash.com/overall/durability',
+  globalDatabase: 'https://docs.upstash.com/redis/features/globaldatabase',
   compare: 'https://docs.upstash.com/overall/compare',
-  pricing: 'https://docs.upstash.com/account/pricing',
+  pricing: 'https://docs.upstash.com/redis/overall/pricing',
+  pricingKafka: 'https://docs.upstash.com/kafka/pricing',
   aws: 'https://docs.upstash.com/howto/connectfromawslambda',
   nextjs: 'https://docs.upstash.com/tutorials/nextjs_with_redis',
   restApi: 'https://docs.upstash.com/features/restapi',
@@ -32,8 +34,40 @@ export const PRICES = {
   commandsLimit: {
     title: 'Commands Limit',
     description:
-      'This is the maximum number of requests/commands that your database can receive and process per day.',
+        'This is the maximum number of requests/commands that your database can receive and process per day.',
     free: 'Max 10,000 Commands Daily',
+    payg: 'Unlimited',
+    enterprise: 'Unlimited'
+  },
+  maxRetentionSizeLimit: {
+    title: 'Max Retention Size',
+    description:
+        'This is the maximum size of a log data for a topic partition.',
+    free: '256 MB',
+    payg: '1 TB',
+    enterprise: 'Infinite'
+  },
+  maxRetentionTimeLimit: {
+    title: 'Max Retention Time',
+    description:
+        'This is the maximum time the logs will be retained before they will be discarded to free up space.',
+    free: '1 week',
+    payg: '30 days',
+    enterprise: 'Infinite'
+  },
+  maxNumberOfPartitionsLimit: {
+    title: 'Max Partitions',
+    description:
+        'This is the max total number of partitions you can create in the plan.',
+    free: '10',
+    payg: '100',
+    enterprise: '10000'
+  },
+  messagesLimit: {
+    title: 'Messages Limit',
+    description:
+        'This is the maximum number of messages that your cluster can produce and consume per day.',
+    free: 'Max 10,000 Messages Daily',
     payg: 'Unlimited',
     enterprise: 'Unlimited'
   },
@@ -80,8 +114,16 @@ export const PRICES = {
   multiZoneReplication: {
     title: 'Multi Zone Replication',
     description:
-      'Upstash replicates data to multiple zones for Premium type of databases. This provides high availability and minumum failover time. Enabling multi zone replication doubles the price.',
+      'Upstash replicates data to multiple zones for Premium type of databases. This provides high availability and minimum fail over time. Enabling multi zone replication doubles the price.',
     free: false,
+    payg: true,
+    enterprise: true
+  },
+  multiZoneReplicationKafka: {
+    title: 'Multi Zone Replication',
+    description:
+        'Upstash replicates your data to different availability zones. This provides high availability and minimum fail over time. ',
+    free: true,
     payg: true,
     enterprise: true
   },
@@ -112,9 +154,25 @@ export const PRICES = {
   price: {
     title: 'Price',
     description:
-      'Pricing is based on per request/command. Operational commands like AUTH, INFO, PING, QUIT, COMMAND are not billed.',
+        'Pricing is based on per request/command. Operational commands like AUTH, INFO, PING, QUIT, COMMAND are not billed.',
     free: 'Free (No credit card required)',
     payg: '$0.2 per 100K commands, up to $120 monthly max.',
+    enterprise: 'Custom'
+  },
+  priceKafkaSingleZone: {
+    title: 'Price - Single Zone',
+    description:
+        'Single zone cluster is recommended only for testing and development purposes.',
+    free: 'Free (No credit card required)',
+    payg: '$0.2 per 100K commands, up to $120 monthly max.',
+    enterprise: 'Custom'
+  },
+  priceKafkaMultiZone: {
+    title: 'Price - Multi Zone',
+    description:
+        'Multi zone cluster is recommended for production use cases.',
+    free: 'Free (No credit card required)',
+    payg: '$0.6 per 100K commands, up to $360 monthly max. ',
     enterprise: 'Custom'
   }
 }

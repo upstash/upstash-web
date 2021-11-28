@@ -129,7 +129,7 @@ function SectionWhat() {
               </Text>
             </Box>
             <Box mt={4}>
-              <CustomLink isExternal href={LINKS.compare}>
+              <CustomLink isExternal href={LINKS.globalDatabase}>
                 Learn More
               </CustomLink>
             </Box>
