@@ -47,7 +47,7 @@ function SectionPricing() {
 
         <Box as="header">
           <Heading as="h2" size="2xl">
-            Plans & Pricingg
+            Plans & Pricing
           </Heading>
           <Container maxW="3xl">
             <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
