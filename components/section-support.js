@@ -4,10 +4,19 @@ import SectionSupportIconNext from './section-support-icon-next'
 import SectionSupportIconAws from './section-support-icon-aws'
 import SupportCard from './section-support-card'
 import SectionSupportIconRest from './section-support-icon-rest'
+import Bg from './bg'
 
 function SectionSupport() {
   return (
-    <Box as="section" my={['100px', '220px']} textAlign="center">
+    <Box
+      as="section"
+      py={['100px', '160px']}
+      pos="relative"
+      overflow="hidden"
+      textAlign="center"
+    >
+      <Bg />
+
       <Container maxW="5xl">
         {/**/}
 
