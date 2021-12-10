@@ -37,7 +37,7 @@ function Investors({ fullList = false, ...props }) {
       {/**/}
 
       <Box as="header">
-        <Heading as="h2" size="xl">
+        <Heading as="h2" size="2xl">
           Our investors
         </Heading>
         <Container maxW="3xl">

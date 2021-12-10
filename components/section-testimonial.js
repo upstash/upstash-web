@@ -9,7 +9,7 @@ import {
 
 export default function SectionTestimonial() {
   return (
-    <Box as="section" mt={['40px', '100px']} mb={['100px', '220px']} textAlign="center">
+    <Box as="section" mt={['40px', '80px']} mb={['100px', '220px']} textAlign="center">
       <Container maxW="5xl">
         {/**/}
 

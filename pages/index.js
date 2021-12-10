@@ -9,6 +9,7 @@ import Section from '../components/section'
 import { Box } from '@chakra-ui/react'
 import Link from '../components/link'
 import SectionTestimonial from '../components/section-testimonial'
+import Bg from '../components/bg'
 
 function HomePage() {
   return (
@@ -19,15 +20,22 @@ function HomePage() {
 
       <SectionHero />
       <SectionWhat />
-      <Section>
+      <SectionPricing />
+      <Box
+        as="section"
+        pos="relative"
+        overflow="hidden"
+        py={['100px', '140px']}
+        textAlign="center"
+      >
+        <Bg />
         <Investors />
         <Box mt={16}>
           <Link href="/about">See the full list</Link>
         </Box>
-      </Section>
-      <SectionSupport />
+      </Box>
       <SectionTestimonial />
-      <SectionPricing />
+      <SectionSupport />
       <SectionFaq />
     </>
   )
