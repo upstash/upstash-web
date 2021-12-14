@@ -32,8 +32,8 @@ const FEATURES = [
     icon: <Box as={API} w={16} mx="auto" color="primary" />
   },
   {
-    title: 'Edge Caching',
-    desc: 'Cache your data at edge locations (CDN).',
+    title: 'Redis and Kafka',
+    desc: 'Serverless Redis and Kafka with per request pricing.',
     icon: <Box as={Redis} w={16} mx="auto" color="primary" />
   }
 ]
@@ -69,7 +69,7 @@ return new Response("view count:" +JSON.parse(text).result)
   return (
     <>
       <Head>
-        <title>Upstash: The Best Database for Cloudflare Workers</title>
+        <title>Upstash: Serverless Data for Cloudflare Workers</title>
       </Head>
 
       <Box as="section" py={['70px', '100px']}>
@@ -77,14 +77,14 @@ return new Response("view count:" +JSON.parse(text).result)
           <SimpleGrid columns={[1, 2]} spacing={10} alignItems="center">
             <div>
               <Heading as="h1" fontWeight="extrabold" size="2xl">
-                Global <br />
-                Database <br />
+                Serverless <br />
+                Data <br />
                 for Cloudflare Workers
               </Heading>
 
               <Box mt="24px" fontSize={['md', 'xl']} color="whiteAlpha.700">
                 <Text>
-                  Serverless Database with Redis/REST API and per request
+                  Serverless Redis and Kafka with per request
                   pricing.
                   <br />
                   <br />
@@ -93,9 +93,9 @@ return new Response("view count:" +JSON.parse(text).result)
                     Global Replication{' '}
                   </CustomLink>{' '}
                   together with{' '}
-                  <CustomLink href="https://docs.upstash.com/features/edgecaching">
+                  <CustomLink href="https://docs.upstash.com/redis/features/restapi">
                     {' '}
-                    Edge Caching{' '}
+                    REST API{' '}
                   </CustomLink>{' '}
                   makes Upstash a perfect database for Cloudflare Workers.
                 </Text>
@@ -117,7 +117,7 @@ return new Response("view count:" +JSON.parse(text).result)
             <div>
               <img
                 src="/assets/upstash-cloudflare-workers.svg"
-                alt="Serverless Database for Cloudflare Workers"
+                alt="Serverless Data for Cloudflare Workers"
               />
             </div>
           </SimpleGrid>

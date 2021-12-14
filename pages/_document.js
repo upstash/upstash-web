@@ -8,9 +8,9 @@ class MyDocument extends Document {
 
   render() {
     const meta = {
-      title: 'Upstash: Serverless Database for Redis',
+      title: 'Upstash: Serverless Data for Redis and Kafka',
       description:
-        'Designed for the serverless with per-request pricing and Redis API on durable storage.',
+        'Designed for the serverless with per-request pricing and Redis/Kafka API.',
       url: process.env.BASE_URL,
       twitterAccount: '@upstash',
       imagePath: 'https://upstash.com/static/logo/square-dark.png',

@@ -15,7 +15,7 @@ function HomePage() {
   return (
     <>
       <Head>
-        <title>Upstash: Serverless Database for Redis®</title>
+        <title>Upstash: Serverless Data for Redis® and Kafka®</title>
       </Head>
 
       <SectionHero />
