@@ -77,7 +77,7 @@ function Header({ onOpen }) {
                   fontWeight="semibold"
                   fontSize="xs"
                 >
-                  2
+                  3
                 </Flex>
               </NextLink>
 
