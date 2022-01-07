@@ -47,7 +47,6 @@ We are looking for new intern student to explore and develop the next generation
 
 ### What we offer
 
-- Competitive salary
 - Work from anywhere in the world
 
 <br/>
