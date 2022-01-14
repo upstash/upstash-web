@@ -9,29 +9,30 @@ import {
 } from '@chakra-ui/react'
 import Section from '../components/section'
 import Bg from '../components/bg'
-import Mission1 from '../components/icons/Mission1'
-import Durable from '../components/icons/Durable'
+import Simple from '../components/icons/Mission2'
+import Kafka from '../components/icons/API'
 import SupportCard from '../components/section-support-card'
-import SectionSupportIconNext from '../components/section-support-icon-next'
+import Docs from '../components//icons/Docs'
 import Head from 'next/head'
 import CodeBlock from '../components/code-block'
-import Redis from '../components/icons/Redis'
+import Redis from '../components/icons/Global'
 import { LINKS } from '../constants'
+import Analytics from "../components/icons/Analytics";
 
 const FEATURES = [
   {
-    title: 'Fast',
-    desc: 'Speed up your Next.js apps with Low Latency Redis.',
-    icon: <Box as={Mission1} w={16} mx="auto" color="primary" />
+    title: 'Simple',
+    desc: 'Start Using Kafka in 15 seconds.',
+    icon: <Box as={Simple} w={16} mx="auto" color="primary" />
   },
   {
-    title: 'Durable',
-    desc: 'Upstash persists your data to the block storage by default.',
-    icon: <Box as={Durable} w={16} mx="auto" color="primary" />
+    title: 'Apache Kafka',
+    desc: 'Works with all Kafka Clients.',
+    icon: <Box as={Kafka} w={16} mx="auto" color="primary" />
   },
   {
-    title: 'Redis',
-    desc: 'The most loved database adapted to the cloud and serverless.',
+    title: 'REST API',
+    desc: 'Designed for serverless and edge functions.',
     icon: <Box as={Redis} w={16} mx="auto" color="primary" />
   }
 ]
@@ -53,49 +54,39 @@ function FeatureItem({ title, desc, icon }) {
 
 function HomePage() {
   let code1 = `
-import styles from '../styles/Home.module.css'
-import Redis from 'ioredis'
-
-let redis = new Redis("redis://:3assd1e9bdfbe41bf23edd165f6afda@us1-destined-deer-34130.upstash.io:34130")
-
-export default function Home({ data }) {
-  return (
-      <div>
-            View Count: <b>{data}</b>
-      </div>
-  )
-}
-
-export async function getServerSideProps() {
-  const data = await redis.incr('counter')
-  return { props: { data } }
-}
+const { Kafka } = require('kafkajs')
+ 
+const kafka = new Kafka({
+  brokers: ['full-mantis-14187-us1-kafka.upstash.io:9092'],
+  sasl: {
+    mechanism: 'scram-sha-256',
+    username: 'ZnVsbC1tYW50aXMtMTQyODkHBV9Jjzow03SnUtRQ',
+    password: '4-R-fmtoalXnoeu9TjQBOOL4njfSKwEsE10YvjqUrrq5_yAq4TPGd9c6JbqfQ==',
+  },
+  ssl: true,
+})
+ 
+const producer = kafka.producer()
+producer.connect()
+// ...
+producer.disconnect()
   `
 
   let code2 = `
-export default function Home({ data }) {
-  return (
-      <div>
-            View Count: <b>{data}</b>
-      </div>
-  )
-}
-
-export async function getServerSideProps() {
-    let data = await fetch("https://us1-destined-deer-34130.upstash.io/incr/counter", {
-        headers: {
-            Authorization: "Bearer AYW2ACZDYtZGFjNzYxNjg3ZTc4M2UyZfFjOWfkfWJmMjNlZGQzNjVhNmFmZGE="
-        }
-    }).then(response => response.json())
-        .then(data => data.result);
-  return { props: { data } }
-}
+fetch("https://full-mantis-14187-us1-rest-kafka.upstash.io/produce/github-events/MESSAGE", {
+  headers: {
+    Authorization: "Basic Wm5Wc2JDMXRZVrthtr56VdFJROjQtUi1mbXRvYWxYbm9ldTlUalFCT09MNG5qZlNLd0VzRTEwWXZITWlXNjNoRmxqcVVycnE1X3lBcTRUUEdkOWM2SmJxZlE9PQ=="
+  }
+}).then(response => response.json())
+  .then(data => {
+    console.log(data)
+  });
   `
 
   return (
     <>
       <Head>
-        <title>Upstash: The Best Database for Next.js</title>
+        <title>Upstash: The Serverless Kafka</title>
       </Head>
 
       <Box as="section" py={['70px', '100px']}>
@@ -103,18 +94,17 @@ export async function getServerSideProps() {
           <SimpleGrid columns={[1, 2]} spacing={10} alignItems="center">
             <div>
               <Heading as="h1" fontWeight="extrabold" size="2xl">
-                The Best <br />
-                Database <br />
-                for Next.js
+                Serverless <br />
+                Kafka <br />
               </Heading>
 
               <Box mt="24px" fontSize={['md', 'xl']} color="whiteAlpha.700">
                 <Text>
-                  Serverless Database with Redis API and per request pricing.
+                  Kafka as a service with per request pricing.
                   <br />
                   <br />
-                  Redis/REST API together with durable storage makes Upstash a
-                  perfect database for your Next.js applications.
+                  Kafka/REST API together with flexible pricing makes Upstash Kafka a perfect
+                  event streaming solution for modern architectures.
                 </Text>
                 <Button
                   as={Link}
@@ -161,17 +151,17 @@ export async function getServerSideProps() {
 
         <Box as="header">
           <Heading as="h2" size="2xl">
-            Boost Your Next.js App
+            Kafka Easier Than Ever
           </Heading>
           <Container maxW="3xl">
             <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
-              Add Redis to your application in seconds
+              Add Kafka to your application in seconds
             </Text>
           </Container>
         </Box>
 
         <Container maxW="4xl" mt={12}>
-          <CodeBlock fileName="Using Redis Client">{code1}</CodeBlock>
+          <CodeBlock fileName="Using Kafka Client">{code1}</CodeBlock>
         </Container>
         <Container maxW="4xl" mt={12}>
           <CodeBlock fileName="Using REST">{code2}</CodeBlock>
@@ -196,11 +186,11 @@ export async function getServerSideProps() {
           <SimpleGrid mt={[10, 20]} columns={[1, 3]} spacing={6}>
             <SupportCard
               theme="next"
-              href={'https://docs.upstash.com/tutorials/nextjs_with_redis'}
+              href={'https://docs.upstash.com/kafka'}
             >
-              <SectionSupportIconNext />
+              <Box as={Docs} w={20} mx="auto" color="primary" />
               <Text>
-                <br /> <b> Next.js with Redis </b>
+                <br /> <b> Upstash Kafka </b>
                 <br />
                 Getting Started Guide
               </Text>
@@ -208,27 +198,25 @@ export async function getServerSideProps() {
             {/**/}
             <SupportCard
               theme="next"
-              href={'https://blog.upstash.com/roadmap-application'}
+              href={'https://docs.upstash.com/kafka/tutorials/getstarted_awslambda_kafka'}
             >
-              <SectionSupportIconNext />
+              <Box as={Docs} w={20} mx="auto" color="primary" />
               <Text>
-                <b> Roadmap Voting App</b>
-                <br /> for Next.js, Redis
-                <br /> authentication with Auth0
+                <br />
+                <b> Get started</b>
+                <br /> with AWS Lambda
               </Text>
             </SupportCard>
             {/**/}
             <SupportCard
               theme="next"
-              href={'https://blog.upstash.com/nextjs-todo'}
+              href={'https://docs.upstash.com/kafka/tutorials/getstarted_cloudflare_workers_kafka'}
             >
-              <SectionSupportIconNext />
+              <Box as={Docs} w={20} mx="auto" color="primary" />
               <Text>
-                <b> TODO App</b>
                 <br />
-                Using Next.js and
-                <br />
-                Upstash REST API
+                <b> Get started</b>
+                <br /> with Cloudflare Workers
               </Text>
             </SupportCard>
             {/**/}

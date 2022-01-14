@@ -2,6 +2,7 @@ export const LINKS = {
   docs: 'https://docs.upstash.com',
   console: 'https://console.upstash.com',
   consoleNextjs: 'https://console.upstash.com?utm_source=nextjs',
+  consoleKafka: 'https://console.upstash.com?utm_source=kafka',
   support: 'https://docs.upstash.com/docs/help/support',
   privacy: 'static/legal/privacy.html',
   terms: 'static/legal/terms.html',

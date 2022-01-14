@@ -84,18 +84,28 @@ function SectionHero() {
             </Box>
             redis
           </LinkNext>
-          <Box as="span" color="primary" d="inline-flex" alignItems="center">
+          <LinkNext
+              href="/kafka"
+              color="primary"
+              d="inline-flex"
+              alignItems="center"
+          >
             <Box as="span" opacity={0.3}>
               #
             </Box>
             kafka{' '}
-          </Box>
-          <Box as="span" color="primary" d="inline-flex" alignItems="center">
+          </LinkNext>
+          <LinkNext
+              href="/cloudflareworkers"
+              color="primary"
+              d="inline-flex"
+              alignItems="center"
+          >
             <Box as="span" opacity={0.3}>
               #
             </Box>
-            edge
-          </Box>
+            edge{' '}
+          </LinkNext>
         </HStack>
 
         {/**/}
