@@ -5,7 +5,7 @@ import SectionWhat from '../components/section-what'
 import SectionSupport from '../components/section-support'
 import SectionPricing from '../components/section-pricing'
 import SectionFaq from '../components/section-faq'
-import Section from '../components/section'
+import SectionInfo from '../components/section-info'
 import { Box } from '@chakra-ui/react'
 import Link from '../components/link'
 import SectionTestimonial from '../components/section-testimonial'
@@ -19,6 +19,7 @@ function HomePage() {
       </Head>
 
       <SectionHero />
+      <SectionInfo />
       <SectionWhat />
       <SectionPricing />
       <Box

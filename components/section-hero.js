@@ -16,7 +16,7 @@ import * as Icon from './icons'
 
 function SectionHero() {
   return (
-    <Box as="section" py={['80px', '100px']} textAlign="center">
+    <Box as="section" pt={['80px', '100px']} textAlign="center">
       <Container maxW="5xl">
         {/**/}
 
@@ -85,10 +85,10 @@ function SectionHero() {
             redis
           </LinkNext>
           <LinkNext
-              href="/kafka"
-              color="primary"
-              d="inline-flex"
-              alignItems="center"
+            href="/kafka"
+            color="primary"
+            d="inline-flex"
+            alignItems="center"
           >
             <Box as="span" opacity={0.3}>
               #
@@ -96,10 +96,10 @@ function SectionHero() {
             kafka{' '}
           </LinkNext>
           <LinkNext
-              href="/cloudflareworkers"
-              color="primary"
-              d="inline-flex"
-              alignItems="center"
+            href="/cloudflareworkers"
+            color="primary"
+            d="inline-flex"
+            alignItems="center"
           >
             <Box as="span" opacity={0.3}>
               #
