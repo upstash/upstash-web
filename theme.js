@@ -13,7 +13,7 @@ const theme = extendTheme({
     global: {
       html: {
         fontSize: '17px',
-        'scroll-behavior': 'smooth'
+        scrollBehavior: 'smooth'
       },
       body: {
         bg: 'mainBlack',
