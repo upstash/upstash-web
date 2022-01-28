@@ -14,7 +14,26 @@ function CountCard({ value, title }) {
       <Text fontSize={['2xl', '3xl']} fontWeight="semibold" lineHeight="1">
         {value}
       </Text>
-      <Text mt={2} color="gray.500" lineHeight="1">
+      <Text
+        mt={2}
+        color="gray.500"
+        lineHeight="1"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+      >
+        <Box
+          as="span"
+          mr="2"
+          ml="-2"
+          d="inline-flex"
+          boxSize="10px"
+          bgColor="primary"
+          borderRadius="full"
+          css={{
+            animation: '1s online infinite alternate'
+          }}
+        />{' '}
         {title}
       </Text>
     </Box>

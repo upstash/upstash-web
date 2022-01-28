@@ -41,6 +41,29 @@ function MobileMenu({ isOpen, onClose }) {
             </Button>
 
             <VStack divider={<StackDivider />} align="stretch" color="white">
+              <CustomLink href="/about" h={10} color="inherit">
+                <Flex grow={1}>About</Flex>
+              </CustomLink>
+              <CustomLink href="/careers" h={10} color="inherit">
+                <Flex grow={1} alignItems="center">
+                  Careers
+                  <Flex
+                    alignItems="center"
+                    justify="center"
+                    ml={2}
+                    px={1}
+                    h={4}
+                    minW={4}
+                    borderRadius="full"
+                    bg="primary"
+                    color="black"
+                    fontWeight="semibold"
+                    fontSize="xs"
+                  >
+                    3
+                  </Flex>
+                </Flex>
+              </CustomLink>
               <CustomLink isExternal href={LINKS.docs} h={10} color="inherit">
                 <Flex grow={1}>Docs</Flex>
               </CustomLink>
@@ -51,6 +74,14 @@ function MobileMenu({ isOpen, onClose }) {
                 color="inherit"
               >
                 <Flex grow={1}>Blog</Flex>
+              </CustomLink>
+              <CustomLink
+                isExternal
+                href={SOCIAL_LINKS.blog}
+                h={10}
+                color="inherit"
+              >
+                <Flex grow={1}>Discord</Flex>
               </CustomLink>
             </VStack>
           </VStack>

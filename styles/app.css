@@ -2,3 +2,9 @@
   font-size: 0.84em;
   font-weight: 500;
 }
+
+@keyframes online {
+  from {
+    opacity: 0;
+  }
+}
