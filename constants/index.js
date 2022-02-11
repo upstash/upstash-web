@@ -351,13 +351,13 @@ export const INVESTORS = [
   {
     name: 'Andreas Klinger',
     title: 'Remote First Capital',
-    src: '/investors/andreasklinger.jpeg',
+    src: '/investors/andreas-klinger.jpeg',
     url: 'https://twitter.com/andreasklinger'
   },
   {
     name: 'Joseph Abebe',
     title: 'Investor/Advisor (ex-Slack)',
-    src: '/investors/josephaabebe.jpeg',
+    src: '/investors/joseph-abebe.jpeg',
     url: 'https://twitter.com/josephaabebe'
   },
   {
@@ -375,7 +375,7 @@ export const INVESTORS = [
   {
     name: 'Jake Zeller',
     title: 'Partner, AngelList',
-    src: '/investors/jake_zeller.jpeg',
+    src: '/investors/jake-zeller.jpeg',
     url: 'https://twitter.com/jake_zeller'
   },
   {
@@ -383,5 +383,11 @@ export const INVESTORS = [
     title: 'Partner, ScaleX Ventures',
     src: '/investors/dilekdayinlarli.jpeg',
     url: 'https://twitter.com/dilekdayinlarli'
+  },
+  {
+    name: 'Morgan Dioli',
+    title: 'Partner, Ravix Group',
+    src: '/investors/morgan-dioli.jpeg',
+    url: 'https://www.linkedin.com/in/morgan-dioli-author-cfo'
   }
 ]
