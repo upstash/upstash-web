@@ -11,6 +11,10 @@ skills:
   - aws
 ---
 
+
+#### UPDATE: This position is closed. You can still apply for possible future openings.
+
+
 At Upstash, we are building the next generation data platform for the serverless and edge era.
 Our cloud platform lets users deploy data services in seconds and immediately start using them.
 At the infrastructure level, we are using the latest technologies like Kubernetes, Golang, Terraform and popular cloud providers (AWS,GCE).

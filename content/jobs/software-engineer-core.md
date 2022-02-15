@@ -12,6 +12,8 @@ skills:
   - distributed-systems
 ---
 
+#### UPDATE: This position is closed. You can still apply for possible future openings.
+
 At Upstash, we are building the next generation data platform for the serverless and edge era.
 Our cloud platform lets users deploy data services in seconds and immediately start using them.
 For the best quality and flexibility we design and build our data platform ourselves.
