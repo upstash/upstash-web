@@ -5,37 +5,36 @@ import {
   Heading,
   Text,
   Button,
-  Link
-} from '@chakra-ui/react'
-import Section from '../components/section'
-import Bg from '../components/bg'
-import Simple from '../components/icons/Mission2'
-import Kafka from '../components/icons/API'
-import SupportCard from '../components/section-support-card'
-import Docs from '../components//icons/Docs'
-import Head from 'next/head'
-import CodeBlock from '../components/code-block'
-import Redis from '../components/icons/Global'
-import { LINKS } from '../constants'
-import Analytics from "../components/icons/Analytics";
+  Link,
+} from "@chakra-ui/react";
+import Section from "components/section";
+import Bg from "components/bg";
+import Simple from "components/icons/Mission2";
+import Kafka from "components/icons/API";
+import SupportCard from "components/section-support-card";
+import Docs from "components/icons/Docs";
+import Head from "next/head";
+import CodeBlock from "components/code-block";
+import Redis from "components/icons/Global";
+import { LINKS } from "constants/index.js";
 
 const FEATURES = [
   {
-    title: 'Simple',
-    desc: 'Start Using Kafka in 15 seconds.',
-    icon: <Box as={Simple} w={16} mx="auto" color="primary" />
+    title: "Simple",
+    desc: "Start Using Kafka in 15 seconds.",
+    icon: <Box as={Simple} w={16} mx="auto" color="primary" />,
   },
   {
-    title: 'Apache Kafka',
-    desc: 'Works with all Kafka Clients.',
-    icon: <Box as={Kafka} w={16} mx="auto" color="primary" />
+    title: "Apache Kafka",
+    desc: "Works with all Kafka Clients.",
+    icon: <Box as={Kafka} w={16} mx="auto" color="primary" />,
   },
   {
-    title: 'REST API',
-    desc: 'Designed for serverless and edge functions.',
-    icon: <Box as={Redis} w={16} mx="auto" color="primary" />
-  }
-]
+    title: "REST API",
+    desc: "Designed for serverless and edge functions.",
+    icon: <Box as={Redis} w={16} mx="auto" color="primary" />,
+  },
+];
 
 function FeatureItem({ title, desc, icon }) {
   return (
@@ -49,7 +48,7 @@ function FeatureItem({ title, desc, icon }) {
         {desc}
       </Text>
     </Box>
-  )
+  );
 }
 
 function HomePage() {
@@ -70,7 +69,7 @@ const producer = kafka.producer()
 producer.connect()
 // ...
 producer.disconnect()
-  `
+  `;
 
   let code2 = `
 fetch("https://full-mantis-14187-us1-rest-kafka.upstash.io/produce/github-events/MESSAGE", {
@@ -81,7 +80,7 @@ fetch("https://full-mantis-14187-us1-rest-kafka.upstash.io/produce/github-events
   .then(data => {
     console.log(data)
   });
-  `
+  `;
 
   return (
     <>
@@ -89,7 +88,7 @@ fetch("https://full-mantis-14187-us1-rest-kafka.upstash.io/produce/github-events
         <title>Upstash: The Serverless Kafka</title>
       </Head>
 
-      <Box as="section" py={['70px', '100px']}>
+      <Box as="section" py={["70px", "100px"]}>
         <Container maxW="5xl">
           <SimpleGrid columns={[1, 2]} spacing={10} alignItems="center">
             <div>
@@ -98,13 +97,14 @@ fetch("https://full-mantis-14187-us1-rest-kafka.upstash.io/produce/github-events
                 Kafka <br />
               </Heading>
 
-              <Box mt="24px" fontSize={['md', 'xl']} color="whiteAlpha.700">
+              <Box mt="24px" fontSize={["md", "xl"]} color="whiteAlpha.700">
                 <Text>
                   Kafka as a service with per request pricing.
                   <br />
                   <br />
-                  Kafka/REST API together with flexible pricing makes Upstash Kafka a perfect
-                  event streaming solution for modern architectures.
+                  Kafka/REST API together with flexible pricing makes Upstash
+                  Kafka a perfect event streaming solution for modern
+                  architectures.
                 </Text>
                 <Button
                   as={Link}
@@ -114,7 +114,7 @@ fetch("https://full-mantis-14187-us1-rest-kafka.upstash.io/produce/github-events
                   color="black"
                   bg="primary"
                   _hover={{
-                    textDecoration: 'none'
+                    textDecoration: "none",
                   }}
                 >
                   Start for free in 30 seconds
@@ -140,13 +140,13 @@ fetch("https://full-mantis-14187-us1-rest-kafka.upstash.io/produce/github-events
         >
           <SimpleGrid columns={[1, 3]} spacing={10}>
             {FEATURES.map((mission) => {
-              return <FeatureItem key={mission.title} {...mission} />
+              return <FeatureItem key={mission.title} {...mission} />;
             })}
           </SimpleGrid>
         </Container>
       </Box>
 
-      <Section py={['100px', '140px']}>
+      <Section py={["100px", "140px"]}>
         <Bg />
 
         <Box as="header">
@@ -154,7 +154,7 @@ fetch("https://full-mantis-14187-us1-rest-kafka.upstash.io/produce/github-events
             Kafka Easier Than Ever
           </Heading>
           <Container maxW="3xl">
-            <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
+            <Text fontSize={["md", "xl"]} color="whiteAlpha.600" mt={3}>
               Add Kafka to your application in seconds
             </Text>
           </Container>
@@ -168,7 +168,7 @@ fetch("https://full-mantis-14187-us1-rest-kafka.upstash.io/produce/github-events
         </Container>
       </Section>
 
-      <Section py={['100px', '140px']}>
+      <Section py={["100px", "140px"]}>
         <Bg />
 
         <Box as="header">
@@ -176,7 +176,7 @@ fetch("https://full-mantis-14187-us1-rest-kafka.upstash.io/produce/github-events
             Community Resources
           </Heading>
           <Container maxW="3xl">
-            <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
+            <Text fontSize={["md", "xl"]} color="whiteAlpha.600" mt={3}>
               Check our docs and examples to learn more
             </Text>
           </Container>
@@ -184,10 +184,7 @@ fetch("https://full-mantis-14187-us1-rest-kafka.upstash.io/produce/github-events
 
         <Container maxW="5xl">
           <SimpleGrid mt={[10, 20]} columns={[1, 3]} spacing={6}>
-            <SupportCard
-              theme="next"
-              href={'https://docs.upstash.com/kafka'}
-            >
+            <SupportCard theme="next" href={"https://docs.upstash.com/kafka"}>
               <Box as={Docs} w={20} mx="auto" color="primary" />
               <Text>
                 <br /> <b> Upstash Kafka </b>
@@ -198,7 +195,9 @@ fetch("https://full-mantis-14187-us1-rest-kafka.upstash.io/produce/github-events
             {/**/}
             <SupportCard
               theme="next"
-              href={'https://docs.upstash.com/kafka/tutorials/getstarted_awslambda_kafka'}
+              href={
+                "https://docs.upstash.com/kafka/tutorials/getstarted_awslambda_kafka"
+              }
             >
               <Box as={Docs} w={20} mx="auto" color="primary" />
               <Text>
@@ -210,7 +209,9 @@ fetch("https://full-mantis-14187-us1-rest-kafka.upstash.io/produce/github-events
             {/**/}
             <SupportCard
               theme="next"
-              href={'https://docs.upstash.com/kafka/tutorials/getstarted_cloudflare_workers_kafka'}
+              href={
+                "https://docs.upstash.com/kafka/tutorials/getstarted_cloudflare_workers_kafka"
+              }
             >
               <Box as={Docs} w={20} mx="auto" color="primary" />
               <Text>
@@ -224,7 +225,7 @@ fetch("https://full-mantis-14187-us1-rest-kafka.upstash.io/produce/github-events
         </Container>
       </Section>
     </>
-  )
+  );
 }
 
-export default HomePage
+export default HomePage;

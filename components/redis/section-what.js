@@ -1,10 +1,10 @@
-import { Container, Heading, Text, Box, SimpleGrid } from '@chakra-ui/react'
-import CustomLink from '../custom-link'
-import What1 from '../icons/What1'
-import What2 from '../icons/What2'
-import What3 from '../icons/What3'
-import What4 from '../icons/What4'
-import { LINKS } from '../../constants'
+import { Container, Heading, Text, Box, SimpleGrid } from "@chakra-ui/react";
+import CustomLink from "../custom-link";
+import What1 from "../icons/What1";
+import What2 from "../icons/What2";
+import What3 from "../icons/What3";
+import What4 from "../icons/What4";
+import { LINKS } from "constants/index.js";
 
 function SectionWhat() {
   return (
@@ -12,8 +12,8 @@ function SectionWhat() {
       as="section"
       pos="relative"
       overflow="hidden"
-      mt={['100px']}
-      mb={['100px', '220px']}
+      mt={["100px"]}
+      mb={["100px", "220px"]}
       textAlign="center"
     >
       <Container maxW="5xl">
@@ -35,7 +35,7 @@ function SectionWhat() {
               color="whiteAlpha.800"
               mb={6}
             />
-            <Heading as="h4" fontSize={['xl', '2xl']}>
+            <Heading as="h4" fontSize={["xl", "2xl"]}>
               Per-Request Pricing with Cap
             </Heading>
             <Box mt={4}>
@@ -62,7 +62,7 @@ function SectionWhat() {
               color="whiteAlpha.800"
               mb={6}
             />
-            <Heading as="h4" fontSize={['xl', '2xl']}>
+            <Heading as="h4" fontSize={["xl", "2xl"]}>
               Low Latency
             </Heading>
             <Box mt={4}>
@@ -88,7 +88,7 @@ function SectionWhat() {
               color="whiteAlpha.800"
               mb={6}
             />
-            <Heading as="h4" fontSize={['xl', '2xl']}>
+            <Heading as="h4" fontSize={["xl", "2xl"]}>
               Fast, Durable Storage
             </Heading>
             <Box mt={4}>
@@ -115,7 +115,7 @@ function SectionWhat() {
               color="whiteAlpha.800"
               mb={6}
             />
-            <Heading as="h4" fontSize={['xl', '2xl']}>
+            <Heading as="h4" fontSize={["xl", "2xl"]}>
               Global Database and Edge Caching
             </Heading>
             <Box mt={4}>
@@ -136,7 +136,7 @@ function SectionWhat() {
         {/**/}
       </Container>
     </Box>
-  )
+  );
 }
 
-export default SectionWhat
+export default SectionWhat;

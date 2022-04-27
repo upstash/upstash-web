@@ -37,5 +37,5 @@ export default function What4(props) {
 	"
       />
     </svg>
-  )
+  );
 }

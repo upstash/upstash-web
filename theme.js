@@ -1,89 +1,89 @@
-import { extendTheme } from '@chakra-ui/react'
+import { extendTheme } from "@chakra-ui/react";
 // import { mode } from '@chakra-ui/theme-tools'
 
 const config = {
   useSystemColorMode: false,
-  initialColorMode: 'dark'
-}
+  initialColorMode: "dark",
+};
 
-export const sizes = {}
+export const sizes = {};
 
 const theme = extendTheme({
   styles: {
     global: {
       html: {
-        fontSize: '17px',
-        scrollBehavior: 'smooth'
+        fontSize: "17px",
+        scrollBehavior: "smooth",
       },
       body: {
-        bg: 'mainBlack',
-        color: 'white'
-      }
-    }
+        bg: "mainBlack",
+        color: "white",
+      },
+    },
   },
   sizes,
   fonts: {
-    heading: 'Inter, sans-serif',
-    body: 'Inter, sans-serif'
+    heading: "Inter, sans-serif",
+    body: "Inter, sans-serif",
   },
   colors: {
-    mainBlack: '#050505',
-    primary: '#00E9A3'
+    mainBlack: "#050505",
+    primary: "#00E9A3",
   },
   components: {
     Button: {
       baseStyle: {
-        fontWeight: 'medium'
+        fontWeight: "medium",
       },
       sizes: {
         lg: {
-          fontSize: 'md'
-        }
-      }
+          fontSize: "md",
+        },
+      },
     },
     Container: {
       baseStyle: {
-        px: [6, 8]
-      }
+        px: [6, 8],
+      },
     },
     Modal: {
       baseStyle: {
         dialogContainer: {
-          p: '1rem'
+          p: "1rem",
         },
         dialog: {
           my: 0,
-          borderRadius: '2xl'
+          borderRadius: "2xl",
         },
         closeButton: {
           right: 6,
-          top: 4
-        }
-      }
+          top: 4,
+        },
+      },
     },
     Accordion: {
       baseStyle: {
         container: {
           borderTopWidth: 0,
           _last: {
-            borderBottomWidth: 0
-          }
+            borderBottomWidth: 0,
+          },
         },
         button: {
-          d: 'flex',
-          justifyContent: 'center',
+          d: "flex",
+          justifyContent: "center",
           _hover: {
-            bg: 'transparent'
+            bg: "transparent",
           },
           _focus: {
-            boxShadow: 'none'
-          }
+            boxShadow: "none",
+          },
         },
-        panel: {}
-      }
-    }
+        panel: {},
+      },
+    },
   },
-  config
-})
+  config,
+});
 
-export default theme
+export default theme;

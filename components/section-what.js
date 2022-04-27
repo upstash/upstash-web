@@ -4,14 +4,14 @@ import {
   Text,
   Box,
   SimpleGrid,
-  Badge
-} from '@chakra-ui/react'
-import CustomLink from './custom-link'
-import GlobalNetwork from './icons/GlobalNetwork'
-import What1 from './icons/What1'
-import What3 from './icons/What3'
-import What4 from './icons/What4'
-import { LINKS } from '../constants'
+  Badge,
+} from "@chakra-ui/react";
+import CustomLink from "./custom-link";
+import GlobalNetwork from "./icons/GlobalNetwork";
+import What1 from "./icons/What1";
+import What3 from "./icons/What3";
+import What4 from "./icons/What4";
+import { LINKS } from "constants/index.js";
 
 function SectionWhat() {
   return (
@@ -19,7 +19,7 @@ function SectionWhat() {
       as="section"
       pos="relative"
       overflow="hidden"
-      mb={['100px', '220px']}
+      mb={["100px", "220px"]}
       textAlign="center"
     >
       <Container maxW="5xl">
@@ -35,7 +35,7 @@ function SectionWhat() {
               color="whiteAlpha.800"
               mb={6}
             />
-            <Heading as="h4" fontSize={['xl', '2xl']}>
+            <Heading as="h4" fontSize={["xl", "2xl"]}>
               Durable Redis
             </Heading>
             <Box mt={4}>
@@ -61,8 +61,8 @@ function SectionWhat() {
               color="whiteAlpha.800"
               mb={6}
             />
-            <Heading as="h4" fontSize={['xl', '2xl']}>
-              Kafka meets simplicity{' '}
+            <Heading as="h4" fontSize={["xl", "2xl"]}>
+              Kafka meets simplicity{" "}
               <Badge colorScheme="purple" fontSize="md" py="1">
                 New
               </Badge>
@@ -91,7 +91,7 @@ function SectionWhat() {
               color="whiteAlpha.800"
               mb={6}
             />
-            <Heading as="h4" fontSize={['xl', '2xl']}>
+            <Heading as="h4" fontSize={["xl", "2xl"]}>
               Per-Request Pricing with Cap
             </Heading>
             <Box mt={4}>
@@ -118,7 +118,7 @@ function SectionWhat() {
               color="whiteAlpha.800"
               mb={6}
             />
-            <Heading as="h4" fontSize={['xl', '2xl']}>
+            <Heading as="h4" fontSize={["xl", "2xl"]}>
               Designed for the Edge
             </Heading>
             <Box mt={4}>
@@ -139,7 +139,7 @@ function SectionWhat() {
         {/**/}
       </Container>
     </Box>
-  )
+  );
 }
 
-export default SectionWhat
+export default SectionWhat;

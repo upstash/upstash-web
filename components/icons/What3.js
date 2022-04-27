@@ -22,5 +22,5 @@ export default function What3(props) {
 	H30.64z"
       />
     </svg>
-  )
+  );
 }

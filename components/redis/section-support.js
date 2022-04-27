@@ -1,13 +1,13 @@
-import { Container, SimpleGrid, Heading, Text, Box } from '@chakra-ui/react'
-import SectionSupportIconRedis from '../section-support-icon-redis'
-import SectionSupportIconNext from '../section-support-icon-next'
-import SectionSupportIconAws from '../section-support-icon-aws'
-import SupportCard from '../section-support-card'
-import SectionSupportIconRest from '../section-support-icon-rest'
+import { Container, SimpleGrid, Heading, Text, Box } from "@chakra-ui/react";
+import SectionSupportIconRedis from "../section-support-icon-redis";
+import SectionSupportIconNext from "../section-support-icon-next";
+import SectionSupportIconAws from "../section-support-icon-aws";
+import SupportCard from "../section-support-card";
+import SectionSupportIconRest from "../section-support-icon-rest";
 
 function SectionSupport() {
   return (
-    <Box as="section" my={['100px', '220px']} textAlign="center">
+    <Box as="section" my={["100px", "220px"]} textAlign="center">
       <Container maxW="5xl">
         {/**/}
 
@@ -16,7 +16,7 @@ function SectionSupport() {
             Best Choice for the Jamstack
           </Heading>
           <Container maxW="3xl">
-            <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
+            <Text fontSize={["md", "xl"]} color="whiteAlpha.600" mt={3}>
               Low latency data, ease of use, and pay-per-request pricing makes
               Upstash a perfect choice for the Jamstack and Serverless world.
             </Text>
@@ -64,7 +64,7 @@ function SectionSupport() {
               Check out docs <br />
               <Text as="b" fontWeight="bold">
                 Redis API
-              </Text>{' '}
+              </Text>{" "}
               <br />
               Compatibility
             </Text>
@@ -90,7 +90,7 @@ function SectionSupport() {
         {/**/}
       </Container>
     </Box>
-  )
+  );
 }
 
-export default SectionSupport
+export default SectionSupport;

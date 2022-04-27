@@ -1,15 +1,15 @@
-import { Link, Container, Button, Box, Heading, Text } from '@chakra-ui/react'
-import { LINKS } from '../../constants'
+import { Link, Container, Button, Box, Heading, Text } from "@chakra-ui/react";
+import { LINKS } from "constants/index.js";
 
 function SectionHero() {
   return (
-    <Box as="section" py={['80px', '100px']} textAlign="center">
+    <Box as="section" py={["80px", "100px"]} textAlign="center">
       <Container maxW="5xl">
         {/**/}
 
         <Heading
           as="h1"
-          fontSize={['60px', '110px']}
+          fontSize={["60px", "110px"]}
           fontWeight="extrabold"
           lineHeight="none"
           letterSpacing="tight"
@@ -22,7 +22,7 @@ function SectionHero() {
           </Text>
         </Heading>
 
-        <Box mt="24px" fontSize={['md', '2xl']} color="whiteAlpha.700">
+        <Box mt="24px" fontSize={["md", "2xl"]} color="whiteAlpha.700">
           <Text>Global Low Latency</Text>
           <Text>Per-Request Pricing with Cap</Text>
           <Text>Durable Storage</Text>
@@ -36,7 +36,7 @@ function SectionHero() {
           color="black"
           bg="primary"
           _hover={{
-            textDecoration: 'none'
+            textDecoration: "none",
           }}
         >
           Start free in 30 seconds
@@ -45,7 +45,7 @@ function SectionHero() {
         {/**/}
       </Container>
     </Box>
-  )
+  );
 }
 
-export default SectionHero
+export default SectionHero;

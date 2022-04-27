@@ -9,11 +9,11 @@ import {
   CloseButton,
   Spacer,
   VStack,
-  Link
-} from '@chakra-ui/react'
-import CustomLink from './custom-link'
-import Logo from './logo'
-import { LINKS, SOCIAL_LINKS } from '../constants'
+  Link,
+} from "@chakra-ui/react";
+import CustomLink from "./custom-link";
+import Logo from "./logo";
+import { LINKS, SOCIAL_LINKS } from "constants/index.js";
 
 function MobileMenu({ isOpen, onClose }) {
   return (
@@ -90,7 +90,7 @@ function MobileMenu({ isOpen, onClose }) {
         </ModalBody>
       </ModalContent>
     </Modal>
-  )
+  );
 }
 
-export default MobileMenu
+export default MobileMenu;

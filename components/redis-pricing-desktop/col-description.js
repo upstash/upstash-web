@@ -1,4 +1,4 @@
-import Col from './col'
+import Col from "./col";
 
 export default function ColDescription({ children, ...props }) {
   return (
@@ -10,5 +10,5 @@ export default function ColDescription({ children, ...props }) {
     >
       {children}
     </Col>
-  )
+  );
 }

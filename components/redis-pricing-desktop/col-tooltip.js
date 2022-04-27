@@ -1,5 +1,5 @@
-import { Box, Tooltip } from '@chakra-ui/react'
-import * as Icon from '../icons'
+import { Box, Tooltip } from "@chakra-ui/react";
+import * as Icon from "../icons";
 
 export default function CustomTooltip({ children }) {
   return (
@@ -12,5 +12,5 @@ export default function CustomTooltip({ children }) {
         display="inline-flex"
       />
     </Tooltip>
-  )
+  );
 }

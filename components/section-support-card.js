@@ -1,5 +1,5 @@
-import { VStack } from '@chakra-ui/react'
-import CustomLink from './custom-link'
+import { VStack } from "@chakra-ui/react";
+import CustomLink from "./custom-link";
 
 export default function SupportCard({
   bgColor,
@@ -19,12 +19,12 @@ export default function SupportCard({
       borderRadius="2xl"
       _hover={{
         color: textColor,
-        textDecoration: 'none',
-        transform: 'scale(1.02)'
+        textDecoration: "none",
+        transform: "scale(1.02)",
       }}
       {...props}
     >
       {children}
     </VStack>
-  )
+  );
 }

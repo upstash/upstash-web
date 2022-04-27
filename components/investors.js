@@ -6,9 +6,9 @@ import {
   Wrap,
   Link,
   WrapItem,
-  Heading
-} from '@chakra-ui/react'
-import { INVESTORS } from '../constants'
+  Heading,
+} from "@chakra-ui/react";
+import { INVESTORS } from "constants/index.js";
 
 function Investor({ name, title, src, url }) {
   return (
@@ -26,11 +26,11 @@ function Investor({ name, title, src, url }) {
         {title}
       </Text>
     </Box>
-  )
+  );
 }
 
 function Investors({ fullList = false, ...props }) {
-  const DATA = fullList ? INVESTORS : INVESTORS.slice(0, 5)
+  const DATA = fullList ? INVESTORS : INVESTORS.slice(0, 5);
 
   return (
     <Container maxW="5xl">
@@ -41,7 +41,7 @@ function Investors({ fullList = false, ...props }) {
           Our investors
         </Heading>
         <Container maxW="3xl">
-          <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
+          <Text fontSize={["md", "xl"]} color="whiteAlpha.600" mt={3}>
             We are fortunate to work with some of the best investors in the
             world. Chances are you are already using the products they helped to
             create.
@@ -54,7 +54,7 @@ function Investors({ fullList = false, ...props }) {
           return (
             <WrapItem
               key={investor.name}
-              width={['calc(50% - 40px)', 'calc(33% - 40px)']}
+              width={["calc(50% - 40px)", "calc(33% - 40px)"]}
               justifyContent="center"
             >
               <Investor
@@ -64,11 +64,11 @@ function Investors({ fullList = false, ...props }) {
                 url={investor.url}
               />
             </WrapItem>
-          )
+          );
         })}
       </Wrap>
     </Container>
-  )
+  );
 }
 
-export default Investors
+export default Investors;

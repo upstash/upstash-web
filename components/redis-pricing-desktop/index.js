@@ -5,13 +5,13 @@ import {
   Heading,
   Grid,
   GridItem,
-  Text
-} from '@chakra-ui/react'
-import { LINKS, PRICES } from '../../constants'
-import Col from './col'
-import ColCheck from './col-check'
-import ColDescription from './col-description'
-import CustomTooltip from './col-tooltip'
+  Text,
+} from "@chakra-ui/react";
+import { LINKS, PRICES } from "constants/index.js";
+import Col from "./col";
+import ColCheck from "./col-check";
+import ColDescription from "./col-description";
+import CustomTooltip from "./col-tooltip";
 
 export default function RedisDesktopTable() {
   return (
@@ -24,7 +24,7 @@ export default function RedisDesktopTable() {
           Free
         </Heading>
       </Col>
-      <Col highlight style={{ borderRadius: '16px 16px 0 0' }}>
+      <Col highlight style={{ borderRadius: "16px 16px 0 0" }}>
         <Heading as="h5" fontSize="2xl">
           Pay as you go
         </Heading>
@@ -224,20 +224,20 @@ export default function RedisDesktopTable() {
           color="black"
           bg="white"
           _hover={{
-            textDecoration: 'none'
+            textDecoration: "none",
           }}
         >
           Start for free
         </Button>
       </Col>
-      <Col highlight style={{ borderRadius: '0 0 16px 16px' }}>
+      <Col highlight style={{ borderRadius: "0 0 16px 16px" }}>
         <Button
           as={Link}
           href={LINKS.console}
           color="black"
           bg="primary"
           _hover={{
-            textDecoration: 'none'
+            textDecoration: "none",
           }}
         >
           Login
@@ -250,7 +250,7 @@ export default function RedisDesktopTable() {
           color="black"
           bg="white"
           _hover={{
-            textDecoration: 'none'
+            textDecoration: "none",
           }}
         >
           Contact Us
@@ -259,5 +259,5 @@ export default function RedisDesktopTable() {
 
       {/**/}
     </Grid>
-  )
+  );
 }

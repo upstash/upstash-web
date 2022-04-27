@@ -1,17 +1,17 @@
-import { Container, SimpleGrid, Box, Text } from '@chakra-ui/react'
-import { useEffect, useState } from 'react'
+import { Container, SimpleGrid, Box, Text } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 
 function CountCard({ value, title }) {
   return (
     <Box
       bgColor="white"
       color="gray.900"
-      borderRadius={['xl', '2xl']}
+      borderRadius={["xl", "2xl"]}
       py={5}
       textAlign="center"
       boxShadow="dark-lg"
     >
-      <Text fontSize={['2xl', '3xl']} fontWeight="semibold" lineHeight="1">
+      <Text fontSize={["2xl", "3xl"]} fontWeight="semibold" lineHeight="1">
         {value}
       </Text>
       <Text
@@ -31,48 +31,48 @@ function CountCard({ value, title }) {
           bgColor="primary"
           borderRadius="full"
           css={{
-            animation: '1s online infinite alternate'
+            animation: "1s online infinite alternate",
           }}
-        />{' '}
+        />{" "}
         {title}
       </Text>
     </Box>
-  )
+  );
 }
 
 function SectionInfo() {
-  const [data, setData] = useState({ database: 0, user: 0 })
+  const [data, setData] = useState({ database: 0, user: 0 });
 
   useEffect(() => {
-    fetch('https://global-proven-finch-31564.upstash.io/hgetall/active_data', {
+    fetch("https://global-proven-finch-31564.upstash.io/hgetall/active_data", {
       headers: {
         Authorization:
-          'Bearer AntMASQgYzc5YTMwMmQtMmE1Zi00NDI1LWE5ODctOTlhOTEzMWU1Mjc5_3NQlPMV3SNRmBYHfi62PIe4deMnaBqgQHDXFNL6G7I='
-      }
+          "Bearer AntMASQgYzc5YTMwMmQtMmE1Zi00NDI1LWE5ODctOTlhOTEzMWU1Mjc5_3NQlPMV3SNRmBYHfi62PIe4deMnaBqgQHDXFNL6G7I=",
+      },
     })
       .then((response) => response.json())
       .then(({ result }) => {
-        const data = { database: 0, user: 0 }
+        const data = { database: 0, user: 0 };
         for (let i = 0; i < result.length; i++) {
-          data[result[i]] = result[i + 1]
-          i++
+          data[result[i]] = result[i + 1];
+          i++;
         }
-        console.log(data)
-        setData(data)
-      })
-  }, [])
+        console.log(data);
+        setData(data);
+      });
+  }, []);
 
   return (
-    <Box as="section" my={['-120px', '-160px']}>
+    <Box as="section" my={["-120px", "-160px"]}>
       <Box
         bgImage="/assets/map.png"
         bgRepeat="no-repeat"
-        bgPos={'center'}
-        bgSize={['1400px auto', '1418px 686px']}
+        bgPos={"center"}
+        bgSize={["1400px auto", "1418px 686px"]}
       >
         <Box bg="linear-gradient(180deg, #050505 0%, rgba(5, 5, 5, 0) 41.67%, rgba(5, 5, 5, 0) 56.77%, #050505 100%)">
           <Box
-            height={['700px']}
+            height={["700px"]}
             d="flex"
             alignItems="center"
             justifyContent="center"
@@ -87,7 +87,7 @@ function SectionInfo() {
         </Box>
       </Box>
     </Box>
-  )
+  );
 }
 
-export default SectionInfo
+export default SectionInfo;

@@ -18,5 +18,5 @@ export default function Mission3(props) {
 		h0.721L23.36,15L23.36,15z M9.36,15H8.64V5h0.72C9.36,5,9.36,15,9.36,15z M21,3.36H11V2.64h10V3.36z"
       />
     </svg>
-  )
+  );
 }

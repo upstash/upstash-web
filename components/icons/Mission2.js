@@ -16,5 +16,5 @@ export default function Mission2(props) {
 	C22.214,20.329,20.145,23.36,16,23.36z"
       />
     </svg>
-  )
+  );
 }

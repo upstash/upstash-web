@@ -17,5 +17,5 @@ export default function What2(props) {
 	 M19.179,18.312l-0.357-0.625l7-4l0.357,0.625L19.179,18.312z M14,13.36H4v-0.72h10V13.36z"
       />
     </svg>
-  )
+  );
 }

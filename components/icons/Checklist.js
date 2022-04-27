@@ -16,5 +16,5 @@ export default function Redis(props) {
 	 M1.36,6.64h5.28V1.36H1.36V6.64z M31,4.36H11V3.64h20V4.36z"
       />
     </svg>
-  )
+  );
 }

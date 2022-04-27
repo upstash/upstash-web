@@ -1,23 +1,23 @@
-import Document, { Html, Head, Main, NextScript } from 'next/document'
+import Document, { Html, Head, Main, NextScript } from "next/document";
 
 class MyDocument extends Document {
   static async getInitialProps(ctx) {
-    const initialProps = await Document.getInitialProps(ctx)
-    return { ...initialProps }
+    const initialProps = await Document.getInitialProps(ctx);
+    return { ...initialProps };
   }
 
   render() {
     const meta = {
-      title: 'Upstash: Serverless Data for Redis and Kafka',
+      title: "Upstash: Serverless Data for Redis and Kafka",
       description:
-        'Designed for the serverless with per-request pricing and Redis/Kafka API.',
-      url: process.env.BASE_URL,
-      twitterAccount: '@upstash',
-      imagePath: 'https://upstash.com/static/logo/square-dark.png',
-      coverImagePath: 'https://upstash.com/static/logo/cover.jpg',
+        "Designed for the serverless with per-request pricing and Redis/Kafka API.",
+      url: "https://upstash.com",
+      twitterAccount: "@upstash",
+      imagePath: "https://upstash.com/static/logo/square-dark.png",
+      coverImagePath: "https://upstash.com/static/logo/cover.jpg",
       imageSize: 1024,
-      googleAnalytic: 'G-QW5KRSTDM0'
-    }
+      googleAnalytic: "G-QW5KRSTDM0",
+    };
 
     return (
       <Html lang="en">
@@ -103,7 +103,7 @@ class MyDocument extends Document {
           <meta content="#050505" name="msapplication-TileColor" />
 
           {/* analytic */}
-          {process.env.NODE_ENV !== 'development' && (
+          {process.env.NODE_ENV !== "development" && (
             <>
               <script
                 async
@@ -115,7 +115,7 @@ class MyDocument extends Document {
                   __html: ` window.dataLayer = window.dataLayer || [];
                             function gtag(){ dataLayer.push(arguments); }
                             gtag('js', new Date());
-                            gtag('config', 'G-QW5KRSTDM0');`
+                            gtag('config', 'G-QW5KRSTDM0');`,
                 }}
               />
               <script
@@ -133,8 +133,8 @@ class MyDocument extends Document {
           <NextScript />
         </body>
       </Html>
-    )
+    );
   }
 }
 
-export default MyDocument
+export default MyDocument;

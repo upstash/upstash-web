@@ -1,6 +1,6 @@
-import { Flex, Box, Text, VStack } from '@chakra-ui/react'
-import Window from './window'
-import WindowHeader from './window-header'
+import { Flex, Box, Text, VStack } from "@chakra-ui/react";
+import Window from "./window";
+import WindowHeader from "./window-header";
 
 function FormItem({ label, input, ...props }) {
   return (
@@ -27,12 +27,12 @@ function FormItem({ label, input, ...props }) {
         <Text fontSize="sm">{input}</Text>
       </Flex>
     </Box>
-  )
+  );
 }
 
 function Step1() {
   return (
-    <Window d={['none', 'none', 'block']}>
+    <Window d={["none", "none", "block"]}>
       <WindowHeader>
         <Box
           pos="absolute"
@@ -72,7 +72,7 @@ function Step1() {
         </VStack>
       </Flex>
     </Window>
-  )
+  );
 }
 
-export default Step1
+export default Step1;

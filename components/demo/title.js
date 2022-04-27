@@ -1,4 +1,4 @@
-import { HStack, Flex, Text } from '@chakra-ui/react'
+import { HStack, Flex, Text } from "@chakra-ui/react";
 
 function Title({ number, children }) {
   return (
@@ -11,16 +11,16 @@ function Title({ number, children }) {
         bg="white"
         borderRadius="full"
       >
-        <Text fontSize={['md', 'xl']} color="black" fontWeight="bold">
+        <Text fontSize={["md", "xl"]} color="black" fontWeight="bold">
           {number}
         </Text>
       </Flex>
 
-      <Text fontWeight="medium" fontSize={['md', 'xl']} mt={1}>
+      <Text fontWeight="medium" fontSize={["md", "xl"]} mt={1}>
         {children}
       </Text>
     </HStack>
-  )
+  );
 }
 
-export default Title
+export default Title;

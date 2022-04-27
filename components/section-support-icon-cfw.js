@@ -121,5 +121,5 @@ export default function SectionSupportIconCFW() {
         opacity=".6"
       />
     </svg>
-  )
+  );
 }

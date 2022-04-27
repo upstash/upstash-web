@@ -16,5 +16,5 @@ export default function Durable(props) {
 	V7.36z M20,4.36h-8V3.64h8V4.36z"
       />
     </svg>
-  )
+  );
 }

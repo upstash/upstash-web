@@ -17,5 +17,5 @@ export default function Redis(props) {
 	c-0.145,0.059-0.311,0.021-0.412-0.098l-5.842-6.816L1.36,8.259z"
       />
     </svg>
-  )
+  );
 }

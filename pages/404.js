@@ -1,5 +1,5 @@
-import Head from 'next/head'
-import { Container, Text, Heading } from '@chakra-ui/react'
+import Head from "next/head";
+import { Container, Text, Heading } from "@chakra-ui/react";
 
 function ErrorPage() {
   return (
@@ -19,7 +19,7 @@ function ErrorPage() {
         <Text>Something’s gone wrong...</Text>
       </Container>
     </>
-  )
+  );
 }
 
-export default ErrorPage
+export default ErrorPage;

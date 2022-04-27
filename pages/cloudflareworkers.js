@@ -5,38 +5,38 @@ import {
   Heading,
   Text,
   Button,
-  Link
-} from '@chakra-ui/react'
-import Section from '../components/section'
-import Bg from '../components/bg'
-import Global from '../components/icons/Global'
-import API from '../components/icons/API'
-import SupportCard from '../components/section-support-card'
-import Head from 'next/head'
-import CodeBlock from '../components/code-block'
-import Redis from '../components/icons/Redis'
-import Checklist from '../components/icons/Checklist'
-import Analytics from '../components/icons/Analytics'
-import { LINKS } from '../constants'
-import CustomLink from '../components/custom-link'
+  Link,
+} from "@chakra-ui/react";
+import Section from "components/section";
+import Bg from "components/bg";
+import Global from "components/icons/Global";
+import API from "components/icons/API";
+import SupportCard from "components/section-support-card";
+import Head from "next/head";
+import CodeBlock from "components/code-block";
+import Redis from "components/icons/Redis";
+import Checklist from "components/icons/Checklist";
+import Analytics from "components/icons/Analytics";
+import { LINKS } from "constants/index.js";
+import CustomLink from "components/custom-link";
 
 const FEATURES = [
   {
-    title: 'Globally Fast',
-    desc: 'Upstash replicates data worldwide for global low latency.',
-    icon: <Box as={Global} w={16} mx="auto" color="primary" />
+    title: "Globally Fast",
+    desc: "Upstash replicates data worldwide for global low latency.",
+    icon: <Box as={Global} w={16} mx="auto" color="primary" />,
   },
   {
-    title: 'REST API',
-    desc: 'Access your Redis from edge functions with the Upstash REST API.',
-    icon: <Box as={API} w={16} mx="auto" color="primary" />
+    title: "REST API",
+    desc: "Access your Redis from edge functions with the Upstash REST API.",
+    icon: <Box as={API} w={16} mx="auto" color="primary" />,
   },
   {
-    title: 'Redis and Kafka',
-    desc: 'Serverless Redis and Kafka with per request pricing.',
-    icon: <Box as={Redis} w={16} mx="auto" color="primary" />
-  }
-]
+    title: "Redis and Kafka",
+    desc: "Serverless Redis and Kafka with per request pricing.",
+    icon: <Box as={Redis} w={16} mx="auto" color="primary" />,
+  },
+];
 
 function FeatureItem({ title, desc, icon }) {
   return (
@@ -50,7 +50,7 @@ function FeatureItem({ title, desc, icon }) {
         {desc}
       </Text>
     </Box>
-  )
+  );
 }
 
 function HomePage() {
@@ -64,7 +64,7 @@ let res = await fetch("https://us1-cool-tiger-31312.upstash.io/incr/counter\\?_t
 text = await res.text()
 return new Response("view count:" +JSON.parse(text).result)
 }
-  `
+  `;
 
   return (
     <>
@@ -72,7 +72,7 @@ return new Response("view count:" +JSON.parse(text).result)
         <title>Upstash: Serverless Data for Cloudflare Workers</title>
       </Head>
 
-      <Box as="section" py={['70px', '100px']}>
+      <Box as="section" py={["70px", "100px"]}>
         <Container maxW="5xl">
           <SimpleGrid columns={[1, 2]} spacing={10} alignItems="center">
             <div>
@@ -82,21 +82,20 @@ return new Response("view count:" +JSON.parse(text).result)
                 for Cloudflare Workers
               </Heading>
 
-              <Box mt="24px" fontSize={['md', 'xl']} color="whiteAlpha.700">
+              <Box mt="24px" fontSize={["md", "xl"]} color="whiteAlpha.700">
                 <Text>
-                  Serverless Redis and Kafka with per request
-                  pricing.
+                  Serverless Redis and Kafka with per request pricing.
                   <br />
                   <br />
                   <CustomLink href="https://docs.upstash.com/features/globaldatabase">
-                    {' '}
-                    Global Replication{' '}
-                  </CustomLink>{' '}
-                  together with{' '}
+                    {" "}
+                    Global Replication{" "}
+                  </CustomLink>{" "}
+                  together with{" "}
                   <CustomLink href="https://docs.upstash.com/redis/features/restapi">
-                    {' '}
-                    REST API{' '}
-                  </CustomLink>{' '}
+                    {" "}
+                    REST API{" "}
+                  </CustomLink>{" "}
                   makes Upstash a perfect database for Cloudflare Workers.
                 </Text>
                 <Button
@@ -107,7 +106,7 @@ return new Response("view count:" +JSON.parse(text).result)
                   color="black"
                   bg="primary"
                   _hover={{
-                    textDecoration: 'none'
+                    textDecoration: "none",
                   }}
                 >
                   Start for free in 30 seconds
@@ -133,13 +132,13 @@ return new Response("view count:" +JSON.parse(text).result)
         >
           <SimpleGrid columns={[1, 3]} spacing={10}>
             {FEATURES.map((mission) => {
-              return <FeatureItem key={mission.title} {...mission} />
+              return <FeatureItem key={mission.title} {...mission} />;
             })}
           </SimpleGrid>
         </Container>
       </Box>
 
-      <Section py={['100px', '140px']}>
+      <Section py={["100px", "140px"]}>
         <Bg />
 
         <Box as="header">
@@ -147,7 +146,7 @@ return new Response("view count:" +JSON.parse(text).result)
             Global Store for Edge Functions
           </Heading>
           <Container maxW="3xl">
-            <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
+            <Text fontSize={["md", "xl"]} color="whiteAlpha.600" mt={3}>
               Add Redis to your Cloudflare Workers function in seconds
             </Text>
           </Container>
@@ -158,7 +157,7 @@ return new Response("view count:" +JSON.parse(text).result)
         </Container>
       </Section>
 
-      <Section py={['100px', '140px']}>
+      <Section py={["100px", "140px"]}>
         <Bg />
 
         <Box as="header">
@@ -166,7 +165,7 @@ return new Response("view count:" +JSON.parse(text).result)
             Community Resources
           </Heading>
           <Container maxW="3xl">
-            <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
+            <Text fontSize={["md", "xl"]} color="whiteAlpha.600" mt={3}>
               Check our docs and examples to learn more
             </Text>
           </Container>
@@ -177,7 +176,7 @@ return new Response("view count:" +JSON.parse(text).result)
             <SupportCard
               theme="next"
               href={
-                'https://docs.upstash.com/howto/getstartedcloudflareworkers'
+                "https://docs.upstash.com/howto/getstartedcloudflareworkers"
               }
             >
               <Box as={Redis} w={20} mx="auto" color="primary" />
@@ -190,7 +189,7 @@ return new Response("view count:" +JSON.parse(text).result)
             {/**/}
             <SupportCard
               theme="next"
-              href={'https://blog.upstash.com/redis-cloudflare-workers'}
+              href={"https://blog.upstash.com/redis-cloudflare-workers"}
             >
               <Box as={Analytics} w={20} mx="auto" color="primary" />
               <Text>
@@ -202,7 +201,7 @@ return new Response("view count:" +JSON.parse(text).result)
             {/**/}
             <SupportCard
               theme="next"
-              href={'https://blog.upstash.com/edge-guard'}
+              href={"https://blog.upstash.com/edge-guard"}
             >
               <Box as={Checklist} w={20} mx="auto" color="primary" />
               <Text>
@@ -218,7 +217,7 @@ return new Response("view count:" +JSON.parse(text).result)
         </Container>
       </Section>
     </>
-  )
+  );
 }
 
-export default HomePage
+export default HomePage;

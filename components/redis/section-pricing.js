@@ -1,9 +1,9 @@
-import { Box, Container, VStack, Text, Heading } from '@chakra-ui/react'
-import Bg from '../bg'
-import RedisDesktopTable from '../redis-pricing-desktop'
-import RedisMobileTable from '../redis-pricing-mobile'
-import CustomLink from '../custom-link'
-import { LINKS } from '../../constants'
+import { Box, Container, VStack, Text, Heading } from "@chakra-ui/react";
+import Bg from "../bg";
+import RedisDesktopTable from "../redis-pricing-desktop";
+import RedisMobileTable from "../redis-pricing-mobile";
+import CustomLink from "../custom-link";
+import { LINKS } from "constants/index.js";
 
 function SectionPricing() {
   return (
@@ -12,7 +12,7 @@ function SectionPricing() {
       id="section-pricing"
       pos="relative"
       overflow="hidden"
-      py={['100px', '140px']}
+      py={["100px", "140px"]}
       textAlign="center"
     >
       <Bg />
@@ -25,17 +25,17 @@ function SectionPricing() {
             Plans & Pricing
           </Heading>
           <Container maxW="3xl">
-            <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
+            <Text fontSize={["md", "xl"]} color="whiteAlpha.600" mt={3}>
               Pay only for what you use with per-request pricing.
             </Text>
           </Container>
         </Box>
 
         <Box mt={[10, 20]}>
-          <Box d={['none', 'block']}>
+          <Box d={["none", "block"]}>
             <RedisDesktopTable />
           </Box>
-          <Box d={['block', 'none']}>
+          <Box d={["block", "none"]}>
             <RedisMobileTable />
           </Box>
         </Box>
@@ -47,17 +47,17 @@ function SectionPricing() {
             price.
           </Text>
           <Text>
-            See{' '}
+            See{" "}
             <CustomLink isExternal noIcon href={LINKS.pricing}>
               pricing page
-            </CustomLink>{' '}
+            </CustomLink>{" "}
             for more information.
           </Text>
           <Text>
-            Talk to{' '}
+            Talk to{" "}
             <CustomLink isExternal noIcon href={LINKS.support}>
               us
-            </CustomLink>{' '}
+            </CustomLink>{" "}
             for advanced needs.
           </Text>
         </VStack>
@@ -65,7 +65,7 @@ function SectionPricing() {
         {/**/}
       </Container>
     </Box>
-  )
+  );
 }
 
-export default SectionPricing
+export default SectionPricing;

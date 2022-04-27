@@ -11,5 +11,5 @@ export default function SectionSupportIconNext() {
         fill="#111"
       />
     </svg>
-  )
+  );
 }

@@ -6,13 +6,13 @@ import {
   HStack,
   Text,
   Link,
-  IconButton
-} from '@chakra-ui/react'
-import CustomLink from './custom-link'
-import Bg from './bg'
-import * as Icon from './icons'
-import Logo from './logo'
-import { LINKS, SOCIAL_LINKS } from '../constants'
+  IconButton,
+} from "@chakra-ui/react";
+import CustomLink from "./custom-link";
+import Bg from "./bg";
+import * as Icon from "./icons";
+import Logo from "./logo";
+import { LINKS, SOCIAL_LINKS } from "constants/index.js";
 
 function Footer() {
   return (
@@ -20,13 +20,13 @@ function Footer() {
       as="footer"
       pos="relative"
       overflow="hidden"
-      py={['80px', '120px']}
+      py={["80px", "120px"]}
       textAlign="center"
     >
       <Bg />
 
       <Container maxW="5xl">
-        <VStack spacing={['32px', '40px']}>
+        <VStack spacing={["32px", "40px"]}>
           {/**/}
 
           <Box>
@@ -67,9 +67,9 @@ function Footer() {
           </HStack>
 
           <Stack
-            direction={['column', 'row']}
+            direction={["column", "row"]}
             align="center"
-            spacing={['16px', '24px']}
+            spacing={["16px", "24px"]}
             color="whiteAlpha.700"
           >
             <CustomLink isExternal href={LINKS.support} color="inherit">
@@ -107,7 +107,7 @@ function Footer() {
         </VStack>
       </Container>
     </Box>
-  )
+  );
 }
 
-export default Footer
+export default Footer;

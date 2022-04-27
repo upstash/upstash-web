@@ -1,8 +1,8 @@
-import { Container, Box, SimpleGrid } from '@chakra-ui/react'
-import Step1 from '../demo/step-1'
-import Step2 from '../demo/step-2'
-import Bg from '../bg'
-import Title from '../demo/title'
+import { Container, Box, SimpleGrid } from "@chakra-ui/react";
+import Step1 from "../demo/step-1";
+import Step2 from "../demo/step-2";
+import Bg from "../bg";
+import Title from "../demo/title";
 
 function SectionDemo(props) {
   return (
@@ -10,7 +10,7 @@ function SectionDemo(props) {
       as="section"
       pos="relative"
       overflow="hidden"
-      pb={['120px', '220px']}
+      pb={["120px", "220px"]}
       textAlign="center"
       {...props}
     >
@@ -28,7 +28,7 @@ function SectionDemo(props) {
         </SimpleGrid>
       </Container>
     </Box>
-  )
+  );
 }
 
-export default SectionDemo
+export default SectionDemo;

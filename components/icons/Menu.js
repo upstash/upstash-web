@@ -1,4 +1,4 @@
-import * as React from 'react'
+import * as React from "react";
 
 function SvgMenu(props) {
   return (
@@ -17,7 +17,7 @@ function SvgMenu(props) {
     >
       <path d="M3 12h18M3 6h18M3 18h18" />
     </svg>
-  )
+  );
 }
 
-export default SvgMenu
+export default SvgMenu;

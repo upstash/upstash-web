@@ -6,23 +6,23 @@ import {
   Button,
   Box,
   Heading,
-  Text
-} from '@chakra-ui/react'
-import { LINKS } from '../constants'
-import React from 'react'
-import Typist from 'react-typist'
-import LinkNext from '../components/link'
-import * as Icon from './icons'
+  Text,
+} from "@chakra-ui/react";
+import { LINKS } from "constants/index.js";
+import React from "react";
+import Typist from "react-typist";
+import LinkNext from "../components/link";
+import * as Icon from "./icons";
 
 function SectionHero() {
   return (
-    <Box as="section" pt={['80px', '100px']} textAlign="center">
+    <Box as="section" pt={["80px", "100px"]} textAlign="center">
       <Container maxW="5xl">
         {/**/}
 
         <Heading
           as="h1"
-          fontSize={['60px', '110px']}
+          fontSize={["60px", "110px"]}
           fontWeight="extrabold"
           lineHeight="none"
           letterSpacing="tight"
@@ -48,7 +48,7 @@ function SectionHero() {
           </Typist>
         </Heading>
 
-        <Box mt="24px" fontSize={['md', '2xl']} color="whiteAlpha.700">
+        <Box mt="24px" fontSize={["md", "2xl"]} color="whiteAlpha.700">
           <Text>Global Low Latency</Text>
           <Text>Per-Request Pricing with Cap</Text>
         </Box>
@@ -61,7 +61,7 @@ function SectionHero() {
           color="black"
           bg="primary"
           _hover={{
-            textDecoration: 'none'
+            textDecoration: "none",
           }}
         >
           Start free in 30 seconds
@@ -71,7 +71,7 @@ function SectionHero() {
           mt="40px"
           spacing="24px"
           justifyContent="center"
-          fontSize={['lg', '2xl']}
+          fontSize={["lg", "2xl"]}
         >
           <LinkNext
             href="/redis"
@@ -93,7 +93,7 @@ function SectionHero() {
             <Box as="span" opacity={0.3}>
               #
             </Box>
-            kafka{' '}
+            kafka{" "}
           </LinkNext>
           <LinkNext
             href="/cloudflareworkers"
@@ -104,14 +104,14 @@ function SectionHero() {
             <Box as="span" opacity={0.3}>
               #
             </Box>
-            edge{' '}
+            edge{" "}
           </LinkNext>
         </HStack>
 
         {/**/}
       </Container>
     </Box>
-  )
+  );
 }
 
-export default SectionHero
+export default SectionHero;

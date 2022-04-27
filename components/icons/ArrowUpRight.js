@@ -1,4 +1,4 @@
-import * as React from 'react'
+import * as React from "react";
 
 function SvgArrowUpRight(props) {
   return (
@@ -17,7 +17,7 @@ function SvgArrowUpRight(props) {
     >
       <path d="M7 17L17 7M7 7h10v10" />
     </svg>
-  )
+  );
 }
 
-export default SvgArrowUpRight
+export default SvgArrowUpRight;

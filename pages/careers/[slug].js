@@ -1,7 +1,4 @@
-import Head from 'next/head'
-import { useHydrate } from 'next-mdx/client'
-// import { mdxComponents } from 'components/mdx-components'
-import { getMdxNode, getMdxPaths } from 'next-mdx/server'
+import Head from "next/head";
 import {
   Box,
   Button,
@@ -10,57 +7,71 @@ import {
   HStack,
   Stack,
   Tag,
-  Text
-} from '@chakra-ui/react'
+  Text,
+} from "@chakra-ui/react";
+import { allJobs } from "contentlayer/generated";
 
-function CareerDetailPage({ job }) {
-  const { title, excerpt, skills, experience, type, location } = job.frontMatter
+export async function getStaticPaths() {
+  const paths = allJobs.map((job) => ({ params: { slug: job.slug } }));
 
-  const content = useHydrate(job, {
-    // components: mdxComponents
-  })
+  return {
+    paths,
+    fallback: false,
+  };
+}
 
+export async function getStaticProps({ params }) {
+  const job = allJobs.find((job) => job.slug === params.slug);
+
+  return {
+    props: {
+      job,
+    },
+  };
+}
+
+export default function CareerDetailPage({ job }) {
   return (
     <>
       <Head>
         <title>Careers - Upstash</title>
       </Head>
 
-      <Box as="section" py={['100px', '120px']} textAlign="center">
+      <Box as="section" py={["100px", "120px"]} textAlign="center">
         <Container maxW="3xl">
           <Heading as="h1" fontWeight="extrabold" size="3xl">
-            {title}
+            {job.title}
           </Heading>
 
           <Stack
-            direction={['column', 'row']}
+            direction={["column", "row"]}
             justify="center"
             spacing={[1, 6]}
             mt={6}
             color="whiteAlpha.600"
           >
             <Text>
-              Experience:{' '}
+              Experience:{" "}
               <Text as="span" color="white">
-                {experience}
+                {job.experience}
               </Text>
             </Text>
             <Text>
-              Job type:{' '}
+              Job type:{" "}
               <Text as="span" color="white">
-                {type}
+                {job.how}
               </Text>
             </Text>
             <Text>
-              Location:{' '}
+              Location:{" "}
               <Text as="span" color="white">
-                {location}
+                {job.location}
               </Text>
             </Text>
           </Stack>
 
           <HStack mt={4} justify="center" spacing={2}>
-            {skills.map((skill) => (
+            {job.skills.map((skill) => (
               <Tag key={skill} variant="solid" bg="whiteAlpha.300">
                 {skill}
               </Tag>
@@ -74,19 +85,26 @@ function CareerDetailPage({ job }) {
             color="black"
             bg="primary"
             _hover={{
-              textDecoration: 'none'
+              textDecoration: "none",
             }}
           >
             Apply now
           </Button>
 
-          <Box mt={20} textAlign="left" className="post">
-            {content}
-          </Box>
+          <Box
+            mt={20}
+            textAlign="left"
+            className="post"
+            dangerouslySetInnerHTML={{ __html: job.body.html }}
+          />
 
           <style global jsx>{`
             .post > * {
-              margin-top: 1rem;
+              margin-bottom: 1rem;
+            }
+            .post > ul,
+            .post > ol {
+              padding-left: 2rem;
             }
 
             .post > h3,
@@ -99,7 +117,7 @@ function CareerDetailPage({ job }) {
               font-size: 1.6rem;
             }
 
-            .post > p + h3 {
+            .post > * + h3 {
               margin-top: 3rem;
             }
 
@@ -110,30 +128,5 @@ function CareerDetailPage({ job }) {
         </Container>
       </Box>
     </>
-  )
+  );
 }
-
-export async function getStaticPaths() {
-  return {
-    paths: await getMdxPaths('post'),
-    fallback: false
-  }
-}
-
-export async function getStaticProps(context) {
-  const job = await getMdxNode('post', context)
-
-  if (!job) {
-    return {
-      notFound: true
-    }
-  }
-
-  return {
-    props: {
-      job
-    }
-  }
-}
-
-export default CareerDetailPage

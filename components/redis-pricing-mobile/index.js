@@ -1,6 +1,6 @@
-import { Button, Flex, VStack, Heading, Text } from '@chakra-ui/react'
-import { PRICES } from '../../constants'
-import ColCheck from '../redis-pricing-desktop/col-check'
+import { Button, Flex, VStack, Heading, Text } from "@chakra-ui/react";
+import { PRICES } from "constants/index.js";
+import ColCheck from "../redis-pricing-desktop/col-check";
 
 export function Title({ children }) {
   return (
@@ -15,13 +15,13 @@ export function Title({ children }) {
     >
       {children}
     </Heading>
-  )
+  );
 }
 
 export default function RedisMobileTable() {
   return (
     <VStack spacing={10} align="stretch">
-      {['free', 'payg', 'enterprise'].map((key) => {
+      {["free", "payg", "enterprise"].map((key) => {
         return (
           <VStack
             key={key}
@@ -31,9 +31,9 @@ export default function RedisMobileTable() {
             borderRadius="2xl"
           >
             <Heading as="h4" fontSize="2xl">
-              {key === 'free' && 'Free'}
-              {key === 'payg' && 'Pay as you go'}
-              {key === 'enterprise' && 'Enterprise'}
+              {key === "free" && "Free"}
+              {key === "payg" && "Pay as you go"}
+              {key === "enterprise" && "Enterprise"}
             </Heading>
 
             <Flex direction="column" align="center">
@@ -73,7 +73,7 @@ export default function RedisMobileTable() {
 
             <Flex direction="column" align="center">
               <Title>{PRICES.support.title}</Title>
-              {typeof PRICES.support[key] === 'boolean' ? (
+              {typeof PRICES.support[key] === "boolean" ? (
                 <ColCheck check={PRICES.support[key]} />
               ) : (
                 <Text>{PRICES.support[key]}</Text>
@@ -91,7 +91,7 @@ export default function RedisMobileTable() {
             </Flex>
 
             <Flex direction="column" align="center">
-              {key === 'free' ? (
+              {key === "free" ? (
                 <Button bg="primary" color="black">
                   Start for free
                 </Button>
@@ -102,8 +102,8 @@ export default function RedisMobileTable() {
               )}
             </Flex>
           </VStack>
-        )
+        );
       })}
     </VStack>
-  )
+  );
 }

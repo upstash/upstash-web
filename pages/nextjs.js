@@ -5,36 +5,36 @@ import {
   Heading,
   Text,
   Button,
-  Link
-} from '@chakra-ui/react'
-import Section from '../components/section'
-import Bg from '../components/bg'
-import Mission1 from '../components/icons/Mission1'
-import Durable from '../components/icons/Durable'
-import SupportCard from '../components/section-support-card'
-import SectionSupportIconNext from '../components/section-support-icon-next'
-import Head from 'next/head'
-import CodeBlock from '../components/code-block'
-import Redis from '../components/icons/Redis'
-import { LINKS } from '../constants'
+  Link,
+} from "@chakra-ui/react";
+import Section from "components/section";
+import Bg from "components/bg";
+import Mission1 from "components/icons/Mission1";
+import Durable from "components/icons/Durable";
+import SupportCard from "components/section-support-card";
+import SectionSupportIconNext from "components/section-support-icon-next";
+import Head from "next/head";
+import CodeBlock from "components/code-block";
+import Redis from "components/icons/Redis";
+import { LINKS } from "constants/index.js";
 
 const FEATURES = [
   {
-    title: 'Fast',
-    desc: 'Speed up your Next.js apps with Low Latency Redis.',
-    icon: <Box as={Mission1} w={16} mx="auto" color="primary" />
+    title: "Fast",
+    desc: "Speed up your Next.js apps with Low Latency Redis.",
+    icon: <Box as={Mission1} w={16} mx="auto" color="primary" />,
   },
   {
-    title: 'Durable',
-    desc: 'Upstash persists your data to the block storage by default.',
-    icon: <Box as={Durable} w={16} mx="auto" color="primary" />
+    title: "Durable",
+    desc: "Upstash persists your data to the block storage by default.",
+    icon: <Box as={Durable} w={16} mx="auto" color="primary" />,
   },
   {
-    title: 'Redis',
-    desc: 'The most loved database adapted to the cloud and serverless.',
-    icon: <Box as={Redis} w={16} mx="auto" color="primary" />
-  }
-]
+    title: "Redis",
+    desc: "The most loved database adapted to the cloud and serverless.",
+    icon: <Box as={Redis} w={16} mx="auto" color="primary" />,
+  },
+];
 
 function FeatureItem({ title, desc, icon }) {
   return (
@@ -48,7 +48,7 @@ function FeatureItem({ title, desc, icon }) {
         {desc}
       </Text>
     </Box>
-  )
+  );
 }
 
 function HomePage() {
@@ -70,7 +70,7 @@ export async function getServerSideProps() {
   const data = await redis.incr('counter')
   return { props: { data } }
 }
-  `
+  `;
 
   let code2 = `
 export default function Home({ data }) {
@@ -90,7 +90,7 @@ export async function getServerSideProps() {
         .then(data => data.result);
   return { props: { data } }
 }
-  `
+  `;
 
   return (
     <>
@@ -98,7 +98,7 @@ export async function getServerSideProps() {
         <title>Upstash: The Best Database for Next.js</title>
       </Head>
 
-      <Box as="section" py={['70px', '100px']}>
+      <Box as="section" py={["70px", "100px"]}>
         <Container maxW="5xl">
           <SimpleGrid columns={[1, 2]} spacing={10} alignItems="center">
             <div>
@@ -108,7 +108,7 @@ export async function getServerSideProps() {
                 for Next.js
               </Heading>
 
-              <Box mt="24px" fontSize={['md', 'xl']} color="whiteAlpha.700">
+              <Box mt="24px" fontSize={["md", "xl"]} color="whiteAlpha.700">
                 <Text>
                   Serverless Database with Redis API and per request pricing.
                   <br />
@@ -124,7 +124,7 @@ export async function getServerSideProps() {
                   color="black"
                   bg="primary"
                   _hover={{
-                    textDecoration: 'none'
+                    textDecoration: "none",
                   }}
                 >
                   Start for free in 30 seconds
@@ -150,13 +150,13 @@ export async function getServerSideProps() {
         >
           <SimpleGrid columns={[1, 3]} spacing={10}>
             {FEATURES.map((mission) => {
-              return <FeatureItem key={mission.title} {...mission} />
+              return <FeatureItem key={mission.title} {...mission} />;
             })}
           </SimpleGrid>
         </Container>
       </Box>
 
-      <Section py={['100px', '140px']}>
+      <Section py={["100px", "140px"]}>
         <Bg />
 
         <Box as="header">
@@ -164,7 +164,7 @@ export async function getServerSideProps() {
             Boost Your Next.js App
           </Heading>
           <Container maxW="3xl">
-            <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
+            <Text fontSize={["md", "xl"]} color="whiteAlpha.600" mt={3}>
               Add Redis to your application in seconds
             </Text>
           </Container>
@@ -178,7 +178,7 @@ export async function getServerSideProps() {
         </Container>
       </Section>
 
-      <Section py={['100px', '140px']}>
+      <Section py={["100px", "140px"]}>
         <Bg />
 
         <Box as="header">
@@ -186,7 +186,7 @@ export async function getServerSideProps() {
             Community Resources
           </Heading>
           <Container maxW="3xl">
-            <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
+            <Text fontSize={["md", "xl"]} color="whiteAlpha.600" mt={3}>
               Check our docs and examples to learn more
             </Text>
           </Container>
@@ -196,7 +196,7 @@ export async function getServerSideProps() {
           <SimpleGrid mt={[10, 20]} columns={[1, 3]} spacing={6}>
             <SupportCard
               theme="next"
-              href={'https://docs.upstash.com/tutorials/nextjs_with_redis'}
+              href={"https://docs.upstash.com/tutorials/nextjs_with_redis"}
             >
               <SectionSupportIconNext />
               <Text>
@@ -208,7 +208,7 @@ export async function getServerSideProps() {
             {/**/}
             <SupportCard
               theme="next"
-              href={'https://blog.upstash.com/roadmap-application'}
+              href={"https://blog.upstash.com/roadmap-application"}
             >
               <SectionSupportIconNext />
               <Text>
@@ -220,7 +220,7 @@ export async function getServerSideProps() {
             {/**/}
             <SupportCard
               theme="next"
-              href={'https://blog.upstash.com/nextjs-todo'}
+              href={"https://blog.upstash.com/nextjs-todo"}
             >
               <SectionSupportIconNext />
               <Text>
@@ -236,7 +236,7 @@ export async function getServerSideProps() {
         </Container>
       </Section>
     </>
-  )
+  );
 }
 
-export default HomePage
+export default HomePage;

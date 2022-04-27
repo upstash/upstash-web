@@ -1,4 +1,4 @@
-import * as React from 'react'
+import * as React from "react";
 
 function SvgCheck(props) {
   return (
@@ -17,7 +17,7 @@ function SvgCheck(props) {
     >
       <path d="M20 6L9 17l-5-5" />
     </svg>
-  )
+  );
 }
 
-export default SvgCheck
+export default SvgCheck;

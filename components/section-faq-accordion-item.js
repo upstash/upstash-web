@@ -6,8 +6,8 @@ import {
   Box,
   Heading,
   VStack,
-  StackDivider
-} from '@chakra-ui/react'
+  StackDivider,
+} from "@chakra-ui/react";
 
 export default function FaqAccordionItem({ title, children }) {
   return (
@@ -15,12 +15,12 @@ export default function FaqAccordionItem({ title, children }) {
       {({ isExpanded }) => (
         <>
           <Box
-            bgColor={isExpanded ? 'whiteAlpha.200' : 'transparent'}
+            bgColor={isExpanded ? "whiteAlpha.200" : "transparent"}
             borderRadius="2xl"
             p={0}
           >
             <AccordionButton px={6} pb={6} pt={isExpanded ? 8 : 6}>
-              <Heading as="h4" fontSize={['md', 'xl']} fontWeight="medium">
+              <Heading as="h4" fontSize={["md", "xl"]} fontWeight="medium">
                 {title}
               </Heading>
               <AccordionIcon fontSize={32} color="whiteAlpha.400" />
@@ -37,5 +37,5 @@ export default function FaqAccordionItem({ title, children }) {
         </>
       )}
     </AccordionItem>
-  )
+  );
 }

@@ -1,14 +1,13 @@
-const withPWA = require('next-pwa')
-const isDev = process.env.NODE_ENV === 'development'
+const { withContentlayer } = require("next-contentlayer");
+const withPWA = require("next-pwa");
 
-module.exports = withPWA({
-  env: {
-    BASE_URL: isDev
-      ? 'http://localhost:3000/'
-      : 'https://upstash.com/'
-  },
-  pwa: {
-    dest: 'public',
-    disable: isDev
-  }
-})
+const isDev = process.env.NODE_ENV === "development";
+
+module.exports = withPWA(
+  withContentlayer({
+    pwa: {
+      dest: "public",
+      disable: isDev,
+    },
+  })
+);

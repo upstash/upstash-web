@@ -6,44 +6,48 @@ import {
   MenuList,
   MenuItem,
   useClipboard,
-  useToast
-} from '@chakra-ui/react'
-import { codeGernerator, HIGHLIGHT_THEME, SUPPORT_LANG } from '../../constants'
-import SyntaxHighlighter from 'react-syntax-highlighter'
-import * as Icon from '../icons'
-import Window from './window'
-import WindowHeader from './window-header'
-import { useState, useEffect } from 'react'
+  useToast,
+} from "@chakra-ui/react";
+import {
+  codeGernerator,
+  HIGHLIGHT_THEME,
+  SUPPORT_LANG,
+} from "constants/index.js";
+import SyntaxHighlighter from "react-syntax-highlighter";
+import * as Icon from "../icons";
+import Window from "./window";
+import WindowHeader from "./window-header";
+import { useState, useEffect } from "react";
 
 function Step2() {
-  const toast = useToast()
+  const toast = useToast();
 
   // clipboard
-  const [text, textSet] = useState('')
-  const { onCopy } = useClipboard(text)
+  const [text, textSet] = useState("");
+  const { onCopy } = useClipboard(text);
 
   // lang
-  const initialLang = SUPPORT_LANG.NODE_REDIS
-  const [name, nameSet] = useState(initialLang.name)
-  const [language, languageSet] = useState(initialLang.language)
-  const code = codeGernerator(name)
+  const initialLang = SUPPORT_LANG.NODE_REDIS;
+  const [name, nameSet] = useState(initialLang.name);
+  const [language, languageSet] = useState(initialLang.language);
+  const code = codeGernerator(name);
 
   const onChange = (name, language) => {
-    nameSet(name)
-    languageSet(language)
-  }
+    nameSet(name);
+    languageSet(language);
+  };
 
   useEffect(() => {
-    if (text === '') return
-    onCopy()
+    if (text === "") return;
+    onCopy();
     toast({
-      status: 'success',
-      title: 'Copied!',
-      position: 'top',
+      status: "success",
+      title: "Copied!",
+      position: "top",
 
-      duration: 1500
-    })
-  }, [text])
+      duration: 1500,
+    });
+  }, [text]);
 
   return (
     <Window>
@@ -70,7 +74,7 @@ function Step2() {
             </MenuButton>
             <MenuList bg="white" borderColor="white" color="black">
               {Object.keys(SUPPORT_LANG).map((lang) => {
-                const SELECTED_LANG = SUPPORT_LANG[lang]
+                const SELECTED_LANG = SUPPORT_LANG[lang];
                 return (
                   <MenuItem
                     key={lang}
@@ -80,7 +84,7 @@ function Step2() {
                   >
                     {SELECTED_LANG.name}
                   </MenuItem>
-                )
+                );
               })}
             </MenuList>
           </Menu>
@@ -111,7 +115,7 @@ function Step2() {
           language={language}
           showLineNumbers
           lineNumberStyle={{
-            color: '#555'
+            color: "#555",
           }}
           style={HIGHLIGHT_THEME}
         >
@@ -119,7 +123,7 @@ function Step2() {
         </SyntaxHighlighter>
       </Box>
     </Window>
-  )
+  );
 }
 
-export default Step2
+export default Step2;

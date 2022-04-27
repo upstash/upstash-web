@@ -50,5 +50,5 @@ export default function SectionSupportIconRedis() {
         </clipPath>
       </defs>
     </svg>
-  )
+  );
 }

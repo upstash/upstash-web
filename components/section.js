@@ -1,4 +1,4 @@
-import { Box } from '@chakra-ui/react'
+import { Box } from "@chakra-ui/react";
 
 function Section({ children, ...props }) {
   return (
@@ -12,7 +12,7 @@ function Section({ children, ...props }) {
     >
       {children}
     </Box>
-  )
+  );
 }
 
-export default Section
+export default Section;

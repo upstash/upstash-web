@@ -11,5 +11,5 @@ export default function SectionSupportIconAws() {
         fill="#FA7E14"
       />
     </svg>
-  )
+  );
 }

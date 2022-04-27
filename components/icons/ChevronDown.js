@@ -1,4 +1,4 @@
-import * as React from 'react'
+import * as React from "react";
 
 function SvgChevronDown(props) {
   return (
@@ -17,7 +17,7 @@ function SvgChevronDown(props) {
     >
       <path d="M6 9l6 6 6-6" />
     </svg>
-  )
+  );
 }
 
-export default SvgChevronDown
+export default SvgChevronDown;

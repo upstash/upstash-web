@@ -1,14 +1,14 @@
-import { Container, Heading, Text, Box, Accordion } from '@chakra-ui/react'
-import FaqAccordionItem from './section-faq-accordion-item'
-import CustomLink from './custom-link'
-import { LINKS } from '../constants'
+import { Container, Heading, Text, Box, Accordion } from "@chakra-ui/react";
+import FaqAccordionItem from "./section-faq-accordion-item";
+import CustomLink from "./custom-link";
+import { LINKS } from "constants/index.js";
 
 function SectionFaq() {
   return (
     <Box
       as="section"
-      pt={['100px', '80px']}
-      pb={['100px', '220px']}
+      pt={["100px", "80px"]}
+      pb={["100px", "220px"]}
       textAlign="center"
     >
       <Container maxW="5xl">
@@ -19,7 +19,7 @@ function SectionFaq() {
             FAQ
           </Heading>
           <Container maxW="3xl">
-            <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
+            <Text fontSize={["md", "xl"]} color="whiteAlpha.600" mt={3}>
               Frequently Asked Questions
             </Text>
           </Container>
@@ -54,7 +54,7 @@ function SectionFaq() {
               lost when a server crashes. This is not the case for Upstash
               thanks to Durable Storage. Data is reloaded to memory from block
               storage in case of a server crash. For more information, see our
-              documentation{' '}
+              documentation{" "}
               <CustomLink isExternal noIcon href={LINKS.durability}>
                 durable storage.
               </CustomLink>
@@ -105,7 +105,7 @@ function SectionFaq() {
         {/**/}
       </Container>
     </Box>
-  )
+  );
 }
 
-export default SectionFaq
+export default SectionFaq;

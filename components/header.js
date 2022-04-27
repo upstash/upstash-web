@@ -7,24 +7,24 @@ import {
   Box,
   Stack,
   Link,
-  Flex
-} from '@chakra-ui/react'
-import CustomLink from './custom-link'
-import * as Icon from './icons'
-import Logo from './logo'
-import { LINKS, SOCIAL_LINKS } from '../constants'
-import { useRouter } from 'next/router'
-import NextLink from './link'
+  Flex,
+} from "@chakra-ui/react";
+import CustomLink from "./custom-link";
+import * as Icon from "./icons";
+import Logo from "./logo";
+import { LINKS, SOCIAL_LINKS } from "constants/index.js";
+import { useRouter } from "next/router";
+import NextLink from "./link";
 
 function Header({ onOpen }) {
-  const { pathname } = useRouter()
-  const isSubPage = pathname !== '/'
+  const { pathname } = useRouter();
+  const isSubPage = pathname !== "/";
 
   return (
     <Box as="header" mt={[10, 14]}>
       <Container maxW="5xl">
         <Grid
-          templateColumns={['repeat(2, 1fr)', 'repeat(4, 1fr)']}
+          templateColumns={["repeat(2, 1fr)", "repeat(4, 1fr)"]}
           alignItems="center"
         >
           {/* logo */}
@@ -35,13 +35,13 @@ function Header({ onOpen }) {
           {/* nav */}
           <GridItem
             colSpan={2}
-            d={['none', 'flex']}
+            d={["none", "flex"]}
             justifyContent="center"
             color="whiteAlpha.700"
           >
             <Stack
               as="nav"
-              direction={['column', 'row']}
+              direction={["column", "row"]}
               spacing="24px"
               justify="center"
             >
@@ -96,12 +96,12 @@ function Header({ onOpen }) {
           </GridItem>
 
           {/* console */}
-          <GridItem d={['none', 'flex']} justifyContent="flex-end">
+          <GridItem d={["none", "flex"]} justifyContent="flex-end">
             <Button
               as={Link}
               href={LINKS.console}
               _hover={{
-                textDecoration: 'none'
+                textDecoration: "none",
               }}
             >
               Console
@@ -109,7 +109,7 @@ function Header({ onOpen }) {
           </GridItem>
 
           {/* mobile */}
-          <GridItem d={['flex', 'none']} justifyContent="flex-end">
+          <GridItem d={["flex", "none"]} justifyContent="flex-end">
             <IconButton size="lg" onClick={onOpen} bg="transparent">
               <Box as={Icon.Menu} fontSize="24px" />
             </IconButton>
@@ -117,7 +117,7 @@ function Header({ onOpen }) {
         </Grid>
       </Container>
     </Box>
-  )
+  );
 }
 
-export default Header
+export default Header;

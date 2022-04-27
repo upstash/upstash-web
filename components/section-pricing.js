@@ -1,12 +1,19 @@
-import { Box, Button, Container, VStack, Text, Heading } from '@chakra-ui/react'
-import Bg from './bg'
-import RedisDesktopTable from './redis-pricing-desktop'
-import RedisMobileTable from './redis-pricing-mobile'
-import KafkaDesktopTable from './kafka-pricing-desktop'
-import KafkaMobileTable from './kafka-pricing-mobile'
-import CustomLink from './custom-link'
-import { LINKS } from '../constants'
-import { useState } from 'react'
+import {
+  Box,
+  Button,
+  Container,
+  VStack,
+  Text,
+  Heading,
+} from "@chakra-ui/react";
+import Bg from "./bg";
+import RedisDesktopTable from "./redis-pricing-desktop";
+import RedisMobileTable from "./redis-pricing-mobile";
+import KafkaDesktopTable from "./kafka-pricing-desktop";
+import KafkaMobileTable from "./kafka-pricing-mobile";
+import CustomLink from "./custom-link";
+import { LINKS } from "constants/index.js";
+import { useState } from "react";
 
 function PriceButton({ isActive, children, ...props }) {
   return (
@@ -17,19 +24,19 @@ function PriceButton({ isActive, children, ...props }) {
       border="1px"
       fontSize="sm"
       borderColor="white"
-      bgColor={isActive ? 'white' : null}
-      color={isActive ? 'black' : 'whiteAlpha.700'}
+      bgColor={isActive ? "white" : null}
+      color={isActive ? "black" : "whiteAlpha.700"}
       _hover={{}}
       {...props}
     >
-      {isActive && '✓ '}
+      {isActive && "✓ "}
       {children}
     </Button>
-  )
+  );
 }
 
 function SectionPricing() {
-  const [price, setPrice] = useState('redis')
+  const [price, setPrice] = useState("redis");
 
   return (
     <Box
@@ -37,7 +44,7 @@ function SectionPricing() {
       id="section-pricing"
       pos="relative"
       overflow="hidden"
-      py={['100px', '140px']}
+      py={["100px", "140px"]}
       textAlign="center"
     >
       <Bg />
@@ -50,7 +57,7 @@ function SectionPricing() {
             Plans & Pricing
           </Heading>
           <Container maxW="3xl">
-            <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
+            <Text fontSize={["md", "xl"]} color="whiteAlpha.600" mt={3}>
               Pay only for what you use with per-request pricing.
             </Text>
           </Container>
@@ -59,10 +66,10 @@ function SectionPricing() {
             <PriceButton
               borderLeftRadius="md"
               borderRightWidth={0}
-              isActive={price === 'redis'}
+              isActive={price === "redis"}
               onClick={() => {
-                console.log('redis')
-                setPrice('redis')
+                console.log("redis");
+                setPrice("redis");
               }}
             >
               Redis
@@ -70,10 +77,10 @@ function SectionPricing() {
             <PriceButton
               borderRightRadius="md"
               borderLeftWidth={0}
-              isActive={price === 'kafka'}
+              isActive={price === "kafka"}
               onClick={() => {
-                console.log('kafka')
-                setPrice('kafka')
+                console.log("kafka");
+                setPrice("kafka");
               }}
             >
               Kafka
@@ -82,28 +89,28 @@ function SectionPricing() {
         </Box>
 
         <Box mt={[10, 20]}>
-          {price === 'redis' && (
+          {price === "redis" && (
             <>
-              <Box d={['none', 'block']}>
+              <Box d={["none", "block"]}>
                 <RedisDesktopTable />
               </Box>
-              <Box d={['block', 'none']}>
+              <Box d={["block", "none"]}>
                 <RedisMobileTable />
               </Box>
             </>
           )}
-          {price === 'kafka' && (
+          {price === "kafka" && (
             <>
-              <Box d={['none', 'block']}>
+              <Box d={["none", "block"]}>
                 <KafkaDesktopTable />
               </Box>
-              <Box d={['block', 'none']}>
+              <Box d={["block", "none"]}>
                 <KafkaMobileTable />
               </Box>
             </>
           )}
         </Box>
-        {price === 'redis' && (
+        {price === "redis" && (
           <VStack spacing={2} mt={14}>
             <Text>Disk storage cost is $0.25 per GB per month.</Text>
             <Text>
@@ -111,36 +118,36 @@ function SectionPricing() {
               price.
             </Text>
             <Text>
-              See{' '}
+              See{" "}
               <CustomLink isExternal noIcon href={LINKS.pricing}>
                 pricing page
-              </CustomLink>{' '}
+              </CustomLink>{" "}
               for more information.
             </Text>
             <Text>
-              Talk to{' '}
+              Talk to{" "}
               <CustomLink isExternal noIcon href={LINKS.support}>
                 us
-              </CustomLink>{' '}
+              </CustomLink>{" "}
               for advanced needs.
             </Text>
           </VStack>
         )}
-        {price === 'kafka' && (
+        {price === "kafka" && (
           <VStack spacing={2} mt={14}>
             <Text>Disk storage cost is $0.25 per GB per month.</Text>
             <Text>
-              See{' '}
+              See{" "}
               <CustomLink isExternal noIcon href={LINKS.pricingKafka}>
                 pricing page
-              </CustomLink>{' '}
+              </CustomLink>{" "}
               for more information.
             </Text>
             <Text>
-              Talk to{' '}
+              Talk to{" "}
               <CustomLink isExternal noIcon href={LINKS.support}>
                 us
-              </CustomLink>{' '}
+              </CustomLink>{" "}
               for advanced needs.
             </Text>
           </VStack>
@@ -149,7 +156,7 @@ function SectionPricing() {
         {/**/}
       </Container>
     </Box>
-  )
+  );
 }
 
-export default SectionPricing
+export default SectionPricing;

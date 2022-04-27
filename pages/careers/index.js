@@ -1,19 +1,23 @@
-import Head from 'next/head'
+import Head from "next/head";
 import {
   Box,
   Container,
   Flex,
   Heading,
   StackDivider,
-  VStack
-} from '@chakra-ui/react'
-import Bg from '../../components/bg'
-import Section from '../../components/section'
-import CareerCard from '../../components/career-card'
-import { getAllNodes } from 'next-mdx'
+  VStack,
+} from "@chakra-ui/react";
+import Bg from "components/bg";
+import Section from "components/section";
+import CareerCard from "components/career-card";
+import { allJobs } from "contentlayer/generated";
 
-function CareerPage({ jobs }) {
-  const hasJobs = jobs.length > 0
+export async function getStaticProps() {
+  return { props: { jobs: allJobs } };
+}
+
+export default function CareerPage({ jobs }) {
+  const hasJobs = jobs.length > 0;
 
   return (
     <>
@@ -21,7 +25,7 @@ function CareerPage({ jobs }) {
         <title>Careers - Upstash</title>
       </Head>
 
-      <Box as="section" py={['100px', '140px']} textAlign="center">
+      <Box as="section" py={["100px", "140px"]} textAlign="center">
         <Container maxW="3xl">
           <Heading as="h1" fontWeight="extrabold" size="3xl">
             Join Upstash
@@ -32,10 +36,10 @@ function CareerPage({ jobs }) {
             as="h4"
             mt="5"
             lineHeight=""
-            fontSize={['md', 'xl']}
+            fontSize={["md", "xl"]}
             color="whiteAlpha.600"
           >
-            Help us build the cutting edge data platform for the serverless era.{' '}
+            Help us build the cutting edge data platform for the serverless era.{" "}
             <br />
           </Heading>
 
@@ -89,7 +93,7 @@ function CareerPage({ jobs }) {
       </Box>
 
       {hasJobs && (
-        <Section id="list" py={['100px', '120px']}>
+        <Section id="list" py={["100px", "120px"]}>
           <Bg />
 
           <Container maxW="2xl">
@@ -104,31 +108,12 @@ function CareerPage({ jobs }) {
               divider={<StackDivider borderColor="whiteAlpha.300" />}
             >
               {jobs.map((job) => {
-                return (
-                  <CareerCard
-                    key={job.slug}
-                    {...job.frontMatter}
-                    slug={job.slug}
-                    url={job.url}
-                  />
-                )
+                return <CareerCard key={job.slug} {...job} />;
               })}
             </VStack>
           </Container>
         </Section>
       )}
     </>
-  )
+  );
 }
-
-export async function getStaticProps() {
-  const jobs = await getAllNodes('post')
-
-  return {
-    props: {
-      jobs
-    }
-  }
-}
-
-export default CareerPage

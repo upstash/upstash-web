@@ -1,5 +1,5 @@
-import * as Icon from './icons'
-import { Link, Flex, Box } from '@chakra-ui/react'
+import * as Icon from "./icons";
+import { Link, Flex, Box } from "@chakra-ui/react";
 
 function CustomLink({
   isExternal = false,
@@ -15,7 +15,7 @@ function CustomLink({
       align="center"
       color="primary"
       _hover={{
-        color: 'primary'
+        color: "primary",
       }}
       {...props}
     >
@@ -24,7 +24,7 @@ function CustomLink({
         <Box as={Icon.ArrowUpRight} ml="2px" fontSize="22px" opacity={0.5} />
       )}
     </Flex>
-  )
+  );
 }
 
-export default CustomLink
+export default CustomLink;

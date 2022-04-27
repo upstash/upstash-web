@@ -1,10 +1,10 @@
-import { Box, HStack, Flex } from '@chakra-ui/react'
+import { Box, HStack, Flex } from "@chakra-ui/react";
 
 function WindowHeader({ children }) {
   function Dot() {
     return (
       <Box as="span" w="9px" h="9px" borderRadius="full" bg="whiteAlpha.300" />
-    )
+    );
   }
 
   return (
@@ -16,7 +16,7 @@ function WindowHeader({ children }) {
       </HStack>
       {children}
     </Flex>
-  )
+  );
 }
 
-export default WindowHeader
+export default WindowHeader;

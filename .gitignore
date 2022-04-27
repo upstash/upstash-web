@@ -8,3 +8,7 @@ public/workbox*
 *.local
 
 .vercel
+
+
+# Contentlayer
+.contentlayer

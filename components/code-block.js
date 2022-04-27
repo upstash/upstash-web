@@ -1,8 +1,8 @@
-import { Box } from '@chakra-ui/react'
-import { HIGHLIGHT_THEME } from '../constants'
-import WindowHeader from '../components/demo/window-header'
-import SyntaxHighlighter from 'react-syntax-highlighter'
-import Window from '../components/demo/window'
+import { Box } from "@chakra-ui/react";
+import { HIGHLIGHT_THEME } from "constants/index.js";
+import WindowHeader from "../components/demo/window-header";
+import SyntaxHighlighter from "react-syntax-highlighter";
+import Window from "../components/demo/window";
 
 function CodeBlock({ fileName, children }) {
   return (
@@ -39,7 +39,7 @@ function CodeBlock({ fileName, children }) {
           language="javascript"
           showLineNumbers
           lineNumberStyle={{
-            color: '#555'
+            color: "#555",
           }}
           style={HIGHLIGHT_THEME}
         >
@@ -47,7 +47,7 @@ function CodeBlock({ fileName, children }) {
         </SyntaxHighlighter>
       </Box>
     </Window>
-  )
+  );
 }
 
-export default CodeBlock
+export default CodeBlock;

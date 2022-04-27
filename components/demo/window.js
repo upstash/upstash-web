@@ -1,4 +1,4 @@
-import { Box, Flex } from '@chakra-ui/react'
+import { Box, Flex } from "@chakra-ui/react";
 
 function Window({ children, ...props }) {
   return (
@@ -19,7 +19,7 @@ function Window({ children, ...props }) {
         {children}
       </Flex>
     </Box>
-  )
+  );
 }
 
-export default Window
+export default Window;

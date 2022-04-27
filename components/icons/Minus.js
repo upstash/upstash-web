@@ -1,4 +1,4 @@
-import * as React from 'react'
+import * as React from "react";
 
 function SvgMinus(props) {
   return (
@@ -17,7 +17,7 @@ function SvgMinus(props) {
     >
       <path d="M5 12h14" />
     </svg>
-  )
+  );
 }
 
-export default SvgMinus
+export default SvgMinus;

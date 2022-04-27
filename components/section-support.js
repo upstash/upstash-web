@@ -1,16 +1,16 @@
-import { Container, SimpleGrid, Heading, Text, Box } from '@chakra-ui/react'
-import SectionSupportIconCFW from './section-support-icon-cfw'
-import SectionSupportIconNext from './section-support-icon-next'
-import SectionSupportIconAws from './section-support-icon-aws'
-import SupportCard from './section-support-card'
-import SectionSupportIconRest from './section-support-icon-rest'
-import Bg from './bg'
+import { Container, SimpleGrid, Heading, Text, Box } from "@chakra-ui/react";
+import SectionSupportIconCFW from "./section-support-icon-cfw";
+import SectionSupportIconNext from "./section-support-icon-next";
+import SectionSupportIconAws from "./section-support-icon-aws";
+import SupportCard from "./section-support-card";
+import SectionSupportIconRest from "./section-support-icon-rest";
+import Bg from "./bg";
 
 function SectionSupport() {
   return (
     <Box
       as="section"
-      py={['100px', '160px']}
+      py={["100px", "160px"]}
       pos="relative"
       overflow="hidden"
       textAlign="center"
@@ -25,7 +25,7 @@ function SectionSupport() {
             Best Choice for the Serverless
           </Heading>
           <Container maxW="3xl">
-            <Text fontSize={['md', 'xl']} color="whiteAlpha.600" mt={3}>
+            <Text fontSize={["md", "xl"]} color="whiteAlpha.600" mt={3}>
               Low latency data, ease of use, and pay-per-request pricing makes
               Upstash a perfect choice for the Jamstack and Serverless world.
             </Text>
@@ -74,7 +74,7 @@ function SectionSupport() {
               <br />
               <Text as="b" fontWeight="bold">
                 Cloudflare Workers
-              </Text>{' '}
+              </Text>{" "}
               <br />
               Page
             </Text>
@@ -100,7 +100,7 @@ function SectionSupport() {
         {/**/}
       </Container>
     </Box>
-  )
+  );
 }
 
-export default SectionSupport
+export default SectionSupport;
