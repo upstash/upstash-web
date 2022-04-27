@@ -1,4 +1,6 @@
 import "../styles/app.css";
+import "../styles/prism.css";
+
 import theme from "theme";
 import Head from "next/head";
 import { ChakraProvider, useDisclosure } from "@chakra-ui/react";

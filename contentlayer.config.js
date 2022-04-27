@@ -1,4 +1,5 @@
 import { defineDocumentType, makeSource } from "contentlayer/source-files";
+import rehypePrism from "rehype-prism-plus";
 import authors from "./authors";
 
 export const Job = defineDocumentType(() => ({
@@ -22,7 +23,8 @@ export const Job = defineDocumentType(() => ({
 
 export const Blog = defineDocumentType(() => ({
   name: "Blog",
-  filePathPattern: `blog/*.md`,
+  filePathPattern: `blog/*.mdx`,
+  contentType: "mdx",
   fields: {
     title: { type: "string", required: true },
     authors: { type: "string", required: true },
@@ -32,7 +34,7 @@ export const Blog = defineDocumentType(() => ({
     slug: {
       type: "string",
       resolve: (doc) => {
-        return doc._raw.sourceFileName.substring(11).replace(/\.md$/, "");
+        return doc._raw.sourceFileName.substring(11).replace(/\.mdx$/, "");
       },
     },
     date: {
@@ -75,4 +77,5 @@ export const Blog = defineDocumentType(() => ({
 export default makeSource({
   contentDirPath: "data",
   documentTypes: [Job, Blog],
+  mdx: { rehypePlugins: [rehypePrism] },
 });

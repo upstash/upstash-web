@@ -5,12 +5,9 @@ authors: "andreas"
 tags: [serverless, keepalive, latency, vercel, lambda]
 ---
 
-
 ### What is keepalive?
 
 Whenever you make an HTTP request to a server, your computer and the server create a connection, sending some data back and forth and closing the connection afterward. This is an excellent system, as it cleans up after itself if you infrequently connect to the same server. However, suppose you need to communicate with the same server multiple times in short succession. Then, every new connection would require a new TLS handshake, which causes numerous round trips between you and the server. So instead, we can keep the connection open and reduce the latency for each subsequent request by enabling keepalive.
-
-<!--truncate-->
 
 ### Sounds very nice but aren't we talking about stateless serverless functions?
 
@@ -63,9 +60,9 @@ I have set up a Next.js app on Vercel and an Upstash Redis database in the same 
 
 I called the initially cold function 1000 times in rapid succession for each scenario and recorded the latency for a single Redis command.
 
-![](/img/blog/keepalive-in-serverless/latency_percentile.svg)
+![](/blog/keepalive-in-serverless/latency_percentile.svg)
 
-As you can see, in the scenario where we use keepalive and cache, the agent between requests performs much better. The first request had a latency of 43ms as it had to make multiple round trips to establish the connection. However, all subsequent requests are faster, reducing the average latency to 2.2ms. Of course, the ratio between hot/cold startups might not be this high in the real world, but this can be useful even without many warm function starts. 
+As you can see, in the scenario where we use keepalive and cache, the agent between requests performs much better. The first request had a latency of 43ms as it had to make multiple round trips to establish the connection. However, all subsequent requests are faster, reducing the average latency to 2.2ms. Of course, the ratio between hot/cold startups might not be this high in the real world, but this can be useful even without many warm function starts.
 Consider a function that uses Upstash Redis for caching. When the function starts, it will try to load cached values from Redis (here, a connection gets established but not closed immediately). If the cache does not hold the required data, it will get computed, and afterwards, a second request to Redis to store the result can reuse the same connection and reduce the overall execution time.
 
 The other tests yielded an expected outcome. Without enabling keepalive or recreating the agent every time, the connection will not be reused, and we don't get any latency benefit.
