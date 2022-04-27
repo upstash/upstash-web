@@ -1,0 +1,99 @@
+---
+slug: aws-lambda-redis-rest
+date: 2021-07-27
+title: "Stateful AWS Lambda with Redis REST"
+sidebar_label: "Stateful AWS Lambda with Redis REST"
+authors: enes
+image: img/blog/upstash-lambda.png
+tags: [redis, database, serverless, aws, aws-lambda, lambda]
+---
+
+
+AWS Lambda pioneered serverless space. Many developers think that serverless is the future of development. It gives you the true pay-per-use model, relieves you from the maintenance and scaling of the backend infrastructure. But it also comes with challenges. One of those is its statelessness. You need to keep the state in an external data store. Unfortunately most of the popular data stores are connection based. But as we explained in [this post](https://blog.upstash.com/serverless-database-connections), managing connections can become painful in serverless. That’s why, we have developed a high performance [REST API](https://docs.upstash.com/features/restapi) on top of Upstash Redis. In this blog post, I will implement a very basic stateful api (page counter) on AWS Lambda and Upstash Redis using the REST API.
+
+<!--truncate-->
+
+See the live demo: [https://3jyz1n07o8.execute-api.us-east-1.amazonaws.com/count](https://3jyz1n07o8.execute-api.us-east-1.amazonaws.com/count)
+
+See the code: [https://github.com/upstash/examples/tree/master/aws-lambda-redis-rest](https://github.com/upstash/examples/tree/master/aws-lambda-redis-rest)
+
+## Project Setup
+
+We will use the serverless framework to deploy our application.
+
+``` shell
+
+git:(master) ✗ serverless
+
+Serverless: No project detected. Do you want to create a new one? Yes
+
+Serverless: What do you want to make? AWS Node.js
+
+Serverless: What do you want to call this project? aws-lambda-redis-rest
+
+Project successfully created in 'aws-lambda-redis-rest' folder.
+
+```
+
+
+## The Code
+
+Install fetch via `npm install node-fetch`. Then create a database from the Upstash[ console.](https://console.upstash.com/) Click the REST API button and copy the url and token. Update handler.js as below:
+
+
+``` javascript
+const fetch = require("node-fetch");
+
+module.exports.hello = async (event) => {
+   const url = "https://us1-last-panther-33620.upstash.io/incr/counter?_token=AACQgMzYyNGM0OGMtZWQ3MC00OTRlLWFmOGEtODc3ZWQxYWQyZGJjZjgyOTlkM2JhNWIxE3OTJlNmE2NGVjNGM=";
+   let data = await fetch(url)
+   let result = (await data.text());
+   return {'statusCode': 200,  'body': result}
+};
+```
+
+
+Add API endpoint to the serverless.yml as below:
+
+
+```
+service: aws-lambda-redis-rest
+frameworkVersion: '2'
+
+provider:
+ name: aws
+ runtime: nodejs12.x
+ lambdaHashingVersion: 20201221
+
+functions:
+ hello:
+   handler: handler.hello
+   events:
+     - httpApi:
+         path: /count
+         method: get
+```
+
+
+
+## Run and Deploy
+
+You can the functions locally:
+
+`serverless invoke local -f hello`
+
+You can deploy with:
+
+`serverless deploy`
+
+The command will output the url which you can check in your browser.
+
+
+## Notes
+
+
+
+* For the best performance, your database and AWS Lambda function should be in the same region.
+* Thanks to the REST API, we do not need to manage database connections and we do not need any Redis client.
+* Do not share your API token publicly. If leaked mistakenly, you can revoke it by resetting your database’s password.
+* If you want to run multiple commands in a single function, use [pipeline API ](https://docs.upstash.com/features/restapi#pipelining)for the best performance.

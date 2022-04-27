@@ -1,0 +1,281 @@
+---
+slug: redis-with-remix
+title: "Using Upstash Redis with Remix"
+authors: leigh
+image: img/blog/remix.png
+tags: [redis, remix, serverless]
+---
+
+[Remix](https://remix.run/) is a new take on what it means to be a fullstack React framework, focusing on existing web standards and tying the frontend closely to the backend. This tight coupling is a breath of fresh air when you see how simple it is to load data into your React components or how to process data submitted from a form.
+
+In this article we will see Remix's power by creating a simple [Feature Flag](https://en.wikipedia.org/wiki/Feature_toggle) management system using [Upstash Redis](https://upstash.com/) as the database.
+
+<!--truncate-->
+
+Full source code can be [found here](https://github.com/leighhalliday/remix-upstash-redis).
+
+## Setup
+
+You will get a brand new Remix app by running `npx create-remix@latest` and choosing your preferred deployment environment. I went with [Vercel](https://vercel.com/) but it should not make a difference for this tutorial.
+
+There are two ways you can connect to Upstash Redis: The first is through a TCP connection in which you can use any standard Redis client library that you are used to. The second is via Upstash's REST API. We will be going with the second option because it is available in all serverless environments, such as the [Cloudflare Workers](https://workers.cloudflare.com/) environment that Remix can be deployed to. Upstash has a [package](https://www.npmjs.com/package/@upstash/redis) which mimics the actual [Redis commands](https://redis.io/commands), making it easy to know which function to call.
+
+We now need a way to store two environment variables needed to connect to our Upstash Redis database. Remix doesn't come with [development env var](https://remix.run/docs/en/v1/guides/envvars) support out of the box, but it can be accomplished by adding [dotenv](https://www.npmjs.com/package/dotenv) as a development dependency.
+
+```txt
+npm add --save-dev dotenv
+```
+
+In our `.env` file (which should be added to `.gitignore`) we can set up two env vars required to connect to Upstash Redis. The `@upstash/redis` package automatically detects these so there is no need to connect within our code. These values can be found within the Upstash dashboard after creating a new Redis database.
+
+```txt
+UPSTASH_REDIS_REST_URL="https://..."
+UPSTASH_REDIS_REST_TOKEN="..."
+```
+
+We need to update our `dev` script to have dotenv pick up the env vars. The other scripts can stay the same.
+
+```json
+{
+  "scripts": {
+    "dev": "node -r dotenv/config node_modules/.bin/remix dev"
+  }
+}
+```
+
+## Storing Feature Data
+
+Feature flags can get incredibly complex, with rollout plans to percentages of your userbase, enabled for specific groups of users, but they can also be as simple as "on" and "off". We will be storing our feature flags using the [Hash data type](https://redis.io/topics/data-types-intro) that Redis provides. Our data will end up looking like the JSON below, where "1" is enabled/on and "0" is disabled/off".
+
+```json
+{
+  "chart": "1",
+  "graph": "0"
+}
+```
+
+To access and manipulate this data we'll use four commands/functions provided by Redis:
+
+- [hgetall](https://redis.io/commands/hgetall) to retrieve all keys (features) and values (enabled/disabled).
+- [hset](https://redis.io/commands/hset) to enable or disable a specific feature flag.
+- [hdel](https://redis.io/commands/hdel) to delete a specific feature flag.
+- [hmget](https://redis.io/commands/hmget) to get multiple but specific feature flag values at once.
+
+## Managing Features
+
+We will be building a page located at `/features` which is in charge of creating and managing (enable/disable/delete) existing features. We will go into detail about what `AddFeature` and `FeatureList` do when we discuss how to load data and then how to write data.
+
+```tsx
+// app/routes/features.tsx
+export default function Features() {
+  return (
+    <div>
+      <h1>Features</h1>
+      <AddFeature />
+      <FeatureList />
+    </div>
+  );
+}
+```
+
+## Data Loaders
+
+A [data loader](https://remix.run/docs/en/v1/guides/data-loading) is an exported function in Remix named `loader` which gets run on the server and returns data that is made available to our React component via a hook.
+
+We are starting with a page to create and manage feature flags, and in this case we want to return all the features. They'll be returned as an array of pairs:
+
+```json
+[
+  ["graph", true],
+  ["chart", false]
+]
+```
+
+Starting with a [TypeScript](https://www.typescriptlang.org/) type definition, we'll then see a function called `loadAllFeatures` that uses the `hgetall` function from `@upstash/redis`.
+
+```ts
+import { Redis } from "@upstash/redis";
+
+type LoaderData = {
+  features: Array<[string, boolean]>;
+};
+
+const loadAllFeatures = async () => {
+  const redis = Redis.fromEnv();
+  const data = await redis.hgetall("features");
+  const features: Array<[string, boolean]> = [];
+
+  for (let i = 0; i < data.length; i += 2) {
+    features.push([data[i], data[i + 1] === "1"]);
+  }
+
+  return features.sort((a, b) => {
+    if (a[0] > b[0]) return 1;
+    if (a[0] < b[0]) return -1;
+    return 0;
+  });
+};
+```
+
+The exported `loader` function itself will call the `loadAllFeatures` function, returning the features to be passed into the React component.
+
+```ts
+export const loader: LoaderFunction = async (): Promise<LoaderData> => {
+  // You would want to add authentication/authorization here
+  const features = await loadAllFeatures();
+  return { features };
+};
+```
+
+We'll cover the details of this React component later, but to show how you access the data returned from the loader function, you use a Remix hook called `useLoaderData`.
+
+```tsx
+const FeatureList = () => {
+  const { features } = useLoaderData<LoaderData>();
+
+  return (
+    <ul>
+      {features.map(([feature, active]) => (
+        <li key={feature}>{/* coming soon */}</li>
+      ))}
+    </ul>
+  );
+};
+```
+
+## Form Actions
+
+We've seen how data is loaded, but at this stage we don't actually have any features in our feature flag database! Here is where [form actions](https://remix.run/docs/en/v1/guides/data-writes) come into play. Data is processed in Remix by exporting a function named `action`. Much like `loader`, this is run on the server and it typically returns `json` data that the React component can access via another hook, or it can tell the browser to `redirect` to another page.
+
+The `action` function below actually handles four different types of actions, creating a feature, enabling/disabling a feature, and deleting a feature. We handle this with a `switch` statement that then calls the appropriate Redis function/command.
+
+```ts
+export const action: ActionFunction = async ({ request }) => {
+  // You would want to add authentication/authorization here
+  const formData = await request.formData();
+  const feature = formData.get("feature") as string;
+  const action = formData.get("_action") as string;
+
+  if (!feature || feature.length === 0) {
+    // This isn't currently displayed in our component
+    return json({ error: "Please provide a feature" });
+  }
+
+  switch (action) {
+    case "create":
+    case "enable":
+      await redis.hset("features", { [feature]: 1 });
+      break;
+    case "disable":
+      await redis.hset("features", { [feature]: 0 });
+      break;
+    case "delete":
+      await redis.hdel("features", feature);
+      break;
+  }
+
+  return redirect("/features");
+};
+```
+
+You'll notice that on success, I redirect to the same page the user is currently on. This essentially triggers a page reload, calling the `loader` function and updating what is displayed to the user.
+
+To add a new feature flag, the `AddFeature` component will use the Remix `Form` component that will submit the data to the action function we saw above. I specified that it should submit via the `post` method and also provided the `replace` prop so that it doesn't add a new page to the browser's history every time we create a feature flag.
+
+```tsx
+const AddFeature = () => {
+  return (
+    <Form method="post" replace>
+      <input type="hidden" name="_action" value="create" />
+      <input type="text" name="feature" required placeholder="name" />
+      <button type="submit">Add</button>
+    </Form>
+  );
+};
+```
+
+Once a feature has been created, we'll want to show all the current feature flags so they can be managed. Each feature flag actually displays two forms: One to enable/disable the feature flag, and a second to delete it.
+
+Note that there are two hidden fields: `_action` so that our `action` function knows what we are trying to do to the feature, and `feature` which sends the flag name we want to modify.
+
+```tsx
+const FeatureList = () => {
+  const { features } = useLoaderData<LoaderData>();
+
+  return (
+    <ul>
+      {features.map(([feature, active]) => (
+        <li key={feature}>
+          <Form method="post" replace>
+            <input
+              type="hidden"
+              name="_action"
+              value={active ? "disable" : "enable"}
+            />
+            <input type="hidden" name="feature" value={feature} />
+            <button type="submit" className="btn-naked">
+              {active ? "💪" : "🦾"}
+            </button>
+          </Form>
+
+          <span>{feature}</span>
+
+          <Form method="post" replace>
+            <input type="hidden" name="_action" value="delete" />
+            <input type="hidden" name="feature" value={feature} />
+            <button type="submit">Delete</button>
+          </Form>
+        </li>
+      ))}
+    </ul>
+  );
+};
+```
+
+## Using Features
+
+We have feature flags in our Upstash Redis database, but what good is that if we aren't toggling functionality on or off in our app based on these flags. We will use a loader function to load specific features from the database using `hmget`, and then a little data manipulation to get it into the right structure.
+
+If we want to load `["chart", "graph", "fake"]` flags, Redis will return us `["1", "0", null]`... keep in mind that if the flag doesn't exist, its value will be `null`, which I wanted to show by including the `fake` flag.
+
+```ts
+type LoaderData = {
+  features: Record<string, boolean>;
+};
+
+const loadFeatures = async (keys: Array<string>) => {
+  const data = await redis.hmget("features", ...keys);
+
+  const features = keys.reduce<Record<string, boolean>>((acc, key, index) => {
+    acc[key] = data[index] === "1";
+    return acc;
+  }, {});
+
+  return features;
+};
+
+export const loader: LoaderFunction = async (): Promise<LoaderData> => {
+  const features = await loadFeatures(["chart", "graph"]);
+  return { features };
+};
+```
+
+We can now access the loaded data in our component, again using Remix's `useLoaderData` hook. Then choose how the functionality of our website should change given whether a flag is currently enabled or disabled.
+
+```tsx
+export default function Index() {
+  const { features } = useLoaderData<LoaderData>();
+
+  return (
+    <div>
+      <h1>Dashboard</h1>
+      {features.chart ? <h2>Chart</h2> : <h2>No Chart</h2>}
+      {features.graph ? <h2>Graph</h2> : <h2>No Graph</h2>}
+    </div>
+  );
+}
+```
+
+## Conclusion
+
+In this article we've seen how to use Upstash Redis to create a simple feature flag system in Remix, taking advantage of its data loader and form action server side functions. These allow us to keep the backend and frontend of a specific page tightly coupled, iterating quickly without the need to set up a separate GraphQL API and override standard form submission events on the frontend. Remix as we've seen leans in to web standards around how forms submit their data.

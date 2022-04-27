@@ -1,0 +1,68 @@
+---
+slug: edge-caching-benchmark
+date: 2021-08-23
+title: '5 ms Global Redis Latency with Edge Caching'
+sidebar_label: '5 ms Global Redis Latency with Edge Caching'
+authors: enes
+image: img/blog/cover-edge-caching.jpg
+tags: [redis, database, serverless, aws, edge, edge-computing]
+---
+
+
+1 ms latency is easy with Redis when the database and clients are in the same region. But if you want the clients to be globally distributed then the latency rises over 100 ms. We built Edge Caching to overcome this.
+
+<!--truncate-->
+
+## Edge Caching
+
+With edge caching, REST responses are cached at edge locations all over the world, just like the CDN. We see 5ms global latency at average when edge caching is enabled. See [our benchmark application](https://edge-benchmark.vercel.app/) where we record latency numbers from the clients located in 10 different regions. We compare the latency between the requests that are made to edge url and plain REST url. As the distance between the server and the client increases, the impact of edge caching increases. 
+
+[Click here](https://edge-benchmark.vercel.app/) to run the test yourself.
+
+
+![Edge caching Architecture](/img/blog/edge-caching.png "Edge caching Architecture")
+
+## Use cases
+
+
+### Web/mobile (backendless) clients
+
+Upstash provides read only authentication tokens to enable users to access the database without any backend. You can directly access the Redis from the web or mobile application. In this architecture, clients can be anywhere. It makes a lot of sense to cache the data in locations closest to your users.
+
+
+### Multi region serverless architectures
+
+You can run your AWS Lambda function in multiple regions to lower global latency. Vercel/Netlify functions run in different regions in some configurations. Serverless Redis with edge caching will give you fast data wherever your serverless functions are.
+
+
+### Edge functions
+
+Edge computing (Cloudflare workers etc) is becoming a popular way of building globally fast applications. The challenge with edge functions is that you do not have many options to keep your data. Redis with edge caching is a great fit for edge functions with its low latency and lightweightness.
+
+
+## Get Started
+
+You can enable edge caching, in the Upstash console. Beware that edge caching has [an extra cost.](https://docs.upstash.com/account/pricing#edge-caching)
+
+Once edge caching is enabled, you can find the Edge URL in the REST API dialog. Edge caching is available only for GET calls. For updates (POST), you can still use the plain REST API.
+
+By default, the cached responses expire in 30 seconds. You can control this with the `Cache-Control: max-age=<seconds>` header.
+
+Example:
+        
+```shell
+curl https://us1-smart-bunny-32732.edge-c.upstash.io/get/foo \
+
+-H "Authorization: Bearer 2dfgf98elrg0w009c842z2adfdde9132"
+
+-H "Cache-Control: max-age=50"
+```
+
+The first request to the above URL will fetch the response from the origin. The next requests will be fetched from edge locations. The cached responses will expire after 50 seconds at each edge location.
+
+
+## Edge Caching vs Global Database
+
+Building a global database (Update: This is released, [learn more](https://blog.upstash.com/global-database)) by replicating Redis to multiple regions is in our roadmap. Global databases will give you better consistency guarantees and write latency by replicating the writes too. But it can be very costly to replicate the database to all regions. Still you may need caching to minimize latency in all locations. So Edge caching and Global replication are solutions that complete each other rather than compete. If your use case tolerates eventually consistent reads, edge caching is already a great solution which provides global fast data.
+
+Looking forward to hearing from you about our efforts on serverless and edge data. Talk to us on [twitter](https://twitter.com/upstash) and [discord](https://discord.com/invite/w9SenAtbme).

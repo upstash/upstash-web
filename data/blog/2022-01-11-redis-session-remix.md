@@ -1,0 +1,247 @@
+---
+slug: redis-session-remix
+title: 'Using Upstash Redis as a Session Store for Remix'
+authors: gabriel
+image: img/blog/cover_remix_session.png
+tags: [redis, remix, serverless, session]
+---
+As full  stack web framework [Remix](https://remix.run/) provides APIs to deal with common web server use cases. This post will focus on sessions and why and how you can use Upstash to store them.
+
+## What is a session?
+> The Remix docs have a very good introduction to sessions https://remix.run/docs/en/v1/api/remix#sessions
+
+In a few words - sessions are a mechanism that allows the server and the client to share user data / state. Example of session uses are tracking user authentication state, shopping carts status, flash messages etc.
+
+<!--truncate-->
+
+## Why use Upstash Redis?
+Session data is stored on the server. When deploying to a serverless infrastructure or some PASS infrastructure (e.g. Heroku) you cannot persist the data on the server's file system as it may change on every request (serverless) or deployment (PASS). To persist the data you should store the users data on an external database.  Upstash Redis DB is a great solution to store session data for the following reasons:
+
+- Similar to Redis Sessions ,by nature, have a `key:value`  data structure where the key is the id of the session and the value is its serialized data.
+- Redis has a built in expiry mechanism that reduces the need to cleanup expired sessions.
+- Session may hold sensitive user data and Upstash Redis encrypt all its stored data.
+- Upstash is using a simple HTTP REST API . HTTP is the easiest way to communicate from serverless infrastructure.
+
+##  How to use Upstash as a session provider  in Redis
+> This post is based on the [Redis Session Storage Using Upstash Example](https://github.com/remix-run/remix/tree/main/examples/redis-upstash-session) I wrote. Feel free to clone the Remix repo and give it a go.
+
+### Step 1 - Get your Upstash API keys
+- Go to https://upstash.com/ and create a new account
+- Create a new Redis DB
+- Copy the `UPSTASH_REDIS_REST_URL` & `UPSTASH_REDIS_REST_TOKEN` and store them in a file called  `.env`  in the root of your Remix project.
+- Install `dotenv` - `$ npm install --save-dev dotenv` - This will allow you to inject your environment variables from the `.env` file you just created.
+- Go to you `package.json` file and replace the `dev` script form `remix dev`  to `dotenv/config node_modules/.bin/remix dev`.
+
+### Step 2 - Implement the core `createSessionStorage` to create the Upstash session implementation
+Remix offers a great API to build your own Session integration using `createSessionStorage` . Lets implement this function to integrate Upstash.
+
+```ts
+// sessions/upstash.server.ts
+
+import * as crypto from "crypto";
+
+import { createSessionStorage } from "remix";
+
+const upstashRedisRestUrl = process.env.UPSTASH_REDIS_REST_URL;
+
+const headers = {
+  Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}`,
+  Accept: "application/json",
+  "Content-Type": "application/json"
+};
+
+const expiresToSeconds = expires => {
+  const now = new Date();
+  const expiresDate = new Date(expires);
+  const secondsDelta = expiresDate.getSeconds() - now.getSeconds();
+  return secondsDelta < 0 ? 0 : secondsDelta;
+};
+
+// For more info check https://remix.run/docs/en/v1/api/remix#createsessionstorage
+export function createUpstashSessionStorage({ cookie }: any) {
+  return createSessionStorage({
+    cookie,
+    async createData(data, expires) {
+        // Create a random id - taken from the core `createFileSessionStorage` Remix function.
+        const randomBytes = crypto.randomBytes(8);
+        const id = Buffer.from(randomBytes).toString("hex");
+        // Call Upstash Redis HTTP API. Set expiration according to the cookie `expired property.
+        // Note the use of the `expiresToSeconds` that converts date to seconds.
+        await fetch(
+          `${upstashRedisRestUrl}/set/${id}?EX=${expiresToSeconds(expires)}`,
+          {
+            method: "post",
+            body: JSON.stringify({ data }),
+            headers
+          }
+        );
+        return id;
+    },
+    async readData(id) {
+      const response = await fetch(`${upstashRedisRestUrl}/get/${id}`, {
+        headers
+      });
+      try {
+        const { result } = await response.json();
+        return JSON.parse(result).data;
+      } catch (error) {
+        return null;
+      }
+    },
+    async updateData(id, data, expires) {
+      await fetch(
+        `${upstashRedisRestUrl}/set/${id}?EX=${expiresToSeconds(expires)}`,
+        {
+          method: "post",
+          body: JSON.stringify({ data }),
+          headers
+        }
+      );
+    },
+    async deleteData(id) {
+      await fetch(`${upstashRedisRestUrl}/del/${id}`, {
+        method: "post",
+        headers
+      });
+    }
+  });
+}
+```
+
+Let's explain what we just wrote:
+We created a file named `sessions/upstash.server.ts` . This file exports a function named  `createUpstashSessionStorage`.
+This function takes as a parameter a `cookie`  (more on that later) and uses the core Remix `createSessionStorage` factory function to implement a new session provider.
+
+Inside the function we implemented the `createSessionStorage` protocol for creating a new session (`createData`), read the session value (`readData`), update the session value (`updateData`) and delete the session (`deleteData`).
+
+Each function uses the `REST` Upstash API to interact with Redis Database.
+
+
+#### Things to note:
+- The passed cookie holds the `cookie expiration date` in a `js Date` format. We use the `expiresToSeconds` function to convert the data to seconds as this is what Redis expects.
+- When setting a cookie, don't forget to set its expiration date. Redis will automatically delete those sessions when they are expired.
+- We use `crypto` to create a unique session id. You can use other alternatives for creating unique ids. I chose this option as its the same being used in the core `createFileSessionStorage` [function](https://github.com/remix-run/remix/blob/main/packages/remix-node/sessions/fileStorage.ts).
+
+
+### Step 3 - use the `createSessionStorage` on your app
+Now the we've created our own session storage implementation lets demonstrate how to use it.
+
+> Note that from now on there is nothing specific to Upstash. All the logic is encapsulated in the `sessions/upstash.server.ts` file.
+
+```ts
+// sessions.server.ts
+
+import { createCookie } from "remix";
+import { createUpstashSessionStorage } from "~/sessions/upstash.server";
+
+// This will set the length of the session.
+// For the example we use a very short duration to easily demonstrate its functionally.
+const EXPIRATION_DURATION_IN_SECONDS = 10;
+
+const expires = new Date();
+expires.setSeconds(expires.getSeconds() + EXPIRATION_DURATION_IN_SECONDS);
+
+const sessionCookie = createCookie("__session", {
+  secrets: ["r3m1xr0ck1"],
+  sameSite: true,
+  expires
+});
+
+const { getSession, commitSession, destroySession } =
+  createUpstashSessionStorage({ cookie: sessionCookie });
+
+export { getSession, commitSession, destroySession };
+```
+
+Create a file named  `sessions.server.ts`  and paste the code above.
+This file exports 3 functions `getSession`, `commitSession` and  `destroySession` . Those functions allows the app to interact with the session. We also created  a cookie to store a reference to the session in the client.
+
+Setup the expiration duration according to your business needs. For more info read https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies
+
+#### Using session in Remix routes
+Using Remix you can define session usage per route.  In the following example we use the `session` on the `routes/index.tsx`. This example only demonstrated how to use the session API. Connecting session to a specific business logic is out of the scope of this post.
+
+> If you are looking for an example on how to use session for authentication see https://github.com/remix-run/remix/tree/main/examples/remix-auth-form
+
+```tsx
+// routes/index.tsx
+
+import type { LoaderFunction } from "remix";
+import { json, useLoaderData } from "remix";
+import { commitSession, getSession } from "~/sessions.server";
+
+export const loader: LoaderFunction = async ({ request }) => {
+  // Get the session from the cookie
+  const session = await getSession(request.headers.get("Cookie"));
+  const myStoredData = session.get("myStoredData");
+  // If no session found (was never created or was expired) create a new session.
+  if (!myStoredData) {
+    session.set("myStoredData", "Some data");
+    return json(
+      {
+        message: "Created new session"
+      },
+      {
+        headers: {
+          "Set-Cookie": await commitSession(session)
+        }
+      }
+    );
+  }
+  // If session was found, present the session info.
+  return json({
+    message: `Showing Session info: ${myStoredData}`
+  });
+};
+
+export default function () {
+  const data = useLoaderData();
+  return <div>{data.message}</div>;
+}
+
+```
+
+The example demonstrates how to handle the two possible states of a user session (User has a session or user doesn't have a session). If the user doesn't have a session, navigating to the app's index file will create a new session and store some dummy data.  If the user has a valid (non expired) session the route will show the session's data.
+
+
+### Step 4 - Deploy
+Now that you've implemented the session using Upstash, you are free to choose any deployment strategy that you choose .
+
+> Don't forget to set your Upstash environment variables.
+
+
+## Appendix  
+
+**Using `createFileSessionStorage` for local development and `createUpstashSessionStorage` in staging / production**
+
+It's likely that would want to be able to develop while being offline. When developing locally you can replace the `createUpstashSessionStorage` with `createFileSessionStorage` by detecting the current `NODE_ENV`.
+
+After testing that your Upstash implementation works you change the  `sessions/upstash.server.ts` file as follows:
+
+Change this section:
+
+```tsx
+// from sessions/upstash.server.t
+
+const { getSession, commitSession, destroySession } =
+  createUpstashSessionStorage({ cookie: sessionCookie });
+
+```
+
+With:
+
+```tsx
+// from sessions/upstash.server.ts
+
+const { getSession, commitSession, destroySession } = (process.env.NODE_ENV === "development") ?
+createFileSessionStorage({ cookie: sessionCookie, dir: './sessions' });
+:  createUpstashSessionStorage({ cookie: sessionCookie });
+
+```
+
+Now when you develop locally you'll use your local file system instead of calling Upstash.
+
+## Conclusion
+In this post we saw how to use Upstash Redis DB to host our session storage data. Remix API encapsulates the specific session storage implementation  really well, making the integration strait forward.  If you want to play with the example you can check it out in the Remix source code at https://github.com/remix-run/remix/tree/main/examples/redis-upstash-session
+
+Enjoy.

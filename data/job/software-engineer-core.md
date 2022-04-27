@@ -4,14 +4,7 @@ summary: Build the Upstash core data platform.
 experience: 4+ years
 how: Full time
 location: Work from anywhere
-skills:
-
-- golang
-- java
-- concurrency
-- databases
-- distributed-systems
-
+skills: [golang, java, concurrency, databases, distributed-systems]
 ---
 
 #### UPDATE: This position is closed. You can still apply for possible future openings.

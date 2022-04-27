@@ -1,0 +1,159 @@
+---
+slug: in-app-announcement-react-native
+title: 'In-app Announcements with Serverless Redis and React Native'
+sidebar_label: 'In-app Announcements with Serverless Redis'
+authors: omer
+tags: [serverless, redis, react-native, mobile]
+image: https://upstash-og-image.vercel.app/In-app%20Announcements%20with%20Serverless%20Redis%20and%20React%20Native.png?theme=light&md=1&fontSize=100px&authorName=Omer+Aytac&authorTitle=Full+Stack+Developer+%28Guest+Author%29&authorPhoto=https%3A%2F%2Fblog.upstash.com%2Fimg%2Fblog%2Fauthors%2Fomer.png
+---
+
+In a mobile application, there may be a need to send some information, warnings or guidance to the end-users in the app. One way to do this is sending in-app announcements to the users. 
+
+In this blog post, we will develop a mobile application to show how to send announcements to the users with serverless Redis. We will use React Native to develop a mobile application and Upstash for a serverless Redis, which is directly connected to the app.
+      
+<!-- truncate -->
+
+### What is an In-App Announcement?
+
+In-app announcements are the messages that are sent to the end-users to inform them about something important, notify them about their actions or guide them to somewhere.
+
+These announcements help developers to communicate with users without updating any code or publishing a new release of the app.
+
+In our case, we will implement a solution to announce messages that are needed to be read by users just once. This implementation can be used for some purposes such as:
+
+-   Announcing the update or a new release
+    
+-   Announcing a new feature in the app
+    
+-   Celebrating something with users such as reaching 1 million users etc.
+
+### Serverless Announcements
+
+In our case, we want to show the last announcement to the users only one time. Therefore, a version should be assigned to each announcement to order them, and send the latest announcement to the user if the user has not seen it yet. So, conditions that we will try to satisfy in our case are
+
+-   Displaying only the latest announcement
+    
+-   Displaying the announcement just once for every user
+    
+
+For this purpose, a sorted set in Redis is exactly the thing that we need. It helps keeping track of the announcements by storing and sorting them by their versions.
+
+A sorted set is a sorted data type which is in the format like a map where key is the string message and value is the score assigned to the string message. It is sorted by scores, which correspond to the versions of our announcements in our case.
+
+As the very first step, we need to create an Upstash database [console](https://console.upstash.com/login).
+
+Then, we can start filling out our serverless Redis with announcements. Since I like to automate everything by coding, I prefer to add new announcements by writing a Python script.
+
+At first, I need to configure my Upstash Redis in my Python script:
+
+``` python
+import json
+import redis
+
+r = redis.Redis(
+host= 'YOUR_REDIS_ENDPOINT',
+port= 'YOUR_REDIS_PORT',
+password= 'YOUR_REDIS_PASSWORD',
+charset="utf-8",
+decode_responses=True)
+```
+
+Then, I can add my new message to Redis by getting the latest version from my database and add new message in the following format:
+
+```
+{“new_message”: latest_version + 1}
+```
+
+``` python
+message = "Please update the application before using it."
+
+last_message = r.zrange("Announcements", 0, 0, withscores=True, desc=True)
+new_version = 0
+if len(last_message) > 0:
+	new_version = last_message[0][1] + 1
+r.zadd("Announcements", {message: new_version})
+```
+
+Thanks to the new feature on the Upstash console, we can display our data and visualize it in the “Data Browser” section on the console.
+
+**![](https://lh6.googleusercontent.com/69xgTFYTx8sMrfGW4MuHEPt07LlI8j7tgGcKrcY0k8bzRIoO08vOmumKBMjzbP0sWo_MmjRZlXCyYo7Sp3bcmsRQ1Tz10g8Jz2TqfIqoYbe3JG62XfgwPTJyOHs_Bdl8afuOnpDn)**
+
+That’s how we can add new announcements to our sorted set.
+
+Of course, this is just one way to add a new announcement. If anyone is comfortable using the console directly ( [https://console.upstash.com/](https://console.upstash.com/) ), then it can be used as well.
+
+### **Connecting the App to the Serverless Redis**
+
+In this demonstration, the main aim is to create an announcement control by directly connecting end-users to the Redis without the need for any backend service that connects users with announcements in the database.
+
+To be able to read announcements in Redis from mobile apps, we are able to get read-only token from the Upstash console.
+
+**![](https://lh6.googleusercontent.com/oOdNqkd90lDGwAz20u_PKqm-5GLGP19CuVIqmbuF2HJzmzX8IdoxRw58RBl01c30esOezgbmevs_eHFayY5SDrSh_VmUHvA8cx70x7qeNiBY3vEQwpTU92e2V3Pv88Y6I8WGsVtb)**
+
+Now, we can move on to the React Native for mobile application. To get more information about React Native, please visit [react native](https://reactnative.dev/) .
+
+To start using React Native for the first time, please follow the steps in [environment setup](https://reactnative.dev/docs/environment-setup) .
+
+Since we just need to show how to implement one of the ways of in-app announcements, we will design only one screen that displays the new message as an alert, if a new message exists.
+
+On the screen, we need to check whether a new message exists or not by sending an HTTP request to Redis by using the read-only token. To do this, we need to store the latest version retrieved from Redis in the past.
+
+We can use [react-native-encrypted-storage](https://www.npmjs.com/package/react-native-encrypted-storage)  as the local storage in React Native.
+
+Everytime the user opens this screen, we need to get the latest message which has a version higher than the stored version in the local storage of the mobile phone.
+
+Using ZRANGEBYSCORE from +inf to the version that is stored in local by limiting the results to just one result can be a solution to our problem. For more detailed information about Redis commands can be found at [Redis commands](https://redis.io/commands).
+
+The next code segment implements the following steps in React Native:
+
+-   Get the stored version of the latest message displayed.
+    
+-   Send an HTTP request to Upstash to get the latest announcement, which has a higher version than we get in the previous step.
+    
+-   If the new message returns from request, display it and update the version in local storage.
+
+``` javascript
+var version = await EncryptedStorage.getItem('announcement_version');
+if(version == null){
+	version = "-1";
+}
+version = parseInt(version);
+console.log(version)
+await fetch('REPLACE_UPSTASH_REDIS_REST_URL/zrangebyscore/Announcements/+inf/' + version + "/WITHSCORES/LIMIT/0/1", {
+	method: 'GET',
+	headers: {
+		Authorization: "Bearer REPLACE_UPSTASH_REDIS_REST_READONLY_TOKEN",
+		Accept: 'application/json',
+		'Content-Type': 'application/json'
+	}
+})
+.then(response => response.json())
+.then(data => {
+	var announcement = data["result"];
+	if(announcement && announcement.length > 0){
+		version = parseInt(announcement[1]) + 1;
+		var message = announcement[0];
+		EncryptedStorage.setItem('announcement_version', version.toString());
+		Alert.alert("You have new message!", message);
+	}
+})
+.catch(err => {
+	console.error(err)
+});
+```
+
+At the end, we can display the latest announcement as an alert and synchronize the local version to the latest version in Redis.
+
+**![](https://lh4.googleusercontent.com/QIY55Jp-xwUEJA2KgYXjzjO4JKUwg4Onqwm-31tEWTUo8Gp9aNdRp4m_GZuNt75WZo_X5YOfgEJC5h-7JmyrYOGM2R92Ur05-OWn1z-TVnGInq_dp9wh0rTLZTlTp59c_96NjIYz)**
+
+Complete source code of this simple application is available on [github](https://github.com/omeraytac/in-app-announcement).
+
+### **Conclusion**
+
+In this post, we developed an in-app announcement system, which is sending a new message to users just once if a new message exists.
+
+The user receives the latest announcement that the user hasn’t seen yet. Then the version of the received message is stored in local storage. Every time the user opens the screen, the application checks whether there is a new message in Redis or not.
+
+This solution can be implemented without any backend service by directly connecting from mobile app to Upstash Redis via read-only token.
+
+I hope this post helps you to communicate with users in an easy way.

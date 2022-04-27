@@ -7,29 +7,17 @@ image: https://upstash-og-image.vercel.app/Reusing%20HTTP%20connections%20with%2
 
 ---
 
+
 ### What is keepalive?
 
-Whenever you make an HTTP request to a server, your computer and the server
-create a connection, sending some data back and forth and closing the connection
-afterward. This is an excellent system, as it cleans up after itself if you
-infrequently connect to the same server. However, suppose you need to
-communicate with the same server multiple times in short succession. Then, every
-new connection would require a new TLS handshake, which causes numerous round
-trips between you and the server. So instead, we can keep the connection open
-and reduce the latency for each subsequent request by enabling keepalive.
+Whenever you make an HTTP request to a server, your computer and the server create a connection, sending some data back and forth and closing the connection afterward. This is an excellent system, as it cleans up after itself if you infrequently connect to the same server. However, suppose you need to communicate with the same server multiple times in short succession. Then, every new connection would require a new TLS handshake, which causes numerous round trips between you and the server. So instead, we can keep the connection open and reduce the latency for each subsequent request by enabling keepalive.
 
 <!--truncate-->
 
 ### Sounds very nice but aren't we talking about stateless serverless functions?
 
-Even serverless functions (AWS Lambda, Vercel, Netlify, etc.) hold the state
-temporarily. Whenever a serverless function runs, it remains in memory for a
-brief time, also referred to as "hot". When a hot function receives a new
-request, it can still have data or connections in memory and reuse them. State
-initialized outside the handler function may be available on subsequent
-invocations on most platforms.
-I'm using Vercel as an example in this blog post, but this applies to AWS,
-Netlify, etc.
+Even serverless functions (AWS Lambda, Vercel, Netlify, etc.) hold the state temporarily. Whenever a serverless function runs, it remains in memory for a brief time, also referred to as "hot". When a hot function receives a new request, it can still have data or connections in memory and reuse them. State initialized outside the handler function may be available on subsequent invocations on most platforms.
+I'm using Vercel as an example in this blog post, but this applies to AWS, Netlify, etc.
 
 Here is a small example of keeping a variable outside the handler in Next.js
 
@@ -45,11 +33,9 @@ export default async function handler(req, res) {
 }
 ```
 
-You must create the state outside the handler. Otherwise, it would get
-overwritten on every execution, even if the function is still warm.
+You must create the state outside the handler. Otherwise, it would get overwritten on every execution, even if the function is still warm.
 
-Just like we can retain a counter variable between invocations, we can also keep
-other objects like an HTTPS agent:
+Just like we can retain a counter variable between invocations, we can also keep other objects like an HTTPS agent:
 
 ```ts
 import https from "https";
@@ -71,54 +57,27 @@ export default async function handler(req, res) {
 
 [Code on GitHub](https://github.com/chronark/vercel-keepalive-tests)
 
-I have set up a Next.js app on Vercel and an Upstash Redis database in the same
-region and tested four different scenarios:
-
+I have set up a Next.js app on Vercel and an Upstash Redis database in the same region and tested four different scenarios:
 - with keepalive and cached state (Like the example above)
 - with keepalive, but the agent is recreated inside the handler every time
 - without keepalive and cached state
 - without keepalive and recreated agent
 
-I called the initially cold function 1000 times in rapid succession for each
-scenario and recorded the latency for a single Redis command.
+I called the initially cold function 1000 times in rapid succession for each scenario and recorded the latency for a single Redis command.
 
 ![](/img/blog/keepalive-in-serverless/latency_percentile.svg)
 
-As you can see, in the scenario where we use keepalive and cache, the agent
-between requests performs much better. The first request had a latency of 43ms
-as it had to make multiple round trips to establish the connection. However, all
-subsequent requests are faster, reducing the average latency to 2.2ms. Of
-course, the ratio between hot/cold startups might not be this high in the real
-world, but this can be useful even without many warm function starts.
-Consider a function that uses Upstash Redis for caching. When the function
-starts, it will try to load cached values from Redis (here, a connection gets
-established but not closed immediately). If the cache does not hold the required
-data, it will get computed, and afterwards, a second request to Redis to store
-the result can reuse the same connection and reduce the overall execution time.
+As you can see, in the scenario where we use keepalive and cache, the agent between requests performs much better. The first request had a latency of 43ms as it had to make multiple round trips to establish the connection. However, all subsequent requests are faster, reducing the average latency to 2.2ms. Of course, the ratio between hot/cold startups might not be this high in the real world, but this can be useful even without many warm function starts. 
+Consider a function that uses Upstash Redis for caching. When the function starts, it will try to load cached values from Redis (here, a connection gets established but not closed immediately). If the cache does not hold the required data, it will get computed, and afterwards, a second request to Redis to store the result can reuse the same connection and reduce the overall execution time.
 
-The other tests yielded an expected outcome. Without enabling keepalive or
-recreating the agent every time, the connection will not be reused, and we don't
-get any latency benefit.
+The other tests yielded an expected outcome. Without enabling keepalive or recreating the agent every time, the connection will not be reused, and we don't get any latency benefit.
 
 You can find all the data points inside the repository linked above.
 
 ## Conclusion
 
-Since [@upstash/redis v1.3.1](https://github.com/upstash/upstash-redis/releases/tag/v1.3.1) (
-coming soon to [@upstash/kafka](https://github.com/upstash/upstash-kafka)), we
-have enabled `keepalive` in our SDK, and you should see lower latencies for
-multiple calls for the same function without anything to configure. Furthermore,
-to share and reuse connections between function invocations, all you need to do
-is moving the `const redis = new Redis({ ... })` instantiation outside your
-handler.
+Since [@upstash/redis v1.3.1](https://github.com/upstash/upstash-redis/releases/tag/v1.3.1) (coming soon to [@upstash/kafka](https://github.com/upstash/upstash-kafka)), we have enabled `keepalive` in our SDK, and you should see lower latencies for multiple calls for the same function without anything to configure. Furthermore, to share and reuse connections between function invocations, all you need to do is moving the `const redis = new Redis({ ... })` instantiation outside your handler.
 
-If you are using a native Redis client (TCP based) reusing connections is a
-little problematic.
-Check [this post](https://blog.upstash.com/serverless-database-connections) for
-details.
+If you are using a native Redis client (TCP based) reusing connections is a little problematic. Check [this post](https://blog.upstash.com/serverless-database-connections) for details.
 
-Don't hesitate to reach out
-on [GitHub](https://github.com/upstash/issues/issues/new)
-, [Discord](https://discord.com/invite/w9SenAtbme)
-or [Twitter](https://twitter.com/upstash) for bugs, or if you want to request a
-feature or need help.
+Don't hesitate to reach out on [GitHub](https://github.com/upstash/issues/issues/new), [Discord](https://discord.com/invite/w9SenAtbme) or [Twitter](https://twitter.com/upstash) for bugs, or if you want to request a feature or need help.

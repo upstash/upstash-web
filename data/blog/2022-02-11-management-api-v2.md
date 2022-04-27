@@ -1,0 +1,60 @@
+---
+slug: management-api-v2
+title: 'Developer API V2 Released!'
+sidebar_label: 'Developer API V2 Released!'
+authors: ilter
+tags: [api, rest, devops]
+image: https://upstash-og-image.vercel.app/Developer%20API%20V2%20Released!.png?theme=light&md=1&fontSize=100px&authorName=Ilter+Kavlak&authorTitle=Site+Reliability+Engineer+%40Upstash&authorPhoto=https%3A%2F%2Fblog.upstash.com%2Fimg%2Fblog%2Fauthors%2Filter.png
+---
+
+It has been a while since we have developed the first version of the developer api where we have supported creating and editing Upstash redis databases and Upstash teams. 
+Since then we have brought many great features to Upstash including a whole new product, the Serverless Kafka!
+
+<!--truncate-->
+
+On top of these, we know that automated deployment and configuration is very important in terms of better scalability and ease of maintenance. 
+So we have decided to put our efforts to create a developer api that completely covers all possible actions that can be taken for any Upstash resource.
+
+Also it was about time we provide endpoints for monitoring redis databases and kafka clusters so that our customers will be able to monitor their resources and integrate with their existing
+monitoring solutions.
+
+Today we are announcing the release of [the Upstash Developer API v2!](https://developer.upstash.com/#introduction)
+We have updated all our endpoints but this doesn't mean that your existing solution is no longer working. We will be supporting v1 endpoints for a while too.
+
+### What is new in API V2?
+
+A lot is new! Let's start with redis databases.
+We have brought support for:
+* Redis database creation in **global region**.
+* Setting up all database configurations during creation including **multi-zone**, **tls** and **strong consistency**.
+* **Resetting** redis **database password**.
+* **Renaming** redis **database**.
+* **Enabling multi-zone replication** for your redis database.
+* **Moving** an existing redis database **under a team**.
+* Getting **database statistics**!
+
+On top of this, now you can create and edit Upstash kafka clusters with API v2. It brings support for:
+* **Crud operations** on **Upstash kafka clusters**. You can pass all configurations like **region** and **multi-zone replication**, including:
+  * Support for **renaming cluster**.
+  * Support for **resetting cluster password**.
+* **Crud operations** on **Upstash kafka topics**. You can pass all configurations like **retention time**, **retention size**, **max message size**, **cleanup policy** and **partitions**. 
+* Getting **statistics** about **Upstash kafka clusters** and **topics**!
+
+### How can I start using it?
+
+If you have never used Upstash before you can just go to [the Upstash Console](https://https://console.upstash.com/), start in 30 seconds and use Upstash for free!
+
+Then all you need is to go to `Account > Management API` and push the `Create API Key` button.
+
+### Related Future Work
+
+It is always our priority to ease developers lives. That is why the following items are on our short-term roadmap.
+* An Upstash CLI where you can do everything on your Upstash resources.
+* Upstash SDKs for programmatic access to your resources.
+* Updated Upstash terraform provider.
+* Brand new Upstash Pulumi provider.
+
+### Closing Words
+We are always open to any feedback, and we will make improvements based on them for sure! Your thoughts are very important for us.
+
+You can contact and follow us at on [Twitter](https://twitter.com/upstash) and [Discord](https://discord.gg/w9SenAtbme).

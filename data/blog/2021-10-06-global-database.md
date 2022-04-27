@@ -1,0 +1,104 @@
+---
+slug: global-database
+date: 2021-10-06
+title: 'Global Database for Serverless and Edge'
+authors: mehmet
+image: img/blog/globaldb/cover-global-database.jpg
+tags: [serverless, database, redis, high availability, replication]
+---
+
+In recent years, serverless architectures and edge computing are becoming very popular for application deployments. But storing application state 
+and the data inside a serverless and/or edge function is a different story. There are many difficulties such as; 
+managing the connections to the database, making the data available for fast access from multiple locations etc. 
+There are only a few database services supporting serverless access and very few of those are also suitable for edge functions. 
+(_You can read a detailed analysis [here](https://blog.upstash.com/best-database-for-serverless)._)
+
+At Upstash, from day one, we are providing a serverless Redis compatible database for low latency and with a per-request pricing model.
+Additionally we expose a first-class REST API built directly on the database. REST API removes the connection management hassle, 
+especially when used in serverless functions, but also accessible even from restricted environments like edge locations or web browsers.
+
+Today we are happy to announce the Global Database, which is a step further to make the database available globally, closer to the clients 
+and edge locations for low latency reads. *Global Database is available on free tier, [you can try it](https://console.upstash.com/) without any cost*.   
+
+<!--truncate-->
+
+### Use when?
+
+A Global Database is deployed to multiple regions on different continents and the client requests are routed to the nearest region 
+to minimize the latency when users are distributed around the world. Upstash Global databases can be used for;
+
+
+- Edge functions (Cloudflare workers, Fastly Compute):  Built-in REST API and low latency access from all edge locations makes it a perfect solution.
+
+- Multi region serverless deployments: AWS Lambda, Vercel and Netlify functions can be deployed to multiple regions. A Global Database provides low latency data wherever your serverless functions are.
+
+- Web/mobile platforms: Using the read only REST API, you can access Redis database a web/mobile application directly. A Global Database will provide better latencies as you can expect the users from anywhere. 
+
+
+Another goal behind the Global Database is to make the database resilient to region wide failures. When a region is not available, 
+your requests are routed to the nearest available region; so your database remains available.
+
+
+### How it works?
+
+![Global Database](/img/blog/globaldb/map.png "Global Database")
+
+
+In the global database model, there are multiple replicas of the same database and they form a cluster together. Each replica is connected to other cluster members 
+and tracks liveness of each of them using a failure detector. Both cluster membership and failure detection are managed using a gossip based communication protocol. 
+(See [SWIM: scalable weakly-consistent infection-style process group membership protocol](https://ieeexplore.ieee.org/document/1028914).)
+
+To replicate data (more specifically, individual writes/updates/deletes), single leader replication model is used. A group of keys are assigned to a leader
+replica, which is elected using a leader election mechanism after a membership change. Remaining replicas become the backups of that leader for that group of keys.
+When the leader replica is detected as failed by the failure detector, remaining replicas start a new leader election round and elect a new leader. 
+During the election process, the database becomes unavailable for a short period and all requests will be blocked until election is completed.
+
+Only the leader replica accepts and processes the write requests, backup replicas internally forward writes to the leader without notifying the client. 
+So regardless of the replica type, leader or backup, a client can send a write request. After processing the write request, leader replica propagates it to the backup replicas.
+
+### More on consistency 
+
+Currently, Global Databases are weakly consistent, they do not support strong consistency yet. Response of a write request is returned to the client 
+after the leader replica processes the operation, without waiting for ACK from the majority of backups. Result of the write is replicated to backup replicas 
+asynchronously in parallel.
+
+Read requests are processed by any replica, which gives better read scalability but also means a read request may return a stale value 
+until the result of a write operation for the same key reaches the backup replica.
+
+
+### Would be easier without conflicts!
+
+In case of a cluster wide failure such as a network partition, multiple leaders can be elected for the same key. That means multiple replicas
+to accept writes and data to diverge on different replicas. It would be possible to prevent conflicts happening at the beginning with a stronger model 
+by using protocols like Calvin or Spanner (or maybe even Paxos, Raft), but that's a different path we don't want to take at the moment.
+
+Instead, Global Database allows conflicts to happen and resolves them using a LWW (_last-write-wins_) algorithm and converge the replicas to the same state eventually. 
+Each write in Upstash database has a unique, monotonic sequence number. Every time a replica becomes the leader, it marks the sequence of the first write
+it processes. When two leader replicas discover each other, they share their writes after becoming the leader, and they resolve their conflicts.
+
+### Not all replicas are equal
+
+Some replicas are more equal than others. Because only some of them can be elected as leaders. In a global database cluster, a replica can be 
+marked as _learner_, which makes it unsuitable for leader election. Learner replicas always remain readonly and cannot be a candidate for leadership.
+
+Adding learner replicas doesn't affect stability of the cluster and they cannot cause write conflicts when they are split away. Even when
+they are split from the leader, they still continue to allow read requests and sync the remaining writes after the split is healed. So learner replicas
+are a very good utility for us to expand more edge locations.
+
+
+### More regions, more replicas?
+
+In our initial release, we are offering Global Database with five replicas and in five regions. And replicas outside of the US and EU are marked as *learner*s, 
+so only replicas in US and EU regions can be elected as leaders. This narrows down the possibility of write-conflicts during a network partition.
+But also allows us to add more regions as learner replicas without worrying about network partitions.
+
+
+### Still way to go
+
+Currently Global Databases are designed only to optimize/minimize the latency of read operations. They are not a good fit for write-heavy loads. 
+We are working to improve the latency for write operations too with a better design. 
+
+In addition to the initial five region setup, we are considering opening more regions and/or different region groups in future due to demand and feedback from our users.
+
+You can reach us on [Twitter](https://twitter.com/upstash) and [Discord](https://discord.com/invite/w9SenAtbme) to share your thoughts/ideas and for your questions.
+

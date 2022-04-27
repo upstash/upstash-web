@@ -1,0 +1,229 @@
+---
+slug: aws-msk-confluent-serverless
+date: 2021-12-13
+title: 'AWS MSK and Confluent. Are they really Serverless?'
+sidebar_label: 'AWS MSK and Confluent. Are they really Serverless?'
+authors: enes
+image: img/blog/awsmsk/cover.jpg
+tags: [serverless, aws-msk, aws, kafka, confluent]
+---
+
+
+In this article, we will analyse three managed Kafka products to check if they are really serverless.
+
+**1- AWS MSK**
+
+**2- Confluent Cloud**
+
+**3- Upstash**
+      
+<!-- truncate -->
+
+### What is Serverless?
+
+The biggest two requirements to be serverless:
+
+1- Users do not manage and maintain any server.
+
+2- Price should scale to zero.
+
+
+
+![alt_text](/img/blog/awsmsk/jeremy.png "image_tooltip")
+
+
+The first one is clearly provided by those products. So we will focus on the second one. We will check if the price of those products scales to zero.
+
+Before diving into calculations, let’s give a brief information about each product and their pricing model.
+
+
+### AWS MSK (Serverless)
+
+AWS MSK is a managed Kafka service provided by AWS. In November 2021, AWS announced the serverless version of AWS MSK where your usage is priced per cluster-hour.
+
+Their pricing has the following components:
+
+
+
+* Cluster hours: 	$0.75 per hour-cluster
+* Partition hours: $ 0.0015 per hour-partition
+* Storage: $ 0.1 per GB
+* Data In: $0.1 per GB
+* Data Out: $0.05 per GB
+
+AWS MSK (Serverless) has those limits:
+
+
+
+* Max retention time: 1 day
+* Max partitions: 120
+* Max storage per partition 250Gb
+
+
+### Confluent Cloud
+
+Confluent Cloud is a Kafka offering from the creators of Apache Kafka. You can run Confluent Cloud on AWS, GCP and Azure. In this article, we will work with Standard multi zone offering on AWS.
+
+Confluent also calls their service `Serverless`. Similar to AWS MSK their pricing has the following components:
+
+
+
+* Cluster hours: 	$1.5 per hour-cluster
+* Partition hours (first 500 free): $ 0.0015 per hour-partition
+* Storage: $ 0.1 per GB
+* Data In: $0.13 per GB
+* Data Out: $0.06 per GB
+
+Confluent has better limits:
+
+
+
+* Throughput: 100MBps
+* Max partitions: 2048
+
+
+### Upstash Kafka
+
+Upstash Kafka is a serverless offering from Upstash. It works on multi zones in AWS. Its pricing is based on per-message. It has multiple tiers depending on throughput needs (messages per sec):
+
+
+#### Pay-as-you-go Tier
+
+
+
+* Message cost: $0.6 per 100K messages with a monthly price cap $360 (max price)
+* Storage cost: $0.25 per GB
+* Limits: max 1000 messages per second, 50GB bandwidth per day
+
+
+#### Enterprise 2K / 10K / 100K
+
+
+
+* Service cost:
+    * Enterprise 2K -> $320 per month
+    * Enterprise 10K -> $520 per month
+    * Enterprise 100K -> $980 per month
+* Storage cost: $0.25 per GB
+* Data in: $0.1 per GB
+* Data out: $0.05 per GB
+* Limits:
+    * Enterprise 2K -> max 2000 messages per second
+    * Enterprise 10K -> max 10.000 messages per second
+    * Enterprise 100K -> max 100.000 messages per second
+
+
+### Scenarios
+
+We will calculate the cost of each of 3 products for scenarios with different loads. Our scenarios will start from an empty cluster with zero bandwidth up to a cluster with a 1.5TB daily bandwidth. The below parameters will be an input variable for each scenario:
+
+
+
+* Daily Data In
+* Daily Data Out
+* Storage
+* Average size of a message
+* Number of partitions
+
+Here the scenarios with those parameters:
+
+![alt_text](/img/blog/awsmsk/scenarios.png "image_tooltip")
+
+### Calculation
+
+Here are the formulas that we use to calculate the cost for each product.
+
+
+#### AWS MSK Calculation
+
+Monthly Cost =
+
+$0.75 x 31 days x 24 hours (cluster cost)
+
++Storage x 0.1 GB
+
++Partition count x 0.0015
+
++Data In x 0.1 GB
+
++Data Out x 0.05 GB
+
+
+#### Confluent Calculation
+
+Monthly Cost =
+
+$1.5 x 31 days x 24 hours (cluster cost)
+
++Storage x 0.1 GB
+
++Partition count x 0.0015 (first 500 free)
+
++Data In x 0.13 GB
+
++Data Out x 0.06 GB
+
+
+#### Upstash Calculation (Pay As You Go)
+
+Monthly Cost =
+
+$0.6 x message count / 100K
+
++Storage x 0.25 GB
+
+* Note that the monthly cost can not exceed $360 because of the price cap (ceiling).
+
+
+#### Upstash Calculation (Enterprise)
+
+Monthly Cost =
+
+Service cost ($320 or $520 or $980 depending on throughput)
+
++Storage x 0.25 GB
+
++Data In x 0.1 GB
+
++Data Out x 0.05 GB
+
+
+### Results
+
+You can check [the spreadsheet](https://docs.google.com/spreadsheets/d/1C_kJ68vevFzvckLM7R8TvSzQfvrBynPtPVjVQ4mcvs0/edit?usp=sharing) to see the calculation and results in detail. The spreadsheet is read only but you can download the spreadsheet and change the input variables. The input variables are the red ones at each sheet.
+
+Here are the results:
+
+![alt_text](/img/blog/awsmsk/results.png "image_tooltip")
+
+![alt_text](/img/blog/awsmsk/charts.png "image_tooltip")
+
+Here some notes:
+
+
+
+* AWS MSK and Confluent charges for an inactive, empty cluster. Upstash does not charge if your cluster is not active. The minimum costs:
+    * AWS MSK: $569
+    * Confluent Cloud: $1116
+    * Upstash Kafka: $0
+
+* AWS MSK Serverless has been recently announced. It looks like they copied the pricing model of Confluent. Their pricing is almost the same as Confluent but their cluster-per-hour cost is half of the Confluent’s one.
+* Upstash Pay-as-You-Go overcomes daily-0, daily-3gb and daily-30gb scenarios. Daily-90gb and higher requires Upstash Enterprise plans.
+* The price cap of Upstash (max $360 per month) prevents excessive bills for high throughput use cases. E.g. daily 30GB case
+* Upstash pricing is based on per message. So we found the number of messages by dividing the bandwidth by the average message size. We assumed the average message size is 1Kb. For bigger values, Upstash’s cost will decrease. You can change this number on the spreadsheet for each scenario.
+
+
+### Conclusion
+
+If you agree the price should scale to zero then both AWS MSK and Confluent are not serverless. Upstash Kafka charges just for what you use also with a competitive price for high throughput use cases.
+
+We love to improve [Upstash](https://upstash.com) and our content by your feedback. Let us know your thoughts on [Twitter](https://twitter.com/upstash) or [Discord](https://discord.gg/w9SenAtbme).
+
+
+### Links
+
+[https://www.confluent.io/confluent-cloud/pricing](https://www.confluent.io/confluent-cloud/pricing)
+
+[https://aws.amazon.com/msk/pricing/](https://aws.amazon.com/msk/pricing/)
+
+[https://docs.upstash.com/kafka/pricing](https://docs.upstash.com/kafka/pricing)

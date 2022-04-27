@@ -4,13 +4,7 @@ summary: Build the Upstash cloud infrastructure.
 experience: 2+ years
 how: Full time
 location: Work from anywhere
-skills:
-
-- kubernetes
-- docker
-- linux
-- aws
-
+skills: [kubernetes, docker, linux, aws]
 ---
 
 #### UPDATE: This position is closed. You can still apply for possible future openings.

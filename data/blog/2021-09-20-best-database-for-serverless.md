@@ -1,0 +1,93 @@
+---
+slug: best-database-for-serverless
+date: 2021-09-20
+title: 'Best Databases for Serverless'
+sidebar_label: 'Best Databases for Serverless'
+authors: enes
+image: img/blog/cover-best-database.jpg
+tags: [redis, database, serverless, aws, mongodb, cassandra, datastax, faunadb, firestore, DynamoDB]
+---
+
+
+Serverless is great for developers who want to build an application end to end with lowest maintenance and financial cost. Serverless functions enable you to run your own code without maintaining the backend infra. But they are stateless by design so you need an external data store. So the next question is which databases are best fit for serverless? The good news is database vendors see the serverless trend and they are either launching either serverless offerings or trying to adapt their product. In this article, I will first list the things that make a database great for serverless. Then I will list the database that I personally think to be candidates to be the great database for Serverless.
+
+<!--truncate-->
+
+### What makes a database great for Serverless?
+
+
+
+* **Ease of use:** Next generation developers do not want to spend days and weeks learning the technologies. They want to learn by watching youtube videos instead of reading pages of docs. So a database for serverless should be simple and intuitive.
+* **Serverless Pricing:** The price should scale to zero. Why should I pay for something that I do not use. Pricing models based on per-bandwidth or per-request are serverless as they correlate with your exact usage. Personally I prefer per-request as it is always easier to estimate than bandwidth.
+* **Developer friendly pricing:** Pricing should be simple without traps. Some pricing pages are so complicated that there are extra articles and blog posts to explain the details. Some vendors have complex calculators. Unfortunately most vendors prefer a complex pricing to minimize their risks. So it is hard to foresee how much you will pay before seeing the invoice.
+* **Serverless Connections:** Serverless functions can scale to hundreds even thousands in seconds. If your database requires persistent connections then you can easily hit the connection limits of your database. HTTP based connections do not have such a problem as those are more lightweight and generally do not have such limitations.
+* **Low latency:** Extra latency is cost in serverless functions. But the real cost is the unhappy users waiting idle on your website.
+* **Portability:** If you want to move to another cloud vendor, do you have to rewrite the data layer. Or are you able to test your application in your laptop without connecting to the remote database.
+* **Consistency:** Generally, there is a tradeoff between consistency and performance. The databases are at different places on the consistency & performance spectrum. A good database should clearly define its consistency guarantees so the user will be aware of the possible issues and risks
+* **Scalability:** The database should keep up when your application starts to receive high throughput. Ideally, scaling should be automatic or managed by the cloud provider. You should not worry about it.
+* **Edge friendly:** Cloudflare Workers and Fasty Compute are cool technologies which enable you to run your serverless functions at the edge closest to your user. Those require REST based connections but also globally replicated database to minimize the latency.
+* **Globality:** As your application gets globally popular, you need a database which provides good performance all over the world. Multi region replication is the key feature to enable this. But be careful, check the pricing. This feature can be expensive.
+
+
+### The best databases for Serverless?
+
+In this section, I will share my impressions and notes from trying the following databases. They are not based on scientific analysis but I hope to give you an idea before doing any real comparison analysis.
+
+**MongoDB (Atlas)**
+
+
+
+* Ease of use: MongoDB is the most popular NoSQL database and document store. Its API is very simple and intuitive thanks to its JSON based data model.
+* Portability: Almost all cloud providers have database products with MongoDB API as well as you can run MongoDB yourself on-premise. So there is no portability issue.
+* [MongoDB](https://www.mongodb.com/cloud/atlas) Atlas recently announced its Serverless database type. My personal impression is that it was more like a hosted MongoDB instance under a serverless pricing model. As seen [here](https://docs.atlas.mongodb.com/reference/serverless-instance-limitations/) many features are not supported for Serverless database including Node.js SDK.
+* Serverless Connections: MongoDB Atlas does not provide you an HTTP based (e.g. REST) API. You can hit the connection limit easily. That’s why they publish articles how to avoid this [https://docs.atlas.mongodb.com/best-practices-connecting-from-aws-lambda/](https://docs.atlas.mongodb.com/best-practices-connecting-from-aws-lambda/)
+  
+  ** *(Update) MongoDB Atlas has launched an [HTTP based Data API](https://docs.atlas.mongodb.com/api/data-api/) *
+
+
+**Cassandra (Datastax Astra)**
+
+
+
+* Datastax Astra provides REST and GraphQL API in addition to native Cassandra drivers.
+* Ease of use: For me it was harder to learn Cassandra compared to MongoDB and Redis. However, Datastax team did a good job with the console, it was very intuitive. But still I remember I was lost in the docs with different versions of the REST API.
+* Developer friendly pricing: The pricing of [Datastax Astra](https://www.datastax.com/products/datastax-astra) is not a simple one. Every unit is calculated separately (reads, writes, bandwidth) and they have different prices depending on cloud provider and even region. Datastax has its own definition of read/write units (RRU and WRU).
+
+**DynamoDB (AWS)**
+
+
+
+* Ease of use: If you are an AWS user, it is easy to start and work with [DynamoDB](https://aws.amazon.com/dynamodb/). However I think MongoDB has an easier and more intuitive query API.
+* Serverless connections: DynamoDB connections are http based, you do not have any connection limit problem.
+* Portability: Biggest problem is here. You can not use DynamoDB anywhere but AWS.
+
+**FaunaDB**
+
+
+
+* Consistency: Probably FaunaDB is the best on this list in terms of consistency. It guarantees consistency along with global replication. But beware that this comes at extra performance costs. Consider whether you really need such a strong consistency.
+* Performance: It has higher latency than others due to its strong consistency.
+* Ease of use: Honestly, FQL was the hardest one for me to learn and use. But [FaunaDB](https://fauna.com/) also supports GraphQL API, so it might be easier.
+* Serverless connections: Thanks to its HTTP based connection, FaunaDB does not have problem with connection limits.
+
+**Upstash**
+
+
+
+* Ease of use: Redis is probably the easiest to learn API in this list. Upstash makes it easy to use in the cloud with its intuitive and simple interface.
+* Developer friendly pricing: [Upstash](https://upstash.com/) pricing is based on per-request. It also sets price-caps, so it guarantees that you will not pay more than a predetermined amount.
+* Performance: Thanks to memory based storage, Upstash gives the best latency numbers. Check [this](https://serverless-battleground.vercel.app/) to get an idea.
+* If you need complex query capabilities (joins etc), Redis data structures may not be practical. You may need a database with better SQL support in such a case.
+
+**Firestore**
+
+
+
+* Ease of use: Firestore is one of the best in this list for this category. The UI and API is quite intuitive.
+* Portability: Just like DynamoDB, Firestore has a vendor-lock problem. It is good as long as you are on Google Cloud.
+* Performance: I heard some complaints about its performance before. I have personally experienced its latency is worse than others together with FaunaDB. So there is a question mark here.
+
+
+### Closing Words
+
+I believe that serverless is the future of development and there is an ongoing transition towards serverless. Serverless enables developers and small companies to create scalable products with a very limited budget. Databases should be part of this transition with offerings which are coherent with serverless principles.  

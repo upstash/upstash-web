@@ -1,0 +1,108 @@
+---
+slug: upstash-terraform-provider-v1
+title: 'Announcing Upstash Terraform Provider with Kafka Support'
+authors: burak
+tags: [terraform, devops, serverless, sre, upstash]
+image: https://upstash-og-image.vercel.app/Announcing%20Upstash%20Terraform%20Provider%20with%20Kafka%20Support.png?theme=light&md=1&fontSize=100px&authorName=Burak+Y%C4%B1lmaz&authorTitle=Jr.+Site+Reliability+Engineer+%40Upstash&authorPhoto=https%3A%2F%2Fblog.upstash.com%2Fimg%2Fblog%2Fauthors%2Fburak.png
+---
+
+It has been some time since we released our very first version of Upstash Terraform Provider, which helped developers automate their Redis database management.
+Since then, we have worked on and advanced our products, even adding new ones to our arsenal!
+
+
+Now, our provider v1.0.0 is publicly available in [the terraform marketplace](https://registry.terraform.io/providers/upstash/upstash/latest).
+
+<!-- truncate -->
+
+### What is new in Terraform Provider V1.0.0 ?
+
+Since we announced our [very first version of Terraform Provider](https://blog.upstash.com/redis-terraform), a lot has improved!
+
+In this new version of the provider; we have expanded the capabilities of our provider with the new functionalities of the newly announced [v2 api](https://blog.upstash.com/management-api-v2) and the team functionalities that were not implemented in the previous version of the Terraform Provider.
+
+
+As a result, creating the infrastructure of your applications has become automated and much more robust.
+
+#### Here is what are new:
+* Kafka Topic Creation and Management
+* Kafka Cluster Creation and Management
+* Team Creation and Management
+
+
+### Configuration
+
+If you want to use the plugin, just configure your provider as such:
+
+```
+terraform {
+  required_providers {
+    upstash = {
+      source = "upstash/upstash"
+      version = "1.0.0"
+    }
+  }
+}
+```
+
+```
+provider "upstash" {
+  email = "EMAIL"
+  api_key  = "API_KEY"
+}
+```
+:::note
+You can get an API_KEY from the Upstash Console. Also EMAIL is the email you registered for Upstash.
+:::
+
+### Creating Resources
+
+#### Upstash Redis Database
+
+```
+resource "upstash_redis_database" "exampleDB" {
+  database_name = "TerraformDB"
+  region = "eu-west-1"
+  tls = false
+  multizone = false
+}
+```
+
+#### Upstash Kafka Cluster
+
+```
+resource "upstash_kafka_cluster" "exampleCluster" {
+  cluster_name = "TerraformCluster"
+  region = "eu-west-1"
+  multizone = false
+}
+```
+
+
+```
+resource "upstash_kafka_topic" "exampleKafkaTopic" {
+  topic_name = "TerraformTopic"
+  partitions = 1
+  retention_time = 625135
+  retention_size = 725124
+  max_message_size = 829213
+  cleanup_policy = "delete"
+  cluster_id = resource.upstash_kafka_cluster.exampleKafkaCluster.cluster_id
+}
+```
+
+
+For the detailed explanation of the parameters, their behaviors and how they should be used, please visit: https://registry.terraform.io/providers/upstash/upstash/latest/docs
+
+
+### Future Work
+
+We want to become more SRE/Cloud friendly product that's why we are giving high priority to different integration and automation tools.
+We will keep on creating and advancing our tools up-to-date with the services we provide each coming day. 
+Also new integrations are on the way!
+
+
+### Closing Words
+
+We are trying our best to provide a more robust and intuitive experience for developers using our services.
+In that regard, we will highly appreciate it if you give us feedback on our terraform provider at [twitter](https://twitter.com/upstash) or [discord](https://discord.com/invite/w9SenAtbme).
+

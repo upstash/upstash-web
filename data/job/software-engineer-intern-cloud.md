@@ -4,12 +4,7 @@ summary: Build the Upstash cloud infrastructure.
 experience: Student
 how: Part/Full time
 location: Work from anywhere
-skills:
-
-- linux
-- aws
-- any programming language
-
+skills: [linux, aws, any programming language]
 ---
 
 #### UPDATE: This position is closed. You can still apply for possible future openings.

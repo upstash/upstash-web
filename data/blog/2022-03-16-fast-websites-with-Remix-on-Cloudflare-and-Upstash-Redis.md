@@ -1,0 +1,182 @@
+﻿---
+slug: fast_websites_with_Remix_on_Cloudflare_and_Upstash_Redis
+title: 'Blazing Fast Websites with Remix on Cloudflare and Upstash Redis'
+authors: sonke
+image: https://upstash-og-image.vercel.app/Blazing%20Fast%20Websites%20with%20Remix%20on%20Cloudflare%20and%20Upstash%20Redis.png?theme=light&md=1&fontSize=100px&authorName=S%C3%B6nke+Peters&authorTitle=Full+Stack+Web+Developer+%28Guest+Author%29&authorPhoto=https%3A%2F%2Fblog.upstash.com%2Fimg%2Fblog%2Fauthors%2Fsonke.jpg
+tags: [redis, serverless, remix, cloudflare]
+---
+
+When developing a website or web app, nobody wants to spend hours of their time just on speed optimization. The problem is that a fast website is incredibly important and performance is often a deciding factor for its success.
+Web frameworks like [Remix Run](https://remix.run) were created with the goal of optimizing web performance while keeping their configuration to a minimum ("zero-config"). Nowadays, there are dozens of frameworks available, that help you achieve high speeds.
+
+Unfortunately, the best website load times are of little use to us unless the databases of our apps are lightning fast as well.
+
+<!-- truncate -->
+
+Today, we'll look at how to achieve excellent website loading speeds   and combine them with **peak database performance** of [Upstash Redis](https://upstash.com/redis) [Global Databases](https://docs.upstash.com/redis/features/globaldatabase).
+
+## Why Global Databases?
+
+Most individuals use a Content Delivery Network (CDN) when they deploy a website online. A content delivery network (CDN) is a global network of servers. Because website files can be cached and served from the closest geographic location to the client, a CDN delivers significantly lower latency than a single server system. This will ensure that your website loads quickly all across the world.
+When we talk about [Upstash](https://upstash.com)'s [Global Databases](https://docs.upstash.com/redis/features/globaldatabase) the same concept of a CDN applies to Redis Databases. With global databases, replicas of your databases are distributed across multiple regions around the world. Now, the clients are routed to the nearest region and experience up to < 10ms latency.
+
+## Getting started
+
+Now that I've already promised a lot, let's take a look at how the whole thing works in practice. 
+
+### What we are going to build
+
+We will build a web app with [Remix Run](https://remix.run) that uses [Upstash Redis](https://upstash.com/redis) [Global Databases](https://docs.upstash.com/redis/features/globaldatabase) and deploy it on [Cloudflare Workers](https://workers.cloudflare.com/).
+
+Cloudflare Workers have the advantage of being deployed globally, similar to a CDN. This means that our Remix app's server-side rendering happens as close to the client as possible, resulting in minimum latency. Combined with Upstash's Global Databases this is the ideal setup performance-wise.
+
+### Setup Remix
+
+Go to a folder of your choice and run
+
+```bash
+npx create-remix@latest
+```
+You will be greeted with a dialog that walks you through the setup of your Remix Run app.
+
+Make sure to select *Cloudflare Workers* as the deployment target. In this walkthrough I am going to proceed with a *JavaScript* app but feel free to choose TypeScript. The setup should look similar to this.   
+
+```bash
+
+R E M I X - v1.2.3
+
+💿 Welcome to Remix! Let's get you set up with a new project.
+
+? Where would you like to create your app? upstash-remix
+? Where do you want to deploy? Choose Remix if you're unsure, it's easy to chang
+e deployment targets. Cloudflare Workers
+? TypeScript or JavaScript? JavaScript
+? Do you want me to run `npm install`? Yes
+
+```
+
+Once the installment has finished, open the newly created folder in your code editor.
+
+### Create your Upstash Redis Global Database
+
+For the Upstash Redis Global Database, go to https://upstash.com/ and login or create an account. In the console, click on "Create Database", enter a name and select "Global" as the database type. Finally hit "Create" and wait for the database to be created.
+Now copy the `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`.
+
+In your project, create a file called `.env` in the project root and add both variables there like this:
+
+```bash
+UPSTASH_REDIS_REST_TOKEN=<INSERT YOUR UPSTASH_REDIS_REST_TOKEN HERE>
+UPSTASH_REDIS_REST_URL=<INSERT YOUR UPSTASH_REDIS_REST_URL HERE>
+```
+
+To interact with our database let's install the `@upstash/redis` npm package with `npm install @upstash/redis`.
+
+### Writing the Remix Run application
+
+Now that your database is set up, open the file `app/routes/index.jsx`, remove the boilerplate code and enter the following:
+
+```jsx
+import { json, redirect, useLoaderData } from "remix";
+import redis from "../utils/redis.server";
+
+export const loader = async () => {
+  const start = new Date();
+  const count = await redis.get("counter");
+  return json({ count, loadingTime: new Date() - start });
+};
+
+export const action = async () => {
+  await redis.incr("counter");
+  return redirect("/");
+};
+
+export default function Index() {
+  const { count, loadingTime } = useLoaderData();
+
+  return (
+    <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.4" }}>
+      <h1>Record speeds with Remix on Cloudflare and Upstash Redis</h1>
+      <p>The button below was clicked {count} times already.</p>
+      <form method="post" action="/?index">
+        <button type="submit">Click me!</button>
+      </form>
+      <p>
+        It took <b>{loadingTime} ms</b> to read the number of button clicks from{" "}
+        <a href="https://upstash.com/redis">Upstash Redis</a>{" "}
+        <a href="https://docs.upstash.com/redis/features/globaldatabase">
+          Global Database
+        </a>
+        .
+      </p>
+    </div>
+  );
+}
+```
+
+Additionally, create a file `app/utils/redis.server.js` with
+
+```javascript
+// app/utils/redis.server.js
+
+import { Redis } from  "@upstash/redis/cloudflare";
+
+export  default  Redis.fromEnv();
+```
+
+This does two things. Let's take a look at both.
+
+#### 1. Server-side rendering data with `useLoaderData`
+
+In our return statement at the very bottom we have a simple user interface that displays
+- a counter variable called `count` and
+- a variable called `loadingTime`. 
+
+If we look a bit further up, we see that those two variables come from the `useLoaderData()` hook. This [Remix Run specific hook](https://remix.run/docs/en/v1/api/remix#useloaderdata) is used together with the `loader` function at the top.
+In there, we read a key `counter` from the database, measure the time that takes and return both to our `useLoaderData()` function.
+The `loader` function will then run every time we load the Remix Run app, so each time someone requests the website, it will read the current `counter` value, server-side render the website and send it back to the client. 
+
+#### 2. Incrementing the counter variable when someone clicks the "Click me!" button.
+
+Remix Run allows us the build forms very easily. In our JSX, you can find a `<form/>` tag that submits a `POST` request to `/?index` when somebody clicks on the submit button. The amazing thing with Remix Run is that we only have to add an `action` function to the file and will have a frontend-backend interaction ready without having to explicitly create an API.
+In the `action` function, we simply increment the counter and tell the client to reload the website to reflect the changes.
+
+🥳   **You're ready to go**
+
+### Running locally
+
+Now, you'll probably want to take a look at what you've just created. To do so, run `npm run dev` and view the app in your browser.
+
+1. Click on the "Click me!" button and see how the count increments
+2. Take a look at the measured loading time. In Germany, I usually see latencies of < 20ms *but be prepared to cut that in half once deployed to Cloudflare.*
+
+### Deploying to Cloudflare
+
+Let's advance to full speed with Cloudflare and achieve single digit millisecond latencies now!
+
+First of all, if you haven't, install the Cloudflare Workers CLI [Wrangler](https://developers.cloudflare.com/workers/cli-wrangler) as described in the documentation: https://developers.cloudflare.com/workers/cli-wrangler/install-update/. Be sure to [authenticate the CLI](https://developers.cloudflare.com/workers/cli-wrangler/authentication) as well.
+
+If you don't already have an account, then [create a cloudflare account here](https://dash.cloudflare.com/sign-up) and after verifying your email address with Cloudflare, go to your dashboard and set up your free custom Cloudflare Workers subdomain.
+
+Don't forget to set your secrets from `.env` for Cloudflare as well via
+
+```sh
+wrangler secret put UPSTASH_REDIS_REST_TOKEN
+...
+
+wrangler secret put UPSTASH_REDIS_REST_URL
+...
+```
+
+Once that's done, you should be able to deploy your app:
+
+```sh
+npm run deploy
+```
+
+Wrangler will give you a link to your app once it's deployed. Open it and see how fast your app will be.
+
+### Links
+
+Check out an example deployment on https://remix-cloudflare-workers.soenkep.workers.dev/.
+
+Take a look at the full code (without environment variables) on: https://github.com/zunkelty/upstash-remix-run.

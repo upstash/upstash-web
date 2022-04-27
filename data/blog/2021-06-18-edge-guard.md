@@ -1,0 +1,103 @@
+---
+slug: edge-guard
+date: 2021-06-18
+title: "Implement IP Allow/Deny List at Edge with Cloudflare Workers and Upstash Redis"
+sidebar_label: IP Allow/Deny List at Edge
+authors:
+  name: Lisa Natsumi
+  title: Engineer @Upstash
+  image_url: img/blog/authors/pp-lisa.jpg
+tags: [redis, database, cloudflare, cloudflare workers, serverless]
+---
+                      
+It is a common need to restrict access to your website to some specific IPs. 
+In this post, I will show how to implement an IP Allow/Deny list using Edge computing. Let me first introduce Cloudflare Workers.
+
+
+### Cloudflare Workers
+[Cloudflare workers](https://workers.cloudflare.com/) are quite popular technology in recent years. It became [publicly available](https://blog.cloudflare.com/introducing-cloudflare-workers/) in 2017 and
+Cloudflare KV storage became [publicly available](https://blog.cloudflare.com/workers-kv-is-ga/) in 2019.
+
+<!--truncate-->
+
+Without going to very deep details of Cloudflare workers or KV storage, I will explain them briefly. 
+With Cloudflare workers you can intercept any http request edge level, you can execute your code snippets and manipulate the request/response.
+Also you can use KV storage to make put/get a dictionary which is natively available inside Cloudflare Workers.
+You can quickly try [playground environment](https://cloudflareworkers.com/), it is quite simple and 1-click test environment.
+
+
+Apart from the Cloudflare KV Storage, as a developer you might need more advanced data structures. 
+Also you might want to access KV storage from outside (like from a backend or an API or SDK clients). 
+So recently we have enabled REST Api Upstash.
+
+Now you can access your [Upstash](https://upstash.com/) Redis database using:
+
+* [Upstash Rest API](https://docs.upstash.com/features/restapi) in Cloudflare Workers 
+* [redis-cli](https://redis.io/topics/rediscli) in your command line terminal 
+* Any [redis client](https://redis.io/clients) in that particular programming language
+
+Please click your `connect` button in your database details page for some sample code snippets and sample commands.
+
+<img src="/img/blog/redis-connect.png" />
+
+Let's make a small application using Cloudflare workers and explore Upstash Redis Rest API together.
+
+### Application 
+
+***IP Allow/Deny in Cloudflare worker using Redis as a source of truth.***
+
+### Prerequisites
+
+* A Serverless Redis Database ( You can create one from [Upstash Console](https://console.upstash.com/) )
+* A Cloudflare account or you can use [CF Playground](https://developers.cloudflare.com/workers/learning/playground)
+* Basic javascript knowledge
+* Basic [Cloudflare Workers](https://developers.cloudflare.com/workers/get-started/guide) knowledge
+
+:::note
+Select **Global Database** while creating Upstash database. Global database replicates data to multiple regions to lower the latency from the edge functions.  
+:::
+
+Let's Create a Cloudflare worker and intercept the request. When you create a worker it will automatically come with
+sample code.
+
+### Implementation
+Let's Get the IP address of the visitor:
+
+```javascript
+async function handleRequest(request) {
+  const ip = request.headers.get('cf-connecting-ip');
+  return new Response(ip);
+}
+```
+
+It is possible to get a visitor IP address from the header. Now we want to check that this IP address is in the allowed
+list or not. Let's make a single REST API call and improve our code.
+
+```javascript
+async function handleRequest(request) {
+  const ip = request.headers.get('cf-connecting-ip');
+  res = await fetch("https://YOUR_DATABASE_ENDPOINT/sismember/allowed-set/"+ip+"?_token=YOUR_REST_API_TOKEN")
+  if ((await res.text()).includes("1")){
+    return new Response(ip + ' is allowed.')
+  }
+  return new Response(ip + ' is not allowed.')
+}
+```
+
+Now we make a rest api call to our Upstash Redis Server and check if the IP address is in the list. If the result
+contains "1" then it means it is in the list, otherwise it doesn't.
+
+You can update the Redis set using redis-cli with following command:
+
+```
+sadd allowed-set $IP_ADDRESS
+```
+
+### Conclusion and Future Work
+
+Now it is possible to access your Redis server instance using rest api. 
+We are supporting almost all commands using rest api. Please take a look at [our documentation](https://docs.upstash.com/features/restapi) for more details.
+With Cloudflare KV storage, you are bound to only KV dictionary API and it is not easy to access Cloudflare Workers KV from 3rd party applications.
+But Redis huge number of different Client SDKs and redis-cli. Also in Upstash you can access your Redis database using REST API.
+
+This simple application can be extended to a kind of security guard in Cloudflare Workers. Users can change config values in Redis database and Cloudflare Worker can read configuration from the Redis.

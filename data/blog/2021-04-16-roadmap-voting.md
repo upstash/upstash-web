@@ -1,0 +1,41 @@
+---
+slug: roadmap-application
+date: 2021-04-16
+title: Roadmap Application with Next.js, Redis and Auth0
+sidebar_label: Roadmap Application with Next.js, Redis and Auth0
+authors: noah
+image: img/blog/roadmap.png
+tags: [redis, database, nextjs]
+---
+
+We have been developing example applications to showcase how easy and practical to develop serverless applications with Redis. So far, the most popular of those [examples](https://github.com/upstash/examples) is the Roadmap Voting Application. As we started to use it in real life, there were two main problems:
+
+- We started to see spam entries. The application does not have an admin dashboard, so one had to connect to Redis to delete an entry.
+- We released some features in the list but there was no way to flag them as released and remove from voting list.
+
+<!--truncate-->
+
+To solve both, we decided to add authentication. Thanks to authentication:
+- Users should sign in to add new feature requests.
+- We can set ourselves as admin, so we can remove or release the feature requests.
+
+We have added Auth0 authentication module with single sign on options. Here the new [Upstash Roadmap Voting App](https://roadmap.upstash.com)
+
+<img src="/img/blog/roadmap.png" />
+                                     
+If you scroll to the bottom, you will see the feature requests which are already released.
+            
+
+## Deploy Yourself
+You can easily create and deploy Roadmap Voting App for your project. Follow the steps in the [repo](https://github.com/upstash/roadmap). You won't need to write any code, but you have to update the environment variables to configure Redis and Auth0.
+       
+If you prefer the simpler version without Auth0, check our [examples repo](https://github.com/upstash/examples/tree/master/roadmap-voting-app) for the older version.
+
+
+
+
+
+
+
+
+

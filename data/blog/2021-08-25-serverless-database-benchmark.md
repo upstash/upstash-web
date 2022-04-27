@@ -1,0 +1,121 @@
+---
+slug: serverless-database-benchmark
+date: 2021-08-25
+title: 'Serverless Battleground - DynamoDB vs Firestore vs MongoDB vs Cassandra vs Redis vs FaunaDB'
+sidebar_label: 'Serverless Battleground - DynamoDB vs Firestore vs MongoDB vs Cassandra vs Redis vs FaunaDB'
+authors: enes
+image: img/blog/cover-serverless-battleground.jpg
+tags: [redis, database, serverless, aws, mongodb, cassandra, datastax, faunadb, firestore, DynamoDB]
+---
+
+
+* *This is a continuation of [the blog post](https://blog.upstash.com/latency-comparison) published in April,2021.*
+
+We built a [sample application](https://serverless-battleground.vercel.app/) which compares the performance of leading serverless databases using a common web use case and serverless functions. The databases are DynamoDB, MongoDB (Atlas), Firestore, Cassandra (Datastax Astra), FaunaDB and Redis (Upstash)
+
+<!--truncate-->
+
+Check [the application](https://serverless-battleground.vercel.app/) and [the source code.](https://github.com/upstash/latency-comparison)
+
+What we compared is the latency of fetching top 10 news articles for each database. The whole data is 7001 real news articles collected from New York Times API. The query that we measure whose latency is:
+
+`select * from news where section = “World” order by view_count desc limit 10`
+
+The backend is implemented as serverless functions on AWS Lambda (Google Cloud function for Firestore) . We colocated serverless functions and the databases in the same region (when possible) to minimize the latency.
+
+We excluded the database connection time from the latency measurement, and recorded timestamps just before and after the query. The latency is measured and recorded at the backend (inside serverless function) so it does not include the network latency between the browser and the server. Also the latency is not affected by the cold start time of the serverless function either.
+
+To simulate dynamic real world data, we assigned random view_count values to the top 10 articles. So each time we force the database to return a different set of articles, to prevent them from using their caches. The update operations are not included in calculation of the latency.
+
+Here the latency numbers as of today (Aug, 25)
+
+![Latency Histogram](/img/blog/latency-chart.png "Latency Histogram")
+
+
+Below, I will list the custom configurations that applied for each database:
+
+
+### DynamoDB
+
+Region: US-West-1
+
+The read and write capacity: 50 (the default value was 5).
+
+Index: GSI with partition key section (String) and sort key view_count (Number)
+
+Note: Global tables is not enabled as the client is already in the same region (US-West-1)
+
+Check [the code](https://github.com/upstash/latency-comparison/blob/master/newsapis/dynamoHandler.js).
+
+
+### MongoDB (Atlas)
+
+Region: AWS N. Virginia (us-east-1)
+
+Cluster tier: M5 (General)
+
+Index: Compound index on section and view_count
+
+Note: I wish I could try MongoDB serverless offering but it does not have a Node.js driver. But it should not be a problem as I keep the db connection outside the part that I calculate the latency.
+
+Check [the code](https://github.com/upstash/latency-comparison/blob/master/newsapis/mongoHandler.js).
+
+
+### Firestore
+
+Region: GCP US-Central
+
+Mode: Datastore
+
+Index: Composite index on section(ascending) and view_count(descending)
+
+Check [the code](https://github.com/upstash/latency-comparison/blob/master/newsapis/gcp/index.js).
+
+
+### Cassandra (Datastax Astra)
+
+Region: AWS US-East-1
+
+Plan: Pay as you go
+
+Index: PRIMARY KEY (section, view_count, id)
+
+API: REST API
+
+Check [the code](https://github.com/upstash/latency-comparison/blob/master/newsapis/cassandraHandler.js).
+
+
+### FaunaDB
+
+Plan: Individual ($25 per month)
+
+Index: term=section, value=view_count
+
+API: FQL
+
+Check [the code](https://github.com/upstash/latency-comparison/blob/master/newsapis/faunaHandler.js).
+
+
+### Redis (Upstash)
+
+Region: AWS US-West-1
+
+Plan: Pay as you go.
+
+Index: SortedSet is used.
+
+Note: Single and multi zone databases are tested separately.
+
+Check [the code](https://github.com/upstash/latency-comparison/blob/master/newsapis/redisHandler.js).
+
+
+### Special Notes
+
+
+
+* FaunaDB has better consistency guarantees and global replication by default. Also it does not allow you to choose which region to deploy. These can be reasons behind its relatively lower performance.
+* Firestore has a similar performance with others but with a bigger variance. It may be because there is an overhead of cold connections. I could not find how to keep the connection alive. Let me know if you have ideas on this.
+* Cassandra does not allow updating the primary key fields. Secondary indexes are not recommended if you will update the index much. So I could not update the view_count which can affect its performance positively.
+* Although Upstash single zone looks slightly faster, there is not a big performance difference between single and multi zone setup for Upstash. REST API looks to have a performance very close to native API in higher percentiles.
+
+Note that this is a continuous effort so we will continue to refactor code to improve the quality of the benchmark. When we refactored a product’s code we will reset its histogram. Please check the code and let us know if there are things to improve. You can contact us on [twitter](https://twitter.com/upstash) and [discord](https://discord.com/invite/w9SenAtbme).

@@ -1,0 +1,213 @@
+---
+slug: "redis-strapi"
+title: "Serverless Redis Caching for Strapi"
+authors: "kay"
+tags: [serverless, redis, upstash, strapi]
+image: https://upstash-og-image.vercel.app/Serverless%20Redis%20Caching%20for%20Strapi.png?theme=light&md=1&fontSize=100px&authorName=Kay+Pl%C3%B6%C3%9Fer&authorTitle=Developer+and+Author+%28Guest+Author%29&authorPhoto=https%3A%2F%2Fblog.upstash.com%2Fimg%2Fblog%2Fauthors%2Fkay.jpeg 
+---
+
+
+
+Delivering a project on time usually means you need to leverage as much existing technology as possible. Every decision you make that leads to a custom implementation must consider that you also need to maintain your own solution. This is why open-source tools like Strapi are the way to go for building the REST API for your next project.
+
+Strapi is a state-of-the-art headless CMS. It allows you to define your schema with a graphical interface, so even non-technical people can model data. Your development team can focus on building web and mobile apps and delivering new features without worrying about the backend implementation. After all, a big open-source community maintains Strapi.
+
+<!-- truncate -->
+
+
+## Speeding Up Your Backend
+
+Now, Strapi is relatively quick in delivering responses when using SQLite, but as your data and user base grow, this might not be the best solution to start with. After you hit the market, you might end up with thousands of users distributed all over the globe.
+
+So, you need to scale out your Strapi and, in turn, your database deployments to handle all that load. Wouldn’t it be nice if you could just plug in some kind of cache?
+
+
+## Enter REST Cache
+
+The Strapi [REST Cache](https://strapi-community.github.io/strapi-plugin-rest-cache/) is a collection of Strapi plugins. They help you add LRU caching to your Strapi app, lowering the actual database requests.
+
+Memory, Couchbase, and Redis are supported, and you can even write a custom provider. The exciting part here is the Redis cache provider that allows us to connect to Upstash Redis in minutes!
+
+You can use Upstash Redis in most scenarios you would use Redis. The difference is that you can set up Upstash Redis with a few clicks. It also comes with global replication, so your Strapi instances will get routed to the nearest replica, which is crucial for a fast cache. And it’s serverless, so you only pay for what you use.
+
+So, let’s see how we can get Strapi up and running with Upstash Redis!
+
+
+## Prerequisites
+
+For this tutorial, you need [an Upstash account](https://console.upstash.com/login) and [a Node.js installation](https://nodejs.org/en/). You also need [Yarn](https://yarnpkg.com/getting-started/install), which is the preferred package manager of Strapi.
+
+
+## Creating a Strapi Project
+
+You can head directly to the “Adding the REST Cache” section if you already have an existing Strapi project. The following steps are just to set up data to work with.
+
+The first step is creating a new backend with Strapi. You can do this with the following command:
+
+	`$ npx create-strapi-app@latest strapi-upstash-redis-cache`
+
+After the command finishes, Strapi will open the browser and ask you for admin login details to create a data model and the first content.
+
+
+## Modeling Data with the Content-Type Builder
+
+After you log in, you can model your first data collection with the Strapi Content-Type Builder. Figure 1 shows where you can find the Content-Type Builder in the Strapi admin console.
+
+
+![strapi redis](/img/blog/strapi/s1.png)
+
+
+Click the “Create new collection type” link and create a new type. Name it “Article” and add two simple text fields. One field is for short text called “title,” and one for long text called “content.”
+
+Figure 2 shows what the type should look like before clicking the “Save” button.
+
+![strapi redis](/img/blog/strapi/s2.png)
+
+
+After that, we need an actual instance of that content type.
+
+
+## Creating Content with the Content Manager
+
+You can see the location of the Content Manager in Figure 1. Navigate to it and click the “Create new entry” button at the top right.
+
+In figure 3, you can see the new content entry UI. Don’t forget to click on the “Save” and the “Publish” button; otherwise, you will have a private draft that isn’t accessible via the public API.
+
+
+![strapi redis](/img/blog/strapi/s3.png)
+
+## Setting Permissions for the Content-Type
+
+We have an article type and an actual article, but it isn’t accessible to the public. To change this, we need to update the public role. Figure 4 shows where you can find it in the navigation.
+
+![strapi redis](/img/blog/strapi/s4.png)
+
+Click on the public role and then on the “Article” permissions. Here you need to select “find” and “findOne” and click “Save” this way, anyone opening that API can list all articles and load one article.
+
+When you open the articles resource in the browser, you should see our new article. The default Strapi settings should give you the resource at the following URL:
+
+
+```
+http://localhost:1337/api/articles
+```
+
+
+The response should look something like this:
+
+
+```
+    {
+      "data": [
+        {
+          "id": 2,
+          "attributes": {
+            "title": "My First Article",
+            "content": "This is an article!",
+            "createdAt": "2022-04-06T15:29:48.104Z",
+            "updatedAt": "2022-04-06T15:29:48.949Z",
+            "publishedAt": "2022-04-06T15:29:48.948Z"
+          }
+        }
+      ],
+      "meta": {
+        "pagination": {
+          "page": 1,
+          "pageSize": 25,
+          "pageCount": 1,
+          "total": 1
+        }
+      }
+    }
+```
+
+
+
+## Adding the REST Cache
+
+Finally, the exciting part of adding caching with Upstash Redis!
+
+To do so, you first need to install three packages.
+
+
+```
+    $ yarn add strapi-plugin-redis \
+      strapi-plugin-rest-cache \
+      strapi-provider-rest-cache-redis
+```
+
+
+These three packages will allow Strapi to send data to your Upstash Redis database.
+
+
+## Creating an Upstash Redis Database
+
+To configure the cache correctly, we need an URL to a Redis instance. For this, we have to create an Upstash Redis database. So open [the Upstash Console](https://console.upstash.com/) in your browser and click the “Create database” button.
+
+After the creation process finishes, you can grab the database URL, which should only take seconds. Choose the “Node” tab, and copy the URL from the code example as seen in Figure 5.
+
+![strapi redis](/img/blog/strapi/s5.png)
+
+## Configuring the REST Cache
+
+To configure the REST cache, you need to create a file at `config/plugins.js` with the following content:
+
+
+```
+    module.exports = {
+      redis: {
+        config: {
+          connections: {
+            default: {connection: "REDIS_URL"},
+          },
+        },
+      },
+      "rest-cache": {
+        config: {
+          provider: {name: "redis"},
+          strategy: {
+            contentTypes: [
+              {contentType: "api::article.article", hitpass: false}
+            ],
+            //debug: true,
+          },
+        },
+      },
+    };
+```
+
+
+In the `redis` field, we configure the connection to the Upstash Redis database. The URL from the previous step contains all credentials Strapi needs.
+
+In the rest-cache field, we tell the cache which provider it should use and what content type should be cached. In our case, it’s just the article content type. The `hitpass: false` makes sure the content is always cached, even if some authentication had happened.
+
+If you un-comment the `debug: true`, you will see some debug output. This output makes it easier to see if the cache works.
+
+Strapi uses SQLite as default, which runs in-process on your development computer, so it will be faster than Upstash Redis deployed kilometers away from this system. Things will look quite different in a production environment with a real database server.
+
+
+## Testing the Cache
+
+After we configured everything correctly, we can restart the development server:
+
+
+```
+$ yarn run develop
+```
+
+
+When the server is up and running, we can access it again with this URL:
+
+
+```
+http://localhost:1337/api/articles
+```
+
+
+Our database will serve the first request, and Upstash Redis will do the following.
+
+
+## Conclusion
+
+Speeding up a Strapi deployment only takes a few minutes when we use Upstash Redis. The Upstash Console gives us an URL we can simply paste into the config, and that’s it.
+
+The first Upstash Redis database is even free, so [check it out](https://console.upstash.com/login); no credit card required!
