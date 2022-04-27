@@ -3,8 +3,6 @@ slug: "keepalive-in-serverless"
 title: "Reusing HTTP connections with `keepalive` in Serverless"
 authors: "andreas"
 tags: [serverless, keepalive, latency, vercel, lambda]
-image: https://upstash-og-image.vercel.app/Reusing%20HTTP%20connections%20with%20%60keepalive%60%20in%20Serverless.png?theme=light&md=1&fontSize=100px&authorName=Andreas+Thomas&authorTitle=Software+Engineer+%40Upstash&authorPhoto=https%3A%2F%2Fblog.upstash.com%2Fimg%2Fblog%2Fauthors%2Fandreas.jpeg
-
 ---
 
 

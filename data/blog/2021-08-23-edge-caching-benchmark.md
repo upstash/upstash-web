@@ -3,7 +3,7 @@ slug: edge-caching-benchmark
 title: '5 ms Global Redis Latency with Edge Caching'
 sidebar_label: '5 ms Global Redis Latency with Edge Caching'
 authors: enes
-image: img/blog/cover-edge-caching.jpg
+image: https://blog.upstash.com/img/blog/cover-edge-caching.jpg
 tags: [redis, database, serverless, aws, edge, edge-computing]
 ---
 

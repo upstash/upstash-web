@@ -2,7 +2,7 @@
 slug: global-database
 title: 'Global Database for Serverless and Edge'
 authors: mehmet
-image: img/blog/globaldb/cover-global-database.jpg
+image: https://blog.upstash.com/img/blog/globaldb/cover-global-database.jpg
 tags: [serverless, database, redis, high availability, replication]
 ---
 

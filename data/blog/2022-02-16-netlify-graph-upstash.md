@@ -3,7 +3,6 @@ slug: netlify-graph-upstash
 title: 'Global Cache for Netlify Graph with Upstash Redis'
 authors: noah
 tags: [netlify, graphql, serverless, redis, upstash]
-image: https://upstash-og-image.vercel.app/Global%20Cache%20for%20Netlify%20Graph%20with%20Upstash%20Redis.png?theme=light&md=1&fontSize=100px&authorName=Noah+Fischer&authorTitle=DevRel+%40Upstash&authorPhoto=https%3A%2F%2Favatars.githubusercontent.com%2Fu%2F78238464%3Fv%3D4
 ---
 
 Yesterday, Netlify announced a new feature called [Netlify Graph](https://www.netlify.com/blog/announcing-netlify-graph-a-faster-way-for-teams-to-develop-web-apps-with-apis). 

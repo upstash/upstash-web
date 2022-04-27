@@ -3,7 +3,6 @@ slug: "kafka-url-shortener"
 title: "Serverless Node.js URL Shortener App powered by Upstash Kafka and Materialize"
 authors: "bobby"
 tags: [serverless, kafka, materialize]
-image: https://upstash-og-image.vercel.app/Serverless%20Node.js%20URL%20Shortener%20App%20powered%20by%20Upstash%20Kafka%20and%20Materialize.png?theme=light&md=1&fontSize=100px&authorName=Bobby+Iliev&authorTitle=DevOps+Engineer+%28Guest+Author%29&authorPhoto=https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Fuser%2Fprofile_image%2F191651%2Fa7ce5d4e-1298-48e7-b99e-a9755d786776.jpeg
 ---
 
 

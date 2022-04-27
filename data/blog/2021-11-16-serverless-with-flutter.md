@@ -3,7 +3,7 @@ slug: serverless-with-flutter
 title: 'Fullstack Serverless app with Flutter, Serverless Framework and Upstash(REDIS) - PART 1'
 sidebar_label: 'Serverless with Flutter (Part 1)'
 authors: rosius
-image: img/blog/flutter/code.png
+image: https://blog.upstash.com/img/blog/flutter/code.png
 tags: [serverless, flutter, upstash, redis]
 ---
 

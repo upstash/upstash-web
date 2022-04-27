@@ -2,7 +2,6 @@
 slug: fast_websites_with_Remix_on_Cloudflare_and_Upstash_Redis
 title: 'Blazing Fast Websites with Remix on Cloudflare and Upstash Redis'
 authors: sonke
-image: https://upstash-og-image.vercel.app/Blazing%20Fast%20Websites%20with%20Remix%20on%20Cloudflare%20and%20Upstash%20Redis.png?theme=light&md=1&fontSize=100px&authorName=S%C3%B6nke+Peters&authorTitle=Full+Stack+Web+Developer+%28Guest+Author%29&authorPhoto=https%3A%2F%2Fblog.upstash.com%2Fimg%2Fblog%2Fauthors%2Fsonke.jpg
 tags: [redis, serverless, remix, cloudflare]
 ---
 

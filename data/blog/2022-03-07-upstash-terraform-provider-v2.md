@@ -3,7 +3,6 @@ slug: upstash-terraform-provider-v1
 title: 'Announcing Upstash Terraform Provider with Kafka Support'
 authors: burak
 tags: [terraform, devops, serverless, sre, upstash]
-image: https://upstash-og-image.vercel.app/Announcing%20Upstash%20Terraform%20Provider%20with%20Kafka%20Support.png?theme=light&md=1&fontSize=100px&authorName=Burak+Y%C4%B1lmaz&authorTitle=Jr.+Site+Reliability+Engineer+%40Upstash&authorPhoto=https%3A%2F%2Fblog.upstash.com%2Fimg%2Fblog%2Fauthors%2Fburak.png
 ---
 
 It has been some time since we released our very first version of Upstash Terraform Provider, which helped developers automate their Redis database management.

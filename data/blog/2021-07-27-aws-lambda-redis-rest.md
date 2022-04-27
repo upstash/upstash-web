@@ -3,7 +3,7 @@ slug: aws-lambda-redis-rest
 title: "Stateful AWS Lambda with Redis REST"
 sidebar_label: "Stateful AWS Lambda with Redis REST"
 authors: enes
-image: img/blog/upstash-lambda.png
+image: https://blog.upstash.com/img/blog/upstash-lambda.png
 tags: [redis, database, serverless, aws, aws-lambda, lambda]
 ---
 

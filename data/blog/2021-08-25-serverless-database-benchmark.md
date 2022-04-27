@@ -3,7 +3,7 @@ slug: serverless-database-benchmark
 title: 'Serverless Battleground - DynamoDB vs Firestore vs MongoDB vs Cassandra vs Redis vs FaunaDB'
 sidebar_label: 'Serverless Battleground - DynamoDB vs Firestore vs MongoDB vs Cassandra vs Redis vs FaunaDB'
 authors: enes
-image: img/blog/cover-serverless-battleground.jpg
+image: https://blog.upstash.com/img/blog/cover-serverless-battleground.jpg
 tags: [redis, database, serverless, aws, mongodb, cassandra, datastax, faunadb, firestore, DynamoDB]
 ---
 

@@ -2,7 +2,7 @@
 slug: best-database-for-nextjs
 title: 'Best Databases for Next.js'
 sidebar_label: 'Best Databases for Next.js'
-image: img/blog/nextjsdbs/cover.jpg
+image: https://blog.upstash.com/img/blog/nextjsdbs/cover.jpg
 authors: enes
 tags: [redis, database, serverless, aws, mongodb, planetscale, supabase, faunadb, upstash, DynamoDB]
 ---

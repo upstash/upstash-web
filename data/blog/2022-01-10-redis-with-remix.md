@@ -2,7 +2,7 @@
 slug: redis-with-remix
 title: "Using Upstash Redis with Remix"
 authors: leigh
-image: img/blog/remix.png
+image: https://blog.upstash.com/img/blog/remix.png
 tags: [redis, remix, serverless]
 ---
 

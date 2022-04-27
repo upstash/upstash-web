@@ -3,7 +3,7 @@ slug: svelte-with-serverless-redis
 title: 'Building SvelteKit Applications with Serverless Redis'
 sidebar_label: 'SvelteKit Applications with Serverless Redis'
 authors: geoff
-image: img/blog/svelte/cover.png
+image: https://blog.upstash.com/img/blog/svelte/cover.png
 tags: [serverless, svelte, svelte-kit, netlify, redis]
 ---
 

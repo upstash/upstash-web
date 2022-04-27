@@ -3,7 +3,7 @@ slug: best-database-for-serverless
 title: 'Best Databases for Serverless'
 sidebar_label: 'Best Databases for Serverless'
 authors: enes
-image: img/blog/cover-best-database.jpg
+image: https://blog.upstash.com/img/blog/cover-best-database.jpg
 tags: [redis, database, serverless, aws, mongodb, cassandra, datastax, faunadb, firestore, DynamoDB]
 ---
 

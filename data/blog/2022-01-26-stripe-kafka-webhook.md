@@ -3,7 +3,7 @@ slug: stripe-kafka-webhook
 title: 'Integrate Stripe and Kafka Using Webhook API'
 sidebar_label: 'Integrate Stripe and Kafka Using Webhook API'
 authors: enes
-image: img/blog/stripe/cover.png
+image: https://blog.upstash.com/img/blog/stripe/cover.png
 tags: [serverless, kafka, webhook, stripe]
 ---
 

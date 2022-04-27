@@ -3,7 +3,6 @@ slug: react-native-logs-kafka
 title: 'Send React Native Logs to Serverless Kafka'
 sidebar_label: 'Send React Native Logs to Serverless Kafka'
 authors: omer
-image: https://upstash-og-image.vercel.app/Send%20React%20Native%20Logs%20to%20Serverless%20Kafka.png?theme=light&md=1&fontSize=100px&authorName=Omer+Aytac&authorTitle=Full+Stack+Developer+%28Guest+Author%29&authorPhoto=https%3A%2F%2Fblog.upstash.com%2Fimg%2Fblog%2Fauthors%2Fomer.png
 tags: [serverless, kafka, react-native, mobile, aws-lambda]
 ---
 

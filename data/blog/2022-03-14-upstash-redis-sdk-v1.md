@@ -15,7 +15,6 @@ tags:
     vercel,
     http,
   ]
-image: https://upstash-og-image.vercel.app/Announcing%20Upstash%20Redis%20SDK%20v1.0.0.png?theme=light&md=1&fontSize=100px&authorName=Andreas+Thomas&authorTitle=Software+Engineer&authorPhoto=https%3A%2F%2Fblog.upstash.com%2Fimg%2Fblog%2Fauthors%2Fandreas.jpeg
 ---
 
 Today, we are announcing [`@upstash/redis` v1.0.0](https://github.com/upstash/upstash-redis/releases/tag/v1.0.0).

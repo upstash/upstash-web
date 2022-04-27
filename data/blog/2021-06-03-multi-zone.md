@@ -3,7 +3,7 @@ slug: multi-zone
 title: "More Resilient and More Scalable: Upstash with Multi-Zone Replication"
 sidebar_label: Multi- Zone Replication
 authors: enes
-image: img/blog/multizone-arch.jpg
+image: https://blog.upstash.com/img/blog/multizone-arch.jpg
 tags: [redis, database, serverless, high availability, replication]
 ---
 

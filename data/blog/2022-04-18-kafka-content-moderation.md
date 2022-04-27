@@ -3,7 +3,6 @@ slug: "kafka-content-moderation"
 title: "Serverless Kafka Real World Example: Content Moderation"
 authors: "enes"
 tags: [serverless, kafka, aws-lambda]
-image: https://upstash-og-image.vercel.app/Serverless%20Kafka%20Real%20World%20Example%3A%20Content%20Moderation.png?theme=light&md=1&fontSize=100px&authorName=Enes+Akar&authorTitle=Cofounder+%40Upstash&authorPhoto=https%3A%2F%2Fpbs.twimg.com%2Fprofile_images%2F1323714360204644352%2FzMGxlw6H_400x400.jpg 
 ---
 
 In this post, we will write a very basic example which showcases content moderation for web applications using:

@@ -3,7 +3,7 @@ slug: kafka-web-usescases
 title: 'Kafka Use Cases for Web Developers'
 sidebar_label: 'Kafka Use Cases for Web Developers'
 authors: enes
-image: img/blog/kafkausecases/cover.jpg
+image: https://blog.upstash.com/img/blog/kafkausecases/cover.jpg
 tags: [serverless, kafka, web]
 ---
 

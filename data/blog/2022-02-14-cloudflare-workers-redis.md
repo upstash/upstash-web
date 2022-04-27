@@ -4,7 +4,6 @@ title: 'Cloudflare Workers KV vs Upstash Redis'
 sidebar_label: 'Cloudflare Workers KV vs Upstash Redis'
 authors: enes
 tags: [redis, database, serverless, cloudflare workers]
-image: https://upstash-og-image.vercel.app/Cloudflare%20Workers%20KV%20vs%20Upstash%20Redis.png?theme=light&md=1&fontSize=100px&authorName=Enes+Akar&authorTitle=CEO+%40Upstash&authorPhoto=https%3A%2F%2Fpbs.twimg.com%2Fprofile_images%2F1323714360204644352%2FzMGxlw6H_400x400.jpg
 ---
 
 If you are using Cloudflare Workers, [Upstash Global Redis](https://docs.upstash.com/redis/features/globaldatabase) and [Workers KV](https://www.cloudflare.com/products/workers-kv/) are probably your best options to keep your data. In this post, I will briefly compare them as a data store for your Cloudflare Workers functions.

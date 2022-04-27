@@ -3,7 +3,7 @@ slug: nuxt-redis
 title: 'Getting started with Nuxt 3 and Serverless Redis'
 sidebar_label: 'Nuxt 3 with Serverless Redis'
 authors: krutie
-image: img/blog/nuxt/cover.png
+image: https://blog.upstash.com/img/blog/nuxt/cover.png
 tags: [serverless, nuxt, upstash, redis, nuxtjs]
 ---
 

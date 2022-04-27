@@ -3,7 +3,6 @@ slug: blitzjs-todo-redis
 title: "Building A To-Do List with Blitz.js & Redis"
 authors: vedant
 tags: [redis, blitzjs, upstash, todo]
-image: https://upstash-og-image.vercel.app/Making%20A%20To-Do%20List%20with%20Blitz.js%20&%20Redis.png?theme=light&md=1&fontSize=100px&authorName=Vedant+Atodaria&authorTitle=Frontend+Engineer+%28Guest+Author%29&authorPhoto=https%3A%2F%2Fblog.upstash.com%2Fimg%2Fblog%2Fauthors%2Ffish.jpeg
 ---
 
 Blitz.js is a React framework that was originally forked from Next.js. Today we’ll build a Blitz.js To-Do application that stores tasks in Upstash. Without further ado, let’s get started!

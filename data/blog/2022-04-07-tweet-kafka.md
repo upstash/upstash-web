@@ -3,7 +3,6 @@ slug: tweet-kafka
 title: "Stream Twitter to Serverless Kafka"
 authors: nihan
 tags: [kafka, twitter]
-image: https://upstash-og-image.vercel.app/Stream%20Twitter%20to%20Serverless%20Kafka.png?theme=light&md=1&fontSize=100px&authorName=Nihan+Iman&authorTitle=Software+Developer+%28Guest+Author%29&authorPhoto=https%3A%2F%2Fblog.upstash.com%2Fimg%2Fblog%2Fauthors%2Fnihan2.png 
 ---
 
 Upstash offers serverless Kafka topics. In this blog post, we are going to demonstrate how to publish to and read from a Kafka topic with only a few clicks using Upstash. The complete project code can be found at [here](https://github.com/upstash/kafka-examples/tree/master/tweet-streaming)

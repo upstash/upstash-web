@@ -3,7 +3,7 @@ slug: serverless-react-native
 title: 'Building React Native Apps Backed by AWS Lambda and Serverless Redis'
 sidebar_label: 'React Native with AWS Lambda and Serverless Redis'
 authors: omer
-image: img/blog/reactnative/cover.jpg
+image: https://blog.upstash.com/img/blog/reactnative/cover.jpg
 tags: [serverless, redis, react-native, mobile, aws-lambda]
 ---
 

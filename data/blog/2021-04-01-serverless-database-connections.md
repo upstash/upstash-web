@@ -2,7 +2,7 @@
 slug: serverless-database-connections
 title: 'Challenge of Serverless: Database Connections'
 authors: noah
-image: img/blog/serverless-connections.jpeg
+image: https://blog.upstash.com/img/blog/serverless-connections.jpeg
 tags: [redis, database, serverless, aws lambda]
 ---
 

@@ -3,7 +3,6 @@ slug: vercel-note-taker-slackbot
 title: 'Build a Serverless Slackbot with Vercel and Upstash Redis'
 authors: burak
 tags: [slack, slackbot, slackapp, serverless, upstash, vercel]
-image: https://upstash-og-image.vercel.app/Build%20a%20Serverless%20Slackbot%20with%20Vercel%20and%20Upstash%20Redis.png?theme=light&md=1&fontSize=100px&authorName=Burak+Y%C4%B1lmaz&authorTitle=Site+Reliability+Engineer+%40Upstash&authorPhoto=https%3A%2F%2Fblog.upstash.com%2Fimg%2Fblog%2Fauthors%2Fburak.png
 ---
 
 Slackbots are awesome tools if you use Slack and want to automate some tasks or ease your workflow. However, managing your own server might be a bit of an overhead. That is why, we created this tutorial, enabling for serverless deployment of slackbots.

@@ -3,7 +3,7 @@ slug: serverless-kafka-launch
 title: 'Upstash Launches Serverless Kafka'
 sidebar_label: 'Upstash Launches Serverless Kafka'
 authors: enes
-image: img/blog/kafkalaunch/cover.jpg
+image: https://blog.upstash.com/img/blog/kafkalaunch/cover.jpg
 tags: [serverless, kafka, edge]
 ---
 

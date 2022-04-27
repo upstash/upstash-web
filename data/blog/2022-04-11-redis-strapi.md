@@ -3,7 +3,6 @@ slug: "redis-strapi"
 title: "Serverless Redis Caching for Strapi"
 authors: "kay"
 tags: [serverless, redis, upstash, strapi]
-image: https://upstash-og-image.vercel.app/Serverless%20Redis%20Caching%20for%20Strapi.png?theme=light&md=1&fontSize=100px&authorName=Kay+Pl%C3%B6%C3%9Fer&authorTitle=Developer+and+Author+%28Guest+Author%29&authorPhoto=https%3A%2F%2Fblog.upstash.com%2Fimg%2Fblog%2Fauthors%2Fkay.jpeg 
 ---
 
 

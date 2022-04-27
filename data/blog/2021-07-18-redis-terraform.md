@@ -3,7 +3,7 @@ slug: redis-terraform
 title: "Announcing Upstash Terraform Provider"
 sidebar_label: "Terraform Provider"
 authors: noah
-image: img/blog/terraform.png
+image: https://blog.upstash.com/img/blog/terraform.png
 tags: [redis, database, serverless, terraform]
 ---
 

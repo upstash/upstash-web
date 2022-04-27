@@ -3,7 +3,7 @@ slug: aws-lambda-vs-cloudflare-workers
 title: 'AWS Lambda vs Cloudflare Workers'
 sidebar_label: 'AWS Lambda vs Cloudflare Workers'
 authors: enes
-image: img/blog/cloudflare_workers_vs_awslambda.jpg
+image: https://blog.upstash.com/img/blog/cloudflare_workers_vs_awslambda.jpg
 tags: [serverless, aws-lambda, cloudflare-workers]
 ---
 

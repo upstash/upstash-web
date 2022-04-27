@@ -3,7 +3,7 @@ slug: aws-msk-confluent-serverless
 title: 'AWS MSK and Confluent. Are they really Serverless?'
 sidebar_label: 'AWS MSK and Confluent. Are they really Serverless?'
 authors: enes
-image: img/blog/awsmsk/cover.jpg
+image: https://blog.upstash.com/img/blog/awsmsk/cover.jpg
 tags: [serverless, aws-msk, aws, kafka, confluent]
 ---
 

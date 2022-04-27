@@ -3,7 +3,7 @@ slug: edge-redis-database
 title: 'Upstash as a Serverless Database for Edge'
 sidebar_label: 'Upstash as a Serverless Database for Edge'
 authors: enes
-image: img/blog/cover-edge-database.jpg
+image: https://blog.upstash.com/img/blog/cover-edge-database.jpg
 tags: [serverless, aws-lambda, cloudflare-workers, edge, redis]
 ---
 

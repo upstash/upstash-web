@@ -3,7 +3,7 @@ slug: nextjs-caching-with-redis
 title: Speed up your Next.js application with Redis
 sidebar_label: Speed up your Next.js app with Redis
 authors: noah
-image: img/blog/nextjscaching.png
+image: https://blog.upstash.com/img/blog/nextjscaching.png
 tags: [redis, database, serverless, caching, nextjs]
 ---
 

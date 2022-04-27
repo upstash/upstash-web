@@ -2,7 +2,7 @@
 slug: redis-session-remix
 title: 'Using Upstash Redis as a Session Store for Remix'
 authors: gabriel
-image: img/blog/cover_remix_session.png
+image: https://blog.upstash.com/img/blog/cover_remix_session.png
 tags: [redis, remix, serverless, session]
 ---
 As full  stack web framework [Remix](https://remix.run/) provides APIs to deal with common web server use cases. This post will focus on sessions and why and how you can use Upstash to store them.

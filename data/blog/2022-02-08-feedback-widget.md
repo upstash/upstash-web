@@ -3,7 +3,6 @@ slug: feedback-widget
 title: 'Feedback Widget for Next.js Applications'
 sidebar_label: 'Feedback Widget for Next.js'
 authors: adem
-image: https://upstash-og-image.vercel.app/Feedback%20Widget%20for%20Next.js%20Applications.png?theme=light&md=1&fontSize=100px&authorName=Adem+Ilter&authorTitle=Frontend+Developer+%40Upstash&authorPhoto=https%3A%2F%2Fblog.upstash.com%2Fimg%2Fblog%2Fauthors%2Fadem.jpg
 tags: [redis, database, serverless, nextjs]
 ---
 

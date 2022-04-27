@@ -3,7 +3,7 @@ slug: fastly-compute-edge-with-redis
 title: 'Use Redis in Fastly Compute'
 sidebar_label: 'Use Redis in Fastly Compute'
 authors: enes
-image: img/blog/fastly/cover.png
+image: https://blog.upstash.com/img/blog/fastly/cover.png
 tags: [serverless, fastly, edge, redis]
 ---
 

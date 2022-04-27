@@ -3,7 +3,6 @@ slug: chalice-event-reminder-slackbot
 title: 'Serverless Birthday Slackbot with AWS Chalice and Upstash Redis'
 authors: burak
 tags: [slackbot, serverless, upstash, redis, python]
-image: https://upstash-og-image.vercel.app/Build%20a%20Serverless%20Slackbot%20with%20AWS%20Lambda%20and%20Upstash%20Redis.png?theme=light&md=1&fontSize=100px&authorName=Burak+Y%C4%B1lmaz&authorTitle=Site+Reliability+Engineer+%40Upstash&authorPhoto=https%3A%2F%2Fblog.upstash.com%2Fimg%2Fblog%2Fauthors%2Fburak.png
 ---
 
 Sometimes it is the best to create reminders for your annual events so that you don't forget and miss those special dates.

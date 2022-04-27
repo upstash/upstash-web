@@ -3,7 +3,7 @@ slug: roadmap-application
 title: Roadmap Application with Next.js, Redis and Auth0
 sidebar_label: Roadmap Application with Next.js, Redis and Auth0
 authors: noah
-image: img/blog/roadmap.png
+image: https://blog.upstash.com/img/blog/roadmap.png
 tags: [redis, database, nextjs]
 ---
 

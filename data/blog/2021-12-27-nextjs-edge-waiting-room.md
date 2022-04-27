@@ -3,7 +3,7 @@ slug: nextjs-edge-waiting-room
 title: 'Waiting Room for your Next.js App Using Edge Functions'
 sidebar_label: 'Waiting Room for your Next.js App Using Edge Functions'
 authors: enes
-image: img/blog/nextjs/upstash-next.png
+image: https://blog.upstash.com/img/blog/nextjs/upstash-next.png
 tags: [serverless, nextjs, edge, redis]
 ---
 

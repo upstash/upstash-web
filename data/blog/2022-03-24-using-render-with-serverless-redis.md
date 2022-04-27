@@ -3,7 +3,6 @@ slug: render-serverless-redis
 title: 'Using Render with Serverless Redis'
 authors: vedant
 tags: [redis, render, serverless, upstash]
-image: https://upstash-og-image.vercel.app/Using%20Render%20with%20Serverless%20Redis.png?theme=light&md=1&fontSize=100px&authorName=Vedant+Atodaria&authorTitle=Frontend+Engineer+%28Guest+Author%29&authorPhoto=https%3A%2F%2Fblog.upstash.com%2Fimg%2Fblog%2Fauthors%2Ffish.jpeg
 ---
 
 [Render](https://render.com) is a powerful infrastructure platform that offers instant deploys and autoscaling, among other things. Today we'll be making a simple Next.js application with Upstash and then deploying it on Render.

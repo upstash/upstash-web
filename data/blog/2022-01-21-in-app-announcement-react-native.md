@@ -4,7 +4,6 @@ title: 'In-app Announcements with Serverless Redis and React Native'
 sidebar_label: 'In-app Announcements with Serverless Redis'
 authors: omer
 tags: [serverless, redis, react-native, mobile]
-image: https://upstash-og-image.vercel.app/In-app%20Announcements%20with%20Serverless%20Redis%20and%20React%20Native.png?theme=light&md=1&fontSize=100px&authorName=Omer+Aytac&authorTitle=Full+Stack+Developer+%28Guest+Author%29&authorPhoto=https%3A%2F%2Fblog.upstash.com%2Fimg%2Fblog%2Fauthors%2Fomer.png
 ---
 
 In a mobile application, there may be a need to send some information, warnings or guidance to the end-users in the app. One way to do this is sending in-app announcements to the users. 

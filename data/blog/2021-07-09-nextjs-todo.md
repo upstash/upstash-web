@@ -3,7 +3,7 @@ slug: nextjs-todo
 title: "The Most Minimalist Next.js TODO app"
 sidebar_label: "The Most Minimalist Next.js TODO app"
 authors: enes
-image: img/blog/upstash-nextjs.png
+image: https://blog.upstash.com/img/blog/upstash-nextjs.png
 tags: [redis, database, serverless, nextjs, vercel, vercel functions]
 ---
 

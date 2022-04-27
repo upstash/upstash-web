@@ -2,7 +2,7 @@
 slug: logstash-kafka-upstash
 title: 'Shipping from Logstash to Kafka and analysing with Cloudflare Workers'
 authors: noah
-image: img/blog/log-ship.jpeg
+image: https://blog.upstash.com/img/blog/log-ship.jpeg
 tags: [kafka, logstash, serverless]
 ---
 

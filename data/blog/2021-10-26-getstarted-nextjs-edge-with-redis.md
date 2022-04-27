@@ -3,7 +3,7 @@ slug: getstarted-nextjs-edge-with-redis
 title: 'Getting started with Next.js Edge Functions'
 sidebar_label: 'Getting started with Next.js Edge'
 authors: enes
-image: img/blog/cover-nextjs-edge.png
+image: https://blog.upstash.com/img/blog/cover-nextjs-edge.png
 tags: [serverless, nextjs, vercel, edge, redis]
 ---
 

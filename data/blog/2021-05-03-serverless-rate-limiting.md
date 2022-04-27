@@ -3,7 +3,7 @@ slug: serverless-rate-limiting
 title: Rate Limiting Your Serverless Applications
 sidebar_label: Rate Limiting For Serverless
 authors: noah
-image: img/blog/ratelimit.png
+image: https://blog.upstash.com/img/blog/ratelimit.png
 tags: [redis, database, serverless, lambda, rate-limiting]
 ---
 

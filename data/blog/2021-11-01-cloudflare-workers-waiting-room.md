@@ -3,7 +3,7 @@ slug: cloudflare-workers-waiting-room
 title: 'Build your own Waiting Room for your Web site with Cloudflare Workers and Serverless Redis'
 sidebar_label: 'Waiting Room with Cloudflare Workers and Redis'
 authors: enes
-image: img/blog/waitingroom/cover.jpg
+image: https://blog.upstash.com/img/blog/waitingroom/cover.jpg
 tags: [serverless, cloudflare-workers, cloudflare, edge, redis]
 ---
 

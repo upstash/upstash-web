@@ -4,7 +4,6 @@ title: 'Developer API V2 Released!'
 sidebar_label: 'Developer API V2 Released!'
 authors: ilter
 tags: [api, rest, devops]
-image: https://upstash-og-image.vercel.app/Developer%20API%20V2%20Released!.png?theme=light&md=1&fontSize=100px&authorName=Ilter+Kavlak&authorTitle=Site+Reliability+Engineer+%40Upstash&authorPhoto=https%3A%2F%2Fblog.upstash.com%2Fimg%2Fblog%2Fauthors%2Filter.png
 ---
 
 It has been a while since we have developed the first version of the developer api where we have supported creating and editing Upstash redis databases and Upstash teams. 

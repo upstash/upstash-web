@@ -3,7 +3,6 @@ slug: "sveltekit-todo-redis"
 title: "SvelteKit TODO App with Redis"
 authors: "adem"
 tags: [svelte, sveltekit, todo, serverless, redis, upstash]
-image: https://upstash-og-image.vercel.app/SvelteKit%20TODO%20App%20with%20Redis.png?theme=light&md=1&fontSize=100px&authorName=Adem+Ilter&authorTitle=Frontend+Developer+%40Upstash&authorPhoto=https%3A%2F%2Fblog.upstash.com%2Fimg%2Fblog%2Fauthors%2Fadem.jpg
 ---
 
 In this post, we will write a simple TODO app

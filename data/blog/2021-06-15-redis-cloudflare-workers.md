@@ -3,7 +3,7 @@ slug: redis-cloudflare-workers
 title: "Redis @ Edge with Cloudflare Workers "
 sidebar_label: Redis@Edge with Cloudflare Workers
 authors: enes
-image: img/blog/cloudflare.png
+image: https://blog.upstash.com/img/blog/cloudflare.png
 tags: [redis, database, serverless, cloudflare, edge computing]
 ---
 
