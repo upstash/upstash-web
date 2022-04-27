@@ -1,6 +1,5 @@
 ---
 slug: serverless-database-benchmark
-date: 2021-08-25
 title: 'Serverless Battleground - DynamoDB vs Firestore vs MongoDB vs Cassandra vs Redis vs FaunaDB'
 sidebar_label: 'Serverless Battleground - DynamoDB vs Firestore vs MongoDB vs Cassandra vs Redis vs FaunaDB'
 authors: enes

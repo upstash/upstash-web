@@ -1,6 +1,5 @@
 ---
 slug: serverless-kafka-launch
-date: 2021-11-29
 title: 'Upstash Launches Serverless Kafka'
 sidebar_label: 'Upstash Launches Serverless Kafka'
 authors: enes

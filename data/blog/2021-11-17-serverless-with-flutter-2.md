@@ -1,6 +1,5 @@
 ---
 slug: serverless-with-flutter-2
-date: 2021-11-17
 title: 'Fullstack Serverless app with Flutter, Serverless Framework and Upstash(REDIS) - PART 2'
 sidebar_label: 'Serverless with Flutter (Part 2)'
 authors: rosius

@@ -1,6 +1,5 @@
 ---
 slug: cloudflare-workers-waiting-room
-date: 2021-11-01
 title: 'Build your own Waiting Room for your Web site with Cloudflare Workers and Serverless Redis'
 sidebar_label: 'Waiting Room with Cloudflare Workers and Redis'
 authors: enes

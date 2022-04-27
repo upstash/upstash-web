@@ -1,6 +1,5 @@
 ---
 slug: fastly-compute-edge-with-redis
-date: 2021-12-07
 title: 'Use Redis in Fastly Compute'
 sidebar_label: 'Use Redis in Fastly Compute'
 authors: enes

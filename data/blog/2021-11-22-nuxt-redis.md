@@ -1,6 +1,5 @@
 ---
 slug: nuxt-redis
-date: 2021-11-22
 title: 'Getting started with Nuxt 3 and Serverless Redis'
 sidebar_label: 'Nuxt 3 with Serverless Redis'
 authors: krutie

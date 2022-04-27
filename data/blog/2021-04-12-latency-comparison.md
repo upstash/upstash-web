@@ -1,6 +1,5 @@
 ---
 slug: latency-comparison
-date: 2021-04-12
 title: 'Latency Comparison Among Serverless Databases: DynamoDB vs FaunaDB vs Upstash'
 sidebar_label: Latency Comparison Among Serverless Databases
 authors: noah

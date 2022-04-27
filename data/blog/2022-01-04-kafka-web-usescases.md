@@ -1,6 +1,5 @@
 ---
 slug: kafka-web-usescases
-date: "2020-01-04"
 title: 'Kafka Use Cases for Web Developers'
 sidebar_label: 'Kafka Use Cases for Web Developers'
 authors: enes

@@ -1,6 +1,5 @@
 ---
 slug: serverless-database-connections
-date: 2021-04-01
 title: 'Challenge of Serverless: Database Connections'
 authors: noah
 image: img/blog/serverless-connections.jpeg

@@ -1,6 +1,5 @@
 ---
 slug: aws-msk-confluent-serverless
-date: 2021-12-13
 title: 'AWS MSK and Confluent. Are they really Serverless?'
 sidebar_label: 'AWS MSK and Confluent. Are they really Serverless?'
 authors: enes

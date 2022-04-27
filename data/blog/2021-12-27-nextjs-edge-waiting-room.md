@@ -1,6 +1,5 @@
 ---
 slug: nextjs-edge-waiting-room
-date: 2021-12-27
 title: 'Waiting Room for your Next.js App Using Edge Functions'
 sidebar_label: 'Waiting Room for your Next.js App Using Edge Functions'
 authors: enes

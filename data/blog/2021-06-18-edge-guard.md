@@ -1,6 +1,5 @@
 ---
 slug: edge-guard
-date: 2021-06-18
 title: "Implement IP Allow/Deny List at Edge with Cloudflare Workers and Upstash Redis"
 sidebar_label: IP Allow/Deny List at Edge
 authors:

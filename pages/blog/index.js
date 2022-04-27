@@ -9,10 +9,15 @@ import {
 import Bg from "components/bg";
 import Section from "components/section";
 import PostCard from "components/post-card";
+import { compareDesc } from "date-fns";
 import { allBlogs } from "contentlayer/generated";
 
 export async function getStaticProps() {
-  return { props: { posts: allBlogs } };
+  const posts = allBlogs.sort((a, b) => {
+    return compareDesc(new Date(a.date), new Date(b.date));
+  });
+
+  return { props: { posts } };
 }
 
 export default function CareerPage({ posts }) {

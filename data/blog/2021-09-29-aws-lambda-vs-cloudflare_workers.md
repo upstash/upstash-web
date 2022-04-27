@@ -1,6 +1,5 @@
 ---
 slug: aws-lambda-vs-cloudflare-workers
-date: 2021-09-29
 title: 'AWS Lambda vs Cloudflare Workers'
 sidebar_label: 'AWS Lambda vs Cloudflare Workers'
 authors: enes

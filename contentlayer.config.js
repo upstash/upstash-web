@@ -25,7 +25,6 @@ export const Blog = defineDocumentType(() => ({
   filePathPattern: `blog/*.md`,
   fields: {
     title: { type: "string", required: true },
-    date: { type: "date", required: true },
     authors: { type: "string", required: true },
     tags: { type: "json", required: true },
   },
@@ -34,6 +33,12 @@ export const Blog = defineDocumentType(() => ({
       type: "string",
       resolve: (doc) => {
         return doc._raw.sourceFileName.substring(11).replace(/\.md$/, "");
+      },
+    },
+    date: {
+      type: "date",
+      resolve: (doc) => {
+        return doc._raw.sourceFileName.substring(-1, 10);
       },
     },
     author: {

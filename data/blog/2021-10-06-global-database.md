@@ -1,6 +1,5 @@
 ---
 slug: global-database
-date: 2021-10-06
 title: 'Global Database for Serverless and Edge'
 authors: mehmet
 image: img/blog/globaldb/cover-global-database.jpg

@@ -1,6 +1,5 @@
 ---
 slug: serverless-rate-limiting
-date: 2021-05-03
 title: Rate Limiting Your Serverless Applications
 sidebar_label: Rate Limiting For Serverless
 authors: noah

@@ -1,6 +1,5 @@
 ---
 slug: nextjs-todo
-date: 2021-07-09
 title: "The Most Minimalist Next.js TODO app"
 sidebar_label: "The Most Minimalist Next.js TODO app"
 authors: enes

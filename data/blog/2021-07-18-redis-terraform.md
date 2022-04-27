@@ -1,6 +1,5 @@
 ---
 slug: redis-terraform
-date: 2021-07-18
 title: "Announcing Upstash Terraform Provider"
 sidebar_label: "Terraform Provider"
 authors: noah

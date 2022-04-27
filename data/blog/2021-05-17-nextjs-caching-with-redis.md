@@ -1,6 +1,5 @@
 ---
 slug: nextjs-caching-with-redis
-date: 2021-05-17
 title: Speed up your Next.js application with Redis
 sidebar_label: Speed up your Next.js app with Redis
 authors: noah

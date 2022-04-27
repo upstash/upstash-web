@@ -1,6 +1,5 @@
 ---
 slug: svelte-with-serverless-redis
-date: 2021-11-05
 title: 'Building SvelteKit Applications with Serverless Redis'
 sidebar_label: 'SvelteKit Applications with Serverless Redis'
 authors: geoff

@@ -1,6 +1,5 @@
 ---
 slug: roadmap-application
-date: 2021-04-16
 title: Roadmap Application with Next.js, Redis and Auth0
 sidebar_label: Roadmap Application with Next.js, Redis and Auth0
 authors: noah

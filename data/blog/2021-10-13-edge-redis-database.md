@@ -1,6 +1,5 @@
 ---
 slug: edge-redis-database
-date: 2021-10-13
 title: 'Upstash as a Serverless Database for Edge'
 sidebar_label: 'Upstash as a Serverless Database for Edge'
 authors: enes

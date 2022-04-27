@@ -1,6 +1,5 @@
 ---
 slug: getstarted-nextjs-edge-with-redis
-date: 2021-10-26
 title: 'Getting started with Next.js Edge Functions'
 sidebar_label: 'Getting started with Next.js Edge'
 authors: enes

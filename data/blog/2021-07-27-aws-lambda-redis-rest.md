@@ -1,6 +1,5 @@
 ---
 slug: aws-lambda-redis-rest
-date: 2021-07-27
 title: "Stateful AWS Lambda with Redis REST"
 sidebar_label: "Stateful AWS Lambda with Redis REST"
 authors: enes

@@ -1,6 +1,5 @@
 ---
 slug: edge-caching-benchmark
-date: 2021-08-23
 title: '5 ms Global Redis Latency with Edge Caching'
 sidebar_label: '5 ms Global Redis Latency with Edge Caching'
 authors: enes

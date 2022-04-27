@@ -1,6 +1,5 @@
 ---
 slug: redis-cloudflare-workers
-date: 2021-06-15
 title: "Redis @ Edge with Cloudflare Workers "
 sidebar_label: Redis@Edge with Cloudflare Workers
 authors: enes

@@ -1,6 +1,5 @@
 ---
 slug: best-database-for-serverless
-date: 2021-09-20
 title: 'Best Databases for Serverless'
 sidebar_label: 'Best Databases for Serverless'
 authors: enes

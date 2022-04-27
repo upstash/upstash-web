@@ -1,6 +1,5 @@
 ---
 slug: multi-zone
-date: 2021-06-03
 title: "More Resilient and More Scalable: Upstash with Multi-Zone Replication"
 sidebar_label: Multi- Zone Replication
 authors: enes
