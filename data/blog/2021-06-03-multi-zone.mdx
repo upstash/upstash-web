@@ -1,0 +1,41 @@
+---
+slug: multi-zone
+title: "More Resilient and More Scalable: Upstash with Multi-Zone Replication"
+authors: enes
+image: https://blog.upstash.com/img/blog/multizone-arch.jpg
+tags: [redis, database, serverless, high availability, replication]
+---
+
+We are happy to announce Multi Zone Replication capability. When enabled the data is replicated to multiple availability zones. Multi zone replication provides you high availability and better scalability.
+
+### High Availability
+
+Multi-zone database is more resilient to failures because there are database replicas running in different zones. This means even if an availability zone is unavailable, your applications should not be affected as the requests will be redirected to the healthy zone. The failover time for a single-zone database is several minutes while it is seconds for a multi-zone database.
+
+### Better Scalability
+
+In a multi-zone database, your requests are being distributed among the replicas in a round robin fashion. New replicas are added to the cluster to meet your high throughput needs.
+
+### Architecture
+
+We use the single leader replication model. Each key is owned by a leader replica and other replicas become the backups of the leader. Writes on a key are processed by the leader replica first then propagated to backup replicas. Reads can be performed from any replica or the leader depending on the consistency configuration. This model gives a better write consistency and read scalability.
+
+Each replica employs a failure detector to track liveness of the leader replica. When the leader replica fails for a reason, remaining replicas start a new leader election round and elect a new leader. This is the only unavailability window for the cluster where your requests can be blocked for a short period of time.
+
+![Multi-zone Architecture](/blog/multizone-arch.jpg "Multi-zone Architecture")
+
+### Consistency
+
+We have two consistency modes; Eventual and Strong consistency. With eventually consistent mode; the write request returns after the leader replica processes the operation. Write operation is replicated to backup replicas asynchronously. Read requests can be served by any replica, which gives better horizontal scalability but also means a read request may return a stale value while a write operation for the same key is being propagated to backup replicas.
+
+With strong consistency mode; the response for a write request is returned to the client only after at least one backup replica processes the write operation in addition to the leader replica.
+
+Also strong consistency mode guarantees that a write is synced to the disk before returning the response. Upon receiving the acknowledgement, the client can assume data will be safe even if the leader replica fails. Read requests are served only by the leader replica, which provides stronger consistency but also reduces scalability of the cluster.
+
+### Upgrades
+
+You can enable multi-zone replication for your database in the Upstash Console. Thanks to the replication model, there will be no down time. You can experience a slight degradation in the performance during the migration. Migration will be completed from a few seconds up to several minutes depending on the size of your database.
+
+### Pricing
+
+Due to the increased infrastructure cost, the price of the multi-zone database is higher. It is $0.4 per 100.000 requests and $0.5 per GB.

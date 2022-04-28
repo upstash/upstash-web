@@ -1,0 +1,163 @@
+---
+slug: react-native-logs-kafka
+title: "Send React Native Logs to Serverless Kafka"
+authors: omer
+tags: [serverless, kafka, react-native, mobile, aws-lambda]
+---
+
+Tracking logs and errors in a software product is very essential for reliability and maintainability. Kafka is one of the most powerful solution for collecting/storing logs and activities. Use cases can be seen in this [blog](https://blog.upstash.com/kafka-web-usescases).
+
+In this post, we will use Upstash Kafka to collect errors and logs occurred while users are using the mobile application which is built by React Native. Once the logs are stored in Kafka, there are endless possibilities how to consume them and integrate to log analysis tools.
+
+### **Using Upstash Kafka**
+
+Upstash provides serverless Kafka with HTTP connection. [Here](https://docs.upstash.com/kafka) is the documentation of Upstash Kafka.
+
+The advantages of Upstash Kafka:
+
+- Price scales to zero
+
+- Free tier
+
+- Fully managed
+
+- REST API for connecting Kafka
+
+- Very simple and fast configuration
+
+To use Upstash Kafka, first thing to do is [login](https://console.upstash.com/login) and connect to [console](https://console.upstash.com/kafka) . As the second step, we need a Kafka cluster to use.
+
+![](https://raw.githubusercontent.com/upstash/kafka-examples/master/react-native-collecting-logs/Screenshots/create%20cluster.png)
+
+Name your Kafka cluster, select the region where the cluster will be stored, click the create button, Kafka cluster is ready!
+
+On the second page of the setup, first topic is requested. We can pass this step and create topics later.
+
+![](https://raw.githubusercontent.com/upstash/kafka-examples/master/react-native-collecting-logs/Screenshots/cluster%20created.png)
+
+Inside the cluster, Upstash provides “Topics” and “Credentials” sections to configure our cluster.
+
+We can create our topics under the “Topics” tab. We can configure its settings while creating it as below.
+
+![](https://raw.githubusercontent.com/upstash/kafka-examples/master/react-native-collecting-logs/Screenshots/create%20topic.png)
+
+In this blog, we will work with two different topics. First one is the topic which will contain our error messages. Those error messages will come from mobile app when failures happen. We will name this topic “users.error”. The second topic is “users.purchase”. We will collect the log, which will occur when a user purchases an item from our simple mobile app. To keep our demonstration simple, I created these topics without changing default configurations.
+
+![](https://raw.githubusercontent.com/upstash/kafka-examples/master/react-native-collecting-logs/Screenshots/my%20topics.png)
+
+Lastly, we can create new credentials under “Credentials” tab. Since our users will be the producers of logs and errors, we need to create new credentials for “produce only” purpose and permit their access for only the topics with the prefix “users.”.
+
+![](https://raw.githubusercontent.com/upstash/kafka-examples/master/react-native-collecting-logs/Screenshots/new%20cred.png)
+
+For more detailed information about credentials, please read [docs](https://docs.upstash.com/kafka/credentials).
+
+![](https://raw.githubusercontent.com/upstash/kafka-examples/master/react-native-collecting-logs/Screenshots/my%20creds.png)
+
+### **Building React Native App**
+
+React Native is a framework, which allows developers to create native mobile apps for IOS and Android with JavaScript. Please follow the [steps](https://reactnative.dev/docs/environment-setup) to create React Native environment and start building mobile apps.
+
+This demo app contains only one screen. On this screen, there will be four images of four different items. When a user clicks on one of them, React Native will read its price from Upstash Redis, return to the user, and send the log of this operation to Upstash Kafka. If something unexpected happens, then app will produce the error event and send it to “users.error” topic on Kafka.
+
+All the communication with both Redis and Kafka will be based on HTTP, and we will use REST API’s.
+
+Now, we need to create our Upstash Redis database to store the prices. To do this, please check the [docs](https://docs.upstash.com/redis). I will not go into further details on setting the Redis in this post.
+
+Since we are demonstrating both success and failure cases, we will add three prices for the first three items from CLI. There will be no price for the last one.
+
+The command is: SET "PRODUCT-CODE" "PRICE"
+
+```
+SET 1234 30
+SET 1235 42
+SET 1236 22
+```
+
+You can check the data from “Data Browser” tab.
+
+![](https://raw.githubusercontent.com/upstash/kafka-examples/master/react-native-collecting-logs/Screenshots/data%20browser.png)
+
+The screen can be seen below.
+
+![](https://raw.githubusercontent.com/upstash/kafka-examples/master/react-native-collecting-logs/Screenshots/Screenshot_1648580635.png)
+
+We are going to use [upstash-kafka](https://github.com/upstash/upstash-kafka) library, which is provided by Upstash to communicate with our Kafka cluster via HTTP requests. This is a JavaScript library, and it can be used with React Native.
+
+First, install the [upstash-kafka](https://github.com/upstash/upstash-kafka) library.
+
+```
+npm install @upstash/kafka
+```
+
+Then, we need to configure our Kafka client to use and create producer in “ComponentDidMount” function, which is the first function that is executed when a screen is created.
+
+```javascript
+componentDidMount() {
+	kafka = new Kafka({
+		url: “<UPSTASH_KAFKA_REST_URL>”,
+		username: "<UPSTASH-KAFKA-PRODUCEONLY-USERNAME",
+		password: “UPSTASH-KAFKA-PRODUCEONLY-PASSWORD",
+	});
+	p = kafka.producer();
+}
+```
+
+Now, our Kafka library is configured at the beginning of the application. Since our purpose is to make the mobile app producer, we will just use the following function in our case.
+
+```javascript
+const res = await p.produce("<my.topic>", message);
+```
+
+On this screen, when the user clicks on one of these images, we will send an HTTP request to get the price of it.
+
+```javascript
+async costQuery(code){
+	console.log("CODE OF QUERIED PRODUCT: ", code);
+	await fetch('https://us1-maximum-boar-36431.upstash.io/get/' + code, {
+		headers: {
+		Authorization: "Bearer UPSTASH-REDIS-READONLY-TOKEN"
+		}
+	})
+	.then(response => response.json())
+	.then(async (data) => {
+		var result = data["result"];
+		if(result == null){
+			throw new Error("Price of the " + code + " could not found.")
+		}
+		else{
+			const res = await p.produce("users.purchase", "Cost of " + code + " is retreived successfully.");
+			Alert.alert("The price of the product is " + result);
+		}
+	})
+	.catch(async (err) => {
+		const res = await p.produce("users.error", err.message);
+	});
+}
+```
+
+If the query is successful, then the following code
+
+```javascript
+const res = await p.produce(
+  "users.purchase",
+  "Cost of " + code + " is retreived successfully."
+);
+```
+
+sends the log of the successful operation to Kafka and the alert will be like below.
+
+![](https://raw.githubusercontent.com/upstash/kafka-examples/master/react-native-collecting-logs/Screenshots/Screenshot_1648580670.png)
+
+If the user clicks on the fourth image, which does not have the price, then error occurs, and the error message is sent to Kafka.
+
+```javascript
+const res = await p.produce("users.error", err.message);
+```
+
+Complete source code of the application is available at [react-native-collecting-logs](https://github.com/upstash/kafka-examples/tree/master/react-native-collecting-logs).
+
+### **Conclusion**
+
+In this post, we developed a mobile application by using React Native, collected and sent the logs&errors to Upstash Kafka by using the upstash-kafka [upstash-kafka](https://github.com/upstash/upstash-kafka) library, which uses HTTP requests and used Upstash Redis to store some information related to app.
+
+I hope this post helps you to build new products easily with Upstash Kafka & Redis.

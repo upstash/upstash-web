@@ -53,14 +53,14 @@ After the command finishes, Strapi will open the browser and ask you for admin l
 After you log in, you can model your first data collection with the Strapi Content-Type Builder. Figure 1 shows where you can find the Content-Type Builder in the Strapi admin console.
 
 
-![strapi redis](/img/blog/strapi/s1.png)
+![strapi redis](/blog/strapi/s1.png)
 
 
 Click the “Create new collection type” link and create a new type. Name it “Article” and add two simple text fields. One field is for short text called “title,” and one for long text called “content.”
 
 Figure 2 shows what the type should look like before clicking the “Save” button.
 
-![strapi redis](/img/blog/strapi/s2.png)
+![strapi redis](/blog/strapi/s2.png)
 
 
 After that, we need an actual instance of that content type.
@@ -73,13 +73,13 @@ You can see the location of the Content Manager in Figure 1. Navigate to it and 
 In figure 3, you can see the new content entry UI. Don’t forget to click on the “Save” and the “Publish” button; otherwise, you will have a private draft that isn’t accessible via the public API.
 
 
-![strapi redis](/img/blog/strapi/s3.png)
+![strapi redis](/blog/strapi/s3.png)
 
 ## Setting Permissions for the Content-Type
 
 We have an article type and an actual article, but it isn’t accessible to the public. To change this, we need to update the public role. Figure 4 shows where you can find it in the navigation.
 
-![strapi redis](/img/blog/strapi/s4.png)
+![strapi redis](/blog/strapi/s4.png)
 
 Click on the public role and then on the “Article” permissions. Here you need to select “find” and “findOne” and click “Save” this way, anyone opening that API can list all articles and load one article.
 
@@ -144,7 +144,7 @@ To configure the cache correctly, we need an URL to a Redis instance. For this, 
 
 After the creation process finishes, you can grab the database URL, which should only take seconds. Choose the “Node” tab, and copy the URL from the code example as seen in Figure 5.
 
-![strapi redis](/img/blog/strapi/s5.png)
+![strapi redis](/blog/strapi/s5.png)
 
 ## Configuring the REST Cache
 

@@ -1,0 +1,178 @@
+---
+slug: upstash-redis-sdk-v1
+title: "Announcing Upstash Redis SDK v1.0.0"
+authors: andreas
+tags:
+  [
+    redis,
+    typescript,
+    pipeline,
+    serverless,
+    rest,
+    upstash,
+    cloudflare,
+    fastly,
+    vercel,
+    http,
+  ]
+---
+
+Today, we are announcing [`@upstash/redis` v1.0.0](https://github.com/upstash/upstash-redis/releases/tag/v1.0.0).
+
+`@upstash/redis` is the only connectionless (HTTP based) Redis client that is designed for serverless and compatible with [Cloudflare Workers](https://workers.cloudflare.com/) and [fastly](https://www.fastly.com/).
+
+### What is new in v1.0.0?
+
+Version 1.0.0 is a complete rewrite of the previous library. Among the biggest feature requests we received were pipeline support and improved typesafety.
+Due to the nature of these new features `v1` is not backwards compatible, however the older version will continue to work as the underlying REST API did not change.
+
+Most commands follow the same syntax you are used to from Redis like `redis.setex("key", 2, "value")`. For others, such as `hset` we offer an easier to use API to reduce the amount of (de)serialization you need to do yourself:
+
+```ts
+await redis.hset("123", {
+  id: "123",
+  name: { first: "andreas" },
+});
+```
+
+This will internally be serialized to `hset 123 id 123 name {"first":"andreas"}` and sent to Upstash. Note that objects are serialized automatically and you no longer have to do that yourself.
+
+If you are unsure how a command can be used, typescript will help you if your editor supports intellisense. Also check out the [test](https://github.com/upstash/upstash-redis/tree/main/pkg/commands) that covers everything and can serve as examples.
+
+**Here are the most important changes:**
+
+- Explicit authentication
+- Optimized for different platforms (Node.js, Cloudflare Workers and fastly)
+- Improved type system
+- Errors are thrown
+- Pipeline support
+
+### Explicit authentication
+
+The automatic authentication when only importing specific functions caused issues where the actual behavior differed from the expectation and led to wasted time debugging an issue that could have been prevented. Especially on different platforms that handle environment variables differently. That's why we require you to explicitly authenticate your client.
+
+We understand that for most use cases you would store them in your environment and only require them once for setting up your Redis client. `@upstash/redis` offers a shortcut here: All you need to do is set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` as environment variable and then load them on the deployment platform of your choice. In case they are not properly configured, an error is thrown.
+
+#### Node.js
+
+```ts
+import { Redis } from "@upstash/redis";
+const redis = Redis.fromEnv();
+```
+
+#### Cloudflare Workers
+
+```ts
+import { Redis } from "@upstash/redis/cloudflare";
+const redis = Redis.fromEnv();
+```
+
+### Typescript
+
+The new version supports strict types for every command and makes sure you find mistakes sooner rather than later.
+Types are optionally and by default we infer types where possible.
+
+```ts
+import { Redis } from "@upstash/redis";
+const redis = new Redis({
+  /* auth */
+});
+
+type User = {
+  id: string;
+  email: string;
+};
+
+const user = {
+  id: "abc",
+  email: "andreas@upstash.com",
+};
+
+await redis.set<User>("userKey", user);
+
+const user = await redis.get<User>("userKey");
+// -> user is typed as User
+```
+
+Redis offers many commands with optional arguments and potentially different combinations. Typescript allows you to check for any invalid combinations before executing a single line of code.
+
+```ts
+redis.set("key", "value", {
+  ex: 60, // expire in 60 seconds
+  nx: true, // only create if the key does not yet exist
+});
+```
+
+### Error handling
+
+The previous version more or less returned the raw response from the Upstash HTTP API. That required you to take care of checking if an error exists and then throwing it.
+In javascript you usually expect that an error is thrown when something goes wrong, so we're doing just that.
+
+From now on, commands only return the data and automatically throw if something went wrong.
+
+```ts
+// `v0.2.1`
+const { data, error } = await set("key", "value");
+if (error) {
+  throw new Error(error);
+}
+```
+
+```ts
+// '^v1.0.0'
+const data = await redis.set("key", "value");
+```
+
+### Pipelines
+
+Upstash offers pipelining Redis commands over HTTP to batch requests together and send them in bulk.
+This can reduce your execution time and save you some money, especially when using serverless functions.
+
+:::note
+Execution of the pipeline is not atomic. Even though each command in the pipeline will be executed in order, commands sent by other clients can interleave with the pipeline.
+:::
+
+You can create a new pipeline from your existing `redis` instance.
+
+```ts
+import { Redis } from "@upstash/redis";
+const redis = new Redis({
+  /* auth */
+});
+
+const p = redis.pipeline();
+```
+
+We designed the pipeline API to allow chaining of multiple commands. After you added all commands to your pipeline, you can send the request and receive an array where every element corresponds to a command in the same order.
+
+```ts
+p.set("key", 2);
+
+// or chain directly
+p.incr("key").decrby("key", 2);
+
+const res = await p.exec();
+// res[0] => "OK"   | the result of p.set("key", 2)
+// res[1] => 3      | the result of p.incr("key")
+// res[2] => 1      | the result of p.decrby("key", 2)
+```
+
+### How do I get started?
+
+Head over to [console.upstash.com](https://console.upstash.com/) and create a new database.
+Then follow the instructions in the [quick-start guide](https://github.com/upstash/upstash-redis#quick-start)
+
+If you have previously used an older version, you can check out the [Migrate to v1](https://github.com/upstash/upstash-redis#migrating-to-v1) section on GitHub to get started.
+
+### Future work
+
+Upstash Redis recently received an update to be compatible with `redis v6.2`, that includes new commands and extends others. `@upstash/redis` will support these soon.
+
+As an additional platform, we are planning to support [deno](https://deno.land/) in the near future.
+
+### Closing Words
+
+This is a big change and will require some work from you to update. Please let us know your experience.
+
+We welcome any feedback to improve your experience when working with Upstash products.
+Don't hesitate to reach out on [GitHub](https://github.com/upstash/upstash-redis/issues/new), [Discord](https://discord.com/invite/w9SenAtbme) or [Twitter](https://twitter.com/upstash) for bugs or if you are interested in contributing, want to request a feature or need help.

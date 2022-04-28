@@ -21,7 +21,6 @@ export async function getStaticProps() {
 }
 
 export default function CareerPage({ posts }) {
-  console.log(posts);
   const isEmpty = posts.length === 0;
 
   return (

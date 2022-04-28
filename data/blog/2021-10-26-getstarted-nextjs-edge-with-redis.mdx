@@ -1,0 +1,94 @@
+---
+slug: getstarted-nextjs-edge-with-redis
+title: "Getting started with Next.js Edge Functions"
+authors: enes
+image: https://blog.upstash.com/img/blog/cover-nextjs-edge.png
+tags: [serverless, nextjs, vercel, edge, redis]
+---
+
+## What are Next.js Functions? Why are they important?
+
+Today, the Vercel team announced the Next.js Edge functions. Edge functions allow developers to run their code at the servers distributed globally. This means your code will be executed at the location that is closest to your user. You can think of edge functions as the serverless functions which are run at the CDN infrastructure. Edge functions have the following advantages:
+
+- Global low latency: Because the code is replicated to many global locations (PoP: points of presence), a user anywhere in the world will experience low latency. Each client will fetch the response from the nearest server.
+- No cold start: Edge infrastructure providers use V8 Isolates which eliminates the cold starts. This means much faster startups.
+
+## Getting Started with Next.js Functions
+
+Here we will write a Next.js edge function which will show a custom greeting depending on the location of the client. We will load the greeting message from Upstash Redis.
+
+Check [the repo](https://github.com/upstash/examples/tree/master/nextjs-edge) and [the demo](https://nextjs-edge-enesakar-upstash.vercel.app/api/hello).
+
+** `1` Create a Next.js application and install Upstash Redis: **
+
+```shell
+npx create-next-app@latest --typescript
+cd nextjs-edge
+npm install @upstash/redis
+```
+
+** `2` Create a Redis database: **
+
+Create a Global database for the best edge latency in [Upstash Console](https://console.upstash.com/). Connect to your database with redis-cli and add some greeting data as below:
+
+```shell
+global-promoted-chicken-30286.upstash.io:30286> set GB "Ey up?"
+OK
+global-promoted-chicken-30286.upstash.io:30286> set US "Yo, what’s up?"
+OK
+global-promoted-chicken-30286.upstash.io:30286> set TR "Naber dostum?"
+OK
+global-promoted-chicken-30286.upstash.io:30286> set DE "Was ist los?"
+OK
+global-promoted-chicken-30286.upstash.io:30286> set IN "Namaste"
+OK
+```
+
+** `3` Create the edge function:**
+
+Create pages/api/\_middleware.ts as below:
+
+```typescript
+import type { NextFetchEvent, NextRequest } from "next/server";
+import { Redis } from "@upstash/redis";
+
+export async function middleware(req: NextRequest, ev: NextFetchEvent) {
+  const country = req.geo.country || "US";
+  const redis = new Redis({
+    url: "UPSTASH_REDIS_REST_URL",
+    token: "UPSTASH_REDIS_REST_TOKEN",
+  });
+  const result = await redis.get<string>(country);
+  const greeting = result || "Hello World!";
+  return new Response(greeting);
+}
+```
+
+Copy and replace `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` from your database page in [Upstash Console](https://console.upstash.com/).
+
+** `4` Run and Deploy:**
+
+Run your application locally:
+
+`npm run dev`
+
+Check: [http://localhost:3000/api/hello](http://localhost:3000/api/hello)
+
+You will see that `req.geo` is not defined. Deploy your app to Vercel to see how it is working at the Edge infrastructure:
+
+`vercel deploy`
+
+Check: [https://nextjs-edge-enesakar-upstash.vercel.app/api/hello](https://nextjs-edge-enesakar-upstash.vercel.app/api/hello)
+
+You can check the greeting from different locations using a VPN.
+
+## Conclusion
+
+Next.js Edge is great news for developers who are building globally fast applications. Upstash Redis is a data service which is designed and optimized for edge functions.
+
+Here useful links:
+
+- Next.js Edge functions documentation: [https://vercel.com/docs/concepts/functions/edge-functions](https://vercel.com/docs/concepts/functions/edge-functions)
+- Next.js Edge examples: [https://github.com/vercel/examples/tree/main/edge-functions](https://github.com/vercel/examples/tree/main/edge-functions)
+
+Let us know your thoughts on [Twitter](https://twitter.com/upstash) or [Discord](https://discord.gg/w9SenAtbme).

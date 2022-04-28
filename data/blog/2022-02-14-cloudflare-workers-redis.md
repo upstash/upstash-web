@@ -1,7 +1,6 @@
 ---
 slug: cloudflare-workers-redis
 title: 'Cloudflare Workers KV vs Upstash Redis'
-sidebar_label: 'Cloudflare Workers KV vs Upstash Redis'
 authors: enes
 tags: [redis, database, serverless, cloudflare workers]
 ---

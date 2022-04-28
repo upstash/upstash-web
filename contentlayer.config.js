@@ -26,17 +26,12 @@ export const Blog = defineDocumentType(() => ({
   filePathPattern: `blog/*.mdx`,
   contentType: "mdx",
   fields: {
+    slug: { type: "string", required: true },
     title: { type: "string", required: true },
     authors: { type: "string", required: true },
     tags: { type: "json", required: true },
   },
   computedFields: {
-    slug: {
-      type: "string",
-      resolve: (doc) => {
-        return doc._raw.sourceFileName.substring(11).replace(/\.mdx$/, "");
-      },
-    },
     date: {
       type: "date",
       resolve: (doc) => {

@@ -53,6 +53,7 @@ export default async function handler(req, res) {
 [Code on GitHub](https://github.com/chronark/vercel-keepalive-tests)
 
 I have set up a Next.js app on Vercel and an Upstash Redis database in the same region and tested four different scenarios:
+
 - with keepalive and cached state (Like the example above)
 - with keepalive, but the agent is recreated inside the handler every time
 - without keepalive and cached state

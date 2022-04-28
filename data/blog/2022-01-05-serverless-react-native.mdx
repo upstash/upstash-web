@@ -1,0 +1,300 @@
+---
+slug: serverless-react-native
+title: "Building React Native Apps Backed by AWS Lambda and Serverless Redis"
+authors: omer
+image: https://blog.upstash.com/img/blog/reactnative/cover.jpg
+tags: [serverless, redis, react-native, mobile, aws-lambda]
+---
+
+In this post, we will use React Native, Serverless framework and Upstash to develop a mobile application for viewing and updating a leaderboard.
+
+We will use React Native to develop the mobile application backed by the Serverless framework, which consists of Python functions running on AWS Lambda.
+
+### **1 - Using Upstash Redis**
+
+In a typical leaderboard app, user information and scores belonging to users are needed to be stored. Since all of these data should be sorted by scores, using Redis is one of the best possible solutions.
+
+“Sorted Set”, which is supported by Redis is a sorted data type that enables users to do storing, adding, removing and querying by range operations in a very fast manner.
+
+Sorted set is exactly the thing that is needed for storing, updating and displaying a sorted leaderboard.
+
+#### **1.1 - Getting Started with Upstash**
+
+Upstash provides a serverless database for Redis. For more detailed information about how Redis works, please check [Redis](https://redis.io/documentation) documentation.
+
+Here are some of the advantages that led us to use Upstash Redis in our example:
+
+- Pay as you go pricing system, [Pricing](https://upstash.com/#section-pricing)
+
+- Free tier for storing and operations
+
+- Very easy implementation
+
+- No need for detailed configuration
+
+In our case, the first step is creating an Upstash account [Console](https://console.upstash.com/login). Secondly, create an Upstash database as you wish. Then, it is ready to go!
+
+**![](https://lh4.googleusercontent.com/Td9jwj8UQ87GKFtzvC7OzzAMhNTfx2VSSJSLnIbHfbPgPYop2kJ5j1fpzHiz42tN6_-LNZrgQ1PmYwPFw6nDfx4dUlkJyNI1tosiELug4gycQaBsxKxhMTQSsr5t0sKzZq6RA2O_)**
+
+To get familiar, we can do some operations in CLI, which is provided in the Upstash console.
+
+First, we can start our database by adding a new user with a score to the sorted set, which we set its name as Leaderboard.
+
+```
+ZADD Leaderboard <Score> <User>
+```
+
+Then we can display all user information with its score.
+
+```
+ZRANGE Leaderboard 0 -1 WITHSCORES
+```
+
+**![](https://lh5.googleusercontent.com/ltLwyC-EmQAGahQybD6y1KcIKkWa3hDWXK8gEETW-g_CiB98x2PyWDj1Sg_wBpScSRq-8gwQ4t3f75lF2pNIxT92N37J1cwibpvqV-RS8AaPjiuML1NjTam0H9vJmgxM0zU5CY7T)**
+We can do these operations on AWS Lambda functions with Serverless Framework to connect Redis to the backend of the app.
+
+### **2 - Create Functions with Serverless Framework**
+
+Serverless is a framework which allows us to work with serverless functions of cloud providers such as AWS, Azure, Google Cloud etc. It is a very powerful tool to implement and manage serverless functions from the user side.
+
+Let’s start by installing and configuring Serverless Framework for AWS. Visit and follow the steps [Serverless quick start](https://www.serverless.com/framework/docs/providers/aws/guide/quick-start).
+
+After installation, we have handler.py and serverless.yml.
+
+- serverless.yml
+
+  In this file, we will define the functions that we will implement. In our case, we will only need to add new users and get the leaderboard to display. Therefore, defining “addScore” and “getLeaderboard” functions should be enough.
+
+```
+	functions:
+		addScore:
+			handler: handler.addScore
+			events:
+				- httpApi: 'POST /add'
+		getLeaderboard:
+			handler: handler.getLeaderboard
+			events:
+				- httpApi: 'GET /getLeaderboard'
+```
+
+- handler.py
+
+  In this file, we will implement the functions, which are the codes that will be executed in the backend when a http request is sent by a mobile app as defined in serverless.yml file.
+
+  First, we need to import and configure redis, which is the only dependency we have. To add redis dependency to the serverless framework, we need to add the “Serverless Python Requirements” plugin. Run the command,
+
+  ```
+  serverless plugin install -n serverless-python-requirements
+  ```
+
+  Then ensure that the plugin is added to serverless.yml as below.
+
+  ```
+  plugins:
+  - serverless-python-requirements
+  ```
+
+  For further detail, please visit [serverless-python-requirements](https://www.serverless.com/plugins/serverless-python-requirements).
+
+  As the last step, we need to create the requirements.txt file in the same directory as serverless.yml. Add the redis dependency to the requirements.txt file as below
+
+  ```
+  redis==4.0.2
+  ```
+
+  Now we can configure our Upstash Redis in handler.py.
+
+  ```
+  import json
+  import redis
+
+  r = redis.Redis(
+  host= 'YOUR_REDIS_ENDPOINT',
+  port= 'YOUR_REDIS_PORT',
+  password= 'YOUR_REDIS_PASSWORD',
+  charset="utf-8",
+  decode_responses=True)
+  ```
+
+  After we have finished the Redis configuration, we can prepare our functions that will be called by users.
+
+  We have two functionalities.
+
+  First one is adding new users and scores to the leaderboard. This is a POST request. Users will send their information inside the body of the HTTP request.
+
+  ```
+  {"score": 15,"firstname": "Jack","lastname": "Thang"}
+  ```
+
+  The function can be implemented as below.
+
+  ```
+  def addScore(event, context):
+  info = json.loads(event["body"])
+  leaderboard = "Leaderboard"
+  score = info["score"]
+  player_name = info["firstname"] + "_" + info["lastname"]
+  r.zadd(leaderboard, {player_name: score})
+  body = {
+  "message": "Score added successfully!",
+  }
+  response = {"statusCode": 200, "body": json.dumps(body)}
+  return response
+  ```
+
+  We can parse the score and user information from the event parameter, which is provided by AWS Lambda.
+
+  By using the zadd function of redis, we can add users and score to the sorted set “Leaderboard”. Example:
+
+  ```
+  Request body: {"score": 15,"firstname": "Jack","lastname": "Thang"}
+
+  Response body: {"message": "Score added successfully!"}
+  ```
+
+  Our second function is getLeaderboard. This function accepts GET requests from users and it returns the leaderboard in descending order, which is read from Redis.
+
+  ```
+  def getLeaderboard(event, context):
+  leaderboard = "Leaderboard"
+  score_list = r.zrange(leaderboard, 0, -1, withscores=True, desc=True)
+  body = {
+  "message": "Leaderboard returned successfully!",
+  "leaderboard": score_list
+  }
+  response = {"statusCode": 200, "body": json.dumps(body)}
+  return response
+  ```
+
+  Example:
+
+  ```
+  Response body: {"message": "Leaderboard returned successfully!", "leaderboard": [["Jack_Thang", 15.0], ["Omer_Aytac", 12.0]]}
+  ```
+
+  Finally, we can deploy our functions by running
+
+  ```
+  serverless deploy -v
+  ```
+
+  You will see Service Information while deploying. Save endpoints to somewhere to use them again later.
+
+  endpoints:
+
+  ```
+  POST - https://f571j8y8s1.execute-api.us-east-1.amazonaws.com/add
+
+  GET - https://f571j8y8s1.execute-api.us-east-1.amazonaws.com/getLeaderboard
+  ```
+
+  Now the serverless backend is ready.
+
+### **3 - Developing Mobile App with React Native**
+
+React Native is a framework, which allows us to develop mobile applications for multiple platforms by writing code in Javascript.
+
+To develop mobile applications with React Native, we have to set up our environment and create the project. Please follow the steps to create your first mobile application [environment-setup](https://reactnative.dev/docs/environment-setup).
+
+In our mobile application, there will be two screens. The first one is the screen where users add a new score with user information.
+
+For the sake of simplicity, we will only request first name, last name and score from the user.
+
+Screen which users submit scores looks like below.
+
+**![](https://lh4.googleusercontent.com/FIRqwt5tR6JLjdao-9AYNc9SmHY0jIUNkkqYgpxRr5yRz1eqhm0A9WbCHCoTZs22g00hptix6Vi8MQac6qcUZ02-jK54naCg5CA1BThH5lycQu78n6rSTLWEBa1rnpLtkTS0OpKk)**
+
+In this screen, when a user enters a score, the application will send a HTTP request to our serverless endpoint
+
+```
+https://f571j8y8s1.execute-api.us-east-1.amazonaws.com/add
+```
+
+which we saved while deploying serverless functions. The function used in this example is
+
+```
+async addScore(){
+	if(isNaN(this.state.score)){
+		Alert.alert("Error", "Please enter a valid score.");
+		return;
+	}
+	if(this.state.firstname == "" || this.state.lastname == "" || this.state.score == null){
+		Alert.alert("Error", "Please fill in the blanks.");
+		return;
+	}
+	await fetch('https://f571j8y8s1.execute-api.us-east-1.amazonaws.com/add', {
+		method: 'POST',
+		headers: {
+			Accept: 'application/json',
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({
+			firstname: this.state.firstname,
+			lastname: this.state.lastname,
+			score: parseInt(this.state.score)
+		}),
+	})
+	.then(response => response.json())
+	.then(data => {
+		if(data.message == "Score added successfully!"){
+			Alert.alert("Done!", "Score added successfully!");
+		}
+		else{
+			Alert.alert("Error", "Please try again later.");
+		}
+	})
+	.catch(err => {
+		console.error(err)
+		Alert.alert("Error", "Please try again later.");
+	});
+}
+```
+
+As you can see, the POST request body contains “firstname”, “lastname”, “score” keys and corresponding values that we get from users.
+
+If the response that is sent from the backend contains "Score added successfully!", then this means that the request we sent is received and the score is added successfully.
+
+**![](https://lh5.googleusercontent.com/US4YUueJZIIlP-vXNgh5ZNVm70y1sDS6J9JQWZS3lPmQ07-ZR_oWaRD6YTD0VEDTvJty_1MhoQrA2ShIQZqxNMytvcQgdZoc4LI16H3OFszIdKTVw_TdYRVbew0TgN4wC7LW8O6P)**
+
+Now, we will design a very simple leaderboard screen. The user can be navigated to the leaderboard screen by clicking the “Go to Leaderboard” button.
+
+Leaderboard screen will look like this.
+
+![](https://lh3.googleusercontent.com/a0WyWXaz0DdRRcI0OAoowqclSBG_h4cqvnTeT4kaTRMvkleq0G7vifLbF6qp-QZc4ggw4UKFCT0_2OZnrFmdq5pv72dQM-SVZUQv8cNWjE9x03pv__PQPxw3VVIYc37kCDvqZdon)
+
+Sending an HTTP POST request to the following endpoint is the most important thing on this screen.
+
+```
+https://f571j8y8s1.execute-api.us-east-1.amazonaws.com/getLeaderboard
+```
+
+when the screen opens at the beginning. For this purpose, we can send this request in the componentDidMount function which is invoked immediately after a component is mounted as follows.
+
+```
+async componentDidMount() {
+	await fetch('https://f571j8y8s1.execute-api.us-east-1.amazonaws.com/getLeaderboard',{
+		method: 'GET',
+		headers: {
+			Accept: 'application/json',
+			'Content-Type': 'application/json'
+		}
+	})
+	.then(response => response.json())
+	.then(data => {
+		console.log(data);
+		userlist = data.leaderboard;
+		this.setState({reRender: !this.state.reRender});
+	})
+	.catch(err => console.error(err));
+}
+```
+
+Complete source code of the application is available [upstash-react-native-project](https://github.com/upstash/redis-examples/tree/master/react-native-leaderboard)
+
+### **Conclusion**
+
+In this post, we developed a mobile application for the leaderboard which is backed by Python functions running on AWS Lambda through Serverless Framework. We stored our leaderboard inside Upstash Redis.
+
+There are so many things that can be done with Upstash. Building a leaderboard application using Redis is just one of them.
+
+I hope this post helps you all!

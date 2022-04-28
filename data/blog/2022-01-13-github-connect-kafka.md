@@ -13,7 +13,7 @@ You can send all types of repository events to Kafka. We will use Kafka as a per
 
 <!--truncate-->
 
-![kafka github 1](/img/blog/kafkagithub/g1.png)
+![kafka github 1](/blog/kafkagithub/g1.png)
 
 
 
@@ -82,19 +82,19 @@ Note: Creating a consumer group can take some time, so run the curl command mult
 
 Now we have our webhook ready so we can link our Github repo to it. In your repo page, click on `Settings > Webhooks > Add webhook`. In the form, enter the url of your Vercel function, select the event types that you want to be sent.
 
-![kafka github 2](/img/blog/kafkagithub/g2.png)
+![kafka github 2](/blog/kafkagithub/g2.png)
 
 
 Now, you can test your webhook by pushing a commit to your repo. You can also check the recent deliveries and redeliver an event using the Github dashboard for testing.
 
 
-![kafka github 3](/img/blog/kafkagithub/g3.png)
+![kafka github 3](/blog/kafkagithub/g3.png)
 
 ### Troubleshooting
 
 In case of any issue, check the Vercel function logs (`Vercel > View function logs`)
 
-![kafka github 4](/img/blog/kafkagithub/g4.png)
+![kafka github 4](/blog/kafkagithub/g4.png)
 
 
 ### Conclusion

@@ -17,23 +17,23 @@ and [Serverless Redis](https://upstash.com) (Upstash).
 
 Run the below command:
 
-```sh
+```bash
 npm init svelte@next todo-app-with-redis
 ```
 
-![create-project](/img/blog/sveltekit-todo/create-project.png)
+![create-project](/blog/sveltekit-todo/create-project.png)
 
 The project is ready. Now let's install the dependencies and run:
 
-```sh
+```bash
 npm install
 ```
 
-```sh
+```bash
 npm run dev
 ```
 
-![run-dev](/img/blog/sveltekit-todo/run-dev.png)
+![run-dev](/blog/sveltekit-todo/run-dev.png)
 
 ### The User Interface
 
@@ -125,7 +125,7 @@ Here is our TODO component:
 
 Now you should see:
 
-![static-data](/img/blog/sveltekit-todo/static-data.png)
+![static-data](/blog/sveltekit-todo/static-data.png)
 
 ### Prepare the database
 
@@ -133,7 +133,7 @@ We will keep our data in Upstash Redis.
 So [create an Upstash database](https://console.upstash.com/). We will use HTTP
 based Upstash client which is friendly with Serverless environments. Let's install:
 
-```sh
+```bash
 npm install @upstash/redis
 ```
                                                               
@@ -148,7 +148,7 @@ UPSTASH_REDIS_REST_TOKEN=AXs3ACsjfg684jJBFQgN34je7RFJ58wYjg4NjMt=
                                         
 We need to install **dotenv** to use the environment variables.
 
-```sh
+```bash
 npm install dotenv
 ```
 

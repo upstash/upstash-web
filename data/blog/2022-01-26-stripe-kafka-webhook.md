@@ -1,7 +1,6 @@
 ---
 slug: stripe-kafka-webhook
 title: 'Integrate Stripe and Kafka Using Webhook API'
-sidebar_label: 'Integrate Stripe and Kafka Using Webhook API'
 authors: enes
 image: https://blog.upstash.com/img/blog/stripe/cover.png
 tags: [serverless, kafka, webhook, stripe]
@@ -20,7 +19,7 @@ In this post, we will show how to push Stripe events to Apache Kafka using Upsta
                                                     
 <!-- truncate -->
 
-![stripe kafka](/img/blog/stripe/cover.png)
+![stripe kafka](/blog/stripe/cover.png)
 
 ### Upstash Webhook API
 
@@ -31,7 +30,7 @@ Upstash Kafka has an HTTP based [Webhook API](https://docs.upstash.com/kafka/web
 
 If you don’t already have an Upstash account, you can [sign up here](https://console.upstash.com/login). You’ll see the [Upstash console](https://console.upstash.com/) afterward. Select the Kafka tab at the top. Now, you need a Kafka cluster. Click the **Create Cluster**:
 
-![stripe kafka](/img/blog/stripe/k1.png)
+![stripe kafka](/blog/stripe/k1.png)
 
 
 
@@ -39,29 +38,29 @@ Create a topic in the second page of the form:
 
 
 
-![stripe kafka](/img/blog/stripe/k2.png)
+![stripe kafka](/blog/stripe/k2.png)
 
 
 You will see the Kafka Details page:
 
-![stripe kafka](/img/blog/stripe/k3.png)
+![stripe kafka](/blog/stripe/k3.png)
 
 Scroll down to the Webhook section. You will need the URL in the next step.
 
-![stripe kafka](/img/blog/stripe/k4.png)
+![stripe kafka](/blog/stripe/k4.png)
 
 
 ### Step 2: Stripe Webhook Setup
 
 Sign in to your Stripe account, then click the Stripe[ Webhook](https://dashboard.stripe.com/webhooks/create) page (Developers > Webhooks). Click the `Add an endpoint` button.
 
-![stripe kafka](/img/blog/stripe/k5.png)
+![stripe kafka](/blog/stripe/k5.png)
 
 
 Now, you need to enter the webhook URL copied from Upstash Console. The url should have `topic`, `user` and `pass` parameters. You may want to change the `topic` parameter if you have more than one topic.
 
 
-![stripe kafka](/img/blog/stripe/k6.png)
+![stripe kafka](/blog/stripe/k6.png)
 
 
 You can select which events to be sent. Then click on `Add endpoint` and you are done.

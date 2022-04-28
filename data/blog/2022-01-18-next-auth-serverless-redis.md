@@ -88,7 +88,7 @@ You get the Upstash credentials from [the Upstash console](https://console.upsta
 
 You get the GitHub provider credentials when registering[ a new OAuth Application](https://github.com/settings/applications/new) for your GitHub account. Figure 2 shows the registration form. To run the example on your local machine, you should use [http://localhost:3000](http://localhost:3000) as URLs.
 
-![next auth](/img/blog/nextauth/n2.png)
+![next auth](/blog/nextauth/n2.png)
 
 After registering your app, you are presented with the Client ID and can generate the secret by clicking on the “generate new client secret” button.
 

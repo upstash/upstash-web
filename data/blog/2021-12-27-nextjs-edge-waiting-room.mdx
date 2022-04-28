@@ -1,0 +1,188 @@
+---
+slug: nextjs-edge-waiting-room
+title: "Waiting Room for your Next.js App Using Edge Functions"
+authors: enes
+image: https://blog.upstash.com/img/blog/nextjs/upstash-next.png
+tags: [serverless, nextjs, edge, redis]
+---
+
+In this post, we will create a waiting room for your Next.js application using Vercel Edge functions and Upstash Redis.
+
+You can check [the source code](https://github.com/upstash/redis-examples/tree/master/nextjs-waiting-room) and [the demo app](https://nextjs-waiting-room.vercel.app/api/hello).
+
+### Waiting Room?
+
+The waiting room is useful when you want to limit the number of active visitors to your website so as not to overload your resources.
+
+In our implementation, you will be able to set a maximum number of active visitors. There will two parameters to control the traffic:
+
+- Max website capacity: Max number of visitors in the website at the same time?
+- Max session timeout: Max number of seconds that a visitor can stay idle
+
+### Step 1: Project Setup
+
+**Create a Next.js app:**
+
+```shell
+examples git:(master) ✗ npx create-next-app@latest --typescript
+
+✔ What is your project named? … nextjs-waiting-room
+
+Creating a new Next.js app in /Users/enes/dev/examples/nextjs-waiting-room.
+```
+
+**Install upstash-redis:**
+
+```shell
+npm install @upstash/redis
+```
+
+### Step 2: Implementation
+
+Vercel supports Edge functions via [Next.js middleware](https://nextjs.org/docs/middleware). So we will add \_middleware.ts under `pages/api/`. The middleware code intercepts all requests made to /api. For different configurations see [here](https://vercel.com/docs/concepts/functions/edge-functions#middleware-running-order).
+
+Update `pages/api/_middleware.ts` as below:
+
+```typescript
+import { Redis } from "@upstash/redis";
+import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
+
+const COOKIE_NAME_ID = "__waiting_room_id";
+const COOKIE_NAME_TIME = "__waiting_room_last_update_time";
+const UPSTASH_REDIS_REST_TOKEN = "REPLACE_HERE";
+const UPSTASH_REDIS_REST_URL = "REPLACE_HERE";
+const TOTAL_ACTIVE_USERS = 10;
+const SESSION_DURATION_SECONDS = 30;
+
+const redis = new Redis({
+  url: UPSTASH_REDIS_REST_URL,
+  token: UPSTASH_REDIS_REST_TOKEN,
+});
+
+export async function middleware(req: NextRequest, ev: NextFetchEvent) {
+  const cookies = req.cookies;
+  let userId;
+  if (cookies[COOKIE_NAME_ID] != null) {
+    userId = cookies[COOKIE_NAME_ID];
+  } else {
+    userId = makeid(8);
+  }
+
+  const size = await redis.dbsize();
+  console.log("current capacity:" + size);
+  // there is enough capacity
+  if (size < TOTAL_ACTIVE_USERS) {
+    return getDefaultResponse(req, userId);
+  } else {
+    // site capacity is full
+    const user = await redis.get(userId);
+    if (user === "1") {
+      // the user has already active session
+      return getDefaultResponse(req, userId);
+    } else {
+      // capacity is full so the user is forwarded to waiting room
+      return getWaitingRoomResponse();
+    }
+  }
+}
+
+function makeid(length: number) {
+  let result = "";
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
+
+async function getDefaultResponse(request: NextRequest, userId: string) {
+  // uncomment below to test the function with a static html content
+  let newResponse = new NextResponse(default_html);
+  newResponse.headers.set("content-type", "text/html;charset=UTF-8");
+
+  // const response = await fetch(request)
+  // const newResponse = new Response(response.body, response)
+
+  const cookies = request.cookies;
+  const now = Date.now();
+  let lastUpdate = cookies[COOKIE_NAME_TIME];
+  let lastUpdateTime = 0;
+  if (lastUpdate) lastUpdateTime = parseInt(lastUpdate);
+  const diff = now - lastUpdateTime;
+  const updateInterval = (SESSION_DURATION_SECONDS * 1000) / 2;
+  if (diff > updateInterval) {
+    await redis.setex(userId, SESSION_DURATION_SECONDS, "1");
+    newResponse.cookie(COOKIE_NAME_TIME, now.toString());
+  }
+  newResponse.cookie(COOKIE_NAME_ID, userId);
+  return newResponse;
+}
+
+async function getWaitingRoomResponse() {
+  const newResponse = new NextResponse(waiting_room_html);
+  newResponse.headers.set("content-type", "text/html;charset=UTF-8");
+  return newResponse;
+}
+
+const waiting_room_html = `
+<title>Waiting Room</title>
+<meta http-equiv='refresh' content='30' />
+
+<style>*{box-sizing:border-box;margin:0;padding:0}body{line-height:1.4;font-size:1rem;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;padding:2rem;display:grid;place-items:center;min-height:100vh}.container{width:100%;max-width:800px}p{margin-top:.5rem}</style>
+
+<div class='container'>
+ <h1>
+   <div>You are now in line.</div>
+   <div>Thanks for your patience.</div>
+ </h1>
+ <p>We are experiencing a high volume of traffic. Please sit tight and we will let you in soon. </p>
+ <p><b>This page will automatically refresh, please do not close your browser.</b></p>
+</div>
+`;
+
+const default_html = `
+<title>Waiting Room Demo</title>
+
+<style>*{box-sizing:border-box;margin:0;padding:0}body{line-height:1.4;font-size:1rem;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;padding:2rem;display:grid;place-items:center;min-height:100vh}.container{width:100%;max-width:800px}p{margin-top:.5rem}</style>
+
+<div class="container">
+ <h1>
+   <div>Waiting Room Demo</div>
+ </h1>
+   <p>
+             Visit this site from a different browser, you will be forwarded to the waiting room when the capacity is full.
+   </p>
+ <p>  Check <a href='//github.com/upstash/redis-examples/tree/master/nextjs-waiting-room' style={{"color": "blue"}}>this project </a> to set up a waiting room for your website.</p>
+</div>
+`;
+```
+
+We use Upstash Redis as the state store to keep the active user sessions. Thanks to its REST API, upstash-redis is compatible with Vercel Edge functions.
+
+You need to create a Global database from the [Upstash console](https://console.upstash.com). Copy and paste the REST token and REST URL from the console. The Redis database should be empty and used by only this application.
+
+Also set TOTAL_ACTIVE_USERS and SESSION_DURATION_SECONDS depending on your own requirements.
+
+The application creates a unique id for new visitors and sets it as a cookie and pushes it to Redis. So the next time, the application checks if the visitor has already a session checking Redis. While inserting to Redis, it sets an expiration time as session idle timeout. If the number of sessions exceeds the max-capacity, the new user is forwarded to the waiting room page.
+
+You can update `waiting_room_html` to customize the waiting room page.
+
+You can update the `getDefaultResponse()` method to forward to your own page using the [NextResponse](https://vercel.com/docs/concepts/functions/edge-functions#nextresponse).
+
+### Step 3: Run and Deploy
+
+Run the application locally by `npm run dev`. You may want to set 1 to `TOTAL_ACTIVE_USERS` and open the page (http://localhost:3000/api/hello) in different browsers to easily test the waiting room.
+
+You can deploy your application to Vercel by
+
+`vercel deploy –prod`
+
+Vercel will run the \_middleware.ts in edge locations to minimize the latency globally.
+
+### Conclusion
+
+This tutorial showcases how easy it is to build a dynamic application at edge thanks to Vercel and Upstash. Check our [examples](https://docs.upstash.com/redis/redis/examples) for more examples.
+
+Waiting for your feedback on [Twitter](https://twitter.com/upstash) or [Discord](https://discord.gg/w9SenAtbme).

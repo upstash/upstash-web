@@ -16,23 +16,23 @@ In this post, we will write a simple TODO app using [Remix](https://remix.run/) 
 
 Run the below command:            
 
-```sh
+```bash
 npx create-remix@latest
 ```
 
-![create-remix-project](/img/blog/remixtodo/create-remix-project.png)
+![create-remix-project](/blog/remixtodo/create-remix-project.png)
                       
 The project is ready. Now let's install the dependencies and run:
 
-```sh
+```bash
 npm install
 ```
 
-```sh
+```bash
 npm run dev
 ```
 
-![run-dev](/img/blog/remixtodo/run-dev.png)
+![run-dev](/blog/remixtodo/run-dev.png)
 
 ### The User Interface
 
@@ -292,13 +292,13 @@ export default function App() {
 
 Now you should see:
 
-![img/blog/remixtodo/static-app.png](/img/blog/remixtodo/static-app.png)
+![img/blog/remixtodo/static-app.png](/blog/remixtodo/static-app.png)
 
 ### Prepare the database
 
 We will keep our data in Upstash Redis. So [create an Upstash database](https://console.upstash.com/). We will use HTTP based Upstash client. Let's install:
 
-```sh
+```bash
 npm install @upstash/redis
 ```
 

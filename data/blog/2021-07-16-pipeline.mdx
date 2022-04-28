@@ -1,0 +1,49 @@
+---
+slug: pipeline
+title: "Pipeline REST API on Serverless Redis"
+authors: enes
+image: https://blog.upstash.com/img/blog/pipeline.png
+tags: [redis, database, serverless, pipeline]
+---
+
+Upstash supports the REST API in addition to the native Redis API. REST API helps developers to access their Redis without connection issues from serverless and edge functions. But if you execute multiple Redis commands in the same function then this means you will make a call to the database multiple times. One of our community members (@MasterGates) came with a great suggestion in our Discord channel. Pipeline API:
+
+![pipeline api](/blog/pipeline.png "image_tooltip")
+
+## Pipeline API
+
+Pipeline API is just adaptation of Redis PIPELINE command to the REST API. You send multiple commands in a single http request, the responses are returned in a single request. This improves the performance of your application by reducing the RTT (round trip time) as well as decreasing the socket I/O.
+
+Request syntax:
+
+```shell
+curl -X POST https://us1-merry-cat-32748.upstash.io/pipeline \
+-H "Authorization: Bearer 2553feg6a2d9842h2a0gcdb5f8efe9934" \
+-d '
+   [
+     ["SET", "key1", "valuex"],
+     ["SETEX", "key2", 13, "valuez"],
+     ["INCR", "key1"],
+     ["ZADD", "myset", 11, "item1", 22, "item2"]
+   ]
+   '
+```
+
+Response syntax:
+
+```json
+[
+  { "result": "OK" },
+  { "result": "OK" },
+  { "error": "ERR value is not an integer or out of range" },
+  { "result": 2 }
+]
+```
+
+## Ordering Guarantee and Atomicity
+
+Upstash guarantees the commands in the pipeline are executed in the same order. But the atomicity is not guaranteed. Commands sent by other clients can interleave with the pipeline. Some commands may fail while the remaining are executed with success.
+
+Another limitation of pipeline API is your commands should be independent, so response of a command should not be needed by another command in the pipeline.
+
+Check [our documentation](https://docs.upstash.com/features/restapi) to learn more about Upstash REST API. We continue to develop the API guided by our users so please share your feedback on [twitter](https://twitter.com) or [discord](https://discord.gg/w9SenAtbme).

@@ -1,7 +1,6 @@
 ---
 slug: in-app-announcement-react-native
 title: 'In-app Announcements with Serverless Redis and React Native'
-sidebar_label: 'In-app Announcements with Serverless Redis'
 authors: omer
 tags: [serverless, redis, react-native, mobile]
 ---

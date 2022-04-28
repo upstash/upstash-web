@@ -1,7 +1,6 @@
 ---
 slug: feedback-widget
 title: 'Feedback Widget for Next.js Applications'
-sidebar_label: 'Feedback Widget for Next.js'
 authors: adem
 tags: [redis, database, serverless, nextjs]
 ---
@@ -15,7 +14,7 @@ When you add the component to your Next.js page, an icon will be displayed on bo
 
 See [the Github repo](https://github.com/upstash/feedback) to check out the code. *Currently, the widget is designed to be used in a Next.js application. We welcome your contributions to support others like Nuxt, SvelteKit or Remix*
 
-![feedback widget](/img/blog/feedback/f1.png)
+![feedback widget](/blog/feedback/f1.png)
          
 
 ### Installation
@@ -74,7 +73,7 @@ You need to create a Redis database at [Upstash](https://console.upstash.com) th
 
 Upstash Console has a page under `Integrations` > `Feedback Widget` so you can see and manage the submitted feedback. 
 
-![feedback widget](/img/blog/feedback/f2.png)
+![feedback widget](/blog/feedback/f2.png)
 
 
 ### Configuration

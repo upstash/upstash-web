@@ -1,0 +1,76 @@
+---
+slug: "redis-6"
+title: "Introducing Redis 6 Compatibility"
+authors: "mehmet"
+tags: [serverless, redis, upstash, database]
+---
+
+Since our initial release last year, Upstash was compatible with Redis® API up to version 5. Our Redis offering was lacking
+commands such as `GETDEL`, `LMOVE`, `COPY` and features such as [ACL](https://redis.io/docs/manual/security/acl/)
+which were introduced in Redis 6 (and 6.2).
+
+Happy to announce that Upstash Redis databases are now compatible with Redis commands up to version 6.2.
+
+
+### ACL Feature
+
+With the new release, Upstash provides an always persistent [ACL](https://redis.io/docs/manual/security/acl/) implementation.
+All `ACL` subcommands available in Redis 6.2 are supported by Upstash. Note that `ACL LOAD` and `ACL SAVE` commands are no-op
+since every `ACL` update is persisted & replicated to all replicas immediately before `ACL` command returns the response.
+
+Additionally Upstash provides a new `ACL` subcommand, named `ACL RESTTOKEN` to generate REST API tokens for the
+users created via [`ACL SETUSER`](https://redis.io/commands/acl-setuser/):
+```
+ACL RESTTOKEN <username> <password>
+    Generate a REST token for the specified username & password.
+    Token will have the same permissions with the user.
+```
+
+You can execute `ACL RESTTOKEN` command via `redis-cli` or CLI on the Upstash console::
+
+```shell
+redis-cli> ACL RESTTOKEN default 35fedg8xyu907d84af29222ert
+"AYNgAS2553feg6a2d9842h2a0gcdb5f8efe9934DQ="
+```
+
+
+### New Redis 6 Commands
+
+Following is the list of new commands added with Redis 6 release, you can find the command details
+at the official Redis documentation:
+
+- [ACL](https://redis.io/commands/acl/)
+- [BLMOVE](https://redis.io/commands/blmove/)
+- [COPY](https://redis.io/commands/copy/)
+- [GETDEL](https://redis.io/commands/getdel/)
+- [GETEX](https://redis.io/commands/getex/)
+- [HELLO](https://redis.io/commands/hello/)
+- [HRANDFIELD](https://redis.io/commands/hrandfield/)
+- [LMOVE](https://redis.io/commands/lmove/)
+- [LPOS](https://redis.io/commands/lpos/)
+- [RESET](https://redis.io/commands/reset/)
+- [SMISMEMBER](https://redis.io/commands/smismember/)
+- [ZDIFF](https://redis.io/commands/zdiff/)
+- [ZDIFFSTORE](https://redis.io/commands/zdiffstore/)
+- [ZINTER](https://redis.io/commands/zinter/)
+- [ZMSCORE](https://redis.io/commands/zmscore/)
+- [ZRANDMEMBER](https://redis.io/commands/zrandmember/)
+- [ZRANGESTORE](https://redis.io/commands/zrangestore/)
+- [ZUNION](https://redis.io/commands/zunion/)
+
+### Updated Redis Commands
+
+- [AUTH](https://redis.io/commands/auth/): Auth command now supports ACL `username` parameter.
+- [BLPOP](https://redis.io/commands/blpop/), [BRPOP](https://redis.io/commands/brpop/), [BRPOPLPUSH](https://redis.io/commands/brpoplpush/):
+Timeout parameter is interpreted as a double instead of an integer.
+- [BZPOPMAX](https://redis.io/commands/bzpopmax/), [BZPOPMIN](https://redis.io/commands/bzpopmin/):
+Timeout parameter is interpreted as a double instead of an integer.
+- [LPOP](https://redis.io/commands/lpop/), [RPOP](https://redis.io/commands/rpop/): New `count` parameter added.
+- [SCAN](https://redis.io/commands/scan/): Scan command now supports `TYPE` parameter.
+- [SET](https://redis.io/commands/set/): Set command now supports `KEEPTTL`, `GET`, `EXAT` and `PXAT` options.
+- [ZADD](https://redis.io/commands/zadd/): Zadd command now supprts `GT` and `LT` parameters.
+- [ZRANGE](https://redis.io/commands/zrange/): Zrange command now suppirts `BYSCORE`, `BYLEX`, `REV` and `LIMIT` parameters.
+
+
+We have already started to work on changes coming in Redis 7 release. Stay tuned and follow us at on [Twitter](https://twitter.com/upstash)
+and [Discord](https://discord.gg/w9SenAtbme).

@@ -1,7 +1,6 @@
 ---
 slug: management-api-v2
 title: 'Developer API V2 Released!'
-sidebar_label: 'Developer API V2 Released!'
 authors: ilter
 tags: [api, rest, devops]
 ---

@@ -1,7 +1,6 @@
 ---
 slug: best-database-for-nextjs
 title: 'Best Databases for Next.js'
-sidebar_label: 'Best Databases for Next.js'
 image: https://blog.upstash.com/img/blog/nextjsdbs/cover.jpg
 authors: enes
 tags: [redis, database, serverless, aws, mongodb, planetscale, supabase, faunadb, upstash, DynamoDB]
@@ -51,7 +50,7 @@ I have reviewed PlanetScale, Supabase, Upstash, Fauna, DynamoDB and MongoDB Atla
   * Writes/month: $1.50 per 1m, after first 50m
 * PlanetScale does not have an HTTP/REST based API.
 
-![db](/img/blog/nextjsdbs/n1.png)
+![db](/blog/nextjsdbs/n1.png)
 
 
 #### My Comments:
@@ -89,7 +88,7 @@ I have reviewed PlanetScale, Supabase, Upstash, Fauna, DynamoDB and MongoDB Atla
 
 
 
-![db](/img/blog/nextjsdbs/n2.jpeg)
+![db](/blog/nextjsdbs/n2.jpeg)
 
 
 #### My Comments:
@@ -117,7 +116,7 @@ I have reviewed PlanetScale, Supabase, Upstash, Fauna, DynamoDB and MongoDB Atla
   * Commands: $0.2 per 100K commands
   * Storage: $0.25 per GB
 
-![db](/img/blog/nextjsdbs/n3.png)
+![db](/blog/nextjsdbs/n3.png)
 
 
 #### My Comments:
@@ -149,7 +148,7 @@ I have reviewed PlanetScale, Supabase, Upstash, Fauna, DynamoDB and MongoDB Atla
   * Writes: $2.25/Million units (1KB)
   * Storage: $0.23/GB
 
-![db](/img/blog/nextjsdbs/n4.png)
+![db](/blog/nextjsdbs/n4.png)
 
 #### My Comments:
 
@@ -181,7 +180,7 @@ I have reviewed PlanetScale, Supabase, Upstash, Fauna, DynamoDB and MongoDB Atla
   * Writes: $1.25 per million unit (1KB)
   * Storage: $0.25/GB-month
 
-![db](/img/blog/nextjsdbs/n5.png)
+![db](/blog/nextjsdbs/n5.png)
 
 
 #### My Comments:
@@ -215,7 +214,7 @@ I have reviewed PlanetScale, Supabase, Upstash, Fauna, DynamoDB and MongoDB Atla
   * Storage: $0.25 per GB-month
 
 
-![db](/img/blog/nextjsdbs/n6.png)
+![db](/blog/nextjsdbs/n6.png)
 
 
 #### My Comments:
