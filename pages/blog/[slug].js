@@ -1,8 +1,10 @@
 import Head from "next/head";
 import {
+  Avatar,
   Box,
   Container,
   Divider,
+  Flex,
   Heading,
   HStack,
   SimpleGrid,
@@ -11,7 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { useMDXComponent } from "next-contentlayer/hooks";
 import { allBlogs } from "contentlayer/generated";
-import { compareDesc } from "date-fns";
+import { compareDesc, format, parseISO } from "date-fns";
 import NextLink from "next/link";
 
 export async function getStaticPaths() {
@@ -53,30 +55,47 @@ export default function CareerDetailPage({ post, prevPost, nextPost }) {
         <title>Careers - Upstash</title>
       </Head>
 
-      <Box as="section" py={["100px", "120px"]} textAlign="center">
+      <Box as="section" py={["80px", "100px"]}>
         <Container maxW="3xl">
-          <Heading
-            as="h1"
-            fontWeight="extrabold"
-            size="2xl"
-            lineHeight="normal"
-          >
-            {post.title}
-          </Heading>
+          <Box as="header">
+            <Heading
+              as="h1"
+              fontWeight="bold"
+              size="2xl"
+              lineHeight="shorter"
+              letterSpacings="tight"
+            >
+              {post.title}
+            </Heading>
 
-          <Box display="flex" flexDirection="column" alignItems="center" mt={8}>
-            {post.author.name}
-            <br />
-            {post.author.title}
-            <br />
-            <img
-              width={50}
-              src={post.author.image_url}
-              alt={post.author.name}
-            />
+            <Text
+              mt="16px"
+              color="whiteAlpha.600"
+              as="time"
+              dateTime={post.date}
+              className="block text-sm text-slate-600"
+            >
+              {format(parseISO(post.date), "LLLL d, yyyy")}
+            </Text>
           </Box>
 
-          <Box mt={20} textAlign="left" className="post">
+          <Divider mt="60px" mb="24px" />
+
+          <HStack>
+            <Avatar
+              size="md"
+              name={post.author.name}
+              src={post.author.image_url}
+            />
+            <Box mt="8px">
+              <Text fontWeight="semibold">{post.author.name}</Text>
+              <Text color="whiteAlpha.600">{post.author.title}</Text>
+            </Box>
+          </HStack>
+
+          <Divider mt="24px" mb="60px" />
+
+          <Box className="post" color="whiteAlpha.700">
             <Component />
           </Box>
 
@@ -94,7 +113,7 @@ export default function CareerDetailPage({ post, prevPost, nextPost }) {
             <Box p={6} bg="#333">
               {prevPost && (
                 <NextLink href={`/blog/${prevPost.slug}`}>
-                  <Box textAlign="left">
+                  <Box as="a" textAlign="left">
                     <Text color="whiteAlpha.600">Older Post:</Text>
                     <Text>{prevPost.title}</Text>
                   </Box>
@@ -104,7 +123,7 @@ export default function CareerDetailPage({ post, prevPost, nextPost }) {
             <Box p={6} bg="#333">
               {nextPost && (
                 <NextLink href={`/blog/${nextPost.slug}`}>
-                  <Box textAlign="right">
+                  <Box as="a" textAlign="right">
                     <Text color="whiteAlpha.600">Newer Post:</Text>
                     <Text>{nextPost.title}</Text>
                   </Box>
@@ -155,6 +174,7 @@ export default function CareerDetailPage({ post, prevPost, nextPost }) {
             .post h3,
             .post h4,
             .post h5 {
+              color: white;
               font-weight: bold;
               line-height: 1.4;
             }

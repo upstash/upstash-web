@@ -1,25 +1,43 @@
-import { VStack, HStack, Text, Heading, Tag, Box } from "@chakra-ui/react";
-import Link from "./link";
+import {
+  VStack,
+  Flex,
+  HStack,
+  Text,
+  Heading,
+  Tag,
+  Box,
+  Avatar,
+} from "@chakra-ui/react";
+import NextLink from "next/link";
 import { format, parseISO } from "date-fns";
 
 export default function PostCard({ title, author, date, slug, image }) {
   return (
-    <Box borderRadius={2} bg="whiteAlpha.200" p={6}>
-      <VStack spacing={2} align="stretch" textAlign="left">
-        <Heading as="h3" size="md">
-          <Link href={`/blog/${slug}`}>{title}</Link>
-        </Heading>
+    <Flex
+      direction="column"
+      p={6}
+      h="full"
+      borderRadius="md"
+      bg="whiteAlpha.200"
+      textAlign="left"
+    >
+      <Heading as="h3" size="md">
+        <NextLink href={`/blog/${slug}`}>
+          <a>{title}</a>
+        </NextLink>
+      </Heading>
 
-        <Text color="whiteAlpha.600">{author.name}</Text>
-        <Text color="whiteAlpha.600">{author.title}</Text>
-        <img width={50} src={author.image_url} alt={author.name} />
-
-        <time dateTime={date} className="block text-sm text-slate-600">
-          {format(parseISO(date), "LLLL d, yyyy")}
-        </time>
-
-        {/*<img src={image} alt={title} />*/}
-      </VStack>
-    </Box>
+      <Flex flexGrow={1} align="end" mt="24px">
+        <HStack mt="auto">
+          <Avatar size="md" name={author.name} src={author.image_url} />
+          <Box>
+            <Text color="whiteAlpha.600">{author.name}</Text>
+            <time dateTime={date}>
+              {format(parseISO(date), "LLLL d, yyyy")}
+            </time>
+          </Box>
+        </HStack>
+      </Flex>
+    </Flex>
   );
 }

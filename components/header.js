@@ -6,7 +6,7 @@ import {
   GridItem,
   Box,
   Stack,
-  Link,
+  Link as ChakraLink,
   Flex,
 } from "@chakra-ui/react";
 import CustomLink from "./custom-link";
@@ -14,7 +14,7 @@ import * as Icon from "./icons";
 import Logo from "./logo";
 import { LINKS, SOCIAL_LINKS } from "constants/index.js";
 import { useRouter } from "next/router";
-import NextLink from "./link";
+import Link from "./link";
 
 function Header({ onOpen }) {
   const { pathname } = useRouter();
@@ -58,12 +58,12 @@ function Header({ onOpen }) {
                 </CustomLink>
               )}
 
-              <NextLink href="/about" color="inherit">
+              <Link href="/about" color="inherit">
                 About
-              </NextLink>
+              </Link>
 
-              <NextLink href="/careers" color="inherit">
-                Careers
+              <Link href="/careers" color="inherit">
+                <span>Careers</span>{" "}
                 <Flex
                   alignItems="center"
                   justify="center"
@@ -79,7 +79,7 @@ function Header({ onOpen }) {
                 >
                   3
                 </Flex>
-              </NextLink>
+              </Link>
 
               <CustomLink isExternal href={LINKS.docs} color="inherit">
                 Docs
@@ -98,7 +98,7 @@ function Header({ onOpen }) {
           {/* console */}
           <GridItem d={["none", "flex"]} justifyContent="flex-end">
             <Button
-              as={Link}
+              as={ChakraLink}
               href={LINKS.console}
               _hover={{
                 textDecoration: "none",
