@@ -1,4 +1,10 @@
 export default {
+  lisa: {
+    name: "Lisa Natsumi",
+    title: "Engineer @Upstash",
+    url: "https://twitter.com/enesakar",
+    image_url: "https://blog.upstash.com/img/blog/authors/pp-lisa.jpg",
+  },
   enes: {
     name: "Enes Akar",
     title: "Cofounder @Upstash",

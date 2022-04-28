@@ -1,10 +1,7 @@
 ---
 slug: edge-guard
 title: "Implement IP Allow/Deny List at Edge with Cloudflare Workers and Upstash Redis"
-authors:
-  name: Lisa Natsumi
-  title: Engineer @Upstash
-  image_url: img/blog/authors/pp-lisa.jpg
+authors: lisa
 tags: [redis, database, cloudflare, cloudflare workers, serverless]
 ---
 
@@ -49,7 +46,7 @@ Let's make a small application using Cloudflare workers and explore Upstash Redi
 - Basic [Cloudflare Workers](https://developers.cloudflare.com/workers/get-started/guide) knowledge
 
 :::note
-Select **Global Database** while creating Upstash database. Global database replicates data to multiple regions to lower the latency from the edge functions.  
+Select **Global Database** while creating Upstash database. Global database replicates data to multiple regions to lower the latency from the edge functions.
 :::
 
 Let's Create a Cloudflare worker and intercept the request. When you create a worker it will automatically come with

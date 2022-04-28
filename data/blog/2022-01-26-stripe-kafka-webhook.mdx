@@ -1,23 +1,17 @@
 ---
 slug: stripe-kafka-webhook
-title: 'Integrate Stripe and Kafka Using Webhook API'
+title: "Integrate Stripe and Kafka Using Webhook API"
 authors: enes
 image: https://blog.upstash.com/img/blog/stripe/cover.png
 tags: [serverless, kafka, webhook, stripe]
 ---
 
-
-
 In this post, we will show how to push Stripe events to Apache Kafka using Upstash Webhook API. Once data is in Kafka there are many use cases how you can use it:
 
-
-
-* Processing  payment events (with Apache Flink or Spark) to notify your business and sales team.
-* Trigger processes such as sending Slack messages or email if a payment fails.
-* Using a Kafka connector to move the data to a database or data warehouse to feed reporting and analytics applications.
-* Feeding new payment activity data to your CRM.
-                                                    
-<!-- truncate -->
+- Processing payment events (with Apache Flink or Spark) to notify your business and sales team.
+- Trigger processes such as sending Slack messages or email if a payment fails.
+- Using a Kafka connector to move the data to a database or data warehouse to feed reporting and analytics applications.
+- Feeding new payment activity data to your CRM.
 
 ![stripe kafka](/blog/stripe/cover.png)
 
@@ -25,21 +19,15 @@ In this post, we will show how to push Stripe events to Apache Kafka using Upsta
 
 Upstash Kafka has an HTTP based [Webhook API](https://docs.upstash.com/kafka/webhook) which pushes the incoming requests’ payload to the Kafka. Thanks to the Webhook API, you do not need to write code to move data and you do not need a separate connector setup.
 
-
 ### Step 1: Kafka Setup
 
 If you don’t already have an Upstash account, you can [sign up here](https://console.upstash.com/login). You’ll see the [Upstash console](https://console.upstash.com/) afterward. Select the Kafka tab at the top. Now, you need a Kafka cluster. Click the **Create Cluster**:
 
 ![stripe kafka](/blog/stripe/k1.png)
 
-
-
 Create a topic in the second page of the form:
 
-
-
 ![stripe kafka](/blog/stripe/k2.png)
-
 
 You will see the Kafka Details page:
 
@@ -49,28 +37,23 @@ Scroll down to the Webhook section. You will need the URL in the next step.
 
 ![stripe kafka](/blog/stripe/k4.png)
 
-
 ### Step 2: Stripe Webhook Setup
 
 Sign in to your Stripe account, then click the Stripe[ Webhook](https://dashboard.stripe.com/webhooks/create) page (Developers > Webhooks). Click the `Add an endpoint` button.
 
 ![stripe kafka](/blog/stripe/k5.png)
 
-
 Now, you need to enter the webhook URL copied from Upstash Console. The url should have `topic`, `user` and `pass` parameters. You may want to change the `topic` parameter if you have more than one topic.
-
 
 ![stripe kafka](/blog/stripe/k6.png)
 
-
 You can select which events to be sent. Then click on `Add endpoint` and you are done.
-
 
 ### Step 3: Testing the Webhook
 
 Now we have the pipeline, we can test it. Copy the curl command for Consumer REST API from the Upstash console. Run it on your terminal, it should output an empty message. Then add a new credit card to your Stripe account (or delete one) and run the curl command again. You should see the Stripe event is saved to Kafka topic.
 
-``` shell
+```shell
 curl https://full-mantis-14289-us1-rest-kafka.upstash.io/consume/GROUP_NAME/GROUP_INSTANCE_NAME/stripe-events -u \
   ZnVsbC1tYW50aXMtMTQyODkMiW63hFljqUrrq5_yAq4TPGd9c6JbqfQ==
 [ {
@@ -85,7 +68,6 @@ curl https://full-mantis-14289-us1-rest-kafka.upstash.io/consume/GROUP_NAME/GROU
     "value" : "t=16477,v1=2457820fdebbb77e5fc8563"
   } ]
 ```
-
 
 ### Conclusion
 

@@ -11,8 +11,6 @@ and [Serverless Redis](https://upstash.com) (Upstash).
 
 > SvelteKit is a framework for building web applications of all sizes, with a beautiful development experience and flexible filesystem-based routing.
 
-<!-- truncate -->
-
 ### Create project
 
 Run the below command:
@@ -37,7 +35,8 @@ npm run dev
 
 ### The User Interface
 
-We create a simple form and a list to keep the todo items. It will be empty for now, later we will bind it to the database.                 
+We create a simple form and a list to keep the todo items. It will be empty for now, later we will bind it to the database.
+
 ```tsx
 // src/routes/index.svelte
 
@@ -136,7 +135,7 @@ based Upstash client which is friendly with Serverless environments. Let's insta
 ```bash
 npm install @upstash/redis
 ```
-                                                              
+
 Now let's create our Redis database on [Upstash Console](https://console.upstash.com).
 Copy/paste the `UPSTASH_REDIS_REST_URL`
 and `UPSTASH_REDIS_REST_TOKEN` to the .env file.
@@ -145,7 +144,7 @@ and `UPSTASH_REDIS_REST_TOKEN` to the .env file.
 UPSTASH_REDIS_REST_URL=https://global-renewing-gecko-31543.upstash.io
 UPSTASH_REDIS_REST_TOKEN=AXs3ACsjfg684jJBFQgN34je7RFJ58wYjg4NjMt=
 ```
-                                        
+
 We need to install **dotenv** to use the environment variables.
 
 ```bash
@@ -158,7 +157,7 @@ Now create `lib/redis.ts` and create a new Redis instance as below:
 // src/lib/redis.ts
 
 import "dotenv/config";
-import {Redis} from "@upstash/redis";
+import { Redis } from "@upstash/redis";
 
 export const databaseName =
   process.env.NODE_ENV === "development"
@@ -171,62 +170,61 @@ const redis = new Redis({
 });
 
 export default redis;
-
 ```
 
 ### Create API
 
 In the folder, the `js/ts` files is used as API backend. So `index.svelte` -> frontend, `index.ts` -> backend.
 
-Let's create `index.ts` and add the required API methods. 
+Let's create `index.ts` and add the required API methods.
 
 ```ts
 // src/routes/index.ts
 
-import redis, {databaseName} from '../lib/redis';
-import type {RequestHandler} from '@sveltejs/kit';
+import redis, { databaseName } from "../lib/redis";
+import type { RequestHandler } from "@sveltejs/kit";
 
 const redirect = {
   status: 303,
   headers: {
-    location: '/'
-  }
+    location: "/",
+  },
 };
 
 export const get: RequestHandler = async () => {
   // runs every time the page is loaded
-  return {body: {todos: []}};
+  return { body: { todos: [] } };
 };
 
-export const post: RequestHandler = async ({request}) => {
+export const post: RequestHandler = async ({ request }) => {
   // form: create todo
   return redirect;
 };
 
-export const patch: RequestHandler = async ({request}) => {
+export const patch: RequestHandler = async ({ request }) => {
   // form: update todo
   return redirect;
 };
 
-export const del: RequestHandler = async ({request}) => {
+export const del: RequestHandler = async ({ request }) => {
   // form: delete todo
   return redirect;
 };
 ```
 
 #### `POST` Create Todo
-                                 
+
 Let's implement the TODO item creation:
 
 ```ts
 // src/routes/index.ts
 
-export const post: RequestHandler = async ({request}) => {
+export const post: RequestHandler = async ({ request }) => {
   const form = await request.formData();
   const text = form.get("text");
   const id = Date.now().toString();
 
-  const todo = JSON.stringify({text, status: false});
+  const todo = JSON.stringify({ text, status: false });
 
   await redis.hset(databaseName, id, todo);
   return redirect;
@@ -244,7 +242,7 @@ export const get: RequestHandler = async () => {
   let todos = [];
 
   const data = await redis.hgetall(databaseName);
-  if (!data) return {body: {todos}};
+  if (!data) return { body: { todos } };
 
   // normalize data
   todos = Object.keys(data)
@@ -256,13 +254,11 @@ export const get: RequestHandler = async () => {
     // id = timestamp
     .sort((a, b) => parseInt(b.id) - parseInt(a.id));
 
-  return {body: {todos}};
+  return { body: { todos } };
 };
 ```
-              
+
 > To keep the post simple, I did not add `task deletion` and `taks completion` code here, but you can see them in the github repo.
-
-
 
 Now everything is ready!
 

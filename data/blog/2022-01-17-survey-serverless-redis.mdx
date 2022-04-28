@@ -1,6 +1,6 @@
 ---
 slug: survey-serverless-redis
-title: 'Building a survey app with Upstash Redis and Next.js'
+title: "Building a survey app with Upstash Redis and Next.js"
 authors: sonke
 tags: [redis, serverless]
 ---
@@ -8,19 +8,15 @@ tags: [redis, serverless]
 Nowadays, it is hard to image the IT world without Redis databases. In [Stackoverflow's Developer Survey published in 2021](https://insights.stackoverflow.com/survey/2021#most-loved-dreaded-and-wanted-database-love-dread), the in-memory database enjoyed great popularity and was chosen as the most loved database by over 70000 developers.
 As an in-memory database, Redis delivers strong performance, making it ideal in scenarios that require short response times and minimal latency. However, the use cases of Redis are often wrongly understood as being limited to caching and message-brokering. Today we'll look at why this is wrong and use Redis in the role of a primary database.
 
-
-<!--truncate-->
-
-
 ## The idea
 
 **We want to build a small app that allows users to leave feedback in the form of an online survey.** In this specific case, let's imagine we want to collect feedback for a company.
 To keep it simple, we will focus on the functionality of the app which should be the following:
 
 1. A user can answer three questions.
-    * How do you feel about our products/services? *1 - 10 points*
-    * Would you recommend us to your colleagues? *Yes/No (true/false)*
-    * Please share your thoughts... *Free text*
+   - How do you feel about our products/services? _1 - 10 points_
+   - Would you recommend us to your colleagues? _Yes/No (true/false)_
+   - Please share your thoughts... _Free text_
 2. A user can submit the form.
 3. Each individual survey result is stored as a single record in the database (hash).
 4. A user can take a look at the survey results.
@@ -28,10 +24,12 @@ To keep it simple, we will focus on the functionality of the app which should be
 Here you can check [the demo app](https://upstash-survey-app.vercel.app/).
 
 ## The tech stack
+
 Our small survey app is a perfect example to leverage the full potential of a serverless architecture. Serverless ensures a maximum scalability while keeping cost down to a minimum and can be achieved with the following technologies:
 
 #### Next.js
-[Next.js](https://nextjs.org) is an open-source development framework that enhances traditional React web applications with featurs such as server-side rendering, static page generation and most importantly *API routes*. We are going to be using Next.js to create both the frontend and API of our app.
+
+[Next.js](https://nextjs.org) is an open-source development framework that enhances traditional React web applications with featurs such as server-side rendering, static page generation and most importantly _API routes_. We are going to be using Next.js to create both the frontend and API of our app.
 
 #### Upstash Redis
 
@@ -50,7 +48,9 @@ The project will be a single page application with two API endpoints:
 To communicate with Upstash more easily, let's install the [`@upstash/redis`](https://www.npmjs.com/package/@upstash/redis) npm package via `npm install @upstash/redis`.
 
 ## The code
+
 Create a new file `pages/api/submit.js` as below:
+
 ```javascript
 // pages/api/submit.js
 
@@ -101,6 +101,7 @@ const submitHandler = async (req, res) => {
 
 export default submitHandler;
 ```
+
 We do three things here:
 
 1. Take the survey data from the request body and prepare it for Redis
@@ -109,7 +110,8 @@ We do three things here:
 
 You might be wondering why we're creating a hash for the survey entry and then additionally put it's id into a set. This step will be important as soon as we want to retrieve the event from Redis again. Redis works as a key-value store which means that unlike what we are used to with SQL databases, Redis is not made to find data unless we specify an exact key under which it is stored. A query like `SELECT * FROM SurveyResults;` would be supported in SQL but with Redis we'll have to use another trick. For this we create a [set](https://redis.io/topics/data-types#sets) and add all Redis keys of the survey result entries to it. Once we would like to retrieve all survey entries, we can simply look up their keys in the set.
 But let's get back to coding now and see how this looks in practice.
-_____
+
+---
 
 Create a new file `pages/api/results.js` as below:
 
@@ -155,12 +157,11 @@ const resultsHandler = async (req, res) => {
 };
 
 export default resultsHandler;
-
 ```
 
 Our backend is working now and we can finish our app with a frontend.
 
-___
+---
 
 Create a new file `pages/index.js` as below:
 
@@ -241,43 +242,40 @@ export default function Home() {
     </div>
   );
 }
-
 ```
 
 Now to get the styles working, replace the contents of `styles/Home.styles.css` with the following:
 
 ```css
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
-.container { 
-	display: flex; 
-	flex-direction: column; 
-	align-items: center; 
-	justify-content: center; 
-	
-	min-height: 100vh; 
-} 
-
-.container form > div { 
-	padding: 20px;
-	
-	display: flex; 
-	flex-direction: column; 
-	align-items: stretch; 
-} 
-
-.container form > div > label { 
-	margin-bottom: 10px; 
+  min-height: 100vh;
 }
 
+.container form > div {
+  padding: 20px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.container form > div > label {
+  margin-bottom: 10px;
+}
 ```
 
 Now we are ready to receive survey entries! But wait, there's more. We still need to implement the survey results in the frontend.
-___
 
-Create a new file  `pages/results.js`  as below:
+---
+
+Create a new file `pages/results.js` as below:
 
 ```jsx
-
 import { useEffect, useState } from "react";
 
 import styles from "../styles/Results.module.css";
@@ -310,40 +308,37 @@ export default function Results() {
     </div>
   );
 }
-
-
 ```
 
 and finally create a file `styles/Results.module.css` with the following content:
 
 ```css
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
-.container { 
-	display: flex; 
-	flex-direction: column; 
-	align-items: center; 
-	
-	gap: 20px; 
-	
-	min-height: 100vh; 
-	margin: 50px  0; 
-} 
+  gap: 20px;
 
-.container > div { 
-	background: rgba(0, 0, 0, 0.05); 
-	border-radius: 10px;
-	
-	padding: 15px; 
-	
-	display: flex; 
-	flex-direction: column; 
-	align-items: stretch; 
-	
-	gap: 10px; 
-} 
+  min-height: 100vh;
+  margin: 50px 0;
+}
 
-.container p { 
-	margin: 0; 
+.container > div {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+
+  padding: 15px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+
+  gap: 10px;
+}
+
+.container p {
+  margin: 0;
 }
 ```
 

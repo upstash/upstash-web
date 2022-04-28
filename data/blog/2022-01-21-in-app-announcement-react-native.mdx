@@ -1,15 +1,13 @@
 ---
 slug: in-app-announcement-react-native
-title: 'In-app Announcements with Serverless Redis and React Native'
+title: "In-app Announcements with Serverless Redis and React Native"
 authors: omer
 tags: [serverless, redis, react-native, mobile]
 ---
 
-In a mobile application, there may be a need to send some information, warnings or guidance to the end-users in the app. One way to do this is sending in-app announcements to the users. 
+In a mobile application, there may be a need to send some information, warnings or guidance to the end-users in the app. One way to do this is sending in-app announcements to the users.
 
 In this blog post, we will develop a mobile application to show how to send announcements to the users with serverless Redis. We will use React Native to develop a mobile application and Upstash for a serverless Redis, which is directly connected to the app.
-      
-<!-- truncate -->
 
 ### What is an In-App Announcement?
 
@@ -19,20 +17,16 @@ These announcements help developers to communicate with users without updating a
 
 In our case, we will implement a solution to announce messages that are needed to be read by users just once. This implementation can be used for some purposes such as:
 
--   Announcing the update or a new release
-    
--   Announcing a new feature in the app
-    
--   Celebrating something with users such as reaching 1 million users etc.
+- Announcing the update or a new release
+- Announcing a new feature in the app
+- Celebrating something with users such as reaching 1 million users etc.
 
 ### Serverless Announcements
 
 In our case, we want to show the last announcement to the users only one time. Therefore, a version should be assigned to each announcement to order them, and send the latest announcement to the user if the user has not seen it yet. So, conditions that we will try to satisfy in our case are
 
--   Displaying only the latest announcement
-    
--   Displaying the announcement just once for every user
-    
+- Displaying only the latest announcement
+- Displaying the announcement just once for every user
 
 For this purpose, a sorted set in Redis is exactly the thing that we need. It helps keeping track of the announcements by storing and sorting them by their versions.
 
@@ -44,7 +38,7 @@ Then, we can start filling out our serverless Redis with announcements. Since I 
 
 At first, I need to configure my Upstash Redis in my Python script:
 
-``` python
+```python
 import json
 import redis
 
@@ -62,7 +56,7 @@ Then, I can add my new message to Redis by getting the latest version from my da
 {“new_message”: latest_version + 1}
 ```
 
-``` python
+```python
 message = "Please update the application before using it."
 
 last_message = r.zrange("Announcements", 0, 0, withscores=True, desc=True)
@@ -96,7 +90,7 @@ Since we just need to show how to implement one of the ways of in-app announceme
 
 On the screen, we need to check whether a new message exists or not by sending an HTTP request to Redis by using the read-only token. To do this, we need to store the latest version retrieved from Redis in the past.
 
-We can use [react-native-encrypted-storage](https://www.npmjs.com/package/react-native-encrypted-storage)  as the local storage in React Native.
+We can use [react-native-encrypted-storage](https://www.npmjs.com/package/react-native-encrypted-storage) as the local storage in React Native.
 
 Everytime the user opens this screen, we need to get the latest message which has a version higher than the stored version in the local storage of the mobile phone.
 
@@ -104,40 +98,43 @@ Using ZRANGEBYSCORE from +inf to the version that is stored in local by limiting
 
 The next code segment implements the following steps in React Native:
 
--   Get the stored version of the latest message displayed.
-    
--   Send an HTTP request to Upstash to get the latest announcement, which has a higher version than we get in the previous step.
-    
--   If the new message returns from request, display it and update the version in local storage.
+- Get the stored version of the latest message displayed.
+- Send an HTTP request to Upstash to get the latest announcement, which has a higher version than we get in the previous step.
+- If the new message returns from request, display it and update the version in local storage.
 
-``` javascript
-var version = await EncryptedStorage.getItem('announcement_version');
-if(version == null){
-	version = "-1";
+```javascript
+var version = await EncryptedStorage.getItem("announcement_version");
+if (version == null) {
+  version = "-1";
 }
 version = parseInt(version);
-console.log(version)
-await fetch('REPLACE_UPSTASH_REDIS_REST_URL/zrangebyscore/Announcements/+inf/' + version + "/WITHSCORES/LIMIT/0/1", {
-	method: 'GET',
-	headers: {
-		Authorization: "Bearer REPLACE_UPSTASH_REDIS_REST_READONLY_TOKEN",
-		Accept: 'application/json',
-		'Content-Type': 'application/json'
-	}
-})
-.then(response => response.json())
-.then(data => {
-	var announcement = data["result"];
-	if(announcement && announcement.length > 0){
-		version = parseInt(announcement[1]) + 1;
-		var message = announcement[0];
-		EncryptedStorage.setItem('announcement_version', version.toString());
-		Alert.alert("You have new message!", message);
-	}
-})
-.catch(err => {
-	console.error(err)
-});
+console.log(version);
+await fetch(
+  "REPLACE_UPSTASH_REDIS_REST_URL/zrangebyscore/Announcements/+inf/" +
+    version +
+    "/WITHSCORES/LIMIT/0/1",
+  {
+    method: "GET",
+    headers: {
+      Authorization: "Bearer REPLACE_UPSTASH_REDIS_REST_READONLY_TOKEN",
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  }
+)
+  .then((response) => response.json())
+  .then((data) => {
+    var announcement = data["result"];
+    if (announcement && announcement.length > 0) {
+      version = parseInt(announcement[1]) + 1;
+      var message = announcement[0];
+      EncryptedStorage.setItem("announcement_version", version.toString());
+      Alert.alert("You have new message!", message);
+    }
+  })
+  .catch((err) => {
+    console.error(err);
+  });
 ```
 
 At the end, we can display the latest announcement as an alert and synchronize the local version to the latest version in Redis.
