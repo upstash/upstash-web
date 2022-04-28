@@ -3,6 +3,7 @@ import {
   Box,
   Container,
   Heading,
+  SimpleGrid,
   StackDivider,
   VStack,
 } from "@chakra-ui/react";
@@ -21,8 +22,6 @@ export async function getStaticProps() {
 }
 
 export default function CareerPage({ posts }) {
-  const isEmpty = posts.length === 0;
-
   return (
     <>
       <Head>
@@ -37,17 +36,13 @@ export default function CareerPage({ posts }) {
         </Container>
       </Box>
 
-      {!isEmpty && (
-        <Section id="list" py={["100px", "120px"]}>
-          <Bg />
-
-          <Container maxW="2xl">
-            {posts.map((post) => {
-              return <PostCard key={post.slug} {...post} />;
-            })}
-          </Container>
-        </Section>
-      )}
+      <Container maxW="5xl">
+        <SimpleGrid columns={2} spacing={10}>
+          {posts.map((post) => {
+            return <PostCard key={post.slug} {...post} />;
+          })}
+        </SimpleGrid>
+      </Container>
     </>
   );
 }
