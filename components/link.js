@@ -6,7 +6,7 @@ function Link({ href, isExternal = false, children, ...props }) {
     <NextLink href={href} passHref>
       <ChakraLink
         isExternal={isExternal}
-        d="inline-flex"
+        display="inline-flex"
         alignItems="center"
         color="primary"
         _hover={{
