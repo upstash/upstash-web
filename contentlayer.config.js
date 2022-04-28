@@ -30,6 +30,7 @@ export const Blog = defineDocumentType(() => ({
     title: { type: "string", required: true },
     authors: { type: "string", required: true },
     tags: { type: "json", required: true },
+    image: { type: "string" },
   },
   computedFields: {
     date: {
@@ -44,28 +45,28 @@ export const Blog = defineDocumentType(() => ({
         return authors[doc.authors];
       },
     },
-    image: {
-      type: "string",
-      resolve: (doc) => {
-        const author = authors[doc.authors];
-        return encodeURI(
-          [
-            "https://upstash-og-image.vercel.app/",
-            doc.title,
-            ".png",
-            "?theme=light",
-            "&md=1",
-            "&fontSize=100px",
-            "&authorName=",
-            author.name,
-            "&authorTitle=",
-            author.title,
-            "&authorPhoto=",
-            author.image_url,
-          ].join("")
-        );
-      },
-    },
+    // customImage: {
+    //   type: "string",
+    //   resolve: (doc) => {
+    //     const author = authors[doc.authors];
+    //     return encodeURI(
+    //       [
+    //         "https://upstash-og-image.vercel.app/",
+    //         doc.title,
+    //         ".png",
+    //         "?theme=light",
+    //         "&md=1",
+    //         "&fontSize=100px",
+    //         "&authorName=",
+    //         author.name,
+    //         "&authorTitle=",
+    //         author.title,
+    //         "&authorPhoto=",
+    //         author.image_url,
+    //       ].join("")
+    //     );
+    //   },
+    // },
   },
 }));
 

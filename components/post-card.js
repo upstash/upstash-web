@@ -27,14 +27,14 @@ export default function PostCard({ title, author, date, slug, image }) {
         </NextLink>
       </Heading>
 
-      <Flex flexGrow={1} align="end" mt="24px">
+      <Flex flexGrow={1} align="end" mt="32px">
         <HStack mt="auto">
           <Avatar size="md" name={author.name} src={author.image_url} />
           <Box>
-            <Text color="whiteAlpha.600">{author.name}</Text>
-            <time dateTime={date}>
+            <Text>{author.name}</Text>
+            <Text as="time" dateTime={date} color="whiteAlpha.600">
               {format(parseISO(date), "LLLL d, yyyy")}
-            </time>
+            </Text>
           </Box>
         </HStack>
       </Flex>
