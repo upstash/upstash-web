@@ -17,28 +17,35 @@ import { compareDesc } from "date-fns";
 import { allBlogs } from "contentlayer/generated";
 
 export async function getStaticProps() {
-  const posts = allBlogs.sort((a, b) => {
-    return compareDesc(new Date(a.date), new Date(b.date));
-  });
+  const posts = allBlogs
+    .filter((p) => p.categories)
+    .sort((a, b) => {
+      return compareDesc(new Date(a.date), new Date(b.date));
+    });
   // .slice(0, 10);
 
   return { props: { posts } };
 }
 
 export default function CareerPage({ posts }) {
-  const contByTags = countBy(flatten(posts.map((post) => post.tags)));
-  const sortedTags = Object.entries(contByTags).sort((a, b) => b[1] - a[1]);
+  const { undefined, ...categories } = countBy(
+    flatten(posts.map((post) => post.categories))
+  );
+  const sortedCategories = Object.entries(categories).sort(
+    (a, b) => b[1] - a[1]
+  );
 
   const colors = [
-    "purple",
     "red",
+    "cyan",
+    "purple",
     "orange",
-    "yellow",
     "green",
     "teal",
-    "blue",
-    "cyan",
+    "gray",
     "pink",
+    "blue",
+    "yellow",
   ];
 
   return (
@@ -58,8 +65,8 @@ export default function CareerPage({ posts }) {
             </Box>
           </Box>
 
-          <Wrap justify="center" spacing={2} mt="24px">
-            {sortedTags.slice(0, 8).map(([key, count], index) => {
+          <Wrap justify="center" spacing="8px" mt="24px" maxW="2xl" mx="auto">
+            {sortedCategories.slice(0, 10).map(([key, count], index) => {
               return (
                 <Tag
                   as={Button}
@@ -67,7 +74,6 @@ export default function CareerPage({ posts }) {
                   size="lg"
                   variant="subtle"
                   colorScheme={`${colors[index]}`}
-                  textTransform="capitalize"
                 >
                   {key}
                 </Tag>

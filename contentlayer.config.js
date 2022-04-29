@@ -30,6 +30,7 @@ export const Blog = defineDocumentType(() => ({
     title: { type: "string", required: true },
     authors: { type: "string", required: true },
     tags: { type: "json", required: true },
+    categories: { type: "json" },
     image: { type: "string" },
   },
   computedFields: {
