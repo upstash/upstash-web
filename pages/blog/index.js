@@ -1,48 +1,45 @@
-import { useDeferredValue, useEffect, useState } from "react";
 import Head from "next/head";
 import {
   Box,
   Button,
   Container,
-  Flex,
   Heading,
-  Input,
-  InputGroup,
-  InputLeftElement,
-  Menu,
-  MenuButton,
-  MenuDivider,
-  MenuItemOption,
-  MenuList,
-  MenuOptionGroup,
   SimpleGrid,
+  Tag,
   Text,
-  VStack,
+  Wrap,
 } from "@chakra-ui/react";
+import PostCard from "components/post-card";
 import Bg from "components/bg";
 import Section from "components/section";
-import PostCard from "components/post-card";
-import SvgSearch from "components/icons/Search";
+import { flatten, countBy } from "lodash";
 import { compareDesc } from "date-fns";
 import { allBlogs } from "contentlayer/generated";
 
 export async function getStaticProps() {
-  const posts = allBlogs
-    .sort((a, b) => {
-      return compareDesc(new Date(a.date), new Date(b.date));
-    })
-    .slice(0, 10);
+  const posts = allBlogs.sort((a, b) => {
+    return compareDesc(new Date(a.date), new Date(b.date));
+  });
+  // .slice(0, 10);
 
   return { props: { posts } };
 }
 
 export default function CareerPage({ posts }) {
-  const [search, setSearch] = useState("");
-  const deferredSearch = useDeferredValue(search, { timeoutMs: 2000 });
+  const contByTags = countBy(flatten(posts.map((post) => post.tags)));
+  const sortedTags = Object.entries(contByTags).sort((a, b) => b[1] - a[1]);
 
-  useEffect(() => {
-    console.log(deferredSearch);
-  }, [deferredSearch]);
+  const colors = [
+    "purple",
+    "red",
+    "orange",
+    "yellow",
+    "green",
+    "teal",
+    "blue",
+    "cyan",
+    "pink",
+  ];
 
   return (
     <>
@@ -50,60 +47,41 @@ export default function CareerPage({ posts }) {
         <title>Blog - Upstash</title>
       </Head>
 
-      <Box as="section" py={["80px", "100px"]} textAlign="center">
-        <Container maxW="3xl">
-          <Heading as="h1" fontWeight="extrabold" size="3xl">
-            Blog
-          </Heading>
-
-          <Box mt="24px" fontSize={["md", "2xl"]} color="whiteAlpha.700">
-            <Text>Blog posts from the Upstash team and community.</Text>
-            <Text>Discover the latest in web development.</Text>
+      <Box as="section" py={["60px", "80px"]} textAlign="center">
+        <Container maxW="5xl">
+          <Box as="header">
+            <Heading as="h1" fontWeight="extrabold" size="3xl">
+              Blog
+            </Heading>
+            <Box mt="24px" fontSize={["md", "xl"]} color="whiteAlpha.700">
+              <Text>Blog posts from the Upstash team and community.</Text>
+            </Box>
           </Box>
 
-          <Flex align="center" justify="center" mt="24px">
-            <InputGroup maxW={320}>
-              <InputLeftElement
-                pointerEvents="none"
-                children={<Box as={SvgSearch} color="whiteAlpha.400" />}
-              />
-              <Input
-                placeholder="Search..."
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                }}
-              />
-            </InputGroup>
-
-            <Box ml="24px">
-              <Menu closeOnSelect={false}>
-                <MenuButton as={Button}>Filter by Tag</MenuButton>
-                <MenuList minWidth="240px">
-                  <MenuOptionGroup
-                    defaultValue="asc"
-                    title="Order"
-                    type="radio"
-                  >
-                    <MenuItemOption value="asc">Ascending</MenuItemOption>
-                    <MenuItemOption value="desc">Descending</MenuItemOption>
-                  </MenuOptionGroup>
-                  <MenuDivider />
-                  <MenuOptionGroup defaultValue="asc" title="Tag" type="radio">
-                    <MenuItemOption value="asc">Ascending</MenuItemOption>
-                    <MenuItemOption value="desc">Descending</MenuItemOption>
-                  </MenuOptionGroup>
-                </MenuList>
-              </Menu>
-            </Box>
-          </Flex>
+          <Wrap justify="center" spacing={2} mt="24px">
+            {sortedTags.slice(0, 8).map(([key, count], index) => {
+              return (
+                <Tag
+                  as={Button}
+                  key={key}
+                  size="lg"
+                  variant="subtle"
+                  colorScheme={`${colors[index]}`}
+                  textTransform="capitalize"
+                >
+                  {key}
+                </Tag>
+              );
+            })}
+          </Wrap>
         </Container>
       </Box>
 
-      <Section py={["100px", "140px"]}>
+      <Section pt={["80px", "140px"]}>
         <Bg />
+
         <Container maxW="5xl">
-          <SimpleGrid columns={2} spacing="24px">
+          <SimpleGrid columns={{ sm: 1, md: 2 }} spacing="24px">
             {posts.map((post) => {
               return <PostCard key={post.slug} {...post} />;
             })}

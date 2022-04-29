@@ -79,9 +79,9 @@ export default function CareerDetailPage({ post, prevPost, nextPost }) {
             </Text>
           </Box>
 
-          <Divider mt="60px" mb="24px" />
+          <Divider mt="60px" />
 
-          <HStack>
+          <HStack py="24px">
             <Avatar
               size="md"
               name={post.author.name}
@@ -93,7 +93,7 @@ export default function CareerDetailPage({ post, prevPost, nextPost }) {
             </Box>
           </HStack>
 
-          <Divider mt="24px" mb="60px" />
+          <Divider mb="60px" />
 
           <Box className="post" color="whiteAlpha.700">
             <Component />
