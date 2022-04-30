@@ -163,7 +163,7 @@ export default function CareerDetailPage({ post, prevPost, nextPost }) {
               word-spacing: normal;
               word-break: normal;
               word-wrap: normal;
-              background: #333;
+              background: #1d1f21;
               padding: 0.15em 0.4em;
               border-radius: 0.4rem;
             }

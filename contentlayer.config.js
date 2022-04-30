@@ -74,5 +74,5 @@ export const Blog = defineDocumentType(() => ({
 export default makeSource({
   contentDirPath: "data",
   documentTypes: [Job, Blog],
-  mdx: { rehypePlugins: [rehypePrism] },
+  mdx: { rehypePlugins: [[rehypePrism, { showLineNumbers: true }]] },
 });

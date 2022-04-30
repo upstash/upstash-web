@@ -6,13 +6,15 @@ https://prismjs.com/download.html#themes=prism-okaidia&languages=markup+css+clik
  * @author ocodia
  */
 
-
 code[class*="language-"],
 pre[class*="language-"] {
-  color: #fff;
-  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-  font-size: .92em;
-  line-height: 1.5;
+  color: #c5c8c6;
+  background: #1d1f21;
+  text-shadow: 0 1px rgba(0, 0, 0, 0.3);
+
+  font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace;
+  font-size: 0.94em;
+  line-height: 1.6;
   text-align: left;
   white-space: pre;
   word-spacing: normal;
@@ -31,9 +33,9 @@ pre[class*="language-"] {
 
 /* Code blocks */
 pre[class*="language-"] {
-  padding: 1em 1.4em;
+  padding: 1rem;
   overflow: auto;
-  border-radius: 0.3em;
+  border-radius: 0.5em;
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
@@ -44,42 +46,53 @@ pre[class*="language-"]::-webkit-scrollbar {
 
 :not(pre) > code[class*="language-"],
 pre[class*="language-"] {
-  background: #1b2623;
+  /*background: #1d1f21;*/
 }
 
 /* Inline code */
 :not(pre) > code[class*="language-"] {
   padding: .1em;
   border-radius: .3em;
-  white-space: normal;
 }
 
 .token.comment,
 .token.prolog,
 .token.doctype,
 .token.cdata {
-  color: #8292a2;
+  color: #7c7c7c;
 }
 
 .token.punctuation {
-  color: #f8f8f2;
+  color: #c5c8c6;
 }
 
-.token.namespace {
+.namespace {
   opacity: .7;
 }
 
 .token.property,
-.token.tag,
-.token.constant,
+.token.keyword,
+.token.tag {
+  color: #96cbfe;
+}
+
+.token.class-name {
+  color: #ffffb6;
+  text-decoration: underline;
+}
+
+.token.boolean,
+.token.constant {
+  color: #9c9;
+}
+
 .token.symbol,
 .token.deleted {
   color: #f92672;
 }
 
-.token.boolean,
 .token.number {
-  color: #ae81ff;
+  color: #ff73fd;
 }
 
 .token.selector,
@@ -88,30 +101,44 @@ pre[class*="language-"] {
 .token.char,
 .token.builtin,
 .token.inserted {
-  color: #fff;
+  color: #a8ff60;
 }
 
-.token.operator,
-.token.entity,
-.token.url,
-.language-css .token.string,
-.style .token.string,
 .token.variable {
-  color: #f8f8f2;
+  color: #c6c5fe;
+}
+
+.token.operator {
+  color: #ededed;
+}
+
+.token.entity {
+  color: #ffffb6;
+  cursor: help;
+}
+
+.token.url {
+  color: #96cbfe;
+}
+
+.language-css .token.string,
+.style .token.string {
+  color: #87c38a;
 }
 
 .token.atrule,
-.token.attr-value,
-.token.function,
-.token.class-name {
-  color: #e6db74;
+.token.attr-value {
+  color: #f9ee98;
 }
 
-.token.keyword {
-  color: #00e9a3;
+.token.function {
+  color: #dad085;
 }
 
-.token.regex,
+.token.regex {
+  color: #e9c062;
+}
+
 .token.important {
   color: #fd971f;
 }
@@ -125,6 +152,43 @@ pre[class*="language-"] {
   font-style: italic;
 }
 
-.token.entity {
-  cursor: help;
+/**
+ * Inspired by gatsby remark prism - https://www.gatsbyjs.com/plugins/gatsby-remark-prismjs/
+ * 1. Make the element just wide enough to fit its content.
+ * 2. Always fill the visible space in .code-highlight.
+ */
+.code-highlight {
+  float: left; /* 1 */
+  width: 100%; /* 2 */
+}
+
+.code-line {
+  display: block;
+}
+
+.code-line.inserted {
+  background-color: rgba(16, 185, 129, 0.2);
+}
+
+.code-line.deleted {
+  background-color: rgba(239, 68, 68, 0.2);
+}
+
+.highlight-line {
+  background-color: rgb(255 255 255 / 10%);
+  /*border-left-width: 4px;*/
+  /*border-left-color: rgb(255 255 255 / 50%);*/
+}
+
+.line-number::before {
+  display: inline-block;
+  width: 1rem;
+  text-align: right;
+  margin-right: 1rem;
+  color: rgb(255 255 255 / 10%);
+  content: attr(line);
+}
+
+.highlight-line.line-number::before {
+  color: rgb(255 255 255 / 30%);
 }
