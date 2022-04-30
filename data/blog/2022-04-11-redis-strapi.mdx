@@ -72,35 +72,33 @@ Click on the public role and then on the “Article” permissions. Here you nee
 
 When you open the articles resource in the browser, you should see our new article. The default Strapi settings should give you the resource at the following URL:
 
-```
-http://localhost:1337/api/articles
-```
+`http://localhost:1337/api/articles`
 
 The response should look something like this:
 
-```
+```json
+{
+  "data": [
     {
-      "data": [
-        {
-          "id": 2,
-          "attributes": {
-            "title": "My First Article",
-            "content": "This is an article!",
-            "createdAt": "2022-04-06T15:29:48.104Z",
-            "updatedAt": "2022-04-06T15:29:48.949Z",
-            "publishedAt": "2022-04-06T15:29:48.948Z"
-          }
-        }
-      ],
-      "meta": {
-        "pagination": {
-          "page": 1,
-          "pageSize": 25,
-          "pageCount": 1,
-          "total": 1
-        }
+      "id": 2,
+      "attributes": {
+        "title": "My First Article",
+        "content": "This is an article!",
+        "createdAt": "2022-04-06T15:29:48.104Z",
+        "updatedAt": "2022-04-06T15:29:48.949Z",
+        "publishedAt": "2022-04-06T15:29:48.948Z"
       }
     }
+  ],
+  "meta": {
+    "pagination": {
+      "page": 1,
+      "pageSize": 25,
+      "pageCount": 1,
+      "total": 1
+    }
+  }
+}
 ```
 
 ## Adding the REST Cache
@@ -109,10 +107,10 @@ Finally, the exciting part of adding caching with Upstash Redis!
 
 To do so, you first need to install three packages.
 
-```
-    $ yarn add strapi-plugin-redis \
-      strapi-plugin-rest-cache \
-      strapi-provider-rest-cache-redis
+```bash
+yarn add strapi-plugin-redis \
+strapi-plugin-rest-cache \
+strapi-provider-rest-cache-redis
 ```
 
 These three packages will allow Strapi to send data to your Upstash Redis database.
@@ -129,27 +127,25 @@ After the creation process finishes, you can grab the database URL, which should
 
 To configure the REST cache, you need to create a file at `config/plugins.js` with the following content:
 
-```
-    module.exports = {
-      redis: {
-        config: {
-          connections: {
-            default: {connection: "REDIS_URL"},
-          },
-        },
+```js
+module.exports = {
+  redis: {
+    config: {
+      connections: {
+        default: { connection: "REDIS_URL" },
       },
-      "rest-cache": {
-        config: {
-          provider: {name: "redis"},
-          strategy: {
-            contentTypes: [
-              {contentType: "api::article.article", hitpass: false}
-            ],
-            //debug: true,
-          },
-        },
+    },
+  },
+  "rest-cache": {
+    config: {
+      provider: { name: "redis" },
+      strategy: {
+        contentTypes: [{ contentType: "api::article.article", hitpass: false }],
+        //debug: true,
       },
-    };
+    },
+  },
+};
 ```
 
 In the `redis` field, we configure the connection to the Upstash Redis database. The URL from the previous step contains all credentials Strapi needs.
@@ -164,15 +160,13 @@ Strapi uses SQLite as default, which runs in-process on your development compute
 
 After we configured everything correctly, we can restart the development server:
 
-```
-$ yarn run develop
+```bash
+yarn run develop
 ```
 
 When the server is up and running, we can access it again with this URL:
 
-```
-http://localhost:1337/api/articles
-```
+`http://localhost:1337/api/articles`
 
 Our database will serve the first request, and Upstash Redis will do the following.
 
