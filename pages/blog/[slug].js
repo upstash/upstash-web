@@ -4,7 +4,6 @@ import {
   Box,
   Container,
   Divider,
-  Flex,
   Heading,
   HStack,
   SimpleGrid,
@@ -15,8 +14,8 @@ import { useMDXComponent } from "next-contentlayer/hooks";
 import { allBlogs } from "contentlayer/generated";
 import { compareDesc, format, parseISO } from "date-fns";
 import NextLink from "next/link";
-import Section from "../../components/section";
-import Bg from "../../components/bg";
+import Section from "components/section";
+import Bg from "components/bg";
 
 export async function getStaticPaths() {
   const paths = allBlogs.map((doc) => ({ params: { slug: doc.slug } }));
@@ -33,6 +32,14 @@ export async function getStaticProps({ params }) {
   });
 
   const indexOfPost = posts.findIndex((doc) => doc.slug === params.slug);
+
+  if (!indexOfPost) {
+    return {
+      redirect: {
+        destination: "/404",
+      },
+    };
+  }
 
   const post = posts[indexOfPost];
   const nextPost = indexOfPost > 0 ? posts[indexOfPost - 1] : null;
