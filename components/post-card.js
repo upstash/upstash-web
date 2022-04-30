@@ -26,7 +26,7 @@ export default function PostCard({ title, author, date, slug, summary }) {
         size="md"
         fontWeight="semibold"
         lineHeight="shorter"
-        letterSpacings="tight"
+        letterSpacing="tight"
         className="post-card-title"
       >
         <NextLink href={`/blog/${slug}`}>

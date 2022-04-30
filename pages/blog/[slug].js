@@ -15,6 +15,8 @@ import { useMDXComponent } from "next-contentlayer/hooks";
 import { allBlogs } from "contentlayer/generated";
 import { compareDesc, format, parseISO } from "date-fns";
 import NextLink from "next/link";
+import Section from "../../components/section";
+import Bg from "../../components/bg";
 
 export async function getStaticPaths() {
   const paths = allBlogs.map((doc) => ({ params: { slug: doc.slug } }));
@@ -55,47 +57,43 @@ export default function CareerDetailPage({ post, prevPost, nextPost }) {
         <title>Careers - Upstash</title>
       </Head>
 
-      <Box as="section" py={["80px", "100px"]}>
+      <Box as="header" pt={["80px", "100px"]} textAlign="center">
         <Container maxW="3xl">
-          <Box as="header">
-            <Heading
-              as="h1"
-              fontWeight="bold"
-              size="2xl"
-              lineHeight="shorter"
-              letterSpacings="tight"
-            >
-              {post.title}
-            </Heading>
+          <Text as="time" dateTime={post.date} color="whiteAlpha.600">
+            {format(parseISO(post.date), "LLLL d, yyyy")}
+          </Text>
 
-            <Text
-              mt="16px"
-              color="whiteAlpha.600"
-              as="time"
-              dateTime={post.date}
-              className="block text-sm text-slate-600"
-            >
-              {format(parseISO(post.date), "LLLL d, yyyy")}
-            </Text>
-          </Box>
+          <Heading
+            as="h1"
+            mt={2}
+            fontWeight="bold"
+            size="2xl"
+            lineHeight="shorter"
+            letterSpacing="tight"
+          >
+            {post.title}
+          </Heading>
 
-          <Divider mt="60px" />
-
-          <HStack py="24px">
+          <Box mt={8}>
             <Avatar
               size="md"
               name={post.author.name}
               src={post.author.image_url}
             />
-            <Box mt="8px">
+            <Box mt={4}>
               <Text fontWeight="semibold">{post.author.name}</Text>
               <Text color="whiteAlpha.600">{post.author.title}</Text>
             </Box>
-          </HStack>
+          </Box>
+        </Container>
+      </Box>
 
-          <Divider mb="60px" />
+      <Section mt="60px" pt={["80px", "100px"]} textAlign="left">
+        <Bg />
 
-          <Box className="post" color="whiteAlpha.700">
+        <Container maxW="3xl">
+          {/*<Divider mt="60px" />*/}
+          <Box className="post" color="whiteAlpha.800">
             <Component />
           </Box>
 
@@ -165,8 +163,8 @@ export default function CareerDetailPage({ post, prevPost, nextPost }) {
               word-spacing: normal;
               word-break: normal;
               word-wrap: normal;
-              background: #444;
-              padding: 0.1em 0.3em;
+              background: #333;
+              padding: 0.15em 0.4em;
               border-radius: 0.4rem;
             }
 
@@ -197,7 +195,7 @@ export default function CareerDetailPage({ post, prevPost, nextPost }) {
             }
           `}</style>
         </Container>
-      </Box>
+      </Section>
     </>
   );
 }

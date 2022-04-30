@@ -1,0 +1,84 @@
+---
+slug: "redis-fly-io"
+title: "Run Fly.io Apps with Serverless Redis"
+authors: "enes"
+tags: [serverless, redis, flyio]
+categories: ["Fly.io"]
+---
+
+Fly.io is a great platform where you can distribute your application globally.
+When your application is global, your data needs to be global. You can run
+regular [Redis as a Fly.io app](https://fly.io/docs/reference/redis/) but the
+problem is it is located in a single region. On the other hand, Upstash Redis
+Global Database perfectly fits Fly.io as it is globally replicated. Moreover,
+thanks to its [REST based SDK](https://github.com/upstash/upstash-redis), it
+does not have any connection problem in stateless runtime.
+
+In this article, I will create a basic Node.js application which accesses
+Upstash Redis and deploy it to Fly.io platform.
+
+### Fly.io Setup
+
+- Create a [Fly.io](https://fly.io/) account.
+- Install [flyctl](https://fly.io/docs/getting-started/installing-flyctl/) and
+  run `flyctl auth login`
+
+### Upstash Redis Setup
+
+- Create a free Global Database
+  on [Upstash Console](https://console.upstash.com/)
+- Copy the REST_URL and REST_TOKEN, you will use them in the next step.
+
+### Application Code
+
+- Clone the hello world
+  app: `git clone https://github.com/fly-apps/hellonode-builtin`
+- Install dependencies:
+  `npm install express @upstash/redis`
+- Update the server.js and replace `url` and `token`:
+
+```js
+const express = require("express");
+const app = express();
+const port = process.env.PORT || 3000;
+const { Redis } = require("@upstash/redis");
+
+const redis = new Redis({
+  url: "REPLACE_HERE",
+  token: "REPLACE_HERE",
+});
+
+app.get(["/", "/:name"], async (req, res) => {
+  let greeting = "<h1>Hello From Node on Fly!</h1>";
+  if (req.url !== "/favicon.ico") {
+    const data = await redis.incr("count");
+    res.send(greeting + "</br> Counter: " + data);
+  } else {
+    res.send("");
+  }
+});
+
+app.listen(port, () => console.log(`HelloNode app listening on port ${port}!`));
+```
+
+### Run and Deploy
+
+- Run the application locally:
+  `node server.js`
+- Launch and deploy to fly.io:
+  `flyctl launch`
+- You can redeploy your app with `flyctl deploy`
+
+- See your applications url with `flyctl status`
+- You can also check your application from fly.io dashboard:
+  ![](/img/blog/flyio/dashboard.png)
+
+## Closing Words
+
+In this article, we have showcased how to use Upstash Redis on Fly.io
+application platform.
+
+Feel free to reach out us
+on [GitHub](https://github.com/upstash/issues/issues/new)
+, [Discord](https://discord.com/invite/w9SenAtbme)
+and [Twitter](https://twitter.com/upstash) for any issues or comments.
