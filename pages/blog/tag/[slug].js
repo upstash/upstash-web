@@ -7,9 +7,7 @@ import { allBlogs } from "contentlayer/generated";
 import { countBy, flatten, toLower } from "lodash";
 
 export async function getStaticPaths() {
-  const { undefined, ...tags } = countBy(
-    flatten(allBlogs.map((p) => p.tags?.map((c) => toLower(c))))
-  );
+  const { undefined, ...tags } = countBy(flatten(allBlogs.map((p) => p.tags)));
 
   const paths = Object.entries(tags)
     .sort((a, b) => b[1] - a[1])
@@ -63,7 +61,7 @@ export default function CareerPage({ posts }) {
         </Container>
       </Box>
 
-      <Section pt={["80px", "140px"]}>
+      <Section py={["80px", "140px"]}>
         <Bg />
 
         <Container maxW="5xl">

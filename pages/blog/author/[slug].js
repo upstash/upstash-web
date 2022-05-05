@@ -8,7 +8,7 @@ import { countBy, flatten, toLower } from "lodash";
 
 export async function getStaticPaths() {
   const { undefined, ...authors } = countBy(
-    flatten(allBlogs.map((p) => toLower(p.author)))
+    flatten(allBlogs.map((p) => p.author))
   );
 
   const paths = Object.entries(authors).map(([key]) => ({
@@ -61,7 +61,7 @@ export default function CareerPage({ posts }) {
         </Container>
       </Box>
 
-      <Section pt={["80px", "140px"]}>
+      <Section py={["80px", "140px"]}>
         <Bg />
 
         <Container maxW="5xl">
