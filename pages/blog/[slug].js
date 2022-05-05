@@ -16,6 +16,7 @@ import { compareDesc, format, parseISO } from "date-fns";
 import NextLink from "next/link";
 import Section from "components/section";
 import Bg from "components/bg";
+import { toLower } from "lodash";
 
 export async function getStaticPaths() {
   const paths = allBlogs.map((doc) => ({ params: { slug: doc.slug } }));
@@ -31,9 +32,11 @@ export async function getStaticProps({ params }) {
     return compareDesc(new Date(a.date), new Date(b.date));
   });
 
-  const indexOfPost = posts.findIndex((doc) => doc.slug === params.slug);
+  const indexOfPost = posts.findIndex(
+    (doc) => toLower(doc.slug) === toLower(params.slug)
+  );
 
-  if (!indexOfPost) {
+  if (indexOfPost < 0) {
     return {
       redirect: {
         destination: "/404",
