@@ -66,12 +66,11 @@ export default function CareerPage({ posts, tags }) {
           <Wrap justify="center" spacing="8px" mt="24px" maxW="2xl" mx="auto">
             {tags.slice(0, 10).map(([key, count], index) => {
               return (
-                <NextLink href={`/blog/tag/${key}`}>
+                <NextLink key={key} href={`/blog/tag/${key}`}>
                   <a>
                     <Tooltip
-                      key={key}
-                      label="Hey, I'm here!"
-                      aria-label="A tooltip"
+                      label={`Filter by ${key} posts`}
+                      aria-label={`Filter by ${key} posts`}
                     >
                       <Tag
                         key={key}
@@ -92,7 +91,7 @@ export default function CareerPage({ posts, tags }) {
         </Container>
       </Box>
 
-      <Section pt={["80px", "140px"]}>
+      <Section py={["80px", "140px"]}>
         <Bg />
 
         <Container maxW="5xl">
