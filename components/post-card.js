@@ -1,17 +1,8 @@
-import {
-  VStack,
-  Flex,
-  HStack,
-  Text,
-  Heading,
-  Tag,
-  Box,
-  Avatar,
-} from "@chakra-ui/react";
+import { Flex, HStack, Text, Heading, Box, Avatar } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { format, parseISO } from "date-fns";
 
-export default function PostCard({ title, author, date, slug, summary }) {
+export default function PostCard({ title, authorObj, date, slug }) {
   return (
     <Flex
       direction="column"
@@ -23,7 +14,7 @@ export default function PostCard({ title, author, date, slug, summary }) {
     >
       <Heading
         as="h3"
-        size="md"
+        size="lg"
         fontWeight="semibold"
         lineHeight="shorter"
         letterSpacing="tight"
@@ -34,13 +25,16 @@ export default function PostCard({ title, author, date, slug, summary }) {
         </NextLink>
       </Heading>
 
-      <p>{summary}</p>
-
       <Flex flexGrow={1} align="end" mt="32px">
         <HStack mt="auto">
-          <Avatar size="md" name={author.name} src={author.image_url} />
+          <Avatar size="md" name={authorObj.name} src={authorObj.image_url} />
           <Box>
-            <Text>{author.name}</Text>
+            <NextLink href={`/blog/author/${authorObj.slug}`}>
+              <a>
+                <Text>{authorObj.name}</Text>
+              </a>
+            </NextLink>
+
             <Text as="time" dateTime={date} color="whiteAlpha.600">
               {format(parseISO(date), "LLLL d, yyyy")}
             </Text>

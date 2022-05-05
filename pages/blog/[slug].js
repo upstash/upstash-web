@@ -84,12 +84,12 @@ export default function CareerDetailPage({ post, prevPost, nextPost }) {
           <Box mt={8}>
             <Avatar
               size="md"
-              name={post.author.name}
-              src={post.author.image_url}
+              name={post.authorObj.name}
+              src={post.authorObj.image_url}
             />
             <Box mt={4}>
-              <Text fontWeight="semibold">{post.author.name}</Text>
-              <Text color="whiteAlpha.600">{post.author.title}</Text>
+              <Text fontWeight="semibold">{post.authorObj.name}</Text>
+              <Text color="whiteAlpha.600">{post.authorObj.title}</Text>
             </Box>
           </Box>
         </Container>

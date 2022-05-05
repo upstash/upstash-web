@@ -1,10 +1,9 @@
 ---
 slug: pipeline
 title: "Pipeline REST API on Serverless Redis"
-authors: enes
+author: enes
 image: /blog/pipeline.png
 tags: [redis, database, serverless, pipeline]
-categories: ["REST-API"]
 ---
 
 Upstash supports the REST API in addition to the native Redis API. REST API helps developers to access their Redis without connection issues from serverless and edge functions. But if you execute multiple Redis commands in the same function then this means you will make a call to the database multiple times. One of our community members (@MasterGates) came with a great suggestion in our Discord channel. Pipeline API:

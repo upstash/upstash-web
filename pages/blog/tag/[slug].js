@@ -11,12 +11,10 @@ export async function getStaticPaths() {
     flatten(allBlogs.map((p) => p.tags?.map((c) => toLower(c))))
   );
 
-  console.log(tags);
-
   const paths = Object.entries(tags)
     .sort((a, b) => b[1] - a[1])
     .map(([key]) => ({
-      params: { tag: key },
+      params: { slug: key },
     }));
 
   return {
@@ -27,7 +25,7 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }) {
   const posts = allBlogs.filter((post) => {
-    return post.tags?.find((c) => toLower(c) === params.tag);
+    return post.tags?.find((c) => toLower(c) === toLower(params.slug));
   });
 
   if (!posts.length) {

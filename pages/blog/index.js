@@ -1,12 +1,12 @@
 import Head from "next/head";
 import {
   Box,
-  Button,
   Container,
   Heading,
   SimpleGrid,
   Tag,
   Text,
+  Tooltip,
   Wrap,
 } from "@chakra-ui/react";
 import PostCard from "components/post-card";
@@ -15,26 +15,24 @@ import Section from "components/section";
 import { flatten, countBy } from "lodash";
 import { compareDesc } from "date-fns";
 import { allBlogs } from "contentlayer/generated";
+import NextLink from "next/link";
 
 export async function getStaticProps() {
   const posts = allBlogs
-    .filter((p) => p.categories)
+    .filter((p) => p.tags?.length > 0)
     .sort((a, b) => {
       return compareDesc(new Date(a.date), new Date(b.date));
     });
-  // .slice(0, 10);
 
-  return { props: { posts } };
+  const { undefined, ...tags } = countBy(
+    flatten(posts.map((post) => post.tags))
+  );
+  const sortedTags = Object.entries(tags).sort((a, b) => b[1] - a[1]);
+
+  return { props: { posts, tags: sortedTags } };
 }
 
-export default function CareerPage({ posts }) {
-  const { undefined, ...categories } = countBy(
-    flatten(posts.map((post) => post.categories))
-  );
-  const sortedCategories = Object.entries(categories).sort(
-    (a, b) => b[1] - a[1]
-  );
-
+export default function CareerPage({ posts, tags }) {
   const colors = [
     "red",
     "cyan",
@@ -66,17 +64,28 @@ export default function CareerPage({ posts }) {
           </Box>
 
           <Wrap justify="center" spacing="8px" mt="24px" maxW="2xl" mx="auto">
-            {sortedCategories.slice(0, 10).map(([key, count], index) => {
+            {tags.slice(0, 10).map(([key, count], index) => {
               return (
-                <Tag
-                  as={Button}
-                  key={key}
-                  size="lg"
-                  variant="subtle"
-                  colorScheme={`${colors[index]}`}
-                >
-                  {key}
-                </Tag>
+                <NextLink href={`/blog/tag/${key}`}>
+                  <a>
+                    <Tooltip
+                      key={key}
+                      label="Hey, I'm here!"
+                      aria-label="A tooltip"
+                    >
+                      <Tag
+                        key={key}
+                        size="lg"
+                        variant="subtle"
+                        colorScheme={`${colors[index]}`}
+                        textTransform="capitalize"
+                        py={3}
+                      >
+                        {key}
+                      </Tag>
+                    </Tooltip>
+                  </a>
+                </NextLink>
               );
             })}
           </Wrap>
@@ -87,7 +96,7 @@ export default function CareerPage({ posts }) {
         <Bg />
 
         <Container maxW="5xl">
-          <SimpleGrid columns={{ sm: 1, md: 2 }} spacing="24px">
+          <SimpleGrid columns={{ sm: 1, md: 2 }} spacing={8}>
             {posts.map((post) => {
               return <PostCard key={post.slug} {...post} />;
             })}

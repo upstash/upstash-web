@@ -7,17 +7,13 @@ import { allBlogs } from "contentlayer/generated";
 import { countBy, flatten, toLower } from "lodash";
 
 export async function getStaticPaths() {
-  const { undefined, ...categories } = countBy(
-    flatten(allBlogs.map((p) => p.categories?.map((c) => toLower(c))))
+  const { undefined, ...authors } = countBy(
+    flatten(allBlogs.map((p) => toLower(p.author)))
   );
 
-  console.log(categories);
-
-  const paths = Object.entries(categories)
-    .sort((a, b) => b[1] - a[1])
-    .map(([key]) => ({
-      params: { category: key },
-    }));
+  const paths = Object.entries(authors).map(([key]) => ({
+    params: { slug: key },
+  }));
 
   return {
     paths,
@@ -26,8 +22,8 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }) {
-  const posts = allBlogs.filter((post) => {
-    return post.categories?.find((c) => toLower(c) === params.category);
+  const posts = allBlogs.filter((p) => {
+    return toLower(p.author) === toLower(params.slug);
   });
 
   if (!posts.length) {
