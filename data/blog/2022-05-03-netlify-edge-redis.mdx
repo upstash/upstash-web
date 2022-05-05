@@ -13,12 +13,12 @@ functions and accesses Upstash Redis as a data store. Upstash Redis is a perfect
 match for Netlify Edge Functions because:
 
 - Upstash Redis has Global database type where the Redis replicas are
-  distributed all over the world. So your edge function will access to the
-  closest region with low latency.
+distributed all over the world. So your edge function will access to the
+closest region with low latency.
 - Upstash Redis has a built-in REST API and SDK which is free from any
-  connection issues common in serverless runtimes.
+connection issues common in serverless runtimes.
 - Upstash Redis has a [JS SDK](https://github.com/upstash/upstash-redis) which
-  is built and tested with Deno runtime
+is built and tested with Deno runtime
 
 ### Project Setup
 
@@ -26,7 +26,7 @@ match for Netlify Edge Functions because:
 out [this folder](https://github.com/upstash/redis-examples/tree/master/netlify-edge-with-redis)
 if you want to skip the below steps.*
 
-![](/img/blog/netlify-edge/project.png)
+![](/blog/netlify-edge/project.png)
 
 Create an empty Node project (`npm init`) and create `hello.js`
 under `netlify>edge-functions` as below:
@@ -61,7 +61,7 @@ from [Upstash Console](https://console.upstash.com/). Select the Global database
 to minimize the latency from your edge functions. Copy the REST_URL and
 REST_TOKEN from Upstash dashboard and paste to the `.env`.
 
-![](/img/blog/netlify-edge/upstash.png)
+![](/blog/netlify-edge/upstash.png)
 
 ### Test and Deploy
 
@@ -72,7 +72,7 @@ Also, you can deploy your app
 using [Netlify dashboard](https://app.netlify.com/). You need to set Upstash URL
 and Token as an environment variable in Netlify.
 
-![](/img/blog/netlify-edge/dashboard.png)
+![](/blog/netlify-edge/dashboard.png)
 
 ## Closing Words
 

@@ -15,13 +15,13 @@ There is a drawback using Netlify Functions together with a 3rd Party service.
 Client-side request first goes to Netlify Backend(Functions) then to the 3rd Party Service. (in our example it is Spotify)
 This journey increases latency much if these services and end user are not in the same geo-location.
 
-![img.png](../static/img/blog/netlifygraph/img.png)
+![img.png](/blog/netlifygraph/img.png)
 
 If we are able to cache the data from Netlify functions then we can minimize latency.
 [Upstash Global Redis Database](https://docs.upstash.com/redis/features/globaldatabase) can be a good solution to cache Netlify API calls.
 Thanks to multi region replication of Upstash Redis, API responses can be cached/replicated globally.
 
-![img2.png](../static/img/blog/netlifygraph/img2.png)
+![img2.png](/blog/netlifygraph/img2.png)
 
 Let's create very simple Spotify Application that calls Spotify API and cache the API calls in Upstash Global Redis.
 
@@ -36,28 +36,28 @@ Now we will configure Netlify Graph-Spotify API integration.
 Navigate to:
 
 `Netlify Console --> Sample App --> Graph --> Connect API or Service --> Spotify `
-![img.png](../static/img/blog/netlifygraph/img3.png)
+![img.png](/blog/netlifygraph/img3.png)
 
 In Spotify Configuration page, enable `Authentication` and `Graph Explorer` , it will authenticate with Spotify for API integration.
 
-![img.png](../static/img/blog/netlifygraph/img4.png)
+![img.png](/blog/netlifygraph/img4.png)
 
 Now we can play with GraphQL Playground.
 Click the `Start querying Spotify` button. Now we need to run netlify-cli with following command in the project directory.
 
-```
+```bash
 netlify dev --graph
 ```
 
 After CLI finishes, check Netlify Graph section, and you will see the active session.
 Click the session, and it will open a playground environment for GraphQL API.
 
-![img.png](../static/img/blog/netlifygraph/img5.png)
+![img.png](/blog/netlifygraph/img5.png)
 
 This playground is awesome. It is very useful to generate a specific GraphQL query.
 I have quickly generated a Spotify query that returns `Featured Playlists`
 
-```
+```javascript
 query SpotifyFeatured {
   spotify {
     featuredPlaylists {
@@ -72,7 +72,7 @@ After you build the query, let's generate the code and inject to our project.
 
 Click `Actions` --> `Generate Handler`
 
-![img.png](../static/img/blog/netlifygraph/img6.png)
+![img.png](/blog/netlifygraph/img6.png)
 
 `netlify-cli` will automatically generate `SpotifyFeatured.js` file under api directory and `SpotifyFeaturedForm.jsx` under `pages` directory.
 
@@ -96,12 +96,12 @@ Let's cache the responses.
 
 Create Upstash Global Database from Upstash Console
 
-![img.png](../static/img/blog/netlifygraph/img7.png)
+![img.png](/blog/netlifygraph/img7.png)
 
 We will modify the Auto-Generated Netlify Function code (`SpotifyFeatured.js`)
 In the code there is a code that fetches data from Netlify Backend/Spotify API:
 
-```
+```bash
 const { errors, data } = await NetlifyGraph.fetchSpotifyFeatured({  }, {accessToken: accessToken});
 ```
 
@@ -110,11 +110,11 @@ We will first check Redis for caching if it doesn't exist then we will call the 
 In order to communicate with redis, I have used [Upstash Redis JS](https://github.com/upstash/upstash-redis) library.
 You can get your Upstash Redis REST Credentials from the database details page.
 
-![img.png](../static/img/blog/netlifygraph/img8.png)
+![img.png](/blog/netlifygraph/img8.png)
 
 Replace your `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_PASSWORD` in the code snippet.
 
-```
+```javascript
 redisClient.auth('UPSTASH_REDIS_REST_URL', 'UPSTASH_REDIS_REST_PASSWORD');
 spotifyData = await redisClient.get('spotify-cache');
 if (spotifyData.data == null) {
@@ -140,7 +140,7 @@ It is very simple code-snippet and can be improved/modified based on purpose.
 
 So we added global cache behaviour to Netlify Graph feature with a couple of lines.
 
-![img.png](../static/img/blog/netlifygraph/img9.png)
+![img.png](/blog/netlifygraph/img9.png)
 
 ## Conclusion
 
