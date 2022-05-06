@@ -70,9 +70,13 @@ export default function CareerDetailPage({ post, prevPost, nextPost }) {
 
       <Box as="header" pt={["80px", "100px"]} textAlign="center">
         <Container maxW="4xl">
-          <Text as="time" dateTime={post.date} color="whiteAlpha.600">
-            {format(parseISO(post.date), "LLLL d, yyyy")}
-          </Text>
+          <HStack justify="center" color="whiteAlpha.600">
+            <Text as="time" dateTime={post.date}>
+              {format(parseISO(post.date), "LLLL d, yyyy")}
+            </Text>
+            <Text>·</Text>
+            <Text as="span">{post.readingTime.text}</Text>
+          </HStack>
 
           <Heading
             as="h1"

@@ -36,9 +36,14 @@ export const Blog = defineDocumentType(() => ({
     author: { type: "string", required: true },
     tags: { type: "json", required: true },
     image: { type: "string" },
-    readingTime: { type: "json", resolve: (doc) => readingTime(doc.body.raw) },
   },
   computedFields: {
+    readingTime: {
+      type: "json",
+      resolve: (doc) => {
+        return readingTime(doc.body.raw);
+      },
+    },
     date: {
       type: "date",
       resolve: (doc) => {
