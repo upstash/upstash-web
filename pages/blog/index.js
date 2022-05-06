@@ -69,8 +69,8 @@ export default function CareerPage({ posts, tags }) {
                 <NextLink key={key} href={`/blog/tag/${key}`}>
                   <a>
                     <Tooltip
-                      label={`Filter by ${key} posts`}
-                      aria-label={`Filter by ${key} posts`}
+                      label={`Filter by ${key}`}
+                      aria-label={`Filter by ${key}`}
                     >
                       <Tag
                         key={key}

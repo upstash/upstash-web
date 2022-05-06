@@ -1,4 +1,5 @@
 import Head from "next/head";
+import Link from "components/link";
 import { Box, Container, Heading, SimpleGrid, Text } from "@chakra-ui/react";
 import PostCard from "components/post-card";
 import Bg from "components/bg";
@@ -37,11 +38,12 @@ export async function getStaticProps({ params }) {
   return {
     props: {
       posts,
+      slug: params.slug,
     },
   };
 }
 
-export default function CareerPage({ posts }) {
+export default function CareerPage({ posts, slug }) {
   return (
     <>
       <Head>
@@ -51,11 +53,17 @@ export default function CareerPage({ posts }) {
       <Box as="section" py={["60px", "80px"]} textAlign="center">
         <Container maxW="5xl">
           <Box as="header">
-            <Heading as="h1" fontWeight="extrabold" size="3xl">
-              Blog
+            <Heading as="h1" fontWeight="normal" size="2xl">
+              <Text as="span" color="whiteAlpha.500">
+                blog/tag/
+              </Text>
+              <Text as="span" fontWeight="bold">
+                {slug}
+              </Text>
             </Heading>
-            <Box mt="24px" fontSize={["md", "xl"]} color="whiteAlpha.700">
-              <Text>Blog posts from the Upstash team and community.</Text>
+
+            <Box mt={8}>
+              <Link href="/blog">Back to All Posts</Link>
             </Box>
           </Box>
         </Container>
