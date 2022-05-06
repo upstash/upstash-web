@@ -36,7 +36,7 @@ app: `git clone https://github.com/fly-apps/hellonode-builtin`
 `npm install express @upstash/redis`
 - Update the server.js and replace `url` and `token`:
 
-```js
+```js:server.js
 const express = require("express");
 const app = express();
 const port = process.env.PORT || 3000;

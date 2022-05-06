@@ -66,14 +66,14 @@ function Header({ onOpen }) {
 
               <Link href="/blog" color="inherit" alignItems="baseline">
                 <Text as="span">Blog</Text>{" "}
-                {/*<Badge
+                <Badge
                   ml={1}
                   variant="subtle"
                   colorScheme="yellow"
                   fontWeight="normal"
                 >
                   New
-                </Badge>*/}
+                </Badge>
               </Link>
 
               <Link href="/careers" color="inherit" alignItems="baseline">

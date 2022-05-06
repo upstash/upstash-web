@@ -31,9 +31,7 @@ In the above algorithm, the user does not immediately see the comment they just 
 
 This is a basic Next.js application which sends the submitted content to an AWS Lambda function. It also loads the accepted and rejected comments from Redis.
 
-Here the index.js:
-
-```jsx
+```jsx:index.js
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
 import { useEffect, useState } from "react";
@@ -150,9 +148,9 @@ export default function Home() {
 
 We need two API routes. submit.js to send the comment to Kafka and load.js to load the comments from Redis. Create a Redis database and Kafka cluster using the [Upstash console](https://console.upstash.com), then replace the Redis and Kafka urls and credentials below.
 
-#### submit.js
+#### Submit
 
-```js
+```js:submit.js
 import { Kafka } from "@upstash/kafka";
 
 const kafka = new Kafka({
@@ -169,9 +167,9 @@ export default async function handler(req, res) {
 }
 ```
 
-#### load.js
+#### Load
 
-```js
+```js:load.js
 import { Redis } from "@upstash/redis";
 
 const redis = new Redis({

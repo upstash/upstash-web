@@ -35,7 +35,7 @@ You can head directly to the “Adding the REST Cache” section if you already 
 
 The first step is creating a new backend with Strapi. You can do this with the following command:
 
-    `$ npx create-strapi-app@latest strapi-upstash-redis-cache`
+`$ npx create-strapi-app@latest strapi-upstash-redis-cache`
 
 After the command finishes, Strapi will open the browser and ask you for admin login details to create a data model and the first content.
 
@@ -126,7 +126,7 @@ After the creation process finishes, you can grab the database URL, which should
 
 To configure the REST cache, you need to create a file at `config/plugins.js` with the following content:
 
-```js
+```js:config/plugins.js
 module.exports = {
   redis: {
     config: {
