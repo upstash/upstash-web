@@ -12,7 +12,7 @@ import {
 import PostCard from "components/post-card";
 import Bg from "components/bg";
 import Section from "components/section";
-import { flatten, countBy } from "lodash";
+import { flatten, countBy, omit } from "lodash";
 import { compareDesc } from "date-fns";
 import { allBlogs } from "contentlayer/generated";
 import NextLink from "next/link";
@@ -25,9 +25,15 @@ export async function getStaticProps() {
       return compareDesc(new Date(a.date), new Date(b.date));
     });
 
-  const { undefined, ...tags } = countBy(
-    flatten(posts.map((post) => post.tags))
-  );
+  const tags = omit(countBy(flatten(posts.map((post) => post.tags))), [
+    "undefined",
+    "upstash",
+    "aws",
+    "database",
+    "faunadb",
+    "dynamodb",
+  ]);
+
   const sortedTags = Object.entries(tags).sort((a, b) => b[1] - a[1]);
 
   return { props: { posts, tags: sortedTags } };
@@ -60,7 +66,9 @@ export default function CareerPage({ posts, tags }) {
               Blog
             </Heading>
             <Box mt="24px" fontSize={["md", "xl"]} color="whiteAlpha.700">
-              <Text>Blog posts from the Upstash team and community.</Text>
+              <Text>
+                Articles and tutorials from the Upstash team and community.
+              </Text>
             </Box>
           </Box>
 
