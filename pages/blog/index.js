@@ -16,6 +16,7 @@ import { flatten, countBy } from "lodash";
 import { compareDesc } from "date-fns";
 import { allBlogs } from "contentlayer/generated";
 import NextLink from "next/link";
+import { TAG_NAMES } from "constants/index";
 
 export async function getStaticProps() {
   const posts = allBlogs
@@ -64,23 +65,23 @@ export default function CareerPage({ posts, tags }) {
           </Box>
 
           <Wrap justify="center" spacing="8px" mt="24px" maxW="2xl" mx="auto">
-            {tags.slice(0, 10).map(([key, count], index) => {
+            {tags.slice(0, 10).map(([tag, count], index) => {
               return (
-                <NextLink key={key} href={`/blog/tag/${key}`}>
+                <NextLink key={tag} href={`/blog/tag/${tag}`}>
                   <a>
                     <Tooltip
-                      label={`Filter by ${key}`}
-                      aria-label={`Filter by ${key}`}
+                      label={`Filter by ${tag}`}
+                      aria-label={`Filter by ${tag}`}
                     >
                       <Tag
-                        key={key}
+                        key={tag}
                         size="lg"
                         variant="subtle"
                         colorScheme={`${colors[index]}`}
                         textTransform="capitalize"
                         py={3}
                       >
-                        {key}
+                        {TAG_NAMES[tag] || tag}
                       </Tag>
                     </Tooltip>
                   </a>
