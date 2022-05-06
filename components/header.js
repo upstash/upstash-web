@@ -8,6 +8,8 @@ import {
   Stack,
   Link as ChakraLink,
   Flex,
+  Badge,
+  Text,
 } from "@chakra-ui/react";
 import CustomLink from "./custom-link";
 import * as Icon from "./icons";
@@ -62,27 +64,28 @@ function Header({ onOpen }) {
                 About
               </Link>
 
-              <Link href="/blog" color="inherit">
-                Blog
+              <Link href="/blog" color="inherit" alignItems="baseline">
+                <Text as="span">Blog</Text>{" "}
+                {/*<Badge
+                  ml={1}
+                  variant="subtle"
+                  colorScheme="yellow"
+                  fontWeight="normal"
+                >
+                  New
+                </Badge>*/}
               </Link>
 
-              <Link href="/careers" color="inherit">
-                <span>Careers</span>{" "}
-                <Flex
-                  alignItems="center"
-                  justify="center"
+              <Link href="/careers" color="inherit" alignItems="baseline">
+                <Text as="span">Careers</Text>{" "}
+                <Badge
                   ml={1}
-                  px={1}
-                  h={4}
-                  minW={4}
-                  borderRadius="full"
-                  bg="primary"
-                  color="black"
-                  fontWeight="semibold"
-                  fontSize="xs"
+                  variant="subtle"
+                  colorScheme="green"
+                  fontWeight="normal"
                 >
                   3
-                </Flex>
+                </Badge>
               </Link>
 
               <CustomLink isExternal href={LINKS.docs} color="inherit">

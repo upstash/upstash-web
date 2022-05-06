@@ -30,6 +30,11 @@ export const SOCIAL_LINKS = {
   discord: "https://discord.gg/w9SenAtbme",
 };
 
+export const TAG_NAMES = {
+  aws: "AWS",
+  "aws-lambda": "AWS Lambda",
+};
+
 export const PRICES = {
   commandsLimit: {
     title: "Commands Limit",
