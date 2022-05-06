@@ -13,37 +13,37 @@ functions and accesses Upstash Redis as a data store. Upstash Redis is a perfect
 match for Netlify Edge Functions because:
 
 - Upstash Redis has Global database type where the Redis replicas are
-distributed all over the world. So your edge function will access to the
-closest region with low latency.
+  distributed all over the world. So your edge function will access to the
+  closest region with low latency.
 - Upstash Redis has a built-in REST API and SDK which is free from any
-connection issues common in serverless runtimes.
+  connection issues common in serverless runtimes.
 - Upstash Redis has a [JS SDK](https://github.com/upstash/upstash-redis) which
-is built and tested with Deno runtime
+  is built and tested with Deno runtime
 
 ### Project Setup
 
-*You can check
+_You can check
 out [this folder](https://github.com/upstash/redis-examples/tree/master/netlify-edge-with-redis)
-if you want to skip the below steps.*
+if you want to skip the below steps._
 
 ![](/blog/netlify-edge/project.png)
 
 Create an empty Node project (`npm init`) and create `hello.js`
 under `netlify>edge-functions` as below:
 
-```js
+```js:hello.js
 import { Redis } from "https://deno.land/x/upstash_redis@v1.3.2/mod.ts";
 
 export default async () => {
-    const redis = Redis.fromEnv()
-    const counter = await redis.incr("edge_counter")
-    return new Response(counter)
-}
+  const redis = Redis.fromEnv();
+  const counter = await redis.incr("edge_counter");
+  return new Response(counter);
+};
 ```
 
 Create a netlify.toml file in your project folder
 
-```toml
+```toml:netlify.toml
 [[edge_functions]]
 path = "/test"
 function = "hello"
@@ -51,7 +51,7 @@ function = "hello"
 
 Create an `.env` file in your project folder
 
-```text
+```text:.env
 UPSTASH_REDIS_REST_URL=
 UPSTASH_REDIS_REST_TOKEN=
 ```
