@@ -1,5 +1,10 @@
 import { defineDocumentType, makeSource } from "contentlayer/source-files";
 import rehypePrism from "rehype-prism-plus";
+import readingTime from "reading-time";
+import remarkGfm from "remark-gfm";
+import rehypeSlug from "rehype-slug";
+import rehypeCodeTitles from "rehype-code-titles";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import authors from "./authors";
 
 export const Job = defineDocumentType(() => ({
@@ -31,6 +36,7 @@ export const Blog = defineDocumentType(() => ({
     author: { type: "string", required: true },
     tags: { type: "json", required: true },
     image: { type: "string" },
+    readingTime: { type: "json", resolve: (doc) => readingTime(doc.body.raw) },
   },
   computedFields: {
     date: {
@@ -73,5 +79,25 @@ export const Blog = defineDocumentType(() => ({
 export default makeSource({
   contentDirPath: "data",
   documentTypes: [Job, Blog],
-  mdx: { rehypePlugins: [[rehypePrism, { showLineNumbers: true }]] },
+  mdx: {
+    remarkPlugins: [remarkGfm],
+    rehypePlugins: [
+      rehypeSlug,
+      rehypeCodeTitles,
+      [
+        rehypePrism,
+        {
+          showLineNumbers: true,
+        },
+      ],
+      [
+        rehypeAutolinkHeadings,
+        {
+          properties: {
+            className: ["anchor"],
+          },
+        },
+      ],
+    ],
+  },
 });

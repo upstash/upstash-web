@@ -142,6 +142,21 @@ export default function CareerDetailPage({ post, prevPost, nextPost }) {
               margin-bottom: 2rem;
             }
 
+            .post > .rehype-code-title {
+              margin-bottom: 0;
+              padding: 0.3rem 1rem;
+              background-color: #1d1f21;
+              border-radius: 0.5em 0.5em 0 0;
+              font-size: 0.9rem;
+              color: rgb(255 255 255 / 40%);
+              border-bottom: 1px solid #050505;
+            }
+
+            .post .rehype-code-title + pre {
+              border-top-left-radius: 0;
+              border-top-right-radius: 0;
+            }
+
             .post a {
               color: #00e9a3;
               text-decoration: underline;
