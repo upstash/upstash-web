@@ -62,6 +62,10 @@ function Header({ onOpen }) {
                 About
               </Link>
 
+              <Link href="/blog" color="inherit">
+                Blog
+              </Link>
+
               <Link href="/careers" color="inherit">
                 <span>Careers</span>{" "}
                 <Flex
@@ -109,7 +113,7 @@ function Header({ onOpen }) {
           </GridItem>
 
           {/* mobile */}
-          <GridItem d={["flex", "none"]} justifyContent="flex-end">
+          <GridItem display={["flex", "none"]} justifyContent="flex-end">
             <IconButton size="lg" onClick={onOpen} bg="transparent">
               <Box as={Icon.Menu} fontSize="24px" />
             </IconButton>

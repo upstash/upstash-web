@@ -44,6 +44,9 @@ function MobileMenu({ isOpen, onClose }) {
               <CustomLink href="/about" h={10} color="inherit">
                 <Flex grow={1}>About</Flex>
               </CustomLink>
+              <CustomLink href="/blog" h={10} color="inherit">
+                <Flex grow={1}>Blog</Flex>
+              </CustomLink>
               <CustomLink href="/careers" h={10} color="inherit">
                 <Flex grow={1} alignItems="center">
                   Careers
@@ -66,14 +69,6 @@ function MobileMenu({ isOpen, onClose }) {
               </CustomLink>
               <CustomLink isExternal href={LINKS.docs} h={10} color="inherit">
                 <Flex grow={1}>Docs</Flex>
-              </CustomLink>
-              <CustomLink
-                isExternal
-                href={SOCIAL_LINKS.blog}
-                h={10}
-                color="inherit"
-              >
-                <Flex grow={1}>Blog</Flex>
               </CustomLink>
               <CustomLink
                 isExternal

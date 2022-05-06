@@ -12,11 +12,12 @@ import {
 } from "@chakra-ui/react";
 import { useMDXComponent } from "next-contentlayer/hooks";
 import { allBlogs } from "contentlayer/generated";
+import { toLower } from "lodash";
 import { compareDesc, format, parseISO } from "date-fns";
 import NextLink from "next/link";
 import Section from "components/section";
 import Bg from "components/bg";
-import { toLower } from "lodash";
+import OtherPostCard from "components/other-post-card";
 
 export async function getStaticPaths() {
   const paths = allBlogs.map((doc) => ({ params: { slug: doc.slug } }));
@@ -68,7 +69,7 @@ export default function CareerDetailPage({ post, prevPost, nextPost }) {
       </Head>
 
       <Box as="header" pt={["80px", "100px"]} textAlign="center">
-        <Container maxW="3xl">
+        <Container maxW="4xl">
           <Text as="time" dateTime={post.date} color="whiteAlpha.600">
             {format(parseISO(post.date), "LLLL d, yyyy")}
           </Text>
@@ -102,42 +103,34 @@ export default function CareerDetailPage({ post, prevPost, nextPost }) {
         <Bg />
 
         <Container maxW="3xl">
-          {/*<Divider mt="60px" />*/}
+          {/* Post Body */}
+
           <Box className="post" color="whiteAlpha.800">
             <Component />
           </Box>
 
-          <HStack spacing={2} mt={8}>
+          {/* Post Tags */}
+
+          <HStack spacing={2} mt={20}>
+            <Text>Tags:</Text>
             {post.tags.map((tag) => (
-              <Tag key={tag} variant="solid" bg="whiteAlpha.300">
-                {tag}
-              </Tag>
+              <NextLink key={tag} href={`/blog/tag/${tag}`}>
+                <a>
+                  <Tag size="lg" variant="subtle" colorScheme="gray">
+                    {tag}
+                  </Tag>
+                </a>
+              </NextLink>
             ))}
           </HStack>
 
           <Divider my={10} />
 
+          {/* Other Post */}
+
           <SimpleGrid columns={2} spacing={10}>
-            <Box p={6} bg="#333">
-              {prevPost && (
-                <NextLink href={`/blog/${prevPost.slug}`}>
-                  <Box as="a" textAlign="left">
-                    <Text color="whiteAlpha.600">Older Post:</Text>
-                    <Text>{prevPost.title}</Text>
-                  </Box>
-                </NextLink>
-              )}
-            </Box>
-            <Box p={6} bg="#333">
-              {nextPost && (
-                <NextLink href={`/blog/${nextPost.slug}`}>
-                  <Box as="a" textAlign="right">
-                    <Text color="whiteAlpha.600">Newer Post:</Text>
-                    <Text>{nextPost.title}</Text>
-                  </Box>
-                </NextLink>
-              )}
-            </Box>
+            <OtherPostCard post={prevPost} />
+            <OtherPostCard post={nextPost} align="right" />
           </SimpleGrid>
 
           <style global jsx>{`
@@ -146,7 +139,7 @@ export default function CareerDetailPage({ post, prevPost, nextPost }) {
             }
 
             .post > * {
-              margin-bottom: 1.25rem;
+              margin-bottom: 2rem;
             }
 
             .post a {
