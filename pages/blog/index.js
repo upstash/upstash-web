@@ -43,13 +43,13 @@ export default function CareerPage({ posts, tags }) {
   const colors = [
     "red",
     "cyan",
-    "purple",
     "orange",
+    "purple",
     "green",
-    "teal",
-    "gray",
     "pink",
     "blue",
+    "gray",
+    "teal",
     "yellow",
   ];
 
