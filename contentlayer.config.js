@@ -38,6 +38,12 @@ export const Blog = defineDocumentType(() => ({
     image: { type: "string" },
   },
   computedFields: {
+    url: {
+      type: "string",
+      resolve: (doc) => {
+        return `https://upstash.com/blog/${doc.slug}`;
+      },
+    },
     readingTime: {
       type: "json",
       resolve: (doc) => {

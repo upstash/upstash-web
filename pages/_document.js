@@ -75,7 +75,6 @@ class MyDocument extends Document {
           <meta name="twitter:description" content={meta.description} />
 
           {/* icons */}
-
           <link href="/static/icons/site.webmanifest" rel="manifest" />
           <link
             href="/static/icons/apple-touch-icon.png"

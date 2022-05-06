@@ -65,7 +65,35 @@ export default function CareerDetailPage({ post, prevPost, nextPost }) {
   return (
     <>
       <Head>
-        <title>Careers - Upstash</title>
+        <title>{post.title}</title>
+        {/*<meta
+          name="description"
+          content="Recently, Netlify announced Edge Functions where you can run your code at edge locations on Deno runtime with globally low latency. In this post, we will build a simple app which runs Netlify Edge functions and accesses Upstash Redis as a data store. Upstash Redis is a perfect match for Netlify Edge Functions because:"
+        />*/}
+        <meta property="article:published_time" content={post.date} />
+        <meta property="article:author" content={post.authorObj.url} />
+        <meta property="article:tag" content={post.tags.join(",")} />
+
+        <link rel="canonical" href={post.url} />
+        <link rel="alternate" href={post.url} hrefLang="en" />
+        <link rel="alternate" href={post.url} hrefLang="x-default" />
+
+        {/* facebook */}
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={post.url} />
+        <meta property="og:title" content={post.title} />
+        {/*        <meta
+          property="og:description"
+          content="Recently, Netlify announced Edge Functions where you can run your code at edge locations on Deno runtime with globally low latency. In this post, we will build a simple app which runs Netlify Edge functions and accesses Upstash Redis as a data store. Upstash Redis is a perfect match for Netlify Edge Functions because:"
+        />*/}
+        <meta property="og:image" content={post.image || post.metaImage} />
+
+        {/* twitter */}
+        <meta name="twitter:image" content={post.image || post.metaImage} />
+        {/*<meta
+          name="twitter:description"
+          content="Designed for the serverless with per-request pricing and Redis/Kafka API."
+        />*/}
       </Head>
 
       <Box as="header" pt={["80px", "100px"]} textAlign="center">
