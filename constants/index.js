@@ -30,6 +30,18 @@ export const SOCIAL_LINKS = {
   discord: "https://discord.gg/w9SenAtbme",
 };
 
+export const META = {
+  title: "Upstash: Serverless Data for Redis® and Kafka®",
+  description:
+    "Designed for the serverless with per-request pricing and Redis/Kafka API.",
+  url: "https://upstash.com",
+  twitterAccount: "@upstash",
+  imagePath: "https://upstash.com/static/logo/square-dark.png",
+  coverImagePath: "https://upstash.com/static/logo/cover.jpg",
+  imageSize: 1024,
+  googleAnalytic: "G-QW5KRSTDM0",
+};
+
 export const TAG_NAMES = {
   aws: "AWS",
   "aws-lambda": "AWS Lambda",

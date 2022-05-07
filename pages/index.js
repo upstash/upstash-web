@@ -14,10 +14,6 @@ import Bg from "components/bg";
 function HomePage() {
   return (
     <>
-      <Head>
-        <title>Upstash: Serverless Data for Redis® and Kafka®</title>
-      </Head>
-
       <SectionHero />
       <SectionInfo />
       <SectionWhat />

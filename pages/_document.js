@@ -1,4 +1,5 @@
 import Document, { Html, Head, Main, NextScript } from "next/document";
+import { META } from "constants/index.js";
 
 class MyDocument extends Document {
   static async getInitialProps(ctx) {
@@ -7,18 +8,6 @@ class MyDocument extends Document {
   }
 
   render() {
-    const meta = {
-      title: "Upstash: Serverless Data for Redis and Kafka",
-      description:
-        "Designed for the serverless with per-request pricing and Redis/Kafka API.",
-      url: "https://upstash.com",
-      twitterAccount: "@upstash",
-      imagePath: "https://upstash.com/static/logo/square-dark.png",
-      coverImagePath: "https://upstash.com/static/logo/cover.jpg",
-      imageSize: 1024,
-      googleAnalytic: "G-QW5KRSTDM0",
-    };
-
     return (
       <Html lang="en">
         <Head>
@@ -54,25 +43,6 @@ class MyDocument extends Document {
           {/* base */}
           <meta charSet="utf-8" />
           <meta name="robots" content="follow, index" />
-          <meta httpEquiv="x-ua-compatible" content="ie=edge" />
-          <meta name="description" content={meta.description} />
-          <link rel="canonical" href={meta.url} />
-
-          {/* facebook */}
-          <meta property="og:url" content={meta.url} />
-          <meta property="og:type" content="website" />
-          <meta property="og:title" content={meta.title} />
-          <meta property="og:image" content={meta.coverImagePath} />
-          <meta property="og:description" content={meta.description} />
-
-          {/* twitter */}
-          <meta name="twitter:card" content="summary_large_image" />
-          <meta name="twitter:url" content={meta.url} />
-          <meta name="twitter:site" content={meta.twitterAccount} />
-          <meta name="twitter:author" content={meta.twitterAccount} />
-          <meta name="twitter:title" content={meta.title} />
-          <meta name="twitter:image" content={meta.coverImagePath} />
-          <meta name="twitter:description" content={meta.description} />
 
           {/* icons */}
           <link href="/static/icons/site.webmanifest" rel="manifest" />
@@ -106,7 +76,7 @@ class MyDocument extends Document {
             <>
               <script
                 async
-                src={`https://www.googletagmanager.com/gtag/js?id=${meta.googleAnalytic}`}
+                src={`https://www.googletagmanager.com/gtag/js?id=${META.googleAnalytic}`}
               />
               <script
                 type="text/javascript"
