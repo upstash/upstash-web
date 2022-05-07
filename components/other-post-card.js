@@ -11,8 +11,8 @@ export default function OtherPostCard({ post, align = "left" }) {
       cursor={post ? "pointer" : "default"}
     >
       {post && (
-        <NextLink href={`/blog/${post.slug}`}>
-          <Box as="a">
+        <NextLink href={`/blog/${post.slug}`} passHref>
+          <Box as="a" display="block">
             <Text color="whiteAlpha.500">
               {align === "left" ? "Older Post:" : "Newer Post:"}
             </Text>

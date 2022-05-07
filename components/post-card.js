@@ -1,4 +1,12 @@
-import { Flex, HStack, Text, Heading, Box, Avatar } from "@chakra-ui/react";
+import {
+  Flex,
+  HStack,
+  Text,
+  Heading,
+  Box,
+  Avatar,
+  Link,
+} from "@chakra-ui/react";
 import NextLink from "next/link";
 import { format, parseISO } from "date-fns";
 
@@ -20,8 +28,10 @@ export default function PostCard({ title, authorObj, date, slug }) {
         letterSpacing="tight"
         className="post-card-title"
       >
-        <NextLink href={`/blog/${slug}`}>
-          <a>{title}</a>
+        <NextLink href={`/blog/${slug}`} passHref>
+          <Box as="a" display="block">
+            {title}
+          </Box>
         </NextLink>
       </Heading>
 
