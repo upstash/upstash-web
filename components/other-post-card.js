@@ -14,7 +14,7 @@ export default function OtherPostCard({ post, align = "left" }) {
         <NextLink href={`/blog/${post.slug}`} passHref>
           <Box as="a" display="block">
             <Text color="whiteAlpha.500">
-              {align === "left" ? "Older Post:" : "Newer Post:"}
+              {align === "left" ? "Previous:" : "Next:"}
             </Text>
             <Heading mt={2} as="h4" size="md" fontWeight="semibold">
               {post.title}

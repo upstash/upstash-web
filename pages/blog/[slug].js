@@ -179,7 +179,7 @@ export default function CareerDetailPage({ post, prevPost, nextPost }) {
 
           <style global jsx>{`
             .post {
-              line-height: 1.6;
+              line-height: 1.7;
             }
 
             .post > * {
@@ -188,12 +188,12 @@ export default function CareerDetailPage({ post, prevPost, nextPost }) {
 
             .post > .rehype-code-title {
               margin-bottom: 0;
-              padding: 0.3rem 1rem;
-              background-color: #1d1f21;
+              padding: 0.5rem 1rem;
               border-radius: 0.5em 0.5em 0 0;
               font-size: 0.9rem;
-              color: rgb(255 255 255 / 40%);
-              border-bottom: 1px solid #050505;
+              color: rgb(255 255 255 / 50%);
+              border: 1px solid rgb(255 255 255 / 10%);
+              border-bottom: 0;
             }
 
             .post .rehype-code-title + pre {
@@ -202,8 +202,8 @@ export default function CareerDetailPage({ post, prevPost, nextPost }) {
             }
 
             .post a {
-              color: #00e9a3;
               text-decoration: underline;
+              text-decoration-color: #555;
             }
 
             .post img {
@@ -218,15 +218,13 @@ export default function CareerDetailPage({ post, prevPost, nextPost }) {
             }
 
             .post :not(pre) > code {
-              font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono",
-                monospace;
-              font-size: 0.9em;
+              font-size: 0.86rem;
               white-space: pre;
               word-spacing: normal;
               word-break: normal;
               word-wrap: normal;
-              background: #1d1f21;
-              padding: 0.15em 0.4em;
+              border: 1px solid rgb(255 255 255 / 20%);
+              padding: 0.2em 0.3em;
               border-radius: 0.4rem;
             }
 

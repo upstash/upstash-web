@@ -98,7 +98,7 @@ export default makeSource({
       [
         rehypePrism,
         {
-          showLineNumbers: true,
+          // showLineNumbers: true,
         },
       ],
       [
