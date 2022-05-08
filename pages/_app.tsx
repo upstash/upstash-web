@@ -13,8 +13,13 @@ import MobileMenu from "components/mobile-menu";
 import * as gtag from "lib/gtag";
 import { META } from "constants/";
 import theme from "theme";
+import type { AppProps, NextWebVitalsMetric } from "next/app";
 
-export default function MyApp({ Component, pageProps }) {
+export function reportWebVitals(metric: NextWebVitalsMetric) {
+  console.log(metric);
+}
+
+export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
 
   const { isOpen, onOpen, onClose } = useDisclosure();

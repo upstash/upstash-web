@@ -1,14 +1,25 @@
 import SectionHero from "components/section-hero";
-import Investors from "components/investors";
 import SectionWhat from "components/section-what";
 import SectionSupport from "components/section-support";
-import SectionPricing from "components/section-pricing";
 import SectionFaq from "components/section-faq";
 import SectionInfo from "components/section-info";
 import { Box } from "@chakra-ui/react";
 import Link from "components/link";
-import SectionTestimonial from "components/section-testimonial";
 import Bg from "components/bg";
+import dynamic from "next/dynamic";
+
+const SectionPricing = dynamic(() => import("components/section-pricing"), {
+  ssr: false,
+});
+const Investors = dynamic(() => import("components/investors"), {
+  ssr: false,
+});
+const SectionTestimonial = dynamic(
+  () => import("components/section-testimonial"),
+  {
+    ssr: false,
+  }
+);
 
 export default function HomePage() {
   return (

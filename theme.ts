@@ -1,12 +1,9 @@
-import { extendTheme } from "@chakra-ui/react";
-// import { mode } from '@chakra-ui/theme-tools'
+import { extendTheme, type ThemeConfig } from "@chakra-ui/react";
 
-const config = {
-  useSystemColorMode: false,
+const config: ThemeConfig = {
   initialColorMode: "dark",
+  useSystemColorMode: false,
 };
-
-export const sizes = {};
 
 const theme = extendTheme({
   styles: {
@@ -21,11 +18,7 @@ const theme = extendTheme({
       },
     },
   },
-  sizes,
-  fonts: {
-    heading: "Inter, sans-serif",
-    body: "Inter, sans-serif",
-  },
+  sizes: {},
   colors: {
     mainBlack: "#050505",
     primary: "#00E9A3",

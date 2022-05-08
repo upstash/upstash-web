@@ -1,3 +1,16 @@
 const { withContentlayer } = require("next-contentlayer");
 
-module.exports = withContentlayer({});
+const withBundleAnalyzer = require("@next/bundle-analyzer")({
+  enabled: process.env.ANALYZE === "true",
+});
+
+module.exports = withContentlayer(
+  withBundleAnalyzer({
+    swcMinify: true,
+    compiler: {
+      removeConsole: {
+        exclude: ["error"],
+      },
+    },
+  })
+);
