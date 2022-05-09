@@ -43,7 +43,10 @@ export async function getStaticProps({ params }) {
 
   return {
     props: {
-      posts,
+      posts: posts.map((post: Post) => {
+        const { body, metaImage, type, _id, _raw, ...rest } = post;
+        return rest;
+      }),
       slug: params.slug,
     },
   };

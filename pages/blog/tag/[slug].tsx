@@ -35,8 +35,6 @@ export async function getStaticProps({ params }) {
       return compareDesc(new Date(a.date), new Date(b.date));
     });
 
-  console.log(posts);
-
   if (!posts.length) {
     return {
       redirect: {
@@ -47,7 +45,10 @@ export async function getStaticProps({ params }) {
 
   return {
     props: {
-      posts,
+      posts: posts.map((post: Post) => {
+        const { body, metaImage, type, _id, _raw, ...rest } = post;
+        return rest;
+      }),
       slug: params.slug,
     },
   };

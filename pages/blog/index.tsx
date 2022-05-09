@@ -33,7 +33,15 @@ export async function getStaticProps() {
 
   const sortedTags = Object.entries(tags).sort((a, b) => b[1] - a[1]);
 
-  return { props: { posts, tags: sortedTags } };
+  return {
+    props: {
+      posts: posts.map((post: Post) => {
+        const { body, metaImage, type, _id, _raw, ...rest } = post;
+        return rest;
+      }),
+      tags: sortedTags,
+    },
+  };
 }
 
 export default function BlogPage({
