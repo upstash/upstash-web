@@ -1,0 +1,119 @@
+---
+slug: "laravel-redis"
+title: "Scaling Laravel with Serverless Redis"
+author: "bobby"
+tags: [serverless, redis, laravel]
+---
+
+## Introduction
+
+Laravel is a popular PHP framework for building scalable, high-performance web applications.
+
+In this article, we will learn how to use [serverless Redis](https://upstash.com/redis?utm_source=bobby1) to scale Laravel applications by storing the Laravel session and cache data in a serverless Redis instance.
+
+## Prerequisites
+
+Before you get started, you'll need to have the following:
+
+- [Upstash account](https://upstash.com?utm_source=bobby1): In case that you don't have one, you can [sign up for free](https://upstash.com/signup?utm_source=bobby1), no credit card required.
+- If you don't have Laravel installed, you can follow the steps on how to do that here: [Install Laravel with 1-click](https://devdojo.com/bobbyiliev/how-to-install-laravel-on-digitalocean-with-1-click)
+
+## Architecture Overview
+
+Rather than running Laravel on a single server, let's consider the following scenario:
+
+- A Laravel application running on two web servers.
+- A single Load Balancer is responsible for routing requests to the two web servers.
+- A MySQL database server, used to store the application's data.
+- [Upstash Serverless Redis cluster](https://upstash.com/redis?utm_source=bobby1) is responsible for caching data and storing user sessions.
+
+Diagram:
+
+![Scaling Laravel with serverless Redis](https://imgur.com/rFmygO1.png)
+
+## What is Serverless Redis?
+
+Serverless Redis is a fully managed database as a service product where the pricing is based on per command, so you are only charged what you actually use.
+
+That way you don't have to over provision your servers, and you can scale your application as needed.
+
+## Why Serverless Redis?
+
+By default, Laravel would store the user sessions in files on the web server's disk. That way if the load balancer forwards the user request to a different server, the user session would be lost.
+
+This is why it is important to have a centralized place to store the user sessions and application cache, so that they can be shared between requests and across multiple servers, and not be lost each time the load balancer forwards the request to a different server.
+
+Of course, you can also use your database to store the user sessions and cache data, but for better performance, it is recommended to use Redis for better performance. If you want to learn more about the performance benefits of the different options, check out this great article here: [Which is the best Laravel cache driver for performance?](https://www.georgebuckingham.com/laravel-cache-driver-performance/).
+
+## Horizontal Scaling vs. Vertical Scaling
+
+Just a few words about the difference between horizontal and vertical scaling:
+
+- When you have a single server, you can scale it vertically by adding more resources to it. For example, you can add more CPU cores, RAM, or disk space to **scale-up**.
+- Horizontal scaling on the other side, is when you add more servers that are responsible for serving requests to **scale-out**.
+
+Here is a simple example of horizontal scaling vs. vertical scaling:
+
+![Horizontal vs vertical scaling](https://imgur.com/RAklmV6.png)
+
+When horizontally scaling an application, it is important to handle your user sessions and cache data in a scalable way.
+
+## Creating a serverless Redis cluster
+
+With [Upstash](https://upstash.com?utm_source=bobby1), you can create a serverless Redis cluster in 30 seconds by following these steps:
+
+- Log in to your [Upstash account](https://console.upstash.com?utm_source=bobby1).
+- Click on the **Create Database** button.
+- Enter the name of your Redis cluster and choose a region.
+- Click on the **Create** button.
+
+That's it! You now have a serverless Redis cluster ready to use.
+
+Make sure to note down the endpoint of your Redis cluster along with the password and the port.
+
+## Configuring Laravel with Serverless Redis
+
+Now that you have a serverless Redis cluster, you can configure Laravel to use it just as you would any other Redis instance.
+
+### Install the Predis package
+
+In the past, you would use the PHP Redis extension to connect to your Redis cluster. However, now you can use the Predis package instead.
+
+To install the Predis package, run the following command:
+
+```bash
+composer require predis/predis
+```
+
+Next, head over to your Laravel project's `.env` file and update the following lines:
+
+```php
+REDIS_HOST=your_upstash_redis_endpoint
+REDIS_PASSWORD=your_upstash_redis_password
+REDIS_PORT=your_upstash_redis_port
+```
+
+While changing the Redis details, make sure to also change the cache driver and the session driver to `redis`:
+
+```
+CACHE_DRIVER=redis
+SESSION_DRIVER=redis
+```
+
+Finally, clear your config cache by running the following command:
+
+```bash
+php artisan config:clear
+```
+
+That way your Laravel application will use the serverless Redis cluster to store its cache and session data.
+
+## Conclusion
+
+Using Laravel with Serverless Redis is a great way to scale your application. Even if you are running Laravel on a Kubernetes cluster, you can still use a serverless Redis cluster to store your user sessions and cache data in a scalable way.
+
+For more information on Upstash, check the [documentation](https://docs.upstash.com/redis?utm_source=bobby1).
+
+For more information on how to scale your Laravel application check out the following article:
+
+- [How to Set Up a Scalable Laravel 6 Application using Managed Databases and Object Storage](https://www.digitalocean.com/community/tutorials/how-to-set-up-a-scalable-laravel-6-application-using-managed-databases-and-object-storage)
