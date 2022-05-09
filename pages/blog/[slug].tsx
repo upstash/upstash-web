@@ -194,6 +194,7 @@ export default function CareerDetailPage({ post, prevPost, nextPost }) {
               color: rgb(255 255 255 / 50%);
               border: 1px solid rgb(255 255 255 / 10%);
               border-bottom: 0;
+              background-color: rgb(255 255 255 / 5%);
             }
 
             .post .rehype-code-title + pre {

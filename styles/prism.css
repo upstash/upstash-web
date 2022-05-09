@@ -27,6 +27,11 @@ pre[class*="language-"] {
   hyphens: none;
 }
 
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+  /*background-color: rgb(255 255 255 / 5%);*/
+}
+
 /* Code blocks */
 pre[class*="language-"] {
   padding: 1rem;
