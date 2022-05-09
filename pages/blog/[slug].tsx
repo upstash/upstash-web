@@ -60,7 +60,7 @@ export async function getStaticProps({ params }) {
   };
 }
 
-export default function CareerDetailPage({ post, prevPost, nextPost }) {
+export default function BlogPostPage({ post, prevPost, nextPost }) {
   const Component = useMDXComponent(post.body.code);
 
   return (

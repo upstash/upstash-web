@@ -35,6 +35,8 @@ export async function getStaticProps({ params }) {
       return compareDesc(new Date(a.date), new Date(b.date));
     });
 
+  console.log(posts);
+
   if (!posts.length) {
     return {
       redirect: {
@@ -51,7 +53,7 @@ export async function getStaticProps({ params }) {
   };
 }
 
-export default function CareerPage({
+export default function BlogTagPage({
   posts,
   slug,
 }: {
@@ -77,7 +79,7 @@ export default function CareerPage({
             </Heading>
 
             <Box mt={8}>
-              <Link href="/index">Back to All Posts</Link>
+              <Link href="/blog">Back to All Posts</Link>
             </Box>
           </Box>
         </Container>

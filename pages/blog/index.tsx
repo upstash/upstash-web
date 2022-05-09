@@ -36,7 +36,7 @@ export async function getStaticProps() {
   return { props: { posts, tags: sortedTags } };
 }
 
-export default function CareerPage({
+export default function BlogPage({
   posts,
   tags,
 }: {

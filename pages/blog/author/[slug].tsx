@@ -49,7 +49,7 @@ export async function getStaticProps({ params }) {
   };
 }
 
-export default function CareerPage({
+export default function BlogAuthorPage({
   posts,
   slug,
 }: {
@@ -75,7 +75,7 @@ export default function CareerPage({
             </Heading>
 
             <Box mt={8}>
-              <Link href="/index">Back to All Posts</Link>
+              <Link href="/blog">Back to All Posts</Link>
             </Box>
           </Box>
         </Container>
