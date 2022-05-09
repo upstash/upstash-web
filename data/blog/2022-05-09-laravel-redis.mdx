@@ -87,7 +87,7 @@ composer require predis/predis
 
 Next, head over to your Laravel project's `.env` file and update the following lines:
 
-```php
+```shell
 REDIS_HOST=your_upstash_redis_endpoint
 REDIS_PASSWORD=your_upstash_redis_password
 REDIS_PORT=your_upstash_redis_port
@@ -95,7 +95,7 @@ REDIS_PORT=your_upstash_redis_port
 
 While changing the Redis details, make sure to also change the cache driver and the session driver to `redis`:
 
-```
+```shell
 CACHE_DRIVER=redis
 SESSION_DRIVER=redis
 ```
