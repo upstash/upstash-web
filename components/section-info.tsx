@@ -1,5 +1,6 @@
 import { Container, SimpleGrid, Box, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
+import commaNumber from "comma-number";
 
 function CountCard({ value, title }) {
   return (
@@ -12,7 +13,7 @@ function CountCard({ value, title }) {
       boxShadow="dark-lg"
     >
       <Text fontSize={["2xl", "3xl"]} fontWeight="semibold" lineHeight="1">
-        {value}
+        {commaNumber(value)}
       </Text>
       <Text
         mt={2}
@@ -57,7 +58,6 @@ function SectionInfo() {
           data[result[i]] = result[i + 1];
           i++;
         }
-        console.log(data);
         setData(data);
       });
   }, []);
