@@ -59,7 +59,17 @@ export default function CareerPage({
   return (
     <>
       <Head>
-        <title>Blog - Upstash</title>
+        <title>Upstash Blog</title>
+        <meta
+          key="og:description"
+          property="og:description"
+          content="Articles and tutorials from the Upstash team and community."
+        />
+        <meta
+          key="og:image"
+          property="og:image"
+          content="https://upstash.com/static/logo/og-blog.jpg"
+        />
       </Head>
 
       <Box as="section" py={["60px", "80px"]} textAlign="center">

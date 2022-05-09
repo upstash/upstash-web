@@ -46,7 +46,7 @@ export const META = {
   url: "https://upstash.com",
   twitterAccount: "@upstash",
   imagePath: "https://upstash.com/static/logo/square-dark.png",
-  coverImagePath: "https://upstash.com/static/logo/cover.jpg",
+  coverImagePath: "https://upstash.com/static/logo/og-homepage.jpg",
   imageSize: 1024,
   googleAnalytic: "G-QW5KRSTDM0",
 };

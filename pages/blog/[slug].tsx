@@ -66,7 +66,7 @@ export default function CareerDetailPage({ post, prevPost, nextPost }) {
   return (
     <>
       <Head>
-        <title>{post.title}</title>
+        <title>{post.title} | Upstash Blog</title>
         {/*<meta
           name="description"
           content="Recently, Netlify announced Edge Functions where you can run your code at edge locations on Deno runtime with globally low latency. In this post, we will build a simple app which runs Netlify Edge functions and accesses Upstash Redis as a data store. Upstash Redis is a perfect match for Netlify Edge Functions because:"

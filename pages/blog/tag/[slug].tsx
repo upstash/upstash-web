@@ -61,7 +61,7 @@ export default function CareerPage({
   return (
     <>
       <Head>
-        <title>Blog Tag - Upstash</title>
+        <title>tag/{slug} | Upstash Blog</title>
       </Head>
 
       <Box as="section" py={["60px", "80px"]} textAlign="center">
