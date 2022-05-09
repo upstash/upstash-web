@@ -27,7 +27,7 @@ function SectionSupport() {
           <SupportCard
             bgColor="#fff"
             textColor="#000"
-            href="'https://docs.upstash.com/tutorials/nextjs_with_redis'"
+            href="https://docs.upstash.com/tutorials/nextjs_with_redis"
           >
             <SectionSupportIconNext />
             <Text>
