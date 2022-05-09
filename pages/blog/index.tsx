@@ -17,7 +17,7 @@ import { compareDesc } from "date-fns";
 import { allPosts } from "contentlayer/generated";
 import type { Post } from "contentlayer/generated";
 import NextLink from "next/link";
-import { TAG_NAMES, BANNED_TAGS } from "constants/";
+import { TAG_NAMES, BANNED_TAGS, META } from "constants/";
 
 export async function getStaticProps() {
   const posts: Post[] = allPosts
@@ -68,6 +68,13 @@ export default function BlogPage({
     <>
       <Head>
         <title>Upstash Blog</title>
+
+        <meta
+          key="og:url"
+          property="og:url"
+          content="https://upstash.com/blog"
+        />
+        <meta key="og:title" property="og:title" content="Upstash Blog" />
         <meta
           key="og:description"
           property="og:description"
@@ -77,6 +84,23 @@ export default function BlogPage({
           key="og:image"
           property="og:image"
           content="https://upstash.com/static/logo/og-blog.jpg"
+        />
+
+        <meta
+          key="twitter:url"
+          name="twitter:url"
+          content="https://upstash.com/blog"
+        />
+        <meta key="twitter:title" name="twitter:title" content="Upstash Blog" />
+        <meta
+          key="twitter:image"
+          name="twitter:image"
+          content="https://upstash.com/static/logo/og-blog.jpg"
+        />
+        <meta
+          key="twitter:description"
+          name="twitter:description"
+          content="Articles and tutorials from the Upstash team and community."
         />
       </Head>
 
