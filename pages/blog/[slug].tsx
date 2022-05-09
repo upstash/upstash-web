@@ -204,7 +204,26 @@ export default function CareerDetailPage({ post, prevPost, nextPost }) {
 
             .post a {
               text-decoration: underline;
-              text-decoration-color: #555;
+              text-decoration-color: rgb(255 255 255 / 40%);
+            }
+
+            .post a.anchor:after {
+              content: "#";
+              color: rgb(255 255 255 / 50%);
+            }
+
+            .post a.anchor {
+              visibility: hidden;
+              position: absolute;
+              -webkit-text-decoration-line: none;
+              text-decoration-line: none;
+              margin-left: -1em;
+              padding-right: 0.5em;
+              cursor: pointer;
+            }
+
+            .post :hover > .anchor {
+              visibility: visible;
             }
 
             .post img {
@@ -227,6 +246,10 @@ export default function CareerDetailPage({ post, prevPost, nextPost }) {
               border: 1px solid rgb(255 255 255 / 20%);
               padding: 0.2em 0.3em;
               border-radius: 0.4rem;
+            }
+
+            .post :where(h2, h3, h4, h5) {
+              scroll-margin-top: 2rem;
             }
 
             .post h2,
