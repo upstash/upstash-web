@@ -20,11 +20,10 @@ Also:
 - Posts to the general channel once some new channel is created.
 
 ![slash_commands](/blog/vercel-note-taker-slackbot/slash_commands.png)
+
 ![events](/blog/vercel-note-taker-slackbot/events.png)
 
 An example use case could be setting some index values for individual tasks or creating To-Do lists or task distribution for different team members, etc.
-
----
 
 ## Getting Started
 
@@ -33,19 +32,19 @@ An example use case could be setting some index values for individual tasks or c
 - Currently, Vercel supports node v12 and v14. Before starting development, it may be a good idea to switch your node version to 14, especially for testing and local development.
 - Since our files will act as api endpoints, all the files mentioned below should be in a directory called `api`.
 - For deployment in Vercel, there is a naming convention for files:
-  - File names starting with `_` will not be converted to endpoints.
-    > I.E. `challenge.js` will result in an endpoint /api/challenge. If you don't want that, create the file as `_challenge.js`
+- File names starting with `_` will not be converted to endpoints.
+
+> I.E. `challenge.js` will result in an endpoint /api/challenge. If you don't want that, create the file as `_challenge.js`
 
 ### Prepare the Database
 
 We can create our Redis database on [Upstash Console](https://console.upstash.com). Copy/paste the UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN to the `.env` file:
 
-```
+```shell
 UPSTASH_REDIS_REST_URL=<YOUR_REST_URL>
 UPSTASH_REDIS_REST_TOKEN=<YOUR_REST_TOKEN>
 ```
 
----
 
 ## Starting Development
 
@@ -54,9 +53,10 @@ First of all, `npm install vercel axios crypto` to install dependencies and Verc
 ### Create helper files:
 
 - #### Create `_utils.js`:
-  > These will help us customize and ease the management of our slackbot.
 
-```
+> These will help us customize and ease the management of our slackbot.
+
+```js
 const axios = require('axios');
 import { token } from './_constants';
 
@@ -132,9 +132,10 @@ async function channelNameToId(channelName) {
 ```
 
 - #### Create `_validate.js`:
-  > We want to make sure that the requests that are coming to our server comes from Slack itself. For that, we will use some hashing to see whether the request is valid.
 
-```
+> We want to make sure that the requests that are coming to our server comes from Slack itself. For that, we will use some hashing to see whether the request is valid.
+
+```js
 const crypto = require("crypto");
 
 exports.validateSlackRequest = (event, signingSecret) => {
@@ -157,11 +158,12 @@ exports.validateSlackRequest = (event, signingSecret) => {
 ```
 
 - #### Create `_constants.js`:
-  > We don't want to hardcode our sensitive data.
-  >
-  > > `token` and `signingSecret` will be given after slack configuration.
 
-```
+> We don't want to hardcode our sensitive data.
+
+> `token` and `signingSecret` will be given after slack configuration.
+
+```js
 // These can be filled after Slack configuration
 export const token = process.env.SLACK_BOT_TOKEN
 export const signingSecret = process.env.SLACK_SIGNING_SECRET
@@ -178,7 +180,7 @@ Create a file named `note.js` with the code:
 
 > Simply tokenize the coming request from the slash commands. Depending on the command, direct the request to relevant handlers.
 
-```
+```js
 import { tokenizeString } from './_utils'
 import { setKey } from './slash_handlers/_set_key'
 import { addToList } from './slash_handlers/_add_to_list'
@@ -209,9 +211,10 @@ module.exports = (req, res) => {
 #### Create a directory named `slash_handlers` and inside:
 
 - `_set_key.js`:
-  > Using Upstash RESTFUL API, we can simply send a request without the need to create a client to connect to our database. This is one of the strengths of Upstash Redis.
 
-```
+> Using Upstash RESTFUL API, we can simply send a request without the need to create a client to connect to our database. This is one of the strengths of Upstash Redis.
+
+```js
 const axios = require('axios')
 import { redisURL, redisToken } from '../_constants'
 
@@ -243,7 +246,6 @@ export async function setKey(res, commandArray) {
 }
 ```
 
----
 
 ### Handling Events
 
@@ -251,7 +253,7 @@ Create a file named `events.js` with the code:
 
 > Slack sends a challenge for verification. If this is the case, direct request to that handler. Otherwise, check validity of the request and then direct it to relevant handler functions.
 
-```
+```js
 import { challenge } from './events_handlers/_challenge'
 import { app_mention } from './events_handlers/_app_mention'
 import { channel_created } from './events_handlers/_channel_created'
@@ -284,9 +286,10 @@ module.exports = async (req, res) => {
 #### Create a directory named `events_handlers` and inside:
 
 - `_challenge.js`:
-  > Simply send back the challenge for Slack verification.
 
-```
+> Simply send back the challenge for Slack verification.
+
+```js
 export function challenge(req, res) {
 
     res.status(200).send({
@@ -296,9 +299,10 @@ export function challenge(req, res) {
 ```
 
 - `_app_mention.js`:
-  > When our bot is mentioned, this function will be triggered. Simply post a greeting message to any channel with any text you like.
 
-```
+> When our bot is mentioned, this function will be triggered. Simply post a greeting message to any channel with any text you like.
+
+```js
 import { postToChannel } from "../_utils"
 
 export async function app_mention(req, res) {
@@ -314,7 +318,7 @@ export async function app_mention(req, res) {
 ```
 
 - #### Create other handler js files similar to `_app_mention.js`. (For reference, you can go to [Github Repo Of the Project](https://github.com/upstash/vercel-note-taker-slackbot))
-  - `_channel_created.js`
+- `_channel_created.js`
 
 ---
 
@@ -324,7 +328,7 @@ export async function app_mention(req, res) {
 
 #### Your folder structure should look something like this:
 
-```
+```bash
 <project_name>:
     api:
         _constants.js
@@ -349,12 +353,14 @@ export async function app_mention(req, res) {
 ### Running Locally
 
 > Vercel has a CLI that lets you simulate deployment on your local environment. To do so:
-> ![local-deployment](/blog/vercel-note-taker-slackbot/vercellocal.png)
+
+![local-deployment](/blog/vercel-note-taker-slackbot/vercellocal.png)
 
 If you don't have a static IP address, then you should use a tunnelling service such as `ngrok` so that you can show your endpoint to Slack:
 
 > `./ngrok http 3000` --> Tunnels your localhost:3000
-> ![ngrok](/blog/vercel-note-taker-slackbot/ngrok.png)
+
+![ngrok](/blog/vercel-note-taker-slackbot/ngrok.png)
 
 ### Configure Slack
 
