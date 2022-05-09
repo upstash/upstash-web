@@ -1,6 +1,7 @@
 import Head from "next/head";
 import {
   Box,
+  Button,
   Container,
   Heading,
   SimpleGrid,
@@ -18,6 +19,7 @@ import { allPosts } from "contentlayer/generated";
 import type { Post } from "contentlayer/generated";
 import NextLink from "next/link";
 import { TAG_NAMES, BANNED_TAGS, META } from "constants/";
+import { useState } from "react";
 
 export async function getStaticProps() {
   const posts: Post[] = allPosts
@@ -51,6 +53,12 @@ export default function BlogPage({
   posts: Post[];
   tags: [string, number][];
 }) {
+  const [showAll, showAllSet] = useState(false);
+  const MAX_SHOW_DATA = 20;
+  const HAS_HIDE_DATA = posts.length > MAX_SHOW_DATA;
+
+  const LAST_POSTS = showAll ? posts : posts.slice(0, MAX_SHOW_DATA);
+
   const colors = [
     "red",
     "cyan",
@@ -150,10 +158,22 @@ export default function BlogPage({
 
         <Container maxW="5xl">
           <SimpleGrid columns={{ sm: 1, md: 2 }} spacing={8}>
-            {posts.map((post) => {
+            {LAST_POSTS.map((post: Post) => {
               return <PostCard key={post.slug} {...post} />;
             })}
           </SimpleGrid>
+
+          <Box mt={10}>
+            <Button
+              variant="outline"
+              hidden={!HAS_HIDE_DATA || showAll}
+              onClick={() => {
+                showAllSet(true);
+              }}
+            >
+              Show all posts
+            </Button>
+          </Box>
         </Container>
       </Section>
     </>
