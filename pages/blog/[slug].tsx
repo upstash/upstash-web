@@ -55,8 +55,12 @@ export async function getStaticProps({ params }) {
   return {
     props: {
       post,
-      prevPost,
-      nextPost,
+      prevPost: prevPost
+        ? { title: prevPost.title, slug: prevPost.slug }
+        : null,
+      nextPost: nextPost
+        ? { title: nextPost.title, slug: nextPost.slug }
+        : null,
     },
   };
 }
