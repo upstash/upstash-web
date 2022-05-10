@@ -29,7 +29,7 @@ pre[class*="language-"] {
 
 :not(pre) > code[class*="language-"],
 pre[class*="language-"] {
-  /*background-color: rgb(255 255 255 / 5%);*/
+  background-color: rgb(255 255 255 / 5%);
 }
 
 /* Code blocks */
@@ -39,7 +39,7 @@ pre[class*="language-"] {
   border-radius: 0.5em;
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
-  border: 1px solid rgb(255 255 255 / 10%);
+  border: 1px solid rgb(255 255 255 / 5%);
 }
 
 pre[class*="language-"]::-webkit-scrollbar {
@@ -56,7 +56,7 @@ pre[class*="language-"]::-webkit-scrollbar {
 .token.prolog,
 .token.doctype,
 .token.cdata {
-  color: #7c7c7c;
+  color: #666;
 }
 
 .token.punctuation {

@@ -256,10 +256,10 @@ export default function BlogPostPage({
               padding: 0.5rem 1rem;
               border-radius: 0.5em 0.5em 0 0;
               font-size: 0.9rem;
-              color: rgb(255 255 255 / 50%);
+              color: rgb(255 255 255 / 60%);
               border: 1px solid rgb(255 255 255 / 10%);
               border-bottom: 0;
-              background-color: rgb(255 255 255 / 5%);
+              // background-color: rgb(255 255 255 / 5%);
             }
 
             .post .rehype-code-title + pre {
