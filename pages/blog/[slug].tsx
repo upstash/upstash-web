@@ -145,7 +145,11 @@ export default function BlogPostPage({
               src={post.authorObj.image_url}
             />
             <Box mt={4}>
-              <Text fontWeight="semibold">{post.authorObj.name}</Text>
+              <NextLink href={`/blog/author/${post.author}`} passHref>
+                <Text as="a" fontWeight="semibold">
+                  {post.authorObj.name}
+                </Text>
+              </NextLink>
               <Text color="whiteAlpha.600">{post.authorObj.title}</Text>
             </Box>
           </Box>
