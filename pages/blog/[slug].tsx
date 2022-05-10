@@ -72,14 +72,15 @@ export default function BlogPostPage({
 }) {
   const Component = useMDXComponent(post.body.code);
 
+  const description =
+    post.description ||
+    "Articles and tutorials on serverless technologies from Upstash team and community";
+
   return (
     <>
       <Head>
         <title>{post.title} | Upstash Blog</title>
-        {/*<meta
-          name="description"
-          content="Recently, Netlify announced Edge Functions where you can run your code at edge locations on Deno runtime with globally low latency. In this post, we will build a simple app which runs Netlify Edge functions and accesses Upstash Redis as a data store. Upstash Redis is a perfect match for Netlify Edge Functions because:"
-        />*/}
+        <meta name="description" content={description} />
         <meta property="article:published_time" content={post.date} />
         <meta property="article:author" content={post.authorObj.url} />
         <meta property="article:tag" content={post.tags.join(",")} />
@@ -92,10 +93,7 @@ export default function BlogPostPage({
         <meta key="og:type" property="og:type" content="article" />
         <meta key="og:url" property="og:url" content={post.url} />
         <meta key="og:title" property="og:title" content={post.title} />
-        {/*        <meta
-          property="og:description"
-          content="Recently, Netlify announced Edge Functions where you can run your code at edge locations on Deno runtime with globally low latency. In this post, we will build a simple app which runs Netlify Edge functions and accesses Upstash Redis as a data store. Upstash Redis is a perfect match for Netlify Edge Functions because:"
-        />*/}
+        <meta property="og:description" content={description} />
         <meta
           key="og:image"
           property="og:image"
@@ -105,11 +103,11 @@ export default function BlogPostPage({
         {/* twitter */}
         <meta key="twitter:url" name="twitter:url" content={post.url} />
         <meta key="twitter:title" name="twitter:title" content={post.title} />
-        {/*<meta
+        <meta
           key="twitter:description"
           name="twitter:description"
-          content={META.description}
-        />*/}
+          content={description}
+        />
         <meta
           key="twitter:image"
           name="twitter:image"
