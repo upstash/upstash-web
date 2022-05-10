@@ -59,10 +59,12 @@ export default function BlogAuthorPage({
   posts: Post[];
   slug: string;
 }) {
+  const author = posts[0].authorObj;
+
   return (
     <>
       <Head>
-        <title>author/{slug} | Upstash Blog</title>
+        <title>{author.name}'s posts | Upstash Blog</title>
       </Head>
 
       <Box as="section" py={["60px", "80px"]} textAlign="center">
