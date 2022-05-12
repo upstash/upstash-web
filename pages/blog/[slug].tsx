@@ -55,8 +55,12 @@ export async function getStaticProps({ params }) {
   return {
     props: {
       post,
-      prevPost,
-      nextPost,
+      prevPost: prevPost
+        ? { title: prevPost.title, slug: prevPost.slug }
+        : null,
+      nextPost: nextPost
+        ? { title: nextPost.title, slug: nextPost.slug }
+        : null,
     },
   };
 }
@@ -72,14 +76,15 @@ export default function BlogPostPage({
 }) {
   const Component = useMDXComponent(post.body.code);
 
+  const description =
+    post.description ||
+    "Articles and tutorials on serverless technologies from Upstash team and community";
+
   return (
     <>
       <Head>
         <title>{post.title} | Upstash Blog</title>
-        {/*<meta
-          name="description"
-          content="Recently, Netlify announced Edge Functions where you can run your code at edge locations on Deno runtime with globally low latency. In this post, we will build a simple app which runs Netlify Edge functions and accesses Upstash Redis as a data store. Upstash Redis is a perfect match for Netlify Edge Functions because:"
-        />*/}
+        <meta name="description" content={description} />
         <meta property="article:published_time" content={post.date} />
         <meta property="article:author" content={post.authorObj.url} />
         <meta property="article:tag" content={post.tags.join(",")} />
@@ -92,10 +97,7 @@ export default function BlogPostPage({
         <meta key="og:type" property="og:type" content="article" />
         <meta key="og:url" property="og:url" content={post.url} />
         <meta key="og:title" property="og:title" content={post.title} />
-        {/*        <meta
-          property="og:description"
-          content="Recently, Netlify announced Edge Functions where you can run your code at edge locations on Deno runtime with globally low latency. In this post, we will build a simple app which runs Netlify Edge functions and accesses Upstash Redis as a data store. Upstash Redis is a perfect match for Netlify Edge Functions because:"
-        />*/}
+        <meta property="og:description" content={description} />
         <meta
           key="og:image"
           property="og:image"
@@ -105,11 +107,11 @@ export default function BlogPostPage({
         {/* twitter */}
         <meta key="twitter:url" name="twitter:url" content={post.url} />
         <meta key="twitter:title" name="twitter:title" content={post.title} />
-        {/*<meta
+        <meta
           key="twitter:description"
           name="twitter:description"
-          content={META.description}
-        />*/}
+          content={description}
+        />
         <meta
           key="twitter:image"
           name="twitter:image"
@@ -145,7 +147,11 @@ export default function BlogPostPage({
               src={post.authorObj.image_url}
             />
             <Box mt={4}>
-              <Text fontWeight="semibold">{post.authorObj.name}</Text>
+              <NextLink href={`/blog/author/${post.author}`} passHref>
+                <Text as="a" fontWeight="semibold">
+                  {post.authorObj.name}
+                </Text>
+              </NextLink>
               <Text color="whiteAlpha.600">{post.authorObj.title}</Text>
             </Box>
           </Box>
@@ -252,10 +258,10 @@ export default function BlogPostPage({
               padding: 0.5rem 1rem;
               border-radius: 0.5em 0.5em 0 0;
               font-size: 0.9rem;
-              color: rgb(255 255 255 / 50%);
+              color: rgb(255 255 255 / 60%);
               border: 1px solid rgb(255 255 255 / 10%);
               border-bottom: 0;
-              background-color: rgb(255 255 255 / 5%);
+              // background-color: rgb(255 255 255 / 5%);
             }
 
             .post .rehype-code-title + pre {
