@@ -119,6 +119,8 @@ export default function BlogPostPage({
         />
       </Head>
 
+      {/* Post Header */}
+
       <Box as="header" pt={["80px", "100px"]} textAlign="center">
         <Container maxW="4xl">
           <HStack justify="center" color="whiteAlpha.600">
@@ -158,13 +160,32 @@ export default function BlogPostPage({
         </Container>
       </Box>
 
+      <Box
+        className="post-headings"
+        display={["none", "none", "none", "block"]}
+      >
+        {post.headings.map((heading) => {
+          return (
+            <HStack
+              as="a"
+              key={heading.level}
+              href={`#${heading.slug}`}
+              className={`post-headings-link h${heading.level}`}
+            >
+              <Box className="post-headings-link-dot" />
+              <Box className="post-headings-link-text">{heading.title}</Box>
+            </HStack>
+          );
+        })}
+      </Box>
+
       <Section mt="60px" pt={["80px", "100px"]} textAlign="left">
         <Bg />
 
         <Container maxW="3xl">
           {/* Post Body */}
 
-          <Box className="post" color="whiteAlpha.800">
+          <Box className="post" color="whiteAlpha.900">
             <Component />
           </Box>
 
@@ -183,6 +204,8 @@ export default function BlogPostPage({
           </HStack>
 
           <Divider my={10} />
+
+          {/* Post Share */}
 
           <HStack spacing={4} justify="center">
             <Link
@@ -243,6 +266,8 @@ export default function BlogPostPage({
             <OtherPostCard post={prevPost} />
             <OtherPostCard post={nextPost} align="right" />
           </SimpleGrid>
+
+          {/* Post Style */}
 
           <style global jsx>{`
             .post {

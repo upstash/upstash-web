@@ -1,11 +1,14 @@
 import { defineDocumentType, makeSource } from "contentlayer/source-files";
 import rehypePrism from "rehype-prism-plus";
 import readingTime from "reading-time";
-import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
 import rehypeCodeTitles from "rehype-code-titles";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import authors from "./authors";
+import { bundleMDX } from "mdx-bundler";
+import { tocPlugin } from "./utils/contentlayerPlugins";
+
+export type PostHeading = { level: 2 | 3; title: string; slug: string };
 
 export const Job = defineDocumentType(() => ({
   name: "Job",
@@ -85,6 +88,25 @@ export const Post = defineDocumentType(() => ({
         );
       },
     },
+    headings: {
+      type: "json",
+      resolve: async (doc) => {
+        const headings: PostHeading[] = [];
+
+        await bundleMDX({
+          source: doc.body.raw,
+          mdxOptions: (opts) => {
+            opts.remarkPlugins = [
+              ...(opts.remarkPlugins ?? []),
+              tocPlugin(headings),
+            ];
+            return opts;
+          },
+        });
+
+        return headings;
+      },
+    },
   },
 }));
 
@@ -92,7 +114,7 @@ export default makeSource({
   contentDirPath: "data",
   documentTypes: [Job, Post],
   mdx: {
-    remarkPlugins: [remarkGfm],
+    // remarkPlugins: [remarkGfm],
     rehypePlugins: [
       rehypeSlug,
       rehypeCodeTitles,
