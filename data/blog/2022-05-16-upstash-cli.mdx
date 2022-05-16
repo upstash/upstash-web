@@ -1,0 +1,90 @@
+---
+slug: "upstash-cli"
+title: "Announcing Upstash CLI"
+author: "andreas"
+tags: [cli, serverless, redis, kafka, upstash-cli, devops]
+---
+
+One of the primary goals of Upstash is to enable every developer to create Upstash resources easily using various tools.
+In the past, we have announced [Developer Api](https://developer.upstash.com/), [Terraform Provider](https://upstash.com/blog/redis-terraform), and now it is time for Upstash CLI.
+
+## Announcing @upstash/cli
+
+We are thrilled to announce Upstash command-line tool so that every developer can create their Upstash resources with a single command.
+
+It is available on [GitHub](https://github.com/upstash/cli), [npm](https://www.npmjs.com/package/@upstash/cli) or [built binaries](https://github.com/upstash/cli/releases/latest)
+
+## Get started
+
+Upstash CLI requires a developer api key. A new api key can be created in the [Console](https://docs.upstash.com/redis/account/developerapi).
+
+```bash
+npm install -g @upstash/cli
+```
+Or visit the GitHub [release page](https://github.com/upstash/cli/releases) for prebuilt binaries.
+
+After installing, execute the following command to log in. It will ask for your email and api key:
+
+```ts
+upstash auth login
+```
+
+That's all. You are now logged in and can manage your Upstash resources from the command line.
+
+If you are unsure what a command does, use the `--help` flag, and it will explain all available commands and flags.
+
+```bash
+upstash redis --help
+```
+
+All parameters can be given via CLI, but the CLI will ask you if a required parameter is missing.
+
+### Creating Resources
+
+#### Creating Redis Database
+
+```ts
+upstash redis create --name=cli-powered-db --region=eu-central-1
+```
+
+You only need to provide the name of your database and region. Other optional flags can be provided like tls, multizone, etc.
+
+#### Creating Kafka Cluster
+
+```ts
+upstash kafka create --name=$name --region=$region
+```
+
+Similar to redis, kafka resources requires 2 parameters name and region. After creating a region, a topic can be created.
+
+```ts
+upstash kafka topic create --name=mytopic --cluster-id=$id
+```
+
+#### Other Commands
+
+Upstash CLI includes many different commands to perform CRUD operations on your Upstash Resources.
+
+- **Team**: This allows you to manage teams and their members
+  ```bash
+  upstash team
+  ```
+
+- **Redis**: Create/edit/delete redis databases
+  ```bash
+  upstash redis
+  ```
+
+- **Kafka**: Create/edit/delete kafka clusters and topics
+  ```bash
+  upstash kafka cluster
+  upstash kafka topic
+  ```
+
+## Closing words
+
+If you have any questions, please reach out to us on [GitHub](https://github.com/upstash/upstash-cli/issues/new) or the channels below.
+
+Follow us
+on [Discord](https://discord.com/invite/w9SenAtbme)
+and [Twitter](https://twitter.com/upstash).
