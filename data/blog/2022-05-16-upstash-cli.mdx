@@ -1,0 +1,79 @@
+---
+slug: "upstash-cli"
+title: "Announcing Upstash CLI"
+author: "noah"
+tags:
+  [
+    cli,
+    serverless,
+    redis,
+    kafka,
+    upstash-cli,
+    devops
+  ]
+---
+
+One of primary goals of Upstash is that every developer should create Upstash resources easily using various tools.
+In the past we have announced [Developer Api](https://developer.upstash.com/), [Terraform Provider](https://upstash.com/blog/redis-terraform) and now it is time for Upstash CLI.
+
+
+## Announcing @upstash/cli
+We are thrilled to announce Upstash command line tool so that every developer can create their Upstash resources with single command.
+
+It is available on [GitHub](https://github.com/upstash/upstash-cli), [npm](https://www.npmjs.com/package/@upstash/cli) or [Deno](https://deno.land/x/upstash_cli)
+
+
+## Get started
+
+Upstash CLI requires developer api key. Api key can be created via [Console.](https://docs.upstash.com/redis/account/developerapi)
+
+```ts
+npm install -g @upstash/upstash-cli
+```
+
+After installing CLI execute following command, it will ask your email and apikey:
+
+```ts
+upstash login
+```
+That's all. You are now logged in and can manage your Upstash resources from the command line.
+
+
+### Creating Resources
+
+Upstash CLI has help command that explains all available commands and flags.
+All parameters can be given via CLI but if a  required parameter is missing then CLI will ask you again for that parameter.
+
+
+#### Creating Redis Database
+
+```ts
+upstash redis create --name $name --region $region
+```
+You only need to provide name of your database and region. There are other optional flags can be provided like tls, multizone etc.
+
+
+#### Creating Kafka Cluster
+
+```ts
+upstash kafka create --name $name --region $region
+```
+
+Similar to redis, kafka resources requires 2 parameters name and region. After creating a region, a topic can be created.
+
+```ts
+upstash kafka add topic --name mytopic --cluster $cluster_name
+```
+
+#### Other Commands
+
+Upstash CLI includes many different commands that gives you chance of CRUD operations on your Upstash Resources.
+I would like to reference our documentation for full explanation of commands and Github README.
+
+## Closing words
+
+If you have any questions, please reach out to us on [GitHub](https://github.com/upstash/upstash-cli/issues/new) or the channels below.
+
+Follow us
+on [Discord](https://discord.com/invite/w9SenAtbme)
+and [Twitter](https://twitter.com/upstash).
