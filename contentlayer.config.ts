@@ -2,6 +2,7 @@ import { defineDocumentType, makeSource } from "contentlayer/source-files";
 import rehypePrism from "rehype-prism-plus";
 import readingTime from "reading-time";
 import rehypeSlug from "rehype-slug";
+import remarkGfm from "remark-gfm";
 import rehypeCodeTitles from "rehype-code-titles";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import authors from "./authors";
@@ -114,16 +115,11 @@ export default makeSource({
   contentDirPath: "data",
   documentTypes: [Job, Post],
   mdx: {
-    // remarkPlugins: [remarkGfm],
+    remarkPlugins: [remarkGfm],
     rehypePlugins: [
       rehypeSlug,
       rehypeCodeTitles,
-      [
-        rehypePrism,
-        {
-          // showLineNumbers: true,
-        },
-      ],
+      rehypePrism,
       [
         rehypeAutolinkHeadings,
         {
