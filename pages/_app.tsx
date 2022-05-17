@@ -50,7 +50,10 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <ChakraProvider theme={theme}>
-      <Provider url={process.env.NEXT_PUBLIC_API_URL} options={options}>
+      <Provider
+        url={`${process.env.NEXT_PUBLIC_VERCEL_URL}/api`}
+        options={options}
+      >
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <meta httpEquiv="x-ua-compatible" content="ie=edge" />
