@@ -1,5 +1,5 @@
-import "../styles/app.css";
-import "../styles/prism.css";
+import "styles/app.css";
+import "styles/prism.css";
 import "react-typist/dist/Typist.css";
 
 import { useEffect } from "react";
@@ -13,11 +13,9 @@ import * as gtag from "lib/gtag";
 import { META } from "constants/";
 import theme from "theme";
 import { Provider, CachePolicies } from "use-http";
-import type { AppProps, NextWebVitalsMetric } from "next/app";
+import type { AppProps } from "next/app";
 
-export function reportWebVitals(metric: NextWebVitalsMetric) {
-  console.log(metric);
-}
+console.log(process.env.NEXT_PUBLIC_URL);
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -50,10 +48,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <ChakraProvider theme={theme}>
-      <Provider
-        url={`${process.env.NEXT_PUBLIC_VERCEL_URL}/api`}
-        options={options}
-      >
+      <Provider url={`${process.env.NEXT_PUBLIC_URL}/api`} options={options}>
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <meta httpEquiv="x-ua-compatible" content="ie=edge" />

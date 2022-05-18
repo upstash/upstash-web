@@ -244,7 +244,7 @@ export default function BlogPostPage({
               color="black"
               bgColor="primary"
               fontWeight="normal"
-              transform={`scale(${cacheCount * 0.04 + 1})`}
+              transform={`scale(${cacheCount * 0.02 + 1})`}
               transformOrigin="left bottom"
               _hover={{}}
               _active={{}}
@@ -391,7 +391,7 @@ export default function BlogPostPage({
             }
 
             .post :not(pre) > code {
-              font-size: 0.86rem;
+              font-size: 0.86em;
               white-space: pre;
               word-spacing: normal;
               word-break: normal;

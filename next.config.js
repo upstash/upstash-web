@@ -1,12 +1,16 @@
 const { withContentlayer } = require("next-contentlayer");
+const { PHASE_DEVELOPMENT_SERVER } = require("next/constants");
 
-const withBundleAnalyzer = require("@next/bundle-analyzer")({
-  enabled: process.env.ANALYZE === "true",
-});
+module.exports = (phase) => {
+  const isDev = phase === PHASE_DEVELOPMENT_SERVER;
 
-module.exports = withContentlayer(
-  withBundleAnalyzer({
+  return withContentlayer({
     swcMinify: true,
+    env: {
+      NEXT_PUBLIC_URL: isDev
+        ? "http://localhost:3000"
+        : `https://${process.env.VERCEL_URL}`,
+    },
     compiler: {
       removeConsole:
         process.env.NODE_ENV === "development"
@@ -15,5 +19,5 @@ module.exports = withContentlayer(
               exclude: ["error"],
             },
     },
-  })
-);
+  });
+};

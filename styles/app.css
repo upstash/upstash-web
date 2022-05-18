@@ -15,7 +15,7 @@
   top: 50%;
   left: 1rem;
   transform: translateY(-50%);
-  padding: 1rem;
+  padding: .5rem;
   background-color: rgb(255 255 255 / 10%);
   border-radius: 1rem;
 }
@@ -23,6 +23,7 @@
 
 .post-headings:hover {
   background-color: #555;
+  padding: 1rem;
 }
 
 .post-headings-link {
@@ -30,7 +31,7 @@
 }
 
 .post-headings-link-dot {
-  font-size: 8px;
+  font-size: 6px;
   width: 1em;
   height: 1em;
   border-radius: 99em;
