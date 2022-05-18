@@ -214,7 +214,13 @@ export default function BlogPostPage({
           {/* Post Body */}
 
           <Box className="post" color="whiteAlpha.900">
-            <Component />
+            <Component
+              components={{
+                FullWidth: (props) => {
+                  return <Box mx={{ xl: -40 }} {...props} />;
+                },
+              }}
+            />
           </Box>
 
           {/* Post Tags */}
@@ -358,6 +364,33 @@ export default function BlogPostPage({
             .post a {
               text-decoration: underline;
               text-decoration-color: rgb(255 255 255 / 40%);
+            }
+
+            .post table {
+              display: block;
+              width: 100%;
+              width: max-content;
+              max-width: 100%;
+              overflow: auto;
+            }
+
+            .post table tr {
+              border-top: 1px solid #333;
+            }
+
+            .post table th,
+            .post table td {
+              padding: 6px 13px;
+              border: 1px solid #333;
+            }
+
+            .post table th {
+              font-weight: semibold;
+              white-space: nowrap;
+            }
+
+            .post table tr:nth-child(2n) {
+              background-color: rgb(255 255 255 / 10%);
             }
 
             .post a.anchor:after {
