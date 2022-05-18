@@ -25,9 +25,9 @@ export default async function handler(
       const response =
         ip === "NA" ? 1 : await redis.sadd(`vote:post:${id}`, ip.toString());
 
-      if (response === 0) {
-        return res.status(400).json({ message: "Already voted" });
-      }
+      // if (response === 0) {
+      //   return res.status(400).json({ message: "Already voted" });
+      // }
 
       const initialCount = req.body.count || 1;
 
