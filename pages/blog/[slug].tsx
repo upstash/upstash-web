@@ -92,9 +92,9 @@ export default function BlogPostPage({
     get: getCount,
     patch: updateCount,
     response: responseCount,
-  } = useFetch(`post/clap/${post.slug}`, []);
+  } = useFetch(`post/clap/${post.slug}`);
 
-  const debouncedSave = React.useCallback(
+  const onClapSaving = React.useCallback(
     debounce(async (count) => {
       const data = await updateCount({ count });
       setCacheCount(0);
@@ -104,10 +104,10 @@ export default function BlogPostPage({
     []
   );
 
-  const onClaps = async () => {
+  const onClap = () => {
     const value = cacheCount === MAX_CLAP ? cacheCount : cacheCount + 1;
     setCacheCount(value);
-    await debouncedSave(value);
+    return onClapSaving(value);
   };
 
   const initData = async () => {
@@ -266,7 +266,7 @@ export default function BlogPostPage({
               transformOrigin="left bottom"
               _hover={{}}
               _active={{}}
-              onClick={onClaps}
+              onClick={onClap}
             >
               <svg width="24" height="24" viewBox="0 0 24 24" aria-label="clap">
                 <path
