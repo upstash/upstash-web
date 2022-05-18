@@ -24,6 +24,7 @@ import Bg from "components/bg";
 import OtherPostCard from "components/other-post-card";
 import useFetch from "use-http";
 import React from "react";
+import { MAX_CLAP } from "constants/index";
 
 export async function getStaticPaths() {
   const paths = allPosts.map((doc: Post) => ({ params: { slug: doc.slug } }));
@@ -85,7 +86,6 @@ export default function BlogPostPage({
     "Articles and tutorials on serverless technologies from Upstash team and community";
 
   const [cacheCount, setCacheCount] = React.useState(0);
-  const MAX_VALUE = 30;
 
   const {
     data = { count: 0 },
@@ -103,7 +103,7 @@ export default function BlogPostPage({
   );
 
   const onClaps = async () => {
-    const value = cacheCount === MAX_VALUE ? cacheCount : cacheCount + 1;
+    const value = cacheCount === MAX_CLAP ? cacheCount : cacheCount + 1;
     setCacheCount(value);
     await debouncedSave(value);
   };

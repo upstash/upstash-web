@@ -15,8 +15,6 @@ import theme from "theme";
 import { Provider, CachePolicies } from "use-http";
 import type { AppProps } from "next/app";
 
-console.log(process.env.NEXT_PUBLIC_URL);
-
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
 

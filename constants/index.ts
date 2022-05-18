@@ -414,3 +414,5 @@ export const INVESTORS = [
     url: "https://www.linkedin.com/in/morgan-dioli-author-cfo",
   },
 ];
+
+export const MAX_CLAP = 10;

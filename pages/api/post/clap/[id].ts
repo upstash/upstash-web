@@ -1,5 +1,6 @@
 import redis from "lib/redis";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { MAX_CLAP } from "constants/index";
 
 export default async function handler(
   req: NextApiRequest,
@@ -11,6 +12,7 @@ export default async function handler(
   try {
     if (method === "GET") {
       const count = await redis.get(`post:${id}`);
+      console.log(count);
       return res.status(200).json({ count: count || 0 });
     }
 
@@ -29,11 +31,10 @@ export default async function handler(
       }
 
       const initialCount = req.body.count || 1;
-      const MAX_VALUE = 30;
 
       const count = await redis.incrby(
         `post:${id}`,
-        initialCount > MAX_VALUE ? MAX_VALUE : initialCount
+        initialCount > MAX_CLAP ? MAX_CLAP : initialCount
       );
       return res.status(200).json({ count });
     }
