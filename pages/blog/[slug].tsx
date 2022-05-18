@@ -85,17 +85,21 @@ export default function BlogPostPage({
     post.description ||
     "Articles and tutorials on serverless technologies from Upstash team and community";
 
+  const [count, setCount] = React.useState(0);
   const [cacheCount, setCacheCount] = React.useState(0);
 
-  const clapPath = `post/clap/${post.slug}`;
-  const { data = { count: 0 } } = useFetch(clapPath, []);
-  const { patch, response } = useFetch(clapPath, []);
+  const {
+    get: getCount,
+    patch: updateCount,
+    response: responseCount,
+  } = useFetch(`post/clap/${post.slug}`, []);
 
   const debouncedSave = React.useCallback(
     debounce(async (count) => {
-      await patch({ count });
-      if (!response.ok) alert(response.data.message);
+      const data = await updateCount({ count });
       setCacheCount(0);
+      if (!responseCount.ok) return;
+      setCount(data);
     }, 1000),
     []
   );
@@ -105,6 +109,16 @@ export default function BlogPostPage({
     setCacheCount(value);
     await debouncedSave(value);
   };
+
+  const initData = async () => {
+    const data = await getCount();
+    if (!responseCount.ok) return;
+    setCount(data.count);
+  };
+
+  React.useEffect(() => {
+    initData();
+  }, []);
 
   return (
     <>
