@@ -87,11 +87,9 @@ export default function BlogPostPage({
 
   const [cacheCount, setCacheCount] = React.useState(0);
 
-  const {
-    data = { count: 0 },
-    patch,
-    response,
-  } = useFetch(`post/clap/${post.slug}`, []);
+  const clapPath = `post/clap/${post.slug}`;
+  const { data = { count: 0 } } = useFetch(clapPath, []);
+  const { patch, response } = useFetch(clapPath, []);
 
   const debouncedSave = React.useCallback(
     debounce(async (count) => {
