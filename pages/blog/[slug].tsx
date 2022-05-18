@@ -99,7 +99,7 @@ export default function BlogPostPage({
       const data = await updateCount({ count });
       setCacheCount(0);
       if (!responseCount.ok) return;
-      setCount(data);
+      setCount(data.count);
     }, 1000),
     []
   );
@@ -277,7 +277,7 @@ export default function BlogPostPage({
                 />
               </svg>
               <Box as="span" ml={1}>
-                {data.count} {cacheCount > 0 && ` + ${cacheCount}`}
+                {count} {cacheCount > 0 && ` + ${cacheCount}`}
               </Box>
             </Button>
           </Box>
