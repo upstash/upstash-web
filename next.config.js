@@ -7,9 +7,7 @@ module.exports = (phase) => {
   return withContentlayer({
     swcMinify: true,
     env: {
-      NEXT_PUBLIC_URL: isDev
-        ? "http://localhost:3000"
-        : `https://${process.env.VERCEL_URL}`,
+      NEXT_PUBLIC_URL: isDev ? "http://localhost:3000" : `https://upstash.com`,
     },
     compiler: {
       removeConsole:

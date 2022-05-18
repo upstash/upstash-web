@@ -12,7 +12,6 @@ export default async function handler(
   try {
     if (method === "GET") {
       const count = await redis.get(`post:${id}`);
-      console.log(count);
       return res.status(200).json({ count: count || 0 });
     }
 
