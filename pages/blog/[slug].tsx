@@ -25,6 +25,7 @@ import OtherPostCard from "components/other-post-card";
 import useFetch from "use-http";
 import React from "react";
 import { MAX_CLAP } from "constants/index";
+import commaNumber from "comma-number";
 
 export async function getStaticPaths() {
   const paths = allPosts.map((doc: Post) => ({ params: { slug: doc.slug } }));
@@ -88,17 +89,22 @@ export default function BlogPostPage({
   const [count, setCount] = React.useState(0);
   const [cacheCount, setCacheCount] = React.useState(0);
 
+  const { data: viewData = { count: 0 }, patch: updateView } = useFetch(
+    `post/view/${post.slug}`,
+    []
+  );
+
   const {
-    get: getCount,
-    patch: updateCount,
-    response: responseCount,
+    get: getClaps,
+    patch: updateClaps,
+    response: responseClaps,
   } = useFetch(`post/clap/${post.slug}`);
 
   const onClapSaving = React.useCallback(
     debounce(async (count) => {
-      const data = await updateCount({ count });
+      const data = await updateClaps({ count });
       setCacheCount(0);
-      if (!responseCount.ok) return;
+      if (!responseClaps.ok) return;
       setCount(data.count);
     }, 1000),
     []
@@ -111,13 +117,14 @@ export default function BlogPostPage({
   };
 
   const initData = async () => {
-    const data = await getCount();
-    if (!responseCount.ok) return;
+    const data = await getClaps();
+    if (!responseClaps.ok) return;
     setCount(data.count);
   };
 
   React.useEffect(() => {
     initData();
+    updateView();
   }, []);
 
   return (
@@ -169,6 +176,8 @@ export default function BlogPostPage({
             </Text>
             <Text>·</Text>
             <Text as="span">{post.readingTime.text}</Text>
+            <Text>·</Text>
+            <Text as="span">{commaNumber(viewData.count)} views</Text>
           </HStack>
 
           <Heading
