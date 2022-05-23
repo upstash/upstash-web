@@ -176,8 +176,8 @@ export default function BlogPostPage({
             </Text>
             <Text>·</Text>
             <Text as="span">{post.readingTime.text}</Text>
-            <Text>·</Text>
-            <Text as="span">{commaNumber(viewData.count)} views</Text>
+            {/*<Text>·</Text>*/}
+            {/*<Text as="span">{commaNumber(viewData.count)} views</Text>*/}
           </HStack>
 
           <Heading
@@ -209,24 +209,26 @@ export default function BlogPostPage({
         </Container>
       </Box>
 
-      <Box
-        className="post-headings"
-        display={["none", "none", "none", "block"]}
-      >
-        {post.headings.map((heading) => {
-          return (
-            <HStack
-              as="a"
-              key={heading.slug}
-              href={`#${heading.slug}`}
-              className={`post-headings-link h${heading.level}`}
-            >
-              <Box className="post-headings-link-dot" />
-              <Box className="post-headings-link-text">{heading.title}</Box>
-            </HStack>
-          );
-        })}
-      </Box>
+      {post.headings.length > 0 && (
+        <Box
+          className="post-headings"
+          display={["none", "none", "none", "block"]}
+        >
+          {post.headings.map((heading) => {
+            return (
+              <HStack
+                as="a"
+                key={heading.slug}
+                href={`#${heading.slug}`}
+                className={`post-headings-link h${heading.level}`}
+              >
+                <Box className="post-headings-link-dot" />
+                <Box className="post-headings-link-text">{heading.title}</Box>
+              </HStack>
+            );
+          })}
+        </Box>
+      )}
 
       <Section mt="60px" pt={["80px", "100px"]} textAlign="left">
         <Bg />
