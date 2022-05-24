@@ -113,4 +113,10 @@ export default {
     image_url:
       "https://dev-to-uploads.s3.amazonaws.com/uploads/user/profile_image/191651/a7ce5d4e-1298-48e7-b99e-a9755d786776.jpeg",
   },
+  jake: {
+    name: "Jake Lynch",
+    title: "CTO, Fig (Guest Author)",
+    image_url:
+        "https://pbs.twimg.com/profile_images/1338274717816516612/BmHl_4t__400x400.jpg",
+  }
 };
