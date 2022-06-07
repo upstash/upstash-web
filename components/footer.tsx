@@ -22,6 +22,7 @@ function Footer() {
       overflow="hidden"
       py={["80px", "120px"]}
       textAlign="center"
+      zIndex={90}
     >
       <Bg />
 
