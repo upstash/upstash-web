@@ -19,7 +19,7 @@ Here we will write a Next.js edge function which will show a custom greeting dep
 
 Check [the repo](https://github.com/upstash/examples/tree/master/nextjs-edge) and [the demo](https://nextjs-edge-enesakar-upstash.vercel.app/api/hello).
 
-** `1` Create a Next.js application and install Upstash Redis: **
+### `1` Create a Next.js application and install Upstash Redis:
 
 ```shell
 npx create-next-app@latest --typescript
@@ -27,7 +27,7 @@ cd nextjs-edge
 npm install @upstash/redis
 ```
 
-** `2` Create a Redis database: **
+### `2` Create a Redis database:
 
 Create a Global database for the best edge latency in [Upstash Console](https://console.upstash.com/). Connect to your database with redis-cli and add some greeting data as below:
 
@@ -44,7 +44,7 @@ global-promoted-chicken-30286.upstash.io:30286> set IN "Namaste"
 OK
 ```
 
-** `3` Create the edge function:**
+### `3` Create the edge function:
 
 Create pages/api/\_middleware.ts as below:
 
@@ -66,7 +66,7 @@ export async function middleware(req: NextRequest, ev: NextFetchEvent) {
 
 Copy and replace `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` from your database page in [Upstash Console](https://console.upstash.com/).
 
-** `4` Run and Deploy:**
+### `4` Run and Deploy:
 
 Run your application locally:
 
