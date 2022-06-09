@@ -10,7 +10,7 @@ In this tutorial, you will learn how to connect to Upstash Redis database using 
 
 ## What is go-redis?
 
-[go-redis](https://redis.uptrace.dev/) is a popular Redis client for Golang. Out of the box, it supports Redis Server, Sentinel, and Cluster.
+[go-redis](https://redis.uptrace.dev/?utm_source=upstash) is a popular Redis client for Golang. Out of the box, it supports Redis Server, Sentinel, and Cluster.
 
 To connect to Upstash Redis database, use the following code:
 
@@ -50,11 +50,11 @@ if err != nil {
 }
 ```
 
-You can use go-redis to [cache](https://redis.uptrace.dev/guide/go-redis-cache.html) data or [rate-limit](https://redis.uptrace.dev/guide/go-redis-rate-limiting.html) requests to your API. To learn more about the client, see [Redis Golang](https://redis.uptrace.dev/guide/go-redis.html) documentation.
+You can use go-redis to [cache](https://redis.uptrace.dev/guide/go-redis-cache.html?utm_source=upstash) data or [rate-limit](https://redis.uptrace.dev/guide/go-redis-rate-limiting.html?utm_source=upstash) requests to your API. To learn more about the client, see [Redis Golang](https://redis.uptrace.dev/guide/go-redis.html?utm_source=upstash) documentation.
 
 ## What is distributed tracing?
 
-[Distributed tracing](https://opentelemetry.uptrace.dev/guide/distributed-tracing.html) allows to observe requests as they propagate through distributed systems, especially those built using a microservices architecture.
+[Distributed tracing](https://opentelemetry.uptrace.dev/guide/distributed-tracing.html?utm_source=upstash) allows to observe requests as they propagate through distributed systems, especially those built using a microservices architecture.
 
 Tracing allows to follow requests as they travel through distributed systems. You get a full context of what is different, what is broken, and which logs & errors are relevant.
 
@@ -63,9 +63,9 @@ Tracing allows to follow requests as they travel through distributed systems. Yo
 
 ## What is OpenTelemetry?
 
-[OpenTelemetry](https://opentelemetry.uptrace.dev/) is a vendor-neutral standard that allows you to collect and export [traces](https://opentelemetry.uptrace.dev/guide/distributed-tracing.html), [logs](https://opentelemetry.uptrace.dev/guide/logs.html), and [metrics](https://opentelemetry.uptrace.dev/guide/metrics.html).
+[OpenTelemetry](https://opentelemetry.uptrace.dev/?utm_source=upstash) is a vendor-neutral standard that allows you to collect and export [traces](https://opentelemetry.uptrace.dev/guide/distributed-tracing.html?utm_source=upstash), [logs](https://opentelemetry.uptrace.dev/guide/logs.html?utm_source=upstash), and [metrics](https://opentelemetry.uptrace.dev/guide/metrics.html?utm_source=upstash).
 
-Otel allows developers to collect and export telemetry data in a vendor agnostic way. With OpenTelemetry, you can [instrument](https://opentelemetry.uptrace.dev/instrumentations/) your application once and then add or change vendors without changing the instrumentation, for example, here is a list [popular DataDog alternatives](https://get.uptrace.dev/compare/datadog-competitors.html) that support OpenTelemetry.
+Otel allows developers to collect and export telemetry data in a vendor agnostic way. With OpenTelemetry, you can [instrument](https://opentelemetry.uptrace.dev/instrumentations/?utm_source=upstash) your application once and then add or change vendors without changing the instrumentation, for example, here is a list [popular DataDog alternatives](https://get.uptrace.dev/compare/datadog-competitors.html?utm_source=upstash) that support OpenTelemetry.
 
 OpenTelemetry is available for most programming languages and provides interoperability across different languages and environments.
 
@@ -90,20 +90,20 @@ rdb := redis.NewClient(&redis.Options{...})
 rdb.AddHook(redisotel.NewTracingHook())
 ```
 
-To make tracing work, you must pass the active [trace context](https://opentelemetry.uptrace.dev/guide/go-tracing.html#context) to go-redis commands, for example:
+To make tracing work, you must pass the active [trace context](https://opentelemetry.uptrace.dev/guide/go-tracing.html#context?utm_source=upstash) to go-redis commands, for example:
 
 ```go
 ctx := req.Context()
 val, err := rdb.Get(ctx, "key").Result()
 ```
 
-To learn more about redisotel, see [Monitoring Go Redis Performance and Errors](https://redis.uptrace.dev/guide/go-redis-monitoring.html).
+To learn more about redisotel, see [Monitoring Go Redis Performance and Errors](https://redis.uptrace.dev/guide/go-redis-monitoring.html?utm_source=upstash).
 
 ## Uptrace
 
-[Uptrace](https://uptrace.dev/) is an open source [DataDog competitor](https://get.uptrace.dev/compare/datadog-competitors.html) with an intuitive query builder, rich dashboards, automatic alerts, and integrations for most languages and frameworks.
+[Uptrace](https://uptrace.dev/) is an open source [DataDog competitor](https://get.uptrace.dev/compare/datadog-competitors.html?utm_source=upstash) with an intuitive query builder, rich dashboards, automatic alerts, and integrations for most languages and frameworks.
 
-You can [install Uptrace](https://get.uptrace.dev/guide/opentelemetry-tracing-tool.html) by downloading a DEB/RPM package or a pre-compiled binary.
+You can [install Uptrace](https://get.uptrace.dev/guide/opentelemetry-tracing-tool.html?utm_source=upstash) by downloading a DEB/RPM package or a pre-compiled binary.
 
 As expected, redisotel creates [spans](https://opentelemetry.uptrace.dev/guide/distributed-tracing.html#spans) for processed Redis commands and records any errors as they occur. Here is how the collected information is displayed at Uptrace:
 
@@ -115,4 +115,4 @@ You can find a runnable example at [GitHub](https://github.com/go-redis/redis/tr
 
 Next, you can install more OpenTelemetry [instrumentations](https://opentelemetry.uptrace.dev/instrumentations/?lang=go) to monitor other aspects of the app, for example, [Gin](https://opentelemetry.uptrace.dev/instrumentations/go-gin.html) or [Go gRPC](https://opentelemetry.uptrace.dev/instrumentations/go-grpc.html).
 
-You can also learn about OpenTelemetry [Tracing API](https://opentelemetry.uptrace.dev/guide/go-tracing.html) and [Metrics API](https://opentelemetry.uptrace.dev/guide/go-metrics.html) to create your own instrumentations.
+You can also learn about OpenTelemetry [Tracing API](https://opentelemetry.uptrace.dev/guide/go-tracing.html?utm_source=upstash) and [Metrics API](https://opentelemetry.uptrace.dev/guide/go-metrics.html?utm_source=upstash) to create your own instrumentation.
