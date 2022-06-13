@@ -113,14 +113,6 @@ export const PRICES = {
     payg: "1000",
     enterprise: "10,000",
   },
-  strongConsistency: {
-    title: "Strong Consistency",
-    description:
-      "With strong consistency, writes are guaranteed to be durable and replicated when the client receives a success response.",
-    free: true,
-    payg: true,
-    enterprise: true,
-  },
   persistence: {
     title: "Persistence",
     description:

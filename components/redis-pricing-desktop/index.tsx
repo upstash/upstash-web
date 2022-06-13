@@ -61,26 +61,6 @@ export default function RedisDesktopTable() {
 
       <ColDescription>
         <Text as="span">
-          {PRICES.strongConsistency.title}
-          <CustomTooltip>{PRICES.strongConsistency.description}</CustomTooltip>
-        </Text>
-      </ColDescription>
-      <Col>
-        <ColCheck check={PRICES.strongConsistency.free} />
-      </Col>
-      <Col highlight>
-        <ColCheck check={PRICES.strongConsistency.payg} />
-      </Col>
-      <Col>
-        <ColCheck check={PRICES.strongConsistency.enterprise} />
-      </Col>
-
-      <GridItem colSpan={4}>
-        <Box height="1px" bg="whiteAlpha.100" />
-      </GridItem>
-
-      <ColDescription>
-        <Text as="span">
           {PRICES.persistence.title}
           <CustomTooltip>{PRICES.persistence.description}</CustomTooltip>
         </Text>

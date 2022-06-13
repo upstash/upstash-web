@@ -42,11 +42,6 @@ export default function RedisMobileTable() {
             </Flex>
 
             <Flex direction="column" align="center">
-              <Title>{PRICES.strongConsistency.title}</Title>
-              <ColCheck check={PRICES.strongConsistency[key]} />
-            </Flex>
-
-            <Flex direction="column" align="center">
               <Title>{PRICES.persistence.title}</Title>
               <ColCheck check={PRICES.persistence[key]} />
             </Flex>
