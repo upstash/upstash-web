@@ -91,20 +91,20 @@ function SectionPricing() {
         <Box mt={[10, 20]}>
           {price === "redis" && (
             <>
-              <Box d={["none", "block"]}>
+              <Box display={["none", "block"]}>
                 <RedisDesktopTable />
               </Box>
-              <Box d={["block", "none"]}>
+              <Box display={["block", "none"]}>
                 <RedisMobileTable />
               </Box>
             </>
           )}
           {price === "kafka" && (
             <>
-              <Box d={["none", "block"]}>
+              <Box display={["none", "block"]}>
                 <KafkaDesktopTable />
               </Box>
-              <Box d={["block", "none"]}>
+              <Box display={["block", "none"]}>
                 <KafkaMobileTable />
               </Box>
             </>

@@ -11,7 +11,7 @@ function CustomLink({
     <Flex
       as={Link}
       isExternal={isExternal}
-      d="inline-flex"
+      display="inline-flex"
       align="center"
       color="primary"
       _hover={{

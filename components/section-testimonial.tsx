@@ -77,7 +77,7 @@ export default function SectionTestimonial() {
 export function TestimonialCard({ photo, name, title, children, ...props }) {
   return (
     <Box
-      d="flex"
+      display="flex"
       textAlign="left"
       borderRadius="md"
       bgColor="whiteAlpha.100"

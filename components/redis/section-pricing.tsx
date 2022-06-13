@@ -32,10 +32,10 @@ function SectionPricing() {
         </Box>
 
         <Box mt={[10, 20]}>
-          <Box d={["none", "block"]}>
+          <Box display={["none", "block"]}>
             <RedisDesktopTable />
           </Box>
-          <Box d={["block", "none"]}>
+          <Box display={["block", "none"]}>
             <RedisMobileTable />
           </Box>
         </Box>

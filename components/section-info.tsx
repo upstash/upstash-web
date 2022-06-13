@@ -27,7 +27,7 @@ function CountCard({ value, title }) {
           as="span"
           mr="2"
           ml="-2"
-          d="inline-flex"
+          display="inline-flex"
           boxSize="10px"
           bgColor="primary"
           borderRadius="full"
@@ -73,7 +73,7 @@ function SectionInfo() {
         <Box bg="linear-gradient(180deg, #050505 0%, rgba(5, 5, 5, 0) 41.67%, rgba(5, 5, 5, 0) 56.77%, #050505 100%)">
           <Box
             height={["700px"]}
-            d="flex"
+            display="flex"
             alignItems="center"
             justifyContent="center"
           >

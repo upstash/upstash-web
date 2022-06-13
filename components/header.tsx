@@ -29,14 +29,14 @@ function Header({ onOpen }: { onOpen: () => void }) {
           alignItems="center"
         >
           {/* logo */}
-          <GridItem d="flex">
+          <GridItem display="flex">
             <Logo />
           </GridItem>
 
           {/* nav */}
           <GridItem
             colSpan={2}
-            d={["none", "flex"]}
+            display={["none", "flex"]}
             justifyContent="center"
             color="whiteAlpha.700"
           >
@@ -102,7 +102,7 @@ function Header({ onOpen }: { onOpen: () => void }) {
           </GridItem>
 
           {/* console */}
-          <GridItem d={["none", "flex"]} justifyContent="flex-end">
+          <GridItem display={["none", "flex"]} justifyContent="flex-end">
             <Button
               as={ChakraLink}
               href={LINKS.console}

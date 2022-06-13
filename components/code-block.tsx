@@ -16,7 +16,7 @@ function CodeBlock({ fileName, children }) {
               color="whiteAlpha.700"
               bg="blackAlpha.500"
               fontSize="sm"
-              d="flex"
+              display="flex"
               alignItems="center"
               h="32px"
               px={4}

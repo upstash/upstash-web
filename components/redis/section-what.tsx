@@ -29,7 +29,7 @@ function SectionWhat() {
           <Box bg="whiteAlpha.100" borderRadius="2xl" p={10}>
             <Box
               as={What3}
-              d="inline-flex"
+              display="inline-flex"
               w="80px"
               h="80px"
               color="whiteAlpha.800"
@@ -56,7 +56,7 @@ function SectionWhat() {
           <Box bg="whiteAlpha.100" borderRadius="2xl" p={10}>
             <Box
               as={What2}
-              d="inline-flex"
+              display="inline-flex"
               w="80px"
               h="80px"
               color="whiteAlpha.800"
@@ -82,7 +82,7 @@ function SectionWhat() {
           <Box bg="whiteAlpha.100" borderRadius="2xl" p={10}>
             <Box
               as={What1}
-              d="inline-flex"
+              display="inline-flex"
               w="80px"
               h="80px"
               color="whiteAlpha.800"
@@ -109,7 +109,7 @@ function SectionWhat() {
           <Box bg="whiteAlpha.100" borderRadius="2xl" p={10}>
             <Box
               as={What4}
-              d="inline-flex"
+              display="inline-flex"
               w="80px"
               h="80px"
               color="whiteAlpha.800"

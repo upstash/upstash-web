@@ -74,7 +74,7 @@ function SectionHero() {
           <LinkNext
             href="/redis"
             color="primary"
-            d="inline-flex"
+            display="inline-flex"
             alignItems="center"
           >
             <Box as="span" opacity={0.3}>
@@ -85,7 +85,7 @@ function SectionHero() {
           <LinkNext
             href="/kafka"
             color="primary"
-            d="inline-flex"
+            display="inline-flex"
             alignItems="center"
           >
             <Box as="span" opacity={0.3}>
@@ -96,7 +96,7 @@ function SectionHero() {
           <LinkNext
             href="/cloudflareworkers"
             color="primary"
-            d="inline-flex"
+            display="inline-flex"
             alignItems="center"
           >
             <Box as="span" opacity={0.3}>

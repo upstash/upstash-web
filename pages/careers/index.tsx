@@ -47,7 +47,7 @@ export default function CareerPage({ jobs }) {
             <Flex
               as="a"
               href="#list"
-              d="inline-flex"
+              display="inline-flex"
               justify="center"
               alignItems="center"
               mt="6"
@@ -77,7 +77,7 @@ export default function CareerPage({ jobs }) {
             </Flex>
           ) : (
             <Flex
-              d="inline-flex"
+              display="inline-flex"
               justify="center"
               alignItems="center"
               mt="6"
