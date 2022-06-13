@@ -118,5 +118,10 @@ export default {
     title: "CTO, Fig (Guest Author)",
     image_url:
         "https://pbs.twimg.com/profile_images/1338274717816516612/BmHl_4t__400x400.jpg",
+  },
+  vladimir: {
+    name: "Vladimir Mihailenco",
+    title: "Uptrace Founder, Go-Redis Author",
+    image_url: "https://upstash.com/blog/authors/vladimir.jpg",
   }
 };
