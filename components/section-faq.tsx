@@ -42,15 +42,15 @@ function SectionFaq() {
           <FaqAccordionItem title="My app is not serverless. Can I still use Upstash?">
             <Text>
               Yes! You can use whatever architecture you like, you can still use
-              Upstash Redis and Kafka.
+              Upstash Redis® and Kafka®.
             </Text>
           </FaqAccordionItem>
 
           {/**/}
 
-          <FaqAccordionItem title="Can I use Upstash Redis as a database?">
+          <FaqAccordionItem title="Can I use Upstash Redis® as a database?">
             <Text>
-              Definitely, yes. Some users are worried that Redis data will be
+              Definitely, yes. Some users are worried that Redis® data will be
               lost when a server crashes. This is not the case for Upstash
               thanks to Durable Storage. Data is reloaded to memory from block
               storage in case of a server crash. For more information, see our
@@ -63,7 +63,7 @@ function SectionFaq() {
 
           {/**/}
 
-          <FaqAccordionItem title="How does Upstash Redis compare to Elasticache and RedisLabs?">
+          <FaqAccordionItem title="How does Upstash Redis® compare to Elasticache and RedisLabs?">
             <Text>
               With ElastiCache and Redislabs, you pay a fixed price even when
               not using your database. Their price is based on instance-hour.
@@ -84,7 +84,7 @@ function SectionFaq() {
 
           {/**/}
 
-          <FaqAccordionItem title="When should I prefer REST API over the Kafka/Redis clients?">
+          <FaqAccordionItem title="When should I prefer REST API over the Kafka®/Redis® clients?">
             <Text>
               If your application runs on serverless or edge functions (AWS
               Lambda, Cloudflare Workers) then using REST protocol will free

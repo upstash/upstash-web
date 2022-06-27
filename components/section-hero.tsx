@@ -28,21 +28,101 @@ function SectionHero() {
           <div>Serverless</div>
           <div>Data</div>
           <Typist avgTypingDelay={100}>
-            <span>for Redis</span>
-            <Typist.Backspace count={5} delay={3000} />
-            <span>Kafka</span>
-            <Typist.Backspace count={5} delay={3000} />
-            <span>Redis</span>
-            <Typist.Backspace count={5} delay={3000} />
-            <span>Kafka</span>
-            <Typist.Backspace count={5} delay={3000} />
-            <span>Redis</span>
-            <Typist.Backspace count={5} delay={3000} />
-            <span>Kafka</span>
-            <Typist.Backspace count={5} delay={3000} />
-            <span>Redis</span>
-            <Typist.Backspace count={5} delay={3000} />
-            <span>Kafka</span>
+            <span>
+              for Redis
+              <Text
+                as="span"
+                verticalAlign="super"
+                fontSize=".6em"
+                fontWeight="normal"
+              >
+                ®
+              </Text>
+            </span>
+            <Typist.Backspace count={6} delay={3000} />
+            <span>
+              Kafka
+              <Text
+                as="span"
+                verticalAlign="super"
+                fontSize=".6em"
+                fontWeight="normal"
+              >
+                ®
+              </Text>
+            </span>
+            <Typist.Backspace count={6} delay={3000} />
+            <span>
+              Redis
+              <Text
+                as="span"
+                verticalAlign="super"
+                fontSize=".6em"
+                fontWeight="normal"
+              >
+                ®
+              </Text>
+            </span>
+            <Typist.Backspace count={6} delay={3000} />
+            <span>
+              Kafka
+              <Text
+                as="span"
+                verticalAlign="super"
+                fontSize=".6em"
+                fontWeight="normal"
+              >
+                ®
+              </Text>
+            </span>
+            <Typist.Backspace count={6} delay={3000} />
+            <span>
+              Redis
+              <Text
+                as="span"
+                verticalAlign="super"
+                fontSize=".6em"
+                fontWeight="normal"
+              >
+                ®
+              </Text>
+            </span>
+            <Typist.Backspace count={6} delay={3000} />
+            <span>
+              Kafka
+              <Text
+                as="span"
+                verticalAlign="super"
+                fontSize=".6em"
+                fontWeight="normal"
+              >
+                ®
+              </Text>
+            </span>
+            <Typist.Backspace count={6} delay={3000} />
+            <span>
+              Redis
+              <Text
+                as="span"
+                verticalAlign="super"
+                fontSize=".6em"
+                fontWeight="normal"
+              >
+                ®
+              </Text>
+            </span>
+            <Typist.Backspace count={6} delay={3000} />
+            <span>
+              Kafka
+              <Text
+                as="span"
+                verticalAlign="super"
+                fontSize=".6em"
+                fontWeight="normal"
+              >
+                ®
+              </Text>
+            </span>
           </Typist>
         </Heading>
 

@@ -112,7 +112,7 @@ export default function TestPage() {
         <Box width="42%" pos="relative" zIndex={1}>
           <Box as="header">
             <Heading as="h1" size="2xl">
-              Global Latency for Serverless Redis
+              Global Latency for Serverless Redis®
             </Heading>
             <Text
               mt={4}

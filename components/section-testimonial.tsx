@@ -31,14 +31,14 @@ export default function SectionTestimonial() {
               name: "Donny West",
               title: "Architect, Nzxt",
               content:
-                "Upstash has been a great fit for our needs. Upstash fits perfectly with our serverless stack, and empowers our full-stack web engineers to leverage Redis without costly and time-consuming infrastructure management and dev ops. The straightforward pricing and great service and support has been icing on the cake!",
+                "Upstash has been a great fit for our needs. Upstash fits perfectly with our serverless stack, and empowers our full-stack web engineers to leverage Redis® without costly and time-consuming infrastructure management and dev ops. The straightforward pricing and great service and support has been icing on the cake!",
             },
             {
               photo: "/testimonial/joe.jpg",
               name: "Joe Emison",
               title: "Co-Founder and CTO, Branch",
               content:
-                "Upstash has saved us a significant amount of money and effort over Redis Enterprise, especially around scaling. Redis Enterprise's solution requires a painful and expensive process once you exceed 50GB in storage. Upstash, in contrast, is a modern, serverless service that encapsulates the Redis API that we need, without having any of the pain of having to think about and deal with the underlying infrastructure that it runs on.",
+                "Upstash has saved us a significant amount of money and effort over Redis® Enterprise, especially around scaling. Redis® Enterprise's solution requires a painful and expensive process once you exceed 50GB in storage. Upstash, in contrast, is a modern, serverless service that encapsulates the Redis® API that we need, without having any of the pain of having to think about and deal with the underlying infrastructure that it runs on.",
             },
             {
               photo: "/testimonial/rauch.jpeg",

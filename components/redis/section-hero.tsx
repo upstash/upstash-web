@@ -17,7 +17,12 @@ function SectionHero() {
           Serverless <br />
           Database <br />
           for Redis
-          <Text as="span" verticalAlign="super" fontSize=".4em">
+          <Text
+            as="span"
+            verticalAlign="super"
+            fontSize=".6em"
+            fontWeight="normal"
+          >
             ®
           </Text>
         </Heading>

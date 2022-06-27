@@ -50,7 +50,7 @@ function SectionFaq() {
 
           <FaqAccordionItem title="Can I use Upstash as a database?">
             <Text>
-              Definitely, yes. Some users are worried that Redis data will be
+              Definitely, yes. Some users are worried that Redis® data will be
               lost when a server crashes. This is not the case for Upstash
               thanks to Durable Storage. Data is reloaded to memory from block
               storage in case of a server crash. For more information, see our
@@ -76,7 +76,7 @@ function SectionFaq() {
           <FaqAccordionItem title="What about Dynamodb and Fauna?">
             <Text>
               Upstash has lower latency than DynamoDB and Fauna. Upstash is
-              easier to use just like the Redis API. For more information, see
+              easier to use just like the Redis® API. For more information, see
               our documentation{" "}
               <CustomLink isExternal noIcon href={LINKS.compare}>
                 comparing vendors.

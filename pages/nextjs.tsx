@@ -21,7 +21,7 @@ import { LINKS } from "constants/";
 const FEATURES = [
   {
     title: "Fast",
-    desc: "Speed up your Next.js apps with Low Latency Redis.",
+    desc: "Speed up your Next.js apps with Low Latency Redis®.",
     icon: <Box as={Mission1} w={16} mx="auto" color="primary" />,
   },
   {
@@ -30,7 +30,7 @@ const FEATURES = [
     icon: <Box as={Durable} w={16} mx="auto" color="primary" />,
   },
   {
-    title: "Redis",
+    title: "Redis®",
     desc: "The most loved database adapted to the cloud and serverless.",
     icon: <Box as={Redis} w={16} mx="auto" color="primary" />,
   },
@@ -110,10 +110,10 @@ export async function getServerSideProps() {
 
               <Box mt="24px" fontSize={["md", "xl"]} color="whiteAlpha.700">
                 <Text>
-                  Serverless Database with Redis API and per request pricing.
+                  Serverless Database with Redis® API and per request pricing.
                   <br />
                   <br />
-                  Redis/REST API together with durable storage makes Upstash a
+                  Redis®/REST API together with durable storage makes Upstash a
                   perfect database for your Next.js applications.
                 </Text>
                 <Button
@@ -165,13 +165,13 @@ export async function getServerSideProps() {
           </Heading>
           <Container maxW="3xl">
             <Text fontSize={["md", "xl"]} color="whiteAlpha.600" mt={3}>
-              Add Redis to your application in seconds
+              Add Redis® to your application in seconds
             </Text>
           </Container>
         </Box>
 
         <Container maxW="4xl" mt={12}>
-          <CodeBlock fileName="Using Redis Client">{code1}</CodeBlock>
+          <CodeBlock fileName="Using Redis® Client">{code1}</CodeBlock>
         </Container>
         <Container maxW="4xl" mt={12}>
           <CodeBlock fileName="Using REST">{code2}</CodeBlock>
@@ -199,7 +199,7 @@ export async function getServerSideProps() {
             >
               <SectionSupportIconNext />
               <Text>
-                <br /> <b> Next.js with Redis </b>
+                <br /> <b> Next.js with Redis® </b>
                 <br />
                 Getting Started Guide
               </Text>
@@ -209,7 +209,7 @@ export async function getServerSideProps() {
               <SectionSupportIconNext />
               <Text>
                 <b> Roadmap Voting App</b>
-                <br /> for Next.js, Redis
+                <br /> for Next.js, Redis®
                 <br /> authentication with Auth0
               </Text>
             </SupportCard>

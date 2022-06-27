@@ -1,7 +1,7 @@
 {
     "name": "Upstash",
     "short_name": "Upstash",
-    "description": "Serverless Data for Redis and Kafka",
+    "description": "Serverless Data for Redis® and Kafka®",
     "icons": [
         {
             "src": "/static/icons/android-chrome-192x192.png",

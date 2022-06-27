@@ -36,7 +36,7 @@ function SectionWhat() {
               mb={6}
             />
             <Heading as="h4" fontSize={["xl", "2xl"]}>
-              Durable Redis
+              Durable Redis®
             </Heading>
             <Box mt={4}>
               <Text color="whiteAlpha.600">

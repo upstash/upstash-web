@@ -28,12 +28,12 @@ const FEATURES = [
   },
   {
     title: "REST API",
-    desc: "Access your Redis from edge functions with the Upstash REST API.",
+    desc: "Access your Redis® from edge functions with the Upstash REST API.",
     icon: <Box as={API} w={16} mx="auto" color="primary" />,
   },
   {
-    title: "Redis and Kafka",
-    desc: "Serverless Redis and Kafka with per request pricing.",
+    title: "Redis® and Kafka®",
+    desc: "Serverless Redis® and Kafka with per request pricing.",
     icon: <Box as={Redis} w={16} mx="auto" color="primary" />,
   },
 ];
@@ -84,7 +84,7 @@ return new Response("view count:" +JSON.parse(text).result)
 
               <Box mt="24px" fontSize={["md", "xl"]} color="whiteAlpha.700">
                 <Text>
-                  Serverless Redis and Kafka with per request pricing.
+                  Serverless Redis® and Kafka with per request pricing.
                   <br />
                   <br />
                   <CustomLink href="https://docs.upstash.com/features/globaldatabase">
@@ -147,7 +147,7 @@ return new Response("view count:" +JSON.parse(text).result)
           </Heading>
           <Container maxW="3xl">
             <Text fontSize={["md", "xl"]} color="whiteAlpha.600" mt={3}>
-              Add Redis to your Cloudflare Workers function in seconds
+              Add Redis® to your Cloudflare Workers function in seconds
             </Text>
           </Container>
         </Box>
@@ -180,7 +180,7 @@ return new Response("view count:" +JSON.parse(text).result)
             >
               <Box as={Redis} w={20} mx="auto" color="primary" />
               <Text>
-                <br /> <b> Cloudflare Workers with Redis </b>
+                <br /> <b> Cloudflare Workers with Redis® </b>
                 <br />
                 Getting Started Guide
               </Text>
@@ -193,7 +193,7 @@ return new Response("view count:" +JSON.parse(text).result)
               <Text>
                 <br />
                 <b> Analytics at Edge</b>
-                <br /> with Redis and CF Workers
+                <br /> with Redis® and CF Workers
               </Text>
             </SupportCard>
             {/**/}
@@ -202,7 +202,7 @@ return new Response("view count:" +JSON.parse(text).result)
               <Text>
                 <br /> <b> Build IP Allow List </b>
                 <br />
-                Using Upstash Redis and
+                Using Upstash Redis® and
                 <br />
                 Edge Functions
               </Text>

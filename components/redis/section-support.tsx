@@ -4,6 +4,7 @@ import SectionSupportIconNext from "../section-support-icon-next";
 import SectionSupportIconAws from "../section-support-icon-aws";
 import SupportCard from "../section-support-card";
 import SectionSupportIconRest from "../section-support-icon-rest";
+import React from "react";
 
 function SectionSupport() {
   return (
@@ -63,7 +64,16 @@ function SectionSupport() {
             <Text>
               Check out docs <br />
               <Text as="b" fontWeight="bold">
-                Redis API
+                Redis
+                <Text
+                  as="span"
+                  verticalAlign="super"
+                  fontSize=".6em"
+                  fontWeight="normal"
+                >
+                  ®
+                </Text>{" "}
+                API
               </Text>{" "}
               <br />
               Compatibility

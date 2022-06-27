@@ -42,7 +42,7 @@ export const BANNED_TAGS = [
 export const META = {
   title: "Upstash: Serverless Data for Redis® and Kafka®",
   description:
-    "Designed for the serverless with per-request pricing and Redis/Kafka API.",
+    "Designed for the serverless with per-request pricing and Redis®/Kafka® API.",
   url: "https://upstash.com",
   twitterAccount: "@upstash",
   imagePath: "https://upstash.com/static/logo/square-dark.png",

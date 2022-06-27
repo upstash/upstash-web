@@ -68,7 +68,6 @@ function SectionPricing() {
               borderRightWidth={0}
               isActive={price === "redis"}
               onClick={() => {
-                console.log("redis");
                 setPrice("redis");
               }}
             >
