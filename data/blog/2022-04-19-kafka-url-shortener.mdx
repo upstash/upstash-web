@@ -53,25 +53,25 @@ Once you have all the prerequisites, you can proceed with the following steps:
 
 - Clone the repository and run the following command:
 
-```bash
+```shell
 git clone https://github.com/bobbyiliev/cf-url-shortener.git
 ```
 
 - Access the directory:
 
-```bash
+```shell
 cd cf-url-shortener
 ```
 
 - Install the `npm` dependencies:
 
-```bash
+```shell
 npm install
 ```
 
 - Run the `wrangler` command to authenticate with Cloudflare:
 
-```bash
+```shell
 wrangler login
 ```
 
@@ -83,7 +83,7 @@ account_id = "YOUR_ACCOUNT_ID_HERE"
 
 - Set the following secrets in Cloudflare using the `wrangler` tool:
 
-```bash
+```shell
 wrangler secret put UPSTASH_REDIS_REST_URL
 wrangler secret put UPSTASH_REDIS_REST_TOKEN
 wrangler secret put UPSTASH_KAFKA_REST_URL
@@ -95,7 +95,7 @@ wrangler secret put UPSTASH_KAFKA_REST_PASSWORD
 
 - Run the following command to deploy the CF Worker:
 
-```bash
+```shell
 wrangler deploy
 ```
 

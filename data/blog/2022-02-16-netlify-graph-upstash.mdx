@@ -45,7 +45,7 @@ In Spotify Configuration page, enable `Authentication` and `Graph Explorer` , it
 Now we can play with GraphQL Playground.
 Click the `Start querying Spotify` button. Now we need to run netlify-cli with following command in the project directory.
 
-```bash
+```shell
 netlify dev --graph
 ```
 
@@ -101,7 +101,7 @@ Create Upstash Global Database from Upstash Console
 We will modify the Auto-Generated Netlify Function code (`SpotifyFeatured.js`)
 In the code there is a code that fetches data from Netlify Backend/Spotify API:
 
-```bash
+```shell
 const { errors, data } = await NetlifyGraph.fetchSpotifyFeatured({  }, {accessToken: accessToken});
 ```
 

@@ -18,7 +18,7 @@ It is available on [GitHub](https://github.com/upstash/cli), [npm](https://www.n
 
 Upstash CLI requires a developer api key. A new api key can be created in the [Console](https://docs.upstash.com/redis/account/developerapi).
 
-```bash
+```shell
 npm install -g @upstash/cli
 ```
 Or visit the GitHub [release page](https://github.com/upstash/cli/releases) for prebuilt binaries.
@@ -33,7 +33,7 @@ That's all. You are now logged in and can manage your Upstash resources from the
 
 If you are unsure what a command does, use the `--help` flag, and it will explain all available commands and flags.
 
-```bash
+```shell
 upstash redis --help
 ```
 
@@ -66,17 +66,17 @@ upstash kafka topic create --name=mytopic --cluster-id=$id
 Upstash CLI includes many different commands to perform CRUD operations on your Upstash Resources.
 
 - **Team**: This allows you to manage teams and their members
-  ```bash
+  ```shell
   upstash team
   ```
 
 - **Redis**: Create/edit/delete redis databases
-  ```bash
+  ```shell
   upstash redis
   ```
 
 - **Kafka**: Create/edit/delete kafka clusters and topics
-  ```bash
+  ```shell
   upstash kafka cluster
   upstash kafka topic
   ```

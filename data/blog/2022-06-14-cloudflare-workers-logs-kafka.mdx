@@ -60,7 +60,8 @@ You can test the function locally with `wrangler dev`.
 Deploy your function to Cloudflare with `wrangler publish`
 
 The endpoint of the function will be printed. You can check if logs are collected in Kafka by copying the `curl` expression from the console:
-```
+
+```shell
 curl https://definite-goldfish-14184-us1-rest-kafka.upstash.io/consume/GROUP_NAME/GROUP_INSTANCE_NAME/mytopic -H "Kafka-Auto-Offset-Reset: earliest" -u \
   REPLACE_HERE
 ```

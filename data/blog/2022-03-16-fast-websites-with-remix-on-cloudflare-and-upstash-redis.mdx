@@ -31,7 +31,7 @@ Cloudflare Workers have the advantage of being deployed globally, similar to a C
 
 Go to a folder of your choice and run
 
-```bash
+```shell
 npx create-remix@latest
 ```
 
@@ -39,7 +39,7 @@ You will be greeted with a dialog that walks you through the setup of your Remix
 
 Make sure to select _Cloudflare Workers_ as the deployment target. In this walkthrough I am going to proceed with a _JavaScript_ app but feel free to choose TypeScript. The setup should look similar to this.
 
-```bash
+```shell
 
 R E M I X - v1.2.3
 
@@ -62,7 +62,7 @@ Now copy the `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`.
 
 In your project, create a file called `.env` in the project root and add both variables there like this:
 
-```bash
+```shell
 UPSTASH_REDIS_REST_TOKEN=<INSERT YOUR UPSTASH_REDIS_REST_TOKEN HERE>
 UPSTASH_REDIS_REST_URL=<INSERT YOUR UPSTASH_REDIS_REST_URL HERE>
 ```
@@ -158,7 +158,7 @@ If you don't already have an account, then [create a cloudflare account here](ht
 
 Don't forget to set your secrets from `.env` for Cloudflare as well via
 
-```bash
+```shell
 wrangler secret put UPSTASH_REDIS_REST_TOKEN
 ...
 
@@ -168,7 +168,7 @@ wrangler secret put UPSTASH_REDIS_REST_URL
 
 Once that's done, you should be able to deploy your app:
 
-```bash
+```shell
 npm run deploy
 ```
 
