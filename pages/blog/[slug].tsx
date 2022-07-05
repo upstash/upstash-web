@@ -25,7 +25,6 @@ import OtherPostCard from "components/other-post-card";
 import useFetch from "use-http";
 import React from "react";
 import { MAX_CLAP } from "constants/index";
-import commaNumber from "comma-number";
 
 export async function getStaticPaths() {
   const paths = allPosts.map((doc: Post) => ({ params: { slug: doc.slug } }));
@@ -261,20 +260,15 @@ export default function BlogPostPage({
           </HStack>
 
           {/* Post Claps */}
-          <Box
-            zIndex={99}
-            position="fixed"
-            left={6}
-            bottom={6}
-            // transform="translateX(-50%)"
-          >
+          <Box zIndex={99} position="fixed" left={6} bottom={6}>
             <Button
               borderRadius="full"
               color="black"
               bgColor="primary"
               fontWeight="normal"
-              transform={`scale(${cacheCount * 0.02 + 1})`}
+              transform={`scale(${cacheCount * 0.03 + 1})`}
               transformOrigin="left bottom"
+              fontSize="sm"
               _hover={{}}
               _active={{}}
               onClick={onClap}
@@ -288,7 +282,12 @@ export default function BlogPostPage({
                 />
               </svg>
               <Box as="span" ml={1}>
-                {count} {cacheCount > 0 && ` + ${cacheCount}`}
+                {count}{" "}
+                {cacheCount > 0 && (
+                  <Box as="span" opacity=".6">
+                    + {cacheCount}
+                  </Box>
+                )}
               </Box>
             </Button>
           </Box>

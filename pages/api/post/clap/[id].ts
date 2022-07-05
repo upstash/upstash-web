@@ -16,20 +16,7 @@ export default async function handler(
     }
 
     if (method === "PATCH") {
-      const ip =
-        req.headers["x-real-ip"] ||
-        req.headers["x-forwarded-for"] ||
-        req.headers["Remote_Addr"] ||
-        "NA";
-
-      const response =
-        ip === "NA" ? 1 : await redis.sadd(`vote:post:${id}`, ip.toString());
-
-      if (response === 0) {
-        return res.status(400).json({ message: "Already voted" });
-      }
-
-      const initialCount = req.body.count || 1;
+      const initialCount = Number(req.body.count) || 0;
 
       const count = await redis.incrby(
         `post:${id}`,
