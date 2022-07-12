@@ -22,6 +22,7 @@ import NextLink from "next/link";
 import Section from "components/section";
 import Bg from "components/bg";
 import OtherPostCard from "components/other-post-card";
+import PostNote from "components/post-note";
 import useFetch from "use-http";
 import React from "react";
 import { MAX_CLAP } from "constants/index";
@@ -88,11 +89,6 @@ export default function BlogPostPage({
   const [count, setCount] = React.useState(0);
   const [cacheCount, setCacheCount] = React.useState(0);
 
-  const { data: viewData = { count: 0 }, patch: updateView } = useFetch(
-    `post/view/${post.slug}`,
-    []
-  );
-
   const {
     get: getClaps,
     patch: updateClaps,
@@ -123,7 +119,6 @@ export default function BlogPostPage({
 
   React.useEffect(() => {
     initData();
-    updateView();
   }, []);
 
   return (
@@ -240,6 +235,9 @@ export default function BlogPostPage({
               components={{
                 FullWidth: (props) => {
                   return <Box mx={{ xl: -40 }} {...props} />;
+                },
+                Note: (props) => {
+                  return <PostNote {...props} />;
                 },
               }}
             />
