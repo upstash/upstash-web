@@ -6,6 +6,8 @@ image: /blog/serverless-connections.jpeg
 tags: [redis, database, serverless, aws lambda]
 ---
 
+#### UPDATE: We have built [@upstash/redis](https://github.com/upstash/upstash-redis) to solve the issues explained in this article. It is HTTP based, designed and tested for serverless runtimes for efficient connection handling.
+
 Designing a database for serverless, the biggest challenge in our mind was to build an infrastructure which supports per request pricing in a profitable way. We believe Upstash has achieved this. After we launched the product, we saw that there was another major challenge: Database connections!
 
 As you know, Serverless Functions scale from 0 to infinity. This means when your functions get a lot of traffic, the cloud provider creates new containers (lambda functions) in parallel and scales out your backend. If you create a new database connection within the function then you can rapidly reach the connection limit of your database.
