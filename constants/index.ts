@@ -56,7 +56,7 @@ export const TAG_NAMES = {
   "aws-lambda": "AWS Lambda",
 };
 
-export const PRICES = {
+export const REDIS_PRICES = {
   commandsLimit: {
     title: "Commands Limit",
     description:
@@ -65,6 +65,23 @@ export const PRICES = {
     payg: "Unlimited",
     enterprise: "Unlimited",
   },
+  persistence: {
+    title: "Persistence",
+    description:
+      "Upstash has its own persistence layer that integrates with block storage services of cloud providers. This provides fault tolerance to all database types including the free.",
+    free: true,
+    payg: true,
+    enterprise: true,
+  },
+  encryption: {
+    title: "Encryption (TLS)",
+    description:
+      "Encrypts the data between server and client. Recommended for production.",
+    free: true,
+    payg: true,
+    enterprise: true,
+  },
+
   maxRetentionSizeLimit: {
     title: "Max Retention Size",
     description:
@@ -113,18 +130,10 @@ export const PRICES = {
     payg: "1000",
     enterprise: "10,000",
   },
-  persistence: {
-    title: "Persistence",
+  restApi: {
+    title: "REST API",
     description:
-      "Upstash has its own persistence layer that integrates with block storage services of cloud providers. This provides fault tolerance to all database types including the free.",
-    free: true,
-    payg: true,
-    enterprise: true,
-  },
-  encryption: {
-    title: "Encryption (TLS)",
-    description:
-      "Encrypts the data between server and client. Recommended for production.",
+      "REST API provides HTTP based, connectionless access to the Upstash databases.",
     free: true,
     payg: true,
     enterprise: true,
@@ -137,28 +146,12 @@ export const PRICES = {
     payg: true,
     enterprise: true,
   },
-  multiZoneReplicationKafka: {
-    title: "Multi Zone Replication",
-    description:
-      "Upstash replicates your data to different availability zones. This provides high availability and minimum fail over time. ",
-    free: true,
-    payg: true,
-    enterprise: true,
-  },
   vpcPeering: {
     title: "VPC Peering",
     description:
       "VPC Peering enables you to connect to Upstash from your own VPC using private IP. Database and your application can run in the same subnet which also cancels out data transfer costs.",
     free: false,
     payg: false,
-    enterprise: true,
-  },
-  graphqlRestApi: {
-    title: "REST API",
-    description:
-      "REST API provides HTTP based, connectionless access to the Upstash databases.",
-    free: true,
-    payg: true,
     enterprise: true,
   },
   support: {
@@ -177,7 +170,74 @@ export const PRICES = {
     payg: "$0.2 per 100K commands, up to $120 monthly max.",
     enterprise: "Custom",
   },
-  priceKafkaSingleZone: {
+};
+
+export const KAFKA_PRICES = {
+  messagesLimit: {
+    title: "Messages Limit",
+    description:
+      "This is the maximum number of messages that your cluster can produce and consume per day.",
+    free: "Max 10,000 Messages Daily",
+    payg: "Unlimited",
+    enterprise: "Unlimited",
+  },
+  maxRetentionSizeLimit: {
+    title: "Max Retention Size",
+    description:
+      "This is the maximum size of a log data for a topic partition.",
+    free: "256 MB",
+    payg: "1 TB",
+    enterprise: "Infinite",
+  },
+  maxRetentionTimeLimit: {
+    title: "Max Retention Time",
+    description:
+      "This is the maximum time the logs will be retained before they will be discarded to free up space.",
+    free: "1 week",
+    payg: "30 days",
+    enterprise: "Infinite",
+  },
+  maxNumberOfPartitionsLimit: {
+    title: "Max Partitions",
+    description:
+      "This is the max total number of partitions you can create in the plan.",
+    free: "10",
+    payg: "100",
+    enterprise: "10000",
+  },
+  restApi: {
+    title: "REST API",
+    description:
+      "REST API provides HTTP based, connectionless access to the Upstash databases.",
+    free: true,
+    payg: true,
+    enterprise: true,
+  },
+  multiZoneReplication: {
+    title: "Multi Zone Replication",
+    description:
+      "Upstash replicates your data to different availability zones. This provides high availability and minimum fail over time. ",
+    free: true,
+    payg: true,
+    enterprise: true,
+  },
+  vpcPeering: {
+    title: "VPC Peering",
+    description:
+      "VPC Peering enables you to connect to Upstash from your own VPC using private IP. Database and your application can run in the same subnet which also cancels out data transfer costs.",
+    free: false,
+    payg: false,
+    enterprise: true,
+  },
+  support: {
+    title: "Professional Support",
+    description:
+      "Professional Support includes dedicated service desk and Slack channel with response time SLAs.",
+    free: false,
+    payg: "Optional",
+    enterprise: "Included",
+  },
+  priceSingleZone: {
     title: "Price - Single Zone",
     description:
       "Single zone cluster is recommended only for testing and development purposes.",
@@ -185,7 +245,7 @@ export const PRICES = {
     payg: "$0.2 per 100K commands, up to $120 monthly max.",
     enterprise: "Custom",
   },
-  priceKafkaMultiZone: {
+  priceMultiZone: {
     title: "Price - Multi Zone",
     description: "Multi zone cluster is recommended for production use cases.",
     free: "Free (No credit card required)",
