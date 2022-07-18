@@ -1,0 +1,65 @@
+---
+slug: upstash-pulumi-provider
+title: "Announcing Upstash Pulumi Provider"
+author: burak
+tags: [terraform, devops, serverless, sre, upstash]
+---
+
+## Announcing Upstash Pulumi Provider
+After community requests, we have developed Pulumi Provider for our resources, which are publicly available.
+
+[Pulumi](https://www.pulumi.com) is an automated provisioning tool similar to Terraform but it leverages the functionalities of modern programming languages such as TypeScript, Go and Python.
+This way, you can create conditional resources, multiple resources via loops and so on, enabling for more dynamic and maintainable IAC.
+
+### What's New
+Other than our fully new Pulumi Provider, we have created `Kafka Credential` resource for both of our Terraform and Pulumi providers.
+
+### Creating your infrastructure as code with your favorite languages
+#### Create pulumi template: `pulumi new <your_language>`
+
+#### TypeScript / JavaScript
+```shell
+const createdDb = new upstash.RedisDatabase("mydb", {
+    databaseName: "pulumi-ts-db",
+    region: "eu-west-1",
+    tls: true
+})
+```
+
+#### Go
+```shell
+createdCluster, _ := upstash.NewKafkaCluster(ctx, "exampleCluster", &upstash.KafkaClusterArgs{
+    ClusterName: pulumi.String("pulumi-go-cluster"),
+    Multizone:   pulumi.Bool(false),
+    Region:      pulumi.String("eu-west-1"),
+})
+```
+
+#### Python
+```shell
+created_team = upstash.Team(
+    resource_name="myTeam",
+    team_name="pulumi team",
+    copy_cc=True,
+    team_members={
+        "<owner_email>": "owner",
+        "<second_email>": "admin"
+    }
+)
+
+```
+
+#### Create / Update resources: `pulumi up`
+
+![web3-before-connection](/blog/announce-pulumi/update-example.png)
+
+
+
+### Future Work
+We plan to keep the developer experince easy and intuitive.
+
+
+### Closing Words
+For resource creations with different languages, you can have a look at [our repo](https://github.com/upstash/upstash-pulumi-provider/tree/master/examples).
+
+You can give your feedbacks on any of our services via [twitter](https://twitter.com/upstash) or [discord](https://discord.gg/w9SenAtbme)
