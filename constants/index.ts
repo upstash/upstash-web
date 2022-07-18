@@ -194,6 +194,44 @@ export const PRICES = {
   },
 };
 
+export const QSTASH_PRICES = {
+  maxRequestPerDay: {
+    title: "Max Requests per day",
+    description: "",
+    free: "100",
+    payg: "50,000",
+    enterprise: "Unlimited",
+  },
+  maxMessageSize: {
+    title: "Max Message Size",
+    description: "",
+    free: "1 MB",
+    payg: "1 MB",
+    enterprise: "10 MB",
+  },
+  maxRetryCount: {
+    title: "Max Retry Count",
+    description: "",
+    free: "3",
+    payg: "5",
+    enterprise: "20",
+  },
+  maxNumberOfSchedules: {
+    title: "Max Number of Schedules",
+    description: "",
+    free: "1",
+    payg: "10",
+    enterprise: "Unlimited",
+  },
+  price: {
+    title: "Price",
+    description: "",
+    free: "Free (No credit card required)",
+    payg: "$0.4 per 1K requests, up to $450 monthly max.",
+    enterprise: "Custom",
+  },
+};
+
 export const HIGHLIGHT_THEME = {
   hljs: {
     textAlign: "left",
