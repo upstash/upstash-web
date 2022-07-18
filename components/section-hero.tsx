@@ -171,10 +171,10 @@ function SectionHero() {
             <Box as="span" opacity={0.3}>
               #
             </Box>
-            kafka{" "}
+            kafka
           </LinkNext>
           <LinkNext
-            href="/cloudflareworkers"
+            href="/qstash"
             color="primary"
             display="inline-flex"
             alignItems="center"
@@ -182,7 +182,7 @@ function SectionHero() {
             <Box as="span" opacity={0.3}>
               #
             </Box>
-            edge{" "}
+            qStash
           </LinkNext>
         </HStack>
 
