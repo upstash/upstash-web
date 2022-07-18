@@ -88,7 +88,7 @@ export const REDIS_PRICES = {
       "This is the maximum size of a log data for a topic partition.",
     free: "256 MB",
     payg: "1 TB",
-    enterprise: "Infinite",
+    enterprise: "Unlimited",
   },
   maxRetentionTimeLimit: {
     title: "Max Retention Time",
@@ -96,7 +96,7 @@ export const REDIS_PRICES = {
       "This is the maximum time the logs will be retained before they will be discarded to free up space.",
     free: "1 week",
     payg: "30 days",
-    enterprise: "Infinite",
+    enterprise: "Unlimited",
   },
   maxNumberOfPartitionsLimit: {
     title: "Max Partitions",
@@ -187,7 +187,7 @@ export const KAFKA_PRICES = {
       "This is the maximum size of a log data for a topic partition.",
     free: "256 MB",
     payg: "1 TB",
-    enterprise: "Infinite",
+    enterprise: "Unlimited",
   },
   maxRetentionTimeLimit: {
     title: "Max Retention Time",
@@ -195,7 +195,7 @@ export const KAFKA_PRICES = {
       "This is the maximum time the logs will be retained before they will be discarded to free up space.",
     free: "1 week",
     payg: "30 days",
-    enterprise: "Infinite",
+    enterprise: "Unlimited",
   },
   maxNumberOfPartitionsLimit: {
     title: "Max Partitions",
