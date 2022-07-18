@@ -1,6 +1,10 @@
 {
   "redirects": [
     {
+      "source": "/qstash",
+      "destination": "https://docs.upstash.com/qstash"
+    },
+    {
       "source": "/discord",
       "destination": "https://discord.com/invite/w9SenAtbme"
     },
