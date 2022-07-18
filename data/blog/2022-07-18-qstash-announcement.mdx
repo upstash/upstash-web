@@ -2,10 +2,12 @@
 slug: qstash-announcement
 title: "qStash: Messaging for the Serverless"
 author: enes
-tags: [qstash, redis, queue]
+tags: [qstash, redis, queue, announce]
 ---
 
-We are proud and excited to announce [qStash](https://console.upstash.com/qstash). Formally, qStash is a message queue and task scheduler designed for serverless runtimes. Informally, qStash is a glue for your serverless functions.
+We are proud and excited to announce [qStash](https://console.upstash.com/qstash) 🔥🔥🔥
+
+Formally, qStash is a message queue and task scheduler designed for serverless runtimes. Informally, qStash is a glue for your serverless functions.
 
 There was a perception serverless was only good for simple tasks. Not anymore. People build powerful systems with serverless stack. Powerful systems are composed of multiple components. Communication among those components is a big engineering problem. There are already great solutions for this problem. But we think existing solutions do not fit in serverless space. Either they are too complex or not designed to work with stateless runtimes. So we want a solution which (is):
 
@@ -64,11 +66,11 @@ qStash can repeat sending your task in a schedule. Set a CRON expression as a va
 
 ``` shell
 curl -XPOST \
+    'https://qstash.upstash.io/v1/publish/https://example.com'
     -H 'Authorization: Bearer XXX' \
     -H "Content-type: application/json" \
     -H "Upstash-Cron: * * * * *" \
     -d '{ "hello": "world" }' \
-    'https://qstash.upstash.io/v1/publish/https://example.com'
 ```
 
 ### More
