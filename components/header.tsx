@@ -22,7 +22,7 @@ function Header({ onOpen }: { onOpen: () => void }) {
   const isSubPage = pathname !== "/";
 
   return (
-    <Box as="header" mt={[10, 14]} pos="relative" zIndex={90}>
+    <Box as="header" pt={[10, 14]} pos="relative" zIndex={90}>
       <Container maxW="5xl">
         <Grid
           templateColumns={["repeat(2, 1fr)", "repeat(4, 1fr)"]}

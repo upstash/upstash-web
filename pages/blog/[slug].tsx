@@ -26,6 +26,11 @@ import PostNote from "components/post-note";
 import useFetch from "use-http";
 import React from "react";
 import { MAX_CLAP } from "constants/index";
+import dynamic from "next/dynamic";
+
+const Confetti = dynamic(() => import("components/confetti"), {
+  ssr: false,
+});
 
 export async function getStaticPaths() {
   const paths = allPosts.map((doc: Post) => ({ params: { slug: doc.slug } }));
@@ -87,6 +92,7 @@ export default function BlogPostPage({
     "Articles and tutorials on serverless technologies from Upstash team and community";
 
   const [count, setCount] = React.useState(0);
+  const [party, setParty] = React.useState(false);
   const [cacheCount, setCacheCount] = React.useState(0);
 
   const {
@@ -111,14 +117,25 @@ export default function BlogPostPage({
     return onClapSaving(value);
   };
 
-  const initData = async () => {
+  const fetchClaps = async () => {
     const data = await getClaps();
     if (!responseClaps.ok) return;
     setCount(data.count);
   };
 
+  const checkAnnounce = async () => {
+    const hasAnnounce = post.tags.find((o) => o === "announce");
+    if (hasAnnounce) {
+      setParty(true);
+      setTimeout(() => {
+        setParty(false);
+      }, 2000);
+    }
+  };
+
   React.useEffect(() => {
-    initData();
+    fetchClaps();
+    checkAnnounce();
   }, []);
 
   return (
@@ -161,6 +178,12 @@ export default function BlogPostPage({
       </Head>
 
       {/* Post Header */}
+
+      <Confetti
+        numberOfPieces={party ? 300 : 0}
+        recycle={false}
+        style={{ pointerEvents: "none" }}
+      />
 
       <Box as="header" pt={["80px", "100px"]} textAlign="center">
         <Container maxW="4xl">
