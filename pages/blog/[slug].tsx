@@ -129,7 +129,7 @@ export default function BlogPostPage({
       setParty(true);
       setTimeout(() => {
         setParty(false);
-      }, 2000);
+      }, 4000);
     }
   };
 
@@ -180,7 +180,7 @@ export default function BlogPostPage({
       {/* Post Header */}
 
       <Confetti
-        numberOfPieces={party ? 300 : 0}
+        numberOfPieces={party ? 500 : 0}
         recycle={false}
         style={{ pointerEvents: "none" }}
       />
