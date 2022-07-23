@@ -1,0 +1,49 @@
+---
+slug: next-edge-api
+title: "Next.js Edge API Routes and Serverless Redis on Vercel"
+author: noah
+tags: [nextjs, edge, redis, vercel]
+---
+
+Recently, Next.js team has announced [Next 12.2](https://nextjs.org/blog/next-12-2#edge-api-routes-experimental). The most exciting news for me is the [Edge API Routes](https://nextjs.org/docs/api-routes/edge-api-routes). Edge API Routes enable developers to run their APIs at edge locations. This is a great news if you need low latency all over the world.
+
+In this article, I will create a basic API which will count the page views per each edge location. I will use [Upstash Global Redis](https://docs.upstash.com/redis/features/globaldatabase) to keep the page counts. Because Upstash replicates the data to multiple regions, it helps to keep the latency low. I will deploy the Next.js application to Vercel which supports the Edge runtime.
+
+### Project Setup
+- Create the project: `npx create-next-app@latest --typescript`
+
+- Install Upstash Redis client: `npm install @upstash/redis`
+
+<Note>
+You can use any Redis client, but we recommend @upstash/redis to avoid [connection problems](https://upstash.com/blog/serverless-database-connections).
+</Note>
+
+- Create a Global Redis database on [Upstash](https://console.upstash.com) and copy the REST URL and token.
+
+### The Code
+
+Update the
+
+```javascript:pages/api/hello.ts
+
+import type { NextRequest } from 'next/server';
+import { Redis } from '@upstash/redis'
+
+const redis = new Redis({
+  url: 'REPLACE_YOUR_REST_URL',
+  token: 'REPLACE_YOUR_TOKEN',
+})
+
+export default async(req: NextRequest) => {
+  let loc = req.geo?.country || "World"
+  const count = await redis.incr(loc);
+  return new Response(`Location: ${loc}  View count: ${count}` );
+};
+
+export const config = {
+  runtime: 'experimental-edge',
+};
+```
+
+### Deploy
+Run `vercel --prod` to deploy your application. Test the URL from different locations (you may use a VPN). You should see different view counts for each location.
