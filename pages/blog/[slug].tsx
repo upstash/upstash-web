@@ -461,6 +461,7 @@ export default function BlogPostPage({
               max-width: 100%;
               display: block;
               margin: 0 auto;
+              border-radius: 0.5rem;
             }
 
             .post ul,
