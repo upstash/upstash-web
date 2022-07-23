@@ -124,13 +124,15 @@ export default function BlogPostPage({
   };
 
   const checkAnnounce = async () => {
-    const hasAnnounce = post.tags.find((o) => o === "announce");
-    if (hasAnnounce) {
-      setParty(true);
-      setTimeout(() => {
-        setParty(false);
-      }, 4000);
-    }
+    const hasAnnounced = post.tags.find((o) => o === "announce");
+
+    if (!hasAnnounced) return;
+
+    setParty(true);
+
+    setTimeout(() => {
+      setParty(false);
+    }, 4000);
   };
 
   React.useEffect(() => {
