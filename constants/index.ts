@@ -444,6 +444,12 @@ export const INVESTORS = [
     url: "https://twitter.com/rauchg",
   },
   {
+    name: "Cem Sertoglu",
+    title: "Partner, Earlybird",
+    src: "/investors/cem-sertoglu.jpg",
+    url: "https://www.linkedin.com/in/csertoglu",
+  },
+  {
     name: "Matias Woloski",
     title: "Founder, Auth0",
     src: "/investors/matias.png",
