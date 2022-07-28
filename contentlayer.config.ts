@@ -41,6 +41,7 @@ export const Post = defineDocumentType(() => ({
     author: { type: "string", required: true },
     tags: { type: "json", required: true },
     image: { type: "string" },
+    tweetUrl: { type: "string" },
   },
   computedFields: {
     url: {
