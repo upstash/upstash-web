@@ -407,8 +407,8 @@ export default function BlogPostPage({
             }
 
             .post a {
+              color: #00e9a3;
               text-decoration: underline;
-              text-decoration-color: rgb(255 255 255 / 40%);
             }
 
             .post table {

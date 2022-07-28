@@ -48,7 +48,12 @@
 
 ![](public/readme/note-custom-title.png)
 ```mdx
-gi
+<Note title="custom">
+    You can use any Redis client, but we recommend @upstash/redis
+</Note>
+<Note title="custom" danger>
+    You can use any Redis client, but we recommend @upstash/redis
+</Note>
 ```
 
 ---
