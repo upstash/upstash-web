@@ -1,6 +1,6 @@
 ---
-slug: qstash-scheduled-db-updates
-title: "Scheduled database updates in Next.js serverless functions"
+slug: qstash-periodic-data-updates
+title: "Periodic Data Updates with Next.js and Vercel Serverless Functions"
 author: andreas
 tags: [qstash, edge, cron, schedule, serverless, vercel, nextjs]
 ---
@@ -22,7 +22,7 @@ to run your business logic inside a serverless functions on a schedule.
 ## What will we build?
 
 In this post we will build a simple
-[application](https://qstash-examples-scheduled-db-updates.vercel.app) to
+[application](https://qstash-examples-periodic-data-updates.vercel.app) to
 continuously fetch the current USD price of Bitcoin from
 [blockchain.info](https://blockchain.info/ticker) and store it in a Redis
 database. I chose Redis here, because it's very simple to setup, but you can use
@@ -127,7 +127,7 @@ export const config = {
 };
 ```
 
-The file can be found [here](https://github.com/upstash/qstash-examples/blob/main/scheduled-db-updates/pages/api/cron.ts).
+The file can be found [here](https://github.com/upstash/qstash-examples/blob/main/periodic-data-updates/pages/api/cron.ts).
 
 The next step is to deploy it on Vercel.
 
@@ -155,7 +155,7 @@ If you are not using a custom database, you can quickly create a new
 
 You should now have 4 environment variables in your vercel project:
 
-![](/blog/qstash/scheduled-db-updates/vercel_env.png)
+![](/blog/qstash/periodic-data-updates/vercel_env.png)
 
 Redeploy the app for the changes to take effect.
 
@@ -171,7 +171,7 @@ The final step is to create a schedule that will trigger our handler function.
    case)
 5. Click on Schedule.
 
-![](/blog/qstash/scheduled-db-updates/schedule.png)
+![](/blog/qstash/periodic-data-updates/schedule.png)
 
 ## Wrapping up
 
@@ -182,9 +182,9 @@ After a while, you can check the data in the database. We have also created a
 small frontend for this application but that is neither necessary, nor important
 for this example. It involves a few more dependencies for styling and the chart,
 but you can check it out
-[here]([index.tsx](https://github.com/upstash/qstash-examples/blob/main/scheduled-db-updates/pages/index.tsx).
+[here]([index.tsx](https://github.com/upstash/qstash-examples/blob/main/periodic-data-updates/pages/index.tsx).
 
-![](/blog/qstash/scheduled-db-updates/app.png)
+![](/blog/qstash/periodic-data-updates/app.png)
 
 If you have any questions, please reach out to us on
 [Discord](https://discord.com/invite/w9SenAtbme) and
@@ -195,6 +195,6 @@ If you have any questions, please reach out to us on
 ## Source
 
 - Code:
-  [Repository](https://github.com/upstash/qstash-examples/tree/main/scheduled-db-updates)
+  [Repository](https://github.com/upstash/qstash-examples/tree/main/periodic-data-updates)
 - App:
-  [qstash-examples-scheduled-db-updates.vercel.app](https://qstash-examples-scheduled-db-updates.vercel.app)
+  [qstash-examples-periodic-data-updates.vercel.app](https://qstash-examples-periodic-data-updates.vercel.app)
