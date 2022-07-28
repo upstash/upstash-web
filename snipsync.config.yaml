@@ -1,0 +1,16 @@
+# https://github.com/temporalio/snipsync
+# This configures from where the code snippets are synced
+
+
+origins:
+  - owner: upstash
+    repo: qstash-examples
+  
+
+targets:
+  - pages
+
+features:
+  enable_source_link: false
+  enable_code_block: true
+  allowed_target_extensions: [.md]

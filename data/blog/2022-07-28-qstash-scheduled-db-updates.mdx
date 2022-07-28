@@ -1,0 +1,200 @@
+---
+slug: qstash-scheduled-db-updates
+title: "Scheduled database updates in Next.js serverless functions"
+author: andreas
+tags: [qstash, edge, cron, schedule, serverless, vercel, nextjs]
+---
+
+For many applications, there is a need to insert or update data in your database
+regularly. For example fetching metrics from somewhere or tracking the price of items.
+You might want to update these every day, every hour, or every minute. Traditionally you
+would have to setup a server, create a repeating job using `cron` or something
+else and then maintain it. This server would continously fetch updated prices
+from an API and then insert them into your database.
+
+What if you could just do this within your existing Next.js application without
+any additional infrastructure?
+
+[qStash](https://upstash.com/qstash) allows you to create schedules using [CRON](https://crontab.guru) and
+will send an `HTTP` request to your API, whenever it triggers. This allows you
+to run your business logic inside a serverless functions on a schedule.
+
+## What will we build?
+
+In this post we will build a simple
+[application](https://qstash-examples-scheduled-db-updates.vercel.app) to
+continuously fetch the current USD price of Bitcoin from
+[blockchain.info](https://blockchain.info/ticker) and store it in a Redis
+database. I chose Redis here, because it's very simple to setup, but you can use
+any other database if you want.
+
+## Application
+
+If you don't have an existing Next.js application, you can create a new one with
+`npx create-next-app@latest --ts`.
+
+We need two dependencies to build our example:
+
+- [@upstash/redis](https://github.com/upstash/upstash-redis) - Redis will serve
+  as the database.
+- [@upstash/qstash](https://github.com/upstash/sdk-qstash-ts) - The qStash sdk
+  allows us to verify incoming webhooks from Upstash
+
+Install them with:
+```bash
+npm install @upstash/redis @upstash/qstash
+```
+
+### The api handler
+
+Let's create a new api route in `/pages/api/cron.ts`, that will be called by
+`qStash` when the schedule triggers.
+
+Here are the dependencies:
+
+```ts:pages/api/cron.ts_(1/3)
+import { NextApiRequest, NextApiResponse } from "next";
+import { Redis } from "@upstash/redis";
+import { verifySignature } from "@upstash/qstash/nextjs";
+```
+
+Next we create the actual handler function. Please note, that it is not exported
+yet!
+
+The first step is to get updated data from the API (blockchain.info in this
+case), and then store it in our database of choice. Here we store the current
+exchange rate together with the current timestamp.
+
+```ts:pages/api/cron.ts_(2/3)
+async function handler(_req: NextApiRequest, res: NextApiResponse) {
+  try {
+
+    /**
+     * The API returns something like this:
+     * ```json
+     * {
+     *   "USD": {
+     *     "last": 123
+     *   },
+     *   ...
+     * }
+     * ```
+     */
+    const raw = await fetch("https://blockchain.info/ticker");
+    const prices = await raw.json();
+    const bitcoinPrice = prices["USD"]["last"] as number;
+
+    /**
+     * After we have loaded the current bitcoin price, we can store it in the
+     * database together with the current time
+     */
+    const redis = Redis.fromEnv();
+    await redis.zadd("bitcoin-prices", {
+      score: Date.now(),
+      member: bitcoinPrice,
+    });
+
+    res.send("OK");
+  } catch (err) {
+    res.status(500).send(err);
+  } finally {
+    res.end();
+  }
+}
+```
+
+Lastly, we wrap the handler with `verifySignature`, so that we can verify that
+the request is coming from Upstash. You can read more about this in the
+[qStash documentation](https://docs.upstash.com/qstash/features/security) And we
+also need to disable automatic parsing of the request body, in order to allow
+`verifySignature` to work properly.
+
+```ts:pages/api/cron.ts_(3/3)
+/**
+ * Wrap your handler with `verifySignature` to automatically reject all
+ * requests that are not coming from Upstash.
+ */
+export default verifySignature(handler);
+
+/**
+ * To verify the authenticity of the incoming request in the `verifySignature`
+ * function, we need access to the raw request body.
+ */
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+```
+
+The file can be found [here](https://github.com/upstash/qstash-examples/blob/main/scheduled-db-updates/pages/api/cron.ts).
+
+The next step is to deploy it on Vercel.
+
+## Deployment
+
+You can either push your code to a git repository and deploy it to Vercel, or
+you can deploy it directly from your local machine using the
+[vercel cli](https://vercel.com/docs/cli).
+
+For a more indepth tutorial on how to deploy to Vercel, check out this
+[quickstart](https://docs.upstash.com/qstash/quickstarts/vercel-nextjs#4-deploy-to-vercel).
+
+After you have deployed your app, it is time to add your secrets to your
+environment variables.
+
+## Secrets
+
+Head over to [qStash](https://console.upstash.com/qstash) and copy the
+`QSTASH_CURRENT_SIGNING_KEY` and `QSTASH_NEXT_SIGNING_KEY` to vercel's
+environment variables.
+
+If you are not using a custom database, you can quickly create a new
+[Redis database](https://console.upstash.com/redis). Afterwards copy the
+`UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` to vercel.
+
+You should now have 4 environment variables in your vercel project:
+
+![](/blog/qstash/scheduled-db-updates/vercel_env.png)
+
+Redeploy the app for the changes to take effect.
+
+## Create a schedule
+
+The final step is to create a schedule that will trigger our handler function.
+
+1. Go to [console.upstash.com/qstash](https://console.upstash.com/qstash) and
+   scroll down to the Request Builder.
+2. Configure the endpoint URL as `https://[YOUR_VERCEL_PROJECT_DOMAIN]/api/cron`
+3. Select the type as `Scheduled`.
+4. Configure the cron schedule to run whenever you want. (every hour in this
+   case)
+5. Click on Schedule.
+
+![](/blog/qstash/scheduled-db-updates/schedule.png)
+
+## Wrapping up
+
+That's it, your serverless function will now be called regularly and will insert
+new data into the database.
+
+After a while, you can check the data in the database. We have also created a
+small frontend for this application but that is neither necessary, nor important
+for this example. It involves a few more dependencies for styling and the chart,
+but you can check it out
+[here]([index.tsx](https://github.com/upstash/qstash-examples/blob/main/scheduled-db-updates/pages/index.tsx).
+
+![](/blog/qstash/scheduled-db-updates/app.png)
+
+If you have any questions, please reach out to us on
+[Discord](https://discord.com/invite/w9SenAtbme) and
+[Twitter](https://twitter.com/upstash).
+
+---
+
+## Source
+
+- Code:
+  [Repository](https://github.com/upstash/qstash-examples/tree/main/scheduled-db-updates)
+- App:
+  [qstash-examples-scheduled-db-updates.vercel.app](https://qstash-examples-scheduled-db-updates.vercel.app)
