@@ -11,13 +11,15 @@ export default function PostNote({
   info,
   caution,
   danger,
+  title
 }: {
   children: React.ReactNode;
   note?: boolean;
   tip?: boolean;
   info?: boolean;
   caution?: boolean;
-  danger?: boolean;
+  danger?: boolean
+  title?: string
 }) {
   const bgColor = [
     tip && "green.900",
@@ -40,7 +42,7 @@ export default function PostNote({
     danger && PostNoteDanger,
   ].find((color) => color);
 
-  const title = [
+  title ??= [
     tip && "Tip",
     info && "Info",
     caution && "Caution",
