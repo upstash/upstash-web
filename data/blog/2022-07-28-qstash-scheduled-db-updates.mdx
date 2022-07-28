@@ -45,7 +45,7 @@ Install them with:
 npm install @upstash/redis @upstash/qstash
 ```
 
-### The api handler
+### The API handler
 
 Let's create a new api route in `/pages/api/cron.ts`, that will be called by
 `qStash` when the schedule triggers.
@@ -61,7 +61,7 @@ import { verifySignature } from "@upstash/qstash/nextjs";
 Next we create the actual handler function. Please note, that it is not exported
 yet!
 
-The first step is to get updated data from the API (blockchain.info in this
+The first step is to get fresh data from the API (blockchain.info in this
 case), and then store it in our database of choice. Here we store the current
 exchange rate together with the current timestamp.
 
@@ -105,7 +105,7 @@ async function handler(_req: NextApiRequest, res: NextApiResponse) {
 
 Lastly, we wrap the handler with `verifySignature`, so that we can verify that
 the request is coming from Upstash. You can read more about this in the
-[qStash documentation](https://docs.upstash.com/qstash/features/security) And we
+[qStash documentation](https://docs.upstash.com/qstash/features/security). And we
 also need to disable automatic parsing of the request body, in order to allow
 `verifySignature` to work properly.
 
@@ -175,14 +175,14 @@ The final step is to create a schedule that will trigger our handler function.
 
 ## Wrapping up
 
-That's it, your serverless function will now be called regularly and will insert
+That's it, your serverless function will now be called periodically and will insert
 new data into the database.
 
 After a while, you can check the data in the database. We have also created a
 small frontend for this application but that is neither necessary, nor important
 for this example. It involves a few more dependencies for styling and the chart,
 but you can check it out
-[here]([index.tsx](https://github.com/upstash/qstash-examples/blob/main/periodic-data-updates/pages/index.tsx).
+[here](https://github.com/upstash/qstash-examples/blob/main/periodic-data-updates/pages/index.tsx).
 
 ![](/blog/qstash/periodic-data-updates/app.png)
 
