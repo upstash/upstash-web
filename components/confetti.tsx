@@ -6,7 +6,13 @@ export default React.forwardRef((passedProps: Props, ref) => {
   const { width, height } = useWindowSize();
 
   return (
-    // @ts-ignore
-    <ReactConfetti width={width} height={height} {...passedProps} ref={ref} />
+    <ReactConfetti
+      // bug: screen-width - scrollbar-width
+      width={width - 50}
+      height={height}
+      {...passedProps}
+      // @ts-ignore
+      ref={ref}
+    />
   );
 });
