@@ -18,7 +18,7 @@ import { compareDesc } from "date-fns";
 import { allPosts } from "contentlayer/generated";
 import type { Post } from "contentlayer/generated";
 import NextLink from "next/link";
-import { TAG_NAMES, BANNED_TAGS, META } from "constants/";
+import { TAG_NAMES, BANNED_TAGS } from "constants/";
 import { useState } from "react";
 
 export async function getStaticProps() {

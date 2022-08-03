@@ -7,7 +7,7 @@ import {
   GridItem,
   Text,
 } from "@chakra-ui/react";
-import { LINKS, PRICES } from "constants/";
+import { LINKS, KAFKA_PRICES } from "constants/";
 import Col from "../redis-pricing-desktop/col";
 import ColCheck from "../redis-pricing-desktop/col-check";
 import ColDescription from "../redis-pricing-desktop/col-description";
@@ -41,83 +41,63 @@ export default function KafkaDesktopTable() {
 
       <ColDescription>
         <Text as="span">
-          {PRICES.messagesLimit.title}
-          <CustomTooltip>{PRICES.messagesLimit.description}</CustomTooltip>
-        </Text>
-      </ColDescription>
-      <Col>
-        <Text as="span">{PRICES.messagesLimit.free}</Text>
-      </Col>
-      <Col highlight>
-        <Text as="span">{PRICES.messagesLimit.payg}</Text>
-      </Col>
-      <Col>
-        <Text as="span">{PRICES.messagesLimit.enterprise}</Text>
-      </Col>
-
-      <GridItem colSpan={4}>
-        <Box height="1px" bg="whiteAlpha.100" />
-      </GridItem>
-
-      <ColDescription>
-        <Text as="span">
-          {PRICES.maxRetentionSizeLimit.title}
+          {KAFKA_PRICES.messagesLimit.title}
           <CustomTooltip>
-            {PRICES.maxRetentionSizeLimit.description}
+            {KAFKA_PRICES.messagesLimit.description}
           </CustomTooltip>
         </Text>
       </ColDescription>
       <Col>
-        <Text as="span">{PRICES.maxRetentionSizeLimit.free}</Text>
+        <Text as="span">{KAFKA_PRICES.messagesLimit.free}</Text>
       </Col>
       <Col highlight>
-        <Text as="span">{PRICES.maxRetentionSizeLimit.payg}</Text>
+        <Text as="span">{KAFKA_PRICES.messagesLimit.payg}</Text>
       </Col>
       <Col>
-        <Text as="span">{PRICES.maxRetentionSizeLimit.enterprise}</Text>
+        <Text as="span">{KAFKA_PRICES.messagesLimit.enterprise}</Text>
       </Col>
+
       <GridItem colSpan={4}>
         <Box height="1px" bg="whiteAlpha.100" />
       </GridItem>
 
       <ColDescription>
         <Text as="span">
-          {PRICES.maxRetentionTimeLimit.title}
+          {KAFKA_PRICES.maxRetentionSizeLimit.title}
           <CustomTooltip>
-            {PRICES.maxRetentionTimeLimit.description}
+            {KAFKA_PRICES.maxRetentionSizeLimit.description}
           </CustomTooltip>
         </Text>
       </ColDescription>
       <Col>
-        <Text as="span">{PRICES.maxRetentionTimeLimit.free}</Text>
+        <Text as="span">{KAFKA_PRICES.maxRetentionSizeLimit.free}</Text>
       </Col>
       <Col highlight>
-        <Text as="span">{PRICES.maxRetentionTimeLimit.payg}</Text>
+        <Text as="span">{KAFKA_PRICES.maxRetentionSizeLimit.payg}</Text>
       </Col>
       <Col>
-        <Text as="span">{PRICES.maxRetentionTimeLimit.enterprise}</Text>
+        <Text as="span">{KAFKA_PRICES.maxRetentionSizeLimit.enterprise}</Text>
       </Col>
-
       <GridItem colSpan={4}>
         <Box height="1px" bg="whiteAlpha.100" />
       </GridItem>
 
       <ColDescription>
         <Text as="span">
-          {PRICES.maxNumberOfPartitionsLimit.title}
+          {KAFKA_PRICES.maxRetentionTimeLimit.title}
           <CustomTooltip>
-            {PRICES.maxNumberOfPartitionsLimit.description}
+            {KAFKA_PRICES.maxRetentionTimeLimit.description}
           </CustomTooltip>
         </Text>
       </ColDescription>
       <Col>
-        <Text as="span">{PRICES.maxNumberOfPartitionsLimit.free}</Text>
+        <Text as="span">{KAFKA_PRICES.maxRetentionTimeLimit.free}</Text>
       </Col>
       <Col highlight>
-        <Text as="span">{PRICES.maxNumberOfPartitionsLimit.payg}</Text>
+        <Text as="span">{KAFKA_PRICES.maxRetentionTimeLimit.payg}</Text>
       </Col>
       <Col>
-        <Text as="span">{PRICES.maxNumberOfPartitionsLimit.enterprise}</Text>
+        <Text as="span">{KAFKA_PRICES.maxRetentionTimeLimit.enterprise}</Text>
       </Col>
 
       <GridItem colSpan={4}>
@@ -126,40 +106,22 @@ export default function KafkaDesktopTable() {
 
       <ColDescription>
         <Text as="span">
-          {PRICES.graphqlRestApi.title}
-          <CustomTooltip>{PRICES.graphqlRestApi.description}</CustomTooltip>
-        </Text>
-      </ColDescription>
-      <Col>
-        <ColCheck check={PRICES.graphqlRestApi.free} />
-      </Col>
-      <Col highlight>
-        <ColCheck check={PRICES.graphqlRestApi.payg} />
-      </Col>
-      <Col>
-        <ColCheck check={PRICES.graphqlRestApi.enterprise} />
-      </Col>
-
-      <GridItem colSpan={4}>
-        <Box height="1px" bg="whiteAlpha.100" />
-      </GridItem>
-
-      <ColDescription>
-        <Text as="span">
-          {PRICES.multiZoneReplicationKafka.title}
+          {KAFKA_PRICES.maxNumberOfPartitionsLimit.title}
           <CustomTooltip>
-            {PRICES.multiZoneReplicationKafka.description}
+            {KAFKA_PRICES.maxNumberOfPartitionsLimit.description}
           </CustomTooltip>
         </Text>
       </ColDescription>
       <Col>
-        <ColCheck check={PRICES.multiZoneReplicationKafka.free} />
+        <Text as="span">{KAFKA_PRICES.maxNumberOfPartitionsLimit.free}</Text>
       </Col>
       <Col highlight>
-        <ColCheck check={PRICES.multiZoneReplicationKafka.payg} />
+        <Text as="span">{KAFKA_PRICES.maxNumberOfPartitionsLimit.payg}</Text>
       </Col>
       <Col>
-        <ColCheck check={PRICES.multiZoneReplicationKafka.enterprise} />
+        <Text as="span">
+          {KAFKA_PRICES.maxNumberOfPartitionsLimit.enterprise}
+        </Text>
       </Col>
 
       <GridItem colSpan={4}>
@@ -168,18 +130,18 @@ export default function KafkaDesktopTable() {
 
       <ColDescription>
         <Text as="span">
-          {PRICES.vpcPeering.title}
-          <CustomTooltip>{PRICES.vpcPeering.description}</CustomTooltip>
+          {KAFKA_PRICES.restApi.title}
+          <CustomTooltip>{KAFKA_PRICES.restApi.description}</CustomTooltip>
         </Text>
       </ColDescription>
       <Col>
-        <ColCheck check={PRICES.vpcPeering.free} />
+        <ColCheck check={KAFKA_PRICES.restApi.free} />
       </Col>
       <Col highlight>
-        <ColCheck check={PRICES.vpcPeering.payg} />
+        <ColCheck check={KAFKA_PRICES.restApi.payg} />
       </Col>
       <Col>
-        <ColCheck check={PRICES.vpcPeering.enterprise} />
+        <ColCheck check={KAFKA_PRICES.restApi.enterprise} />
       </Col>
 
       <GridItem colSpan={4}>
@@ -188,40 +150,20 @@ export default function KafkaDesktopTable() {
 
       <ColDescription>
         <Text as="span">
-          {PRICES.support.title}
-          <CustomTooltip>{PRICES.support.description}</CustomTooltip>
-        </Text>
-      </ColDescription>
-      <Col>
-        <ColCheck check={PRICES.support.free} />
-      </Col>
-      <Col highlight>
-        <Text as="span">{PRICES.support.payg}</Text>
-      </Col>
-      <Col>
-        <Text as="span">{PRICES.support.enterprise}</Text>
-      </Col>
-
-      <GridItem colSpan={4}>
-        <Box height="1px" bg="whiteAlpha.100" />
-      </GridItem>
-
-      <ColDescription>
-        <Text as="span">
-          {PRICES.priceKafkaSingleZone.title}
+          {KAFKA_PRICES.multiZoneReplication.title}
           <CustomTooltip>
-            {PRICES.priceKafkaSingleZone.description}
+            {KAFKA_PRICES.multiZoneReplication.description}
           </CustomTooltip>
         </Text>
       </ColDescription>
       <Col>
-        <Text as="span">{PRICES.priceKafkaSingleZone.free}</Text>
+        <ColCheck check={KAFKA_PRICES.multiZoneReplication.free} />
       </Col>
       <Col highlight>
-        <Text as="span">{PRICES.priceKafkaSingleZone.payg}</Text>
+        <ColCheck check={KAFKA_PRICES.multiZoneReplication.payg} />
       </Col>
       <Col>
-        <Text as="span">{PRICES.priceKafkaSingleZone.enterprise}</Text>
+        <ColCheck check={KAFKA_PRICES.multiZoneReplication.enterprise} />
       </Col>
 
       <GridItem colSpan={4}>
@@ -230,20 +172,82 @@ export default function KafkaDesktopTable() {
 
       <ColDescription>
         <Text as="span">
-          {PRICES.priceKafkaMultiZone.title}
+          {KAFKA_PRICES.vpcPeering.title}
+          <CustomTooltip>{KAFKA_PRICES.vpcPeering.description}</CustomTooltip>
+        </Text>
+      </ColDescription>
+      <Col>
+        <ColCheck check={KAFKA_PRICES.vpcPeering.free} />
+      </Col>
+      <Col highlight>
+        <ColCheck check={KAFKA_PRICES.vpcPeering.payg} />
+      </Col>
+      <Col>
+        <ColCheck check={KAFKA_PRICES.vpcPeering.enterprise} />
+      </Col>
+
+      <GridItem colSpan={4}>
+        <Box height="1px" bg="whiteAlpha.100" />
+      </GridItem>
+
+      <ColDescription>
+        <Text as="span">
+          {KAFKA_PRICES.support.title}
+          <CustomTooltip>{KAFKA_PRICES.support.description}</CustomTooltip>
+        </Text>
+      </ColDescription>
+      <Col>
+        <ColCheck check={KAFKA_PRICES.support.free} />
+      </Col>
+      <Col highlight>
+        <Text as="span">{KAFKA_PRICES.support.payg}</Text>
+      </Col>
+      <Col>
+        <Text as="span">{KAFKA_PRICES.support.enterprise}</Text>
+      </Col>
+
+      <GridItem colSpan={4}>
+        <Box height="1px" bg="whiteAlpha.100" />
+      </GridItem>
+
+      <ColDescription>
+        <Text as="span">
+          {KAFKA_PRICES.priceSingleZone.title}
           <CustomTooltip>
-            {PRICES.priceKafkaMultiZone.description}
+            {KAFKA_PRICES.priceSingleZone.description}
           </CustomTooltip>
         </Text>
       </ColDescription>
       <Col>
-        <Text as="span">{PRICES.priceKafkaMultiZone.free}</Text>
+        <Text as="span">{KAFKA_PRICES.priceSingleZone.free}</Text>
       </Col>
       <Col highlight>
-        <Text as="span">{PRICES.priceKafkaMultiZone.payg}</Text>
+        <Text as="span">{KAFKA_PRICES.priceSingleZone.payg}</Text>
       </Col>
       <Col>
-        <Text as="span">{PRICES.priceKafkaMultiZone.enterprise}</Text>
+        <Text as="span">{KAFKA_PRICES.priceSingleZone.enterprise}</Text>
+      </Col>
+
+      <GridItem colSpan={4}>
+        <Box height="1px" bg="whiteAlpha.100" />
+      </GridItem>
+
+      <ColDescription>
+        <Text as="span">
+          {KAFKA_PRICES.priceMultiZone.title}
+          <CustomTooltip>
+            {KAFKA_PRICES.priceMultiZone.description}
+          </CustomTooltip>
+        </Text>
+      </ColDescription>
+      <Col>
+        <Text as="span">{KAFKA_PRICES.priceMultiZone.free}</Text>
+      </Col>
+      <Col highlight>
+        <Text as="span">{KAFKA_PRICES.priceMultiZone.payg}</Text>
+      </Col>
+      <Col>
+        <Text as="span">{KAFKA_PRICES.priceMultiZone.enterprise}</Text>
       </Col>
 
       <GridItem colSpan={4}>

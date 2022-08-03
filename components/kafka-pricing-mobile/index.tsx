@@ -1,5 +1,5 @@
 import { Button, Flex, VStack, Heading, Text } from "@chakra-ui/react";
-import { PRICES } from "constants/";
+import { KAFKA_PRICES } from "constants/";
 import ColCheck from "../redis-pricing-desktop/col-check";
 import { Title } from "../redis-pricing-mobile";
 
@@ -22,60 +22,60 @@ export default function KafkaMobileTable() {
             </Heading>
 
             <Flex direction="column" align="center">
-              <Title>{PRICES.messagesLimit.title}</Title>
-              <Text>{PRICES.messagesLimit[key]}</Text>
+              <Title>{KAFKA_PRICES.messagesLimit.title}</Title>
+              <Text>{KAFKA_PRICES.messagesLimit[key]}</Text>
             </Flex>
 
             <Flex direction="column" align="center">
-              <Title>{PRICES.maxRetentionSizeLimit.title}</Title>
-              <Text>{PRICES.maxRetentionSizeLimit[key]}</Text>
+              <Title>{KAFKA_PRICES.maxRetentionSizeLimit.title}</Title>
+              <Text>{KAFKA_PRICES.maxRetentionSizeLimit[key]}</Text>
             </Flex>
 
             <Flex direction="column" align="center">
-              <Title>{PRICES.maxRetentionTimeLimit.title}</Title>
-              <Text>{PRICES.maxRetentionTimeLimit[key]}</Text>
+              <Title>{KAFKA_PRICES.maxRetentionTimeLimit.title}</Title>
+              <Text>{KAFKA_PRICES.maxRetentionTimeLimit[key]}</Text>
             </Flex>
 
             <Flex direction="column" align="center">
-              <Title>{PRICES.maxNumberOfPartitionsLimit.title}</Title>
-              <Text>{PRICES.maxNumberOfPartitionsLimit[key]}</Text>
+              <Title>{KAFKA_PRICES.maxNumberOfPartitionsLimit.title}</Title>
+              <Text>{KAFKA_PRICES.maxNumberOfPartitionsLimit[key]}</Text>
             </Flex>
 
             <Flex direction="column" align="center">
-              <Title>{PRICES.graphqlRestApi.title}</Title>
-              <ColCheck check={PRICES.graphqlRestApi[key]} />
+              <Title>{KAFKA_PRICES.restApi.title}</Title>
+              <ColCheck check={KAFKA_PRICES.restApi[key]} />
             </Flex>
 
             <Flex direction="column" align="center">
-              <Title>{PRICES.multiZoneReplicationKafka.title}</Title>
-              <ColCheck check={PRICES.multiZoneReplicationKafka[key]} />
+              <Title>{KAFKA_PRICES.multiZoneReplication.title}</Title>
+              <ColCheck check={KAFKA_PRICES.multiZoneReplication[key]} />
             </Flex>
 
             <Flex direction="column" align="center">
-              <Title>{PRICES.vpcPeering.title}</Title>
-              <ColCheck check={PRICES.vpcPeering[key]} />
+              <Title>{KAFKA_PRICES.vpcPeering.title}</Title>
+              <ColCheck check={KAFKA_PRICES.vpcPeering[key]} />
             </Flex>
 
             <Flex direction="column" align="center">
-              <Title>{PRICES.support.title}</Title>
-              {typeof PRICES.support[key] === "boolean" ? (
-                <ColCheck check={PRICES.support[key]} />
+              <Title>{KAFKA_PRICES.support.title}</Title>
+              {typeof KAFKA_PRICES.support[key] === "boolean" ? (
+                <ColCheck check={KAFKA_PRICES.support[key]} />
               ) : (
-                <Text>{PRICES.support[key]}</Text>
+                <Text>{KAFKA_PRICES.support[key]}</Text>
               )}
             </Flex>
 
             <Flex direction="column" align="center">
-              <Title>{PRICES.priceKafkaSingleZone.title}</Title>
+              <Title>{KAFKA_PRICES.priceSingleZone.title}</Title>
               <div>
-                <Text as="p">{PRICES.priceKafkaSingleZone[key]}</Text>
+                <Text as="p">{KAFKA_PRICES.priceSingleZone[key]}</Text>
               </div>
             </Flex>
 
             <Flex direction="column" align="center">
-              <Title>{PRICES.priceKafkaMultiZone.title}</Title>
+              <Title>{KAFKA_PRICES.priceMultiZone.title}</Title>
               <div>
-                <Text as="p">{PRICES.priceKafkaMultiZone[key]}</Text>
+                <Text as="p">{KAFKA_PRICES.priceMultiZone[key]}</Text>
               </div>
             </Flex>
 

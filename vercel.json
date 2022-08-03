@@ -1,6 +1,22 @@
 {
   "redirects": [
     {
+      "source": "/redis",
+      "destination": "https://docs.upstash.com/redis"
+    },
+    {
+      "source": "/kafka",
+      "destination": "https://docs.upstash.com/kafka"
+    },
+    {
+      "source": "/qstash",
+      "destination": "https://docs.upstash.com/qstash"
+    },
+    {
+      "source": "/edge",
+      "destination": "https://docs.upstash.com/redis/features/globaldatabase"
+    },
+    {
       "source": "/discord",
       "destination": "https://discord.com/invite/w9SenAtbme"
     },

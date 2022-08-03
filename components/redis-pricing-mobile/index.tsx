@@ -1,5 +1,5 @@
 import { Button, Flex, VStack, Heading, Text } from "@chakra-ui/react";
-import { PRICES } from "constants/";
+import { REDIS_PRICES } from "constants/";
 import ColCheck from "../redis-pricing-desktop/col-check";
 
 export function Title({ children }) {
@@ -37,50 +37,50 @@ export default function RedisMobileTable() {
             </Heading>
 
             <Flex direction="column" align="center">
-              <Title>{PRICES.commandsLimit.title}</Title>
-              <Text>{PRICES.commandsLimit[key]}</Text>
+              <Title>{REDIS_PRICES.commandsLimit.title}</Title>
+              <Text>{REDIS_PRICES.commandsLimit[key]}</Text>
             </Flex>
 
             <Flex direction="column" align="center">
-              <Title>{PRICES.persistence.title}</Title>
-              <ColCheck check={PRICES.persistence[key]} />
+              <Title>{REDIS_PRICES.persistence.title}</Title>
+              <ColCheck check={REDIS_PRICES.persistence[key]} />
             </Flex>
 
             <Flex direction="column" align="center">
-              <Title>{PRICES.encryption.title}</Title>
-              <ColCheck check={PRICES.encryption[key]} />
+              <Title>{REDIS_PRICES.encryption.title}</Title>
+              <ColCheck check={REDIS_PRICES.encryption[key]} />
             </Flex>
 
             <Flex direction="column" align="center">
-              <Title>{PRICES.graphqlRestApi.title}</Title>
-              <ColCheck check={PRICES.graphqlRestApi[key]} />
+              <Title>{REDIS_PRICES.restApi.title}</Title>
+              <ColCheck check={REDIS_PRICES.restApi[key]} />
             </Flex>
 
             <Flex direction="column" align="center">
-              <Title>{PRICES.multiZoneReplication.title}</Title>
-              <ColCheck check={PRICES.multiZoneReplication[key]} />
+              <Title>{REDIS_PRICES.multiZoneReplication.title}</Title>
+              <ColCheck check={REDIS_PRICES.multiZoneReplication[key]} />
             </Flex>
 
             <Flex direction="column" align="center">
-              <Title>{PRICES.vpcPeering.title}</Title>
-              <ColCheck check={PRICES.vpcPeering[key]} />
+              <Title>{REDIS_PRICES.vpcPeering.title}</Title>
+              <ColCheck check={REDIS_PRICES.vpcPeering[key]} />
             </Flex>
 
             <Flex direction="column" align="center">
-              <Title>{PRICES.support.title}</Title>
-              {typeof PRICES.support[key] === "boolean" ? (
-                <ColCheck check={PRICES.support[key]} />
+              <Title>{REDIS_PRICES.support.title}</Title>
+              {typeof REDIS_PRICES.support[key] === "boolean" ? (
+                <ColCheck check={REDIS_PRICES.support[key]} />
               ) : (
-                <Text>{PRICES.support[key]}</Text>
+                <Text>{REDIS_PRICES.support[key]}</Text>
               )}
             </Flex>
 
             <Flex direction="column" align="center">
-              <Title>{PRICES.price.title}</Title>
+              <Title>{REDIS_PRICES.price.title}</Title>
               <div>
-                <Text as="p">{PRICES.price[key]}</Text>
+                <Text as="p">{REDIS_PRICES.price[key]}</Text>
                 <Text as="span" fontSize="xs" color="whiteAlpha.600">
-                  {PRICES.price[`${key}Detail`]}
+                  {REDIS_PRICES.price[`${key}Detail`]}
                 </Text>
               </div>
             </Flex>

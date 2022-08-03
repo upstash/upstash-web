@@ -11,6 +11,8 @@ import RedisDesktopTable from "./redis-pricing-desktop";
 import RedisMobileTable from "./redis-pricing-mobile";
 import KafkaDesktopTable from "./kafka-pricing-desktop";
 import KafkaMobileTable from "./kafka-pricing-mobile";
+import QStashDesktopTable from "./qstash-pricing/desktop";
+import QStashMobileTable from "./qstash-pricing/mobile";
 import CustomLink from "./custom-link";
 import { LINKS } from "constants/";
 import { useState } from "react";
@@ -74,15 +76,22 @@ function SectionPricing() {
               Redis
             </PriceButton>
             <PriceButton
-              borderRightRadius="md"
-              borderLeftWidth={0}
               isActive={price === "kafka"}
               onClick={() => {
-                console.log("kafka");
                 setPrice("kafka");
               }}
             >
               Kafka
+            </PriceButton>
+            <PriceButton
+              borderRightRadius="md"
+              borderLeftWidth={0}
+              isActive={price === "qstash"}
+              onClick={() => {
+                setPrice("qstash");
+              }}
+            >
+              qStash
             </PriceButton>
           </Box>
         </Box>
@@ -108,7 +117,18 @@ function SectionPricing() {
               </Box>
             </>
           )}
+          {price === "qstash" && (
+            <>
+              <Box display={["none", "block"]}>
+                <QStashDesktopTable />
+              </Box>
+              <Box display={["block", "none"]}>
+                <QStashMobileTable />
+              </Box>
+            </>
+          )}
         </Box>
+
         {price === "redis" && (
           <VStack spacing={2} mt={14}>
             <Text>Disk storage cost is $0.25 per GB per month.</Text>
@@ -132,6 +152,7 @@ function SectionPricing() {
             </Text>
           </VStack>
         )}
+
         {price === "kafka" && (
           <VStack spacing={2} mt={14}>
             <Text>Disk storage cost is $0.25 per GB per month.</Text>

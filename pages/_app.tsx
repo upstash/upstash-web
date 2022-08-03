@@ -1,6 +1,7 @@
 import "styles/app.css";
 import "styles/prism.css";
 import "react-typist/dist/Typist.css";
+import "@upstash/claps/style.css";
 
 import { useEffect } from "react";
 import { useRouter } from "next/router";

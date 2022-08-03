@@ -2,6 +2,8 @@ import { Box, Tooltip } from "@chakra-ui/react";
 import * as Icon from "../icons";
 
 export default function CustomTooltip({ children }) {
+  if (!children) return null;
+
   return (
     <Tooltip shouldWrapChildren placement="top" label={children}>
       <Box
