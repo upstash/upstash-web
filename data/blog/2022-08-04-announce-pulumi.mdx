@@ -5,16 +5,22 @@ author: burak
 tags: [pulumi, devops, terraform, serverless, sre, upstash]
 ---
 
-## Announcing Upstash Pulumi Provider
 Upon request from our community, we have developed Pulumi Provider for Upstash Redis and Kafka, which is now publicly available.
 
 [Pulumi](https://www.pulumi.com) is an automated provisioning tool similar to Terraform but it leverages the functionalities of modern programming languages such as TypeScript, Go and Python.
 This way, you can create conditional resources, multiple resources via loops and so on, enabling for more dynamic and maintainable IAC.
+
 ### Creating your infrastructure as code with your favorite languages
-#### Create pulumi template: `pulumi new <your_language>`
+
+#### Create pulumi template
+
+```shell
+pulumi new <your_language>
+```
 
 #### TypeScript / JavaScript
-```shell
+
+```js
 const createdDb = new upstash.RedisDatabase("mydb", {
     databaseName: "pulumi-ts-db",
     region: "eu-west-1",
@@ -23,7 +29,8 @@ const createdDb = new upstash.RedisDatabase("mydb", {
 ```
 
 #### Go
-```shell
+
+```go
 createdCluster, _ := upstash.NewKafkaCluster(ctx, "exampleCluster", &upstash.KafkaClusterArgs{
     ClusterName: pulumi.String("pulumi-go-cluster"),
     Multizone:   pulumi.Bool(false),
@@ -32,7 +39,8 @@ createdCluster, _ := upstash.NewKafkaCluster(ctx, "exampleCluster", &upstash.Kaf
 ```
 
 #### Python
-```shell
+
+```python
 created_team = upstash.Team(
     resource_name="myTeam",
     team_name="pulumi team",
@@ -49,14 +57,14 @@ created_team = upstash.Team(
 
 ![web3-before-connection](/blog/announce-pulumi/update-example.png)
 
-
-
 ### Future Work
+
 We want to keep the developer experience easy and intuitive. Hence, we will keep our tools up-to-date with our services.
 As an example, qStash resources will soon be added
 to both Terraform and Pulumi providers.
 
 ### Closing Words
+
 For resource creations with different languages, you can have a look at [our repo](https://github.com/upstash/upstash-pulumi-provider/tree/master/examples).
 
 You can share your feedback via [Twitter](https://twitter.com/upstash) or [Discord](https://discord.gg/w9SenAtbme), which will be greatly appreciated.

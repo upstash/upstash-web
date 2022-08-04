@@ -154,7 +154,7 @@ export default function BlogPostPage({
       />
 
       <Box as="header" pt={["80px", "100px"]} textAlign="center">
-        <Container maxW="4xl">
+        <Container maxW="3xl">
           <HStack justify="center" color="whiteAlpha.600">
             <Text as="time" dateTime={post.date}>
               {format(parseISO(post.date), "LLLL d, yyyy")}
