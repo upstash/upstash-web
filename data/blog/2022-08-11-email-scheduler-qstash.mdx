@@ -1,0 +1,183 @@
+---
+slug: email-scheduler-qstash
+title: "Building an Email Scheduler with Vercel Functions and qStash"
+author: kay
+tags: [qstash, vercel, scheduler]
+image: https://dev-to-uploads.s3.amazonaws.com/uploads/articles/heoz05agz9n8uwdf2ymr.jpg
+---
+
+
+Serverless systems are easy to start, but they can have some growing pains later in their lifecycle. They’re stateless by nature, and liking all the moving parts isn’t easy. Let your serverless functions call each other or put another service, like a queue or database, between your functions. Both solutions were sub-optimal in the past.
+
+If you call a serverless function from another serverless function, you pay for both of them, even if the first one just waits for the second and doesn’t do anything.
+
+Suppose you use another service to bridge between functions. In that case, it might cost money even if the service is idle because many data-related serverless services are serverless in all accounts but pricing.
+
+Highly integrated cloud providers like AWS or Google might come with on-demand priced queues, but they might not always be an option.
+
+This is where qStash comes into play, the new queuing service from Upstash. It’s a serverless queue where you only pay for what you use. It supports delivery to one or more HTTP endpoints, deduplication based on IDs or content hash, and scheduled delivery.
+
+In this article, we will check out what qStash can do by building an email scheduler with it. Vercel will be the cloud provider of choice for this tutorial. So, let’s go!
+
+## Prerequisites
+
+To follow this tutorial, you need accounts for three services:
+
+- [GitHub](https://github.com/signup)
+- [Upstash](https://console.upstash.com/login)
+- [Vercel](https://vercel.com/signup)
+
+## Setting up a Next.js App
+
+Your first step is to set up a Next.js project. For this, run the following command:
+
+    $ npx create-next-app@latest
+
+Then navigate into the new project folder.
+
+## Installing Dependencies
+
+While using the qStash service via an HTTP API, the TypeScript package makes working with it more accessible. You will use the nodemailer package to send the emails. Install them with NPM:
+
+    $ npm i @upastash/qstash nodemailer
+
+## Creating the Schedule API Route
+
+Next.js comes with superb integration for Vercel functions. Creating an API route will automatically execute inside a serverless Vercel function without additional code changes. For this, create a new JavaScript file at `pages/api/schedule.js` with the following content:
+
+```javascript
+import { Client } from "@upstash/qstash"
+
+const qstashClient = new Client({
+  token: process.env.QSTASH_TOKEN
+})
+
+export default async function handler(request, response) {
+  if (request.method !== "POST")
+    return response.status(404).end()
+
+  const qstashResponse = await qstashClient.publishJSON({
+    url: `https://${request.headers.host}/api/notify`,
+    body: request.body,
+    notBefore: request.query.timestamp,
+  })
+
+  response.status(201).send(qstashResponse)
+}
+```
+
+First, you initialize the qStash client with a token from Upstash. Best practice suggests that you put the token in environment variables, which are encrypted in Vercel. (You will set these variables later when you finish the code part)
+
+Next comes the actual function `handler`. It checks that the function was called via a `POST` method and proceeds to extract the content from the request to use it with qStash.
+
+qStash uses the `url` field as a target for the scheduled message. We want it to call another API route from our Next.js app, but the domain can change between Vercel deployments; we will use the Host header field to get the correct URL.
+
+The `body` field is simply what our API request had in its body.
+
+The `notBefore` field takes a Unix timestamp as the date we want to send the email.
+
+To tie everything together, the user would send a request with a text body and a timestamp query parameter to our API route, and the Vercel function will relay it to qStash.
+
+## Creating the Notify API Route
+
+Now that we get our messages scheduled to qStash, we need the route to convert them to emails and send them out. For this, create file at `pages/api/notify.js` that contains:
+
+```javascript
+import nodemailer from "nodemailer"
+import { verifySignature } from "@upstash/qstash/nextjs"
+
+export const config = {
+  api: { bodyParser: false },
+}
+
+export default verifySignature(handler, {
+  currentSigningKey: process.env.QSTASH_CURRENT_SIGNING_KEY,
+  nextSigningKey: process.env.QSTASH_NEXT_SIGNING_KEY,
+})
+
+async function handler(request, response) {
+  const emailAccount = await nodemailer.createTestAccount()
+
+  const transport = nodemailer.createTransport({
+    host: "smtp.ethereal.email",
+    auth: emailAccount,
+  })
+
+  await transport.sendMail({
+    from: '"qStash" <qstash@upstash.com>',
+    to: "jane.doe@example.com",
+    subject: "Notification from qStash",
+    text: request.body,
+  })
+
+  response.send()
+}
+```
+
+First, we export the `config` object to tell Next.js it shouldn’t parse the body. Next.js parses the body by default, but to verify the signature of a qStash request, we need the raw/unparsed body.
+
+The qStash service will sign all requests to ensure you only process valid messages. The middleware needs the signature keys from Upstash. Again, we assume they will be in the environment variables.
+
+The handler function creates a test account at ethereal.email, a simple test service for nodemailer, and tries to send a mail with it. In your own app, you can replace this with an email service of your choice.
+
+## Pushing the Code to GitHub
+
+Vercel will build and deploy your app every time you push a new commit to GitHub, but for this, it has to be on GitHub first. Creating GitHub repos and pushing code to them is outside the scope here, but [there are good explanations online](https://www.techrepublic.com/videos/how-to-push-a-new-project-to-github/).
+
+## Creating a Vercel Project
+
+You need to [create a new project on Vercel](https://vercel.com/new) by importing the GitHub repo from the last step.
+
+When creating the project, don’t forget to put the qStash credentials into the right environment variables. Figure 1 shows where you find them in [the Upstash Console](https://console.upstash.com/qstash).
+
+![Figure 1: qStash Credentials](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/ruz5uon5bfxio3yaycil.png)
+
+As a reminder, the variables should have the following names:
+
+- `QSTASH_TOKEN`
+- `QSTASH_CURRENT_SIGNING_KEY`
+- `QSTASH_NEXT_SIGNING_KEY`
+
+After you create the project, Vercel will download the latest version from GitHub, build your app, and deploy it on its infrastructure.
+
+## Testing the App
+
+To test the app, you must get the correct domain from Vercel after the deployment is finished. Figure 2 shows where you can find it.
+
+![Figure 2: Vercel Dashboard](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/53rftmf9e5bvrvt83ycw.png)
+
+To send a request to your app, you can use the cURL CLI tool:
+
+```
+$ curl -X POST \
+  -H "Content-Type: text/plain" \
+  -d "Hello!" \
+  "https://<APP_DOMAIN>.vercel.app/api/schedule?timestamp=<TIMESTAMP>"
+```
+
+Replace the APP_DOMAIN and TIMESTAMP accordingly.
+
+You can check the delivery of your message in [the Upstash Console](https://console.upstash.com/qstash), as seen in Figure 3.
+
+![Figure 3: Upstash Console](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/y2naopzlriyey1l5wk65.png)
+
+## Summary
+Serverless application development is all about gluing services together. You either let your functions call other functions directly, or you need to put another service between them.
+
+Upstash’s new serverless queuing service comes to the rescue with a straightforward interface and pay-as-you-go pricing.
+
+It is 100% built on stateless HTTP requests and designed for:
+
+- Serverless functions (AWS Lambda ...)
+- Cloudflare Workers
+- Fastly Compute@Edge
+- Next.js, including edge
+- Deno
+- Client-side web/mobile applications
+- WebAssembly
+- other environments where HTTP is preferred over TCP.
+
+Have I sparked your interest?
+
+[Give it a try; the first 50 requests per day are on the house!](https://console.upstash.com/login)
+
