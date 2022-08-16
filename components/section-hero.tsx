@@ -182,7 +182,7 @@ function SectionHero() {
             <Box as="span" opacity={0.3}>
               #
             </Box>
-            qStash
+            QStash
           </LinkNext>
         </HStack>
 

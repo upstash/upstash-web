@@ -91,7 +91,7 @@ function SectionPricing() {
                 setPrice("qstash");
               }}
             >
-              qStash
+              QStash
             </PriceButton>
           </Box>
         </Box>
