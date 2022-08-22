@@ -284,7 +284,7 @@ module.exports.load = async (event) => {
 
 ### Histogram Calculation
 
-I used `hdr-histogram-js` library to calculate the histogram. This is a js implementation of Gil Tene’s [hdr-histogram](http://hdrhistogram.github.io/) library. See the code of the lambda function which receives the latency numbers and calculates the histogram.
+I used `hdr-histogram-js` library to calculate the histogram. This is a js implementation of Gil Tene’s [hdr-histogram](https://github.com/HdrHistogram/HdrHistogramJS) library. See the code of the lambda function which receives the latency numbers and calculates the histogram.
 
 ```javascript
 const Redis = require("ioredis");
