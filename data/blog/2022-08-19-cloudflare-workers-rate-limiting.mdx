@@ -65,7 +65,7 @@ export default {
         })
       ],
       limiter: MultiRegionRatelimit.fixedWindow(5, "5 s"),
-      ephermeralCache: cache,
+      ephemeralCache: cache,
     });
 
     const userIP: string = request.headers.get('CF-Connecting-IP') || "none";
