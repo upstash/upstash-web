@@ -123,5 +123,10 @@ export default {
     name: "Vladimir Mihailenco",
     title: "Uptrace Founder, Go-Redis Author",
     image_url: "https://upstash.com/blog/authors/vladimir.jpg",
+  },
+  rodney: {
+    name: "Rodney Johnson",
+    title: "Consultant Web Developer",
+    image_url: "https://upstash.com/blog/authors/rodney.jpg",
   }
 };
