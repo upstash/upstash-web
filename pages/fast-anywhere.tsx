@@ -2,19 +2,18 @@ import dynamic from "next/dynamic";
 import {
   Box,
   Button,
+  Container,
+  Heading,
+  Text,
   TableContainer,
-  TableCaption,
   Thead,
   Tbody,
   Tr,
   Th,
   Td,
   Table,
-  Container,
-  Heading,
-  Text,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useEffect } from "react";
 import useFetch from "use-http";
 
 const AnimatedGlobe = dynamic(() => import("components/globe"), {
@@ -23,7 +22,7 @@ const AnimatedGlobe = dynamic(() => import("components/globe"), {
 
 function SpeedText({ loading, data }) {
   return loading ? (
-    <>Loading...</>
+    <Text color={"whiteAlpha.500"}>Loading...</Text>
   ) : data ? (
     <Text color={data > 10 ? "yellow.500" : "primary"}>
       {Math.round(data)}ms
@@ -40,12 +39,14 @@ export default function TestPage() {
     "https://kg2nsnegmd.execute-api.us-west-1.amazonaws.com/dev/run";
   const urlUsWest2 =
     "https://xsdlzzdyji.execute-api.us-west-2.amazonaws.com/dev/run";
-  const urlAfSouth1 =
-    "https://up1j9vlh71.execute-api.af-south-1.amazonaws.com/dev/run";
+  // const urlAfSouth1 =
+  //   "https://up1j9vlh71.execute-api.af-south-1.amazonaws.com/dev/run";
   const urlApEast1 =
     "https://gu1zu8xx11.execute-api.ap-east-1.amazonaws.com/dev/run";
-  const urlApNorthEast1 =
-    "https://c3iqabumtd.execute-api.ap-northeast-1.amazonaws.com/dev/run";
+  // const urlApNorthEast1 =
+  //   "https://c3iqabumtd.execute-api.ap-northeast-1.amazonaws.com/dev/run";
+  const urlApSouthEast1 =
+    "https://czphf8wj9b.execute-api.ap-southeast-1.amazonaws.com/dev/run";
   const urlEuWest1 =
     "https://fvj3rll99i.execute-api.eu-west-1.amazonaws.com/dev/run";
   const urlEuCentral1 =
@@ -70,21 +71,26 @@ export default function TestPage() {
     get: getUsEast1,
     loading: loadingUsEast1,
   } = useFetch(urlUsEast1);
-  const {
-    data: afSouth1,
-    get: getAfSouth1,
-    loading: loadingAfSouth1,
-  } = useFetch(urlAfSouth1);
+  // const {
+  //   data: afSouth1,
+  //   get: getAfSouth1,
+  //   loading: loadingAfSouth1,
+  // } = useFetch(urlAfSouth1);
   const {
     data: apEast1,
     get: getApEast1,
     loading: loadingApEast1,
   } = useFetch(urlApEast1);
+  // const {
+  //   data: apNorthEast1,
+  //   get: getApNorthEast1,
+  //   loading: loadingApNorthEast1,
+  // } = useFetch(urlApNorthEast1);
   const {
-    data: apNorthEast1,
-    get: getApNorthEast1,
-    loading: loadingApNorthEast1,
-  } = useFetch(urlApNorthEast1);
+    data: apSouthEast1,
+    get: getApSouthEast1,
+    loading: loadingApSouthEast1,
+  } = useFetch(urlApSouthEast1);
   const {
     data: euWest1,
     get: getEuWest1,
@@ -106,46 +112,48 @@ export default function TestPage() {
     loading: loadingSaEast1,
   } = useFetch(urlSaEast1);
 
+  const onRefresh = () => {
+    getUsWest1();
+    getUsWest2();
+    getUsEast1();
+    getSaEast1();
+    // getAfSouth1();
+    getApEast1();
+    // getApNorthEast1();
+    getApSouthEast1();
+    getEuWest1();
+    getEuCentral1();
+    getMeSouth1();
+  };
+
+  useEffect(() => {
+    onRefresh();
+  }, []);
+
   return (
-    <Box py={180} pos="relative">
+    <Box py={140} pos="relative">
       <Container maxW="5xl">
         <Box width="42%" pos="relative" zIndex={1}>
           <Box as="header">
-            <Heading as="h1" size="2xl">
-              Global Latency for Serverless Redis®
+            <Heading
+              as="h1"
+              lineHeight="shorter"
+              size="2xl"
+              bgGradient="linear(to-r, #00e9a3, #d69e2e)"
+              bgClip="text"
+            >
+              Fast Anywhere ⚡️
             </Heading>
             <Text
-              mt={4}
+              mt={2}
               fontSize={["md", "2xl"]}
               fontWeight={"light"}
               color="whiteAlpha.700"
               lineHeight="short"
             >
-              We have implemented an AWS Lambda function which reads a value
-              from an Upstash database using the REST API.
+              An AWS Lambda function from different regions reads from Upstash
+              Redis* and records latency.
             </Text>
-
-            <Button
-              mt={8}
-              size="md"
-              color="black"
-              bg="primary"
-              _hover={{}}
-              onClick={() => {
-                getUsWest1();
-                getUsWest2();
-                getUsEast1();
-                getSaEast1();
-                getAfSouth1();
-                getApEast1();
-                getApNorthEast1();
-                getEuWest1();
-                getEuCentral1();
-                getMeSouth1();
-              }}
-            >
-              Start
-            </Button>
           </Box>
 
           <TableContainer mt={10}>
@@ -169,15 +177,6 @@ export default function TestPage() {
                   >
                     Read
                   </Th>
-                  <Th
-                    paddingX={0}
-                    borderColor="#222"
-                    fontWeight="normal"
-                    color="whiteAlpha.500"
-                    isNumeric
-                  >
-                    Write
-                  </Th>
                 </Tr>
               </Thead>
               <Tbody>
@@ -191,9 +190,6 @@ export default function TestPage() {
                       data={usWest1?.latencyGlobal}
                     />
                   </Td>
-                  <Td paddingX={0} borderColor="#222" isNumeric>
-                    ~10ms
-                  </Td>
                 </Tr>
                 <Tr>
                   <Td paddingX={0} borderColor="#222">
@@ -204,9 +200,6 @@ export default function TestPage() {
                       loading={loadingUsWest2}
                       data={usWest2?.latencyGlobal}
                     />
-                  </Td>
-                  <Td paddingX={0} borderColor="#222" isNumeric>
-                    ~10ms
                   </Td>
                 </Tr>
                 <Tr>
@@ -219,9 +212,6 @@ export default function TestPage() {
                       data={usEast1?.latencyGlobal}
                     />
                   </Td>
-                  <Td paddingX={0} borderColor="#222" isNumeric>
-                    ~10ms
-                  </Td>
                 </Tr>
                 <Tr>
                   <Td paddingX={0} borderColor="#222">
@@ -233,11 +223,8 @@ export default function TestPage() {
                       data={saEast1?.latencyGlobal}
                     />
                   </Td>
-                  <Td paddingX={0} borderColor="#222" isNumeric>
-                    ~10ms
-                  </Td>
                 </Tr>
-                <Tr>
+                {/*<Tr>
                   <Td paddingX={0} borderColor="#222">
                     Africa (Cape Town)
                   </Td>
@@ -247,10 +234,7 @@ export default function TestPage() {
                       data={afSouth1?.latencyGlobal}
                     />
                   </Td>
-                  <Td paddingX={0} borderColor="#222" isNumeric>
-                    ~10ms
-                  </Td>
-                </Tr>
+                </Tr>*/}
                 <Tr>
                   <Td paddingX={0} borderColor="#222">
                     Asia Pacific (Hong Kong)
@@ -261,11 +245,8 @@ export default function TestPage() {
                       data={apEast1?.latencyGlobal}
                     />
                   </Td>
-                  <Td paddingX={0} borderColor="#222" isNumeric>
-                    ~10ms
-                  </Td>
                 </Tr>
-                <Tr>
+                {/*<Tr>
                   <Td paddingX={0} borderColor="#222">
                     Asia Pacific (Tokyo)
                   </Td>
@@ -275,8 +256,16 @@ export default function TestPage() {
                       data={apNorthEast1?.latencyGlobal}
                     />
                   </Td>
+                </Tr>*/}
+                <Tr>
+                  <Td paddingX={0} borderColor="#222">
+                    Asia Pacific (Singapore)
+                  </Td>
                   <Td paddingX={0} borderColor="#222" isNumeric>
-                    ~10ms
+                    <SpeedText
+                      loading={loadingApSouthEast1}
+                      data={apSouthEast1?.latencyGlobal}
+                    />
                   </Td>
                 </Tr>
                 <Tr>
@@ -289,9 +278,6 @@ export default function TestPage() {
                       data={euWest1?.latencyGlobal}
                     />
                   </Td>
-                  <Td paddingX={0} borderColor="#222" isNumeric>
-                    ~10ms
-                  </Td>
                 </Tr>
                 <Tr>
                   <Td paddingX={0} borderColor="#222">
@@ -302,9 +288,6 @@ export default function TestPage() {
                       loading={loadingEuCentral1}
                       data={euCentral1?.latencyGlobal}
                     />
-                  </Td>
-                  <Td paddingX={0} borderColor="#222" isNumeric>
-                    ~10ms
                   </Td>
                 </Tr>
                 <Tr>
@@ -317,13 +300,14 @@ export default function TestPage() {
                       data={meSouth1?.latencyGlobal}
                     />
                   </Td>
-                  <Td paddingX={0} borderColor="#222" isNumeric>
-                    ~10ms
-                  </Td>
                 </Tr>
               </Tbody>
             </Table>
           </TableContainer>
+
+          <Button mt={6} size="sm" fontWeight="normal" onClick={onRefresh}>
+            Refresh
+          </Button>
         </Box>
 
         <Box
@@ -331,7 +315,7 @@ export default function TestPage() {
           pos="absolute"
           left="50%"
           top="50%"
-          transform="translate3d(-200px, -50%, 0)"
+          transform="translate3d(-200px, -45%, 0)"
         >
           <AnimatedGlobe width={1400} height={1400} />
         </Box>

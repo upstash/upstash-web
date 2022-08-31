@@ -1,10 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-
-const Globe =
-  typeof window !== "undefined"
-    ? require("react-globe.gl").default
-    : () => null;
+import Globe from "react-globe.gl";
 
 type arcsData = {
   startLat: number;
