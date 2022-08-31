@@ -1,0 +1,158 @@
+---
+slug: upstash-pulumi-provider
+title: "Get Started with Sidekiq and Upstash on Fly.io"
+author: burak
+tags: [sidekiq, fly, flyctl, worker, background, upstash]
+---
+
+Recently, we have announced Upstash Redis on Fly.io: [Upstash Redis on Fly](https://fly.io/docs/reference/redis/)
+
+Sidekiq is a backroung processing library in Ruby language. With this library, we can distribute our processes to what is called `Sidekiq workers` instead of doing the heavy work on the server itself. 
+
+What these workers do basically is they fetch the enqueued or scheduled tasks from the database. Then, execute them whenever the time comes and the worker is idle.
+
+This way, we can make sure that our server remains responsive for incoming requests, without being blocked by heavy or recurring processes.
+
+We will create a sample app using Sidekiq on Fly.io using Upstash Redis. It will enqueu and/or schedule some notification for users, depending on the inputs provided.
+
+![schema](/blog/sidekiq-fly/sidekiq.png)
+
+
+## Fly.io Setup
+- Create a [Fly.io](https://fly.io/) account.
+- Install [flyctl](https://fly.io/docs/getting-started/installing-flyctl/) and
+run `flyctl auth login`
+
+## Upstash Redis Setup on Fly
+- Run `flyctl redis create`.
+- Set your connection link: `flyctl secrets set UPSTASH_REDIS_LINK=<upstash-redis-connection-link>`
+
+## Application Code
+- Create the sendEmail.rb file:
+
+```ruby
+require "sidekiq"
+require "sidekiq/api"
+
+connection_url = ENV['UPSTASH_REDIS_LINK']
+
+Sidekiq.configure_client do |config|
+    config.redis = {url: connection_url}
+end
+
+Sidekiq.configure_server do |config|
+    config.redis = {url: connection_url}
+end
+
+class EmailService
+    include Sidekiq::Worker
+    def perform(id, type)
+        # Logic goes here. Let's assume sending email by printing to console.
+        puts "Emailed to: " +  id + ": " + "'Congrats on " + type + " plan.'"
+    end
+end
+
+def updateEmail(id, newType)
+    jobFound = false
+    
+    a = Sidekiq::ScheduledSet.new
+    a.each do |job|
+        if job.args[0] == id
+            job.delete
+            jobFound = true
+        end
+    end
+
+    if jobFound
+        EmailService.perform_async(id, ("starting using our service and upgrading it to " + newType))
+    else
+        EmailService.perform_async(id, ("upgrading to " + newType))
+    end
+end
+
+def sendEmail(id, type)
+    case type
+    when "free"
+        # if free, delay for 5 seconds.
+        EmailService.perform_in("5", id, "free")
+    when "paid"
+        # if paid, delay for 3 seconds.
+        EmailService.perform_in("3", id, "paid")
+    when "enterprise"
+        # if enterprise, immediately queue.
+        EmailService.perform_async(id, "enterprise")
+    when "enterprise10k"
+        EmailService.perform_async(id, "enterprise10k")
+    else
+        puts "Only plans are: `free`, `paid` and `enterprise`"
+    end
+end
+
+def clearSchedules()
+    Sidekiq::ScheduledSet.new.clear
+    Sidekiq::Queue.new.clear
+end
+```
+- Create a simple Sinatra server:
+```ruby
+...
+
+get '/register/:id/:plan' do
+  sendEmail(params[:id], params[:plan])
+  "<h1>Email is queued.</h1>"
+end
+
+get '/update/:id/:plan' do
+  updateEmail(params[:id], params[:plan])
+  "<h1>Updated Email is queued.</h1>"
+end
+
+get '/clear' do
+  clearSchedules()
+  "<h1>Queue and the schedules are cleared.</h1>"
+end
+...
+```
+(Complete source codes and configurations are in our [repo](https://github.com/upstash/redis-examples/tree/compatible-libraries/using-sidekiq))
+## Launch App
+- First, run `flyctl launch` to create `.toml` template. 
+- There, update `internal_port = 9292` under `[[services]]`. It should look something like this:
+```
+...
+
+[[services]]
+  internal_port = 9292
+  protocol = "tcp"
+  [services.concurrency]
+    hard_limit = 25
+    soft_limit = 20
+    type = "connections"
+
+...
+
+```
+- Add `Procfile` so that we can run both the Sinatra server and the Sidekiq Worker:
+`web: bundle exec rackup & bundle exec sidekiq -r ./sendEmail.rb`
+
+- run `flyctl deploy` to deploy.
+
+## App Deployed
+- send `get register/id1/enterprise`:
+![enterprise](/blog/sidekiq-fly/enterprise.png)
+
+
+- send `get register/id2/paid`:
+![paid](/blog/sidekiq-fly/paid.png)
+
+
+- send `get register/id3/free` and then `get update/id3/paid`
+![register-update](/blog/sidekiq-fly/register-update.png)
+
+
+### Closing Words
+In this example, we have implemented an app, using Sidekiq background processing library. In the sample, we have demonstrated a simple usecase which you can customize depending on your needs. This way, we have decreased the workload of our main server and with that enabled for more responsive experience for users.
+
+For the complete source code, you can look at [our repo](https://github.com/upstash/redis-examples/tree/compatible-libraries/using-sidekiq).
+
+
+You can give your feedbacks on any of our services via [twitter](https://twitter.com/upstash) or [discord](https://discord.gg/w9SenAtbme), which will be greatly appreciated.
