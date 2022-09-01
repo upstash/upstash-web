@@ -9,37 +9,48 @@ type arcsData = {
   endLng: number;
 };
 
-const REGIONS = {
-  oregon: {
+type region = {
+  name: string;
+  lat: string;
+  lng: string;
+};
+
+const REGIONS: region[] = [
+  {
+    name: "oregon",
     lat: "44.1274576",
     lng: "-122.8257181",
   },
-  n_virginia: {
+  {
+    name: "n_virginia",
     lat: "37.4784129",
     lng: "-76.4618534",
   },
-  sao_paulo: {
+  {
+    name: "sao_paulo",
     lat: "-23.6820347",
     lng: "-46.735724",
   },
-  singapore: {
+  {
+    name: "singapore",
     lat: "1.3143394",
     lng: "103.7038242",
   },
-  frankfurt: {
+  {
+    name: "frankfurt",
     lat: "50.1213009",
     lng: "8.5663531",
   },
-};
+];
 
-function getRandomArcData() {
+function getRandomItem(list: any) {
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+function getRandomArcData(): arcsData[] {
   // @ts-ignore
   return [...Array(3).keys()].map(() => {
-    const selectedRegion =
-      Object.keys(REGIONS)[
-        Math.floor(Math.random() * Object.keys(REGIONS).length)
-      ];
-    const region = REGIONS[selectedRegion];
+    const region: region = getRandomItem(REGIONS);
 
     return {
       startLat: region.lat,
@@ -54,6 +65,7 @@ function getRandomArcData() {
 export default function AnimatedGlobe({ ...props }) {
   const [arcsData, setArcsData] = useState<arcsData[]>(getRandomArcData());
   const [countries, setCountries] = useState({ features: [] });
+
   const [globeMaterial, setGlobeMaterial] = useState(
     new THREE.MeshPhongMaterial()
   );
@@ -88,23 +100,17 @@ export default function AnimatedGlobe({ ...props }) {
     <Globe
       ref={globeRef}
       // animateIn={false}
-      width={600}
-      height={600}
       backgroundColor="rgba(0, 0, 0, 0)"
       globeMaterial={globeMaterial}
-      onGlobeClick={(a) => {
-        console.log(a);
-      }}
       //
       // HEX POLYGONS
       hexPolygonsData={countries.features}
       hexPolygonResolution={3}
       hexPolygonMargin={0.7}
-      hexPolygonColor={() => "#888"}
+      hexPolygonColor={() => "#777"}
       //
       // ATMOSPHERE
-      atmosphereColor={"#fff"}
-      // atmosphereColor={"#00e9a3"}
+      atmosphereColor={"#d69e2e"}
       atmosphereAltitude={0.1}
       //
       // ARCS

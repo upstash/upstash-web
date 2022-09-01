@@ -1,18 +1,7 @@
 import dynamic from "next/dynamic";
-import {
-  Box,
-  Button,
-  Container,
-  Heading,
-  Text,
-  TableContainer,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  Table,
-} from "@chakra-ui/react";
+import { Box, Button, Container, Flex, Heading, Text } from "@chakra-ui/react";
+import { TableContainer } from "@chakra-ui/react";
+import { Thead, Tbody, Tr, Th, Td, Table } from "@chakra-ui/react";
 import React, { useEffect } from "react";
 import useFetch from "use-http";
 
@@ -127,13 +116,13 @@ export default function TestPage() {
   };
 
   useEffect(() => {
-    onRefresh();
+    // onRefresh();
   }, []);
 
   return (
-    <Box py={140} pos="relative">
-      <Container maxW="5xl">
-        <Box width="42%" pos="relative" zIndex={1}>
+    <Box py={[20, "140px"]} pos="relative">
+      <Container maxW="5xl" overflow="hidden">
+        <Box width={["full", "42%"]} pos="relative" zIndex={1}>
           <Box as="header">
             <Heading
               as="h1"
@@ -175,7 +164,34 @@ export default function TestPage() {
                     color="whiteAlpha.500"
                     isNumeric
                   >
-                    Read
+                    <Button
+                      size="xs"
+                      variant="ghost"
+                      fontWeight="normal"
+                      onClick={onRefresh}
+                      px={1}
+                      mr={0.5}
+                      color="whiteAlpha.500"
+                      _hover={{
+                        color: "white",
+                      }}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        strokeWidth="1.5"
+                        stroke="currentColor"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" />
+                        <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" />
+                      </svg>
+                    </Button>
+                    <span>Read</span>
                   </Th>
                 </Tr>
               </Thead>
@@ -304,13 +320,10 @@ export default function TestPage() {
               </Tbody>
             </Table>
           </TableContainer>
-
-          <Button mt={6} size="sm" fontWeight="normal" onClick={onRefresh}>
-            Refresh
-          </Button>
         </Box>
 
         <Box
+          display={["none", "block"]}
           zIndex={0}
           pos="absolute"
           left="50%"

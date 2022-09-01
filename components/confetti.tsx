@@ -2,7 +2,7 @@ import React from "react";
 import { useWindowSize } from "react-use";
 import ReactConfetti, { Props } from "react-confetti";
 
-export default React.forwardRef((passedProps: Props, ref) => {
+const Confetti = React.forwardRef((passedProps: Props, ref) => {
   const { width, height } = useWindowSize();
 
   return (
@@ -16,3 +16,6 @@ export default React.forwardRef((passedProps: Props, ref) => {
     />
   );
 });
+
+Confetti.displayName = "Confetti";
+export default Confetti;
