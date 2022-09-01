@@ -1,5 +1,5 @@
 ---
-slug: upstash-pulumi-provider
+slug: sidekiq-with-upstash-on-fly
 title: "Get Started with Sidekiq and Upstash on Fly.io"
 author: burak
 tags: [sidekiq, fly, flyctl, worker, background, upstash]
@@ -7,13 +7,13 @@ tags: [sidekiq, fly, flyctl, worker, background, upstash]
 
 Recently, we have announced Upstash Redis on Fly.io: [Upstash Redis on Fly](https://fly.io/docs/reference/redis/)
 
-Sidekiq is a backroung processing library in Ruby language. With this library, we can distribute our processes to what is called `Sidekiq workers` instead of doing the heavy work on the server itself. 
+Sidekiq is a background processing library in Ruby language. With this library, we can distribute our processes to what is called `Sidekiq workers` instead of doing the heavy work on the server itself. 
 
 What these workers do basically is they fetch the enqueued or scheduled tasks from the database. Then, execute them whenever the time comes and the worker is idle.
 
 This way, we can make sure that our server remains responsive for incoming requests, without being blocked by heavy or recurring processes.
 
-We will create a sample app using Sidekiq on Fly.io using Upstash Redis. It will enqueu and/or schedule some notification for users, depending on the inputs provided.
+We will create a sample app using Sidekiq on Fly.io using Upstash Redis. It will enqueue and/or schedule some notification for users, depending on the inputs provided.
 
 ![schema](/blog/sidekiq-fly/sidekiq.png)
 
@@ -25,10 +25,12 @@ run `flyctl auth login`
 
 ## Upstash Redis Setup on Fly
 - Run `flyctl redis create`.
-- Set your connection link: `flyctl secrets set UPSTASH_REDIS_LINK=<upstash-redis-connection-link>`
+- Set your connection link (after the `.toml` creation): `flyctl secrets set UPSTASH_REDIS_LINK=<upstash-redis-connection-link>`
 
 ## Application Code
-- Create the sendEmail.rb file:
+- `bundle init` and `bundle add sidekiq sinatra` to initiate Gemfile and install dependencies.
+`
+- Create `sendEmail.rb` file:
 
 ```ruby
 require "sidekiq"
@@ -73,11 +75,11 @@ end
 def sendEmail(id, type)
     case type
     when "free"
-        # if free, delay for 5 seconds.
-        EmailService.perform_in("5", id, "free")
+        # if free, delay for 10 seconds.
+        EmailService.perform_in("10", id, "free")
     when "paid"
-        # if paid, delay for 3 seconds.
-        EmailService.perform_in("3", id, "paid")
+        # if paid, delay for 5 seconds.
+        EmailService.perform_in("5", id, "paid")
     when "enterprise"
         # if enterprise, immediately queue.
         EmailService.perform_async(id, "enterprise")
@@ -93,9 +95,15 @@ def clearSchedules()
     Sidekiq::Queue.new.clear
 end
 ```
-- Create a simple Sinatra server:
+
+- Create a simple Sinatra server `app.rb`:
 ```ruby
-...
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'bundler/setup'
+require 'sinatra'
+require './sendEmail.rb'
 
 get '/register/:id/:plan' do
   sendEmail(params[:id], params[:plan])
@@ -111,14 +119,32 @@ get '/clear' do
   clearSchedules()
   "<h1>Queue and the schedules are cleared.</h1>"
 end
-...
 ```
-(Complete source codes and configurations are in our [repo](https://github.com/upstash/redis-examples/tree/compatible-libraries/using-sidekiq))
+
+- Create `config.ru` file:
+```ruby
+# config.ru
+
+require './app.rb'
+require 'sidekiq'
+require "sidekiq/api"
+
+run Sinatra::Application
+```
 ## Launch App
 - First, run `flyctl launch` to create `.toml` template. 
 - There, update `internal_port = 9292` under `[[services]]`. It should look something like this:
-```
-...
+``` ruby
+app = "sidekiq-example"
+kill_signal = "SIGINT"
+kill_timeout = 5
+processes = []
+
+[build]
+  builder = "heroku/buildpacks:20"
+
+[env]
+  PORT = "8080"
 
 [[services]]
   internal_port = 9292
@@ -128,24 +154,31 @@ end
     soft_limit = 20
     type = "connections"
 
-...
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
 
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
 ```
-- Add `Procfile` so that we can run both the Sinatra server and the Sidekiq Worker:
-`web: bundle exec rackup & bundle exec sidekiq -r ./sendEmail.rb`
+- Create a file named `Procfile` so that we can run both the Sinatra server and the Sidekiq Worker:
+```ruby
+web: bundle exec rackup & bundle exec sidekiq -r ./sendEmail.rb
+```
 
 - run `flyctl deploy` to deploy.
 
 ## App Deployed
-- send `get register/id1/enterprise`:
+- send `get register/id1/enterprise` via `curl <fly-domain>/register/:id/:plan`
 ![enterprise](/blog/sidekiq-fly/enterprise.png)
 
 
-- send `get register/id2/paid`:
+- send `get register/id2/paid` via `curl <fly-domain>/register/:id/:plan`
 ![paid](/blog/sidekiq-fly/paid.png)
 
 
-- send `get register/id3/free` and then `get update/id3/paid`
+- send `get register/id3/free` and then `get update/id3/paid` via `curl <fly-domain>/register/:id/:plan` and `curl <fly-domain>/update/:id/:newPlan`
 ![register-update](/blog/sidekiq-fly/register-update.png)
 
 
