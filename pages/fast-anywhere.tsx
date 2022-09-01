@@ -116,7 +116,7 @@ export default function TestPage() {
   };
 
   useEffect(() => {
-    // onRefresh();
+    onRefresh();
   }, []);
 
   return (
