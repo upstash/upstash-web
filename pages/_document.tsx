@@ -1,5 +1,6 @@
 import Document, { Html, Head, Main, NextScript } from "next/document";
 import { META } from "constants/";
+import { Box } from "@chakra-ui/react";
 
 export default class MyDocument extends Document {
   static async getInitialProps(ctx) {

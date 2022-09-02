@@ -5,7 +5,7 @@ import "@upstash/claps/style.css";
 
 import { useEffect } from "react";
 import { useRouter } from "next/router";
-import { ChakraProvider, useDisclosure } from "@chakra-ui/react";
+import { Box, ChakraProvider, useDisclosure } from "@chakra-ui/react";
 import Head from "next/head";
 import Footer from "components/footer";
 import Header from "components/header";
@@ -106,12 +106,14 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           />
         </Head>
 
-        <Header onOpen={onOpen} />
-        <MobileMenu isOpen={isOpen} onClose={onClose} />
-        <main>
-          <Component {...pageProps} />
-        </main>
-        <Footer />
+        <Box width="100vw" overflow="hidden">
+          <Header onOpen={onOpen} />
+          <MobileMenu isOpen={isOpen} onClose={onClose} />
+          <main>
+            <Component {...pageProps} />
+          </main>
+          <Footer />
+        </Box>
       </Provider>
     </ChakraProvider>
   );

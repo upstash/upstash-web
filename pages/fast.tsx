@@ -121,7 +121,7 @@ export default function TestPage() {
 
   return (
     <Box py={[20, "140px"]} pos="relative">
-      <Container maxW="5xl" overflow="hidden">
+      <Container maxW="5xl">
         <Box width={["full", "42%"]} pos="relative" zIndex={1}>
           <Box as="header">
             <Heading
@@ -326,11 +326,11 @@ export default function TestPage() {
           display={["none", "block"]}
           zIndex={0}
           pos="absolute"
-          left="50%"
           top="50%"
-          transform="translate3d(-200px, -45%, 0)"
+          left="50%"
+          transform="translateY(-50%) translateX(-300px)"
         >
-          <AnimatedGlobe width={1400} height={1400} />
+          <AnimatedGlobe width={1800} height={1800} />
         </Box>
       </Container>
     </Box>
