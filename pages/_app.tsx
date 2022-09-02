@@ -106,7 +106,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           />
         </Head>
 
-        <Box width="100vw" overflow="hidden">
+        <Box overflow="hidden">
           <Header onOpen={onOpen} />
           <MobileMenu isOpen={isOpen} onClose={onClose} />
           <main>
