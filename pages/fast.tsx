@@ -164,34 +164,36 @@ export default function TestPage() {
                     color="whiteAlpha.500"
                     isNumeric
                   >
-                    <Button
-                      size="xs"
-                      variant="ghost"
-                      fontWeight="normal"
-                      onClick={onRefresh}
-                      px={1}
-                      mr={0.5}
-                      color="whiteAlpha.500"
-                      _hover={{
-                        color: "white",
-                      }}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+                    <Flex align="center" justify="end">
+                      <Button
+                        size="xs"
+                        variant="ghost"
+                        fontWeight="normal"
+                        onClick={onRefresh}
+                        px={1}
+                        mr={0.5}
+                        color="whiteAlpha.500"
+                        _hover={{
+                          color: "white",
+                        }}
                       >
-                        <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" />
-                        <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" />
-                      </svg>
-                    </Button>
-                    <span>Read</span>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          strokeWidth="1.5"
+                          stroke="currentColor"
+                          fill="none"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" />
+                          <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" />
+                        </svg>
+                      </Button>
+                      <span>Read</span>
+                    </Flex>
                   </Th>
                 </Tr>
               </Thead>
