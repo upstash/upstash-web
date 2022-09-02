@@ -49,7 +49,7 @@ function getRandomItem(list: any) {
 
 function getRandomArcData(): arcsData[] {
   // @ts-ignore
-  return [...Array(3).keys()].map(() => {
+  return [...Array(8).keys()].map(() => {
     const region: region = getRandomItem(REGIONS);
 
     return {
