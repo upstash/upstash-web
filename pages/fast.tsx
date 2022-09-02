@@ -1,6 +1,6 @@
 import dynamic from "next/dynamic";
 import { Box, Button, Container, Flex, Heading, Text } from "@chakra-ui/react";
-import { TableContainer } from "@chakra-ui/react";
+import { TableContainer, Link } from "@chakra-ui/react";
 import { Thead, Tbody, Tr, Th, Td, Table } from "@chakra-ui/react";
 import React, { useEffect } from "react";
 import useFetch from "use-http";
@@ -11,7 +11,7 @@ const AnimatedGlobe = dynamic(() => import("components/globe"), {
 
 function SpeedText({ loading, data }) {
   return loading ? (
-    <Text color={"whiteAlpha.500"}>Loading...</Text>
+    <Text color="dimgray">Loading...</Text>
   ) : data ? (
     <Text color={data > 10 ? "yellow.500" : "primary"}>
       {Math.round(data)}ms
@@ -320,6 +320,18 @@ export default function TestPage() {
               </Tbody>
             </Table>
           </TableContainer>
+
+          <Text mt={4} fontSize="sm" color="dimgray">
+            See the{" "}
+            <Link
+              isExternal
+              href="https://upstash.com/blog/global-database"
+              textDecor="underline"
+            >
+              blog post
+            </Link>
+            .
+          </Text>
         </Box>
 
         <Box
