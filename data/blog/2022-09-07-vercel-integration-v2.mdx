@@ -1,0 +1,47 @@
+---
+slug: vercel-integration-v2
+title: "Announcing Vercel Integration v2"
+author: andreas
+tags: [vercel, redis, kafka, qstash, integration]
+---
+
+Over 18 months ago we have created the Vercel - Upstash integration, allowing
+developers to easily create Redis databases and add their connection secrets as
+environment variables in Vercel. A lot has changed since then and we have
+released 2 new products:
+
+- [Managed Serverless Kafka](https://upstash.com/kafka)
+- [QStash](https://upstash.com/qstash)
+
+However it was not possible to use these in the Vercel integration. Until now...
+
+## Vercel + Upstash v2
+
+In the past weeks we have rewritten large parts of the existing integration to
+make it possible to integrate Kafka and QStash as well as creating new databases
+and clusters on demand.
+
+You can now select a Redis database and/or Kafka cluster as well as toggle
+QStash for your projects.
+
+![](/blog/vercel-integration/integration_filled.png)
+
+If you don't have a database or cluster yet, the dropdown allows you to create a
+new one on the fly.
+
+The integration will set all required environment variables in your Vercel
+project to get you up and running as fast as possible.
+
+## Steps
+
+0. Create an account on [upstash.com](https://console.upstash.com).
+1. Head over to the [integration page](https://vercel.com/integrations/upstash)
+   on Vercel and click `Add Integration`.
+2. Select your resources and click `Create` at the bottom of the screen.
+3. Redeploy your project to make the environment variables take effect.
+
+For a more in-depth guide on how to use the integration, please visit our
+[documentation](https://docs.upstash.com/redis/howto/vercelintegration).
+
+Let us know your feedback on [Twitter](https://twitter.com/upstash) or
+[Discord](https://upstash.com/discord).
