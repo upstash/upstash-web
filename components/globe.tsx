@@ -49,7 +49,7 @@ function getRandomItem(list: any) {
 
 function getRandomArcData(): arcsData[] {
   // @ts-ignore
-  return [...Array(3).keys()].map(() => {
+  return [...Array(6).keys()].map(() => {
     const region: region = getRandomItem(REGIONS);
 
     return {
@@ -78,7 +78,6 @@ export default function AnimatedGlobe({ ...props }) {
       .then((res) => res.json())
       .then(setCountries);
 
-    // globeRef.current.controls().enabled = false;
     globeRef.current.controls().rotate = false;
     globeRef.current.controls().enableZoom = false;
     globeRef.current.controls().autoRotate = true;
@@ -88,6 +87,8 @@ export default function AnimatedGlobe({ ...props }) {
       new THREE.MeshPhongMaterial({
         color: "#111",
         shininess: 14,
+        transparent: true,
+        opacity: 0.8,
       })
     );
 
@@ -107,11 +108,11 @@ export default function AnimatedGlobe({ ...props }) {
       hexPolygonsData={countries.features}
       hexPolygonResolution={3}
       hexPolygonMargin={0.7}
-      hexPolygonColor={() => "#777"}
+      hexPolygonColor={() => "#555"}
       //
       // ATMOSPHERE
-      atmosphereColor={"#d69e2e"}
-      atmosphereAltitude={0.1}
+      atmosphereColor={"#00e9a3"}
+      atmosphereAltitude={0.08}
       //
       // ARCS
       arcsData={arcsData}

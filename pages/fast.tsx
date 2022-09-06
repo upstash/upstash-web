@@ -1,6 +1,6 @@
 import dynamic from "next/dynamic";
 import { Box, Button, Container, Flex, Heading, Text } from "@chakra-ui/react";
-import { TableContainer } from "@chakra-ui/react";
+import { TableContainer, Link } from "@chakra-ui/react";
 import { Thead, Tbody, Tr, Th, Td, Table } from "@chakra-ui/react";
 import React, { useEffect } from "react";
 import useFetch from "use-http";
@@ -11,7 +11,7 @@ const AnimatedGlobe = dynamic(() => import("components/globe"), {
 
 function SpeedText({ loading, data }) {
   return loading ? (
-    <Text color={"whiteAlpha.500"}>Loading...</Text>
+    <Text color="dimgray">Loading...</Text>
   ) : data ? (
     <Text color={data > 10 ? "yellow.500" : "primary"}>
       {Math.round(data)}ms
@@ -121,7 +121,7 @@ export default function TestPage() {
 
   return (
     <Box py={[20, "140px"]} pos="relative">
-      <Container maxW="5xl" overflow="hidden">
+      <Container maxW="5xl">
         <Box width={["full", "42%"]} pos="relative" zIndex={1}>
           <Box as="header">
             <Heading
@@ -164,34 +164,36 @@ export default function TestPage() {
                     color="whiteAlpha.500"
                     isNumeric
                   >
-                    <Button
-                      size="xs"
-                      variant="ghost"
-                      fontWeight="normal"
-                      onClick={onRefresh}
-                      px={1}
-                      mr={0.5}
-                      color="whiteAlpha.500"
-                      _hover={{
-                        color: "white",
-                      }}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+                    <Flex align="center" justify="end">
+                      <Button
+                        size="xs"
+                        variant="ghost"
+                        fontWeight="normal"
+                        onClick={onRefresh}
+                        px={1}
+                        mr={0.5}
+                        color="whiteAlpha.500"
+                        _hover={{
+                          color: "white",
+                        }}
                       >
-                        <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" />
-                        <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" />
-                      </svg>
-                    </Button>
-                    <span>Read</span>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          strokeWidth="1.5"
+                          stroke="currentColor"
+                          fill="none"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" />
+                          <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" />
+                        </svg>
+                      </Button>
+                      <span>Read</span>
+                    </Flex>
                   </Th>
                 </Tr>
               </Thead>
@@ -320,17 +322,29 @@ export default function TestPage() {
               </Tbody>
             </Table>
           </TableContainer>
+
+          <Text mt={4} fontSize="sm" color="dimgray">
+            See the{" "}
+            <Link
+              isExternal
+              href="https://upstash.com/blog/global-database"
+              textDecor="underline"
+            >
+              blog post
+            </Link>
+            .
+          </Text>
         </Box>
 
         <Box
           display={["none", "block"]}
           zIndex={0}
           pos="absolute"
-          left="50%"
           top="50%"
-          transform="translate3d(-200px, -45%, 0)"
+          left="50%"
+          transform="translateY(-50%) translateX(-300px)"
         >
-          <AnimatedGlobe width={1400} height={1400} />
+          <AnimatedGlobe width={1800} height={1800} />
         </Box>
       </Container>
     </Box>

@@ -1,4 +1,4 @@
-import { VStack, HStack, Text, Heading, Tag } from "@chakra-ui/react";
+import { VStack, HStack, Text, Heading, Tag, Flex } from "@chakra-ui/react";
 import Link from "./link";
 
 export default function CareerCard({ title, summary, skills, slug }) {
@@ -10,13 +10,13 @@ export default function CareerCard({ title, summary, skills, slug }) {
 
       <Text color="whiteAlpha.600">{summary}</Text>
 
-      <HStack spacing={2}>
+      <Flex flexWrap="wrap" gap={2}>
         {skills.map((skill) => (
           <Tag key={skill} variant="solid" bg="whiteAlpha.300">
             {skill}
           </Tag>
         ))}
-      </HStack>
+      </Flex>
     </VStack>
   );
 }

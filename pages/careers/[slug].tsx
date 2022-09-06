@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Container,
+  Flex,
   Heading,
   HStack,
   Stack,
@@ -70,13 +71,13 @@ export default function CareerDetailPage({ job }) {
             </Text>
           </Stack>
 
-          <HStack mt={4} justify="center" spacing={2}>
+          <Flex mt={4} flexWrap="wrap" justify="center" gap={2}>
             {job.skills.map((skill) => (
               <Tag key={skill} variant="solid" bg="whiteAlpha.300">
                 {skill}
               </Tag>
             ))}
-          </HStack>
+          </Flex>
 
           <Button
             as="a"
