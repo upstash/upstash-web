@@ -23,7 +23,7 @@ function SpeedText({ loading, data }) {
 
 export default function TestPage() {
   const urlUsEast1 =
-    "https://effbmlt2n4.execute-api.us-east-1.amazonaws.com/dev/run";
+    "https://upstash-latency-kix1.vercel.app/api/test/fast";
   const urlUsWest1 =
     "https://kg2nsnegmd.execute-api.us-west-1.amazonaws.com/dev/run";
   const urlUsWest2 =
