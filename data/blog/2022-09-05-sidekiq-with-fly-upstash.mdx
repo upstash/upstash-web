@@ -5,9 +5,7 @@ author: burak
 tags: [sidekiq, fly, flyctl, worker, background, upstash]
 ---
 
-Recently, we have announced Upstash Redis on Fly.io: [Upstash Redis on Fly](https://fly.io/docs/reference/redis/)
-
-Sidekiq is a background processing library in Ruby language. With this library, we can distribute our processes to what is called `Sidekiq workers` instead of doing the heavy work on the server itself. 
+Sidekiq is a popular background processing library in Ruby language. With this library, we can distribute our processes to what is called `Sidekiq workers` instead of doing the heavy work on the server itself.
 
 What these workers do basically is they fetch the enqueued or scheduled tasks from the database. Then, execute them whenever the time comes and the worker is idle.
 
