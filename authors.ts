@@ -131,7 +131,7 @@ export default {
   },
   lorenzo: {
     name: "Lorenzo Noccioli",
-    title: "Founder/editor at popEating",
+    title: "Founder at popEating",
     image_url: "https://upstash.com/blog/authors/lorenzo.jpg",
   }
 };
