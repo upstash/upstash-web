@@ -128,5 +128,10 @@ export default {
     name: "Rodney Johnson",
     title: "Consultant Web Developer",
     image_url: "https://upstash.com/blog/authors/rodney.jpg",
+  },
+  lorenzo: {
+    name: "Lorenzo Noccioli",
+    title: "Founder/editor at popEating",
+    image_url: "https://upstash.com/blog/authors/lorenzo.jpg",
   }
 };
