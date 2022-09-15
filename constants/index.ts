@@ -287,7 +287,7 @@ export const QSTASH_PRICES = {
     title: "Price",
     description: "",
     free: "Free (No credit card required)",
-    payg: "$0.4 per 1K requests, up to $450 monthly max.",
+    payg: "$1 per 100K requests, up to $200 monthly max.",
     enterprise: "Custom",
   },
 };
