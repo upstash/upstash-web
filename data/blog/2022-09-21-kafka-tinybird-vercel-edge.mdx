@@ -50,16 +50,16 @@ npx create-next-app@latest --typescript
 Create a middleware.ts (or .js) file at the same level as your pages directory. Update the file as below:
 
 ```tsx
-import {NextResponse}from 'next/server';
-import type {NextRequest}from 'next/server';
-import {Kafka}from "@upstash/kafka";
+import {NextResponse} from 'next/server';
+import type {NextRequest} from 'next/server';
+import {Kafka} from "@upstash/kafka";
 
 // Trigger this middleware to run on the `/secret-page` route
-exportconst config = {
+export const config = {
     matcher: '/',
 };
 
-exportasyncfunction middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
 // Extract country. Default to US if not found.
     console.log(req.url)
 
@@ -79,6 +79,7 @@ let message = {
         platform: req.headers.get("sec-ch-ua-platform"),
         useragent: req.headers.get("user-agent")
     }
+
 const p = kafka.producer()
 const topic = "mytopic"
 
