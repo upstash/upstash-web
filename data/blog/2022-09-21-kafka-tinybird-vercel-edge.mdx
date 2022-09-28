@@ -51,7 +51,7 @@ Create a middleware.ts (or .js) file at the same level as your pages directory. 
 
 ```tsx
 import {NextResponse} from 'next/server';
-import type {NextRequest} from 'next/server';
+import type {NextRequest, NextFetchEvent} from 'next/server';
 import {Kafka} from "@upstash/kafka";
 
 // Trigger this middleware to run on the `/secret-page` route
@@ -59,7 +59,7 @@ export const config = {
     matcher: '/',
 };
 
-export async function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest, event: NextFetchEvent) {
 // Extract country. Default to US if not found.
     console.log(req.url)
 
@@ -83,7 +83,7 @@ const message = {
 const p = kafka.producer()
 const topic = "mytopic"
 
-await p.produce(topic, JSON.stringify(message))
+event.waitUntil(p.produce(topic, JSON.stringify(message)))
 
 // Rewrite to URL
 return NextResponse.next();
