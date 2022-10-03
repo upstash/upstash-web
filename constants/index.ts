@@ -11,6 +11,7 @@ export const LINKS = {
   globalDatabase: "https://docs.upstash.com/redis/features/globaldatabase",
   compare: "https://docs.upstash.com/overall/compare",
   pricing: "https://docs.upstash.com/redis/overall/pricing",
+  redisQuotas: "https://docs.upstash.com/redis/overall/pricing#pay-as-you-go-plan-quotas",
   pricingKafka: "https://docs.upstash.com/kafka/pricing",
   aws: "https://docs.upstash.com/howto/connectfromawslambda",
   nextjs: "https://docs.upstash.com/tutorials/nextjs_with_redis",
@@ -160,14 +161,14 @@ export const REDIS_PRICES = {
       "Professional Support includes dedicated service desk and Slack channel with response time SLAs.",
     free: false,
     payg: "Optional",
-    enterprise: "Included",
+    enterprise: "Optional",
   },
   price: {
     title: "Price",
     description:
       "Pricing is based on per request/command. Operational commands like AUTH, INFO, PING, QUIT, COMMAND are not billed.",
     free: "Free (No credit card required)",
-    payg: "$0.2 per 100K commands, up to $120 monthly max.",
+    payg: "$0.2 per 100K commands, up to $160 monthly max.",
     enterprise: "Custom",
   },
 };
@@ -235,7 +236,7 @@ export const KAFKA_PRICES = {
       "Professional Support includes dedicated service desk and Slack channel with response time SLAs.",
     free: false,
     payg: "Optional",
-    enterprise: "Included",
+    enterprise: "Optional",
   },
   priceSingleZone: {
     title: "Price - Single Zone",
