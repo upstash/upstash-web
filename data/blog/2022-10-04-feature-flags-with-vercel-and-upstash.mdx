@@ -1,0 +1,193 @@
+---
+slug: "feature-flags-with-vercel-and-upstash"
+title: "Adding Feature Flags to Your Next.js App with Upstash Redis"
+author: "kay"
+tags: [serverless, redis, upstash, vercel, feature-flags]
+---
+
+Updates are part of every software; you need to fix bugs, add new features, and generally iterate to make things more secure, reliable, or faster.
+
+But coupling new features or changes in general with deployment isn’t always a good idea. Sometimes you follow recurring deployment schedules, but the marketing team isn’t ready to announce the new feature. If the changes are hardcoded, the marketing team might need a developer to activate or deactivate them.
+
+Feature flags, or feature toggles, are a way to decouple your changes from a deployment. You implement a change, but you hide it behind an if-statement; as long as a variable is false, the software will use the version before your change; if the variable is `true`, it will be the new version. If the variable's value comes from a database the marketing team can access, they can toggle these changes without needing code changes.
+
+Upstash Redis is such a database. It’s a simple key-value store you can use to store your feature flags. Since it’s blazingly fast, it doesn’t add much to your latency to check for multiple different flags in your application.
+
+This tutorial will teach you how to build a simple feature flag mechanism for your Next.js app. We will deploy on Vercel and use Upstash Redis as storage.
+
+### Prerequisites
+
+You need [a GitHub account](https://github.com/login), [a Vercel account](https://vercel.com/signup), and [an Upstash account](https://console.upstash.com/login).
+
+Because we use NPM, you also need a current installation of [Node.js](https://nodejs.org/en/).
+
+### Initializing a Next.js Project
+
+Our first step is creating a new Next.js project. You do this with the following command:
+
+```bash
+$ npx create-next-app upstash-next-feature-flags
+```
+
+
+### Creating the Upstash Redis Connection
+
+Next, we must connect our Next.js app with an Upstash Redis database. For this, we need to install the `@upstash/redis` package and create a small wrapper around it.
+
+```
+$ npm i @upstash/redis
+```
+
+Create a file at `upstash-next-feature-flags/lib/featureFlags.js` with this code:
+
+```javascript
+import { Redis } from "@upstash/redis"
+
+const { UPSTASH_TOKEN, UPSTASH_URL } = process.env
+const redis = new Redis({
+  token: UPSTASH_TOKEN,
+  url: UPSTASH_URL,
+})
+
+export async function flagIsActive(flagName) {
+  const flag = await redis.get(flagName)
+  return Boolean(flag)
+}
+```
+
+We will get the API credentials from environment variables to set them up later in this tutorial. The `flagIsActive` function will query Redis and convert the returned value to a `boolean`. This conversion is necessary because we will save the flag as a number in Redis.
+
+### Creating the API Route
+
+We must create the API route with the two different implementations. We will use the feature flag to switch between them.
+
+For this, create a file at `upstash-next-feature-flags/pages/api/sort-numbers.js`.
+
+It should have this code:
+
+```javascript
+import { flagIsActive } from "../../lib/featureFlags"
+
+export default async function handler(request, response) {
+  let sort = bucketSort
+
+  const newSortingAlgorithm = await flagIsActive("newSortingAlgorithm")
+
+  if (newSortingAlgorithm) sort = selectionSort
+
+  const { numbers } = request.body
+  const sorted = sort(numbers)
+
+  response.status(200).json({
+    numbers: sorted,
+    newSortingAlgorithm,
+  })
+}
+
+// old sorting algorithm
+const bucketSort = (arr, size = 5) => {
+  const min = Math.min(...arr)
+  const max = Math.max(...arr)
+  const buckets = Array.from(
+    { length: Math.floor((max - min) / size) + 1 },
+    () => []
+  )
+  arr.forEach((val) => {
+    buckets[Math.floor((val - min) / size)].push(val)
+  })
+  return buckets.reduce((acc, b) => [...acc, ...b.sort((a, b) => a - b)], [])
+}
+
+// new sorting algorithm
+const selectionSort = (arr) => {
+  const a = [...arr]
+  for (let i = 0; i < a.length; i++) {
+    const min = a
+      .slice(i + 1)
+      .reduce((acc, val, j) => (val < a[acc] ? j + i + 1 : acc), i)
+    if (min !== i) [a[i], a[min]] = [a[min], a[i]]
+  }
+  return a
+}
+```
+
+This API route is a simple number sorter. It takes an array of unsorted numbers and will use one of two sorting algorithms to sort them.
+
+These sorting algorithms stand for any change you want to “toggle” in your application. Put them both into your code and switch between them via the `flagIsActive` function by changing the value in Redis.
+
+We call the `flagIsActive` function and give it the name of the flag we want to check. If the flag is set to `1` in Redis, this function returns `true`; otherwise, it will return `false`.
+
+After sorting, the API route responds with the sorted array.
+
+### Pushing the Project to GitHub
+
+After implementing everything, we need to push the project to a repository on GitHub to make it accessible for Verce’ls deployment service. [GitHub explains how to create a repository in their docs](https://docs.github.com/en/get-started/quickstart/create-a-repo).
+
+Creating an empty repository will automatically show you how you can link it with the project we created.
+
+
+### Creating an Upstash Redis Database
+
+You can create a new database in [the Upstash console](https://console.upstash.com/). Figure 1 shows a good config for this tutorial.
+
+![Figure 1: Database configuration](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/0690e037umqy8w19cvj8.png)
+
+As Figure 1 says, one database is free, so you won’t have to pay anything for this tutorial.
+
+Keep the browser tab with the Upstash console open because we need it later to gather the database credentials.
+
+### Linking the GitHub Repository with Vercel
+
+If you use your GitHub account to log into Vercel, adding a GitHub repository only takes a few clicks. In Figure 2, you see the top left of the Vercel dashboard; click on “Add New…” and choose “Project.”
+
+![Figure 2: Create a new Vercel project](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/ckg6ninjnqfu6up9jjvl.png)
+
+Choose “Continue with GitHub” and one of the “import” buttons that belong to the repository you created in the previous step.
+
+![Figure 3: Import Git Repository](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/0nqnjcqemjxjy7i17krc.png)
+
+Finally, the project configuration step will pop up, where you have to add your environment variables. For the rest of that configuration, you can keep the defaults. Figure 4 shows the place where you have to enter these variables.
+
+![Figure 4: Vercel project configuration](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/4e98aafy4fju31koiw5o.png)
+
+They are called `UPSTASH_TOKEN` and `UPSTASH_URL`, and you find them in your Upstash console, where we created the database before. Figure 5 shows which buttons you need to copy the required values for our variables.
+
+![Figure 5: Upstash Database credentials](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/alnvk28gsybwtjfm33i1.png)
+
+When you press the big “Deploy” button, Vercel will clone your GitHub repository and deploy it on its infrastructure.
+
+### Switching Between Implementations with Redis
+
+Now, we should be able to call our API endpoint, and we can switch between the implementations by setting a value in Redis. The Redis CLI in the Upstash console is the simplest way to achieve this.
+
+Figure 6 illustrates where to find the CLI and the command we need to execute to set the value.
+
+    set newSortingAlgorithm 1
+
+![Figure 6: Upstash Redis CLI](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/hu3po5tkvuaayx01tgtd.png)
+
+If we would delete `newSortingAlgorithm` or set it to `0`, it would switch the flag back to `false,` and our API route would use the old algorithm.
+
+### Using the API Route
+
+The last thing missing is the actual use of the API route. We must send a JSON object via a POST request to the route. An easy way to do this is with cURL.
+
+The following command sends such an object:
+ ```
+    $ curl --header "Content-Type: application/json" \
+      --request POST \
+      --data '{"numbers":[1, 100, 10, 1000, 100000, 10000]}' \
+      API_ROUTE_URL
+```
+
+You have to find the correct API_ROUTE_URL in Vercel. You should see a “Domains” category in your project on the Vercel dashboard, like in Figure 7.
+
+![Figure 7: Vercel project view](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/nv9nch9r5cvkp9dp1m4w.png)
+
+The response should be a JSON object that includes the sorted `numbers` and a `newSortingAlgorithm` field that indicates which algorithm was used for this sorting.
+
+### Summary
+
+Feature flags are an excellent way to decouple deployments from feature releases. They turn a hard-coded change into setting a simple value in a database, which gives more flexibility to your teams and gives more power to non-technical people.
+
+With a fast database like Upstash Redis, it’s easy to implement the feature flag pattern for your application without sacrificing much of your performance. Upstash Redis has sub-second access times, and you can deploy it near your FaaS if required. All that with on-demand pricing, so you never pay for resources you don’t use.

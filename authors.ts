@@ -10,7 +10,7 @@ export default {
     title: "Cofounder @Upstash",
     url: "https://twitter.com/enesakar",
     image_url:
-      "https://pbs.twimg.com/profile_images/1323714360204644352/zMGxlw6H_400x400.jpg",
+      "https://upstash.com/blog/authors/enes.png",
   },
   noah: {
     name: "Noah Fischer",
