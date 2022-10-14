@@ -133,5 +133,10 @@ export default {
     name: "Lorenzo Noccioli",
     title: "Founder at popEating",
     image_url: "https://upstash.com/blog/authors/lorenzo.jpg",
+  },
+  lambros: {
+    name: "Lambros Petrou",
+    title: "Software Engineer at Datadog (Guest Author)",
+    image_url: "https://upstash.com/blog/authors/lambros.jpg",
   }
 };
