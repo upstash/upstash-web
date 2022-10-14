@@ -259,8 +259,8 @@ export const QSTASH_PRICES = {
   maxRequestPerDay: {
     title: "Max Requests per day",
     description: "",
-    free: "50",
-    payg: "50,000",
+    free: "500",
+    payg: "500,000",
     enterprise: "Unlimited",
   },
   maxMessageSize: {
