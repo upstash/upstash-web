@@ -9,14 +9,13 @@ export default {
     name: "Enes Akar",
     title: "Cofounder @Upstash",
     url: "https://twitter.com/enesakar",
-    image_url:
-      "https://upstash.com/blog/authors/enes.png",
+    image_url: "https://upstash.com/blog/authors/enes.png",
   },
   noah: {
     name: "Noah Fischer",
     title: "DevRel @Upstash",
     url: "https://twitter.com/noahfschr",
-    image_url: "https://avatars.githubusercontent.com/u/78238464?v=4",
+    image_url: "https://upstash.com/blog/authors/noah.jpg",
   },
   mehmet: {
     name: "Mehmet Dogan",
@@ -74,7 +73,7 @@ export default {
   },
   adem: {
     name: "Adem Ilter",
-    title: "Frontend Developer @Upstash",
+    title: "Designer @Upstash",
     url: "https://twitter.com/ademilter",
     image_url: "https://upstash.com/blog/authors/adem.jpg",
   },
@@ -110,14 +109,12 @@ export default {
   bobby: {
     name: "Bobby Iliev",
     title: "DevOps Engineer (Guest Author)",
-    image_url:
-      "https://dev-to-uploads.s3.amazonaws.com/uploads/user/profile_image/191651/a7ce5d4e-1298-48e7-b99e-a9755d786776.jpeg",
+    image_url: "https://upstash.com/blog/authors/bobby.jpg",
   },
   jake: {
     name: "Jake Lynch",
     title: "CTO, Fig (Guest Author)",
-    image_url:
-        "https://pbs.twimg.com/profile_images/1338274717816516612/BmHl_4t__400x400.jpg",
+    image_url: "https://upstash.com/blog/authors/jake.jpg",
   },
   vladimir: {
     name: "Vladimir Mihailenco",
@@ -138,5 +135,5 @@ export default {
     name: "Lambros Petrou",
     title: "Software Engineer at Datadog (Guest Author)",
     image_url: "https://upstash.com/blog/authors/lambros.jpg",
-  }
+  },
 };
