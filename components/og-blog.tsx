@@ -11,15 +11,7 @@ export default function OGBlog({
   };
 }) {
   return (
-    <div
-      tw="flex flex-col items-stretch p-[70px] pb-[140px] h-full w-full anti-aliased bg-[#161616] text-white"
-      style={{
-        backgroundImage: "url(https://upstash-og-image.vercel.app/bg.png)",
-        backgroundRepeat: "no-repeat",
-        backgroundSize: "cover",
-        backgroundPosition: "center center",
-      }}
-    >
+    <div tw="flex flex-col items-stretch p-[70px] pb-[140px] h-full w-full anti-aliased bg-[#161616] text-white bg-center bg-no-repeat bg-cover bg-[url('https://upstash.com/assets/bg.png')]">
       <header tw="flex">
         <h1 tw="m-0 leading-[1.16] text-7xl font-bold">{title}</h1>
       </header>
