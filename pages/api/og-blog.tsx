@@ -1,7 +1,7 @@
 import { ImageResponse } from "@vercel/og";
-import { NextRequest } from "next/server";
 import OGBlog from "components/og-blog";
 import authors from "../../authors";
+import type { NextRequest } from "next/server";
 
 export const config = {
   runtime: "experimental-edge",
