@@ -36,13 +36,13 @@ export default async function handler(req: NextRequest) {
       height: 630,
       fonts: [
         {
-          name: "Typewriter",
+          name: "Inter",
           data: DataInterRegular,
           style: "normal",
           weight: 400,
         },
         {
-          name: "Typewriter",
+          name: "Inter",
           data: DataInterBold,
           style: "normal",
           weight: 800,

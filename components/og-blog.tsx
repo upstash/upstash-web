@@ -17,7 +17,7 @@ export default function OGBlog({
         backgroundImage: "url(https://upstash-og-image.vercel.app/bg.png)",
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
-        backgroundPosition: "center",
+        backgroundPosition: "center center",
       }}
     >
       <header tw="flex">
