@@ -249,7 +249,7 @@ export default function BlogPostPage({
           </HStack>
 
           {/* Post Claps */}
-          <Claps fixed="left" replyUrl={post.tweetUrl} />
+          <Claps fixed="left" replyUrl={post.tweetUrl} shareButton={false} />
 
           <Divider my={10} />
 

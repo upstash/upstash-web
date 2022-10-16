@@ -71,23 +71,7 @@ export const Post = defineDocumentType(() => ({
     metaImage: {
       type: "string",
       resolve: (doc) => {
-        const authorObj = authors[doc.author];
-        return encodeURI(
-          [
-            "https://upstash-og-image.vercel.app/",
-            doc.title,
-            ".png",
-            "?theme=light",
-            "&md=1",
-            "&fontSize=100px",
-            "&authorName=",
-            authorObj.name,
-            "&authorTitle=",
-            authorObj.title,
-            "&authorPhoto=",
-            authorObj.image_url,
-          ].join("")
-        );
+        return `https://upstash.com/api/og-blog?title=${doc.title}&author=${doc.author}`;
       },
     },
     headings: {
