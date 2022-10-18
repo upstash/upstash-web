@@ -204,7 +204,7 @@ Map<String, Object> props = new HashMap<>();
 props.put("bootstrap.servers", "hot-teal-10548-us1-kafka.upstash.io:9092");
 props.put("sasl.mechanism", "SCRAM-SHA-256");
 props.put("security.protocol", "SASL_SSL");
-props.put("sasl.jaas.config", "org.apache.kafka.common.security.scram.ScramLoginModule required username=\" UPSTASH-KAFKA-PRODUCEONLY-USERNAME\" password=\" UPSTASH-KAFKA-PRODUCEONLY-PASSWORD \";");
+props.put("sasl.jaas.config", "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"UPSTASH-KAFKA-USERNAME\" password=\"UPSTASH-KAFKA-PASSWORD\";");
 props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 props.put("auto.offset.reset", "earliest");
@@ -302,7 +302,7 @@ Dataset<Row> df = spark
 .option("kafka.bootstrap.servers", "hot-teal-10548-us1-kafka.upstash.io:9092")
 .option("kafka.sasl.mechanism", "SCRAM-SHA-256")
 .option("kafka.security.protocol", "SASL_SSL")
-.option("kafka.sasl.jaas.config", "org.apache.kafka.common.security.scram.ScramLoginModule required username=\" UPSTASH-KAFKA-PRODUCEONLY-USERNAME \" password=\" UPSTASH-KAFKA-PRODUCEONLY-PASSWORD \";")
+.option("kafka.sasl.jaas.config", "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"UPSTASH-KAFKA-USERNAME\" password=\"UPSTASH-KAFKA-PASSWORD\";")
 .option("startingOffsets", "earliest")
 .option("subscribe", "users.error")
 .load()
