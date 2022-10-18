@@ -20,7 +20,7 @@ export default function OGDoc({
     >
       <header tw="flex flex-col items-center">
         {/* breadcrumbs */}
-        <h5 tw="m-0 ">
+        <h5 tw="m-0">
           <span tw="bg-white text-gray-700 text-3xl px-8 py-4 rounded-full">
             {product}
           </span>
@@ -35,12 +35,14 @@ export default function OGDoc({
         </h5>*/}
 
         {/* title */}
-        <h1 tw="m-0 mt-12 leading-[1.16] text-8xl font-bold">{title}</h1>
+        <h1 tw="m-0 mt-12 leading-[1.1] text-7xl font-bold text-center">
+          {title}
+        </h1>
       </header>
 
       <div tw="mt-auto flex">
         <svg
-          height="50"
+          height="60"
           viewBox="0 0 1631 472"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"

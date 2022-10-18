@@ -38,9 +38,9 @@ export default async function handler(req: NextRequest) {
     }
 
     const products = {
-      redis: "Redis",
-      kafka: "Kafka",
-      qstash: "QStash",
+      redis: "Upstash Redis",
+      kafka: "Upstash Kafka",
+      qstash: "Upstash QStash",
     };
 
     if (!title || !hasProduct) {
