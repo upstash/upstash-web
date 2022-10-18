@@ -7,17 +7,21 @@ export default function OGDoc({
 }) {
   return (
     <div
-      tw="flex flex-col items-center p-[80px] h-full w-full text-white"
+      tw="flex flex-col items-center p-[80px] h-full w-full text-white bg-black"
       style={{
-        backgroundColor: "#000",
         backgroundImage:
-          "linear-gradient(146deg, rgba(0, 233, 163, 0.35) 10%, rgba(0, 233, 163, 0) 60%, rgba(0, 233, 163, 0.08) 75%, rgba(0, 233, 163, 0) 90%, rgba(0, 233, 163, 0.06) 99%)",
+          "linear-gradient(146deg, " +
+          "rgba(0, 233, 163, 0.35) 10%, " +
+          "rgba(0, 233, 163, 0) 60%, " +
+          "rgba(0, 233, 163, 0.08) 75%, " +
+          "rgba(0, 233, 163, 0) 90%, " +
+          "rgba(0, 233, 163, 0.06) 99%)",
       }}
     >
       <header tw="flex flex-col items-center">
         {/* breadcrumbs */}
         <h5 tw="m-0 ">
-          <span tw="bg-white font-normal text-gray-700 text-3xl px-8 py-4 rounded-full">
+          <span tw="bg-white text-gray-700 text-3xl px-8 py-4 rounded-full">
             {product}
           </span>
         </h5>
@@ -36,7 +40,7 @@ export default function OGDoc({
 
       <div tw="mt-auto flex">
         <svg
-          height="60"
+          height="50"
           viewBox="0 0 1631 472"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
