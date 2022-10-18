@@ -5,6 +5,8 @@ export default function OGDoc({
   title: string;
   product: string;
 }) {
+  const path = product.toLocaleLowerCase().split("_");
+
   return (
     <div
       tw="flex flex-col items-center p-[80px] h-full w-full text-white bg-black"
@@ -20,19 +22,17 @@ export default function OGDoc({
     >
       <header tw="flex flex-col items-center">
         {/* breadcrumbs */}
-        <h5 tw="m-0">
-          <span tw="bg-white text-gray-700 text-3xl px-8 py-4 rounded-full">
-            {product}
-          </span>
-        </h5>
-
-        {/*<h5 tw="m-0 ">
+        <h5 tw="m-0 ">
           <span tw="bg-white text-gray-700 text-3xl font-normal px-8 py-4 rounded-full">
             <span>doc.upstash.com</span>
-            <span tw="mx-1">/</span>
-            <span>{product}</span>
+            {path.map((p, i) => (
+              <span key={i}>
+                <span tw="mx-1">/</span>
+                <span>{p}</span>
+              </span>
+            ))}
           </span>
-        </h5>*/}
+        </h5>
 
         {/* title */}
         <h1 tw="m-0 mt-12 leading-[1.1] text-7xl font-bold text-center">

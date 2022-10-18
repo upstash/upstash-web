@@ -21,54 +21,31 @@ export default async function handler(req: NextRequest) {
     const { searchParams } = new URL(req.url);
 
     const title = searchParams.get("title");
-    const product = searchParams.get("product");
+    const path = searchParams.get("path");
 
-    if (!title || !product) {
+    if (!title || !path) {
       throw new Error("Missing required query parameters");
     }
 
-    const productName = product.toLocaleLowerCase();
-
-    const hasProduct = ["redis", "kafka", "qstash"].includes(
-      product.toLocaleLowerCase()
-    );
-
-    if (!hasProduct) {
-      throw new Error("Invalid product name");
-    }
-
-    const products = {
-      redis: "Upstash Redis",
-      kafka: "Upstash Kafka",
-      qstash: "Upstash QStash",
-    };
-
-    if (!title || !hasProduct) {
-      throw new Error("Missing required query parameters");
-    }
-
-    return new ImageResponse(
-      <OGDoc title={title} product={products[productName]} />,
-      {
-        // debug: true,
-        width: 1200,
-        height: 630,
-        fonts: [
-          {
-            name: "Inter",
-            data: DataInterRegular,
-            style: "normal",
-            weight: 400,
-          },
-          {
-            name: "Inter",
-            data: DataInterBold,
-            style: "normal",
-            weight: 800,
-          },
-        ],
-      }
-    );
+    return new ImageResponse(<OGDoc title={title} product={path} />, {
+      // debug: true,
+      width: 1200,
+      height: 630,
+      fonts: [
+        {
+          name: "Inter",
+          data: DataInterRegular,
+          style: "normal",
+          weight: 400,
+        },
+        {
+          name: "Inter",
+          data: DataInterBold,
+          style: "normal",
+          weight: 800,
+        },
+      ],
+    });
   } catch (e: any) {
     return new Response(`Failed to generate the image`, {
       status: 500,
