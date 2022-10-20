@@ -24,7 +24,7 @@ export default function OGDoc({
         {/* breadcrumbs */}
         <h5 tw="m-0 ">
           <span tw="bg-white text-gray-700 text-3xl font-normal px-8 py-4 rounded-full">
-            <span>doc.upstash.com</span>
+            <span>docs.upstash.com</span>
             {path.map((p, i) => (
               <span key={i}>
                 <span tw="mx-1">/</span>
