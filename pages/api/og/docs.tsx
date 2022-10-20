@@ -18,19 +18,17 @@ export default async function handler(req: NextRequest) {
   const DataInterBold = await FontInterBold;
 
   try {
-    const { searchParams } = new URL(req.url);
-
-    const url = searchParams.get("url");
-    if (!url) {
+    const docsUrl = new URL(req.url).searchParams.get("url");
+    if (!docsUrl) {
       throw new Error("url parameter must be set");
     }
 
-    const title = await getPageTitle(url);
+    const title = await getPageTitle(docsUrl);
 
     return new ImageResponse(
       <OGDoc
         title={title}
-        product={new URL(url).pathname.replace(/^\//, "")}
+        product={new URL(docsUrl).pathname.replace(/^\//, "")}
       />,
       {
         // debug: true,
