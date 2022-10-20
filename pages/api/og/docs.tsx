@@ -22,7 +22,7 @@ export default async function handler(req: NextRequest) {
 
     const url = searchParams.get("url");
     if (!url) {
-      throw new Error("url paramter must be set");
+      throw new Error("url parameter must be set");
     }
 
     const title = await getPageTitle(url);
