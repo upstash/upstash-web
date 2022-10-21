@@ -48,7 +48,12 @@ export default async function handler(req: NextRequest) {
             weight: 800,
           },
         ],
+        headers: {
+          "Cache-Control": "s-maxage=3600"
+        }
       },
+
+
     );
   } catch (e: any) {
     return new Response(`Failed to generate the image`, {
