@@ -32,8 +32,8 @@ function SectionFaq() {
             <Text>
               With servers/instances, you pay per-hour or a fixed price. With
               Serverless, you pay per-request. This means you're not charged
-              when your data isn't in use. And Upstash configures and manages
-              the everything for you.
+              when your data isn't in use. Upstash configures and manages
+              everything for you.
             </Text>
           </FaqAccordionItem>
 
@@ -87,8 +87,8 @@ function SectionFaq() {
           <FaqAccordionItem title="When should I prefer REST API over the Kafka®/Redis® clients?">
             <Text>
               If your application runs on serverless or edge functions (AWS
-              Lambda, Cloudflare Workers) then using REST protocol will free
-              your from any connection problem which are common in serverless
+              Lambda, Cloudflare Workers) then using our REST protocol will free
+              you from any connection problems common in serverless
               functions.
             </Text>
           </FaqAccordionItem>
