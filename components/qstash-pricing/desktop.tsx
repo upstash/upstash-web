@@ -106,20 +106,20 @@ export default function QStashDesktopTable() {
 
       <ColDescription>
         <Text as="span">
-          {QSTASH_PRICES.maxNumberOfSchedules.title}
+          {QSTASH_PRICES.maxRetentionTimeLimit.title}
           <CustomTooltip>
-            {QSTASH_PRICES.maxNumberOfSchedules.description}
+            {QSTASH_PRICES.maxRetentionTimeLimit.description}
           </CustomTooltip>
         </Text>
       </ColDescription>
       <Col>
-        <Text as="span">{QSTASH_PRICES.maxNumberOfSchedules.free}</Text>
+        <Text as="span">{QSTASH_PRICES.maxRetentionTimeLimit.free}</Text>
       </Col>
       <Col highlight>
-        <Text as="span">{QSTASH_PRICES.maxNumberOfSchedules.payg}</Text>
+        <Text as="span">{QSTASH_PRICES.maxRetentionTimeLimit.payg}</Text>
       </Col>
       <Col>
-        <Text as="span">{QSTASH_PRICES.maxNumberOfSchedules.enterprise}</Text>
+        <Text as="span">{QSTASH_PRICES.maxRetentionTimeLimit.enterprise}</Text>
       </Col>
 
       <GridItem colSpan={4}>

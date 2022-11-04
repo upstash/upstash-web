@@ -277,6 +277,13 @@ export const QSTASH_PRICES = {
     payg: "5",
     enterprise: "20",
   },
+  maxRetentionTimeLimit: {
+    title: "Max Retention Time",
+    description: "",
+    free: "1 week",
+    payg: "30 days",
+    enterprise: "90 days",
+  },
   maxNumberOfSchedules: {
     title: "Max Number of Schedules",
     description: "",
@@ -288,7 +295,7 @@ export const QSTASH_PRICES = {
     title: "Price",
     description: "",
     free: "Free (No credit card required)",
-    payg: "$1 per 100K requests, up to $200 monthly max.",
+    payg: "$1 per 100K requests",
     enterprise: "Custom",
   },
 };
