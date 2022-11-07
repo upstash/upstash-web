@@ -1,5 +1,5 @@
-import { Button, Flex, VStack, Heading, Text } from "@chakra-ui/react";
-import { KAFKA_PRICES } from "constants/";
+import { Button, Flex, VStack, Heading, Text, Link } from "@chakra-ui/react";
+import { KAFKA_PRICES, LINKS } from "constants/";
 import ColCheck from "../redis-pricing-desktop/col-check";
 import { Title } from "../redis-pricing-mobile";
 
@@ -81,11 +81,27 @@ export default function KafkaMobileTable() {
 
             <Flex direction="column" align="center">
               {key === "free" ? (
-                <Button bg="primary" color="black">
+                <Button
+                  as={Link}
+                  href={LINKS.console}
+                  color="black"
+                  bg="white"
+                  _hover={{
+                    textDecoration: "none",
+                  }}
+                >
                   Start for free
                 </Button>
               ) : (
-                <Button bg="white" color="black">
+                <Button
+                  as={Link}
+                  href={LINKS.console}
+                  color="black"
+                  bg="primary"
+                  _hover={{
+                    textDecoration: "none",
+                  }}
+                >
                   Login
                 </Button>
               )}

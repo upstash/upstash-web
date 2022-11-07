@@ -1,5 +1,5 @@
-import { Button, Flex, VStack, Heading, Text } from "@chakra-ui/react";
-import { REDIS_PRICES } from "constants/";
+import { Button, Flex, VStack, Heading, Text, Link } from "@chakra-ui/react";
+import { LINKS, REDIS_PRICES } from "constants/";
 import ColCheck from "../redis-pricing-desktop/col-check";
 
 export function Title({ children }) {
@@ -87,11 +87,27 @@ export default function RedisMobileTable() {
 
             <Flex direction="column" align="center">
               {key === "free" ? (
-                <Button bg="primary" color="black">
+                <Button
+                  as={Link}
+                  href={LINKS.console}
+                  color="black"
+                  bg="white"
+                  _hover={{
+                    textDecoration: "none",
+                  }}
+                >
                   Start for free
                 </Button>
               ) : (
-                <Button bg="white" color="black">
+                <Button
+                  as={Link}
+                  href={LINKS.console}
+                  color="black"
+                  bg="primary"
+                  _hover={{
+                    textDecoration: "none",
+                  }}
+                >
                   Login
                 </Button>
               )}

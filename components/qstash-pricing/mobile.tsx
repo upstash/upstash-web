@@ -1,5 +1,5 @@
-import { Button, Flex, VStack, Heading, Text } from "@chakra-ui/react";
-import { QSTASH_PRICES } from "constants/";
+import { Button, Flex, VStack, Heading, Text, Link } from "@chakra-ui/react";
+import { LINKS, QSTASH_PRICES } from "constants/";
 import { Title } from "../redis-pricing-mobile";
 
 export default function QStashMobileTable() {
@@ -49,11 +49,27 @@ export default function QStashMobileTable() {
 
             <Flex direction="column" align="center">
               {key === "free" ? (
-                <Button bg="primary" color="black">
+                <Button
+                  as={Link}
+                  href={LINKS.console}
+                  color="black"
+                  bg="white"
+                  _hover={{
+                    textDecoration: "none",
+                  }}
+                >
                   Start for free
                 </Button>
               ) : (
-                <Button bg="white" color="black">
+                <Button
+                  as={Link}
+                  href={LINKS.console}
+                  color="black"
+                  bg="primary"
+                  _hover={{
+                    textDecoration: "none",
+                  }}
+                >
                   Login
                 </Button>
               )}
