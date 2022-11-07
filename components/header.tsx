@@ -47,10 +47,7 @@ function Header({ onOpen }: { onOpen: () => void }) {
               justify="center"
             >
               {isSubPage ? (
-                <CustomLink
-                  href="https://upstash.com/#section-pricing"
-                  color="inherit"
-                >
+                <CustomLink href="/#section-pricing" color="inherit">
                   Pricing
                 </CustomLink>
               ) : (
