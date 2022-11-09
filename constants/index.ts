@@ -280,17 +280,19 @@ export const QSTASH_PRICES = {
   maxRetentionTimeLimit: {
     title: "Max Retention Time",
     description: "",
-    free: "1 week",
-    payg: "30 days",
-    enterprise: "90 days",
+    free: "1 day",
+    payg: "7 days",
+    enterprise: "30 days",
   },
-  maxNumberOfSchedules: {
-    title: "Max Number of Schedules",
-    description: "",
-    free: "1",
-    payg: "10",
-    enterprise: "Unlimited",
+  maxTimeout: {
+    title: "Max HTTP Timeout",
+    description: "How long we wait for a response from the target API",
+    free: "2 min",
+    payg: "5 min",
+    enterprise: "Custom",
   },
+ 
+ 
   price: {
     title: "Price",
     description: "",

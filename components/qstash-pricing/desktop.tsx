@@ -121,6 +121,27 @@ export default function QStashDesktopTable() {
       <Col>
         <Text as="span">{QSTASH_PRICES.maxRetentionTimeLimit.enterprise}</Text>
       </Col>
+      <GridItem colSpan={4}>
+        <Box height="1px" bg="whiteAlpha.100" />
+      </GridItem>
+
+      <ColDescription>
+        <Text as="span">
+          {QSTASH_PRICES.maxTimeout.title}
+          <CustomTooltip>
+            {QSTASH_PRICES.maxTimeout.description}
+          </CustomTooltip>
+        </Text>
+      </ColDescription>
+      <Col>
+        <Text as="span">{QSTASH_PRICES.maxTimeout.free}</Text>
+      </Col>
+      <Col highlight>
+        <Text as="span">{QSTASH_PRICES.maxTimeout.payg}</Text>
+      </Col>
+      <Col>
+        <Text as="span">{QSTASH_PRICES.maxTimeout.enterprise}</Text>
+      </Col>
 
       <GridItem colSpan={4}>
         <Box height="1px" bg="whiteAlpha.100" />
