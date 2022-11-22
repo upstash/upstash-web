@@ -136,4 +136,10 @@ export default {
     title: "Software Engineer at Datadog (Guest Author)",
     image_url: "https://upstash.com/blog/authors/lambros.jpg",
   },
+  max: {
+    name: "Maximilian Kaske",
+    title: "Fullstack Developer (Guest Author)",
+    url: "https://twitter.com/mxkaske",
+    image_url: "https://upstash.com/blog/authors/max.jpg",
+  },
 };
