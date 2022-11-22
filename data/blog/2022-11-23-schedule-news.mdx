@@ -5,17 +5,6 @@ author: max
 tags: [qstash, serverless, callbacks, vercel, discord, news, nytimes]
 ---
 
-Let's look closely at the
-[Upstash-Callback](https://docs.upstash.com/qstash/features/callbacks) property
-that can be used with the QStash services.
-
-Quick recap': **What is a callback function?**
-
-A callback function is a function that is accessible by another function and is
-invoked after the first function if that first function completes. It is
-“**called at the back**” of the passed function.
-
-### **What will we build?**
 
 In this post, we will build a simple application that will fetch the most
 popular viewed articles from the New York Times once a day via a cron job and
@@ -23,6 +12,14 @@ post them to our internal discord _#notifications_ channel to stay up to date
 with the outside world - creating discussions around non-technical hot topics.
 
 ![CleanShot 2022-11-14 at 21.43.23.png](/blog/qstash/news/CleanShot_2022-11-14_at_21.43.23.png)
+
+To build this, we'll use the new [QStash Callback](https://docs.upstash.com/qstash/features/callbacks) feature.
+
+Quick recap': **What is a callback function?**
+
+A callback function is a function that is accessible by another function and is
+invoked after the first function if that first function completes. It is
+“**called at the back**” of the passed function.
 
 ### Application
 
