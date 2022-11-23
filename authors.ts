@@ -23,6 +23,11 @@ export default {
     url: "https://twitter.com/mmdogan",
     image_url: "https://upstash.com/blog/authors/mehmet.jpg",
   },
+  sancar: {
+    name: "Sancar Koyunlu",
+    title: "Senior Software Engineer @Upstash",
+    image_url: "https://upstash.com/blog/authors/sancar.jpg",
+  },
   geoff: {
     name: "Geoff Rich",
     title: "Guest Author",

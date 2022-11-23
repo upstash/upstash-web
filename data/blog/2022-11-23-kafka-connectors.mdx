@@ -1,0 +1,45 @@
+---
+slug: kafka-connectors
+title: "Announcing Managed Kafka Connect"
+author: sancar
+tags: [kafka, serverless, announce]
+---
+
+Here at Upstash, we are providing Serverless Kafka with a per usage pricing which is loved and used extensively. 
+There was a main ingredient missing from this until now, which is Kafka Connect.
+
+## What is Kafka Connect ?
+
+One of the main usecases of Kafka is to use it as a bridge between different systems 
+so that these services are decoupled from each other. 
+
+You can collect your data from different databases to Kafka to be used later from various decoupled 
+applications to server your needs. 
+Also you may need to store what is in your Kafka topics to a well known database/datalake.
+
+[Kafka Connect](https://kafka.apache.org/documentation/#connect) is here so that you don't need to implement
+a single line of code to Connect external systems to Kafka.
+
+There is still a problem tough. You need to manage it yourself.
+As we always do, we don't want our users to manage a server or a process.
+And again, we are here to get that burden of your shoulders. 
+
+To help you, we are proudly announcing **managed**, **low latency** and **free** [Upstash Kafka Connect](https://docs.upstash.com/kafka/connectintro). 
+
+With **Upstash Managed  Kafka Connect**,
+- You don't need to worry about the health/scale of your Kafka Connect. It is 7/24 **managed** by our team for you.
+- Your Kafka Connect is right besides your Kafka Cluster so that you benefit from Kafka Connect with **low latency**.
+- And compared to other Managed Kafka Connect Providers, it is **free**. You only pay for per message activity on your 
+Kafka topics. There is no additional cost for using Managed Kafka Connect.
+
+We will be starting with following connectors from day one:
+
+- [Mongo Source Connector](https://docs.upstash.com/kafka/mongosource)
+- [Mongo Sink Connector](https://docs.upstash.com/kafka/mongosink)
+- [Debezium Mongo Source Connector](https://docs.upstash.com/kafka/debeziummongo)
+- [Debezium Mysql Source Connector](https://docs.upstash.com/kafka/debeziummysql)
+- [Debezium PostgreSql Source Connector](https://docs.upstash.com/kafka/debeziumpsql)
+- [Aiven JDBC Source Connector](https://docs.upstash.com/kafka/aivenjdbcsource)
+- [Aiven JDBC Sink Connector](https://docs.upstash.com/kafka/aivenjdbcsink)
+
+Our aim is to always help manage with whatever you need. So, if the connector that you need is not in this list, please add a request to our [Road Map](https://roadmap.upstash.com/).
