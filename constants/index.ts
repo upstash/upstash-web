@@ -142,7 +142,7 @@ export const REDIS_PRICES = {
   multiZoneReplication: {
     title: "Multi Zone Replication",
     description:
-      "Upstash replicates data to multiple zones for Premium type of databases. This provides high availability and minimum fail over time. Enabling multi zone replication doubles the price.",
+      "Upstash replicates data to multiple zones for Premium type of databases. This provides high availability and minimum fail over time.",
     free: false,
     payg: true,
     enterprise: true,
