@@ -1,6 +1,6 @@
 ---
 slug: schedule-news
-title: "Schedule 'Most Popular' NY Times articles to Discord with QStash"
+title: "Post Most Popular NY Times articles to Discord with QStash"
 author: max
 tags: [qstash, serverless, callbacks, vercel, discord, news, nytimes]
 ---
@@ -34,7 +34,7 @@ following:
 npm install @upstash/qstash
 ```
 
-Qstash by [Upstash](http://upstash.com) is a powerful messaging and scheduling
+QStash by [Upstash](http://upstash.com) is a powerful messaging and scheduling
 solution that we will use to create a cron job and include a callback URL that
 will be called once the published request has finished, including the response
 of the request.
@@ -217,7 +217,7 @@ Let's decompose the request:
 
 ### Conclusion
 
-Let's wrap it up. Every morning at 8 am, Qstash will request the most popular NY
+Let's wrap it up. Every morning at 8 am, QStash will request the most popular NY
 Times articles of the day and will forward the results to our callback URL
 (`/api/callback`) where we will post them to our Discord channel.
 
