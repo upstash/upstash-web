@@ -131,7 +131,7 @@ function SectionPricing() {
 
         {price === "redis" && (
           <VStack spacing={2} mt={14}>
-            <Text>Disk storage cost is $0.50 per GB per month.</Text>
+            <Text>Disk storage cost is $0.25 per GB per month.</Text>
             <Text>
               Each plan has {" "}
               <CustomLink isExternal noIcon href={LINKS.redisQuotas}>
