@@ -142,4 +142,10 @@ export default {
     url: "https://twitter.com/mxkaske",
     image_url: "https://upstash.com/blog/authors/max.jpg",
   },
+  menelaos : {
+    name: "Menelaos Kotsollaris",
+    title: "Staff Software Engineer at Realtor.com (Guest Author)",
+    url: "https://menelaos.dev/",
+    image_url: "https://i.stack.imgur.com/QXmES.jpg?s=256&g=1",
+  }
 };
