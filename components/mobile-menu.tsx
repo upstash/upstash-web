@@ -78,7 +78,7 @@ function MobileMenu({
               </CustomLink>
               <CustomLink
                 isExternal
-                href={SOCIAL_LINKS.blog}
+                href={SOCIAL_LINKS.discord}
                 h={10}
                 color="inherit"
               >
