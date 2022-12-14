@@ -291,8 +291,6 @@ export const QSTASH_PRICES = {
     payg: "5 min",
     enterprise: "Custom",
   },
- 
- 
   price: {
     title: "Price",
     description: "",

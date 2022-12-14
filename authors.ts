@@ -2,7 +2,6 @@ export default {
   lisa: {
     name: "Lisa Natsumi",
     title: "Engineer @Upstash",
-    url: "https://twitter.com/enesakar",
     image_url: "https://upstash.com/blog/authors/pp-lisa.jpg",
   },
   enes: {
@@ -152,5 +151,11 @@ export default {
     title: "Staff Software Engineer at Realtor.com (Guest Author)",
     url: "https://menelaos.dev/",
     image_url: "https://i.stack.imgur.com/QXmES.jpg?s=256&g=1",
-  }
+  },
+  enesozcan: {
+    name: "Enes Ozcan",
+    title: "Senior Software Engineer at Zapata Computing (Guest Author)",
+    url: "https://github.com/enozcan",
+    image_url: "https://upstash.com/blog/authors/enesozcan.png",
+  },
 };
