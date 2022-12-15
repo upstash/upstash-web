@@ -5,19 +5,19 @@ author: enes
 tags: [vercel, edge]
 ---
 
-Vercel provides edge runtimes which are run at locations close to the caller (client). So your serverless function is replicated to edge locations; when a user call your endpoint, the code is executed and the response fetched from the location which is closest to your user. This minimizes the latency by canceling out the network latency due to the distance between your client and server.
+Vercel provides edge runtimes which are run at locations close to the caller (client). So your serverless function is replicated to edge locations; when a user calls your endpoint, the code is executed and the response fetched from the location which is closest to your user. This minimizes the latency by canceling out the network latency due to the distance between your client and server.
 
-Note that Vercel also has a CDN product which is called Edge Network. As CDN is relatively an old technology and most people know about it enough, in this article I will focus on edge compute products.
+Note that Vercel also has a CDN product which is called Edge Network. A CDN is a relatively old technology and most people know about it enough, in this article I will focus on edge compute products.
 
 Vercel has two edge compute offerings which enable users to leverage the edge infrastructure. Edge middleware and edge functions:
 
 ### Edge Middleware
 
-Edge middleware intercepts the requests coming to your serverless functions. It is deployed globally on Vercel's [](https://vercel.com/docs/concepts/edge-network/overview)edge location and runs your server-side code to close to your user's origin. It runs before the request hits the edge cache. So you can update the request before being fetched from cache or processed in the serverless function. Edge Middleware runs on Vercel’s [edge runtime](https://edge-runtime.vercel.sh/packages/runtime) which is a V8 Javascript engine.
+Edge middleware intercepts the requests coming to your serverless functions. It is deployed globally on Vercel's [](https://vercel.com/docs/concepts/edge-network/overview)edge locations and runs your server-side code to close to your user's origin. It runs before the request hits the edge cache. So you can update the request before being fetched from cache or processed in the serverless function. Edge Middleware runs on Vercel’s [edge runtime](https://edge-runtime.vercel.sh/packages/runtime) which is a V8 Javascript engine.
 
 ### Edge Functions
 
-Edge functions are serverless functions which are executed at Vercel’s edge locations close to your user’s origin. Just like Edge Middleware, they run on [edge runtime](https://edge-runtime.vercel.sh/packages/runtime) which is a V8 Javascript engine. Thanks to its runtime, it has a shorter cold starts than regular serverless functions. Edge functions are run after the cache different than Edge Middleware.
+Edge functions are serverless functions which are executed at Vercel’s edge locations close to your user’s origin. Just like Edge Middleware, they run on [edge runtime](https://edge-runtime.vercel.sh/packages/runtime) which is a V8 Javascript engine. Thanks to its runtime, it has shorter cold starts than regular serverless functions. Edge functions are run after the cache, in contrast to Edge Middleware.
 
 ![Untitled-2022-12-13-1936.png](/blog/vercel-edge/vercel-edge.png)
 
@@ -59,7 +59,7 @@ Edge functions are cheaper and provides you low latency all over the world. Also
 
 ### Recap
 
-Vercel Edge functions and middleware are great products which broadens the capabilities of serverless functions. Canceling out the cold starts and providing low latency everywhere make them superior to single region serverless functions. But they have still some restrictions which limits them to some special use cases. It will be exciting to see how these products will evolve and if the developers will adopt them for more use cases.
+Vercel Edge functions and middleware are great products which broadens the capabilities of serverless functions. Canceling out the cold starts and providing low latency everywhere make them superior to single region serverless functions. But they still have some restrictions which limits them to some special use cases. It will be exciting to see how these products will evolve and if the developers will adopt them for more use cases.
 
 **Links**
 
