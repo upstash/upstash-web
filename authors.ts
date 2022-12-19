@@ -161,7 +161,7 @@ export default {
   tudor: {
     name: "Tudor Zgîmbău",
     title: "Full-Stack Engineer (Guest Author)",
-    url: "https://github.com/enozcan",
+    url: "https://www.linkedin.com/in/tudor-zg%C3%AEmb%C4%83u-a85274234",
     image_url: "https://upstash.com/blog/authors/tudor.jpg",
   },
 };
