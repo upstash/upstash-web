@@ -158,4 +158,10 @@ export default {
     url: "https://github.com/enozcan",
     image_url: "https://upstash.com/blog/authors/enesozcan.png",
   },
+  tudor: {
+    name: "Tudor Zgîmbău",
+    title: "Full-Stack Engineer (Guest Author)",
+    url: "https://github.com/enozcan",
+    image_url: "https://upstash.com/blog/authors/tudor.jpg",
+  },
 };
