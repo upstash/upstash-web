@@ -1,10 +1,12 @@
 ---
 slug: sveltekit-edge-redis
-title: "Building a Guest Book on the Edge with SvelteKit, Upstash Redis and Vercel"
+title: 'Building a Guest Book on the Edge with SvelteKit, Upstash Redis and Vercel'
 author: geoff
 tags: [sveltekit, edge, redis, vercel]
 tweetUrl: https://twitter.com/upstash/status/1551664802858164224
 ---
+
+> This post was updated in December 2022 and is now compatible with [SvelteKit 1.0](https://svelte.dev/blog/announcing-sveltekit-1.0).
 
 Vercel recently launched [Edge Functions](https://vercel.com/features/edge-functions), which let you run JavaScript code on their globally-distributed edge network. With SvelteKit, the upcoming full-stack framework for Svelte, you can deploy your app to these Edge Functions. This means you can serve your users dynamically-rendered pages at the same speed you would serve static files from a CDN.
 
@@ -13,8 +15,6 @@ In this tutorial, we’ll show how to build a small site with SvelteKit that tak
 For a preview of what we’re building, see the [live demo](https://sveltekit-edge-guestbook.vercel.app/).
 
 We’ll be using Upstash Redis as a data store, since (like SvelteKit) it’s optimized for use with serverless hosting providers. In addition, they allow provisioning a global database that will minimize latency from the deployed function to the database instance.
-
-A word of caution before starting this tutorial: at time of writing, both SvelteKit and Vercel Edge Functions are currently in beta and the APIs might change.
 
 ## Starter overview
 
@@ -29,33 +29,23 @@ npm run dev
 
 Currently, it’s non-functional since it’s not getting the user’s city or storing the list of cities anywhere. In this blog post, we’ll fix both of those issues.
 
-Let’s quickly orient ourselves in the project. `src/routes/index.svelte` corresponds to the page we’ll see at the root route. It takes props for the list of visits, the city of the current user, and whether the user has signed the guest book or not.
+Let’s quickly orient ourselves in the project. `src/routes/+page.svelte` corresponds to the page we’ll see at the root route. It receives a `data` prop that includes the list of visits and the city of the current user and a `form` prop that will contain the result of submitting the form.
 
-One cool thing is that the data is submitted via a `<form>`, so it does *not* need JavaScript to function. When JS is not available, the form will submit as normal and trigger a full page reload. When JS is available, it will update in place instead of reloading. This is accomplished using a [Svelte action](https://svelte.dev/tutorial/actions) called `enhance`, which is copied from the default SvelteKit project template. Explaining how it works is outside of the scope of this post, but take a look at the code in `src/lib/enhance.ts` if you’re curious.
+One cool thing is that the data is submitted via a `<form>`, so it does _not_ need JavaScript to function. When JS is not available, the form will submit as normal and trigger a full page reload. When JS is available, it will update in place instead of reloading. This is accomplished using a [Svelte action](https://svelte.dev/tutorial/actions) called `enhance`, which is included with SvelteKit. Explaining how it works is outside of the scope of this post, but take a look at the [SvelteKit docs on progressive enhancement](https://kit.svelte.dev/docs/form-actions#progressive-enhancement) if you're curious.
 
 ```html
-<form
-	action="/"
-	method="post"
-	use:enhance={{
-		result: () => {
-			signed = true;
-		}
-	}}
->
+<form action="/" method="post" use:enhance>
 	<button>I was here</button>
 </form>
 ```
 
-In `src/routes/index.ts`, we have our main page endpoint. The exported `GET` function will supply the props to our `index.svelte` page and the `POST` function will handle the POST request from the form. If you’re not familiar with SvelteKit’s endpoints, [see the documentation](https://kit.svelte.dev/docs/routing#endpoints-page-endpoints) for more information on how they work.
-
-Currently, the endpoints call the `get_visitors` and `add_visitor` functions from our `$lib` directory to retrieve and update the list of visits. They also call a local `get_city` method to get the user’s city. Those methods are stubbed out for now, since we’ll be implementing them as part of this tutorial.
+In `src/routes/+page.server.ts` we have our [`load` function](https://kit.svelte.dev/docs/load), which supplies data to the page, and our default [form action](https://kit.svelte.dev/docs/form-actions), which will handle form submissions. Currently, they call the `get_visitors` and `add_visitor` functions from our `$lib` directory to retrieve and update the list of visits. They also call a local `get_city` method to get the user’s city. Those methods are stubbed out for now, since we’ll be implementing them as part of this tutorial.
 
 ## Getting the user’s location
 
 Since we’re planning to deploy the app to Vercel, we can use Vercel’s [edge headers](https://vercel.com/docs/concepts/edge-network/headers) to get the user’s city and country. [x-vercel-ip-country](https://vercel.com/docs/concepts/edge-network/headers#x-vercel-ip-country) will have the country code of the user and [x-vercel-ip-city](https://vercel.com/docs/concepts/edge-network/headers#x-vercel-ip-city) will have the city of the user. This is all based off of the user’s IP address, so it won’t be 100% accurate. However, it will be good enough for our purposes.
 
-The relevant headers names are already in `src/lib/constants.ts` for our use. Import them at the top of `src/routes/index.ts`.
+The relevant headers names are already in `src/lib/constants.ts` for our use. Import them at the top of `src/routes/+page.server.ts`.
 
 ```tsx
 import { CITY_HEADER, COUNTRY_HEADER } from '$lib/constants';
@@ -71,9 +61,9 @@ function get_city(request: Request) {
 }
 
 const display_names = new Intl.DisplayNames(['en'], { type: 'region' });
-function get_country_name(countryCode: string | null) {
-	if (countryCode) {
-		return display_names.of(countryCode);
+function get_country_name(country_code: string | null) {
+	if (country_code) {
+		return display_names.of(country_code);
 	}
 	return 'unknown country';
 }
@@ -81,15 +71,15 @@ function get_country_name(countryCode: string | null) {
 
 This method will retrieve the city and country from the request headers, falling back to “unknown” if it’s not set. Note how this function uses the web `Intl.DisplayNames` API to get the country name from the country code—no NPM package required! This API will be available when we deploy to [Vercel Edge Functions](https://vercel.com/docs/concepts/functions/edge-functions/edge-functions-api).
 
-This will work great when deployed, but these headers won’t be automatically set when developing. Fortunately, the starter project already adds custom code in SvelteKit’s [handle hook](https://kit.svelte.dev/docs/hooks#handle) to add these headers in development.
+This will work great when deployed, but these headers won’t be automatically set when developing. Fortunately, the starter project already adds custom code in SvelteKit’s [handle hook](https://kit.svelte.dev/docs/hooks#server-hooks-handle) to add these headers in development.
 
 ```tsx
-// src/hooks.ts
 import type { Handle } from '@sveltejs/kit';
 import { COUNTRY_HEADER, CITY_HEADER } from '$lib/constants';
+import { dev } from '$app/environment';
 
 export const handle: Handle = async function ({ event, resolve }) {
-	if (import.meta.env.DEV) {
+	if (dev) {
 		event.request.headers.append(CITY_HEADER, 'Kakariko Village');
 		event.request.headers.append(COUNTRY_HEADER, 'JP');
 	}
@@ -115,25 +105,37 @@ UPSTASH_REDIS_REST_URL="COPY URL HERE"
 UPSTASH_REDIS_REST_TOKEN="COPY TOKEN HERE"
 ```
 
-The project is set up to use [env-cmd](https://www.npmjs.com/package/env-cmd) in development, which will make these values available to your application. In production, we will set these values in the Vercel console.
+We can access these values in our code using SvelteKit's [`$env` module](https://kit.svelte.dev/docs/modules#$env-static-private).
 
 Now, update our `get_visitors` and `add_visitor` functions in `/src/lib/data.ts` to read and write data from our Redis instance.
 
 ```tsx
 import { Redis } from '@upstash/redis';
-import type { Visit } from './types';
+import { UPSTASH_REDIS_REST_TOKEN, UPSTASH_REDIS_REST_URL } from '$env/static/private';
+
+interface Visit {
+	city: string;
+	count: string;
+}
 
 const set_name = 'visitors';
 
 export async function get_visitors(): Promise<Visit[]> {
-	const redis = Redis.fromEnv();
+	const redis = get_redis();
 	const visitors = await redis.zrange<string[]>(set_name, 0, -1, { withScores: true });
 	return adapt_visitors(visitors);
 }
 
 export async function add_visitor(city: string) {
-	const redis = Redis.fromEnv();
+	const redis = get_redis();
 	await redis.zincrby(set_name, 1, city);
+}
+
+function get_redis() {
+	return new Redis({
+		url: UPSTASH_REDIS_REST_URL,
+		token: UPSTASH_REDIS_REST_TOKEN
+	});
 }
 
 // takes the result from ZRANGE and adapt it into a list of visits
@@ -150,11 +152,11 @@ function adapt_visitors(visitors: string[]): Visit[] {
 }
 ```
 
-In `get_visitors`, we first initialize our Redis client using the built-in `fromEnv` function. This will grab the environment variables we set earlier. We then use the [ZRANGE](https://redis.io/commands/zrange/) command to retrieve everything in the `visitors` set and their scores. The data returned is not in the format we want, so we convert it into a list of visit objects and return it.
+In `get_visitors`, we first initialize our Redis client using the environment variables we set earlier. We then use the [ZRANGE](https://redis.io/commands/zrange/) command to retrieve everything in the `visitors` set and their scores. The data returned is not in the format we want, so we convert it into a list of visit objects and return it.
 
 `add_visitor` is simpler. It gets the Redis client as in the previous method, and uses [ZINCRBY](https://redis.io/commands/zincrby/) to add one to that city in the `visitors` set. By default, ZINCRBY will add the item to the set if it isn’t already there.
 
-These methods are already used in our `index.ts` page endpoint, so you should now be able to add cities to the list and see the results.
+These methods are already used in our `+page.server.ts` file, so you should now be able to add cities to the list and see the results.
 
 ## Deploying to Vercel
 

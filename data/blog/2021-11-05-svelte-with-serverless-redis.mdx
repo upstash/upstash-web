@@ -1,12 +1,14 @@
 ---
 slug: svelte-with-serverless-redis
-title: "Building SvelteKit Applications with Serverless Redis"
+title: 'Building SvelteKit Applications with Serverless Redis'
 author: geoff
 image: /blog/svelte/cover.png
 tags: [serverless, svelte, svelte-kit, netlify, redis]
 ---
 
-[SvelteKit](https://kit.svelte.dev/) is the upcoming full-stack application framework for [Svelte](https://svelte.dev/), the UI framework that builds your app at compile time to produce smaller, faster JavaScript. While SvelteKit allows you to write server-side logic using endpoints, it's up to you how you want to persist your application's data.
+> This post was updated in December 2022 and is now compatible with [SvelteKit 1.0](https://svelte.dev/blog/announcing-sveltekit-1.0).
+
+[SvelteKit](https://kit.svelte.dev/) is a framework for building web applications on top of [Svelte](https://svelte.dev/), the UI framework that builds your app at compile time to produce smaller, faster JavaScript. While SvelteKit allows you to write server-side logic, it's up to you how you want to persist your application's data.
 
 In this post, I will show how to store data using [Redis](https://redis.io/) in a SvelteKit application. We'll use Redis to cache movie API responses and display a random movie, using data from [The Movie Database (TMDB) API](https://developers.themoviedb.org/3/getting-started/introduction).
 
@@ -14,7 +16,7 @@ You will either need a Redis connection string or run Redis locally to follow al
 
 ## Prerequisites
 
-- Basic familiarity with [SvelteKit](https://kit.svelte.dev/) (e.g. pages vs endpoints, loading, retrieving query and params for a given page)
+- Basic familiarity with [SvelteKit](https://kit.svelte.dev/) (e.g. routing and loading data)
 - A [TMDB API key](https://developers.themoviedb.org/3/getting-started/introduction) and Redis instance (e.g. on [Upstash](https://upstash.com/?utm_source=geoff1)) if you want to run or deploy the demo
 
 ## Starter overview
@@ -27,17 +29,15 @@ cd movie-search-redis
 git checkout initial
 ```
 
-This is a small SvelteKit application that allows searching for movies and viewing their details using the TMDB API. It uses TypeScript to make interacting with the API responses easier, but this is not a requirement to use Redis or SvelteKit. The following routes already exist (corresponding to the files in `src/routes`):
+This is a small SvelteKit application that allows searching for movies and viewing their details using the TMDB API. It uses TypeScript to make interacting with the API responses easier, but this is not a requirement to use Redis or SvelteKit. The following routes already exist (corresponding to the folders in `src/routes`):
 
 - `/` renders the home page
 - `/search` renders a list of search results. It takes `query` and `page` as query params, e.g. `?query=star wars&page=3` shows the third page of results for "Star Wars"
-- `/search.json` is a [server endpoint](https://kit.svelte.dev/docs#routing-endpoints) that queries the TMDB API and returns the list of results. It takes the same query parameters as `/search`
-- `/movie/[id]` renders details for a movie with the given ID, e.g. `/movie/11`
-- `/movie/[id].json` is a server endpoint that returns movie details from the TMDB API. Since the TMDB response returns more data than we use on the page, we adapt the response to return a subset of the data.
+- `/movie/[id=id]` renders details for a movie with the given ID, e.g. `/movie/11`. While not important for this tutorial, `[id=id]` indicates that there is a parameter named `id` that needs to be validated by the `match` function in `src/params/id.ts`.
 
-You can see the demo running on [Netlify](https://movie-search-upstash-demo.netlify.app/).
+If SvelteKit's routing system is unfamiliar to you, give the [documentation](https://kit.svelte.dev/docs/routing) a read first. You can see the demo running on [Netlify](https://movie-search-upstash-demo.netlify.app/).
 
-Note that the TMDB API calls only happen in the server endpoints. This is so our API key is not exposed to the client.
+Note that the TMDB API calls only happen in the `+page.server.ts` files, which only run on the server. This is so our API key is not exposed to the client.
 
 To run the demo locally, create a `.env` file in the root of the project and add your TMDB API key and Redis connection string (sample below). Then run `npm install` to install dependencies and run `npm run dev` to run the app.
 
@@ -46,11 +46,17 @@ TMDB_API_KEY=KEY_GOES_HERE
 REDIS_CONNECTION=CONNECTION_GOES_HERE
 ```
 
-At runtime, we can access these values using `process.env['TMDB_API_KEY']` or `process.env['REDIS_CONNECTION']`. The values are read from the `.env` file using [dotenv](https://www.npmjs.com/package/dotenv) in `hooks.ts`.
+At runtime, we can access these values by importing them from SvelteKit's [`$env` module](https://kit.svelte.dev/docs/modules#$env-static-private), which will automatically prevent sensitive environment variables from being accidentally exposed via client-side code.
+
+```tsx
+import { TMDB_API_KEY } from '$env/static/private';
+```
 
 ## Caching the API response in Redis
 
 One improvement we can make to the existing project is to cache the API response for an individual movie in Redis. Currently, the app makes a request to the TMDB API every time a movie page is loaded. When we first make a request, we can store the API response in Redis so that we don't need to keep requesting the data from TMDB.
+
+(You can also cache responses by setting [cache headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching) with SvelteKit's [`setHeaders` function](https://kit.svelte.dev/docs/load#cookies-and-headers). However, depending on your CDN, this may only reuse the data for requests from an individual user's browser.)
 
 While the TMDB API is fast and doesn't necessarily need to be cached, this can be a useful technique for APIs that take a while to respond or that have request limits. It also provides a level of resiliency if the API were to go down.
 
@@ -59,42 +65,45 @@ We've already added [ioredis](https://github.com/luin/ioredis) as a dependency. 
 Create the file `src/lib/redis.ts`. This file initializes the Redis client and exports it for use by other functions. It also contains some helper functions for getting keys. Add the code below to the file.
 
 ```tsx
-import Redis from "ioredis";
+import Redis from 'ioredis';
+import { REDIS_CONNECTION } from '$env/static/private';
 
-const connectionString = process.env["REDIS_CONNECTION"];
-
-export const MOVIE_IDS_KEY = "movie_ids";
+export const MOVIE_IDS_KEY = 'movie_ids';
 
 /** Return the key used to store movie details for a given ID in Redis */
-export function getMovieKey(id): string {
-  return `movie:${id}`;
+export function getMovieKey(id: number): string {
+	return `movie:${id}`;
 }
 
-export default connectionString ? new Redis(connectionString) : new Redis();
+export default REDIS_CONNECTION ? new Redis(REDIS_CONNECTION) : new Redis();
 ```
 
 Note that this implementation creates a single Redis client per serverless instance. Another option is to create and close a [Redis connection per request](https://blog.upstash.com/serverless-database-connections?utm_source=geoff1). Upstash also has a [REST API](https://docs.upstash.com/features/restapi?utm_source=geoff1) that does not require you to initialize a Redis connection. The best option depends on your app's latency and memory requirements.
 
-Go to the `/src/routes/movie/[id].json.ts` file. Import the Redis client and the `getMovieKey` function from `redis.ts`.
+Go to the `/src/routes/movie/[id=id]/+page.server.ts` file. Import the Redis client and the `getMovieKey` function from `redis.ts`.
 
 ```tsx
-import redis, { getMovieKey } from "$lib/redis";
+import redis, { getMovieKey } from '$lib/redis';
 ```
 
 Take a look at the `getMovieDetailsFromApi` function. It calls the TMDB API to get movie details and credits and returns them. Before returning the data, we want to store it in our Redis cache so that next time we retrieve the cached version instead of calling the API. Add a new `cacheMovieResponse` function to the file to cache the data in Redis.
 
 ```tsx
-async function cacheMovieResponse(id: number, movie, credits) {
-  try {
-    const cache: MovieDetails = {
-      movie,
-      credits,
-    };
-    // store movie response for 24 hours
-    await redis.set(getMovieKey(id), JSON.stringify(cache), "EX", 24 * 60 * 60);
-  } catch (e) {
-    console.log("Unable to cache", id, e);
-  }
+async function cacheMovieResponse(
+	id: number,
+	movie: TMDB.Movie,
+	credits: TMDB.MovieCreditsResponse
+) {
+	try {
+		const cache: MovieDetails = {
+			movie,
+			credits
+		};
+		// store movie response for 24 hours
+		await redis.set(getMovieKey(id), JSON.stringify(cache), 'EX', 24 * 60 * 60);
+	} catch (e) {
+		console.log('Unable to cache', id, e);
+	}
 }
 ```
 
@@ -106,77 +115,66 @@ We can now use the new `cacheMovieResponse` function inside `getMovieDetailsFrom
 
 ```tsx
 async function getMovieDetailsFromApi(id: number) {
-  const [movieResponse, creditsResponse] = await Promise.all([
-    getMovieDetails(id),
-    getCredits(id),
-  ]);
-  if (movieResponse.ok) {
-    const movie = await movieResponse.json();
-    const credits = await creditsResponse.json();
+	const [movieResponse, creditsResponse] = await Promise.all([getMovieDetails(id), getCredits(id)]);
+	if (movieResponse.ok) {
+		const movie = await movieResponse.json();
+		const credits = await creditsResponse.json();
 
-    // add this line
-    await cacheMovieResponse(id, movie, credits);
+		// add this line
+		await cacheMovieResponse(id, movie, credits);
 
-    return {
-      movie,
-      credits,
-    };
-  }
+		return {
+			movie,
+			credits
+		};
+	}
 
-  return {
-    status: movieResponse.status,
-  };
+	console.log('Bad status from API', movieResponse.status);
+	throw error(500, 'unable to retrieve movie details from API');
 }
 ```
+
+If we get a bad response from the API, we use SvelteKit's `error` helper to [show an error page](https://kit.svelte.dev/docs/load#errors).
 
 Now we have stored data in the cache, but we still need to retrieve the cached data. Let's add a function to read the movie details from the cache.
 
 ```tsx
-async function getMovieDetailsFromCache(
-  id: number
-): Promise<MovieDetails | Record<string, never>> {
-  try {
-    const cached: string = await redis.get(getMovieKey(id));
-    if (cached) {
-      const parsed: MovieDetails = JSON.parse(cached);
-      console.log(`Found ${id} in cache`);
-      return parsed;
-    }
-  } catch (e) {
-    console.log("Unable to retrieve from cache", id, e);
-  }
-  return {};
+async function getMovieDetailsFromCache(id: number): Promise<MovieDetails | Record<string, never>> {
+	try {
+		const cached = await redis.get(getMovieKey(id));
+		if (cached) {
+			const parsed: MovieDetails = JSON.parse(cached);
+			console.log(`Found ${id} in cache`);
+			return parsed;
+		}
+	} catch (e) {
+		console.log('Unable to retrieve from cache', id, e);
+	}
+	return {};
 }
 ```
 
 Because the data was stored as a string, we need to parse it into an object to make it usable. Similar to the previous function, we log any exceptions, but do not allow them to escape the caching function. We can always fall back to retrieving data from the API.
 
-Finally, we can call our caching function in the main request handler. If we find the data in the cache, we return it right away; otherwise, we read from the API as before.
+Finally, we can call our caching function inside our [`load` function](https://kit.svelte.dev/docs/load). If we find the data in the cache, we return it right away; otherwise, we read from the API as before.
 
 ```tsx
-export const get: RequestHandler = async function ({ params }) {
-	const { id: rawId } = params;
-	// validate and sanitize the input
-	const id = parseInt(rawId);
-	if (isNaN(id)) {
-		return {
-			status: 400
-		};
-	}
+export const load: PageServerLoad = async function ({ params }) {
+  const id = parseInt(params.id ?? '');
 
-	// add these lines
-	const { movie, credits } = await getMovieDetailsFromCache(id);
-	if (movie && credits) {
-		return {
-			body: adaptResponse(movie, credits)
-		};
-	}
+  // add these lines
+  const { movie, credits } = await getMovieDetailsFromCache(id);
+  if (movie && credits) {
+    return {
+      movie: adaptResponse(movie, credits)
+    };
+  }
 
-	// fallback to the API
-	const result = await getMovieDetailsFromApi(id);
+  // fall back to the API
+  const result = await getMovieDetailsFromApi(id);
 ```
 
-You can see the final code for this endpoint in the [demo repo](https://github.com/geoffrich/movie-search-redis/blob/main/src/routes/movie/%5Bid%5D.json.ts).
+You can see the final code for this load function in the [demo repo](https://github.com/geoffrich/movie-search-redis/blob/main/src/routes/movie/%5Bid%3Did%5D/%2Bpage.server.ts).
 
 With these changes, try navigating to a movie's page. When you refresh the page, you should see "Found id in cache" in the console log, indicating that we successfully stored and retrieved that movie from the cache.
 
@@ -191,38 +189,40 @@ This isn't as simple as picking a random number between 1 and 300000 and using t
 
 The possible random movies returned will start small, but grow larger as more searches are performed.
 
-To populate the random set, update `/src/routes/search.json.ts` to the following.
+To populate the random set, update `/src/routes/search/+page.server.ts` to the following.
 
 ```tsx
-import type { RequestHandler } from "@sveltejs/kit";
-import type { SearchResponse } from "$lib/types/tmdb";
-import redis, { MOVIE_IDS_KEY } from "$lib/redis";
+import type { PageServerLoad } from './$types';
+import type { SearchResponse } from '$lib/types/tmdb';
+import redis, { MOVIE_IDS_KEY } from '$lib/redis';
+import { TMDB_API_KEY } from '$env/static/private';
 
 const VOTE_THRESHOLD = 20;
 
-export const get: RequestHandler = async function ({ query }) {
-  const searchQuery = query.get("query");
-  const page = query.get("page") ?? 1;
-  const response = await fetch(
-    `https://api.themoviedb.org/3/search/movie?api_key=${process.env["TMDB_API_KEY"]}&page=${page}&include_adult=false&query=${searchQuery}`
-  );
-  const parsed: SearchResponse = await response.json();
+export const load: PageServerLoad = async function ({ url, setHeaders }) {
+	const searchQuery = url.searchParams.get('query');
+	const page = url.searchParams.get('page') ?? 1;
+	const response = await fetch(
+		`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&page=${page}&include_adult=false&query=${searchQuery}`
+	);
+	const parsed: SearchResponse = await response.json();
 
-  // add these lines
-  const filteredMovies = parsed.results.filter(
-    (movie) => movie.vote_count >= VOTE_THRESHOLD
-  );
-  if (filteredMovies.length > 0) {
-    try {
-      await redis.sadd(MOVIE_IDS_KEY, ...filteredMovies.map((r) => r.id));
-    } catch (e) {
-      console.log(e);
-    }
-  }
+	// add these lines
+	const filteredMovies = parsed.results.filter((movie) => movie.vote_count >= VOTE_THRESHOLD);
+	if (filteredMovies.length > 0) {
+		try {
+			await redis.sadd(MOVIE_IDS_KEY, ...filteredMovies.map((r) => r.id));
+		} catch (e) {
+			console.log(e);
+		}
+	}
 
-  return {
-    body: parsed,
-  };
+	setHeaders({
+		'cache-control': 'max-age=300'
+	});
+	return {
+		searchResponse: parsed
+	};
 };
 ```
 
@@ -230,62 +230,35 @@ Note that we aren't adding _every_ movie returned to the set. I chose to filter 
 
 With this change, searching for movies will start populating the set of movie IDs. Perform some searches to add some IDs to the set. For example:
 
-- [Star Wars](http://localhost:3000/search?query=star%20wars)
-- [Lion King](http://localhost:3000/search?query=lion%20king)
-- [Spider Man](http://localhost:3000/search?query=spider%20man)
+- [Star Wars](http://localhost:5173/search?query=star%20wars)
+- [Lion King](http://localhost:5173/search?query=lion%20king)
+- [Spider Man](http://localhost:5173/search?query=spider%20man)
 
-After performing a few searches, you should have a set of random IDs stored in Redis. Let's create routes for the `/movie/random` endpoint and page.
+After performing a few searches, you should have a set of random IDs stored in Redis. Let's create a route for the `/movie/random` page. Create a folder at `src/routes/movie/random` and a `+page.server.ts` file.
 
-`src/routes/movie/random.json.ts`
+`src/routes/movie/random/+page.server.ts`
 
 ```tsx
-import type { RequestHandler } from "@sveltejs/kit";
-import redis, { MOVIE_IDS_KEY } from "$lib/redis";
+import { redirect } from '@sveltejs/kit';
+import type { PageServerLoad } from './$types';
+import redis, { MOVIE_IDS_KEY } from '$lib/redis';
 
-export const get: RequestHandler = async function () {
-  const randomId = await redis.srandmember(MOVIE_IDS_KEY);
-  return {
-    body: randomId,
-  };
+export const load: PageServerLoad = async function () {
+	const randomId = await redis.srandmember(MOVIE_IDS_KEY);
+	throw redirect(303, `/movie/${randomId}`);
 };
 ```
 
-This server endpoint uses [SRANDMEMBER](https://redis.io/commands/srandmember) to pick a random ID from the movie ID set.
+This server load function uses [SRANDMEMBER](https://redis.io/commands/srandmember) to pick a random ID from the movie ID set and [redirects](https://kit.svelte.dev/docs/load#redirects) the user to the corresponding page.
 
-`src/routes/movie/random.svelte`
-
-```html
-<script context="module" lang="ts">
-  import type { Load } from "@sveltejs/kit";
-
-  export const load: Load = async function ({ fetch }) {
-    const result = await fetch(`/movie/random.json`);
-    if (result.ok) {
-      const id = await result.json();
-      return {
-        redirect: `/movie/${id}`,
-        status: 303,
-      };
-    }
-
-    return {
-      status: result.status,
-      error: new Error("Could not retrieve random id"),
-    };
-  };
-</script>
-```
-
-The corresponding Svelte page only needs a load function since it does not render any UI. It calls the server endpoint we just added and [redirects](https://kit.svelte.dev/docs#loading-output-redirect) to the corresponding movie page.
-
-That's all there is to it! Now, navigate to [http://localhost:3000/movie/random](http://localhost:3000/movie/random). You should be automatically redirected to a random movie from the previous searches you performed. To make accessing this route easier, you can add it to the navigation in `/src/routes/__layout.svelte`
+That's all there is to it! Now, navigate to [http://localhost:5173/movie/random](http://localhost:5173/movie/random). You should be automatically redirected to a random movie from the previous searches you performed. To make accessing this route easier, you can add it to the navigation in `/src/routes/+layout.svelte`
 
 ```html
 <header>
-  <nav>
-    <a href="/">Search</a>
-    <a href="/movie/random">Random</a>
-  </nav>
+	<nav>
+		<a href="/">Search</a>
+		<a href="/movie/random">Random</a>
+	</nav>
 </header>
 ```
 
