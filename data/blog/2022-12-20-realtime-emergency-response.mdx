@@ -15,6 +15,10 @@ Ranging from emergency broadcast systems such as the [AMBER alerts](https://en.w
 
 Now, we are going to take a look at how [Redis](https://redis.com/) and serverless workloads can play a key role in building a realtime emergency response system that helps citizens find the closest bunkers, while also informing them about the capacity, features(such as disabled persons facilities) and resources(water, electricity, medicine etc.) available.
 
+
+![app](/blog/realtime-emergency-response/app.png)
+Courtesy of [Project Cloud4](https://project-cloud4-hosting.vercel.app/)
+
 ## Why serverless?
 
 The so-called [serverless](https://en.wikipedia.org/wiki/Serverless_computing) concept has been popularised among developers for the last years. We have seen an increase in the number of startups that choose to follow this architecture and also an increased adoption in large corporations. 
@@ -296,6 +300,7 @@ If you are updating from the server(ex: admin confirmations), do not forget to u
 On the server, we can use the [GET ](https://redis.io/commands/get/), [SMEMBERS](https://redis.io/commands/smembers/) and [HGETALL](https://redis.io/commands/hgetall/) commands.
 
 On the client, we can listen for messages in the channel and update the state accordingly.
+
 
 
 ## To sum up
