@@ -1,0 +1,133 @@
+---
+slug: scheduled-payments-in-web3
+title: "Building Scheduled Payments in Web3 with QStash"
+author: chillyfish
+tags: [web3, serverless, qstash, payments]
+---
+
+
+Web3 is a confusing place to be for a Web2 developer. The rules here are different here, so the solutions must be as well.
+
+In Web2, building a payroll system is easy. Ask the user for their bank account and routing number, store their information (securely), and call an API to transfer the money between their institutions. Even better, use a service like Plaid to do it all for you.
+
+In Web3, every transaction requires a one-time authorization from the user who owns the funds. No one will give you their secret key, the password that gives you complete control over the funds held in that account. Instead, it's up to us as product builders to surface the appropriate transaction details for the user to review and execute.
+
+If it's more complicated, why would we want to do things this way?
+
+Web3 is about ownership and control.
+
+The Web2 financial system is dependent on banks, who hold your assets and expose interfaces for you to manage them. That's very nice of them, but nothing in this world is free. In exchange for this service, banks get to generate interest off of the liquidity you have stored with them. They loan it out, get a return, then act like nothing ever happened. Under centralized ownership in the hands of banks you have to deal with challenges like holds on your account, pending transactions that don't settle until after a few days later (or ever), and restrictions on how much money you can move and where/when you can move it. In the case of a bank run, you may not have access to your money at all. Can that really be considered *'your'* money?
+
+Web3 promises a better financial future, where individuals control their money. Want to generate interest with your saved funds? **You** decide how much money to loan and how much risk you want to take. Want to send your money overseas? Just put in their wallet address and send it in a couple clicks.
+
+To enable a decentralized financial system, we need to build core primitives that make it easy to do things traditional finance in Web3. For a better future!
+
+## What we will build
+
+We are going to build a backend system for creating payment plans which create payment instances on a recurring schedule. We use QStash to schedule messages on a future date and consume the incoming message with a webhook handler.
+
+### API
+
+```ts
+// creates a QStash message to be sent on dueDate
+async function schedulePaymentInstance(paymentPlanId: string, dueDate: Date);
+
+// creates a payment plan and calls schedulePaymentInstance for the first payment instance
+async function createPaymentPlan(
+  frequency: number,
+  startDate: Date,
+  endDate?: Date
+);
+
+// creates a payment instance from the payment plan
+async function createPaymentInstance(paymentPlanId: string, dueDate: Date);
+```
+
+
+### Sending the message
+
+When creating a payment plan, we schedule the first upcoming payment by sending a message to QStash.
+
+First, we initialize the QStash client.
+
+```js
+import { Client } from "@upstash/qstash";
+
+const qstashClient = new Client({
+  token: process.env.QSTASH_TOKEN,
+});
+```
+
+Our message to QStash contains the `paymentPlanId` and `dueDate`. QStash also offers deduplication, so we specify the deduplication hash based on these parameters.
+
+By using QStash Topics, we can add multiple webhook listeners in the QStash console to respond to the event. For our purposes, we will only cover the creation of payment instances, but you could have another webhook endpoint which alerts a user that a payment has been scheduled or triggers a recurring reminder notification under a different QStash topic.
+
+```ts
+async function schedulePaymentInstance(paymentPlanId: string, dueDate: Date) {
+  // convert date to seconds
+  const notBefore = dueDate.getTime() / 1000;
+  // build meta
+  const body = {
+    paymentPlanId,
+    dueDate: dueDate.toISOString(),
+    deduplicationId: paymentId,
+  };
+
+  // make request to upstash
+  return await qstashClient?.publishJSON({
+    topic: "scheduled_payments",
+    body,
+    notBefore,
+  });
+}
+```
+
+### API Handler
+
+Our API handler receives a message from QStash on the due date and schedules the next payment instance.
+
+First, we initialize the QStash receiver.
+
+```js
+import { Receiver } from "@upstash/qstash";
+
+const qstashReceiver = new Receiver({
+  currentSigningKey: process.env.QSTASH_SIGNING_KEY,
+  nextSigningKey: process.env.QSTASH_NEXT_SIGNING_KEY,
+});
+```
+
+Then, we handle the message for this payment instance.
+
+```js
+async function handler(request) {
+  // verify the message comes from QStash
+  await upstashReceiver.verify({
+    signature: req.headers["upstash-signature"],
+    body: JSON.stringify(req.body),
+  });
+
+  const { paymentPlanId, dueDate } = req.body;
+
+  // create the payment due today
+  await createPaymentInstance(paymentPlanId, new Date(dueDate));
+
+  // business logic to get the next due date
+  const nextDueDate = getNextDueDate(paymentPlanId, dueDate);
+
+  if (nextDueDate) {
+    // schedule the next payment instance
+    await schedulePaymentInstance(paymentPlanId, new Date(dueDate));
+  }
+}
+```
+
+## What's next?
+
+Now, all we have to do is build a beautiful frontend to share our payment plan implementation with the world.
+
+One step closer to a fairer and more decentralized economy...
+
+Thank you Upstash for your help along the way!
+
+For more information, check out [utopialabs.com](https://www.utopialabs.com).
