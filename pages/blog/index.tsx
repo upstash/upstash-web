@@ -133,7 +133,8 @@ export default function BlogPage({
                     <Tooltip
                       label={`Filter by ${tag}`}
                       aria-label={`Filter by ${tag}`}
-                    >
+                      color="black"
+                      >
                       <Tag
                         key={tag}
                         size="lg"
