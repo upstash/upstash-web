@@ -13,12 +13,12 @@ export default function OGBlog({
   return (
     <div
       tw="flex flex-col items-stretch p-[70px] pb-[140px] h-full w-full bg-[#161616] text-white bg-no-repeat"
-      style={{
-        backgroundImage: "url(https://upstash.com/assets/bg.png)",
-        backgroundRepeat: "no-repeat",
-        backgroundSize: "cover",
-        backgroundPosition: "center center",
-      }}
+      // style={{
+      //   backgroundImage: "url(https://upstash.com/assets/bg.png)",
+      //   backgroundRepeat: "no-repeat",
+      //   backgroundSize: "cover",
+      //   backgroundPosition: "center center",
+      // }}
     >
       <header tw="flex">
         <h1 tw="m-0 leading-[1.16] text-7xl font-bold">{title}</h1>
@@ -35,7 +35,7 @@ export default function OGBlog({
             <img
               tw="w-36 h-36 rounded-full object-cover object-center border-[6px] border-black"
               alt={author.name}
-              src={author.image_url}
+              src={`https://upstash.com/${author.image_url}`}
             />
           </div>
         )}

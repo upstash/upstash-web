@@ -1,12 +1,4 @@
-import {
-  Flex,
-  HStack,
-  Text,
-  Heading,
-  Box,
-  Avatar,
-  Link,
-} from "@chakra-ui/react";
+import { Avatar, Box, Flex, Heading, HStack, Text } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { format, parseISO } from "date-fns";
 
@@ -37,7 +29,11 @@ export default function PostCard({ title, authorObj, date, slug }) {
 
       <Flex flexGrow={1} align="end" mt="32px">
         <HStack mt="auto">
-          <Avatar size="md" name={authorObj.name} src={authorObj.image_url} />
+          <Avatar
+            size="md"
+            name={authorObj.name}
+            src={`https://upstash.com/${authorObj.image_url}`}
+          />
           <Box>
             <NextLink href={`/blog/author/${authorObj.slug}`}>
               <a>
