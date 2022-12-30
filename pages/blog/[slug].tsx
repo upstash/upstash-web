@@ -180,7 +180,7 @@ export default function BlogPostPage({
             <Avatar
               size="md"
               name={post.authorObj.name}
-              src={post.authorObj.image_url}
+              src={`https://upstash.com/${post.authorObj.image_url}`}
             />
             <Box mt={4}>
               <NextLink href={`/blog/author/${post.author}`} passHref>
