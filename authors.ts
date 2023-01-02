@@ -170,4 +170,10 @@ export default {
     url: "https://twitter.com/chillyfish_dev",
     image_url: "blog/authors/chillyfish.jpg",
   },
+  andreaselia: {
+    name: "Andreas Elia",
+    title: "Full-Stack Engineer (Guest Author)",
+    url: "https://twitter.com/digitalandreas",
+    image_url: "https://pbs.twimg.com/profile_images/1495808367348137985/6pRWEZap_400x400.jpg",
+  },
 };

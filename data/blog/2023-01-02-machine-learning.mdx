@@ -1,0 +1,413 @@
+---
+slug: machine-learning
+title: "Using Machine Learning to Bring Your Stories to Life (with OpenAI and Next.js)"
+author: andreaselia
+tags: [redis, qstash, openai, nextjs]
+---
+
+#
+
+For this blog post, we'll make a few assumptions before continuing, but you should ideally have:
+
+- An [Upstash](https://upstash.com?utm_source=andreas1) account where you have a Redis and QStash instance created
+- An [OpenAI](https://openai.com) account with access to your API key
+- A [Next.js](https://nextjs.com) project where we'll create the story generator functionality
+- A [Vercel](https://vercel.com) account to deploy your project to
+
+## Introduction
+
+Have you ever wanted to generate your own stories using AI? With OpenAI's completions API and Upstash's QStash and Redis, it's now easier than ever to create your own custom stories using natural language processing. In this tutorial, we'll walk through the process of setting up and using these tools to generate unique and engaging stories.
+
+![Create Story Form Preview](https://user-images.githubusercontent.com/5033092/210117050-fafc6ce0-1d02-4901-a6e3-3fb61cb28fd4.png)
+
+View more images of the app:
+
+- [Create Story Form](https://user-images.githubusercontent.com/5033092/210116656-d9b75698-16c6-467e-a13f-5a99241b20e7.png)
+- [Generating Story State](https://user-images.githubusercontent.com/5033092/210116669-5d2e3921-d3f5-497b-97ea-b8b1dab7c09a.png)
+- [Generated Story Displayed](https://user-images.githubusercontent.com/5033092/210116642-bb4f9084-df48-4452-a8bb-8fb1d0ab85de.png)
+
+## Architecture
+
+You're likely to get a decent understanding of how the app is setup from looking through the code, but as a bit of a higher level overview, there is the image below showing some parts of the application flow and how they communicate.
+
+![App Flow](https://user-images.githubusercontent.com/5033092/210117420-ba0f8c26-cc36-4fd3-b2fc-05cb90ff2715.png)
+
+## Project Setup
+
+First up we'll want to create a Next.js project. This can be done by running the following to create a new Next.js project with TypeScript. You can find out the steps to setup Next.js [here](https://nextjs.com).
+
+For the sake of this tutorial, we also have [Tailwind CSS](https://tailwindcss.com/docs/guides/nextjs) ([forms](https://github.com/tailwindlabs/tailwindcss-forms) and [typography](https://github.com/tailwindlabs/tailwindcss-typography) too) installed, but that's totally optional and only for the frontend form styling.
+
+Next up we'll want to install Upstash's QStash and Redis libraries via the following:
+
+```bash
+npm install @upstash/qstash
+npm install @upstash/redis
+```
+
+You'll now want to create a `.env.local` file and populate it with the following keys (and the values from the relevant places).
+
+```
+SITE_URL=https://your-project-url.vercel.app
+OPENAI_API_KEY=
+QSTASH_TOKEN=
+UPSTASH_REDIS_REST_URL=
+UPSTASH_REDIS_REST_TOKEN=
+```
+
+You can find your QStash and Redis tokens in the [Upstash](https://upstash.com?utm_source=andreas1) console, the OpenAI API key [here](https://beta.openai.com/account/api-keys), and your site URL in your Vercel dashboard once you have a project created and a basic Next.js project deployed.
+
+## Frontend Setup
+
+Next up we'll create the page and form for inputting the story prompt. You'll need a text field for the prompt and a submit button.
+
+### Story Creation
+
+File: `pages/index.tsx`
+
+```tsx
+import Head from 'next/head'
+import { RefObject, useRef, useState } from 'react'
+import useInterval from '../hooks/useInterval'
+
+export default function Home() {
+  const [generating, setGenerating] = useState<boolean>(false)
+  const [messageId, setMessageId] = useState<string|null>(null)
+  const [story, setStory] = useState<string[]>([])
+  const themeRef: RefObject<HTMLInputElement> = useRef(null)
+  const characterRef: RefObject<HTMLInputElement> = useRef(null)
+  const moralRef: RefObject<HTMLInputElement> = useRef(null)
+
+  useInterval(async () => {
+    await fetch(`/api/poll?id=${messageId}`)
+      .then((res: any) => res.json())
+      .then((data: any) => {
+        if (!data.choices) {
+          return
+        }
+
+        setGenerating(false)
+        setMessageId(null)
+
+        setStory(data.choices[0].text.split('\n\n'))
+      })
+      .catch((err: any) => console.error(err))
+  }, messageId ? 1000 : null)
+
+  async function generateStory(event: any) {
+    event.preventDefault()
+
+    setGenerating(true)
+
+    await fetch('/api/create', {
+      method: 'POST',
+      body: JSON.stringify({
+        theme: themeRef.current?.value,
+        character: characterRef.current?.value,
+        moral: moralRef.current?.value,
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    })
+      .then((res: any) => res.json())
+      .then((data: any) => setMessageId(data.id))
+      .catch((err: any) => console.error(err))
+  }
+
+  return (
+    <>
+      <Head>
+        <title>StoryTime</title>
+        <meta name="description" content="A simple Next.js application which allows you to create stories using AI." />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <main>
+        <div className="my-16 flex flex-col justify-center items-center md:my-32">
+          <h1 className="text-5xl font-black">
+            StoryTime
+          </h1>
+
+          {story.length > 0 && (
+            <div className="mt-10 max-w-3xl mx-auto">
+              <div className="w-full prose lg:prose-xl">
+                {story.map((paragraph: string, index: number) => (
+                  <p key={index}>{paragraph}</p>
+                ))}
+              </div>
+
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={() => setStory([])}
+                  className="mt-6 inline-flex items-center rounded-full border border-transparent bg-gray-900 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2"
+                >
+                  Start Over
+                </button>
+              </div>
+            </div>
+          )}
+
+          {story.length == 0 && (
+            <form onSubmit={generateStory} className="mt-10 flex flex-col items-center w-full max-w-lg">
+              <div className="w-full space-y-4">
+                <div>
+                  <label htmlFor="theme" className="text-sm font-semibold">
+                    My story is about
+                  </label>
+                  <input
+                    name="theme"
+                    id="theme"
+                    type="text"
+                    className="mt-0.5 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-500 focus:ring-gray-500"
+                    placeholder="two friends going on an adventure"
+                    ref={themeRef}
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="character" className="text-sm font-semibold">
+                    My main character is
+                  </label>
+                  <input
+                    name="character"
+                    id="character"
+                    type="text"
+                    className="mt-0.5 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-500 focus:ring-gray-500"
+                    placeholder="a dog named Spot"
+                    ref={characterRef}
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="moral" className="text-sm font-semibold">
+                    The moral of my story is
+                  </label>
+                  <input
+                    name="moral"
+                    id="moral"
+                    type="text"
+                    className="mt-0.5 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-500 focus:ring-gray-500"
+                    placeholder="to always be kind"
+                    ref={moralRef}
+                    required
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={generating}
+                className="mt-6 inline-flex items-center rounded-full border border-transparent bg-gray-900 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 disabled:opacity-50"
+              >
+                {generating ? 'Generating...' : 'Generate'}
+              </button>
+            </form>
+          )}
+        </div>
+      </main>
+    </>
+  )
+}
+```
+
+This file defines a React component that displays a form that allows users to input a theme, character, and moral for a story. When the form is submitted, it sends a **POST** request to the `/api/create` endpoint with the inputted theme, character and moral values as the body.
+
+The component then enters a polling state where it sends a **GET** request to the `/api/poll` endpoint every second along with the message identifier received in the previous story creation request, which allows us to track the story creation request to the story we're polling for to check when it has finished being generated by OpenAI.
+
+When the response from the `/api/poll` endpoint contains a choices property, we know that the polling request has returned a successfully generated story, so the component stops polling and displays the story text by splitting it into paragraphs and rendering each paragraph separately.
+
+### Interval Hook
+
+File: `hooks/useInterval.ts`
+
+```ts
+import { useEffect, useRef } from 'react'
+
+function useInterval(callback: () => void, delay: number | null) {
+  const savedCallback = useRef(callback)
+
+  useEffect(() => {
+    savedCallback.current = callback
+  }, [callback])
+
+  useEffect(() => {
+    if (!delay && delay !== 0) {
+      return
+    }
+
+    const id = setInterval(() => savedCallback.current(), delay)
+
+    return () => clearInterval(id)
+  }, [delay])
+}
+
+export default useInterval
+```
+
+The `useInterval` hook makes use of the `useEffect` and `useRef` hooks to manage the interval and the callback function that works seamlessly with the React component lifecycle, as well as providing a convenient way to manage the interval and callback within a React component, optimizing performance and making the codebase that little bit more maintainable. You can find more information on this hook [here](https://usehooks-ts.com/react-hook/use-interval) and [here](https://overreacted.io/making-setinterval-declarative-with-react-hooks/).
+
+## API Setup
+
+First up we'll create the callback, poll and create files, as well as the Redis and QStash library usage.
+
+### Story Creation
+
+File: `pages/api/create.ts`
+
+```ts
+import type { NextApiRequest, NextApiResponse } from 'next'
+import qstashClient from '../../lib/qstash'
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  if (req.method !== 'POST') {
+    return res.status(400).json({
+      message: `Invalid request method: ${req.method}.`,
+    })
+  }
+
+  const { theme, character, moral }: any = req.body
+
+  qstashClient.publishJSON({
+    url: 'https://api.openai.com/v1/completions',
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${process.env.QSTASH_TOKEN}`,
+      'Content-Type': 'application/json',
+      'Upstash-Callback': `${process.env.SITE_URL}/api/callback`,
+      'Upstash-Forward-Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+    },
+    body: {
+      model: 'text-davinci-003',
+      prompt: `Write a children's story about ${theme}, which has a main character who is ${character} with the moral of the story being ${moral}.`,
+      max_tokens: 500,
+      temperature: 0.75,
+    },
+  })
+    .then((data: any) => {
+      return res.status(202).json({ id: data.messageId })
+    })
+    .catch((error: any) => {
+      return res.status(500).json({ message: error.message })
+    })
+}
+```
+
+We first check that the request method is `POST`, and sends a response with a status code of 400 (indicating a client error) if it is not. We then proceed to destructure the theme, character, and moral fields from the body of the request.
+
+Next up we call the `publishJSON` method on the `qstashClient` object, which sends a `POST` request to the OpenAI API with a JSON body containing a prompt to generate a children's story based on the values of theme, character, and moral. It also sets several headers, including an authorization header with a token stored in the `QSTASH_TOKEN` environment variable, and a forwarded authorization header for passing through the `OPENAI_API_KEY` which will be used alongside the OpenAI API request.
+
+We then return the message ID of the request if the `publishJSON` call is successful, which will be used for polling to check when the request is finished. If an error occurs, it sends a response with a status code of 500 (indicating an internal server error) and the relevant error message.
+
+### Callback
+
+File: `pages/api/callback.ts`
+
+```ts
+import type { NextApiRequest, NextApiResponse } from 'next'
+import redis from '../../lib/redis'
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  const { body }: any = req
+
+  try {
+    const decoded = Buffer.from(body.body, 'base64').toString('utf-8')
+
+    await redis.set(body.sourceMessageId, decoded)
+
+    return res.status(200).send(decoded)
+  } catch (error) {
+    return res.status(500).json({ error })
+  }
+}
+```
+
+First off, we first try to decode the body of the incoming request, which will be a base64-encoded string, and if successful, it stores the decoded string in Redis under the same key as what was returned when we sent the initial request to QStash.
+
+Finally, we send return a response with a status code of 200 (indicating success) as well as the decoded string. If any errors occur, we will return a response with a status code of 500 (indicating an internal server error) and the error message.
+
+### Polling
+
+File: `pages/api/poll.ts`
+
+```ts
+import type { NextApiRequest, NextApiResponse } from 'next'
+import redis from '../../lib/redis'
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  const { id }: any = req.query
+
+  try {
+    const data = await redis.get(id)
+
+    if (!data) {
+      return res.status(404).json({ message: 'Data for supplied ID not found' })
+    }
+
+    return res.status(200).json(data)
+  } catch (error: any) {
+    return res.status(500).json({ message: error.message })
+  }
+}
+```
+
+First up, we destructure the  `id` from the query object of the request. We then try to retrieve the data stored in Redis under the destructured `id` and if no data is found, it sends a response with a status code of 404 (indicating that the requested resource could not be found) and a message stating so.
+
+If data is found belonging to the given key, it sends a response with a status code of 200 (indicating success), and the found data along with it. If any error occurs, we return a response with a status code of 500 (indicating an internal server error) and the relevant error message.
+
+### Libs
+
+Next up, we'll create two files for creating the QStash and Redis clients, which are used within the story generation process. Both files export an object that is used to interact with the respective external service.
+
+File: `lib/qstash.ts`
+
+```ts
+import { Client } from '@upstash/qstash'
+
+const qstashClient = new Client({
+  token: process.env.QSTASH_TOKEN as string,
+})
+
+export default qstashClient
+```
+
+The QStash client is initialized with a token stored in the `QSTASH_TOKEN` environment variable. This object can be used to send HTTP requests to the Upstash QStash service.
+
+File: `lib/redis.ts`
+
+```ts
+import { Redis } from '@upstash/redis'
+
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL as string,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN as string,
+})
+
+export default redis
+```
+
+The Redis client is initialized with a URL and token stored in the `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` environment variables, respectively. This object can be used to store and retrieve data in a Redis database through the Upstash Redis REST API.
+
+## Conclusion
+
+With OpenAI's completions API, as well as Upstash's QStash and Redis, it's easy to generate custom stories using natural language processing. By following this tutorial, you should now be able to set up your own system for generating stories using these tools, and make your own changes and improvements upon it.
+
+You can view the source code in its entirety [here](https://github.com/andreaselia/storytime).
+
+## Further Improvements
+
+Below are a few ideas on what you could do next, using this story generator as a start:
+
+- Update the frontend styling to be a lot more visually appealing and colourful
+- Add Dall-E image generation using OpenAI to the stories based on a given prompt
+- Hook the output up to a book printing service via an API, so users can order physical books
+
+There are so many possibilities and directions you could take this, so have fun and enjoy the process. You can even use the work so far as a base for other projects that could make use of OpenAI, QStash and Redis.
