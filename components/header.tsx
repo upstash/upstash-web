@@ -61,15 +61,7 @@ function Header({ onOpen }: { onOpen: () => void }) {
               </Link>
 
               <Link href="/blog" color="inherit" alignItems="baseline">
-                <Text as="span">Blog</Text>{" "}
-                <Badge
-                  ml={1}
-                  variant="subtle"
-                  colorScheme="green"
-                  fontWeight="normal"
-                >
-                  New
-                </Badge>
+                <Text as="span">Blog</Text>
               </Link>
 
               {/*<Link href="/careers" color="inherit" alignItems="baseline">
