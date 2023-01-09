@@ -9,6 +9,7 @@ public/workbox*
 
 .vercel
 
+.env
 
 # Contentlayer
 .contentlayer
