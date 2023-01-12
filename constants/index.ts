@@ -257,7 +257,7 @@ export const KAFKA_PRICES = {
 
 export const QSTASH_PRICES = {
   maxRequestPerDay: {
-    title: "Max Requests per day",
+    title: "Max Messages per day",
     description: "",
     free: "500",
     payg: "500,000",
@@ -277,13 +277,6 @@ export const QSTASH_PRICES = {
     payg: "5",
     enterprise: "20",
   },
-  maxRetentionTimeLimit: {
-    title: "Max Retention Time",
-    description: "",
-    free: "1 day",
-    payg: "7 days",
-    enterprise: "30 days",
-  },
   maxTimeout: {
     title: "Max HTTP Timeout",
     description: "How long we wait for a response from the target API",
@@ -295,7 +288,7 @@ export const QSTASH_PRICES = {
     title: "Price",
     description: "",
     free: "Free (No credit card required)",
-    payg: "$1 per 100K requests",
+    payg: "$1 per 100K messages",
     enterprise: "Custom",
   },
 };

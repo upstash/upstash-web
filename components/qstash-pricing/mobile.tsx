@@ -34,20 +34,11 @@ export default function QStashMobileTable() {
               <Title>{QSTASH_PRICES.maxRetryCount.title}</Title>
               <Text>{QSTASH_PRICES.maxRetryCount[key]}</Text>
             </Flex>
-
            
-            <Flex direction="column" align="center">
-              <Title>{QSTASH_PRICES.maxRetentionTimeLimit.title}</Title>
-              <Text>{QSTASH_PRICES.maxRetentionTimeLimit[key]}</Text>
-            </Flex>
-
- 
             <Flex direction="column" align="center">
               <Title>{QSTASH_PRICES.maxTimeout.title}</Title>
               <Text>{QSTASH_PRICES.maxTimeout[key]}</Text>
             </Flex>
-
-
 
             <Flex direction="column" align="center">
               <Title>{QSTASH_PRICES.price.title}</Title>
