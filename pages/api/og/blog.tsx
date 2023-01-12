@@ -1,6 +1,6 @@
 import { ImageResponse } from "@vercel/og";
 import OGBlog from "components/og-blog";
-import authors from "../../authors";
+import authors from "../../../authors";
 import type { NextRequest } from "next/server";
 
 export const config = {
@@ -8,10 +8,10 @@ export const config = {
 };
 
 const FontInterRegular = fetch(
-  new URL("../../public/static/fonts/Inter-Regular.ttf", import.meta.url)
+  new URL("../../../public/static/fonts/Inter-Regular.ttf", import.meta.url)
 ).then((res) => res.arrayBuffer());
 const FontInterBold = fetch(
-  new URL("../../public/static/fonts/Inter-Bold.ttf", import.meta.url)
+  new URL("../../../public/static/fonts/Inter-Bold.ttf", import.meta.url)
 ).then((res) => res.arrayBuffer());
 
 export default async function handler(req: NextRequest) {

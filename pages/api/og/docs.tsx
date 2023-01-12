@@ -7,10 +7,10 @@ export const config = {
 };
 
 const FontInterRegular = fetch(
-  new URL("../../../public/static/fonts/Inter-Regular.ttf", import.meta.url),
+  new URL("../../../public/static/fonts/Inter-Regular.ttf", import.meta.url)
 ).then((res) => res.arrayBuffer());
 const FontInterBold = fetch(
-  new URL("../../../public/static/fonts/Inter-Bold.ttf", import.meta.url),
+  new URL("../../../public/static/fonts/Inter-Bold.ttf", import.meta.url)
 ).then((res) => res.arrayBuffer());
 
 export default async function handler(req: NextRequest) {
@@ -19,6 +19,7 @@ export default async function handler(req: NextRequest) {
 
   try {
     const docsUrl = new URL(req.url).searchParams.get("url");
+
     if (!docsUrl) {
       throw new Error("url parameter must be set");
     }
@@ -26,10 +27,12 @@ export default async function handler(req: NextRequest) {
     const title = await getPageTitle(docsUrl);
 
     return new ImageResponse(
-      <OGDoc
-        title={title}
-        product={new URL(docsUrl).pathname.replace(/^\//, "")}
-      />,
+      (
+        <OGDoc
+          title={title}
+          product={new URL(docsUrl).pathname.replace(/^\//, "")}
+        />
+      ),
       {
         // debug: true,
         width: 1200,
@@ -49,11 +52,9 @@ export default async function handler(req: NextRequest) {
           },
         ],
         headers: {
-          "Cache-Control": "s-maxage=3600"
-        }
-      },
-
-
+          "Cache-Control": "s-maxage=3600",
+        },
+      }
     );
   } catch (e: any) {
     return new Response(`Failed to generate the image`, {
@@ -64,7 +65,7 @@ export default async function handler(req: NextRequest) {
 
 /**
  * Fetch the docs page and parse its content to get the page title
- * 
+ *
  */
 async function getPageTitle(url: string): Promise<string> {
   const fallbackTitle = "Upstash Documentation";
