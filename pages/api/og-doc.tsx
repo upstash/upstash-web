@@ -7,10 +7,10 @@ export const config = {
 };
 
 const FontInterRegular = fetch(
-  new URL("../../../public/static/fonts/Inter-Regular.ttf", import.meta.url)
+  new URL("../../public/static/fonts/Inter-Regular.ttf", import.meta.url)
 ).then((res) => res.arrayBuffer());
 const FontInterBold = fetch(
-  new URL("../../../public/static/fonts/Inter-Bold.ttf", import.meta.url)
+  new URL("../../public/static/fonts/Inter-Bold.ttf", import.meta.url)
 ).then((res) => res.arrayBuffer());
 
 export default async function handler(req: NextRequest) {
