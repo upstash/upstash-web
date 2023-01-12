@@ -71,7 +71,7 @@ export const Post = defineDocumentType(() => ({
     metaImage: {
       type: "string",
       resolve: (doc) => {
-        return `https://upstash.com/api/og-blog?title=${doc.title}&author=${doc.author}`;
+        return `https://upstash.com/api/og/blog?title=${doc.title}&author=${doc.author}`;
       },
     },
     headings: {
