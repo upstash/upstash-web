@@ -1,0 +1,86 @@
+---
+slug: powering-envshare
+title: "How Upstash is powering EnvShare"
+author: andreas
+tags: [redis, edge, nextjs, vercel, environment, variable, env]
+---
+
+
+
+[envshare.dev](https://envshare.dev) is an open source project allowing developers to share environment variables securely with anyone.
+You can upload your `.env` file or type in your environment variables and they will be encrypted before being stored in a database.
+You can then share the link with anyone and they will be able to decrypt the environment variables.
+
+EnvShare is free to use and open source. You can find the code on [GitHub](https://github.com/chronark/envshare).
+
+
+
+## Features
+
+- **Sharable Links:** Share your environment variables securely by sending a link
+- **End-to-End Encryption:** AES encryption is used to encrypt your data before storing it
+- **Limit number of reads:** Limit the number of times a link can be read and encrypted
+- **Auto Expire:** Automatically expire links and delete data after a certain time
+
+
+
+## How it works
+
+Every time you want to share your environment variables, a new random encryption key is generated in the browser. 
+Your sensitive data is encrypted using [AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard) and then stored in Redis.
+
+Afterwards, a unique document id is combined with the encryption key to form a shareable link, that you can use to access and decrypt your data.
+
+![EnvShare](/blog/envshare/arch.png)
+
+
+## Data
+
+EnvShare uses Redis to store the encrypted environment variables. Redis is great because it can be used as a fast key-value store, but also offers more complex data structures like lists, sets, and hashes.
+It also automatically removes expired keys, which is perfect for our use case.
+
+The data is stored in a Redis hash with the following structure:
+
+```json
+{
+  "remainingReads": 20, // Optional, the number of times the link can be read
+  "encrypted": "...", // The encrypted environment variables
+  "iv": "...", // The initialization vector for AES-CBC
+}
+```
+
+Using a hash allows us to store some metadata along with the encrypted data and also to atomically decrement the remaining reads with `HINCRBY`.
+Redis is incredibly flexible and allows for fast iteration and implementation of new ideas. For example in the future we might want to add something like an access log. A [sorted set](https://redis.io/docs/data-types/sorted-sets/) would be a great fit for this.
+
+The only problem is that Redis is usually only available over TCP, which does not work in our edge-functions. Luckily, Upstash offers a Redis API that can be used to access [Redis over HTTP](https://docs.upstash.com/redis/features/restapi). This is exactly what we need for EnvShare.
+Upstash offers a free Redis database with 10,000 requests per day. This is more than enough for us, and if you want to host EnvShare yourself, you can get a free account [here](https://console.upstash.com).
+Check out the selfhosting guide [here](https://envshare.dev/deploy)
+
+Setting up Redis in our edge-functions is easy. We just need to [create a database](https://console.upstash.com/redis) and install `@upstash/redis`.
+
+In our edge-function we can then store the data:
+
+```ts:/api/share.ts
+import { Redis } from "@upstash/redis";
+
+const redis = new Redis({
+  url: "..." // UPSTASH_REDIS_REST_URL
+  token: "..." // UPSTASH_REDIS_REST_TOKEN
+});
+
+
+await redis.hset(key, {
+  remainingReads: 20,
+  encrypted: "...",
+  iv: "...",
+});
+```
+
+## Wrapping up
+
+Thanks for reading! EnvShare is a fun project that I built to show how easy it is to get started with Next.js and Upstash Redis. I hope you like it and find it useful. If you have any questions or feedback, feel free to reach out to me on [Twitter](https://twitter.com/chronark_).
+
+Relevant links:
+- [EnvShare](https://envshare.dev)
+- [GitHub](https://github.com/chronark/envshare)
+- [Deployment Guide](https://envshare.dev/deploy)
