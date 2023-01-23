@@ -1,0 +1,91 @@
+---
+slug: edge-flags-middleware
+title: Using Edge Flags in Next.js Middleware
+author: andreas
+tags: [redis, edge, nextjs, middleware]
+---
+
+
+Edge-Flags allow you to easily manage feature flags for your serverless applications. It's built on top of Upstash Redis with powerful geolocation rules.
+Today I'll show you a very simple example of how you can use Edge-Flags in a Next.js middleware to rewrite requests based on the location of the user.
+
+
+
+## Create the flag
+
+In our example app we only want to make content available to our users in the EU, so we'll [create](https://console.upstash/redis?new=true) a new Redis database and then go to the [edge-flags](https://console.upstash.com/edge-flags) page.
+Select the created database and the `production` environment.
+
+Then we can create a new flag named `eu-countries` and add the all countries within the EU.
+
+![Edge-Flags](/blog/edge-flags-middleware/flag.png)
+
+
+## Setup and install the packages
+
+1. If you don't have an existing Next.js app, you can create one  with `npx create-next-app` and install the `@upstash/edge-flags` and `@upstash/redis` packages:
+```sh-session
+$ npm install @upstash/edge-flags @upstash/redis
+```
+
+2. Create a new file `middleware.ts` in the root of your project and add the following code:
+```ts:/middleware.ts
+import { NextRequest, NextResponse } from "next/server";
+import { Redis } from "@upstash/redis";
+import { Client as EdgeFlags } from "@upstash/edge-flags";
+
+const edgeFlags = new EdgeFlags({ redis: Redis.fromEnv() });
+export default async function middleware(req: NextRequest): Promise<NextResponse> {
+    const enabled = await edgeFlags.getFlag("eu-countries", req.geo ?? {}).catch(err => {
+        console.error(err)
+        return false
+    })
+
+    if (!enabled) {
+        const url = new URL(req.url);
+        url.pathname = "/blocked";
+        return NextResponse.rewrite(url);
+    }
+
+    return NextResponse.next();
+}
+
+export const config = {
+    matcher: "/",
+};
+```
+
+3. Create a very sophisticated `/blocked` page
+```tsx:app/blocked/page.tsx
+export default function Page() {
+  return <div> You are not in the EU</div>;
+}
+```
+
+Now all that's left is to deploy the project to Vercel:
+```sh-session
+$ npx vercel
+```
+
+Make sure to add the environment variables to Vercel either by copying them from the [Upstash console](https://console.upstash.com/redis) or by using the [Upstash integration](https://vercel.com/integrations/upstash).
+
+![Vercel](/blog/edge-flags-middleware/vercel-env.png)
+
+
+
+## Test it out
+
+<Note title="Geolocation in development">
+  Geolocation data is not avaiable when developing locally. You need to actually deploy the app to Vercel to test it out.
+</Note>
+
+Now you can test it out by visiting the index page of your app. If you're in the EU you should see the content, otherwise you'll be redirected to the `/blocked` page.
+
+
+
+## Links
+
+- [Edge-Flags](https://upstash.com/blog/edge-flags-beta)
+- [Example Code](https://github.com/upstash/edge-flags/tree/main/examples/middleware-rewrites)
+- [Example App](https://edge-flags-middleware-rewrites.vercel.app/)
+
