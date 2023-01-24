@@ -1,0 +1,81 @@
+---
+slug: realtime-code-sharing
+title: Realtime Code Sharing with Upstash
+author: tudor
+tags: [redis, nextjs]
+---
+
+## Introduction
+
+Did you ever wonder how platforms like [Codeshare](https://codeshare.io) are built? Did you ever try to tackle the challenges of scaling a service like that while maintaining a good developer experience for yourself?
+When I decided to build [Bytecrowds](https://www.bytecrowds.com), I had to learn how to do all these. Doing rigorous research followed by the decision to use [Yjs](https://docs.yjs.dev) for providing text-sharing capabilities, it came time to choose a database. With so many options available on the market, I narrowed down the list using one essential keyword: **simplicity**
+
+## Why Upstash?
+
+Even before discovering Upstash, I was interested in Redis for its simple API. However, using it as a primary database comes with challenges like scaling(you might need this for caching too) and maintaining persistence. At the same time, before securing any sponsorship, you have to be very careful about budgeting an open-source software. Will you pay for the computing power even if it's not used at times? Can you handle a sudden traffic spike and be ready to spend hours working on infrastructure instead of working toward publishing new features, improving existing ones, or fixing some bugs? I, for one, wasn't. So I found Upstash.
+
+The Upstash [Redis](https://docs.upstash.com/redis) offering matches 3 of my essential criteria: it's **easy to use**, **easy to scale**, and **flexible**. Combine that with [low latency](https://upstash.com/fast), out of the box [REST sdk](https://github.com/upstash/upstash-redis) to use in serverless clients(a **requirement** for Bytecrowds too), global replication and a pay-as-you-go plan for the computing power, to name a few, and you will understand why I chose it for my project.
+
+## Using Redis across the app
+
+Let's find out how Redis can be used as the main database of a project, fulfilling the needs of multiple services. To understand the context, here is a diagram of Bytecrowds's flow:
+
+![flow](/blog/realtime-code-sharing/flow.png)
+
+It uses [Ably](https://ably.com) to sync text across clients and a custom analytics engine that collects data based on the request's IP address.
+
+### Main storage
+
+A bytecrowd takes the form of a Redis [hash](https://redis.io/docs/data-types/hashes/) with the following properties:
+
+```javascript
+{
+  text: string,
+  language: string,
+  authorizedEmails: undefined || string array
+}
+```
+
+We update the hash once one of its properties changes, with a delay of "x" seconds between updates. In production, this is currently set to 100 milliseconds.
+
+### Authentication and authorization
+
+#### Authentication
+
+As Bytecrowds uses [Next.js](https://nextjs.org), a solid choice for integrating GitHub OAuth was [Auth.js](https://authjs.dev). Fortunately, we could also leverage the [Upstash adapter](https://authjs.dev/reference/adapters/upstash-redis) for storing sessions, allowing us to use Redis all across our app.
+
+#### Authorization
+
+Bytecrowds handles authorization by creating, on demand, an  `authorizedEmails` field that is immutable from the API once set. One of the things I like about Redis is the multitude of functions available out of the box for routine operations that are also algorithmically designed to be efficient. To give an example, all we need to do to check if the  `authorizedEmails` has already been set is to use the [HEXISTS](https://redis.io/commands/hexists/) command, which has O(1) complexity.
+
+### Analytics
+
+Bytecrowds uses an analytics system that handles two categories of data:
+* a day's stats, which takes the form of a Redis hash, named like `year month day` with the following properties:
+```javascript
+{
+  countries: string array,
+  hits: integer,
+  pages: string array,
+  uniqueVisitors: integer,
+  addresses: string array,
+  continents: string array
+}  
+```
+Where `addresses` is an array of SHA256-encrypted IP addresses used to determine the unique number of website visitors.
+* 3 keys named `continents`, `countries`, and `pages` for which Redis [sorted sets](https://redis.io/docs/data-types/sorted-sets/) were used to store the data
+By storing every stat along with its count ("score", for the sorted set), we can easily query or sort them using commands like [SORT](https://redis.io/commands/sort/) or [SORT_RO](https://redis.io/commands/sort_ro/). Redis's simplicity shows again.
+
+If you're curious about the code behind this, check https://github.com/Bytecrowds/analytics/blob/main/src/index.js
+
+**Note**: In a more complex scenario, you'd probably apply some changes to this system, like storing the raw data before processing and using some sort of stream processing tool like [Apache Kafka](https://kafka.apache.org) (Upstash can take care of this too, check the [docs](https://docs.upstash.com/kafka)). 
+
+## See it live
+
+Want to see Bytecrowds in action? Go to https://www.bytecrowds.com, click on the "new bytecrowd" button and open the link in multiple tabs. When you start writing, you'll see that the code is replicated across all of the connected clients.
+
+## Ending
+
+It's no secret that being the sole active maintainer of an open-source project is hard, but having the right tools and an auto-scaling infrastructure can be a great support that backs you up to continue working on awesome projects, without having to worry about traffic spikes. Already convinced to give Upstash Redis a try? [Sign up](https://console.upstash.com/) for a free account, no credit card is required.
+
+To see the full code, check the GitHub [repository](https://github.com/Bytecrowds/bytecrowds). If you have any questions or feedback about this article, reach out to me at tudor.zgimbau@gmail.com.
