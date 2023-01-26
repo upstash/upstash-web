@@ -5,6 +5,7 @@ author: enes
 tags: [redis, database, serverless, cloudflare workers, cloudflare]
 ---
 
+
 If you are using Cloudflare Workers, [Upstash Global Redis](https://docs.upstash.com/redis/features/globaldatabase) and [Workers KV](https://www.cloudflare.com/products/workers-kv/) are probably your best options to keep your data. In this post, I will briefly compare them as a data store for your Cloudflare Workers functions.
 
 ### Feature Set
@@ -24,8 +25,7 @@ Upstash Redis has much larger API, including Strings, Sets, Lists, Hashes, Sorte
 
 Upstash Global Redis:
 
-- $0.4 per 100K reads
-- $2 per 100K writes
+- $4 per 1M commands
 - Storage: $0.25/ GB-month
 
 Cloudflare Workers KV:
@@ -42,7 +42,7 @@ Workers KV is only supported in Cloudflare Workers.
 
 ### Read Latency
 
-Upstash Global distributes the data to 5 regions (North Virginia, Oregon, Frankfurt, Singapore, São Paulo). Depending on the location of the client, the read latency ranges from 10 to 80 milliseconds.
+Upstash Global distributes the data to 8 regions (North Virginia, Oregon, Frankfurt, Singapore, São Paulo, Ireland, California, Australia). Depending on the location of the client, the read latency ranges from 10 to 80 milliseconds.
 Client locations and read latency:
 
 - US: 10-20 msec
