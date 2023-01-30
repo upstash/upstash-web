@@ -16,14 +16,14 @@ Edge runtimes, such as Cloudflare Workers and Vercel Edge, provide speed by exec
 Global database is designed to minimize the latency for reads. A database has a single primary replica and multiple read replicas. A write command is sent and processed at the primary replica. Then it is replicated to all read replicas. When a client sends a read command, it fetches the response from the nearest read replica (region).  Meanwhile, all write requests go to the primary replica for consistency.
 
 Our tests show sub-millisecond latency for clients within the same AWS region as the Redis instance.
-{/* 
+
 **Reads are processed from the nearest replica.**
 
 ![reads.png](/blog/global2/reads.png)
 
 **Writes are processed at the primary.**
 
-![writes.png](/blog/global2/writes.png) */}
+![writes.png](/blog/global2/writes.png)
 
 
 ### Choose your regions
@@ -45,7 +45,7 @@ Here the regions supported currently:
 - AWS AP-SouthEast-2 Sydney
 - AWS SA-East-1 São Paulo
 
-{/* ![Screen Shot 2023-01-29 at 8.39.00 PM.png](/blog/global2/Screen_Shot_2023-01-29_at_8.39.00_PM.png) */}
+![Screen Shot 2023-01-29 at 8.39.00 PM.png](/blog/global2/Screen_Shot_2023-01-29_at_8.39.00_PM.png) 
 
 ### Pricing
 
