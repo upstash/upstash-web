@@ -29,7 +29,7 @@ export default {
   },
   geoff: {
     name: "Geoff Rich",
-    title: "Guest Author",
+    title: " Svelte core team member (Guest Author)",
     url: "https://geoffrich.net/",
     image_url: "blog/authors/geoff.jpg",
   },

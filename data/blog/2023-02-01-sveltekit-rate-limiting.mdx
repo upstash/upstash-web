@@ -1,0 +1,216 @@
+---
+slug: sveltekit-rate-limiting
+title: Rate limit your SvelteKit app with Upstash Redis
+author: geoff
+tags: [redis, rate-limit, svelte, sveltekit]
+---
+
+Rate limiting is an important security measure for publicly exposed endpoints, especially if they perform intensive operations or call an external API that bills based on usage. In this post, I’ll show you how to rate limit your [SvelteKit](https://kit.svelte.dev/) application using Upstash Redis.
+
+If you want to skip to the end, the final code [is on GitHub](https://github.com/geoffrich/sveltekit-rate-limiting).
+
+## Setting up the project
+
+To get started, run the following command in a terminal to scaffold a new SvelteKit project. Select the “Skeleton project” option and “TypeScript” for type-checking. Set up the rest of the options as you like — if you don’t have a preference, choose the default option.
+
+```bash
+npm create svelte@latest sveltekit-rate-limit
+```
+
+Then follow the listed steps to install dependencies and start the dev server.
+
+```bash
+cd sveltekit-rate-limit
+npm install
+git init && git add -A && git commit -m "Initial commit"
+npm run dev -- --open
+```
+
+First, let’s create a `<form>` and associated [form action](https://kit.svelte.dev/docs/form-actions). Add the following code to your root page at `/src/routes/+page.svelte`
+
+```html
+<script lang="ts">
+	import type { ActionData } from './$types';
+	import { enhance } from '$app/forms';
+
+	export let form: ActionData;
+
+	let submitCount = 0;
+</script>
+
+<h1>Home</h1>
+
+<form
+	method="POST"
+	use:enhance={() => {
+		submitCount++;
+		return ({ update }) => {
+			// prevent resetting the form after submission
+			update({ reset: false });
+		};
+	}}
+>
+	<label for="text">Submission</label>
+	<input id="text" type="text" name="text" />
+	<button>Go</button>
+</form>
+
+<p>Submitted {submitCount} times</p>
+
+{#if form?.error}
+	{form.error}
+{:else if form?.result}
+	<p>Transformed: {form.result}</p>
+{/if}
+```
+
+This code adds a form to the page to submit a value to our server. Create a `+page.server.ts` with the following content to handle the form submission.
+
+```tsx
+import type { Actions } from "./$types";
+
+export const actions: Actions = {
+  default: async (event) => {
+    const data = await event.request.formData();
+    const text = (data.get("text") as string) ?? "";
+    const result = performExpensiveOperation(text);
+    return {
+      result
+    };
+  }
+};
+
+const wordSeparators =
+  /[\s\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\-.\/:;<=>?@\[\]^_`{|}~]+/;
+const capitals = /[A-Z\u00C0-\u00D6\u00D9-\u00DD]/g;
+
+// credit to https://github.com/angus-c/just/blob/master/packages/string-snake-case/index.mjs
+function performExpensiveOperation(text: string) {
+  text = text.replace(capitals, function (match) {
+    return " " + (match.toLowerCase() || match);
+  });
+  return text.trim().split(wordSeparators).join("_");
+}
+```
+
+In this demo the form is only converting the provided text into [snake case](https://en.wikipedia.org/wiki/Snake_case), but you can think of the `performExpensiveOperation` function as standing in for a much more expensive action or API call.
+
+This is a fairly standard SvelteKit form, so if any of this looks unfamiliar give [the docs](https://kit.svelte.dev/docs/form-actions) a read.
+
+If you navigate to where the dev server is running and submit a value with the form, you should see the value transformed into snake case. For example, submitting “the quick brownFoxJumped over-the-lazy-dog” should show “the_quick_brown_fox_jumped_over_the_lazy_dog” when you submit the form.
+
+This works great! However, there’s an issue — people can submit as many requests as they want to our endpoint. For this demo, that’s not a big deal, since it’s a simple operation. However, if we were doing something that took a lot of time, or calling another service that charged based on the number of API calls, then we would want to limit the number of requests that individual users can make.
+
+One way to do that is with Upstash’s [rate limiting SDK](https://github.com/upstash/ratelimit), which tracks the number of requests a user makes in a Redis database and tells you if they’ve gone over the limit.
+
+## Adding rate limiting to our form action
+
+First, set up a new Redis database via the [Upstash console](https://console.upstash.com/) and retrieve the `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` environment variables. Place those variables in an `.env` file at the root of the repo.
+
+```
+UPSTASH_REDIS_REST_URL=URL_GOES_HERE
+UPSTASH_REDIS_REST_TOKEN=TOKEN_GOES_HERE
+```
+
+Then, install the necessary dependencies for Upstash.
+
+```bash
+npm i @upstash/redis @upstash/ratelimit -D
+```
+
+At the top of our `+page.server.ts` file, import the necessary dependencies and initialize the database and rate limiter.
+
+```tsx
+import { building } from "$app/environment";
+import { Redis } from "@upstash/redis";
+import { Ratelimit } from "@upstash/ratelimit";
+import {
+  UPSTASH_REDIS_REST_TOKEN,
+  UPSTASH_REDIS_REST_URL
+} from "$env/static/private";
+import { fail } from "@sveltejs/kit";
+
+let redis: Redis;
+let ratelimit: Ratelimit;
+
+if (!building) {
+  redis = new Redis({
+    url: UPSTASH_REDIS_REST_URL,
+    token: UPSTASH_REDIS_REST_TOKEN
+  });
+
+  ratelimit = new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(5, "10 s")
+  });
+}
+```
+
+A few things to note:
+
+- We import the environment variables using SvelteKit’s [$env module](https://kit.svelte.dev/docs/modules#$env-static-private) for environment variables. In this case we’re using static environment variables, which requires your variables to be available at build time. If this is not the case, you should use [dynamic environment variables](https://kit.svelte.dev/docs/modules#$env-dynamic-private) instead.
+- We’re using the sliding window rate limiting strategy and allowing 5 requests every 10 seconds. The `@upstash/ratelimit` package has a variety of strategies available with different pros and cons, which you can read about [in the documentation](https://github.com/upstash/ratelimit#ratelimiting-algorithms).
+- We initialize our Redis client when the app starts up, instead of creating a new one per-request. While doing this, we first check if we’re [building the app](https://kit.svelte.dev/docs/modules#$app-environment-building) so we don’t initialize the client when the app builds. During the build process, SvelteKit imports all our code to analyze it.
+
+With that, we can use the rate limiter in our action and return an error response if the user has made too many requests. The rate limiter needs to group requests using an identifier — in this case, we use the IP address of the request.
+
+```tsx
+export const actions: Actions = {
+  default: async (event) => {
+    // add this part
+    const ip = event.getClientAddress();
+    const rateLimitAttempt = await ratelimit.limit(ip);
+    if (!rateLimitAttempt.success) {
+      const timeRemaining = Math.floor(
+        (rateLimitAttempt.reset - new Date().getTime()) / 1000
+      );
+      return fail(429, {
+        error: `Too many requests. Please try again in ${timeRemaining} seconds.`
+      });
+    }
+
+    // the rest is as before
+    const data = await event.request.formData();
+    const text = (data.get("text") as string) ?? "";
+    const result = performExpensiveOperation(text);
+    return {
+      original: text,
+      result
+    };
+  }
+};
+```
+
+You can test this out by loading up the page and clicking the submit button quickly. After a few times, you should see an error message telling you that you’ve been rate limited.
+
+It’s important to note that this does not prevent requests to the app itself. What it does prevent is the app from doing further work once the request comes in, e.g. calling an expensive API or performing some intensive work.
+
+## Going further
+
+In this tutorial we protected a single form action. You can apply the same method to protect [load functions](https://kit.svelte.dev/docs/load) or [server routes](https://kit.svelte.dev/docs/routing#server). If you want to rate limit requests to your entire application, you can use a custom [handle hook](https://kit.svelte.dev/docs/hooks#server-hooks-handle):
+
+```tsx
+import { type Handle, error } from "@sveltejs/kit";
+
+export const handle = (async ({ event, resolve }) => {
+  const ip = event.getClientAddress();
+  const rateLimitAttempt = await ratelimit.limit(ip);
+  if (!rateLimitAttempt.success) {
+    const timeRemaining = Math.floor(
+      (rateLimitAttempt.reset - new Date().getTime()) / 1000
+    );
+    throw error(
+      429,
+      `Too many requests. Please try again in ${timeRemaining} seconds.`
+    );
+  }
+  const response = await resolve(event);
+  return response;
+}) satisfies Handle;
+```
+
+You can inspect the [event](https://kit.svelte.dev/docs/types#public-types-requestevent) argument to determine whether to limit the request, for instance if you wanted to only limit requests that matched a given URL.
+
+There is an [open SvelteKit feature request](https://github.com/sveltejs/kit/issues/8764) for rate limiting to be provided by SvelteKit itself, though isn’t a clear solution since SvelteKit doesn’t come with a database.
+
+This tutorial only scratched the surface of the `@upstash/ratelimit` package — consult the [full documentation](https://github.com/upstash/ratelimit#ratelimiting-algorithms) for additional options and considerations.
