@@ -176,4 +176,10 @@ export default {
     url: "https://twitter.com/digitalandreas",
     image_url: "blog/authors/andreaselia.jpeg",
   },
+  bilaltahir: {
+    name: "Bilal Tahir",
+    title: "Front-end developer (Guest Author)",
+    url: "https://twitter.com/deepwhitman",
+    image_url: "blog/authors/bilaltahir.jpeg",
+  },
 };
