@@ -176,4 +176,10 @@ export default {
     url: "https://twitter.com/digitalandreas",
     image_url: "blog/authors/andreaselia.jpeg",
   },
+  thomasCazade:{
+    name:"Thomas Cazade",
+    title:"Founder of fastsheet",
+    url:"https://twitter.com/TotomInc",
+    image_url:"blog/authors/thomas_cazade.jpeg",
+  }
 };
