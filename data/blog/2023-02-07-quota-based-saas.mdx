@@ -143,8 +143,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // Retrieve the user's quota from Redis.
   const quota = await redis.incr(quotaKey);
 
-  // If this is the first time the user makes an API request the returned value
-  // will be 1 and we set the expiration to 1 day.
+  // If the key did not exist before, the returned value will be 1 
+  // and we set the expiration to 1 day.
   if (quota === 1){
     await redis.expire(quotaKey, 60 * 60 * 24);
   }
