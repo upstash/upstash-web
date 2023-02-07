@@ -182,4 +182,10 @@ export default {
     url:"https://twitter.com/TotomInc",
     image_url:"blog/authors/thomas_cazade.jpeg",
   }
+  bilaltahir: {
+    name: "Bilal Tahir",
+    title: "Front-end developer (Guest Author)",
+    url: "https://twitter.com/deepwhitman",
+    image_url: "blog/authors/bilaltahir.jpeg",
+  },
 };
