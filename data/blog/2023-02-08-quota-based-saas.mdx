@@ -101,11 +101,11 @@ This is not optimal for many reasons:
 
 ## Using Upstash to increase the user's quota
 
-To solve this problem, we will use [Upstash Redis](https://upstash.com/) to increase the user's quota. Upstash Redis is a fast and reliable Redis database, hosted in the cloud made for serverless environments, ready for the Edge _(run code close to your users)_.
+To solve this problem, we will use [Upstash Redis](https://upstash.com/) to increase the user's quota. Upstash Redis® is a fast and reliable Redis® database, hosted in the cloud made for serverless environments, ready for the Edge _(run code close to your users)_.
 
-We will use the `INCR` Redis command to increase the user's quota by 1. This command is atomic, which means that it will only be executed once, and it will be executed fast.
+We will use the `INCR` Redis® command to increase the user's quota by 1. This command is atomic, which means that it will only be executed once, and it will be executed fast.
 
-Here is the same code as before, but using Upstash Redis to manage the user's quota:
+Here is the same code as before, but using Upstash Redis® to manage the user's quota:
 
 ```typescript
 // pages/api/spreadsheets/[id]/index.ts
@@ -159,17 +159,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 }
 ```
 
-Using Upstash Redis makes your code easily scalable, as you can leverage the power of [**Upstash Redis Edge**](https://upstash.com/blog/global-2) to run your code close to your users.
+Using Upstash Redis® makes your code easily scalable, as you can leverage the power of [**Upstash Redis® Edge**](https://upstash.com/blog/global-2) to run your code close to your users.
 
 ## Conclusion
 
-Upstash Redis makes it very easy to implement a caching system for a serverless environment.
+Upstash Redis® makes it very easy to implement a caching system for a serverless environment.
 
 We used it to implement a quota system but the original idea can be applied to much more use-cases, such as caching more database queries, or caching the results of an API request.
 
 The final goal of caching is to make your API faster and more likely to consume less resources _(e.g. Planetscale database read/writes queries)_.
 
-In a future article, we will see how to use Upstash QStash to retrieve the user's quota from Redis and store it in the database, to make sure that the user's quota is always up-to-date and not lost.
+In a future article, we will see how to use Upstash QStash to retrieve the user's quota from Redis® and store it in the database, to make sure that the user's quota is always up-to-date and not lost.
 
 ## See it live
 

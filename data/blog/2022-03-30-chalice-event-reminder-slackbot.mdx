@@ -132,7 +132,7 @@ So, this tool can be used to keep track of the special dates for team members. T
 
 ### Prepare the Database
 
-We can create our Redis database on [Upstash Console](https://console.upstash.com). Note the UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN since they will be environment variables for AWS.
+We can create our Redis® database on [Upstash Console](https://console.upstash.com). Note the UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN since they will be environment variables for AWS.
 
 ### Configuring AWS Credentials
 
@@ -497,7 +497,7 @@ Main file for functions directly related to the database.
 
 > Here, we will handle our database calls. We will fetch from the database, set key-value pairs etc. This file also helps us abstract low level details from the `app.py`, enhancing readability and modularity.
 
-#### A great thing about Upstash Redis Database is that it supports RESTFUL API calls. This way, you can access your database without the need to constantly create and close connections, which is the way to go for serverless applications.
+#### A great thing about Upstash Redis® Database is that it supports RESTFUL API calls. This way, you can access your database without the need to constantly create and close connections, which is the way to go for serverless applications.
 
 ```
 from chalicelib.utils import sendPostRequest, getRealName, allSlackUsers, diffWithTodayFromString, totalTimefromString

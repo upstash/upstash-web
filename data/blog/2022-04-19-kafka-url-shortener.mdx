@@ -7,7 +7,7 @@ tags: [serverless, kafka, materialize]
 
 This is a Node.js URL shortener app that uses [Cloudflare Workers](https://www.cloudflare.com/workers/).
 
-The app is powered by [Cloudflare Workers](https://www.cloudflare.com/workers/) and [Upstash](https://upstash.com/) Redis for storing data and Kafka for storing the click events along with [Materialize](https://materialize.com/) for real-time data analytics.
+The app is powered by [Cloudflare Workers](https://www.cloudflare.com/workers/) and [Upstash](https://upstash.com/) Redis® for storing data and Kafka for storing the click events along with [Materialize](https://materialize.com/) for real-time data analytics.
 
 [Upstash](https://upstash.com/) offers Serverless, Low latency, and pay-as-you-go solutions for Kafka and Redis.
 
@@ -18,7 +18,7 @@ The app is powered by [Cloudflare Workers](https://www.cloudflare.com/workers/) 
 The demo app has the following structure:
 
 - A serverless Cloudflare Worker that lets you add short links and redirect them to other URLs.
-- All data is stored in Upstash serverless Redis cluster as key-value pairs (short link -> long link).
+- All data is stored in Upstash serverless Redis® cluster as key-value pairs (short link -> long link).
 - Every time you visit a short link, it triggers an event and stores it in Upstash Kafka.
 - We then get the data from Upstash Kafka and analyze it in Materialize in real-time.
 
@@ -42,7 +42,7 @@ Here is a quick demo of how the app works:
 
 Before you get started, you need to make sure that you have the following
 
-- A Redis cluster and a Kafka cluster in Upstash.
+- A Redis® cluster and a Kafka cluster in Upstash.
 - A Kafka topic in Upstash called `visits-log`.
 - The Cloudflare CLI tool called `wrangler` on your local machine as described [here](https://developers.cloudflare.com/workers/cli-wrangler/install-update/)
 - A Materialize instance running on your local machine as described [here](https://materialize.com/docs/install/) or a [Materialize Cloud instance](https://cloud.materialize.com/deployments).

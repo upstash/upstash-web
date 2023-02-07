@@ -9,13 +9,13 @@ I am thrilled to announce to Upstash users that we have just released an updated
 
 ### Designed for the Edge Functions
 
-Edge runtimes, such as Cloudflare Workers and Vercel Edge, provide speed by executing your code at locations closest to your users. However, if your use case requires data storage, it is crucial to also have your data store located near your users for optimal performance. Upstash Global addresses this issue by replicating your data across multiple regions. Additionally, edge runtimes have some limitations, but Upstash offers a HTTP-based Redis client that is specifically built and tested to work with popular edge runtimes like Vercel, Cloudflare, Fastly, and Deno.
+Edge runtimes, such as Cloudflare Workers and Vercel Edge, provide speed by executing your code at locations closest to your users. However, if your use case requires data storage, it is crucial to also have your data store located near your users for optimal performance. Upstash Global addresses this issue by replicating your data across multiple regions. Additionally, edge runtimes have some limitations, but Upstash offers a HTTP-based Redis® client that is specifically built and tested to work with popular edge runtimes like Vercel, Cloudflare, Fastly, and Deno.
 
 ### Read Regions Everywhere, Low Latency Anywhere
 
 Global database is designed to minimize the latency for reads. A database has a single primary replica and multiple read replicas. A write command is sent and processed at the primary replica. Then it is replicated to all read replicas. When a client sends a read command, it fetches the response from the nearest read replica (region).  Meanwhile, all write requests go to the primary replica for consistency.
 
-Our tests show sub-millisecond latency for clients within the same AWS region as the Redis instance.
+Our tests show sub-millisecond latency for clients within the same AWS region as the Redis® instance.
 
 **Reads are processed from the nearest replica.**
 

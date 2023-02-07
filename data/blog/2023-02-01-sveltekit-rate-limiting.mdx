@@ -101,11 +101,11 @@ If you navigate to where the dev server is running and submit a value with the f
 
 This works great! However, there’s an issue — people can submit as many requests as they want to our endpoint. For this demo, that’s not a big deal, since it’s a simple operation. However, if we were doing something that took a lot of time, or calling another service that charged based on the number of API calls, then we would want to limit the number of requests that individual users can make.
 
-One way to do that is with Upstash’s [rate limiting SDK](https://github.com/upstash/ratelimit), which tracks the number of requests a user makes in a Redis database and tells you if they’ve gone over the limit.
+One way to do that is with Upstash’s [rate limiting SDK](https://github.com/upstash/ratelimit), which tracks the number of requests a user makes in a Redis® database and tells you if they’ve gone over the limit.
 
 ## Adding rate limiting to our form action
 
-First, set up a new Redis database via the [Upstash console](https://console.upstash.com/) and retrieve the `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` environment variables. Place those variables in an `.env` file at the root of the repo.
+First, set up a new Redis® database via the [Upstash console](https://console.upstash.com/) and retrieve the `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` environment variables. Place those variables in an `.env` file at the root of the repo.
 
 ```
 UPSTASH_REDIS_REST_URL=URL_GOES_HERE

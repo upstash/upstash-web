@@ -8,9 +8,9 @@ tags: [serverless, nuxt, upstash, redis, nuxtjs]
 
 # Introduction
 
-If you ever had to build an app that tracks the application usage, restrict resources utilisation or fetch data from the cache to increase app performance, then you would know that Redis is the answer to these requirements! Redis is in-memory, key-value database. It is open source and it stands for Remote Dictionary Server.
+If you ever had to build an app that tracks the application usage, restrict resources utilisation or fetch data from the cache to increase app performance, then you would know that Redis® is the answer to these requirements! Redis® is in-memory, key-value database. It is open source and it stands for Remote Dictionary Server.
 
-In this article, we are going to discuss [Upstash](https://upstash.com/), Redis database and the recent beta release of Vue SSR framework, Nuxt 3. This is a beginner friendly article that explores Redis database, where we will build basic app that tracks page-visits of a Nuxt app.
+In this article, we are going to discuss [Upstash](https://upstash.com/), Redis® database and the recent beta release of Vue SSR framework, Nuxt 3. This is a beginner friendly article that explores Redis® database, where we will build basic app that tracks page-visits of a Nuxt app.
 
 ## **Resources**
 
@@ -21,11 +21,11 @@ In this article, we are going to discuss [Upstash](https://upstash.com/), Redis 
 
 # What is Upstash?
 
-Upstash is a service that provides serverless access to Redis database. That's why it becomes essential for us to learn Redis fundamentals that includes Redis use cases and available commands to manipulate different types of data.
+Upstash is a service that provides serverless access to Redis® database. That's why it becomes essential for us to learn Redis® fundamentals that includes Redis® use cases and available commands to manipulate different types of data.
 
 ## What is Redis?
 
-Redis has popular use cases such as:
+Redis® has popular use cases such as:
 
 - Caching data and session
 - Leader-boards - rank names and scores in computer gaming or any software built with gamification principles
@@ -33,14 +33,14 @@ Redis has popular use cases such as:
 - Usage metering/counting - restrict resource utilisation, control resource distribution or just counting at scale to watch and analyse usage, such as e-commerce sites, social media, mobile apps, etc
 - Content filtering - for example, filter content against the list of prohibited words
 
-At basic level, Redis database stores data in key-value pairs. But it can also store data in advanced data structures such as Lists, Sets, Sorted sets, etc. Redis also provides set of commands to manipulate these data-structures. Since we will use one of them in our example app, it's worth taking a look at their high-level definitions.
+At basic level, Redis® database stores data in key-value pairs. But it can also store data in advanced data structures such as Lists, Sets, Sorted sets, etc. Redis® also provides set of commands to manipulate these data-structures. Since we will use one of them in our example app, it's worth taking a look at their high-level definitions.
 
 - Lists - is more like a basic array. List allows you to push and pop items from both ends of a sequence, fetch individual items, and perform a variety of other operations. List commands are prefixed with letter L, i.e. LPOP, LPUSH, LSET, etc
-- Hash - allows you to store groups of key-value pairs in a single Redis key. Hash commands are prefixed with letter H, i.e. HSET, HGET, HDEL, etc
+- Hash - allows you to store groups of key-value pairs in a single Redis® key. Hash commands are prefixed with letter H, i.e. HSET, HGET, HDEL, etc
 - Sets - are like lists, but Sets are unique and store items in an unordered list. That's why Sets are not sortable, but you can quickly add, remove, and determine whether an item is in the Set. Set commands are prefixed with letter S, i.e. SADD, SCARD, SISMEMBER, etc
 - Sorted sets - are like sets, but Sorted sets allow sorting by scores that looks very much like key-value pair. We can also manipulate and sort this numeric scores. Sorted set commands are prefixed with letter Z, i,e, ZADD, ZINCRBY, ZSCORE, etc
 
-> You can learn more about other Redis commands at [https://redis.io/commands](https://redis.io/commands)
+> You can learn more about other Redis® commands at [https://redis.io/commands](https://redis.io/commands)
 
 ## Upstash setup
 
@@ -48,7 +48,7 @@ At basic level, Redis database stores data in key-value pairs. But it can also s
 
 Before you jump onto creating Nuxt app, make sure that your Upstash account is ready. You should be able to create one database with free-tier.
 
-Once your database is created, you can create and access Redis database using any Redis client. Alternatively, you can use browser-based CLI👇 provided in Upstash console to get started immediately.
+Once your database is created, you can create and access Redis® database using any Redis® client. Alternatively, you can use browser-based CLI👇 provided in Upstash console to get started immediately.
 
 ![Browser-based CLI provided in Upstash console](/blog/nuxt/upstash-console.png)
 
@@ -56,11 +56,11 @@ Browser-based CLI provided in Upstash console
 
 ### `Redis-cli`
 
-You can setup `redis-cli` on your machine terminal to create and access Redis database directly from your command line interface.
+You can setup `redis-cli` on your machine terminal to create and access Redis® database directly from your command line interface.
 
-### Redis npm packages
+### Redis® npm packages
 
-We also have several npm packages to interact with Redis database. We will use 1) `@upstash/redis` and 2) `ioredis` - to access Redis commands in our Nuxt project.
+We also have several npm packages to interact with Redis® database. We will use 1) `@upstash/redis` and 2) `ioredis` - to access Redis commands in our Nuxt project.
 
 ---
 

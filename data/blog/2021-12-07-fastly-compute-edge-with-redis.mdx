@@ -1,6 +1,6 @@
 ---
 slug: fastly-compute-edge-with-redis
-title: "Use Redis in Fastly Compute"
+title: "Use Redis® in Fastly Compute"
 author: enes
 image: /blog/fastly/cover.png
 tags: [serverless, fastly, edge, redis]
@@ -16,7 +16,7 @@ In this post, we will write a simple application which will run on [Fastly Compu
 
 Edge Computing is one of the most exciting trends in recent years. CDN services like Cloudflare and Fastly started to enable users to run their applications on their edge infrastructure. This helps developers to build globally distributed, high performance applications.
 
-Compute@Edge is the serverless platform from Fastly. You can write your code in Rust, AssemblyScript, Javascript and run in Fastly’s edge network. Fastly Compute functions are stateless. This means developers should keep their application state at an external storage. But Fastly uses WebAssembly as the runtime for the functions and it does not allow TCP connections. Upstash Redis is a perfect solution for Fastly Compute functions with REST API, global replication and serverless pricing.
+Compute@Edge is the serverless platform from Fastly. You can write your code in Rust, AssemblyScript, Javascript and run in Fastly’s edge network. Fastly Compute functions are stateless. This means developers should keep their application state at an external storage. But Fastly uses WebAssembly as the runtime for the functions and it does not allow TCP connections. Upstash Redis® is a perfect solution for Fastly Compute functions with REST API, global replication and serverless pricing.
 
 See [the code](https://github.com/upstash/examples/tree/master/using-fastly-compute) and [the demo](https://horribly-organic-spider.edgecompute.app)
 
@@ -157,7 +157,7 @@ You need to copy and paste REST URL and token from the [Upstash console](https:/
 
 We simply connect to Upstash using [upstash-redis](https://github.com/upstash/upstash-redis) client. We increment a counter and return the response.
 
-Note that you can not use other Redis clients as they use TCP connection which is not supported by Fastly Compute.
+Note that you can not use other Redis® clients as they use TCP connection which is not supported by Fastly Compute.
 
 While authenticating with `auth()`, you need to add `backend: upstash-db` as an extra request option. This is required as Fastly Compute requires any external network connection to be registered as a backend.
 

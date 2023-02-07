@@ -93,7 +93,7 @@ function Footer() {
           <Box w="full">
             <Container maxW="xl">
               <Text fontSize="xs" color="whiteAlpha.500">
-                * Redis is a trademark of Redis Labs Ltd. Any rights therein are
+                * Redis is a trademark of Redis Ltd. Any rights therein are
                 reserved to Redis Ltd. Any use by Upstash is for referential
                 purposes only and does not indicate any sponsorship, endorsement
                 or affiliation between Redis and Upstash.

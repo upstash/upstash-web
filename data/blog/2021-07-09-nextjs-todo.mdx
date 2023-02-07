@@ -30,7 +30,7 @@ See the code: [https://github.com/upstash/examples/tree/master/nextjs-todo](http
 
 Create a Next.js app: `npx create-next-app`
 
-Create an [Upstash Redis database](https://console.upstash.com) in AWS-US-EAST-1 region and copy the REST URL and token.
+Create an [Upstash Redis® database](https://console.upstash.com) in AWS-US-EAST-1 region and copy the REST URL and token.
 
 The project will be a single page application with 3 API endpoints:
 
@@ -223,5 +223,5 @@ Run your project locally with `npm run dev`. If everything looks good, you can d
 ### NOTES
 
 - It is safer to keep the database token in a [Vercel environment variable](https://vercel.com/docs/environment-variables).
-- It is best for performance to keep the serverless function and Redis database in the same region.
-- We could use Redis clients instead of REST API. But as I mentioned before, the database connections can cause issues inside serverless functions. Also note that we did not see a major performance difference between Upstash REST API and native API.
+- It is best for performance to keep the serverless function and Redis® database in the same region.
+- We could use Redis® clients instead of REST API. But as I mentioned before, the database connections can cause issues inside serverless functions. Also note that we did not see a major performance difference between Upstash REST API and native API.

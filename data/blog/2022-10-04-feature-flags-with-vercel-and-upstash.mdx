@@ -11,9 +11,9 @@ But coupling new features or changes in general with deployment isn’t always a
 
 Feature flags, or feature toggles, are a way to decouple your changes from a deployment. You implement a change, but you hide it behind an if-statement; as long as a variable is false, the software will use the version before your change; if the variable is `true`, it will be the new version. If the variable's value comes from a database the marketing team can access, they can toggle these changes without needing code changes.
 
-Upstash Redis is such a database. It’s a simple key-value store you can use to store your feature flags. Since it’s blazingly fast, it doesn’t add much to your latency to check for multiple different flags in your application.
+Upstash Redis® is such a database. It’s a simple key-value store you can use to store your feature flags. Since it’s blazingly fast, it doesn’t add much to your latency to check for multiple different flags in your application.
 
-This tutorial will teach you how to build a simple feature flag mechanism for your Next.js app. We will deploy on Vercel and use Upstash Redis as storage.
+This tutorial will teach you how to build a simple feature flag mechanism for your Next.js app. We will deploy on Vercel and use Upstash Redis® as storage.
 
 ### Prerequisites
 
@@ -30,9 +30,9 @@ $ npx create-next-app upstash-next-feature-flags
 ```
 
 
-### Creating the Upstash Redis Connection
+### Creating the Upstash Redis® Connection
 
-Next, we must connect our Next.js app with an Upstash Redis database. For this, we need to install the `@upstash/redis` package and create a small wrapper around it.
+Next, we must connect our Next.js app with an Upstash Redis® database. For this, we need to install the `@upstash/redis` package and create a small wrapper around it.
 
 ```
 $ npm i @upstash/redis
@@ -55,7 +55,7 @@ export async function flagIsActive(flagName) {
 }
 ```
 
-We will get the API credentials from environment variables to set them up later in this tutorial. The `flagIsActive` function will query Redis and convert the returned value to a `boolean`. This conversion is necessary because we will save the flag as a number in Redis.
+We will get the API credentials from environment variables to set them up later in this tutorial. The `flagIsActive` function will query Redis® and convert the returned value to a `boolean`. This conversion is necessary because we will save the flag as a number in Redis.
 
 ### Creating the API Route
 
@@ -126,7 +126,7 @@ After implementing everything, we need to push the project to a repository on Gi
 Creating an empty repository will automatically show you how you can link it with the project we created.
 
 
-### Creating an Upstash Redis Database
+### Creating an Upstash Redis® Database
 
 You can create a new database in [the Upstash console](https://console.upstash.com/). Figure 1 shows a good config for this tutorial.
 
