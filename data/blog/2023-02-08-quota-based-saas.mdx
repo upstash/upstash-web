@@ -101,7 +101,7 @@ This is not optimal for many reasons:
 
 ## Using Upstash to increase the user's quota
 
-To solve this problem, we will use [Upstash Redis](https://upstash.com/) to increase the user's quota. Upstash Redis® is a fast and reliable Redis® database, hosted in the cloud made for serverless environments, ready for the Edge _(run code close to your users)_.
+To solve this problem, we will use [Upstash Redis®](https://upstash.com/) to increase the user's quota. Upstash Redis® is a fast and reliable Redis® database, hosted in the cloud made for serverless environments, ready for the Edge _(run code close to your users)_.
 
 We will use the `INCR` Redis® command to increase the user's quota by 1. This command is atomic, which means that it will only be executed once, and it will be executed fast.
 
