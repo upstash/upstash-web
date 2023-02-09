@@ -140,9 +140,9 @@ export const REDIS_PRICES = {
     enterprise: true,
   },
   multiZoneReplication: {
-    title: "Multi Zone Replication",
+    title: "Replication",
     description:
-      "Upstash replicates data to multiple zones for Premium type of databases. This provides high availability and minimum fail over time.",
+      "Upstash replicates your data to multiple instances. This provides high availability and minimum fail over time.",
     free: false,
     payg: true,
     enterprise: true,
@@ -215,9 +215,9 @@ export const KAFKA_PRICES = {
     enterprise: true,
   },
   multiZoneReplication: {
-    title: "Multi Zone Replication",
+    title: "Replication",
     description:
-      "Upstash replicates your data to different availability zones. This provides high availability and minimum fail over time. ",
+      "Upstash replicates your data to multiple instances. This provides high availability and minimum fail over time. ",
     free: true,
     payg: true,
     enterprise: true,
@@ -239,16 +239,16 @@ export const KAFKA_PRICES = {
     enterprise: "Optional",
   },
   priceSingleZone: {
-    title: "Price - Single Zone",
+    title: "Price - Single Replica",
     description:
-      "Single zone cluster is recommended only for testing and development purposes.",
+      "Single replica cluster is recommended only for testing and development purposes.",
     free: "Free (No credit card required)",
     payg: "$0.2 per 100K commands, up to $120 monthly max.",
     enterprise: "Custom",
   },
   priceMultiZone: {
-    title: "Price - Multi Zone",
-    description: "Multi zone cluster is recommended for production use cases.",
+    title: "Price - Multi Replica",
+    description: "Multi replica cluster is recommended for production use cases.",
     free: "Free (No credit card required)",
     payg: "$0.6 per 100K commands, up to $360 monthly max. ",
     enterprise: "Custom",
