@@ -5,9 +5,9 @@ author: thomasCazade
 tags: [redis, qstash, serverless, nextjs, vercel]
 ---
 
-In a previous article, we discussed [how we can use Redis to store the state of your user's quota](/blog/quota-based-saas) on a full-stack Next.js app. Doing this allows us to improve the performance of our application, as a Redis instance is much faster than a database.
+In a previous article, we discussed [how we can use Redis to store the state of your user's quota](/blog/quota-based-saas) on a full-stack Next.js app. Doing this allows us to improve the performance of our application, as Redis in general is much faster than a database.
 
-However, a Redis server is volatile. If keys expires or the server crashes, we will lose the state of our users' quota. To prevent this, we can use QStash to sync the state of our Redis server to a database.
+Upstash Redis especially is a great choice for this use case, as it is a fully managed Redis database and accessible via HTTP. This means we can even use edge runtimes like Vercel to run our code close to the user with minimum latency.
 
 ## What is QStash?
 
@@ -34,7 +34,6 @@ if (quota === 1) {
   await redis.expire(quotaKey, 60 * 60 * 24);
 }
 ```
-
 Given this code, we can now create a CRON job endpoint using QStash. Our CRON job endpoint will be triggered at the URL `/api/cron/update-usage`.
 
 Let's create a new file for our Next.js endpoint:
@@ -152,8 +151,10 @@ Last step, we need to **setup 2 environment variables** in our Next.js applicati
 
 In the **Request Builder** section, there are 2 environment variables ready to be copied:
 
-- `QSTASH_URL`: QStash base URL.
-- `QSTASH_TOKEN`: authentication token sent to our Next.js CRON job endpoint, by QStash.
+- `QSTASH_CURRENT_SIGNING_KEY`
+- `QSTASH_NEXT_SIGNING_KEY`
+
+These are necessary to authenticate the incoming message. Otherwise anyone would be able to call your endpoint.
 
 ![](/blog/syncing-state-with-qstash/upstash-qstash-env-vars.png)
 
