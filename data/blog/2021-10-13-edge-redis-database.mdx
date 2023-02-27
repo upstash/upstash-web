@@ -6,6 +6,8 @@ image: /blog/cover-edge-database.jpg
 tags: [serverless, aws-lambda, cloudflare-workers, edge, redis]
 ---
 
+(Update: Edge Caching feature is deprecated. For low latencies at edge, use our global configurations. [Learn more](https://docs.upstash.com/redis/features/globaldatabase))
+
 Upstash started its journey with a mission to be the best database option for your AWS Lambda functions. Meanwhile, we discovered another great option to build your serverless functions: Cloudflare Workers. It is an exciting product because it promises a better latency all over the world with a lower cost and no cold starts. But it has many limitations when [compared to AWS Lambda](https://blog.upstash.com/aws-lambda-vs-cloudflare-workers). Extra limitations makes the list of database options shorter. We saw this as an opportunity to position Upstash as a great solution for the question: `CF Workers are stateless. Where should I keep my data then?`
 
 ## Challenges

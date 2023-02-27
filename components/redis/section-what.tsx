@@ -116,12 +116,12 @@ function SectionWhat() {
               mb={6}
             />
             <Heading as="h4" fontSize={["xl", "2xl"]}>
-              Global Database and Edge Caching
+              Global Database
             </Heading>
             <Box mt={4}>
               <Text color="whiteAlpha.600">
                 Upstash REST API enables access from Cloudflare Workers and
-                Fastly Compute@Edge. With Global Database and Edge Caching, you
+                Fastly Compute@Edge. With Global Database, you
                 can access your database from anywhere with very low latency.
               </Text>
             </Box>
