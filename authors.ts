@@ -127,7 +127,7 @@ export default {
   },
   rodney: {
     name: "Rodney Johnson",
-    title: "Consultant Web Developer",
+    title: "Technical Content Writer",
     image_url: "blog/authors/rodney.jpg",
   },
   lorenzo: {
