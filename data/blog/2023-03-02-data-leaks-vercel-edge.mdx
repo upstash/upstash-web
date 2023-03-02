@@ -1,0 +1,329 @@
+---
+slug: data-leaks-vercel-edge
+title: "Prevent Data Leaks using Vercel Edge Functions and Upstash for Redis"
+author: kay
+tags: [redis, vercel, edge, serverless]
+---
+
+Data leaks are a major issue on the internet. [According to Statista](https://www.statista.com/statistics/273550/data-breaches-recorded-in-the-united-states-by-number-of-breaches-and-records-exposed/), over 400 million people were affected by a data leak in 2022 alone. Nobody wants their data leaked all over the internet, so building secure applications that respect user privacy is crucial in many industries.
+
+One way to fight leaks is to filter problematic data before delivering it to other services or users. This method requires up-to-date filters to ensure data won't slip through and low latency infrastructure, to keep the performance impact of filtering as small as possible.
+
+Upstash for Redis® and Vercel Edge Functions form a powerful team that can tackle the problem while honing both requirements. Both of these low-latency serverless solutions can be deployed close to our users. With Vercel's new cron feature, we can ensure the filter data gets updated regularly.
+
+To illustrate how such a filter could work, we will build a frontend and backend that leverages this serverless edge technology to filter profanities.
+
+## Features
+
+The app will use Vercel's cron feature to update an Upstash for Redis database with the current words from a remote API.
+
+We will have three means of getting data:
+
+1. Returning a website with filtered text.
+2. Returning JSON with filtered text from a data store.
+3. Accepting text and returning JSON with the filtered text.
+
+## Technology
+
+We will build the app with Next.js and deploy it on Vercel; this way, we will have a seamless serverless development experience when using edge functions.
+
+We will use Upstash for Redis® as data storage because of its low latency and ease of use.
+
+Both services come with free tiers and have on-demand pricing.
+
+## Prerequisites
+
+We need accounts for the services:
+
+- [GitHub](https://github.com/) to upload our code so Vercel can download and deploy it
+- [Vercel](https://vercel.com/signup) to host our application, with home page and edge functions
+- [Upstash](https://console.upstash.com/login) to store the list of words we want to filter
+
+## Implementation
+
+To get started, we create a new GitHub repository and ensure. We check "Add a README file," so it isn't empty. Since the repository is not empty, GitHub allows us to start a Codespace for it, which comes preconfigured with Node.js and a Git-to-GitHub connection.
+
+![Figure 1: Start Codespace](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/flx6846ai4j45mg2b2ql.png)
+_Figure 1: Start Codespace_
+
+First, we need to create a new Next.js project and install the Upstash Redis client with the following commands:
+
+```bash
+$ npx create-next-app@latest --typescript
+$ npm i @upstash/redis
+```
+
+### Implementing the Refresh Function
+
+The first feature we will implement is the function that will refresh our list of bad words. To do so, create a new file at `pages/api/refresh-list.ts` with the following content:
+
+File `pages/api/refresh-list.ts`:
+
+```typescript
+import { Redis } from "@upstash/redis"
+
+export const config = { runtime: "edge" }
+
+const redisClient = new Redis({
+  url: process.env.UPSTASH_REDIS_URL,
+  token: process.env.UPSTASH_REDIS_TOKEN,
+})
+
+export default async function handler() {
+  const wordResponse = await fetch(
+    "https://raw.githubusercontent.com/kay-is/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/master/en"
+  )
+  const words = await wordResponse.text()
+
+  const redisCommands = redisClient.pipeline()
+  words
+    .trim()
+    .split("\n")
+    .forEach((word) => redisCommands.sadd("words", word))
+  await redisCommands.exec()
+}
+```
+
+We start by configuring the function to run on the edge. This isn't essential here because this function will run in the background, but the Vercel Edge Functions are powered by Cloudflare Workers, which allows us to use the fetch method, which Node.js doesn't natively support.
+
+The handler will load a text file containing bad words into Upstash Redis. The pipeline feature ensures we only send one request with all Redis commands.
+
+We use a [set](https://redis.io/commands/set/) to store the words, so we don't get duplicates. It also allows us to load all the words as an array of strings with one command later.
+
+If we wanted to filter personal data, we could use an account database to get our users' emails, phone numbers, names, and addresses as the basis for the filter.
+
+To tell Vercel we want this function to be a cron function, we need to create a vercel.json file in the project root with the following content:
+
+File `vercel.json`:
+
+```json
+{
+  "crons": [
+    {
+      "path": "/api/refresh-list",
+      "schedule": "0 10 * * *"
+    }
+  ]
+}
+```
+
+This config will cause Vercel to execute the refresh-list function daily at 10:00 UTC.
+
+Free Vercel accounts only support one automatic execution per day. For our example, that's enough, but if we have data that changes more often, we should increase the update rate.
+
+### Implementing the Filter Utility
+
+The next feature is a utility function that will mask the words in a text when they correspond to the words in our database. Create a new file at utils/word-filter.ts and add the following code.
+
+File `utils/word-filter.ts`:
+
+```typescript
+import { Redis } from "@upstash/redis"
+
+const redisClient = new Redis({
+  url: process.env.UPSTASH_REDIS_URL,
+  token: process.env.UPSTASH_REDIS_TOKEN,
+})
+
+export async function filter(text: string) {
+  const filteredWords = await redisClient.smembers("words")
+
+  let maskedText = text
+  for (let word of filteredWords)
+    maskedText = maskedText.replaceAll(new RegExp(word, "gi"), "[REDACTED]")
+
+  return maskedText
+}
+```
+
+Again, the function uses the Upstash Redis client, but this time it loads the data we saved before.
+
+Since we get an array of strings, we can simply loop over it and call a replacement function that replaces every bad word in the text with "[REDACTED]".
+
+This function doesn't care about the type of words it filters out. In this case, the words are "not safe for work", but the filter process only depends on the data we stored before.
+
+### Implementing the Home Page
+
+To see the filter in action, let's replace the content of `pages/index.ts` with the following:
+
+File `pages/index.ts`:
+
+```typescript
+import Head from "next/head"
+import { filter } from "@/utils/word-filter"
+
+export const config = { runtime: "experimental-edge" }
+
+interface HomeProps {
+  maskedText: string
+}
+
+export default function Home(props: HomeProps) {
+  return (
+    <>
+      <Head>
+        <title>Text with Filtered Words</title>
+      </Head>
+      <div>
+        <h1>Text with Filtered Words</h1>
+        <p>{props.maskedText}</p>
+      </div>
+    </>
+  )
+}
+
+export async function getServerSideProps(): Promise<{ props: HomeProps }> {
+  const maskedText = await filter(
+    "He slipped and fell on his butt. Well, that wasn't very sexy."
+  )
+  return { props: { maskedText } }
+}
+```
+
+The config ensures everything is executed on edge, even the server-side rendering. This Vercel feature is still experimental.
+
+The interesting part is the `getServerSideProps` function, which uses our `filter` function from before on a static text. It is called on the server only, so the unfiltered data never gets to the client.
+
+In a real application, this text might come from a database with personal data that needs to be cleaned up before it's displayed.
+
+### Implementing the First API Route
+
+The first API route works like the home page; it returns JSON and no HTML. Create a file at `pages/api/filtered-data.ts` with this code:
+
+File `pages/api/filtered-data.ts`:
+
+```typescript
+import { filter } from "@/utils/word-filter"
+export const config = { runtime: "edge" }
+
+export default async function handler() {
+  const maskedText = await filter(
+    "He slipped and fell on his butt. Well, that wasn't very sexy."
+  )
+
+  return new Response(JSON.stringify({ text: maskedText }), {
+    status: 200,
+    headers: { "content-type": "application/json" },
+  })
+}
+```
+
+Again, the runtime is edge, and just as with the getServerSideProps function, we use a static text.
+
+### Implementing the Second API Route
+
+This route accepts text via request and returns the filtered version. Create a new file at `pages/api/filter.ts` and add the following code:
+
+File `pages/api/filter.ts`:
+
+```typescript
+import type { NextApiRequest } from "next"
+import { filter } from "@/utils/word-filter"
+
+export const config = { runtime: "edge" }
+
+export default async function handler(request: NextApiRequest) {
+  const { text } = await new Response(request.body).json()
+  const maskedText = await filter(text)
+  return new Response(JSON.stringify({ text: maskedText }), {
+    status: 200,
+    headers: { "content-type": "application/json" },
+  })
+}
+```
+
+This time, we must parse the body to get to the text we want to filter. In Vercel's Edge Functions, the `body` is a `ReadableStream`; if we convert it to a `Response`, we can use the native JSON parser to extract the data.
+
+After we get the data from the request, everything works as before.
+
+### Push Code Changes
+
+Now that everything is implemented, we need to push the code to our GitHub repository with these commands:
+
+```bash
+$ git add -A
+$ git commit -m "Init"
+$ git push
+```
+
+After this, the code is available online for Vercel to download and deploy.
+
+## Deployment
+
+We need to create an Upstash Redis database, to get the credentials for the environment variables and a Vercel project.
+
+### Creating a Redis Database
+
+We can create a new Redis database in [the Upstash Console](https://console.upstash.com/) by clicking the "Create database" button. Figure 2 shows the configuration. For this example, a regional database is enough, but if you have globally distributed users and want to keep the latency low, you can also choose the global type.
+
+![Figure 2: Create a new database](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/bthd55mhipu6wrsg0n4l.png)
+
+_Figure 2: Create a new database_
+
+After the creation, we can find the URL and token required for our environment variables under the REST API category; it looks something like in figure 3.
+
+![Figure 3: Database credentials](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/vlkufon3r7sau63meh3y.png)
+
+_Figure 3: Database credentials_
+
+### Creating a Vercel Project
+
+To create a new Vercel project, [open the Vercel Dashboard](https://vercel.com/dashboard) in a browser, and click "Create a New Project" in the center. After connecting Vercel with your GitHub account, you can choose a repository to import.
+
+We can keep the default configuration and add our environment variables with the Upstash Redis credentials from above. Figure 4 shows Vercel's creation UI for reference.
+
+![Figure 4: Vercel project creation](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/6h1y1jyg5z69dur56oc3.png)
+
+_Figure 4: Vercel project creation_
+
+The names of the environment variables are `UPSTASH_REDIS_URL` and `UPSTASH_REDIS_TOKEN`. We use the values from the previous step to create them.
+
+After clicking "Deploy" Vercel will download and deploy the code from our GitHub repository.
+
+### Testing the App
+
+After the deployment, the app will still keep showing unfiltered words since the cron job didn't run yet. But we can do the first execution manually. Click the "Continue to Dashboard" button and choose the "Cron Jobs" tab.
+
+Here we see our `/api/refresh-list` function with a "Run" button to click.
+
+When the function finishes, we navigate to the "Project" tab and click on one of the URLs under "Domain". This will open the website with filtered text in the browser; it should look like in figure 5.
+
+![Figure 5: Filtered website](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/eddtnc968izzu2v9cfph.png)
+_Figure 5: Filtered website_
+
+If we add `/api/filtered-data` to our URL, we can see that this also works for API responses. They should look like the following example:
+
+```json
+{
+  "text": "He slipped and fell on his [REDACTED]. Well, that wasn't very [REDACTED]y."
+}
+```
+
+Finally, if we send a request via cURL to the `/api/filter` endpoint, we get our custom text filtered. Make sure to replace `&lt;PROJECT>` with your Vercel project.
+
+```
+$ curl -X POST https://<PROJECT>.vercel.app/api/filter \
+   -H "Content-Type: application/json" \
+   -d '{"text":"He fell on his butt."}'
+```
+
+The response:
+
+```json
+{
+  "text": "He fell on his [REDACTED]."
+}
+```
+
+## What's Next
+
+After this tutorial, you might ask yourself what happens if the data is updated, but the cron job hasn't updated the database. Good observation!
+
+A cron job triggers our refresh function, but it's still a regular API function, so we can call it however we want.
+
+In the case of a real data filter, we might want to trigger the function in response to a data change, but the implementation details highly depend on the data storage we use as a base for our filters. So, keep that in mind when building!
+
+## Additional Resources
+
+You can find the complete project [on GitHub](https://github.com/kay-is/upstash-vercel-edge-cron).
+
