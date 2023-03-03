@@ -1,0 +1,242 @@
+---
+slug: sveltekit-qstash
+title: "Refresh stale data in a SvelteKit app with QStash"
+author: geoff
+tags: [qstash, sveltekit]
+---
+
+[QStash](https://docs.upstash.com/qstash) is a message delivery solution from Upstash designed for serverless and the edge. Let’s see how we can use it in a [SvelteKit](https://kit.svelte.dev/) app!
+
+## The project
+
+In a previous post, I showed how to build a [movie search site](https://upstash.com/blog/svelte-with-serverless-redis) that cached the API responses in Redis to improve the response time. The data is set to expire after 24 hours so that we have reasonably up-to-date information. This works great, but once the data expires in Redis, the user has to wait for the API response again. Instead, what if we could quickly return *stale data* to the user and refresh the data in the background?
+
+However, we don’t want the user to wait while we’re refreshing the cache — that would defeat the whole point. Instead, we’ll use QStash to refresh the cache for us in a separate request, so it doesn’t impact the user’s request at all.
+
+Note that the effectiveness of this technique depends on the API you’re using. If you have a super fast API, implementing a technique like this may not be helpful and could actually *slow your app down*. Also, there may be some apps where showing stale data is not appropriate. Make sure to understand the tradeoffs before using this in production.
+
+## Prerequisites
+
+- Basic familiarity with [SvelteKit](https://kit.svelte.dev/) (e.g. routing and loading data)
+- A [TMDB API key](https://developers.themoviedb.org/3/getting-started/introduction) and Redis instance (e.g. on [Upstash](https://upstash.com/))
+- An [Upstash](https://upstash.com/) account so you can access QStash. The [free plan](https://docs.upstash.com/qstash/pricing) allows you to send a small number of messages per day, which should be plenty for our use case.
+
+## Getting started
+
+Clone the [starter repo](https://github.com/geoffrich/movie-search-qstash/tree/initial). The `main` branch has the end result, so checkout the `initial` branch to follow along with this post. If you want to push your changes, fork the repo first.
+
+This is a small SvelteKit application that allows searching for movies and viewing their details using the TMDB API. It uses [ioredis](https://github.com/luin/ioredis) to interact with Redis, though you could also use [Upstash’s REST API](https://docs.upstash.com/redis/features/restapi). You can see the deployed demo running [on Vercel](https://movie-search-qstash.vercel.app/).
+
+To run the demo locally, add a `.env` file with the required environment variables. See `.sample.env` for an example. To start, you only need to add `TMDB_API_KEY` and `REDIS_CONNECTION` — the other variables will come later. Then, run `npm install` and `npm run dev` to start the app.
+
+## Updating our Redis caching strategy
+
+Redis doesn’t have a built-in way to keep data in the cache after it expires. Instead, we’ll use a dual-key strategy. For a movie with ID 1234:
+
+- The cached data will live at `movie:1234`
+- The expiry key will live at `movie:1234:fresh`
+
+When we store data, we’ll set both keys, but only allow the expiry key to expire. When retrieving the data, if the expiry key is present, then the data is still valid. If it’s not, then the data is stale and needs to be refreshed. Either way, we can return the cached data to the user.
+
+Here’s what our new caching logic in `src/lib/redis.ts` looks like. The main change is that instead of setting a single value, we set two. We use a [Redis pipeline](https://redis.io/docs/manual/pipelining/) to send multiple commands at once.
+
+```ts
+function getMovieKey(id: number) {
+	return `movie:${id}`;
+}
+
+function getExpiryKey(id: number) {
+	return getMovieKey(id) + ':fresh';
+}
+
+export async function cacheMovieResponse(
+	id: number,
+	movie: TMDB.Movie,
+	credits: TMDB.MovieCreditsResponse
+) {
+	try {
+		console.log(`Caching ${id}`);
+		const cache: MovieDetails = {
+			movie,
+			credits
+		};
+		const movieKey = getMovieKey(id);
+		const expiryKey = getExpiryKey(id);
+		await redis
+			.multi()
+			// store movie response
+			.set(movieKey, JSON.stringify(cache))
+			// this will track whether the data needs to be refreshed
+			// set the last argument to a smaller value for easier testing
+			.set(expiryKey, 'true', 'EX', DEFAULT_EXPIRY)
+			.exec();
+	} catch (e) {
+		console.log('Unable to cache', id, e);
+	}
+}
+```
+
+And here’s what our updated cache retrieval logic looks like. We now retrieve a second value from Redis to check if the cache has expired.
+
+```ts
+export async function getMovieDetailsFromCache(
+	id: number
+): Promise<MovieDetails | Record<string, never>> {
+	try {
+		const [cached, expiryKey] = await redis.mget(getMovieKey(id), getExpiryKey(id));
+
+		if (cached) {
+			if (expiryKey === null) {
+				console.log('Cache expired, sending update request');
+				await sendUpdateRequest(id);
+			}
+			const parsed: MovieDetails = JSON.parse(cached);
+			console.log(`Found ${id} in cache`);
+			return parsed;
+		}
+	} catch (e) {
+		console.log('Unable to retrieve from cache', id, e);
+	}
+	return {};
+}
+
+async function sendUpdateRequest(id: number) {
+	// TODO
+}
+```
+
+For now, `sendUpdateRequest` is just a stub — we’ll look at expanding that next.
+
+## Set up cache refresh manually
+
+Before getting started with QStash, let’s lay the groundwork. QStash needs an endpoint to deliver the message to. Create a new file at `src/routes/api/refresh/+server.ts`. This will create a [server endpoint](https://kit.svelte.dev/docs/routing#server) at `/api/refresh` that QStash can request.
+
+Add the following to the `+server.ts` file:
+
+```ts
+import type { RequestHandler } from './$types';
+import { getMovieDetailsFromApi } from '$lib/api';
+
+export const POST: RequestHandler = async ({ request }) => {
+	const { id } = await request.json();
+	console.log('Received update request for', id);
+
+	// this will automatically cache the response
+	await getMovieDetailsFromApi(id);
+	return new Response();
+};
+```
+
+When someone POSTs to this endpoint, this will refresh the cache for the movie with the corresponding ID. You can make a request to the endpoint yourself by running the app locally and pasting the following in your browser console:
+
+```js
+fetch('http://localhost:5173/api/refresh', {
+	body: JSON.stringify({ id: 1894 }),
+	method: 'POST'
+});
+```
+
+Next, we’ll publish a message with QStash to call this endpoint.
+
+## Setting up QStash
+
+If you’re using the sample project, the `@upstash/qstash` client should already be installed. You’ll also want to set the `QSTASH_TOKEN`, `QSTASH_CURRENT_SIGNING_KEY` and `QSTASH_NEXT_SIGNING_KEY` variables in your .env file. You can get those values in your [Upstash console](https://console.upstash.com/qstash).
+
+QStash also needs a public URL to call, since it can’t hit your app running on localhost. For this demo, I used [ngrok](https://ngrok.com/), which will give you a publicly accessible URL that proxies requests to your local app. If you have ngrok installed, you can point it at your local SvelteKit dev server by running `ngrok http 5173`. This should give you a [ngrok.io](http://ngrok.io) address — put this in a `CALLBACK_URL` environment variable so we can use it later.
+
+If you plan to run this locally, make sure you’ve provided values for all of the environment variables in a `.env` file. See the `sample.env` file in the repo for an example:
+
+```bash
+TMDB_API_KEY=
+REDIS_CONNECTION=
+QSTASH_TOKEN=
+QSTASH_CURRENT_SIGNING_KEY=
+QSTASH_NEXT_SIGNING_KEY=
+CALLBACK_URL=
+```
+
+Now that we have the QStash keys, we can call it in our `sendUpdateRequest` function. First, instantiate the QStash client in `redis.ts` using the environment variables we set:
+
+```ts
+import { REDIS_CONNECTION, QSTASH_TOKEN, CALLBACK_URL } from '$env/static/private';
+
+const qstash = new Client({
+	token: QSTASH_TOKEN
+});
+```
+
+Then, we can call `qstash.publishJSON` in `sendUpdateRequest` to publish a JSON message.
+
+```ts
+async function sendUpdateRequest(id: number) {
+	try {
+		const res = await qstash.publishJSON({
+			url: new URL('/api/refresh', CALLBACK_URL).toString(),
+			body: {
+				id
+			}
+		});
+
+		console.log('QStash response:', res);
+	} catch (e) {
+		console.log('Unable to call QStash', e);
+	}
+}
+```
+
+We only need to wait for the message to be published. Once that happens, QStash will call the given URL with the request body we provided. We wrap the whole thing in a try/catch, since if this fails, we don’t want to fail the whole request.
+
+Now let’s test it! To make testing easier, update the line setting `DEFAULT_EXPIRY` to something smaller, e.g. 20. This means the data will only be valid for 20 seconds and it will be easier to test what happens when the data expires. Search for a movie and view the details page. You should see a “Caching” message in the logs. Wait 20 seconds and refresh to see a “Cache expired, sending update request” message. If you set up a CALLBACK_URL with ngrok, QStash will then make a request to the locally running app, and you should see a “Received update request” message in the logs.
+
+## Security
+
+It works! Though we do have a security vulnerability — anyone can request the `/api/refresh` endpoint. This might not be a big issue for our app, but it could be for more sensitive workloads. We can use the QStash client’s `Receiver` to make sure the request is coming from QStash. Update our `+server.ts` file to the following:
+
+```ts
+import type { RequestHandler } from './$types';
+import { Receiver } from '@upstash/qstash';
+import { QSTASH_CURRENT_SIGNING_KEY, QSTASH_NEXT_SIGNING_KEY } from '$env/static/private';
+import { getMovieDetailsFromApi } from '$lib/api';
+
+const receiver = new Receiver({
+	currentSigningKey: QSTASH_CURRENT_SIGNING_KEY,
+	nextSigningKey: QSTASH_NEXT_SIGNING_KEY
+});
+
+export const POST: RequestHandler = async ({ request }) => {
+	const body = await request.text();
+	const isValid = await receiver.verify({
+		signature: request.headers.get('Upstash-Signature') ?? '',
+		body
+	});
+
+	if (!isValid) {
+		console.log('Invalid request:', body);
+		return new Response(null, { status: 400 });
+	}
+
+	// normally we would use .json(), but we've already consumed the request for the verification
+	const { id } = JSON.parse(body);
+	console.log('Received update request for', id);
+
+	// this will automatically cache the response
+	await getMovieDetailsFromApi(id);
+	return new Response();
+};
+```
+
+The verification needs the raw message body, so we have to consume the request with `text` and parse it to JSON ourselves.
+
+You can check that the verification is working by running the `fetch` call in your browser console from before. Since it doesn’t have the correct headers, the request should fail. However, triggering the request from QStash (e.g. by waiting for a cached movie detail to expire) should still succeed.
+
+For more on message verification, see the [client](https://github.com/upstash/sdk-qstash-ts#receiving-a-message) and [security](https://docs.upstash.com/qstash/howto/signature) docs.
+
+## Deploying to production
+
+You should be able to deploy to production using a [SvelteKit adapter](https://kit.svelte.dev/docs/adapters) as-is. However, you will need to set the `CALLBACK_URL` environment variable to the URL of your deployed app. For instance, if your app is deployed at `https://kit.svelte.dev`, then you should set `CALLBACK_URL` to that address. The app will use that URL to tell QStash where to send the message.
+
+You can see the deployed version of the example app [on Vercel](https://movie-search-qstash.vercel.app/).
+
+## Wrapping up
+
+This is just one way you can use QStash in your app. QStash also supports many other use-cases — take a look at [the docs](https://docs.upstash.com/qstash) for more.
