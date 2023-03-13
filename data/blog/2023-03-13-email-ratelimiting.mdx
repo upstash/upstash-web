@@ -1,0 +1,202 @@
+---
+slug: email-ratelimiting
+title: "Protecting your mailbox with @upstash/ratelimit"
+author: russTran
+tags: [ratelimit, email, nextjs, sendgrid, upstash]
+---
+
+
+
+In today's digital age, email has become an essential part of our daily lives. From personal communication to business marketing campaigns, email is an effective way to reach out to your audience. Last year, as a front-end developer at JUST.engineer, one of my tasks was building a landing page for the company. The landing page had to include a section for customers to send emails to our HR for further discussion. I managed to finish the task, but I also inadvertently overloaded my company mailbox. Let me introduce you to my story and how I managed to fix the problem.
+
+## Get ready with me
+
+One of the first things to kickstart the project is to select the tech stack to work with. For this project, we will use **NextJS** to handle the UI and logic. We will also use **Sendgrid** to handle sending emails, and most importantly, **Upstash** to prevent internet trolls from spamming our precious company email.
+
+### NextJS
+
+I personally like to use **NextJS** because it's a popular React framework that supports SEO, generates static pages, and has a page-routing system, among other features. Most importantly, we can write simple APIs with NextJS using its built-in API routes feature. NextJS allows you to create serverless API endpoints that can handle HTTP requests and responses, so we don't need to create a separate NodeJS Express application to handle endpoint logic.
+
+It's also quite simple to bootstrap a NextJS project using the CLI command: `npx create-next-app@latest`. After running the command, we can start our work. I've created a form that has a nice rocket since my boss wants the landing page to convey the idea of "Going to the moon."
+
+![Email form](https://s2.gifyu.com/images/ezgif.com-optimizeaaf6baefb5f72f8d.gif)
+_A little bit time for coding and we have a nice rocket for users to play with._
+
+### Sendgrid
+
+Now that the form is ready, we can move on to the next point: _Sending emails_. I decided to use **Sendgrid** because they have a library that can handle this problem quite easily, even for beginners.
+
+We need to open our command line tool again, type in `npm install @sendgrid/mail`, and press `Enter` to install the library. After the library is installed, we can take a look at our current NextJS project. As I mentioned earlier, NextJS gives us the ability to handle logic from API routes. We can create a file called `sendgrid.js` in `/pages/api/` to write the logic for handling sending email. After that, we can call the API by using the endpoint `/api/sendgrid`.
+
+To use SendGrid services, we need to create an API Key. This can be done by visiting the SendGrid website and following the provided instructions. Once you generate your API key, it's essential to keep it safe and secure in our `env` file.
+
+> **Please remember:** Always put `.env` inside our `.gitignore` file and do not share it publicly.
+
+Let's create the email template and handle the request for the endpoint:
+
+```js
+// /pages/api/sendgrid.js
+
+import sgMail from "@sendgrid/mail";
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+async function sendEmail(req, res) {
+  try {
+    await sgMail.send({
+      to: "to.email@gmail.com", // Your email where you'll receive emails
+      from: "from.email@just.engineer", // your company email address here
+      subject: `${req.body.subject}`,
+      html: `
+		<!DOCTYPE html>
+		<html lang="en">
+			<head>
+			<meta charset="UTF-8" />
+			<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+			<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+			<title>JUST.engineer's offer</title>
+			</head>
+			<body style="margin: 0 auto; padding: 0; font-family: 'Poppins', sans-serif; width: 100%; max-width: 600px; box-sizing: border-box; color: #19285e; font-size: 16px;">
+			<header style="width: 100%; max-width: 600px; background-color: #0067ff; color: #ffffff; padding: 12px 48px; box-sizing: border-box; color: #19285e;">
+			  <div style="width: fit-content; margin: 0 auto">
+			    <img src="http://drive.google.com/uc?export=view&id=1-zUWC8tF5Tp8B1UbctjitrWdt-XYfe1D" alt="just.engineer" style="width: 48px; height: 48px;" />
+			  </div>
+			</header>
+			<section style="width: 100%; box-sizing: border-box">
+			<div style="margin: 0 auto; width: 100%">
+			  <p style="font-size: 36px; text-transform: uppercase; font-weight: 700; width: fit-content; margin: 20px auto 10px; text-align: center; color: #19285e;">You have received an <span style="color: #0067ff">offer</span></p>
+			</div>
+			<div style="width: 100%; max-width: 540px; margin: 0 auto">
+			  <p style="margin: 0 auto; width: fit-content; font-size: 24px; color: #19285e">Offer valuation: <span style="font-weight: 700; color: #0067ff; text-align: center">${req.body.budget}</span></p>
+			<div>
+			  <p style="margin-top: 36px; color: #19285e; font-weight: 700; font-size: 18px">Client's information:</p>
+		  	  <ul style="margin: 0; padding: 0; list-style-type: none">
+		  	    <li style="color: #19285e; margin-top: 8px">
+			      <span style="font-weight: 600">Full name:</span>
+			      <span style="color: #008dff">${req.body.fullname}</span>
+			    </li>
+			    <li style="color: #19285e; margin-top: 8px">
+			      <span style="font-weight: 600">Email:</span>
+			      <a href="mailto:${req.body.email}" style="color: #008dff">${req.body.email}</a>
+			    </li>
+			    <li style="color: #19285e; margin-top: 8px">
+			      <span style="font-weight: 600">Message:</span>
+			    </li>
+			    <li style="color: #19285e; text-align: justify">${req.body.message}</li>
+			  </ul>
+			</div>
+		  </div>
+		</section>
+		</body>
+		</html>
+		`,
+    });
+  } catch (error) {
+    return res.status(error.statusCode || 500).json({ error: error.message });
+  }
+  return res.status(200).json({ error: "" });
+}
+
+export default sendEmail;
+```
+
+Now the endpoint is ready, we can integrate it with our email form above:
+
+```js
+// /pages/form.jsx
+
+const handleSubmitData = async (data) => {
+  const res = await fetch("/api/sendgrid", {
+    body: JSON.stringify({
+      fullname: data.fullName,
+      email: data.email,
+      message: data.message,
+      budget: data.budget,
+      subject: `You've received a new offer - ${data.budget}`,
+    }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+  });
+  if (res?.status === 200) {
+    // success!
+  } else {
+    // error, handle it yourself bro
+  }
+};
+```
+
+
+### Deploying to Vercel
+
+The last thing we need to do is to deploy our app to Vercel. It's a free hosting service that allows you to deploy your Next.js app in a few clicks. Check them out at [vercel.com](https://vercel.com).
+
+Also make sure to copy the `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` from the Upstash Console and add them to your Vercel project's environment variables.
+
+Cool! We are finished! Right? ...
+
+![meme](https://i.imgflip.com/7eabhz.jpg)
+_Murphy's Law: "Anything that can go wrong will go wrong."_
+
+
+_Things will never go as you expected_. That's the lesson I learned when my boss called me and said our mailbox was on fire. It turned out that some internet trolls had found the form and were spamming the send email button.
+
+![Burning the mailbox](https://i.ibb.co/dpDyyQP/Screenshot-2023-03-13-at-17-45-53.png)
+_I smell something burning_
+
+### Upstash has arrived to rescue your mailbox
+
+
+Okay, now we need a way to limit the number of emails that users are allowed to send. That's where Upstash comes in with its magic library: [@upstash/ratelimit](https://github.com/upstash/ratelimit). Let's create a new database in the [Upstash Console](https://console.upstash.com/redis?new=true) and grab our keys: `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`.
+
+After setting those keys in our `.env` file, we need to install the required libraries by running the command: `npm i @upstash/ratelimit @upstash/redis request-ip`. Once we've done that, let's integrate those libraries into our codebase.
+
+```js
+// /pages/api/sendgrid.js
+
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
+import { getClientIp } from 'request-ip';
+
+const redis = new Redis({
+	url: process.env.UPSTASH_REDIS_REST_URL,
+	token: process.env.UPSTASH_REDIS_REST_TOKEN,
+});
+
+// Create a new ratelimiter that allows 2 requests per 30 minutes
+const ratelimit = new Ratelimit({
+	redis,
+	limiter: Ratelimit.fixedWindow(2, '30m'),
+});
+
+...
+
+async function sendEmail(req, res) {
+	try {
+		const identifier = getClientIp(req);
+		const result = await ratelimit.limit(identifier);
+
+		if (result.remaining  <=  0) {
+			return res.status(500).json({
+				error: 'Your messages have been registered, please give us time to walkthough your ideas. Thank you! 👩‍💻 🧑‍💻'
+			});
+		}
+
+		// ...
+
+	} catch (error) {
+		return  res.status(error.statusCode  ||  500).json({ error: error.message });
+	}
+}
+
+```
+
+Now we are ready! Let's give it a test to see if it's working or not.
+
+![After add rate limit](https://i.ibb.co/fCyKWnr/Screenshot-2023-03-13-at-18-22-15.png)
+_Try to spam again bros_
+
+## Closing thoughts
+
+It's amazing to see how we can implement a complicated function with just a few lines of code. I hope my experience with this problem reflects a real-world case study that can help my fellow developers solve their own problems. Thank you for reading the entire post; I really appreciate it!
