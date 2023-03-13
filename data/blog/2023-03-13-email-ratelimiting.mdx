@@ -35,7 +35,7 @@ To use SendGrid services, we need to create an API Key. This can be done by visi
 Let's create the email template and handle the request for the endpoint:
 
 ```js
-// sendgrid.js
+// /pages/api/sendgrid.js
 
 import sgMail from "@sendgrid/mail";
 
@@ -103,7 +103,7 @@ export default sendEmail;
 Now the endpoint is ready, we can integrate it with our email form above:
 
 ```js
-// form.jsx
+// /pages/form.jsx
 
 const handleSubmitData = async (data) => {
   const res = await fetch("/api/sendgrid", {
@@ -127,24 +127,33 @@ const handleSubmitData = async (data) => {
 };
 ```
 
+
+### Deploying to Vercel
+
+The last thing we need to do is to deploy our app to Vercel. It's a free hosting service that allows you to deploy your Next.js app in a few clicks. Check them out at [vercel.com](https://vercel.com).
+
+Also make sure to copy the `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` from the Upstash Console and add them to your Vercel project's environment variables.
+
 Cool! We are finished! Right? ...
 
 ![meme](https://i.imgflip.com/7eabhz.jpg)
 _Murphy's Law: "Anything that can go wrong will go wrong."_
 
-### Upstash has arrived to rescue your mailbox
 
 _Things will never go as you expected_. That's the lesson I learned when my boss called me and said our mailbox was on fire. It turned out that some internet trolls had found the form and were spamming the send email button.
 
 ![Burning the mailbox](https://i.ibb.co/dpDyyQP/Screenshot-2023-03-13-at-17-45-53.png)
 _I smell something burning_
 
-Okay, now we need a way to limit the number of emails that users are allowed to send. That's where Upstash comes in with its magic library: `@upstash/ratelimit`. Let's create an account on the [Upstash Console](https://console.upstash.com/) and grab our keys: `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`.
+### Upstash has arrived to rescue your mailbox
+
+
+Okay, now we need a way to limit the number of emails that users are allowed to send. That's where Upstash comes in with its magic library: [@upstash/ratelimit](https://github.com/upstash/ratelimit). Let's create a new database in the [Upstash Console](https://console.upstash.com/redis?new=true) and grab our keys: `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`.
 
 After setting those keys in our `.env` file, we need to install the required libraries by running the command: `npm i @upstash/ratelimit @upstash/redis request-ip`. Once we've done that, let's integrate those libraries into our codebase.
 
 ```js
-// sendgrid.js
+// /pages/api/sendgrid.js
 
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
@@ -188,6 +197,6 @@ Now we are ready! Let's give it a test to see if it's working or not.
 ![After add rate limit](https://i.ibb.co/fCyKWnr/Screenshot-2023-03-13-at-18-22-15.png)
 _Try to spam again bros_
 
-## Some random thoughts
+## Closing thoughts
 
 It's amazing to see how we can implement a complicated function with just a few lines of code. I hope my experience with this problem reflects a real-world case study that can help my fellow developers solve their own problems. Thank you for reading the entire post; I really appreciate it!
