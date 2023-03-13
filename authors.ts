@@ -184,8 +184,14 @@ export default {
   },
   thomasCazade:{
     name:"Thomas Cazade",
-    title:"Founder of fastsheet",
+    title:"Founder of fastsheet (Guest Author)",
     url:"https://twitter.com/TotomInc",
     image_url:"blog/authors/thomas_cazade.jpeg",
+  },
+  russTran:{
+    name:"Russ Tran",
+    title:"Frontend Engineer at JUST.engineer (Guest Author)",
+    url:"https://twitter.com/russdevdotnet",
+    image_url:"blog/authors/russ_tran.jpeg",
   }
 };
