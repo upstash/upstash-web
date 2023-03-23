@@ -86,7 +86,7 @@ export default function BlogPage({
         <meta
           key="og:description"
           property="og:description"
-          content="Articles and tutorials from the Upstash team and community."
+          content="Articles and tutorials from Upstash and community."
         />
         <meta
           key="og:image"
@@ -108,7 +108,7 @@ export default function BlogPage({
         <meta
           key="twitter:description"
           name="twitter:description"
-          content="Articles and tutorials from the Upstash team and community."
+          content="Articles and tutorials from Upstash and community."
         />
       </Head>
 
@@ -119,9 +119,7 @@ export default function BlogPage({
               Blog
             </Heading>
             <Box mt="24px" fontSize={["md", "xl"]} color="whiteAlpha.700">
-              <Text>
-                Articles and tutorials from the Upstash team and community.
-              </Text>
+              <Text>Articles and tutorials from Upstash and community.</Text>
             </Box>
           </Box>
 
@@ -134,7 +132,7 @@ export default function BlogPage({
                       label={`Filter by ${tag}`}
                       aria-label={`Filter by ${tag}`}
                       color="black"
-                      >
+                    >
                       <Tag
                         key={tag}
                         size="lg"

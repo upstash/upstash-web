@@ -86,7 +86,7 @@ export default function BlogPostPage({
 
   const description =
     post.description ||
-    "Articles and tutorials on serverless technologies from Upstash team and community";
+    "Articles and tutorials on serverless technologies from Upstash and community";
 
   const [party, setParty] = React.useState(false);
 

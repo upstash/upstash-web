@@ -127,7 +127,7 @@ export default {
   },
   rodney: {
     name: "Rodney Johnson",
-    title: "Consultant Web Developer",
+    title: "Technical Content Writer",
     image_url: "blog/authors/rodney.jpg",
   },
   lorenzo: {
@@ -184,8 +184,20 @@ export default {
   },
   thomasCazade:{
     name:"Thomas Cazade",
-    title:"Founder of fastsheet",
+    title:"Founder of fastsheet (Guest Author)",
     url:"https://twitter.com/TotomInc",
     image_url:"blog/authors/thomas_cazade.jpeg",
+  },
+  russTran:{
+    name:"Russ Tran",
+    title:"Frontend Engineer at JUST.engineer (Guest Author)",
+    url:"https://twitter.com/russdevdotnet",
+    image_url:"blog/authors/russ_tran.jpeg",
+  },
+  hosna:{
+    name:"Hosna Qasmei",
+    title:"Full Stack Developer (Guest Author)",
+    url:"https://twitter.com/hqasmei",
+    image_url:"blog/authors/hosna.jpeg",
   }
 };
