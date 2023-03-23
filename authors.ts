@@ -193,5 +193,11 @@ export default {
     title:"Frontend Engineer at JUST.engineer (Guest Author)",
     url:"https://twitter.com/russdevdotnet",
     image_url:"blog/authors/russ_tran.jpeg",
+  },
+  hosna:{
+    name:"Hosna Qasmei",
+    title:"Full Stack Developer (Guest Author)",
+    url:"https://twitter.com/hqasmei",
+    image_url:"blog/authors/hosna.jpeg",
   }
 };
