@@ -1,26 +1,26 @@
 ---
-slug: ratelimit-dashboard
-title: "Announcing the Ratelimit Dashboard"
+slug: ratelimit-analyticss
+title: "Announcing the Rate Limit Analytics"
 author: andreas
 tags: [redis, ratelimit, dashboard, announcement, analytics]
 ---
 
 We are thrilled to announce the latest addition to our
 [@upstash/ratelimit](https://github.com/upstash/ratelimit) library, the
-**Ratelimit Dashboard**! As the library gains more popularity, we have been
+**Rate Limit Analytics**! As the library gains more popularity, we have been
 receiving valuable feedback on how we can improve it. One of the most requested
 features was a way to have a better view of the overall performance and how
-limits apply to different users in an application. The Ratelimit Dashboard
+limits apply to different users in an application. The Rate Limit Dashboard
 allows you to do just that. You can now easily visualize and analyze your rate
 limits, giving you better insights into your application's performance. You can
-access the Ratelimit Dashboard by visiting
+access the Rate Limit Dashboard by visiting
 [console.upstash.com/ratelimit](https://console.upstash.com/ratelimit) after
 enabling analytics (see below).
 
 ![Dashboard](/blog/ratelimit-dashboard/dashboard.png)
 
 If you're not familiar with `@upstash/ratelimit`, it is a TypeScript library
-built on top of [Upstash Redis](https://upstash.com/). It allows you to easily
+built on top of [Upstash for Redis®](https://upstash.com/). It allows you to easily
 add rate limiting to your application and works over HTTP, making it perfect for
 stateless runtimes like serverless and edge. You can learn more about how it
 works by reading our [announcement](/blog/upstash-ratelimit) or by checking out
@@ -30,7 +30,7 @@ the [repository](https://github.com/upsatsh/ratelimit).
 
 Enabling analytics for `@upstash/ratelimit` is completely optional and does not
 add any latency to your application's critical path. You can enable analytics by
-configuring it in the Ratelimit constructor:
+configuring it in the Rate Limit constructor:
 
 ```ts
 import { Ratelimit } from "@upstash/ratelimit";
@@ -45,7 +45,7 @@ const ratelimit = new Ratelimit({
 
 ## Console
 
-Once you've enabled analytics, you can access the Ratelimit Dashboard by
+Once you've enabled analytics, you can access the Rate Limit Dashboard by
 visiting [console.upstash.com/ratelimit](https://console.upstash.com/ratelimit).
 From there, you can select the database you're using for rate limiting and start
 monitoring. ![Select Database](/blog/ratelimit-dashboard/select-db.png)
