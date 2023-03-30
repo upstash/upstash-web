@@ -80,10 +80,7 @@ body. If it's not present, we'll return a `400` status code.
 ```ts:/api/incr.ts_2/5
 export default async function incr(req: NextRequest): Promise<NextResponse> {
   const body = await req.json();
-  let slug: string | undefined = undefined;
-  if ("slug" in body) {
-    slug = body.slug;
-  }
+  const slug = body.slug as string | undefined;
   if (!slug) {
     return new NextResponse("Slug not found", { status: 400 });
   }
