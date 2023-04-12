@@ -7,7 +7,7 @@ location: Work from anywhere
 skills: [kubernetes, docker, linux, aws]
 ---
 
-#### UPDATE: This position is closed. You can still apply for possible future openings.
+[comment]: <> (#### UPDATE: This position is closed. You can still apply for possible future openings.)
 
 At Upstash, we are building the next generation data platform for the serverless
 and edge era.
