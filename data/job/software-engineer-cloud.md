@@ -1,13 +1,11 @@
 ---
-title: Software Engineer - Cloud/SRE
+title: Mid/Senior Software Engineer - Cloud/SRE
 summary: Build the Upstash cloud infrastructure.
 experience: 2+ years
 how: Full time
 location: Work from anywhere
 skills: [kubernetes, docker, linux, aws]
 ---
-
-[comment]: <> (#### UPDATE: This position is closed. You can still apply for possible future openings.)
 
 At Upstash, we are building the next generation data platform for the serverless
 and edge era.
