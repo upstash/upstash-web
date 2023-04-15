@@ -21,6 +21,7 @@ export const Job = defineDocumentType(() => ({
     how: { type: "string", required: true },
     location: { type: "string", required: true },
     skills: { type: "json", required: true },
+    draft: { type: "boolean" },
   },
   computedFields: {
     slug: {

@@ -5,6 +5,7 @@ experience: Student
 how: Part/Full time
 location: Work from anywhere
 skills: [linux, aws, any programming language]
+draft: true
 ---
 
 #### UPDATE: This position is closed. You can still apply for possible future openings.

@@ -13,7 +13,7 @@ import CareerCard from "components/career-card";
 import { allJobs } from "contentlayer/generated";
 
 export async function getStaticProps() {
-  return { props: { jobs: allJobs } };
+  return { props: { jobs: allJobs.filter((o) => !o.draft) } };
 }
 
 export default function CareerPage({ jobs }) {

@@ -125,6 +125,10 @@ export default function CareerDetailPage({ job }) {
             .post > h4 {
               font-size: 1.2rem;
             }
+
+            .post a {
+              color: #00e9a3;
+            }
           `}</style>
         </Container>
       </Box>

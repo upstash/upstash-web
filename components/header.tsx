@@ -1,13 +1,13 @@
 import {
-  Container,
-  IconButton,
-  Grid,
-  Button,
-  GridItem,
-  Box,
-  Stack,
-  Link as ChakraLink,
   Badge,
+  Box,
+  Button,
+  Container,
+  Grid,
+  GridItem,
+  IconButton,
+  Link as ChakraLink,
+  Stack,
   Text,
 } from "@chakra-ui/react";
 import CustomLink from "./custom-link";
@@ -16,6 +16,7 @@ import Logo from "./logo";
 import { LINKS, SOCIAL_LINKS } from "constants/";
 import { useRouter } from "next/router";
 import Link from "./link";
+import { allJobs } from "contentlayer/generated";
 
 function Header({ onOpen }: { onOpen: () => void }) {
   const { pathname } = useRouter();
@@ -64,7 +65,7 @@ function Header({ onOpen }: { onOpen: () => void }) {
                 <Text as="span">Blog</Text>
               </Link>
 
-              {/*<Link href="/careers" color="inherit" alignItems="baseline">
+              <Link href="/careers" color="inherit" alignItems="baseline">
                 <Text as="span">Careers</Text>{" "}
                 <Badge
                   ml={1}
@@ -72,9 +73,9 @@ function Header({ onOpen }: { onOpen: () => void }) {
                   colorScheme="green"
                   fontWeight="normal"
                 >
-                  3
+                  {allJobs.filter((o) => !o.draft).length}
                 </Badge>
-              </Link>*/}
+              </Link>
 
               <CustomLink isExternal href={LINKS.docs} color="inherit">
                 Docs
