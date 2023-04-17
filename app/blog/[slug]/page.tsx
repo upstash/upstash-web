@@ -48,7 +48,7 @@ export default async function BlogPage({ params }: Props) {
         <Mdx code={post.body.code} />
 
         {/* Tags */}
-        <div className="flex justify-center gap-2 border-y border-zinc-900 py-10">
+        <div className="flex flex-wrap justify-center gap-2 border-y border-zinc-900 py-10">
           {post.tags.map((tag: string) => (
             <Link
               key={tag}

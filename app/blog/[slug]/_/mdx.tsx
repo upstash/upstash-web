@@ -1,6 +1,6 @@
 import { ComponentProps } from "react";
 import { useMDXComponent } from "next-contentlayer/hooks";
-import Image from "next/image";
+import PostNote from "./note";
 
 interface MdxProps {
   code: string;
@@ -29,7 +29,9 @@ function a(props: ComponentProps<"a">) {
 
 function table(props: ComponentProps<"table">) {
   return (
-    <table className="w-full max-w-fit max-w-full overflow-auto" {...props} />
+    <div className="overflow-auto">
+      <table className="max-w-fit" {...props} />
+    </div>
   );
 }
 
@@ -109,6 +111,10 @@ function img(props: ComponentProps<"img">) {
   return <img className="mx-auto block rounded-xl" {...props} />;
 }
 
+function FullWidth(props: ComponentProps<"div">) {
+  return <div className="lg:-mx-40" {...props} />;
+}
+
 const components = {
   strong,
   b: strong,
@@ -126,10 +132,6 @@ const components = {
   img,
   code,
   h4,
-  FullWidth: (props: ComponentProps<"div">) => {
-    return <div {...props} />;
-  },
-  Note: (props: ComponentProps<"div">) => {
-    return <div {...props} />;
-  },
+  FullWidth,
+  Note: PostNote,
 };
