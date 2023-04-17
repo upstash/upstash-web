@@ -5,7 +5,7 @@ import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 import rehypeCodeTitles from "rehype-code-titles";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import authors from "./authors";
+import authors from "./utils/authors";
 import { bundleMDX } from "mdx-bundler";
 import { tocPlugin } from "./utils/contentlayerPlugins";
 
@@ -40,15 +40,26 @@ export const Post = defineDocumentType(() => ({
     title: { type: "string", required: true },
     description: { type: "string" },
     author: { type: "string", required: true },
-    tags: { type: "json", required: true },
+    tags: { type: "json", of: "string", required: true },
     image: { type: "string" },
-    tweetUrl: { type: "string" },
+    tweet: { type: "string" },
+    draft: { type: "boolean" },
   },
   computedFields: {
+    authorObj: {
+      type: "json",
+      resolve: (doc) => {
+        const author = authors[doc.author as keyof typeof authors];
+        return {
+          ...author,
+          photo: `/authors/${author.image}`,
+        };
+      },
+    },
     url: {
       type: "string",
       resolve: (doc) => {
-        return `https://upstash.com/blog/${doc.slug}`;
+        return `/blog/${doc.slug}`;
       },
     },
     readingTime: {
@@ -63,13 +74,7 @@ export const Post = defineDocumentType(() => ({
         return doc._raw.sourceFileName.substring(-1, 10);
       },
     },
-    authorObj: {
-      type: "json",
-      resolve: (doc) => {
-        return { slug: doc.author, ...authors[doc.author] };
-      },
-    },
-    metaImage: {
+    image: {
       type: "string",
       resolve: (doc) => {
         return `https://upstash.com/api/og/blog?title=${doc.title}&author=${doc.author}`;
@@ -109,6 +114,7 @@ export default makeSource({
       [
         rehypeAutolinkHeadings,
         {
+          behavior: "wrap",
           properties: {
             className: ["anchor"],
           },
