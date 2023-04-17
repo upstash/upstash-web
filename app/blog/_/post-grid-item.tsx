@@ -15,24 +15,27 @@ export default function PostCard({
 
   return (
     <article className="flex h-full flex-col rounded-xl bg-zinc-900 p-6 md:p-8">
-      <h3 className="font-display text-3xl font-semibold leading-tight">
+      <h3 className="pr-4 font-display text-3xl font-semibold leading-tight md:pr-12">
         <Balancer>
-          <Link href={`/blog/${slug}`}>{title}</Link>
+          <Link
+            href={`/blog/${slug}`}
+            className="block decoration-emerald-900 hover:text-emerald-400 hover:underline"
+          >
+            {title}
+          </Link>
         </Balancer>
       </h3>
 
-      <div className="mt-8 flex grow items-center gap-6">
-        <Image
-          width={50}
-          height={50}
-          alt={authorObj.name}
-          src={authorObj.photo}
-          className="rounded-full"
-        />
-        <div className="flex flex-col">
-          <Link href={`/blog/author/${author}`}>{authorObj.name}</Link>
+      <div className="mt-4 flex grow items-center gap-4">
+        <div className="flex grow flex-col items-start">
+          <Link
+            href={`/blog/author/${author}`}
+            className="decoration-emerald-900 opacity-80 hover:text-emerald-400 hover:underline"
+          >
+            {authorObj.name}
+          </Link>
 
-          <time dateTime={date} className="opacity-60">
+          <time dateTime={date} className="opacity-40">
             {DateTime.fromISO(date).toFormat("LLLL d, yyyy")}
           </time>
 
@@ -44,6 +47,14 @@ export default function PostCard({
             </span>
           )}
         </div>
+
+        <Image
+          width={50}
+          height={50}
+          alt={authorObj.name}
+          src={authorObj.photo}
+          className="shrink-0 rounded-full"
+        />
       </div>
     </article>
   );

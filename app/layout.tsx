@@ -7,6 +7,7 @@ import { Inter } from "next/font/google";
 import localFont from "next/font/local";
 import { ReactNode } from "react";
 import cx from "@/utils/cx";
+import { SITE_URL } from "@/utils/const";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -28,16 +29,37 @@ const interDisplay = localFont({
   ],
 });
 
-const title = "Adem ilter";
-const description = "Designer, developer, creator and photographer.";
-const url = "https://ademilter.com";
+const title = "Upstash: Serverless Data for Redis® and Kafka®";
+const description =
+  "Designed for the serverless with per-request pricing and Redis®/Kafka® API.";
 
 export const metadata: Metadata = {
   title: {
     default: title,
-    template: `%s | ${title}`,
+    template: `%s | Upstash`,
   },
   description,
+  openGraph: {
+    title,
+    description,
+    url: SITE_URL,
+    siteName: title,
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title,
+    description,
+    site: "@upstash",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  icons: {
+    icon: "/static/favicon-32x32.png",
+    apple: "/static/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

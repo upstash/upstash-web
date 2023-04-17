@@ -1,3 +1,4 @@
+import type { Post } from "contentlayer/generated";
 import { allPosts } from "contentlayer/generated";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -6,6 +7,7 @@ import OtherPostCard from "./_/other-post";
 import Clap from "./_/claps";
 import { Mdx } from "./_/mdx";
 import Container from "@/components/container";
+import { SITE_URL } from "@/utils/const";
 
 type Props = {
   params: {
@@ -19,6 +21,37 @@ export async function generateStaticParams(): Promise<Props["params"][]> {
     .map((post) => ({
       slug: post.slug,
     }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Props["params"];
+}) {
+  const post = allPosts.find((post: Post) => post.slug === params.slug) as Post;
+  const title = post.title;
+  const description =
+    post.description ||
+    "Articles and tutorials on serverless technologies from Upstash and community";
+  const url = `${SITE_URL}/blog/${post.slug}`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: title,
+      type: "website",
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+      site: "@upstash",
+    },
+  };
 }
 
 export default async function BlogPage({ params }: Props) {

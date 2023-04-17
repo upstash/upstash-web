@@ -56,12 +56,6 @@ export const Post = defineDocumentType(() => ({
         };
       },
     },
-    url: {
-      type: "string",
-      resolve: (doc) => {
-        return `/blog/${doc.slug}`;
-      },
-    },
     readingTime: {
       type: "json",
       resolve: (doc) => {
