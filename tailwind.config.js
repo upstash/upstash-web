@@ -11,14 +11,15 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: ["var(--font-sans)", ...defaultTheme.fontFamily.sans],
+        display: [
+          "var(--font-display)",
+          "var(--font-sans)",
+          ...defaultTheme.fontFamily.sans,
+        ],
       },
-    },
-    fontFamily: {
-      display: [
-        "var(--font-display)",
-        "var(--font-sans)",
-        ...defaultTheme.fontFamily.sans,
-      ],
+      lineHeight: {
+        p: "1.72",
+      },
     },
   },
 };

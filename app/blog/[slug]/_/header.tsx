@@ -15,14 +15,16 @@ export default function PostHeader({ post }: Props) {
     <header className="py-20 text-center">
       <Container className="max-w-screen-md">
         {/* meta */}
-        <div className="flex flex-wrap items-center justify-center opacity-60">
+        <div className="flex flex-wrap items-center justify-center gap-2 opacity-60">
           <time dateTime={post.date}>
             {DateTime.fromISO(post.date).toFormat("LLLL d, yyyy")}
           </time>
           <span>·</span>
           <span>{post.readingTime.text}</span>
           <span>·</span>
-          <IncrView slug={post.slug} />
+          <span>
+            <IncrView slug={post.slug} /> views
+          </span>
         </div>
 
         {/* title */}

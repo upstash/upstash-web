@@ -19,7 +19,7 @@ export default function PostCard({
         <Balancer>
           <Link
             href={`/blog/${slug}`}
-            className="block decoration-emerald-900 hover:text-emerald-400 hover:underline"
+            className="block decoration-emerald-900 hover:text-emerald-200 hover:underline"
           >
             {title}
           </Link>
@@ -30,7 +30,7 @@ export default function PostCard({
         <div className="flex grow flex-col items-start">
           <Link
             href={`/blog/author/${author}`}
-            className="decoration-emerald-900 opacity-80 hover:text-emerald-400 hover:underline"
+            className="decoration-emerald-900 hover:text-emerald-200 hover:underline"
           >
             {authorObj.name}
           </Link>

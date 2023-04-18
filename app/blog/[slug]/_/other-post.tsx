@@ -15,7 +15,7 @@ export default function OtherPostCard({ post, align = "left" }: Props) {
       className={cx(
         "flex flex-col px-6 py-5 text-left",
         "cursor-pointer rounded-xl bg-zinc-800",
-        "hover:bg-emerald-950 hover:text-emerald-200",
+        "hover:bg-emerald-950 hover:text-emerald-200 hover:underline",
         align === "right" && "text-right"
       )}
     >

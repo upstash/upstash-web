@@ -22,8 +22,6 @@ export default function IncrView({ slug }: { slug: string }) {
   }, [slug]);
 
   return (
-    <span>
-      {Intl.NumberFormat("en-US", { notation: "compact" }).format(count)}
-    </span>
+    <>{Intl.NumberFormat("en-US", { notation: "compact" }).format(count)}</>
   );
 }

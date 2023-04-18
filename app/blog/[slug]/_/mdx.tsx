@@ -10,7 +10,7 @@ export function Mdx({ code }: MdxProps) {
   const Component = useMDXComponent(code);
 
   return (
-    <div className="post leading-relaxed">
+    <div className="post leading-p">
       <Component components={{ ...components }} />
     </div>
   );
@@ -21,7 +21,8 @@ export function Mdx({ code }: MdxProps) {
 function a(props: ComponentProps<"a">) {
   return (
     <a
-      className="text-emerald-400 underline decoration-emerald-800"
+      className="text-emerald-400
+      hover:underline hover:decoration-emerald-400"
       {...props}
     />
   );
@@ -65,7 +66,7 @@ function hr(props: ComponentProps<"hr">) {
 function ul(props: ComponentProps<"ul">) {
   return (
     <ul
-      className="list-inside list-disc space-y-4 marker:text-zinc-400"
+      className="list-inside list-disc space-y-2 marker:text-zinc-400"
       {...props}
     />
   );
@@ -74,7 +75,7 @@ function ul(props: ComponentProps<"ul">) {
 function ol(props: ComponentProps<"ol">) {
   return (
     <ol
-      className="list-inside list-decimal space-y-4 marker:text-zinc-400"
+      className="list-inside list-decimal space-y-2 marker:text-zinc-400"
       {...props}
     />
   );
@@ -86,7 +87,7 @@ function blockquote(props: ComponentProps<"blockquote">) {
 
 function h2(props: ComponentProps<"h2">) {
   return (
-    <h2 className="mt-10 font-display text-4xl font-semibold" {...props} />
+    <h2 className="mt-16 font-display text-4xl font-semibold" {...props} />
   );
 }
 
@@ -101,7 +102,8 @@ function h4(props: ComponentProps<"h4">) {
 function code(props: ComponentProps<"code">) {
   return (
     <code
-      className="whitespace-pre break-normal rounded bg-emerald-950 bg-opacity-50 p-0.5 text-[.92em] text-emerald-200"
+      className="whitespace-pre break-normal rounded bg-emerald-950
+      bg-opacity-50 px-1 py-0.5 text-[.94em] text-emerald-200"
       {...props}
     />
   );
