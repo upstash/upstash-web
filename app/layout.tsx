@@ -1,7 +1,6 @@
 import "./globals.css";
 import "@upstash/claps/style.css";
 
-import AnalyticsWrapper from "./analytics";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import localFont from "next/font/local";
@@ -72,11 +71,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         "scroll-smooth bg-zinc-950 text-zinc-50 antialiased"
       )}
     >
-      <body className="py-20">
-        {children}
-
-        <AnalyticsWrapper />
-      </body>
+      <body className="py-20">{children}</body>
     </html>
   );
 }
