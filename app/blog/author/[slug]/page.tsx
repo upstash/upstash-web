@@ -1,6 +1,6 @@
-import getData from "../../_/get-data";
-import PostGrid from "@/app/blog/_/post-grid";
-import TagList from "@/app/blog/_/tag-list";
+import getData from "../../get-data";
+import PostGrid from "@/components/blog/grid";
+import PopularTag from "@/components/blog/popular-tag";
 
 export default async function BlogPage() {
   const { posts, views, tags } = await getData();
@@ -14,7 +14,7 @@ export default async function BlogPage() {
         </p>
 
         <div className="mt-6">
-          <TagList data={tags.slice(0, 10)} />
+          <PopularTag data={tags.slice(0, 10)} />
         </div>
       </header>
 

@@ -3,7 +3,7 @@ import type { Post } from "contentlayer/generated";
 import Balancer from "react-wrap-balancer";
 import Container from "@/components/container";
 import { DateTime } from "luxon";
-import IncrView from "@/app/blog/[slug]/_/view";
+import IncrView from "@/components/post/view";
 import Image from "next/image";
 
 type Props = {

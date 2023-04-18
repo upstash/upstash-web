@@ -1,9 +1,9 @@
 import Link from "next/link";
 import type { Post } from "contentlayer/generated";
 import Container from "@/components/container";
-import PostCard from "./post-list-item";
+import PostCard from "./grid-item";
 
-export default function PostList({
+export default function PostGrid({
   data,
   views,
 }: {
@@ -11,14 +11,20 @@ export default function PostList({
   views: Record<string, number>;
 }) {
   return (
-    <Container className="max-w-screen-lg">
-      <div className="grid gap-0.5">
+    <Container>
+      <div className="grid gap-6 md:grid-cols-2 md:gap-8">
         {data.map((post: Post) => {
-          return <PostCard key={post.slug} data={post} />;
+          return (
+            <PostCard
+              key={post.slug}
+              data={post}
+              viewCount={views[post.slug]}
+            />
+          );
         })}
       </div>
 
-      <div className="mt-10 ">
+      <div className="mt-10">
         <Link href={`/blog/all`}>Show all posts</Link>
       </div>
     </Container>

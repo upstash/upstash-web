@@ -1,6 +1,6 @@
-import getData from "./_/get-data";
-import PostGrid from "@/app/blog/_/post-grid";
-import TagList from "@/app/blog/_/tag-list";
+import getData from "./get-data";
+import PostGrid from "@/components/blog/grid";
+import PopularTag from "@/components/blog/popular-tag";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
 import Container from "@/components/container";
@@ -19,7 +19,7 @@ export default async function BlogPage() {
           </PageHeaderDesc>
 
           <div className="mt-8">
-            <TagList data={tags.slice(0, 12)} />
+            <PopularTag data={tags.slice(0, 12)} />
           </div>
         </Container>
       </header>

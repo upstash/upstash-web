@@ -1,13 +1,13 @@
 import type { Post } from "contentlayer/generated";
 import { allPosts } from "contentlayer/generated";
 import { notFound } from "next/navigation";
-import OtherPostCard from "./_/other-post";
-import Clap from "./_/claps";
-import { Mdx } from "./_/mdx";
+import OtherPostCard from "@/components/post/other-post";
+import Clap from "@/components/post/claps";
+import { Mdx } from "@/components/post/mdx";
 import Container from "@/components/container";
 import { SITE_URL } from "@/utils/const";
-import PostHeader from "@/app/blog/[slug]/_/header";
-import PostTags from "@/app/blog/[slug]/_/tags";
+import PostHeader from "@/components/post/header";
+import PostTags from "@/components/post/tags";
 import PageBodyGradient from "@/components/page-body-gradient";
 // import PostTOC from "@/app/blog/[slug]/_/toc";
 

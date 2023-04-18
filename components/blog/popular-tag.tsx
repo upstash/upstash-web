@@ -2,7 +2,7 @@ import { TAG_NAMES } from "@/utils/const";
 import Link from "next/link";
 import cx from "@/utils/cx";
 
-export default function TagList({ data }: { data: [string, number][] }) {
+export default function BlogPopularTag({ data }: { data: [string, number][] }) {
   const colors = [
     "bg-rose-300 bg-opacity-10 text-rose-300 hover:bg-opacity-20 hover:text-rose-200",
     "bg-blue-300 bg-opacity-10 text-blue-300 hover:bg-opacity-20 hover:text-blue-200",
