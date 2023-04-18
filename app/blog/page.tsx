@@ -14,17 +14,17 @@ export default async function BlogPage() {
       <header className="py-20 text-center">
         <Container>
           <PageHeaderTitle>Blog</PageHeaderTitle>
-          <PageHeaderDesc>
+          <PageHeaderDesc className="mt-2">
             Articles and tutorials from Upstash and community.
           </PageHeaderDesc>
 
-          <div className="mt-8">
+          <div className="mt-10">
             <PopularTag data={tags.slice(0, 12)} />
           </div>
         </Container>
       </header>
 
-      <div className="relative z-10 pt-20">
+      <div className="relative z-0 pt-20">
         <PageBodyGradient className="opacity-40" />
 
         {/* grid */}

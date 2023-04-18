@@ -53,7 +53,7 @@ export default function PostCard({
           height={50}
           alt={authorObj.name}
           src={authorObj.photo}
-          className="shrink-0 rounded-full"
+          className="aspect-square shrink-0 rounded-full object-cover"
         />
       </div>
     </article>

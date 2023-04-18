@@ -20,10 +20,6 @@ export default function PostHeader({ post }: Props) {
           </time>
           <span>·</span>
           <span>{post.readingTime.text}</span>
-          {/*<span>·</span>*/}
-          {/*<span>*/}
-          {/*  <IncrView slug={post.slug} /> views*/}
-          {/*</span>*/}
         </div>
 
         {/* title */}
@@ -38,7 +34,7 @@ export default function PostHeader({ post }: Props) {
             height={50}
             alt={post.authorObj.name}
             src={post.authorObj.photo}
-            className="shrink-0 rounded-full"
+            className="aspect-square shrink-0 rounded-full object-cover"
           />
           <Link
             href={`/blog/author/${post.author}`}

@@ -1,5 +1,6 @@
 import React, { HTMLAttributes } from "react";
 import cx from "@/utils/cx";
+import Balancer from "react-wrap-balancer";
 
 type IPageHeaderDesc = HTMLAttributes<HTMLParagraphElement> & {
   children: React.ReactNode;
@@ -11,8 +12,10 @@ export default function PageHeaderDesc({
   ...props
 }: IPageHeaderDesc) {
   return (
-    <p className={cx("mt-4 text-xl opacity-60", className)} {...props}>
-      {children}
-    </p>
+    <Balancer>
+      <p className={cx("text-lg opacity-60 md:text-2xl", className)} {...props}>
+        {children}
+      </p>
+    </Balancer>
   );
 }
