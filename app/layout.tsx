@@ -7,6 +7,8 @@ import localFont from "next/font/local";
 import { ReactNode } from "react";
 import cx from "@/utils/cx";
 import { SITE_URL } from "@/utils/const";
+import AppHeader from "@/components/app-header";
+import AppFooter from "@/components/app-footer";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -70,7 +72,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         "scroll-smooth bg-zinc-950 text-zinc-50 antialiased"
       )}
     >
-      <body className="py-20">{children}</body>
+      <body>
+        <AppHeader />
+        {children}
+        <AppFooter />
+      </body>
     </html>
   );
 }
