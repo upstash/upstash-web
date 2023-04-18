@@ -8,6 +8,8 @@ import Container from "@/components/container";
 import { SITE_URL } from "@/utils/const";
 import PostHeader from "@/app/blog/[slug]/_/header";
 import PostTags from "@/app/blog/[slug]/_/tags";
+import PageBodyGradient from "@/components/page-body-gradient";
+// import PostTOC from "@/app/blog/[slug]/_/toc";
 
 type Props = {
   params: {
@@ -73,12 +75,11 @@ export default async function BlogPage({ params }: Props) {
       {/* Header */}
       <PostHeader post={post} />
 
+      {/*<PostTOC post={post} />*/}
+
       {/* Body */}
       <div className="relative z-0 pt-20">
-        <div
-          className="absolute inset-x-0 top-0 -z-10 h-[800px]
-        bg-gradient-to-b from-zinc-900 to-zinc-950 opacity-80"
-        />
+        <PageBodyGradient />
 
         <Container className="max-w-screen-md">
           <Mdx code={post.body.code} />

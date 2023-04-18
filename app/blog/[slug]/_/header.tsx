@@ -3,7 +3,6 @@ import type { Post } from "contentlayer/generated";
 import Balancer from "react-wrap-balancer";
 import Container from "@/components/container";
 import { DateTime } from "luxon";
-import IncrView from "@/app/blog/[slug]/_/view";
 import Image from "next/image";
 
 type Props = {
@@ -13,7 +12,7 @@ type Props = {
 export default function PostHeader({ post }: Props) {
   return (
     <header className="py-20 text-center">
-      <Container className="max-w-screen-md">
+      <Container className="max-w-screen-lg">
         {/* meta */}
         <div className="flex flex-wrap items-center justify-center gap-2 opacity-60">
           <time dateTime={post.date}>
@@ -21,14 +20,14 @@ export default function PostHeader({ post }: Props) {
           </time>
           <span>·</span>
           <span>{post.readingTime.text}</span>
-          <span>·</span>
-          <span>
-            <IncrView slug={post.slug} /> views
-          </span>
+          {/*<span>·</span>*/}
+          {/*<span>*/}
+          {/*  <IncrView slug={post.slug} /> views*/}
+          {/*</span>*/}
         </div>
 
         {/* title */}
-        <h1 className="mt-2 font-display text-6xl font-semibold">
+        <h1 className="mt-2 font-display text-4xl font-semibold !leading-title md:text-5xl">
           <Balancer>{post.title}</Balancer>
         </h1>
 

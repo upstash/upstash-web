@@ -1,7 +1,7 @@
 import * as unified from "unified";
 import { toMarkdown } from "mdast-util-to-markdown";
 import { mdxToMarkdown } from "mdast-util-mdx";
-import { PostHeading } from "../contentlayer.config";
+import { PostHeading } from "@/contentlayer.config";
 import Slugger from "github-slugger";
 
 // https://github.com/contentlayerdev/website/blob/main/src/contentlayer/document/Post.ts#L108
@@ -23,7 +23,7 @@ export const tocPlugin =
             .replace(/\\/g, "")
             .trim();
 
-          if (![2, 3].includes(heading.depth)) return;
+          if (![2].includes(heading.depth)) return;
 
           return headings.push({
             level: heading.depth,

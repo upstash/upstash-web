@@ -19,7 +19,7 @@ export default function PostCard({
         <Balancer>
           <Link
             href={`/blog/${slug}`}
-            className="block decoration-emerald-900 hover:text-emerald-200 hover:underline"
+            className="block decoration-emerald-900 transition hover:text-emerald-200 hover:underline"
           >
             {title}
           </Link>

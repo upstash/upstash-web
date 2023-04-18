@@ -19,6 +19,7 @@ module.exports = {
       },
       lineHeight: {
         p: "1.72",
+        title: "1.16",
       },
     },
   },

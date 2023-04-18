@@ -13,16 +13,16 @@ export default function OtherPostCard({ post, align = "left" }: Props) {
     <NextLink
       href={`/blog/${post.slug}`}
       className={cx(
-        "flex flex-col px-6 py-5 text-left",
-        "cursor-pointer rounded-xl bg-zinc-800",
-        "hover:bg-emerald-950 hover:text-emerald-200 hover:underline",
+        "flex flex-col p-6 text-left",
+        "cursor-pointer rounded-xl bg-zinc-800 transition",
+        "hover:bg-emerald-950 hover:text-emerald-100 hover:underline",
         align === "right" && "text-right"
       )}
     >
       <span className="text-sm uppercase opacity-40">
         {align === "left" ? "Previous post" : "Next post"}
       </span>
-      <h4 className="mt-1 font-display text-2xl font-medium leading-snug">
+      <h4 className="mt-2 font-display text-xl font-medium md:text-2xl">
         <Balancer>{post.title}</Balancer>
       </h4>
     </NextLink>

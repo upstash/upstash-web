@@ -9,7 +9,7 @@ import authors from "./utils/authors";
 import { bundleMDX } from "mdx-bundler";
 import { tocPlugin } from "./utils/contentlayerPlugins";
 
-export type PostHeading = { level: 2 | 3; title: string; slug: string };
+export type PostHeading = { level: number; title: string; slug: string };
 
 export const Job = defineDocumentType(() => ({
   name: "Job",

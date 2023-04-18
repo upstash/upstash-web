@@ -17,8 +17,8 @@ export default function PostTags({ post }: Props) {
         <Link
           key={tag}
           href={`/blog/tag/${tag}`}
-          className="rounded bg-zinc-900 px-2 py-1 text-zinc-300
-          decoration-emerald-900 hover:bg-emerald-950 hover:text-emerald-200 hover:underline"
+          className="rounded bg-zinc-900 px-2 py-1 text-zinc-300 decoration-emerald-900
+          transition hover:bg-emerald-950 hover:text-emerald-100 hover:underline"
         >
           {tag}
         </Link>

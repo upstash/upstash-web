@@ -58,9 +58,7 @@ function strong(props: ComponentProps<"strong">) {
 }
 
 function hr(props: ComponentProps<"hr">) {
-  return (
-    <hr className="my-14 border-0 border-b border-black opacity-10 dark:border-white" />
-  );
+  return <hr className="my-10 border-b border-zinc-900 md:my-20" />;
 }
 
 function ul(props: ComponentProps<"ul">) {
@@ -87,16 +85,23 @@ function blockquote(props: ComponentProps<"blockquote">) {
 
 function h2(props: ComponentProps<"h2">) {
   return (
-    <h2 className="mt-16 font-display text-4xl font-semibold" {...props} />
+    <h2
+      className="mt-10 font-display text-2xl font-semibold md:mt-16 md:text-3xl"
+      {...props}
+    />
   );
 }
 
 function h3(props: ComponentProps<"h3">) {
-  return <h3 className="font-display text-3xl font-semibold" {...props} />;
+  return (
+    <h3 className="font-display text-xl font-semibold md:text-2xl" {...props} />
+  );
 }
 
 function h4(props: ComponentProps<"h4">) {
-  return <h4 className="font-display text-xl font-semibold" {...props} />;
+  return (
+    <h4 className="font-display text-lg font-semibold md:text-xl" {...props} />
+  );
 }
 
 function code(props: ComponentProps<"code">) {
