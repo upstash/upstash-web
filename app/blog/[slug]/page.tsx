@@ -1,13 +1,13 @@
 import type { Post } from "contentlayer/generated";
 import { allPosts } from "contentlayer/generated";
 import { notFound } from "next/navigation";
-import Link from "next/link";
-import IncrView from "./_/view";
 import OtherPostCard from "./_/other-post";
 import Clap from "./_/claps";
 import { Mdx } from "./_/mdx";
 import Container from "@/components/container";
 import { SITE_URL } from "@/utils/const";
+import PostHeader from "@/app/blog/[slug]/_/header";
+import PostTags from "@/app/blog/[slug]/_/tags";
 
 type Props = {
   params: {
@@ -69,36 +69,33 @@ export default async function BlogPage({ params }: Props) {
     indexOfPost < allPosts.length - 1 ? allPosts[indexOfPost + 1] : undefined;
 
   return (
-    <>
-      <IncrView slug={slug} />
-      <div>{post.title}</div>
+    <article>
+      {/* Header */}
+      <PostHeader post={post} />
+
+      {/* Body */}
+      <div className="relative z-0 pt-20">
+        <div
+          className="absolute inset-x-0 top-0 -z-10 h-[800px]
+        bg-gradient-to-b from-zinc-900 to-zinc-950 opacity-80"
+        />
+
+        <Container className="max-w-screen-md">
+          <Mdx code={post.body.code} />
+
+          {/* Tags */}
+          <PostTags post={post} />
+
+          {/* Other Post */}
+          <div className="mt-10 grid gap-6 md:grid-cols-2 md:gap-8">
+            <OtherPostCard post={prevPost} />
+            <OtherPostCard post={nextPost} align="right" />
+          </div>
+        </Container>
+      </div>
 
       {/* Claps */}
       <Clap tweet={post.tweet} />
-
-      {/* Body */}
-      <Container className="max-w-screen-md">
-        <Mdx code={post.body.code} />
-
-        {/* Tags */}
-        <div className="flex flex-wrap justify-center gap-2 border-y border-zinc-900 py-10">
-          {post.tags.map((tag: string) => (
-            <Link
-              key={tag}
-              href={`/blog/tag/${tag}`}
-              className="rounded bg-zinc-900 px-2 py-1 text-zinc-300"
-            >
-              {tag}
-            </Link>
-          ))}
-        </div>
-
-        {/* Other Post */}
-        <div className="mt-10 grid gap-6 md:grid-cols-2 md:gap-8">
-          <OtherPostCard post={prevPost} />
-          <OtherPostCard post={nextPost} align="right" />
-        </div>
-      </Container>
-    </>
+    </article>
   );
 }

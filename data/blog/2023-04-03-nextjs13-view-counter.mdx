@@ -11,10 +11,9 @@ page. I'm also using Next.js 13 with the new app router but instead of storing
 the page views in a mysql database, I'll be using Upstash Redis.
 
 Here's an example of what we'll be building.
-Each card on the home page will show the number of views it has. 
+Each card on the home page will show the number of views it has.
+
 ![](/blog/nextjs13-approuter-view-counter/preview.png)
-
-
 
 ## Why Redis?
 
@@ -37,7 +36,7 @@ Setting up a database on Upstash is easy and includes 10k requests per day
 for free! You can create a new database
 [here](https://console.upstash.com?new=true). It literally takes only a few
 seconds. Afterwards scroll down and copy the `REST` connection
-secrets to your `.env.local` file: 
+secrets to your `.env.local` file:
 
 ```bash:.env.local
 UPSTASH_REDIS_REST_URL=
