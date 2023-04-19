@@ -32,7 +32,7 @@ export default function AppHeader({ className, ...props }: IAppHeader) {
             <Link href="/careers">
               Careers
               <span
-                className="ml-0.5 rounded-full bg-emerald-300 bg-opacity-20
+                className="ml-0.5 rounded-full bg-emerald-300/20
               px-1.5 py-0.5 font-mono text-sm text-emerald-500"
               >
                 {allJobs.filter((o) => !o.draft).length}
@@ -45,7 +45,7 @@ export default function AppHeader({ className, ...props }: IAppHeader) {
 
           {/* cta */}
           <div className="flex justify-end">
-            <Button>sad</Button>
+            <Button href="https://console.upstash.com">sad</Button>
           </div>
         </div>
       </Container>

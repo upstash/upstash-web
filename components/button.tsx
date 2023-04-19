@@ -3,6 +3,7 @@ import cx from "@/utils/cx";
 
 export interface IButton extends HTMLProps<HTMLAnchorElement> {
   children: ReactNode;
+  href: string;
 }
 
 export default function Button({ children, className, ...props }: IButton) {

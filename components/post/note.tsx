@@ -18,10 +18,10 @@ export default function PostNote({
   title?: string;
 }) {
   const style = [
-    tip && "bg-green-600 bg-opacity-20 text-green-100",
-    info && "bg-blue-600 bg-opacity-20 text-blue-100",
-    caution && "bg-orange-600 bg-opacity-20 text-orange-100",
-    danger && "bg-red-600 bg-opacity-20 text-red-100",
+    tip && "bg-green-600/20 text-green-100",
+    info && "bg-blue-600/20 text-blue-100",
+    caution && "bg-orange-600/20 text-orange-100",
+    danger && "bg-red-600/20 text-red-100",
   ].find((color) => color);
 
   const icon = [
