@@ -23,7 +23,7 @@ export default function PostHeader({ post }: Props) {
         </div>
 
         {/* title */}
-        <h1 className="mt-2 font-display text-4xl font-semibold !leading-title md:text-5xl">
+        <h1 className="mx-4 mt-2 font-display text-3xl font-semibold !leading-title md:text-5xl">
           <Balancer>{post.title}</Balancer>
         </h1>
 

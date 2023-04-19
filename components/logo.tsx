@@ -48,7 +48,7 @@ export function Logo({
 }: React.HTMLAttributes<SVGElement>) {
   return (
     <svg
-      height="38"
+      height="32"
       viewBox="0 0 1631 472"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

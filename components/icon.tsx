@@ -21,7 +21,7 @@ export default function Icon({ icon, className, ...props }: IconProps) {
       viewBox="0 0 24 24"
       width="1em"
       height="1em"
-      className={cx("text-2xl", className)}
+      className={cx("text-xl", className)}
       {...props}
     >
       {children}
