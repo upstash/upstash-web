@@ -14,12 +14,12 @@ export default function PostCard({
   const { title, slug, date, author, authorObj } = data;
 
   return (
-    <article className="flex h-full flex-col rounded-xl bg-zinc-900 p-6 md:p-8">
+    <article className="flex h-full flex-col rounded-3xl bg-zinc-900 p-6 md:p-8">
       <h3 className="pr-4 font-display text-3xl font-semibold leading-tight md:pr-12">
         <Balancer>
           <Link
             href={`/blog/${slug}`}
-            className="block decoration-emerald-900 transition hover:text-emerald-200 hover:underline"
+            className="block transition hover:text-emerald-300 hover:underline"
           >
             {title}
           </Link>
@@ -30,7 +30,7 @@ export default function PostCard({
         <div className="flex grow flex-col items-start">
           <Link
             href={`/blog/author/${author}`}
-            className="decoration-emerald-900 hover:text-emerald-200 hover:underline"
+            className="hover:text-emerald-300 hover:underline"
           >
             {authorObj.name}
           </Link>

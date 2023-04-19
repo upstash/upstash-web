@@ -18,20 +18,20 @@ const MISSIONS = [
   {
     title: "Fast",
     desc: "We know each millisecond is important for you.",
-    icon: <IconFast className="text-[60px] text-emerald-400 md:text-[70px]" />,
+    icon: <IconFast className="text-[60px] text-emerald-300 md:text-[70px]" />,
   },
   {
     title: "Simple",
     desc: "Keep the things as simple as possible but not simpler.",
     icon: (
-      <IconSimple className="text-[60px] text-emerald-400 md:text-[70px]" />
+      <IconSimple className="text-[60px] text-emerald-300 md:text-[70px]" />
     ),
   },
   {
     title: "Robust",
     desc: "We win your trust with robustness.",
     icon: (
-      <IconRobust className="text-[60px] text-emerald-400 md:text-[70px]" />
+      <IconRobust className="text-[60px] text-emerald-300 md:text-[70px]" />
     ),
   },
 ];

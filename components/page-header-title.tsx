@@ -21,17 +21,15 @@ export default function PageHeaderTitle({
   };
 
   return (
-    <Balancer>
-      <Tag
-        className={cx(
-          "font-display font-bold !leading-title",
-          size[as],
-          className
-        )}
-        {...props}
-      >
-        {children}
-      </Tag>
-    </Balancer>
+    <Tag
+      className={cx(
+        "font-display font-bold !leading-title",
+        size[as],
+        className
+      )}
+      {...props}
+    >
+      <Balancer>{children}</Balancer>
+    </Tag>
   );
 }

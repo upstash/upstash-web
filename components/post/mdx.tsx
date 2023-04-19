@@ -19,13 +19,7 @@ export function Mdx({ code }: MdxProps) {
 // Components
 
 function a(props: ComponentProps<"a">) {
-  return (
-    <a
-      className="text-emerald-400
-      hover:underline hover:decoration-emerald-400"
-      {...props}
-    />
-  );
+  return <a className="text-emerald-300 hover:underline" {...props} />;
 }
 
 function table(props: ComponentProps<"table">) {
@@ -86,7 +80,7 @@ function blockquote(props: ComponentProps<"blockquote">) {
 function h2(props: ComponentProps<"h2">) {
   return (
     <h2
-      className="mt-10 font-display text-2xl font-semibold md:mt-16 md:text-3xl"
+      className="mt-10 font-display text-2xl font-semibold md:mt-16 md:text-4xl"
       {...props}
     />
   );
@@ -107,8 +101,8 @@ function h4(props: ComponentProps<"h4">) {
 function code(props: ComponentProps<"code">) {
   return (
     <code
-      className="whitespace-pre break-normal rounded bg-emerald-950
-      bg-opacity-50 px-1 py-0.5 text-[.94em] text-emerald-200"
+      className="whitespace-pre break-normal rounded bg-zinc-800
+      px-1 py-0.5 text-[.94em]"
       {...props}
     />
   );

@@ -26,13 +26,13 @@ export default function AppHeader({ className, ...props }: IAppHeader) {
           opacity-60 transition group-hover:opacity-100"
           >
             <Link href="/about">Pricing</Link>
-            <Link href="/about">Open Source</Link>
+            {/*<Link href="/about">Open Source</Link>*/}
             <Link href="/about">About</Link>
             <Link href="/blog">Blog</Link>
             <Link href="/careers">
               Careers
               <span
-                className="ml-0.5 rounded-full bg-emerald-400 bg-opacity-20
+                className="ml-0.5 rounded-full bg-emerald-300 bg-opacity-20
               px-1.5 py-0.5 font-mono text-sm text-emerald-500"
               >
                 {allJobs.filter((o) => !o.draft).length}

@@ -1,10 +1,5 @@
 import Link from "next/link";
 import type { Post } from "contentlayer/generated";
-import Balancer from "react-wrap-balancer";
-import Container from "@/components/container";
-import { DateTime } from "luxon";
-import IncrView from "@/components/post/view";
-import Image from "next/image";
 
 type Props = {
   post: Post;
@@ -13,12 +8,14 @@ type Props = {
 export default function PostTags({ post }: Props) {
   return (
     <div className="flex flex-wrap justify-center gap-2 border-y border-zinc-900 py-10">
+      {/*<Link href="/">Return to all articles</Link>*/}
+
       {post.tags.map((tag: string) => (
         <Link
           key={tag}
           href={`/blog/tag/${tag}`}
-          className="rounded bg-zinc-900 px-2 py-1 text-zinc-300 decoration-emerald-900
-          transition hover:bg-emerald-950 hover:text-emerald-100 hover:underline"
+          className="rounded-full bg-zinc-900 px-3 py-1 text-zinc-300
+          transition hover:bg-emerald-950 hover:text-emerald-300"
         >
           {tag}
         </Link>
