@@ -19,6 +19,10 @@ const interDisplay = localFont({
   variable: "--font-display",
   src: [
     {
+      path: "./fonts/inter/Inter-DisplayMedium.woff2",
+      weight: "500",
+    },
+    {
       path: "./fonts/inter/Inter-DisplaySemiBold.woff2",
       weight: "600",
     },
