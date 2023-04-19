@@ -11,9 +11,9 @@ export default function HomeHero() {
       <Container>
         <h1
           className={cx(
-            "inline-flex flex-col gap-2",
+            "inline-flex flex-col gap-1",
             "font-display text-6xl font-bold leading-none md:text-[7rem]",
-            "bg-gradient-to-r from-emerald-400 to-amber-300 bg-clip-text text-transparent"
+            "bg-gradient-to-r from-emerald-400 from-20% to-amber-300 bg-clip-text text-transparent"
           )}
         >
           <span>Serverless</span>

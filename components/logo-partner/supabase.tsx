@@ -1,4 +1,4 @@
-export default function () {
+export default function SupabaseLogo() {
   return (
     <svg
       height={26}

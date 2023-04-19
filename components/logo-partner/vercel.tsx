@@ -1,4 +1,4 @@
-export default function () {
+export default function VercelLogo() {
   return (
     <svg
       height={24}

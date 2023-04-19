@@ -109,7 +109,7 @@ function code(props: ComponentProps<"code">) {
 }
 
 function img(props: ComponentProps<"img">) {
-  return <img className="mx-auto block rounded-xl" {...props} />;
+  return <img className="mx-auto block rounded-xl" alt="" {...props} />;
 }
 
 function FullWidth(props: ComponentProps<"div">) {
