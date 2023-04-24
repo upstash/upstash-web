@@ -11,12 +11,9 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: ["var(--font-sans)", ...defaultTheme.fontFamily.sans],
-        display: [
-          "var(--font-display)",
-          "var(--font-sans)",
-          ...defaultTheme.fontFamily.sans,
-        ],
+        display: ["var(--font-display)", ...defaultTheme.fontFamily.sans],
       },
+      // for blog
       lineHeight: {
         p: "1.72",
         title: "1.16",

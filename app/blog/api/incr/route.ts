@@ -3,9 +3,7 @@ import { NextResponse } from "next/server";
 
 const redis = Redis.fromEnv();
 
-export const config = {
-  runtime: "edge",
-};
+export const runtime = "experimental-edge";
 
 // source: https://github.com/chronark/chronark.com/blob/main/pages/api/incr.ts
 

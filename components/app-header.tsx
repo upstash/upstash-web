@@ -1,4 +1,4 @@
-import React from "react";
+import { HTMLAttributes } from "react";
 import cx from "@/utils/cx";
 import { Logo } from "@/components/logo";
 import Link from "next/link";
@@ -7,7 +7,7 @@ import LinkNewTab from "@/components/link-new-tab";
 import Container from "@/components/container";
 import Button from "@/components/button";
 
-export interface IAppHeader extends React.HTMLAttributes<HTMLDivElement> {}
+export interface IAppHeader extends HTMLAttributes<HTMLDivElement> {}
 
 export default function AppHeader({ className, ...props }: IAppHeader) {
   return (
@@ -45,7 +45,7 @@ export default function AppHeader({ className, ...props }: IAppHeader) {
 
           {/* cta */}
           <div className="flex justify-end">
-            <Button href="https://console.upstash.com">sad</Button>
+            <Button href="https://console.upstash.com">Login</Button>
           </div>
         </div>
       </Container>

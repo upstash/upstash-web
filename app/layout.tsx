@@ -33,6 +33,25 @@ const interDisplay = localFont({
   ],
 });
 
+export default function RootLayout({ children }: { children: ReactNode }) {
+  return (
+    <html
+      lang="en"
+      className={cx(
+        inter.variable,
+        interDisplay.variable,
+        "scroll-smooth bg-zinc-950 text-zinc-50 antialiased"
+      )}
+    >
+      <body>
+        <AppHeader />
+        {children}
+        <AppFooter />
+      </body>
+    </html>
+  );
+}
+
 const title = "Upstash: Serverless Data for Redis® and Kafka®";
 const description =
   "Designed for the serverless with per-request pricing and Redis®/Kafka® API.";
@@ -65,22 +84,3 @@ export const metadata: Metadata = {
     apple: "/static/apple-touch-icon.png",
   },
 };
-
-export default function RootLayout({ children }: { children: ReactNode }) {
-  return (
-    <html
-      lang="en"
-      className={cx(
-        inter.variable,
-        interDisplay.variable,
-        "scroll-smooth bg-zinc-950 text-zinc-50 antialiased"
-      )}
-    >
-      <body>
-        <AppHeader />
-        {children}
-        <AppFooter />
-      </body>
-    </html>
-  );
-}
