@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function HomeHeroPartner() {
   return (
-    <div className="mt-20">
+    <div className="mt-16">
       <h5 className="text-sm opacity-20">Trusted by the best teams</h5>
       <div className="mt-6 flex flex-wrap items-center justify-center gap-8">
         {[

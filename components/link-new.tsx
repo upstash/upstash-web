@@ -7,7 +7,7 @@ export interface ILinkNewTab extends HTMLProps<HTMLAnchorElement> {
   hideIcon?: boolean;
 }
 
-export default function LinkNewTab({
+export default function LinkNew({
   children,
   className,
   hideIcon,
@@ -17,7 +17,7 @@ export default function LinkNewTab({
     <a
       target="_blank"
       className={cx(
-        "group flex items-center gap-0.5",
+        "flex items-center gap-0.5",
         "hover:text-emerald-300 hover:underline",
         className
       )}
@@ -25,10 +25,7 @@ export default function LinkNewTab({
     >
       <span>{children}</span>
       {hideIcon ? null : (
-        <Icon
-          className="group-hover: opacity-40"
-          icon={ICON_NAMES.ArrowUpRight}
-        />
+        <Icon className="opacity-40" icon={ICON_NAMES.ArrowUpRight} />
       )}
     </a>
   );

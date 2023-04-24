@@ -12,7 +12,8 @@ export default function Button({ children, className, ...props }: IButton) {
       target="_blank"
       className={cx(
         "flex cursor-pointer items-center gap-0.5 px-5 py-2",
-        "rounded-full bg-zinc-900",
+        "rounded-full bg-white/10",
+        "hover:bg-white/20",
         className
       )}
       {...props}

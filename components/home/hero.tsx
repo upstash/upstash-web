@@ -17,7 +17,7 @@ export default function HomeHero() {
   const [activeProduct, setActiveProduct] = useState<HeroProduct>();
 
   return (
-    <section className="relative z-0 py-10">
+    <section className="relative z-10 py-10">
       <Container>
         <HomeHeroSlogan activeProduct={activeProduct} />
 

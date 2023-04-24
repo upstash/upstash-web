@@ -2,7 +2,7 @@ import React from "react";
 import cx from "@/utils/cx";
 import Container from "@/components/container";
 import { Logo } from "@/components/logo";
-import LinkNewTab from "@/components/link-new-tab";
+import LinkNew from "@/components/link-new";
 
 export interface IAppFooter extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -16,15 +16,11 @@ export default function AppFooter({ className, ...props }: IAppFooter) {
           <Logo />
 
           <div className="flex items-center gap-6 opacity-60 hover:opacity-100">
-            <LinkNewTab href="https://docs.upstash.com/docs/help/support">
+            <LinkNew href="https://docs.upstash.com/docs/help/support">
               Contact Us
-            </LinkNewTab>
-            <LinkNewTab href="/static/trust/privacy.pdf">
-              Privacy Policy
-            </LinkNewTab>
-            <LinkNewTab href="/static/trust/terms.pdf">
-              Terms of Service
-            </LinkNewTab>
+            </LinkNew>
+            <LinkNew href="/static/trust/privacy.pdf">Privacy Policy</LinkNew>
+            <LinkNew href="/static/trust/terms.pdf">Terms of Service</LinkNew>
           </div>
 
           <p>© {new Date().getFullYear()} Upstash, Inc. Based in California.</p>
