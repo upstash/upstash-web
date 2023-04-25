@@ -15,15 +15,30 @@ export default function Footer({ className, ...props }: IAppFooter) {
 
           <Logo />
 
-          <div className="flex items-center gap-6 opacity-60 hover:opacity-100">
-            <LinkNew href="https://docs.upstash.com/docs/help/support">
+          <p className="opacity-60">
+            © {new Date().getFullYear()} Upstash, Inc. Based in California.
+          </p>
+
+          <div className="flex items-center gap-6">
+            <LinkNew
+              href="https://docs.upstash.com/docs/help/support"
+              className="opacity-60 hover:opacity-100"
+            >
               Contact Us
             </LinkNew>
-            <LinkNew href="/static/trust/privacy.pdf">Privacy Policy</LinkNew>
-            <LinkNew href="/static/trust/terms.pdf">Terms of Service</LinkNew>
+            <LinkNew
+              href="/static/trust/privacy.pdf"
+              className="opacity-60 hover:opacity-100"
+            >
+              Privacy Policy
+            </LinkNew>
+            <LinkNew
+              href="/static/trust/terms.pdf"
+              className="opacity-60 hover:opacity-100"
+            >
+              Terms of Service
+            </LinkNew>
           </div>
-
-          <p>© {new Date().getFullYear()} Upstash, Inc. Based in California.</p>
 
           <div className="space-y-2 text-xs opacity-40">
             <p>

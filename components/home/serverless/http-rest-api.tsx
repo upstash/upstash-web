@@ -5,7 +5,7 @@ import {
   BorderBoxBody,
   BorderBoxBodySummary,
   BorderBoxBodyTitle,
-} from "@/components/border-box";
+} from "@/components/home/border-box";
 import {
   SandpackCodeEditor,
   SandpackLayout,
@@ -102,7 +102,9 @@ fetch("https://fleet-opossum-9500-eu1-rest-kafka.upstash.io/consume/GROUP_NAME/G
     <BorderBox className="col-span-4">
       <BorderBoxBody>
         <header>
-          <BorderBoxBodyTitle className="">HTTP/REST API</BorderBoxBodyTitle>
+          <BorderBoxBodyTitle link="https://docs.upstash.com/redis/features/restapi">
+            HTTP/REST API
+          </BorderBoxBodyTitle>
           <BorderBoxBodySummary>
             HTTP-based APIs enable access from both serverless and edge
             functions, while also supporting the use of standard clients via the
@@ -140,7 +142,7 @@ fetch("https://fleet-opossum-9500-eu1-rest-kafka.upstash.io/consume/GROUP_NAME/G
           </div>*/}
 
           {/* editor */}
-          <div className="mt-4 h-[288px] overflow-y-auto rounded-xl bg-zinc-950 px-2">
+          <div className="mt-4 h-[288px] overflow-y-auto rounded-xl bg-black/20">
             <SandpackProvider
               theme={sandpackDark}
               files={{
@@ -162,8 +164,8 @@ fetch("https://fleet-opossum-9500-eu1-rest-kafka.upstash.io/consume/GROUP_NAME/G
                 style={{
                   // @ts-ignore
                   "--sp-layout-height": 100,
-                  "--sp-colors-surface1": colors.zinc["950"],
-                  "--sp-colors-surface2": colors.zinc["900"],
+                  "--sp-colors-surface1": "rgb(0 0 0 / 0%)",
+                  "--sp-colors-surface2": "rgb(0 0 0 / 0%)",
                   border: 0,
                   "--sp-border-radius": borderRadius["2xl"],
                 }}

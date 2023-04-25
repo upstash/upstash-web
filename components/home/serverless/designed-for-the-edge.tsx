@@ -3,7 +3,7 @@ import {
   BorderBoxBody,
   BorderBoxBodySummary,
   BorderBoxBodyTitle,
-} from "@/components/border-box";
+} from "@/components/home/border-box";
 import { LogoIcon } from "@/components/app/logo";
 
 export default function DesignedForTheEdge() {
@@ -13,7 +13,7 @@ export default function DesignedForTheEdge() {
     <BorderBox className="col-span-2">
       <BorderBoxBody className="relative overflow-hidden">
         <header className="relative z-20">
-          <BorderBoxBodyTitle className="">
+          <BorderBoxBodyTitle link="https://docs.upstash.com/redis/features/globaldatabase">
             Designed for the edge
           </BorderBoxBodyTitle>
           <BorderBoxBodySummary>

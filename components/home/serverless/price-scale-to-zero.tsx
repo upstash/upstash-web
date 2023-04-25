@@ -3,7 +3,7 @@ import {
   BorderBoxBody,
   BorderBoxBodySummary,
   BorderBoxBodyTitle,
-} from "@/components/border-box";
+} from "@/components/home/border-box";
 import cx from "@/utils/cx";
 
 export default function PriceScaleToZero() {
@@ -11,7 +11,7 @@ export default function PriceScaleToZero() {
     <BorderBox className="col-span-3">
       <BorderBoxBody>
         <header>
-          <BorderBoxBodyTitle className="">
+          <BorderBoxBodyTitle link="https://docs.upstash.com/redis/overall/pricing">
             Price scale to zero
           </BorderBoxBodyTitle>
           <BorderBoxBodySummary>
@@ -38,7 +38,7 @@ export default function PriceScaleToZero() {
           ].map(({ title, value }, index) => (
             <div
               key={title}
-              className="flex h-20 grow flex-col justify-center rounded-xl bg-zinc-950 px-4"
+              className="flex h-20 grow flex-col justify-center rounded-xl bg-black/20 px-4"
             >
               <span className="text-sm opacity-40">{title}</span>
               <span

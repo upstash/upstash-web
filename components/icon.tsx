@@ -3,12 +3,14 @@ import cx from "@/utils/cx";
 
 export type IconProps = SVGProps<SVGSVGElement> & {
   // size?: number | string;
-  icon: keyof typeof ICON_NAMES;
+  icon?: keyof typeof ICON_NAMES;
   className?: string;
 };
 
 export default function Icon({ icon, className, ...props }: IconProps) {
-  const children: ReactNode = PATHS[icon];
+  const children: ReactNode = icon
+    ? PATHS[icon]
+    : PATHS[ICON_NAMES.ArrowUpRight];
 
   return (
     <svg

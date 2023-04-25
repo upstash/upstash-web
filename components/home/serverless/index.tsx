@@ -9,6 +9,9 @@ import GlobalLowLatency from "@/components/home/serverless/global-low-latency";
 import PriceScaleToZero from "@/components/home/serverless/price-scale-to-zero";
 import HttpRestApi from "@/components/home/serverless/http-rest-api";
 import DesignedForTheEdge from "@/components/home/serverless/designed-for-the-edge";
+import ServerlessRedis from "@/components/home/serverless/redis";
+import ServerlessQStash from "@/components/home/serverless/qstash";
+import ServerlessKafka from "@/components/home/serverless/kafka";
 
 export interface ISectionHeader extends HTMLProps<HTMLDivElement> {}
 
@@ -28,6 +31,9 @@ export default function HomeServerless({}: ISectionHeader) {
           <PriceScaleToZero />
           <HttpRestApi />
           <DesignedForTheEdge />
+          <ServerlessRedis />
+          <ServerlessKafka />
+          <ServerlessQStash />
         </div>
       </Container>
     </section>
