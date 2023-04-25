@@ -1,10 +1,10 @@
 import cx from "@/utils/cx";
-import { HeroProduct } from "@/components/home/hero/hero";
+import { Product } from "@/utils/type";
 
 export default function HomeHeroBg({
   activeProduct,
 }: {
-  activeProduct?: HeroProduct;
+  activeProduct?: Product;
 }) {
   return (
     <div
@@ -14,9 +14,9 @@ export default function HomeHeroBg({
         "opacity-10 blur-[100px]",
         // default
         "bg-emerald-500",
-        activeProduct === HeroProduct.REDIS && "bg-red-500",
-        activeProduct === HeroProduct.KAFKA && "bg-blue-500",
-        activeProduct === HeroProduct.QSTASH && "bg-purple-500"
+        activeProduct === Product.REDIS && "bg-red-500",
+        activeProduct === Product.KAFKA && "bg-blue-500",
+        activeProduct === Product.QSTASH && "bg-purple-500"
       )}
     />
   );

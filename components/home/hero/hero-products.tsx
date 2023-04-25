@@ -1,15 +1,14 @@
 import cx from "@/utils/cx";
 import Button from "@/components/button";
-import Balancer from "react-wrap-balancer";
 import { HTMLAttributes } from "react";
-import { HeroProduct } from "./hero";
+import { Product } from "@/utils/type";
 
 export default function HomeHeroProducts({
   activeProduct,
   setActiveProduct,
 }: {
-  activeProduct?: HeroProduct;
-  setActiveProduct: (product?: HeroProduct) => void;
+  activeProduct?: Product;
+  setActiveProduct: (product?: Product) => void;
 }) {
   return (
     <div
@@ -19,13 +18,13 @@ export default function HomeHeroProducts({
       <HomeHeroProduct
         title="Redis"
         desc="Serverless database service compatible with Redis® API"
-        onMouseEnter={() => setActiveProduct(HeroProduct.REDIS)}
-        className={cx(activeProduct === HeroProduct.REDIS && "bg-white/20")}
+        onMouseEnter={() => setActiveProduct(Product.REDIS)}
+        className={cx(activeProduct === Product.REDIS && "bg-white/20")}
         button={{
           href: "https://console.upstash.com/redis?create=tru",
           text: "Create Database",
           className: cx(
-            activeProduct === HeroProduct.REDIS &&
+            activeProduct === Product.REDIS &&
               "bg-[#E5484D] hover:bg-[#E5484D] text-white"
           ),
         }}
@@ -33,13 +32,13 @@ export default function HomeHeroProducts({
       <HomeHeroProduct
         title="Kafka"
         desc="Serverless database service compatible with Redis® API"
-        onMouseEnter={() => setActiveProduct(HeroProduct.KAFKA)}
-        className={cx(activeProduct === HeroProduct.KAFKA && "bg-white/20")}
+        onMouseEnter={() => setActiveProduct(Product.KAFKA)}
+        className={cx(activeProduct === Product.KAFKA && "bg-white/20")}
         button={{
           href: "https://console.upstash.com/kafka?create=tru",
           text: "Create Cluster",
           className: cx(
-            activeProduct === HeroProduct.KAFKA &&
+            activeProduct === Product.KAFKA &&
               "bg-[#0090FF] hover:bg-[#0090FF] text-white"
           ),
         }}
@@ -47,13 +46,13 @@ export default function HomeHeroProducts({
       <HomeHeroProduct
         title="QStash"
         desc="Serverless database service compatible with Redis® API"
-        onMouseEnter={() => setActiveProduct(HeroProduct.QSTASH)}
-        className={cx(activeProduct === HeroProduct.QSTASH && "bg-white/20")}
+        onMouseEnter={() => setActiveProduct(Product.QSTASH)}
+        className={cx(activeProduct === Product.QSTASH && "bg-white/20")}
         button={{
           href: "https://console.upstash.com/qstash",
           text: "Publish Messages",
           className: cx(
-            activeProduct === HeroProduct.QSTASH &&
+            activeProduct === Product.QSTASH &&
               "bg-[#6E56CF] hover:bg-[#6E56CF] text-white"
           ),
         }}

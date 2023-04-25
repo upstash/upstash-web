@@ -1,10 +1,10 @@
 import cx from "@/utils/cx";
-import { HeroProduct } from "@/components/home/hero/hero";
+import { Product } from "@/utils/type";
 
 export default function HomeHeroSlogan({
   activeProduct,
 }: {
-  activeProduct?: HeroProduct;
+  activeProduct?: Product;
 }) {
   return (
     <h1
@@ -14,9 +14,9 @@ export default function HomeHeroSlogan({
         "bg-gradient-to-r from-20% bg-clip-text text-transparent",
         // default
         "from-emerald-400 to-yellow-300",
-        activeProduct === HeroProduct.REDIS && "from-red-500 to-red-200",
-        activeProduct === HeroProduct.KAFKA && "from-blue-500 to-blue-200",
-        activeProduct === HeroProduct.QSTASH && "from-purple-500 to-purple-200"
+        activeProduct === Product.REDIS && "from-red-500 to-red-200",
+        activeProduct === Product.KAFKA && "from-blue-500 to-blue-200",
+        activeProduct === Product.QSTASH && "from-purple-500 to-purple-200"
       )}
     >
       <span>Serverless</span>

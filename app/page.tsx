@@ -5,8 +5,8 @@ import HomeServerless from "@/components/home/serverless";
 export default function Home() {
   return (
     <main className="text-center">
-      <HomeHero />
-      <HomeFast />
+      {/*<HomeHero />*/}
+      {/*<HomeFast />*/}
       <HomeServerless />
     </main>
   );
