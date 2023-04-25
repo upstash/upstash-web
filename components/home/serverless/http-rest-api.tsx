@@ -12,8 +12,9 @@ import {
   SandpackProvider,
 } from "@codesandbox/sandpack-react";
 import { sandpackDark } from "@codesandbox/sandpack-themes";
+import { theme } from "tailwindcss/defaultConfig";
 import colors from "tailwindcss/colors";
-import { borderRadius } from "tailwindcss/defaultTheme";
+import { borderRadius, fontSize } from "tailwindcss/defaultTheme";
 import { CodeExample, Product } from "@/utils/type";
 
 export default function HttpRestApi() {
@@ -139,7 +140,7 @@ fetch("https://fleet-opossum-9500-eu1-rest-kafka.upstash.io/consume/GROUP_NAME/G
           </div>*/}
 
           {/* editor */}
-          <div className="mt-4 h-[260px] overflow-y-auto rounded-xl bg-zinc-950 px-2">
+          <div className="mt-4 h-[288px] overflow-y-auto rounded-xl bg-zinc-950 px-2">
             <SandpackProvider
               theme={sandpackDark}
               files={{

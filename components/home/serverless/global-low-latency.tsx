@@ -25,7 +25,7 @@ export default function GlobalLowLatency() {
           {[...Array(24).keys()].map((i) => (
             <div
               key={i}
-              className="flex h-16 w-[10px] items-end rounded-full bg-zinc-950"
+              className="flex h-16 w-[8px] items-end rounded-full bg-zinc-950"
             >
               <span className={cx("h-4 w-full rounded-full bg-emerald-500")} />
             </div>
