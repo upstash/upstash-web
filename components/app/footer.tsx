@@ -1,12 +1,12 @@
 import React from "react";
 import cx from "@/utils/cx";
 import Container from "@/components/container";
-import { Logo } from "@/components/logo";
+import { Logo } from "@/components/app/logo";
 import LinkNew from "@/components/link-new";
 
 export interface IAppFooter extends React.HTMLAttributes<HTMLDivElement> {}
 
-export default function AppFooter({ className, ...props }: IAppFooter) {
+export default function Footer({ className, ...props }: IAppFooter) {
   return (
     <footer className={cx("py-32 text-center", className)} {...props}>
       <Container className="max-w-screen-md">

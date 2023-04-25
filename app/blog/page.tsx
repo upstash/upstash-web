@@ -1,10 +1,10 @@
 import getData from "./get-data";
-import PostGrid from "@/components/blog/grid";
-import PopularTag from "@/components/blog/popular-tag";
-import PageHeaderDesc from "@/components/page-header-desc";
-import PageHeaderTitle from "@/components/page-header-title";
+import PostGrid from "@/components/blog/grid/grid";
+import PopularTag from "@/components/blog/popular-tag/popular-tag";
+import PageHeaderDesc from "@/components/app/page-header-desc";
+import PageHeaderTitle from "@/components/app/page-header-title";
 import Container from "@/components/container";
-import PageBodyGradient from "@/components/page-body-gradient";
+import PageBodyGradient from "@/components/app/page-body-gradient";
 
 export default async function BlogPage() {
   const { posts, views, tags } = await getData();

@@ -2,8 +2,8 @@ import Link from "next/link";
 import { INVESTORS } from "@/utils/investors";
 import Container from "@/components/container";
 import Image from "next/image";
-import PageHeaderTitle from "@/components/page-header-title";
-import PageHeaderDesc from "@/components/page-header-desc";
+import PageHeaderTitle from "@/components/app/page-header-title";
+import PageHeaderDesc from "@/components/app/page-header-desc";
 
 export default function Investors({ fullList = false, ...props }) {
   const DATA = fullList ? INVESTORS : INVESTORS.slice(0, 5);

@@ -8,7 +8,7 @@ import Container from "@/components/container";
 import { SITE_URL } from "@/utils/const";
 import PostHeader from "@/components/post/header";
 import PostTags from "@/components/post/tags";
-import PageBodyGradient from "@/components/page-body-gradient";
+import PageBodyGradient from "@/components/app/page-body-gradient";
 // import PostTOC from "@/app/blog/[slug]/_/toc";
 
 type Props = {

@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import Container from "@/components/container";
-import HomeHeroBg from "@/components/home/hero-bg";
-import HomeHeroProducts from "@/components/home/hero-products";
-import HomeHeroPartner from "@/components/home/hero-partner";
-import HomeHeroSlogan from "@/components/home/hero-slogan";
+import HomeHeroBg from "@/components/home/hero/hero-bg";
+import HomeHeroProducts from "@/components/home/hero/hero-products";
+import HomeHeroPartner from "@/components/home/hero/hero-partner";
+import HomeHeroSlogan from "@/components/home/hero/hero-slogan";
 
 export enum HeroProduct {
   REDIS = "redis",

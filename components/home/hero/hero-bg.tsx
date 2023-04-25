@@ -1,5 +1,5 @@
 import cx from "@/utils/cx";
-import { HeroProduct } from "@/components/home/hero";
+import { HeroProduct } from "@/components/home/hero/hero";
 
 export default function HomeHeroBg({
   activeProduct,

@@ -1,6 +1,6 @@
 import { HTMLAttributes } from "react";
 import cx from "@/utils/cx";
-import { Logo } from "@/components/logo";
+import { Logo } from "@/components/app/logo";
 import Link from "next/link";
 import { allJobs } from "contentlayer/generated";
 import LinkNew from "@/components/link-new";
@@ -9,7 +9,7 @@ import Button from "@/components/button";
 
 export interface IAppHeader extends HTMLAttributes<HTMLDivElement> {}
 
-export default function AppHeader({ className, ...props }: IAppHeader) {
+export default function Header({ className, ...props }: IAppHeader) {
   return (
     <header className={cx("group py-10", className)} {...props}>
       <Container>

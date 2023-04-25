@@ -1,5 +1,5 @@
 import getData from "../get-data";
-import PostList from "@/components/blog/list";
+import PostList from "@/components/blog/list/list";
 
 export default async function BlogPage() {
   const { posts, views, tags } = await getData();

@@ -1,6 +1,6 @@
 import getData from "../../get-data";
-import PostGrid from "@/components/blog/grid";
-import PopularTag from "@/components/blog/popular-tag";
+import PostGrid from "@/components/blog/grid/grid";
+import PopularTag from "@/components/blog/popular-tag/popular-tag";
 
 export default async function BlogPage() {
   const { posts, views, tags } = await getData();

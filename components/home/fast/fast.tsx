@@ -116,7 +116,7 @@ export default function AnimatedGlobe() {
           hexPolygonsData={countries.features}
           hexPolygonResolution={3}
           hexPolygonMargin={0.7}
-          hexPolygonColor={() => "#333"}
+          hexPolygonColor={() => "#444"}
           //
           // ATMOSPHERE
           atmosphereColor={"#00e9a3"}

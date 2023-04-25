@@ -1,11 +1,11 @@
-import IconFast from "@/components/investor/icon-fast";
-import IconSimple from "@/components/investor/icon-simple";
-import IconRobust from "@/components/investor/icon-robust";
+import IconFast from "@/components/investor/icon/icon-fast";
+import IconSimple from "@/components/investor/icon/icon-simple";
+import IconRobust from "@/components/investor/icon/icon-robust";
 import { Metadata } from "next";
 import Container from "@/components/container";
-import PageHeaderTitle from "@/components/page-header-title";
-import PageHeaderDesc from "@/components/page-header-desc";
-import PageBodyGradient from "@/components/page-body-gradient";
+import PageHeaderTitle from "@/components/app/page-header-title";
+import PageHeaderDesc from "@/components/app/page-header-desc";
+import PageBodyGradient from "@/components/app/page-body-gradient";
 import Balancer from "react-wrap-balancer";
 import Investors from "@/components/investor/investors";
 
