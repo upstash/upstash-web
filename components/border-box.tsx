@@ -40,5 +40,5 @@ export function BorderBoxBodySummary({
   children,
   className,
 }: HTMLProps<HTMLParagraphElement>) {
-  return <p className={cx("mt-2 opacity-60", className)}>{children}</p>;
+  return <p className={cx("mt-3 opacity-60", className)}>{children}</p>;
 }

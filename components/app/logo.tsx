@@ -1,9 +1,6 @@
 import React from "react";
 
-export function LogoIcon({
-  className,
-  ...props
-}: React.HTMLAttributes<SVGElement>) {
+export function LogoIcon({ ...props }: React.HTMLAttributes<SVGElement>) {
   return (
     <svg
       height="38"

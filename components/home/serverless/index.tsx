@@ -19,9 +19,7 @@ export default function HomeServerless({}: ISectionHeader) {
         <SectionHeader>
           <SectionHeaderTitle>Serverless & Edge</SectionHeaderTitle>
           <SectionHeaderSummary>
-            Built on cutting-edge serverless technology, Upstash can withstand
-            any traffic spike, with automatic failover and global replication of
-            assets.
+            Built on cutting-edge serverless technology
           </SectionHeaderSummary>
         </SectionHeader>
 

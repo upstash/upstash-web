@@ -24,7 +24,7 @@ export function SectionHeaderTitle({
 }: ISectionHeader) {
   return (
     <h3
-      className={cx("font-display text-5xl font-semibold", className)}
+      className={cx("font-display text-6xl font-semibold", className)}
       {...props}
     >
       {children}
@@ -38,7 +38,7 @@ export function SectionHeaderSummary({
   ...props
 }: ISectionHeader) {
   return (
-    <p className={cx("mt-2 text-xl opacity-40", className)} {...props}>
+    <p className={cx("mt-2 text-2xl opacity-40", className)} {...props}>
       {children}
     </p>
   );
