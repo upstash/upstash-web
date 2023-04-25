@@ -19,12 +19,7 @@ export function BorderBoxBody({
   className,
 }: HTMLProps<HTMLDivElement>) {
   return (
-    <div
-      className={cx(
-        "h-full rounded-[inherit] bg-zinc-900 px-8 py-7",
-        className
-      )}
-    >
+    <div className={cx("h-full rounded-[inherit] bg-zinc-900 p-8", className)}>
       {children}
     </div>
   );
@@ -45,5 +40,5 @@ export function BorderBoxBodySummary({
   children,
   className,
 }: HTMLProps<HTMLParagraphElement>) {
-  return <p className={cx("mt-2 opacity-40", className)}>{children}</p>;
+  return <p className={cx("mt-2 opacity-60", className)}>{children}</p>;
 }

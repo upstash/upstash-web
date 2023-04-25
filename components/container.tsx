@@ -12,7 +12,7 @@ export default function Container({
 }: IContainer) {
   return (
     <div
-      className={cx("mx-auto max-w-screen-xl px-6 md:px-8", className)}
+      className={cx("mx-auto max-w-screen-xl px-6 md:px-10", className)}
       {...props}
     >
       {children}
