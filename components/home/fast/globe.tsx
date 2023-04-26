@@ -99,8 +99,8 @@ export default function AnimatedGlobe() {
   }, []);
 
   return (
-    <section className="relative z-0 h-[1000px] -translate-y-[260px] overflow-hidden">
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-[300px] bg-gradient-to-b from-transparent to-zinc-950" />
+    <section className="relative z-0 -mt-[260px] h-[1000px] overflow-hidden">
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-[200px] bg-gradient-to-b from-transparent to-zinc-950" />
 
       <div className="absolute -top-0 left-1/2 z-10 -translate-x-1/2">
         <Globe

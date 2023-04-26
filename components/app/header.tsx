@@ -3,9 +3,8 @@ import cx from "@/utils/cx";
 import { Logo } from "@/components/app/logo";
 import Link from "next/link";
 import { allJobs } from "contentlayer/generated";
-import LinkNew from "@/components/link-new";
-import Container from "@/components/container";
 import Button from "@/components/button";
+import Container from "@/components/container";
 
 export interface IAppHeader extends HTMLAttributes<HTMLDivElement> {}
 
@@ -56,14 +55,16 @@ export default function Header({ className, ...props }: IAppHeader) {
                 {allJobs.filter((o) => !o.draft).length}
               </span>
             </Link>
-            <LinkNew href="https://docs.upstash.com" target="_blank">
+            <Button href="https://docs.upstash.com" target="_blank">
               Docs
-            </LinkNew>
+            </Button>
           </nav>
 
           {/* cta */}
           <div className="flex justify-end">
-            <Button href="https://console.upstash.com">Login</Button>
+            <Button type="button" hideIcon href="https://console.upstash.com">
+              Login
+            </Button>
           </div>
         </div>
       </Container>

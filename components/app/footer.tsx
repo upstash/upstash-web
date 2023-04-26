@@ -2,7 +2,7 @@ import React from "react";
 import cx from "@/utils/cx";
 import Container from "@/components/container";
 import { Logo } from "@/components/app/logo";
-import LinkNew from "@/components/link-new";
+import Button from "@/components/button";
 
 export interface IAppFooter extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -20,24 +20,24 @@ export default function Footer({ className, ...props }: IAppFooter) {
           </p>
 
           <div className="flex items-center gap-6">
-            <LinkNew
+            <Button
               href="https://docs.upstash.com/docs/help/support"
               className="opacity-60 hover:opacity-100"
             >
               Contact Us
-            </LinkNew>
-            <LinkNew
+            </Button>
+            <Button
               href="/static/trust/privacy.pdf"
               className="opacity-60 hover:opacity-100"
             >
               Privacy Policy
-            </LinkNew>
-            <LinkNew
+            </Button>
+            <Button
               href="/static/trust/terms.pdf"
               className="opacity-60 hover:opacity-100"
             >
               Terms of Service
-            </LinkNew>
+            </Button>
           </div>
 
           <div className="space-y-2 text-xs opacity-40">

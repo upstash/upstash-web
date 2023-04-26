@@ -12,9 +12,7 @@ import {
   SandpackProvider,
 } from "@codesandbox/sandpack-react";
 import { sandpackDark } from "@codesandbox/sandpack-themes";
-import { theme } from "tailwindcss/defaultConfig";
-import colors from "tailwindcss/colors";
-import { borderRadius, fontSize } from "tailwindcss/defaultTheme";
+import { borderRadius } from "tailwindcss/defaultTheme";
 import { CodeExample, Product } from "@/utils/type";
 
 export default function HttpRestApi() {
@@ -113,9 +111,47 @@ fetch("https://fleet-opossum-9500-eu1-rest-kafka.upstash.io/consume/GROUP_NAME/G
         </header>
 
         {/* body */}
-        <div className="mt-8">
-          {/* buttons */}
-          {/*<div className="flex items-center gap-px">
+        <div className="h-full overflow-y-auto rounded-xl bg-black/20">
+          <SandpackProvider
+            style={{
+              fontSize: ".9rem",
+            }}
+            theme={sandpackDark}
+            files={{
+              Redis: {
+                active: true,
+                code: code[Product.REDIS][CodeExample.lib],
+              },
+              Kafka: {
+                active: true,
+                code: code[Product.KAFKA][CodeExample.lib],
+              },
+              QStash: {
+                active: true,
+                code: code[Product.QSTASH][CodeExample.lib],
+              },
+            }}
+          >
+            <SandpackLayout
+              style={{
+                border: 0,
+                // @ts-ignore
+                "--sp-border-radius": borderRadius["2xl"],
+                "--sp-colors-surface1": "rgb(0 0 0 / 0%)",
+                "--sp-colors-surface2": "rgb(0 0 0 / 0%)",
+                "--sp-font-lineHeight": 1.5,
+              }}
+            >
+              <SandpackCodeEditor readOnly showReadOnly={false} />
+            </SandpackLayout>
+          </SandpackProvider>
+        </div>
+      </BorderBoxBody>
+    </BorderBox>
+  );
+}
+
+/*<div className="flex items-center gap-px">
             {Object.keys(Product).map((key) => {
               const value = Product[key as keyof typeof Product];
               return (
@@ -139,43 +175,4 @@ fetch("https://fleet-opossum-9500-eu1-rest-kafka.upstash.io/consume/GROUP_NAME/G
                 </label>
               );
             })}
-          </div>*/}
-
-          {/* editor */}
-          <div className="mt-4 h-[288px] overflow-y-auto rounded-xl bg-black/20">
-            <SandpackProvider
-              theme={sandpackDark}
-              files={{
-                Redis: {
-                  active: true,
-                  code: code[Product.REDIS][CodeExample.lib],
-                },
-                Kafka: {
-                  active: true,
-                  code: code[Product.KAFKA][CodeExample.lib],
-                },
-                QStash: {
-                  active: true,
-                  code: code[Product.QSTASH][CodeExample.lib],
-                },
-              }}
-            >
-              <SandpackLayout
-                style={{
-                  // @ts-ignore
-                  "--sp-layout-height": 100,
-                  "--sp-colors-surface1": "rgb(0 0 0 / 0%)",
-                  "--sp-colors-surface2": "rgb(0 0 0 / 0%)",
-                  border: 0,
-                  "--sp-border-radius": borderRadius["2xl"],
-                }}
-              >
-                <SandpackCodeEditor readOnly showReadOnly={false} />
-              </SandpackLayout>
-            </SandpackProvider>
-          </div>
-        </div>
-      </BorderBoxBody>
-    </BorderBox>
-  );
-}
+          </div>*/

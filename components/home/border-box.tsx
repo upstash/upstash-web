@@ -1,6 +1,6 @@
 import { HTMLProps } from "react";
 import cx from "@/utils/cx";
-import LinkNew from "@/components/link-new";
+import Button from "@/components/button";
 
 export function BorderBox({ children, className }: HTMLProps<HTMLDivElement>) {
   return (
@@ -22,7 +22,7 @@ export function BorderBoxBody({
   return (
     <div
       className={cx(
-        "group/box-body relative h-full rounded-[inherit] bg-zinc-900 p-8",
+        "group/box-body relative z-0 flex h-full flex-col gap-8 rounded-[inherit] bg-zinc-900 p-8",
         className
       )}
     >
@@ -51,7 +51,7 @@ export function BorderBoxBodyTitle({
           className="translate-y-1/4 opacity-0 transition
         group-hover/box-body:translate-y-0 group-hover/box-body:opacity-100"
         >
-          <LinkNew
+          <Button
             href={link}
             iconProps={{
               className: "text-2xl",

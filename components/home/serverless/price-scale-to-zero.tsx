@@ -16,12 +16,12 @@ export default function PriceScaleToZero() {
           </BorderBoxBodyTitle>
           <BorderBoxBodySummary>
             Start free, then pay only for what you use with per-request pricing.
-            You'll never pay more than the cap price, guaranteed.
+            You&apos;ll never pay more than the cap price, guaranteed.
           </BorderBoxBodySummary>
         </header>
 
         {/* body */}
-        <div className="mt-8 flex gap-4">
+        <div className="flex gap-4">
           {[
             {
               title: "Request",

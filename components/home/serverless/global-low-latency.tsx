@@ -21,7 +21,7 @@ export default function GlobalLowLatency() {
         </header>
 
         {/* body */}
-        <div className="mt-8 flex justify-between gap-1">
+        <div className="flex justify-between gap-1">
           {[...Array(30).keys()].map((i) => (
             <div
               key={i}

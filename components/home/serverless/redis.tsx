@@ -4,12 +4,15 @@ import {
   BorderBoxBodySummary,
   BorderBoxBodyTitle,
 } from "@/components/home/border-box";
-import LinkNew from "@/components/link-new";
+import Button from "@/components/button";
+import React from "react";
 
 export default function ServerlessRedis() {
   return (
-    <BorderBox className="col-span-2">
-      <BorderBoxBody className="flex flex-col gap-8">
+    <BorderBox className="col-span-2 from-red-300/20">
+      <BorderBoxBody className="overflow-hidden">
+        <div className="absolute inset-x-0 top-0 -z-10 h-1/2 bg-gradient-to-b from-red-500 to-transparent opacity-10" />
+
         <header>
           <BorderBoxBodyTitle>Redis</BorderBoxBodyTitle>
           <BorderBoxBodySummary>
@@ -17,13 +20,13 @@ export default function ServerlessRedis() {
           </BorderBoxBodySummary>
         </header>
 
-        <LinkNew
+        <Button
           href={"/docs/redis"}
-          className="mt-auto justify-between"
+          className="mt-auto justify-between hover:bg-[#E5484D] hover:text-white"
           type="button"
         >
           Read the docs
-        </LinkNew>
+        </Button>
       </BorderBoxBody>
     </BorderBox>
   );
