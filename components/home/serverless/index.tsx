@@ -21,9 +21,9 @@ export default function HomeServerless({}: ISectionHeader) {
     <section className="relative z-10 py-32">
       <div
         className={cx(
-          "absolute left-1/2 top-0 -z-10 h-[800px] w-2/3",
+          "absolute left-1/2 top-32 -z-10 h-1/2 w-4/5",
           "-translate-x-1/2",
-          "bg-emerald-500/5 blur-[100px]"
+          "bg-emerald-500 opacity-5 blur-[100px]"
         )}
       />
 

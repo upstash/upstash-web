@@ -13,6 +13,8 @@ export default function PriceKafka() {
     <PriceBox>
       <PriceTitle>Kafka</PriceTitle>
 
+      <PriceHr />
+
       <div>
         <PriceBadge>Free</PriceBadge>
         <PriceValue className="mt-3">10K commands</PriceValue>

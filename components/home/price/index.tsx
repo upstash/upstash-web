@@ -18,9 +18,9 @@ export default function HomeServerless({}: ISectionHeader) {
     <section id="pricing" className="relative py-32">
       <div
         className={cx(
-          "absolute left-1/2 top-1/2 -z-10 h-[400px] w-[800px]",
-          "-translate-x-1/2 -translate-y-1/2",
-          "bg-emerald-500/5 blur-[100px]"
+          "absolute left-1/2 top-32 -z-10 h-1/2 w-4/5",
+          "-translate-x-1/2",
+          "bg-emerald-500 opacity-5 blur-[100px]"
         )}
       />
 
@@ -38,7 +38,7 @@ export default function HomeServerless({}: ISectionHeader) {
           </div>
         </SectionHeader>
 
-        <div className="mt-24 grid grid-cols-3 gap-1">
+        <div className="mt-24 grid grid-cols-3 gap-2">
           <PriceRedis />
           <PriceKafka />
           <PriceQStash />

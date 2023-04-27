@@ -13,6 +13,8 @@ export default function PriceQStash() {
     <PriceBox>
       <PriceTitle>QStash</PriceTitle>
 
+      <PriceHr />
+
       <div>
         <PriceBadge>Free</PriceBadge>
         <PriceValue className="mt-3">500 messages</PriceValue>

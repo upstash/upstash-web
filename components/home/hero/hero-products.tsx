@@ -12,14 +12,13 @@ export default function HomeHeroProducts({
 }) {
   return (
     <div
-      className="mt-16 grid grid-cols-3 gap-1"
+      className="mt-16 grid grid-cols-3 gap-2"
       onMouseLeave={() => setActiveProduct(undefined)}
     >
       <HomeHeroProduct
         title="Redis"
         desc="Serverless database service compatible with Redis® API"
         onMouseEnter={() => setActiveProduct(Product.REDIS)}
-        className={cx(activeProduct === Product.REDIS && "bg-white/20")}
         button={{
           href: "https://console.upstash.com/redis?create=tru",
           text: "Create Database",
@@ -33,7 +32,6 @@ export default function HomeHeroProducts({
         title="Kafka"
         desc="Serverless database service compatible with Redis® API"
         onMouseEnter={() => setActiveProduct(Product.KAFKA)}
-        className={cx(activeProduct === Product.KAFKA && "bg-white/20")}
         button={{
           href: "https://console.upstash.com/kafka?create=tru",
           text: "Create Cluster",
@@ -47,7 +45,6 @@ export default function HomeHeroProducts({
         title="QStash"
         desc="Serverless database service compatible with Redis® API"
         onMouseEnter={() => setActiveProduct(Product.QSTASH)}
-        className={cx(activeProduct === Product.QSTASH && "bg-white/20")}
         button={{
           href: "https://console.upstash.com/qstash",
           text: "Publish Messages",
@@ -76,9 +73,10 @@ function HomeHeroProduct({
   return (
     <div
       className={cx(
-        "group/hero-product flex cursor-default flex-col items-center bg-white/10 p-8",
+        "group/hero-product flex cursor-default flex-col items-center bg-white/5 p-8",
         "backdrop-blur-xl transition",
-        "first:rounded-l-[2.2rem] last:rounded-r-[2.2rem]",
+        "rounded-xl first:rounded-l-[2.2rem] last:rounded-r-[2.2rem]",
+        "hover:bg-white/10",
         className
       )}
       {...props}
