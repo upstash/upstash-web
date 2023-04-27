@@ -26,7 +26,7 @@ export default function HomeServerless({}: ISectionHeader) {
           </SectionHeaderSummary>
         </SectionHeader>
 
-        <div className="mt-24 grid grid-cols-6 gap-10 text-left">
+        <div className="mt-24 grid grid-cols-6 gap-6 text-left">
           <GlobalLowLatency />
           <PriceScaleToZero />
           <HttpRestApi />

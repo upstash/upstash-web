@@ -6,7 +6,7 @@ export function BorderBox({ children, className }: HTMLProps<HTMLDivElement>) {
   return (
     <div
       className={cx(
-        "rounded-[2.2rem] bg-gradient-to-b from-white/10 to-transparent p-px",
+        "group/box-body relative z-0 grid gap-8 rounded-[2.2rem] rounded-l-[2.2rem] bg-white/5 p-8 backdrop-blur-xl",
         className
       )}
     >
@@ -15,23 +15,7 @@ export function BorderBox({ children, className }: HTMLProps<HTMLDivElement>) {
   );
 }
 
-export function BorderBoxBody({
-  children,
-  className,
-}: HTMLProps<HTMLDivElement>) {
-  return (
-    <div
-      className={cx(
-        "group/box-body relative z-0 flex h-full flex-col gap-8 rounded-[inherit] bg-zinc-900 p-8",
-        className
-      )}
-    >
-      {children}
-    </div>
-  );
-}
-
-export function BorderBoxBodyTitle({
+export function BorderBoxTitle({
   children,
   className,
   link,
@@ -63,9 +47,20 @@ export function BorderBoxBodyTitle({
   );
 }
 
-export function BorderBoxBodySummary({
+export function BorderBoxSummary({
   children,
   className,
 }: HTMLProps<HTMLParagraphElement>) {
   return <p className={cx("mt-3 opacity-60", className)}>{children}</p>;
+}
+
+export function BorderBoxBG({ className }: HTMLProps<HTMLDivElement>) {
+  return (
+    <div
+      className={cx(
+        "absolute inset-x-0 top-0 -z-10 h-1/2 rounded-[inherit] bg-gradient-to-b from-white/5 to-transparent opacity-10",
+        className
+      )}
+    />
+  );
 }

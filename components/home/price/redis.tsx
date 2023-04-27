@@ -1,36 +1,42 @@
-import { BorderBox, BorderBoxBody } from "@/components/home/border-box";
-import { PriceBadge, PriceDesc, PriceHr, PriceTitle, PriceValue } from "./comp";
+import {
+  PriceBadge,
+  PriceBox,
+  PriceDesc,
+  PriceHr,
+  PriceTitle,
+  PriceValue,
+} from "./comp";
 import Button from "@/components/button";
 
 export default function PriceRedis() {
   return (
-    <BorderBox>
-      <BorderBoxBody className="items-center">
-        <PriceTitle>Redis</PriceTitle>
+    <PriceBox>
+      <PriceTitle>Redis</PriceTitle>
 
-        <div>
-          <PriceBadge>Free</PriceBadge>
-          <PriceValue className="mt-3">10K commands</PriceValue>
-          <PriceDesc>per day</PriceDesc>
-        </div>
+      <PriceHr />
 
-        <PriceHr />
+      <div>
+        <PriceBadge>Free</PriceBadge>
+        <PriceValue className="mt-3">10K commands</PriceValue>
+        <PriceDesc>per day</PriceDesc>
+      </div>
 
-        <div>
-          <PriceBadge type="payg">Pay as you go</PriceBadge>
-          <PriceValue className="mt-3">$0.4</PriceValue>
-          <PriceDesc>per 100K commands</PriceDesc>
-        </div>
+      <PriceHr />
 
-        <PriceHr />
+      <div>
+        <PriceBadge type="payg">Pay as you go</PriceBadge>
+        <PriceValue className="mt-3">$0.4</PriceValue>
+        <PriceDesc>per 100K commands</PriceDesc>
+      </div>
 
-        <Button
-          className="opacity-40 hover:opacity-100"
-          href="https://docs.upstash.com/redis/overall/pricing"
-        >
-          More information
-        </Button>
-      </BorderBoxBody>
-    </BorderBox>
+      <PriceHr />
+
+      <Button
+        className="opacity-40 hover:opacity-100"
+        href="https://docs.upstash.com/redis/overall/pricing"
+      >
+        More information
+      </Button>
+    </PriceBox>
   );
 }

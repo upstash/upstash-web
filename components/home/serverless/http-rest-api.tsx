@@ -2,9 +2,8 @@
 
 import {
   BorderBox,
-  BorderBoxBody,
-  BorderBoxBodySummary,
-  BorderBoxBodyTitle,
+  BorderBoxSummary,
+  BorderBoxTitle,
 } from "@/components/home/border-box";
 import {
   SandpackCodeEditor,
@@ -98,55 +97,53 @@ fetch("https://fleet-opossum-9500-eu1-rest-kafka.upstash.io/consume/GROUP_NAME/G
 
   return (
     <BorderBox className="col-span-4">
-      <BorderBoxBody>
-        <header>
-          <BorderBoxBodyTitle link="https://docs.upstash.com/redis/features/restapi">
-            HTTP/REST API
-          </BorderBoxBodyTitle>
-          <BorderBoxBodySummary>
-            HTTP-based APIs enable access from both serverless and edge
-            functions, while also supporting the use of standard clients via the
-            Redis/Kafka protocol.
-          </BorderBoxBodySummary>
-        </header>
+      <header>
+        <BorderBoxTitle link="https://docs.upstash.com/redis/features/restapi">
+          HTTP/REST API
+        </BorderBoxTitle>
+        <BorderBoxSummary>
+          HTTP-based APIs enable access from both serverless and edge functions,
+          while also supporting the use of standard clients via the Redis/Kafka
+          protocol.
+        </BorderBoxSummary>
+      </header>
 
-        {/* body */}
-        <div className="h-full overflow-y-auto rounded-xl bg-black/20">
-          <SandpackProvider
+      {/* body */}
+      <div className="h-full overflow-y-auto rounded-xl bg-black/20">
+        <SandpackProvider
+          style={{
+            fontSize: ".9rem",
+          }}
+          theme={sandpackDark}
+          files={{
+            Redis: {
+              active: true,
+              code: code[Product.REDIS][CodeExample.lib],
+            },
+            Kafka: {
+              active: true,
+              code: code[Product.KAFKA][CodeExample.lib],
+            },
+            QStash: {
+              active: true,
+              code: code[Product.QSTASH][CodeExample.lib],
+            },
+          }}
+        >
+          <SandpackLayout
             style={{
-              fontSize: ".9rem",
-            }}
-            theme={sandpackDark}
-            files={{
-              Redis: {
-                active: true,
-                code: code[Product.REDIS][CodeExample.lib],
-              },
-              Kafka: {
-                active: true,
-                code: code[Product.KAFKA][CodeExample.lib],
-              },
-              QStash: {
-                active: true,
-                code: code[Product.QSTASH][CodeExample.lib],
-              },
+              border: 0,
+              // @ts-ignore
+              "--sp-border-radius": borderRadius["2xl"],
+              "--sp-colors-surface1": "rgb(0 0 0 / 0%)",
+              "--sp-colors-surface2": "rgb(0 0 0 / 0%)",
+              "--sp-font-lineHeight": 1.5,
             }}
           >
-            <SandpackLayout
-              style={{
-                border: 0,
-                // @ts-ignore
-                "--sp-border-radius": borderRadius["2xl"],
-                "--sp-colors-surface1": "rgb(0 0 0 / 0%)",
-                "--sp-colors-surface2": "rgb(0 0 0 / 0%)",
-                "--sp-font-lineHeight": 1.5,
-              }}
-            >
-              <SandpackCodeEditor readOnly showReadOnly={false} />
-            </SandpackLayout>
-          </SandpackProvider>
-        </div>
-      </BorderBoxBody>
+            <SandpackCodeEditor readOnly showReadOnly={false} />
+          </SandpackLayout>
+        </SandpackProvider>
+      </div>
     </BorderBox>
   );
 }

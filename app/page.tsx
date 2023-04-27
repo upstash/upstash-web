@@ -6,9 +6,9 @@ import HomePrice from "@/components/home/price";
 export default function Home() {
   return (
     <main className="text-center">
-      {/*<HomeHero />*/}
-      {/*<HomeFast />*/}
-      {/*<HomeServerless />*/}
+      <HomeHero />
+      <HomeFast />
+      <HomeServerless />
       <HomePrice />
     </main>
   );

@@ -76,7 +76,7 @@ function HomeHeroProduct({
   return (
     <div
       className={cx(
-        "group/hero-product flex cursor-default flex-col items-center bg-white/10 px-8 py-8",
+        "group/hero-product flex cursor-default flex-col items-center bg-white/10 p-8",
         "backdrop-blur-xl transition",
         "first:rounded-l-[2.2rem] last:rounded-r-[2.2rem]",
         className

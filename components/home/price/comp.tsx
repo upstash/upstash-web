@@ -1,11 +1,31 @@
 import { HTMLProps, ReactNode } from "react";
 import cx from "@/utils/cx";
 
-export function PriceTitle({
+export function PriceBox({
   children,
   className,
   ...props
 }: HTMLProps<HTMLDivElement> & {
+  children: ReactNode;
+}) {
+  return (
+    <div
+      className={cx(
+        "grid place-items-center gap-6 bg-white/5 p-8 backdrop-blur-xl first:rounded-l-[2.2rem] last:rounded-r-[2.2rem]",
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+}
+
+export function PriceTitle({
+  children,
+  className,
+  ...props
+}: HTMLProps<HTMLHeadingElement> & {
   children: ReactNode;
 }) {
   return (
@@ -22,13 +42,13 @@ export function PriceValue({
   children,
   className,
   ...props
-}: HTMLProps<HTMLDivElement> & {
+}: HTMLProps<HTMLHeadingElement> & {
   children: ReactNode;
 }) {
   return (
-    <h3 className={cx("text-xl font-medium", className)} {...props}>
+    <h5 className={cx("text-xl font-medium", className)} {...props}>
       {children}
-    </h3>
+    </h5>
   );
 }
 
@@ -36,7 +56,7 @@ export function PriceDesc({
   children,
   className,
   ...props
-}: HTMLProps<HTMLDivElement> & {
+}: HTMLProps<HTMLParagraphElement> & {
   children: ReactNode;
 }) {
   return (
@@ -51,7 +71,7 @@ export function PriceBadge({
   type = "free",
   className,
   ...props
-}: HTMLProps<HTMLDivElement> & {
+}: HTMLProps<HTMLSpanElement> & {
   children: ReactNode;
   type?: "free" | "payg";
 }) {
@@ -61,7 +81,7 @@ export function PriceBadge({
         "inline-flex rounded-full border px-3 py-1 leading-none",
         "text-xs uppercase leading-none tracking-widest",
         type === "free" &&
-          "border-emerald-300/10 bg-emerald-300/5 text-emerald-300",
+          "border-emerald-300/10 bg-emerald-300/5 text-emerald-400",
         type === "payg" &&
           "border-yellow-300/10 bg-yellow-300/5 text-yellow-300/90",
         className
@@ -73,8 +93,8 @@ export function PriceBadge({
   );
 }
 
-export function PriceHr({ className }: HTMLProps<HTMLDivElement> & {}) {
+export function PriceHr({ className }: HTMLProps<HTMLHRElement> & {}) {
   return (
-    <hr className={cx("w-1/3 border-0 border-b border-white/5", className)} />
+    <hr className={cx("w-10 border-0 border-b border-white/5", className)} />
   );
 }
