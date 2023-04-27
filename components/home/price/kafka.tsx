@@ -29,14 +29,14 @@ export default function PriceKafka() {
         <PriceDesc>per 100K messages</PriceDesc>
       </div>
 
-      <PriceHr />
+      {/*<PriceHr />*/}
 
-      <Button
+      {/*<Button
         className="text-sm opacity-40 hover:opacity-100"
         href="https://docs.upstash.com/kafka/pricing"
       >
         More information
-      </Button>
+      </Button>*/}
     </PriceBox>
   );
 }

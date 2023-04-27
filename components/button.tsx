@@ -27,7 +27,7 @@ export default function Button({
     <a
       target="_blank"
       className={cx(
-        "group/link-new flex cursor-pointer items-center transition",
+        "group/link-new inline-flex cursor-pointer items-center transition",
         classes[type],
         className
       )}

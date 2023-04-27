@@ -29,14 +29,14 @@ export default function PriceRedis() {
         <PriceDesc>per 100K commands</PriceDesc>
       </div>
 
-      <PriceHr />
+      {/*<PriceHr />*/}
 
-      <Button
+      {/*<Button
         className="text-sm opacity-40 hover:opacity-100"
         href="https://docs.upstash.com/redis/overall/pricing"
       >
         More information
-      </Button>
+      </Button>*/}
     </PriceBox>
   );
 }

@@ -10,6 +10,7 @@ import PriceKafka from "@/components/home/price/kafka";
 import PriceQStash from "@/components/home/price/qstash";
 import Icon, { ICON_NAMES } from "@/components/icon";
 import cx from "@/utils/cx";
+import Button from "@/components/button";
 
 export interface ISectionHeader extends HTMLProps<HTMLDivElement> {}
 
@@ -42,6 +43,18 @@ export default function HomeServerless({}: ISectionHeader) {
           <PriceRedis />
           <PriceKafka />
           <PriceQStash />
+        </div>
+
+        <div className="mt-10 text-zinc-600">
+          See{" "}
+          <Button
+            href="https://docs.upstash.com/redis/overall/pricing"
+            className="underline"
+            hideIcon
+          >
+            pricing page
+          </Button>{" "}
+          for more information.
         </div>
       </Container>
     </section>
