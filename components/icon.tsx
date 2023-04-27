@@ -33,6 +33,8 @@ export default function Icon({ icon, className, ...props }: IconProps) {
 
 export enum ICON_NAMES {
   ArrowUpRight = "ArrowUpRight",
+  Check = "Check",
+  CreditCard = "CreditCard",
 }
 
 const PATHS = {
@@ -40,6 +42,19 @@ const PATHS = {
     <>
       <line x1="7" y1="17" x2="17" y2="7"></line>
       <polyline points="7 7 17 7 17 17"></polyline>
+    </>
+  ),
+  [ICON_NAMES.Check]: (
+    <>
+      <path d="M5 12l5 5l10 -10" />
+    </>
+  ),
+  [ICON_NAMES.CreditCard]: (
+    <>
+      <rect x="3" y="5" width="18" height="14" rx="3" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+      <line x1="7" y1="15" x2="7.01" y2="15" />
+      <line x1="11" y1="15" x2="13" y2="15" />
     </>
   ),
 };

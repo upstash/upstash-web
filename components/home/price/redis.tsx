@@ -1,5 +1,6 @@
 import { BorderBox, BorderBoxBody } from "@/components/home/border-box";
-import { PriceBadge, PriceDesc, PriceHr, PriceTitle } from "./comp";
+import { PriceBadge, PriceDesc, PriceHr, PriceTitle, PriceValue } from "./comp";
+import Button from "@/components/button";
 
 export default function PriceRedis() {
   return (
@@ -8,18 +9,27 @@ export default function PriceRedis() {
         <PriceTitle>Redis</PriceTitle>
 
         <div>
-          <PriceBadge>Pay as you go</PriceBadge>
-          <PriceTitle className="mt-3">$0.4</PriceTitle>
-          <PriceDesc>per 100K commands</PriceDesc>
+          <PriceBadge>Free</PriceBadge>
+          <PriceValue className="mt-3">10K commands</PriceValue>
+          <PriceDesc>per day</PriceDesc>
         </div>
 
         <PriceHr />
 
         <div>
-          <PriceBadge>Free</PriceBadge>
-          <PriceTitle className="mt-3">10K commands</PriceTitle>
-          <PriceDesc>per day</PriceDesc>
+          <PriceBadge type="payg">Pay as you go</PriceBadge>
+          <PriceValue className="mt-3">$0.4</PriceValue>
+          <PriceDesc>per 100K commands</PriceDesc>
         </div>
+
+        <PriceHr />
+
+        <Button
+          className="opacity-40 hover:opacity-100"
+          href="https://docs.upstash.com/redis/overall/pricing"
+        >
+          More information
+        </Button>
       </BorderBoxBody>
     </BorderBox>
   );

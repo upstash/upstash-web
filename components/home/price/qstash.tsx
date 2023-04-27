@@ -4,7 +4,9 @@ import {
   PriceDesc,
   PriceHr,
   PriceTitle,
+  PriceValue,
 } from "@/components/home/price/comp";
+import Button from "@/components/button";
 
 export default function PriceQStash() {
   return (
@@ -13,18 +15,27 @@ export default function PriceQStash() {
         <PriceTitle>QStash</PriceTitle>
 
         <div>
-          <PriceBadge>Pay as you go</PriceBadge>
-          <PriceTitle className="mt-3">$1</PriceTitle>
-          <PriceDesc>per 100K messages</PriceDesc>
+          <PriceBadge>Free</PriceBadge>
+          <PriceValue className="mt-3">500 messages</PriceValue>
+          <PriceDesc>per day</PriceDesc>
         </div>
 
         <PriceHr />
 
         <div>
-          <PriceBadge>Free</PriceBadge>
-          <PriceTitle className="mt-3">500 messages</PriceTitle>
-          <PriceDesc>per day</PriceDesc>
+          <PriceBadge type="payg">Pay as you go</PriceBadge>
+          <PriceValue className="mt-3">$1</PriceValue>
+          <PriceDesc>per 100K messages</PriceDesc>
         </div>
+
+        <PriceHr />
+
+        <Button
+          className="opacity-40 hover:opacity-100"
+          href="https://docs.upstash.com/qstash/pricing"
+        >
+          More information
+        </Button>
       </BorderBoxBody>
     </BorderBox>
   );
