@@ -58,7 +58,7 @@ export function BorderBoxBG({ className }: HTMLProps<HTMLDivElement>) {
   return (
     <div
       className={cx(
-        "absolute inset-x-0 top-0 -z-10 h-1/2 rounded-[inherit] bg-gradient-to-b from-white/5 to-transparent opacity-10",
+        "absolute inset-x-0 top-0 -z-10 h-full rounded-[inherit] bg-gradient-to-b from-white to-white opacity-5",
         className
       )}
     />

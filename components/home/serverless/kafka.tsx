@@ -20,7 +20,7 @@ export default function ServerlessKafka() {
 
       <Button
         href={"/docs/redis"}
-        className="mt-auto justify-between hover:bg-[#0090FF] hover:text-white"
+        className="mt-auto justify-between group-hover/box-body:bg-[#0090FF] group-hover/box-body:text-white"
         type="button"
       >
         Read the docs

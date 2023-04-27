@@ -20,7 +20,7 @@ export default function ServerlessQStash() {
 
       <Button
         href={"/docs/redis"}
-        className="mt-auto justify-between hover:bg-[#6E56CF] hover:text-white"
+        className="mt-auto justify-between group-hover/box-body:bg-[#6E56CF] group-hover/box-body:text-white"
         type="button"
       >
         Read the docs

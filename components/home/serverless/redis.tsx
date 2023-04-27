@@ -21,7 +21,7 @@ export default function ServerlessRedis() {
 
       <Button
         href={"/docs/redis"}
-        className="mt-auto justify-between hover:bg-[#E5484D] hover:text-white"
+        className="mt-auto justify-between group-hover/box-body:bg-[#E5484D] group-hover/box-body:text-white"
         type="button"
       >
         Read the docs
