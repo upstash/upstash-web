@@ -1,21 +1,17 @@
-import {
-  BorderBox,
-  BorderBoxSummary,
-  BorderBoxTitle,
-} from "@/components/home/border-box";
+import { ServerlessBox, ServerlessSummary, ServerlessTitle } from "./comp";
 import cx from "@/utils/cx";
 
 export default function PriceScaleToZero() {
   return (
-    <BorderBox className="col-span-3">
+    <ServerlessBox className="col-span-3">
       <header>
-        <BorderBoxTitle link="https://docs.upstash.com/redis/overall/pricing">
+        <ServerlessTitle link="https://docs.upstash.com/redis/overall/pricing">
           Price scale to zero
-        </BorderBoxTitle>
-        <BorderBoxSummary>
+        </ServerlessTitle>
+        <ServerlessSummary>
           Start free, then pay only for what you use with per-request pricing.
           You&apos;ll never pay more than the cap price, guaranteed.
-        </BorderBoxSummary>
+        </ServerlessSummary>
       </header>
 
       {/* body */}
@@ -50,6 +46,6 @@ export default function PriceScaleToZero() {
           </div>
         ))}
       </div>
-    </BorderBox>
+    </ServerlessBox>
   );
 }

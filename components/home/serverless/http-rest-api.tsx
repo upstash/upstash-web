@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  BorderBox,
-  BorderBoxSummary,
-  BorderBoxTitle,
-} from "@/components/home/border-box";
+import { ServerlessBox, ServerlessSummary, ServerlessTitle } from "./comp";
 import {
   SandpackCodeEditor,
   SandpackLayout,
@@ -96,16 +92,16 @@ fetch("https://fleet-opossum-9500-eu1-rest-kafka.upstash.io/consume/GROUP_NAME/G
   };
 
   return (
-    <BorderBox className="col-span-4">
+    <ServerlessBox className="col-span-4">
       <header>
-        <BorderBoxTitle link="https://docs.upstash.com/redis/features/restapi">
+        <ServerlessTitle link="https://docs.upstash.com/redis/features/restapi">
           HTTP/REST API
-        </BorderBoxTitle>
-        <BorderBoxSummary>
+        </ServerlessTitle>
+        <ServerlessSummary>
           HTTP-based APIs enable access from both serverless and edge functions,
           while also supporting the use of standard clients via the Redis/Kafka
           protocol.
-        </BorderBoxSummary>
+        </ServerlessSummary>
       </header>
 
       {/* body */}
@@ -144,7 +140,7 @@ fetch("https://fleet-opossum-9500-eu1-rest-kafka.upstash.io/consume/GROUP_NAME/G
           </SandpackLayout>
         </SandpackProvider>
       </div>
-    </BorderBox>
+    </ServerlessBox>
   );
 }
 

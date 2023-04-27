@@ -2,7 +2,10 @@ import { HTMLProps } from "react";
 import cx from "@/utils/cx";
 import Button from "@/components/button";
 
-export function BorderBox({ children, className }: HTMLProps<HTMLDivElement>) {
+export function ServerlessBox({
+  children,
+  className,
+}: HTMLProps<HTMLDivElement>) {
   return (
     <div
       className={cx(
@@ -15,7 +18,7 @@ export function BorderBox({ children, className }: HTMLProps<HTMLDivElement>) {
   );
 }
 
-export function BorderBoxTitle({
+export function ServerlessTitle({
   children,
   className,
   link,
@@ -47,20 +50,9 @@ export function BorderBoxTitle({
   );
 }
 
-export function BorderBoxSummary({
+export function ServerlessSummary({
   children,
   className,
 }: HTMLProps<HTMLParagraphElement>) {
   return <p className={cx("mt-3 opacity-40", className)}>{children}</p>;
-}
-
-export function BorderBoxBG({ className }: HTMLProps<HTMLDivElement>) {
-  return (
-    <div
-      className={cx(
-        "absolute inset-x-0 top-0 -z-10 h-full rounded-[inherit] bg-gradient-to-b from-white to-white opacity-5",
-        className
-      )}
-    />
-  );
 }

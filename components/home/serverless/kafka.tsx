@@ -1,21 +1,14 @@
-import {
-  BorderBox,
-  BorderBoxBG,
-  BorderBoxSummary,
-  BorderBoxTitle,
-} from "@/components/home/border-box";
+import { ServerlessBox, ServerlessSummary, ServerlessTitle } from "./comp";
 import Button from "@/components/button";
 
 export default function ServerlessKafka() {
   return (
-    <BorderBox className="col-span-2 from-blue-300/20">
-      {/*<BorderBoxBG className="from-blue-500" />*/}
-
+    <ServerlessBox className="col-span-2 from-blue-300/20">
       <header>
-        <BorderBoxTitle>Kafka</BorderBoxTitle>
-        <BorderBoxSummary>
+        <ServerlessTitle>Kafka</ServerlessTitle>
+        <ServerlessSummary>
           The data is replicated across multiple regions
-        </BorderBoxSummary>
+        </ServerlessSummary>
       </header>
 
       <Button
@@ -25,6 +18,6 @@ export default function ServerlessKafka() {
       >
         Read the docs
       </Button>
-    </BorderBox>
+    </ServerlessBox>
   );
 }

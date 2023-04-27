@@ -1,23 +1,19 @@
-import {
-  BorderBox,
-  BorderBoxSummary,
-  BorderBoxTitle,
-} from "@/components/home/border-box";
+import { ServerlessBox, ServerlessSummary, ServerlessTitle } from "./comp";
 import { LogoIcon } from "@/components/app/logo";
 
 export default function DesignedForTheEdge() {
   const duration = 120000;
 
   return (
-    <BorderBox className="col-span-2 overflow-hidden">
+    <ServerlessBox className="col-span-2 overflow-hidden">
       <header className="relative z-20">
-        <BorderBoxTitle link="https://docs.upstash.com/redis/features/globaldatabase">
+        <ServerlessTitle link="https://docs.upstash.com/redis/features/globaldatabase">
           Designed for the edge
-        </BorderBoxTitle>
-        <BorderBoxSummary>
+        </ServerlessTitle>
+        <ServerlessSummary>
           Tested and optimized for Vercel Edge, Cloudflare Workers and Fastly
           Edge.
-        </BorderBoxSummary>
+        </ServerlessSummary>
       </header>
 
       {/* body */}
@@ -178,6 +174,6 @@ export default function DesignedForTheEdge() {
           </span>
         </div>
       </div>
-    </BorderBox>
+    </ServerlessBox>
   );
 }

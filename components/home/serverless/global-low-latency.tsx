@@ -1,21 +1,17 @@
-import {
-  BorderBox,
-  BorderBoxSummary,
-  BorderBoxTitle,
-} from "@/components/home/border-box";
+import { ServerlessBox, ServerlessSummary, ServerlessTitle } from "./comp";
 import cx from "@/utils/cx";
 
 export default function GlobalLowLatency() {
   return (
-    <BorderBox className="col-span-3">
+    <ServerlessBox className="col-span-3">
       <header>
-        <BorderBoxTitle link="https://docs.upstash.com/redis/features/globaldatabase">
+        <ServerlessTitle link="https://docs.upstash.com/redis/features/globaldatabase">
           Global low latency
-        </BorderBoxTitle>
-        <BorderBoxSummary>
+        </ServerlessTitle>
+        <ServerlessSummary>
           The data is replicated across multiple regions, allowing you to select
           the regions that provide the best latency for your users.
-        </BorderBoxSummary>
+        </ServerlessSummary>
       </header>
 
       {/* body */}
@@ -29,6 +25,6 @@ export default function GlobalLowLatency() {
           </div>
         ))}
       </div>
-    </BorderBox>
+    </ServerlessBox>
   );
 }
