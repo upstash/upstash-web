@@ -15,7 +15,7 @@ export interface ISectionHeader extends HTMLProps<HTMLDivElement> {}
 
 export default function HomeServerless({}: ISectionHeader) {
   return (
-    <section id="pricing" className="relative py-20">
+    <section id="pricing" className="relative py-32">
       <div
         className={cx(
           "absolute left-1/2 top-1/2 -z-10 h-[400px] w-[800px]",

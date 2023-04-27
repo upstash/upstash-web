@@ -21,8 +21,6 @@ export default function DesignedForTheEdge() {
       </header>
 
       {/* body */}
-      <div className="absolute left-0 top-0 z-10 h-[240px] w-full bg-gradient-to-b from-zinc-900 from-30% to-transparent" />
-
       <div
         className="relative z-0 h-[320px] animate-spin"
         style={{

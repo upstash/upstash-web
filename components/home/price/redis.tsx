@@ -32,7 +32,7 @@ export default function PriceRedis() {
       <PriceHr />
 
       <Button
-        className="opacity-40 hover:opacity-100"
+        className="text-sm opacity-40 hover:opacity-100"
         href="https://docs.upstash.com/redis/overall/pricing"
       >
         More information

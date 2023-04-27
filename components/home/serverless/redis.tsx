@@ -10,7 +10,7 @@ import React from "react";
 export default function ServerlessRedis() {
   return (
     <BorderBox className="col-span-2 from-red-300/20">
-      <BorderBoxBG className="from-red-500" />
+      {/*<BorderBoxBG className="from-red-500" />*/}
 
       <header>
         <BorderBoxTitle>Redis</BorderBoxTitle>

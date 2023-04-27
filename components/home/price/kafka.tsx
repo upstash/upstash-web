@@ -30,7 +30,7 @@ export default function PriceKafka() {
       <PriceHr />
 
       <Button
-        className="opacity-40 hover:opacity-100"
+        className="text-sm opacity-40 hover:opacity-100"
         href="https://docs.upstash.com/kafka/pricing"
       >
         More information

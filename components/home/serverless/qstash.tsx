@@ -9,7 +9,7 @@ import Button from "@/components/button";
 export default function ServerlessQStash() {
   return (
     <BorderBox className="col-span-2 from-purple-300/20">
-      <BorderBoxBG className="from-purple-500" />
+      {/*<BorderBoxBG className="from-purple-500" />*/}
 
       <header>
         <BorderBoxTitle>QStash</BorderBoxTitle>

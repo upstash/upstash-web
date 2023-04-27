@@ -51,7 +51,7 @@ export function BorderBoxSummary({
   children,
   className,
 }: HTMLProps<HTMLParagraphElement>) {
-  return <p className={cx("mt-3 opacity-60", className)}>{children}</p>;
+  return <p className={cx("mt-3 opacity-40", className)}>{children}</p>;
 }
 
 export function BorderBoxBG({ className }: HTMLProps<HTMLDivElement>) {

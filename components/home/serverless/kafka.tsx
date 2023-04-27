@@ -9,7 +9,7 @@ import Button from "@/components/button";
 export default function ServerlessKafka() {
   return (
     <BorderBox className="col-span-2 from-blue-300/20">
-      <BorderBoxBG className="from-blue-500" />
+      {/*<BorderBoxBG className="from-blue-500" />*/}
 
       <header>
         <BorderBoxTitle>Kafka</BorderBoxTitle>
