@@ -19,6 +19,8 @@ export default async function BlogPage() {
         )}
       />
 
+      {/* TODO: blog yazmak isteyenler için bir uyarı */}
+
       <header className="py-20 text-center">
         <Container>
           <PageHeaderTitle>Blog</PageHeaderTitle>
