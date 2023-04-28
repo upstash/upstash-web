@@ -9,7 +9,7 @@ import cx from "@/utils/cx";
 
 export default function Nav({}: HTMLAttributes<HTMLDivElement> & {}) {
   return (
-    <nav className="col-span-2 flex items-center justify-center">
+    <nav className="col-span-2 flex items-center justify-center gap-2">
       {[
         {
           name: "Pricing",
@@ -71,7 +71,7 @@ function NavLink({
     <Link
       href={href}
       className={cx(
-        "rounded-full px-5 py-2 text-zinc-400 transition",
+        "rounded-full px-3 py-2 text-zinc-400 transition",
         "hover:bg-white/5",
         isActive && "!bg-white/10 !text-zinc-50",
         className

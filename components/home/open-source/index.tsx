@@ -67,8 +67,6 @@ export default function HomeOpenSource({}: ISectionHeader) {
             ))}
           </div>
         </div>
-
-        <div className="mt-10 text-zinc-600">github link</div>
       </Container>
     </section>
   );
@@ -76,7 +74,7 @@ export default function HomeOpenSource({}: ISectionHeader) {
 
 export enum Category {
   SDK = "JavaScript SDK",
-  Product = "Product",
+  Template = "Template",
   Integration = "Integration",
 }
 
@@ -99,38 +97,33 @@ const repositories = [
     description: "HTTP based SDK for QStash.",
     category: Category.SDK,
   },
-  // {
-  //   url: "https://github.com/upstash/edge-flags",
-  //   title: "Edge flags",
-  //   description: "Feature flags with Redis at edge functions.",
-  //   category: "Product",
-  // },
   {
-    url: "https://github.com/upstash/claps",
-    title: "Claps",
-    description: "Add a claps button to your website backed by Upstash Redis.",
-    category: Category.Product,
+    url: "https://github.com/upstash/edge-flags",
+    title: "Edge flags",
+    description: "Feature flags with Redis at edge functions.",
+    category: Category.SDK,
   },
   {
     url: "https://github.com/upstash/ratelimit",
     title: "Rate limiting",
     description: "Protect your serverless functions.",
-    category: Category.Product,
+    category: Category.SDK,
+  },
+  {
+    url: "https://github.com/upstash/claps",
+    title: "Claps",
+    description: "Add a claps button to your website backed by Upstash Redis.",
+    category: Category.Template,
   },
   {
     url: "https://github.com/upstash/roadmap",
     title: "Roadmap",
     description: "Build and deploy a roadmap app for your project/product.",
-    category: Category.Product,
+    category: Category.Template,
   },
   {
     title: "Fly",
     description: "Create global Redis replicated at 20+ regions of Fly.io",
-    category: Category.Integration,
-  },
-  {
-    title: "Vercel",
-    description: "Integrate Upstash to your Vercel projects in seconds.",
     category: Category.Integration,
   },
   {
