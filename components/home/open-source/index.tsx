@@ -22,7 +22,7 @@ export default function HomeOpenSource({}: ISectionHeader) {
         className={cx(
           "absolute left-1/2 top-32 -z-10 h-1/2 w-4/5",
           "-translate-x-1/2",
-          "bg-purple-500 opacity-5 blur-[100px]"
+          "bg-emerald-500 opacity-5 blur-[100px]"
         )}
       />
 
@@ -37,7 +37,10 @@ export default function HomeOpenSource({}: ISectionHeader) {
         <div className="relative mt-24 grid grid-cols-3 gap-6 text-left">
           <div className="absolute bottom-full mb-6 grid w-full grid-cols-3 gap-6 opacity-[0.03]">
             {[...Array(3).keys()].map((i) => (
-              <div key={i} className="flex h-[180px] rounded-2xl border" />
+              <div
+                key={i}
+                className="flex h-[180px] rounded-2xl border border-white"
+              />
             ))}
           </div>
 
@@ -57,7 +60,10 @@ export default function HomeOpenSource({}: ISectionHeader) {
 
           <div className="absolute top-full mt-6 grid w-full grid-cols-3 gap-6 opacity-[0.03]">
             {[...Array(3).keys()].map((i) => (
-              <div key={i} className="flex h-[180px] rounded-2xl border" />
+              <div
+                key={i}
+                className="flex h-[180px] rounded-2xl border border-white"
+              />
             ))}
           </div>
         </div>
