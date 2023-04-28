@@ -5,10 +5,10 @@ export default async function BlogPage() {
   const { posts, views, tags } = await getData();
 
   return (
-    <>
+    <main>
       <div className="mt-10">
         <PostList data={posts} views={views} />
       </div>
-    </>
+    </main>
   );
 }

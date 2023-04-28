@@ -71,32 +71,34 @@ export default async function BlogPage({ params }: Props) {
     indexOfPost < allPosts.length - 1 ? allPosts[indexOfPost + 1] : undefined;
 
   return (
-    <article>
-      {/* Header */}
-      <PostHeader post={post} />
+    <main>
+      <article>
+        {/* Header */}
+        <PostHeader post={post} />
 
-      {/*<PostTOC post={post} />*/}
+        {/*<PostTOC post={post} />*/}
 
-      {/* Body */}
-      <div className="relative z-0 pt-20">
-        <PageBodyGradient />
+        {/* Body */}
+        <div className="relative z-0 pt-20">
+          <PageBodyGradient />
 
-        <Container className="max-w-screen-md">
-          <Mdx code={post.body.code} />
+          <Container className="max-w-screen-md">
+            <Mdx code={post.body.code} />
 
-          {/* Tags */}
-          <PostTags post={post} />
+            {/* Tags */}
+            <PostTags post={post} />
 
-          {/* Other Post */}
-          <div className="mt-10 grid gap-6 md:grid-cols-2 md:gap-8">
-            <OtherPostCard post={prevPost} />
-            <OtherPostCard post={nextPost} align="right" />
-          </div>
-        </Container>
-      </div>
+            {/* Other Post */}
+            <div className="mt-10 grid gap-6 md:grid-cols-2 md:gap-8">
+              <OtherPostCard post={prevPost} />
+              <OtherPostCard post={nextPost} align="right" />
+            </div>
+          </Container>
+        </div>
 
-      {/* Claps */}
-      <Clap tweet={post.tweet} />
-    </article>
+        {/* Claps */}
+        <Clap tweet={post.tweet} />
+      </article>
+    </main>
   );
 }

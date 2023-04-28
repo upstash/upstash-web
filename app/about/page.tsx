@@ -8,6 +8,7 @@ import PageHeaderDesc from "@/components/app/page-header-desc";
 import PageBodyGradient from "@/components/app/page-body-gradient";
 import Balancer from "react-wrap-balancer";
 import Investors from "@/components/investor/investors";
+import cx from "@/utils/cx";
 
 export const metadata: Metadata = {
   title: "About",
@@ -38,7 +39,15 @@ const MISSIONS = [
 
 export default function HomePage() {
   return (
-    <main className="text-center">
+    <main className="relative z-0 text-center">
+      <div
+        className={cx(
+          "absolute left-1/2 -z-10 h-[400px] w-4/5",
+          "-translate-x-1/2",
+          "bg-emerald-500 opacity-5 blur-[100px]"
+        )}
+      />
+
       <section className="py-16 md:py-32">
         <Container className="max-w-screen-lg">
           {/* header */}

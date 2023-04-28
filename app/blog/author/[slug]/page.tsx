@@ -6,7 +6,7 @@ export default async function BlogPage() {
   const { posts, views, tags } = await getData();
 
   return (
-    <>
+    <main>
       <header className="text-center">
         <h1 className="font-display text-6xl font-semibold">Blog</h1>
         <p className="text-xl">
@@ -18,9 +18,9 @@ export default async function BlogPage() {
         </div>
       </header>
 
-      <div className="mt-20">
+      <section className="mt-20">
         <PostGrid data={posts.slice(0, 20)} views={views} />
-      </div>
-    </>
+      </section>
+    </main>
   );
 }
