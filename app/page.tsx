@@ -4,6 +4,7 @@ import HomeServerless from "@/components/home/serverless";
 import HomePrice from "@/components/home/price";
 import HomeOpenSource from "@/components/home/open-source";
 import HomeInvestors from "@/components/home/investor";
+import HomeCommunity from "@/components/home/community";
 
 export default function Home() {
   return (
@@ -14,6 +15,7 @@ export default function Home() {
       <HomePrice />
       <HomeOpenSource />
       <HomeInvestors />
+      <HomeCommunity />
     </main>
   );
 }
