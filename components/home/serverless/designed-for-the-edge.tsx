@@ -5,7 +5,7 @@ export default function DesignedForTheEdge() {
   const duration = 120000;
 
   return (
-    <ServerlessBox className="col-span-2 overflow-hidden">
+    <ServerlessBox className="overflow-hidden md:col-span-2">
       <header className="relative z-20">
         <ServerlessTitle link="https://docs.upstash.com/redis/features/globaldatabase">
           Designed for the edge

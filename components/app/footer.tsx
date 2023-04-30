@@ -19,7 +19,7 @@ export default function Footer({ className, ...props }: IAppFooter) {
             © {new Date().getFullYear()} Upstash, Inc. Based in California.
           </p>
 
-          <div className="flex items-center gap-6">
+          <div className="flex flex-col items-center gap-6 md:flex-row">
             <Button
               href="https://docs.upstash.com/docs/help/support"
               className="opacity-60 hover:opacity-100"

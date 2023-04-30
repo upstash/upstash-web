@@ -11,7 +11,11 @@ export function PriceBox({
   return (
     <div
       className={cx(
-        "grid place-items-center gap-6 rounded-lg bg-white/5 p-8 backdrop-blur first:rounded-l-[2.2rem] last:rounded-r-[2.2rem]",
+        "grid place-items-center gap-6 rounded-lg p-6 md:p-8",
+        "bg-white/5 backdrop-blur",
+        "first:rounded-t-[2.2rem] last:rounded-b-[2.2rem]",
+        "md:first:rounded-t md:last:rounded-b",
+        "md:first:!rounded-l-[2.2rem] md:last:!rounded-r-[2.2rem]",
         className
       )}
       {...props}
@@ -86,7 +90,7 @@ export function PriceBadge({
         type === "free" &&
           "border-emerald-300/10 bg-emerald-300/5 text-emerald-400",
         type === "payg" &&
-          "border-yellow-300/10 bg-yellow-300/5 text-yellow-300/90",
+          "border-yellow-300/10 bg-yellow-300/5 text-yellow-300/80",
         className
       )}
       {...props}

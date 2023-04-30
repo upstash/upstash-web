@@ -3,7 +3,7 @@ import cx from "@/utils/cx";
 
 export default function PriceScaleToZero() {
   return (
-    <ServerlessBox className="col-span-3">
+    <ServerlessBox className="md:col-span-3">
       <header>
         <ServerlessTitle link="https://docs.upstash.com/redis/overall/pricing">
           Price scale to zero
@@ -15,7 +15,7 @@ export default function PriceScaleToZero() {
       </header>
 
       {/* body */}
-      <div className="flex gap-4">
+      <div className="flex gap-1 md:gap-4">
         {[
           {
             title: "Request",
@@ -32,12 +32,12 @@ export default function PriceScaleToZero() {
         ].map(({ title, value }, index) => (
           <div
             key={title}
-            className="flex h-20 grow flex-col justify-center rounded-xl bg-black/20 px-4"
+            className="flex grow flex-col justify-center rounded-xl bg-black/20 px-4 py-2 md:h-20"
           >
             <span className="text-sm opacity-40">{title}</span>
             <span
               className={cx(
-                "text-2xl text-amber-200",
+                "text-xl text-amber-200 md:text-2xl",
                 index === 2 && "text-emerald-300"
               )}
             >

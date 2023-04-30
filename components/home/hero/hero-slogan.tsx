@@ -10,7 +10,7 @@ export default function HomeHeroSlogan({
     <h1
       className={cx(
         "inline-flex flex-col gap-1 transition",
-        "font-display text-6xl font-bold leading-none md:text-[7rem]",
+        "font-display text-6xl font-bold leading-none md:text-[8rem]",
         "bg-gradient-to-r from-20% bg-clip-text text-transparent",
         // default
         "from-emerald-400 to-yellow-300",

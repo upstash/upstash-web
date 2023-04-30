@@ -16,7 +16,7 @@ import React from "react";
 
 export default function HomeCommunity() {
   return (
-    <section className="relative py-32">
+    <section className="relative py-16 md:py-32">
       {/* bg */}
       <div
         className={cx(
@@ -35,11 +35,11 @@ export default function HomeCommunity() {
           </SectionHeaderSummary>
         </SectionHeader>
 
-        <div className="mt-24 grid grid-cols-3 gap-2">
+        <div className="mt-12 grid gap-2 md:mt-24 md:grid-cols-3">
           <CommunityBox>
             <Icon
               icon={ICON_NAMES.FileText}
-              className="mb-4 text-5xl group-hover/community-box:text-emerald-300"
+              className="mb-4 text-4xl group-hover/community-box:text-emerald-300 md:text-5xl"
               strokeWidth="1"
             />
             <CommunityBoxTitle>Blog</CommunityBoxTitle>
@@ -53,7 +53,7 @@ export default function HomeCommunity() {
           <CommunityBox>
             <Icon
               icon={ICON_NAMES.Discord}
-              className="mb-4 text-5xl group-hover/community-box:text-emerald-300"
+              className="mb-4 text-4xl group-hover/community-box:text-emerald-300 md:text-5xl"
               strokeWidth="1"
             />
             <CommunityBoxTitle>Discord</CommunityBoxTitle>
@@ -68,7 +68,7 @@ export default function HomeCommunity() {
           <CommunityBox>
             <Icon
               icon={ICON_NAMES.Twitter}
-              className="mb-4 text-5xl group-hover/community-box:text-emerald-300"
+              className="mb-4 text-4xl group-hover/community-box:text-emerald-300 md:text-5xl"
               strokeWidth="1"
             />
             <CommunityBoxTitle>Twitter</CommunityBoxTitle>

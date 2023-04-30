@@ -17,7 +17,7 @@ export interface ISectionHeader extends HTMLProps<HTMLDivElement> {}
 
 export default function HomeOpenSource({}: ISectionHeader) {
   return (
-    <section id="pricing" className="relative py-32">
+    <section id="pricing" className="relative py-16 md:py-32">
       <div
         className={cx(
           "absolute left-1/2 top-32 -z-10 h-1/2 w-4/5",
@@ -34,37 +34,43 @@ export default function HomeOpenSource({}: ISectionHeader) {
           </SectionHeaderSummary>
         </SectionHeader>
 
-        <div className="relative mt-24 grid grid-cols-3 gap-6 text-left">
-          <div className="absolute bottom-full mb-6 grid w-full grid-cols-3 gap-6 opacity-[0.03]">
-            {[...Array(3).keys()].map((i) => (
-              <div
-                key={i}
-                className="flex h-[180px] rounded-2xl border border-white"
-              />
-            ))}
-          </div>
+        <div className="mt-12 overflow-x-scroll md:mt-24 md:overflow-auto">
+          <div className="relative grid w-[270%] grid-cols-3 gap-6 text-left md:w-full">
+            <div className="absolute bottom-full mb-6 hidden w-full grid-cols-3 gap-6 opacity-[0.03] md:grid">
+              {[...Array(3).keys()].map((i) => (
+                <div
+                  key={i}
+                  className={cx(
+                    "flex h-[180px] rounded-2xl border border-white"
+                  )}
+                />
+              ))}
+            </div>
 
-          {repositories.map((item) => {
-            return (
-              <SourceBox
-                key={item.url}
-                href={item.url}
-                category={item.category}
-              >
-                <SourceTitle>{item.title}</SourceTitle>
-                <SourceDesc>{item.description}</SourceDesc>
-                <SourceTag>{item.category}</SourceTag>
-              </SourceBox>
-            );
-          })}
+            {repositories.map((item) => {
+              return (
+                <SourceBox
+                  key={item.url}
+                  href={item.url}
+                  category={item.category}
+                >
+                  <SourceTitle>{item.title}</SourceTitle>
+                  <SourceDesc>{item.description}</SourceDesc>
+                  <SourceTag>{item.category}</SourceTag>
+                </SourceBox>
+              );
+            })}
 
-          <div className="absolute top-full mt-6 grid w-full grid-cols-3 gap-6 opacity-[0.03]">
-            {[...Array(3).keys()].map((i) => (
-              <div
-                key={i}
-                className="flex h-[180px] rounded-2xl border border-white"
-              />
-            ))}
+            <div className="absolute top-full mt-6 hidden w-full grid-cols-3 gap-6 opacity-[0.03] md:grid">
+              {[...Array(3).keys()].map((i) => (
+                <div
+                  key={i}
+                  className={cx(
+                    "flex h-[180px] rounded-2xl border border-white"
+                  )}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </Container>

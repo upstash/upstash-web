@@ -36,8 +36,8 @@ export function SourceBox({
     <a
       target="_blank"
       className={cx(
-        "group/source-box flex flex-col rounded-2xl bg-white/5 p-8 backdrop-blur",
-        "transition",
+        "group/source-box flex flex-col rounded-2xl p-8",
+        "bg-white/5 backdrop-blur transition",
         "hover:scale-[1.02] hover:bg-white/10",
         className
       )}

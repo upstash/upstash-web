@@ -13,6 +13,8 @@ export default function HomeHero() {
 
   return (
     <section className="relative z-10 py-10">
+      <HomeHeroBg activeProduct={activeProduct} />
+
       <Container>
         <HomeHeroSlogan activeProduct={activeProduct} />
 
@@ -25,8 +27,6 @@ export default function HomeHero() {
       <Container className="max-w-screen-md">
         <HomeHeroCustomer />
       </Container>
-
-      <HomeHeroBg activeProduct={activeProduct} />
     </section>
   );
 }

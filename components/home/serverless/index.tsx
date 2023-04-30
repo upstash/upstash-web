@@ -35,7 +35,7 @@ export default function HomeServerless({}: ISectionHeader) {
           </SectionHeaderSummary>
         </SectionHeader>
 
-        <div className="mt-24 grid grid-cols-6 gap-6 text-left">
+        <div className="mt-24 grid gap-6 text-left md:grid-cols-6">
           {/* features */}
           <GlobalLowLatency />
           <PriceScaleToZero />

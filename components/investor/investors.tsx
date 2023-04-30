@@ -6,13 +6,13 @@ export default function Investors({ short = false }) {
   const DATA = short ? INVESTORS.slice(0, 5) : INVESTORS;
 
   return (
-    <div className="mt-20 flex flex-wrap justify-center gap-y-10 md:mx-24">
+    <div className="flex flex-wrap justify-center gap-y-10 md:mx-24">
       {DATA.map((investor) => {
         return (
           <Link
             key={investor.name}
             href={investor.url}
-            className="group/investor inline-flex w-1/3 flex-col items-center"
+            className="group/investor inline-flex w-1/2 flex-col items-center md:w-1/3"
           >
             <span className="rounded-full bg-emerald-200">
               <Image

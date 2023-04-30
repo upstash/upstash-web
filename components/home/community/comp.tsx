@@ -10,9 +10,11 @@ export function CommunityBox({
   return (
     <div
       className={cx(
-        "group/community-box flex flex-col items-center bg-white/5 p-8",
-        "transition",
-        "first:rounded-l-[2.2rem] last:rounded-r-[2.2rem]",
+        "group/community-box flex flex-col items-center p-6 md:p-8",
+        "bg-white/5 transition",
+        "first:rounded-t-[2.2rem] last:rounded-b-[2.2rem]",
+        "md:first:rounded-t md:last:rounded-b",
+        "md:first:!rounded-l-[2.2rem] md:last:!rounded-r-[2.2rem]",
         "hover:scale-[1.02] hover:bg-white/10",
         className
       )}
@@ -29,7 +31,10 @@ export function CommunityBoxTitle({
   ...props
 }: HTMLProps<HTMLHeadingElement>) {
   return (
-    <h4 className={cx("font-display text-2xl", className)} {...props}>
+    <h4
+      className={cx("font-display text-xl md:text-2xl", className)}
+      {...props}
+    >
       {children}
     </h4>
   );

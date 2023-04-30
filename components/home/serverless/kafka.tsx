@@ -10,7 +10,7 @@ import { Product } from "@/utils/type";
 
 export default function ServerlessKafka() {
   return (
-    <ServerlessBox className="col-span-3">
+    <ServerlessBox className="md:col-span-3">
       <header>
         <ServerlessTitle>Kafka</ServerlessTitle>
       </header>

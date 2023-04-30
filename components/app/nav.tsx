@@ -9,7 +9,7 @@ import cx from "@/utils/cx";
 
 export default function Nav({}: HTMLAttributes<HTMLDivElement> & {}) {
   return (
-    <nav className="col-span-2 flex items-center justify-center gap-2">
+    <nav className="col-span-2 hidden items-center justify-center gap-2 md:flex">
       {[
         {
           name: "Pricing",

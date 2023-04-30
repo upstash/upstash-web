@@ -12,7 +12,7 @@ export default function HomeHeroProducts({
 }) {
   return (
     <div
-      className="mt-16 grid grid-cols-3 gap-2"
+      className="mt-8 grid gap-2 md:mt-16 md:grid-cols-3"
       onMouseLeave={() => setActiveProduct(undefined)}
     >
       <HomeHeroProduct
@@ -73,9 +73,9 @@ function HomeHeroProduct({
   return (
     <div
       className={cx(
-        "group/hero-product flex cursor-default flex-col items-center bg-white/5 p-8",
-        "backdrop-blur transition",
-        "rounded-lg first:rounded-l-[2.2rem] last:rounded-r-[2.2rem]",
+        "group/hero-product flex cursor-default flex-col items-center p-8",
+        "bg-white/5 backdrop-blur transition",
+        "rounded-lg md:first:rounded-l-[2.2rem] md:last:rounded-r-[2.2rem]",
         "hover:scale-[1.02] hover:bg-white/10",
         className
       )}

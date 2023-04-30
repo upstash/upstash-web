@@ -92,7 +92,7 @@ fetch("https://fleet-opossum-9500-eu1-rest-kafka.upstash.io/consume/GROUP_NAME/G
   };
 
   return (
-    <ServerlessBox className="col-span-4">
+    <ServerlessBox className="md:col-span-4">
       <header>
         <ServerlessTitle link="https://docs.upstash.com/redis/features/restapi">
           HTTP/REST API

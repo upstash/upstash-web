@@ -12,7 +12,7 @@ export default function Header({ className, ...props }: IAppHeader) {
   return (
     <header className={cx("group py-10", className)} {...props}>
       <Container>
-        <div className="grid grid-cols-4 items-center">
+        <div className="flex items-center md:grid md:grid-cols-4">
           <div className="flex">
             <Link href="/">
               <Logo />

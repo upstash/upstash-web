@@ -9,7 +9,7 @@ import Investors from "@/components/investor/investors";
 
 export default function HomeInvestors() {
   return (
-    <section className="relative py-32">
+    <section className="relative py-16 md:py-32">
       {/* bg */}
       <div
         className={cx(
@@ -29,7 +29,9 @@ export default function HomeInvestors() {
           </SectionHeaderSummary>
         </SectionHeader>
 
-        <Investors short />
+        <div className="mt-12 md:mt-24">
+          <Investors short />
+        </div>
       </Container>
     </section>
   );

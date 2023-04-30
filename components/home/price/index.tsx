@@ -16,7 +16,7 @@ export interface ISectionHeader extends HTMLProps<HTMLDivElement> {}
 
 export default function HomeServerless({}: ISectionHeader) {
   return (
-    <section id="pricing" className="relative py-32">
+    <section id="pricing" className="relative py-16 md:py-32">
       {/* bg */}
       <div
         className={cx(
@@ -30,11 +30,16 @@ export default function HomeServerless({}: ISectionHeader) {
         {/* header */}
         <SectionHeader>
           <SectionHeaderTitle>Pricing</SectionHeaderTitle>
+
           <SectionHeaderSummary>
             Pay only for what you use with per-request pricing.
           </SectionHeaderSummary>
+
           <div className="mt-4">
-            <p className="inline-flex items-center gap-2 rounded-full bg-emerald-950/40 px-4 py-2 text-emerald-600">
+            <p
+              className="inline-flex items-center gap-2 rounded-full
+            bg-emerald-950/40 px-4 py-2 text-sm text-emerald-600 md:text-base"
+            >
               <Icon icon={ICON_NAMES.CreditCard} />
               No credit card required to get started
             </p>
@@ -42,7 +47,7 @@ export default function HomeServerless({}: ISectionHeader) {
         </SectionHeader>
 
         {/* table */}
-        <div className="mt-24 grid grid-cols-3 gap-2">
+        <div className="mt-12 grid gap-2 md:mt-24 md:grid-cols-3">
           <PriceRedis />
           <PriceKafka />
           <PriceQStash />
