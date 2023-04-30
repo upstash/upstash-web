@@ -1,4 +1,3 @@
-export const MAX_CLAP = 10;
 export const SITE_URL = "https://upstash.com";
 
 export const BANNED_TAGS = [

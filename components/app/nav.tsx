@@ -32,7 +32,7 @@ export default function Nav({}: HTMLAttributes<HTMLDivElement> & {}) {
           href: "/careers",
           children: (
             <span
-              className="ml-0.5 rounded-full bg-emerald-300/20
+              className="rounded-full bg-emerald-300/20
               px-1.5 py-0.5 font-mono text-sm text-emerald-500"
             >
               {allJobs.filter((o) => !o.draft).length}
@@ -50,7 +50,6 @@ export default function Nav({}: HTMLAttributes<HTMLDivElement> & {}) {
       <Button
         href="https://docs.upstash.com"
         className="px-5 py-2 text-zinc-400"
-        target="_blank"
       >
         Docs
       </Button>
@@ -71,7 +70,7 @@ function NavLink({
     <Link
       href={href}
       className={cx(
-        "rounded-full px-3 py-2 text-zinc-400 transition",
+        "inline-flex gap-1 rounded-full px-3 py-2 text-zinc-400 transition",
         "hover:bg-white/5",
         isActive && "!bg-white/10 !text-zinc-50",
         className

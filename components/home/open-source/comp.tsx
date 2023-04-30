@@ -34,10 +34,11 @@ export function SourceBox({
 
   return (
     <a
+      target="_blank"
       className={cx(
         "group/source-box flex flex-col rounded-2xl bg-white/5 p-8 backdrop-blur-xl",
         "transition",
-        "hover:scale-105 hover:bg-white/10",
+        "hover:scale-[1.02] hover:bg-white/10",
         className
       )}
       href={href}

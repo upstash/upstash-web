@@ -56,6 +56,7 @@ const title = "Upstash: Serverless Data for Redis® and Kafka®";
 const description =
   "Designed for the serverless with per-request pricing and Redis®/Kafka® API.";
 
+// "G-QW5KRSTDM0"
 export const metadata: Metadata = {
   title: {
     default: title,
@@ -80,7 +81,7 @@ export const metadata: Metadata = {
     follow: true,
   },
   icons: {
-    icon: "/static/favicon-32x32.png",
-    apple: "/static/apple-touch-icon.png",
+    icon: "/icons/favicon-32x32.png",
+    apple: "/icons/apple-touch-icon.png",
   },
 };

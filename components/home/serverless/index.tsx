@@ -18,7 +18,7 @@ export interface ISectionHeader extends HTMLProps<HTMLDivElement> {}
 
 export default function HomeServerless({}: ISectionHeader) {
   return (
-    <section className="relative z-10 py-32">
+    <section className="relative z-10 mt-20 py-32">
       <div
         className={cx(
           "absolute left-1/2 top-32 -z-10 h-1/2 w-4/5",
@@ -36,10 +36,13 @@ export default function HomeServerless({}: ISectionHeader) {
         </SectionHeader>
 
         <div className="mt-24 grid grid-cols-6 gap-6 text-left">
+          {/* features */}
           <GlobalLowLatency />
           <PriceScaleToZero />
           <HttpRestApi />
           <DesignedForTheEdge />
+
+          {/* products */}
           <ServerlessRedis />
           <ServerlessKafka />
           <ServerlessQStash />

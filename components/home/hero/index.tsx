@@ -4,7 +4,7 @@ import { useState } from "react";
 import Container from "@/components/container";
 import HomeHeroBg from "@/components/home/hero/hero-bg";
 import HomeHeroProducts from "@/components/home/hero/hero-products";
-import HomeHeroPartner from "@/components/home/hero/hero-partner";
+import HomeHeroCustomer from "@/components/home/hero/hero-customer";
 import HomeHeroSlogan from "@/components/home/hero/hero-slogan";
 import { Product } from "@/utils/type";
 
@@ -20,7 +20,7 @@ export default function HomeHero() {
           activeProduct={activeProduct}
           setActiveProduct={setActiveProduct}
         />
-        <HomeHeroPartner />
+        <HomeHeroCustomer />
       </Container>
 
       <HomeHeroBg activeProduct={activeProduct} />

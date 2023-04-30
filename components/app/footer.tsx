@@ -27,13 +27,13 @@ export default function Footer({ className, ...props }: IAppFooter) {
               Contact Us
             </Button>
             <Button
-              href="/static/trust/privacy.pdf"
+              href="/trust/privacy.pdf"
               className="opacity-60 hover:opacity-100"
             >
               Privacy Policy
             </Button>
             <Button
-              href="/static/trust/terms.pdf"
+              href="/trust/terms.pdf"
               className="opacity-60 hover:opacity-100"
             >
               Terms of Service

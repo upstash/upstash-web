@@ -76,7 +76,7 @@ function HomeHeroProduct({
         "group/hero-product flex cursor-default flex-col items-center bg-white/5 p-8",
         "backdrop-blur-xl transition",
         "rounded-lg first:rounded-l-[2.2rem] last:rounded-r-[2.2rem]",
-        "hover:bg-white/10",
+        "hover:scale-[1.02] hover:bg-white/10",
         className
       )}
       {...props}

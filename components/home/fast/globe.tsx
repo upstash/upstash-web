@@ -99,40 +99,34 @@ export default function AnimatedGlobe() {
   }, []);
 
   return (
-    <section className="relative z-0 -mt-[260px] h-[1000px] overflow-hidden">
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-[200px] bg-gradient-to-b from-transparent to-zinc-950" />
-
-      <div className="absolute -top-0 left-1/2 z-10 -translate-x-1/2">
-        <Globe
-          ref={globeRef}
-          width={1900}
-          height={1900}
-          // animateIn={false}
-          backgroundColor={colors.zinc["950"]}
-          globeMaterial={globeMaterial}
-          //
-          // HEX POLYGONS
-          hexPolygonsData={countries.features}
-          hexPolygonResolution={3}
-          hexPolygonMargin={0.7}
-          hexPolygonColor={() => "#444"}
-          //
-          // ATMOSPHERE
-          atmosphereColor={"#00e9a3"}
-          atmosphereAltitude={0.07}
-          //
-          // ARCS
-          arcsData={arcsData}
-          arcColor="color"
-          arcStroke={0.1}
-          arcAltitudeAutoScale={0.3}
-          arcDashLength={0.3}
-          arcDashGap={2}
-          arcDashInitialGap={1}
-          arcDashAnimateTime={2000}
-          arcsTransitionDuration={0}
-        />
-      </div>
-    </section>
+    <Globe
+      ref={globeRef}
+      width={1880}
+      height={1880}
+      // animateIn={false}
+      backgroundColor={colors.zinc["950"]}
+      globeMaterial={globeMaterial}
+      //
+      // HEX POLYGONS
+      hexPolygonsData={countries.features}
+      hexPolygonResolution={3}
+      hexPolygonMargin={0.7}
+      hexPolygonColor={() => "#444"}
+      //
+      // ATMOSPHERE
+      atmosphereColor={"#00e9a3"}
+      atmosphereAltitude={0.07}
+      //
+      // ARCS
+      arcsData={arcsData}
+      arcColor="color"
+      arcStroke={0.1}
+      arcAltitudeAutoScale={0.3}
+      arcDashLength={0.3}
+      arcDashGap={2}
+      arcDashInitialGap={1}
+      arcDashAnimateTime={2000}
+      arcsTransitionDuration={0}
+    />
   );
 }
