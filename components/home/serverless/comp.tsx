@@ -9,7 +9,7 @@ export function ServerlessBox({
   return (
     <div
       className={cx(
-        "group/box-body relative z-0 grid gap-8 rounded-[2.2rem] rounded-l-[2.2rem] bg-white/5 p-8 backdrop-blur-xl",
+        "group/box-body relative z-0 grid gap-8 rounded-[2.2rem] rounded-l-[2.2rem] bg-white/5 p-8 backdrop-blur",
         className
       )}
     >

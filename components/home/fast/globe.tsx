@@ -89,7 +89,7 @@ export default function AnimatedGlobe() {
         color: colors.zinc["950"],
         shininess: 10,
         transparent: true,
-        opacity: 0.8,
+        opacity: 0.9,
       })
     );
 
@@ -104,7 +104,7 @@ export default function AnimatedGlobe() {
       width={1880}
       height={1880}
       // animateIn={false}
-      backgroundColor={colors.zinc["950"]}
+      backgroundColor={"#00000000"}
       globeMaterial={globeMaterial}
       //
       // HEX POLYGONS
@@ -115,7 +115,7 @@ export default function AnimatedGlobe() {
       //
       // ATMOSPHERE
       atmosphereColor={"#00e9a3"}
-      atmosphereAltitude={0.07}
+      atmosphereAltitude={0.08}
       //
       // ARCS
       arcsData={arcsData}

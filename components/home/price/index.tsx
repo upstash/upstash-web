@@ -17,6 +17,7 @@ export interface ISectionHeader extends HTMLProps<HTMLDivElement> {}
 export default function HomeServerless({}: ISectionHeader) {
   return (
     <section id="pricing" className="relative py-32">
+      {/* bg */}
       <div
         className={cx(
           "absolute left-1/2 top-32 -z-10 h-1/2 w-4/5",
@@ -26,6 +27,7 @@ export default function HomeServerless({}: ISectionHeader) {
       />
 
       <Container>
+        {/* header */}
         <SectionHeader>
           <SectionHeaderTitle>Pricing</SectionHeaderTitle>
           <SectionHeaderSummary>
@@ -39,12 +41,14 @@ export default function HomeServerless({}: ISectionHeader) {
           </div>
         </SectionHeader>
 
+        {/* table */}
         <div className="mt-24 grid grid-cols-3 gap-2">
           <PriceRedis />
           <PriceKafka />
           <PriceQStash />
         </div>
 
+        {/* doc link */}
         <div className="mt-10 text-zinc-600">
           See{" "}
           <Button

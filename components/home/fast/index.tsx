@@ -9,6 +9,7 @@ import {
 } from "@/components/home/fast/card";
 import { useEffect, useState } from "react";
 import { numberFormat } from "@/utils/number-format";
+import Button from "@/components/button";
 
 const AnimatedGlobe = dynamic(() => import("./globe"), {
   ssr: false,
@@ -37,8 +38,27 @@ export default function Fast() {
   }, []);
 
   return (
-    <section className="relative z-0 -mt-[230px] h-[800px] overflow-hidden">
-      <div className="group/source-box absolute inset-x-0 bottom-0 z-20">
+    <section className="relative z-0 -mt-[160px] h-[900px] overflow-hidden">
+      {/*  */}
+
+      {/* slogan */}
+      <h5 className="absolute inset-x-0 top-[210px] -z-10 select-none font-display text-[14vw] font-bold leading-none opacity-[0.02]">
+        Fast Anywhere
+      </h5>
+
+      {/* globe */}
+      <div className="absolute -top-0 left-1/2 z-0 -translate-x-1/2">
+        <AnimatedGlobe />;
+      </div>
+
+      {/* bottom-bg */}
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[200px]
+      bg-gradient-to-b from-transparent to-zinc-950"
+      />
+
+      {/* data */}
+      <div className="group/source-box absolute inset-x-0 bottom-10 z-20">
         <Container className="max-w-screen-md">
           <div className="grid grid-cols-3 rounded-[2.2rem] bg-white/5 p-8 backdrop-blur">
             <FastCard>
@@ -63,18 +83,14 @@ export default function Fast() {
               <FastCardTitle>Request per week</FastCardTitle>
             </FastCard>
           </div>
+
+          {/* test */}
+          <p className="mt-4">
+            <Button href="https://upstash.com/fast" className="opacity-60">
+              Test the speed!
+            </Button>
+          </p>
         </Container>
-      </div>
-
-      {/* bottom-bg */}
-      <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[200px]
-      bg-gradient-to-b from-transparent to-zinc-950"
-      />
-
-      {/* globe */}
-      <div className="absolute -top-0 left-1/2 z-0 -translate-x-1/2">
-        <AnimatedGlobe />;
       </div>
     </section>
   );

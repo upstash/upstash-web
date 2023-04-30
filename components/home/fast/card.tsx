@@ -23,7 +23,10 @@ export function FastCardValue({
   children: ReactNode;
 }) {
   return (
-    <div className={cx("font-display text-4xl", className)} {...props}>
+    <div
+      className={cx("font-display text-4xl font-medium", className)}
+      {...props}
+    >
       {children}
     </div>
   );

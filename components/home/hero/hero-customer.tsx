@@ -4,13 +4,16 @@ import Link from "next/link";
 export default function HomeHeroPartner() {
   return (
     <div className="mt-16">
+      {/* title */}
       <h5 className="text-sm opacity-20">Trusted by the best teams</h5>
-      <div className="mt-6 flex flex-wrap items-center justify-center gap-8">
+
+      {/* logos */}
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-x-8 gap-y-6">
         {customers.map(({ name, url, icon }) => (
           <Link
             key={name}
             target="_blank"
-            className="opacity-20 transition hover:opacity-100"
+            className="opacity-20 transition hover:scale-105 hover:opacity-80"
             title={name}
             href={url}
           >

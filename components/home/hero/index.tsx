@@ -20,6 +20,9 @@ export default function HomeHero() {
           activeProduct={activeProduct}
           setActiveProduct={setActiveProduct}
         />
+      </Container>
+
+      <Container className="max-w-screen-md">
         <HomeHeroCustomer />
       </Container>
 
