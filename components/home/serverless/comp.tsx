@@ -1,6 +1,14 @@
-import { HTMLProps } from "react";
+import React, {
+  Children,
+  cloneElement,
+  HTMLProps,
+  ReactElement,
+  ReactNode,
+} from "react";
 import cx from "@/utils/cx";
 import Button from "@/components/button";
+import Icon, { ICON_NAMES } from "@/components/icon";
+import { Product } from "@/utils/type";
 
 export function ServerlessBox({
   children,
@@ -55,4 +63,56 @@ export function ServerlessSummary({
   className,
 }: HTMLProps<HTMLParagraphElement>) {
   return <p className={cx("mt-3 opacity-40", className)}>{children}</p>;
+}
+
+export function ProductFeature({
+  children,
+  className,
+  product,
+}: HTMLProps<HTMLUListElement> & {
+  product?: Product;
+}) {
+  const childs: ReactNode[] = Children.map(
+    // @ts-ignore
+    children,
+    (child: ReactElement) => {
+      return cloneElement(child, {
+        ...child.props,
+        product,
+      });
+    }
+  );
+
+  return <ul className={cx("space-y-2", className)}>{childs}</ul>;
+}
+
+export function ProductFeatureItem({
+  children,
+  className,
+  product,
+}: HTMLProps<HTMLLIElement> & {
+  product?: Product;
+}) {
+  return (
+    <li
+      className={cx(
+        "flex",
+        // product === Product.REDIS && "text-red-300",
+        // product === Product.KAFKA && "text-blue-300",
+        // product === Product.QSTASH && "text-purple-300",
+        className
+      )}
+    >
+      <Icon
+        icon={ICON_NAMES.CircleCheck}
+        className={cx(
+          "mr-2 text-2xl",
+          product === Product.REDIS && "text-red-400",
+          product === Product.KAFKA && "text-blue-400",
+          product === Product.QSTASH && "text-purple-400"
+        )}
+      />
+      {children}
+    </li>
+  );
 }

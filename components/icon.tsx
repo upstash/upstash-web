@@ -35,6 +35,7 @@ export enum ICON_NAMES {
   ArrowUpRight = "ArrowUpRight",
   Check = "Check",
   CreditCard = "CreditCard",
+  CircleCheck = "CircleCheck",
 }
 
 const PATHS = {
@@ -55,6 +56,12 @@ const PATHS = {
       <line x1="3" y1="10" x2="21" y2="10" />
       <line x1="7" y1="15" x2="7.01" y2="15" />
       <line x1="11" y1="15" x2="13" y2="15" />
+    </>
+  ),
+  [ICON_NAMES.CircleCheck]: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9 12l2 2l4 -4" />
     </>
   ),
 };

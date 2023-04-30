@@ -45,7 +45,7 @@ export default function HomeServerless({}: ISectionHeader) {
           {/* products */}
           <ServerlessRedis />
           <ServerlessKafka />
-          <ServerlessQStash />
+          {/*<ServerlessQStash />*/}
         </div>
       </Container>
     </section>
