@@ -73,7 +73,7 @@ function HomeHeroProduct({
   return (
     <div
       className={cx(
-        "group/hero-product flex cursor-default flex-col items-center p-8",
+        "group/hero-product flex cursor-default flex-col items-center p-6 md:p-8",
         "bg-white/5 backdrop-blur transition",
         "rounded-lg md:first:rounded-l-[2.2rem] md:last:rounded-r-[2.2rem]",
         "hover:scale-[1.02] hover:bg-white/10",

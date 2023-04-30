@@ -61,7 +61,7 @@ export default function Fast() {
       {/* data */}
       <div className="group/source-box absolute inset-x-0 bottom-10 z-20">
         <Container className="max-w-screen-md">
-          <div className="grid grid-cols-3 rounded-[2.2rem] bg-white/5 p-8 backdrop-blur">
+          <div className="grid grid-cols-3 rounded-[2.2rem] bg-white/5 p-6 backdrop-blur md:p-8">
             <FastCard>
               <FastCardValue className="text-emerald-200">
                 {numberFormat(data.user)}

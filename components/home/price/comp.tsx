@@ -11,7 +11,7 @@ export function PriceBox({
   return (
     <div
       className={cx(
-        "grid place-items-center gap-6 rounded-lg p-6 md:p-8",
+        "grid place-items-center gap-4 rounded-lg p-6 md:gap-6 md:p-8",
         "bg-white/5 backdrop-blur",
         "first:rounded-t-[2.2rem] last:rounded-b-[2.2rem]",
         "md:first:rounded-t md:last:rounded-b",
@@ -35,7 +35,7 @@ export function PriceTitle({
   return (
     <h3
       className={cx(
-        "font-display text-2xl font-medium leading-none",
+        "font-display text-xl font-medium leading-none md:text-2xl",
         className
       )}
       {...props}
@@ -53,7 +53,7 @@ export function PriceValue({
   children: ReactNode;
 }) {
   return (
-    <h5 className={cx("text-xl font-medium", className)} {...props}>
+    <h5 className={cx("text-lg font-medium md:text-xl", className)} {...props}>
       {children}
     </h5>
   );
@@ -85,7 +85,7 @@ export function PriceBadge({
   return (
     <span
       className={cx(
-        "inline-flex rounded-full border px-3 py-1 leading-none",
+        "inline-flex rounded-full border px-3 pb-1 pt-1.5 leading-none",
         "text-xs uppercase leading-none tracking-widest",
         type === "free" &&
           "border-emerald-300/10 bg-emerald-300/5 text-emerald-400",

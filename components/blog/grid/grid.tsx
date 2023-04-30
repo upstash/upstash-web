@@ -12,7 +12,7 @@ export default function PostGrid({
 }) {
   return (
     <Container>
-      <div className="grid gap-6 md:grid-cols-2 md:gap-8">
+      <div className="grid gap-4 md:grid-cols-2 md:gap-8">
         {data.map((post: Post) => {
           return (
             <PostCard
