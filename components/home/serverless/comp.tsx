@@ -17,7 +17,9 @@ export function ServerlessBox({
   return (
     <div
       className={cx(
-        "group/box-body relative z-0 grid gap-8 rounded-[2.2rem] rounded-l-[2.2rem] bg-white/5 p-8 backdrop-blur",
+        "group/box-body relative z-0 grid gap-8 p-8",
+        "bg-white/5 backdrop-blur",
+        "rounded-[2.2rem] rounded-l-[2.2rem]",
         className
       )}
     >
@@ -105,12 +107,7 @@ export function ProductFeatureItem({
     >
       <Icon
         icon={ICON_NAMES.CircleCheck}
-        className={cx(
-          "mr-2 text-2xl",
-          product === Product.REDIS && "text-red-400",
-          product === Product.KAFKA && "text-blue-400",
-          product === Product.QSTASH && "text-purple-400"
-        )}
+        className={cx("mr-2 text-2xl text-emerald-300")}
       />
       {children}
     </li>

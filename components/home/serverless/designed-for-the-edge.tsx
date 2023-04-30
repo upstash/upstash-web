@@ -54,7 +54,10 @@ export default function DesignedForTheEdge() {
             className="absolute bottom-1/2 left-1/2 z-10 flex h-[118px]
             w-0 origin-bottom rotate-[120deg] justify-center"
           >
-            <span className="flex h-12 w-12 shrink-0 rotate-[-120deg] items-center justify-center rounded-full bg-white">
+            <span
+              className="flex h-12 w-12 shrink-0 rotate-[-120deg]
+            items-center justify-center rounded-full bg-white"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="35"
@@ -82,7 +85,10 @@ export default function DesignedForTheEdge() {
             className="absolute bottom-1/2 left-1/2 z-10 flex h-[118px]
             w-0 origin-bottom rotate-[240deg] justify-center"
           >
-            <span className="flex h-12 w-12 shrink-0 rotate-[-240deg] items-center justify-center rounded-full bg-white">
+            <span
+              className="flex h-12 w-12 shrink-0 rotate-[-240deg]
+            items-center justify-center rounded-full bg-white"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="35"
@@ -110,7 +116,10 @@ export default function DesignedForTheEdge() {
             className="absolute bottom-1/2 left-1/2 z-10 flex h-[118px]
             w-0 origin-bottom rotate-[360deg] justify-center"
           >
-            <span className="flex h-12 w-12 shrink-0 rotate-[-360deg] items-center justify-center rounded-full bg-white">
+            <span
+              className="flex h-12 w-12 shrink-0 rotate-[-360deg]
+            items-center justify-center rounded-full bg-white"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="25"
@@ -133,21 +142,30 @@ export default function DesignedForTheEdge() {
             className="absolute bottom-1/2 left-1/2 z-10 flex h-[170px]
             w-0 origin-bottom rotate-[180deg] justify-center"
           >
-            <span className="flex h-12 w-12 shrink-0 rotate-[-180deg] items-center justify-center rounded-full bg-zinc-800" />
+            <span
+              className="flex h-12 w-12 shrink-0 rotate-[-180deg]
+            items-center justify-center rounded-full bg-white opacity-[0.02]"
+            />
           </span>
 
           <span
             className="absolute bottom-1/2 left-1/2 z-10 flex h-[170px]
             w-0 origin-bottom rotate-[60deg] justify-center"
           >
-            <span className="flex h-12 w-12 shrink-0 rotate-[60deg] items-center justify-center rounded-full bg-zinc-800" />
+            <span
+              className="flex h-12 w-12 shrink-0 rotate-[60deg]
+            items-center justify-center rounded-full bg-white opacity-[0.02]"
+            />
           </span>
 
           <span
             className="absolute bottom-1/2 left-1/2 z-10 flex h-[170px]
             w-0 origin-bottom rotate-[300deg] justify-center"
           >
-            <span className="flex h-12 w-12 shrink-0 rotate-[300deg] items-center justify-center rounded-full bg-zinc-800" />
+            <span
+              className="flex h-12 w-12 shrink-0 rotate-[300deg]
+            items-center justify-center rounded-full bg-white opacity-[0.02]"
+            />
           </span>
 
           {/* dış boş halka */}
@@ -156,21 +174,30 @@ export default function DesignedForTheEdge() {
             className="absolute bottom-1/2 left-1/2 z-10 flex h-[220px]
             w-0 origin-bottom rotate-[120deg] justify-center"
           >
-            <span className="flex h-12 w-12 shrink-0 rotate-[-120deg] items-center justify-center rounded-full bg-zinc-800" />
+            <span
+              className="flex h-12 w-12 shrink-0 rotate-[-120deg]
+            items-center justify-center rounded-full bg-white opacity-[0.02]"
+            />
           </span>
 
           <span
             className="absolute bottom-1/2 left-1/2 z-10 flex h-[220px]
             w-0 origin-bottom rotate-[240deg] justify-center"
           >
-            <span className="flex h-12 w-12 shrink-0 rotate-[240deg] items-center justify-center rounded-full bg-zinc-800" />
+            <span
+              className="flex h-12 w-12 shrink-0 rotate-[240deg]
+            items-center justify-center rounded-full bg-white opacity-[0.02]"
+            />
           </span>
 
           <span
             className="absolute bottom-1/2 left-1/2 z-10 flex h-[220px]
             w-0 origin-bottom rotate-[360deg] justify-center"
           >
-            <span className="flex h-12 w-12 shrink-0 rotate-[360deg] items-center justify-center rounded-full bg-zinc-800" />
+            <span
+              className="flex h-12 w-12 shrink-0 rotate-[360deg]
+            items-center justify-center rounded-full bg-white opacity-[0.02]"
+            />
           </span>
         </div>
       </div>

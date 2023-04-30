@@ -10,7 +10,7 @@ import { Product } from "@/utils/type";
 
 export default function ServerlessRedis() {
   return (
-    <ServerlessBox className="col-span-3 border border-red-300/5 bg-red-300/5">
+    <ServerlessBox className="col-span-3">
       <header>
         <ServerlessTitle>Redis</ServerlessTitle>
       </header>
@@ -27,19 +27,13 @@ export default function ServerlessRedis() {
         </ProductFeatureItem>
       </ProductFeature>
 
-      <div className="mt-auto grid w-fit grid-cols-2 gap-1">
-        <Button
-          href={"/docs/redis"}
-          className="rounded-r-none
-          bg-red-300/10 hover:bg-red-300 hover:text-red-950"
-          type="button"
-        >
+      <div className="mt-auto grid grid-cols-2 gap-1">
+        <Button href={"/docs/redis"} className="rounded-r-none" type="button">
           Read the docs
         </Button>
         <Button
           href="https://github.com/upstash/redis-examples"
-          className="rounded-l-none
-          bg-red-300/10 hover:bg-red-300 hover:text-red-950"
+          className="rounded-l-none"
           type="button"
         >
           View examples

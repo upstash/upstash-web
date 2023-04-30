@@ -10,7 +10,7 @@ import { Product } from "@/utils/type";
 
 export default function ServerlessKafka() {
   return (
-    <ServerlessBox className="col-span-3 border border-blue-300/5 bg-blue-400/5">
+    <ServerlessBox className="col-span-3">
       <header>
         <ServerlessTitle>Kafka</ServerlessTitle>
       </header>
@@ -27,19 +27,13 @@ export default function ServerlessKafka() {
         </ProductFeatureItem>
       </ProductFeature>
 
-      <div className="mt-auto grid w-fit grid-cols-2 gap-1">
-        <Button
-          href={"/docs/kafka"}
-          className="rounded-r-none
-          bg-blue-300/10 hover:bg-blue-300 hover:text-blue-950"
-          type="button"
-        >
+      <div className="mt-auto grid grid-cols-2 gap-1">
+        <Button href={"/docs/kafka"} className="rounded-r-none" type="button">
           Read the docs
         </Button>
         <Button
           href="https://github.com/upstash/kafka-examples"
-          className="rounded-l-none
-          bg-blue-300/10 hover:bg-blue-300 hover:text-blue-950"
+          className="rounded-l-none"
           type="button"
         >
           View examples

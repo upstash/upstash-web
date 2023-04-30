@@ -8,7 +8,7 @@ export interface IAppFooter extends React.HTMLAttributes<HTMLDivElement> {}
 
 export default function Footer({ className, ...props }: IAppFooter) {
   return (
-    <footer className={cx("py-32 text-center", className)} {...props}>
+    <footer className={cx("py-24 text-center", className)} {...props}>
       <Container className="max-w-screen-md">
         <div className="grid place-items-center gap-10">
           {/**/}
