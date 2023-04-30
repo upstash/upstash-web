@@ -36,6 +36,7 @@ export enum ICON_NAMES {
   Check = "Check",
   CreditCard = "CreditCard",
   CircleCheck = "CircleCheck",
+  Bolt = "Bolt",
 }
 
 const PATHS = {
@@ -62,6 +63,11 @@ const PATHS = {
     <>
       <circle cx="12" cy="12" r="9" />
       <path d="M9 12l2 2l4 -4" />
+    </>
+  ),
+  [ICON_NAMES.Bolt]: (
+    <>
+      <polyline points="13 3 13 10 19 10 11 21 11 14 5 14 13 3" />
     </>
   ),
 };

@@ -7,9 +7,10 @@ import {
   FastCardTitle,
   FastCardValue,
 } from "@/components/home/fast/card";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { numberFormat } from "@/utils/number-format";
-import Button from "@/components/button";
+import Link from "next/link";
+import Icon, { ICON_NAMES } from "@/components/icon";
 
 const AnimatedGlobe = dynamic(() => import("./globe"), {
   ssr: false,
@@ -85,10 +86,16 @@ export default function Fast() {
           </div>
 
           {/* test */}
-          <p className="mt-4">
-            <Button href="https://upstash.com/fast" className="opacity-60">
+          <p className="mt-6">
+            <Link
+              href="/fast"
+              className="inline-flex items-center gap-1 opacity-60 transition hover:text-yellow-200
+              hover:underline hover:opacity-100
+              "
+            >
+              <Icon icon={ICON_NAMES.Bolt} className="text-2xl" />
               Test the speed!
-            </Button>
+            </Link>
           </p>
         </Container>
       </div>

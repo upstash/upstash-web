@@ -1,6 +1,4 @@
-import IconFast from "@/components/investor/icon/icon-fast";
-import IconSimple from "@/components/investor/icon/icon-simple";
-import IconRobust from "@/components/investor/icon/icon-robust";
+import * as AboutIcon from "@/components/investor/icons";
 import { Metadata } from "next";
 import Container from "@/components/container";
 import PageHeaderTitle from "@/components/app/page-header-title";
@@ -19,20 +17,22 @@ const MISSIONS = [
   {
     title: "Fast",
     desc: "We know each millisecond is important for you.",
-    icon: <IconFast className="text-[60px] text-emerald-300 md:text-[70px]" />,
+    icon: (
+      <AboutIcon.Fast className="text-[60px] text-emerald-300 md:text-[70px]" />
+    ),
   },
   {
     title: "Simple",
     desc: "Keep the things as simple as possible but not simpler.",
     icon: (
-      <IconSimple className="text-[60px] text-emerald-300 md:text-[70px]" />
+      <AboutIcon.Simple className="text-[60px] text-emerald-300 md:text-[70px]" />
     ),
   },
   {
     title: "Robust",
     desc: "We win your trust with robustness.",
     icon: (
-      <IconRobust className="text-[60px] text-emerald-300 md:text-[70px]" />
+      <AboutIcon.Robust className="text-[60px] text-emerald-300 md:text-[70px]" />
     ),
   },
 ];
@@ -87,7 +87,19 @@ export default function HomePage() {
 
       <section className="relative z-0 py-16 md:py-32">
         <PageBodyGradient />
-        <Investors fullList />
+
+        <Container className="max-w-screen-lg">
+          <header>
+            <PageHeaderTitle as="h2">Our investors</PageHeaderTitle>
+            <PageHeaderDesc className="mt-4">
+              We are fortunate to work with some of the best investors in the
+              world. Chances are you are already using the products they helped
+              to create.
+            </PageHeaderDesc>
+          </header>
+
+          <Investors />
+        </Container>
       </section>
     </main>
   );
