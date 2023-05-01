@@ -82,6 +82,7 @@ export default function FastResult() {
         ].map(([title, url]) => {
           return (
             <div
+              key={url}
               className="flex items-center justify-between
             border-b border-b-zinc-900 py-3 md:py-2"
             >
