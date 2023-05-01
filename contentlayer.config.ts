@@ -13,7 +13,8 @@ export type PostHeading = { level: number; title: string; slug: string };
 
 export const Job = defineDocumentType(() => ({
   name: "Job",
-  filePathPattern: `job/*.md`,
+  filePathPattern: `job/*.mdx`,
+  contentType: "mdx",
   fields: {
     title: { type: "string", required: true },
     summary: { type: "string", required: true },

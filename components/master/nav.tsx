@@ -9,7 +9,7 @@ import { NavItems } from "./header";
 
 export default function Nav({}: HTMLAttributes<HTMLDivElement> & {}) {
   return (
-    <nav className="col-span-2 flex items-center justify-center gap-2">
+    <nav className="col-span-2 flex items-center justify-center gap-1">
       {NavItems.map((item) => {
         return (
           <NavLink key={item.href} href={item.href}>
@@ -20,7 +20,7 @@ export default function Nav({}: HTMLAttributes<HTMLDivElement> & {}) {
       })}
       <Button
         href="https://docs.upstash.com"
-        className="px-5 py-2 text-zinc-400"
+        className="px-4 py-2 text-zinc-400"
       >
         Docs
       </Button>
@@ -41,9 +41,9 @@ function NavLink({
     <Link
       href={href}
       className={cx(
-        "inline-flex gap-1.5 rounded-full px-3 py-2 text-zinc-400 transition",
+        "inline-flex gap-1.5 rounded-full px-4 py-2 text-zinc-400 transition",
         "hover:bg-white/5",
-        isActive && "!bg-white/10 !text-zinc-50",
+        isActive && "!bg-white/5 !text-zinc-50",
         className
       )}
       {...props}
