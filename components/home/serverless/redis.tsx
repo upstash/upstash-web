@@ -10,7 +10,7 @@ import { Product } from "@/utils/type";
 
 export default function ServerlessRedis() {
   return (
-    <ServerlessBox className="md:col-span-3">
+    <ServerlessBox className="bg-emerald-100/5 md:col-span-3">
       <header>
         <ServerlessTitle>Redis</ServerlessTitle>
       </header>
