@@ -13,7 +13,7 @@ export function PriceBox({
       className={cx(
         "grid place-items-center gap-4 rounded-lg p-6 md:gap-6 md:p-8",
         "bg-white/5 backdrop-blur",
-        "first:rounded-t-[2.2rem] last:rounded-b-[2.2rem]",
+        "first:rounded-t-3xl last:rounded-b-3xl",
         "md:first:rounded-t md:last:rounded-b",
         "md:first:!rounded-l-[2.2rem] md:last:!rounded-r-[2.2rem]",
         className

@@ -12,7 +12,7 @@ export function CommunityBox({
       className={cx(
         "group/community-box flex flex-col items-center p-6 md:p-8",
         "bg-white/5 transition",
-        "first:rounded-t-[2.2rem] last:rounded-b-[2.2rem]",
+        "first:rounded-t-3xl last:rounded-b-3xl",
         "md:first:rounded-t md:last:rounded-b",
         "md:first:!rounded-l-[2.2rem] md:last:!rounded-r-[2.2rem]",
         "hover:scale-[1.02] hover:bg-white/10",

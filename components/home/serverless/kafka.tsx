@@ -27,13 +27,17 @@ export default function ServerlessKafka() {
         </ProductFeatureItem>
       </ProductFeature>
 
-      <div className="mt-auto grid grid-cols-2 gap-1">
-        <Button href={"/docs/kafka"} className="rounded-r-none" type="button">
+      <div className="mt-4 grid gap-2 md:mt-auto md:grid-cols-2 md:gap-1">
+        <Button
+          href={"/docs/kafka"}
+          className="md:rounded-r-none"
+          type="button"
+        >
           Read the docs
         </Button>
         <Button
           href="https://github.com/upstash/kafka-examples"
-          className="rounded-l-none"
+          className="md:rounded-r-none"
           type="button"
         >
           View examples

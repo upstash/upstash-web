@@ -39,7 +39,7 @@ export default function Fast() {
   }, []);
 
   return (
-    <section className="relative z-0 -mt-[160px] h-[900px] overflow-hidden">
+    <section className="relative z-0 -mt-[160px] hidden h-[900px] overflow-hidden md:block">
       {/*  */}
 
       {/* slogan */}
