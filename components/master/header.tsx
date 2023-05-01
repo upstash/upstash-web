@@ -28,6 +28,7 @@ export default function Header({ className, ...props }: IAppHeader) {
               type="button"
               hideIcon
               href="https://console.upstash.com"
+              className="backdrop-blur"
             >
               Login
             </Button>

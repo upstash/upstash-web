@@ -8,7 +8,10 @@ export interface IAppFooter extends HTMLProps<HTMLDivElement> {}
 
 export default function Footer({ className, ...props }: IAppFooter) {
   return (
-    <footer className={cx("py-24 text-center", className)} {...props}>
+    <footer
+      className={cx("relative z-50 py-24 text-center", className)}
+      {...props}
+    >
       <Container className="max-w-screen-md">
         <div className="grid place-items-center gap-10">
           {/**/}

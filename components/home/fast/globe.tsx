@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import Globe from "react-globe.gl";
