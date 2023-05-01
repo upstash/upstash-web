@@ -43,7 +43,7 @@ export default function NavMobile({
           <Button
             type="button"
             href="https://docs.upstash.com"
-            className="bg-transparent px-0 py-3 font-display text-lg font-medium hover:bg-white/5 hover:text-zinc-50"
+            className="bg-transparent px-0 py-4 font-display text-lg font-medium hover:bg-white/5 hover:text-zinc-50"
           >
             Docs
           </Button>
@@ -66,7 +66,7 @@ function NavLink({
     <Link
       href={href}
       className={cx(
-        "flex gap-2 py-3 font-display text-lg font-medium",
+        "flex gap-2 py-4 font-display text-lg font-medium",
         isActive && "!bg-white/10 !text-zinc-50",
         className
       )}

@@ -98,7 +98,9 @@ export default function HomePage() {
             </PageHeaderDesc>
           </header>
 
-          <Investors />
+          <div className="mt-12 md:mt-24">
+            <Investors />
+          </div>
         </Container>
       </section>
     </main>

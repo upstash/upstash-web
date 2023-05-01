@@ -21,7 +21,7 @@ export default async function BlogPage() {
 
       {/* TODO: blog yazmak isteyenler için bir uyarı */}
 
-      <header className="py-20 text-center">
+      <header className="py-10 text-center md:py-20">
         <Container>
           <PageHeaderTitle>Blog</PageHeaderTitle>
           <PageHeaderDesc className="mt-2">

@@ -14,7 +14,7 @@ export default function PostHeader({ post }: Props) {
     <header className="py-20 text-center">
       <Container className="max-w-screen-lg">
         {/* meta */}
-        <div className="flex flex-wrap items-center justify-center gap-2 opacity-60">
+        <div className="flex flex-wrap items-center justify-center gap-2 opacity-40">
           <time dateTime={post.date}>
             {DateTime.fromISO(post.date).toFormat("LLLL d, yyyy")}
           </time>
@@ -23,7 +23,7 @@ export default function PostHeader({ post }: Props) {
         </div>
 
         {/* title */}
-        <h1 className="mx-4 mt-2 font-display text-4xl font-semibold !leading-title md:text-6xl">
+        <h1 className="mx-4 mt-2 font-display text-4xl font-bold !leading-title md:text-6xl">
           <Balancer>{post.title}</Balancer>
         </h1>
 
@@ -42,7 +42,7 @@ export default function PostHeader({ post }: Props) {
           >
             {post.authorObj.name}
           </Link>
-          <span className="opacity-60">{post.authorObj.title}</span>
+          <span className="opacity-40">{post.authorObj.title}</span>
         </div>
       </Container>
     </header>
