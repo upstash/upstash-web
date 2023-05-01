@@ -7,8 +7,9 @@ import localFont from "next/font/local";
 import { ReactNode } from "react";
 import cx from "@/utils/cx";
 import { SITE_URL } from "@/utils/const";
-import Header from "@/components/app/header";
-import Footer from "@/components/app/footer";
+import Header from "@/components/master/header";
+import HeaderMobile from "@/components/master/header-mobile";
+import Footer from "@/components/master/footer";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -45,6 +46,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     >
       <body>
         <Header />
+        <HeaderMobile />
         {children}
         <Footer />
       </body>

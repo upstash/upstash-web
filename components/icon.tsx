@@ -40,6 +40,8 @@ export enum ICON_NAMES {
   FileText = "FileText",
   Twitter = "Twitter",
   Discord = "Discord",
+  Menu = "Menu",
+  Cancel = "Cancel",
 }
 
 const PATHS = {
@@ -95,6 +97,18 @@ const PATHS = {
       <path d="M7 16.5c3.5 1 6.5 1 10 0" />
       <path d="M15.5 17c0 1 1.5 3 2 3c1.5 0 2.833 -1.667 3.5 -3c.667 -1.667 .5 -5.833 -1.5 -11.5c-1.457 -1.015 -3 -1.34 -4.5 -1.5l-1 2.5" />
       <path d="M8.5 17c0 1 -1.356 3 -1.832 3c-1.429 0 -2.698 -1.667 -3.333 -3c-.635 -1.667 -.476 -5.833 1.428 -11.5c1.388 -1.015 2.782 -1.34 4.237 -1.5l1 2.5" />
+    </>
+  ),
+  [ICON_NAMES.Menu]: (
+    <>
+      <line x1="4" y1="8" x2="20" y2="8" />
+      <line x1="4" y1="16" x2="20" y2="16" />
+    </>
+  ),
+  [ICON_NAMES.Cancel]: (
+    <>
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
     </>
   ),
 };

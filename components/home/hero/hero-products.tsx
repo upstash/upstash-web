@@ -83,7 +83,7 @@ function HomeHeroProduct({
       )}
       {...props}
     >
-      <h3 className="font-display text-2xl font-medium leading-none">
+      <h3 className="font-display text-xl font-medium leading-none md:text-2xl">
         {title}
       </h3>
       <p className="mt-2 opacity-60">{desc}</p>

@@ -1,7 +1,7 @@
 import React from "react";
 import cx from "@/utils/cx";
 import Container from "@/components/container";
-import { Logo } from "@/components/app/logo";
+import { Logo } from "@/components/logo";
 import Button from "@/components/button";
 
 export interface IAppFooter extends React.HTMLAttributes<HTMLDivElement> {}

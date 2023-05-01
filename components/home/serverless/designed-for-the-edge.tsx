@@ -1,5 +1,5 @@
 import { ServerlessBox, ServerlessSummary, ServerlessTitle } from "./comp";
-import { LogoIcon } from "@/components/app/logo";
+import { LogoIcon } from "@/components/logo";
 
 export default function DesignedForTheEdge() {
   const duration = 120000;

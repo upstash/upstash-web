@@ -7,39 +7,41 @@ import Button from "@/components/button";
 import { usePathname } from "next/navigation";
 import cx from "@/utils/cx";
 
+export const NavItems = [
+  {
+    name: "Pricing",
+    href: "/#pricing",
+  },
+  // {
+  //   name: "Open Source",
+  //   href: "/open-source",
+  // },
+  {
+    name: "About",
+    href: "/about",
+  },
+  {
+    name: "Blog",
+    href: "/blog",
+  },
+  {
+    name: "Careers",
+    href: "/careers",
+    children: (
+      <span
+        className="rounded-full bg-emerald-300/20
+              px-1.5 py-0.5 font-mono text-sm text-emerald-500"
+      >
+        {allJobs.filter((o) => !o.draft).length}
+      </span>
+    ),
+  },
+];
+
 export default function Nav({}: HTMLAttributes<HTMLDivElement> & {}) {
   return (
-    <nav className="col-span-2 hidden items-center justify-center gap-2 md:flex">
-      {[
-        {
-          name: "Pricing",
-          href: "/#pricing",
-        },
-        // {
-        //   name: "Open Source",
-        //   href: "/open-source",
-        // },
-        {
-          name: "About",
-          href: "/about",
-        },
-        {
-          name: "Blog",
-          href: "/blog",
-        },
-        {
-          name: "Careers",
-          href: "/careers",
-          children: (
-            <span
-              className="rounded-full bg-emerald-300/20
-              px-1.5 py-0.5 font-mono text-sm text-emerald-500"
-            >
-              {allJobs.filter((o) => !o.draft).length}
-            </span>
-          ),
-        },
-      ].map((item) => {
+    <nav className="col-span-2 flex items-center justify-center gap-2">
+      {NavItems.map((item) => {
         return (
           <NavLink key={item.href} href={item.href}>
             {item.name}
