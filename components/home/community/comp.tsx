@@ -61,7 +61,7 @@ export function CommunityBoxButton({
     <Button
       className={cx(
         "mt-auto",
-        "group-hover/community-box:bg-emerald-300 group-hover/community-box:text-emerald-950",
+        "group-hover/community-box:bg-emerald-400 group-hover/community-box:text-emerald-950",
         className
       )}
       {...props}

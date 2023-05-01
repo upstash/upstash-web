@@ -70,13 +70,13 @@ export default function Fast() {
         <Container className="max-w-screen-md">
           <div className="grid grid-cols-3 rounded-[2.2rem] bg-white/5 px-6 py-4 backdrop-blur md:p-6">
             <FastCard>
-              <FastCardValue className="text-emerald-200">
+              <FastCardValue className="text-emerald-300">
                 {numberFormat(data.user)}
               </FastCardValue>
               <FastCardTitle>Users</FastCardTitle>
             </FastCard>
             <FastCard>
-              <FastCardValue className="text-emerald-200">
+              <FastCardValue className="text-emerald-300">
                 {numberFormat(data.database)}
               </FastCardValue>
               <FastCardTitle>Databases</FastCardTitle>
@@ -84,7 +84,7 @@ export default function Fast() {
             <FastCard>
               <FastCardValue className="text-yellow-200">
                 ~
-                {numberFormat(45000000, {
+                {numberFormat(50000000, {
                   notation: "compact",
                 })}
               </FastCardValue>

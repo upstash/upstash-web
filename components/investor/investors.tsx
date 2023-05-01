@@ -29,7 +29,7 @@ export default function Investors({ short = false }) {
 
             <h4
               className="mt-4 font-display text-xl font-medium
-            group-hover/investor:text-emerald-300 group-hover/investor:underline"
+            group-hover/investor:text-emerald-400 group-hover/investor:underline"
             >
               {investor.name}
             </h4>

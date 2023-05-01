@@ -6,6 +6,8 @@ import {
 import Container from "@/components/container";
 import cx from "@/utils/cx";
 import Investors from "@/components/investor/investors";
+import Button from "@/components/button";
+import Link from "next/link";
 
 export default function HomeInvestors() {
   return (
@@ -31,6 +33,16 @@ export default function HomeInvestors() {
 
         <div className="mt-12 md:mt-24">
           <Investors short />
+        </div>
+
+        {/* about link */}
+        <div className="mt-10 text-zinc-600">
+          <Link
+            href="https://docs.upstash.com/redis/overall/pricing"
+            className="underline hover:text-emerald-400"
+          >
+            See the full list
+          </Link>
         </div>
       </Container>
     </section>

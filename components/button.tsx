@@ -19,8 +19,8 @@ export default function Button({
 }: IButton) {
   const classes = {
     button: `gap-1 px-5 py-2 rounded-full bg-white/5
-    hover:bg-emerald-300 hover:text-emerald-950`,
-    link: `gap-0.5 hover:text-emerald-300 hover:underline`,
+    hover:bg-emerald-400 hover:text-emerald-950`,
+    link: `gap-0.5 hover:text-emerald-400 hover:underline`,
   };
 
   return (
