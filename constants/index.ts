@@ -168,7 +168,7 @@ export const REDIS_PRICES = {
     description:
       "Pricing is based on per request/command. Operational commands like AUTH, INFO, PING, QUIT, COMMAND are not billed.",
     free: "Free (No credit card required)",
-    payg: "$0.2 per 100K commands, up to $160 monthly max.",
+    payg: "$0.2 per 100K commands ($0.4 for global)",
     enterprise: "Custom",
   },
 };
