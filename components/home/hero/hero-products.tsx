@@ -21,7 +21,7 @@ export default function HomeHeroProducts({
         onMouseEnter={() => setActiveProduct(Product.REDIS)}
         button={{
           href: "https://console.upstash.com",
-          target: "_self",
+
           text: "Create Database",
           className: cx(
             activeProduct === Product.REDIS &&
@@ -90,6 +90,7 @@ function HomeHeroProduct({
       <p className="mt-2 opacity-60">{desc}</p>
       <Button
         href={href}
+        target="_self"
         className={cx("mt-6 bg-zinc-50 text-zinc-950", btnClass)}
         {...buttonProps}
         type="button"

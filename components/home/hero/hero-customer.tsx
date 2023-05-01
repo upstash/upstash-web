@@ -1,5 +1,4 @@
 import * as Logo from "components/home/hero/hero-customer-icons";
-import Link from "next/link";
 
 export default function HomeHeroPartner() {
   return (
@@ -12,15 +11,15 @@ export default function HomeHeroPartner() {
       {/* logos */}
       <div className="mt-6 flex flex-wrap items-center justify-center gap-x-8 gap-y-6">
         {customers.map(({ name, url, icon }) => (
-          <Link
+          <a
             key={name}
+            href={url}
             target="_blank"
             className="opacity-40 transition hover:scale-105 hover:opacity-80 md:opacity-20"
             title={name}
-            href={url}
           >
             {icon}
-          </Link>
+          </a>
         ))}
       </div>
     </div>
