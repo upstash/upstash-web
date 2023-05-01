@@ -1,5 +1,5 @@
 import cx from "@/utils/cx";
-import { HTMLAttributes } from "react";
+import { HTMLProps } from "react";
 import { Product } from "@/utils/type";
 import Button from "@/components/button";
 
@@ -20,7 +20,8 @@ export default function HomeHeroProducts({
         desc="Serverless database service compatible with Redis® API"
         onMouseEnter={() => setActiveProduct(Product.REDIS)}
         button={{
-          href: "https://console.upstash.com/redis?create=tru",
+          href: "https://console.upstash.com",
+          target: "_self",
           text: "Create Database",
           className: cx(
             activeProduct === Product.REDIS &&
@@ -33,7 +34,7 @@ export default function HomeHeroProducts({
         desc="Serverless database service compatible with Redis® API"
         onMouseEnter={() => setActiveProduct(Product.KAFKA)}
         button={{
-          href: "https://console.upstash.com/kafka?create=tru",
+          href: "https://console.upstash.com",
           text: "Create Cluster",
           className: cx(
             activeProduct === Product.KAFKA &&
@@ -46,7 +47,7 @@ export default function HomeHeroProducts({
         desc="Serverless database service compatible with Redis® API"
         onMouseEnter={() => setActiveProduct(Product.QSTASH)}
         button={{
-          href: "https://console.upstash.com/qstash",
+          href: "https://console.upstash.com",
           text: "Publish Messages",
           className: cx(
             activeProduct === Product.QSTASH &&
@@ -64,11 +65,11 @@ function HomeHeroProduct({
   className,
   button: { href, text, className: btnClass, ...buttonProps },
   ...props
-}: HTMLAttributes<HTMLDivElement> & {
+}: HTMLProps<HTMLDivElement> & {
   title: string;
   desc: string;
   className?: string;
-  button: HTMLAttributes<HTMLAnchorElement> & { href: string; text: string };
+  button: HTMLProps<HTMLAnchorElement> & { text: string };
 }) {
   return (
     <div
@@ -88,10 +89,10 @@ function HomeHeroProduct({
       </h3>
       <p className="mt-2 opacity-60">{desc}</p>
       <Button
-        type="button"
         href={href}
         className={cx("mt-6 bg-zinc-50 text-zinc-950", btnClass)}
         {...buttonProps}
+        type="button"
       >
         {text}
       </Button>

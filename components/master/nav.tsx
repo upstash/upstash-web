@@ -1,13 +1,13 @@
 "use client";
 
-import { HTMLAttributes, ReactNode } from "react";
+import { HTMLProps, ReactNode } from "react";
 import Link, { LinkProps } from "next/link";
 import Button from "@/components/button";
 import { usePathname } from "next/navigation";
 import cx from "@/utils/cx";
 import { NavItems } from "./header";
 
-export default function Nav({}: HTMLAttributes<HTMLDivElement> & {}) {
+export default function Nav({}: HTMLProps<HTMLDivElement> & {}) {
   return (
     <nav className="col-span-2 flex items-center justify-center gap-1">
       {NavItems.map((item) => {

@@ -1,12 +1,10 @@
-import { HTMLAttributes, ReactNode } from "react";
+import { HTMLProps, ReactNode } from "react";
 import Link, { LinkProps } from "next/link";
 import Button from "@/components/button";
 import cx from "@/utils/cx";
 import { NavItems } from "./header";
 
-export default function NavMobile({
-  hidden,
-}: HTMLAttributes<HTMLDivElement> & {}) {
+export default function NavMobile({ hidden }: HTMLProps<HTMLDivElement> & {}) {
   return (
     <nav
       className={cx(
@@ -18,6 +16,7 @@ export default function NavMobile({
       {/* login */}
       <Button
         type="button"
+        target="_self"
         hideIcon
         href="https://console.upstash.com"
         className="-mx-5 bg-emerald-300 py-3 font-display text-lg font-medium text-zinc-950"

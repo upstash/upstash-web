@@ -1,8 +1,8 @@
-import React from "react";
+import { HTMLProps, ReactNode } from "react";
 import cx from "@/utils/cx";
 
-export interface IContainer extends React.HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode;
+export interface IContainer extends HTMLProps<HTMLDivElement> {
+  children: ReactNode;
 }
 
 export default function Container({

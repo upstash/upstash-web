@@ -1,9 +1,9 @@
-import React, { HTMLAttributes } from "react";
+import { HTMLProps, ReactNode } from "react";
 import cx from "@/utils/cx";
 import Balancer from "react-wrap-balancer";
 
-type IPageHeaderDesc = HTMLAttributes<HTMLParagraphElement> & {
-  children: React.ReactNode;
+type IPageHeaderDesc = HTMLProps<HTMLParagraphElement> & {
+  children: ReactNode;
 };
 
 export default function PageHeaderDesc({

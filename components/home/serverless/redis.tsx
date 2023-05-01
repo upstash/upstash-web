@@ -29,7 +29,7 @@ export default function ServerlessRedis() {
 
       <div className="mt-4 grid gap-2 md:mt-auto md:grid-cols-2 md:gap-1">
         <Button
-          href={"/docs/redis"}
+          href="https://docs.upstash.com/redis"
           className="md:rounded-r-none"
           type="button"
         >

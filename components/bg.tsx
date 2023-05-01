@@ -1,7 +1,7 @@
-import React, { HTMLAttributes } from "react";
+import React, { HTMLProps } from "react";
 import cx from "@/utils/cx";
 
-export default function Bg({ className }: HTMLAttributes<HTMLDivElement>) {
+export default function Bg({ className }: HTMLProps<HTMLDivElement>) {
   return (
     <div
       className={cx(

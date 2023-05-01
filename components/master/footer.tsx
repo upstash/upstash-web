@@ -1,10 +1,10 @@
-import React from "react";
+import { HTMLProps } from "react";
 import cx from "@/utils/cx";
 import Container from "@/components/container";
 import { Logo } from "@/components/logo";
 import Button from "@/components/button";
 
-export interface IAppFooter extends React.HTMLAttributes<HTMLDivElement> {}
+export interface IAppFooter extends HTMLProps<HTMLDivElement> {}
 
 export default function Footer({ className, ...props }: IAppFooter) {
   return (

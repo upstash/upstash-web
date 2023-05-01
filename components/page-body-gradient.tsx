@@ -1,7 +1,7 @@
-import React, { HTMLAttributes } from "react";
+import { HTMLProps } from "react";
 import cx from "@/utils/cx";
 
-type IPageBodyGradient = HTMLAttributes<HTMLDivElement> & {};
+type IPageBodyGradient = HTMLProps<HTMLDivElement> & {};
 
 export default function PageBodyGradient({
   className,

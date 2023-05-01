@@ -1,4 +1,4 @@
-import { HTMLAttributes } from "react";
+import { HTMLProps } from "react";
 import cx from "@/utils/cx";
 import { Logo } from "@/components/logo";
 import Link from "next/link";
@@ -7,7 +7,7 @@ import Container from "@/components/container";
 import Nav from "./nav";
 import { allJobs } from "contentlayer/generated";
 
-export interface IAppHeader extends HTMLAttributes<HTMLHeadElement> {}
+export interface IAppHeader extends HTMLProps<HTMLHeadElement> {}
 
 export default function Header({ className, ...props }: IAppHeader) {
   return (
@@ -23,7 +23,12 @@ export default function Header({ className, ...props }: IAppHeader) {
           <Nav />
 
           <div className="flex justify-end">
-            <Button type="button" hideIcon href="https://console.upstash.com">
+            <Button
+              target="_self"
+              type="button"
+              hideIcon
+              href="https://console.upstash.com"
+            >
               Login
             </Button>
           </div>

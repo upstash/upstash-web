@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { INVESTORS } from "@/utils/investors";
 import Image from "next/image";
 
@@ -9,8 +8,9 @@ export default function Investors({ short = false }) {
     <div className="flex flex-wrap justify-center gap-y-10 md:mx-24">
       {DATA.map((investor) => {
         return (
-          <Link
+          <a
             key={investor.name}
+            target="_blank"
             href={investor.url}
             className="group/investor inline-flex w-1/2 flex-col items-center md:w-1/3"
           >
@@ -34,7 +34,7 @@ export default function Investors({ short = false }) {
               {investor.name}
             </h4>
             <p className="opacity-40">{investor.title}</p>
-          </Link>
+          </a>
         );
       })}
     </div>
