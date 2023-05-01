@@ -6,49 +6,19 @@ import PageHeaderDesc from "@/components/page-header-desc";
 import PageBodyGradient from "@/components/page-body-gradient";
 import Balancer from "react-wrap-balancer";
 import Investors from "@/components/investor/investors";
-import cx from "@/utils/cx";
+import Bg from "@/components/bg";
 
 export const metadata: Metadata = {
   title: "About",
-  description: "We manage everything for you",
+  description: "We manage everything for you.",
 };
-
-const MISSIONS = [
-  {
-    title: "Fast",
-    desc: "We know each millisecond is important for you.",
-    icon: (
-      <AboutIcon.Fast className="text-[60px] text-emerald-300 md:text-[70px]" />
-    ),
-  },
-  {
-    title: "Simple",
-    desc: "Keep the things as simple as possible but not simpler.",
-    icon: (
-      <AboutIcon.Simple className="text-[60px] text-emerald-300 md:text-[70px]" />
-    ),
-  },
-  {
-    title: "Robust",
-    desc: "We win your trust with robustness.",
-    icon: (
-      <AboutIcon.Robust className="text-[60px] text-emerald-300 md:text-[70px]" />
-    ),
-  },
-];
 
 export default function HomePage() {
   return (
     <main className="relative z-0 text-center">
-      <div
-        className={cx(
-          "absolute left-1/2 -z-10 h-[400px] w-4/5",
-          "-translate-x-1/2",
-          "bg-emerald-500 opacity-5 blur-[100px]"
-        )}
-      />
+      <Bg />
 
-      <section className="py-16 md:py-32">
+      <section className="py-10 md:py-20">
         <Container className="max-w-screen-lg">
           {/* header */}
           <header>
@@ -106,3 +76,27 @@ export default function HomePage() {
     </main>
   );
 }
+
+const MISSIONS = [
+  {
+    title: "Fast",
+    desc: "We know each millisecond is important for you.",
+    icon: (
+      <AboutIcon.Fast className="text-[60px] text-emerald-300 md:text-[70px]" />
+    ),
+  },
+  {
+    title: "Simple",
+    desc: "Keep the things as simple as possible but not simpler.",
+    icon: (
+      <AboutIcon.Simple className="text-[60px] text-emerald-300 md:text-[70px]" />
+    ),
+  },
+  {
+    title: "Robust",
+    desc: "We win your trust with robustness.",
+    icon: (
+      <AboutIcon.Robust className="text-[60px] text-emerald-300 md:text-[70px]" />
+    ),
+  },
+];

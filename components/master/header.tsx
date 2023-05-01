@@ -5,6 +5,7 @@ import Link from "next/link";
 import Button from "@/components/button";
 import Container from "@/components/container";
 import Nav from "./nav";
+import { allJobs } from "contentlayer/generated";
 
 export interface IAppHeader extends HTMLAttributes<HTMLHeadElement> {}
 
@@ -31,3 +32,34 @@ export default function Header({ className, ...props }: IAppHeader) {
     </header>
   );
 }
+
+export const NavItems = [
+  {
+    name: "Pricing",
+    href: "/#pricing",
+  },
+  // {
+  //   name: "Open Source",
+  //   href: "/open-source",
+  // },
+  {
+    name: "About",
+    href: "/about",
+  },
+  {
+    name: "Blog",
+    href: "/blog",
+  },
+  {
+    name: "Careers",
+    href: "/careers",
+    children: (
+      <span
+        className="rounded-full bg-emerald-300/20
+              px-1.5 py-1 font-mono text-sm leading-none text-emerald-500"
+      >
+        {allJobs.filter((o) => !o.draft).length}
+      </span>
+    ),
+  },
+];

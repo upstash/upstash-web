@@ -9,6 +9,8 @@ import { SITE_URL } from "@/utils/const";
 import PostHeader from "@/components/post/header";
 import PostTags from "@/components/post/tags";
 import PageBodyGradient from "@/components/page-body-gradient";
+import cx from "@/utils/cx";
+import Bg from "@/components/bg";
 // import PostTOC from "@/app/blog/[slug]/_/toc";
 
 type Props = {
@@ -71,7 +73,9 @@ export default async function BlogPage({ params }: Props) {
     indexOfPost < allPosts.length - 1 ? allPosts[indexOfPost + 1] : undefined;
 
   return (
-    <main>
+    <main className="relative z-0">
+      <Bg />
+
       <article>
         {/* Header */}
         <PostHeader post={post} />

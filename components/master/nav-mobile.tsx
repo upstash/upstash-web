@@ -1,11 +1,8 @@
-"use client";
-
 import { HTMLAttributes, ReactNode } from "react";
 import Link, { LinkProps } from "next/link";
 import Button from "@/components/button";
-import { usePathname } from "next/navigation";
 import cx from "@/utils/cx";
-import { NavItems } from "@/components/master/nav";
+import { NavItems } from "./header";
 
 export default function NavMobile({
   hidden,
@@ -59,15 +56,11 @@ function NavLink({
   children,
   ...props
 }: LinkProps & { className?: string; children: ReactNode }) {
-  const pathname = usePathname();
-  const isActive = pathname === href;
-
   return (
     <Link
       href={href}
       className={cx(
-        "flex gap-2 py-4 font-display text-lg font-medium",
-        isActive && "!bg-white/10 !text-zinc-50",
+        "flex items-center gap-2 py-4 font-display text-lg font-medium",
         className
       )}
       {...props}

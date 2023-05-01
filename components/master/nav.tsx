@@ -2,41 +2,10 @@
 
 import { HTMLAttributes, ReactNode } from "react";
 import Link, { LinkProps } from "next/link";
-import { allJobs } from "contentlayer/generated";
 import Button from "@/components/button";
 import { usePathname } from "next/navigation";
 import cx from "@/utils/cx";
-
-export const NavItems = [
-  {
-    name: "Pricing",
-    href: "/#pricing",
-  },
-  // {
-  //   name: "Open Source",
-  //   href: "/open-source",
-  // },
-  {
-    name: "About",
-    href: "/about",
-  },
-  {
-    name: "Blog",
-    href: "/blog",
-  },
-  {
-    name: "Careers",
-    href: "/careers",
-    children: (
-      <span
-        className="rounded-full bg-emerald-300/20
-              px-1.5 py-0.5 font-mono text-sm text-emerald-500"
-      >
-        {allJobs.filter((o) => !o.draft).length}
-      </span>
-    ),
-  },
-];
+import { NavItems } from "./header";
 
 export default function Nav({}: HTMLAttributes<HTMLDivElement> & {}) {
   return (
@@ -72,7 +41,7 @@ function NavLink({
     <Link
       href={href}
       className={cx(
-        "inline-flex gap-1 rounded-full px-3 py-2 text-zinc-400 transition",
+        "inline-flex gap-1.5 rounded-full px-3 py-2 text-zinc-400 transition",
         "hover:bg-white/5",
         isActive && "!bg-white/10 !text-zinc-50",
         className
