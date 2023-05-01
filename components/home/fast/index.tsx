@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { numberFormat } from "@/utils/number-format";
 import Link from "next/link";
 import Icon, { ICON_NAMES } from "@/components/icon";
+import cx from "@/utils/cx";
 
 const AnimatedGlobe = dynamic(() => import("./globe"), {
   ssr: false,
@@ -43,7 +44,13 @@ export default function Fast() {
       {/*  */}
 
       {/* slogan */}
-      <h5 className="absolute inset-x-0 top-[210px] -z-10 select-none font-display text-[14vw] font-bold leading-none opacity-[0.02]">
+      <h5
+        className={cx(
+          "absolute inset-x-0 top-[210px] -z-10 select-none",
+          "font-display text-[14vw] font-bold leading-none",
+          "to-white/0] bg-gradient-to-t from-white/[0.04] bg-clip-text text-transparent"
+        )}
+      >
         Fast Anywhere
       </h5>
 
