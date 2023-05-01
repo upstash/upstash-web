@@ -37,7 +37,7 @@ export default function ServerlessKafka() {
         </Button>
         <Button
           href="https://github.com/upstash/kafka-examples"
-          className="md:rounded-r-none"
+          className="md:rounded-l-none"
           type="button"
         >
           View examples

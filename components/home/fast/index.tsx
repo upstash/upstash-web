@@ -7,7 +7,7 @@ import {
   FastCardTitle,
   FastCardValue,
 } from "@/components/home/fast/card";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { numberFormat } from "@/utils/number-format";
 import Link from "next/link";
 import Icon, { ICON_NAMES } from "@/components/icon";
@@ -39,7 +39,7 @@ export default function Fast() {
   }, []);
 
   return (
-    <section className="relative z-0 -mt-[160px] hidden h-[900px] overflow-hidden md:block">
+    <section className="relative z-0 -mt-[160px] hidden h-[700px] overflow-hidden md:block">
       {/*  */}
 
       {/* slogan */}
@@ -59,9 +59,9 @@ export default function Fast() {
       />
 
       {/* data */}
-      <div className="group/source-box absolute inset-x-0 bottom-10 z-20">
+      <div className="group/source-box absolute inset-x-0 bottom-0 z-20">
         <Container className="max-w-screen-md">
-          <div className="grid grid-cols-3 rounded-[2.2rem] bg-white/5 p-6 backdrop-blur md:p-8">
+          <div className="grid grid-cols-3 rounded-[2.2rem] bg-white/5 px-6 py-4 backdrop-blur md:p-6">
             <FastCard>
               <FastCardValue className="text-emerald-200">
                 {numberFormat(data.user)}
