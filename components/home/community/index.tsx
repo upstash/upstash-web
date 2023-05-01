@@ -35,7 +35,7 @@ export default function HomeCommunity() {
           </SectionHeaderSummary>
         </SectionHeader>
 
-        <div className="mt-12 grid gap-2 md:mt-24 md:grid-cols-3">
+        <div className="mt-12 grid gap-2 md:mt-24 md:grid-cols-4">
           <CommunityBox>
             <Icon
               icon={ICON_NAMES.FileText}
@@ -50,6 +50,7 @@ export default function HomeCommunity() {
               Read
             </CommunityBoxButton>
           </CommunityBox>
+
           <CommunityBox>
             <Icon
               icon={ICON_NAMES.Discord}
@@ -65,6 +66,7 @@ export default function HomeCommunity() {
               Join
             </CommunityBoxButton>
           </CommunityBox>
+
           <CommunityBox>
             <Icon
               icon={ICON_NAMES.Twitter}
@@ -78,6 +80,22 @@ export default function HomeCommunity() {
             </CommunityBoxDesc>
             <CommunityBoxButton href="https://twitter.com/upstash">
               Follow
+            </CommunityBoxButton>
+          </CommunityBox>
+
+          <CommunityBox>
+            <Icon
+              icon={ICON_NAMES.Github}
+              className="mb-4 text-4xl group-hover/community-box:text-emerald-300 md:text-5xl"
+              strokeWidth="1"
+            />
+            <CommunityBoxTitle>Github</CommunityBoxTitle>
+            <CommunityBoxDesc>
+              You can view all the projects we have developed as open source on
+              our Github page.
+            </CommunityBoxDesc>
+            <CommunityBoxButton href="https://github.com/upstash">
+              View
             </CommunityBoxButton>
           </CommunityBox>
         </div>
