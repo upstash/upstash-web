@@ -19,8 +19,8 @@ export default function HomePage() {
   return (
     <main>
       <Container>
-        <div className="grid grid-cols-2 py-44">
-          <div className="w-4/5">
+        <div className="grid py-10 md:grid-cols-2 md:py-44">
+          <div className="md:w-4/5">
             <h1
               className={cx(
                 "font-display text-4xl font-bold leading-none md:text-5xl",
@@ -49,7 +49,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="relative -z-10">
+          <div className="relative -z-10 hidden md:block">
             <div className="absolute left-1/2 top-1/2 -translate-x-[600px] -translate-y-1/2">
               <AnimatedGlobe />
             </div>

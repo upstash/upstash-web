@@ -13,7 +13,7 @@ export default function FastResult() {
     <div>
       <header
         className="flex items-center justify-between border-b
-      border-b-zinc-900 py-1.5 text-xs uppercase tracking-widest text-zinc-600"
+      border-b-zinc-900 py-3 text-xs uppercase tracking-widest text-zinc-600 md:py-2"
       >
         <span>Regions</span>
         <span className="flex items-center gap-1">
@@ -83,7 +83,7 @@ export default function FastResult() {
           return (
             <div
               className="flex items-center justify-between
-            border-b border-b-zinc-900 py-1.5"
+            border-b border-b-zinc-900 py-3 md:py-2"
             >
               <span>{title}</span>
               <span className="ml-auto">
