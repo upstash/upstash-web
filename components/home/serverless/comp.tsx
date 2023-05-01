@@ -17,7 +17,7 @@ export function ServerlessBox({
   return (
     <div
       className={cx(
-        "group/box-body relative z-0 grid gap-4 p-6 md:gap-8 md:p-8",
+        "group/box-body relative z-0 grid gap-6 p-6 md:gap-8 md:p-8",
         "bg-white/5 backdrop-blur",
         "rounded-3xl md:rounded-[2.2rem]",
         className
@@ -64,7 +64,7 @@ export function ServerlessSummary({
   children,
   className,
 }: HTMLProps<HTMLParagraphElement>) {
-  return <p className={cx("mt-3 opacity-40", className)}>{children}</p>;
+  return <p className={cx("mt-2 opacity-40 md:mt-3", className)}>{children}</p>;
 }
 
 export function ProductFeature({

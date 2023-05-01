@@ -84,7 +84,7 @@ export default function Fast() {
             <FastCard>
               <FastCardValue className="text-yellow-200">
                 ~
-                {numberFormat(50000000, {
+                {numberFormat(9200000000, {
                   notation: "compact",
                 })}
               </FastCardValue>
