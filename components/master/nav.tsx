@@ -9,7 +9,7 @@ import { NavItems } from "./header";
 
 export default function Nav({}: HTMLProps<HTMLDivElement> & {}) {
   return (
-    <nav className="col-span-2 flex items-center justify-center gap-1">
+    <nav className="col-span-2 flex items-center justify-center">
       {NavItems.map((item) => {
         return (
           <NavLink key={item.href} href={item.href}>
