@@ -5,7 +5,9 @@ export default function HomeHeroPartner() {
   return (
     <div className="mt-16">
       {/* title */}
-      <h5 className="text-sm opacity-20">Trusted by the best teams</h5>
+      <h5 className="text-sm opacity-40 md:opacity-20">
+        Trusted by the best teams
+      </h5>
 
       {/* logos */}
       <div className="mt-6 flex flex-wrap items-center justify-center gap-x-8 gap-y-6">
@@ -13,7 +15,7 @@ export default function HomeHeroPartner() {
           <Link
             key={name}
             target="_blank"
-            className="opacity-20 transition hover:scale-105 hover:opacity-80"
+            className="opacity-40 transition hover:scale-105 hover:opacity-80 md:opacity-20"
             title={name}
             href={url}
           >

@@ -35,7 +35,7 @@ export default function HomeOpenSource({}: ISectionHeader) {
         </SectionHeader>
 
         <div className="mt-12 overflow-x-auto md:mt-24">
-          <div className="relative grid w-[280%] grid-cols-3 gap-2 text-left md:w-full md:gap-6">
+          <div className="relative grid w-[280%] grid-cols-3 gap-4 text-left md:w-full md:gap-6">
             <div className="absolute bottom-full mb-6 hidden w-full grid-cols-3 gap-6 opacity-[0.03] md:grid">
               {[...Array(3).keys()].map((i) => (
                 <div

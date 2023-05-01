@@ -20,9 +20,10 @@ export default function Investors({ short = false }) {
                 src={investor.src}
                 width={100}
                 height={100}
-                className="aspect-square scale-[1.01] rounded-full object-cover
-                mix-blend-multiply grayscale transition-all duration-1000
-                group-hover/investor:mix-blend-normal group-hover/investor:grayscale-0"
+                className="aspect-square h-[80px] w-[80px] scale-[1.01] rounded-full
+                object-cover mix-blend-multiply grayscale
+                transition-all duration-1000 group-hover/investor:mix-blend-normal group-hover/investor:grayscale-0
+                md:h-[100px] md:w-[100px]"
               />
             </span>
 

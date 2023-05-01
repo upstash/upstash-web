@@ -11,10 +11,10 @@ export function PriceBox({
   return (
     <div
       className={cx(
-        "grid place-items-center gap-4 rounded-lg p-6 md:gap-6 md:p-8",
+        "grid place-items-center gap-4  p-6 md:gap-6 md:p-8",
         "bg-white/5 backdrop-blur",
-        "first:rounded-t-3xl last:rounded-b-3xl",
-        "md:first:rounded-t md:last:rounded-b",
+        "rounded-lg first:rounded-t-3xl last:rounded-b-3xl",
+        "md:first:rounded-t-lg md:last:rounded-b-lg",
         "md:first:!rounded-l-[2.2rem] md:last:!rounded-r-[2.2rem]",
         className
       )}
