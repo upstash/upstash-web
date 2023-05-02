@@ -199,5 +199,12 @@ export default {
     title:"Full Stack Developer (Guest Author)",
     url:"https://twitter.com/hqasmei",
     image_url:"blog/authors/hosna.jpeg",
+  },
+  fahreddin:{
+    name:"Fahreddin Ozcan",
+    title:"Full Stack Developer (Guest Author)",
+    url:"https://github.com/fahreddinozcan",
+    image_url:"blog/authors/fahreddin.png",
   }
+
 };
