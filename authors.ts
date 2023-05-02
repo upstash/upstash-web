@@ -199,5 +199,10 @@ export default {
     title:"Full Stack Developer (Guest Author)",
     url:"https://twitter.com/hqasmei",
     image_url:"blog/authors/hosna.jpeg",
+  },
+  rishi:{
+    name:"Rishi Raj Jain",
+    title:"Technical CSM @Edgio (Guest Author)",
+    image_url:"blog/authors/rishi.jpeg",
   }
 };
