@@ -50,7 +50,7 @@ export default function HomeOpenSource({}: ISectionHeader) {
             {repositories.map((item) => {
               return (
                 <SourceBox
-                  key={item.url}
+                  key={item.title}
                   href={item.url}
                   category={item.category}
                 >
