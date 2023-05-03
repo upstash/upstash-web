@@ -9,13 +9,13 @@
     @apply mb-8;
   }
   .post > .rehype-code-title {
-    @apply mb-0 rounded-t-lg border-x border-t px-1 border-zinc-800 py-3 px-4 text-sm text-gray-400;
+    @apply mb-0 rounded-t-lg border-x border-t border-zinc-800 px-1 px-4 py-3 text-sm text-gray-400;
   }
   .post > .rehype-code-title + pre {
-    @apply rounded-t-none
+    @apply rounded-t-none;
   }
   .post a.anchor {
-      @apply after:content-['#'] after:ml-2 after:opacity-10 hover:after:opacity-40;
+    @apply after:ml-2 after:opacity-10 after:content-['#'] hover:after:opacity-40;
   }
   .post :where(h2, h3, h4) {
     scroll-margin-top: 2rem;

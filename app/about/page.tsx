@@ -24,7 +24,8 @@ export default function HomePage() {
           <header>
             <PageHeaderTitle>
               Data Platform
-              <br/>for Developers
+              <br />
+              for Developers
             </PageHeaderTitle>
 
             <PageHeaderDesc className="mt-2 grid gap-1 md:gap-2">
