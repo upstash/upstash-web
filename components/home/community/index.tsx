@@ -10,21 +10,14 @@ import {
   CommunityBoxDesc,
   CommunityBoxTitle,
 } from "./comp";
-import cx from "@/utils/cx";
 import Icon, { ICON_NAMES } from "@/components/icon";
 import React from "react";
+import Bg from "@/components/bg";
 
 export default function HomeCommunity() {
   return (
-    <section className="relative py-16 md:py-32">
-      {/* bg */}
-      <div
-        className={cx(
-          "absolute left-1/2 top-32 -z-10 h-1/2 w-4/5",
-          "-translate-x-1/2",
-          "bg-yellow-500 opacity-5 blur-[100px]"
-        )}
-      />
+    <section className="relative py-16 md:py-28">
+      <Bg className="top-32 h-1/2 bg-yellow-500" />
 
       <Container>
         {/* header */}
@@ -35,7 +28,7 @@ export default function HomeCommunity() {
           </SectionHeaderSummary>
         </SectionHeader>
 
-        <div className="mt-12 grid gap-2 md:mt-24 md:grid-cols-4">
+        <div className="mt-10 grid gap-2 md:mt-20 md:grid-cols-4">
           <CommunityBox>
             <Icon
               icon={ICON_NAMES.FileText}

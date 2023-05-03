@@ -12,20 +12,14 @@ import DesignedForTheEdge from "@/components/home/serverless/designed-for-the-ed
 // import ServerlessRedis from "@/components/home/serverless/redis";
 // import ServerlessKafka from "@/components/home/serverless/kafka";
 // import ServerlessQStash from "@/components/home/serverless/qstash";
-import cx from "@/utils/cx";
+import Bg from "@/components/bg";
 
 export interface ISectionHeader extends HTMLProps<HTMLDivElement> {}
 
 export default function HomeServerless({}: ISectionHeader) {
   return (
-    <section className="relative z-10 py-16 md:mt-20 md:py-32">
-      <div
-        className={cx(
-          "absolute left-1/2 top-32 -z-10 h-1/2 w-4/5",
-          "-translate-x-1/2",
-          "bg-emerald-500 opacity-5 blur-[100px]"
-        )}
-      />
+    <section className="relative z-10 py-16 md:mt-20 md:py-28">
+      <Bg className="top-32 h-1/2" />
 
       <Container>
         <SectionHeader>
@@ -35,7 +29,7 @@ export default function HomeServerless({}: ISectionHeader) {
           </SectionHeaderSummary>
         </SectionHeader>
 
-        <div className="mt-12 grid gap-2 text-left md:mt-24 md:grid-cols-6 md:gap-6">
+        <div className="mt-10 grid gap-2 text-left md:mt-20 md:grid-cols-6 md:gap-6">
           {/* features */}
           <GlobalLowLatency />
           <PriceScaleToZero />

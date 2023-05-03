@@ -12,19 +12,14 @@ import {
   SourceTag,
   SourceTitle,
 } from "@/components/home/open-source/comp";
+import Bg from "@/components/bg";
 
 export interface ISectionHeader extends HTMLProps<HTMLDivElement> {}
 
 export default function HomeOpenSource({}: ISectionHeader) {
   return (
-    <section id="pricing" className="relative py-16 md:py-32">
-      <div
-        className={cx(
-          "absolute left-1/2 top-32 -z-10 h-1/2 w-4/5",
-          "-translate-x-1/2",
-          "bg-emerald-500 opacity-5 blur-[100px]"
-        )}
-      />
+    <section id="pricing" className="relative py-16 md:py-28">
+      <Bg className="top-32 h-1/2" />
 
       <Container>
         <SectionHeader>
@@ -34,7 +29,7 @@ export default function HomeOpenSource({}: ISectionHeader) {
           </SectionHeaderSummary>
         </SectionHeader>
 
-        <div className="mt-12 overflow-x-auto md:mt-24 md:overflow-visible">
+        <div className="mt-10 overflow-x-auto md:mt-20 md:overflow-visible">
           <div className="relative grid w-[280%] grid-cols-3 gap-4 text-left md:w-full md:gap-6">
             <div className="absolute bottom-full mb-6 hidden w-full grid-cols-3 gap-6 opacity-[0.03] md:grid">
               {[...Array(3).keys()].map((i) => (

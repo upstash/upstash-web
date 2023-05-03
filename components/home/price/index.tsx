@@ -9,22 +9,15 @@ import PriceRedis from "@/components/home/price/redis";
 import PriceKafka from "@/components/home/price/kafka";
 import PriceQStash from "@/components/home/price/qstash";
 import Icon, { ICON_NAMES } from "@/components/icon";
-import cx from "@/utils/cx";
 import Button from "@/components/button";
+import Bg from "@/components/bg";
 
 export interface ISectionHeader extends HTMLProps<HTMLDivElement> {}
 
 export default function HomeServerless({}: ISectionHeader) {
   return (
-    <section id="pricing" className="relative py-16 md:py-32">
-      {/* bg */}
-      <div
-        className={cx(
-          "absolute left-1/2 top-32 -z-10 h-1/2 w-4/5",
-          "-translate-x-1/2",
-          "bg-emerald-500 opacity-5 blur-[100px]"
-        )}
-      />
+    <section id="pricing" className="relative py-16 md:py-28">
+      <Bg className="top-32 h-1/2" />
 
       <Container>
         {/* header */}
@@ -47,7 +40,7 @@ export default function HomeServerless({}: ISectionHeader) {
         </SectionHeader>
 
         {/* table */}
-        <div className="mt-12 grid gap-2 md:mt-24 md:grid-cols-3">
+        <div className="mt-10 grid gap-2 md:mt-20 md:grid-cols-3">
           <PriceRedis />
           <PriceKafka />
           <PriceQStash />

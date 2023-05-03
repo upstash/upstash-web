@@ -6,11 +6,13 @@ import Statistic from "@/components/home/fast/statistic";
 import Link from "next/link";
 import Icon, { ICON_NAMES } from "@/components/icon";
 import cx from "@/utils/cx";
+import Bg from "@/components/bg";
 
 export default function Fast() {
   return (
-    <section className="relative z-0 hidden h-[700px] overflow-hidden md:block">
+    <section className="relative z-0 mt-10 hidden h-[700px] overflow-hidden md:block">
       {/*  */}
+      <Bg className="top-44 h-1/2" />
 
       {/* slogan */}
       <h5
@@ -18,7 +20,7 @@ export default function Fast() {
           "absolute inset-x-0 top-[40px] -z-10 select-none",
           "font-display text-[13vw] font-bold leading-none",
           "bg-gradient-to-t bg-clip-text text-transparent",
-          "from-emerald-200/10 to-emerald-100/5"
+          "from-emerald-200/5 to-emerald-100/[0.02]"
         )}
       >
         Fast Anywhere
