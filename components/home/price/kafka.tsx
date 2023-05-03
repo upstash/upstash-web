@@ -17,7 +17,7 @@ export default function PriceKafka() {
 
       <div>
         <PriceBadge>Free</PriceBadge>
-        <PriceValue className="mt-3">10K commands</PriceValue>
+        <PriceValue className="mt-3">10K messages</PriceValue>
         <PriceDesc>per day</PriceDesc>
       </div>
 

@@ -125,7 +125,7 @@ const repositories = [
   {
     url: "https://fly.io/docs/reference/redis/",
     title: "Fly",
-    description: "Global Redis replicated at 20+ regions of Fly.io",
+    description: "Global Redis replicated in 20+ regions of Fly.io",
     category: Category.Integration,
   },
   {

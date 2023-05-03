@@ -28,7 +28,7 @@ export default function HomeHeroProducts({
         onMouseEnter={() => setActiveProduct(Product.REDIS)}
       >
         <HeroProductTitle>
-          Redis<span className="opacity-40">®*</span>
+          Redis<span className="text-[.9em] opacity-20">®*</span>
         </HeroProductTitle>
         <HeroProductDesc>Serverless database with Redis API</HeroProductDesc>
 
@@ -54,7 +54,7 @@ export default function HomeHeroProducts({
         onMouseEnter={() => setActiveProduct(Product.KAFKA)}
       >
         <HeroProductTitle>
-          Kafka<span className="opacity-40">®</span>
+          Kafka<span className="text-[.9em] opacity-20">®</span>
         </HeroProductTitle>
         <HeroProductDesc>Serverless Kafka and Connectors</HeroProductDesc>
 

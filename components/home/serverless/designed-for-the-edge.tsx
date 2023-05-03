@@ -1,6 +1,11 @@
 import { ServerlessBox, ServerlessSummary, ServerlessTitle } from "./comp";
 import { LogoIcon } from "@/components/logo";
 
+// TODO: add more logos
+// deno
+// lagon
+// netlify
+
 export default function DesignedForTheEdge() {
   const duration = 120000;
 

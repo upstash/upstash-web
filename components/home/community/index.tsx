@@ -28,7 +28,7 @@ export default function HomeCommunity() {
           </SectionHeaderSummary>
         </SectionHeader>
 
-        <div className="mt-10 grid gap-2 md:mt-20 md:grid-cols-4">
+        <div className="mt-10 grid gap-2 md:mt-20 md:grid-cols-2 lg:grid-cols-4">
           <CommunityBox>
             <Icon
               icon={ICON_NAMES.FileText}

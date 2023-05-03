@@ -6,7 +6,7 @@ export default function PriceScaleToZero() {
     <ServerlessBox className="md:col-span-3">
       <header>
         <ServerlessTitle link="https://docs.upstash.com/redis/overall/pricing">
-          Price scale to zero
+          Price scales to zero
         </ServerlessTitle>
         <ServerlessSummary>
           Start free, then pay only for what you use with per-request pricing.
@@ -18,7 +18,7 @@ export default function PriceScaleToZero() {
       <div className="flex gap-1 md:gap-4">
         {[
           {
-            title: "Request",
+            title: "Requests",
             value: "12,004",
           },
           {

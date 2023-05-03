@@ -25,7 +25,7 @@ export default function HomeServerless({}: ISectionHeader) {
         <SectionHeader>
           <SectionHeaderTitle>Serverless & Edge</SectionHeaderTitle>
           <SectionHeaderSummary>
-            Platform tailored for the serverless revolution
+            The platform tailored for the serverless revolution
           </SectionHeaderSummary>
         </SectionHeader>
 

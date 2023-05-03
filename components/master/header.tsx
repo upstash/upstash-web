@@ -8,7 +8,6 @@ import Nav from "./nav";
 import { allJobs } from "contentlayer/generated";
 
 const jobLength = allJobs.filter((o) => !o.draft).length;
-console.log(jobLength);
 
 export interface IAppHeader extends HTMLProps<HTMLHeadElement> {}
 

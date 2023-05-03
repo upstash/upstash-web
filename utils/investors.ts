@@ -14,7 +14,7 @@ export const INVESTORS = [
   {
     name: "Guillermo Rauch",
     title: "CEO, Vercel",
-    src: "/investors/rauchg.jpeg",
+    src: "/investors/rauchg.jpg",
     url: "https://twitter.com/rauchg",
   },
   {

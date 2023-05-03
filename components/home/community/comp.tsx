@@ -13,8 +13,9 @@ export function CommunityBox({
         "group/community-box flex flex-col items-center p-6 md:p-8",
         "bg-white/5 transition",
         "rounded-lg first:rounded-t-3xl last:rounded-b-3xl",
-        "md:first:rounded-t-lg md:last:rounded-b-lg",
-        "md:first:!rounded-l-[2.2rem] md:last:!rounded-r-[2.2rem]",
+        "md:rounded-lg md:first:rounded-t-lg md:last:rounded-b-lg",
+        "lg:first:rounded-t-lg lg:last:rounded-b-lg",
+        "lg:first:!rounded-l-[2.2rem] lg:last:!rounded-r-[2.2rem]",
         "hover:scale-[1.02] hover:bg-white/10",
         className
       )}
