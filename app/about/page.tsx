@@ -23,7 +23,8 @@ export default function HomePage() {
           {/* header */}
           <header>
             <PageHeaderTitle>
-              Make Data the Easiest Part of Your Job
+              Data Platform
+              <br/>for Developers
             </PageHeaderTitle>
 
             <PageHeaderDesc className="mt-2 grid gap-1 md:gap-2">
@@ -60,7 +61,7 @@ export default function HomePage() {
 
         <Container className="max-w-screen-lg">
           <header>
-            <PageHeaderTitle as="h2">Our investors</PageHeaderTitle>
+            <PageHeaderTitle as="h2">Our Investors</PageHeaderTitle>
             <PageHeaderDesc className="mt-4">
               We are fortunate to work with some of the best investors in the
               world. Chances are you are already using the products they helped

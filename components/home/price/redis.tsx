@@ -25,7 +25,7 @@ export default function PriceRedis() {
 
       <div>
         <PriceBadge type="payg">Pay as you go</PriceBadge>
-        <PriceValue className="mt-3">$0.4</PriceValue>
+        <PriceValue className="mt-3">$0.2</PriceValue>
         <PriceDesc>per 100K commands</PriceDesc>
       </div>
 

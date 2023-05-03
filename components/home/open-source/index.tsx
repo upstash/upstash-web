@@ -30,7 +30,7 @@ export default function HomeOpenSource({}: ISectionHeader) {
         <SectionHeader>
           <SectionHeaderTitle>Open Source & Integrations</SectionHeaderTitle>
           <SectionHeaderSummary>
-            It is the perfect for your serverless applications thanks to its
+            Tools and integrations to simplify developers' lives
           </SectionHeaderSummary>
         </SectionHeader>
 
@@ -106,7 +106,7 @@ const repositories = [
   {
     url: "https://github.com/upstash/edge-flags",
     title: "Edge flags",
-    description: "Feature flags with Redis at edge functions.",
+    description: "Feature flags with Redis at edge.",
     category: Category.SDK,
   },
   {
@@ -128,13 +128,15 @@ const repositories = [
     category: Category.Template,
   },
   {
+    url: "https://fly.io/docs/reference/redis/",
     title: "Fly",
-    description: "Create global Redis replicated at 20+ regions of Fly.io",
+    description: "Global Redis replicated at 20+ regions of Fly.io",
     category: Category.Integration,
   },
   {
-    title: "Vercel",
-    description: "Integrate Upstash to your Vercel projects in seconds.",
+    url: "https://vercel.com/docs/storage/vercel-kv",
+    title: "Vercel KV",
+    description: "Durable and Global Redis with Vercel experience.",
     category: Category.Integration,
   },
 ];

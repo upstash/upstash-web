@@ -12,18 +12,18 @@ export default function ServerlessRedis() {
   return (
     <ServerlessBox className="bg-emerald-100/5 md:col-span-3">
       <header>
-        <ServerlessTitle>Redis</ServerlessTitle>
+        <ServerlessTitle>Serverless KV with Redis API</ServerlessTitle>
       </header>
 
       <ProductFeature product={Product.REDIS}>
         <ProductFeatureItem>
-          Durable and fast with multi tier storage
+          Durable and fast with multi tier storage.
         </ProductFeatureItem>
         <ProductFeatureItem>
-          Fast anywhere with global replication
+          Fast anywhere with global replication.
         </ProductFeatureItem>
         <ProductFeatureItem>
-          Designed for Edge/Serverless with REST API
+          Designed for Edge/Serverless with REST API.
         </ProductFeatureItem>
       </ProductFeature>
 

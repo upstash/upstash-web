@@ -16,8 +16,8 @@ export default function HomeHeroProducts({
       onMouseLeave={() => setActiveProduct(undefined)}
     >
       <HomeHeroProduct
-        title="Redis"
-        desc="Serverless database service compatible with Redis® API"
+        title="Redis®*"
+        desc="Serverless database with Redis API"
         onMouseEnter={() => setActiveProduct(Product.REDIS)}
         button={{
           href: "https://console.upstash.com",
@@ -30,8 +30,8 @@ export default function HomeHeroProducts({
         }}
       />
       <HomeHeroProduct
-        title="Kafka"
-        desc="Serverless database service compatible with Redis® API"
+        title="Kafka®"
+        desc="Serverless Kafka and Connectors"
         onMouseEnter={() => setActiveProduct(Product.KAFKA)}
         button={{
           href: "https://console.upstash.com",
@@ -44,7 +44,7 @@ export default function HomeHeroProducts({
       />
       <HomeHeroProduct
         title="QStash"
-        desc="Serverless database service compatible with Redis® API"
+        desc="Messaging for the Serverless"
         onMouseEnter={() => setActiveProduct(Product.QSTASH)}
         button={{
           href: "https://console.upstash.com",

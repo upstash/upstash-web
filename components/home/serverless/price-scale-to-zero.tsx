@@ -19,7 +19,7 @@ export default function PriceScaleToZero() {
         {[
           {
             title: "Request",
-            value: "12.004",
+            value: "12,004",
           },
           {
             title: "Storage",
