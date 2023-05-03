@@ -14,18 +14,16 @@ export default function Investors({ short = false }) {
             href={investor.url}
             className="group/investor inline-flex w-1/2 flex-col items-center md:w-1/3"
           >
-            <span className="rounded-full bg-emerald-200">
-              <Image
-                alt={investor.name}
-                src={investor.src}
-                width={100}
-                height={100}
-                className="aspect-square h-[80px] w-[80px] scale-[1.01] rounded-full
-                object-cover mix-blend-multiply grayscale
-                transition-all duration-1000 group-hover/investor:mix-blend-normal group-hover/investor:grayscale-0
+            <Image
+              alt={investor.name}
+              src={investor.src}
+              width={100}
+              height={100}
+              className="aspect-square h-[80px] w-[80px] scale-[1.01] rounded-full
+                object-cover grayscale transition
+                group-hover/investor:mix-blend-normal group-hover/investor:grayscale-0
                 md:h-[100px] md:w-[100px]"
-              />
-            </span>
+            />
 
             <h4
               className="mt-4 font-display text-xl font-medium
