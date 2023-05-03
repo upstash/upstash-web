@@ -4,7 +4,6 @@ import PopularTag from "@/components/blog/popular-tag/popular-tag";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
 import Container from "@/components/container";
-import cx from "@/utils/cx";
 import Bg from "@/components/bg";
 
 export default async function BlogPage() {

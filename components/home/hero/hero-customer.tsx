@@ -38,6 +38,16 @@ const customers = [
     icon: <Logo.Flyio />,
   },
   {
+    name: "NZXT",
+    url: "https://nzxt.com",
+    icon: <Logo.Nzxt />,
+  },
+  {
+    name: "Branch",
+    url: "https://www.ourbranch.com",
+    icon: <Logo.Ourbranch />,
+  },
+  {
     name: "Supabase",
     url: "https://supabase.io",
     icon: <Logo.Supabase />,
@@ -51,15 +61,5 @@ const customers = [
     name: "Hashnode",
     url: "https://hashnode.com",
     icon: <Logo.Hashnode />,
-  },
-  {
-    name: "NZXT",
-    url: "https://nzxt.com",
-    icon: <Logo.Nzxt />,
-  },
-  {
-    name: "Branch",
-    url: "https://www.ourbranch.com",
-    icon: <Logo.Ourbranch />,
   },
 ];
