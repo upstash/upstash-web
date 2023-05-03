@@ -69,12 +69,6 @@ export const Post = defineDocumentType(() => ({
         return doc._raw.sourceFileName.substring(-1, 10);
       },
     },
-    image: {
-      type: "string",
-      resolve: (doc) => {
-        return `https://upstash.com/api/og/blog?title=${doc.title}&author=${doc.author}`;
-      },
-    },
     headings: {
       type: "json",
       resolve: async (doc) => {
