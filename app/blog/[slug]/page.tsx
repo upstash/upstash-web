@@ -9,7 +9,6 @@ import { SITE_URL } from "@/utils/const";
 import PostHeader from "@/components/post/header";
 import PostTags from "@/components/post/tags";
 import PageBodyGradient from "@/components/page-body-gradient";
-import cx from "@/utils/cx";
 import Bg from "@/components/bg";
 // import PostTOC from "@/app/blog/[slug]/_/toc";
 
@@ -43,17 +42,19 @@ export async function generateMetadata({
     title,
     description,
     openGraph: {
+      type: "article",
       title,
       description,
       url,
       siteName: title,
-      type: "website",
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title,
       description,
-      site: "@upstash",
+      images: [
+        `${process.env.NEXT_PUBLIC_SITE_URL}/api/og/blog?slug=${post.slug}`,
+      ],
     },
   };
 }

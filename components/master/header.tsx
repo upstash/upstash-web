@@ -1,4 +1,4 @@
-import { HTMLProps } from "react";
+import { HTMLProps, ReactNode } from "react";
 import cx from "@/utils/cx";
 import { Logo } from "@/components/logo";
 import Link from "next/link";
@@ -6,6 +6,9 @@ import Button from "@/components/button";
 import Container from "@/components/container";
 import Nav from "./nav";
 import { allJobs } from "contentlayer/generated";
+
+const jobLength = allJobs.filter((o) => !o.draft).length;
+console.log(jobLength);
 
 export interface IAppHeader extends HTMLProps<HTMLHeadElement> {}
 
@@ -39,7 +42,11 @@ export default function Header({ className, ...props }: IAppHeader) {
   );
 }
 
-export const NavItems = [
+const NavItems: {
+  name: string;
+  href: string;
+  children?: ReactNode;
+}[] = [
   {
     name: "Pricing",
     href: "/#pricing",
@@ -56,7 +63,10 @@ export const NavItems = [
     name: "Blog",
     href: "/blog",
   },
-  {
+];
+
+if (jobLength > 0) {
+  NavItems.push({
     name: "Careers",
     href: "/careers",
     children: (
@@ -64,8 +74,10 @@ export const NavItems = [
         className="rounded-full bg-emerald-300/20
               px-1.5 py-1 font-mono text-sm leading-none text-emerald-500"
       >
-        {allJobs.filter((o) => !o.draft).length}
+        {jobLength}
       </span>
     ),
-  },
-];
+  });
+}
+
+export { NavItems };
