@@ -200,4 +200,10 @@ export default {
     url: "https://twitter.com/hqasmei",
     image: "hosna.jpeg",
   },
+  fahreddin: {
+    name: "Fahreddin Ozcan",
+    title: "Full Stack Developer (Guest Author)",
+    url: "https://github.com/fahreddinozcan",
+    image: "fahreddin.png",
+  },
 };
