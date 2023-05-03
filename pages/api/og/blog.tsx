@@ -7,25 +7,22 @@ export const config = {
   runtime: "edge",
 };
 
-// const FontInterRegular = fetch(
-//   new URL("../../../public/static/fonts/Inter-Regular.ttf", import.meta.url)
-// ).then((res) => res.arrayBuffer());
-// const FontInterBold = fetch(
-//   new URL("../../../public/static/fonts/Inter-Bold.ttf", import.meta.url)
-// ).then((res) => res.arrayBuffer());
+const FontInterRegular = fetch(
+  new URL("../../../public/fonts/Inter-Regular.ttf", import.meta.url)
+).then((res) => res.arrayBuffer());
+const FontInterBold = fetch(
+  new URL("../../../public/fonts/Inter-Bold.ttf", import.meta.url)
+).then((res) => res.arrayBuffer());
 
 export default async function handler(req: NextRequest) {
-  // const DataInterRegular = await FontInterRegular;
-  // const DataInterBold = await FontInterBold;
-
   try {
+    const DataInterRegular = await FontInterRegular;
+    const DataInterBold = await FontInterBold;
+
     const { searchParams } = req.nextUrl;
     const slug = searchParams.get("slug");
 
     const post = allPosts.find((p) => p.slug === slug);
-
-    console.log(process.env.NEXT_PUBLIC_SITE_URL);
-    console.log(post?.authorObj);
 
     if (!post) {
       throw new Error("Post not found");
@@ -33,7 +30,7 @@ export default async function handler(req: NextRequest) {
 
     return new ImageResponse(
       (
-        <div tw="flex flex-col items-stretch p-[70px] pb-[140px] h-full w-full bg-[#161616] text-white bg-no-repeat">
+        <div tw="flex flex-col items-stretch p-[70px] pb-[140px] h-full w-full bg-[#161616] text-white">
           <header tw="flex">
             <h1 tw="m-0 leading-[1.16] text-7xl font-bold">{post.title}</h1>
           </header>
@@ -48,7 +45,7 @@ export default async function handler(req: NextRequest) {
 
             <div tw="flex items-center border-4 border-[#00e9a3] rounded-full">
               <img
-                tw="w-36 h-36 rounded-full object-cover object-center border-[6px] border-black"
+                tw="w-36 h-36 rounded-full border-[6px] border-black"
                 alt={post.authorObj.name}
                 src={`${process.env.NEXT_PUBLIC_SITE_URL}${post.authorObj.photo}`}
               />
@@ -63,20 +60,20 @@ export default async function handler(req: NextRequest) {
       {
         width: 1200,
         height: 630,
-        // fonts: [
-        //   {
-        //     name: "Inter",
-        //     data: DataInterRegular,
-        //     style: "normal",
-        //     weight: 400,
-        //   },
-        //   {
-        //     name: "Inter",
-        //     data: DataInterBold,
-        //     style: "normal",
-        //     weight: 800,
-        //   },
-        // ],
+        fonts: [
+          {
+            name: "Inter",
+            data: DataInterRegular,
+            style: "normal",
+            weight: 400,
+          },
+          {
+            name: "Inter",
+            data: DataInterBold,
+            style: "normal",
+            weight: 800,
+          },
+        ],
       }
     );
   } catch (e: any) {
