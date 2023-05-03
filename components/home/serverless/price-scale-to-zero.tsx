@@ -10,7 +10,7 @@ export default function PriceScaleToZero() {
         </ServerlessTitle>
         <ServerlessSummary>
           Start free, then pay only for what you use with per-request pricing.
-          You&apos;ll never pay more than the cap price, guaranteed.
+          You'll never pay more than the cap price, guaranteed.
         </ServerlessSummary>
       </header>
 
