@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import { numberFormat } from "@/utils/number-format";
 
 export default function FastStatistic() {
-  const [data, setData] = useState({ database: 0, user: 0 });
+  const [data, setData] = useState({ database: 0, user: 0, weekly_request: 0 });
 
   useEffect(() => {
     fetch("https://global-proven-finch-31564.upstash.io/hgetall/active_data", {
@@ -20,7 +20,7 @@ export default function FastStatistic() {
     })
       .then((response) => response.json())
       .then(({ result }) => {
-        const data = { database: 0, user: 0 };
+        const data = { database: 0, user: 0, weekly_request: 0 };
         for (let i = 0; i < result.length; i++) {
           // @ts-ignore
           data[result[i]] = result[i + 1];
@@ -49,7 +49,7 @@ export default function FastStatistic() {
       <FastCard>
         <FastCardValue className="text-yellow-200">
           ~
-          {numberFormat(9200000000, {
+          {numberFormat(data.weekly_request, {
             notation: "compact",
           })}
         </FastCardValue>

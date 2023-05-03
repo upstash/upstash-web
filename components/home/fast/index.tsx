@@ -16,8 +16,9 @@ export default function Fast() {
       <h5
         className={cx(
           "absolute inset-x-0 top-[40px] -z-10 select-none",
-          "font-display text-[14vw] font-bold leading-none",
-          "to-white/0.02] bg-gradient-to-t from-white/[0.05] bg-clip-text text-transparent"
+          "font-display text-[13vw] font-bold leading-none",
+          "bg-gradient-to-t bg-clip-text text-transparent",
+          "from-emerald-200/10 to-emerald-100/5"
         )}
       >
         Fast Anywhere
