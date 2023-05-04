@@ -10,7 +10,7 @@ import HomeCommunity from "@/components/home/community";
 
 export default function Home() {
   return (
-    <main className="overflow-hidden text-center">
+    <main className="overflow-x-hidden text-center">
       <HomeHero />
       <HomeFast />
       <HomeServerless />
