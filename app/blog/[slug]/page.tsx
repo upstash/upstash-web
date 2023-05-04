@@ -46,7 +46,9 @@ export async function generateMetadata({
       title,
       description,
       url,
-      siteName: title,
+      images: [
+        `${process.env.NEXT_PUBLIC_SITE_URL}/api/og/blog?slug=${post.slug}`,
+      ],
     },
     twitter: {
       card: "summary_large_image",

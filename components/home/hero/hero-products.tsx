@@ -149,7 +149,6 @@ function HomeHeroProduct({
 function HeroProductTitle({
   children,
   className,
-  ...props
 }: HTMLProps<HTMLHeadingElement>) {
   return (
     <h3
@@ -157,7 +156,6 @@ function HeroProductTitle({
         "font-display text-xl font-medium leading-none text-zinc-50 md:text-2xl",
         className
       )}
-      {...props}
     >
       {children}
     </h3>
@@ -167,13 +165,8 @@ function HeroProductTitle({
 function HeroProductDesc({
   children,
   className,
-  ...props
 }: HTMLProps<HTMLParagraphElement>) {
-  return (
-    <p className={cx("mt-2", className)} {...props}>
-      {children}
-    </p>
-  );
+  return <p className={cx("mt-2", className)}>{children}</p>;
 }
 
 export function HeroProductFeature({
