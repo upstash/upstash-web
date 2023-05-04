@@ -23,6 +23,7 @@
     "prismjs": "^1.29.0",
     "react": "^18.2.0",
     "react-dom": "18.2.0",
+    "react-globe.gl": "^2.24.1",
     "react-lazyload": "^3.2.0",
     "react-wrap-balancer": "^0.4.1",
     "reading-time": "^1.5.0",
@@ -32,7 +33,8 @@
     "rehype-slug": "^5.1.0",
     "remark-gfm": "^3.0.1",
     "sharp": "^0.32.1",
-    "swr": "^2.1.5"
+    "swr": "^2.1.5",
+    "three": "^0.152.2"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.194",
