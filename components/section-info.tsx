@@ -55,7 +55,13 @@ function SectionInfo() {
       .then(({ result }) => {
         const data = { database: 0, user: 0 };
         for (let i = 0; i < result.length; i++) {
-          data[result[i]] = result[i + 1];
+          try {
+
+            data[result[i]] = parseFloat(result[i + 1])
+          } catch{
+            data[result[i]] = result[i + 1];
+
+          }
           i++;
         }
         setData(data);
