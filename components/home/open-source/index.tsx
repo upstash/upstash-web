@@ -22,7 +22,7 @@ export default function HomeOpenSource({}: ISectionHeader) {
       <Bg className="top-32 h-1/2" />
 
       <Container>
-        <SectionHeader>
+        <SectionHeader className="relative z-10">
           <SectionHeaderTitle>Open Source & Integrations</SectionHeaderTitle>
           <SectionHeaderSummary>
             Tools and integrations to simplify developers' lives
