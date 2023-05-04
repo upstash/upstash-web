@@ -13,8 +13,6 @@ export default async function BlogPage() {
     <main className="relative z-0">
       <Bg />
 
-      {/* TODO: blog yazmak isteyenler için bir uyarı */}
-
       <header className="py-10 text-center md:py-20">
         <Container>
           <PageHeaderTitle>Blog</PageHeaderTitle>
