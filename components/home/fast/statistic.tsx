@@ -53,7 +53,7 @@ export default function FastStatistic() {
             notation: "compact",
           })}
         </FastCardValue>
-        <FastCardTitle>Request per week</FastCardTitle>
+        <FastCardTitle>Requests per week</FastCardTitle>
       </FastCard>
 
       <FastCard>
