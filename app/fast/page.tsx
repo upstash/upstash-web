@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import cx from "@/utils/cx";
 import Link from "next/link";
 
-const AnimatedGlobe = dynamic(() => import("@/components/home/fast/globe"), {
+const Globe = dynamic(() => import("@/components/home/fast/globe"), {
   ssr: false,
 });
 
@@ -51,7 +51,7 @@ export default function HomePage() {
 
           <div className="relative -z-10 hidden md:block">
             <div className="absolute left-1/2 top-1/2 -translate-x-[540px] -translate-y-1/2 lg:-translate-x-[640px]">
-              <AnimatedGlobe />
+              <Globe />
             </div>
           </div>
         </div>
