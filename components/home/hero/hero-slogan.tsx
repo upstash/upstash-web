@@ -9,9 +9,9 @@ export default function HomeHeroSlogan({
 }) {
   return (
     <motion.h1
-      // initial={{ opacity: 0, scale: 0.9 }}
-      // animate={{ opacity: 1, scale: 1 }}
-      // transition={{ delay: 0 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 0.2, duration: 1 }}
       className={cx(
         "inline-flex flex-col gap-1 transition",
         "font-display text-6xl font-bold leading-none md:text-[8rem]",

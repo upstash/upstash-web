@@ -23,22 +23,22 @@ export default function HomeHeroProducts({
     show: {
       opacity: 1,
       transition: {
-        delayChildren: 0.1,
-        staggerChildren: 0.1,
+        delayChildren: 0.4,
+        staggerChildren: 0.2,
       },
     },
   };
 
   const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 },
+    hidden: { opacity: 0, duration: 1 },
+    show: { opacity: 1, duration: 1 },
   };
 
   return (
     <motion.div
-      // variants={container}
-      // initial="hidden"
-      // animate="show"
+      variants={container}
+      initial="hidden"
+      animate="show"
       className="mt-8 grid gap-2 md:mt-16 md:grid-cols-3"
       onMouseLeave={() => setActiveProduct(undefined)}
     >

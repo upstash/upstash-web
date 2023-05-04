@@ -18,9 +18,9 @@ export default function Header({
 }: HTMLMotionProps<"header">) {
   return (
     <motion.header
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 1 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 0, duration: 1 }}
       className={cx("hidden py-10 md:block", className)}
       {...props}
     >
