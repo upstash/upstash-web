@@ -50,7 +50,7 @@ export default function HomePage() {
           </div>
 
           <div className="relative -z-10 hidden md:block">
-            <div className="absolute left-1/2 top-1/2 -translate-x-[600px] -translate-y-1/2">
+            <div className="absolute left-1/2 top-1/2 -translate-x-[540px] -translate-y-1/2 lg:-translate-x-[640px]">
               <AnimatedGlobe />
             </div>
           </div>
