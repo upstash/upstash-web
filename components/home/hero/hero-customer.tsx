@@ -1,14 +1,8 @@
 import * as Logo from "components/home/hero/hero-customer-icons";
-import { motion } from "framer-motion";
 
 export default function HomeHeroPartner() {
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ delay: 1, duration: 1 }}
-      className="mt-16"
-    >
+    <div className="mt-16">
       {/* title */}
       <h5 className="text-sm opacity-40 md:opacity-20">
         Trusted by the best teams
@@ -28,7 +22,7 @@ export default function HomeHeroPartner() {
           </a>
         ))}
       </div>
-    </motion.div>
+    </div>
   );
 }
 

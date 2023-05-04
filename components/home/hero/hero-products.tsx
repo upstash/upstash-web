@@ -9,7 +9,6 @@ import React, {
 import { Product } from "@/utils/type";
 import Button, { IButton } from "@/components/button";
 import Icon, { ICON_NAMES } from "@/components/icon";
-import { HTMLMotionProps, motion } from "framer-motion";
 
 export default function HomeHeroProducts({
   activeProduct,
@@ -18,32 +17,12 @@ export default function HomeHeroProducts({
   activeProduct?: Product;
   setActiveProduct: (product?: Product) => void;
 }) {
-  const container = {
-    hidden: {},
-    show: {
-      opacity: 1,
-      transition: {
-        delayChildren: 0.4,
-        staggerChildren: 0.2,
-      },
-    },
-  };
-
-  const item = {
-    hidden: { opacity: 0, duration: 1 },
-    show: { opacity: 1, duration: 1 },
-  };
-
   return (
-    <motion.div
-      variants={container}
-      initial="hidden"
-      animate="show"
+    <div
       className="mt-8 grid gap-2 md:mt-16 md:grid-cols-3"
       onMouseLeave={() => setActiveProduct(undefined)}
     >
       <HomeHeroProduct
-        variants={item}
         active={activeProduct === Product.REDIS}
         activeProduct={activeProduct}
         onMouseEnter={() => setActiveProduct(Product.REDIS)}
@@ -70,7 +49,6 @@ export default function HomeHeroProducts({
       </HomeHeroProduct>
 
       <HomeHeroProduct
-        variants={item}
         active={activeProduct === Product.KAFKA}
         activeProduct={activeProduct}
         onMouseEnter={() => setActiveProduct(Product.KAFKA)}
@@ -97,7 +75,6 @@ export default function HomeHeroProducts({
       </HomeHeroProduct>
 
       <HomeHeroProduct
-        variants={item}
         active={activeProduct === Product.QSTASH}
         activeProduct={activeProduct}
         onMouseEnter={() => setActiveProduct(Product.QSTASH)}
@@ -120,7 +97,7 @@ export default function HomeHeroProducts({
           Publish Messages
         </HeroProductCta>
       </HomeHeroProduct>
-    </motion.div>
+    </div>
   );
 }
 
@@ -130,7 +107,7 @@ function HomeHeroProduct({
   activeProduct,
   active,
   ...props
-}: HTMLMotionProps<"div"> & {
+}: HTMLProps<HTMLDivElement> & {
   active?: boolean;
   activeProduct?: Product;
 }) {
@@ -147,7 +124,7 @@ function HomeHeroProduct({
   );
 
   return (
-    <motion.div
+    <div
       className={cx(
         "group/hero-product",
         "flex flex-col items-center p-6 md:p-8",
@@ -165,7 +142,7 @@ function HomeHeroProduct({
       {...props}
     >
       {childs}
-    </motion.div>
+    </div>
   );
 }
 

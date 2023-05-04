@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode } from "react";
+import { HTMLProps, ReactNode } from "react";
 import cx from "@/utils/cx";
 import { Logo } from "@/components/logo";
 import Link from "next/link";
@@ -8,22 +8,15 @@ import Button from "@/components/button";
 import Container from "@/components/container";
 import Nav from "./nav";
 import { allJobs } from "contentlayer/generated";
-import { HTMLMotionProps, motion } from "framer-motion";
 
 const jobLength = allJobs.filter((o) => !o.draft).length;
 
 export default function Header({
   className,
   ...props
-}: HTMLMotionProps<"header">) {
+}: HTMLProps<HTMLHeadElement>) {
   return (
-    <motion.header
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ delay: 0, duration: 1 }}
-      className={cx("hidden py-10 md:block", className)}
-      {...props}
-    >
+    <header className={cx("hidden py-10 md:block", className)} {...props}>
       <Container>
         <div className="flex items-center md:grid md:grid-cols-4">
           <div className="flex">
@@ -47,7 +40,7 @@ export default function Header({
           </div>
         </div>
       </Container>
-    </motion.header>
+    </header>
   );
 }
 

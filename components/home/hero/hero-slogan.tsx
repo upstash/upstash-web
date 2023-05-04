@@ -1,6 +1,5 @@
 import cx from "@/utils/cx";
 import { Product } from "@/utils/type";
-import { motion } from "framer-motion";
 
 export default function HomeHeroSlogan({
   activeProduct,
@@ -8,10 +7,7 @@ export default function HomeHeroSlogan({
   activeProduct?: Product;
 }) {
   return (
-    <motion.h1
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ delay: 0.2, duration: 1 }}
+    <h1
       className={cx(
         "inline-flex flex-col gap-1 transition",
         "font-display text-6xl font-bold leading-none md:text-[8rem]",
@@ -25,6 +21,6 @@ export default function HomeHeroSlogan({
     >
       <span>Serverless</span>
       <span>Data Platform</span>
-    </motion.h1>
+    </h1>
   );
 }
