@@ -5,8 +5,8 @@ import {
   PriceHr,
   PriceTitle,
   PriceValue,
+  PriceButton,
 } from "@/components/home/price/comp";
-import Button from "@/components/button";
 
 export default function PriceQStash() {
   return (
@@ -29,14 +29,11 @@ export default function PriceQStash() {
         <PriceDesc>per 100K messages</PriceDesc>
       </div>
 
-      {/*<PriceHr />*/}
+      <PriceHr />
 
-      {/*<Button
-        className="text-sm opacity-40 hover:opacity-100"
-        href="https://docs.upstash.com/qstash/pricing"
-      >
+      <PriceButton href="https://docs.upstash.com/qstash/pricing">
         More information
-      </Button>*/}
+      </PriceButton>
     </PriceBox>
   );
 }

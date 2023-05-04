@@ -47,7 +47,7 @@ export default function HomeServerless({}: ISectionHeader) {
         </div>
 
         {/* doc link */}
-        <div className="mt-10 text-zinc-600">
+        {/*<div className="mt-10 text-zinc-600">
           See{" "}
           <Button
             href="https://docs.upstash.com/redis/overall/pricing"
@@ -57,7 +57,7 @@ export default function HomeServerless({}: ISectionHeader) {
             pricing page
           </Button>{" "}
           for more information.
-        </div>
+        </div>*/}
       </Container>
     </section>
   );

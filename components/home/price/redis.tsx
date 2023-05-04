@@ -1,12 +1,12 @@
 import {
   PriceBadge,
   PriceBox,
+  PriceButton,
   PriceDesc,
   PriceHr,
   PriceTitle,
   PriceValue,
 } from "./comp";
-import Button from "@/components/button";
 
 export default function PriceRedis() {
   return (
@@ -29,14 +29,11 @@ export default function PriceRedis() {
         <PriceDesc>per 100K commands</PriceDesc>
       </div>
 
-      {/*<PriceHr />*/}
+      <PriceHr />
 
-      {/*<Button
-        className="text-sm opacity-40 hover:opacity-100"
-        href="https://docs.upstash.com/redis/overall/pricing"
-      >
+      <PriceButton href="https://docs.upstash.com/redis/overall/pricing">
         More information
-      </Button>*/}
+      </PriceButton>
     </PriceBox>
   );
 }

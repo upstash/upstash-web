@@ -1,5 +1,6 @@
 import { HTMLProps, ReactNode } from "react";
 import cx from "@/utils/cx";
+import Button, { IButton } from "@/components/button";
 
 export function PriceBox({
   children,
@@ -11,11 +12,12 @@ export function PriceBox({
   return (
     <div
       className={cx(
-        "grid place-items-center gap-4  p-6 md:gap-6 md:p-8",
-        "bg-white/5 backdrop-blur",
+        "group/price-box grid place-items-center gap-4 p-6 md:gap-6 md:p-8",
+        "bg-white bg-opacity-5 backdrop-blur transition",
         "rounded-lg first:rounded-t-3xl last:rounded-b-3xl",
         "md:first:rounded-t-lg md:last:rounded-b-lg",
         "md:first:!rounded-l-[2.2rem] md:last:!rounded-r-[2.2rem]",
+        "hover:scale-[1.02] hover:bg-opacity-10",
         className
       )}
       {...props}
@@ -103,5 +105,20 @@ export function PriceBadge({
 export function PriceHr({ className }: HTMLProps<HTMLHRElement> & {}) {
   return (
     <hr className={cx("w-10 border-0 border-b border-white/5", className)} />
+  );
+}
+
+export function PriceButton({ children, className, ...props }: IButton) {
+  return (
+    <Button
+      className={cx(
+        "opacity-20 transition",
+        "group-hover/price-box:text-emerald-400 group-hover/price-box:opacity-100",
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </Button>
   );
 }
