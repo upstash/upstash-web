@@ -28,14 +28,9 @@ export default function HomeHeroPartner() {
 
 const customers = [
   {
-    name: "Vercel",
-    url: "https://vercel.com",
-    icon: <Logo.Vercel />,
-  },
-  {
-    name: "Fly.io",
-    url: "https://fly.io",
-    icon: <Logo.Flyio />,
+    name: "Branch",
+    url: "https://www.ourbranch.com",
+    icon: <Logo.Ourbranch />,
   },
   {
     name: "NZXT",
@@ -43,9 +38,14 @@ const customers = [
     icon: <Logo.Nzxt />,
   },
   {
-    name: "Branch",
-    url: "https://www.ourbranch.com",
-    icon: <Logo.Ourbranch />,
+    name: "Fly.io",
+    url: "https://fly.io",
+    icon: <Logo.Flyio />,
+  },
+  {
+    name: "Vercel",
+    url: "https://vercel.com",
+    icon: <Logo.Vercel />,
   },
   {
     name: "Supabase",
@@ -53,13 +53,13 @@ const customers = [
     icon: <Logo.Supabase />,
   },
   {
-    name: "Materialize",
-    url: "https://materialize.com",
-    icon: <Logo.Materialize />,
-  },
-  {
     name: "Hashnode",
     url: "https://hashnode.com",
     icon: <Logo.Hashnode />,
+  },
+  {
+    name: "Materialize",
+    url: "https://materialize.com",
+    icon: <Logo.Materialize />,
   },
 ];
