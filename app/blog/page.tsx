@@ -25,6 +25,7 @@ export default async function BlogPage() {
 
       <header className="py-10 text-center md:py-20">
         <Container>
+          <div>{process.env.VERCEL_URL}</div>
           <PageHeaderTitle>Blog</PageHeaderTitle>
           <PageHeaderDesc className="mt-2">
             Articles and tutorials from Upstash and community.
