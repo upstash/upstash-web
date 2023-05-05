@@ -52,7 +52,7 @@ function getRandomItem(list: any): region {
 }
 
 function getRandomArcData(): arcsData[] {
-  return [...Array(4).keys()].map(() => {
+  return Array.from(Array(4).keys()).map(() => {
     const region = getRandomItem(REGIONS);
 
     return {

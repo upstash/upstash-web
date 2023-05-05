@@ -32,7 +32,7 @@ export default function HomeOpenSource({}: ISectionHeader) {
         <div className="mt-10 overflow-x-auto md:mt-20 md:overflow-visible">
           <div className="relative grid w-[280%] grid-cols-3 gap-4 text-left md:w-full md:gap-6">
             <div className="absolute bottom-full mb-6 hidden w-full grid-cols-3 gap-6 opacity-[0.03] md:grid">
-              {[...Array(3).keys()].map((i) => (
+              {Array.from(Array(3).keys()).map((i) => (
                 <div
                   key={i}
                   className={cx(
@@ -57,7 +57,7 @@ export default function HomeOpenSource({}: ISectionHeader) {
             })}
 
             <div className="absolute top-full mt-6 hidden w-full grid-cols-3 gap-6 opacity-[0.03] md:grid">
-              {[...Array(3).keys()].map((i) => (
+              {Array.from(Array(3).keys()).map((i) => (
                 <div
                   key={i}
                   className={cx(
