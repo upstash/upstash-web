@@ -1,15 +1,23 @@
 import getData from "../../get-data";
-import PostGrid from "@/components/blog/grid/grid";
 import PageHeaderTitle from "@/components/page-header-title";
-import cx from "@/utils/cx";
 import Link from "next/link";
 import Bg from "@/components/bg";
+import { uniq } from "lodash";
+import Container from "@/components/container";
+import { Post } from "contentlayer/generated";
+import PostGridCard from "@/components/blog/grid-item";
 
 type Props = {
   params: {
     tag: string;
   };
 };
+
+export async function generateStaticParams(): Promise<Props["params"][]> {
+  const posts = await getData();
+  const tags = uniq(posts.flatMap((post) => post.tags));
+  return tags.map((tag) => ({ tag }));
+}
 
 export async function generateMetadata({
   params,
@@ -22,7 +30,8 @@ export async function generateMetadata({
 }
 
 export default async function BlogPage({ params: { tag } }: Props) {
-  const { posts, views } = await getData();
+  const posts = await getData();
+  const postsWithTag = posts.filter((post) => post.tags.includes(tag));
 
   return (
     <main className="relative z-0">
@@ -34,14 +43,20 @@ export default async function BlogPage({ params: { tag } }: Props) {
           <span className="font-bold">{tag}</span>
         </PageHeaderTitle>
         <div className="mt-4">
-          <Link className="text-emerald-300 hover:underline" href="/blog">
+          <Link className="text-emerald-400 hover:underline" href="/blog">
             Back to all posts
           </Link>
         </div>
       </header>
 
       <section>
-        <PostGrid data={posts.slice(0, 20)} views={views} />
+        <Container>
+          <div className="grid gap-4 md:grid-cols-2 md:gap-8">
+            {postsWithTag.map((post: Post) => {
+              return <PostGridCard key={post.slug} data={post} />;
+            })}
+          </div>
+        </Container>
       </section>
     </main>
   );

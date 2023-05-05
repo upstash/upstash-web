@@ -20,23 +20,23 @@ Upstash Redis and deploy it to Fly.io platform.
 
 - Create a [Fly.io](https://fly.io/) account.
 - Install [flyctl](https://fly.io/docs/getting-started/installing-flyctl/) and
-run `flyctl auth login`
+  run `flyctl auth login`
 
 ### Upstash Redis Setup
 
 - Create a free Global Database
-on [Upstash Console](https://console.upstash.com/)
+  on [Upstash Console](https://console.upstash.com/)
 - Copy the REST_URL and REST_TOKEN, you will use them in the next step.
 
 ### Application Code
 
 - Clone the hello world
-app: `git clone https://github.com/fly-apps/hellonode-builtin`
+  app: `git clone https://github.com/fly-apps/hellonode-builtin`
 - Install dependencies:
-`npm install express @upstash/redis`
+  `npm install express @upstash/redis`
 - Update the server.js and replace `url` and `token`:
 
-```js:server.js
+```js title="server.js"
 const express = require("express");
 const app = express();
 const port = process.env.PORT || 3000;
@@ -63,9 +63,9 @@ app.listen(port, () => console.log(`HelloNode app listening on port ${port}!`));
 ### Run and Deploy
 
 - Run the application locally:
-`node server.js`
+  `node server.js`
 - Launch and deploy to fly.io:
-`flyctl launch`
+  `flyctl launch`
 - You can redeploy your app with `flyctl deploy`
 
 - See your applications url with `flyctl status`

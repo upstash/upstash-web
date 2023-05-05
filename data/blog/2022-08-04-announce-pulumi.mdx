@@ -22,10 +22,10 @@ pulumi new <your_language>
 
 ```js
 const createdDb = new upstash.RedisDatabase("mydb", {
-    databaseName: "pulumi-ts-db",
-    region: "eu-west-1",
-    tls: true
-})
+  databaseName: "pulumi-ts-db",
+  region: "eu-west-1",
+  tls: true,
+});
 ```
 
 #### Go

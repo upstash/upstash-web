@@ -4,7 +4,7 @@ import type { Post } from "contentlayer/generated";
 import { DateTime } from "luxon";
 import Balancer from "react-wrap-balancer";
 
-export default function PostCard({ data }: { data: Post }) {
+export default function PostListCard({ data }: { data: Post }) {
   const { title, slug, date, author, authorObj } = data;
 
   return (

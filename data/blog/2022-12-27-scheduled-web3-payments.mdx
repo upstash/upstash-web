@@ -5,7 +5,6 @@ author: chillyfish
 tags: [web3, serverless, qstash, payments]
 ---
 
-
 Web3 is a confusing place to be for a Web2 developer. The rules here are different here, so the solutions must be as well.
 
 In Web2, building a payroll system is easy. Ask the user for their bank account and routing number, store their information (securely), and call an API to transfer the money between their institutions. Even better, use a service like Plaid to do it all for you.
@@ -16,7 +15,7 @@ If it's more complicated, why would we want to do things this way?
 
 Web3 is about ownership and control.
 
-The Web2 financial system is dependent on banks, who hold your assets and expose interfaces for you to manage them. That's very nice of them, but nothing in this world is free. In exchange for this service, banks get to generate interest off of the liquidity you have stored with them. They loan it out, get a return, then act like nothing ever happened. Under centralized ownership in the hands of banks you have to deal with challenges like holds on your account, pending transactions that don't settle until after a few days later (or ever), and restrictions on how much money you can move and where/when you can move it. In the case of a bank run, you may not have access to your money at all. Can that really be considered *'your'* money?
+The Web2 financial system is dependent on banks, who hold your assets and expose interfaces for you to manage them. That's very nice of them, but nothing in this world is free. In exchange for this service, banks get to generate interest off of the liquidity you have stored with them. They loan it out, get a return, then act like nothing ever happened. Under centralized ownership in the hands of banks you have to deal with challenges like holds on your account, pending transactions that don't settle until after a few days later (or ever), and restrictions on how much money you can move and where/when you can move it. In the case of a bank run, you may not have access to your money at all. Can that really be considered _'your'_ money?
 
 Web3 promises a better financial future, where individuals control their money. Want to generate interest with your saved funds? **You** decide how much money to loan and how much risk you want to take. Want to send your money overseas? Just put in their wallet address and send it in a couple clicks.
 
@@ -42,7 +41,6 @@ async function createPaymentPlan(
 // creates a payment instance from the payment plan
 async function createPaymentInstance(paymentPlanId: string, dueDate: Date);
 ```
-
 
 ### Sending the message
 

@@ -59,28 +59,28 @@ The first feature we will implement is the function that will refresh our list o
 
 File `pages/api/refresh-list.ts`:
 
-```typescript
-import { Redis } from "@upstash/redis"
+```ts
+import { Redis } from "@upstash/redis";
 
-export const config = { runtime: "edge" }
+export const config = { runtime: "edge" };
 
 const redisClient = new Redis({
   url: process.env.UPSTASH_REDIS_URL,
   token: process.env.UPSTASH_REDIS_TOKEN,
-})
+});
 
 export default async function handler() {
   const wordResponse = await fetch(
     "https://raw.githubusercontent.com/kay-is/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/master/en"
-  )
-  const words = await wordResponse.text()
+  );
+  const words = await wordResponse.text();
 
-  const redisCommands = redisClient.pipeline()
+  const redisCommands = redisClient.pipeline();
   words
     .trim()
     .split("\n")
-    .forEach((word) => redisCommands.sadd("words", word))
-  await redisCommands.exec()
+    .forEach((word) => redisCommands.sadd("words", word));
+  await redisCommands.exec();
 }
 ```
 
@@ -117,22 +117,22 @@ The next feature is a utility function that will mask the words in a text when t
 
 File `utils/word-filter.ts`:
 
-```typescript
-import { Redis } from "@upstash/redis"
+```ts
+import { Redis } from "@upstash/redis";
 
 const redisClient = new Redis({
   url: process.env.UPSTASH_REDIS_URL,
   token: process.env.UPSTASH_REDIS_TOKEN,
-})
+});
 
 export async function filter(text: string) {
-  const filteredWords = await redisClient.smembers("words")
+  const filteredWords = await redisClient.smembers("words");
 
-  let maskedText = text
+  let maskedText = text;
   for (let word of filteredWords)
-    maskedText = maskedText.replaceAll(new RegExp(word, "gi"), "[REDACTED]")
+    maskedText = maskedText.replaceAll(new RegExp(word, "gi"), "[REDACTED]");
 
-  return maskedText
+  return maskedText;
 }
 ```
 
@@ -148,14 +148,14 @@ To see the filter in action, let's replace the content of `pages/index.ts` with 
 
 File `pages/index.ts`:
 
-```typescript
-import Head from "next/head"
-import { filter } from "@/utils/word-filter"
+```ts
+import Head from "next/head";
+import { filter } from "@/utils/word-filter";
 
-export const config = { runtime: "experimental-edge" }
+export const config = { runtime: "experimental-edge" };
 
 interface HomeProps {
-  maskedText: string
+  maskedText: string;
 }
 
 export default function Home(props: HomeProps) {
@@ -169,14 +169,14 @@ export default function Home(props: HomeProps) {
         <p>{props.maskedText}</p>
       </div>
     </>
-  )
+  );
 }
 
 export async function getServerSideProps(): Promise<{ props: HomeProps }> {
   const maskedText = await filter(
     "He slipped and fell on his butt. Well, that wasn't very sexy."
-  )
-  return { props: { maskedText } }
+  );
+  return { props: { maskedText } };
 }
 ```
 
@@ -192,19 +192,19 @@ The first API route works like the home page; it returns JSON and no HTML. Creat
 
 File `pages/api/filtered-data.ts`:
 
-```typescript
-import { filter } from "@/utils/word-filter"
-export const config = { runtime: "edge" }
+```ts
+import { filter } from "@/utils/word-filter";
+export const config = { runtime: "edge" };
 
 export default async function handler() {
   const maskedText = await filter(
     "He slipped and fell on his butt. Well, that wasn't very sexy."
-  )
+  );
 
   return new Response(JSON.stringify({ text: maskedText }), {
     status: 200,
     headers: { "content-type": "application/json" },
-  })
+  });
 }
 ```
 
@@ -216,19 +216,19 @@ This route accepts text via request and returns the filtered version. Create a n
 
 File `pages/api/filter.ts`:
 
-```typescript
-import type { NextApiRequest } from "next"
-import { filter } from "@/utils/word-filter"
+```ts
+import type { NextApiRequest } from "next";
+import { filter } from "@/utils/word-filter";
 
-export const config = { runtime: "edge" }
+export const config = { runtime: "edge" };
 
 export default async function handler(request: NextApiRequest) {
-  const { text } = await new Response(request.body).json()
-  const maskedText = await filter(text)
+  const { text } = await new Response(request.body).json();
+  const maskedText = await filter(text);
   return new Response(JSON.stringify({ text: maskedText }), {
     status: 200,
     headers: { "content-type": "application/json" },
-  })
+  });
 }
 ```
 
@@ -326,4 +326,3 @@ In the case of a real data filter, we might want to trigger the function in resp
 ## Additional Resources
 
 You can find the complete project [on GitHub](https://github.com/kay-is/upstash-vercel-edge-cron).
-

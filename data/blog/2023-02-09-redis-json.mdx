@@ -5,11 +5,14 @@ author: enes
 tags: [redis, json, announce]
 ---
 
-I am excited to announce the JSON support in Upstash for Redis®. This means Upstash is compatible [RedisJSON API](https://redis.io/docs/stack/json/).  You can leverage RedisJSON API using these [client libraries](https://redis.io/docs/stack/json/clients/) as well as [Upstash SDK for Redis](https://docs.upstash.com/redis/sdks/javascriptsdk/modules/json).
+I am excited to announce the JSON support in Upstash for Redis®. This means Upstash is compatible [RedisJSON API](https://redis.io/docs/stack/json/). You can leverage RedisJSON API using these [client libraries](https://redis.io/docs/stack/json/clients/) as well as [Upstash SDK for Redis](https://docs.upstash.com/redis/sdks/javascriptsdk/modules/json).
 
 ### What is RedisJSON?
+
 <Note info>
-Upstash does not use or copy [RedisJSON](https://redis.io/docs/stack/json/) which is licensed by Redis® Ltd. Upstash provides a custom implementation of RedisJSON compatibility.
+  Upstash does not use or copy [RedisJSON](https://redis.io/docs/stack/json/)
+  which is licensed by Redis® Ltd. Upstash provides a custom implementation of
+  RedisJSON compatibility.
 </Note>
 
 [RedisJSON](https://redis.io/docs/stack/json/) is a Redis® module that implements the standard specification for JSON, in Redis. It provides Redis® with native JSON data storage, manipulation, and processing capabilities, allowing developers to store, retrieve, and manipulate JSON data in Redis® using Redis® commands. With RedisJSON, developers can use Redis® as a complete solution for working with JSON data, eliminating the need to use additional data storage technologies for this purpose.
@@ -17,14 +20,16 @@ Upstash does not use or copy [RedisJSON](https://redis.io/docs/stack/json/) whic
 ### Why is it important?
 
 <Note info>
-    Upstash does not use or copy [RedisJSON](https://redis.io/docs/stack/json/) which is licensed by Redis® Ltd. Upstash provides a custom implementation of RedisJSON compatibility.
+  Upstash does not use or copy [RedisJSON](https://redis.io/docs/stack/json/)
+  which is licensed by Redis® Ltd. Upstash provides a custom implementation of
+  RedisJSON compatibility.
 </Note>
 
 RedisJSON is important because it provides native JSON support, which allows developers to work with JSON data in Redis® in a more efficient and convenient way. Prior to RedisJSON, working with JSON data in Redis® involved serializing and deserializing JSON data, which added overhead and complexity to the process.
 
 With RedisJSON, developers can process the JSON data in Redis® using Redis® commands, just like they would with any other type of data in Redis. This eliminates the need for serialization and deserialization, making the process of working with JSON data in Redis® faster and more efficient.
 
-In addition, RedisJSON provides a number of advanced features for working with JSON data,  and perform operations on arrays and objects, and more. These features make RedisJSON a valuable tool for developers looking to store, process, and manipulate JSON data in Redis.
+In addition, RedisJSON provides a number of advanced features for working with JSON data, and perform operations on arrays and objects, and more. These features make RedisJSON a valuable tool for developers looking to store, process, and manipulate JSON data in Redis.
 
 ### Example with and without RedisJSON
 
@@ -33,7 +38,6 @@ We will write a simple example where we update a field in a JSON object with and
 **Without RedisJSON**
 
 ```jsx
-
 // myjson -> { name: "John", age: 30 }
 
 let myjson = await client.get("myjson");
@@ -47,14 +51,14 @@ Cost of the above code is 2 Redis® calls + 1 serialization + 1 deserialization.
 **With RedisJSON**
 
 ```jsx
-await client.json.set('myjson', '$.age', 30);
+await client.json.set("myjson", "$.age", 30);
 ```
 
 Cost of the above code is a single Redis® call. You do not worry about atomicity as it is a single operation.
 
 ### Legal Note
 
-Well, yes, we know RedisJSON is under the license of Redis® Ltd which is RSAL2/SSPL. Upstash did not use or copy any portion of RedisJSON.  We implemented its API from scratch, compatible with the API. Indeed, even their license was non-restrictive, we would still prefer to implement it ourselves 😎.
+Well, yes, we know RedisJSON is under the license of Redis® Ltd which is RSAL2/SSPL. Upstash did not use or copy any portion of RedisJSON. We implemented its API from scratch, compatible with the API. Indeed, even their license was non-restrictive, we would still prefer to implement it ourselves 😎.
 
 ### Closing Notes
 

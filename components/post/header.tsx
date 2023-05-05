@@ -38,7 +38,7 @@ export default function PostHeader({ post }: Props) {
           />
           <Link
             href={`/blog/author/${post.author}`}
-            className="mt-2 hover:text-emerald-300 hover:underline"
+            className="mt-2 hover:text-emerald-400 hover:underline"
           >
             {post.authorObj.name}
           </Link>

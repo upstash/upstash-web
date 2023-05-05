@@ -5,13 +5,14 @@ author: noah
 tags: [cloudflare-workers, kafka, edge, logs]
 ---
 
-
 In this tutorial, we will show how to collect logs from Cloudflare Workers to Serverless Kafka.
 
 ### Kafka Setup
+
 Create a Kafka cluster and topic using [Upstash Console](https://console.upstash.com) or [Upstash CLI](https://github.com/upstash/cli). Copy the Webhook URL to be used in the next steps.
 
 ### Project Setup
+
 We will use Wrangler 2 for deployment, so please install (or upgrade) [Wrangler 2](https://developers.cloudflare.com/workers/wrangler/).
 
 Create a folder for your project and run `wrangler init`. Select `js`:
@@ -31,14 +32,14 @@ Would you like to create a Worker at src/index.js? (y/n)
 ✨ Created src/index.js
 ```
 
-
 ### The Code
 
 Update `src/index.js` as below:
+
 ```js
 export default {
   async fetch(request, env, context) {
-    context.waitUntil(postLog("some log from cf workers!"))
+    context.waitUntil(postLog("some log from cf workers!"));
     return new Response("Hello World!");
   },
 };
@@ -53,8 +54,8 @@ function postLog(data) {
 
 Copy/paste the webhook URL from [Upstash Console](https://console.upstash.com). Webhook URL simply pushes everything posted to the Kafka. You can also use [Upstash Kafka SDK](https://github.com/upstash/upstash-kafka) or directly the [REST API](https://docs.upstash.com/kafka/rest).
 
-
 ### Test and Deploy
+
 You can test the function locally with `wrangler dev`.
 
 Deploy your function to Cloudflare with `wrangler publish`
@@ -65,4 +66,3 @@ The endpoint of the function will be printed. You can check if logs are collecte
 curl https://definite-goldfish-14184-us1-rest-kafka.upstash.io/consume/GROUP_NAME/GROUP_INSTANCE_NAME/mytopic -H "Kafka-Auto-Offset-Reset: earliest" -u \
   REPLACE_HERE
 ```
-

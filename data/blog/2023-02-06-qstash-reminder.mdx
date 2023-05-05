@@ -2,9 +2,8 @@
 slug: qstash-reminder
 title: Building Reminders for Whatsapp (GPT Online) using QStash
 author: bilaltahir
-tags: [redis, vercel, nextjs, vercel-edge, edge-flags]
+tags: [qstash, redis, vercel, nextjs, vercel-edge, edge-flags]
 ---
-
 
 QStash is a task scheduler and message queue system designed for serverless environments. It's a valuable tool for developers as it allows you to set up automated workflows that run at specific intervals, either once or repeatedly, without having to worry about managing state.
 
@@ -48,26 +47,23 @@ GPT Hotline is built using Next.js so we can trigger QStash in a couple of ways.
 
 ```javascript
 // Note: There are CURL Command examples available in the QStash docs.
-const YOUR_API_URL = 'https://api.example.com'
-const MY_MESSAGE = 'go for a walk'
-const REMINDER_TIME = '3h'
-const MESSENGER = '1800-MCDONALDS'
+const YOUR_API_URL = "https://api.example.com";
+const MY_MESSAGE = "go for a walk";
+const REMINDER_TIME = "3h";
+const MESSENGER = "1800-MCDONALDS";
 
-await fetch(
-    `https://qstash.upstash.io/v1/publish/${YOUR_API_URL}`,
-        {
-        headers: {
-            Authorization: `Bearer ${process.env.QSTASH_TOKEN}`,
-            'Upstash-Delay': REMINDER_TIME,
-            'Content-Type': 'application/json',
-        },
-        method: 'POST',
-        body: JSON.stringify({
-            message: MY_MESSAGE,
-            messenger: MESSENGER,
-        }),
-    }
-)
+await fetch(`https://qstash.upstash.io/v1/publish/${YOUR_API_URL}`, {
+  headers: {
+    Authorization: `Bearer ${process.env.QSTASH_TOKEN}`,
+    "Upstash-Delay": REMINDER_TIME,
+    "Content-Type": "application/json",
+  },
+  method: "POST",
+  body: JSON.stringify({
+    message: MY_MESSAGE,
+    messenger: MESSENGER,
+  }),
+});
 ```
 
 This is an example of a fetch request we can send to QStash. I have hardcoded values and taken out extra fields but this is a good representation of our actual fetch request in the app.
@@ -76,7 +72,7 @@ QStash requires a URL to send the message to. This would be our API URL which we
 
 The Upstash-Delay value determines the time to send the message. Upstash-Delay can take values in seconds (s), minutes (m), hours (h) and days (d). For example, 30m is 30 minutes and 2d is 2 days etc. If we wanted to set up a job that runs periodically rather than just once we would use the Upstash-Cron field with cron logic*.*
 
-We'll also send the message in the body, along with the recipient's number (messenger), and authenticate using our QSTASH\_TOKEN which is set as an environment variable.
+We'll also send the message in the body, along with the recipient's number (messenger), and authenticate using our QSTASH_TOKEN which is set as an environment variable.
 
 And that's it! If everything works as expected, we'll receive a confirmation that the reminder has been set, and QStash will trigger the API at the set time with the message and messenger values (which would in turn send the reminder to the recipient).
 

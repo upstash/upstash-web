@@ -45,7 +45,7 @@ export function ServerlessTitle({
       {children}
       {link && (
         <span
-          className="inline-flex translate-y-1/4 text-emerald-300 opacity-0 transition
+          className="inline-flex translate-y-1/4 text-emerald-400 opacity-0 transition
         group-hover/box-body:translate-y-0 group-hover/box-body:opacity-100"
         >
           <Button
@@ -103,7 +103,7 @@ export function ProductFeatureItem({
     >
       <Icon
         icon={ICON_NAMES.CircleCheck}
-        className={cx("mr-2 text-2xl text-emerald-300")}
+        className={cx("mr-2 text-2xl text-emerald-400")}
       />
       {children}
     </li>

@@ -42,7 +42,7 @@ export default function HomePage() {
                 href={`/careers/${job.slug}`}
               >
                 <h2
-                  className="font-display text-xl font-semibold text-emerald-300
+                  className="font-display text-xl font-semibold text-emerald-400
                 group-hover/job-item:underline"
                 >
                   {job.title}

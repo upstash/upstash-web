@@ -5,8 +5,6 @@ author: russTran
 tags: [ratelimit, email, nextjs, sendgrid, upstash]
 ---
 
-
-
 In today's digital age, email has become an essential part of our daily lives. From personal communication to business marketing campaigns, email is an effective way to reach out to your audience. Last year, as a front-end developer at JUST.engineer, one of my tasks was building a landing page for the company. The landing page had to include a section for customers to send emails to our HR for further discussion. I managed to finish the task, but I also inadvertently overloaded my company mailbox. Let me introduce you to my story and how I managed to fix the problem.
 
 ## Get ready with me
@@ -127,7 +125,6 @@ const handleSubmitData = async (data) => {
 };
 ```
 
-
 ### Deploying to Vercel
 
 The last thing we need to do is to deploy our app to Vercel. It's a free hosting service that allows you to deploy your Next.js app in a few clicks. Check them out at [vercel.com](https://vercel.com).
@@ -139,14 +136,12 @@ Cool! We are finished! Right? ...
 ![meme](https://i.imgflip.com/7eabhz.jpg)
 _Murphy's Law: "Anything that can go wrong will go wrong."_
 
-
 _Things will never go as you expected_. That's the lesson I learned when my boss called me and said our mailbox was on fire. It turned out that some internet trolls had found the form and were spamming the send email button.
 
 ![Burning the mailbox](https://i.ibb.co/dpDyyQP/Screenshot-2023-03-13-at-17-45-53.png)
 _I smell something burning_
 
 ### Upstash has arrived to rescue your mailbox
-
 
 Okay, now we need a way to limit the number of emails that users are allowed to send. That's where Upstash comes in with its magic library: [@upstash/ratelimit](https://github.com/upstash/ratelimit). Let's create a new database in the [Upstash Console](https://console.upstash.com/redis?new=true) and grab our keys: `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`.
 

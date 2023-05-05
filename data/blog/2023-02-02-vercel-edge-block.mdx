@@ -24,15 +24,15 @@ Vercel Edge middleware is a code that intercepts the web requests before being p
 Indeed you can check country and block traffic with a simple if statement in your edge middleware code as below:
 
 ```jsx
-const BLOCKED_COUNTRY = 'BAD_COUNTRY'
+const BLOCKED_COUNTRY = "BAD_COUNTRY";
 
 export function middleware(req: NextRequest) {
-  const country = req.geo.country
+  const country = req.geo.country;
 
   if (country === BLOCKED_COUNTRY) {
-    return new Response('Blocked ', { status: 451 })
+    return new Response("Blocked ", { status: 451 });
   }
-  return new Response(`Greetings`)
+  return new Response(`Greetings`);
 }
 ```
 
@@ -40,15 +40,14 @@ So why do we need edge flags? Edge flags will enable us to manage the rules with
 
 Let’s start..
 
-
 ### Step 1: Redis and Edge Flags Setup
+
 Create a Redis database on [Upstash Console](https://console.upstash.com/redis?new=true). For best performance, select global and the regions that users likely to be.
 
 ![Edge-Flags](/blog/edge-flags-block/eb1.png)
 
-
 Go to [Edge flags page](https://console.upstash.com/edge-flags) and select the database you have just created. Create a new flag with a name `blockTraffic`. Then add a rule for blocked countries:
-`Country` `is in array`  `United States` -> `on`
+`Country` `is in array` `United States` -> `on`
 
 Save and enable the flag.
 
@@ -57,6 +56,7 @@ Save and enable the flag.
 The above flag will be enabled if the request is originating from the United States.
 
 ### Step 2: Next.js Project Setup
+
 Create a Next.js application.
 
 ```shell
@@ -64,68 +64,70 @@ npx create-next-app@latest --typescript
 ```
 
 Install @upstash packages:
+
 ```shell
 $ npm install @upstash/edge-flags @upstash/redis
 ```
 
 Create middleware.ts (top level in your project folder):
 
-```ts:/middleware.ts
+```ts title="/middleware.ts"
 import { NextRequest, NextResponse } from "next/server";
 import { Redis } from "@upstash/redis";
 import { Client as EdgeFlags } from "@upstash/edge-flags";
 
 const edgeFlags = new EdgeFlags({ redis: Redis.fromEnv() });
-export default async function middleware(req: NextRequest): Promise<NextResponse> {
-    const enabled = await edgeFlags.getFlag("blockTraffic", req.geo ?? {})
+export default async function middleware(
+  req: NextRequest
+): Promise<NextResponse> {
+  const enabled = await edgeFlags.getFlag("blockTraffic", req.geo ?? {});
 
-    if (!enabled) {
-        const url = new URL(req.url);
-        url.pathname = "/blocked";
-        return NextResponse.rewrite(url);
-    }
+  if (!enabled) {
+    const url = new URL(req.url);
+    url.pathname = "/blocked";
+    return NextResponse.rewrite(url);
+  }
 
-    return NextResponse.next();
+  return NextResponse.next();
 }
 
 export const config = {
-    matcher: "/",
+  matcher: "/",
 };
 ```
 
 Let's create a page for the blocked:
-```tsx:pages/blocked.tsx
+
+```tsx title="pages/blocked.tsx"
 import styles from "@/styles/Home.module.css";
 
 export default function Blocked() {
-    return (
-        <div>
-            <main className={styles.main}>
-                <h3>Access blocked.</h3>
-            </main>
-        </div>
-    );
+  return (
+    <div>
+      <main className={styles.main}>
+        <h3>Access blocked.</h3>
+      </main>
+    </div>
+  );
 }
 ```
 
 That's all! Now you can deploy the app to Vercel:
 `vercel deploy`
 
-
 Make sure to add the environment variables to Vercel either by copying them from the [Upstash console](https://console.upstash.com/redis) or by using the [Upstash integration](https://vercel.com/integrations/upstash).
 
 ![Vercel](/blog/edge-flags-middleware/vercel-env.png)
 
-
 Visit the page, you should be redirected to the blocked page if you are in US. Test different countries using VPN.
 
-
 <Note title="Geolocation in development">
-    Geolocation data is not avallable locally. You have to deploy to Vercel to test it the app.
+  Geolocation data is not avallable locally. You have to deploy to Vercel to
+  test it the app.
 </Note>
 
-
 ### Links
+
 [Edge flags documentation](https://docs.upstash.com/redis/sdks/edge-flags/getstarted)
 
 [Vercel Edge middleware](https://vercel.com/docs/concepts/functions/edge-middleware)

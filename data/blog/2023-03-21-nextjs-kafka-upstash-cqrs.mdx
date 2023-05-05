@@ -99,7 +99,7 @@ We will start by implementing the commands of CQRS with GraphQL mutation resolve
 
 File `schema/resolvers.ts`:
 
-```typescript
+```ts
 ...
 export const resolvers = {
   Query: {...},
@@ -145,7 +145,7 @@ Besides the task construction in `createTask`, there is not much logic in these 
 
 File `utils/eventstore.ts`:
 
-```typescript
+```ts
 ...
 async saveEvent(event: Omit<TaskEvent, "offset">) {
   await fetch(
@@ -161,7 +161,7 @@ Nothing fancy here either; just sending a `GET` request with our new event to Up
 
 File `utils/notificator.ts`:
 
-```typescript
+```ts
 ...
 export const notify = async () => {
   const qstashClient = new Client({
@@ -186,7 +186,7 @@ There is just one query resolver, and it lists all the tasks.
 
 File `schema/resolvers.ts`:
 
-```typescript
+```ts
 ...
 export const resolvers = {
   Query: {
@@ -203,7 +203,7 @@ The resolver calls `loadTasks` on the `projectionStore`, which handles the work.
 
 File `utils/projectionstore.ts`:
 
-```typescript
+```ts
 ...
 async loadTasks(): Promise<Task[]> {
   const taskIds = await this.redisClient.smembers("tasks")
@@ -224,7 +224,7 @@ The handler of our serverless function is quite simple:
 
 File `app/projection/route.ts`:
 
-```typescript
+```ts
 ...
 export const POST = validate(async (request: Request) => {
   const offset = await projectionStore.loadOffset()
@@ -241,7 +241,7 @@ The function handler is wrapped in a `validate` function from our `notificator`,
 
 File `utils/notificator.ts`:
 
-```typescript
+```ts
 ...
 export const validate = (handler: RequestHandler) => {
   const qstashReceiver = new Receiver({
@@ -274,7 +274,7 @@ The `loadEvents` method of our `EventStore` looks like this:
 
 File `utils/eventstore.ts`:
 
-```typescript
+```ts
 ...
 async loadEvents(offset: number): Promise<TaskEvent[]> {
   const response = await fetch(this.fetchUrl, {
@@ -306,7 +306,7 @@ Finally, the `processEvents` method of the `projectionStore` will calculate our 
 
 File `utils/projectionstore.ts`:
 
-```typescript
+```ts
 ...
 async processEvents(events: TaskEvent[]) {
   if (events.length === 0) return
@@ -348,7 +348,7 @@ We will write all Upstash credentials into a `.env.local` file, so they are avai
 
 File `.env.local`:
 
-``` shell
+```shell
 UPSTASH_REDIS_REST_URL=...
 UPSTASH_REDIS_REST_TOKEN=...
 
@@ -442,7 +442,7 @@ mutation {
 
 Console output:
 
-``` shell
+```shell
 [EventStore] Saving Event...
 [EventStore] Event saved!
 [EventStore] Notifying other services...
@@ -462,6 +462,7 @@ Console output:
 [ProjectionStore] Events processed!
 [ProjectionHandler] Done!
 ```
+
        &nbsp;
 
 ### Listing all Tasks
@@ -480,7 +481,7 @@ query {
 
 Console Output:
 
-``` shell
+```shell
 [ProjectionStore] Loading tasks...
 [ProjectionStore] 1 tasks loaded!
 ```
@@ -503,7 +504,7 @@ mutation {
 
 Console Output:
 
-``` shell
+```shell
 [EventStore] Saving Event...
 [EventStore] Event saved!
 [EventStore] Notifying other services...
@@ -536,7 +537,7 @@ mutation {
 
 Console Output:
 
-``` shell
+```shell
 [EventStore] Saving Event...
 [EventStore] Event saved!
 [EventStore] Notifying other services...

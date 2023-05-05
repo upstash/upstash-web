@@ -115,22 +115,25 @@ You can get your Upstash Redis REST Credentials from the database details page.
 Replace your `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_PASSWORD` in the code snippet.
 
 ```javascript
-redisClient.auth('UPSTASH_REDIS_REST_URL', 'UPSTASH_REDIS_REST_PASSWORD');
-spotifyData = await redisClient.get('spotify-cache');
+redisClient.auth("UPSTASH_REDIS_REST_URL", "UPSTASH_REDIS_REST_PASSWORD");
+spotifyData = await redisClient.get("spotify-cache");
 if (spotifyData.data == null) {
-    spotifyData = await NetlifyGraph.fetchSpotifyFeatured({}, {accessToken: accessToken});
-    if (spotifyData.errors) {
-        console.error(JSON.stringify(spotifyData.errors, null, 2));
-    } else {
-        await redisClient.setex('spotify-cache', 300, JSON.stringify(spotifyData));
-    }
+  spotifyData = await NetlifyGraph.fetchSpotifyFeatured(
+    {},
+    { accessToken: accessToken }
+  );
+  if (spotifyData.errors) {
+    console.error(JSON.stringify(spotifyData.errors, null, 2));
+  } else {
+    await redisClient.setex("spotify-cache", 300, JSON.stringify(spotifyData));
+  }
 } else {
-    spotifyData = JSON.parse(spotifyData.data)
+  spotifyData = JSON.parse(spotifyData.data);
 }
 res.setHeader("Content-Type", "application/json");
 
 return res.status(200).json({
-    spotifyData
+  spotifyData,
 });
 ```
 

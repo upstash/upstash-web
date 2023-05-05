@@ -79,21 +79,26 @@ const selectedNote = notes[0];
 const title = 'Upstash Astro Notes';
 ---
 
-<Layout title={title}>
-	<main class="wrapper">
-		<h1>{title}</h1>
-		<div class="container">
-			<header class="heading">
-				{selectedNote ? <HeadingBar note={selectedNote} {editMode} /> : null}
-			</header>
-			<aside class="list">
-				<NotesList client:load {notes} selectedId={selectedNote?.id} {editMode} />
-			</aside>
-			<section class="note">
-				<NoteBody note={selectedNote} />
-			</section>
-		</div>
-	</main>
+<Layout title="{title}">
+  <main class="wrapper">
+    <h1>{title}</h1>
+    <div class="container">
+      <header class="heading">
+        {selectedNote ? <HeadingBar note="{selectedNote}" {editMode} /> : null}
+      </header>
+      <aside class="list">
+        <NotesList
+          client:load
+          {notes}
+          selectedId="{selectedNote?.id}"
+          {editMode}
+        />
+      </aside>
+      <section class="note">
+        <NoteBody note="{selectedNote}" />
+      </section>
+    </div>
+  </main>
 </Layout>
 ```
 
@@ -126,7 +131,7 @@ We will minimize JavaSript use and lean heavily on HTML. To achieve that, in the
 
 The `src/pages/api.ts` file will handle all of them, ultimately from a Cloudflare Worker. From there we reach out to the Upstash serverless database to complete the CRUD (create, read, update and delete) operation. Let&rsquo;s take a closer look at the&nbsp;file. So, this file handles HTTP requests sent to `http://localhost:3000/api`. We are using the `@upstash/redis` package to interface with our remote database. We import this and then configure the Redis instance at the&nbsp;top:
 
-```typescript
+```ts
 import { Redis } from "@upstash/redis";
 
 /* TRUNCATED */
@@ -155,14 +160,14 @@ We set up our note creation process so that new notes have a title automatically
 
 The form contains a hidden `action` field used in the endpoint code above. Here the action is `create` and we will use `update` and `delete` later (in other forms). Essentially our `put` function gets the action and request URL using standard APIs. If the action is `create` we make a new note in a **Hashset data structure**. This is a [Redis structure which fits our use case](https://redis.io/docs/data-types/tutorial/) well. We use the current timestamp (as [number of milliseconds since ECMAScript epoch](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTime)) as the element `id`. This works fine for our simple app. The `redis.hset` call takes care of putting the new note to the database for&nbsp;us:
 
-```typescript
+```ts
 const date = new Date();
 const id = date.getTime();
 
 /* TRUNCATED */
 
 await redis.hset(HASHSET_KEY, {
-	[id]: JSON.stringify(note),
+  [id]: JSON.stringify(note),
 });
 urlParams.append("edit", "true");
 urlParams.append("note", id.toString(10));
@@ -178,7 +183,7 @@ Finally, notice how we add the `edit` and `note` query parameters on the end of 
 
 At the moment we can only create a skeleton note and cannot even edit it, so here is the complete code for the API. Update `src/pages/api.ts` with the full functions:
 
-```typescript
+```ts
 import { Redis } from "@upstash/redis/cloudflare";
 import type { APIRoute } from "astro";
 import type { Note } from "../types/note";
@@ -191,9 +196,9 @@ const token = import.meta.env.UPSTASH_REDIS_REST_TOKEN;
 const redis = new Redis({ url, token });
 
 export const get: APIRoute = async function get() {
-	try {
-		const notes: Record<string, Note> | null = await redis.hgetall(HASHSET_KEY);
-		/* notes (when not null) has structure:
+  try {
+    const notes: Record<string, Note> | null = await redis.hgetall(HASHSET_KEY);
+    /* notes (when not null) has structure:
 				{
 					'1660841122914': { // this is the note id
 						title: 'First One',
@@ -208,86 +213,86 @@ export const get: APIRoute = async function get() {
 				}
 		*/
 
-		if (notes) {
-			const sortedNotes: Note[] = Object.entries(notes)
-				.map(([id, { title, text, modified }]) => ({
-					id,
-					title,
-					text,
-					modified,
-				}))
-				.sort((a, b) => Date.parse(b.modified) - Date.parse(a.modified));
+    if (notes) {
+      const sortedNotes: Note[] = Object.entries(notes)
+        .map(([id, { title, text, modified }]) => ({
+          id,
+          title,
+          text,
+          modified,
+        }))
+        .sort((a, b) => Date.parse(b.modified) - Date.parse(a.modified));
 
-			return new Response(JSON.stringify({ notes: sortedNotes }), {
-				headers: { "content-type": "application/json" },
-				status: 200,
-			});
-		}
+      return new Response(JSON.stringify({ notes: sortedNotes }), {
+        headers: { "content-type": "application/json" },
+        status: 200,
+      });
+    }
 
-		return new Response(JSON.stringify({ notes: [] }), {
-			headers: { "content-type": "application/json" },
-			status: 200,
-		});
-	} catch (error: unknown) {
-		console.error(`Error in /api GET method: ${error as string}`);
-		return new Response(JSON.stringify({ notes: [] }), {
-			headers: { "content-type": "application/json" },
-			status: 200,
-		});
-	}
+    return new Response(JSON.stringify({ notes: [] }), {
+      headers: { "content-type": "application/json" },
+      status: 200,
+    });
+  } catch (error: unknown) {
+    console.error(`Error in /api GET method: ${error as string}`);
+    return new Response(JSON.stringify({ notes: [] }), {
+      headers: { "content-type": "application/json" },
+      status: 200,
+    });
+  }
 };
 
 export const post: APIRoute = async function post({ request }) {
-	try {
-		const form = await request.formData();
-		const action = form.get("action");
-		const redirectURL: string = getDomainUrl(request);
-		const urlParams = new URLSearchParams();
+  try {
+    const form = await request.formData();
+    const action = form.get("action");
+    const redirectURL: string = getDomainUrl(request);
+    const urlParams = new URLSearchParams();
 
-		switch (action) {
-			case "create": {
-				const date = new Date();
-				const id = date.getTime();
-				const modified = date.toISOString();
-				const note = {
-					title: "Untitled",
-					text: "",
-					modified,
-				};
-				await redis.hset(HASHSET_KEY, {
-					[id]: JSON.stringify(note),
-				});
-				urlParams.append("edit", "true");
-				urlParams.append("note", id.toString(10));
+    switch (action) {
+      case "create": {
+        const date = new Date();
+        const id = date.getTime();
+        const modified = date.toISOString();
+        const note = {
+          title: "Untitled",
+          text: "",
+          modified,
+        };
+        await redis.hset(HASHSET_KEY, {
+          [id]: JSON.stringify(note),
+        });
+        urlParams.append("edit", "true");
+        urlParams.append("note", id.toString(10));
 
-				break;
-			}
-			case "update": {
-				const id = form.get("id") as string;
-				const title = form.get("title");
-				const text = form.get("text");
-				const modified = new Date().toISOString();
+        break;
+      }
+      case "update": {
+        const id = form.get("id") as string;
+        const title = form.get("title");
+        const text = form.get("text");
+        const modified = new Date().toISOString();
 
-				await redis.hset(HASHSET_KEY, {
-					[id]: JSON.stringify({ title, text, modified }),
-				});
-				urlParams.append("note", id);
-				break;
-			}
-			case "delete": {
-				const id = form.get("id");
-				if (typeof id === "string") {
-					await redis.hdel(HASHSET_KEY, id);
-				}
-				break;
-			}
-			default:
-		}
-		return Response.redirect(`${redirectURL}?${urlParams.toString()}`);
-	} catch (error: unknown) {
-		console.error(`Error in /api PUT method: ${error as string}`);
-		return Response.redirect(getDomainUrl(request));
-	}
+        await redis.hset(HASHSET_KEY, {
+          [id]: JSON.stringify({ title, text, modified }),
+        });
+        urlParams.append("note", id);
+        break;
+      }
+      case "delete": {
+        const id = form.get("id");
+        if (typeof id === "string") {
+          await redis.hdel(HASHSET_KEY, id);
+        }
+        break;
+      }
+      default:
+    }
+    return Response.redirect(`${redirectURL}?${urlParams.toString()}`);
+  } catch (error: unknown) {
+    console.error(`Error in /api PUT method: ${error as string}`);
+    return Response.redirect(getDomainUrl(request));
+  }
 };
 ```
 
@@ -309,8 +314,8 @@ import svelte from "@astrojs/svelte";
 
 // https://astro.build/config
 export default defineConfig({
-	output: "server",
-	integrations: [svelte()],
+  output: "server",
+  integrations: [svelte()],
 });
 ```
 
@@ -383,8 +388,8 @@ Try creating another note once the first is saved. This time click `Cancel`, ins
 
 ```javascript
 function handleCancel() {
-	const searchParams = new URLSearchParams({ note: id });
-	window.location.replace(`/?${searchParams}`);
+  const searchParams = new URLSearchParams({ note: id });
+  window.location.replace(`/?${searchParams}`);
 }
 ```
 
@@ -425,19 +430,19 @@ import cloudflare from "@astrojs/cloudflare";
 
 // https://astro.build/config
 export default defineConfig({
-	output: "server",
-	integrations: [svelte()],
-	adapter: cloudflare(),
-	vite: {
-		define: {
-			"process.env.UPSTASH_REDIS_REST_URL": JSON.stringify(
-				process.env.UPSTASH_REDIS_REST_URL,
-			),
-			"process.env.UPSTASH_REDIS_REST_TOKEN": JSON.stringify(
-				process.env.UPSTASH_REDIS_REST_TOKEN,
-			),
-		},
-	},
+  output: "server",
+  integrations: [svelte()],
+  adapter: cloudflare(),
+  vite: {
+    define: {
+      "process.env.UPSTASH_REDIS_REST_URL": JSON.stringify(
+        process.env.UPSTASH_REDIS_REST_URL
+      ),
+      "process.env.UPSTASH_REDIS_REST_TOKEN": JSON.stringify(
+        process.env.UPSTASH_REDIS_REST_TOKEN
+      ),
+    },
+  },
 });
 ```
 

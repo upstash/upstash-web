@@ -9,11 +9,11 @@ tags: [qstash, sveltekit]
 
 ## The project
 
-In a previous post, I showed how to build a [movie search site](https://upstash.com/blog/svelte-with-serverless-redis) that cached the API responses in Redis to improve the response time. The data is set to expire after 24 hours so that we have reasonably up-to-date information. This works great, but once the data expires in Redis, the user has to wait for the API response again. Instead, what if we could quickly return *stale data* to the user and refresh the data in the background?
+In a previous post, I showed how to build a [movie search site](https://upstash.com/blog/svelte-with-serverless-redis) that cached the API responses in Redis to improve the response time. The data is set to expire after 24 hours so that we have reasonably up-to-date information. This works great, but once the data expires in Redis, the user has to wait for the API response again. Instead, what if we could quickly return _stale data_ to the user and refresh the data in the background?
 
 However, we don’t want the user to wait while we’re refreshing the cache — that would defeat the whole point. Instead, we’ll use QStash to refresh the cache for us in a separate request, so it doesn’t impact the user’s request at all.
 
-Note that the effectiveness of this technique depends on the API you’re using. If you have a super fast API, implementing a technique like this may not be helpful and could actually *slow your app down*. Also, there may be some apps where showing stale data is not appropriate. Make sure to understand the tradeoffs before using this in production.
+Note that the effectiveness of this technique depends on the API you’re using. If you have a super fast API, implementing a technique like this may not be helpful and could actually _slow your app down_. Also, there may be some apps where showing stale data is not appropriate. Make sure to understand the tradeoffs before using this in production.
 
 ## Prerequisites
 
@@ -42,37 +42,37 @@ Here’s what our new caching logic in `src/lib/redis.ts` looks like. The main c
 
 ```ts
 function getMovieKey(id: number) {
-	return `movie:${id}`;
+  return `movie:${id}`;
 }
 
 function getExpiryKey(id: number) {
-	return getMovieKey(id) + ':fresh';
+  return getMovieKey(id) + ":fresh";
 }
 
 export async function cacheMovieResponse(
-	id: number,
-	movie: TMDB.Movie,
-	credits: TMDB.MovieCreditsResponse
+  id: number,
+  movie: TMDB.Movie,
+  credits: TMDB.MovieCreditsResponse
 ) {
-	try {
-		console.log(`Caching ${id}`);
-		const cache: MovieDetails = {
-			movie,
-			credits
-		};
-		const movieKey = getMovieKey(id);
-		const expiryKey = getExpiryKey(id);
-		await redis
-			.multi()
-			// store movie response
-			.set(movieKey, JSON.stringify(cache))
-			// this will track whether the data needs to be refreshed
-			// set the last argument to a smaller value for easier testing
-			.set(expiryKey, 'true', 'EX', DEFAULT_EXPIRY)
-			.exec();
-	} catch (e) {
-		console.log('Unable to cache', id, e);
-	}
+  try {
+    console.log(`Caching ${id}`);
+    const cache: MovieDetails = {
+      movie,
+      credits,
+    };
+    const movieKey = getMovieKey(id);
+    const expiryKey = getExpiryKey(id);
+    await redis
+      .multi()
+      // store movie response
+      .set(movieKey, JSON.stringify(cache))
+      // this will track whether the data needs to be refreshed
+      // set the last argument to a smaller value for easier testing
+      .set(expiryKey, "true", "EX", DEFAULT_EXPIRY)
+      .exec();
+  } catch (e) {
+    console.log("Unable to cache", id, e);
+  }
 }
 ```
 
@@ -80,28 +80,31 @@ And here’s what our updated cache retrieval logic looks like. We now retrieve 
 
 ```ts
 export async function getMovieDetailsFromCache(
-	id: number
+  id: number
 ): Promise<MovieDetails | Record<string, never>> {
-	try {
-		const [cached, expiryKey] = await redis.mget(getMovieKey(id), getExpiryKey(id));
+  try {
+    const [cached, expiryKey] = await redis.mget(
+      getMovieKey(id),
+      getExpiryKey(id)
+    );
 
-		if (cached) {
-			if (expiryKey === null) {
-				console.log('Cache expired, sending update request');
-				await sendUpdateRequest(id);
-			}
-			const parsed: MovieDetails = JSON.parse(cached);
-			console.log(`Found ${id} in cache`);
-			return parsed;
-		}
-	} catch (e) {
-		console.log('Unable to retrieve from cache', id, e);
-	}
-	return {};
+    if (cached) {
+      if (expiryKey === null) {
+        console.log("Cache expired, sending update request");
+        await sendUpdateRequest(id);
+      }
+      const parsed: MovieDetails = JSON.parse(cached);
+      console.log(`Found ${id} in cache`);
+      return parsed;
+    }
+  } catch (e) {
+    console.log("Unable to retrieve from cache", id, e);
+  }
+  return {};
 }
 
 async function sendUpdateRequest(id: number) {
-	// TODO
+  // TODO
 }
 ```
 
@@ -114,25 +117,25 @@ Before getting started with QStash, let’s lay the groundwork. QStash needs an 
 Add the following to the `+server.ts` file:
 
 ```ts
-import type { RequestHandler } from './$types';
-import { getMovieDetailsFromApi } from '$lib/api';
+import type { RequestHandler } from "./$types";
+import { getMovieDetailsFromApi } from "$lib/api";
 
 export const POST: RequestHandler = async ({ request }) => {
-	const { id } = await request.json();
-	console.log('Received update request for', id);
+  const { id } = await request.json();
+  console.log("Received update request for", id);
 
-	// this will automatically cache the response
-	await getMovieDetailsFromApi(id);
-	return new Response();
+  // this will automatically cache the response
+  await getMovieDetailsFromApi(id);
+  return new Response();
 };
 ```
 
 When someone POSTs to this endpoint, this will refresh the cache for the movie with the corresponding ID. You can make a request to the endpoint yourself by running the app locally and pasting the following in your browser console:
 
 ```js
-fetch('http://localhost:5173/api/refresh', {
-	body: JSON.stringify({ id: 1894 }),
-	method: 'POST'
+fetch("http://localhost:5173/api/refresh", {
+  body: JSON.stringify({ id: 1894 }),
+  method: "POST",
 });
 ```
 
@@ -158,10 +161,14 @@ CALLBACK_URL=
 Now that we have the QStash keys, we can call it in our `sendUpdateRequest` function. First, instantiate the QStash client in `redis.ts` using the environment variables we set:
 
 ```ts
-import { REDIS_CONNECTION, QSTASH_TOKEN, CALLBACK_URL } from '$env/static/private';
+import {
+  REDIS_CONNECTION,
+  QSTASH_TOKEN,
+  CALLBACK_URL,
+} from "$env/static/private";
 
 const qstash = new Client({
-	token: QSTASH_TOKEN
+  token: QSTASH_TOKEN,
 });
 ```
 
@@ -169,18 +176,18 @@ Then, we can call `qstash.publishJSON` in `sendUpdateRequest` to publish a JSON 
 
 ```ts
 async function sendUpdateRequest(id: number) {
-	try {
-		const res = await qstash.publishJSON({
-			url: new URL('/api/refresh', CALLBACK_URL).toString(),
-			body: {
-				id
-			}
-		});
+  try {
+    const res = await qstash.publishJSON({
+      url: new URL("/api/refresh", CALLBACK_URL).toString(),
+      body: {
+        id,
+      },
+    });
 
-		console.log('QStash response:', res);
-	} catch (e) {
-		console.log('Unable to call QStash', e);
-	}
+    console.log("QStash response:", res);
+  } catch (e) {
+    console.log("Unable to call QStash", e);
+  }
 }
 ```
 
@@ -193,35 +200,38 @@ Now let’s test it! To make testing easier, update the line setting `DEFAULT_EX
 It works! Though we do have a security vulnerability — anyone can request the `/api/refresh` endpoint. This might not be a big issue for our app, but it could be for more sensitive workloads. We can use the QStash client’s `Receiver` to make sure the request is coming from QStash. Update our `+server.ts` file to the following:
 
 ```ts
-import type { RequestHandler } from './$types';
-import { Receiver } from '@upstash/qstash';
-import { QSTASH_CURRENT_SIGNING_KEY, QSTASH_NEXT_SIGNING_KEY } from '$env/static/private';
-import { getMovieDetailsFromApi } from '$lib/api';
+import type { RequestHandler } from "./$types";
+import { Receiver } from "@upstash/qstash";
+import {
+  QSTASH_CURRENT_SIGNING_KEY,
+  QSTASH_NEXT_SIGNING_KEY,
+} from "$env/static/private";
+import { getMovieDetailsFromApi } from "$lib/api";
 
 const receiver = new Receiver({
-	currentSigningKey: QSTASH_CURRENT_SIGNING_KEY,
-	nextSigningKey: QSTASH_NEXT_SIGNING_KEY
+  currentSigningKey: QSTASH_CURRENT_SIGNING_KEY,
+  nextSigningKey: QSTASH_NEXT_SIGNING_KEY,
 });
 
 export const POST: RequestHandler = async ({ request }) => {
-	const body = await request.text();
-	const isValid = await receiver.verify({
-		signature: request.headers.get('Upstash-Signature') ?? '',
-		body
-	});
+  const body = await request.text();
+  const isValid = await receiver.verify({
+    signature: request.headers.get("Upstash-Signature") ?? "",
+    body,
+  });
 
-	if (!isValid) {
-		console.log('Invalid request:', body);
-		return new Response(null, { status: 400 });
-	}
+  if (!isValid) {
+    console.log("Invalid request:", body);
+    return new Response(null, { status: 400 });
+  }
 
-	// normally we would use .json(), but we've already consumed the request for the verification
-	const { id } = JSON.parse(body);
-	console.log('Received update request for', id);
+  // normally we would use .json(), but we've already consumed the request for the verification
+  const { id } = JSON.parse(body);
+  console.log("Received update request for", id);
 
-	// this will automatically cache the response
-	await getMovieDetailsFromApi(id);
-	return new Response();
+  // this will automatically cache the response
+  await getMovieDetailsFromApi(id);
+  return new Response();
 };
 ```
 

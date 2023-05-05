@@ -5,7 +5,6 @@ author: vladimir
 tags: [go, redis, opentelemetry, Distributed tracing]
 ---
 
-
 In this tutorial, you will learn how to connect to Upstash Redis database using go-redis client and monitor performance of your app using distributed tracing.
 
 ## What is go-redis?
@@ -58,7 +57,6 @@ You can use go-redis to [cache](https://redis.uptrace.dev/guide/go-redis-cache.h
 
 Tracing allows to follow requests as they travel through distributed systems. You get a full context of what is different, what is broken, and which logs & errors are relevant.
 
-
 ![Trace](/blog/opentelemetry/trace-graph.png)
 
 ## What is OpenTelemetry?
@@ -107,9 +105,7 @@ You can [install Uptrace](https://get.uptrace.dev/guide/opentelemetry-tracing-to
 
 As expected, redisotel creates [spans](https://opentelemetry.uptrace.dev/guide/distributed-tracing.html#spans) for processed Redis commands and records any errors as they occur. Here is how the collected information is displayed at Uptrace:
 
-<FullWidth>
-![Redis trace](/blog/opentelemetry/trace.png)
-</FullWidth>
+<FullWidth>![Redis trace](/blog/opentelemetry/trace.png)</FullWidth>
 
 You can find a runnable example at [GitHub](https://github.com/go-redis/redis/tree/master/example/otel).
 

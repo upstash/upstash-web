@@ -43,7 +43,7 @@ Vercel supports Edge functions via [Next.js middleware](https://nextjs.org/docs/
 
 Update `pages/api/_middleware.ts` as below:
 
-```typescript
+```ts
 import { Redis } from "@upstash/redis";
 import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 

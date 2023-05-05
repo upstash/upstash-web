@@ -172,7 +172,7 @@ export function HeroProductFeature({
     >
       <Icon
         icon={ICON_NAMES.Check}
-        className={cx("text-xl text-emerald-300")}
+        className={cx("text-xl text-emerald-400")}
       />
       {children}
     </div>

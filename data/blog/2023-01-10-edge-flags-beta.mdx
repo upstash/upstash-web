@@ -9,7 +9,7 @@ Whether you want to ship without breaking things, run A/B tests or just want to 
 feature flags are a great way to dynamically change the behaviour of your app without redeploying. We're excited to announce the public
 beta release of our new feature flagging library: [@upstash/edge-flags](https://github.com/upstash/edge-flags).
 
-*Edge Flags*, as the name implies, is a feature flag solution built to run at the edge. It is using [Upstash Redis](https://upstash.com/), a globally replicated serverless Redis service, to store configuration and is 
+_Edge Flags_, as the name implies, is a feature flag solution built to run at the edge. It is using [Upstash Redis](https://upstash.com/), a globally replicated serverless Redis service, to store configuration and is
 designed to work with [Next.js](https://nextjs.org) and [Vercel](https://vercel.com). We want to support other frameworks in the future, so if you have a suggestion, please let us know!
 
 With the ability to toggle features on and off at the edge, you can quickly respond
@@ -18,11 +18,9 @@ perform A/B testing, gradually roll out a new feature, or simply have the
 ability to turn things off in case of an issue, our feature flagging library has
 you covered.
 
-
 ## How it works
 
 There are two components to this: The [console](https://console.upstash.com/edge-flags) to manage flags and the [typescript sdk](https://github.com/upstash/edge-flags) to use them in your code.
-
 
 ### Console
 
@@ -36,14 +34,12 @@ Each flag can have a [percentage](https://docs.upstash.com/redis/sdks/edge-flags
 In addition to the percentage, you are able to add rules. Rules can be used to target specific users or groups of users. For example, you can target users geographically or users that have a specific email address domain.
 To learn more about differen rule types, please check out the [rules documentation](https://docs.upstash.com/redis/sdks/edge-flags/rules).
 
-
 ### Your App
 
 Adding `@upstash/edge-flags` to your Next.js application is easy:
 All we need to do is to install the package, create a simple edge handler and then use the flag in our frontend.
 
 For a full tutorial, please check out the [quickstart](https://docs.upstash.com/redis/sdks/edge-flags/getstarted).
-
 
 #### 1. Create a Redis database and copy the credentials
 
@@ -52,18 +48,20 @@ Choose `Global` for the best read latency performance, or select a single region
 
 Make sure to copy the `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` to your `.env` file.
 
+#### 2. Install `@upstash/edge-flags` with your favourite package manager:
 
-#### 2. Install `@upstash/edge-flags` with your favourite package manager: 
 ```bash
 npm install @upstash/edge-flags
 ```
+
 #### 3. Create a new edge function in your Next.js application
-```ts:/pages/api/edge-flags.ts
+
+```ts title="/pages/api/edge-flags.ts"
 import { createEdgeHandler } from "@upstash/edge-flags";
 
 export default createEdgeHandler({
   // cache time in seconds, 0 disables the cache
-  cacheMaxAge: 0, 
+  cacheMaxAge: 0,
 
   // you can omit these to load from env automatically
   redisUrl: process.env.UPSTASH_REDIS_REST_URL!,
@@ -78,39 +76,39 @@ export const config = {
 That's it, all of the evaluation, fetching and caching logic is now handled by the edge function.
 It will extract the `geolocation` parameters from the request and use them together with your custom attributes to evaluate the flag.
 
-You can set the `cacheMaxAge` to a positive integer to try and cache flags in the memory of the edge function. 
+You can set the `cacheMaxAge` to a positive integer to try and cache flags in the memory of the edge function.
 While the edge function remains hot, it does not require a lookup to Redis and can return a result instantly.
 Caching like this inside functions is quite volatile, as there is no guarantee for how long the edge function remains hot.
-We will be adding more caching strategies during the beta. 
-
+We will be adding more caching strategies during the beta.
 
 #### 4. Use the flag in your frontend
 
 The last step is to use the flag. The `useFlag` hook allows you to query a flag in your frontend
 
 In this example we want to modify the navigation to only show a link to beta users.
-```tsx:/app/page.tsx
+
+```tsx title="/app/page.tsx"
 import { useFlag } from "@upstash/edge-flags";
 
 export default function Page() {
-  const {isEnabled, loading, error} = useFlag("beta-users", {
+  const { isEnabled, loading, error } = useFlag("beta-users", {
     // optional custom attributes
     userId: "chronark",
     company: "Upstash",
   });
 
-  if (error){
-    return <div>Something went wrong: {error}</div>
+  if (error) {
+    return <div>Something went wrong: {error}</div>;
   }
-  if (loading){
-    return <div>Loading...</div>
+  if (loading) {
+    return <div>Loading...</div>;
   }
   return (
     <div>
-        <Link href="/home">Home</Link>
-        <Link href="/settings">Settings</Link>
-        {/* Only display the beta navigation to beta users */}
-        {isEnabled ? <Link href="/beta">Beta</Link> : null}
+      <Link href="/home">Home</Link>
+      <Link href="/settings">Settings</Link>
+      {/* Only display the beta navigation to beta users */}
+      {isEnabled ? <Link href="/beta">Beta</Link> : null}
     </div>
   );
 }
@@ -125,8 +123,6 @@ Our Redis free tier allows **10,000** requests **per day** for free. If you need
 
 We want to reduce the cost even further by adding more caching strategies during the beta.
 See [below](#road-to-v1) for more details.
-
-
 
 ## Documentation
 
@@ -145,26 +141,25 @@ To reduce the requests made to redis and thus decreasing your bill at the end of
 Caching flags is a double edged sword: The longer the cache time, the fewer requests to Redis need to be made. But at the same time changes to flags will take longer to propagate.
 
 We're currently evaluating the following caching strategies:
+
 - Cookies
 - Vercel's edge CDN
 - React context
 
 There are pros and cons to each and we would appreciate if you share your feedback and ideas.
 
-
 ##### Support more frameworks and platforms
 
 Right now edge-flags only works well with Next.js. But the underlying logic is already platform agnostic. We are planning to add support for other frameworks and platforms in the future.
 Let us know what platform you would like to see next.
-
 
 ## Wrapping up
 
 Thank you for checking out edge-flags.
 If you have any questions or feedback, please reach out to us on [Twitter](https://twitter.com/upstash) or [Discord](https://discord.gg/w9SenAtbme).
 
-
 Relevant links:
+
 - [GitHub](https://github.com/upstash/edge-flags)
 - [Documentation](https://docs.upstash.com/redis/sdks/edge-flags/overview)
 - [Console](https://console.upstash.com/edge-flags)

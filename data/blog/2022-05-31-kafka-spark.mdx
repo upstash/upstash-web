@@ -5,7 +5,6 @@ author: omer
 tags: [serverless, kafka, apache, spark, react-native, cassandra]
 ---
 
-
 The data collected from users in real-time are very essential for improving the product, reacting on time, and growing much faster. For collecting, preparing, and storing data, we can use the serverless Kafka with one of the most common open-source streaming tools, which is Spark Streaming.
 
 In this blog post, we will use Serverless Kafka to collect logs from a mobile application developed using React Native and send these logs to Apache Spark for streaming into the Cassandra Database.
@@ -26,15 +25,13 @@ In summary, we will develop a simple data pipeline, which consists of serverless
 
 ![pipeline](/blog/kafka-spark/data-pipeline.png)
 
- + Producing logs from mobile clients
+- Producing logs from mobile clients
 
- + Collecting by serverless Kafka
+- Collecting by serverless Kafka
 
- + Real-time streaming from Kafka to Cassandra with Apache Spark
+- Real-time streaming from Kafka to Cassandra with Apache Spark
 
- + Storing the data in Cassandra
-
-
+- Storing the data in Cassandra
 
 ### **From React Native App to Serverless Kafka**
 
@@ -48,7 +45,6 @@ In this mobile app, there is only one screen to keep the demo project simple. On
 
 ![app screen](/blog/kafka-spark/app-screen.png)
 
-
 The prices of these products were stored in Upstash Redis. When a user clicks on these products, the mobile app reads its price from Redis, displays it on screen and produces a template log of this action to serverless Kafka. The topic of this event is “users.purchase”.
 
 If an error occurs, then the application sends the error message to another Kafka topic “users.error”.
@@ -57,7 +53,7 @@ If an error occurs, then the application sends the error message to another Kafk
 
 The following code block does the operations described above.
 
-``` javascript
+```javascript
 async costQuery(code){
 	console.log("CODE OF QUERIED PRODUCT: ", code);
 	await fetch('https://us1-maximum-boar-36431.upstash.io/get/' + code, {
@@ -99,8 +95,8 @@ In these two tables, there will be two columns, “message” and “time”. Th
 First, let’s create a keyspace in our database. We are going to use CQL “Cassandra Query Language” for doing operations on the database. Here is the [documentation](https://cassandra.apache.org/doc/latest/cassandra/cql/ddl.html) of it.
 
 ```
-CREATE KEYSPACE app WITH replication = 
-{'class': 'SimpleStrategy', 
+CREATE KEYSPACE app WITH replication =
+{'class': 'SimpleStrategy',
 'replication_factor': '1'
 }  AND durable_writes = true;
 ```
@@ -183,13 +179,13 @@ Firstly, we need to create a maven project and add the dependencies below to pom
 
 While adding these dependencies, be sure that all Spark related dependencies have the same version on their artifactId to prevent any possible error which may occurs. In our case, the version is 2.11.
 
-+ **Spark Streaming**
+- **Spark Streaming**
 
 Streaming with DStream API receives data in mini-batches and performs operations over the data by separating them into chunks.
 
 The first step of implementing a demo Spark streaming is configuring the Spark and creating a streaming context.
 
-``` java
+```java
 SparkConf sparkConf = new SparkConf();
 sparkConf.setMaster("local");
 sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
@@ -199,7 +195,7 @@ JavaStreamingContext streamingContext = new JavaStreamingContext(sparkConf, Dura
 
 Then, we need to configure our serverless Kafka connection. For this purpose, we are going to create props map as it is stated in [Kafka API](https://docs.upstash.com/kafka/kafkaapi).
 
-``` java
+```java
 Map<String, Object> props = new HashMap<>();
 props.put("bootstrap.servers", "hot-teal-10548-us1-kafka.upstash.io:9092");
 props.put("sasl.mechanism", "SCRAM-SHA-256");
@@ -212,13 +208,13 @@ props.put("auto.offset.reset", "earliest");
 
 Next, we can define topics that we are going to subscribe.
 
-``` java
+```java
 Collection<String> topics = Arrays.asList("users.purchase", "users.error");
 ```
 
 To collect data from Kafka to Spark Streaming, we can use KafkaUtils, which is a part of “spark-streaming-kafka” dependency as below.
 
-``` java
+```java
 JavaInputDStream<ConsumerRecord<String, String>> stream =
 	KafkaUtils.createDirectStream(
 		streamingContext,
@@ -229,11 +225,11 @@ JavaInputDStream<ConsumerRecord<String, String>> stream =
 
 At first, I have created a very simple “Message” class, which will be parsed and saved to the Cassandra. It contains the message and the timestamp as fields.
 
-``` java
+```java
 public class Message {
 	private String message;
 	private long time;
-	
+
 	public Message(String message, long time) {
 		this.message = message;
 		this.time = time;
@@ -243,7 +239,7 @@ public class Message {
 
 In Spark Streaming, RDDs (Resilient Distributed Datasets), which are the main abstraction for Spark Streaming, are used to process the streamed data. According to the [Spark Guide](https://spark.apache.org/docs/latest/rdd-programming-guide.html), RDDs are “collections of elements partitioned across the nodes of the cluster that can be operated on in parallel”. This abstraction provides fast, parallelized and fault tolerant processing system.
 
-``` java
+```java
 JavaPairDStream<String, String> data = stream.mapToPair(record -> new Tuple2<>(record.topic(), record.value()));
 data.foreachRDD(javaRDD -> {
 	List<Tuple2<String, String>> dataMap = javaRDD.collect();
@@ -266,8 +262,7 @@ data.foreachRDD(javaRDD -> {
 
 Since we are going to save the log message and its timestamp, we retrieve the timestamp the data is received and the message that comes from the stream. To save these two elements, we use the following line and the “saveToCassandra” function for each RDDs. These messages are saved to corresponding table on Cassandra according to their topics.
 
-
-``` java
+```java
 javaFunctions(rdd).writerBuilder("app", "purchases", mapToRow(Message.class)).saveToCassandra();
 
 javaFunctions(rdd).writerBuilder("app", "errors", mapToRow(Message.class)).saveToCassandra();
@@ -275,18 +270,18 @@ javaFunctions(rdd).writerBuilder("app", "errors", mapToRow(Message.class)).saveT
 
 At the end, we need to start and run the stream until the program terminated.
 
-``` java
+```java
 streamingContext.start();
 streamingContext.awaitTermination();
 ```
 
-+ **Structured Streaming**
+- **Structured Streaming**
 
 Structure streaming is a newer fashion compared to Spark streaming. It is better designed and optimized. It does not focus on batch processing as Spark streaming does. It processes the data and print or save it according to the choice of the user, such as “complete”, “append” or “update”.
 
 At first, we need to create our Spark session.
 
-``` java
+```java
 SparkSession spark = SparkSession.builder()
 .appName("ReactNativeKafkaSparkStreaming")
 .config("spark.master", "local")
@@ -295,7 +290,7 @@ SparkSession spark = SparkSession.builder()
 
 As the next step, we need to configure our stream, which returns Dataset object, by entering our Kafka props, dataset details and choices.
 
-``` java
+```java
 Dataset<Row> df = spark
 .readStream()
 .format("kafka")
@@ -317,7 +312,7 @@ In addition, the dataset columns should be same with the columns of Cassandra ta
 
 Now, we need to start stream to Cassandra. This stream should be formatted as “org.apache.spark.sql.cassandra”, which is provided with spark-cassandra-connector dependency. After that, we need to set the keyspace and the table, which will be filled, as options.
 
-``` java
+```java
 StreamingQuery query = df.writeStream()
 .outputMode("append")
 .option("checkpointLocation", "/tmp/check_point/")
@@ -329,13 +324,13 @@ StreamingQuery query = df.writeStream()
 
 Again, we can set the stream as terminated when the program terminated.
 
-``` java
+```java
 query.awaitTermination();
 ```
 
 Everything is ready now. When we click on any images, the log is collected by serverless Kafka. Spark streams this log from Kafka and save it with its timestamp to the corresponding Cassandra table as below.
 
-``` 
+```
 cqlsh> SELECT * FROM app.purchases;
 
 time  | message
@@ -354,8 +349,10 @@ time  | message
 
 (2 rows)
 ```
+
 &nbsp;
-<br/>
+
+<br />
 
 ### **Conclusion**
 
