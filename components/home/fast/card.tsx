@@ -9,7 +9,7 @@ export function FastCard({
   children: ReactNode;
 }) {
   return (
-    <div className={cx("", className)} {...props}>
+    <div className={cx("text-yellow-200", className)} {...props}>
       {children}
     </div>
   );
@@ -41,7 +41,7 @@ export function FastCardTitle({
 }) {
   return (
     <h5
-      className="mt-1 text-sm uppercase tracking-widest opacity-40"
+      className="mt-1 text-xs uppercase tracking-widest opacity-40"
       {...props}
     >
       {children}
