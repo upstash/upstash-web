@@ -9,7 +9,8 @@
   "plugins": ["tailwindcss"],
   "rules": {
     "react-hooks/exhaustive-deps": "off",
-    "react/no-unescaped-entities": "off"
+    "react/no-unescaped-entities": "off",
+    "tailwindcss/no-custom-classname": "off"
   },
   "settings": {
     "tailwindcss": {
