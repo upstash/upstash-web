@@ -20,17 +20,13 @@ export function SourceBox({
   category?: Category;
   href?: string;
 }) {
-  const childs: ReactNode[] = Children.map(
-    // @ts-ignore
-    children,
-    (child: ReactElement) => {
-      return cloneElement(child, {
-        ...child.props,
-        category,
-        href,
-      });
-    }
-  );
+  const childs = Children.map(children, (child: ReactElement) => {
+    return cloneElement(child, {
+      ...child.props,
+      category,
+      href,
+    });
+  });
 
   return (
     <a

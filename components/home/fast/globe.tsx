@@ -10,50 +10,50 @@ type arcsData = {
   startLng: number;
   endLat: number;
   endLng: number;
+  color: string;
 };
 
 type region = {
   name: string;
-  lat: string;
-  lng: string;
+  lat: number;
+  lng: number;
 };
 
 const REGIONS: region[] = [
   {
     name: "oregon",
-    lat: "44.1274576",
-    lng: "-122.8257181",
+    lat: 44.1274576,
+    lng: -122.8257181,
   },
   {
     name: "n_virginia",
-    lat: "37.4784129",
-    lng: "-76.4618534",
+    lat: 37.4784129,
+    lng: -76.4618534,
   },
   {
     name: "sao_paulo",
-    lat: "-23.6820347",
-    lng: "-46.735724",
+    lat: -23.6820347,
+    lng: -46.735724,
   },
   {
     name: "singapore",
-    lat: "1.3143394",
-    lng: "103.7038242",
+    lat: 1.3143394,
+    lng: 103.7038242,
   },
   {
     name: "frankfurt",
-    lat: "50.1213009",
-    lng: "8.5663531",
+    lat: 50.1213009,
+    lng: 8.5663531,
   },
 ];
 
-function getRandomItem(list: any) {
+function getRandomItem(list: any): region {
   return list[Math.floor(Math.random() * list.length)];
 }
 
 function getRandomArcData(): arcsData[] {
-  // @ts-ignore
   return [...Array(4).keys()].map(() => {
-    const region: region = getRandomItem(REGIONS);
+    const region = getRandomItem(REGIONS);
 
     return {
       startLat: region.lat,

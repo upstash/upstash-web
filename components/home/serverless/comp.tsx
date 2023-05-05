@@ -74,16 +74,12 @@ export function ProductFeature({
 }: HTMLProps<HTMLUListElement> & {
   product?: Product;
 }) {
-  const childs: ReactNode[] = Children.map(
-    // @ts-ignore
-    children,
-    (child: ReactElement) => {
-      return cloneElement(child, {
-        ...child.props,
-        product,
-      });
-    }
-  );
+  const childs = Children.map(children, (child: ReactElement) => {
+    return cloneElement(child, {
+      ...child.props,
+      product,
+    });
+  });
 
   return <ul className={cx("space-y-2", className)}>{childs}</ul>;
 }

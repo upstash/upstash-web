@@ -1,11 +1,5 @@
 import cx from "@/utils/cx";
-import React, {
-  Children,
-  cloneElement,
-  HTMLProps,
-  ReactElement,
-  ReactNode,
-} from "react";
+import React, { Children, cloneElement, HTMLProps, ReactElement } from "react";
 import { Product } from "@/utils/type";
 import Button, { IButton } from "@/components/button";
 import Icon, { ICON_NAMES } from "@/components/icon";
@@ -111,17 +105,13 @@ function HomeHeroProduct({
   active?: boolean;
   activeProduct?: Product;
 }) {
-  const childs: ReactNode[] = Children.map(
-    // @ts-ignore
-    children,
-    (child: ReactElement) => {
-      return cloneElement(child, {
-        ...child.props,
-        activeProduct,
-        active,
-      });
-    }
-  );
+  const childs = Children.map(children, (child: ReactElement) => {
+    return cloneElement(child, {
+      ...child.props,
+      activeProduct,
+      active,
+    });
+  });
 
   return (
     <div

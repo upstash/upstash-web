@@ -16,7 +16,7 @@ export default function GlobalLowLatency() {
 
       {/* body */}
       <div className="flex justify-between gap-1">
-        {[...Array(30).keys()].map((i) => (
+        {Array.from(Array(30).keys()).map((i) => (
           <div
             key={i}
             className={cx(
