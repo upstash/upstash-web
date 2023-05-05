@@ -1,4 +1,4 @@
-import "./prism.css";
+import "./post.css";
 
 import { ReactNode } from "react";
 import { Metadata } from "next";

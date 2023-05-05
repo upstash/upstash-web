@@ -6,7 +6,6 @@ import { Inter } from "next/font/google";
 import localFont from "next/font/local";
 import { ReactNode } from "react";
 import cx from "@/utils/cx";
-import { SITE_URL } from "@/utils/const";
 import Header from "@/components/master/header";
 import HeaderMobile from "@/components/master/header-mobile";
 import Footer from "@/components/master/footer";
@@ -89,13 +88,22 @@ export const metadata: Metadata = {
     template: `%s | Upstash`,
   },
   description,
+  keywords: [
+    "redis",
+    "kafka",
+    "qstash",
+    "serverless database",
+    "global database",
+    "serverless kafka",
+  ],
   openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: process.env.NEXT_PUBLIC_SITE_URL,
     title,
     description,
-    url: SITE_URL,
     siteName: title,
-    type: "website",
-    images: [`${process.env.NEXT_PUBLIC_SITE_URL}/og-home.jpg`],
+    // images: [`${process.env.NEXT_PUBLIC_SITE_URL}/og-home.jpg`],
   },
   twitter: {
     card: "summary_large_image",
@@ -104,10 +112,6 @@ export const metadata: Metadata = {
     site: "@upstash",
     creator: "@upstash",
     images: [`${process.env.NEXT_PUBLIC_SITE_URL}/og-home.jpg`],
-  },
-  robots: {
-    index: true,
-    follow: true,
   },
   icons: {
     icon: "/icons/favicon-32x32.png",

@@ -38,7 +38,7 @@ for free! You can create a new database
 seconds. Afterwards scroll down and copy the `REST` connection
 secrets to your `.env.local` file:
 
-```bash:.env.local
+```bash title=".env.local"
 UPSTASH_REDIS_REST_URL=
 UPSTASH_REDIS_REST_TOKEN=
 ```
@@ -47,7 +47,7 @@ UPSTASH_REDIS_REST_TOKEN=
 
 Now that we have a Redis database, we can start implementing the counter. We need to install @upstash/redis first:
 
-```sh-session
+```bash
 pnpm add @upstash/redis
 ```
 
@@ -62,7 +62,7 @@ runtime to be `edge`.
 
 Create a new file `/api/incr.ts` and add the following code:
 
-```ts:/api/incr.ts_1/5
+```ts title="/api/incr.ts" {1,5}
 import { Redis } from "@upstash/redis";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -76,7 +76,7 @@ export const config = {
 Next up we'll require a slug or similar identifier to be passed in the request
 body. If it's not present, we'll return a `400` status code.
 
-```ts:/api/incr.ts_2/5
+```ts title="/api/incr.ts" {2,5}
 export default async function incr(req: NextRequest): Promise<NextResponse> {
   const body = await req.json();
   const slug = body.slug as string | undefined;
@@ -93,13 +93,10 @@ Then we also need to get the user's IP address. We can do this by using the
 store it in the database. This way we don't have to store the IP address
 directly, which could be a security concern.
 
-```ts:/api/incr.ts_3/5
+```ts title="/api/incr.ts" {3,5}
 const ip = req.ip;
 // Hash the IP and turn it into a hex string
-const buf = await crypto.subtle.digest(
-  "SHA-256",
-  new TextEncoder().encode(ip),
-);
+const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(ip));
 const hash = Array.from(new Uint8Array(buf))
   .map((b) => b.toString(16).padStart(2, "0"))
   .join("");
@@ -109,7 +106,7 @@ Now let's use the first redis command mentioned above. Using `SET` together with
 `NX` and `EX` gives us an easy way to check if a specific ip address has been
 viewing a page within the last 24 hours:
 
-```ts:/api/incr.ts_4/5
+```ts title="/api/incr.ts" {4,5}
 const isNew = await redis.set(["deduplicate", hash, slug].join(":"), true, {
   nx: true,
   ex: 24 * 60 * 60,
@@ -122,7 +119,7 @@ if (!isNew) {
 The last thing to do is to increment the counter for the given slug. We'll use
 the `INCR` command for this:
 
-```ts:/api/incr.ts_5/5
+```ts title="/api/incr.ts" {2}
 await redis.incr(["pageviews", "projects", slug].join(":"));
 return new NextResponse(null, { status: 202 });
 ```
@@ -130,29 +127,27 @@ return new NextResponse(null, { status: 202 });
 For reference, you can find the complete code
 [here](https://github.com/chronark/chronark.com/blob/main/pages/api/incr.ts)
 
-
-
 ## /app/[slug]/view.tsx
 
 Next, let's create a small client component, that sends a request to the api route we just created whenever it mounts. This component can then be embedded in any page we want to track.
 
-```tsx:/app/[slug]/view.tsx
+```tsx title="/app/[slug]/view.tsx"
 "use client";
 
 import { useEffect } from "react";
 
 export const ReportView: React.FC<{ slug: string }> = ({ slug }) => {
-	useEffect(() => {
-		fetch("/api/incr", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({ slug }),
-		});
-	}, [slug]);
+  useEffect(() => {
+    fetch("/api/incr", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ slug }),
+    });
+  }, [slug]);
 
-	return null;
+  return null;
 };
 ```
 
@@ -160,26 +155,24 @@ export const ReportView: React.FC<{ slug: string }> = ({ slug }) => {
 
 The last thing we need to do is to add the `ReportView` component to the page we want to track:
 
-```tsx:/app/[slug]/page.tsx
+```tsx title="/app/[slug]/page.tsx"
 import { ReportView } from "./view";
 
 type Props = {
-	params: {
-		slug: string;
-	};
+  params: {
+    slug: string;
+  };
 };
 
 export default function Page({ params }: Props) {
-
-	return (
-		<div>
-			<ReportView slug={params.slug} />
+  return (
+    <div>
+      <ReportView slug={params.slug} />
       {/* Add your page content here */}
-		</div>
-	);
+    </div>
+  );
 }
 ```
-
 
 From now on all visits to `/app/[slug]` will be tracked and the counter will be incremented for each unique visitor in the last 24h.
 
@@ -189,7 +182,7 @@ Tracking the views is nice, but we also want to display them publicly. Let's see
 
 In order to display the number of views, we need to look them up from the database. We can do this by using the `GET` command. We should also add a `revalidate` config to the page component, so that the page is revalidated every 60 seconds and not for every request.
 
-```tsx:/app/[slug]/page.tsx
+```tsx title="/app/[slug]/page.tsx"
 type Props = {
 	params: {
 		slug: string;
@@ -209,6 +202,7 @@ export default function Page({ params }: Props) {
 
 Check out a full example of this at [chronark.com](https://chronark.com). The code is available on [GitHub](https://github.com/chronark/chronark.com).
 Specifically, here are the relevant bits:
+
 - [api route](https://github.com/chronark/chronark.com/blob/main/pages/api/incr.ts)
 - [tracking component](https://github.com/chronark/chronark.com/blob/main/app/projects/%5Bslug%5D/view.tsx)
 - [loading the number of views](https://github.com/chronark/chronark.com/blob/fa3e5f043362fa3e26c2b10b0ae3b9383c45f29c/app/projects/%5Bslug%5D/page.tsx#L35)

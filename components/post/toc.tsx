@@ -1,24 +1,20 @@
-import { Post } from "contentlayer/generated";
-import { PostHeading } from "@/contentlayer.config";
+"use client";
+
+import { TableOfContents } from "@/utils/toc";
 
 type Props = {
-  post: Post;
+  toc: TableOfContents;
 };
 
-export default function PostTOC({ post }: Props) {
-  if (post.headings.length === 0) return null;
+export default function PostTOC({ toc }: Props) {
+  if (!toc?.items) return null;
 
   return (
     <div className="grid">
-      {post.headings.map((heading: PostHeading) => {
+      {toc.items.map(({ title, url }) => {
         return (
-          <a
-            key={heading.slug}
-            href={`#${heading.slug}`}
-            className={`post-headings-link h${heading.level}`}
-          >
-            <span className="post-headings-link-dot" />
-            <span className="post-headings-link-text">{heading.title}</span>
+          <a key={url} href={url} className="">
+            {title}
           </a>
         );
       })}

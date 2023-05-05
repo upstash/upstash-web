@@ -198,10 +198,11 @@ export default function DesignedForTheEdge() {
                   animationDirection: "reverse",
                   animationDuration: `${duration}ms`,
                 }}
-                width={20}
+                width={26}
                 viewBox="0 0 128 113"
                 fill="currentColor"
                 xmlns="http://www.w3.org/2000/svg"
+                aria-label="Netlify Logo"
               >
                 <g>
                   <path d="M80.4595 74.6047H71.6825L70.9494 73.8717V53.3259C70.9494 49.6705 69.513 46.8372 65.1047 46.7382C62.8361 46.6787 60.2406 46.7382 57.4669 46.8471L57.0508 47.2731V55.5746V73.8618L56.3177 74.5948H47.5407L46.8076 73.8618V38.7636L47.5407 38.0305H67.294C74.9714 38.0305 81.1926 44.2517 81.1926 51.9291V73.8717L80.4595 74.6047Z"></path>

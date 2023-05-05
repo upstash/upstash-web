@@ -10,7 +10,8 @@ import PostHeader from "@/components/post/header";
 import PostTags from "@/components/post/tags";
 import PageBodyGradient from "@/components/page-body-gradient";
 import Bg from "@/components/bg";
-// import PostTOC from "@/app/blog/[slug]/_/toc";
+import { getTableOfContents } from "@/utils/toc";
+import PostTOC from "@/components/post/toc";
 
 type Props = {
   params: {
@@ -24,6 +25,59 @@ export async function generateStaticParams(): Promise<Props["params"][]> {
     .map((post) => ({
       slug: post.slug,
     }));
+}
+
+export default async function BlogPage({ params }: Props) {
+  const slug = params?.slug;
+
+  const indexOfPost = allPosts.findIndex((post) => post.slug === slug);
+  const post = allPosts[indexOfPost];
+
+  if (!post) {
+    notFound();
+  }
+
+  const toc = await getTableOfContents(post.body.raw);
+
+  const nextPost = indexOfPost > 0 ? allPosts[indexOfPost - 1] : undefined;
+  const prevPost =
+    indexOfPost < allPosts.length - 1 ? allPosts[indexOfPost + 1] : undefined;
+
+  return (
+    <main className="relative z-0">
+      <Bg />
+
+      <article>
+        {/* Header */}
+        <PostHeader post={post} />
+
+        {/* Body */}
+        <div className="relative z-0 pt-20">
+          <PageBodyGradient />
+
+          <Container className="max-w-screen-md">
+            {/* toc */}
+            <PostTOC toc={toc} />
+
+            {/* content */}
+            <Mdx code={post.body.code} />
+
+            {/* Tags */}
+            <PostTags post={post} />
+
+            {/* Other Post */}
+            <div className="mt-10 grid gap-4 md:grid-cols-2 md:gap-8">
+              <OtherPostCard post={prevPost} />
+              <OtherPostCard post={nextPost} align="right" />
+            </div>
+          </Container>
+        </div>
+
+        {/* Claps */}
+        <Clap tweet={post.tweet} />
+      </article>
+    </main>
+  );
 }
 
 export async function generateMetadata({
@@ -59,53 +113,4 @@ export async function generateMetadata({
       ],
     },
   };
-}
-
-export default async function BlogPage({ params }: Props) {
-  const slug = params?.slug;
-
-  const indexOfPost = allPosts.findIndex((post) => post.slug === slug);
-  const post = allPosts[indexOfPost];
-
-  if (!post) {
-    notFound();
-  }
-
-  const nextPost = indexOfPost > 0 ? allPosts[indexOfPost - 1] : undefined;
-  const prevPost =
-    indexOfPost < allPosts.length - 1 ? allPosts[indexOfPost + 1] : undefined;
-
-  return (
-    <main className="relative z-0">
-      <Bg />
-
-      <article>
-        {/* Header */}
-        <PostHeader post={post} />
-
-        {/*<PostTOC post={post} />*/}
-
-        {/* Body */}
-        <div className="relative z-0 pt-20">
-          <PageBodyGradient />
-
-          <Container className="max-w-screen-md">
-            <Mdx code={post.body.code} />
-
-            {/* Tags */}
-            <PostTags post={post} />
-
-            {/* Other Post */}
-            <div className="mt-10 grid gap-4 md:grid-cols-2 md:gap-8">
-              <OtherPostCard post={prevPost} />
-              <OtherPostCard post={nextPost} align="right" />
-            </div>
-          </Container>
-        </div>
-
-        {/* Claps */}
-        <Clap tweet={post.tweet} />
-      </article>
-    </main>
-  );
 }

@@ -24,7 +24,7 @@ export default function BlogPopularTag({ data }: { data: [string, number][] }) {
             key={tag}
             href={`/blog/tag/${tag}`}
             className={cx(
-              "rounded-full bg-opacity-10 px-3 py-2 font-medium transition",
+              "rounded-full bg-opacity-10 px-3 py-2 transition",
               "hover:bg-opacity-20 hover:underline",
               colors[index % colors.length]
             )}

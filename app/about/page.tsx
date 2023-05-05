@@ -28,11 +28,13 @@ export default function HomePage() {
               for Developers
             </PageHeaderTitle>
 
-            <PageHeaderDesc className="mt-2 grid gap-1 md:gap-2">
-              <span>We manage everything for you.</span>
-              <span>You focus on more important things.</span>
-              <span>
-                With per-request pricing, you pay only for what you use.
+            <PageHeaderDesc className="mt-2">
+              <span className="grid gap-1 md:gap-2">
+                <span>We manage everything for you.</span>
+                <span>You focus on more important things.</span>
+                <span>
+                  With per-request pricing, you pay only for what you use.
+                </span>
               </span>
             </PageHeaderDesc>
           </header>

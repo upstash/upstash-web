@@ -1,13 +1,10 @@
 import { defineDocumentType, makeSource } from "contentlayer/source-files";
-import rehypePrism from "rehype-prism-plus";
 import readingTime from "reading-time";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import rehypePrettyCode from "rehype-pretty-code";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
-import rehypeCodeTitles from "rehype-code-titles";
-import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import authors from "./utils/authors";
-import { bundleMDX } from "mdx-bundler";
-import { tocPlugin } from "./utils/contentlayerPlugins";
 
 export type PostHeading = { level: number; title: string; slug: string };
 
@@ -27,7 +24,7 @@ export const Job = defineDocumentType(() => ({
   computedFields: {
     slug: {
       type: "string",
-      resolve: (doc) => doc._raw.sourceFileName.replace(/\.md$/, ""),
+      resolve: (doc: any) => `/${doc._raw.flattenedPath}`,
     },
   },
 }));
@@ -69,43 +66,41 @@ export const Post = defineDocumentType(() => ({
         return doc._raw.sourceFileName.substring(-1, 10);
       },
     },
-    headings: {
-      type: "json",
-      resolve: async (doc) => {
-        const headings: PostHeading[] = [];
-
-        await bundleMDX({
-          source: doc.body.raw,
-          mdxOptions: (opts) => {
-            opts.remarkPlugins = [
-              ...(opts.remarkPlugins ?? []),
-              tocPlugin(headings),
-            ];
-            return opts;
-          },
-        });
-
-        return headings;
-      },
-    },
   },
 }));
 
 export default makeSource({
-  contentDirPath: "data",
+  contentDirPath: "./data",
   documentTypes: [Job, Post],
   mdx: {
     remarkPlugins: [remarkGfm],
     rehypePlugins: [
       rehypeSlug,
-      rehypeCodeTitles,
-      rehypePrism,
+      [
+        rehypePrettyCode,
+        {
+          theme: "poimandres",
+          onVisitLine(node: any) {
+            // Prevent lines from collapsing in `display: grid` mode, and allow empty
+            // lines to be copy/pasted
+            if (node.children.length === 0) {
+              node.children = [{ type: "text", value: " " }];
+            }
+          },
+          onVisitHighlightedLine(node: any) {
+            node.properties.className.push("line--highlighted");
+          },
+          onVisitHighlightedWord(node: any) {
+            node.properties.className = ["word--highlighted"];
+          },
+        },
+      ],
       [
         rehypeAutolinkHeadings,
         {
-          behavior: "wrap",
           properties: {
-            className: ["anchor"],
+            className: ["subheading-anchor"],
+            ariaLabel: "Link to section",
           },
         },
       ],

@@ -80,7 +80,7 @@ function blockquote(props: ComponentProps<"blockquote">) {
 function h2(props: ComponentProps<"h2">) {
   return (
     <h2
-      className="mt-10 font-display text-2xl font-semibold md:mt-16 md:text-4xl"
+      className="font-display text-2xl font-semibold md:mt-16 md:text-4xl"
       {...props}
     />
   );
@@ -95,16 +95,6 @@ function h3(props: ComponentProps<"h3">) {
 function h4(props: ComponentProps<"h4">) {
   return (
     <h4 className="font-display text-lg font-semibold md:text-xl" {...props} />
-  );
-}
-
-function code(props: ComponentProps<"code">) {
-  return (
-    <code
-      className="whitespace-pre break-normal rounded bg-zinc-800
-      px-1 py-0.5 text-[.94em]"
-      {...props}
-    />
   );
 }
 
@@ -131,7 +121,6 @@ const components = {
   h2,
   h3,
   img,
-  code,
   h4,
   FullWidth,
   Note: PostNote,

@@ -27,8 +27,6 @@ export default async function BlogPage() {
       </header>
 
       <section className="relative z-0 mt-6">
-        {/*<PageBodyGradient className="opacity-40" />*/}
-
         {/* grid */}
         <PostGrid data={posts.slice(0, 20)} views={views} />
       </section>

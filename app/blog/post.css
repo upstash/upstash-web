@@ -1,0 +1,67 @@
+.post > * {
+  @apply mb-10;
+}
+
+.post code:not(pre > code) {
+  @apply rounded border border-white/5
+    bg-emerald-100/10 px-1 py-0.5 text-[.94em];
+}
+
+.post .subheading-anchor {
+  @apply order-1 ml-4 opacity-0 after:content-['#'];
+}
+
+.post :where(h2, h3, h4) {
+  @apply mb-6 flex;
+  scroll-margin-top: 2rem;
+}
+
+.post :where(h2, h3, h4):hover .subheading-anchor {
+  @apply opacity-60;
+}
+
+/* code */
+
+[data-rehype-pretty-code-fragment] {
+  @apply relative rounded-xl bg-white/[0.04] text-sm;
+}
+
+/* code pre */
+
+[data-rehype-pretty-code-fragment] pre {
+  @apply overflow-x-auto py-4;
+}
+
+[data-rehype-pretty-code-fragment] code {
+  @apply grid min-w-full break-words;
+  counter-reset: line;
+  box-decoration-break: clone;
+}
+
+[data-rehype-pretty-code-fragment] .line {
+  @apply inline-block px-6 py-1;
+}
+
+[data-rehype-pretty-code-fragment] [data-line-numbers] > .line::before {
+  @apply mr-6 inline-block w-5 select-none text-right text-white/10;
+  counter-increment: line;
+  content: counter(line);
+}
+
+[data-rehype-pretty-code-fragment] .line--highlighted {
+  @apply bg-emerald-200/5;
+}
+
+[data-rehype-pretty-code-fragment] .word--highlighted {
+  @apply rounded-md bg-slate-300 bg-opacity-10 p-1;
+}
+
+/* code title */
+
+[data-rehype-pretty-code-title] {
+  @apply mt-4 border-b border-b-white/5 px-6 py-3 text-white/60;
+}
+
+[data-rehype-pretty-code-title] + pre {
+  @apply rounded-t-none;
+}
