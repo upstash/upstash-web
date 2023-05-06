@@ -24,7 +24,7 @@ export default function PostGridCard({ data }: { data: Post }) {
         <div className="flex grow flex-col items-start">
           <Link
             href={`/blog/author/${author}`}
-            className="hover:text-emerald-400 hover:underline"
+            className="opacity-80 hover:text-emerald-400 hover:underline"
           >
             {authorObj.name}
           </Link>

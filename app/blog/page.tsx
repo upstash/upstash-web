@@ -25,7 +25,6 @@ export default async function BlogPage() {
 
       <header className="py-10 text-center md:py-20">
         <Container>
-          <div>{process.env.VERCEL_URL}</div>
           <PageHeaderTitle>Blog</PageHeaderTitle>
           <PageHeaderDesc className="mt-2">
             Articles and tutorials from Upstash and community.
@@ -37,18 +36,18 @@ export default async function BlogPage() {
         </Container>
       </header>
 
-      <section className="relative z-0 mt-6">
+      <section className="mt-6">
         <Container>
           <div className="grid gap-4 md:grid-cols-2 md:gap-8">
             {posts.slice(0, 20).map((post: Post) => {
               return <PostGridCard key={post.slug} data={post} />;
             })}
           </div>
-        </Container>
 
-        <div className="mt-10">
-          <Link href={`/blog/all`}>Show all posts</Link>
-        </div>
+          <div className="mt-10">
+            <Link href={`/blog/all`}>Show all posts</Link>
+          </div>
+        </Container>
       </section>
     </main>
   );

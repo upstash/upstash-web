@@ -19,7 +19,7 @@ export default function NavMobile({ hidden }: HTMLProps<HTMLDivElement> & {}) {
         target="_self"
         hideIcon
         href="https://console.upstash.com"
-        className="-mx-5 bg-emerald-300 py-3 font-display text-lg font-medium text-zinc-950"
+        className="-mx-5 bg-emerald-400 py-3 font-display text-lg font-medium text-zinc-950"
       >
         Login
       </Button>

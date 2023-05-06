@@ -52,7 +52,7 @@ export default async function BlogPage({ params }: Props) {
         <PostHeader post={post} />
 
         {/* Body */}
-        <div className="relative z-0 pt-20">
+        <div className="relative z-0 pt-10">
           <PageBodyGradient />
 
           <Container className="max-w-screen-md">
