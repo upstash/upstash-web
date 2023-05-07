@@ -11,7 +11,7 @@ import { Post } from "contentlayer/generated";
 import PostGridCard from "@/components/blog/grid-item";
 
 export default async function BlogPage() {
-  const posts = await getData();
+  const posts = await getData(10);
 
   const _tags = omit(
     countBy(flatten(posts.map((post) => post.tags))),
@@ -39,13 +39,20 @@ export default async function BlogPage() {
       <section className="mt-6">
         <Container>
           <div className="grid gap-4 md:grid-cols-2 md:gap-8">
-            {posts.slice(0, 20).map((post: Post) => {
+            {posts.map((post: Post) => {
               return <PostGridCard key={post.slug} data={post} />;
             })}
           </div>
 
-          <div className="mt-10">
-            <Link href={`/blog/all`}>Show all posts</Link>
+          <div className="mt-10 flex justify-center">
+            <Link
+              className="flex w-1/3 justify-center gap-1
+              rounded-full bg-white/5 px-5 py-3
+              transition hover:bg-emerald-400 hover:text-emerald-950"
+              href={`/blog/all`}
+            >
+              Show all posts
+            </Link>
           </div>
         </Container>
       </section>
