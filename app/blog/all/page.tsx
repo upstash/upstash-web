@@ -41,7 +41,7 @@ export default async function BlogPage() {
             {Object.keys(postsByMonth).map((key) => {
               const posts: Post[] = postsByMonth[key];
               return (
-                <div>
+                <div key={key}>
                   <h4 className="pl-2 font-display text-2xl font-medium opacity-20">
                     {key}
                   </h4>

@@ -16,7 +16,7 @@ export default function PostListCard({ data }: { data: Post }) {
         "flex h-full items-center gap-4 bg-zinc-900 px-6 py-4",
         "first:rounded-t-xl last:rounded-b-xl",
         "md:gap-6 md:py-6",
-        isAnnouncement && "bg-emerald-400/10"
+        isAnnouncement && "bg-emerald-300/10"
       )}
     >
       <div className="grow">
