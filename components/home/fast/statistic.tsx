@@ -18,7 +18,9 @@ export default function FastStatistic() {
       </FastCard>
 
       <FastCard>
-        <FastCardValue>{`>99.99%`}</FastCardValue>
+        <FastCardValue>
+          <span className="opacity-40">{`>`}</span>99.99%
+        </FastCardValue>
         <FastCardTitle>UPTIME</FastCardTitle>
       </FastCard>
     </div>

@@ -49,8 +49,8 @@ export default function Fast() {
           <p className="mt-6">
             <Link
               href="/fast"
-              className="inline-flex items-center gap-1 opacity-60 transition hover:text-yellow-200
-              hover:underline hover:opacity-100
+              className="inline-flex items-center gap-1 opacity-40 transition
+              hover:text-emerald-400 hover:underline hover:opacity-100
               "
             >
               <Icon icon={ICON_NAMES.Bolt} className="text-2xl" />
