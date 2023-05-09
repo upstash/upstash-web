@@ -18,7 +18,7 @@ export default function HomePage() {
     <main className="relative z-0 text-center">
       <Bg />
 
-      <section className="py-10 md:py-20">
+      <section className="py-16 md:pb-32 md:pt-20">
         <Container className="max-w-screen-lg">
           {/* header */}
           <header>
