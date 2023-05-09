@@ -119,21 +119,23 @@ function ActionButtons({
     >
       <div className="flex items-center gap-px overflow-hidden rounded-full border border-zinc-200 bg-zinc-200 md:border-none">
         <a
-          className="inline-flex h-10 w-14 items-center justify-center bg-white text-sm font-medium text-zinc-950"
+          className="inline-flex h-10 w-14 items-center justify-center bg-white
+          text-sm font-medium text-zinc-950 transition hover:bg-zinc-200"
           href={pngURL}
           download
         >
           PNG
         </a>
         <a
-          className="inline-flex h-10 w-14 items-center justify-center bg-white text-sm font-medium text-zinc-950"
+          className="inline-flex h-10 w-14 items-center justify-center bg-white
+          text-sm font-medium text-zinc-950 transition hover:bg-zinc-200"
           href={svgURL}
           download
         >
           SVG
         </a>
         <CopyButton
-          className="h-10 w-14 bg-white text-sm text-zinc-950"
+          className="h-10 w-14 bg-white text-sm text-zinc-950 hover:bg-zinc-200"
           code={copyCode}
         />
       </div>

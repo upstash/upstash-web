@@ -21,7 +21,10 @@ export default function CopyButton({ code, className, ...props }: Props) {
     <button
       type="button"
       aria-label="Copy code to clipboard"
-      className={cx("inline-flex items-center justify-center", className)}
+      className={cx(
+        "inline-flex items-center justify-center transition",
+        className
+      )}
       onClick={() => {
         copy(code);
         setHasCopied(true);
