@@ -13,13 +13,22 @@ export default function PostListCard({ data }: { data: Post }) {
   return (
     <article
       className={cx(
-        "flex h-full items-center gap-4 bg-zinc-900 px-6 py-4",
+        "flex h-full items-center gap-4 bg-zinc-900 px-6 py-5",
         "first:rounded-t-xl last:rounded-b-xl",
         "md:gap-6 md:py-6",
-        isAnnouncement && "bg-emerald-300/10"
+        isAnnouncement && "bg-yellow-300/10"
       )}
     >
       <div className="grow">
+        {isAnnouncement && (
+          <h5
+            className="-ml-0.5 mb-2 inline-flex rounded-full bg-amber-500/50 px-2 py-1 text-xs
+            uppercase tracking-wide text-amber-100 md:mb-4"
+          >
+            Announcement
+          </h5>
+        )}
+
         <h3 className="font-display text-xl font-semibold md:leading-tight">
           <Balancer>
             <Link href={`/blog/${slug}`}>{title}</Link>
