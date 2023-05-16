@@ -55,7 +55,10 @@ export function PriceValue({
   children: ReactNode;
 }) {
   return (
-    <h5 className={cx("text-lg font-medium md:text-xl", className)} {...props}>
+    <h5
+      className={cx("text-lg font-semibold md:text-xl", className)}
+      {...props}
+    >
       {children}
     </h5>
   );
@@ -87,7 +90,7 @@ export function PriceBadge({
   return (
     <span
       className={cx(
-        "inline-flex rounded-full px-3 pb-1 pt-1.5 leading-none",
+        "inline-flex rounded-full px-2 pb-0.5 pt-1 leading-none",
         "text-xs uppercase leading-none tracking-widest",
         "border border-white/10 bg-white/03 text-white/60",
         type === "payg" &&

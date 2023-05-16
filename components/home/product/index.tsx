@@ -5,7 +5,6 @@ import {
   SectionHeaderTitle,
 } from "@/components/home/section-header";
 import Container from "@/components/container";
-import Icon, { ICON_NAMES } from "@/components/icon";
 import Bg from "@/components/bg";
 import { HOME_SECTIONS } from "@/utils/const";
 import Redis from "./redis";
@@ -16,10 +15,7 @@ export interface ISectionHeader extends HTMLProps<HTMLDivElement> {}
 
 export default function HomeServerless({}: ISectionHeader) {
   return (
-    <section
-      id={`#${HOME_SECTIONS.PRICING}`}
-      className="relative py-16 md:py-28"
-    >
+    <section id={HOME_SECTIONS.PRODUCTS} className="relative py-16 md:py-28">
       <Bg className="top-32 h-1/2" />
 
       <Container>
@@ -27,7 +23,7 @@ export default function HomeServerless({}: ISectionHeader) {
         <SectionHeader>
           <SectionHeaderTitle>Products</SectionHeaderTitle>
           <SectionHeaderSummary>
-            Pay only for what you use with per-request pricing.
+            True serverless data platform for your data
           </SectionHeaderSummary>
         </SectionHeader>
 

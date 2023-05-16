@@ -16,7 +16,7 @@ const Globe = dynamic(() => import("./globe"), {
 export default function Fast() {
   return (
     <section
-      id={`#${HOME_SECTIONS.FAST}`}
+      id={HOME_SECTIONS.FAST}
       className="relative z-0 mt-10 hidden h-[600px] overflow-hidden md:block"
     >
       <Bg className="top-44 h-1/2" />
@@ -53,8 +53,8 @@ export default function Fast() {
           <p className="mt-6">
             <Link
               href="/fast"
-              className="inline-flex items-center gap-1 underline opacity-40
-              transition hover:text-emerald-400 hover:opacity-100"
+              className="inline-flex items-center gap-1 text-yellow-200 underline
+              opacity-60 transition hover:opacity-100"
             >
               <Icon icon={ICON_NAMES.Bolt} className="text-2xl" />
               Test the speed

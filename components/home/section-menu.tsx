@@ -1,37 +1,99 @@
 "use client";
 
-import { HTMLProps } from "react";
+import { HTMLProps, useState } from "react";
 import cx from "@/utils/cx";
 import { HOME_SECTIONS } from "@/utils/const";
+import {
+  HTMLMotionProps,
+  motion,
+  useMotionValueEvent,
+  useScroll,
+} from "framer-motion";
+import { Logo, LogoIcon } from "@/components/logo";
+import Button from "@/components/button";
+import Link from "next/link";
 
 export default function SectionMenu({
   children,
   className,
   ...props
-}: HTMLProps<HTMLDivElement> & {}) {
+}: HTMLMotionProps<any> & {}) {
+  const [show, setShow] = useState(false);
+  const { scrollY } = useScroll();
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    if (latest > 200) {
+      setShow(true);
+    } else {
+      setShow(false);
+    }
+  });
+
   return (
-    <header
+    <motion.div
       className={cx(
-        "fixed left-1/2 top-10 z-50 -translate-x-1/2",
-        "flex items-center p-1",
-        "rounded-full bg-black/90 shadow-xl backdrop-blur",
-        // show ? "flex" : "hidden",
+        "fixed inset-x-0 top-0 z-50 pt-10",
+        "hidden justify-center md:flex",
+        show ? "pointer-events-auto" : "pointer-events-none",
         className
       )}
+      initial="hidden"
+      animate={show ? "visible" : "hidden"}
+      variants={{
+        visible: { opacity: 1, y: 0 },
+        hidden: { opacity: 0, y: -60 },
+      }}
+      transition={{ duration: 0.16 }}
       {...props}
     >
-      <SectionMenuItem href={HOME_SECTIONS.FAST}>Fast Anywhere</SectionMenuItem>
-      <SectionMenuItem href={HOME_SECTIONS.SERVERLESS}>
-        Serverless
-      </SectionMenuItem>
-      <SectionMenuItem href={HOME_SECTIONS.PRICING}>Pricing</SectionMenuItem>
-      <SectionMenuItem href={HOME_SECTIONS.OPEN_SOURCE}>
-        Open Source
-      </SectionMenuItem>
-      <SectionMenuItem href={HOME_SECTIONS.COMMUNITY}>
-        Community
-      </SectionMenuItem>
-    </header>
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10
+      h-40 bg-gradient-to-b from-zinc-950 to-transparent"
+      />
+
+      <div className={cx("flex items-center gap-4 rounded-full bg-white p-2")}>
+        <Link
+          href="/"
+          className="flex h-10 w-10 items-center justify-center rounded-full
+          hover:bg-zinc-100"
+        >
+          <LogoIcon lightBg height={30} />
+        </Link>
+
+        <div className={cx("flex items-center")}>
+          <SectionMenuItem href={`#${HOME_SECTIONS.FAST}`}>
+            Fast
+          </SectionMenuItem>
+          <SectionMenuItem href={`#${HOME_SECTIONS.SERVERLESS}`}>
+            Serverless
+          </SectionMenuItem>
+          <SectionMenuItem href={`#${HOME_SECTIONS.PRODUCTS}`}>
+            Product
+          </SectionMenuItem>
+          <SectionMenuItem href={`#${HOME_SECTIONS.PRICING}`}>
+            Pricing
+          </SectionMenuItem>
+          <SectionMenuItem href={`#${HOME_SECTIONS.OPEN_SOURCE}`}>
+            Open Source
+          </SectionMenuItem>
+          <SectionMenuItem href={`#${HOME_SECTIONS.COMMUNITY}`}>
+            Community
+          </SectionMenuItem>
+        </div>
+
+        <div className="flex justify-end">
+          <Button
+            target="_self"
+            type="button"
+            hideIcon
+            className="bg-emerald-400 text-emerald-950"
+            href="https://console.upstash.com"
+          >
+            Login
+          </Button>
+        </div>
+      </div>
+    </motion.div>
   );
 }
 
@@ -41,7 +103,13 @@ function SectionMenuItem({
   ...props
 }: HTMLProps<HTMLAnchorElement>) {
   return (
-    <a className={cx("rounded-full px-4 py-3", className)} {...props}>
+    <a
+      className={cx(
+        "rounded-full px-4 py-2 text-zinc-950 hover:bg-zinc-200",
+        className
+      )}
+      {...props}
+    >
       {children}
     </a>
   );

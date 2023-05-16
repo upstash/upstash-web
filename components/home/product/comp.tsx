@@ -76,9 +76,9 @@ export function ProductFeatureItem({
     <li
       className={cx(
         "flex md:w-5/6",
-        // product === Product.REDIS && "text-red-100",
-        // product === Product.KAFKA && "text-blue-100",
-        // product === Product.QSTASH && "text-purple-100",
+        product === Product.REDIS && "text-red-100",
+        product === Product.KAFKA && "text-blue-100",
+        product === Product.QSTASH && "text-purple-100",
         className
       )}
     >
@@ -92,7 +92,7 @@ export function ProductFeatureItem({
           className
         )}
       />
-      {children}
+      <span className="opacity-80">{children}</span>
     </li>
   );
 }

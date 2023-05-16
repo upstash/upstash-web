@@ -20,6 +20,7 @@ export const TAG_NAMES = {
 export enum HOME_SECTIONS {
   FAST = "fast",
   SERVERLESS = "serverless",
+  PRODUCTS = "products",
   PRICING = "pricing",
   OPEN_SOURCE = "open-source",
   INVESTORS = "investors",

@@ -20,7 +20,7 @@ export interface ISectionHeader extends HTMLProps<HTMLDivElement> {}
 export default function HomeServerless({}: ISectionHeader) {
   return (
     <section
-      id={`#${HOME_SECTIONS.SERVERLESS}`}
+      id={HOME_SECTIONS.SERVERLESS}
       className="relative z-10 py-16 md:mt-20 md:py-28"
     >
       <Bg className="top-32 h-1/2" />
@@ -41,9 +41,9 @@ export default function HomeServerless({}: ISectionHeader) {
           <DesignedForTheEdge />
 
           {/* products */}
-          <ProductRedis />
-          <ProductKafka />
-          <ProductQStash />
+          {/*<ProductRedis />*/}
+          {/*<ProductKafka />*/}
+          {/*<ProductQStash />*/}
         </div>
       </Container>
     </section>

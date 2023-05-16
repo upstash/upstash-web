@@ -1,7 +1,7 @@
 import HomeHero from "@/components/home/hero";
 import HomeFast from "@/components/home/fast";
 import HomeServerless from "@/components/home/serverless";
-// import HomeProduct from "@/components/home/product";
+import HomeProduct from "@/components/home/product";
 import HomePrice from "@/components/home/price";
 import HomeOpenSource from "@/components/home/open-source";
 import HomeInvestors from "@/components/home/investor";
@@ -12,10 +12,10 @@ export default function Home() {
   return (
     <main className="overflow-x-hidden text-center">
       <HomeHero />
-      {/*<SectionMenu />*/}
+      <SectionMenu />
       <HomeFast />
       <HomeServerless />
-      {/*<HomeProduct />*/}
+      <HomeProduct />
       <HomePrice />
       <HomeOpenSource />
       <HomeInvestors />
