@@ -1,11 +1,11 @@
 import {
   PriceBadge,
   PriceBox,
+  PriceButton,
   PriceDesc,
   PriceHr,
   PriceTitle,
   PriceValue,
-  PriceButton,
 } from "@/components/home/price/comp";
 
 export default function PriceKafka() {
@@ -27,6 +27,15 @@ export default function PriceKafka() {
         <PriceBadge type="payg">Pay as you go</PriceBadge>
         <PriceValue className="mt-3">$0.6</PriceValue>
         <PriceDesc>per 100K messages</PriceDesc>
+      </div>
+
+      <PriceHr />
+
+      <div>
+        <PriceBadge type="pro">Pro</PriceBadge>
+        <PriceDesc className="mt-3">Starts from</PriceDesc>
+        <PriceValue>$320</PriceValue>
+        <PriceDesc>Unlimited</PriceDesc>
       </div>
 
       <PriceHr />

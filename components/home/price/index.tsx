@@ -11,12 +11,16 @@ import PriceQStash from "@/components/home/price/qstash";
 import Icon, { ICON_NAMES } from "@/components/icon";
 import Button from "@/components/button";
 import Bg from "@/components/bg";
+import { HOME_SECTIONS } from "@/utils/const";
 
 export interface ISectionHeader extends HTMLProps<HTMLDivElement> {}
 
 export default function HomeServerless({}: ISectionHeader) {
   return (
-    <section id="pricing" className="relative py-16 md:py-28">
+    <section
+      id={`#${HOME_SECTIONS.PRICING}`}
+      className="relative py-16 md:py-28"
+    >
       <Bg className="top-32 h-1/2" />
 
       <Container>

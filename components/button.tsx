@@ -18,7 +18,7 @@ export default function Button({
   ...props
 }: IButton) {
   const classes = {
-    button: `gap-1 px-5 py-2 rounded-full bg-white/5
+    button: `gap-1 px-5 py-2 rounded-full bg-white/03
     hover:bg-emerald-400 hover:text-emerald-950`,
     link: `gap-0.5 hover:text-emerald-400 hover:underline`,
   };

@@ -11,7 +11,7 @@ export function CommunityBox({
     <div
       className={cx(
         "group/community-box flex flex-col items-center p-6 md:p-8",
-        "bg-white/5 transition",
+        "bg-white/03 transition",
         "rounded-lg first:rounded-t-3xl last:rounded-b-3xl",
         "md:rounded-lg md:first:rounded-t-lg md:last:rounded-b-lg",
         "lg:first:rounded-t-lg lg:last:rounded-b-lg",

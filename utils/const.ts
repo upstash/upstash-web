@@ -16,3 +16,12 @@ export const TAG_NAMES = {
   qstash: "QStash",
   nextjs: "Next.js",
 };
+
+export enum HOME_SECTIONS {
+  FAST = "fast",
+  SERVERLESS = "serverless",
+  PRICING = "pricing",
+  OPEN_SOURCE = "open-source",
+  INVESTORS = "investors",
+  COMMUNITY = "community",
+}

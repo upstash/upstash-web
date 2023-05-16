@@ -36,7 +36,7 @@ export default function CareerHeader({ job }: Props) {
         <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
           {job.skills.map((skill: string) => (
             <span
-              className="rounded bg-white/5 px-3 py-1 text-zinc-400"
+              className="rounded bg-white/03 px-3 py-1 text-zinc-400"
               key={skill}
             >
               {skill}

@@ -8,6 +8,7 @@ import Button from "@/components/button";
 import Container from "@/components/container";
 import Nav from "./nav";
 import { allJobs } from "contentlayer/generated";
+import { HOME_SECTIONS } from "@/utils/const";
 
 const jobLength = allJobs.filter((o) => !o.draft).length;
 
@@ -51,7 +52,7 @@ const NavItems: {
 }[] = [
   {
     name: "Pricing",
-    href: "/#pricing",
+    href: `/#${HOME_SECTIONS.PRICING}`,
   },
   // {
   //   name: "Open Source",

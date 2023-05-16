@@ -31,6 +31,15 @@ export default function PriceQStash() {
 
       <PriceHr />
 
+      <div>
+        <PriceBadge type="pro">Pro</PriceBadge>
+        <PriceDesc className="mt-3">Max Messages per Day</PriceDesc>
+        <PriceValue>$180</PriceValue>
+        <PriceDesc>Up to 100M</PriceDesc>
+      </div>
+
+      <PriceHr />
+
       <PriceButton href="https://docs.upstash.com/qstash/pricing">
         More information
       </PriceButton>

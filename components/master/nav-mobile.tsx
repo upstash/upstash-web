@@ -25,7 +25,7 @@ export default function NavMobile({ hidden }: HTMLProps<HTMLDivElement> & {}) {
       </Button>
 
       {/* items */}
-      <div className="mt-2 flex flex-col divide-y divide-white/5">
+      <div className="mt-2 flex flex-col divide-y divide-white/03">
         {NavItems.map((item) => {
           return (
             <NavLink key={item.href} href={item.href}>
@@ -39,7 +39,7 @@ export default function NavMobile({ hidden }: HTMLProps<HTMLDivElement> & {}) {
           <Button
             type="button"
             href="https://docs.upstash.com"
-            className="bg-transparent px-0 py-4 font-display text-lg font-medium hover:bg-white/5 hover:text-zinc-50"
+            className="bg-transparent px-0 py-4 font-display text-lg font-medium hover:bg-white/03 hover:text-zinc-50"
           >
             Docs
           </Button>

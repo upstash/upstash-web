@@ -8,7 +8,7 @@ export default function PostGridCard({ data }: { data: Post }) {
   const { title, slug, date, author, authorObj } = data;
 
   return (
-    <article className="flex h-full flex-col rounded-3xl bg-white/5 p-6 md:p-8">
+    <article className="flex h-full flex-col rounded-3xl bg-white/03 p-6 md:p-8">
       <h3 className="pr-4 font-display text-3xl font-semibold leading-tight md:pr-12">
         <Balancer>
           <Link

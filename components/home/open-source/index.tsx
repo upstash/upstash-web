@@ -13,12 +13,16 @@ import {
   SourceTitle,
 } from "@/components/home/open-source/comp";
 import Bg from "@/components/bg";
+import { HOME_SECTIONS } from "@/utils/const";
 
 export interface ISectionHeader extends HTMLProps<HTMLDivElement> {}
 
 export default function HomeOpenSource({}: ISectionHeader) {
   return (
-    <section id="pricing" className="relative py-16 md:py-28">
+    <section
+      id={`#${HOME_SECTIONS.OPEN_SOURCE}`}
+      className="relative py-16 md:py-28"
+    >
       <Bg className="top-32 h-1/2" />
 
       <Container>

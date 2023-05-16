@@ -7,10 +7,14 @@ import Container from "@/components/container";
 import Investors from "@/components/investor/investors";
 import Link from "next/link";
 import Bg from "@/components/bg";
+import { HOME_SECTIONS } from "@/utils/const";
 
 export default function HomeInvestors() {
   return (
-    <section className="relative py-16 md:py-28">
+    <section
+      id={`#${HOME_SECTIONS.INVESTORS}`}
+      className="relative py-16 md:py-28"
+    >
       <Bg className="top-32 h-1/2" />
 
       <Container>

@@ -117,7 +117,7 @@ export default function AnimatedGlobe() {
       //
       // ATMOSPHERE
       atmosphereColor={"#00e9a3"}
-      atmosphereAltitude={0.08}
+      atmosphereAltitude={0}
       //
       // ARCS
       arcsData={arcsData}

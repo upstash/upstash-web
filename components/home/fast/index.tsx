@@ -7,6 +7,7 @@ import Icon, { ICON_NAMES } from "@/components/icon";
 import cx from "@/utils/cx";
 import Bg from "@/components/bg";
 import dynamic from "next/dynamic";
+import { HOME_SECTIONS } from "@/utils/const";
 
 const Globe = dynamic(() => import("./globe"), {
   ssr: false,
@@ -14,7 +15,10 @@ const Globe = dynamic(() => import("./globe"), {
 
 export default function Fast() {
   return (
-    <section className="relative z-0 mt-10 hidden h-[600px] overflow-hidden md:block">
+    <section
+      id={`#${HOME_SECTIONS.FAST}`}
+      className="relative z-0 mt-10 hidden h-[600px] overflow-hidden md:block"
+    >
       <Bg className="top-44 h-1/2" />
 
       {/* slogan */}
@@ -49,12 +53,11 @@ export default function Fast() {
           <p className="mt-6">
             <Link
               href="/fast"
-              className="inline-flex items-center gap-1 opacity-40 transition
-              hover:text-emerald-400 hover:underline hover:opacity-100
-              "
+              className="inline-flex items-center gap-1 underline opacity-40
+              transition hover:text-emerald-400 hover:opacity-100"
             >
               <Icon icon={ICON_NAMES.Bolt} className="text-2xl" />
-              Test the speed!
+              Test the speed
             </Link>
           </p>
         </Container>

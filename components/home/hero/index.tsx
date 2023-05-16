@@ -24,7 +24,7 @@ export default function HomeHero() {
         />
       </Container>
 
-      <Container className="max-w-screen-md">
+      <Container className="max-w-screen-sm">
         <HomeHeroCustomer />
       </Container>
     </section>

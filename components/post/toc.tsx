@@ -12,7 +12,7 @@ export default function PostTOC({ toc }: Props) {
 
   return (
     <details
-      className="group/toc mb-10 rounded-xl bg-white/5"
+      className="group/toc mb-10 rounded-xl bg-white/03"
       role="navigation"
       aria-label="Table of contents"
     >

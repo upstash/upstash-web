@@ -13,7 +13,7 @@ export function PriceBox({
     <div
       className={cx(
         "group/price-box grid place-items-center gap-4 p-6 md:gap-6 md:p-8",
-        "bg-white bg-opacity-5 backdrop-blur transition",
+        "bg-white bg-opacity-03 backdrop-blur transition",
         "rounded-lg first:rounded-t-3xl last:rounded-b-3xl",
         "md:first:rounded-t-lg md:last:rounded-b-lg",
         "md:first:!rounded-l-[2.2rem] md:last:!rounded-r-[2.2rem]",
@@ -82,17 +82,19 @@ export function PriceBadge({
   ...props
 }: HTMLProps<HTMLSpanElement> & {
   children: ReactNode;
-  type?: "free" | "payg";
+  type?: "free" | "payg" | "pro";
 }) {
   return (
     <span
       className={cx(
-        "inline-flex rounded-full border px-3 pb-1 pt-1.5 leading-none",
+        "inline-flex rounded-full px-3 pb-1 pt-1.5 leading-none",
         "text-xs uppercase leading-none tracking-widest",
-        type === "free" &&
-          "border-emerald-300/10 bg-emerald-300/5 text-emerald-400",
+        "border border-white/10 bg-white/03 text-white/60",
         type === "payg" &&
-          "border-yellow-300/10 bg-yellow-300/5 text-yellow-300/80",
+          "border-emerald-300/10 bg-emerald-300/03 text-emerald-300/60",
+        type === "pro" &&
+          "border-yellow-300/10 bg-yellow-300/03 text-yellow-300/60",
+
         className
       )}
       {...props}
@@ -104,7 +106,7 @@ export function PriceBadge({
 
 export function PriceHr({ className }: HTMLProps<HTMLHRElement> & {}) {
   return (
-    <hr className={cx("w-10 border-0 border-b border-white/5", className)} />
+    <hr className={cx("w-10 border-0 border-b border-white/03", className)} />
   );
 }
 

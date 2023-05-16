@@ -18,7 +18,7 @@ export function ServerlessBox({
     <div
       className={cx(
         "group/box-body relative z-0 grid gap-6 p-6 md:gap-8 md:p-8",
-        "bg-white/5 backdrop-blur",
+        "bg-white/03 backdrop-blur",
         "rounded-3xl md:rounded-[2.2rem]",
         className
       )}

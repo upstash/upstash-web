@@ -2,30 +2,35 @@
 
 import { HTMLProps } from "react";
 import cx from "@/utils/cx";
+import { HOME_SECTIONS } from "@/utils/const";
 
 export default function SectionMenu({
   children,
   className,
-  show,
   ...props
-}: HTMLProps<HTMLDivElement> & {
-  show: boolean;
-}) {
+}: HTMLProps<HTMLDivElement> & {}) {
   return (
     <header
       className={cx(
-        "fixed left-1/2 top-40 z-50 -translate-x-1/2 items-center p-1",
+        "fixed left-1/2 top-10 z-50 -translate-x-1/2",
+        "flex items-center p-1",
         "rounded-full bg-black/90 shadow-xl backdrop-blur",
-        show ? "flex" : "hidden",
+        // show ? "flex" : "hidden",
         className
       )}
       {...props}
     >
-      <SectionMenuItem>Fast Anywhere</SectionMenuItem>
-      <SectionMenuItem>Serverless</SectionMenuItem>
-      <SectionMenuItem>Pricing</SectionMenuItem>
-      <SectionMenuItem>Open Source</SectionMenuItem>
-      <SectionMenuItem>Community</SectionMenuItem>
+      <SectionMenuItem href={HOME_SECTIONS.FAST}>Fast Anywhere</SectionMenuItem>
+      <SectionMenuItem href={HOME_SECTIONS.SERVERLESS}>
+        Serverless
+      </SectionMenuItem>
+      <SectionMenuItem href={HOME_SECTIONS.PRICING}>Pricing</SectionMenuItem>
+      <SectionMenuItem href={HOME_SECTIONS.OPEN_SOURCE}>
+        Open Source
+      </SectionMenuItem>
+      <SectionMenuItem href={HOME_SECTIONS.COMMUNITY}>
+        Community
+      </SectionMenuItem>
     </header>
   );
 }
