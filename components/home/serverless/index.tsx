@@ -9,9 +9,6 @@ import GlobalLowLatency from "@/components/home/serverless/global-low-latency";
 import PriceScaleToZero from "@/components/home/serverless/price-scale-to-zero";
 import HttpRestApi from "@/components/home/serverless/http-rest-api";
 import DesignedForTheEdge from "@/components/home/serverless/designed-for-the-edge";
-import ProductRedis from "../product/redis";
-import ProductKafka from "../product/kafka";
-import ProductQStash from "../product/qstash";
 import Bg from "@/components/bg";
 import { HOME_SECTIONS } from "@/utils/const";
 
@@ -33,7 +30,7 @@ export default function HomeServerless({}: ISectionHeader) {
           </SectionHeaderSummary>
         </SectionHeader>
 
-        <div className="mt-10 grid gap-2 text-left md:mt-20 md:grid-cols-6 md:gap-6">
+        <div className="mt-10 grid gap-6 text-left md:mt-20 md:grid-cols-6">
           {/* features */}
           <GlobalLowLatency />
           <PriceScaleToZero />

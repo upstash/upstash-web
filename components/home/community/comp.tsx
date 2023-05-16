@@ -15,7 +15,7 @@ export function CommunityBox({
         "rounded-lg first:rounded-t-3xl last:rounded-b-3xl",
         "md:rounded-lg md:first:rounded-t-lg md:last:rounded-b-lg",
         "lg:first:rounded-t-lg lg:last:rounded-b-lg",
-        "lg:first:!rounded-l-[2.2rem] lg:last:!rounded-r-[2.2rem]",
+        "lg:first:!rounded-l-4xl lg:last:!rounded-r-4xl",
         "hover:scale-[1.02] hover:bg-white/10",
         className
       )}

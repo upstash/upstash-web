@@ -41,7 +41,7 @@ export default function HomeServerless({}: ISectionHeader) {
         </SectionHeader>
 
         {/* table */}
-        <div className="mt-10 grid gap-2 md:mt-20 md:grid-cols-3">
+        <div className="mt-10 grid gap-6 md:mt-20 md:grid-cols-3">
           <PriceRedis />
           <PriceKafka />
           <PriceQStash />

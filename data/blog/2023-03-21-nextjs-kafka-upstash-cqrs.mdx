@@ -61,9 +61,7 @@ The first function handles client requests with a GraphQL API. GraphQL queries h
 
 Let’s check out the GraphQL schema:
 
-File `schema/typedefs.ts`:
-
-```graphql
+```graphql title="schema/typedefs.ts"
 ...
 type Task {
   id: String!
@@ -97,9 +95,7 @@ The second function gets notified by QStash when new events are stored in Upstas
 
 We will start by implementing the commands of CQRS with GraphQL mutation resolvers. Let’s look at the following code:
 
-File `schema/resolvers.ts`:
-
-```ts
+```ts title="schema/resolvers.ts"
 ...
 export const resolvers = {
   Query: {...},
@@ -143,9 +139,7 @@ As we saw in the schema before, we need three resolvers:
 
 Besides the task construction in `createTask`, there is not much logic in these resolvers. Everything is handed off to the `EventStore`. So, let’s look at the `saveEvent` method of our `EventStore`.
 
-File `utils/eventstore.ts`:
-
-```ts
+```ts title="utils/eventstore.ts"
 ...
 async saveEvent(event: Omit<TaskEvent, "offset">) {
   await fetch(
@@ -159,9 +153,7 @@ async saveEvent(event: Omit<TaskEvent, "offset">) {
 
 Nothing fancy here either; just sending a `GET` request with our new event to Upstash Kafka and calling `notify`. For completeness, let’s also look at the implementation of the `notify` function.
 
-File `utils/notificator.ts`:
-
-```ts
+```ts title="utils/notificator.ts"
 ...
 export const notify = async () => {
   const qstashClient = new Client({
@@ -184,9 +176,7 @@ Since QStash handles all the work, there is not much to see here either. While t
 
 There is just one query resolver, and it lists all the tasks.
 
-File `schema/resolvers.ts`:
-
-```ts
+```ts title="schema/resolvers.ts"
 ...
 export const resolvers = {
   Query: {
@@ -201,9 +191,7 @@ export const resolvers = {
 
 The resolver calls `loadTasks` on the `projectionStore`, which handles the work. The `projectionStore` uses Upstash Redis to store the state calculated from all the events we put in Upstash Kafka. Let’s look at the `loadTasks` method.
 
-File `utils/projectionstore.ts`:
-
-```ts
+```ts title="utils/projectionstore.ts"
 ...
 async loadTasks(): Promise<Task[]> {
   const taskIds = await this.redisClient.smembers("tasks")
@@ -222,9 +210,7 @@ Now that the GraphQL resolvers are ready, we must calculate our read state. We n
 
 The handler of our serverless function is quite simple:
 
-File `app/projection/route.ts`:
-
-```ts
+```ts title="app/projection/route.ts"
 ...
 export const POST = validate(async (request: Request) => {
   const offset = await projectionStore.loadOffset()
@@ -239,9 +225,7 @@ If the request came from QStash, we would load the last `offset` stored in the `
 
 The function handler is wrapped in a `validate` function from our `notificator`, which ensures only QStash can call this endpoint.
 
-File `utils/notificator.ts`:
-
-```ts
+```ts title="utils/notificator.ts"
 ...
 export const validate = (handler: RequestHandler) => {
   const qstashReceiver = new Receiver({
@@ -272,9 +256,7 @@ The `validate` function uses the QStash signing keys to check every request befo
 
 The `loadEvents` method of our `EventStore` looks like this:
 
-File `utils/eventstore.ts`:
-
-```ts
+```ts title="utils/eventstore.ts"
 ...
 async loadEvents(offset: number): Promise<TaskEvent[]> {
   const response = await fetch(this.fetchUrl, {
@@ -304,9 +286,7 @@ We `fetch` all `messages` since the `offset` and extract the events from them.
 
 Finally, the `processEvents` method of the `projectionStore` will calculate our state for the query resolver:
 
-File `utils/projectionstore.ts`:
-
-```ts
+```ts title="utils/projectionstore.ts"
 ...
 async processEvents(events: TaskEvent[]) {
   if (events.length === 0) return
@@ -346,9 +326,7 @@ In the next steps, we will set up the infrastructure for our system. We will use
 
 We will write all Upstash credentials into a `.env.local` file, so they are available in the environment variables of our development machine. Here is a template for this file:
 
-File `.env.local`:
-
-```shell
+```shell title=".env.local"
 UPSTASH_REDIS_REST_URL=...
 UPSTASH_REDIS_REST_TOKEN=...
 

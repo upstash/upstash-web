@@ -21,6 +21,9 @@ module.exports = {
       opacity: {
         "03": "0.03",
       },
+      borderRadius: {
+        "4xl": "2.2rem",
+      },
     },
   },
 };

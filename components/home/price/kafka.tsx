@@ -7,11 +7,15 @@ import {
   PriceTitle,
   PriceValue,
 } from "@/components/home/price/comp";
+import IconKafka from "@/components/icon-kafka";
 
 export default function PriceKafka() {
   return (
     <PriceBox>
-      <PriceTitle>Kafka</PriceTitle>
+      <header>
+        <IconKafka className="mb-4 inline-flex" />
+        <PriceTitle>Kafka</PriceTitle>
+      </header>
 
       <PriceHr />
 

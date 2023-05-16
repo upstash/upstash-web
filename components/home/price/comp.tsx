@@ -13,10 +13,7 @@ export function PriceBox({
     <div
       className={cx(
         "group/price-box grid place-items-center gap-4 p-6 md:gap-6 md:p-8",
-        "bg-white bg-opacity-03 backdrop-blur transition",
-        "rounded-lg first:rounded-t-3xl last:rounded-b-3xl",
-        "md:first:rounded-t-lg md:last:rounded-b-lg",
-        "md:first:!rounded-l-[2.2rem] md:last:!rounded-r-[2.2rem]",
+        "rounded-4xl bg-white bg-opacity-03 backdrop-blur transition",
         "hover:scale-[1.02] hover:bg-opacity-10",
         className
       )}
@@ -37,7 +34,7 @@ export function PriceTitle({
   return (
     <h3
       className={cx(
-        "font-display text-xl font-medium leading-none md:text-2xl",
+        "font-display text-xl font-semibold leading-none md:text-2xl",
         className
       )}
       {...props}

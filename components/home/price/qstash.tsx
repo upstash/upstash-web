@@ -7,11 +7,15 @@ import {
   PriceValue,
   PriceButton,
 } from "@/components/home/price/comp";
+import IconQStash from "@/components/icon-qstash";
 
 export default function PriceQStash() {
   return (
     <PriceBox>
-      <PriceTitle>QStash</PriceTitle>
+      <header>
+        <IconQStash className="mb-4 inline-flex" />
+        <PriceTitle>QStash</PriceTitle>
+      </header>
 
       <PriceHr />
 

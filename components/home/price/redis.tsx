@@ -7,11 +7,16 @@ import {
   PriceTitle,
   PriceValue,
 } from "./comp";
+import React from "react";
+import IconRedis from "@/components/icon-redis";
 
 export default function PriceRedis() {
   return (
     <PriceBox>
-      <PriceTitle>Redis</PriceTitle>
+      <header>
+        <IconRedis className="mb-4 inline-flex" />
+        <PriceTitle>Redis</PriceTitle>
+      </header>
 
       <PriceHr />
 

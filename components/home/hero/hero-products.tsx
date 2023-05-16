@@ -121,7 +121,7 @@ function HomeHeroProduct({
         "cursor-default bg-white/03 backdrop-blur transition",
         "rounded-lg first:rounded-t-3xl last:rounded-b-3xl",
         "md:first:rounded-t-lg md:last:rounded-b-lg",
-        "md:first:!rounded-l-[2.2rem] md:last:!rounded-r-[2.2rem]",
+        "md:first:!rounded-l-4xl md:last:!rounded-r-4xl",
         "hover:scale-[1.02] hover:bg-white/10",
         "text-emerald-100",
         activeProduct === Product.REDIS && "text-red-200",
