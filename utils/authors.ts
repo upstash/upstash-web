@@ -206,4 +206,9 @@ export default {
     url: "https://github.com/fahreddinozcan",
     image: "fahreddin.png",
   },
+  rishi: {
+    name: "Rishi Raj Jain",
+    title: "Technical CSM @Edgio (Guest Author)",
+    image: "rishi.jpeg",
+  },
 };
