@@ -1,6 +1,6 @@
 "use client";
 
-import { HTMLProps, useState } from "react";
+import { HTMLProps, useEffect, useState } from "react";
 import cx from "@/utils/cx";
 import { HOME_SECTIONS } from "@/utils/const";
 import {
@@ -9,9 +9,10 @@ import {
   useMotionValueEvent,
   useScroll,
 } from "framer-motion";
-import { Logo, LogoIcon } from "@/components/logo";
+import { LogoIcon } from "@/components/logo";
 import Button from "@/components/button";
 import Link from "next/link";
+import { Events, Link as SpyLink } from "react-scroll";
 
 export default function SectionMenu({
   children,
@@ -28,6 +29,21 @@ export default function SectionMenu({
       setShow(false);
     }
   });
+
+  useEffect(() => {
+    Events.scrollEvent.register("begin", function () {
+      console.log("begin", arguments);
+    });
+
+    Events.scrollEvent.register("end", function () {
+      console.log("end", arguments);
+    });
+
+    return () => {
+      Events.scrollEvent.remove("begin");
+      Events.scrollEvent.remove("end");
+    };
+  }, [show]);
 
   return (
     <motion.div
@@ -61,22 +77,20 @@ export default function SectionMenu({
         </Link>
 
         <div className={cx("flex items-center")}>
-          <SectionMenuItem href={`#${HOME_SECTIONS.FAST}`}>
-            Fast
-          </SectionMenuItem>
-          <SectionMenuItem href={`#${HOME_SECTIONS.SERVERLESS}`}>
+          <SectionMenuItem href={HOME_SECTIONS.FAST}>Fast</SectionMenuItem>
+          <SectionMenuItem href={HOME_SECTIONS.SERVERLESS}>
             Serverless
           </SectionMenuItem>
-          <SectionMenuItem href={`#${HOME_SECTIONS.PRODUCTS}`}>
+          <SectionMenuItem href={HOME_SECTIONS.PRODUCTS}>
             Products
           </SectionMenuItem>
-          <SectionMenuItem href={`#${HOME_SECTIONS.PRICING}`}>
+          <SectionMenuItem href={HOME_SECTIONS.PRICING}>
             Pricing
           </SectionMenuItem>
-          <SectionMenuItem href={`#${HOME_SECTIONS.OPEN_SOURCE}`}>
+          <SectionMenuItem href={HOME_SECTIONS.OPEN_SOURCE}>
             Open Source
           </SectionMenuItem>
-          <SectionMenuItem href={`#${HOME_SECTIONS.COMMUNITY}`}>
+          <SectionMenuItem href={HOME_SECTIONS.COMMUNITY}>
             Community
           </SectionMenuItem>
         </div>
@@ -103,14 +117,18 @@ function SectionMenuItem({
   ...props
 }: HTMLProps<HTMLAnchorElement>) {
   return (
-    <a
-      className={cx(
-        "rounded-full px-4 py-2 text-zinc-950 hover:bg-zinc-200",
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </a>
+    <SpyLink spy={true} activeClass="active" to={props.href}>
+      <span
+        className={cx(
+          "select-none px-4 py-2 text-zinc-700",
+          "cursor-pointer rounded-full transition",
+          "[.active_&]:bg-zinc-200 [.active_&]:text-zinc-950",
+          "hover:bg-zinc-200",
+          className
+        )}
+      >
+        {children}
+      </span>
+    </SpyLink>
   );
 }

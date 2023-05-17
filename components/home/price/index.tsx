@@ -1,4 +1,3 @@
-import { HTMLProps } from "react";
 import {
   SectionHeader,
   SectionHeaderSummary,
@@ -9,13 +8,10 @@ import PriceRedis from "@/components/home/price/redis";
 import PriceKafka from "@/components/home/price/kafka";
 import PriceQStash from "@/components/home/price/qstash";
 import Icon, { ICON_NAMES } from "@/components/icon";
-import Button from "@/components/button";
 import Bg from "@/components/bg";
 import { HOME_SECTIONS } from "@/utils/const";
 
-export interface ISectionHeader extends HTMLProps<HTMLDivElement> {}
-
-export default function HomeServerless({}: ISectionHeader) {
+export default function HomeServerless() {
   return (
     <section id={HOME_SECTIONS.PRICING} className="relative py-16 md:py-28">
       <Bg className="top-32 h-1/2" />

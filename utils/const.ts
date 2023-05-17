@@ -18,6 +18,7 @@ export const TAG_NAMES = {
 };
 
 export enum HOME_SECTIONS {
+  HERO = "hero",
   FAST = "fast",
   SERVERLESS = "serverless",
   PRODUCTS = "products",
