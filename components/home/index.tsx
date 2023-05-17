@@ -1,5 +1,5 @@
 import HomeHero from "./hero";
-import HomeFast from "./fast";
+// import HomeFast from "./fast";
 import HomeServerless from "./serverless";
 import HomeProduct from "./product";
 import HomePrice from "./price";
@@ -12,7 +12,7 @@ export default function Home() {
   return (
     <main className="overflow-x-hidden text-center">
       <HomeHero />
-      <HomeFast />
+      {/* <HomeFast /> */}
       <HomeServerless />
       <HomeProduct />
       <HomePrice />
@@ -20,7 +20,7 @@ export default function Home() {
       <HomeInvestors />
       <HomeCommunity />
 
-      {/* <SectionMenu /> */}
+      <SectionMenu />
     </main>
   );
 }
