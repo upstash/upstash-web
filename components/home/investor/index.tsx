@@ -30,10 +30,7 @@ export default function HomeInvestors() {
 
         {/* about link */}
         <div className="mt-10 text-zinc-600">
-          <Link
-            href="https://docs.upstash.com/redis/overall/pricing"
-            className="underline hover:text-emerald-400"
-          >
+          <Link href="/about" className="underline hover:text-emerald-400">
             See the full list
           </Link>
         </div>
