@@ -37,7 +37,7 @@ export default function PriceQStash() {
 
       <div>
         <PriceBadge type="pro">Pro</PriceBadge>
-        <PriceDesc className="mt-3">Max Messages per Day</PriceDesc>
+        <PriceDesc className="mt-3">Starts from</PriceDesc>
         <PriceValue>$180</PriceValue>
         <PriceDesc>Up to 100M</PriceDesc>
       </div>
