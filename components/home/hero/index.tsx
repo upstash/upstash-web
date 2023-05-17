@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import Container from "@/components/container";
 import HomeHeroBg from "@/components/home/hero/hero-bg";
 import HomeHeroProducts from "@/components/home/hero/hero-products";
 import HomeHeroCustomer from "@/components/home/hero/hero-customer";
 import HomeHeroSlogan from "@/components/home/hero/hero-slogan";
 import { Product } from "@/utils/type";
-import { useInView } from "framer-motion";
 
 export default function HomeHero() {
   const [activeProduct, setActiveProduct] = useState<Product>();

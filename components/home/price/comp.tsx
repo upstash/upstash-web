@@ -13,7 +13,7 @@ export function PriceBox({
     <div
       className={cx(
         "group/price-box grid place-items-center gap-4 p-6 md:gap-6 md:p-8",
-        "rounded-4xl bg-white bg-opacity-03 backdrop-blur transition",
+        "rounded-4xl bg-white bg-opacity-5 backdrop-blur transition",
         "hover:scale-[1.02] hover:bg-opacity-10",
         className
       )}
@@ -90,11 +90,8 @@ export function PriceBadge({
         "inline-flex rounded-full px-2 pb-0.5 pt-1 leading-none",
         "text-xs uppercase leading-none tracking-widest",
         "border border-white/10 bg-white/03 text-white/60",
-        type === "payg" &&
-          "border-emerald-300/10 bg-emerald-300/03 text-emerald-300/60",
-        type === "pro" &&
-          "border-yellow-300/10 bg-yellow-300/03 text-yellow-300/60",
-
+        type === "free" &&
+          "border-emerald-300/10 bg-emerald-300/5 text-emerald-300/80",
         className
       )}
       {...props}

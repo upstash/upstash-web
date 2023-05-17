@@ -3,6 +3,9 @@ import React, { Children, cloneElement, HTMLProps, ReactElement } from "react";
 import { Product } from "@/utils/type";
 import Button, { IButton } from "@/components/button";
 import Icon, { ICON_NAMES } from "@/components/icon";
+import IconRedis from "@/components/icon-redis";
+import IconQStash from "@/components/icon-qstash";
+import IconKafka from "@/components/icon-kafka";
 
 export default function HomeHeroProducts({
   activeProduct,
@@ -22,21 +25,13 @@ export default function HomeHeroProducts({
         onMouseEnter={() => setActiveProduct(Product.REDIS)}
       >
         <HeroProductTitle>
-          Redis<span className="text-[.9em] opacity-20">®*</span>
+          {/*<span className="block">
+            <IconRedis className="mb-3 inline-flex grayscale group-hover/hero-product:grayscale-0" />
+          </span>*/}
+          <span>Redis</span>
+          <span className="text-[.9em] opacity-20">®*</span>
         </HeroProductTitle>
         <HeroProductDesc>Serverless database with Redis API</HeroProductDesc>
-
-        {/*
-          Durable and fast with multi tier storage.
-          Fast anywhere with global replication.
-          Designed for Edge/Serverless with REST API.
-        */}
-        {/*<div className="mt-4 space-y-1">
-          <HeroProductFeature>Durable and fast.</HeroProductFeature>
-          <HeroProductFeature>Global replication.</HeroProductFeature>
-          <HeroProductFeature>Designed for Edge/Serverless.</HeroProductFeature>
-        </div>*/}
-
         <HeroProductCta href="https://console.upstash.com">
           Create Database
         </HeroProductCta>
@@ -48,21 +43,13 @@ export default function HomeHeroProducts({
         onMouseEnter={() => setActiveProduct(Product.KAFKA)}
       >
         <HeroProductTitle>
-          Kafka<span className="text-[.9em] opacity-20">®</span>
+          {/*<span className="block">
+            <IconKafka className="mb-3 inline-flex grayscale group-hover/hero-product:grayscale-0" />
+          </span>*/}
+          <span>Kafka</span>
+          <span className="text-[.9em] opacity-20">®</span>
         </HeroProductTitle>
         <HeroProductDesc>Serverless Kafka and Connectors</HeroProductDesc>
-
-        {/*
-          Per message pricing with zero fixed cost.
-          Managed Kafka Connectors with no cost.
-          REST support in addition to Kafka API.
-          */}
-        {/*<div className="mt-4 space-y-1">
-          <HeroProductFeature>Durable and fast.</HeroProductFeature>
-          <HeroProductFeature>Global replication.</HeroProductFeature>
-          <HeroProductFeature>Designed for Edge/Serverless.</HeroProductFeature>
-        </div>*/}
-
         <HeroProductCta href="https://console.upstash.com">
           Create Cluster
         </HeroProductCta>
@@ -73,20 +60,13 @@ export default function HomeHeroProducts({
         activeProduct={activeProduct}
         onMouseEnter={() => setActiveProduct(Product.QSTASH)}
       >
-        <HeroProductTitle>QStash</HeroProductTitle>
+        <HeroProductTitle>
+          {/*<span className="block">
+            <IconQStash className="mb-3 inline-flex grayscale group-hover/hero-product:grayscale-0" />
+          </span>*/}
+          <span>QStash</span>
+        </HeroProductTitle>
         <HeroProductDesc>Messaging for the Serverless</HeroProductDesc>
-
-        {/*
-          Serverless, HTTP based messaging.
-          Scheduling via CRON.
-          At-least-once delivery with auto retries.
-          */}
-        {/*<div className="mt-4 space-y-1">
-          <HeroProductFeature>Durable and fast.</HeroProductFeature>
-          <HeroProductFeature>Global replication.</HeroProductFeature>
-          <HeroProductFeature>Designed for Edge/Serverless.</HeroProductFeature>
-        </div>*/}
-
         <HeroProductCta href="https://console.upstash.com">
           Publish Messages
         </HeroProductCta>
@@ -118,15 +98,11 @@ function HomeHeroProduct({
       className={cx(
         "group/hero-product",
         "flex flex-col items-center p-6 md:p-8",
-        "cursor-default bg-white/03 backdrop-blur transition",
+        "cursor-default bg-white/5 backdrop-blur transition",
         "rounded-lg first:rounded-t-3xl last:rounded-b-3xl",
         "md:first:rounded-t-lg md:last:rounded-b-lg",
         "md:first:!rounded-l-4xl md:last:!rounded-r-4xl",
         "hover:scale-[1.02] hover:bg-white/10",
-        "text-emerald-100",
-        activeProduct === Product.REDIS && "text-red-200",
-        activeProduct === Product.KAFKA && "text-blue-200",
-        activeProduct === Product.QSTASH && "text-purple-200",
         className
       )}
       {...props}
@@ -143,7 +119,7 @@ function HeroProductTitle({
   return (
     <h3
       className={cx(
-        "font-display text-xl font-medium leading-none text-zinc-50 md:text-2xl",
+        "flex items-center gap-1 font-display text-xl font-medium leading-none text-zinc-50 md:text-2xl",
         className
       )}
     >
@@ -156,27 +132,7 @@ function HeroProductDesc({
   children,
   className,
 }: HTMLProps<HTMLParagraphElement>) {
-  return <p className={cx("mt-2", className)}>{children}</p>;
-}
-
-export function HeroProductFeature({
-  children,
-  className,
-}: HTMLProps<HTMLLIElement>) {
-  return (
-    <div
-      className={cx(
-        "flex items-center justify-center gap-1 opacity-40 group-hover/hero-product:opacity-80",
-        className
-      )}
-    >
-      <Icon
-        icon={ICON_NAMES.Check}
-        className={cx("text-xl text-emerald-400")}
-      />
-      {children}
-    </div>
-  );
+  return <p className={cx("opacity-60", className)}>{children}</p>;
 }
 
 function HeroProductCta({
@@ -193,7 +149,7 @@ function HeroProductCta({
     <Button
       type="button"
       className={cx(
-        "mt-6",
+        "mt-5",
         activeProduct ? "bg-white/03 text-zinc-50" : "bg-zinc-50 text-zinc-950",
         activeProduct === Product.REDIS && active && "!bg-red-500 !text-white",
         activeProduct === Product.KAFKA && active && "!bg-blue-500 !text-white",
