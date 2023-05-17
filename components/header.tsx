@@ -65,7 +65,7 @@ function Header({ onOpen }: { onOpen: () => void }) {
                 <Text as="span">Blog</Text>
               </Link>
 
-              <Link href="/careers" color="inherit" alignItems="baseline">
+              {/*<Link href="/careers" color="inherit" alignItems="baseline">
                 <Text as="span">Careers</Text>{" "}
                 <Badge
                   ml={1}
@@ -75,7 +75,7 @@ function Header({ onOpen }: { onOpen: () => void }) {
                 >
                   {allJobs.filter((o) => !o.draft).length}
                 </Badge>
-              </Link>
+              </Link>*/}
 
               <CustomLink isExternal href={LINKS.docs} color="inherit">
                 Docs

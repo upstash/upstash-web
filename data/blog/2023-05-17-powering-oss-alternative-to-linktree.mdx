@@ -6,7 +6,7 @@ tags: ["astro", "redis", "edgio", "github"]
 ---
 
 
-In this post, I talk about how [itsmy.fyi](http://itsmy.fyi) (an open-source alternative to LinkTree) is built with [Upstash](https://upstash.com/), [Astro](https://astro.build), [GitHub](https://github.com) and [Edgio](https://edg.io). Upstash helped me to manage (CRUD) data of all the users, offered way generous rate limiting as compared to GitHub API for CRUD operations, and implement granular rate limiting.
+In this post, I talk about how [itsmy.fyi](http://itsmy.fyi) (an open-source alternative to LinkTree) is built with [Upstash](https://upstash.com/), [Astro](https://astro.build), [GitHub](https://github.com) and [Edgio](https://edg.io). Upstash helped me to manage (CRUD) data of all the users, offered way generous rate limiting as compared to GitHub API for CRUD operations, and implemening granular rate limiting.
 
 ![screenzy-1682836269858.png](/blog/powering-oss-alternative-to-linktree/screenzy-1682836269858.png)
 
@@ -23,12 +23,6 @@ In this post, I talk about how [itsmy.fyi](http://itsmy.fyi) (an open-source alt
 - A [GitHub](https://github.com) account
 - An [Upstash](https://upstash.com/) account to create a database
 
-## Demo
-
-<video controls>
-  <source src="https://user-images.githubusercontent.com/46300090/213339667-d6a6599c-8136-4dd3-9e05-6594636c1d48.mp4" type="video/mp4"/>
-</video>
-[https://user-images.githubusercontent.com/46300090/213339667-d6a6599c-8136-4dd3-9e05-6594636c1d48.mp4](https://user-images.githubusercontent.com/46300090/213339667-d6a6599c-8136-4dd3-9e05-6594636c1d48.mp4)
 
 ## Setting up Upstash Redis
 
@@ -38,7 +32,7 @@ Once you have created an Upstash account and are logged in you are going to go t
 
 ![screenzy-1682836009723.png](/blog/powering-oss-alternative-to-linktree/screenzy-1682836009723.png)
 
-After you have created your database, you are then going to the Details tab. Scroll down until you find the Connect your database section. Copy the content and save it somewhere safe.
+After you have created your database, you are then going to the Details tab. Scroll down until you find the `Connect your database` section. Copy the content and save it somewhere safe.
 
 ![screenzy-1682836213955.png](/blog/powering-oss-alternative-to-linktree/screenzy-1682836213955.png)
 
@@ -90,13 +84,13 @@ This is the main folder structure for the project. I have circled in red the fil
 This is a high-level diagram of how data is flowing.
 
 - If a user visits [itsmy.fyi/me/slug](http://itsmy.fyi/me/slug) and the response to this page is not cached (or is being revalidated), it calls the getUserInfo function which in turns retrieves the user json from the Upstash DB
-- If a user create(s), update(s) or delete(s) a GitHub Issue, GitHub triggers a Webhook which POSTs to an endpoint. In that endpoint, first Upstash Rate Limiting is used to evaluate if the requested change can be made, and then using Upstash DB, the user json(s) are created, updated or deleted.
+- If a user create(s), update(s) or delete(s) a GitHub Issue, GitHub triggers a Webhook which POSTs to an endpoint. In that endpoint, first Upstash Rate Limiting is used to evaluate if the requested change can be made, and then using Upstash, the user json(s) are created, updated or deleted.
 
 ![screenzy-1682838780867.png](/blog/powering-oss-alternative-to-linktree/screenzy-1682838780867.png)
 
 ## User Profile(s) CRUD Operations via Upstash Redis
 
-In this section, we'll be diving deep into how the data fetching, updating and deletion for the user profile(s) is done. We make constant use of Upstash DB (via `ioredis`) to fetch and display data.
+In this section, we'll be diving deep into how the data fetching, updating and deletion for the user profile(s) is done. We make constant use of Upstash (via `ioredis`) to fetch and display data.
 
 ### Why I moved over from GitHub to Upstash for CRUD Operations?
 
@@ -171,10 +165,6 @@ export async function postUserInfo(data) {
   }
 }
 ```
-
-## Graph: Visualizing the CRUD Operations
-
-Attach a graph
 
 ## Rate Limiting
 

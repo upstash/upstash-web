@@ -54,7 +54,7 @@ function MobileMenu({
               <CustomLink href="/blog" h={10} color="inherit">
                 <Flex grow={1}>Blog</Flex>
               </CustomLink>
-              <CustomLink href="/careers" h={10} color="inherit">
+              {/*<CustomLink href="/careers" h={10} color="inherit">
                 <Flex grow={1} alignItems="center">
                   Careers
                   <Flex
@@ -73,7 +73,7 @@ function MobileMenu({
                     {allJobs.filter((o) => !o.draft).length}
                   </Flex>
                 </Flex>
-              </CustomLink>
+              </CustomLink>*/}
               <CustomLink isExternal href={LINKS.docs} h={10} color="inherit">
                 <Flex grow={1}>Docs</Flex>
               </CustomLink>

@@ -182,27 +182,34 @@ export default {
     url: "https://twitter.com/deepwhitman",
     image_url: "blog/authors/bilaltahir.jpeg",
   },
-  thomasCazade:{
-    name:"Thomas Cazade",
-    title:"Founder of fastsheet (Guest Author)",
-    url:"https://twitter.com/TotomInc",
-    image_url:"blog/authors/thomas_cazade.jpeg",
+  thomasCazade: {
+    name: "Thomas Cazade",
+    title: "Founder of fastsheet (Guest Author)",
+    url: "https://twitter.com/TotomInc",
+    image_url: "blog/authors/thomas_cazade.jpeg",
   },
-  russTran:{
-    name:"Russ Tran",
-    title:"Frontend Engineer at JUST.engineer (Guest Author)",
-    url:"https://twitter.com/russdevdotnet",
-    image_url:"blog/authors/russ_tran.jpeg",
+  russTran: {
+    name: "Russ Tran",
+    title: "Frontend Engineer at JUST.engineer (Guest Author)",
+    url: "https://twitter.com/russdevdotnet",
+    image_url: "blog/authors/russ_tran.jpeg",
   },
-  hosna:{
-    name:"Hosna Qasmei",
-    title:"Full Stack Developer (Guest Author)",
-    url:"https://twitter.com/hqasmei",
-    image_url:"blog/authors/hosna.jpeg",
+  hosna: {
+    name: "Hosna Qasmei",
+    title: "Full Stack Developer (Guest Author)",
+    url: "https://twitter.com/hqasmei",
+    image_url: "blog/authors/hosna.jpeg",
   },
-  rishi:{
-    name:"Rishi Raj Jain",
-    title:"Technical CSM @Edgio (Guest Author)",
-    image_url:"blog/authors/rishi.jpeg",
+  rishi: {
+    name: "Rishi Raj Jain",
+    title: "Technical CSM @Edgio (Guest Author)",
+    image_url: "blog/authors/rishi.jpeg",
+  },
+  fahreddin: {
+    name: "Fahreddin Ozcan",
+    title: "Full Stack Developer (Guest Author)",
+    url: "https://github.com/fahreddinozcan",
+    image_url: "blog/authors/fahreddin.png",
   }
+
 };
