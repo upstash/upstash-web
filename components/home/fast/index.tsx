@@ -1,5 +1,3 @@
-"use client";
-
 import Container from "@/components/container";
 import Statistic from "@/components/home/fast/statistic";
 import Link from "next/link";
@@ -45,7 +43,7 @@ export default function Fast() {
       />
 
       {/* data */}
-      <div className="group/source-box absolute inset-x-0 bottom-0 z-20">
+      <div className="absolute inset-x-0 bottom-0 z-20 group/source-box">
         <Container className="max-w-screen-lg">
           <Statistic />
 
@@ -53,8 +51,7 @@ export default function Fast() {
           <p className="mt-6">
             <Link
               href="/fast"
-              className="inline-flex items-center gap-1 text-yellow-200 underline
-              opacity-60 transition hover:opacity-100"
+              className="inline-flex items-center gap-1 text-yellow-200 underline transition opacity-60 hover:opacity-100"
             >
               <Icon icon={ICON_NAMES.Bolt} className="text-2xl" />
               Test the speed
