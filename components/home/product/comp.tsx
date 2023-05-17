@@ -85,7 +85,7 @@ export function ProductFeatureItem({
       <Icon
         icon={ICON_NAMES.CircleCheck}
         className={cx(
-          "mr-2 text-2xl text-[inherit]",
+          "mr-2 shrink-0 text-2xl text-[inherit]",
           product === Product.REDIS && "text-red-300",
           product === Product.KAFKA && "text-blue-300",
           product === Product.QSTASH && "text-purple-300",

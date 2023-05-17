@@ -10,6 +10,7 @@ import Header from "@/components/master/header";
 import HeaderMobile from "@/components/master/header-mobile";
 import Footer from "@/components/master/footer";
 import Script from "next/script";
+import { SITE_URL } from "@/utils/const";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -83,6 +84,7 @@ const description =
   "Designed for the serverless with per-request pricing and Redis®/Kafka® API.";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
     default: title,
     template: `%s | Upstash`,
@@ -99,11 +101,11 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: process.env.NEXT_PUBLIC_SITE_URL,
+    url: "/",
     title,
     description,
     siteName: title,
-    // images: [`${process.env.NEXT_PUBLIC_SITE_URL}/og-home.jpg`],
+    images: "/og-home.jpg",
   },
   twitter: {
     card: "summary_large_image",
@@ -111,7 +113,7 @@ export const metadata: Metadata = {
     description,
     site: "@upstash",
     creator: "@upstash",
-    images: [`${process.env.NEXT_PUBLIC_SITE_URL}/og-home.jpg`],
+    images: "/og-home.jpg",
   },
   icons: {
     icon: "/icons/favicon-32x32.png",

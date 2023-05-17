@@ -23,7 +23,7 @@ export default function HomeServerless({}: ISectionHeader) {
         <SectionHeader>
           <SectionHeaderTitle>Products</SectionHeaderTitle>
           <SectionHeaderSummary>
-            True serverless data platform for your data
+            True serverless data platform
           </SectionHeaderSummary>
         </SectionHeader>
 

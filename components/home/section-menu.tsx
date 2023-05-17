@@ -68,7 +68,7 @@ export default function SectionMenu({
             Serverless
           </SectionMenuItem>
           <SectionMenuItem href={`#${HOME_SECTIONS.PRODUCTS}`}>
-            Product
+            Products
           </SectionMenuItem>
           <SectionMenuItem href={`#${HOME_SECTIONS.PRICING}`}>
             Pricing

@@ -8,6 +8,7 @@ const title = "Upstash Blog";
 const description = "Articles and tutorials from Upstash and community.";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Blog",
     template: `%s | ${title}`,
@@ -16,10 +17,10 @@ export const metadata: Metadata = {
   openGraph: {
     title,
     description,
-    url: `${SITE_URL}/blog`,
+    url: `/blog`,
     siteName: title,
     type: "website",
-    images: [`${process.env.NEXT_PUBLIC_SITE_URL}/og-blog.jpg`],
+    images: "/og-blog.jpg",
   },
   twitter: {
     card: "summary_large_image",
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
     description,
     site: "@upstash",
     creator: "@upstash",
-    images: [`${process.env.NEXT_PUBLIC_SITE_URL}/og-blog.jpg`],
+    images: "/og-blog.jpg",
   },
 };
 
