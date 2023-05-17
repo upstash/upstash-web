@@ -1,5 +1,3 @@
-"use client";
-
 import HomeHero from "./hero";
 import HomeFast from "./fast";
 import HomeServerless from "./serverless";
@@ -22,7 +20,7 @@ export default function Home() {
       <HomeInvestors />
       <HomeCommunity />
 
-      <SectionMenu />
+      {/* <SectionMenu /> */}
     </main>
   );
 }
