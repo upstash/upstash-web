@@ -11,8 +11,7 @@ import {
 } from "framer-motion";
 import { LogoIcon } from "@/components/logo";
 import Button from "@/components/button";
-import Link from "next/link";
-import { Events, Link as SpyLink } from "react-scroll";
+import { animateScroll, Events, Link as SpyLink } from "react-scroll";
 
 export default function SectionMenu({
   children,
@@ -67,14 +66,22 @@ export default function SectionMenu({
       h-40 bg-gradient-to-b from-zinc-950 to-transparent"
       />
 
-      <div className={cx("flex items-center gap-4 rounded-full bg-white p-2")}>
-        <Link
-          href="/"
+      <div
+        className={cx(
+          "flex cursor-pointer items-center gap-4 rounded-full bg-white p-2"
+        )}
+      >
+        <SpyLink
+          onClick={() =>
+            animateScroll.scrollToTop({
+              duration: 0,
+            })
+          }
           className="flex h-10 w-10 items-center justify-center rounded-full
           hover:bg-zinc-100"
         >
           <LogoIcon lightBg height={30} />
-        </Link>
+        </SpyLink>
 
         <div className={cx("flex items-center")}>
           <SectionMenuItem href={HOME_SECTIONS.FAST}>Fast</SectionMenuItem>
