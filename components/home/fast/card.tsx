@@ -44,7 +44,7 @@ export function FastCardTitle({
 }) {
   return (
     <h5
-      className="mt-1 text-xs uppercase tracking-widest opacity-40"
+      className="mt-1 text-xs uppercase tracking-widest text-emerald-200 opacity-40"
       {...props}
     >
       {children}

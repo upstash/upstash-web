@@ -15,7 +15,7 @@ export default function Fast() {
   return (
     <section
       id={HOME_SECTIONS.FAST}
-      className="relative z-0 my-10 h-[300px] overflow-hidden md:mb-0 md:h-[540px]"
+      className="relative z-0 my-10 h-[300px] overflow-hidden md:mb-0 md:h-[500px]"
     >
       <Bg className="top-44 h-1/2" />
 
@@ -26,14 +26,14 @@ export default function Fast() {
           "pointer-events-none absolute inset-x-0 top-0 -z-10",
           "font-display text-[13vw] font-bold leading-none",
           "bg-gradient-to-t bg-clip-text text-transparent",
-          "from-emerald-200/5 to-emerald-100/[0.02]"
+          "from-emerald-300/5 to-emerald-200/[0.02]"
         )}
       >
         Fast Anywhere
       </h5>
 
       {/* globe */}
-      <div className="absolute inset-x-0 -top-2 z-0 w-full">
+      <div className="absolute inset-x-0 -top-8 z-0 -mx-24 min-w-full">
         <Globe />
       </div>
 
@@ -52,7 +52,7 @@ export default function Fast() {
           <p className="mt-6">
             <Link
               href="/fast"
-              className="inline-flex items-center gap-1 text-yellow-200 underline opacity-60 transition hover:opacity-100"
+              className="inline-flex items-center gap-1 underline opacity-60 transition hover:opacity-100"
             >
               <Icon icon={ICON_NAMES.Bolt} className="text-2xl" />
               Test the speed

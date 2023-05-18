@@ -91,7 +91,7 @@ const GlobeAnimation = () => {
         size: 0.03,
       })),
       onRender: (state) => {
-        phi += 0.0004;
+        phi += 0.001;
         state.phi = phi + r.get();
         state.width = width;
         state.height = width;

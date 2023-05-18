@@ -7,8 +7,8 @@ import {
 export default function FastStatistic() {
   return (
     <div
-      className="grid grid-cols-3 gap-4 rounded-2xl
-    bg-white/5 px-6 py-4 backdrop-blur md:rounded-4xl md:p-6"
+      className="mx-auto grid w-fit grid-cols-3 gap-4 rounded-2xl bg-white/5
+    px-6 py-4 backdrop-blur md:gap-16 md:rounded-4xl md:px-12 md:py-6"
     >
       <FastCard>
         <FastCardValue>8.3B</FastCardValue>
