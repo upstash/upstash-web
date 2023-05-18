@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import cx from "@/utils/cx";
 import Link from "next/link";
 
-const Globe = dynamic(() => import("@/components/home/fast/globe"), {
+const Globe = dynamic(() => import("@/components/home/fast/globe2"), {
   ssr: false,
 });
 

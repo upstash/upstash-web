@@ -49,10 +49,8 @@ export default function GlobeClient() {
 
 const GlobeAnimation = () => {
   const canvasRef = useRef<any>();
-  const pointerInteracting = useRef<number | null>(null);
-  const pointerInteractionMovement = useRef(0);
 
-  const [{ r }, api] = useSpring(() => ({
+  const [{ r }] = useSpring(() => ({
     r: 0,
     config: {
       mass: 1,
@@ -98,15 +96,22 @@ const GlobeAnimation = () => {
       },
     });
 
-    return () => {
-      globe.destroy();
-    };
+    setTimeout(() => (canvasRef.current.style.opacity = "1"));
+
+    return () => globe.destroy();
   }, []);
 
   return (
     <canvas
       ref={canvasRef}
-      style={{ width: "100%", height: "100%", aspectRatio: 1 }}
+      style={{
+        width: "100%",
+        height: "100%",
+        aspectRatio: "1",
+        contain: "layout paint size",
+        opacity: 0,
+        transition: "opacity 1s ease",
+      }}
     />
   );
 };

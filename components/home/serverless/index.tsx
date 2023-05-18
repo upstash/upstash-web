@@ -10,7 +10,6 @@ import HttpRestApi from "@/components/home/serverless/http-rest-api";
 import DesignedForTheEdge from "@/components/home/serverless/designed-for-the-edge";
 import Bg from "@/components/bg";
 import { HOME_SECTIONS } from "@/utils/const";
-import { Element } from "react-scroll";
 
 export default function HomeServerless() {
   return (
