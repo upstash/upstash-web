@@ -102,7 +102,7 @@ After you run the `producer.py` file, you can see the message analytics on Upsta
 
 Creating a consumer client is similar to creating a producer client. First, create a `consumer.py` file in the same folder as `producer.py`. Then copy/paste the **Consumer** code snippet to `consumer.py` from **Connect to your cluster** section in the **Upstash Console**
 
-```python:consumer.py
+```python title="consumer.py"
 from kafka import KafkaConsumer
 
 consumer = KafkaConsumer(
@@ -126,7 +126,7 @@ First, go to [OpenAI platform](https://platform.openai.com/overview), create an 
 
 Before making the request to ChatGPT, we must decide on a clear and unambiguous prompt that conveys our purpose. As an example, I have provided a prompt below for you to use. Please copy and paste it into your `consumer.py` file
 
-```python:consumer.py
+```python title="consumer.py"
 prompt="I want you to act as a notification bot that works with Slack API. I'll provide Reddit posts about a specific keyword and I expect you to apply sentiment analysis to the text and return it as a notification. The analysis should reflect the thoughts, problems, and feedbacks of the user in a concise comment length. Avoid using first-person or the word Notification: in the beginning. Instead, write the notification in an easy-to-read format, indicating that the post is about the topic or keyword mentioned.
 Here's an example:
 TechEnthusiast21 posted about Upstash, mentioning that it's a game changer for cloud databases. They were impressed with the ease of use and speed of the database, which led to a significant improvement in their application's performance. They highly recommend Upstash for anyone looking for a fast and reliable cloud database."
@@ -134,7 +134,7 @@ TechEnthusiast21 posted about Upstash, mentioning that it's a game changer for c
 
 Finally, we'll create the `analyze_post` method which will apply sentiment analysis on the Reddit posts.
 
-```python:consumer.py
+```python title="consumer.py"
 api_key=<YOUR_OPENAI_API_KEY>
 
 def analyze_tweet(post):
