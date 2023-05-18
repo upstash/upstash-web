@@ -33,8 +33,12 @@ export default function Fast() {
       </h5>
 
       {/* globe */}
-      <div className="absolute inset-x-0 -top-8 z-0 -mx-24 min-w-full">
-        <Globe />
+      <div className="absolute inset-x-0 -top-8 z-0">
+        <Container>
+          <div className="-mx-40">
+            <Globe />
+          </div>
+        </Container>
       </div>
 
       {/* bottom-bg */}
