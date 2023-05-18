@@ -7,7 +7,7 @@ import Bg from "@/components/bg";
 import dynamic from "next/dynamic";
 import { HOME_SECTIONS } from "@/utils/const";
 
-const Globe = dynamic(() => import("./globe"), {
+const Globe = dynamic(() => import("./globe2"), {
   ssr: false,
 });
 
@@ -15,14 +15,15 @@ export default function Fast() {
   return (
     <section
       id={HOME_SECTIONS.FAST}
-      className="relative z-0 mt-10 hidden h-[600px] overflow-hidden md:block"
+      className="relative z-0 my-10 h-[300px] overflow-hidden md:mb-0 md:h-[540px]"
     >
       <Bg className="top-44 h-1/2" />
 
       {/* slogan */}
       <h5
         className={cx(
-          "pointer-events-none absolute inset-x-0 top-[40px] -z-10",
+          "hidden md:block",
+          "pointer-events-none absolute inset-x-0 top-0 -z-10",
           "font-display text-[13vw] font-bold leading-none",
           "bg-gradient-to-t bg-clip-text text-transparent",
           "from-emerald-200/5 to-emerald-100/[0.02]"
@@ -32,7 +33,7 @@ export default function Fast() {
       </h5>
 
       {/* globe */}
-      <div className="absolute left-1/2 top-[-180px] z-0 -translate-x-1/2">
+      <div className="absolute inset-x-0 -top-2 z-0 w-full">
         <Globe />
       </div>
 
@@ -43,7 +44,7 @@ export default function Fast() {
       />
 
       {/* data */}
-      <div className="absolute inset-x-0 bottom-0 z-20 group/source-box">
+      <div className="group/source-box absolute inset-x-0 bottom-0 z-20">
         <Container className="max-w-screen-lg">
           <Statistic />
 
@@ -51,7 +52,7 @@ export default function Fast() {
           <p className="mt-6">
             <Link
               href="/fast"
-              className="inline-flex items-center gap-1 text-yellow-200 underline transition opacity-60 hover:opacity-100"
+              className="inline-flex items-center gap-1 text-yellow-200 underline opacity-60 transition hover:opacity-100"
             >
               <Icon icon={ICON_NAMES.Bolt} className="text-2xl" />
               Test the speed

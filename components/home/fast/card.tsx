@@ -25,7 +25,7 @@ export function FastCardValue({
   return (
     <div
       className={cx(
-        "font-display text-4xl font-semibold text-emerald-400",
+        "font-display text-3xl font-semibold text-emerald-400 md:text-4xl",
         className
       )}
       {...props}

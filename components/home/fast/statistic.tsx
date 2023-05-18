@@ -6,7 +6,10 @@ import {
 
 export default function FastStatistic() {
   return (
-    <div className="grid grid-cols-3 rounded-4xl bg-white/5 px-6 py-4 backdrop-blur md:p-6">
+    <div
+      className="grid grid-cols-3 gap-4 rounded-2xl
+    bg-white/5 px-6 py-4 backdrop-blur md:rounded-4xl md:p-6"
+    >
       <FastCard>
         <FastCardValue>8.3B</FastCardValue>
         <FastCardTitle>REDIS COMMANDS / WEEK</FastCardTitle>
