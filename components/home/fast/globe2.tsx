@@ -142,4 +142,44 @@ const REGIONS = [
     lat: 50.1213009,
     lng: 8.5663531,
   },
+  {
+    name: "london",
+    lat: 51.5287718,
+    lng: -0.2416804,
+  },
+  {
+    name: "mumbai",
+    lat: 19.0759899,
+    lng: 72.8773928,
+  },
+  {
+    name: "sydney",
+    lat: -33.8548157,
+    lng: 151.2164539,
+  },
+  {
+    name: "tokyo",
+    lat: 35.6828387,
+    lng: 139.7594549,
+  },
+  {
+    name: "seoul",
+    lat: 37.5666791,
+    lng: 126.9782914,
+  },
+  {
+    name: "hong_kong",
+    lat: 22.2793278,
+    lng: 114.1628131,
+  },
+  {
+    name: "osaka",
+    lat: 34.6937378,
+    lng: 135.5021651,
+  },
+  {
+    name: "stockholm",
+    lat: 59.3251172,
+    lng: 18.0710935,
+  },
 ];
