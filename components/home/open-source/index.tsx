@@ -30,8 +30,9 @@ export default function HomeOpenSource({}: ISectionHeader) {
           </SectionHeaderSummary>
         </SectionHeader>
 
-        <div className="mt-10 overflow-x-auto md:mt-20 md:overflow-visible">
+        <div className="mt-10 overflow-x-auto overflow-y-hidden md:mt-20 md:overflow-visible">
           <div className="relative grid w-[280%] grid-cols-3 gap-4 text-left md:w-full md:gap-6">
+            {/* top boxes */}
             <div className="absolute bottom-full mb-6 hidden w-full grid-cols-3 gap-6 opacity-[0.03] md:grid">
               {Array.from(Array(3).keys()).map((i) => (
                 <div
@@ -43,6 +44,7 @@ export default function HomeOpenSource({}: ISectionHeader) {
               ))}
             </div>
 
+            {/* data */}
             {repositories.map((item) => {
               return (
                 <SourceBox
@@ -57,6 +59,7 @@ export default function HomeOpenSource({}: ISectionHeader) {
               );
             })}
 
+            {/* bottom boxes */}
             <div className="absolute top-full mt-6 hidden w-full grid-cols-3 gap-6 opacity-[0.03] md:grid">
               {Array.from(Array(3).keys()).map((i) => (
                 <div
