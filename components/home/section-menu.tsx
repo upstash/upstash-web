@@ -72,6 +72,7 @@ export default function SectionMenu({
         )}
       >
         <SpyLink
+          to={""}
           onClick={() =>
             animateScroll.scrollToTop({
               duration: 0,
