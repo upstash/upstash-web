@@ -24,9 +24,11 @@ export default function HomeHero() {
         />
       </Container>
 
-      <Container className="max-w-screen-sm">
-        <HomeHeroCustomer />
-      </Container>
+      <div className="mt-20">
+        <Container className="max-w-screen-md">
+          <HomeHeroCustomer />
+        </Container>
+      </div>
     </section>
   );
 }
