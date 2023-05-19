@@ -50,7 +50,7 @@ export function LogoIcon({
 export function Logo({
   lightBg,
   ...props
-}: HTMLAttributes<SVGElement> & {
+}: HTMLProps<SVGSVGElement> & {
   lightBg?: boolean;
 }) {
   const fill = lightBg ? "#00C98D" : "#00E9A3";

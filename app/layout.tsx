@@ -45,7 +45,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         "min-h-screen scroll-smooth bg-zinc-950 text-sm text-zinc-50 antialiased md:text-base"
       )}
     >
-      <body>
+      <body className="pt-20 md:pt-0">
         <Header />
         <HeaderMobile />
         {children}

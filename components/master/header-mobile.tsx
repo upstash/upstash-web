@@ -15,14 +15,18 @@ export default function Header({ className, ...props }: IAppHeader) {
 
   return (
     <header
-      className={cx("relative z-50 py-6 md:hidden", className)}
+      className={cx(
+        "fixed inset-x-0 top-0 z-50 py-4 md:hidden",
+        "border-b border-b-white/5 bg-zinc-950",
+        className
+      )}
       {...props}
     >
       <Container>
         <div className="flex items-center justify-between">
           <div className="flex">
             <Link href="/">
-              <Logo />
+              <Logo height={30} />
             </Link>
           </div>
 
