@@ -95,9 +95,9 @@ export default function SectionMenu({
           <SectionMenuItem href={HOME_SECTIONS.PRICING}>
             Pricing
           </SectionMenuItem>
-          <SectionMenuItem href={HOME_SECTIONS.OPEN_SOURCE}>
-            Open Source
-          </SectionMenuItem>
+          {/*<SectionMenuItem href={HOME_SECTIONS.OPEN_SOURCE}>*/}
+          {/*  Open Source*/}
+          {/*</SectionMenuItem>*/}
           <SectionMenuItem href={HOME_SECTIONS.COMMUNITY}>
             Community
           </SectionMenuItem>
