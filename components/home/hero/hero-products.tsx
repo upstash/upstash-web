@@ -119,7 +119,8 @@ function HeroProductTitle({
   return (
     <h3
       className={cx(
-        "flex items-center gap-1 font-display text-xl font-medium leading-none text-zinc-50 md:text-2xl",
+        "flex items-center gap-1 text-zinc-50",
+        "font-display text-2xl font-medium leading-none",
         className
       )}
     >
@@ -132,7 +133,7 @@ function HeroProductDesc({
   children,
   className,
 }: HTMLProps<HTMLParagraphElement>) {
-  return <p className={cx("opacity-60", className)}>{children}</p>;
+  return <p className={cx("mt-2 opacity-60", className)}>{children}</p>;
 }
 
 function HeroProductCta({
@@ -149,7 +150,7 @@ function HeroProductCta({
     <Button
       type="button"
       className={cx(
-        "mt-5",
+        "mt-4",
         activeProduct ? "bg-white/03 text-zinc-50" : "bg-zinc-50 text-zinc-950",
         activeProduct === Product.REDIS && active && "!bg-red-500 !text-white",
         activeProduct === Product.KAFKA && active && "!bg-blue-500 !text-white",
