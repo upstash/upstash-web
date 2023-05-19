@@ -1,27 +1,56 @@
 import * as Logo from "components/home/hero/hero-customer-icons";
+import cx from "@/utils/cx";
 
 export default function HomeHeroPartner() {
   return (
-    <div className="mt-16">
+    <>
       {/* title */}
-      <h5 className="text-sm opacity-40 md:opacity-20">
-        Trusted by the best teams
-      </h5>
+      <h5 className="text-sm opacity-40">Trusted by the best teams</h5>
 
       {/* logos */}
-      <div className="mt-6 flex flex-wrap items-center justify-center gap-x-8 gap-y-6">
-        {customers.map(({ name, url, icon }) => (
-          <a
-            key={name}
-            href={url}
-            target="_blank"
-            className="opacity-40 transition hover:scale-105 hover:opacity-80 md:opacity-20"
-            title={name}
-          >
-            {icon}
-          </a>
-        ))}
+      <div className={cx("relative -mx-6 mt-6 overflow-hidden md:mx-0")}>
+        <div
+          className="inline-block overflow-hidden whitespace-nowrap md:!animate-none"
+          style={{
+            animationDuration: "20s",
+            animationTimingFunction: "linear",
+            animationIterationCount: "infinite",
+            animationName: "animate-slide",
+          }}
+        >
+          <div className="inline-block">
+            <Logos />
+          </div>
+          <div className="inline-block">
+            <Logos className="md:hidden" />
+          </div>
+        </div>
       </div>
+    </>
+  );
+}
+
+function Logos({ className }: { className?: string }) {
+  return (
+    <div
+      className={cx(
+        "overflow-hidden whitespace-nowrap",
+        "flex-wrap items-center justify-center gap-x-10 gap-y-6",
+        "md:flex",
+        className
+      )}
+    >
+      {customers.map(({ name, url, icon }) => (
+        <a
+          key={name}
+          href={url}
+          target="_blank"
+          className="mx-4 inline-flex align-middle opacity-40 transition hover:scale-105 hover:opacity-100 md:mx-0"
+          title={name}
+        >
+          {icon}
+        </a>
+      ))}
     </div>
   );
 }
@@ -61,5 +90,10 @@ const customers = [
     name: "Materialize",
     url: "https://materialize.com",
     icon: <Logo.Materialize />,
+  },
+  {
+    name: "Tinybird",
+    url: "https://tinybird.co",
+    icon: <Logo.Tinybird />,
   },
 ];
