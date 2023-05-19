@@ -1,17 +1,23 @@
 "use client";
 
-import { HTMLProps, useState } from "react";
+import { HTMLProps, useEffect, useState } from "react";
 import cx from "@/utils/cx";
 import { Logo } from "@/components/logo";
 import Link from "next/link";
 import Container from "@/components/container";
 import NavMobile from "./nav-mobile";
 import Icon, { ICON_NAMES } from "@/components/icon";
+import { usePathname } from "next/navigation";
 
 export interface IAppHeader extends HTMLProps<HTMLHeadElement> {}
 
 export default function Header({ className, ...props }: IAppHeader) {
   const [showMenu, setShowMenu] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    setShowMenu(false);
+  }, [pathname]);
 
   return (
     <header

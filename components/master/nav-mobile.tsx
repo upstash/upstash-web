@@ -8,8 +8,8 @@ export default function NavMobile({ hidden }: HTMLProps<HTMLDivElement> & {}) {
   return (
     <nav
       className={cx(
-        "absolute inset-x-6 top-full z-10 -mt-4 flex-col p-6 pb-10",
-        "rounded-lg bg-zinc-950 shadow-2xl",
+        "absolute inset-x-0 top-full z-10 mt-px flex-col p-6 pb-24",
+        "bg-zinc-950 shadow-2xl",
         hidden ? "flex" : "hidden"
       )}
     >
@@ -19,13 +19,13 @@ export default function NavMobile({ hidden }: HTMLProps<HTMLDivElement> & {}) {
         target="_self"
         hideIcon
         href="https://console.upstash.com"
-        className="-mx-5 bg-emerald-400 py-3 font-display text-lg font-medium text-zinc-950"
+        className="justify-center bg-emerald-400 py-3 font-display text-lg font-medium text-zinc-950"
       >
         Login
       </Button>
 
       {/* items */}
-      <div className="mt-2 flex flex-col divide-y divide-white/03">
+      <div className="mt-6 flex flex-col divide-y divide-white/5 border-y border-y-white/5">
         {NavItems.map((item) => {
           return (
             <NavLink key={item.href} href={item.href}>
