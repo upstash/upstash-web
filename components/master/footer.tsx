@@ -13,16 +13,16 @@ export default function Footer({ className, ...props }: IAppFooter) {
       {...props}
     >
       <Container className="max-w-screen-md">
-        <div className="grid place-items-center gap-10">
+        <div className="grid place-items-center">
           {/**/}
 
           <Logo />
 
-          <p className="opacity-60">
+          <p className="mt-10 opacity-60">
             © {new Date().getFullYear()} Upstash, Inc. Based in California.
           </p>
 
-          <div className="flex flex-col items-center gap-6 md:flex-row">
+          <div className="mt-2 flex flex-col items-center gap-4 md:flex-row">
             <Button
               href="https://docs.upstash.com/docs/help/support"
               className="opacity-60 hover:opacity-100"
@@ -43,7 +43,16 @@ export default function Footer({ className, ...props }: IAppFooter) {
             </Button>
           </div>
 
-          <div className="space-y-2 text-xs opacity-40">
+          <Button
+            href="https://status.upstash.com/"
+            className="mt-10 whitespace-nowrap rounded-full bg-emerald-400/10 px-4 py-1 text-emerald-500"
+            hideIcon
+          >
+            <span className="-ml-1 mr-2 inline-flex h-3 w-3 animate-pulse rounded-full bg-current" />
+            <span className="">Status</span>
+          </Button>
+
+          <div className="mt-10 space-y-2 text-xs opacity-40">
             <p>
               * Redis is a trademark of Redis Ltd. Any rights therein are
               reserved to Redis Ltd. Any use by Upstash is for referential
