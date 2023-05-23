@@ -27,17 +27,12 @@ export default function HomeServerless() {
           </SectionHeaderSummary>
         </SectionHeader>
 
-        <div className="mt-10 grid gap-6 text-left md:mt-20 md:grid-cols-6">
+        <div className="mt-10 grid gap-4 text-left md:mt-20 md:grid-cols-6 md:gap-6">
           {/* features */}
           <GlobalLowLatency />
           <PriceScaleToZero />
           <HttpRestApi />
           <DesignedForTheEdge />
-
-          {/* products */}
-          {/*<ProductRedis />*/}
-          {/*<ProductKafka />*/}
-          {/*<ProductQStash />*/}
         </div>
       </Container>
     </section>

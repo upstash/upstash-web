@@ -5,8 +5,6 @@ import Image from "next/image";
 import cx from "@/utils/cx";
 
 export default function DesignedForTheEdge() {
-  const duration = 120000;
-
   return (
     <ServerlessBox className="overflow-hidden md:col-span-2">
       <header className="relative z-20">
@@ -20,12 +18,7 @@ export default function DesignedForTheEdge() {
       </header>
 
       {/* body */}
-      <div
-        className="relative z-0 h-[320px] animate-spin"
-        style={{
-          animationDuration: `${duration}ms`,
-        }}
-      >
+      <div className="relative z-0 h-[320px]">
         {/* upstash */}
         <div
           className="absolute left-1/2 top-1/2 z-0 flex
@@ -47,13 +40,7 @@ export default function DesignedForTheEdge() {
             <circle opacity="0.02" cx="245" cy="245" r="244.5" stroke="white" />
           </svg>
 
-          <LogoIcon
-            className="animate-spin"
-            style={{
-              animationDirection: "reverse",
-              animationDuration: `${duration}ms`,
-            }}
-          />
+          <LogoIcon />
 
           <ProductOut className="h-[118px] rotate-[120deg]">
             <ProductIn className="rotate-[-120deg]">
@@ -62,11 +49,6 @@ export default function DesignedForTheEdge() {
                 width="35"
                 viewBox="0 0 35 15"
                 fill="none"
-                className="animate-spin"
-                style={{
-                  animationDirection: "reverse",
-                  animationDuration: `${duration}ms`,
-                }}
               >
                 <path
                   fill="#F6821F"
@@ -87,11 +69,6 @@ export default function DesignedForTheEdge() {
                 width="35"
                 viewBox="0 0 35 16"
                 fill="none"
-                className="animate-spin"
-                style={{
-                  animationDirection: "reverse",
-                  animationDuration: `${duration}ms`,
-                }}
               >
                 <path
                   fill="#FF282D"
@@ -112,11 +89,6 @@ export default function DesignedForTheEdge() {
                 width="25"
                 viewBox="0 0 25 20"
                 fill="none"
-                className="animate-spin"
-                style={{
-                  animationDirection: "reverse",
-                  animationDuration: `${duration}ms`,
-                }}
               >
                 <path fill="#000" d="m12.5 0 11.547 20H.953L12.5 0Z" />
               </svg>
@@ -128,11 +100,7 @@ export default function DesignedForTheEdge() {
           <ProductOut className="h-[170px] rotate-[180deg]">
             <ProductIn className="rotate-[-180deg]">
               <svg
-                className="animate-spin text-black"
-                style={{
-                  animationDirection: "reverse",
-                  animationDuration: `${duration}ms`,
-                }}
+                className="text-black"
                 width="25"
                 viewBox="0 0 30 30"
                 fill="none"
@@ -177,11 +145,7 @@ export default function DesignedForTheEdge() {
           <ProductOut className="h-[170px] rotate-[60deg]">
             <ProductIn className="rotate-[-60deg]">
               <Image
-                className="block h-6 w-6 animate-spin text-black"
-                style={{
-                  animationDirection: "reverse",
-                  animationDuration: `${duration}ms`,
-                }}
+                className="block h-6 w-6 text-black"
                 src="/lagon-icon-black.png"
                 width={40}
                 height={40}
@@ -193,11 +157,7 @@ export default function DesignedForTheEdge() {
           <ProductOut className="h-[170px] rotate-[300deg]">
             <ProductIn className="rotate-[-300deg]">
               <svg
-                className="animate-spin text-black"
-                style={{
-                  animationDirection: "reverse",
-                  animationDuration: `${duration}ms`,
-                }}
+                className="text-black"
                 width={26}
                 viewBox="0 0 128 113"
                 fill="currentColor"

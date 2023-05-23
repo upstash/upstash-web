@@ -39,7 +39,7 @@ export default function Button({
           icon={ICON_NAMES.ArrowUpRight}
           {...iconProps}
           className={cx(
-            "opacity-60",
+            "ml-auto opacity-60",
             // "transition group-hover/link-new:opacity-100",
             iconProps?.className
           )}

@@ -18,13 +18,14 @@ export default function Fast() {
   const isMobile = useIsMobile();
 
   if (isMobile) {
-    return (
-      <section id={HOME_SECTIONS.FAST} className="relative z-0 py-16">
-        <Bg className="top-44 h-1/2" />
-
-        <Statistic />
-      </section>
-    );
+    return null;
+    // return (
+    //   <section id={HOME_SECTIONS.FAST} className="relative z-0 py-16">
+    //     <Bg className="top-44 h-1/2" />
+    //
+    //     <Statistic />
+    //   </section>
+    // );
   }
 
   return (

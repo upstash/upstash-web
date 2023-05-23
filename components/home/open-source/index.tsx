@@ -30,46 +30,40 @@ export default function HomeOpenSource({}: ISectionHeader) {
           </SectionHeaderSummary>
         </SectionHeader>
 
-        <div className="mt-10 overflow-x-auto overflow-y-hidden md:mt-20 md:overflow-visible">
-          <div className="relative grid w-[280%] grid-cols-3 gap-4 text-left md:w-full md:gap-6">
-            {/* top boxes */}
-            <div className="absolute bottom-full mb-6 hidden w-full grid-cols-3 gap-6 opacity-[0.03] md:grid">
-              {Array.from(Array(3).keys()).map((i) => (
-                <div
-                  key={i}
-                  className={cx(
-                    "flex h-[180px] rounded-2xl border border-white"
-                  )}
-                />
-              ))}
-            </div>
+        <div className="relative mt-10 grid gap-4 text-left md:mt-20 md:grid-cols-3 md:gap-6">
+          {/* top boxes */}
+          <div className="absolute bottom-full mb-6 hidden w-full grid-cols-3 gap-6 opacity-[0.03] md:grid">
+            {Array.from(Array(3).keys()).map((i) => (
+              <div
+                key={i}
+                className={cx("flex h-[180px] rounded-2xl border border-white")}
+              />
+            ))}
+          </div>
 
-            {/* data */}
-            {repositories.map((item) => {
-              return (
-                <SourceBox
-                  key={item.title}
-                  href={item.url}
-                  category={item.category}
-                >
-                  <SourceTitle>{item.title}</SourceTitle>
-                  <SourceDesc>{item.description}</SourceDesc>
-                  <SourceTag>{item.category}</SourceTag>
-                </SourceBox>
-              );
-            })}
+          {/* data */}
+          {repositories.map((item) => {
+            return (
+              <SourceBox
+                key={item.title}
+                href={item.url}
+                category={item.category}
+              >
+                <SourceTitle>{item.title}</SourceTitle>
+                <SourceDesc>{item.description}</SourceDesc>
+                <SourceTag>{item.category}</SourceTag>
+              </SourceBox>
+            );
+          })}
 
-            {/* bottom boxes */}
-            <div className="absolute top-full mt-6 hidden w-full grid-cols-3 gap-6 opacity-[0.03] md:grid">
-              {Array.from(Array(3).keys()).map((i) => (
-                <div
-                  key={i}
-                  className={cx(
-                    "flex h-[180px] rounded-2xl border border-white"
-                  )}
-                />
-              ))}
-            </div>
+          {/* bottom boxes */}
+          <div className="absolute top-full mt-6 hidden w-full grid-cols-3 gap-6 opacity-[0.03] md:grid">
+            {Array.from(Array(3).keys()).map((i) => (
+              <div
+                key={i}
+                className={cx("flex h-[180px] rounded-2xl border border-white")}
+              />
+            ))}
           </div>
         </div>
       </Container>

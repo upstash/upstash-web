@@ -16,7 +16,7 @@ export default function Home() {
       <HomeServerless />
       <HomeProduct />
       <HomePrice />
-      {/*<HomeOpenSource />*/}
+      <HomeOpenSource />
       <HomeInvestors />
       <HomeCommunity />
 

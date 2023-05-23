@@ -42,7 +42,10 @@ export function SectionHeaderSummary({
 }: ISectionHeader) {
   return (
     <p
-      className={cx("mt-2 text-lg opacity-40 md:text-2xl", className)}
+      className={cx(
+        "mx-4 mt-2 text-lg opacity-40 md:mx-auto md:text-2xl",
+        className
+      )}
       {...props}
     >
       {children}
