@@ -151,7 +151,7 @@ function Example({
   );
 }
 
-Example.Title = function ({
+Example.Title = function ExampleTitle({
   className,
   children,
   ...props
@@ -166,7 +166,7 @@ Example.Title = function ({
   );
 };
 
-Example.Description = function ({
+Example.Description = function ExampleDescription({
   className,
   children,
   ...props
@@ -178,7 +178,7 @@ Example.Description = function ({
   );
 };
 
-Example.Products = function ({
+Example.Products = function ExampleProducts({
   className,
   children,
   ...props
@@ -197,6 +197,7 @@ Example.Products = function ({
         if (product === Products.redis) {
           return (
             <span
+              key={product}
               className="inline-flex items-center gap-1.5
              rounded bg-red-400/10 px-2 py-1 text-red-200"
             >
@@ -211,6 +212,7 @@ Example.Products = function ({
         } else if (product === Products.kafka) {
           return (
             <span
+              key={product}
               className="inline-flex items-center gap-1.5
              rounded bg-blue-400/10 px-2 py-1 text-blue-200"
             >
@@ -225,6 +227,7 @@ Example.Products = function ({
         } else if (product === Products.qstash) {
           return (
             <span
+              key={product}
               className="inline-flex items-center gap-1.5
              rounded bg-purple-400/10 px-2 py-1 text-purple-200"
             >
@@ -242,7 +245,7 @@ Example.Products = function ({
   );
 };
 
-Example.Link = function ({
+Example.Link = function ExampleLink({
   className,
   children,
   ...props
@@ -254,7 +257,11 @@ Example.Link = function ({
   );
 };
 
-Example.LinkItem = function ({ className, children, ...props }: IButton) {
+Example.LinkItem = function ExampleLinkItem({
+  className,
+  children,
+  ...props
+}: IButton) {
   return (
     <Button
       type="button"
