@@ -1,5 +1,6 @@
 import * as Logo from "components/home/hero/hero-customer-icons";
 import cx from "@/utils/cx";
+import { Maker } from "components/home/hero/hero-customer-icons";
 
 export default function HomeHeroPartner() {
   return (
@@ -82,9 +83,9 @@ const customers = [
     icon: <Logo.Supabase />,
   },
   {
-    name: "Hashnode",
-    url: "https://hashnode.com",
-    icon: <Logo.Hashnode />,
+    name: "Maker.co",
+    url: "https://www.maker.co",
+    icon: <Logo.Maker />,
   },
   {
     name: "Materialize",
