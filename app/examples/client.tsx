@@ -18,8 +18,8 @@ export default function HomePage() {
   });
 
   return (
-    <div className="flex flex-col items-start gap-16 text-left lg:flex-row">
-      <div className="lg:w-1/6">
+    <div className="flex flex-col items-stretch gap-10 text-left lg:flex-row lg:items-start lg:gap-16">
+      <div className="lg:w-1/4 xl:w-1/6">
         <ExampleFilter
           selectedProducts={selectedProducts}
           setSelectedProduct={setSelectedProduct}
@@ -30,7 +30,7 @@ export default function HomePage() {
         />
       </div>
 
-      <div className="grid grow gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3">
+      <div className="grid grow gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
         {data.map((item) => (
           <Box key={item.title} products={item.products}>
             <Box.Products />

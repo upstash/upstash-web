@@ -179,7 +179,6 @@ function Child({ className, children, ...props }: HTMLProps<HTMLDivElement>) {
 function Toc({ className, children, ...props }: HTMLProps<HTMLDetailsElement>) {
   return (
     <details
-      open
       role="navigation"
       aria-label="Use Cases"
       className={cx("group/toc", className)}
