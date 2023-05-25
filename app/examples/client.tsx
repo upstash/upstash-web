@@ -11,9 +11,7 @@ export default function HomePage() {
   const [selectedStacks, setSelectedStack] = useState<string[]>([]);
 
   const data = allExamples.filter((item: Example) => {
-    // if (product.length && !product.includes(item.products)) return false;
-    // if (useCase.length && !useCase.includes(item.use_case)) return false;
-    // if (stack.length && !stack.some((s) => item.stack.includes(s))) return false;
+    // filter
     return true;
   });
 
