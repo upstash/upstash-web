@@ -7,7 +7,6 @@ import IconKafka from "@/components/icon-kafka";
 import IconQStash from "@/components/icon-qstash";
 import Balancer from "react-wrap-balancer";
 import Button, { IButton } from "@/components/button";
-import { IProducts } from "./filter";
 
 export function Example({
   className,
@@ -15,7 +14,7 @@ export function Example({
   products,
   ...props
 }: HTMLProps<HTMLDivElement> & {
-  products: IProducts[];
+  products: string[];
 }) {
   const childs = Children.map(children, (child: ReactElement) => {
     return cloneElement(child, {
@@ -75,7 +74,7 @@ Example.Products = function ExampleProducts({
   className,
   children,
   ...props
-}: HTMLProps<HTMLDivElement> & { products?: IProducts[] }) {
+}: HTMLProps<HTMLDivElement> & { products?: string[] }) {
   if (!props.products) return null;
 
   return (
@@ -85,16 +84,11 @@ Example.Products = function ExampleProducts({
     >
       {props.products.map((product) => {
         if (product === "redis") {
-          return (
-            <IconRedis
-              width={24}
-              aria-label="Upstash Redis Icon"
-              className=""
-            />
-          );
+          return <IconRedis key={product} width={24} className="" />;
         } else if (product === "kafka") {
           return (
             <IconKafka
+              key={product}
               width={24}
               aria-label="Upstash Kafka Icon"
               className=""
@@ -103,6 +97,7 @@ Example.Products = function ExampleProducts({
         } else if (product === "qstash") {
           return (
             <IconQStash
+              key={product}
               width={24}
               aria-label="Upstash QStash Icon"
               className=""

@@ -1,14 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import ExampleFilter, { IProducts } from "./filter";
+import ExampleFilter from "./filter";
 import { Example as Box } from "./comp";
 import { allExamples, Example } from "contentlayer/generated";
 
 export default function HomePage() {
-  const [product, setProduct] = useState<IProducts[]>([]);
-  const [useCase, setUseCase] = useState<string[]>([]);
-  const [stack, setStack] = useState<string[]>([]);
+  const [selectedProducts, setSelectedProduct] = useState<string[]>([]);
+  const [selectedUseCase, setSelectedUseCase] = useState<string[]>([]);
+  const [selectedStacks, setSelectedStack] = useState<string[]>([]);
 
   const data = allExamples.filter((item: Example) => {
     // if (product.length && !product.includes(item.products)) return false;
@@ -18,19 +18,19 @@ export default function HomePage() {
   });
 
   return (
-    <div className="flex items-start gap-16 text-left">
-      <div className="w-1/6">
+    <div className="flex flex-col items-start gap-16 text-left lg:flex-row">
+      <div className="lg:w-1/6">
         <ExampleFilter
-          product={product}
-          setProduct={setProduct}
-          useCase={useCase}
-          setUseCase={setUseCase}
-          stack={stack}
-          setStack={setStack}
+          selectedProducts={selectedProducts}
+          setSelectedProduct={setSelectedProduct}
+          selectedUseCase={selectedUseCase}
+          setSelectedUseCase={setSelectedUseCase}
+          selectedStacks={selectedStacks}
+          setSelectedStack={setSelectedStack}
         />
       </div>
 
-      <div className="grid grow gap-4 md:grid-cols-3 md:gap-6">
+      <div className="grid grow gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3">
         {data.map((item) => (
           <Box key={item.title} products={item.products}>
             <Box.Products />

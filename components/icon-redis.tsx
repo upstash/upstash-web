@@ -11,6 +11,7 @@ export default function IconRedis({ ...props }: SVGProps<SVGSVGElement>) {
       viewBox="0 0 360 360"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      aria-label="Upstash Redis"
       {...props}
     >
       <rect width="360" height="360" rx="80" fill={bg} />

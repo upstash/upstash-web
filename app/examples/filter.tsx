@@ -1,30 +1,27 @@
 "use client";
 
-import IconRedis from "@/components/icon-redis";
-import IconKafka from "@/components/icon-kafka";
-import IconQStash from "@/components/icon-qstash";
 import { IconArrow } from "@/components/post/toc";
 import * as React from "react";
 import { HTMLProps } from "react";
 import cx from "@/utils/cx";
 import Icon, { ICON_NAMES } from "@/components/icon";
+import { allExamples } from "contentlayer/generated";
+import { flatten } from "lodash";
+import IconRedis from "@/components/icon-redis";
+import IconKafka from "@/components/icon-kafka";
+import IconQStash from "@/components/icon-qstash";
 
-export const Products = {
+export const ProductsLabel = {
   redis: "Redis",
   kafka: "Kafka",
   qstash: "QStash",
 };
 
-export const UseCases = {
+export const UseCasesLabel = {
   ai_ml: "AI/ML",
-  analytics: "Analytics",
-  cron: "Cron",
-  web3: "Web3",
-  edge: "Edge",
-  global: "Global",
 };
 
-export const Stack = {
+export const StackLabel = {
   nextjs: "Next.js",
   react: "React",
   nuxtjs: "Nuxt",
@@ -35,73 +32,147 @@ export const Stack = {
   astro: "Astro",
 };
 
-export type IProducts = keyof typeof Products;
-export type IUseCases = keyof typeof UseCases;
-export type IStack = keyof typeof Stack;
-
 export default function ExampleFilter({
-  product,
-  setProduct,
-  useCase,
-  setUseCase,
-  stack,
-  setStack,
+  selectedProducts,
+  setSelectedProduct,
+  selectedUseCase,
+  setSelectedUseCase,
+  selectedStacks,
+  setSelectedStack,
 }) {
+  const allUseCases = flatten(allExamples.map((example) => example.use_cases));
+  const allStack = flatten(allExamples.map((example) => example.stack));
   return (
     <form className="grid gap-4">
-      {/*onChange={(e) => setProduct(e.target.value as Products)}*/}
-
-      <div className="border-b border-b-white/5 pb-4">
+      {/*<div className="border-b border-b-white/5 pb-4">
         <input
           type="search"
           className="rounded bg-white px-4 py-2 text-zinc-950"
         />
-      </div>
+      </div>*/}
 
-      <div className="border-b border-b-white/5 pb-4">
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            value={Products.redis}
-            className="pointer-events-none absolute opacity-0"
-          />
-          <IconRedis width={16} aria-label="Upstash Redis Icon" className="" />
-          <span>Redis</span>
-        </label>
-        <label className="flex items-center gap-2">
-          <input type="checkbox" value={Products.kafka} />
-          <IconKafka width={16} aria-label="Upstash Kafka Icon" className="" />
-          <span>Kafka</span>
-        </label>
-        <label className="flex items-center gap-2">
-          <input type="checkbox" value={Products.qstash} />
-          <IconQStash
-            width={16}
-            aria-label="Upstash QStash Icon"
-            className=""
-          />
-          <span>QStash</span>
-        </label>
-      </div>
+      <Child>
+        <h4 className="text-sm uppercase tracking-widest opacity-60">Filter</h4>
+      </Child>
+      <Child>
+        <div className="space-y-0.5">
+          {["redis", "kafka", "qstash"].map((key) => {
+            const isRedis = key === "redis";
+            const isKafka = key === "kafka";
+            const isQStash = key === "qstash";
+            const isActive = selectedProducts.includes(key);
 
-      <Toc>
-        <Toc.Summary>Stack</Toc.Summary>
-        <div className="space-y-px">
-          {Object.keys(Stack).map((key) => {
-            return <Item key={key} value={key} label={Stack[key]} />;
+            return (
+              <Item
+                key={key}
+                value={key}
+                checked={selectedProducts.includes(key)}
+                label={ProductsLabel[key]}
+                onChange={(e) => {
+                  const { value, checked } = e.target;
+                  if (checked) {
+                    setSelectedProduct([...selectedProducts, value]);
+                  } else {
+                    setSelectedProduct(
+                      selectedProducts.filter((item) => item !== value)
+                    );
+                  }
+                }}
+                className={cx(
+                  isRedis && isActive && "bg-red-200/10",
+                  isKafka && isActive && "bg-blue-200/10",
+                  isQStash && isActive && "bg-purple-200/10"
+                )}
+                icon={
+                  <>
+                    {isRedis && (
+                      <IconRedis
+                        width={20}
+                        className={cx("grayscale", isActive && "grayscale-0")}
+                      />
+                    )}
+                    {isKafka && (
+                      <IconKafka
+                        width={20}
+                        className={cx("grayscale", isActive && "grayscale-0")}
+                      />
+                    )}
+                    {isQStash && (
+                      <IconQStash
+                        width={20}
+                        className={cx("grayscale", isActive && "grayscale-0")}
+                      />
+                    )}
+                  </>
+                }
+              />
+            );
           })}
         </div>
-      </Toc>
-
-      <Toc>
-        <Toc.Summary>Use Cases</Toc.Summary>
-        <div className="space-y-px">
-          {Object.keys(UseCases).map((key) => {
-            return <Item key={key} value={key} label={UseCases[key]} />;
-          })}
-        </div>
-      </Toc>
+      </Child>
+      <Child>
+        <Toc>
+          <Toc.Summary count={selectedStacks.length}>Stack</Toc.Summary>
+          <div className="space-y-0.5">
+            {allUseCases.map((key) => {
+              return (
+                <Item
+                  key={key}
+                  value={key}
+                  checked={selectedStacks.includes(key)}
+                  label={StackLabel[key]}
+                  onChange={(e) => {
+                    const { value, checked } = e.target;
+                    if (checked) {
+                      setSelectedStack([...selectedStacks, value]);
+                    } else {
+                      setSelectedStack(
+                        selectedStacks.filter((item) => item !== value)
+                      );
+                    }
+                  }}
+                />
+              );
+            })}
+          </div>
+        </Toc>
+      </Child>
+      <Child>
+        <Toc>
+          <Toc.Summary count={selectedUseCase.length}>Use Cases</Toc.Summary>
+          <div className="space-y-0.5">
+            {allStack.map((key) => {
+              return (
+                <Item
+                  key={key}
+                  value={key}
+                  checked={selectedUseCase.includes(key)}
+                  label={UseCasesLabel[key]}
+                  onChange={(e) => {
+                    const { value, checked } = e.target;
+                    if (checked) {
+                      setSelectedUseCase([...selectedUseCase, value]);
+                    } else {
+                      setSelectedUseCase(
+                        selectedUseCase.filter((item) => item !== value)
+                      );
+                    }
+                  }}
+                />
+              );
+            })}
+          </div>
+        </Toc>
+      </Child>
     </form>
+  );
+}
+
+function Child({ className, children, ...props }: HTMLProps<HTMLDivElement>) {
+  return (
+    <div className={cx("border-b border-b-white/5 pb-4", className)} {...props}>
+      {children}
+    </div>
   );
 }
 
@@ -111,7 +182,7 @@ function Toc({ className, children, ...props }: HTMLProps<HTMLDetailsElement>) {
       open
       role="navigation"
       aria-label="Use Cases"
-      className={cx("group/toc border-b border-b-white/5 pb-4", className)}
+      className={cx("group/toc", className)}
       {...props}
     >
       {children}
@@ -120,53 +191,82 @@ function Toc({ className, children, ...props }: HTMLProps<HTMLDetailsElement>) {
 }
 
 Toc.Summary = function TocSummary({
+  count = 0,
   className,
   children,
   ...props
-}: HTMLProps<HTMLDetailsElement>) {
+}: HTMLProps<HTMLDetailsElement> & { count?: number }) {
   return (
     <summary
       className={cx(
-        "flex select-none list-none items-center justify-between",
-        "mb-px h-10 rounded text-white/40 hover:bg-white/03",
+        "flex select-none list-none items-center gap-2",
+        "mb-px h-10 rounded px-4 text-white/40 hover:bg-white/03",
         className
       )}
       {...props}
     >
-      <IconArrow className="rotate-0 group-open/toc:rotate-90" />
+      <span className="inline-flex w-5 shrink-0 items-center justify-center">
+        <IconArrow className="rotate-0 group-open/toc:rotate-90" />
+      </span>
       <span className="grow text-sm uppercase tracking-wide">{children}</span>
+      {count > 0 && (
+        <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/5 font-mono text-sm">
+          {count}
+        </span>
+      )}
     </summary>
   );
 };
 
 function Item({
   value,
+  icon,
   label,
+  className,
   checked,
-}: {
+  onChange = () => {},
+}: HTMLProps<HTMLLabelElement> & {
+  icon?: React.ReactNode;
   value: string;
   label: string;
   checked?: boolean;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
   return (
     <label
-      className="flex select-none items-center gap-2
-     rounded bg-white/03 px-4 py-2"
+      className={cx(
+        "flex cursor-pointer select-none items-center gap-2",
+        "rounded-lg bg-white/03 px-4 py-3 text-zinc-400",
+        "hover:bg-white/5",
+        checked && "bg-white/10 text-zinc-50",
+        className
+      )}
     >
       <input
         type="checkbox"
         value={value}
+        onChange={onChange}
         className="pointer-events-none absolute opacity-0"
       />
-      <span className="h-4 w-4 rounded border border-white/10">
-        <Icon
-          icon={ICON_NAMES.Check}
+      {icon ? (
+        icon
+      ) : (
+        <span
           className={cx(
-            "opacity-0 transition",
-            checked && "text-emerald-400 opacity-100"
+            "relative h-5 w-5 rounded border border-white/10",
+            checked && "border-emerald-400"
           )}
-        />
-      </span>
+        >
+          <Icon
+            icon={ICON_NAMES.Check}
+            className={cx(
+              "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2",
+              "text-lg opacity-0 transition duration-100",
+              checked && "text-emerald-400 opacity-100"
+            )}
+          />
+        </span>
+      )}
       <span className="grow">{label}</span>
     </label>
   );
