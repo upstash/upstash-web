@@ -1,4 +1,4 @@
-import { Frameworks, Products, UseCases } from "./filter";
+import { Stack, Products, UseCases } from "./filter";
 
 export default [
   {
@@ -6,7 +6,7 @@ export default [
     description:
       "Serverless API using AWS Lambda and we will deploy it using AWS CDK.",
     products: [Products.kafka, Products.qstash],
-    frameworks: [Frameworks.nextjs],
+    stack: [Stack.nextjs],
     use_cases: [UseCases.ai_ml],
     github_url: "dasd",
   },
@@ -15,7 +15,7 @@ export default [
     description:
       "This example implements an autocomplete API powered by serverless Redis.",
     products: [Products.redis],
-    frameworks: [Frameworks.nextjs],
+    stack: [Stack.nextjs],
     use_cases: [UseCases.ai_ml],
     blog_url: "dasd",
   },
@@ -24,7 +24,7 @@ export default [
     description:
       "We benchmarked two AWS Lambda functions which fetch records from two different Serverless databases",
     products: [Products.redis],
-    frameworks: [Frameworks.nextjs],
+    stack: [Stack.nextjs],
     use_cases: [UseCases.ai_ml],
     github_url: "dasd",
     blog_url: "dasd",
@@ -34,7 +34,7 @@ export default [
     description:
       "This example implements a Serverless Histogram API powered by serverless Upstash Redis",
     products: [Products.kafka],
-    frameworks: [Frameworks.nextjs],
+    stack: [Stack.nextjs],
     use_cases: [UseCases.ai_ml],
     blog_url: "dasd",
   },
@@ -43,7 +43,7 @@ export default [
     description:
       "A sample web application which uses Redis as state store in Next.js application.",
     products: [Products.qstash],
-    frameworks: [Frameworks.nextjs],
+    stack: [Stack.nextjs],
     use_cases: [UseCases.ai_ml],
     github_url: "dasd",
     blog_url: "dasd",
@@ -53,7 +53,7 @@ export default [
     description:
       "We benchmarked two AWS Lambda functions which fetch records from two different Serverless databases",
     products: [Products.redis, Products.qstash],
-    frameworks: [Frameworks.nextjs],
+    stack: [Stack.nextjs],
     use_cases: [UseCases.ai_ml],
     github_url: "dasd",
     blog_url: "dasd",
@@ -63,7 +63,7 @@ export default [
     description:
       "This example implements a Serverless Histogram API powered by serverless Upstash Redis",
     products: [Products.redis, Products.kafka],
-    frameworks: [Frameworks.nextjs],
+    stack: [Stack.nextjs],
     use_cases: [UseCases.ai_ml],
     blog_url: "dasd",
   },
@@ -72,7 +72,7 @@ export default [
     description:
       "A sample web application which uses Redis as state store in Next.js application.",
     products: [Products.kafka],
-    frameworks: [Frameworks.nextjs],
+    stack: [Stack.nextjs],
     use_cases: [UseCases.ai_ml],
     github_url: "dasd",
     blog_url: "dasd",

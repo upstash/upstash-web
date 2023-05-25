@@ -6,7 +6,20 @@ import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 import authors from "./utils/authors";
 
-export type PostHeading = { level: number; title: string; slug: string };
+export const Example = defineDocumentType(() => ({
+  name: "Example",
+  filePathPattern: `example/*.md`,
+  contentType: "markdown",
+  fields: {
+    title: { type: "string", required: true },
+    github_url: { type: "string", required: false },
+    blog_url: { type: "string", required: false },
+    products: { type: "json", required: true },
+    stack: { type: "json", required: true },
+    use_cases: { type: "json", required: true },
+    draft: { type: "boolean" },
+  },
+}));
 
 export const Job = defineDocumentType(() => ({
   name: "Job",
@@ -71,7 +84,7 @@ export const Post = defineDocumentType(() => ({
 
 export default makeSource({
   contentDirPath: "./data",
-  documentTypes: [Job, Post],
+  documentTypes: [Job, Post, Example],
   mdx: {
     remarkPlugins: [remarkGfm],
     rehypePlugins: [

@@ -7,7 +7,7 @@ import IconKafka from "@/components/icon-kafka";
 import IconQStash from "@/components/icon-qstash";
 import Balancer from "react-wrap-balancer";
 import Button, { IButton } from "@/components/button";
-import { Products } from "./filter";
+import { IProducts } from "./filter";
 
 export function Example({
   className,
@@ -15,7 +15,7 @@ export function Example({
   products,
   ...props
 }: HTMLProps<HTMLDivElement> & {
-  products: Products[];
+  products: IProducts[];
 }) {
   const childs = Children.map(children, (child: ReactElement) => {
     return cloneElement(child, {
@@ -27,10 +27,11 @@ export function Example({
   return (
     <article
       className={cx(
-        "group/example-box p-6 text-left md:p-8",
-        "flex flex-col gap-1",
+        "group/example-box p-6",
+        "flex flex-col gap-4 md:gap-6",
         "rounded-3xl bg-white/03",
         "border border-white/5",
+        "transition hover:bg-white/5",
         className
       )}
       {...props}
@@ -47,7 +48,10 @@ Example.Title = function ExampleTitle({
 }: HTMLProps<HTMLHeadingElement>) {
   return (
     <h3
-      className={cx("font-display text-xl font-semibold", className)}
+      className={cx(
+        "font-display text-xl font-medium md:leading-tight",
+        className
+      )}
       {...props}
     >
       <Balancer>{children}</Balancer>
@@ -71,62 +75,38 @@ Example.Products = function ExampleProducts({
   className,
   children,
   ...props
-}: HTMLProps<HTMLDivElement> & { products?: Products[] }) {
+}: HTMLProps<HTMLDivElement> & { products?: IProducts[] }) {
   if (!props.products) return null;
 
   return (
     <div
-      className={cx(
-        "mt-auto flex items-center justify-start gap-2 pt-4",
-        className
-      )}
+      className={cx("flex items-center justify-start gap-2", className)}
       {...props}
     >
       {props.products.map((product) => {
-        if (product === Products.redis) {
+        if (product === "redis") {
           return (
-            <span
-              key={product}
-              className="inline-flex items-center gap-1.5
-             rounded bg-red-400/10 px-2 py-1 text-red-200"
-            >
-              <IconRedis
-                width={16}
-                aria-label="Upstash Redis Icon"
-                className=""
-              />
-              Redis
-            </span>
+            <IconRedis
+              width={24}
+              aria-label="Upstash Redis Icon"
+              className=""
+            />
           );
-        } else if (product === Products.kafka) {
+        } else if (product === "kafka") {
           return (
-            <span
-              key={product}
-              className="inline-flex items-center gap-1.5
-             rounded bg-blue-400/10 px-2 py-1 text-blue-200"
-            >
-              <IconKafka
-                width={16}
-                aria-label="Upstash Kafka Icon"
-                className=""
-              />
-              Kafka
-            </span>
+            <IconKafka
+              width={24}
+              aria-label="Upstash Kafka Icon"
+              className=""
+            />
           );
-        } else if (product === Products.qstash) {
+        } else if (product === "qstash") {
           return (
-            <span
-              key={product}
-              className="inline-flex items-center gap-1.5
-             rounded bg-purple-400/10 px-2 py-1 text-purple-200"
-            >
-              <IconQStash
-                width={16}
-                aria-label="Upstash QStash Icon"
-                className=""
-              />
-              QStash
-            </span>
+            <IconQStash
+              width={24}
+              aria-label="Upstash QStash Icon"
+              className=""
+            />
           );
         }
       })}
@@ -140,7 +120,7 @@ Example.Link = function ExampleLink({
   ...props
 }: HTMLProps<HTMLDivElement>) {
   return (
-    <div className={cx("mt-6 flex items-center gap-2", className)} {...props}>
+    <div className={cx("mt-auto grid grid-cols-2 gap-2", className)} {...props}>
       {children}
     </div>
   );
@@ -154,10 +134,19 @@ Example.LinkItem = function ExampleLinkItem({
   return (
     <Button
       type="button"
-      className={cx("grow text-white/60", className)}
+      hideIcon={!props.href}
+      disabled={!props.href}
+      className={cx(
+        "text-white/60",
+        props.href &&
+          "group-hover/example-box:bg-white group-hover/example-box:text-zinc-950",
+        !props.href && "pointer-events-none bg-white/03",
+        "hover:!bg-emerald-400 hover:!text-emerald-950",
+        className
+      )}
       {...props}
     >
-      {children}
+      {props.href ? children : <span className="opacity-0">View</span>}
     </Button>
   );
 };

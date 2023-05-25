@@ -1,57 +1,47 @@
 "use client";
 
 import { useState } from "react";
-import ExampleFilter, { Frameworks, Products, UseCases } from "./filter";
-import { Example } from "./comp";
-import Data from "./data";
+import ExampleFilter, { IProducts } from "./filter";
+import { Example as Box } from "./comp";
+import { allExamples, Example } from "contentlayer/generated";
 
 export default function HomePage() {
-  const [product, setProduct] = useState<"all" | Products>("all");
-  const [useCase, setUseCase] = useState<"all" | UseCases>("all");
-  const [framework, setFramework] = useState<"all" | Frameworks>("all");
+  const [product, setProduct] = useState<IProducts[]>([]);
+  const [useCase, setUseCase] = useState<string[]>([]);
+  const [stack, setStack] = useState<string[]>([]);
 
-  const data = Data.filter((item) => {
-    if (product !== "all" && !item.products.includes(product)) return false;
-    if (useCase !== "all" && !item.use_cases.includes(useCase)) return false;
-    if (framework !== "all" && !item.frameworks.includes(framework))
-      return false;
+  const data = allExamples.filter((item: Example) => {
+    // if (product.length && !product.includes(item.products)) return false;
+    // if (useCase.length && !useCase.includes(item.use_case)) return false;
+    // if (stack.length && !stack.some((s) => item.stack.includes(s))) return false;
     return true;
   });
 
   return (
-    <>
-      <div>
+    <div className="flex items-start gap-16 text-left">
+      <div className="w-1/6">
         <ExampleFilter
           product={product}
           setProduct={setProduct}
           useCase={useCase}
           setUseCase={setUseCase}
-          framework={framework}
-          setFramework={setFramework}
+          stack={stack}
+          setStack={setStack}
         />
       </div>
 
-      <div className="mt-16 grid gap-4 md:grid-cols-3 md:gap-6">
+      <div className="grid grow gap-4 md:grid-cols-3 md:gap-6">
         {data.map((item) => (
-          <Example key={item.title} products={item.products}>
-            <Example.Title>{item.title}</Example.Title>
-            <Example.Description>{item.description}</Example.Description>
-            <Example.Products />
-            <Example.Link>
-              {item.github_url && (
-                <Example.LinkItem href={item.github_url}>
-                  View Repo
-                </Example.LinkItem>
-              )}
-              {item.blog_url && (
-                <Example.LinkItem href={item.blog_url}>
-                  Read Post
-                </Example.LinkItem>
-              )}
-            </Example.Link>
-          </Example>
+          <Box key={item.title} products={item.products}>
+            <Box.Products />
+            <Box.Title>{item.title}</Box.Title>
+            <Box.Link>
+              <Box.LinkItem href={item.github_url}>Code</Box.LinkItem>
+              <Box.LinkItem href={item.blog_url}>Read</Box.LinkItem>
+            </Box.Link>
+          </Box>
         ))}
       </div>
-    </>
+    </div>
   );
 }

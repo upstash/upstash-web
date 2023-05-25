@@ -26,7 +26,7 @@ export default function PostTOC({ toc }: Props) {
         <span className="text-sm uppercase tracking-wide">
           Table of contents
         </span>
-        <Icon />
+        <IconArrow />
       </summary>
 
       {/* content */}
@@ -47,10 +47,13 @@ export default function PostTOC({ toc }: Props) {
   );
 }
 
-function Icon() {
+export function IconArrow({ className }: { className?: string }) {
   return (
     <svg
-      className="rotate-90 group-open/toc:-rotate-90"
+      className={cx(
+        "shrink-0 rotate-90 transition group-open/toc:-rotate-90",
+        className
+      )}
       width={24}
       viewBox="0 0 24 24"
       role="img"
@@ -58,7 +61,6 @@ function Icon() {
       fill="currentColor"
     >
       <path d="M10 17l5-5-5-5v10z"></path>
-      <path d="M0 24V0h24v24H0z" fill="none"></path>
     </svg>
   );
 }
