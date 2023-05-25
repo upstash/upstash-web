@@ -97,4 +97,9 @@ const customers = [
     url: "https://tinybird.co",
     icon: <Logo.Tinybird />,
   },
+  {
+    name: "Hashnode",
+    url: "https://hashnode.com",
+    icon: <Logo.Hashnode />,
+  },
 ];
