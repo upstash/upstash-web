@@ -33,25 +33,22 @@ export default function HomePage() {
       <section className="">
         <Container className="max-w-screen-md text-left">
           {jobs.map((job) => {
-            console.log(job.slug)
             return (
               <Link
                 key={job.slug}
-                className="grid p-6 transition rounded-lg group/job-item bg-white/03 hover:bg-emerald-200/5 md:rounded-3xl md:p-8"
+                className="group/job-item grid rounded-lg bg-white/03 p-6 transition hover:bg-emerald-200/5 md:rounded-3xl md:p-8"
                 href={`/careers/${job.slug}`}
               >
-                <h2
-                  className="text-xl font-semibold font-display text-emerald-400 group-hover/job-item:underline"
-                >
+                <h2 className="font-display text-xl font-semibold text-emerald-400 group-hover/job-item:underline">
                   {job.title}
                 </h2>
 
                 <p className="mt-1 opacity-80">{job.summary}</p>
 
-                <div className="flex flex-wrap items-center gap-1 mt-6">
+                <div className="mt-6 flex flex-wrap items-center gap-1">
                   {job.skills.map((skill: string) => (
                     <span
-                      className="px-3 py-1 rounded bg-white/03 text-zinc-400"
+                      className="rounded bg-white/03 px-3 py-1 text-zinc-400"
                       key={skill}
                     >
                       {skill}
