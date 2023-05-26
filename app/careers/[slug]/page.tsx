@@ -49,7 +49,6 @@ export async function generateMetadata({
 
 export default async function BlogPage({ params }: Props) {
   const slug = params?.slug;
-
   const job = allJobs.find((job) => job.slug === slug);
 
   if (!job) {
@@ -65,7 +64,7 @@ export default async function BlogPage({ params }: Props) {
         <CareerHeader job={job} />
 
         {/* Body */}
-        <div className="relative z-0 pt-20">
+        <div className="relative z-0 pt-10">
           <PageBodyGradient />
 
           <Container className="max-w-screen-md">
