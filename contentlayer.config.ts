@@ -9,38 +9,6 @@ import authors from "./utils/authors";
 
 
 
-export const Example = defineDocumentType(() => ({
-  name: "Example",
-  filePathPattern: `examples/examples/**/README.md`,
-
-  contentType: "markdown",
-  fields: {
-    title: { type: "string", required: true },
-    blog_url: { type: "string", required: false },
-    products: { type: "enum", options: ["redis", "kafka", "qstash"], required: true },
-    stack: { type: "list", of: { type: "string" }, required: true },
-    use_cases: { type: "list", of: { type: "string" }, required: true },
-    draft: { type: "boolean" },
-    author: { type: "string", required: true },
-  },
-  computedFields: {
-    github_url: {
-      type: "string",
-      resolve: (doc: any) => `https://github.com/upstash/examples/${doc._raw.flattenedPath.split("/").at(-1)}`,
-    },
-    authorObj: {
-      type: "json",
-      resolve: (doc) => {
-        const author = authors[doc.author as keyof typeof authors];
-        return {
-          ...author,
-          photo: `/authors/${author.image}`,
-        };
-      },
-    },
-  },
-
-}));
 
 export const Job = defineDocumentType(() => ({
   name: "Job",
@@ -107,7 +75,7 @@ export const Post = defineDocumentType(() => ({
 
 export default makeSource({
   contentDirPath: "./data",
-  documentTypes: [Job, Post, Example],
+  documentTypes: [Job, Post],
   mdx: {
     remarkPlugins: [remarkGfm],
     rehypePlugins: [
