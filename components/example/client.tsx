@@ -28,7 +28,7 @@ export default function HomePage() {
         />
       </div>
 
-      <div className="grid grow gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
+      <div className="grid gap-4 grow sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
         {data.map((item) => (
           <Box key={item.title} products={item.products}>
             <Box.Products />
