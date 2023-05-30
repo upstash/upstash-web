@@ -1,4 +1,5 @@
 import { defineDocumentType, makeSource } from "contentlayer/source-files";
+
 import readingTime from "reading-time";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypePrettyCode from "rehype-pretty-code";
@@ -6,19 +7,39 @@ import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 import authors from "./utils/authors";
 
+
+
 export const Example = defineDocumentType(() => ({
   name: "Example",
-  filePathPattern: `example/*.md`,
+  filePathPattern: `examples/examples/**/README.md`,
+
   contentType: "markdown",
   fields: {
     title: { type: "string", required: true },
-    github_url: { type: "string", required: false },
     blog_url: { type: "string", required: false },
-    products: { type: "json", required: true },
-    stack: { type: "json", required: true },
-    use_cases: { type: "json", required: true },
+    products: { type: "enum", options: ["redis", "kafka", "qstash"], required: true },
+    stack: { type: "list", of: { type: "string" }, required: true },
+    use_cases: { type: "list", of: { type: "string" }, required: true },
     draft: { type: "boolean" },
+    author: { type: "string", required: true },
   },
+  computedFields: {
+    github_url: {
+      type: "string",
+      resolve: (doc: any) => `https://github.com/upstash/examples/${doc._raw.flattenedPath.split("/").at(-1)}`,
+    },
+    authorObj: {
+      type: "json",
+      resolve: (doc) => {
+        const author = authors[doc.author as keyof typeof authors];
+        return {
+          ...author,
+          photo: `/authors/${author.image}`,
+        };
+      },
+    },
+  },
+
 }));
 
 export const Job = defineDocumentType(() => ({
@@ -81,6 +102,8 @@ export const Post = defineDocumentType(() => ({
     },
   },
 }));
+
+
 
 export default makeSource({
   contentDirPath: "./data",
