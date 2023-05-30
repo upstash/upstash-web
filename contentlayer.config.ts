@@ -29,6 +29,16 @@ export const Job = defineDocumentType(() => ({
       resolve: (doc: any) => doc._raw.flattenedPath.split("/").at(-1),
     },
   },
+  authorObj: {
+    type: "json",
+    resolve: (doc) => {
+      const author = authors[doc.author as keyof typeof authors];
+      return {
+        ...author,
+        photo: `/authors/${author.image}`,
+      };
+    },
+  },
 }));
 
 export const Post = defineDocumentType(() => ({
