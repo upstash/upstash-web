@@ -5,7 +5,6 @@ import * as React from "react";
 import { HTMLProps } from "react";
 import cx from "@/utils/cx";
 import Icon, { ICON_NAMES } from "@/components/icon";
-import { allExamples } from "contentlayer/generated";
 import { flatten } from "lodash";
 import IconRedis from "@/components/icon-redis";
 import IconKafka from "@/components/icon-kafka";
@@ -39,20 +38,20 @@ export default function ExampleFilter({
   setSelectedUseCase,
   selectedStacks,
   setSelectedStack,
+  allUseCases,
+  allStacks
 }) {
-  const allUseCases = flatten(allExamples.map((example) => example.use_cases));
-  const allStack = flatten(allExamples.map((example) => example.stack));
   return (
     <form className="grid gap-4">
-      {/*<div className="border-b border-b-white/5 pb-4">
+      {/*<div className="pb-4 border-b border-b-white/5">
         <input
           type="search"
-          className="rounded bg-white px-4 py-2 text-zinc-950"
+          className="px-4 py-2 bg-white rounded text-zinc-950"
         />
       </div>*/}
 
       <Child>
-        <h4 className="text-sm uppercase tracking-widest opacity-60">Filter</h4>
+        <h4 className="text-sm tracking-widest uppercase opacity-60">Filter</h4>
       </Child>
       <Child>
         <div className="space-y-0.5">
@@ -141,7 +140,7 @@ export default function ExampleFilter({
         <Toc>
           <Toc.Summary count={selectedUseCase.length}>Use Cases</Toc.Summary>
           <div className="space-y-0.5">
-            {allStack.map((key) => {
+            {allStacks.map((key) => {
               return (
                 <Item
                   key={key}
@@ -204,12 +203,12 @@ Toc.Summary = function TocSummary({
       )}
       {...props}
     >
-      <span className="inline-flex w-5 shrink-0 items-center justify-center">
+      <span className="inline-flex items-center justify-center w-5 shrink-0">
         <IconArrow className="rotate-0 group-open/toc:rotate-90" />
       </span>
-      <span className="grow text-sm uppercase tracking-wide">{children}</span>
+      <span className="text-sm tracking-wide uppercase grow">{children}</span>
       {count > 0 && (
-        <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/5 font-mono text-sm">
+        <span className="inline-flex items-center justify-center w-5 h-5 font-mono text-sm rounded-full bg-white/5">
           {count}
         </span>
       )}
@@ -245,7 +244,7 @@ function Item({
         type="checkbox"
         value={value}
         onChange={onChange}
-        className="pointer-events-none absolute opacity-0"
+        className="absolute opacity-0 pointer-events-none"
       />
       {icon ? (
         icon

@@ -1,17 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import ExampleFilter from "./filter";
 import { Example as Box } from "./comp";
-import { allExamples, Example } from "contentlayer/generated";
+import type { Example } from "@/utils/type";
+type Props = {
+  examples: Example[]
+  useCases: Record<string, number>
+  stack: Record<string, number>
+}
 
-export default function HomePage() {
-  const [selectedProducts, setSelectedProduct] = useState<string[]>([]);
+export const Client: React.FC<Props> = ({ examples, useCases, stack }) => {
+  const [selectedProducts, setSelectedProduct] = useState<Example["products"]>([]);
   const [selectedUseCase, setSelectedUseCase] = useState<string[]>([]);
   const [selectedStacks, setSelectedStack] = useState<string[]>([]);
 
-  const data = allExamples.filter((item: Example) => {
-    // filter
+  const data = examples.filter((item: Example) => {
+   // TODO: andreas
     return true;
   });
 
@@ -25,17 +30,19 @@ export default function HomePage() {
           setSelectedUseCase={setSelectedUseCase}
           selectedStacks={selectedStacks}
           setSelectedStack={setSelectedStack}
+          allStacks={Object.keys(stack)}
+          allUseCases={Object.keys(useCases)}
         />
       </div>
 
-      <div className="grid grow gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
+      <div className="grid gap-4 grow sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
         {data.map((item) => (
           <Box key={item.title} products={item.products}>
             <Box.Products />
             <Box.Title>{item.title}</Box.Title>
             <Box.Link>
-              <Box.LinkItem href={item.github_url}>Code</Box.LinkItem>
-              <Box.LinkItem href={item.blog_url}>Read</Box.LinkItem>
+              <Box.LinkItem href={item.githubUrl}>Code</Box.LinkItem>
+              {/* <Box.LinkItem href={item.blog}>Read</Box.LinkItem> */}
             </Box.Link>
           </Box>
         ))}
