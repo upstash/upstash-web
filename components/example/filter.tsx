@@ -15,21 +15,6 @@ export const ProductsLabel = {
   qstash: "QStash",
 };
 
-export const UseCasesLabel = {
-  ai_ml: "AI/ML",
-};
-
-export const StackLabel = {
-  nextjs: "Next.js",
-  react: "React",
-  nuxtjs: "Nuxt",
-  vuejs: "Vue",
-  svelte: "Svelte",
-  gatsby: "Gatsby",
-  remix: "Remix",
-  astro: "Astro",
-};
-
 export default function ExampleFilter({
   selectedProducts,
   setSelectedProduct,
@@ -40,6 +25,14 @@ export default function ExampleFilter({
   allUseCases,
   allStacks,
 }) {
+  const isFilterDirty = React.useMemo(() => {
+    return (
+      selectedProducts.length > 0 ||
+      selectedUseCase.length > 0 ||
+      selectedStacks.length > 0
+    );
+  }, [selectedProducts, selectedUseCase, selectedStacks]);
+
   return (
     <form className="grid gap-4">
       {/*<div className="pb-4 border-b border-b-white/5">
@@ -50,7 +43,25 @@ export default function ExampleFilter({
       </div>*/}
 
       <Child>
-        <h4 className="text-sm uppercase tracking-widest opacity-60">Filter</h4>
+        <div className="flex items-center">
+          <h4 className="text-sm uppercase tracking-widest opacity-60">
+            Filter
+          </h4>
+          {isFilterDirty && (
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedProduct([]);
+                setSelectedUseCase([]);
+                setSelectedStack([]);
+              }}
+              className="ml-auto inline-flex h-5 items-center justify-center
+           rounded-full bg-white/5 px-2 text-sm text-white/40"
+            >
+              Clear
+            </button>
+          )}
+        </div>
       </Child>
       <Child>
         <div className="space-y-0.5">
@@ -118,7 +129,7 @@ export default function ExampleFilter({
                   key={key}
                   value={key}
                   checked={selectedStacks.includes(key)}
-                  label={StackLabel[key]}
+                  label={key}
                   onChange={(e) => {
                     const { value, checked } = e.target;
                     if (checked) {
@@ -145,7 +156,7 @@ export default function ExampleFilter({
                   key={key}
                   value={key}
                   checked={selectedUseCase.includes(key)}
-                  label={UseCasesLabel[key]}
+                  label={key}
                   onChange={(e) => {
                     const { value, checked } = e.target;
                     if (checked) {
@@ -207,7 +218,7 @@ Toc.Summary = function TocSummary({
       </span>
       <span className="grow text-sm uppercase tracking-wide">{children}</span>
       {count > 0 && (
-        <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/5 font-mono text-sm">
+        <span className="inline-flex h-5 items-center justify-center rounded-full bg-white/5 px-2 font-mono text-sm">
           {count}
         </span>
       )}

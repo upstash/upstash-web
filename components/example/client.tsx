@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import ExampleFilter from "./filter";
 import { Example as Box } from "./comp";
 import type { Example } from "@/utils/type";
+import authors from "@/utils/authors";
 
 type Props = {
   examples: Example[];
@@ -40,14 +41,12 @@ export const Client: React.FC<Props> = ({ examples, useCases, stack }) => {
 
       <div className="grid grow gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
         {data.map((item) => (
-          <Box key={item.title} products={item.products}>
-            <Box.Products />
-            <Box.Title>{item.title}</Box.Title>
-            <Box.Link>
-              <Box.LinkItem href={item.githubUrl}>Code</Box.LinkItem>
-              {/* <Box.LinkItem href={item.blog}>Read</Box.LinkItem> */}
-            </Box.Link>
-          </Box>
+          <Box
+            key={item.title}
+            title={item.title}
+            products={item.products}
+            author={item.author as keyof typeof authors}
+          />
         ))}
       </div>
     </div>

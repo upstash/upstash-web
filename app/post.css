@@ -15,12 +15,27 @@
   @apply bg-red-200 p-4;
 }
 
+.post ul,
+.post ol {
+  @apply list-inside space-y-2;
+}
+
 .post ul {
-  @apply list-inside list-disc space-y-2 marker:text-zinc-400;
+  @apply list-none;
 }
 
 .post ol {
-  @apply list-inside list-decimal space-y-2 marker:text-zinc-400;
+  @apply list-decimal pl-2 marker:text-zinc-500;
+}
+
+.post ul li {
+  @apply relative pl-6;
+}
+
+.post ul > li:before {
+  @apply absolute left-0 h-0.5 w-3 rounded-full bg-zinc-600;
+  content: "";
+  top: .8em;
 }
 
 .post hr {

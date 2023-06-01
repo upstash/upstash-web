@@ -6,28 +6,26 @@ import IconRedis from "@/components/icon-redis";
 import IconKafka from "@/components/icon-kafka";
 import IconQStash from "@/components/icon-qstash";
 import Balancer from "react-wrap-balancer";
-import Button, { IButton } from "@/components/button";
+import authors from "@/utils/authors";
+import Image from "next/image";
 
 export function Example({
   className,
   children,
   products,
+  author,
+  title,
   ...props
 }: HTMLProps<HTMLDivElement> & {
   products: string[];
+  author: keyof typeof authors;
+  title: string;
 }) {
-  const childs = Children.map(children, (child: ReactElement) => {
-    return cloneElement(child, {
-      ...child.props,
-      products,
-    });
-  });
-
   return (
     <article
       className={cx(
         "group/example-box p-6",
-        "flex flex-col gap-4 md:gap-6",
+        "flex flex-col gap-4",
         "rounded-3xl bg-white/03",
         "border border-white/5",
         "transition hover:bg-white/5",
@@ -35,16 +33,21 @@ export function Example({
       )}
       {...props}
     >
-      {childs}
+      <ExampleProducts products={products} />
+      <ExampleTitle title={title} />
+      <ExampleAuthor author={author} />
     </article>
   );
 }
 
-Example.Title = function ExampleTitle({
+function ExampleTitle({
   className,
   children,
+  title,
   ...props
-}: HTMLProps<HTMLHeadingElement>) {
+}: HTMLProps<HTMLHeadingElement> & {
+  title: string;
+}) {
   return (
     <h3
       className={cx(
@@ -53,24 +56,14 @@ Example.Title = function ExampleTitle({
       )}
       {...props}
     >
-      <Balancer>{children}</Balancer>
+      <a href={`/examples/${title.toLowerCase().replace(/ /g, "-")}`}>
+        <Balancer>{title}</Balancer>
+      </a>
     </h3>
   );
-};
+}
 
-Example.Description = function ExampleDescription({
-  className,
-  children,
-  ...props
-}: HTMLProps<HTMLParagraphElement>) {
-  return (
-    <p className={cx("opacity-60", className)} {...props}>
-      {children}
-    </p>
-  );
-};
-
-Example.Products = function ExampleProducts({
+function ExampleProducts({
   className,
   children,
   ...props
@@ -107,41 +100,30 @@ Example.Products = function ExampleProducts({
       })}
     </div>
   );
-};
+}
 
-Example.Link = function ExampleLink({
+function ExampleAuthor({
   className,
   children,
+  author,
   ...props
-}: HTMLProps<HTMLDivElement>) {
+}: HTMLProps<HTMLDivElement> & {
+  author: keyof typeof authors;
+}) {
+  const { image, name } = authors[author];
   return (
-    <div className={cx("mt-auto grid grid-cols-2 gap-2", className)} {...props}>
-      {children}
-    </div>
-  );
-};
-
-Example.LinkItem = function ExampleLinkItem({
-  className,
-  children,
-  ...props
-}: IButton) {
-  return (
-    <Button
-      type="button"
-      hideIcon={!props.href}
-      disabled={!props.href}
-      className={cx(
-        "text-white/60",
-        props.href &&
-          "group-hover/example-box:bg-white group-hover/example-box:text-zinc-950",
-        !props.href && "pointer-events-none bg-white/03",
-        "hover:!bg-emerald-400 hover:!text-emerald-950",
-        className
-      )}
+    <div
+      className={cx("mt-auto flex items-center grayscale", className)}
       {...props}
     >
-      {props.href ? children : <span className="opacity-0">View</span>}
-    </Button>
+      <Image
+        className="rounded-full"
+        src={`/authors/${image}`}
+        alt={name}
+        width={30}
+        height={30}
+      />
+      <span className="ml-2 opacity-60">{name}</span>
+    </div>
   );
-};
+}

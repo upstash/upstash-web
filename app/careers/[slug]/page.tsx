@@ -51,6 +51,8 @@ export default async function BlogPage({ params }: Props) {
   const slug = params?.slug;
   const job = allJobs.find((job) => job.slug === slug);
 
+  console.log(job);
+
   if (!job) {
     notFound();
   }

@@ -4,19 +4,19 @@ import { ReactNode } from "react";
 import { Metadata } from "next";
 import { SITE_URL } from "@/utils/const";
 
-const title = "Upstash Careers";
+const title = "Upstash Examples";
 const description =
-  "Help us build the cutting edge data platform for the serverless era.";
+  "Jumpstart your app development process with our pre-built solutions.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Upstash Careers",
+    default: title,
     template: `%s | ${title}`,
   },
   description,
 };
 
-export default function CareersLayout({ children }: { children: ReactNode }) {
+export default function ExamplesLayout({ children }: { children: ReactNode }) {
   return children;
 }

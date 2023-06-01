@@ -63,6 +63,10 @@ const NavItems: {
     href: "/about",
   },
   {
+    name: "Examples",
+    href: "/examples",
+  },
+  {
     name: "Blog",
     href: "/blog",
   },

@@ -5,29 +5,20 @@ import PageHeaderDesc from "@/components/page-header-desc";
 import Bg from "@/components/bg";
 import { Client } from "@/components/example/client";
 import type { Example } from "@/utils/type";
+import getData from "./get-data";
 
-// TODO: clear filter
 // TODO: set canonical url
 
-export const metadata: Metadata = {
-  title: "Brand Assets",
-};
-
-export const revalidate = 300; // this page is statically generated and cached for 5 minutes
+// this page is statically generated and cached for 5 minutes
+export const revalidate = 300;
 
 export default async function ExamplesPage() {
-  const examples: Example[] = await fetch(
-    "https://upstash-examples-content.vercel.app/"
-  )
-    .then((res) => res.json())
-    .catch((err) => {
-      console.log(err);
-      return [];
-    });
+  const examples: Example[] = await getData();
 
   // counting occurences of each stack
   const stack: Record<string, number> = {};
   const useCases: Record<string, number> = {};
+
   for (const e of examples) {
     for (const s of e.stack) {
       stack[s] = (stack[s] || 0) + 1;

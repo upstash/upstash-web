@@ -1,4 +1,4 @@
-import "./post.css";
+import "../post.css";
 import "./code.css";
 
 import { ReactNode } from "react";

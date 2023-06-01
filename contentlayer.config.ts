@@ -7,9 +7,6 @@ import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 import authors from "./utils/authors";
 
-
-
-
 export const Job = defineDocumentType(() => ({
   name: "Job",
   filePathPattern: `job/*.mdx`,
@@ -80,8 +77,6 @@ export const Post = defineDocumentType(() => ({
     },
   },
 }));
-
-
 
 export default makeSource({
   contentDirPath: "./data",
