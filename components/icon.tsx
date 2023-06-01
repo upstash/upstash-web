@@ -33,6 +33,7 @@ export default function Icon({ icon, className, ...props }: IconProps) {
 
 export enum ICON_NAMES {
   ArrowUpRight = "ArrowUpRight",
+  ArrowRight = "ArrowRight",
   Check = "Check",
   CreditCard = "CreditCard",
   CircleCheck = "CircleCheck",
@@ -122,6 +123,13 @@ const PATHS = {
     <>
       <rect x="8" y="8" width="12" height="12" rx="2" />
       <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2" />
+    </>
+  ),
+  [ICON_NAMES.ArrowRight]: (
+    <>
+      <path d="M5 12l14 0" />
+      <path d="M13 18l6 -6" />
+      <path d="M13 6l6 6" />
     </>
   ),
 };
