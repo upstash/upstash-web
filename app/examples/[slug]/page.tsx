@@ -68,15 +68,17 @@ export default async function BlogPage({ params }: Props) {
   const content = await markdownToHtml(example.body);
 
   return (
-    <main className="pt-8 md:pt-16">
+    <main className="">
       <Container>
-        <div className="grid gap-8 text-left md:grid-cols-3 md:gap-16">
+        <div className="border-b border-b-white/5 py-8 md:pt-0">
+          <Link href="/examples" className="inline-flex opacity-80">
+            ← Back to Examples
+          </Link>
+        </div>
+
+        <div className="mt-8 grid gap-8 text-left md:mt-16 md:grid-cols-3 md:gap-16">
           {/* meta */}
           <div className="order-2 md:order-1">
-            <Link href="/examples" className="mb-4 hidden opacity-80 md:block">
-              ← Back to Examples
-            </Link>
-
             <div className="top-8 rounded-2xl bg-white/5 p-6 md:sticky">
               <div className="">
                 <ExampleMetaRow title="Products">
@@ -197,11 +199,7 @@ export default async function BlogPage({ params }: Props) {
           </div>
 
           {/* post */}
-          <div className="order-1 md:col-span-2 md:pt-10">
-            <Link href="/examples" className="mb-8 block opacity-60 md:hidden">
-              ← Back to Examples
-            </Link>
-
+          <div className="order-1 md:col-span-2">
             <article>
               <h1 className="font-display text-4xl font-bold !leading-title md:text-5xl">
                 <Balancer>{example.title}</Balancer>
