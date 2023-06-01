@@ -5,7 +5,6 @@ import * as React from "react";
 import { HTMLProps } from "react";
 import cx from "@/utils/cx";
 import Icon, { ICON_NAMES } from "@/components/icon";
-import { flatten } from "lodash";
 import IconRedis from "@/components/icon-redis";
 import IconKafka from "@/components/icon-kafka";
 import IconQStash from "@/components/icon-qstash";
@@ -39,7 +38,7 @@ export default function ExampleFilter({
   selectedStacks,
   setSelectedStack,
   allUseCases,
-  allStacks
+  allStacks,
 }) {
   return (
     <form className="grid gap-4">
@@ -51,7 +50,7 @@ export default function ExampleFilter({
       </div>*/}
 
       <Child>
-        <h4 className="text-sm tracking-widest uppercase opacity-60">Filter</h4>
+        <h4 className="text-sm uppercase tracking-widest opacity-60">Filter</h4>
       </Child>
       <Child>
         <div className="space-y-0.5">
@@ -203,12 +202,12 @@ Toc.Summary = function TocSummary({
       )}
       {...props}
     >
-      <span className="inline-flex items-center justify-center w-5 shrink-0">
+      <span className="inline-flex w-5 shrink-0 items-center justify-center">
         <IconArrow className="rotate-0 group-open/toc:rotate-90" />
       </span>
-      <span className="text-sm tracking-wide uppercase grow">{children}</span>
+      <span className="grow text-sm uppercase tracking-wide">{children}</span>
       {count > 0 && (
-        <span className="inline-flex items-center justify-center w-5 h-5 font-mono text-sm rounded-full bg-white/5">
+        <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/5 font-mono text-sm">
           {count}
         </span>
       )}
@@ -244,7 +243,7 @@ function Item({
         type="checkbox"
         value={value}
         onChange={onChange}
-        className="absolute opacity-0 pointer-events-none"
+        className="pointer-events-none absolute opacity-0"
       />
       {icon ? (
         icon

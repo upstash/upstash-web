@@ -4,19 +4,22 @@ import React, { useState } from "react";
 import ExampleFilter from "./filter";
 import { Example as Box } from "./comp";
 import type { Example } from "@/utils/type";
+
 type Props = {
-  examples: Example[]
-  useCases: Record<string, number>
-  stack: Record<string, number>
-}
+  examples: Example[];
+  useCases: Record<string, number>;
+  stack: Record<string, number>;
+};
 
 export const Client: React.FC<Props> = ({ examples, useCases, stack }) => {
-  const [selectedProducts, setSelectedProduct] = useState<Example["products"]>([]);
+  const [selectedProducts, setSelectedProduct] = useState<Example["products"]>(
+    []
+  );
   const [selectedUseCase, setSelectedUseCase] = useState<string[]>([]);
   const [selectedStacks, setSelectedStack] = useState<string[]>([]);
 
   const data = examples.filter((item: Example) => {
-   // TODO: andreas
+    // TODO: andreas
     return true;
   });
 
@@ -35,7 +38,7 @@ export const Client: React.FC<Props> = ({ examples, useCases, stack }) => {
         />
       </div>
 
-      <div className="grid gap-4 grow sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
+      <div className="grid grow gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
         {data.map((item) => (
           <Box key={item.title} products={item.products}>
             <Box.Products />
@@ -49,4 +52,4 @@ export const Client: React.FC<Props> = ({ examples, useCases, stack }) => {
       </div>
     </div>
   );
-}
+};
