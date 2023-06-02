@@ -36,13 +36,21 @@ export async function generateMetadata({
     title,
     description,
     openGraph: {
+      type: "website",
+      locale: "en_US",
+      url,
       title,
       description,
-      url,
+      siteName: title,
+      images: "/og-home.jpg",
     },
     twitter: {
+      card: "summary_large_image",
       title,
       description,
+      site: "@upstash",
+      creator: "@upstash",
+      images: "/og-home.jpg",
     },
   };
 }
@@ -50,8 +58,6 @@ export async function generateMetadata({
 export default async function BlogPage({ params }: Props) {
   const slug = params?.slug;
   const job = allJobs.find((job) => job.slug === slug);
-
-  console.log(job);
 
   if (!job) {
     notFound();
