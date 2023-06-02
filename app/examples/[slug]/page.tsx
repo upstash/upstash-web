@@ -70,8 +70,8 @@ export default async function BlogPage({ params }: Props) {
   return (
     <main className="">
       <Container>
-        <div className="border-b border-b-white/5 py-8 md:pt-0">
-          <Link href="/examples" className="inline-flex opacity-80">
+        <div className="border-b border-white/5 py-4">
+          <Link href="/examples" className="inline-flex opacity-60">
             ← Back to Examples
           </Link>
         </div>
@@ -80,7 +80,7 @@ export default async function BlogPage({ params }: Props) {
           {/* meta */}
           <div className="order-2 md:order-1">
             <div className="top-8 rounded-2xl bg-white/5 p-6 md:sticky">
-              <div className="">
+              <div className="-mt-2">
                 <ExampleMetaRow title="Products">
                   <>
                     {example.products.map((item) => {

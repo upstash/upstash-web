@@ -32,7 +32,7 @@ export default async function ExamplesPage() {
     <main className="relative z-0 text-center">
       <Bg />
 
-      <section className="py-16 md:pb-24 md:pt-16">
+      <section className="py-16 md:py-20">
         <Container className="max-w-screen-lg">
           {/* header */}
           <header>

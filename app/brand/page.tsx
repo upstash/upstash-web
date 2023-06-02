@@ -17,7 +17,7 @@ export default function HomePage() {
     <main className="relative z-0 text-center">
       <Bg />
 
-      <section className="py-16 md:pb-24 md:pt-16">
+      <section className="py-16 md:py-20">
         <Container className="max-w-screen-lg">
           {/* header */}
           <header>
@@ -31,9 +31,7 @@ export default function HomePage() {
       </section>
 
       {/* body */}
-      <section className="relative z-0 py-10 md:py-20">
-        <PageBodyGradient />
-
+      <section>
         <Container className="max-w-screen-lg">
           <div className="grid gap-6 md:grid-cols-5">
             {/**/}
