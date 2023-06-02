@@ -12,7 +12,7 @@ export default function HomeHero() {
   const [activeProduct, setActiveProduct] = useState<Product>();
 
   return (
-    <section className="relative z-10 py-10">
+    <section className="relative z-10 py-20">
       <HomeHeroBg activeProduct={activeProduct} />
 
       <Container>

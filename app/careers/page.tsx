@@ -30,7 +30,7 @@ export default function HomePage() {
         </Container>
       </section>
 
-      <section className="">
+      <section className="pb-40">
         <Container className="max-w-screen-md text-left">
           {jobs.map((job) => {
             return (
