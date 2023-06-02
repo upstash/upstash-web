@@ -42,7 +42,7 @@ export default function ExampleFilter({
         />
       </div>*/}
 
-      <Child>
+      <Child className="sm:-mt-10">
         <div className="flex items-center">
           <h4 className="text-sm uppercase tracking-widest opacity-60">
             Filter
