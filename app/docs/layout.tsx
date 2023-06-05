@@ -1,9 +1,11 @@
+import "../post.css";
+import "../code.css";
+
 import { ReactNode } from "react";
 import { Metadata } from "next";
 import { SITE_URL } from "@/utils/const";
 import Bg from "@/components/bg";
 import Container from "@/components/container";
-import DocSidebar from "./sidebar";
 
 const title = "Upstash Blog";
 const description = "Articles and tutorials from Upstash and community.";
@@ -40,10 +42,7 @@ export default function BlogLayout({ children }: { children: ReactNode }) {
 
       <section className="mt-6">
         <Container>
-          <div className="grid grid-cols-4">
-            <DocSidebar />
-            <div className="col-span-3">{children}</div>
-          </div>
+          <div className="grid grid-cols-5 gap-10">{children}</div>
         </Container>
       </section>
     </main>

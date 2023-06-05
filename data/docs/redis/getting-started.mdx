@@ -7,13 +7,12 @@ published: true
 This page describes the steps on how to create a database on the Upstash and
 connect it with a Redis client.
 
-
 ## Create a Database
 
 Once you logged in, you can create a database by clicking on the plus sign at
 the top right corner.
 
-<img class="ss" src="/img/getting_started/create.png" width="520" />
+<img className="ss" src="/img/getting_started/create.png" width="520" />
 
 **Database Name:** Type a name for your database.
 
@@ -25,7 +24,7 @@ to [feedback@upstash.com](mailto:feedback@upstash.com) to expedite it.
 Once you click on Create button, you should see your cluster up and running as
 below:
 
-<img class="ss" src="/img/getting_started/database.png" width="100%" />
+<img className="ss" src="/img/getting_started/database.png" width="100%" />
 
 ## Connect to Your Database
 
@@ -40,17 +39,17 @@ at <a href="https://redis.io/topics/quickstart" target="_blank">Redis Quick
 Start</a>
 document. Now, you can connect to and run commands on your database as below:
 
-```
-> redis-cli -a PASSWORD -h ENDPOINT -p PORT
-Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+```bash
+redis-cli -a PASSWORD -h ENDPOINT -p PORT
+# Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
 ENDPOINT:PORT> set counter 0
-OK
+# OK
 ENDPOINT:PORT> get counter
-"0"
+# "0"
 ENDPOINT:PORT> incr counter
-(integer) 1
+# (integer) 1
 ENDPOINT:PORT> incr counter
-(integer) 2
+# (integer) 2
 ```
 
 Now you will start to see some action on the charts. Please go
@@ -58,6 +57,6 @@ to [Metrics and Charts](../howto/metricsandcharts.md) section for detailed
 information about metrics and charts. Note that charts are updated every 10
 seconds.
 
-<img class="ss" src="/img/getting_started/charts.png" width="100%" />
+<img className="ss" src="/img/getting_started/charts.png" width="100%" />
 
 Congratulations! You have created your first database with Upstash.

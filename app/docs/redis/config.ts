@@ -12,28 +12,28 @@ export const docsConfig: SidebarNavItem[] = [
     items: [
       {
         title: "Getting Started",
-        href: "/docs/redis",
+        href: "/docs/redis/getting-started",
       },
       {
         title: "Pricing",
         href: "/docs/redis/pricing",
       },
-      {
-        title: "Redis® API Compatibility",
-        href: "/docs/redis/compatibility",
-      },
-      {
-        title: "Use Cases",
-        href: "/docs/redis/use-cases",
-      },
-      {
-        title: "Compare",
-        href: "/docs/redis/compare",
-      },
-      {
-        title: "Pro and Enterprise Plans",
-        href: "/docs/redis/pro-and-enterprise-plans",
-      },
+      // {
+      //   title: "Redis® API Compatibility",
+      //   href: "/docs/redis/compatibility",
+      // },
+      // {
+      //   title: "Use Cases",
+      //   href: "/docs/redis/use-cases",
+      // },
+      // {
+      //   title: "Compare",
+      //   href: "/docs/redis/compare",
+      // },
+      // {
+      //   title: "Pro and Enterprise Plans",
+      //   href: "/docs/redis/pro-and-enterprise-plans",
+      // },
     ],
   },
   {

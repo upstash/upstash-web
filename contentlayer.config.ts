@@ -7,9 +7,9 @@ import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 import authors from "./utils/authors";
 
-export const Doc = defineDocumentType(() => ({
-  name: "Doc",
-  filePathPattern: `docs/**/*.mdx`,
+export const DocRedis = defineDocumentType(() => ({
+  name: "DocRedis",
+  filePathPattern: `docs/redis/**/*.mdx`,
   contentType: "mdx",
   fields: {
     title: {
@@ -27,11 +27,7 @@ export const Doc = defineDocumentType(() => ({
   computedFields: {
     slug: {
       type: "string",
-      resolve: (doc) => `/${doc._raw.flattenedPath}`,
-    },
-    slugAsParams: {
-      type: "string",
-      resolve: (doc) => doc._raw.flattenedPath.split("/").slice(1).join("/"),
+      resolve: (doc) => doc._raw.flattenedPath.split("/").slice(2).join("/"),
     },
   },
 }));
@@ -109,7 +105,7 @@ export const Post = defineDocumentType(() => ({
 
 export default makeSource({
   contentDirPath: "./data",
-  documentTypes: [Doc, Job, Post],
+  documentTypes: [DocRedis, Job, Post],
   mdx: {
     remarkPlugins: [remarkGfm],
     rehypePlugins: [

@@ -1,6 +1,7 @@
-import { allDocs } from "contentlayer/generated";
+import { allDocRedis } from "contentlayer/generated";
 import { notFound } from "next/navigation";
 import { Mdx } from "@/components/post/mdx";
+import DocSidebar from "@/app/docs/sidebar";
 
 interface DocPageProps {
   params: {
@@ -10,8 +11,9 @@ interface DocPageProps {
 
 async function getDocFromParams(params) {
   const slug = params.slug?.join("/") || "";
-  const doc = allDocs.find((doc) => {
-    return doc.slugAsParams === slug;
+
+  const doc = allDocRedis.find((doc) => {
+    return doc.slug === slug;
   });
 
   if (!doc) {
@@ -24,8 +26,8 @@ async function getDocFromParams(params) {
 export async function generateStaticParams(): Promise<
   DocPageProps["params"][]
 > {
-  return allDocs.map((doc) => ({
-    slug: doc.slugAsParams.split("/"),
+  return allDocRedis.map((doc) => ({
+    slug: doc.slug.split("/"),
   }));
 }
 
@@ -37,12 +39,14 @@ export default async function DocPage({ params }: DocPageProps) {
   }
 
   return (
-    <div>
-      <h1>{doc.title}</h1>
+    <>
+      <DocSidebar />
 
-      <div>
+      <div className="col-span-3">
+        <h1>{doc.title}</h1>
+
         <Mdx code={doc.body.code} />
       </div>
-    </div>
+    </>
   );
 }
