@@ -35,9 +35,9 @@ function Item({
     <label
       className={cx(
         "flex cursor-pointer select-none items-center gap-2",
-        "rounded-lg bg-white/03 px-3 py-2 text-zinc-400",
+        "-mx-2 rounded-lg px-2 py-1.5 text-zinc-400",
         "hover:bg-white/5",
-        checked && "bg-white/10 text-zinc-50",
+        checked && "bg-white/5 text-zinc-50",
         className
       )}
     >
@@ -93,11 +93,6 @@ export default function DocSidebar() {
               onChange={(e) => {
                 const { value, checked } = e.target;
               }}
-              className={cx(
-                isRedis && isActive && "bg-red-200/10",
-                isKafka && isActive && "bg-blue-200/10",
-                isQStash && isActive && "bg-purple-200/10"
-              )}
               icon={
                 <>
                   {isRedis && (
@@ -125,7 +120,7 @@ export default function DocSidebar() {
         })}
       </div>
 
-      <div className="mt-8 grid gap-4">
+      <div className="mt-8 grid gap-6">
         {docsConfig.map((item, index) => (
           <div key={index} className="">
             <h4 className="font-medium">{item.title}</h4>

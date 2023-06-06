@@ -42,8 +42,8 @@ export default async function DocPage({ params }: DocPageProps) {
     <>
       <DocSidebar />
 
-      <div className="col-span-3">
-        <h1>{doc.title}</h1>
+      <div className="col-span-3 border-b border-b-white/5 pb-20">
+        <h1 className="mb-2 text-5xl font-semibold">{doc.title}</h1>
 
         <Mdx code={doc.body.code} />
       </div>

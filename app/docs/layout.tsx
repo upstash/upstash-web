@@ -40,7 +40,7 @@ export default function BlogLayout({ children }: { children: ReactNode }) {
     <main className="relative z-0">
       <Bg />
 
-      <section className="mt-6">
+      <section className="mt-10">
         <Container>
           <div className="grid grid-cols-5 gap-10">{children}</div>
         </Container>
