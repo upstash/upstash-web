@@ -1,7 +1,7 @@
 export default async function DocPage() {
   return (
     <>
-      <h1 className="mb-2 text-5xl font-semibold">Redis</h1>
+      <h1 className="mb-2 text-5xl font-semibold">Kafka</h1>
 
       <div>
         <p>

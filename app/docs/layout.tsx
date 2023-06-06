@@ -42,7 +42,7 @@ export default function BlogLayout({ children }: { children: ReactNode }) {
 
       <section className="mt-10">
         <Container>
-          <div className="grid grid-cols-5 gap-10">{children}</div>
+          <div className="grid grid-cols-5 gap-14">{children}</div>
         </Container>
       </section>
     </main>

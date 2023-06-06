@@ -19,53 +19,41 @@ export const docsConfig: SidebarNavItem[] = [
         href: "/docs/redis/pricing",
       },
       {
-        title: "Redis® API Compatibility",
+        title: "Kafka API",
         href: "/docs/redis/compatibility",
       },
       {
-        title: "Use Cases",
+        title: "Credentials",
         href: "/docs/redis/use-cases",
       },
       {
-        title: "Compare",
+        title: "Pro and Enterprise Plans",
         href: "/docs/redis/compare",
       },
       {
-        title: "Pro and Enterprise Plans",
+        title: "SDK For Javascript",
         href: "/docs/redis/pro-and-enterprise-plans",
       },
     ],
   },
   {
-    title: "Quickstarts",
+    title: "REST API",
     items: [],
   },
   {
-    title: "Features",
+    title: "Connectors",
     items: [],
   },
   {
-    title: "How To",
+    title: "How to",
     items: [],
   },
   {
-    title: "SDKs",
+    title: "Integrations",
     items: [],
   },
-  // {
-  //   title: "Devops Tools",
-  //   items: [],
-  // },
-  // {
-  //   title: "Troubleshooting",
-  //   items: [],
-  // },
-  // {
-  //   title: "Account & Users",
-  //   items: [],
-  // },
-  // {
-  //   title: "Help",
-  //   items: [],
-  // },
+  {
+    title: "Monitoring",
+    items: [],
+  },
 ];
