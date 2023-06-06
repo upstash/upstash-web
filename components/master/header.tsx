@@ -17,9 +17,9 @@ export default function Header({
   ...props
 }: HTMLProps<HTMLHeadElement>) {
   return (
-    <header className={cx("hidden py-10 md:block", className)} {...props}>
+    <header className={cx("hidden md:block", className)} {...props}>
       <Container>
-        <div className="flex items-center md:grid md:grid-cols-4">
+        <div className="flex items-center border-b border-b-white/5 py-5 md:grid md:grid-cols-4">
           <div className="flex">
             <Link href="/">
               <Logo />
@@ -62,6 +62,10 @@ const NavItems: {
     name: "About",
     href: "/about",
   },
+  // {
+  //   name: "Examples",
+  //   href: "/examples",
+  // },
   {
     name: "Blog",
     href: "/blog",

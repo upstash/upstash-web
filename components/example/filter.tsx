@@ -5,8 +5,6 @@ import * as React from "react";
 import { HTMLProps } from "react";
 import cx from "@/utils/cx";
 import Icon, { ICON_NAMES } from "@/components/icon";
-import { allExamples } from "contentlayer/generated";
-import { flatten } from "lodash";
 import IconRedis from "@/components/icon-redis";
 import IconKafka from "@/components/icon-kafka";
 import IconQStash from "@/components/icon-qstash";
@@ -17,21 +15,6 @@ export const ProductsLabel = {
   qstash: "QStash",
 };
 
-export const UseCasesLabel = {
-  ai_ml: "AI/ML",
-};
-
-export const StackLabel = {
-  nextjs: "Next.js",
-  react: "React",
-  nuxtjs: "Nuxt",
-  vuejs: "Vue",
-  svelte: "Svelte",
-  gatsby: "Gatsby",
-  remix: "Remix",
-  astro: "Astro",
-};
-
 export default function ExampleFilter({
   selectedProducts,
   setSelectedProduct,
@@ -39,20 +22,46 @@ export default function ExampleFilter({
   setSelectedUseCase,
   selectedStacks,
   setSelectedStack,
+  allUseCases,
+  allStacks,
 }) {
-  const allUseCases = flatten(allExamples.map((example) => example.use_cases));
-  const allStack = flatten(allExamples.map((example) => example.stack));
+  const isFilterDirty = React.useMemo(() => {
+    return (
+      selectedProducts.length > 0 ||
+      selectedUseCase.length > 0 ||
+      selectedStacks.length > 0
+    );
+  }, [selectedProducts, selectedUseCase, selectedStacks]);
+
   return (
     <form className="grid gap-4">
-      {/*<div className="border-b border-b-white/5 pb-4">
+      {/*<div className="pb-4 border-b border-b-white/5">
         <input
           type="search"
-          className="rounded bg-white px-4 py-2 text-zinc-950"
+          className="px-4 py-2 bg-white rounded text-zinc-950"
         />
       </div>*/}
 
-      <Child>
-        <h4 className="text-sm uppercase tracking-widest opacity-60">Filter</h4>
+      <Child className="sm:-mt-10">
+        <div className="flex items-center">
+          <h4 className="text-sm uppercase tracking-widest opacity-60">
+            Filter
+          </h4>
+          {isFilterDirty && (
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedProduct([]);
+                setSelectedUseCase([]);
+                setSelectedStack([]);
+              }}
+              className="ml-auto inline-flex h-5 items-center justify-center
+           rounded-full bg-white/5 px-2 text-sm text-white/40"
+            >
+              Clear
+            </button>
+          )}
+        </div>
       </Child>
       <Child>
         <div className="space-y-0.5">
@@ -120,7 +129,7 @@ export default function ExampleFilter({
                   key={key}
                   value={key}
                   checked={selectedStacks.includes(key)}
-                  label={StackLabel[key]}
+                  label={key}
                   onChange={(e) => {
                     const { value, checked } = e.target;
                     if (checked) {
@@ -141,13 +150,13 @@ export default function ExampleFilter({
         <Toc>
           <Toc.Summary count={selectedUseCase.length}>Use Cases</Toc.Summary>
           <div className="space-y-0.5">
-            {allStack.map((key) => {
+            {allStacks.map((key) => {
               return (
                 <Item
                   key={key}
                   value={key}
                   checked={selectedUseCase.includes(key)}
-                  label={UseCasesLabel[key]}
+                  label={key}
                   onChange={(e) => {
                     const { value, checked } = e.target;
                     if (checked) {
@@ -209,7 +218,7 @@ Toc.Summary = function TocSummary({
       </span>
       <span className="grow text-sm uppercase tracking-wide">{children}</span>
       {count > 0 && (
-        <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/5 font-mono text-sm">
+        <span className="inline-flex h-5 items-center justify-center rounded-full bg-white/5 px-2 font-mono text-sm">
           {count}
         </span>
       )}

@@ -1,4 +1,5 @@
 import { defineDocumentType, makeSource } from "contentlayer/source-files";
+
 import readingTime from "reading-time";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypePrettyCode from "rehype-pretty-code";
@@ -6,18 +7,28 @@ import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 import authors from "./utils/authors";
 
-export const Example = defineDocumentType(() => ({
-  name: "Example",
-  filePathPattern: `example/*.md`,
-  contentType: "markdown",
+export const DocRedis = defineDocumentType(() => ({
+  name: "DocRedis",
+  filePathPattern: `docs/redis/**/*.mdx`,
+  contentType: "mdx",
   fields: {
-    title: { type: "string", required: true },
-    github_url: { type: "string", required: false },
-    blog_url: { type: "string", required: false },
-    products: { type: "json", required: true },
-    stack: { type: "json", required: true },
-    use_cases: { type: "json", required: true },
-    draft: { type: "boolean" },
+    title: {
+      type: "string",
+      required: true,
+    },
+    description: {
+      type: "string",
+    },
+    published: {
+      type: "boolean",
+      default: true,
+    },
+  },
+  computedFields: {
+    slug: {
+      type: "string",
+      resolve: (doc) => doc._raw.flattenedPath.split("/").slice(2).join("/"),
+    },
   },
 }));
 
@@ -38,6 +49,16 @@ export const Job = defineDocumentType(() => ({
     slug: {
       type: "string",
       resolve: (doc: any) => doc._raw.flattenedPath.split("/").at(-1),
+    },
+  },
+  authorObj: {
+    type: "json",
+    resolve: (doc) => {
+      const author = authors[doc.author as keyof typeof authors];
+      return {
+        ...author,
+        photo: `/authors/${author.image}`,
+      };
     },
   },
 }));
@@ -84,7 +105,7 @@ export const Post = defineDocumentType(() => ({
 
 export default makeSource({
   contentDirPath: "./data",
-  documentTypes: [Job, Post, Example],
+  documentTypes: [DocRedis, Job, Post],
   mdx: {
     remarkPlugins: [remarkGfm],
     rehypePlugins: [

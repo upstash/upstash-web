@@ -36,13 +36,21 @@ export async function generateMetadata({
     title,
     description,
     openGraph: {
+      type: "website",
+      locale: "en_US",
+      url,
       title,
       description,
-      url,
+      siteName: title,
+      images: "/og-home.jpg",
     },
     twitter: {
+      card: "summary_large_image",
       title,
       description,
+      site: "@upstash",
+      creator: "@upstash",
+      images: "/og-home.jpg",
     },
   };
 }

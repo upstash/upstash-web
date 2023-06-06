@@ -5,6 +5,7 @@ import Icon, { ICON_NAMES, IconProps } from "@/components/icon";
 export interface IButton extends HTMLProps<HTMLAnchorElement> {
   children?: ReactNode;
   hideIcon?: boolean;
+  icon?: ReactNode;
   iconProps?: IconProps;
   type?: "button" | "link";
 }
@@ -13,6 +14,7 @@ export default function Button({
   children,
   className,
   hideIcon,
+  icon,
   type = "link",
   iconProps,
   ...props
@@ -35,7 +37,9 @@ export default function Button({
       {...props}
     >
       {children && <span>{children}</span>}
-      {hideIcon ? null : (
+      {icon ? (
+        <span className="ml-auto">{icon}</span>
+      ) : hideIcon ? null : (
         <Icon
           icon={ICON_NAMES.ArrowUpRight}
           {...iconProps}
