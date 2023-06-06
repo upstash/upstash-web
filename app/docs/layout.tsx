@@ -4,6 +4,8 @@ import "../code.css";
 import { ReactNode } from "react";
 import { Metadata } from "next";
 import { SITE_URL } from "@/utils/const";
+import Bg from "@/components/bg";
+import Container from "@/components/container";
 
 const title = "Upstash Blog";
 const description = "Articles and tutorials from Upstash and community.";
@@ -34,5 +36,15 @@ export const metadata: Metadata = {
 };
 
 export default function BlogLayout({ children }: { children: ReactNode }) {
-  return children;
+  return (
+    <main className="relative z-0">
+      <Bg />
+
+      <section className="mt-10">
+        <Container>
+          <div className="grid grid-cols-5 gap-14">{children}</div>
+        </Container>
+      </section>
+    </main>
+  );
 }

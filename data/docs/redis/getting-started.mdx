@@ -1,0 +1,62 @@
+---
+title: Getting Started
+description: test
+published: true
+---
+
+This page describes the steps on how to create a database on the Upstash and
+connect it with a Redis client.
+
+## Create a Database
+
+Once you logged in, you can create a database by clicking on the plus sign at
+the top right corner.
+
+<img className="ss" src="/img/getting_started/create.png" width="520" />
+
+**Database Name:** Type a name for your database.
+
+**Region:** Select the region where your database will run. For best
+performance, choose the Region which your applications are closer to. We are
+planning to support other regions and cloud providers. Please send your requests
+to [feedback@upstash.com](mailto:feedback@upstash.com) to expedite it.
+
+Once you click on Create button, you should see your cluster up and running as
+below:
+
+<img className="ss" src="/img/getting_started/database.png" width="100%" />
+
+## Connect to Your Database
+
+You can connect to your database with any Redis client. For simplicity, we will
+use `redis-cli` tool in this guide but please refer
+to [Connect Your Client](../howto/connectclient.md) section for more about
+connecting via Redis clients.
+
+`redis-cli` comes packaged with the official Redis distribution. If you do not
+have Redis installed, you can get it as described
+at <a href="https://redis.io/topics/quickstart" target="_blank">Redis Quick
+Start</a>
+document. Now, you can connect to and run commands on your database as below:
+
+```bash
+redis-cli -a PASSWORD -h ENDPOINT -p PORT
+# Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+ENDPOINT:PORT> set counter 0
+# OK
+ENDPOINT:PORT> get counter
+# "0"
+ENDPOINT:PORT> incr counter
+# (integer) 1
+ENDPOINT:PORT> incr counter
+# (integer) 2
+```
+
+Now you will start to see some action on the charts. Please go
+to [Metrics and Charts](../howto/metricsandcharts.md) section for detailed
+information about metrics and charts. Note that charts are updated every 10
+seconds.
+
+<img className="ss" src="/img/getting_started/charts.png" width="100%" />
+
+Congratulations! You have created your first database with Upstash.
