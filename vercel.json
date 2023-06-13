@@ -27,6 +27,10 @@
     {
       "source": "/redis-api-compatibility",
       "destination": "https://docs.upstash.com/features/restapi#rest---redis-api-compatibility"
+    },
+    {
+      "source": "/:path((?static/trust/).*)",
+      "destination": "/trust/:path*"
     }
   ]
 }
