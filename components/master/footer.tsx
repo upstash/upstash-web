@@ -3,7 +3,6 @@ import cx from "@/utils/cx";
 import Container from "@/components/container";
 import { Logo } from "@/components/logo";
 import Button from "@/components/button";
-import TermsBanner from "@/components/terms-banner";
 
 export interface IAppFooter extends HTMLProps<HTMLDivElement> {}
 
@@ -43,8 +42,6 @@ export default function Footer({ className, ...props }: IAppFooter) {
               Terms of Service
             </Button>
           </div>
-
-          <TermsBanner />
 
           <Button
             href="https://status.upstash.com/"
