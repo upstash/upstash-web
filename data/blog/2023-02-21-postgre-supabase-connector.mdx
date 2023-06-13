@@ -21,16 +21,16 @@ Here is the flow of the user data for better visualization.
 
 Supabase is an open-source alternative of Firebase. They aim to provide services like Firebase with different technological choices. Main differences that distinguish Supabase from Firebase:
 
-* Everything they use is open-source
-* Support existing tools rather than building from scratch
-* Providing PostgreSQL rather than NoSQL
+- Everything they use is open-source
+- Support existing tools rather than building from scratch
+- Providing PostgreSQL rather than NoSQL
 
 Currently, Supabase provides following services:
 
-* Authentication
-* Database (PostgreSQL)
-* Storage
-* Edge Functions
+- Authentication
+- Database (PostgreSQL)
+- Storage
+- Edge Functions
 
 Detailed information about Supabase can be found on Supabase [website](https://supabase.com/docs).
 
@@ -84,7 +84,7 @@ Before creating connector, we need to set “postgres” user as Super User, sin
 
 To do this, we need to go to the SQL Editor in right bar and create new query. In this tool, we need to run following command:
 
-``` sql
+```sql
 ALTER USER postgres WITH SUPERUSER;
 ```
 
@@ -108,31 +108,33 @@ For the rest, we will define which schema and tables we are going to stream from
 
 In the last step, we can review Debezium connector settings as JSON. At this step, we should add 2 new property to prevent failures:
 
-``` json
+```json
 "plugin.name": "pgoutput",
 "publication.autocreate.mode": "filtered"
 ```
+
 Now, we should be able to run this Kafka connector. Currently, connector config looks like following:
-``` json
+
+```json
 {
-	"name": "MyConnector",
-	"properties": {
-		"connector.class": "io.debezium.connector.postgresql.PostgresConnector",
-		"database.hostname": "db.acoyeduxnqeaurrjgaox.supabase.co",
-		"database.port": "5432",
-		"database.user": "postgres",
-		"database.password": "********",
-		"database.dbname": "postgres",
-		"database.server.name": "user",
-		"schema.include.list": "public",
-		"plugin.name": "pgoutput",
-		"publication.autocreate.mode": "filtered",
-		"table.include.list": "public.comments,public.likes",
-		"key.converter": "org.apache.kafka.connect.json.JsonConverter",
-		"key.converter.schemas.enable": true,
-		"value.converter": "org.apache.kafka.connect.json.JsonConverter",
-		"value.converter.schemas.enable": true
-	}
+  "name": "MyConnector",
+  "properties": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "database.hostname": "db.acoyeduxnqeaurrjgaox.supabase.co",
+    "database.port": "5432",
+    "database.user": "postgres",
+    "database.password": "********",
+    "database.dbname": "postgres",
+    "database.server.name": "user",
+    "schema.include.list": "public",
+    "plugin.name": "pgoutput",
+    "publication.autocreate.mode": "filtered",
+    "table.include.list": "public.comments,public.likes",
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": true,
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": true
+  }
 }
 ```
 
@@ -166,7 +168,7 @@ Let’s create a Java application to stream data from Kafka topics via Kafka Str
 
 First, we should add dependencies we are going to use.
 
-``` xml
+```xml
 <dependency>
 <groupId>com.fasterxml.jackson.core</groupId>
 <artifactId>jackson-databind</artifactId>
@@ -191,13 +193,14 @@ First, we should add dependencies we are going to use.
 
 Then, we should connect to our Serverless Redis.
 
-``` java
+```java
 Jedis jedis = new Jedis("UPSTASH-REDIS-ENDPOINT", 38900);
 jedis.auth("UPSTASH-REDIS-PASSWORD");
 ```
+
 Once we create Redis connection, we can configure Kafka Streams.
 
-``` java
+```java
 Properties props = new Properties();
 props.put(StreamsConfig._BOOTSTRAP_SERVERS_CONFIG_, "UPSTASH-KAFKA-ENDPOINT:9092");
 props.put(SaslConfigs._SASL_MECHANISM_, "SCRAM-SHA-256");
@@ -211,7 +214,7 @@ props.put(StreamsConfig._DEFAULT_VALUE_SERDE_CLASS_CONFIG_, Serdes._String_().ge
 
 We should create a Kafka Streams builder to specify the topics we are going to stream from. To do this, we will use the prefix of the Kafka topics created by Kafka Connector.
 
-```  java
+```java
 StreamsBuilder builder = new StreamsBuilder();
 KStream<String, String> source = builder.stream(Pattern._compile_("user.public.*"));
 ```
@@ -220,7 +223,7 @@ Now, it is time to implement what we are going to do with the data we streamed.
 
 We are going to use JsonNodes to retrieve the fields from Kafka messages. To increase the scores in leaderboard, we will use [ZINCRBY](https://redis.io/commands/zincrby) method.
 
-``` java
+```java
 source.foreach((key, value) -> {
 	try {
 		final ObjectMapper mapper = new ObjectMapper();
@@ -243,7 +246,7 @@ source.foreach((key, value) -> {
 
 Finally, we can start streaming!
 
-``` java
+```java
 final Topology topology = builder.build();
 System._out_.println(topology.describe());
 

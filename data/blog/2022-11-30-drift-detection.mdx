@@ -27,16 +27,21 @@ One tremendous benefit of Upstash is the ease of getting started and effectively
 
 ```ts
 const getAllRemoteState = async () => {
-    const result = await getAllRemoteKeys();
-    const enabledResources: string[] = await result.reduce( async (acc:string[], currKey:string) => {
-        const accum = await acc;
-        await axios.get(`${URL}/get/${currKey}`, getHeaders()).then(({data}) => data);
-        accum.push(currKey);
+  const result = await getAllRemoteKeys();
+  const enabledResources: string[] = await result.reduce(
+    async (acc: string[], currKey: string) => {
+      const accum = await acc;
+      await axios
+        .get(`${URL}/get/${currKey}`, getHeaders())
+        .then(({ data }) => data);
+      accum.push(currKey);
 
-        return accum;
-        }, []);
-    return enabledResources;
-}
+      return accum;
+    },
+    []
+  );
+  return enabledResources;
+};
 ```
 
 ## Persisting state locally
@@ -47,9 +52,9 @@ For this use case, we will use local `json` blobs. Each `json` can store its met
 
 ```json
 {
-    "name": "example",
-    "description": "this is an example",
-    "expires": "March 2023"
+  "name": "example",
+  "description": "this is an example",
+  "expires": "March 2023"
 }
 ```
 
@@ -84,7 +89,8 @@ Let's see what do do on any of these cases:
 This can usually happen when a developer is working on a branch, and hasn't pulled the latest changes from the trunk. While the trunk has been updated with the latest resources, the local branch hasn't pulled all the recent changes, resulting in discrepancies with the local state. A way to visualize this:
 
 `# Branch | Checksum | Resource #`
-```git          [CURRENT RESOURCES]=6
+
+```git [CURRENT RESOURCES]=6
 * 040cc7c     [CURRENT RESOURCES]=6
 | * d9e8b5e   [CURRENT RESOURCES]=6
 | * 5b98a10   [CURRENT RESOURCES]=6
@@ -99,12 +105,12 @@ In this case, we don't modify the remote state as it's updated. The local state 
 Say our `git` branches are in sync, but we find that there are more `resources` available remotely than locally. That's an indication of a resource removal that has occurred locally. in this scenario, we want to remove the resource from the remote so that we sync it with the local state. Here's how we can do so:
 
 ```ts
-const computeToBeDeleted= async (directoryPath='') => {
-    const localResources = await getLocalResources(directoryPath);
-    const remoteResources = await getAllRemoteResourceKeys();
-    const result = remoteResources.filter(x => !localResources.includes(x));
-    return result;
-}
+const computeToBeDeleted = async (directoryPath = "") => {
+  const localResources = await getLocalResources(directoryPath);
+  const remoteResources = await getAllRemoteResourceKeys();
+  const result = remoteResources.filter((x) => !localResources.includes(x));
+  return result;
+};
 ```
 
 This function will compute the resources that need to be deleted from the remote state. Note that it will return an array, which we later need to iterate to send a request to `upstash` redis server, removing all the keys from the redis DB.
@@ -128,7 +134,6 @@ The idea of coupling drift to branches could be appealing for certain teams who 
 In this article, we built the bare bones of a drift management engine. By using controls for both `remote` and `local` states, we were able to interchangeably compute desired states and add/remove resources. Something to highlight is how easy it was to achieve the `remote` computations by using `Upstash`. Obviously, we could contemplate using other databases within `AWS` (ie `DynamoDB`), having a RESTful API in under 30 seconds was very e.handy to get started.
 
 In the drift management space, there are certain players, like HashiCorp's terraform solution, which are leading the space. Drift management mechanisms could be applied in other domains. The general concept of `remote` and `local` differentiation is very close to the ones of [cache invalidation](https://en.wikipedia.org/wiki/Cache_invalidation), [remote caching](https://bazel.build/remote/caching) and others. I feel that the industry is just at the begging of realizing how powerful some of these concepts are, and one example is Vercel's Turborepo implementation, my bet is that there will be a steady increase of vendors utilizing such solutions in the near future, which makes the space very exciting to be part of!
-
 
 ## Resources
 

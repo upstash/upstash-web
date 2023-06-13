@@ -1,0 +1,3 @@
+[submodule "data/examples"]
+	path = data/examples
+	url = git@github.com:upstash/examples.git

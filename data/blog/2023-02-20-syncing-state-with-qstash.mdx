@@ -21,7 +21,7 @@ The goal of our CRON job in this article is to sync the state of our users' quot
 
 Here is a quick recap of [the previous article](/blog/quota-based-saas), of how we handle the state of our users' quota in Redis:
 
-```typescript
+```ts
 // Key stored in Redis. A key is created for each user, and made unique by their ID.
 const quotaKey = `user:${userId}:quota`;
 
@@ -34,6 +34,7 @@ if (quota === 1) {
   await redis.expire(quotaKey, 60 * 60 * 24);
 }
 ```
+
 Given this code, we can now create a CRON job endpoint using QStash. Our CRON job endpoint will be triggered at the URL `/api/cron/update-usage`.
 
 Let's create a new file for our Next.js endpoint:
@@ -61,7 +62,7 @@ Here is a quick recap of what we will do:
 
 The full code endpoint is here, I made sure to comment every aspect of the code:
 
-```typescript
+```ts
 // /pages/api/cron/update-usage.ts
 import type { NextApiRequest, NextApiResponse } from "next";
 import { verifySignature } from "@upstash/qstash/nextjs";

@@ -2,7 +2,7 @@
 slug: getstarted-nextjs-edge-with-redis
 title: "Getting started with Next.js Edge Functions"
 author: enes
-image: /blog/cover-nextjs-edge.png
+image: cover-nextjs-edge.png
 tags: [serverless, nextjs, vercel, edge, redis]
 ---
 
@@ -48,7 +48,7 @@ OK
 
 Create pages/api/\_middleware.ts as below:
 
-```typescript
+```ts
 import type { NextFetchEvent, NextRequest } from "next/server";
 import { Redis } from "@upstash/redis";
 

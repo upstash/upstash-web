@@ -5,14 +5,14 @@ author: noah
 tags: [cloudflare-workers, redis, edge, rate-limiting]
 ---
 
-
 In this tutorial, we will show how to rate limit your applications using Cloudflare Workers and Upstash Redis. We will use the [rate limiting SDK](https://github.com/upstash/ratelimit) which keeps data in Upstash Redis.
 
-
 ### Redis Setup
+
 Create one or more Redis databases using [Upstash Console](https://console.upstash.com) or [Upstash CLI](https://github.com/upstash/cli). Do not choose Global, instead create multiple databases in different regions where you expect traffic to your site. (Why? We will explain later) You will need the REST URL and TOKENs in the next steps.
 
 ### Project Setup
+
 We will use Wrangler 2 for deployment, so install (or upgrade) [Wrangler 2](https://developers.cloudflare.com/workers/wrangler/).
 
 Create a folder for your project and run `wrangler init`. Select `ts`:
@@ -30,16 +30,15 @@ Would you like to create a Worker at src/index.ts? (y/n)
 ✨ Created src/index.ts
 ```
 
-
 ### The Code
 
 Update Workers function as below:
-```ts:src/index.ts
+
+```ts title="src/index.ts"
 import { Redis } from "@upstash/redis/cloudflare";
 import { MultiRegionRatelimit } from "@upstash/ratelimit";
 
-export interface Env {
-}
+export interface Env {}
 
 const cache = new Map();
 
@@ -47,7 +46,7 @@ export default {
   async fetch(
     request: Request,
     env: Env,
-    _ctx: ExecutionContext,
+    _ctx: ExecutionContext
   ): Promise<Response> {
     if (new URL(request.url).pathname == "/favicon.ico") {
       return new Response(null, { status: 400 });
@@ -57,27 +56,47 @@ export default {
       redis: [
         new Redis({
           url: "https://us1-cool-macaque-32148.upstash.io",
-          token: "AASQgODM5ZjExZGEtMZDRjOWI4ZmVjNmE3ZDk3NDIxMmEwNmNkYjVmOGVmZTk5Mz",
+          token:
+            "AASQgODM5ZjExZGEtMZDRjOWI4ZmVjNmE3ZDk3NDIxMmEwNmNkYjVmOGVmZTk5Mz",
         }),
         new Redis({
           url: "https://eu2-merry-caribou-31549.upstash.io",
-          token: "AXe5ASQgNmM5YmFiYWEtMmV3N2E1ODFiMWExMDc5NNGFiYWEwMzk2ZjE4ZWQ3N2Y",
-        })
+          token:
+            "AXe5ASQgNmM5YmFiYWEtMmV3N2E1ODFiMWExMDc5NNGFiYWEwMzk2ZjE4ZWQ3N2Y",
+        }),
       ],
       limiter: MultiRegionRatelimit.fixedWindow(5, "5 s"),
       ephemeralCache: cache,
     });
 
-    const userIP: string = request.headers.get('CF-Connecting-IP') || "none";
+    const userIP: string = request.headers.get("CF-Connecting-IP") || "none";
 
     const data = await ratelimit.limit(userIP);
     if (data.success) {
       // if you use CF Workers to intercept another site, uncomment below
       // return await fetch(request);
-      return new Response(JSON.stringify({ message: "Success, you are not rate limited.", ip: userIP, data }, null, 2), { status: 200 });
+      return new Response(
+        JSON.stringify(
+          { message: "Success, you are not rate limited.", ip: userIP, data },
+          null,
+          2
+        ),
+        { status: 200 }
+      );
     } else {
       // show an error page for rate limited users
-      return new Response(JSON.stringify({ message: "You are rate limited, try again later.", ip: userIP,  data }, null, 2), { status: 200 });
+      return new Response(
+        JSON.stringify(
+          {
+            message: "You are rate limited, try again later.",
+            ip: userIP,
+            data,
+          },
+          null,
+          2
+        ),
+        { status: 200 }
+      );
     }
   },
 };
@@ -86,28 +105,31 @@ export default {
 Replace the REST_URL and TOKENs for the Redis instances above. You can add more Redis databases in different regions (or set a single one) depending on your traffic.
 
 ### Test and Deploy
+
 You can test the function locally with `wrangler dev`.
 
 Deploy your function to Cloudflare with `wrangler publish`
 
 The endpoint of the function will be printed. e.g. [https://cloudflare-workers-rate-limiting.upsdev.workers.dev/](https://cloudflare-workers-rate-limiting.upsdev.workers.dev/) When you refresh the page 5 times consecutively, you should see you are rate limited.
 
-
 Ok, the tutorial is over (it was easy, right?), now let's get into some details.
 
 ### Isn't it costly to make remote call for each request?
+
 It might be if we did not use the ephemeral cache. [The ephemeral cache](https://github.com/upstash/ratelimit#ephemeral-cache) is a map object defined outside the handler. The rate limiting SDK uses it to cache identifiers while the serverless function is active (hot). It is important to define it outside the handler, so it will be a global variable. Cloudflare Workers does not guarantee different invocations will use the same variable but still it helps much to cache it during peak traffic.
 
-
 ### Why not Global Database?
+
 Upstash Global databases replicates Redis data to multiple regions. It perfectly fits for many edge use cases. But for rate limiting, we do not need to replicate data in one region to all other regions. Rate limiting sessions have local scopes. We could still use a global database, but that would be unnecessarily costly as each update would be replicated to all over the world. That's why we chose to create multiple regional databases as [the rate-limiting SDK recommends](https://github.com/upstash/ratelimit#multiregion-replicated-ratelimiting).
 
 ### IP as the identifier
+
 We have used the user's IP as the identifier for the rate-limiting function. This means we limit the rate for a single user. If you have a better identifier in your request (username, email etc), use it. You can set a constant string if you want to limit traffic in total. Or you can use region or country ([request.cf.country](https://developers.cloudflare.com/workers/examples/country-code-redirect/)) as identifier to limit traffic per geography.
 
 ### Can I use self hosted Redis?
+
 Cloudflare Workers runs on V8 isolates and it does not allow TCP connections. So you can not access to self hosted Redis, Redislabs or Elasticache unless you use a REST Proxy. Upstash Redis has a built-in REST API.
 
 ### Integration to your existing website
-You can rate limit your existing web applications/sites without touching their code. You just need to create a site in Cloudflare and set nameservers for your domain accordingly. So Cloudflare will be able to intercept the requests to your website and run the Workers function. Also uncomment the line XX, so your Workers function will forward the request to your website, if the request is not rate limited.
 
+You can rate limit your existing web applications/sites without touching their code. You just need to create a site in Cloudflare and set nameservers for your domain accordingly. So Cloudflare will be able to intercept the requests to your website and run the Workers function. Also uncomment the line XX, so your Workers function will forward the request to your website, if the request is not rate limited.

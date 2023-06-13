@@ -5,8 +5,7 @@ author: enes
 tags: [kafka, analytics, vercel, tinybird, vercel-edge, next.js]
 ---
 
-
-In this article, we will build an end to end pipeline to analyze our web site traffic on real time. At the end we will be able to query the traffic coming to our Next.js application. We will run a query like: 
+In this article, we will build an end to end pipeline to analyze our web site traffic on real time. At the end we will be able to query the traffic coming to our Next.js application. We will run a query like:
 
 ```sql
 SELECT city, count() FROM page_views
@@ -31,7 +30,7 @@ We will use Vercel Edge, Upstash Kafka and Tinybird. Now let’s talk about why 
 
 ### Tinybird
 
-[Tinybird](https://www.tinybird.co/) is a serverless analytical backend where you can run queries on Kafka topics on real time and create API endpoints on those queries. 
+[Tinybird](https://www.tinybird.co/) is a serverless analytical backend where you can run queries on Kafka topics on real time and create API endpoints on those queries.
 
 ## Kafka Setup[](https://docs.upstash.com/kafka/real-time-analytics/realtime_analytics_serverless_kafka_setup#kafka-setup)
 
@@ -50,43 +49,43 @@ npx create-next-app@latest --typescript
 Create a middleware.ts (or .js) file at the same level as your pages directory. Update the file as below:
 
 ```tsx
-import {NextResponse} from 'next/server';
-import type {NextRequest, NextFetchEvent} from 'next/server';
-import {Kafka} from "@upstash/kafka";
+import { NextResponse } from "next/server";
+import type { NextRequest, NextFetchEvent } from "next/server";
+import { Kafka } from "@upstash/kafka";
 
 // Trigger this middleware to run on the `/secret-page` route
 export const config = {
-    matcher: '/',
+  matcher: "/",
 };
 
 export async function middleware(req: NextRequest, event: NextFetchEvent) {
-// Extract country. Default to US if not found.
-    console.log(req.url)
+  // Extract country. Default to US if not found.
+  console.log(req.url);
 
-const kafka =new Kafka({
-        url: "https://real-goldfish-14081-us1-rest-kafka.upstash.io",
-        username: "ZGVmaW5453tZ29sZhgf65yzQy26tVXO_fm8Y",
-        password: "v02ibEEtghfg56OybgOHwjmRdNS3nthrt=",
-    })
+  const kafka = new Kafka({
+    url: "https://real-goldfish-14081-us1-rest-kafka.upstash.io",
+    username: "ZGVmaW5453tZ29sZhgf65yzQy26tVXO_fm8Y",
+    password: "v02ibEEtghfg56OybgOHwjmRdNS3nthrt=",
+  });
 
-const message = {
-        country: req.geo?.country,
-        city: req.geo?.city,
-        region: req.geo?.region,
-        url: req.url,
-        ip: req.headers.get("x-real-ip"),
-        mobile: req.headers.get("sec-ch-ua-mobile"),
-        platform: req.headers.get("sec-ch-ua-platform"),
-        useragent: req.headers.get("user-agent")
-    }
+  const message = {
+    country: req.geo?.country,
+    city: req.geo?.city,
+    region: req.geo?.region,
+    url: req.url,
+    ip: req.headers.get("x-real-ip"),
+    mobile: req.headers.get("sec-ch-ua-mobile"),
+    platform: req.headers.get("sec-ch-ua-platform"),
+    useragent: req.headers.get("user-agent"),
+  };
 
-const p = kafka.producer()
-const topic = "mytopic"
+  const p = kafka.producer();
+  const topic = "mytopic";
 
-event.waitUntil(p.produce(topic, JSON.stringify(message)))
+  event.waitUntil(p.produce(topic, JSON.stringify(message)));
 
-// Rewrite to URL
-return NextResponse.next();
+  // Rewrite to URL
+  return NextResponse.next();
 }
 ```
 
@@ -105,7 +104,7 @@ curl https://real-goldfish-14081-us1-rest-kafka.upstash.io/consume/GROUP_NAME/GR
 
 ## Tinybird Setup
 
-Create a [Tinybird](http://tinybird.co) account and select a region. Create an empty workspace.  On the wizard screen click `Add Data` button.
+Create a [Tinybird](http://tinybird.co) account and select a region. Create an empty workspace. On the wizard screen click `Add Data` button.
 
 ![tiny1.png](/blog/vercel-edge-tinybird/tiny1.png)
 
@@ -113,7 +112,7 @@ In the next screen click on Kafka tab and fill the fields with the credentials c
 
 ![tiny2.png](/blog/vercel-edge-tinybird/tiny2.png)
 
-If the connection is successful, then you should see the topic you have just created. Select it and click `Continue` . 
+If the connection is successful, then you should see the topic you have just created. Select it and click `Continue` .
 
 ![tiny3.png](/blog/vercel-edge-tinybird/tiny3.png)
 
@@ -128,7 +127,7 @@ Click `Create Pipe` on the next screen.
 In the next page, you will see the query editor where you can execute queries on your data pipe. You can rename the views. Update the query as (replace the datasource):
 
 ```sql
-SELECT city, count() FROM  kafka_ds_534681 where  timestamp > now() - INTERVAL 15 MINUTE group by city 
+SELECT city, count() FROM  kafka_ds_534681 where  timestamp > now() - INTERVAL 15 MINUTE group by city
 ```
 
 ![tiny6.png](/blog/vercel-edge-tinybird/tiny6.png)

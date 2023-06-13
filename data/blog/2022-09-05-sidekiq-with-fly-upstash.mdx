@@ -15,19 +15,21 @@ We will create a sample app using Sidekiq on Fly.io using Upstash Redis. It will
 
 ![schema](/blog/sidekiq-fly/sidekiq.png)
 
-
 ## Fly.io Setup
+
 - Create a [Fly.io](https://fly.io/) account.
 - Install [flyctl](https://fly.io/docs/getting-started/installing-flyctl/) and
-run `flyctl auth login`
+  run `flyctl auth login`
 
 ## Upstash Redis Setup on Fly
+
 - Run `flyctl redis create`.
 - Set your connection link (after the `.toml` creation): `flyctl secrets set UPSTASH_REDIS_LINK=<upstash-redis-connection-link>`
 
 ## Application Code
+
 - `bundle init` and `bundle add sidekiq sinatra` to initiate Gemfile and install dependencies.
-`
+  `
 - Create `sendEmail.rb` file:
 
 ```ruby
@@ -54,7 +56,7 @@ end
 
 def updateEmail(id, newType)
     jobFound = false
-    
+
     a = Sidekiq::ScheduledSet.new
     a.each do |job|
         if job.args[0] == id
@@ -95,6 +97,7 @@ end
 ```
 
 - Create a simple Sinatra server `app.rb`:
+
 ```ruby
 #!/usr/bin/env ruby
 
@@ -120,6 +123,7 @@ end
 ```
 
 - Create `config.ru` file:
+
 ```ruby
 # config.ru
 
@@ -129,10 +133,13 @@ require "sidekiq/api"
 
 run Sinatra::Application
 ```
+
 ## Launch App
-- First, run `flyctl launch` to create `.toml` template. 
+
+- First, run `flyctl launch` to create `.toml` template.
 - There, update `internal_port = 9292` under `[[services]]`. It should look something like this:
-``` ruby
+
+```ruby
 app = "sidekiq-example"
 kill_signal = "SIGINT"
 kill_timeout = 5
@@ -160,7 +167,9 @@ processes = []
     handlers = ["tls", "http"]
     port = 443
 ```
+
 - Create a file named `Procfile` so that we can run both the Sinatra server and the Sidekiq Worker:
+
 ```ruby
 web: bundle exec rackup & bundle exec sidekiq -r ./sendEmail.rb
 ```
@@ -168,22 +177,20 @@ web: bundle exec rackup & bundle exec sidekiq -r ./sendEmail.rb
 - run `flyctl deploy` to deploy.
 
 ## App Deployed
-- send `get register/id1/enterprise` via `curl <fly-domain>/register/:id/:plan`
-![enterprise](/blog/sidekiq-fly/enterprise.png)
 
+- send `get register/id1/enterprise` via `curl <fly-domain>/register/:id/:plan`
+  ![enterprise](/blog/sidekiq-fly/enterprise.png)
 
 - send `get register/id2/paid` via `curl <fly-domain>/register/:id/:plan`
-![paid](/blog/sidekiq-fly/paid.png)
-
+  ![paid](/blog/sidekiq-fly/paid.png)
 
 - send `get register/id3/free` and then `get update/id3/paid` via `curl <fly-domain>/register/:id/:plan` and `curl <fly-domain>/update/:id/:newPlan`
-![register-update](/blog/sidekiq-fly/register-update.png)
-
+  ![register-update](/blog/sidekiq-fly/register-update.png)
 
 ### Closing Words
+
 In this example, we have implemented an app, using Sidekiq background processing library. In the sample, we have demonstrated a simple usecase which you can customize depending on your needs. This way, we have decreased the workload of our main server and with that enabled for more responsive experience for users.
 
 For the complete source code, you can look at [our repo](https://github.com/upstash/redis-examples/tree/compatible-libraries/using-sidekiq).
-
 
 You can give your feedbacks on any of our services via [twitter](https://twitter.com/upstash) or [discord](https://discord.gg/w9SenAtbme), which will be greatly appreciated.

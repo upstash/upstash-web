@@ -64,70 +64,74 @@ Next up we'll create the page and form for inputting the story prompt. You'll ne
 File: `pages/index.tsx`
 
 ```tsx
-import Head from 'next/head'
-import { RefObject, useRef, useState } from 'react'
-import useInterval from '../hooks/useInterval'
+import Head from "next/head";
+import { RefObject, useRef, useState } from "react";
+import useInterval from "../hooks/useInterval";
 
 export default function Home() {
-  const [generating, setGenerating] = useState<boolean>(false)
-  const [messageId, setMessageId] = useState<string|null>(null)
-  const [story, setStory] = useState<string[]>([])
-  const themeRef: RefObject<HTMLInputElement> = useRef(null)
-  const characterRef: RefObject<HTMLInputElement> = useRef(null)
-  const moralRef: RefObject<HTMLInputElement> = useRef(null)
+  const [generating, setGenerating] = useState<boolean>(false);
+  const [messageId, setMessageId] = useState<string | null>(null);
+  const [story, setStory] = useState<string[]>([]);
+  const themeRef: RefObject<HTMLInputElement> = useRef(null);
+  const characterRef: RefObject<HTMLInputElement> = useRef(null);
+  const moralRef: RefObject<HTMLInputElement> = useRef(null);
 
-  useInterval(async () => {
-    await fetch(`/api/poll?id=${messageId}`)
-      .then((res: any) => res.json())
-      .then((data: any) => {
-        if (!data.choices) {
-          return
-        }
+  useInterval(
+    async () => {
+      await fetch(`/api/poll?id=${messageId}`)
+        .then((res: any) => res.json())
+        .then((data: any) => {
+          if (!data.choices) {
+            return;
+          }
 
-        setGenerating(false)
-        setMessageId(null)
+          setGenerating(false);
+          setMessageId(null);
 
-        setStory(data.choices[0].text.split('\n\n'))
-      })
-      .catch((err: any) => console.error(err))
-  }, messageId ? 1000 : null)
+          setStory(data.choices[0].text.split("\n\n"));
+        })
+        .catch((err: any) => console.error(err));
+    },
+    messageId ? 1000 : null
+  );
 
   async function generateStory(event: any) {
-    event.preventDefault()
+    event.preventDefault();
 
-    setGenerating(true)
+    setGenerating(true);
 
-    await fetch('/api/create', {
-      method: 'POST',
+    await fetch("/api/create", {
+      method: "POST",
       body: JSON.stringify({
         theme: themeRef.current?.value,
         character: characterRef.current?.value,
         moral: moralRef.current?.value,
       }),
-      headers: { 'Content-Type': 'application/json' },
+      headers: { "Content-Type": "application/json" },
     })
       .then((res: any) => res.json())
       .then((data: any) => setMessageId(data.id))
-      .catch((err: any) => console.error(err))
+      .catch((err: any) => console.error(err));
   }
 
   return (
     <>
       <Head>
         <title>StoryTime</title>
-        <meta name="description" content="A simple Next.js application which allows you to create stories using AI." />
+        <meta
+          name="description"
+          content="A simple Next.js application which allows you to create stories using AI."
+        />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <div className="my-16 flex flex-col justify-center items-center md:my-32">
-          <h1 className="text-5xl font-black">
-            StoryTime
-          </h1>
+        <div className="my-16 flex flex-col items-center justify-center md:my-32">
+          <h1 className="text-5xl font-black">StoryTime</h1>
 
           {story.length > 0 && (
-            <div className="mt-10 max-w-3xl mx-auto">
-              <div className="w-full prose lg:prose-xl">
+            <div className="mx-auto mt-10 max-w-3xl">
+              <div className="prose lg:prose-xl w-full">
                 {story.map((paragraph: string, index: number) => (
                   <p key={index}>{paragraph}</p>
                 ))}
@@ -146,7 +150,10 @@ export default function Home() {
           )}
 
           {story.length == 0 && (
-            <form onSubmit={generateStory} className="mt-10 flex flex-col items-center w-full max-w-lg">
+            <form
+              onSubmit={generateStory}
+              className="mt-10 flex w-full max-w-lg flex-col items-center"
+            >
               <div className="w-full space-y-4">
                 <div>
                   <label htmlFor="theme" className="text-sm font-semibold">
@@ -197,14 +204,14 @@ export default function Home() {
                 disabled={generating}
                 className="mt-6 inline-flex items-center rounded-full border border-transparent bg-gray-900 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 disabled:opacity-50"
               >
-                {generating ? 'Generating...' : 'Generate'}
+                {generating ? "Generating..." : "Generate"}
               </button>
             </form>
           )}
         </div>
       </main>
     </>
-  )
+  );
 }
 ```
 
@@ -219,27 +226,27 @@ When the response from the `/api/poll` endpoint contains a choices property, we 
 File: `hooks/useInterval.ts`
 
 ```ts
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef } from "react";
 
 function useInterval(callback: () => void, delay: number | null) {
-  const savedCallback = useRef(callback)
+  const savedCallback = useRef(callback);
 
   useEffect(() => {
-    savedCallback.current = callback
-  }, [callback])
+    savedCallback.current = callback;
+  }, [callback]);
 
   useEffect(() => {
     if (!delay && delay !== 0) {
-      return
+      return;
     }
 
-    const id = setInterval(() => savedCallback.current(), delay)
+    const id = setInterval(() => savedCallback.current(), delay);
 
-    return () => clearInterval(id)
-  }, [delay])
+    return () => clearInterval(id);
+  }, [delay]);
 }
 
-export default useInterval
+export default useInterval;
 ```
 
 The `useInterval` hook makes use of the `useEffect` and `useRef` hooks to manage the interval and the callback function that works seamlessly with the React component lifecycle, as well as providing a convenient way to manage the interval and callback within a React component, optimizing performance and making the codebase that little bit more maintainable. You can find more information on this hook [here](https://usehooks-ts.com/react-hook/use-interval) and [here](https://overreacted.io/making-setinterval-declarative-with-react-hooks/).
@@ -253,43 +260,44 @@ First up we'll create the callback, poll and create files, as well as the Redis 
 File: `pages/api/create.ts`
 
 ```ts
-import type { NextApiRequest, NextApiResponse } from 'next'
-import qstashClient from '../../lib/qstash'
+import type { NextApiRequest, NextApiResponse } from "next";
+import qstashClient from "../../lib/qstash";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method !== 'POST') {
+  if (req.method !== "POST") {
     return res.status(400).json({
       message: `Invalid request method: ${req.method}.`,
-    })
+    });
   }
 
-  const { theme, character, moral }: any = req.body
+  const { theme, character, moral }: any = req.body;
 
-  qstashClient.publishJSON({
-    url: 'https://api.openai.com/v1/completions',
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${process.env.QSTASH_TOKEN}`,
-      'Content-Type': 'application/json',
-      'Upstash-Callback': `${process.env.SITE_URL}/api/callback`,
-      'Upstash-Forward-Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-    },
-    body: {
-      model: 'text-davinci-003',
-      prompt: `Write a children's story about ${theme}, which has a main character who is ${character} with the moral of the story being ${moral}.`,
-      max_tokens: 500,
-      temperature: 0.75,
-    },
-  })
+  qstashClient
+    .publishJSON({
+      url: "https://api.openai.com/v1/completions",
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.QSTASH_TOKEN}`,
+        "Content-Type": "application/json",
+        "Upstash-Callback": `${process.env.SITE_URL}/api/callback`,
+        "Upstash-Forward-Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+      },
+      body: {
+        model: "text-davinci-003",
+        prompt: `Write a children's story about ${theme}, which has a main character who is ${character} with the moral of the story being ${moral}.`,
+        max_tokens: 500,
+        temperature: 0.75,
+      },
+    })
     .then((data: any) => {
-      return res.status(202).json({ id: data.messageId })
+      return res.status(202).json({ id: data.messageId });
     })
     .catch((error: any) => {
-      return res.status(500).json({ message: error.message })
-    })
+      return res.status(500).json({ message: error.message });
+    });
 }
 ```
 
@@ -304,23 +312,23 @@ We then return the message ID of the request if the `publishJSON` call is succes
 File: `pages/api/callback.ts`
 
 ```ts
-import type { NextApiRequest, NextApiResponse } from 'next'
-import redis from '../../lib/redis'
+import type { NextApiRequest, NextApiResponse } from "next";
+import redis from "../../lib/redis";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { body }: any = req
+  const { body }: any = req;
 
   try {
-    const decoded = Buffer.from(body.body, 'base64').toString('utf-8')
+    const decoded = Buffer.from(body.body, "base64").toString("utf-8");
 
-    await redis.set(body.sourceMessageId, decoded)
+    await redis.set(body.sourceMessageId, decoded);
 
-    return res.status(200).send(decoded)
+    return res.status(200).send(decoded);
   } catch (error) {
-    return res.status(500).json({ error })
+    return res.status(500).json({ error });
   }
 }
 ```
@@ -334,30 +342,32 @@ Finally, we send return a response with a status code of 200 (indicating success
 File: `pages/api/poll.ts`
 
 ```ts
-import type { NextApiRequest, NextApiResponse } from 'next'
-import redis from '../../lib/redis'
+import type { NextApiRequest, NextApiResponse } from "next";
+import redis from "../../lib/redis";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { id }: any = req.query
+  const { id }: any = req.query;
 
   try {
-    const data = await redis.get(id)
+    const data = await redis.get(id);
 
     if (!data) {
-      return res.status(404).json({ message: 'Data for supplied ID not found' })
+      return res
+        .status(404)
+        .json({ message: "Data for supplied ID not found" });
     }
 
-    return res.status(200).json(data)
+    return res.status(200).json(data);
   } catch (error: any) {
-    return res.status(500).json({ message: error.message })
+    return res.status(500).json({ message: error.message });
   }
 }
 ```
 
-First up, we destructure the  `id` from the query object of the request. We then try to retrieve the data stored in Redis under the destructured `id` and if no data is found, it sends a response with a status code of 404 (indicating that the requested resource could not be found) and a message stating so.
+First up, we destructure the `id` from the query object of the request. We then try to retrieve the data stored in Redis under the destructured `id` and if no data is found, it sends a response with a status code of 404 (indicating that the requested resource could not be found) and a message stating so.
 
 If data is found belonging to the given key, it sends a response with a status code of 200 (indicating success), and the found data along with it. If any error occurs, we return a response with a status code of 500 (indicating an internal server error) and the relevant error message.
 
@@ -368,13 +378,13 @@ Next up, we'll create two files for creating the QStash and Redis clients, which
 File: `lib/qstash.ts`
 
 ```ts
-import { Client } from '@upstash/qstash'
+import { Client } from "@upstash/qstash";
 
 const qstashClient = new Client({
   token: process.env.QSTASH_TOKEN as string,
-})
+});
 
-export default qstashClient
+export default qstashClient;
 ```
 
 The QStash client is initialized with a token stored in the `QSTASH_TOKEN` environment variable. This object can be used to send HTTP requests to the Upstash QStash service.
@@ -382,14 +392,14 @@ The QStash client is initialized with a token stored in the `QSTASH_TOKEN` envir
 File: `lib/redis.ts`
 
 ```ts
-import { Redis } from '@upstash/redis'
+import { Redis } from "@upstash/redis";
 
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL as string,
   token: process.env.UPSTASH_REDIS_REST_TOKEN as string,
-})
+});
 
-export default redis
+export default redis;
 ```
 
 The Redis client is initialized with a URL and token stored in the `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` environment variables, respectively. This object can be used to store and retrieve data in a Redis database through the Upstash Redis REST API.

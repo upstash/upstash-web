@@ -5,7 +5,7 @@ author: tudor
 tags: [realtime, serverless, edge, qstash, redis]
 ---
 
-In today's article we are going to talk about how you can take advantage of [Upstash](https://upstash.com/)  to securely store and access information about a country's shelter map using Redis, and update the database in realtime via [QStash](https://docs.upstash.com/qstash). 
+In today's article we are going to talk about how you can take advantage of [Upstash](https://upstash.com/) to securely store and access information about a country's shelter map using Redis, and update the database in realtime via [QStash](https://docs.upstash.com/qstash).
 
 ## Introduction
 
@@ -15,17 +15,17 @@ Ranging from emergency broadcast systems such as the [AMBER alerts](https://en.w
 
 Now, we are going to take a look at how [Redis](https://redis.com/) and serverless workloads can play a key role in building a realtime emergency response system that helps citizens find the closest bunkers, while also informing them about the capacity, features(such as disabled persons facilities) and resources(water, electricity, medicine etc.) available.
 
-
 ![app](/blog/realtime-emergency-response/app.png)
 Courtesy of [Project Cloud4](https://project-cloud4-hosting.vercel.app/)
 
 ## Why serverless?
 
-The so-called [serverless](https://en.wikipedia.org/wiki/Serverless_computing) concept has been popularised among developers for the last years. We have seen an increase in the number of startups that choose to follow this architecture and also an increased adoption in large corporations. 
+The so-called [serverless](https://en.wikipedia.org/wiki/Serverless_computing) concept has been popularised among developers for the last years. We have seen an increase in the number of startups that choose to follow this architecture and also an increased adoption in large corporations.
 
 Especially when talking about state actors, a rapid development environment and auto-managed services can drastically reduce the complexity and overhead of building emergency response systems. We also have to take two other factors into consideration:
+
 1. **Budget**: If a country does not go through an emerging disaster, will any person in a decision-making role be able to approve payments for unused compute power? I doubt so.
-2. **Traffic spikes**: Imagine an alarm is triggered and millions of people access the web platform to find the closest shelter. How will your REST API handle this sudden rps(request-per-second) increase? What about the essential realtime components? 
+2. **Traffic spikes**: Imagine an alarm is triggered and millions of people access the web platform to find the closest shelter. How will your REST API handle this sudden rps(request-per-second) increase? What about the essential realtime components?
 
 All this different questions can be answered by using true serverless platforms like [Upstash](https://upstash.com/) and [Ably](https://ably.com/) to power up heavy-lifting servers that auto-scale and charge only for the resources you are using.
 
@@ -44,11 +44,12 @@ QStash solves this problem by allowing requests to be made using HTTP, the state
 **P.S**.: If you just want to look through the samples, skip the requirements and setup section. They are meant to show what we are using and how.
 
 If you would like to build this kind of system on your own, you will need the following:
- - an [Upstash](https://upstash.com/) account, from which you will create a Redis database and use a QStash endpoint or topic;
- - an [Ably](https://ably.com/) account and a webhook integration set up
- - a [Next.js](https://nextjs.org/) project;
- - a tunneling service like [ngrok](https://ngrok.com/) if you want to proxy local requests to an internet available URL;
- - any package manager that supports the requested libraries. This article will use npm, but it is not mandatory.
+
+- an [Upstash](https://upstash.com/) account, from which you will create a Redis database and use a QStash endpoint or topic;
+- an [Ably](https://ably.com/) account and a webhook integration set up
+- a [Next.js](https://nextjs.org/) project;
+- a tunneling service like [ngrok](https://ngrok.com/) if you want to proxy local requests to an internet available URL;
+- any package manager that supports the requested libraries. This article will use npm, but it is not mandatory.
 
 **NOTE**: This article will provide some basic proof-of-concept samples to demonstrate the use of said technologies in the context of our application's architecture. The given code is NOT production ready and was simplified and shortened for better reading. Make sure to perform the necessary modifications if you would like to deploy(exception handling, security, etc.)
 
@@ -63,22 +64,21 @@ To create a Next.js project run `npx create-next-app@latest <your-app-name>` in 
 Next.js uses the [node](https://nextjs.org/docs/advanced-features/react-18/switchable-runtime) environment for API routes as a default. We can change that in two ways:
 
 1. The per-route approach. Add the following export to the desired route:
-	  ```javascript
-	 export const config = {
-		runtime: "experimental-edge",
-     };
-     ```
+   ```javascript
+   export const config = {
+     runtime: "experimental-edge",
+   };
+   ```
 2. The global approach. To make **edge** the default runtime, add the following to your next.config,js file:
-	 ```javascript
-	 const nextConfig = {
-		// ...
-		experimental: {
-			runtime:  "experimental-edge",
-		},
-		// ...
-	 };
-	```
-
+   ```javascript
+   const nextConfig = {
+     // ...
+     experimental: {
+       runtime: "experimental-edge",
+     },
+     // ...
+   };
+   ```
 
 ### Upstash
 
@@ -89,7 +89,7 @@ Note that Ably provides us with two options for the webhook message encoding, [J
 
 ### Ably
 
-For the realtime functionality, we will use Ably's protocols, that defaults to [WebSockets](https://en.wikipedia.org/wiki/WebSocket) where possible. To get started follow [this guide](https://ably.com/docs/quick-start-guide?lang=javascript)  and, as we are using Next.js, you can take a look at the [@ably-labs/react-hooks](https://www.npmjs.com/package/@ably-labs/react-hooks) npm package.
+For the realtime functionality, we will use Ably's protocols, that defaults to [WebSockets](https://en.wikipedia.org/wiki/WebSocket) where possible. To get started follow [this guide](https://ably.com/docs/quick-start-guide?lang=javascript) and, as we are using Next.js, you can take a look at the [@ably-labs/react-hooks](https://www.npmjs.com/package/@ably-labs/react-hooks) npm package.
 
 We should also [set up](https://ably.com/docs/general/webhooks) a webhook integration to point to our QStash URL, and add any necessary headers.
 
@@ -98,16 +98,17 @@ If you are going to production, also check [authentication and security](https:/
 ### Optional: local tunneling
 
 Follow [this guide](https://ngrok.com/docs/getting-started) to get started with ngrok
- 
+
 ## Architecture
 
 ### Flow
-  
-To better understand our application's flow, let's look at this diagram(created with [excalidraw.com](https://www.excalidraw.com)): 
+
+To better understand our application's flow, let's look at this diagram(created with [excalidraw.com](https://www.excalidraw.com)):
 
 ![architecture](/blog/realtime-emergency-response/arch.png)
 
-As you can see we have defined two types of users: 
+As you can see we have defined two types of users:
+
 1. **the citizen**, who can acces a shelter or a location's info, and can announce his intention to go to a bunker
 2. **the admin**, who can modify a bunker's logistics data and modify the availability(for example, confirm that a person/family arrived at the location)
 
@@ -118,68 +119,70 @@ Also, we will use Ably's [REST API](https://ably.com/docs/rest) to publish messa
 ### Data
 
 Currently we have to store two main data types:
-* a shelter's information, which can take the form of a Redis [hash](https://redis.io/docs/data-types/hashes/) and have the following properties:
-	- the key's name as `country-city-number`  (ex: `RO-CJ-01`)
-	- availability (ex: `300`)
-	- features (ex: `["disabled persons special acces", "counseling"]`)
-	- resources: 
-		```javascript
-		{
-			resource: quantity,
-			or
-			resource: list
-			...
-		}
-		```
-		ex: 
-		```json
-		{
-			"water": "200 liters",
-			"medicine": ["insuline", ...]
-		}
-		```
-	- electricity: `yes/no`
-	- heating: `yes/no`
-	- position: `[longitude, latitude]` or 
-		```javascript
-		{
-			longitude: number,
-			latitude: number
-		}
-		```
-	- _id: we will generate this randomly
-	
-* a location's information 
 
-  While we *can* do a nested query to find the shelters available for the specified location, it might be a better idea to store them as a separate data structure to simplify and optimise the query. To do so, we can use a Redis [set](https://redis.io/docs/data-types/sets/) and name the elements as `<geographical-unit>-<name>` (ex: `country-RO` or `city-CJ`). This way we are also preventing duplication
+- a shelter's information, which can take the form of a Redis [hash](https://redis.io/docs/data-types/hashes/) and have the following properties:
+  - the key's name as `country-city-number` (ex: `RO-CJ-01`)
+  - availability (ex: `300`)
+  - features (ex: `["disabled persons special acces", "counseling"]`)
+  - resources:
+    ```javascript
+    {
+    	resource: quantity,
+    	or
+    	resource: list
+    	...
+    }
+    ```
+    ex:
+    ```json
+    {
+    	"water": "200 liters",
+    	"medicine": ["insuline", ...]
+    }
+    ```
+  - electricity: `yes/no`
+  - heating: `yes/no`
+  - position: `[longitude, latitude]` or
+    ```javascript
+    {
+    	longitude: number,
+    	latitude: number
+    }
+    ```
+  - \_id: we will generate this randomly
+- a location's information
 
-	ex: 
-	```javascript
-		city-CJ : ["RO-CJ-01", "RO-CJ-02", "RO-CJ-03"]
-	```
+  While we _can_ do a nested query to find the shelters available for the specified location, it might be a better idea to store them as a separate data structure to simplify and optimise the query. To do so, we can use a Redis [set](https://redis.io/docs/data-types/sets/) and name the elements as `<geographical-unit>-<name>` (ex: `country-RO` or `city-CJ`). This way we are also preventing duplication
 
-But there still remains one problem: how can we distinguish between a citizen's intention to go to a shelter and an *actual* update of the occupancy triggered by the shelter's admin confirmation? We can do so in two ways:
+  ex:
+
+  ```javascript
+  	city-CJ : ["RO-CJ-01", "RO-CJ-02", "RO-CJ-03"]
+  ```
+
+But there still remains one problem: how can we distinguish between a citizen's intention to go to a shelter and an _actual_ update of the occupancy triggered by the shelter's admin confirmation? We can do so in two ways:
+
 1.  **Constantly update** the shelter's availability key:
-A user announces his intention to come (alone or with the family/etc) => we increment by x;
-The admin finds out the confirmation is not valid => we decrement by x (or increment by -x)
+    A user announces his intention to come (alone or with the family/etc) => we increment by x;
+    The admin finds out the confirmation is not valid => we decrement by x (or increment by -x)
 
-	The problem here is that the admin must act as a source of truth and keep track of citizen's location; also, the shelter's data can't be immediately trusted
-	
-2.  **Create a separate [string](https://redis.io/docs/data-types/strings/) key** named `shelter-"availability"` (ex: `RO-CJ-01-availability`) and store the realtime-updated value. 
-This way we can update realtime, and keep our hash's availability key as the source of truth.
+        The problem here is that the admin must act as a source of truth and keep track of citizen's location; also, the shelter's data can't be immediately trusted
 
-	Note that on the client side we will fetch both the hash and the string key, and present them as the actual availability and the projected one. An alternative approach would be to only fetch the string and revert to the source of truth when needed. Although this would reduce the network load, the admin would need to constantly verify the data(as in the first scenario) and, to *actually* fetch less, we would need to store the shelter's availability key separately(remember, we still need to get the other informations!).
+2.  **Create a separate [string](https://redis.io/docs/data-types/strings/) key** named `shelter-"availability"` (ex: `RO-CJ-01-availability`) and store the realtime-updated value.
+    This way we can update realtime, and keep our hash's availability key as the source of truth.
+
+        Note that on the client side we will fetch both the hash and the string key, and present them as the actual availability and the projected one. An alternative approach would be to only fetch the string and revert to the source of truth when needed. Although this would reduce the network load, the admin would need to constantly verify the data(as in the first scenario) and, to *actually* fetch less, we would need to store the shelter's availability key separately(remember, we still need to get the other informations!).
 
 #### Sorting
 
-Let's take advantage of another Redis data type called [sorted set](https://redis.io/docs/data-types/sorted-sets/). Say we want to sort the bunkers in a location by availability, facilities or available resources: as I mentioned previously, we can do a nested query but at the cost of time and with a much bigger data load.  A better solution would be to create sorted sets for every filtering criteria (we can name them `<geographical-unit>-<name>-<criteria>`, like `city-CJ-availability` or `country-RO-food`) 
+Let's take advantage of another Redis data type called [sorted set](https://redis.io/docs/data-types/sorted-sets/). Say we want to sort the bunkers in a location by availability, facilities or available resources: as I mentioned previously, we can do a nested query but at the cost of time and with a much bigger data load. A better solution would be to create sorted sets for every filtering criteria (we can name them `<geographical-unit>-<name>-<criteria>`, like `city-CJ-availability` or `country-RO-food`)
 
-ex:  `city-B-availability`
+ex: `city-B-availability`
 
-| 		Score  	| 		Content 		|
-|-----------|-------------------|
-|		200 		|	  RO-B-02	|
-|		100 		|	  RO-B-01	|
+| Score | Content |
+| ----- | ------- |
+| 200   | RO-B-02 |
+| 100   | RO-B-01 |
 
 In this example, the availability score was calculated as `total seats - current occupation`.
 
@@ -190,86 +193,85 @@ We can write some basic code to demonstrate our API and client's behaviour
 ### Endpoints
 
 Mainly, we need to have:
+
 - a data endpoint that would serve the client any requested information
-and
+  and
 - an edpoint to create or update our data types
 
-
 ### Client
+
 After tracking the user's location we will automatically connect to the "availability" channel and publish a message if the citizen intends to go to a bunker.
 
 First, let's make a connection from the `/_app.js` file:
 
 ```javascript
-import { useEffect, useState } from  "react";
-import  "../styles/globals.css";
-import { configureAbly } from  "@ably-labs/react-hooks";
+import { useEffect, useState } from "react";
+import "../styles/globals.css";
+import { configureAbly } from "@ably-labs/react-hooks";
 
 export default function App({ Component, pageProps }) {
   const [loaded, setLoaded] = useState(false);
   useEffect(() => {
-	configureAbly({
-	  // In a production system, you should use authentication
-	  key: process.env.NEXT_PUBLIC_ABLY_API_KEY,
-	});
-	setLoaded(true);
+    configureAbly({
+      // In a production system, you should use authentication
+      key: process.env.NEXT_PUBLIC_ABLY_API_KEY,
+    });
+    setLoaded(true);
   }, []);
-  
+
   if (!loaded) return <div>loading...</div>;
-  return  <Component  {...pageProps}  />;
-}	
+  return <Component {...pageProps} />;
+}
 ```
 
 And then connect to the channel in any component we need to:
 
 ```javascript
-import { useChannel } from  "@ably-labs/react-hooks";
+import { useChannel } from "@ably-labs/react-hooks";
 
 export default function Test() {
   const [availability] = useChannel("availability", (msg) => {
     console.log(msg);
   });
 
-  return  <></>;
+  return <></>;
 }
 ```
-
 
 ### Working with the database
 
 #### Adding new data
 
-To add new data to Redis we can use the [HSET]([https://redis.io/commands/hset), [SET](https://redis.io/commands/set/) and [SADD](https://redis.io/commands/sadd/) commands 
+To add new data to Redis we can use the [HSET]([https://redis.io/commands/hset), [SET](https://redis.io/commands/set/) and [SADD](https://redis.io/commands/sadd/) commands
 
 ```javascript
 export default async (req) => {
-	let data = await req.json();
-	
-	if (data.type === "shelter") {
-	// Remove the 'type' key as it is not neccesary anymore
-	delete data.type;
-	const { name: shelter, availability } = data;
-	
-	let shelterData = data;
-	// Generate a random id.
-	shelterData._id = Math.random()
-	.toString(36)
-	.replace(/[^a-z]+/g, "")
-	.substring(0, 7);
-	
-	// Store the shelter's info as a hash
-	await redis.hset(shelter, shelterData);
+  let data = await req.json();
 
-	// Store the realtime-updated availability as a string
-	await redis.set(shelter + "-availability", availability);
-	return new Response("ok");
+  if (data.type === "shelter") {
+    // Remove the 'type' key as it is not neccesary anymore
+    delete data.type;
+    const { name: shelter, availability } = data;
 
+    let shelterData = data;
+    // Generate a random id.
+    shelterData._id = Math.random()
+      .toString(36)
+      .replace(/[^a-z]+/g, "")
+      .substring(0, 7);
+
+    // Store the shelter's info as a hash
+    await redis.hset(shelter, shelterData);
+
+    // Store the realtime-updated availability as a string
+    await redis.set(shelter + "-availability", availability);
+    return new Response("ok");
   } else if (data.type === "location") {
-	const { name: location, shelters } = data;
-	
-	await redis.sadd(location, ...shelters);
-	
-	return new Response("ok");
+    const { name: location, shelters } = data;
+
+    await redis.sadd(location, ...shelters);
+
+    return new Response("ok");
   }
 };
 ```
@@ -281,16 +283,16 @@ Other than basic UD (update-delete) operations, we can use the Redis [INCRBY](ht
 If a citizen announces his intention to go to a bunker, we can publish a message from the client app
 
 ```javascript
-	availability.publish("update", {
-	  shelter:  "RO-CJ-01",
-	  availability: 1, // Or -x, if the user cancels.
-    })
+availability.publish("update", {
+  shelter: "RO-CJ-01",
+  availability: 1, // Or -x, if the user cancels.
+});
 ```
 
 As explained in the architecture, this will trigger a webhook from which we can take the data and update the `shelter-"availability"` key.
 
 ```javascript
-	await redis.incrby(shelter + "-availability", value);
+await redis.incrby(shelter + "-availability", value);
 ```
 
 If you are updating from the server(ex: admin confirmations), do not forget to use the REST API instead.
@@ -300,8 +302,6 @@ If you are updating from the server(ex: admin confirmations), do not forget to u
 On the server, we can use the [GET ](https://redis.io/commands/get/), [SMEMBERS](https://redis.io/commands/smembers/) and [HGETALL](https://redis.io/commands/hgetall/) commands.
 
 On the client, we can listen for messages in the channel and update the state accordingly.
-
-
 
 ## To sum up
 

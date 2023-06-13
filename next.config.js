@@ -1,20 +1,17 @@
 const { withContentlayer } = require("next-contentlayer");
-const { PHASE_DEVELOPMENT_SERVER } = require("next/constants");
 
-module.exports = (phase) => {
-  const isDev = phase === PHASE_DEVELOPMENT_SERVER;
-
-  return withContentlayer({
-    env: {
-      NEXT_PUBLIC_URL: isDev ? "http://localhost:3000" : `https://upstash.com`,
-    },
-    compiler: {
-      removeConsole:
-        process.env.NODE_ENV === "development"
-          ? false
-          : {
-              exclude: ["error"],
-            },
-    },
-  });
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  env: {
+    NEXT_PUBLIC_SITE_URL:
+      process.env.NODE_ENV === "development"
+        ? "http://localhost:3000"
+        : "https://upstash.com",
+  },
+  reactStrictMode: false,
+  experimental: {
+    appDir: true,
+  },
 };
+
+module.exports = withContentlayer(nextConfig);

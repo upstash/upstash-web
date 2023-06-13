@@ -5,7 +5,6 @@ author: max
 tags: [qstash, serverless, callbacks, vercel, discord, news, nytimes]
 ---
 
-
 In this post, we will build a simple application that will fetch the most
 popular viewed articles from the New York Times once a day via a cron job and
 post them to our internal discord _#notifications_ channel to stay up to date
@@ -198,8 +197,8 @@ Running the following command will then start our cron job.
 
 ```jsx
 curl -XPOST "https://qstash.upstash.io/v1/publish/https://api.nytimes.com/svc/mostpopular/v2/viewed/1.json?api-key=your-key" \
-  -H "Upstash-Callback: XXX-YYY-ZZZ.ngrok.io/api/callback" \ 
-	-H "Upstash-Cron: 0 8 * * *" \ 
+  -H "Upstash-Callback: XXX-YYY-ZZZ.ngrok.io/api/callback" \
+	-H "Upstash-Cron: 0 8 * * *" \
   -H "Authorization: Bearer XXX"
 ```
 

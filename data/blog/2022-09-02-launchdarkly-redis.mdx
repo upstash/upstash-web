@@ -9,28 +9,27 @@ tags: [serverless, redis, launchdarkly, java]
 
 - **Testing code live in production**
 
-	Teams can create groups of users according to their specific identifiers, such as their unique keys, their regions, users’ ages etc.
+  Teams can create groups of users according to their specific identifiers, such as their unique keys, their regions, users’ ages etc.
 
-	Test groups can also be created according to the users’ identifiers for testing purposes.
+  Test groups can also be created according to the users’ identifiers for testing purposes.
 
-	Even if teams don’t want to classify their users, they can deploy their tests to just some percentage of the users by enabling the feature flags to x% of users.
+  Even if teams don’t want to classify their users, they can deploy their tests to just some percentage of the users by enabling the feature flags to x% of users.
 
 - **Feature release management**
 
-	The new deployment, new feature or any additional thing on the software product can be controlled by a feature flag.
+  The new deployment, new feature or any additional thing on the software product can be controlled by a feature flag.
 
-	For example, a team wanted to create a new feature for users in a specific region, let’s say in the USA.
+  For example, a team wanted to create a new feature for users in a specific region, let’s say in the USA.
 
-	The thing that team needs to release their new feature in this country is creating a feature flag, which is a kind of a controller for the new feature.  By creating rules for this feature flag through a simple UI, teams can adjust their targets for their new feature.
+  The thing that team needs to release their new feature in this country is creating a feature flag, which is a kind of a controller for the new feature. By creating rules for this feature flag through a simple UI, teams can adjust their targets for their new feature.
 
-
-The benefits of Launchdarky do not end here. You can check their [website]( [https://launchdarkly.com/](https://launchdarkly.com/)) and [use cases]( [https://launchdarkly.com/use-cases/](https://launchdarkly.com/use-cases/)) for further information.
+The benefits of Launchdarky do not end here. You can check their [website](<[https://launchdarkly.com/](https://launchdarkly.com/)>) and [use cases](<[https://launchdarkly.com/use-cases/](https://launchdarkly.com/use-cases/)>) for further information.
 
 LaunchDarkly provides a Redis® integration to make teams able to have Redis-backed feature store. At that point, Serverless Redis® comes into play as an easy, fast and feasible option.
 
 ### **LaunchDarkly Setup**
 
-The first step is creating a personal or team account in [LaunchDarkly]( [https://app.launchdarkly.com/](https://app.launchdarkly.com/))
+The first step is creating a personal or team account in [LaunchDarkly](<[https://app.launchdarkly.com/](https://app.launchdarkly.com/)>)
 
 After signing in, we are going to create a feature flag, that we are going to use.
 
@@ -60,11 +59,11 @@ The one way that I most loved to adjust the distribution of the flag was percent
 
 In this blog, we are going to work on the server side. The demo endpoint is very simple. If the feature flag is false, then return false, else true.
 
-We are going to follow the instructions on [LaunchDarkly docs]( [https://docs.launchdarkly.com/sdk/server-side/java#getting-started](https://docs.launchdarkly.com/sdk/server-side/java#getting-started)).
+We are going to follow the instructions on [LaunchDarkly docs](<[https://docs.launchdarkly.com/sdk/server-side/java#getting-started](https://docs.launchdarkly.com/sdk/server-side/java#getting-started)>).
 
 First, we need to install the LaunchDarkly SDK as a dependency.
 
-``` xml
+```xml
 <dependency>
 <groupId>com.launchdarkly</groupId>
 <artifactId>launchdarkly-java-server-sdk</artifactId>
@@ -76,35 +75,35 @@ implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', 
 
 After that, our LaunchDarkly Java client will be like below.
 
-``` java
-package com.example.demo;  
-  
-import com.launchdarkly.sdk.server.Components;  
-import com.launchdarkly.sdk.server.LDClient;  
-import com.launchdarkly.sdk.server.LDConfig;  
-import com.launchdarkly.sdk.server.integrations.Redis;  
-  
-import java.net.URI;  
-  
-public class ClientSingleton {  
+```java
+package com.example.demo;
 
-	private static ClientSingleton _clientSingleton_ = null;  
-	private LDClient ldClient;  
-	 
-	private ClientSingleton(){  
-		ldClient = new LDClient("YOUR_SDK_KEY");  
-	}  
-	
-	public static ClientSingleton getInstance(){  
-		if (_clientSingleton_ == null){  
-			_clientSingleton_ = new ClientSingleton();  
-		}  
-		return _clientSingleton_;  
-	}   
-	
-	public static LDClient getClient(){  
-		return getInstance().ldClient;  
-	}  
+import com.launchdarkly.sdk.server.Components;
+import com.launchdarkly.sdk.server.LDClient;
+import com.launchdarkly.sdk.server.LDConfig;
+import com.launchdarkly.sdk.server.integrations.Redis;
+
+import java.net.URI;
+
+public class ClientSingleton {
+
+	private static ClientSingleton _clientSingleton_ = null;
+	private LDClient ldClient;
+
+	private ClientSingleton(){
+		ldClient = new LDClient("YOUR_SDK_KEY");
+	}
+
+	public static ClientSingleton getInstance(){
+		if (_clientSingleton_ == null){
+			_clientSingleton_ = new ClientSingleton();
+		}
+		return _clientSingleton_;
+	}
+
+	public static LDClient getClient(){
+		return getInstance().ldClient;
+	}
 }
 ```
 
@@ -112,39 +111,39 @@ The reason I created LaunchDarkly Java client like this is the warning in their 
 
 **![](https://lh5.googleusercontent.com/NRxMXZTdPnQy7Ecx0Sb-cdQZ_FXIg1J1QwfzK4Y9ewEfECVW57-qH0ivqoSEkr2_FspCWyn-35gyT37wzN4IBMGSaE4vcGbDsOGhnlffw4uRg6dMgAXzmhKezgkvn1fgnXD7RWBwe1G-Y_FIgxbZz2s3UURoZWZy7CML4FkIEehcLuZWthwzWu1VPw)**
 
-In this blog, I created my API endpoint by using [Spring]( [https://start.spring.io/](https://start.spring.io/)) which I feel comfortable with.
+In this blog, I created my API endpoint by using [Spring](<[https://start.spring.io/](https://start.spring.io/)>) which I feel comfortable with.
 
 Here is the simple endpoint:
 
-``` java
-import org.springframework.web.bind.annotation.GetMapping;  
-import org.springframework.web.bind.annotation.RestController;  
-  
-import com.launchdarkly.sdk.*;  
-import com.launchdarkly.sdk.server.*;  
-  
-  
-import java.io.IOException;  
-import java.net.URI; 
+```java
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@RestController 
-public class test { 
+import com.launchdarkly.sdk.*;
+import com.launchdarkly.sdk.server.*;
 
-	@GetMapping("/") 
+
+import java.io.IOException;
+import java.net.URI;
+
+@RestController
+public class test {
+
+	@GetMapping("/")
 	public static String getVar() throws IOException {
-		LDClient ldClient = ClientSingleton.getClient(); 
-		// Set up the user properties. This user should appear on your  
-		// LaunchDarkly users dashboard soon after you run the demo. 
-		LDUser user = new LDUser.Builder("unique id").build();  
+		LDClient ldClient = ClientSingleton.getClient();
+		// Set up the user properties. This user should appear on your
+		// LaunchDarkly users dashboard soon after you run the demo.
+		LDUser user = new LDUser.Builder("unique id").build();
 
 		boolean showFeature = ldClient.boolVariation("test", user, false);
-		System.out.println("SDK successfully connected! The value of test is " + showFeature + " for " + user);   ldClient.close();  
-		if(showFeature){ 
-			return "test feature is enabled for us :) "; 
-		} else{ 
-			return "test feature is disabled for us :( "; 
+		System.out.println("SDK successfully connected! The value of test is " + showFeature + " for " + user);   ldClient.close();
+		if(showFeature){
+			return "test feature is enabled for us :) ";
+		} else{
+			return "test feature is disabled for us :( ";
 		}
-	}  
+	}
 }
 ```
 
@@ -152,11 +151,11 @@ public class test {
 
 Storing our feature flag in Redis is possible with LaunchDarkly. At that point, serverless Redis can be used as our Redis datastore for our LaunchDarkly client.
 
-We are following the [Upstash docs]( [https://docs.upstash.com/redis](https://docs.upstash.com/redis)) first, if we don’t have a Redis database yet.
+We are following the [Upstash docs](<[https://docs.upstash.com/redis](https://docs.upstash.com/redis)>) first, if we don’t have a Redis database yet.
 
-Then, to connect our serverless Redis to the LaunchDarkly client, first we need to install the LaunchDarkly Java Redis library, as it is stated in their [library]( [https://github.com/launchdarkly/java-server-sdk-redis](https://github.com/launchdarkly/java-server-sdk-redis)).
+Then, to connect our serverless Redis to the LaunchDarkly client, first we need to install the LaunchDarkly Java Redis library, as it is stated in their [library](<[https://github.com/launchdarkly/java-server-sdk-redis](https://github.com/launchdarkly/java-server-sdk-redis)>).
 
-``` xml
+```xml
 <dependency>
 <groupId>com.launchdarkly</groupId>
 <artifactId>launchdarkly-java-server-sdk-redis-store</artifactId>
@@ -166,26 +165,26 @@ Then, to connect our serverless Redis to the LaunchDarkly client, first we need 
 
 After having the dependency, we can connect our serverless Redis by using LaunchDarkly Redis integration. To do that, we need to import it.
 
-``` java
+```java
 import com.launchdarkly.sdk.server.*;
 import com.launchdarkly.sdk.server.integrations.*;
 ```
 
 Then, we can connect it by adding configuration to the client as follows.
 
-``` java
+```java
 LDConfig config = new LDConfig.Builder().dataStore(
 	Components.persistentDataStore(
 		Redis.dataStore().uri(
 			URI.create("redis://:<REDIS-PASSWORD>@<REDIS-ENDPOINT>:<PORT>")
 		)
-	).cacheSeconds(30)  
-  )  
-  .build(); 
+	).cacheSeconds(30)
+  )
+  .build();
 ldClient = new LDClient("YOUR_SDK_KEY", config);
 ```
 
-When we check our Upstash Redis by using the “Data Browser” tab in the [console]( [https://console.upstash.com/](https://console.upstash.com/)), we can see the following data.
+When we check our Upstash Redis by using the “Data Browser” tab in the [console](<[https://console.upstash.com/](https://console.upstash.com/)>), we can see the following data.
 
 **![](https://lh6.googleusercontent.com/3LhQtnc_8phZajqPUKTaZqDMjY6kBviPpzyd3yNxl6JziKhETIk_evPi0qiBFGDzo1MG2q6PLq6jTjjFhNvJa0l6jlFtJwWNonAlR8Mnox3GXhQRIQmal2vZshLY2mpJNzV_BTwsnVfO9Xq4B5YlMyKByp8OuD7B2Wm6-hahsO1-JO3UIN0AUhZ_Kg)**
 
@@ -195,8 +194,6 @@ When we check our Upstash Redis by using the “Data Browser” tab in the [cons
 
 LaunchDarkly is helping companies to manage their rollouts and deployments by providing feature flags.
 
-In this blog post, we have utilized feature flags from [LaunchDarkly]( [https://launchdarkly.com/](https://launchdarkly.com/)) and stored them in Upstash Redis by using the LaunchDarkly Redis integration.
+In this blog post, we have utilized feature flags from [LaunchDarkly](<[https://launchdarkly.com/](https://launchdarkly.com/)>) and stored them in Upstash Redis by using the LaunchDarkly Redis integration.
 
 Since this one was just an example demonstrates the integration, the functionality was very basic. LaunchDarkly can be used in so many ways and serverless Redis is ready to store flags.
-
-

@@ -21,7 +21,6 @@ Edge functions are serverless functions which are executed at Vercel’s edge lo
 
 ![Untitled-2022-12-13-1936.png](/blog/vercel-edge/vercel-edge.png)
 
-
 ### Edge Middleware vs Edge Functions
 
 - Edge middleware runs before the backend logic while edge function is positioned to be the backend logic.
@@ -45,16 +44,16 @@ Edge functions are serverless functions which are executed at Vercel’s edge lo
 
 Edge functions are cheaper and provides you low latency all over the world. Also they do not have the cold start problem so they are faster. But they have more limitations such they do not support Node API and they have more restricted code size and timeout limits.
 
-|  | Serverless Function | Edge Function |
-| --- | --- | --- |
-| Maturity | GA | GA |
-| Fast Start | Cold start | No cold start (faster) |
-| Global low latency | No | Yes |
-| Regions | Single | Edge (many) |
-| Max exec time | 60s (pro) | 5s |
-| Max code size | 50MB | 1MB |
-| Max memory | 1024MB | 128MB |
-| Price | $40 per 100GB hours | $0.65 per 1 million execution |
+|                    | Serverless Function | Edge Function                 |
+| ------------------ | ------------------- | ----------------------------- |
+| Maturity           | GA                  | GA                            |
+| Fast Start         | Cold start          | No cold start (faster)        |
+| Global low latency | No                  | Yes                           |
+| Regions            | Single              | Edge (many)                   |
+| Max exec time      | 60s (pro)           | 5s                            |
+| Max code size      | 50MB                | 1MB                           |
+| Max memory         | 1024MB              | 128MB                         |
+| Price              | $40 per 100GB hours | $0.65 per 1 million execution |
 
 ### Recap
 

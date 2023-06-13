@@ -75,9 +75,9 @@ export const actions: Actions = {
     const text = (data.get("text") as string) ?? "";
     const result = performExpensiveOperation(text);
     return {
-      result
+      result,
     };
-  }
+  },
 };
 
 const wordSeparators =
@@ -126,7 +126,7 @@ import { Redis } from "@upstash/redis";
 import { Ratelimit } from "@upstash/ratelimit";
 import {
   UPSTASH_REDIS_REST_TOKEN,
-  UPSTASH_REDIS_REST_URL
+  UPSTASH_REDIS_REST_URL,
 } from "$env/static/private";
 import { fail } from "@sveltejs/kit";
 
@@ -136,12 +136,12 @@ let ratelimit: Ratelimit;
 if (!building) {
   redis = new Redis({
     url: UPSTASH_REDIS_REST_URL,
-    token: UPSTASH_REDIS_REST_TOKEN
+    token: UPSTASH_REDIS_REST_TOKEN,
   });
 
   ratelimit = new Ratelimit({
     redis,
-    limiter: Ratelimit.slidingWindow(5, "10 s")
+    limiter: Ratelimit.slidingWindow(5, "10 s"),
   });
 }
 ```
@@ -165,7 +165,7 @@ export const actions: Actions = {
         (rateLimitAttempt.reset - new Date().getTime()) / 1000
       );
       return fail(429, {
-        error: `Too many requests. Please try again in ${timeRemaining} seconds.`
+        error: `Too many requests. Please try again in ${timeRemaining} seconds.`,
       });
     }
 
@@ -175,9 +175,9 @@ export const actions: Actions = {
     const result = performExpensiveOperation(text);
     return {
       original: text,
-      result
+      result,
     };
-  }
+  },
 };
 ```
 

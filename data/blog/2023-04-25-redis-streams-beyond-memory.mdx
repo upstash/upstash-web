@@ -6,19 +6,19 @@ tags: [redis, announce, streams]
 ---
 
 Streams support has become one of the most anticipated features that we implemented so far.
-We have finished the implementation and we are ready to ship. Also, we are excited about telling the differences between 
+We have finished the implementation and we are ready to ship. Also, we are excited about telling the differences between
 **Upstash Streams for Redis®** and the standard Redis Streams.
 
 ## What is Upstash Streams for Redis®
 
 Upstash Streams is an append-only log which is compatible with Redis Streams API. Each entry added to a log has a unique id (`millisecondsTime-sequenceNumber`), and
-one or more field-value pairs. It is a great fit to keep track of continuous events like 
-tracking user actions, storing sensor data, etc. 
+one or more field-value pairs. It is a great fit to keep track of continuous events like
+tracking user actions, storing sensor data, etc.
 
 If you are familiar with Apache Kafka, Upstash Streams is essentially the same. The differences are in the details.
 Apache Kafka has partitions that will help the system scale. And also if you are looking for integrations
-with existing systems(databases, data lakes, logging platforms etc), thanks to [Connectors](http://localhost:3000/blog/kafka-connectors), you can 
-easily integrate your stream to a variety of systems with just a config file. 
+with existing systems(databases, data lakes, logging platforms etc), thanks to [Connectors](http://localhost:3000/blog/kafka-connectors), you can
+easily integrate your stream to a variety of systems with just a config file.
 If you already decided to use Apache Kafka instead, see our getting started guide for [Apache Kafka on cloud](https://docs.upstash.com/kafka).
 
 This is how Upstash Streams looks in action. A user tracking system can store data to a stream as follows:
@@ -56,14 +56,14 @@ Later you can query a particular date to analyze it:
       8) "home"
 ```
 
-For more details, see this [tutorial](https://redis.io/docs/data-types/streams-tutorial/). 
+For more details, see this [tutorial](https://redis.io/docs/data-types/streams-tutorial/).
 
-##  Better Streams By Upstash
+## Better Streams By Upstash
 
-At Upstash, we are not using [standard Redis®](https://github.com/redis/redis). Even though it is a good piece of technology, 
-we had our priorities like multitenancy and scalability, so we have written our Redis® s  erver.
+At Upstash, we are not using [standard Redis®](https://github.com/redis/redis). Even though it is a good piece of technology,
+we had our priorities like multitenancy and scalability, so we have written our Redis® s erver.
 
-This gives us some extra benefits. We can choose to add more superpowers 🦸 to Redis®. 
+This gives us some extra benefits. We can choose to add more superpowers 🦸 to Redis®.
 
 While implementing Upstash Streams, we wanted to address the real use case of a streaming API. Streaming data tends to be big and never-ending.
 Standard Redis® as you know is memory based. Even though it syncs to disk, all the data should always fit into the memory.
@@ -71,18 +71,18 @@ For streams, this does not seem to be a good fit. At some point, your data will 
 
 **You are going to have to trim the valuable data 😞 not because of what the business tells you, but because of your budget, your choice of cloud service limits you.**
 
-To enable the stream API to be used at its fullest potential, we removed the limit of the memory. 
+To enable the stream API to be used at its fullest potential, we removed the limit of the memory.
 
 ## How limitless Upstash Streams is implemented
 
 To be able to store much more data than that can fit into memory, we decided to implement disk-based Upstash Streams.
 The entries will be stored on disk, but only some of the frequently used metadata will be stored in memory.
 
-We are keeping some metadata in memory because they will be accessed frequently, and they are usually small. 
-This way, we will not go to disk more than needed. This metadata contains things like `lastTrimmedId`, `lastWrittenId`, the `length` of the stream, 
+We are keeping some metadata in memory because they will be accessed frequently, and they are usually small.
+This way, we will not go to disk more than needed. This metadata contains things like `lastTrimmedId`, `lastWrittenId`, the `length` of the stream,
 consumer group related data (`lastDeliveredId`, `Pending Entries List`), etc.
 
-The entries are stored on the disk. They are kept sorted according to their id's so that we can efficiently read the data when 
+The entries are stored on the disk. They are kept sorted according to their id's so that we can efficiently read the data when
 XREAD or XRANGE is requested. This way, you can keep all the data you need in Upstash Streams without worrying.
 
 ## Conclusion

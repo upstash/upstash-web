@@ -2,8 +2,8 @@
 slug: qstash-announcement
 title: "QStash: Messaging for the Serverless"
 author: enes
-tags: [qstash, redis, queue, announce]
-tweetUrl: https://twitter.com/upstash/status/1549049539079786501
+tags: [qstash, redis, queue, announcement]
+tweet: https://twitter.com/upstash/status/1549049539079786501
 ---
 
 We are proud and excited to announce [QStash](https://console.upstash.com/qstash) 🔥🔥🔥
@@ -12,44 +12,42 @@ Formally, QStash is a message queue and task scheduler designed for serverless r
 
 There was a perception serverless was only good for simple tasks. Not anymore. People build powerful systems with serverless stack. Powerful systems are composed of multiple components. Communication among those components is a big engineering problem. There are already great solutions for this problem. But we think existing solutions do not fit in serverless space. Either they are too complex or not designed to work with stateless runtimes. So we want a solution which (is):
 
-* Works anywhere including serverless and edge.
-* Messaging as a service with no backend for users to run.
-* Lightweight, easy to understand, requires nothing to learn.
-* Price scales to zero.
+- Works anywhere including serverless and edge.
+- Messaging as a service with no backend for users to run.
+- Lightweight, easy to understand, requires nothing to learn.
+- Price scales to zero.
 
-Let’s talk about a real world example. We have an e-commerce app and we want to send an informational email after each purchase. We have a service (an API route) for new purchases (newPurchase) and a second service for sending emails and notifications (sendEmail). We can call the sendEmail service from the newPurchase service. But what if the call fails? Should we wait for the response and retry?  What if too many calls congest the sendEmail service and the service does not respond on time? You need to handle all these cases in your newPurchase service. Moreover, when you change the contract of sendEmail service; you have to update your newPurchase service too.
+Let’s talk about a real world example. We have an e-commerce app and we want to send an informational email after each purchase. We have a service (an API route) for new purchases (newPurchase) and a second service for sending emails and notifications (sendEmail). We can call the sendEmail service from the newPurchase service. But what if the call fails? Should we wait for the response and retry? What if too many calls congest the sendEmail service and the service does not respond on time? You need to handle all these cases in your newPurchase service. Moreover, when you change the contract of sendEmail service; you have to update your newPurchase service too.
 
 If you use QStash in the above example, you simply send a request to QStash from the newPurchase service. QStash will queue the request and call the sendEmail service. If the service does not respond, QStash will retry with a backoff strategy. The latency of sendEmail service will not affect the newPurchase service, because it will not wait for a response from the sendEmail service. QStash decouples the newPurchase and sendEmail services. You can update both services independently as long as you keep the message format compatible.
 
 With QStash, you can add `delays` to the requests. Send an email 3 days after the shipment to remind the customer to add a review. You can also schedule tasks. You can send the requests with a CRON expression, so it will be run repetitively.
 
-<FullWidth>
-  ![](/blog/qstash/rbuilder.png)
-</FullWidth>
+<FullWidth>![](/blog/qstash/rbuilder.png)</FullWidth>
 
 Now let’s briefly visit features of QStash:
-
 
 ### Works Anywhere
 
 Instead of traditional pull-based messaging where you require a long-running process to consume from the queue, QStash pushes messages to your API. This allows you to use serverless functions to process them. We handle retries, custom delays and scheduling for you. All you need is a publicly accessible HTTP API.
-
 
 ### Price Scales to Zero
 
 QStash price is $0.4 per thousand requests. The good thing is that there is no minimum or fixed payment. You only pay for what you use. If you expect millions of requests, we will offer you an enterprise plan with lower per request prices.
 
 <Note title="Update - September 2022">
-We reduced QStash pricing to $1 per 100K requests. See [QStash Pricing](https://docs.upstash.com/qstash/pricing) page for the latest pricing information.
+  We reduced QStash pricing to $1 per 100K requests. See [QStash
+  Pricing](https://docs.upstash.com/qstash/pricing) page for the latest pricing
+  information.
 </Note>
 
 ### Endpoints and Topics
 
 You include an endpoint together with the message to QStash. So QStash sends the message to this endpoint. Also, you can define a topic which allows grouping one or more endpoints into a single namespace. Thanks to the topic abstraction, you can modify endpoints without touching the backend implementation. The below sends the requests to the topic `user-apis`. A copy of the message will be delivered to each endpoint.
 
-
 ##### Sending to an endpoint
-``` shell
+
+```shell
 curl -XPOST \
     "https://qstash.upstash.io/v1/publish/https://example.com" \
 	-H "Authorization: Bearer XXX" \
@@ -58,7 +56,8 @@ curl -XPOST \
 ```
 
 ##### Sending to a topic
-``` shell
+
+```shell
 curl -XPOST \
 	"https://qstash.upstash.io/v1/publish/user-apis" \
 	-H "Authorization: Bearer XXX" \
@@ -70,7 +69,7 @@ curl -XPOST \
 
 QStash can repeat sending your task in a schedule. Set a CRON expression as a value to the header Upstash-Cron. The below example instructs QStash to call the API every minute.
 
-``` shell
+```shell
 curl -XPOST \
     'https://qstash.upstash.io/v1/publish/https://example.com'
     -H 'Authorization: Bearer XXX' \
@@ -80,12 +79,12 @@ curl -XPOST \
 ```
 
 ### More
-* [Retries](https://docs.upstash.com/qstash/features/retry): If your API does not respond with a success status code, QStash retries the request to ensure every message will be delivered.
-* [Delays](https://docs.upstash.com/qstash/features/delay): Delay the delivery of a message by up to 90 days.
-* [Deduplication](https://docs.upstash.com/qstash/features/deduplication): You can prevent duplicate messages using Deduplication-Id or automatic content based deduplication.
-* [Request signing](https://docs.upstash.com/qstash/howto/signature): Your APIs must be public. You can verify the authenticity of each incoming request by verifying the signature.
-* [JS/TS SDK](https://github.com/upstash/sdk-qstash-ts): REST API is simple, but if you are building on JS/TS, our SDK is even simpler.
 
+- [Retries](https://docs.upstash.com/qstash/features/retry): If your API does not respond with a success status code, QStash retries the request to ensure every message will be delivered.
+- [Delays](https://docs.upstash.com/qstash/features/delay): Delay the delivery of a message by up to 90 days.
+- [Deduplication](https://docs.upstash.com/qstash/features/deduplication): You can prevent duplicate messages using Deduplication-Id or automatic content based deduplication.
+- [Request signing](https://docs.upstash.com/qstash/howto/signature): Your APIs must be public. You can verify the authenticity of each incoming request by verifying the signature.
+- [JS/TS SDK](https://github.com/upstash/sdk-qstash-ts): REST API is simple, but if you are building on JS/TS, our SDK is even simpler.
 
 ### Closing Words
 

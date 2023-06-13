@@ -10,7 +10,9 @@ Clickhouse is a popular database for real time analytical queries. It is commonl
 In this article, we will connect a Kafka topic to a Clickhouse table using Upstash Kafka and Clickhouse Cloud. We will use the JDBC sink connector managed by Upstash to sync data from Kafka to Clickhouse. We will use managed services and you will have a complete pipeline without hosting any server or backend service.
 
 ## Step 1: Clickhouse Setup
+
 You can create a managed service from [Clickhouse Cloud](https://https://clickhouse.cloud/) with a 30 days free trial. Select your region and enter a name for your service. For simplicity, you can allow access to the service from anywhere. If you want to restrict to the IP addresses here is the list of Upstash addresses that needs permission:
+
 ```text
 52.48.149.7
 52.213.40.91
@@ -18,11 +20,12 @@ You can create a managed service from [Clickhouse Cloud](https://https://clickho
 34.195.190.47
 ```
 
-
 ![create clickhouse service](/blog/clickhouse/ss1.png)
 
 ### Create a table
+
 On Clickhouse service screen click on `Open SQL console`. Click on `+` to open a new query window and run the following query to create a table:
+
 ```
 CREATE TABLE events
 (
@@ -31,11 +34,12 @@ CREATE TABLE events
 )
 ORDER BY (name)
 ```
+
 &nbsp;
 ![create clickhouse table](/blog/clickhouse/ss7.png)
 
-
 ## Step 2: Kafka Setup
+
 We will create an [Upstash Kafka cluster](https://console.upstash.com/kafka). Upstash offers serverless Kafka cluster with per message pricing. Select the same (or nearest) region with region of Clickhouse for the best performance.
 &nbsp;
 
@@ -46,12 +50,11 @@ Also create a topic whose messages will be streamed to Clickhouse.
 
 ![create kafka topic](/blog/clickhouse/ss9.png)
 
-
 ## Step 3: Connector Setup
+
 We will create a connector on [Upstash console](https://console.upstash.com/kafka). Select your cluster and click on `Connectors` tab. Select `Aiven JDBC Connector - Sink`
 
 ![create clickhouse table](/blog/clickhouse/ss2.png)
-
 
 Click next to skip the Config step as we will enter the configuration manually at the third (Advanced) step.
 
@@ -59,8 +62,8 @@ In the third step. copy paste the below config to the text editor:
 
 ```json
 {
-    "name": "kafka-clickhouse",
-    "properties": {
+  "name": "kafka-clickhouse",
+  "properties": {
     "auto.create": false,
     "auto.evolve": false,
     "batch.size": 10,
@@ -77,7 +80,7 @@ In the third step. copy paste the below config to the text editor:
     "topics": "events",
     "value.converter": "org.apache.kafka.connect.json.JsonConverter",
     "value.converter.schemas.enable": true
-	}
+  }
 }
 ```
 
@@ -96,31 +99,33 @@ Note that there should be `?ssl=true` as a parameter for the connection.url.
 
 Click the `Connect` button to create the connector.
 
-
 ## Step 4: Test and Run
+
 Now it is time to check if the configurations are correct. Go to your Upstash Kafka dashboard select your cluster. Click on `Topics` tab and select the topic that you have created at step 2. In the topic page, select the `Messages` tab. Enter the below json to the text area:
+
 ```json
 {
-	"schema": {
-		"type": "struct",
-		"optional": false,
-		"version": 1,
-		"fields": [{
-				"field": "name",
-				"type": "string",
-				"optional": false
-			},
-			{
-				"field": "value",
-				"type": "string",
-				"optional": true
-			}
-		]
-	},
-	"payload": {
-		"name": "hello",
-		"value": "world!"
-	}
+  "schema": {
+    "type": "struct",
+    "optional": false,
+    "version": 1,
+    "fields": [
+      {
+        "field": "name",
+        "type": "string",
+        "optional": false
+      },
+      {
+        "field": "value",
+        "type": "string",
+        "optional": true
+      }
+    ]
+  },
+  "payload": {
+    "name": "hello",
+    "value": "world!"
+  }
 }
 ```
 
@@ -129,11 +134,11 @@ Now it is time to check if the configurations are correct. Go to your Upstash Ka
 Click on `Send` several times. You may update payload and `Send` again.
 
 <Note>
-Yes, I know it is not ideal to send the schema together with payload. Schema registry is a solution. Upstash will launch managed schema registry service soon.
+  Yes, I know it is not ideal to send the schema together with payload. Schema
+  registry is a solution. Upstash will launch managed schema registry service
+  soon.
 </Note>
 
 Now, go to the Clickhouse console. `Connect` > `Open SQL console`. Click on `events` (your table's name) on the left menu. You should see the table is populated like below:
 
 ![create kafka topic](/blog/clickhouse/ss6.png)
-
-

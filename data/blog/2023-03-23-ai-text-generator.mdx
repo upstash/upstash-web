@@ -57,7 +57,7 @@ Once you have that copied, you are going to add the items we saved from the abov
 
 It should look something like this:
 
-``` shell
+```shell
 // .env
 
 REPLICATE_API_KEY="your_replicate_api_key_from_above"
@@ -69,11 +69,11 @@ UPSTASH_REDIS_REST_TOKEN="your_upstash_redis_rest__token_from_above"
 
 Once you have included this information you should be able to run the project by entering these commands into a terminal:
 
-``` shell
+```shell
 npm install
 ```
 
-``` shell
+```shell
 npm run dev
 ```
 
@@ -95,7 +95,7 @@ to the backend for BLIP ML API processing and then displays the response text in
 
 Inside the project, we are going to set up our upstash redis client that we can reference throughout the project when necessary.
 
-``` typescript
+```typescript
 // `/utils/redis.ts`
 
 import { Redis } from "@upstash/redis";
@@ -119,7 +119,7 @@ are undefined, the redis variable is set to undefined. Finally, the redis variab
 
 ## Uploading an Image
 
-``` typescript
+```typescript
 // `/pages/captions.tsx`
 
 const uploader = Uploader({
@@ -174,7 +174,7 @@ The options object contains various options for the uploader. These include:
 - styles: Defines custom styles for the uploader UI.
 - onValidate: Defines a function that is called to validate each file before it is uploaded. In this case, the function uses a NSFWPredictor to check if the image is safe for work. If the image is not safe, an error message is returned indicating that the image is not allowed.
 
-``` typescript
+```typescript
 // `/pages/captions.tsx` continued
 
 const Home: NextPage = () => {
@@ -253,7 +253,7 @@ Finally, there is an asynchronous function named generateCaption that takes in a
 
 ### Rate Limiting
 
-``` typescript
+```typescript
 // `/pages/api/generate.ts`
 
 import redis from "../../utils/redis";
@@ -289,7 +289,7 @@ limiter that allows 5 requests every 1440 minutes (24 hours). The redis property
 to enable rate limiting across multiple instances of the application. If redis is undefined (e.g., if the Redis database is not configured),
 ratelimit is also set to undefined. This means that rate limiting will not be applied if Redis is not available.
 
-``` typescript
+```typescript
 // `/pages/api/generate.ts` continued
 
 export default async function handler(
@@ -325,7 +325,7 @@ status code and an error message are sent in the response, and the function retu
 
 ### BLIP ML API
 
-``` typescript
+```typescript
 // `/pages/api/generate.ts` continued
 
  const imageUrl = req.body.imageUrl;
@@ -367,7 +367,7 @@ Scroll down until the version number shows up, outlined in red.
 And outlined in blue are the input parameters you can use.
 ![Alt Text](/blog/ai-text-generator/replicate-ml-model-version.png)
 
-``` typescript
+```typescript
 // `/pages/api/generate.ts` continued
 
   let jsonStartResponse = await startResponse.json();
@@ -403,7 +403,7 @@ Next, a while loop is used to poll the endpointUrl in 1-second intervals until t
 
 Finally, the caption is returned as a JSON response with a status code of 200 if it's not null, otherwise, a response with the message "Failed to generate caption" is returned with a status code of 200.
 
-# Conclusion
+## Conclusion
 
 In conclusion, this project has provided valuable experience in implementing image uploading, rate limiting and integrating machine learning APIs.
 By successfully completing this project, we have gained a better understanding of these technologies and how they can be utilized to create more advanced projects in the future.

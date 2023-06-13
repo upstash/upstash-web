@@ -17,7 +17,7 @@
 ![](public/readme/note-info.png)
 
 ```mdx
-<Note info>
+<Note type="info">
     You can use any Redis® client, but we recommend @upstash/redis
 </Note>
 ```
@@ -25,7 +25,7 @@
 ![](public/readme/note-tip.png)
 
 ```mdx
-<Note tip>
+<Note type="tip">
     You can use any Redis® client, but we recommend @upstash/redis
 </Note>
 ```
@@ -33,7 +33,7 @@
 ![](public/readme/note-caution.png)
 
 ```mdx
-<Note caution>
+<Note type="caution">
     You can use any Redis® client, but we recommend @upstash/redis
 </Note>
 ```
@@ -41,7 +41,7 @@
 ![](public/readme/note-danger.png)
 
 ```mdx
-<Note danger>
+<Note type="danger">
     You can use any Redis® client, but we recommend @upstash/redis
 </Note>
 ```

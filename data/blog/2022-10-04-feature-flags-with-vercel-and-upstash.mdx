@@ -29,7 +29,6 @@ Our first step is creating a new Next.js project. You do this with the following
 $ npx create-next-app upstash-next-feature-flags
 ```
 
-
 ### Creating the Upstash Redis® Connection
 
 Next, we must connect our Next.js app with an Upstash Redis® database. For this, we need to install the `@upstash/redis` package and create a small wrapper around it.
@@ -41,17 +40,17 @@ $ npm i @upstash/redis
 Create a file at `upstash-next-feature-flags/lib/featureFlags.js` with this code:
 
 ```javascript
-import { Redis } from "@upstash/redis"
+import { Redis } from "@upstash/redis";
 
-const { UPSTASH_TOKEN, UPSTASH_URL } = process.env
+const { UPSTASH_TOKEN, UPSTASH_URL } = process.env;
 const redis = new Redis({
   token: UPSTASH_TOKEN,
   url: UPSTASH_URL,
-})
+});
 
 export async function flagIsActive(flagName) {
-  const flag = await redis.get(flagName)
-  return Boolean(flag)
+  const flag = await redis.get(flagName);
+  return Boolean(flag);
 }
 ```
 
@@ -66,49 +65,49 @@ For this, create a file at `upstash-next-feature-flags/pages/api/sort-numbers.js
 It should have this code:
 
 ```javascript
-import { flagIsActive } from "../../lib/featureFlags"
+import { flagIsActive } from "../../lib/featureFlags";
 
 export default async function handler(request, response) {
-  let sort = bucketSort
+  let sort = bucketSort;
 
-  const newSortingAlgorithm = await flagIsActive("newSortingAlgorithm")
+  const newSortingAlgorithm = await flagIsActive("newSortingAlgorithm");
 
-  if (newSortingAlgorithm) sort = selectionSort
+  if (newSortingAlgorithm) sort = selectionSort;
 
-  const { numbers } = request.body
-  const sorted = sort(numbers)
+  const { numbers } = request.body;
+  const sorted = sort(numbers);
 
   response.status(200).json({
     numbers: sorted,
     newSortingAlgorithm,
-  })
+  });
 }
 
 // old sorting algorithm
 const bucketSort = (arr, size = 5) => {
-  const min = Math.min(...arr)
-  const max = Math.max(...arr)
+  const min = Math.min(...arr);
+  const max = Math.max(...arr);
   const buckets = Array.from(
     { length: Math.floor((max - min) / size) + 1 },
     () => []
-  )
+  );
   arr.forEach((val) => {
-    buckets[Math.floor((val - min) / size)].push(val)
-  })
-  return buckets.reduce((acc, b) => [...acc, ...b.sort((a, b) => a - b)], [])
-}
+    buckets[Math.floor((val - min) / size)].push(val);
+  });
+  return buckets.reduce((acc, b) => [...acc, ...b.sort((a, b) => a - b)], []);
+};
 
 // new sorting algorithm
 const selectionSort = (arr) => {
-  const a = [...arr]
+  const a = [...arr];
   for (let i = 0; i < a.length; i++) {
     const min = a
       .slice(i + 1)
-      .reduce((acc, val, j) => (val < a[acc] ? j + i + 1 : acc), i)
-    if (min !== i) [a[i], a[min]] = [a[min], a[i]]
+      .reduce((acc, val, j) => (val < a[acc] ? j + i + 1 : acc), i);
+    if (min !== i) [a[i], a[min]] = [a[min], a[i]];
   }
-  return a
-}
+  return a;
+};
 ```
 
 This API route is a simple number sorter. It takes an array of unsorted numbers and will use one of two sorting algorithms to sort them.
@@ -124,7 +123,6 @@ After sorting, the API route responds with the sorted array.
 After implementing everything, we need to push the project to a repository on GitHub to make it accessible for Verce’ls deployment service. [GitHub explains how to create a repository in their docs](https://docs.github.com/en/get-started/quickstart/create-a-repo).
 
 Creating an empty repository will automatically show you how you can link it with the project we created.
-
 
 ### Creating an Upstash Redis® Database
 
@@ -173,11 +171,12 @@ If we would delete `newSortingAlgorithm` or set it to `0`, it would switch the f
 The last thing missing is the actual use of the API route. We must send a JSON object via a POST request to the route. An easy way to do this is with cURL.
 
 The following command sends such an object:
- ```
-    $ curl --header "Content-Type: application/json" \
-      --request POST \
-      --data '{"numbers":[1, 100, 10, 1000, 100000, 10000]}' \
-      API_ROUTE_URL
+
+```
+   $ curl --header "Content-Type: application/json" \
+     --request POST \
+     --data '{"numbers":[1, 100, 10, 1000, 100000, 10000]}' \
+     API_ROUTE_URL
 ```
 
 You have to find the correct API_ROUTE_URL in Vercel. You should see a “Domains” category in your project on the Vercel dashboard, like in Figure 7.

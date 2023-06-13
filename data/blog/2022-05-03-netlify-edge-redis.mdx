@@ -31,7 +31,7 @@ if you want to skip the below steps._
 Create an empty Node project (`npm init`) and create `hello.js`
 under `netlify>edge-functions` as below:
 
-```js:hello.js
+```js title="hello.js"
 import { Redis } from "https://deno.land/x/upstash_redis@v1.3.2/mod.ts";
 
 export default async () => {

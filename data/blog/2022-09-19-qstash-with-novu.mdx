@@ -83,43 +83,48 @@ to another serverless function. The only real purpose of this function is to use
 secrets to authenticate with other services, instead of exposing them in the
 frontend.
 
-```ts:/api/add.ts
+```ts title="/api/add.ts"
 import { NextApiRequest, NextApiResponse } from "next";
-import { Client } from "@upstash/qstash"
+import { Client } from "@upstash/qstash";
 import assert from "assert";
 
-export default async function (req: NextApiRequest, res: NextApiResponse): Promise<void> {
-    try {
+export default async function (
+  req: NextApiRequest,
+  res: NextApiResponse
+): Promise<void> {
+  try {
+    const qstashToken = process.env.QSTASH_TOKEN;
+    assert(qstashToken, "QSTASH_TOKEN is not defined");
 
-        const qstashToken = process.env.QSTASH_TOKEN;
-        assert(qstashToken, "QSTASH_TOKEN is not defined");
+    const qstash = new Client({
+      token: qstashToken,
+    });
 
-        const qstash = new Client({
-            token: qstashToken,
-        })
+    const { userId, x, y } = req.body as {
+      userId: string;
+      x: number;
+      y: number;
+    };
 
-        const { userId, x, y } = req.body as { userId: string, x: number, y: number }
+    await qstash.publishJSON({
+      url: `https://${process.env.VERCEL_URL}/api/task/process`,
+      retries: 3,
+      body: {
+        userId,
+        x,
+        y,
+      },
+    });
 
-        await qstash.publishJSON({
-            url: `https://${process.env.VERCEL_URL}/api/task/process`,
-            retries: 3,
-            body: {
-                userId,
-                x,
-                y,
-            }
-        })
-
-        res.status(201)
-        res.send("OK")
-        return
-
-    } catch (error) {
-        console.error((error as Error).message)
-        res.status(500).json({ error: (error as Error).message })
-    } finally {
-        res.end()
-    }
+    res.status(201);
+    res.send("OK");
+    return;
+  } catch (error) {
+    console.error((error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  } finally {
+    res.end();
+  }
 }
 ```
 
@@ -129,69 +134,69 @@ Here we receive the message from QStash and do the calculation. We also
 introduce a random error component just to highlight the retry capabilities of
 QStash.
 
-```ts:/api/process.ts
+```ts title="/api/process.ts"
 import { Novu } from "@novu/node";
 import { verifySignature } from "@upstash/qstash/nextjs";
 import assert from "assert";
 import { NextApiRequest, NextApiResponse } from "next";
 
-
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-    try {
-        const { userId, x, y } = req.body as { userId: string, x: number, y: number }
+  try {
+    const { userId, x, y } = req.body as {
+      userId: string;
+      x: number;
+      y: number;
+    };
 
-        const novuApiKey = process.env.NOVU_API_KEY;
-        assert(novuApiKey, "NOVU_API_KEY is not defined")
-        const novu = new Novu(novuApiKey)
+    const novuApiKey = process.env.NOVU_API_KEY;
+    assert(novuApiKey, "NOVU_API_KEY is not defined");
+    const novu = new Novu(novuApiKey);
 
-        const rng = Math.random()
-        const success = rng > 0.5
+    const rng = Math.random();
+    const success = rng > 0.5;
 
-        if (success) {
-            await novu.trigger('add.success',  {
-                to: {
-                    subscriberId: userId
-                },
-                payload: {
-                    x,
-                    y,
-                    result: x + y
-                }
-            })
-            return res.send("ok")
-
-        }
-
-        if (!success) {
-            const error = "simulated error"
-            await novu.trigger('add.failure', {
-                to: {
-                    subscriberId: userId
-                },
-                payload: {
-                    x,
-                    y,
-                    error
-                }
-            })
-            return res.status(500).send(error)
-
-        }
-
-    } catch (error) {
-        console.error((error as Error).message)
-        res.status(500).json({ error: (error as Error).message })
-    } finally {
-        res.end()
+    if (success) {
+      await novu.trigger("add.success", {
+        to: {
+          subscriberId: userId,
+        },
+        payload: {
+          x,
+          y,
+          result: x + y,
+        },
+      });
+      return res.send("ok");
     }
+
+    if (!success) {
+      const error = "simulated error";
+      await novu.trigger("add.failure", {
+        to: {
+          subscriberId: userId,
+        },
+        payload: {
+          x,
+          y,
+          error,
+        },
+      });
+      return res.status(500).send(error);
+    }
+  } catch (error) {
+    console.error((error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  } finally {
+    res.end();
+  }
 }
 
 export default verifySignature(handler);
 
 export const config = {
-    api: {
-        bodyParser: false,
-    },
+  api: {
+    bodyParser: false,
+  },
 };
 ```
 

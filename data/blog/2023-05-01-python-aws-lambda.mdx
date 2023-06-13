@@ -41,7 +41,7 @@ The first thing to do is adding the environment variables. From the `shortener` 
 
 Now we can start coding. Return back to the **Code** section of `shortener` function, and paste the code below. This will provide us the connection to Upstash Redis Database.
 
-``` python
+```python
 import random
 import string
 import json
@@ -64,7 +64,7 @@ Then we will be implementing our main shortener algorithm. What this code snippe
 
 Just below the Redis client creation, add the `generate_short_url` and `lambda_handler` functions.
 
-``` python
+```python
 def generate_short_url():
 	# Define the character set for generating the short URLs
     CHARSET = string.ascii_letters + string.digits
@@ -255,24 +255,25 @@ Within the `<body>` block, we'll have the main HTML elements.
 
 ```html
 <div class="container mt-5">
-	<h1 class="text-center mb-4">URL Shortener</h1>
-	<div class="row justify-content-center">
-		<div class="col-md-6">
-			<div class="input-group mb-3">
-				<input
-				type="text"
-				class="form-control"
-				id="url-input"
-				placeholder="Enter URL to shorten"/>
-				<div class="input-group-append">
-					<button class="btn btn-primary" type="button" id="shorten-btn">
-					Shorten
-					</button>
-				</div>
-			</div>
-			<a id="short-url" class="d-none"></a>
-		</div>
-	</div>
+  <h1 class="mb-4 text-center">URL Shortener</h1>
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="input-group mb-3">
+        <input
+          type="text"
+          class="form-control"
+          id="url-input"
+          placeholder="Enter URL to shorten"
+        />
+        <div class="input-group-append">
+          <button class="btn btn-primary" type="button" id="shorten-btn">
+            Shorten
+          </button>
+        </div>
+      </div>
+      <a id="short-url" class="d-none"></a>
+    </div>
+  </div>
 </div>
 ```
 
@@ -286,21 +287,21 @@ After adding the elements, only the data fetching from the API Gateway remains. 
 
 <!-- Add custom JS -->
 <script>
-	const shortenBtn = document.getElementById("shorten-btn");
-	const urlInput = document.getElementById("url-input");
-	const urlOutput = document.getElementById("short-url");
+  const shortenBtn = document.getElementById("shorten-btn");
+  const urlInput = document.getElementById("url-input");
+  const urlOutput = document.getElementById("short-url");
 
-	shortenBtn.addEventListener("click", async function () {
-		let long_url = urlInput.value;
-			const apiUrl = `<INVOKE_URL>/shortener?long_url="${long_url}"`;
-		const response = await fetch(apiUrl);
-		const data = await response.json();
-		shortUrl = data.short_url;
+  shortenBtn.addEventListener("click", async function () {
+    let long_url = urlInput.value;
+    const apiUrl = `<INVOKE_URL>/shortener?long_url="${long_url}"`;
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+    shortUrl = data.short_url;
 
-		urlOutput.innerHTML = shortUrl;
-		urlOutput.href = shortUrl;
-		urlOutput.classList.remove("d-none");
-	});
+    urlOutput.innerHTML = shortUrl;
+    urlOutput.href = shortUrl;
+    urlOutput.classList.remove("d-none");
+  });
 </script>
 ```
 

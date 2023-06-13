@@ -8,15 +8,19 @@ tags: [serverless, nextjs, redis, rate-limiting]
 In this article, we will show how to rate limit your Next.js API routes using the [Upstash Rate limit SDK](https://github.com/upstash/ratelimit)
 
 ### Database Setup
+
 Create a Redis database using [Upstash Console](https://console.upstash.com) or [Upstash CLI](https://github.com/upstash/cli). Copy the `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` for the next steps.
 
 ### Project Setup
+
 We will create a Next.js application and deploy to Vercel.
+
 ```shell
 npx create-next-app@latest
 ```
 
 Install @upstash/ratelimit:
+
 ```shell
 npm install @upstash/ratelimit @upstash/redis
 ```
@@ -25,7 +29,7 @@ npm install @upstash/ratelimit @upstash/redis
 
 Update your `pages/api/hello.js` as below and replace `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`.
 
-``` js:pages/api/hello.js
+```js:pages/api/hello.js
 import {Ratelimit} from "@upstash/ratelimit";
 import {Redis} from "@upstash/redis";
 
@@ -61,6 +65,7 @@ export default async function handler(req, res) {
 Here, we allow 5 requests per 5 seconds.
 
 ### Run
+
 Run the app with `npm run dev`. Refresh the browser more than 5 times and you will see the rate limiting in action.
 
 ```text
@@ -68,23 +73,27 @@ Run the app with `npm run dev`. Refresh the browser more than 5 times and you wi
 ```
 
 ### Possible Enhancements
+
 - Use your user's id or IP address as identifier to limit the usage per user.
+
 ```js
-   const identifier = getClientIp(req);
-   const result = await ratelimit.limit(identifier);
+const identifier = getClientIp(req);
+const result = await ratelimit.limit(identifier);
 ```
 
 - Use [Sliding Window Algorithm](https://github.com/upstash/ratelimit#sliding-window) for a smoother (but more expensive) rate limiting experience.
+
 ```js
- const ratelimit = new Ratelimit({
+const ratelimit = new Ratelimit({
   redis: redis,
   limiter: Ratelimit.slidingWindow(10, "10 s"),
 });
 ```
 
 - Use [Token Bucket Algorithm](https://github.com/upstash/ratelimit#token-bucket) to tolerate some amount of spike.
+
 ```js
- const ratelimit = new Ratelimit({
+const ratelimit = new Ratelimit({
   redis: redis,
   limiter: Ratelimit.tokenBucket(5, "10 s", 10),
 });

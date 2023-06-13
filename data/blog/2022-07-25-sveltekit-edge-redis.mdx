@@ -1,9 +1,9 @@
 ---
 slug: sveltekit-edge-redis
-title: 'Building a Guest Book on the Edge with SvelteKit, Upstash Redis® and Vercel'
+title: "Building a Guest Book on the Edge with SvelteKit, Upstash Redis® and Vercel"
 author: geoff
 tags: [sveltekit, edge, redis, vercel]
-tweetUrl: https://twitter.com/upstash/status/1551664802858164224
+tweet: https://twitter.com/upstash/status/1551664802858164224
 ---
 
 > This post was updated in December 2022 and is now compatible with [SvelteKit 1.0](https://svelte.dev/blog/announcing-sveltekit-1.0).
@@ -35,7 +35,7 @@ One cool thing is that the data is submitted via a `<form>`, so it does _not_ ne
 
 ```html
 <form action="/" method="post" use:enhance>
-	<button>I was here</button>
+  <button>I was here</button>
 </form>
 ```
 
@@ -48,24 +48,24 @@ Since we’re planning to deploy the app to Vercel, we can use Vercel’s [edge 
 The relevant headers names are already in `src/lib/constants.ts` for our use. Import them at the top of `src/routes/+page.server.ts`.
 
 ```tsx
-import { CITY_HEADER, COUNTRY_HEADER } from '$lib/constants';
+import { CITY_HEADER, COUNTRY_HEADER } from "$lib/constants";
 ```
 
 Then replace the existing `get_city` function with the following:
 
 ```tsx
 function get_city(request: Request) {
-	const city = request.headers.get(CITY_HEADER) ?? 'unknown city';
-	const country = get_country_name(request.headers.get(COUNTRY_HEADER));
-	return `${city}, ${country}`;
+  const city = request.headers.get(CITY_HEADER) ?? "unknown city";
+  const country = get_country_name(request.headers.get(COUNTRY_HEADER));
+  return `${city}, ${country}`;
 }
 
-const display_names = new Intl.DisplayNames(['en'], { type: 'region' });
+const display_names = new Intl.DisplayNames(["en"], { type: "region" });
 function get_country_name(country_code: string | null) {
-	if (country_code) {
-		return display_names.of(country_code);
-	}
-	return 'unknown country';
+  if (country_code) {
+    return display_names.of(country_code);
+  }
+  return "unknown country";
 }
 ```
 
@@ -74,17 +74,17 @@ This method will retrieve the city and country from the request headers, falling
 This will work great when deployed, but these headers won’t be automatically set when developing. Fortunately, the starter project already adds custom code in SvelteKit’s [handle hook](https://kit.svelte.dev/docs/hooks#server-hooks-handle) to add these headers in development.
 
 ```tsx
-import type { Handle } from '@sveltejs/kit';
-import { COUNTRY_HEADER, CITY_HEADER } from '$lib/constants';
-import { dev } from '$app/environment';
+import type { Handle } from "@sveltejs/kit";
+import { COUNTRY_HEADER, CITY_HEADER } from "$lib/constants";
+import { dev } from "$app/environment";
 
 export const handle: Handle = async function ({ event, resolve }) {
-	if (dev) {
-		event.request.headers.append(CITY_HEADER, 'Kakariko Village');
-		event.request.headers.append(COUNTRY_HEADER, 'JP');
-	}
-	const response = await resolve(event);
-	return response;
+  if (dev) {
+    event.request.headers.append(CITY_HEADER, "Kakariko Village");
+    event.request.headers.append(COUNTRY_HEADER, "JP");
+  }
+  const response = await resolve(event);
+  return response;
 };
 ```
 
@@ -110,45 +110,50 @@ We can access these values in our code using SvelteKit's [`$env` module](https:/
 Now, update our `get_visitors` and `add_visitor` functions in `/src/lib/data.ts` to read and write data from our Redis® instance.
 
 ```tsx
-import { Redis } from '@upstash/redis';
-import { UPSTASH_REDIS_REST_TOKEN, UPSTASH_REDIS_REST_URL } from '$env/static/private';
+import { Redis } from "@upstash/redis";
+import {
+  UPSTASH_REDIS_REST_TOKEN,
+  UPSTASH_REDIS_REST_URL,
+} from "$env/static/private";
 
 interface Visit {
-	city: string;
-	count: string;
+  city: string;
+  count: string;
 }
 
-const set_name = 'visitors';
+const set_name = "visitors";
 
 export async function get_visitors(): Promise<Visit[]> {
-	const redis = get_redis();
-	const visitors = await redis.zrange<string[]>(set_name, 0, -1, { withScores: true });
-	return adapt_visitors(visitors);
+  const redis = get_redis();
+  const visitors = await redis.zrange<string[]>(set_name, 0, -1, {
+    withScores: true,
+  });
+  return adapt_visitors(visitors);
 }
 
 export async function add_visitor(city: string) {
-	const redis = get_redis();
-	await redis.zincrby(set_name, 1, city);
+  const redis = get_redis();
+  await redis.zincrby(set_name, 1, city);
 }
 
 function get_redis() {
-	return new Redis({
-		url: UPSTASH_REDIS_REST_URL,
-		token: UPSTASH_REDIS_REST_TOKEN
-	});
+  return new Redis({
+    url: UPSTASH_REDIS_REST_URL,
+    token: UPSTASH_REDIS_REST_TOKEN,
+  });
 }
 
 // takes the result from ZRANGE and adapt it into a list of visits
 // e.g. ['Seattle', '2', 'Los Angeles', '1'] becomes
 // [ { city: 'Seattle', count: '2'}, { city: 'Los Angeles', count: '1' } ]
 function adapt_visitors(visitors: string[]): Visit[] {
-	const adapted: Visit[] = [];
-	for (let i = 0; i < visitors.length; i += 2) {
-		const member = visitors[i];
-		const score = visitors[i + 1];
-		adapted.push({ city: decodeURIComponent(member), count: score });
-	}
-	return adapted;
+  const adapted: Visit[] = [];
+  for (let i = 0; i < visitors.length; i += 2) {
+    const member = visitors[i];
+    const score = visitors[i + 1];
+    adapted.push({ city: decodeURIComponent(member), count: score });
+  }
+  return adapted;
 }
 ```
 
@@ -163,18 +168,18 @@ These methods are already used in our `+page.server.ts` file, so you should now 
 With those changes in place, we can deploy the project to Vercel Edge Functions. In SvelteKit, this is as simple as using the Vercel adapter and passing `{edge: true}` to the adapter options. This should already be done in the provided starter project.
 
 ```jsx
-import adapter from '@sveltejs/adapter-vercel';
-import preprocess from 'svelte-preprocess';
+import adapter from "@sveltejs/adapter-vercel";
+import preprocess from "svelte-preprocess";
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-	// Consult https://github.com/sveltejs/svelte-preprocess
-	// for more information about preprocessors
-	preprocess: preprocess(),
+  // Consult https://github.com/sveltejs/svelte-preprocess
+  // for more information about preprocessors
+  preprocess: preprocess(),
 
-	kit: {
-		adapter: adapter({ edge: true })
-	}
+  kit: {
+    adapter: adapter({ edge: true }),
+  },
 };
 
 export default config;

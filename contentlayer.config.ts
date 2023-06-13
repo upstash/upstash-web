@@ -1,19 +1,41 @@
 import { defineDocumentType, makeSource } from "contentlayer/source-files";
-import rehypePrism from "rehype-prism-plus";
+
 import readingTime from "reading-time";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import rehypePrettyCode from "rehype-pretty-code";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
-import rehypeCodeTitles from "rehype-code-titles";
-import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import authors from "./authors";
-import { bundleMDX } from "mdx-bundler";
-import { tocPlugin } from "./utils/contentlayerPlugins";
+import authors from "./utils/authors";
 
-export type PostHeading = { level: 2 | 3; title: string; slug: string };
+export const DocRedis = defineDocumentType(() => ({
+  name: "DocRedis",
+  filePathPattern: `docs/redis/**/*.mdx`,
+  contentType: "mdx",
+  fields: {
+    title: {
+      type: "string",
+      required: true,
+    },
+    description: {
+      type: "string",
+    },
+    published: {
+      type: "boolean",
+      default: true,
+    },
+  },
+  computedFields: {
+    slug: {
+      type: "string",
+      resolve: (doc) => doc._raw.flattenedPath.split("/").slice(2).join("/"),
+    },
+  },
+}));
 
 export const Job = defineDocumentType(() => ({
   name: "Job",
-  filePathPattern: `job/*.md`,
+  filePathPattern: `job/*.mdx`,
+  contentType: "mdx",
   fields: {
     title: { type: "string", required: true },
     summary: { type: "string", required: true },
@@ -26,7 +48,17 @@ export const Job = defineDocumentType(() => ({
   computedFields: {
     slug: {
       type: "string",
-      resolve: (doc) => doc._raw.sourceFileName.replace(/\.md$/, ""),
+      resolve: (doc: any) => doc._raw.flattenedPath.split("/").at(-1),
+    },
+  },
+  authorObj: {
+    type: "json",
+    resolve: (doc) => {
+      const author = authors[doc.author as keyof typeof authors];
+      return {
+        ...author,
+        photo: `/authors/${author.image}`,
+      };
     },
   },
 }));
@@ -40,15 +72,20 @@ export const Post = defineDocumentType(() => ({
     title: { type: "string", required: true },
     description: { type: "string" },
     author: { type: "string", required: true },
-    tags: { type: "json", required: true },
+    tags: { type: "json", of: "string", required: true },
     image: { type: "string" },
-    tweetUrl: { type: "string" },
+    tweet: { type: "string" },
+    draft: { type: "boolean" },
   },
   computedFields: {
-    url: {
-      type: "string",
+    authorObj: {
+      type: "json",
       resolve: (doc) => {
-        return `https://upstash.com/blog/${doc.slug}`;
+        const author = authors[doc.author as keyof typeof authors];
+        return {
+          ...author,
+          photo: `/authors/${author.image}`,
+        };
       },
     },
     readingTime: {
@@ -63,54 +100,41 @@ export const Post = defineDocumentType(() => ({
         return doc._raw.sourceFileName.substring(-1, 10);
       },
     },
-    authorObj: {
-      type: "json",
-      resolve: (doc) => {
-        return { slug: doc.author, ...authors[doc.author] };
-      },
-    },
-    metaImage: {
-      type: "string",
-      resolve: (doc) => {
-        return `https://upstash.com/api/og/blog?title=${doc.title}&author=${doc.author}`;
-      },
-    },
-    headings: {
-      type: "json",
-      resolve: async (doc) => {
-        const headings: PostHeading[] = [];
-
-        await bundleMDX({
-          source: doc.body.raw,
-          mdxOptions: (opts) => {
-            opts.remarkPlugins = [
-              ...(opts.remarkPlugins ?? []),
-              tocPlugin(headings),
-            ];
-            return opts;
-          },
-        });
-
-        return headings;
-      },
-    },
   },
 }));
 
 export default makeSource({
-  contentDirPath: "data",
-  documentTypes: [Job, Post],
+  contentDirPath: "./data",
+  documentTypes: [DocRedis, Job, Post],
   mdx: {
     remarkPlugins: [remarkGfm],
     rehypePlugins: [
       rehypeSlug,
-      rehypeCodeTitles,
-      rehypePrism,
+      [
+        rehypePrettyCode,
+        {
+          theme: "poimandres",
+          onVisitLine(node: any) {
+            // Prevent lines from collapsing in `display: grid` mode, and allow empty
+            // lines to be copy/pasted
+            if (node.children.length === 0) {
+              node.children = [{ type: "text", value: " " }];
+            }
+          },
+          onVisitHighlightedLine(node: any) {
+            node.properties.className.push("line--highlighted");
+          },
+          onVisitHighlightedWord(node: any) {
+            node.properties.className = ["word--highlighted"];
+          },
+        },
+      ],
       [
         rehypeAutolinkHeadings,
         {
           properties: {
-            className: ["anchor"],
+            className: ["subheading-anchor"],
+            ariaLabel: "Link to section",
           },
         },
       ],

@@ -45,7 +45,6 @@ UPSTASH_REDIS_REST_URL=<YOUR_REST_URL>
 UPSTASH_REDIS_REST_TOKEN=<YOUR_REST_TOKEN>
 ```
 
-
 ## Starting Development
 
 First of all, `npm install vercel axios crypto` to install dependencies and Vercel CLI.
@@ -57,77 +56,79 @@ First of all, `npm install vercel axios crypto` to install dependencies and Verc
 > These will help us customize and ease the management of our slackbot.
 
 ```js
-const axios = require('axios');
-import { token } from './_constants';
+const axios = require("axios");
+import { token } from "./_constants";
 
 // Tokenizes the string so that commands can be extracted.
 export function tokenizeString(string) {
-    const array = string.split(" ").filter(element => {
-        return element !== ""
-    })
-    console.log("Tokenized version:", array)
-    return array
+  const array = string.split(" ").filter((element) => {
+    return element !== "";
+  });
+  console.log("Tokenized version:", array);
+  return array;
 }
 
 // Posts to a channel with given name with given text/payload.
 export async function postToChannel(channel, res, payload) {
+  console.log("channel:", channel);
+  var channelId = await channelNameToId(channel);
 
-    console.log("channel:", channel)
-    var channelId = await channelNameToId(channel)
+  console.log("ID:", channelId);
 
-    console.log("ID:", channelId)
+  const message = {
+    channel: channelId,
+    text: payload,
+  };
 
-    const message = {
-        channel: channelId,
-        text: payload,
-    }
-
-    axios({
-        method: 'post',
-        url: 'https://slack.com/api/chat.postMessage',
-        headers: { 'Content-Type': 'application/json; charset=utf-8', 'Authorization': `Bearer ${token}` },
-        data: message,
+  axios({
+    method: "post",
+    url: "https://slack.com/api/chat.postMessage",
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      Authorization: `Bearer ${token}`,
+    },
+    data: message,
+  })
+    .then((response) => {
+      console.log("data from axios:", response.data);
+      res.json({ ok: true });
     })
-        .then(response => {
-            console.log("data from axios:", response.data)
-            res.json({ ok: true })
-        })
-        .catch(err => {
-            console.log("axios Error:", err)
-            res.send({
-                "response_type": "ephemeral",
-                "text": `${err.response.data.error}`
-            })
-        })
-
+    .catch((err) => {
+      console.log("axios Error:", err);
+      res.send({
+        response_type: "ephemeral",
+        text: `${err.response.data.error}`,
+      });
+    });
 }
 
 // Converts the given channel name to channel id since post works with ids.
 async function channelNameToId(channelName) {
-    var generalId
-    var id
-    await axios({
-        method: 'post',
-        url: 'https://slack.com/api/conversations.list',
-        headers: { 'Content-Type': 'application/json; charset=utf-8', 'Authorization': `Bearer ${token}` },
+  var generalId;
+  var id;
+  await axios({
+    method: "post",
+    url: "https://slack.com/api/conversations.list",
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((response) => {
+      response.data.channels.forEach((element) => {
+        if (element.name === channelName) {
+          id = element.id;
+          return element.id;
+        } else if (element.name === "general") generalId = element.id;
+      });
+
+      return generalId;
     })
-        .then(response => {
-            response.data.channels.forEach(element => {
+    .catch((err) => {
+      console.log("axios Error:", err);
+    });
 
-                if (element.name === channelName) {
-                    id = element.id
-                    return element.id
-                }
-                else if(element.name === "general") generalId = element.id
-            });
-
-            return generalId
-        })
-        .catch(err => {
-            console.log("axios Error:", err)
-        })
-
-        return id
+  return id;
 }
 ```
 
@@ -139,21 +140,21 @@ async function channelNameToId(channelName) {
 const crypto = require("crypto");
 
 exports.validateSlackRequest = (event, signingSecret) => {
+  const requestBody = JSON.stringify(event["body"]);
+  const headers = event.headers;
 
-    const requestBody = JSON.stringify(event["body"])
-    const headers = event.headers
+  const timestamp = headers["x-slack-request-timestamp"];
+  const slackSignature = headers["x-slack-signature"];
+  const baseString = "v0:" + timestamp + ":" + requestBody;
 
-    const timestamp = headers["x-slack-request-timestamp"]
-    const slackSignature = headers["x-slack-signature"]
-    const baseString = 'v0:' + timestamp + ':' + requestBody
+  const hmac = crypto
+    .createHmac("sha256", signingSecret)
+    .update(baseString)
+    .digest("hex");
+  const computedSlackSignature = "v0=" + hmac;
+  const isValid = computedSlackSignature === slackSignature;
 
-    const hmac = crypto.createHmac("sha256", signingSecret)
-        .update(baseString)
-        .digest("hex")
-    const computedSlackSignature = "v0=" + hmac
-    const isValid = computedSlackSignature === slackSignature
-
-    return isValid;
+  return isValid;
 };
 ```
 
@@ -165,11 +166,11 @@ exports.validateSlackRequest = (event, signingSecret) => {
 
 ```js
 // These can be filled after Slack configuration
-export const token = process.env.SLACK_BOT_TOKEN
-export const signingSecret = process.env.SLACK_SIGNING_SECRET
+export const token = process.env.SLACK_BOT_TOKEN;
+export const signingSecret = process.env.SLACK_SIGNING_SECRET;
 
-export const redisURL = process.env.UPSTASH_REDIS_REST_URL
-export const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN
+export const redisURL = process.env.UPSTASH_REDIS_REST_URL;
+export const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
 ```
 
 ---
@@ -181,31 +182,40 @@ Create a file named `note.js` with the code:
 > Simply tokenize the coming request from the slash commands. Depending on the command, direct the request to relevant handlers.
 
 ```js
-import { tokenizeString } from './_utils'
-import { setKey } from './slash_handlers/_set_key'
-import { addToList } from './slash_handlers/_add_to_list'
-import { listAll } from './slash_handlers/_list_all'
-import { getKey } from './slash_handlers/_get_key'
-import { removeFromList } from './slash_handlers/_remove_from_list'
+import { tokenizeString } from "./_utils";
+import { setKey } from "./slash_handlers/_set_key";
+import { addToList } from "./slash_handlers/_add_to_list";
+import { listAll } from "./slash_handlers/_list_all";
+import { getKey } from "./slash_handlers/_get_key";
+import { removeFromList } from "./slash_handlers/_remove_from_list";
 
 module.exports = (req, res) => {
-
-  const commandArray = tokenizeString(req.body.text)
-  const action = commandArray[0]
+  const commandArray = tokenizeString(req.body.text);
+  const action = commandArray[0];
 
   switch (action) {
-    case "set": setKey(res, commandArray); break
-    case "get": getKey(res, commandArray); break
-    case "list-set": addToList(res, commandArray); break
-    case "list-all": listAll(res, commandArray); break
-    case "list-remove": removeFromList(res, commandArray); break
+    case "set":
+      setKey(res, commandArray);
+      break;
+    case "get":
+      getKey(res, commandArray);
+      break;
+    case "list-set":
+      addToList(res, commandArray);
+      break;
+    case "list-all":
+      listAll(res, commandArray);
+      break;
+    case "list-remove":
+      removeFromList(res, commandArray);
+      break;
     default:
       res.send({
-        "response_type": "ephemeral",
-        "text": "Wrong usage of the command!"
-      })
+        response_type: "ephemeral",
+        text: "Wrong usage of the command!",
+      });
   }
-}
+};
 ```
 
 #### Create a directory named `slash_handlers` and inside:
@@ -215,37 +225,35 @@ module.exports = (req, res) => {
 > Using Upstash RESTFUL API, we can simply send a request without the need to create a client to connect to our database. This is one of the strengths of Upstash Redis.
 
 ```js
-const axios = require('axios')
-import { redisURL, redisToken } from '../_constants'
+const axios = require("axios");
+import { redisURL, redisToken } from "../_constants";
 
 export async function setKey(res, commandArray) {
+  let key = commandArray[1];
+  let value = commandArray[2];
 
-    let key = commandArray[1]
-    let value = commandArray[2]
-
-    await axios({
-        url: `${redisURL}/set/${key}/${value}`,
-        headers: {
-            "Authorization": `Bearer ${redisToken}`
-        }
+  await axios({
+    url: `${redisURL}/set/${key}/${value}`,
+    headers: {
+      Authorization: `Bearer ${redisToken}`,
+    },
+  })
+    .then((response) => {
+      console.log("data from axios:", response.data);
+      res.send({
+        response_type: "in_channel",
+        text: `Successfully set ${key}=${value}`,
+      });
     })
-        .then(response => {
-            console.log("data from axios:", response.data)
-            res.send({
-                "response_type": "in_channel",
-                "text": `Successfully set ${key}=${value}`
-            })
-        })
-        .catch(err => {
-            console.log("axios Error:", err)
-            res.send({
-                "response_type": "ephemeral",
-                "text": `${err.response.data.error}`
-            })
-        })
+    .catch((err) => {
+      console.log("axios Error:", err);
+      res.send({
+        response_type: "ephemeral",
+        text: `${err.response.data.error}`,
+      });
+    });
 }
 ```
-
 
 ### Handling Events
 
@@ -254,33 +262,36 @@ Create a file named `events.js` with the code:
 > Slack sends a challenge for verification. If this is the case, direct request to that handler. Otherwise, check validity of the request and then direct it to relevant handler functions.
 
 ```js
-import { challenge } from './events_handlers/_challenge'
-import { app_mention } from './events_handlers/_app_mention'
-import { channel_created } from './events_handlers/_channel_created'
-import { validateSlackRequest } from './_validate'
-import { signingSecret } from './_constants'
+import { challenge } from "./events_handlers/_challenge";
+import { app_mention } from "./events_handlers/_app_mention";
+import { channel_created } from "./events_handlers/_channel_created";
+import { validateSlackRequest } from "./_validate";
+import { signingSecret } from "./_constants";
 
 module.exports = async (req, res) => {
-    var type = req.body.type
+  var type = req.body.type;
 
-    if (type === "url_verification") {
-        await challenge(req, res)
-    }
-    else if (validateSlackRequest(req, signingSecret)) {
-        if (type === "event_callback") {
-            var event_type = req.body.event.type
+  if (type === "url_verification") {
+    await challenge(req, res);
+  } else if (validateSlackRequest(req, signingSecret)) {
+    if (type === "event_callback") {
+      var event_type = req.body.event.type;
 
-            switch (event_type) {
-                case "app_mention": await app_mention(req, res); break;
-                case "channel_created": await channel_created(req, res); break;
-                default: break;
-            }
-        }
-        else {
-            console.log("body:", req.body)
-        }
+      switch (event_type) {
+        case "app_mention":
+          await app_mention(req, res);
+          break;
+        case "channel_created":
+          await channel_created(req, res);
+          break;
+        default:
+          break;
+      }
+    } else {
+      console.log("body:", req.body);
     }
-}
+  }
+};
 ```
 
 #### Create a directory named `events_handlers` and inside:
@@ -291,10 +302,9 @@ module.exports = async (req, res) => {
 
 ```js
 export function challenge(req, res) {
-
-    res.status(200).send({
-        "challenge": req.body.challenge
-    })
+  res.status(200).send({
+    challenge: req.body.challenge,
+  });
 }
 ```
 
@@ -303,17 +313,20 @@ export function challenge(req, res) {
 > When our bot is mentioned, this function will be triggered. Simply post a greeting message to any channel with any text you like.
 
 ```js
-import { postToChannel } from "../_utils"
+import { postToChannel } from "../_utils";
 
 export async function app_mention(req, res) {
-    let event = req.body.event
+  let event = req.body.event;
 
-    try {
-        await postToChannel("general", res, `Hi there! Thanks for mentioning me, <@${event.user}>!`)
-    }
-    catch (e) {
-        console.log(e)
-    }
+  try {
+    await postToChannel(
+      "general",
+      res,
+      `Hi there! Thanks for mentioning me, <@${event.user}>!`
+    );
+  } catch (e) {
+    console.log(e);
+  }
 }
 ```
 

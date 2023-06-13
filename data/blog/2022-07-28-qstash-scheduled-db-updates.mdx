@@ -3,7 +3,7 @@ slug: qstash-periodic-data-updates
 title: "Periodic Data Updates with Next.js and Vercel Serverless Functions"
 author: andreas
 tags: [qstash, edge, cron, schedule, serverless, vercel, nextjs]
-tweetUrl: https://twitter.com/upstash/status/1554126359156461570
+tweet: https://twitter.com/upstash/status/1554126359156461570
 ---
 
 For many applications, there is a need to insert or update data in your database
@@ -42,6 +42,7 @@ We need two dependencies to build our example:
   allows us to verify incoming webhooks from Upstash
 
 Install them with:
+
 ```bash
 npm install @upstash/redis @upstash/qstash
 ```
@@ -53,7 +54,7 @@ Let's create a new api route in `/pages/api/cron.ts`, that will be called by
 
 Here are the dependencies:
 
-```ts:pages/api/cron.ts_(1/3)
+```ts title="pages/api/cron.ts" {1/3}
 import { NextApiRequest, NextApiResponse } from "next";
 import { Redis } from "@upstash/redis";
 import { verifySignature } from "@upstash/qstash/nextjs";
@@ -66,10 +67,9 @@ The first step is to get fresh data from the API (blockchain.info in this
 case), and then store it in our database of choice. Here we store the current
 exchange rate together with the current timestamp.
 
-```ts:pages/api/cron.ts_(2/3)
+````ts title="pages/api/cron.ts" {2/3}
 async function handler(_req: NextApiRequest, res: NextApiResponse) {
   try {
-
     /**
      * The API returns something like this:
      * ```json
@@ -102,7 +102,7 @@ async function handler(_req: NextApiRequest, res: NextApiResponse) {
     res.end();
   }
 }
-```
+````
 
 Lastly, we wrap the handler with `verifySignature`, so that we can verify that
 the request is coming from Upstash. You can read more about this in the
@@ -110,7 +110,7 @@ the request is coming from Upstash. You can read more about this in the
 also need to disable automatic parsing of the request body, in order to allow
 `verifySignature` to work properly.
 
-```ts:pages/api/cron.ts_(3/3)
+```ts title="pages/api/cron.ts" {3/3}
 /**
  * Wrap your handler with `verifySignature` to automatically reject all
  * requests that are not coming from Upstash.

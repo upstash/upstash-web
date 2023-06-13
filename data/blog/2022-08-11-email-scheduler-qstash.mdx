@@ -6,7 +6,6 @@ tags: [qstash, vercel, scheduler]
 image: https://dev-to-uploads.s3.amazonaws.com/uploads/articles/heoz05agz9n8uwdf2ymr.jpg
 ---
 
-
 Serverless systems are easy to start, but they can have some growing pains later in their lifecycle. They’re stateless by nature, and liking all the moving parts isn’t easy. Let your serverless functions call each other or put another service, like a queue or database, between your functions. Both solutions were sub-optimal in the past.
 
 If you call a serverless function from another serverless function, you pay for both of them, even if the first one just waits for the second and doesn’t do anything.
@@ -46,23 +45,22 @@ While using the QStash service via an HTTP API, the TypeScript package makes wor
 Next.js comes with superb integration for Vercel functions. Creating an API route will automatically execute inside a serverless Vercel function without additional code changes. For this, create a new JavaScript file at `pages/api/schedule.js` with the following content:
 
 ```javascript
-import { Client } from "@upstash/qstash"
+import { Client } from "@upstash/qstash";
 
 const qstashClient = new Client({
-  token: process.env.QSTASH_TOKEN
-})
+  token: process.env.QSTASH_TOKEN,
+});
 
 export default async function handler(request, response) {
-  if (request.method !== "POST")
-    return response.status(404).end()
+  if (request.method !== "POST") return response.status(404).end();
 
   const qstashResponse = await qstashClient.publishJSON({
     url: `https://${request.headers.host}/api/notify`,
     body: request.body,
     notBefore: request.query.timestamp,
-  })
+  });
 
-  response.status(201).send(qstashResponse)
+  response.status(201).send(qstashResponse);
 }
 ```
 
@@ -83,34 +81,34 @@ To tie everything together, the user would send a request with a text body and a
 Now that we get our messages scheduled to QStash, we need the route to convert them to emails and send them out. For this, create file at `pages/api/notify.js` that contains:
 
 ```javascript
-import nodemailer from "nodemailer"
-import { verifySignature } from "@upstash/qstash/nextjs"
+import nodemailer from "nodemailer";
+import { verifySignature } from "@upstash/qstash/nextjs";
 
 export const config = {
   api: { bodyParser: false },
-}
+};
 
 export default verifySignature(handler, {
   currentSigningKey: process.env.QSTASH_CURRENT_SIGNING_KEY,
   nextSigningKey: process.env.QSTASH_NEXT_SIGNING_KEY,
-})
+});
 
 async function handler(request, response) {
-  const emailAccount = await nodemailer.createTestAccount()
+  const emailAccount = await nodemailer.createTestAccount();
 
   const transport = nodemailer.createTransport({
     host: "smtp.ethereal.email",
     auth: emailAccount,
-  })
+  });
 
   await transport.sendMail({
     from: '"QStash" <qstash@upstash.com>',
     to: "jane.doe@example.com",
     subject: "Notification from QStash",
     text: request.body,
-  })
+  });
 
-  response.send()
+  response.send();
 }
 ```
 
@@ -162,6 +160,7 @@ You can check the delivery of your message in [the Upstash Console](https://cons
 ![Figure 3: Upstash Console](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/y2naopzlriyey1l5wk65.png)
 
 ## Summary
+
 Serverless application development is all about gluing services together. You either let your functions call other functions directly, or you need to put another service between them.
 
 Upstash’s new serverless queuing service comes to the rescue with a straightforward interface and pay-as-you-go pricing.
@@ -180,4 +179,3 @@ It is 100% built on stateless HTTP requests and designed for:
 Have I sparked your interest?
 
 [Give it a try; the first 50 requests per day are on the house!](https://console.upstash.com/login)
-

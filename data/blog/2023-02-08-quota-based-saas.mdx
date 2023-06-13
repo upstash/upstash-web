@@ -5,7 +5,6 @@ author: thomasCazade
 tags: [redis, quota, edge, billing, saas, prisma]
 ---
 
-
 In this post, we will show you how to use Upstash to create a quota system for a SaaS application, made with **Next.js** and **Prisma**. We will use Next.js API routes to create a simple API.
 
 In many SaaS application, you may have encountered a quota system. It is a system that limits the number of actions a user can do in a given time.
@@ -50,13 +49,16 @@ We want to increase the user's quota every time the user makes an API request.
 
 At first glance, this seems easy and straightforward to do. We can simply increase the user's quota by 1 **every time the user makes an API request** on our Next.js API route:
 
-```typescript
+```ts
 // pages/api/spreadsheets/[id]/index.ts
 import type { NextApiRequest, NextApiResponse } from "next";
 
 const MAX_FREE_TIER_QUOTA = 1000;
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   // Get the ID of the spreadsheet from the URL.
   const { id } = req.params;
 
@@ -107,7 +109,7 @@ We will use the `INCR` Redis® command to increase the user's quota by 1. This c
 
 Here is the same code as before, but using Upstash Redis® to manage the user's quota:
 
-```typescript
+```ts
 // pages/api/spreadsheets/[id]/index.ts
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Redis } from "@upstash/redis";
@@ -121,7 +123,10 @@ const redis = new Redis({
   token: process.env.UPSTASH_REDIS_REST_TOKEN!,
 });
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   // Get the ID of the spreadsheet from the URL.
   const { id } = req.params;
 
@@ -136,16 +141,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(404).json({ error: "Spreadsheet not found" });
   }
 
-
   // Redis quota key, unique for each user by its ID.
   const quotaKey = `user:${spreadsheet.user.id}:quota`;
 
   // Retrieve the user's quota from Redis.
   const quota = await redis.incr(quotaKey);
 
-  // If the key did not exist before, the returned value will be 1 
+  // If the key did not exist before, the returned value will be 1
   // and we set the expiration to 1 day.
-  if (quota === 1){
+  if (quota === 1) {
     await redis.expire(quotaKey, 60 * 60 * 24);
   }
 

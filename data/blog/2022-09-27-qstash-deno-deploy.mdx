@@ -41,13 +41,15 @@ serve(async (req: Request) => {
   });
 
   const body = await req.text();
-  const isValid = await r.verify({
-    signature: req.headers.get("Upstash-Signature")!,
-    body,
-  }).catch((err: Error) => {
-    console.error(err);
-    return false;
-  });
+  const isValid = await r
+    .verify({
+      signature: req.headers.get("Upstash-Signature")!,
+      body,
+    })
+    .catch((err: Error) => {
+      console.error(err);
+      return false;
+    });
 
   if (!isValid) {
     return new Response("Invalid signature", { status: 401 });

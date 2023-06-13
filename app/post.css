@@ -1,0 +1,85 @@
+.post > * {
+  @apply mb-10;
+}
+
+.post b,
+.post strong {
+  @apply font-semibold;
+}
+
+.post a {
+  @apply text-emerald-400 hover:underline;
+}
+
+.post blockquote {
+  @apply rounded-xl border border-white/5 bg-white/5 p-4 text-zinc-300 md:p-6;
+}
+
+.post ul,
+.post ol {
+  @apply list-inside space-y-2;
+}
+
+.post ul {
+  @apply list-none;
+}
+
+.post ol {
+  @apply list-decimal pl-2 marker:text-zinc-500;
+}
+
+.post ul li {
+  @apply relative pl-6;
+}
+
+.post ul > li:before {
+  @apply absolute left-0 h-0.5 w-3 rounded-full bg-zinc-600;
+  content: "";
+  top: 0.8em;
+}
+
+.post hr {
+  @apply my-10 border-b border-zinc-900 md:my-20;
+}
+
+.post table tr {
+  @apply border-t;
+}
+
+.post table th {
+  @apply whitespace-nowrap border px-2 py-2 font-semibold;
+}
+
+.post table td {
+  @apply border px-2 py-2;
+}
+
+.post code:not(pre > code) {
+  @apply rounded border border-white/03
+    bg-emerald-100/10 px-1 py-0.5 text-[0.86em];
+}
+
+.post .subheading-anchor {
+  @apply order-1 ml-4 opacity-0 after:content-['#'];
+}
+
+.post h2 {
+  @apply text-2xl md:mt-16 md:text-4xl;
+}
+
+.post h3 {
+  @apply text-xl md:text-2xl;
+}
+
+.post h4 {
+  @apply text-lg md:text-xl;
+}
+
+.post :where(h2, h3, h4) {
+  @apply mb-6 flex font-display font-semibold;
+  scroll-margin-top: 2rem;
+}
+
+.post :where(h2, h3, h4):hover .subheading-anchor {
+  @apply opacity-60;
+}

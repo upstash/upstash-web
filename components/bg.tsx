@@ -1,19 +1,16 @@
-import { Box } from "@chakra-ui/react";
+import React, { HTMLProps } from "react";
+import cx from "@/utils/cx";
 
-function Bg(props) {
+export default function Bg({ className }: HTMLProps<HTMLDivElement>) {
   return (
-    <Box
-      zIndex={-1}
-      pos="absolute"
-      left={["calc(50% - 1200px / 2)", "calc(50% - 3000px / 2)"]}
-      top={0}
-      width={[1200, 3000]}
-      h={[800, 1400]}
-      background="linear-gradient(180deg, rgba(23, 23, 23, 1) 0%, rgba(5, 5, 5, 1) 40%)"
-      borderRadius="100%"
-      {...props}
+    <div
+      className={cx(
+        "absolute left-1/2 top-0 -z-10 -translate-x-1/2",
+        "h-[200px] w-4/5 md:h-[400px]",
+        "bg-emerald-500 opacity-5 blur-[100px]",
+        "pointer-events-none",
+        className
+      )}
     />
   );
 }
-
-export default Bg;

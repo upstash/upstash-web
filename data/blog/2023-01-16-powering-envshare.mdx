@@ -20,7 +20,7 @@ EnvShare is free to use and open source. You can find the code on [GitHub](https
 
 ## How it works
 
-Every time you want to share your environment variables, a new random encryption key is generated in the browser. 
+Every time you want to share your environment variables, a new random encryption key is generated in the browser.
 Your sensitive data is encrypted using [AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard) and then stored in Redis.
 
 Afterwards, a unique document id is combined with the encryption key to form a shareable link, that you can use to access and decrypt your data.
@@ -38,7 +38,7 @@ The data is stored in a Redis hash with the following structure:
 {
   "remainingReads": 20, // Optional, the number of times the link can be read
   "encrypted": "...", // The encrypted environment variables
-  "iv": "...", // The initialization vector for AES-CBC
+  "iv": "..." // The initialization vector for AES-CBC
 }
 ```
 
@@ -53,7 +53,7 @@ Setting up Redis in our edge-functions is easy. We just need to [create a databa
 
 In our edge-function we can then store the data:
 
-```ts:/api/share.ts
+```ts title="/api/share.ts"
 import { Redis } from "@upstash/redis";
 
 const redis = new Redis({
@@ -74,6 +74,7 @@ await redis.hset(key, {
 Thanks for reading! EnvShare is a fun project that I built to show how easy it is to get started with Next.js and Upstash Redis. I hope you like it and find it useful. If you have any questions or feedback, feel free to reach out to me on [Twitter](https://twitter.com/chronark_).
 
 Relevant links:
+
 - [EnvShare](https://envshare.dev)
 - [GitHub](https://github.com/chronark/envshare)
 - [Deployment Guide](https://envshare.dev/deploy)
