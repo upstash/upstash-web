@@ -9,8 +9,8 @@ import getData from "./get-data";
 
 // TODO: set canonical url
 
-// this page is statically generated and cached for 5 minutes
-export const revalidate = 300;
+// this page is statically generated and cached for 1 minute
+export const revalidate = 60;
 
 export default async function ExamplesPage() {
   const examples: Example[] = await getData();
