@@ -110,7 +110,10 @@ function ExampleAuthor({
 }: HTMLProps<HTMLDivElement> & {
   author: keyof typeof authors;
 }) {
-  const { image, name } = authors[author];
+  
+  const image = authors[author]?.image ?? ""
+  const name = authors[author]?.name ?? author
+  
   return (
     <div
       className={cx("mt-auto flex items-center grayscale", className)}
