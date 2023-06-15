@@ -7,31 +7,6 @@ import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 import authors from "./utils/authors";
 
-export const DocRedis = defineDocumentType(() => ({
-  name: "DocRedis",
-  filePathPattern: `docs/redis/**/*.mdx`,
-  contentType: "mdx",
-  fields: {
-    title: {
-      type: "string",
-      required: true,
-    },
-    description: {
-      type: "string",
-    },
-    published: {
-      type: "boolean",
-      default: true,
-    },
-  },
-  computedFields: {
-    slug: {
-      type: "string",
-      resolve: (doc) => doc._raw.flattenedPath.split("/").slice(2).join("/"),
-    },
-  },
-}));
-
 export const Job = defineDocumentType(() => ({
   name: "Job",
   filePathPattern: `job/*.mdx`,
@@ -105,7 +80,7 @@ export const Post = defineDocumentType(() => ({
 
 export default makeSource({
   contentDirPath: "./data",
-  documentTypes: [DocRedis, Job, Post],
+  documentTypes: [Job, Post],
   mdx: {
     remarkPlugins: [remarkGfm],
     rehypePlugins: [
