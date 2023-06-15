@@ -6,7 +6,6 @@ import IconRedis from "@/components/icon-redis";
 import IconKafka from "@/components/icon-kafka";
 import IconQStash from "@/components/icon-qstash";
 import Balancer from "react-wrap-balancer";
-import authors from "@/utils/authors";
 import Image from "next/image";
 
 export function Example({
@@ -18,7 +17,10 @@ export function Example({
   ...props
 }: HTMLProps<HTMLDivElement> & {
   products: string[];
-  author: keyof typeof authors;
+  author:{
+    name: string,
+    image: string
+  };
   title: string;
 }) {
   return (
@@ -108,25 +110,25 @@ function ExampleAuthor({
   author,
   ...props
 }: HTMLProps<HTMLDivElement> & {
-  author: keyof typeof authors;
+  author: {
+    name:string,image:string
+  };
 }) {
   
-  const image = authors[author]?.image ?? ""
-  const name = authors[author]?.name ?? author
   
   return (
     <div
-      className={cx("mt-auto flex items-center grayscale", className)}
+      className={cx("mt-auto flex items-center", className)}
       {...props}
     >
       <Image
         className="rounded-full"
-        src={`/authors/${image}`}
-        alt={name}
+        src={author.image}
+        alt={author.name}
         width={30}
         height={30}
       />
-      <span className="ml-2 opacity-60">{name}</span>
+      <span className="ml-2 opacity-60">{author.name}</span>
     </div>
   );
 }

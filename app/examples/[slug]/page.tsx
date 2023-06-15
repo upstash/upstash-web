@@ -64,22 +64,25 @@ export default async function BlogPage({ params }: Props) {
     notFound();
   }
 
-  const author = authors[example.author];
+  const author = authors[example.author] ?? {
+    name: example.author,
+    image: `https://github.com/${example.author}.png`
+  }  
   const content = await markdownToHtml(example.body);
 
   return (
     <main className="">
       <Container>
-        <div className="border-b border-white/5 py-4">
+        <div className="py-4 border-b border-white/5">
           <Link href="/examples" className="inline-flex opacity-60">
             ← Back to Examples
           </Link>
         </div>
 
-        <div className="mt-8 grid gap-8 text-left md:mt-16 md:grid-cols-3 md:gap-16">
+        <div className="grid gap-8 mt-8 text-left md:mt-16 md:grid-cols-3 md:gap-16">
           {/* meta */}
           <div className="order-2 md:order-1">
-            <div className="top-8 rounded-2xl bg-emerald-100/5 p-6 md:sticky">
+            <div className="p-6 top-8 rounded-2xl bg-emerald-100/5 md:sticky">
               <div className="-mt-2">
                 <ExampleMetaRow title="Products">
                   <>
@@ -156,7 +159,7 @@ export default async function BlogPage({ params }: Props) {
                 </ExampleMetaRow>
               </div>
 
-              <div className="mt-6 grid gap-4">
+              <div className="grid gap-4 mt-6">
                 <Button
                   type="button"
                   href={example.githubUrl}
@@ -207,7 +210,7 @@ export default async function BlogPage({ params }: Props) {
               </h1>
 
               <div
-                className="post mt-8 leading-p"
+                className="mt-8 post leading-p"
                 dangerouslySetInnerHTML={{ __html: content }}
               />
             </article>
@@ -227,11 +230,11 @@ function ExampleMetaRow({
   title: string;
 }) {
   return (
-    <div className="flex items-center border-b border-b-emerald-100/5 py-3">
-      <div className="text-xs uppercase tracking-widest opacity-40">
+    <div className="flex items-center py-3 border-b border-b-emerald-100/5">
+      <div className="text-xs tracking-widest uppercase opacity-40">
         {title}:
       </div>
-      <div className="ml-auto flex items-center">{children}</div>
+      <div className="flex items-center ml-auto">{children}</div>
     </div>
   );
 }

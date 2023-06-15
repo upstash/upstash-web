@@ -16,11 +16,35 @@ export const Client: React.FC<Props> = ({ examples, useCases, stack }) => {
   const [selectedProducts, setSelectedProduct] = useState<Example["products"]>(
     []
   );
-  const [selectedUseCase, setSelectedUseCase] = useState<string[]>([]);
+  const [selectedUseCases, setSelectedUseCases] = useState<string[]>([]);
   const [selectedStacks, setSelectedStack] = useState<string[]>([]);
 
   const data = examples.filter((item: Example) => {
-    // TODO: andreas
+    /**
+     * Filter out other products
+     */
+    if (selectedProducts.length > 0 && !item.products.some((p) => selectedProducts.includes(p))) {
+      return false
+    }
+ /**
+     * Filter out other stacks
+     */
+ if (selectedStacks.length > 0 && !item.stack.some((s) => selectedStacks.includes(s))) {
+  console.log("filtering out due to stack", item)
+  return false
+}
+/**
+     * Filter out other usecases
+     */
+if (selectedUseCases.length > 0 && !item.useCases.some((uc) => selectedUseCases.includes(uc))) {
+  console.log("filtering out due to usecase", item, selectedUseCases)
+
+  return false
+}
+
+
+
+    
     return true;
   });
 
@@ -30,8 +54,8 @@ export const Client: React.FC<Props> = ({ examples, useCases, stack }) => {
         <ExampleFilter
           selectedProducts={selectedProducts}
           setSelectedProduct={setSelectedProduct}
-          selectedUseCase={selectedUseCase}
-          setSelectedUseCase={setSelectedUseCase}
+          selectedUseCase={selectedUseCases}
+          setSelectedUseCase={setSelectedUseCases}
           selectedStacks={selectedStacks}
           setSelectedStack={setSelectedStack}
           allStacks={Object.keys(stack)}
@@ -39,15 +63,23 @@ export const Client: React.FC<Props> = ({ examples, useCases, stack }) => {
         />
       </div>
 
-      <div className="grid grow gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
-        {data.map((item) => (
-          <Box
+      <div className="grid gap-4 grow sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
+        {data.map((item) => {
+
+
+          const author = authors[item.author] ?? {
+            name: item.author,
+            image: `https://github.com/${item.author}.png`
+          }
+
+          return (<Box
             key={item.title}
             title={item.title}
             products={item.products}
-            author={item.author as keyof typeof authors}
+            author={author}
           />
-        ))}
+          )
+        })}
       </div>
     </div>
   );
