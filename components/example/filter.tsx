@@ -44,7 +44,7 @@ export default function ExampleFilter({
 
       <Child className="sm:-mt-10">
         <div className="flex items-center">
-          <h4 className="text-sm uppercase tracking-widest opacity-60">
+          <h4 className="text-sm tracking-widest uppercase opacity-60">
             Filter
           </h4>
           {isFilterDirty && (
@@ -55,8 +55,7 @@ export default function ExampleFilter({
                 setSelectedUseCase([]);
                 setSelectedStack([]);
               }}
-              className="ml-auto inline-flex h-5 items-center justify-center
-           rounded-full bg-white/5 px-2 text-sm text-white/40"
+              className="inline-flex items-center justify-center h-5 px-2 ml-auto text-sm rounded-full bg-white/5 text-white/40"
             >
               Clear
             </button>
@@ -123,7 +122,7 @@ export default function ExampleFilter({
         <Toc>
           <Toc.Summary count={selectedStacks.length}>Stack</Toc.Summary>
           <div className="space-y-0.5">
-            {allUseCases.map((key) => {
+            {allStacks.map((key) => {
               return (
                 <Item
                   key={key}
@@ -150,7 +149,7 @@ export default function ExampleFilter({
         <Toc>
           <Toc.Summary count={selectedUseCase.length}>Use Cases</Toc.Summary>
           <div className="space-y-0.5">
-            {allStacks.map((key) => {
+            {allUseCases.map((key) => {
               return (
                 <Item
                   key={key}
@@ -213,12 +212,12 @@ Toc.Summary = function TocSummary({
       )}
       {...props}
     >
-      <span className="inline-flex w-5 shrink-0 items-center justify-center">
+      <span className="inline-flex items-center justify-center w-5 shrink-0">
         <IconArrow className="rotate-0 group-open/toc:rotate-90" />
       </span>
-      <span className="grow text-sm uppercase tracking-wide">{children}</span>
+      <span className="text-sm tracking-wide uppercase grow">{children}</span>
       {count > 0 && (
-        <span className="inline-flex h-5 items-center justify-center rounded-full bg-white/5 px-2 font-mono text-sm">
+        <span className="inline-flex items-center justify-center h-5 px-2 font-mono text-sm rounded-full bg-white/5">
           {count}
         </span>
       )}
@@ -254,7 +253,7 @@ function Item({
         type="checkbox"
         value={value}
         onChange={onChange}
-        className="pointer-events-none absolute opacity-0"
+        className="absolute opacity-0 pointer-events-none"
       />
       {icon ? (
         icon
