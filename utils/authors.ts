@@ -160,7 +160,7 @@ export default {
   },
   tudor: {
     name: "Tudor Zgîmbău",
-    title: "Full-Stack Engineer (Guest Author)",
+    title: "Software Engineer (Guest Author)",
     url: "https://www.linkedin.com/in/tudor-zg%C3%AEmb%C4%83u-a85274234",
     image: "tudor.jpg",
   },
