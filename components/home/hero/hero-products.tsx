@@ -6,6 +6,7 @@ import Icon, { ICON_NAMES } from "@/components/icon";
 import IconRedis from "@/components/icon-redis";
 import IconQStash from "@/components/icon-qstash";
 import IconKafka from "@/components/icon-kafka";
+import { useSegment } from "@/hooks/use-segment";
 
 export default function HomeHeroProducts({
   activeProduct,
@@ -16,7 +17,7 @@ export default function HomeHeroProducts({
 }) {
   return (
     <div
-      className="mt-8 grid gap-2 md:mt-16 md:grid-cols-3"
+      className="grid gap-2 mt-8 md:mt-16 md:grid-cols-3"
       onMouseLeave={() => setActiveProduct(undefined)}
     >
       <HomeHeroProduct
@@ -26,7 +27,7 @@ export default function HomeHeroProducts({
       >
         <HeroProductTitle>
           {/*<span className="block">
-            <IconRedis className="mb-3 inline-flex grayscale group-hover/hero-product:grayscale-0" />
+            <IconRedis className="inline-flex mb-3 grayscale group-hover/hero-product:grayscale-0" />
           </span>*/}
           <span>Redis</span>
           <span className="text-[.9em] opacity-20">®*</span>
@@ -44,7 +45,7 @@ export default function HomeHeroProducts({
       >
         <HeroProductTitle>
           {/*<span className="block">
-            <IconKafka className="mb-3 inline-flex grayscale group-hover/hero-product:grayscale-0" />
+            <IconKafka className="inline-flex mb-3 grayscale group-hover/hero-product:grayscale-0" />
           </span>*/}
           <span>Kafka</span>
           <span className="text-[.9em] opacity-20">®</span>
@@ -62,7 +63,7 @@ export default function HomeHeroProducts({
       >
         <HeroProductTitle>
           {/*<span className="block">
-            <IconQStash className="mb-3 inline-flex grayscale group-hover/hero-product:grayscale-0" />
+            <IconQStash className="inline-flex mb-3 grayscale group-hover/hero-product:grayscale-0" />
           </span>*/}
           <span>QStash</span>
         </HeroProductTitle>
@@ -146,6 +147,7 @@ function HeroProductCta({
   activeProduct?: Product;
   active?: boolean;
 }) {
+  const { track } = useSegment()
   return (
     <Button
       type="button"
@@ -155,10 +157,25 @@ function HeroProductCta({
         activeProduct === Product.REDIS && active && "!bg-red-500 !text-white",
         activeProduct === Product.KAFKA && active && "!bg-blue-500 !text-white",
         activeProduct === Product.QSTASH &&
-          active &&
-          "!bg-purple-500 !text-white",
+        active &&
+        "!bg-purple-500 !text-white",
         className
       )}
+      onClick={(e) => {
+        switch (activeProduct) {
+          case Product.REDIS:
+            track("button.create.redis")
+            break;
+          case Product.KAFKA:
+            track("button.create.kafka")
+            break;
+          case Product.QSTASH:
+            track("button.create.qstash")
+            break;
+
+
+        }
+      }}
       {...props}
     >
       {children}

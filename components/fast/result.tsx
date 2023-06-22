@@ -9,10 +9,9 @@ const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export default function FastResult() {
   const [r, setR] = useState<number>();
-  const { track,pageView } = useSegment()
-  pageView("/fast")
+  const { track } = useSegment()
   return (
-    <div> 
+    <div>
       <header
         className="flex items-center justify-between py-3 text-xs tracking-widest uppercase border-b border-b-zinc-900 text-zinc-600 md:py-2"
       >
@@ -20,7 +19,7 @@ export default function FastResult() {
         <span className="flex items-center gap-1">
           <button
             onClick={() => {
-              track("refresh-fast-anywhere")
+              track("button.fast-anywhere.refresh")
               setR(Date.now())
             }}
             type="button"

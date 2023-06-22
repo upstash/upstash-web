@@ -1,9 +1,10 @@
 "use client"
-import React, { PropsWithChildren } from 'react'
-import { AnalyticsBrowser} from '@segment/analytics-next'
+import React, { useEffect, PropsWithChildren } from 'react'
+import { Segment } from "./segment"
 
+const segment = new Segment()
 
-export const SegmentContext = React.createContext<AnalyticsBrowser | null>(null)
+export const SegmentContext = React.createContext<Segment>(segment)
 
 
 type Props = {
@@ -11,14 +12,16 @@ type Props = {
 }
 export const SegmentProvider: React.FC<PropsWithChildren<Props>> = ({ children, writeKey }) => {
 
-  const analytics = React.useMemo(() => {
-    return AnalyticsBrowser.load({ writeKey })
+
+  useEffect(() => {
+    segment.load({ writeKey }).catch(err=>{
+      console.warn(err)
+    })
   }, [writeKey])
 
-  analytics.track("XXX").then(console.log)
   return (
     <SegmentContext.Provider
-      value={analytics}
+      value={segment}
     >
       {children}
     </SegmentContext.Provider>
