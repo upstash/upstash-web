@@ -1,3 +1,4 @@
+"use client"
 import {
   ProductBox,
   ProductFeature,
@@ -8,8 +9,10 @@ import Button from "@/components/button";
 import React from "react";
 import { Product } from "@/utils/type";
 import IconQStash from "@/components/icon-qstash";
+import { useSegment } from "@/hooks/use-segment";
 
 export default function ServerlessQStash() {
+  const {track} = useSegment()
   return (
     <ProductBox
       product={Product.QSTASH}
@@ -30,11 +33,14 @@ export default function ServerlessQStash() {
         </ProductFeatureItem>
       </ProductFeature>
 
-      <div className="mt-auto grid gap-4">
+      <div className="grid gap-4 mt-auto">
         <Button
           href="https://github.com/upstash/qstash-examples"
           className="hover:bg-purple-100 hover:text-purple-950"
           type="button"
+          onClick={()=>{
+            track("button.examples.qstash")
+          }}
         >
           View examples
         </Button>
@@ -42,6 +48,9 @@ export default function ServerlessQStash() {
           href="https://docs.upstash.com/qstash"
           className="bg-purple-100 text-purple-950 hover:bg-purple-100 hover:text-purple-950"
           type="button"
+          onClick={()=>{
+            track("button.docs.qstash")
+          }}
         >
           Read the docs
         </Button>
