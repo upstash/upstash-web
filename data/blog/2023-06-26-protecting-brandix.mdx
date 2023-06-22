@@ -86,11 +86,11 @@ const ratelimit = new Ratelimit({
   analytics: true
 });
 ```
-and then check if a user (based on his IP) has made too many requests:
+and then check if a user (based on their IP) has made too many requests:
 ```ts
 const { success } = await ratelimit.limit(REQUEST-IP)
 ```
-If success is true we let the request through, if it's false we return a 429, informing the user that he please shouldn't empty my bank account.
+If success is `true` we let the request through, if it's `false` we return a 429, informing the user that they please shouldn't empty my bank account.
 
 ## Wrapping things up
 Thanks for reading. [Brandix](https://brandix.ai/) is a fun little side project I made in a few days. But with tools like Next.js, Vercel, OpenAI, Tailwind, [Shadcn UI](https://ui.shadcn.com) and [Upstash](https://upstash.com/) Redis, it's incredibly simple to bring small, but still production-ready projects to life. If you have any questions or feedback, feel free to reach out to me on [Twitter](https://twitter.com/paukraft).
