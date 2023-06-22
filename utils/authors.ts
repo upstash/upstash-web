@@ -211,4 +211,9 @@ export default {
     title: "Technical CSM @Edgio (Guest Author)",
     image: "rishi.jpeg",
   },
+  pau_kraft:{
+    name: "Pau Kraft",
+    title: "Software Engineer @TeampilotAI (Guest Author)",
+    image: "pau_kraft.png",
+  }
 };
