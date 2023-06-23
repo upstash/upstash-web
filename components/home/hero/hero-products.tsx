@@ -147,7 +147,7 @@ function HeroProductCta({
   activeProduct?: Product;
   active?: boolean;
 }) {
-  const { track } = useSegment()
+  const segment = useSegment()
   return (
     <Button
       type="button"
@@ -164,13 +164,13 @@ function HeroProductCta({
       onClick={(e) => {
         switch (activeProduct) {
           case Product.REDIS:
-            track("button.create.redis")
+            segment.track("button.create.redis")
             break;
           case Product.KAFKA:
-            track("button.create.kafka")
+            segment.track("button.create.kafka")
             break;
           case Product.QSTASH:
-            track("button.create.qstash")
+            segment.track("button.create.qstash")
             break;
 
 

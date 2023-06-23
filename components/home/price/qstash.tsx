@@ -12,7 +12,7 @@ import IconQStash from "@/components/icon-qstash";
 import { useSegment } from "@/hooks/use-segment";
 
 export default function PriceQStash() {
-  const {track} = useSegment()
+  const segment = useSegment()
   return (
     <PriceBox>
       <header>
@@ -47,7 +47,7 @@ export default function PriceQStash() {
 
       <PriceHr />
 
-      <PriceButton href="https://docs.upstash.com/qstash/pricing" onClick={()=>{track("button.pricing.redis")}}>
+      <PriceButton href="https://docs.upstash.com/qstash/pricing" onClick={() => { segment.track("button.pricing.redis") }}>
         More information
       </PriceButton>
     </PriceBox>
