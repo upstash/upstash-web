@@ -1,10 +1,9 @@
 "use client"
-import React, { useEffect, PropsWithChildren } from 'react'
+import React, { useEffect, PropsWithChildren, useMemo } from 'react'
 import { Segment } from "./segment"
 
-const segment = new Segment()
 
-export const SegmentContext = React.createContext<Segment>(segment)
+export const SegmentContext = React.createContext<Segment | null>(null)
 
 
 type Props = {
@@ -12,11 +11,12 @@ type Props = {
 }
 export const SegmentProvider: React.FC<PropsWithChildren<Props>> = ({ children, writeKey }) => {
 
-
-  useEffect(() => {
-    segment.load({ writeKey }).catch(err=>{
+  const segment = useMemo(() => {
+    const segment = new Segment()
+    segment.load(writeKey).catch(err => {
       console.warn(err)
     })
+    return segment
   }, [writeKey])
 
   return (
@@ -27,6 +27,3 @@ export const SegmentProvider: React.FC<PropsWithChildren<Props>> = ({ children, 
     </SegmentContext.Provider>
   )
 }
-
-
-

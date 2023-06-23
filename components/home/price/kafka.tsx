@@ -12,7 +12,7 @@ import IconKafka from "@/components/icon-kafka";
 import { useSegment } from "@/hooks/use-segment";
 
 export default function PriceKafka() {
-  const {track} = useSegment()
+  const segment = useSegment()
 
   return (
     <PriceBox>
@@ -48,7 +48,7 @@ export default function PriceKafka() {
 
       <PriceHr />
 
-      <PriceButton href="https://docs.upstash.com/kafka/pricing" onClick={()=>track("button.pricing.kafka")}>
+      <PriceButton href="https://docs.upstash.com/kafka/pricing" onClick={() => segment.track("button.pricing.kafka")}>
         More information
       </PriceButton>
     </PriceBox>

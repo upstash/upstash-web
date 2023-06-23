@@ -31,11 +31,11 @@ export default function SectionMenu({
   });
 
   useEffect(() => {
-    Events.scrollEvent.register("begin", function () {
+    Events.scrollEvent.register("begin", function() {
       console.log("begin", arguments);
     });
 
-    Events.scrollEvent.register("end", function () {
+    Events.scrollEvent.register("end", function() {
       console.log("end", arguments);
     });
 
@@ -44,7 +44,7 @@ export default function SectionMenu({
       Events.scrollEvent.remove("end");
     };
   }, [show]);
-  const { track } = useSegment()
+  const segment = useSegment()
   return (
     <motion.div
       className={cx(
@@ -91,7 +91,7 @@ export default function SectionMenu({
           <SectionMenuItem href={HOME_SECTIONS.PRODUCTS}>
             Products
           </SectionMenuItem>
-          <SectionMenuItem href={HOME_SECTIONS.PRICING} onClick={() => track("button.pricing")}>
+          <SectionMenuItem href={HOME_SECTIONS.PRICING} onClick={() => segment.track("button.pricing")}>
             Pricing
           </SectionMenuItem>
           {/*<SectionMenuItem href={HOME_SECTIONS.OPEN_SOURCE}>*/}
