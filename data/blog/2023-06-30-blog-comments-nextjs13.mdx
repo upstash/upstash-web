@@ -134,7 +134,7 @@ to store comments in the Redis database.
 
 1. Head to [Upstash](https://console.upstash.com/) and create a Redis Database.
 2. Choose a region close to your users and opt for TLS encryption.
-3. Install `@upstash/Redis` package.
+3. Install `@upstash/redis` package.
 
 ```sh
 pnpm install @upstash/redis
@@ -191,12 +191,12 @@ let's use it.
 
 You can see the entire code [here](https://github.com/JDeepD/NextJS13-Comment/tree/main/app/api/comment). Here is the gist of it:
 
-1. Create a comment: `redis.lpush(referer, JSON.stringify(comment))`. This will push the comment in list
+1. Create a comment: `redis.lpush(referer, comment)`. This will push the comment in list
 having the key `referer`
 
 2. Get all comments `redis.lrange(referer, 0, -1)`
 
-3. Delete a comment `redis.lrem(referer, 0, JSON.stringify(comment))`. This will delete all occurrences of `comment` in the list with the key `referer`.
+3. Delete a comment `redis.lrem(referer, 0, comment)`. This will delete all occurrences of `comment` in the list with the key `referer`.
 
 Our API is now in place. Let's get to integrating the frontend with the backend.
 
