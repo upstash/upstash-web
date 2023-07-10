@@ -1,3 +1,4 @@
+"use client"
 import {
   ProductBox,
   ProductFeature,
@@ -9,8 +10,10 @@ import React from "react";
 import { Product } from "@/utils/type";
 import colors from "tailwindcss/colors";
 import IconRedis from "@/components/icon-redis";
+import { useSegment } from "@/hooks/use-segment";
 
 export default function ServerlessRedis() {
+  const {track} = useSegment()
   return (
     <ProductBox product={Product.REDIS} className="mdd:col-span-2 bg-red-200/5">
       <header>
@@ -30,11 +33,14 @@ export default function ServerlessRedis() {
         </ProductFeatureItem>
       </ProductFeature>
 
-      <div className="mt-auto grid gap-4">
+      <div className="grid gap-4 mt-auto">
         <Button
           href="https://github.com/upstash/redis-examples"
           className="hover:bg-red-100 hover:text-red-950"
           type="button"
+          onClick={()=>{
+            track("button.examples.redis")
+          }}
         >
           View examples
         </Button>
@@ -42,6 +48,9 @@ export default function ServerlessRedis() {
           href="https://docs.upstash.com/redis"
           className="bg-red-100 text-red-950 hover:bg-red-100 hover:text-red-950"
           type="button"
+          onClick={()=>{
+            track("button.docs.redis")
+          }}
         >
           Read the docs
         </Button>
