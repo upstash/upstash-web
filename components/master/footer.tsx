@@ -4,12 +4,12 @@ import Container from "@/components/container";
 import { Logo } from "@/components/logo";
 import Button from "@/components/button";
 
-export interface IAppFooter extends HTMLProps<HTMLDivElement> {}
+export interface IAppFooter extends HTMLProps<HTMLDivElement> { }
 
 export default function Footer({ className, ...props }: IAppFooter) {
   return (
     <footer
-      className={cx("relative z-50 py-24 text-center", className)}
+      className={cx("relative z-20 py-24 text-center", className)}
       {...props}
     >
       <Container className="max-w-screen-md">
