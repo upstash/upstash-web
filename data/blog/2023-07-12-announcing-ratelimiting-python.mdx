@@ -1,0 +1,119 @@
+---
+slug: announcing-ratelimit-python
+title: "Announcing Python Serverless Redis and Ratelimiting SDKs"
+author: tudor
+tags: [redis, ratelimit, python, serverless]
+---
+
+In the context of modern cybersecurity threats,  an increasing number of AI apps, and concurrency-based pricing, we often find ourselves dealing with various needs, such as:
+- Having a predictable maximum number of requests / second for a server, to ensure high availability
+- Having the ability to limit a certain identifier's (IP address, API key, etc.) requests in a said interval, especially a potential malicious actor's ones
+- Having the ability to enforce a maximum number of requests to an AI API such as the one offered by OpenAI
+- Having the ability to apply different concurrency limits to users on different plans (ex: `free: 5 req/s`, `pro: 10 req/s`)
+- Having the ability to process a blocked request after its limit has passed
+
+Rate limiting is a common way of fulfilling them. The problem is, it's often hard to implement manually, especially if you have complex use cases. Even more, you might need to check if your tool works in both serverful and serverless environments.
+
+Of course, it would make sense to release the Redis SDK that powers this Ratelimit SDK as well. So,
+
+## Announcing upstash-redis and upstash-ratelimit
+- upstash-redis: Available on [GitHub](https://github.com/upstash/redis-python) and [PyPi](https://pypi.org/project/upstash-redis/)
+- upstash-ratelimit: Available on [GitHub](https://github.com/upstash/ratelimit-python) and [PyPi](https://pypi.org/project/upstash-ratelimit/)
+
+We're proud to announce new additions to the serverless data ecosystem. 
+`upstash-redis` and `upstash-ratelimit` are HTTP-based solutions that provide an easy, fast, and customisable way to use your Upstash database and rate-limit in both your stateful servers and your serverless functions.
+
+
+## Getting Started
+Before using the SDKs, make sure you exported the following env variables:
+- `UPSTASH_REDIS_REST_URL`: This is the url that is given in the console.
+- `UPSTASH_REDIS_REST_TOKEN`: This is the token that is given in the console.
+
+
+## Upstash Redis SDK
+
+```python
+from upstash_redis import Redis
+
+redis = Redis.from_env()
+
+redis.set("foo", "bar")
+
+print("Set value:", redis.get("foo"))
+```
+
+Or, you can use upstash-redis in async context as well!
+
+```python
+from upstash_redis.asyncio import Redis
+from asyncio import run
+
+async def main():
+    redis = Redis.from_env()
+    await redis.set("foo", "bar")
+    print("Set value in async context:", await redis.get("foo"))
+
+run(main())
+```
+
+You can have a look at [GitHub](https://github.com/upstash/redis-python) to see different client options.
+
+## Upstash Ratelimit SDK
+
+```python
+from upstash_ratelimit import Ratelimit, FixedWindow
+from upstash_redis import Redis
+from time import sleep
+
+ratelimit = Ratelimit(
+    redis=Redis.from_env(),
+    limiter=FixedWindow(max_requests=2, window=10),
+    prefix="upstash-ratelimit",
+)
+
+identifier = "api"
+response = ratelimit.limit(identifier)
+
+if not response.allowed:
+    print("Unable to process at this time")
+else:
+    sleep(1) # do_expensive_calculation()
+    print("Here you go!")
+```
+
+Or, similar to `upstash-redis`, you can use upstash-redis in async context as well!
+
+```python
+from upstash_ratelimit.asyncio import Ratelimit, FixedWindow
+from upstash_redis.asyncio import Redis
+from asyncio import run, sleep
+
+ratelimit = Ratelimit(
+    redis=Redis.from_env(),
+    limiter=FixedWindow(max_requests=2, window=10),
+    prefix="upstash-ratelimit",
+)
+
+async def main():
+    identifier = "api"
+    response = await ratelimit.limit(identifier)
+
+    if not response.allowed:
+        print("Unable to process at this time")
+    else:
+        await sleep(1) # do_expensive_calculation()
+        print("Here you go!")
+
+run(main())
+```
+
+`upstash-ratelimit` provides 3 different algorithms to use for rate-limiting, each having its pros and cons. You can read more about the differences in the project [README](https://github.com/upstash/ratelimit-python).
+
+We also provide two methods for enforcing limits:
+- `limit`, which returns a dict containing `is_allowed` and some additional metadata about an `identifier`'s request
+- `block_until_ready`, which allows waiting for a request to pass in a certain `timeout`.
+
+## Closing words
+If you have any questions, please reach out to Upstash on [Discord](https://upstash.com/discord) or [Twitter](https://twitter.com/upstash). 
+
+If you encounter any issues or have any suggestions, you can also file an issue on [GitHub](https://github.com/upstash/ratelimit-python)
