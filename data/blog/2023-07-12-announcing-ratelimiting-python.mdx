@@ -110,15 +110,14 @@ run(main())
 `upstash-ratelimit` provides 3 different algorithms to use for rate-limiting, each having its pros and cons. You can read more about the differences in the project [README](https://github.com/upstash/ratelimit-python).
 
 We also provide two methods for enforcing limits:
-- `limit`, which returns an object containing `is_allowed` field and some additional metadata about an `identifier`'s request
-- `block_until_ready`, which allows waiting for a request to pass in a certain `timeout`.
+- `limit()`, which returns an object containing `allowed` field and some additional metadata about an `identifier`'s request
+- `block_until_ready()`, which allows waiting for a request to pass in a certain `timeout`.
 
-You can also get some metadata about an identifier's state.
+You can also get some metadata about an identifier's state:
 
-```python
-remaining = ratelimit.get_remaining("identifier") # Returns the number of requests left for the given identifier.
-reset = ratelimit.get_reset("identifier") # Returns the UNIX timestamp in seconds when the remaining requests will be reset or replenished.
-```
+- `get_remaining()`: Returns the number of requests left for the given identifier.
+- `get_reset()`: Returns the UNIX timestamp in seconds when the remaining requests will be reset or replenished.
+
 ## Closing words
 If you have any questions, please reach out to Upstash on [Discord](https://upstash.com/discord) or [Twitter](https://twitter.com/upstash). 
 
