@@ -2,7 +2,6 @@ import { Metadata } from "next";
 import Container from "@/components/container";
 import PageHeaderTitle from "@/components/page-header-title";
 import PageHeaderDesc from "@/components/page-header-desc";
-import PageBodyGradient from "@/components/page-body-gradient";
 import Bg from "@/components/bg";
 import cx from "@/utils/cx";
 import { HTMLAttributes } from "react";
@@ -33,9 +32,9 @@ export default function HomePage() {
       {/* body */}
       <section>
         <Container className="max-w-screen-lg">
-          <div className="grid gap-6 md:grid-cols-5">
+          <div className="grid gap-6 md:grid-cols-3">
             {/**/}
-            <LogoBox className="order-1 md:col-span-2">
+            <LogoBox className="order-1 md:col-span-1">
               <img
                 src="logo/upstash-icon-dark-bg.svg"
                 alt="Upstash icon with dark background"
@@ -63,7 +62,7 @@ export default function HomePage() {
               />
             </LogoBox>
             {/**/}
-            <LogoBox className="order-2 md:col-span-3">
+            <LogoBox className="order-2 md:col-span-2">
               <img
                 src="logo/upstash-dark-bg.svg"
                 alt="Upstash Logo with dark background"
@@ -91,7 +90,7 @@ export default function HomePage() {
               />
             </LogoBox>
             {/**/}
-            <LogoBox className="order-4 bg-zinc-100 md:order-3 md:col-span-3">
+            <LogoBox className="order-4 bg-zinc-100 md:order-3 md:col-span-2">
               <img
                 src="logo/upstash-white-bg.svg"
                 alt="Upstash Logo with white background"
@@ -119,7 +118,7 @@ export default function HomePage() {
               />
             </LogoBox>
             {/**/}
-            <LogoBox className="order-3 bg-zinc-100 md:order-4 md:col-span-2">
+            <LogoBox className="order-3 bg-zinc-100 md:order-4 md:col-span-1">
               <img
                 src="logo/upstash-icon-white-bg.svg"
                 alt="Upstash icon with white background"
@@ -146,6 +145,71 @@ export default function HomePage() {
 `}
               />
             </LogoBox>
+            {/**/}
+            <LogoBox className="order-5 bg-[#00E9A3] md:col-span-3">
+              <ActionButtons copyCode={`#00E9A3`} />
+            </LogoBox>
+            {/**/}
+            <LogoBox className="order-6">
+              <img
+                src="logo/redis-icon.svg"
+                alt="Upstash Redis icon"
+                className="h-12 md:h-16"
+              />
+              <ActionButtons
+                pngURL="logo/redis-icon.png"
+                svgURL="logo/redis-icon.svg"
+                copyCode={`<svg width="36" viewBox="0 0 360 360" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Upstash Redis"
+     class="inline-flex mb-4">
+    <rect width="360" height="360" rx="80" fill="#b91c1c"></rect>
+    <path d="M248.101 54.3602C251.818 47.1091 262.182 47.1091 265.899 54.3603L310.536 141.438C313.947 148.093 309.114 156 301.637 156H212.363C204.886 156 200.053 148.093 203.464 141.438L248.101 54.3602Z"
+          fill="#fecaca"></path>
+    <circle cx="103.5" cy="103.5" r="54.5" fill="#fecaca"></circle>
+    <rect x="53" y="206" width="100" height="101" rx="16" fill="#fecaca"></rect>
+    <path d="M248.501 204.493C253.519 200.659 260.481 200.659 265.499 204.493L305.24 234.852C309.902 238.414 311.849 244.505 310.117 250.11L294.659 300.133C292.846 306 287.423 310 281.283 310H232.717C226.577 310 221.154 306 219.341 300.133L203.883 250.11C202.151 244.505 204.098 238.414 208.76 234.852L248.501 204.493Z"
+          fill="#fecaca"></path>
+</svg>`}
+              />
+            </LogoBox>
+            {/**/}
+            <LogoBox className="order-6">
+              <img
+                src="logo/kafka-icon.svg"
+                alt="Upstash Kafka icon"
+                className="h-12 md:h-16"
+              />
+              <ActionButtons
+                pngURL="logo/kafka-icon.png"
+                svgURL="logo/kafka-icon.svg"
+                copyCode={`<svg width="36" viewBox="0 0 360 360" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Upstash Kafka"
+     class="inline-flex mb-4">
+    <rect width="360" height="360" rx="80" fill="#1d4ed8"></rect>
+    <path fill-rule="evenodd" clip-rule="evenodd"
+          d="M114 161.489C114 157.684 116.707 154.468 120.311 153.251C141.061 146.242 156 126.615 156 103.5C156 74.5051 132.495 51 103.5 51C74.5051 51 51 74.5051 51 103.5C51 126.301 65.5353 145.707 85.8453 152.958C89.3733 154.217 92 157.4 92 161.146V198.854C92 202.6 89.3733 205.783 85.8454 207.042C65.5353 214.293 51 233.699 51 256.5C51 285.495 74.5051 309 103.5 309C126.301 309 145.707 294.465 152.958 274.155C154.217 270.627 157.4 268 161.146 268H198.854C202.6 268 205.783 270.627 207.042 274.155C214.293 294.465 233.699 309 256.5 309C285.495 309 309 285.495 309 256.5C309 227.505 285.495 204 256.5 204C233.385 204 213.758 218.939 206.749 239.689C205.532 243.293 202.316 246 198.511 246H161.489C157.684 246 154.469 243.294 153.251 239.69C152.533 237.565 151.684 235.502 150.711 233.509C149.053 230.11 149.427 225.953 152.101 223.278L223.278 152.101C225.953 149.427 230.11 149.053 233.509 150.711C240.453 154.099 248.254 156 256.5 156C285.495 156 309 132.495 309 103.5C309 74.5051 285.495 51 256.5 51C227.505 51 204 74.5051 204 103.5C204 111.666 205.864 119.397 209.191 126.29C210.829 129.683 210.447 133.82 207.783 136.484L136.484 207.783C133.82 210.447 129.683 210.829 126.29 209.191C124.36 208.259 122.363 207.442 120.31 206.749C116.706 205.531 114 202.316 114 198.511V161.489Z"
+          fill="#bfdbfe"></path>
+</svg>`}
+              />
+            </LogoBox>
+            {/**/}
+            <LogoBox className="order-6">
+              <img
+                src="logo/qstash-icon.svg"
+                alt="Upstash QStash icon"
+                className="h-12 md:h-16"
+              />
+              <ActionButtons
+                pngURL="logo/qstash-icon.png"
+                svgURL="logo/qstash-icon.svg"
+                copyCode={`<svg width="36" viewBox="0 0 360 360" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Upstash QStash"
+     class="inline-flex mb-4">
+    <rect width="360" height="360" rx="80" fill="#7e22ce"></rect>
+    <path fill-rule="evenodd" clip-rule="evenodd"
+          d="M162 57C162 47.6112 169.611 40 179 40C188.389 40 196 47.6112 196 57V140L254.979 81.0208C261.618 74.3819 272.382 74.3819 279.021 81.0208C285.66 87.6597 285.66 98.4235 279.021 105.062L220.083 164H303C312.389 164 320 171.611 320 181C320 190.389 312.389 198 303 198H219.255L279.011 257.756C285.259 264.004 285.259 274.135 279.011 280.383C272.762 286.632 262.632 286.632 256.383 280.383L196 220V304C196 313.389 188.389 321 179 321C169.611 321 162 313.389 162 304V222.083L104.365 279.718C97.7265 286.357 86.9627 286.357 80.3238 279.718C73.6849 273.079 73.6849 262.315 80.3238 255.676L138 198H56C46.6112 198 39 190.389 39 181C39 171.611 46.6112 164 56 164H140L80.3137 104.314C74.0653 98.0653 74.0653 87.9347 80.3137 81.6863C86.5621 75.4379 96.6927 75.4379 102.941 81.6863L162 140.745V57Z"
+          fill="#e9d5ff"></path>
+</svg>`}
+              />
+            </LogoBox>
+            {/**/}
           </div>
         </Container>
       </section>
@@ -160,9 +224,9 @@ function ActionButtons({
   svgURL,
   ...props
 }: HTMLAttributes<HTMLDivElement> & {
-  copyCode: string;
-  pngURL: string;
-  svgURL: string;
+  copyCode?: string;
+  pngURL?: string;
+  svgURL?: string;
   className?: string;
 }) {
   return (
@@ -176,26 +240,32 @@ function ActionButtons({
       {...props}
     >
       <div className="flex items-center gap-px overflow-hidden rounded-full border border-zinc-200 bg-zinc-200 md:border-none">
-        <a
-          className="inline-flex h-10 w-14 items-center justify-center bg-white
+        {pngURL && (
+          <a
+            className="inline-flex h-10 w-14 items-center justify-center bg-white
           text-sm font-medium text-zinc-950 transition hover:bg-zinc-200"
-          href={pngURL}
-          download
-        >
-          PNG
-        </a>
-        <a
-          className="inline-flex h-10 w-14 items-center justify-center bg-white
+            href={pngURL}
+            download
+          >
+            PNG
+          </a>
+        )}
+        {svgURL && (
+          <a
+            className="inline-flex h-10 w-14 items-center justify-center bg-white
           text-sm font-medium text-zinc-950 transition hover:bg-zinc-200"
-          href={svgURL}
-          download
-        >
-          SVG
-        </a>
-        <CopyButton
-          className="h-10 w-14 bg-white text-sm text-zinc-950 hover:bg-zinc-200"
-          code={copyCode}
-        />
+            href={svgURL}
+            download
+          >
+            SVG
+          </a>
+        )}
+        {copyCode && (
+          <CopyButton
+            className="h-10 w-14 bg-white text-sm text-zinc-950 hover:bg-zinc-200"
+            code={copyCode}
+          />
+        )}
       </div>
     </div>
   );
