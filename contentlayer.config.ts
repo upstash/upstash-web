@@ -5,7 +5,7 @@ import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypePrettyCode from "rehype-pretty-code";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
-import authors from "./utils/authors";
+import { authors } from "./utils/authors";
 
 export const Job = defineDocumentType(() => ({
   name: "Job",
@@ -26,16 +26,7 @@ export const Job = defineDocumentType(() => ({
       resolve: (doc: any) => doc._raw.flattenedPath.split("/").at(-1),
     },
   },
-  authorObj: {
-    type: "json",
-    resolve: (doc) => {
-      const author = authors[doc.author as keyof typeof authors];
-      return {
-        ...author,
-        photo: `/authors/${author.image}`,
-      };
-    },
-  },
+ 
 }));
 
 export const Post = defineDocumentType(() => ({
@@ -46,21 +37,24 @@ export const Post = defineDocumentType(() => ({
     slug: { type: "string", required: true },
     title: { type: "string", required: true },
     description: { type: "string" },
-    author: { type: "string", required: true },
+    authors: { type: "json", required: true, of: "string" },
     tags: { type: "json", of: "string", required: true },
     image: { type: "string" },
     tweet: { type: "string" },
     draft: { type: "boolean" },
   },
   computedFields: {
-    authorObj: {
+    authorsData: {
       type: "json",
       resolve: (doc) => {
-        const author = authors[doc.author as keyof typeof authors];
-        return {
-          ...author,
-          photo: `/authors/${author.image}`,
-        };
+        return doc.authors.map(authorId => {
+          const author = authors[authorId]
+          return {
+            id: authorId,
+            ...author,
+            image: `/authors/${author.image}`
+          }
+        })
       },
     },
     readingTime: {

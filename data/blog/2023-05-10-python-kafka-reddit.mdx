@@ -1,7 +1,8 @@
 ---
 slug: python-kafka-reddit
 title: "Sentiment Analysis on Reddit using OpenAI (ChatGPT) and Upstash Kafka"
-author: fahreddin
+authors:
+  -  fahreddin
 tags: [kafka, python, reddit]
 ---
 
@@ -144,7 +145,8 @@ def analyze_tweet(post):
         messages=[{"role":"user","content": prompt+"\n"+\
         f"The subreddit: {post['subreddit']}\n\
         The query: {post['query']}\n\
-        The author: {post['author']}\n\
+        The authors:
+  -  {post['author']}\n\
         The title: {post['title']}\n\
         The post text: {post['text']}\n"}])
     return response.choices[0].message.content
