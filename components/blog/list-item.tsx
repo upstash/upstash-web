@@ -36,7 +36,7 @@ export default function PostListCard({ data }: { data: Post }) {
         </h3>
 
         <div className="flex items-center gap-2 mt-1 grow opacity-60">
-          <Link href={`/blog/author/${author}`}>{authorObj.name}</Link>
+          <Link href={`/blog/author/${authors[0].id}`}>{authorsData[0].name}</Link>
           <span>•</span>
           <time dateTime={date}>
             {DateTime.fromISO(date).toFormat("LLLL d, yyyy")}
@@ -47,8 +47,8 @@ export default function PostListCard({ data }: { data: Post }) {
       <Image
         width={50}
         height={50}
-        alt={authorObj.name}
-        src={authorObj.photo}
+        alt={authorsData[0].name}
+        src={authorsData[0].photo}
         className="object-cover rounded-full aspect-square shrink-0"
       />
     </article>

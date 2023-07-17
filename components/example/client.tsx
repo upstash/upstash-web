@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import ExampleFilter from "./filter";
 import { Example as Box } from "./comp";
 import type { Example } from "@/utils/type";
-import authors from "@/utils/authors";
+import { authors } from "@/utils/authors";
 
 type Props = {
   examples: Example[];
@@ -26,25 +26,25 @@ export const Client: React.FC<Props> = ({ examples, useCases, stack }) => {
     if (selectedProducts.length > 0 && !item.products.some((p) => selectedProducts.includes(p))) {
       return false
     }
- /**
-     * Filter out other stacks
-     */
- if (selectedStacks.length > 0 && !item.stack.some((s) => selectedStacks.includes(s))) {
-  console.log("filtering out due to stack", item)
-  return false
-}
-/**
-     * Filter out other usecases
-     */
-if (selectedUseCases.length > 0 && !item.useCases.some((uc) => selectedUseCases.includes(uc))) {
-  console.log("filtering out due to usecase", item, selectedUseCases)
+    /**
+        * Filter out other stacks
+        */
+    if (selectedStacks.length > 0 && !item.stack.some((s) => selectedStacks.includes(s))) {
+      console.log("filtering out due to stack", item)
+      return false
+    }
+    /**
+         * Filter out other usecases
+         */
+    if (selectedUseCases.length > 0 && !item.useCases.some((uc) => selectedUseCases.includes(uc))) {
+      console.log("filtering out due to usecase", item, selectedUseCases)
 
-  return false
-}
+      return false
+    }
 
 
 
-    
+
     return true;
   });
 
