@@ -15,7 +15,7 @@ type Props = {
 
 export async function generateStaticParams(): Promise<Props["params"][]> {
   const posts = await getData();
-  const authors = uniq(posts.map((post) => post.author));
+  const authors = uniq(posts.flatMap((post) => post.authors));
   return authors.map((author) => ({ author }));
 }
 
@@ -31,7 +31,7 @@ export async function generateMetadata({
 
 export default async function BlogPage({ params: { author } }: Props) {
   const posts = await getData();
-  const postsByAuthor = posts.filter((post) => post.author === author);
+  const postsByAuthor = posts.filter((post) => post.authors.includes(author));
 
   return (
     <main className="relative z-0">

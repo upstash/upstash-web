@@ -6,7 +6,7 @@ import getData from "../get-data";
 import markdownToHtml from "@/utils/markdownToHtml";
 import Balancer from "react-wrap-balancer";
 import Button from "@/components/button";
-import authors from "@/utils/authors";
+import { authors } from "@/utils/authors";
 import IconRedis from "@/components/icon-redis";
 import IconKafka from "@/components/icon-kafka";
 import IconQStash from "@/components/icon-qstash";
@@ -67,7 +67,7 @@ export default async function BlogPage({ params }: Props) {
   const author = authors[example.author] ?? {
     name: example.author,
     image: `https://github.com/${example.author}.png`
-  }  
+  }
   const content = await markdownToHtml(example.body);
 
   return (
@@ -194,7 +194,7 @@ export default async function BlogPage({ params }: Props) {
                   type="button"
                   href="mailto:jobs@upstash.com"
                   className="bg-white text-zinc-950"
-                  // className="bg-emerald-400 text-zinc-950"
+                // className="bg-emerald-400 text-zinc-950"
                 >
                   Deploy
                 </Button>

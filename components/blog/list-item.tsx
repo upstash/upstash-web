@@ -6,7 +6,7 @@ import Balancer from "react-wrap-balancer";
 import cx from "@/utils/cx";
 
 export default function PostListCard({ data }: { data: Post }) {
-  const { title, slug, date, author, authorObj } = data;
+  const { title, slug, date, authors, authorsData } = data;
 
   const isAnnouncement = data.tags.includes("announcement");
 
@@ -29,13 +29,13 @@ export default function PostListCard({ data }: { data: Post }) {
           </h5>
         )}
 
-        <h3 className="font-display text-xl font-semibold md:leading-tight">
+        <h3 className="text-xl font-semibold font-display md:leading-tight">
           <Balancer>
             <Link href={`/blog/${slug}`}>{title}</Link>
           </Balancer>
         </h3>
 
-        <div className="mt-1 flex grow items-center gap-2 opacity-60">
+        <div className="flex items-center gap-2 mt-1 grow opacity-60">
           <Link href={`/blog/author/${author}`}>{authorObj.name}</Link>
           <span>•</span>
           <time dateTime={date}>
@@ -49,7 +49,7 @@ export default function PostListCard({ data }: { data: Post }) {
         height={50}
         alt={authorObj.name}
         src={authorObj.photo}
-        className="aspect-square shrink-0 rounded-full object-cover"
+        className="object-cover rounded-full aspect-square shrink-0"
       />
     </article>
   );

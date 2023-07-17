@@ -27,24 +27,29 @@ export default function PostHeader({ post }: Props) {
           <Balancer>{post.title}</Balancer>
         </h1>
 
-        {/* author */}
-        <div className="mt-8 flex flex-col items-center">
-          <Image
-            width={50}
-            height={50}
-            alt={post.authorObj.name}
-            src={post.authorObj.photo}
-            className="aspect-square shrink-0 rounded-full object-cover"
-          />
-          <Link
-            href={`/blog/author/${post.author}`}
-            className="mt-2 hover:text-emerald-400 hover:underline"
-          >
-            {post.authorObj.name}
-          </Link>
-          <span className="opacity-40">{post.authorObj.title}</span>
+        <div className="flex flex-col items-center justify-center gap-8 mt-8 md:flex-row">
+          {post.authorsData.map((author) => (
+            <div key={author.name} className="flex flex-col items-center">
+              <Image
+                width={50}
+                height={50}
+                alt={author.name}
+                src={author.image}
+                className="object-cover rounded-full aspect-square shrink-0"
+              />
+              <Link
+                href={`/blog/author/${author.id}`}
+                className="mt-2 hover:text-emerald-400 hover:underline"
+              >
+                {author.name}
+              </Link>
+              <span className="opacity-40">{author.title}</span>
+            </div>
+          ))}
+
         </div>
-      </Container>
-    </header>
+
+      </Container >
+    </header >
   );
 }

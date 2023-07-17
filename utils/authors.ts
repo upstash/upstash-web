@@ -1,4 +1,9 @@
-export default {
+export const authors: Record<string, {
+  name: string
+  title: string
+  image: string
+  url?: string
+}> = {
   lisa: {
     name: "Lisa Natsumi",
     title: "Engineer @Upstash",
@@ -211,12 +216,12 @@ export default {
     title: "Technical CSM @Edgio (Guest Author)",
     image: "rishi.jpeg",
   },
-  pau_kraft:{
+  pau_kraft: {
     name: "Pau Kraft",
     title: "Software Engineer @TeampilotAI (Guest Author)",
     image: "pau_kraft.png",
   },
-  jaydeep:{
+  jaydeep: {
     name: "Jaydeep Das",
     title: "Software Developer (Guest Author)",
     image: "jaydeep.jpeg",
