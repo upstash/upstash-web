@@ -48,7 +48,7 @@ export default function PostListCard({ data }: { data: Post }) {
         width={50}
         height={50}
         alt={authorsData[0].name}
-        src={authorsData[0].photo}
+        src={authorsData[0].image}
         className="object-cover rounded-full aspect-square shrink-0"
       />
     </article>
