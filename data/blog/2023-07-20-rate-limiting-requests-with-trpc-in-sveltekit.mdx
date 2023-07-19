@@ -41,7 +41,7 @@ To get up and running with the app and following along you need:
 
 ## **Getting started**
 
-For the sake of efficiency, we won't be creating the entire application from scratch given that there’s a bit of initial boilerplate. Instead, you can clone the `sveltekit-trpc-ratelimit` directory from the Upstash examples repo.
+For the sake of efficiency, we won't be creating the entire application from scratch given that there’s a bit of initial boilerplate. Instead, you can clone the `sveltekit-trpc-ratelimit` directory from the [Upstash examples repo](https://github.com/upstash/examples).
 
 After successfully downloading the repository, navigate into the application using the `cd` command and install the necessary dependencies via your preferred package manager and set the `.env` variables by duplicating `.env.example`.
 
@@ -75,7 +75,7 @@ export const load = (async (events) => {
 }) satisfies PageServerLoad;
 ```
 
-We use `trpcLoad(events, (t) => t.public.cat.getMany())` to load all the cats.  I've wrote more about the useful `trpcLoad` helper [here](https://chrisjayden.com/articles/optimizing-code-imports-sveltekit-trpc).
+We use `trpcLoad(events, (t) => t.public.cat.getMany())` to load all the cats.  I've written more about the useful `trpcLoad` helper [here](https://chrisjayden.com/articles/optimizing-code-imports-sveltekit-trpc).
 
 In our `+page.svelte` file, this data is consumed and rendered. The data object gets its properties from the `public.cat.getMany` method which provides us the list of cats. Then, each of these cats are rendered as individual `CatCard.svelte` components passing the cat info as a prop.
 
@@ -336,7 +336,7 @@ In this example, our use case is rather specific use case but in your applicatio
 
 Now, let's break down the `highfiveRatelimitMiddleware` piece by piece. 👇
 
-The `highfiveRatelimitMiddleware` begins by importing necessary modules and initialising a `ratelimit` object from the `[@upstash/ratelimit`](https://github.com/upstash/ratelimit#docs) package that contains our Redis client and the specifics of our rate limiter. In this case, `Ratelimit.slidingWindow(1, "60 s")` specifies that only one request will be allowed every 60 seconds.
+The `highfiveRatelimitMiddleware` begins by importing necessary modules and initialising a `ratelimit` object from the [`@upstash/ratelimit`](https://github.com/upstash/ratelimit) package that contains our Redis client and the specifics of our rate limiter. In this case, `Ratelimit.slidingWindow(1, "60 s")` specifies that only one request will be allowed every 60 seconds.
 
 ```ts title="ratelimitMiddleware.ts"
 import { redis } from '$lib/config/upstash';
@@ -346,7 +346,7 @@ import { Ratelimit } from "@upstash/ratelimit";
 
 const ratelimit = new Ratelimit({
 	redis: redis,
-	limiter: Ratelimit.slidingWindow(1, "60 s"),
+	limiter: Ratelimit.slidingWindow(1, "60s"),
 });
 ```
 
