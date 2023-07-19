@@ -5,29 +5,29 @@ authors: [tudor, burak]
 tags: [redis, ratelimit, python, serverless]
 ---
 
-In the context of modern cybersecurity threats,  an increasing number of AI apps, and concurrency-based pricing, we often find ourselves dealing with various needs, such as:
-- Having a predictable maximum number of requests / second for a server, to ensure high availability
-- Having the ability to limit a certain identifier's (IP address, API key, etc.) requests in a said interval, especially a potential malicious actor's ones
-- Having the ability to enforce a maximum number of requests to an AI API such as the one offered by OpenAI
-- Having the ability to apply different concurrency limits to users on different plans (ex: `free: 5 req/s`, `pro: 10 req/s`)
-- Having the ability to process a blocked request after its limit has passed
+As the Upstash team, our top priority is ensuring the happiness of our users. We aim to make the user experience easy and smooth, with our SDKs playing a significant role in achieving this goal. So far, all of our SDKs are in JavaScript and TypeScript, given their popularity. However, with the rising popularity of AI-based applications, we've noticed an increasing number of people using Upstash Redis in Python applications. We aim to simplify things for Python developers too. As a first step, we are releasing the official SDK for Redis in Python, which will utilize our HTTP-based API. Thanks to this HTTP-based API, it's perfect for serverless runtimes, which can prove challenging for TCP connections.
 
-Rate limiting is a common way of fulfilling them. The problem is, it's often hard to implement manually, especially if you have complex use cases. Even more, you might need to check if your tool works in both serverful and serverless environments.
+Secondly, we're porting our most popular and arguably most useful SDK to Python - the Upstash Rate Limiting SDK. This SDK has become an essential component of applications requiring application-level rate limiting. Rate limiting is becoming an increasingly significant requirement, particularly for applications that consume AI APIs. These APIs are expensive in terms of both cost and resources. Thus, limiting users on an API key or IP basis is critical.
 
-Of course, it would make sense to release the Redis SDK that powers this Ratelimit SDK as well. So,
+Here's what you can do with the rate-limiting SDK:
 
-## Announcing upstash-redis and upstash-ratelimit
+- Limit user activity by the number of requests within a certain time period.
+- Set an identifier to limit a user in a unique way (e.g., user-id, API key, IP address).
+- Choose from different strategies, including fixed window, sliding window, and token bucket.
+- Block (or wait) the request until it is allowed to process.
+- Set different limits for different plans.
+- Monitor usage with an analytics dashboard
+
+## Packages: upstash-redis and upstash-ratelimit
 - upstash-redis: Available on [GitHub](https://github.com/upstash/redis-python) and [PyPi](https://pypi.org/project/upstash-redis/)
 - upstash-ratelimit: Available on [GitHub](https://github.com/upstash/ratelimit-python) and [PyPi](https://pypi.org/project/upstash-ratelimit/)
 
-We're proud to announce new additions to the serverless data ecosystem. 
-`upstash-redis` and `upstash-ratelimit` are HTTP-based solutions that provide an easy, fast, and customisable way to use your Upstash database and rate-limit in both your stateful servers and your serverless functions.
-
-
 ## Getting Started
-Before using the SDKs, make sure you exported the following env variables:
-- `UPSTASH_REDIS_REST_URL`: This is the url that is given in the console.
-- `UPSTASH_REDIS_REST_TOKEN`: This is the token that is given in the console.
+Before using the SDKs, make sure you set the following environment variables:
+- `UPSTASH_REDIS_REST_URL`
+- `UPSTASH_REDIS_REST_TOKEN`
+
+You can find those variables in Upstash console.
 
 
 ## Upstash Redis SDK
@@ -81,7 +81,7 @@ else:
     print("Here you go!")
 ```
 
-Or, similar to `upstash-redis`, you can use upstash-redis in async context as well!
+Or,you can use it in async context as well!
 
 ```python
 from upstash_ratelimit.asyncio import Ratelimit, FixedWindow
@@ -107,7 +107,7 @@ async def main():
 run(main())
 ```
 
-`upstash-ratelimit` provides 3 different algorithms to use for rate-limiting, each having its pros and cons. You can read more about the differences in the project [README](https://github.com/upstash/ratelimit-python).
+`upstash-ratelimit` provides 3 different algorithms to use for rate-limiting, each having its pros and cons. You can read more about the differences in the [README](https://github.com/upstash/ratelimit-python).
 
 We also provide two methods for enforcing limits:
 - `limit()`, which returns an object containing `allowed` field and some additional metadata about an `identifier`'s request
