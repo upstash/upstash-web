@@ -21,10 +21,6 @@ export default function HomePage() {
           {/* header */}
           <header>
             <PageHeaderTitle>Brand Assets</PageHeaderTitle>
-
-            <PageHeaderDesc className="mt-2">
-              Lorem ipsum dolor sit amet
-            </PageHeaderDesc>
           </header>
         </Container>
       </section>
@@ -147,7 +143,8 @@ export default function HomePage() {
             </LogoBox>
             {/**/}
             <LogoBox className="order-5 bg-[#00E9A3] md:col-span-3">
-              <ActionButtons copyCode={`#00E9A3`} />
+              <span className="text-xl font-semibold text-black">#00E9A3</span>
+              <ActionButtons copyCode="#00E9A3" />
             </LogoBox>
             {/**/}
             <LogoBox className="order-6">
@@ -232,18 +229,17 @@ function ActionButtons({
   return (
     <div
       className={cx(
-        "grid place-items-center rounded-[inherit]",
+        "grid place-items-center rounded-lg",
         "inset-2 z-10 transition md:absolute md:bg-emerald-500/80 md:opacity-0",
         "group-hover/logo-box:opacity-100",
-        className
+        className,
       )}
       {...props}
     >
-      <div className="flex items-center gap-px overflow-hidden rounded-full border border-zinc-200 bg-zinc-200 md:border-none">
+      <div className="flex items-center gap-px overflow-hidden border rounded-full border-zinc-200 bg-zinc-200 md:border-none">
         {pngURL && (
           <a
-            className="inline-flex h-10 w-14 items-center justify-center bg-white
-          text-sm font-medium text-zinc-950 transition hover:bg-zinc-200"
+            className="inline-flex items-center justify-center h-10 text-sm font-medium transition bg-white w-14 text-zinc-950 hover:bg-zinc-200"
             href={pngURL}
             download
           >
@@ -252,8 +248,7 @@ function ActionButtons({
         )}
         {svgURL && (
           <a
-            className="inline-flex h-10 w-14 items-center justify-center bg-white
-          text-sm font-medium text-zinc-950 transition hover:bg-zinc-200"
+            className="inline-flex items-center justify-center h-10 text-sm font-medium transition bg-white w-14 text-zinc-950 hover:bg-zinc-200"
             href={svgURL}
             download
           >
@@ -262,7 +257,7 @@ function ActionButtons({
         )}
         {copyCode && (
           <CopyButton
-            className="h-10 w-14 bg-white text-sm text-zinc-950 hover:bg-zinc-200"
+            className="h-10 text-sm bg-white w-14 text-zinc-950 hover:bg-zinc-200"
             code={copyCode}
           />
         )}
@@ -281,7 +276,7 @@ function LogoBox({
       className={cx(
         "group/logo-box relative flex flex-col items-center justify-center gap-6 py-14",
         "rounded-2xl border border-zinc-800 bg-zinc-950",
-        className
+        className,
       )}
       {...props}
     >
