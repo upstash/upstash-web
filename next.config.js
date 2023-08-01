@@ -18,11 +18,11 @@ const nextConfig = {
   rewrites: () => [
     {
       source: "/docs",
-      destination: "https://upstash.mintlify.app/docs",
+      destination: "https://upstash.mintlify.dev/docs",
     },
     {
       source: "/docs/:match*",
-      destination: "https://upstash.mintlify.app/docs/:match*",
+      destination: "https://upstash.mintlify.dev/docs/:match*",
     },
   ],
 };
