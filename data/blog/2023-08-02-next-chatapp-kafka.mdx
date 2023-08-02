@@ -1,4 +1,10 @@
-# Building a Chat Application using Upstash Kafka, Redis and Next.js
+---
+slug: next-chatapp-kafka
+title: "Building a Chat Application using Upstash Kafka, Redis and Next.js"
+authors:
+  -  fahreddin
+tags: [next.js, kafka, redis, fly.io]
+---
 
 ## Project Description
 
@@ -6,11 +12,11 @@ In this blog post, we will be creating a messaging application that allows users
 
 The project consists of two pages. The first page is dedicated to client registration, where you can create multiple clients with unique names.
 
-![client registiration](blog/chatapp-kafka/client_registration.png)
+![client registiration](/blog/chatapp-kafka/client_registration.png)
 
 When you click on a client's username, you will be directed to the chatroom client associated with that specific user.
 
-![chat room](blog/chatapp-kafka/chat_room.png)
+![chat room](/blog/chatapp-kafka/chat_room.png)
 
 The logic of the chat application is as follows:
 
@@ -26,7 +32,7 @@ Here's the general overview of the application:
 
 **Note:** In our implementation, we'll create single message server for demo purposes, one can increase the number of servers to handle the message load.
 
-![diagram](blog/chatapp-kafka/diagram.png)
+![diagram](/blog/chatapp-kafka/diagram.png)
 
 ### Demo
 
@@ -46,7 +52,7 @@ Here are the steps for building the chat application:
 
 Navigate to the [Upstash Console](console.upstash.com) and login, then on the **Redis** tab, click **Create Database** button.
 
-![Create Redis Database](blog/chatapp-kafka/create_redis_db.png)
+![Create Redis Database](/blog/chatapp-kafka/create_redis_db.png)
 
 Just like that, our Redis is ready to use!
 We'll come back to Redis console for the credentials.
@@ -55,7 +61,7 @@ We'll come back to Redis console for the credentials.
 
 Now, switch to the **Kafka** Tab, and click **Create Cluster** button. Type in the cluster name and proceed. Then, create the Kafka topic and confirm.
 
-![Create Kafka Cluster](blog/chatapp-kafka/create_kafka_cluster.png)
+![Create Kafka Cluster](/blog/chatapp-kafka/create_kafka_cluster.png)
 
 
 ### Creating the Next App
@@ -72,12 +78,12 @@ Then, create your next app.
 $ npx create-next-app@latest
 
 ✔ What is your project named? … next-chat-app
-✔ Would you like to use TypeScript? … No / **Yes**
-✔ Would you like to use ESLint? … No / **Yes**
-✔ Would you like to use Tailwind CSS? … **No** / Yes
-✔ Would you like to use `src/` directory? … No / Yes
-✔ Would you like to use App Router? (recommended) … **No** / Yes
-✔ Would you like to customize the default import alias? … **No** / Yes
+✔ Would you like to use TypeScript? … Yes
+✔ Would you like to use ESLint? … Yes
+✔ Would you like to use Tailwind CSS? … No
+✔ Would you like to use `src/` directory? … No
+✔ Would you like to use App Router? (recommended) … No
+✔ Would you like to customize the default import alias? … No
 ```
 #### Handling Credentials
 We'll create a file named `.env` to store the credentials. We won't need to copy and paste the credentials over and over again, we'll just import from this file. 
@@ -86,11 +92,11 @@ First, create the `.env` file.
 
 Then, navigate to Redis console, and copy/paste the `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` credentials to `.env` file.
 
-![Redis Credentials](blog/chatapp-kafka/redis_credentials.png)
+![Redis Credentials](/blog/chatapp-kafka/redis_credentials.png)
 
 Finally, switch to Kafka console, and transfer the `UPSTASH_KAFKA_REST_URL`, `UPSTASH_KAFKA_REST_USERNAME`, `UPSTASH_KAFKA_REST_PASSWORD`
 
-![Kafka Credentials](blog/chatapp-kafka/kafka_credentials.png)
+![Kafka Credentials](/blog/chatapp-kafka/kafka_credentials.png)
 
 Now, your `.env` file should look similar
 
