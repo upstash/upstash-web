@@ -1,8 +1,8 @@
 ---
-slug: next-chatapp-kafka
+slug: next-chatapp-with-kafka
 title: "Building a Chat Application using Upstash Kafka, Redis and Next.js"
 authors:
-  -  fahreddin
+    - fahreddin
 tags: [next.js, kafka, redis, fly.io]
 ---
 
@@ -22,13 +22,13 @@ The logic of the chat application is as follows:
 
 Users can create multiple clients on the index page, each with a unique username. Clicking on a client's username will open a new tab with a separate client with a unique path.
 
-Each client will be connected to a message server via a WebSocket connection. When a new message is created on the client, it will be sent to the  message server associated with that client.
+Each client will be connected to a message server via a WebSocket connection. When a new message is created on the client, it will be sent to the message server associated with that client.
 
 The message servers will handle the message traffic. When a client sends a message through the WebSocket connection, the server will direct it to a Kafka Broker. Each message server will run a NodeJS thread to handle incoming messages. When a message is consumed, it will be sent to the clients through the existing WebSocket connection. To consume incoming messages on the client-side, we'll be using the `react-use-websocket` library.
 
 The application will utilize Upstash Redis to store message history. When a message is produced to Kafka, it will also be persisted to the Redis database. Upon creating a new client, the old messages will be retrieved from Upstash Redis and rendered in the chat display.
 
-Here's the general overview of the application: 
+Here's the general overview of the application:
 
 **Note:** In our implementation, we'll create single message server for demo purposes, one can increase the number of servers to handle the message load.
 
@@ -63,7 +63,6 @@ Now, switch to the **Kafka** Tab, and click **Create Cluster** button. Type in t
 
 ![Create Kafka Cluster](/blog/chatapp-kafka/create_kafka_cluster.png)
 
-
 ### Creating the Next App
 
 First, create and navigate to the root folder of your application from your terminal. We'll keep the Next app and the server in this folder.
@@ -74,6 +73,7 @@ cd chat-app
 ```
 
 Then, create your next app.
+
 ```shell
 $ npx create-next-app@latest
 
@@ -85,8 +85,10 @@ $ npx create-next-app@latest
 ✔ Would you like to use App Router? (recommended) … No
 ✔ Would you like to customize the default import alias? … No
 ```
+
 #### Handling Credentials
-We'll create a file named `.env` to store the credentials. We won't need to copy and paste the credentials over and over again, we'll just import from this file. 
+
+We'll create a file named `.env` to store the credentials. We won't need to copy and paste the credentials over and over again, we'll just import from this file.
 
 First, create the `.env` file.
 
@@ -100,7 +102,7 @@ Finally, switch to Kafka console, and transfer the `UPSTASH_KAFKA_REST_URL`, `UP
 
 Now, your `.env` file should look similar
 
-```text .env.local
+```text title=".env"
 UPSTASH_REDIS_REST_URL=...
 UPSTASH_REDIS_REST_TOKEN=...
 
@@ -110,11 +112,12 @@ UPSTASH_KAFKA_REST_PASSWORD=...
 ```
 
 Now that we've configured the credentials, we may proceed with the application.
+
 #### Client Registration Page
 
-Index page will contain the client registration/creation operations. When a username is submitted, a new client will be created and listed under the *Current Clients* table.
+Index page will contain the client registration/creation operations. When a username is submitted, a new client will be created and listed under the _Current Clients_ table.
 
-```TypeScript /pages/index.tsx
+```typescript title="pages/index.tsx"
 import styles from "@/styles/Home.module.css";
 import Link from "next/link";
 import { useState } from "react";
@@ -145,8 +148,8 @@ export default function Home() {
                     Upstash Redis for state management.
                     <br />
                     <br />
-                    To get started, create several clients by typing in unique
-                    usernames to the input section below and submitting.
+                    To get started, create several clients by typing in unique usernames
+                    to the input section below and submitting.
                     <br />
                     <br />
                     The usernames will be added to the list of current clients.
@@ -193,7 +196,7 @@ export default function Home() {
 
 If you want to reset the chat history each time the app is reloaded, you can use the following function:
 
-```typescript /pages/index.tsx
+```typescript title="pages/index.tsx"
 export async function getServerSideProps() {
     const redis = new Redis({
         url: process.env.UPSTASH_REDIS_REST_URL,
@@ -208,19 +211,20 @@ export async function getServerSideProps() {
 }
 ```
 
-With that, index page is ready to run. Run `npm run dev` command in `next-chat-app` folder to see the index page go live. 
+With that, index page is ready to run. Run `npm run dev` command in `next-chat-app` folder to see the index page go live.
 
 #### Message Client Page
 
 To implement dynamic routing for the clients, we will create a folder named `/pages/user/[username].tsx` This folder structure will allow us to create dynamic routes for each individual client based on their username.
 
-Here's the main component of the client. This component will hold the states for the list of messages, username etc. We are using useWebSocket hook to create message, connection and disconnection events from the WebSocket. When a message event is emitted, message will be added to message list and  MessageDisplay component will be rerendered.
-```typescript /pages/user/[username].tsx
+Here's the main component of the client. This component will hold the states for the list of messages, username etc. We are using useWebSocket hook to create message, connection and disconnection events from the WebSocket. When a message event is emitted, message will be added to message list and MessageDisplay component will be rerendered.
+
+```typescript title="/pages/user/[username].tsx"
 import useWebSocket from "react-use-websocket";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import styles from "@/styles/Home.module.css";
-import {Redis} from "@upstash/redis";
+import { Redis } from "@upstash/redis";
 
 type Message = {
     id: number;
@@ -293,7 +297,7 @@ export default function MessageApp(props: { messagesData: Message[] }) {
 
 Here are the MessageDisplay and MessageInput components:
 
-```typescript /pages/user/[username].tsx
+```typescript title="/pages/user/[username].tsx"
 const MessageDisplay = function (props: { messages: Message[] }) {
     const { messages } = props;
 
@@ -371,7 +375,7 @@ const MessageBubble = (props: {
 
 In order to provide the chat history to the client, we'll use `getServerSideProps()` function.
 
-```typescript /pages/user/[username].tsx
+```typescript title="/pages/user/[username].tsx"
 export async function getServerSideProps() {
     const redis = new Redis({
         url: process.env.UPSTASH_REDIS_REST_URL,
@@ -398,14 +402,17 @@ Server's structure is rather simple. We're going to use Node.js, ws library, and
 mkdir server
 cd server
 ```
+
 Inside the `server` folder, we'll install the requirements and configure the files.
+
 ```shell
 npm install typescript ws tsc @upstash/kafka @types/ws
 tsc --init
 ```
+
 Then, we're going to create the WebSocket, Kafka Producer and Kafka Consumer clients inside `/server/message_server.ts` file:
 
-```typescript /server/message_server.ts
+```typescript title="/server/message_server.ts"
 import { WebSocket } from "ws";
 
 import * as http from "http";
@@ -426,8 +433,8 @@ const kafka = new Kafka({
 });
 
 const redis = new Redis({
-        url: process.env.UPSTASH_REDIS_REST_URL,
-        token: process.env.UPSTASH_REDIS_REST_TOKEN,
+    url: process.env.UPSTASH_REDIS_REST_URL,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN,
 });
 
 const consumer = kafka.consumer();
@@ -439,7 +446,7 @@ const clients = new Set<WebSocket>();
 
 In order to interact with the WebSocket, we're creating `connection` and `message` events.
 
-```typescript /server/message_server.ts
+```typescript title="/server/message_server.ts"
 wss.on("connection", async (connection, req) => {
     clients.add(connection);
     console.log(`New client connected!`);
@@ -457,12 +464,11 @@ wss.on("connection", async (connection, req) => {
         clients.delete(connection);
     });
 });
-
 ```
 
 Finally, we'll create and run the thread that consumes messages with predefined interval:
 
-```typescript /server/message_server.ts
+```typescript title="/server/message_server.ts"
 async function run() {
     while (true) {
         const messages = await consumer.consume({
@@ -512,7 +518,7 @@ flyctl auth login
 
 To create the configuration files, run `flyctl init`. This will create a `fly.toml`. Go to `fly.toml` and insert the following lines for the WebSocket connection configurations:
 
-```toml fly.toml
+```toml title="fly.toml"
 [[services]]
   internal_port = 8080
   protocol = "tcp"
@@ -551,9 +557,17 @@ We are done! If you run the `flyctl open` command, you'll be navigated to your d
 
 ### Conclusion and Suggestions
 
-Thank you for reading and following along!
-You can find the Github repository of the project [here]([github.com](https://github.com/upstash/examples/tree/main/examples/next-chatapp-with-kafka))
+Thank you for following along!
 
-If you want to keep improving the project, you could implement multiple message servers, and a load balancer to apply the best system design practices.
+You can find the Github repository of the project [here](https://github.com/upstash/examples/tree/main/examples/next-chatapp-with-kafka).
+
+If you want to keep working on the project, here are some suggestions:
+
+-   Currently, whenever the page is reloaded, all the stored messages in Upstash Redis are being flushed. This behavior is controlled by the code in the `pages/index.tsx file`, specifically within the `getServerSideProps` function. However, a critical issue arises when a user decides to reload the page, it results in the deletion of chat history for all participants in the chatroom.<br/>
+    To solve this issue, a recommended solution involves implementing an extension of the TTL for the chat history each time a message is sent. This improvement would ensure that chat history remains accessible and preserved even after page reloads.
+
+-   You could implement multiple chatrooms feature. To achieve this, you could create multiple Kafka topics with unique names for each chatroom. Another way is to handle it on the message server itself using the right data structures.
+
+-   You could also implement multiple message servers, and a load balancer to apply the best system design practices.
 
 If you have any questions, you can react me at fahreddin@upstash.com
