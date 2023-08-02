@@ -12,9 +12,19 @@ const nextConfig = {
   experimental: {
     appDir: true,
   },
-  images:{
-    domains: ["github.com","avatars.githubusercontent.com"]
-  }
+  images: {
+    domains: ["github.com", "avatars.githubusercontent.com"]
+  },
+  rewrites: () => [
+    {
+      source: "/docs",
+      destination: "https://upstash.mintlify.dev/docs",
+    },
+    {
+      source: "/docs/:match*",
+      destination: "https://upstash.mintlify.dev/docs/:match*",
+    },
+  ],
 };
 
 module.exports = withContentlayer(nextConfig);
