@@ -117,7 +117,7 @@ Now that we've configured the credentials, we may proceed with the application.
 
 Index page will contain the client registration/creation operations. When a username is submitted, a new client will be created and listed under the _Current Clients_ table.
 
-```typescript title="pages/index.tsx"
+```tsx title="pages/index.tsx"
 import styles from "@/styles/Home.module.css";
 import Link from "next/link";
 import { useState } from "react";
@@ -196,7 +196,7 @@ export default function Home() {
 
 If you want to reset the chat history each time the app is reloaded, you can use the following function:
 
-```typescript title="pages/index.tsx"
+```ts title="pages/index.tsx"
 export async function getServerSideProps() {
     const redis = new Redis({
         url: process.env.UPSTASH_REDIS_REST_URL,
@@ -219,7 +219,7 @@ To implement dynamic routing for the clients, we will create a folder named `/pa
 
 Here's the main component of the client. This component will hold the states for the list of messages, username etc. We are using useWebSocket hook to create message, connection and disconnection events from the WebSocket. When a message event is emitted, message will be added to message list and MessageDisplay component will be rerendered.
 
-```typescript title="/pages/user/[username].tsx"
+```tsx title="/pages/user/[username].tsx"
 import useWebSocket from "react-use-websocket";
 import { useState } from "react";
 import { useRouter } from "next/router";
@@ -244,7 +244,7 @@ export default function MessageApp(props: { messagesData: Message[] }) {
         setMessageList(nextMessages);
     };
 
-    //////handling WebSocket events
+    // handling WebSocket events
     const { sendMessage } = useWebSocket("ws://localhost:8080", {
         share: true,
         filter: () => false,
@@ -271,7 +271,7 @@ export default function MessageApp(props: { messagesData: Message[] }) {
             return "disconnected";
         },
     });
-    //////////
+
 
     function handleSendMessage(messageText: string) {
         const messageData = {
@@ -412,7 +412,7 @@ tsc --init
 
 Then, we're going to create the WebSocket, Kafka Producer and Kafka Consumer clients inside `/server/message_server.ts` file:
 
-```typescript title="/server/message_server.ts"
+```ts title="/server/message_server.ts"
 import { WebSocket } from "ws";
 
 import * as http from "http";
@@ -446,7 +446,7 @@ const clients = new Set<WebSocket>();
 
 In order to interact with the WebSocket, we're creating `connection` and `message` events.
 
-```typescript title="/server/message_server.ts"
+```ts title="/server/message_server.ts"
 wss.on("connection", async (connection, req) => {
     clients.add(connection);
     console.log(`New client connected!`);
@@ -468,7 +468,7 @@ wss.on("connection", async (connection, req) => {
 
 Finally, we'll create and run the thread that consumes messages with predefined interval:
 
-```typescript title="/server/message_server.ts"
+```ts title="/server/message_server.ts"
 async function run() {
     while (true) {
         const messages = await consumer.consume({
@@ -563,11 +563,11 @@ You can find the Github repository of the project [here](https://github.com/upst
 
 If you want to keep working on the project, here are some suggestions:
 
--   Currently, whenever the page is reloaded, all the stored messages in Upstash Redis are being flushed. This behavior is controlled by the code in the `pages/index.tsx file`, specifically within the `getServerSideProps` function. However, a critical issue arises when a user decides to reload the page, it results in the deletion of chat history for all participants in the chatroom.<br/>
+-   Currently, whenever the page is reloaded, all the stored messages in Upstash Redis are being flushed. This behavior is controlled by the code in the `pages/index.tsx` file, specifically within the `getServerSideProps` function. However, a critical issue arises when a user decides to reload the page, it results in the deletion of chat history for all participants in the chatroom.<br/>
     To solve this issue, a recommended solution involves implementing an extension of the TTL for the chat history each time a message is sent. This improvement would ensure that chat history remains accessible and preserved even after page reloads.
 
 -   You could implement multiple chatrooms feature. To achieve this, you could create multiple Kafka topics with unique names for each chatroom. Another way is to handle it on the message server itself using the right data structures.
 
 -   You could also implement multiple message servers, and a load balancer to apply the best system design practices.
 
-If you have any questions, you can react me at fahreddin@upstash.com
+If you have any questions, you can reach me at fahreddin@upstash.com
