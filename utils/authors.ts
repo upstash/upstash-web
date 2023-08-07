@@ -207,7 +207,7 @@ export const authors: Record<string, {
   },
   fahreddin: {
     name: "Fahreddin Ozcan",
-    title: "Full Stack Developer (Guest Author)",
+    title: "Software Engineer Intern @Upstash",
     url: "https://github.com/fahreddinozcan",
     image: "fahreddin.png",
   },

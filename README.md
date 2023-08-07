@@ -4,7 +4,7 @@
 
 ---
 
-#### Note 
+#### Note
 
 ![](public/readme/note-default.png)
 
@@ -47,6 +47,7 @@
 ```
 
 ![](public/readme/note-custom-title.png)
+
 ```mdx
 <Note title="custom">
     You can use any Redis® client, but we recommend @upstash/redis
@@ -62,19 +63,21 @@
 
 ![](public/readme/code-title.png)
 
-```mdx
-```javascript:pages/api/hello.ts
+````mdx
+```javascript title:"pages/api/hello.ts"
 import type { NextRequest } from 'next/server';
-import { Redis } from '@upstash/redis'
+import { Redis } from '@upstash/redis';
 ```
+````
 
 ![](public/readme/code-showLineNumber.png)
 
-```mdx
+````mdx
 ```javascript:pages/api/hello.ts showLineNumbers {5-8,12}
 import type { NextRequest } from 'next/server';
 import { Redis } from '@upstash/redis'
 ```
+````
 
 ---
 
@@ -91,9 +94,6 @@ tags: [announce]
 ---
 ```
 
-
-
-
 ## Snipsync
 
 We use [snipsync](https://github.com/temporalio/snipsync) to synchronize snippets from other repos (like redis-examples) to the docs, so they are deduplicated.
@@ -102,8 +102,10 @@ Snipsync runs automatically when you do `yarn build`
 ### How to use:
 
 #### Source files:
+
 Use comments to identify code snippets and the locations where they should be merged.
 In the source repo, wrap the code snippets in comments with a unique snippet identifier like this:
+
 ```go
 // @@@SNIPSTART hellouniverse
 func HelloUniverse() {
@@ -111,6 +113,7 @@ func HelloUniverse() {
 }
 // @@@SNIPEND
 ```
+
 In the example above, "hellouniverse" is the unique identifier for the code snippet.
 Unique identifiers can contain letters, numbers, hyphens, and underscores.
 
@@ -120,10 +123,10 @@ In the target files wrap the location with comments that reference the identifie
 
 <!--SNIPSTART hellouniverse-->
 <!--SNIPEND-->
-In the example above, the "hellouniverse" code snippet will be spliced between the comments. Any text inside of the placeholders will be replaced by the code snippet when the tool runs.%  
 
-
+In the example above, the "hellouniverse" code snippet will be spliced between the comments. Any text inside of the placeholders will be replaced by the code snippet when the tool runs.%
 
 # Please build
+
 // I needed something to change to trigger a build
 // - andreas
