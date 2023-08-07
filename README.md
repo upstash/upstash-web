@@ -9,7 +9,9 @@
 ![](public/readme/note-default.png)
 
 ```mdx
-<Note>You can use any Redis® client, but we recommend @upstash/redis</Note>
+<Note>
+    You can use any Redis® client, but we recommend @upstash/redis
+</Note>
 ```
 
 ![](public/readme/note-info.png)
@@ -63,8 +65,8 @@
 
 ````mdx
 ```javascript title:"pages/api/hello.ts"
-import type { NextRequest } from "next/server";
-import { Redis } from "@upstash/redis";
+import type { NextRequest } from 'next/server';
+import { Redis } from '@upstash/redis';
 ```
 ````
 
