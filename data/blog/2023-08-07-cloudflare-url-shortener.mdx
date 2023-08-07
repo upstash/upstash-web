@@ -13,10 +13,10 @@ Cloudflare has recently released the Upstash Integration for the Cloudflare Work
 Here are the steps of building this project:
 
 -   Set up an Upstash database
--   Create the Worker functions on Cloudflare
+-   Create the Worker on Cloudflare
 -   Integrate Cloudflare Workers with Upstash
 -   Implement the project algorithm.
--   Deploy your function
+-   Deploy your application
 
 ### Creating the database
 
@@ -28,16 +28,16 @@ Just like that, your database is all set!
 
 ### Creating the Cloudflare Worker
 
-We're going to use the Cloudflare CLI tool to generate the Worker. It's a pretty simple process. Just open your terminal, and type in the command below:
+We're going to use the Cloudflare CLI tool to generate the Worker. It's a pretty simple process. Just open your terminal and type in the command below:
 
 ```
-npm create cloudflare@2
+npm create cloudflare@latest
 ```
 
-Executing this command will lead you through the options and configurations for the function. Finally, it will request you to log in to Cloudflare. Below is an example of my configuration and the resultant output:
+Executing this command will lead you through the options and configurations for the application. Finally, it will request you to log in to Cloudflare. Below is an example of my configuration and the resultant output:
 
-```bash
-$ npm create cloudflare@2
+```text
+$ npm create cloudflare@latest
 
 using create-cloudflare version 2.1.0
 
@@ -108,7 +108,7 @@ using create-cloudflare version 2.1.0
 ╰ See you again soon!
 ```
 
-We've created and deployed the function using a single line command. This command should have initialized a folder similar to this:
+We've created and deployed the application using a single line command. This command should have initialized a folder similar to this:
 
 ```shell title="/url-shortener"
 src
@@ -124,17 +124,17 @@ Enabling Upstash integration will be equally straightforward.
 
 ### Cloudflare - Upstash Integration
 
-Access to the [Cloudflare Dashboard](https://dash.cloudflare.com) and login with the same account that you've created the `url-shortener` function. Then, navigate to the **Workers & Pages > Overview** section of the sidebar. Here, you will find the `url-shortener` function listed.
+Access to the [Cloudflare Dashboard](https://dash.cloudflare.com) and login with the same account that you've created the `url-shortener` application. Then, navigate to the **Workers & Pages > Overview** section of the sidebar. Here, you will find the `url-shortener` application listed.
 
 ![Cloudflare workers](/blog/cloudflare-url-shortener/cloudflare-workers.png)
 
-Clicking on the function will direct you to the function details page, where we will perform the integration process. Switch to the **Settings** tab in the function details, and proceed to **Integrations** section. You will see various Worker integrations listed. To proceed, click the **Add Integration** button associated with the Upstash Redis.
+Clicking on the application will direct you to the application details page, where we will perform the integration process. Switch to the **Settings** tab in the application details, and proceed to **Integrations** section. You will see various Worker integrations listed. To proceed, click the **Add Integration** button associated with the Upstash Redis.
 
 ![Add integration](/blog/cloudflare-url-shortener/add-integration.png)
 
 On the Integration page, connect to your Upstash account. Then, select the `url-shortener` database from the dropdown menu. Finalize the process by pressing **Save button**.
 
-**Note:** Please don't make any changes in the secret names on the **Configure secrets** step.
+**Note:** Please don't make any changes in the secret names on the **Configure secrets** step. These credentials will be automatically picked up by `Redis.fromEnv(env)` line in the code as `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`. 
 
 ![Choose Upstash Database](/blog/cloudflare-url-shortener/choose-db.png)
 
@@ -144,9 +144,9 @@ Our implementation will rather be a simple one. It will have two functionalities
 
 -   When a URL is sent using the POST method, a randomly generated key will be assigned to that URL. This key-URL pair will be stored in Redis for retrieval. The key will be appended as a path to the Worker URL and sent to the user in the `<YOUR_WORKER_URL>/<KEY>` format.
 
--   When user accesses the Worker URL with previously added key as a path, corresponding value of the key will be retrieved from Redis. The user will then be redirected to this URL with a `301` response code.
+-   When user accesses the Worker URL with previously added key as a path, corresponding value of the key will be retrieved from Redis. The user will then be redirected to this URL with a `307` response code.
 
-We will implement the function in the `src/worker.ts` file. Below is the basic implementation of our URL Shortener:
+We will implement the application in the `src/worker.ts` file. Below is the basic implementation of our URL Shortener:
 
 ```typescript title="src/worker.ts"
 import { Redis } from "@upstash/redis/cloudflare";
@@ -163,27 +163,19 @@ export default {
         ctx: ExecutionContext
     ): Promise<Response> {
         const redis = Redis.fromEnv(env);
+
         /*
         generateRandomKey function returns a 7 digit alphanumerical key.
 		If an identical key exists in Redis, it will create new key.
 		*/
         async function generateRandomKey(): Promise<string> {
-            const length = 7;
-            const characters =
-                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            let key = "";
+			const key: string = btoa(crypto.getRandomValues(new Uint8Array(2)).toString()).replaceAll("=","")
+			if (await redis.exists(key)) {
+				return generateRandomKey();
+			}
+			return key;
+		}
 
-            for (let i = 0; i < length; i++) {
-                const randomIndex = Math.floor(
-                    Math.random() * characters.length
-                );
-                key += characters.charAt(randomIndex);
-            }
-            if (await redis.exists(key)) {
-                return generateRandomKey();
-            }
-            return key;
-        }
         /*
 		If the request method is POST, "longUrl" field will be extracted from
           the request body and new key will be generated for this url.
@@ -209,7 +201,7 @@ export default {
           an error will be returned.
 	    */
         if (url) {
-            return Response.redirect(url, 301);
+            return Response.redirect(url, 307);
         } else {
             const errorText = !slug
                 ? "Please provide a slug."
@@ -221,13 +213,13 @@ export default {
 };
 ```
 
-Now that our algorithm is ready, there's only one step left: deploying the function. Navigate to `url-shortener` folder from the terminal, and run the command below:
+Now that our algorithm is ready, there's only one step left: deploying the application. Navigate to `url-shortener` folder from the terminal, and run the command below:
 
 ```shell
 npm run deploy
 ```
 
-Our Cloudflare Worker is now up and running! You can test the function either in the function dashboard, or via a curl request. Here's an example request for you. You can replace the URL with your Worker URL, or test with my implementation:
+Our Cloudflare Worker is now up and running! You can test it either in the application dashboard, or via a curl request. Here's an example request for you. You can replace the URL with your Worker URL, or test with my implementation:
 
 ```shell
 curl -X POST https://url-shortener.fahreddin.workers.dev \
