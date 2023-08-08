@@ -77,7 +77,7 @@ We are going to schedule our lambda function to run every 15 minutes. So let us 
 
 ## Kafka Producer
 
-Now we want to publish these tweets to a Kafka topic. We need to sign up Upstash console [here](https://console.upstash.com/login). Lets create Kafka cluster in Upstash. You can find instructions [here](https://docs.upstash.com/kafka). Upstash Console already gives us the code to connect to the cluster. I just copied below connection piece off Upstash Console. We define bootstrap servers, Kafka username and Kafka password as environment variables.
+Now we want to publish these tweets to a Kafka topic. We need to sign up Upstash console [here](https://console.upstash.com/login). Lets create Kafka cluster in Upstash. You can find instructions [here](/docs/kafka). Upstash Console already gives us the code to connect to the cluster. I just copied below connection piece off Upstash Console. We define bootstrap servers, Kafka username and Kafka password as environment variables.
 
 ```java
 private KafkaProducer<String, String> createKafkaProducer() {

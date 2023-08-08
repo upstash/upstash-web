@@ -47,7 +47,7 @@ export default function ServerlessKafka() {
           View examples
         </Button>
         <Button
-          href="https://docs.upstash.com/kafka"
+          href="/docs/kafka"
           className="bg-blue-100 text-blue-950 hover:bg-blue-100 hover:text-blue-950"
           type="button"
           onClick={()=>{

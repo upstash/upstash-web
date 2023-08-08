@@ -8,7 +8,7 @@ export default function DesignedForTheEdge() {
   return (
     <ServerlessBox className="overflow-hidden md:col-span-2">
       <header className="relative z-20">
-        <ServerlessTitle link="https://docs.upstash.com/redis/features/globaldatabase">
+        <ServerlessTitle link="/docs/redis/features/globaldatabase">
           Designed for the edge
         </ServerlessTitle>
         <ServerlessSummary>
@@ -26,7 +26,7 @@ export default function DesignedForTheEdge() {
         >
           {/* circles line */}
           <svg
-            className="absolute left-0 top-0 z-0"
+            className="absolute top-0 left-0 z-0"
             width="490"
             height="490"
             viewBox="0 0 490 490"
@@ -145,7 +145,7 @@ export default function DesignedForTheEdge() {
           <ProductOut className="h-[170px] rotate-[60deg]">
             <ProductIn className="rotate-[-60deg]">
               <Image
-                className="block h-6 w-6 text-black"
+                className="block w-6 h-6 text-black"
                 src="/lagon-icon-black.png"
                 width={40}
                 height={40}

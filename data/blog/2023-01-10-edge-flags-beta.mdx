@@ -29,17 +29,17 @@ There are two components to this: The [console](https://console.upstash.com/edge
 When you go to [console.upstash.com/edge-flags](https://console.upstash.com/edge-flags) for the first time, you need to select a Redis database to use. This database will be used to store the feature flags. If you don't have a Redis database yet, you can [create one for free](https://console.upstash.com/).
 
 In the console, you can create, update and delete flags or temporarily toggle them on or off.
-Each flag can have a [percentage](https://docs.upstash.com/redis/sdks/edge-flags/percentage) defined, allowing you to rollout flags gradually to a random subset of your users.
+Each flag can have a [percentage](/docs/redis/sdks/edge-flags/percentage) defined, allowing you to rollout flags gradually to a random subset of your users.
 
 In addition to the percentage, you are able to add rules. Rules can be used to target specific users or groups of users. For example, you can target users geographically or users that have a specific email address domain.
-To learn more about differen rule types, please check out the [rules documentation](https://docs.upstash.com/redis/sdks/edge-flags/rules).
+To learn more about differen rule types, please check out the [rules documentation](/docs/redis/sdks/edge-flags/rules).
 
 ### Your App
 
 Adding `@upstash/edge-flags` to your Next.js application is easy:
 All we need to do is to install the package, create a simple edge handler and then use the flag in our frontend.
 
-For a full tutorial, please check out the [quickstart](https://docs.upstash.com/redis/sdks/edge-flags/getstarted).
+For a full tutorial, please check out the [quickstart](/docs/redis/sdks/edge-flags/getstarted).
 
 #### 1. Create a Redis database and copy the credentials
 
@@ -126,7 +126,7 @@ See [below](#road-to-v1) for more details.
 
 ## Documentation
 
-For a full list of features and some explanations, please check out the [documentation](https://docs.upstash.com/redis/sdks/edge-flags/overview) and stay tuned for a technical deep dive blog post soon<sup>TM</sup>.
+For a full list of features and some explanations, please check out the [documentation](/docs/redis/sdks/edge-flags/overview) and stay tuned for a technical deep dive blog post soon<sup>TM</sup>.
 If something is not clear or you have any questions, please let us know!
 
 ## Road to v1
@@ -161,6 +161,6 @@ If you have any questions or feedback, please reach out to us on [Twitter](https
 Relevant links:
 
 - [GitHub](https://github.com/upstash/edge-flags)
-- [Documentation](https://docs.upstash.com/redis/sdks/edge-flags/overview)
+- [Documentation](/docs/redis/sdks/edge-flags/overview)
 - [Console](https://console.upstash.com/edge-flags)
 - [Examples](https://github.com/upstash/edge-flags/tree/main/examples)

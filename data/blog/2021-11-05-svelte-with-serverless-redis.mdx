@@ -79,7 +79,7 @@ export function getMovieKey(id: number): string {
 export default REDIS_CONNECTION ? new Redis(REDIS_CONNECTION) : new Redis();
 ```
 
-Note that this implementation creates a single Redis client per serverless instance. Another option is to create and close a [Redis connection per request](https://blog.upstash.com/serverless-database-connections?utm_source=geoff1). Upstash also has a [REST API](https://docs.upstash.com/features/restapi?utm_source=geoff1) that does not require you to initialize a Redis connection. The best option depends on your app's latency and memory requirements.
+Note that this implementation creates a single Redis client per serverless instance. Another option is to create and close a [Redis connection per request](https://blog.upstash.com/serverless-database-connections?utm_source=geoff1). Upstash also has a [REST API](/docs/features/restapi?utm_source=geoff1) that does not require you to initialize a Redis connection. The best option depends on your app's latency and memory requirements.
 
 Go to the `/src/routes/movie/[id=id]/+page.server.ts` file. Import the Redis client and the `getMovieKey` function from `redis.ts`.
 

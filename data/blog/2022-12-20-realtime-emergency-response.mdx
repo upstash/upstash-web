@@ -6,7 +6,7 @@ authors:
 tags: [realtime, serverless, edge, qstash, redis]
 ---
 
-In today's article we are going to talk about how you can take advantage of [Upstash](https://upstash.com/) to securely store and access information about a country's shelter map using Redis, and update the database in realtime via [QStash](https://docs.upstash.com/qstash).
+In today's article we are going to talk about how you can take advantage of [Upstash](https://upstash.com/) to securely store and access information about a country's shelter map using Redis, and update the database in realtime via [QStash](/docs/qstash).
 
 ## Introduction
 
@@ -83,9 +83,9 @@ Next.js uses the [node](https://nextjs.org/docs/advanced-features/react-18/switc
 
 ### Upstash
 
-To create an Upstash provider follow [this guide](https://docs.upstash.com/redis/quickstarts/nextjs13).
+To create an Upstash provider follow [this guide](/docs/redis/quickstarts/nextjs13).
 
-To setup a QStash-receiver route, follow [this guide](https://docs.upstash.com/qstash/quickstarts/vercel-nextjs).
+To setup a QStash-receiver route, follow [this guide](/docs/qstash/quickstarts/vercel-nextjs).
 Note that Ably provides us with two options for the webhook message encoding, [JSON](https://www.json.org/json-en.html) and [MessagePack](https://msgpack.org/). If you want to use the former, you might need to use an authorization header instead of JWT to work along potential encryption compatibility problems. For simplicity we will stick to JSON.
 
 ### Ably

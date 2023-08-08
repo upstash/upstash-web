@@ -15,7 +15,7 @@ When I decided to build [Bytecrowds](https://www.bytecrowds.com), I had to learn
 
 Even before discovering Upstash, I was interested in Redis® for its simple API. However, using it as a primary database comes with challenges like scaling(you might need this for caching too) and maintaining persistence. At the same time, before securing any sponsorship, you have to be very careful about budgeting an open-source software. Will you pay for the computing power even if it's not used at times? Can you handle a sudden traffic spike and be ready to spend hours working on infrastructure instead of working toward publishing new features, improving existing ones, or fixing some bugs? I, for one, wasn't. So I found Upstash.
 
-The Upstash [Redis](https://docs.upstash.com/redis) offering matches 3 of my essential criteria: it's **easy to use**, **easy to scale**, and **flexible**. Combine that with [low latency](https://upstash.com/fast), out of the box [REST sdk](https://github.com/upstash/upstash-redis) to use in serverless clients(a **requirement** for Bytecrowds too), global replication and a pay-as-you-go plan for the computing power, to name a few, and you will understand why I chose it for my project.
+The Upstash [Redis](/docs/redis) offering matches 3 of my essential criteria: it's **easy to use**, **easy to scale**, and **flexible**. Combine that with [low latency](https://upstash.com/fast), out of the box [REST sdk](https://github.com/upstash/upstash-redis) to use in serverless clients(a **requirement** for Bytecrowds too), global replication and a pay-as-you-go plan for the computing power, to name a few, and you will understand why I chose it for my project.
 
 ## Using Redis® across the app
 
@@ -73,7 +73,7 @@ Where `addresses` is an array of SHA256-encrypted IP addresses used to determine
 
 If you're curious about the code behind this, check https://github.com/Bytecrowds/analytics/blob/main/src/index.js
 
-**Note**: In a more complex scenario, you'd probably apply some changes to this system, like storing the raw data before processing and using some sort of stream processing tool like [Apache Kafka](https://kafka.apache.org) (Upstash can take care of this too, check the [docs](https://docs.upstash.com/kafka)).
+**Note**: In a more complex scenario, you'd probably apply some changes to this system, like storing the raw data before processing and using some sort of stream processing tool like [Apache Kafka](https://kafka.apache.org) (Upstash can take care of this too, check the [docs](/docs/kafka)).
 
 ## See it live
 

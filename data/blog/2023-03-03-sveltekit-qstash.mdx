@@ -6,7 +6,7 @@ authors:
 tags: [qstash, sveltekit]
 ---
 
-[QStash](https://docs.upstash.com/qstash) is a message delivery solution from Upstash designed for serverless and the edge. Let’s see how we can use it in a [SvelteKit](https://kit.svelte.dev/) app!
+[QStash](/docs/qstash) is a message delivery solution from Upstash designed for serverless and the edge. Let’s see how we can use it in a [SvelteKit](https://kit.svelte.dev/) app!
 
 ## The project
 
@@ -20,13 +20,13 @@ Note that the effectiveness of this technique depends on the API you’re using.
 
 - Basic familiarity with [SvelteKit](https://kit.svelte.dev/) (e.g. routing and loading data)
 - A [TMDB API key](https://developers.themoviedb.org/3/getting-started/introduction) and Redis instance (e.g. on [Upstash](https://upstash.com/))
-- An [Upstash](https://upstash.com/) account so you can access QStash. The [free plan](https://docs.upstash.com/qstash/pricing) allows you to send a small number of messages per day, which should be plenty for our use case.
+- An [Upstash](https://upstash.com/) account so you can access QStash. The [free plan](/docs/qstash/pricing) allows you to send a small number of messages per day, which should be plenty for our use case.
 
 ## Getting started
 
 Clone the [starter repo](https://github.com/geoffrich/movie-search-qstash/tree/initial). The `main` branch has the end result, so checkout the `initial` branch to follow along with this post. If you want to push your changes, fork the repo first.
 
-This is a small SvelteKit application that allows searching for movies and viewing their details using the TMDB API. It uses [ioredis](https://github.com/luin/ioredis) to interact with Redis, though you could also use [Upstash’s REST API](https://docs.upstash.com/redis/features/restapi). You can see the deployed demo running [on Vercel](https://movie-search-qstash.vercel.app/).
+This is a small SvelteKit application that allows searching for movies and viewing their details using the TMDB API. It uses [ioredis](https://github.com/luin/ioredis) to interact with Redis, though you could also use [Upstash’s REST API](/docs/redis/features/restapi). You can see the deployed demo running [on Vercel](https://movie-search-qstash.vercel.app/).
 
 To run the demo locally, add a `.env` file with the required environment variables. See `.sample.env` for an example. To start, you only need to add `TMDB_API_KEY` and `REDIS_CONNECTION` — the other variables will come later. Then, run `npm install` and `npm run dev` to start the app.
 
@@ -240,7 +240,7 @@ The verification needs the raw message body, so we have to consume the request w
 
 You can check that the verification is working by running the `fetch` call in your browser console from before. Since it doesn’t have the correct headers, the request should fail. However, triggering the request from QStash (e.g. by waiting for a cached movie detail to expire) should still succeed.
 
-For more on message verification, see the [client](https://github.com/upstash/sdk-qstash-ts#receiving-a-message) and [security](https://docs.upstash.com/qstash/howto/signature) docs.
+For more on message verification, see the [client](https://github.com/upstash/sdk-qstash-ts#receiving-a-message) and [security](/docs/qstash/howto/signature) docs.
 
 ## Deploying to production
 
@@ -250,4 +250,4 @@ You can see the deployed version of the example app [on Vercel](https://movie-se
 
 ## Wrapping up
 
-This is just one way you can use QStash in your app. QStash also supports many other use-cases — take a look at [the docs](https://docs.upstash.com/qstash) for more.
+This is just one way you can use QStash in your app. QStash also supports many other use-cases — take a look at [the docs](/docs/qstash) for more.

@@ -5,7 +5,7 @@ authors: [enes]
 tags: [redis, database, serverless, cloudflare workers, cloudflare]
 ---
 
-If you are using Cloudflare Workers, [Upstash Global Redis](https://docs.upstash.com/redis/features/globaldatabase) and [Workers KV](https://www.cloudflare.com/products/workers-kv/) are probably your best options to keep your data. In this post, I will briefly compare them as a data store for your Cloudflare Workers functions.
+If you are using Cloudflare Workers, [Upstash Global Redis](/docs/redis/features/globaldatabase) and [Workers KV](https://www.cloudflare.com/products/workers-kv/) are probably your best options to keep your data. In this post, I will briefly compare them as a data store for your Cloudflare Workers functions.
 
 ### Feature Set
 
@@ -18,7 +18,7 @@ delete(key)
 list({prefix?: string, limit?: number, cursor?: string})
 ```
 
-Upstash Redis has much larger API, including Strings, Sets, Lists, Hashes, SortedSets. Check [the Upstash API](https://docs.upstash.com/redis/overall/rediscompatibility).
+Upstash Redis has much larger API, including Strings, Sets, Lists, Hashes, SortedSets. Check [the Upstash API](/docs/redis/overall/rediscompatibility).
 
 ### Price
 
@@ -82,4 +82,4 @@ Cloudflare Workers KV has a hard limit that you can send 1 write operation to th
 
 [Workers KV Runtime APIs](https://developers.cloudflare.com/workers/runtime-apis/kv)
 
-[Upstash Global Database](https://docs.upstash.com/redis/features/globaldatabase)
+[Upstash Global Database](/docs/redis/features/globaldatabase)

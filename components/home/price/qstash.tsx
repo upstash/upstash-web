@@ -47,7 +47,7 @@ export default function PriceQStash() {
 
       <PriceHr />
 
-      <PriceButton href="https://docs.upstash.com/qstash/pricing" onClick={() => { segment.track("button.pricing.redis") }}>
+      <PriceButton href="/docs/qstash/overall/pricing" onClick={() => { segment.track("button.pricing.redis") }}>
         More information
       </PriceButton>
     </PriceBox>

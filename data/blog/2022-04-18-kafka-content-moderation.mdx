@@ -190,8 +190,8 @@ export default async function handler(req, res) {
 
 A Kafka topic will trigger this AWS Lambda function with each new comment. The function will call Sightengine API and depending on the response it will either push the comment to the `comments` list or `rejected-comments` list in the Redis. Here the required steps:
 
-- Create a Serverless function (select Node.js runtime) using [AWS SAM](https://docs.upstash.com/redis/tutorials/using_aws_sam) or [Serverless Framework](https://docs.upstash.com/redis/tutorials/using_serverless_framework).
-- Set your Kafka topic as trigger for the Lambda function as explained [here.](https://docs.upstash.com/kafka/howto/kafka-with-lambda)
+- Create a Serverless function (select Node.js runtime) using [AWS SAM](/docs/redis/tutorials/using_aws_sam) or [Serverless Framework](/docs/redis/tutorials/using_serverless_framework).
+- Set your Kafka topic as trigger for the Lambda function as explained [here.](/docs/kafka/howto/kafka-with-lambda)
 - Create a [Sightengine](https://sightengine.com/) account and get API keys.
 
 Here the function code:

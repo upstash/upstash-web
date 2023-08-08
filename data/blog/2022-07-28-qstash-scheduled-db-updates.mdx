@@ -106,7 +106,7 @@ async function handler(_req: NextApiRequest, res: NextApiResponse) {
 
 Lastly, we wrap the handler with `verifySignature`, so that we can verify that
 the request is coming from Upstash. You can read more about this in the
-[QStash documentation](https://docs.upstash.com/qstash/features/security). And we
+[QStash documentation](/docs/qstash/features/security). And we
 also need to disable automatic parsing of the request body, in order to allow
 `verifySignature` to work properly.
 
@@ -139,7 +139,7 @@ you can deploy it directly from your local machine using the
 [vercel cli](https://vercel.com/docs/cli).
 
 For a more indepth tutorial on how to deploy to Vercel, check out this
-[quickstart](https://docs.upstash.com/qstash/quickstarts/vercel-nextjs#4-deploy-to-vercel).
+[quickstart](/docs/qstash/quickstarts/vercel-nextjs#4-deploy-to-vercel).
 
 After you have deployed your app, it is time to add your secrets to your
 environment variables.

@@ -2,19 +2,19 @@
   "redirects": [
     {
       "source": "/redis",
-      "destination": "https://docs.upstash.com/redis"
+      "destination": "https://upstash.com/docs/redis"
     },
     {
       "source": "/kafka",
-      "destination": "https://docs.upstash.com/kafka"
+      "destination": "https://upstash.com/docs/kafka"
     },
     {
       "source": "/qstash",
-      "destination": "https://docs.upstash.com/qstash"
+      "destination": "https://upstash.com/docs/qstash"
     },
     {
       "source": "/edge",
-      "destination": "https://docs.upstash.com/redis/features/globaldatabase"
+      "destination": "https://upstash.com/docs/redis/features/globaldatabase"
     },
     {
       "source": "/discord",
@@ -26,7 +26,7 @@
     },
     {
       "source": "/redis-api-compatibility",
-      "destination": "https://docs.upstash.com/features/restapi#rest---redis-api-compatibility"
+      "destination": "https://upstash.com/docs/redis/features/restapi#rest-redis-api-compatibility"
     }
   ]
 }

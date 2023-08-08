@@ -6,7 +6,7 @@ image: serverless-connections.jpeg
 tags: [redis, database, serverless, aws lambda]
 ---
 
-(Update: GraphQL API is deprecated. Instead, you can use the [REST API](https://docs.upstash.com/redis/features/restapi))
+(Update: GraphQL API is deprecated. Instead, you can use the [REST API](/docs/redis/features/restapi))
 
 #### UPDATE: We have built [@upstash/redis](https://github.com/upstash/upstash-redis) to solve the issues explained in this article. It is HTTP based, designed and tested for serverless runtimes for efficient connection handling.
 
@@ -35,7 +35,7 @@ if( current_connection_count > HARD_LIMIT ) {
 }
 ```
 
-Note that the max concurrent connection limits listed in the [Upstash docs](https://docs.upstash.com/overall/databasetypes) are the soft limits.
+Note that the max concurrent connection limits listed in the [Upstash docs](/docs/overall/databasetypes) are the soft limits.
 
 ### Ephemeral Connections
 
@@ -150,7 +150,7 @@ This issue is quite similar to [the issue](https://github.com/jeremydaly/serverl
 
 ### GraphQL Helps Too
 
-One way to get rid of connection issues to have connectionless API. Upstash supports [GraphQL API](https://docs.upstash.com/graphql/aboutgraphqlapi) in addition to Redis protocol. GraphQL is HTTP based so it does not have the connection limit issue. Check the docs for supported commands. Beware that GraphQL API has a latency overhead (about 5msec) over Redis protocol.
+One way to get rid of connection issues to have connectionless API. Upstash supports [GraphQL API](/docs/graphql/aboutgraphqlapi) in addition to Redis protocol. GraphQL is HTTP based so it does not have the connection limit issue. Check the docs for supported commands. Beware that GraphQL API has a latency overhead (about 5msec) over Redis protocol.
 
 ### Conclusion
 

@@ -45,7 +45,7 @@ export default function ServerlessQStash() {
           View examples
         </Button>
         <Button
-          href="https://docs.upstash.com/qstash"
+          href="/docs/qstash"
           className="bg-purple-100 text-purple-950 hover:bg-purple-100 hover:text-purple-950"
           type="button"
           onClick={()=>{

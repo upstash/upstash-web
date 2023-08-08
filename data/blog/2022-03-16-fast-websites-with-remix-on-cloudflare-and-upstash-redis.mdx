@@ -11,12 +11,12 @@ Web frameworks like [Remix Run](https://remix.run) were created with the goal of
 
 Unfortunately, the best website load times are of little use to us unless the databases of our apps are lightning fast as well.
 
-Today, we'll look at how to achieve excellent website loading speeds and combine them with **peak database performance** of [Upstash Redis](https://upstash.com/redis) [Global Databases](https://docs.upstash.com/redis/features/globaldatabase).
+Today, we'll look at how to achieve excellent website loading speeds and combine them with **peak database performance** of [Upstash Redis](https://upstash.com/redis) [Global Databases](/docs/redis/features/globaldatabase).
 
 ## Why Global Databases?
 
 Most individuals use a Content Delivery Network (CDN) when they deploy a website online. A content delivery network (CDN) is a global network of servers. Because website files can be cached and served from the closest geographic location to the client, a CDN delivers significantly lower latency than a single server system. This will ensure that your website loads quickly all across the world.
-When we talk about [Upstash](https://upstash.com)'s [Global Databases](https://docs.upstash.com/redis/features/globaldatabase) the same concept of a CDN applies to Redis Databases. With global databases, replicas of your databases are distributed across multiple regions around the world. Now, the clients are routed to the nearest region and experience up to < 10ms latency.
+When we talk about [Upstash](https://upstash.com)'s [Global Databases](/docs/redis/features/globaldatabase) the same concept of a CDN applies to Redis Databases. With global databases, replicas of your databases are distributed across multiple regions around the world. Now, the clients are routed to the nearest region and experience up to < 10ms latency.
 
 ## Getting started
 
@@ -24,7 +24,7 @@ Now that I've already promised a lot, let's take a look at how the whole thing w
 
 ### What we are going to build
 
-We will build a web app with [Remix Run](https://remix.run) that uses [Upstash Redis](https://upstash.com/redis) [Global Databases](https://docs.upstash.com/redis/features/globaldatabase) and deploy it on [Cloudflare Workers](https://workers.cloudflare.com/).
+We will build a web app with [Remix Run](https://remix.run) that uses [Upstash Redis](https://upstash.com/redis) [Global Databases](/docs/redis/features/globaldatabase) and deploy it on [Cloudflare Workers](https://workers.cloudflare.com/).
 
 Cloudflare Workers have the advantage of being deployed globally, similar to a CDN. This means that our Remix app's server-side rendering happens as close to the client as possible, resulting in minimum latency. Combined with Upstash's Global Databases this is the ideal setup performance-wise.
 
@@ -102,7 +102,7 @@ export default function Index() {
       <p>
         It took <b>{loadingTime} ms</b> to read the number of button clicks from{" "}
         <a href="https://upstash.com/redis">Upstash Redis</a>{" "}
-        <a href="https://docs.upstash.com/redis/features/globaldatabase">
+        <a href="/docs/redis/features/globaldatabase">
           Global Database
         </a>
         .

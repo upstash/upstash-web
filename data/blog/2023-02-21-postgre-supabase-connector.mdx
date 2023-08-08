@@ -38,7 +38,7 @@ Detailed information about Supabase can be found on Supabase [website](https://s
 
 First, we need to login [Upstash console](https://console.upstash.com/login) and navigate to [Kafka](https://console.upstash.com/kafka).
 
-We need to create a Kafka cluster by following [Upstash Kafka Docs](https://docs.upstash.com/kafka).
+We need to create a Kafka cluster by following [Upstash Kafka Docs](/docs/kafka).
 
 There is no need to create any topic for now. Once we have a Kafka cluster, we can continue with Supabase.
 
@@ -162,7 +162,7 @@ We can create a leaderboard!
 
 All users are going to have scores according to their activities. They will earn 2 points for every “comment” they provided and 1 point for every “like” activity.
 
-To store this leaderboard, we can use sorted sets in Serverless Redis. To create Redis, please follow the steps in [Serverless Redis Docs](https://docs.upstash.com/redis).
+To store this leaderboard, we can use sorted sets in Serverless Redis. To create Redis, please follow the steps in [Serverless Redis Docs](/docs/redis).
 
 Let’s create a Java application to stream data from Kafka topics via Kafka Streams. Then we can use the data to increment scores of the users in leaderboard we store in Redis.
 

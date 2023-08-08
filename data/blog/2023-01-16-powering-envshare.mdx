@@ -45,7 +45,7 @@ The data is stored in a Redis hash with the following structure:
 Using a hash allows us to store some metadata along with the encrypted data and also to atomically decrement the remaining reads with `HINCRBY`.
 Redis is incredibly flexible and allows for fast iteration and implementation of new ideas. For example in the future we might want to add something like an access log. A [sorted set](https://redis.io/docs/data-types/sorted-sets/) would be a great fit for this.
 
-The only problem is that Redis is usually only available over TCP, which does not work in our edge-functions. Luckily, Upstash offers a Redis API that can be used to access [Redis over HTTP](https://docs.upstash.com/redis/features/restapi). This is exactly what we need for EnvShare.
+The only problem is that Redis is usually only available over TCP, which does not work in our edge-functions. Luckily, Upstash offers a Redis API that can be used to access [Redis over HTTP](/docs/redis/features/restapi). This is exactly what we need for EnvShare.
 Upstash offers a free Redis database with 10,000 requests per day. This is more than enough for us, and if you want to host EnvShare yourself, you can get a free account [here](https://console.upstash.com).
 Check out the selfhosting guide [here](https://envshare.dev/deploy)
 

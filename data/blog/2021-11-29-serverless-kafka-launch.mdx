@@ -6,7 +6,7 @@ image: kafkalaunch/cover.jpg
 tags: [serverless, kafka, edge]
 ---
 
-We are thrilled to announce Upstash Kafka today. [Upstash Kafka](https://docs.upstash.com/kafka) is the first Serverless Kafka offering. With a pay-per-request model, you can have a fully managed Kafka cluster without paying hundreds of dollars. With the free tier, you can create a Kafka cluster in seconds and without entering your credit card. The [Upstash](https://upstash.com) team takes care of availability, maintenance, scaling, upgrades and all the other tedious stuff while you focus on your app.
+We are thrilled to announce Upstash Kafka today. [Upstash Kafka](/docs/kafka) is the first Serverless Kafka offering. With a pay-per-request model, you can have a fully managed Kafka cluster without paying hundreds of dollars. With the free tier, you can create a Kafka cluster in seconds and without entering your credit card. The [Upstash](https://upstash.com) team takes care of availability, maintenance, scaling, upgrades and all the other tedious stuff while you focus on your app.
 
 ### Why Kafka?
 
@@ -20,7 +20,7 @@ We believe a serverless data service requires the following criteria:
 
 - **Price scales to zero:** A true serverless offering shouldn't charge you if you're not actively using it. Price-per-request is our most outstanding feature. We've been designing our products and infrastructure to fit this pricing model from day one. This requires minimizing fixed costs, which is quite difficult for a beast like Kafka.
 - **No operational burden for the user:** The user creates the Kafka topic and starts using it. High availability, scalability, upgrades, backups… it's all our responsibility.
-- **Connectionless:** Serverless functions do not hold state. So you should be able to access your data with a stateless connection. Our Kafka offering supports the Kafka TCP protocol so all Kafka clients will work with Upstash. We also have [a built-in REST API](https://docs.upstash.com/kafka/rest) to enable connectionless environments like AWS Lambda, Cloudflare Workers, Fastly Compute@Edge.
+- **Connectionless:** Serverless functions do not hold state. So you should be able to access your data with a stateless connection. Our Kafka offering supports the Kafka TCP protocol so all Kafka clients will work with Upstash. We also have [a built-in REST API](/docs/kafka/rest) to enable connectionless environments like AWS Lambda, Cloudflare Workers, Fastly Compute@Edge.
 
 ### Developer First
 
@@ -30,13 +30,13 @@ Upstash is built by developers. We believe we know what developers love. They lo
 
 Upstash Kafka price is based on the number of messages produced and consumed. Single zone cluster costs $0.2 per 100K messages. Multi zone cluster, which we recommend for production, costs $0.6 per 100K messages. The storage costs $0.25 per GB. We do not charge for bandwidth or number of partitions. We do not apply different prices for reads and writes. Our users should be able to calculate their cost easily.
 
-To avoid surprise bills, Upstash guarantees that your monthly cost for a cluster will not exceed the ceiling price (price cap). The price cap for single zone clusters is $120 per month, for multi zone clusters, it is $360 per month. Check [our pricing page](https://docs.upstash.com/kafka/pricing) for more details.
+To avoid surprise bills, Upstash guarantees that your monthly cost for a cluster will not exceed the ceiling price (price cap). The price cap for single zone clusters is $120 per month, for multi zone clusters, it is $360 per month. Check [our pricing page](/docs/kafka/pricing) for more details.
 
 ### REST API
 
 I have already mentioned the critical role of the REST API for serverless and edge functions. For example, you cannot use any of the Kafka clients in Cloudflare Workers. So creating a REST API was a must for us. But it wasn't easy.
 
-Kafka is a very powerful technology. The difficulty is that if a product is very powerful, its API tends to be complex. Existing Kafka clients reflect this complexity with the power of Kafka. We wanted to introduce a REST API for the serverless community that would be simple and intuitive without sacrificing power. We believe [this](https://docs.upstash.com/kafka/kafkaapi) is a good first step and will be evolving for the better with the feedback we will receive from our users.
+Kafka is a very powerful technology. The difficulty is that if a product is very powerful, its API tends to be complex. Existing Kafka clients reflect this complexity with the power of Kafka. We wanted to introduce a REST API for the serverless community that would be simple and intuitive without sacrificing power. We believe [this](/docs/kafka/kafkaapi) is a good first step and will be evolving for the better with the feedback we will receive from our users.
 
 ### Upstash vs Confluent
 
@@ -53,6 +53,6 @@ Upstash Kafka is our first step into the messaging world. It is a big step. We h
 - Fully managed connectors to other data services (e.g. Elasticsearch, MongoDB etc)
 - Global Kafka clusters where the data is replicated to multiple continents.
 
-You can [check our documentation](https://docs.upstash.com/kafka) to learn more. And you can start using Serverless Kafka for free by [creating an Upstash account](https://console.upstash.com/).
+You can [check our documentation](/docs/kafka) to learn more. And you can start using Serverless Kafka for free by [creating an Upstash account](https://console.upstash.com/).
 
 We love to improve [Upstash](https://upstash.com) by your feedback. Let us know your thoughts on [Twitter](https://twitter.com/upstash) or [Discord](https://discord.gg/w9SenAtbme).
