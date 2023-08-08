@@ -5,7 +5,7 @@ export default function PriceScaleToZero() {
   return (
     <ServerlessBox className="md:col-span-3">
       <header>
-        <ServerlessTitle link="https://docs.upstash.com/redis/overall/pricing">
+        <ServerlessTitle link="/docs/redis/overall/pricing">
           Price scales to zero
         </ServerlessTitle>
         <ServerlessSummary>
@@ -32,7 +32,7 @@ export default function PriceScaleToZero() {
         ].map(({ title, value }, index) => (
           <div
             key={title}
-            className="flex grow flex-col justify-center rounded-xl bg-black/20 px-4 py-2 md:h-20"
+            className="flex flex-col justify-center px-4 py-2 grow rounded-xl bg-black/20 md:h-20"
           >
             <span className="text-sm opacity-40">{title}</span>
             <span

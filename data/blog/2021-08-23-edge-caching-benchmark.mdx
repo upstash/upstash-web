@@ -6,7 +6,7 @@ image: cover-edge-caching.jpg
 tags: [redis, database, serverless, aws, edge, edge-computing]
 ---
 
-(Update: Edge Caching feature is deprecated. For low latencies at edge, use our global configurations. [Learn more](https://docs.upstash.com/redis/features/globaldatabase))
+(Update: Edge Caching feature is deprecated. For low latencies at edge, use our global configurations. [Learn more](/docs/redis/features/globaldatabase))
 
 1 ms latency is easy with Redis when the database and clients are in the same region. But if you want the clients to be globally distributed then the latency rises over 100 ms. We built Edge Caching to overcome this.
 
@@ -34,7 +34,7 @@ Edge computing (Cloudflare workers etc) is becoming a popular way of building gl
 
 ## Get Started
 
-You can enable edge caching, in the Upstash console. Beware that edge caching has [an extra cost.](https://docs.upstash.com/account/pricing#edge-caching)
+You can enable edge caching, in the Upstash console. Beware that edge caching has [an extra cost.](/docs/account/pricing#edge-caching)
 
 Once edge caching is enabled, you can find the Edge URL in the REST API dialog. Edge caching is available only for GET calls. For updates (POST), you can still use the plain REST API.
 

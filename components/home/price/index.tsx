@@ -27,8 +27,7 @@ export default function HomeServerless() {
 
           <div className="mt-4">
             <p
-              className="inline-flex items-center gap-2 rounded-full
-            bg-emerald-950/20 px-4 py-2 text-sm text-emerald-400/80 md:text-base"
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm rounded-full bg-emerald-950/20 text-emerald-400/80 md:text-base"
             >
               <Icon icon={ICON_NAMES.CreditCard} />
               No credit card required to get started
@@ -37,24 +36,12 @@ export default function HomeServerless() {
         </SectionHeader>
 
         {/* table */}
-        <div className="mt-10 grid gap-4 md:mt-20 md:grid-cols-3 md:gap-6">
+        <div className="grid gap-4 mt-10 md:mt-20 md:grid-cols-3 md:gap-6">
           <PriceRedis />
           <PriceKafka />
           <PriceQStash />
         </div>
 
-        {/* doc link */}
-        {/*<div className="mt-10 text-zinc-600">
-          See{" "}
-          <Button
-            href="https://docs.upstash.com/redis/overall/pricing"
-            className="underline"
-            hideIcon
-          >
-            pricing page
-          </Button>{" "}
-          for more information.
-        </div>*/}
       </Container>
     </section>
   );

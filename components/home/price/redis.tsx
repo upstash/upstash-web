@@ -49,7 +49,7 @@ export default function PriceRedis() {
 
       <PriceHr />
 
-      <PriceButton href="https://docs.upstash.com/redis/overall/pricing" onClick={() => segment.track("button.pricing.redis")}>
+      <PriceButton href="/docs/redis/overall/pricing" onClick={() => segment.track("button.pricing.redis")}>
         More information
       </PriceButton>
     </PriceBox>

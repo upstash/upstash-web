@@ -203,7 +203,7 @@ async loadTasks(): Promise<Task[]> {
 ...
 ```
 
-First, we load the `taskIds`, which are stored in [a Redis Set](https://redis.io/docs/data-types/sets/). Then we use each ID to fetch the corresponding task. [A pipeline](https://docs.upstash.com/redis/sdks/javascriptsdk/pipeline) ensures we send all get commands in one request to Upstash.
+First, we load the `taskIds`, which are stored in [a Redis Set](https://redis.io/docs/data-types/sets/). Then we use each ID to fetch the corresponding task. [A pipeline](/docs/redis/sdks/javascriptsdk/pipeline) ensures we send all get commands in one request to Upstash.
 
 ### Implementing the Projection
 

@@ -37,9 +37,9 @@ In order to focus on the interesting parts, we will use a mock for the API,
 there are various free services for this and we will be using
 [requestcatcher.com](https://requestcatcher.com/) today. It allows us to easily
 see what payloads are sent. For production, we have a dedicated
-[section](https://docs.upstash.com/qstash/features/security) about how you
+[section](/docs/qstash/features/security) about how you
 should secure your webhook API and
-[quickstarts](https://docs.upstash.com/qstash/quickstarts/vercel-nextjs) for
+[quickstarts](/docs/qstash/quickstarts/vercel-nextjs) for
 popular frameworks.
 
 ### API
@@ -148,14 +148,14 @@ From now you no longer have to worry about losing webhooks in case your API is
 temporarily down for updates, not reachable over the network or some unforeseen
 error occured. By default we are retrying failed messages a couple of times with
 increasing exponential backoff. You can check out the details
-[here](https://docs.upstash.com/qstash/pricing).
+[here](/docs/qstash/pricing).
 
 ## Next steps
 
 In production you should verify the authenticity of incoming webhooks using the
 signature, we generate for each message. You can use our typescript sdk
 @upstash/qstash or check out
-[https://docs.upstash.com/qstash/features/security](https://docs.upstash.com/qstash/features/security)
+[/docs/qstash/features/security](/docs/qstash/features/security)
 to learn how to verify messages.
 
 Let us know your feedback on [Twitter](https://twitter.com/upstash) or

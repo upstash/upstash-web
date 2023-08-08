@@ -194,7 +194,7 @@ sparkConf.setAppName("ReactNativeKafkaSparkStreaming");
 JavaStreamingContext streamingContext = new JavaStreamingContext(sparkConf, Durations.seconds(1));
 ```
 
-Then, we need to configure our serverless Kafka connection. For this purpose, we are going to create props map as it is stated in [Kafka API](https://docs.upstash.com/kafka/kafkaapi).
+Then, we need to configure our serverless Kafka connection. For this purpose, we are going to create props map as it is stated in [Kafka API](/docs/kafka/kafkaapi).
 
 ```java
 Map<String, Object> props = new HashMap<>();

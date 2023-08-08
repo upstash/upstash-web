@@ -45,7 +45,7 @@ export default function ServerlessRedis() {
           View examples
         </Button>
         <Button
-          href="https://docs.upstash.com/redis"
+          href="/docs/redis"
           className="bg-red-100 text-red-950 hover:bg-red-100 hover:text-red-950"
           type="button"
           onClick={()=>{

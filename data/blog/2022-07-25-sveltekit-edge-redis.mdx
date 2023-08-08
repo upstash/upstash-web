@@ -95,9 +95,9 @@ With these changes, you can deploy the project and the page will display the cit
 
 When the user submits the form, we want to add their city to a list. This list should store both the city name as well as the number of times this city has been submitted. This is perfect for a Redis® [sorted set](https://redis.io/docs/manual/data-types/#sorted-sets), since each member in the set has a value (the city name) and score (the number of times that city has visited).
 
-For the purposes of this tutorial, we’ll use Upstash and their [JavaScript SDK](https://docs.upstash.com/redis/sdks/javascriptsdk/overview) to make interacting with Redis® as straightforward as possible.
+For the purposes of this tutorial, we’ll use Upstash and their [JavaScript SDK](/docs/redis/sdks/javascriptsdk/overview) to make interacting with Redis® as straightforward as possible.
 
-Go ahead and sign up for a free [Upstash instance](https://upstash.com/) to continue following along with this tutorial. A single region should be fine for development, though when you deploy production applications to the edge you may want to use a [multi-region database](https://docs.upstash.com/redis/features/globaldatabase) to reduce latency between the edge function processing the request and the database.
+Go ahead and sign up for a free [Upstash instance](https://upstash.com/) to continue following along with this tutorial. A single region should be fine for development, though when you deploy production applications to the edge you may want to use a [multi-region database](/docs/redis/features/globaldatabase) to reduce latency between the edge function processing the request and the database.
 
 Once you’ve created a Redis® instance, create a `.env` file at the root of the repo with your REST URL and token. You can find these values in the “REST API” section of your database settings in the Upstash console.
 

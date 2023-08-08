@@ -12,10 +12,10 @@ backend or a persistent store.
 Kafka output plugin comes along with the built-in FluentBit connectors. That is, FluentBit can read logs from an arbitrary
 source and export them to a Kafka topic. Upstash, on the other hand, provides serverless, fully managed Kafka cluster with
 pay-per-message model. That rescues developers from the burden of managing, scaling and maintaining clusters. Besides,
-its price [scales to zero](https://docs.upstash.com/kafka/pricing) if there is no message - as a real serverless offering!
+its price [scales to zero](/docs/kafka/pricing) if there is no message - as a real serverless offering!
 The last but not the least, the first 10.000 messages per day are free of charge.
 
-In this article, we will export the logs of particular Kubernetes pods to [Upstash Kafka](https://docs.upstash.com/kafka)
+In this article, we will export the logs of particular Kubernetes pods to [Upstash Kafka](/docs/kafka)
 via FluentBit, and then consume, filter and stream these logs to clients through a Go HTTP server.
 
 Before start, make sure you have an Upstash account ([sign up free](<[url](https://console.upstash.com/login)>) if you
