@@ -1,0 +1,366 @@
+---
+slug: timezone-scheduling-emails
+title: "Scheduling emails in the user's timezone using QStash"
+authors:
+  - anshuman
+tags: [qstash, emails, scheduling, nextjs, redis, docsly]
+---
+
+At [docsly](https://docsly.dev), we launched a new feature to send email notifications to users with a summary of all the feedback they received in the last week or month. Sending emails isn't a new problem, but we wanted to provide the best user experience in this regard so we decided that all emails should be sent in the user's timezone to avoid sending emails at odd hours. We also wanted to give users the ability to choose the frequency they want to receive the email. We also wanted to give users the ability to cancel the scheduled email notifications at any time.
+
+Implementing this solution was tricky because:
+
+1. We did not want to store the user's timezone in our database.
+2. We also did not want to run a cron job every minute or hour to check whether it was time to send the email.
+3. We also wanted to let users cancel the scheduled email notifications.
+
+So we came up with a unique solution: Schedule cron jobs in the user's timezone and then cancel the cron job when the user cancels the email notifications. But one question remained: how?
+
+We were already using [Upstash](https://upstash.com) as a Redis store and we found that [QStash](hhttps://upstash.com/docs/qstash) supports a [Schedules](https://upstash.com/docs/qstash/features/schedules) feature as well. Digging a bit deeper we found that QStash supports CRON expressions as well. So we decided to use QStash to schedule the cron jobs.
+
+In this article, we will walk you through the process of scheduling emails in a user's timezone using QStash and Upstash Redis in a Next.js application. You can also find the complete source code on [GitHub](https://github.com/Anshuman71/qstash-email-scheduling).
+
+## Building a Next.js application to schedule emails in the user's timezone
+
+### Prerequisites
+
+To follow along with this tutorial, you will need:
+
+- An [Upstash](https://console.upstash.com/) account
+- A Node.js development environment
+
+### Set up the project
+
+To get started, create a new Next.js project using the following command:
+
+```bash
+npx create-next-app qstash-email-scheduling
+```
+
+Next, install the following dependencies to interact with Upstash:
+
+```bash
+npm install --save @upstash/redis axios
+```
+
+Create a new `.env.local` file in the root of your project and add the following environment variables from your Upstash account:
+
+```bash
+UPSTASH_REDIS_REST_URL=
+UPSTASH_REDIS_REST_TOKEN=
+QSTASH_URL=
+QSTASH_TOKEN=
+QSATSH_CURRENT_SIGNING_KEY=
+QSATSH_NEXT_SIGNING_KEY=
+```
+
+### Solution overview
+
+Before we implement the code, let's take a look at the solution overview. We'll create three Next.js API routes:
+
+- `POST /api/schedule-cron` - to schedule the email cron job in the user's timezone.
+- `POST /api/cancel-schedule` - to cancel the scheduled email cron job.
+- `POST /api/send-email` - triggered by the scheduled cron job to send the email.
+
+In addition to the API routes, we'll also create a simple form to collect the user's preferred time to receive the email.
+
+### Create the user interface
+
+To create the user interface, we'll create a new page at `app/page.tsx` with the following code:
+
+```tsx
+"use client";
+import axios from "axios";
+import { useState } from "react";
+
+export default function Home() {
+  const userId = "tony-stark-11";
+  const [selectedTime, setSelectedTime] = useState("10:00");
+
+  async function createEmailNotificationSchedule() {
+    try {
+      await axios.post(
+        "/api/schedule-cron",
+        {
+          userId,
+          selectedTime,
+          utcOffset: new Date().getTimezoneOffset(),
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      alert("Email notification scheduled");
+    } catch (e) {
+      console.log("Client side error", e);
+      alert("Error scheduling email notification");
+    }
+  }
+
+  async function cancelEmailNotificationSchedule() {
+    try {
+      await axios.post(
+        "/api/cancel-schedule",
+        {
+          userId,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      alert("Email notification schedule cancelled");
+    } catch (e) {
+      console.log("Client side error", e);
+      alert("Error scheduling email notification");
+    }
+  }
+
+  return (
+    <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center p-24">
+      <h1 className="mb-4 text-xl font-bold text-neutral-600">
+        Email Notification for {userId}
+      </h1>
+      Send daily email summary at:
+      <select
+        onChange={(e) => setSelectedTime(e.target.value)}
+        className="mt-4 h-12 w-64 rounded-lg border-2 border-neutral-600 bg-neutral-800 p-2
+       text-white"
+      >
+        {new Array(24).fill(0).map((_, i) => {
+          const time = i < 10 ? `0${i}:00` : `${i}:00`;
+          return (
+            <option key={i} value={time}>
+              {time}
+            </option>
+          );
+        })}
+      </select>
+      <button
+        className="mt-4 rounded bg-green-700 px-4 py-2 text-white"
+        onClick={createEmailNotificationSchedule}
+      >
+        Schedule
+      </button>
+      <button
+        className="mt-4 rounded bg-red-500 px-4 py-2 text-white"
+        onClick={cancelEmailNotificationSchedule}
+      >
+        Cancel Schedule
+      </button>
+    </main>
+  );
+}
+```
+
+The code above creates a form with a drop-down for users to set their preferred time for receiving daily email summaries. They can schedule or cancel these notifications, and the application communicates with the server using HTTP POST requests. We'll create the HTTP endpoints in the following sections.
+
+![Schedule email form](https://i.imgur.com/ObbzMyd.png)
+
+### Schedule email cron job
+
+![Schedule email flow](https://i.imgur.com/34tRQMZ.png)
+
+Let's start by creating the `POST /api/schedule-cron` route. This route will be used to schedule the email cron job in user's timezone. We'll use the [QStash](https://upstash.com/docs/qstash) library to schedule the cron job.
+
+```ts
+import { NextApiRequest, NextApiResponse } from "next";
+import axios from "axios";
+import { Redis } from "@upstash/redis";
+
+export const QSTASH_CONFIG = {
+  QSTASH_URL: process.env.QSTASH_URL,
+  QSTASH_TOKEN: process.env.QSTASH_TOKEN,
+  QSTASH_CURRENT_SIGNING_KEY: process.env.QSTASH_CURRENT_SIGNING_KEY,
+};
+
+export const upstash = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
+
+// Edit this endpoint to match your domain
+const SUMMARY_ENDPOINT = "https://<your-domain>/api/send-email";
+
+export default async function scheduleSummary(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  console.log("========SCHEDULE SUMMARY========");
+  if (req.method !== "POST") {
+    return res.status(400).json({ message: "bad request" });
+  }
+  const { body } = req;
+
+  const { userId, selectedTime, utcOffset } = body;
+
+  const emailScheduleKey = `email-schedule-${userId}`;
+
+  const scheduleId = await upstash.get(emailScheduleKey);
+
+  // remove existing schedule before creating a new one
+  if (scheduleId) {
+    try {
+      await axios.delete(
+        `https://qstash.upstash.io/v1/schedules/${scheduleId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${QSTASH_CONFIG.QSTASH_TOKEN}`,
+          },
+        }
+      );
+    } catch (e) {
+      console.log("Schedule not found in QStash ");
+    }
+    await upstash.del(emailScheduleKey);
+  }
+
+  const [hour, min] = convertToUTC(selectedTime, utcOffset).split(":");
+  const selectedCron = `${min} ${hour} * * *`;
+
+  // create and store new schedule
+  try {
+    const { data, status } = await axios.post(
+      `${QSTASH_CONFIG.QSTASH_URL}${SUMMARY_ENDPOINT}`,
+      { userId },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${QSTASH_CONFIG.QSTASH_TOKEN}`,
+          "Upstash-Cron": selectedCron,
+        },
+      }
+    );
+    console.log({ data, status });
+    if (data.scheduleId) {
+      await upstash.set(emailScheduleKey, data.scheduleId);
+    }
+  } catch (e) {
+    console.log({ e });
+  }
+
+  return res.status(200).json({ message: "success" });
+}
+
+function convertToUTC(timeString: string, utcOffset: number) {
+  const [hours, minutes] = timeString.split(":").map(Number);
+  const timeInMinutes = hours * 60 + minutes;
+  const utcTimeInMinutes = (timeInMinutes + utcOffset + 1440) % 1440;
+  const utcHours = Math.floor(utcTimeInMinutes / 60);
+  const utcMinutes = utcTimeInMinutes % 60;
+  return `${utcHours.toString().padStart(2, "0")}:${utcMinutes
+    .toString()
+    .padStart(2, "0")}`;
+}
+```
+
+The core of the code is the `scheduleSummary` function, which is an API endpoint. It handles incoming POST requests and performs the following steps:
+
+1. Validates the request method, ensuring it's a POST request.
+2. Extracts data from the request body, including userId, selectedTime, and utcOffset.
+3. Constructs a key for the user's email schedule in the Upstash database.
+4. Retrieves any existing schedule for the user and removes it from QStash.
+5. Converts the user's selected time to UTC format using `convertToUTC` function that takes a time string and UTC offset, converting the time to UTC format while accounting for the offset.
+6. Creates a new schedule for sending email summaries using QStash's scheduling functionality and add `userId` as the payload that the `/api/send-email` endpoint receives.
+7. Stores the newly created schedule ID in the Upstash database.
+
+### Send email summary
+
+The `POST /api/send-email` route will be triggered by the scheduled cron job to send the email. We'll use the `@upstash/qstash/nextjs` library to [verify the signature](https://upstash.com/docs/qstash/quickstarts/vercel-nextjs) of the request. This will ensure that the request is coming from QStash and not from any other source.
+
+The `POST /api/send-email` function receives `userId` in the request body. You can implement a function to prepare and send the email based on the `userId`.
+
+```ts
+import { NextApiRequest, NextApiResponse } from "next";
+import { verifySignature } from "@upstash/qstash/nextjs";
+
+async function handler(request: NextApiRequest, res: NextApiResponse) {
+  console.log("==========Project summary handler==========");
+  if (request.method !== "POST") {
+    return res.status(400).json({ message: "bad request" });
+  }
+  const { body } = request;
+  const { userId } = body;
+
+  // prepare and send email
+
+  return res.status(200).json({ message: "success" });
+}
+
+export default verifySignature(handler);
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+```
+
+### Cancel scheduled email cron job
+
+![Cancel scheduled email flow](https://i.imgur.com/xvYy7CJ.png)
+
+Next, let's create the `POST /api/cancel-schedule` route. This route will be used to cancel the scheduled email cron job. We'll use the [QStash](https://upstash.com/docs/qstash) library to cancel the cron job.
+
+```js
+import { NextApiRequest, NextApiResponse } from "next";
+import axios from "axios";
+import { Redis } from "@upstash/redis";
+
+export const QSTASH_CONFIG = {
+    QSTASH_URL: process.env.QSTASH_URL,
+    QSTASH_TOKEN: process.env.QSTASH_TOKEN,
+    QSTASH_CURRENT_SIGNING_KEY: process.env.QSTASH_CURRENT_SIGNING_KEY,
+};
+
+export const upstash = new Redis({
+    url: process.env.UPSTASH_REDIS_REST_URL!,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
+
+export default async function scheduleSummary(
+    req: NextApiRequest,
+    res: NextApiResponse
+) {
+    console.log("========REMOVE SCHEDULE SUMMARY========");
+    if (req.method !== "POST") {
+        return res.status(400).json({ message: "bad request" });
+    }
+    const { body } = req;
+
+    const { userId } = body;
+
+    const emailScheduleKey = `email-schedule-${userId}`;
+
+    const scheduleId = await upstash.get(emailScheduleKey);
+
+    // remove existing schedule before creating a new one
+    if (scheduleId) {
+        try {
+            await axios.delete(
+                `https://qstash.upstash.io/v1/schedules/${scheduleId}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${QSTASH_CONFIG.QSTASH_TOKEN}`,
+                    },
+                }
+            );
+        } catch (e) {
+            console.log("Schedule not found in QStash ");
+        }
+        await upstash.del(emailScheduleKey);
+    }
+
+
+    return res.status(200).json({ message: "success" });
+}
+```
+
+## Conclusion
+
+To summarize, we were able to schedule emails in the user's timezone using Upstash Redis and QStash. We were able to achieve this without storing the user's timezone in our database. We were also able to give users the ability to cancel the scheduled email notifications at any time.
+
+If you're maintaining documentation for your product, you should check out [docsly](https://www.docsly.dev). It's a feedback tool crafted for technical documentation that helps you collect feedback from your users and turn them into actionable insights.
