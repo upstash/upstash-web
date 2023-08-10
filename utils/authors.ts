@@ -230,5 +230,10 @@ export const authors: Record<string, {
     name: "Chris Jayden",
     title: "Software Engineer (Guest Author)",
     image: "chris.jpg",
+  },
+  anshuman:{
+    name: "Anshuman Bhardwaj",
+    title:"Founder @docsly (Guest Author)",
+    image:"anshuman.png"
   }
 };
