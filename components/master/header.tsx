@@ -70,10 +70,18 @@ const NavItems: {
     name: "Blog",
     href: "/blog",
   },
+  {
+    name: "Discord",
+    href: "https://upstash.com/discord",
+  },
+  {
+    name: "Docs",
+    href: "/docs",
+  },
 ];
 
 if (jobLength > 0) {
-  NavItems.push({
+  NavItems.splice(4, 0, {
     name: "Careers",
     href: "/careers",
     children: (

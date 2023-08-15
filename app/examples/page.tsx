@@ -32,14 +32,13 @@ export default async function ExamplesPage() {
     <main className="relative z-0 text-center">
       <Bg />
 
-      <section className="py-16 md:py-20">
+      <section className="pb-6 pt-12 md:pb-8 md:pt-16">
         <Container className="max-w-screen-lg">
           {/* header */}
           <header>
             <PageHeaderTitle>Examples</PageHeaderTitle>
             <PageHeaderDesc className="mt-2">
-              Jumpstart your app development process with our pre-built
-              solutions.
+              Jumpstart your development with our pre-built solutions.
             </PageHeaderDesc>
           </header>
         </Container>

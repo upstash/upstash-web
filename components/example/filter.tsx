@@ -22,6 +22,12 @@ export default function ExampleFilter({
   setSelectedUseCase,
   selectedStacks,
   setSelectedStack,
+  queriedStacks,
+  handleStackQuery,
+  stackQuery,
+  queriedUseCases,
+  handleUseCaseQuery,
+  useCaseQuery,
   allUseCases,
   allStacks,
 }) {
@@ -35,16 +41,16 @@ export default function ExampleFilter({
 
   return (
     <form className="grid gap-4">
-      {/*<div className="pb-4 border-b border-b-white/5">
+      {/* <div className="pb-4 border-b border-b-white/5">
         <input
           type="search"
           className="px-4 py-2 bg-white rounded text-zinc-950"
         />
-      </div>*/}
+      </div> */}
 
       <Child className="sm:-mt-10">
         <div className="flex items-center">
-          <h4 className="text-sm tracking-widest uppercase opacity-60">
+          <h4 className="text-sm uppercase tracking-widest opacity-60">
             Filter
           </h4>
           {isFilterDirty && (
@@ -54,8 +60,10 @@ export default function ExampleFilter({
                 setSelectedProduct([]);
                 setSelectedUseCase([]);
                 setSelectedStack([]);
+                handleStackQuery({ target: { value: "" } });
+                handleUseCaseQuery({ target: { value: "" } });
               }}
-              className="inline-flex items-center justify-center h-5 px-2 ml-auto text-sm rounded-full bg-white/5 text-white/40"
+              className="ml-auto inline-flex h-5 items-center justify-center rounded-full bg-white/5 px-2 text-sm text-white/40"
             >
               Clear
             </button>
@@ -121,54 +129,79 @@ export default function ExampleFilter({
       <Child>
         <Toc>
           <Toc.Summary count={selectedStacks.length}>Stack</Toc.Summary>
-          <div className="space-y-0.5">
-            {allStacks.map((key) => {
-              return (
-                <Item
-                  key={key}
-                  value={key}
-                  checked={selectedStacks.includes(key)}
-                  label={key}
-                  onChange={(e) => {
-                    const { value, checked } = e.target;
-                    if (checked) {
-                      setSelectedStack([...selectedStacks, value]);
-                    } else {
-                      setSelectedStack(
-                        selectedStacks.filter((item) => item !== value)
-                      );
-                    }
-                  }}
-                />
-              );
-            })}
+          <div className="w-[100%] space-y-0.5">
+            <div className="w-[100%] border-b border-b-white/5 py-4">
+              <input
+                type="search"
+                className="w-[100%] rounded bg-white px-4 py-2 text-zinc-950"
+                value={stackQuery}
+                onChange={(e) => {
+                  handleStackQuery(e);
+                }}
+              />
+            </div>
+
+            <div className="grid h-[14rem] grid-flow-row auto-rows-[3.125rem] space-y-0.5 overflow-scroll">
+              {queriedStacks.map((key) => {
+                return (
+                  <Item
+                    key={key}
+                    value={key}
+                    checked={selectedStacks.includes(key)}
+                    label={key}
+                    onChange={(e) => {
+                      const { value, checked } = e.target;
+                      if (checked) {
+                        setSelectedStack([...selectedStacks, value]);
+                      } else {
+                        setSelectedStack(
+                          selectedStacks.filter((item) => item !== value)
+                        );
+                      }
+                    }}
+                  />
+                );
+              })}
+            </div>
           </div>
         </Toc>
       </Child>
       <Child>
         <Toc>
           <Toc.Summary count={selectedUseCase.length}>Use Cases</Toc.Summary>
-          <div className="space-y-0.5">
-            {allUseCases.map((key) => {
-              return (
-                <Item
-                  key={key}
-                  value={key}
-                  checked={selectedUseCase.includes(key)}
-                  label={key}
-                  onChange={(e) => {
-                    const { value, checked } = e.target;
-                    if (checked) {
-                      setSelectedUseCase([...selectedUseCase, value]);
-                    } else {
-                      setSelectedUseCase(
-                        selectedUseCase.filter((item) => item !== value)
-                      );
-                    }
-                  }}
-                />
-              );
-            })}
+          <div className="w-[100%] space-y-0.5">
+            <div className="w-[100%] border-b border-b-white/5 py-4">
+              <input
+                type="search"
+                className="w-[100%] rounded bg-white px-4 py-2 text-zinc-950"
+                value={useCaseQuery}
+                onChange={(e) => {
+                  handleUseCaseQuery(e);
+                }}
+              />
+            </div>
+            <div className="grid h-[14rem] grid-flow-row auto-rows-[3.125rem] space-y-0.5 overflow-scroll">
+              {queriedUseCases.map((key) => {
+                return (
+                  <Item
+                    key={key}
+                    value={key}
+                    checked={selectedUseCase.includes(key)}
+                    label={key}
+                    onChange={(e) => {
+                      const { value, checked } = e.target;
+                      if (checked) {
+                        setSelectedUseCase([...selectedUseCase, value]);
+                      } else {
+                        setSelectedUseCase(
+                          selectedUseCase.filter((item) => item !== value)
+                        );
+                      }
+                    }}
+                  />
+                );
+              })}
+            </div>
           </div>
         </Toc>
       </Child>
@@ -212,12 +245,12 @@ Toc.Summary = function TocSummary({
       )}
       {...props}
     >
-      <span className="inline-flex items-center justify-center w-5 shrink-0">
+      <span className="inline-flex w-5 shrink-0 items-center justify-center">
         <IconArrow className="rotate-0 group-open/toc:rotate-90" />
       </span>
-      <span className="text-sm tracking-wide uppercase grow">{children}</span>
+      <span className="grow text-sm uppercase tracking-wide">{children}</span>
       {count > 0 && (
-        <span className="inline-flex items-center justify-center h-5 px-2 font-mono text-sm rounded-full bg-white/5">
+        <span className="inline-flex h-5 items-center justify-center rounded-full bg-white/5 px-2 font-mono text-sm">
           {count}
         </span>
       )}
@@ -253,7 +286,7 @@ function Item({
         type="checkbox"
         value={value}
         onChange={onChange}
-        className="absolute opacity-0 pointer-events-none"
+        className="pointer-events-none absolute opacity-0"
       />
       {icon ? (
         icon

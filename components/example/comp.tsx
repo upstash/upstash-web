@@ -121,14 +121,7 @@ function ExampleAuthor({
       className={cx("mt-auto flex items-center", className)}
       {...props}
     >
-      <Image
-        className="rounded-full"
-        src={author.image}
-        alt={author.name}
-        width={30}
-        height={30}
-      />
-      <span className="ml-2 opacity-60">{author.name}</span>
+      
     </div>
   );
 }

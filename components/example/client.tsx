@@ -5,6 +5,7 @@ import ExampleFilter from "./filter";
 import { Example as Box } from "./comp";
 import type { Example } from "@/utils/type";
 import { authors } from "@/utils/authors";
+import { set } from "lodash";
 
 type Props = {
   examples: Example[];
@@ -17,40 +18,95 @@ export const Client: React.FC<Props> = ({ examples, useCases, stack }) => {
     []
   );
   const [selectedUseCases, setSelectedUseCases] = useState<string[]>([]);
-  const [selectedStacks, setSelectedStack] = useState<string[]>([]);
+  const [queriedUseCases, setQueriedUseCases] = useState<string[]>(
+    Object.keys(useCases)
+  );
+  const [useCaseQuery, setUseCaseQuery] = useState<string>("");
 
-  const data = examples.filter((item: Example) => {
+  const [selectedStacks, setSelectedStack] = useState<string[]>([]);
+  const [queriedStacks, setQueriedStacks] = useState<string[]>(
+    Object.keys(stack)
+  );
+  const [stackQuery, setStackQuery] = useState<string>("");
+
+  const [queriedExamples, setQueriedExamples] = useState<Example[]>(examples);
+  const [exampleQuery, setExampleQuery] = useState<string>("");
+
+  const handleStackQuery = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+
+    setStackQuery(query);
+    const filteredStacks = Object.keys(stack).filter((item) => {
+      if (selectedStacks.includes(item)) return false;
+      if (query === "") return true;
+      return item.toLocaleLowerCase().includes(query.toLocaleLowerCase());
+    });
+    const outputStack = selectedStacks.concat(filteredStacks);
+    setQueriedStacks(outputStack);
+  };
+
+  const handleUseCaseQuery = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setUseCaseQuery(e.target.value);
+
+    const filteredUseCase = Object.keys(useCases).filter((item) => {
+      if (selectedUseCases.includes(item)) return false;
+      if (query === "") return true;
+      return item.toLocaleLowerCase().includes(query.toLocaleLowerCase());
+    });
+    const outputUseCase = selectedUseCases.concat(filteredUseCase);
+    setQueriedUseCases(outputUseCase);
+  };
+
+  const handleExampleQuery = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setExampleQuery(query);
+
+    const filteredExamples = examples.filter((item) => {
+      if (query === "") return true;
+      return item.title.toLocaleLowerCase().includes(query.toLocaleLowerCase());
+    });
+    setQueriedExamples(filteredExamples);
+  };
+
+  const data = queriedExamples.filter((item: Example) => {
     /**
      * Filter out other products
      */
-    if (selectedProducts.length > 0 && !item.products.some((p) => selectedProducts.includes(p))) {
-      return false
+    if (
+      selectedProducts.length > 0 &&
+      !item.products.some((p) => selectedProducts.includes(p))
+    ) {
+      return false;
     }
     /**
-        * Filter out other stacks
-        */
-    if (selectedStacks.length > 0 && !item.stack.some((s) => selectedStacks.includes(s))) {
-      console.log("filtering out due to stack", item)
-      return false
+     * Filter out other stacks
+     */
+    if (
+      selectedStacks.length > 0 &&
+      !item.stack.some((s) => selectedStacks.includes(s))
+    ) {
+      console.log("filtering out due to stack", item);
+      return false;
     }
     /**
-         * Filter out other usecases
-         */
-    if (selectedUseCases.length > 0 && !item.useCases.some((uc) => selectedUseCases.includes(uc))) {
-      console.log("filtering out due to usecase", item, selectedUseCases)
+     * Filter out other usecases
+     */
+    if (
+      selectedUseCases.length > 0 &&
+      !item.useCases.some((uc) => selectedUseCases.includes(uc))
+    ) {
+      console.log("filtering out due to usecase", item, selectedUseCases);
 
-      return false
+      return false;
     }
-
-
-
 
     return true;
   });
 
   return (
-    <div className="flex flex-col items-stretch gap-10 text-left lg:flex-row lg:items-start lg:gap-16">
-      <div className="lg:w-1/4 xl:w-1/6">
+    <div className="grid auto-cols-[1fr_4fr] grid-flow-col items-stretch gap-10 text-left lg:flex-row lg:items-start lg:gap-10">
+      <div className="mt-[4.5rem] lg:w-[100%] xl:w-[100%]">
         <ExampleFilter
           selectedProducts={selectedProducts}
           setSelectedProduct={setSelectedProduct}
@@ -58,28 +114,45 @@ export const Client: React.FC<Props> = ({ examples, useCases, stack }) => {
           setSelectedUseCase={setSelectedUseCases}
           selectedStacks={selectedStacks}
           setSelectedStack={setSelectedStack}
+          queriedStacks={queriedStacks}
+          handleStackQuery={handleStackQuery}
+          stackQuery={stackQuery}
+          queriedUseCases={queriedUseCases}
+          handleUseCaseQuery={handleUseCaseQuery}
+          useCaseQuery={useCaseQuery}
           allStacks={Object.keys(stack)}
           allUseCases={Object.keys(useCases)}
         />
       </div>
-
-      <div className="grid gap-4 grow sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
-        {data.map((item) => {
-
-
-          const author = authors[item.author] ?? {
-            name: item.author,
-            image: `https://github.com/${item.author}.png`
-          }
-
-          return (<Box
-            key={item.title}
-            title={item.title}
-            products={item.products}
-            author={author}
+      <div className="grid grid-flow-row auto-rows-[6_auto]">
+        <div className="flex w-[100%] justify-end border-b  border-b-white/5 py-4">
+          <input
+            type="search"
+            className="w-[31.25%] rounded bg-white px-4 py-2 text-zinc-950"
+            value={exampleQuery}
+            placeholder="Search for an example..."
+            onChange={(e) => {
+              handleExampleQuery(e);
+            }}
           />
-          )
-        })}
+        </div>
+        <div className="grid grow gap-4 py-3.5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
+          {data.map((item) => {
+            const author = authors[item.author] ?? {
+              name: item.author,
+              image: `https://github.com/${item.author}.png`,
+            };
+
+            return (
+              <Box
+                key={item.title}
+                title={item.title}
+                products={item.products}
+                author={author}
+              />
+            );
+          })}
+        </div>
       </div>
     </div>
   );
