@@ -133,7 +133,8 @@ export default function ExampleFilter({
             <div className="w-[100%] border-b border-b-white/5 py-4">
               <input
                 type="search"
-                className="w-[100%] rounded bg-white px-4 py-2 text-zinc-950"
+                className="text:white focus:border-1 border-1 w-[100%] rounded  border-white/5 bg-white/10 px-4 py-2 text-slate-100 transition ease-in-out focus:border-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-500"
+                placeholder="Search for a stack..."
                 value={stackQuery}
                 onChange={(e) => {
                   handleStackQuery(e);
@@ -173,7 +174,8 @@ export default function ExampleFilter({
             <div className="w-[100%] border-b border-b-white/5 py-4">
               <input
                 type="search"
-                className="w-[100%] rounded bg-white px-4 py-2 text-zinc-950"
+                className="text:white focus:border-1 border-1 w-[100%] rounded  border-white/5 bg-white/10 px-4 py-2 text-slate-100 transition ease-in-out focus:border-zinc-100/03 focus:outline-none focus:ring-2 focus:ring-zinc-500"
+                placeholder="Search for an use case..."
                 value={useCaseQuery}
                 onChange={(e) => {
                   handleUseCaseQuery(e);

@@ -128,7 +128,7 @@ export const Client: React.FC<Props> = ({ examples, useCases, stack }) => {
         <div className="flex w-[100%] justify-end border-b  border-b-white/5 py-4">
           <input
             type="search"
-            className="w-[31.25%] rounded bg-white px-4 py-2 text-zinc-950"
+            className="text:white focus:border-1 border-1 w-[31.25%] rounded  border-white/5 bg-white/10 px-4 py-2 text-slate-100 transition ease-in-out focus:border-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-500"
             value={exampleQuery}
             placeholder="Search for an example..."
             onChange={(e) => {
