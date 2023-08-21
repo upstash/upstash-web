@@ -18,12 +18,7 @@ export default function Nav({}: HTMLProps<HTMLDivElement> & {}) {
           </NavLink>
         );
       })}
-      {/* <Button
-        href="/docs"
-        className="px-4 py-2 text-zinc-400"
-      >
-        Docs
-      </Button> */}
+      
     </nav>
   );
 }

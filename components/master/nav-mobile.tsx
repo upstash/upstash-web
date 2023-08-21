@@ -34,16 +34,7 @@ export default function NavMobile({ hidden }: HTMLProps<HTMLDivElement> & {}) {
             </NavLink>
           );
         })}
-        {/* doc */}
-        {/* <div>
-          <Button
-            type="button"
-            href="/docs"
-            className="px-0 py-4 text-lg font-medium bg-transparent font-display hover:bg-white/03 hover:text-zinc-50"
-          >
-            Docs
-          </Button>
-        </div> */}
+        
       </div>
     </nav>
   );

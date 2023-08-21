@@ -80,8 +80,9 @@ const NavItems: {
   },
 ];
 
+const careersIndex = NavItems.length - 1;
 if (jobLength > 0) {
-  NavItems.splice(4, 0, {
+  NavItems.splice(careersIndex, 0, {
     name: "Careers",
     href: "/careers",
     children: (
