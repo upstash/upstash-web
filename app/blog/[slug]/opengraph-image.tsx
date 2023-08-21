@@ -35,7 +35,7 @@ export default async function TwImage({
       (
         <div tw="flex flex-col items-stretch p-[70px] pb-[140px] h-full w-full bg-[#161616] text-white">
           <header tw="flex">
-            <h1 tw="m-0 leading-[1.16] text-7xl">{post.title}</h1>
+            <h1 tw="m-0 leading-[1.16] text-7xl">{post?.title}</h1>
           </header>
 
           <div tw="mt-auto flex items-end">
@@ -43,12 +43,12 @@ export default async function TwImage({
               <h4 tw="m-0 text-4xl text-[#00e9a3] ">
                 {post.authorsData[0].name}
               </h4>
-              <p tw="m-0 mt-3 text-2xl ">{post.authorsData[0].title}</p>
+              <p tw="m-0 mt-3 text-2xl ">{post.authorsData.at(0)?.title}</p>
             </div>
 
             <div tw="flex items-center border-4 border-[#00e9a3] rounded-full">
               <img
-                 tw="w-36 h-36 rounded-full border-[6px] border-black"
+                tw="w-36 h-36 rounded-full border-[6px] border-black"
                 alt={post.authorsData[0].name}
                 src={authorImage}
               />
