@@ -19,7 +19,7 @@ export default function Header({
   return (
     <header className={cx("hidden md:block", className)} {...props}>
       <Container>
-        <div className="flex items-center border-b border-b-white/5 py-5 md:grid md:grid-cols-4">
+        <div className="flex items-center py-5 border-b border-b-white/5 md:grid md:grid-cols-4">
           <div className="flex">
             <Link href="/">
               <Logo />
@@ -80,14 +80,15 @@ const NavItems: {
   },
 ];
 
+const careersIndex = NavItems.length - 1;
 if (jobLength > 0) {
-  NavItems.splice(4, 0, {
+  NavItems.splice(careersIndex, 0, {
     name: "Careers",
     href: "/careers",
     children: (
       <span
         className="rounded-full bg-emerald-300/20
-              px-1.5 py-1 font-mono text-sm leading-none text-emerald-500"
+          px-1.5 py-1 font-mono text-sm leading-none text-emerald-500"
       >
         {jobLength}
       </span>
