@@ -70,16 +70,25 @@ const NavItems: {
     name: "Blog",
     href: "/blog",
   },
+  {
+    name: "Discord",
+    href: "https://upstash.com/discord",
+  },
+  {
+    name: "Docs",
+    href: "/docs",
+  },
 ];
 
+const careersIndex = NavItems.length - 1;
 if (jobLength > 0) {
-  NavItems.push({
+  NavItems.splice(careersIndex, 0, {
     name: "Careers",
     href: "/careers",
     children: (
       <span
         className="rounded-full bg-emerald-300/20
-              px-1.5 py-1 font-mono text-sm leading-none text-emerald-500"
+          px-1.5 py-1 font-mono text-sm leading-none text-emerald-500"
       >
         {jobLength}
       </span>
