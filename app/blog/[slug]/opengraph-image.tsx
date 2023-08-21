@@ -29,7 +29,7 @@ export default async function TwImage({
     }
 
     const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"
-    const authorImage = new URL(`/authors/${authors[post.authors[0]].image}`, baseUrl).toString()
+    const authorImage = new URL(`/authors/${authors[post.authors[0]].image}`).toString()
     console.log({ authorImage })
     return new ImageResponse(
       (
