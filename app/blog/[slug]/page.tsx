@@ -5,7 +5,6 @@ import OtherPostCard from "@/components/post/other-post";
 import Clap from "@/components/post/claps";
 import { Mdx } from "@/components/post/mdx";
 import Container from "@/components/container";
-import { SITE_URL } from "@/utils/const";
 import PostHeader from "@/components/post/header";
 import PostTags from "@/components/post/tags";
 import PageBodyGradient from "@/components/page-body-gradient";
@@ -66,7 +65,7 @@ export default async function BlogPage({ params }: Props) {
             <PostTags post={post} />
 
             {/* Other Post */}
-            <div className="mt-10 grid gap-4 md:grid-cols-2 md:gap-8">
+            <div className="grid gap-4 mt-10 md:grid-cols-2 md:gap-8">
               <OtherPostCard post={prevPost} />
               <OtherPostCard post={nextPost} align="right" />
             </div>
@@ -90,7 +89,7 @@ export async function generateMetadata({
   const description =
     post.description ||
     "Articles and tutorials on serverless technologies from Upstash and community";
-  const url = `${SITE_URL}/blog/${post.slug}`;
+  const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"
 
   return {
     title,
@@ -99,8 +98,16 @@ export async function generateMetadata({
       type: "article",
       title,
       description,
-      url,
+      url: `${baseUrl}/blog/${post.slug}`,
+      images: [
+        {
+          url: `${baseUrl}/blog/${post.slug}/opengraph-image`,
+          width: 1200,
+          height: 675,
+        },
+      ],
     },
+
     twitter: {
       card: "summary_large_image",
       title,
