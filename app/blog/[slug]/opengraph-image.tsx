@@ -1,7 +1,6 @@
 import { ImageResponse } from "@vercel/og";
 import { allPosts } from "contentlayer/generated";
 import { authors } from "@/utils/authors";
-import * as process from "process";
 
 export const runtime = "edge";
 export const size = {
@@ -30,7 +29,6 @@ export default async function TwImage({
 
     const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"
     const authorImage = new URL(`/authors/${authors[post.authors[0]].image}`, baseUrl).toString()
-    console.log({ authorImage, env: process.env })
     return new ImageResponse(
       (
         <div tw="flex flex-col items-stretch p-[70px] pb-[140px] h-full w-full bg-[#161616] text-white">
