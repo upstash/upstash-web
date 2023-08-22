@@ -93,7 +93,7 @@ Then we also need to get the user's IP address. We can do this by using the
 store it in the database. This way we don't have to store the IP address
 directly, which could be a security concern.
 
-```ts title="/api/incr.ts" {3,5}
+```ts title="/api/incr.ts"
 const ip = req.ip;
 // Hash the IP and turn it into a hex string
 const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(ip));
