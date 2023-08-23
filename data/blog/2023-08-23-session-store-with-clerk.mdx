@@ -6,18 +6,19 @@ authors:
 tags: [redis, clerk]
 ---
 
-One of the main use cases of Redis is storing and managing user sessions to maintain the state across requests in web applications. This can be achieved in various ways, and some of the recent serverless tools provides us amazing ways to make it even easier than ever.
+One of the main use cases of Redis is storing and managing user sessions to maintain the state across requests in web applications. This can be achieved in various ways, and some of the recent serverless tools provides us easy to deploy options.
 
 ### Project Description
 
-In this blogpost, we will use [Clerk](https://clerk.com), Next.js and Upstash Redis to build a session store for a shopping application. Here are the features to be implemented in this project:
+In this blogpost, we will use [Clerk](https://clerk.com), Next.js and Upstash Redis to build a session store for a shopping application. Here is the list of the features we will implement in this project:
 
 - Users will be able to perform sign-up, sign-in and sign-out actions.
-- Each user can add, remove items to their unique carts. Also changing item quantities in cart and checking out is possible.
+- Each user can add, remove items to their unique shopping carts. 
+- Users will be able to update the item quantities in the shopping cart.
 
 This project has some other features related to QStash and Upstash Ratelimit:
 
-- Certain actions within the application will initiate events, leading to the scheduling of emails through QStash. These emails will subsequently be dispatched by Resend. For instance, upon checking out, a shipping confirmation email is scheduled to be sent 24 hours later. Similarly, after purchasing an item, users will receive a prompt after a certain period, encouraging them to rate their purchase.
+- Certain actions within the application will initiate events, leading to the scheduling of emails through QStash. These emails will subsequently be dispatched by Resend. For instance, upon checking out, a shipping confirmation email will be scheduled for 24 hours later. Similarly, after purchasing an item, users will receive a prompt after a certain time-delay, encouraging them to rate their purchase.
 - Users also have the option to rate items. All rating data is meticulously stored in appropriate data structures on Upstash Redis. To ensure a balanced flow of user interactions and prevent any potential misuse, the rating event is governed by the rate-limiting capabilities of Upstash Ratelimit.
 
 ### Demo
