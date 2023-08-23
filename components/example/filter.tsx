@@ -38,7 +38,6 @@ export default function ExampleFilter({
       selectedStacks.length > 0
     );
   }, [selectedProducts, selectedUseCase, selectedStacks]);
-
   return (
     <form className="grid gap-4">
       {/* <div className="pb-4 border-b border-b-white/5">
@@ -49,7 +48,7 @@ export default function ExampleFilter({
       </div> */}
 
       <Child className="sm:-mt-10">
-        <div className="flex items-center">
+        <div className="flex items-center ">
           <h4 className="text-sm uppercase tracking-widest opacity-60">
             Filter
           </h4>
@@ -129,7 +128,7 @@ export default function ExampleFilter({
       <Child>
         <Toc>
           <Toc.Summary count={selectedStacks.length}>Stack</Toc.Summary>
-          <div className="w-[100%] space-y-0.5">
+          <div className=" w-[100%]">
             <div className="w-[100%] border-b border-b-white/5 py-4">
               <input
                 type="search"
@@ -143,26 +142,32 @@ export default function ExampleFilter({
             </div>
 
             <div className="grid h-[14rem] grid-flow-row auto-rows-[3.125rem] space-y-0.5 overflow-scroll">
-              {queriedStacks.map((key) => {
-                return (
-                  <Item
-                    key={key}
-                    value={key}
-                    checked={selectedStacks.includes(key)}
-                    label={key}
-                    onChange={(e) => {
-                      const { value, checked } = e.target;
-                      if (checked) {
-                        setSelectedStack([...selectedStacks, value]);
-                      } else {
-                        setSelectedStack(
-                          selectedStacks.filter((item) => item !== value)
-                        );
-                      }
-                    }}
-                  />
-                );
-              })}
+              {queriedStacks.length !== 0 ? (
+                queriedStacks.map((key) => {
+                  return (
+                    <Item
+                      key={key}
+                      value={key}
+                      checked={selectedStacks.includes(key)}
+                      label={key}
+                      onChange={(e) => {
+                        const { value, checked } = e.target;
+                        if (checked) {
+                          setSelectedStack([...selectedStacks, value]);
+                        } else {
+                          setSelectedStack(
+                            selectedStacks.filter((item) => item !== value)
+                          );
+                        }
+                      }}
+                    />
+                  );
+                })
+              ) : (
+                <div className="grid h-[100%] w-[100%] items-center justify-center">
+                  <p className="text-white/40">No stacks found</p>
+                </div>
+              )}
             </div>
           </div>
         </Toc>
@@ -183,26 +188,33 @@ export default function ExampleFilter({
               />
             </div>
             <div className="grid h-[14rem] grid-flow-row auto-rows-[3.125rem] space-y-0.5 overflow-scroll">
-              {queriedUseCases.map((key) => {
-                return (
-                  <Item
-                    key={key}
-                    value={key}
-                    checked={selectedUseCase.includes(key)}
-                    label={key}
-                    onChange={(e) => {
-                      const { value, checked } = e.target;
-                      if (checked) {
-                        setSelectedUseCase([...selectedUseCase, value]);
-                      } else {
-                        setSelectedUseCase(
-                          selectedUseCase.filter((item) => item !== value)
-                        );
-                      }
-                    }}
-                  />
-                );
-              })}
+              {queriedUseCases.length !== 0 ? (
+                queriedUseCases.map((key) => {
+                  console.log("ITEM");
+                  return (
+                    <Item
+                      key={key}
+                      value={key}
+                      checked={selectedUseCase.includes(key)}
+                      label={key}
+                      onChange={(e) => {
+                        const { value, checked } = e.target;
+                        if (checked) {
+                          setSelectedUseCase([...selectedUseCase, value]);
+                        } else {
+                          setSelectedUseCase(
+                            selectedUseCase.filter((item) => item !== value)
+                          );
+                        }
+                      }}
+                    />
+                  );
+                })
+              ) : (
+                <div className="grid h-[100%] w-[100%] items-center justify-center">
+                  <p className="text-white/40">No use cases found</p>
+                </div>
+              )}
             </div>
           </div>
         </Toc>
@@ -242,7 +254,7 @@ Toc.Summary = function TocSummary({
     <summary
       className={cx(
         "flex select-none list-none items-center gap-2",
-        "mb-px h-10 rounded px-4 text-white/40 hover:bg-white/03",
+        "mb-px h-10 rounded px-4 text-white/40 hover:bg-white/03 ",
         className
       )}
       {...props}
@@ -250,7 +262,7 @@ Toc.Summary = function TocSummary({
       <span className="inline-flex w-5 shrink-0 items-center justify-center">
         <IconArrow className="rotate-0 group-open/toc:rotate-90" />
       </span>
-      <span className="grow text-sm uppercase tracking-wide">{children}</span>
+      <span className="grow text-sm uppercase tracking-wide ">{children}</span>
       {count > 0 && (
         <span className="inline-flex h-5 items-center justify-center rounded-full bg-white/5 px-2 font-mono text-sm">
           {count}
@@ -279,7 +291,7 @@ function Item({
       className={cx(
         "flex cursor-pointer select-none items-center gap-2",
         "rounded-lg bg-white/03 px-4 py-3 text-zinc-400",
-        "hover:bg-white/5",
+        " hover:bg-white/5",
         checked && "bg-white/10 text-zinc-50",
         className
       )}

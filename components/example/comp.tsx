@@ -14,14 +14,16 @@ export function Example({
   products,
   author,
   title,
+  stack,
   ...props
 }: HTMLProps<HTMLDivElement> & {
   products: string[];
-  author:{
-    name: string,
-    image: string
+  author: {
+    name: string;
+    image: string;
   };
   title: string;
+  stack: string[];
 }) {
   return (
     <article
@@ -38,6 +40,7 @@ export function Example({
       <ExampleProducts products={products} />
       <ExampleTitle title={title} />
       <ExampleAuthor author={author} />
+      <ExampleStack stack={stack} />
     </article>
   );
 }
@@ -111,17 +114,37 @@ function ExampleAuthor({
   ...props
 }: HTMLProps<HTMLDivElement> & {
   author: {
-    name:string,image:string
+    name: string;
+    image: string;
   };
 }) {
-  
-  
   return (
     <div
       className={cx("mt-auto flex items-center", className)}
       {...props}
-    >
-      
+    ></div>
+  );
+}
+
+function ExampleStack({
+  className,
+  children,
+  stack,
+  ...props
+}: HTMLProps<HTMLDivElement> & { stack: string[] }) {
+  return (
+    <div className={cx("grid auto-cols-min grid-flow-col gap-2", className)}>
+      {stack.slice(0, 3).map((stackTitle) => {
+        return (
+          <>
+            <div className="py-0.2 w-min cursor-default rounded-xl border border-[#34D399] bg-[#34D399] bg-opacity-30 px-2 transition ease-in-out hover:bg-opacity-60">
+              <p className="whitespace-nowrap text-sm " key={stackTitle}>
+                {stackTitle}
+              </p>
+            </div>
+          </>
+        );
+      })}
     </div>
   );
 }

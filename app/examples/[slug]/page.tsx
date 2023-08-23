@@ -66,23 +66,23 @@ export default async function BlogPage({ params }: Props) {
 
   const author = authors[example.author] ?? {
     name: example.author,
-    image: `https://github.com/${example.author}.png`
-  }
+    image: `https://github.com/${example.author}.png`,
+  };
   const content = await markdownToHtml(example.body);
 
   return (
     <main className="">
       <Container>
-        <div className="py-4 border-b border-white/5">
+        <div className="border-b border-white/5 py-4">
           <Link href="/examples" className="inline-flex opacity-60">
             ← Back to Examples
           </Link>
         </div>
 
-        <div className="grid gap-8 mt-8 text-left md:mt-16 md:grid-cols-3 md:gap-16">
+        <div className="mt-8 grid gap-8 text-left md:mt-16 md:grid-cols-3 md:gap-16">
           {/* meta */}
           <div className="order-2 md:order-1">
-            <div className="p-6 top-8 rounded-2xl bg-emerald-100/5 md:sticky">
+            <div className="top-8 rounded-2xl bg-emerald-100/5 p-6 md:sticky">
               <div className="-mt-2">
                 <ExampleMetaRow title="Products">
                   <>
@@ -155,21 +155,24 @@ export default async function BlogPage({ params }: Props) {
                 </ExampleMetaRow>
 
                 <ExampleMetaRow title="Publisher">
-                  
-                  <Button href={`https://github.com/${author.name}`}><>{author.name}</></Button>
+                  <Button href={`https://github.com/${author.name}`}>
+                    <>{author.name}</>
+                  </Button>
                 </ExampleMetaRow>
               </div>
 
-              <div className="grid gap-4 mt-6">
-                {example.blog_url && (<Button
-                  type="button"
-                  href={example.githubUrl}
-                  iconProps={{
-                    icon: ICON_NAMES.FileText,
-                  }}
-                >
-                  Read Post
-                </Button>)}
+              <div className="mt-6 grid gap-4">
+                {example.blogUrl && (
+                  <Button
+                    type="button"
+                    href={example.blogUrl}
+                    iconProps={{
+                      icon: ICON_NAMES.FileText,
+                    }}
+                  >
+                    Read Post
+                  </Button>
+                )}
 
                 <Button
                   type="button"
@@ -191,14 +194,17 @@ export default async function BlogPage({ params }: Props) {
                   View Repo
                 </Button>
 
-                <Button
-                  type="button"
-                  href="mailto:jobs@upstash.com"
-                  className="bg-white text-zinc-950"
-                // className="bg-emerald-400 text-zinc-950"
-                >
-                  Preview
-                </Button>
+                {example.previewUrl && (
+                  <Button
+                    type="button"
+                    href={example.previewUrl}
+                    className="bg-white text-zinc-950"
+
+                    // className="bg-emerald-400 text-zinc-950"
+                  >
+                    Preview
+                  </Button>
+                )}
               </div>
             </div>
           </div>
@@ -211,7 +217,7 @@ export default async function BlogPage({ params }: Props) {
               </h1>
 
               <div
-                className="mt-8 post leading-p"
+                className="post mt-8 leading-p"
                 dangerouslySetInnerHTML={{ __html: content }}
               />
             </article>
@@ -231,11 +237,11 @@ function ExampleMetaRow({
   title: string;
 }) {
   return (
-    <div className="flex items-center py-3 border-b border-b-emerald-100/5">
-      <div className="text-xs tracking-widest uppercase opacity-40">
+    <div className="flex items-center border-b border-b-emerald-100/5 py-3">
+      <div className="text-xs uppercase tracking-widest opacity-40">
         {title}:
       </div>
-      <div className="flex items-center ml-auto text-right">{children}</div>
+      <div className="ml-auto flex items-center text-right">{children}</div>
     </div>
   );
 }
