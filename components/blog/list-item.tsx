@@ -36,7 +36,12 @@ export default function PostListCard({ data }: { data: Post }) {
         </h3>
 
         <div className="flex items-center gap-2 mt-1 grow opacity-60">
-          <Link href={`/blog/author/${authors[0].id}`}>{authorsData[0].name}</Link>
+          <Link 
+            href={`/blog/author/${authorsData[0].id}`} 
+            className="hover:text-emerald-400 hover:underline"
+          >
+            {authorsData[0].name}
+          </Link>
           <span>•</span>
           <time dateTime={date}>
             {DateTime.fromISO(date).toFormat("LLLL d, yyyy")}
