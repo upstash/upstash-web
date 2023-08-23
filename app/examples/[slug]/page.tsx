@@ -155,12 +155,13 @@ export default async function BlogPage({ params }: Props) {
                 </ExampleMetaRow>
 
                 <ExampleMetaRow title="Publisher">
-                  <>{author.name}</>
+                  
+                  <Button href={`https://github.com/${author.name}`}><>{author.name}</></Button>
                 </ExampleMetaRow>
               </div>
 
               <div className="grid gap-4 mt-6">
-                <Button
+                {example.blog_url && (<Button
                   type="button"
                   href={example.githubUrl}
                   iconProps={{
@@ -168,7 +169,7 @@ export default async function BlogPage({ params }: Props) {
                   }}
                 >
                   Read Post
-                </Button>
+                </Button>)}
 
                 <Button
                   type="button"
@@ -196,7 +197,7 @@ export default async function BlogPage({ params }: Props) {
                   className="bg-white text-zinc-950"
                 // className="bg-emerald-400 text-zinc-950"
                 >
-                  Deploy
+                  Preview
                 </Button>
               </div>
             </div>
@@ -234,7 +235,7 @@ function ExampleMetaRow({
       <div className="text-xs tracking-widest uppercase opacity-40">
         {title}:
       </div>
-      <div className="flex items-center ml-auto">{children}</div>
+      <div className="flex items-center ml-auto text-right">{children}</div>
     </div>
   );
 }
