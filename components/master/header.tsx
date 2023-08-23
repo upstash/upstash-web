@@ -80,14 +80,15 @@ const NavItems: {
   },
 ];
 
+const careersIndex = NavItems.length - 1;
 if (jobLength > 0) {
-  NavItems.splice(4, 0, {
+  NavItems.splice(careersIndex, 0, {
     name: "Careers",
     href: "/careers",
     children: (
       <span
         className="rounded-full bg-emerald-300/20
-              px-1.5 py-1 font-mono text-sm leading-none text-emerald-500"
+          px-1.5 py-1 font-mono text-sm leading-none text-emerald-500"
       >
         {jobLength}
       </span>
