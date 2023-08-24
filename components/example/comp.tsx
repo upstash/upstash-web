@@ -133,7 +133,7 @@ function ExampleStack({
   ...props
 }: HTMLProps<HTMLDivElement> & { stack: string[] }) {
   return (
-    <div className={cx("grid auto-cols-min grid-flow-col gap-2", className)}>
+    <div className={cx("flex flex-cols flex-wrap gap-1.5", className)}>
       {stack.slice(0, 3).map((stackTitle) => {
         return (
           <>

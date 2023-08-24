@@ -300,7 +300,7 @@ function Item({
         type="checkbox"
         value={value}
         onChange={onChange}
-        className="pointer-events-none absolute opacity-0"
+        className="pointer-events-none opacity-0"
       />
       {icon ? (
         icon

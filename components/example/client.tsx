@@ -106,7 +106,7 @@ export const Client: React.FC<Props> = ({ examples, useCases, stack }) => {
   });
 
   return (
-    <div className="grid  auto-cols-[1fr_4fr] grid-flow-col items-start gap-10 text-left lg:flex-row lg:items-start lg:gap-10">
+    <div className="grid auto-cols-[1fr_4fr] grid-flow-col items-start gap-10 text-left sm:auto-cols-[1fr_4fr] md:auto-cols-[1fr_4.5fr] lg:flex-row lg:items-start lg:gap-10">
       <div className="mt-[4.5rem]  lg:w-[100%] xl:w-[100%]">
         <ExampleFilter
           selectedProducts={selectedProducts}
@@ -136,7 +136,7 @@ export const Client: React.FC<Props> = ({ examples, useCases, stack }) => {
           </Button>
           <input
             type="search"
-            className="text:white focus:border-1 border-1 w-[31.25%] rounded  border-white/5 bg-white/10 px-4 py-2 text-slate-100 transition ease-in-out focus:border-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-500"
+            className="text:white focus:border-1 border-1 w-[31.25%] rounded border-white/5  bg-white/10 px-4 py-2 text-slate-100 transition ease-in-out focus:border-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-500 sm:text-sm"
             value={exampleQuery}
             placeholder="Search for an example..."
             onChange={(e) => {
