@@ -1,13 +1,20 @@
 "use client";
 
 import cx from "@/utils/cx";
-import { Children, cloneElement, HTMLProps, ReactElement } from "react";
+import {
+  Children,
+  cloneElement,
+  HTMLProps,
+  ReactElement,
+  Dispatch,
+  SetStateAction,
+} from "react";
 import IconRedis from "@/components/icon-redis";
 import IconKafka from "@/components/icon-kafka";
 import IconQStash from "@/components/icon-qstash";
 import Balancer from "react-wrap-balancer";
 import Image from "next/image";
-
+import Button from "@/components/button";
 export function Example({
   className,
   children,
@@ -15,6 +22,8 @@ export function Example({
   author,
   title,
   stack,
+  selectedStacks,
+  setSelectedStacks,
   ...props
 }: HTMLProps<HTMLDivElement> & {
   products: string[];
@@ -24,6 +33,8 @@ export function Example({
   };
   title: string;
   stack: string[];
+  selectedStacks: string[];
+  setSelectedStacks: Dispatch<SetStateAction<string[]>>;
 }) {
   return (
     <article
@@ -40,7 +51,11 @@ export function Example({
       <ExampleProducts products={products} />
       <ExampleTitle title={title} />
       <ExampleAuthor author={author} />
-      <ExampleStack stack={stack} />
+      <ExampleStack
+        stack={stack}
+        selectedStacks={selectedStacks}
+        setSelectedStacks={setSelectedStacks}
+      />
     </article>
   );
 }
@@ -130,21 +145,63 @@ function ExampleStack({
   className,
   children,
   stack,
+  selectedStacks,
+  setSelectedStacks,
   ...props
-}: HTMLProps<HTMLDivElement> & { stack: string[] }) {
+}: HTMLProps<HTMLDivElement> & {
+  stack: string[];
+  selectedStacks: string[];
+  setSelectedStacks: Dispatch<SetStateAction<string[]>>;
+}) {
   return (
-    <div className={cx("flex flex-cols flex-wrap gap-1.5", className)}>
+    <div className={cx("flex-cols flex flex-wrap gap-1.5", className)}>
       {stack.slice(0, 3).map((stackTitle) => {
         return (
           <>
-            <div className="py-0.2 w-min cursor-default rounded-xl border border-[#34D399] bg-[#34D399] bg-opacity-30 px-2 transition ease-in-out hover:bg-opacity-60">
-              <p className="whitespace-nowrap text-sm " key={stackTitle}>
-                {stackTitle}
-              </p>
-            </div>
+            <Pill
+              stackTitle={stackTitle}
+              selected={selectedStacks.includes(stackTitle)}
+              selectedStacks={selectedStacks}
+              setSelectedStacks={setSelectedStacks}
+            />
           </>
         );
       })}
     </div>
+  );
+}
+
+export function Pill({
+  stackTitle,
+  selected,
+  selectedStacks,
+  setSelectedStacks,
+}: {
+  stackTitle: string;
+  selected: boolean;
+  selectedStacks: string[];
+  setSelectedStacks: Dispatch<SetStateAction<string[]>>;
+}) {
+  return (
+    <>
+      <button
+        className={`py-0.2 w-min cursor-default rounded-xl border border-[#34D399] bg-[#34D399] bg-opacity-30 px-2 transition ease-in-out hover:bg-opacity-60 ${
+          selected ? "bg-opacity-60" : "bg-opacity-30"
+        }`}
+        onClick={(e) => {
+          if (!selected) {
+            setSelectedStacks([...selectedStacks, stackTitle]);
+          } else {
+            setSelectedStacks(
+              selectedStacks.filter((item) => item !== stackTitle)
+            );
+          }
+        }}
+      >
+        <p className="whitespace-nowrap text-sm " key={stackTitle}>
+          {stackTitle}
+        </p>
+      </button>
+    </>
   );
 }

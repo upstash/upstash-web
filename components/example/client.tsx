@@ -97,8 +97,6 @@ export const Client: React.FC<Props> = ({ examples, useCases, stack }) => {
       selectedUseCases.length > 0 &&
       !item.useCases.some((uc) => selectedUseCases.includes(uc))
     ) {
-      console.log("filtering out due to usecase", item, selectedUseCases);
-
       return false;
     }
 
@@ -129,7 +127,7 @@ export const Client: React.FC<Props> = ({ examples, useCases, stack }) => {
         <div className="flex w-[100%] justify-between border-b  border-b-white/5 py-4">
           <Button
             href="https://github.com/upstash/examples"
-            className="bg-white text-zinc-950"
+            className="rounded bg-white text-zinc-950"
             type="button"
           >
             Contribute
@@ -158,6 +156,8 @@ export const Client: React.FC<Props> = ({ examples, useCases, stack }) => {
                 products={item.products}
                 author={author}
                 stack={item.stack}
+                selectedStacks={selectedStacks}
+                setSelectedStacks={setSelectedStack}
               />
             );
           })}
