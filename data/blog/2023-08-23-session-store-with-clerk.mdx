@@ -62,14 +62,14 @@ npm install clerk@nextjs
 
 Then, we'll create our application on [Clerk dashboard](https://dashboard.clerk.com/). You can do the the configuration for required sign-up info, based on your choice. Once you create the app, the necessary credentials will be prompted. We'll copy these to `.env.local` file. Here's an example:
 
-```text
+```text title=".env.local"
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_********
 CLERK_SECRET_KEY=sk_test_********
 ```
 
 We'll also configure the paths for the Clerk in the '.env.local' file.
 
-```text
+```text title=".env.local"
 NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
 NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/
@@ -104,7 +104,7 @@ export default function RootLayout({
 }
 ```
 
-Now, Clerk is installed on our project. The next step is to decide which pages to hide behind the authentication. We'll perform this operation in the `middleware.tsx` file placed in the root folder.
+Now, Clerk is installed in our project. The next step is to decide which pages to hide behind the authentication. We'll perform this operation in the `middleware.tsx` file placed in the root folder.
 
 ```tsx title="middleware.tsx"
 import { authMiddleware } from "@clerk/nextjs";
@@ -358,11 +358,11 @@ export default CartContext;
 
 Here's how the algorithm works in the higher overview.
 
-- The cart, treated as a session store, will be hold in a hash on Upstash Redis. The unique identifier for this hash will be based on the user's ID, so each user will have a cart named in the format of `cart:<USER_ID>`.
+- The cart, treated as a session store, will be held in a hash on Upstash Redis. The unique identifier for this hash will be based on the user's ID, so each user will have a cart named in the format of `cart:<USER_ID>`.
 - When saving cart data to the Redis hash, we'll use item IDs as keys and the quantity of each item as values. Thanks to Redis's built-in commands, modifying the cart becomes a breeze.
 - On the client side, the cart will be managed as a state consisting of an array of Item objects. When a page is loaded, the `useEffect` hook fetches the cart data from Upstash Redis. Should there be any alterations to the cart, all relevant components get rerendered.
 - Redis's straightforward data structures simplify the implementation of `addItem` and `removeItem` functionalities. By deploying the `redis.hincrby()` command, we can handle tasks ranging from adding or removing items to adjusting item quantities within the cart. This utility underscores Redis's prowess.
-- For the `resetCart` function, we'll just delette the hash's key from the Upstash database using `redis.del()`.
+- For the `resetCart` function, we'll just delete the hash's key from the Upstash database using `redis.del()`.
 
 Now that you've grasped the cart's conceptual outline, it's time to roll up our sleeves and get into the core methods.
 
@@ -453,7 +453,7 @@ The cart functionality is now in place, complete with all essential methods. It'
 
 ### Index Page
 
-A point of note: items on the index page are showcased exclusively for active, signed-in users. First, we fetch the user data from Clerk, post which the corresponding components spring to life.
+A point of note: items on the index page are showcased exclusively for active, signed-in users. First, we fetch the user data from Clerk and render the components based on the response from Clerk.
 
 ```tsx title="app/index.tsx"
 import { currentUser } from "@clerk/nextjs";
@@ -718,7 +718,7 @@ With that final snippet of code, our project reaches its conclusion. We've succe
 
 ### Conclusion
 
-The combination of Clerk for user management and Upstash Redis for efficient data storage has been instrumental in the creation of our dynamic cart system. Together, they've formed the backbone of our application, ensuring both security and performance. This project stands as a testament to the sheer prowess of these tools and the potential that can be unlocked when they're synergistically combined.
+The combination of Clerk for user management and Upstash Redis for efficient data storage has been instrumental in the creation of our dynamic cart system. Together, they've formed the backbone of our application, ensuring both security and performance. This project is a great example of how these powerful tools such as Upstash Redis, Clerk used together solves very complex problems smoothly.
 
 Here are some suggestions for further improvements on this project:
 
