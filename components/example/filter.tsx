@@ -206,7 +206,7 @@ function FormContent({
   return (
     <>
       <Child>
-        <div className="space-y-0.5">
+        <div className="flex w-[100%] flex-row items-center justify-between gap-1 space-y-0.5 sm:block">
           {["redis", "kafka", "qstash"].map((key) => {
             const isRedis = key === "redis";
             const isKafka = key === "kafka";
@@ -232,7 +232,8 @@ function FormContent({
                 className={cx(
                   isRedis && isActive && "bg-red-200/10",
                   isKafka && isActive && "bg-blue-200/10",
-                  isQStash && isActive && "bg-purple-200/10"
+                  isQStash && isActive && "bg-purple-200/10",
+                  " w-[100%] justify-center pl-0 sm:pl-4"
                 )}
                 icon={
                   <>
@@ -424,9 +425,9 @@ function Item({
   return (
     <label
       className={cx(
-        "flex cursor-pointer select-none items-center gap-2",
-        "rounded-lg bg-white/03 px-4 py-3 text-zinc-400",
-        " hover:bg-white/5",
+        " flex cursor-pointer select-none items-center gap-2",
+        "rounded-lg bg-white/03  px-4 py-3 text-zinc-400",
+        "  hover:bg-white/5",
         checked && "bg-white/10 text-zinc-50",
         className
       )}
