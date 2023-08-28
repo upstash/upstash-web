@@ -32,7 +32,7 @@ export default async function ExamplesPage() {
     <main className="relative z-0 text-center">
       <Bg />
 
-      <section className="pb-6 pt-12 md:pb-8 md:pt-16">
+      <section className="pb-4 pt-8 sm:pb-6 sm:pt-12 md:pb-8 md:pt-16">
         <Container className="max-w-screen-lg">
           {/* header */}
           <header>
@@ -45,7 +45,7 @@ export default async function ExamplesPage() {
       </section>
 
       {/* body */}
-      <section className="mt-6">
+      <section className="mt-2 sm:mt-6">
         <Container>
           <Client examples={examples} stack={stack} useCases={useCases} />
         </Container>

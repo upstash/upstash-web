@@ -28,8 +28,6 @@ export default function ExampleFilter({
   queriedUseCases,
   handleUseCaseQuery,
   useCaseQuery,
-  allUseCases,
-  allStacks,
 }) {
   const isFilterDirty = React.useMemo(() => {
     return (
@@ -39,14 +37,58 @@ export default function ExampleFilter({
     );
   }, [selectedProducts, selectedUseCase, selectedStacks]);
   return (
-    <form className="grid gap-4">
-      {/* <div className="pb-4 border-b border-b-white/5">
-        <input
-          type="search"
-          className="px-4 py-2 bg-white rounded text-zinc-950"
-        />
-      </div> */}
+    <>
+      <ExampleFilterMobile
+        isFilterDirty={isFilterDirty}
+        selectedProducts={selectedProducts}
+        setSelectedProduct={setSelectedProduct}
+        selectedUseCase={selectedUseCase}
+        setSelectedUseCase={setSelectedUseCase}
+        selectedStacks={selectedStacks}
+        setSelectedStack={setSelectedStack}
+        queriedStacks={queriedStacks}
+        handleStackQuery={handleStackQuery}
+        stackQuery={stackQuery}
+        queriedUseCases={queriedUseCases}
+        handleUseCaseQuery={handleUseCaseQuery}
+        useCaseQuery={useCaseQuery}
+      />
+      <ExampleFilterDesktop
+        isFilterDirty={isFilterDirty}
+        selectedProducts={selectedProducts}
+        setSelectedProduct={setSelectedProduct}
+        selectedUseCase={selectedUseCase}
+        setSelectedUseCase={setSelectedUseCase}
+        selectedStacks={selectedStacks}
+        setSelectedStack={setSelectedStack}
+        queriedStacks={queriedStacks}
+        handleStackQuery={handleStackQuery}
+        stackQuery={stackQuery}
+        queriedUseCases={queriedUseCases}
+        handleUseCaseQuery={handleUseCaseQuery}
+        useCaseQuery={useCaseQuery}
+      />
+    </>
+  );
+}
 
+function ExampleFilterDesktop({
+  isFilterDirty,
+  selectedProducts,
+  setSelectedProduct,
+  selectedUseCase,
+  setSelectedUseCase,
+  selectedStacks,
+  setSelectedStack,
+  queriedStacks,
+  handleStackQuery,
+  stackQuery,
+  queriedUseCases,
+  handleUseCaseQuery,
+  useCaseQuery,
+}) {
+  return (
+    <form className="hidden gap-4 sm:grid">
       <Child className="sm:-mt-10">
         <div className="flex items-center ">
           <h4 className="text-sm uppercase tracking-widest opacity-60">
@@ -69,6 +111,100 @@ export default function ExampleFilter({
           )}
         </div>
       </Child>
+      <FormContent
+        selectedProducts={selectedProducts}
+        setSelectedProduct={setSelectedProduct}
+        selectedUseCase={selectedUseCase}
+        setSelectedUseCase={setSelectedUseCase}
+        selectedStacks={selectedStacks}
+        setSelectedStack={setSelectedStack}
+        queriedStacks={queriedStacks}
+        handleStackQuery={handleStackQuery}
+        stackQuery={stackQuery}
+        queriedUseCases={queriedUseCases}
+        handleUseCaseQuery={handleUseCaseQuery}
+        useCaseQuery={useCaseQuery}
+      />
+    </form>
+  );
+}
+
+function ExampleFilterMobile({
+  isFilterDirty,
+  selectedProducts,
+  setSelectedProduct,
+  selectedUseCase,
+  setSelectedUseCase,
+  selectedStacks,
+  setSelectedStack,
+  queriedStacks,
+  handleStackQuery,
+  stackQuery,
+  queriedUseCases,
+  handleUseCaseQuery,
+  useCaseQuery,
+}) {
+  return (
+    <div className="block  sm:hidden">
+      <Toc>
+        <Toc.Summary className="pl-3">
+          <div className="flex items-center ">
+            <h4 className="text-sm uppercase tracking-widest text-white/90 opacity-100">
+              Filter
+            </h4>
+            {isFilterDirty && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedProduct([]);
+                  setSelectedUseCase([]);
+                  setSelectedStack([]);
+                  handleStackQuery({ target: { value: "" } });
+                  handleUseCaseQuery({ target: { value: "" } });
+                }}
+                className="ml-auto inline-flex h-5 items-center justify-center rounded-full bg-white/5 px-2 text-sm text-white/40"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+        </Toc.Summary>
+        <div className="px-6 pt-2">
+          <FormContent
+            selectedProducts={selectedProducts}
+            setSelectedProduct={setSelectedProduct}
+            selectedUseCase={selectedUseCase}
+            setSelectedUseCase={setSelectedUseCase}
+            selectedStacks={selectedStacks}
+            setSelectedStack={setSelectedStack}
+            queriedStacks={queriedStacks}
+            handleStackQuery={handleStackQuery}
+            stackQuery={stackQuery}
+            queriedUseCases={queriedUseCases}
+            handleUseCaseQuery={handleUseCaseQuery}
+            useCaseQuery={useCaseQuery}
+          />
+        </div>
+      </Toc>
+    </div>
+  );
+}
+function FormContent({
+  selectedProducts,
+  setSelectedProduct,
+  selectedUseCase,
+  setSelectedUseCase,
+  selectedStacks,
+  setSelectedStack,
+  queriedStacks,
+  handleStackQuery,
+  stackQuery,
+  queriedUseCases,
+  handleUseCaseQuery,
+  useCaseQuery,
+}) {
+  return (
+    <>
       <Child>
         <div className="space-y-0.5">
           {["redis", "kafka", "qstash"].map((key) => {
@@ -126,7 +262,7 @@ export default function ExampleFilter({
         </div>
       </Child>
       <Child>
-        <Toc>
+        <Toc className="mt-4 sm:mt-0">
           <Toc.Summary count={selectedStacks.length}>Stack</Toc.Summary>
           <div className=" w-[100%]">
             <div className="w-[100%] border-b border-b-white/5 py-4">
@@ -173,7 +309,7 @@ export default function ExampleFilter({
         </Toc>
       </Child>
       <Child>
-        <Toc>
+        <Toc className="mt-4 sm:mt-0">
           <Toc.Summary count={selectedUseCase.length}>Use Cases</Toc.Summary>
           <div className="w-[100%] space-y-0.5">
             <div className="w-[100%] border-b border-b-white/5 py-4">
@@ -219,10 +355,9 @@ export default function ExampleFilter({
           </div>
         </Toc>
       </Child>
-    </form>
+    </>
   );
 }
-
 function Child({ className, children, ...props }: HTMLProps<HTMLDivElement>) {
   return (
     <div className={cx("border-b border-b-white/5 pb-4", className)} {...props}>
