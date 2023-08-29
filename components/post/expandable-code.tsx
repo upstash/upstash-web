@@ -1,0 +1,66 @@
+"use client";
+
+import cx from "@/utils/cx";
+import { HTMLProps, useState } from "react";
+import { IconArrow } from "@/components/post/toc";
+export default function ExpandableCode({
+  children,
+  title,
+}: {
+  children: React.ReactNode;
+  title: string;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div
+      onClick={() => {
+        setIsOpen(!isOpen);
+      }}
+    >
+      <Toc>
+        <Toc.Summary className="mb-2">
+          Click to {isOpen ? " hide " : " expand "}
+          <span className="font-large text-white">{title} </span>
+          file content
+        </Toc.Summary>
+        {children}
+      </Toc>
+    </div>
+  );
+}
+
+function Toc({ className, children, ...props }: HTMLProps<HTMLDetailsElement>) {
+  return (
+    <details
+      role="navigation"
+      aria-label="Use Cases"
+      className={cx("group/toc", className)}
+      {...props}
+    >
+      {children}
+    </details>
+  );
+}
+
+Toc.Summary = function TocSummary({
+  className,
+  children,
+  ...props
+}: HTMLProps<HTMLDetailsElement> & { count?: number }) {
+  return (
+    <summary
+      className={cx(
+        "flex select-none list-none items-center gap-2",
+        "mb-px h-10 rounded-lg px-4 text-white/40 hover:bg-[#151518ff]",
+        className
+      )}
+      {...props}
+    >
+      <span className="inline-flex w-5 shrink-0 items-center justify-center">
+        <IconArrow className="rotate-0 group-open/toc:rotate-90" />
+      </span>
+      <span className="grow text-sm  tracking-wide ">{children}</span>
+    </summary>
+  );
+};
