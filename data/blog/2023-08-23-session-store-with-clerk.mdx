@@ -123,7 +123,6 @@ At this point, our app needs the sign-up and sign-in pages. We're going to provi
 <ExpandableCode title="app/components/Header.tsx">
 ```tsx
 import { auth, UserButton, useClerk } from "@clerk/nextjs";
-import Link from 'next/link'; // Importing Link assuming you are using Next.js
 
 const Header = () => {
   const { userId } = auth();
@@ -268,7 +267,7 @@ type cartContent = {
 
 const CartContext = createContext<CartContextProps>({
   cart: [],
-  cartItems: {},
+  cartItemIDs: {},
   addItem: async (id: number) => {},
   checkout: async () => {},
   removeItem: async (id: number) => {},
@@ -280,12 +279,13 @@ const mapIdsToObjects = (
   cartItemsIDs: cartContent
 ): Item[] => {
   const mappedItems: Item[] = [];
-  for (const id of Object.keys(cartItemsIDs)) {
+  for (const id of Object.keys(cartItemIDs)) {
     const product = products.find((p) => p.id === parseInt(id));
     if (product && cartItems?.hasOwnProperty(id)) {
       mappedItems.push(product);
     }
   }
+
   return mappedItems;
 };
 
@@ -304,6 +304,7 @@ export const CartProvider: any = ({
     fetchCartItems();
   }, []);
 
+//On the page load, the cart data will be retrieved from Upstash Redis, and the state will be edited
   const fetchCartItems = async () => {
     const flatitems = await redis.hgetall(`user:${userId}`);
     setCartItemIDs(flatitems as cartContent);
@@ -318,6 +319,7 @@ export const CartProvider: any = ({
     // to be implemented further in the blog
   };
 
+//The cart will be resetted by deleting the related key from Redis DB, and setting the state to empty objects.
   const resetCart = async () => {
     redis.del(`user:${userId}`);
     setCart([]);
@@ -343,6 +345,7 @@ export const CartProvider: any = ({
     </CartContext.Provider>
   );
 };
+
 export default CartContext;
 ```
 </ExpandableCode>
@@ -396,7 +399,7 @@ const addItem = async (id: number) => {
     redis.hincrby(`user:${userId}`, id.toString(), 1);
   }
 };
-````
+```
 
 ### Removing Item from the Cart
 
@@ -702,10 +705,8 @@ export default function Cart() {
         </SheetContent>
       </Sheet>
     </>
-
-);
+  );
 }
-
 ```
 </ExpandableCode>
 
@@ -726,4 +727,3 @@ Here are some suggestions for further improvements on this project:
 - **Integration:** There's potential to integrate payment gateways for a smooth checkout process or even interface with third-party inventory or CRM systems for a comprehensive eCommerce solution.
 
 Thank you for following along this development adventure. We're eager to hear your feedback and would love to see the innovations you might bring to this foundational structure! Should you have any questions or problems about this project, feel free to get in contact with me at fahreddin@upstash.com.
-```
