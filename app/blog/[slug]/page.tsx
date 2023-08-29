@@ -65,7 +65,7 @@ export default async function BlogPage({ params }: Props) {
             <PostTags post={post} />
 
             {/* Other Post */}
-            <div className="grid gap-4 mt-10 md:grid-cols-2 md:gap-8">
+            <div className="mt-10 grid gap-4 md:grid-cols-2 md:gap-8">
               <OtherPostCard post={prevPost} />
               <OtherPostCard post={nextPost} align="right" />
             </div>
@@ -89,7 +89,9 @@ export async function generateMetadata({
   const description =
     post.description ||
     "Articles and tutorials on serverless technologies from Upstash and community";
-  const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"
+  const baseUrl = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "http://localhost:3000";
 
   return {
     title,
@@ -112,6 +114,13 @@ export async function generateMetadata({
       card: "summary_large_image",
       title,
       description,
+      images: [
+        {
+          url: `${baseUrl}/blog/${post.slug}/twitter-image`,
+          width: 1200,
+          height: 675,
+        },
+      ],
     },
   };
 }
