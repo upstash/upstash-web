@@ -120,8 +120,10 @@ With this, the whole application is protected. If you try to access any page wit
 
 At this point, our app needs the sign-up and sign-in pages. We're going to provide the navigation to these files from the Header and this component will be rendered based on the active user. If there's an active user, then user will be able to sign-out and see their profile. Else, sign-in and sign-up routes will be shown.
 
-```tsx title="app/components/Header.tsx"
+<ExpandableCode title="app/components/Header.tsx">
+```tsx
 import { auth, UserButton, useClerk } from "@clerk/nextjs";
+import Link from 'next/link'; // Importing Link assuming you are using Next.js
 
 const Header = () => {
   const { userId } = auth();
@@ -140,21 +142,14 @@ const Header = () => {
         <div className="flex items-center text-white">
           {!userId && (
             <>
-              <Link
-                href="/sign-in"
-                className="mr-5 text-gray-300 hover:text-white"
-              >
+              <Link href="/sign-in" className="mr-5 text-gray-300 hover:text-white">
                 Sign In
               </Link>
-              <Link
-                href="/sign-up"
-                className="mr-5 text-gray-300 hover:text-white"
-              >
+              <Link href="/sign-up" className="mr-5 text-gray-300 hover:text-white">
                 Sign Up
               </Link>
             </>
           )}
-
           {userId && (
             <>
               <button
@@ -165,10 +160,7 @@ const Header = () => {
               >
                 Sign Out
               </button>
-              <Link
-                href="profile"
-                className="mr-6 text-gray-100 hover:text-white"
-              >
+              <Link href="/profile" className="mr-6 text-gray-100 hover:text-white">
                 Profile
               </Link>
             </>
@@ -181,7 +173,9 @@ const Header = () => {
     </>
   );
 };
+
 ```
+</ExpandableCode>
 
 Here's the state of the header without an active user:
 
@@ -257,7 +251,8 @@ Our Cart Context will be placed in the `app/context/CartContext.tsx` file. We'll
 - There's also a checkout feature.
   Here's an overarching view of the context API. We'll break down and implement each method step by step.
 
-```tsx title="contexts/CartContext.tsx"
+<ExpandableCode title="contexts/CartContext.tsx">
+```tsx
 interface CartContextProps {
   cart: Item[];
   cartItems: cartContent;
@@ -273,7 +268,7 @@ type cartContent = {
 
 const CartContext = createContext<CartContextProps>({
   cart: [],
-  cartItemIDs: {},
+  cartItems: {},
   addItem: async (id: number) => {},
   checkout: async () => {},
   removeItem: async (id: number) => {},
@@ -285,13 +280,12 @@ const mapIdsToObjects = (
   cartItemsIDs: cartContent
 ): Item[] => {
   const mappedItems: Item[] = [];
-  for (const id of Object.keys(cartItemIDs)) {
+  for (const id of Object.keys(cartItemsIDs)) {
     const product = products.find((p) => p.id === parseInt(id));
     if (product && cartItems?.hasOwnProperty(id)) {
       mappedItems.push(product);
     }
   }
-
   return mappedItems;
 };
 
@@ -310,23 +304,20 @@ export const CartProvider: any = ({
     fetchCartItems();
   }, []);
 
-  //On the page load, the cart data will be retrieved from Upstash Redis, and the state will be edited
   const fetchCartItems = async () => {
     const flatitems = await redis.hgetall(`user:${userId}`);
-
     setCartItemIDs(flatitems as cartContent);
     setCart(mapIdsToObjects(items, flatitems as cartContent));
   };
 
   const addItem = async (id: number) => {
-    /// to be implemented further in the blog
+    // to be implemented further in the blog
   };
 
   const removeItem = async (id: number, force: boolean = false) => {
-    /// to be implemented further in the blog
+    // to be implemented further in the blog
   };
 
-  //The cart will be resetted by deleting the related key from Redis DB, and setting the state to empty objects.
   const resetCart = async () => {
     redis.del(`user:${userId}`);
     setCart([]);
@@ -352,9 +343,9 @@ export const CartProvider: any = ({
     </CartContext.Provider>
   );
 };
-
 export default CartContext;
 ```
+</ExpandableCode>
 
 Here's how the algorithm works in the higher overview.
 
@@ -405,7 +396,7 @@ const addItem = async (id: number) => {
     redis.hincrby(`user:${userId}`, id.toString(), 1);
   }
 };
-```
+````
 
 ### Removing Item from the Cart
 
@@ -454,8 +445,8 @@ The cart functionality is now in place, complete with all essential methods. It'
 ### Index Page
 
 A point of note: items on the index page are showcased exclusively for active, signed-in users. First, we fetch the user data from Clerk and render the components based on the response from Clerk.
-
-```tsx title="app/index.tsx"
+<ExpandableCode title="app/index.tsx">
+```tsx
 import { currentUser } from "@clerk/nextjs";
 import CardComponent from "./components/ui/card";
 import Cart from "./components/cart/cart";
@@ -495,7 +486,7 @@ export default async function Home() {
   );
 }
 ```
-
+</ExpandableCode>
 In the card component, we'll just retrieve the necessary functions and objects CartContext.
 
 ```tsx title="components/CardComponent.tsx"
@@ -584,7 +575,8 @@ However, as items trickle into the cart, they become readily visible in this com
 
 For a full walkthrough of this component's creation, take a look below. If you're hunting for minutiae, like button configurations, I'd recommend heading over to our GitHub repository, where the entirety of the codebase is at your use.
 
-```tsx title="components/Cart.tsx"
+<ExpandableCode title="components/Cart.tsx">
+```tsx
 export default function Cart() {
   const { addItem, removeItem, resetCart, cart, cartItems, checkout } =
     useContext(CartContext);
@@ -710,9 +702,12 @@ export default function Cart() {
         </SheetContent>
       </Sheet>
     </>
-  );
+
+);
 }
+
 ```
+</ExpandableCode>
 
 With that final snippet of code, our project reaches its conclusion. We've successfully journeyed from concept to implementation, bringing our cart feature to life using the power of Upstash Redis and the flexibility of the shadcn/ui library.
 
@@ -731,3 +726,4 @@ Here are some suggestions for further improvements on this project:
 - **Integration:** There's potential to integrate payment gateways for a smooth checkout process or even interface with third-party inventory or CRM systems for a comprehensive eCommerce solution.
 
 Thank you for following along this development adventure. We're eager to hear your feedback and would love to see the innovations you might bring to this foundational structure! Should you have any questions or problems about this project, feel free to get in contact with me at fahreddin@upstash.com.
+```

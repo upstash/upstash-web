@@ -21,6 +21,7 @@ export function Mdx({ code }: MdxProps) {
 function CopyFeaturePre(props: ComponentProps<"pre">) {
   const containerRef = useRef<HTMLDivElement>(null);
 
+  
   if (props && !props["data-language"]) {
     return <pre {...props} />;
   }
@@ -65,3 +66,4 @@ const components = {
   ExpandableCode,
   pre: CopyFeaturePre,
 };
+

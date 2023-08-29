@@ -11,15 +11,11 @@ export default function ExpandableCode({
   title: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
-
+  
   return (
-    <div
-      onClick={() => {
-        setIsOpen(!isOpen);
-      }}
-    >
+    <div>
       <Toc>
-        <Toc.Summary className="mb-2">
+        <Toc.Summary className="mb-2" isOpen={isOpen} setIsOpen={setIsOpen}>
           Click to {isOpen ? " hide " : " expand "}
           <span className="font-large text-white">{title} </span>
           file content
@@ -46,8 +42,12 @@ function Toc({ className, children, ...props }: HTMLProps<HTMLDetailsElement>) {
 Toc.Summary = function TocSummary({
   className,
   children,
+  isOpen,
+  setIsOpen,
   ...props
-}: HTMLProps<HTMLDetailsElement> & { count?: number }) {
+}: HTMLProps<HTMLDetailsElement> & { isOpen?: boolean } & {
+  setIsOpen: (isOpen: boolean) => void;
+}) {
   return (
     <summary
       className={cx(
@@ -60,7 +60,15 @@ Toc.Summary = function TocSummary({
       <span className="inline-flex w-5 shrink-0 items-center justify-center">
         <IconArrow className="rotate-0 group-open/toc:rotate-90" />
       </span>
-      <span className="grow text-sm  tracking-wide ">{children}</span>
+      <span
+        onClick={() => {
+          setIsOpen(!isOpen);
+        }}
+        className="grow text-sm  tracking-wide"
+      >
+        {children}
+      </span>
     </summary>
   );
 };
+
