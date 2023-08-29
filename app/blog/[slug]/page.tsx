@@ -101,26 +101,12 @@ export async function generateMetadata({
       title,
       description,
       url: `${baseUrl}/blog/${post.slug}`,
-      images: [
-        {
-          url: `${baseUrl}/blog/${post.slug}/opengraph-image`,
-          width: 1200,
-          height: 675,
-        },
-      ],
     },
 
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: [
-        {
-          url: `${baseUrl}/blog/${post.slug}/twitter-image`,
-          width: 1200,
-          height: 675,
-        },
-      ],
     },
   };
 }
