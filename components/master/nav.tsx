@@ -9,7 +9,7 @@ import { NavItems } from "./header";
 
 export default function Nav({}: HTMLProps<HTMLDivElement> & {}) {
   return (
-    <nav className="col-span-2 flex items-center justify-center">
+    <nav className="flex items-center justify-center col-span-2">
       {NavItems.map((item) => {
         return (
           <NavLink key={item.href} href={item.href}>
@@ -18,7 +18,6 @@ export default function Nav({}: HTMLProps<HTMLDivElement> & {}) {
           </NavLink>
         );
       })}
-      
     </nav>
   );
 }
