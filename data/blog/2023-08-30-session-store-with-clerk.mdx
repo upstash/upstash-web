@@ -6,7 +6,9 @@ authors:
 tags: [redis, clerk]
 ---
 
-One of the main use cases of Redis is storing and managing user sessions to maintain the state across requests in web applications. This can be achieved in various ways, and some of the recent serverless tools provides us easy to deploy options.
+One of the main use cases of Redis is storing and managing user sessions to maintain the state across requests in web applications. This can be done in several ways, and some of the newer serverless tools offer easy-to-deploy options.
+
+User session data management is critical for various business applications. For example, personalization platforms use Redis to store user interactions and preferences, enabling them to offer customized content or product suggestions. In the gaming world, Redis helps manage user data to provide a smooth multiplayer experience by tracking player interactions in real-time. Advertising platforms also rely on Redis to store session data, which optimizes ad delivery and personalizes future campaigns. In the example that follows, we'll specifically focus on an e-commerce application and explore how Redis can be used to manage shopping carts effectively.
 
 ### Project Description
 
@@ -25,7 +27,7 @@ This project has some other features related to QStash and Upstash Ratelimit:
 
 You can see the deployed demo of the project [here](https://shopstash.vercel.app/).
 
-You can also reach the Github repository of this project [here](https://github.com/upstash/examples).
+You can also reach the Github repository of this project [here](https://github.com/upstash/examples/tree/main/examples/session-store-with-clerk).
 
 ### Creating the Next.js Application
 
@@ -133,9 +135,7 @@ const Header = () => {
       <nav className="flex items-center justify-between bg-teal-500 px-6 py-4">
         <div className="flex items-center">
           <Link href="/">
-            <div className="text-lg font-bold uppercase text-white">
-              ShopStash
-            </div>
+            <div className="text-lg font-bold uppercase text-white">ShopStash</div>
           </Link>
         </div>
         <div className="flex items-center text-white">
@@ -170,9 +170,8 @@ const Header = () => {
         </div>
       </nav>
     </>
-  );
-};
-
+  ); 
+;
 ```
 </ExpandableCode>
 
@@ -193,7 +192,7 @@ const SignUpPage = () => {
   );
 };
 export default SignUpPage;
-```
+````
 
 Sign up page is almost identical to sign in, and we'll implement it in a similar path.
 
@@ -285,7 +284,6 @@ const mapIdsToObjects = (
       mappedItems.push(product);
     }
   }
-
   return mappedItems;
 };
 
@@ -304,7 +302,6 @@ export const CartProvider: any = ({
     fetchCartItems();
   }, []);
 
-//On the page load, the cart data will be retrieved from Upstash Redis, and the state will be edited
   const fetchCartItems = async () => {
     const flatitems = await redis.hgetall(`user:${userId}`);
     setCartItemIDs(flatitems as cartContent);
@@ -319,7 +316,6 @@ export const CartProvider: any = ({
     // to be implemented further in the blog
   };
 
-//The cart will be resetted by deleting the related key from Redis DB, and setting the state to empty objects.
   const resetCart = async () => {
     redis.del(`user:${userId}`);
     setCart([]);
@@ -347,7 +343,8 @@ export const CartProvider: any = ({
 };
 
 export default CartContext;
-```
+
+````
 </ExpandableCode>
 
 Here's how the algorithm works in the higher overview.
@@ -362,7 +359,7 @@ Now that you've grasped the cart's conceptual outline, it's time to roll up our 
 
 ### Adding Item to Cart
 
-From Redis hash's viewpoint, adding an item or augmenting its quantity employs the same command. The `hincrby` command either creates the key and sets its value to 1 or amplifies the relevant value based on the `increment` parameter of command.
+From Redis hash's viewpoint, adding an item or changing its quantity requires the same command. The `hincrby` command either creates the key and sets its value to 1 or increases the related value based on the `increment` parameter of command.
 
 On the client-side, we'll mirror these actions by either introducing a fresh item or tweaking the quantity in the cart's state.
 
@@ -448,6 +445,7 @@ The cart functionality is now in place, complete with all essential methods. It'
 ### Index Page
 
 A point of note: items on the index page are showcased exclusively for active, signed-in users. First, we fetch the user data from Clerk and render the components based on the response from Clerk.
+
 <ExpandableCode title="app/index.tsx">
 ```tsx
 import { currentUser } from "@clerk/nextjs";
@@ -458,7 +456,7 @@ import { items } from "@/public/items";
 export default async function Home() {
   const user = await currentUser();
 
-  //If there's no active user, we simply ask user to sign in.
+  // If there's no active user, we simply ask the user to sign in.
   if (!user)
     return (
       <div>
@@ -467,13 +465,14 @@ export default async function Home() {
         </h1>
       </div>
     );
-  //If user has signed in, we render the shop items and the cart.
+
+  // If the user has signed in, we render the shop items and the cart.
   return (
     <div className="">
       <div className="align-center mb-5 mt-5 flex items-center justify-between">
         <h1 className="align-center mb-5 text-2xl">
           Welcome to shop,
-          <span className=" font-bold"> {user?.firstName}</span>
+          <span className="font-bold"> {user?.firstName}</span>
         </h1>
         <div className="align-self-begin justify-self-begin flex">
           <Cart />
@@ -488,6 +487,7 @@ export default async function Home() {
     </div>
   );
 }
+
 ```
 </ExpandableCode>
 In the card component, we'll just retrieve the necessary functions and objects CartContext.
@@ -524,7 +524,7 @@ export default function CardComponent(props: { item: cardProps }) {
     </>
   );
 }
-```
+````
 
 The important component here is the cart button, where you can add or remove the item from the cart. This button will be rendered using the current state of the cart.
 
@@ -705,8 +705,10 @@ export default function Cart() {
         </SheetContent>
       </Sheet>
     </>
-  );
+
+);
 }
+
 ```
 </ExpandableCode>
 
@@ -727,3 +729,6 @@ Here are some suggestions for further improvements on this project:
 - **Integration:** There's potential to integrate payment gateways for a smooth checkout process or even interface with third-party inventory or CRM systems for a comprehensive eCommerce solution.
 
 Thank you for following along this development adventure. We're eager to hear your feedback and would love to see the innovations you might bring to this foundational structure! Should you have any questions or problems about this project, feel free to get in contact with me at fahreddin@upstash.com.
+
+You can find the Github Repository of the project [here](https://github.com/upstash/examples/tree/main/examples/session-store-with-clerk).
+```
