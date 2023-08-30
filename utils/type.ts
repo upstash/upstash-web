@@ -9,18 +9,15 @@ export enum CodeExample {
   fetch = "JavaScript (Fetch)",
 }
 
-
-
-
-
-
 export type Example = {
-  id: string
+  id: string;
   githubUrl: string;
   title: string;
-  products: ("redis" | "kafka" | "qstash")[]
-  stack: string[]
-  useCases: string[]
-  author: string
-  body: string
-}
+  products: ("redis" | "kafka" | "qstash")[];
+  stack: string[];
+  useCases: string[];
+  author: string;
+  body: string;
+  blogUrl: string;
+  previewUrl: string;
+};

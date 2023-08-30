@@ -22,8 +22,12 @@ export default function ExampleFilter({
   setSelectedUseCase,
   selectedStacks,
   setSelectedStack,
-  allUseCases,
-  allStacks,
+  queriedStacks,
+  handleStackQuery,
+  stackQuery,
+  queriedUseCases,
+  handleUseCaseQuery,
+  useCaseQuery,
 }) {
   const isFilterDirty = React.useMemo(() => {
     return (
@@ -32,19 +36,62 @@ export default function ExampleFilter({
       selectedStacks.length > 0
     );
   }, [selectedProducts, selectedUseCase, selectedStacks]);
-
   return (
-    <form className="grid gap-4">
-      {/*<div className="pb-4 border-b border-b-white/5">
-        <input
-          type="search"
-          className="px-4 py-2 bg-white rounded text-zinc-950"
-        />
-      </div>*/}
+    <>
+      <ExampleFilterMobile
+        isFilterDirty={isFilterDirty}
+        selectedProducts={selectedProducts}
+        setSelectedProduct={setSelectedProduct}
+        selectedUseCase={selectedUseCase}
+        setSelectedUseCase={setSelectedUseCase}
+        selectedStacks={selectedStacks}
+        setSelectedStack={setSelectedStack}
+        queriedStacks={queriedStacks}
+        handleStackQuery={handleStackQuery}
+        stackQuery={stackQuery}
+        queriedUseCases={queriedUseCases}
+        handleUseCaseQuery={handleUseCaseQuery}
+        useCaseQuery={useCaseQuery}
+      />
+      <ExampleFilterDesktop
+        isFilterDirty={isFilterDirty}
+        selectedProducts={selectedProducts}
+        setSelectedProduct={setSelectedProduct}
+        selectedUseCase={selectedUseCase}
+        setSelectedUseCase={setSelectedUseCase}
+        selectedStacks={selectedStacks}
+        setSelectedStack={setSelectedStack}
+        queriedStacks={queriedStacks}
+        handleStackQuery={handleStackQuery}
+        stackQuery={stackQuery}
+        queriedUseCases={queriedUseCases}
+        handleUseCaseQuery={handleUseCaseQuery}
+        useCaseQuery={useCaseQuery}
+      />
+    </>
+  );
+}
 
+function ExampleFilterDesktop({
+  isFilterDirty,
+  selectedProducts,
+  setSelectedProduct,
+  selectedUseCase,
+  setSelectedUseCase,
+  selectedStacks,
+  setSelectedStack,
+  queriedStacks,
+  handleStackQuery,
+  stackQuery,
+  queriedUseCases,
+  handleUseCaseQuery,
+  useCaseQuery,
+}) {
+  return (
+    <form className="hidden gap-4 sm:grid">
       <Child className="sm:-mt-10">
-        <div className="flex items-center">
-          <h4 className="text-sm tracking-widest uppercase opacity-60">
+        <div className="flex items-center ">
+          <h4 className="text-sm uppercase tracking-widest opacity-60">
             Filter
           </h4>
           {isFilterDirty && (
@@ -54,16 +101,112 @@ export default function ExampleFilter({
                 setSelectedProduct([]);
                 setSelectedUseCase([]);
                 setSelectedStack([]);
+                handleStackQuery({ target: { value: "" } });
+                handleUseCaseQuery({ target: { value: "" } });
               }}
-              className="inline-flex items-center justify-center h-5 px-2 ml-auto text-sm rounded-full bg-white/5 text-white/40"
+              className="ml-auto inline-flex h-5 items-center justify-center rounded-full bg-white/5 px-2 text-sm text-white/40"
             >
               Clear
             </button>
           )}
         </div>
       </Child>
+      <FormContent
+        selectedProducts={selectedProducts}
+        setSelectedProduct={setSelectedProduct}
+        selectedUseCase={selectedUseCase}
+        setSelectedUseCase={setSelectedUseCase}
+        selectedStacks={selectedStacks}
+        setSelectedStack={setSelectedStack}
+        queriedStacks={queriedStacks}
+        handleStackQuery={handleStackQuery}
+        stackQuery={stackQuery}
+        queriedUseCases={queriedUseCases}
+        handleUseCaseQuery={handleUseCaseQuery}
+        useCaseQuery={useCaseQuery}
+      />
+    </form>
+  );
+}
+
+function ExampleFilterMobile({
+  isFilterDirty,
+  selectedProducts,
+  setSelectedProduct,
+  selectedUseCase,
+  setSelectedUseCase,
+  selectedStacks,
+  setSelectedStack,
+  queriedStacks,
+  handleStackQuery,
+  stackQuery,
+  queriedUseCases,
+  handleUseCaseQuery,
+  useCaseQuery,
+}) {
+  return (
+    <div className="block  sm:hidden">
+      <Toc>
+        <Toc.Summary className="pl-3">
+          <div className="flex items-center ">
+            <h4 className="text-sm uppercase tracking-widest text-white/90 opacity-100">
+              Filter
+            </h4>
+            {isFilterDirty && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedProduct([]);
+                  setSelectedUseCase([]);
+                  setSelectedStack([]);
+                  handleStackQuery({ target: { value: "" } });
+                  handleUseCaseQuery({ target: { value: "" } });
+                }}
+                className="ml-auto inline-flex h-5 items-center justify-center rounded-full bg-white/5 px-2 text-sm text-white/40"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+        </Toc.Summary>
+        <div className="px-6 pt-2">
+          <FormContent
+            selectedProducts={selectedProducts}
+            setSelectedProduct={setSelectedProduct}
+            selectedUseCase={selectedUseCase}
+            setSelectedUseCase={setSelectedUseCase}
+            selectedStacks={selectedStacks}
+            setSelectedStack={setSelectedStack}
+            queriedStacks={queriedStacks}
+            handleStackQuery={handleStackQuery}
+            stackQuery={stackQuery}
+            queriedUseCases={queriedUseCases}
+            handleUseCaseQuery={handleUseCaseQuery}
+            useCaseQuery={useCaseQuery}
+          />
+        </div>
+      </Toc>
+    </div>
+  );
+}
+function FormContent({
+  selectedProducts,
+  setSelectedProduct,
+  selectedUseCase,
+  setSelectedUseCase,
+  selectedStacks,
+  setSelectedStack,
+  queriedStacks,
+  handleStackQuery,
+  stackQuery,
+  queriedUseCases,
+  handleUseCaseQuery,
+  useCaseQuery,
+}) {
+  return (
+    <>
       <Child>
-        <div className="space-y-0.5">
+        <div className="flex w-[100%] flex-row items-center justify-between gap-1 space-y-0.5 sm:block">
           {["redis", "kafka", "qstash"].map((key) => {
             const isRedis = key === "redis";
             const isKafka = key === "kafka";
@@ -89,7 +232,8 @@ export default function ExampleFilter({
                 className={cx(
                   isRedis && isActive && "bg-red-200/10",
                   isKafka && isActive && "bg-blue-200/10",
-                  isQStash && isActive && "bg-purple-200/10"
+                  isQStash && isActive && "bg-purple-200/10",
+                  " w-[100%] justify-center pl-0 sm:pl-4"
                 )}
                 icon={
                   <>
@@ -119,63 +263,102 @@ export default function ExampleFilter({
         </div>
       </Child>
       <Child>
-        <Toc>
+        <Toc className="mt-4 sm:mt-0">
           <Toc.Summary count={selectedStacks.length}>Stack</Toc.Summary>
-          <div className="space-y-0.5">
-            {allStacks.map((key) => {
-              return (
-                <Item
-                  key={key}
-                  value={key}
-                  checked={selectedStacks.includes(key)}
-                  label={key}
-                  onChange={(e) => {
-                    const { value, checked } = e.target;
-                    if (checked) {
-                      setSelectedStack([...selectedStacks, value]);
-                    } else {
-                      setSelectedStack(
-                        selectedStacks.filter((item) => item !== value)
-                      );
-                    }
-                  }}
-                />
-              );
-            })}
+          <div className=" w-[100%]">
+            <div className="w-[100%] border-b border-b-white/5 py-4">
+              <input
+                type="search"
+                className="text:white focus:border-1 border-1 w-[100%] rounded  border-white/5 bg-white/10 px-4 py-2 text-slate-100 transition ease-in-out focus:border-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-500"
+                placeholder="Search for a stack..."
+                value={stackQuery}
+                onChange={(e) => {
+                  handleStackQuery(e);
+                }}
+              />
+            </div>
+
+            <div className="grid h-[14rem] grid-flow-row auto-rows-[3.125rem] space-y-0.5 overflow-scroll">
+              {queriedStacks.length !== 0 ? (
+                queriedStacks.map((key) => {
+                  return (
+                    <Item
+                      key={key}
+                      value={key}
+                      checked={selectedStacks.includes(key)}
+                      label={key}
+                      onChange={(e) => {
+                        const { value, checked } = e.target;
+                        if (checked) {
+                          setSelectedStack([...selectedStacks, value]);
+                        } else {
+                          setSelectedStack(
+                            selectedStacks.filter((item) => item !== value)
+                          );
+                        }
+                      }}
+                    />
+                  );
+                })
+              ) : (
+                <div className="grid h-[100%] w-[100%] items-center justify-center">
+                  <p className="text-white/40">No stacks found</p>
+                </div>
+              )}
+            </div>
           </div>
         </Toc>
       </Child>
       <Child>
-        <Toc>
+        <Toc className="mt-4 sm:mt-0">
           <Toc.Summary count={selectedUseCase.length}>Use Cases</Toc.Summary>
-          <div className="space-y-0.5">
-            {allUseCases.map((key) => {
-              return (
-                <Item
-                  key={key}
-                  value={key}
-                  checked={selectedUseCase.includes(key)}
-                  label={key}
-                  onChange={(e) => {
-                    const { value, checked } = e.target;
-                    if (checked) {
-                      setSelectedUseCase([...selectedUseCase, value]);
-                    } else {
-                      setSelectedUseCase(
-                        selectedUseCase.filter((item) => item !== value)
-                      );
-                    }
-                  }}
-                />
-              );
-            })}
+          <div className="w-[100%] space-y-0.5">
+            <div className="w-[100%] border-b border-b-white/5 py-4">
+              <input
+                type="search"
+                className="text:white focus:border-1 border-1 w-[100%] rounded  border-white/5 bg-white/10 px-4 py-2 text-slate-100 transition ease-in-out focus:border-zinc-100/03 focus:outline-none focus:ring-2 focus:ring-zinc-500"
+                placeholder="Search for an use case..."
+                value={useCaseQuery}
+                onChange={(e) => {
+                  handleUseCaseQuery(e);
+                }}
+              />
+            </div>
+            <div className="grid h-[14rem] grid-flow-row auto-rows-[3.125rem] space-y-0.5 overflow-scroll">
+              {queriedUseCases.length !== 0 ? (
+                queriedUseCases.map((key) => {
+                  console.log("ITEM");
+                  return (
+                    <Item
+                      key={key}
+                      value={key}
+                      checked={selectedUseCase.includes(key)}
+                      label={key}
+                      onChange={(e) => {
+                        const { value, checked } = e.target;
+                        if (checked) {
+                          setSelectedUseCase([...selectedUseCase, value]);
+                        } else {
+                          setSelectedUseCase(
+                            selectedUseCase.filter((item) => item !== value)
+                          );
+                        }
+                      }}
+                    />
+                  );
+                })
+              ) : (
+                <div className="grid h-[100%] w-[100%] items-center justify-center">
+                  <p className="text-white/40">No use cases found</p>
+                </div>
+              )}
+            </div>
           </div>
         </Toc>
       </Child>
-    </form>
+    </>
   );
 }
-
 function Child({ className, children, ...props }: HTMLProps<HTMLDivElement>) {
   return (
     <div className={cx("border-b border-b-white/5 pb-4", className)} {...props}>
@@ -207,17 +390,17 @@ Toc.Summary = function TocSummary({
     <summary
       className={cx(
         "flex select-none list-none items-center gap-2",
-        "mb-px h-10 rounded px-4 text-white/40 hover:bg-white/03",
+        "mb-px h-10 rounded px-4 text-white/40 hover:bg-white/03 ",
         className
       )}
       {...props}
     >
-      <span className="inline-flex items-center justify-center w-5 shrink-0">
+      <span className="inline-flex w-5 shrink-0 items-center justify-center">
         <IconArrow className="rotate-0 group-open/toc:rotate-90" />
       </span>
-      <span className="text-sm tracking-wide uppercase grow">{children}</span>
+      <span className="grow text-sm uppercase tracking-wide ">{children}</span>
       {count > 0 && (
-        <span className="inline-flex items-center justify-center h-5 px-2 font-mono text-sm rounded-full bg-white/5">
+        <span className="inline-flex h-5 items-center justify-center rounded-full bg-white/5 px-2 font-mono text-sm">
           {count}
         </span>
       )}
@@ -242,9 +425,9 @@ function Item({
   return (
     <label
       className={cx(
-        "flex cursor-pointer select-none items-center gap-2",
-        "rounded-lg bg-white/03 px-4 py-3 text-zinc-400",
-        "hover:bg-white/5",
+        " flex cursor-pointer select-none items-center gap-2",
+        "rounded-lg bg-white/03  px-4 py-3 text-zinc-400",
+        "  hover:bg-white/5",
         checked && "bg-white/10 text-zinc-50",
         className
       )}
@@ -253,7 +436,7 @@ function Item({
         type="checkbox"
         value={value}
         onChange={onChange}
-        className="absolute opacity-0 pointer-events-none"
+        className="pointer-events-none opacity-0"
       />
       {icon ? (
         icon

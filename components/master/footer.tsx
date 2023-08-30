@@ -24,7 +24,7 @@ export default function Footer({ className, ...props }: IAppFooter) {
 
           <div className="flex flex-col items-center gap-4 mt-2 md:flex-row">
             <Button
-              href="/docs/help/support"
+              href="/docs/common/help/support"
               className="opacity-60 hover:opacity-100"
             >
               Contact Us
