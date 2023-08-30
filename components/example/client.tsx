@@ -124,8 +124,8 @@ export const Client: React.FC<Props> = ({ examples, useCases, stack }) => {
       <div className="grid grid-flow-row auto-rows-[6_min]">
         <div className="flex w-[100%] flex-col gap-4 border-b border-b-white/5  sm:flex-row sm:justify-between sm:py-4">
           <Button
-            href="https://github.com/upstash/examples"
-            className="rounded  bg-white/10 text-white "
+            href="https://github.com/upstash/examples#contributing"
+            className="text-white rounded bg-white/10 "
             type="button"
           >
             Contribute
