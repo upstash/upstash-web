@@ -18,7 +18,6 @@ export default function Nav({}: HTMLProps<HTMLDivElement> & {}) {
           </NavLink>
         );
       })}
-      
     </nav>
   );
 }

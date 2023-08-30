@@ -6,6 +6,7 @@ import { Example as Box } from "./comp";
 import type { Example } from "@/utils/type";
 import { authors } from "@/utils/authors";
 import { set } from "lodash";
+import Button from "@/components/button";
 
 type Props = {
   examples: Example[];
@@ -96,8 +97,6 @@ export const Client: React.FC<Props> = ({ examples, useCases, stack }) => {
       selectedUseCases.length > 0 &&
       !item.useCases.some((uc) => selectedUseCases.includes(uc))
     ) {
-      console.log("filtering out due to usecase", item, selectedUseCases);
-
       return false;
     }
 
@@ -105,8 +104,8 @@ export const Client: React.FC<Props> = ({ examples, useCases, stack }) => {
   });
 
   return (
-    <div className="grid auto-cols-[1fr_4fr] grid-flow-col items-stretch gap-10 text-left lg:flex-row lg:items-start lg:gap-10">
-      <div className="mt-[4.5rem] lg:w-[100%] xl:w-[100%]">
+    <div className="grid items-start gap-4 text-left sm:auto-cols-[1fr_4fr] sm:auto-cols-[1fr_4fr] sm:grid-flow-col  sm:gap-10 lg:flex-row lg:items-start lg:gap-10">
+      <div className="mt-2  sm:mt-[4.5rem] lg:w-[100%] xl:w-[100%]">
         <ExampleFilter
           selectedProducts={selectedProducts}
           setSelectedProduct={setSelectedProduct}
@@ -120,15 +119,20 @@ export const Client: React.FC<Props> = ({ examples, useCases, stack }) => {
           queriedUseCases={queriedUseCases}
           handleUseCaseQuery={handleUseCaseQuery}
           useCaseQuery={useCaseQuery}
-          allStacks={Object.keys(stack)}
-          allUseCases={Object.keys(useCases)}
         />
       </div>
-      <div className="grid grid-flow-row auto-rows-[6_auto]">
-        <div className="flex w-[100%] justify-end border-b  border-b-white/5 py-4">
+      <div className="grid grid-flow-row auto-rows-[6_min]">
+        <div className="flex w-[100%] flex-col gap-4 border-b border-b-white/5  sm:flex-row sm:justify-between sm:py-4">
+          <Button
+            href="https://github.com/upstash/examples"
+            className="rounded  bg-white/10 text-white "
+            type="button"
+          >
+            Contribute
+          </Button>
           <input
             type="search"
-            className="text:white focus:border-1 border-1 w-[31.25%] rounded  border-white/5 bg-white/10 px-4 py-2 text-slate-100 transition ease-in-out focus:border-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-500"
+            className="text:white focus:border-1 border-1 w-[100%] rounded border-white/5 bg-white/10  px-4 py-2 text-slate-100 transition ease-in-out focus:border-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-500 sm:w-[31.25%] sm:text-sm"
             value={exampleQuery}
             placeholder="Search for an example..."
             onChange={(e) => {
@@ -149,6 +153,9 @@ export const Client: React.FC<Props> = ({ examples, useCases, stack }) => {
                 title={item.title}
                 products={item.products}
                 author={author}
+                stack={item.stack}
+                selectedStacks={selectedStacks}
+                setSelectedStacks={setSelectedStack}
               />
             );
           })}
