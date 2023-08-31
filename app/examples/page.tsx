@@ -18,13 +18,17 @@ export default async function ExamplesPage() {
   // counting occurences of each stack
   const stack: Record<string, number> = {};
   const useCases: Record<string, number> = {};
+  const platforms: Record<string, number> = {};
 
   for (const e of examples) {
     for (const s of e.stack) {
       stack[s] = (stack[s] || 0) + 1;
     }
-    for (const s of e.useCases) {
-      useCases[s] = (useCases[s] || 0) + 1;
+    for (const u of e.useCases) {
+      useCases[u] = (useCases[u] || 0) + 1;
+    }
+    for (const p of e.platforms) {
+      platforms[p] = (platforms[p] || 0) + 1;
     }
   }
 
@@ -32,7 +36,7 @@ export default async function ExamplesPage() {
     <main className="relative z-0 text-center">
       <Bg />
 
-      <section className="pb-4 pt-8 sm:pb-6 sm:pt-12 md:pb-8 md:pt-16">
+      <section className="pt-8 pb-4 sm:pb-6 sm:pt-12 md:pb-8 md:pt-16">
         <Container className="max-w-screen-lg">
           {/* header */}
           <header>
@@ -47,7 +51,7 @@ export default async function ExamplesPage() {
       {/* body */}
       <section className="mt-2 sm:mt-6">
         <Container>
-          <Client examples={examples} stack={stack} useCases={useCases} />
+          <Client examples={examples} stack={stack} useCases={useCases} platforms={platforms} />
         </Container>
       </section>
     </main>

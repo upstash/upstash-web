@@ -91,7 +91,7 @@ function ExampleFilterDesktop({
     <form className="hidden gap-4 sm:grid">
       <Child className="sm:-mt-10">
         <div className="flex items-center ">
-          <h4 className="text-sm uppercase tracking-widest opacity-60">
+          <h4 className="text-sm tracking-widest uppercase opacity-60">
             Filter
           </h4>
           {isFilterDirty && (
@@ -104,7 +104,7 @@ function ExampleFilterDesktop({
                 handleStackQuery({ target: { value: "" } });
                 handleUseCaseQuery({ target: { value: "" } });
               }}
-              className="ml-auto inline-flex h-5 items-center justify-center rounded-full bg-white/5 px-2 text-sm text-white/40"
+              className="inline-flex items-center justify-center h-5 px-2 ml-auto text-sm rounded-full bg-white/5 text-white/40"
             >
               Clear
             </button>
@@ -145,11 +145,11 @@ function ExampleFilterMobile({
   useCaseQuery,
 }) {
   return (
-    <div className="block  sm:hidden">
+    <div className="block sm:hidden">
       <Toc>
         <Toc.Summary className="pl-3">
           <div className="flex items-center ">
-            <h4 className="text-sm uppercase tracking-widest text-white/90 opacity-100">
+            <h4 className="text-sm tracking-widest uppercase opacity-100 text-white/90">
               Filter
             </h4>
             {isFilterDirty && (
@@ -162,7 +162,7 @@ function ExampleFilterMobile({
                   handleStackQuery({ target: { value: "" } });
                   handleUseCaseQuery({ target: { value: "" } });
                 }}
-                className="ml-auto inline-flex h-5 items-center justify-center rounded-full bg-white/5 px-2 text-sm text-white/40"
+                className="inline-flex items-center justify-center h-5 px-2 ml-auto text-sm rounded-full bg-white/5 text-white/40"
               >
                 Clear
               </button>
@@ -278,7 +278,7 @@ function FormContent({
               />
             </div>
 
-            <div className="grid h-[14rem] grid-flow-row auto-rows-[3.125rem] space-y-0.5 overflow-scroll">
+            <div className="grid grid-flow-row auto-rows-[3.125rem] space-y-0.5 overflow-scroll">
               {queriedStacks.length !== 0 ? (
                 queriedStacks.map((key) => {
                   return (
@@ -309,6 +309,7 @@ function FormContent({
           </div>
         </Toc>
       </Child>
+      
       <Child>
         <Toc className="mt-4 sm:mt-0">
           <Toc.Summary count={selectedUseCase.length}>Use Cases</Toc.Summary>
@@ -324,7 +325,7 @@ function FormContent({
                 }}
               />
             </div>
-            <div className="grid h-[14rem] grid-flow-row auto-rows-[3.125rem] space-y-0.5 overflow-scroll">
+            <div className="grid grid-flow-row auto-rows-[3.125rem] space-y-0.5 overflow-scroll">
               {queriedUseCases.length !== 0 ? (
                 queriedUseCases.map((key) => {
                   console.log("ITEM");
@@ -361,7 +362,7 @@ function FormContent({
 }
 function Child({ className, children, ...props }: HTMLProps<HTMLDivElement>) {
   return (
-    <div className={cx("border-b border-b-white/5 pb-4", className)} {...props}>
+    <div className={cx("border-b border-b-white/5 pb-4 ", className)} {...props}>
       {children}
     </div>
   );
@@ -372,7 +373,7 @@ function Toc({ className, children, ...props }: HTMLProps<HTMLDetailsElement>) {
     <details
       role="navigation"
       aria-label="Use Cases"
-      className={cx("group/toc", className)}
+      className={cx("group/toc ", className)}
       {...props}
     >
       {children}
@@ -395,12 +396,12 @@ Toc.Summary = function TocSummary({
       )}
       {...props}
     >
-      <span className="inline-flex w-5 shrink-0 items-center justify-center">
+      <span className="inline-flex items-center justify-center w-5 shrink-0">
         <IconArrow className="rotate-0 group-open/toc:rotate-90" />
       </span>
-      <span className="grow text-sm uppercase tracking-wide ">{children}</span>
+      <span className="text-sm tracking-wide uppercase grow ">{children}</span>
       {count > 0 && (
-        <span className="inline-flex h-5 items-center justify-center rounded-full bg-white/5 px-2 font-mono text-sm">
+        <span className="inline-flex items-center justify-center h-5 px-2 font-mono text-sm rounded-full bg-white/5">
           {count}
         </span>
       )}
@@ -436,7 +437,7 @@ function Item({
         type="checkbox"
         value={value}
         onChange={onChange}
-        className="pointer-events-none opacity-0"
+        className="opacity-0 pointer-events-none"
       />
       {icon ? (
         icon

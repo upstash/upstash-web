@@ -16,6 +16,7 @@ export type Example = {
   products: ("redis" | "kafka" | "qstash")[];
   stack: string[];
   useCases: string[];
+  platforms: string[];
   author: string;
   body: string;
   blogUrl: string;

@@ -12,9 +12,10 @@ type Props = {
   examples: Example[];
   useCases: Record<string, number>;
   stack: Record<string, number>;
+  platforms: Record<string, number>;
 };
 
-export const Client: React.FC<Props> = ({ examples, useCases, stack }) => {
+export const Client: React.FC<Props> = ({ examples, useCases, stack,platforms }) => {
   const [selectedProducts, setSelectedProduct] = useState<Example["products"]>(
     []
   );
@@ -27,6 +28,11 @@ export const Client: React.FC<Props> = ({ examples, useCases, stack }) => {
   const [selectedStacks, setSelectedStack] = useState<string[]>([]);
   const [queriedStacks, setQueriedStacks] = useState<string[]>(
     Object.keys(stack)
+  );
+
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
+  const [queriedPlatforms, setQueriedPlatforms] = useState<string[]>(
+    Object.keys(platforms)
   );
   const [stackQuery, setStackQuery] = useState<string>("");
 
@@ -96,6 +102,15 @@ export const Client: React.FC<Props> = ({ examples, useCases, stack }) => {
     if (
       selectedUseCases.length > 0 &&
       !item.useCases.some((uc) => selectedUseCases.includes(uc))
+    ) {
+      return false;
+    }
+    /**
+     * Filter out other platforms
+     */
+    if (
+      selectdPlatforms.length > 0 &&
+      !item.platforms.some((uc) => selectdPlatforms.includes(uc))
     ) {
       return false;
     }
