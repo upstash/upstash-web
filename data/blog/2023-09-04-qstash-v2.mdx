@@ -1,0 +1,48 @@
+---
+slug: qstash-v2
+title: "Announcing QStash v2"
+authors:
+  - andreas
+tags: [qstash, serverless, redis, queue, cron, scheduler]
+---
+
+
+We're thrilled to announce a major milestone for us: the launch of **QStash 2.0**! The new version is a rewrite of our existing system, with a focus on enhanced reliability and scalability.
+
+
+## What's New in QStash 2.0?
+
+- Dead Letter Queues (DLQ)
+One of the standout features of QStash 2.0 is the introduction of DLQs. Handling failed messages effectively has always been a challenge, and DLQs provide an elegant solution. When a message repeatedly fails to be delivered, it is moved to the DLQ, allowing developers to investigate and resolve issues and finally republish the messages to ensure every single message will be delivered.
+- Complete Rewrite for Horizontal Scalability
+We understand that as your applications grow, so do your scalability needs. That's why we've completely rewritten QStash 2.0 with a focus on horizontal scalability. Our new architecture allows us to seamlessly scale your message queue horizontally to handle increased workloads. Whether you're dealing with a sudden spike in traffic or planning for long-term growth, QStash 2.0 has you covered.
+- Custom methods
+One of the most requested features was a way to send not only `POST` methods to your API, and we listened. Now you can use any method you want, by specifying a `Upstash-Method: GET` header when publishing a message.
+
+## Key Benefits of QStash 2.0
+
+Here are some of the key benefits you can expect when you upgrade to QStash 2.0:
+
+- Enhanced Reliability: DLQs ensure that failed messages are not lost and can be easily recovered and analyzed, enhancing the reliability of your applications.
+- Improved Scalability: QStash can scale with your application's demands, ensuring that you never hit performance bottlenecks.
+- Simplified Debugging: DLQs provide valuable insights into message failures, making it easier for developers to identify and resolve issues quickly.
+
+## Getting Started with QStash 2.0
+
+QStash v1 will be deprecated on **December 1, 2023**. Until then you have time to migrate to v2.
+
+To use QStash 2.0, you just need to use the new `/v2/...` api endpoints as documented [here](https://upstash.com/docs/qstash/api/messages/create). 
+Publishing is almost the same as before, except that creating schedules now has it's own [api](https://upstash.com/docs/qstash/features/schedules) to clean everything up.
+
+If you're using the [@upstash/qstash sdk](https://github.com/upstash/sdk-qstash-ts), you should upgrade to the latest version: `npm install @upstash/qstash@latest`.
+
+Check out the [migration guide](https://upstash.com/docs/qstash/migrating/v2) for more information on changes.
+
+On the [upstash console](https://console.upstash.com/qstash) you will find a switch in the top right corner, where you can toggle the dashboard between showing v1 or v2.
+
+![](/blog/qstash-v2/console.png)
+
+## Join us in the QStash 2.0 Journey
+We're incredibly excited about the potential that QStash 2.0 brings to the world of message queuing. Whether you're a developer working on a small project or an enterprise managing complex application ecosystems, QStash 2.0 is designed to meet your needs.
+
+Stay tuned for a deepdive into how we leverage our own redis-compatible databases to power QStash 2.0. In the meantime, we'd love to hear your feedback on the new version. Feel free to reach out to us on [Twitter](https://twitter.com/upstash) or [Discord](https://upstash.com/discord) to share your thoughts and suggestions.
