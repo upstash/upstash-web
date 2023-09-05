@@ -74,11 +74,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                             gtag('config', 'G-QW5KRSTDM0');`,
               }}
             />
-            <Script
-              id="hs-script-loader"
-              strategy="afterInteractive"
-              src="//js.hs-scripts.com/6849390.js"
-            />
           </>
         )}
       </body>
