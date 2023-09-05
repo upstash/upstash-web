@@ -7,6 +7,7 @@ import IconRedis from "@/components/icon-redis";
 import IconQStash from "@/components/icon-qstash";
 import IconKafka from "@/components/icon-kafka";
 import { useSegment } from "@/hooks/use-segment";
+import * as insightTag from "@/lib/linkedin/lintrk";
 
 export default function HomeHeroProducts({
   activeProduct,
@@ -17,13 +18,16 @@ export default function HomeHeroProducts({
 }) {
   return (
     <div
-      className="grid gap-2 mt-8 md:mt-16 md:grid-cols-3"
+      className="mt-8 grid gap-2 md:mt-16 md:grid-cols-3"
       onMouseLeave={() => setActiveProduct(undefined)}
     >
       <HomeHeroProduct
         active={activeProduct === Product.REDIS}
         activeProduct={activeProduct}
         onMouseEnter={() => setActiveProduct(Product.REDIS)}
+        onClick={() => {
+          insightTag.event(13728580);
+        }}
       >
         <HeroProductTitle>
           {/*<span className="block">
@@ -147,7 +151,7 @@ function HeroProductCta({
   activeProduct?: Product;
   active?: boolean;
 }) {
-  const segment = useSegment()
+  const segment = useSegment();
   return (
     <Button
       type="button"
@@ -157,23 +161,21 @@ function HeroProductCta({
         activeProduct === Product.REDIS && active && "!bg-red-500 !text-white",
         activeProduct === Product.KAFKA && active && "!bg-blue-500 !text-white",
         activeProduct === Product.QSTASH &&
-        active &&
-        "!bg-purple-500 !text-white",
+          active &&
+          "!bg-purple-500 !text-white",
         className
       )}
       onClick={(e) => {
         switch (activeProduct) {
           case Product.REDIS:
-            segment.track("button.create.redis")
+            segment.track("button.create.redis");
             break;
           case Product.KAFKA:
-            segment.track("button.create.kafka")
+            segment.track("button.create.kafka");
             break;
           case Product.QSTASH:
-            segment.track("button.create.qstash")
+            segment.track("button.create.qstash");
             break;
-
-
         }
       }}
       {...props}

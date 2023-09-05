@@ -12,6 +12,7 @@ import Footer from "@/components/master/footer";
 import Script from "next/script";
 import { SITE_URL } from "@/utils/const";
 import { SegmentProvider } from "@/lib/segment/provider";
+import LinkedinInsightTag from "@/lib/linkedin/LinkedInInsightTag";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -47,12 +48,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       )}
     >
       <body className="pt-20 md:pt-0">
+        <LinkedinInsightTag />
         <SegmentProvider writeKey={process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY!}>
-          
-        <Header />
-        <HeaderMobile />
-        {children}
-        <Footer />
+          <Header />
+
+          <HeaderMobile />
+          {children}
+          <Footer />
         </SegmentProvider>
 
         {process.env.NODE_ENV !== "development" && (
