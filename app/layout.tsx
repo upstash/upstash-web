@@ -4,7 +4,7 @@ import "@upstash/claps/style.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import localFont from "next/font/local";
-import { ReactNode } from "react";
+import { ReactNode, Suspense } from "react";
 import cx from "@/utils/cx";
 import Header from "@/components/master/header";
 import HeaderMobile from "@/components/master/header-mobile";
@@ -12,6 +12,7 @@ import Footer from "@/components/master/footer";
 import Script from "next/script";
 import { SITE_URL } from "@/utils/const";
 import { SegmentProvider } from "@/lib/segment/provider";
+import Analytics from "@/components/Analytics";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -47,12 +48,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       )}
     >
       <body className="pt-20 md:pt-0">
+        <Suspense>
+          <Analytics />
+        </Suspense>
         <SegmentProvider writeKey={process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY!}>
-          
-        <Header />
-        <HeaderMobile />
-        {children}
-        <Footer />
+          <Header />
+          <HeaderMobile />
+          {children}
+          <Footer />
         </SegmentProvider>
 
         {process.env.NODE_ENV !== "development" && (
