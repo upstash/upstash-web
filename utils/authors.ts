@@ -240,5 +240,10 @@ export const authors: Record<string, {
     name: "Anish Pallati",
     title:"Software Developer (Guest Author)",
     image:"anish.jpeg"
+  },
+  cameron:{
+    name: "Cameron Youngblood",
+    title:"Software Developer (Guest Author)",
+    image:"cameron.jpeg"
   }
 };
