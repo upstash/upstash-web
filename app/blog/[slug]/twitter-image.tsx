@@ -50,11 +50,11 @@ export default async function TwImage({
             </div>
 
             <div tw="flex items-center border-4 border-[#00e9a3] rounded-full">
-              <img
+              {/* <img
                 tw="w-36 h-36 rounded-full border-[6px] border-black"
                 alt={post.authorsData[0].name}
                 src={authorImage}
-              />
+              /> */}
             </div>
           </div>
 
