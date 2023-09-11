@@ -1,9 +1,9 @@
 ---
-slug: nextjs-replicate
-title: "How to create an AI app with Upstash, Next.js and Replicate"
+slug: langchain-replicate
+title: "Retaining Replicate History Using LangChain and Upstash Redis"
 authors:
   - cameron
-tags: [ai, serverless, redis, replicate]
+tags: [ai, serverless, redis, langchain]
 ---
 
 In this article, we will show you how to rate limit a Next.js app using Upstash Redis. We will be rebuilding [lofianime.com](https://www.lofianime.com/), an app that generates AI images with a Stable Diffusion model on Replicate. We will focus predominantly on how to implement Upstash rate limiting with a Redis database. You can checkout the original source code for this project on [GitHub](https://github.com/alpinecodex/lofianime).
@@ -155,19 +155,19 @@ export default function Home() {
       {!image ? (
         <div className="w-1/2 space-y-2 p-10">
           <form onSubmit={handleSubmit} className="flex flex-col">
-            <label className="text-gray-600 block mb-2">
+            <label className="mb-2 block text-gray-600">
               Enter your prompt
             </label>
             <input
               type="text"
               value={inputValue}
               onChange={handleChange}
-              className="border border-black rounded-md px-2 py-1"
+              className="rounded-md border border-black px-2 py-1"
             />
             <button
               disabled={loading}
               type="submit"
-              className="border w-max px-4 py-1 border-black rounded-md mt-4"
+              className="mt-4 w-max rounded-md border border-black px-4 py-1"
             >
               Submit
             </button>
