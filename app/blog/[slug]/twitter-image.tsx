@@ -16,9 +16,9 @@ export default async function TwImage({
   params: { slug: string };
 }) {
   try {
-    const DataInterRegular = await fetch(
-      new URL("../../../public/fonts/Inter-Bold.ttf", import.meta.url)
-    ).then((res) => res.arrayBuffer());
+    // const DataInterRegular = await fetch(
+    //   new URL("../../../public/fonts/Inter-Bold.ttf", import.meta.url)
+    // ).then((res) => res.arrayBuffer());
     const slug = params.slug;
 
     const post = allPosts.find((p) => p.slug === slug);
@@ -62,16 +62,16 @@ export default async function TwImage({
             <p tw="text-3xl my-4 leading-[1] ">blog.upstash.com</p>
           </footer>
         </div>
-      ),
-      {
-        fonts: [
-          {
-            name: "Inter",
-            data: DataInterRegular,
-            style: "normal",
-          },
-        ],
-      }
+        // {
+        //   fonts: [
+        //     {
+        //       name: "Inter",
+        //       data: DataInterRegular,
+        //       style: "normal",
+        //     },
+        //   ],
+        // }
+      )
     );
   } catch (e) {
     console.error(e);
