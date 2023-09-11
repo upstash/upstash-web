@@ -1,4 +1,4 @@
-import { HTMLAttributes, HTMLProps } from "react";
+import { HTMLProps } from "react";
 
 export function LogoIcon({
   lightBg,

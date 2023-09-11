@@ -1,22 +1,22 @@
-"use client"
+"use client";
 import {
   PriceBadge,
   PriceBox,
+  PriceButton,
   PriceDesc,
   PriceHr,
   PriceTitle,
   PriceValue,
-  PriceButton,
 } from "@/components/home/price/comp";
 import IconQStash from "@/components/icon-qstash";
 import { useSegment } from "@/hooks/use-segment";
 
 export default function PriceQStash() {
-  const segment = useSegment()
+  const segment = useSegment();
   return (
     <PriceBox>
       <header>
-        <IconQStash className="inline-flex mb-4" />
+        <IconQStash className="mb-4 inline-flex" />
         <PriceTitle>QStash</PriceTitle>
       </header>
 
@@ -47,7 +47,12 @@ export default function PriceQStash() {
 
       <PriceHr />
 
-      <PriceButton href="/docs/qstash/overall/pricing" onClick={() => { segment.track("button.pricing.redis") }}>
+      <PriceButton
+        href="/docs/qstash/overall/pricing"
+        onClick={() => {
+          segment.track("button.pricing.redis");
+        }}
+      >
         More information
       </PriceButton>
     </PriceBox>

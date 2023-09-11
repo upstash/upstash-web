@@ -2,14 +2,13 @@
 
 import { HTMLProps, ReactNode } from "react";
 import Link, { LinkProps } from "next/link";
-import Button from "@/components/button";
 import { usePathname } from "next/navigation";
 import cx from "@/utils/cx";
 import { NavItems } from "./header";
 
 export default function Nav({}: HTMLProps<HTMLDivElement> & {}) {
   return (
-    <nav className="flex items-center justify-center col-span-2">
+    <nav className="col-span-2 flex items-center justify-center">
       {NavItems.map((item) => {
         return (
           <NavLink key={item.href} href={item.href}>

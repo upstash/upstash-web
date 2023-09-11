@@ -19,7 +19,7 @@ export default function Header({
   return (
     <header className={cx("hidden md:block", className)} {...props}>
       <Container>
-        <div className="flex items-center py-5 border-b border-b-white/5 md:grid md:grid-cols-4">
+        <div className="flex items-center border-b border-b-white/5 py-5 md:grid md:grid-cols-4">
           <div className="flex">
             <Link href="/">
               <Logo />

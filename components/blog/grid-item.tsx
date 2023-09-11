@@ -8,8 +8,8 @@ export default function PostGridCard({ data }: { data: Post }) {
   const { title, slug, date, authorsData } = data;
 
   return (
-    <article className="flex flex-col justify-between h-full p-6 rounded-3xl bg-white/03 md:p-8">
-      <h3 className="pr-4 text-3xl font-semibold leading-tight font-display md:pr-12">
+    <article className="flex h-full flex-col justify-between rounded-3xl bg-white/03 p-6 md:p-8">
+      <h3 className="pr-4 font-display text-3xl font-semibold leading-tight md:pr-12">
         <Balancer>
           <Link
             href={`/blog/${slug}`}
@@ -20,10 +20,14 @@ export default function PostGridCard({ data }: { data: Post }) {
         </Balancer>
       </h3>
 
-      <div className={`grid ${authorsData.length >= 2 ? "lg:grid-cols-2" : "grid-cols-1"} gap-8`}>
-        {authorsData.map(author => (
-          <div key={author.name} className="flex items-center gap-4 mt-4 grow">
-            <div className="flex flex-col items-start grow">
+      <div
+        className={`grid ${
+          authorsData.length >= 2 ? "lg:grid-cols-2" : "grid-cols-1"
+        } gap-8`}
+      >
+        {authorsData.map((author) => (
+          <div key={author.name} className="mt-4 flex grow items-center gap-4">
+            <div className="flex grow flex-col items-start">
               <Link
                 href={`/blog/author/${author.id}`}
                 className="opacity-80 hover:text-emerald-400 hover:underline"
@@ -41,13 +45,11 @@ export default function PostGridCard({ data }: { data: Post }) {
               height={50}
               alt={author.name}
               src={author.image}
-              className="object-cover rounded-full aspect-square shrink-0"
+              className="aspect-square shrink-0 rounded-full object-cover"
             />
           </div>
         ))}
-
       </div>
-
     </article>
   );
 }

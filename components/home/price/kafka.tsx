@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import {
   PriceBadge,
   PriceBox,
@@ -12,12 +12,12 @@ import IconKafka from "@/components/icon-kafka";
 import { useSegment } from "@/hooks/use-segment";
 
 export default function PriceKafka() {
-  const segment = useSegment()
+  const segment = useSegment();
 
   return (
     <PriceBox>
       <header>
-        <IconKafka className="inline-flex mb-4" />
+        <IconKafka className="mb-4 inline-flex" />
         <PriceTitle>Kafka</PriceTitle>
       </header>
 
@@ -48,7 +48,10 @@ export default function PriceKafka() {
 
       <PriceHr />
 
-      <PriceButton href="/docs/kafka/overall/pricing" onClick={() => segment.track("button.pricing.kafka")}>
+      <PriceButton
+        href="/docs/kafka/overall/pricing"
+        onClick={() => segment.track("button.pricing.kafka")}
+      >
         More information
       </PriceButton>
     </PriceBox>

@@ -1,6 +1,5 @@
 import * as Logo from "components/home/hero/hero-customer-icons";
 import cx from "@/utils/cx";
-import { Maker } from "components/home/hero/hero-customer-icons";
 
 export default function HomeHeroPartner() {
   return (

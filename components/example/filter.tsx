@@ -189,6 +189,7 @@ function ExampleFilterMobile({
     </div>
   );
 }
+
 function FormContent({
   selectedProducts,
   setSelectedProduct,
@@ -359,6 +360,7 @@ function FormContent({
     </>
   );
 }
+
 function Child({ className, children, ...props }: HTMLProps<HTMLDivElement>) {
   return (
     <div className={cx("border-b border-b-white/5 pb-4", className)} {...props}>

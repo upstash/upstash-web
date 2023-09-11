@@ -1,20 +1,12 @@
 "use client";
 
 import cx from "@/utils/cx";
-import {
-  Children,
-  cloneElement,
-  HTMLProps,
-  ReactElement,
-  Dispatch,
-  SetStateAction,
-} from "react";
+import { Dispatch, HTMLProps, SetStateAction } from "react";
 import IconRedis from "@/components/icon-redis";
 import IconKafka from "@/components/icon-kafka";
 import IconQStash from "@/components/icon-qstash";
 import Balancer from "react-wrap-balancer";
-import Image from "next/image";
-import Button from "@/components/button";
+
 export function Example({
   className,
   children,

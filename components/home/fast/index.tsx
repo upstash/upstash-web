@@ -2,8 +2,6 @@
 
 import Container from "@/components/container";
 import Statistic from "@/components/home/fast/statistic";
-import Link from "next/link";
-import Icon, { ICON_NAMES } from "@/components/icon";
 import cx from "@/utils/cx";
 import Bg from "@/components/bg";
 import dynamic from "next/dynamic";
