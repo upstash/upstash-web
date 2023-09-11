@@ -11,7 +11,7 @@ import HeaderMobile from "@/components/master/header-mobile";
 import Footer from "@/components/master/footer";
 import Script from "next/script";
 import { SITE_URL } from "@/utils/const";
-import { SegmentProvider } from "@/lib/segment/provider";
+// import { SegmentProvider } from "@/lib/segment/provider";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -47,13 +47,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       )}
     >
       <body className="pt-20 md:pt-0">
-        <SegmentProvider writeKey={process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY!}>
-          
+        {/*<SegmentProvider writeKey={process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY!}>*/}
         <Header />
         <HeaderMobile />
         {children}
         <Footer />
-        </SegmentProvider>
+        {/*</SegmentProvider>*/}
 
         {process.env.NODE_ENV !== "development" && (
           <>
