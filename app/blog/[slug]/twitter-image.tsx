@@ -10,15 +10,16 @@ export const size = {
 
 export const contentType = "image/png";
 
+const DataInterBold = fetch(
+  new URL("../../../public/fonts/Inter-Bold.ttf", import.meta.url)
+).then((res) => res.arrayBuffer());
+
 export default async function TwImage({
   params,
 }: {
   params: { slug: string };
 }) {
   try {
-    const DataInterRegular = await fetch(
-      new URL("../../../public/fonts/Inter-Bold.ttf", import.meta.url)
-    ).then((res) => res.arrayBuffer());
     const slug = params.slug;
 
     const post = allPosts.find((p) => p.slug === slug);
@@ -67,7 +68,7 @@ export default async function TwImage({
         fonts: [
           {
             name: "Inter",
-            data: DataInterRegular,
+            data: await DataInterBold,
             style: "normal",
           },
         ],
