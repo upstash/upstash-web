@@ -1,4 +1,4 @@
-import { ImageResponse } from "@vercel/og";
+import { ImageResponse } from "next/server";
 import { allPosts } from "contentlayer/generated";
 import { authors } from "@/utils/authors";
 
