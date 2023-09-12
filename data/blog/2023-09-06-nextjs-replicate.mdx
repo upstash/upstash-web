@@ -51,12 +51,11 @@ Create a new API route called `app/api/ai/route.js`. In this route, we will use 
 
 Your route should look like this:
 
-<ExpandableCode title="components/Cart.tsx">
 ```jsx
-import { NextResponse } from "next/server";
-import Replicate from "replicate";
-import { Redis } from "@upstash/redis";
-import { Ratelimit } from "@upstash/ratelimit";
+import { NextResponse } from 'next/server';
+import Replicate from 'replicate';
+import { Redis } from '@upstash/redis';
+import { Ratelimit } from '@upstash/ratelimit';
 
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL,
@@ -65,7 +64,7 @@ const redis = new Redis({
 
 const ratelimit = new Ratelimit({
   redis: redis,
-  limiter: Ratelimit.fixedWindow(5, "1440 m"),
+  limiter: Ratelimit.fixedWindow(5, '1440 m'),
 });
 
 const replicate = new Replicate({
@@ -73,15 +72,15 @@ const replicate = new Replicate({
 });
 
 export async function POST(request) {
-  const identifier = "api-route";
+  const identifier = 'api-route';
   const result = await ratelimit.limit(identifier);
 
   if (!result.success) {
-    return NextResponse.json("No generations remaining.", {
+    return NextResponse.json('No generations remaining.', {
       status: 429,
       headers: {
-        "X-RateLimit-Limit": result?.limit,
-        "X-RateLimit-Remaining": result?.remaining,
+        'X-RateLimit-Limit': result?.limit,
+        'X-RateLimit-Remaining': result?.remaining,
       },
     });
   }
@@ -91,10 +90,10 @@ export async function POST(request) {
   try {
     const output = await replicate.run(
       // This is the ID of the replicate model you are running
-      "doriandarko/sdxl-hiroshinagai:563a66acc0b39e5308e8372bed42504731b7fec3bc21f2fcbea413398690f3ec",
+      'doriandarko/sdxl-hiroshinagai:563a66acc0b39e5308e8372bed42504731b7fec3bc21f2fcbea413398690f3ec',
       {
         input: {
-          prompt: "In the style of HISGH. " + prompt,
+          prompt: 'In the style of HISGH. ' + prompt,
           // ... other model parameters
         },
       }
@@ -102,19 +101,18 @@ export async function POST(request) {
 
     return NextResponse.json(output, {
       headers: {
-        "X-RateLimit-Limit": result?.limit,
-        "X-RateLimit-Remaining": result?.remaining,
+        'X-RateLimit-Limit': result?.limit,
+        'X-RateLimit-Remaining': result?.remaining,
       },
     });
   } catch (error) {
     console.log(error);
-    return NextResponse.json("An error occurred. Please try again later.", {
+    return NextResponse.json('An error occurred. Please try again later.', {
       status: 500,
     });
   }
 }
 ```
-</ExpandableCode>
 
 Let’s break this code down. We first create a Redis client using the Upstash SDK. We then use that client to create a RateLimit of 5 requests with a fixed window of 1440 minutes, or 24 hours. Then, we create an instance of Replicate for our image generation. Using Next.js route handlers, we define a function to handle `POST` requests. In this example, we limit all requests for the app. However, by getting an `email` or `IP address`, we can rate limit on an individual visitor level. In our `POST` function, we check if the user has remaining generations. If they have reached their limit, we return a response with a `429` HTTP status code and set the headers with the limit and the remaining amount.
 
