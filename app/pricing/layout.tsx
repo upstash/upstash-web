@@ -17,7 +17,7 @@ export default function PricingLayout({
 }) {
   return (
     <main className="relative z-0 text-center">
-      <Bg />
+      <Bg className="opacity-10" />
 
       <section className="py-16 md:pb-32 md:pt-20">
         <Container className="max-w-screen-lg">
@@ -28,9 +28,11 @@ export default function PricingLayout({
               Pay only for what you use with per-request pricing.
             </PageHeaderDesc>
           </header>
-
-          <div className="mt-6 md:mt-8">{children}</div>
         </Container>
+
+        <div className="mt-6 md:mt-8">
+          <Container>{children}</Container>
+        </div>
       </section>
     </main>
   );
