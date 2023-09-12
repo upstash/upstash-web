@@ -12,7 +12,7 @@ import {
 import { LogoIcon } from "@/components/logo";
 import Button from "@/components/button";
 import { animateScroll, Events, Link as SpyLink } from "react-scroll";
-import { segment } from "@/components/segment/analytics";
+import { segment } from "@/lib/segment/segment";
 
 export default function SectionMenu({
   children,

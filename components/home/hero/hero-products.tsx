@@ -1,3 +1,5 @@
+"use client"
+
 import cx from "@/utils/cx";
 import React, { Children, cloneElement, HTMLProps, ReactElement } from "react";
 import { Product } from "@/utils/type";
@@ -6,7 +8,7 @@ import Icon, { ICON_NAMES } from "@/components/icon";
 import IconRedis from "@/components/icon-redis";
 import IconQStash from "@/components/icon-qstash";
 import IconKafka from "@/components/icon-kafka";
-import { segment } from "@/components/segment/analytics";
+import { segment } from "@/lib/segment/segment";
 
 export default function HomeHeroProducts({
   activeProduct,

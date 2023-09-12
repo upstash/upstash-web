@@ -9,7 +9,7 @@ import {
   PriceButton,
 } from "@/components/home/price/comp";
 import IconQStash from "@/components/icon-qstash";
-import { segment } from "@/components/segment/analytics";
+import { segment } from "@/lib/segment/segment";
 
 export default function PriceQStash() {
   return (

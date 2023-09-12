@@ -1,5 +1,6 @@
 "use client"
 
+
 import { AnalyticsBrowser, Analytics } from '@segment/analytics-next'
 
 
@@ -20,9 +21,9 @@ export type EventName = |
   "button.fast-anywhere.refresh"
 
 
-  
 
-export class Segment {
+
+class Segment {
   private analytics: Analytics | null = null
 
   async load(writeKey: string): Promise<void> {
@@ -41,3 +42,10 @@ export class Segment {
     await this.analytics?.page()
   }
 }
+const SEGMENT_WRITE_KEY: string = process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY? process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY : ""
+
+const segment = new Segment()
+
+segment.load(SEGMENT_WRITE_KEY)
+
+export {segment}

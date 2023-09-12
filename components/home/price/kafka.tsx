@@ -9,7 +9,7 @@ import {
   PriceValue,
 } from "@/components/home/price/comp";
 import IconKafka from "@/components/icon-kafka";
-import { segment } from "@/components/segment/analytics";
+import { segment } from "@/lib/segment/segment";
 
 
 export default function PriceKafka() {

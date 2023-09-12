@@ -9,7 +9,7 @@ import Button from "@/components/button";
 import React from "react";
 import { Product } from "@/utils/type";
 import IconQStash from "@/components/icon-qstash";
-import { segment } from "@/components/segment/analytics";
+import { segment } from "@/lib/segment/segment";
 
 export default function ServerlessQStash() {
   return (

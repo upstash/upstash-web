@@ -10,7 +10,7 @@ import React from "react";
 import { Product } from "@/utils/type";
 import colors from "tailwindcss/colors";
 import IconRedis from "@/components/icon-redis";
-import { segment } from "@/components/segment/analytics";
+import { segment } from "@/lib/segment/segment";
 
 export default function ServerlessRedis() {
   return (

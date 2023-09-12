@@ -10,7 +10,7 @@ import {
 } from "./comp";
 import React from "react";
 import IconRedis from "@/components/icon-redis";
-import { segment } from "@/components/segment/analytics";
+import { segment } from "@/lib/segment/segment";
 
 export default function PriceRedis() {
 

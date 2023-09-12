@@ -13,6 +13,7 @@ import Script from "next/script";
 import { SITE_URL } from "@/utils/const";
 import { Analytics } from "@/components/segment/analytics";
 
+
 const inter = Inter({
   variable: "--font-sans",
   subsets: ["latin"],
@@ -80,7 +81,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           </>
         )}
       </body>
-      <Analytics />
+              <Analytics />
     </html>
   );
 }

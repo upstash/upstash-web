@@ -3,7 +3,7 @@
 import useSWR from "swr";
 import { useEffect, useState } from "react";
 import cx from "@/utils/cx";
-import {segment} from "@/components/segment/analytics"
+import { segment } from "@/lib/segment/segment";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
