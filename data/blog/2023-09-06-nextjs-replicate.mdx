@@ -136,19 +136,7 @@ export default function Home() {
     setInputValue(e.target.value);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    const response = await fetch('/api/ai', {
-      method: 'POST',
-      body: JSON.stringify({
-        prompt: inputValue,
-      }),
-    });
-    const data = await response.json();
-    setImage(data?.[0]);
-    setLoading(false);
-  };
+
   }
 
 ```
