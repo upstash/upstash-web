@@ -11,6 +11,7 @@ import HeaderMobile from "@/components/master/header-mobile";
 import Footer from "@/components/master/footer";
 import Script from "next/script";
 import { SITE_URL } from "@/utils/const";
+import { Analytics } from "@/components/segment/analytics";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -48,7 +49,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="pt-20 md:pt-0">
         
 
-          
+         
         <Header />
         <HeaderMobile />
         {children}
@@ -79,6 +80,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           </>
         )}
       </body>
+      <Analytics />
     </html>
   );
 }

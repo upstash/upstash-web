@@ -22,5 +22,7 @@ export const Analytics = () =>{
 	useEffect(()=>{
 		segment.page()
 	}, [pathname, searchParams])
+
+	return null
 }
 
