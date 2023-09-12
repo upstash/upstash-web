@@ -3,13 +3,12 @@
 import useSWR from "swr";
 import { useEffect, useState } from "react";
 import cx from "@/utils/cx";
-import { useSegment } from "@/hooks/use-segment";
+import {segment} from "@/components/segment/analytics"
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export default function FastResult() {
   const [r, setR] = useState<number>();
-  const segment = useSegment()
   return (
     <div>
       <header

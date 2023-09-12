@@ -9,10 +9,11 @@ import {
   PriceValue,
 } from "@/components/home/price/comp";
 import IconKafka from "@/components/icon-kafka";
-import { useSegment } from "@/hooks/use-segment";
+import { segment } from "@/components/segment/analytics";
+
 
 export default function PriceKafka() {
-  const segment = useSegment()
+
 
   return (
     <PriceBox>

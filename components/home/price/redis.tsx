@@ -10,10 +10,9 @@ import {
 } from "./comp";
 import React from "react";
 import IconRedis from "@/components/icon-redis";
-import { useSegment } from "@/hooks/use-segment";
+import { segment } from "@/components/segment/analytics";
 
 export default function PriceRedis() {
-  const segment = useSegment()
 
   return (
     <PriceBox>

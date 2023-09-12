@@ -20,10 +20,10 @@ export type EventName = |
   "button.fast-anywhere.refresh"
 
 
+  
 
 export class Segment {
   private analytics: Analytics | null = null
-
 
   async load(writeKey: string): Promise<void> {
     if (this.analytics) {
@@ -33,13 +33,11 @@ export class Segment {
     this.analytics = analytics
   }
 
-
-
-
-
   public async track(eventName: EventName) {
     await this.analytics?.track(eventName)
   }
 
-
+  public async page() {
+    await this.analytics?.page()
+  }
 }

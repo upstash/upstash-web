@@ -6,7 +6,7 @@ import Icon, { ICON_NAMES } from "@/components/icon";
 import IconRedis from "@/components/icon-redis";
 import IconQStash from "@/components/icon-qstash";
 import IconKafka from "@/components/icon-kafka";
-import { useSegment } from "@/hooks/use-segment";
+import { segment } from "@/components/segment/analytics";
 
 export default function HomeHeroProducts({
   activeProduct,
@@ -147,7 +147,6 @@ function HeroProductCta({
   activeProduct?: Product;
   active?: boolean;
 }) {
-  const segment = useSegment()
   return (
     <Button
       type="button"
@@ -172,8 +171,6 @@ function HeroProductCta({
           case Product.QSTASH:
             segment.track("button.create.qstash")
             break;
-
-
         }
       }}
       {...props}

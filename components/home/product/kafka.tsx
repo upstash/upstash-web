@@ -9,10 +9,11 @@ import Button from "@/components/button";
 import React from "react";
 import { Product } from "@/utils/type";
 import IconKafka from "@/components/icon-kafka";
-import { useSegment } from "@/hooks/use-segment";
+import { segment } from "@/components/segment/analytics";
+
 
 export default function ServerlessKafka() {
-  const {track} = useSegment()
+
   return (
     <ProductBox
       product={Product.KAFKA}
@@ -41,7 +42,7 @@ export default function ServerlessKafka() {
           className="hover:bg-blue-100 hover:text-blue-950"
           type="button"
           onClick={()=>{
-            track("button.examples.kafka")
+            segment.track("button.examples.kafka")
           }}
         >
           View examples
@@ -51,7 +52,7 @@ export default function ServerlessKafka() {
           className="bg-blue-100 text-blue-950 hover:bg-blue-100 hover:text-blue-950"
           type="button"
           onClick={()=>{
-            track("button.docs.kafka")
+            segment.track("button.docs.kafka")
           }}
         >
           Read the docs

@@ -9,10 +9,9 @@ import Button from "@/components/button";
 import React from "react";
 import { Product } from "@/utils/type";
 import IconQStash from "@/components/icon-qstash";
-import { useSegment } from "@/hooks/use-segment";
+import { segment } from "@/components/segment/analytics";
 
 export default function ServerlessQStash() {
-  const {track} = useSegment()
   return (
     <ProductBox
       product={Product.QSTASH}
@@ -39,7 +38,7 @@ export default function ServerlessQStash() {
           className="hover:bg-purple-100 hover:text-purple-950"
           type="button"
           onClick={()=>{
-            track("button.examples.qstash")
+            segment.track("button.examples.qstash")
           }}
         >
           View examples
@@ -49,7 +48,7 @@ export default function ServerlessQStash() {
           className="bg-purple-100 text-purple-950 hover:bg-purple-100 hover:text-purple-950"
           type="button"
           onClick={()=>{
-            track("button.docs.qstash")
+            segment.track("button.docs.qstash")
           }}
         >
           Read the docs

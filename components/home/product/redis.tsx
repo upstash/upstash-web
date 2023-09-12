@@ -10,10 +10,9 @@ import React from "react";
 import { Product } from "@/utils/type";
 import colors from "tailwindcss/colors";
 import IconRedis from "@/components/icon-redis";
-import { useSegment } from "@/hooks/use-segment";
+import { segment } from "@/components/segment/analytics";
 
 export default function ServerlessRedis() {
-  const {track} = useSegment()
   return (
     <ProductBox product={Product.REDIS} className="mdd:col-span-2 bg-red-200/5">
       <header>
@@ -39,7 +38,7 @@ export default function ServerlessRedis() {
           className="hover:bg-red-100 hover:text-red-950"
           type="button"
           onClick={()=>{
-            track("button.examples.redis")
+            segment.track("button.examples.redis")
           }}
         >
           View examples
@@ -49,7 +48,7 @@ export default function ServerlessRedis() {
           className="bg-red-100 text-red-950 hover:bg-red-100 hover:text-red-950"
           type="button"
           onClick={()=>{
-            track("button.docs.redis")
+            segment.track("button.docs.redis")
           }}
         >
           Read the docs

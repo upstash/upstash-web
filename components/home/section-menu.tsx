@@ -12,7 +12,7 @@ import {
 import { LogoIcon } from "@/components/logo";
 import Button from "@/components/button";
 import { animateScroll, Events, Link as SpyLink } from "react-scroll";
-import { useSegment } from "@/hooks/use-segment";
+import { segment } from "@/components/segment/analytics";
 
 export default function SectionMenu({
   children,
@@ -44,7 +44,6 @@ export default function SectionMenu({
       Events.scrollEvent.remove("end");
     };
   }, [show]);
-  const segment = useSegment()
   return (
     <motion.div
       className={cx(

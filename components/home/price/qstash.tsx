@@ -9,10 +9,9 @@ import {
   PriceButton,
 } from "@/components/home/price/comp";
 import IconQStash from "@/components/icon-qstash";
-import { useSegment } from "@/hooks/use-segment";
+import { segment } from "@/components/segment/analytics";
 
 export default function PriceQStash() {
-  const segment = useSegment()
   return (
     <PriceBox>
       <header>
