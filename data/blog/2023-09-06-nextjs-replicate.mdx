@@ -51,6 +51,7 @@ Create a new API route called `app/api/ai/route.js`. In this route, we will use 
 
 Your route should look like this:
 
+<ExpandableCode title="components/Cart.tsx">
 ```jsx
 import { NextResponse } from "next/server";
 import Replicate from "replicate";
@@ -113,6 +114,7 @@ export async function POST(request) {
   }
 }
 ```
+</ExpandableCode>
 
 Let’s break this code down. We first create a Redis client using the Upstash SDK. We then use that client to create a RateLimit of 5 requests with a fixed window of 1440 minutes, or 24 hours. Then, we create an instance of Replicate for our image generation. Using Next.js route handlers, we define a function to handle `POST` requests. In this example, we limit all requests for the app. However, by getting an `email` or `IP address`, we can rate limit on an individual visitor level. In our `POST` function, we check if the user has remaining generations. If they have reached their limit, we return a response with a `429` HTTP status code and set the headers with the limit and the remaining amount.
 
@@ -122,6 +124,73 @@ If the user does have remaining generations, we grab the prompt from the request
 ## Building the UI
 
 In your `app/page.js` file, add the following code:
+
+```jsx
+"use client";
+
+import { useState } from "react";
+import Image from "next/image";
+
+export default function Home() {
+  const [inputValue, setInputValue] = useState("");
+  const [image, setImage] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setInputValue(e.target.value);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    const response = await fetch("/api/ai", {
+      method: "POST",
+      body: JSON.stringify({
+        prompt: inputValue,
+      }),
+    });
+    const data = await response.json();
+    setImage(data?.[0]);
+    setLoading(false);
+  };
+
+  return (
+    <main>
+      {!image ? (
+        <div className="w-1/2 space-y-2 p-10">
+          <form onSubmit={handleSubmit} className="flex flex-col">
+            <label className="text-gray-600 block mb-2">
+              Enter your prompt
+            </label>
+            <input
+              type="text"
+              value={inputValue}
+              onChange={handleChange}
+              className="border border-black rounded-md px-2 py-1"
+            />
+            <button
+              disabled={loading}
+              type="submit"
+              className="border w-max px-4 py-1 border-black rounded-md mt-4"
+            >
+              Submit
+            </button>
+          </form>
+        </div>
+      ) : (
+        <div>
+          <Image
+            src={image}
+            width={600}
+            height={600}
+            alt="Generated AI Image"
+          />
+        </div>
+      )}
+    </main>
+  );
+}
+```
 
 Additionally, update your `next.config.js` file in the root of the directory to look like this:
 
