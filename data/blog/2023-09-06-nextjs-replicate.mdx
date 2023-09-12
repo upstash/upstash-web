@@ -124,7 +124,32 @@ If the user does have remaining generations, we grab the prompt from the request
 In your `app/page.js` file, add the following code:
 
 ```jsx
+import { useState } from 'react';
+import Image from 'next/image';
 
+export default function Home() {
+  const [inputValue, setInputValue] = useState('');
+  const [image, setImage] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setInputValue(e.target.value);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    const response = await fetch('/api/ai', {
+      method: 'POST',
+      body: JSON.stringify({
+        prompt: inputValue,
+      }),
+    });
+    const data = await response.json();
+    setImage(data?.[0]);
+    setLoading(false);
+  };
+  }
 
 ```
 
