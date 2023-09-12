@@ -10,12 +10,6 @@ export const metadata: Metadata = {
   description: "We manage everything for you.",
 };
 
-enum Products {
-  redis = "redis",
-  kafka = "kafka",
-  qstash = "qstash",
-}
-
 export default function PricingLayout({
   children,
 }: {
@@ -35,9 +29,7 @@ export default function PricingLayout({
             </PageHeaderDesc>
           </header>
 
-          <div className="mt-10 grid gap-6 md:mt-20 md:grid-cols-3">
-            {children}
-          </div>
+          <div className="mt-6 md:mt-8">{children}</div>
         </Container>
       </section>
     </main>

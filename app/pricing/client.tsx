@@ -1,101 +1,80 @@
+"use client";
+
 import cx from "@/utils/cx";
 import * as React from "react";
-import Icon, { ICON_NAMES } from "@/components/icon";
 import IconRedis from "@/components/icon-redis";
 import IconKafka from "@/components/icon-kafka";
 import IconQStash from "@/components/icon-qstash";
-import Link, { LinkProps } from "next/link";
+import Link from "next/link";
+import { motion } from "framer-motion";
 
-export default function PricingToggle({
-  selectedProducts,
-}: {
-  selectedProducts: string;
-}) {
+export function PricingToggle({ product }: { product: string }) {
   return (
-    <div className="flex w-[100%] flex-row items-center justify-between gap-1 space-y-0.5 sm:block">
-      {["redis", "kafka", "qstash"].map((key) => {
-        const isRedis = key === "redis";
-        const isKafka = key === "kafka";
-        const isQStash = key === "qstash";
-        const isActive = selectedProducts === key;
+    <div className="flex justify-center">
+      <div className=" flex gap-2 rounded-xl bg-white/5 p-2">
+        {["/", "/kafka", "/qstash"].map((key) => {
+          const isActive = product === key;
 
-        return (
-          <PricingToggleItem
-            key={key}
-            href={isRedis ? `/pricing` : `/pricing/${key}`}
-            className={cx(
-              isRedis && isActive && "bg-red-200/10",
-              isKafka && isActive && "bg-blue-200/10",
-              isQStash && isActive && "bg-purple-200/10",
-              " w-[100%] justify-center pl-0 sm:pl-4"
-            )}
-            icon={
+          const isRedis = key === "/";
+          const isKafka = key === "/kafka";
+          const isQStash = key === "/qstash";
+
+          return (
+            <Link
+              key={key}
+              href={`/pricing${key}`}
+              className={cx(
+                "relative flex cursor-pointer select-none items-center gap-2",
+                "rounded-lg px-2 py-1.5 text-zinc-400",
+                "transition-colors hover:bg-white/10",
+                isActive && "!text-zinc-950"
+              )}
+            >
+              {isActive && (
+                <motion.span
+                  layoutId="bg"
+                  className="absolute left-0 top-0 -z-10 h-full w-full rounded-lg bg-white"
+                  transition={{
+                    duration: 0.2,
+                  }}
+                />
+              )}
               <>
-                {isRedis && (
-                  <IconRedis
-                    width={20}
-                    className={cx("grayscale", isActive && "grayscale-0")}
-                  />
-                )}
-                {isKafka && (
-                  <IconKafka
-                    width={20}
-                    className={cx("grayscale", isActive && "grayscale-0")}
-                  />
-                )}
-                {isQStash && (
-                  <IconQStash
-                    width={20}
-                    className={cx("grayscale", isActive && "grayscale-0")}
-                  />
-                )}
+                {isRedis && <IconRedis width={20} />}
+                {isKafka && <IconKafka width={20} />}
+                {isQStash && <IconQStash width={20} />}
               </>
-            }
-          >
-            {isRedis && "Redis"}
-            {isKafka && "Kafka"}
-            {isQStash && "QStash"}
-          </PricingToggleItem>
-        );
-      })}
+              <span className="grow">
+                {isRedis && "Redis"}
+                {isKafka && "Kafka"}
+                {isQStash && "QStash"}
+              </span>
+            </Link>
+          );
+        })}
+      </div>
     </div>
   );
 }
 
-export function PricingToggleItem({
-  icon,
-  href,
-  className,
-  children,
-}: LinkProps & {
-  icon?: React.ReactNode;
-  className?: string;
-  children: React.ReactNode;
-}) {
+export function PricingBadge({ children }: { children: React.ReactNode }) {
   return (
-    <Link
-      href={href}
+    <h5
       className={cx(
-        " flex cursor-pointer select-none items-center gap-2",
-        "rounded-lg bg-white/03  px-4 py-3 text-zinc-400",
-        "  hover:bg-white/5",
-        className
+        "inline-flex rounded border px-2 py-1 uppercase  leading-none"
       )}
     >
-      {icon ? (
-        icon
-      ) : (
-        <span className={cx("relative h-5 w-5 rounded border border-white/10")}>
-          <Icon
-            icon={ICON_NAMES.Check}
-            className={cx(
-              "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2",
-              "text-lg opacity-0 transition duration-100"
-            )}
-          />
-        </span>
-      )}
-      <span className="grow">{children}</span>
-    </Link>
+      {children}
+    </h5>
   );
+}
+
+export function PricingTableBody({ children }: { children: React.ReactNode }) {
+  return (
+    <div className={cx("rounded-3xl bg-white/5 px-4 py-6")}>{children}</div>
+  );
+}
+
+export function PricingTableRow({ children }: { children: React.ReactNode }) {
+  return <div className={cx("")}>{children}</div>;
 }
