@@ -124,8 +124,6 @@ If the user does have remaining generations, we grab the prompt from the request
 In your `app/page.js` file, add the following code:
 
 ```jsx
-'use client';
-
 import { useState } from 'react';
 import Image from 'next/image';
 
@@ -152,7 +150,6 @@ export default function Home() {
     setLoading(false);
   };
 
-  
 ```
 
 Additionally, update your `next.config.js` file in the root of the directory to look like this:
