@@ -1,5 +1,5 @@
 import { ImageResponse } from "@vercel/og";
-import { allPosts } from "contentlayer/generated";
+import { MDX, allPosts } from "contentlayer/generated";
 import { authors } from "@/utils/authors";
 
 export const runtime = "edge";
@@ -9,6 +9,15 @@ export const size = {
 };
 
 export const contentType = "image/png";
+
+type Post = {
+  body: MDX | undefined;
+  [key: string]: any;
+};
+
+(allPosts as Post[]).forEach((post) => {
+  post.body = undefined;
+});
 
 export default async function TwImage({
   params,
