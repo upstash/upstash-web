@@ -17,39 +17,7 @@ To avoid high API costs incurred from using hosted AI models, it’s imperative 
 
 We will create a Next.js application and deploy it to Vercel. Alternatively, you can clone the [lofianime repository](https://github.com/alpinecodex/lofianime) from GitHub, or use one-click deployment from the repo's README file.
 
-## Project Setup
 
-Create a new Next.js project. Make sure to enable the `App Router`, and `tailwindCSS`. We will use Javascript instead of Typescript for sake of simplicity.
-
-```bash
-npx create-next-app@latest
-```
-
-Install @upstash/ratelimit:
-
-```bash
-npm install @upstash/ratelimit @upstash/redis
-```
-
-Install the Replicate Node SDK:
-
-```bash
-npm install replicate
-```
-
-## Database Setup
-
-Create a Redis database using the [Upstash Console](https://console.upstash.com/) or the [Upstash CLI](https://github.com/upstash/cli). Copy the `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` variables and place them in the `.env.local` file in the root directory of your Next project.
-
-## Replicate AI Setup
-
-Create a [Replicate](https://replicate.com/) account. Click on your profile icon and select “API Tokens”. Create a new API token and save it in your `.env.local` file as `REPLICATE_API_TOKEN`.
-
-## Making the API Route
-
-Create a new API route called `app/api/ai/route.js`. In this route, we will use Upstash Redis to create a rate limit as well as use the Replicate SDK to generate an image.
-
-Your route should look like this:
 
 ```jsx
 import { NextResponse } from 'next/server';
@@ -124,7 +92,9 @@ If the user does have remaining generations, we grab the prompt from the request
 In your `app/page.js` file, add the following code:
 
 
-```text
+```jsx
+"use client";
+
 import { useState } from "react";
 import Image from "next/image";
 
@@ -188,29 +158,3 @@ export default function Home() {
   );
 }
 ```
-
-Additionally, update your `next.config.js` file in the root of the directory to look like this:
-
-```jsx
-const nextConfig = {
-  images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "pbxt.replicate.delivery",
-        port: "",
-        pathname: "/**",
-      },
-    ],
-  },
-};
-
-module.exports = nextConfig;
-```
-
-Let’s break this code down. We created a simple React form that will submit the user prompt to our API route. When we receive a response, we set a state variable with the image URL and then render the image in the UI. Finally, we updated `next.config.js` so that we can remotely load images from Replicate.
-
-**And it works!** If we inspect the network tab of the browser developer tools, we can see the rate limit as well as the number of generations remaining in the headers of our API route response. If we reach the limit, the API will return a 429 status code and will not allow us to generate any more images.
-
-Congratulations! You just created a Next.js app that generates images with AI that is rate limited using Upstash Redis. Not too bad, right?
-
