@@ -10,21 +10,21 @@ export const size = {
 
 export const contentType = "image/png";
 
-type Post = {
-  body: MDX | undefined;
-  [key: string]: any;
-};
-
-(allPosts as Post[]).forEach((post) => {
-  post.body = undefined;
-});
-
 export default async function TwImage({
   params,
 }: {
   params: { slug: string };
 }) {
   try {
+    type Post = {
+      body: MDX | undefined;
+      [key: string]: any;
+    };
+
+    (allPosts as Post[]).forEach((post) => {
+      post.body = undefined;
+    });
+
     const DataInterRegular = await fetch(
       new URL("../../../public/fonts/Inter-Bold.ttf", import.meta.url)
     ).then((res) => res.arrayBuffer());
