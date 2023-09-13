@@ -4,10 +4,9 @@ type WindowWithDataLayer = Window & {
 
 declare const window: WindowWithDataLayer;
 
-export const GTM_ID = "GTM-57DWFWHM";
+export const GTM_ID = process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID;
 
 export const pageview = (url: string) => {
-  console.log("pageview!!!!");
   if (typeof window.dataLayer !== "undefined") {
     console.log("Working");
     window.dataLayer.push({
@@ -15,8 +14,6 @@ export const pageview = (url: string) => {
       page: url,
     });
   } else {
-    console.log("Not working");
-
     console.log({
       event: "pageview",
       page: url,
