@@ -20,8 +20,8 @@ export default async function TwImage({
       body: MDX | undefined;
       [key: string]: any;
     };
-
-    (allPosts as Post[]).forEach((post) => {
+    const typedPosts = allPosts as Post[];
+    typedPosts.forEach((post) => {
       post.body = undefined;
     });
 
@@ -30,7 +30,7 @@ export default async function TwImage({
     ).then((res) => res.arrayBuffer());
     const slug = params.slug;
 
-    const post = allPosts.find((p) => p.slug === slug);
+    const post = typedPosts.find((p) => p.slug === slug);
 
     if (!post) {
       throw new Error("Post not found");
