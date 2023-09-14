@@ -35,9 +35,9 @@ function NavLink({
       href={href}
       className={cx(
         "inline-flex gap-1.5 rounded-full px-4 py-2 text-zinc-400 transition",
-        "hover:bg-white/03 hover:text-zinc-50",
+        "hover:bg-white/3 hover:text-zinc-50",
         isActive && "bg-white/5 text-zinc-50",
-        className
+        className,
       )}
       {...props}
     >

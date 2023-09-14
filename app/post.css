@@ -55,7 +55,7 @@
 }
 
 .post code:not(pre > code) {
-  @apply rounded border border-white/03
+  @apply rounded border border-white/3
     bg-emerald-100/10 px-1 py-0.5 text-[0.86em];
 }
 

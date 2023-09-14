@@ -1,6 +1,6 @@
 const defaultTheme = require("tailwindcss/defaultTheme");
 
-/** @type {import('tailwindcss').Config} */
+/** @type {import("tailwindcss").Config} */
 module.exports = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx}",
@@ -19,7 +19,7 @@ module.exports = {
         title: "1.16",
       },
       opacity: {
-        "03": "0.03",
+        3: "0.03",
       },
       borderRadius: {
         "4xl": "2.2rem",

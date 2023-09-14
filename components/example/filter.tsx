@@ -226,7 +226,7 @@ function FormContent({
                     setSelectedProduct([...selectedProducts, value]);
                   } else {
                     setSelectedProduct(
-                      selectedProducts.filter((item) => item !== value)
+                      selectedProducts.filter((item) => item !== value),
                     );
                   }
                 }}
@@ -234,7 +234,7 @@ function FormContent({
                   isRedis && isActive && "bg-red-200/10",
                   isKafka && isActive && "bg-blue-200/10",
                   isQStash && isActive && "bg-purple-200/10",
-                  " w-[100%] justify-center pl-0 sm:pl-4"
+                  " w-[100%] justify-center pl-0 sm:pl-4",
                 )}
                 icon={
                   <>
@@ -294,7 +294,7 @@ function FormContent({
                           setSelectedStack([...selectedStacks, value]);
                         } else {
                           setSelectedStack(
-                            selectedStacks.filter((item) => item !== value)
+                            selectedStacks.filter((item) => item !== value),
                           );
                         }
                       }}
@@ -317,7 +317,7 @@ function FormContent({
             <div className="w-[100%] border-b border-b-white/5 py-4">
               <input
                 type="search"
-                className="text:white focus:border-1 border-1 w-[100%] rounded  border-white/5 bg-white/10 px-4 py-2 text-slate-100 transition ease-in-out focus:border-zinc-100/03 focus:outline-none focus:ring-2 focus:ring-zinc-500"
+                className="text:white focus:border-1 border-1 w-[100%] rounded  border-white/5 bg-white/10 px-4 py-2 text-slate-100 transition ease-in-out focus:border-zinc-100/3 focus:outline-none focus:ring-2 focus:ring-zinc-500"
                 placeholder="Search for an use case..."
                 value={useCaseQuery}
                 onChange={(e) => {
@@ -341,7 +341,7 @@ function FormContent({
                           setSelectedUseCase([...selectedUseCase, value]);
                         } else {
                           setSelectedUseCase(
-                            selectedUseCase.filter((item) => item !== value)
+                            selectedUseCase.filter((item) => item !== value),
                           );
                         }
                       }}
@@ -392,8 +392,8 @@ Toc.Summary = function TocSummary({
     <summary
       className={cx(
         "flex select-none list-none items-center gap-2",
-        "mb-px h-10 rounded px-4 text-white/40 hover:bg-white/03 ",
-        className
+        "mb-px h-10 rounded px-4 text-white/40 hover:bg-white/3 ",
+        className,
       )}
       {...props}
     >
@@ -428,10 +428,10 @@ function Item({
     <label
       className={cx(
         " flex cursor-pointer select-none items-center gap-2",
-        "rounded-lg bg-white/03  px-4 py-3 text-zinc-400",
+        "rounded-lg bg-white/3  px-4 py-3 text-zinc-400",
         "  hover:bg-white/5",
         checked && "bg-white/10 text-zinc-50",
-        className
+        className,
       )}
     >
       <input
@@ -446,7 +446,7 @@ function Item({
         <span
           className={cx(
             "relative h-5 w-5 rounded border border-white/10",
-            checked && "border-emerald-400"
+            checked && "border-emerald-400",
           )}
         >
           <Icon
@@ -454,7 +454,7 @@ function Item({
             className={cx(
               "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2",
               "text-lg opacity-0 transition duration-100",
-              checked && "text-emerald-400 opacity-100"
+              checked && "text-emerald-400 opacity-100",
             )}
           />
         </span>

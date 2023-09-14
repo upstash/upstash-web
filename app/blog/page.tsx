@@ -15,7 +15,7 @@ export default async function BlogPage() {
 
   const _tags = omit(
     countBy(flatten(posts.map((post) => post.tags))),
-    BANNED_TAGS
+    BANNED_TAGS,
   );
   const tags = Object.entries(_tags).sort((a, b) => b[1] - a[1]);
 
@@ -46,7 +46,7 @@ export default async function BlogPage() {
 
           <div className="mt-10 flex justify-center">
             <Link
-              className="flex w-1/3 justify-center gap-1 rounded-full bg-white/03 px-5 py-3 transition hover:bg-emerald-400 hover:text-emerald-950"
+              className="flex w-1/3 justify-center gap-1 rounded-full bg-white/3 px-5 py-3 transition hover:bg-emerald-400 hover:text-emerald-950"
               href={`/blog/all`}
             >
               Show all posts

@@ -100,7 +100,7 @@ function HomeHeroProduct({
         "md:first:rounded-t-lg md:last:rounded-b-lg",
         "md:first:!rounded-l-4xl md:last:!rounded-r-4xl",
         "hover:scale-[1.02] hover:bg-white/10",
-        className
+        className,
       )}
       {...props}
     >
@@ -118,7 +118,7 @@ function HeroProductTitle({
       className={cx(
         "flex items-center gap-1 text-zinc-50",
         "font-display text-2xl font-medium leading-none",
-        className
+        className,
       )}
     >
       {children}
@@ -149,13 +149,13 @@ function HeroProductCta({
       type="button"
       className={cx(
         "mt-4",
-        activeProduct ? "bg-white/03 text-zinc-50" : "bg-zinc-50 text-zinc-950",
+        activeProduct ? "bg-white/3 text-zinc-50" : "bg-zinc-50 text-zinc-950",
         activeProduct === Product.REDIS && active && "!bg-red-500 !text-white",
         activeProduct === Product.KAFKA && active && "!bg-blue-500 !text-white",
         activeProduct === Product.QSTASH &&
           active &&
           "!bg-purple-500 !text-white",
-        className
+        className,
       )}
       onClick={(e) => {
         switch (activeProduct) {

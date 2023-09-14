@@ -22,9 +22,9 @@ export function ProductBox({
     <div
       className={cx(
         "group/box-body relative z-0 grid gap-6 p-6 text-left md:gap-8 md:p-8",
-        "bg-white/03 backdrop-blur",
+        "bg-white/3 backdrop-blur",
         "rounded-3xl md:rounded-4xl",
-        className
+        className,
       )}
     >
       {childs}
@@ -40,7 +40,7 @@ export function ProductTitle({
     <h4
       className={cx(
         "flex w-2/3 items-center gap-2 font-display text-xl font-semibold md:text-2xl",
-        className
+        className,
       )}
     >
       <Balancer>{children}</Balancer>
@@ -79,7 +79,7 @@ export function ProductFeatureItem({
         product === Product.REDIS && "text-red-100",
         product === Product.KAFKA && "text-blue-100",
         product === Product.QSTASH && "text-purple-100",
-        className
+        className,
       )}
     >
       <Icon
@@ -89,7 +89,7 @@ export function ProductFeatureItem({
           product === Product.REDIS && "text-red-300",
           product === Product.KAFKA && "text-blue-300",
           product === Product.QSTASH && "text-purple-300",
-          className
+          className,
         )}
       />
       <span className="opacity-80">{children}</span>

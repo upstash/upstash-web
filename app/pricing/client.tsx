@@ -26,9 +26,9 @@ export function PricingToggle({ product }: { product: string }) {
               href={`/pricing${key}`}
               className={cx(
                 "relative flex cursor-pointer select-none items-center gap-2",
-                "rounded-lg px-2 py-1.5 text-zinc-400",
-                "transition-colors hover:bg-white/10",
-                isActive && "!text-zinc-950",
+                "rounded-lg px-2 py-1.5 text-zinc-400 transition",
+                "hover:bg-white/10",
+                isActive && "!text-zinc-950 hover:bg-transparent",
               )}
             >
               {isActive && (
@@ -58,7 +58,7 @@ export function PricingToggle({ product }: { product: string }) {
   );
 }
 
-export function PricingBadge({ children }: HTMLProps<HTMLHeadingElement> & {}) {
+/*export function PricingBadge({ children }: HTMLProps<HTMLHeadingElement> & {}) {
   return (
     <h5
       className={cx(
@@ -70,7 +70,7 @@ export function PricingBadge({ children }: HTMLProps<HTMLHeadingElement> & {}) {
       {children}
     </h5>
   );
-}
+}*/
 
 export function PricingTableBody({
   children,
@@ -98,14 +98,5 @@ export function PricingTableRow({
 export function PricingTableHR({ className }: HTMLProps<HTMLHRElement> & {}) {
   return (
     <hr className={cx("border-0 border-b border-b-white/5 w-2/3", className)} />
-  );
-}
-
-export function PricingPrice({
-  children,
-  className,
-}: HTMLProps<HTMLHeadingElement> & {}) {
-  return (
-    <h4 className={cx("text-3xl font-semibold", className)}>{children}</h4>
   );
 }

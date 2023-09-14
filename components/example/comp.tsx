@@ -33,10 +33,10 @@ export function Example({
       className={cx(
         "group/example-box p-6",
         "flex flex-col gap-4",
-        "rounded-3xl bg-white/03",
+        "rounded-3xl bg-white/3",
         "border border-white/5",
         "transition hover:bg-white/5",
-        className
+        className,
       )}
       {...props}
     >
@@ -64,7 +64,7 @@ function ExampleTitle({
     <h3
       className={cx(
         "font-display text-xl font-medium md:leading-tight",
-        className
+        className,
       )}
       {...props}
     >
@@ -185,7 +185,7 @@ export function Pill({
             setSelectedStacks([...selectedStacks, stackTitle]);
           } else {
             setSelectedStacks(
-              selectedStacks.filter((item) => item !== stackTitle)
+              selectedStacks.filter((item) => item !== stackTitle),
             );
           }
         }}

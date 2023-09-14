@@ -10,7 +10,7 @@ export default function PageHeaderDesc({
   ...props
 }: IPageHeaderDesc) {
   return (
-    <p className={cx("text-lg opacity-60 md:text-2xl", className)} {...props}>
+    <p className={cx("text-lg opacity-40 md:text-2xl", className)} {...props}>
       <Balancer>{children}</Balancer>
     </p>
   );
