@@ -4,6 +4,56 @@ export default function Ps() {
   return (
     <div className="text-left space-y-6 md:space-y-8">
       <div className="rounded-xl bg-white/5 px-8 py-6">
+        <p>
+          The only thing you are charged for are <code>messages</code> whereas
+          retries are free. Below are some message examples:
+        </p>
+
+        <ul className="mt-4 list-disc pl-6 space-y-2">
+          <li className="space-y-2">
+            <p>
+              <b>
+                Publish to single API endpoint. Here you would be charged for 1
+                message
+              </b>
+            </p>
+
+            <ol className="list-decimal pl-6 space-y-2">
+              <li>
+                You make a request to <code>/v1/publish/[your-api-url]</code>
+              </li>
+              <li>
+                We make an HTTP request to your API and it returns a 500 status
+                code
+              </li>
+              <li>
+                After some time we retry to deliver the message and it succeeds
+              </li>
+            </ol>
+          </li>
+
+          <li>
+            <b>Schedule triggered “Every hour”;</b> at the end of the month this
+            would be around <code>24 * 30 = 720</code> billed messages.
+          </li>
+
+          <li className="space-y-2">
+            <p>
+              Publishing to a topic with 2 end points (A and B) subscribed to it
+              would be charged for 2 messages
+            </p>
+
+            <ol className="list-decimal pl-6 space-y-2">
+              <li>
+                You make a request to <code>/v1/publish/[your-api-url]</code>
+              </li>
+              <li>We make an HTTP request to each of your endpoints.</li>
+            </ol>
+          </li>
+        </ul>
+      </div>
+
+      <div className="rounded-xl bg-white/5 px-8 py-6">
         <h4 className="text-xl text-emerald-400 font-semibold">Free Tier</h4>
 
         <div className="mt-4 text-white/80 space-y-4">
