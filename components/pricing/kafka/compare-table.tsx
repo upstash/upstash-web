@@ -9,7 +9,7 @@ export default function CompareTable() {
 
   const [selectedPlans, setSelectedPlans] = useState([
     PricingPlans.Free,
-    PricingPlans.PayAsYouGo,
+    // PricingPlans.PayAsYouGo,
   ]);
 
   const showFree = selectedPlans.includes(PricingPlans.Free);
@@ -182,7 +182,10 @@ export default function CompareTable() {
 
       <tbody>
         <tr>
-          <th colSpan={5} className="z-10 top-0 p-0 sticky text-left">
+          <th
+            colSpan={isMobile ? 2 : 5}
+            className="z-10 top-20 md:top-0 p-0 sticky text-left"
+          >
             <div
               className="-ml-4 h-16 flex items-center px-4
             bg-gradient-to-r from-zinc-900 to-zinc-950"
@@ -458,7 +461,10 @@ export default function CompareTable() {
         {/**/}
 
         <tr>
-          <th colSpan={5} className="z-10 top-0 p-0 sticky text-left">
+          <th
+            colSpan={isMobile ? 2 : 5}
+            className="z-10 top-20 md:top-0 p-0 sticky text-left"
+          >
             <div
               className="-ml-4 h-16 flex items-center px-4
             bg-gradient-to-r from-zinc-900 to-zinc-950"
@@ -596,7 +602,10 @@ export default function CompareTable() {
         {/**/}
 
         <tr>
-          <th colSpan={5} className="z-10 top-0 p-0 sticky text-left">
+          <th
+            colSpan={isMobile ? 2 : 5}
+            className="z-10 top-20 md:top-0 p-0 sticky text-left"
+          >
             <div
               className="-ml-4 h-16 flex items-center px-4
             bg-gradient-to-r from-zinc-900 to-zinc-950"
@@ -796,7 +805,10 @@ export default function CompareTable() {
         {/**/}
 
         <tr>
-          <th colSpan={5} className="z-10 top-0 p-0 sticky text-left">
+          <th
+            colSpan={isMobile ? 2 : 5}
+            className="z-10 top-20 md:top-0 p-0 sticky text-left"
+          >
             <div
               className="-ml-4 h-16 flex items-center px-4
             bg-gradient-to-r from-zinc-900 to-zinc-950"

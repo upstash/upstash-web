@@ -8,7 +8,7 @@ export default function CompareTable() {
 
   const [selectedPlans, setSelectedPlans] = useState([
     PricingPlans.Free,
-    PricingPlans.PayAsYouGo,
+    // PricingPlans.PayAsYouGo,
   ]);
 
   const showFree = selectedPlans.includes(PricingPlans.Free);
@@ -90,7 +90,7 @@ export default function CompareTable() {
                   Free
                 </option>
                 <option value={PricingPlans.PayAsYouGo}>Pay as you go</option>
-                <option value={PricingPlans.Enterprise}>Enterprise</option>
+                <option value={PricingPlans.Enterprise}>Pro</option>
               </select>
             </div>
           </th>
@@ -112,7 +112,7 @@ export default function CompareTable() {
                 <option value={PricingPlans.PayAsYouGo} disabled>
                   Pay as you go
                 </option>
-                <option value={PricingPlans.Enterprise}>Enterprise</option>
+                <option value={PricingPlans.Enterprise}>Pro</option>
               </select>
             </div>
           </th>
@@ -133,7 +133,7 @@ export default function CompareTable() {
                 <option value={PricingPlans.Free}>Free</option>
                 <option value={PricingPlans.PayAsYouGo}>Pay as you go</option>
                 <option value={PricingPlans.Enterprise} disabled>
-                  Enterprise
+                  Pro
                 </option>
               </select>
             </div>
