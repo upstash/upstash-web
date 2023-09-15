@@ -50,7 +50,7 @@ export default function PriceRedis() {
       <PriceHr />
 
       <PriceButton
-        href="/docs/redis/overall/pricing"
+        href="/pricing"
         onClick={() => segment.track("button.pricing.redis")}
       >
         More information

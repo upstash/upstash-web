@@ -52,7 +52,7 @@ const NavItems: {
 }[] = [
   {
     name: "Pricing",
-    href: `/#${HOME_SECTIONS.PRICING}`,
+    href: `/pricing`,
   },
   // {
   //   name: "Open Source",

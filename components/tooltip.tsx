@@ -25,7 +25,7 @@ const Tooltip = ({
             data-[state=delayed-open]:data-[side=left]:animate-slideRightAndFade
             data-[state=delayed-open]:data-[side=bottom]:animate-slideUpAndFade
             text-zinc-950 select-none rounded-[4px] bg-white px-[15px] py-[10px]
-            leading-none will-change-[transform,opacity]"
+            leading-none will-change-[transform,opacity] max-w-2xl"
             sideOffset={5}
           >
             {content}

@@ -49,7 +49,7 @@ export default function PriceKafka() {
       <PriceHr />
 
       <PriceButton
-        href="/docs/kafka/overall/pricing"
+        href="/pricing"
         onClick={() => segment.track("button.pricing.kafka")}
       >
         More information

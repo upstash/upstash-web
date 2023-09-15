@@ -864,7 +864,10 @@ export default function CompareTable() {
 
         <tr>
           <th className="py-4 px-0 text-left font-normal text-white/60">
-            Compliance (SOC2, ISO27001, ...)
+            
+            <Tooltip content="Upstash Global regions are SOC-2 certified.">
+              Compliance (SOC2)
+            </Tooltip>
           </th>
           {/**/}
           <td
