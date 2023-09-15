@@ -44,6 +44,33 @@ export default function Ps() {
             cancel within the month, you will be billed for the minimum term of
             1 full month
           </p>
+
+          <table className="mini-table">
+            <thead>
+              <tr>
+                <th>Plan</th>
+                <th>Max Messages per Day</th>
+                <th>Price (per month)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Pro 1M</td>
+                <td>1M</td>
+                <td>$180</td>
+              </tr>
+              <tr>
+                <td>Pro 10M</td>
+                <td>10M</td>
+                <td>$420</td>
+              </tr>
+              <tr>
+                <td>Enterprise</td>
+                <td>100M</td>
+                <td>$1800</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

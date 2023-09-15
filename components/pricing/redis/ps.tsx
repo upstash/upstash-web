@@ -78,17 +78,60 @@ export default function Ps() {
             </li>
             <li>
               <p>
-                {" "}
                 <b>Monthly Bandwidth (Data Transfer Cost):</b> The data transfer
                 is free up to monthly bandwidth limit of 200GB. Beyond that, we
                 charge $0.03 for each additional GB data transfer.
               </p>
             </li>
-            <li>
+            <li className="space-y-4">
               <p>
                 <b>Custom Add-ons:</b> You can add some quotas for your database
                 with an extra fee based on the below pricing list:
               </p>
+              <table className="mini-table">
+                <thead>
+                  <tr>
+                    <th>Max Request Size Limit</th>
+                    <th>Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>10MB</td>
+                    <td>$50</td>
+                  </tr>
+                  <tr>
+                    <td>50MB</td>
+                    <td>$80</td>
+                  </tr>
+                  <tr>
+                    <td>100MB</td>
+                    <td>$120</td>
+                  </tr>
+                </tbody>
+              </table>
+              <table className="mini-table">
+                <thead>
+                  <tr>
+                    <th>Max Record Size Limit</th>
+                    <th>Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>256MB</td>
+                    <td>$60</td>
+                  </tr>
+                  <tr>
+                    <td>500MB</td>
+                    <td>$100</td>
+                  </tr>
+                  <tr>
+                    <td>1GB</td>
+                    <td>$180</td>
+                  </tr>
+                </tbody>
+              </table>
             </li>
           </ul>
         </div>
