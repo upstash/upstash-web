@@ -122,7 +122,7 @@ export default function CompareTable() {
           >
             <div className="bg-white/3 h-16 flex items-center justify-center">
               <h4 className="hidden md:block text-emerald-400 text-lg font-semibold">
-                Pro 2K
+                Pro
               </h4>
 
               <select

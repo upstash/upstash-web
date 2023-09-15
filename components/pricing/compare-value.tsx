@@ -2,7 +2,7 @@
 
 import cx from "@/utils/cx";
 import * as React from "react";
-import { HTMLProps, isValidElement } from "react";
+import { Children, HTMLProps } from "react";
 
 export default function CompareValue({
   type = "plain",
@@ -54,12 +54,9 @@ export default function CompareValue({
 
       {type === "list" && children && (
         <span className="text-left flex items-center justify-center flex-wrap gap-1">
-          {ReactChildrenText(children).map((item, index) => (
-            <span
-              className="text-sm px-2 py-1.5 font-medium bg-emerald-300/10 rounded leading-none"
-              key={index}
-            >
-              {item}
+          {Children.map(children, (child) => (
+            <span className="text-sm px-2 py-1.5 font-medium bg-emerald-300/10 rounded leading-none">
+              {child}
             </span>
           ))}
         </span>
@@ -69,12 +66,3 @@ export default function CompareValue({
     </span>
   );
 }
-
-const hasChildren = (element) =>
-  // @ts-ignore
-  isValidElement(element) && Boolean(element.props.children);
-
-const ReactChildrenText = (children) => {
-  if (hasChildren(children)) return ReactChildrenText(children.props.children);
-  return children;
-};

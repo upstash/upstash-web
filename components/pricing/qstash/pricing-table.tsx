@@ -97,11 +97,9 @@ export default function PricingTable() {
 
       <div className="rounded-3xl bg-white/5 px-6 py-8 flex flex-col gap-6 items-center">
         <div>
-          <h4 className="mb-2 text-emerald-400 text-xl font-semibold">
-            Pro 2K
-          </h4>
+          <h4 className="mb-2 text-emerald-400 text-xl font-semibold">Pro</h4>
 
-          <h5 className="text-3xl font-semibold">$80</h5>
+          <h5 className="text-3xl font-semibold">$180</h5>
           <p className="text-white/40">Starting from</p>
         </div>
 

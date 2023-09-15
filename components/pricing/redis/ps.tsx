@@ -180,7 +180,7 @@ export default function Ps() {
                 <b>Monthly Bandwidth (Data Transfer Cost):</b> Data transfer is
                 charged at a rate of $0.03 per GB for all the usage throughout
                 the month. For use cases with high volume, you may consider VPC
-                Peering which minimizes the data transfer cost. Contact us
+                Peering which minimizes the data transfer cost. Contact us at{" "}
                 <a href="mailto:support@upstash.com">
                   <b>support@upstash.com</b>
                 </a>{" "}

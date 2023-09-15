@@ -3,6 +3,7 @@ import Button from "@/components/button";
 import { PricingPlans } from "@/utils/type";
 import CompareValue from "../compare-value";
 import useIsMobile from "@/hooks/use-is-mobile";
+import Tooltip from "@/components/tooltip";
 
 export default function CompareTable() {
   const isMobile = useIsMobile();
@@ -214,7 +215,9 @@ export default function CompareTable() {
 
         <tr>
           <th className="py-4 px-0 text-left font-normal text-white/60">
-            Max command per second
+            <Tooltip content="This is the number of commands that your database can process per second.">
+              Max command per second
+            </Tooltip>
           </th>
           {/**/}
           <td
@@ -276,7 +279,9 @@ export default function CompareTable() {
 
         <tr>
           <th className="py-4 px-0 text-left font-normal text-white/60">
-            Max request size
+            <Tooltip content="The max size of a single request/command.">
+              Max request size
+            </Tooltip>
           </th>
           {/**/}
           <td
@@ -315,7 +320,9 @@ export default function CompareTable() {
 
         <tr>
           <th className="py-4 px-0 text-left font-normal text-white/60">
-            Max record size
+            <Tooltip content="This is the maximum size per your entry. The entry can be String, List, Set, Hash etc.">
+              Max record size
+            </Tooltip>
           </th>
           {/**/}
           <td
@@ -354,7 +361,9 @@ export default function CompareTable() {
 
         <tr>
           <th className="py-4 px-0 text-left font-normal text-white/60">
-            Max memory storage
+            <Tooltip content="Upstash stores entries in both memory and SSD. Once the memory size reaches its limit, entries are evicted from memory. However, when an evicted entry is accessed, it is reloaded from SSD back into memory.">
+              Max memory storage
+            </Tooltip>
           </th>
           {/**/}
           <td
@@ -393,7 +402,9 @@ export default function CompareTable() {
 
         <tr>
           <th className="py-4 px-0 text-left font-normal text-white/60">
-            Max data size
+            <Tooltip content="When limit is reached, if eviction is enabled, some entries will be evicted to allow new writes. Otherwise, write commands will be rejected.">
+              Max data size
+            </Tooltip>
           </th>
           {/**/}
           <td
@@ -432,7 +443,9 @@ export default function CompareTable() {
 
         <tr>
           <th className="py-4 px-0 text-left font-normal text-white/60">
-            Max concurrent connections
+            <Tooltip content="When the limit is reached, your idle connections may be terminated. You will not experience any issue unless all of your connections are active. Even in that case; most Redis clients reconnect automatically. You can use REST API if you expect very high number of concurrent connections.">
+              Max concurrent connections
+            </Tooltip>
           </th>
           {/**/}
           <td
@@ -463,7 +476,9 @@ export default function CompareTable() {
 
         <tr>
           <th className="py-4 px-0 text-left font-normal text-white/60">
-            Max monthly bandwidth
+            <Tooltip content="The max outbound data transfer (bandwidth) limit per month.">
+              Max monthly bandwidth
+            </Tooltip>
           </th>
           {/**/}
           <td
@@ -527,7 +542,7 @@ export default function CompareTable() {
                   </svg>
                 </span>
 
-                <span>Backend Feature</span>
+                <span>Backend Features</span>
               </span>
             </div>
           </th>
@@ -744,7 +759,6 @@ export default function CompareTable() {
           >
             <CompareValue type="list">
               <span>Password</span>
-              <span>TLS</span>
             </CompareValue>
           </td>
           <td
@@ -753,7 +767,6 @@ export default function CompareTable() {
           >
             <CompareValue type="list">
               <span>Password</span>
-              <span>TLS</span>
             </CompareValue>
           </td>
           <td
@@ -762,7 +775,6 @@ export default function CompareTable() {
           >
             <CompareValue type="list">
               <span>Password</span>
-              <span>TLS</span>
               <span>VPC Peering</span>
               <span>IP Whitelisting</span>
             </CompareValue>
@@ -773,7 +785,6 @@ export default function CompareTable() {
           >
             <CompareValue type="list">
               <span>Password</span>
-              <span>TLS</span>
               <span>VPC Peering</span>
               <span>IP Whitelisting</span>
             </CompareValue>

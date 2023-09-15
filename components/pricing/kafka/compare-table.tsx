@@ -370,7 +370,7 @@ export default function CompareTable() {
             className="px-4 py-0 bg-white/3"
           >
             <CompareValue type="size" suffix="TB">
-              50
+              2
             </CompareValue>
           </td>
           <td
@@ -378,7 +378,7 @@ export default function CompareTable() {
             className="px-4 py-0 bg-white/3"
           >
             <CompareValue type="size" suffix="TB">
-              100
+              10
             </CompareValue>
           </td>
         </tr>
@@ -482,7 +482,7 @@ export default function CompareTable() {
                   </svg>
                 </span>
 
-                <span>Backend Feature</span>
+                <span>Backend Features</span>
               </span>
             </div>
           </th>
@@ -668,7 +668,6 @@ export default function CompareTable() {
           >
             <CompareValue type="list">
               <span>Password</span>
-              <span>TLS</span>
             </CompareValue>
           </td>
           <td
@@ -677,7 +676,6 @@ export default function CompareTable() {
           >
             <CompareValue type="list">
               <span>Password</span>
-              <span>TLS</span>
             </CompareValue>
           </td>
           <td
@@ -686,7 +684,6 @@ export default function CompareTable() {
           >
             <CompareValue type="list">
               <span>Password</span>
-              <span>TLS</span>
               <span>VPC Peering</span>
               <span>IP Whitelisting</span>
             </CompareValue>
@@ -697,7 +694,6 @@ export default function CompareTable() {
           >
             <CompareValue type="list">
               <span>Password</span>
-              <span>TLS</span>
               <span>VPC Peering</span>
               <span>IP Whitelisting</span>
             </CompareValue>
