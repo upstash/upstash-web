@@ -3,6 +3,7 @@ import Button from "@/components/button";
 import CompareValue from "../compare-value";
 import { PricingPlans } from "@/utils/type";
 import useIsMobile from "@/hooks/use-is-mobile";
+import Tooltip from "@/components/tooltip";
 
 export default function CompareTable() {
   const isMobile = useIsMobile();
@@ -773,7 +774,9 @@ export default function CompareTable() {
 
         <tr>
           <th className="py-4 px-0 text-left font-normal text-white/60">
-            Compliance (SOC2, ISO27001, ...)
+            <Tooltip content="Upstash Global regions are SOC-2 certified.">
+              Compliance (SOC2)
+            </Tooltip>
           </th>
           {/**/}
           <td
