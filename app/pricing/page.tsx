@@ -1,9 +1,10 @@
 import PageHeaderTitle from "@/components/page-header-title";
 import PageHeaderDesc from "@/components/page-header-desc";
-import PricingTable from "@/app/pricing/redis/pricing-table";
-import PricingTableEnterprise from "@/app/pricing/redis/pricing-table-enterprise";
-import CompareTable from "@/app/pricing/redis/compare-table";
 import { ProductToggle } from "@/components/pricing/product-toggle";
+import PricingTable from "./redis/pricing-table";
+import PricingTableEnterprise from "./redis/pricing-table-enterprise";
+import CompareTable from "./redis/compare-table";
+import Ps from "./redis/ps";
 
 export default function Pricing() {
   return (
@@ -12,7 +13,9 @@ export default function Pricing() {
 
       <div className="mt-16 md:mt-20">
         <PricingTable />
-        <PricingTableEnterprise />
+        <div className="mt-10">
+          <PricingTableEnterprise />
+        </div>
 
         <div className="mt-32 md:mt-40">
           <header>
@@ -28,6 +31,10 @@ export default function Pricing() {
           <div className="mt-12 md:mt-16">
             <CompareTable />
           </div>
+        </div>
+
+        <div className="mt-32 md:mt-40">
+          <Ps />
         </div>
       </div>
     </div>
