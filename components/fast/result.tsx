@@ -17,7 +17,6 @@ export default function FastResult() {
         <span className="flex items-center gap-1">
           <button
             onClick={() => {
-              console.log("XX");
               segment.track("button.fast-anywhere.refresh");
               setR(Date.now());
             }}

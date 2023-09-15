@@ -328,7 +328,6 @@ function FormContent({
             <div className="grid h-[14rem] grid-flow-row auto-rows-[3.125rem] space-y-0.5 overflow-scroll">
               {queriedUseCases.length !== 0 ? (
                 queriedUseCases.map((key) => {
-                  console.log("ITEM");
                   return (
                     <Item
                       key={key}
