@@ -1,7 +1,7 @@
 "use client";
 
 import PricingTable from "@/components/pricing/kafka/pricing-table";
-import PricingTableEnterprise from "@/components/pricing/kafka/pricing-table-enterprise";
+import Enterprise from "@/components/pricing/enterprise";
 import CompareTable from "@/components/pricing/kafka/compare-table";
 import Ps from "@/components/pricing/kafka/ps";
 import ProductToggle from "@/components/pricing/product-toggle";
@@ -15,8 +15,8 @@ export default function PricingKafkaPage() {
 
       <div className="mt-16 md:mt-20">
         <PricingTable />
-        <div className="mt-10">
-          <PricingTableEnterprise />
+        <div className="mt-10 md:mt-20">
+          <Enterprise />
         </div>
 
         <div className="mt-32 md:mt-40">

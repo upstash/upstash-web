@@ -1,7 +1,7 @@
 "use client";
 
 import PricingTable from "@/components/pricing/qstash/pricing-table";
-import PricingTableEnterprise from "@/components/pricing/qstash/pricing-table-enterprise";
+import Enterprise from "@/components/pricing/enterprise";
 import CompareTable from "@/components/pricing/qstash/compare-table";
 import Ps from "@/components/pricing/qstash/ps";
 import ProductToggle from "@/components/pricing/product-toggle";
@@ -15,8 +15,8 @@ export default function PricingQStashPage() {
 
       <div className="mt-16 md:mt-20">
         <PricingTable />
-        <div className="mt-10">
-          <PricingTableEnterprise />
+        <div className="mt-10 md:mt-20">
+          <Enterprise />
         </div>
 
         <div className="mt-32 md:mt-40">

@@ -57,7 +57,7 @@ export default function CompareTable() {
           </th>
           <th
             hidden={isMobile ? !showPayg : false}
-            className="bg-emerald-300/10 py-3 px-0 text-white/80
+            className="bg-white/10 py-3 px-0 text-white/80
              uppercase text-xs font-medium tracking-wider
           border-b-2 border-b-zinc-950"
           >
@@ -110,7 +110,7 @@ export default function CompareTable() {
             hidden={isMobile ? !showPayg : false}
             className="bg-zinc-950 p-0 border-b border-b-zinc-800"
           >
-            <div className="bg-emerald-300/10 h-16 flex items-center justify-center">
+            <div className="bg-white/10 h-16 flex items-center justify-center">
               <h4 className="hidden md:block text-emerald-400 text-lg font-semibold">
                 Pay as you go
               </h4>
@@ -225,7 +225,7 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPayg : false}
-            className="px-4 py-0 bg-emerald-300/10"
+            className="px-4 py-0 bg-white/10"
           >
             <CompareValue type="number">1000</CompareValue>
           </td>
@@ -256,7 +256,7 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPayg : false}
-            className="px-4 py-0 bg-emerald-300/10"
+            className="px-4 py-0 bg-white/10"
           >
             <CompareValue>Unlimited</CompareValue>
           </td>
@@ -289,7 +289,7 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPayg : false}
-            className="px-4 py-0 bg-emerald-300/10"
+            className="px-4 py-0 bg-white/10"
           >
             <CompareValue type="size" suffix="MB">
               1
@@ -328,7 +328,7 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPayg : false}
-            className="px-4 py-0 bg-emerald-300/10"
+            className="px-4 py-0 bg-white/10"
           >
             <CompareValue type="size" suffix="MB">
               100
@@ -367,7 +367,7 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPayg : false}
-            className="px-4 py-0 bg-emerald-300/10"
+            className="px-4 py-0 bg-white/10"
           >
             <CompareValue type="size" suffix="GB">
               1
@@ -406,7 +406,7 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPayg : false}
-            className="px-4 py-0 bg-emerald-300/10"
+            className="px-4 py-0 bg-white/10"
           >
             <CompareValue type="size" suffix="GB">
               10
@@ -443,7 +443,7 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPayg : false}
-            className="px-4 py-0 bg-emerald-300/10"
+            className="px-4 py-0 bg-white/10"
           >
             <CompareValue type="number">1000</CompareValue>
           </td>
@@ -476,7 +476,7 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPayg : false}
-            className="px-4 py-0 bg-emerald-300/10"
+            className="px-4 py-0 bg-white/10"
           >
             <CompareValue type="size" suffix="GB" className="border-b-0">
               200
@@ -549,7 +549,7 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPayg : false}
-            className="px-4 py-0 bg-emerald-300/10"
+            className="px-4 py-0 bg-white/10"
           >
             <CompareValue type="list">
               <span>AWS</span>
@@ -589,7 +589,7 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPayg : false}
-            className="px-4 py-0 bg-emerald-300/10"
+            className="px-4 py-0 bg-white/10"
           >
             <CompareValue type="boolean" />
           </td>
@@ -620,7 +620,7 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPayg : false}
-            className="px-4 py-0 bg-emerald-300/10"
+            className="px-4 py-0 bg-white/10"
           >
             <CompareValue type="boolean" />
           </td>
@@ -651,7 +651,7 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPayg : false}
-            className="px-4 py-0 bg-emerald-300/10"
+            className="px-4 py-0 bg-white/10"
           >
             <CompareValue type="boolean" className="border-b-0" />
           </td>
@@ -715,7 +715,7 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPayg : false}
-            className="px-4 py-0 bg-emerald-300/10"
+            className="px-4 py-0 bg-white/10"
           >
             <CompareValue type="boolean" />
           </td>
@@ -749,7 +749,7 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPayg : false}
-            className="px-4 py-0 bg-emerald-300/10"
+            className="px-4 py-0 bg-white/10"
           >
             <CompareValue type="list">
               <span>Password</span>
@@ -793,7 +793,7 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPayg : false}
-            className="px-4 py-0 bg-emerald-300/10"
+            className="px-4 py-0 bg-white/10"
           >
             <CompareValue>Last 30 days</CompareValue>
           </td>
@@ -824,7 +824,7 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPayg : false}
-            className="px-4 py-0 bg-emerald-300/10"
+            className="px-4 py-0 bg-white/10"
           >
             <CompareValue type="boolean" valid={false} />
           </td>
@@ -855,7 +855,7 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPayg : false}
-            className="px-4 py-0 bg-emerald-300/10"
+            className="px-4 py-0 bg-white/10"
           >
             <CompareValue type="boolean" className="border-b-0" />
           </td>
@@ -919,7 +919,7 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPayg : false}
-            className="px-4 py-0 bg-emerald-300/10"
+            className="px-4 py-0 bg-white/10"
           >
             <CompareValue type="boolean" />
           </td>
@@ -950,7 +950,7 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPayg : false}
-            className="px-4 py-0 bg-emerald-300/10"
+            className="px-4 py-0 bg-white/10"
           >
             <CompareValue type="boolean" />
           </td>
@@ -981,7 +981,7 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPayg : false}
-            className="px-4 py-0 bg-emerald-300/10"
+            className="px-4 py-0 bg-white/10"
           >
             <CompareValue type="boolean" valid={false} />
           </td>
@@ -1010,7 +1010,7 @@ export default function CompareTable() {
           ></td>
           <td
             hidden={isMobile ? !showPayg : false}
-            className="px-4 py-0 bg-emerald-300/10"
+            className="px-4 py-0 bg-white/10"
           >
             <CompareValue className="border-b-0">
               <div>
@@ -1059,7 +1059,7 @@ export default function CompareTable() {
             </div>
           </th>
           <th hidden={isMobile ? !showPayg : false} className="bg-zinc-950 p-0">
-            <div className="bg-emerald-300/10 py-4 text-white/60">
+            <div className="bg-white/10 py-4 text-white/60">
               <Button
                 target="_self"
                 type="button"

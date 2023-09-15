@@ -50,7 +50,7 @@ export default function PricingTable() {
 
       {/* PAYG */}
 
-      <div className="rounded-3xl px-6 py-8 flex flex-col gap-6 items-center bg-emerald-300/10 border-2 border-emerald-300/10">
+      <div className="rounded-3xl px-4 py-8 flex flex-col gap-6 items-center bg-white/10 border-2 border-white/20">
         <div className="grow">
           <h4 className="mb-2 text-emerald-400 text-xl font-semibold">
             Pay as you go
@@ -61,7 +61,7 @@ export default function PricingTable() {
         </div>
 
         <div className="grow">
-          <div className="text-emerald-100/80">
+          <div className="text-white/80">
             For use cases with bursting traffic.
           </div>
         </div>
@@ -86,7 +86,7 @@ export default function PricingTable() {
             type="button"
             hideIcon
             href="https://console.upstash.com"
-            className="bg-emerald-400 text-zinc-950 font-medium"
+            className="bg-zinc-50 text-zinc-950 font-medium"
           >
             Start Now
           </Button>

@@ -4,7 +4,7 @@ import PageHeaderTitle from "@/components/page-header-title";
 import PageHeaderDesc from "@/components/page-header-desc";
 import ProductToggle from "@/components/pricing/product-toggle";
 import PricingTable from "@/components/pricing/redis/pricing-table";
-import PricingTableEnterprise from "@/components/pricing/redis/pricing-table-enterprise";
+import Enterprise from "@/components/pricing/enterprise";
 import CompareTable from "@/components/pricing/redis/compare-table";
 import Ps from "@/components/pricing/redis/ps";
 
@@ -15,8 +15,8 @@ export default function PricingRedisPage() {
 
       <div className="mt-16 md:mt-20">
         <PricingTable />
-        <div className="mt-10">
-          <PricingTableEnterprise />
+        <div className="mt-10 md:mt-20">
+          <Enterprise />
         </div>
 
         <div className="mt-32 md:mt-40">
