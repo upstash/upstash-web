@@ -2,17 +2,16 @@
 
 import cx from "@/utils/cx";
 import * as React from "react";
-import { HTMLProps } from "react";
 import IconRedis from "@/components/icon-redis";
 import IconKafka from "@/components/icon-kafka";
 import IconQStash from "@/components/icon-qstash";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
-export function PricingToggle({ product }: { product: string }) {
+export function ProductToggle({ product }: { product: string }) {
   return (
     <div className="flex justify-center">
-      <div className=" flex gap-3 rounded-xl p-2 border border-white/5">
+      <div className="flex gap-3 rounded-xl p-2 border border-white/5">
         {["/", "/kafka", "/qstash"].map((key) => {
           const isActive = product === key;
 
@@ -55,48 +54,5 @@ export function PricingToggle({ product }: { product: string }) {
         })}
       </div>
     </div>
-  );
-}
-
-/*export function PricingBadge({ children }: HTMLProps<HTMLHeadingElement> & {}) {
-  return (
-    <h5
-      className={cx(
-        "inline-flex rounded-md border border-white/10 px-3 py-1.5",
-        "uppercase text-sm leading-none",
-        "bg-gradient-to-r from-white/0 to-white/5",
-      )}
-    >
-      {children}
-    </h5>
-  );
-}*/
-
-export function PricingTableBody({
-  children,
-  className,
-}: HTMLProps<HTMLDivElement> & {}) {
-  return (
-    <div
-      className={cx(
-        "rounded-3xl bg-white/5 px-4 py-8 flex flex-col gap-6 items-center",
-        className,
-      )}
-    >
-      {children}
-    </div>
-  );
-}
-
-export function PricingTableRow({
-  children,
-  className,
-}: HTMLProps<HTMLDivElement> & {}) {
-  return <div className={cx("", className)}>{children}</div>;
-}
-
-export function PricingTableHR({ className }: HTMLProps<HTMLHRElement> & {}) {
-  return (
-    <hr className={cx("border-0 border-b border-b-white/5 w-2/3", className)} />
   );
 }

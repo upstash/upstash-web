@@ -1,195 +1,189 @@
-import * as React from "react";
-import {
-  PricingTableBody,
-  PricingTableHR,
-  PricingTableRow,
-} from "@/app/pricing/client";
 import Button from "@/components/button";
 
 export default function PricingTable() {
   return (
-    <div className="grid grid-cols-4 gap-6">
+    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
       {/**/}
 
       {/* FREE */}
 
-      <PricingTableBody>
-        <PricingTableRow className="grow">
+      <div className="rounded-3xl bg-white/5 px-4 py-8 flex flex-col gap-6 items-center">
+        <div className="grow">
           <h4 className="mb-2 text-emerald-400 text-xl font-semibold">Free</h4>
 
           <h5 className="text-3xl font-semibold">$0</h5>
           <p className="text-white/40">-</p>
-        </PricingTableRow>
+        </div>
 
-        <PricingTableRow className="grow">
+        <div className="grow">
           <div className="text-white/80">
             Perfect for prototypes and hobby projects.
           </div>
-        </PricingTableRow>
+        </div>
 
-        <PricingTableHR />
+        <hr className="border-0 border-b border-b-white/5 w-2/3" />
 
-        <PricingTableRow>
+        <div>
           <p className="text-sm text-white/40">Max command per second</p>
           <p className="font-semibold">1,000</p>
-        </PricingTableRow>
+        </div>
 
-        <PricingTableRow>
+        <div>
           <p className="text-sm text-white/40">Daily command limit</p>
           <p className="font-semibold">10,000</p>
-        </PricingTableRow>
+        </div>
 
-        <PricingTableHR />
+        <hr className="border-0 border-b border-b-white/5 w-2/3" />
 
-        <PricingTableRow>
+        <div>
           <Button
             target="_self"
             type="button"
             hideIcon
             href="https://console.upstash.com"
-            className="bg-zinc-50 text-zinc-950"
+            className="bg-zinc-50 text-zinc-950 font-medium"
           >
             Start Now
           </Button>
-        </PricingTableRow>
-      </PricingTableBody>
+        </div>
+      </div>
 
       {/* PAYG */}
 
-      <PricingTableBody className="bg-emerald-300/10 border border-emerald-300/5">
-        <PricingTableRow className="grow">
+      <div className="rounded-3xl px-4 py-8 flex flex-col gap-6 items-center bg-emerald-300/10 border border-emerald-300/5">
+        <div className="grow">
           <h4 className="mb-2 text-emerald-400 text-xl font-semibold">
             Pay as you go
           </h4>
 
           <h5 className="text-3xl font-semibold">$0.2</h5>
           <p className="text-white/40">-</p>
-        </PricingTableRow>
+        </div>
 
-        <PricingTableRow className="grow">
+        <div className="grow">
           <div className="text-emerald-100/80">
             For use cases with bursting traffic.
           </div>
-        </PricingTableRow>
+        </div>
 
-        <PricingTableHR />
+        <hr className="border-0 border-b border-b-white/5 w-2/3" />
 
-        <PricingTableRow>
+        <div>
           <p className="text-sm text-emerald-100/40">Max command per second</p>
           <p className="font-semibold">1,000</p>
-        </PricingTableRow>
+        </div>
 
-        <PricingTableRow>
+        <div>
           <p className="text-sm text-emerald-100/40">Daily command limit</p>
           <p className="font-semibold">Unlimited</p>
-        </PricingTableRow>
+        </div>
 
-        <PricingTableHR />
+        <hr className="border-0 border-b border-b-white/5 w-2/3" />
 
-        <PricingTableRow>
+        <div>
           <Button
             target="_self"
             type="button"
             hideIcon
             href="https://console.upstash.com"
-            className="bg-emerald-400 text-zinc-950"
+            className="bg-emerald-400 text-zinc-950 font-medium"
           >
             Start Now
           </Button>
-        </PricingTableRow>
-      </PricingTableBody>
+        </div>
+      </div>
 
       {/* PRO 2K */}
 
-      <PricingTableBody>
-        <PricingTableRow>
+      <div className="rounded-3xl bg-white/5 px-4 py-8 flex flex-col gap-6 items-center">
+        <div>
           <h4 className="mb-2 text-emerald-400 text-xl font-semibold">
             Pro 2K
           </h4>
 
           <h5 className="text-3xl font-semibold">$280</h5>
           <p className="text-white/40">+$100 ✕ read region</p>
-        </PricingTableRow>
+        </div>
 
-        <PricingTableRow>
+        <div>
           <div className="text-white/80">
             For businesses with consistent high-capacity loads and predictable
             costs.
           </div>
-        </PricingTableRow>
+        </div>
 
-        <PricingTableHR />
+        <hr className="border-0 border-b border-b-white/5 w-2/3" />
 
-        <PricingTableRow>
+        <div>
           <p className="text-sm text-white/40">Max command per second</p>
           <p className="font-semibold">2,000</p>
-        </PricingTableRow>
+        </div>
 
-        <PricingTableRow>
+        <div>
           <p className="text-sm text-white/40">Daily command limit</p>
           <p className="font-semibold">Unlimited</p>
-        </PricingTableRow>
+        </div>
 
-        <PricingTableHR />
+        <hr className="border-0 border-b border-b-white/5 w-2/3" />
 
-        <PricingTableRow>
+        <div>
           <Button
             target="_self"
             type="button"
             hideIcon
             href="https://console.upstash.com"
-            className="bg-zinc-50 text-zinc-950"
+            className="bg-zinc-50 text-zinc-950 font-medium"
           >
             Start Now
           </Button>
-        </PricingTableRow>
-      </PricingTableBody>
+        </div>
+      </div>
 
       {/* PRO 10K */}
 
-      <PricingTableBody>
-        <PricingTableRow>
+      <div className="rounded-3xl bg-white/5 px-4 py-8 flex flex-col gap-6 items-center">
+        <div>
           <h4 className="mb-2 text-emerald-400 text-xl font-semibold">
             Pro 10K
           </h4>
 
           <h5 className="text-3xl font-semibold">$680</h5>
           <p className="text-white/40">+$200 ✕ read region</p>
-        </PricingTableRow>
+        </div>
 
-        <PricingTableRow>
+        <div>
           <div className="text-white/80">
             For businesses with consistent high-capacity loads and predictable
             costs.
           </div>
-        </PricingTableRow>
+        </div>
 
-        <PricingTableHR />
+        <hr className="border-0 border-b border-b-white/5 w-2/3" />
 
-        <PricingTableRow>
+        <div>
           <p className="text-sm text-white/40">Max command per second</p>
           <p className="font-semibold">10,000</p>
-        </PricingTableRow>
+        </div>
 
-        <PricingTableRow>
+        <div>
           <p className="text-sm text-white/40">Daily command limit</p>
           <p className="font-semibold">Unlimited</p>
-        </PricingTableRow>
+        </div>
 
-        <PricingTableHR />
+        <hr className="border-0 border-b border-b-white/5 w-2/3" />
 
-        <PricingTableRow>
+        <div>
           <Button
             target="_self"
             type="button"
             hideIcon
             href="https://console.upstash.com"
-            className="bg-zinc-50 text-zinc-950"
+            className="bg-zinc-50 text-zinc-950 font-medium"
           >
             Start Now
           </Button>
-        </PricingTableRow>
-      </PricingTableBody>
+        </div>
+      </div>
     </div>
   );
 }

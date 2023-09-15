@@ -1,16 +1,53 @@
+"use client";
+
 import * as React from "react";
-import { HTMLProps, isValidElement } from "react";
+import { HTMLProps, isValidElement, useState } from "react";
 import cx from "@/utils/cx";
+import Button from "@/components/button";
+import { useMediaQuery } from "@uidotdev/usehooks";
+
+enum Plan {
+  Free = "free",
+  PayAsYouGo = "payAsYouGo",
+  Pro2K = "pro2k",
+  Pro10K = "pro10k",
+}
 
 export default function CompareTable() {
+  const isMobile = useMediaQuery("only screen and (max-width: 768px)");
+  const [selectedPlans, setSelectedPlans] = useState([
+    Plan.Free,
+    Plan.PayAsYouGo,
+  ]);
+
+  const showFree = selectedPlans.includes(Plan.Free);
+  const showPayg = selectedPlans.includes(Plan.PayAsYouGo);
+  const showPro2 = selectedPlans.includes(Plan.Pro2K);
+  const showPro10 = selectedPlans.includes(Plan.Pro10K);
+
+  const onPlanChange = (
+    event: React.ChangeEvent<HTMLSelectElement>,
+    plan: Plan,
+  ) => {
+    const value = event.target.value as Plan;
+    const index = selectedPlans.indexOf(plan);
+
+    setSelectedPlans((prev) => {
+      if (index === 0) {
+        return [value, prev[1]];
+      }
+      return [prev[0], value];
+    });
+  };
+
   return (
     <table className="w-full border-separate border-spacing-y-0 border-spacing-x-1">
       <colgroup>
-        <col className="w-2/6" />
-        <col className="w-1/6" />
-        <col className="w-1/6" />
-        <col className="w-1/6" />
-        <col className="w-1/6" />
+        <col className="w-1/3 md:w-1/4" />
+        <col className="w-1/3 md:w-auto" />
+        <col className="w-1/3 md:w-auto" />
+        <col className="w-1/3 md:w-auto" />
+        <col className="w-1/3 md:w-auto" />
       </colgroup>
 
       {/**/}
@@ -19,50 +56,131 @@ export default function CompareTable() {
         <tr>
           <th className="p-0" />
           <th
-            className="bg-white/5 py-3 px-0 text-white/60 uppercase text-xs font-medium tracking-wider
+            hidden={isMobile ? !showFree : false}
+            className="bg-white/3 py-3 px-0 text-white/80
+             uppercase text-xs font-medium tracking-wider
           border-b-2 border-b-zinc-950"
           >
             Limit of 1 Free DB
           </th>
           <th
-            className="bg-white/5 py-3 px-0 text-white/60 uppercase text-xs font-medium tracking-wider
+            hidden={isMobile ? !showPayg : false}
+            className="bg-emerald-300/10 py-3 px-0 text-white/80
+             uppercase text-xs font-medium tracking-wider
           border-b-2 border-b-zinc-950"
           >
             Usage Based Pricing
           </th>
           <th
-            className="bg-white/5 py-3 px-0 text-white/60 uppercase text-xs font-medium tracking-wider
+            hidden={isMobile ? !showPro2 : false}
+            className="bg-white/3 py-3 px-0 text-white/80
+             uppercase text-xs font-medium tracking-wider
             border-b-2 border-b-zinc-950"
-            colSpan={2}
+          >
+            Fixed Pricing
+          </th>
+          <th
+            hidden={isMobile ? !showPro10 : false}
+            className="bg-white/3 py-3 px-0 text-white/80
+             uppercase text-xs font-medium tracking-wider
+            border-b-2 border-b-zinc-950"
           >
             Fixed Pricing
           </th>
         </tr>
 
-        <tr className="top-0 sticky">
-          <th className="p-0" />
-          <th className="bg-zinc-950 p-0">
-            <div className="bg-white/5 py-6 text-white/60">
-              <h4 className="text-emerald-400 text-lg font-semibold">Free</h4>
+        <tr className="top-20 md:top-0 sticky">
+          <th className="bg-zinc-950 p-0 border-b border-b-zinc-800" />
+          <th
+            hidden={isMobile ? !showFree : false}
+            className="bg-zinc-950 p-0 border-b border-b-zinc-800"
+          >
+            <div className="bg-white/5 py-6">
+              <h4 className="hidden md:block text-emerald-400 text-lg font-semibold">
+                Free
+              </h4>
+
+              <select
+                className="md:hidden font-semibold bg-transparent px-4 py-2"
+                onChange={(e) => onPlanChange(e, Plan.Free)}
+                value={Plan.Free}
+              >
+                <option value={Plan.Free} disabled>
+                  Free
+                </option>
+                <option value={Plan.PayAsYouGo}>Pay as you go</option>
+                <option value={Plan.Pro2K}>Pro 2K</option>
+                <option value={Plan.Pro10K}>Pro 10K</option>
+              </select>
             </div>
           </th>
-          <th className="bg-zinc-950 p-0">
-            <div className="bg-emerald-300/10 py-6 text-white/60">
-              <h4 className="text-emerald-400 text-lg font-semibold">
+          <th
+            hidden={isMobile ? !showPayg : false}
+            className="bg-zinc-950 p-0 border-b border-b-zinc-800"
+          >
+            <div className="bg-emerald-300/10 py-6">
+              <h4 className="hidden md:block text-emerald-400 text-lg font-semibold">
                 Pay as you go
               </h4>
+
+              <select
+                className="md:hidden font-semibold bg-transparent px-4 py-2"
+                onChange={(e) => onPlanChange(e, Plan.PayAsYouGo)}
+                value={Plan.PayAsYouGo}
+              >
+                <option value={Plan.Free}>Free</option>
+                <option value={Plan.PayAsYouGo} disabled>
+                  Pay as you go
+                </option>
+                <option value={Plan.Pro2K}>Pro 2K</option>
+                <option value={Plan.Pro10K}>Pro 10K</option>
+              </select>
             </div>
           </th>
-          <th className="bg-zinc-950 p-0">
-            <div className="bg-white/5 py-6 text-white/60">
-              <h4 className="text-emerald-400 text-lg font-semibold">Pro 2K</h4>
+          <th
+            hidden={isMobile ? !showPro2 : false}
+            className="bg-zinc-950 p-0 border-b border-b-zinc-800"
+          >
+            <div className="bg-white/5 py-6">
+              <h4 className="hidden md:block text-emerald-400 text-lg font-semibold">
+                Pro 2K
+              </h4>
+
+              <select
+                className="md:hidden font-semibold bg-transparent px-4 py-2"
+                onChange={(e) => onPlanChange(e, Plan.Pro2K)}
+                value={Plan.Pro2K}
+              >
+                <option value={Plan.Free}>Free</option>
+                <option value={Plan.PayAsYouGo}>Pay as you go</option>
+                <option value={Plan.Pro2K} disabled>
+                  Pro 2K
+                </option>
+                <option value={Plan.Pro10K}>Pro 10K</option>
+              </select>
             </div>
           </th>
-          <th className="bg-zinc-950 p-0">
-            <div className="bg-white/5 py-6 text-white/60">
-              <h4 className="text-emerald-400 text-lg font-semibold">
+          <th
+            hidden={isMobile ? !showPro10 : false}
+            className="bg-zinc-950 p-0 border-b border-b-zinc-800"
+          >
+            <div className="bg-white/5 py-6">
+              <h4 className="hidden md:block text-emerald-400 text-lg font-semibold">
                 Pro 10K
               </h4>
+
+              <select
+                className="md:hidden font-semibold bg-transparent px-4 py-2"
+                onChange={(e) => onPlanChange(e, Plan.Pro10K)}
+                value={Plan.Pro10K}
+              >
+                <option value={Plan.Free}>Free</option>
+                <option value={Plan.PayAsYouGo}>Pay as you go</option>
+                <option value={Plan.Pro2K}>Pro 2K</option>
+                <option value={Plan.Pro10K} disabled>
+                  Pro 10K
+                </option>
+              </select>
             </div>
           </th>
         </tr>
@@ -72,13 +190,13 @@ export default function CompareTable() {
 
       <tbody>
         <tr>
-          <th className="top-0 sticky bg-zinc-950 text-left py-4 px-0 border-b border-b-white/10">
-            <span className="flex items-center gap-2 font-semibold text-xl">
+          <th className="bg-zinc-950 top-0 sticky text-left py-4 px-0">
+            <span className="flex items-center gap-2 font-semibold text-lg">
               <span className="flex items-center p-2 rounded-full bg-white/10">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
+                  width="20"
+                  height="20"
                   viewBox="0 0 24 24"
                   strokeWidth="1.6"
                   stroke="currentColor"
@@ -95,10 +213,10 @@ export default function CompareTable() {
               <span>Capacity</span>
             </span>
           </th>
-          <th className="p-0 bg-white/5 border-b-2 border-b-zinc-950" />
-          <th className="p-0 bg-emerald-300/10 border-b-2 border-b-zinc-950" />
-          <th className="p-0 bg-white/5 border-b-2 border-b-zinc-950" />
-          <th className="p-0 bg-white/5 border-b-2 border-b-zinc-950" />
+          <th hidden={isMobile ? !showFree : false} className="p-0" />
+          <th hidden={isMobile ? !showPayg : false} className="p-0" />
+          <th hidden={isMobile ? !showPro2 : false} className="p-0" />
+          <th hidden={isMobile ? !showPro10 : false} className="p-0" />
         </tr>
 
         <tr>
@@ -106,16 +224,28 @@ export default function CompareTable() {
             Max command per second
           </th>
           {/**/}
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="number">1000</CompareValue>
           </td>
-          <td className="px-4 py-0 bg-emerald-300/10">
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="px-4 py-0 bg-emerald-300/10"
+          >
             <CompareValue type="number">1000</CompareValue>
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro2 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="number">2000</CompareValue>
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro10 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="number">10000</CompareValue>
           </td>
         </tr>
@@ -125,16 +255,28 @@ export default function CompareTable() {
             Daily command limit
           </th>
           {/**/}
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="number">10000</CompareValue>
           </td>
-          <td className="px-4 py-0 bg-emerald-300/10">
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="px-4 py-0 bg-emerald-300/10"
+          >
             <CompareValue>Unlimited</CompareValue>
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro2 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue>Unlimited</CompareValue>
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro10 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue>Unlimited</CompareValue>
           </td>
         </tr>
@@ -144,22 +286,34 @@ export default function CompareTable() {
             Max request size
           </th>
           {/**/}
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="size" suffix="MB">
               1
             </CompareValue>
           </td>
-          <td className="px-4 py-0 bg-emerald-300/10">
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="px-4 py-0 bg-emerald-300/10"
+          >
             <CompareValue type="size" suffix="MB">
               1
             </CompareValue>
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro2 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="size" suffix="MB">
               10
             </CompareValue>
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro10 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="size" suffix="MB">
               100
             </CompareValue>
@@ -171,22 +325,34 @@ export default function CompareTable() {
             Max record size
           </th>
           {/**/}
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="size" suffix="MB">
               100
             </CompareValue>
           </td>
-          <td className="px-4 py-0 bg-emerald-300/10">
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="px-4 py-0 bg-emerald-300/10"
+          >
             <CompareValue type="size" suffix="MB">
               100
             </CompareValue>
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro2 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="size" suffix="MB">
               200
             </CompareValue>
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro10 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="size" suffix="MB">
               500
             </CompareValue>
@@ -198,22 +364,34 @@ export default function CompareTable() {
             Max memory storage
           </th>
           {/**/}
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="size" suffix="MB">
               64
             </CompareValue>
           </td>
-          <td className="px-4 py-0 bg-emerald-300/10">
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="px-4 py-0 bg-emerald-300/10"
+          >
             <CompareValue type="size" suffix="GB">
               1
             </CompareValue>
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro2 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="size" suffix="GB">
               3
             </CompareValue>
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro10 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="size" suffix="GB">
               10
             </CompareValue>
@@ -225,22 +403,34 @@ export default function CompareTable() {
             Max data size
           </th>
           {/**/}
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="size" suffix="MB">
               256
             </CompareValue>
           </td>
-          <td className="px-4 py-0 bg-emerald-300/10">
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="px-4 py-0 bg-emerald-300/10"
+          >
             <CompareValue type="size" suffix="GB">
               10
             </CompareValue>
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro2 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="size" suffix="GB">
               50
             </CompareValue>
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro10 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="size" suffix="GB">
               100
             </CompareValue>
@@ -252,16 +442,28 @@ export default function CompareTable() {
             Max concurrent connections
           </th>
           {/**/}
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="number">100</CompareValue>
           </td>
-          <td className="px-4 py-0 bg-emerald-300/10">
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="px-4 py-0 bg-emerald-300/10"
+          >
             <CompareValue type="number">1000</CompareValue>
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro2 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="number">2000</CompareValue>
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro10 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="number">5000</CompareValue>
           </td>
         </tr>
@@ -271,22 +473,34 @@ export default function CompareTable() {
             Max monthly bandwidth
           </th>
           {/**/}
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="size" suffix="GB" className="border-b-0">
               50
             </CompareValue>
           </td>
-          <td className="px-4 py-0 bg-emerald-300/10">
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="px-4 py-0 bg-emerald-300/10"
+          >
             <CompareValue type="size" suffix="GB" className="border-b-0">
               200
             </CompareValue>
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro2 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="size" suffix="TB" className="border-b-0">
               5
             </CompareValue>
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro10 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="size" suffix="TB" className="border-b-0">
               10
             </CompareValue>
@@ -296,13 +510,13 @@ export default function CompareTable() {
         {/**/}
 
         <tr>
-          <th className="top-0 sticky bg-zinc-950 text-left py-6 border-b border-b-white/10">
-            <span className="flex items-center gap-2 font-semibold text-xl">
+          <th className="bg-zinc-950 top-0 sticky text-left py-4 px-0">
+            <span className="flex items-center gap-2 font-semibold text-lg">
               <span className="flex items-center p-2 rounded-full bg-white/10">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
+                  width="20"
+                  height="20"
                   viewBox="0 0 24 24"
                   strokeWidth="1.6"
                   stroke="currentColor"
@@ -319,10 +533,10 @@ export default function CompareTable() {
               <span>Backend Feature</span>
             </span>
           </th>
-          <th className="p-0 bg-white/5 border-b-2 border-b-zinc-950" />
-          <th className="p-0 bg-emerald-300/10 border-b-2 border-b-zinc-950" />
-          <th className="p-0 bg-white/5 border-b-2 border-b-zinc-950" />
-          <th className="p-0 bg-white/5 border-b-2 border-b-zinc-950" />
+          <th hidden={isMobile ? !showFree : false} className="p-0" />
+          <th hidden={isMobile ? !showPayg : false} className="p-0" />
+          <th hidden={isMobile ? !showPro2 : false} className="p-0" />
+          <th hidden={isMobile ? !showPro10 : false} className="p-0" />
         </tr>
 
         <tr>
@@ -330,25 +544,37 @@ export default function CompareTable() {
             Supported platforms
           </th>
           {/**/}
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="list">
               <span>AWS</span>
               <span>GCP</span>
             </CompareValue>
           </td>
-          <td className="px-4 py-0 bg-emerald-300/10">
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="px-4 py-0 bg-emerald-300/10"
+          >
             <CompareValue type="list">
               <span>AWS</span>
               <span>GCP</span>
             </CompareValue>
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro2 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="list">
               <span>AWS</span>
               <span>GCP</span>
             </CompareValue>
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro10 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="list">
               <span>AWS</span>
               <span>GCP</span>
@@ -361,16 +587,28 @@ export default function CompareTable() {
             Persistence
           </th>
           {/**/}
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="boolean" />
           </td>
-          <td className="px-4 py-0 bg-emerald-300/10">
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="px-4 py-0 bg-emerald-300/10"
+          >
             <CompareValue type="boolean" />
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro2 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="boolean" />
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro10 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="boolean" />
           </td>
         </tr>
@@ -380,16 +618,28 @@ export default function CompareTable() {
             REST API
           </th>
           {/**/}
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="boolean" />
           </td>
-          <td className="px-4 py-0 bg-emerald-300/10">
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="px-4 py-0 bg-emerald-300/10"
+          >
             <CompareValue type="boolean" />
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro2 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="boolean" />
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro10 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="boolean" />
           </td>
         </tr>
@@ -399,16 +649,28 @@ export default function CompareTable() {
             Global replication
           </th>
           {/**/}
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="boolean" className="border-b-0" />
           </td>
-          <td className="px-4 py-0 bg-emerald-300/10">
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="px-4 py-0 bg-emerald-300/10"
+          >
             <CompareValue type="boolean" className="border-b-0" />
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro2 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="boolean" className="border-b-0" />
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro10 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="boolean" className="border-b-0" />
           </td>
         </tr>
@@ -416,13 +678,13 @@ export default function CompareTable() {
         {/**/}
 
         <tr>
-          <th className="top-0 sticky bg-zinc-950 text-left py-6 border-b border-b-white/10">
-            <span className="flex items-center gap-2 font-semibold text-xl">
+          <th className="bg-zinc-950 top-0 sticky text-left py-4 px-0">
+            <span className="flex items-center gap-2 font-semibold text-lg">
               <span className="flex items-center p-2 rounded-full bg-white/10">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
+                  width="20"
+                  height="20"
                   viewBox="0 0 24 24"
                   strokeWidth="1.6"
                   stroke="currentColor"
@@ -439,10 +701,10 @@ export default function CompareTable() {
               <span>Security and Privacy</span>
             </span>
           </th>
-          <th className="p-0 bg-white/5 border-b-2 border-b-zinc-950" />
-          <th className="p-0 bg-emerald-300/10 border-b-2 border-b-zinc-950" />
-          <th className="p-0 bg-white/5 border-b-2 border-b-zinc-950" />
-          <th className="p-0 bg-white/5 border-b-2 border-b-zinc-950" />
+          <th hidden={isMobile ? !showFree : false} className="p-0" />
+          <th hidden={isMobile ? !showPayg : false} className="p-0" />
+          <th hidden={isMobile ? !showPro2 : false} className="p-0" />
+          <th hidden={isMobile ? !showPro10 : false} className="p-0" />
         </tr>
 
         <tr>
@@ -450,16 +712,28 @@ export default function CompareTable() {
             SSL Encryption (TLS)
           </th>
           {/**/}
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="boolean" />
           </td>
-          <td className="px-4 py-0 bg-emerald-300/10">
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="px-4 py-0 bg-emerald-300/10"
+          >
             <CompareValue type="boolean" />
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro2 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="boolean" />
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro10 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="boolean" />
           </td>
         </tr>
@@ -469,25 +743,37 @@ export default function CompareTable() {
             Security
           </th>
           {/**/}
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="list">
               <span>Password</span>
               <span>TLS</span>
             </CompareValue>
           </td>
-          <td className="px-4 py-0 bg-emerald-300/10">
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="px-4 py-0 bg-emerald-300/10"
+          >
             <CompareValue type="list">
               <span>Password</span>
               <span>TLS</span>
             </CompareValue>
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro2 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="list">
               <span>Password</span>
               <span>TLS</span>
             </CompareValue>
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro10 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="list">
               <span>Password</span>
               <span>TLS</span>
@@ -500,16 +786,28 @@ export default function CompareTable() {
             Audit logs
           </th>
           {/**/}
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue>Last 7 days</CompareValue>
           </td>
-          <td className="px-4 py-0 bg-emerald-300/10">
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="px-4 py-0 bg-emerald-300/10"
+          >
             <CompareValue>Last 30 days</CompareValue>
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro2 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue>Last 1 year</CompareValue>
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro10 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue>Last 1 year</CompareValue>
           </td>
         </tr>
@@ -519,16 +817,28 @@ export default function CompareTable() {
             Encryption at REST
           </th>
           {/**/}
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="boolean" valid={false} />
           </td>
-          <td className="px-4 py-0 bg-emerald-300/10">
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="px-4 py-0 bg-emerald-300/10"
+          >
             <CompareValue type="boolean" valid={false} />
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro2 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="boolean" />
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro10 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="boolean" />
           </td>
         </tr>
@@ -538,16 +848,28 @@ export default function CompareTable() {
             Compliance (SOC2, ISO27001, ...)
           </th>
           {/**/}
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="boolean" className="border-b-0" />
           </td>
-          <td className="px-4 py-0 bg-emerald-300/10">
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="px-4 py-0 bg-emerald-300/10"
+          >
             <CompareValue type="boolean" className="border-b-0" />
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro2 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="boolean" className="border-b-0" />
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro10 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="boolean" className="border-b-0" />
           </td>
         </tr>
@@ -555,13 +877,13 @@ export default function CompareTable() {
         {/**/}
 
         <tr>
-          <th className="top-0 sticky bg-zinc-950 text-left py-6 border-b border-b-white/10">
-            <span className="flex items-center gap-2 font-semibold text-xl">
+          <th className="bg-zinc-950 top-0 sticky text-left py-4 px-0">
+            <span className="flex items-center gap-2 font-semibold text-lg">
               <span className="flex items-center p-2 rounded-full bg-white/10">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
+                  width="20"
+                  height="20"
                   viewBox="0 0 24 24"
                   strokeWidth="1.6"
                   stroke="currentColor"
@@ -578,10 +900,10 @@ export default function CompareTable() {
               <span>Support</span>
             </span>
           </th>
-          <th className="p-0 bg-white/5 border-b-2 border-b-zinc-950" />
-          <th className="p-0 bg-emerald-300/10 border-b-2 border-b-zinc-950" />
-          <th className="p-0 bg-white/5 border-b-2 border-b-zinc-950" />
-          <th className="p-0 bg-white/5 border-b-2 border-b-zinc-950" />
+          <th hidden={isMobile ? !showFree : false} className="p-0" />
+          <th hidden={isMobile ? !showPayg : false} className="p-0" />
+          <th hidden={isMobile ? !showPro2 : false} className="p-0" />
+          <th hidden={isMobile ? !showPro10 : false} className="p-0" />
         </tr>
 
         <tr>
@@ -589,16 +911,28 @@ export default function CompareTable() {
             Community Support
           </th>
           {/**/}
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="boolean" />
           </td>
-          <td className="px-4 py-0 bg-emerald-300/10">
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="px-4 py-0 bg-emerald-300/10"
+          >
             <CompareValue type="boolean" />
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro2 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="boolean" />
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro10 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="boolean" />
           </td>
         </tr>
@@ -608,16 +942,28 @@ export default function CompareTable() {
             Email Support
           </th>
           {/**/}
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="boolean" />
           </td>
-          <td className="px-4 py-0 bg-emerald-300/10">
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="px-4 py-0 bg-emerald-300/10"
+          >
             <CompareValue type="boolean" />
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro2 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="boolean" />
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro10 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="boolean" />
           </td>
         </tr>
@@ -627,16 +973,28 @@ export default function CompareTable() {
             Dedicated support and Slack channel
           </th>
           {/**/}
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="boolean" valid={false} />
           </td>
-          <td className="px-4 py-0 bg-emerald-300/10">
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="px-4 py-0 bg-emerald-300/10"
+          >
             <CompareValue type="boolean" valid={false} />
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro2 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="boolean" valid={false} />
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro10 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue type="boolean" />
           </td>
         </tr>
@@ -646,8 +1004,14 @@ export default function CompareTable() {
             Uptime SLA
           </th>
           {/**/}
-          <td className="px-4 py-0 bg-white/5"></td>
-          <td className="px-4 py-0 bg-emerald-300/10">
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="px-4 py-0 bg-white/3"
+          ></td>
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="px-4 py-0 bg-emerald-300/10"
+          >
             <CompareValue className="border-b-0">
               <div>
                 <div>Regional: 99.99%</div>
@@ -655,7 +1019,10 @@ export default function CompareTable() {
               </div>
             </CompareValue>
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro2 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue className="border-b-0">
               <div>
                 <div>Regional: 99.99%</div>
@@ -663,7 +1030,10 @@ export default function CompareTable() {
               </div>
             </CompareValue>
           </td>
-          <td className="px-4 py-0 bg-white/5">
+          <td
+            hidden={isMobile ? !showPro10 : false}
+            className="px-4 py-0 bg-white/3"
+          >
             <CompareValue className="border-b-0">
               <div>
                 <div>Regional: 99.99%</div>
@@ -671,6 +1041,65 @@ export default function CompareTable() {
               </div>
             </CompareValue>
           </td>
+        </tr>
+
+        <tr>
+          <th className="p-0" />
+          <th hidden={isMobile ? !showFree : false} className="bg-zinc-950 p-0">
+            <div className="bg-white/3 py-4 text-white/60">
+              <Button
+                target="_self"
+                type="button"
+                hideIcon
+                href="https://console.upstash.com"
+                className="bg-zinc-50 text-zinc-950 font-medium"
+              >
+                Start Now
+              </Button>
+            </div>
+          </th>
+          <th hidden={isMobile ? !showPayg : false} className="bg-zinc-950 p-0">
+            <div className="bg-emerald-300/10 py-4 text-white/60">
+              <Button
+                target="_self"
+                type="button"
+                hideIcon
+                href="https://console.upstash.com"
+                className="bg-emerald-400 text-zinc-950 font-medium"
+              >
+                Start Now
+              </Button>
+            </div>
+          </th>
+          <th hidden={isMobile ? !showPro2 : false} className="bg-zinc-950 p-0">
+            <div className="bg-white/3 py-4 text-white/60">
+              <Button
+                target="_self"
+                type="button"
+                hideIcon
+                href="https://console.upstash.com"
+                className="bg-zinc-50 text-zinc-950 font-medium"
+              >
+                Start Now
+              </Button>
+            </div>
+          </th>
+          <th
+            hidden={isMobile ? !showPro10 : false}
+            className="bg-zinc-950 p-0"
+          >
+            <div className="bg-white/3 py-4 text-white/60">
+              <Button
+                target="_self"
+                type="button"
+                hideIcon
+                href="https://console.upstash.com"
+                className="bg-zinc-50 text-zinc-950 font-medium"
+              >
+                Start Now
+              </Button>
+            </div>
+          </th>
         </tr>
       </tbody>
     </table>
@@ -725,7 +1154,7 @@ const CompareValue = ({
     )}
 
     {type === "list" && children && (
-      <span className="text-left flex items-center flex-wrap gap-1">
+      <span className="text-left flex items-center justify-center flex-wrap gap-1">
         {ReactChildrenText(children).map((item, index) => (
           <span
             className="text-sm px-2 py-1.5 font-medium bg-emerald-300/10 rounded leading-none"

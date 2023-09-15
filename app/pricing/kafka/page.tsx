@@ -1,10 +1,10 @@
 import * as React from "react";
-import { PricingToggle } from "@/app/pricing/client";
+import { ProductToggle } from "@/components/pricing/product-toggle";
 
 export default function Pricing() {
   return (
     <div>
-      <PricingToggle product={"/kafka"} />
+      <ProductToggle product={"/kafka"} />
     </div>
   );
 }
