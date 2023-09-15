@@ -29,15 +29,15 @@ export default function PostListCard({ data }: { data: Post }) {
           </h5>
         )}
 
-        <h3 className="text-xl font-semibold font-display md:leading-tight">
+        <h3 className="font-display text-xl font-semibold md:leading-tight">
           <Balancer>
             <Link href={`/blog/${slug}`}>{title}</Link>
           </Balancer>
         </h3>
 
-        <div className="flex items-center gap-2 mt-1 grow opacity-60">
-          <Link 
-            href={`/blog/author/${authorsData[0].id}`} 
+        <div className="mt-1 flex grow items-center gap-2 opacity-60">
+          <Link
+            href={`/blog/author/${authorsData[0].id}`}
             className="hover:text-emerald-400 hover:underline"
           >
             {authorsData[0].name}
@@ -54,7 +54,7 @@ export default function PostListCard({ data }: { data: Post }) {
         height={50}
         alt={authorsData[0].name}
         src={authorsData[0].image}
-        className="object-cover rounded-full aspect-square shrink-0"
+        className="aspect-square shrink-0 rounded-full object-cover"
       />
     </article>
   );

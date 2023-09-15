@@ -4,7 +4,7 @@ import Container from "@/components/container";
 import { Logo } from "@/components/logo";
 import Button from "@/components/button";
 
-export interface IAppFooter extends HTMLProps<HTMLDivElement> { }
+export interface IAppFooter extends HTMLProps<HTMLDivElement> {}
 
 export default function Footer({ className, ...props }: IAppFooter) {
   return (
@@ -22,7 +22,7 @@ export default function Footer({ className, ...props }: IAppFooter) {
             © {new Date().getFullYear()} Upstash, Inc. Based in California.
           </p>
 
-          <div className="flex flex-col items-center gap-4 mt-2 md:flex-row">
+          <div className="mt-2 flex flex-col items-center gap-4 md:flex-row">
             <Button
               href="/docs/common/help/support"
               className="opacity-60 hover:opacity-100"
@@ -45,10 +45,10 @@ export default function Footer({ className, ...props }: IAppFooter) {
 
           <Button
             href="https://status.upstash.com/"
-            className="px-4 py-1 mt-10 rounded-full whitespace-nowrap bg-emerald-400/10 text-emerald-500"
+            className="mt-10 whitespace-nowrap rounded-full bg-emerald-400/10 px-4 py-1 text-emerald-500"
             hideIcon
           >
-            <span className="inline-flex w-3 h-3 mr-2 -ml-1 bg-current rounded-full animate-pulse" />
+            <span className="-ml-1 mr-2 inline-flex h-3 w-3 animate-pulse rounded-full bg-current" />
             <span className="">Status</span>
           </Button>
 

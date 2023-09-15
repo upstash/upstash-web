@@ -27,7 +27,7 @@ export default function PostHeader({ post }: Props) {
           <Balancer>{post.title}</Balancer>
         </h1>
 
-        <div className="flex flex-col items-center justify-center gap-8 mt-8 md:flex-row">
+        <div className="mt-8 flex flex-col items-center justify-center gap-8 md:flex-row">
           {post.authorsData.map((author) => (
             <div key={author.name} className="flex flex-col items-center">
               <Image
@@ -35,7 +35,7 @@ export default function PostHeader({ post }: Props) {
                 height={50}
                 alt={author.name}
                 src={author.image}
-                className="object-cover rounded-full aspect-square shrink-0"
+                className="aspect-square shrink-0 rounded-full object-cover"
               />
               <Link
                 href={`/blog/author/${author.id}`}
@@ -46,10 +46,8 @@ export default function PostHeader({ post }: Props) {
               <span className="opacity-40">{author.title}</span>
             </div>
           ))}
-
         </div>
-
-      </Container >
-    </header >
+      </Container>
+    </header>
   );
 }

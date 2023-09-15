@@ -41,7 +41,7 @@ export default function HttpRestApi() {
                 )}
               >
                 <input
-                  className="absolute opacity-0 pointer-events-none"
+                  className="pointer-events-none absolute opacity-0"
                   type="radio"
                   value={value}
                   name="product"
@@ -57,7 +57,7 @@ export default function HttpRestApi() {
 
         {/* body */}
         <div className="mt-4 grid rounded-xl bg-black/20 md:h-[276px]">
-          <div className="p-4 overflow-y-scroll md:px-6">
+          <div className="overflow-y-scroll p-4 md:px-6">
             <Pre hidden={product !== Product.REDIS}>{CODE[Product.REDIS]}</Pre>
             <Pre hidden={product !== Product.KAFKA}>{CODE[Product.KAFKA]}</Pre>
             <Pre hidden={product !== Product.QSTASH}>

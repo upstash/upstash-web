@@ -48,11 +48,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     >
       <body className="pt-20 md:pt-0">
         <SegmentProvider writeKey={process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY!}>
-          
-        <Header />
-        <HeaderMobile />
-        {children}
-        <Footer />
+          <Header />
+          <HeaderMobile />
+          {children}
+          <Footer />
         </SegmentProvider>
 
         {process.env.NODE_ENV !== "development" && (

@@ -35,7 +35,7 @@
 /* code title */
 
 [data-rehype-pretty-code-title] {
-  @apply mt-4 border-b border-b-white/03 px-6 py-3 text-white/60;
+  @apply mt-4 border-b border-b-white/3 px-6 py-3 text-white/60;
 }
 
 [data-rehype-pretty-code-title] + pre {
