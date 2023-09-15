@@ -50,7 +50,7 @@ export default function PricingTable() {
 
       {/* PAYG */}
 
-      <div className="rounded-3xl px-4 py-8 flex flex-col gap-6 items-center bg-emerald-300/10 border border-emerald-300/5">
+      <div className="rounded-3xl px-4 py-8 flex flex-col gap-6 items-center bg-emerald-300/10 border-2 border-emerald-300/10">
         <div className="grow">
           <h4 className="mb-2 text-emerald-400 text-xl font-semibold">
             Pay as you go

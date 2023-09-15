@@ -213,7 +213,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Max command per second
           </th>
           {/**/}
@@ -244,7 +244,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Daily command limit
           </th>
           {/**/}
@@ -275,7 +275,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Max request size
           </th>
           {/**/}
@@ -314,7 +314,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Max record size
           </th>
           {/**/}
@@ -353,7 +353,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Max memory storage
           </th>
           {/**/}
@@ -392,7 +392,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Max data size
           </th>
           {/**/}
@@ -431,7 +431,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Max concurrent connections
           </th>
           {/**/}
@@ -462,7 +462,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Max monthly bandwidth
           </th>
           {/**/}
@@ -534,7 +534,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Supported platforms
           </th>
           {/**/}
@@ -577,7 +577,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Persistence
           </th>
           {/**/}
@@ -608,7 +608,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             REST API
           </th>
           {/**/}
@@ -639,7 +639,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Global replication
           </th>
           {/**/}
@@ -703,7 +703,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             SSL Encryption (TLS)
           </th>
           {/**/}
@@ -734,7 +734,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Security
           </th>
           {/**/}
@@ -781,7 +781,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Audit logs
           </th>
           {/**/}
@@ -812,7 +812,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Encryption at REST
           </th>
           {/**/}
@@ -843,7 +843,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Compliance (SOC2, ISO27001, ...)
           </th>
           {/**/}
@@ -907,7 +907,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Community Support
           </th>
           {/**/}
@@ -938,7 +938,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Email Support
           </th>
           {/**/}
@@ -969,7 +969,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Dedicated support and Slack channel
           </th>
           {/**/}
@@ -1000,7 +1000,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Uptime SLA
           </th>
           {/**/}
