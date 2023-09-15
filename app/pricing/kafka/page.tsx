@@ -3,7 +3,7 @@ import PricingTable from "./pricing-table";
 import PricingTableEnterprise from "./pricing-table-enterprise";
 import CompareTable from "./compare-table";
 import Ps from "./ps";
-import { ProductToggle } from "@/components/pricing/product-toggle";
+import ProductToggle from "@/components/pricing/product-toggle";
 import PageHeaderTitle from "@/components/page-header-title";
 import PageHeaderDesc from "@/components/page-header-desc";
 

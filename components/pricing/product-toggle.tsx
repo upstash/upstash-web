@@ -8,7 +8,7 @@ import IconQStash from "@/components/icon-qstash";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
-export function ProductToggle({ product }: { product: string }) {
+export default function ProductToggle({ product }: { product: string }) {
   return (
     <div className="flex justify-center">
       <div className="flex gap-3 rounded-xl p-2 border border-white/5">
@@ -24,7 +24,7 @@ export function ProductToggle({ product }: { product: string }) {
               key={key}
               href={`/pricing${key}`}
               className={cx(
-                "relative flex cursor-pointer select-none items-center gap-2",
+                "relative flex cursor-pointer select-none items-center gap-1",
                 "rounded-lg px-2 py-1.5 text-zinc-400 transition",
                 "hover:bg-white/10",
                 isActive && "!text-zinc-950 hover:bg-transparent",
@@ -44,7 +44,7 @@ export function ProductToggle({ product }: { product: string }) {
                 {isKafka && <IconKafka width={20} />}
                 {isQStash && <IconQStash width={20} />}
               </>
-              <span className="grow">
+              <span className="grow font-medium px-1">
                 {isRedis && "Redis"}
                 {isKafka && "Kafka"}
                 {isQStash && "QStash"}

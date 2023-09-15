@@ -5,31 +5,25 @@ import { HTMLProps, isValidElement, useState } from "react";
 import cx from "@/utils/cx";
 import Button from "@/components/button";
 import { useMediaQuery } from "@uidotdev/usehooks";
-
-enum Plan {
-  Free = "free",
-  PayAsYouGo = "payAsYouGo",
-  Pro2K = "pro2k",
-  Pro10K = "pro10k",
-}
+import { PricingPlans } from "@/utils/type";
 
 export default function CompareTable() {
   const isMobile = useMediaQuery("only screen and (max-width: 768px)");
   const [selectedPlans, setSelectedPlans] = useState([
-    Plan.Free,
-    Plan.PayAsYouGo,
+    PricingPlans.Free,
+    PricingPlans.PayAsYouGo,
   ]);
 
-  const showFree = selectedPlans.includes(Plan.Free);
-  const showPayg = selectedPlans.includes(Plan.PayAsYouGo);
-  const showPro2 = selectedPlans.includes(Plan.Pro2K);
-  const showPro10 = selectedPlans.includes(Plan.Pro10K);
+  const showFree = selectedPlans.includes(PricingPlans.Free);
+  const showPayg = selectedPlans.includes(PricingPlans.PayAsYouGo);
+  const showPro2 = selectedPlans.includes(PricingPlans.Pro2K);
+  const showPro10 = selectedPlans.includes(PricingPlans.Pro10K);
 
   const onPlanChange = (
     event: React.ChangeEvent<HTMLSelectElement>,
-    plan: Plan,
+    plan: PricingPlans,
   ) => {
-    const value = event.target.value as Plan;
+    const value = event.target.value as PricingPlans;
     const index = selectedPlans.indexOf(plan);
 
     setSelectedPlans((prev) => {
@@ -43,11 +37,11 @@ export default function CompareTable() {
   return (
     <table className="w-full border-separate border-spacing-y-0 border-spacing-x-1">
       <colgroup>
-        <col className="w-1/3 md:w-1/4" />
-        <col className="w-1/3 md:w-auto" />
-        <col className="w-1/3 md:w-auto" />
-        <col className="w-1/3 md:w-auto" />
-        <col className="w-1/3 md:w-auto" />
+        <col className="w-1/3 md:w-1/5" />
+        <col className="w-1/3 md:w-1/5" />
+        <col className="w-1/3 md:w-1/5" />
+        <col className="w-1/3 md:w-1/5" />
+        <col className="w-1/3 md:w-1/5" />
       </colgroup>
 
       {/**/}
@@ -89,28 +83,28 @@ export default function CompareTable() {
           </th>
         </tr>
 
-        <tr className="top-20 md:top-0 sticky">
-          <th className="bg-zinc-950 p-0 border-b border-b-zinc-800" />
+        <tr className="top-20 md:top-0 sticky z-20">
+          <th className="" />
           <th
             hidden={isMobile ? !showFree : false}
             className="bg-zinc-950 p-0 border-b border-b-zinc-800"
           >
-            <div className="bg-white/5 py-6">
+            <div className="bg-white/3 h-16 flex items-center justify-center">
               <h4 className="hidden md:block text-emerald-400 text-lg font-semibold">
                 Free
               </h4>
 
               <select
                 className="md:hidden font-semibold bg-transparent px-4 py-2"
-                onChange={(e) => onPlanChange(e, Plan.Free)}
-                value={Plan.Free}
+                onChange={(e) => onPlanChange(e, PricingPlans.Free)}
+                value={PricingPlans.Free}
               >
-                <option value={Plan.Free} disabled>
+                <option value={PricingPlans.Free} disabled>
                   Free
                 </option>
-                <option value={Plan.PayAsYouGo}>Pay as you go</option>
-                <option value={Plan.Pro2K}>Pro 2K</option>
-                <option value={Plan.Pro10K}>Pro 10K</option>
+                <option value={PricingPlans.PayAsYouGo}>Pay as you go</option>
+                <option value={PricingPlans.Pro2K}>Pro 2K</option>
+                <option value={PricingPlans.Pro10K}>Pro 10K</option>
               </select>
             </div>
           </th>
@@ -118,22 +112,22 @@ export default function CompareTable() {
             hidden={isMobile ? !showPayg : false}
             className="bg-zinc-950 p-0 border-b border-b-zinc-800"
           >
-            <div className="bg-emerald-300/10 py-6">
+            <div className="bg-emerald-300/10 h-16 flex items-center justify-center">
               <h4 className="hidden md:block text-emerald-400 text-lg font-semibold">
                 Pay as you go
               </h4>
 
               <select
                 className="md:hidden font-semibold bg-transparent px-4 py-2"
-                onChange={(e) => onPlanChange(e, Plan.PayAsYouGo)}
-                value={Plan.PayAsYouGo}
+                onChange={(e) => onPlanChange(e, PricingPlans.PayAsYouGo)}
+                value={PricingPlans.PayAsYouGo}
               >
-                <option value={Plan.Free}>Free</option>
-                <option value={Plan.PayAsYouGo} disabled>
+                <option value={PricingPlans.Free}>Free</option>
+                <option value={PricingPlans.PayAsYouGo} disabled>
                   Pay as you go
                 </option>
-                <option value={Plan.Pro2K}>Pro 2K</option>
-                <option value={Plan.Pro10K}>Pro 10K</option>
+                <option value={PricingPlans.Pro2K}>Pro 2K</option>
+                <option value={PricingPlans.Pro10K}>Pro 10K</option>
               </select>
             </div>
           </th>
@@ -141,22 +135,22 @@ export default function CompareTable() {
             hidden={isMobile ? !showPro2 : false}
             className="bg-zinc-950 p-0 border-b border-b-zinc-800"
           >
-            <div className="bg-white/5 py-6">
+            <div className="bg-white/3 h-16 flex items-center justify-center">
               <h4 className="hidden md:block text-emerald-400 text-lg font-semibold">
                 Pro 2K
               </h4>
 
               <select
                 className="md:hidden font-semibold bg-transparent px-4 py-2"
-                onChange={(e) => onPlanChange(e, Plan.Pro2K)}
-                value={Plan.Pro2K}
+                onChange={(e) => onPlanChange(e, PricingPlans.Pro2K)}
+                value={PricingPlans.Pro2K}
               >
-                <option value={Plan.Free}>Free</option>
-                <option value={Plan.PayAsYouGo}>Pay as you go</option>
-                <option value={Plan.Pro2K} disabled>
+                <option value={PricingPlans.Free}>Free</option>
+                <option value={PricingPlans.PayAsYouGo}>Pay as you go</option>
+                <option value={PricingPlans.Pro2K} disabled>
                   Pro 2K
                 </option>
-                <option value={Plan.Pro10K}>Pro 10K</option>
+                <option value={PricingPlans.Pro10K}>Pro 10K</option>
               </select>
             </div>
           </th>
@@ -164,20 +158,20 @@ export default function CompareTable() {
             hidden={isMobile ? !showPro10 : false}
             className="bg-zinc-950 p-0 border-b border-b-zinc-800"
           >
-            <div className="bg-white/5 py-6">
+            <div className="bg-white/3 h-16 flex items-center justify-center">
               <h4 className="hidden md:block text-emerald-400 text-lg font-semibold">
                 Pro 10K
               </h4>
 
               <select
                 className="md:hidden font-semibold bg-transparent px-4 py-2"
-                onChange={(e) => onPlanChange(e, Plan.Pro10K)}
-                value={Plan.Pro10K}
+                onChange={(e) => onPlanChange(e, PricingPlans.Pro10K)}
+                value={PricingPlans.Pro10K}
               >
-                <option value={Plan.Free}>Free</option>
-                <option value={Plan.PayAsYouGo}>Pay as you go</option>
-                <option value={Plan.Pro2K}>Pro 2K</option>
-                <option value={Plan.Pro10K} disabled>
+                <option value={PricingPlans.Free}>Free</option>
+                <option value={PricingPlans.PayAsYouGo}>Pay as you go</option>
+                <option value={PricingPlans.Pro2K}>Pro 2K</option>
+                <option value={PricingPlans.Pro10K} disabled>
                   Pro 10K
                 </option>
               </select>
@@ -190,37 +184,38 @@ export default function CompareTable() {
 
       <tbody>
         <tr>
-          <th className="bg-zinc-950 top-0 sticky text-left py-4 px-0">
-            <span className="flex items-center gap-2 font-semibold text-lg">
-              <span className="flex items-center p-2 rounded-full bg-white/10">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.6"
-                  stroke="currentColor"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M12 6m-8 0a8 3 0 1 0 16 0a8 3 0 1 0 -16 0"></path>
-                  <path d="M4 6v6a8 3 0 0 0 16 0v-6"></path>
-                  <path d="M4 12v6a8 3 0 0 0 16 0v-6"></path>
-                </svg>
-              </span>
+          <th colSpan={5} className="z-10 top-0 p-0 sticky text-left">
+            <div
+              className="-ml-4 h-16 flex items-center px-4
+            bg-gradient-to-r from-zinc-900 to-zinc-950"
+            >
+              <span className="flex items-center gap-2 font-semibold text-lg">
+                <span className="flex items-center p-2 rounded-full bg-white/10">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.6"
+                    stroke="currentColor"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M12 6m-8 0a8 3 0 1 0 16 0a8 3 0 1 0 -16 0"></path>
+                    <path d="M4 6v6a8 3 0 0 0 16 0v-6"></path>
+                    <path d="M4 12v6a8 3 0 0 0 16 0v-6"></path>
+                  </svg>
+                </span>
 
-              <span>Capacity</span>
-            </span>
+                <span>Capacity</span>
+              </span>
+            </div>
           </th>
-          <th hidden={isMobile ? !showFree : false} className="p-0" />
-          <th hidden={isMobile ? !showPayg : false} className="p-0" />
-          <th hidden={isMobile ? !showPro2 : false} className="p-0" />
-          <th hidden={isMobile ? !showPro10 : false} className="p-0" />
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
             Max command per second
           </th>
           {/**/}
@@ -251,7 +246,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
             Daily command limit
           </th>
           {/**/}
@@ -282,7 +277,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
             Max request size
           </th>
           {/**/}
@@ -321,7 +316,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
             Max record size
           </th>
           {/**/}
@@ -360,7 +355,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
             Max memory storage
           </th>
           {/**/}
@@ -399,7 +394,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
             Max data size
           </th>
           {/**/}
@@ -438,7 +433,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
             Max concurrent connections
           </th>
           {/**/}
@@ -469,7 +464,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
             Max monthly bandwidth
           </th>
           {/**/}
@@ -510,37 +505,38 @@ export default function CompareTable() {
         {/**/}
 
         <tr>
-          <th className="bg-zinc-950 top-0 sticky text-left py-4 px-0">
-            <span className="flex items-center gap-2 font-semibold text-lg">
-              <span className="flex items-center p-2 rounded-full bg-white/10">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.6"
-                  stroke="currentColor"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M4 13a8 8 0 0 1 7 7a6 6 0 0 0 3 -5a9 9 0 0 0 6 -8a3 3 0 0 0 -3 -3a9 9 0 0 0 -8 6a6 6 0 0 0 -5 3"></path>
-                  <path d="M7 14a6 6 0 0 0 -3 6a6 6 0 0 0 6 -3"></path>
-                  <path d="M15 9m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path>
-                </svg>
-              </span>
+          <th colSpan={5} className="z-10 top-0 p-0 sticky text-left">
+            <div
+              className="-ml-4 h-16 flex items-center px-4
+            bg-gradient-to-r from-zinc-900 to-zinc-950"
+            >
+              <span className="flex items-center gap-2 font-semibold text-lg">
+                <span className="flex items-center p-2 rounded-full bg-white/10">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.6"
+                    stroke="currentColor"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M4 13a8 8 0 0 1 7 7a6 6 0 0 0 3 -5a9 9 0 0 0 6 -8a3 3 0 0 0 -3 -3a9 9 0 0 0 -8 6a6 6 0 0 0 -5 3"></path>
+                    <path d="M7 14a6 6 0 0 0 -3 6a6 6 0 0 0 6 -3"></path>
+                    <path d="M15 9m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path>
+                  </svg>
+                </span>
 
-              <span>Backend Feature</span>
-            </span>
+                <span>Backend Feature</span>
+              </span>
+            </div>
           </th>
-          <th hidden={isMobile ? !showFree : false} className="p-0" />
-          <th hidden={isMobile ? !showPayg : false} className="p-0" />
-          <th hidden={isMobile ? !showPro2 : false} className="p-0" />
-          <th hidden={isMobile ? !showPro10 : false} className="p-0" />
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
             Supported platforms
           </th>
           {/**/}
@@ -583,7 +579,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
             Persistence
           </th>
           {/**/}
@@ -614,7 +610,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
             REST API
           </th>
           {/**/}
@@ -645,7 +641,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
             Global replication
           </th>
           {/**/}
@@ -678,37 +674,38 @@ export default function CompareTable() {
         {/**/}
 
         <tr>
-          <th className="bg-zinc-950 top-0 sticky text-left py-4 px-0">
-            <span className="flex items-center gap-2 font-semibold text-lg">
-              <span className="flex items-center p-2 rounded-full bg-white/10">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.6"
-                  stroke="currentColor"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3"></path>
-                  <path d="M12 11m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path>
-                  <path d="M12 12l0 2.5"></path>
-                </svg>
-              </span>
+          <th colSpan={5} className="z-10 top-0 p-0 sticky text-left">
+            <div
+              className="-ml-4 h-16 flex items-center px-4
+            bg-gradient-to-r from-zinc-900 to-zinc-950"
+            >
+              <span className="flex items-center gap-2 font-semibold text-lg">
+                <span className="flex items-center p-2 rounded-full bg-white/10">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.6"
+                    stroke="currentColor"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3"></path>
+                    <path d="M12 11m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path>
+                    <path d="M12 12l0 2.5"></path>
+                  </svg>
+                </span>
 
-              <span>Security and Privacy</span>
-            </span>
+                <span>Security and Privacy</span>
+              </span>
+            </div>
           </th>
-          <th hidden={isMobile ? !showFree : false} className="p-0" />
-          <th hidden={isMobile ? !showPayg : false} className="p-0" />
-          <th hidden={isMobile ? !showPro2 : false} className="p-0" />
-          <th hidden={isMobile ? !showPro10 : false} className="p-0" />
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
             SSL Encryption (TLS)
           </th>
           {/**/}
@@ -739,7 +736,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
             Security
           </th>
           {/**/}
@@ -786,7 +783,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
             Audit logs
           </th>
           {/**/}
@@ -817,7 +814,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
             Encryption at REST
           </th>
           {/**/}
@@ -848,7 +845,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
             Compliance (SOC2, ISO27001, ...)
           </th>
           {/**/}
@@ -881,37 +878,38 @@ export default function CompareTable() {
         {/**/}
 
         <tr>
-          <th className="bg-zinc-950 top-0 sticky text-left py-4 px-0">
-            <span className="flex items-center gap-2 font-semibold text-lg">
-              <span className="flex items-center p-2 rounded-full bg-white/10">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.6"
-                  stroke="currentColor"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M4 13m0 2a2 2 0 0 1 2 -2h1a2 2 0 0 1 2 2v3a2 2 0 0 1 -2 2h-1a2 2 0 0 1 -2 -2z"></path>
-                  <path d="M15 13m0 2a2 2 0 0 1 2 -2h1a2 2 0 0 1 2 2v3a2 2 0 0 1 -2 2h-1a2 2 0 0 1 -2 -2z"></path>
-                  <path d="M4 15v-3a8 8 0 0 1 16 0v3"></path>
-                </svg>
-              </span>
+          <th colSpan={5} className="z-10 top-0 p-0 sticky text-left">
+            <div
+              className="-ml-4 h-16 flex items-center px-4
+            bg-gradient-to-r from-zinc-900 to-zinc-950"
+            >
+              <span className="flex items-center gap-2 font-semibold text-lg">
+                <span className="flex items-center p-2 rounded-full bg-white/10">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.6"
+                    stroke="currentColor"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M4 13m0 2a2 2 0 0 1 2 -2h1a2 2 0 0 1 2 2v3a2 2 0 0 1 -2 2h-1a2 2 0 0 1 -2 -2z"></path>
+                    <path d="M15 13m0 2a2 2 0 0 1 2 -2h1a2 2 0 0 1 2 2v3a2 2 0 0 1 -2 2h-1a2 2 0 0 1 -2 -2z"></path>
+                    <path d="M4 15v-3a8 8 0 0 1 16 0v3"></path>
+                  </svg>
+                </span>
 
-              <span>Support</span>
-            </span>
+                <span>Support</span>
+              </span>
+            </div>
           </th>
-          <th hidden={isMobile ? !showFree : false} className="p-0" />
-          <th hidden={isMobile ? !showPayg : false} className="p-0" />
-          <th hidden={isMobile ? !showPro2 : false} className="p-0" />
-          <th hidden={isMobile ? !showPro10 : false} className="p-0" />
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
             Community Support
           </th>
           {/**/}
@@ -942,7 +940,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
             Email Support
           </th>
           {/**/}
@@ -973,7 +971,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
             Dedicated support and Slack channel
           </th>
           {/**/}
@@ -1004,7 +1002,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
+          <th className="py-4 px-0 text-left font-normal text-white/60 underline decoration-dashed decoration-zinc-700">
             Uptime SLA
           </th>
           {/**/}

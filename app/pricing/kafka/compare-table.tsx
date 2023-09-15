@@ -1,35 +1,29 @@
 "use client";
 
 import * as React from "react";
-import { HTMLProps, isValidElement, useState } from "react";
-import cx from "@/utils/cx";
+import { useState } from "react";
 import Button from "@/components/button";
 import { useMediaQuery } from "@uidotdev/usehooks";
-
-enum Plan {
-  Free = "free",
-  PayAsYouGo = "payAsYouGo",
-  Pro2K = "pro2k",
-  Pro10K = "pro10k",
-}
+import CompareValue from "@/components/pricing/compare-value";
+import { PricingPlans } from "@/utils/type";
 
 export default function CompareTable() {
   const isMobile = useMediaQuery("only screen and (max-width: 768px)");
   const [selectedPlans, setSelectedPlans] = useState([
-    Plan.Free,
-    Plan.PayAsYouGo,
+    PricingPlans.Free,
+    PricingPlans.PayAsYouGo,
   ]);
 
-  const showFree = selectedPlans.includes(Plan.Free);
-  const showPayg = selectedPlans.includes(Plan.PayAsYouGo);
-  const showPro2 = selectedPlans.includes(Plan.Pro2K);
-  const showPro10 = selectedPlans.includes(Plan.Pro10K);
+  const showFree = selectedPlans.includes(PricingPlans.Free);
+  const showPayg = selectedPlans.includes(PricingPlans.PayAsYouGo);
+  const showPro2 = selectedPlans.includes(PricingPlans.Pro2K);
+  const showPro10 = selectedPlans.includes(PricingPlans.Pro10K);
 
   const onPlanChange = (
     event: React.ChangeEvent<HTMLSelectElement>,
-    plan: Plan,
+    plan: PricingPlans,
   ) => {
-    const value = event.target.value as Plan;
+    const value = event.target.value as PricingPlans;
     const index = selectedPlans.indexOf(plan);
 
     setSelectedPlans((prev) => {
@@ -102,15 +96,15 @@ export default function CompareTable() {
 
               <select
                 className="md:hidden font-semibold bg-transparent px-4 py-2"
-                onChange={(e) => onPlanChange(e, Plan.Free)}
-                value={Plan.Free}
+                onChange={(e) => onPlanChange(e, PricingPlans.Free)}
+                value={PricingPlans.Free}
               >
-                <option value={Plan.Free} disabled>
+                <option value={PricingPlans.Free} disabled>
                   Free
                 </option>
-                <option value={Plan.PayAsYouGo}>Pay as you go</option>
-                <option value={Plan.Pro2K}>Pro 2K</option>
-                <option value={Plan.Pro10K}>Pro 10K</option>
+                <option value={PricingPlans.PayAsYouGo}>Pay as you go</option>
+                <option value={PricingPlans.Pro2K}>Pro 2K</option>
+                <option value={PricingPlans.Pro10K}>Pro 10K</option>
               </select>
             </div>
           </th>
@@ -125,15 +119,15 @@ export default function CompareTable() {
 
               <select
                 className="md:hidden font-semibold bg-transparent px-4 py-2"
-                onChange={(e) => onPlanChange(e, Plan.PayAsYouGo)}
-                value={Plan.PayAsYouGo}
+                onChange={(e) => onPlanChange(e, PricingPlans.PayAsYouGo)}
+                value={PricingPlans.PayAsYouGo}
               >
-                <option value={Plan.Free}>Free</option>
-                <option value={Plan.PayAsYouGo} disabled>
+                <option value={PricingPlans.Free}>Free</option>
+                <option value={PricingPlans.PayAsYouGo} disabled>
                   Pay as you go
                 </option>
-                <option value={Plan.Pro2K}>Pro 2K</option>
-                <option value={Plan.Pro10K}>Pro 10K</option>
+                <option value={PricingPlans.Pro2K}>Pro 2K</option>
+                <option value={PricingPlans.Pro10K}>Pro 10K</option>
               </select>
             </div>
           </th>
@@ -148,15 +142,15 @@ export default function CompareTable() {
 
               <select
                 className="md:hidden font-semibold bg-transparent px-4 py-2"
-                onChange={(e) => onPlanChange(e, Plan.Pro2K)}
-                value={Plan.Pro2K}
+                onChange={(e) => onPlanChange(e, PricingPlans.Pro2K)}
+                value={PricingPlans.Pro2K}
               >
-                <option value={Plan.Free}>Free</option>
-                <option value={Plan.PayAsYouGo}>Pay as you go</option>
-                <option value={Plan.Pro2K} disabled>
+                <option value={PricingPlans.Free}>Free</option>
+                <option value={PricingPlans.PayAsYouGo}>Pay as you go</option>
+                <option value={PricingPlans.Pro2K} disabled>
                   Pro 2K
                 </option>
-                <option value={Plan.Pro10K}>Pro 10K</option>
+                <option value={PricingPlans.Pro10K}>Pro 10K</option>
               </select>
             </div>
           </th>
@@ -171,13 +165,13 @@ export default function CompareTable() {
 
               <select
                 className="md:hidden font-semibold bg-transparent px-4 py-2"
-                onChange={(e) => onPlanChange(e, Plan.Pro10K)}
-                value={Plan.Pro10K}
+                onChange={(e) => onPlanChange(e, PricingPlans.Pro10K)}
+                value={PricingPlans.Pro10K}
               >
-                <option value={Plan.Free}>Free</option>
-                <option value={Plan.PayAsYouGo}>Pay as you go</option>
-                <option value={Plan.Pro2K}>Pro 2K</option>
-                <option value={Plan.Pro10K} disabled>
+                <option value={PricingPlans.Free}>Free</option>
+                <option value={PricingPlans.PayAsYouGo}>Pay as you go</option>
+                <option value={PricingPlans.Pro2K}>Pro 2K</option>
+                <option value={PricingPlans.Pro10K} disabled>
                   Pro 10K
                 </option>
               </select>
@@ -221,7 +215,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Max Messages Daily
           </th>
           {/**/}
@@ -252,7 +246,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Max Message Per Second
           </th>
           {/**/}
@@ -283,7 +277,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Max Message Size
           </th>
           {/**/}
@@ -322,7 +316,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Max Number of Partitions
           </th>
           {/**/}
@@ -353,7 +347,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Max Retention Size
           </th>
           {/**/}
@@ -392,7 +386,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Max Retention Time
           </th>
           {/**/}
@@ -425,7 +419,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Max Monthly Bandwidth
           </th>
           {/**/}
@@ -497,7 +491,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Supported platforms
           </th>
           {/**/}
@@ -540,7 +534,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             REST API
           </th>
           {/**/}
@@ -571,7 +565,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Managed Connectors
           </th>
           {/**/}
@@ -635,7 +629,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             SSL Encryption (TLS)
           </th>
           {/**/}
@@ -666,7 +660,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Security
           </th>
           {/**/}
@@ -713,7 +707,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Audit logs
           </th>
           {/**/}
@@ -744,7 +738,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Encryption at REST
           </th>
           {/**/}
@@ -775,7 +769,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Compliance (SOC2, ISO27001, ...)
           </th>
           {/**/}
@@ -839,7 +833,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Community Support
           </th>
           {/**/}
@@ -870,7 +864,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Email Support
           </th>
           {/**/}
@@ -901,7 +895,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Dedicated support and Slack channel
           </th>
           {/**/}
@@ -932,7 +926,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="py-3 px-0 text-left font-normal text-white/60">
+          <th className="py-4 px-0 text-left font-normal text-white/60">
             Uptime SLA
           </th>
           {/**/}
@@ -1037,76 +1031,3 @@ export default function CompareTable() {
     </table>
   );
 }
-
-const CompareValue = ({
-  type = "plain",
-  suffix = "",
-  valid = true,
-  children,
-  className = "",
-  ...props
-}: HTMLProps<HTMLSpanElement> & {
-  type?: "plain" | "size" | "boolean" | "list" | "number";
-  suffix?: string;
-  valid?: boolean;
-}) => (
-  <span
-    className={`inner py-3 border-b border-b-white/3 flex items-center justify-center ${className}`}
-    {...props}
-  >
-    {type === "plain" && children}
-
-    {type === "size" && (
-      <>
-        {children} <span className="ml-1 text-white/40">{suffix}</span>
-      </>
-    )}
-
-    {type === "boolean" && (
-      <span className="text-zinc-400">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className={cx(valid ? "text-emerald-400" : "text-white/10")}
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          strokeWidth="1.25"
-          stroke="currentColor"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path
-            d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-1.293 5.953a1 1 0 0 0 -1.32 -.083l-.094 .083l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.403 1.403l.083 .094l2 2l.094 .083a1 1 0 0 0 1.226 0l.094 -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z"
-            strokeWidth="0"
-            fill="currentColor"
-          />
-        </svg>
-      </span>
-    )}
-
-    {type === "list" && children && (
-      <span className="text-left flex items-center justify-center flex-wrap gap-1">
-        {ReactChildrenText(children).map((item, index) => (
-          <span
-            className="text-sm px-2 py-1.5 font-medium bg-emerald-300/10 rounded leading-none"
-            key={index}
-          >
-            {item}
-          </span>
-        ))}
-      </span>
-    )}
-
-    {type === "number" && Number(children).toLocaleString()}
-  </span>
-);
-
-const hasChildren = (element) =>
-  // @ts-ignore
-  isValidElement(element) && Boolean(element.props.children);
-
-const ReactChildrenText = (children) => {
-  if (hasChildren(children)) return ReactChildrenText(children.props.children);
-  return children;
-};
