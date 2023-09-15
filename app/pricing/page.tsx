@@ -1,12 +1,12 @@
 import PageHeaderTitle from "@/components/page-header-title";
 import PageHeaderDesc from "@/components/page-header-desc";
 import ProductToggle from "@/components/pricing/product-toggle";
-import PricingTable from "./redis/pricing-table";
-import PricingTableEnterprise from "./redis/pricing-table-enterprise";
-import CompareTable from "./redis/compare-table";
-import Ps from "./redis/ps";
+import PricingTable from "@/components/pricing/redis/pricing-table";
+import PricingTableEnterprise from "@/components/pricing/redis/pricing-table-enterprise";
+import CompareTable from "@/components/pricing/redis/compare-table";
+import Ps from "@/components/pricing/redis/ps";
 
-export default function Pricing() {
+export default function PricingRedisPage() {
   return (
     <div>
       <ProductToggle product={"/"} />

@@ -1,13 +1,13 @@
 import * as React from "react";
-import PricingTable from "./pricing-table";
-import PricingTableEnterprise from "./pricing-table-enterprise";
-import CompareTable from "./compare-table";
-import Ps from "./ps";
+import PricingTable from "@/components/pricing/kafka/pricing-table";
+import PricingTableEnterprise from "@/components/pricing/kafka/pricing-table-enterprise";
+import CompareTable from "@/components/pricing/kafka/compare-table";
+import Ps from "@/components/pricing/kafka/ps";
 import ProductToggle from "@/components/pricing/product-toggle";
 import PageHeaderTitle from "@/components/page-header-title";
 import PageHeaderDesc from "@/components/page-header-desc";
 
-export default function Pricing() {
+export default function PricingKafkaPage() {
   return (
     <div>
       <ProductToggle product={"/kafka"} />
