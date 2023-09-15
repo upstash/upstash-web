@@ -1,13 +1,11 @@
-"use client";
-
-import * as React from "react";
-import { useState } from "react";
-import { useMediaQuery } from "@uidotdev/usehooks";
-import CompareValue from "@/components/pricing/compare-value";
+import { ChangeEvent, useState } from "react";
+import CompareValue from "../compare-value";
 import { PricingPlans } from "@/utils/type";
+import useIsMobile from "@/hooks/use-is-mobile";
 
 export default function CompareTable() {
-  const isMobile = useMediaQuery("only screen and (max-width: 768px)");
+  const isMobile = useIsMobile();
+
   const [selectedPlans, setSelectedPlans] = useState([
     PricingPlans.Free,
     PricingPlans.PayAsYouGo,
@@ -18,7 +16,7 @@ export default function CompareTable() {
   const showEnterprise = selectedPlans.includes(PricingPlans.Enterprise);
 
   const onPlanChange = (
-    event: React.ChangeEvent<HTMLSelectElement>,
+    event: ChangeEvent<HTMLSelectElement>,
     plan: PricingPlans,
   ) => {
     const value = event.target.value as PricingPlans;

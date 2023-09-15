@@ -1,5 +1,3 @@
-"use client";
-
 import cx from "@/utils/cx";
 import * as React from "react";
 import IconRedis from "@/components/icon-redis";

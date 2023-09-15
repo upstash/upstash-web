@@ -1,4 +1,5 @@
-import * as React from "react";
+"use client";
+
 import PricingTable from "@/components/pricing/kafka/pricing-table";
 import PricingTableEnterprise from "@/components/pricing/kafka/pricing-table-enterprise";
 import CompareTable from "@/components/pricing/kafka/compare-table";

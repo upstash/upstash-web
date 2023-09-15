@@ -1,4 +1,5 @@
-import * as React from "react";
+"use client";
+
 import PricingTable from "@/components/pricing/qstash/pricing-table";
 import PricingTableEnterprise from "@/components/pricing/qstash/pricing-table-enterprise";
 import CompareTable from "@/components/pricing/qstash/compare-table";
