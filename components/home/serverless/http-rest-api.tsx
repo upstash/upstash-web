@@ -36,7 +36,7 @@ export default function HttpRestApi() {
               <label
                 key={key}
                 className={cx(
-                  "select-none bg-white bg-opacity-03 px-4 py-1 text-sm first:rounded-l-full last:rounded-r-full",
+                  "select-none bg-white bg-opacity-3 px-4 py-1 text-sm first:rounded-l-full last:rounded-r-full",
                   value === product && "bg-opacity-10"
                 )}
               >
