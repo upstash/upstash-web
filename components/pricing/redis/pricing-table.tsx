@@ -57,7 +57,7 @@ export default function PricingTable() {
           </h4>
 
           <h5 className="text-3xl font-semibold">$0.2</h5>
-          <p className="text-white/40">-</p>
+          <p className="text-white/40">per 100K commands</p>
         </div>
 
         <div className="grow">

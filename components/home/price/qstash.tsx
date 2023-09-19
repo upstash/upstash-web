@@ -48,7 +48,7 @@ export default function PriceQStash() {
       <PriceHr />
 
       <PriceButton
-        href="/pricing"
+        href="/pricing/qstash"
         onClick={() => {
           segment.track("button.pricing.redis");
         }}

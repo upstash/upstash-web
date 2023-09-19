@@ -57,10 +57,11 @@ export default function PricingTable() {
           </h4>
 
           <h5 className="text-3xl font-semibold">$0.2</h5>
+          <p className="text-white/40">per 100K messages </p>
           <p className="text-white/40">Multi Replica: $0.6</p>
         </div>
 
-        <div className="grow">
+        <div className="grow mt-[-1.5rem]">
           <div className="text-white/80">
             For use cases with bursting traffic.
           </div>
