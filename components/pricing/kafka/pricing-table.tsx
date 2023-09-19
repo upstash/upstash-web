@@ -61,7 +61,7 @@ export default function PricingTable() {
           <p className="text-white/40">Multi Replica: $0.6</p>
         </div>
 
-        <div className="grow mt-[-1.5rem]">
+        <div className="grow -mt-6">
           <div className="text-white/80">
             For use cases with bursting traffic.
           </div>
