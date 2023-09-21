@@ -21,3 +21,11 @@ export type Example = {
   blogUrl: string;
   previewUrl: string;
 };
+
+export enum PricingPlans {
+  Free = "free",
+  PayAsYouGo = "payAsYouGo",
+  Pro2K = "pro2k",
+  Pro10K = "pro10k",
+  Enterprise = "enterprise",
+}

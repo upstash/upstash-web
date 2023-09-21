@@ -3,6 +3,7 @@
 import cx from "@/utils/cx";
 import { HTMLProps, useState } from "react";
 import { IconArrow } from "@/components/post/toc";
+
 export default function ExpandableCode({
   children,
   title,
@@ -11,7 +12,7 @@ export default function ExpandableCode({
   title: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  
+
   return (
     <div>
       <Toc>
@@ -71,4 +72,3 @@ Toc.Summary = function TocSummary({
     </summary>
   );
 };
-

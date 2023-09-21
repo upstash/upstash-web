@@ -2,10 +2,6 @@ import cx from "@/utils/cx";
 import React, { Children, cloneElement, HTMLProps, ReactElement } from "react";
 import { Product } from "@/utils/type";
 import Button, { IButton } from "@/components/button";
-import Icon, { ICON_NAMES } from "@/components/icon";
-import IconRedis from "@/components/icon-redis";
-import IconQStash from "@/components/icon-qstash";
-import IconKafka from "@/components/icon-kafka";
 import { useSegment } from "@/hooks/use-segment";
 
 export default function HomeHeroProducts({
@@ -17,7 +13,7 @@ export default function HomeHeroProducts({
 }) {
   return (
     <div
-      className="grid gap-2 mt-8 md:mt-16 md:grid-cols-3"
+      className="mt-8 grid gap-2 md:mt-16 md:grid-cols-3"
       onMouseLeave={() => setActiveProduct(undefined)}
     >
       <HomeHeroProduct
@@ -104,7 +100,7 @@ function HomeHeroProduct({
         "md:first:rounded-t-lg md:last:rounded-b-lg",
         "md:first:!rounded-l-4xl md:last:!rounded-r-4xl",
         "hover:scale-[1.02] hover:bg-white/10",
-        className
+        className,
       )}
       {...props}
     >
@@ -122,7 +118,7 @@ function HeroProductTitle({
       className={cx(
         "flex items-center gap-1 text-zinc-50",
         "font-display text-2xl font-medium leading-none",
-        className
+        className,
       )}
     >
       {children}
@@ -147,33 +143,31 @@ function HeroProductCta({
   activeProduct?: Product;
   active?: boolean;
 }) {
-  const segment = useSegment()
+  const segment = useSegment();
   return (
     <Button
       type="button"
       className={cx(
         "mt-4",
-        activeProduct ? "bg-white/03 text-zinc-50" : "bg-zinc-50 text-zinc-950",
+        activeProduct ? "bg-white/3 text-zinc-50" : "bg-zinc-50 text-zinc-950",
         activeProduct === Product.REDIS && active && "!bg-red-500 !text-white",
         activeProduct === Product.KAFKA && active && "!bg-blue-500 !text-white",
         activeProduct === Product.QSTASH &&
-        active &&
-        "!bg-purple-500 !text-white",
-        className
+          active &&
+          "!bg-purple-500 !text-white",
+        className,
       )}
       onClick={(e) => {
         switch (activeProduct) {
           case Product.REDIS:
-            segment.track("button.create.redis")
+            segment.track("button.create.redis");
             break;
           case Product.KAFKA:
-            segment.track("button.create.kafka")
+            segment.track("button.create.kafka");
             break;
           case Product.QSTASH:
-            segment.track("button.create.qstash")
+            segment.track("button.create.qstash");
             break;
-
-
         }
       }}
       {...props}

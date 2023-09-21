@@ -5,7 +5,6 @@ import ExampleFilter from "./filter";
 import { Example as Box } from "./comp";
 import type { Example } from "@/utils/type";
 import { authors } from "@/utils/authors";
-import { set } from "lodash";
 import Button from "@/components/button";
 
 type Props = {
@@ -125,7 +124,7 @@ export const Client: React.FC<Props> = ({ examples, useCases, stack }) => {
         <div className="flex w-[100%] flex-col gap-4 border-b border-b-white/5  sm:flex-row sm:justify-between sm:py-4">
           <Button
             href="https://github.com/upstash/examples#contributing"
-            className="text-white rounded bg-white/10 "
+            className="rounded bg-white/10 text-white "
             type="button"
           >
             Contribute

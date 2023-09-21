@@ -31,11 +31,11 @@ export default function SectionMenu({
   });
 
   useEffect(() => {
-    Events.scrollEvent.register("begin", function() {
+    Events.scrollEvent.register("begin", function () {
       console.log("begin", arguments);
     });
 
-    Events.scrollEvent.register("end", function() {
+    Events.scrollEvent.register("end", function () {
       console.log("end", arguments);
     });
 
@@ -44,7 +44,7 @@ export default function SectionMenu({
       Events.scrollEvent.remove("end");
     };
   }, [show]);
-  const segment = useSegment()
+  const segment = useSegment();
   return (
     <motion.div
       className={cx(
@@ -62,9 +62,7 @@ export default function SectionMenu({
       transition={{ duration: 0.16 }}
       {...props}
     >
-      <div
-        className="absolute inset-x-0 top-0 h-40 pointer-events-none -z-10 bg-gradient-to-b from-zinc-950 to-transparent"
-      />
+      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-40 bg-gradient-to-b from-zinc-950 to-transparent" />
 
       <div
         className={cx(
@@ -78,7 +76,7 @@ export default function SectionMenu({
               duration: 0,
             })
           }
-          className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-zinc-100"
+          className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-zinc-100"
         >
           <LogoIcon lightBg height={30} />
         </SpyLink>
@@ -91,7 +89,10 @@ export default function SectionMenu({
           <SectionMenuItem href={HOME_SECTIONS.PRODUCTS}>
             Products
           </SectionMenuItem>
-          <SectionMenuItem href={HOME_SECTIONS.PRICING} onClick={() => segment.track("button.pricing")}>
+          <SectionMenuItem
+            href={HOME_SECTIONS.PRICING}
+            onClick={() => segment.track("button.pricing")}
+          >
             Pricing
           </SectionMenuItem>
           {/*<SectionMenuItem href={HOME_SECTIONS.OPEN_SOURCE}>*/}

@@ -9,19 +9,16 @@ const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export default function FastResult() {
   const [r, setR] = useState<number>();
-  const segment = useSegment()
+  const segment = useSegment();
   return (
     <div>
-      <header
-        className="flex items-center justify-between py-3 text-xs tracking-widest uppercase border-b border-b-zinc-900 text-zinc-600 md:py-2"
-      >
+      <header className="flex items-center justify-between border-b border-b-zinc-900 py-3 text-xs uppercase tracking-widest text-zinc-600 md:py-2">
         <span>Regions</span>
         <span className="flex items-center gap-1">
           <button
             onClick={() => {
-              console.log("XX")
-              segment.track("button.fast-anywhere.refresh")
-              setR(Date.now())
+              segment.track("button.fast-anywhere.refresh");
+              setR(Date.now());
             }}
             type="button"
             className="hover:text-emerald-400"
@@ -87,7 +84,7 @@ export default function FastResult() {
           return (
             <div
               key={url}
-              className="flex items-center justify-between py-3 border-b border-b-zinc-900 md:py-2"
+              className="flex items-center justify-between border-b border-b-zinc-900 py-3 md:py-2"
             >
               <span>{title}</span>
               <span className="ml-auto">
