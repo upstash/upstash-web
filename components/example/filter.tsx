@@ -298,7 +298,7 @@ function FormContent({
         <Toc className="mt-4 sm:mt-0">
           <Toc.Summary count={selectedStacks.length}>Stack</Toc.Summary>
           <div className=" w-[100%]">
-            <div className="grid grid-flow-row auto-rows-[3.125rem] space-y-0.5">
+            <div className="grid grid-flow-row auto-rows-[3.125rem] space-y-0.5 pointer-events-auto">
               {queriedStacks.length !== 0 ? (
                 queriedStacks.map((key) => {
                   return (
@@ -333,7 +333,7 @@ function FormContent({
         <Toc>
           <Toc.Summary count={selectedUseCase.length}>Use Cases</Toc.Summary>
           <div className="w-[100%] space-y-0.5">
-            <div className="grid  grid-flow-row auto-rows-[3.125rem] space-y-0.5 ">
+            <div className="grid  grid-flow-row auto-rows-[3.125rem] space-y-0.5 pointer-events-auto">
               {queriedUseCases.length !== 0 ? (
                 queriedUseCases.map((key) => {
                   return (
@@ -368,7 +368,7 @@ function FormContent({
         <Toc className="mt-4 sm:mt-0">
           <Toc.Summary count={selectedLanguages.length}>Language</Toc.Summary>
           <div className=" w-[100%]">
-            <div className="grid grid-flow-row auto-rows-[3.125rem] space-y-0.5">
+            <div className="grid grid-flow-row auto-rows-[3.125rem] space-y-0.5 pointer-events-auto">
               {queriedLanguages.length !== 0 ? (
                 queriedLanguages.map((key) => {
                   return (
@@ -403,7 +403,7 @@ function FormContent({
         <Toc className="mt-4 sm:mt-0">
           <Toc.Summary count={selectedPlatforms.length}>Platforms</Toc.Summary>
           <div className=" w-[100%]">
-            <div className="grid grid-flow-row auto-rows-[3.125rem] space-y-0.5">
+            <div className="grid grid-flow-row auto-rows-[3.125rem] space-y-0.5 pointer-events-auto">
               {queriedPlatforms.length !== 0 ? (
                 queriedPlatforms.map((key) => {
                   return (
@@ -449,9 +449,10 @@ function Child({ className, children, ...props }: HTMLProps<HTMLDivElement>) {
 function Toc({ className, children, ...props }: HTMLProps<HTMLDetailsElement>) {
   return (
     <details
+      open={true}
       role="navigation"
       aria-label="Use Cases"
-      className={cx("group/toc", className)}
+      className={cx("group/toc pointer-events-none", className)}
       {...props}
     >
       {children}
@@ -469,7 +470,7 @@ Toc.Summary = function TocSummary({
     <summary
       className={cx(
         "flex select-none list-none items-center gap-2",
-        "mb-px h-10 rounded px-4 text-white/40 hover:bg-white/3 ",
+        "mb-px h-10 rounded px-4 text-white/40 hover:bg-white/3  ",
         className,
       )}
       {...props}
@@ -477,7 +478,7 @@ Toc.Summary = function TocSummary({
       <span className="inline-flex w-5 shrink-0 items-center justify-center">
         <IconArrow className="rotate-0 group-open/toc:rotate-90" />
       </span>
-      <span className="grow text-sm uppercase tracking-wide ">{children}</span>
+      <span className="grow text-sm uppercase tracking-wide">{children}</span>
       {count > 0 && (
         <span className="inline-flex h-5 items-center justify-center rounded-full bg-white/5 px-2 font-mono text-sm">
           {count}
