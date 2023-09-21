@@ -15,6 +15,15 @@ export const ProductsLabel = {
   qstash: "QStash",
 };
 
+const LanguagesLabel = {
+  ts: "TypeScript",
+  js: "JavaScript",
+  py: "Python",
+  rs: "Rust",
+  rb: "Ruby",
+  java: "Java",
+};
+
 export default function ExampleFilter({
   selectedProducts,
   setSelectedProduct,
@@ -22,20 +31,30 @@ export default function ExampleFilter({
   setSelectedUseCase,
   selectedStacks,
   setSelectedStack,
+  selectedLanguages,
+  setSelectedLanguages,
+  selectedPlatforms,
+  setSelectedPlatforms,
   queriedStacks,
-  handleStackQuery,
-  stackQuery,
   queriedUseCases,
-  handleUseCaseQuery,
-  useCaseQuery,
+  queriedLanguages,
+  queriedPlatforms,
 }) {
   const isFilterDirty = React.useMemo(() => {
     return (
       selectedProducts.length > 0 ||
       selectedUseCase.length > 0 ||
-      selectedStacks.length > 0
+      selectedStacks.length > 0 ||
+      selectedLanguages.length > 0 ||
+      selectedPlatforms.length > 0
     );
-  }, [selectedProducts, selectedUseCase, selectedStacks]);
+  }, [
+    selectedProducts,
+    selectedUseCase,
+    selectedStacks,
+    selectedLanguages,
+    selectedPlatforms,
+  ]);
   return (
     <>
       <ExampleFilterMobile
@@ -46,12 +65,14 @@ export default function ExampleFilter({
         setSelectedUseCase={setSelectedUseCase}
         selectedStacks={selectedStacks}
         setSelectedStack={setSelectedStack}
+        selectedLanguages={selectedLanguages}
+        setSelectedLanguages={setSelectedLanguages}
+        selectedPlatforms={selectedPlatforms}
+        setSelectedPlatforms={setSelectedPlatforms}
         queriedStacks={queriedStacks}
-        handleStackQuery={handleStackQuery}
-        stackQuery={stackQuery}
         queriedUseCases={queriedUseCases}
-        handleUseCaseQuery={handleUseCaseQuery}
-        useCaseQuery={useCaseQuery}
+        queriedLanguages={queriedLanguages}
+        queriedPlatforms={queriedPlatforms}
       />
       <ExampleFilterDesktop
         isFilterDirty={isFilterDirty}
@@ -61,12 +82,14 @@ export default function ExampleFilter({
         setSelectedUseCase={setSelectedUseCase}
         selectedStacks={selectedStacks}
         setSelectedStack={setSelectedStack}
+        selectedLanguages={selectedLanguages}
+        setSelectedLanguages={setSelectedLanguages}
+        selectedPlatforms={selectedPlatforms}
+        setSelectedPlatforms={setSelectedPlatforms}
         queriedStacks={queriedStacks}
-        handleStackQuery={handleStackQuery}
-        stackQuery={stackQuery}
         queriedUseCases={queriedUseCases}
-        handleUseCaseQuery={handleUseCaseQuery}
-        useCaseQuery={useCaseQuery}
+        queriedLanguages={queriedLanguages}
+        queriedPlatforms={queriedPlatforms}
       />
     </>
   );
@@ -80,12 +103,14 @@ function ExampleFilterDesktop({
   setSelectedUseCase,
   selectedStacks,
   setSelectedStack,
+  selectedLanguages,
+  setSelectedLanguages,
+  selectedPlatforms,
+  setSelectedPlatforms,
   queriedStacks,
-  handleStackQuery,
-  stackQuery,
   queriedUseCases,
-  handleUseCaseQuery,
-  useCaseQuery,
+  queriedLanguages,
+  queriedPlatforms,
 }) {
   return (
     <form className="hidden gap-4 sm:grid">
@@ -101,8 +126,8 @@ function ExampleFilterDesktop({
                 setSelectedProduct([]);
                 setSelectedUseCase([]);
                 setSelectedStack([]);
-                handleStackQuery({ target: { value: "" } });
-                handleUseCaseQuery({ target: { value: "" } });
+                setSelectedLanguages([]);
+                setSelectedPlatforms([]);
               }}
               className="ml-auto inline-flex h-5 items-center justify-center rounded-full bg-white/5 px-2 text-sm text-white/40"
             >
@@ -118,12 +143,14 @@ function ExampleFilterDesktop({
         setSelectedUseCase={setSelectedUseCase}
         selectedStacks={selectedStacks}
         setSelectedStack={setSelectedStack}
+        selectedLanguages={selectedLanguages}
+        setSelectedLanguages={setSelectedLanguages}
+        selectedPlatforms={selectedPlatforms}
+        setSelectedPlatforms={setSelectedPlatforms}
         queriedStacks={queriedStacks}
-        handleStackQuery={handleStackQuery}
-        stackQuery={stackQuery}
         queriedUseCases={queriedUseCases}
-        handleUseCaseQuery={handleUseCaseQuery}
-        useCaseQuery={useCaseQuery}
+        queriedLanguages={queriedLanguages}
+        queriedPlatforms={queriedPlatforms}
       />
     </form>
   );
@@ -137,12 +164,14 @@ function ExampleFilterMobile({
   setSelectedUseCase,
   selectedStacks,
   setSelectedStack,
+  selectedLanguages,
+  setSelectedLanguages,
+  selectedPlatforms,
+  setSelectedPlatforms,
   queriedStacks,
-  handleStackQuery,
-  stackQuery,
   queriedUseCases,
-  handleUseCaseQuery,
-  useCaseQuery,
+  queriedLanguages,
+  queriedPlatforms,
 }) {
   return (
     <div className="block  sm:hidden">
@@ -159,8 +188,6 @@ function ExampleFilterMobile({
                   setSelectedProduct([]);
                   setSelectedUseCase([]);
                   setSelectedStack([]);
-                  handleStackQuery({ target: { value: "" } });
-                  handleUseCaseQuery({ target: { value: "" } });
                 }}
                 className="ml-auto inline-flex h-5 items-center justify-center rounded-full bg-white/5 px-2 text-sm text-white/40"
               >
@@ -177,12 +204,14 @@ function ExampleFilterMobile({
             setSelectedUseCase={setSelectedUseCase}
             selectedStacks={selectedStacks}
             setSelectedStack={setSelectedStack}
+            selectedLanguages={selectedLanguages}
+            setSelectedLanguages={setSelectedLanguages}
+            selectedPlatforms={selectedPlatforms}
+            setSelectedPlatforms={setSelectedPlatforms}
             queriedStacks={queriedStacks}
-            handleStackQuery={handleStackQuery}
-            stackQuery={stackQuery}
             queriedUseCases={queriedUseCases}
-            handleUseCaseQuery={handleUseCaseQuery}
-            useCaseQuery={useCaseQuery}
+            queriedLanguages={queriedLanguages}
+            queriedPlatforms={queriedPlatforms}
           />
         </div>
       </Toc>
@@ -197,12 +226,14 @@ function FormContent({
   setSelectedUseCase,
   selectedStacks,
   setSelectedStack,
+  selectedLanguages,
+  setSelectedLanguages,
+  selectedPlatforms,
+  setSelectedPlatforms,
   queriedStacks,
-  handleStackQuery,
-  stackQuery,
   queriedUseCases,
-  handleUseCaseQuery,
-  useCaseQuery,
+  queriedLanguages,
+  queriedPlatforms,
 }) {
   return (
     <>
@@ -267,19 +298,7 @@ function FormContent({
         <Toc className="mt-4 sm:mt-0">
           <Toc.Summary count={selectedStacks.length}>Stack</Toc.Summary>
           <div className=" w-[100%]">
-            <div className="w-[100%] border-b border-b-white/5 py-4">
-              <input
-                type="search"
-                className="text:white focus:border-1 border-1 w-[100%] rounded  border-white/5 bg-white/10 px-4 py-2 text-slate-100 transition ease-in-out focus:border-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-500"
-                placeholder="Search for a stack..."
-                value={stackQuery}
-                onChange={(e) => {
-                  handleStackQuery(e);
-                }}
-              />
-            </div>
-
-            <div className="grid h-[14rem] grid-flow-row auto-rows-[3.125rem] space-y-0.5 overflow-scroll">
+            <div className="grid grid-flow-row auto-rows-[3.125rem] space-y-0.5">
               {queriedStacks.length !== 0 ? (
                 queriedStacks.map((key) => {
                   return (
@@ -311,21 +330,10 @@ function FormContent({
         </Toc>
       </Child>
       <Child>
-        <Toc className="mt-4 sm:mt-0">
+        <Toc>
           <Toc.Summary count={selectedUseCase.length}>Use Cases</Toc.Summary>
           <div className="w-[100%] space-y-0.5">
-            <div className="w-[100%] border-b border-b-white/5 py-4">
-              <input
-                type="search"
-                className="text:white focus:border-1 border-1 w-[100%] rounded  border-white/5 bg-white/10 px-4 py-2 text-slate-100 transition ease-in-out focus:border-zinc-100/3 focus:outline-none focus:ring-2 focus:ring-zinc-500"
-                placeholder="Search for an use case..."
-                value={useCaseQuery}
-                onChange={(e) => {
-                  handleUseCaseQuery(e);
-                }}
-              />
-            </div>
-            <div className="grid h-[14rem] grid-flow-row auto-rows-[3.125rem] space-y-0.5 overflow-scroll">
+            <div className="grid  grid-flow-row auto-rows-[3.125rem] space-y-0.5 ">
               {queriedUseCases.length !== 0 ? (
                 queriedUseCases.map((key) => {
                   return (
@@ -350,6 +358,76 @@ function FormContent({
               ) : (
                 <div className="grid h-[100%] w-[100%] items-center justify-center">
                   <p className="text-white/40">No use cases found</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </Toc>
+      </Child>
+      <Child>
+        <Toc className="mt-4 sm:mt-0">
+          <Toc.Summary count={selectedLanguages.length}>Language</Toc.Summary>
+          <div className=" w-[100%]">
+            <div className="grid grid-flow-row auto-rows-[3.125rem] space-y-0.5">
+              {queriedLanguages.length !== 0 ? (
+                queriedLanguages.map((key) => {
+                  return (
+                    <Item
+                      key={key}
+                      value={key}
+                      checked={selectedLanguages.includes(key)}
+                      label={LanguagesLabel[key]}
+                      onChange={(e) => {
+                        const { value, checked } = e.target;
+                        if (checked) {
+                          setSelectedLanguages([...selectedLanguages, value]);
+                        } else {
+                          setSelectedLanguages(
+                            selectedLanguages.filter((item) => item !== value),
+                          );
+                        }
+                      }}
+                    />
+                  );
+                })
+              ) : (
+                <div className="grid h-[100%] w-[100%] items-center justify-center">
+                  <p className="text-white/40">No stacks found</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </Toc>
+      </Child>
+      <Child>
+        <Toc className="mt-4 sm:mt-0">
+          <Toc.Summary count={selectedPlatforms.length}>Platforms</Toc.Summary>
+          <div className=" w-[100%]">
+            <div className="grid grid-flow-row auto-rows-[3.125rem] space-y-0.5">
+              {queriedPlatforms.length !== 0 ? (
+                queriedPlatforms.map((key) => {
+                  return (
+                    <Item
+                      key={key}
+                      value={key}
+                      checked={selectedPlatforms.includes(key)}
+                      label={key}
+                      onChange={(e) => {
+                        const { value, checked } = e.target;
+                        if (checked) {
+                          setSelectedPlatforms([...selectedPlatforms, value]);
+                        } else {
+                          setSelectedPlatforms(
+                            selectedPlatforms.filter((item) => item !== value),
+                          );
+                        }
+                      }}
+                    />
+                  );
+                })
+              ) : (
+                <div className="grid h-[100%] w-[100%] items-center justify-center">
+                  <p className="text-white/40">No stacks found</p>
                 </div>
               )}
             </div>

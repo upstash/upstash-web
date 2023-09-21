@@ -11,52 +11,42 @@ type Props = {
   examples: Example[];
   useCases: Record<string, number>;
   stack: Record<string, number>;
+  languages: Record<string, number>;
+  platforms: Record<string, number>;
 };
 
-export const Client: React.FC<Props> = ({ examples, useCases, stack }) => {
+export const Client: React.FC<Props> = ({
+  examples,
+  useCases,
+  stack,
+  languages,
+  platforms,
+}) => {
   const [selectedProducts, setSelectedProduct] = useState<Example["products"]>(
-    []
+    [],
   );
   const [selectedUseCases, setSelectedUseCases] = useState<string[]>([]);
   const [queriedUseCases, setQueriedUseCases] = useState<string[]>(
-    Object.keys(useCases)
+    Object.keys(useCases),
   );
-  const [useCaseQuery, setUseCaseQuery] = useState<string>("");
 
   const [selectedStacks, setSelectedStack] = useState<string[]>([]);
   const [queriedStacks, setQueriedStacks] = useState<string[]>(
-    Object.keys(stack)
+    Object.keys(stack),
   );
-  const [stackQuery, setStackQuery] = useState<string>("");
+
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
+  const [queriedLanguages, setQueriedLanguages] = useState<string[]>(
+    Object.keys(languages),
+  );
+
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
+  const [queriedPlatforms, setQueriedPlatforms] = useState<string[]>(
+    Object.keys(platforms),
+  );
 
   const [queriedExamples, setQueriedExamples] = useState<Example[]>(examples);
   const [exampleQuery, setExampleQuery] = useState<string>("");
-
-  const handleStackQuery = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value;
-
-    setStackQuery(query);
-    const filteredStacks = Object.keys(stack).filter((item) => {
-      if (selectedStacks.includes(item)) return false;
-      if (query === "") return true;
-      return item.toLocaleLowerCase().includes(query.toLocaleLowerCase());
-    });
-    const outputStack = selectedStacks.concat(filteredStacks);
-    setQueriedStacks(outputStack);
-  };
-
-  const handleUseCaseQuery = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value;
-    setUseCaseQuery(e.target.value);
-
-    const filteredUseCase = Object.keys(useCases).filter((item) => {
-      if (selectedUseCases.includes(item)) return false;
-      if (query === "") return true;
-      return item.toLocaleLowerCase().includes(query.toLocaleLowerCase());
-    });
-    const outputUseCase = selectedUseCases.concat(filteredUseCase);
-    setQueriedUseCases(outputUseCase);
-  };
 
   const handleExampleQuery = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -99,6 +89,27 @@ export const Client: React.FC<Props> = ({ examples, useCases, stack }) => {
       return false;
     }
 
+    /**
+     * Filter out other languages
+     */
+    if (
+      selectedLanguages.length > 0 &&
+      !item.languages.some((l) => selectedLanguages.includes(l))
+    ) {
+      return false;
+    }
+
+    /**
+     * Filter out other platforms
+     */
+
+    if (
+      selectedPlatforms.length > 0 &&
+      !item.platforms?.some((p) => selectedPlatforms.includes(p))
+    ) {
+      return false;
+    }
+
     return true;
   });
 
@@ -112,12 +123,14 @@ export const Client: React.FC<Props> = ({ examples, useCases, stack }) => {
           setSelectedUseCase={setSelectedUseCases}
           selectedStacks={selectedStacks}
           setSelectedStack={setSelectedStack}
+          selectedLanguages={selectedLanguages}
+          setSelectedLanguages={setSelectedLanguages}
+          selectedPlatforms={selectedPlatforms}
+          setSelectedPlatforms={setSelectedPlatforms}
           queriedStacks={queriedStacks}
-          handleStackQuery={handleStackQuery}
-          stackQuery={stackQuery}
           queriedUseCases={queriedUseCases}
-          handleUseCaseQuery={handleUseCaseQuery}
-          useCaseQuery={useCaseQuery}
+          queriedLanguages={queriedLanguages}
+          queriedPlatforms={queriedPlatforms}
         />
       </div>
       <div className="grid grid-flow-row auto-rows-[6_min]">
