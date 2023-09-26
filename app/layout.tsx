@@ -4,7 +4,7 @@ import "@upstash/claps/style.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import localFont from "next/font/local";
-import { ReactNode, Suspense } from "react";
+import { ReactNode } from "react";
 import cx from "@/utils/cx";
 import Header from "@/components/master/header";
 import HeaderMobile from "@/components/master/header-mobile";
@@ -12,7 +12,6 @@ import Footer from "@/components/master/footer";
 import Script from "next/script";
 import { SITE_URL } from "@/utils/const";
 import { SegmentProvider } from "@/lib/segment/provider";
-import Analytics from "@/components/Analytics";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -44,13 +43,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       className={cx(
         inter.variable,
         interDisplay.variable,
-        "min-h-screen scroll-smooth bg-zinc-950 text-sm text-zinc-50 antialiased md:text-base"
+        "min-h-screen scroll-smooth bg-zinc-950 text-sm text-zinc-50 antialiased md:text-base",
       )}
     >
       <body className="pt-20 md:pt-0">
-        <Suspense>
-          <Analytics />
-        </Suspense>
         <SegmentProvider writeKey={process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY!}>
           <Header />
           <HeaderMobile />
@@ -73,6 +69,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                             gtag('js', new Date());
                             gtag('config', 'G-QW5KRSTDM0');`,
               }}
+            />
+            <Script
+              id="hs-script-loader"
+              strategy="afterInteractive"
+              src="//js.hs-scripts.com/6849390.js"
             />
           </>
         )}
