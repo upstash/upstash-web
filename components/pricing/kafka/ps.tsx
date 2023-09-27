@@ -2,15 +2,15 @@ import * as React from "react";
 
 export default function Ps() {
   return (
-    <div className="text-left space-y-6 md:space-y-8">
-      <div className="rounded-xl bg-white/5 px-8 py-6">
-        <h4 className="text-xl text-emerald-400 font-semibold">Free Tier</h4>
+    <div className="space-y-6 text-left md:space-y-8">
+      <div className="px-8 py-6 rounded-xl bg-white/5">
+        <h4 className="text-xl font-semibold text-emerald-400">Free Tier</h4>
 
-        <div className="mt-4 text-white/80 space-y-4">
+        <div className="mt-4 space-y-4 text-white/80">
           <p>
-            You can start using Upstash Free right away without entering your
+            You can start using Upstash for free right away without entering your
             credit card information. This tier lets you create one cluster with
-            a limit of 10K daily messages and $256MB retension size Once you
+            a limit of 10K daily messages and 256MB retention size. Once you
             provide your credit card details, your cluster will upgrade to the
             pay-as-you-go plan and limits will be updated. If you want to try
             Upstash paid and enterprise plans, we can offer Free Trials. Email
@@ -22,15 +22,15 @@ export default function Ps() {
         </div>
       </div>
 
-      <div className="rounded-xl bg-white/5 px-8 py-6">
-        <h4 className="text-xl text-emerald-400 font-semibold">
+      <div className="px-8 py-6 rounded-xl bg-white/5">
+        <h4 className="text-xl font-semibold text-emerald-400">
           Pay as you go
         </h4>
         <h5 className="text-xl text-white/40">
           Components of the Monthly Bill
         </h5>
 
-        <div className="mt-4 text-white/80 space-y-4">
+        <div className="mt-4 space-y-4 text-white/80">
           <p>
             With Pay As you go plan, you can set a maximum monthly budget for
             your Kafka cluster so that you won't be charged beyond this chosen
@@ -46,7 +46,7 @@ export default function Ps() {
             charges are per cluster.
           </p>
 
-          <ul className="list-disc pl-6 space-y-4">
+          <ul className="pl-6 space-y-4 list-disc">
             <li>
               <p>
                 <b>Commands Per second:</b> You are billed based on the number
@@ -96,15 +96,15 @@ export default function Ps() {
         </div>
       </div>
 
-      <div className="rounded-xl bg-white/5 px-8 py-6">
-        <h4 className="text-xl text-emerald-400 font-semibold">
+      <div className="px-8 py-6 rounded-xl bg-white/5">
+        <h4 className="text-xl font-semibold text-emerald-400">
           Pro / Enterprise Plans
         </h4>
         <h5 className="text-xl text-white/40">
           Components of the Monthly Bill
         </h5>
 
-        <div className="mt-4 text-white/80 space-y-4">
+        <div className="mt-4 space-y-4 text-white/80">
           <p>
             For the Pro/Enterprise tiers, you'll be charged a fixed monthly
             price per cluster. There is no requirement for long-term contracts
@@ -123,7 +123,7 @@ export default function Ps() {
             components:
           </p>
 
-          <ul className="list-disc pl-6 space-y-4">
+          <ul className="pl-6 space-y-4 list-disc">
             <li>
               <p>
                 <b>Monthly fixed price:</b> This is fixed based on the Pro tier
@@ -164,7 +164,7 @@ export default function Ps() {
                 about their pricing.
               </p>
 
-              <ul className="mt-4 list-disc pl-6 space-y-4">
+              <ul className="pl-6 mt-4 space-y-4 list-disc">
                 <li>
                   <p>
                     <b>IP Whitelisting:</b> You can set the IP addresses which
