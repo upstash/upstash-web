@@ -43,7 +43,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       className={cx(
         inter.variable,
         interDisplay.variable,
-        "min-h-screen scroll-smooth bg-zinc-950 text-sm text-zinc-50 antialiased md:text-base"
+        "min-h-screen scroll-smooth bg-zinc-950 text-sm text-zinc-50 antialiased md:text-base",
       )}
     >
       <body className="pt-20 md:pt-0">

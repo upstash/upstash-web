@@ -13,17 +13,25 @@ export const revalidate = 60;
 
 export default async function ExamplesPage() {
   const examples: Example[] = await getData();
-
   // counting occurences of each stack
   const stack: Record<string, number> = {};
   const useCases: Record<string, number> = {};
-
+  const languages: Record<string, number> = {};
+  const platforms: Record<string, number> = {};
   for (const e of examples) {
     for (const s of e.stack) {
       stack[s] = (stack[s] || 0) + 1;
     }
     for (const s of e.useCases) {
       useCases[s] = (useCases[s] || 0) + 1;
+    }
+    for (const s of e.languages) {
+      languages[s] = (languages[s] || 0) + 1;
+    }
+    if (e.platforms) {
+      for (const s of e.platforms) {
+        platforms[s] = (platforms[s] || 0) + 1;
+      }
     }
   }
 
@@ -46,7 +54,13 @@ export default async function ExamplesPage() {
       {/* body */}
       <section className="mt-2 sm:mt-6">
         <Container>
-          <Client examples={examples} stack={stack} useCases={useCases} />
+          <Client
+            examples={examples}
+            stack={stack}
+            useCases={useCases}
+            languages={languages}
+            platforms={platforms}
+          />
         </Container>
       </section>
     </main>

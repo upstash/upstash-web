@@ -20,6 +20,15 @@ type Props = {
   };
 };
 
+const LanguagesLabel = {
+  ts: "TypeScript",
+  js: "JavaScript",
+  py: "Python",
+  rs: "Rust",
+  rb: "Ruby",
+  java: "Java",
+};
+
 export async function generateStaticParams(): Promise<Props["params"][]> {
   const examples: Example[] = await getData();
 
@@ -35,7 +44,7 @@ export async function generateMetadata({
 }) {
   const examples: Example[] = await getData();
   const example = examples.find(
-    (item) => item.title.toLowerCase().replace(/ /g, "-") === params.slug
+    (item) => item.title.toLowerCase().replace(/ /g, "-") === params.slug,
   );
 
   if (!example) {
@@ -57,7 +66,7 @@ export async function generateMetadata({
 export default async function BlogPage({ params }: Props) {
   const examples: Example[] = await getData();
   const example = examples.find(
-    (item) => item.title.toLowerCase().replace(/ /g, "-") === params.slug
+    (item) => item.title.toLowerCase().replace(/ /g, "-") === params.slug,
   );
 
   if (!example) {
@@ -153,6 +162,24 @@ export default async function BlogPage({ params }: Props) {
                       .join(", ")}
                   </>
                 </ExampleMetaRow>
+
+                <ExampleMetaRow title="Languages">
+                  <>
+                    {example.languages.map((item) => {
+                      return LanguagesLabel[item];
+                    })}
+                  </>
+                </ExampleMetaRow>
+
+                {example.platforms && (
+                  <ExampleMetaRow title="Platforms">
+                    <>
+                      {example.platforms.map((item) => {
+                        return item;
+                      })}
+                    </>
+                  </ExampleMetaRow>
+                )}
 
                 <ExampleMetaRow title="Publisher">
                   <Button href={`https://github.com/${author.name}`}>
