@@ -1,0 +1,124 @@
+---
+slug: query
+title: "Typesafe Queries for Redis" 
+authors:
+  - andreas
+tags: [redis, serverless, index, query]
+---
+
+
+Upstash for Redis is a versatile and high-performance globally distributed data store, but it requires you to think differently about data modeling. Unlike traditional relational databases, Redis doesn't allow querying your data by arbitrary properties out of the box. This limitation can make it challenging to query data efficiently.
+
+A solution to this problem is to create secondary indexes on your data. Secondary indexes are data structures that allow you to query your data by a single or multiple properties in constant time. For example, you could create an index on a user's email address to retrieve the user's data by email. Secondary indices are incredibly fast when reading data, but they require extra work when writing data. You need to update the index when you create, update, or delete a document.
+
+That doesn't sound like a lot of fun to do manually, does it? So we solved it for you.
+
+
+## Introducing `@upstash/query`
+
+
+`@upstash/query` is a TypeScript SDK that allows you to create secondary indices on your Redis data and run queries using a simple API.
+
+
+
+To make it easy to use, we are introducing two new concepts: `Collection` and `Index`.
+- A **collection** is just a set of documents of the same type. You can think of it as a table in a relational database.
+- An **index** creates a quick lookup table that maps search-terms to documents in a collection.
+
+
+
+Here's a quick demo of what you can do with `@upstash/query`.
+Searches and filters are blazing fast, check out the source code of the demo [here](https://github.com/upstash/examples/tree/main/examples/upstash-query).
+
+<video controls>
+  <source src="/blog/upstash-query/query-demo.mp4" type="video/mp4"/>
+</video>
+
+
+
+
+## Quick Start
+
+Getting started is a straightforward process. This quickstart is loosely based on the example above, let's dive right in:
+
+
+You can install using your favourite package manager or if you need time to grab a beverage first, you can use `npm`:
+```bash
+npm install @upstash/query @upstash/redis
+```
+
+```ts
+import { Redis } from "@upstash/redis";
+import { Query } from "@upstash/query";
+
+// Define a custom type for your documents
+type Deployment = {
+    id: string;
+    time: number
+    organization: string;
+    gitHash: string;
+};
+
+// Initialize the client
+const q = new Query({
+    redis: Redis.fromEnv({ automaticDeserialization: false }),
+});
+
+// Create your first collection
+const deployments = q.createCollection<Deployment>("deployments");
+
+// Create a searchable index on the collection
+// The available terms are strictly typed based on your document type above
+const deploymentsByOrganization = deployments.createIndex({
+    name: "deployments_by_organization",
+    terms: ["organization"], // you can also add multiple terms
+});
+
+const deployment: Deployment = {
+    id: "1",
+    time: Date.now(),
+    organization: "Upstash",
+    gitHash: "1234567890",
+};
+
+// Create and store your first deployment
+await deployments.set(deployment.id, deployment);
+
+// Query by organization
+const upstashDeployments = await deploymentsByOrganization.match({ organization: "Upstash" });
+```
+You'll receive the following result including all documens where `organization === "Upstash"`:
+
+```ts
+[
+    {
+        id: "1",
+        ts: 1630480000000, // timestamp of last modification,
+        data: {
+            id: "1",
+            time: 1630480000000,
+            organization: "Upstash",
+            gitHash: "1234567890",
+        }
+    }
+]
+
+```
+
+When you're adding, modifying or deleting a document in a collection, we automatically update all secondary indices in a single transaction. This ensures that your data is always consistent.
+
+
+That's already it. Nothing more to do. You can now query your data by any property you want. You can also create multiple indices on the same collection to query your data in different ways.
+
+
+
+
+
+Let us know what you think about it and what you're excited to build with it. We're always happy to hear from you. You can reach us on [Twitter](https://twitter.com/upstash) or [Discord](https://upstash.com/discord).
+
+
+## Additional Resources
+
+- [GitHub Repository](https://github.com/upstash/query)
+- [Documentation](https://upstash.com/docs/oss/sdks/ts/query/overview)
+- [Example](https://query.upstash.app/)
