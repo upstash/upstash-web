@@ -26,7 +26,7 @@ export class Segment {
 
 
   async load(writeKey: string): Promise<void> {
-    if (this.analytics) {
+    if (this.analytics || typeof window === "undefined") {
       return
     }
     const [analytics] = await AnalyticsBrowser.load({ writeKey })
