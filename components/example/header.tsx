@@ -1,7 +1,7 @@
 import Balancer from "react-wrap-balancer";
 import Container from "@/components/container";
 import Button from "@/components/button";
-import { Example } from "@/utils/type";
+import { Example } from "@/app/examples/get-data";
 
 type Props = {
   example: Example;
@@ -17,7 +17,7 @@ export default function ExampleHeader({ example }: Props) {
         </h1>
 
         {/* meta */}
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
+        <div className="flex flex-wrap items-center justify-center gap-4 mt-6">
           {example.products.map((item) => {
             return (
               <div key={item} className="inline-flex gap-1 text-lg">

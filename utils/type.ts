@@ -9,21 +9,6 @@ export enum CodeExample {
   fetch = "JavaScript (Fetch)",
 }
 
-export type Example = {
-  id: string;
-  githubUrl: string;
-  title: string;
-  products: ("redis" | "kafka" | "qstash")[];
-  stack: string[];
-  useCases: string[];
-  languages: string[];
-  platforms: string[];
-  author: string;
-  body: string;
-  blogUrl: string;
-  previewUrl: string;
-};
-
 export enum PricingPlans {
   Free = "free",
   PayAsYouGo = "payAsYouGo",

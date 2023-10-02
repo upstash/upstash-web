@@ -1,8 +1,6 @@
 import { notFound } from "next/navigation";
-import { SITE_URL } from "@/utils/const";
 import Container from "@/components/container";
-import { Example } from "@/utils/type";
-import getData from "../get-data";
+import { type Example, getData } from "../get-data";
 import markdownToHtml from "@/utils/markdownToHtml";
 import Balancer from "react-wrap-balancer";
 import Button from "@/components/button";
@@ -53,13 +51,8 @@ export async function generateMetadata({
     };
   }
 
-  const title = example.title;
-  const url = `${SITE_URL}/examples/${example.title
-    .toLowerCase()
-    .replace(/ /g, "-")}`;
-
   return {
-    title,
+    title: example.title,
   };
 }
 
@@ -82,16 +75,16 @@ export default async function BlogPage({ params }: Props) {
   return (
     <main className="">
       <Container>
-        <div className="border-b border-white/5 py-4">
+        <div className="py-4 border-b border-white/5">
           <Link href="/examples" className="inline-flex opacity-60">
             ← Back to Examples
           </Link>
         </div>
 
-        <div className="mt-8 grid gap-8 text-left md:mt-16 md:grid-cols-3 md:gap-16">
+        <div className="grid gap-8 mt-8 text-left md:mt-16 md:grid-cols-3 md:gap-16">
           {/* meta */}
           <div className="order-2 md:order-1">
-            <div className="top-8 rounded-2xl bg-emerald-100/5 p-6 md:sticky">
+            <div className="p-6 top-8 rounded-2xl bg-emerald-100/5 md:sticky">
               <div className="-mt-2">
                 <ExampleMetaRow title="Products">
                   <>
@@ -188,7 +181,7 @@ export default async function BlogPage({ params }: Props) {
                 </ExampleMetaRow>
               </div>
 
-              <div className="mt-6 grid gap-4">
+              <div className="grid gap-4 mt-6">
                 {example.blogUrl && (
                   <Button
                     type="button"
@@ -244,7 +237,7 @@ export default async function BlogPage({ params }: Props) {
               </h1>
 
               <div
-                className="post mt-8 leading-p"
+                className="mt-8 post leading-p"
                 dangerouslySetInnerHTML={{ __html: content }}
               />
             </article>
@@ -264,11 +257,11 @@ function ExampleMetaRow({
   title: string;
 }) {
   return (
-    <div className="flex items-center border-b border-b-emerald-100/5 py-3">
-      <div className="text-xs uppercase tracking-widest opacity-40">
+    <div className="flex items-center py-3 border-b border-b-emerald-100/5">
+      <div className="text-xs tracking-widest uppercase opacity-40">
         {title}:
       </div>
-      <div className="ml-auto flex items-center text-right">{children}</div>
+      <div className="flex items-center ml-auto text-right">{children}</div>
     </div>
   );
 }

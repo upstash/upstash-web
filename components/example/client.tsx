@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import ExampleFilter from "./filter";
 import { Example as Box } from "./comp";
-import type { Example } from "@/utils/type";
+import type { Example } from "@/app/examples/get-data"
 import { authors } from "@/utils/authors";
 import Button from "@/components/button";
 
@@ -137,7 +137,7 @@ export const Client: React.FC<Props> = ({
         <div className="flex w-[100%] flex-col gap-4 border-b border-b-white/5  sm:flex-row sm:justify-between sm:py-4">
           <Button
             href="https://github.com/upstash/examples#contributing"
-            className="rounded bg-white/10 text-white "
+            className="text-white rounded bg-white/10 "
             type="button"
           >
             Contribute
