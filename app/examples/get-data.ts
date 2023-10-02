@@ -6,14 +6,14 @@ const example = z.object({
   githubUrl: z.string(),
   title: z.string(),
   products: z.array(z.enum(["redis" , "kafka" , "qstash"])),
-  stack: z.array(z.string()),
-  useCases: z.array(z.string()),
-  languages: z.array(z.string()),
-  platforms: z.array(z.string()),
+  stack: z.array(z.string()).default([]),
+  useCases: z.array(z.string()).default([]),
+  languages: z.array(z.string()).default([]),
+  platforms: z.array(z.string()).default([]),
   author: z.string(),
   body: z.string(),
-  blogUrl: z.string(),
-  previewUrl: z.string(),
+  blogUrl: z.string().optional(),
+  previewUrl: z.string().optional(),
 
 
 })
