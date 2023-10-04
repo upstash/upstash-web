@@ -143,15 +143,15 @@ There are some other differences, where Cloudflare is more expensive on storage,
 - [Upstash Pricing](https://upstash.com/pricing)
 
 
-### Is Upstash worth it?
+### Is Upstash right for you?
 
 *This is a question only you can answer.*
 
 Obviously we are biased here and really believe in our product and it's value, so take this with a grain of salt.
 
-If you're running a small to medium sized API, the cost difference will likely be negligible. And for larger APIs, you can use a fixed-priced plan from Upstash, which will be cheaper than Cloudflare KV.
+If you're running a small to medium sized API, then you will need to consider latency as the cost will be negligible. When the API has heavy traffic, Upstash offers fixed pricing which is cheaper then Cloudflare KV.
 
-If all you're ever going to need is as simple as `set`, `get` or `list`, you're always going to stay on the workers platform and high latency is acceptable for your application, then Cloudflare KV is great. Everything is handled in the same place and you don't have to worry about anything.
+If all you're ever going to need is as simple as `set`, `get` or `list`, you're always going to stay on the workers platform and high latency is acceptable for your application, then Cloudflare KV might be the right choice. Everything is handled in the same place and you don't have to worry about anything.
 
 If you answered one of those question with *'no'*, then I'd encourage you to give Upstash a try. Redis has lots of features that Cloudflare KV doesn't have, like pub/sub, sorted sets, hashes, etc. And Upstash supports all of them.
 If you're already using Redis, you can just point your application to Upstash and it will just work. No need to change anything.
