@@ -8,8 +8,8 @@ tags: [redis, serverless, cloudflare, kv, cache]
 
 When choosing a deployment platform, it's often very hard to compare the real-world performance between them. This is especially true for serverless platforms, who advertise super low latency due to global edge deployments. But what good is a low latency if fetching your data is still slow? If your api runs right next to the user but needs to do a network roundtrip halfway across the globe to fetch data, you're not going to have a good time.
 
-Traditionally your compute and your storage would be colocated in a single server or at least the same datacenter, but with the rise of serverless and edge functions, we have seen a decoupling of compute and storage. This is great for scaling and availability, but it does introduce a new problem: latency.
-These days it's trivially easy to deploy your api to a global edge network, but what about your data? Data is still trailing behind, but definitly catching up.
+Traditionally your compute and your storage would be colocated in a single server or at least the same datacenter, but with the rise of serverless and edge functions, we have seen a decouppling of compute and storage. This is great for scaling and availability, but it does introduce a new problem: latency.
+These days it's trivially easy to deploy your api to a global edge network, but what about your data? Data is still trailing behind, but definitely catching up.
 
 In this article we will compare the performance of two serverless datastores: Cloudflare KV and Upstash Redis. Both are serverless, both are globally distributed, but they are very different in their approach. Cloudflare KV is a pull-based key-value store, while Upstash is a Redis-compatible service with active replication.
 
@@ -117,7 +117,7 @@ The latency of KV has improved massively:
 
 
 Apparently you really need a rather high load before Cloudflare actually replicates your data closer to the running workers. However it's still far above the latency of Upstash Redis.
-While the P90 latency of Cloudflare of 115ms isn't so bad, the P99 latency of over half a second is clearly noticable. 
+While the P90 latency of Cloudflare of 115ms isn't so bad, the P99 latency of over half a second is clearly noticeable. 
 Keep in mind we are doing around 400 requests per second to ensure the data is actually replicated, which is already more load than most small to medium APIs will usually see.
 
 
@@ -147,7 +147,7 @@ There are some other differences, where Cloudflare is more expensive on storage,
 
 *This is a question only you can answer.*
 
-Obviously we're biased here and really believe in our product and it's value, so take this with a grain of salt.
+Obviously we are biased here and really believe in our product and it's value, so take this with a grain of salt.
 
 If you're running a small to medium sized API, the cost difference will likely be negligible. And for larger APIs, you can use a fixed-priced plan from Upstash, which will be cheaper than Cloudflare KV.
 
@@ -160,4 +160,4 @@ If you're already using Redis, you can just point your application to Upstash an
 
 Cloudflare KV is a great product, but it's not a replacement for a fully-fledged database like Redis. It's a good fit for simple use-cases, where latency isn't a concern.
 
-Come say hi and ask questions about any of this in our [Discord](https://upstash.com/discord) or over on [X](https://twitter.com/upstash).
+Come say hi and ask questions about any of this in our [Discord](https://upstash.com/discord) or over on [X](https://x.com/upstash).
