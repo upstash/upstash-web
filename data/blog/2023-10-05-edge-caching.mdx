@@ -1,0 +1,163 @@
+---
+slug: edgecaching-benchmark
+title: "Edgecaching - Cloudflare KV vs Upstash Redis"
+authors:
+  - andreas
+tags: [redis, serverless, cloudflare, kv, cache]
+---
+
+When choosing a deployment platform, it's often very hard to compare the real-world performance between them. This is especially true for serverless platforms, who advertise super low latency due to global edge deployments. But what good is a low latency if fetching your data is still slow? If your api runs right next to the user but needs to do a network roundtrip halfway across the globe to fetch data, you're not going to have a good time.
+
+Traditionally your compute and your storage would be colocated in a single server or at least the same datacenter, but with the rise of serverless and edge functions, we have seen a decoupling of compute and storage. This is great for scaling and availability, but it does introduce a new problem: latency.
+These days it's trivially easy to deploy your api to a global edge network, but what about your data? Data is still trailing behind, but definitly catching up.
+
+In this article we will compare the performance of two serverless datastores: Cloudflare KV and Upstash Redis. Both are serverless, both are globally distributed, but they are very different in their approach. Cloudflare KV is a pull-based key-value store, while Upstash is a Redis-compatible service with active replication.
+
+<Note>
+  **Pull-based**: The data is generally stored in a central location and only
+  moved to edge-nodes when requested by a user. This is the approach taken by
+  Cloudflare KV.
+  <br />
+  **Active replication**: The data is stored in every edge-location and is kept
+  in sync by the datastore itself. Updates to the data are immediately
+  replicated to all regions. This is the approach taken by Upstash and
+  consequently Vercel.
+</Note>
+
+Caching is really just storing a bunch of keys and their values. It's a simple concept, but it's also a very common one. It's also a great way to compare the performance of two datastores. We will use a simple caching scenario to compare the performance of Cloudflare KV and Upstash Redis.
+
+## The Benchmark
+
+What are we actually testing?
+
+We will measure the latency experienced by a cloudflare worker when reading a single value from Cloudflare KV and Upstash Redis.
+
+- 1 cloudflare worker
+- 1000 keys
+- 4KB - 64KB data size (random)
+- 60s TTL on all keys
+- 20 regions invoking the worker
+- ~10 requests per second
+
+I chose a rather small keyspace, to ensure we're getting some cache hits without having to crank up the RPS too far.
+
+## Worker Code
+
+The worker itself is very simple, it just reads from Redis, reads from KV and then return those latencies to be evaluated later.
+
+```ts title="worker.ts"
+app.get("/test", async (c) => {
+  const redis = Redis.fromEnv(c.env);
+
+  const key = Math.floor(Math.random() * 1_000).toString();
+  const minValueSize = 4 * 1024;
+  const maxValueSize = 64 * 1024;
+  const ttlSeconds = 60;
+  const randomValue = new TextDecoder().decode(crypto.getRandomValues(new Uint8Array(Math.floor(Math.random() * (maxValueSize - minValueSize)) + minValueSize)))
+
+  const beforeRedis = performance.now();
+  const redisResponse = await redis.get(key);
+  const redisLatency = performance.now() - beforeRedis;
+
+  if (!redisResponse) {
+    await redis.set(key, randomValue, {
+      ex: ttlSeconds,
+    });
+  }
+
+  const beforeKV = performance.now();
+  const kvResponse = await c.env.ANDREAS_KV_BENCHMARK.get(key);
+  const kvLatency = performance.now() - beforeKV;
+
+  if (!kvResponse) {
+    await c.env.ANDREAS_KV_BENCHMARK.put(key,randomValue, { expirationTtl: ttlSeconds });
+  }
+
+  return c.json({
+    kvLatency,
+    redisLatency
+  });
+});
+```
+
+
+
+
+## The Results - Global Latency
+
+After running the benchmark for ~30 minutes, we can already observe some significant differences between the two datastores.
+
+<a href="/blog/kv-benchmark/global.png" target="_blank">
+<img src="/blog/kv-benchmark/global.png" />
+Click image for full size
+</a>
+
+As you can see Cloudflare KV is consistently slower than Upstash Redis. I wasn't expecting this, as Cloudflare advertises KV as low-latency and runs on the same platform as the workers themselves. Yes, they don't keep data in every single region by default, but after a few minutes, I'd expect the data to be cached in the region where the worker is running.
+
+Maybe the load isn't high enough for their system to colocate data? 
+Let's isolate a region and increase the load drastically to see if that makes a difference.
+
+## Single Region
+
+Let's look at the results for a single region with much higher RPS. In theory cloudflare should be able to warm all of their caches in this region and get super low latency as advertised.
+
+This test is identical to the first one, except that we're calling the worker from a single region and with ~400 RPS.
+
+
+<a href="/blog/kv-benchmark/single-region.png" target="_blank">
+<img src="/blog/kv-benchmark/single-region.png" />
+Click image for full size
+</a>
+
+
+The latency of KV has improved massively:
+
+- **P90:** 742ms -> 115ms
+- **P99:** 1,336ms ->560ms
+
+
+Apparently you really need a rather high load before Cloudflare actually replicates your data closer to the running workers. However it's still far above the latency of Upstash Redis.
+While the P90 latency of Cloudflare of 115ms isn't so bad, the P99 latency of over half a second is clearly noticable. 
+Keep in mind we are doing around 400 requests per second to ensure the data is actually replicated, which is already more load than most small to medium APIs will usually see.
+
+
+Interestingly you can see when Cloudflare have moved data closer or farther away from the worker annotated in the following image:
+
+<a href="/blog/kv-benchmark/single-region-annotation.png" target="_blank">
+<img src="/blog/kv-benchmark/single-region-annotation.png" />
+Click image for full size
+</a>
+
+
+## Pricing
+
+This wouldn't be a fair comparison without talking about the cost of things.
+
+The main driving factor here will be the per-request cost to access either datastore.
+
+Cloudflare charges $0.50 per million KV reads, while Upstash charges $1 per million Redis commands.
+There are some other differences, where Cloudflare is more expensive on storage, whereas Upstash is more expensive on bandwidth. However, these are not the main cost drivers in this scenario.
+
+
+- [Cloudflare Pricing](https://developers.cloudflare.com/workers/platform/pricing/#workers-kv)
+- [Upstash Pricing](https://upstash.com/pricing)
+
+
+### Is Upstash worth it?
+
+*This is a question only you can answer.*
+
+Obviously we're biased here and really believe in our product and it's value, so take this with a grain of salt.
+
+If you're running a small to medium sized API, the cost difference will likely be negligible. And for larger APIs, you can use a fixed-priced plan from Upstash, which will be cheaper than Cloudflare KV.
+
+If all you're ever going to need is as simple as `set`, `get` or `list`, you're always going to stay on the workers platform and high latency is acceptable for your application, then Cloudflare KV is great. Everything is handled in the same place and you don't have to worry about anything.
+
+If you answered one of those question with *'no'*, then I'd encourage you to give Upstash a try. Redis has lots of features that Cloudflare KV doesn't have, like pub/sub, sorted sets, hashes, etc. And Upstash supports all of them.
+If you're already using Redis, you can just point your application to Upstash and it will just work. No need to change anything.
+
+## Conclusion
+
+Cloudflare KV is a great product, but it's not a replacement for a fully-fledged database like Redis. It's a good fit for simple use-cases, where latency isn't a concern.
+
+Come say hi and ask questions about any of this in our [Discord](https://upstash.com/discord) or over on [X](https://twitter.com/upstash).
