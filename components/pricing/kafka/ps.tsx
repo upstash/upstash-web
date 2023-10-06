@@ -143,7 +143,7 @@ export default function Ps() {
             <li>
               <p>
                 <b>Monthly Bandwidth (Data Transfer Cost):</b> Data transfer is
-                charged at a rate of $0.1 per GB in and $0.05 per GB out for all
+                charged at a rate of $0.1 per GB out and $0.05 per GB in for all
                 the usage throughout the month. For use cases with high volume,
                 you may consider VPC Peering which minimizes the data transfer
                 cost. The above pricing assumes that the clients and cluster are
