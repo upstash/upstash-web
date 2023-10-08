@@ -8,7 +8,6 @@ import Button from "@/components/button";
 import Container from "@/components/container";
 import Nav from "./nav";
 import { allJobs } from "contentlayer/generated";
-import { HOME_SECTIONS } from "@/utils/const";
 
 const jobLength = allJobs.filter((o) => !o.draft).length;
 
@@ -54,13 +53,9 @@ const NavItems: {
     name: "Pricing",
     href: `/pricing`,
   },
-  // {
-  //   name: "Open Source",
-  //   href: "/open-source",
-  // },
   {
-    name: "About",
-    href: "/about",
+    name: "Customers",
+    href: "/customers",
   },
   // {
   //   name: "Examples",
@@ -69,6 +64,10 @@ const NavItems: {
   {
     name: "Blog",
     href: "/blog",
+  },
+  {
+    name: "About",
+    href: "/about",
   },
   {
     name: "Discord",
