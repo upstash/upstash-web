@@ -99,7 +99,12 @@ export default function PricingTable() {
         <div>
           <h4 className="mb-2 text-emerald-400 text-xl font-semibold">Pro</h4>
 
-          <h5 className="text-3xl font-semibold">$180</h5>
+          <h5 className="text-3xl font-semibold flex items-baseline">
+            $180
+            <span className="text-base font-normal opacity-40 ml-1">
+              / month
+            </span>
+          </h5>
           <p className="text-white/40">Starting from</p>
         </div>
 

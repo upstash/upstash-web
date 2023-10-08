@@ -101,7 +101,12 @@ export default function PricingTable() {
             Pro 2K
           </h4>
 
-          <h5 className="text-3xl font-semibold">$280</h5>
+          <h5 className="text-3xl font-semibold flex items-baseline">
+            $280
+            <span className="text-base font-normal opacity-40 ml-1">
+              / month
+            </span>
+          </h5>
           <p className="text-white/40">+$100 ✕ read region</p>
         </div>
 
@@ -147,7 +152,12 @@ export default function PricingTable() {
             Pro 10K
           </h4>
 
-          <h5 className="text-3xl font-semibold">$680</h5>
+          <h5 className="text-3xl font-semibold flex items-baseline">
+            $680
+            <span className="text-base font-normal opacity-40 ml-1">
+              / month
+            </span>
+          </h5>
           <p className="text-white/40">+$200 ✕ read region</p>
         </div>
 
