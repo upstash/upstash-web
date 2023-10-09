@@ -87,28 +87,31 @@ function Highlight(props: {
     <FullWidth>
       <div
         className="group/highlight text-center grid place-items-center gap-6
-                  border-4 rounded-4xl border-white/5 p-10 md:py-16 md:px-20"
+        border-4 rounded-4xl border-white/5 p-10 md:py-16 md:px-20"
       >
-        <Image
-          src={`/customer/${props.photo}`}
-          alt={props.name}
-          width={60}
-          height={60}
-          className="rounded-full"
-        />
+        {props.photo && (
+          <Image
+            src={`/customer/${props.photo}`}
+            alt={props.name}
+            width={60}
+            height={60}
+            className="rounded-full"
+          />
+        )}
 
         <p
-          className="text-xl
-                    bg-clip-text text-transparent
-                    bg-gradient-to-br from-white to-[#6DBEA6]"
+          className="text-xl bg-clip-text font-medium text-transparent
+          bg-gradient-to-br from-white to-[#6DBEA6]"
         >
           {props.children}
         </p>
 
-        <div className="">
-          <h5 className="opacity-80">{props.name}</h5>
-          <h6 className="opacity-40">{props.title}</h6>
-        </div>
+        {(props.name || props.title) && (
+          <div className="">
+            {props.name && <span className="opacity-80">{props.name}</span>}
+            {props.title && <span className="opacity-40">, {props.title}</span>}
+          </div>
+        )}
       </div>
     </FullWidth>
   );
