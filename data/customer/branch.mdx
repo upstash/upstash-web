@@ -1,52 +1,47 @@
 ---
-company: branch
-url: branch.com
+company_name: branch
+company_url: ourbranch.com
+company_logo: branch.svg
+user_name: Adithya
+user_title: Software Engineering Manager
+user_photo: steven.jpeg
 highlight: "Before Upstash we used Redis Cloud. This was not serverless, you had to think about instance size, memory usage etc. which we really don't want to do as it pulls our focus from product engineering, any time spent on operations like this is less time spent on our products and what differentiates Branch."
+cover_image: zapier-cover.png
 ---
 
-#### Introduce Branch to the Upstash community.
+Branch is a personal insurance carrier built on advanced technology that offers affordable home and auto insurance to users. Branch is the only carrier that allows customers to instantly bundle home and auto coverage, and also allow to purchase renters, condo, and umbrella insurance. Branch is a series-C startup with a valuation over a billion dollars.
 
-Branch is a personal insurance carrier built on advanced technology that offers affordable home and auto insurance
-to users. We're the only carrier that allows you to instantly bundle home and auto coverage, and we also allow you
-to purchase renters, condo, and umbrella insurance. We're a series-C startup and our last raise valued us at $1.05
-billion.
+#### An entirely serverless tech stack allowing to have a lean development team
 
-#### Tell us about your tech stack.
+Branch’s tech stack is entirely serverless which is rare in a highly regulated industries like insurance. They have been following the managed services philosophy to offload undifferentiated heavy lifting to vendors and focus all of their software development resources on things that differentiate Branch from others. As a result, they managed to have an extremely lean software development team of around 20 people while still delivering new features and launching products in new states much faster than was previously thought possible.
 
-Our tech stack is entirely serverless which is rare in a highly regulated industry like ours. Our philosophy has
-been to leverage managed services and offload undifferentiated heavy lifting to our vendors and focus all of our
-software development resources on things that differentiate Branch from others. In practice this has allowed us to
-maintain an extremely lean software development team of around 20 people while still delivering new features and
-launching our products in new states much faster than was previously thought possible. We rely on AWS as our primary
-cloud provider, we use GraphQL with AWS AppSync in all of our applications, all of our compute is on AWS Lambda,
-DynamoDB is our primary database, and Cognito as our authentication provider. We like to pick the best tools for the
-job and don't limit ourselves to AWS however -- which is why we use Algolia for search, Neon for our relational
-database workloads, and of course Upstash for our Redis workload.
+<Highlight name="Adithya" title="Software Engineering Manager" photo="steven.jpeg">
+  The biggest compliment that we can give Upstash is that we've never had to
+  think about it since we adopted it. Upstash's billing based usage, and the
+  option for a HTTP-based request-response style of communication (while still
+  supporting persistent connections for compatibility with existing code that
+  touches Redis) has meant that if a developer thinks it's appropriate to use
+  Redis to solve a problem, they just use Upstash without having to think about
+  load / memory usage / storage size / number of connections / any other
+  resource constraints. Having that sort of reliable, zero-surprises
+  infrastructure that you never have to worry about frees up so much time that
+  can be spent on product engineering and working on things that actually make a
+  difference to our customers and business, instead of baby-sitting servers.
+  That's how we like to work at Branch and Upstash has been an amazing fit for
+  us.
+</Highlight>
 
-#### Tell us about your use case of Upstash
+#### Beyond AWS: Picking the Right Tool for the Task
 
-We use Upstash's Redis product as a cache, to maintain state like when a workflow was last run, the last record that
-was processed by a workflow, and for things like rate limiting and deduplicating messages we receive from services
-that have at-least-once delivery like webhooks, and messaging queues.
+Branch mainly rely on AWS as primary cloud provider, use GraphQL with AWS AppSync in all their applications, compute on AWS Lambda, primary database on DynamoDB, Cognito as our authentication provider. However their approach has been not to limit themselves to AWS only but to pick the best tools for the job -- which is they also use multiple other vendors such as Algolia, Neon, and of course Upstash for Redis workload.
 
-#### Before Upstash: What were you using before Upstash?
+#### Journey to truly serverless Upstash Redis
 
-Before Upstash we used Redis Cloud. This was not serverless, you had to think about instance size, memory usage etc.
-which we really don't want to do as it pulls our focus from product engineering, any time spent on operations like
-this is less time spent on our products and what differentiates Branch. The pricing model also didn't really work
-for us because we greatly prefer to be billed based on usage. The need for persistent connections to communicate
-with Redis was also a problem for us, as it doesn't really well with our compute model. All of our compute is on AWS
-Lambda, which means every request is isolated, and so every request that needed to work with Redis would have to
-open its own connection. This means that 10,000 requests -- which really isn't a lot -- would have 10,000 Lambdas
-opening 10,000 connections to Redis.
+Before Upstash Branch first used Redis Cloud, however it was not meeting their expectations from a serverless set up,
 
-#### After Upstash: How did Upstash improve things? What was its impact?
+- **Minimum operational load:** They had to think about instance size, memory usage etc. which would shift focus from product engineering. Any time spent on operations like that meant less time spent on core products and what differentiates Branch.
+- **Usage based pricing:** The pricing model also didn't really meet their preference to be billed based on usage.
+- **Support for Rest API:** The need for persistent connections to communicate with Redis was also a problem for Branch, as it caused issues with their compute model. All compute being on AWS Lambda meant every request is isolated, and so every request that needed to work with Redis would have to open its own connection. This meant that 10,000 requests would have 10,000 Lambdas opening 10,000 connections to Redis.
 
-The biggest compliment that we can give Upstash is that we've never had to think about it since we adopted it.
-Upstash's billing based usage, and the option for a HTTP-based request-response style of communication (while still
-supporting persistent connections for compatibility with existing code that touches Redis) has meant that if a
-developer thinks it's appropriate to use Redis to solve a problem, they just use Upstash without having to think
-about load / memory usage / storage size / number of connections / any other resource constraints. Having that sort
-of reliable, zero-surprises infrastructure that you never have to worry about frees up so much time that can be
-spent on product engineering and working on things that actually make a difference to our customers and business,
-instead of baby-sitting servers. That's how we like to work at Branch and Upstash has been an amazing fit for us.
+Because of all these reasons, they instead started using Upstash Redis product as a cache to maintain state like when a workflow was last run the last record that was processed by a workflow. They also use Redis for its popular rate limiting function and deduplicating messages they receive from services that have at-least-once delivery like webhooks, and messaging queues.
+

@@ -1,10 +1,10 @@
 import Container from "@/components/container";
 import Link from "next/link";
 import { allCustomers, Customer } from "contentlayer/generated";
-import { SITE_URL } from "@/utils/const";
 import { notFound } from "next/navigation";
 import { Mdx } from "@/components/post/mdx";
 import Bg from "@/components/bg";
+import Image from "next/image";
 
 type Props = {
   params: {
@@ -18,41 +18,6 @@ export async function generateStaticParams(): Promise<Props["params"][]> {
     .map((customer) => ({
       slug: customer.slug,
     }));
-}
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Props["params"];
-}) {
-  const customer = allCustomers.find(
-    (customer) => customer.slug === params.slug,
-  ) as Customer;
-  const title = customer.company;
-  const description = customer.highlight;
-  const url = `${SITE_URL}/customers/${customer.slug}`;
-
-  return {
-    title,
-    description,
-    openGraph: {
-      type: "website",
-      locale: "en_US",
-      url,
-      title,
-      description,
-      siteName: title,
-      images: "/og-home.jpg",
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      site: "@upstash",
-      creator: "@upstash",
-      images: "/og-home.jpg",
-    },
-  };
 }
 
 export default async function BlogPage({ params }: Props) {
@@ -83,7 +48,15 @@ export default async function BlogPage({ params }: Props) {
 
         <article>
           <header className="py-20 text-center">
-            <div>header</div>
+            <Container className="max-w-screen-lg">
+              <Image
+                src={`/customer/${customer.cover_image}`}
+                alt={customer.company_name}
+                width={1760}
+                height={920}
+                className="rounded-3xl"
+              />
+            </Container>
           </header>
 
           <div>
@@ -95,4 +68,36 @@ export default async function BlogPage({ params }: Props) {
       </main>
     </>
   );
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Props["params"];
+}) {
+  const customer = allCustomers.find(
+    (customer) => customer.slug === params.slug,
+  ) as Customer;
+  const title = customer.company_name;
+  const description = customer.highlight;
+  const baseUrl = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "http://localhost:3000";
+
+  return {
+    title,
+    description,
+    openGraph: {
+      type: "article",
+      title,
+      description,
+      url: `${baseUrl}/customers/${customer.slug}`,
+    },
+
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+  };
 }

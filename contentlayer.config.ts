@@ -12,9 +12,14 @@ export const Customer = defineDocumentType(() => ({
   filePathPattern: `customer/*.mdx`,
   contentType: "mdx",
   fields: {
-    company: { type: "string", required: true },
-    url: { type: "string", required: true },
+    company_name: { type: "string", required: true },
+    company_url: { type: "string", required: true },
+    company_logo: { type: "string", required: true },
+    user_name: { type: "string", required: true },
+    user_title: { type: "string", required: true },
+    user_photo: { type: "string", required: true },
     highlight: { type: "string", required: true },
+    cover_image: { type: "string", required: true },
     draft: { type: "boolean" },
   },
   computedFields: {
