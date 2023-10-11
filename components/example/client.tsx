@@ -114,7 +114,7 @@ export const Client: React.FC<Props> = ({
   });
 
   return (
-    <div className="grid items-start gap-4 text-left sm:auto-cols-[1fr_4fr] sm:auto-cols-[1fr_4fr] sm:grid-flow-col  sm:gap-10 lg:flex-row lg:items-start lg:gap-10">
+    <div className="grid items-start gap-4 text-left sm:auto-cols-[1fr_4fr] sm:grid-flow-col  sm:gap-10 lg:flex-row lg:items-start lg:gap-10">
       <div className="mt-2  sm:mt-[4.5rem] lg:w-[100%] xl:w-[100%]">
         <ExampleFilter
           selectedProducts={selectedProducts}
@@ -137,7 +137,7 @@ export const Client: React.FC<Props> = ({
         <div className="flex w-[100%] flex-col gap-4 border-b border-b-white/5  sm:flex-row sm:justify-between sm:py-4">
           <Button
             href="https://github.com/upstash/examples#contributing"
-            className="text-white rounded bg-white/10 "
+            className="rounded bg-white/10 text-white "
             type="button"
           >
             Contribute

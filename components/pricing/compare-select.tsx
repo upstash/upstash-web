@@ -30,7 +30,7 @@ export default function CompareSelect({
 
   return (
     <select
-      className="md:hidden font-semibold bg-transparent px-4 py-2"
+      className="bg-transparent px-4 py-2 font-semibold md:hidden"
       onChange={(e) => onChangeEvent(e, value)}
       {...props}
     >

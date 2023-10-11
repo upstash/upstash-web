@@ -3,7 +3,7 @@ import * as React from "react";
 export default function Ps() {
   return (
     <div className="space-y-6 text-left md:space-y-8">
-      <div className="px-8 py-6 rounded-xl bg-white/5">
+      <div className="rounded-xl bg-white/5 px-8 py-6">
         <h4 className="text-xl font-semibold text-emerald-400">Free Tier</h4>
 
         <div className="mt-4 space-y-4 text-white/80">
@@ -22,7 +22,7 @@ export default function Ps() {
         </div>
       </div>
 
-      <div className="px-8 py-6 rounded-xl bg-white/5">
+      <div className="rounded-xl bg-white/5 px-8 py-6">
         <h4 className="text-xl font-semibold text-emerald-400">
           Pay as you go
         </h4>
@@ -46,7 +46,7 @@ export default function Ps() {
             charges are per cluster.
           </p>
 
-          <ul className="pl-6 space-y-4 list-disc">
+          <ul className="list-disc space-y-4 pl-6">
             <li>
               <p>
                 <b>Commands Per second:</b> You are billed based on the number
@@ -96,7 +96,7 @@ export default function Ps() {
         </div>
       </div>
 
-      <div className="px-8 py-6 rounded-xl bg-white/5">
+      <div className="rounded-xl bg-white/5 px-8 py-6">
         <h4 className="text-xl font-semibold text-emerald-400">
           Pro / Enterprise Plans
         </h4>
@@ -123,7 +123,7 @@ export default function Ps() {
             components:
           </p>
 
-          <ul className="pl-6 space-y-4 list-disc">
+          <ul className="list-disc space-y-4 pl-6">
             <li>
               <p>
                 <b>Monthly fixed price:</b> This is fixed based on the Pro tier
@@ -164,7 +164,7 @@ export default function Ps() {
                 about their pricing.
               </p>
 
-              <ul className="pl-6 mt-4 space-y-4 list-disc">
+              <ul className="mt-4 list-disc space-y-4 pl-6">
                 <li>
                   <p>
                     <b>IP Whitelisting:</b> You can set the IP addresses which

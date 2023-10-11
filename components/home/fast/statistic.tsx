@@ -40,7 +40,7 @@ export default function FastStatistic() {
       <p className="mt-6">
         <Link
           href="/fast"
-          className="inline-flex items-center gap-1 underline transition opacity-60 hover:opacity-100"
+          className="inline-flex items-center gap-1 underline opacity-60 transition hover:opacity-100"
         >
           <Icon icon={ICON_NAMES.Bolt} className="text-2xl" />
           Test the speed
