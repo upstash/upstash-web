@@ -38,7 +38,7 @@ export default async function ExamplesPage() {
     <main className="relative z-0 text-center">
       <Bg />
 
-      <section className="pt-8 pb-4 sm:pb-6 sm:pt-12 md:pb-8 md:pt-16">
+      <section className="pb-4 pt-8 sm:pb-6 sm:pt-12 md:pb-8 md:pt-16">
         <Container className="max-w-screen-lg">
           {/* header */}
           <header>

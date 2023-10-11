@@ -2,14 +2,14 @@ import * as React from "react";
 
 export default function Ps() {
   return (
-    <div className="text-left space-y-6 md:space-y-8">
+    <div className="space-y-6 text-left md:space-y-8">
       <div className="rounded-xl bg-white/5 px-8 py-6">
         <p>
           The only thing you are charged for are <code>messages</code> whereas
           retries are free. Below are some message examples:
         </p>
 
-        <ul className="mt-4 list-disc pl-6 space-y-2">
+        <ul className="mt-4 list-disc space-y-2 pl-6">
           <li className="space-y-2">
             <p>
               <b>
@@ -18,7 +18,7 @@ export default function Ps() {
               </b>
             </p>
 
-            <ol className="list-decimal pl-6 space-y-2">
+            <ol className="list-decimal space-y-2 pl-6">
               <li>
                 You make a request to <code>/v1/publish/[your-api-url]</code>
               </li>
@@ -43,7 +43,7 @@ export default function Ps() {
               would be charged for 2 messages
             </p>
 
-            <ol className="list-decimal pl-6 space-y-2">
+            <ol className="list-decimal space-y-2 pl-6">
               <li>
                 You make a request to <code>/v1/publish/[your-api-url]</code>
               </li>
@@ -54,9 +54,9 @@ export default function Ps() {
       </div>
 
       <div className="rounded-xl bg-white/5 px-8 py-6">
-        <h4 className="text-xl text-emerald-400 font-semibold">Free Tier</h4>
+        <h4 className="text-xl font-semibold text-emerald-400">Free Tier</h4>
 
-        <div className="mt-4 text-white/80 space-y-4">
+        <div className="mt-4 space-y-4 text-white/80">
           <p>
             The free tier includes 500 Messages per day. Afterwards we will no
             longer accept new requests.
@@ -65,11 +65,11 @@ export default function Ps() {
       </div>
 
       <div className="rounded-xl bg-white/5 px-8 py-6">
-        <h4 className="text-xl text-emerald-400 font-semibold">
+        <h4 className="text-xl font-semibold text-emerald-400">
           Pay as you go
         </h4>
 
-        <div className="mt-4 text-white/80 space-y-4">
+        <div className="mt-4 space-y-4 text-white/80">
           <p>
             Upstash limits your monthly usage for QStash to daily 500,000 in
             pay-as-you-go plan. If you are expecting to exceed this limit,
@@ -79,11 +79,11 @@ export default function Ps() {
       </div>
 
       <div className="rounded-xl bg-white/5 px-8 py-6">
-        <h4 className="text-xl text-emerald-400 font-semibold">
+        <h4 className="text-xl font-semibold text-emerald-400">
           Pro / Enterprise Plans
         </h4>
 
-        <div className="mt-4 text-white/80 space-y-4">
+        <div className="mt-4 space-y-4 text-white/80">
           <p>
             In the pro/enterprise plans, we offer 3 different fixed price
             options to meet higher throughput demands. We reserve isolated

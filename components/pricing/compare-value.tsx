@@ -18,7 +18,7 @@ export default function CompareValue({
 }) {
   return (
     <span
-      className={`inner py-3 border-b border-b-white/3 flex items-center justify-center ${className}`}
+      className={`inner flex items-center justify-center border-b border-b-white/3 py-3 ${className}`}
       {...props}
     >
       {type === "plain" && children}
@@ -53,9 +53,9 @@ export default function CompareValue({
       )}
 
       {type === "list" && children && (
-        <span className="text-left flex items-center justify-center flex-wrap gap-1">
+        <span className="flex flex-wrap items-center justify-center gap-1 text-left">
           {Children.map(children, (child) => (
-            <span className="text-sm px-2 py-1.5 font-medium bg-emerald-300/10 rounded leading-none">
+            <span className="rounded bg-emerald-300/10 px-2 py-1.5 text-sm font-medium leading-none">
               {child}
             </span>
           ))}

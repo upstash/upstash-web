@@ -17,7 +17,7 @@ export default function ExampleHeader({ example }: Props) {
         </h1>
 
         {/* meta */}
-        <div className="flex flex-wrap items-center justify-center gap-4 mt-6">
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
           {example.products.map((item) => {
             return (
               <div key={item} className="inline-flex gap-1 text-lg">
