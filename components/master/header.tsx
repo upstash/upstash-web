@@ -1,14 +1,13 @@
 "use client";
 
-import { HTMLProps, ReactNode } from "react";
-import cx from "@/utils/cx";
-import { Logo } from "@/components/logo";
-import Link from "next/link";
 import Button from "@/components/button";
 import Container from "@/components/container";
-import Nav from "./nav";
+import { Logo } from "@/components/logo";
+import cx from "@/utils/cx";
 import { allJobs } from "contentlayer/generated";
-import { HOME_SECTIONS } from "@/utils/const";
+import Link from "next/link";
+import { HTMLProps, ReactNode } from "react";
+import Nav from "./nav";
 
 const jobLength = allJobs.filter((o) => !o.draft).length;
 
@@ -52,7 +51,7 @@ const NavItems: {
 }[] = [
   {
     name: "Pricing",
-    href: `/pricing`,
+    href: "/pricing",
   },
   // {
   //   name: "Open Source",
@@ -87,7 +86,7 @@ if (jobLength > 0) {
     href: "/careers",
     children: (
       <span
-        className="rounded-full bg-emerald-300/20
+        className="flex items-center rounded-full bg-emerald-300/20
           px-1.5 py-1 font-mono text-sm leading-none text-emerald-500"
       >
         {jobLength}
