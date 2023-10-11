@@ -31,7 +31,7 @@ export default function HomePage() {
       </section>
 
       <section className="pb-40">
-        <Container className="max-w-screen-md text-left">
+        <Container className="max-w-screen-md space-y-6 text-left">
           {jobs.map((job) => {
             return (
               <Link
