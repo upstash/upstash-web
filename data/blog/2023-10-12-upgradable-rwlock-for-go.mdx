@@ -1,0 +1,223 @@
+---
+slug: upgradable-rwlock-for-go
+title: "Upgradable Read Write Lock for Go"
+authors:
+  - sancar
+tags: [redis, go]
+---
+
+## Why we needed an upgradable read write lock ?
+
+In go, eventhough the guideline says that avoid locks when building a Redis® server that should be concurrently accessed by multiple connections, 
+we usually had to fallback to locks in order to get max performance. And, this time standard go library wasn't enough.
+
+In Upstash Redis® server, we are guarding the keys of the Redis® with locks. When searching how we can scale it, there were a couple of 
+ideas. One is partitioning the locks, and the other is replacing the sync.Mutex with a sync.RWMutex. Partitioning locks could be a blog for another 
+day, we will focus on RWMutex for this blogpost.
+
+sync.RWMutex is the read-write lock in go. It allows multiple readers to have the lock at the same time when there is no writer around.
+And it allows single writer to have the lock ensuring that there is no readers in the critical section.
+
+Since all of our commands work in-memory, they are pretty quick and don't keep long under the lock. But there are commands have a tendency to take long. These commands are usually the ones that their complexity depends on how large the data is like [SUNION](https://redis.io/commands/sunion/),[SDIFF](https://redis.io/commands/sdiff/), [ZDIFF](https://redis.io/commands/zdiff/) etc. 
+
+Since they are read operations, it is `mostly` ok. It means that other readers can still continue under RWMutex. The writers will be blocked.
+We realized another problem. All of these commands have `STORE` versions like [SUNIONSTORE](https://redis.io/commands/zunionstore/),  [SDIFFSTORE](https://redis.io/commands/sdiffstore/), [ZDIFFSTORE](https://redis.io/commands/zdiffstore/), etc. They need to get the write lock.
+And if that takes long both reads and writes needs to wait. The solution comes after realizing that the part taking long is the read and preparing the result and not the `STORE`
+
+## First naive wrong attempt
+
+Lets assume that we are doing this for `SUNIONSTORE`. We may try to `unlock` for the reader first, then `lock` for the write access as floows:
+
+```go
+mutex := sync.RWMutex()
+
+mutex.RLock()
+// calculate UNION of two sets under read lock but don't assing it anywhere
+mutex.RUnlock()
+
+mutex.Lock()
+// assign it to the in memory store
+mutex.Unlock()
+```
+
+This does not work because the `SUNIONSTORE` is not atomic anymore. Once we release the read lock another operation can get in and modify the 
+set. After that, this code will try to store a stale set in the memory, overriding the change made in between.
+
+## Second naive wrong attempt
+
+Ok, if releasing the read-lock is problem lets not release it and take the write lock instead as follows:
+
+```go
+mutex := sync.RWMutex()
+
+mutex.RLock()
+// calculate UNION of two sets under read lock but don't assing it anywhere
+
+// upgrade to the write lock without giving up the read lock
+mutex.Lock()
+
+// assign it to the in memory store
+mutex.Unlock()
+
+
+mutex.RUnlock()
+```
+
+If you do this the code will hang at `mutex.Lock`. You can't get a write-lock as long as there are readers holding the read lock. 
+
+## Correct solution
+
+What we actually need is an upgradabe read-write lock. There can be various different API's. I will first show what we ended up with.
+
+```go
+
+mutex.UpgradableRLock()
+// calculate UNION of two sets under read lock but don't assing it anywhere
+
+// upgrade to the write lock without giving up the read lock
+mutex.UpgradeWLock()
+// assign it to the in memory store
+
+mutex.UpgradableRUnlock()
+```
+
+We need to mention at this point that this idea is well known in the literature and there are implementations of upgrading a readlock even
+in the standard libraries of other languages. Examples:
+[JAVA StampedLock](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/locks/StampedLock.html)
+[.NET ReaderWriterLockSlim](https://learn.microsoft.com/en-us/dotnet/api/system.threading.readerwriterlockslim?view=net-7.0)
+
+Our API is very close to the `.NET ReaderWriterLockSlim`. At this point, you might say that this usage looks very similar to second attempt.
+How can it get away with deadlock ? The trick is that it has one more mode `upgradeble-read` together with `read` and `write`. Semantics are 
+as follows:
+
+- Both `read` and `upgradable-read` lock can be held together at the same time.
+- `write-lock` prevents both `read` and `upgradable-read` to enter the critical section.
+- There can be multiple goroutines holding `read` lock but there can be only `single` `upgradable-read`.
+
+The last point is important. If we don't have that guarantee, we will again end up with a deadlock. If we allow lets say two `upgradable-read` to be acquired, when they come to `upgrade to write`, one of them has to give up the `read-lock`. Therefore, the atomicity will be broken again.
+
+## The implementation
+
+To tell you the truth, we ended up with the API after realizing that it is trivial to modify [GO sync.RWMutex](https://pkg.go.dev/sync#RWMutex) into 
+this API.
+
+```go
+
+mutex.UpgradableRLock()
+// calculate UNION of two sets under read lock but don't assing it anywhere
+
+// upgrade to the write lock without giving up the read lock
+mutex.UpgradeWLock()
+// assign it to the in memory store
+
+mutex.UpgradableRUnlock()
+```
+
+To understand our implementation, we need to take a look [sync.RWMutex](https://pkg.go.dev/sync#RWMutex) especially `Lock` and `Rlock`
+
+```go
+
+type RWMutex struct {
+	w           Mutex        // held if there are pending writers
+	// .... skipped
+}
+
+func (rw *RWMutex) Lock() {
+	// First, resolve competition with other writers.
+	rw.w.Lock()
+	// Announce to readers there is a pending writer.
+	r := rw.readerCount.Add(-rwmutexMaxReaders) + rwmutexMaxReaders
+	// Wait for active readers.
+	if r != 0 && rw.readerWait.Add(r) != 0 {
+		semaphoreAcquire(&rw.writerSem)
+	}
+}
+
+func (rw *RWMutex) RLock() {
+	if rw.readerCount.Add(1) < 0 {
+		// A writer is pending, wait for it.
+		semaphoreAcquire(&rw.readerSem)
+	}
+}
+```
+
+The `RLock` is really simple. It just increments a reader count and sleep for a writer to `unlock` if necessary.
+
+The `Lock` first gets the underlying `w` lock first. At this point, no other writes can get in, but it has nothing to do with reads yet.
+Then it announces to the readers that they can not get in anymore. That means if we just split that method into two, the first half basically
+an `UpgradebleRLock` and the second part is `UpgradeWLock`. The second part upgrades the `upgradable-read` to `write`. 
+
+This gives us everything we need already and all we did is to seperate a method into two.
+
+```go 
+
+func (rw *UpgradableRWMutex) UpgradableRLock() {
+	// First, resolve competition with other writers.
+	// Disallow writers to acquire the lock
+	rw.w.Lock()	
+}
+
+func (rw *UpgradableRWMutex) UpgradeWLock() {
+	rw.upgraded = true
+	// Announce to readers there is a pending writer.
+	r := rw.readerCount.Add(-rwmutexMaxReaders) + rwmutexMaxReaders
+	// Wait for active readers.
+	if r != 0 && rw.readerWait.Add(r) != 0 {
+		semaphoreAcquire(&rw.writerSem)
+	}
+}
+
+```
+
+We still need to figure out how to unlock though, a.k.a `UpgradableRUnlock`. 
+This method should call`sync.RWMutex.Unlock()` if it is upgraded to the `write`.
+It should call just `rw.w.Unlock()` if it is not upgraded. Because all we did was just `rw.w.Lock()` anyway so far.
+
+We will add a `bool` to keep track if the lock is upgraded or not. And we don't need to guard this `bool` for concurrent
+access because we will access it only under `rw.w.Lock()`
+
+```go 
+
+type UpgradableRWMutex struct {
+	//... skipped. Same as sync.RWMutex
+
+	// Keep track if an upgradeable read-lock is upgraded to write-lock or not. Always accessed under w locked
+	upgraded           bool
+
+}
+
+func (rw *UpgradableRWMutex) UpgradableRLock() {
+	// First, resolve competition with other writers.
+	// Disallow writers to acquire the lock
+	rw.w.Lock()	
+}
+
+func (rw *UpgradableRWMutex) UpgradeWLock() {
+	rw.upgraded = true
+	// Announce to readers there is a pending writer.
+	r := rw.readerCount.Add(-rwmutexMaxReaders) + rwmutexMaxReaders
+	// Wait for active readers.
+	if r != 0 && rw.readerWait.Add(r) != 0 {
+		semaphoreAcquire(&rw.writerSem)
+	}
+}
+
+func (rw *UpgradableRWMutex) UpgradableRUnlock() {
+	rw.upgradableReadMode = false
+	if rw.upgraded {
+		rw.upgraded = false
+		rw.Unlock()
+	} else {
+		rw.w.Unlock()
+	}
+}
+```
+
+## Conclusion
+
+Implementing any concurrent structure is not easy from stratch. But sometimes if you give time to study an existing solution, you might relaize that it is not too hard to improve upon some of them.
+
+You can access the complete source of the `UpgradableRWMutex` here to check it in more detail.
+
+https://gist.github.com/sancar/d1663e90892cd12c839ae21841b79295
+
