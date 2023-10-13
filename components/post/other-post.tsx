@@ -16,11 +16,11 @@ export default function OtherPostCard({ post, align = "left" }: Props) {
         "flex flex-col p-6 text-left",
         "cursor-pointer rounded-xl bg-zinc-800 transition",
         "hover:bg-emerald-200/10 hover:text-emerald-400 hover:underline",
-        align === "right" && "text-right"
+        align === "right" && "text-right",
       )}
     >
       <span className="text-sm uppercase opacity-40">
-        {align === "left" ? "Previous post" : "Next post"}
+        {align === "right" ? "Next post" : "Previous post"}
       </span>
       <h4 className="mt-2 font-display text-xl font-medium md:text-2xl">
         <Balancer>{post.title}</Balancer>
