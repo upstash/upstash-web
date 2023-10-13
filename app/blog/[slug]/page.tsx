@@ -66,8 +66,8 @@ export default async function BlogPage({ params }: Props) {
 
             {/* Other Post */}
             <div className="mt-10 grid gap-4 md:grid-cols-2 md:gap-8">
-              <OtherPostCard post={prevPost} />
-              <OtherPostCard post={nextPost} align="right" />
+              <OtherPostCard post={nextPost} align="left" />
+              <OtherPostCard post={prevPost} align="right" />
             </div>
           </Container>
         </div>
