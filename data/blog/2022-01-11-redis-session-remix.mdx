@@ -2,7 +2,7 @@
 slug: redis-session-remix
 title: "Using Upstash Redis as a Session Store for Remix"
 authors:
-  -  gabriel
+  - gabriel
 image: cover_remix_session.png
 tags: [redis, remix, serverless, session]
 ---
@@ -78,7 +78,7 @@ export function createUpstashSessionStorage({ cookie }: any) {
           method: "post",
           body: JSON.stringify({ data }),
           headers,
-        }
+        },
       );
       return id;
     },
@@ -100,7 +100,7 @@ export function createUpstashSessionStorage({ cookie }: any) {
           method: "post",
           body: JSON.stringify({ data }),
           headers,
-        }
+        },
       );
     },
     async deleteData(id) {
@@ -136,8 +136,8 @@ Now the we've created our own session storage implementation lets demonstrate ho
 ```ts
 // sessions.server.ts
 
-import { createCookie } from "remix";
 import { createUpstashSessionStorage } from "~/sessions/upstash.server";
+import { createCookie } from "remix";
 
 // This will set the length of the session.
 // For the example we use a very short duration to easily demonstrate its functionally.
@@ -172,9 +172,9 @@ Using Remix you can define session usage per route. In the following example we 
 ```tsx
 // routes/index.tsx
 
+import { commitSession, getSession } from "~/sessions.server";
 import type { LoaderFunction } from "remix";
 import { json, useLoaderData } from "remix";
-import { commitSession, getSession } from "~/sessions.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
   // Get the session from the cookie
@@ -191,7 +191,7 @@ export const loader: LoaderFunction = async ({ request }) => {
         headers: {
           "Set-Cookie": await commitSession(session),
         },
-      }
+      },
     );
   }
   // If session was found, present the session info.

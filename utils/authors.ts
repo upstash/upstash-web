@@ -1,9 +1,12 @@
-export const authors: Record<string, {
-  name: string
-  title: string
-  image: string
-  url?: string
-}> = {
+export const authors: Record<
+  string,
+  {
+    name: string;
+    title: string;
+    image: string;
+    url?: string;
+  }
+> = {
   lisa: {
     name: "Lisa Natsumi",
     title: "Engineer @Upstash",
@@ -231,24 +234,24 @@ export const authors: Record<string, {
     title: "Software Engineer (Guest Author)",
     image: "chris.jpg",
   },
-  anshuman:{
+  anshuman: {
     name: "Anshuman Bhardwaj",
-    title:"Founder @docsly (Guest Author)",
-    image:"anshuman.png"
+    title: "Founder @docsly (Guest Author)",
+    image: "anshuman.png",
   },
-  anish:{
+  anish: {
     name: "Anish Pallati",
-    title:"Software Developer (Guest Author)",
-    image:"anish.jpeg"
+    title: "Software Developer (Guest Author)",
+    image: "anish.jpeg",
   },
-  cameron:{
+  cameron: {
     name: "Cameron Youngblood",
-    title:"Software Developer (Guest Author)",
-    image:"cameron.jpeg"
+    title: "Software Developer (Guest Author)",
+    image: "cameron.jpeg",
   },
-  asim:{
+  asim: {
     name: "Asim Hafeez",
-    title:"Software Developer (Guest Author)",
-    image:"asim.jpeg"
-  }
+    title: "Software Developer (Guest Author)",
+    image: "asim.jpeg",
+  },
 };

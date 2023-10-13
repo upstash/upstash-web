@@ -1,15 +1,18 @@
 import { HTMLProps } from "react";
+
+import { HOME_SECTIONS } from "@/utils/const";
+
+import Bg from "@/components/bg";
+import Container from "@/components/container";
 import {
   SectionHeader,
   SectionHeaderSummary,
   SectionHeaderTitle,
 } from "@/components/home/section-header";
-import Container from "@/components/container";
-import Bg from "@/components/bg";
-import { HOME_SECTIONS } from "@/utils/const";
-import Redis from "./redis";
+
 import Kafka from "./kafka";
 import QStash from "./qstash";
+import Redis from "./redis";
 
 export interface ISectionHeader extends HTMLProps<HTMLDivElement> {}
 

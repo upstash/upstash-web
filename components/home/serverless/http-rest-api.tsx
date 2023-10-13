@@ -1,10 +1,14 @@
 "use client";
 
-import { ServerlessBox, ServerlessSummary, ServerlessTitle } from "./comp";
 import { Product } from "@/utils/type";
 import Prism from "prismjs";
+
+import { ServerlessBox, ServerlessSummary, ServerlessTitle } from "./comp";
+
 import "prismjs/themes/prism-tomorrow.css";
+
 import { HTMLProps, ReactNode, useEffect, useState } from "react";
+
 import cx from "@/utils/cx";
 
 export default function HttpRestApi() {
@@ -37,7 +41,7 @@ export default function HttpRestApi() {
                 key={key}
                 className={cx(
                   "select-none bg-white bg-opacity-3 px-4 py-1 text-sm first:rounded-l-full last:rounded-r-full",
-                  value === product && "bg-opacity-10"
+                  value === product && "bg-opacity-10",
                 )}
               >
                 <input

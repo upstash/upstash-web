@@ -2,7 +2,7 @@
 slug: vercel-note-taker-slackbot
 title: "Build a Serverless Slackbot with Vercel and Upstash Redis"
 authors:
-  -  burak
+  - burak
 tags: [slack, slackbot, slackapp, serverless, upstash, vercel]
 ---
 
@@ -57,8 +57,9 @@ First of all, `npm install vercel axios crypto` to install dependencies and Verc
 > These will help us customize and ease the management of our slackbot.
 
 ```js
-const axios = require("axios");
 import { token } from "./_constants";
+
+const axios = require("axios");
 
 // Tokenizes the string so that commands can be extracted.
 export function tokenizeString(string) {
@@ -184,11 +185,11 @@ Create a file named `note.js` with the code:
 
 ```js
 import { tokenizeString } from "./_utils";
-import { setKey } from "./slash_handlers/_set_key";
 import { addToList } from "./slash_handlers/_add_to_list";
-import { listAll } from "./slash_handlers/_list_all";
 import { getKey } from "./slash_handlers/_get_key";
+import { listAll } from "./slash_handlers/_list_all";
 import { removeFromList } from "./slash_handlers/_remove_from_list";
+import { setKey } from "./slash_handlers/_set_key";
 
 module.exports = (req, res) => {
   const commandArray = tokenizeString(req.body.text);
@@ -226,8 +227,9 @@ module.exports = (req, res) => {
 > Using Upstash RESTFUL API, we can simply send a request without the need to create a client to connect to our database. This is one of the strengths of Upstash Redis.
 
 ```js
+import { redisToken, redisURL } from "../_constants";
+
 const axios = require("axios");
-import { redisURL, redisToken } from "../_constants";
 
 export async function setKey(res, commandArray) {
   let key = commandArray[1];
@@ -263,11 +265,11 @@ Create a file named `events.js` with the code:
 > Slack sends a challenge for verification. If this is the case, direct request to that handler. Otherwise, check validity of the request and then direct it to relevant handler functions.
 
 ```js
-import { challenge } from "./events_handlers/_challenge";
-import { app_mention } from "./events_handlers/_app_mention";
-import { channel_created } from "./events_handlers/_channel_created";
-import { validateSlackRequest } from "./_validate";
 import { signingSecret } from "./_constants";
+import { validateSlackRequest } from "./_validate";
+import { app_mention } from "./events_handlers/_app_mention";
+import { challenge } from "./events_handlers/_challenge";
+import { channel_created } from "./events_handlers/_channel_created";
 
 module.exports = async (req, res) => {
   var type = req.body.type;
@@ -323,7 +325,7 @@ export async function app_mention(req, res) {
     await postToChannel(
       "general",
       res,
-      `Hi there! Thanks for mentioning me, <@${event.user}>!`
+      `Hi there! Thanks for mentioning me, <@${event.user}>!`,
     );
   } catch (e) {
     console.log(e);

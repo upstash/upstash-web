@@ -1,5 +1,6 @@
 import * as React from "react";
 import { ChangeEvent, HTMLProps } from "react";
+
 import { PricingPlans } from "@/utils/type";
 
 export default function CompareSelect({

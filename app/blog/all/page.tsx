@@ -1,11 +1,13 @@
-import getData from "../get-data";
 import { Post } from "contentlayer/generated";
+import { div } from "three/examples/jsm/nodes/shadernode/ShaderNodeBaseElements";
+
+import Bg from "@/components/bg";
 import PostListCard from "@/components/blog/list-item";
 import Container from "@/components/container";
-import { div } from "three/examples/jsm/nodes/shadernode/ShaderNodeBaseElements";
-import Bg from "@/components/bg";
-import PageHeaderTitle from "@/components/page-header-title";
 import PageHeaderDesc from "@/components/page-header-desc";
+import PageHeaderTitle from "@/components/page-header-title";
+
+import getData from "../get-data";
 
 export default async function BlogPage() {
   const posts = await getData();

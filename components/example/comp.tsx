@@ -1,11 +1,13 @@
 "use client";
 
-import cx from "@/utils/cx";
 import { Dispatch, HTMLProps, SetStateAction } from "react";
-import IconRedis from "@/components/icon-redis";
+
+import cx from "@/utils/cx";
+import Balancer from "react-wrap-balancer";
+
 import IconKafka from "@/components/icon-kafka";
 import IconQStash from "@/components/icon-qstash";
-import Balancer from "react-wrap-balancer";
+import IconRedis from "@/components/icon-redis";
 
 export function Example({
   className,

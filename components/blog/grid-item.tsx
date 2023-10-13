@@ -1,5 +1,6 @@
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
+
 import type { Post } from "contentlayer/generated";
 import { DateTime } from "luxon";
 import Balancer from "react-wrap-balancer";

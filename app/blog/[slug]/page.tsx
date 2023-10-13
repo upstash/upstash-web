@@ -1,15 +1,17 @@
+import { notFound } from "next/navigation";
+
+import { getTableOfContents } from "@/utils/toc";
 import type { Post } from "contentlayer/generated";
 import { allPosts } from "contentlayer/generated";
-import { notFound } from "next/navigation";
-import OtherPostCard from "@/components/post/other-post";
-import Clap from "@/components/post/claps";
-import { Mdx } from "@/components/post/mdx";
-import Container from "@/components/container";
-import PostHeader from "@/components/post/header";
-import PostTags from "@/components/post/tags";
-import PageBodyGradient from "@/components/page-body-gradient";
+
 import Bg from "@/components/bg";
-import { getTableOfContents } from "@/utils/toc";
+import Container from "@/components/container";
+import PageBodyGradient from "@/components/page-body-gradient";
+import Clap from "@/components/post/claps";
+import PostHeader from "@/components/post/header";
+import { Mdx } from "@/components/post/mdx";
+import OtherPostCard from "@/components/post/other-post";
+import PostTags from "@/components/post/tags";
 import PostTOC from "@/components/post/toc";
 
 type Props = {

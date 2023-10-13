@@ -8,13 +8,13 @@ export default function Ps() {
 
         <div className="mt-4 space-y-4 text-white/80">
           <p>
-            You can start using Upstash for free right away without entering your
-            credit card information. This tier lets you create one cluster with
-            a limit of 10K daily messages and 256MB retention size. Once you
-            provide your credit card details, your cluster will upgrade to the
-            pay-as-you-go plan and limits will be updated. If you want to try
-            Upstash paid and enterprise plans, we can offer Free Trials. Email
-            us at{" "}
+            You can start using Upstash for free right away without entering
+            your credit card information. This tier lets you create one cluster
+            with a limit of 10K daily messages and 256MB retention size. Once
+            you provide your credit card details, your cluster will upgrade to
+            the pay-as-you-go plan and limits will be updated. If you want to
+            try Upstash paid and enterprise plans, we can offer Free Trials.
+            Email us at{" "}
             <a href="mailto:support@upstash.com">
               <b>support@upstash.com</b>
             </a>

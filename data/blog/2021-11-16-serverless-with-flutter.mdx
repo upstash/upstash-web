@@ -2,7 +2,7 @@
 slug: serverless-with-flutter
 title: "Fullstack Serverless app with Flutter, Serverless Framework and Upstash(REDIS) - PART 1"
 authors:
-  -  rosius
+  - rosius
 image: flutter/code.png
 tags: [serverless, flutter, upstash, redis]
 ---
@@ -315,7 +315,7 @@ await client.hmset(
   profilePic,
   data.profilePic,
   "timestamp",
-  timestamp
+  timestamp,
 );
 ```
 
@@ -348,9 +348,9 @@ client.pipeline(
     profilePic,
     data.profilePic,
     "timestamp",
-    timestamp
+    timestamp,
   ),
-  await client.lpush("users", userId)
+  await client.lpush("users", userId),
 );
 ```
 
@@ -413,7 +413,7 @@ module.exports.createUser = async (event) => {
           message: "Couldn't create the user item",
         },
         null,
-        2
+        2,
       ),
     };
   }
@@ -437,9 +437,9 @@ module.exports.createUser = async (event) => {
       profilePic,
       data.profilePic,
       "timestamp",
-      timestamp
+      timestamp,
     ),
-    await client.lpush("users", userId)
+    await client.lpush("users", userId),
   );
 
   //get and display saved user item
@@ -495,7 +495,7 @@ module.exports.updateUser = async (event) => {
           message: "Couldn't update the user item",
         },
         null,
-        2
+        2,
       ),
     };
   }
@@ -509,7 +509,7 @@ module.exports.updateUser = async (event) => {
     firstName,
     data.firstName,
     lastName,
-    data.lastName
+    data.lastName,
   );
 
   //get and display saved user item
@@ -568,7 +568,7 @@ module.exports.getUserById = async (event) => {
           message: "Couldn't get the user item",
         },
         null,
-        2
+        2,
       ),
     };
   }
@@ -632,7 +632,7 @@ module.exports.getAllUsers = async (event) => {
         const item = await client.hgetall(`userItem:${userId}`);
         users.push(item);
         console.log(users);
-      })
+      }),
     );
 
     return users;
@@ -722,7 +722,7 @@ module.exports.createPost = async (event) => {
           message: "Couldn't create the Post item",
         },
         null,
-        2
+        2,
       ),
     };
   }
@@ -741,10 +741,10 @@ module.exports.createPost = async (event) => {
       "postImage",
       data.postImage,
       "createdOn",
-      timestamp
+      timestamp,
     ),
     await client.lpush("posts", postId),
-    await client.lpush(`userPost:${data.userId}`, postId)
+    await client.lpush(`userPost:${data.userId}`, postId),
   );
 
   //get and display saved post item
@@ -799,7 +799,7 @@ module.exports.getPostById = async (event) => {
           message: "Couldn't get the post item",
         },
         null,
-        2
+        2,
       ),
     };
   }
@@ -930,7 +930,7 @@ module.exports.reactToPost = async (event) => {
           message: "Couldn't react to the Post",
         },
         null,
-        2
+        2,
       ),
     };
   }
@@ -940,7 +940,7 @@ module.exports.reactToPost = async (event) => {
   // first check if user has already liked the post
   const hasUserReacted = await client.zscore(
     `postReactions:${postId}`,
-    data.userId
+    data.userId,
   );
   if (hasUserReacted == null) {
     //user hasn't reacted.
@@ -954,8 +954,8 @@ module.exports.reactToPost = async (event) => {
         "userId",
         data.userId,
         "timestamp",
-        timestamp
-      )
+        timestamp,
+      ),
     );
   } else {
     //user already reacted, so unreact
@@ -969,8 +969,8 @@ module.exports.reactToPost = async (event) => {
         "userId",
         data.userId,
         "timestamp",
-        timestamp
-      )
+        timestamp,
+      ),
     );
   }
 

@@ -64,8 +64,9 @@ Next up we'll create the page and form for inputting the story prompt. You'll ne
 File: `pages/index.tsx`
 
 ```tsx
-import Head from "next/head";
 import { RefObject, useRef, useState } from "react";
+import Head from "next/head";
+
 import useInterval from "../hooks/useInterval";
 
 export default function Home() {
@@ -92,7 +93,7 @@ export default function Home() {
         })
         .catch((err: any) => console.error(err));
     },
-    messageId ? 1000 : null
+    messageId ? 1000 : null,
   );
 
   async function generateStory(event: any) {
@@ -261,11 +262,12 @@ File: `pages/api/create.ts`
 
 ```ts
 import type { NextApiRequest, NextApiResponse } from "next";
+
 import qstashClient from "../../lib/qstash";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   if (req.method !== "POST") {
     return res.status(400).json({
@@ -313,11 +315,12 @@ File: `pages/api/callback.ts`
 
 ```ts
 import type { NextApiRequest, NextApiResponse } from "next";
+
 import redis from "../../lib/redis";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   const { body }: any = req;
 
@@ -343,11 +346,12 @@ File: `pages/api/poll.ts`
 
 ```ts
 import type { NextApiRequest, NextApiResponse } from "next";
+
 import redis from "../../lib/redis";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   const { id }: any = req.query;
 

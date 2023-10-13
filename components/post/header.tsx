@@ -1,9 +1,11 @@
-import Link from "next/link";
-import type { Post } from "contentlayer/generated";
-import Balancer from "react-wrap-balancer";
-import Container from "@/components/container";
-import { DateTime } from "luxon";
 import Image from "next/image";
+import Link from "next/link";
+
+import type { Post } from "contentlayer/generated";
+import { DateTime } from "luxon";
+import Balancer from "react-wrap-balancer";
+
+import Container from "@/components/container";
 
 type Props = {
   post: Post;

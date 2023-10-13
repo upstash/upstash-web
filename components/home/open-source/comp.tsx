@@ -5,9 +5,12 @@ import {
   ReactElement,
   ReactNode,
 } from "react";
+
 import cx from "@/utils/cx";
-import { Category } from "./index";
+
 import Icon, { ICON_NAMES } from "@/components/icon";
+
+import { Category } from "./index";
 
 export function SourceBox({
   children,
@@ -35,7 +38,7 @@ export function SourceBox({
         "group/source-box flex flex-col rounded-3xl p-6 md:p-8",
         "bg-white/5 backdrop-blur transition",
         "hover:scale-[1.02] hover:bg-white/10",
-        className
+        className,
       )}
       href={href}
       {...props}
@@ -58,7 +61,7 @@ export function SourceTitle({
     <h5
       className={cx(
         "flex items-center gap-2 font-display text-xl font-medium",
-        className
+        className,
       )}
       {...props}
     >
@@ -70,7 +73,7 @@ export function SourceTitle({
             "group-hover/source-box:translate-y-0 group-hover/source-box:opacity-100",
             props.category === Category.SDK && "text-emerald-400",
             props.category === Category.Template && "text-yellow-400",
-            props.category === Category.Integration && "text-pink-400"
+            props.category === Category.Integration && "text-pink-400",
           )}
         >
           <Icon icon={ICON_NAMES.ArrowUpRight} className="text-2xl" />
@@ -111,7 +114,7 @@ export function SourceTag({
           "bg-yellow-300/10 text-yellow-300",
         props.category === Category.Integration &&
           "bg-pink-300/10 text-pink-400",
-        className
+        className,
       )}
       {...props}
     >

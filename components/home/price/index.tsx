@@ -1,15 +1,16 @@
+import { HOME_SECTIONS } from "@/utils/const";
+
+import Bg from "@/components/bg";
+import Container from "@/components/container";
+import PriceKafka from "@/components/home/price/kafka";
+import PriceQStash from "@/components/home/price/qstash";
+import PriceRedis from "@/components/home/price/redis";
 import {
   SectionHeader,
   SectionHeaderSummary,
   SectionHeaderTitle,
 } from "@/components/home/section-header";
-import Container from "@/components/container";
-import PriceRedis from "@/components/home/price/redis";
-import PriceKafka from "@/components/home/price/kafka";
-import PriceQStash from "@/components/home/price/qstash";
 import Icon, { ICON_NAMES } from "@/components/icon";
-import Bg from "@/components/bg";
-import { HOME_SECTIONS } from "@/utils/const";
 
 export default function HomeServerless() {
   return (

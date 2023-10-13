@@ -2,10 +2,9 @@
 slug: opensource-jira-clone
 title: "Building an open-source JIRA using Firebase, Upstash and SvelteKit"
 authors:
-  -  rishi
+  - rishi
 tags: [redis, svelte, sveltekit, auth.js]
 ---
-
 
 In this post, I talk about how I built a open-source alternative to Jira Kanban Board using [Upstash](https://upstash.com/), [SvelteKit](https://kit.svelte.dev/), and [Firebase Storage](https://firebase.google.com/docs/storage).
 
@@ -79,18 +78,18 @@ UPSTASH_REDIS_REST_TOKEN="your_upstash_redis_rest__token_from_above"
 // https://firebase.google.com/docs/web/learn-more#config-object
 
 {
-	"type": "...",
-	"project_id": "...",
-	"private_key_id": "...",
-	"private_key": "...",
-	"client_email": "...",
-	"client_id": "...",
-	"auth_uri": "...",
-	"token_uri": "...",
-	"auth_provider_x509_cert_url": "...",
-	"client_x509_cert_url": "...",
-	"universe_domain": "...",
-	"storageBucket": "..."
+  "type": "...",
+  "project_id": "...",
+  "private_key_id": "...",
+  "private_key": "...",
+  "client_email": "...",
+  "client_id": "...",
+  "auth_uri": "...",
+  "token_uri": "...",
+  "auth_provider_x509_cert_url": "...",
+  "client_x509_cert_url": "...",
+  "universe_domain": "...",
+  "storageBucket": "..."
 }
 ```
 
@@ -117,17 +116,17 @@ Using SvelteKit’s Server Hooks, we enforce Auth on all incoming requests (to a
 ```tsx
 // File: @/src/hooks.server.ts
 
-import type { Handle } from '@sveltejs/kit'
-import { SvelteKitAuth } from '@auth/sveltekit'
-import Google from '@auth/core/providers/google'
-import { GOOGLE_ID, GOOGLE_SECRET } from '$env/static/private'
+import Google from "@auth/core/providers/google";
+import { SvelteKitAuth } from "@auth/sveltekit";
+import type { Handle } from "@sveltejs/kit";
+import { GOOGLE_ID, GOOGLE_SECRET } from "$env/static/private";
 
 // Read more on
 // https://kit.svelte.dev/docs/hooks#server-hooks-handle
 export const handle = SvelteKitAuth({
-	// @ts-ignore
-	providers: [Google({ clientId: GOOGLE_ID, clientSecret: GOOGLE_SECRET })]
-}) satisfies Handle
+  // @ts-ignore
+  providers: [Google({ clientId: GOOGLE_ID, clientSecret: GOOGLE_SECRET })],
+}) satisfies Handle;
 ```
 
 ### Authorization on Edge Function(s) using SvelteKit’s Server Locals
@@ -185,29 +184,29 @@ In this section, we'll be diving deep into how the data fetching, updating and d
 The `getTask` function uses Upstash’s `hget` via `id` as the key to make an API request to Upstash for the relevant issue ata, identified by a unique `id`. If that issue is not present (or there is an error), the function is set to return an object with a `{ code: 0 }` so that then the user can be redirected to 404 (issue not found) automatically in SvelteKit’s dynamic route.
 
 ```tsx
-type Task = { [key: string]: any } | null
+type Task = { [key: string]: any } | null;
 
 // Get Issue Data
 // File: @/src/lib/issues/get.ts
 export async function getTask(id: string) {
-	try {
-		const redis = (await import('../upstash/setup')).default
-		const task: Task = await redis.hget('issues', id)
-		if (!task) {
-			return {
-				code: 0,
-				error: 'No such issue found.'
-			}
-		}
-		return { ...task, code: 1 }
-	} catch (e: any) {
-		const error = e.message || e.toString()
-		console.log(error)
-		return {
-			code: 0,
-			error
-		}
-	}
+  try {
+    const redis = (await import("../upstash/setup")).default;
+    const task: Task = await redis.hget("issues", id);
+    if (!task) {
+      return {
+        code: 0,
+        error: "No such issue found.",
+      };
+    }
+    return { ...task, code: 1 };
+  } catch (e: any) {
+    const error = e.message || e.toString();
+    console.log(error);
+    return {
+      code: 0,
+      error,
+    };
+  }
 }
 ```
 
@@ -217,19 +216,20 @@ Similarly, the remaining CRUD operations are as follows:
 // Create Issue
 // File: @/src/lib/issues/create.ts
 export async function createTask(info: any) {
-	try {
-		const redis = (await import('../upstash/setup')).default
-		const id = Math.random().toString().slice(2) + new Date().getUTCMilliseconds()
-		await redis.hset('issues', { [id]: info })
-		return { code: 1, id, message: 'Issue Created Succesfully ✅' }
-	} catch (e: any) {
-		const error = e.message || e.toString()
-		console.log(error)
-		return {
-			code: 0,
-			error
-		}
-	}
+  try {
+    const redis = (await import("../upstash/setup")).default;
+    const id =
+      Math.random().toString().slice(2) + new Date().getUTCMilliseconds();
+    await redis.hset("issues", { [id]: info });
+    return { code: 1, id, message: "Issue Created Succesfully ✅" };
+  } catch (e: any) {
+    const error = e.message || e.toString();
+    console.log(error);
+    return {
+      code: 0,
+      error,
+    };
+  }
 }
 ```
 
@@ -237,18 +237,18 @@ export async function createTask(info: any) {
 // Delete Issue
 // File: @/src/lib/issues/delete.ts
 export async function deleteTask(id: string) {
-	try {
-		const redis = (await import('../upstash/setup')).default
-		await redis.hdel('issues', id)
-		return { code: 1, message: 'Deleted Succesfully!' }
-	} catch (e: any) {
-		const error = e.message || e.toString()
-		console.log(error)
-		return {
-			code: 0,
-			error
-		}
-	}
+  try {
+    const redis = (await import("../upstash/setup")).default;
+    await redis.hdel("issues", id);
+    return { code: 1, message: "Deleted Succesfully!" };
+  } catch (e: any) {
+    const error = e.message || e.toString();
+    console.log(error);
+    return {
+      code: 0,
+      error,
+    };
+  }
 }
 ```
 
@@ -256,27 +256,27 @@ export async function deleteTask(id: string) {
 // Update Issue Data
 // File: @/src/lib/issues/update.ts
 export async function updateTask(info: any, id: string) {
-	try {
-		const redis = (await import('../upstash/setup')).default
-		if (id) {
-			const task = await redis.hget('issues', id)
-			if (task) {
-				await redis.hset('issues', { [id]: info })
-				return { code: 1, message: 'Updated Successfully' }
-			}
-		}
-		return {
-			code: 0,
-			error: 'No such issue was found.'
-		}
-	} catch (e: any) {
-		const error = e.message || e.toString()
-		console.log(error)
-		return {
-			code: 0,
-			error
-		}
-	}
+  try {
+    const redis = (await import("../upstash/setup")).default;
+    if (id) {
+      const task = await redis.hget("issues", id);
+      if (task) {
+        await redis.hset("issues", { [id]: info });
+        return { code: 1, message: "Updated Successfully" };
+      }
+    }
+    return {
+      code: 0,
+      error: "No such issue was found.",
+    };
+  } catch (e: any) {
+    const error = e.message || e.toString();
+    console.log(error);
+    return {
+      code: 0,
+      error,
+    };
+  }
 }
 ```
 
@@ -287,19 +287,20 @@ To implement rate-limiting at the edge, we use `Upstash Redis` database client a
 ```tsx
 // Reference Function to ratelimiting
 // File: @/src/lib/upstash/ratelimit.ts
-import redis from './setup'
-import { Ratelimit } from '@upstash/ratelimit'
+import { Ratelimit } from "@upstash/ratelimit";
+
+import redis from "./setup";
 
 export const ratelimit = {
-	upload: new Ratelimit({
-		redis,
-		limiter: Ratelimit.slidingWindow(2, '60s')
-	}),
-	issues: new Ratelimit({
-		redis,
-		limiter: Ratelimit.slidingWindow(5, '60s')
-	})
-}
+  upload: new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(2, "60s"),
+  }),
+  issues: new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(5, "60s"),
+  }),
+};
 ```
 
 Using Rate Limiting, I was able to achieve the following:
@@ -311,34 +312,40 @@ Using Rate Limiting, I am able to limit creation of five issues per authenticate
 ```tsx
 // File: @/src/routes/api/issue/+server.ts
 // Issue Creation POST API SvelteKit Handler
-import { ratelimit } from '@/src/lib/upstash/ratelimit'
+import { ratelimit } from "@/src/lib/upstash/ratelimit";
 
 export async function POST(event: RequestEvent) {
-	const user = await isAuth(event)
-	if (!user) {
-		return new Response(undefined, {
-			status: 403
-		})
-	}
-	if (user.session.user?.email) {
-		// Look at the user email of authenticated user at edge
-		// Rate limit 5 issues creation per minute
-		const result = await ratelimit.issues.limit(user.session.user.email)
-		if (!result.success) {
-			return new Response(JSON.stringify({ code: 0, error: `You can't create more than 5 issues per minute.` }), {
-				status: 403,
-				headers: {
-					'content-type': 'application/json'
-				}
-			})
-		}
-		const { info } = await event.request.json()
-		const res = await createTask(info)
-		return json(res)
-	}
-	return new Response(undefined, {
-		status: 403
-	})
+  const user = await isAuth(event);
+  if (!user) {
+    return new Response(undefined, {
+      status: 403,
+    });
+  }
+  if (user.session.user?.email) {
+    // Look at the user email of authenticated user at edge
+    // Rate limit 5 issues creation per minute
+    const result = await ratelimit.issues.limit(user.session.user.email);
+    if (!result.success) {
+      return new Response(
+        JSON.stringify({
+          code: 0,
+          error: `You can't create more than 5 issues per minute.`,
+        }),
+        {
+          status: 403,
+          headers: {
+            "content-type": "application/json",
+          },
+        },
+      );
+    }
+    const { info } = await event.request.json();
+    const res = await createTask(info);
+    return json(res);
+  }
+  return new Response(undefined, {
+    status: 403,
+  });
 }
 ```
 
@@ -349,30 +356,38 @@ Using Rate Limiting, I am able to limit file uploads to upto 2 per authenticated
 ```tsx
 // File: @/src/routes/api/content/+server.ts
 // File Upload POST API SvelteKit Handler
-import { ratelimit } from '@/src/lib/upstash/ratelimit'
+import { ratelimit } from "@/src/lib/upstash/ratelimit";
 
 export async function POST(event: RequestEvent) {
-	// User Authentication Code
-	if (user.session.user?.email) {
+  // User Authentication Code
+  if (user.session.user?.email) {
     // Validate User, Task ID and if a file is uploaded
-		// Look at the user email of authenticated user and task's ID at edge
-		// Rate limit 2 uploads per minute
-		const result = await ratelimit.upload.limit(`${user.session.user.email}_${taskID}`)
-		if (!result.success) {
-			return new Response(JSON.stringify({ code: 0, error: `You can't upload more than 2 files per issue per minute.` }), {
-				status: 403,
-				headers: {
-					'content-type': 'application/json'
-				}
-			})
-		}
-		// File upload code
-		// Continue reading the blog to see how
+    // Look at the user email of authenticated user and task's ID at edge
+    // Rate limit 2 uploads per minute
+    const result = await ratelimit.upload.limit(
+      `${user.session.user.email}_${taskID}`,
+    );
+    if (!result.success) {
+      return new Response(
+        JSON.stringify({
+          code: 0,
+          error: `You can't upload more than 2 files per issue per minute.`,
+        }),
+        {
+          status: 403,
+          headers: {
+            "content-type": "application/json",
+          },
+        },
+      );
+    }
+    // File upload code
+    // Continue reading the blog to see how
     // file uploads are being taken care of
-	}
-	return new Response(undefined, {
-		status: 403
-	})
+  }
+  return new Response(undefined, {
+    status: 403,
+  });
 }
 ```
 
@@ -391,89 +406,106 @@ In the following Edge function, we’re looking at any POST request event and if
 ```tsx
 // File: @/src/routes/api/content/+server.ts
 // File Upload POST API SvelteKit Handler
-import { initializeApp } from 'firebase/app'
-import fireBaseConfig from '../../../../firebase-adminsdk.json'
-import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage'
+import { initializeApp } from "firebase/app";
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+
+import fireBaseConfig from "../../../../firebase-adminsdk.json";
 
 export async function POST(event: RequestEvent) {
-	// User Authentication Code
-	if (user.session.user?.email) {
-		const app = initializeApp(fireBaseConfig)
-		const storage = getStorage(app)
-		const data = await event.request.formData()
-		const taskID = data.get('taskID')
-		const file = data.get('file')
+  // User Authentication Code
+  if (user.session.user?.email) {
+    const app = initializeApp(fireBaseConfig);
+    const storage = getStorage(app);
+    const data = await event.request.formData();
+    const taskID = data.get("taskID");
+    const file = data.get("file");
 
     // ...Validate User, Task ID and if a file is uploaded
     // ...Rate Limiting Code
 
-		// File Size Restriction(s)
-		if (file.size > 5 * 1024 * 1024) {
-			return new Response(JSON.stringify({ code: 0, error: 'File size exceeds the limit of 5 MB.' }), {
-				status: 400,
-				headers: {
-					'content-type': 'application/json'
-				}
-			})
-		}
+    // File Size Restriction(s)
+    if (file.size > 5 * 1024 * 1024) {
+      return new Response(
+        JSON.stringify({
+          code: 0,
+          error: "File size exceeds the limit of 5 MB.",
+        }),
+        {
+          status: 400,
+          headers: {
+            "content-type": "application/json",
+          },
+        },
+      );
+    }
 
     // Start File Upload Code
-		try {
-		  // Create a unique ID
-			const fileId = uuidv4()
-			// If uploaded is not a File type
-			if (!(file instanceof File)) return
-			// Create a ref to firebase storage
-			const storageRef = ref(storage, `uploads/${fileId}/${file.name}`)
-			// Obtain the arrayBuffer of the file uploaded
-			const fileBuffer = await file.arrayBuffer()
-			// Upload file to Firebase Storage in bytes using Uint8Array
-			const { metadata } = await uploadBytes(storageRef, new Uint8Array(fileBuffer))
-			const { fullPath } = metadata
-			// No fullPath is received, the API errored out
-			if (!fullPath) {
-				return new Response(
-					JSON.stringify({
-						code: 0,
-						error: `<span>There was some error while uploading the file.</span> <span class="mt-1 text-xs text-gray-500">Report an issue with the current URL that you are on and with the code XXX.</span>`
-					}),
-					{
-						status: 403,
-						headers: {
-							'content-type': 'application/json'
-						}
-					}
-				)
-			}
-			// If a file is uploaded successfully, append the file to list of attachments to the issue's data
-			const { code, ...taskValues } = await getTask(taskID)
-			if (code === 1) {
-				if (taskValues) {
-					if (taskValues.hasOwnProperty('files')) {
-						taskValues['files'].push(`https://storage.googleapis.com/${storageRef.bucket}/${storageRef.fullPath}`)
-					} else {
-						taskValues['files'] = [`https://storage.googleapis.com/${storageRef.bucket}/${storageRef.fullPath}`]
-					}
-				}
-				// Update the task's data in Upstash
-				await updateTask(taskValues, taskID)
-			}
-			return json({
-				code: 1,
-				message: 'Uploaded Successfully'
-			})
-		} catch (error) {
-			return new Response(JSON.stringify({ code: 0, error: error.message || error.toString() }), {
-				status: 403,
-				headers: {
-					'content-type': 'application/json'
-				}
-			})
-		}
-	}
-	return new Response(undefined, {
-		status: 403
-	})
+    try {
+      // Create a unique ID
+      const fileId = uuidv4();
+      // If uploaded is not a File type
+      if (!(file instanceof File)) return;
+      // Create a ref to firebase storage
+      const storageRef = ref(storage, `uploads/${fileId}/${file.name}`);
+      // Obtain the arrayBuffer of the file uploaded
+      const fileBuffer = await file.arrayBuffer();
+      // Upload file to Firebase Storage in bytes using Uint8Array
+      const { metadata } = await uploadBytes(
+        storageRef,
+        new Uint8Array(fileBuffer),
+      );
+      const { fullPath } = metadata;
+      // No fullPath is received, the API errored out
+      if (!fullPath) {
+        return new Response(
+          JSON.stringify({
+            code: 0,
+            error: `<span>There was some error while uploading the file.</span> <span class="mt-1 text-xs text-gray-500">Report an issue with the current URL that you are on and with the code XXX.</span>`,
+          }),
+          {
+            status: 403,
+            headers: {
+              "content-type": "application/json",
+            },
+          },
+        );
+      }
+      // If a file is uploaded successfully, append the file to list of attachments to the issue's data
+      const { code, ...taskValues } = await getTask(taskID);
+      if (code === 1) {
+        if (taskValues) {
+          if (taskValues.hasOwnProperty("files")) {
+            taskValues["files"].push(
+              `https://storage.googleapis.com/${storageRef.bucket}/${storageRef.fullPath}`,
+            );
+          } else {
+            taskValues["files"] = [
+              `https://storage.googleapis.com/${storageRef.bucket}/${storageRef.fullPath}`,
+            ];
+          }
+        }
+        // Update the task's data in Upstash
+        await updateTask(taskValues, taskID);
+      }
+      return json({
+        code: 1,
+        message: "Uploaded Successfully",
+      });
+    } catch (error) {
+      return new Response(
+        JSON.stringify({ code: 0, error: error.message || error.toString() }),
+        {
+          status: 403,
+          headers: {
+            "content-type": "application/json",
+          },
+        },
+      );
+    }
+  }
+  return new Response(undefined, {
+    status: 403,
+  });
 }
 ```
 
@@ -484,40 +516,44 @@ As you’d recall, we appended the unique URL returned by Firebase in issue’s 
 ```tsx
 // File: @/src/routes/api/content/+server.ts
 // File Upload GET API SvelteKit Handler
-import { initializeApp } from 'firebase/app'
-import fireBaseConfig from '../../../../firebase-adminsdk.json'
-import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage'
+import { initializeApp } from "firebase/app";
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+
+import fireBaseConfig from "../../../../firebase-adminsdk.json";
 
 export async function GET(event: RequestEvent) {
-	if (!(await isAuth(event))) {
-		return new Response(undefined, {
-			status: 403
-		})
-	}
-	const url = event.url
-	const image = url.searchParams.get('image')
-	if (image) {
-		try {
-			const app = initializeApp(fireBaseConfig)
-			const storage = getStorage(app)
-			const fileRef = ref(storage, image)
-			const imagePublicURL = await getDownloadURL(fileRef)
-			return json({ code: 1, image: imagePublicURL })
-		} catch (error) {
-			return new Response(JSON.stringify({ code: 0, error: error.message || error.toString() }), {
-				status: 500,
-				headers: {
-					'content-type': 'application/json'
-				}
-			})
-		}
-	}
-	return new Response(JSON.stringify({ code: 0, error: 'Invalid Request.' }), {
-		status: 400,
-		headers: {
-			'content-type': 'application/json'
-		}
-	})
+  if (!(await isAuth(event))) {
+    return new Response(undefined, {
+      status: 403,
+    });
+  }
+  const url = event.url;
+  const image = url.searchParams.get("image");
+  if (image) {
+    try {
+      const app = initializeApp(fireBaseConfig);
+      const storage = getStorage(app);
+      const fileRef = ref(storage, image);
+      const imagePublicURL = await getDownloadURL(fileRef);
+      return json({ code: 1, image: imagePublicURL });
+    } catch (error) {
+      return new Response(
+        JSON.stringify({ code: 0, error: error.message || error.toString() }),
+        {
+          status: 500,
+          headers: {
+            "content-type": "application/json",
+          },
+        },
+      );
+    }
+  }
+  return new Response(JSON.stringify({ code: 0, error: "Invalid Request." }), {
+    status: 400,
+    headers: {
+      "content-type": "application/json",
+    },
+  });
 }
 ```
 
@@ -527,18 +563,17 @@ As you’d be already thinking, there can be multiple media that can be uploaded
 <!-- File: @/src/routes/issue/[slug]/+page.svelte -->
 
 {#each fieldFiles as file}
-	<div class="mt-8 w-full border border-white/25 p-3">
-		{#if /\.(mp4|mov|mkv)/i.test(file)}
-			<video class="h-auto w-full" src={file} controls>
-				<track kind="captions" />
-			</video>
-		{:else}
-			<img alt={file} src={file} class="h-auto w-full" />
-		{/if}
-	</div>
+<div class="mt-8 w-full border border-white/25 p-3">
+  {#if /\.(mp4|mov|mkv)/i.test(file)}
+  <video class="h-auto w-full" src="{file}" controls>
+    <track kind="captions" />
+  </video>
+  {:else}
+  <img alt="{file}" src="{file}" class="h-auto w-full" />
+  {/if}
+</div>
 {/each}
 ```
-
 
 ## But why an open source alternative to Jira Kanban Board?
 

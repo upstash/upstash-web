@@ -1,11 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import ExampleFilter from "./filter";
-import { Example as Box } from "./comp";
-import type { Example } from "@/app/examples/get-data"
+
+import type { Example } from "@/app/examples/get-data";
 import { authors } from "@/utils/authors";
+
 import Button from "@/components/button";
+
+import { Example as Box } from "./comp";
+import ExampleFilter from "./filter";
 
 type Props = {
   examples: Example[];

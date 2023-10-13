@@ -1,9 +1,11 @@
 import { Metadata } from "next";
-import FastResult from "@/components/fast/result";
-import Container from "@/components/container";
 import dynamic from "next/dynamic";
-import cx from "@/utils/cx";
 import Link from "next/link";
+
+import cx from "@/utils/cx";
+
+import Container from "@/components/container";
+import FastResult from "@/components/fast/result";
 
 const Globe = dynamic(() => import("@/components/home/fast/globe2"), {
   ssr: false,
@@ -25,7 +27,7 @@ export default function HomePage() {
               className={cx(
                 "font-display text-4xl font-bold leading-none md:text-5xl",
                 "bg-gradient-to-r from-20% bg-clip-text text-transparent",
-                "from-emerald-400 to-yellow-300"
+                "from-emerald-400 to-yellow-300",
               )}
             >
               Fast Anywhere ⚡️

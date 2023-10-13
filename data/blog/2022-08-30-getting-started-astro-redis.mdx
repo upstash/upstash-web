@@ -4,7 +4,7 @@ title: "Get Started with Astro and Redis"
 description: "Getting started with Astro and Redis: quick start tutorial building a notes app with serverless Upstash data and Cloudflare workers."
 tags: [redis, astro, cloudflare, serverless]
 authors:
-  -  rodney
+  - rodney
 ---
 
 Astro is a new tool optimized for building **fast** content sites. Although it is new, the team already released version 1.0 and the APIs are now stable. Key selling points are **zero JavaScript** by default as well as &ldquo;bring your own framework&rdquo;. We will use Svelte here to help us get started with Astro and Redis. That is building a basic notes app with a serverless database. Although we use Svelte, you should be able to follow along without prior Svelte knowledge. That said, you can swap the components out for <a aria-label="Open list of Astro supported frameworks" href="https://astro.build/integrations/frameworks/">React, Vue or other supported frameworks</a> later, if you prefer.
@@ -187,6 +187,7 @@ At the moment we can only create a skeleton note and cannot even edit it, so her
 ```ts
 import { Redis } from "@upstash/redis/cloudflare";
 import type { APIRoute } from "astro";
+
 import type { Note } from "../types/note";
 import { getDomainUrl } from "../utilities/utilities";
 
@@ -309,9 +310,8 @@ So the main Upstash Redis commands we use&nbsp;are:
 By default Astro is a Static Site Generator (SSG) and we want access to Server Side Rendering (SSR) so we always display the latest notes from the database. We will add a Cloudflare adapter later and doing so automatically switches us from SSG to SSR. We want to access Request headers in the meantime though, this is in a `getDomainUrl` function we use in the next section. To switch to SSR update the `astro.config.js` file to include `output: 'server'` then restart your dev server:
 
 ```javascript
-import { defineConfig } from "astro/config";
-
 import svelte from "@astrojs/svelte";
+import { defineConfig } from "astro/config";
 
 // https://astro.build/config
 export default defineConfig({
@@ -424,10 +424,9 @@ There is one small change to support reading secret environment variables in the
 
 ```javascript
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import cloudflare from "@astrojs/cloudflare";
 import svelte from "@astrojs/svelte";
 import { defineConfig } from "astro/config";
-
-import cloudflare from "@astrojs/cloudflare";
 
 // https://astro.build/config
 export default defineConfig({
@@ -437,10 +436,10 @@ export default defineConfig({
   vite: {
     define: {
       "process.env.UPSTASH_REDIS_REST_URL": JSON.stringify(
-        process.env.UPSTASH_REDIS_REST_URL
+        process.env.UPSTASH_REDIS_REST_URL,
       ),
       "process.env.UPSTASH_REDIS_REST_TOKEN": JSON.stringify(
-        process.env.UPSTASH_REDIS_REST_TOKEN
+        process.env.UPSTASH_REDIS_REST_TOKEN,
       ),
     },
   },

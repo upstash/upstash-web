@@ -1,4 +1,5 @@
 import React, { SVGProps } from "react";
+
 import colors from "tailwindcss/colors";
 
 export default function IconQStash({ ...props }: SVGProps<SVGSVGElement>) {

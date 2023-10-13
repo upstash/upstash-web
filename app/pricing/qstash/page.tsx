@@ -1,12 +1,12 @@
 "use client";
 
-import PricingTable from "@/components/pricing/qstash/pricing-table";
-import Enterprise from "@/components/pricing/enterprise";
-import CompareTable from "@/components/pricing/qstash/compare-table";
-import Ps from "@/components/pricing/qstash/ps";
-import ProductToggle from "@/components/pricing/product-toggle";
-import PageHeaderTitle from "@/components/page-header-title";
 import PageHeaderDesc from "@/components/page-header-desc";
+import PageHeaderTitle from "@/components/page-header-title";
+import Enterprise from "@/components/pricing/enterprise";
+import ProductToggle from "@/components/pricing/product-toggle";
+import CompareTable from "@/components/pricing/qstash/compare-table";
+import PricingTable from "@/components/pricing/qstash/pricing-table";
+import Ps from "@/components/pricing/qstash/ps";
 
 export default function PricingQStashPage() {
   return (

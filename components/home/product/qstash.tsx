@@ -1,15 +1,20 @@
 "use client";
+
+import React from "react";
+
+import { Product } from "@/utils/type";
+
+import { useSegment } from "@/hooks/use-segment";
+
+import Button from "@/components/button";
+import IconQStash from "@/components/icon-qstash";
+
 import {
   ProductBox,
   ProductFeature,
   ProductFeatureItem,
   ProductTitle,
 } from "./comp";
-import Button from "@/components/button";
-import React from "react";
-import { Product } from "@/utils/type";
-import IconQStash from "@/components/icon-qstash";
-import { useSegment } from "@/hooks/use-segment";
 
 export default function ServerlessQStash() {
   const { track } = useSegment();

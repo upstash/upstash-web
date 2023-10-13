@@ -1,12 +1,14 @@
-import * as AboutIcon from "@/components/investor/icons";
 import { Metadata } from "next";
-import Container from "@/components/container";
-import PageHeaderTitle from "@/components/page-header-title";
-import PageHeaderDesc from "@/components/page-header-desc";
-import PageBodyGradient from "@/components/page-body-gradient";
+
 import Balancer from "react-wrap-balancer";
-import Investors from "@/components/investor/investors";
+
 import Bg from "@/components/bg";
+import Container from "@/components/container";
+import * as AboutIcon from "@/components/investor/icons";
+import Investors from "@/components/investor/investors";
+import PageBodyGradient from "@/components/page-body-gradient";
+import PageHeaderDesc from "@/components/page-header-desc";
+import PageHeaderTitle from "@/components/page-header-title";
 
 export const metadata: Metadata = {
   title: "About",

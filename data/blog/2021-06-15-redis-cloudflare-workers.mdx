@@ -72,8 +72,8 @@ async function handleRequest(request) {
 addEventListener("fetch", (event) => {
   event.respondWith(
     handleRequest(event.request).catch(
-      (err) => new Response(err.stack, { status: 500 })
-    )
+      (err) => new Response(err.stack, { status: 500 }),
+    ),
   );
 });
 ```
@@ -106,7 +106,7 @@ redis.lrange(datestr, "0", "-1", function (err, result) {
     console.error(err);
   } else {
     console.log(
-      "Upstash Redis Connection Successful. Analyzing the access logs..."
+      "Upstash Redis Connection Successful. Analyzing the access logs...",
     );
     if (!result || result.length === 0) {
       console.log("Could not find any access logs for the date:" + datestr);

@@ -2,7 +2,7 @@
 slug: sveltekit-rate-limiting
 title: Rate limit your SvelteKit app with Upstash Redis
 authors:
-  -  geoff
+  - geoff
 tags: [redis, rate-limit, svelte, sveltekit]
 ---
 
@@ -31,37 +31,29 @@ First, let’s create a `<form>` and associated [form action](https://kit.svelte
 
 ```html
 <script lang="ts">
-	import type { ActionData } from './$types';
-	import { enhance } from '$app/forms';
+  import { enhance } from "$app/forms";
 
-	export let form: ActionData;
+  import type { ActionData } from "./$types";
 
-	let submitCount = 0;
+  export let form: ActionData;
+
+  let submitCount = 0;
 </script>
 
 <h1>Home</h1>
 
-<form
-	method="POST"
-	use:enhance={() => {
-		submitCount++;
-		return ({ update }) => {
-			// prevent resetting the form after submission
-			update({ reset: false });
-		};
-	}}
->
-	<label for="text">Submission</label>
-	<input id="text" type="text" name="text" />
-	<button>Go</button>
+<form method="POST" use:enhance="{()" ="">
+  { submitCount++; return ({ update }) => { // prevent resetting the form after
+  submission update({ reset: false }); }; }} >
+  <label for="text">Submission</label>
+  <input id="text" type="text" name="text" />
+  <button>Go</button>
 </form>
 
 <p>Submitted {submitCount} times</p>
 
-{#if form?.error}
-	{form.error}
-{:else if form?.result}
-	<p>Transformed: {form.result}</p>
+{#if form?.error} {form.error} {:else if form?.result}
+<p>Transformed: {form.result}</p>
 {/if}
 ```
 
@@ -122,14 +114,14 @@ npm i @upstash/redis @upstash/ratelimit
 At the top of our `+page.server.ts` file, import the necessary dependencies and initialize the database and rate limiter.
 
 ```tsx
-import { building } from "$app/environment";
-import { Redis } from "@upstash/redis";
+import { fail } from "@sveltejs/kit";
 import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+import { building } from "$app/environment";
 import {
   UPSTASH_REDIS_REST_TOKEN,
   UPSTASH_REDIS_REST_URL,
 } from "$env/static/private";
-import { fail } from "@sveltejs/kit";
 
 let redis: Redis;
 let ratelimit: Ratelimit;
@@ -163,7 +155,7 @@ export const actions: Actions = {
     const rateLimitAttempt = await ratelimit.limit(ip);
     if (!rateLimitAttempt.success) {
       const timeRemaining = Math.floor(
-        (rateLimitAttempt.reset - new Date().getTime()) / 1000
+        (rateLimitAttempt.reset - new Date().getTime()) / 1000,
       );
       return fail(429, {
         error: `Too many requests. Please try again in ${timeRemaining} seconds.`,
@@ -191,18 +183,18 @@ It’s important to note that this does not prevent requests to the app itself. 
 In this tutorial we protected a single form action. You can apply the same method to protect [load functions](https://kit.svelte.dev/docs/load) or [server routes](https://kit.svelte.dev/docs/routing#server). If you want to rate limit requests to your entire application, you can use a custom [handle hook](https://kit.svelte.dev/docs/hooks#server-hooks-handle):
 
 ```tsx
-import { type Handle, error } from "@sveltejs/kit";
+import { error, type Handle } from "@sveltejs/kit";
 
 export const handle = (async ({ event, resolve }) => {
   const ip = event.getClientAddress();
   const rateLimitAttempt = await ratelimit.limit(ip);
   if (!rateLimitAttempt.success) {
     const timeRemaining = Math.floor(
-      (rateLimitAttempt.reset - new Date().getTime()) / 1000
+      (rateLimitAttempt.reset - new Date().getTime()) / 1000,
     );
     throw error(
       429,
-      `Too many requests. Please try again in ${timeRemaining} seconds.`
+      `Too many requests. Please try again in ${timeRemaining} seconds.`,
     );
   }
   const response = await resolve(event);

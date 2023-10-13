@@ -2,7 +2,7 @@
 slug: "kafka-content-moderation"
 title: "Serverless Kafka Real World Example: Content Moderation"
 authors:
-  -  "enes"
+  - "enes"
 tags: [serverless, kafka, aws-lambda]
 ---
 
@@ -33,9 +33,10 @@ In the above algorithm, the user does not immediately see the comment they just 
 This is a basic Next.js application which sends the submitted content to an AWS Lambda function. It also loads the accepted and rejected comments from Redis.
 
 ```jsx title="index.js"
-import Head from "next/head";
-import styles from "../styles/Home.module.css";
 import { useEffect, useState } from "react";
+import Head from "next/head";
+
+import styles from "../styles/Home.module.css";
 
 export default function Home() {
   const [data, setData] = useState([]);

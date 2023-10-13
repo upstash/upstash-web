@@ -1,10 +1,12 @@
-import { Metadata } from "next";
-import Container from "@/components/container";
-import PageHeaderTitle from "@/components/page-header-title";
-import Bg from "@/components/bg";
-import cx from "@/utils/cx";
 import { HTMLAttributes } from "react";
+import { Metadata } from "next";
+
+import cx from "@/utils/cx";
+
+import Bg from "@/components/bg";
+import Container from "@/components/container";
 import CopyButton from "@/components/copy-button";
+import PageHeaderTitle from "@/components/page-header-title";
 
 export const metadata: Metadata = {
   title: "Brand Assets",
@@ -231,7 +233,7 @@ function ActionButtons({
         "grid place-items-center rounded-lg",
         "inset-2 z-10 transition md:absolute md:bg-emerald-500/80 md:opacity-0",
         "group-hover/logo-box:opacity-100",
-        className
+        className,
       )}
       {...props}
     >
@@ -275,7 +277,7 @@ function LogoBox({
       className={cx(
         "group/logo-box relative flex flex-col items-center justify-center gap-6 py-14",
         "rounded-2xl border border-zinc-800 bg-zinc-950",
-        className
+        className,
       )}
       {...props}
     >

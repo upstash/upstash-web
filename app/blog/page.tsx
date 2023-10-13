@@ -1,14 +1,17 @@
-import getData from "./get-data";
+import Link from "next/link";
+
+import { BANNED_TAGS } from "@/utils/const";
+import { Post } from "contentlayer/generated";
+import { countBy, flatten, omit } from "lodash";
+
+import Bg from "@/components/bg";
+import PostGridCard from "@/components/blog/grid-item";
 import PopularTag from "@/components/blog/popular-tag";
+import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
-import Container from "@/components/container";
-import Bg from "@/components/bg";
-import { countBy, flatten, omit } from "lodash";
-import { BANNED_TAGS } from "@/utils/const";
-import Link from "next/link";
-import { Post } from "contentlayer/generated";
-import PostGridCard from "@/components/blog/grid-item";
+
+import getData from "./get-data";
 
 export default async function BlogPage() {
   const posts = await getData(10);

@@ -1,17 +1,20 @@
 import "./globals.css";
 import "@upstash/claps/style.css";
 
+import { ReactNode } from "react";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import localFont from "next/font/local";
-import { ReactNode } from "react";
+import Script from "next/script";
+
+import { SITE_URL } from "@/utils/const";
 import cx from "@/utils/cx";
+
+import { SegmentProvider } from "@/lib/segment/provider";
+
+import Footer from "@/components/master/footer";
 import Header from "@/components/master/header";
 import HeaderMobile from "@/components/master/header-mobile";
-import Footer from "@/components/master/footer";
-import Script from "next/script";
-import { SITE_URL } from "@/utils/const";
-import { SegmentProvider } from "@/lib/segment/provider";
 
 const inter = Inter({
   variable: "--font-sans",

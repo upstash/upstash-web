@@ -1,9 +1,10 @@
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
+
+import cx from "@/utils/cx";
 import type { Post } from "contentlayer/generated";
 import { DateTime } from "luxon";
 import Balancer from "react-wrap-balancer";
-import cx from "@/utils/cx";
 
 export default function PostListCard({ data }: { data: Post }) {
   const { title, slug, date, authors, authorsData } = data;
@@ -16,7 +17,7 @@ export default function PostListCard({ data }: { data: Post }) {
         "flex h-full items-center gap-4 bg-zinc-900 px-6 py-5",
         "first:rounded-t-xl last:rounded-b-xl",
         "md:gap-6 md:py-6",
-        isAnnouncement && "bg-yellow-300/10"
+        isAnnouncement && "bg-yellow-300/10",
       )}
     >
       <div className="grow">

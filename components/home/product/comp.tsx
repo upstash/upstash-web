@@ -1,8 +1,10 @@
 import React, { Children, cloneElement, HTMLProps, ReactElement } from "react";
+
 import cx from "@/utils/cx";
-import Icon, { ICON_NAMES } from "@/components/icon";
 import { Product } from "@/utils/type";
 import Balancer from "react-wrap-balancer";
+
+import Icon, { ICON_NAMES } from "@/components/icon";
 
 export function ProductBox({
   children,

@@ -2,7 +2,7 @@
 slug: authenticated-api-redis
 title: "Build an authenticated API with Next.js API Routes and Upstash Redis"
 authors:
-  -  lorenzo
+  - lorenzo
 tags: [authenticatio, redis, nextjs]
 ---
 
@@ -137,12 +137,14 @@ We start with the sign in endpoint, let’s create the file `pages/api/auth/sign
 
 ```js
 import bcrypt from "bcrypt";
+
 import {
+  addToList,
   generateAccessToken,
   generateRefreshToken,
-  addToList,
   redis,
 } from "../../../utils";
+
 export default async (req, res) => {
   if (req.method === "GET") {
     res.status(405).send("Not Allowed");
@@ -199,8 +201,9 @@ It is responsibility of the client to store the returned tokens, use them for au
 We have a function to generate our Token `generateAccessToken`, one to generate our refresh Token `generateRefreshToken`, and one to store the refresh Token in our Redis `addToList`. This `utils.js` this file will also be used to keep all the other utility functions and references (like the Redis connection, the token verification and refresh, and so on):
 
 ```js
-import jwt from "jsonwebtoken";
 import { Redis } from "@upstash/redis";
+import jwt from "jsonwebtoken";
+
 export const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL,
   token: process.env.UPSTASH_REDIS_REST_TOKEN,
@@ -211,7 +214,7 @@ export function generateAccessToken(username, email, level) {
     process.env.SECRET_TOKEN,
     {
       expiresIn: "1h",
-    }
+    },
   );
 }
 
@@ -221,7 +224,7 @@ export function generateRefreshToken(username, email, level) {
     process.env.SECRET_RTOKEN,
     {
       expiresIn: "30d",
-    }
+    },
   );
 }
 
@@ -292,7 +295,8 @@ If everything was correct, in your Redis database you should now see a new Hash 
 Next, we are completing the authentication process, by coding a token refresh route `refresh.js`
 
 ```js
-import { tokenRefresh, redis } from "../../../utils";
+import { redis, tokenRefresh } from "../../../utils";
+
 export default async (req, res) => {
   if (req.method === "GET") {
     res.status(405).send("Not Allowed");
@@ -316,6 +320,7 @@ Create a new API route: `api/movies/[[...id]].js` that will be used to get the l
 
 ```js
 import { redis, verifyToken } from "../../../utils";
+
 export default async (req, res) => {
   var id;
   console.log(req.query);
