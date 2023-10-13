@@ -2,7 +2,7 @@
 slug: quota-based-saas
 title: Manage a quota-based SaaS application with Upstash and Next.js
 authors:
-  -  thomasCazade
+  - thomasCazade
 tags: [redis, quota, edge, billing, saas, prisma]
 ---
 
@@ -58,7 +58,7 @@ const MAX_FREE_TIER_QUOTA = 1000;
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   // Get the ID of the spreadsheet from the URL.
   const { id } = req.params;
@@ -113,6 +113,7 @@ Here is the same code as before, but using Upstash Redis® to manage the user's 
 ```ts
 // pages/api/spreadsheets/[id]/index.ts
 import type { NextApiRequest, NextApiResponse } from "next";
+
 import { Redis } from "@upstash/redis";
 
 const MAX_FREE_TIER_QUOTA = 1000;
@@ -126,7 +127,7 @@ const redis = new Redis({
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   // Get the ID of the spreadsheet from the URL.
   const { id } = req.params;

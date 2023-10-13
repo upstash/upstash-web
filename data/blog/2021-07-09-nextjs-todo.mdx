@@ -103,10 +103,11 @@ export default async (req, res) => {
 Update pages/index.js as below:
 
 ```javascript
+import { useEffect, useState } from "react";
 import Head from "next/head";
 import Image from "next/image";
+
 import styles from "../styles/Home.module.css";
-import { useEffect, useState } from "react";
 
 export default function Home() {
   const [data, setData] = useState([]);

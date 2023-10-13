@@ -50,7 +50,8 @@ Create a middleware.ts (or .js) file at the same level as your pages directory. 
 
 ```tsx
 import { NextResponse } from "next/server";
-import type { NextRequest, NextFetchEvent } from "next/server";
+import type { NextFetchEvent, NextRequest } from "next/server";
+
 import { Kafka } from "@upstash/kafka";
 
 // Trigger this middleware to run on the `/secret-page` route

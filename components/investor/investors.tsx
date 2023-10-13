@@ -1,5 +1,6 @@
-import { INVESTORS } from "@/utils/investors";
 import Image from "next/image";
+
+import { INVESTORS } from "@/utils/investors";
 
 export default function Investors({ short = false }) {
   const DATA = short ? INVESTORS.slice(0, 5) : INVESTORS;

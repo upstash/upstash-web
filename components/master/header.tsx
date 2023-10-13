@@ -1,12 +1,15 @@
 "use client";
 
+import { HTMLProps, ReactNode } from "react";
+import Link from "next/link";
+
+import cx from "@/utils/cx";
+import { allJobs } from "contentlayer/generated";
+
 import Button from "@/components/button";
 import Container from "@/components/container";
 import { Logo } from "@/components/logo";
-import cx from "@/utils/cx";
-import { allJobs } from "contentlayer/generated";
-import Link from "next/link";
-import { HTMLProps, ReactNode } from "react";
+
 import Nav from "./nav";
 
 const jobLength = allJobs.filter((o) => !o.draft).length;

@@ -1,12 +1,12 @@
 "use client";
 
-import PricingTable from "@/components/pricing/kafka/pricing-table";
+import PageHeaderDesc from "@/components/page-header-desc";
+import PageHeaderTitle from "@/components/page-header-title";
 import Enterprise from "@/components/pricing/enterprise";
 import CompareTable from "@/components/pricing/kafka/compare-table";
+import PricingTable from "@/components/pricing/kafka/pricing-table";
 import Ps from "@/components/pricing/kafka/ps";
 import ProductToggle from "@/components/pricing/product-toggle";
-import PageHeaderTitle from "@/components/page-header-title";
-import PageHeaderDesc from "@/components/page-header-desc";
 
 export default function PricingKafkaPage() {
   return (

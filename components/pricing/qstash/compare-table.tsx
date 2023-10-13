@@ -1,7 +1,10 @@
 import { ChangeEvent, useState } from "react";
-import CompareValue from "../compare-value";
+
 import { PricingPlans } from "@/utils/type";
+
 import useIsMobile from "@/hooks/use-is-mobile";
+
+import CompareValue from "../compare-value";
 
 export default function CompareTable() {
   const isMobile = useIsMobile();

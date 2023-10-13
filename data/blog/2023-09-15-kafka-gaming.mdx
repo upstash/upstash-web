@@ -81,60 +81,61 @@ First, we would implement the backend server of the game where will would implem
 We will create a file which is named **config.js** to have the Upstash Kafka configuration using **kafka.js**.
 
 ```js
-    import { Kafka } from "kafkajs"
-    const { updatePlayerState } = require("./players")
+// dotenv is used to load environment variables from a .env file into process.env
+import dotenv from "dotenv";
+import { Kafka } from "kafkajs";
 
-    // dotenv is used to load environment variables from a .env file into process.env
-    import dotenv from "dotenv"
-    dotenv.config()
+const { updatePlayerState } = require("./players");
 
-    // create a new Kafka instance and export it
-    export const kafka = new Kafka({
-     brokers: [process.env.UPSTASH_KAFKA_BROKER_URL],
-     sasl: {
-      mechanism: "scram-sha-256",
-      username: process.env.UPSTASH_KAFKA_USERNAME,
-      password: process.env.UPSTASH_KAFKA_PASSWORD,
-     },
-     ssl: true,
-     // dont log anything
-     logLevel: 0,
-    })
+dotenv.config();
 
-    const consumer = kafka.consumer({ groupId: "players-state" })
-    const producer = kafka.producer()
+// create a new Kafka instance and export it
+export const kafka = new Kafka({
+  brokers: [process.env.UPSTASH_KAFKA_BROKER_URL],
+  sasl: {
+    mechanism: "scram-sha-256",
+    username: process.env.UPSTASH_KAFKA_USERNAME,
+    password: process.env.UPSTASH_KAFKA_PASSWORD,
+  },
+  ssl: true,
+  // dont log anything
+  logLevel: 0,
+});
 
-    // on succesfull connection to kafka broker
-    consumer.on("consumer.group_join", () => {
-     console.log("Consumer connected to kafka broker!")
-    })
+const consumer = kafka.consumer({ groupId: "players-state" });
+const producer = kafka.producer();
 
-    // on disconnect from kafka broker
-    consumer.on("consumer.stop", () => {
-     console.log("Consumer disconnected from kafka broker!")
-    })
+// on succesfull connection to kafka broker
+consumer.on("consumer.group_join", () => {
+  console.log("Consumer connected to kafka broker!");
+});
 
-    const consume = async () => {
-     await consumer.connect()
-     await consumer.subscribe({ topic: "players-state" })
-     await consumer.run({
-      eachMessage: async ({ __, _, message }) => {
-       const updatedPlayerState = JSON.parse(message.value)
-       console.log({ updatedPlayerState })
-       updatePlayerState(updatedPlayerState)
-      },
-     })
-    }
+// on disconnect from kafka broker
+consumer.on("consumer.stop", () => {
+  console.log("Consumer disconnected from kafka broker!");
+});
 
-    const produce = async message => {
-     await producer.connect()
-     await producer.send({
-      topic: "players-state",
-      messages: [{ value: JSON.stringify(message) }],
-     })
-    }
+const consume = async () => {
+  await consumer.connect();
+  await consumer.subscribe({ topic: "players-state" });
+  await consumer.run({
+    eachMessage: async ({ __, _, message }) => {
+      const updatedPlayerState = JSON.parse(message.value);
+      console.log({ updatedPlayerState });
+      updatePlayerState(updatedPlayerState);
+    },
+  });
+};
 
-    module.exports = { kafka, consume, produce }
+const produce = async (message) => {
+  await producer.connect();
+  await producer.send({
+    topic: "players-state",
+    messages: [{ value: JSON.stringify(message) }],
+  });
+};
+
+module.exports = { kafka, consume, produce };
 ```
 
 where we are using the environment variables that are defined in the **.env** file. we have two functions one to **produce** messages to the Kafka and one to **consume **messages.
@@ -144,22 +145,22 @@ where we are using the environment variables that are defined in the **.env** fi
 The server configuration would be,
 
 ```js
-    const express = require("express")
-    const http = require("http")
-    const socketIo = require("socket.io")
+const express = require("express");
+const http = require("http");
+const socketIo = require("socket.io");
 
-    const app = express()
-    const server = http.createServer(app)
-    const io = socketIo(server)
+const app = express();
+const server = http.createServer(app);
+const io = socketIo(server);
 
-    module.exports = { app, server, io }
+module.exports = { app, server, io };
 ```
 
 ### 3. Players Configuration
 
 The “player.js” file centralizes player data and offers an “updatePlayerState” function for real-time state management. It tracks player movements and interactions, facilitating synchronization among players in our multiplayer game through the “io” object. This file is integral to ensuring dynamic and engaging gameplay by maintaining player states and broadcasting updates to all connected clients.
 
-```js
+````js
     const { io } = require("./socketServer")
 
     let players = [
@@ -234,7 +235,7 @@ Now, we are going to implement the main server.js file
     server.listen(PORT, () => {
      console.log(`Server is running on port ${PORT}`)
     })
-```
+````
 
 Our primary event is “**player-state-change**,” which triggers the production of a message to the Upstash Kafka cluster whenever a player updates their state. Simultaneously, a Kafka consumer operates, actively monitoring this specific topic for newly produced messages. It consumes these messages in real-time and promptly updates the player values on other players’ computers that are subscribed to receive this data.
 
@@ -249,84 +250,84 @@ Next, we’ll create a basic game UI to visualize real-time player state changes
 First, we would create a file named **index.ejs** in the views folder.
 
 ```html
-    <!DOCTYPE html>
-    <html lang="en">
-     <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <link rel="stylesheet" href="/styles.css" />
-      <title>Two-Player Game</title>
-     </head>
-     <body>
-      <div class="player" id="player1">P1</div>
-      <div class="player" id="player2">P2</div>
-      <script src="/socket.io/socket.io.js"></script>
-      <script>
-       const socket = io()
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/styles.css" />
+    <title>Two-Player Game</title>
+  </head>
+  <body>
+    <div class="player" id="player1">P1</div>
+    <div class="player" id="player2">P2</div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
 
-       const player1 = document.getElementById("player1")
-       const player2 = document.getElementById("player2")
+      const player1 = document.getElementById("player1");
+      const player2 = document.getElementById("player2");
 
-       const PLAYER_SPEED = 10
+      const PLAYER_SPEED = 10;
 
-       let player1Position = 0
-       let player2Position = 0
+      let player1Position = 0;
+      let player2Position = 0;
 
-       function updatePositions() {
-        player1.style.top = player1Position + "px"
-        player2.style.top = player2Position + "px"
-       }
+      function updatePositions() {
+        player1.style.top = player1Position + "px";
+        player2.style.top = player2Position + "px";
+      }
 
-       document.addEventListener("keydown", event => {
-        const key = event.key
+      document.addEventListener("keydown", (event) => {
+        const key = event.key;
         if (key === "ArrowUp") {
-         player1Position = Math.max(player1Position - PLAYER_SPEED, 0)
-         updatePlayerPosition(1, player1Position)
+          player1Position = Math.max(player1Position - PLAYER_SPEED, 0);
+          updatePlayerPosition(1, player1Position);
         } else if (key === "ArrowDown") {
-         player1Position = Math.min(
-          player1Position + PLAYER_SPEED,
-          window.innerHeight - 50
-         )
-         updatePlayerPosition(1, player1Position)
+          player1Position = Math.min(
+            player1Position + PLAYER_SPEED,
+            window.innerHeight - 50,
+          );
+          updatePlayerPosition(1, player1Position);
         } else if (key === "w") {
-         player2Position = Math.max(player2Position - PLAYER_SPEED, 0)
-         updatePlayerPosition(2, player2Position)
+          player2Position = Math.max(player2Position - PLAYER_SPEED, 0);
+          updatePlayerPosition(2, player2Position);
         } else if (key === "s") {
-         player2Position = Math.min(
-          player2Position + PLAYER_SPEED,
-          window.innerHeight - 50
-         )
-         updatePlayerPosition(2, player2Position)
+          player2Position = Math.min(
+            player2Position + PLAYER_SPEED,
+            window.innerHeight - 50,
+          );
+          updatePlayerPosition(2, player2Position);
         }
 
-        updatePositions()
-       })
+        updatePositions();
+      });
 
-       function updatePlayerPosition(playerId, position) {
+      function updatePlayerPosition(playerId, position) {
         socket.emit("player-state-change", {
-         id: playerId,
-         name: "player" + playerId,
-         y: position,
-        })
-       }
+          id: playerId,
+          name: "player" + playerId,
+          y: position,
+        });
+      }
 
-       socket.on("update-state-by-consumer", data => {
-        const newData = data.players
+      socket.on("update-state-by-consumer", (data) => {
+        const newData = data.players;
         //iterate through the array and update the position
         newData.forEach(function (player) {
-         console.log("player", player)
-         if (player.id === 1) {
-          player1Position = player.y
-         } else if (player.id === 2) {
-          player2Position = player.y
-         }
-        })
+          console.log("player", player);
+          if (player.id === 1) {
+            player1Position = player.y;
+          } else if (player.id === 2) {
+            player2Position = player.y;
+          }
+        });
 
-        updatePositions()
-       })
-      </script>
-     </body>
-    </html>
+        updatePositions();
+      });
+    </script>
+  </body>
+</html>
 ```
 
 In our game, we have just two users who can move up and down. We employ two key events: “**player-state-change**,” which is triggered whenever a player alters their state, and “**update-state-by-consumer,**” which listens for updates when the consumer processes the player’s new state. Upon consumption, it promptly adjusts the player’s state accordingly.

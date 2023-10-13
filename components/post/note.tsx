@@ -1,4 +1,5 @@
 import { ReactNode, SVGProps } from "react";
+
 import cx from "@/utils/cx";
 
 export default function PostNote({
@@ -29,7 +30,7 @@ export default function PostNote({
       className={cx(
         "flex items-start gap-4 rounded-xl md:px-6 md:py-5",
         "border border-white/5 bg-white/5 p-4 text-zinc-200",
-        type && style[type]
+        type && style[type],
       )}
     >
       <span className="text-2xl">

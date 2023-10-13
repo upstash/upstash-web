@@ -2,7 +2,7 @@
 slug: next-auth-serverless-redis
 title: "Next.js Authentication with NextAuth and Serverless Redis"
 authors:
-  -  kay
+  - kay
 image: nextauth/cover.png
 tags: [redis, serverless, nextjs]
 ---
@@ -46,10 +46,11 @@ You will use the dotenv package to make the setup of the credentials a bit easie
 The API endpoint for NextAuth is a simple JS file, create it at `pages/api/auth/[...nextauth].js` with the following content:
 
 ```javascript
-import NextAuth from "next-auth";
-import GithubProvider from "next-auth/providers/github";
 import { UpstashRedisAdapter } from "@next-auth/upstash-redis-adapter";
 import { Redis } from "@upstash/redis";
+import NextAuth from "next-auth";
+import GithubProvider from "next-auth/providers/github";
+
 import "dotenv/config";
 
 export default NextAuth({
@@ -57,7 +58,7 @@ export default NextAuth({
     new Redis({
       url: process.env.UPSTASH_REDIS_URL,
       token: process.env.UPSTASH_REDIS_TOKEN,
-    })
+    }),
   ),
   providers: [
     GithubProvider({
@@ -115,7 +116,7 @@ This code will provide all components in your Next.js app with the session data 
 To check if everything works, you also need to update the index page at `page/index.js` with this code:
 
 ```javascript
-import { useSession, signIn, signOut } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -159,7 +160,7 @@ UpstashRedisAdapter(
     url: process.env.UPSTASH_REDIS_URL,
     token: process.env.UPSTASH_REDIS_TOKEN,
   }),
-  { baseKeyPrefix: "app-specific-prefix-1:" }
+  { baseKeyPrefix: "app-specific-prefix-1:" },
 );
 ```
 

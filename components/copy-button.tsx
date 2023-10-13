@@ -2,9 +2,11 @@
 
 import * as React from "react";
 import { HTMLAttributes } from "react";
-import Icon, { ICON_NAMES } from "@/components/icon";
-import copy from "copy-to-clipboard";
+
 import cx from "@/utils/cx";
+import copy from "copy-to-clipboard";
+
+import Icon, { ICON_NAMES } from "@/components/icon";
 
 export interface Props extends HTMLAttributes<HTMLButtonElement> {
   code: string;
@@ -23,7 +25,7 @@ export default function CopyButton({ code, className, ...props }: Props) {
       aria-label="Copy code to clipboard"
       className={cx(
         "inline-flex items-center justify-center transition",
-        className
+        className,
       )}
       onClick={() => {
         copy(code);

@@ -1,11 +1,13 @@
+import { notFound } from "next/navigation";
+
+import { SITE_URL } from "@/utils/const";
 import type { Job } from "contentlayer/generated";
 import { allJobs } from "contentlayer/generated";
-import { notFound } from "next/navigation";
-import { SITE_URL } from "@/utils/const";
+
 import Bg from "@/components/bg";
 import CareerHeader from "@/components/career/header";
-import PageBodyGradient from "@/components/page-body-gradient";
 import Container from "@/components/container";
+import PageBodyGradient from "@/components/page-body-gradient";
 import { Mdx } from "@/components/post/mdx";
 
 type Props = {

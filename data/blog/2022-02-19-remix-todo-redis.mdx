@@ -2,7 +2,7 @@
 slug: remix-todo-redis
 title: "Remix TODO App with Redis"
 authors:
-  -  adem
+  - adem
 tags: [remix, todo, serverless, redis, upstash]
 ---
 
@@ -39,11 +39,12 @@ We will build a simple form and a list for todo items:
 ```tsx
 // app/routes/index.tsx
 
-import type { ActionFunction, LoaderFunction } from "remix";
-import { Form, useLoaderData, useTransition, redirect } from "remix";
 import { useEffect, useRef } from "react";
+
 import type { Todo } from "~/components/todo-item";
 import TodoItem from "~/components/todo-item";
+import type { ActionFunction, LoaderFunction } from "remix";
+import { Form, redirect, useLoaderData, useTransition } from "remix";
 
 export const loader: LoaderFunction = async () => {
   // example data
@@ -192,9 +193,21 @@ button {
 }
 
 html {
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe
-      UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif,
-    Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    Segoe UI,
+    Roboto,
+    Helvetica Neue,
+    Arial,
+    Noto Sans,
+    sans-serif,
+    Apple Color Emoji,
+    Segoe UI Emoji,
+    Segoe UI Symbol,
+    Noto Color Emoji;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -272,6 +285,7 @@ import {
   ScrollRestoration,
 } from "remix";
 import type { MetaFunction } from "remix";
+
 import styles from "./styles/app.css";
 
 export function links() {

@@ -1,6 +1,6 @@
+import { authors } from "@/utils/authors";
 import { ImageResponse } from "@vercel/og";
 import { allPosts } from "contentlayer/generated";
-import { authors } from "@/utils/authors";
 
 export const runtime = "edge";
 export const size = {
@@ -29,7 +29,7 @@ export default async function TwImage({
       : "http://localhost:3000";
     const authorImage = new URL(
       `/authors/${authors[post.authors[0]].image}`,
-      baseUrl
+      baseUrl,
     ).toString();
     return new ImageResponse(
       (
@@ -59,7 +59,7 @@ export default async function TwImage({
             <p tw="text-3xl my-4 leading-[1] ">blog.upstash.com</p>
           </footer>
         </div>
-      )
+      ),
     );
   } catch (e) {
     console.error(e);
@@ -67,7 +67,7 @@ export default async function TwImage({
       `Failed to generate the image: ${(e as Error).message}`,
       {
         status: 500,
-      }
+      },
     );
   }
 }

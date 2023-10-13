@@ -3,7 +3,9 @@
 import { HTMLProps, ReactNode } from "react";
 import Link, { LinkProps } from "next/link";
 import { usePathname } from "next/navigation";
+
 import cx from "@/utils/cx";
+
 import { NavItems } from "./header";
 
 export default function Nav({}: HTMLProps<HTMLDivElement> & {}) {

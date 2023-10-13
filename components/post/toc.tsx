@@ -1,7 +1,7 @@
 "use client";
 
-import { TableOfContents } from "@/utils/toc";
 import cx from "@/utils/cx";
+import { TableOfContents } from "@/utils/toc";
 
 type Props = {
   toc: TableOfContents;

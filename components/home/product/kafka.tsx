@@ -1,15 +1,20 @@
 "use client";
+
+import React from "react";
+
+import { Product } from "@/utils/type";
+
+import { useSegment } from "@/hooks/use-segment";
+
+import Button from "@/components/button";
+import IconKafka from "@/components/icon-kafka";
+
 import {
   ProductBox,
   ProductFeature,
   ProductFeatureItem,
   ProductTitle,
 } from "./comp";
-import Button from "@/components/button";
-import React from "react";
-import { Product } from "@/utils/type";
-import IconKafka from "@/components/icon-kafka";
-import { useSegment } from "@/hooks/use-segment";
 
 export default function ServerlessKafka() {
   const { track } = useSegment();

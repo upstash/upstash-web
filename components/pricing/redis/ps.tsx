@@ -8,10 +8,10 @@ export default function Ps() {
 
         <div className="mt-4 space-y-4 text-white/80">
           <p>
-            You can start using Upstash for free right away without entering your
-            credit card information. This tier lets you create one database with
-            a limit of 10K daily commands and 256MB Storage. Additionally you
-            can create one read region at maximum within this tier. Once you
+            You can start using Upstash for free right away without entering
+            your credit card information. This tier lets you create one database
+            with a limit of 10K daily commands and 256MB Storage. Additionally
+            you can create one read region at maximum within this tier. Once you
             provide your credit card details, your database will upgrade to the
             pay-as-you-go plan and limits will be updated. If you want to try
             Upstash paid and enterprise plans, we can offer Free Trials. Email
@@ -33,14 +33,14 @@ export default function Ps() {
 
         <div className="mt-4 space-y-4 text-white/80">
           <p>
-            With the Pay As you go plan, you can set a maximum monthly budget for
-            your database so that you won't be charged beyond this chosen limit.
-            We'll keep you informed by sending email notifications once you
-            reach 70% and 90% of your monthly budget. This notifications will
-            let you either adjust your budget limit or upgrade to the Pro tier.
-            Please note that if your usage exceeds your monthly budget cap, your
-            database will be rate limited and your cost will not exceed your
-            chosen budget limit.
+            With the Pay As you go plan, you can set a maximum monthly budget
+            for your database so that you won't be charged beyond this chosen
+            limit. We'll keep you informed by sending email notifications once
+            you reach 70% and 90% of your monthly budget. This notifications
+            will let you either adjust your budget limit or upgrade to the Pro
+            tier. Please note that if your usage exceeds your monthly budget
+            cap, your database will be rate limited and your cost will not
+            exceed your chosen budget limit.
           </p>
           <p>
             Your monthly bill will be driven by the below components, all

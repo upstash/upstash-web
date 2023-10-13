@@ -1,5 +1,6 @@
-import { TAG_NAMES } from "@/utils/const";
 import Link from "next/link";
+
+import { TAG_NAMES } from "@/utils/const";
 import cx from "@/utils/cx";
 
 export default function BlogPopularTag({ data }: { data: [string, number][] }) {
@@ -26,7 +27,7 @@ export default function BlogPopularTag({ data }: { data: [string, number][] }) {
             className={cx(
               "rounded-full bg-opacity-10 px-3 py-2 transition",
               "hover:bg-opacity-20 hover:underline",
-              colors[index % colors.length]
+              colors[index % colors.length],
             )}
           >
             {TAG_NAMES[tag as keyof typeof TAG_NAMES] || (

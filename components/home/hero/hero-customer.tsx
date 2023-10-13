@@ -1,5 +1,5 @@
-import * as Logo from "components/home/hero/hero-customer-icons";
 import cx from "@/utils/cx";
+import * as Logo from "components/home/hero/hero-customer-icons";
 
 export default function HomeHeroPartner() {
   return (
@@ -37,7 +37,7 @@ function Logos({ className }: { className?: string }) {
         "overflow-hidden whitespace-nowrap",
         "flex-wrap items-center justify-center gap-x-10 gap-y-6",
         "md:flex",
-        className
+        className,
       )}
     >
       {customers.map(({ name, url, icon }) => (

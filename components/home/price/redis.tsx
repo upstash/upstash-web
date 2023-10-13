@@ -1,4 +1,11 @@
 "use client";
+
+import React from "react";
+
+import { useSegment } from "@/hooks/use-segment";
+
+import IconRedis from "@/components/icon-redis";
+
 import {
   PriceBadge,
   PriceBox,
@@ -8,9 +15,6 @@ import {
   PriceTitle,
   PriceValue,
 } from "./comp";
-import React from "react";
-import IconRedis from "@/components/icon-redis";
-import { useSegment } from "@/hooks/use-segment";
 
 export default function PriceRedis() {
   const segment = useSegment();

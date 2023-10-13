@@ -1,13 +1,16 @@
 "use client";
 
 import { HTMLProps, useEffect, useState } from "react";
-import cx from "@/utils/cx";
-import { Logo } from "@/components/logo";
 import Link from "next/link";
-import Container from "@/components/container";
-import NavMobile from "./nav-mobile";
-import Icon, { ICON_NAMES } from "@/components/icon";
 import { usePathname } from "next/navigation";
+
+import cx from "@/utils/cx";
+
+import Container from "@/components/container";
+import Icon, { ICON_NAMES } from "@/components/icon";
+import { Logo } from "@/components/logo";
+
+import NavMobile from "./nav-mobile";
 
 export interface IAppHeader extends HTMLProps<HTMLHeadElement> {}
 
@@ -24,7 +27,7 @@ export default function Header({ className, ...props }: IAppHeader) {
       className={cx(
         "fixed inset-x-0 top-0 z-50 py-4 md:hidden",
         "border-b border-b-white/5 bg-zinc-950",
-        className
+        className,
       )}
       {...props}
     >

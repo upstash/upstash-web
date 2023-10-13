@@ -84,13 +84,14 @@ secrets to authenticate with other services, instead of exposing them in the
 frontend.
 
 ```ts title="/api/add.ts"
-import { NextApiRequest, NextApiResponse } from "next";
-import { Client } from "@upstash/qstash";
 import assert from "assert";
+import { NextApiRequest, NextApiResponse } from "next";
+
+import { Client } from "@upstash/qstash";
 
 export default async function (
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ): Promise<void> {
   try {
     const qstashToken = process.env.QSTASH_TOKEN;
@@ -135,10 +136,11 @@ introduce a random error component just to highlight the retry capabilities of
 QStash.
 
 ```ts title="/api/process.ts"
-import { Novu } from "@novu/node";
-import { verifySignature } from "@upstash/qstash/nextjs";
 import assert from "assert";
 import { NextApiRequest, NextApiResponse } from "next";
+
+import { Novu } from "@novu/node";
+import { verifySignature } from "@upstash/qstash/nextjs";
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {

@@ -2,7 +2,7 @@
 slug: sveltekit-edge-redis
 title: "Building a Guest Book on the Edge with SvelteKit, Upstash Redis® and Vercel"
 authors:
-  -  geoff
+  - geoff
 tags: [sveltekit, edge, redis, vercel]
 tweet: https://twitter.com/upstash/status/1551664802858164224
 ---
@@ -76,8 +76,8 @@ This will work great when deployed, but these headers won’t be automatically s
 
 ```tsx
 import type { Handle } from "@sveltejs/kit";
-import { COUNTRY_HEADER, CITY_HEADER } from "$lib/constants";
 import { dev } from "$app/environment";
+import { CITY_HEADER, COUNTRY_HEADER } from "$lib/constants";
 
 export const handle: Handle = async function ({ event, resolve }) {
   if (dev) {

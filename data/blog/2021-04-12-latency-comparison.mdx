@@ -121,7 +121,7 @@ module.exports.load = (event, context, callback) => {
     if (err) {
       console.error(
         "Unable to scan the table. Error JSON:",
-        JSON.stringify(err, null, 2)
+        JSON.stringify(err, null, 2),
       );
     } else {
       // response is ready so we can set the latency
@@ -154,7 +154,7 @@ module.exports.load = (event, context, callback) => {
           if (err) {
             console.error(
               "Unable to update item. Error JSON:",
-              JSON.stringify(err, null, 2)
+              JSON.stringify(err, null, 2),
             );
           }
         });
@@ -194,8 +194,8 @@ module.exports.load = async (event) => {
         q.Paginate(q.Match(q.Index("section_by_view_count"), section), {
           size: 10,
         }),
-        q.Lambda(["view_count", "X"], q.Get(q.Var("X")))
-      )
+        q.Lambda(["view_count", "X"], q.Get(q.Var("X"))),
+      ),
     )
     .catch((err) => console.error("Error: %s", err));
   console.log(ret);
@@ -217,7 +217,7 @@ module.exports.load = async (event) => {
       .query(
         q.Update(q.Ref(q.Collection("news"), item["ref"].id), {
           data: { view_count },
-        })
+        }),
       )
       .catch((err) => console.error("Error: %s", err));
   });
@@ -327,7 +327,7 @@ module.exports.load = async (event) => {
         fauna_histogram: hfauna,
       },
       null,
-      2
+      2,
     ),
   };
 };

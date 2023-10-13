@@ -70,8 +70,10 @@ To create the user interface, we'll create a new page at `app/page.tsx` with the
 
 ```tsx
 "use client";
-import axios from "axios";
+
 import { useState } from "react";
+
+import axios from "axios";
 
 export default function Home() {
   const userId = "tony-stark-11";
@@ -90,7 +92,7 @@ export default function Home() {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
       alert("Email notification scheduled");
     } catch (e) {
@@ -110,7 +112,7 @@ export default function Home() {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
       alert("Email notification schedule cancelled");
     } catch (e) {
@@ -168,8 +170,9 @@ Let's start by creating the `POST /api/schedule-cron` route. This route will be 
 
 ```ts
 import { NextApiRequest, NextApiResponse } from "next";
-import axios from "axios";
+
 import { Redis } from "@upstash/redis";
+import axios from "axios";
 
 export const QSTASH_CONFIG = {
   QSTASH_URL: process.env.QSTASH_URL,
@@ -187,7 +190,7 @@ const SUMMARY_ENDPOINT = "https://<your-domain>/api/send-email";
 
 export default async function scheduleSummary(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   console.log("========SCHEDULE SUMMARY========");
   if (req.method !== "POST") {
@@ -210,7 +213,7 @@ export default async function scheduleSummary(
           headers: {
             Authorization: `Bearer ${QSTASH_CONFIG.QSTASH_TOKEN}`,
           },
-        }
+        },
       );
     } catch (e) {
       console.log("Schedule not found in QStash ");
@@ -232,7 +235,7 @@ export default async function scheduleSummary(
           Authorization: `Bearer ${QSTASH_CONFIG.QSTASH_TOKEN}`,
           "Upstash-Cron": selectedCron,
         },
-      }
+      },
     );
     console.log({ data, status });
     if (data.scheduleId) {
@@ -275,6 +278,7 @@ The `POST /api/send-email` function receives `userId` in the request body. You c
 
 ```ts
 import { NextApiRequest, NextApiResponse } from "next";
+
 import { verifySignature } from "@upstash/qstash/nextjs";
 
 async function handler(request: NextApiRequest, res: NextApiResponse) {

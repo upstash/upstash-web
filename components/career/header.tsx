@@ -1,7 +1,8 @@
 import type { Job } from "contentlayer/generated";
 import Balancer from "react-wrap-balancer";
-import Container from "@/components/container";
+
 import Button from "@/components/button";
+import Container from "@/components/container";
 
 type Props = {
   job: Job;

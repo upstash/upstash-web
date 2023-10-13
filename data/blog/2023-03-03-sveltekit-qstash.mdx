@@ -2,7 +2,7 @@
 slug: sveltekit-qstash
 title: "Refresh stale data in a SvelteKit app with QStash"
 authors:
-  -  geoff
+  - geoff
 tags: [qstash, sveltekit]
 ---
 
@@ -53,7 +53,7 @@ function getExpiryKey(id: number) {
 export async function cacheMovieResponse(
   id: number,
   movie: TMDB.Movie,
-  credits: TMDB.MovieCreditsResponse
+  credits: TMDB.MovieCreditsResponse,
 ) {
   try {
     console.log(`Caching ${id}`);
@@ -81,12 +81,12 @@ And here’s what our updated cache retrieval logic looks like. We now retrieve 
 
 ```ts
 export async function getMovieDetailsFromCache(
-  id: number
+  id: number,
 ): Promise<MovieDetails | Record<string, never>> {
   try {
     const [cached, expiryKey] = await redis.mget(
       getMovieKey(id),
-      getExpiryKey(id)
+      getExpiryKey(id),
     );
 
     if (cached) {
@@ -118,8 +118,9 @@ Before getting started with QStash, let’s lay the groundwork. QStash needs an 
 Add the following to the `+server.ts` file:
 
 ```ts
-import type { RequestHandler } from "./$types";
 import { getMovieDetailsFromApi } from "$lib/api";
+
+import type { RequestHandler } from "./$types";
 
 export const POST: RequestHandler = async ({ request }) => {
   const { id } = await request.json();
@@ -163,9 +164,9 @@ Now that we have the QStash keys, we can call it in our `sendUpdateRequest` func
 
 ```ts
 import {
-  REDIS_CONNECTION,
-  QSTASH_TOKEN,
   CALLBACK_URL,
+  QSTASH_TOKEN,
+  REDIS_CONNECTION,
 } from "$env/static/private";
 
 const qstash = new Client({
@@ -201,13 +202,14 @@ Now let’s test it! To make testing easier, update the line setting `DEFAULT_EX
 It works! Though we do have a security vulnerability — anyone can request the `/api/refresh` endpoint. This might not be a big issue for our app, but it could be for more sensitive workloads. We can use the QStash client’s `Receiver` to make sure the request is coming from QStash. Update our `+server.ts` file to the following:
 
 ```ts
-import type { RequestHandler } from "./$types";
 import { Receiver } from "@upstash/qstash";
 import {
   QSTASH_CURRENT_SIGNING_KEY,
   QSTASH_NEXT_SIGNING_KEY,
 } from "$env/static/private";
 import { getMovieDetailsFromApi } from "$lib/api";
+
+import type { RequestHandler } from "./$types";
 
 const receiver = new Receiver({
   currentSigningKey: QSTASH_CURRENT_SIGNING_KEY,

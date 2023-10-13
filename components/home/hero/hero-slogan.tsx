@@ -16,7 +16,7 @@ export default function HomeHeroSlogan({
         "from-emerald-400 to-yellow-300",
         activeProduct === Product.REDIS && "from-red-500 to-red-200",
         activeProduct === Product.KAFKA && "from-blue-500 to-blue-200",
-        activeProduct === Product.QSTASH && "from-purple-500 to-purple-200"
+        activeProduct === Product.QSTASH && "from-purple-500 to-purple-200",
       )}
     >
       <span>Serverless</span>

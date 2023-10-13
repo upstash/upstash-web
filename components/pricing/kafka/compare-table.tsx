@@ -1,9 +1,13 @@
 import { ChangeEvent, useState } from "react";
-import Button from "@/components/button";
-import CompareValue from "../compare-value";
+
 import { PricingPlans } from "@/utils/type";
+
 import useIsMobile from "@/hooks/use-is-mobile";
+
+import Button from "@/components/button";
 import Tooltip from "@/components/tooltip";
+
+import CompareValue from "../compare-value";
 
 export default function CompareTable() {
   const isMobile = useIsMobile();

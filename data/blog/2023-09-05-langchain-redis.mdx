@@ -59,11 +59,11 @@ To start off, we'll create a basic `app/layout.tsx` to house our app:
 import type { PropsWithChildren } from "react";
 
 export default function RootLayout({ children }: PropsWithChildren) {
-	return (
-		<html lang="en">
-			<body>{children}</body>
-		</html>
-	);
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
 }
 ```
 
@@ -71,14 +71,14 @@ Next, we'll need a basic form with an input to accept messages from the user. Th
 
 ```tsx
 export default function Home() {
-	return (
-		<main>
-			<form>
-				<input placeholder="Enter a message..." />
-				<button type="submit">Send</button>
-			</form>
-		</main>
-	);
+  return (
+    <main>
+      <form>
+        <input placeholder="Enter a message..." />
+        <button type="submit">Send</button>
+      </form>
+    </main>
+  );
 }
 ```
 
@@ -97,20 +97,20 @@ The Vercel AI SDK exports a useful hook called `useChat`, which makes it very ea
 import { useChat } from "ai/react";
 
 export default function Home() {
-	const { messages, input, handleInputChange, handleSubmit } = useChat();
+  const { messages, input, handleInputChange, handleSubmit } = useChat();
 
-	return (
-		<main>
-			<form onSubmit={handleSubmit}>
-				<input
-					value={input}
-					onChange={handleInputChange}
-					placeholder="Enter a message..."
-				/>
-				<button type="submit">Send</button>
-			</form>
-		</main>
-	);
+  return (
+    <main>
+      <form onSubmit={handleSubmit}>
+        <input
+          value={input}
+          onChange={handleInputChange}
+          placeholder="Enter a message..."
+        />
+        <button type="submit">Send</button>
+      </form>
+    </main>
+  );
 }
 ```
 
@@ -120,13 +120,13 @@ Finally, let's render the `messages` above our form:
 
 ```tsx
 <main>
-	<section>
-		{messages.map((message) => (
-			<p key={message.id}>{message.content}</p>
-		))}
-	</section>
+  <section>
+    {messages.map((message) => (
+      <p key={message.id}>{message.content}</p>
+    ))}
+  </section>
 
-	{/* snip */}
+  {/* snip */}
 </main>
 ```
 
@@ -138,17 +138,18 @@ Because we're using Upstash Redis, our endpoint is edge-compatible. We can speci
 
 ```ts
 import { type NextRequest } from "next/server";
+
 import { LangChainStream, StreamingTextResponse } from "ai";
 
 export const runtime = "edge";
 
 export async function POST(req: NextRequest) {
-	const { messages } = await req.json();
-	const { stream, handlers } = LangChainStream();
+  const { messages } = await req.json();
+  const { stream, handlers } = LangChainStream();
 
-	const latestMessage = messages[messages.length - 1];
+  const latestMessage = messages[messages.length - 1];
 
-	return new StreamingTextResponse(stream);
+  return new StreamingTextResponse(stream);
 }
 ```
 
@@ -161,11 +162,10 @@ Before we can implement the chain itself, we'll need to import a few additional 
 
 ```ts
 import { Redis } from "@upstash/redis";
-
+import { ConversationChain } from "langchain/chains";
+import { ChatOpenAI } from "langchain/chat_models/openai";
 import { BufferMemory } from "langchain/memory";
 import { UpstashRedisChatMessageHistory } from "langchain/stores/message/upstash_redis";
-import { ChatOpenAI } from "langchain/chat_models/openai";
-import { ConversationChain } from "langchain/chains";
 ```
 
 We can now create a Redis client and set up the memory for our chain. Here, we create a `ConversationChain` that we can call in lieu of the model itself. It is a custom chain that facilitates holding conversations between a human and an AI. We can pass a custom `BaseMemory` implementation to the chain, which will be used to store and retrieve messages. In this case, we're using `BufferMemory` with `UpstashRedisChatMessageHistory` to store messages in Upstash Redis:
@@ -175,15 +175,15 @@ We can now create a Redis client and set up the memory for our chain. Here, we c
 const latestMessage = messages[messages.length - 1];
 
 const memory = new BufferMemory({
-	chatHistory: new UpstashRedisChatMessageHistory({
-		sessionId: new Date().toLocaleDateString(),
-		client: Redis.fromEnv(),
-	}),
+  chatHistory: new UpstashRedisChatMessageHistory({
+    sessionId: new Date().toLocaleDateString(),
+    client: Redis.fromEnv(),
+  }),
 });
 
 const model = new ChatOpenAI({
-	modelName: "gpt-3.5-turbo",
-	streaming: true,
+  modelName: "gpt-3.5-turbo",
+  streaming: true,
 });
 
 const chain = new ConversationChain({ llm: model, memory });

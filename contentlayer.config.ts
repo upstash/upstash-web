@@ -1,10 +1,10 @@
 import { defineDocumentType, makeSource } from "contentlayer/source-files";
-
 import readingTime from "reading-time";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypePrettyCode from "rehype-pretty-code";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
+
 import { authors } from "./utils/authors";
 
 export const Job = defineDocumentType(() => ({
@@ -26,7 +26,6 @@ export const Job = defineDocumentType(() => ({
       resolve: (doc: any) => doc._raw.flattenedPath.split("/").at(-1),
     },
   },
- 
 }));
 
 export const Post = defineDocumentType(() => ({
@@ -47,14 +46,14 @@ export const Post = defineDocumentType(() => ({
     authorsData: {
       type: "json",
       resolve: (doc) => {
-        return doc.authors.map(authorId => {
-          const author = authors[authorId]
+        return doc.authors.map((authorId) => {
+          const author = authors[authorId];
           return {
             id: authorId,
             ...author,
-            image: `/authors/${author.image}`
-          }
-        })
+            image: `/authors/${author.image}`,
+          };
+        });
       },
     },
     readingTime: {

@@ -1,9 +1,13 @@
 import { ChangeEvent, useState } from "react";
-import Button from "@/components/button";
+
 import { PricingPlans } from "@/utils/type";
-import CompareValue from "../compare-value";
+
 import useIsMobile from "@/hooks/use-is-mobile";
+
+import Button from "@/components/button";
 import Tooltip from "@/components/tooltip";
+
+import CompareValue from "../compare-value";
 
 export default function CompareTable() {
   const isMobile = useIsMobile();
@@ -864,7 +868,6 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 py-4 text-left font-normal text-white/60">
-            
             <Tooltip content="Upstash Global regions are SOC-2 certified.">
               Compliance (SOC2)
             </Tooltip>

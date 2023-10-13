@@ -2,7 +2,7 @@
 slug: fast-websites-with-remix-on-cloudflare-and-upstash-redis
 title: "Blazing Fast Websites with Remix on Cloudflare and Upstash Redis"
 authors:
-  -  sonke
+  - sonke
 tags: [redis, serverless, remix, cloudflare]
 ---
 
@@ -76,6 +76,7 @@ Now that your database is set up, open the file `app/routes/index.jsx`, remove t
 
 ```jsx
 import { json, redirect, useLoaderData } from "remix";
+
 import redis from "../utils/redis.server";
 
 export const loader = async () => {
@@ -102,10 +103,7 @@ export default function Index() {
       <p>
         It took <b>{loadingTime} ms</b> to read the number of button clicks from{" "}
         <a href="https://upstash.com/redis">Upstash Redis</a>{" "}
-        <a href="/docs/redis/features/globaldatabase">
-          Global Database
-        </a>
-        .
+        <a href="/docs/redis/features/globaldatabase">Global Database</a>.
       </p>
     </div>
   );

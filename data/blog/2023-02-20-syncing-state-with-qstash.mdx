@@ -2,7 +2,7 @@
 slug: syncing-state-with-qstash
 title: Sync Redis state to your database using QStash
 authors:
-  -  thomasCazade
+  - thomasCazade
 tags: [redis, qstash, serverless, nextjs, vercel]
 ---
 
@@ -66,6 +66,7 @@ The full code endpoint is here, I made sure to comment every aspect of the code:
 ```ts
 // /pages/api/cron/update-usage.ts
 import type { NextApiRequest, NextApiResponse } from "next";
+
 import { verifySignature } from "@upstash/qstash/nextjs";
 
 import prisma from "@/lib/prisma";
@@ -119,7 +120,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     prisma.user.update({
       where: { id: user.id },
       data: { quota: user.quota },
-    })
+    }),
   );
 
   // Run all transactions.

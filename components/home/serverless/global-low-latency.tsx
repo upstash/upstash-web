@@ -1,5 +1,6 @@
-import { ServerlessBox, ServerlessSummary, ServerlessTitle } from "./comp";
 import cx from "@/utils/cx";
+
+import { ServerlessBox, ServerlessSummary, ServerlessTitle } from "./comp";
 
 export default function GlobalLowLatency() {
   return (
@@ -21,7 +22,7 @@ export default function GlobalLowLatency() {
             key={i}
             className={cx(
               "flex h-10 w-[8px] items-end rounded-full bg-black/20 md:h-16",
-              i > 15 && "hidden md:flex"
+              i > 15 && "hidden md:flex",
             )}
           >
             <span className={cx("h-4 w-full rounded-full bg-emerald-400")} />

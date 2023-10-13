@@ -1,6 +1,7 @@
 import NextLink from "next/link";
-import type { Post } from "contentlayer/generated";
+
 import cx from "@/utils/cx";
+import type { Post } from "contentlayer/generated";
 import Balancer from "react-wrap-balancer";
 
 type Props = {

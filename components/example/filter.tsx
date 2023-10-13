@@ -1,13 +1,15 @@
 "use client";
 
-import { IconArrow } from "@/components/post/toc";
 import * as React from "react";
 import { HTMLProps } from "react";
+
 import cx from "@/utils/cx";
+
 import Icon, { ICON_NAMES } from "@/components/icon";
-import IconRedis from "@/components/icon-redis";
 import IconKafka from "@/components/icon-kafka";
 import IconQStash from "@/components/icon-qstash";
+import IconRedis from "@/components/icon-redis";
+import { IconArrow } from "@/components/post/toc";
 
 export const ProductsLabel = {
   redis: "Redis",

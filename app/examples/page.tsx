@@ -1,9 +1,10 @@
-import Container from "@/components/container";
-import PageHeaderTitle from "@/components/page-header-title";
-import PageHeaderDesc from "@/components/page-header-desc";
 import Bg from "@/components/bg";
+import Container from "@/components/container";
 import { Client } from "@/components/example/client";
-import {getData, type Example} from "./get-data";
+import PageHeaderDesc from "@/components/page-header-desc";
+import PageHeaderTitle from "@/components/page-header-title";
+
+import { getData, type Example } from "./get-data";
 
 // TODO: set canonical url
 

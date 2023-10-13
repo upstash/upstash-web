@@ -35,8 +35,8 @@ Would you like to create a Worker at src/index.ts? (y/n)
 Update Workers function as below:
 
 ```ts title="src/index.ts"
-import { Redis } from "@upstash/redis/cloudflare";
 import { MultiRegionRatelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis/cloudflare";
 
 export interface Env {}
 
@@ -46,7 +46,7 @@ export default {
   async fetch(
     request: Request,
     env: Env,
-    _ctx: ExecutionContext
+    _ctx: ExecutionContext,
   ): Promise<Response> {
     if (new URL(request.url).pathname == "/favicon.ico") {
       return new Response(null, { status: 400 });
@@ -79,9 +79,9 @@ export default {
         JSON.stringify(
           { message: "Success, you are not rate limited.", ip: userIP, data },
           null,
-          2
+          2,
         ),
-        { status: 200 }
+        { status: 200 },
       );
     } else {
       // show an error page for rate limited users
@@ -93,9 +93,9 @@ export default {
             data,
           },
           null,
-          2
+          2,
         ),
-        { status: 200 }
+        { status: 200 },
       );
     }
   },

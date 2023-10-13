@@ -1,4 +1,5 @@
 import { HTMLProps, ReactNode } from "react";
+
 import cx from "@/utils/cx";
 
 export function FastCard({
@@ -26,7 +27,7 @@ export function FastCardValue({
     <div
       className={cx(
         "font-display text-3xl font-semibold text-emerald-400 md:text-4xl",
-        className
+        className,
       )}
       {...props}
     >

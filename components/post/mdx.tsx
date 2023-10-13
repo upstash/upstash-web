@@ -1,8 +1,11 @@
 "use client";
+
 import { ComponentProps, useEffect, useRef, useState } from "react";
-import { useMDXComponent } from "next-contentlayer/hooks";
-import { IconClipboard, IconClipboardCheck } from "@tabler/icons-react";
+
 import cx from "@/utils/cx";
+import { IconClipboard, IconClipboardCheck } from "@tabler/icons-react";
+import { useMDXComponent } from "next-contentlayer/hooks";
+
 import ExpandableCode from "./expandable-code";
 import PostNote from "./note";
 
@@ -46,7 +49,7 @@ function CopyFeaturePre(props: ComponentProps<"pre">) {
           "absolute right-5 top-5 flex h-7 w-7 cursor-pointer items-center justify-center rounded-md border p-1 transition ease-in-out hover:border-white/60 hover:text-white/60",
           !hasCopied
             ? "border-white/20 text-white/20"
-            : "border-white/60 text-white/60"
+            : "border-white/60 text-white/60",
         )}
       >
         {hasCopied ? (

@@ -88,16 +88,16 @@ You should set TOTAL_ACTIVE_USERS and SESSION_DURATION_SECONDS depending on your
 Index.js is the Cloudflare Workers implementation file. So we will put all the logic inside it. Copy and paste the below code into it:
 
 ```javascript
-import { parse } from "cookie";
 import { Redis } from "@upstash/redis/cloudflare";
+import { parse } from "cookie";
 
 const redis = Redis.fromEnv();
 
 addEventListener("fetch", (event) => {
   event.respondWith(
     handleRequest(event.request).catch(
-      (err) => new Response(err.stack, { status: 500 })
-    )
+      (err) => new Response(err.stack, { status: 500 }),
+    ),
   );
 });
 
@@ -160,13 +160,13 @@ async function getDefaultResponse(request, cookie, userId) {
     await redis.setex(userId, SESSION_DURATION_SECONDS, 1);
     newResponse.headers.append(
       "Set-Cookie",
-      `${COOKIE_NAME_TIME}=${now}; path=/`
+      `${COOKIE_NAME_TIME}=${now}; path=/`,
     );
   }
 
   newResponse.headers.append(
     "Set-Cookie",
-    `${COOKIE_NAME_ID}=${userId}; path=/`
+    `${COOKIE_NAME_ID}=${userId}; path=/`,
   );
   return newResponse;
 }
