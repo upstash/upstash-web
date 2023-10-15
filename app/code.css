@@ -1,10 +1,10 @@
 @media (prefers-color-scheme: dark) {
-  [data-theme="light"] {
+  data-rehype-pretty-code-fragment > [data-theme="light"] {
     display: none;
   }
 }
 @media (prefers-color-scheme: light), (prefers-color-scheme: no-preference) {
-  [data-theme="dark"] {
+  [data-rehype-pretty-code-fragment] > [data-theme="dark"] {
     display: none;
   }
 }
