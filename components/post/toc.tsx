@@ -12,7 +12,8 @@ export default function PostTOC({ toc }: Props) {
 
   return (
     <details
-      className="group/toc mb-10 rounded-xl bg-white/3"
+      className="group/toc mb-10 rounded-xl
+      bg-emerald-700/10 dark:bg-white/3"
       role="navigation"
       aria-label="Table of contents"
     >
@@ -20,7 +21,7 @@ export default function PostTOC({ toc }: Props) {
       <summary
         className={cx(
           "flex items-center justify-between px-6 py-3",
-          "select-none list-none text-zinc-400",
+          "select-none list-none opacity-60",
         )}
       >
         <span className="text-sm uppercase tracking-wide">
@@ -35,7 +36,10 @@ export default function PostTOC({ toc }: Props) {
           {toc.items.map(({ title, url }) => {
             return (
               <li key={url}>
-                <a href={url} className="text-emerald-400">
+                <a
+                  href={url}
+                  className="text-emerald-600 dark:text-emerald-400"
+                >
                   {title}
                 </a>
               </li>
