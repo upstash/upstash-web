@@ -6,26 +6,26 @@ authors:
 tags: [redis, go]
 ---
 
-In this blog post, we'll explore the implementation of an upgradable read-write lock in Go, 
+In this blog post, we'll explore the implementation of an upgradable read-write lock in Go.
 We will talk about why we needed it by giving concrete examples from the real-world use case and also discuss potential pitfalls during the blog post.
 
 ## Why do we need an upgradable read-write lock?
 
-In go, even though the guideline says to avoid locks when building a Redis® server that should be concurrently accessed by multiple connections, 
-we usually had to fall back to locks in order to get maximum performance. And, this time standard go library wasn't enough.
+In Go, even though the guidelines say to avoid locks, when building a Redis® server that should be concurrently accessed by multiple connections, 
+we usually had to fall back to locks in order to get maximum performance. And, this time standard Go library wasn't enough.
 
-In the Upstash Redis® server, we are guarding the keys of the Redis® with locks. When searching for how we can scale it, there were a couple of 
-ideas. One is partitioning the locks, and the other is replacing the `sync.Mutex` with a sync.RWMutex. Partitioning locks could be a blog for another 
+In the Upstash Redis® server implementation, we are guarding the keyspace with locks. While searching for how we can scale it more, there were a couple of 
+ideas. One is partitioning the locks, and the other is replacing the `sync.Mutex` with a `sync.RWMutex`. Partitioning locks could be a blog for another 
 day, we will focus on RWMutex for this blog post.
 
-sync.RWMutex is the read-write lock in go. It allows multiple readers to have the lock at the same time when there is no writer around.
+`sync.RWMutex` is the read-write lock in Go library. It allows multiple readers to have the lock at the same time when there is no writer around.
 It allows the single writer to have the lock ensuring that there are no readers in the critical section.
 
 Since all of our commands work in memory, they are pretty quick and don't keep long under the lock. But there are commands that have a tendency to take long. These commands are usually the ones that their complexity depends on how large the data is like [SUNION](https://redis.io/commands/sunion/),[SDIFF](https://redis.io/commands/sdiff/), [ZDIFF](https://redis.io/commands/zdiff/) etc. 
 
-Since they are read operations, it is `mostly` ok. It means that other readers can still continue under RWMutex. The writers will be blocked.
+Since they are read operations, it is _mostly_ ok. It means that other readers can still continue under RWMutex. The writers will be blocked.
 We realized another problem. All of these commands have `STORE` versions like [SUNIONSTORE](https://redis.io/commands/zunionstore/),  [SDIFFSTORE](https://redis.io/commands/sdiffstore/), [ZDIFFSTORE](https://redis.io/commands/zdiffstore/), etc. They need to get the write lock.
-And if that takes long both reads and writes need to wait. The solution comes after realizing that the part taking long is the reading and preparing of the result and not the `STORE`
+And if that takes long both reads and writes need to wait. The solution comes after realizing that the part taking long is the reading and preparing of the result and not the `STORE`.
 
 ## First naive wrong attempt
 
@@ -90,14 +90,14 @@ in the standard libraries of other languages. Examples:
 [.NET ReaderWriterLockSlim](https://learn.microsoft.com/en-us/dotnet/api/system.threading.readerwriterlockslim?view=net-7.0)
 
 Our API is very close to the `.NET ReaderWriterLockSlim`. At this point, you might say that this usage looks very similar to the second attempt.
-How can it get away with deadlock? The trick is that it has one more mode `upgradeble-read` together with `read` and `write`. Semantics are 
+How can it get away with deadlock? The trick is that it has one more mode `upgradable-read` together with `read` and `write`. Semantics are 
 as follows:
 
 - Both `read` and `upgradable-read` locks can be held together at the same time.
 - `write-lock` prevents both `read` and `upgradable-read` from entering the critical section.
 - There can be multiple goroutines holding the `read` lock but there can be only a single `upgradable-read`.
 
-The last point is important. If we don't have that guarantee, we will again end up with a deadlock. If we allow let’s say two `upgradable-read` to be acquired when they come to `upgrade to write`, one of them has to give up the `read-lock`. Therefore, the atomicity will be broken again.
+The last point is important. If we don't have that guarantee, we will again end up with a deadlock. If we allow let’s say two `upgradable-read` locks can be acquired, when they try to `upgrade to write`, one of them has to give up the `read-lock`. Therefore, the atomicity will be broken again.
 
 ## The implementation
 
