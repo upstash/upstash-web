@@ -1,6 +1,5 @@
 import { authors } from "@/utils/authors";
 import { ImageResponse } from "@vercel/og";
-import { allPosts } from "contentlayer/generated";
 
 export const runtime = "edge";
 export const size = {
@@ -18,7 +17,11 @@ export default async function TwImage({
   try {
     const slug = params.slug;
 
-    const post = allPosts.find((p) => p.slug === slug);
+    const response = await fetch(`/api/getPostData?slug=${slug}`);
+    if (!response.ok) {
+      throw new Error("Post not found");
+    }
+    const post = await response.json();
 
     if (!post) {
       throw new Error("Post not found");
