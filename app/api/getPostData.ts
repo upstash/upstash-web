@@ -1,9 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { allPosts } from "contentlayer/generated";
+import { NextResponse } from 'next/server';
 
 export const runtime = 'edge'
 
-export default async function getPost(req: NextApiRequest, res: NextApiResponse) {
+export async function GET(req: NextApiRequest, res: NextApiResponse) {
 	const { slug } = req.query;
 
 	const post = allPosts.find((post) => post.slug === slug);
@@ -12,5 +13,5 @@ export default async function getPost(req: NextApiRequest, res: NextApiResponse)
 		return res.status(404).json({ message: `Post with slug '${slug}' not found` });
 	}
 
-	res.status(200).json(post);
+	return NextResponse.json(post);
 }
