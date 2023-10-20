@@ -17,7 +17,7 @@ export default async function TwImage({
   try {
     const slug = params.slug;
 
-    const response = await fetch(`/api/getPostData?slug=${slug}`);
+    const response = await fetch(`/api/get/post-data?slug=${slug}`);
     if (!response.ok) {
       throw new Error("Post not found");
     }
