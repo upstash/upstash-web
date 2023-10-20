@@ -17,7 +17,14 @@ export default async function TwImage({
   try {
     const slug = params.slug;
 
-    const response = await fetch(`/api/get/post-data?slug=${slug}`);
+    const baseUrl = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "http://localhost:3000";
+
+    const postDataURL = new URL(`/api/get/post-data?slug=${slug}`, baseUrl);
+    
+    const response = await fetch(postDataURL);
+
     if (!response.ok) {
       throw new Error("Post not found");
     }
@@ -27,9 +34,7 @@ export default async function TwImage({
       throw new Error("Post not found");
     }
 
-    const baseUrl = process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : "http://localhost:3000";
+
     const authorImage = new URL(
       `/authors/${authors[post.authors[0]].image}`,
       baseUrl,
