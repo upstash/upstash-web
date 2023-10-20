@@ -11,7 +11,7 @@ import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
 
-import { getData } from "./util/helpers";
+import { getData } from "./utils/helpers";
 
 export default async function BlogPage() {
   const posts = await getData(10);
