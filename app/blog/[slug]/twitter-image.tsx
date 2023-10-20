@@ -1,6 +1,5 @@
 import { authors } from "@/utils/authors";
 import { ImageResponse } from "@vercel/og";
-import { allPosts } from "contentlayer/generated";
 
 export const runtime = "edge";
 export const size = {
@@ -18,15 +17,23 @@ export default async function TwImage({
   try {
     const slug = params.slug;
 
-    const post = allPosts.find((p) => p.slug === slug);
+    const baseUrl = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "http://localhost:3000";
+
+    const postDataURL = new URL(`/api/get/post-data?slug=${slug}`, baseUrl);
+    
+    const response = await fetch(postDataURL);
+
+    if (!response.ok) {
+      throw new Error("Post not found");
+    }
+    const post = await response.json();
 
     if (!post) {
       throw new Error("Post not found");
     }
 
-    const baseUrl = process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : "http://localhost:3000";
     const authorImage = new URL(
       `/authors/${authors[post.authors[0]].image}`,
       baseUrl,
