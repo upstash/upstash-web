@@ -15,8 +15,8 @@ export default function OtherPostCard({ post, align = "left" }: Props) {
       href={`/blog/${post.slug}`}
       className={cx(
         "flex flex-col p-6 text-left",
-        "cursor-pointer rounded-xl transition",
-        "bg-emerald-600/10 text-emerald-800",
+        "cursor-pointer rounded-xl text-inherit transition",
+        "bg-emerald-600/10",
         "hover:bg-emerald-600/20",
         "dark:bg-zinc-800",
         "dark:hover:bg-emerald-200/10 dark:hover:text-emerald-400 dark:hover:underline",
