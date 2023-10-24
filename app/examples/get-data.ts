@@ -19,7 +19,9 @@ const schema = z.array(example);
 export type Example = z.infer<typeof example>;
 
 export async function getData(): Promise<Example[]> {
-  return await fetch("https://upstash-examples-content.vercel.app/")
+  return await fetch("https://upstash-examples-content.vercel.app/", {
+    cache: "no-store"
+  })
     .then(async (res) => schema.parse(await res.json()))
     .catch((err) => {
       console.log(err);
