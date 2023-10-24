@@ -63,7 +63,7 @@ export default async function BlogPage({ params }: Props) {
             {/* content */}
             <Mdx code={post.body.code} />
 
-            {/* Tags */}
+            {/* Tags- */}
             <PostTags post={post} />
 
             {/* Other Post */}

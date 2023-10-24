@@ -42,7 +42,10 @@
   "importOrderSeparation": true,
   "importOrderSortSpecifiers": true,
   "importOrderBuiltinModulesToTop": true,
-  "importOrderParserPlugins": ["typescript", "jsx"],
+  "importOrderParserPlugins": [
+    "typescript",
+    "jsx"
+  ],
   "importOrderMergeDuplicateImports": true,
   "importOrderCombineTypeAndValueImports": true,
   "plugins": [
