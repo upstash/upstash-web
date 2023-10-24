@@ -3,7 +3,7 @@
 import { ComponentProps, useEffect, useRef, useState } from "react";
 
 import cx from "@/utils/cx";
-import { IconClipboard, IconClipboardCheck } from "@tabler/icons-react";
+import { IconCheck, IconCopy } from "@tabler/icons-react";
 import { useMDXComponent } from "next-contentlayer/hooks";
 
 import ExpandableCode from "./expandable-code";
@@ -30,14 +30,18 @@ function CopyFeaturePre(props: ComponentProps<"pre">) {
   useEffect(() => {
     setTimeout(() => {
       setHasCopied(false);
-    }, 2000);
+    }, 3000);
   }, [hasCopied]);
   if (props && !props["data-language"]) {
     return <pre {...props} />;
   }
 
   return (
-    <div ref={containerRef} className="relative">
+    <div
+      {...(props as ComponentProps<"div">)}
+      ref={containerRef}
+      className="relative"
+    >
       <button
         onClick={() => {
           const content =
@@ -46,17 +50,16 @@ function CopyFeaturePre(props: ComponentProps<"pre">) {
           setHasCopied(true);
         }}
         className={cx(
-          "absolute right-5 top-5 flex h-7 w-7 cursor-pointer items-center justify-center rounded-md border p-1 transition ease-in-out hover:border-white/60 hover:text-white/60",
-          !hasCopied
-            ? "border-white/20 text-white/20"
-            : "border-white/60 text-white/60",
+          "absolute right-5 top-5",
+          "flex items-center justify-center p-1",
+          "cursor-pointer rounded-md",
+          "",
+          hasCopied
+            ? "text-emerald-600"
+            : "text-zinc-400 hover:text-zinc-600 dark:text-zinc-600 dark:hover:text-zinc-200",
         )}
       >
-        {hasCopied ? (
-          <IconClipboardCheck stroke={1} />
-        ) : (
-          <IconClipboard stroke={1} />
-        )}
+        {hasCopied ? <IconCheck stroke={1.5} /> : <IconCopy stroke={1.5} />}
       </button>
       <pre {...props} />
     </div>

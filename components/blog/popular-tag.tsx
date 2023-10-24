@@ -5,16 +5,16 @@ import cx from "@/utils/cx";
 
 export default function BlogPopularTag({ data }: { data: [string, number][] }) {
   const colors = [
-    "bg-rose-300 text-rose-200 hover:text-rose-200",
-    "bg-blue-300 text-blue-200 hover:text-blue-200",
-    "bg-yellow-300 text-yellow-200 hover:text-yellow-200",
-    "bg-emerald-300 text-emerald-200 hover:text-emerald-200",
-    "bg-purple-300 text-purple-200 hover:text-purple-200",
-    "bg-lime-300 text-lime-200 hover:text-lime-200",
-    "bg-fuchsia-300 text-fuchsia-200 hover:text-fuchsia-200",
-    "bg-indigo-300 text-indigo-200 hover:text-indigo-200",
-    "bg-orange-300 text-orange-200 hover:text-orange-200",
-    "bg-cyan-300 text-cyan-200 hover:text-cyan-200",
+    "bg-rose-600 text-rose-800 dark:text-rose-200",
+    "bg-blue-600 text-blue-800 dark:text-blue-200",
+    "bg-yellow-600 text-yellow-800 dark:text-yellow-200",
+    "bg-emerald-600 text-emerald-800 dark:text-emerald-200",
+    "bg-purple-600 text-purple-800 dark:text-purple-200",
+    "bg-lime-600 text-lime-800 dark:text-lime-200",
+    "bg-fuchsia-600 text-fuchsia-800 dark:text-fuchsia-200",
+    "bg-indigo-600 text-indigo-800 dark:text-indigo-200",
+    "bg-orange-600 text-orange-800 dark:text-orange-200",
+    "bg-cyan-600 text-cyan-800 dark:text-cyan-200",
   ];
 
   return (
@@ -31,7 +31,7 @@ export default function BlogPopularTag({ data }: { data: [string, number][] }) {
             )}
           >
             {TAG_NAMES[tag as keyof typeof TAG_NAMES] || (
-              <span className="capitalize">{tag}</span>
+              <span className="capitalize font-medium">{tag}</span>
             )}
           </Link>
         );

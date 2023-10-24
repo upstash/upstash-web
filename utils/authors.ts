@@ -254,4 +254,9 @@ export const authors: Record<
     title: "Software Developer (Guest Author)",
     image: "asim.jpeg",
   },
+  brace: {
+    name: "Brace Sproul",
+    title: "Software Developer (Guest Author)",
+    image: "brace.jpeg",
+  },
 };
