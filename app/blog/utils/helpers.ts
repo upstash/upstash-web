@@ -1,7 +1,7 @@
 import { allPosts, Post } from "contentlayer/generated";
 import { DateTime } from "luxon";
 
-export default async function getData(count?: number): Promise<Post[]> {
+export async function getData(count?: number): Promise<Post[]> {
   const posts = allPosts
     .filter((post) => !post.draft)
     .sort((a, b) => {
@@ -14,3 +14,4 @@ export default async function getData(count?: number): Promise<Post[]> {
 
   return posts;
 }
+

@@ -7,7 +7,7 @@ import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
 
-import getData from "../get-data";
+import { getData } from "../utils/helpers";
 
 export default async function BlogPage() {
   const posts = await getData();
@@ -44,7 +44,7 @@ export default async function BlogPage() {
               const posts: Post[] = postsByMonth[key];
               return (
                 <div key={key}>
-                  <h4 className="pl-2 font-display text-2xl font-medium opacity-20">
+                  <h4 className="pl-2 text-2xl font-medium font-display opacity-20">
                     {key}
                   </h4>
                   <div className="mt-2 grid gap-0.5">

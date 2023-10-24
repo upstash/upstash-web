@@ -8,7 +8,7 @@ import PostGridCard from "@/components/blog/grid-item";
 import Container from "@/components/container";
 import PageHeaderTitle from "@/components/page-header-title";
 
-import getData from "../../get-data";
+import { getData } from "../../utils/helpers";
 
 type Props = {
   params: {
