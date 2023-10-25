@@ -1,0 +1,202 @@
+---
+slug: linearizable-dist-map-on-kafka
+title: "Linearizable Distributed Map On Kafka"
+authors:
+  - sancar
+tags: [kafka, java]
+---
+
+Implementing a distributed system is hard. There are lots of algorithms just to be able make all nodes came to same 
+conclusion. They are called consesus algorithms, Raft, Paxos being most known ones. (TODO sancar more sentences needed here to jump to next one) In this blogpost, we will try 
+to see if we can use Kafka as our source of truth and implement a distributed linearizable KV store on top of it.
+
+## Why we needed a KV store ?
+
+While developing SchemaRegistry we needed to have a KV store to server the schema registry. 
+The requirements are:
+
+1. It should be fault tolerant. If a broker dies, the schema registry should continue to work.
+2. It shouldn't cause us to maintain another service creating another failure point. 
+3. It should be strongly consistent or even linearizable if possible.
+4. It doesn't need to be high performant. Schema registry is something rarely updated and rarely read(because clients caches the schemas locally)
+
+Because of item 2, we decided to use Kafka itself as our storage but use it as a replicated KV store. Then there are a couple of questions to be answered. One is a log like Kafka enough for this ? And second how to make it consistent enough to be used as Schema Registry. While searching for answers, we learned a lot. Although during our implementation of the Schema Registry we took different decisions and tackled many more problems than mentioned here. We would like to mention how can one implement a linearizable KV store. 
+
+So the question is can we turn Kafka into a replicated linearizable KV store.
+
+## Reference
+
+We will follow the Designing Data-Intensive Applications from Martin Kleppmann heavily in this blog. From here on when I say the book I refer to this one. 
+All of the mentions are from Chapter 9 Consistency and Concensus. Section, Total Order Broadcast. 
+
+## Can we convert Kafka to a replicated linearizable KV store ? 
+
+In the [book](#reference),  it is mentioned linearizable storage and total order broadcast has a strong connection between them and one can be implemented with other [*1](#reference). And it is strongly related to what we are trying to achieve here. 
+linearizable storage -> KV Store 
+total order broadcast -> Kafka 
+
+Lets double check the definition `total order broadcast` first to see if we the right tool. 
+
+Total order broadcast requires two things [*1](#reference):
+1. Reliable delivery: No messages are lost. If a message is delivered to one node the other nodes should also get it. 
+
+2. Total ordered delivery: Messages are delivered to every node in the same order. 
+
+So the answer seems to be yes. We can convert Kafka into a replicated linearizable KV store. But how ?
+
+## How to turn Kafka into a replicated linearizable KV store ?
+
+Linearizability in simplest terms means to make a system appear as if there is only a single copy of the data. In other words, it means that if you have a `map.putIfAbsent` method, it should work as if it is a basic in memory hash map. Or if you put something to the map, all the subsequent readers should be able to see it as it happens in the normal hash map. Lets look closely how can we achieve linearizable writes and reads separately. 
+ 
+### Linearizable Writes
+
+The [book](#reference) mentions that you can implement a linearizable compare-and-set. The data structure it mentions a simple one. A register where it is initially null. It can only be set once. After it is set, new writes will fail. The solution to that is as follows in the [book](#####reference):
+
+1. Append a message to the log. This basically means that I want to write something here.
+2. Read the log and wait for the message you appended delivered back to you. 
+3. If the first message you see regarding this register is your own message, then you are successful. You can return to the client. If the first message belongs to another one, that you have failed.
+
+We need to improve upon this idea. We need to be able to set more than once. And this algorithm fails in this case. 
+
+To improve upon this, we can introduce a version to be stored along side with the append. Version will start from 0 and it will be incremental. Lets see how a write will take place:
+
+1. Read the last known version you have belonging the key. Lets say it was 3.
+2. Set your own version for write attempt as one plus the last known version(4)
+3. Put your write attempt to the log.
+4. Read the log and wait for the message you appended delivered back to you. 
+5. If the first message you see with the version 4 is your own message, then you are successful to set the value. If you see a different message with version 4 you have failed to set it. 
+
+Depending at the API, you give you can retry this whole operation to attempt next write, or return a failure to the client immediately. 
+
+To implement a `map.putIfAbsent` , returning after failure is enough.
+`map.put` with this algorithm is almost same. We can return to the client after 3 step.
+
+Lets see how this is translated to do the code. Some locking is ignored for brevity. We will give example for `putIfAbsent` only. The rest can be found [here](TODO sancar github link). Code is explained as comments below.
+
+```java
+// Relevant class fields //
+HashMap<String,String> data = new HashMap();
+TotalOrderBroadcast totalOrderBroadcast;
+
+/* PutIfAbsent */
+
+// Ignore the first function for now, we will get into detail of it in the next section. Just be aware that, it needs to be there. 
+linearizableRead();
+
+// We read the local value first and if it is not null, we should return according to putIfAbsent contract
+VersionedValue existingVal = data.get(key);
+if (existingVal != null && existingVal.value != null) {
+	return existingVal.value;
+}
+
+// Decide what the next version is via incrementing it.
+int nextVersion;
+if (existingVal == null) {
+	nextVersion = 1;
+} else {
+	nextVersion = existingVal.version + 1;
+}
+
+String compositeKey = key + nextVersion
+CompletableFuture<VersionedValue> f = new CompletableFuture<>();
+registerToWaitFirstMessage(f, compositeKey);
+
+// broadcast the write attempt to kafka log with the value
+totalOrderBroadcast.offer(compositeKey, value, Records.HeaderValues.WRITE_ATTEMPT);
+
+// here we wait for the first message to arrive
+VersionedValue firstMessageBack = f.join();
+// if the first message we get back is ours. Then putIfAbsent is successful.
+if (value.equals(firstMessageBack.value)) {
+	return null;
+}
+// otherwise, there was another set/remove, putIfAbsent failed.
+return firstMessageBack.value;
+```
+
+And there is a continuously polling thread which reads the log and populates the `data` map that we used above and also notify the future `f` when the first message arrives. For each polled message, it does the following:
+
+```java
+// decide on the existing version
+VersionedValue old = data.get(key);
+int existingVersion = 0;
+if (old != null) {
+	existingVersion = old.version;
+}
+
+var newValue = new VersionedValue(version, value);
+// if the version is bigger, we update the key. 
+// This is basically means only the first update for this version is effective.
+// the next ones will be ignored since they are bigger(but equal)
+if (key.version() > existingVersion) {
+	data.put(key, newValue);
+}
+
+// also wake up all the ones waiting for the first update to key and version.
+var futures = waitMap.remove(key + version);
+if (futures != null) {
+	futures.forEach(f -> f.complete(newValue));
+}
+
+// this part is relevant for the linearizable reads
+lastUpdateBarrier.setIfBigger(message.offset());
+```
+
+### Linearizable Reads
+
+When you are serving the reads, if we do not take any precautions and serve whatever we have locally on reads, the clients can read the stale data. This is because we do not wait any of the other nodes to consume the log. Moreover we can't, because we don't know how many readers are there. 
+
+![Figure 1](/blog/kafka-dist/rywLog.svg)
+
+In the figure 1 above, the users puts a value to the node 1. When it asks it from the node 1, it can see the update because we have waited the message to comeback to node 1 on write. But when it asks the second node, it can not see the update it did because it haven't consume the latest message from the log yet.
+
+To make sure the reads are linearizable, we have a couple of options. 
+
+1. Upon a read request, append a dummy message to log, read the log until you see that the dummy message. Only then, serve the request. Our choice will be this.
+2. If you can read the current position of the log in `linearizable` way, then you can wait until that position, and only then serve the request. This is not possible in our case because of the Kafka API (TODO sancar ask mehmet)
+3. Read from a replica that is synchronously updated on writes. Meaning that, a write is done both to log and this replica always. If we follow this path, we need to designate a node to do the writes and read from it. This requires more coordination, therefore more complicated for our taste.
+
+The code for linearizable read is simpler:
+
+```java
+/* linearizableRead */
+
+// This is a dummy key that we will put to the same log
+String jsonKey = toJson(new Records.WaitKey("read"));
+
+long offset = totalOrderBroadcast.offer(jsonKey, "true", Records.HeaderValues.WAIT_KEY);
+// wait for the message we sent to get back
+// lastUpdateBarrier is updated on the polling thread. And this call waits to be offset to be at least what pass here.
+lastUpdateBarrier.await(offset);
+
+```
+
+Basically any read operation should call `linearizableRead` and do the local operation. Some examples:
+
+```java
+public String get(Object key) {
+	linearizableRead();
+
+	VersionedValue existingVal = data.get(key);
+	if (existingVal == null) {
+		return null;
+	}
+	return existingVal.value;
+}
+
+public int size() {
+	linearizableRead();
+	return data.size();
+}
+
+```
+
+## The conclusion
+
+We have implemented a distributed KV store on top of Kafka. You can see the full source code, implementing a basic Map interface [here](TODO SANCAR PUT LINK HERE). But there are still a lot to fix to make it usable in the production. 
+
+- We are using an infinite log. As time passes, this will turn out to be a problem. We need some mechanism of checkpointing so that we can trim the log at some point. 
+- Tombstones. When we delete data, we are not deleting the data actually just to be able to keep track of versions. 
+
+We will attempt those in a seperate blogpost. Stay tuned and don't forget to give feedback at our repo [here](TODO sancar put link) 
+if you see a bug/problem in our design.
