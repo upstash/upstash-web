@@ -44,7 +44,7 @@ export default async function BlogPage() {
               const posts: Post[] = postsByMonth[key];
               return (
                 <div key={key}>
-                  <h4 className="pl-2 text-2xl font-medium font-display opacity-20">
+                  <h4 className="pl-2 font-display text-2xl font-medium opacity-40 dark:opacity-20">
                     {key}
                   </h4>
                   <div className="mt-2 grid gap-0.5">
