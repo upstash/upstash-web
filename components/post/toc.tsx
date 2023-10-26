@@ -20,14 +20,11 @@ export default function PostTOC({ toc }: Props) {
       {/* summary */}
       <summary
         className={cx(
-          "flex items-center justify-between px-6 py-3",
-          "select-none list-none opacity-60",
+          "flex items-center px-6 py-3",
+          "select-none list-none text-sm uppercase tracking-wide opacity-60",
         )}
       >
-        <span className="text-sm uppercase tracking-wide">
-          Table of contents
-        </span>
-        <IconArrow />
+        Table of contents
       </summary>
 
       {/* content */}
