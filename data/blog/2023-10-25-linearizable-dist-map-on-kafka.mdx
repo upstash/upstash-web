@@ -41,7 +41,6 @@ Let's double-check the definition `total order broadcast` first to see if we the
 
 Total order broadcast requires two things [*1](#reference):
 1. Reliable delivery: No messages are lost. If a message is delivered to one node the other nodes should also get it. 
-
 2. Total ordered delivery: Messages are delivered to every node in the same order. 
 
 So the answer seems to be yes. We can convert Kafka into a replicated linearizable KV store. But how?
@@ -220,7 +219,7 @@ the Kafka eventually.
 
 We still need to be careful here. Our algorithm relies on the fact that there can be multiple versions of the same key
 in the log. If the first write attempt of a version gets compacted, the different nodes can decide on a different final value 
-for the same key. To mitigate this, we will use a config of kafka (min.compaction.lag.ms)[https://kafka.apache.org/documentation/#topicconfigs_min.compaction.lag.ms].
+for the same key. To mitigate this, we will use a config of kafka [min.compaction.lag.ms](https://kafka.apache.org/documentation/#topicconfigs_min.compaction.lag.ms).
 With this, we can configure the minimum time a message will remain uncompacted in the log. We can keep it long enough so that any concurrent
 writes(within the same version) settle. Even a value like 10 minutes should be more than enough for this, but let's make it 1 hour to be on the 
 safe side.
