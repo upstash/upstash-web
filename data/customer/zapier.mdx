@@ -3,20 +3,21 @@ company_name: zapier
 company_url: zapier.com
 company_logo: zapier.svg
 user_name: Ben Biran
-user_title: Software Engineering Manager
-user_photo: steven.jpeg
+user_title: Engineering Manager
+user_photo: benbiran.jpeg
 highlight: "We chose Upstash specifically because it offers an HTTP interface for Redis, which perfectly suited our needs"
 cover_image: zapier-cover.png
 ---
 
-#### Tech Stack & Use Case of Upstash
 
-One of our core components of our tech stack is our middleware, which is designed to be robust and scalable, running in Vercel's edge runtime. Within this context, we leverage Upstash for our Redis storage needs. The main functionalities we've integrated using Redis, via Upstash, are malicious IP blocking and global request rate limiting. These features are critical for our infrastructure, ensuring both safety from malicious actors and stability under high traffic loads.
+Zapier needs no introduction, but briefly from their website Zapier is an online automation tool that connects your apps and services. You can connect two or more apps to automate repetitive tasks without coding or relying on developers to build the integration
+#### Upstash enhancing the resiliency of Zapier tech stack against malicious actors
 
-#### Before Upstash
+One of our core components of Zapier’s tech stack is their middleware, which is designed to be robust and scalable, running in Vercel's edge runtime. Within this context, Zapier leverages Upstash for their Redis storage needs. The main functionalities Zapier have integrated Upstash are malicious IP blocking and global request rate limiting. These features have played a critical role for Zapier’s infrastructure, ensuring both safety from malicious actors and stability under high traffic loads.
+#### Overcoming TCP Constraints with Upstash's Redis Integration
 
-Before Upstash, we had a separate Redis instance that we connected to from our node serverless functions, hosted on Redis Labs. However, we faced limitations in the Vercel edge runtime, which does not support TCP connections. This made it challenging to implement certain features like API rate limiting by IP from our middleware.
+Before Upstash, Zapier had a separate Redis instance that was connected to from their node serverless functions, hosted on Redis Labs. However, they have faced limitations in the Vercel edge runtime, which does not support TCP connections. This made it challenging to implement certain features like API rate limiting by IP from our middleware. To overcome these challenges, they chose Upstash. This decision was majorly influenced by the fact that their middleware always runs in the Vercel edge runtime, which only supports web APIs due to its reliance on Cloudflare Workers that can't establish TCP connections for traditional Redis instance integrations.
 
-#### Why Upstash & Its Impact
-
-We chose Upstash specifically because it offers an HTTP interface for Redis, which perfectly suited our needs. This decision was majorly influenced by the fact that our middleware always runs in the Vercel edge runtime, which only supports web APIs due to its reliance on Cloudflare Workers that can't establish TCP connections for traditional Redis instance integrations.With Upstash, we were able to seamlessly implement features like API rate limiting by IP from our middleware without needing to work around the limitations posed by the Vercel edge runtime. The HTTP interface for Redis that Upstash provides made this transition much more straightforward for us, allowing our team to focus on optimizing other aspects of our platform.
+<Highlight name="Ben Biran" title="Engineering Manager" photo="benbiran.jpeg">
+With Upstash, we were able to seamlessly implement features like API rate limiting by IP from our middleware without needing to work around the limitations posed by the Vercel edge runtime. The HTTP interface for Redis that Upstash provides made this transition much more straightforward for us, allowing our team to focus on optimizing other aspects of our platform.
+</Highlight>
