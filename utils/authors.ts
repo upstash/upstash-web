@@ -259,4 +259,9 @@ export const authors: Record<
     title: "Software Developer (Guest Author)",
     image: "brace.jpeg",
   },
+  ruben: {
+    name: "Ruben de Groot",
+    title: "Software Developer (Guest Author)",
+    image: "ruben.jpeg",
+  },
 };
