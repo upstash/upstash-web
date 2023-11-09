@@ -1,0 +1,24 @@
+---
+company_name: Ding
+company_url: https://www.ding.live/
+company_logo: ding-logo.png
+user_name: Aymerick Valette
+user_title: Founding Engineer
+user_photo: aymerick.jpeg
+highlight: "With Upstash we minimized the our operational costs and we also felt very safe that we only pay for what we use, this is on top of amazing support we get whenever we need it."
+cover_image: upstash-ding.png
+---
+
+
+Ding provides a user authentication solution specifically for scale-ups. Their service enables authentication and verification via text messages, offering global reach, competitive pricing, and super fast deliverability. Their authentication solution effectively prevents fraudulent requests; in some cases, it has cut the number of fraudulent authentication attempts in half for their customers. By filtering out these fraud attempts, their clients save on costs that would otherwise go to SMS providers for handling fraudulent traffic. Some of the customers of Ding's authentication services include social media platforms BeReal and Bumble.
+#### Upstash Redis: Enhancing User Experience and Supporting Fraud Detection
+
+Ding's infrastructure mainly utilizes Go and runs on AWS Lambda, achieving complete serverlessness across all operations. They rely on DynamoDB for OLTP (Online Transaction Processing) and Redshift for OLAP (Online Analytical Processing) workloads. Upstash plays multiples roles in this architecture, serving both as a caching solution, enabling rate limiting and providing simple database store functionality due to durability feature.
+
+On the caching side, Upstash caches the results of intensive OLAP queries from Redshift. As part of their customer facing solution, they also offer analytics capabilities including customer facing dashboards monitoring acquisition metrics  in real-time. Ding achieves this realtime speed and experience by using Upstash. They optimize this experience by caching the results of lengthy Redshift queries in Upstash, enabling them to deliver content with latencies as low as 10ms at the edge, significantly enhancing the user experience.
+
+Moreover, Upstash Redis's rate limiting is a key component of Ding's anti-fraud algorithms, helping in the early detection of fraudulent behavior signals and preventing fraud authentications and savings costs for their users
+
+<Highlight name="Aymerick Valette" title="Founding Engineer" photo="aymerick.jpeg">
+With Upstash we minimized our operational costs and we also felt very safe that we only pay for what we use, this is on top of amazing support we get whenever we need it.
+</Highlight>
