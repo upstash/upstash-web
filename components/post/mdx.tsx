@@ -1,4 +1,5 @@
 "use client";
+
 import { ComponentProps, useEffect, useRef, useState } from "react";
 import { useMDXComponent } from "next-contentlayer/hooks";
 import { IconClipboard, IconClipboardCheck } from "@tabler/icons-react";
@@ -6,6 +7,7 @@ import cx from "@/utils/cx";
 import ExpandableCode from "./expandable-code";
 import PostNote from "./note";
 import Image from "next/image";
+import Balancer from "react-wrap-balancer";
 
 interface MdxProps {
   code: string;
@@ -103,7 +105,7 @@ function Highlight(props: {
           className="text-xl bg-clip-text font-medium text-transparent
           bg-gradient-to-br from-white to-[#6DBEA6]"
         >
-          {props.children}
+          <Balancer>{props.children}</Balancer>
         </p>
 
         {(props.name || props.title) && (

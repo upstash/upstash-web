@@ -46,9 +46,9 @@ export default async function BlogPage({ params }: Props) {
       <main className="relative z-0">
         <Bg />
 
-        <article>
-          <header className="py-20 text-center">
-            <Container className="max-w-screen-lg">
+        <article className="customer-post">
+          <header className="pt-20 text-center">
+            <Container className="">
               <Image
                 src={`/customer/${customer.cover_image}`}
                 alt={customer.company_name}
@@ -59,7 +59,9 @@ export default async function BlogPage({ params }: Props) {
             </Container>
           </header>
 
-          <div>
+          <div className="z-10 relative -mt-20">
+            <div className="-z-10 absolute -top-40 inset-x-0 h-60 bg-gradient-to-t from-zinc-950 to-transparent" />
+
             <Container className="max-w-screen-md">
               <Mdx code={customer.body.code} />
             </Container>

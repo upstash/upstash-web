@@ -1,3 +1,7 @@
 .post h3 {
   @apply text-xl md:text-2xl;
 }
+
+.customer-post p:first-of-type {
+  @apply text-xl font-medium
+}

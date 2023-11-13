@@ -14,7 +14,7 @@ export default async function CustomerPage() {
     <main className="relative z-0 text-center">
       <Bg className="opacity-10" />
 
-      <section className="py-16 md:py-20">
+      <section className="py-16 md:py-24">
         <Container className="max-w-screen-lg">
           {/* header */}
           <header>
