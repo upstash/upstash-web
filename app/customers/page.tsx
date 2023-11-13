@@ -35,7 +35,7 @@ export default async function CustomerPage() {
               return (
                 <Link
                   key={customer.slug}
-                  className="group/customer-comp grid place-items-center gap-6
+                  className="group/customer-comp flex flex-col items-center gap-6
                   border-4 rounded-4xl border-white/5 p-10 md:p-16
                   bg-gradient-to-br transition
                   hover:from-[#00E9A3]/0 hover:to-[#00E9A3]/10"
@@ -51,13 +51,15 @@ export default async function CustomerPage() {
 
                   <hr className="border-0 border-b border-white/5 w-1/4" />
 
-                  <p
-                    className="text-xl font-semibold
+                  <div className="grow flex items-center">
+                    <p
+                      className="text-xl font-semibold
                     bg-clip-text text-transparent
                     bg-gradient-to-br from-white to-[#6DBEA6]"
-                  >
-                    “ {customer.highlight} ”
-                  </p>
+                    >
+                      “ {customer.highlight} ”
+                    </p>
+                  </div>
 
                   <div className="grid h-10 mt-auto group-hover/customer-comp:hidden">
                     <span className="opacity-80">{customer.user_name}</span>
