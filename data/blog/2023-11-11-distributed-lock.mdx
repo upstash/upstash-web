@@ -1,17 +1,148 @@
 ---
 slug: lock
-title: "Introducing Upstash Lock"
+title: "Introducing @upstash/lock: Distributed Locking using Upstash Redis"
 authors:
   - meshan
 tags: [Redis]
 ---
 
 Today we're announcing our brand new SDK for distributed locking: [@upstash/lock](https://github.com/upstash/lock)!
-Let's explore when and why you might want to a distributed lock, and how to use them with Upstash in your applications.
+
+#### TL;DR
+
+You can now use Upstash to create distributed locks for your applications.
+This is useful for applications that need to ensure only one client can access a resource at a time.
+
+```typescript
+import { Lock } from "@upstash/lock";
+import { Redis } from "@upstash/redis";
+
+function handleOperation() {
+	const lock = new Lock({
+		id: "unique-lock-id",
+		lease: 5000, // Hold the lock for 5 seconds
+		redis: Redis.fromEnv(),
+	});
+
+	const lock = await lock.acquire();
+	if (lock.status === "ACQUIRED") {
+		await handleCriticalSection();
+		await lock.release();
+	} else {
+		handleLockNotAcquired();
+	}
+}
+```
+
+You can see a demo of this in action [here](https://todo-host-upstash-lock-demo.com).
+
+If you're interested in learning more about locks, read on!
 
 ## What is a lock?
-First, let's explore what a lock is and what kind of applications might need them. 
+
+First, let's explore what a lock is and what kind of applications might need them.
 A lock allows for mutual exclusion, meaning only one client can hold the lock at a time.
 
-Take this example handles of code that handles requests for an ATM network. 
+Take this example handles of code that handles requests for an ATM network.
 When the bank server receives a request (ie: deposit or withdraw), it should appropriately handle it:
+
+```typescript
+// Code adapted from UC Berkeley's CS162
+function bankServer() {
+	while (true) {
+		receiveRequest(operation, acctId, amount);
+		await processRequest(operation, acctId, amount);
+	}
+}
+
+async function processRequest(op, acctId, amount) {
+	if (op == "deposit") {
+		acct = await getAccount(acctId); // acct 1
+		acct.balance = acct.balance + amount;
+		await storeAccount(acct)
+	}
+	...
+}
+```
+
+Let’s say Alice and Bob both want to deposit `$50` into one ccount. The expected behavior would be account `1` having `$100`. With the current implementation, the behavior is undefined.
+To demonstrate, here are 2 cases that produce different outputs:
+
+**Case 1:** The requests are processed serially. This means that Alice’s request will fully execute, and then Bob’s request will fully execute.
+
+| Alice                                | Bob                                  |
+| ------------------------------------ | ------------------------------------ |
+| acct = getAccount(acctId)            |                                      |
+| acct.balance = acct.balance + amount |                                      |
+| storeAccount(acct)                   |                                      |
+|                                      | acct = getAccount(acctId)            |
+|                                      | acct.balance = acct.balance + amount |
+|                                      | storeAccount(acct)                   |
+
+Final account balance: `$100`
+
+This is great! We get our expected result since both tasks ran serially. However, consider the following ordering:
+
+**Case 2:** The requests are interleaved
+
+| Alice                                | Bob                                  |
+| ------------------------------------ | ------------------------------------ |
+| acct = getAccount(acctId)            |                                      |
+|                                      | acct = getAccount(acctId)            |
+| acct.balance = acct.balance + amount |                                      |
+|                                      | acct.balance = acct.balance + amount |
+| storeAccount(acct)                   |                                      |
+|                                      | storeAccount(acct)                   |
+
+Final account balance: `$50`
+Uh oh, now we don’t have the expected behavior! We’ve run into a flaw with our synchronization,
+aka a race condition 👻. The primary problem here is that there is a section of code that we don’t
+want to be interleaved. That is, we want some portion of our code to be executed by only one thread
+at a time. This area of code is called the _critical section_. In our example, the critical section is
+
+```typescript
+acct = getAccount(acctId);
+acct.balance = acct.balance + amount;
+storeAccount(acct);
+```
+
+We saw that running the 2 requests serially results in the correct behavior,
+and a lock helps us do exactly that. Specifically, a lock is a synchronization mechanism that allows only
+one thread to execute a specific section of code at a time (mutual exclusion). It ensures that multiple threads
+do not interfere with each other and helps maintain data consistency. Acquiring a lock around our
+critical section will give us the intended behavior.
+
+## How do locks work?
+
+Locks in an operating system are implemented using atomic instructions. These instructions are
+guaranteed to be executed as a single unit, and cannot be interrupted. This means that if a thread
+is executing an atomic instruction, no other thread can execute any other instruction until the atomic
+instruction is finished. This is exactly what we want for our critical section! We want to ensure that
+once a thread enters the critical section, no other thread can enter until the first thread is done.
+
+## How do we implement locks with Redis?
+
+It just so happens that Redis has its own atomic instructions that we can use to implement locks.
+Using Upstash Redis, we can use the `SETNX` command to set a key if it doesn’t already exist, making
+the locking process atomic. We can then use the `EXPIRE` command to set a timeout on the key, so that
+if the thread that acquired the lock crashes, the lock will be released after a certain amount of time.
+
+For releasing, we can use the `DEL` command to delete the key, which is also atomic. However, simply
+using `DEL` to release the lock is not enough. Consider the following scenario:
+
+1. Thread A acquires the lock
+2. Thread A crashes
+3. Thread A lease expires and the lock is released
+4. Thread B acquires the lock
+5. Thread A recovers and releases the lock
+   This is a problem because Thread A was able to release the lock even though it was already acquired by Thread B.
+
+To fix this, we assign a unique UUID to each lock. When a thread acquires the lock, it stores the UUID and we are
+able to verify that the thread releasing the lock is the same thread that acquired it. A similar mechanism is used for
+extending the lock lease.
+
+### Future plans
+
+A full distributed lock implementation would mean that we can use multiple Redis instances to improve
+performance and reliability. You can read more about distributed locks [here](https://redis.io/docs/manual/patterns/distributed-locks).
+If you're interested in this, please let us know!
