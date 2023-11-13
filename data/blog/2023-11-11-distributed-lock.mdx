@@ -12,3 +12,6 @@ Let's explore when and why you might want to a distributed lock, and how to use 
 ## What is a lock?
 First, let's explore what a lock is and what kind of applications might need them. 
 A lock allows for mutual exclusion, meaning only one client can hold the lock at a time.
+
+Take this example handles of code that handles requests for an ATM network. 
+When the bank server receives a request (ie: deposit or withdraw), it should appropriately handle it:
