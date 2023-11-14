@@ -56,13 +56,9 @@ const NavItems: {
     name: "Pricing",
     href: "/pricing",
   },
-  // {
-  //   name: "Open Source",
-  //   href: "/open-source",
-  // },
   {
-    name: "About",
-    href: "/about",
+    name: "Customers",
+    href: "/customers",
   },
   // {
   //   name: "Examples",
@@ -71,6 +67,10 @@ const NavItems: {
   {
     name: "Blog",
     href: "/blog",
+  },
+  {
+    name: "About",
+    href: "/about",
   },
   {
     name: "Discord",
