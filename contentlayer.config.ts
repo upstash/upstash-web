@@ -21,6 +21,7 @@ export const Customer = defineDocumentType(() => ({
     highlight: { type: "string", required: true },
     cover_image: { type: "string", required: true },
     draft: { type: "boolean" },
+    order: { type: "number" },
   },
   computedFields: {
     slug: {
