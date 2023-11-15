@@ -1,11 +1,12 @@
-import { Metadata } from "next";
-import Container from "@/components/container";
-import PageHeaderTitle from "@/components/page-header-title";
-import PageHeaderDesc from "@/components/page-header-desc";
-import Bg from "@/components/bg";
-import cx from "@/utils/cx";
 import { HTMLAttributes } from "react";
+import { Metadata } from "next";
+
+import cx from "@/utils/cx";
+
+import Bg from "@/components/bg";
+import Container from "@/components/container";
 import CopyButton from "@/components/copy-button";
+import PageHeaderTitle from "@/components/page-header-title";
 
 export const metadata: Metadata = {
   title: "Brand Assets",
@@ -236,10 +237,10 @@ function ActionButtons({
       )}
       {...props}
     >
-      <div className="flex items-center gap-px overflow-hidden border rounded-full border-zinc-200 bg-zinc-200 md:border-none">
+      <div className="flex items-center gap-px overflow-hidden rounded-full border border-zinc-200 bg-zinc-200 md:border-none">
         {pngURL && (
           <a
-            className="inline-flex items-center justify-center h-10 text-sm font-medium transition bg-white w-14 text-zinc-950 hover:bg-zinc-200"
+            className="inline-flex h-10 w-14 items-center justify-center bg-white text-sm font-medium text-zinc-950 transition hover:bg-zinc-200"
             href={pngURL}
             download
           >
@@ -248,7 +249,7 @@ function ActionButtons({
         )}
         {svgURL && (
           <a
-            className="inline-flex items-center justify-center h-10 text-sm font-medium transition bg-white w-14 text-zinc-950 hover:bg-zinc-200"
+            className="inline-flex h-10 w-14 items-center justify-center bg-white text-sm font-medium text-zinc-950 transition hover:bg-zinc-200"
             href={svgURL}
             download
           >
@@ -257,7 +258,7 @@ function ActionButtons({
         )}
         {copyCode && (
           <CopyButton
-            className="h-10 text-sm bg-white w-14 text-zinc-950 hover:bg-zinc-200"
+            className="h-10 w-14 bg-white text-sm text-zinc-950 hover:bg-zinc-200"
             code={copyCode}
           />
         )}

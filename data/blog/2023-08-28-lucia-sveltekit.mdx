@@ -2,7 +2,7 @@
 slug: lucia-sveltekit
 title: Type-safe User Authentication in SvelteKit with Lucia, Planetscale, and Upstash Redis
 authors:
-- chris
+  - chris
 tags: [redis, lucia, svelte, sveltekit]
 ---
 
@@ -25,7 +25,6 @@ This guide will be in SvelteKit, but since Lucia supports any framework, most of
 Simply put, Lucia is a library for TypeScript that makes handling users and sessions a piece of cake.
 Originally, this library was created for SvelteKit, but it has continually evolved and is now versatile enough to play well with just about any framework.
 
-
 What's so awesome about Lucia is how it equips you with everything you need to manage the complexity of authentication without sacrificing user experience.
 Think of Lucia as a set of primitives — it’s up to you how you want to structure your code and handle the user experience.
 Lucia has a few key parts that are important to understand:
@@ -35,14 +34,15 @@ Lucia has a few key parts that are important to understand:
 Here's an example of how you would configure middleware:
 
 ```ts
-import { lucia } from 'lucia';
-import { node } from 'lucia/middleware';
+import { lucia } from "lucia";
+import { node } from "lucia/middleware";
+
 // import { nextjs } from "lucia/middleware";
 // import { h3 } from "lucia/middleware";
 
 export const auth = lucia({
-	env: 'DEV', // "PROD" if deployed to HTTPS
-	middleware: node()
+  env: "DEV", // "PROD" if deployed to HTTPS
+  middleware: node(),
 });
 ```
 
@@ -51,15 +51,15 @@ export const auth = lucia({
 Here's an example of how you would configure a database adapter:
 
 ```ts
-import { lucia } from 'lucia';
-import { prisma } from '@lucia-auth/adapter-prisma';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from "@lucia-auth/adapter-prisma";
+import { PrismaClient } from "@prisma/client";
+import { lucia } from "lucia";
 
 const client = new PrismaClient();
 
 const auth = lucia({
-	env: 'DEV',
-	adapter: prisma(client)
+  env: "DEV",
+  adapter: prisma(client),
 });
 ```
 
@@ -98,35 +98,36 @@ Here’s a quick rundown of all the important parts.
 The first thing we need to do is configure Lucia. We can do this by creating a new file in `src/lib/server/auth/index.ts`.
 
 ```ts title="src/lib/server/auth/index.ts"
-import { lucia } from 'lucia';
-import { dev } from '$app/environment';
-import { sveltekit } from 'lucia/middleware';
-import { planetscale } from '@lucia-auth/adapter-mysql';
-import { ps } from '../planetscale';
+import { planetscale } from "@lucia-auth/adapter-mysql";
+import { dev } from "$app/environment";
+import { lucia } from "lucia";
+import { sveltekit } from "lucia/middleware";
+
+import { ps } from "../planetscale";
 
 export enum PROVIDER_ID {
-	EMAIL = 'email'
+  EMAIL = "email",
 }
 
 export const auth = lucia({
-	adapter: {
-		user: planetscale(ps, {
-			user: 'users',
-			key: 'keys',
-			/**
-			 * Sessions are handled by Upstash Redis.
-			 */
-			session: null
-		})
-	},
-	middleware: sveltekit(),
-	env: dev ? 'DEV' : 'PROD',
-	getUserAttributes: (data) => {
-		return {
-			userId: data.id,
-			email: data.email
-		};
-	}
+  adapter: {
+    user: planetscale(ps, {
+      user: "users",
+      key: "keys",
+      /**
+       * Sessions are handled by Upstash Redis.
+       */
+      session: null,
+    }),
+  },
+  middleware: sveltekit(),
+  env: dev ? "DEV" : "PROD",
+  getUserAttributes: (data) => {
+    return {
+      userId: data.id,
+      email: data.email,
+    };
+  },
 });
 
 export type Auth = typeof auth;
@@ -153,32 +154,32 @@ Lucia is written in TypeScript, so you get great type inference out of the box. 
 Open up your `app.d.ts` file and add the following:
 
 ```ts title="src/app.d.ts"
-import type { AuthRequest, Session, User } from 'lucia';
-import type { Auth as LuciaAuth } from '$lib/server/auth';
+import type { Auth as LuciaAuth } from "$lib/server/auth";
+import type { AuthRequest, Session, User } from "lucia";
 
 declare global {
-	namespace App {
-		// interface Error {}
-		interface Locals {
-			auth: AuthRequest;
-			session: Session | null;
-		}
-		interface PageData {
-			user?: User;
-		}
-		// interface Platform {}
-	}
+  namespace App {
+    // interface Error {}
+    interface Locals {
+      auth: AuthRequest;
+      session: Session | null;
+    }
+    interface PageData {
+      user?: User;
+    }
+    // interface Platform {}
+  }
 }
 
 /// <reference types="lucia" />
 declare global {
-	namespace Lucia {
-		type Auth = LuciaAuth;
-		type DatabaseUserAttributes = {
-			email: string;
-		};
-		type DatabaseSessionAttributes = {};
-	}
+  namespace Lucia {
+    type Auth = LuciaAuth;
+    type DatabaseUserAttributes = {
+      email: string;
+    };
+    type DatabaseSessionAttributes = {};
+  }
 }
 
 export {};
@@ -193,15 +194,15 @@ Now that we have these types, we can set up `hooks.server.ts`. This is where we�
 This will make it easily accessible on the server through `locals`.
 
 ```ts title="src/hooks.server.ts"
-import { auth } from '$lib/server';
-import type { Handle } from '@sveltejs/kit';
-import { sequence } from '@sveltejs/kit/hooks';
+import type { Handle } from "@sveltejs/kit";
+import { sequence } from "@sveltejs/kit/hooks";
+import { auth } from "$lib/server";
 
 const auth_handle: Handle = async ({ event, resolve }) => {
-	event.locals.auth = auth.handleRequest(event);
-	event.locals.session = await event.locals.auth.validate();
+  event.locals.auth = auth.handleRequest(event);
+  event.locals.session = await event.locals.auth.validate();
 
-	return resolve(event);
+  return resolve(event);
 };
 
 export const handle = sequence(auth_handle);
@@ -215,8 +216,11 @@ Now that we have Lucia configured, we can create our user model.
 
 We'll use Drizzle ORM, since it's all hot and happening right now.
 
-<div class="max-w-sm mx-auto my-8 rounded-sm">
-    <img src="/blog/lucia-sveltekit/drizzle-orm-meme.jpeg" alt="drizzle-orm-meme" />
+<div class="mx-auto my-8 max-w-sm rounded-sm">
+  <img
+    src="/blog/lucia-sveltekit/drizzle-orm-meme.jpeg"
+    alt="drizzle-orm-meme"
+  />
 </div>
 
 _And their memes are on point. Just look at this one._
@@ -224,8 +228,8 @@ _And their memes are on point. Just look at this one._
 Before you can continue, you need to create a database on PlanetScale. And setup the Drizzle config file. This will help the Drizzle CLI to connect to your database.
 
 ```ts title="drizzle.config.ts"
-import type { Config } from 'drizzle-kit';
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
+import type { Config } from "drizzle-kit";
 
 dotenv.config();
 
@@ -236,11 +240,11 @@ const db = process.env.DATABASE_NAME;
 const connectionString = `mysql://${username}:${password}@${host}/${db}?ssl={"rejectUnauthorized":true}`;
 
 export default {
-	schema: './src/lib/server/drizzle/schema/index.ts',
-	driver: 'mysql2',
-	dbCredentials: {
-		connectionString: connectionString
-	}
+  schema: "./src/lib/server/drizzle/schema/index.ts",
+  driver: "mysql2",
+  dbCredentials: {
+    connectionString: connectionString,
+  },
 } satisfies Config;
 ```
 
@@ -249,48 +253,48 @@ Because we're using the mySQL adapter, Lucia expects our user model to have a sp
 Place the following code in `src/lib/server/drizzle/schema/index.ts`.
 
 ```ts title="src/lib/server/drizzle/schema/index.ts"
+import { relations } from "drizzle-orm";
 import {
-	mysqlTable,
-	index,
-	unique,
-	varchar,
-	datetime,
-	mysqlEnum,
-	bigint,
-	timestamp,
-	int
-} from 'drizzle-orm/mysql-core';
-import { relations } from 'drizzle-orm';
+  bigint,
+  datetime,
+  index,
+  int,
+  mysqlEnum,
+  mysqlTable,
+  timestamp,
+  unique,
+  varchar,
+} from "drizzle-orm/mysql-core";
 
 export const users = mysqlTable(
-	'users',
-	{
-		id: varchar('id', { length: 255 }).primaryKey(),
-		createdAt: timestamp('createdAt').defaultNow().onUpdateNow().notNull(),
-		updatedAt: timestamp('updatedAt').defaultNow().onUpdateNow().notNull(),
-		email: varchar('email', { length: 191 }).notNull()
-	},
-	(table) => {
-		return {
-			idIdx: index('users_id_idx').on(table.id),
-			userIdKey: unique('users_id_key').on(table.id)
-		};
-	}
+  "users",
+  {
+    id: varchar("id", { length: 255 }).primaryKey(),
+    createdAt: timestamp("createdAt").defaultNow().onUpdateNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+    email: varchar("email", { length: 191 }).notNull(),
+  },
+  (table) => {
+    return {
+      idIdx: index("users_id_idx").on(table.id),
+      userIdKey: unique("users_id_key").on(table.id),
+    };
+  },
 );
 
 export const keys = mysqlTable(
-	'keys',
-	{
-		id: varchar('id', { length: 255 }).primaryKey(),
-		hashedPassword: varchar('hashed_password', { length: 255 }),
-		userId: varchar('user_id', { length: 255 }).notNull()
-	},
-	(table) => {
-		return {
-			userIdIdx: index('keys_user_id_idx').on(table.userId),
-			keyIdKey: unique('keys_id_key').on(table.id)
-		};
-	}
+  "keys",
+  {
+    id: varchar("id", { length: 255 }).primaryKey(),
+    hashedPassword: varchar("hashed_password", { length: 255 }),
+    userId: varchar("user_id", { length: 255 }).notNull(),
+  },
+  (table) => {
+    return {
+      userIdIdx: index("keys_user_id_idx").on(table.userId),
+      keyIdKey: unique("keys_id_key").on(table.id),
+    };
+  },
 );
 ```
 
@@ -313,48 +317,52 @@ Once you're in the dashboard, all you need to do is create a new database and co
 Now add these variables to your `.env` file. And add the following to `src/lib/server/upstash/index.ts`.
 
 ```ts title="src/lib/server/upstash/index.ts"
-import { UPSTASH_REDIS_REST_TOKEN, UPSTASH_REDIS_REST_URL } from '$env/static/private';
-import { Redis } from '@upstash/redis';
+import { Redis } from "@upstash/redis";
+import {
+  UPSTASH_REDIS_REST_TOKEN,
+  UPSTASH_REDIS_REST_URL,
+} from "$env/static/private";
 
 export const upstashClient = new Redis({
-	url: UPSTASH_REDIS_REST_URL,
-	token: UPSTASH_REDIS_REST_TOKEN
+  url: UPSTASH_REDIS_REST_URL,
+  token: UPSTASH_REDIS_REST_TOKEN,
 });
 ```
 
 Now remember when we configured Lucia, we set the `session` to `null`. This is because we want to use Redis to handle sessions. This is what our config looks like now:
 
 ```ts title="src/lib/server/auth/index.ts"
-import { lucia } from 'lucia';
-import { upstash } from '@lucia-auth/adapter-session-redis';
-import { dev } from '$app/environment';
-import { sveltekit } from 'lucia/middleware';
-import { upstashClient } from '../upstash';
-import { planetscale } from '@lucia-auth/adapter-mysql';
-import { ps } from '../planetscale';
+import { planetscale } from "@lucia-auth/adapter-mysql";
+import { upstash } from "@lucia-auth/adapter-session-redis";
+import { dev } from "$app/environment";
+import { lucia } from "lucia";
+import { sveltekit } from "lucia/middleware";
+
+import { ps } from "../planetscale";
+import { upstashClient } from "../upstash";
 
 export enum PROVIDER_ID {
-	EMAIL = 'email'
+  EMAIL = "email",
 }
 
 export const auth = lucia({
-	adapter: {
-		user: planetscale(ps, {
-			user: 'users',
-			key: 'keys',
-			session: null
-		}),
-		// Instruct Lucia to use Upstash Redis for sessions
-		session: upstash(upstashClient)
-	},
-	middleware: sveltekit(),
-	env: dev ? 'DEV' : 'PROD',
-	getUserAttributes: (data) => {
-		return {
-			userId: data.id,
-			email: data.email
-		};
-	}
+  adapter: {
+    user: planetscale(ps, {
+      user: "users",
+      key: "keys",
+      session: null,
+    }),
+    // Instruct Lucia to use Upstash Redis for sessions
+    session: upstash(upstashClient),
+  },
+  middleware: sveltekit(),
+  env: dev ? "DEV" : "PROD",
+  getUserAttributes: (data) => {
+    return {
+      userId: data.id,
+      email: data.email,
+    };
+  },
 });
 
 export type Auth = typeof auth;
@@ -456,13 +464,14 @@ The rest of the code is pretty self-explanatory.
 SvelteKit makes it incredibly easy to handle POST requests. All we need to do is create a file `+page.server.ts` in the same directory as the `+page.svelte` file and export a `actions` object with at least a `default` property.
 
 ```ts title="src/routes/auth/signin/+page.server.ts"
-import { fail, redirect } from '@sveltejs/kit';
-import type { PageServerLoad, Actions } from './$types';
-import { PROVIDER_ID, auth } from '$lib/server';
-import { LuciaError } from 'lucia';
+import { fail, redirect } from "@sveltejs/kit";
+import { auth, PROVIDER_ID } from "$lib/server";
+import { LuciaError } from "lucia";
+
+import type { Actions, PageServerLoad } from "./$types";
 
 export const actions = {
-	/* our actions here */
+  /* our actions here */
 };
 ```
 
@@ -525,8 +534,8 @@ return redirect('/app');
 
 As you can probably tell, Lucia abstracts away a lot of the complexity of authentication. All we need to do is call the right methods, and Lucia will handle the rest.
 
-<div class="max-w-sm mx-auto my-8 rounded-sm">
-    <img src="/blog/lucia-sveltekit/spongebob-magic.jpeg" alt="spongebob meme" />
+<div class="mx-auto my-8 max-w-sm rounded-sm">
+  <img src="/blog/lucia-sveltekit/spongebob-magic.jpeg" alt="spongebob meme" />
 </div>
 
 No need to, hash passwords, create sessions, or manage cookies. Lucia does it all for us. And it's all type-safe!
@@ -661,14 +670,14 @@ If the user doesn't exist, we'll create a new user using Lucia.
 
 ```ts
 const newUser = await auth.createUser({
-	key: {
-		providerId: PROVIDER_ID.EMAIL,
-		providerUserId: email.toLowerCase(),
-		password: password
-	},
-	attributes: {
-		email
-	}
+  key: {
+    providerId: PROVIDER_ID.EMAIL,
+    providerUserId: email.toLowerCase(),
+    password: password,
+  },
+  attributes: {
+    email,
+  },
 });
 ```
 
@@ -676,8 +685,8 @@ And finally, we'll create a new session and redirect the user to the dashboard.
 
 ```ts
 const session = await auth.createSession({
-	userId: newUser.userId,
-	attributes: {}
+  userId: newUser.userId,
+  attributes: {},
 });
 
 locals.auth.setSession(session);
@@ -692,27 +701,28 @@ While we're at it, let's create an endpoint to sign out the user. Create a new f
 And add the following code:
 
 ```ts title="src/routes/auth/signout/+server.ts"
-import { auth } from '$lib/server';
-import type { RequestHandler } from './$types';
+import { auth } from "$lib/server";
+
+import type { RequestHandler } from "./$types";
 
 export const POST: RequestHandler = async ({ locals }) => {
-	const session = await locals.auth.validate();
+  const session = await locals.auth.validate();
 
-	if (!session) {
-		return new Response(null, {
-			status: 400
-		});
-	}
+  if (!session) {
+    return new Response(null, {
+      status: 400,
+    });
+  }
 
-	// Invalidate session or alternatively, you can delete all sessions: await auth.invalidateAllUserSessions(session.userId);
-	await auth.invalidateSession(session.sessionId);
+  // Invalidate session or alternatively, you can delete all sessions: await auth.invalidateAllUserSessions(session.userId);
+  await auth.invalidateSession(session.sessionId);
 
-	// Remove the cookie.
-	locals.auth.setSession(null);
+  // Remove the cookie.
+  locals.auth.setSession(null);
 
-	return new Response(null, {
-		status: 200
-	});
+  return new Response(null, {
+    status: 200,
+  });
 };
 ```
 

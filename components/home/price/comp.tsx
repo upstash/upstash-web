@@ -1,5 +1,7 @@
 import { HTMLProps, ReactNode } from "react";
+
 import cx from "@/utils/cx";
+
 import Button, { IButton } from "@/components/button";
 
 export function PriceBox({
@@ -15,7 +17,7 @@ export function PriceBox({
         "group/price-box grid place-items-center gap-4 p-6 md:gap-6 md:p-8",
         "rounded-4xl bg-white bg-opacity-5 backdrop-blur transition",
         "hover:scale-[1.02] hover:bg-opacity-10",
-        className
+        className,
       )}
       {...props}
     >
@@ -35,7 +37,7 @@ export function PriceTitle({
     <h3
       className={cx(
         "font-display text-xl font-semibold leading-none md:text-2xl",
-        className
+        className,
       )}
       {...props}
     >
@@ -89,10 +91,10 @@ export function PriceBadge({
       className={cx(
         "inline-flex rounded-full px-2 pb-0.5 pt-1 leading-none",
         "text-xs uppercase leading-none tracking-widest",
-        "border border-white/10 bg-white/03 text-white/60",
+        "border border-white/10 bg-white/3 text-white/60",
         type === "free" &&
           "border-emerald-300/10 bg-emerald-300/5 text-emerald-300/80",
-        className
+        className,
       )}
       {...props}
     >
@@ -103,7 +105,7 @@ export function PriceBadge({
 
 export function PriceHr({ className }: HTMLProps<HTMLHRElement> & {}) {
   return (
-    <hr className={cx("w-10 border-0 border-b border-white/03", className)} />
+    <hr className={cx("w-10 border-0 border-b border-white/3", className)} />
   );
 }
 
@@ -113,7 +115,7 @@ export function PriceButton({ children, className, ...props }: IButton) {
       className={cx(
         "opacity-20 transition",
         "group-hover/price-box:text-emerald-400 group-hover/price-box:opacity-100",
-        className
+        className,
       )}
       {...props}
     >

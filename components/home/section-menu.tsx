@@ -1,18 +1,21 @@
 "use client";
 
 import { HTMLProps, useEffect, useState } from "react";
-import cx from "@/utils/cx";
+
 import { HOME_SECTIONS } from "@/utils/const";
+import cx from "@/utils/cx";
 import {
   HTMLMotionProps,
   motion,
   useMotionValueEvent,
   useScroll,
 } from "framer-motion";
-import { LogoIcon } from "@/components/logo";
-import Button from "@/components/button";
 import { animateScroll, Events, Link as SpyLink } from "react-scroll";
+
 import { useSegment } from "@/hooks/use-segment";
+
+import Button from "@/components/button";
+import { LogoIcon } from "@/components/logo";
 
 export default function SectionMenu({
   children,
@@ -31,11 +34,11 @@ export default function SectionMenu({
   });
 
   useEffect(() => {
-    Events.scrollEvent.register("begin", function() {
+    Events.scrollEvent.register("begin", function () {
       console.log("begin", arguments);
     });
 
-    Events.scrollEvent.register("end", function() {
+    Events.scrollEvent.register("end", function () {
       console.log("end", arguments);
     });
 
@@ -44,14 +47,14 @@ export default function SectionMenu({
       Events.scrollEvent.remove("end");
     };
   }, [show]);
-  const segment = useSegment()
+  const segment = useSegment();
   return (
     <motion.div
       className={cx(
         "fixed inset-x-0 top-0 z-50 pt-10",
         "hidden justify-center md:flex",
         show ? "pointer-events-auto" : "pointer-events-none",
-        className
+        className,
       )}
       initial="hidden"
       animate={show ? "visible" : "hidden"}
@@ -62,13 +65,11 @@ export default function SectionMenu({
       transition={{ duration: 0.16 }}
       {...props}
     >
-      <div
-        className="absolute inset-x-0 top-0 h-40 pointer-events-none -z-10 bg-gradient-to-b from-zinc-950 to-transparent"
-      />
+      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-40 bg-gradient-to-b from-zinc-950 to-transparent" />
 
       <div
         className={cx(
-          "flex cursor-pointer items-center gap-4 rounded-full bg-white p-2"
+          "flex cursor-pointer items-center gap-4 rounded-full bg-white p-2",
         )}
       >
         <SpyLink
@@ -78,7 +79,7 @@ export default function SectionMenu({
               duration: 0,
             })
           }
-          className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-zinc-100"
+          className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-zinc-100"
         >
           <LogoIcon lightBg height={30} />
         </SpyLink>
@@ -91,7 +92,10 @@ export default function SectionMenu({
           <SectionMenuItem href={HOME_SECTIONS.PRODUCTS}>
             Products
           </SectionMenuItem>
-          <SectionMenuItem href={HOME_SECTIONS.PRICING} onClick={() => segment.track("button.pricing")}>
+          <SectionMenuItem
+            href={HOME_SECTIONS.PRICING}
+            onClick={() => segment.track("button.pricing")}
+          >
             Pricing
           </SectionMenuItem>
           {/*<SectionMenuItem href={HOME_SECTIONS.OPEN_SOURCE}>*/}
@@ -131,7 +135,7 @@ function SectionMenuItem({
           "cursor-pointer rounded-full transition",
           "[.active_&]:bg-zinc-200 [.active_&]:text-zinc-950",
           "hover:bg-zinc-200",
-          className
+          className,
         )}
       >
         {children}

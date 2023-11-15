@@ -1,15 +1,17 @@
+import { notFound } from "next/navigation";
+
+import { getTableOfContents } from "@/utils/toc";
 import type { Post } from "contentlayer/generated";
 import { allPosts } from "contentlayer/generated";
-import { notFound } from "next/navigation";
-import OtherPostCard from "@/components/post/other-post";
-import Clap from "@/components/post/claps";
-import { Mdx } from "@/components/post/mdx";
-import Container from "@/components/container";
-import PostHeader from "@/components/post/header";
-import PostTags from "@/components/post/tags";
-import PageBodyGradient from "@/components/page-body-gradient";
+
 import Bg from "@/components/bg";
-import { getTableOfContents } from "@/utils/toc";
+import Container from "@/components/container";
+import PageBodyGradient from "@/components/page-body-gradient";
+import Clap from "@/components/post/claps";
+import PostHeader from "@/components/post/header";
+import { Mdx } from "@/components/post/mdx";
+import OtherPostCard from "@/components/post/other-post";
+import PostTags from "@/components/post/tags";
 import PostTOC from "@/components/post/toc";
 
 type Props = {
@@ -52,7 +54,7 @@ export default async function BlogPage({ params }: Props) {
 
         {/* Body */}
         <div className="relative z-0 pt-10">
-          <PageBodyGradient />
+          <PageBodyGradient isBlogPage />
 
           <Container className="max-w-screen-md">
             {/* toc */}
@@ -61,13 +63,13 @@ export default async function BlogPage({ params }: Props) {
             {/* content */}
             <Mdx code={post.body.code} />
 
-            {/* Tags */}
+            {/* Tags- */}
             <PostTags post={post} />
 
             {/* Other Post */}
             <div className="mt-10 grid gap-4 md:grid-cols-2 md:gap-8">
-              <OtherPostCard post={prevPost} />
-              <OtherPostCard post={nextPost} align="right" />
+              <OtherPostCard post={nextPost} align="left" />
+              <OtherPostCard post={prevPost} align="right" />
             </div>
           </Container>
         </div>

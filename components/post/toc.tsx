@@ -1,7 +1,7 @@
 "use client";
 
-import { TableOfContents } from "@/utils/toc";
 import cx from "@/utils/cx";
+import { TableOfContents } from "@/utils/toc";
 
 type Props = {
   toc: TableOfContents;
@@ -12,21 +12,19 @@ export default function PostTOC({ toc }: Props) {
 
   return (
     <details
-      className="group/toc mb-10 rounded-xl bg-white/03"
+      className="group/toc mb-10 rounded-xl
+      bg-emerald-700/10 dark:bg-white/3"
       role="navigation"
       aria-label="Table of contents"
     >
       {/* summary */}
       <summary
         className={cx(
-          "flex items-center justify-between px-6 py-3",
-          "select-none list-none text-zinc-400"
+          "flex items-center px-6 py-3",
+          "select-none list-none text-sm uppercase tracking-wide opacity-60",
         )}
       >
-        <span className="text-sm uppercase tracking-wide">
-          Table of contents
-        </span>
-        <IconArrow />
+        Table of contents
       </summary>
 
       {/* content */}
@@ -35,7 +33,10 @@ export default function PostTOC({ toc }: Props) {
           {toc.items.map(({ title, url }) => {
             return (
               <li key={url}>
-                <a href={url} className="text-emerald-400">
+                <a
+                  href={url}
+                  className="text-emerald-600 dark:text-emerald-400"
+                >
                   {title}
                 </a>
               </li>
@@ -52,7 +53,7 @@ export function IconArrow({ className }: { className?: string }) {
     <svg
       className={cx(
         "shrink-0 rotate-90 transition group-open/toc:-rotate-90",
-        className
+        className,
       )}
       width={24}
       viewBox="0 0 24 24"

@@ -2,7 +2,7 @@
 slug: nuxt-redis
 title: "Getting started with Nuxt 3 and Serverless Redis"
 authors:
-  -  krutie
+  - krutie
 image: nuxt/cover.png
 tags: [serverless, nuxt, upstash, redis, nuxtjs]
 ---
@@ -168,6 +168,7 @@ For example, we can use `zincrby` to increase the page SCORE every time the requ
 ```jsx
 // server/middleware/pageCount.js
 import { Redis } from "@upstash/redis";
+
 import { getRedisKey } from "../utils";
 
 const redis = Redis.fromEnv();

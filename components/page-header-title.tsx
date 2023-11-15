@@ -1,4 +1,5 @@
 import { HTMLProps, ReactNode } from "react";
+
 import cx from "@/utils/cx";
 import Balancer from "react-wrap-balancer";
 
@@ -25,7 +26,7 @@ export default function PageHeaderTitle({
       className={cx(
         "font-display font-bold !leading-title",
         size[as],
-        className
+        className,
       )}
       {...props}
     >

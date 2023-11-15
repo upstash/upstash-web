@@ -1,11 +1,35 @@
 import { defineDocumentType, makeSource } from "contentlayer/source-files";
-
 import readingTime from "reading-time";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypePrettyCode from "rehype-pretty-code";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
+
 import { authors } from "./utils/authors";
+
+export const Customer = defineDocumentType(() => ({
+  name: "Customer",
+  filePathPattern: `customer/*.mdx`,
+  contentType: "mdx",
+  fields: {
+    company_name: { type: "string", required: true },
+    company_url: { type: "string", required: true },
+    company_logo: { type: "string", required: true },
+    user_name: { type: "string", required: true },
+    user_title: { type: "string", required: true },
+    user_photo: { type: "string", required: true },
+    highlight: { type: "string", required: true },
+    cover_image: { type: "string", required: true },
+    draft: { type: "boolean" },
+    order: { type: "number" },
+  },
+  computedFields: {
+    slug: {
+      type: "string",
+      resolve: (doc: any) => doc._raw.flattenedPath.split("/").at(-1),
+    },
+  },
+}));
 
 export const Job = defineDocumentType(() => ({
   name: "Job",
@@ -26,7 +50,6 @@ export const Job = defineDocumentType(() => ({
       resolve: (doc: any) => doc._raw.flattenedPath.split("/").at(-1),
     },
   },
- 
 }));
 
 export const Post = defineDocumentType(() => ({
@@ -47,14 +70,14 @@ export const Post = defineDocumentType(() => ({
     authorsData: {
       type: "json",
       resolve: (doc) => {
-        return doc.authors.map(authorId => {
-          const author = authors[authorId]
+        return doc.authors.map((authorId) => {
+          const author = authors[authorId];
           return {
             id: authorId,
             ...author,
-            image: `/authors/${author.image}`
-          }
-        })
+            image: `/authors/${author.image}`,
+          };
+        });
       },
     },
     readingTime: {
@@ -74,7 +97,7 @@ export const Post = defineDocumentType(() => ({
 
 export default makeSource({
   contentDirPath: "./data",
-  documentTypes: [Job, Post],
+  documentTypes: [Customer, Job, Post],
   mdx: {
     remarkPlugins: [remarkGfm],
     rehypePlugins: [
@@ -82,7 +105,10 @@ export default makeSource({
       [
         rehypePrettyCode,
         {
-          theme: "poimandres",
+          theme: {
+            dark: "poimandres",
+            light: "github-light",
+          },
           onVisitLine(node: any) {
             // Prevent lines from collapsing in `display: grid` mode, and allow empty
             // lines to be copy/pasted

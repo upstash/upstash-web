@@ -2,7 +2,7 @@
 slug: blitzjs-todo-redis
 title: "Building A To-Do List with Blitz.js & Redis"
 authors:
-  -  vedant
+  - vedant
 tags: [redis, blitzjs, upstash, todo]
 ---
 
@@ -79,6 +79,7 @@ First, let's initialize the Upstash JS SDK in `/lib/redis.ts`
 
 ```ts
 import { Redis } from "@upstash/redis";
+
 const redis = Redis.fromEnv();
 export default redis;
 ```
@@ -161,11 +162,12 @@ To start off, let’s delete everything in `app/pages/index.js` and write our To
 At the top of the file, paste these imports in.
 
 ```jsx
-import { Link, BlitzPage, useMutation, Routes, getAntiCSRFToken } from "blitz";
-import { useRef, useEffect, useState, Suspense } from "react";
-import Layout from "app/core/layouts/Layout";
-import { useCurrentUser } from "app/core/hooks/useCurrentUser";
+import { Suspense, useEffect, useRef, useState } from "react";
+
 import logout from "app/auth/mutations/logout";
+import { useCurrentUser } from "app/core/hooks/useCurrentUser";
+import Layout from "app/core/layouts/Layout";
+import { BlitzPage, getAntiCSRFToken, Link, Routes, useMutation } from "blitz";
 ```
 
 We will be using React Hooks to build the core functionality of our To-Do list. Let’s implement some of the core features of the list.

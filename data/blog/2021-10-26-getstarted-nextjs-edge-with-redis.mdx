@@ -50,6 +50,7 @@ Create pages/api/\_middleware.ts as below:
 
 ```ts
 import type { NextFetchEvent, NextRequest } from "next/server";
+
 import { Redis } from "@upstash/redis";
 
 export async function middleware(req: NextRequest, ev: NextFetchEvent) {

@@ -1,4 +1,5 @@
 import { ReactNode, SVGProps } from "react";
+
 import cx from "@/utils/cx";
 
 export default function PostNote({
@@ -11,15 +12,15 @@ export default function PostNote({
   title?: string;
 }) {
   const style = {
-    tip: "bg-emerald-300/5 text-emerald-200 border-emerald-300/5",
-    info: "bg-blue-300/5 text-blue-200 border-blue-300/5",
-    caution: "bg-orange-300/5 text-orange-200 border-orange-300/5",
-    danger: "bg-red-300/10 text-red-200 border-red-300/10",
+    caution:
+      "border-orange-800/10 bg-orange-500/10 text-orange-700 " +
+      "dark:bg-orange-500/20 dark:text-orange-200 dark:border-orange-500/10",
+    danger:
+      "border-red-800/10 bg-red-500/10 text-red-700 " +
+      "dark:bg-red-500/20 dark:text-red-200 dark:border-red-500/10",
   };
 
   const icon = {
-    tip: <PostNoteTip />,
-    info: <PostNoteInfo />,
     caution: <PostNoteCaution />,
     danger: <PostNoteDanger />,
   };
@@ -27,9 +28,10 @@ export default function PostNote({
   return (
     <div
       className={cx(
-        "flex items-start gap-4 rounded-xl md:px-6 md:py-5",
-        "border border-white/5 bg-white/5 p-4 text-zinc-200",
-        type && style[type]
+        "flex items-start gap-4 rounded-xl border p-5 md:p-6",
+        "border-emerald-900/10 bg-emerald-800/5 text-emerald-900",
+        "dark:border-emerald-500/10 dark:bg-emerald-700/20 dark:text-emerald-50",
+        type && style[type],
       )}
     >
       <span className="text-2xl">
@@ -61,48 +63,6 @@ function PostNoteDefault(props: SVGProps<SVGSVGElement>) {
       <circle cx="12" cy="12" r="9" />
       <line x1="12" y1="8" x2="12.01" y2="8" />
       <polyline points="11 12 12 12 12 16 13 16" />
-    </svg>
-  );
-}
-
-function PostNoteTip(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="1em"
-      height="1em"
-      viewBox="0 0 24 24"
-      strokeWidth="1.5"
-      stroke="currentColor"
-      fill="none"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      {...props}
-    >
-      <path d="M3 12h1m8 -9v1m8 8h1m-15.4 -6.4l.7 .7m12.1 -.7l-.7 .7" />
-      <path d="M9 16a5 5 0 1 1 6 0a3.5 3.5 0 0 0 -1 3a2 2 0 0 1 -4 0a3.5 3.5 0 0 0 -1 -3" />
-      <line x1="9.7" y1="17" x2="14.3" y2="17" />
-    </svg>
-  );
-}
-
-function PostNoteInfo(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="1em"
-      height="1em"
-      viewBox="0 0 24 24"
-      strokeWidth="1.5"
-      stroke="currentColor"
-      fill="none"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      {...props}
-    >
-      <circle cx="12" cy="12" r="9" />
-      <line x1="12" y1="8" x2="12" y2="12" />
-      <line x1="12" y1="16" x2="12.01" y2="16" />
     </svg>
   );
 }

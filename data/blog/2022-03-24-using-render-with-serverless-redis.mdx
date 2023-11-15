@@ -2,7 +2,7 @@
 slug: render-serverless-redis
 title: "Using Render with Serverless Redis"
 authors:
-  -  vedant
+  - vedant
 tags: [redis, render, serverless, upstash]
 ---
 
@@ -54,8 +54,11 @@ Let's implement a simple view counter on our application next. Open `pages/index
 ```jsx
 import Head from "next/head";
 import Image from "next/image";
-import styles from "../styles/Home.module.css";
+
 import { Redis } from "@upstash/redis";
+
+import styles from "../styles/Home.module.css";
+
 const redis = Redis.fromEnv();
 ```
 

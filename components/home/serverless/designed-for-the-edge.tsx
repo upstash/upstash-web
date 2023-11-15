@@ -1,8 +1,11 @@
-import { ServerlessBox, ServerlessSummary, ServerlessTitle } from "./comp";
-import { LogoIcon } from "@/components/logo";
 import { HTMLProps } from "react";
 import Image from "next/image";
+
 import cx from "@/utils/cx";
+
+import { LogoIcon } from "@/components/logo";
+
+import { ServerlessBox, ServerlessSummary, ServerlessTitle } from "./comp";
 
 export default function DesignedForTheEdge() {
   return (
@@ -26,7 +29,7 @@ export default function DesignedForTheEdge() {
         >
           {/* circles line */}
           <svg
-            className="absolute top-0 left-0 z-0"
+            className="absolute left-0 top-0 z-0"
             width="490"
             height="490"
             viewBox="0 0 490 490"
@@ -145,7 +148,7 @@ export default function DesignedForTheEdge() {
           <ProductOut className="h-[170px] rotate-[60deg]">
             <ProductIn className="rotate-[-60deg]">
               <Image
-                className="block w-6 h-6 text-black"
+                className="block h-6 w-6 text-black"
                 src="/lagon-icon-black.png"
                 width={40}
                 height={40}
@@ -204,7 +207,7 @@ function ProductOut({ children, className }: HTMLProps<HTMLDivElement> & {}) {
       className={cx(
         "absolute bottom-1/2 left-1/2 z-10",
         "flex w-0 origin-bottom justify-center",
-        className
+        className,
       )}
     >
       {children}
@@ -218,7 +221,7 @@ function ProductIn({ children, className }: HTMLProps<HTMLDivElement> & {}) {
       className={cx(
         "flex h-12 w-12 shrink-0 items-center justify-center",
         "rounded-full bg-white",
-        className
+        className,
       )}
     >
       {children}

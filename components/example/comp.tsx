@@ -1,20 +1,14 @@
 "use client";
 
+import { Dispatch, HTMLProps, SetStateAction } from "react";
+
 import cx from "@/utils/cx";
-import {
-  Children,
-  cloneElement,
-  HTMLProps,
-  ReactElement,
-  Dispatch,
-  SetStateAction,
-} from "react";
-import IconRedis from "@/components/icon-redis";
+import Balancer from "react-wrap-balancer";
+
 import IconKafka from "@/components/icon-kafka";
 import IconQStash from "@/components/icon-qstash";
-import Balancer from "react-wrap-balancer";
-import Image from "next/image";
-import Button from "@/components/button";
+import IconRedis from "@/components/icon-redis";
+
 export function Example({
   className,
   children,
@@ -41,10 +35,10 @@ export function Example({
       className={cx(
         "group/example-box p-6",
         "flex flex-col gap-4",
-        "rounded-3xl bg-white/03",
+        "rounded-3xl bg-white/3",
         "border border-white/5",
         "transition hover:bg-white/5",
-        className
+        className,
       )}
       {...props}
     >
@@ -72,7 +66,7 @@ function ExampleTitle({
     <h3
       className={cx(
         "font-display text-xl font-medium md:leading-tight",
-        className
+        className,
       )}
       {...props}
     >
@@ -193,7 +187,7 @@ export function Pill({
             setSelectedStacks([...selectedStacks, stackTitle]);
           } else {
             setSelectedStacks(
-              selectedStacks.filter((item) => item !== stackTitle)
+              selectedStacks.filter((item) => item !== stackTitle),
             );
           }
         }}

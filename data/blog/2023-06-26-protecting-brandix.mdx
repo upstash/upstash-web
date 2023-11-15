@@ -2,7 +2,7 @@
 slug: protecting-brandix
 title: "Protecting my wallet by ratelimiting OpenAI requests"
 authors:
-  -  pau_kraft
+  - pau_kraft
 tags: [redis, ratelimiting, openai]
 ---
 
@@ -13,6 +13,7 @@ Let's delve into how [Brandix](https://brandix.ai/) works and how [Upstash](http
 ## How it works
 
 ### Name generation
+
 To be honest, it's quite simple. All the magic behind [Brandix](https://brandix.ai/) comes from the hard work of OpenAI's GPT models. That's the stuff that powers [Brandix](https://brandix.ai/).
 
 To keep costs at a minimum and with tests showing that GPT-4 doesn't have any advantages for this specific use case, I chose GPT-3.5 to generate the names.
@@ -21,9 +22,10 @@ You can imagine the generate page as a chat between you and the AI. You send a m
 
 If you send a request (either by sending a message or requesting more names), the backend adds a pre-prompt to instruct the AI to answer with five brand names in a list, and sends it to OpenAI.
 
-GPT-3.5 is sometimes a bit too polite and starts its response with something like "Sure, I can provide you with some names:", that's why we instruct GPT to return a numbered list. We then split the string line by line and filter out all strings, with the help of a RegEx (```/^[0-9]/```), that don't start with a number.
+GPT-3.5 is sometimes a bit too polite and starts its response with something like "Sure, I can provide you with some names:", that's why we instruct GPT to return a numbered list. We then split the string line by line and filter out all strings, with the help of a RegEx (`/^[0-9]/`), that don't start with a number.
 
 The result looks something like this:
+
 ```
 1. StellarEdge
 2. CosmoTech
@@ -31,23 +33,29 @@ The result looks something like this:
 4. GalactiCorp
 5. CelestialX
 ```
+
 The problem is, it gets streamed in token by token, so we can't just split it line by line and call it a day. But don't worry, it's still quite simple. We just split it and don't use the last item of the array.
 
 For example, let's imagine our current streamed string is:
+
 ```
 1. StellarEdge
 2. CosmoTech
 3. As
 ```
+
 Now we split it line by line so we get an array like this
+
 ```
 ["1. StellarEdge", "2. CosmoTech", "3. As"]
 ```
+
 Do you see it? All elements of the array but the last are complete, so we just leave the last one behind and only use the elements before. (If the stream is done we do use the last one, because then we know that it's complete)
 
 Now we throw a little RegEx at it (/^\d+\.\s/) that replaces the unwanted number in front.
 
 The current array looks like this:
+
 ```
 ["StellarEdge", "CosmoTech"]
 ```
@@ -57,6 +65,7 @@ And now we just check if we have the domain already in our list and if not we ad
 That's it.
 
 ### Domain availability check
+
 This is quite an unusual one. Since the service is free to use, I have to pay for everything. So, I didn't want to go the easy way and throw money at an API and call it a day.
 
 So, how am I doing it, then?
@@ -80,23 +89,29 @@ And that's where Upstash and the [ratelimit library](https://github.com/upstash/
 You create a Redis on [Upstash](https://upstash.com/).
 
 And initiate the ratelimiter, with the algorithm you want:
+
 ```ts
 const ratelimit = new Ratelimit({
   redis: Redis.fromEnv(),
   limiter: Ratelimit.fixedWindow(10, "10 s"),
-  analytics: true
+  analytics: true,
 });
 ```
+
 and then check if a user (based on their IP) has made too many requests:
+
 ```ts
-const { success } = await ratelimit.limit(REQUEST-IP)
+const { success } = await ratelimit.limit(REQUEST - IP);
 ```
+
 If success is `true` we let the request through, if it's `false` we return a 429, informing the user that they please shouldn't empty my bank account.
 
 ## Wrapping things up
+
 Thanks for reading. [Brandix](https://brandix.ai/) is a fun little side project I made in a few days. But with tools like Next.js, Vercel, OpenAI, Tailwind, [Shadcn UI](https://ui.shadcn.com) and [Upstash](https://upstash.com/) Redis, it's incredibly simple to bring small, but still production-ready projects to life. If you have any questions or feedback, feel free to reach out to me on [Twitter](https://twitter.com/paukraft).
 
 Relevant links:
+
 - [Brandix](https://brandix.ai/)
 - [OpenAI](https://openai.com/)
 - [Upstash ratelimiter](https://github.com/upstash/ratelimit)

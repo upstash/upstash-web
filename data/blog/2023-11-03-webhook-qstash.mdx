@@ -1,0 +1,180 @@
+---
+slug: webhook-qstash
+title: "Decouple Webhook Processing with QStash on Next.js"
+authors:
+  - ruben
+tags: [webhook, nextjs, qstash]
+---
+
+
+In this article I will show you how to decouple the processing of incoming webhook data on your Next.js webapp. We will be using QStash to act as our message queue. By implementing this decoupling, we not only ensure higher fault tolerance and scalability but also guarantee the prompt delivery of incoming data. This can be particularly useful in cases where the number of webhook events increases for every new user. For example when integrating with a third party service that sends statistics for every separate user on a daily basis. Without this message queue, a huge amount of incoming webhook traffic can lead to long processing times, potentially causing your webapp to not be able to process the incoming data.
+
+The most important benefit of using a messaging service like QStash is the automatic retrying it offers. Without retrying our third-party service will send the webhook data to us and just forget about it, whether it successfully runs or not. QStash will actually make sure to retry if our webapp fails to process the data. We will also make use of Zod to verify whether the data we are expecting from the webhook is actually what it is sending, further increasing the successful processing of the data.
+
+Zod is, as stated by their website a: “TypeScript-first schema declaration and validation library”. It allows us to verify whether data coming for a third-party is the data we are expecting and gives us type safety for this third-party data. I highly recommend using it whenever you are working with some kind of external source that will send you data. Also, many other libraries come with Zod integrations. Read more about Zod [here](https://zod.dev/).
+
+## Setting up QStash
+
+First of all for QStash to work we will need a public URL where QStash can access our webapp. When we develop on localhost it is not publicly accessible. But there is a great tool called ngrok which can actually make our localhost publicly accessible.
+
+To use ngrok follow the install instructions for your platform [here](https://ngrok.com/download). After installing, to actually get the public URL run this in your terminal (if you are not running your Next.js app on port 3000 fill in your port instead of 3000):
+
+```bash
+ngrok http 3000
+```
+
+After running this copy the first URL displayed after `Forwarding` it should look something like this: `https://38le-181-153-161-73.ngrok-free.app`. Make sure to keep the ngrok process running in your terminal to keep the public URL.
+
+Now, let's get started with actually setting up QStash for our webapp. Navigate to [https://console.upstash.com/qstash](https://console.upstash.com/qstash):
+
+![The QStash dashboard](/blog/webhook-qstash/qstash.png)
+
+The QStash dashboard
+
+Be sure to copy the `QSTASH_TOKEN` and the signing keys you see here. Copy them into a file called `.env` like this:
+
+```bash
+QSTASH_TOKEN=your_token_here
+QSTASH_CURRENT_SIGNING_KEY=your_current_signing_key_here
+QSTASH_NEXT_SIGNING_KEY=your_next_signing_key_here
+```
+
+Be sure to not commit this file to Git by adding a new line with `.env` in your `.gitignore` file.
+
+Now navigate to the ‘Topics’ tab, and click ‘Create Topic’. A topic is like a mailbox where you can send your QStash messages. You give it a name (remember this as well), and the URL of the endpoint you want QStash to send the data to. Here we will add the ngrok URL we copied earlier, but be sure to add /api/qstash add the end of it. So it should look something like this:
+
+![Creating a topic within the QStash dashboard](/blog/webhook-qstash/topic.png)
+
+Creating a topic within the QStash dashboard.
+
+Click ‘Create’. Now we are done setting up everything on the QStash dashboard.
+
+## Setting up and implementing the API routes
+
+So for the rest of this tutorial I will assume you already have a Next.js webapp up and running. If this is not the case Vercel has some [great documentation](https://nextjs.org/docs/app/api-reference/create-next-app) on how to easily setup a new project.
+
+We will need three extra dependencies, the Typescript SDK for QStash, Zod and dotenv. We will use dotenv to load our secret values like the `QSTASH_TOKEN` we added to the `.env` file earlier. Install them with your preferred package manager:
+
+```bash
+npm install zod @upstash/qstash dotenv       # npm
+yarn add zod @upstash/qstash dotenv          # yarn
+bun add zod @upstash/qstash dotenv           # bun
+pnpm add zod @upstash/qstash dotenv          # pnpm
+```
+
+We will need two API routes for this project. One we give to our third-party service, where they can send the webhook data to, we will call it our webhook endpoint. And the one where we handle the data QStash sends back to us, which we just added into the QStash dashboard.
+
+Next.js allows us to create API endpoints with the `pages` and the `app` folder. For this tutorial we will solely focus on the `app` folder. For documentation on how to implement this with the `pages` folder please refer to the QStash documentation [here](https://upstash.com/docs/qstash/quickstarts/vercel-nextjs).
+
+With the `app` folder it is common practice to place your API endpoints in the `app/api` subfolder. Also when working with the `app` folder a file defining an API endpoint should be named `route.ts` .
+
+Let’s create the first one. We will place the file at this location: `app/api/webhook/route.ts` :
+
+```tsx
+import { headers } from 'next/headers';
+import { NextRequest, NextResponse } from 'next/server';
+import { isValid } from '.';
+import z from 'zod';
+import { Client } from "@upstash/qstash";
+import "dotenv/config";
+
+// Here we initialise our QStash client.
+// We will use it send our messages to QStash.
+// Here, the dotenv package will make sure
+// the QSTASH_TOKEN is loaded from the .env file.
+const c = new Client({
+  token: process.env.QSTASH_TOKEN!,
+});
+
+// Here, you should define the expected shape or schema
+// of the data sent to your webhook endpoint by
+// the third-party service. For this example I expect an object
+// with a user id and an object id. If I receive this data
+// I know there is some new data available for a certain user.
+const IncomingWebhookDataSchema = z.object({
+	user_id: z.string(),
+	object_id: z.string()
+})
+export async function POST(req: NextRequest) {
+		// The next five lines are not necessary for this project
+		// but it is to make you aware of the fact that in a production
+		// app you should always verify incoming webhook request for
+		// security reasons. Your third party service should
+		// provide documentation for this.
+    const headerList = headers();
+    const signature = headerList.get('x-third-party-signature');
+    if (!signature || !(await isValid(signature))) {
+        return NextResponse.json(null, { status: 401 });
+    }
+
+		// As the first real step of the webhook endpoint
+		// we will verify the incoming data with Zod.
+		// If the data is invalid we will
+		// return an error and a 400 HTTP status code.
+		const body = await req.json();
+		const parseResult = IncomingWebhookDataSchema.safeParse(body);
+		if (!parseResult.success) {
+			return NextResponse.json({ error: "Body invalid" }, { status: 400 })
+		}
+		const data = parseResult.data
+		// Now we are sure that the data const is an object with
+		// a user_id string field and an object_id string field.
+
+		// Now it is time to actually send this data to QStash, so
+		// QStash can take over and send the webhook data back to us
+		// when we are ready to process it:
+		const res = await c.publishJSON({
+			// For 'topic' fill in the exact same name as when
+			// you setup the topic in the QStash dashboard.
+		  topic: "process-webhook-data",
+		  body: data
+		});
+		console.log("New message sent to QStash to handle webhook data", res);
+
+		// Return a succesfull response.
+    return NextResponse.json({ success: true }, { status: 200 });
+}
+```
+
+Now we can create the API endpoint that QStash will call. We will create a new file at `app/api/qstash/route.ts` . This should be the same route as the one we added in the topic in the QStash dashboard.
+
+```tsx
+import { NextRequest, NextResponse } from "next/server";
+import { verifySignatureEdge } from "@upstash/qstash/dist/nextjs";
+
+// QStash will call this endpoint with the data it received earlier.
+async function handler(_req: NextRequest) {
+	const data = await _req.json();
+	// The data const will now hold what we sent to QStash
+	// earlier, so we can process it now.
+	// Here you should actually handle the data
+	// in the way you would normally process your
+	// incoming webhook data. In this case it
+	// would probably involve a HTTP request
+	// with fetch or axios back to the third party
+	// to request the new data.
+
+  console.log("Processed webhook data");
+	// Return a succesfull response so QStash knows the message
+	// was processed successfully.
+  return NextResponse.json({ success: true }, { status: 200 });
+}
+
+// It is very important to add this line as this makes
+// sure that only QStash can successfully call this endpoint.
+// It will make use of the QSTASH_CURRENT_SIGNING_KEY and
+// QSTASH_NEXT_SIGNING_KEY from your .env file.
+export const POST = verifySignatureEdge(handler);
+
+export const runtime = "edge";
+```
+
+That’s it! You just decoupled the processing of incoming webhook data. Easy right? I really like how simple it is to set up a system like this by using QStash.
+
+## Next steps
+
+Make sure that in a production app you add your production URL to the earlier created QStash topic. Also to actually debug issues with your QStash messages you can navigate back to the QStash dashboard and click the ‘Logs’ tab. It will show all the messages QStash sent back to you, how many times it retried, and if the messages were successful or not.
+
+I hope this article inspired you to possibly include QStash into your webapp or to explore the other use cases for QStash. Also be sure to checkout all the other serverless solutions Upstash provides.
+
+I am curious to see how you guys use this implementation. If you have any questions or thoughts you would like to share, [feel free to reach out to me on X](https://twitter.com/rubenpdegroot).

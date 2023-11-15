@@ -2,7 +2,7 @@
 slug: powering-oss-alternative-to-linktree
 title: "Building an open-source alternative to LinkTree with Astro, Upstash and GitHub"
 authors:
-  -  rishi
+  - rishi
 tags: ["astro", "redis", "edgio", "github"]
 ---
 
@@ -188,9 +188,10 @@ we use Upstash Redis database client and a rate limiter library called `@upstash
 ```jsx title="@/lib/Upstash/ratelimit.js"
 // Reference Function to ratelimiting
 
-import { getENV } from "@/lib/env";
-import { Redis } from "@upstash/redis";
 import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+
+import { getENV } from "@/lib/env";
 
 const url = getENV("UPSTASH_REDIS_REST_URL");
 const token = getENV("UPSTASH_REDIS_REST_TOKEN");

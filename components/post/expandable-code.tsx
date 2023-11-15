@@ -1,8 +1,11 @@
 "use client";
 
-import cx from "@/utils/cx";
 import { HTMLProps, useState } from "react";
+
+import cx from "@/utils/cx";
+
 import { IconArrow } from "@/components/post/toc";
+
 export default function ExpandableCode({
   children,
   title,
@@ -11,7 +14,7 @@ export default function ExpandableCode({
   title: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  
+
   return (
     <div>
       <Toc>
@@ -53,7 +56,7 @@ Toc.Summary = function TocSummary({
       className={cx(
         "flex select-none list-none items-center gap-2",
         "mb-px h-10 rounded-lg px-4 text-white/40 hover:bg-[#151518ff]",
-        className
+        className,
       )}
       {...props}
     >
@@ -71,4 +74,3 @@ Toc.Summary = function TocSummary({
     </summary>
   );
 };
-

@@ -1,10 +1,14 @@
 "use client";
 
-import { ServerlessBox, ServerlessSummary, ServerlessTitle } from "./comp";
 import { Product } from "@/utils/type";
 import Prism from "prismjs";
+
+import { ServerlessBox, ServerlessSummary, ServerlessTitle } from "./comp";
+
 import "prismjs/themes/prism-tomorrow.css";
+
 import { HTMLProps, ReactNode, useEffect, useState } from "react";
+
 import cx from "@/utils/cx";
 
 export default function HttpRestApi() {
@@ -36,12 +40,12 @@ export default function HttpRestApi() {
               <label
                 key={key}
                 className={cx(
-                  "select-none bg-white bg-opacity-03 px-4 py-1 text-sm first:rounded-l-full last:rounded-r-full",
-                  value === product && "bg-opacity-10"
+                  "select-none bg-white bg-opacity-3 px-4 py-1 text-sm first:rounded-l-full last:rounded-r-full",
+                  value === product && "bg-opacity-10",
                 )}
               >
                 <input
-                  className="absolute opacity-0 pointer-events-none"
+                  className="pointer-events-none absolute opacity-0"
                   type="radio"
                   value={value}
                   name="product"
@@ -57,7 +61,7 @@ export default function HttpRestApi() {
 
         {/* body */}
         <div className="mt-4 grid rounded-xl bg-black/20 md:h-[276px]">
-          <div className="p-4 overflow-y-scroll md:px-6">
+          <div className="overflow-y-scroll p-4 md:px-6">
             <Pre hidden={product !== Product.REDIS}>{CODE[Product.REDIS]}</Pre>
             <Pre hidden={product !== Product.KAFKA}>{CODE[Product.KAFKA]}</Pre>
             <Pre hidden={product !== Product.QSTASH}>

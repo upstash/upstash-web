@@ -9,11 +9,8 @@ const nextConfig = {
         : "https://upstash.com",
   },
   reactStrictMode: false,
-  experimental: {
-    appDir: true,
-  },
   images: {
-    domains: ["github.com", "avatars.githubusercontent.com"]
+    domains: ["github.com", "avatars.githubusercontent.com"],
   },
   rewrites: () => [
     {

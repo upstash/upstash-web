@@ -1,18 +1,23 @@
-"use client"
+"use client";
+
+import React from "react";
+
+import { Product } from "@/utils/type";
+
+import { useSegment } from "@/hooks/use-segment";
+
+import Button from "@/components/button";
+import IconKafka from "@/components/icon-kafka";
+
 import {
   ProductBox,
   ProductFeature,
   ProductFeatureItem,
   ProductTitle,
 } from "./comp";
-import Button from "@/components/button";
-import React from "react";
-import { Product } from "@/utils/type";
-import IconKafka from "@/components/icon-kafka";
-import { useSegment } from "@/hooks/use-segment";
 
 export default function ServerlessKafka() {
-  const {track} = useSegment()
+  const { track } = useSegment();
   return (
     <ProductBox
       product={Product.KAFKA}
@@ -35,13 +40,13 @@ export default function ServerlessKafka() {
         </ProductFeatureItem>
       </ProductFeature>
 
-      <div className="grid gap-4 mt-auto">
+      <div className="mt-auto grid gap-4">
         <Button
           href="https://github.com/upstash/kafka-examples"
           className="hover:bg-blue-100 hover:text-blue-950"
           type="button"
-          onClick={()=>{
-            track("button.examples.kafka")
+          onClick={() => {
+            track("button.examples.kafka");
           }}
         >
           View examples
@@ -50,8 +55,8 @@ export default function ServerlessKafka() {
           href="/docs/kafka"
           className="bg-blue-100 text-blue-950 hover:bg-blue-100 hover:text-blue-950"
           type="button"
-          onClick={()=>{
-            track("button.docs.kafka")
+          onClick={() => {
+            track("button.docs.kafka");
           }}
         >
           Read the docs

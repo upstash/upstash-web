@@ -1,18 +1,29 @@
 "use client";
 
-import { IconArrow } from "@/components/post/toc";
 import * as React from "react";
 import { HTMLProps } from "react";
+
 import cx from "@/utils/cx";
+
 import Icon, { ICON_NAMES } from "@/components/icon";
-import IconRedis from "@/components/icon-redis";
 import IconKafka from "@/components/icon-kafka";
 import IconQStash from "@/components/icon-qstash";
+import IconRedis from "@/components/icon-redis";
+import { IconArrow } from "@/components/post/toc";
 
 export const ProductsLabel = {
   redis: "Redis",
   kafka: "Kafka",
   qstash: "QStash",
+};
+
+const LanguagesLabel = {
+  ts: "TypeScript",
+  js: "JavaScript",
+  py: "Python",
+  rs: "Rust",
+  rb: "Ruby",
+  java: "Java",
 };
 
 export default function ExampleFilter({
@@ -22,20 +33,30 @@ export default function ExampleFilter({
   setSelectedUseCase,
   selectedStacks,
   setSelectedStack,
+  selectedLanguages,
+  setSelectedLanguages,
+  selectedPlatforms,
+  setSelectedPlatforms,
   queriedStacks,
-  handleStackQuery,
-  stackQuery,
   queriedUseCases,
-  handleUseCaseQuery,
-  useCaseQuery,
+  queriedLanguages,
+  queriedPlatforms,
 }) {
   const isFilterDirty = React.useMemo(() => {
     return (
       selectedProducts.length > 0 ||
       selectedUseCase.length > 0 ||
-      selectedStacks.length > 0
+      selectedStacks.length > 0 ||
+      selectedLanguages.length > 0 ||
+      selectedPlatforms.length > 0
     );
-  }, [selectedProducts, selectedUseCase, selectedStacks]);
+  }, [
+    selectedProducts,
+    selectedUseCase,
+    selectedStacks,
+    selectedLanguages,
+    selectedPlatforms,
+  ]);
   return (
     <>
       <ExampleFilterMobile
@@ -46,12 +67,14 @@ export default function ExampleFilter({
         setSelectedUseCase={setSelectedUseCase}
         selectedStacks={selectedStacks}
         setSelectedStack={setSelectedStack}
+        selectedLanguages={selectedLanguages}
+        setSelectedLanguages={setSelectedLanguages}
+        selectedPlatforms={selectedPlatforms}
+        setSelectedPlatforms={setSelectedPlatforms}
         queriedStacks={queriedStacks}
-        handleStackQuery={handleStackQuery}
-        stackQuery={stackQuery}
         queriedUseCases={queriedUseCases}
-        handleUseCaseQuery={handleUseCaseQuery}
-        useCaseQuery={useCaseQuery}
+        queriedLanguages={queriedLanguages}
+        queriedPlatforms={queriedPlatforms}
       />
       <ExampleFilterDesktop
         isFilterDirty={isFilterDirty}
@@ -61,12 +84,14 @@ export default function ExampleFilter({
         setSelectedUseCase={setSelectedUseCase}
         selectedStacks={selectedStacks}
         setSelectedStack={setSelectedStack}
+        selectedLanguages={selectedLanguages}
+        setSelectedLanguages={setSelectedLanguages}
+        selectedPlatforms={selectedPlatforms}
+        setSelectedPlatforms={setSelectedPlatforms}
         queriedStacks={queriedStacks}
-        handleStackQuery={handleStackQuery}
-        stackQuery={stackQuery}
         queriedUseCases={queriedUseCases}
-        handleUseCaseQuery={handleUseCaseQuery}
-        useCaseQuery={useCaseQuery}
+        queriedLanguages={queriedLanguages}
+        queriedPlatforms={queriedPlatforms}
       />
     </>
   );
@@ -80,12 +105,14 @@ function ExampleFilterDesktop({
   setSelectedUseCase,
   selectedStacks,
   setSelectedStack,
+  selectedLanguages,
+  setSelectedLanguages,
+  selectedPlatforms,
+  setSelectedPlatforms,
   queriedStacks,
-  handleStackQuery,
-  stackQuery,
   queriedUseCases,
-  handleUseCaseQuery,
-  useCaseQuery,
+  queriedLanguages,
+  queriedPlatforms,
 }) {
   return (
     <form className="hidden gap-4 sm:grid">
@@ -101,8 +128,8 @@ function ExampleFilterDesktop({
                 setSelectedProduct([]);
                 setSelectedUseCase([]);
                 setSelectedStack([]);
-                handleStackQuery({ target: { value: "" } });
-                handleUseCaseQuery({ target: { value: "" } });
+                setSelectedLanguages([]);
+                setSelectedPlatforms([]);
               }}
               className="ml-auto inline-flex h-5 items-center justify-center rounded-full bg-white/5 px-2 text-sm text-white/40"
             >
@@ -118,12 +145,14 @@ function ExampleFilterDesktop({
         setSelectedUseCase={setSelectedUseCase}
         selectedStacks={selectedStacks}
         setSelectedStack={setSelectedStack}
+        selectedLanguages={selectedLanguages}
+        setSelectedLanguages={setSelectedLanguages}
+        selectedPlatforms={selectedPlatforms}
+        setSelectedPlatforms={setSelectedPlatforms}
         queriedStacks={queriedStacks}
-        handleStackQuery={handleStackQuery}
-        stackQuery={stackQuery}
         queriedUseCases={queriedUseCases}
-        handleUseCaseQuery={handleUseCaseQuery}
-        useCaseQuery={useCaseQuery}
+        queriedLanguages={queriedLanguages}
+        queriedPlatforms={queriedPlatforms}
       />
     </form>
   );
@@ -137,12 +166,14 @@ function ExampleFilterMobile({
   setSelectedUseCase,
   selectedStacks,
   setSelectedStack,
+  selectedLanguages,
+  setSelectedLanguages,
+  selectedPlatforms,
+  setSelectedPlatforms,
   queriedStacks,
-  handleStackQuery,
-  stackQuery,
   queriedUseCases,
-  handleUseCaseQuery,
-  useCaseQuery,
+  queriedLanguages,
+  queriedPlatforms,
 }) {
   return (
     <div className="block  sm:hidden">
@@ -159,8 +190,6 @@ function ExampleFilterMobile({
                   setSelectedProduct([]);
                   setSelectedUseCase([]);
                   setSelectedStack([]);
-                  handleStackQuery({ target: { value: "" } });
-                  handleUseCaseQuery({ target: { value: "" } });
                 }}
                 className="ml-auto inline-flex h-5 items-center justify-center rounded-full bg-white/5 px-2 text-sm text-white/40"
               >
@@ -177,18 +206,21 @@ function ExampleFilterMobile({
             setSelectedUseCase={setSelectedUseCase}
             selectedStacks={selectedStacks}
             setSelectedStack={setSelectedStack}
+            selectedLanguages={selectedLanguages}
+            setSelectedLanguages={setSelectedLanguages}
+            selectedPlatforms={selectedPlatforms}
+            setSelectedPlatforms={setSelectedPlatforms}
             queriedStacks={queriedStacks}
-            handleStackQuery={handleStackQuery}
-            stackQuery={stackQuery}
             queriedUseCases={queriedUseCases}
-            handleUseCaseQuery={handleUseCaseQuery}
-            useCaseQuery={useCaseQuery}
+            queriedLanguages={queriedLanguages}
+            queriedPlatforms={queriedPlatforms}
           />
         </div>
       </Toc>
     </div>
   );
 }
+
 function FormContent({
   selectedProducts,
   setSelectedProduct,
@@ -196,12 +228,14 @@ function FormContent({
   setSelectedUseCase,
   selectedStacks,
   setSelectedStack,
+  selectedLanguages,
+  setSelectedLanguages,
+  selectedPlatforms,
+  setSelectedPlatforms,
   queriedStacks,
-  handleStackQuery,
-  stackQuery,
   queriedUseCases,
-  handleUseCaseQuery,
-  useCaseQuery,
+  queriedLanguages,
+  queriedPlatforms,
 }) {
   return (
     <>
@@ -225,7 +259,7 @@ function FormContent({
                     setSelectedProduct([...selectedProducts, value]);
                   } else {
                     setSelectedProduct(
-                      selectedProducts.filter((item) => item !== value)
+                      selectedProducts.filter((item) => item !== value),
                     );
                   }
                 }}
@@ -233,7 +267,7 @@ function FormContent({
                   isRedis && isActive && "bg-red-200/10",
                   isKafka && isActive && "bg-blue-200/10",
                   isQStash && isActive && "bg-purple-200/10",
-                  " w-[100%] justify-center pl-0 sm:pl-4"
+                  " w-[100%] justify-center pl-0 sm:pl-4",
                 )}
                 icon={
                   <>
@@ -266,19 +300,7 @@ function FormContent({
         <Toc className="mt-4 sm:mt-0">
           <Toc.Summary count={selectedStacks.length}>Stack</Toc.Summary>
           <div className=" w-[100%]">
-            <div className="w-[100%] border-b border-b-white/5 py-4">
-              <input
-                type="search"
-                className="text:white focus:border-1 border-1 w-[100%] rounded  border-white/5 bg-white/10 px-4 py-2 text-slate-100 transition ease-in-out focus:border-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-500"
-                placeholder="Search for a stack..."
-                value={stackQuery}
-                onChange={(e) => {
-                  handleStackQuery(e);
-                }}
-              />
-            </div>
-
-            <div className="grid h-[14rem] grid-flow-row auto-rows-[3.125rem] space-y-0.5 overflow-scroll">
+            <div className="grid grid-flow-row auto-rows-[3.125rem] space-y-0.5">
               {queriedStacks.length !== 0 ? (
                 queriedStacks.map((key) => {
                   return (
@@ -293,7 +315,77 @@ function FormContent({
                           setSelectedStack([...selectedStacks, value]);
                         } else {
                           setSelectedStack(
-                            selectedStacks.filter((item) => item !== value)
+                            selectedStacks.filter((item) => item !== value),
+                          );
+                        }
+                      }}
+                    />
+                  );
+                })
+              ) : (
+                <div className="grid h-[100%] w-[100%] items-center justify-center">
+                  <p className="text-white/40">No stacks found</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </Toc>
+      </Child>
+      <Child>
+        <Toc>
+          <Toc.Summary count={selectedUseCase.length}>Use Cases</Toc.Summary>
+          <div className="w-[100%] space-y-0.5">
+            <div className="grid  grid-flow-row auto-rows-[3.125rem] space-y-0.5">
+              {queriedUseCases.length !== 0 ? (
+                queriedUseCases.map((key) => {
+                  return (
+                    <Item
+                      key={key}
+                      value={key}
+                      checked={selectedUseCase.includes(key)}
+                      label={key}
+                      onChange={(e) => {
+                        const { value, checked } = e.target;
+                        if (checked) {
+                          setSelectedUseCase([...selectedUseCase, value]);
+                        } else {
+                          setSelectedUseCase(
+                            selectedUseCase.filter((item) => item !== value),
+                          );
+                        }
+                      }}
+                    />
+                  );
+                })
+              ) : (
+                <div className="grid h-[100%] w-[100%] items-center justify-center">
+                  <p className="text-white/40">No use cases found</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </Toc>
+      </Child>
+      <Child>
+        <Toc className="mt-4 sm:mt-0">
+          <Toc.Summary count={selectedLanguages.length}>Language</Toc.Summary>
+          <div className=" w-[100%]">
+            <div className="grid grid-flow-row auto-rows-[3.125rem] space-y-0.5">
+              {queriedLanguages.length !== 0 ? (
+                queriedLanguages.map((key) => {
+                  return (
+                    <Item
+                      key={key}
+                      value={key}
+                      checked={selectedLanguages.includes(key)}
+                      label={LanguagesLabel[key]}
+                      onChange={(e) => {
+                        const { value, checked } = e.target;
+                        if (checked) {
+                          setSelectedLanguages([...selectedLanguages, value]);
+                        } else {
+                          setSelectedLanguages(
+                            selectedLanguages.filter((item) => item !== value),
                           );
                         }
                       }}
@@ -311,36 +403,24 @@ function FormContent({
       </Child>
       <Child>
         <Toc className="mt-4 sm:mt-0">
-          <Toc.Summary count={selectedUseCase.length}>Use Cases</Toc.Summary>
-          <div className="w-[100%] space-y-0.5">
-            <div className="w-[100%] border-b border-b-white/5 py-4">
-              <input
-                type="search"
-                className="text:white focus:border-1 border-1 w-[100%] rounded  border-white/5 bg-white/10 px-4 py-2 text-slate-100 transition ease-in-out focus:border-zinc-100/03 focus:outline-none focus:ring-2 focus:ring-zinc-500"
-                placeholder="Search for an use case..."
-                value={useCaseQuery}
-                onChange={(e) => {
-                  handleUseCaseQuery(e);
-                }}
-              />
-            </div>
-            <div className="grid h-[14rem] grid-flow-row auto-rows-[3.125rem] space-y-0.5 overflow-scroll">
-              {queriedUseCases.length !== 0 ? (
-                queriedUseCases.map((key) => {
-                  console.log("ITEM");
+          <Toc.Summary count={selectedPlatforms.length}>Platforms</Toc.Summary>
+          <div className=" w-[100%]">
+            <div className="grid grid-flow-row auto-rows-[3.125rem] space-y-0.5">
+              {queriedPlatforms.length !== 0 ? (
+                queriedPlatforms.map((key) => {
                   return (
                     <Item
                       key={key}
                       value={key}
-                      checked={selectedUseCase.includes(key)}
+                      checked={selectedPlatforms.includes(key)}
                       label={key}
                       onChange={(e) => {
                         const { value, checked } = e.target;
                         if (checked) {
-                          setSelectedUseCase([...selectedUseCase, value]);
+                          setSelectedPlatforms([...selectedPlatforms, value]);
                         } else {
-                          setSelectedUseCase(
-                            selectedUseCase.filter((item) => item !== value)
+                          setSelectedPlatforms(
+                            selectedPlatforms.filter((item) => item !== value),
                           );
                         }
                       }}
@@ -349,7 +429,7 @@ function FormContent({
                 })
               ) : (
                 <div className="grid h-[100%] w-[100%] items-center justify-center">
-                  <p className="text-white/40">No use cases found</p>
+                  <p className="text-white/40">No stacks found</p>
                 </div>
               )}
             </div>
@@ -359,6 +439,7 @@ function FormContent({
     </>
   );
 }
+
 function Child({ className, children, ...props }: HTMLProps<HTMLDivElement>) {
   return (
     <div className={cx("border-b border-b-white/5 pb-4", className)} {...props}>
@@ -370,6 +451,7 @@ function Child({ className, children, ...props }: HTMLProps<HTMLDivElement>) {
 function Toc({ className, children, ...props }: HTMLProps<HTMLDetailsElement>) {
   return (
     <details
+      open={true}
       role="navigation"
       aria-label="Use Cases"
       className={cx("group/toc", className)}
@@ -390,15 +472,15 @@ Toc.Summary = function TocSummary({
     <summary
       className={cx(
         "flex select-none list-none items-center gap-2",
-        "mb-px h-10 rounded px-4 text-white/40 hover:bg-white/03 ",
-        className
+        "mb-px h-10 rounded px-4 text-white/40 hover:bg-white/3  ",
+        className,
       )}
       {...props}
     >
       <span className="inline-flex w-5 shrink-0 items-center justify-center">
         <IconArrow className="rotate-0 group-open/toc:rotate-90" />
       </span>
-      <span className="grow text-sm uppercase tracking-wide ">{children}</span>
+      <span className="grow text-sm uppercase tracking-wide">{children}</span>
       {count > 0 && (
         <span className="inline-flex h-5 items-center justify-center rounded-full bg-white/5 px-2 font-mono text-sm">
           {count}
@@ -426,10 +508,10 @@ function Item({
     <label
       className={cx(
         " flex cursor-pointer select-none items-center gap-2",
-        "rounded-lg bg-white/03  px-4 py-3 text-zinc-400",
+        "rounded-lg bg-white/3  px-4 py-3 text-zinc-400",
         "  hover:bg-white/5",
         checked && "bg-white/10 text-zinc-50",
-        className
+        className,
       )}
     >
       <input
@@ -444,7 +526,7 @@ function Item({
         <span
           className={cx(
             "relative h-5 w-5 rounded border border-white/10",
-            checked && "border-emerald-400"
+            checked && "border-emerald-400",
           )}
         >
           <Icon
@@ -452,7 +534,7 @@ function Item({
             className={cx(
               "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2",
               "text-lg opacity-0 transition duration-100",
-              checked && "text-emerald-400 opacity-100"
+              checked && "text-emerald-400 opacity-100",
             )}
           />
         </span>

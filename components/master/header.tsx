@@ -1,14 +1,16 @@
 "use client";
 
 import { HTMLProps, ReactNode } from "react";
-import cx from "@/utils/cx";
-import { Logo } from "@/components/logo";
 import Link from "next/link";
+
+import cx from "@/utils/cx";
+import { allJobs } from "contentlayer/generated";
+
 import Button from "@/components/button";
 import Container from "@/components/container";
+import { Logo } from "@/components/logo";
+
 import Nav from "./nav";
-import { allJobs } from "contentlayer/generated";
-import { HOME_SECTIONS } from "@/utils/const";
 
 const jobLength = allJobs.filter((o) => !o.draft).length;
 
@@ -19,7 +21,7 @@ export default function Header({
   return (
     <header className={cx("hidden md:block", className)} {...props}>
       <Container>
-        <div className="flex items-center py-5 border-b border-b-white/5 md:grid md:grid-cols-4">
+        <div className="flex items-center border-b border-b-white/5 py-5 md:grid md:grid-cols-4">
           <div className="flex">
             <Link href="/">
               <Logo />
@@ -52,15 +54,11 @@ const NavItems: {
 }[] = [
   {
     name: "Pricing",
-    href: `/#${HOME_SECTIONS.PRICING}`,
+    href: "/pricing",
   },
-  // {
-  //   name: "Open Source",
-  //   href: "/open-source",
-  // },
   {
-    name: "About",
-    href: "/about",
+    name: "Customers",
+    href: "/customers",
   },
   // {
   //   name: "Examples",
@@ -69,6 +67,10 @@ const NavItems: {
   {
     name: "Blog",
     href: "/blog",
+  },
+  {
+    name: "About",
+    href: "/about",
   },
   {
     name: "Discord",
@@ -87,7 +89,7 @@ if (jobLength > 0) {
     href: "/careers",
     children: (
       <span
-        className="rounded-full bg-emerald-300/20
+        className="flex items-center rounded-full bg-emerald-300/20
           px-1.5 py-1 font-mono text-sm leading-none text-emerald-500"
       >
         {jobLength}

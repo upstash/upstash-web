@@ -1,7 +1,8 @@
 import type { Job } from "contentlayer/generated";
 import Balancer from "react-wrap-balancer";
-import Container from "@/components/container";
+
 import Button from "@/components/button";
+import Container from "@/components/container";
 
 type Props = {
   job: Job;
@@ -36,7 +37,7 @@ export default function CareerHeader({ job }: Props) {
         <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
           {job.skills.map((skill: string) => (
             <span
-              className="rounded bg-white/03 px-3 py-1 text-zinc-400"
+              className="rounded bg-white/3 px-3 py-1 text-zinc-400"
               key={skill}
             >
               {skill}

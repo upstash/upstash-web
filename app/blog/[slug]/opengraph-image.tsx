@@ -1,6 +1,6 @@
-import { ImageResponse } from "@vercel/og";
-import { allPosts } from "contentlayer/generated";
 import { authors } from "@/utils/authors";
+import { ImageResponse } from "@vercel/og";
+import { getPostDetails, baseUrl } from "../utils/og-post-details";
 
 export const runtime = "edge";
 export const size = {
@@ -16,19 +16,18 @@ export default async function TwImage({
   params: { slug: string };
 }) {
   try {
-    const DataInterRegular = await fetch(
-      new URL("../../../public/fonts/Inter-Bold.ttf", import.meta.url)
-    ).then((res) => res.arrayBuffer());
     const slug = params.slug;
 
-    const post = allPosts.find((p) => p.slug === slug);
+    const post = await getPostDetails(slug)
 
     if (!post) {
       throw new Error("Post not found");
     }
 
-    const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"
-    const authorImage = new URL(`/authors/${authors[post.authors[0]].image}`, baseUrl).toString()
+    const authorImage = new URL(
+      `/authors/${authors[post.authors[0]].image}`,
+      baseUrl,
+    ).toString();
     return new ImageResponse(
       (
         <div tw="flex flex-col items-stretch p-[70px] pb-[140px] h-full w-full bg-[#161616] text-white">
@@ -58,20 +57,14 @@ export default async function TwImage({
           </footer>
         </div>
       ),
-      {
-        fonts: [
-          {
-            name: "Inter",
-            data: DataInterRegular,
-            style: "normal",
-          },
-        ],
-      }
     );
   } catch (e) {
-    console.error(e)
-    return new Response(`Failed to generate the image: ${(e as Error).message}`, {
-      status: 500,
-    });
+    console.error(e);
+    return new Response(
+      `Failed to generate the image: ${(e as Error).message}`,
+      {
+        status: 500,
+      },
+    );
   }
 }

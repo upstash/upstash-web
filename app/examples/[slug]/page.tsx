@@ -1,23 +1,33 @@
-import { notFound } from "next/navigation";
-import { SITE_URL } from "@/utils/const";
-import Container from "@/components/container";
-import { Example } from "@/utils/type";
-import getData from "../get-data";
-import markdownToHtml from "@/utils/markdownToHtml";
-import Balancer from "react-wrap-balancer";
-import Button from "@/components/button";
-import { authors } from "@/utils/authors";
-import IconRedis from "@/components/icon-redis";
-import IconKafka from "@/components/icon-kafka";
-import IconQStash from "@/components/icon-qstash";
 import { HTMLProps } from "react";
 import Link from "next/link";
+import { notFound } from "next/navigation";
+
+import { authors } from "@/utils/authors";
+import markdownToHtml from "@/utils/markdownToHtml";
+import Balancer from "react-wrap-balancer";
+
+import Button from "@/components/button";
+import Container from "@/components/container";
 import { ICON_NAMES } from "@/components/icon";
+import IconKafka from "@/components/icon-kafka";
+import IconQStash from "@/components/icon-qstash";
+import IconRedis from "@/components/icon-redis";
+
+import { getData, type Example } from "../get-data";
 
 type Props = {
   params: {
     slug: string;
   };
+};
+
+const LanguagesLabel = {
+  ts: "TypeScript",
+  js: "JavaScript",
+  py: "Python",
+  rs: "Rust",
+  rb: "Ruby",
+  java: "Java",
 };
 
 export async function generateStaticParams(): Promise<Props["params"][]> {
@@ -35,7 +45,7 @@ export async function generateMetadata({
 }) {
   const examples: Example[] = await getData();
   const example = examples.find(
-    (item) => item.title.toLowerCase().replace(/ /g, "-") === params.slug
+    (item) => item.title.toLowerCase().replace(/ /g, "-") === params.slug,
   );
 
   if (!example) {
@@ -44,20 +54,15 @@ export async function generateMetadata({
     };
   }
 
-  const title = example.title;
-  const url = `${SITE_URL}/examples/${example.title
-    .toLowerCase()
-    .replace(/ /g, "-")}`;
-
   return {
-    title,
+    title: example.title,
   };
 }
 
 export default async function BlogPage({ params }: Props) {
   const examples: Example[] = await getData();
   const example = examples.find(
-    (item) => item.title.toLowerCase().replace(/ /g, "-") === params.slug
+    (item) => item.title.toLowerCase().replace(/ /g, "-") === params.slug,
   );
 
   if (!example) {
@@ -153,6 +158,24 @@ export default async function BlogPage({ params }: Props) {
                       .join(", ")}
                   </>
                 </ExampleMetaRow>
+
+                <ExampleMetaRow title="Languages">
+                  <>
+                    {example.languages.map((item) => {
+                      return LanguagesLabel[item];
+                    })}
+                  </>
+                </ExampleMetaRow>
+
+                {example.platforms && (
+                  <ExampleMetaRow title="Platforms">
+                    <>
+                      {example.platforms.map((item) => {
+                        return item;
+                      })}
+                    </>
+                  </ExampleMetaRow>
+                )}
 
                 <ExampleMetaRow title="Publisher">
                   <Button href={`https://github.com/${author.name}`}>

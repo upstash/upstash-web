@@ -1,8 +1,8 @@
-import type { Job } from "contentlayer/generated";
+import { Example } from "@/app/examples/get-data";
 import Balancer from "react-wrap-balancer";
-import Container from "@/components/container";
+
 import Button from "@/components/button";
-import { Example } from "@/utils/type";
+import Container from "@/components/container";
 
 type Props = {
   example: Example;

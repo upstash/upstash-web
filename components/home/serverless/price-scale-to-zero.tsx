@@ -1,5 +1,6 @@
-import { ServerlessBox, ServerlessSummary, ServerlessTitle } from "./comp";
 import cx from "@/utils/cx";
+
+import { ServerlessBox, ServerlessSummary, ServerlessTitle } from "./comp";
 
 export default function PriceScaleToZero() {
   return (
@@ -32,13 +33,13 @@ export default function PriceScaleToZero() {
         ].map(({ title, value }, index) => (
           <div
             key={title}
-            className="flex flex-col justify-center px-4 py-2 grow rounded-xl bg-black/20 md:h-20"
+            className="flex grow flex-col justify-center rounded-xl bg-black/20 px-4 py-2 md:h-20"
           >
             <span className="text-sm opacity-40">{title}</span>
             <span
               className={cx(
                 "text-xl text-amber-200 md:text-2xl",
-                index === 2 && "text-emerald-300"
+                index === 2 && "text-emerald-300",
               )}
             >
               {value}

@@ -6,9 +6,12 @@
     "build": "contentlayer build && next build",
     "prebuild": "snipsync",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "lint-fix": "next lint --fix",
+    "fmt": "prettier . --write && yarn biome check ."
   },
   "dependencies": {
+    "@radix-ui/react-tooltip": "^1.0.6",
     "@segment/analytics-next": "^1.53.0",
     "@tabler/icons-react": "^2.32.0",
     "@upstash/claps": "^1.0.0-beta.4",
@@ -44,23 +47,20 @@
     "@types/react-dom": "^18.2.4",
     "@types/three": "^0.152.0",
     "autoprefixer": "^10.4.14",
-    "eslint": "^8.41.0",
-    "eslint-config-next": "^13.4.3",
-    "eslint-config-prettier": "^8.8.0",
-    "eslint-plugin-react": "^7.32.2",
-    "eslint-plugin-tailwindcss": "^3.12.0",
     "postcss": "^8.4.23",
-    "prettier": "^2.8.8",
-    "prettier-plugin-tailwindcss": "^0.3.0",
+    "prettier": "^3.0.3",
     "reading-time": "^1.5.0",
     "rehype-autolink-headings": "^6.1.1",
     "rehype-pretty-code": "^0.9.5",
     "rehype-slug": "^5.1.0",
     "remark-gfm": "^3.0.1",
     "snipsync": "^1.8.0",
-    "tailwind-merge": "^1.12.0",
+    "tailwind-merge": "^1.14.0",
     "tailwindcss": "^3.3.2",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "@biomejs/biome": "^1.2.2",
+    "@ianvs/prettier-plugin-sort-imports": "^4.1.0",
+    "prettier-plugin-tailwindcss": "^0.5.5"
   },
   "resolutions": {
     "@types/react": "^18.2.6",

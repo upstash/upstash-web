@@ -1,0 +1,221 @@
+---
+slug: chat-langchain
+title: "Chat Model Response Caching With Upstash Redis in LangChain TS"
+authors:
+  - brace
+tags: [redis, langchain, ai]
+---
+
+LLMs can be a resource drain in production, consuming both time and money as user queries scale into the millions of tokens. Current chat models lack efficiency, often resulting in subpar user experience. Caching is a potent remedy for these challenges. In this article, we'll take a deep dive into setting up caching for your chat models with Upstash Redis and LangChain in a production ready way.
+
+## Prerequisites:
+In this blog, we'll be using the LangChain TS `ChatOpenAI` class, `LLMChain` Upstash Redis.
+
+First, create a project directory, install the following packages and setup git.
+```bash
+mkdir langchain_upstash_redis # Create a project directory
+
+cd langchain_upstash_redis # Navigate into the project directory
+
+yarn init -y # Initializes a new project with a package.json file
+
+yarn add typescript ts-node --dev # Installs TypeScript and TS-Node for running TypeScript files
+
+npx tsc --init # Initializes a TypeScript project
+
+yarn add @upstash/redis langchain dotenv # Installs Upstash Redis, LangChain and dotenv for our environment variables
+
+git init # Initializes a git repository
+
+touch .gitignore # Creates a .gitignore file
+```
+For a starter `.gitignore` file, copy the contents from [this link](https://github.com/microsoft/TypeScript-Node-Starter/blob/master/.gitignore).
+
+We now have initialized the project and need to setup an Upstash account for our Redis server.
+Sign up for an Upstash account by visiting [the login page](https://console.upstash.com/login), selecting the "Sign Up" option, and following the prompts.
+After signing up you'll be redirected to the Upstash console. Make sure you're on the Redis tab (click Redis in the navigation bar in the top left). Click the "Create Database" button to create a new database.
+For this example, we'll name it `test-cache-db`, select the `N. California (us-west-1)` region, and choose the `TLS (SSL) Enabled` checkbox.
+
+Once your database has been created we can move to the next step of setting up our TypeScript project.
+
+Let's create a TypeScript file inside our `./src` directory to initialize and export our Upstash Redis client.
+```bash
+# Inside the root project directory
+
+mkdir src # Creates a src directory to house our TypeScript files
+
+cd ./src
+
+touch redis.ts # Creates a TypeScript file to initialize our Redis client.
+```
+
+Open the project in your preferred IDE to start coding.
+
+```typescript
+// ./src/redis.ts
+import { UpstashRedisCache } from "langchain/cache/upstash_redis";
+import dotenv from "dotenv";
+
+// Loads our environment variables from a .env file
+dotenv.config();
+
+// Ensures we have the required environment variables
+if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
+  throw new Error("Missing Upstash Redis REST URL or REST TOKEN");
+}
+
+export const upstashRedisCache = new UpstashRedisCache({
+  config: {
+    url: process.env.UPSTASH_REDIS_REST_URL,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN,
+  },
+});
+```
+In this file we're initialing and exporting our Upstash Redis client. We're also loading our environment variables from a `.env` file and ensuring we have the required environment variables.
+
+To get your REST URL and REST TOKEN go back to your tab where you've created your database, scroll to the section titled `REST API` and click to copy the URL and token.
+
+You will also need an OpenAI account and API key. To get a key: create an OpenAI account, navigate to the API section, and generate a new key.
+
+Once you've gathered all your keys, create a `.env` file in the root of your project and paste the URL and token into the file.
+```bash
+# Inside the root project directory
+
+touch .env
+```
+```env
+# .env
+UPSTASH_REDIS_REST_URL=ADD_YOUR_KEY_HERE
+UPSTASH_REDIS_REST_TOKEN=ADD_YOUR_KEY_HERE
+OPENAI_API_KEY=ADD_YOUR_KEY_HERE
+```
+
+Next, we need to create the LLM chat function where we can pass in our Upstash Redis client, and start making OpenAI requests.
+```bash
+# Inside the src directory
+
+touch llm-chat.ts
+```
+
+Import the `upstashRedisCache` client we created in the previous step, and the classes you see below from LangChain.
+In this file we'll create a function called `llmChat` that takes a prompt as an argument and returns a response from the OpenAI API. Before sending our requests to OpenAI we'll also create a chat prompt using the `ChatPromptTemplate` from LangChain.
+```typescript
+// ./src/llm-chat.ts
+import { upstashRedisCache } from "./redis";
+import { ChatOpenAI } from "langchain/chat_models/openai";
+import { LLMChain } from "langchain/chains";
+import { ChatPromptTemplate } from "langchain/prompts";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+// Makes chat requests to OpenAI and returns a response
+export async function llmChat(prompt: string): Promise<string> {
+  // Check if our OpenAI API key is set
+  if (!process.env.OPENAI_API_KEY) {
+    throw new Error("OPENAI_API_KEY environment variable not set");
+  }
+
+  const systemTemplate =
+    "You are a helpful assistant for the owner of a small dog food business. Do not disclose you are an AI assistant. Reply in short concise sentences.";
+  const humanTemplate = "{prompt}";
+
+  // Creates our chat prompt we will eventually pass to the chat function
+  const chatPrompt = ChatPromptTemplate.fromMessages([
+    ["system", systemTemplate],
+    ["human", humanTemplate],
+  ]);
+
+  const chat = new ChatOpenAI({
+    temperature: 1, // We want our responses to be more creative
+    cache: upstashRedisCache, // Pass in our Upstash Redis client
+    openAIApiKey: process.env.OPENAI_API_KEY, // Pass in our OpenAI API key
+  });
+
+  const chain = new LLMChain({
+    llm: chat,
+    prompt: chatPrompt,
+  });
+
+  const result = await chain.predict({
+    prompt,
+  });
+
+  // Return the generated response
+  return result;
+}
+```
+
+Whew, that was a lot. Let's go over line by line what we just did.
+In lines 1-5 we imported our `upstashRedisCache` client, the `ChatOpenAI` class, the `LLMChain` class, and the `ChatPromptTemplate` class from LangChain. We also imported the `dotenv` package to load our environment variables from our `.env` file.
+
+Next, we called `dotenv.config()` to load our environment variables from our `.env` file.
+
+We then created our `llmChat` function that takes a prompt as an argument and returns a response from the OpenAI API.
+
+In line 10 we check if our OpenAI API key is set, and if not we throw an error.
+
+After that we define two variables, one for the system prompt and one for the user prompt. In our system prompt we define the context of our chat, in our case we want our assistant to act like a pet store owner. For our human template we only want to pass in the prompt we defined as an argument to our `llmChat` function.
+
+Next, we create the prompt message by passing our system and human templates into the `ChatPromptTemplate.fromMessages` method.
+
+In line 24 we create a new `ChatOpenAI` instance and pass in our `upstashRedisCache` client, our OpenAI API key, and a temperature of 1. The temperature parameter controls the creativity of our responses, the higher the temperature the more creative the responses will be. The `cache` parameter defines the cache we want to use for our chat model, in this case we're using Upstash Redis.
+
+Next, we initialize an LLM chain by passing in our `ChatOpenAI` instance and our chat prompt.
+
+Finally, we call `chain.predict` and pass in our prompt as an argument. This will return a string that contains the generated response from OpenAI.
+
+Now that we've created our `llmChat` function, let's create an `index` file to pull everything together and test it out.
+```bash
+# Inside the src directory
+
+touch index.ts
+```
+
+In order to test that our `llmChat` function is caching results, we'll make two calls with identical prompts. If they are cached correctly, the second call's result will match the first.
+
+```typescript
+// ./src/index.ts
+import { llmChat } from "./llm-chat";
+
+async function main() {
+  const prompt = "What is the best dog food?";
+
+  // Call our llmChat twice with the same prompts.
+  const response1 = await llmChat(prompt);
+  const response2 = await llmChat(prompt);
+
+  if (response1 !== response2) {
+    throw new Error("Responses do not match.");
+  }
+
+  console.log(`Responses match. We've got caching 🚀`);
+  console.log({ response1, response2 });
+}
+
+main()
+  .then(() => console.log("Done."))
+  .catch((err) => {
+    // If the cache does not work, we'll get an error here.
+    console.error(err);
+  });
+```
+
+Run this file in your terminal with the following command
+```bash
+# Inside the root project directory
+
+yarn ts-node src/index.ts
+```
+
+You should then see the following output in your terminal with the same response from OpenAI.
+```bash
+Responses match. We've got caching!!
+{
+  response1: "The best dog food varies based on your dog's specific needs and preferences.",
+  response2: "The best dog food varies based on your dog's specific needs and preferences."
+}
+Done.
+```
+
+All of the code outlined in this blog can be found in [this GitHub repository](https://github.com/bracesproul/Upstash-Redis-LangChain-Caching/).

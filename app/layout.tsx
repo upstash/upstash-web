@@ -5,14 +5,17 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import localFont from "next/font/local";
 import { ReactNode, Suspense } from "react";
-import cx from "@/utils/cx";
-import Header from "@/components/master/header";
-import HeaderMobile from "@/components/master/header-mobile";
-import Footer from "@/components/master/footer";
 import Script from "next/script";
+
 import { SITE_URL } from "@/utils/const";
+import cx from "@/utils/cx";
+
 import { SegmentProvider } from "@/lib/segment/provider";
 import Analytics from "@/components/Analytics";
+
+import Footer from "@/components/master/footer";
+import Header from "@/components/master/header";
+import HeaderMobile from "@/components/master/header-mobile";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -44,7 +47,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       className={cx(
         inter.variable,
         interDisplay.variable,
-        "min-h-screen scroll-smooth bg-zinc-950 text-sm text-zinc-50 antialiased md:text-base"
+        "min-h-screen scroll-smooth bg-zinc-950 text-sm text-zinc-50 antialiased md:text-base",
       )}
     >
       <body className="pt-20 md:pt-0">

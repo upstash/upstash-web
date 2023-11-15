@@ -2,7 +2,7 @@
 slug: realtime-emergency-response
 title: "Building a realtime emergency response system"
 authors:
-  -  tudor
+  - tudor
 tags: [realtime, serverless, edge, qstash, redis]
 ---
 
@@ -207,7 +207,9 @@ First, let's make a connection from the `/_app.js` file:
 
 ```javascript
 import { useEffect, useState } from "react";
+
 import "../styles/globals.css";
+
 import { configureAbly } from "@ably-labs/react-hooks";
 
 export default function App({ Component, pageProps }) {
