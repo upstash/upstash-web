@@ -15,7 +15,7 @@ export default function PricingTableEnterprise() {
 
         <Button
           type="button"
-          href="https://calendly.com/upstash"
+          href="mailto:sales@upstash.com"
           className="-ml-1 mt-4 hidden bg-emerald-400 font-medium text-zinc-950 md:inline-flex"
         >
           Contact Us

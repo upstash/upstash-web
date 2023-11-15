@@ -216,7 +216,7 @@ export const authors: Record<
   },
   rishi: {
     name: "Rishi Raj Jain",
-    title: "Technical CSM @Edgio (Guest Author)",
+    title: "Founder of LaunchFa.st (Guest Author)",
     image: "rishi.jpeg",
   },
   pau_kraft: {
