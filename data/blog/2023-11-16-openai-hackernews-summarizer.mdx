@@ -1,0 +1,469 @@
+---
+slug: openai-hackernews-summarizer
+title: "Make your own HackerNews summarizer with OpenAI and Upstash"
+description: "Craft your own HackerNews summarizer using OpenAI and Upstash Redis/Qstash. Let's hack it!"
+authors:
+  - oguzhan
+tags: [openai, nextjs, redis, qstash]
+---
+
+Today, we're diving into the creation of a minified version of [https://hackerdigest.upstash.app](HackerDigest). Here's how HackerDigest operates: it begins by fetching the top 10 stories from Hacker News. Next, it leverages OpenAI's ChatGPT to process and analyze these stories.
+Finally, it stores the results in Redis. This entire process is made super easy thanks to Qstash. So, buckle up as we set out on this journey.
+
+First things first, let's set up a [https://console.upstash.com/redis](Redis Database). Head over to Upstash Redis Console to get your keys, which will look something like this:
+
+```sh
+UPSTASH_REDIS_REST_URL="https://us1-XXX-38101.upstash.io"
+UPSTASH_REDIS_REST_TOKEN="AZTVACQXXXVhOTktYzI0Mi0XXXM4ZmQzMjI3NDY0NTZmNDXXXYjQ0NGY4MGYwNDI="
+```
+
+Good, now head over to [https://console.upstash.com/qstash](Qstash), and get your secrets that are needed for NextJS.
+
+```sh
+QSTASH_CURRENT_SIGNING_KEY=XXXX
+QSTASH_NEXT_SIGNING_KEY=XXXX
+```
+
+One more thing left, we also need OpenAI keys for that [https://platform.openai.com/api-keys](OpenAI API) just create yourself a key and you are good to go.
+
+There's one more thing left – get your OpenAI API key by creating one at [https://platform.openai.com/api-keys](OpenAI API). Once you've got that, you're good to go!
+
+Final `env` file will look like this:
+
+```sh
+OPENAI_API_KEY=XXXX
+
+UPSTASH_REDIS_REST_URL="https://us1-XXX-38101.upstash.io"
+UPSTASH_REDIS_REST_TOKEN="AZTVACQXXXVhOTktYzI0Mi0XXXM4ZmQzMjI3NDY0NTZmNDXXXYjQ0NGY4MGYwNDI="
+
+QSTASH_CURRENT_SIGNING_KEY=XXXX
+QSTASH_NEXT_SIGNING_KEY=XXXX
+```
+
+With the grunt work behind us, give yourself a well-deserved pat on the back. Now, let's dive into the juicy part.
+
+We need NextJS for that, run this command below:
+
+```sh
+npx create-next-app
+```
+
+And, do these:
+
+```sh
+✔ What is your project named? … hackernews-summarizer
+✔ Would you like to use TypeScript? … No / Yes
+✔ Would you like to use ESLint? … No / Yes
+✔ Would you like to use Tailwind CSS? … No / Yes
+✔ Would you like to use `src/` directory? … No / Yes
+✔ Would you like to use App Router? (recommended) … No / Yes
+✔ Would you like to customize the default import alias (@/*)? … No / Yes
+✔ What import alias would you like configured? … @/*
+
+cd hackernews-summarizer && npm i node-html-parser ky @upstash/redis @upstash/ratelimit @upstash/qstash openai
+```
+
+Then, see if your project works without an issue, simply run:
+
+```sh
+npm run dev
+```
+
+Okay, before we move on we have to put our `env` keys into `env.local` file. Create `env.local` in the root of your project - where `package.json` lives. Then, simply copy them.
+
+So far so good. Let's move on to our folder structure:
+
+```sh
+📦src
+ ┣ 📂app
+ ┃ ┣ 📂actions
+ ┃ ┃ ┗ 📜get-all-summarized-articles.ts
+ ┃ ┣ 📂api
+ ┃ ┃ ┣ 📂stories
+ ┃ ┃ ┃ ┗ 📜route.ts
+ ┃ ┃ ┗ 📂summarize
+ ┃ ┃ ┃ ┗ 📜route.ts
+ ┃ ┣ 📂libs
+ ┃ ┃ ┣ 📜redis-client.ts
+ ┃ ┃ ┗ 📜requester.ts
+ ┃ ┣ 📜favicon.ico
+ ┃ ┣ 📜globals.css
+ ┃ ┣ 📜layout.tsx
+ ┃ ┗ 📜page.tsx
+ ┣ 📂commands
+ ┃ ┣ 📜constants.ts
+ ┃ ┣ 📜get.ts
+ ┃ ┗ 📜set.ts
+ ┗ 📂services
+ ┃ ┣ 📜hackernews.ts
+ ┃ ┣ 📜link-parser.ts
+ ┃ ┗ 📜summarizer.ts
+```
+
+Looks cool, right? We will start off with libs folder. This is where we initialize our clients like Redis and fetcher - [https://www.npmjs.com/package/ky](Ky) in our case.
+
+### 📂libs/redis-client
+
+```ts
+import { Redis } from "@upstash/redis";
+
+export const redisClient = () => {
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+
+  if (!url) throw new Error("Redis URL is missing!");
+  if (!token) throw new Error("Redis TOKEN is missing!");
+
+  const redis = new Redis({
+    url,
+    token,
+  });
+
+  return redis;
+};
+```
+
+### 📂libs/requester.ts
+
+```ts
+import ky from "ky";
+
+const HN_BASE_URL = "https://hacker-news.firebaseio.com/v0/";
+
+export const requester = ky.create({
+  cache: "no-cache",
+  prefixUrl: HN_BASE_URL,
+  headers: {
+    pragma: "no-cache",
+  },
+});
+```
+
+Now, let's proceed to services/hackernews.ts. In this section, our goal is to:
+
+- Fetch all the top stories from Hacker News.
+- Filter these stories based on their scores, ensuring they fall within a 12-hour period.
+- Retrieve the details of the selected articles and return them.
+
+### 📂services/hackernews.ts
+
+```ts
+import { requester } from "@/app/libs/requester";
+
+// Fetch the top story IDs
+async function fetchTopStoryIds(): Promise<number[]> {
+  const storyIds: number[] = await requester.get(`topstories.json`).json();
+  return storyIds;
+}
+```
+
+Now, we need to filter them.
+
+```ts
+type HackerNewsStoryRaw = {
+  id: number;
+  by: string; // Author of the story
+  score: number;
+  time: number;
+  title: string;
+  url: string;
+  descendants: number; // Number of comments
+  type: "story"; // Ensures the type is strictly 'story'
+};
+
+export type HackerNewsStory = {
+  author: string;
+  score: number;
+  title: string;
+  url: string;
+  numOfComments: number;
+  commentUrl: string;
+  postedDate: string;
+};
+
+// Fetch story details by ID
+// Fetch top stories from the last 12 hours
+export async function fetchTopStoriesFromLast12Hours(
+  limit: number = 10,
+): Promise<HackerNewsStory[]> {
+  const twelveHoursAgoTimestamp = Date.now() - 12 * 60 * 60 * 1000;
+  const topStoryIds = await fetchTopStoryIds();
+
+  const storyDetailsPromises = topStoryIds.map(fetchStoryDetails);
+  const allStories = await Promise.all(storyDetailsPromises);
+
+  const topStoriesFromLast12Hours = allStories
+    .filter((story) => story && story.time * 1000 >= twelveHoursAgoTimestamp)
+    .sort((a, b) => b!.score - a!.score)
+    .slice(0, limit) as HackerNewsStoryRaw[];
+
+  return topStoriesFromLast12Hours.map((story) => ({
+    commentUrl: `https://news.ycombinator.com/item?id=${story.id}`,
+    postedDate: timeSince(story.time * 1000),
+    numOfComments: story.descendants,
+    author: story.by,
+    url: story.url,
+    title: story.title,
+    score: story.score,
+  }));
+}
+```
+
+We'll also need some types to ensure type-safety. Here's an overview of what this function does:
+
+- It begins by fetching topStoryIds.
+- For each story, it calls fetchStoryDetails (which we'll implement shortly).
+- T he stories are then filtered to ensure they fall within the specified time period, sorted by their scores.
+- Since we only need 10 stories (our limit), the list is sliced accordingly.
+- Before returning the data, a final mapping step is performed to enhance the API's user-friendliness, appending additional data.
+- Before moving on let's add `fetchStoryDetails`
+
+```ts
+// Fetch story details by ID
+async function fetchStoryDetails(
+  id: number,
+): Promise<HackerNewsStoryRaw | null> {
+  const story: HackerNewsStoryRaw | null = await requester
+    .get(`item/${id}.json`)
+    .json();
+  // Check if the story has a URL and is of type 'story'
+  if (story && story.url && story.type === "story") {
+    return story;
+  }
+  return null;
+}
+```
+
+For the `fetchStoryDetails` function, it's a straightforward call to the endpoint with the story ID. However, there's a caveat: not all items retrieved are stories; sometimes, there are different data types. To address this, we need to ensure that the fetched items are indeed stories before proceeding.
+
+Now that we've covered this part, let's proceed to parsing links within Hacker News stories.
+Since many stories redirect users to external links, it's critical to tell our summarizer to navigate to these links, extract their content, and provide it back.
+This way, we can effectively feed ChatGPT with the relevant information.
+
+### 📂services/link-parser.ts
+
+Our approach for parsing links within Hacker News stories involves navigating to the provided URL, using node-html-parser for extraction.
+We'll check if the page contains `p` tags; if present, we'll extract the entire content. In case `p` tags are missing, we'll fallback to extracting content within `div` tags.
+The extracted content will then be pushed into `chunkString` since some stories are extensive, and breaking them into smaller chunks is necessary to comply with ChatGPT's token limit (which restricts input to less than 4K tokens at once).
+We'll also have some utility functions to make things easier and cleaner.
+
+```ts
+import parse, { HTMLElement } from "node-html-parser";
+
+async function fetchInnerContent(
+  url?: string,
+): Promise<string | string[] | null> {
+  if (!url) throw new Error("URL is missing!");
+  if (!isValidUrl(url)) throw new Error("URL is not valid");
+
+  try {
+    const response = await fetch(url); // Can be replaced with Ky client
+    const html = await response.text();
+    const root = parse(html);
+
+    let content = extractText(root.querySelectorAll("p"));
+
+    if (!content) {
+      // If no content was found in <p> tags, fallback to <div> tags
+      content = extractText(root.querySelectorAll("div"));
+    }
+
+    // Assuming chunkString splits the string into manageable pieces
+    return chunkString(content); // Ensure chunkString handles an empty string properly
+  } catch (error) {
+    console.error("Error fetching content:", error);
+    return null;
+  }
+}
+
+function isValidUrl(urlString: string): boolean {
+  try {
+    new URL(urlString);
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
+function chunkString(inputString: string, chunkSize = 4000) {
+  if (inputString.length <= chunkSize) return inputString;
+  else {
+    const chunks = [];
+    for (let i = 0; i < inputString.length; i += chunkSize) {
+      chunks.push(inputString.slice(i, i + chunkSize));
+    }
+    return chunks;
+  }
+}
+
+// A function to clean and prepare text content
+function cleanText(text: string) {
+  return text.replace(/\s+/g, " ").trim();
+}
+
+// A function to extract text from a collection of nodes
+function extractText(nodes: HTMLElement[]) {
+  return nodes.map((node) => cleanText(node.innerText)).join(" ");
+}
+```
+
+It's time to feed our parse with some Hacker News data!
+
+```ts
+type Content = (string | string[]) | null;
+export type HackerNewsStoryWithRawContent = HackerNewsStory & {
+  rawContent: Content;
+};
+export type HackerNewsStoryWithParsedContent = HackerNewsStory & {
+  parsedContent: Content;
+};
+
+export async function getContentsOfArticles(
+  articleLimit: number,
+): Promise<HackerNewsStoryWithRawContent[] | undefined> {
+  const articleLinksAndTitles =
+    await fetchTopStoriesFromLast12Hours(articleLimit);
+  return await Promise.all(
+    articleLinksAndTitles.map(async (article) => ({
+      ...article,
+      rawContent: await fetchInnerContent(article.url),
+    })),
+  );
+}
+```
+
+To prepare for the next steps, we begin by extending our `HackerNewsStory` type with additional fields: `rawContent` and `parsedContent` for future use.
+Following this, we call `fetchTopStoriesFromLast12Hours` to retrieve the top 10 stories. These stories are then mapped over, and the URLs are parsed into `rawContent`.
+This parsed content will be utilized in the subsequent stage, where we feed it to ChatGPT.
+
+Time to move to most critical part.
+
+### 📂services/summarizer.ts
+
+This is where the magic happens. Fortunately, most of the code is quite straightforward, mainly consisting of OpenAI configurations. Let's dive into it from the beginning.
+
+```ts
+import {
+  getContentsOfArticles,
+  HackerNewsStoryWithParsedContent,
+  HackerNewsStoryWithRawContent,
+} from "@/services/link-parser"
+import { OpenAI } from "openai"
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+  organization: process.env.OPENAI_ORGANIZATION_API,
+})
+
+async function summarizeText(title: string, content: string): Promise<string | undefined> {
+  const prompt = `
+  Title: "${title}"
+  Summarize the following news article in 2-3 clear and concise sentences without repetition: "${content}"`
+
+  try {
+    const chatCompletion = await openai.completions.create({
+      model: "gpt-3.5-turbo-instruct",
+      prompt,
+      temperature: 0.2,
+      frequency_penalty: 0,
+      presence_penalty: 0,
+      max_tokens: 150,
+      stream: false,
+      n: 1,
+    })
+    return chatCompletion.choices[0]?.text
+  } catch (error) {
+    console.error("summarizeText failed", (error as Error).message)
+  }
+}
+
+async function summarizeChunk(chunk?: string) {
+  if (!chunk) return null
+
+  const prompt = `
+      Please provide a concise summary of the following text and please ensure that the summary avoids any unnecessary information or repetition: "${chunk}"
+      `
+  const chatCompletion = await openai.completions.create({
+    model: "gpt-3.5-turbo-instruct",
+    prompt,
+    temperature: 0.2,
+    frequency_penalty: 0,
+    presence_penalty: 0,
+    max_tokens: 300,
+    stream: false,
+    n: 1,
+  })
+  return chatCompletion.choices[0]?.text
+}
+```
+
+We need two functions: one for summarizing short texts without chunking and another for summarizing chunks without losing much context. Feel free to make adjustments as needed.
+
+Now, we need a function to determine whether to call the summarization function for an array or a string, depending on the type of rawContent.
+
+
+```ts
+async function summarizeArticles(
+  article: HackerNewsStoryWithRawContent
+): Promise<string | undefined> {
+  if (!Array.isArray(article.rawContent)) {
+    try {
+      if (!article.rawContent) throw new Error("Content is missing from summarizeArticles!")
+      const summarizedText = await summarizeText(article.title, article.rawContent)
+      if (!summarizedText) throw new Error("summarizedText is missing!")
+      return summarizedText
+    } catch (error) {
+      console.error(
+        `Something went wrong when summarizing single article ${(error as Error).message}`
+      )
+    }
+  } else {
+    const summarizedChunks = await Promise.all(
+      article.rawContent.map((chunk) => summarizeChunk(chunk))
+    )
+
+    try {
+      const summarizedText = await summarizeText(
+        article.title,
+        summarizedChunks.filter(Boolean).join(" ")
+      )
+      if (!summarizedText) throw new Error("chunkedSummarizedText is missing!")
+      return summarizedText
+    } catch (error) {
+      console.error(
+        `Something went wrong when summarizing chunked articles ${(error as Error).message}`
+      )
+    }
+  }
+}
+```
+
+It's a straightforward process: we check if `rawContent` is an array. If it is, we call `summarizedChunks` and then feed those results into `summarizedText`. If not, we directly call `summarizedText`.
+
+
+Next, we'll call the function `getContentsOfArticles` to retrieve parsed raw contents.
+These contents will then be fed into the summarizer function. Finally, we'll omit the rawContent from the object since it's no longer needed.
+
+
+```ts
+export async function getSummarizedArticles(
+  articleLimit: number
+): Promise<HackerNewsStoryWithParsedContent[] | undefined> {
+  const res = await getContentsOfArticles(articleLimit)
+  if (res && res.length > 0) {
+    const summarizedArticlesPromises = res.map(async (article) => {
+      if (article.rawContent) {
+        // eslint-disable-next-line no-unused-vars
+        const { rawContent, ...articleWithoutRawContent } = article
+        const parsedContent = await summarizeArticles(article)
+        return { parsedContent, ...articleWithoutRawContent }
+      }
+      return null
+    })
+
+    const summarizedArticles = await Promise.all(summarizedArticlesPromises)
+
+    return summarizedArticles.filter(Boolean) as HackerNewsStoryWithParsedContent[]
+  }
+}
+```
