@@ -368,47 +368,6 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 py-4 text-left font-normal text-white/60">
-            <Tooltip content="Upstash stores entries in both memory and SSD. Once the memory size reaches its limit, entries are evicted from memory. However, when an evicted entry is accessed, it is reloaded from SSD back into memory.">
-              Max memory storage
-            </Tooltip>
-          </th>
-          {/**/}
-          <td
-            hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue type="size" suffix="MB">
-              64
-            </CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPayg : false}
-            className="bg-white/10 px-4 py-0"
-          >
-            <CompareValue type="size" suffix="GB">
-              1
-            </CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPro2 : false}
-            className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue type="size" suffix="GB">
-              3
-            </CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue type="size" suffix="GB">
-              10
-            </CompareValue>
-          </td>
-        </tr>
-
-        <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
             <Tooltip content="When limit is reached, if eviction is enabled, some entries will be evicted to allow new writes. Otherwise, write commands will be rejected.">
               Max data size
             </Tooltip>
