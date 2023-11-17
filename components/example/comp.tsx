@@ -160,12 +160,12 @@ function ExampleStack({
 }) {
   return (
     <div className={cx("flex-cols mt-auto flex flex-wrap gap-1.5", className)}>
-      {stack.slice(0, 5).map((stackTitle) => {
+      {stack.slice(0, 4).map((stackTitle) => {
         return (
           <span
             key={stackTitle}
             className={cx(
-              "rounded-full border border-white/10 px-3 py-1.5 leading-none",
+              "rounded-full border border-white/10 px-3 py-1.5 leading-none text-white/60",
               selectedStacks.includes(stackTitle) ? "bg-emerald-300/10" : "",
             )}
           >
