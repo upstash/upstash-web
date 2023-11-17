@@ -11,7 +11,7 @@
 ```mdx
 <Note>You can use any Redis® client, but we recommend @upstash/redis</Note>
 ```
-
+ 
 ![](public/readme/note-info.png)
 
 ```mdx
