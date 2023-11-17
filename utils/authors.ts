@@ -30,6 +30,12 @@ export const authors: Record<
     url: "https://twitter.com/mmdogan",
     image: "mehmet.jpg",
   },
+  oguzhan: {
+    name: "Oguzhan Olguncu",
+    title: "Software Engineer @Upstash",
+    url: "https://ogzhanolguncu.com",
+    image: "oguzhan.jpeg",
+  },
   sancar: {
     name: "Sancar Koyunlu",
     title: "Senior Software Engineer @Upstash",
