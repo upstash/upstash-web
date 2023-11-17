@@ -240,7 +240,7 @@ export default async function BlogPage({ params }: Props) {
               </h1>
 
               <div
-                className="post mt-8 leading-p"
+                className="post mt-8"
                 dangerouslySetInnerHTML={{ __html: content }}
               />
             </article>

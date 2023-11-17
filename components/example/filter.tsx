@@ -9,7 +9,6 @@ import Icon, { ICON_NAMES } from "@/components/icon";
 import IconKafka from "@/components/icon-kafka";
 import IconQStash from "@/components/icon-qstash";
 import IconRedis from "@/components/icon-redis";
-import { IconArrow } from "@/components/post/toc";
 
 export const ProductsLabel = {
   redis: "Redis",
@@ -472,14 +471,11 @@ Toc.Summary = function TocSummary({
     <summary
       className={cx(
         "flex select-none list-none items-center gap-2",
-        "mb-px h-10 rounded px-4 text-white/40 hover:bg-white/3  ",
+        "mb-px h-10 cursor-pointer select-none rounded px-4 text-white/40 hover:bg-white/3",
         className,
       )}
       {...props}
     >
-      <span className="inline-flex w-5 shrink-0 items-center justify-center">
-        <IconArrow className="rotate-0 group-open/toc:rotate-90" />
-      </span>
       <span className="grow text-sm uppercase tracking-wide">{children}</span>
       {count > 0 && (
         <span className="inline-flex h-5 items-center justify-center rounded-full bg-white/5 px-2 font-mono text-sm">
@@ -507,9 +503,9 @@ function Item({
   return (
     <label
       className={cx(
-        " flex cursor-pointer select-none items-center gap-2",
-        "rounded-lg bg-white/3  px-4 py-3 text-zinc-400",
-        "  hover:bg-white/5",
+        " flex cursor-pointer select-none items-center gap-4",
+        "rounded-lg bg-white/3 px-4 py-3 text-zinc-400",
+        "hover:bg-white/5",
         checked && "bg-white/10 text-zinc-50",
         className,
       )}
@@ -518,7 +514,7 @@ function Item({
         type="checkbox"
         value={value}
         onChange={onChange}
-        className="pointer-events-none opacity-0"
+        className="pointer-events-none absolute opacity-0"
       />
       {icon ? (
         icon

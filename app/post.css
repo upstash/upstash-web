@@ -1,5 +1,5 @@
 .post > * {
-  @apply mb-10 md:mb-14;
+  @apply mb-10;
 }
 
 .post b,
