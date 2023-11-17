@@ -1,0 +1,814 @@
+---
+slug: openai-hackernews-summarizer
+title: "Make your own HackerNews summarizer with OpenAI, NextJS and Upstash"
+description: "Craft your own HackerNews summarizer using OpenAI, NextJS and Upstash Redis/Qstash. Let's hack it!"
+authors:
+  - oguzhan
+tags: [openai, nextjs, redis, qstash,ratelimit]
+---
+
+Today, we're diving into the creation of a minified version of [HackerDigest](https://hackerdigest.upstash.app). Here's how HackerDigest operates: it begins by fetching the top 10 stories from Hacker News. Next, it leverages OpenAI's ChatGPT to process and analyze these stories.
+Finally, it stores the results in Redis. This entire process is made super easy thanks to Qstash. So, buckle up as we set out on this journey.
+
+First things first, let's set up a [Redis](https://console.upstash.com/redis). Head over to Upstash Redis Console to get your keys, which will look something like this:
+
+```sh
+UPSTASH_REDIS_REST_URL="https://us1-XXX-38101.upstash.io"
+UPSTASH_REDIS_REST_TOKEN="AZTVACQXXXVhOTktYzI0Mi0XXXM4ZmQzMjI3NDY0NTZmNDXXXYjQ0NGY4MGYwNDI="
+```
+
+Good, now head over to [Qstash](https://console.upstash.com/qstash), and get your secrets that are needed for NextJS.
+
+```sh
+QSTASH_CURRENT_SIGNING_KEY=XXXX
+QSTASH_NEXT_SIGNING_KEY=XXXX
+```
+
+One more thing left, we also need [OpenAI API](https://platform.openai.com/api-keys) key for that just create yourself a key and you are good to go.
+
+Final `env` file will look like this:
+
+## Env Key Setup
+
+```sh
+OPENAI_API_KEY=XXXX
+
+UPSTASH_REDIS_REST_URL="https://us1-XXX-38101.upstash.io"
+UPSTASH_REDIS_REST_TOKEN="AZTVACQXXXVhOTktYzI0Mi0XXXM4ZmQzMjI3NDY0NTZmNDXXXYjQ0NGY4MGYwNDI="
+
+QSTASH_CURRENT_SIGNING_KEY=XXXX
+QSTASH_NEXT_SIGNING_KEY=XXXX
+```
+
+With the grunt work behind us, give yourself a well-deserved pat on the back. Now, let's dive into the juicy part.
+
+## Initial Setup
+
+We need NextJS for that, run this command below:
+
+```sh
+npx create-next-app
+```
+
+And, do these:
+
+```sh
+✔ What is your project named? … hackernews-summarizer
+✔ Would you like to use TypeScript? … No / Yes
+✔ Would you like to use ESLint? … No / Yes
+✔ Would you like to use Tailwind CSS? … No / Yes
+✔ Would you like to use `src/` directory? … No / Yes
+✔ Would you like to use App Router? (recommended) … No / Yes
+✔ Would you like to customize the default import alias (@/*)? … No / Yes
+✔ What import alias would you like configured? … @/*
+
+cd hackernews-summarizer && npm i node-html-parser ky @upstash/redis @upstash/ratelimit @upstash/qstash openai
+```
+
+Then, see if your project works without an issue, simply run:
+
+```sh
+npm run dev
+```
+
+Okay, before we move on we have to put our `env` keys into `env.local` file. Create `env.local` in the root of your project - where `package.json` lives. Then, simply copy them.
+
+So far so good. Let's move on.
+
+## Folder Structure
+
+```sh
+📦src
+ ┣ 📂app
+ ┃ ┣ 📂actions
+ ┃ ┃ ┗ 📜get-all-summarized-articles.ts
+ ┃ ┣ 📂api
+ ┃ ┃ ┣ 📂stories
+ ┃ ┃ ┃ ┗ 📜route.ts
+ ┃ ┃ ┗ 📂summarize
+ ┃ ┃ ┃ ┗ 📜route.ts
+ ┃ ┣ 📂libs
+ ┃ ┃ ┣ 📜redis-client.ts
+ ┃ ┃ ┗ 📜requester.ts
+ ┃ ┣ 📜favicon.ico
+ ┃ ┣ 📜globals.css
+ ┃ ┣ 📜layout.tsx
+ ┃ ┗ 📜page.tsx
+ ┣ 📂commands
+ ┃ ┣ 📜constants.ts
+ ┃ ┣ 📜get.ts
+ ┃ ┗ 📜set.ts
+ ┗ 📂services
+ ┃ ┣ 📜hackernews.ts
+ ┃ ┣ 📜link-parser.ts
+ ┃ ┗ 📜summarizer.ts
+```
+
+Looks cool, right? We will start off with libs folder. This is where we initialize our clients like Redis and fetcher - [Ky](https://www.npmjs.com/package/ky) in our case.
+
+## Fun Begins
+
+### 📂libs/📜redis-client
+
+```ts
+import { Redis } from "@upstash/redis";
+
+export const redisClient = () => {
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+
+  if (!url) throw new Error("Redis URL is missing!");
+  if (!token) throw new Error("Redis TOKEN is missing!");
+
+  const redis = new Redis({
+    url,
+    token,
+  });
+
+  return redis;
+};
+```
+
+### 📂libs/📜requester.ts
+
+```ts
+import ky from "ky";
+
+const HN_BASE_URL = "https://hacker-news.firebaseio.com/v0/";
+
+export const requester = ky.create({
+  cache: "no-cache",
+  prefixUrl: HN_BASE_URL,
+  headers: {
+    pragma: "no-cache",
+  },
+});
+```
+
+Now, let's proceed to `services/hackernews.ts`. In this section, our goal is to:
+
+- Fetch all the top stories from Hacker News.
+- Filter these stories based on their scores, ensuring they fall within a 12-hour period.
+- Retrieve the details of the selected stories and return them.
+
+### 📂services/📜hackernews.ts
+
+```ts
+import { requester } from "@/app/libs/requester";
+
+// Fetch the top story IDs
+async function fetchTopStoryIds(): Promise<number[]> {
+  const storyIds: number[] = await requester.get(`topstories.json`).json();
+  return storyIds;
+}
+```
+
+Now, we need to filter them.
+
+```ts
+type HackerNewsStoryRaw = {
+  id: number;
+  by: string; // Author of the story
+  score: number;
+  time: number;
+  title: string;
+  url: string;
+  descendants: number; // Number of comments
+  type: "story"; // Ensures the type is strictly 'story'
+};
+
+export type HackerNewsStory = {
+  author: string;
+  score: number;
+  title: string;
+  url: string;
+  numOfComments: number;
+  commentUrl: string;
+  postedDate: string;
+};
+
+// Fetch story details by ID
+// Fetch top stories from the last 12 hours
+export async function fetchTopStoriesFromLast12Hours(
+  limit: number = 10,
+): Promise<HackerNewsStory[]> {
+  const twelveHoursAgoTimestamp = Date.now() - 12 * 60 * 60 * 1000;
+  const topStoryIds = await fetchTopStoryIds();
+
+  const storyDetailsPromises = topStoryIds.map(fetchStoryDetails);
+  const allStories = await Promise.all(storyDetailsPromises);
+
+  const topStoriesFromLast12Hours = allStories
+    .filter((story) => story && story.time * 1000 >= twelveHoursAgoTimestamp)
+    .sort((a, b) => b!.score - a!.score)
+    .slice(0, limit) as HackerNewsStoryRaw[];
+
+  return topStoriesFromLast12Hours.map((story) => ({
+    commentUrl: `https://news.ycombinator.com/item?id=${story.id}`,
+    postedDate: timeSince(story.time * 1000),
+    numOfComments: story.descendants,
+    author: story.by,
+    url: story.url,
+    title: story.title,
+    score: story.score,
+  }));
+}
+```
+
+We'll also need some types to ensure type-safety. Here's an overview of what this function does:
+
+- It begins by fetching topStoryIds.
+- For each story, it calls fetchStoryDetails (which we'll implement shortly).
+- The stories are then filtered to ensure they fall within the specified time period, sorted by their scores.
+- Since we only need 10 stories (our limit), the list is sliced accordingly.
+- Before returning the data, a final mapping step is performed to enhance the API's user-friendliness, appending additional data.
+- Before moving on let's add `fetchStoryDetails`
+
+```ts
+// Fetch story details by ID
+async function fetchStoryDetails(
+  id: number,
+): Promise<HackerNewsStoryRaw | null> {
+  const story: HackerNewsStoryRaw | null = await requester
+    .get(`item/${id}.json`)
+    .json();
+  // Check if the story has a URL and is of type 'story'
+  if (story && story.url && story.type === "story") {
+    return story;
+  }
+  return null;
+}
+```
+
+For the `fetchStoryDetails` function, it's a straightforward call to the endpoint with the story ID. However, there's a caveat: not all items retrieved are stories; sometimes, there are different data types. To address this, we need to ensure that the fetched items are indeed stories before proceeding.
+
+Now that we've covered this part, let's proceed to parsing links within Hacker News stories.
+Since many stories redirect users to external links, it's critical to tell our summarizer to navigate to these links, extract their content, and provide it back.
+This way, we can effectively feed ChatGPT with the relevant information.
+
+### 📂services/📜link-parser.ts
+
+Our approach for parsing links within Hacker News stories involves navigating to the provided URL, using `node-html-parser` for extraction.
+We'll check if the page contains `p` tags; if present, we'll extract the entire content. In case `p` tags are missing, we'll fallback to extracting content within `div` tags.
+The extracted content will then be pushed into `chunkString` since some stories are extensive, and breaking them into smaller chunks is necessary to comply with ChatGPT's token limit (which restricts input to less than 4K tokens at once).
+We'll also have some utility functions to make things easier and cleaner.
+
+```ts
+import parse, { HTMLElement } from "node-html-parser";
+
+async function fetchInnerContent(
+  url?: string,
+): Promise<string | string[] | null> {
+  if (!url) throw new Error("URL is missing!");
+  if (!isValidUrl(url)) throw new Error("URL is not valid");
+
+  try {
+    const response = await fetch(url); // Can be replaced with Ky client
+    const html = await response.text();
+    const root = parse(html);
+
+    let content = extractText(root.querySelectorAll("p"));
+
+    if (!content) {
+      // If no content was found in <p> tags, fallback to <div> tags
+      content = extractText(root.querySelectorAll("div"));
+    }
+
+    // Assuming chunkString splits the string into manageable pieces
+    return chunkString(content); // Ensure chunkString handles an empty string properly
+  } catch (error) {
+    console.error("Error fetching content:", error);
+    return null;
+  }
+}
+
+function isValidUrl(urlString: string): boolean {
+  try {
+    new URL(urlString);
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
+function chunkString(inputString: string, chunkSize = 4000) {
+  if (inputString.length <= chunkSize) return inputString;
+  else {
+    const chunks = [];
+    for (let i = 0; i < inputString.length; i += chunkSize) {
+      chunks.push(inputString.slice(i, i + chunkSize));
+    }
+    return chunks;
+  }
+}
+
+// A function to clean and prepare text content
+function cleanText(text: string) {
+  return text.replace(/\s+/g, " ").trim();
+}
+
+// A function to extract text from a collection of nodes
+function extractText(nodes: HTMLElement[]) {
+  return nodes.map((node) => cleanText(node.innerText)).join(" ");
+}
+```
+
+It's time to feed our parse with some Hacker News data!
+
+```ts
+type Content = (string | string[]) | null;
+export type HackerNewsStoryWithRawContent = HackerNewsStory & {
+  rawContent: Content;
+};
+export type HackerNewsStoryWithParsedContent = HackerNewsStory & {
+  parsedContent: Content;
+};
+
+export async function getContentsOfArticles(
+  articleLimit: number,
+): Promise<HackerNewsStoryWithRawContent[] | undefined> {
+  const articleLinksAndTitles =
+    await fetchTopStoriesFromLast12Hours(articleLimit);
+  return await Promise.all(
+    articleLinksAndTitles.map(async (article) => ({
+      ...article,
+      rawContent: await fetchInnerContent(article.url),
+    })),
+  );
+}
+```
+
+To prepare for the next steps, we begin by extending our `HackerNewsStory` type with additional fields: `rawContent` and `parsedContent` for future use.
+Following this, we call `fetchTopStoriesFromLast12Hours` to retrieve the top 10 stories. These stories are then mapped over, and the URLs are parsed into `rawContent`.
+This parsed content will be utilized in the subsequent stage, where we feed it to ChatGPT.
+
+Time to move to most critical part.
+
+### 📂services/📜summarizer.ts
+
+This is where the magic happens. Fortunately, most of the code is quite straightforward, mainly consisting of OpenAI configurations. Let's dive into it from the beginning.
+
+```ts
+import {
+  getContentsOfArticles,
+  HackerNewsStoryWithParsedContent,
+  HackerNewsStoryWithRawContent,
+} from "@/services/link-parser";
+import { OpenAI } from "openai";
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+  organization: process.env.OPENAI_ORGANIZATION_API,
+});
+
+async function summarizeText(
+  title: string,
+  content: string,
+): Promise<string | undefined> {
+  const prompt = `
+  Title: "${title}"
+  Summarize the following news article in 2-3 clear and concise sentences without repetition: "${content}"`;
+
+  try {
+    const chatCompletion = await openai.completions.create({
+      model: "gpt-3.5-turbo-instruct",
+      prompt,
+      temperature: 0.2,
+      frequency_penalty: 0,
+      presence_penalty: 0,
+      max_tokens: 150,
+      stream: false,
+      n: 1,
+    });
+    return chatCompletion.choices[0]?.text;
+  } catch (error) {
+    console.error("summarizeText failed", (error as Error).message);
+  }
+}
+
+async function summarizeChunk(chunk?: string) {
+  if (!chunk) return null;
+
+  const prompt = `
+      Please provide a concise summary of the following text and please ensure that the summary avoids any unnecessary information or repetition: "${chunk}"
+      `;
+  const chatCompletion = await openai.completions.create({
+    model: "gpt-3.5-turbo-instruct",
+    prompt,
+    temperature: 0.2,
+    frequency_penalty: 0,
+    presence_penalty: 0,
+    max_tokens: 300,
+    stream: false,
+    n: 1,
+  });
+  return chatCompletion.choices[0]?.text;
+}
+```
+
+We need two functions: one for summarizing short texts without chunking and another for summarizing chunks without losing much context. Feel free to make adjustments as needed.
+
+Now, we need a function to determine whether to call the summarization function for an array or a string, depending on the type of rawContent.
+
+```ts
+async function summarizeArticles(
+  article: HackerNewsStoryWithRawContent,
+): Promise<string | undefined> {
+  if (!Array.isArray(article.rawContent)) {
+    try {
+      if (!article.rawContent)
+        throw new Error("Content is missing from summarizeArticles!");
+      const summarizedText = await summarizeText(
+        article.title,
+        article.rawContent,
+      );
+      if (!summarizedText) throw new Error("summarizedText is missing!");
+      return summarizedText;
+    } catch (error) {
+      console.error(
+        `Something went wrong when summarizing single article ${
+          (error as Error).message
+        }`,
+      );
+    }
+  } else {
+    const summarizedChunks = await Promise.all(
+      article.rawContent.map((chunk) => summarizeChunk(chunk)),
+    );
+
+    try {
+      const summarizedText = await summarizeText(
+        article.title,
+        summarizedChunks.filter(Boolean).join(" "),
+      );
+      if (!summarizedText) throw new Error("chunkedSummarizedText is missing!");
+      return summarizedText;
+    } catch (error) {
+      console.error(
+        `Something went wrong when summarizing chunked articles ${
+          (error as Error).message
+        }`,
+      );
+    }
+  }
+}
+```
+
+It's a straightforward process: we check if `rawContent` is an array. If it is, we call `summarizedChunks` and then feed those results into `summarizedText`. If not, we directly call `summarizedText`.
+
+Next, we'll call the function `getContentsOfArticles` to retrieve parsed raw contents.
+These contents will then be fed into the summarizer function. Finally, we'll omit the rawContent from the object since it's no longer needed.
+
+```ts
+export async function getSummarizedArticles(
+  articleLimit: number,
+): Promise<HackerNewsStoryWithParsedContent[] | undefined> {
+  const res = await getContentsOfArticles(articleLimit);
+  if (res && res.length > 0) {
+    const summarizedArticlesPromises = res.map(async (article) => {
+      if (article.rawContent) {
+        const { rawContent, ...articleWithoutRawContent } = article;
+        const parsedContent = await summarizeArticles(article);
+        return { parsedContent, ...articleWithoutRawContent };
+      }
+      return null;
+    });
+
+    const summarizedArticles = await Promise.all(summarizedArticlesPromises);
+
+    return summarizedArticles.filter(
+      Boolean,
+    ) as HackerNewsStoryWithParsedContent[];
+  }
+}
+```
+
+Now, all we have to do is create an endpoint to call this function. But before that, we need to figure out a way to store those processed stories, and Upstash Redis comes to the rescue.
+We can easily store them in Redis once we are done processing them, allowing us to use them anytime in our API, pages, or even in another app, if needed.
+
+### 📂commands/📜constants.ts
+
+```ts
+export const redisKey = "hackerdigest";
+```
+
+We need to store our key somewhere, and `constant.ts` is a good place for that. Maybe in the future we might end up with more keys.
+
+We also need a way to get them back from Redis when we need so where comes the `get.ts`
+
+### 📂commands/📜get.ts
+
+```ts
+import { redisClient } from "../app/libs/redis-client";
+import { HackerNewsStoryWithParsedContent } from "../services/link-parser";
+import { redisKey } from "./constants";
+
+export type ArticlesType = {
+  stories: (HackerNewsStoryWithParsedContent | null)[];
+  lastFetched: string;
+};
+
+export const getArticles = async () => {
+  const redis = redisClient();
+  return await redis.get<ArticlesType>(redisKey);
+};
+```
+
+Another one for storing.
+
+### 📂commands/📜set.ts
+
+```ts
+import { redisClient } from "../app/libs/redis-client";
+import { HackerNewsStoryWithParsedContent } from "../services/link-parser";
+import { redisKey } from "./constants";
+import { ArticlesType } from "./get";
+
+export const setArticles = async (
+  stories: HackerNewsStoryWithParsedContent[],
+) => {
+  const redis = redisClient();
+  await redis.set<ArticlesType>(redisKey, {
+    stories,
+    lastFetched: new Date().toJSON(),
+  });
+};
+```
+
+These utilities are quite straightforward to use. Once you begin using `redis.get` and `redis.get`, you find yourself passing the key - in our case, '**hackerdigest**' - and return types throughout the app, which can quickly become ugly and difficult to maintain.
+So, we opted for this approach to streamline the process.
+
+Now, it's time to make our APIs we will start with `summarize` end point.
+
+### 📂api/📂summarize/📜route.ts
+
+```ts
+import { NextResponse } from "next/server";
+
+import { setArticles } from "@/commands/set";
+import { getSummarizedArticles } from "@/services/summarizer";
+import { verifySignatureAppRouter } from "@upstash/qstash/dist/nextjs";
+
+export const maxDuration = 300;
+
+async function handler() {
+  try {
+    const articles = await getSummarizedArticles(10);
+    if (articles) {
+      await setArticles(articles);
+      return NextResponse.json({ articles });
+    } else {
+      console.error("Stories are missing!");
+      return NextResponse.json({}, { status: 400 });
+    }
+  } catch (error) {
+    console.error(
+      `Something went wrong when saving to cache or retriving stories ${
+        (error as Error).message
+      }`,
+    );
+    return NextResponse.json({}, { status: 400 });
+  }
+}
+export const POST = verifySignatureAppRouter(handler);
+```
+
+Firstly, we need to set `maxDuration` to a value higher than the default, which is 15, because OpenAI processes may take some time due to extensive computations.
+The rest is relatively simple – we just invoke `getSummarizedArticles` with the desired limit.
+If the operation is successful, we save the results to the cache and return.
+To enable periodic API calls with Qstash, we wrap the handler with `verifySignatureAppRouter` to ensure that only Qstash can access this endpoint. Additionally, it should be a POST request.
+
+Now, we need a way to get those processed stories.
+
+### 📂api/📂stories/📜route.ts
+
+```ts
+import { NextRequest, NextResponse } from "next/server";
+
+import { getArticles } from "@/commands/get";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+
+export async function GET(req: NextRequest) {
+  const ratelimit = new Ratelimit({
+    redis: Redis.fromEnv(),
+    limiter: Ratelimit.slidingWindow(10, "10s"),
+    prefix: "hackerdigest-stories",
+  });
+
+  const ip = (req.headers.get("x-forwarded-for") ?? "127.0.0.1").split(",")[0];
+  const { success } = await ratelimit.limit(ip);
+  if (!success) {
+    return NextResponse.json({ message: "You shall not pass!" });
+  }
+  const { stories } = await getArticles();
+
+  return NextResponse.json({ stories });
+}
+```
+
+This is also quite straightforward; we simply invoke `getArticles`. However, to prevent abuse of our app, we need to implement rate limiting using `@upstash/ratelimit` and use the user's IP address as an identifier.
+
+Let's add a simple HTML and Tailwind to see how it looks.
+
+### 📜page.tsx
+
+```tsx
+import { getArticles } from "@/commands/get";
+
+export default async function Home() {
+  const { stories } = await getArticles();
+
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-between bg-[#0B0A0A] p-4 text-[#FBFBFB] sm:p-24">
+      <div className="max-w-[1200px]">
+        <section className="pb-16 pt-14">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="sm:col-span-2">
+              <h1 className="text-3xl font-bold tracking-tight sm:text-6xl">
+                HackerNews Summarizer
+              </h1>
+              <p className="mb-12 mt-8 text-base text-gray-400 sm:text-lg">
+                Upstash Rocks 🚀
+              </p>
+              <a
+                className="button button-1 light text-lg font-semibold"
+                href="https://github.com/upstash/hackerdigest"
+              >
+                View on Github
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {stories?.length ? (
+          <section>
+            <h2 className="mb-8 text-2xl font-bold tracking-tight sm:text-4xl">
+              Stories
+            </h2>
+            <div className="grid gap-8 sm:grid-cols-1 lg:grid-cols-2">
+              {stories.map((article, index) => (
+                <div
+                  key={index}
+                  className="neon-border flex flex-col rounded-[20px] border border-gray-900 bg-[#0c0d0ccc] p-4 sm:p-8"
+                >
+                  <div className="mb-5 flex w-full items-center justify-between">
+                    <h3 className="max-w-[350px] text-lg font-semibold text-[#FBFBFB]">
+                      {article?.title}
+                    </h3>
+                    <span className="flex h-full items-start text-right">
+                      {article?.postedDate}
+                    </span>
+                  </div>
+                  <p className="mb-10 text-sm font-medium text-gray-400">
+                    {article?.parsedContent}
+                  </p>
+                  <div className="mt-auto flex items-center justify-between">
+                    <div className="font-medium text-[#00a372]">
+                      <p>
+                        Author:{" "}
+                        <span className="text-[#FBFBFB]">
+                          {article?.author}
+                        </span>
+                      </p>
+                      <p className="">
+                        Num of comments:{" "}
+                        <span className=" text-[#FBFBFB]">
+                          {article?.numOfComments}
+                        </span>
+                      </p>
+                      <p>
+                        Score:{" "}
+                        <span className="text-[#FBFBFB]">{article?.score}</span>
+                      </p>
+                    </div>
+                    <div className="flex h-full flex-col items-start gap-2">
+                      {article?.url && (
+                        <a
+                          href={article.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-fit border-b border-dashed transition delay-75 ease-linear hover:border-solid hover:border-[#00a372] hover:text-[#00a372]"
+                        >
+                          Go to original article
+                        </a>
+                      )}
+                      {article?.commentUrl && (
+                        <a
+                          href={article.commentUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-fit border-b border-dashed transition delay-75 ease-linear hover:border-solid hover:border-[#00a372] hover:text-[#00a372]"
+                        >
+                          Go to comments
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        ) : (
+          <div className="mb-8 text-2xl font-bold tracking-tight sm:text-4xl">
+            Nothing to digest
+          </div>
+        )}
+      </div>
+    </main>
+  );
+}
+```
+
+Also, make sure to copy those CSS styles to your `global.css` file. This will give your cards and buttons a cool neon look.
+
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.button {
+  width: 200px;
+  padding: 8px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.button-1 {
+  background-color: transparent;
+  border: 1px solid #00a372;
+  border-bottom: 2px solid #00a372;
+  border-radius: 5px;
+  -webkit-transition: all 0.15s ease-in-out;
+  transition: all 0.15s ease-in-out;
+  color: #00a372;
+  background-image: -webkit-linear-gradient(
+    30deg,
+    #00a372 50%,
+    transparent 50%
+  );
+  background-image: linear-gradient(30deg, #00a372 50%, transparent 50%);
+  background-size: 600px;
+  background-repeat: no-repeat;
+  background-position: 100%;
+  -webkit-transition: background 300ms ease-in-out;
+  transition: background 300ms ease-in-out;
+  box-shadow:
+    0 0 10px 0 #00a372 inset,
+    0 0 20px 2px #00a372;
+  border: 3px solid #00a372;
+  animation: pulse 1s infinite;
+  background-position: 0%;
+  color: #fbfbfb;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.light {
+  overflow: hidden;
+}
+
+.light:before {
+  content: "";
+  width: 200%;
+  height: 200%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(45deg);
+  position: absolute;
+  top: -10%;
+  left: -200%;
+  transition: 0.2s ease-in-out;
+}
+
+.light:hover:before {
+  left: -10%;
+}
+
+.neon-border:hover {
+  box-shadow:
+    0 0 0.2rem #fff,
+    0 0 0.2rem #fff,
+    0 0 2rem #00a372,
+    0 0 0.8rem #00a372,
+    0 0 2rem #00a372,
+    inset 0 0 1.3rem #00a372;
+}
+```
+
+## Conclusion
+
+So, there you have it – a HackerNews summarizer that not only works like a charm but also looks darn good doing it.
+Take this recipe, add your own secret sauce, and who knows, maybe you'll create the next internet sensation. Happy hacking, friends! 🚀
