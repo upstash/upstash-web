@@ -59,7 +59,7 @@ export default function Ps() {
                 write commands are replicated to all read regions in addition
                 to primary region. Replications (write operations) are counted
                 as commands. For example, if you have 1 primary 1 read region,
-                100K writes will cost \$0.4 ($0.2 x 2)
+                100K writes will cost $0.4 ($0.2 x 2)
               </p>
             </li>
             <li>
