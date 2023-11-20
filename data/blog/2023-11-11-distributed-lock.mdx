@@ -1,6 +1,7 @@
 ---
 slug: lock
 title: "Introducing @upstash/lock: Distributed Locking using Upstash Redis"
+description: Learn what a lock is, how it works, and how to use it with Upstash Redis for full stack applications.
 authors:
   - meshan
 tags: [Redis]
@@ -24,8 +25,7 @@ function handleOperation() {
 		redis: Redis.fromEnv(),
 	});
 
-	const lock = await lock.acquire();
-	if (lock.status === "ACQUIRED") {
+	if (await lock.acquire()) {
 		await handleCriticalSection();
 		await lock.release();
 	} else {
@@ -123,7 +123,7 @@ once a thread enters the critical section, no other thread can enter until the f
 ## How do we implement locks with Redis?
 
 It just so happens that Redis has its own atomic instructions that we can use to implement locks.
-Using Upstash Redis, we can use the `SETNX` command to set a key if it doesn’t already exist, making
+Using Upstash Redis, we can use the `SETNX` attribute to set a key if it doesn’t already exist, making
 the locking process atomic. We can then use the `EXPIRE` command to set a timeout on the key, so that
 if the thread that acquired the lock crashes, the lock will be released after a certain amount of time.
 
