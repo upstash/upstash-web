@@ -1,6 +1,7 @@
 "use client";
 
 import { Dispatch, HTMLProps, SetStateAction } from "react";
+import Image from "next/image";
 
 import cx from "@/utils/cx";
 import Balancer from "react-wrap-balancer";
@@ -34,15 +35,33 @@ export function Example({
     <article
       className={cx(
         "group/example-box p-6",
-        "flex flex-col gap-4",
+        "flex flex-col gap-2",
         "rounded-xl bg-white/5",
         "transition hover:bg-emerald-300/10",
         className,
       )}
       {...props}
     >
-      <ExampleTitle title={title} />
-      {/*<ExampleAuthor author={author} />*/}
+      <h3 className={cx("font-display text-2xl font-semibold", className)}>
+        <a
+          className="hover:text-emerald-400"
+          href={`/examples/${title.toLowerCase().replace(/ /g, "-")}`}
+        >
+          <Balancer>{title}</Balancer>
+        </a>
+      </h3>
+
+      <div className="mb-4 flex items-center gap-2">
+        <Image
+          alt={author.name}
+          src={author.image}
+          width={32}
+          height={32}
+          className="rounded-full"
+        />
+        <span className="opacity-60">{author.name}</span>
+      </div>
+
       <div className="mt-auto flex items-center gap-2">
         <ExampleProducts products={products} />
         <ExampleStack
@@ -52,26 +71,6 @@ export function Example({
         />
       </div>
     </article>
-  );
-}
-
-function ExampleTitle({
-  className,
-  children,
-  title,
-  ...props
-}: HTMLProps<HTMLHeadingElement> & {
-  title: string;
-}) {
-  return (
-    <h3
-      className={cx("font-display text-xl font-medium", className)}
-      {...props}
-    >
-      <a href={`/examples/${title.toLowerCase().replace(/ /g, "-")}`}>
-        <Balancer>{title}</Balancer>
-      </a>
-    </h3>
   );
 }
 
@@ -127,25 +126,6 @@ function ExampleProducts({
   );
 }
 
-function ExampleAuthor({
-  className,
-  children,
-  author,
-  ...props
-}: HTMLProps<HTMLDivElement> & {
-  author: {
-    name: string;
-    image: string;
-  };
-}) {
-  return (
-    <div
-      className={cx("mt-auto flex items-center", className)}
-      {...props}
-    ></div>
-  );
-}
-
 function ExampleStack({
   className,
   children,
@@ -162,15 +142,13 @@ function ExampleStack({
     <div className={cx("flex-cols mt-auto flex flex-wrap gap-1.5", className)}>
       {stack.slice(0, 4).map((stackTitle) => {
         return (
-          <span
+          <Pill
             key={stackTitle}
-            className={cx(
-              "rounded-full border border-white/10 px-3 py-1.5 leading-none text-white/60",
-              selectedStacks.includes(stackTitle) ? "bg-emerald-300/10" : "",
-            )}
-          >
-            {stackTitle}
-          </span>
+            stackTitle={stackTitle}
+            selected={selectedStacks.includes(stackTitle)}
+            selectedStacks={selectedStacks}
+            setSelectedStacks={setSelectedStacks}
+          />
         );
       })}
     </div>
@@ -191,9 +169,10 @@ export function Pill({
   return (
     <>
       <button
-        className={`py-0.2 w-min cursor-default rounded-xl border border-[#34D399] bg-[#34D399] bg-opacity-30 px-2 transition ease-in-out hover:bg-opacity-60 ${
-          selected ? "bg-opacity-60" : "bg-opacity-30"
-        }`}
+        className={cx(
+          "rounded border border-white/5 px-2 py-1 leading-none text-white/60",
+          selected ? "bg-emerald-400/10 text-white" : "",
+        )}
         onClick={(e) => {
           if (!selected) {
             setSelectedStacks([...selectedStacks, stackTitle]);
@@ -204,9 +183,7 @@ export function Pill({
           }
         }}
       >
-        <p className="whitespace-nowrap text-sm " key={stackTitle}>
-          {stackTitle}
-        </p>
+        {stackTitle}
       </button>
     </>
   );
