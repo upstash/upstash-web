@@ -1,16 +1,19 @@
-import { ParsedUrlQueryInput } from "querystring";
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 export const AFFILIATE_CODE = "code";
 
-export const useSetAffiliateCodeToSessionStorage = (
-  searchParams: ParsedUrlQueryInput,
-) => {
+export const useSetAffiliateCodeToSessionStorage = () => {
+  const searchParams = useSearchParams();
+
+  const code = searchParams?.get(AFFILIATE_CODE);
+
   useEffect(() => {
-    if (searchParams.code) {
-      sessionStorage.setItem(AFFILIATE_CODE, searchParams.code as string);
+    console.log("Save to sessionstorage", code);
+    if (code) {
+      sessionStorage.setItem(AFFILIATE_CODE, code as string);
     }
-  }, [searchParams]);
+  }, [code]);
 };
 
 export const useGetAffiliateCodeFromSessionStorage = () => {
@@ -18,6 +21,7 @@ export const useGetAffiliateCodeFromSessionStorage = () => {
 
   useEffect(() => {
     const affiliateCode = sessionStorage.getItem(AFFILIATE_CODE);
+    console.log("get from sessionstorage", affiliateCode);
     if (affiliateCode) {
       setAffiliateCode(affiliateCode);
     }

@@ -1,7 +1,5 @@
 "use client";
 
-import { ParsedUrlQueryInput } from "querystring";
-
 import { useSetAffiliateCodeToSessionStorage } from "@/hooks/use-affiliate-code-session-storage";
 
 import HomeCommunity from "@/components/home/community";
@@ -14,12 +12,8 @@ import HomeProduct from "@/components/home/product";
 import SectionMenu from "@/components/home/section-menu";
 import HomeServerless from "@/components/home/serverless";
 
-export default function Home({
-  searchParams,
-}: {
-  searchParams: ParsedUrlQueryInput;
-}) {
-  useSetAffiliateCodeToSessionStorage(searchParams);
+export default function Home() {
+  useSetAffiliateCodeToSessionStorage();
 
   return (
     <main className="overflow-x-hidden text-center">
