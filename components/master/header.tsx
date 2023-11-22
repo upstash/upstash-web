@@ -6,7 +6,7 @@ import Link from "next/link";
 import cx from "@/utils/cx";
 import { allJobs } from "contentlayer/generated";
 
-import { useGetAffiliateCodeFromSessionStorage } from "@/hooks/use-affiliate-code-session-storage";
+import { useGetAffiliateCodeFromApi } from "@/hooks/use-affiliate-code";
 
 import Button from "@/components/button";
 import Container from "@/components/container";
@@ -20,7 +20,7 @@ export default function Header({
   className,
   ...props
 }: HTMLProps<HTMLHeadElement>) {
-  const { affiliateCode } = useGetAffiliateCodeFromSessionStorage();
+  const { affiliateCode } = useGetAffiliateCodeFromApi();
 
   return (
     <header className={cx("hidden md:block", className)} {...props}>
