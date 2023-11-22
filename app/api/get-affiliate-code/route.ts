@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { AFFILIATE_CODE } from "@/app/constants";
-
 export async function GET(request: NextRequest) {
-  const affiliateCode = request.cookies.get(AFFILIATE_CODE);
+  const affiliateCode = request.cookies.get("code");
 
   if (affiliateCode) {
     return NextResponse.json(
