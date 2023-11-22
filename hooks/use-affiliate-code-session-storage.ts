@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 export const AFFILIATE_CODE = "code";
 
-export const useSetAffiliateCodeToLocalStorage = (
+export const useSetAffiliateCodeToSessionStorage = (
   searchParams: ParsedUrlQueryInput,
 ) => {
   useEffect(() => {
@@ -13,7 +13,7 @@ export const useSetAffiliateCodeToLocalStorage = (
   }, [searchParams]);
 };
 
-export const useGetAffiliateCodeFromLocalStorage = () => {
+export const useGetAffiliateCodeFromSessionStorage = () => {
   const [affiliateCode, setAffiliateCode] = useState<string>();
 
   useEffect(() => {

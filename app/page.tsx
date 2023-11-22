@@ -2,7 +2,7 @@
 
 import { ParsedUrlQueryInput } from "querystring";
 
-import { useSetAffiliateCodeToLocalStorage } from "@/hooks/use-affiliate-code-session-storage";
+import { useSetAffiliateCodeToSessionStorage } from "@/hooks/use-affiliate-code-session-storage";
 
 import HomeCommunity from "@/components/home/community";
 import HomeFast from "@/components/home/fast";
@@ -19,7 +19,7 @@ export default function Home({
 }: {
   searchParams: ParsedUrlQueryInput;
 }) {
-  useSetAffiliateCodeToLocalStorage(searchParams);
+  useSetAffiliateCodeToSessionStorage(searchParams);
 
   return (
     <main className="overflow-x-hidden text-center">
