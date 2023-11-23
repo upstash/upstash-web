@@ -54,33 +54,25 @@ export default function CompareTable() {
           <th className="p-0" />
           <th
             hidden={isMobile ? !showFree : false}
-            className="border-b-2 border-b-zinc-950 bg-white/3 px-0
-             py-3 text-xs font-medium uppercase
-          tracking-wider text-white/80"
+            className="border-b-2 border-b-zinc-950 bg-white/3 px-0 py-3 text-xs font-medium uppercase tracking-wider text-white/80"
           >
             Limit of 1 Free DB
           </th>
           <th
             hidden={isMobile ? !showPayg : false}
-            className="border-b-2 border-b-zinc-950 bg-white/10 px-0
-             py-3 text-xs font-medium uppercase
-          tracking-wider text-white/80"
+            className="border-b-2 border-b-zinc-950 bg-white/10 px-0 py-3 text-xs font-medium uppercase tracking-wider text-white/80"
           >
             Usage Based Pricing
           </th>
           <th
             hidden={isMobile ? !showPro2 : false}
-            className="border-b-2 border-b-zinc-950 bg-white/3 px-0
-             py-3 text-xs font-medium uppercase
-            tracking-wider text-white/80"
+            className="border-b-2 border-b-zinc-950 bg-white/3 px-0 py-3 text-xs font-medium uppercase tracking-wider text-white/80"
           >
             Fixed Pricing
           </th>
           <th
             hidden={isMobile ? !showPro10 : false}
-            className="border-b-2 border-b-zinc-950 bg-white/3 px-0
-             py-3 text-xs font-medium uppercase
-            tracking-wider text-white/80"
+            className="border-b-2 border-b-zinc-950 bg-white/3 px-0 py-3 text-xs font-medium uppercase tracking-wider text-white/80"
           >
             Fixed Pricing
           </th>
@@ -191,10 +183,7 @@ export default function CompareTable() {
             colSpan={isMobile ? 2 : 5}
             className="sticky top-20 z-10 p-0 text-left md:top-0"
           >
-            <div
-              className="-ml-4 flex h-16 items-center bg-gradient-to-r
-            from-zinc-900 to-zinc-950 px-4"
-            >
+            <div className="-ml-4 flex h-16 items-center bg-gradient-to-r from-zinc-900 to-zinc-950 px-4">
               <span className="flex items-center gap-2 text-lg font-semibold">
                 <span className="flex items-center rounded-full bg-white/10 p-2">
                   <svg
@@ -207,10 +196,11 @@ export default function CompareTable() {
                     fill="none"
                     strokeLinecap="round"
                     strokeLinejoin="round"
+                    role="icon"
                   >
-                    <path d="M12 6m-8 0a8 3 0 1 0 16 0a8 3 0 1 0 -16 0"></path>
-                    <path d="M4 6v6a8 3 0 0 0 16 0v-6"></path>
-                    <path d="M4 12v6a8 3 0 0 0 16 0v-6"></path>
+                    <path d="M12 6m-8 0a8 3 0 1 0 16 0a8 3 0 1 0 -16 0" />
+                    <path d="M4 6v6a8 3 0 0 0 16 0v-6" />
+                    <path d="M4 12v6a8 3 0 0 0 16 0v-6" />
                   </svg>
                 </span>
 
@@ -488,10 +478,7 @@ export default function CompareTable() {
             colSpan={isMobile ? 2 : 5}
             className="sticky top-20 z-10 p-0 text-left md:top-0"
           >
-            <div
-              className="-ml-4 flex h-16 items-center bg-gradient-to-r
-            from-zinc-900 to-zinc-950 px-4"
-            >
+            <div className="-ml-4 flex h-16 items-center bg-gradient-to-r from-zinc-900 to-zinc-950 px-4">
               <span className="flex items-center gap-2 text-lg font-semibold">
                 <span className="flex items-center rounded-full bg-white/10 p-2">
                   <svg
@@ -504,10 +491,11 @@ export default function CompareTable() {
                     fill="none"
                     strokeLinecap="round"
                     strokeLinejoin="round"
+                    role="icon"
                   >
-                    <path d="M4 13a8 8 0 0 1 7 7a6 6 0 0 0 3 -5a9 9 0 0 0 6 -8a3 3 0 0 0 -3 -3a9 9 0 0 0 -8 6a6 6 0 0 0 -5 3"></path>
-                    <path d="M7 14a6 6 0 0 0 -3 6a6 6 0 0 0 6 -3"></path>
-                    <path d="M15 9m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path>
+                    <path d="M4 13a8 8 0 0 1 7 7a6 6 0 0 0 3 -5a9 9 0 0 0 6 -8a3 3 0 0 0 -3 -3a9 9 0 0 0 -8 6a6 6 0 0 0 -5 3" />
+                    <path d="M7 14a6 6 0 0 0 -3 6a6 6 0 0 0 6 -3" />
+                    <path d="M15 9m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
                   </svg>
                 </span>
 
@@ -660,10 +648,7 @@ export default function CompareTable() {
             colSpan={isMobile ? 2 : 5}
             className="sticky top-20 z-10 p-0 text-left md:top-0"
           >
-            <div
-              className="-ml-4 flex h-16 items-center bg-gradient-to-r
-            from-zinc-900 to-zinc-950 px-4"
-            >
+            <div className="-ml-4 flex h-16 items-center bg-gradient-to-r from-zinc-900 to-zinc-950 px-4">
               <span className="flex items-center gap-2 text-lg font-semibold">
                 <span className="flex items-center rounded-full bg-white/10 p-2">
                   <svg
@@ -676,10 +661,11 @@ export default function CompareTable() {
                     fill="none"
                     strokeLinecap="round"
                     strokeLinejoin="round"
+                    role="icon"
                   >
-                    <path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3"></path>
-                    <path d="M12 11m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path>
-                    <path d="M12 12l0 2.5"></path>
+                    <path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3" />
+                    <path d="M12 11m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+                    <path d="M12 12l0 2.5" />
                   </svg>
                 </span>
 
@@ -865,10 +851,7 @@ export default function CompareTable() {
             colSpan={isMobile ? 2 : 5}
             className="sticky top-20 z-10 p-0 text-left md:top-0"
           >
-            <div
-              className="-ml-4 flex h-16 items-center bg-gradient-to-r
-            from-zinc-900 to-zinc-950 px-4"
-            >
+            <div className="-ml-4 flex h-16 items-center bg-gradient-to-r from-zinc-900 to-zinc-950 px-4">
               <span className="flex items-center gap-2 text-lg font-semibold">
                 <span className="flex items-center rounded-full bg-white/10 p-2">
                   <svg
@@ -881,10 +864,11 @@ export default function CompareTable() {
                     fill="none"
                     strokeLinecap="round"
                     strokeLinejoin="round"
+                    role="icon"
                   >
-                    <path d="M4 13m0 2a2 2 0 0 1 2 -2h1a2 2 0 0 1 2 2v3a2 2 0 0 1 -2 2h-1a2 2 0 0 1 -2 -2z"></path>
-                    <path d="M15 13m0 2a2 2 0 0 1 2 -2h1a2 2 0 0 1 2 2v3a2 2 0 0 1 -2 2h-1a2 2 0 0 1 -2 -2z"></path>
-                    <path d="M4 15v-3a8 8 0 0 1 16 0v3"></path>
+                    <path d="M4 13m0 2a2 2 0 0 1 2 -2h1a2 2 0 0 1 2 2v3a2 2 0 0 1 -2 2h-1a2 2 0 0 1 -2 -2z" />
+                    <path d="M15 13m0 2a2 2 0 0 1 2 -2h1a2 2 0 0 1 2 2v3a2 2 0 0 1 -2 2h-1a2 2 0 0 1 -2 -2z" />
+                    <path d="M4 15v-3a8 8 0 0 1 16 0v3" />
                   </svg>
                 </span>
 
@@ -995,7 +979,7 @@ export default function CompareTable() {
           <td
             hidden={isMobile ? !showFree : false}
             className="bg-white/3 px-4 py-0"
-          ></td>
+          />
           <td
             hidden={isMobile ? !showPayg : false}
             className="bg-white/10 px-4 py-0"
