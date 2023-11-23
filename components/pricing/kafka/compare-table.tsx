@@ -196,8 +196,8 @@ export default function CompareTable() {
                     fill="none"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    role="icon"
                   >
+                    <title> </title>
                     <path d="M12 6m-8 0a8 3 0 1 0 16 0a8 3 0 1 0 -16 0" />
                     <path d="M4 6v6a8 3 0 0 0 16 0v-6" />
                     <path d="M4 12v6a8 3 0 0 0 16 0v-6" />
@@ -473,8 +473,8 @@ export default function CompareTable() {
                     fill="none"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    role="icon"
                   >
+                    <title> </title>
                     <path d="M4 13a8 8 0 0 1 7 7a6 6 0 0 0 3 -5a9 9 0 0 0 6 -8a3 3 0 0 0 -3 -3a9 9 0 0 0 -8 6a6 6 0 0 0 -5 3" />
                     <path d="M7 14a6 6 0 0 0 -3 6a6 6 0 0 0 6 -3" />
                     <path d="M15 9m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
@@ -608,8 +608,8 @@ export default function CompareTable() {
                     fill="none"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    role="icon"
                   >
+                    <title> </title>
                     <path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3" />
                     <path d="M12 11m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
                     <path d="M12 12l0 2.5" />
@@ -811,8 +811,8 @@ export default function CompareTable() {
                     fill="none"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    role="icon"
                   >
+                    <title> </title>
                     <path d="M4 13m0 2a2 2 0 0 1 2 -2h1a2 2 0 0 1 2 2v3a2 2 0 0 1 -2 2h-1a2 2 0 0 1 -2 -2z" />
                     <path d="M15 13m0 2a2 2 0 0 1 2 -2h1a2 2 0 0 1 2 2v3a2 2 0 0 1 -2 2h-1a2 2 0 0 1 -2 -2z" />
                     <path d="M4 15v-3a8 8 0 0 1 16 0v3" />
