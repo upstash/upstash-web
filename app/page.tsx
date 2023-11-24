@@ -25,7 +25,10 @@ export default function Home({
   useSetAffiliateCodeToSessionStorage(searchParams);
 
   return (
-    <IntercomProvider appId="rtjkeau6" autoBoot>
+    <IntercomProvider
+      appId={process.env.NEXT_PUBLIC_INTERCOM_APP_ID as string}
+      autoBoot
+    >
       <main className="overflow-x-hidden text-center">
         <HomeHero />
         <HomeFast />
