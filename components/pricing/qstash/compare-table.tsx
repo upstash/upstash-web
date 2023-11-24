@@ -400,6 +400,31 @@ export default function CompareTable() {
             <CompareValue>Custom</CompareValue>
           </td>
         </tr>
+
+        <tr>
+          <th className="px-0 py-4 font-normal text-left text-white/60">
+            Max Schedule Count
+          </th>
+          {/**/}
+          <td
+              hidden={isMobile ? !showFree : false}
+              className="px-4 py-0 bg-white/3"
+          >
+            <CompareValue type="number">1000</CompareValue>
+          </td>
+          <td
+              hidden={isMobile ? !showPayg : false}
+              className="px-4 py-0 bg-emerald-300/10"
+          >
+            <CompareValue type="number">1000</CompareValue>
+          </td>
+          <td
+              hidden={isMobile ? !showEnterprise : false}
+              className="px-4 py-0 bg-white/3"
+          >
+            <CompareValue>Custom</CompareValue>
+          </td>
+        </tr>
       </tbody>
     </table>
   );

@@ -1,10 +1,12 @@
 "use client";
 
 import { ComponentProps, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 
 import cx from "@/utils/cx";
 import { IconCheck, IconCopy } from "@tabler/icons-react";
 import { useMDXComponent } from "next-contentlayer/hooks";
+import Balancer from "react-wrap-balancer";
 
 import ExpandableCode from "./expandable-code";
 import PostNote from "./note";
@@ -82,10 +84,51 @@ function FullWidth(props: ComponentProps<"div">) {
   return <div className="lg:-mx-40" {...props} />;
 }
 
+function Highlight(props: {
+  children: string;
+  photo: string;
+  name: string;
+  title: string;
+}) {
+  return (
+    <FullWidth>
+      <div
+        className="group/highlight grid place-items-center gap-6 rounded-4xl
+        border-4 border-white/5 p-10 text-center md:px-20 md:py-16"
+      >
+        {props.photo && (
+          <Image
+            src={`/customer/${props.photo}`}
+            alt={props.name}
+            width={60}
+            height={60}
+            className="rounded-full"
+          />
+        )}
+
+        <p
+          className="bg-gradient-to-br from-white to-[#6DBEA6] bg-clip-text
+          text-xl font-medium text-transparent"
+        >
+          <Balancer>{props.children}</Balancer>
+        </p>
+
+        {(props.name || props.title) && (
+          <div className="">
+            {props.name && <span className="opacity-80">{props.name}</span>}
+            {props.title && <span className="opacity-40">, {props.title}</span>}
+          </div>
+        )}
+      </div>
+    </FullWidth>
+  );
+}
+
 const components = {
   table,
   img,
   FullWidth,
+  Highlight,
   Note: PostNote,
   ExpandableCode,
   pre: CopyFeaturePre,

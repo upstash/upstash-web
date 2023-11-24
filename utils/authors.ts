@@ -30,6 +30,12 @@ export const authors: Record<
 		url: "https://twitter.com/mmdogan",
 		image: "mehmet.jpg",
 	},
+	oguzhan: {
+		name: "Oguzhan Olguncu",
+		title: "Software Engineer @Upstash",
+		url: "https://ogzhanolguncu.com",
+		image: "oguzhan.jpeg",
+	},
 	sancar: {
 		name: "Sancar Koyunlu",
 		title: "Senior Software Engineer @Upstash",
@@ -216,7 +222,7 @@ export const authors: Record<
 	},
 	rishi: {
 		name: "Rishi Raj Jain",
-		title: "Technical CSM @Edgio (Guest Author)",
+		title: "Founder of LaunchFa.st (Guest Author)",
 		image: "rishi.jpeg",
 	},
 	pau_kraft: {
@@ -263,10 +269,5 @@ export const authors: Record<
 		name: "Ruben de Groot",
 		title: "Software Developer (Guest Author)",
 		image: "ruben.jpeg",
-	},
-	meshan: {
-		name: "Meshan Khosla",
-		title: "Title is TBD",
-		image: "meshan.png",
 	},
 };

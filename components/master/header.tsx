@@ -6,6 +6,8 @@ import Link from "next/link";
 import cx from "@/utils/cx";
 import { allJobs } from "contentlayer/generated";
 
+import { useGetAffiliateCodeFromApi } from "@/hooks/use-affiliate-code";
+
 import Button from "@/components/button";
 import Container from "@/components/container";
 import { Logo } from "@/components/logo";
@@ -18,6 +20,8 @@ export default function Header({
   className,
   ...props
 }: HTMLProps<HTMLHeadElement>) {
+  const { affiliateCode } = useGetAffiliateCodeFromApi();
+
   return (
     <header className={cx("hidden md:block", className)} {...props}>
       <Container>
@@ -35,7 +39,11 @@ export default function Header({
               target="_self"
               type="button"
               hideIcon
-              href="https://console.upstash.com"
+              href={
+                affiliateCode
+                  ? `https://console.upstash.com/?code=${affiliateCode}`
+                  : "https://console.upstash.com"
+              }
               className="backdrop-blur"
             >
               Login
@@ -56,13 +64,9 @@ const NavItems: {
     name: "Pricing",
     href: "/pricing",
   },
-  // {
-  //   name: "Open Source",
-  //   href: "/open-source",
-  // },
   {
-    name: "About",
-    href: "/about",
+    name: "Customers",
+    href: "/customers",
   },
   // {
   //   name: "Examples",
@@ -71,6 +75,10 @@ const NavItems: {
   {
     name: "Blog",
     href: "/blog",
+  },
+  {
+    name: "About",
+    href: "/about",
   },
   {
     name: "Discord",
