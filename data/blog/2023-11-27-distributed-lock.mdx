@@ -22,18 +22,18 @@ import { Lock } from "@upstash/lock";
 import { Redis } from "@upstash/redis";
 
 function handleOperation() {
-	const lock = new Lock({
-		id: "unique-lock-id",
-		lease: 5000, // Hold the lock for 5 seconds
-		redis: Redis.fromEnv(),
-	});
+  const lock = new Lock({
+    id: "unique-lock-id",
+    lease: 5000, // Hold the lock for 5 seconds
+    redis: Redis.fromEnv(),
+  });
 
-	if (await lock.acquire()) {
-		await handleCriticalSection();
-		await lock.release();
-	} else {
-		handleLockNotAcquired();
-	}
+  if (await lock.acquire()) {
+    await handleCriticalSection();
+    await lock.release();
+  } else {
+    handleLockNotAcquired();
+  }
 }
 ```
 
@@ -52,23 +52,23 @@ When the bank server receives a request (ie: deposit or withdraw), it should app
 ```typescript
 // Code adapted from UC Berkeley's CS162
 function bankServer() {
-	while (true) {
-		receiveRequest(operation, acctId, amount);
-		await processRequest(operation, acctId, amount);
-	}
+  while (true) {
+    receiveRequest(operation, acctId, amount);
+    await processRequest(operation, acctId, amount);
+  }
 }
 
 async function processRequest(op, acctId, amount) {
-	if (op == "deposit") {
-		acct = await getAccount(acctId); // acct 1
-		acct.balance = acct.balance + amount;
-		await storeAccount(acct)
-	}
-	...
+  if (op == "deposit") {
+    acct = await getAccount(acctId); // acct 1
+    acct.balance = acct.balance + amount;
+    await storeAccount(acct);
+  }
+  ...
 }
 ```
 
-Let’s say Alice and Bob both want to deposit `$50` into one ccount. The expected behavior would be account `1` having `$100`. With the current implementation, the behavior is undefined.
+Let’s say Alice and Bob both want to deposit `$50` into one account. The expected behavior would be account `1` having `$100`. With the current implementation, the behavior is undefined.
 To demonstrate, here are 2 cases that produce different outputs:
 
 **Case 1:** The requests are processed serially. This means that Alice’s request will fully execute, and then Bob’s request will fully execute.
@@ -140,7 +140,7 @@ using `DEL` to release the lock is not enough. Consider the following scenario:
 5. Thread A recovers and releases the lock
    This is a problem because Thread A was able to release the lock even though it was already acquired by Thread B.
 
-To fix this, we assign a unique UUID to each lock. When a thread acquires the lock, it stores the UUID and we are
+To fix this, a unique UUID is assigned to each lock. When a thread acquires the lock, it stores the UUID and we are
 able to verify that the thread releasing the lock is the same thread that acquired it. A similar mechanism is used for
 extending the lock lease.
 
