@@ -270,4 +270,9 @@ export const authors: Record<
 		title: "Software Developer (Guest Author)",
 		image: "ruben.jpeg",
 	},
+	meshan: {
+		name: "Meshan Khosla",
+		title: "Software Engineer",
+		image: "meshan.png",
+	},
 };

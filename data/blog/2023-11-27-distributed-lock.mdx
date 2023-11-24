@@ -12,7 +12,10 @@ Today we're announcing our brand new SDK for distributed locking: [@upstash/lock
 #### TL;DR
 
 You can now use Upstash to create distributed locks for your applications.
-This is useful for applications that need to ensure only one client can access a resource at a time.
+This is useful for applications that need to ensure only one client should access a resource at a time.
+
+Note that because Upstash Redis uses async replication between replicas, a network failure may cause multiple clients to acquire the lock, so
+this library should be used for performance benefits and situations that require _mostly_ consistent locking.
 
 ```typescript
 import { Lock } from "@upstash/lock";
@@ -34,7 +37,7 @@ function handleOperation() {
 }
 ```
 
-You can see a demo of this in action here (TBD).
+You can see a demo of this in action [here](https://lock-upstash.vercel.app).
 
 If you're interested in learning more about locks, read on!
 
