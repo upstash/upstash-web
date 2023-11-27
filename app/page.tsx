@@ -1,6 +1,9 @@
 "use client";
 
 import { ParsedUrlQueryInput } from "querystring";
+import * as React from "react";
+
+import { IntercomProvider } from "react-use-intercom";
 
 import { useSetAffiliateCodeToSessionStorage } from "@/hooks/use-affiliate-code-session-storage";
 
@@ -22,17 +25,22 @@ export default function Home({
   useSetAffiliateCodeToSessionStorage(searchParams);
 
   return (
-    <main className="overflow-x-hidden text-center">
-      <HomeHero />
-      <HomeFast />
-      <HomeServerless />
-      <HomeProduct />
-      <HomePrice />
-      <HomeOpenSource />
-      <HomeInvestors />
-      <HomeCommunity />
+    <IntercomProvider
+      appId={process.env.NEXT_PUBLIC_INTERCOM_APP_ID as string}
+      autoBoot
+    >
+      <main className="overflow-x-hidden text-center">
+        <HomeHero />
+        <HomeFast />
+        <HomeServerless />
+        <HomeProduct />
+        <HomePrice />
+        <HomeOpenSource />
+        <HomeInvestors />
+        <HomeCommunity />
 
-      <SectionMenu />
-    </main>
+        <SectionMenu />
+      </main>
+    </IntercomProvider>
   );
 }
