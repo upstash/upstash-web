@@ -1,0 +1,336 @@
+---
+slug: ably-chat
+title: "A Real-Time Chat Application by Using Ably, Upstash Redis and Node.js"
+description: In this blog post, we will create a simple real-time chat application that allows users to join a chat group and communicate in real-time
+authors:
+  - noah
+tags: [Ably, Redis]
+---
+
+
+In this blog post, we will create a simple real-time chat application that allows users to join a chat group and communicate in real-time.
+
+We will leverage the power of [Ably](https://ably.com) for real-time messaging across users with low latency, [Upstash Redis](https://upstash.com) for storing the messages persistently and [Node.js](https://nodejs.org) for building the application.
+
+## Ably
+
+Ably is a real-time experience platform that enables two-way communication between users.
+
+For this chat application, we will use Pub/Sub channels of Ably to let users send messages by "publishing" messages to an Ably channel and let users receive the messages sent to the channel by "subscribing".
+
+Ably provides these Pub/Sub channels by adding an abstract layer on top of Web Sockets with additional features. Some of them are as follows:
+
+- Presence of subscribers
+
+- Authentication
+
+- Heartbeat mechanism
+
+- Queues
+
+- Ability to deliver messages in the order they were published
+
+- Integrations to invoke functions by any event on Ably
+
+- Stream the messages/presence/metadata to Kafka
+
+You can visit their [website]([https://ably.com](https://ably.com)) to learn more!
+
+To utilize this powerful real-time experience hub, we need to create an application on Ably.
+
+Let’s [create](https://ably.com/sign-up) an Ably account first.
+
+Then, we can create an application by selecting “Live Chat”.
+
+![](https://lh7-us.googleusercontent.com/gpcde5MC1oVQAOWnv0pzBRVw9R05XiK05onb-F8DcfWNI7Yqp0YIZA1oR8Yr0Xnq99fMp5SIHT3JewE-pbnazUzrDJnHxigSt9gwZ8G-U49Nh33lWu4wJY5Q5Cm-yILx7W15aSYa9CmQe2BlSeFj0g)
+
+That’s it!
+
+We don’t need to do anything else here right now. We will return to the Ably dashboard later to get the API key.
+
+## Upstash Redis
+
+We are going to use Upstash Redis to store the chat messages persistently.
+
+This storage will allow users to retrieve the chat history when they join.
+
+Upstash Redis will also allow us to store the chat messages as a sorted list. This will help us to send the messages from the database to the clients without needing to re-sort them.
+
+To create the Upstash Redis database, go to [Upstash Console]([https://console.upstash.com/](https://console.upstash.com/)), log in, and create a Redis database.
+
+![](https://lh7-us.googleusercontent.com/QzmJWf_hiEkEh5CMtRbkvtdAIo2YXrSMRTjrFinNKJuBgY9Df8gqAE2-lsX4zD_Bj0fyDZTAAueV3T8lxRQ7_gBu8QUBKKzuKtYRYO7JtJ5uotsbnGdirlhD3ihtYbdrZgOAfYr1fUXuC1np_Q-i_Q)
+
+The infrastructure is ready. Now, let’s move on to the architecture of the application.
+
+## Chat App Architecture
+
+The design of this chat application is going to be quite straightforward.
+
+![](https://lh7-us.googleusercontent.com/DinqTh36GzO_2RuVU4HVxcqSYZvETcGzJtQr0OFYs7VpNcxaoZQb8SgBEXaF5vwRAHwOonaz7SI6554HK0VxkxshnMoOf0-y9GyyNGzPzFRk3jHNLlY9REyIwn1azoR7qrMX47Ed875LxhRy5ReH5Q)
+
+In this demo project, we will create only one Ably channel to keep it simple. Clients are going to publish the messages that they send to that channel. Once a client publishes a message, other clients will immediately receive the message through their channel subscription.
+
+Apart from the real-time messaging between clients, we need to store the messages in Upstash Redis. To be able to do that, Ably channel will have one more subscriber, which is our server. This server will receive the messages sent by clients, send them to Upstash Redis and store them there.
+
+Lastly, we will utilize the chat history stored in Upstash Redis with the help of the server. We will create an endpoint "/history" on the server side, which returns the chat history from Redis. Clients will be able to retrieve the chat history when they load the app by calling this endpoint.
+
+As you can see, this is a simple chat app for demonstration purposes. This chat application can be modified and extended using other features of Ably mentioned previously in this blog post.
+
+Let’s get started...
+
+## Client Side
+
+First, we need to create a basic chat UI for users. We will create a straightforward `index.html` web page to do this.
+
+``` html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" type="text/css" href="index.css">
+<title>Chat App</title>
+</head>
+
+<body>
+<div class="container">
+<p class="msg">Messages:</p>
+<div id="messages" class="messages"></div>
+<form id="msgForm" class="msgForm">
+<input type="text" placeholder="Send message" class="input" id="inputBox" />
+<input type="submit" class="btn" value="Send">
+</form>
+</div>
+
+<script src="https://cdn.ably.io/lib/ably.min-1.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
+```
+
+In users’ browsers, we will see an input field to type a message, a submit button to send the message and message boxes that display the previous messages.
+
+Now, we will write “app.js”, which is the JavaScript file that is going to be executed as part of the web page.
+
+We are going to create Ably channel first. To do that, we need to go back to the Ably dashboard and create a new API key under “API Keys”.
+
+Let’s select “Publish” and “Subscribe” as the capabilities of this API.
+
+![](https://lh7-us.googleusercontent.com/qFQIIegs_bGyGoe6NvwZ4Ng721q0DttK-Uvtg64gStJdILc3P0apzJbKgySq8rgoltJ7-EOV9EbC5_My689BGlcOGmT5-WDq2ADKeWss4b7L0Vry06-7HxsY3y3e8P3lR-pWtq7vKmpuNvmx8srSCg)
+
+Now we can create Ably client in the JavaScript file by using the Key given in Ably dashboard.
+
+```javascript
+const ably = new Ably.Realtime(‘<Ably API Key>’);
+```
+
+
+> **Warning**
+
+Giving API key to the clients is INSECURE. Ably provides a mechanism called “TokenRequest”. Since this is a demo application, we will give the API key directly to the JavaScript file. For further information about client authentication for Ably, please check Ably’s [token docs]([https://ably.com/docs/auth/token?lang=nodejs#token-request](https://ably.com/docs/auth/token?lang=nodejs#token-request)).
+
+Now, let's get the Ably channel through which the client will communicate.
+
+```javascript
+const channel = ably.channels.get('chat');
+```
+
+We don't need to create the channel. A channel is created once somebody publishes something to it.
+
+As a prior step before implementing messaging functionality, we need to get a username from the user. We will make it very simple since authentication is not the focus of this blog.
+
+```javascript
+let name = window.prompt("Please enter your name.", "Anonymous");
+```
+
+Now we can implement message sending.
+
+```javascript
+const form = document.getElementById('msgForm');
+form.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const message = document.getElementById('inputBox').value;
+  if (message.trim() !== '') {
+    const messageData = {
+      name: name,
+      message: message
+    }
+    channel.publish('message', messageData);
+    document.getElementById('inputBox').value = '';
+  }
+});
+```
+
+Sending a message is very simple! We need to create an object which contains a username and the message and publish it to the Ably channel.
+
+To enable users to receive messages, we need to create a subscription to that channel and add a message box which contains the username and the message.
+
+```javascript
+channel.subscribe('message', (message) => {
+  console.log("Client received: ", message);
+  displayMessage(message.data);
+});
+
+function displayMessage(message) {
+  const incomingName = message.name;
+  const incomingMessage = message.message;
+  const messageElement = document.createElement('div');
+  const messageValue = document.createElement('div');
+  const messageWriter = document.createElement('div');
+  if(incomingName !== name){
+    messageElement.classList.add('msgSent');
+  }
+  else {
+    messageElement.classList.add('msgReceived');
+  }
+  messageWriter.classList.add('msgWriter');
+  messageValue.classList.add('msgValue');
+  messageWriter.textContent = incomingName;
+  messageValue.textContent = incomingMessage;
+  messageElement.appendChild(messageWriter);
+  messageElement.appendChild(messageValue);
+  const list = document.getElementById('messages');
+  list.appendChild(messageElement);
+}
+```
+
+Lastly, we will retrieve the chat history when the page first loaded.
+
+```javascript
+document.addEventListener("DOMContentLoaded", function() {
+  fetchChatHistory();
+});
+
+function fetchChatHistory() {
+  fetch('/history')
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Failed to fetch chat history');
+      } return response.json();
+    })
+    .then((data) => {
+      const history = data.history;
+      console.log(history);
+      if (history && history.length > 0) {
+        history.forEach((message) => {
+          displayMessage(JSON.parse(message));
+        });
+      }
+    })
+    .catch((error) => {
+      console.error('Error fetching chat history:', error);
+    });
+}
+```
+
+## Server Side
+
+The server in this demo application will subscribe to the Ably channel, push it to the Upstash Redis database, and return chat history from the Upstash Redis when client requests.
+
+We will configure the server first in “app.js” file.
+
+```javascript
+var express = require('express'); var path = require('path');
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, 'public')));
+
+var router = express.Router();
+
+/* GET home page. */
+router.get('/', function(req, res, next) {
+  res.render('index', { title: 'ChatApp' });
+});
+
+app.use('/', router);
+
+module.exports = app;
+```
+
+Next, we will create our server in “server.js”, subscribe to Ably channel and connect to Upstash Redis.
+
+```javascript
+var app = require('../app');
+
+var http = require('http');
+const redis = require('redis');
+const Ably = require('ably');
+
+const port = process.env.PORT || '3000';
+app.set('port', port);
+
+var server = http.createServer(app);
+server.listen(port);
+
+const redisClient = redis.createClient({ url : "<Upstash Redis Endpoint>" });
+redisClient.on("error", function(err) {
+  throw err;
+});
+redisClient.connect().then(r => {
+  console.log("Connected to Redis.")
+})
+
+// Ably configuration
+const ably = new Ably.Realtime({
+  key: '<Ably API Key>',
+});
+
+// Define a channel
+const channel = ably.channels.get('chat');
+```
+
+The next step is pushing the incoming messages to Upstash Redis database. We will do this operation with Ably channel subscription.
+
+```javascript
+// Handle incoming messages
+channel.subscribe('message', async (message) => {
+  const convertedMessage = JSON.stringify(message.data);
+  console.log('Received message:', convertedMessage);
+  // Store the message in Upstash Redis
+  await redisClient.LPUSH("AblyChatList",convertedMessage);
+});
+```
+
+Lastly, we will implement the “/history” endpoint, which retrieves the chat history from Upstash Redis and returns it to the client.
+
+```javascript
+// Get chat history endpoint
+app.get('/history', async (req, res) => {
+  // Retrieve chat history from Upstash Redis
+  const messages = await redisClient.LRANGE("AblyChatList", 0, -1);
+  messages.reverse();
+  console.log("history api: ", messages);
+  res.json({ history: messages });
+});
+```
+
+## Run the App
+
+Go to the directory of the “server.js” file and run:
+
+```bash
+node server.js
+```
+
+Open `localhost:3000` in your browser. It will ask for a username first.
+
+![](https://lh7-us.googleusercontent.com/VYUAq86Nyx8nAefxXMKQqx031d7Fe6P5r9y2cjRqouKV6ADoSXyYtTcoNkRyCmIpZJi3VrVt_zDsnnARqVU0sNmaQ8RdvP4JpVMnqXUf7-HfT7MZtITxiWLgRXqxXObJeMlm0Yo7oLiFlVfNS5lsJA)
+
+Once you enter your username, it will allow you to open the chat.
+
+If you send messages from one tab and open `localhost:3000` in another app using a different username, you can see the messages sent from the previous tab.
+
+![](https://lh7-us.googleusercontent.com/gd3CnDuZ3nrrC0t74qQDlE_9UvNvEofxuR8DpaMEoEX1P29qrYiulGEnUlfZqeFBn3oMADDEmguPXOKJj3ly5mDi_bcQ950G4_pI6SkPagtmNLy2OGzCYPq476eS3MAJOmVf5oE79rIA51hKJzp77g)
+
+Thanks to the Upstash Redis, you will retrieve the chat history every time you open the chat application.
+
+## Conclusion
+
+Ably provides various features to enhance real-time communication among applications. Its powerful real-time world can be leveraged for tons of different use cases.
+
+In this blog post, we used Ably to build a real-time chat application using its Pub/Sub channels. While doing this, we stored the messages in the Upstash Redis database. These two tools made this application easy to build and fast.
+
+Since this project was just for demonstrating how to use Upstash Redis and Ably, we kept the scope of it very simple. If you are interested, you can build robust, scalable, and secure real-time applications by utilizing the features of Ably and Upstash Redis.
