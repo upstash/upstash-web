@@ -6,11 +6,14 @@ authors:
 tags: [redis, python]
 ---
 
-Today we are releasing `v1.0.0` version of the `upstash-redis` python package.
+Today we are releasing `v1.0.0` version of the `upstash-redis` python package. It is now available on [GitHub](https://github.com/upstash/redis-python) and [PyPi](https://pypi.org/project/upstash-redis/).
 
-It is a connectionless HTTP-based client for upstash redis,
+The package is a connectionless HTTP-based client for upstash redis,
 designed to be usable in serverless environments like aws lambda,
 google cloud functions or any environment where HTTP is preferred over TCP.
+
+With the new versions the package comes with python docstrings for every command with example usages in them.
+You can also find the documentation and examples for every command in the [upstash redis python docs website](https://upstash.com/docs/oss/sdks/py/redis/commands/overview)
 
 ## Quick Start
 
@@ -56,13 +59,7 @@ asyncio.run(main())
 
 If you are in a serverless environment that allows it, it's recommended to initialise the client outside the request handler to be reused while your function is still hot.
 
-## New documentation and examples
-
-The sdk now has python docstrings for every command with example usages in them.
-
-The documentation and examples for every command can also be found at [https://upstash.com/docs/oss/sdks/py/redis/commands/overview](https://upstash.com/docs/oss/sdks/py/redis/commands/overview)
-
-### Value type change
+### Value type change in some commands
 
 Some commands like `set` or `hset` accepted `Any` as a value type. The value was then converted to a string using `json.dumps`. This leaded to some confusion in some commands.
 
@@ -89,11 +86,15 @@ redis.set("key", {"foo": "bar"})
 redis.set("key", json.dumps({"foo": "bar"}))
 ```
 
-### Geo commands returning `GeoSearchResult`
+### Geo commands returning GeoSearchResult instead of Dict
 
 The `geosearch` and `georadius` commands now return a `GeoSearchResult` object instead of a dictionary which is more convenient to use.
 
-### Set commands returning `List` instead of `Set`
+### Set commands returning List instead of Set
 
 Changed return types of `sdiff`, `sunion`, `sinter`, and `smembers` method to `List` from `Set`.
 This eliminates extra set allocation for users doing iteration over the result. If they want, they can return the list into set themselves.
+
+## Conclusion
+
+We hope you enjoy the new version of the package. If you have any questions or feedback, please reach out to us on [Twitter](https://twitter.com/upstash) or [Discord](https://upstash.com/discord).
