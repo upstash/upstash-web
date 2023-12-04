@@ -16,6 +16,7 @@ export function Example({
   products,
   author,
   title,
+  slug,
   stack,
   selectedStacks,
   setSelectedStacks,
@@ -27,6 +28,7 @@ export function Example({
     image: string;
   };
   title: string;
+  slug: string;
   stack: string[];
   selectedStacks: string[];
   setSelectedStacks: Dispatch<SetStateAction<string[]>>;
@@ -43,10 +45,7 @@ export function Example({
       {...props}
     >
       <h3 className={cx("font-display text-2xl font-semibold", className)}>
-        <a
-          className="hover:text-emerald-400"
-          href={`/examples/${title.toLowerCase().replace(/ /g, "-")}`}
-        >
+        <a className="hover:text-emerald-400" href={`/examples/${slug}`}>
           <Balancer>{title}</Balancer>
         </a>
       </h3>

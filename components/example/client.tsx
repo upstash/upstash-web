@@ -166,7 +166,8 @@ export const Client: React.FC<Props> = ({
 
             return (
               <Box
-                key={item.title}
+                key={item.slug}
+                slug={item.slug}
                 title={item.title}
                 products={item.products}
                 author={author}
