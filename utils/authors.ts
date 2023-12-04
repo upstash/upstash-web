@@ -278,4 +278,9 @@ export const authors: Record<string,
         title: "Software Developer (Guest Author)",
         image: "murillo.png",
     },
+    yusuf: {
+        name: "Yusuf Kımırtı",
+        title: "Sofware Engineer @Upstash",
+        image: "yusuf.jpg",
+    }
 };
