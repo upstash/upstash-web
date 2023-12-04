@@ -88,36 +88,30 @@ function ExampleProducts({
       {props.products.map((product) => {
         if (product === "redis") {
           return (
-            <>
-              <IconRedis
-                key={product}
-                width={24}
-                aria-label="Upstash Redis Icon"
-                className=""
-              />
-            </>
+            <IconRedis
+              key={product}
+              width={24}
+              aria-label="Upstash Redis Icon"
+              className=""
+            />
           );
         } else if (product === "kafka") {
           return (
-            <>
-              <IconKafka
-                key={product}
-                width={24}
-                aria-label="Upstash Kafka Icon"
-                className=""
-              />
-            </>
+            <IconKafka
+              key={product}
+              width={24}
+              aria-label="Upstash Kafka Icon"
+              className=""
+            />
           );
         } else if (product === "qstash") {
           return (
-            <div>
-              <IconQStash
-                key={product}
-                width={24}
-                aria-label="Upstash QStash Icon"
-                className=""
-              />
-            </div>
+            <IconQStash
+              key={product}
+              width={24}
+              aria-label="Upstash QStash Icon"
+              className=""
+            />
           );
         }
       })}
