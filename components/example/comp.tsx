@@ -16,6 +16,7 @@ export function Example({
   products,
   author,
   title,
+  slug,
   stack,
   selectedStacks,
   setSelectedStacks,
@@ -27,6 +28,7 @@ export function Example({
     image: string;
   };
   title: string;
+  slug: string;
   stack: string[];
   selectedStacks: string[];
   setSelectedStacks: Dispatch<SetStateAction<string[]>>;
@@ -43,10 +45,7 @@ export function Example({
       {...props}
     >
       <h3 className={cx("font-display text-2xl font-semibold", className)}>
-        <a
-          className="hover:text-emerald-400"
-          href={`/examples/${title.toLowerCase().replace(/ /g, "-")}`}
-        >
+        <a className="hover:text-emerald-400" href={`/examples/${slug}`}>
           <Balancer>{title}</Balancer>
         </a>
       </h3>
@@ -89,36 +88,30 @@ function ExampleProducts({
       {props.products.map((product) => {
         if (product === "redis") {
           return (
-            <>
-              <IconRedis
-                key={product}
-                width={24}
-                aria-label="Upstash Redis Icon"
-                className=""
-              />
-            </>
+            <IconRedis
+              key={product}
+              width={24}
+              aria-label="Upstash Redis Icon"
+              className=""
+            />
           );
         } else if (product === "kafka") {
           return (
-            <>
-              <IconKafka
-                key={product}
-                width={24}
-                aria-label="Upstash Kafka Icon"
-                className=""
-              />
-            </>
+            <IconKafka
+              key={product}
+              width={24}
+              aria-label="Upstash Kafka Icon"
+              className=""
+            />
           );
         } else if (product === "qstash") {
           return (
-            <div>
-              <IconQStash
-                key={product}
-                width={24}
-                aria-label="Upstash QStash Icon"
-                className=""
-              />
-            </div>
+            <IconQStash
+              key={product}
+              width={24}
+              aria-label="Upstash QStash Icon"
+              className=""
+            />
           );
         }
       })}
