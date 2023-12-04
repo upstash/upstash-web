@@ -279,7 +279,7 @@ export const authors: Record<string,
         image: "murillo.png",
     },
     yusuf: {
-        name: "Yusuf Kımırtı",
+        name: "Yusuf Kimirti",
         title: "Sofware Engineer @Upstash",
         image: "yusuf.jpg",
     }
