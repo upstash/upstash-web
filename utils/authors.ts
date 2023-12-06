@@ -278,4 +278,9 @@ export const authors: Record<string,
         title: "Software Developer (Guest Author)",
         image: "murillo.png",
     },
+    valon: {
+        name: "Valon Januzaj",
+        title: "Software Developer (Guest Author)",
+        image: "valon.png",
+    },
 };
