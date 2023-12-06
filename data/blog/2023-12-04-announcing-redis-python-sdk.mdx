@@ -3,7 +3,7 @@ slug: "announcing-upstash-redis-python-sdk-v1-0-0"
 title: "Announcing Upstash Redis Python SDK v1.0.0"
 authors:
   - yusuf
-tags: [redis, python]
+tags: [redis, python, announcement]
 ---
 
 Today we are releasing `v1.0.0` version of the `upstash-redis` python package. It is now available on [GitHub](https://github.com/upstash/redis-python) and [PyPi](https://pypi.org/project/upstash-redis/).
@@ -12,8 +12,13 @@ The package is a connectionless HTTP-based client for upstash redis,
 designed to be usable in serverless environments like aws lambda,
 google cloud functions or any environment where HTTP is preferred over TCP.
 
+## What's new?
+
 With the new versions the package comes with python docstrings for every command with example usages in them.
-You can also find the documentation and examples for every command in the [upstash redis python docs website](https://upstash.com/docs/oss/sdks/py/redis/commands/overview).
+
+![img.png](/blog/announcing-redis-python-sdk/docstring.png)
+
+You can also find the documentation and examples for every command in the [upstash redis python docs](https://upstash.com/docs/oss/sdks/py/redis/commands/overview).
 
 ## Quick Start
 
@@ -97,4 +102,10 @@ This eliminates extra set allocation for users doing iteration over the result. 
 
 ## Conclusion
 
-We hope you enjoy the new version of the package. If you have any questions or feedback, please reach out to us on [Twitter](https://twitter.com/upstash) or [Discord](https://upstash.com/discord).
+We hope you enjoy the new version of the package. We are planning on adding pipeline and json commands support to the python sdk in the future.
+
+You can also check out our [python ratelimiting library](https://github.com/upstash/ratelimit)
+or our other [blog posts about python](http://upstash.com/blog/tag/python).
+
+If you have any questions or feedback, please reach
+out to us on [Twitter](https://twitter.com/upstash) or [Discord](https://upstash.com/discord).
