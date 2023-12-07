@@ -1,6 +1,6 @@
 "use client";
 
-import { HTMLProps, ReactNode } from "react";
+import React, { HTMLProps, ReactNode } from "react";
 import Link from "next/link";
 
 import cx from "@/utils/cx";
@@ -12,7 +12,7 @@ import Button from "@/components/button";
 import Container from "@/components/container";
 import { Logo } from "@/components/logo";
 
-import Nav from "./nav";
+import NewNavigation from "./new-nav";
 
 const jobLength = allJobs.filter((o) => !o.draft).length;
 
@@ -25,14 +25,14 @@ export default function Header({
   return (
     <header className={cx("hidden md:block", className)} {...props}>
       <Container>
-        <div className="flex items-center border-b border-b-white/5 py-5 md:grid md:grid-cols-4">
+        <div className="flex items-center border-b border-b-white/5 py-5 md:grid md:grid-cols-6">
           <div className="flex">
             <Link href="/">
               <Logo />
             </Link>
           </div>
 
-          <Nav />
+          <NewNavigation />
 
           <div className="flex justify-end">
             <Button
