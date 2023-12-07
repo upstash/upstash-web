@@ -1,3 +1,14 @@
 code {
   @apply rounded bg-emerald-300/10 px-1.5 py-1 font-mono text-sm font-medium text-emerald-200;
 }
+
+.faq [data-state="open"] + [data-state="closed"] {
+  @apply border-t-transparent;
+}
+.faq .faq-body a {
+  @apply text-emerald-400 underline;
+}
+
+.faq .mini-table :where(th, td){
+  @apply border-zinc-800;
+}

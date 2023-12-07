@@ -1,11 +1,12 @@
 "use client";
 
+import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
 import Enterprise from "@/components/pricing/enterprise";
 import CompareTable from "@/components/pricing/kafka/compare-table";
+import FAQ from "@/components/pricing/kafka/faq";
 import PricingTable from "@/components/pricing/kafka/pricing-table";
-import Ps from "@/components/pricing/kafka/ps";
 import ProductToggle from "@/components/pricing/product-toggle";
 
 export default function PricingKafkaPage() {
@@ -36,7 +37,14 @@ export default function PricingKafkaPage() {
         </div>
 
         <div className="mt-32 md:mt-40">
-          <Ps />
+          <Container className="max-w-screen-md">
+            <PageHeaderTitle as="h2" className="mb md:text-4xl">
+              FAQ
+            </PageHeaderTitle>
+            <div className="mt-10">
+              <FAQ />
+            </div>
+          </Container>
         </div>
       </div>
     </div>

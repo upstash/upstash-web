@@ -22,6 +22,6 @@
 
 @layer components {
   .mini-table :where(th, td) {
-    @apply border border-zinc-800 px-2 py-1;
+    @apply border border-black/10 px-3 py-2;
   }
 }

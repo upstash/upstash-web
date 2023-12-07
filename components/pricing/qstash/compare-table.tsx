@@ -9,28 +9,15 @@ import CompareValue from "../compare-value";
 export default function CompareTable() {
   const isMobile = useIsMobile();
 
-  const [selectedPlans, setSelectedPlans] = useState([
-    PricingPlans.Free,
-    // PricingPlans.PayAsYouGo,
-  ]);
+  const [selectedPlans, setSelectedPlans] = useState(PricingPlans.Free);
 
-  const showFree = selectedPlans.includes(PricingPlans.Free);
-  const showPayg = selectedPlans.includes(PricingPlans.PayAsYouGo);
-  const showEnterprise = selectedPlans.includes(PricingPlans.Enterprise);
+  const showFree = selectedPlans === PricingPlans.Free;
+  const showPayg = selectedPlans === PricingPlans.PayAsYouGo;
+  const showEnterprise = selectedPlans == PricingPlans.Enterprise;
 
-  const onPlanChange = (
-    event: ChangeEvent<HTMLSelectElement>,
-    plan: PricingPlans,
-  ) => {
+  const onPlanChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value as PricingPlans;
-    const index = selectedPlans.indexOf(plan);
-
-    setSelectedPlans((prev) => {
-      if (index === 0) {
-        return [value, prev[1]];
-      }
-      return [prev[0], value];
-    });
+    setSelectedPlans(value);
   };
 
   return (
@@ -86,7 +73,7 @@ export default function CompareTable() {
 
               <select
                 className="bg-transparent px-4 py-2 font-semibold md:hidden"
-                onChange={(e) => onPlanChange(e, PricingPlans.Free)}
+                onChange={onPlanChange}
                 value={PricingPlans.Free}
               >
                 <option value={PricingPlans.Free} disabled>
@@ -108,7 +95,7 @@ export default function CompareTable() {
 
               <select
                 className="bg-transparent px-4 py-2 font-semibold md:hidden"
-                onChange={(e) => onPlanChange(e, PricingPlans.PayAsYouGo)}
+                onChange={onPlanChange}
                 value={PricingPlans.PayAsYouGo}
               >
                 <option value={PricingPlans.Free}>Free</option>
@@ -130,7 +117,7 @@ export default function CompareTable() {
 
               <select
                 className="bg-transparent px-4 py-2 font-semibold md:hidden"
-                onChange={(e) => onPlanChange(e, PricingPlans.Enterprise)}
+                onChange={onPlanChange}
                 value={PricingPlans.Enterprise}
               >
                 <option value={PricingPlans.Free}>Free</option>
@@ -402,25 +389,25 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 font-normal text-left text-white/60">
+          <th className="px-0 py-4 text-left font-normal text-white/60">
             Max Schedule Count
           </th>
           {/**/}
           <td
-              hidden={isMobile ? !showFree : false}
-              className="px-4 py-0 bg-white/3"
+            hidden={isMobile ? !showFree : false}
+            className="bg-white/3 px-4 py-0"
           >
             <CompareValue type="number">1000</CompareValue>
           </td>
           <td
-              hidden={isMobile ? !showPayg : false}
-              className="px-4 py-0 bg-emerald-300/10"
+            hidden={isMobile ? !showPayg : false}
+            className="bg-emerald-300/10 px-4 py-0"
           >
             <CompareValue type="number">1000</CompareValue>
           </td>
           <td
-              hidden={isMobile ? !showEnterprise : false}
-              className="px-4 py-0 bg-white/3"
+            hidden={isMobile ? !showEnterprise : false}
+            className="bg-white/3 px-4 py-0"
           >
             <CompareValue>Custom</CompareValue>
           </td>

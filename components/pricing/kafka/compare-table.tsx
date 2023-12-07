@@ -1,3 +1,4 @@
+import * as React from "react";
 import { ChangeEvent, useState } from "react";
 
 import { PricingPlans } from "@/utils/type";
@@ -12,29 +13,16 @@ import CompareValue from "../compare-value";
 export default function CompareTable() {
   const isMobile = useIsMobile();
 
-  const [selectedPlans, setSelectedPlans] = useState([
-    PricingPlans.Free,
-    // PricingPlans.PayAsYouGo,
-  ]);
+  const [selectedPlans, setSelectedPlans] = useState(PricingPlans.Free);
 
-  const showFree = selectedPlans.includes(PricingPlans.Free);
-  const showPayg = selectedPlans.includes(PricingPlans.PayAsYouGo);
-  const showPro2 = selectedPlans.includes(PricingPlans.Pro2K);
-  const showPro10 = selectedPlans.includes(PricingPlans.Pro10K);
+  const showFree = selectedPlans === PricingPlans.Free;
+  const showPayg = selectedPlans === PricingPlans.PayAsYouGo;
+  const showPro2 = selectedPlans === PricingPlans.Pro2K;
+  const showPro10 = selectedPlans === PricingPlans.Pro10K;
 
-  const onPlanChange = (
-    event: ChangeEvent<HTMLSelectElement>,
-    plan: PricingPlans,
-  ) => {
+  const onPlanChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value as PricingPlans;
-    const index = selectedPlans.indexOf(plan);
-
-    setSelectedPlans((prev) => {
-      if (index === 0) {
-        return [value, prev[1]];
-      }
-      return [prev[0], value];
-    });
+    setSelectedPlans(value);
   };
 
   return (
@@ -91,7 +79,7 @@ export default function CompareTable() {
 
               <select
                 className="bg-transparent px-4 py-2 font-semibold md:hidden"
-                onChange={(e) => onPlanChange(e, PricingPlans.Free)}
+                onChange={onPlanChange}
                 value={PricingPlans.Free}
               >
                 <option value={PricingPlans.Free} disabled>
@@ -114,7 +102,7 @@ export default function CompareTable() {
 
               <select
                 className="bg-transparent px-4 py-2 font-semibold md:hidden"
-                onChange={(e) => onPlanChange(e, PricingPlans.PayAsYouGo)}
+                onChange={onPlanChange}
                 value={PricingPlans.PayAsYouGo}
               >
                 <option value={PricingPlans.Free}>Free</option>
@@ -137,7 +125,7 @@ export default function CompareTable() {
 
               <select
                 className="bg-transparent px-4 py-2 font-semibold md:hidden"
-                onChange={(e) => onPlanChange(e, PricingPlans.Pro2K)}
+                onChange={onPlanChange}
                 value={PricingPlans.Pro2K}
               >
                 <option value={PricingPlans.Free}>Free</option>
@@ -160,7 +148,7 @@ export default function CompareTable() {
 
               <select
                 className="bg-transparent px-4 py-2 font-semibold md:hidden"
-                onChange={(e) => onPlanChange(e, PricingPlans.Pro10K)}
+                onChange={onPlanChange}
                 value={PricingPlans.Pro10K}
               >
                 <option value={PricingPlans.Free}>Free</option>
@@ -663,7 +651,9 @@ export default function CompareTable() {
             className="bg-white/3 px-4 py-0"
           >
             <CompareValue type="list">
-              <span>Password</span>
+              <Tooltip content="mTLS ensures two-way authentication where both client and server authenticate each other at the same time in the authentication protocol.">
+                TLS
+              </Tooltip>
             </CompareValue>
           </td>
           <td
@@ -671,7 +661,9 @@ export default function CompareTable() {
             className="bg-emerald-300/10 px-4 py-0"
           >
             <CompareValue type="list">
-              <span>Password</span>
+              <Tooltip content="mTLS ensures two-way authentication where both client and server authenticate each other at the same time in the authentication protocol.">
+                TLS
+              </Tooltip>
             </CompareValue>
           </td>
           <td
@@ -679,9 +671,21 @@ export default function CompareTable() {
             className="bg-white/3 px-4 py-0"
           >
             <CompareValue type="list">
-              <span>Password</span>
-              <span>VPC Peering</span>
-              <span>IP Whitelisting</span>
+              <Tooltip content="mTLS ensures two-way authentication where both client and server authenticate each other at the same time in the authentication protocol.">
+                TLS
+              </Tooltip>
+              <Tooltip content="VPC Peering enables you to connect to Upstash from your own VPC using private IP. Cluster and your application can run in the same subnet which also minimizes data transfer costs.">
+                VPC Peering
+              </Tooltip>
+              <Tooltip content="You can set the IP addresses which will have access to your database.">
+                IP Whitelisting
+              </Tooltip>
+              <Tooltip content="AWS Private link helps you to access to Upstash Cluster with a private network link inside AWS infrastructure.">
+                AWS Private Link
+              </Tooltip>
+              <Tooltip content="Upstash encrypts the block storage where your data is persisted and stored.">
+                Encryption at REST
+              </Tooltip>
             </CompareValue>
           </td>
           <td
@@ -689,9 +693,21 @@ export default function CompareTable() {
             className="bg-white/3 px-4 py-0"
           >
             <CompareValue type="list">
-              <span>Password</span>
-              <span>VPC Peering</span>
-              <span>IP Whitelisting</span>
+              <Tooltip content="mTLS ensures two-way authentication where both client and server authenticate each other at the same time in the authentication protocol.">
+                TLS
+              </Tooltip>
+              <Tooltip content="VPC Peering enables you to connect to Upstash from your own VPC using private IP. Cluster and your application can run in the same subnet which also minimizes data transfer costs.">
+                VPC Peering
+              </Tooltip>
+              <Tooltip content="You can set the IP addresses which will have access to your database.">
+                IP Whitelisting
+              </Tooltip>
+              <Tooltip content="AWS Private link helps you to access to Upstash Cluster with a private network link inside AWS infrastructure.">
+                AWS Private Link
+              </Tooltip>
+              <Tooltip content="Upstash encrypts the block storage where your data is persisted and stored.">
+                Encryption at REST
+              </Tooltip>
             </CompareValue>
           </td>
         </tr>
