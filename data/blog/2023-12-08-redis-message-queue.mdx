@@ -5,6 +5,7 @@ description: Learn to build a high-performance message queue with Redis. Discove
 authors:
   - oguzhan
 tags: [redis, nextjs]
+draft: true
 ---
 
 Have you ever tried to create your own Message Queue but faced challenges?
@@ -23,8 +24,9 @@ While there are several methods to construct message queues with Redis, such as 
 
 ## **Setting up Upstash Redis**
 
-First, we need to setup a Redis instance for ourselves, we just need this connection string to connect our client. I'm not gonna go into detail of this just head over to [Upstash](https://console.upstash.com/redis)
-and click on **Create Database**, then scroll down, and grab your connection string.
+First, let's set up a Redis instance. To do this, simply go to Upstash and click on **Create Database**.
+After that, scroll down to find your connection string, which is what we'll use to connect our client.
+I won't go into the details here, but that's essentially what you need to get started.
 
 ### Example connection string:
 
@@ -34,7 +36,7 @@ redis://XXXXe@social-XXX-39281.upstash.io:39281
 
 ## Project Kickoff
 
-Let's create our Typescript project with Bun. And not because it's faster than Node, but it's much easier to setup. But, it's also pretty fast 🚀.
+Let's start our Typescript project using Bun. The choice isn't just because it's faster than Node—it's also much easier to set up. And yes, it's impressively fast too! 🚀
 
 ```bash
 mkdir upstash-mq
@@ -68,12 +70,16 @@ bun add ioredis
  ┗ 📜tsconfig.json
 ```
 
-We will start off by defining our `Job` class first and visual representation of our `Queue` will be like:
+Visual representation of our `Queue` will be like:
 
-So, our `Job` requires a couple of critical stuff. Status, we need to know the status of our jobs in order to
-decide what to do next. Such as if we should process them or retry them maybe put them somewhere else if they are
-already finished. And, of course we need to have `id` and `data` - data has to be generic so we can give our users a good user experience using types.
-And, of course we need to borrow instance from the queue and the queue name.
+![Queue Process](/blog/redis-message-queue/queue-process.png)
+
+## Job
+
+Our Job class needs a few key things. First, we need to track the status of each job.
+This helps us decide whether to process them, try them again, or move them elsewhere if they're already finished.
+Each job also has an ID and some data, which needs to be generic so we can provide a great user experience.
+Lastly, we need to link each job to its queue and include the queue name for easy management.
 
 Here are the backbones of our `Job` class:
 
@@ -106,6 +112,7 @@ export class Job<T> {
 
 To make the `data` generic, we need to first make the `Job` itself generic. The rest follows in a straightforward manner.
 We could create a separate Redis instance for each `Job` element, but managing this would be complex.
+
 Fortunately, our approach allows for easy configuration of the Redis instance within the queue, and we can simply pass this instance as needed. The same principle applies to `queueName`. Since we'll frequently use it to save jobs to queues, our jobs must be aware of their parent queues.
 To able to save jobs into queues we need a two thing, a lua script to interact with Redis and some utilies.
 
@@ -132,7 +139,7 @@ export const convertToJSONString = <T>(
 ```
 
 Since manually creating our queue name each time we use Redis isn't ideal, we've made a utility called `formatMessageQueueKey`.
-This utility simply concatenates strings together. Additionally, we need to serialize our data for safe storage in Redis - we can't just pass JS objects as a data source they need to be converted into string first.
+This utility simply concatenates strings together. Additionally, we need to serialize our data to store in Redis - we can't just pass JS objects as a data source they need to be converted into string first.
 Given that data is generic, we've implemented a generic function, `convertToJSONString`, for this purpose.
 
 Now, let's add our first lua script:
@@ -212,18 +219,18 @@ fromId = async <T>(jobId: string): Promise<Job<T> | null> => {
   };
 
 private fromData = <T>(jobId: string, stringifiedJobData: string): Job<T> => {
-const parsedData = JSON.parse(stringifiedJobData) as Job<T>;
-const job = new Job<T>(this.config, parsedData.data, jobId);
-job.status = parsedData.status;
-return job;
+    const parsedData = JSON.parse(stringifiedJobData) as Job<T>;
+    const job = new Job<T>(this.config, parsedData.data, jobId);
+    job.status = parsedData.status;
+    return job;
 };
 ```
 
-At this moment, we may not need these functions, but they will become crucial when we start processing jobs in the future. At that point, we'll only have the job's ID `(jobId)`, and we will need a method to reconstruct our Jobs from scratch. This is precisely what `fromId` accomplishes. It retrieves the job data from Redis, converts it into a Job instance, and returns it, so the queue can later process this job.
+Right now, we may not need these functions, but they will become crucial when we start processing jobs in the future. At that point, we'll only have the job's ID `(jobId)`, and we will need a method to reconstruct our Jobs from scratch. This is precisely what `fromId` accomplishes. It retrieves the job data from Redis, converts it into a Job instance, and returns it, so the queue can later process this job.
 
 ## Moving on to Queue
 
-Having completed the `save()` part, let's delve into the details of Queue. Here are our objectives:
+Having completed the `save()` part, let's dive into the details of Queue. Here are our objectives:
 
 - We aim for our queue to either retain or remove data upon success or failure, as there may be cases where reprocessing is needed later.
 - We intend to design the queue for concurrency, enabling multiple jobs to run simultaneously.
@@ -264,14 +271,11 @@ export class Queue extends EventEmitter {
 }
 ```
 
-We have a `config`, to accept some information from outside like queue name, redis instance or retain and remove info.
-We don't care about which Redis they used, although we prefer Upstash 😌 they can pass anything they want and some other info.
-
 The Queue class includes a config to accept external information, such as the queue name, Redis instance, and settings for retaining or removing data.
 We welcome any Redis implementation that users prefer, although we have a special preference for Upstash 😌.
 This flexibility allows users to integrate the queue into their existing systems with ease.
 
-And, our class extends EventEmitter to notify them when something happens.
+And, our class extends [Event Emitter](https://nodejs.org/docs/latest/api/events.html) to notify them when something happens.
 
 #### Here is an example initialization:
 
@@ -305,7 +309,7 @@ const queue = new Queue({
 });
 
 const payload = {
-  hello: "world",
+  upstash: "best-redis-ever",
 };
 
 await queue.add(payload);
@@ -313,9 +317,9 @@ await queue.add(payload);
 
 Now, we need a way to process them.
 
-#### Add
+#### Processing
 
-This is the most challenging part of our queue implementation. We require our users to specify the number of concurrent processes and provide a worker – a callback function to process jobs that will infer the job's type.
+This is the most challenging part of our queue implementation. We require our users to specify the number of concurrent processes and provide a worker – **a callback function to process jobs that will infer the job's type.**
 Additionally, we need a mechanism to track the number of jobs currently running and queued, enabling us to safely select the next job from the queue.
 
 ```typescript
@@ -334,11 +338,12 @@ Additionally, we need a mechanism to track the number of jobs currently running 
 
 The primary purpose of accepting the generic `TJobPayload` is to enhance the developer experience for our users.
 We aim to enable them to benefit from intellisense when using our queue.
-Users are aware that they have stored data like `{hello: "world"}` in the Job, but TypeScript needs assistance to provide accurate intellisense. This is why we have this mechanism in place, to inform TypeScript and facilitate a more intuitive coding experience.
+Users are aware that they have stored data like `{hello: "world"}` in the Job, but TypeScript needs assistance to provide accurate intellisense.
+This is why we have this mechanism in place, to inform TypeScript and force it to infer for better developer experience.
 
-"Before progressing to `jobTick()`, let's carefully consider the process:
+Before progressing to `jobTick()`, let's carefully consider the process:
 
-- As our queue operates on a FIFO (First In First Out) basis, we need to start by popping a job from the queue.
+- As our queue operates on a FIFO (First In First Out) basis, we need to start by popping a job from the right of the queue.
 - Next, we run our worker function on this job.
 - After the job is completed, we emit the result to our user.
 - Finally, we call `jobTick()` again to process the next job.
@@ -524,7 +529,32 @@ Finally, we have two remaining methods, which I won't detail extensively, as the
   }
 ```
 
-One method is to completely wipe the entire queue, and the other is to delete a specific job from the queue.
+### remove-job.lua
+
+```lua
+--[[
+key 1 -> [prefix]:test:succeeded
+key 2 -> [prefix]:test:failed
+key 3 -> [prefix]:test:waiting
+key 4 -> [prefix]:test:active
+key 5 -> [prefix]:test:jobs
+arg 1 -> jobId
+]]
+
+local jobId = ARGV[1]
+
+if (redis.call("sismember", KEYS[1], jobId) + redis.call("sismember", KEYS[2], jobId)) == 0 then
+  redis.call("lrem", KEYS[3], 0, jobId)
+  redis.call("lrem", KEYS[4], 0, jobId)
+end
+
+redis.call("srem", KEYS[1], jobId)
+redis.call("srem", KEYS[2], jobId)
+redis.call("hdel", KEYS[5], jobId)
+
+```
+
+`destroy()` is to completely wipe the entire queue, and the other is to delete a specific job from the queue.
 
 ## Let's see everything in action
 
@@ -575,8 +605,11 @@ async function generateQueueItems(queue: Queue, itemCount: number) {
 
 - Implement retry logic with exponential backoffs for both Redis access and worker processes.
 - Develop an 'at least once' guarantee mechanism.
-- Explore running workers in service workers.
+- Try to execute workers in service workers for better performance
+- Add scheduled jobs
 
 ## Wrap up
 
-The best way to learn something is by building it, and an even better approach is to do so using Upstash Redis. Keep rocking.
+The best way to learn something is by building it, and an even better approach is to do so using [Upstash Redis](https://upstash.com/). Keep rocking.
+
+[🔗 Project's Github address](https://github.com/ogzhanolguncu/ts-message-queue)
