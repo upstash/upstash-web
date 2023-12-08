@@ -19,11 +19,9 @@ const Tooltip = ({
             className="
             max-w-xl
             select-none
-            rounded-[4px]
+            rounded-xl
             bg-white
-            px-[15px]
-            py-[10px]
-            leading-none
+            p-4
             text-zinc-950
             drop-shadow-2xl
             will-change-[transform,opacity]"
@@ -31,7 +29,7 @@ const Tooltip = ({
           >
             {content}
 
-            <Tooltip1.Arrow className="fill-white" />
+            <Tooltip1.Arrow className="h-2 w-4 fill-white" />
           </Tooltip1.Content>
         </Tooltip1.Portal>
       </Tooltip1.Root>

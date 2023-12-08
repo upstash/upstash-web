@@ -7,6 +7,7 @@ import cx from "@/utils/cx";
 
 export default function CompareValue({
   type = "plain",
+  prefix = "",
   suffix = "",
   after,
   valid = true,
@@ -15,6 +16,7 @@ export default function CompareValue({
   ...props
 }: HTMLProps<HTMLSpanElement> & {
   type?: "plain" | "size" | "boolean" | "list" | "number";
+  prefix?: string;
   suffix?: string;
   after?: React.ReactNode;
   valid?: boolean;
@@ -24,13 +26,11 @@ export default function CompareValue({
       className={`flex items-center justify-center border-b border-b-white/3 py-5 ${className}`}
       {...props}
     >
+      {prefix && <span className="mr-1 text-white/40">{prefix}</span>}
+
       {type === "plain" && children}
 
-      {type === "size" && (
-        <>
-          {children} <span className="ml-1 text-white/40">{suffix}</span>
-        </>
-      )}
+      {type === "size" && children}
 
       {type === "boolean" && (
         <span className="text-zinc-400">
@@ -68,6 +68,7 @@ export default function CompareValue({
 
       {type === "number" && Number(children).toLocaleString()}
 
+      {suffix && <span className="ml-1 text-white/40">{suffix}</span>}
       {after}
     </span>
   );

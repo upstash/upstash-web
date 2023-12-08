@@ -1,3 +1,4 @@
+import * as React from "react";
 import { ChangeEvent, useState } from "react";
 
 import { PricingPlans } from "@/utils/type";
@@ -66,7 +67,7 @@ export default function CompareTable() {
             hidden={isMobile ? !showFree : false}
             className="border-b border-b-zinc-800 bg-zinc-950 p-0"
           >
-            <div className="flex h-16 items-center justify-center bg-white/3">
+            <div className="flex h-24 flex-col items-center justify-center bg-white/3">
               <h4 className="hidden text-lg font-semibold text-emerald-400 md:block">
                 Free
               </h4>
@@ -88,7 +89,7 @@ export default function CompareTable() {
             hidden={isMobile ? !showPayg : false}
             className="border-b border-b-zinc-800 bg-zinc-950 p-0"
           >
-            <div className="flex h-16 items-center justify-center bg-emerald-300/10">
+            <div className="flex h-24 flex-col items-center justify-center bg-emerald-300/10">
               <h4 className="hidden text-lg font-semibold text-emerald-400 md:block">
                 Pay as you go
               </h4>
@@ -104,13 +105,20 @@ export default function CompareTable() {
                 </option>
                 <option value={PricingPlans.Enterprise}>Pro</option>
               </select>
+
+              <h5 className="flex items-baseline font-semibold">
+                $1
+                <span className="ml-1 text-base font-normal opacity-40">
+                  / 100K messages
+                </span>
+              </h5>
             </div>
           </th>
           <th
             hidden={isMobile ? !showEnterprise : false}
             className="border-b border-b-zinc-800 bg-zinc-950 p-0"
           >
-            <div className="flex h-16 items-center justify-center bg-white/3">
+            <div className="flex h-24 flex-col items-center justify-center bg-white/3">
               <h4 className="hidden text-lg font-semibold text-emerald-400 md:block">
                 Pro
               </h4>
@@ -126,6 +134,13 @@ export default function CompareTable() {
                   Pro
                 </option>
               </select>
+
+              <h5 className="flex items-baseline font-semibold">
+                $180
+                <span className="ml-1 text-base font-normal opacity-40">
+                  / month
+                </span>
+              </h5>
             </div>
           </th>
         </tr>

@@ -2,6 +2,14 @@ import * as React from "react";
 import { ChangeEvent, useState } from "react";
 
 import { PricingPlans } from "@/utils/type";
+import {
+  IconCreditCard,
+  IconDatabase,
+  IconHeadphones,
+  IconInfoCircle,
+  IconRocket,
+  IconShieldLock,
+} from "@tabler/icons-react";
 
 import useIsMobile from "@/hooks/use-is-mobile";
 
@@ -72,13 +80,13 @@ export default function CompareTable() {
             hidden={isMobile ? !showFree : false}
             className="border-b border-b-zinc-800 bg-zinc-950 p-0"
           >
-            <div className="flex h-16 items-center justify-center bg-white/3">
+            <div className="flex h-24 flex-col items-center justify-center bg-white/3">
               <h4 className="hidden text-lg font-semibold text-emerald-400 md:block">
                 Free
               </h4>
 
               <select
-                className="bg-transparent px-4 py-2 font-semibold md:hidden"
+                className="mb-2 bg-white/5 px-4 py-2 font-semibold md:hidden"
                 onChange={onPlanChange}
                 value={PricingPlans.Free}
               >
@@ -95,13 +103,13 @@ export default function CompareTable() {
             hidden={isMobile ? !showPayg : false}
             className="border-b border-b-zinc-800 bg-zinc-950 p-0"
           >
-            <div className="flex h-16 items-center justify-center bg-emerald-300/10">
+            <div className="flex h-24 flex-col items-center justify-center bg-emerald-300/10">
               <h4 className="hidden text-lg font-semibold text-emerald-400 md:block">
                 Pay as you go
               </h4>
 
               <select
-                className="bg-transparent px-4 py-2 font-semibold md:hidden"
+                className="mb-2 bg-white/5 px-4 py-2 font-semibold md:hidden"
                 onChange={onPlanChange}
                 value={PricingPlans.PayAsYouGo}
               >
@@ -112,19 +120,26 @@ export default function CompareTable() {
                 <option value={PricingPlans.Pro2K}>Pro 2K</option>
                 <option value={PricingPlans.Pro10K}>Pro 10K</option>
               </select>
+
+              <h5 className="flex items-baseline font-semibold">
+                $0.2
+                <span className="ml-1 text-base font-normal opacity-40">
+                  / 100K messages
+                </span>
+              </h5>
             </div>
           </th>
           <th
             hidden={isMobile ? !showPro2 : false}
             className="border-b border-b-zinc-800 bg-zinc-950 p-0"
           >
-            <div className="flex h-16 items-center justify-center bg-white/3">
+            <div className="flex h-24 flex-col items-center justify-center bg-white/3">
               <h4 className="hidden text-lg font-semibold text-emerald-400 md:block">
                 Pro 2K
               </h4>
 
               <select
-                className="bg-transparent px-4 py-2 font-semibold md:hidden"
+                className="mb-2 bg-white/5 px-4 py-2 font-semibold md:hidden"
                 onChange={onPlanChange}
                 value={PricingPlans.Pro2K}
               >
@@ -135,19 +150,26 @@ export default function CompareTable() {
                 </option>
                 <option value={PricingPlans.Pro10K}>Pro 10K</option>
               </select>
+
+              <h5 className="flex items-baseline font-semibold">
+                $320
+                <span className="ml-1 text-base font-normal opacity-40">
+                  / month
+                </span>
+              </h5>
             </div>
           </th>
           <th
             hidden={isMobile ? !showPro10 : false}
             className="border-b border-b-zinc-800 bg-zinc-950 p-0"
           >
-            <div className="flex h-16 items-center justify-center bg-white/3">
+            <div className="flex h-24 flex-col items-center justify-center bg-white/3">
               <h4 className="hidden text-lg font-semibold text-emerald-400 md:block">
                 Pro 10K
               </h4>
 
               <select
-                className="bg-transparent px-4 py-2 font-semibold md:hidden"
+                className="mb-2 bg-white/5 px-4 py-2 font-semibold md:hidden"
                 onChange={onPlanChange}
                 value={PricingPlans.Pro10K}
               >
@@ -158,6 +180,13 @@ export default function CompareTable() {
                   Pro 10K
                 </option>
               </select>
+
+              <h5 className="flex items-baseline font-semibold">
+                $520
+                <span className="ml-1 text-base font-normal opacity-40">
+                  / month
+                </span>
+              </h5>
             </div>
           </th>
         </tr>
@@ -174,22 +203,7 @@ export default function CompareTable() {
             <div className="-ml-4 flex h-16 items-center bg-gradient-to-r from-zinc-900 to-zinc-950 px-4">
               <span className="flex items-center gap-2 text-lg font-semibold">
                 <span className="flex items-center rounded-full bg-white/10 p-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.6"
-                    stroke="currentColor"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <title> </title>
-                    <path d="M12 6m-8 0a8 3 0 1 0 16 0a8 3 0 1 0 -16 0" />
-                    <path d="M4 6v6a8 3 0 0 0 16 0v-6" />
-                    <path d="M4 12v6a8 3 0 0 0 16 0v-6" />
-                  </svg>
+                  <IconDatabase width="20" height="20" strokeWidth={1.5} />
                 </span>
 
                 <span>Capacity</span>
@@ -451,22 +465,7 @@ export default function CompareTable() {
             <div className="-ml-4 flex h-16 items-center bg-gradient-to-r from-zinc-900 to-zinc-950 px-4">
               <span className="flex items-center gap-2 text-lg font-semibold">
                 <span className="flex items-center rounded-full bg-white/10 p-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.6"
-                    stroke="currentColor"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <title> </title>
-                    <path d="M4 13a8 8 0 0 1 7 7a6 6 0 0 0 3 -5a9 9 0 0 0 6 -8a3 3 0 0 0 -3 -3a9 9 0 0 0 -8 6a6 6 0 0 0 -5 3" />
-                    <path d="M7 14a6 6 0 0 0 -3 6a6 6 0 0 0 6 -3" />
-                    <path d="M15 9m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
-                  </svg>
+                  <IconRocket width="20" height="20" strokeWidth={1.5} />
                 </span>
 
                 <span>Backend Features</span>
@@ -586,22 +585,7 @@ export default function CompareTable() {
             <div className="-ml-4 flex h-16 items-center bg-gradient-to-r from-zinc-900 to-zinc-950 px-4">
               <span className="flex items-center gap-2 text-lg font-semibold">
                 <span className="flex items-center rounded-full bg-white/10 p-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.6"
-                    stroke="currentColor"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <title> </title>
-                    <path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3" />
-                    <path d="M12 11m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
-                    <path d="M12 12l0 2.5" />
-                  </svg>
+                  <IconShieldLock width="20" height="20" strokeWidth={1.5} />
                 </span>
 
                 <span>Security and Privacy</span>
@@ -651,7 +635,7 @@ export default function CompareTable() {
             className="bg-white/3 px-4 py-0"
           >
             <CompareValue type="list">
-              <Tooltip content="mTLS ensures two-way authentication where both client and server authenticate each other at the same time in the authentication protocol.">
+              <Tooltip content="Once TLS is enabled, the data transfer between the client and database is encrypted.">
                 TLS
               </Tooltip>
             </CompareValue>
@@ -661,7 +645,7 @@ export default function CompareTable() {
             className="bg-emerald-300/10 px-4 py-0"
           >
             <CompareValue type="list">
-              <Tooltip content="mTLS ensures two-way authentication where both client and server authenticate each other at the same time in the authentication protocol.">
+              <Tooltip content="Once TLS is enabled, the data transfer between the client and database is encrypted.">
                 TLS
               </Tooltip>
             </CompareValue>
@@ -671,8 +655,11 @@ export default function CompareTable() {
             className="bg-white/3 px-4 py-0"
           >
             <CompareValue type="list">
-              <Tooltip content="mTLS ensures two-way authentication where both client and server authenticate each other at the same time in the authentication protocol.">
+              <Tooltip content="Once TLS is enabled, the data transfer between the client and database is encrypted.">
                 TLS
+              </Tooltip>
+              <Tooltip content="mTLS ensures two-way authentication where both client and server authenticate each other at the same time in the authentication protocol.">
+                mTLS
               </Tooltip>
               <Tooltip content="VPC Peering enables you to connect to Upstash from your own VPC using private IP. Cluster and your application can run in the same subnet which also minimizes data transfer costs.">
                 VPC Peering
@@ -682,9 +669,6 @@ export default function CompareTable() {
               </Tooltip>
               <Tooltip content="AWS Private link helps you to access to Upstash Cluster with a private network link inside AWS infrastructure.">
                 AWS Private Link
-              </Tooltip>
-              <Tooltip content="Upstash encrypts the block storage where your data is persisted and stored.">
-                Encryption at REST
               </Tooltip>
             </CompareValue>
           </td>
@@ -696,6 +680,9 @@ export default function CompareTable() {
               <Tooltip content="mTLS ensures two-way authentication where both client and server authenticate each other at the same time in the authentication protocol.">
                 TLS
               </Tooltip>
+              <Tooltip content="mTLS ensures two-way authentication where both client and server authenticate each other at the same time in the authentication protocol.">
+                mTLS
+              </Tooltip>
               <Tooltip content="VPC Peering enables you to connect to Upstash from your own VPC using private IP. Cluster and your application can run in the same subnet which also minimizes data transfer costs.">
                 VPC Peering
               </Tooltip>
@@ -704,9 +691,6 @@ export default function CompareTable() {
               </Tooltip>
               <Tooltip content="AWS Private link helps you to access to Upstash Cluster with a private network link inside AWS infrastructure.">
                 AWS Private Link
-              </Tooltip>
-              <Tooltip content="Upstash encrypts the block storage where your data is persisted and stored.">
-                Encryption at REST
               </Tooltip>
             </CompareValue>
           </td>
@@ -817,22 +801,7 @@ export default function CompareTable() {
             <div className="-ml-4 flex h-16 items-center bg-gradient-to-r from-zinc-900 to-zinc-950 px-4">
               <span className="flex items-center gap-2 text-lg font-semibold">
                 <span className="flex items-center rounded-full bg-white/10 p-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.6"
-                    stroke="currentColor"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <title> </title>
-                    <path d="M4 13m0 2a2 2 0 0 1 2 -2h1a2 2 0 0 1 2 2v3a2 2 0 0 1 -2 2h-1a2 2 0 0 1 -2 -2z" />
-                    <path d="M15 13m0 2a2 2 0 0 1 2 -2h1a2 2 0 0 1 2 2v3a2 2 0 0 1 -2 2h-1a2 2 0 0 1 -2 -2z" />
-                    <path d="M4 15v-3a8 8 0 0 1 16 0v3" />
-                  </svg>
+                  <IconHeadphones width="20" height="20" strokeWidth={1.5} />
                 </span>
 
                 <span>Support</span>
@@ -977,6 +946,172 @@ export default function CompareTable() {
             </CompareValue>
           </td>
         </tr>
+
+        {/**/}
+
+        <tr>
+          <th
+            colSpan={isMobile ? 2 : 5}
+            className="sticky top-20 z-10 p-0 text-left md:top-0"
+          >
+            <div className="-ml-4 flex h-16 items-center bg-gradient-to-r from-zinc-900 to-zinc-950 px-4">
+              <span className="flex items-center gap-2 text-lg font-semibold">
+                <span className="flex items-center rounded-full bg-white/10 p-2">
+                  <IconCreditCard width="20" height="20" strokeWidth={1.5} />
+                </span>
+                <span>Price</span>
+              </span>
+            </div>
+          </th>
+        </tr>
+
+        <tr>
+          <th className="px-0 py-4 text-left font-normal text-white/60">
+            Monthly price
+          </th>
+          {/**/}
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="bg-white/3 px-4 py-0"
+          >
+            <CompareValue>Free</CompareValue>
+          </td>
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="bg-emerald-300/10 px-4 py-0"
+          >
+            <CompareValue>None</CompareValue>
+          </td>
+          <td
+            hidden={isMobile ? !showPro2 : false}
+            className="bg-white/3 px-4 py-0"
+          >
+            <CompareValue>$320</CompareValue>
+          </td>
+          <td
+            hidden={isMobile ? !showPro10 : false}
+            className="bg-white/3 px-4 py-0"
+          >
+            <CompareValue>$520</CompareValue>
+          </td>
+        </tr>
+        <tr>
+          <th className="px-0 py-4 text-left font-normal text-white/60">
+            Request price
+          </th>
+          {/**/}
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="bg-white/3 px-4 py-0"
+          >
+            <CompareValue>Free</CompareValue>
+          </td>
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="bg-emerald-300/10 px-4 py-0"
+          >
+            <CompareValue>$0.2 per 100K</CompareValue>
+          </td>
+          <td
+            hidden={isMobile ? !showPro2 : false}
+            className="bg-white/3 px-4 py-0"
+          >
+            <CompareValue>None</CompareValue>
+          </td>
+          <td
+            hidden={isMobile ? !showPro10 : false}
+            className="bg-white/3 px-4 py-0"
+          >
+            <CompareValue>None</CompareValue>
+          </td>
+        </tr>
+        <tr>
+          <th className="px-0 py-4 text-left font-normal text-white/60">
+            Storage price
+          </th>
+          {/**/}
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="bg-white/3 px-4 py-0"
+          >
+            <CompareValue>Free</CompareValue>
+          </td>
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="bg-emerald-300/10 px-4 py-0"
+          >
+            <CompareValue>$0.25 per GB</CompareValue>
+          </td>
+          <td
+            hidden={isMobile ? !showPro2 : false}
+            className="bg-white/3 px-4 py-0"
+          >
+            <CompareValue>$0.25 per GB</CompareValue>
+          </td>
+          <td
+            hidden={isMobile ? !showPro10 : false}
+            className="bg-white/3 px-4 py-0"
+          >
+            <CompareValue>$0.25 per GB</CompareValue>
+          </td>
+        </tr>
+
+        <tr>
+          <th className="px-0 py-4 text-left font-normal text-white/60">
+            Bandwidth price
+          </th>
+          {/**/}
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="bg-white/3 px-4 py-0"
+          >
+            <CompareValue>Free</CompareValue>
+          </td>
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="bg-emerald-300/10 px-4 py-0"
+          >
+            <CompareValue
+              after={
+                <Tooltip content="Free up to 200GB per month. Beyond that, $0.1 per GB.">
+                  <IconInfoCircle className="ml-1 opacity-60" stroke={1.2} />
+                </Tooltip>
+              }
+            >
+              Free{" "}
+            </CompareValue>
+          </td>
+          <td
+            hidden={isMobile ? !showPro2 : false}
+            className="bg-white/3 px-4 py-0"
+          >
+            <CompareValue
+              after={
+                <Tooltip content="Price can change depending on cloud provider's fee.">
+                  <IconInfoCircle className="ml-1 opacity-60" stroke={1.2} />
+                </Tooltip>
+              }
+            >
+              $0.1 per GB out and $0.05 per GB in
+            </CompareValue>
+          </td>
+          <td
+            hidden={isMobile ? !showPro10 : false}
+            className="bg-white/3 px-4 py-0"
+          >
+            <CompareValue
+              after={
+                <Tooltip content="Price can change depending on cloud provider's fee.">
+                  <IconInfoCircle className="ml-1 opacity-60" stroke={1.2} />
+                </Tooltip>
+              }
+            >
+              $0.1 per GB out and $0.05 per GB in
+            </CompareValue>
+          </td>
+        </tr>
+
+        {/**/}
 
         <tr>
           <th className="p-0" />

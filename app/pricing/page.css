@@ -5,10 +5,34 @@ code {
 .faq [data-state="open"] + [data-state="closed"] {
   @apply border-t-transparent;
 }
+
 .faq .faq-body a {
   @apply text-emerald-400 underline;
 }
 
-.faq .mini-table :where(th, td){
+.mini-table {
+  @apply rounded-xl text-sm border-2 border-zinc-100;
+}
+
+.mini-table :where(th, td) {
+  @apply px-4 py-2;
+}
+
+.mini-table th {
+  @apply bg-zinc-100 text-left;
+}
+
+.mini-table td {
+  @apply min-w-[120px] border-b border-zinc-100;
+}
+
+.faq .mini-table {
   @apply border-zinc-800;
+}
+.faq .mini-table th {
+  @apply bg-zinc-800;
+}
+
+.faq .mini-table td {
+  @apply border-b-zinc-800;
 }
