@@ -12,29 +12,16 @@ import CompareValue from "../compare-value";
 export default function CompareTable() {
   const isMobile = useIsMobile();
 
-  const [selectedPlans, setSelectedPlans] = useState([
-    PricingPlans.Free,
-    // PricingPlans.PayAsYouGo,
-  ]);
+  const [selectedPlans, setSelectedPlans] = useState(PricingPlans.Free);
 
-  const showFree = selectedPlans.includes(PricingPlans.Free);
-  const showPayg = selectedPlans.includes(PricingPlans.PayAsYouGo);
-  const showPro2 = selectedPlans.includes(PricingPlans.Pro2K);
-  const showPro10 = selectedPlans.includes(PricingPlans.Pro10K);
+  const showFree = selectedPlans === PricingPlans.Free;
+  const showPayg = selectedPlans === PricingPlans.PayAsYouGo;
+  const showPro2 = selectedPlans === PricingPlans.Pro2K;
+  const showPro10 = selectedPlans === PricingPlans.Pro10K;
 
-  const onPlanChange = (
-    event: ChangeEvent<HTMLSelectElement>,
-    plan: PricingPlans,
-  ) => {
+  const onPlanChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value as PricingPlans;
-    const index = selectedPlans.indexOf(plan);
-
-    setSelectedPlans((prev) => {
-      if (index === 0) {
-        return [value, prev[1]];
-      }
-      return [prev[0], value];
-    });
+    setSelectedPlans(value);
   };
 
   return (
@@ -84,14 +71,14 @@ export default function CompareTable() {
             hidden={isMobile ? !showFree : false}
             className="border-b border-b-zinc-800 bg-zinc-950 p-0"
           >
-            <div className="flex h-16 items-center justify-center bg-white/3">
+            <div className="flex h-24 flex-col items-center justify-center bg-white/3">
               <h4 className="hidden text-lg font-semibold text-emerald-400 md:block">
                 Free
               </h4>
 
               <select
-                className="bg-transparent px-4 py-2 font-semibold md:hidden"
-                onChange={(e) => onPlanChange(e, PricingPlans.Free)}
+                className="mb-2 bg-white/5 px-4 py-2 font-semibold md:hidden"
+                onChange={onPlanChange}
                 value={PricingPlans.Free}
               >
                 <option value={PricingPlans.Free} disabled>
@@ -101,20 +88,22 @@ export default function CompareTable() {
                 <option value={PricingPlans.Pro2K}>Pro 2K</option>
                 <option value={PricingPlans.Pro10K}>Pro 10K</option>
               </select>
+
+              <h5 className="font-semibold">$0</h5>
             </div>
           </th>
           <th
             hidden={isMobile ? !showPayg : false}
             className="border-b border-b-zinc-800 bg-zinc-950 p-0"
           >
-            <div className="flex h-16 items-center justify-center bg-white/10">
+            <div className="flex h-24 flex-col items-center justify-center bg-white/3">
               <h4 className="hidden text-lg font-semibold text-emerald-400 md:block">
                 Pay as you go
               </h4>
 
               <select
-                className="bg-transparent px-4 py-2 font-semibold md:hidden"
-                onChange={(e) => onPlanChange(e, PricingPlans.PayAsYouGo)}
+                className="mb-2 bg-white/5 px-4 py-2 font-semibold md:hidden"
+                onChange={onPlanChange}
                 value={PricingPlans.PayAsYouGo}
               >
                 <option value={PricingPlans.Free}>Free</option>
@@ -124,20 +113,22 @@ export default function CompareTable() {
                 <option value={PricingPlans.Pro2K}>Pro 2K</option>
                 <option value={PricingPlans.Pro10K}>Pro 10K</option>
               </select>
+
+              <h5 className="font-semibold">$0.2</h5>
             </div>
           </th>
           <th
             hidden={isMobile ? !showPro2 : false}
             className="border-b border-b-zinc-800 bg-zinc-950 p-0"
           >
-            <div className="flex h-16 items-center justify-center bg-white/3">
+            <div className="flex h-24 flex-col items-center justify-center bg-white/3">
               <h4 className="hidden text-lg font-semibold text-emerald-400 md:block">
                 Pro 2K
               </h4>
 
               <select
-                className="bg-transparent px-4 py-2 font-semibold md:hidden"
-                onChange={(e) => onPlanChange(e, PricingPlans.Pro2K)}
+                className="mb-2 bg-white/5 px-4 py-2 font-semibold md:hidden"
+                onChange={onPlanChange}
                 value={PricingPlans.Pro2K}
               >
                 <option value={PricingPlans.Free}>Free</option>
@@ -147,20 +138,27 @@ export default function CompareTable() {
                 </option>
                 <option value={PricingPlans.Pro10K}>Pro 10K</option>
               </select>
+
+              <h5 className="flex items-baseline font-semibold">
+                $280
+                <span className="ml-1 text-base font-normal opacity-40">
+                  / month
+                </span>
+              </h5>
             </div>
           </th>
           <th
             hidden={isMobile ? !showPro10 : false}
             className="border-b border-b-zinc-800 bg-zinc-950 p-0"
           >
-            <div className="flex h-16 items-center justify-center bg-white/3">
+            <div className="flex h-24 flex-col items-center justify-center bg-white/3">
               <h4 className="hidden text-lg font-semibold text-emerald-400 md:block">
                 Pro 10K
               </h4>
 
               <select
-                className="bg-transparent px-4 py-2 font-semibold md:hidden"
-                onChange={(e) => onPlanChange(e, PricingPlans.Pro10K)}
+                className="mb-2 bg-white/5 px-4 py-2 font-semibold md:hidden"
+                onChange={onPlanChange}
                 value={PricingPlans.Pro10K}
               >
                 <option value={PricingPlans.Free}>Free</option>
@@ -170,6 +168,13 @@ export default function CompareTable() {
                   Pro 10K
                 </option>
               </select>
+
+              <h5 className="flex items-baseline font-semibold">
+                $680
+                <span className="ml-1 text-base font-normal opacity-40">
+                  / month
+                </span>
+              </h5>
             </div>
           </th>
         </tr>

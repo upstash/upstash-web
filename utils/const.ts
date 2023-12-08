@@ -15,6 +15,10 @@ export const TAG_NAMES = {
   "cloudflare-workers": "Cloudflare Workers",
   qstash: "QStash",
   nextjs: "Next.js",
+  fly: "Fly.io",
+  ai: "AI",
+  openai: "OpenAI",
+  nestjs: "NestJS",
 };
 
 export enum HOME_SECTIONS {

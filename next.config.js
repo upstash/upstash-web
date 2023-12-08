@@ -10,7 +10,16 @@ const nextConfig = {
   },
   reactStrictMode: false,
   images: {
-    domains: ["github.com", "avatars.githubusercontent.com"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "github.com",
+      },
+      {
+        protocol: "https",
+        hostname: "avatars.githubusercontent.com",
+      },
+    ],
   },
   rewrites: () => [
     {
