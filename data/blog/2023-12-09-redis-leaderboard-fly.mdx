@@ -1,0 +1,304 @@
+---
+slug: redis-leaderboard-fly
+title: "Build a Leaderboard at Edge using Upstash Redis and Fly.io"
+description: "Build a Leaderboard at Edge using Upstash Redis and Fly.io"
+authors:
+  - valon
+tags: [leaderboard, redis, fly, edge]
+---
+
+## Build a Leaderboard at Edge using Upstash Redis and Fly.io
+
+In dynamic and engaging web applications, leaderboards are a powerful tool for fostering competition and user engagement. In this tutorial, we’ll embark on a journey to build a real-time leaderboard using **[Upstash Redis](https://upstash.com/?utm_source=valon)** as the backend storage and deploy it at the edge with **[Fly.io](https://fly.io/?utm_source=valon)**. This dynamic duo combines the efficiency of a serverless Redis service with the global distribution capabilities of Fly.io, ensuring low-latency access for users worldwide.
+
+## About Upstash Redis
+
+**[Upstash is a cloud service](https://upstash.com/?utm_source=valon)** that provides a fully managed Redis service focusing on simplicity, scalability, and ease of use. Redis, known for its versatility and high-performance in-memory data store capabilities, becomes even more compelling when paired with Upstash. With Upstash, developers can seamlessly deploy and scale Redis for various use cases without the operational complexities associated with infrastructure management.
+
+Key features of Upstash Redis include:
+
+* **Ease of Deployment:** Upstash simplifies the deployment process significantly, making it an excellent choice for developers who want to reduce the operational complexities associated with infrastructure.
+
+* **High Performance:** Redis is known for its lightning-fast data retrieval, making it suitable for handling task queuing, message passing, and real-time leaderboards as we’ll explore in this tutorial. With Upstash, you can rely on cloud infrastructure for seamless scaling, ensuring your applications can handle varying workloads efficiently.
+
+* **Scalability:** Redis is highly scalable, and with Upstash, it can scale automatically based on demand. This ensures that your application is always equipped to handle varying levels of load, making it an ideal choice for dynamic and scalable applications.
+
+* **Data Store Integration:** Redis serves both as a message broker and a result store, streamlining the architecture by reducing the number of components you need to manage.
+
+By incorporating Upstash Redis into our real-time leaderboard application, we harness the power of a fully managed Redis service that complements the global distribution capabilities of Fly.io, resulting in a robust and responsive web application architecture. Let’s dive into the implementation and showcase how Upstash Redis with Fly.io can elevate your projects to new heights.
+
+## Prerequisites
+
+Before we start on our journey, ensure you have the following prerequisites:
+
+* A **[Fly.io](https://fly.io/)** account.
+
+* Basic knowledge of Flask and Python.
+
+## Set Up a Fly.io account & Redis Database
+
+Start by **[creating an account in Fly.io](https://fly.io/app/sign-up)** and then install the Fly CLI:
+
+```shell
+    # Linux
+    curl -L https://fly.io/install.sh | sh
+
+    # Other type of installation: https://fly.io/docs/hands-on/install-flyctl/
+```
+
+After installing, from your terminal, log in with Fly:
+```shell
+fly auth login
+```
+This will open a browser in which it asks you to authorize login with the account that you just created. Great, now you will be able to interact with Fly from your terminal.
+
+Now that we have set up Fly, let’s create a **Redis** database, which we are going to use to build our leaderboard:
+```shell
+fly redis create
+automatically selected personal organization: vjanz
+? Choose a Redis database name (leave blank to generate one): upstash-fly-leaderboard
+Some regions require a paid plan (fra, maa).
+See https://fly.io/plans to set up a plan.
+
+? Choose a primary region (can't be changed later) Warsaw, Poland (waw)
+
+Upstash Redis can evict objects when memory is full. This is useful when caching in Redis. This setting can be changed later.
+Learn more at https://fly.io/docs/reference/redis/#memory-limits-and-object-eviction-policies
+? Would you like to enable eviction? No
+
+? Optionally, choose one or more replica regions (can be changed later):
+
+Your Upstash Redis database upstash-fly-leaderboard is ready. Check the pricing details at https://upstash.com/pricing.
+Apps in the personal org can connect to Redis at redis://<user>:<password>@fly-upstash-fly-leaderboard.upstash.io:6379
+```
+Now we have our Upstash Redis database which we created through Fly.io with a single command. Now you can view the REDIS_URL from the output or with a command in the terminal:
+
+```shell
+    flyctl redis status upstash-fly-leaderboard
+    # Or open the upstash dashboard
+    fly redis dashboard <your_org_name | personal>
+```
+
+Grab the **private_url** and store it as we are going to need it in our **Flask_APP.**
+
+## Develop the Flask Application
+
+To create our leaderboard we are going to use Flask. Flask is a minimal Python framework for building web applications. So let’s start by installing the dependencies.
+```shell
+    # flask - for as a web application framework
+    # redis - A wrapper to connect and interact with Redis
+    # gunicorn - wsgi server for running Python web applications
+
+    $ pip install flask redis gunicorn
+
+    # export the dependencies to requirements.txt
+    $ pip freeze > requirements.txt
+```
+
+Now, let’s lay the foundation for our Flask app. Start by creating a module app.py and let’s write the minimum code to initiate a Flask application and connect to the **[Upstash Redis.](https://upstash.com/docs/redis/overall/getstarted?utm_source=valon)**
+
+```python
+import os
+
+from flask import Flask, render_template, request, redirect, url_for
+import redis
+
+app = Flask(__name__)
+
+# Read the connection string from the environment variable
+UPSTASH_FLY_REDIS_CONNECTION_STRING = os.getenv('REDIS_URL')
+LEADERBOARD_KEY = 'leaderboard'
+
+# Initiate a connection to Upstash Redis Instance using the connection string
+redis_client = redis.from_url(UPSTASH_FLY_REDIS_CONNECTION_STRING)
+
+```
+
+So we:
+
+* Initiated a Flask app
+
+* Read the REDIS_URL from environment variable
+
+* Initialized a redis_client to interact with our Upstash Redis Database that we created in Fly.io
+
+Now let’s define functions to add a player to the leaderboard and retrieve the players with the respective scores from the leaderboard:
+```python
+def add_score(player_id, score):
+    # Add or update the score for the player in the leaderboard
+    redis_client.zadd(LEADERBOARD_KEY, {player_id: score})
+
+
+def get_leaderboard():
+    leaderboard = redis_client.zrevrange(LEADERBOARD_KEY, 0, 9, withscores=True)
+
+    formatted_leaderboard = [{'player_id': player_id.decode('utf-8'), 'score': int(score)} for player_id, score in
+                             leaderboard]
+
+    return formatted_leaderboard
+
+```
+
+The function **add_score** gets a **player_id** and a **score** and adds it to the leaderboard. **zadd** is a command in Redis that is used to add one or more members with scores to a sorted set.
+
+The second function **get_leaderboard()** retrieves the top 10 entries with scores from a Redis sorted set (leaderboard), and returns them in a formatted list containing player IDs and their corresponding scores.
+
+Okay, now let’s add three endpoints to interact with our Upstash Redis database.
+
+* [GET] / — retrieve the leaderboard
+
+* POST /submit_score — Submit the score in the leaderboard
+
+* GET /clear_table — Clears up the leaderboard
+
+```python
+@app.route('/')
+def leaderboard():
+    # Retrieve the top 10 players from the leaderboard and redirect to the leaderboard page with the data
+    leaderboard = get_leaderboard()
+    return render_template('leaderboard.html', leaderboard=leaderboard)
+
+
+@app.route('/submit_score', methods=['POST'])
+def submit_score():
+    player_id = request.form['player_id']
+    score = int(request.form['score'])
+
+    # Call the function to add or update the score for the player in the leaderboard
+    add_score(player_id, score)
+
+    return redirect(url_for('leaderboard'))
+
+
+@app.route('/clear_table', methods=['GET'])
+def clear_table():
+    # Delete all the data from the leaderboard
+    redis_client.delete(LEADERBOARD_KEY)
+
+    return redirect(url_for('leaderboard'))
+```
+
+As we can see, we are also rendering a front-end page leaderboard.html to make this more interactive and in real time.
+At the root of the project, create a folder templates , and inside create a file leaderboard.html **[with the following code](https://github.com/vjanz/upstash-fly-redis-leaderboard/blob/main/templates/leaderboard.html).**
+
+Perfect, now to test this locally in your terminal load up the environment variable:
+```shell
+    # Linux
+    export REDIS_URL='YOUR_UPSTASH_FLY_REDIS_CONNECTION_STRING'
+
+    # Windows
+    set REDIS_URL='YOUR_UPSTASH_FLY_REDIS_CONNECTION_STRING'
+
+    # After that run:
+    $ flask run
+```
+
+Your application should be ready with a leaderboard and a way for you to add records to the leaderboard.
+
+![](https://cdn-images-1.medium.com/max/2006/1*uUJ3iOTznCxC_ZEsSgLmzw.png)
+
+As you add the results, you can easily see that the results will be stored updated, and sorted in real-time, which is exactly what we wanted to do! 🎉
+
+## Deploy to Fly.io
+
+Now, let’s elevate our Flask app to new heights by deploying it to **[Fly.io.](https://fly.io/?utm_source=valon)** From the root of your codebase, execute:
+```shell
+flyctl launch
+
+Scanning source code
+Detected a Python app
+Using the following build configuration:
+        Builder: paketobuildpacks/builder:base
+Creating app in /home/valon/code/upstash-fly-leaderboard
+We're about to launch your Python app on Fly.io. Here's what you're getting:
+
+Organization: <MyOrg>          (fly launch defaults to the personal org)
+Name:         upstash-leaderboard    (derived from your directory name)
+Region:       Amsterdam, Netherlands (this is the fastest region for you)
+App Machines: shared-cpu-1x, 1GB RAM (most apps need about 1GB of RAM)
+Postgres:     <none>                 (not requested)
+Redis:        <none>                 (not requested)
+
+? Do you want to tweak these settings before proceeding? (y/N) : N
+```
+
+
+This will detect your codebase and apply some default configuration based on your application name, code, etc. I will go with default settings so I will continue with **N** .
+
+Now this will generate a **fly.toml** and a **Procfile**:
+```shell
+app = "upstash-fly-leaderboard"
+primary_region = "otp" #
+
+[build]
+  builder = "paketobuildpacks/builder:base"
+
+[env]
+  PORT = "8080"
+
+[http_service]
+  internal_port = 8080 # Port where the app runs
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 1024
+```
+I left everything as default, except the region that I change to otp. Now let’s update **Procfile**, where the execution command is defined, and make it run with **gunicorn** in the **8080** port.
+
+```shell
+web: gunicorn -b 0.0.0.0:8080 app:app
+```
+
+Where **app** is the module name and the other **app** is the variable defined in the module where we defined the Flask app.
+We are mostly done, but remember in the code we added the **REDIS_URL** as an environment variable, and we set the value locally to the Upstash Redis that we created using the **Fly CLI**, let’s set this up as a secret in fly.io.
+
+```shell
+    fly secrets set --app upstash-fly-leaderboard REDIS_URL=<>
+```
+
+We are all ready, let’s deploy the app to **fly.io** now:
+
+```shell
+    fly deploy --ha=false
+```
+
+the output should give us the URL to visit our newly deployed application.
+
+```shell
+Watch your deployment at https://fly.io/apps/<app_name>/monitoring
+
+-------
+Updating existing machines in '<app_name>' with rolling strategy
+
+-------
+ ✔ Machine <machine_id> [app] update succeeded
+-------
+
+Visit your newly deployed app at https://<app_name>.fly.dev/
+```
+
+## Conclusion
+
+In this tutorial, we’ve witnessed the seamless integration of **[Upstash Redis](https://upstash.com/?utm_source=valon)** and **[Fly.io](https://fly.io)** to create a real-time leaderboard. By combining the efficiency of a serverless Redis service with the global distribution capabilities of Fly.io, we’ve ensured that users across the globe experience low-latency access.
+
+Feel free to enhance your leaderboard application further by adding user authentication, additional statistics, or any other features that suit your application’s needs. The future of engaging and responsive web applications is here, driven by the power of Upstash Redis and the global reach of Fly.io.
+
+**You can find the full source code of the article on the GitHub repository, with the instructions.**
+
+[https://github.com/vjanz/upstash-fly-redis-leaderboard](https://github.com/vjanz/upstash-fly-redis-leaderboard)
+
+If you have any questions, feel free to reach out to me. Also, you can connect with me on [LinkedIn](https://www.linkedin.com/in/valon-januzaj-b02692187/), [GitHub](http://www.github.com/vjanz)
+
+## References
+
+[Upstash](https://upstash.com/?utm_source=valon)
+[https://redis.io
+](https://redis.io)[https://fly.io/](https://fly.io/)
+
+
