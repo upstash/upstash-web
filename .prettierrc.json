@@ -16,5 +16,40 @@
   "requirePragma": false,
   "tabWidth": 2,
   "useTabs": false,
-  "embeddedLanguageFormatting": "auto"
+  "embeddedLanguageFormatting": "auto",
+  "jsxBracketSameLine": false,
+  "fluid": false,
+  "importOrder": [
+    "^(react/(.*)$)|^(react$)",
+    "^(next/(.*)$)|^(next$)",
+    "",
+    "<THIRD_PARTY_MODULES>",
+    "",
+    "^@/config/(.*)$",
+    "^@/lib/(.*)$",
+    "^@/hooks/(.*)$",
+    "",
+    "^@/components/ui/(.*)$",
+    "^@/components/(.*)$",
+    "",
+    "^@/styles/(.*)$",
+    "",
+    "^types$",
+    "^@/types/(.*)$",
+    "",
+    "^[./]"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true,
+  "importOrderBuiltinModulesToTop": true,
+  "importOrderParserPlugins": [
+    "typescript",
+    "jsx"
+  ],
+  "importOrderMergeDuplicateImports": true,
+  "importOrderCombineTypeAndValueImports": true,
+  "plugins": [
+    "@ianvs/prettier-plugin-sort-imports",
+    "prettier-plugin-tailwindcss"
+  ]
 }

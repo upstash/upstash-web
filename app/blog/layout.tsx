@@ -3,6 +3,7 @@ import "../code.css";
 
 import { ReactNode } from "react";
 import { Metadata } from "next";
+
 import { SITE_URL } from "@/utils/const";
 
 const title = "Upstash Blog";
@@ -34,5 +35,9 @@ export const metadata: Metadata = {
 };
 
 export default function BlogLayout({ children }: { children: ReactNode }) {
-  return children;
+  return (
+    <div className="bg-zinc-50 pb-20 text-emerald-950 dark:bg-transparent dark:text-inherit">
+      {children}
+    </div>
+  );
 }

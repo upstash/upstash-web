@@ -1,15 +1,16 @@
+import { HOME_SECTIONS } from "@/utils/const";
+
+import Bg from "@/components/bg";
+import Container from "@/components/container";
 import {
   SectionHeader,
   SectionHeaderSummary,
   SectionHeaderTitle,
 } from "@/components/home/section-header";
-import Container from "@/components/container";
-import GlobalLowLatency from "@/components/home/serverless/global-low-latency";
-import PriceScaleToZero from "@/components/home/serverless/price-scale-to-zero";
-import HttpRestApi from "@/components/home/serverless/http-rest-api";
 import DesignedForTheEdge from "@/components/home/serverless/designed-for-the-edge";
-import Bg from "@/components/bg";
-import { HOME_SECTIONS } from "@/utils/const";
+import GlobalLowLatency from "@/components/home/serverless/global-low-latency";
+import HttpRestApi from "@/components/home/serverless/http-rest-api";
+import PriceScaleToZero from "@/components/home/serverless/price-scale-to-zero";
 
 export default function HomeServerless() {
   return (

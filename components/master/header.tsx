@@ -1,13 +1,18 @@
 "use client";
 
 import { HTMLProps, ReactNode } from "react";
-import cx from "@/utils/cx";
-import { Logo } from "@/components/logo";
 import Link from "next/link";
+
+import cx from "@/utils/cx";
+import { allJobs } from "contentlayer/generated";
+
+import { useGetAffiliateCodeFromApi } from "@/hooks/use-affiliate-code";
+
 import Button from "@/components/button";
 import Container from "@/components/container";
+import { Logo } from "@/components/logo";
+
 import Nav from "./nav";
-import { allJobs } from "contentlayer/generated";
 
 const jobLength = allJobs.filter((o) => !o.draft).length;
 
@@ -15,6 +20,8 @@ export default function Header({
   className,
   ...props
 }: HTMLProps<HTMLHeadElement>) {
+  const { affiliateCode } = useGetAffiliateCodeFromApi();
+
   return (
     <header className={cx("hidden md:block", className)} {...props}>
       <Container>
@@ -32,7 +39,11 @@ export default function Header({
               target="_self"
               type="button"
               hideIcon
-              href="https://console.upstash.com"
+              href={
+                affiliateCode
+                  ? `https://console.upstash.com/?code=${affiliateCode}`
+                  : "https://console.upstash.com"
+              }
               className="backdrop-blur"
             >
               Login
@@ -51,7 +62,7 @@ const NavItems: {
 }[] = [
   {
     name: "Pricing",
-    href: `/pricing`,
+    href: "/pricing",
   },
   {
     name: "Customers",
@@ -86,7 +97,7 @@ if (jobLength > 0) {
     href: "/careers",
     children: (
       <span
-        className="rounded-full bg-emerald-300/20
+        className="flex items-center rounded-full bg-emerald-300/20
           px-1.5 py-1 font-mono text-sm leading-none text-emerald-500"
       >
         {jobLength}

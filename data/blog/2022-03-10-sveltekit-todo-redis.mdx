@@ -2,7 +2,7 @@
 slug: "sveltekit-todo-redis"
 title: "SvelteKit TODO App with Redis"
 authors:
-  -  "adem"
+  - "adem"
 tags: [svelte, sveltekit, todo, serverless, redis, upstash]
 ---
 
@@ -158,6 +158,7 @@ Now create `lib/redis.ts` and create a new Redis instance as below:
 // src/lib/redis.ts
 
 import "dotenv/config";
+
 import { Redis } from "@upstash/redis";
 
 export const databaseName =
@@ -182,8 +183,9 @@ Let's create `index.ts` and add the required API methods.
 ```ts
 // src/routes/index.ts
 
-import redis, { databaseName } from "../lib/redis";
 import type { RequestHandler } from "@sveltejs/kit";
+
+import redis, { databaseName } from "../lib/redis";
 
 const redirect = {
   status: 303,

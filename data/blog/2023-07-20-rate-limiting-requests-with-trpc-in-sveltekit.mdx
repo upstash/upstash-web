@@ -2,10 +2,9 @@
 slug: rate-limiting-requests-with-trpc-in-sveltekit
 title: "Rate limiting requests with tRPC in Sveltekit"
 authors:
-  -  chris
+  - chris
 tags: [svelte, trpc, ratelimit]
 ---
-
 
 Recently, I found myself tasked with creating an upvote feature in an app I was working on. The app is using [Sveltekit](https://kit.svelte.dev/) along with [tRPC](https://trpc.io/). Each upvote is recorded in a Redis instance
 
@@ -25,7 +24,7 @@ Introducing the  'High Five Cat' app!
 
 ![screenshot of the high five cat app](/blog/rate-limiting-requests-with-trpc-in-sveltekit/high-five-cat-app-sc.png)
 
-*And no, I didn’t use AI to create these cats…* 🤫
+_And no, I didn’t use AI to create these cats…_ 🤫
 
 In this app, there are pictures of 4 different cats. As a visitor, you can high five these cats. Each request is managed through the [tRPC middleware](https://trpc.io/docs/server/middlewares). This middleware conducts a check based on the user's IP to determine if any rate limitations apply.
 
@@ -50,8 +49,8 @@ After successfully downloading the repository, navigate into the application usi
 Here’s a quick rundown of all the important parts.
 
 - `src/lib/api`- This holds all tRPC logic, including routers and middleware.
-    - `src/lib/api/routes/cat.router.ts`– It specifies all logic for querying and mutating cat-related actions.
-    - `src/lib/api/middlewares/ratelimitMidleware.ts` – The middleware that manages each request and can potentially block it when the rate limit has exceeded.
+  - `src/lib/api/routes/cat.router.ts`– It specifies all logic for querying and mutating cat-related actions.
+  - `src/lib/api/middlewares/ratelimitMidleware.ts` – The middleware that manages each request and can potentially block it when the rate limit has exceeded.
 - `src/routes/+page.server.ts` - Renders the initial cats on the server.
 - `src/routes/+page.svelte` - Loops through all the cats and showcases a cat in the `CatCard.svelte` component.
 - `src/lib/components/CatCard.svelte` - This component is where the magic happens. It displays the cat and allows the user to high five a cat.
@@ -65,22 +64,22 @@ Alright! It's time to break down the code and see the app in action!
 In the `+page.server.ts`, we’ll return all the cats.
 
 ```ts title="+page.server.ts"
-import { trpcLoad } from '$lib/api/trpc-load';
-import type { PageServerLoad } from './$types';
+import { trpcLoad } from "$lib/api/trpc-load";
+
+import type { PageServerLoad } from "./$types";
 
 export const load = (async (events) => {
-    return {
-        cats: trpcLoad(events, (t) => t.public.cat.getMany())
-    };
+  return {
+    cats: trpcLoad(events, (t) => t.public.cat.getMany()),
+  };
 }) satisfies PageServerLoad;
 ```
 
-We use `trpcLoad(events, (t) => t.public.cat.getMany())` to load all the cats.  I've written more about the useful `trpcLoad` helper [here](https://chrisjayden.com/articles/optimizing-code-imports-sveltekit-trpc).
+We use `trpcLoad(events, (t) => t.public.cat.getMany())` to load all the cats. I've written more about the useful `trpcLoad` helper [here](https://chrisjayden.com/articles/optimizing-code-imports-sveltekit-trpc).
 
 In our `+page.svelte` file, this data is consumed and rendered. The data object gets its properties from the `public.cat.getMany` method which provides us the list of cats. Then, each of these cats are rendered as individual `CatCard.svelte` components passing the cat info as a prop.
 
 Each time a cat is high-fived we’ll refetch the cats using `invalidateAll()` to update the high five score.
-
 
 ```svelte title="+page.svelte"
 <script>
@@ -259,34 +258,35 @@ This component might look a bit daunting, but in essence all we’re doing is im
 When the high five button is clicked, a request is made to the tRPC route, where we check whether the cat exists and we'll store high five in Redis.
 
 ```ts title="cat.router.ts"
-import publicProcedure from '$lib/api/procedures/publicProcedure';
-import { router } from '$lib/api/trpc';
-import { TRPCError } from '@trpc/server';
-import { ZCatSchema } from './cat.schema';
+import { TRPCError } from "@trpc/server";
+import publicProcedure from "$lib/api/procedures/publicProcedure";
+import { router } from "$lib/api/trpc";
+
+import { ZCatSchema } from "./cat.schema";
 
 const getHighfiveKey = (id: string) => `highfive:${id}`;
 
 export const catRouter = router({
-    highfive: publicProcedure
-        .input(ZCatSchema)
-        .mutation(async ({ input, ctx: { getClientAddress } }) => {
-            const cat = cats.find((cat) => cat.id === input.id);
+  highfive: publicProcedure
+    .input(ZCatSchema)
+    .mutation(async ({ input, ctx: { getClientAddress } }) => {
+      const cat = cats.find((cat) => cat.id === input.id);
 
-            if (!cat) {
-                throw new TRPCError({
-                    code: 'NOT_FOUND',
-                    message: 'Cat not found',
-                });
-            }
+      if (!cat) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Cat not found",
+        });
+      }
 
-            const identifier = getHighfiveKey(input.id);
-            const result = await redis.incr(identifier);
+      const identifier = getHighfiveKey(input.id);
+      const result = await redis.incr(identifier);
 
-            return {
-                ...cat,
-                highfives: result,
-            };
-        }),
+      return {
+        ...cat,
+        highfives: result,
+      };
+    }),
 });
 ```
 
@@ -323,7 +323,6 @@ If the mutation is successful we’ll dispatch an event that tells the `+page.sv
 </div>
 ```
 
-
 ## Implementing the rate limiting
 
 With that initial code in place, we’re ready to implement the rate limiting feature.
@@ -339,14 +338,15 @@ Now, let's break down the `highfiveRatelimitMiddleware` piece by piece. 👇
 The `highfiveRatelimitMiddleware` begins by importing necessary modules and initialising a `ratelimit` object from the [`@upstash/ratelimit`](https://github.com/upstash/ratelimit) package that contains our Redis client and the specifics of our rate limiter. In this case, `Ratelimit.slidingWindow(1, "60 s")` specifies that only one request will be allowed every 60 seconds.
 
 ```ts title="ratelimitMiddleware.ts"
-import { redis } from '$lib/config/upstash';
-import { TRPCError } from '@trpc/server';
-import { middleware } from '../trpc';
+import { TRPCError } from "@trpc/server";
 import { Ratelimit } from "@upstash/ratelimit";
+import { redis } from "$lib/config/upstash";
+
+import { middleware } from "../trpc";
 
 const ratelimit = new Ratelimit({
-	redis: redis,
-	limiter: Ratelimit.slidingWindow(1, "60s"),
+  redis: redis,
+  limiter: Ratelimit.slidingWindow(1, "60s"),
 });
 ```
 
@@ -356,7 +356,6 @@ The `highfiveRatelimitMiddleware` can be thought of as a checkpoint between th
 2. `next`: This represents what comes after this checkpoint. If everything is in order, the `next` function is called.
 3. `getClientAddress`: The IP address of the client making the request is determined using `getClientAddress()`. This is a function from the [`RequestEvent`](https://kit.svelte.dev/docs/types#public-types-requestevent) object in SvelteKit, on which you can read more about [here](https://kit.svelte.dev/docs/adapter-node#environment-variables-address-header-and-xff-depth).
 
-
 The `identifier` for the rate limit is then created using the `path` and the `ip`, making it unique for each route and IP address.
 
 The identifiers used in the rate limiter can be constant strings to limit all requests with a single rate limit, or they can be user-specific like userID, API key, IP address for individual limits.
@@ -364,37 +363,35 @@ The identifiers used in the rate limiter can be constant strings to limit all re
 ```ts title="ratelimitMiddleware.ts"
 // Rest of code ommitted for brevity
 middleware(async ({ path, next, ctx: { getClientAddress, setHeaders } }) => {
-	const ip = getClientAddress();
-	const identifier = `${path}-${ip}`;
+  const ip = getClientAddress();
+  const identifier = `${path}-${ip}`;
 
-	return next();
+  return next();
 });
 ```
 
 The `ratelimit.limit(identifier);` method is then used to get the rate limit information for this request. If the `result.success` property is false, it means that the request has exceeded the rate limit and the middleware returns a `TRPCError` with `TOO_MANY_REQUESTS` code and information about the current limit and the remaining number of requests.
 
-
 ```ts title="ratelimitMiddleware.ts"
 const result = await ratelimit.limit(identifier);
 
 if (!result.success) {
-	throw new TRPCError({
-		code: 'TOO_MANY_REQUESTS',
-		message: JSON.stringify({
-			limit: result.limit,
-			remaining: result.remaining,
-		})
-	});
+  throw new TRPCError({
+    code: "TOO_MANY_REQUESTS",
+    message: JSON.stringify({
+      limit: result.limit,
+      remaining: result.remaining,
+    }),
+  });
 }
 ```
 
 If the result is successful, the middleware calls `next()`, allowing the request to continue to the next middleware or handler.
 
-
 ```ts title="ratelimitMiddleware.ts"
 // Rest of code ommitted for brevity
 middleware(async ({ path, next, ctx: { getClientAddress, setHeaders } }) => {
-	return next();
+  return next();
 });
 
 export default highfiveRatelimitMiddleware;
@@ -402,23 +399,21 @@ export default highfiveRatelimitMiddleware;
 
 As you can see, the `highfiveRatelimitMiddleware` can be easily adjusted with a different `limiter` to protect all your tRPC routes as the identifier is unique per path and IP.
 
-Upstash's Ratelimit provides several algorithms such as Fixed Window, Sliding Window, and Token Bucket, each with its own strengths, weaknesses, and specific use cases..  You can learn more about the different algorithms [here](https://github.com/upstash/ratelimit#ratelimiting-algorithms).
-
+Upstash's Ratelimit provides several algorithms such as Fixed Window, Sliding Window, and Token Bucket, each with its own strengths, weaknesses, and specific use cases.. You can learn more about the different algorithms [here](https://github.com/upstash/ratelimit#ratelimiting-algorithms).
 
 One more thing I like to mention is that analytics can be enabled to get insights about your rate limiting.
 
 ```ts title="ratelimitMiddleware.ts"
 const ratelimit = new Ratelimit({
-	redis: redis,
-	limiter: Ratelimit.slidingWindow(1, "60 s"),
-  analytics: true // <-- Set to true to get more details on the performance of your ratelimiting
+  redis: redis,
+  limiter: Ratelimit.slidingWindow(1, "60 s"),
+  analytics: true, // <-- Set to true to get more details on the performance of your ratelimiting
 });
 ```
 
 If you choose to do so you get access to a special dashboard on Upstash to get more details on how your rate limiting is performing.
 
 ![screenshot of upstash rate limit analytics](/blog/rate-limiting-requests-with-trpc-in-sveltekit/rate-limit-dashboard-upstash.png)
-
 
 ## Wrapping up
 
@@ -427,38 +422,39 @@ Phew, hopefully that was easy to understand and not too much information to dige
 Now all is left to do for us is to import our middleware and `use` it in our tRPC route.
 
 ```ts title="cat.router.ts"
-import publicProcedure from '$lib/api/procedures/publicProcedure';
-import { router } from '$lib/api/trpc';
-import { TRPCError } from '@trpc/server';
-import { ZCatSchema } from './cat.schema';
-import cats from './cats.json';
-import highfiveRatelimitMiddleware from '../middlewares/ratelimitMidleware';
-import { redis } from '$lib/config/upstash';
+import { TRPCError } from "@trpc/server";
+import publicProcedure from "$lib/api/procedures/publicProcedure";
+import { router } from "$lib/api/trpc";
+import { redis } from "$lib/config/upstash";
+
+import highfiveRatelimitMiddleware from "../middlewares/ratelimitMidleware";
+import { ZCatSchema } from "./cat.schema";
+import cats from "./cats.json";
 
 const getHighfiveKey = (id: string) => `highfive:${id}`;
 
 export const catRouter = router({
-    highfive: publicProcedure
-        .use(highfiveRatelimitMiddleware) // <-- our middleware
-        .input(ZCatSchema)
-        .mutation(async ({ input, ctx: { getClientAddress } }) => {
-            const cat = cats.find((cat) => cat.id === input.id);
+  highfive: publicProcedure
+    .use(highfiveRatelimitMiddleware) // <-- our middleware
+    .input(ZCatSchema)
+    .mutation(async ({ input, ctx: { getClientAddress } }) => {
+      const cat = cats.find((cat) => cat.id === input.id);
 
-            if (!cat) {
-                throw new TRPCError({
-                    code: 'NOT_FOUND',
-                    message: 'Cat not found',
-                });
-            }
+      if (!cat) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Cat not found",
+        });
+      }
 
-            const identifier = getHighfiveKey(input.id);
-            const result = await redis.incr(identifier);
+      const identifier = getHighfiveKey(input.id);
+      const result = await redis.incr(identifier);
 
-            return {
-                ...cat,
-                highfives: result,
-            };
-        }),
+      return {
+        ...cat,
+        highfives: result,
+      };
+    }),
 });
 ```
 
@@ -467,7 +463,10 @@ The `.use(highfiveRatelimitMiddleware)`means that every time the `highfive` r
 You might be curious to see how this looks from a user perspective. Below is a quick video showcasing what happens when the rate limit is reached.
 
 <video controls>
-  <source src="/blog/rate-limiting-requests-with-trpc-in-sveltekit/video-demo.mp4" type="video/mp4"/>
+  <source
+    src="/blog/rate-limiting-requests-with-trpc-in-sveltekit/video-demo.mp4"
+    type="video/mp4"
+  />
 </video>
 
 And here’s what the request headers look like for each request.

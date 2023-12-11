@@ -1,19 +1,22 @@
+import React from "react";
+
+import { HOME_SECTIONS } from "@/utils/const";
+
+import Bg from "@/components/bg";
+import Container from "@/components/container";
 import {
   SectionHeader,
   SectionHeaderSummary,
   SectionHeaderTitle,
 } from "@/components/home/section-header";
-import Container from "@/components/container";
+import Icon, { ICON_NAMES } from "@/components/icon";
+
 import {
   CommunityBox,
   CommunityBoxButton,
   CommunityBoxDesc,
   CommunityBoxTitle,
 } from "./comp";
-import Icon, { ICON_NAMES } from "@/components/icon";
-import React from "react";
-import Bg from "@/components/bg";
-import { HOME_SECTIONS } from "@/utils/const";
 
 export default function HomeCommunity() {
   return (

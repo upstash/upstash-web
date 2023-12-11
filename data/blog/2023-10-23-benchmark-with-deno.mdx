@@ -1,0 +1,162 @@
+---
+slug: benchmark-with-deno
+title: "Benchmarking Deno KV vs Upstash Redis"
+authors:
+  - andreas
+tags: [redis, serverless, deno, kv, cache]
+---
+
+
+About [2 weeks ago](/blog/edgecaching-benchmark) we compared the performance and cost of Cloudflare KV and Upstash Redis. This time we'll be looking at [Deno KV](https://deno.com/kv), a Deno-native key value store running in their global edge network.
+
+
+Deno KV is similar in its architecture to Upstash Redis. Both stores have a primary region where all writes are sent to and then replicated to all other regions. Reads are served from the closest region to the client.
+There are a ton of differences in the available features, because Redis has a ton of features that KV doesn't have, but we'll just focus on simple read and writes for now.
+
+
+We will do 2 different benchmarks, both using Deno deploy to run the code for both of them.
+In both cases the KV store and Redis will have all available read regions enabled.
+
+1. Invoking from 20 regions around the world using [planetfall.io](https://planetfall.io).
+2. Invoking from a single region with a much higher load.
+
+Afterwards we'll compare the results and talk about tradeoffs and pricing.
+
+## The Benchmark
+
+Here's how the setup looks, it's essentially the same as on [Cloudflare](/blog/edgecaching-benchmark), just updated to use Deno KV.
+
+- 1000 keys
+- 4 KB - 64 KB data size (random)
+- 60s TTL on all keys
+- 20 regions invoking the function
+- ~10 requests per second
+
+I chose a rather small keyspace, to ensure we're getting some cache hits without having to crank up the RPS too far.
+
+## Code
+
+The function itself is very simple, it just reads from Redis, reads from KV and then return those latencies to be evaluated later.
+
+```ts title="main.ts"
+app.get("/test", async (c) => {
+  const key = Math.floor(Math.random() * 1_000).toString()
+  const minValueSize = 4 * 1024
+  const maxValueSize = 64 * 1024
+
+  const data = randomBytes(minValueSize, maxValueSize)
+
+  const ttlSeconds = 60
+
+  const beforeRedis = performance.now()
+  const redisResponse = await fetch(Deno.env.get("UPSTASH_REDIS_REST_URL")!, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${Deno.env.get("UPSTASH_REDIS_REST_TOKEN")}`,
+    },
+    body: JSON.stringify(["GET", key])
+  })
+  const redisLatency = performance.now() - beforeRedis
+
+  if (!redisResponse) {
+     await fetch(Deno.env.get("UPSTASH_REDIS_REST_URL")!, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${Deno.env.get("UPSTASH_REDIS_REST_TOKEN")}`,
+      },
+      body: JSON.stringify(["SET", key, data, "EX", ttlSeconds])
+    })
+  }
+
+  const kv = await Deno.openKv();
+
+const beforeKV = performance.now()
+  const kvResponse = await kv.get([key])
+  const kvLatency = performance.now() - beforeKV
+  if (!kvResponse.value) {
+    const setRes = await kv.set([key], data, { expireIn: ttlSeconds })
+    console.log({ setRes })
+  }
+
+  return c.json({
+    redisLatency,
+    kvLatency,
+  });
+});
+```
+
+## The Results - Global Latency
+
+After 30 minutes, here are the results. The latency measured here is just from the function on Deno Deploy to the store, not including network roundtrips to invoke the function.
+
+<a href="/blog/benchmark-deno/global.png" target="_blank">
+  <img src="/blog/benchmark-deno/global.png" />
+  Click image for full size
+</a>
+
+
+|         | Deno KV | Upstash Redis |
+|---------|--------:|--------------:|
+| P90     |   265ms |          76ms |
+| P99     |   494ms |          94ms |
+
+
+Deno KV is considerably slower when reading data from KV. My first thought was that they might just not have enough read regions distributed across the globe.
+At the time of this benchmark, they had `gpc-us-east4`, `gpc-asia-southeast1`, `gcp-europe-west3`, `gcp-southamerica-east1` and `gcp-us-west2`.
+
+Perhaps a significant number of requests need to go across multiple regions to fetch the data, which would explain the high latency, effectively eliminating Deno's advantage of controlling both compute and storage inside the same cloud and potentially datacenter.
+Upstash on the other hand is running on AWS and all requests from Deno to Redis are going across cloud provider borders.
+
+## Single Region
+
+In order to test this theory, I've run a second benchmark, where I'm just invoking the function from a single location (my home) and all requests go through Frankfurt. Both Deno KV and Upstash Redis have a read replica there `gcp-europe-west3` and `eu-central-1` respectively for GCP and AWS.
+
+<a href="/blog/benchmark-deno/regional.png" target="_blank">
+  <img src="/blog/benchmark-deno/regional.png" />
+  Click image for full size
+</a>
+
+Both services are much faster in this scenario, but Deno KV is still slower than Upstash Redis.
+Here are the latencies for single a region, with delta to global latency in parenthesis:
+
+|         | Deno KV      | Upstash Redis |
+|---------|-------------:|--------------:|
+| P90     | 132ms (-133) |    16ms (-60) |
+| P99     | 154ms (-340) |    26ms (-68) |
+
+
+154 ms is definitely much better than 494 ms, but it's under the assumption that all my traffic is coming from a single region, which goes against the whole idea of a global edge network.
+If you're running a global API, you will have traffic coming from all over the world and every single request that needs access to data in KV will be slowed down by this.
+
+
+
+## Pricing
+
+Both Deno and Upstash are billing you mainly for usage. Both have good free tiers, so you can try them out without having to pay anything.
+
+
+|           | Deno KV                      | Upstash Redis                     |
+|-----------|------------------------------|-----------------------------------|
+| Flat Cost | $20/mo (to add read regions) | FREE                              |
+| Storage   | $0.50 / GB                   | $0.25 / GB                        |
+| Reads     | $1 / Million / 4kb           | $2 / Million (regardless of size) |
+| Writes    | $2.50 / Million / 1kb        | $2 / Million (regardless of size) |
+| Bandwidth | $0.50 / GB                   | $0.03 / GB                        |
+
+
+The main difference is that Deno's pricing is not as transparent as I hoped since I need to know how large my requests are going to be in order to calculate the cost. This is not a problem with Upstash, since all requests are billed the same.
+By default on Upstash you can read or write up to 1MB per request and we allow you to increase this for a flat fee.
+
+The bottom line is that if you're reading more than 8kb per request, Upstash is most likely cheaper.
+
+
+
+
+## Conclusion
+
+Using Deno KV feels pretty good to use since it's on the same platform, you don't need to manage a separate account and using it doesn't require any extra setup. However the performance and cost is nowhere near Upstash.
+It is also limited by what you can do with it. Setting and getting values, while being the most common operations, is not all you can do with Redis. Check out our [examples](https://upstash.com/examples) to find a lot of ideas and usecases for Redis.
+
+Come say hi and ask questions about any of this in our [Discord](https://upstash.com/discord) or over on [X](https://x.com/upstash).

@@ -1,7 +1,10 @@
 import { HTMLProps, ReactNode } from "react";
 import Link, { LinkProps } from "next/link";
-import Button from "@/components/button";
+
 import cx from "@/utils/cx";
+
+import Button from "@/components/button";
+
 import { NavItems } from "./header";
 
 export default function NavMobile({ hidden }: HTMLProps<HTMLDivElement> & {}) {
@@ -10,7 +13,7 @@ export default function NavMobile({ hidden }: HTMLProps<HTMLDivElement> & {}) {
       className={cx(
         "absolute inset-x-0 top-full z-10 mt-px flex-col p-6 pb-24",
         "bg-zinc-950 shadow-2xl",
-        hidden ? "flex" : "hidden"
+        hidden ? "flex" : "hidden",
       )}
     >
       {/* login */}
@@ -50,7 +53,7 @@ function NavLink({
       href={href}
       className={cx(
         "flex items-center gap-2 py-4 font-display text-lg font-medium",
-        className
+        className,
       )}
       {...props}
     >

@@ -2,7 +2,7 @@
 slug: email-scheduler-qstash
 title: "Building an Email Scheduler with Vercel Functions and QStash"
 authors:
-  -  kay
+  - kay
 tags: [qstash, vercel, scheduler]
 image: https://dev-to-uploads.s3.amazonaws.com/uploads/articles/heoz05agz9n8uwdf2ymr.jpg
 ---
@@ -82,8 +82,8 @@ To tie everything together, the user would send a request with a text body and a
 Now that we get our messages scheduled to QStash, we need the route to convert them to emails and send them out. For this, create file at `pages/api/notify.js` that contains:
 
 ```javascript
-import nodemailer from "nodemailer";
 import { verifySignature } from "@upstash/qstash/nextjs";
+import nodemailer from "nodemailer";
 
 export const config = {
   api: { bodyParser: false },

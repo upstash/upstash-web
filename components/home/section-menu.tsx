@@ -1,18 +1,21 @@
 "use client";
 
 import { HTMLProps, useEffect, useState } from "react";
-import cx from "@/utils/cx";
+
 import { HOME_SECTIONS } from "@/utils/const";
+import cx from "@/utils/cx";
 import {
   HTMLMotionProps,
   motion,
   useMotionValueEvent,
   useScroll,
 } from "framer-motion";
-import { LogoIcon } from "@/components/logo";
-import Button from "@/components/button";
 import { animateScroll, Events, Link as SpyLink } from "react-scroll";
+
 import { useSegment } from "@/hooks/use-segment";
+
+import Button from "@/components/button";
+import { LogoIcon } from "@/components/logo";
 
 export default function SectionMenu({
   children,
@@ -51,7 +54,7 @@ export default function SectionMenu({
         "fixed inset-x-0 top-0 z-50 pt-10",
         "hidden justify-center md:flex",
         show ? "pointer-events-auto" : "pointer-events-none",
-        className
+        className,
       )}
       initial="hidden"
       animate={show ? "visible" : "hidden"}
@@ -66,7 +69,7 @@ export default function SectionMenu({
 
       <div
         className={cx(
-          "flex cursor-pointer items-center gap-4 rounded-full bg-white p-2"
+          "flex cursor-pointer items-center gap-4 rounded-full bg-white p-2",
         )}
       >
         <SpyLink
@@ -132,7 +135,7 @@ function SectionMenuItem({
           "cursor-pointer rounded-full transition",
           "[.active_&]:bg-zinc-200 [.active_&]:text-zinc-950",
           "hover:bg-zinc-200",
-          className
+          className,
         )}
       >
         {children}

@@ -29,12 +29,13 @@ $ npm install @upstash/edge-flags @upstash/redis
 
 ```ts title="/middleware.ts"
 import { NextRequest, NextResponse } from "next/server";
-import { Redis } from "@upstash/redis";
+
 import { Client as EdgeFlags } from "@upstash/edge-flags";
+import { Redis } from "@upstash/redis";
 
 const edgeFlags = new EdgeFlags({ redis: Redis.fromEnv() });
 export default async function middleware(
-  req: NextRequest
+  req: NextRequest,
 ): Promise<NextResponse> {
   const enabled = await edgeFlags
     .getFlag("eu-countries", req.geo ?? {})

@@ -1,16 +1,19 @@
-import { notFound } from "next/navigation";
-import Container from "@/components/container";
-import { type Example, getData } from "../get-data";
-import markdownToHtml from "@/utils/markdownToHtml";
-import Balancer from "react-wrap-balancer";
-import Button from "@/components/button";
-import { authors } from "@/utils/authors";
-import IconRedis from "@/components/icon-redis";
-import IconKafka from "@/components/icon-kafka";
-import IconQStash from "@/components/icon-qstash";
 import { HTMLProps } from "react";
 import Link from "next/link";
+import { notFound } from "next/navigation";
+
+import { authors } from "@/utils/authors";
+import markdownToHtml from "@/utils/markdownToHtml";
+import Balancer from "react-wrap-balancer";
+
+import Button from "@/components/button";
+import Container from "@/components/container";
 import { ICON_NAMES } from "@/components/icon";
+import IconKafka from "@/components/icon-kafka";
+import IconQStash from "@/components/icon-qstash";
+import IconRedis from "@/components/icon-redis";
+
+import { getData, type Example } from "../get-data";
 
 type Props = {
   params: {
@@ -31,7 +34,7 @@ export async function generateStaticParams(): Promise<Props["params"][]> {
   const examples: Example[] = await getData();
 
   return examples.map((item) => ({
-    slug: item.title.toLowerCase().replace(/ /g, "-"),
+    slug: item.slug,
   }));
 }
 
@@ -41,9 +44,7 @@ export async function generateMetadata({
   params: Props["params"];
 }) {
   const examples: Example[] = await getData();
-  const example = examples.find(
-    (item) => item.title.toLowerCase().replace(/ /g, "-") === params.slug,
-  );
+  const example = examples.find((item) => item.slug === params.slug);
 
   if (!example) {
     return {
@@ -58,9 +59,7 @@ export async function generateMetadata({
 
 export default async function BlogPage({ params }: Props) {
   const examples: Example[] = await getData();
-  const example = examples.find(
-    (item) => item.title.toLowerCase().replace(/ /g, "-") === params.slug,
-  );
+  const example = examples.find((item) => item.slug === params.slug);
 
   if (!example) {
     notFound();
@@ -75,16 +74,16 @@ export default async function BlogPage({ params }: Props) {
   return (
     <main className="">
       <Container>
-        <div className="py-4 border-b border-white/5">
+        <div className="border-b border-white/5 py-4">
           <Link href="/examples" className="inline-flex opacity-60">
             ← Back to Examples
           </Link>
         </div>
 
-        <div className="grid gap-8 mt-8 text-left md:mt-16 md:grid-cols-3 md:gap-16">
+        <div className="mt-8 grid gap-8 text-left md:mt-16 md:grid-cols-3 md:gap-16">
           {/* meta */}
           <div className="order-2 md:order-1">
-            <div className="p-6 top-8 rounded-2xl bg-emerald-100/5 md:sticky">
+            <div className="top-8 rounded-2xl bg-emerald-100/5 p-6 md:sticky">
               <div className="-mt-2">
                 <ExampleMetaRow title="Products">
                   <>
@@ -181,7 +180,7 @@ export default async function BlogPage({ params }: Props) {
                 </ExampleMetaRow>
               </div>
 
-              <div className="grid gap-4 mt-6">
+              <div className="mt-6 grid gap-4">
                 {example.blogUrl && (
                   <Button
                     type="button"
@@ -237,7 +236,7 @@ export default async function BlogPage({ params }: Props) {
               </h1>
 
               <div
-                className="mt-8 post leading-p"
+                className="post mt-8"
                 dangerouslySetInnerHTML={{ __html: content }}
               />
             </article>
@@ -257,11 +256,11 @@ function ExampleMetaRow({
   title: string;
 }) {
   return (
-    <div className="flex items-center py-3 border-b border-b-emerald-100/5">
-      <div className="text-xs tracking-widest uppercase opacity-40">
+    <div className="flex items-center border-b border-b-emerald-100/5 py-3">
+      <div className="text-xs uppercase tracking-widest opacity-40">
         {title}:
       </div>
-      <div className="flex items-center ml-auto text-right">{children}</div>
+      <div className="ml-auto flex items-center text-right">{children}</div>
     </div>
   );
 }

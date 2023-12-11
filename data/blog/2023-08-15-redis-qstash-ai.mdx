@@ -2,16 +2,15 @@
 slug: redis-qstash-ai
 title: "Caching OpenAI API Responses with Upstash Redis"
 authors:
-- kay
+  - kay
 tags: [qstash, redis, openai]
 ---
 
-If you used the OpenAI API, you might have noticed that it’s pretty slow and sometimes doesn’t even respond. Especially the GPT-4 model is prone to high latency responses. Also, you pay for every answer you get. Those are all reasons to avoid serving responses directly. 
+If you used the OpenAI API, you might have noticed that it’s pretty slow and sometimes doesn’t even respond. Especially the GPT-4 model is prone to high latency responses. Also, you pay for every answer you get. Those are all reasons to avoid serving responses directly.
 
 You can store your responses in Upstash Redis to get around these issues. If you’re serving the same response to many clients, this can save you quite some money, and with global deployments, you can be sure users get the info as quickly as possible.
 
 This article will guide you through caching OpenAI API responses to an Upstash Redis database.
-
 
 ## Features
 
@@ -21,23 +20,20 @@ We will build a web app showing visitors a list of history jokes.
 2. Cache the joke for future delivery
 3. Display all jokes
 
-
 ## Technology
 
 We will use the following technologies to build the app:
 
-* Node.js as HTTP server
-* The OpenAI API to generate history jokes
-* Upstash QStash to trigger a new joke request from the HTTP server to the OpenAI API
-* Upstash Redis to store the joke for later use
-
+- Node.js as HTTP server
+- The OpenAI API to generate history jokes
+- Upstash QStash to trigger a new joke request from the HTTP server to the OpenAI API
+- Upstash Redis to store the joke for later use
 
 ## Prerequisites
 
-* [An OpenAI account with API access](https://platform.openai.com/signup?launch) to get access to an AI
-* [An Upstash account](https://console.upstash.com/login) to send the request to the OpenAI API and cache the AI responses in Upstash Redis
-* [A Node.js installation](https://nodejs.org/en) to call the OpenAI and Upstash APIs
-
+- [An OpenAI account with API access](https://platform.openai.com/signup?launch) to get access to an AI
+- [An Upstash account](https://console.upstash.com/login) to send the request to the OpenAI API and cache the AI responses in Upstash Redis
+- [A Node.js installation](https://nodejs.org/en) to call the OpenAI and Upstash APIs
 
 ## Implementation
 
@@ -47,34 +43,33 @@ Let’s start by creating the HTTP server to fetch the jokes, store them in Upst
 
 First, we create a new Node.js project and install the dependencies.
 
-``` shell
+```shell
     $ mkdir history-jokes & cd history-jokes
     $ npm init -y
-    $ npm i dotenv express axios @upstash/redis @upstash/qstash 
+    $ npm i dotenv express axios @upstash/redis @upstash/qstash
 ```
 
 ### Implementing the Server
 
 To implement the server, create an `index.js` file and copy the following code into it:
 
-
 ```javascript
-require("dotenv").config()
+require("dotenv").config();
 
-const axios = require("axios")
-const express = require("express")
-const { Redis } = require("@upstash/redis")
-const { Receiver } = require("@upstash/qstash")
+const axios = require("axios");
+const express = require("express");
+const { Redis } = require("@upstash/redis");
+const { Receiver } = require("@upstash/qstash");
 
 const redisClient = new Redis({
   url: process.env.UPSTASH_REDIS_URL,
   token: process.env.UPSTASH_REDIS_TOKEN,
-})
+});
 
 const qstashReceiver = new Receiver({
   currentSigningKey: process.env.UPSTASH_QSTASH_CURRENT_SIGNING_KEY,
   nextSigningKey: process.env.UPSTASH_QSTASH_CURRENT_NEXT_KEY,
-})
+});
 
 const openaiApiClient = axios.create({
   baseURL: "https://api.openai.com/v1",
@@ -82,29 +77,29 @@ const openaiApiClient = axios.create({
     Authorization: "Bearer " + process.env.OPENAI_TOKEN,
     "Content-Type": "application/json",
   },
-})
+});
 
-const server = express()
+const server = express();
 
 server.use("/generate", async (request, response, next) => {
   // return next()
-  let validRequest = false
+  let validRequest = false;
   try {
     validRequest = await qstashReceiver.verify({
       signature: request.headers["upstash-signature"],
       body: "",
-    })
+    });
   } catch (e) {}
-  if (!validRequest) return response.status(403).end("Forbidden")
+  if (!validRequest) return response.status(403).end("Forbidden");
 
-  return next()
-})
+  return next();
+});
 
 server.post("/generate", async (_request, response) => {
-  const today = new Date()
-  const month = today.toLocaleString("default", { month: "long" })
-  let day = today.toLocaleString("default", { day: "numeric" })
-  day = day == 1 ? "1st" : day == 2 ? "2nd" : day == "3" ? "3rd" : day + "th"
+  const today = new Date();
+  const month = today.toLocaleString("default", { month: "long" });
+  let day = today.toLocaleString("default", { day: "numeric" });
+  day = day == 1 ? "1st" : day == 2 ? "2nd" : day == "3" ? "3rd" : day + "th";
 
   const { data } = await openaiApiClient.post("/chat/completions", {
     model: "gpt-3.5-turbo",
@@ -118,39 +113,38 @@ server.post("/generate", async (_request, response) => {
         content: `Please tell me a joke for ${month} the ${day}.`,
       },
     ],
-  })
+  });
 
   const joke = JSON.stringify({
     date: month + " the " + day,
     text: data.choices[0].message.content,
-  })
+  });
 
-  await redisClient.lpush("jokes", joke)
+  await redisClient.lpush("jokes", joke);
 
-  response.end()
-})
+  response.end();
+});
 
 server.get("/", async (_request, response) => {
-  let html = "<h1>History Jokes for Every Day</h1>"
+  let html = "<h1>History Jokes for Every Day</h1>";
 
-  const jokes = await redisClient.lrange("jokes", 0, -1)
+  const jokes = await redisClient.lrange("jokes", 0, -1);
 
   html +=
     "<ul>" +
     jokes
       .map(({ date, text }) => `<li><b>${date}</b><br><pre>${text}</pre></li>`)
       .join("") +
-    "</ul>"
+    "</ul>";
 
-  response.setHeader("Content-Type", "text/html")
-  response.end(html)
-})
+  response.setHeader("Content-Type", "text/html");
+  response.end(html);
+});
 
-server.listen(3000)
+server.listen(3000);
 ```
 
-
-Let’s go through the important parts of this code. 
+Let’s go through the important parts of this code.
 
 We use the `redisClient` to save our responses into Upstash Redis and load them for display.
 
@@ -158,21 +152,19 @@ The `qstashReceiver` is responsible for verifying the daily calls from Upstash Q
 
 We use Axios to create a client for the OpenAI API, so we don’t have to pass the `baseUrl` and `Authentication` header whenever we call the API.
 
-Next, we create an Express middleware that uses the `qstashReceiver` to verify all requests to the `/generate` endpoint. Since we use QStash only to trigger the endpoint and don’t pass any values, we can use an empty string as the `body`. 
+Next, we create an Express middleware that uses the `qstashReceiver` to verify all requests to the `/generate` endpoint. Since we use QStash only to trigger the endpoint and don’t pass any values, we can use an empty string as the `body`.
 
 > Note: The middleware allows all requests if you un-comment the line with "`// return next()`". You can use this to test the `/generate` endpoint on `localhost`.
 
-The `/generate` endpoint listens for `POST` requests and creates and stores the actual jokes. It calculates the current `month` and `day` and uses it to create two prompts for the AI. One tells the AI to behave like a comedian, and the second asks to tell a history joke about the current month and day. 
+The `/generate` endpoint listens for `POST` requests and creates and stores the actual jokes. It calculates the current `month` and `day` and uses it to create two prompts for the AI. One tells the AI to behave like a comedian, and the second asks to tell a history joke about the current month and day.
 
 We call the OpenAI API with the prompts and save the result into a `LIST` in Upstash Redis.
 
 The `/` endpoint listens for `GET` requests and displays the saved jokes. It loads the `LIST` from Upstash Redis, formats it as HTML list elements, and sends it to the client.
 
-
 ## Deployment
 
-Now that the server is set up, we must create the cloud resources and fill in the API credentials to access them. 
-
+Now that the server is set up, we must create the cloud resources and fill in the API credentials to access them.
 
 ### Creating a Credential File
 
@@ -188,27 +180,23 @@ UPSTASH_QSTASH_NEXT_SIGNING_KEY=""
 
 In the next steps, we will fill each of these empty strings.
 
-
 ### Creating an OpenAI API Token
 
-Let’s start with the OpenAI API because we only need a key for the existing API; we don’t have to deploy anything. 
+Let’s start with the OpenAI API because we only need a key for the existing API; we don’t have to deploy anything.
 
 [Go to the OpenAI web console](https://platform.openai.com/account/api-keys) and click the “create new secret key” button. Give the key a name, click “Create secret key”, copy the new key, and paste it into the .env file as the value of `OPENAI_TOKEN`.
-
 
 ### Deploying a Recurring Request with QStash
 
 To tell QStash that it should send a request to the `/generate` endpoint once a day, you use the “Request Builder”. [You find it in the Upstash console](https://console.upstash.com/qstash). Figure 1 shows the configuration details.
 
-
 ![QStash Request Builder](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/se7huw1xpvjzkm9pxuem.png)
 
-*Figure 1: QStash Request Builder*
+_Figure 1: QStash Request Builder_
 
 Replace the `<HOSTNAME>` with the domain that hosts your server. You need a publicly accessible hostname for QStash to work.
 
 You find the singing keys QStash uses in the Upstash console in the “Request Builder” section. Click on the grey “Singing Keys” drop-down, copy each key and paste them in the right places of the `.env` file.
-
 
 ### Deploying an Upstash Redis Database
 
@@ -218,10 +206,9 @@ This will prompt you with a dialog to fill in the database configuration. Figure
 
 ![Upstash Redis Configuration](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/si1l89te7ksww101z1gj.png)
 
-*Figure 2: Upstash Redis Configuration*
+_Figure 2: Upstash Redis Configuration_
 
 After the creation is completed, you can scroll down to the “REST API” section, which has two buttons, “UPSTASH_REDIS_REST_URL” and “UPSTASH_REDIS_REST_TOKEN”. Click each of these buttons to copy the corresponding credentials and paste them into the correct place in the `.env` file.
-
 
 ## Testing the Website
 
@@ -229,7 +216,7 @@ To test the website on your local machine, deactivate the QStash validation midd
 
 Run the server with the following command:
 
-``` shell
+```shell
     $ node .
 ```
 
@@ -237,8 +224,7 @@ If you [open the / route in the browser](http://localhost/), you should only see
 
 You must send a `POST` request to the `/generate` endpoint to generate a joke. You can do so with this command:
 
-
-``` shell
+```shell
     $ curl -X POST http://localhost/generate
 ```
 
@@ -246,12 +232,10 @@ If you refresh the browser page, you should see a joke like in Figure 3.
 
 ![Joke Website](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/r30h8adq0urx4q53y86o.png)
 
-
-*Figure 3: Joke website*
+_Figure 3: Joke website_
 
 This joke is now cached in Upstash Redis, so no OpenAI API requests will happen when someone visits the website. This gives you sub-second response times while saving you quite some money.
 
-
 ## Summary
 
-AI APIs are versatile tools that will transform the Internet as we know it, but right now, they’re slow and expensive. Caching is vital when using these APIs, and Upstash Redis is the easiest way to add it to your stack with just a few clicks. 
+AI APIs are versatile tools that will transform the Internet as we know it, but right now, they’re slow and expensive. Caching is vital when using these APIs, and Upstash Redis is the easiest way to add it to your stack with just a few clicks.

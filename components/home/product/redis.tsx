@@ -1,15 +1,20 @@
 "use client";
+
+import React from "react";
+
+import { Product } from "@/utils/type";
+
+import { useSegment } from "@/hooks/use-segment";
+
+import Button from "@/components/button";
+import IconRedis from "@/components/icon-redis";
+
 import {
   ProductBox,
   ProductFeature,
   ProductFeatureItem,
   ProductTitle,
 } from "./comp";
-import Button from "@/components/button";
-import React from "react";
-import { Product } from "@/utils/type";
-import IconRedis from "@/components/icon-redis";
-import { useSegment } from "@/hooks/use-segment";
 
 export default function ServerlessRedis() {
   const { track } = useSegment();

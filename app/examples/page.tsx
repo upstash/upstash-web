@@ -1,9 +1,12 @@
-import Container from "@/components/container";
-import PageHeaderTitle from "@/components/page-header-title";
-import PageHeaderDesc from "@/components/page-header-desc";
+import React from "react";
+
 import Bg from "@/components/bg";
+import Container from "@/components/container";
 import { Client } from "@/components/example/client";
-import {getData, type Example} from "./get-data";
+import PageHeaderDesc from "@/components/page-header-desc";
+import PageHeaderTitle from "@/components/page-header-title";
+
+import { getData, type Example } from "./get-data";
 
 // TODO: set canonical url
 
@@ -38,7 +41,7 @@ export default async function ExamplesPage() {
     <main className="relative z-0 text-center">
       <Bg />
 
-      <section className="pt-8 pb-4 sm:pb-6 sm:pt-12 md:pb-8 md:pt-16">
+      <section className="pb-4 pt-8 sm:pb-6 sm:pt-12 md:pb-8 md:pt-16">
         <Container className="max-w-screen-lg">
           {/* header */}
           <header>

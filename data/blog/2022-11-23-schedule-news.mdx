@@ -2,7 +2,7 @@
 slug: schedule-news
 title: "Post Most Popular NY Times articles to Discord with QStash"
 authors:
-  -  max
+  - max
 tags: [qstash, serverless, callbacks, vercel, discord, news, nytimes]
 ---
 
@@ -52,6 +52,7 @@ and type the handler with the Next.js request and response types.
 ```tsx
 // pages/api/callback.ts_(1/4)
 import type { NextApiRequest, NextApiResponse } from "next";
+
 import { verifySignature } from "@upstash/qstash/nextjs";
 ```
 

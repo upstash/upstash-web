@@ -2,11 +2,11 @@
 
 import { HTMLProps, ReactNode } from "react";
 import Link, { LinkProps } from "next/link";
-import { usePathname } from "next/navigation";
 import cx from "@/utils/cx";
 import { NavItems } from "./header";
+import { useSelectedLayoutSegment } from 'next/navigation'
 
-export default function Nav({}: HTMLProps<HTMLDivElement> & {}) {
+export default function Nav({ }: HTMLProps<HTMLDivElement> & {}) {
   return (
     <nav className="col-span-2 flex items-center justify-center">
       {NavItems.map((item) => {
@@ -27,8 +27,8 @@ function NavLink({
   children,
   ...props
 }: LinkProps & { className?: string; children: ReactNode }) {
-  const pathname = usePathname();
-  const isActive = pathname === href;
+  const segment = useSelectedLayoutSegment()
+  const isActive = href === `/${segment}`
 
   return (
     <Link

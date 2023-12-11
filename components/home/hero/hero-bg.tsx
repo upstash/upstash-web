@@ -16,7 +16,7 @@ export default function HomeHeroBg({
         "bg-emerald-500",
         activeProduct === Product.REDIS && "bg-red-500",
         activeProduct === Product.KAFKA && "bg-blue-500",
-        activeProduct === Product.QSTASH && "bg-purple-500"
+        activeProduct === Product.QSTASH && "bg-purple-500",
       )}
     />
   );

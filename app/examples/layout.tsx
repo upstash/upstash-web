@@ -2,6 +2,7 @@ import "../post.css";
 
 import { ReactNode } from "react";
 import { Metadata } from "next";
+
 import { SITE_URL } from "@/utils/const";
 
 const title = "Upstash Examples";

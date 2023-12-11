@@ -57,6 +57,7 @@ We understand that for most use cases you would store them in your environment a
 
 ```ts
 import { Redis } from "@upstash/redis";
+
 const redis = Redis.fromEnv();
 ```
 
@@ -64,6 +65,7 @@ const redis = Redis.fromEnv();
 
 ```ts
 import { Redis } from "@upstash/redis/cloudflare";
+
 const redis = Redis.fromEnv();
 ```
 
@@ -136,6 +138,7 @@ You can create a new pipeline from your existing `redis` instance.
 
 ```ts
 import { Redis } from "@upstash/redis";
+
 const redis = new Redis({
   /* auth */
 });

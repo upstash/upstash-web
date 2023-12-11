@@ -1,11 +1,15 @@
 "use client";
+
 import { ComponentProps, useEffect, useRef, useState } from "react";
-import { useMDXComponent } from "next-contentlayer/hooks";
-import { IconClipboard, IconClipboardCheck } from "@tabler/icons-react";
+import Image from "next/image";
+
 import cx from "@/utils/cx";
+import { IconCheck, IconCopy } from "@tabler/icons-react";
+import { useMDXComponent } from "next-contentlayer/hooks";
+import Balancer from "react-wrap-balancer";
+
 import ExpandableCode from "./expandable-code";
 import PostNote from "./note";
-import Image from "next/image";
 
 interface MdxProps {
   code: string;
@@ -28,14 +32,18 @@ function CopyFeaturePre(props: ComponentProps<"pre">) {
   useEffect(() => {
     setTimeout(() => {
       setHasCopied(false);
-    }, 2000);
+    }, 3000);
   }, [hasCopied]);
   if (props && !props["data-language"]) {
     return <pre {...props} />;
   }
 
   return (
-    <div ref={containerRef} className="relative">
+    <div
+      {...(props as ComponentProps<"div">)}
+      ref={containerRef}
+      className="relative"
+    >
       <button
         onClick={() => {
           const content =
@@ -44,17 +52,16 @@ function CopyFeaturePre(props: ComponentProps<"pre">) {
           setHasCopied(true);
         }}
         className={cx(
-          "absolute right-5 top-5 flex h-7 w-7 cursor-pointer items-center justify-center rounded-md border p-1 transition ease-in-out hover:border-white/60 hover:text-white/60",
-          !hasCopied
-            ? "border-white/20 text-white/20"
-            : "border-white/60 text-white/60",
+          "absolute right-5 top-5",
+          "flex items-center justify-center p-1",
+          "cursor-pointer rounded-md",
+          "",
+          hasCopied
+            ? "text-emerald-600"
+            : "text-zinc-400 hover:text-zinc-600 dark:text-zinc-600 dark:hover:text-zinc-200",
         )}
       >
-        {hasCopied ? (
-          <IconClipboardCheck stroke={1} />
-        ) : (
-          <IconClipboard stroke={1} />
-        )}
+        {hasCopied ? <IconCheck stroke={1.5} /> : <IconCopy stroke={1.5} />}
       </button>
       <pre {...props} />
     </div>
@@ -86,8 +93,8 @@ function Highlight(props: {
   return (
     <FullWidth>
       <div
-        className="group/highlight text-center grid place-items-center gap-6
-        border-4 rounded-4xl border-white/5 p-10 md:py-16 md:px-20"
+        className="group/highlight grid place-items-center gap-6 rounded-4xl
+        border-4 border-white/5 p-10 text-center md:px-20 md:py-16"
       >
         {props.photo && (
           <Image
@@ -100,10 +107,10 @@ function Highlight(props: {
         )}
 
         <p
-          className="text-xl bg-clip-text font-medium text-transparent
-          bg-gradient-to-br from-white to-[#6DBEA6]"
+          className="bg-gradient-to-br from-white to-[#6DBEA6] bg-clip-text
+          text-xl font-medium text-transparent"
         >
-          {props.children}
+          <Balancer>{props.children}</Balancer>
         </p>
 
         {(props.name || props.title) && (

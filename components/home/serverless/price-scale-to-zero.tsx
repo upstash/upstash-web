@@ -1,5 +1,6 @@
-import { ServerlessBox, ServerlessSummary, ServerlessTitle } from "./comp";
 import cx from "@/utils/cx";
+
+import { ServerlessBox, ServerlessSummary, ServerlessTitle } from "./comp";
 
 export default function PriceScaleToZero() {
   return (
@@ -38,7 +39,7 @@ export default function PriceScaleToZero() {
             <span
               className={cx(
                 "text-xl text-amber-200 md:text-2xl",
-                index === 2 && "text-emerald-300"
+                index === 2 && "text-emerald-300",
               )}
             >
               {value}

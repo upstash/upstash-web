@@ -2,7 +2,7 @@
 slug: redis-and-performance-api
 title: "Upstash for Redis and Performance API: Cache where it Counts"
 authors:
-  -  rodney
+  - rodney
 tags: [redis, deno, performance, serverless]
 ---
 
@@ -103,7 +103,7 @@ export async function timeEvent<EventReturnType>(
   {
     description,
     performanceMeasures,
-  }: { description: string; performanceMeasures: PerformanceMeasure[] }
+  }: { description: string; performanceMeasures: PerformanceMeasure[] },
 ): Promise<EventReturnType> {
   // prepare
   const startName = `${description}-started`;
@@ -116,7 +116,7 @@ export async function timeEvent<EventReturnType>(
 
   // record
   performanceMeasures.push(
-    performance.measure(description, startName, finishName)
+    performance.measure(description, startName, finishName),
   );
 
   return result;
@@ -131,8 +131,10 @@ We can use the new `timeEvent` function in the handler, then start running the c
 
 ```ts
 import type { Handlers, PageProps } from "$fresh/server.ts";
+
 import "$std/dotenv/load.ts"; /* included for visibility here, typically you
- can import once for project in `dev.ts` */
+                              can import once for project in `dev.ts` */
+
 import { timeEvent } from "@/utils/performance.ts";
 
 // ...TRUNCATED
@@ -224,7 +226,7 @@ export async function getTinybirdViews({
         headers: {
           Authorization: `Bearer ${TINYBIRD_TOKEN}`,
         },
-      }
+      },
     );
 
     const {

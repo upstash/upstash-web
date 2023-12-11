@@ -2,7 +2,7 @@
 slug: edge-guard
 title: "Implement IP Allow/Deny List at Edge with Cloudflare Workers and Upstash Redis"
 authors:
-  -  lisa
+  - lisa
 tags: [redis, database, cloudflare, cloudflare workers, serverless]
 ---
 
@@ -73,7 +73,7 @@ async function handleRequest(request) {
   res = await fetch(
     "https://YOUR_DATABASE_ENDPOINT/sismember/allowed-set/" +
       ip +
-      "?_token=YOUR_REST_API_TOKEN"
+      "?_token=YOUR_REST_API_TOKEN",
   );
   if ((await res.text()).includes("1")) {
     return new Response(ip + " is allowed.");

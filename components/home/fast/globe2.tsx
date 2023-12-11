@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+
+import cx from "@/utils/cx";
 import createGlobe from "cobe";
 import { useSpring } from "react-spring";
+
 import useIntersectionObserver from "@/hooks/use-intersection-observer";
-import cx from "@/utils/cx";
 
 export default function GlobeClient() {
   const divRef = useRef<any>();
@@ -41,7 +43,7 @@ export default function GlobeClient() {
       ref={divRef}
       className={cx(
         "h-full",
-        webglSupported ? "min-h-full md:min-h-[1000px]" : "min-h-[50px]"
+        webglSupported ? "min-h-full md:min-h-[1000px]" : "min-h-[50px]",
       )}
     >
       {webglSupported && showGlobe && <GlobeAnimation />}

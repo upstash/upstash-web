@@ -1,13 +1,15 @@
+import Link from "next/link";
+
+import { HOME_SECTIONS } from "@/utils/const";
+
+import Bg from "@/components/bg";
+import Container from "@/components/container";
 import {
   SectionHeader,
   SectionHeaderSummary,
   SectionHeaderTitle,
 } from "@/components/home/section-header";
-import Container from "@/components/container";
 import Investors from "@/components/investor/investors";
-import Link from "next/link";
-import Bg from "@/components/bg";
-import { HOME_SECTIONS } from "@/utils/const";
 
 export default function HomeInvestors() {
   return (

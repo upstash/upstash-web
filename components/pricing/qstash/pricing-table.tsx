@@ -2,14 +2,14 @@ import Button from "@/components/button";
 
 export default function PricingTable() {
   return (
-    <div className="grid lg:grid-cols-3 gap-6">
+    <div className="grid gap-6 lg:grid-cols-3">
       {/**/}
 
       {/* FREE */}
 
-      <div className="rounded-3xl bg-white/5 px-6 py-8 flex flex-col gap-6 items-center">
+      <div className="flex flex-col items-center gap-6 rounded-3xl bg-white/5 px-6 py-8">
         <div className="grow">
-          <h4 className="mb-2 text-emerald-400 text-xl font-semibold">Free</h4>
+          <h4 className="mb-2 text-xl font-semibold text-emerald-400">Free</h4>
 
           <h5 className="text-3xl font-semibold">$0</h5>
           <p className="text-white/40">-</p>
@@ -21,7 +21,7 @@ export default function PricingTable() {
           </div>
         </div>
 
-        <hr className="border-0 border-b border-b-white/5 w-2/3" />
+        <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
         <div>
           <p className="text-sm text-white/40">Max Messages per Day</p>
@@ -33,7 +33,7 @@ export default function PricingTable() {
           <p className="font-semibold">100</p>
         </div>
 
-        <hr className="border-0 border-b border-b-white/5 w-2/3" />
+        <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
         <div>
           <Button
@@ -41,7 +41,7 @@ export default function PricingTable() {
             type="button"
             hideIcon
             href="https://console.upstash.com"
-            className="bg-zinc-50 text-zinc-950 font-medium"
+            className="bg-zinc-50 font-medium text-zinc-950"
           >
             Start Now
           </Button>
@@ -50,9 +50,9 @@ export default function PricingTable() {
 
       {/* PAYG */}
 
-      <div className="rounded-3xl px-4 py-8 flex flex-col gap-6 items-center bg-white/10 border-2 border-white/20">
+      <div className="flex flex-col items-center gap-6 rounded-3xl border-2 border-white/20 bg-white/10 px-4 py-8">
         <div className="grow">
-          <h4 className="mb-2 text-emerald-400 text-xl font-semibold">
+          <h4 className="mb-2 text-xl font-semibold text-emerald-400">
             Pay as you go
           </h4>
 
@@ -66,7 +66,7 @@ export default function PricingTable() {
           </div>
         </div>
 
-        <hr className="border-0 border-b border-b-white/5 w-2/3" />
+        <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
         <div>
           <p className="text-sm text-white/40">Max Messages per Day</p>
@@ -78,7 +78,7 @@ export default function PricingTable() {
           <p className="font-semibold">100</p>
         </div>
 
-        <hr className="border-0 border-b border-b-white/5 w-2/3" />
+        <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
         <div>
           <Button
@@ -86,7 +86,7 @@ export default function PricingTable() {
             type="button"
             hideIcon
             href="https://console.upstash.com"
-            className="bg-zinc-50 text-zinc-950 font-medium"
+            className="bg-zinc-50 font-medium text-zinc-950"
           >
             Start Now
           </Button>
@@ -95,13 +95,13 @@ export default function PricingTable() {
 
       {/* ENTERPRISE */}
 
-      <div className="rounded-3xl bg-white/5 px-6 py-8 flex flex-col gap-6 items-center">
+      <div className="flex flex-col items-center gap-6 rounded-3xl bg-white/5 px-6 py-8">
         <div>
-          <h4 className="mb-2 text-emerald-400 text-xl font-semibold">Pro</h4>
+          <h4 className="mb-2 text-xl font-semibold text-emerald-400">Pro</h4>
 
-          <h5 className="text-3xl font-semibold flex items-baseline">
+          <h5 className="flex items-baseline text-3xl font-semibold">
             $180
-            <span className="text-base font-normal opacity-40 ml-1">
+            <span className="ml-1 text-base font-normal opacity-40">
               / month
             </span>
           </h5>
@@ -115,7 +115,7 @@ export default function PricingTable() {
           </div>
         </div>
 
-        <hr className="border-0 border-b border-b-white/5 w-2/3" />
+        <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
         <div>
           <p className="text-sm text-white/40">Max Messages per Day</p>
@@ -127,7 +127,7 @@ export default function PricingTable() {
           <p className="font-semibold">Custom</p>
         </div>
 
-        <hr className="border-0 border-b border-b-white/5 w-2/3" />
+        <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
         <div>
           <Button
@@ -135,7 +135,7 @@ export default function PricingTable() {
             type="button"
             hideIcon
             href="https://console.upstash.com"
-            className="bg-zinc-50 text-zinc-950 font-medium"
+            className="bg-zinc-50 font-medium text-zinc-950"
           >
             Start Now
           </Button>

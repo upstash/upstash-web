@@ -1,10 +1,10 @@
 import { defineDocumentType, makeSource } from "contentlayer/source-files";
-
 import readingTime from "reading-time";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypePrettyCode from "rehype-pretty-code";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
+
 import { authors } from "./utils/authors";
 
 export const Customer = defineDocumentType(() => ({
@@ -21,6 +21,7 @@ export const Customer = defineDocumentType(() => ({
     highlight: { type: "string", required: true },
     cover_image: { type: "string", required: true },
     draft: { type: "boolean" },
+    order: { type: "number" },
   },
   computedFields: {
     slug: {
@@ -104,7 +105,10 @@ export default makeSource({
       [
         rehypePrettyCode,
         {
-          theme: "poimandres",
+          theme: {
+            dark: "poimandres",
+            light: "github-light",
+          },
           onVisitLine(node: any) {
             // Prevent lines from collapsing in `display: grid` mode, and allow empty
             // lines to be copy/pasted

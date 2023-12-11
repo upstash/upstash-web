@@ -1,5 +1,7 @@
 import { HTMLProps, ReactNode } from "react";
+
 import cx from "@/utils/cx";
+
 import Icon, { ICON_NAMES, IconProps } from "@/components/icon";
 
 export interface IButton extends HTMLProps<HTMLAnchorElement> {
@@ -32,7 +34,7 @@ export default function Button({
       className={cx(
         "group/link-new inline-flex cursor-pointer items-center transition",
         classes[type],
-        className
+        className,
       )}
       {...props}
     >
@@ -46,7 +48,7 @@ export default function Button({
           className={cx(
             "ml-auto opacity-60",
             // "transition group-hover/link-new:opacity-100",
-            iconProps?.className
+            iconProps?.className,
           )}
         />
       )}

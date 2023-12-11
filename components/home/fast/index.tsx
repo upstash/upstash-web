@@ -1,12 +1,15 @@
 "use client";
 
+import dynamic from "next/dynamic";
+
+import { HOME_SECTIONS } from "@/utils/const";
+import cx from "@/utils/cx";
+
+import useIsMobile from "@/hooks/use-is-mobile";
+
+import Bg from "@/components/bg";
 import Container from "@/components/container";
 import Statistic from "@/components/home/fast/statistic";
-import cx from "@/utils/cx";
-import Bg from "@/components/bg";
-import dynamic from "next/dynamic";
-import { HOME_SECTIONS } from "@/utils/const";
-import useIsMobile from "@/hooks/use-is-mobile";
 
 const Globe = dynamic(() => import("./globe2"), {
   ssr: false,
@@ -40,7 +43,7 @@ export default function Fast() {
           "pointer-events-none absolute inset-x-0 -top-8 -z-10",
           "font-display text-[13vw] font-bold leading-tight",
           "bg-gradient-to-t bg-clip-text text-transparent",
-          "from-emerald-300/5 to-emerald-200/[0.02]"
+          "from-emerald-300/5 to-emerald-200/[0.02]",
         )}
       >
         Fast Anywhere

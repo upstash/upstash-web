@@ -8,11 +8,11 @@
 }
 
 .post a {
-  @apply text-emerald-400 hover:underline;
+  @apply font-medium text-emerald-600 hover:underline dark:text-emerald-400;
 }
 
 .post blockquote {
-  @apply rounded-xl border border-white/5 bg-white/5 p-4 text-zinc-300 md:p-6;
+  @apply rounded-xl bg-emerald-700/10 p-4 dark:bg-white/5 md:p-6;
 }
 
 .post ul,
@@ -33,7 +33,7 @@
 }
 
 .post ul > li:before {
-  @apply absolute left-0 h-0.5 w-3 rounded-full bg-zinc-600;
+  @apply absolute left-0 h-0.5 w-3 rounded-full bg-emerald-800/40 dark:bg-zinc-600;
   content: "";
   top: 0.8em;
 }
@@ -55,8 +55,8 @@
 }
 
 .post code:not(pre > code) {
-  @apply rounded border border-white/3
-    bg-emerald-100/10 px-1 py-0.5 text-[0.86em];
+  @apply rounded border border-emerald-800/10 bg-emerald-500/10
+    px-1 py-0.5 text-[0.86em] dark:border-white/3 dark:bg-emerald-100/10;
 }
 
 .post .subheading-anchor {

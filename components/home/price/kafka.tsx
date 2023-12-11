@@ -1,4 +1,7 @@
 "use client";
+
+import { useSegment } from "@/hooks/use-segment";
+
 import {
   PriceBadge,
   PriceBox,
@@ -9,7 +12,6 @@ import {
   PriceValue,
 } from "@/components/home/price/comp";
 import IconKafka from "@/components/icon-kafka";
-import { useSegment } from "@/hooks/use-segment";
 
 export default function PriceKafka() {
   const segment = useSegment();

@@ -2,7 +2,7 @@
 slug: data-leaks-vercel-edge
 title: "Prevent Data Leaks using Vercel Edge Functions and Upstash for Redis"
 authors:
-  -  kay
+  - kay
 tags: [redis, vercel, edge, serverless]
 ---
 
@@ -72,7 +72,7 @@ const redisClient = new Redis({
 
 export default async function handler() {
   const wordResponse = await fetch(
-    "https://raw.githubusercontent.com/kay-is/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/master/en"
+    "https://raw.githubusercontent.com/kay-is/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/master/en",
   );
   const words = await wordResponse.text();
 
@@ -195,11 +195,12 @@ File `pages/api/filtered-data.ts`:
 
 ```ts
 import { filter } from "@/utils/word-filter";
+
 export const config = { runtime: "edge" };
 
 export default async function handler() {
   const maskedText = await filter(
-    "He slipped and fell on his butt. Well, that wasn't very sexy."
+    "He slipped and fell on his butt. Well, that wasn't very sexy.",
   );
 
   return new Response(JSON.stringify({ text: maskedText }), {
@@ -219,6 +220,7 @@ File `pages/api/filter.ts`:
 
 ```ts
 import type { NextApiRequest } from "next";
+
 import { filter } from "@/utils/word-filter";
 
 export const config = { runtime: "edge" };

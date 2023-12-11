@@ -74,11 +74,11 @@ Finally, modify your `src/index.ts` to add typing for the environment variables 
 
 ```ts
 type Bindings = {
-	QSTASH_CURRENT_SIGNING_KEY: string;
-	QSTASH_NEXT_SIGNING_KEY: string;
-	UPSTASH_REDIS_REST_URL: string;
-	UPSTASH_REDIS_REST_TOKEN: string;
-	OPENAI_API_KEY: string;
+  QSTASH_CURRENT_SIGNING_KEY: string;
+  QSTASH_NEXT_SIGNING_KEY: string;
+  UPSTASH_REDIS_REST_URL: string;
+  UPSTASH_REDIS_REST_TOKEN: string;
+  OPENAI_API_KEY: string;
 };
 
 const app = new Hono<{ Bindings: Bindings }>();
@@ -137,18 +137,18 @@ import { Receiver } from "@upstash/qstash";
 import { type MiddlewareHandler } from "hono";
 
 declare global {
-	interface Response {
-		locals: {
-			query: string;
-		};
-	}
+  interface Response {
+    locals: {
+      query: string;
+    };
+  }
 }
 
 export const verify: MiddlewareHandler = async (ctx, next) => {
-	const receiver = new Receiver({
-		currentSigningKey: ctx.env.QSTASH_CURRENT_SIGNING_KEY,
-		nextSigningKey: ctx.env.QSTASH_NEXT_SIGNING_KEY,
-	});
+  const receiver = new Receiver({
+    currentSigningKey: ctx.env.QSTASH_CURRENT_SIGNING_KEY,
+    nextSigningKey: ctx.env.QSTASH_NEXT_SIGNING_KEY,
+  });
 };
 ```
 
@@ -196,23 +196,23 @@ Because we're going to be connecting this endpoint to our personal OpenAI API ke
 Let's start by creating a new middleware in `src/middleware/ratelimit.ts`:
 
 ```ts
-import { Redis } from "@upstash/redis/cloudflare";
 import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis/cloudflare";
 import { type MiddlewareHandler } from "hono";
 
 export const ratelimit: MiddlewareHandler = async (ctx, next) => {
-	const redis = new Redis({
-		url: ctx.env.UPSTASH_REDIS_REST_URL,
-		token: ctx.env.UPSTASH_REDIS_REST_TOKEN,
-	});
+  const redis = new Redis({
+    url: ctx.env.UPSTASH_REDIS_REST_URL,
+    token: ctx.env.UPSTASH_REDIS_REST_TOKEN,
+  });
 
-	const ratelimit = new Ratelimit({
-		redis,
-		limiter: Ratelimit.slidingWindow(10, "10 s"),
-		analytics: true,
-	});
+  const ratelimit = new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(10, "10 s"),
+    analytics: true,
+  });
 
-	await next();
+  await next();
 };
 ```
 
@@ -226,8 +226,8 @@ const cache = new Map(); // outside of the middleware handler
 // snip
 
 const ratelimit = new Ratelimit({
-	ephemeralCache: cache,
-	// snip
+  ephemeralCache: cache,
+  // snip
 });
 ```
 
@@ -265,8 +265,8 @@ When we send an HTTP request to QStash, the destination we specify will be the U
 
 ```ts
 // snip
-import { verify } from "./middleware/verify";
 import { ratelimit } from "./middleware/ratelimit";
+import { verify } from "./middleware/verify";
 
 // snip
 
@@ -287,27 +287,27 @@ import { OpenAI } from "langchain/llms/openai";
 // snip
 
 app.post("/api/announce", ratelimit, verify, async (ctx) => {
-	const redis = new Redis({
-		url: ctx.env.UPSTASH_REDIS_REST_URL,
-		token: ctx.env.UPSTASH_REDIS_REST_TOKEN,
-	});
+  const redis = new Redis({
+    url: ctx.env.UPSTASH_REDIS_REST_URL,
+    token: ctx.env.UPSTASH_REDIS_REST_TOKEN,
+  });
 
-	const cache = new UpstashRedisCache({ client: redis });
-	const model = new OpenAI({
-		cache,
-		openAIApiKey: ctx.env.OPENAI_API_KEY,
-	});
+  const cache = new UpstashRedisCache({ client: redis });
+  const model = new OpenAI({
+    cache,
+    openAIApiKey: ctx.env.OPENAI_API_KEY,
+  });
 
-	const query = ctx.res.locals.query;
-	const result = await model
-		.call(query)
-		.then((result) => {
-			console.log(result);
-			return result;
-		})
-		.catch((err) => console.error(err));
+  const query = ctx.res.locals.query;
+  const result = await model
+    .call(query)
+    .then((result) => {
+      console.log(result);
+      return result;
+    })
+    .catch((err) => console.error(err));
 
-	return new Response(result ?? "", { status: 200 });
+  return new Response(result ?? "", { status: 200 });
 });
 
 // snip
@@ -335,7 +335,7 @@ Upstash provides a [QStash console](https://console.upstash.com/qstash?tab=detai
 
 ```json
 {
-	"query": "What's the derivative of e^x?"
+  "query": "What's the derivative of e^x?"
 }
 ```
 

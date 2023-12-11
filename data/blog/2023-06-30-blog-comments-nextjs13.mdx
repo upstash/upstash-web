@@ -2,10 +2,9 @@
 slug: blog-comments-nextjs13
 title: "Build a Comment Section for your NextJS blog using Redis and NextAuth"
 authors:
-  -  jaydeep
+  - jaydeep
 tags: [redis, nextjs, nextauth]
 ---
-
 
 We will build a comment section for your blog in this tutorial️. The tech stack we will be:
 
@@ -82,7 +81,9 @@ Now, NextAuth allows you to Sign in and SignOut from any Client Component using 
 ```tsx
 // app/layout.tsx
 "use client";
+
 import "./globals.css";
+
 import { SessionProvider } from "next-auth/react";
 
 export default function RootLayout({
@@ -107,7 +108,7 @@ You can access the session state using the `useSession` hook from `next-auth`. H
 ```tsx
 "use Client";
 
-import { useSession, signIn, signOut } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 export default function LoginButton() {
   const { data: session } = useSession();
@@ -193,7 +194,7 @@ let's use it.
 You can see the entire code [here](https://github.com/JDeepD/NextJS13-Comment/tree/main/app/api/comment). Here is the gist of it:
 
 1. Create a comment: `redis.lpush(referer, comment)`. This will push the comment in list
-having the key `referer`
+   having the key `referer`
 
 2. Get all comments `redis.lrange(referer, 0, -1)`
 
@@ -214,6 +215,7 @@ for making requests.
 "use client";
 
 import { useState } from "react";
+
 import type { Comment } from "@/app/interfaces/interfaces";
 import useSWR from "swr";
 
@@ -226,7 +228,7 @@ const useComment = () => {
     fetcher,
     {
       fallbackData: [],
-    }
+    },
   );
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

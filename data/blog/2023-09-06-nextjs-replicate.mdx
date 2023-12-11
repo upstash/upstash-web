@@ -52,9 +52,10 @@ Your route should look like this:
 
 ```jsx
 import { NextResponse } from "next/server";
-import Replicate from "replicate";
-import { Redis } from "@upstash/redis";
+
 import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+import Replicate from "replicate";
 
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL,
@@ -95,7 +96,7 @@ export async function POST(request) {
           prompt: "In the style of HISGH. " + prompt,
           // ... other model parameters
         },
-      }
+      },
     );
 
     return NextResponse.json(output, {

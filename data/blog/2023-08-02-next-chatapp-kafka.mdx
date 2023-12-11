@@ -2,8 +2,8 @@
 slug: next-chatapp-with-kafka
 title: "Building a Chat Application using Upstash Kafka, Redis and Next.js"
 authors:
-    - fahreddin
-tags: [next.js, kafka, redis, fly.io]
+  - fahreddin
+tags: [nextjs, kafka, redis, fly]
 ---
 
 ## Project Description
@@ -118,79 +118,78 @@ Now that we've configured the credentials, we may proceed with the application.
 Index page will contain the client registration/creation operations. When a username is submitted, a new client will be created and listed under the _Current Clients_ table.
 
 ```tsx title="pages/index.tsx"
-import styles from "@/styles/Home.module.css";
-import Link from "next/link";
 import { useState } from "react";
+import Link from "next/link";
+
 import { Redis } from "@upstash/redis";
 
+import styles from "@/styles/Home.module.css";
+
 export default function Home() {
-    const [usernameInput, setUsernameInput] = useState<string>("");
-    const [usernameList, setUsernameList] = useState<string[]>(Array<string>);
+  const [usernameInput, setUsernameInput] = useState<string>("");
+  const [usernameList, setUsernameList] = useState<string[]>(Array<string>);
 
-    const handleInputChange = (
-        e: React.ChangeEvent<HTMLInputElement>
-    ): void => {
-        const inputValue: string = e.target.value;
-        setUsernameInput(inputValue);
-    };
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const inputValue: string = e.target.value;
+    setUsernameInput(inputValue);
+  };
 
-    const addUsernameClient = (e: React.FormEvent<HTMLFormElement>): void => {
-        e.preventDefault();
-        setUsernameList([...usernameList, usernameInput]);
-        setUsernameInput("");
-    };
-    return (
-        <div className={styles.container}>
-            <div className={styles.welcomeSection}>
-                <h1>Welcome to the demo message app!</h1>
-                <p>
-                    This application uses Upstash Kafka for message passing, and
-                    Upstash Redis for state management.
-                    <br />
-                    <br />
-                    To get started, create several clients by typing in unique usernames
-                    to the input section below and submitting.
-                    <br />
-                    <br />
-                    The usernames will be added to the list of current clients.
-                    Click on a username to open a new tab with that
-                    client&apos;s message display.
-                    <br />
-                    <br />
-                    You can have multiple sessions open at once.
-                </p>
-            </div>
-            <form className={styles.formSection} onSubmit={addUsernameClient}>
-                <input
-                    type="text"
-                    className={styles.formInput}
-                    value={usernameInput}
-                    onChange={handleInputChange}
-                ></input>
+  const addUsernameClient = (e: React.FormEvent<HTMLFormElement>): void => {
+    e.preventDefault();
+    setUsernameList([...usernameList, usernameInput]);
+    setUsernameInput("");
+  };
+  return (
+    <div className={styles.container}>
+      <div className={styles.welcomeSection}>
+        <h1>Welcome to the demo message app!</h1>
+        <p>
+          This application uses Upstash Kafka for message passing, and Upstash
+          Redis for state management.
+          <br />
+          <br />
+          To get started, create several clients by typing in unique usernames to
+          the input section below and submitting.
+          <br />
+          <br />
+          The usernames will be added to the list of current clients. Click on a
+          username to open a new tab with that client&apos;s message display.
+          <br />
+          <br />
+          You can have multiple sessions open at once.
+        </p>
+      </div>
+      <form className={styles.formSection} onSubmit={addUsernameClient}>
+        <input
+          type="text"
+          className={styles.formInput}
+          value={usernameInput}
+          onChange={handleInputChange}
+        ></input>
 
-                <button className={styles.formSubmit} type="submit">
-                    Create the client!
-                </button>
-            </form>
-            <div className={styles.clientListSection}>
-                <p className={styles.clientListHeader}>Current Clients</p>
-                <div className={styles.clientList}>
-                    {usernameList.map((username, i) => {
-                        return (
-                            <Link
-                                href={`/user/${username}`}
-                                key={`${i}`}
-                                className={styles.userClient}
-                                target={"_blank"}
-                            >
-                                <p>{username}</p>
-                            </Link>
-                        );
-                    })}
-                </div>
-            </div>
+        <button className={styles.formSubmit} type="submit">
+          Create the client!
+        </button>
+      </form>
+      <div className={styles.clientListSection}>
+        <p className={styles.clientListHeader}>Current Clients</p>
+        <div className={styles.clientList}>
+          {usernameList.map((username, i) => {
+            return (
+              <Link
+                href={`/user/${username}`}
+                key={`${i}`}
+                className={styles.userClient}
+                target={"_blank"}
+              >
+                <p>{username}</p>
+              </Link>
+            );
+          })}
         </div>
-    );
+      </div>
+    </div>
+  );
 }
 ```
 
@@ -198,16 +197,16 @@ If you want to reset the chat history each time the app is reloaded, you can use
 
 ```ts title="pages/index.tsx"
 export async function getServerSideProps() {
-    const redis = new Redis({
-        url: process.env.UPSTASH_REDIS_REST_URL,
-        token: process.env.UPSTASH_REDIS_REST_TOKEN,
-    });
+  const redis = new Redis({
+    url: process.env.UPSTASH_REDIS_REST_URL,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN,
+  });
 
-    await redis.del("messagesList");
+  await redis.del("messagesList");
 
-    return {
-        props: {},
-    };
+  return {
+    props: {},
+  };
 }
 ```
 
@@ -220,78 +219,79 @@ To implement dynamic routing for the clients, we will create a folder named `/pa
 Here's the main component of the client. This component will hold the states for the list of messages, username etc. We are using useWebSocket hook to create message, connection and disconnection events from the WebSocket. When a message event is emitted, message will be added to message list and MessageDisplay component will be rerendered.
 
 ```tsx title="/pages/user/[username].tsx"
-import useWebSocket from "react-use-websocket";
 import { useState } from "react";
 import { useRouter } from "next/router";
-import styles from "@/styles/Home.module.css";
+
 import { Redis } from "@upstash/redis";
+import useWebSocket from "react-use-websocket";
+
+import styles from "@/styles/Home.module.css";
 
 type Message = {
-    id: number;
-    sender: string;
-    text: string;
+  id: number;
+  sender: string;
+  text: string;
 };
 
 export default function MessageApp(props: { messagesData: Message[] }) {
-    const { messagesData } = props;
-    const { username } = useRouter().query;
-    const [inputText, setInputText] = useState<string>("");
-    const [messageList, setMessageList] = useState<Message[]>(messagesData);
-    const [messageCounter, setMessageCounter] = useState<number>(0);
+  const { messagesData } = props;
+  const { username } = useRouter().query;
+  const [inputText, setInputText] = useState<string>("");
+  const [messageList, setMessageList] = useState<Message[]>(messagesData);
+  const [messageCounter, setMessageCounter] = useState<number>(0);
 
-    const handleMessage = function (message: Message) {
-        const nextMessages = [...messageList, message];
-        setMessageList(nextMessages);
+  const handleMessage = function (message: Message) {
+    const nextMessages = [...messageList, message];
+    setMessageList(nextMessages);
+  };
+
+  // handling WebSocket events
+  const { sendMessage } = useWebSocket("ws://localhost:8080", {
+    share: true,
+    filter: () => false,
+    onOpen: () => {
+      console.log("WebSocket connection!");
+      return "connection";
+    },
+
+    onMessage: (message) => {
+      const data = JSON.parse(message.data);
+      const { sender, text }: { sender: string; text: string } = data;
+      const messageData: Message = {
+        id: messageCounter,
+        sender: sender,
+        text: text,
+      };
+      setMessageCounter(messageCounter + 1);
+      handleMessage(messageData);
+      return message;
+    },
+
+    onClose: () => {
+      console.log("WebSocket disconnected!");
+      return "disconnected";
+    },
+  });
+
+  function handleSendMessage(messageText: string) {
+    const messageData = {
+      sender: username,
+      text: messageText,
     };
 
-    // handling WebSocket events
-    const { sendMessage } = useWebSocket("ws://localhost:8080", {
-        share: true,
-        filter: () => false,
-        onOpen: () => {
-            console.log("WebSocket connection!");
-            return "connection";
-        },
+    sendMessage(JSON.stringify(messageData));
+  }
 
-        onMessage: (message) => {
-            const data = JSON.parse(message.data);
-            const { sender, text }: { sender: string; text: string } = data;
-            const messageData: Message = {
-                id: messageCounter,
-                sender: sender,
-                text: text,
-            };
-            setMessageCounter(messageCounter + 1);
-            handleMessage(messageData);
-            return message;
-        },
-
-        onClose: () => {
-            console.log("WebSocket disconnected!");
-            return "disconnected";
-        },
-    });
-
-
-    function handleSendMessage(messageText: string) {
-        const messageData = {
-            sender: username,
-            text: messageText,
-        };
-
-        sendMessage(JSON.stringify(messageData));
-    }
-
-    return (
-        <div className={styles.Container}>
-            <MessageDisplay messages={messageList} />
-            <MessageInput
-                inputText={inputText}
-                setInputText={setInputText}
-                handleSendMessage={handleSendMessage}
-            />
-        </div>
-    );
+  return (
+    <div className={styles.Container}>
+      <MessageDisplay messages={messageList} />
+      <MessageInput
+        inputText={inputText}
+        setInputText={setInputText}
+        handleSendMessage={handleSendMessage}
+      />
+    </div>
+  );
 }
 ```
 
@@ -377,18 +377,18 @@ In order to provide the chat history to the client, we'll use `getServerSideProp
 
 ```typescript title="/pages/user/[username].tsx"
 export async function getServerSideProps() {
-    const redis = new Redis({
-        url: process.env.UPSTASH_REDIS_REST_URL,
-        token: process.env.UPSTASH_REDIS_REST_TOKEN,
-    });
+  const redis = new Redis({
+    url: process.env.UPSTASH_REDIS_REST_URL,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN,
+  });
 
-    const messagesData = (await redis.lrange("messagesList", 0, -1)).reverse();
+  const messagesData = (await redis.lrange("messagesList", 0, -1)).reverse();
 
-    return {
-        props: {
-            messagesData,
-        },
-    };
+  return {
+    props: {
+      messagesData,
+    },
+  };
 }
 ```
 
@@ -413,28 +413,28 @@ tsc --init
 Then, we're going to create the WebSocket, Kafka Producer and Kafka Consumer clients inside `/server/message_server.ts` file:
 
 ```ts title="/server/message_server.ts"
-import { WebSocket } from "ws";
-
 import * as http from "http";
+
 import { Kafka } from "@upstash/kafka";
 import { Redis } from "@upstash/redis";
+import { WebSocket } from "ws";
 
 const server = http.createServer();
 const wss = new WebSocket.Server({ server });
 
 server.listen(8080, () => {
-    console.log("Server is running on port 8080");
+  console.log("Server is running on port 8080");
 });
 
 const kafka = new Kafka({
-    url: process.env.UPSTASH_KAFKA_REST_URL,
-    username: process.env.UPSTASH_KAFKA_REST_USERNAME,
-    password: process.env.UPSTASH_KAFKA_REST_PASSWORD,
+  url: process.env.UPSTASH_KAFKA_REST_URL,
+  username: process.env.UPSTASH_KAFKA_REST_USERNAME,
+  password: process.env.UPSTASH_KAFKA_REST_PASSWORD,
 });
 
 const redis = new Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL,
-    token: process.env.UPSTASH_REDIS_REST_TOKEN,
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
 });
 
 const consumer = kafka.consumer();
@@ -448,21 +448,21 @@ In order to interact with the WebSocket, we're creating `connection` and `messag
 
 ```ts title="/server/message_server.ts"
 wss.on("connection", async (connection, req) => {
-    clients.add(connection);
-    console.log(`New client connected!`);
+  clients.add(connection);
+  console.log(`New client connected!`);
 
-    connection.on("message", async (message) => {
-        const jsonMessage = message.toString();
+  connection.on("message", async (message) => {
+    const jsonMessage = message.toString();
 
-        console.log("Received message:", JSON.parse(jsonMessage));
+    console.log("Received message:", JSON.parse(jsonMessage));
 
-        producer.produce("chat", jsonMessage);
-    });
+    producer.produce("chat", jsonMessage);
+  });
 
-    connection.on("close", () => {
-        console.log(`Client disconnected:`);
-        clients.delete(connection);
-    });
+  connection.on("close", () => {
+    console.log(`Client disconnected:`);
+    clients.delete(connection);
+  });
 });
 ```
 
@@ -470,29 +470,29 @@ Finally, we'll create and run the thread that consumes messages with predefined 
 
 ```ts title="/server/message_server.ts"
 async function run() {
-    while (true) {
-        const messages = await consumer.consume({
-            consumerGroupId: "group_1",
-            instanceId: "instance_1",
-            topics: ["chat"],
-            autoOffsetReset: "earliest",
+  while (true) {
+    const messages = await consumer.consume({
+      consumerGroupId: "group_1",
+      instanceId: "instance_1",
+      topics: ["chat"],
+      autoOffsetReset: "earliest",
+    });
+
+    if (messages.length != 0) {
+      for (let i = 0; i < messages.length; i++) {
+        await redis.lpush("messagesList", messages[i].value);
+        console.log(`Message sending: ${messages[i].value}`);
+
+        clients.forEach((connection: WebSocket) => {
+          connection.send(messages[i].value);
         });
-
-        if (messages.length != 0) {
-            for (let i = 0; i < messages.length; i++) {
-                await redis.lpush("messagesList", messages[i].value);
-                console.log(`Message sending: ${messages[i].value}`);
-
-                clients.forEach((connection: WebSocket) => {
-                    connection.send(messages[i].value);
-                });
-            }
-        }
-
-        console.log("Run!");
-
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
     }
+
+    console.log("Run!");
+
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
 }
 ```
 
@@ -563,11 +563,11 @@ You can find the Github repository of the project [here](https://github.com/upst
 
 If you want to keep working on the project, here are some suggestions:
 
--   Currently, whenever the page is reloaded, all the stored messages in Upstash Redis are being flushed. This behavior is controlled by the code in the `pages/index.tsx` file, specifically within the `getServerSideProps` function. However, a critical issue arises when a user decides to reload the page, it results in the deletion of chat history for all participants in the chatroom.<br/>
-    To solve this issue, a recommended solution involves implementing an extension of the TTL for the chat history each time a message is sent. This improvement would ensure that chat history remains accessible and preserved even after page reloads.
+- Currently, whenever the page is reloaded, all the stored messages in Upstash Redis are being flushed. This behavior is controlled by the code in the `pages/index.tsx` file, specifically within the `getServerSideProps` function. However, a critical issue arises when a user decides to reload the page, it results in the deletion of chat history for all participants in the chatroom.<br/>
+  To solve this issue, a recommended solution involves implementing an extension of the TTL for the chat history each time a message is sent. This improvement would ensure that chat history remains accessible and preserved even after page reloads.
 
--   You could implement multiple chatrooms feature. To achieve this, you could create multiple Kafka topics with unique names for each chatroom. Another way is to handle it on the message server itself using the right data structures.
+- You could implement multiple chatrooms feature. To achieve this, you could create multiple Kafka topics with unique names for each chatroom. Another way is to handle it on the message server itself using the right data structures.
 
--   You could also implement multiple message servers, and a load balancer to apply the best system design practices.
+- You could also implement multiple message servers, and a load balancer to apply the best system design practices.
 
 If you have any questions, you can reach me at fahreddin@upstash.com

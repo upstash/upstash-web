@@ -3,15 +3,15 @@ import * as React from "react";
 export default function Ps() {
   return (
     <div className="space-y-6 text-left md:space-y-8">
-      <div className="px-8 py-6 rounded-xl bg-white/5">
+      <div className="rounded-xl bg-white/5 px-8 py-6">
         <h4 className="text-xl font-semibold text-emerald-400">Free Tier</h4>
 
         <div className="mt-4 space-y-4 text-white/80">
           <p>
-            You can start using Upstash for free right away without entering your
-            credit card information. This tier lets you create one database with
-            a limit of 10K daily commands and 256MB Storage. Additionally you
-            can create one read region at maximum within this tier. Once you
+            You can start using Upstash for free right away without entering
+            your credit card information. This tier lets you create one database
+            with a limit of 10K daily commands and 256MB Storage. Additionally
+            you can create one read region at maximum within this tier. Once you
             provide your credit card details, your database will upgrade to the
             pay-as-you-go plan and limits will be updated. If you want to try
             Upstash paid and enterprise plans, we can offer Free Trials. Email
@@ -23,7 +23,7 @@ export default function Ps() {
         </div>
       </div>
 
-      <div className="px-8 py-6 rounded-xl bg-white/5">
+      <div className="rounded-xl bg-white/5 px-8 py-6">
         <h4 className="text-xl font-semibold text-emerald-400">
           Pay as you go
         </h4>
@@ -33,14 +33,14 @@ export default function Ps() {
 
         <div className="mt-4 space-y-4 text-white/80">
           <p>
-            With the Pay As you go plan, you can set a maximum monthly budget for
-            your database so that you won't be charged beyond this chosen limit.
-            We'll keep you informed by sending email notifications once you
-            reach 70% and 90% of your monthly budget. This notifications will
-            let you either adjust your budget limit or upgrade to the Pro tier.
-            Please note that if your usage exceeds your monthly budget cap, your
-            database will be rate limited and your cost will not exceed your
-            chosen budget limit.
+            With the Pay As you go plan, you can set a maximum monthly budget
+            for your database so that you won't be charged beyond this chosen
+            limit. We'll keep you informed by sending email notifications once
+            you reach 70% and 90% of your monthly budget. This notifications
+            will let you either adjust your budget limit or upgrade to the Pro
+            tier. Please note that if your usage exceeds your monthly budget
+            cap, your database will be rate limited and your cost will not
+            exceed your chosen budget limit.
           </p>
           <p>
             Your monthly bill will be driven by the below components, all
@@ -49,13 +49,17 @@ export default function Ps() {
             database up to 100 databases.
           </p>
 
-          <ul className="pl-6 space-y-4 list-disc">
+          <ul className="list-disc space-y-4 pl-6">
             <li>
               <p>
                 <b>Commands Per second:</b> You are billed based on the number
                 of Redis Commands processed by your database at a rate of $0.2
                 per 100K request. Operational commands like AUTH, INFO, PING,
-                QUIT, COMMAND will not be charged.
+                QUIT, COMMAND will not be charged. or Global databases, the
+                write commands are replicated to all read regions in addition
+                to primary region. Replications (write operations) are counted
+                as commands. For example, if you have 1 primary 1 read region,
+                100K writes will cost $0.4 ($0.2 x 2)
               </p>
             </li>
             <li>
@@ -137,7 +141,7 @@ export default function Ps() {
         </div>
       </div>
 
-      <div className="px-8 py-6 rounded-xl bg-white/5">
+      <div className="rounded-xl bg-white/5 px-8 py-6">
         <h4 className="text-xl font-semibold text-emerald-400">
           Pro / Enterprise Plans
         </h4>
@@ -157,7 +161,7 @@ export default function Ps() {
             Pro/Enterprise bill will be driven by the below components:
           </p>
 
-          <ul className="pl-6 space-y-4 list-disc">
+          <ul className="list-disc space-y-4 pl-6">
             <li>
               <p>
                 <b>Monthly fixed price:</b> This is fixed based on the Pro tier
@@ -195,7 +199,7 @@ export default function Ps() {
                 about their pricing.
               </p>
 
-              <ul className="pl-6 mt-4 space-y-4 list-disc">
+              <ul className="mt-4 list-disc space-y-4 pl-6">
                 <li>
                   <p>
                     <b>IP Whitelisting:</b> You can set the IP addresses which

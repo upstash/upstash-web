@@ -1,5 +1,7 @@
 import { HTMLProps } from "react";
+
 import cx from "@/utils/cx";
+
 import Button from "@/components/button";
 
 export function CommunityBox({
@@ -17,7 +19,7 @@ export function CommunityBox({
         "lg:first:rounded-t-lg lg:last:rounded-b-lg",
         "lg:first:!rounded-l-4xl lg:last:!rounded-r-4xl",
         "hover:scale-[1.02] hover:bg-white/10",
-        className
+        className,
       )}
       {...props}
     >
@@ -63,7 +65,7 @@ export function CommunityBoxButton({
       className={cx(
         "mt-auto",
         "group-hover/community-box:bg-emerald-400 group-hover/community-box:text-emerald-950",
-        className
+        className,
       )}
       {...props}
       type="button"

@@ -1,11 +1,14 @@
-import getData from "../../get-data";
-import PageHeaderTitle from "@/components/page-header-title";
 import Link from "next/link";
-import Bg from "@/components/bg";
-import { uniq } from "lodash";
-import Container from "@/components/container";
+
 import { Post } from "contentlayer/generated";
+import { uniq } from "lodash";
+
+import Bg from "@/components/bg";
 import PostGridCard from "@/components/blog/grid-item";
+import Container from "@/components/container";
+import PageHeaderTitle from "@/components/page-header-title";
+
+import { getData } from "../../utils/helpers";
 
 type Props = {
   params: {
@@ -43,7 +46,7 @@ export default async function BlogPage({ params: { tag } }: Props) {
           <span className="font-bold">{tag}</span>
         </PageHeaderTitle>
         <div className="mt-4">
-          <Link className="text-emerald-400 hover:underline" href="/blog">
+          <Link className="text-emerald-600 hover:underline" href="/blog">
             Back to all posts
           </Link>
         </div>

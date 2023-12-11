@@ -1,9 +1,11 @@
-import Link from "next/link";
-import type { Post } from "contentlayer/generated";
-import Balancer from "react-wrap-balancer";
-import Container from "@/components/container";
-import { DateTime } from "luxon";
 import Image from "next/image";
+import Link from "next/link";
+
+import type { Post } from "contentlayer/generated";
+import { DateTime } from "luxon";
+import Balancer from "react-wrap-balancer";
+
+import Container from "@/components/container";
 
 type Props = {
   post: Post;
@@ -31,19 +33,20 @@ export default function PostHeader({ post }: Props) {
           {post.authorsData.map((author) => (
             <div key={author.name} className="flex flex-col items-center">
               <Image
-                width={50}
-                height={50}
+                width={64}
+                height={64}
                 alt={author.name}
                 src={author.image}
-                className="aspect-square shrink-0 rounded-full object-cover"
+                className="aspect-square shrink-0 rounded-full object-cover
+                border-2 border-emerald-900/10 dark:border-emerald-500/40"
               />
               <Link
                 href={`/blog/author/${author.id}`}
-                className="mt-2 hover:text-emerald-400 hover:underline"
+                className="mt-2 font-medium hover:text-emerald-400 hover:underline"
               >
                 {author.name}
               </Link>
-              <span className="opacity-40">{author.title}</span>
+              <span className="opacity-60">{author.title}</span>
             </div>
           ))}
         </div>

@@ -1,8 +1,11 @@
-import { ServerlessBox, ServerlessSummary, ServerlessTitle } from "./comp";
-import { LogoIcon } from "@/components/logo";
 import { HTMLProps } from "react";
 import Image from "next/image";
+
 import cx from "@/utils/cx";
+
+import { LogoIcon } from "@/components/logo";
+
+import { ServerlessBox, ServerlessSummary, ServerlessTitle } from "./comp";
 
 export default function DesignedForTheEdge() {
   return (
@@ -204,7 +207,7 @@ function ProductOut({ children, className }: HTMLProps<HTMLDivElement> & {}) {
       className={cx(
         "absolute bottom-1/2 left-1/2 z-10",
         "flex w-0 origin-bottom justify-center",
-        className
+        className,
       )}
     >
       {children}
@@ -218,7 +221,7 @@ function ProductIn({ children, className }: HTMLProps<HTMLDivElement> & {}) {
       className={cx(
         "flex h-12 w-12 shrink-0 items-center justify-center",
         "rounded-full bg-white",
-        className
+        className,
       )}
     >
       {children}

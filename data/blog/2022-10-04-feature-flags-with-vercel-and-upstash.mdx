@@ -2,7 +2,7 @@
 slug: "feature-flags-with-vercel-and-upstash"
 title: "Adding Feature Flags to Your Next.js App with Upstash Redis"
 authors:
-  -  "kay"
+  - "kay"
 tags: [serverless, redis, upstash, vercel, feature-flags]
 ---
 
@@ -90,7 +90,7 @@ const bucketSort = (arr, size = 5) => {
   const max = Math.max(...arr);
   const buckets = Array.from(
     { length: Math.floor((max - min) / size) + 1 },
-    () => []
+    () => [],
   );
   arr.forEach((val) => {
     buckets[Math.floor((val - min) / size)].push(val);

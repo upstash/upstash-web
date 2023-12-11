@@ -17,7 +17,7 @@ Today, the Vercel team announced the Next.js Edge functions. Edge functions allo
 
 Here we will write a Next.js edge function which will show a custom greeting depending on the location of the client. We will load the greeting message from Upstash Redis.
 
-Check [the repo](https://github.com/upstash/examples/tree/master/nextjs-edge) and [the demo](https://nextjs-edge-enesakar-upstash.vercel.app/api/hello).
+Check [the repo](https://github.com/upstash/examples/tree/master/examples/nextjs-edge) and [the demo](https://nextjs-edge-enesakar-upstash.vercel.app/api/hello).
 
 ### `1` Create a Next.js application and install Upstash Redis:
 
@@ -50,6 +50,7 @@ Create pages/api/\_middleware.ts as below:
 
 ```ts
 import type { NextFetchEvent, NextRequest } from "next/server";
+
 import { Redis } from "@upstash/redis";
 
 export async function middleware(req: NextRequest, ev: NextFetchEvent) {

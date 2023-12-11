@@ -1,6 +1,6 @@
-import { ImageResponse } from "@vercel/og";
-import { allPosts } from "contentlayer/generated";
 import { authors } from "@/utils/authors";
+import { ImageResponse } from "@vercel/og";
+import { getPostDetails, baseUrl } from "../utils/og-post-details";
 
 export const runtime = "edge";
 export const size = {
@@ -18,18 +18,15 @@ export default async function TwImage({
   try {
     const slug = params.slug;
 
-    const post = allPosts.find((p) => p.slug === slug);
+    const post = await getPostDetails(slug)
 
     if (!post) {
       throw new Error("Post not found");
     }
 
-    const baseUrl = process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : "http://localhost:3000";
     const authorImage = new URL(
       `/authors/${authors[post.authors[0]].image}`,
-      baseUrl
+      baseUrl,
     ).toString();
     return new ImageResponse(
       (
@@ -59,7 +56,7 @@ export default async function TwImage({
             <p tw="text-3xl my-4 leading-[1] ">blog.upstash.com</p>
           </footer>
         </div>
-      )
+      ),
     );
   } catch (e) {
     console.error(e);
@@ -67,7 +64,7 @@ export default async function TwImage({
       `Failed to generate the image: ${(e as Error).message}`,
       {
         status: 500,
-      }
+      },
     );
   }
 }

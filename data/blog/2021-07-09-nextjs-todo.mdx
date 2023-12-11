@@ -24,7 +24,7 @@ REST allows client and server to communicate with no session information. This s
 
 See the demo: [https://nextjs-todo-zeta.vercel.app/](https://nextjs-todo-zeta.vercel.app/)
 
-See the code: [https://github.com/upstash/examples/tree/master/nextjs-todo](https://github.com/upstash/examples/tree/master/nextjs-todo)
+See the code: [https://github.com/upstash/examples/tree/master/examples/nextjs-todo](https://github.com/upstash/examples/tree/master/examples/nextjs-todo)
 
 ### The Project Setup
 
@@ -103,10 +103,11 @@ export default async (req, res) => {
 Update pages/index.js as below:
 
 ```javascript
+import { useEffect, useState } from "react";
 import Head from "next/head";
 import Image from "next/image";
+
 import styles from "../styles/Home.module.css";
-import { useEffect, useState } from "react";
 
 export default function Home() {
   const [data, setData] = useState([]);

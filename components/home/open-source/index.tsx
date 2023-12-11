@@ -1,19 +1,21 @@
 import { HTMLProps } from "react";
-import {
-  SectionHeader,
-  SectionHeaderSummary,
-  SectionHeaderTitle,
-} from "@/components/home/section-header";
-import Container from "@/components/container";
+
+import { HOME_SECTIONS } from "@/utils/const";
 import cx from "@/utils/cx";
+
+import Bg from "@/components/bg";
+import Container from "@/components/container";
 import {
   SourceBox,
   SourceDesc,
   SourceTag,
   SourceTitle,
 } from "@/components/home/open-source/comp";
-import Bg from "@/components/bg";
-import { HOME_SECTIONS } from "@/utils/const";
+import {
+  SectionHeader,
+  SectionHeaderSummary,
+  SectionHeaderTitle,
+} from "@/components/home/section-header";
 
 export interface ISectionHeader extends HTMLProps<HTMLDivElement> {}
 

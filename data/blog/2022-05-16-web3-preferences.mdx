@@ -2,7 +2,7 @@
 slug: "web3-preferences"
 title: "Preference Storage for DApps using Metamask with Next.js"
 authors:
-  -  "burak"
+  - "burak"
 tags: [redis, nextjs, web3, blockchain, metamask, dapp, dao]
 ---
 
@@ -250,11 +250,10 @@ Here, parse the parameters however you like and create your sample interface.
 In this instance, the project is configured as such:
 
 ```javascript
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 
-import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { orange, grey } from "@mui/material/colors";
+import { grey, orange } from "@mui/material/colors";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 const lightTheme = createTheme({
   palette: {
@@ -286,7 +285,7 @@ export default function Showcase(parameters) {
         <li key={key}>
           {" "}
           {key}: {userSettings[key]}{" "}
-        </li>
+        </li>,
       );
     }
 

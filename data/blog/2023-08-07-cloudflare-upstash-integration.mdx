@@ -2,7 +2,7 @@
 slug: cloudflare-upstash-integration
 title: "Connecting Upstash Redis to Cloudflare Workers"
 authors:
-    - fahreddin
+  - fahreddin
 tags: [redis, cloudflare]
 ---
 
@@ -12,11 +12,11 @@ Cloudflare has recently released the Upstash Integration for the Cloudflare Work
 
 Here are the steps of building this project:
 
--   Set up an Upstash database
--   Create the Worker on Cloudflare
--   Integrate Cloudflare Workers with Upstash
--   Implement the project algorithm.
--   Deploy your application
+- Set up an Upstash database
+- Create the Worker on Cloudflare
+- Integrate Cloudflare Workers with Upstash
+- Implement the project algorithm.
+- Deploy your application
 
 ### Creating the database
 
@@ -134,7 +134,7 @@ Clicking on the application will direct you to the application details page, whe
 
 On the Integration page, connect to your Upstash account. Then, select the `url-shortener` database from the dropdown menu. Finalize the process by pressing **Save button**.
 
-**Note:** Please don't make any changes in the secret names on the **Configure secrets** step. These credentials will be automatically picked up by `Redis.fromEnv(env)` line in the code as `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`. 
+**Note:** Please don't make any changes in the secret names on the **Configure secrets** step. These credentials will be automatically picked up by `Redis.fromEnv(env)` line in the code as `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`.
 
 ![Choose Upstash Database](/blog/cloudflare-url-shortener/choose-db.png)
 
@@ -142,9 +142,9 @@ On the Integration page, connect to your Upstash account. Then, select the `url-
 
 Our implementation will rather be a simple one. It will have two functionalities:
 
--   When a URL is sent using the POST method, a randomly generated key will be assigned to that URL. This key-URL pair will be stored in Redis for retrieval. The key will be appended as a path to the Worker URL and sent to the user in the `<YOUR_WORKER_URL>/<KEY>` format.
+- When a URL is sent using the POST method, a randomly generated key will be assigned to that URL. This key-URL pair will be stored in Redis for retrieval. The key will be appended as a path to the Worker URL and sent to the user in the `<YOUR_WORKER_URL>/<KEY>` format.
 
--   When user accesses the Worker URL with previously added key as a path, corresponding value of the key will be retrieved from Redis. The user will then be redirected to this URL with a `307` response code.
+- When user accesses the Worker URL with previously added key as a path, corresponding value of the key will be retrieved from Redis. The user will then be redirected to this URL with a `307` response code.
 
 We will implement the application in the `src/worker.ts` file. Below is the basic implementation of our URL Shortener:
 
@@ -152,64 +152,66 @@ We will implement the application in the `src/worker.ts` file. Below is the basi
 import { Redis } from "@upstash/redis/cloudflare";
 
 export interface Env {
-    UPSTASH_REDIS_REST_URL: string;
-    UPSTASH_REDIS_REST_TOKEN: string;
+  UPSTASH_REDIS_REST_URL: string;
+  UPSTASH_REDIS_REST_TOKEN: string;
 }
 
 export default {
-    async fetch(
-        request: Request,
-        env: Env,
-        ctx: ExecutionContext
-    ): Promise<Response> {
-        const redis = Redis.fromEnv(env);
+  async fetch(
+    request: Request,
+    env: Env,
+    ctx: ExecutionContext,
+  ): Promise<Response> {
+    const redis = Redis.fromEnv(env);
 
-        /*
+    /*
         generateRandomKey function returns a 7 digit alphanumerical key.
 		If an identical key exists in Redis, it will create new key.
 		*/
-        async function generateRandomKey(): Promise<string> {
-			const key: string = btoa(crypto.getRandomValues(new Uint8Array(2)).toString()).replaceAll("=","")
-			if (await redis.exists(key)) {
-				return generateRandomKey();
-			}
-			return key;
-		}
+    async function generateRandomKey(): Promise<string> {
+      const key: string = btoa(
+        crypto.getRandomValues(new Uint8Array(2)).toString(),
+      ).replaceAll("=", "");
+      if (await redis.exists(key)) {
+        return generateRandomKey();
+      }
+      return key;
+    }
 
-        /*
+    /*
 		If the request method is POST, "longUrl" field will be extracted from
           the request body and new key will be generated for this url.
         Then, this key-value pair will be persisted to Redis.
 		*/
-        if (request.method === "POST") {
-            const requestUrl = request.url;
-            const body = await request.text();
-            const { longUrl } = JSON.parse(body);
-            const key = await generateRandomKey();
-            redis.set(key, longUrl);
+    if (request.method === "POST") {
+      const requestUrl = request.url;
+      const body = await request.text();
+      const { longUrl } = JSON.parse(body);
+      const key = await generateRandomKey();
+      redis.set(key, longUrl);
 
-            const responseUrl = requestUrl + key;
-            return new Response(responseUrl);
-        }
+      const responseUrl = requestUrl + key;
+      return new Response(responseUrl);
+    }
 
-        const slug: string = request.url.split("/").pop() || "";
-        const url = (await redis.get(slug)) as string;
+    const slug: string = request.url.split("/").pop() || "";
+    const url = (await redis.get(slug)) as string;
 
-        /*
+    /*
 		If the slug exists in the Redis DB as key, user will be redirected to URL in the value.
 	    If the slug doesn't exist in the Redis, or it doesn't exist at all,
           an error will be returned.
 	    */
-        if (url) {
-            return Response.redirect(url, 307);
-        } else {
-            const errorText = !slug
-                ? "Please provide a slug."
-                : `Slug ${slug} not found. `;
+    if (url) {
+      return Response.redirect(url, 307);
+    } else {
+      const errorText = !slug
+        ? "Please provide a slug."
+        : `Slug ${slug} not found. `;
 
-            return new Response(errorText, { status: 404 });
-        }
-    },
+      return new Response(errorText, { status: 404 });
+    }
+  },
 };
 ```
 

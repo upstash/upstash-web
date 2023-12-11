@@ -1,11 +1,14 @@
 "use client";
 
-import cx from "@/utils/cx";
 import { Dispatch, HTMLProps, SetStateAction } from "react";
-import IconRedis from "@/components/icon-redis";
+import Image from "next/image";
+
+import cx from "@/utils/cx";
+import Balancer from "react-wrap-balancer";
+
 import IconKafka from "@/components/icon-kafka";
 import IconQStash from "@/components/icon-qstash";
-import Balancer from "react-wrap-balancer";
+import IconRedis from "@/components/icon-redis";
 
 export function Example({
   className,
@@ -13,6 +16,7 @@ export function Example({
   products,
   author,
   title,
+  slug,
   stack,
   selectedStacks,
   setSelectedStacks,
@@ -24,6 +28,7 @@ export function Example({
     image: string;
   };
   title: string;
+  slug: string;
   stack: string[];
   selectedStacks: string[];
   setSelectedStacks: Dispatch<SetStateAction<string[]>>;
@@ -32,46 +37,39 @@ export function Example({
     <article
       className={cx(
         "group/example-box p-6",
-        "flex flex-col gap-4",
-        "rounded-3xl bg-white/3",
-        "border border-white/5",
-        "transition hover:bg-white/5",
+        "flex flex-col gap-2",
+        "rounded-xl bg-white/5",
+        "transition hover:bg-emerald-300/10",
         className,
       )}
       {...props}
     >
-      <ExampleProducts products={products} />
-      <ExampleTitle title={title} />
-      <ExampleAuthor author={author} />
-      <ExampleStack
-        stack={stack}
-        selectedStacks={selectedStacks}
-        setSelectedStacks={setSelectedStacks}
-      />
-    </article>
-  );
-}
+      <h3 className={cx("font-display text-2xl font-semibold", className)}>
+        <a className="hover:text-emerald-400" href={`/examples/${slug}`}>
+          <Balancer>{title}</Balancer>
+        </a>
+      </h3>
 
-function ExampleTitle({
-  className,
-  children,
-  title,
-  ...props
-}: HTMLProps<HTMLHeadingElement> & {
-  title: string;
-}) {
-  return (
-    <h3
-      className={cx(
-        "font-display text-xl font-medium md:leading-tight",
-        className,
-      )}
-      {...props}
-    >
-      <a href={`/examples/${title.toLowerCase().replace(/ /g, "-")}`}>
-        <Balancer>{title}</Balancer>
-      </a>
-    </h3>
+      <div className="mb-4 flex items-center gap-2">
+        <Image
+          alt={author.name}
+          src={author.image}
+          width={32}
+          height={32}
+          className="rounded-full"
+        />
+        <span className="opacity-60">{author.name}</span>
+      </div>
+
+      <div className="mt-auto flex items-center gap-2">
+        <ExampleProducts products={products} />
+        <ExampleStack
+          stack={stack}
+          selectedStacks={selectedStacks}
+          setSelectedStacks={setSelectedStacks}
+        />
+      </div>
+    </article>
   );
 }
 
@@ -89,7 +87,14 @@ function ExampleProducts({
     >
       {props.products.map((product) => {
         if (product === "redis") {
-          return <IconRedis key={product} width={24} className="" />;
+          return (
+            <IconRedis
+              key={product}
+              width={24}
+              aria-label="Upstash Redis Icon"
+              className=""
+            />
+          );
         } else if (product === "kafka") {
           return (
             <IconKafka
@@ -114,25 +119,6 @@ function ExampleProducts({
   );
 }
 
-function ExampleAuthor({
-  className,
-  children,
-  author,
-  ...props
-}: HTMLProps<HTMLDivElement> & {
-  author: {
-    name: string;
-    image: string;
-  };
-}) {
-  return (
-    <div
-      className={cx("mt-auto flex items-center", className)}
-      {...props}
-    ></div>
-  );
-}
-
 function ExampleStack({
   className,
   children,
@@ -146,17 +132,16 @@ function ExampleStack({
   setSelectedStacks: Dispatch<SetStateAction<string[]>>;
 }) {
   return (
-    <div className={cx("flex-cols flex flex-wrap gap-1.5", className)}>
-      {stack.slice(0, 3).map((stackTitle) => {
+    <div className={cx("flex-cols mt-auto flex flex-wrap gap-1.5", className)}>
+      {stack.slice(0, 4).map((stackTitle) => {
         return (
-          <>
-            <Pill
-              stackTitle={stackTitle}
-              selected={selectedStacks.includes(stackTitle)}
-              selectedStacks={selectedStacks}
-              setSelectedStacks={setSelectedStacks}
-            />
-          </>
+          <Pill
+            key={stackTitle}
+            stackTitle={stackTitle}
+            selected={selectedStacks.includes(stackTitle)}
+            selectedStacks={selectedStacks}
+            setSelectedStacks={setSelectedStacks}
+          />
         );
       })}
     </div>
@@ -177,9 +162,10 @@ export function Pill({
   return (
     <>
       <button
-        className={`py-0.2 w-min cursor-default rounded-xl border border-[#34D399] bg-[#34D399] bg-opacity-30 px-2 transition ease-in-out hover:bg-opacity-60 ${
-          selected ? "bg-opacity-60" : "bg-opacity-30"
-        }`}
+        className={cx(
+          "rounded border border-white/5 px-2 py-1 leading-none text-white/60",
+          selected ? "bg-emerald-400/10 text-white" : "",
+        )}
         onClick={(e) => {
           if (!selected) {
             setSelectedStacks([...selectedStacks, stackTitle]);
@@ -190,9 +176,7 @@ export function Pill({
           }
         }}
       >
-        <p className="whitespace-nowrap text-sm " key={stackTitle}>
-          {stackTitle}
-        </p>
+        {stackTitle}
       </button>
     </>
   );

@@ -1,11 +1,12 @@
 import "./page.css";
 
-import { Metadata } from "next";
-import Container from "@/components/container";
-import PageHeaderTitle from "@/components/page-header-title";
-import PageHeaderDesc from "@/components/page-header-desc";
-import Bg from "@/components/bg";
 import { ReactNode } from "react";
+import { Metadata } from "next";
+
+import Bg from "@/components/bg";
+import Container from "@/components/container";
+import PageHeaderDesc from "@/components/page-header-desc";
+import PageHeaderTitle from "@/components/page-header-title";
 
 export const metadata: Metadata = {
   title: "Pricing",

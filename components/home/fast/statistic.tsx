@@ -1,12 +1,14 @@
+import Link from "next/link";
+
+import cx from "@/utils/cx";
+
+import Container from "@/components/container";
 import {
   FastCard,
   FastCardTitle,
   FastCardValue,
 } from "@/components/home/fast/card";
-import Link from "next/link";
 import Icon, { ICON_NAMES } from "@/components/icon";
-import Container from "@/components/container";
-import cx from "@/utils/cx";
 
 export default function FastStatistic() {
   return (
@@ -15,7 +17,7 @@ export default function FastStatistic() {
         className={cx(
           "mx-auto grid grid-cols-2 gap-6 p-6",
           "rounded-2xl bg-white/5 backdrop-blur",
-          "md:w-fit md:grid-cols-3 md:gap-16 md:rounded-4xl md:px-12 md:py-6"
+          "md:w-fit md:grid-cols-3 md:gap-16 md:rounded-4xl md:px-12 md:py-6",
         )}
       >
         <FastCard>
@@ -40,7 +42,7 @@ export default function FastStatistic() {
       <p className="mt-6">
         <Link
           href="/fast"
-          className="inline-flex items-center gap-1 underline transition opacity-60 hover:opacity-100"
+          className="inline-flex items-center gap-1 underline opacity-60 transition hover:opacity-100"
         >
           <Icon icon={ICON_NAMES.Bolt} className="text-2xl" />
           Test the speed

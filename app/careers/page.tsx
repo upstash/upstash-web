@@ -1,10 +1,12 @@
 import { Metadata } from "next";
-import Container from "@/components/container";
-import PageHeaderTitle from "@/components/page-header-title";
-import PageHeaderDesc from "@/components/page-header-desc";
-import { allJobs } from "contentlayer/generated";
 import Link from "next/link";
+
+import { allJobs } from "contentlayer/generated";
+
 import Bg from "@/components/bg";
+import Container from "@/components/container";
+import PageHeaderDesc from "@/components/page-header-desc";
+import PageHeaderTitle from "@/components/page-header-title";
 
 const description =
   "Help us build the cutting edge data platform for the serverless era.";
@@ -31,7 +33,7 @@ export default function HomePage() {
       </section>
 
       <section className="pb-40">
-        <Container className="max-w-screen-md text-left">
+        <Container className="max-w-screen-md space-y-6 text-left">
           {jobs.map((job) => {
             return (
               <Link

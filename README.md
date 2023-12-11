@@ -9,16 +9,14 @@
 ![](public/readme/note-default.png)
 
 ```mdx
-<Note>
-    You can use any Redis® client, but we recommend @upstash/redis
-</Note>
+<Note>You can use any Redis® client, but we recommend @upstash/redis</Note>
 ```
-
+ 
 ![](public/readme/note-info.png)
 
 ```mdx
 <Note type="info">
-    You can use any Redis® client, but we recommend @upstash/redis
+  You can use any Redis® client, but we recommend @upstash/redis
 </Note>
 ```
 
@@ -26,7 +24,7 @@
 
 ```mdx
 <Note type="tip">
-    You can use any Redis® client, but we recommend @upstash/redis
+  You can use any Redis® client, but we recommend @upstash/redis
 </Note>
 ```
 
@@ -34,7 +32,7 @@
 
 ```mdx
 <Note type="caution">
-    You can use any Redis® client, but we recommend @upstash/redis
+  You can use any Redis® client, but we recommend @upstash/redis
 </Note>
 ```
 
@@ -42,7 +40,7 @@
 
 ```mdx
 <Note type="danger">
-    You can use any Redis® client, but we recommend @upstash/redis
+  You can use any Redis® client, but we recommend @upstash/redis
 </Note>
 ```
 
@@ -50,10 +48,10 @@
 
 ```mdx
 <Note title="custom">
-    You can use any Redis® client, but we recommend @upstash/redis
+  You can use any Redis® client, but we recommend @upstash/redis
 </Note>
 <Note title="custom" danger>
-    You can use any Redis® client, but we recommend @upstash/redis
+  You can use any Redis® client, but we recommend @upstash/redis
 </Note>
 ```
 
@@ -128,5 +126,5 @@ In the example above, the "hellouniverse" code snippet will be spliced between t
 
 # Please build
 
-// I needed something to change to trigger a build
+// I needed something to change to trigger a build 
 // - andreas

@@ -2,7 +2,7 @@
 slug: kafka-tinybird-vercel-edge
 title: "Serverless Realtime Analytics for Next.js with Vercel Edge, Upstash Kafka and Tinybird"
 authors: [enes]
-tags: [kafka, analytics, vercel, tinybird, vercel-edge, next.js]
+tags: [kafka, analytics, vercel, tinybird, vercel-edge, nextjs]
 ---
 
 In this article, we will build an end to end pipeline to analyze our web site traffic on real time. At the end we will be able to query the traffic coming to our Next.js application. We will run a query like:
@@ -50,7 +50,8 @@ Create a middleware.ts (or .js) file at the same level as your pages directory. 
 
 ```tsx
 import { NextResponse } from "next/server";
-import type { NextRequest, NextFetchEvent } from "next/server";
+import type { NextFetchEvent, NextRequest } from "next/server";
+
 import { Kafka } from "@upstash/kafka";
 
 // Trigger this middleware to run on the `/secret-page` route

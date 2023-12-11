@@ -1,10 +1,11 @@
-import Container from "@/components/container";
-import Link from "next/link";
-import { allCustomers, Customer } from "contentlayer/generated";
-import { notFound } from "next/navigation";
-import { Mdx } from "@/components/post/mdx";
-import Bg from "@/components/bg";
 import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+
+import { allCustomers, Customer } from "contentlayer/generated";
+
+import Container from "@/components/container";
+import { Mdx } from "@/components/post/mdx";
 
 type Props = {
   params: {
@@ -32,7 +33,7 @@ export default async function BlogPage({ params }: Props) {
     <>
       <section>
         <Container>
-          <div className="py-4 border-b border-white/5">
+          <div className="border-b border-white/5 py-4">
             <Link
               href="/customers"
               className="inline-flex opacity-40 hover:opacity-80"
@@ -44,11 +45,12 @@ export default async function BlogPage({ params }: Props) {
       </section>
 
       <main className="relative z-0">
-        <Bg />
-
-        <article>
+        <article className="customer-post">
           <header className="py-20 text-center">
-            <Container className="max-w-screen-lg">
+            <Container className="relative max-w-screen-lg">
+              <div className="absolute inset-x-0 top-0 z-10 h-40 bg-gradient-to-b from-zinc-950 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 z-10 h-40 bg-gradient-to-t from-zinc-950 to-transparent" />
+
               <Image
                 src={`/customer/${customer.cover_image}`}
                 alt={customer.company_name}
@@ -59,7 +61,7 @@ export default async function BlogPage({ params }: Props) {
             </Container>
           </header>
 
-          <div>
+          <div className="">
             <Container className="max-w-screen-md">
               <Mdx code={customer.body.code} />
             </Container>
