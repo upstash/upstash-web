@@ -1,0 +1,24 @@
+---
+company_name: texture
+company_url: https://www.texture.energy/
+company_logo: texture.png
+user_name: Victor Quinn
+user_title: Cofounder and CTO
+user_photo: victor.jpeg
+highlight: "We  switched from Confluent to Upstash as the pricing model is much more reasonable. Not only on cost, technically Upstash also works better with JavaScript/TypeScript"
+cover_image: upstash-texture.png
+---
+
+
+Texture is an energy data platform that simplifies the process for developers to connect to energy devices, retrieve data from them, and control them. They offer data transformations and aggregations, as well as analytics and automated device control functionalities. To achieve this, they normalize data and APIs across manufacturers and allow grouping and batch control of devices, making it easier for developers to build and manage a network of energy devices
+#### Upstash Kafka: Eliminating Operational Overhead and Allowing Costs to Align with Business Growth
+
+Texture make heavy use of Upstash Kafka to enable scalable cross-microservice communication. They rely on Upstash Kafka for gathering telemetry data from energy devices at regular intervals, typically ranging from 5 to 15 minutes. Their long-term goal is to shift towards even smaller intervals, eventually achieving real-time data updates.
+
+Each data update received from an energy device is put into a Kafka topic as a message, from where it flows downstream and undergoes various transformations, potentially triggering automations and more. Streaming, transforming and processing such substantial volumes of data from every device can be a daunting task, but Upstash Kafka allows Texture to do so efficiently while letting their costs scale with their business growth.
+#### Cost Savings and Superior JavaScript/TypeScript Support Compared to Confluent
+
+Before Upstash, Texture used Confluent. From Texture’s perspective, what sets Upstash apart is not just its cost-effectiveness, where they pay for actual usage rather than maintaining and paying for a dedicated cluster. It also brings peace of mind by eliminating the need for manual cluster scaling when traffic surges. Additionally, Texture has also experienced that Upstash works much more seamlessly with KafkaJS, their preferred method for connecting to Kafka. In contrast, they encountered difficulties with Confluent's support for JavaScript/TypeScript and experienced numerous issues when using KafkaJS with Confluent-hosted Kafka
+<Highlight name="Victor Quinn" title="Cofounder and CTO" photo="victor.jpeg">
+We switched from Confluent to Upstash as the pricing model is much more reasonable. Not only on cost, technically Upstash also works better with JavaScript/TypeScript
+</Highlight>
