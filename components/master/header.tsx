@@ -1,10 +1,9 @@
 "use client";
 
-import React, { HTMLProps, ReactNode } from "react";
+import React, { HTMLProps } from "react";
 import Link from "next/link";
 
 import cx from "@/utils/cx";
-import { allJobs } from "contentlayer/generated";
 
 import { useGetAffiliateCodeFromApi } from "@/hooks/use-affiliate-code";
 
@@ -13,8 +12,6 @@ import Container from "@/components/container";
 import { Logo } from "@/components/logo";
 
 import NewNavigation from "./new-nav";
-
-const jobLength = allJobs.filter((o) => !o.draft).length;
 
 export default function Header({
   className,
@@ -54,56 +51,3 @@ export default function Header({
     </header>
   );
 }
-
-const NavItems: {
-  name: string;
-  href: string;
-  children?: ReactNode;
-}[] = [
-  {
-    name: "Pricing",
-    href: "/pricing",
-  },
-  {
-    name: "Customers",
-    href: "/customers",
-  },
-  // {
-  //   name: "Examples",
-  //   href: "/examples",
-  // },
-  {
-    name: "Blog",
-    href: "/blog",
-  },
-  {
-    name: "About",
-    href: "/about",
-  },
-  {
-    name: "Discord",
-    href: "https://upstash.com/discord",
-  },
-  {
-    name: "Docs",
-    href: "/docs",
-  },
-];
-
-const careersIndex = NavItems.length - 1;
-if (jobLength > 0) {
-  NavItems.splice(careersIndex, 0, {
-    name: "Careers",
-    href: "/careers",
-    children: (
-      <span
-        className="flex items-center rounded-full bg-emerald-300/20
-          px-1.5 py-1 font-mono text-sm leading-none text-emerald-500"
-      >
-        {jobLength}
-      </span>
-    ),
-  });
-}
-
-export { NavItems };

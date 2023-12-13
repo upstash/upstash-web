@@ -6,6 +6,7 @@ import {
   IconUserPlus,
   IconUsers,
 } from "@tabler/icons-react";
+import { allJobs } from "contentlayer/generated";
 
 import {
   ListItem,
@@ -13,42 +14,59 @@ import {
   NewNavigationTrigger,
 } from "./new-nav-root";
 
+const jobLength = allJobs.filter((o) => !o.draft).length;
+
 export default function NewNavigationItemCompany() {
   return (
     <NavigationMenu.Item>
-      <NewNavigationTrigger>Company</NewNavigationTrigger>
+      <NewNavigationTrigger>
+        Company{" "}
+        <span
+          className="ml-1 flex items-center rounded-full
+          bg-emerald-400/20 px-1.5 py-1 font-mono text-sm leading-none text-emerald-400"
+        >
+          {jobLength}
+        </span>
+      </NewNavigationTrigger>
 
-      <NewNavigationContent
-      // forceMount
-      >
-        <div className="grid w-[400px] p-2">
+      <NewNavigationContent>
+        <div className="grid w-[440px] gap-4 p-6">
           <ListItem
             href="/"
-            title="About"
-            icon={<IconUsers strokeWidth={1.5} />}
-          >
-            We manage everything for you
-          </ListItem>
-
-          <ListItem
-            href="/"
-            title="Careers"
+            title1={
+              <>
+                Careers
+                <span
+                  className="ml-1 inline-flex items-center rounded-full bg-purple-200
+          px-1.5 py-1 font-mono text-sm leading-none text-purple-800"
+                >
+                  {jobLength}
+                </span>
+              </>
+            }
             icon={<IconUserPlus strokeWidth={1.5} />}
+            className="hover:bg-purple-50 hover:text-purple-900"
           >
             We manage everything for you
           </ListItem>
 
           <ListItem
             href="/"
-            title="Customers"
+            title1="Customers"
             icon={<IconMoodSmileBeam strokeWidth={1.5} />}
+            className="hover:bg-amber-50 hover:text-amber-900"
           >
             The teams we empower
           </ListItem>
 
-          <NavigationMenu.Link className="" href="/">
-            All systems operational
-          </NavigationMenu.Link>
+          <ListItem
+            href="/"
+            title1="About"
+            icon={<IconUsers strokeWidth={1.5} />}
+            className="hover:bg-emerald-50 hover:text-emerald-900"
+          >
+            We manage everything for you
+          </ListItem>
         </div>
       </NewNavigationContent>
     </NavigationMenu.Item>

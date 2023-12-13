@@ -1,7 +1,11 @@
 import React from "react";
 
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
-import { IconCheck } from "@tabler/icons-react";
+import {
+  IconBrandDiscord,
+  IconBrandGithub,
+  IconBrandX,
+} from "@tabler/icons-react";
 
 import {
   ListItem,
@@ -14,19 +18,17 @@ export default function NewNavigationItemCompany() {
     <NavigationMenu.Item>
       <NewNavigationTrigger>Support</NewNavigationTrigger>
 
-      <NewNavigationContent
-      // forceMount
-      >
-        <div className="grid w-[400px] p-2">
-          <ListItem href="/" title="Discord" icon={<IconCheck />}>
+      <NewNavigationContent>
+        <div className="grid w-[440px] gap-4 p-6">
+          <ListItem href="/" title1="Discord" icon={<IconBrandDiscord />}>
             We manage everything for you
           </ListItem>
 
-          <ListItem href="/" title="Twitter" icon={<IconCheck />}>
+          <ListItem href="/" title1="Twitter" icon={<IconBrandX />}>
             We manage everything for you
           </ListItem>
 
-          <ListItem href="/" title="Github" icon={<IconCheck />}>
+          <ListItem href="/" title1="Github" icon={<IconBrandGithub />}>
             The teams we empower
           </ListItem>
         </div>

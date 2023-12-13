@@ -1,7 +1,7 @@
 import React from "react";
 
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
-import { IconCheck } from "@tabler/icons-react";
+import { IconBook, IconCategory2 } from "@tabler/icons-react";
 
 import {
   ListItem,
@@ -12,17 +12,25 @@ import {
 export default function NewNavigationItemResource() {
   return (
     <NavigationMenu.Item>
-      <NewNavigationTrigger>Resource</NewNavigationTrigger>
+      <NewNavigationTrigger>Resources</NewNavigationTrigger>
 
-      <NewNavigationContent
-      // forceMount
-      >
-        <div className="grid w-[400px] p-2">
-          <ListItem href="/" title="Blog" icon={<IconCheck />}>
+      <NewNavigationContent>
+        <div className="grid w-[440px] gap-4 p-6">
+          <ListItem
+            href="/"
+            title1="Blog"
+            icon={<IconBook strokeWidth={1.5} />}
+            className="hover:bg-emerald-50 hover:text-emerald-900"
+          >
             Articles and tutorials from Upstash and community
           </ListItem>
 
-          <ListItem href="/" title="Example" icon={<IconCheck />}>
+          <ListItem
+            href="/"
+            title1="Example"
+            icon={<IconCategory2 strokeWidth={1.5} />}
+            className="hover:bg-indigo-50 hover:text-indigo-900"
+          >
             Jumpstart your development with our pre-built solutions
           </ListItem>
         </div>

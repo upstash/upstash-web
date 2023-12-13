@@ -1,7 +1,12 @@
-import React, { HTMLProps, PropsWithChildren } from "react";
+import React, { PropsWithChildren } from "react";
 
 import cx from "@/utils/cx";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
+import {
+  NavigationMenuContentProps,
+  NavigationMenuLinkProps,
+  NavigationMenuTriggerProps,
+} from "@radix-ui/react-navigation-menu";
 import { IconChevronDown } from "@tabler/icons-react";
 
 export default function NewNavigationRoot({ children }: PropsWithChildren) {
@@ -35,10 +40,10 @@ export default function NewNavigationRoot({ children }: PropsWithChildren) {
         </NavigationMenu.Indicator>
       </NavigationMenu.List>
 
-      <div className="perspective-[2000px] absolute left-0 top-full flex w-full justify-center">
+      <div className="absolute left-20 right-0 top-full flex w-full justify-center perspective-[2000px]">
         <NavigationMenu.Viewport
           className={cx(
-            "relative mt-[8px] w-full bg-white text-zinc-900",
+            "relative mt-[7px] bg-white text-zinc-900",
             "origin-[top_center] overflow-hidden rounded-xl",
             "transition-[width,_height] duration-300",
             "data-[state=open]:animate-scaleIn",
@@ -53,13 +58,15 @@ export default function NewNavigationRoot({ children }: PropsWithChildren) {
   );
 }
 
-export function NewNavigationTrigger({ children }: PropsWithChildren) {
+export function NewNavigationTrigger({ children }: NavigationMenuTriggerProps) {
   return (
     <NavigationMenu.Trigger
       className={cx(
         "group flex select-none items-center gap-0.5",
-        "rounded-full px-3 py-2 hover:bg-white/10",
-        "data-[state=open]:bg-white/10",
+        "rounded-full px-3 py-2",
+        "opacity-60 hover:bg-white/5 hover:opacity-100",
+        "data-[state=open]:bg-white/5",
+        "data-[state=open]:opacity-100",
       )}
     >
       {children}
@@ -79,7 +86,7 @@ export function NewNavigationTrigger({ children }: PropsWithChildren) {
 export function NewNavigationContent({
   children,
   ...props
-}: PropsWithChildren) {
+}: NavigationMenuContentProps) {
   return (
     <NavigationMenu.Content
       // forceMount
@@ -97,31 +104,32 @@ export function NewNavigationContent({
   );
 }
 
-interface ListItemProps extends HTMLProps<HTMLAnchorElement> {
+interface ListItemProps extends NavigationMenuLinkProps {
   icon?: React.ReactNode;
+  title1?: React.ReactNode;
 }
 
 const ListItem = React.forwardRef(
   (props: ListItemProps, forwardedRef: React.ForwardedRef<any>) => {
-    const { children, className, title, icon } = props;
+    const { children, className, title1, icon, ...otherProps } = props;
 
     return (
-      <NavigationMenu.Link asChild>
+      <NavigationMenu.Link asChild {...otherProps}>
         <a
           className={cx(
-            "flex select-none items-center gap-4 rounded-xl p-4",
-            "hover:bg-emerald-400/10",
+            "flex select-none items-center gap-5 rounded-xl p-5",
+            "bg-black/5",
+            "hover:bg-black/10",
             className,
           )}
-          {...props}
           ref={forwardedRef}
         >
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-black/5">
+          <div className="flex h-full w-10 shrink-0 items-center justify-center rounded-full bg-black/5">
             {icon}
           </div>
           <div>
-            <h4 className="font-semibold">{title}</h4>
-            <p className="opacity-60">{children}</p>
+            <h4 className="font-semibold">{title1}</h4>
+            <p className="opacity-80">{children}</p>
           </div>
         </a>
       </NavigationMenu.Link>
