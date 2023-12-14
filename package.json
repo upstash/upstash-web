@@ -11,6 +11,7 @@
     "fmt": "prettier . --write && yarn biome check ."
   },
   "dependencies": {
+    "@radix-ui/react-navigation-menu": "^1.1.4",
     "@radix-ui/react-tooltip": "^1.0.6",
     "@segment/analytics-next": "^1.53.0",
     "@tabler/icons-react": "^2.32.0",
