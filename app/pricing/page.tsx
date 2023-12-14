@@ -1,12 +1,13 @@
 "use client";
 
+import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
 import Enterprise from "@/components/pricing/enterprise";
 import ProductToggle from "@/components/pricing/product-toggle";
 import CompareTable from "@/components/pricing/redis/compare-table";
+import FAQ from "@/components/pricing/redis/faq";
 import PricingTable from "@/components/pricing/redis/pricing-table";
-import Ps from "@/components/pricing/redis/ps";
 
 export default function PricingRedisPage() {
   return (
@@ -36,7 +37,14 @@ export default function PricingRedisPage() {
         </div>
 
         <div className="mt-32 md:mt-40">
-          <Ps />
+          <Container className="max-w-screen-md">
+            <PageHeaderTitle as="h2" className="mb md:text-4xl">
+              FAQ
+            </PageHeaderTitle>
+            <div className="mt-10">
+              <FAQ />
+            </div>
+          </Container>
         </div>
       </div>
     </div>

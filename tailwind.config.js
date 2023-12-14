@@ -27,21 +27,13 @@ module.exports = {
         "4xl": "2.2rem",
       },
       keyframes: {
-        slideDownAndFade: {
-          from: { opacity: 0, transform: "translateY(-2px)" },
-          to: { opacity: 1, transform: "translateY(0)" },
+        slideDown: {
+          from: { height: 0 },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
-        slideLeftAndFade: {
-          from: { opacity: 0, transform: "translateX(2px)" },
-          to: { opacity: 1, transform: "translateX(0)" },
-        },
-        slideUpAndFade: {
-          from: { opacity: 0, transform: "translateY(2px)" },
-          to: { opacity: 1, transform: "translateY(0)" },
-        },
-        slideRightAndFade: {
-          from: { opacity: 0, transform: "translateX(-2px)" },
-          to: { opacity: 1, transform: "translateX(0)" },
+        slideUp: {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: 0 },
         },
         enterFromRight: {
           from: { opacity: 0, transform: "translateX(200px)" },
@@ -77,6 +69,8 @@ module.exports = {
         },
       },
       animation: {
+        slideDown: "slideDown 300ms cubic-bezier(0.87, 0, 0.13, 1)",
+        slideUp: "slideUp 300ms cubic-bezier(0.87, 0, 0.13, 1)",
         slideDownAndFade:
           "slideDownAndFade 400ms cubic-bezier(0.16, 1, 0.3, 1)",
         slideLeftAndFade:

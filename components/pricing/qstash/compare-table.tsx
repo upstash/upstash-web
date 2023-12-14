@@ -1,3 +1,4 @@
+import * as React from "react";
 import { ChangeEvent, useState } from "react";
 
 import { PricingPlans } from "@/utils/type";
@@ -9,28 +10,15 @@ import CompareValue from "../compare-value";
 export default function CompareTable() {
   const isMobile = useIsMobile();
 
-  const [selectedPlans, setSelectedPlans] = useState([
-    PricingPlans.Free,
-    // PricingPlans.PayAsYouGo,
-  ]);
+  const [selectedPlans, setSelectedPlans] = useState(PricingPlans.Free);
 
-  const showFree = selectedPlans.includes(PricingPlans.Free);
-  const showPayg = selectedPlans.includes(PricingPlans.PayAsYouGo);
-  const showEnterprise = selectedPlans.includes(PricingPlans.Enterprise);
+  const showFree = selectedPlans === PricingPlans.Free;
+  const showPayg = selectedPlans === PricingPlans.PayAsYouGo;
+  const showEnterprise = selectedPlans == PricingPlans.Enterprise;
 
-  const onPlanChange = (
-    event: ChangeEvent<HTMLSelectElement>,
-    plan: PricingPlans,
-  ) => {
+  const onPlanChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value as PricingPlans;
-    const index = selectedPlans.indexOf(plan);
-
-    setSelectedPlans((prev) => {
-      if (index === 0) {
-        return [value, prev[1]];
-      }
-      return [prev[0], value];
-    });
+    setSelectedPlans(value);
   };
 
   return (
@@ -79,14 +67,14 @@ export default function CompareTable() {
             hidden={isMobile ? !showFree : false}
             className="border-b border-b-zinc-800 bg-zinc-950 p-0"
           >
-            <div className="flex h-16 items-center justify-center bg-white/3">
+            <div className="flex h-24 flex-col items-center justify-center bg-white/3">
               <h4 className="hidden text-lg font-semibold text-emerald-400 md:block">
                 Free
               </h4>
 
               <select
                 className="bg-transparent px-4 py-2 font-semibold md:hidden"
-                onChange={(e) => onPlanChange(e, PricingPlans.Free)}
+                onChange={onPlanChange}
                 value={PricingPlans.Free}
               >
                 <option value={PricingPlans.Free} disabled>
@@ -101,14 +89,14 @@ export default function CompareTable() {
             hidden={isMobile ? !showPayg : false}
             className="border-b border-b-zinc-800 bg-zinc-950 p-0"
           >
-            <div className="flex h-16 items-center justify-center bg-emerald-300/10">
+            <div className="flex h-24 flex-col items-center justify-center bg-emerald-300/10">
               <h4 className="hidden text-lg font-semibold text-emerald-400 md:block">
                 Pay as you go
               </h4>
 
               <select
                 className="bg-transparent px-4 py-2 font-semibold md:hidden"
-                onChange={(e) => onPlanChange(e, PricingPlans.PayAsYouGo)}
+                onChange={onPlanChange}
                 value={PricingPlans.PayAsYouGo}
               >
                 <option value={PricingPlans.Free}>Free</option>
@@ -117,20 +105,27 @@ export default function CompareTable() {
                 </option>
                 <option value={PricingPlans.Enterprise}>Pro</option>
               </select>
+
+              <h5 className="flex items-baseline font-semibold">
+                $1
+                <span className="ml-1 text-base font-normal opacity-40">
+                  / 100K messages
+                </span>
+              </h5>
             </div>
           </th>
           <th
             hidden={isMobile ? !showEnterprise : false}
             className="border-b border-b-zinc-800 bg-zinc-950 p-0"
           >
-            <div className="flex h-16 items-center justify-center bg-white/3">
+            <div className="flex h-24 flex-col items-center justify-center bg-white/3">
               <h4 className="hidden text-lg font-semibold text-emerald-400 md:block">
                 Pro
               </h4>
 
               <select
                 className="bg-transparent px-4 py-2 font-semibold md:hidden"
-                onChange={(e) => onPlanChange(e, PricingPlans.Enterprise)}
+                onChange={onPlanChange}
                 value={PricingPlans.Enterprise}
               >
                 <option value={PricingPlans.Free}>Free</option>
@@ -139,6 +134,13 @@ export default function CompareTable() {
                   Pro
                 </option>
               </select>
+
+              <h5 className="flex items-baseline font-semibold">
+                $180
+                <span className="ml-1 text-base font-normal opacity-40">
+                  / month
+                </span>
+              </h5>
             </div>
           </th>
         </tr>
@@ -402,25 +404,25 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 font-normal text-left text-white/60">
+          <th className="px-0 py-4 text-left font-normal text-white/60">
             Max Schedule Count
           </th>
           {/**/}
           <td
-              hidden={isMobile ? !showFree : false}
-              className="px-4 py-0 bg-white/3"
+            hidden={isMobile ? !showFree : false}
+            className="bg-white/3 px-4 py-0"
           >
             <CompareValue type="number">1000</CompareValue>
           </td>
           <td
-              hidden={isMobile ? !showPayg : false}
-              className="px-4 py-0 bg-emerald-300/10"
+            hidden={isMobile ? !showPayg : false}
+            className="bg-emerald-300/10 px-4 py-0"
           >
             <CompareValue type="number">1000</CompareValue>
           </td>
           <td
-              hidden={isMobile ? !showEnterprise : false}
-              className="px-4 py-0 bg-white/3"
+            hidden={isMobile ? !showEnterprise : false}
+            className="bg-white/3 px-4 py-0"
           >
             <CompareValue>Custom</CompareValue>
           </td>

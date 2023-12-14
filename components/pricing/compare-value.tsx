@@ -7,28 +7,30 @@ import cx from "@/utils/cx";
 
 export default function CompareValue({
   type = "plain",
+  prefix = "",
   suffix = "",
+  after,
   valid = true,
   children,
   className = "",
   ...props
 }: HTMLProps<HTMLSpanElement> & {
   type?: "plain" | "size" | "boolean" | "list" | "number";
+  prefix?: string;
   suffix?: string;
+  after?: React.ReactNode;
   valid?: boolean;
 }) {
   return (
     <span
-      className={`inner flex items-center justify-center border-b border-b-white/3 py-3 ${className}`}
+      className={`flex items-center justify-center border-b border-b-white/3 py-5 ${className}`}
       {...props}
     >
+      {prefix && <span className="mr-1 text-white/40">{prefix}</span>}
+
       {type === "plain" && children}
 
-      {type === "size" && (
-        <>
-          {children} <span className="ml-1 text-white/40">{suffix}</span>
-        </>
-      )}
+      {type === "size" && children}
 
       {type === "boolean" && (
         <span className="text-zinc-400">
@@ -57,7 +59,7 @@ export default function CompareValue({
       {type === "list" && children && (
         <span className="flex flex-wrap items-center justify-center gap-1 text-left">
           {Children.map(children, (child) => (
-            <span className="rounded bg-emerald-300/10 px-2 py-1.5 text-sm font-medium leading-none">
+            <span className="rounded bg-emerald-300/5 px-2 py-1.5 text-sm leading-none">
               {child}
             </span>
           ))}
@@ -65,6 +67,9 @@ export default function CompareValue({
       )}
 
       {type === "number" && Number(children).toLocaleString()}
+
+      {suffix && <span className="ml-1 text-white/40">{suffix}</span>}
+      {after}
     </span>
   );
 }
