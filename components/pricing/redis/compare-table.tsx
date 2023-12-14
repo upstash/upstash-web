@@ -815,8 +815,8 @@ export default function CompareTable() {
               <Tooltip content="You can set the IP addresses which will have access to your database.">
                 IP Whitelisting
               </Tooltip>
-              <Tooltip content="AWS Private link helps you to access to Upstash Cluster with a private network link inside AWS infrastructure.">
-                AWS Private Link
+              <Tooltip content="Private Link helps you to access to Upstash Cluster with a private network link inside AWS infrastructure.">
+                Private Link
               </Tooltip>
             </CompareValue>
           </td>
@@ -837,8 +837,8 @@ export default function CompareTable() {
               <Tooltip content="You can set the IP addresses which will have access to your database.">
                 IP Whitelisting
               </Tooltip>
-              <Tooltip content="AWS Private link helps you to access to Upstash Cluster with a private network link inside AWS infrastructure.">
-                AWS Private Link
+              <Tooltip content="Private Link helps you to access to Upstash Cluster with a private network link inside AWS infrastructure.">
+                Private Link
               </Tooltip>
             </CompareValue>
           </td>
