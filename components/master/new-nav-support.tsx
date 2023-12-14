@@ -20,16 +20,20 @@ export default function NewNavigationItemCompany() {
 
       <NewNavigationContent>
         <div className="grid w-[440px] gap-4 p-6">
-          <ListItem href="/" title1="Discord" icon={<IconBrandDiscord />}>
-            We manage everything for you
+          <ListItem
+            href="/discord"
+            title1="Discord"
+            icon={<IconBrandDiscord />}
+          >
+            Join Our Discord Community
           </ListItem>
 
-          <ListItem href="/" title1="Twitter" icon={<IconBrandX />}>
-            We manage everything for you
+          <ListItem href="/x" title1="X" icon={<IconBrandX />}>
+            Follow Us on X
           </ListItem>
 
-          <ListItem href="/" title1="Github" icon={<IconBrandGithub />}>
-            The teams we empower
+          <ListItem href="/github" title1="Github" icon={<IconBrandGithub />}>
+            Explore Our Code on GitHub
           </ListItem>
         </div>
       </NewNavigationContent>

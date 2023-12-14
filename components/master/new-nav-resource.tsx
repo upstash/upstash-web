@@ -17,7 +17,7 @@ export default function NewNavigationItemResource() {
       <NewNavigationContent>
         <div className="grid w-[440px] gap-4 p-6">
           <ListItem
-            href="/"
+            href="/blog"
             title1="Blog"
             icon={<IconBook strokeWidth={1.5} />}
             className="hover:bg-emerald-50 hover:text-emerald-900"
@@ -26,8 +26,8 @@ export default function NewNavigationItemResource() {
           </ListItem>
 
           <ListItem
-            href="/"
-            title1="Example"
+            href="/examples"
+            title1="Examples"
             icon={<IconCategory2 strokeWidth={1.5} />}
             className="hover:bg-indigo-50 hover:text-indigo-900"
           >

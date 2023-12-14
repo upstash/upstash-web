@@ -32,7 +32,16 @@ export default function NewNavigationItemCompany() {
       <NewNavigationContent>
         <div className="grid w-[440px] gap-4 p-6">
           <ListItem
-            href="/"
+            href="/customers"
+            title1="Customers"
+            icon={<IconMoodSmileBeam strokeWidth={1.5} />}
+            className="hover:bg-amber-50 hover:text-amber-900"
+          >
+            The teams we empower
+          </ListItem>
+
+          <ListItem
+            href="/careers"
             title1={
               <>
                 Careers
@@ -47,25 +56,16 @@ export default function NewNavigationItemCompany() {
             icon={<IconUserPlus strokeWidth={1.5} />}
             className="hover:bg-purple-50 hover:text-purple-900"
           >
-            We manage everything for you
+            Help us build the cutting edge data platform
           </ListItem>
 
           <ListItem
-            href="/"
-            title1="Customers"
-            icon={<IconMoodSmileBeam strokeWidth={1.5} />}
-            className="hover:bg-amber-50 hover:text-amber-900"
-          >
-            The teams we empower
-          </ListItem>
-
-          <ListItem
-            href="/"
+            href="/about"
             title1="About"
             icon={<IconUsers strokeWidth={1.5} />}
             className="hover:bg-emerald-50 hover:text-emerald-900"
           >
-            We manage everything for you
+            Data Platform for Developers
           </ListItem>
         </div>
       </NewNavigationContent>
