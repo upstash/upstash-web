@@ -114,7 +114,7 @@ export default function FAQ() {
       </AccordionItem>
 
       <AccordionItem value="item-9">
-        <AccordionTrigger>How the Enterprise plan priced?</AccordionTrigger>
+        <AccordionTrigger>How is the Enterprise plan priced?</AccordionTrigger>
         <AccordionContent>
           In Enterprise plans, a custom price is set based on specific
           requirements of the customer. For more information email us at{" "}
@@ -123,7 +123,7 @@ export default function FAQ() {
       </AccordionItem>
 
       <AccordionItem value="item-10">
-        <AccordionTrigger>How is Professional Support priced?</AccordionTrigger>
+        <AccordionTrigger>How is the Professional Support priced?</AccordionTrigger>
         <AccordionContent>
           Professional support includes a dedicated service desk along and a
           Slack/Discord channel with a committed response time SLA. It is $1600
