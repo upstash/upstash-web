@@ -1,0 +1,111 @@
+---
+slug: "announcing-upstash-redis-python-sdk-v1-0-0"
+title: "Announcing Upstash Redis Python SDK v1.0.0"
+authors:
+  - yusuf
+tags: [redis, python, announcement]
+---
+
+Today we are releasing `v1.0.0` version of the `upstash-redis` python package. It is now available on [GitHub](https://github.com/upstash/redis-python) and [PyPi](https://pypi.org/project/upstash-redis/).
+
+The package is a connectionless HTTP-based client for Upstash Redis,
+designed to be usable in serverless environments like AWS Lambda,
+Google Cloud Functions or any environment where HTTP is preferred over TCP.
+
+## What's new?
+
+With the new versions the package comes with python docstrings for every command with example usages in them.
+
+![img.png](/blog/announcing-redis-python-sdk/docstring.png)
+
+You can also find the documentation and examples for every command in the [upstash redis python docs](https://upstash.com/docs/oss/sdks/py/redis/commands/overview).
+
+## Quick Start
+
+Install the package
+
+```shell
+pip install upstash-redis
+```
+
+Create a Redis client
+
+```python
+from upstash_redis import UpstashRedis
+
+redis = Redis(url="UPSTASH_REDIS_REST_URL", token="UPSTASH_REDIS_REST_TOKEN")
+
+redis.set("key", "value")
+```
+
+You can also use the environment variables `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` instead of passing them to the constructor.
+
+```python
+from upstash_redis import UpstashRedis
+
+redis = Redis.from_env()
+
+redis.set("key", "value")
+```
+
+The sdk also supports async functions with `asyncio` and `aiohttp` packages.
+
+```python
+import asyncio
+from upstash_redis.asyncio import Redis
+
+async def main():
+    redis = Redis.from_env()
+
+    await redis.set("key", "value")
+
+asyncio.run(main())
+```
+
+If you are in a serverless environment that allows it, it's recommended to initialise the client outside the request handler to be reused while your function is still hot.
+
+### Value type change in some commands
+
+Some commands like `set` or `hset` accepted `Any` as a value type. The value was then converted to a string using `json.dumps`. This leaded to some confusion in some commands.
+
+This is now change to a new type, `ValueT` that only accepts `str`, `int`, `float` and `bool`.
+
+```python
+ValueT = Union[str, int, float, bool]
+
+def set(
+    self,
+    key: str,
+    value: ValueT,
+    ...
+) -> Optional[str]: ...
+```
+
+The sdk still supports the old behaviour but the typing is changed.
+
+```python
+# Works, but gives a type error
+redis.set("key", {"foo": "bar"})
+
+# Works
+redis.set("key", json.dumps({"foo": "bar"}))
+```
+
+### Geo commands returning GeoSearchResult instead of Dict
+
+The `geosearch` and `georadius` commands now return a `GeoSearchResult` object instead of a dictionary which is more convenient to use.
+
+### Set commands returning List instead of Set
+
+Changed return types of `sdiff`, `sunion`, `sinter`, and `smembers` method to `List` from `Set`.
+This eliminates extra set allocation for users doing iteration over the result. If they want, they can return the list into set themselves.
+
+## Conclusion
+
+We hope you enjoy the new version of the package. We are planning on adding `pipeline` and `json` commands support to the python sdk.
+
+You can also check out our [python ratelimiting library](https://github.com/upstash/ratelimit)
+or our other [blog posts about python](http://upstash.com/blog/tag/python).
+
+If you have any questions or feedback, please reach
+out to us on [X](https://x.com/upstash) or [Discord](https://upstash.com/discord).
