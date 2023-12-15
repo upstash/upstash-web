@@ -122,7 +122,7 @@ export default function CompareTable() {
               </select>
 
               <h5 className="flex items-baseline font-semibold">
-                $0.2
+                $0.6
                 <span className="ml-1 text-base font-normal opacity-40">
                   / 100K messages
                 </span>

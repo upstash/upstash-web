@@ -56,9 +56,9 @@ export default function PricingTable() {
             Pay as you go
           </h4>
 
-          <h5 className="text-3xl font-semibold">$0.2</h5>
+          <h5 className="text-3xl font-semibold">$0.6</h5>
           <p className="text-white/40">per 100K messages </p>
-          <p className="text-white/40">Multi Replica: $0.6</p>
+          <p className="text-white/40">Single Replica: $0.2</p>
         </div>
 
         <div className="-mt-6 grow">
