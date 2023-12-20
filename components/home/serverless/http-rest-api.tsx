@@ -128,7 +128,7 @@ const messages = await c.consume({
   topics: ["test.topic"],
   autoOffsetReset: "earliest",
 })`,
-  [Product.QSTASH]: `fetch("https://qstash.upstash.io/v1/publish/https://example.com", {
+  [Product.QSTASH]: `fetch("https://qstash.upstash.io/v2/publish/https://example.com", {
   body: "{ 'hello': 'world' }",
   headers: {
     Authorization: "Bearer XXX",
