@@ -19,9 +19,3 @@
     transform: translate3d(-50%, 0, 0);
   }
 }
-
-@layer components {
-  .mini-table :where(th, td) {
-    @apply border border-zinc-800 px-2 py-1;
-  }
-}

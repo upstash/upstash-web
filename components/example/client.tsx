@@ -118,7 +118,7 @@ export const Client: React.FC<Props> = ({
 
   return (
     <div className="grid items-start gap-4 text-left sm:auto-cols-[1fr_4fr] sm:grid-flow-col  sm:gap-10 lg:flex-row lg:items-start lg:gap-10">
-      <div className="mt-2  sm:mt-[4.5rem] lg:w-[100%] xl:w-[100%]">
+      <div className="mt-2  sm:mt-[4.5rem] lg:w-full">
         <ExampleFilter
           selectedProducts={selectedProducts}
           setSelectedProduct={setSelectedProduct}
@@ -137,25 +137,27 @@ export const Client: React.FC<Props> = ({
         />
       </div>
       <div className="grid grid-flow-row auto-rows-[6_min]">
-        <div className="flex w-[100%] flex-col gap-4 border-b border-b-white/5  sm:flex-row sm:justify-between sm:py-4">
-          <Button
-            href="https://github.com/upstash/examples#contributing"
-            className="rounded bg-white/10 text-white "
-            type="button"
-          >
-            Contribute
-          </Button>
+        <div className="flex w-full flex-col gap-6 border-b border-b-white/5 py-4 sm:flex-row sm:justify-between">
           <input
             type="search"
-            className="text:white focus:border-1 border-1 w-[100%] rounded border-white/5 bg-white/10  px-4 py-2 text-slate-100 transition ease-in-out focus:border-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-500 sm:w-[31.25%] sm:text-sm"
+            className="w-1/2 rounded-full bg-white/5 px-4 py-2 transition placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-emerald-400/40"
             value={exampleQuery}
             placeholder="Search for an example..."
             onChange={(e) => {
               handleExampleQuery(e);
             }}
           />
+
+          <Button
+            className="hidden sm:flex"
+            href="https://github.com/upstash/examples#contributing"
+            type="button"
+          >
+            Contribute
+          </Button>
         </div>
-        <div className="grid grow gap-4 py-3.5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
+
+        <div className="mt-10 grid grow gap-4 py-4 sm:grid-cols-2 sm:gap-6 md:mt-0">
           {data.map((item) => {
             const author = authors[item.author] ?? {
               name: item.author,
@@ -164,7 +166,8 @@ export const Client: React.FC<Props> = ({
 
             return (
               <Box
-                key={item.title}
+                key={item.slug}
+                slug={item.slug}
                 title={item.title}
                 products={item.products}
                 author={author}

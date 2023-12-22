@@ -16,15 +16,31 @@ const example = z.object({
 });
 
 const schema = z.array(example);
-export type Example = z.infer<typeof example>;
+
+export type Example = z.infer<typeof example> & {
+  slug: string;
+};
+
+let examplesData: Example[] | null = null;
 
 export async function getData(): Promise<Example[]> {
-  return await fetch("https://upstash-examples-content.vercel.app/", {
-    cache: "no-store"
-  })
-    .then(async (res) => schema.parse(await res.json()))
-    .catch((err) => {
-      console.log(err);
-      return [];
+  if (!examplesData) {
+    const req = await fetch("https://upstash-examples-content.vercel.app/", {
+      cache: "no-store"
     });
+    const data = schema.parse(await req.json());
+
+    examplesData = data.map((example) => ({
+      ...example,
+      // Turns slash and spaces into dashes
+      // Removes all non-word characters
+      // "Hello World" -> hello-world
+      // "@upstash/redis example" -> upstash-redis-example
+      slug: example.title
+        .toLowerCase()
+        .replace(/ \//g, "-")
+        .replace(/[^\w-]/g, ""),
+    }));
+  }
+  return examplesData;
 }

@@ -1,3 +1,5 @@
+import React from "react";
+
 import Bg from "@/components/bg";
 import Container from "@/components/container";
 import { Client } from "@/components/example/client";

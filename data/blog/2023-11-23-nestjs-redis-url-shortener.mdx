@@ -1,0 +1,300 @@
+---
+slug: nestjs-redis-url-shortener
+title: "Let's build our own URL Shortener with NestJS and Redis"
+description: "Let's write our very own URL Shortener with NestJS and Upstash Redis"
+authors:
+  - oguzhan
+tags: [nestjs, redis]
+---
+
+Welcome! Today, we'll create our very own URL shortener using NestJS and Redis. If you've ever surprised at the simplicity of popular services like [TinyURL](https://tinyurl.com/app) and wondered how they transform long URLs into compact links, you're in the right place.
+
+The concept is quite straightforward: users provide a lengthy URL, and our system assigns a unique identifier, in this case, a simple UUID, to represent it. This unique pairing is then stored as a key-value duo in our Redis database. But why bother with URL shorteners?
+
+URL shorteners aren't just about brevity; they significantly enhance the sharing experience. Whether you're sharing links on social media or simplifying URLs for ease of use, this project has practical applications.
+
+## Example key-value
+
+### Understanding the Structure
+
+Let's break down the key-value structure that combines a (UUID) with user information that we are going to store in our redis db:
+
+```bash
+[UUID]:[userId|userName] -> longUrl
+7deb2726:hezarfen -> https://upstash.com/
+```
+- [UUID]: A unique identifier for each entry.
+- [userId|userName]: Information about the user associated with the shortened URL.
+- longUrl: The original URL that has been shortened.
+
+
+First things first, let's set up a [Redis](https://console.upstash.com/redis). Head over to Upstash Redis Console to get your keys, which will look something like this:
+
+```sh
+UPSTASH_REDIS_REST_URL="https://us1-XXX-38101.upstash.io"
+UPSTASH_REDIS_REST_TOKEN="AZTVACQXXXVhOTktYzI0Mi0XXXM4ZmQzMjI3NDY0NTZmNDXXXYjQ0NGY4MGYwNDI="
+```
+
+## Env key setup
+
+```sh
+UPSTASH_REDIS_REST_URL="https://us1-XXX-38101.upstash.io"
+UPSTASH_REDIS_REST_TOKEN="AZTVACQXXXVhOTktYzI0Mi0XXXM4ZmQzMjI3NDY0NTZmNDXXXYjQ0NGY4MGYwNDI="
+```
+
+With the grunt work behind us, give yourself a well-deserved pat on the back. Now, let's dive into the juicy part.
+
+## Setting up our NestJS
+
+Let's first clone the starter repo:
+
+```bs
+git clone https://github.com/nestjs/typescript-starter.git project
+cd project
+```
+
+And, install `@upstash/redis` and some depedencies:
+
+```bs
+npm i @upstash/redis @nestjs/config nanoid
+```
+
+We need `@upstash/redis` to store our shortened urls and `@nestjs/config` to load env files into our project.
+
+Here is our file structure:
+
+```bash
+📦src
+ ┣ 📂lib
+ ┃ ┗ 📜redis-client.ts
+ ┣ 📜app.controller.ts
+ ┣ 📜app.module.ts
+ ┣ 📜app.service.ts
+ ┗ 📜main.ts
+ 📜.env
+```
+
+Before move on let's update our `.env` as follows:
+
+```bash
+UPSTASH_REDIS_REST_URL="https://XXXX-39281.upstash.io"
+UPSTASH_REDIS_REST_TOKEN="AZXXXgNzYzMDhjYTItODQ4XXX4NTktOThmZWRiZjgzODNlMjM4XXXNmU4NDc0Njk0YWExOXXXFlZGU="
+```
+
+And, now it's time to make our `redis-client.ts` this is our entry file to our redis instance.
+
+```ts
+import { Redis } from "@upstash/redis";
+
+export const createRedisClient = (restUrl: string, restToken: string) => {
+  const redis = new Redis({
+    url: restUrl,
+    token: restToken,
+  });
+  return redis;
+};
+```
+
+In NestJS since we can't access env keys directly within our function we have to pass it from the top when we load the env keys with `@nestjs/config`. To be able to use `@nestjs/config` we have to add it into
+our import in `app.module.ts`.
+
+```ts
+import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { ConfigModule } from '@nestjs/config';
+
+@Module({
+  imports: [ConfigModule.forRoot()],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
+```
+
+NestJS has opiniated way of doing things. `.module.ts` files are similar to barel import files. They control what you import from or export to a specific module. As you can see we are also passing
+our `app.controller.ts` and `app.service.ts` which we'll get to it in a second.
+
+Now that we've successfully integrated the modules, let's delve into the functionality of service files and explore the process of injecting environment keys into `app.service.ts`.
+
+```ts
+import { Injectable } from '@nestjs/common';
+
+@Injectable()
+export class AppService {
+  getHello(): string {
+    return 'Hello World!';
+  }
+}
+```
+
+NestJS uses decorators extensively for abstraction. When we apply the `@Injectable` decorator, it signals that other packages can now inject this module into their runtime. With this foundation, let's proceed to inject our environment keys.
+
+```ts
+@Injectable()
+export class AppService {
+   constructor(private configService: ConfigService) {}
+
+  getRedis(): Redis {
+    const restUrl = this.configService.get<string>('UPSTASH_REDIS_REST_URL');
+    const restToken = this.configService.get<string>(
+      'UPSTASH_REDIS_REST_TOKEN',
+    );
+    return createRedisClient(restUrl, restToken);
+  }
+
+  getHello(): string {
+    return 'Hello World!';
+  }
+}
+```
+
+NestJS adopts a developer-friendly approach by favoring Dependency Injection over explicit imports/exports. This streamlined method is how we easily imported environment keys into our Redis client.
+
+Now, let's bring our first actual function `setShortUrlToCache`.
+
+```ts
+export const UUID_LENGTH = 5;
+const EIGHT_HOUR_IN_SEC = 3600 * 8;
+export const EIGHT_HOUR_IN_MS = EIGHT_HOUR_IN_SEC * 1000;
+
+export type ShortLinkCacheValues = {
+  createadAt: number; //Date.now()
+  expiredAt: number; //Date.now()
+  actualLink: string;
+  k: string;
+};
+
+async setShortUrlToCache(
+    linkToShorten: string,
+    expirationTime = EIGHT_HOUR_IN_SEC,
+    userId: string,
+  ) {
+    const pathKey = `${nanoid(UUID_LENGTH)}:${userId}`;
+
+    const payload: ShortLinkCacheValues = {
+      createadAt: Date.now(),
+      expiredAt: Date.now() + EIGHT_HOUR_IN_MS,
+      actualLink: linkToShorten,
+      k: pathKey,
+    };
+    const res = await this.getRedis().set<ShortLinkCacheValues>(
+      pathKey,
+      payload,
+      {
+        ex: expirationTime,
+      },
+    );
+    if (res) {
+      return pathKey;
+    }
+  }
+```
+
+Since we are essentially in a class, we can use `this` to access other internal methods like `this.getRedis()`.
+This function requests a link to shorten, an optional expiration time, and a userId to easily identify shortened URLs.
+Then, We create a UUID using nanoid and the userId: `${nanoid(UUID_LENGTH)}:${userId}`, and then call `redis.set` with the given `pathKey`, `payload`, and `ex`.
+If the set operation is successful, we return `pathKey` to the user so they can later retrieve their full URL.
+
+Now, we need two more method to get single shortened urls and all the shortened urls with associated user.
+
+```ts
+async getShortUrlFromCache(pathKey: string) {
+    const res = await this.getRedis().get<ShortLinkCacheValues>(pathKey);
+    return res;
+  }
+
+  async getAllShortUrlsFromCacheForUser(userId: string) {
+    const keys = await this.getRedis().keys(`*${userId}*`);
+    if (Boolean(keys.length)) {
+      const listOfUrls = await this.getRedis().mget<ShortLinkCacheValues[]>(
+        ...keys,
+      );
+      return listOfUrls;
+    }
+  }
+```
+
+The first method is straightforward: we pass the pathKey and retrieve the full URL along with additional metadata.
+The second method takes a userId, attempts to retrieve all keys containing that userId using `*userId*`, and then calls redis.mget to fetch all of them simultaneously.
+
+Now, we need a controller file to expose those services to endpoints
+
+```ts
+@Controller()
+export class AppController {
+  constructor(private readonly appService: AppService) {}
+
+  @Post('/shorten')
+  shorterUrl(@Req() req: Request) {
+    const queries = req.query;
+    const { linkToShorten, userId } = queries as unknown as {
+      linkToShorten: string;
+      expire: number;
+      userId: string;
+    };
+    return this.appService.setShortUrlToCache(linkToShorten, null, userId);
+  }
+
+  @Get('/get-shortened-url/:id')
+  getShortenedUrl(@Req() req: Request) {
+    return this.appService.getShortUrlFromCache(req.params['id']);
+  }
+
+  @Get('/get-all-shortened-url/:id')
+  getAllShortenedUrl(@Req() req: Request) {
+    return this.appService.getAllShortUrlsFromCacheForUser(req.params['id']);
+  }
+}
+```
+
+As mentioned earlier, NestJS heavily relies on decorators, such as `@Post` and `@Get`. If you've worked with Spring or .Net, the controller structure might seem familiar.
+
+In our case, we use `@Post()` to define an endpoint, in this instance, /shorter. We then use @Req() req: Request to access query parameters. After that, the process is straightforward – we call `this.appService.setShortUrlToCache`, which we injected earlier through constructor injection, and return the pathKey to the user.
+
+If you wanna test `/shorten`. Use this example cURL,
+
+```bs
+curl -X POST "http://localhost:3000/shorten?linktoShorten=https://upstash.com&userId=hezarfen"
+```
+
+In return you will get something like this
+
+```bs
+Pn7d0:hezarfen
+```
+
+To get back our full url we simply do this
+
+```bs
+curl http://localhost:3000/get-shortened-url/Pn7d0:hezarfen
+```
+
+In return you will get something like this
+
+```ts
+{"createadAt":1700743946597,"expiredAt":1700772746597,"k":"Pn7d0:Oz"}
+```
+
+To get every associated long url:
+
+```bs
+curl http://localhost:3000/get-all-shortened-url/hezarfen
+```
+
+In return you will get something like this
+
+```ts
+[
+  { createadAt: 1700744195441, expiredAt: 1700772995441, k: "7KgZF:hezarfen" },
+  { createadAt: 1700744179512, expiredAt: 1700772979512, k: "e0b0S:hezarfen" },
+  { createadAt: 1700744207376, expiredAt: 1700773007376, k: "hMlNs:hezarfen" },
+];
+```
+
+## Wrap up
+
+To sum it up, our journey to build a URL shortener using NestJS and Redis has come to a end.
+Throughout this process, we've seen how the combination of NestJS and Redis, particularly Upstash Redis, can streamline the development of efficient and practical applications.
+The project not only showcases the technical capabilities of these technologies but also emphasizes their real-world applicability in creating useful tools like URL shorteners.
+As you continue exploring and building with these tools, remember the valuable insights gained from this project, and consider how they can be applied to future endeavors. Happy coding!

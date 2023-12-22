@@ -11,7 +11,7 @@
 ```mdx
 <Note>You can use any Redis® client, but we recommend @upstash/redis</Note>
 ```
-
+ 
 ![](public/readme/note-info.png)
 
 ```mdx
@@ -126,5 +126,5 @@ In the example above, the "hellouniverse" code snippet will be spliced between t
 
 # Please build
 
-// I needed something to change to trigger a build
-// - andreas
+// I needed something to change to trigger a build 
+// - andreas.

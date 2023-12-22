@@ -34,7 +34,7 @@ export async function generateStaticParams(): Promise<Props["params"][]> {
   const examples: Example[] = await getData();
 
   return examples.map((item) => ({
-    slug: item.title.toLowerCase().replace(/ /g, "-"),
+    slug: item.slug,
   }));
 }
 
@@ -44,9 +44,7 @@ export async function generateMetadata({
   params: Props["params"];
 }) {
   const examples: Example[] = await getData();
-  const example = examples.find(
-    (item) => item.title.toLowerCase().replace(/ /g, "-") === params.slug,
-  );
+  const example = examples.find((item) => item.slug === params.slug);
 
   if (!example) {
     return {
@@ -61,9 +59,7 @@ export async function generateMetadata({
 
 export default async function BlogPage({ params }: Props) {
   const examples: Example[] = await getData();
-  const example = examples.find(
-    (item) => item.title.toLowerCase().replace(/ /g, "-") === params.slug,
-  );
+  const example = examples.find((item) => item.slug === params.slug);
 
   if (!example) {
     notFound();
@@ -240,7 +236,7 @@ export default async function BlogPage({ params }: Props) {
               </h1>
 
               <div
-                className="post mt-8 leading-p"
+                className="post mt-8"
                 dangerouslySetInnerHTML={{ __html: content }}
               />
             </article>

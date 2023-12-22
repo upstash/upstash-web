@@ -1,7 +1,7 @@
 import "./globals.css";
 import "@upstash/claps/style.css";
 
-import { ReactNode } from "react";
+import { ReactNode, Suspense } from "react";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import localFont from "next/font/local";
@@ -12,6 +12,7 @@ import cx from "@/utils/cx";
 
 import { SegmentProvider } from "@/lib/segment/provider";
 
+import Analytics from "@/components/Analytics";
 import Footer from "@/components/master/footer";
 import Header from "@/components/master/header";
 import HeaderMobile from "@/components/master/header-mobile";
@@ -50,6 +51,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       )}
     >
       <body className="pt-20 md:pt-0">
+        <Suspense>
+          <Analytics />
+        </Suspense>
         <SegmentProvider writeKey={process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY!}>
           <Header />
           <HeaderMobile />
@@ -72,11 +76,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                             gtag('js', new Date());
                             gtag('config', 'G-QW5KRSTDM0');`,
               }}
-            />
-            <Script
-              id="hs-script-loader"
-              strategy="afterInteractive"
-              src="//js.hs-scripts.com/6849390.js"
             />
           </>
         )}

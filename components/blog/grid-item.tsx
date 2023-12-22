@@ -9,14 +9,16 @@ export default function PostGridCard({ data }: { data: Post }) {
   const { title, slug, date, authorsData } = data;
 
   return (
-    <article className="flex h-full flex-col justify-between rounded-3xl p-6 md:p-8
-    bg-emerald-900/5 dark:bg-white/3">
+    <article
+      className="flex h-full flex-col justify-between rounded-3xl bg-emerald-900/5 p-6
+    dark:bg-white/5 md:p-8"
+    >
       <h3 className="pr-4 font-display text-3xl font-semibold leading-tight md:pr-12">
         <Balancer>
           <Link
             href={`/blog/${slug}`}
-            className="block transition hover:underline
-            hover:text-emerald-500
+            className="block transition hover:text-emerald-500
+            hover:underline
             dark:hover:text-emerald-400"
           >
             {title}
@@ -34,8 +36,8 @@ export default function PostGridCard({ data }: { data: Post }) {
             <div className="flex grow flex-col items-start">
               <Link
                 href={`/blog/author/${author.id}`}
-                className="opacity-80 hover:underline font-medium
-                hover:text-emerald-500
+                className="font-medium opacity-80 hover:text-emerald-500
+                hover:underline
                 dark:hover:text-emerald-400"
               >
                 {author.name}
@@ -51,7 +53,7 @@ export default function PostGridCard({ data }: { data: Post }) {
               height={64}
               alt={author.name}
               src={author.image}
-              className="aspect-square border-2 border-emerald-900/10 shrink-0 rounded-full object-cover
+              className="aspect-square shrink-0 rounded-full border-2 border-emerald-900/10 object-cover
               dark:border-emerald-500/40"
             />
           </div>
