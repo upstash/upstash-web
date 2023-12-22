@@ -1,0 +1,149 @@
+---
+slug: "qstash-openrouter"
+title: "Serverless LLM Scheduling with QStash and OpenRouter"
+authors:
+  - kay
+tags: [serverless, llm, ai, messaging]
+draft: true
+---
+
+
+Large language models (LLMs) are the hype right now; everyone wants to integrate them into their application and claim they’re using state-of-the-art “AI”. There are plenty of LLMs, each accessible via their own API, but choosing which model or provider is the best for a use case might not be straightforward at the beginning of a project. Also, if you have to schedule queries and want to deliver answers to several endpoints, you have to implement that process yourself.
+
+OpenRouter and QStash solve these issues for you with just a few clicks, and since they’re essentially serverless, you don’t pay for idling infrastructure. So, read on if you want to learn how to add more flexibility to your LLM integrations!
+
+## What is OpenRouter?
+
+OpenRouter is an aggregator for LLM APIs. It gives you a normalized API for multiple LLMs, so you can integrate one API and switch the model later. Either because you want to try different models for your use cases or because you have multiple use cases, each served best with a particular LLM. There are even a few you can use for free.
+
+You can find [a list of supported models in the OpenRouter documentation](https://openrouter.ai/docs#models).
+
+## Which Benefits Does QStash Add Here?
+
+QStash is a serverless HTTP-based messaging and scheduling service.
+
+- It enables you to schedule recurring calls to HTTP APIs.
+- It can relay the responses of your scheduled calls to any URL you like.
+- It improves delivery guarantees by automatically retrying the requests.
+
+These benefits give you more flexibility when integrating LLM APIs and improve the reliability of your application. Figure 1 illustrates the different integration options.
+
+![Figure 1: LLM API integration options](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/30rh0pmjn8qo4afzx9sm.png "Figure 1: LLM API integration options")
+
+Figure 1: LLM API integration options
+
+## Implementing Scheduled LLM Queries
+
+Now that you understand what OpenRouter and QStash bring to the table, let’s implement it!
+
+### Prerequisites
+
+- A current [Node.js](https://nodejs.org/en) installation
+- [An Upstash account](https://console.upstash.com/login)
+- [An OpenRouter account](https://accounts.openrouter.ai/sign-up)
+
+### Project Setup
+
+Create a new Node.js project with the following commands:
+
+```bash
+$ mkdir qstash-openrouter
+$ cd qstash-openrouter
+$ npm init -y
+```
+
+Add the `"type": "module"` field to your `package.json` to ensure the global `fetch` function is available.
+
+### Creating the API Client
+
+The API client handles the connections to QStash. In this example, it can be a simple function. Create a new file, `llmClient.js,` and add the following code:
+
+```javascript
+const queueCompletion = (message) =>
+  fetch(
+    "https://qstash.upstash.io/v2/publish/" +
+      "https://openrouter.ai/api/v1/chat/completions",
+    {
+      method: "POST",
+      body: JSON.stringify({
+        messages: [{ role: "user", content: message }],
+      }),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + QSTASH_TOKEN,
+        "Upstash-Cron": "0 0 * * *",
+        "Upstash-Callback": YOUR_API_URL,
+        "Upstash-Forward-Authorization": "Bearer " + OPENROUTER_TOKEN,
+      },
+    }
+  ).then((res) => res.json())
+```
+
+It’s quite dense, but that’s all you need to schedule calls and get responses delivered to an endpoint of your choice.
+
+The QStash API accepts `POST` requests in the form of `https://qstash.upstash.io/v2/publish/<API_URL>`, where `API_URL` is the URL that QStash will call; in this case, the OpenRouter API at `https://openrouter.ai/api/v1/chat/completions`.
+
+QStash will simply relay the content of the body to your target API so you can structure the body like a regular OpenRouter request. In this case, a minimal completion query tells the default model what the user said. You can check out [the request format in the OpenRouter documentation](https://openrouter.ai/docs#format).
+
+The headers are where things get interesting.
+
+First, we have the Content-Type, which is also relayed to OpenRouter. In this case, it will always be `application/json` since that’s the only format OpenRouter understands.
+
+Second, the Authorization header. It contains the QStash auth token. [You can find it in the Upstash Console in the Request Builder section](https://console.upstash.com/qstash). Replace `QSTASH_TOKEN` with a string that contains your token, or create a constant with the name that holds your token.
+
+Next, the Upstash-Cron header. It tells QStash that it doesn’t need to send the request immediately but schedule it with [a Cron pattern](https://en.wikipedia.org/wiki/Cron#Overview). In this case, the pattern tells QStash to call OpenRouter once daily at midnight.
+
+The Upstash-Callback header tells QStash where it should send the OpenRouter response. Replace `YOUR_API_URL` with a string that contains the HTTP endpoint that handles the LLM responses.
+
+Finally, there is the Upstash-Forward-Authentication header. Qstash will forward each header beginning with Upstash-Forward- to OpenRouter (without the Upstash-Forward- part), allowing you to pass custom headers. In this case, the OpenRouter API needs an access token, too. [You can get one from the OpenRouter website](https://openrouter.ai/keys).
+
+After you send this request, QStash will:
+
+1. Schedule recurring requests to OpenRouter.
+2. Call OpenRouter once every midnight.
+3. Relay the body and all forwarded headers to OpenRouter.
+4. Deliver the result to your API endpoint.
+
+You can see a visual representation of this flow in Figure 2.
+
+![Figure 2: Request flow](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/pksbr6d4h8ttkb3fch0k.png "Figure 2: Request flow")
+
+Figure 2: Request flow
+
+### Handling Requests in the Callback Endpoint
+
+QStash sends a JSON object that contains a body field with the OpenRouter response body. The body value is Base64 encoded, so you need to decode it first.
+
+The following code illustrates the decoding process:
+
+```javascript
+api.all("/callback", (request) => {
+  const qstashBody = JSON.parse(request.body)
+  const openRouterBody = atob(qstashBody.body)
+  const answer = openRouterBody.choices[0].message.content
+})
+```
+
+If your framework doesn’t automatically parse JSON in the request body, doing so would be your first step. Then, you get the `body` field containing the Base64 encoded OpenRouter response. This includes an array of `choices` that represent the answers of the LLM. [You can find the response format in the OpenRouter documentation](https://openrouter.ai/docs#responses).
+
+The JSON sent by QStash will also contain the headers from OpenRouter, the body of the request you sent via the API client, and the headers you sent via the API client to give your endpoint all the information it needs to handle that message. [The fields are listed in the QStash documentation](https://upstash.com/docs/qstash/features/callbacks#how-do-i-use-callbacks).
+
+### Stopping a Schedule
+
+Most of the time, you only want to schedule one query for later, not sending the same query every time. This means you must delete the schedule from QStash when you receive the completion.
+
+You can delete a schedule with this code:
+
+```javascript
+api.all("/callback", (request) => {
+  const qstashBody = JSON.parse(request.body)
+  fetch("https://qstash.upstash.io/v2/schedules/" + qstashBody.scheduleId, {
+    method: "delete",
+    headers: { Authentication: "Bearer " + QSTASH_TOKEN },
+  })
+})
+```
+
+## Summary
+
+With OpenRouter, you can test your use cases with multiple LLMs without changing your code. If a provider gets too expensive or shuts down their service, you can migrate to another in minutes. With QStash, you get additional flexibility for your architecture. Scheduling LLM queries for later or even doing recurring queries and then getting them delivered to any API endpoint.
