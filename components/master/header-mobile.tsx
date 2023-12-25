@@ -45,9 +45,17 @@ export default function Header({ className, ...props }: IAppHeader) {
             onClick={() => setShowMenu((prev) => !prev)}
           >
             {showMenu ? (
-              <Icon icon={ICON_NAMES.Cancel} className="text-3xl" />
+              <Icon
+                title="Collapse menu"
+                icon={ICON_NAMES.Cancel}
+                className="text-3xl"
+              />
             ) : (
-              <Icon icon={ICON_NAMES.Menu} className="text-3xl" />
+              <Icon
+                title="Expand menu"
+                icon={ICON_NAMES.Menu}
+                className="text-3xl"
+              />
             )}
           </button>
 

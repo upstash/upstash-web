@@ -6,7 +6,7 @@ export default function GlobalLowLatency() {
   return (
     <ServerlessBox className="md:col-span-3">
       <header>
-        <ServerlessTitle link="https://latency.upstash.io">
+        <ServerlessTitle link="https://latency.upstash.io" title="Latency">
           Global low latency
         </ServerlessTitle>
         <ServerlessSummary>

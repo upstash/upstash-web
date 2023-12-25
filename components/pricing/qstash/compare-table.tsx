@@ -34,7 +34,7 @@ export default function CompareTable() {
 
       <thead>
         <tr>
-          <th className="p-0" />
+          <td className="p-0" />
           <th
             hidden={isMobile ? !showFree : false}
             className="border-b-2 border-b-zinc-950 bg-white/3 px-0
@@ -62,7 +62,7 @@ export default function CompareTable() {
         </tr>
 
         <tr className="sticky top-20 z-20 md:top-0">
-          <th className="" />
+          <td className="" />
           <th
             hidden={isMobile ? !showFree : false}
             className="border-b border-b-zinc-800 bg-zinc-950 p-0"

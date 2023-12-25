@@ -28,6 +28,7 @@ export function ServerlessTitle({
   children,
   className,
   link,
+  title,
 }: HTMLProps<HTMLHeadElement> & {
   link?: string;
 }) {
@@ -48,6 +49,7 @@ export function ServerlessTitle({
             href={link}
             iconProps={{
               className: "text-3xl opacity-100",
+              title,
             }}
           />
         </span>
