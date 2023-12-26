@@ -31,7 +31,7 @@ export default function HomeInvestors() {
         </div>
 
         {/* about link */}
-        <div className="mt-10 text-zinc-600">
+        <div className="mt-10 text-zinc-400">
           <Link href="/about" className="underline hover:text-emerald-400">
             See the full list
           </Link>

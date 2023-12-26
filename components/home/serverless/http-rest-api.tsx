@@ -21,7 +21,7 @@ export default function HttpRestApi() {
   return (
     <ServerlessBox className="md:col-span-4">
       <header>
-        <ServerlessTitle link="/docs/redis/features/restapi">
+        <ServerlessTitle link="/docs/redis/features/restapi" title="Rest API">
           HTTP/REST API
         </ServerlessTitle>
         <ServerlessSummary>

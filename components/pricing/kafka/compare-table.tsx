@@ -47,7 +47,7 @@ export default function CompareTable() {
 
       <thead>
         <tr>
-          <th className="p-0" />
+          <td className="p-0" />
           <th
             hidden={isMobile ? !showFree : false}
             className="border-b-2 border-b-zinc-950 bg-white/3 px-0 py-3 text-xs font-medium uppercase tracking-wider text-white/80"
@@ -75,7 +75,7 @@ export default function CompareTable() {
         </tr>
 
         <tr className="sticky top-20 z-20 md:top-0">
-          <th className="" />
+          <td className="" />
           <th
             hidden={isMobile ? !showFree : false}
             className="border-b border-b-zinc-800 bg-zinc-950 p-0"
@@ -1074,7 +1074,11 @@ export default function CompareTable() {
             <CompareValue
               after={
                 <Tooltip content="Free up to 200GB per month. Beyond that, $0.1 per GB.">
-                  <IconInfoCircle className="ml-1 opacity-60" stroke={1.2} />
+                  <IconInfoCircle
+                    className="ml-1 opacity-60"
+                    stroke={1.2}
+                    aria-label="Info"
+                  />
                 </Tooltip>
               }
             >
@@ -1088,7 +1092,11 @@ export default function CompareTable() {
             <CompareValue
               after={
                 <Tooltip content="Price can change depending on cloud provider's fee.">
-                  <IconInfoCircle className="ml-1 opacity-60" stroke={1.2} />
+                  <IconInfoCircle
+                    className="ml-1 opacity-60"
+                    stroke={1.2}
+                    aria-label="Info"
+                  />
                 </Tooltip>
               }
             >
@@ -1102,7 +1110,11 @@ export default function CompareTable() {
             <CompareValue
               after={
                 <Tooltip content="Price can change depending on cloud provider's fee.">
-                  <IconInfoCircle className="ml-1 opacity-60" stroke={1.2} />
+                  <IconInfoCircle
+                    className="ml-1 opacity-60"
+                    stroke={1.2}
+                    aria-label="Info"
+                  />
                 </Tooltip>
               }
             >
@@ -1114,7 +1126,7 @@ export default function CompareTable() {
         {/**/}
 
         <tr>
-          <th className="p-0" />
+          <td className="p-0" />
           <th hidden={isMobile ? !showFree : false} className="bg-zinc-950 p-0">
             <div className="bg-white/3 py-4 text-white/60">
               <Button
