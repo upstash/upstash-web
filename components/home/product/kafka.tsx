@@ -42,7 +42,7 @@ export default function ServerlessKafka() {
 
       <div className="mt-auto grid gap-4">
         <Button
-          href="https://github.com/upstash/kafka-examples"
+          href="https://github.com/upstash/examples/tree/main/examples"
           className="hover:bg-blue-100 hover:text-blue-950"
           type="button"
           onClick={() => {

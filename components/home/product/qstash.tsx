@@ -40,7 +40,7 @@ export default function ServerlessQStash() {
 
       <div className="mt-auto grid gap-4">
         <Button
-          href="https://github.com/upstash/qstash-examples"
+          href="https://github.com/upstash/examples/tree/main/examples"
           className="hover:bg-purple-100 hover:text-purple-950"
           type="button"
           onClick={() => {

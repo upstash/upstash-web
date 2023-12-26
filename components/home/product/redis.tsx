@@ -39,7 +39,7 @@ export default function ServerlessRedis() {
 
       <div className="mt-auto grid gap-4">
         <Button
-          href="https://github.com/upstash/redis-examples"
+          href="https://github.com/upstash/examples/tree/main/examples"
           className="hover:bg-red-100 hover:text-red-950"
           type="button"
           onClick={() => {
