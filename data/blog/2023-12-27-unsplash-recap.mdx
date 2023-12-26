@@ -1,6 +1,6 @@
 ---
 slug: unsplash-2023-recap
-title: "Building a Unsplash 2023 Recap using Golang, AWS Lambda, Redis and React"
+title: "Building an Unsplash 2023 Recap using Golang, AWS Lambda, Redis and React"
 authors:
   - oguzhantasimaz
 tags: [redis, vercel, aws, serverless, golang, react, tailwind, unsplash]
@@ -50,22 +50,21 @@ Before we begin, make sure you have the following:
 
 ### Creating Unsplash Account and App in Unsplash API Dashboard
 
-1. **Create Unsplash Account**
+#### 1. Create Unsplash Account
 
    Start by creating an Unsplash account at [https://unsplash.com/join](https://unsplash.com/join).
 
-2. **Create Unsplash App**
+#### 2. Create Unsplash App
 
    Next, create an Unsplash app in the [Unsplash API dashboard](https://unsplash.com/oauth/applications). This will provide you with the necessary credentials to access the Unsplash API.
    
 
 ### Setting Up the Backend with Golang and AWS Lambda
 
-1. **Create a Golang Lambda Function**
+#### 1. Create a Golang Lambda Function
 
    Start by creating a new Golang Lambda function using the AWS Lambda Go SDK. 
 
-   <ExpandableCode>
    ```go
       package main
 
@@ -87,17 +86,16 @@ Before we begin, make sure you have the following:
          return "Hello from Golang Lambda!", nil
       }
    ```
-   </ExpandableCode>
 
-2. ** Create an AWS Account**
+#### 2. Create an AWS Account
 
    Start by creating an AWS account at [https://aws.amazon.com/](https://aws.amazon.com/).
 
-3. ** Create an AWS Lambda Function**
+#### 3. Create an AWS Lambda Function
 
    Create an AWS Lambda function through the [AWS Lambda console](https://console.aws.amazon.com/lambda/home?region=us-east-1#/create).
 
-4. ** Deploy Golang Lambda Function**
+#### 4. Deploy Golang Lambda Function
 
    Build your Golang Lambda function and deploy it to AWS Lambda using either the [AWS CLI](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-awscli.html) or the [AWS Lambda console](https://us-east-1.console.aws.amazon.com/lambda/home?region=us-east-1#/create).<br/>
 
@@ -114,7 +112,6 @@ Before we begin, make sure you have the following:
 
    Update your Golang Lambda function to include Unsplash API integration for fetching user data and photo statistics.
 
-   <ExpandableCode title="main.go">
    ```go showLineNumbers {12}
       package main
 
@@ -157,24 +154,22 @@ Before we begin, make sure you have the following:
          fmt.Println(string(body))
       }
    ```
-   </ExpandableCode>
 
 ### Upstash Redis Integration
-1. ** Create Upstash Account**
+#### 1. Create Upstash Account
 
    Start by creating an Upstash account at [https://console.upstash.com/login](https://console.upstash.com/login).
 
-2. **Create Upstash Redis Database**
+#### 2. Create Upstash Redis Database
 
    Create an Upstash Redis database through the [console](https://console.upstash.com/) and obtain the connection URL and password.
 
-3. **Integrate Upstash Redis in Golang**
+#### 3. ###Integrate Upstash Redis in Golang
 
    Update your Golang Lambda function to include Upstash Redis integration for storing and retrieving user-specific data.<br/>
    You can either use a redis library or use REST API of Upstash. <br/> In this tutorial, we will use REST API of Upstash. Because it is more convenient for serverless applications. <br/>
 
-   ** Get Data **
-   <ExpandableCode title= "Get Data">
+#### 4. Get Data
    ```go
       package main
 
@@ -213,9 +208,8 @@ Before we begin, make sure you have the following:
       fmt.Println(string(body))
       }
    ```
-   </ExpandableCode>
-   ** Set Data **
-   <ExpandableCode title="Set Data">
+
+##### 5. Get Data
    ```go
       package main
 
@@ -259,11 +253,10 @@ Before we begin, make sure you have the following:
          fmt.Println(string(body))
       }
    ```
-   </ExpandableCode>
 
 ### Building the Frontend with React and Tailwind
 
-1. **Initialize React App**
+#### 1. Initialize React App
 
    Set up a new React app using Create React App.
 
@@ -271,7 +264,7 @@ Before we begin, make sure you have the following:
    npx create-react-app unsplash-recap
    ```
 
-2. **Tailwind CSS Integration**
+#### 2. Tailwind CSS Integration
 
    Install Tailwind CSS and configure it in your React project.
 
@@ -279,11 +272,10 @@ Before we begin, make sure you have the following:
    npm install tailwindcss
    ```
 
-3. **Create Photo Component**
+#### 3. Create Photo Component
 
    Develop a React component to display user's top 5 photos, including views, likes, and downloads.
 
-   <ExpandableCode title= "Photo.js">
    ```js
    import React from 'react';
 
@@ -293,13 +285,11 @@ Before we begin, make sure you have the following:
 
    export default Photo;
    ```
-   </ExpandableCode>
 
-4. **Fetch Data from Golang Lambda**
+#### 4. Fetch Data from Golang Lambda
 
    Implement logic to fetch data from the Golang Lambda function in your React app.
 
-   <ExpandableCode title= "Photo.js">
    ```js
    import React, { useState, useEffect } from 'react';
    import Photo from './Photo';
@@ -319,15 +309,13 @@ Before we begin, make sure you have the following:
 
    export default App;
    ```
-   </ExpandableCode>
 
 ### Bringing It All Together
 
-1. **Connect Frontend and Backend**
+#### 1. Connect Frontend and Backend
 
    Update the React app to make API calls to the Golang Lambda function for fetching user data and photo statistics.
 
-   <ExpandableCode title= "App.js">
    ```js
    const App = () => {
    	const [photoData, setPhotoData] = useState([]);
@@ -353,13 +341,11 @@ Before we begin, make sure you have the following:
     });
    }
    ```
-   </ExpandableCode>
 
-2. **Styling with Tailwind**
+#### 2. Styling with Tailwind
 
    Style your React components using Tailwind CSS utility classes for a visually appealing and responsive design.
 
-   <ExpandableCode title="App.js">
    ```js
    const App = () => {
    	return (
@@ -370,9 +356,8 @@ Before we begin, make sure you have the following:
    	);
    };
    ```
-   </ExpandableCode>
 
-3. **Deploy React App**
+#### 3. Deploy React App
 
    Deploy your React app to a hosting platform of your choice in our case we will use [Vercel](https://vercel.com/). Which you can easily deploy your app by connecting your GitHub repository.
 
@@ -384,11 +369,11 @@ You can find the complete source codes below: <br/>
 
 ## Conclusion
 
-In this tutorial, we’ve covered the integration of **[Golang](https://golang.org/)**, **[Upstash Redis](https://upstash.com)**, **[AWS Lambda](https://aws.amazon.com/lambda/?utm_source=valon)** and **[Unsplash API](https://unsplash.com/developers?utm_source=valon)** to build a Unsplash 2023 Recap. <br/>
+In this tutorial, we’ve covered the integration of [Golang](https://golang.org/), [Upstash Redis](https://upstash.com), [AWS Lambda](https://aws.amazon.com/lambda/?utm_source=valon) and [Unsplash API](https://unsplash.com/developers?utm_source=valon) to build a Unsplash 2023 Recap. <br/>
 
-If you enjoyed this tutorial, be sure to check out our other tutorials on the **[Upstash blog](https://upstash.com/blog)**. <br/>
+If you enjoyed this tutorial, be sure to check out our other tutorials on the [Upstash blog](https://upstash.com/blog). <br/>
 
-If you have any questions or comments, feel free to reach out to me on **[GitHub](https://github.com/oguzhantasimaz)** or **[LinkedIn](https://www.linkedin.com/in/oguzhantasimaz/)**.
+If you have any questions or comments, feel free to reach out to me on [GitHub](https://github.com/oguzhantasimaz) or [LinkedIn](https://www.linkedin.com/in/oguzhantasimaz/).
 
 ## Closing Notes
 
