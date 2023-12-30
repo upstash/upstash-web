@@ -25,7 +25,9 @@ let examplesData: Example[] | null = null;
 
 export async function getData(): Promise<Example[]> {
   if (!examplesData) {
-    const req = await fetch("https://upstash-examples-content.vercel.app/");
+    const req = await fetch("https://upstash-examples-content.vercel.app/", {
+      cache: "no-store"
+    });
     const data = schema.parse(await req.json());
 
     examplesData = data.map((example) => ({
