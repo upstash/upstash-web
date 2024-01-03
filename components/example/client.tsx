@@ -140,6 +140,7 @@ export const Client: React.FC<Props> = ({
         <div className="flex w-full flex-col gap-6 border-b border-b-white/5 py-4 sm:flex-row sm:justify-between">
           <input
             type="search"
+            aria-label="Search"
             className="w-1/2 rounded-full bg-white/5 px-4 py-2 transition placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-emerald-400/40"
             value={exampleQuery}
             placeholder="Search for an example..."

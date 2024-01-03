@@ -292,5 +292,11 @@ export const authors: Record<string,
         name: "Mahesh Saini",
         title: "Software Developer (Guest Author)",
         image: "mahesh.jpeg",
+    },
+    oguzhantasimaz: {
+        name: "Oguzhan Tasimaz",
+        title: "Software Engineer",
+        url: "https://oguzhantasimaz.com",
+        image: "oguzhantasimaz.png",
     }
 };

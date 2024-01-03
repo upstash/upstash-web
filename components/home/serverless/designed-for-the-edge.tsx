@@ -11,7 +11,10 @@ export default function DesignedForTheEdge() {
   return (
     <ServerlessBox className="overflow-hidden md:col-span-2">
       <header className="relative z-20">
-        <ServerlessTitle link="/docs/redis/features/globaldatabase">
+        <ServerlessTitle
+          link="/docs/redis/features/globaldatabase"
+          title="Global database features"
+        >
           Designed for the edge
         </ServerlessTitle>
         <ServerlessSummary>

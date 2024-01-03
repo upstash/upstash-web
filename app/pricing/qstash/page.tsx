@@ -26,8 +26,7 @@ export default function PricingQStashPage() {
               Compare Plans
             </PageHeaderTitle>
             <PageHeaderDesc className="mt-2 md:text-xl">
-              Start with a hobby project, collaborate with a team, and scale to
-              millions of users.
+              Plans that scale to all sizes.
             </PageHeaderDesc>
           </header>
 

@@ -6,9 +6,10 @@ export type IconProps = SVGProps<SVGSVGElement> & {
   // size?: number | string;
   icon?: keyof typeof ICON_NAMES;
   className?: string;
+  title?: string;
 };
 
-export default function Icon({ icon, className, ...props }: IconProps) {
+export default function Icon({ icon, className, title, ...props }: IconProps) {
   const children: ReactNode = icon
     ? PATHS[icon]
     : PATHS[ICON_NAMES.ArrowUpRight];
@@ -27,6 +28,7 @@ export default function Icon({ icon, className, ...props }: IconProps) {
       className={cx("inline-flex shrink-0 text-xl", className)}
       {...props}
     >
+      {title && <title>{title}</title>}
       {children}
     </svg>
   );
