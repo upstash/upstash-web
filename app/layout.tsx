@@ -124,4 +124,5 @@ export const metadata: Metadata = {
     icon: "/icons/favicon-32x32.png",
     apple: "/icons/apple-touch-icon.png",
   },
+  manifest: `${SITE_URL}/site.webmanifest`,
 };
