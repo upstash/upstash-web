@@ -4,16 +4,12 @@ const plugin = require("tailwindcss/plugin");
 /** @type {import("tailwindcss").Config} */
 module.exports = {
   darkMode: "media",
-  content: [
-    "./pages/**/*.{js,ts,jsx,tsx}",
-    "./components/**/*.{js,ts,jsx,tsx}",
-    "./app/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ["./src/**/*.{ts,tsx}", "./post/**/*.mdx", "./public/**/*.svg"],
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-sans)", ...defaultTheme.fontFamily.sans],
-        display: ["var(--font-display)", ...defaultTheme.fontFamily.sans],
+        sans: ["var(--font-sans)"],
+        display: ["var(--font-display)"],
       },
       // for blog
       lineHeight: {

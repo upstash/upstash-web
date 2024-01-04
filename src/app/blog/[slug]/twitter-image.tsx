@@ -1,6 +1,7 @@
 import { authors } from "@/utils/authors";
 import { ImageResponse } from "@vercel/og";
-import { getPostDetails, baseUrl } from "../utils/og-post-details";
+
+import { baseUrl, getPostDetails } from "../utils/og-post-details";
 
 export const runtime = "edge";
 export const size = {
@@ -18,7 +19,7 @@ export default async function TwImage({
   try {
     const slug = params.slug;
 
-    const post = await getPostDetails(slug)
+    const post = await getPostDetails(slug);
 
     if (!post) {
       throw new Error("Post not found");

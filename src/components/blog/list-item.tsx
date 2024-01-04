@@ -24,7 +24,7 @@ export default function PostListCard({ data }: { data: Post }) {
         {isAnnouncement && (
           <h5
             className="-ml-0.5 mb-2 inline-flex rounded-full bg-amber-500/20 px-2 py-1 text-xs
-            uppercase tracking-wide text-amber-900 dark:text-amber-100 md:mb-4"
+            uppercase tracking-wide text-amber-900 md:mb-4 dark:text-amber-100"
           >
             Announcement
           </h5>
