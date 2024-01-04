@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
-import { AFFILIATE_CODE } from "./app/constants";
+import { AFFILIATE_CODE } from "./src/app/constants";
 
 export function middleware(request: NextRequest) {
   const queryParams = request.nextUrl.searchParams; // `URLSearchParams`

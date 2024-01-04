@@ -31,7 +31,7 @@ export default function BlogPopularTag({ data }: { data: [string, number][] }) {
             )}
           >
             {TAG_NAMES[tag as keyof typeof TAG_NAMES] || (
-              <span className="capitalize font-medium">{tag}</span>
+              <span className="font-medium capitalize">{tag}</span>
             )}
           </Link>
         );

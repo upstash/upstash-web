@@ -242,7 +242,7 @@ Also, via Rate Limiting we’re able to moderate the number of edits made by a u
 minute based on their GitHub usernames. As of now, we allow them to make upto 3 changes within a minute.
 This’d help in reducing any unseen spam.
 
-```jsx title="@/src/pages/github/hook/issue.js"
+```jsx title="@/pages/github/hook/issue.js"
 const rateLimiter = ratelimit(3, "60 s");
 
 if (rateLimiter) {
