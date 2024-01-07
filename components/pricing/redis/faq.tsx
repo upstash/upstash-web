@@ -16,8 +16,8 @@ export default function FAQ() {
           How can I upgrade to pay as you go from free tier?
         </AccordionTrigger>
         <AccordionContent>
-          Once you enter your credit card , your cluster will be upgraded to the
-          pay-as-you-go plan and limits will be updated.
+          Once you enter your credit card , your database will be upgraded to
+          the pay-as-you-go plan and limits will be updated.
         </AccordionContent>
       </AccordionItem>
 
