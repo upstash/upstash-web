@@ -86,7 +86,7 @@ export default function HomePage() {
 const MISSIONS = [
   {
     title: "Fast",
-    desc: "We know each millisecond is important for you.",
+    desc: "We understand that every millisecond matters to you.",
     icon: (
       <AboutIcon.Fast className="text-[60px] text-emerald-400 md:text-[70px]" />
     ),
@@ -100,7 +100,7 @@ const MISSIONS = [
   },
   {
     title: "Robust",
-    desc: "We win your trust with robustness.",
+    desc: "We aim to earn your trust with robust solutions.",
     icon: (
       <AboutIcon.Robust className="text-[60px] text-emerald-400 md:text-[70px]" />
     ),

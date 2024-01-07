@@ -25,9 +25,8 @@ export default function HttpRestApi() {
           HTTP/REST API
         </ServerlessTitle>
         <ServerlessSummary>
-          HTTP-based APIs enable access from serverless and edge functions,
-          while the use of standard clients via the Redis/Kafka protocol is
-          still supported.
+          HTTP-based APIs enable access from serverless and edge functions in
+          addition to supporting standard clients via the Redis/Kafka protocol.
         </ServerlessSummary>
       </header>
 

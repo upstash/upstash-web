@@ -10,8 +10,8 @@ export default function GlobalLowLatency() {
           Global low latency
         </ServerlessTitle>
         <ServerlessSummary>
-          Data is replicated to 8+ regions all over the world for the best
-          latency for your users. Add/remove regions without downtime.
+          Data is replicated across 8+ regions worldwide to provide lowest
+          latency for your users. Add/remove regions without any downtime.
         </ServerlessSummary>
       </header>
 
