@@ -82,9 +82,7 @@ export default function FAQ() {
       </AccordionItem>
 
       <AccordionItem value="item-7">
-        <AccordionTrigger>
-          How many databases/clusters can I create?
-        </AccordionTrigger>
+        <AccordionTrigger>How many databases can I create?</AccordionTrigger>
         <AccordionContent>
           You can create up to 10 databases for free and beyond this you will be
           charged $0.5 per database up to 100 databases.
@@ -137,7 +135,9 @@ export default function FAQ() {
       </AccordionItem>
 
       <AccordionItem value="item-11">
-        <AccordionTrigger>How is the Professional Support priced?</AccordionTrigger>
+        <AccordionTrigger>
+          How is the Professional Support priced?
+        </AccordionTrigger>
         <AccordionContent>
           Professional support includes a dedicated service desk along and a
           Slack/Discord channel with a committed response time SLA. It is $1600
