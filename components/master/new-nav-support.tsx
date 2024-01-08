@@ -22,13 +22,6 @@ export default function NewNavigationItemCompany() {
       <NewNavigationContent>
         <div className="grid w-[440px] gap-4 p-6">
           <ListItem
-            href="mailto:support@upstash.com"
-            title1="Mail"
-            icon={<IconMail />}
-          >
-            Send a Mail to Support
-          </ListItem>
-          <ListItem
             href="/discord"
             title1="Discord"
             icon={<IconBrandDiscord />}
@@ -42,6 +35,13 @@ export default function NewNavigationItemCompany() {
 
           <ListItem href="/github" title1="Github" icon={<IconBrandGithub />}>
             Explore Our Code on GitHub
+          </ListItem>
+          <ListItem
+            href="mailto:support@upstash.com"
+            title1="Email"
+            icon={<IconMail />}
+          >
+            Send an Email to Support
           </ListItem>
         </div>
       </NewNavigationContent>
