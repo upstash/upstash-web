@@ -5,6 +5,7 @@ import {
   IconBrandDiscord,
   IconBrandGithub,
   IconBrandX,
+  IconMail,
 } from "@tabler/icons-react";
 
 import {
@@ -34,6 +35,13 @@ export default function NewNavigationItemCompany() {
 
           <ListItem href="/github" title1="Github" icon={<IconBrandGithub />}>
             Explore Our Code on GitHub
+          </ListItem>
+          <ListItem
+            href="mailto:support@upstash.com"
+            title1="Email"
+            icon={<IconMail />}
+          >
+            Send an Email to Support
           </ListItem>
         </div>
       </NewNavigationContent>

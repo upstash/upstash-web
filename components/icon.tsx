@@ -26,6 +26,7 @@ export default function Icon({ icon, className, title, ...props }: IconProps) {
       width="1em"
       height="1em"
       className={cx("inline-flex shrink-0 text-xl", className)}
+      role="icon"
       {...props}
     >
       {title && <title>{title}</title>}
@@ -53,8 +54,8 @@ export enum ICON_NAMES {
 const PATHS = {
   [ICON_NAMES.ArrowUpRight]: (
     <>
-      <line x1="7" y1="17" x2="17" y2="7"></line>
-      <polyline points="7 7 17 7 17 17"></polyline>
+      <line x1="7" y1="17" x2="17" y2="7" />
+      <polyline points="7 7 17 7 17 17" />
     </>
   ),
   [ICON_NAMES.Check]: (
