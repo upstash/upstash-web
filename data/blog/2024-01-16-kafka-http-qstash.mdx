@@ -1,0 +1,174 @@
+---
+slug: kafka-http-QStash
+title: "Simulating QStash with Upstash Kafka and HTTP connector"
+authors:
+  - noah
+tags: [QStash, kafka]
+---
+
+In this blog post, we are going to learn how to simulate QStash by using Upstash Kafka with HTTP connector.
+
+## Why?
+
+QStash is a powerful and versatile HTTP-based messaging and scheduling service designed for serverless and edge runtimes. It provides the following functionalities:
+
+- Pushing messages to the target API
+- PubSub with QStash topics
+- Delaying message delivery
+- Scheduling recurring calls to target API
+- Improved delivery guarantee by retries
+- DLQs
+
+We might need to send more messages than the QStash quota in some use cases. Exceeding the limits can cause exceptions and failure in sending messages.
+
+You can check the limits of QStash from the [docs](https://upstash.com/pricing/QStash).
+
+To overcome this problem, we can use Upstash Kafka with an HTTP connector to mimic QStash since the throughput limit is unlimited in Upstash Kafka.
+
+This solution can remove the throughput limit obstacle by converting a pull-based Kafka topic to a push-based messaging pipeline.
+
+In addition, we can create more than one HTTP connector for a topic. Therefore, we can use Upstash Kafka with HTTP connector as a PubSub topic, similar to the topics in QStash.
+
+In return, we waive the ability to control the timing of delivery of messages.
+
+You can see the comparison between QStash and the simulation with Kafka and HTTP Connector in the table below.
+
+|                                        | **Simulation with Kafka and HTTP Connector** | **QStash** | 
+|----------------------------------------| ----------- | ----------- |
+| **Unlimited Message Throughput**       | X |  | 
+| **Pushing messages to the target API** | X | X | 
+| **PubSup with Topics**                 | X | X | 
+| **DLQs**                               | X | X | 
+| **Scheduling calls**                   |  | X | 
+| **Delaying message delivery**          |  | X | 
+| **Scheduling calls**                   |  | X | 
+| **Retries**                            | (can be done over DLQs) | X |
+
+We will first create an API that we are going to call through Kafka and deploy it to Vercel. Then, we will create a Kafka topic with an HTTP connector and publish messages to the test API.
+
+## Creating a Test API
+
+In this blog post, we need a test endpoint to use as the target of the HTTP connector to test the QStash simulation.
+
+Let’s create a simple Next.js project and deploy it to Vercel.
+
+First, we must create the project in our local by running the following command.
+
+```
+npx create-next-app@latest QStash-simulation
+```
+
+This command will create a Next.js project with a default endpoint which returns a `Welcome to Next.js!` page.
+
+We can verify that the Next.js project is created successfully by running the project with the following command.
+
+```
+npm run dev
+```
+
+Then, we can see the welcome page by opening `localhost:3000`.
+
+We don’t need that page for our case. Therefore, we can create a much simpler endpoint which returns a JSON with a message.
+
+To do that, we will create a new js file under `pages/api/` called `test.js`.
+
+``` javascript
+// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+
+export default function handler(_req, res) {
+	res.status(200).json({ message: "Successful" });
+}
+```
+
+This file is mapped to the API router and creates a new endpoint which can be reached from `localhost:3000/api/test`.
+
+When we open `localhost:3000/api/test`, it returns a simple JSON.
+
+```json
+{
+	"message": “Successful”
+}
+```
+
+Now, we will deploy it to Vercel.
+
+Let’s [create a Vercel account](https://www.vercel.com) if you do not have one yet.
+
+Before going to the following steps on Vercel, let’s push the project to a Github repository so that Vercel can import it to deploy. You can do it by following the steps explained in the [Vercel docs](https://nextjs.org/learn-pages-router/basics/deploying-nextjs-app/github).
+
+Once we push the project to Github, we can [import](https://vercel.com/import/git) it to Vercel.
+
+Since this is just a test API for the blog, we can keep all the settings as they are and deploy the project.
+
+
+![](https://lh7-us.googleusercontent.com/_a73sCZL9jGbN-b2KnLn3o51agm4Su9gXYRoG5ddOM1LnC1pz3vuLl23v0_B5fGOXGo34M38TpaRRzKDa6eZg-u8xKbJmhGUivdeu-0VZK3tTOR6HbEvCaxtwu1CodfesxD3Unhi4zWP7WLhEpK7EA)
+
+After the deployment is completed, we can find the domain on the Vercel Dashboard.
+
+
+![](https://lh7-us.googleusercontent.com/E1zaAx4ZrI8_-DBBOQJDmekYFbmx7Z_2BIMQ0GHllkDGz8-I-4uO5mgpVkN69E_dW6KMs_Kw7tw62gJuPqwND-1gq4QFAD3BWXVFUXhfXgpKRGPIvAqgo-mgKUhHEys7AZBQEt9cpK3FBP5TBvPMPw)
+
+We can use this domain in the Kafka HTTP connector.
+
+## Creating Upstash Kafka with HTTP Connector
+
+Now, we are going to create a Kafka topic, an HTTP connector attached to that topic.
+
+First, let’s go to the [Upstash console](https://console.upstash.com/login) and create a Kafka cluster.
+
+We can create the Kafka cluster by following the [Kafka docs](https://upstash.com/docs/kafka).
+
+Once we have a cluster, we can create a topic which is going to be connected to our Vercel endpoint through HTTP connector.
+
+
+![](https://lh7-us.googleusercontent.com/uM7oZQqizolMjJRqbtGJoFDBwgk58qQJkBXDnd5RH_YJSLAIQpWDNHc7sJhKMEL0fy3BvO3nSHps6qcvopxAMD88OWYe9QoeYE6vpWB3apKfhyLMtRzgqu7dQv8JrMvAlpW8xk3hpe_Q4xCFGcJL3w)
+
+After the topic is created, we can now create an `Aiven HTTP Connector` under `Connectors` tab.
+
+Let’s fill in the fields as follows.
+
+
+![](https://lh7-us.googleusercontent.com/h_uQrggfBpo84pe423MXollgN6n16SautRCd5CIDCoNQJOHMb0TENecJCEn9_zgh0E9jzArkCcnTL8xIxIkQ4cn6-O9ua-5yISV0btjpX-gsUIS4i43AJFVOmpIxvQiCkz5Yagon53_SsrTMkhN7cQ)
+
+We need to put our HTTP endpoint running on Vercel to the `HTTP URL`. As we mentioned before, we can also have DLQs in this connector.
+
+In the next step, we can verify the settings of the connector.
+
+```json
+{
+	"connector.class": "io.aiven.kafka.connect.http.HttpSinkConnector",
+	"errors.deadletterqueue.topic.name": "QStash-simulation-dlq",
+	"http.authorization.type": "none",
+	"http.url": "https://test-oq1c.vercel.app/api/test",
+	"key.converter": "org.apache.kafka.connect.storage.StringConverter",
+	"topics": "simulation",
+	"value.converter": "org.apache.kafka.connect.storage.StringConverter"
+}
+```
+
+When we complete the HTTP connector creation, we can go to the Vercel dashboard and open the logs.
+
+To make it easier, you can find the logs in `https://vercel.com/<username>-projects/<project name>/logs`.
+
+We should see the first GET request has been sent by the connector itself during the creation.
+
+## Publish Message to the Test API via Upstash Kafka
+
+This is the easiest part of the process. We can send a message to the Kafka topic and see from logs that the endpoint has been reached.
+
+Let’s open the Kafka cluster from [Upstash Kafka console](https://console.upstash.com/kafka). Open the Kafka topic, which is `simulation` in this demo. Now, we can produce a message under the `Messages` tab.
+
+Any message that we are going to send will create a POST request to the endpoint. The data in the POST request is the content of the message in the Kafka topic.
+
+Once we produced the message, we can go back to the Vercel dashboard and see the logs. We should see the logs of the POST request created by the Kafka HTTP connector.
+
+
+![](https://lh7-us.googleusercontent.com/cjh29Ce21cFtWNH8UD89H-zqcwK9z3WwL-73-HKePIklnNXrntF8zO1m0Z8g81Oc6BAYIZ2yajczhKcCb7UHDW2v9y_pBPknOWl2LE7Lkn1dgr5ah3pJmxgy3Yj7PeWtWzq08SFf6SBsy9qiyQkR2w)
+
+## Conclusion
+
+In certain scenarios, there may be a necessity to transmit a greater number of messages than the allocated QStash quota permits. Going beyond these limitations could result in exceptions.
+
+To address this issue, one potential solution is to employ Upstash Kafka alongside an HTTP connector to emulate QStash, as we experienced how to do it with a simple demo project.
+
+If you experience quota problems, you can consider this solution depending on your use case.
