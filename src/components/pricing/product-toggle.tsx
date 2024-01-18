@@ -7,17 +7,19 @@ import { motion } from "framer-motion";
 import IconKafka from "@/components/icon-kafka";
 import IconQStash from "@/components/icon-qstash";
 import IconRedis from "@/components/icon-redis";
+import IconVector from "@/components/icon-vector";
 
 export default function ProductToggle({ product }: { product: string }) {
   return (
     <div className="flex justify-center">
       <div className="flex gap-3 rounded-xl border border-white/5 p-2">
-        {["/", "/kafka", "/qstash"].map((key) => {
+        {["/", "/kafka", "/qstash", "/vector"].map((key) => {
           const isActive = product === key;
 
           const isRedis = key === "/";
           const isKafka = key === "/kafka";
           const isQStash = key === "/qstash";
+          const isVector = key === "/vector";
 
           return (
             <Link
@@ -43,11 +45,13 @@ export default function ProductToggle({ product }: { product: string }) {
                 {isRedis && <IconRedis width={20} />}
                 {isKafka && <IconKafka width={20} />}
                 {isQStash && <IconQStash width={20} />}
+                {isVector && <IconVector width={20} />}
               </>
               <span className="grow px-1 font-medium">
                 {isRedis && "Redis"}
                 {isKafka && "Kafka"}
                 {isQStash && "QStash"}
+                {isVector && "Vector"}
               </span>
             </Link>
           );

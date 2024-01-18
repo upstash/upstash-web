@@ -24,7 +24,7 @@ export default function ServerlessQStash() {
       className="mdd:col-span-2 bg-purple-200/5"
     >
       <header>
-        <IconQStash className="mb-6" width={54} />
+        <IconQStash className="mb-4" width={40} />
         <ProductTitle>QStash</ProductTitle>
       </header>
 
@@ -38,17 +38,7 @@ export default function ServerlessQStash() {
         </ProductFeatureItem>
       </ProductFeature>
 
-      <div className="mt-auto grid gap-4">
-        <Button
-          href="https://github.com/upstash/examples/tree/main/examples"
-          className="hover:bg-purple-100 hover:text-purple-950"
-          type="button"
-          onClick={() => {
-            track("button.examples.qstash");
-          }}
-        >
-          View examples
-        </Button>
+      <div className="mt-auto grid gap-4 sm:grid-cols-2">
         <Button
           href="/docs/qstash"
           className="bg-purple-100 text-purple-950 hover:bg-purple-100 hover:text-purple-950"
@@ -58,6 +48,16 @@ export default function ServerlessQStash() {
           }}
         >
           Read the docs
+        </Button>
+        <Button
+          href="https://github.com/upstash/examples/tree/main/examples"
+          className="hover:bg-purple-100 hover:text-purple-950"
+          type="button"
+          onClick={() => {
+            track("button.examples.qstash");
+          }}
+        >
+          View examples
         </Button>
       </div>
     </ProductBox>

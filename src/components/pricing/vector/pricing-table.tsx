@@ -24,13 +24,13 @@ export default function PricingTable() {
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
         <div>
-          <p className="text-sm text-white/40">Max Messages Daily</p>
-          <p className="font-semibold">10,000</p>
+          <p className="text-sm text-white/40">Max Commands Per Second</p>
+          <p className="font-semibold">1,000</p>
         </div>
 
         <div>
-          <p className="text-sm text-white/40">Max Messages Per Second</p>
-          <p className="font-semibold">1,000</p>
+          <p className="text-sm text-white/40">Daily Command Limit</p>
+          <p className="font-semibold">10,000</p>
         </div>
 
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
@@ -56,12 +56,11 @@ export default function PricingTable() {
             Pay as you go
           </h4>
 
-          <h5 className="text-3xl font-semibold">$0.6</h5>
-          <p className="text-white/40">per 100K messages </p>
-          <p className="text-white/40">Single Replica: $0.2</p>
+          <h5 className="text-3xl font-semibold">$0.4</h5>
+          <p className="text-white/40">per 100K request</p>
         </div>
 
-        <div className="-mt-6 grow">
+        <div className="grow">
           <div className="text-white/80">
             For use cases with bursting traffic.
           </div>
@@ -70,13 +69,13 @@ export default function PricingTable() {
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
         <div>
-          <p className="text-sm text-white/40">Max Messages Daily</p>
-          <p className="font-semibold">Unlimited</p>
+          <p className="text-sm text-white/40">Max Commands Per Second</p>
+          <p className="font-semibold">1,000</p>
         </div>
 
         <div>
-          <p className="text-sm text-white/40">Max Messages Per Second</p>
-          <p className="font-semibold">1,000</p>
+          <p className="text-sm text-white/40">Daily Command Limit</p>
+          <p className="font-semibold">Unlimited</p>
         </div>
 
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
@@ -94,16 +93,14 @@ export default function PricingTable() {
         </div>
       </div>
 
-      {/* PRO 2K */}
+      {/* FIXED */}
 
       <div className="flex flex-col items-center gap-6 rounded-3xl bg-white/5 px-4 py-8">
         <div>
-          <h4 className="mb-2 text-xl font-semibold text-emerald-400">
-            Pro 2K
-          </h4>
+          <h4 className="mb-2 text-xl font-semibold text-emerald-400">Fixed</h4>
 
           <h5 className="flex items-baseline text-3xl font-semibold">
-            $320
+            $60
             <span className="ml-1 text-base font-normal opacity-40">
               / month
             </span>
@@ -121,13 +118,13 @@ export default function PricingTable() {
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
         <div>
-          <p className="text-sm text-white/40">Max Messages Daily</p>
-          <p className="font-semibold">Unlimited</p>
+          <p className="text-sm text-white/40">Max Commands Per Second</p>
+          <p className="font-semibold">2,000</p>
         </div>
 
         <div>
-          <p className="text-sm text-white/40">Max Messages Per Second</p>
-          <p className="font-semibold">2,000</p>
+          <p className="text-sm text-white/40">Daily Command Limit</p>
+          <p className="font-semibold">Unlimited</p>
         </div>
 
         <hr className="w-2/3 border-0 border-b border-b-white/5" />

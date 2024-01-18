@@ -92,15 +92,9 @@ export default function SectionMenu({
           <SectionMenuItem href={HOME_SECTIONS.PRODUCTS}>
             Products
           </SectionMenuItem>
-          <SectionMenuItem
-            href={HOME_SECTIONS.PRICING}
-            onClick={() => segment.track("button.pricing")}
-          >
-            Pricing
+          <SectionMenuItem href={HOME_SECTIONS.OPEN_SOURCE}>
+            Open Source
           </SectionMenuItem>
-          {/*<SectionMenuItem href={HOME_SECTIONS.OPEN_SOURCE}>*/}
-          {/*  Open Source*/}
-          {/*</SectionMenuItem>*/}
           <SectionMenuItem href={HOME_SECTIONS.COMMUNITY}>
             Community
           </SectionMenuItem>
@@ -111,7 +105,7 @@ export default function SectionMenu({
             target="_self"
             type="button"
             hideIcon
-            className="bg-emerald-400 text-emerald-950"
+            className="bg-emerald-500"
             href="https://console.upstash.com"
           >
             Login
