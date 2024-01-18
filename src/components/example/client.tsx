@@ -79,7 +79,6 @@ export const Client: React.FC<Props> = ({
       selectedStacks.length > 0 &&
       !item.stack.some((s) => selectedStacks.includes(s))
     ) {
-      console.log("filtering out due to stack", item);
       return false;
     }
     /**
