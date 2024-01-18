@@ -9,6 +9,17 @@
     background-position: right 0.6rem center;
     background-size: 1.5em 1.5em;
   }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply text-balance;
+  }
+
+  p {
+    @apply text-pretty;
+  }
 }
 
 @keyframes animate-slide {

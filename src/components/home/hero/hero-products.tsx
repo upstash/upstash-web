@@ -16,7 +16,7 @@ export default function HomeHeroProducts({
 }) {
   return (
     <div
-      className="mt-8 grid gap-2 md:mt-16 md:grid-cols-3"
+      className="mt-8 grid grid-cols-2 gap-2 md:mt-16 xl:grid-cols-4"
       onMouseLeave={() => setActiveProduct(undefined)}
     >
       <HomeHeroProduct
@@ -71,6 +71,23 @@ export default function HomeHeroProducts({
           Publish Messages
         </HeroProductCta>
       </HomeHeroProduct>
+
+      <HomeHeroProduct
+        active={activeProduct === Product.VECTOR}
+        activeProduct={activeProduct}
+        onMouseEnter={() => setActiveProduct(Product.VECTOR)}
+      >
+        <HeroProductTitle>
+          {/*<span className="block">
+            <IconQStash className="inline-flex mb-3 grayscale group-hover/hero-product:grayscale-0" />
+          </span>*/}
+          <span>Vector</span>
+        </HeroProductTitle>
+        <HeroProductDesc>Serverless Vector Database</HeroProductDesc>
+        <HeroProductCta href="https://console.upstash.com">
+          Create Index
+        </HeroProductCta>
+      </HomeHeroProduct>
     </div>
   );
 }
@@ -99,9 +116,8 @@ function HomeHeroProduct({
         "group/hero-product",
         "flex flex-col items-center p-6 md:p-8",
         "cursor-default bg-white/5 backdrop-blur transition",
-        "rounded-lg first:rounded-t-3xl last:rounded-b-3xl",
-        "md:first:rounded-t-lg md:last:rounded-b-lg",
-        "md:first:!rounded-l-4xl md:last:!rounded-r-4xl",
+        "rounded-lg",
+        "xl:first:!rounded-l-4xl xl:last:!rounded-r-4xl",
         "hover:scale-[1.02] hover:bg-white/10",
         className,
       )}
@@ -120,7 +136,7 @@ function HeroProductTitle({
     <h3
       className={cx(
         "flex items-center gap-1 text-zinc-50",
-        "font-display text-2xl font-medium leading-none",
+        "font-display text-xl font-medium leading-none md:text-2xl",
         className,
       )}
     >
@@ -133,7 +149,9 @@ function HeroProductDesc({
   children,
   className,
 }: HTMLProps<HTMLParagraphElement>) {
-  return <p className={cx("mt-2 opacity-60", className)}>{children}</p>;
+  return (
+    <p className={cx("mt-2 grow opacity-60 xl:mx-4", className)}>{children}</p>
+  );
 }
 
 function HeroProductCta({
@@ -158,6 +176,9 @@ function HeroProductCta({
         activeProduct === Product.QSTASH &&
           active &&
           "!bg-purple-500 !text-white",
+        activeProduct === Product.VECTOR &&
+          active &&
+          "!bg-orange-500 !text-white",
         className,
       )}
       onClick={(e) => {
@@ -170,6 +191,9 @@ function HeroProductCta({
             break;
           case Product.QSTASH:
             segment.track("button.create.qstash");
+            break;
+          case Product.VECTOR:
+            segment.track("button.create.vector");
             break;
         }
       }}

@@ -13,6 +13,7 @@ import {
 import Kafka from "./kafka";
 import QStash from "./qstash";
 import Redis from "./redis";
+import Vector from "./vector";
 
 export interface ISectionHeader extends HTMLProps<HTMLDivElement> {}
 
@@ -31,10 +32,11 @@ export default function HomeServerless({}: ISectionHeader) {
         </SectionHeader>
 
         {/* table */}
-        <div className="mt-10 grid gap-4 md:mt-20 md:grid-cols-3 md:gap-6">
+        <div className="mt-10 grid gap-4 md:mt-20 md:grid-cols-2 md:gap-6">
           <Redis />
           <Kafka />
           <QStash />
+          <Vector />
         </div>
       </Container>
     </section>
