@@ -5,7 +5,7 @@ import rehypePrettyCode from "rehype-pretty-code";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 
-import { authors } from "./utils/authors";
+import { authors } from "./src/utils/authors";
 
 export const Customer = defineDocumentType(() => ({
   name: "Customer",

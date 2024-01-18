@@ -114,7 +114,7 @@ A great work by the team at `Auth.js` has made [Auth with SvelteKit](https://aut
 Using SvelteKit’s Server Hooks, we enforce Auth on all incoming requests (to any page):
 
 ```tsx
-// File: @/src/hooks.server.ts
+// File: @/hooks.server.ts
 
 import Google from "@auth/core/providers/google";
 import { SvelteKitAuth } from "@auth/sveltekit";
@@ -135,9 +135,9 @@ Using [SvelteKit’s Server Locals](https://kit.svelte.dev/docs/types#app-locals
 
 ```tsx
 import { json } from '@sveltejs/kit'
-import { isAuth } from '@/src/lib/auth'
+import { isAuth } from '@/lib/auth'
 import type { RequestEvent } from './$types'
-import { getTask, getTasks } from '@/src/lib/issues'
+import { getTask, getTasks } from '@/lib/issues'
 import type { LayoutServerLoadEvent } from '../routes/$types'
 import type { RequestEvent, ServerLoadEvent } from '@sveltejs/kit'
 
@@ -187,7 +187,7 @@ The `getTask` function uses Upstash’s `hget` via `id` as the key to make a
 type Task = { [key: string]: any } | null;
 
 // Get Issue Data
-// File: @/src/lib/issues/get.ts
+// File: @/lib/issues/get.ts
 export async function getTask(id: string) {
   try {
     const redis = (await import("../upstash/setup")).default;
@@ -214,7 +214,7 @@ Similarly, the remaining CRUD operations are as follows:
 
 ```tsx
 // Create Issue
-// File: @/src/lib/issues/create.ts
+// File: @/lib/issues/create.ts
 export async function createTask(info: any) {
   try {
     const redis = (await import("../upstash/setup")).default;
@@ -235,7 +235,7 @@ export async function createTask(info: any) {
 
 ```tsx
 // Delete Issue
-// File: @/src/lib/issues/delete.ts
+// File: @/lib/issues/delete.ts
 export async function deleteTask(id: string) {
   try {
     const redis = (await import("../upstash/setup")).default;
@@ -254,7 +254,7 @@ export async function deleteTask(id: string) {
 
 ```tsx
 // Update Issue Data
-// File: @/src/lib/issues/update.ts
+// File: @/lib/issues/update.ts
 export async function updateTask(info: any, id: string) {
   try {
     const redis = (await import("../upstash/setup")).default;
@@ -286,7 +286,7 @@ To implement rate-limiting at the edge, we use `Upstash Redis` database client a
 
 ```tsx
 // Reference Function to ratelimiting
-// File: @/src/lib/upstash/ratelimit.ts
+// File: @/lib/upstash/ratelimit.ts
 import { Ratelimit } from "@upstash/ratelimit";
 
 import redis from "./setup";
@@ -310,9 +310,9 @@ Using Rate Limiting, I was able to achieve the following:
 Using Rate Limiting, I am able to limit creation of five issues per authenticated user per minute. We’re able to enforce this rate limit based on the user email of the authenticated user.
 
 ```tsx
-// File: @/src/routes/api/issue/+server.ts
+// File: @/routes/api/issue/+server.ts
 // Issue Creation POST API SvelteKit Handler
-import { ratelimit } from "@/src/lib/upstash/ratelimit";
+import { ratelimit } from "@/lib/upstash/ratelimit";
 
 export async function POST(event: RequestEvent) {
   const user = await isAuth(event);
@@ -354,9 +354,9 @@ export async function POST(event: RequestEvent) {
 Using Rate Limiting, I am able to limit file uploads to upto 2 per authenticated user per task per minute. We’re able to enforce this rate limit based on the user email of the authenticated user and task’s ID. Whenever the upload get’s successfully completed, we update the task in the Upstash DB with the fileURL appended to it.
 
 ```tsx
-// File: @/src/routes/api/content/+server.ts
+// File: @/routes/api/content/+server.ts
 // File Upload POST API SvelteKit Handler
-import { ratelimit } from "@/src/lib/upstash/ratelimit";
+import { ratelimit } from "@/lib/upstash/ratelimit";
 
 export async function POST(event: RequestEvent) {
   // User Authentication Code
@@ -404,7 +404,7 @@ While I’ve seen lot of community advocacy for Cloudflare R2’s free storage p
 In the following Edge function, we’re looking at any POST request event and if the user is authenticated, we obtain the `taskID` and `file` from the event’s formData. With that done, we further evaluate whether to continue if the file size is below 5 MB. Once all the prerequisites are taken care of, we create a unique ID, and then create a firebase’s reference to the unique folder where the file be uploaded to. As soon as the file is uploaded to firebase, it returns us with a URL that can be used to access the file uploaded. We append this unique URL to `files` key of issue’s data.
 
 ```tsx
-// File: @/src/routes/api/content/+server.ts
+// File: @/routes/api/content/+server.ts
 // File Upload POST API SvelteKit Handler
 import { initializeApp } from "firebase/app";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
@@ -514,7 +514,7 @@ export async function POST(event: RequestEvent) {
 As you’d recall, we appended the unique URL returned by Firebase in issue’s `files` key. We receive that unique URL as the image parameter in the GET request to the SvelteKit’s Edge Function for retrieving the original file. We make use of the getDownloadURL function from firebase’s library to get the public URL of the original media.
 
 ```tsx
-// File: @/src/routes/api/content/+server.ts
+// File: @/routes/api/content/+server.ts
 // File Upload GET API SvelteKit Handler
 import { initializeApp } from "firebase/app";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
@@ -560,7 +560,7 @@ export async function GET(event: RequestEvent) {
 As you’d be already thinking, there can be multiple media that can be uploaded, so to handle the trivial case of an image vs video, I’ve added the following if else to the front-end:
 
 ```html
-<!-- File: @/src/routes/issue/[slug]/+page.svelte -->
+<!-- File: @/routes/issue/[slug]/+page.svelte -->
 
 {#each fieldFiles as file}
 <div class="mt-8 w-full border border-white/25 p-3">
