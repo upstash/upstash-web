@@ -1,5 +1,4 @@
 import { Post } from "contentlayer/generated";
-import { div } from "three/examples/jsm/nodes/shadernode/ShaderNodeBaseElements";
 
 import Bg from "@/components/bg";
 import PostListCard from "@/components/blog/list-item";
