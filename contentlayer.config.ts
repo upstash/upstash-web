@@ -1,10 +1,11 @@
-import { authors } from "@/utils/authors";
 import { defineDocumentType, makeSource } from "contentlayer/source-files";
 import readingTime from "reading-time";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypePrettyCode from "rehype-pretty-code";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
+
+import { authors } from "./src/utils/authors";
 
 export const Customer = defineDocumentType(() => ({
   name: "Customer",
