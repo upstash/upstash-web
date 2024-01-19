@@ -31,12 +31,10 @@ export default function ServerlessVector() {
 
       <ProductFeature product={Product.VECTOR}>
         <ProductFeatureItem>
-          Serverless, HTTP based messaging
+          Serverless, price scales to zero
         </ProductFeatureItem>
-        <ProductFeatureItem>Scheduling via CRON</ProductFeatureItem>
-        <ProductFeatureItem>
-          At-least-once delivery with auto retries
-        </ProductFeatureItem>
+        <ProductFeatureItem>Optimized for vector search</ProductFeatureItem>
+        <ProductFeatureItem>Scales up to billion vectors</ProductFeatureItem>
       </ProductFeature>
 
       <div className="mt-auto grid gap-4 sm:grid-cols-2">

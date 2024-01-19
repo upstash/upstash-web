@@ -12,7 +12,6 @@ import HomeFast from "@/components/home/fast";
 import HomeHero from "@/components/home/hero";
 import HomeOpenSource from "@/components/home/open-source";
 import HomeProduct from "@/components/home/product";
-import SectionMenu from "@/components/home/section-menu";
 import HomeServerless from "@/components/home/serverless";
 
 export default function Home({
@@ -34,8 +33,6 @@ export default function Home({
         <HomeProduct />
         <HomeOpenSource />
         <HomeCommunity />
-
-        <SectionMenu />
       </main>
     </IntercomProvider>
   );

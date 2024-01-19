@@ -47,7 +47,9 @@ export default function SectionMenu({
       Events.scrollEvent.remove("end");
     };
   }, [show]);
+
   const segment = useSegment();
+
   return (
     <motion.div
       className={cx(

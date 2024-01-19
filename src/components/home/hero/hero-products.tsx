@@ -16,75 +16,79 @@ export default function HomeHeroProducts({
 }) {
   return (
     <div
-      className="mt-8 grid grid-cols-2 gap-2 md:mt-16 xl:grid-cols-4"
+      className="mt-8 grid gap-2 md:mt-16 md:grid-cols-2 xl:grid-cols-4"
       onMouseLeave={() => setActiveProduct(undefined)}
     >
       <HomeHeroProduct
-        active={activeProduct === Product.REDIS}
+        href="https://console.upstash.com"
         activeProduct={activeProduct}
         onMouseEnter={() => setActiveProduct(Product.REDIS)}
       >
         <HeroProductTitle>
-          {/*<span className="block">
-            <IconRedis className="inline-flex mb-3 grayscale group-hover/hero-product:grayscale-0" />
-          </span>*/}
           <span>Redis</span>
           <span className="text-[.9em] opacity-20">®*</span>
         </HeroProductTitle>
         <HeroProductDesc>Serverless database with Redis API</HeroProductDesc>
-        <HeroProductCta href="https://console.upstash.com">
+        <HeroProductCta
+          className={cx(
+            activeProduct === Product.REDIS && "!bg-red-500 !text-white",
+          )}
+        >
           Create Database
         </HeroProductCta>
       </HomeHeroProduct>
 
       <HomeHeroProduct
-        active={activeProduct === Product.KAFKA}
+        href="https://console.upstash.com"
         activeProduct={activeProduct}
         onMouseEnter={() => setActiveProduct(Product.KAFKA)}
       >
         <HeroProductTitle>
-          {/*<span className="block">
-            <IconKafka className="inline-flex mb-3 grayscale group-hover/hero-product:grayscale-0" />
-          </span>*/}
           <span>Kafka</span>
           <span className="text-[.9em] opacity-20">®</span>
         </HeroProductTitle>
         <HeroProductDesc>Serverless Kafka and Connectors</HeroProductDesc>
-        <HeroProductCta href="https://console.upstash.com">
+        <HeroProductCta
+          className={cx(
+            activeProduct === Product.KAFKA && "!bg-blue-500 !text-white",
+          )}
+        >
           Create Cluster
         </HeroProductCta>
       </HomeHeroProduct>
 
       <HomeHeroProduct
-        active={activeProduct === Product.QSTASH}
+        href="https://console.upstash.com"
         activeProduct={activeProduct}
         onMouseEnter={() => setActiveProduct(Product.QSTASH)}
       >
         <HeroProductTitle>
-          {/*<span className="block">
-            <IconQStash className="inline-flex mb-3 grayscale group-hover/hero-product:grayscale-0" />
-          </span>*/}
           <span>QStash</span>
         </HeroProductTitle>
         <HeroProductDesc>Messaging for the Serverless</HeroProductDesc>
-        <HeroProductCta href="https://console.upstash.com">
+        <HeroProductCta
+          className={cx(
+            activeProduct === Product.QSTASH && "!bg-purple-500 !text-white",
+          )}
+        >
           Publish Messages
         </HeroProductCta>
       </HomeHeroProduct>
 
       <HomeHeroProduct
-        active={activeProduct === Product.VECTOR}
+        href="https://console.upstash.com"
         activeProduct={activeProduct}
         onMouseEnter={() => setActiveProduct(Product.VECTOR)}
       >
         <HeroProductTitle>
-          {/*<span className="block">
-            <IconQStash className="inline-flex mb-3 grayscale group-hover/hero-product:grayscale-0" />
-          </span>*/}
           <span>Vector</span>
         </HeroProductTitle>
         <HeroProductDesc>Serverless Vector Database</HeroProductDesc>
-        <HeroProductCta href="https://console.upstash.com">
+        <HeroProductCta
+          className={cx(
+            activeProduct === Product.VECTOR && "!bg-orange-500 !text-white",
+          )}
+        >
           Create Index
         </HeroProductCta>
       </HomeHeroProduct>
@@ -95,18 +99,20 @@ export default function HomeHeroProducts({
 function HomeHeroProduct({
   children,
   className,
+  href,
   activeProduct,
-  active,
   ...props
 }: HTMLProps<HTMLDivElement> & {
-  active?: boolean;
+  href?: string;
   activeProduct?: Product;
 }) {
+  const segment = useSegment();
+
   const childs = Children.map(children, (child: ReactElement) => {
     return cloneElement(child, {
       ...child.props,
       activeProduct,
-      active,
+      href,
     });
   });
 
@@ -114,7 +120,7 @@ function HomeHeroProduct({
     <div
       className={cx(
         "group/hero-product",
-        "flex flex-col items-center p-6 md:p-8",
+        "relative flex flex-col items-center p-6 md:p-8",
         "cursor-default bg-white/5 backdrop-blur transition",
         "rounded-lg",
         "xl:first:!rounded-l-4xl xl:last:!rounded-r-4xl",
@@ -123,6 +129,28 @@ function HomeHeroProduct({
       )}
       {...props}
     >
+      {href && (
+        <a
+          className="absolute inset-0 z-10"
+          href={href}
+          onClick={(e) => {
+            switch (activeProduct) {
+              case Product.REDIS:
+                segment.track("button.create.redis");
+                break;
+              case Product.KAFKA:
+                segment.track("button.create.kafka");
+                break;
+              case Product.QSTASH:
+                segment.track("button.create.qstash");
+                break;
+              case Product.VECTOR:
+                segment.track("button.create.vector");
+                break;
+            }
+          }}
+        />
+      )}
       {childs}
     </div>
   );
@@ -158,45 +186,18 @@ function HeroProductCta({
   children,
   className,
   activeProduct,
-  active,
   ...props
 }: IButton & {
   activeProduct?: Product;
-  active?: boolean;
 }) {
-  const segment = useSegment();
   return (
     <Button
       type="button"
       className={cx(
-        "mt-4",
+        "mt-4 hidden md:inline-flex",
         activeProduct ? "bg-white/3 text-zinc-50" : "bg-zinc-50 text-zinc-950",
-        activeProduct === Product.REDIS && active && "!bg-red-500 !text-white",
-        activeProduct === Product.KAFKA && active && "!bg-blue-500 !text-white",
-        activeProduct === Product.QSTASH &&
-          active &&
-          "!bg-purple-500 !text-white",
-        activeProduct === Product.VECTOR &&
-          active &&
-          "!bg-orange-500 !text-white",
         className,
       )}
-      onClick={(e) => {
-        switch (activeProduct) {
-          case Product.REDIS:
-            segment.track("button.create.redis");
-            break;
-          case Product.KAFKA:
-            segment.track("button.create.kafka");
-            break;
-          case Product.QSTASH:
-            segment.track("button.create.qstash");
-            break;
-          case Product.VECTOR:
-            segment.track("button.create.vector");
-            break;
-        }
-      }}
       {...props}
     >
       {children}

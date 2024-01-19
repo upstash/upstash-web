@@ -16,9 +16,7 @@ export default function PricingTable() {
         </div>
 
         <div className="grow">
-          <div className="text-white/80">
-            Perfect for prototypes and hobby projects.
-          </div>
+          <div className="text-white/80">Free forever for hobbyists</div>
         </div>
 
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
@@ -62,7 +60,7 @@ export default function PricingTable() {
 
         <div className="grow">
           <div className="text-white/80">
-            For use cases with bursting traffic.
+            For use cases with bursting traffic
           </div>
         </div>
 
@@ -110,8 +108,7 @@ export default function PricingTable() {
 
         <div>
           <div className="text-white/80">
-            For businesses with consistent high-capacity loads and predictable
-            costs.
+            For consistent loads with predictable costs
           </div>
         </div>
 

@@ -20,7 +20,7 @@ export default function NewNavigation() {
           className={cx(
             "flex select-none items-center gap-0.5 rounded-full px-4 py-2",
             "opacity-60 hover:bg-white/5 hover:opacity-100",
-            isPricing ? "bg-emerald-400/10" : "",
+            isPricing ? "bg-white/5 opacity-100" : "",
           )}
           href="/pricing"
         >
