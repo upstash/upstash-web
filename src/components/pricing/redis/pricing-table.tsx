@@ -24,12 +24,12 @@ export default function PricingTable() {
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
         <div>
-          <p className="text-sm text-white/40">Max Commands Per Second</p>
+          <p className="text-white/40">Max Commands Per Second</p>
           <p className="font-semibold">1,000</p>
         </div>
 
         <div>
-          <p className="text-sm text-white/40">Daily Command Limit</p>
+          <p className="text-white/40">Daily Command Limit</p>
           <p className="font-semibold">10,000</p>
         </div>
 
@@ -69,12 +69,12 @@ export default function PricingTable() {
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
         <div>
-          <p className="text-sm text-white/40">Max Commands Per Second</p>
+          <p className="text-white/40">Max Commands Per Second</p>
           <p className="font-semibold">1,000</p>
         </div>
 
         <div>
-          <p className="text-sm text-white/40">Daily Command Limit</p>
+          <p className="text-white/40">Daily Command Limit</p>
           <p className="font-semibold">Unlimited</p>
         </div>
 
@@ -120,12 +120,12 @@ export default function PricingTable() {
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
         <div>
-          <p className="text-sm text-white/40">Max Commands Per Second</p>
+          <p className="text-white/40">Max Commands Per Second</p>
           <p className="font-semibold">2,000</p>
         </div>
 
         <div>
-          <p className="text-sm text-white/40">Daily Command Limit</p>
+          <p className="text-white/40">Daily Command Limit</p>
           <p className="font-semibold">Unlimited</p>
         </div>
 

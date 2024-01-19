@@ -16,19 +16,21 @@ export default function PricingTable() {
         </div>
 
         <div className="grow">
-          <div className="text-white/80">Free forever for hobbyists</div>
+          <div className="text-white/80">
+            Perfect for prototypes and hobby projects
+          </div>
         </div>
 
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
         <div>
-          <p className="text-sm text-white/40">Max Commands Per Second</p>
-          <p className="font-semibold">1,000</p>
+          <p className="text-white/40">Max Vector Count</p>
+          <p className="font-semibold">100K</p>
         </div>
 
         <div>
-          <p className="text-sm text-white/40">Daily Command Limit</p>
-          <p className="font-semibold">10,000</p>
+          <p className="text-white/40">Daily Query / Update Limit</p>
+          <p className="font-semibold">10K</p>
         </div>
 
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
@@ -67,12 +69,12 @@ export default function PricingTable() {
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
         <div>
-          <p className="text-sm text-white/40">Max Commands Per Second</p>
-          <p className="font-semibold">1,000</p>
+          <p className="text-white/40">Max Vector Count</p>
+          <p className="font-semibold">1M</p>
         </div>
 
         <div>
-          <p className="text-sm text-white/40">Daily Command Limit</p>
+          <p className="text-white/40">Daily Query / Update Limit</p>
           <p className="font-semibold">Unlimited</p>
         </div>
 
@@ -115,13 +117,13 @@ export default function PricingTable() {
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
         <div>
-          <p className="text-sm text-white/40">Max Commands Per Second</p>
-          <p className="font-semibold">2,000</p>
+          <p className="text-white/40">Max Vector Count</p>
+          <p className="font-semibold">1M</p>
         </div>
 
         <div>
-          <p className="text-sm text-white/40">Daily Command Limit</p>
-          <p className="font-semibold">Unlimited</p>
+          <p className="text-white/40">Daily Query / Update Limit</p>
+          <p className="font-semibold">1M</p>
         </div>
 
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
