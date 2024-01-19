@@ -468,7 +468,7 @@ export default function CompareTable() {
                   <IconRocket width="20" height="20" strokeWidth={1.5} />
                 </span>
 
-                <span>Backend Features</span>
+                <span>Features</span>
               </span>
             </div>
           </th>
