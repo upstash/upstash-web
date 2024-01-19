@@ -16,6 +16,7 @@ export default function PricingVectorPage() {
 
       <div className="mt-16 md:mt-20">
         <PricingTable />
+
         <div className="mt-10 md:mt-20">
           <Enterprise />
         </div>

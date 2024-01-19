@@ -1,22 +1,22 @@
 "use client";
 
+import { HTMLProps, ReactNode, useEffect, useState } from "react";
+
+import cx from "@/utils/cx";
 import { Product } from "@/utils/type";
 import Prism from "prismjs";
 
 import { ServerlessBox, ServerlessSummary, ServerlessTitle } from "./comp";
 
+import "prismjs/components/prism-python";
 import "prismjs/themes/prism-tomorrow.css";
 
-import { HTMLProps, ReactNode, useEffect, useState } from "react";
-
-import cx from "@/utils/cx";
-
 export default function HttpRestApi() {
-  const [product, setProduct] = useState<Product>(Product.REDIS);
+  const [product, setProduct] = useState<Product>(Product.VECTOR);
 
   useEffect(() => {
     Prism.highlightAll();
-  }, []);
+  }, [product]);
 
   return (
     <ServerlessBox className="md:col-span-4">
@@ -61,10 +61,17 @@ export default function HttpRestApi() {
         {/* body */}
         <div className="mt-4 grid rounded-xl bg-black/20 md:h-[276px]">
           <div className="overflow-y-scroll p-4 md:px-6">
-            <Pre hidden={product !== Product.REDIS}>{CODE[Product.REDIS]}</Pre>
-            <Pre hidden={product !== Product.KAFKA}>{CODE[Product.KAFKA]}</Pre>
+            <Pre hidden={product !== Product.REDIS}>
+              <code className="lang-js">{CODE[Product.REDIS]}</code>
+            </Pre>
+            <Pre hidden={product !== Product.KAFKA}>
+              <code className="lang-js">{CODE[Product.KAFKA]}</code>
+            </Pre>
             <Pre hidden={product !== Product.QSTASH}>
-              {CODE[Product.QSTASH]}
+              <code className="lang-js">{CODE[Product.QSTASH]}</code>
+            </Pre>{" "}
+            <Pre hidden={product !== Product.VECTOR}>
+              <code className="lang-py">{CODE[Product.VECTOR]}</code>
             </Pre>
           </div>
         </div>
@@ -84,7 +91,7 @@ function Pre({
       className="!m-0 !bg-transparent !p-0 !font-[inherit] !text-sm"
       {...props}
     >
-      <code className="language-js">{children}</code>
+      {children}
     </pre>
   );
 }
@@ -136,4 +143,15 @@ const messages = await c.consume({
   },
   method: "POST"
 })`,
+  [Product.VECTOR]: `from upstash_vector import Index
+
+index = Index(url="https://master-yoda-eu1-vector.upstash.io/query", token="XXX")
+
+index.upsert(
+  vectors=[("id-1", [0.72, 0.7], {"meta_key": "meta_value"})]
+)
+
+index.query(
+  vector=[0.72, 0.7], top_k=1, include_vectors=True, include_metadata=True
+)`,
 };
