@@ -24,12 +24,12 @@ export default function PricingTable() {
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
         <div>
-          <p className="text-sm text-white/40">Max Messages per Day</p>
+          <p className="text-white/40">Max Messages per Day</p>
           <p className="font-semibold">500</p>
         </div>
 
         <div>
-          <p className="text-sm text-white/40">Max Requests per Second</p>
+          <p className="text-white/40">Max Requests per Second</p>
           <p className="font-semibold">100</p>
         </div>
 
@@ -69,12 +69,12 @@ export default function PricingTable() {
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
         <div>
-          <p className="text-sm text-white/40">Max Messages per Day</p>
+          <p className="text-white/40">Max Messages per Day</p>
           <p className="font-semibold">500,000</p>
         </div>
 
         <div>
-          <p className="text-sm text-white/40">Max Requests per Second</p>
+          <p className="text-white/40">Max Requests per Second</p>
           <p className="font-semibold">100</p>
         </div>
 
@@ -118,12 +118,12 @@ export default function PricingTable() {
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
         <div>
-          <p className="text-sm text-white/40">Max Messages per Day</p>
+          <p className="text-white/40">Max Messages per Day</p>
           <p className="font-semibold">up to 100M</p>
         </div>
 
         <div>
-          <p className="text-sm text-white/40">Max Requests per Second</p>
+          <p className="text-white/40">Max Requests per Second</p>
           <p className="font-semibold">Custom</p>
         </div>
 

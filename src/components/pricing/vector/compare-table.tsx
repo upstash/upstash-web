@@ -3,13 +3,11 @@ import { ChangeEvent, useState } from "react";
 
 import { PricingPlans } from "@/utils/type";
 import {
-  IconCoin,
   IconCreditCard,
   IconDatabase,
   IconHeadphones,
   IconInfoCircle,
   IconRocket,
-  IconShieldLock,
 } from "@tabler/icons-react";
 
 import useIsMobile from "@/hooks/use-is-mobile";
@@ -26,8 +24,8 @@ export default function CompareTable() {
 
   const showFree = selectedPlans === PricingPlans.Free;
   const showPayg = selectedPlans === PricingPlans.PayAsYouGo;
-  const showPro2 = selectedPlans === PricingPlans.Pro2K;
-  const showPro10 = selectedPlans === PricingPlans.Pro10K;
+  const showFixed = selectedPlans === PricingPlans.Fixed;
+  const showPro = selectedPlans === PricingPlans.Pro;
 
   const onPlanChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value as PricingPlans;
@@ -62,13 +60,13 @@ export default function CompareTable() {
             Usage Based Pricing
           </th>
           <th
-            hidden={isMobile ? !showPro2 : false}
+            hidden={isMobile ? !showFixed : false}
             className="border-b-2 border-b-zinc-950 bg-white/3 px-0 py-3 text-xs font-medium uppercase tracking-wider text-white/80"
           >
             Fixed Pricing
           </th>
           <th
-            hidden={isMobile ? !showPro10 : false}
+            hidden={isMobile ? !showPro : false}
             className="border-b-2 border-b-zinc-950 bg-white/3 px-0 py-3 text-xs font-medium uppercase tracking-wider text-white/80"
           >
             Fixed Pricing
@@ -95,8 +93,8 @@ export default function CompareTable() {
                   Free
                 </option>
                 <option value={PricingPlans.PayAsYouGo}>Pay as you go</option>
-                <option value={PricingPlans.Pro2K}>Fixed</option>
-                <option value={PricingPlans.Pro10K}>Pro</option>
+                <option value={PricingPlans.Fixed}>Fixed</option>
+                <option value={PricingPlans.Pro}>Pro</option>
               </select>
             </div>
           </th>
@@ -118,8 +116,8 @@ export default function CompareTable() {
                 <option value={PricingPlans.PayAsYouGo} disabled>
                   Pay as you go
                 </option>
-                <option value={PricingPlans.Pro2K}>Fixed</option>
-                <option value={PricingPlans.Pro10K}>Pro</option>
+                <option value={PricingPlans.Fixed}>Fixed</option>
+                <option value={PricingPlans.Pro}>Pro</option>
               </select>
 
               <h5 className="flex items-baseline font-semibold">
@@ -131,7 +129,7 @@ export default function CompareTable() {
             </div>
           </th>
           <th
-            hidden={isMobile ? !showPro2 : false}
+            hidden={isMobile ? !showFixed : false}
             className="border-b border-b-zinc-800 bg-zinc-950 p-0"
           >
             <div className="flex h-24 flex-col items-center justify-center bg-white/3">
@@ -142,14 +140,14 @@ export default function CompareTable() {
               <select
                 className="mb-2 bg-white/5 px-4 py-2 font-semibold md:hidden"
                 onChange={onPlanChange}
-                value={PricingPlans.Pro2K}
+                value={PricingPlans.Fixed}
               >
                 <option value={PricingPlans.Free}>Free</option>
                 <option value={PricingPlans.PayAsYouGo}>Pay as you go</option>
-                <option value={PricingPlans.Pro2K} disabled>
+                <option value={PricingPlans.Fixed} disabled>
                   Fixed
                 </option>
-                <option value={PricingPlans.Pro10K}>Pro</option>
+                <option value={PricingPlans.Pro}>Pro</option>
               </select>
 
               <h5 className="flex items-baseline font-semibold">
@@ -161,7 +159,7 @@ export default function CompareTable() {
             </div>
           </th>
           <th
-            hidden={isMobile ? !showPro10 : false}
+            hidden={isMobile ? !showPro : false}
             className="border-b border-b-zinc-800 bg-zinc-950 p-0"
           >
             <div className="flex h-24 flex-col items-center justify-center bg-white/3">
@@ -172,21 +170,20 @@ export default function CompareTable() {
               <select
                 className="mb-2 bg-white/5 px-4 py-2 font-semibold md:hidden"
                 onChange={onPlanChange}
-                value={PricingPlans.Pro10K}
+                value={PricingPlans.Pro}
               >
                 <option value={PricingPlans.Free}>Free</option>
                 <option value={PricingPlans.PayAsYouGo}>Pay as you go</option>
-                <option value={PricingPlans.Pro2K}>Fixed</option>
-                <option value={PricingPlans.Pro10K} disabled>
+                <option value={PricingPlans.Fixed}>Fixed</option>
+                <option value={PricingPlans.Pro} disabled>
                   Pro
                 </option>
-                Pro 10K
+                Pro
               </select>
 
               <h5 className="flex items-baseline font-semibold">
-                $120
                 <span className="ml-1 text-base font-normal opacity-40">
-                  / month
+                  Contact Us
                 </span>
               </h5>
             </div>
@@ -216,353 +213,144 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 text-left font-normal text-white/60">
-            <Tooltip content="This is the number of commands that your database can process per second.">
-              <span className="underline decoration-zinc-500 decoration-dashed">
-                Max command per second
-              </span>
-            </Tooltip>
+            Max vector count
           </th>
           {/**/}
           <td
             hidden={isMobile ? !showFree : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
-            <CompareValue type="number">1000</CompareValue>
+            <CompareValue type="size" suffix="K">
+              100
+            </CompareValue>
           </td>
           <td
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0 align-top"
           >
-            <CompareValue type="number">1000</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPro2 : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue type="number">2000</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue type="number">10000</CompareValue>
-          </td>
-        </tr>
-
-        <tr>
-          <th className="px-0 text-left font-normal text-white/60">
-            Daily command limit
-          </th>
-          {/**/}
-          <td
-            hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue type="number">10000</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPayg : false}
-            className="bg-emerald-300/10 px-4 py-0 align-top"
-          >
-            <CompareValue>Unlimited</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPro2 : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue>Unlimited</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue>Unlimited</CompareValue>
-          </td>
-        </tr>
-
-        <tr>
-          <th className="px-0 text-left font-normal text-white/60">
-            <Tooltip content="The max size of a single request/command.">
-              <span className="underline decoration-zinc-500 decoration-dashed">
-                Max request size
-              </span>
-            </Tooltip>
-          </th>
-          {/**/}
-          <td
-            hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue type="size" suffix="MB">
+            <CompareValue type="size" suffix="M">
               1
             </CompareValue>
           </td>
           <td
-            hidden={isMobile ? !showPayg : false}
-            className="bg-emerald-300/10 px-4 py-0 align-top"
+            hidden={isMobile ? !showFixed : false}
+            className="bg-white/3 px-4 py-0 align-top"
           >
-            <CompareValue
-              type="size"
-              suffix="MB"
-              after={
-                <Tooltip
-                  content={
-                    <>
-                      <h4 className="font-semibold">Custom Limit Pricing</h4>
-                      <table className="mini-table mt-2">
-                        <thead>
-                          <tr>
-                            <th>Extra Limit</th>
-                            <th>Price</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td>10MB</td>
-                            <td>$50</td>
-                          </tr>
-                          <tr>
-                            <td>50MB</td>
-                            <td>$80</td>
-                          </tr>
-                          <tr>
-                            <td>100MB</td>
-                            <td>$120</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </>
-                  }
-                >
-                  <IconCoin
-                    aria-label="Pricing"
-                    className="ml-1 stroke-emerald-400 opacity-60"
-                    stroke={1.2}
-                  />
-                </Tooltip>
-              }
-            >
+            <CompareValue type="size" suffix="M">
               1
             </CompareValue>
           </td>
           <td
-            hidden={isMobile ? !showPro2 : false}
+            hidden={isMobile ? !showPro : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
-            <CompareValue type="size" suffix="MB">
+            <CompareValue type="size" suffix="M">
+              100
+            </CompareValue>
+          </td>
+        </tr>
+
+        <tr>
+          <th className="px-0 text-left font-normal text-white/60">
+            Max dimension
+          </th>
+          {/**/}
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="bg-white/3 px-4 py-0 align-top"
+          >
+            <CompareValue type="number">1536</CompareValue>
+          </td>
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="bg-emerald-300/10 px-4 py-0 align-top"
+          >
+            <CompareValue type="number">1536</CompareValue>
+          </td>
+          <td
+            hidden={isMobile ? !showFixed : false}
+            className="bg-white/3 px-4 py-0 align-top"
+          >
+            <CompareValue type="number">1536</CompareValue>
+          </td>
+          <td
+            hidden={isMobile ? !showPro : false}
+            className="bg-white/3 px-4 py-0 align-top"
+          >
+            <CompareValue type="number">1536</CompareValue>
+          </td>
+        </tr>
+
+        <tr>
+          <th className="px-0 text-left font-normal text-white/60">
+            Daily query / Update Limit
+          </th>
+          {/**/}
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="bg-white/3 px-4 py-0 align-top"
+          >
+            <CompareValue type="size" suffix="K">
               10
             </CompareValue>
           </td>
           <td
-            hidden={isMobile ? !showPro10 : false}
+            hidden={isMobile ? !showPayg : false}
+            className="bg-emerald-300/10 px-4 py-0 align-top"
+          >
+            <CompareValue>Unlimited</CompareValue>
+          </td>
+          <td
+            hidden={isMobile ? !showFixed : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
-            <CompareValue type="size" suffix="MB">
-              100
+            <CompareValue type="size" suffix="M">
+              1
             </CompareValue>
+          </td>
+          <td
+            hidden={isMobile ? !showPro : false}
+            className="bg-white/3 px-4 py-0 align-top"
+          >
+            <CompareValue>Unlimited</CompareValue>
           </td>
         </tr>
 
         <tr>
           <th className="px-0 text-left font-normal text-white/60">
-            <Tooltip content="This is the maximum size per your entry. The entry can be String, List, Set, Hash etc.">
-              <span className="underline decoration-zinc-500 decoration-dashed">
-                Max record size
-              </span>
-            </Tooltip>
+            Max Metadata Size
           </th>
           {/**/}
           <td
             hidden={isMobile ? !showFree : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
-            <CompareValue type="size" suffix="MB">
-              100
+            <CompareValue type="size" suffix="KB">
+              48
             </CompareValue>
           </td>
           <td
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0 align-top"
           >
-            <CompareValue
-              type="size"
-              suffix="MB"
-              after={
-                <Tooltip
-                  content={
-                    <>
-                      <h4 className="font-semibold">Custom Limit Pricing</h4>
-                      <table className="mini-table mt-2">
-                        <thead>
-                          <tr>
-                            <th>Limit</th>
-                            <th>Price</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td>256MB</td>
-                            <td>$60</td>
-                          </tr>
-                          <tr>
-                            <td>500MB</td>
-                            <td>$100</td>
-                          </tr>
-                          <tr>
-                            <td>1GB</td>
-                            <td>$180</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </>
-                  }
-                >
-                  <IconCoin
-                    aria-label="Pricing"
-                    className="ml-1 stroke-emerald-400 opacity-60"
-                    stroke={1.2}
-                  />
-                </Tooltip>
-              }
-            >
-              100
+            <CompareValue type="size" suffix="KB">
+              48
             </CompareValue>
           </td>
           <td
-            hidden={isMobile ? !showPro2 : false}
+            hidden={isMobile ? !showFixed : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
-            <CompareValue type="size" suffix="MB">
-              200
+            <CompareValue type="size" suffix="KB">
+              48
             </CompareValue>
           </td>
           <td
-            hidden={isMobile ? !showPro10 : false}
+            hidden={isMobile ? !showPro : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
-            <CompareValue type="size" suffix="MB">
-              500
-            </CompareValue>
-          </td>
-        </tr>
-
-        <tr>
-          <th className="px-0 text-left font-normal text-white/60">
-            <Tooltip content="When limit is reached, if eviction is enabled, some entries will be evicted to allow new writes. Otherwise, write commands will be rejected.">
-              <span className="underline decoration-zinc-500 decoration-dashed">
-                Max data size
-              </span>
-            </Tooltip>
-          </th>
-          {/**/}
-          <td
-            hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue type="size" suffix="MB">
-              256
-            </CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPayg : false}
-            className="bg-emerald-300/10 px-4 py-0 align-top"
-          >
-            <CompareValue type="size" suffix="GB">
-              10
-            </CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPro2 : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue type="size" suffix="GB">
-              50
-            </CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue type="size" suffix="GB">
-              100
-            </CompareValue>
-          </td>
-        </tr>
-
-        <tr>
-          <th className="px-0 text-left font-normal text-white/60">
-            <Tooltip content="When the limit is reached, your idle connections may be terminated. You will not experience any issue unless all of your connections are active. Even in that case; most Redis clients reconnect automatically. You can use REST API if you expect very high number of concurrent connections.">
-              <span className="underline decoration-zinc-500 decoration-dashed">
-                Max concurrent connections
-              </span>
-            </Tooltip>
-          </th>
-          {/**/}
-          <td
-            hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue type="number">100</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPayg : false}
-            className="bg-emerald-300/10 px-4 py-0 align-top"
-          >
-            <CompareValue type="number">1000</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPro2 : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue type="number">2000</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue type="number">5000</CompareValue>
-          </td>
-        </tr>
-
-        <tr>
-          <th className="px-0 text-left font-normal text-white/60">
-            <Tooltip content="The max outbound data transfer (bandwidth) limit per month.">
-              <span className="underline decoration-zinc-500 decoration-dashed">
-                Max monthly bandwidth
-              </span>
-            </Tooltip>
-          </th>
-          {/**/}
-          <td
-            hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue type="size" suffix="GB" className="border-b-0">
-              50
-            </CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPayg : false}
-            className="bg-emerald-300/10 px-4 py-0 align-top"
-          >
-            <CompareValue type="size" suffix="GB" className="border-b-0">
-              200
-            </CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPro2 : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue type="size" suffix="TB" className="border-b-0">
-              5
-            </CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue type="size" suffix="TB" className="border-b-0">
-              10
+            <CompareValue type="size" suffix="KB">
+              48
             </CompareValue>
           </td>
         </tr>
@@ -580,24 +368,22 @@ export default function CompareTable() {
                   <IconRocket width="20" height="20" strokeWidth={1.5} />
                 </span>
 
-                <span>Backend Features</span>
+                <span>Features</span>
               </span>
             </div>
           </th>
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-white/60">
-            Supported platforms
-          </th>
+          <th className="px-0 text-left font-normal text-white/60">Regions</th>
           {/**/}
           <td
             hidden={isMobile ? !showFree : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
             <CompareValue type="list">
-              <span>AWS</span>
-              <span>GCP</span>
+              <span>N. Virginia, AWS</span>
+              <span>Ireland, AWS</span>
             </CompareValue>
           </td>
           <td
@@ -605,33 +391,80 @@ export default function CompareTable() {
             className="bg-emerald-300/10 px-4 py-0 align-top"
           >
             <CompareValue type="list">
-              <span>AWS</span>
-              <span>GCP</span>
+              <span>N. Virginia, AWS</span>
+              <span>Ireland, AWS</span>
             </CompareValue>
           </td>
           <td
-            hidden={isMobile ? !showPro2 : false}
+            hidden={isMobile ? !showFixed : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
             <CompareValue type="list">
-              <span>AWS</span>
-              <span>GCP</span>
+              <span>N. Virginia, AWS</span>
+              <span>Ireland, AWS</span>
             </CompareValue>
           </td>
           <td
-            hidden={isMobile ? !showPro10 : false}
+            hidden={isMobile ? !showPro : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
             <CompareValue type="list">
-              <span>AWS</span>
-              <span>GCP</span>
+              <span>N. Virginia, AWS</span>
+              <span>Ireland, AWS</span>
             </CompareValue>
           </td>
         </tr>
 
         <tr>
           <th className="px-0 text-left font-normal text-white/60">
-            Persistence
+            API and SDKs
+          </th>
+          {/**/}
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="bg-white/3 px-4 py-0 align-top"
+          >
+            <CompareValue type="list">
+              <span>REST</span>
+              <span>Python</span>
+              <span>Typescript</span>
+            </CompareValue>
+          </td>
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="bg-emerald-300/10 px-4 py-0 align-top"
+          >
+            <CompareValue type="list">
+              <span>REST</span>
+              <span>Python</span>
+              <span>Typescript</span>
+            </CompareValue>
+          </td>
+          <td
+            hidden={isMobile ? !showFixed : false}
+            className="bg-white/3 px-4 py-0 align-top"
+          >
+            <CompareValue type="list">
+              <span>REST</span>
+              <span>Python</span>
+              <span>Typescript</span>
+            </CompareValue>
+          </td>
+          <td
+            hidden={isMobile ? !showPro : false}
+            className="bg-white/3 px-4 py-0 align-top"
+          >
+            <CompareValue type="list">
+              <span>REST</span>
+              <span>Python</span>
+              <span>Typescript</span>
+            </CompareValue>
+          </td>
+        </tr>
+
+        <tr>
+          <th className="px-0 text-left font-normal text-white/60">
+            Live index updates
           </th>
           {/**/}
           <td
@@ -647,42 +480,13 @@ export default function CompareTable() {
             <CompareValue type="boolean" />
           </td>
           <td
-            hidden={isMobile ? !showPro2 : false}
+            hidden={isMobile ? !showFixed : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
             <CompareValue type="boolean" />
           </td>
           <td
-            hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue type="boolean" />
-          </td>
-        </tr>
-
-        <tr>
-          <th className="px-0 text-left font-normal text-white/60">REST API</th>
-          {/**/}
-          <td
-            hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue type="boolean" />
-          </td>
-          <td
-            hidden={isMobile ? !showPayg : false}
-            className="bg-emerald-300/10 px-4 py-0 align-top"
-          >
-            <CompareValue type="boolean" />
-          </td>
-          <td
-            hidden={isMobile ? !showPro2 : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue type="boolean" />
-          </td>
-          <td
-            hidden={isMobile ? !showPro10 : false}
+            hidden={isMobile ? !showPro : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
             <CompareValue type="boolean" />
@@ -691,69 +495,7 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 text-left font-normal text-white/60">
-            Global replication
-          </th>
-          {/**/}
-          <td
-            hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue
-              type="boolean"
-              className="border-b-0"
-              after={
-                <Tooltip content="Free tier allows max one read replica.">
-                  <IconInfoCircle
-                    className="ml-1 opacity-60"
-                    stroke={1.2}
-                    aria-label="Info"
-                  />
-                </Tooltip>
-              }
-            />
-          </td>
-          <td
-            hidden={isMobile ? !showPayg : false}
-            className="bg-emerald-300/10 px-4 py-0 align-top"
-          >
-            <CompareValue type="boolean" className="border-b-0" />
-          </td>
-          <td
-            hidden={isMobile ? !showPro2 : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue type="boolean" className="border-b-0" />
-          </td>
-          <td
-            hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue type="boolean" className="border-b-0" />
-          </td>
-        </tr>
-
-        {/**/}
-
-        <tr>
-          <th
-            colSpan={isMobile ? 2 : 5}
-            className="sticky top-20 z-10 p-0 text-left md:top-0"
-          >
-            <div className="-ml-4 flex h-16 items-center bg-gradient-to-r from-zinc-900 to-zinc-950 px-4">
-              <span className="flex items-center gap-2 text-lg font-semibold">
-                <span className="flex items-center rounded-full bg-white/10 p-2">
-                  <IconShieldLock width="20" height="20" strokeWidth={1.5} />
-                </span>
-
-                <span>Security and Privacy</span>
-              </span>
-            </div>
-          </th>
-        </tr>
-
-        <tr>
-          <th className="px-0 text-left font-normal text-white/60">
-            SSL Encryption (TLS)
+            Scale to zero
           </th>
           {/**/}
           <td
@@ -769,182 +511,109 @@ export default function CompareTable() {
             <CompareValue type="boolean" />
           </td>
           <td
-            hidden={isMobile ? !showPro2 : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue type="boolean" />
-          </td>
-          <td
-            hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue type="boolean" />
-          </td>
-        </tr>
-
-        <tr>
-          <th className="px-0 text-left font-normal text-white/60">Security</th>
-          {/**/}
-          <td
-            hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue type="list">
-              <Tooltip content="mTLS ensures two-way authentication where both client and server authenticate each other at the same time in the authentication protocol.">
-                TLS
-              </Tooltip>
-            </CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPayg : false}
-            className="bg-emerald-300/10 px-4 py-0 align-top"
-          >
-            <CompareValue type="list">
-              <Tooltip content="Once TLS is enabled, the data transfer between the client and database is encrypted.">
-                TLS
-              </Tooltip>
-            </CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPro2 : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue type="list">
-              <Tooltip content="Once TLS is enabled, the data transfer between the client and database is encrypted.">
-                TLS
-              </Tooltip>
-              <Tooltip content="mTLS ensures two-way authentication where both client and server authenticate each other at the same time in the authentication protocol.">
-                mTLS
-              </Tooltip>
-              <Tooltip content="VPC Peering enables you to connect to Upstash from your own VPC using private IP. Cluster and your application can run in the same subnet which also minimizes data transfer costs.">
-                VPC Peering
-              </Tooltip>
-              <Tooltip content="You can set the IP addresses which will have access to your database.">
-                IP Whitelisting
-              </Tooltip>
-              <Tooltip content="Private Link helps you to access to Upstash Cluster with a private network link inside AWS infrastructure.">
-                Private Link
-              </Tooltip>
-            </CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue type="list">
-              <Tooltip content="Once TLS is enabled, the data transfer between the client and database is encrypted.">
-                TLS
-              </Tooltip>
-              <Tooltip content="mTLS ensures two-way authentication where both client and server authenticate each other at the same time in the authentication protocol.">
-                mTLS
-              </Tooltip>
-              <Tooltip content="VPC Peering enables you to connect to Upstash from your own VPC using private IP. Cluster and your application can run in the same subnet which also minimizes data transfer costs.">
-                VPC Peering
-              </Tooltip>
-              <Tooltip content="You can set the IP addresses which will have access to your database.">
-                IP Whitelisting
-              </Tooltip>
-              <Tooltip content="Private Link helps you to access to Upstash Cluster with a private network link inside AWS infrastructure.">
-                Private Link
-              </Tooltip>
-            </CompareValue>
-          </td>
-        </tr>
-
-        <tr>
-          <th className="px-0 text-left font-normal text-white/60">
-            Audit logs
-          </th>
-          {/**/}
-          <td
-            hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue>Last 7 days</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPayg : false}
-            className="bg-emerald-300/10 px-4 py-0 align-top"
-          >
-            <CompareValue>Last 30 days</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPro2 : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue>Last 1 year</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue>Last 1 year</CompareValue>
-          </td>
-        </tr>
-
-        <tr>
-          <th className="px-0 text-left font-normal text-white/60">
-            Encryption at REST
-          </th>
-          {/**/}
-          <td
-            hidden={isMobile ? !showFree : false}
+            hidden={isMobile ? !showFixed : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
             <CompareValue type="boolean" valid={false} />
           </td>
           <td
-            hidden={isMobile ? !showPayg : false}
-            className="bg-emerald-300/10 px-4 py-0 align-top"
+            hidden={isMobile ? !showPro : false}
+            className="bg-white/3 px-4 py-0 align-top"
           >
             <CompareValue type="boolean" valid={false} />
-          </td>
-          <td
-            hidden={isMobile ? !showPro2 : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue type="boolean" />
-          </td>
-          <td
-            hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue type="boolean" />
           </td>
         </tr>
 
         <tr>
           <th className="px-0 text-left font-normal text-white/60">
-            <Tooltip content="Upstash Global regions are SOC-2 certified.">
-              <span className="underline decoration-zinc-500 decoration-dashed">
-                Compliance (SOC2)
-              </span>
-            </Tooltip>
+            Sparse vector
           </th>
           {/**/}
           <td
             hidden={isMobile ? !showFree : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
-            <CompareValue type="boolean" className="border-b-0" />
+            <CompareValue suffix="Coming soon" />
           </td>
           <td
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0 align-top"
           >
-            <CompareValue type="boolean" className="border-b-0" />
+            <CompareValue suffix="Coming soon" />
           </td>
           <td
-            hidden={isMobile ? !showPro2 : false}
+            hidden={isMobile ? !showFixed : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
-            <CompareValue type="boolean" className="border-b-0" />
+            <CompareValue suffix="Coming soon" />
           </td>
           <td
-            hidden={isMobile ? !showPro10 : false}
+            hidden={isMobile ? !showPro : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
-            <CompareValue type="boolean" className="border-b-0" />
+            <CompareValue suffix="Coming soon" />
+          </td>
+        </tr>
+
+        <tr>
+          <th className="px-0 text-left font-normal text-white/60">
+            Namespaces
+          </th>
+          {/**/}
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="bg-white/3 px-4 py-0 align-top"
+          >
+            <CompareValue suffix="Coming soon" />
+          </td>
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="bg-emerald-300/10 px-4 py-0 align-top"
+          >
+            <CompareValue suffix="Coming soon" />
+          </td>
+          <td
+            hidden={isMobile ? !showFixed : false}
+            className="bg-white/3 px-4 py-0 align-top"
+          >
+            <CompareValue suffix="Coming soon" />
+          </td>
+          <td
+            hidden={isMobile ? !showPro : false}
+            className="bg-white/3 px-4 py-0 align-top"
+          >
+            <CompareValue suffix="Coming soon" />
+          </td>
+        </tr>
+
+        <tr>
+          <th className="px-0 text-left font-normal text-white/60">
+            Metadata Filtering
+          </th>
+          {/**/}
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="bg-white/3 px-4 py-0 align-top"
+          >
+            <CompareValue suffix="Coming soon" />
+          </td>
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="bg-emerald-300/10 px-4 py-0 align-top"
+          >
+            <CompareValue suffix="Coming soon" />
+          </td>
+          <td
+            hidden={isMobile ? !showFixed : false}
+            className="bg-white/3 px-4 py-0 align-top"
+          >
+            <CompareValue suffix="Coming soon" />
+          </td>
+          <td
+            hidden={isMobile ? !showPro : false}
+            className="bg-white/3 px-4 py-0 align-top"
+          >
+            <CompareValue suffix="Coming soon" />
           </td>
         </tr>
 
@@ -985,13 +654,13 @@ export default function CompareTable() {
             <CompareValue type="boolean" />
           </td>
           <td
-            hidden={isMobile ? !showPro2 : false}
+            hidden={isMobile ? !showFixed : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
             <CompareValue type="boolean" />
           </td>
           <td
-            hidden={isMobile ? !showPro10 : false}
+            hidden={isMobile ? !showPro : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
             <CompareValue type="boolean" />
@@ -1016,13 +685,13 @@ export default function CompareTable() {
             <CompareValue type="boolean" />
           </td>
           <td
-            hidden={isMobile ? !showPro2 : false}
+            hidden={isMobile ? !showFixed : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
             <CompareValue type="boolean" />
           </td>
           <td
-            hidden={isMobile ? !showPro10 : false}
+            hidden={isMobile ? !showPro : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
             <CompareValue type="boolean" />
@@ -1047,60 +716,16 @@ export default function CompareTable() {
             <CompareValue type="boolean" valid={false} />
           </td>
           <td
-            hidden={isMobile ? !showPro2 : false}
+            hidden={isMobile ? !showFixed : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
             <CompareValue type="boolean" valid={false} />
           </td>
           <td
-            hidden={isMobile ? !showPro10 : false}
+            hidden={isMobile ? !showPro : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
             <CompareValue type="boolean" />
-          </td>
-        </tr>
-
-        <tr>
-          <th className="px-0 text-left font-normal text-white/60">
-            Uptime SLA
-          </th>
-          {/**/}
-          <td
-            hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          />
-          <td
-            hidden={isMobile ? !showPayg : false}
-            className="bg-emerald-300/10 px-4 py-0 align-top"
-          >
-            <CompareValue className="border-b-0">
-              <div>
-                <div>Regional: 99.99%</div>
-                <div>Global: 99.99%</div>
-              </div>
-            </CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPro2 : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue className="border-b-0">
-              <div>
-                <div>Regional: 99.99%</div>
-                <div>Global: 99.99%</div>
-              </div>
-            </CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0 align-top"
-          >
-            <CompareValue className="border-b-0">
-              <div>
-                <div>Regional: 99.99%</div>
-                <div>Global: 99.99%</div>
-              </div>
-            </CompareValue>
           </td>
         </tr>
 
@@ -1140,24 +765,19 @@ export default function CompareTable() {
             <CompareValue>None</CompareValue>
           </td>
           <td
-            hidden={isMobile ? !showPro2 : false}
+            hidden={isMobile ? !showFixed : false}
             className="bg-white/3 px-4 py-0"
           >
-            <CompareValue>
-              $280 <br />
-              +($100 ✕ read region)
-            </CompareValue>
+            <CompareValue>$60</CompareValue>
           </td>
           <td
-            hidden={isMobile ? !showPro10 : false}
+            hidden={isMobile ? !showPro : false}
             className="bg-white/3 px-4 py-0"
           >
-            <CompareValue>
-              $680 <br />
-              +($200 ✕ read region)
-            </CompareValue>
+            <CompareValue>Contact Us</CompareValue>
           </td>
         </tr>
+
         <tr>
           <th className="px-0 py-4 text-left font-normal text-white/60">
             Request price
@@ -1173,16 +793,16 @@ export default function CompareTable() {
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0"
           >
-            <CompareValue>$0.2 per 100K</CompareValue>
+            <CompareValue>$0.4 per 100K</CompareValue>
           </td>
           <td
-            hidden={isMobile ? !showPro2 : false}
+            hidden={isMobile ? !showFixed : false}
             className="bg-white/3 px-4 py-0"
           >
             <CompareValue>None</CompareValue>
           </td>
           <td
-            hidden={isMobile ? !showPro10 : false}
+            hidden={isMobile ? !showPro : false}
             className="bg-white/3 px-4 py-0"
           >
             <CompareValue>None</CompareValue>
@@ -1206,13 +826,13 @@ export default function CompareTable() {
             <CompareValue>$0.25 per GB</CompareValue>
           </td>
           <td
-            hidden={isMobile ? !showPro2 : false}
+            hidden={isMobile ? !showFixed : false}
             className="bg-white/3 px-4 py-0"
           >
             <CompareValue>$0.25 per GB</CompareValue>
           </td>
           <td
-            hidden={isMobile ? !showPro10 : false}
+            hidden={isMobile ? !showPro : false}
             className="bg-white/3 px-4 py-0"
           >
             <CompareValue>$0.25 per GB</CompareValue>
@@ -1236,7 +856,7 @@ export default function CompareTable() {
           >
             <CompareValue
               after={
-                <Tooltip content="Free up to 200GB per month. Beyond that, $0.03 per GB.">
+                <Tooltip content="Free up to 200GB per month, beyond that $0.03 per GB.">
                   <IconInfoCircle
                     className="ml-1 opacity-60"
                     stroke={1.2}
@@ -1249,12 +869,12 @@ export default function CompareTable() {
             </CompareValue>
           </td>
           <td
-            hidden={isMobile ? !showPro2 : false}
+            hidden={isMobile ? !showFixed : false}
             className="bg-white/3 px-4 py-0"
           >
             <CompareValue
               after={
-                <Tooltip content="Price can change depending on cloud provider's fee. $0.03 is when the client is in the same region.">
+                <Tooltip content="Free up to 200GB per month, beyond that $0.03 per GB.">
                   <IconInfoCircle
                     className="ml-1 opacity-60"
                     stroke={1.2}
@@ -1263,16 +883,16 @@ export default function CompareTable() {
                 </Tooltip>
               }
             >
-              $0.03 per GB
+              Free
             </CompareValue>
           </td>
           <td
-            hidden={isMobile ? !showPro10 : false}
+            hidden={isMobile ? !showPro : false}
             className="bg-white/3 px-4 py-0"
           >
             <CompareValue
               after={
-                <Tooltip content="Price can change depending on cloud provider's fee. $0.03 is when the client is in the same region.">
+                <Tooltip content="Price can change depending on cloud provider's fee.">
                   <IconInfoCircle
                     className="ml-1 opacity-60"
                     stroke={1.2}
@@ -1316,7 +936,10 @@ export default function CompareTable() {
               </Button>
             </div>
           </th>
-          <th hidden={isMobile ? !showPro2 : false} className="bg-zinc-950 p-0">
+          <th
+            hidden={isMobile ? !showFixed : false}
+            className="bg-zinc-950 p-0"
+          >
             <div className="bg-white/3 py-4 text-white/60">
               <Button
                 target="_self"
@@ -1329,10 +952,7 @@ export default function CompareTable() {
               </Button>
             </div>
           </th>
-          <th
-            hidden={isMobile ? !showPro10 : false}
-            className="bg-zinc-950 p-0"
-          >
+          <th hidden={isMobile ? !showPro : false} className="bg-zinc-950 p-0">
             <div className="bg-white/3 py-4 text-white/60">
               <Button
                 target="_self"
