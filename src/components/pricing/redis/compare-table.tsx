@@ -525,7 +525,7 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 text-left font-normal text-white/60">
-            <Tooltip content="The max outbound data transfer (bandwidth) limit per month.">
+            <Tooltip content="The max data transfer (bandwidth) limit per month.">
               <span className="underline decoration-zinc-500 decoration-dashed">
                 Max monthly bandwidth
               </span>
