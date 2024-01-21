@@ -61,7 +61,7 @@ class Response:
     limit: int
     remaining: int
     reset: float
-    ```
+```
 
 
 The class has four different attributes:
