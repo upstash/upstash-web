@@ -29,9 +29,9 @@ from upstash_redis import Redis
 ## Creating a Rate Limiter
 
 Now, let's start coding by setting up a rate limiter. It requires three parameters:
-    • redis: The Redis instance. This is like telling the rate limiter where to look.
-    • limiter: The type of limiter. In our example, we used FixedWindow. We will discuss the differences between other types while implementing limiting algorithms.
-    • prefix (optional): If you're sharing Redis with other applications, this is like putting a label on your requests to eliminate possible key collisions. In our example, we used the default prefix, "@upstash/ratelimit".
+- redis: The Redis instance. This is like telling the rate limiter where to look.
+- limiter: The type of limiter. In our example, we used FixedWindow. We will discuss the differences between other types while implementing limiting algorithms.
+- prefix (optional): If you're sharing Redis with other applications, this is like putting a label on your requests to eliminate possible key collisions. In our example, we used the default prefix, "@upstash/ratelimit".
 
 
 ```python
@@ -65,10 +65,10 @@ class Response:
 
 
 The class has four different attributes:
-    • allowed: This is a boolean value. True means the request can be satisfied at this moment, and false means otherwise.
-    • limit: Maximum number of requests allowed in a certain time frame.
-    • remaining: Countdown of how many requests can be satisfied until the end of the current time frame. 
-    • reset: This attribute is a floating-point number representing a Unix timestamp in seconds. It indicates the exact moment when the rate limits are set to reset. After this timestamp, you'll have a fresh set of requests available.
+ - allowed: This is a boolean value. True means the request can be satisfied at this moment, and false means otherwise.
+ - limit: Maximum number of requests allowed in a certain time frame.
+ - remaining: Countdown of how many requests can be satisfied until the end of the current time frame. 
+ - reset: This attribute is a floating-point number representing a Unix timestamp in seconds. It indicates the exact moment when the rate limits are set to reset. After this timestamp, you'll have a fresh set of requests available.
 
 After setting limits, we should check the response by using the allowed method. Unless the response is allowed, that means the request can’t be accepted at this moment and it has to wait.
 
@@ -162,12 +162,12 @@ ratelimit = Ratelimit(
 Here, we've created a rate limiter that allows 10 requests within a 10-second fixed window.
 
 Advantages:
-    • It is cost-effective in terms of both data size and computation. Determining the validity of a request doesn't involve storing a lot of data or performing complex calculations.
-    • Newer requests are not negatively affected by past burst rates, as each window provides a fresh restart.
-        
+- It is cost-effective in terms of both data size and computation. Determining the validity of a request doesn't involve storing a lot of data or performing complex calculations.
+- Newer requests are not negatively affected by past burst rates, as each window provides a fresh restart.
+
 Disadvantages:
-    • May allow high bursts of requests at the boundaries of each window, leading to uneven distribution and potential traffic surges.
-    • In scenarios with a large number of users trying to reach the server at once, particularly at the beginning of a new window, the algorithm may lead to request stampedes, causing a sudden increase in traffic.
+- May allow high bursts of requests at the boundaries of each window, leading to uneven distribution and potential traffic surges.
+- In scenarios with a large number of users trying to reach the server at once, particularly at the beginning of a new window, the algorithm may lead to request stampedes, causing a sudden increase in traffic.
 
 ## Sliding Window Algorithm
 
@@ -194,11 +194,11 @@ ratelimit = Ratelimit(
 In this example, a new rate limiter is created by using a sliding window algorithm.
 
 Advantages:
-    • Successfully resolves the near-boundary problem of the Fixed Window algorithm by considering both old and new windows, reducing the possibility of stampedes.
-      
+- Successfully resolves the near-boundary problem of the Fixed Window algorithm by considering both old and new windows, reducing the possibility of stampedes.
+   
 Disadvantages:
-    • More costly in terms of storage and computation compared to the Fixed Window algorithm. Approximation involves weight calculations and storing old window data.
-    • The approximation mechanism assumes a uniform request flow in the previous window, which may not be the case always. Requests might be concentrated at certain times, leading to bursts of activity. In these cases, the algorithm’s approximation may not accurately reflect the actual request activity.
+- More costly in terms of storage and computation compared to the Fixed Window algorithm. Approximation involves weight calculations and storing old window data.
+- The approximation mechanism assumes a uniform request flow in the previous window, which may not be the case always. Requests might be concentrated at certain times, leading to bursts of activity. In these cases, the algorithm’s approximation may not accurately reflect the actual request activity.
 
 ## Token Bucket Algorithm
 
@@ -215,11 +215,11 @@ ratelimit = Ratelimit(
 ```
 
 Advantages:
-    • Bursts of requests are managed smoothly, the system processes them at a constant rate. This ensures a more consistent handling of incoming traffic.
-    • Capable of offering higher initial burst limits. Setting a maximum number of tokens to be higher than the refill rate enables higher initial bursts. Some systems may need this flexibility.
+- Bursts of requests are managed smoothly, the system processes them at a constant rate. This ensures a more consistent handling of incoming traffic.
+- Capable of offering higher initial burst limits. Setting a maximum number of tokens to be higher than the refill rate enables higher initial bursts. Some systems may need this flexibility.
 
 Disadvantages:
-    • Among the three presented algorithms, the Token Bucket is computationally the most expensive. Managing and updating the token bucket, along with the token consumption logic, increases complexity and computation cost.
+- Among the three presented algorithms, the Token Bucket is computationally the most expensive. Managing and updating the token bucket, along with the token consumption logic, increases complexity and computation cost.
 
 # Final Remarks
 
