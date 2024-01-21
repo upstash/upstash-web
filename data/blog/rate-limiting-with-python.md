@@ -1,3 +1,4 @@
+# How to Rate Limit Your Python Applications with Upstash Redis?
 
 Rate limiting is a crucial mechanism used by developers to control the number of requests an application can receive within a specified time frame, by setting a limit on how frequently an action can be repeated within a specific period, such as attempting to log into your account. It aims to prevent users from exhausting system resources and also has a very pivotal role in Cybersecurity. In serverless setups, where efficient resource management is essential but can be challenging, implementing rate limiting becomes even more important. That's where the Upstash rate limiting library comes in. In this tutorial, we'll explore this library, and make rate limiting easier and more accessible for every user.
 
