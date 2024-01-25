@@ -293,6 +293,11 @@ export const authors: Record<string,
         title: "Software Developer (Guest Author)",
         image: "mahesh.jpeg",
     },
+    eray: {
+        name: "Eray Eroglu",
+        title: "Software Developer (Guest Author)",
+        image: "eray.jpeg",
+    },
     oguzhantasimaz: {
         name: "Oguzhan Tasimaz",
         title: "Software Engineer",

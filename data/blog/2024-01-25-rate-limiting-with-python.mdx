@@ -1,8 +1,17 @@
-# How to Rate Limit Your Python Applications with Upstash Redis?
+---
+slug: rate-limiting-with-python
+title: "How to Rate Limit Your Python Applications with Upstash Redis?"
+authors:
+  - eray
+tags: [python, redis, ratelimiting]
+---
+
+
+## How to Rate Limit Your Python Applications with Upstash Redis?
 
 Rate limiting is a crucial mechanism used by developers to control the number of requests an application can receive within a specified time frame, by setting a limit on how frequently an action can be repeated within a specific period, such as attempting to log into your account. It aims to prevent users from exhausting system resources and also has a very pivotal role in Cybersecurity. In serverless setups, where efficient resource management is essential but can be challenging, implementing rate limiting becomes even more important. That's where the Upstash rate limiting library comes in. In this tutorial, we'll explore this library, and make rate limiting easier and more accessible for every user.
 
-# Getting Started
+## Getting Started
 
 Before starting to code, we must create a database on [Upstash](https://console.upstash.com/login) and install the rate limiting library. To install the library, open your library and enter this command:
 
@@ -10,14 +19,14 @@ Before starting to code, we must create a database on [Upstash](https://console.
 
 Once you successfully created your database on Upstash and installed the library, you can proceed to the coding part.
 
-# Usage of Rate Limiting
+## Usage of Rate Limiting
 
 We will start with the basics of rate limiting library.
-## Redis Client Configuration
+### Redis Client Configuration
 
 Before diving into the usage, it's important to note that this library supports various Redis client configurations. To explore the possibilities, you can check the [Redis SDK repository.](https://github.com/upstash/redis-python)
 
-## Asynchronous Support
+### Asynchronous Support
 
 The library also provides support for asyncio. If you want to utilize the features of upstash_ratelimit.asyncio, you can import the asyncio-based variant from the upstash_ratelimit.asyncio module. In this tutorial, we will import upstash_ratelimit.
 
@@ -27,7 +36,7 @@ from upstash_redis import Redis
  ```
 
 
-## Creating a Rate Limiter
+### Creating a Rate Limiter
 
 Now, let's start coding by setting up a rate limiter. It requires three parameters:
 - redis: The Redis instance. This is like telling the rate limiter where to look.
@@ -45,7 +54,7 @@ ratelimit = Ratelimit(
 
 We created a rate limiter that allows 10 requests per 10 seconds.
 
-## Handling Requests
+### Handling Requests
 
 Next, we will use a rate limiter to respond to requests by calling the limit method with an identifier. You can either use a constant or dynamic identifier depending on your need. Using a constant identifier is more sensible if you will respond to all requests with a single limit. Otherwise, you can use a user ID,  an API key, or an IP address as an identifier to set individual limits.
 
@@ -81,7 +90,7 @@ else:
     print("Here you go!")
 ```
 
-## Blocking
+### Blocking
 
 In certain situations, you may prefer your application to wait for a request until it falls within the specified limits rather than directly denying it. This is where the blocking functionality comes into play. When a request is blocked, it gets automatically suspended until the end of the current window. Once the next window starts, the method attempts to process the request again. If a time parameter is set (in seconds), the method will block the process for that specific duration.
 
@@ -105,7 +114,7 @@ else:
     print("Here you go!")
 ```
 
-## Multiple Limits
+### Multiple Limits
 
 The different components of your application could have diverse requirements or user categories. In such cases, applying different rate limits to different users becomes essential. This is where multiple rate limiters prove beneficial, offering the ability to set specific limits for distinct groups. For instance, if your application has free and paid users, you might want free users to be allowed 10 requests in 10 seconds, while paid users are permitted 60 requests in the same time frame. You can achieve this by implementing a class:
 
@@ -143,10 +152,10 @@ ratelimit.paid.limit("userIP")
 
 The limit method is called on both free and paid rate limiters with the same identifier. These calls to limit will return Response objects, and you can check the allowed attribute in these responses to determine whether the requests are within the allowed limits or not.
 
-# Implementing Rate Limiting Algorithms
+## Implementing Rate Limiting Algorithms
 
 Now, we will review different types of rate limiting algorithms.
-## Fixed Window Algorithm
+### Fixed Window Algorithm
 
 The Fixed Window rate limiting algorithm operates by dividing time into fixed windows, each with a predefined and constant length. For instance, if the system has a limit of 50 requests in 10 minutes, and the window starts at 12:00, it can process 50 requests until 12:10. If 50 requests are made at 12:01, the system must wait until 12:10 to handle another request.
 
@@ -170,7 +179,7 @@ Disadvantages:
 - May allow high bursts of requests at the boundaries of each window, leading to uneven distribution and potential traffic surges.
 - In scenarios with a large number of users trying to reach the server at once, particularly at the beginning of a new window, the algorithm may lead to request stampedes, causing a sudden increase in traffic.
 
-## Sliding Window Algorithm
+### Sliding Window Algorithm
 
 The sliding window algorithm tries to improve the fixed windows algorithm by distributing requests more evenly. Rather than granting all requests at the beginning of the window, it distributes the permissions throughout the window. Instead of a fixed window, it uses a rolling window and divides time into specific slices. Unlike the fixed window algorithm, it considers both old and current windows. The closer a request is to the present moment, the higher its weight in the calculation. Based on the weights of requests, the algorithm makes an approximation for request validation. If the approximated value is lower than the predefined limit, the request is allowed.
 
@@ -201,7 +210,7 @@ Disadvantages:
 - More costly in terms of storage and computation compared to the Fixed Window algorithm. Approximation involves weight calculations and storing old window data.
 - The approximation mechanism assumes a uniform request flow in the previous window, which may not be the case always. Requests might be concentrated at certain times, leading to bursts of activity. In these cases, the algorithm’s approximation may not accurately reflect the actual request activity.
 
-## Token Bucket Algorithm
+### Token Bucket Algorithm
 
 Token bucket is another widely used rate limiting algorithm. It introduces a “bucket of tokens” concept. In this metaphor, each token symbolizes the capacity to execute a single request. Requests can be executed as long as there are available tokens in the bucket. When a request is permitted, it consumes a token from the bucket. Over time, consumed tokens are reloaded at a specified refill rate. If the bucket is empty, incoming requests must wait until tokens are refilled.
 
@@ -222,13 +231,13 @@ Advantages:
 Disadvantages:
 - Among the three presented algorithms, the Token Bucket is computationally the most expensive. Managing and updating the token bucket, along with the token consumption logic, increases complexity and computation cost.
 
-# Final Remarks
+## Final Remarks
 
 This project makes use of Poetry, a handy tool for organizing and managing dependencies. Before testing your application, make sure you can create a Poetry shell with all the required dependencies. Also, for the features we've discussed to work smoothly, your database needs to be hosted on Upstash.To run all tests, activate the Poetry virtual environment with the required dependencies. Set the environment variables UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN, then execute the following command:
 
 `poetry run pytest`
 
-# Conclusion
+## Conclusion
 
 In this tutorial, we explored Upstash’s rate limiting library and its utilities. The library offers versatile features such as asynchronous support, multiple rate limiter creation, and several rate limiting algorithms. With its easy-to-use methods and strong Redis integration, Upstash's rate limiting library enables developers to create effective rate limiting strategies that guarantee the best possible application performance and resource management.
 
