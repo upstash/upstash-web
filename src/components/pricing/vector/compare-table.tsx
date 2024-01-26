@@ -213,46 +213,44 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 text-left font-normal text-white/60">
-            Max vector count
+            Max Vector X Dimension
           </th>
           {/**/}
           <td
             hidden={isMobile ? !showFree : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
-            <CompareValue type="size" suffix="K">
-              100
+            <CompareValue type="size" suffix="Million">
+              200
             </CompareValue>
           </td>
           <td
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0 align-top"
           >
-            <CompareValue type="size" suffix="M">
-              1
+            <CompareValue type="size" suffix="Billion">
+              7.5
             </CompareValue>
           </td>
           <td
             hidden={isMobile ? !showFixed : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
-            <CompareValue type="size" suffix="M">
-              1
+            <CompareValue type="size" suffix="Billion">
+              7.5
             </CompareValue>
           </td>
           <td
             hidden={isMobile ? !showPro : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
-            <CompareValue type="size" suffix="M">
-              100
-            </CompareValue>
+            <CompareValue type="plain">Custom</CompareValue>
           </td>
         </tr>
 
         <tr>
           <th className="px-0 text-left font-normal text-white/60">
-            Max dimension
+            Max Dimension
           </th>
           {/**/}
           <td
@@ -265,25 +263,25 @@ export default function CompareTable() {
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0 align-top"
           >
-            <CompareValue type="number">1536</CompareValue>
+            <CompareValue type="number">3072</CompareValue>
           </td>
           <td
             hidden={isMobile ? !showFixed : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
-            <CompareValue type="number">1536</CompareValue>
+            <CompareValue type="number">3072</CompareValue>
           </td>
           <td
             hidden={isMobile ? !showPro : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
-            <CompareValue type="number">1536</CompareValue>
+            <CompareValue type="number">5000</CompareValue>
           </td>
         </tr>
 
         <tr>
           <th className="px-0 text-left font-normal text-white/60">
-            Daily query / Update Limit
+            Daily Query / Update Limit
           </th>
           {/**/}
           <td

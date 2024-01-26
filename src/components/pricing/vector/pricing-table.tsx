@@ -24,11 +24,6 @@ export default function PricingTable() {
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
         <div>
-          <p className="text-white/40">Max Vector Count</p>
-          <p className="font-semibold">100K</p>
-        </div>
-
-        <div>
           <p className="text-white/40">Daily Query / Update Limit</p>
           <p className="font-semibold">10K</p>
         </div>
@@ -67,11 +62,6 @@ export default function PricingTable() {
         </div>
 
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
-
-        <div>
-          <p className="text-white/40">Max Vector Count</p>
-          <p className="font-semibold">1M</p>
-        </div>
 
         <div>
           <p className="text-white/40">Daily Query / Update Limit</p>
@@ -115,11 +105,6 @@ export default function PricingTable() {
         </div>
 
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
-
-        <div>
-          <p className="text-white/40">Max Vector Count</p>
-          <p className="font-semibold">1M</p>
-        </div>
 
         <div>
           <p className="text-white/40">Daily Query / Update Limit</p>
