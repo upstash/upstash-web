@@ -229,7 +229,7 @@ export default function CompareTable() {
             className="bg-emerald-300/10 px-4 py-0 align-top"
           >
             <CompareValue type="size" suffix="Billion">
-              7.5
+              2
             </CompareValue>
           </td>
           <td
@@ -237,14 +237,16 @@ export default function CompareTable() {
             className="bg-white/3 px-4 py-0 align-top"
           >
             <CompareValue type="size" suffix="Billion">
-              7.5
+              2
             </CompareValue>
           </td>
           <td
             hidden={isMobile ? !showPro : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
-            <CompareValue type="plain">Custom</CompareValue>
+            <CompareValue type="size" suffix="Billion">
+              100
+            </CompareValue>
           </td>
         </tr>
 
