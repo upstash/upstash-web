@@ -100,6 +100,7 @@ export default function CompareTable() {
               </select>
             </div>
           </th>
+
           <th
             hidden={isMobile ? !showPayg : false}
             className="border-b border-b-zinc-800 bg-zinc-950 p-0"
@@ -130,6 +131,7 @@ export default function CompareTable() {
               </h5>
             </div>
           </th>
+
           <th
             hidden={isMobile ? !showPro2 : false}
             className="border-b border-b-zinc-800 bg-zinc-950 p-0"
@@ -160,6 +162,7 @@ export default function CompareTable() {
               </h5>
             </div>
           </th>
+
           <th
             hidden={isMobile ? !showPro10 : false}
             className="border-b border-b-zinc-800 bg-zinc-950 p-0"
@@ -201,7 +204,7 @@ export default function CompareTable() {
             colSpan={isMobile ? 2 : 5}
             className="sticky top-20 z-10 p-0 text-left md:top-0"
           >
-            <div className="-ml-4 flex h-16 items-center bg-gradient-to-r from-zinc-900 to-zinc-950 px-4">
+            <div className="-ml-4 flex h-24 items-center bg-gradient-to-r from-zinc-900 to-zinc-950 px-4 md:h-16">
               <span className="flex items-center gap-2 text-lg font-semibold">
                 <span className="flex items-center rounded-full bg-white/10 p-2">
                   <IconDatabase width="20" height="20" strokeWidth={1.5} />
@@ -573,7 +576,7 @@ export default function CompareTable() {
             colSpan={isMobile ? 2 : 5}
             className="sticky top-20 z-10 p-0 text-left md:top-0"
           >
-            <div className="-ml-4 flex h-16 items-center bg-gradient-to-r from-zinc-900 to-zinc-950 px-4">
+            <div className="-ml-4 flex h-24 items-center bg-gradient-to-r from-zinc-900 to-zinc-950 px-4 md:h-16">
               <span className="flex items-center gap-2 text-lg font-semibold">
                 <span className="flex items-center rounded-full bg-white/10 p-2">
                   <IconRocket width="20" height="20" strokeWidth={1.5} />
@@ -738,7 +741,7 @@ export default function CompareTable() {
             colSpan={isMobile ? 2 : 5}
             className="sticky top-20 z-10 p-0 text-left md:top-0"
           >
-            <div className="-ml-4 flex h-16 items-center bg-gradient-to-r from-zinc-900 to-zinc-950 px-4">
+            <div className="-ml-4 flex h-24 items-center bg-gradient-to-r from-zinc-900 to-zinc-950 px-4 md:h-16">
               <span className="flex items-center gap-2 text-lg font-semibold">
                 <span className="flex items-center rounded-full bg-white/10 p-2">
                   <IconShieldLock width="20" height="20" strokeWidth={1.5} />
@@ -954,7 +957,7 @@ export default function CompareTable() {
             colSpan={isMobile ? 2 : 5}
             className="sticky top-20 z-10 p-0 text-left md:top-0"
           >
-            <div className="-ml-4 flex h-16 items-center bg-gradient-to-r from-zinc-900 to-zinc-950 px-4">
+            <div className="-ml-4 flex h-24 items-center bg-gradient-to-r from-zinc-900 to-zinc-950 px-4 md:h-16">
               <span className="flex items-center gap-2 text-lg font-semibold">
                 <span className="flex items-center rounded-full bg-white/10 p-2">
                   <IconHeadphones width="20" height="20" strokeWidth={1.5} />
@@ -1110,7 +1113,7 @@ export default function CompareTable() {
             colSpan={isMobile ? 2 : 5}
             className="sticky top-20 z-10 p-0 text-left md:top-0"
           >
-            <div className="-ml-4 flex h-16 items-center bg-gradient-to-r from-zinc-900 to-zinc-950 px-4">
+            <div className="-ml-4 flex h-24 items-center bg-gradient-to-r from-zinc-900 to-zinc-950 px-4 md:h-16">
               <span className="flex items-center gap-2 text-lg font-semibold">
                 <span className="flex items-center rounded-full bg-white/10 p-2">
                   <IconCreditCard width="20" height="20" strokeWidth={1.5} />

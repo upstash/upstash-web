@@ -60,6 +60,27 @@ export default function HomeHeroProducts({
       <HomeHeroProduct
         href="https://console.upstash.com"
         activeProduct={activeProduct}
+        onMouseEnter={() => setActiveProduct(Product.VECTOR)}
+      >
+        <HeroProductTitle>
+          <span>Vector</span>
+          <span className="ml-0.5 rounded bg-orange-500 px-1.5 py-1 text-xs font-semibold leading-none tracking-wide">
+            NEW
+          </span>
+        </HeroProductTitle>
+        <HeroProductDesc>Serverless Vector Database</HeroProductDesc>
+        <HeroProductCta
+          className={cx(
+            activeProduct === Product.VECTOR && "!bg-orange-500 !text-white",
+          )}
+        >
+          Create Index
+        </HeroProductCta>
+      </HomeHeroProduct>
+
+      <HomeHeroProduct
+        href="https://console.upstash.com"
+        activeProduct={activeProduct}
         onMouseEnter={() => setActiveProduct(Product.QSTASH)}
       >
         <HeroProductTitle>
@@ -72,24 +93,6 @@ export default function HomeHeroProducts({
           )}
         >
           Publish Messages
-        </HeroProductCta>
-      </HomeHeroProduct>
-
-      <HomeHeroProduct
-        href="https://console.upstash.com"
-        activeProduct={activeProduct}
-        onMouseEnter={() => setActiveProduct(Product.VECTOR)}
-      >
-        <HeroProductTitle>
-          <span>Vector</span>
-        </HeroProductTitle>
-        <HeroProductDesc>Serverless Vector Database</HeroProductDesc>
-        <HeroProductCta
-          className={cx(
-            activeProduct === Product.VECTOR && "!bg-orange-500 !text-white",
-          )}
-        >
-          Create Index
         </HeroProductCta>
       </HomeHeroProduct>
     </div>
