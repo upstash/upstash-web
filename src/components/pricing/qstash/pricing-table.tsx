@@ -2,7 +2,7 @@ import Button from "@/components/button";
 
 export default function PricingTable() {
   return (
-    <div className="grid gap-6 lg:grid-cols-3">
+    <div className="grid gap-6 md:grid-cols-3">
       {/**/}
 
       {/* FREE */}
