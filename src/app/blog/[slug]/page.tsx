@@ -87,6 +87,8 @@ export async function generateMetadata({
   params: Props["params"];
 }) {
   const post = allPosts.find((post: Post) => post.slug === params.slug) as Post;
+  if (!post)
+    notFound()
   const title = post.title;
   const description =
     post.description ||
