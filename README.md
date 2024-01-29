@@ -11,7 +11,7 @@
 ```mdx
 <Note>You can use any Redis® client, but we recommend @upstash/redis</Note>
 ```
- 
+
 ![](public/readme/note-info.png)
 
 ```mdx
@@ -123,8 +123,3 @@ In the target files wrap the location with comments that reference the identifie
 <!--SNIPEND-->
 
 In the example above, the "hellouniverse" code snippet will be spliced between the comments. Any text inside of the placeholders will be replaced by the code snippet when the tool runs.%
-
-# Please build
-
-// I needed something to change to trigger a build 
-// - andreas.
