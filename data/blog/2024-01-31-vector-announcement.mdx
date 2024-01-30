@@ -1,0 +1,198 @@
+---
+slug: introducing-vector-database
+title: "Upstash Vector: Serverless Vector Database for AI and LLMs"
+authors:
+  - mehmet
+tags: [serverless, database, vector, announcement, ai, llm]
+---
+
+Today, we're introducing Upstash Vector, a serverless vector database built for working with vector embeddings for AI models and LLMs. Upstash Vector will help you to efficiently store and query high-dimensional vector embeddings. Upstash Vector operates on a serverless model, abstracting away hosting and management complexities.
+
+
+### What's a Vector Database really?
+
+A vector database is a specialized database designed to store, manage, and query/search vector embeddings, which are mathematical representations of data points in a high-dimensional space. A vector database supports various distance metrics (such as cosine or euclidean) to measure the similarity between vectors.
+Although storage and managing vector data is straightforward, querying for vector similarity poses significant challenges.
+
+A simple and basic approach is to do an exhaustive search; by comparing a query vector to every other vector stored in the database one by one. But this consumes too much resources and results in very high latencies, hence not very usable. To address this problem, _Approximate Nearest Neighbor_ (ANN) algorithms are used. ANN search approximates the true nearest neighbor. This means it might not find the absolute closest point, but it will find one that's _close enough_ with much faster performance and consuming fewer resources.
+
+A vector database indexes stored vector embeddings using an ANN algorithm and a distance metric. That makes an index a data structure optimized for searching a given query vector in a vector database.
+
+
+### ANN Algorithms
+
+Several ANN algorithms, such as [HNSW](http://arxiv.org/abs/1603.09320), [NSG](http://www.vldb.org/pvldb/vol12/p461-fu.pdf), and [DiskANN](https://dl.acm.org/doi/abs/10.5555/3454287.3455520), are available each with its advantages, problems and trade-offs. One of the difficult problems in ANN algorithms is, that indexing and querying vectors may require storing the whole data in memory. When the dataset is huge, then memory requirements for indexing may exceed available memory. 
+
+_DiskANN_ algorithm tries to solve this problem by using disk as the main storage for indexes and to be able to perform queries directly on disk. _DiskANN_ paper acknowledges that _HNSW_ and _NSG_ can also achieve acceptable latencies when vectors are stored on disk. However, it argues that their latencies can be significantly higher compared to _DiskANN_, especially for large datasets and high recall requirements.
+
+Even though _DiskANN_ has its advantages, it also requires more work to be practical. The main problem is that you can’t insert/update existing vectors in the index without rebuilding the whole index. To solve this problem, there is another _DiskANN_ paper: [FreshDiskANN](https://arxiv.org/abs/2105.09613). _FreshDiskANN_ improves _DiskANN_ by introducing a temporary index for the most recent data in memory. Queries are served from both the temporary index and also from the disk index. These temporary indexes are merged to the disk index when needed using the `StreamingMerge` algorithm described in the paper.
+
+### Upstash Vector with DiskANN
+
+Upstash Vector is using _DiskANN_ and _FreshDiskANN_ algorithms with a few more enhancements. We based our work on the amazing [JVector](https://github.com/jbellis/jvector) library and implemented _FreshDiskANN_'s `StreamingMerge` algorithm over it.
+
+For each vector database, we create a _transient_ index in memory (similar to _FreshDiskANN_'s temporary index) and a disk-based index. All writes (except huge bursts)  are performed on the transient index initially, and then background procedures merge the transient index to the disk-based index when some criteria are matched, such as memory usage, number of vectors, etc. Each query operation is executed on both transient and disk indexes, and their results are merged by comparing similarity scores. 
+
+An exception for writes is, when a huge burst write is detected, like inserting hundreds of thousands of vector upserts in a very short period, we skip writing the transient index and merge updates to the disk index directly. According to our internal tests, this significantly reduces the total time to index burst writes compared to using the transient index and then merging it to the disk index.
+
+
+#### Similarity Functions
+
+Vector similarity functions measure how "close" or "similar" two vectors are to each other, helping us understand relationships and patterns within the data. Each of these functions yields distinct query results, catering to specific use cases. 
+
+Here are the three supported similarity functions:
+
+- `Cosine Similarity`: Measures the cosine of the angle between two vectors. It is particularly useful when the magnitude of the vectors is not essential, and the focus is on the orientation.
+
+- `Euclidean Distance`: Measures the straight-line distance between two vectors in the multi-dimensional space. It is well-suited for scenarios where the magnitude of vectors is crucial, providing a measure of their spatial separation.
+
+- `Dot Product`: Measures the similarity by multiplying the corresponding components of two vectors and summing the results. 
+
+You can read more information about them and their main use	cases in our docs: [
+Vector Similarity Functions](https://upstash.com/docs/vector/overall/features#vector-similarity-functions)
+
+#### What about related metadata?
+
+Upstah Vectors allows storing `JSON` metadata alongside the vector embeddings. So you can insert embedding-related metadata and get them back while querying the database. Upstash Vector currently supports storing and retrieving metadata alongside vectors. 
+However, it doesn't yet allow filtering based on that metadata. Filtering is in our roadmap and it will enable you to refine vector search results even further. 
+
+See [Metadata](https://upstash.com/docs/vector/overall/features#metadata) docs and [Roadmap](https://upstash.com/docs/vector/overall/roadmap) for more information.
+
+#### Where will be your data stored?
+
+Initially, Upstash Vector will be deployed on two AWS regions; `us-east-1` (N. Virginia)  and `eu-west-1` (Ireland). 
+We are planning to add more regions (and maybe more cloud providers) in the upcoming days.
+
+#### Multitenancy
+
+As a serverless database, Upstash Vector is a multi-tenant service too. We already have very good experience in providing multitenant services on multiple cloud providers and regions. See our [Redis](https://upstash.com/redis) and [Kafka](https://upstash.com/kafka) offerings. 
+
+Similarly, the Upstash vector is deployed on multiple instances in each region, and databases are load-balanced among them due to their size, usage, and traffic. To avoid noisy neighbor problems, we implemented strict CPU parallelism and memory mapping restrictions for each database. 
+
+#### Plans & Limits & Quotas
+
+Every cloud service has limitations and quotas. While flexibility is important, limitations and quotas ensure fair and sustainable service use.
+
+Upstash Vector will have different-sized plans, and each plan has its own limits & quotas; such as database size, number of daily requests, max vector dimensions, etc.  You can choose a plan that fits your current needs, and know you can always upgrade or downgrade as your project grows.
+
+Initially we will have _free_, _pay-as-you-go_, _fixed_ and _pro_ plans. _Pay-as-you-go_ plan is pure serverless with `$0.4 per 100K` requests, while fixed plan is `$60 per month`.
+
+See the Upstash Vector [pricing & plans](https://upstash.com/pricing/vector) page for more information.
+
+
+### API & SDKs
+
+Upstash Vector provides a REST API to `upsert`, `fetch`, `delete`, and more importantly `query` vector embeddings. REST API works with `JSON` messages. You can learn more information at [REST API](https://upstash.com/docs/vector/apis/restapi) page.
+
+Also, we have released three official SDKs built around our REST API:
+
+- Python SDK: [vector-py](https://github.com/upstash/vector-py)
+```python
+from upstash_vector import Index
+index = Index(url=UPSTASH_VECTOR_REST_URL, token=UPSTASH_VECTOR_REST_TOKEN)
+
+index.upsert(
+    vectors=[
+        ("id1", [0.1, 0.2], {"metadata_field": "metadata_value1"}),
+        ("id2", [0.3, 0.4], {"metadata_field": "metadata_value2"}),
+    ]
+)
+
+query_vector = [0.6, 0.9]
+query_res = index.query(
+    vector=query_vector,
+    top_k=10,
+    include_vectors=True,
+    include_metadata=True,
+)
+// ...
+```
+
+- Javascript/Typescript SDK: [vector-js](https://github.com/upstash/vector-js)
+```js
+import { Index } from "@upstash/vector";
+
+const index = new Index({
+  url: "<UPSTASH_VECTOR_REST_URL>",
+  token: "<UPSTASH_VECTOR_REST_TOKEN>",
+});
+
+await index.upsert([
+    {id: 'id1', vector: [0.1, 0.2], metadata: {metadata_field: 'metadata_value1'}},
+    {id: 'id2', vector: [0.3, 0.4], metadata: {metadata_field: 'metadata_value2'}},
+])
+
+const results = await index.query({ topK: 10, vector: [ 0.6, 0.9 ]})
+// ...
+```
+
+- Go SDK: [vector-go](https://github.com/upstash/vector-go)
+```go
+import (
+	"github.com/upstash/vector-go"
+)
+
+func main() {
+	index := vector.NewIndex("<UPSTASH_VECTOR_REST_URL>", "<UPSTASH_VECTOR_REST_TOKEN>")
+
+    upserts := []vector.Upsert{
+        {
+            Id:     "id1",
+            Vector: []float32{0.1, 0.2},
+            Metadata: map[string]any{"metadata_field": "metadata_value1"}, 
+        },
+        {
+            Id:       "id2",
+            Vector:   []float32{0.3, 0.4},
+            Metadata: map[string]any{"metadata_field": "metadata_value2"}, 
+        },
+    }
+    err := index.UpsertMany(upserts)
+
+    scores, err := index.Query(vector.Query{
+        Vector:          []float32{0.6, 0.9},
+        TopK:            10,
+        IncludeVectors:  true,
+        IncludeMetadata: true,
+    })
+    
+    // ...
+}
+```
+
+### Still way to go: Our roadmap
+
+There are still several features and enhancements planned in the Upstash Vector roadmap:
+
+- **Metadata Filtering**: Filtering feature will add _hybrid search_ capability and will enable you to refine vector search results even further by filtering out irrelevant noise based on keywords or metadata, in addition to vector similarity.
+
+- **Index Replication**: With replication, there will be multiple read replicas of each index, ensuring:
+    - **High Availability:** Even if one replica fails, others will remain accessible, maintaining index availability.
+    - **Reduced Latency:** Replicas can be placed in different regions, bringing the index closer to clients and reducing latency for geographically distributed users.
+
+- **Index Namespaces**: Namespaces will allow you to divide an index into multiple, isolated partitions. Each namespace will function as a self-contained subset of the index.
+
+See our [Roadmap](https://upstash.com/docs/vector/overall/roadmap) page to learn more.
+
+
+### What makes Upstash Vector different?
+
+Upstash is already a pioneer of the serverless database model, allowing users to avoid infrastructure work 
+and only pay for what they use. Despite the crowded vector database market, we believe it lacks a solution that is 
+reasonably priced, powerful, and capable of supporting large amounts of data without compromising performance.
+
+Some solutions offer a low barrier to entry and can be easily used as an extension to your existing database 
+(bolt-on solutions). However, they struggle with high capacity loads. Most use HNSW algorithm, which is memory-intensive, 
+resulting in increased infrastructure costs proportional to the amount of storage.
+
+On the contrary, there are powerful, purpose-built solutions. Unfortunately, many of them offer a poor development experience 
+due to complicated APIs and configuration options. A few offer an easy-to-use managed service, 
+but their complex pricing model can lead to sudden cost increases.
+
+We created Upstash Vector, a purpose-built, powerful vector database that aims an excellent developer experience 
+and a flexible pricing model suitable for both startups and enterprises.
+
+
+If you have any questions or need assistance, you can reach out to our support team 
+at [support@upstash.com](mailto:support@upstash.com) or join our community on [Discord](https://upstash.com/discord).
+Stay updated by following us on [Twitter](https://twitter.com/upstash).
