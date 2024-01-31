@@ -84,7 +84,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   );
 }
 
-const title = "Upstash: Serverless Data for Redis® and Kafka®";
+const title = "Upstash: Serverless Data Platform";
 const description =
   "Designed for the serverless with per-request pricing and Redis®/Kafka® API.";
 
