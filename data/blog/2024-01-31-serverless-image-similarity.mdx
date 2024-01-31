@@ -1,0 +1,178 @@
+---
+slug: serverless-image-similarity
+title: “Serverless Image Similarity with Upstash Vector and Huggingface Models, Datasets and Spaces”
+authors:
+  - Ömer Faruk Özdemir
+tags: [serverless, database, vector, ai, image similarity, huggingface, models, datasets, transformers, spaces, gradio]
+---
+
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1fis0Aj1PDeQFaBsKWoQp5CuKD2eP4EYD?usp=sharing)
+
+
+In this post, we'll guide you through the seamless creation of a face similarity system using Upstash Vector and the Huggingface Ecosystem, all within a serverless environment. With this powerful tech stack, you can eliminate concerns about the complexities of implementing and managing Backend, Frontend, Database, and Hosting. Instead, you can solely concentrate on the Machine Learning while we handle the intricacies of the Vector Database.
+
+
+This week, Upstash, a leading serverless data platform, unveiled its latest product - Vector. Utilizing Upstash Vector allows you to effortlessly to store and retrieve the most similar vectors based on your specified distance metric. Give it a try for free [here](https://upstash.com/)! For additional insights into Upstash Vector, explore our [blog](https://upstash.com/blog/introducing-vector-database).
+
+## Demo
+You can access our demo [here](https://huggingface.co/spaces/omerXfaruq/FindYourTwins) or try it below.
+
+<div style="text-align: center;">
+    <iframe
+        src="https://omerxfaruq-findyourtwins.hf.space"
+        frameborder="0"
+        width="100%"
+        height="800"
+    ></iframe>
+</div>
+## Dataset and Model
+
+For this endeavor, we've opted for the [Face Aging Dataset](https://huggingface.co/datasets/BounharAbdelaziz/Face-Aging-Dataset) coupled with Google's [Vision Transformer(VIT)](https://huggingface.co/google/vit-base-patch16-224-in21k) model, both available through Huggingface. Feel free to explore alternative datasets or models, as Upstash Vector seamlessly integrates with any Machine Learning task, serving as a versatile Vector database.
+
+Upstash Vector is not confined to just facial similarity. Feel free to experiment with diverse modalities or models across various applications. For instance you can build apps to **Find Similar**
+* Poems
+* Poets
+* Songs
+* Paintings
+* Voices
+
+You can use Upstash Vector for diverse Machine Learning tasks and discover similarities across a wide range of content types.
+
+## Generating Vector Embeddings and Storing in Upstash
+Utilizing our VIT model, we will generate condensed representations for our images through the model's embedding layer. In essence, we are compressing the 500x500x3 images into vectors of length 768. These embeddings (vectors) will be stored in Upstash Vector. Subsequently, we will use cosine similarity metric in our Index to query similar vectors, aiming to identify comparable faces. In our system, the assumption is that a higher degree of similarity in embeddings, as measured by cosine similarity, corresponds to greater similarity among faces.
+
+
+### Creating Embeddings
+
+<div align>
+<img src="https://i.ibb.co/mTtdh7F/embeddings.png" width=1200/>
+</div>
+
+\\
+
+### Finding Similar Embeddings
+<div align>
+<img src="https://i.ibb.co/px00rHr/upstash-embedding.png" width=1200/>
+</div>
+
+
+Let's install the necessary packages.
+```
+pip install transformers datasets upstash-vector gradio tqdm -q
+```
+
+Now it's time to initialize the model through transformers library. We're going to use a pretrained VIT from Google.
+```
+from transformers import AutoFeatureExtractor, AutoModel
+
+model_ckpt = "jayanta/vit-base-patch16-224-in21k-face-recognition"
+extractor = AutoFeatureExtractor.from_pretrained(model_ckpt)
+model = AutoModel.from_pretrained(model_ckpt)
+hidden_dim = model.config.hidden_size
+```
+
+Let's download the dataset. To save time, you can opt for the smaller version, as the larger 16GB dataset takes significantly longer to download.
+
+```
+from datasets import load_dataset
+#dataset = load_dataset("BounharAbdelaziz/Face-Aging-Dataset") #40k image
+dataset = load_dataset("HengJi/human_faces") # 100 image
+```
+
+We'll create our Index object to access our index at Upstash Vector. You can create your Index and get your URL and TOKEN from [here](https://console.upstash.com/vector) . If you want to learn more about the client API you can check the quickstart of upstash_vector from [here](https://pypi.org/project/upstash-vector/). We also have clients implemented in typescript and go.
+
+```
+from upstash_vector import Index
+index = Index(
+    url=[YOUR VECTOR URL],
+    token=[YOUR VECTOR TOKEN],
+)
+```
+
+It's time to generate the embeddings and store them in Upstash Vector. To optimize efficiency and minimize latency overhead, we'll employ a batch-by-batch upsert (update/insert) approach on our index. The process involves embedding images one by one on the CPU, warning, this is a resource-intensive operation. On an Intel i5-6600 system, the operation took approximately 3 hours, utilizing 16GB of RAM. For faster inference, you can use GPUs. If you're interested in learning more, refer to this [blog](https://huggingface.co/blog/image-similarity) for detailed instructions.
+
+In this workflow, the extractor preprocesses the image, and the processed input is fed into the model. Subsequently, we extract the embeddings from the output and upsert them into the index in batches.
+
+```
+from tqdm import tqdm
+
+batch_size = 100
+embed_list = [None] * batch_size
+dataset_size = len(dataset["train"])
+
+for step in tqdm(range(dataset_size//batch_size)):
+    for i in range(batch_size):
+        id = step * batch_size + i
+        image = dataset["train"][id]["image"]
+        inputs = extractor(images=image, return_tensors="pt")
+        outputs = model(**inputs)
+        embedding = outputs.last_hidden_state[0][0]
+        embed_list[i] = (f"{id}", embedding)
+    index.upsert(embed_list)
+```
+
+## Building a Face Similarity App with Gradio and Huggingface Spaces
+
+You can create your ML demo effortlessly using [Gradio](https://gradio.app), allowing easy sharing through self-hosting or Huggingface [Spaces](https://huggingface.co/spaces). You don't need to worry about constructing a Backend or Frontend.
+
+The demo code is quite straightforward; we utilize non-blocking AsyncIndex from upstash-vector for handling concurrent requests. Also, we query the most similar vectors through the call `await index.query(...)` and present them using the Gallery component. For more in-depth knowledge about Gradio, refer to their [quickstart guide](https://www.gradio.app/guides/quickstart). To witness this in action on Spaces, visit the [demo](https://huggingface.co/spaces/omerXfaruq/FindYourTwins).
+
+```
+import gradio as gr
+from upstash_vector import AsyncIndex
+from transformers import AutoFeatureExtractor, AutoModel
+from datasets import load_dataset
+
+index = AsyncIndex(
+    url=[YOUR VECTOR URL],
+    token=[YOUR VECTOR TOKEN],
+)
+
+model_ckpt = "google/vit-base-patch16-224-in21k"
+extractor = AutoFeatureExtractor.from_pretrained(model_ckpt)
+model = AutoModel.from_pretrained(model_ckpt)
+hidden_dim = model.config.hidden_size
+dataset = load_dataset("BounharAbdelaziz/Face-Aging-Dataset")
+
+with gr.Blocks() as demo:
+    gr.Markdown(
+        """
+        # Find Your Twins
+
+        Upload your face and find the most similar people from [Face Aging Dataset](https://huggingface.co/datasets/BounharAbdelaziz/Face-Aging-Dataset) using Google's [VIT](https://huggingface.co/google/vit-base-patch16-224-in21k) model.
+        """
+    )
+
+    with gr.Tab("Basic"):
+        with gr.Row():
+            with gr.Column(scale=1):
+                input_image = gr.Image(type="pil")
+            with gr.Column(scale=3):
+                output_image = gr.Gallery(height=800)
+
+
+        @input_image.change(inputs=input_image, outputs=output_image)
+        async def find_similar_faces(image):
+            if image is None:
+                return None
+            inputs = extractor(images=image, return_tensors="pt")
+            outputs = model(**inputs)
+            embed = outputs.last_hidden_state[0][0]
+            result = await index.query(vector=embed.tolist(), top_k=4)
+            return [dataset["train"][int(vector.id)]["image"] for vector in result]
+
+if __name__ == "__main__":
+    demo.launch(debug=True, share=True)
+```
+
+## Conclusion
+
+In summary:
+
+1. Leveraging the VIT model, we generated embeddings for images in the dataset and successfully stored them in our Vector Index.
+2. Through Gradio, we crafted a demo allowing users to embed a given face image and discover the most similar faces within the dataset.
+
+We invite you to explore diverse use-cases, experiment with these tools, and embark on creating your own personalized similarity system. The versatility of these technologies opens up a myriad of possibilities for innovation and exploration.
+
+<sub>Author: [Ömer Faruk Özdemir](https://linktr.ee/omerXfaruq)</sub>
