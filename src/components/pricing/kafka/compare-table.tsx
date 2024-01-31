@@ -1010,7 +1010,7 @@ export default function CompareTable() {
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0"
           >
-            <CompareValue>$0.2 per 100K</CompareValue>
+            <CompareValue>$0.6 per 100K</CompareValue>
           </td>
           <td
             hidden={isMobile ? !showPro2 : false}

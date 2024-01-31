@@ -21,7 +21,7 @@ export default function PricingTableEnterprise() {
       <div className="mt-6 md:mt-0">
         <ul className="space-y-2">
           <li className="flex items-center gap-1">
-            <Icon /> Scales up to a bilion of vectors
+            <Icon /> Scales over a billion of vectors
           </li>
           <li className="flex items-center gap-1">
             <Icon /> Custom configurations

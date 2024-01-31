@@ -13,3 +13,4 @@ public/workbox*
 
 # Contentlayer
 .contentlayer
+package-lock.json

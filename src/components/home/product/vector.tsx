@@ -49,7 +49,7 @@ export default function ServerlessVector() {
           Read the docs
         </Button>
         <Button
-          href="https://github.com/upstash/examples/tree/main/examples"
+          href="https://drive.google.com/drive/u/1/folders/1_W7MgkKGJmbfVQ_QiW_6qcfq0JZYFnhw"
           className="hover:bg-orange-100 hover:text-orange-950"
           type="button"
           onClick={() => {

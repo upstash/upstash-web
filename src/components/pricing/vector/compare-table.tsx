@@ -318,7 +318,7 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 text-left font-normal text-white/60">
-            Max Metadata Size
+            Max Metadata Per Vector
           </th>
           {/**/}
           <td
@@ -351,6 +351,45 @@ export default function CompareTable() {
           >
             <CompareValue type="size" suffix="KB">
               48
+            </CompareValue>
+          </td>
+        </tr>
+
+        <tr>
+          <th className="px-0 text-left font-normal text-white/60">
+            Max Metadata Size
+          </th>
+          {/**/}
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="bg-white/3 px-4 py-0 align-top"
+          >
+            <CompareValue type="size" suffix="GB">
+              1
+            </CompareValue>
+          </td>
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="bg-emerald-300/10 px-4 py-0 align-top"
+          >
+            <CompareValue type="size" suffix="GB">
+              50
+            </CompareValue>
+          </td>
+          <td
+            hidden={isMobile ? !showFixed : false}
+            className="bg-white/3 px-4 py-0 align-top"
+          >
+            <CompareValue type="size" suffix="GB">
+              50
+            </CompareValue>
+          </td>
+          <td
+            hidden={isMobile ? !showPro : false}
+            className="bg-white/3 px-4 py-0 align-top"
+          >
+            <CompareValue type="size" suffix="TB">
+              1
             </CompareValue>
           </td>
         </tr>
@@ -428,6 +467,7 @@ export default function CompareTable() {
               <span>REST</span>
               <span>Python</span>
               <span>Typescript</span>
+              <span>Go</span>
             </CompareValue>
           </td>
           <td
@@ -438,6 +478,7 @@ export default function CompareTable() {
               <span>REST</span>
               <span>Python</span>
               <span>Typescript</span>
+              <span>Go</span>
             </CompareValue>
           </td>
           <td
@@ -448,6 +489,7 @@ export default function CompareTable() {
               <span>REST</span>
               <span>Python</span>
               <span>Typescript</span>
+              <span>Go</span>
             </CompareValue>
           </td>
           <td
@@ -458,13 +500,14 @@ export default function CompareTable() {
               <span>REST</span>
               <span>Python</span>
               <span>Typescript</span>
+              <span>Go</span>
             </CompareValue>
           </td>
         </tr>
 
         <tr>
           <th className="px-0 text-left font-normal text-white/60">
-            Live index updates
+            Live Index Updates
           </th>
           {/**/}
           <td
@@ -495,7 +538,7 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 text-left font-normal text-white/60">
-            Scale to zero
+            Scale to Zero
           </th>
           {/**/}
           <td
@@ -526,7 +569,7 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 text-left font-normal text-white/60">
-            Sparse vector
+            Sparse Vector
           </th>
           {/**/}
           <td
@@ -700,7 +743,7 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 text-left font-normal text-white/60">
-            Dedicated support and Slack channel
+            Dedicated Support and Slack Channel
           </th>
           {/**/}
           <td
@@ -749,7 +792,7 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 py-4 text-left font-normal text-white/60">
-            Monthly price
+            Monthly Price
           </th>
           {/**/}
           <td
@@ -780,7 +823,7 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 py-4 text-left font-normal text-white/60">
-            Request price
+            Request Price
           </th>
           {/**/}
           <td
@@ -810,7 +853,7 @@ export default function CompareTable() {
         </tr>
         <tr>
           <th className="px-0 py-4 text-left font-normal text-white/60">
-            Storage price
+            Storage Price
           </th>
           {/**/}
           <td
@@ -841,7 +884,7 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 py-4 text-left font-normal text-white/60">
-            Bandwidth price
+            Bandwidth Price
           </th>
           {/**/}
           <td
