@@ -26,7 +26,7 @@ export default function ServerlessVector() {
     >
       <header>
         <IconVector className="mb-4" width={40} />
-        <ProductTitle>Vector</ProductTitle>
+        <ProductTitle>Vector Database</ProductTitle>
       </header>
 
       <ProductFeature product={Product.VECTOR}>
