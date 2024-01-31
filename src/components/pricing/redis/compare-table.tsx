@@ -220,7 +220,7 @@ export default function CompareTable() {
           <th className="px-0 text-left font-normal text-white/60">
             <Tooltip content="This is the number of commands that your database can process per second.">
               <span className="underline decoration-zinc-500 decoration-dashed">
-                Max command per second
+                Max commands per second
               </span>
             </Tooltip>
           </th>

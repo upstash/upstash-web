@@ -245,7 +245,7 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 py-4 text-left font-normal text-white/60">
-            Max Message Per Second
+            Max Messages Per Second
           </th>
           {/**/}
           <td

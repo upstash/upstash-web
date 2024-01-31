@@ -123,7 +123,7 @@ export default function CompareTable() {
               <h5 className="flex items-baseline font-semibold">
                 $0.4
                 <span className="ml-1 text-base font-normal opacity-40">
-                  / 100K request
+                  / 100K requests
                 </span>
               </h5>
             </div>
@@ -213,7 +213,7 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 text-left font-normal text-white/60">
-            Max Vector X Dimension
+            Max Vectors X Dimensions
           </th>
           {/**/}
           <td
@@ -252,7 +252,7 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 text-left font-normal text-white/60">
-            Max Dimension
+            Max Dimensions
           </th>
           {/**/}
           <td
@@ -569,7 +569,7 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 text-left font-normal text-white/60">
-            Sparse Vector
+            Sparse Vectors
           </th>
           {/**/}
           <td

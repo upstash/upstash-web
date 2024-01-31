@@ -52,7 +52,7 @@ export default function PricingTable() {
           </h4>
 
           <h5 className="text-3xl font-semibold">$0.4</h5>
-          <p className="text-white/40">per 100K request</p>
+          <p className="text-white/40">per 100K requests</p>
         </div>
 
         <div className="grow">
