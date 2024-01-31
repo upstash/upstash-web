@@ -13,6 +13,10 @@
       "destination": "https://upstash.com/docs/qstash"
     },
     {
+      "source": "/vector",
+      "destination": "https://upstash.com/docs/vector"
+    },
+    {
       "source": "/edge",
       "destination": "https://upstash.com/docs/redis/features/globaldatabase"
     },
