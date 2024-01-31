@@ -6,24 +6,24 @@ authors:
 tags: [serverless, database, vector, announcement, ai, llm]
 ---
 
-Today, we're introducing Upstash Vector, a serverless vector database built for working with vector embeddings for AI models and LLMs. Upstash Vector will help you to efficiently store and query high-dimensional vector embeddings. Upstash Vector operates on a serverless model, abstracting away hosting and management complexities.
+Today, we're introducing Upstash Vector, a serverless vector database built for working with vector embeddings for AI models and LLMs. Upstash Vector will help you efficiently store and query high-dimensional vector embeddings on a serverless model, eliminating the hosting and management complexities.
 
 
 ### What's a Vector Database really?
 
 A vector database is a specialized database designed to store, manage, and query/search vector embeddings, which are mathematical representations of data points in a high-dimensional space. A vector database supports various distance metrics (such as cosine or euclidean) to measure the similarity between vectors.
-Although storage and managing vector data is straightforward, querying for vector similarity poses significant challenges.
+While storing and managing vector data is straightforward, querying for vector similarity poses significant challenges.
 
-A simple and basic approach is to do an exhaustive search; by comparing a query vector to every other vector stored in the database one by one. But this consumes too much resources and results in very high latencies, hence not very usable. To address this problem, _Approximate Nearest Neighbor_ (ANN) algorithms are used. ANN search approximates the true nearest neighbor. This means it might not find the absolute closest point, but it will find one that's _close enough_ with much faster performance and consuming fewer resources.
+A simple and basic approach to searching in a vector database is to perform an exhaustive search by comparing a query vector to every other vector stored in the database one by one. However, this consumes too many resources and results in very high latencies, making it not very practical. To address this problem, _Approximate Nearest Neighbor_ (ANN) algorithms are used. ANN search approximates the true nearest neighbor, which means it might not find the absolute closest point, but it will find one that's _close enough_, with much faster performance and consuming fewer resources.
 
 A vector database indexes stored vector embeddings using an ANN algorithm and a distance metric. That makes an index a data structure optimized for searching a given query vector in a vector database.
 
 
 ### ANN Algorithms
 
-Several ANN algorithms, such as [HNSW](http://arxiv.org/abs/1603.09320), [NSG](http://www.vldb.org/pvldb/vol12/p461-fu.pdf), and [DiskANN](https://dl.acm.org/doi/abs/10.5555/3454287.3455520), are available each with its advantages, problems and trade-offs. One of the difficult problems in ANN algorithms is, that indexing and querying vectors may require storing the whole data in memory. When the dataset is huge, then memory requirements for indexing may exceed available memory. 
+Several ANN algorithms, such as [HNSW](http://arxiv.org/abs/1603.09320), [NSG](http://www.vldb.org/pvldb/vol12/p461-fu.pdf), and [DiskANN](https://dl.acm.org/doi/abs/10.5555/3454287.3455520), are available each with its own advantages, problems and trade-offs. One of the difficult problems in ANN algorithms is, that indexing and querying vectors may require storing the whole data in memory. When the dataset is huge, then memory requirements for indexing may exceed available memory. 
 
-_DiskANN_ algorithm tries to solve this problem by using disk as the main storage for indexes and to be able to perform queries directly on disk. _DiskANN_ paper acknowledges that _HNSW_ and _NSG_ can also achieve acceptable latencies when vectors are stored on disk. However, it argues that their latencies can be significantly higher compared to _DiskANN_, especially for large datasets and high recall requirements.
+_DiskANN_ algorithm tries to solve this problem by using disk as the main storage for indexes and for performing queries directly on disk. _DiskANN_ paper acknowledges that _HNSW_ and _NSG_ can also achieve acceptable latencies when vectors are stored on disk. However, it argues that their latencies can be significantly higher compared to _DiskANN_, especially for large datasets and high recall requirements.
 
 Even though _DiskANN_ has its advantages, it also requires more work to be practical. The main problem is that you can’t insert/update existing vectors in the index without rebuilding the whole index. To solve this problem, there is another _DiskANN_ paper: [FreshDiskANN](https://arxiv.org/abs/2105.09613). _FreshDiskANN_ improves _DiskANN_ by introducing a temporary index for the most recent data in memory. Queries are served from both the temporary index and also from the disk index. These temporary indexes are merged to the disk index when needed using the `StreamingMerge` algorithm described in the paper.
 
