@@ -7,7 +7,7 @@ export default function PricingTable() {
 
       {/* FREE */}
 
-      <div className="flex flex-col items-center gap-6 rounded-3xl bg-white/5 px-6 py-8">
+      <div className="flex flex-col items-center gap-6 rounded-3xl bg-white/5 px-4 py-8">
         <div className="grow">
           <h4 className="mb-2 text-xl font-semibold text-emerald-400">Free</h4>
 
@@ -17,20 +17,15 @@ export default function PricingTable() {
 
         <div className="grow">
           <div className="text-white/80">
-            Perfect for prototypes and hobby projects.
+            Perfect for prototypes and hobby projects
           </div>
         </div>
 
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
         <div>
-          <p className="text-white/40">Max Messages per Day</p>
-          <p className="font-semibold">500</p>
-        </div>
-
-        <div>
-          <p className="text-white/40">Max Requests per Second</p>
-          <p className="font-semibold">100</p>
+          <p className="text-white/40">Daily Query / Update Limit</p>
+          <p className="font-semibold">10K</p>
         </div>
 
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
@@ -56,26 +51,21 @@ export default function PricingTable() {
             Pay as you go
           </h4>
 
-          <h5 className="text-3xl font-semibold">$1</h5>
-          <p className="text-white/40">per 100K messages</p>
+          <h5 className="text-3xl font-semibold">$0.4</h5>
+          <p className="text-white/40">per 100K requests</p>
         </div>
 
         <div className="grow">
           <div className="text-white/80">
-            For use cases with bursting traffic.
+            For use cases with bursting traffic
           </div>
         </div>
 
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
         <div>
-          <p className="text-white/40">Max Messages per Day</p>
-          <p className="font-semibold">500,000</p>
-        </div>
-
-        <div>
-          <p className="text-white/40">Max Requests per Second</p>
-          <p className="font-semibold">100</p>
+          <p className="text-white/40">Daily Query / Update Limit</p>
+          <p className="font-semibold">Unlimited</p>
         </div>
 
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
@@ -93,38 +83,32 @@ export default function PricingTable() {
         </div>
       </div>
 
-      {/* ENTERPRISE */}
+      {/* FIXED */}
 
-      <div className="flex flex-col items-center gap-6 rounded-3xl bg-white/5 px-6 py-8">
+      <div className="flex flex-col items-center gap-6 rounded-3xl bg-white/5 px-4 py-8">
         <div>
-          <h4 className="mb-2 text-xl font-semibold text-emerald-400">Pro</h4>
+          <h4 className="mb-2 text-xl font-semibold text-emerald-400">Fixed</h4>
 
           <h5 className="flex items-baseline text-3xl font-semibold">
-            $180
+            $60
             <span className="ml-1 text-base font-normal opacity-40">
               / month
             </span>
           </h5>
-          <p className="text-white/40">Starting from</p>
+          <p className="text-white/40">-</p>
         </div>
 
         <div>
           <div className="text-white/80">
-            For businesses with consistent high-capacity loads and predictable
-            costs.
+            For consistent loads with predictable costs
           </div>
         </div>
 
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
         <div>
-          <p className="text-white/40">Max Messages per Day</p>
-          <p className="font-semibold">up to 100M</p>
-        </div>
-
-        <div>
-          <p className="text-white/40">Max Requests per Second</p>
-          <p className="font-semibold">Custom</p>
+          <p className="text-white/40">Daily Query / Update Limit</p>
+          <p className="font-semibold">1M</p>
         </div>
 
         <hr className="w-2/3 border-0 border-b border-b-white/5" />

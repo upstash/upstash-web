@@ -2,6 +2,7 @@ export enum Product {
   REDIS = "Redis",
   KAFKA = "Kafka",
   QSTASH = "QStash",
+  VECTOR = "Vector",
 }
 
 export enum CodeExample {
@@ -12,6 +13,8 @@ export enum CodeExample {
 export enum PricingPlans {
   Free = "free",
   PayAsYouGo = "payAsYouGo",
+  Fixed = "fixed",
+  Pro = "pro",
   Pro2K = "pro2k",
   Pro10K = "pro10k",
   Enterprise = "enterprise",

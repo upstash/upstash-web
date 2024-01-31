@@ -36,7 +36,7 @@ const AccordionTrigger = React.forwardRef(
     forwardedRef: React.ForwardedRef<any>,
   ) => {
     const { children, className } = props;
-    console.log(props);
+    // console.log(props);
 
     return (
       <Accordion.Header className="">

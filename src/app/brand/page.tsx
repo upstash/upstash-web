@@ -29,9 +29,9 @@ export default function HomePage() {
       {/* body */}
       <section>
         <Container className="max-w-screen-lg">
-          <div className="grid gap-6 md:grid-cols-3">
-            {/**/}
-            <LogoBox className="order-1 md:col-span-1">
+          <div className="grid gap-6 md:grid-cols-12">
+            {/*upstash-dark*/}
+            <LogoBox className="md:col-span-4">
               <img
                 src="logo/upstash-icon-dark-bg.svg"
                 alt="Upstash icon with dark background"
@@ -58,8 +58,8 @@ export default function HomePage() {
 `}
               />
             </LogoBox>
-            {/**/}
-            <LogoBox className="order-2 md:col-span-2">
+            {/*upstash-dark-logo*/}
+            <LogoBox className="md:col-span-8">
               <img
                 src="logo/upstash-dark-bg.svg"
                 alt="Upstash Logo with dark background"
@@ -86,8 +86,9 @@ export default function HomePage() {
 `}
               />
             </LogoBox>
-            {/**/}
-            <LogoBox className="order-4 bg-zinc-100 md:order-3 md:col-span-2">
+
+            {/*upstash-light*/}
+            <LogoBox className="bg-zinc-100 md:col-span-8">
               <img
                 src="logo/upstash-white-bg.svg"
                 alt="Upstash Logo with white background"
@@ -114,8 +115,8 @@ export default function HomePage() {
 `}
               />
             </LogoBox>
-            {/**/}
-            <LogoBox className="order-3 bg-zinc-100 md:order-4 md:col-span-1">
+            {/*upstash-light-logo*/}
+            <LogoBox className="bg-zinc-100 md:col-span-4">
               <img
                 src="logo/upstash-icon-white-bg.svg"
                 alt="Upstash icon with white background"
@@ -142,13 +143,19 @@ export default function HomePage() {
 `}
               />
             </LogoBox>
-            {/**/}
-            <LogoBox className="order-5 bg-[#00E9A3] md:col-span-3">
-              <span className="text-xl font-semibold text-black">#00E9A3</span>
-              <ActionButtons copyCode="#00E9A3" />
+            {/*light-color1*/}
+            <LogoBox className="bg-emerald-300 py-6 md:col-span-6">
+              <span className="font-semibold text-black">#6ee7b7</span>
+              <ActionButtons copyCode="#6ee7b7" />
             </LogoBox>
-            {/**/}
-            <LogoBox className="order-6">
+            {/*light-color2*/}
+            <LogoBox className="bg-emerald-500 py-6 md:col-span-6">
+              <span className="font-semibold text-black">#10b981</span>
+              <ActionButtons copyCode="#10b981" />
+            </LogoBox>
+
+            {/*redis*/}
+            <LogoBox className="md:col-span-6">
               <img
                 src="logo/redis-icon.svg"
                 alt="Upstash Redis icon"
@@ -169,8 +176,8 @@ export default function HomePage() {
 </svg>`}
               />
             </LogoBox>
-            {/**/}
-            <LogoBox className="order-6">
+            {/*kafka*/}
+            <LogoBox className="md:col-span-6">
               <img
                 src="logo/kafka-icon.svg"
                 alt="Upstash Kafka icon"
@@ -188,8 +195,37 @@ export default function HomePage() {
 </svg>`}
               />
             </LogoBox>
-            {/**/}
-            <LogoBox className="order-6">
+            {/*vector*/}
+            <LogoBox className="md:col-span-6">
+              <img
+                src="logo/vector-icon.svg"
+                alt="Upstash Vector icon"
+                className="h-12 md:h-16"
+              />
+              <ActionButtons
+                pngURL="logo/vector-icon.png"
+                svgURL="logo/vector-icon.svg"
+                copyCode={`<svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_62_2)">
+<path d="M28 0H8C3.58172 0 0 3.58172 0 8V28C0 32.4183 3.58172 36 8 36H28C32.4183 36 36 32.4183 36 28V8C36 3.58172 32.4183 0 28 0Z" fill="#EA580C"/>
+<path d="M18 5H8.3C6.47746 5 5 6.47746 5 8.3C5 10.1225 6.47746 11.6 8.3 11.6H18C19.8225 11.6 21.3 10.1225 21.3 8.3C21.3 6.47746 19.8225 5 18 5Z" fill="#FFF7ED"/>
+<path d="M31 8.3C31 6.47746 29.5225 5 27.7 5C25.8775 5 24.4 6.47746 24.4 8.3C24.4 10.1225 25.8775 11.6 27.7 11.6C29.5225 11.6 31 10.1225 31 8.3Z" fill="#FFF7ED"/>
+<path d="M11.6 18C11.6 16.1775 10.1225 14.7 8.3 14.7C6.47746 14.7 5 16.1775 5 18C5 19.8225 6.47746 21.3 8.3 21.3C10.1225 21.3 11.6 19.8225 11.6 18Z" fill="#FFF7ED"/>
+<path d="M27.7 14.7H18C16.1775 14.7 14.7 16.1775 14.7 18C14.7 19.8225 16.1775 21.3 18 21.3H27.7C29.5225 21.3 31 19.8225 31 18C31 16.1775 29.5225 14.7 27.7 14.7Z" fill="#FFF7ED"/>
+<path d="M17.5 24.75H7.8C5.97746 24.75 4.5 26.2275 4.5 28.05C4.5 29.8725 5.97746 31.35 7.8 31.35H17.5C19.3225 31.35 20.8 29.8725 20.8 28.05C20.8 26.2275 19.3225 24.75 17.5 24.75Z" fill="#FFF7ED"/>
+<path d="M31 27.7C31 25.8775 29.5225 24.4 27.7 24.4C25.8775 24.4 24.4 25.8775 24.4 27.7C24.4 29.5225 25.8775 31 27.7 31C29.5225 31 31 29.5225 31 27.7Z" fill="#FFF7ED"/>
+</g>
+<defs>
+<clipPath id="clip0_62_2">
+<rect width="36" height="36" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+`}
+              />
+            </LogoBox>
+            {/*qstash*/}
+            <LogoBox className="md:col-span-6">
               <img
                 src="logo/qstash-icon.svg"
                 alt="Upstash QStash icon"

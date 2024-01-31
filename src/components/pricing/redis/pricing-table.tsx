@@ -2,7 +2,7 @@ import Button from "@/components/button";
 
 export default function PricingTable() {
   return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-6 md:grid-cols-3">
       {/**/}
 
       {/* FREE */}
@@ -24,12 +24,12 @@ export default function PricingTable() {
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
         <div>
-          <p className="text-sm text-white/40">Max Commands Per Second</p>
+          <p className="text-white/40">Max Commands Per Second</p>
           <p className="font-semibold">1,000</p>
         </div>
 
         <div>
-          <p className="text-sm text-white/40">Daily Command Limit</p>
+          <p className="text-white/40">Daily Command Limit</p>
           <p className="font-semibold">10,000</p>
         </div>
 
@@ -69,12 +69,12 @@ export default function PricingTable() {
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
         <div>
-          <p className="text-sm text-white/40">Max Commands Per Second</p>
+          <p className="text-white/40">Max Commands Per Second</p>
           <p className="font-semibold">1,000</p>
         </div>
 
         <div>
-          <p className="text-sm text-white/40">Daily Command Limit</p>
+          <p className="text-white/40">Daily Command Limit</p>
           <p className="font-semibold">Unlimited</p>
         </div>
 
@@ -120,63 +120,12 @@ export default function PricingTable() {
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
         <div>
-          <p className="text-sm text-white/40">Max Commands Per Second</p>
+          <p className="text-white/40">Max Commands Per Second</p>
           <p className="font-semibold">2,000</p>
         </div>
 
         <div>
-          <p className="text-sm text-white/40">Daily Command Limit</p>
-          <p className="font-semibold">Unlimited</p>
-        </div>
-
-        <hr className="w-2/3 border-0 border-b border-b-white/5" />
-
-        <div>
-          <Button
-            target="_self"
-            type="button"
-            hideIcon
-            href="https://console.upstash.com"
-            className="bg-zinc-50 font-medium text-zinc-950"
-          >
-            Start Now
-          </Button>
-        </div>
-      </div>
-
-      {/* PRO 10K */}
-
-      <div className="flex flex-col items-center gap-6 rounded-3xl bg-white/5 px-4 py-8">
-        <div>
-          <h4 className="mb-2 text-xl font-semibold text-emerald-400">
-            Pro 10K
-          </h4>
-
-          <h5 className="flex items-baseline text-3xl font-semibold">
-            $680
-            <span className="ml-1 text-base font-normal opacity-40">
-              / month
-            </span>
-          </h5>
-          <p className="text-white/40">+$200 ✕ read region</p>
-        </div>
-
-        <div>
-          <div className="text-white/80">
-            For businesses with consistent high-capacity loads and predictable
-            costs.
-          </div>
-        </div>
-
-        <hr className="w-2/3 border-0 border-b border-b-white/5" />
-
-        <div>
-          <p className="text-sm text-white/40">Max Commands Per Second</p>
-          <p className="font-semibold">10,000</p>
-        </div>
-
-        <div>
-          <p className="text-sm text-white/40">Daily Command Limit</p>
+          <p className="text-white/40">Daily Command Limit</p>
           <p className="font-semibold">Unlimited</p>
         </div>
 

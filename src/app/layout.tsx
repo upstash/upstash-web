@@ -50,7 +50,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         "min-h-screen scroll-smooth bg-zinc-950 text-sm text-zinc-50 antialiased md:text-base",
       )}
     >
-      <body className="pt-20 md:pt-0">
+      <body className="pt-[70px] md:pt-[80px]">
         <Suspense>
           <Analytics />
         </Suspense>

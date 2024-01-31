@@ -24,7 +24,7 @@ export default function ServerlessKafka() {
       className="mdd:col-span-2 bg-blue-200/5"
     >
       <header>
-        <IconKafka className="mb-6" width={54} />
+        <IconKafka className="mb-4" width={40} />
         <ProductTitle>Serverless Kafka with no barriers</ProductTitle>
       </header>
 
@@ -40,17 +40,7 @@ export default function ServerlessKafka() {
         </ProductFeatureItem>
       </ProductFeature>
 
-      <div className="mt-auto grid gap-4">
-        <Button
-          href="https://github.com/upstash/examples/tree/main/examples"
-          className="hover:bg-blue-100 hover:text-blue-950"
-          type="button"
-          onClick={() => {
-            track("button.examples.kafka");
-          }}
-        >
-          View examples
-        </Button>
+      <div className="mt-auto grid gap-4 sm:grid-cols-2">
         <Button
           href="/docs/kafka"
           className="bg-blue-100 text-blue-950 hover:bg-blue-100 hover:text-blue-950"
@@ -60,6 +50,16 @@ export default function ServerlessKafka() {
           }}
         >
           Read the docs
+        </Button>
+        <Button
+          href="https://github.com/upstash/examples/tree/main/examples"
+          className="hover:bg-blue-100 hover:text-blue-950"
+          type="button"
+          onClick={() => {
+            track("button.examples.kafka");
+          }}
+        >
+          View examples
         </Button>
       </div>
     </ProductBox>
