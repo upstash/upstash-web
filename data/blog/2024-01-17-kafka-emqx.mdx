@@ -53,16 +53,17 @@ The construction of a connected car platform introduces distinct technical chall
 - **Connectors:** Via Kafka Sink Connectors, you can export your data into any other storage. Via Kafka Source Connectors, you can pull data to your Kafka topics from other systems. Examples of connectors available are MongoDB Source/Sink Connector, Debezium MongoDB Source Connector, Google BigQuery Sink Connector, and Snowflake Sink Connector.
 
 
-#### EMQX MQTT
+#### EMQX MQTT Platfom
+EMQX is a large-scale distributed MQTT messaging platform that offers unlimited connections, seamless integration, and anywhere deployment. It provides the following capabilities:
 - **Distributed MQTT Broker:** Construct a global MQTT access network spanning multiple clouds, facilitating communication among devices, systems, and apps from diverse network endpoints.
-- **Handle Millions of MQTT Messages:** Efficiently manage a high volume of MQTT messages per second by leveraging a broker cluster equipped with a high-performance, real-time processing engine.
+- **Effortless Scale** Connect hundreds of millions of IOT devices to the cloud seamlessly and reliably. It can efficiently manage a high volume of MQTT messages per second by leveraging a broker cluster equipped with a high-performance, real-time processing engine.
 - **Integration with Streaming Platforms:** Connect to popular streaming platforms such as Kafka/Confluent, Pulsar, and RabbitMQ, facilitating message routing between the MQTT broker and enterprise systems.
 
 ## Architecture and Data Flow
 
 The data flow for connected cars involves the seamless transfer of information between the cars and the backend systems. Here's a high-level overview of the data flow, incorporating EMQX, Upstash, Kafka, and other relevant IT systems:
 
-![enter image description here](https://svgshare.com/i/12Cn.svg)
+![enter image description here](https://svgshare.com/i/12Kc.svg)
 
 
 #### Data Generation at Connected Cars
