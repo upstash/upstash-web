@@ -213,7 +213,7 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 text-left font-normal text-white/60">
-            Max Vectors X Dimensions
+            Max Vectors x Dimensions
           </th>
           {/**/}
           <td
