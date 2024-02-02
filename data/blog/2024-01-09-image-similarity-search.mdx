@@ -1,34 +1,34 @@
 ---
 slug: image-similarity-search
-title: "Image Similarity Search with CLIP and Pinecone"
+title: "Image Similarity Search with CLIP and Upstash Vector"
 authors:
   - oguzhantasimaz
-tags: [pinecone, image, search, image embeddings, python, clip, vector database, similarity search]
+tags: [image, search, image embeddings, python, clip, vector database, similarity search, upstash vector]
 draft: true
 ---
 
-In this tutorial, we will explore how to build an image similarity search engine using [CLIP(Contrastive Language-Image Pretraining)](https://openai.com/blog/clip) and [Pinecone](https://www.pinecone.io/), a vector database for efficient similarity search. <br/>
+In this tutorial, we will explore how to build an image similarity search engine using [Upstash Vector](https://upstash.com/vector), a vector database for efficient similarity search and [CLIP(Contrastive Language-Image Pretraining)](https://openai.com/blog/clip) <br/>
 
 ## Introduction
 
-CLIP is a powerful neural network trained on a diverse set of (image, text) pairs, allowing it to understand and encode both visual and textual information. Pinecone, on the other hand, is a scalable vector database designed for storing and searching high-dimensional vectors efficiently. By combining CLIP's image embeddings with Pinecone's similarity search capabilities, we can create a robust image similarity search engine.
+CLIP is a powerful neural network trained on a diverse set of (image, text) pairs, allowing it to understand and encode both visual and textual information. Upstash Vector, on the other hand, is a scalable vector database designed for storing and searching high-dimensional vectors efficiently. By combining CLIP's image embeddings with Upstash Vector's similarity search capabilities, we can create a robust image similarity search engine.
 
 ## Prerequisites
 
 To follow this tutorial, you will need:
 
-- A [Pinecone](https://www.pinecone.io/) account. If you don't have one, you can [sign up for free](https://www.pinecone.io/start/).
+- A [Upstash](https://upstash.com/) account. If you don't have one, you can [sign up for free](https://console.upstash.com/login).
 - [Python](https://www.python.org/downloads/) 3.6 or higher
 - [PyTorch](https://pytorch.org/get-started/locally/) installed
 - [Pillow](https://pillow.readthedocs.io/en/stable/) installed
-- [Pinecone Python Module](https://docs.pinecone.io/docs/python-client) installed
+- [Upstash Python Module](https://py-code.org/projects/view?name=upstash-vector) installed
 - [Numpy](https://numpy.org/install/) installed
 - [Transformers](https://huggingface.co/transformers/installation.html) installed 
 
 You can install the required packages using the following command.
 
 ```bash 
-pip install torch pillow pinecone-client transformers numpy
+pip install torch pillow upstash_vector transformers numpy
 ```
 
 ## Getting Started
@@ -36,7 +36,7 @@ pip install torch pillow pinecone-client transformers numpy
 First, let's import the required libraries and initialize the CLIP model:
 
 ```python
-import pinecone
+import upstash_vector as uv
 import torch
 import numpy as np
 from PIL import Image
@@ -44,11 +44,10 @@ from transformers import CLIPModel
 import os
 from torchvision import transforms
 
-# Initialize Pinecone client
-pinecone.init(api_key="<your_api_key>", environment="<your_environment_name>")
-
-# Connect to your Pinecone index
-index = pinecone.Index("<your_index_name>")
+# Initialize Upstash Vector client
+upstash_url = os.environ.get('UPSTASH_URL')
+token = os.environ.get('UPSTASH_TOKEN')
+index = uv.Index(url=upstash_url, token=token)
 
 # Load the CLIP model
 model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
@@ -57,7 +56,7 @@ model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
 
 ## Image Embeddings and Indexing
 
-We'll define a function to transform images into embeddings using the CLIP model and then upsert these embeddings into the Pinecone index:
+We'll define a function to transform images into embeddings using the CLIP model and then upsert these embeddings into the Upstash Vector index:
 
 ```python
 # Define image preprocessing
@@ -76,18 +75,17 @@ def transform_image(image):
     embedding = features.squeeze().cpu().numpy()
     return embedding.astype(np.float32)
 
-# Upsert image embeddings into the Pinecone index
+# Upsert image embeddings into the Upstash Vector index
 image_dir = "./images"
 for filename in os.listdir(image_dir):
     if filename.endswith(".jpg"):
         image_path = os.path.join(image_dir, filename)
         image = Image.open(image_path)
-        embedding = transform_image(image)
+        embedding = transform_image(image).tolist()
 
         id = filename
 
-        vector = [{"values": embedding, "metadata": {}, "id": id }]
-        index.upsert(vector, namespace='ot')
+        index.upsert(vectors = [(id, embedding, {"metadata_field": "metadata_value"})])
 
         print(f"Upserted image {filename} with ID {filename}")
 ```
@@ -107,13 +105,13 @@ query_embedding = transform_image(query_image)  # Squeeze the tensor to remove b
 # The top_k parameter controls the number of results to retrieve
 top_k = 5
 query_vector = query_embedding.tolist()
-result = index.query(vector=query_vector, namespace='ot', top_k=top_k, include_metadata=True, include_values=True)
+result = index.query(vector=query_vector,  top_k=top_k, include_metadata=True)
 
 # Print results
 print(f"Query image: {query_image_path}")
 print(f"Top {top_k} results:")
 
-for i, res in enumerate(result.matches):
+for i, res in enumerate(result):
     print(f"Rank {i + 1}: ID={res.id}, score={res.score}")
 ```
 
@@ -130,8 +128,7 @@ Rank 5: ID=Two people.jpg, score=0.837375104
 
 ## Bonus
 
-You can fill the field to the Pinecone index to get more information about the images.
-Which is also useful for filtering the results. [More info](https://docs.pinecone.io/docs/metadata-filtering) <br/>
+You can fill the metadata field to the Upstash Vector index to get more information about the vectors. For example, you can store the image URLs in the metadata field and display the images in the search results. <br/>
 
 ## Full Codes
 
@@ -139,6 +136,6 @@ You can find the full code for this tutorial on [Github](https://github.com/oguz
 
 ## Conclusion
 
-In this tutorial, we have learned how to build an image similarity search engine using CLIP and Pinecone. By leveraging CLIP's powerful image embeddings and Pinecone's efficient similarity search capabilities, we can quickly find visually similar images based on a query image. <br/>
+In this tutorial, we have learned how to build an image similarity search engine using CLIP and Upstash Vector. By leveraging CLIP's powerful image embeddings and Upstash Vector's efficient similarity search capabilities, we can quickly find visually similar images based on a query image. <br/>
 
 If you have any questions or comments, feel free to reach out to me on **[GitHub](https://github.com/oguzhantasimaz)** or **[LinkedIn](https://www.linkedin.com/in/oguzhantasimaz/)**. <br/>
