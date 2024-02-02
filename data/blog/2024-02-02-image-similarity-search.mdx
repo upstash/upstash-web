@@ -1,0 +1,140 @@
+---
+slug: image-similarity-search
+title: "Image Similarity Search with CLIP and Upstash Vector"
+authors:
+  - oguzhantasimaz
+tags: [ python, clip, vector]
+---
+
+In this tutorial, we will explore how to build an image similarity search engine using [Upstash Vector](https://upstash.com/vector), a vector database for efficient similarity search and [CLIP(Contrastive Language-Image Pretraining)](https://openai.com/blog/clip) <br/>
+
+## Introduction
+
+CLIP is a powerful neural network trained on a diverse set of (image, text) pairs, allowing it to understand and encode both visual and textual information. Upstash Vector, on the other hand, is a scalable vector database designed for storing and searching high-dimensional vectors efficiently. By combining CLIP's image embeddings with Upstash Vector's similarity search capabilities, we can create a robust image similarity search engine.
+
+## Prerequisites
+
+To follow this tutorial, you will need:
+
+- A [Upstash](https://upstash.com/) account. If you don't have one, you can [sign up for free](https://console.upstash.com/login).
+- [Python](https://www.python.org/downloads/) 3.6 or higher
+- [PyTorch](https://pytorch.org/get-started/locally/) installed
+- [Pillow](https://pillow.readthedocs.io/en/stable/) installed
+- [Upstash Python Module](https://py-code.org/projects/view?name=upstash-vector) installed
+- [Numpy](https://numpy.org/install/) installed
+- [Transformers](https://huggingface.co/transformers/installation.html) installed 
+
+You can install the required packages using the following command.
+
+```bash 
+pip install torch pillow upstash_vector transformers numpy
+```
+
+## Getting Started
+
+First, let's import the required libraries and initialize the CLIP model:
+
+```python
+import upstash_vector as uv
+import torch
+import numpy as np
+from PIL import Image
+from transformers import CLIPModel
+import os
+from torchvision import transforms
+
+# Initialize Upstash Vector client
+upstash_url = os.environ.get('UPSTASH_URL')
+token = os.environ.get('UPSTASH_TOKEN')
+index = uv.Index(url=upstash_url, token=token)
+
+# Load the CLIP model
+model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
+
+```
+
+## Image Embeddings and Indexing
+
+We'll define a function to transform images into embeddings using the CLIP model and then upsert these embeddings into the Upstash Vector index:
+
+```python
+# Define image preprocessing
+preprocess = transforms.Compose([
+    transforms.Resize((224, 224)),
+    transforms.ToTensor(),
+    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+])
+
+# Define a function to transform an image into an embedding
+def transform_image(image):
+    image = preprocess(image)
+    image = image.unsqueeze(0)
+    with torch.no_grad():
+        features = model.get_image_features(pixel_values=image)
+    embedding = features.squeeze().cpu().numpy()
+    return embedding.astype(np.float32)
+
+# Upsert image embeddings into the Upstash Vector index
+image_dir = "./images"
+for filename in os.listdir(image_dir):
+    if filename.endswith(".jpg"):
+        image_path = os.path.join(image_dir, filename)
+        image = Image.open(image_path)
+        embedding = transform_image(image).tolist()
+
+        id = filename
+
+        index.upsert(vectors = [(id, embedding, {"metadata_field": "metadata_value"})])
+
+        print(f"Upserted image {filename} with ID {filename}")
+```
+
+## Image Similarity Search
+
+Once the images are indexed, we can perform similarity searches using a query image:
+
+```python
+# Define a function to query similar images
+query_image_path = "./query_image.jpg"
+
+# Preprocess query image
+query_image = Image.open(query_image_path)
+query_embedding = transform_image(query_image)  # Squeeze the tensor to remove batch dimension
+
+# The top_k parameter controls the number of results to retrieve
+top_k = 5
+query_vector = query_embedding.tolist()
+result = index.query(vector=query_vector,  top_k=top_k, include_metadata=True)
+
+# Print results
+print(f"Query image: {query_image_path}")
+print(f"Top {top_k} results:")
+
+for i, res in enumerate(result):
+    print(f"Rank {i + 1}: ID={res.id}, score={res.score}")
+```
+
+You should get a result similar to the following:
+
+```bash
+Top 5 results:
+Rank 1: ID=Shanghai skyline.jpg, score=0.902134657
+Rank 2: ID=Between Buildings.jpg, score=0.875016212
+Rank 3: ID=Airplane between.jpg, score=0.863566935
+Rank 4: ID=Building.jpg, score=0.838529587
+Rank 5: ID=Two people.jpg, score=0.837375104
+```
+
+## Bonus
+
+You can fill the metadata field to the Upstash Vector index to get more information about the vectors. For example, you can store the image URLs in the metadata field and display the images in the search results. <br/>
+
+## Full Codes
+
+You can find the full code for this tutorial on [Github](https://github.com/oguzhantasimaz/image-similarity-search). <br/>
+
+## Conclusion
+
+In this tutorial, we have learned how to build an image similarity search engine using CLIP and Upstash Vector. By leveraging CLIP's powerful image embeddings and Upstash Vector's efficient similarity search capabilities, we can quickly find visually similar images based on a query image. <br/>
+
+If you have any questions or comments, feel free to reach out to me on **[GitHub](https://github.com/oguzhantasimaz)**. <br/>
