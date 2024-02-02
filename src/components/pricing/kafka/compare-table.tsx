@@ -433,7 +433,17 @@ export default function CompareTable() {
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0"
           >
-            <CompareValue type="size" suffix="TB">
+            <CompareValue type="size" suffix="TB" className="border-b-0"
+              after={
+                <Tooltip content="Free up to 1TB per month. Beyond that, $0.1 per GB.">
+                  <IconInfoCircle
+                    className="ml-1 opacity-60"
+                    stroke={1.2}
+                    aria-label="Info"
+                  />
+                </Tooltip>
+              }
+            >
               1
             </CompareValue>
           </td>
@@ -441,7 +451,17 @@ export default function CompareTable() {
             hidden={isMobile ? !showPro2 : false}
             className="bg-white/3 px-4 py-0"
           >
-            <CompareValue type="size" suffix="TB">
+            <CompareValue type="size" suffix="TB" className="border-b-0"
+              after={
+                <Tooltip content="Upon hitting this limit, we'll prompt you to upgrade without stopping your traffic.">
+                  <IconInfoCircle
+                    className="ml-1 opacity-60"
+                    stroke={1.2}
+                    aria-label="Info"
+                  />
+                </Tooltip>
+              }
+            >
               50
             </CompareValue>
           </td>
@@ -449,7 +469,17 @@ export default function CompareTable() {
             hidden={isMobile ? !showPro10 : false}
             className="bg-white/3 px-4 py-0"
           >
-            <CompareValue type="size" suffix="TB">
+            <CompareValue type="size" suffix="TB" className="border-b-0"
+              after={
+                <Tooltip content="Upon hitting this limit, we'll prompt you to upgrade without stopping your traffic.">
+                  <IconInfoCircle
+                    className="ml-1 opacity-60"
+                    stroke={1.2}
+                    aria-label="Info"
+                  />
+                </Tooltip>
+              }
+            >
               100
             </CompareValue>
           </td>
@@ -1073,7 +1103,7 @@ export default function CompareTable() {
           >
             <CompareValue
               after={
-                <Tooltip content="Free up to 200GB per month. Beyond that, $0.1 per GB.">
+                <Tooltip content="Free up to 1TB per month. Beyond that, $0.1 per GB.">
                   <IconInfoCircle
                     className="ml-1 opacity-60"
                     stroke={1.2}
