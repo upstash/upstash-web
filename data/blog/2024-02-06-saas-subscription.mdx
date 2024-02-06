@@ -1,0 +1,251 @@
+---
+slug: saas-subscription
+title: "Adding a Saas Subscription Feature to a NextJS & Prisma Application with QStash,"
+authors:
+  - brighton
+tags: [NextJS, qstash, prisma]
+---
+
+The most common business model in building a Saas is a subscription model where users pay a certain fee to use your service in a specified time interval. In this article, we will go through the process of adding a subscription service to a NextJS project and the best practices to follow once going into production.
+
+Our Saas will be helping our users to get a daily dose of motivation quotes every morning on their email at a fee of say, $1 per month.
+
+To create your project, paste this command on your terminal and choose Prisma as your ORM; you can opt-out of the rest of the tools. In case you're not familiar with create-t3-app, it is one of the easiest ways to start a nextJS app and add tools like Drizzle, Prisma, trpc, and tailwind. I will be using the Pages router in this article.
+
+```
+pnpm create t3-app@latest
+```
+
+## Data Modelling
+
+A good data modeling will make your application grow easier and managing your database even more seamless.
+Let's start by first adding the data modelling for our quotes to be sent to our users. Open the schema.prisma
+file located in your prisma directory and add the following. I will be using postgres but implementation in other
+databases will be fairly the same.
+
+```title:"schema.prisma"
+model Quotes {
+   name String
+   id   Int    @id @default(autoincrement())
+   body String
+}
+
+model Users {
+   name          String
+   email         String @unique
+   id            Int    @id @default(autoincrement())
+   payments      Payments[]
+   subscriptions Subscriptions[]
+}
+```
+
+On our users' side, we are recording their name, email, every payment they have ever paid, and their subscription status.
+Let's go ahead and add the last two
+
+```title:"schema.prisma"
+model Payments {
+    id        Int    @id @default(autoincrement())
+    userId    Int
+    amount    Float
+    createdAt String
+    User      Users  @relation(fields: [userId], references: [id])
+}
+
+model Subscriptions {
+    id              Int     @id @default(autoincrement())
+    userId          Int     @unique
+    expiryDate      String
+    subsribed       Boolean @default(false)
+    daysWithService Int     @default(0)
+    User            Users   @relation(fields: [userId], references: [id])
+}
+```
+
+We are recording the payment details that we get from our payment provider to track when a
+particular user paid for a service in case they ask for a refund or whatnot. The subscription table
+is where we will check whether this user is currently subscribed to our service. The `daysWithService` column
+is what we will be using to count how many days (or any time interval) this user has used our service.
+
+To deploy your database, you must configure your database URL depending on where you host your database.
+I won't go into the details of hosting your database in this article.
+
+## Recording Payments Details
+
+For us to be able to receive money from our users, we need to set up our payment provider.
+There are different options depending on your location. If you're in US, UK, or Canada you can
+go ahead with Stripe, as it is fairly easy to integrate with different components and setting up
+webhooks is relatively easy. If you're in Africa I would recommend choosing DPO Payments as it is available
+in many countries as compared to Flutterwave and other providers. The choice you make here depends on your
+business requirements and where you are located.
+
+All providers will allow you to configure a webhook that they can ping every time someone makes a payment
+to your account, so go ahead and implement that. Let's say your webhook URL is `https://www/yourDomain.com/api/payments`,
+go ahead and create a `payment.ts` file at the API directory of your application.
+
+```typescript title:"/api/payment.ts"
+import { type NextApiRequest, type NextApiResponse } from "next";
+
+function addMonth(dateObj: Date, num: number) {
+  dateObj.setMonth(dateObj.getMonth() + num);
+  const dateString = dateObj?.toISOString()?.split("T")[0];
+  if (dateString) {
+    return dateString.replace(/-/g, "/");
+  }
+  return "";
+}
+
+export default async function postRequest(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
+  if (req.method === "POST") {
+    const data = req.body;
+
+    try {
+      // find the userId
+      const userId = await prisma.users
+        .findUnique({
+          where: {
+            email: data.email,
+          },
+        })
+        .then((user) => {
+          return user?.id as number;
+        });
+
+      // use the userId to insert it on the payments table
+      const date = new Date()
+        ?.toISOString()
+        ?.split("T")[0]
+        ?.replaceAll("-", "/") as string;
+      if (userId) {
+        const newPayment = await prisma.payments.create({
+          data: {
+            userId: userId,
+            amount: parseFloat(data.TransactionAmount),
+            createdAt: date,
+          },
+        });
+
+        // record the Subscription table
+        // HANDLE WHEN A USER MAKES 2 PAYMENTS IN A ROW
+        const nextMonth: string = addMonth(new Date(), 1);
+
+        // check if the farmer is there in subscription table
+        const subscribedUser = await prisma.subscriptions.findUnique({
+          where: {
+            userId: userId,
+          },
+        });
+
+        if (subscribedUser) {
+          const updatedSubscription = await prisma.subscriptions.update({
+            where: {
+              userId: userId,
+            },
+            data: {
+              expiryDate: nextMonth,
+              subsribed: true,
+              daysWithService: subscribedUser.daysWithService + 31,
+            },
+          });
+        } else {
+          const newSubscription = await prisma.subscriptions.create({
+            data: {
+              expiryDate: nextMonth,
+              userId,
+              subsribed: true,
+              daysWithService: 31,
+            },
+          });
+        }
+      } else {
+        // probably the userId wasnt found and we can just record the number on the users table
+        const newUser = await prisma.users.create({
+          data: {
+            email: data?.email,
+            name: data?.CustomerName,
+          },
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
+    // make sure to send a respond back according to your payment provider
+  }
+}
+```
+
+What we did here is we took the response we got back from our payment provider, extracted the userId
+from the email that we got back and recorded the payments in our table as well as doing the subscription
+logic in our table. We also handled the case where the user has made multiple payments in a row on how it will
+affect the subscription. We also add daysWithService table as 31 meaning this user is subscribed to the service
+for the next month. Ensure you check what data shape your payment provider returns and adjust the above code accordingly.
+
+## Adding CRON Jobs with Upstash
+
+The last piece of the puzzle is adding CRON jobs to our saas. The main point of adding the CRON
+jobs is to unsubscribe the user from getting our service once the subscription ends.
+
+To achieve this, we will be using upstash Qstash Service. Go ahead and create an account and head over
+to Qstash in your dashboard. You will be prompted with UI to publish your messages.
+On the Endpoint section, add your URL `https://www/yourDomain.com/api/updateSubscription`, type Choose Once and specify every midnight, and click schedule. This will hit your specified endpoint every midnight and allow us to trigger a database update.
+
+Go ahead and create a `updateSubscription.ts` file at the API folder.
+
+```javascript title:"/api/updateSubscription.ts"
+import { type NextApiRequest, type NextApiResponse } from "next";
+
+export default async function updatedSubscription(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
+  try {
+    //go through the subscribers table and check if the subscription is still active
+    //if it is not active, update the subscription status to false
+    const currentSubscribers = await prisma.subscriptions.findMany({});
+
+    //update where the daysWithService == 0 and cancels the days of Subscription
+    const subscribers = await prisma.subscriptions.updateMany({
+      where: {
+        daysWithService: {
+          equals: 0,
+        },
+      },
+      data: {
+        subsribed: false,
+        daysWithService: 0,
+      },
+    });
+
+    // if the daysOfService is not 0 then reduce the daysWithService by 1
+    const updatingDays = currentSubscribers.forEach(async (sub) => {
+      const { subsribed, daysWithService } = sub;
+      if (subsribed && daysWithService > 0) {
+        await prisma.subscriptions.update({
+          where: {
+            id: sub.id,
+          },
+          data: {
+            daysWithService: (sub.daysWithService -= 1),
+          },
+        });
+      }
+    });
+
+    res.status(200).json({ message: "Message Received" });
+  } catch (cause) {
+    res.status(500).json({ message: "Failed to send the message" });
+    console.log(cause);
+  }
+}
+```
+
+Here, we go and update our subscription table according to the remaining days of service.
+If the daysOfService is less than or equal to zero, we set isSubscribed field to false meaning
+the user subscription has expired, otherwise we reduce the daysOfService by 1.
+
+And those are all the pieces required to add a subscription service to a saas.
+
+Hope you enjoyed it.
