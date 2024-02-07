@@ -303,5 +303,11 @@ export const authors: Record<string,
         title: "Software Engineer",
         url: "https://oguzhantasimaz.com",
         image: "oguzhantasimaz.png",
+    },
+    bcelik: {
+        name: "Batuhan Celik",
+        title: "Software Developer (Guest Author)",
+        url: "https://https://github.com/mbatuhancelik",
+        image: "bcelik.jpeg",
     }
 };
