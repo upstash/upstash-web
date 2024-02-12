@@ -80,20 +80,6 @@ It is very easy, isn’t it?
 
 ### Creating Upstash Kafka Connector
 
-Before creating connector, we need to set “postgres” user as Super User, since Debezium needs that for our use case.
-
-To do this, we need to go to the SQL Editor in right bar and create new query. In this tool, we need to run following command:
-
-```sql
-ALTER USER postgres WITH SUPERUSER;
-```
-
-After running this, we should see the output:
-
-```
-“Success. No rows returned.”
-```
-
 Now, we need to go back to Upstash [console](https://console.upstash.com/kafka) and open connectors tab in our kafka cluster.
 
 When we click to new connector button, we can see connector options. We will select Debezium Source PostgreSQL Connector since Supabase is PostgreSQL database.
