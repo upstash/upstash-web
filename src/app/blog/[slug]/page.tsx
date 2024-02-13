@@ -34,13 +34,17 @@ export default async function BlogPage({ params }: Props) {
   const indexOfPost = allPosts.findIndex((post) => post.slug === slug);
   const post = allPosts[indexOfPost];
 
+  const dateString = post.date;
+
+  const isoDatePublished = new Date(dateString).toISOString()
+
   const jsonLdData = {
     blogName: post.title,
     blogDescription: post.description || "Articles and tutorials on serverless technologies from Upstash and community",
     keywords: post.tags,
     authorName: post.authorsData[0].name,
     authorUrl: post.authorsData[0].twitter,
-    datePublished: post.date,
+    datePublished: isoDatePublished,
   }
 
   if (!post) {
