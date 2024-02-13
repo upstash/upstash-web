@@ -43,7 +43,7 @@ export default async function BlogPage({ params }: Props) {
     blogDescription: post.description || "Articles and tutorials on serverless technologies from Upstash and community",
     keywords: post.tags,
     authorName: post.authorsData[0].name,
-    authorUrl: post.authorsData[0].twitter,
+    authorUrl: post.authorsData[0].url,
     datePublished: isoDatePublished,
   }
 
