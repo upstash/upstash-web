@@ -9,8 +9,8 @@
     "lint": "next lint",
     "lint-fix": "next lint --fix",
     "fmt": "prettier . --write && yarn biome check .",
-    "postbuild": "pnpm run sitemap",
-    "sitemap": "next-sitemap --quiet"
+    "postbuild": "pnpm --quiet run sitemap",
+    "sitemap": "next-sitemap "
   },
   "dependencies": {
     "@radix-ui/react-navigation-menu": "^1.1.4",
