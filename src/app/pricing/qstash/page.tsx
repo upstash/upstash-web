@@ -1,5 +1,7 @@
 "use client";
 
+import { generateFaqSchema } from "@/utils/structured-schema-generators";
+
 import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
@@ -9,9 +11,19 @@ import CompareTable from "@/components/pricing/qstash/compare-table";
 import FAQ from "@/components/pricing/qstash/faq";
 import PricingTable from "@/components/pricing/qstash/pricing-table";
 
+import QStashFaqJson from "../../../../public/faq/qstash.json";
+
 export default function PricingQStashPage() {
+  const structuredFaqSchema = generateFaqSchema(QStashFaqJson);
+
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: structuredFaqSchema,
+        }}
+      />
       <ProductToggle product={"/qstash"} />
 
       <div className="mt-16 md:mt-20">

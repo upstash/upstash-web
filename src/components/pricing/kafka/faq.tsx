@@ -39,7 +39,7 @@ export default function FAQ() {
           Are all Kafka operations counted in billing?
         </AccordionTrigger>
         <AccordionContent>
-          consume operations with no response are not counted..
+          Consume operations with no response are not counted.
         </AccordionContent>
       </AccordionItem>
 

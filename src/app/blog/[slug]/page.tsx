@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { generateBlogSchema } from "@/utils/structured-schema-generators";
 import { getTableOfContents } from "@/utils/toc";
 import type { Post } from "contentlayer/generated";
 import { allPosts } from "contentlayer/generated";
@@ -36,16 +37,18 @@ export default async function BlogPage({ params }: Props) {
 
   const dateString = post.date;
 
-  const isoDatePublished = new Date(dateString).toISOString()
+  const isoDatePublished = new Date(dateString).toISOString();
 
-  const jsonLdData = {
+  const structuredBlogSchema = generateBlogSchema({
     blogName: post.title,
-    blogDescription: post.description || "Articles and tutorials on serverless technologies from Upstash and community",
+    blogDescription:
+      post.description ||
+      "Articles and tutorials on serverless technologies from Upstash and community",
     keywords: post.tags,
     authorName: post.authorsData[0].name,
     authorUrl: post.authorsData[0].url,
     datePublished: isoDatePublished,
-  }
+  });
 
   if (!post) {
     notFound();
@@ -57,11 +60,14 @@ export default async function BlogPage({ params }: Props) {
   const prevPost =
     indexOfPost < allPosts.length - 1 ? allPosts[indexOfPost + 1] : undefined;
 
- 
-
   return (
     <main className="relative z-0">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(generateJsonLd(jsonLdData))}}/>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: structuredBlogSchema,
+        }}
+      />
       <Bg />
 
       <article>
@@ -83,7 +89,7 @@ export default async function BlogPage({ params }: Props) {
             <PostTags post={post} />
 
             {/* Other Post */}
-            <div className="grid gap-4 mt-10 md:grid-cols-2 md:gap-8">
+            <div className="mt-10 grid gap-4 md:grid-cols-2 md:gap-8">
               <OtherPostCard post={nextPost} align="left" />
               <OtherPostCard post={prevPost} align="right" />
             </div>
@@ -103,8 +109,7 @@ export async function generateMetadata({
   params: Props["params"];
 }) {
   const post = allPosts.find((post: Post) => post.slug === params.slug) as Post;
-  if (!post)
-    notFound()
+  if (!post) notFound();
   const title = post.title;
   const description =
     post.description ||
@@ -131,32 +136,41 @@ export async function generateMetadata({
   };
 }
 
-const generateJsonLd = ({blogName, blogDescription, keywords, authorName, authorUrl, datePublished}: {
+const generateJsonLd = ({
+  blogName,
+  blogDescription,
+  keywords,
+  authorName,
+  authorUrl,
+  datePublished,
+}: {
   blogName: string;
   blogDescription: string;
   keywords: string[];
   authorName: string;
   authorUrl: string;
   datePublished: string;
-})=>{
+}) => {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
-    "headline": blogName,
-    "description": blogDescription,
-    "keywords": keywords.join(" "),
-    "image": [
+    headline: blogName,
+    description: blogDescription,
+    keywords: keywords.join(" "),
+    image: [
       "https://example.com/photos/1x1/photo.jpg",
       "https://example.com/photos/4x3/photo.jpg",
-      "https://example.com/photos/16x9/photo.jpg"
-     ],
-    "datePublished": datePublished,
-    "author": [{
+      "https://example.com/photos/16x9/photo.jpg",
+    ],
+    datePublished: datePublished,
+    author: [
+      {
         "@type": "Person",
-        "name": authorName,
-        "url": authorUrl
-      }]
-  }
+        name: authorName,
+        url: authorUrl,
+      },
+    ],
+  };
 
-  return jsonLd
-}
+  return jsonLd;
+};

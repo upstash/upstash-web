@@ -1,0 +1,12 @@
+{
+  "faq": [
+    {
+      "question": "How are the messages priced? Are retries free?",
+      "answer": "The only thing you are charged for are messages whereas retries are free. Below are some message examples: Publish to single API endpoint. Here you would be charged for 1 message."
+    },
+    {
+      "question": "What happens when we hit daily max messages limit?",
+      "answer": "QStash API starts to return exceptions."
+    }
+  ]
+}

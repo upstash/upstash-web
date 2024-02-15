@@ -1,5 +1,7 @@
 "use client";
 
+import { generateFaqSchema } from "@/utils/structured-schema-generators";
+
 import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
@@ -9,9 +11,19 @@ import CompareTable from "@/components/pricing/redis/compare-table";
 import FAQ from "@/components/pricing/redis/faq";
 import PricingTable from "@/components/pricing/redis/pricing-table";
 
+import RedisFaqJson from "../../../public/faq/redis.json";
+
 export default function PricingRedisPage() {
+  const structuredFaqSchema = generateFaqSchema(RedisFaqJson);
+
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: structuredFaqSchema,
+        }}
+      />
       <ProductToggle product={"/"} />
 
       <div className="mt-16 md:mt-20">
