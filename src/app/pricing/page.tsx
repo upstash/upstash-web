@@ -11,7 +11,7 @@ import CompareTable from "@/components/pricing/redis/compare-table";
 import FAQ from "@/components/pricing/redis/faq";
 import PricingTable from "@/components/pricing/redis/pricing-table";
 
-import RedisFaqJson from "../../../public/faq/redis.json";
+import RedisFaqJson from "@/../public/faq/redis.json";
 
 export default function PricingRedisPage() {
   const structuredFaqSchema = generateFaqSchema(RedisFaqJson);

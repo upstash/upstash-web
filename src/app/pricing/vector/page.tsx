@@ -1,5 +1,6 @@
 "use client";
 
+import VectorFaqJson from "@/../public/faq/vector.json";
 import { generateFaqSchema } from "@/utils/structured-schema-generators";
 
 import PageHeaderDesc from "@/components/page-header-desc";
@@ -8,8 +9,6 @@ import ProductToggle from "@/components/pricing/product-toggle";
 import CompareTable from "@/components/pricing/vector/compare-table";
 import Enterprise from "@/components/pricing/vector/enterprise";
 import PricingTable from "@/components/pricing/vector/pricing-table";
-
-import VectorFaqJson from "../../../../public/faq/vector.json";
 
 export default function PricingVectorPage() {
   const structuredFaqSchema = generateFaqSchema(VectorFaqJson);

@@ -1,5 +1,6 @@
 "use client";
 
+import KafkaFaqJson from "@/../public/faq/kafka.json";
 import { generateFaqSchema } from "@/utils/structured-schema-generators";
 
 import Container from "@/components/container";
@@ -10,8 +11,6 @@ import CompareTable from "@/components/pricing/kafka/compare-table";
 import FAQ from "@/components/pricing/kafka/faq";
 import PricingTable from "@/components/pricing/kafka/pricing-table";
 import ProductToggle from "@/components/pricing/product-toggle";
-
-import KafkaFaqJson from "../../../../public/faq/kafka.json";
 
 export default function PricingKafkaPage() {
   const structuredFaqSchema = generateFaqSchema(KafkaFaqJson);
