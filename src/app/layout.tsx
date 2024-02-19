@@ -88,41 +88,46 @@ const title = "Upstash: Serverless Data Platform";
 const description =
   "Designed for the serverless with per-request pricing and Redis®/Kafka® API.";
 
-export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
-  title: {
-    default: title,
-    template: `%s | Upstash`,
-  },
-  description,
-  keywords: [
-    "redis",
-    "kafka",
-    "qstash",
-    "serverless database",
-    "global database",
-    "serverless kafka",
-  ],
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: "/",
-    title,
+  export async function generateMetadata () {
+  return {
+    metadataBase: new URL(SITE_URL),
+    title: {
+      default: title,
+      template: `%s | Upstash`,
+    },
     description,
-    siteName: title,
-    images: "/og-home.jpg",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title,
-    description,
-    site: "@upstash",
-    creator: "@upstash",
-    images: "/og-home.jpg",
-  },
-  icons: {
-    icon: "/icons/favicon-32x32.png",
-    apple: "/icons/apple-touch-icon.png",
-  },
-  manifest: `${SITE_URL}/site.webmanifest`,
-};
+    keywords: [
+      "redis",
+      "kafka",
+      "qstash",
+      "serverless database",
+      "global database",
+      "serverless kafka",
+    ],
+    openGraph: {
+      type: "website",
+      locale: "en_US",
+      url: "/",
+      title,
+      description,
+      siteName: title,
+      images: "/og-home.jpg",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      site: "@upstash",
+      creator: "@upstash",
+      images: "/og-home.jpg",
+    },
+    icons: {
+      icon: "/icons/favicon-32x32.png",
+      apple: "/icons/apple-touch-icon.png",
+    },
+    manifest: `${SITE_URL}/site.webmanifest`,
+    alternates: {
+      canonical: './',
+    }
+  };
+}

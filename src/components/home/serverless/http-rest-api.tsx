@@ -39,7 +39,7 @@ export default function HttpRestApi() {
               <label
                 key={key}
                 className={cx(
-                  "select-none bg-white bg-opacity-3 px-4 py-1 text-sm first:rounded-l-full last:rounded-r-full",
+                  "cursor-pointer select-none bg-white bg-opacity-3 px-4 py-1 text-sm first:rounded-l-full last:rounded-r-full",
                   value === product && "bg-opacity-10",
                 )}
               >
@@ -60,7 +60,7 @@ export default function HttpRestApi() {
 
         {/* body */}
         <div className="mt-4 grid rounded-xl bg-black/20 md:h-[276px]">
-          <div className="overflow-y-scroll p-4 md:px-6">
+          <div className="no-scrollbar overflow-y-scroll p-4 md:px-6">
             <Pre hidden={product !== Product.REDIS}>
               <code className="lang-js">{CODE[Product.REDIS]}</code>
             </Pre>
@@ -88,7 +88,7 @@ function Pre({
 }) {
   return (
     <pre
-      className="!m-0 !bg-transparent !p-0 !font-[inherit] !text-sm"
+      className="no-scrollbar !m-0 !bg-transparent !p-0 !font-[inherit] !text-sm"
       {...props}
     >
       {children}

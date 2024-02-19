@@ -15,7 +15,7 @@ Rate limiting is a crucial mechanism used by developers to control the number of
 
 Before starting to code, we must create a database on [Upstash](https://console.upstash.com/login) and install the rate limiting library. To install the library, open your library and enter this command:
 
- `pip install upstash-rate limit`
+ `pip install upstash-ratelimit`
 
 Once you successfully created your database on Upstash and installed the library, you can proceed to the coding part.
 
@@ -233,7 +233,7 @@ Disadvantages:
 
 ## Final Remarks
 
-This project makes use of Poetry, a handy tool for organizing and managing dependencies. Before testing your application, make sure you can create a Poetry shell with all the required dependencies. Also, for the features we've discussed to work smoothly, your database needs to be hosted on Upstash.To run all tests, activate the Poetry virtual environment with the required dependencies. Set the environment variables UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN, then execute the following command:
+This project makes use of Poetry, a handy tool for organizing and managing dependencies. Before testing your application, make sure you can create a Poetry shell with all the required dependencies. Also, for the features we've discussed to work smoothly, your database needs to be hosted on Upstash.To run all tests, activate the Poetry virtual environment with the required dependencies. Set the environment variables `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`, then execute the following command:
 
 `poetry run pytest`
 
