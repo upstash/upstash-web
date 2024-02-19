@@ -304,6 +304,12 @@ export const authors: Record<string,
         url: "https://oguzhantasimaz.com",
         image: "oguzhantasimaz.png",
     },
+    brighton: {
+        name: "Brighton Mboya",
+        title: "Software Engineer (Guest Author)",
+        url: "https://twitter.com/brightonmboya",
+        image: "brighton.jpg",
+  },
     bcelik: {
         name: "Batuhan Celik",
         title: "Software Developer (Guest Author)",
@@ -311,3 +317,5 @@ export const authors: Record<string,
         image: "bcelik.jpeg",
     }
 };
+
+
