@@ -1,5 +1,8 @@
 "use client";
 
+import KafkaFaqJson from "@/../public/faq/kafka.json";
+import { generateFaqSchema } from "@/utils/structured-schema-generators";
+
 import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
@@ -10,8 +13,16 @@ import PricingTable from "@/components/pricing/kafka/pricing-table";
 import ProductToggle from "@/components/pricing/product-toggle";
 
 export default function PricingKafkaPage() {
+  const structuredFaqSchema = generateFaqSchema(KafkaFaqJson);
+
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: structuredFaqSchema,
+        }}
+      />
       <ProductToggle product={"/kafka"} />
 
       <div className="mt-16 md:mt-20">

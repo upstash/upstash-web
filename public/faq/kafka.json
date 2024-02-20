@@ -1,0 +1,45 @@
+{
+  "faq": [
+    {
+      "question": "How can I upgrade to pay as you go from free tier?",
+      "answer": "Once you enter your credit card , your cluster will be upgraded to the pay-as-you-go plan and limits will be updated."
+    },
+    {
+      "question": "How does the budget work?",
+      "answer": "With the Pay As you go plan, you can set a maximum monthly budget for your database so that you won't be charged beyond this chosen limit.We'll keep you informed by sending email notifications once you reach70% and 90% of your monthly budget. This notifications will leteither adjust your budget limit or upgrade to the Pro tier. Note thatif your usage exceeds your monthly budget cap, your database will berate limited and your cost will not exceed your chosen budget limit."
+    },
+    {
+      "question": "Are all Kafka operations counted in billing?",
+      "answer": "Consume operations with no response are not counted."
+    },
+    {
+      "question": "How is the storage cost calculated?",
+      "answer": "The storage cost is charged at a rate of $0.25 per GB total storage.\n\t  Total storage is determined by adding up the storage at all replicas.\n\t  Even if you do not access your data, we have to keep it persistent in\n\t  Cloud Provider’s block storage (eg AWS EBS, S3) for durability. To\n\t  calculate the total storage cost, we take daily average of your data\n\t  size and multiply with $0.25 at the end of the month. For instance, if\n\t  you have 1 GB data in your cluster throughout month, you will pay\n\t  $0.25. If you are using your cluster as a cache; then it is a good\n\t  practice to set a timeout (EXPIRE) for your keys to minimize the cost."
+    },
+
+    {
+      "question": "Are there free trials?",
+      "answer": "Yes, we can provide free trials for Pro and Enterprise plans for testing and PoC purposes. Email us at sales@upstash.com"
+    },
+    {
+      "question": "How many clusters can I create?",
+      "answer": "You can create up to 10 clusters for free and beyond this you will be charged $0.5 per clusters up to 100 clusters."
+    },
+    {
+      "question": "How much is the price for bandwidth?",
+      "answer": "For pay is you go plan, it is free up to monthly bandwidth limit of 200GB. Beyond that, we charge $0.1 for each additional GB data transfer. For Pro and Enterprise plans, it is charged at a rate of $0.1 per GB out and $0.05 per GB in for all the usage throughout the month. For use cases with high volume, you may consider VPC Peering which minimizes the data transfer cost. Contact us at support@upstash.com for details. Price can change depending on cloud provider's fee for the incoming traffic."
+    },
+    {
+      "question": "Is there a contract requirement for Pro Plans?",
+      "answer": "There is no requirement for long-term contracts as the minimum term is just one month, and you have the flexibility to cancel anytime. But note that even if you cancel within the month, you will be billed for the minimum term of 1 full month."
+    },
+    {
+      "question": "How is the Enterprise plan priced?",
+      "answer": "In Enterprise plans, a custom price is set based on specific requirements of the customer. For more information email us at sales@upstash.com"
+    },
+    {
+      "question": "How is the Professional Support priced?",
+      "answer": "Professional support includes a dedicated service desk along and a Slack/Discord channel with a committed response time SLA. It is $1600 per year + 10% of your monthly bill. Check https://upstash.com/docs/common/help/prosupport for details."
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { generateBlogSchema } from "@/utils/structured-schema-generators";
 import { getTableOfContents } from "@/utils/toc";
 import type { Post } from "contentlayer/generated";
 import { allPosts } from "contentlayer/generated";
@@ -34,6 +35,21 @@ export default async function BlogPage({ params }: Props) {
   const indexOfPost = allPosts.findIndex((post) => post.slug === slug);
   const post = allPosts[indexOfPost];
 
+  const dateString = post.date;
+
+  const isoDatePublished = new Date(dateString).toISOString();
+
+  const structuredBlogSchema = generateBlogSchema({
+    blogName: post.title,
+    blogDescription:
+      post.description ||
+      "Articles and tutorials on serverless technologies from Upstash and community",
+    keywords: post.tags,
+    authorName: post.authorsData[0].name,
+    authorUrl: post.authorsData[0].url,
+    datePublished: isoDatePublished,
+  });
+
   if (!post) {
     notFound();
   }
@@ -46,6 +62,12 @@ export default async function BlogPage({ params }: Props) {
 
   return (
     <main className="relative z-0">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: structuredBlogSchema,
+        }}
+      />
       <Bg />
 
       <article>
@@ -87,8 +109,7 @@ export async function generateMetadata({
   params: Props["params"];
 }) {
   const post = allPosts.find((post: Post) => post.slug === params.slug) as Post;
-  if (!post)
-    notFound()
+  if (!post) notFound();
   const title = post.title;
   const description =
     post.description ||
