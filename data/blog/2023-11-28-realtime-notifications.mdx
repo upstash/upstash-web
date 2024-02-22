@@ -66,10 +66,12 @@ It should look something like this:
 # Obtained from the steps as above
 
 # Upstash Redis Secrets
-UPSTASH_REDIS_URL="redis://default:...@...-...-...-....upstash.io:..."
+UPSTASH_REDIS_URL="rediss://default:...@...-...-...-....upstash.io:..."
 UPSTASH_REDIS_REST_URL="https://...-...-...-....upstash.io"
 UPSTASH_REDIS_REST_TOKEN="...="
 ```
+
+Note how at the `UPSTASH_REDIS_URL` variable says "rediss" and not "redis", that's to use the TLS/SSL option.
 
 After these steps, you should be able to start the local environment using the following command:
 
