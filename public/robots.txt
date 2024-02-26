@@ -16,3 +16,4 @@ Host: https://upstash.com
 
 # Sitemaps
 Sitemap: https://upstash.com/sitemap.xml
+Sitemap: https://upstash.com/docs/sitemap.xml
