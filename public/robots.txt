@@ -1,0 +1,19 @@
+# *
+User-agent: *
+Allow: /
+Disallow: /*?
+Disallow: /*%
+Disallow: /v1*
+Disallow: /v2*
+Disallow: /help/
+Disallow: /oss/
+Disallow: /api/
+Disallow: /tags/
+Disallow: /devops/
+
+# Host
+Host: https://upstash.com
+
+# Sitemaps
+Sitemap: https://upstash.com/sitemap.xml
+Sitemap: https://upstash.com/docs/sitemap.xml
