@@ -1,0 +1,284 @@
+---
+title: "LangChain Explained?"
+slug: langchain-explained
+authors:
+  - "kay"
+tags: [llm, ai]
+---
+
+Since large language models (LLMs) have risen in popularity, everyone wants to integrate AI into their product. While LLMs offer new ways to interact with data that can improve the UX of a product, their integration comes with technical hurdles and limitations. 
+
+That’s where frameworks like [LangChain](https://www.langchain.com/) come into play. Abstracting LLM interfaces, interacting with document data, and managing prompt templates are just a few of the features that aid the integration of LLMs with your application.
+
+Let's look at LangChain, what it can do, and why you might want to use it.
+
+
+## What is LangChain?
+
+LangChain is a set of tools and libraries that help to integrate LLMs into your software project.
+
+LLMs are AI models that take text as input and generate new text as output. Commercial LLMs have proprietary interfaces; their inputs are limited in length and must follow a reasonable structure called prompts to coerce the model into producing useful outputs. Consequently, the integration of such a model can become quite involved, especially if you want to build production-ready integration. It’s more than just sending a text to an API and hoping for the best. 
+
+LangChain solves these issues by normalizing LLM interfaces, helping with prompt and document management, and supporting the chaining of multiple LLM interactions, either hardcoded or AI-controlled. 
+
+
+## How Does LangChain Work?
+
+LangChain comes with modules for JavaScript/TypeScript and Python, forming a framework that aims to make programming with LLMs easier. They are split into categories, each focusing on specific integration tasks.
+
+
+![Figure 1: LangChain Modules](/blog/langchain-explained/modules.png "Figure 1: LangChain Modules")
+
+Figure 1: LangChain Modules
+
+### The Model I/O Module
+
+This module focuses on the interactions with the LLMs. It handles inputs (e.g., prompts), APIs, and outputs (e.g., completions).
+
+The module gives you a normalized interface to each LLM and allows you to integrate custom models if required. The specific integrations come as software packages for each model (e.g., OpenAI, Anthropic, Gemini, etc.) There are two types of wrappers: low-level LLMs (i.e., text completion models) and high-level chat models (i.e., conversational models). Features like streaming and caching of responses are supported.
+
+The following code example illustrates the feature:
+
+
+```javascript
+let llm
+if (LLM === "anthropic") {
+  const { ChatAnthropic } = await import("@langchain/anthropic")
+  model = new ChatAnthropic({})
+} else {
+  const { OpenAI } = await import("@langchain/openai")
+  model = new OpenAI({})
+}
+const { content } = await model.invoke("<YOUR_PROMPT>")
+```
+
+
+The normalized interfaces are available as NPM packages and will be dynamically imported depending on the value of `LLM`. While their class names differ, the resulting `model` objects will have [the same interface](https://js.langchain.com/docs/expression_language/interface).
+
+This module also offers tools for prompt templating, which makes creating and managing inputs for LLMs easier. Instead of hardcoding all your prompts, LangChain enables you to create reusable templates, which you can then manipulate with utility functions. 
+
+This code shows a simple prompt template with two variables:
+
+
+```javascript
+import { PromptTemplate } from "@langchain/core/prompts"
+
+const template = PromptTemplate.fromTemplate(
+  "What should I {action} {when}?",
+)
+const promptA = await template.format({
+  action: "eat",
+  when: "tomorrow",
+})
+
+const partialTemplate= await template.partial({
+  when: "next week",
+})
+const promptB = await partialTemplate.format({
+  do: "train"
+})
+```
+
+
+First, we create a template that takes two variables; then, we create an actual prompt string you can feed to an LLM. The second example illustrates the `partial` method for filling multiple variables in different code locations. Other prompt utilities include batch creation, a few shot templates, length limits for generated prompts, etc.
+
+The output parsers help you format the completions from an LLM to fit better into your application. For example, when you need a list or array, like in the following code example.
+
+
+```javascript
+import { PromptTemplate } from "@langchain/core/prompts"
+import { OpenAI } from "@langchain/openai"
+import { CommaSeparatedListOutputParser } from "@langchain/core/output_parsers"
+
+const template = PromptTemplate.fromTemplate(
+  "List 10 {subject}.\n{format_instructions}"
+)
+const model = new OpenAI({ temperature: 0 })
+const listParser = new CommaSeparatedListOutputParser()
+
+const prompt = await template.format({
+  subject: "countries",
+  format_instructions: listParser.getFormatInstructions(),
+})
+
+const result = await model.invoke(prompt)
+
+const listResult = await parser.parse(result)
+```
+
+
+You can see in the example that the parser will first inject an instruction to the prompt to improve the likelihood that it responds in the correct format. Then, the parser will convert it to an array.
+
+Figure 2 illustrates how the module fits into your integration code.
+
+
+
+![Figure 2: Model I/O Module](/blog/langchain-explained/modelio.png "Figure 2: Model I/O Module")
+
+Figure 2: Model I/O Module
+
+
+### The Retrieval Module
+
+The retrieval module is about the data you use alongside the user inputs. It handles loading and modifying documents or database records that should be part of your prompts. Despite the module's name, it can also handle the creation of documents and store them in databases. 
+
+The document loaders can load files from disk. Supported formats are CSV, JSON, PDF, and plain text. You can even create a custom loader.
+
+Loading a CSV file works like this:
+
+```javascript
+import { CSVLoader } from "langchain/document_loaders/fs/csv"
+
+const loader = new CSVLoader("path/to/example.csv")
+const docs = await loader.load()
+```
+
+The load method will return an array of [Document objects](https://api.js.langchain.com/classes/langchain_core_documents.Document.html), one for each CSV file row. 
+
+If the documents are too big to become part of your prompts, you can use the text splitters to chunk them into more digestible pieces, turn them into text embeddings, and store them in a vector database.
+
+Take the recursive character text splitter, for example:
+
+
+```javascript
+import { RecursiveCharacterTextSplitter } from "langchain/text_splitter"
+
+const splitter = new RecursiveCharacterTextSplitter({
+  chunkSize: 10,
+  chunkOverlap: 1,
+})
+
+const docs = await splitter.createDocuments(["..."])
+```
+
+It will split by paragraph, then by new line, then by sentence, and so on to get to the desired chunk size for each document. 
+
+This example illustrates how to convert documents into text embeddings and store them in Upstash Vector:
+
+```
+import { OpenAIEmbeddings } from "@langchain/openai"
+import { UpstashVectorStore } from "@langchain/community/vectorstores/upstash"
+
+const vectorstore = new UpstashVectorStore(new OpenAIEmbeddings())
+
+await vectorstore.addDocuments(docs)
+```
+
+The `UpstashVectorStore` class will use the `OpenAIEmbeddings` model in the background whenever you add [a new document object](https://api.js.langchain.com/classes/langchain_core_documents.Document.html) to the database. 
+
+You can then use a retriever to fetch related texts. These are a level above document loaders, each giving you a different retrieving strategy. There are basic retrievers that just load embeddings from a vector database using similarity functions, but also more sophisticated ones that use an LLM to generate queries that operate on documents or any other data store you have.
+
+Let’s look at a simple retriever example:
+
+```javascript
+import { ScoreThresholdRetriever } from "langchain/retrievers/score_threshold"
+
+const retriever = ScoreThresholdRetriever.fromVectorStore(vectorStore, {
+  minSimilarityScore: 0.9,
+})
+
+const result = await retriever.getRelevantDocuments("...?")
+```
+
+This retriever will do a simple similarity search on the vectors in the database.
+
+Figure 3 illustrates how the module fits into your LLM integration code and how it interacts.
+
+![Figure 3: Retrieval Module](/blog/langchain-explained/retrieval.png "Figure 3: Retrieval Module")
+
+Figure 3: Retrieval Module
+
+
+### The Chain Module
+
+The Chain Module is about linking tasks together. Getting data from a document, parsing a prompt, querying an LLM - everything the other modules can do, the Chain Module can group and execute in sequence. This way, you can define specific processes and link them together to form a chain of tasks. 
+
+If we take the output parser example from above, we can rewrite it with a chain that takes input variables for a prompt and then pipes them through `template`, `model`, and `listParser`.
+
+
+```javascript
+import { PromptTemplate } from "@langchain/core/prompts"
+import { RunnableSequence } from "@langchain/core/runnables"
+import { OpenAI } from "@langchain/openai"
+import { CommaSeparatedListOutputParser } from "@langchain/core/output_parsers"
+
+const template = PromptTemplate.fromTemplate(
+  "List 10 {subject}.\n{format_instructions}"
+)
+const model = new OpenAI({ temperature: 0 })
+const listParser = new CommaSeparatedListOutputParser()
+
+const chain = RunnableSequence.from([template, model, listParser])
+
+const result = await chain.invoke({
+  subject: "countries",
+  format_instructions: listParser.getFormatInstructions(),
+})
+```
+
+
+We can then pass around the `chain` variable for use in our application; we don’t have to care if the links in that chain change or if it gets larger or smaller.
+
+Figure 4 shows how the Chain module would relate to your business logic and external services.
+
+![Figure 4: Chains Module](/blog/langchain-explained/chains.png "Figure 4: Chains Module")
+
+Figure 4: Chains Module
+
+
+### The Agents Module
+
+An agent is a chain with a list of functions (called tools) it can execute. It takes a prompt, reasons, and runs the tools to accomplish its goal. The agent chooses the tools that need to be executed by itself. So, while chains are hardcoded, agents choose their actions with the help of an LLM.
+
+LangChain has several agent toolkit libraries that help with tasks like JSON, SQL, or vector databases.
+
+Take this example of the Vector Toolkit. It allows querying a vector database with a LLM.
+
+
+```javascript
+import { VectorStoreToolkit, createVectorStoreAgent } from "langchain/agents"
+
+const toolkit = new VectorStoreToolkit(
+  { name: "Demo Data", vectorStore },
+  model
+)
+const agent = createVectorStoreAgent(model, toolkit)
+
+const result = await agent.invoke({ input: "..." })
+```
+
+
+Figure 5 shows the relations of the Agent module.
+
+![Figure 5: Agents Modul](/blog/langchain-explained/agents.png "Figure 5: Agents Modul")
+
+Figure 5: Agents Module
+
+
+## What are the Benefits of Using LangChain?
+
+Following the features each module offers, these are the benefits LangChain brings.
+
+
+### Avoiding Vendor Lock-In
+
+The normalized interfaces for LLMs, documents, and databases allow you to switch services easily. With minimal code changes, you can change from OpenAI to Anthropic and back; mixing multiple LLMs in one project is possible. The same holds for the documents and databases.
+
+
+### Minimizing Boilerplate Code
+
+Like every good framework, LangChain is optimized to lower the boilerplate code you have to write. LangChain isn’t just about connecting with the LLM API; it helps with all the work around it, including prompt management, document loading, text manipulation, formatting, embedding, database storage and retrieval, and task automation. 
+
+The data retrieval and text manipulation utilities are especially useful, allowing you to load and format additional data for your prompts and ensure that the outputs match your expectations. 
+
+
+### Automating Repetitive Processes
+
+The Chains and Agents modules give you a flexible way of automating tasks. A chain allows hardcoding a fixed sequence to ensure it always runs in a specific order. Conversely, an agent gives your sequences more flexibility to react to changes in the data. Both come with the same interface as the models, so it’s easy to include them later in the process or switch between them.
+
+
+## Summary
+
+LangChain is a one-stop shop for all your LLM integration needs. Prompt management, LLM API integration, text modification, databases, and document access all come with a well-designed interface that makes the composition of each component straightforward. It’s open-source software with JavaScript, TypeScript, and Python libraries. 
+
+Do you want to use OpenAI GPT4 with Upstash Vector with your Node.js application? [It’s just a few packages away!](https://js.langchain.com/docs/get_started/installation#installation-1)
