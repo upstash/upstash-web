@@ -11,8 +11,6 @@ In this post, I talk about how I built real time notifications using [Server-Sen
 
 ## Demo
 
-Try the whole thing in action at [https://upstash-nextjs-publish-messages-with-sse-example.vercel.app/](https://upstash-nextjs-publish-messages-with-sse-example.vercel.app/)
-
 <video controls="controls">
     <source src="/blog/realtime-notification/Screen_Recording_2023-11-14_at_12.25.00_PM.mp4" type="video/mp4" />
 </video>
@@ -66,10 +64,12 @@ It should look something like this:
 # Obtained from the steps as above
 
 # Upstash Redis Secrets
-UPSTASH_REDIS_URL="redis://default:...@...-...-...-....upstash.io:..."
+UPSTASH_REDIS_URL="rediss://default:...@...-...-...-....upstash.io:..."
 UPSTASH_REDIS_REST_URL="https://...-...-...-....upstash.io"
 UPSTASH_REDIS_REST_TOKEN="...="
 ```
+
+Note how at the `UPSTASH_REDIS_URL` variable says "rediss" and not "redis", that's to use the TLS/SSL option.
 
 After these steps, you should be able to start the local environment using the following command:
 
@@ -401,9 +401,8 @@ The repository is ready to deploy to Vercel. Follow the steps below to deploy se
 
 ## References
 
-| Demo | https://upstash-nextjs-publish-messages-with-sse-example.vercel.app/ |
-| --- | --- |
 | GitHub Repo | https://github.com/rishi-raj-jain/upstash-nextjs-publish-messages-with-sse-example |
+| --- | --- |
 | Server Sent Events | https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events |
 | Next.js Server Actions | https://nextjs.org/docs/app/api-reference/functions/server-actions |
 | Next.js Streaming | https://vercel.com/docs/functions/streaming/quickstart |
