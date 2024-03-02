@@ -1,0 +1,325 @@
+---
+title: "Building an Article Recommendation System with Upstash"
+slug: article-recommendation-system
+authors:
+  - rishi
+tags: [vector, rag, upstash, redis, nextjs, openai, langchain, vercel]
+---
+
+Have you used [Google](https://google.com) or [Perplexity.ai](https://perplexity.ai)? Do you wonder how they are able to show search results that are latest and include links to online articles? Well, in this guide you'll learn how to create such a system on your own. You'll learn how to create a system that's able to generate recommendations based on the links of the articles you add to it's growing knowledge bank.
+
+## Prerequisites
+
+You'll need the following:
+
+- [Node.js 18](https://nodejs.org/en/blog/announcements/v18-release-announce) or later
+- An [Upstash](https://upstash.com) account
+- An [OpenAI](https://platform.openai.com/) account
+- A [Fly.io](https://fly.io) Account
+
+## Tech Stack
+
+| Technology | Description |
+| --- | --- |
+| [Upstash](https://upstash.com) | Serverless database platform. You're going to use Upstash Vector for storing vector embeddings and metadata. |
+| [Remix](https://remix.run) | Framework for building full-stack web applications with focus on Web Standards. |
+| [OpenAI](https://platform.openai.com) | An artificial intelligence research lab focused on developing advanced AI technologies. |
+| [LangChain](https://js.langchain.com) | Framework for developing applications powered by language models. |
+| [Vercel AI SDK](https://sdk.vercel.ai/docs) | An open source library for building AI-powered user interfaces. |
+| [TailwindCSS](https://tailwindcss.com) | CSS framework for building custom designs. |
+| [Fly.io](https://fly.io) | A platform for running full stack apps and databases close to your users. |
+| [Prettier](https://prettier.io) | Opinionated code formatter for consistent code style. |
+
+## Steps
+
+To complete this guide and deploy your own article recommendation system, you'll need to follow these steps:
+
+- [Generate an OpenAI Token](#generate-an-openai-token)
+- [Create an Upstash Vector Index](#create-an-upstash-vector-index)
+- [Set up the project](#set-up-the-project)
+- [Instantiate OpenAI API Client](#instantiate-openai-api-client)
+- [Create OpenAI API Embeddings Client](#create-openai-api-embeddings-client)
+- [Create Upstash Vector Client](#create-upstash-vector-client)
+- [Create a Context API Endpoint](#create-a-context-api-endpoint)
+- [Create a Chat API Endpoint](#create-a-chat-api-endpoint)
+- [Deploy To Fly.io](#deploy-to-flyio)
+- [References](#references)
+- [Conclusion](#conclusion)
+
+## Generate an OpenAI Token
+
+Using OpenAI API, you're able to obtain vector embeddings of the articles, and create chatbot responses using AI. Any request to OpenAI API requires an authorization token. To obtain the token, navigate to the [API Keys](https://platform.openai.com/api-keys) in your OpenAI account, and click the **Create new secret key** button. Copy and securely store this token for later use as **OPENAI_API_KEY** environment variable.
+
+## Create an Upstash Vector Index
+
+Once you have created an Upstash account and are logged in, go to the Vector tab and click on **Create Index** to start creating a vector index.
+
+![Create an Upstash Vector](/blog/article-recommendation-system/vector-tab.png)
+
+Enter the index name of your choice (say, `article`) and set the vector dimensions to be of 1536.
+
+![Create An Upstash Vector Index](/blog/article-recommendation-system/vector-create.png)
+
+Now, scroll down till the **Connect** section, and click the **.env** button. Copy the contents, and save it somewhere safe to be used further in your application.
+
+![Vector Index Environment Variables](/blog/article-recommendation-system/index.png)
+
+## Set up the project
+
+To set up, just clone the app repo and follow along this guide to learn everything that's in it. To clone the project, run the following in a terminal:
+
+```bash
+# Clone the project
+git clone https://github.com/rishi-raj-jain/article-recommendation-system
+cd article-recommendation-system
+
+# Install the dependencies
+pnpm install
+```
+
+Once you have cloned the repo, create an `.env` file. You are going to add the secret keys obtained in the sections above.
+
+The `.env` file should contain the following keys:
+
+```bash
+# .env
+
+# OpenAI API Key
+OPENAI_API_KEY="sk-..."
+
+# Upstash Vector Keys
+UPSTASH_VECTOR_REST_URL="https://...-us1-vector.upstash.io"
+UPSTASH_VECTOR_REST_TOKEN="...="
+```
+
+With that done, the configuration set up is complete on your end. You can now see the application in action by executing the following command in your terminal and visiting [localhost:3000](http://localhost:3000).
+
+```bash
+pnpm run build && pnpm run start
+```
+
+Follow along to understand the relevant parts of the code that allow you to succesfully build your own article recommendation system.
+
+## Instantiate OpenAI API Client
+
+With `openai` package, you're able to save time and interact with OpenAI REST API within few lines of code. With the following code, we've instantiated the OpenAI API Client library for further use to create chat completion responses.
+
+```tsx
+// File: app/lib/openai/completion.server.ts
+
+import OpenAI from 'openai'
+
+// Instantiate class to generate text completion using the OpenAI API
+export default new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+})
+```
+
+> Note: By appending `.server.ts` to a file in Remix, you're able to make sure that it's code is [forced **out** of the client side bundle](https://github.com/remix-run/remix/blob/main/decisions/0009-do-not-rely-on-treeshaking-for-correctness.md#server-modules).
+
+## Create OpenAI API Embeddings Client
+
+With `@langchain/openai` package, you're able to use the `OpenAIEmbeddings` class for generating vector embeddings of a given text. When combined with any LangChain Vector Store, the OpenAIEmbeddings class saves you from the process of creating and inserting each vector embedding on your own. With the following code, we've instantiated the OpenAIEmbeddings class for further use to create vector embeddings under the hood.
+
+```tsx
+// File: app/lib/openai/embedding.server.ts
+
+import { OpenAIEmbeddings } from '@langchain/openai'
+
+// Instantiate class to generate embeddings using the OpenAI API
+export default new OpenAIEmbeddings({
+  modelName: 'text-embedding-3-small',
+  openAIApiKey: process.env.OPENAI_API_KEY,
+})
+```
+
+## Create Upstash Vector Client
+
+Using `@upstash/vector` and `@langchain/community/vectorstores/upstash` packages, you are able to create a connectionless client in your Remix application that allows you to store, delete, and query vector embeddings from an Upstash Vector index.
+
+```tsx
+// File: app/lib/upstash/vectorStore.server.ts
+
+import embeddings from '~/lib/openai/embedding.server'
+import { Index as UpstashIndex } from '@upstash/vector'
+import { UpstashVectorStore } from '@langchain/community/vectorstores/upstash'
+
+// Instantiate the Upstash Vector Index
+const index = new UpstashIndex({
+  url: process.env.UPSTASH_VECTOR_REST_URL as string,
+  token: process.env.UPSTASH_VECTOR_REST_TOKEN as string,
+})
+
+// Instantiate the Upstash Vector Store that'll create and save embeddings
+export default new UpstashVectorStore(embeddings, { index })
+```
+
+## Create a Context API Endpoint
+
+As you run the Remix application, you'd see a text box accepting multiple article URLs as an input. Those articles are  to be added to the chatbot's knowledge for creating personalized responses in the future user searches. In this section, you'll learn how the context endpoint (`app/routes/api_.context.tsx`) is set up to accept those multiple article URLs, fetch their content, generate their vector embeddings, and store them into the Upstash Vector Index dynamically.
+
+```tsx
+// File: app/routes/api_.context.tsx
+
+import { Document } from 'langchain/document'
+import { ActionFunctionArgs } from '@remix-run/node'
+import vectorServer from '~/lib/vector/vectorStore.server'
+import { CheerioWebBaseLoader } from 'langchain/document_loaders/web/cheerio'
+
+export const action = async ({ request }: ActionFunctionArgs) => {
+  const formData = await request.formData()
+  // Check if any article link are present in the form submission
+  const articlesToEmbed = formData.get('articles') as string
+  if (articlesToEmbed) {
+    // Create the documents to be added to the Upstash Vector Store
+    const documents: any[] = []
+    await Promise.all(
+      articlesToEmbed.split(',').map(async (link) => {
+        // Use the link to render in the search results
+        // Parse the link using Cheerio
+        const loader = new CheerioWebBaseLoader(link.trim())
+        const scraper = await loader.scrape()
+        // Get the content of title tag to render in the search results
+        const name = scraper('title').html()
+        // Get the page content as string
+        const pageContent = scraper.text()
+        // Create metadata object to be inserted in the vector store
+        const metadata = { link, name }
+        documents.push(new Document({ pageContent, metadata }))
+      }),
+    )
+    // Creating embeddings from the provided documents along with metadata
+    // and add them to Upstash database
+    await vectorServer.addDocuments(documents.filter(Boolean))
+  }
+}
+```
+
+In the [Remix Action](https://remix.run/docs/en/main/guides/form-validation#step-2-defining-the-action) above, the form data present in the POST request to the context endpoint (`/api/context`) is parsed. Further, there's a loop over set of article links seperated by comma (,) that does the following:
+
+- Creates a `pageContent` variable as the text content fetched from the article's webpage
+- Creates a `name` variable as the title of article's webpage
+- Creates a [LangChain Document](https://js.langchain.com/docs/modules/data_connection/document_loaders/creating_documents) with the text content, reference and the name of the article (`new Document({ pageContent, metadata })`)
+- Adds each document to the global `documents` array
+
+Finally, all the documents stored in the global `documents` array are inserted into the Upstash Vector Index. Under the hood, the vector embeddings for each document is generated using it's `pageContent` property.
+
+## Create a Chat API Endpoint
+
+In this section, you'll learn how the chat api endpoint (`app/routes/api_.chat.tsx`) is set up to create search engine like responses containing recommendations to articles relevant to the user search. The articles relevant to the search are found by finding the closest top-K vectors from a given vector index. Further, the titles and links from the metadata of the vectors are passed onto the OpenAI API as context. This allows the chatbot to include the articles as external links in conjuction with responding to the user search. To simplify things, we’ll break this into further parts:
+
+### Find Relevant Vector Embeddings Using Similarity Search
+
+Revisiting the entire knowledge bank of articles for each user search is an expensive operation. To scope it down to the top 3 articles that are (if) highly relevant to the user search, query the existing set of vectors in your Upstash Vector Index. Further, filter to keep the vectors whose embeddings carry atleast 70% similarity score to the vector embeddings of the user search.
+
+```tsx
+// File: app/routes/api_.chat.tsx
+
+import vectorServer from '~/lib/upstash/vectorStore.server'
+import type { ActionFunctionArgs } from '@remix-run/node'
+
+export const action = async ({ request }: ActionFunctionArgs) => {
+  
+  // Set of messages between user and chatbot
+  const { messages = [] } = await request.json()
+  
+  // Get the latest question stored in the last message of the chat array
+  const searchQuery = messages[messages.length - 1].content
+  
+  // Perform Similarity Search using the Upstash Vector Store
+  const queryResult = await vectorServer.similaritySearchWithScore(searchQuery, 3)
+  
+  // Filter the records with confidence score > 70% and
+  // set the metadata as response to render search results
+  const results = queryResult.filter((i) => i[1] >= 0.7).map((i) => i[0].metadata)
+  
+  // Proceed to create a response
+}
+```
+
+### Create System Context and Instructions for Chatbot
+
+Now that you’ve obtained highly relevant set of vectors, you want the chatbot to know and reference the articles associated before it responds to the user search. To do that with OpenAI's `gpt-3.5-turbo` model, create a message object with the role property as **system** and the content property to contain the following instructions:
+
+- The chatbot should respond like Google does
+- The chatbot should make sure that the response is in markdown format
+- The chatbot's response should have hyperlinks to the articles
+- The chatbot goes beyond just including references to the articles
+
+```tsx
+// File: app/routes/api_.train.tsx
+
+import { OpenAIStream, StreamingTextResponse } from 'ai'
+import completionServer from '~/lib/openai/completion.server'
+
+export const action = async ({ request }: ActionFunctionArgs) => {
+    // ...
+
+    // Now use OpenAI Text Completion with relevant articles as context
+    const completionResponse = await completionServer.chat.completions.create({
+        stream: true,
+        model: 'gpt-3.5-turbo',
+        messages: [
+          {
+            // create a system content message to be added as
+            // the open ai text completion will supply it as the context with the API
+            role: 'system',
+            content: `Behave like a Google. You have the knowledge of the following articles: ${JSON.stringify(results)}. Each response should be in 100% markdown compatible format and should have hyperlinks in it. Be precise. Do add some general text in the response related to the query.`,
+          },
+          // also, pass the whole conversation!
+          ...messages,
+        ],
+  })
+
+  // Convert the response into a friendly text-stream
+  const stream = OpenAIStream(completionResponse)
+  // Respond with the stream
+  return new StreamingTextResponse(stream)
+}
+
+```
+
+With the code above, you're able to stream results from OpenAI that are context aware, recommending articles found relevant to the user search.
+
+> That was a lot of learning! You’re all done now ✨
+
+## Deploy to Fly.io
+
+The repository comes in with a baked-in setup for [Fly.io](http://Fly.io), specifically pertaining to:
+
+- Dockerfile
+- fly.toml
+- .dockerignore
+
+Once you have a [Fly.io](https://fly.io) account, you can [create an app](https://fly.io/docs/flyctl/launch/) in Fly.io by executing the following command in your terminal at the root directory:
+
+```bash
+# Create an app based on the baked-in configuration in your account
+# This will result only in the change of app name in existing fly.toml
+
+fly launch
+```
+
+and [deploy to Fly.io](https://fly.io/docs/flyctl/deploy/) executing the following command in your terminal:
+
+```bash
+# Deploy the app based on the configuration created above
+
+fly deploy
+```
+
+## References
+
+For more detailed insights, explore the references used in this guide.
+
+- [GitHub Repo](https://github.com/rishi-raj-jain/article-recommendation-system)
+- [Upstash Vector Store Integration with LangChain](https://js.langchain.com/docs/integrations/vectorstores/upstash)
+- [System Instructions in OpenAI's Chat Completions API](https://platform.openai.com/docs/guides/text-generation/chat-completions-api)
+- [Load data from webpages using Cheerio in LangChain](https://js.langchain.com/docs/integrations/document_loaders/web_loaders/web_cheerio)
+- [Creating AI Chat UI in React apps](https://sdk.vercel.ai/docs/guides/providers/openai#wire-up-the-ui-1)
+
+## Conclusion
+
+In this guide, you learned how to build an article recommendation system using Vector Embeddings and OpenAI Completion API with dynamically generated system context. With Upstash Vector and LangChain, you get the ability to store vectors in an index, perform top-K vector search queries and create relevant context for each user search, all within few lines of code.
+
+If you have any questions or comments, feel free to reach out to me on [GitHub](https://github.com/rishi-raj-jain).
