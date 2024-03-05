@@ -309,12 +309,18 @@ export const authors: Record<string,
         title: "Software Engineer (Guest Author)",
         url: "https://twitter.com/brightonmboya",
         image: "brighton.jpg",
-  },
+    },
     bcelik: {
         name: "Batuhan Celik",
         title: "Software Developer (Guest Author)",
         url: "https://https://github.com/mbatuhancelik",
         image: "bcelik.jpeg",
+    },
+    arda: {
+        name: "Cahid Arda Oz",
+        title: "Software Developer (Guest Author)",
+        url: "https://cahidarda.github.io/",
+        image: "arda.png",
     }
 };
 
