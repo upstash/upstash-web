@@ -2,32 +2,31 @@
 title: "DegreeGuru: A RAG Chatbot Utilising Upstash Vector & Redis, LangChain, Vercel"
 slug: degree-guru
 authors:
-
+  - arda
 tags: [vector, upstash, llm, ai]
-draft: true
 ---
 
-Welcome to this blog post, where we embark on a journey into the inception and evolution of the innovative [DegreeGuru](https://degreeguru.vercel.app/) chatbot application utilizing *Retrieval Augmented Generation (RAG)* approach. Here, we delve into the compelling motivations that sparked its creation, tracing its development through the intricate web of tools such as [Upstash Vector](https://upstash.com/docs/vector/overall/getstarted), [Upstash Redis](https://upstash.com/docs/redis/overall/getstarted), [Langchain](https://js.langchain.com/), [Next.js](https://nextjs.org/), [Vercel](https://vercel.com/), and the [Vercel AI SDK](https://sdk.vercel.ai/docs).
+Welcome to this blog post, where we will talk about the inception and evolution of the [DegreeGuru](https://degreeguru.vercel.app/) chatbot application utilizing *Retrieval Augmented Generation (RAG)* approach. Here, we delve into the motivations that sparked its creation, tracing its development through the web of tools such as [Upstash Vector](https://upstash.com/docs/vector/overall/getstarted), [Upstash Redis](https://upstash.com/docs/redis/overall/getstarted), [Langchain](https://js.langchain.com/), [Next.js](https://nextjs.org/), [Vercel](https://vercel.com/), and the [Vercel AI SDK](https://sdk.vercel.ai/docs).
 
-Following the exploration of our motivations, we pivot towards discussing our approach and the requirements that guided our development process. Subsequently, we provide an overview of the tech stack employed. In the ensuing sections, we delve into the implementation of the crawler and offering insights into the inner workings of the DegreeGuru app.
+Following the exploration of our motivations, we will discuss our approach and the requirements that guided our development process. Subsequently, we provide an overview of the tech stack employed. In the following sections, we delve into the implementation of the crawler and the DegreeGuru app.
 
 # Motivation
 
-Consider a future master's student, eagerly exploring various university programs. Picture her quest for vital details: application deadlines, submission methods—online or by mail, admission criteria, and program specifics.
+Consider a future master's student, exploring various university programs. Picture her quest for vital details: application deadlines, submission methods—online or by mail, admission criteria, and program specifics.
 
-However, the websites of different universities seem worlds apart. They vary immensely in design and how information is organized, making the search for required details a tedious task.
+However, the websites of different universities seem worlds apart. They vary immensely in design and how information is organized, making the search for required details a difficult task.
 
-Imagine if there were a simpler method to access information on these websites! Enter **DegreeGuru**: a chatbot that can be swiftly tailored to **any website**, **in under an hour**. Including this innovative tool in the university webpages will empower our master's student, swiftly providing her with the specific information she seeks, all through a user-friendly chat interface.
+Imagine if there was a simpler method to access information on these websites! Enter **DegreeGuru**: a chatbot that can be easily tailored to **any website**, **in under an hour**. Including this innovative tool in the university webpages will empower our master's student, providing her with the specific information she seeks, all through a user-friendly chat interface.
 
 # Approach & Requirements
 
 In developing the DegreeGuru chatbot application, our focus was on creating a seamless user experience while ensuring the accuracy and reliability of information provided. Here is an overview of the key requirements we considered in the development process:
 
-1. **Simple Interface**: One of the primary goals of DegreeGuru is to offer users a straightforward and user-friendly interface.
-2. **Streaming Responses**: Instead of waiting for the Large Language Model (LLM) to generate the entire response before sending it to the user, we stream tokens as they are generated using Vercel AI SDK. This means users get to see partial responses in real-time, creating a more dynamic and interactive conversation flow.
-3. **Reliable Source Attribution**: Answers provided by DegreeGuru should include links to the sources of the information. This approach ensures transparency and reliability, allowing users to verify the information themselves.
-4. **Data Collection**: To populate the Upstash Vector Store with relevant information, we have developed an easy-to-configure scraper. The scraper splits the page contents into chunks as it crawls them and stores them in the Upstash Vector Store after fetching their vector embeddings.
-5. **Configurability**: DegreeGuru project is designed to be domain agnostic, meaning it can be easily configured for use on any website, not limited to universities. This requirement ensures that the chatbot can adapt to various contexts and serve diverse purposes beyond educational institutions.
+1. **Simple Interface**: Should offer users a straightforward and user-friendly interface.
+2. **Streaming Responses**: Instead of waiting for the Large Language Model (LLM) to generate the entire response before sending it to the user, we should stream tokens as they are generated using Vercel AI SDK. This means users get to see partial responses in real-time, creating a more dynamic conversation flow.
+3. **Reliable Source Attribution**: Answers should include links to the sources of the information. This approach ensures reliability, allowing users to verify the information themselves.
+4. **Data Collection**: To populate the Upstash Vector Store with relevant information, there should be an easy-to-configure scraper. The scraper should split the page contents into chunks and store them in the Upstash Vector Store after fetching their vector embeddings.
+5. **Configurability**: The crawler and the app should be domain agnostic, meaning it should easily be configured for use on any website, not limited to universities.
 
 To ensure we include links to the sources of information, we instruct the agent to use the URLs of the corresponding text chunks during response generation. These URLs, indicating the origin of the text, are stored as metadata together with the vectors in the Upstash Vector Store. When a user submits a query, we include these URLs in the context provided to the LLM agent.
 
@@ -98,7 +97,7 @@ index:
 You can find more information about [configuring the crawler in our guide](https://github.com/upstash/DegreeGuru/tree/master?tab=readme-ov-file#crawler).
 
 ### Vector Store
-We rely on the [Upstash Vector](https://upstash.com/docs/vector/overall/getstarted) for storing vectors and metadata. Setting up an Upstash Vector Store is a breeze, akin to flipping a switch: Simply head to the [Upstash Console](https://console.upstash.com/), access your account, select "Vector" from the navigation bar, and create an index with the click of a button labeled "Create Index". For further instructions, delve into the ["Configure Environment Variables" section of our guide](https://github.com/upstash/DegreeGuru/tree/master?tab=readme-ov-file#crawler).
+We rely on the [Upstash Vector](https://upstash.com/docs/vector/overall/getstarted) for storing vectors and metadata. Setting up an Upstash Vector Store is very simple, akin to flipping a switch: Simply head to the [Upstash Console](https://console.upstash.com/), access your account, select "Vector" from the navigation bar, and create an index with the click of a button labeled "Create Index". For further instructions, delve into the ["Configure Environment Variables" section of our guide](https://github.com/upstash/DegreeGuru/tree/master?tab=readme-ov-file#crawler).
 
 Next, we add the [`UpstashVectorStore`](https://github.com/upstash/DegreeGuru/blob/master/degreegurucrawler/degreegurucrawler/utils/upstash_vector_store.py) class to handle embedding text chunks and storing them in the Upstash Vector.
 
@@ -262,7 +261,7 @@ Once set up and run, the crawler will take some time as it crawls the website as
 
 ## DegreeGuru
 
-DegreeGuru is a web application utilizing *Retrieval Augmented Generation (RAG)* method and an OpenAI *Large Language Model (LLM)* to answer questions. Our Upstash Vector is provided to an LLM agent as a retriever "tool". Upon user prompt, the LLM agent fetches relevant context from the Upstash Vector Store and uses it to answer the user question.
+DegreeGuru is a web application utilizing *Retrieval Augmented Generation (RAG)* approach and an OpenAI *Large Language Model (LLM)* to answer questions. Our Upstash Vector is provided to an LLM agent as a retriever "tool". Upon user prompt, the LLM agent fetches relevant context from the Upstash Vector Store and uses it to answer the user question.
 
 ![Figure 2: DegreeGuru Diagram](/blog/degree-guru/diagram-degreeguru.png)
 
@@ -277,11 +276,11 @@ In the following sections, we will explain:
 
 ### Retrieval Augmented Generation (RAG)
 
-In the realm of conversational AI, the Retrieval Augmented Generation (RAG) approach has emerged as a powerful technique. RAG combines the strengths of both retrieval-based and generative models, offering a nuanced solution for chatbots. At its core, RAG leverages a retriever to efficiently search through a vast amount of data. This retrieved information then augments the generative model's ability to produce accurate responses. In our project, we implement RAG with the Upstash Vector serving as the retriever.
+In the realm of conversational AI, the Retrieval Augmented Generation (RAG) approach has emerged as a powerful technique. RAG combines the strengths of both retrieval-based and generative models, offering a nuanced solution for chatbots. At its core, RAG leverages a retriever to search through a vast amount of data. This retrieved information then augments the generative model's ability to produce accurate responses. In our project, we implement RAG with the Upstash Vector serving as the retriever.
 
 ### Rate Limiting
 
-Rate limiting in the context of the chatbot serves as a crucial cost management strategy. Each interaction with the chatbot incurs expenses, not only through the utilization of OpenAI credits but also by triggering Upstash Vector, which follows a [pay-per-usage model](https://upstash.com/docs/common/concepts/scale-to-zero#pay-for-usage).
+Rate limiting in the context of the chatbot serves as a crucial cost management strategy. Each interaction with the chatbot has a cost, not only through the utilization of OpenAI credits but also by triggering Upstash Vector, which follows a [pay-per-usage model](https://upstash.com/docs/common/concepts/scale-to-zero#pay-for-usage).
 
 For rate limiting, we use Upstash Redis. Setting up a rate limiter is as easy as installing [`@upstash/ratelimit`](https://upstash.com/docs/oss/sdks/ts/ratelimit/overview) and [`@upstash/redis`](https://upstash.com/docs/oss/sdks/ts/redis/overview) packages and initializing a rate limiter like below:
 
@@ -347,9 +346,7 @@ const tool = createRetrieverTool(retriever, {
 
 ### Agent Template
 
-In the development of any chatbot, defining the agent template is a critical step towards ensuring an effective user experience. This template serves as the backbone of how the chatbot interacts with users, outlining its persona, tone, and core functionalities.
-
-In our agent template, the bot is designated as DegreeGuru, specializing in answering inquiries about Stanford University. The template instructs the bot to respond exclusively to questions based on available context, and encourages the use of relevant links whenever feasible.
+In the development of any chatbot, defining the agent template is a critical step. In our agent template, the bot is designated as "DegreeGuru", specializing in answering inquiries about Stanford University. The template instructs the bot to respond exclusively to questions based on available context, and encourages the use of relevant links whenever possible.
 
 ```tsx
 // app/api/guru/route.js
@@ -410,10 +407,10 @@ After installing packages with `npm install` and configuring the environment var
 
 ### Deploying to Vercel
 
-Once you've finished populating your vector store, deploying the chatbot with Vercel is a breeze. Should you choose to crawl a source other than Stanford, we suggest modifing our [agent template](https://github.com/upstash/DegreeGuru/blob/master/src/app/api/guru/route.tsx#L105) accordingly. This can be done by forking our repository, making the necessary updates to the template, and finally clicking the "Deploy" button located at the top of the README file within your forked repository to launch the app on Vercel.
+Once you've finished populating your vector store, deploying the chatbot with Vercel is very simple. Should you choose to crawl a source other than Stanford, we suggest modifing our [agent template](https://github.com/upstash/DegreeGuru/blob/master/src/app/api/guru/route.tsx#L105) accordingly. This can be done by forking our repository, making the necessary updates to the template, and finally clicking the "Deploy" button located at the top of the README file within your forked repository to launch the app on Vercel.
 
 # Conclusion
 
-In conclusion, DegreeGuru stands as a testament to the power of innovative technology when harnessed for practical solutions. Through the integration of tools such as Upstash Vector, Redis, Langchain, Next.js, and Vercel, we have crafted a useful proof of concept. The DegreeGuru, utilizing the Retrieval Augmented Generation (RAG) approach, empowers users with swift access to information, all within a user-friendly chat interface.
+Through the integration of tools such as Upstash Vector, Redis, Langchain, Next.js, and Vercel, we have crafted a useful proof of concept. The DegreeGuru, utilizing the Retrieval Augmented Generation (RAG) approach, enables users with swift access to information, all within a user-friendly chat interface.
 
-The ability to customize DegreeGuru to any website in under an hour opens doors for universities, businesses, and individuals alike. Imagine the ease with which a prospective student can now navigate the vast web of university program details, deadlines, and admission criteria. This same ease of access can be seamlessly offered to the users of any website, using the DegreeGuru project.
+The ability to customize DegreeGuru to any website in under an hour opens doors for universities, businesses, and individuals alike. Imagine the ease with which our prospective student can now navigate the vast web of university program details, deadlines, and admission criteria. This same ease of access can be offered to the users of any website, using the DegreeGuru project.
