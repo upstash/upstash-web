@@ -6,11 +6,11 @@ authors:
 tags: [upstash, redis, nextjs, chatbox, chat]
 ---
 
-Instant, interactive communication is crucial for satisfactory user experience. This is why many companies provide a live chatbox widget on their websites.
+Instant, interactive communication is crucial for a satisfactory user experience. This is why many companies provide a live chatbox widget on their websites.
 
 ## What it is
 
-This is a chatbox widget, alongside with admin chat panel for websites, connecting users with developers/admins. This way, an interactive communication between peers can be established.
+This is a chatbox widget, alongside an admin chat panel for websites, connecting users with developers/admins. This way, interactive communication between peers can be established.
 
 This project uses Next.js, alongside Upstash Redis for storage.
 
@@ -22,7 +22,7 @@ This project uses Next.js, alongside Upstash Redis for storage.
 
 ![slack_notification](/blog/chatbox-widget/chatbox_slack.png)
 
-### Admins can reply
+### Admins Can Reply
 
 ![admin_pannel](/blog/chatbox-widget/admin_pannel.png)
 
@@ -30,7 +30,7 @@ You can see the demo [here](https://upstash-chatbox.vercel.app).
 
 Notice that chat id is shown in the console. Note that and go to `/chat/{id}` to see the admin panel and how both interfaces interact with each other.
 
-### 1. Create Database and Environment Variables
+### 1. Create a Database and Environment Variables
 
 The data will be kept at [Upstash Redis](https://upstash.com).
 
@@ -48,7 +48,7 @@ cp .env.local.example .env.local
 - `SLACK_WEBHOOK_URL` can be found at the Slack integration page
   in https://api.slack.com/messaging/webhooks
 
-### 2. Install Package
+### 2. Install the Package
 
 ```bash
 yarn add @upstash/chatbox
@@ -78,7 +78,7 @@ export default function MyApp({ Component, pageProps }) {
 }
 ```
 
-The options can be passed as React props
+Options can be passed as React props
 
 | key              | type                 | default                                  |
 | ---------------- | -------------------- | ---------------------------------------- |
@@ -127,4 +127,4 @@ Now you have your own chatbox for users! Enjoy!
 You can see the source code [here](https://github.com/upstash/chatbox) and npm package [here](https://www.npmjs.com/package/@upstash/chatbox).
 
 About this project or in general,
-we highly appreciate your feedbacks and ideas. If you want to give any feedback or thoughts on our services, you can do so via [twitter](https://twitter.com/upstash) or [discord](https://upstash.com/discord).
+we highly appreciate your feedback and ideas. If you want to give any feedback or thoughts on our services, you can do so via [twitter](https://twitter.com/upstash) or [discord](https://upstash.com/discord).
