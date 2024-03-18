@@ -6,13 +6,13 @@ authors:
 tags: [kafka, twitter]
 ---
 
-Upstash offers serverless Kafka topics. In this blog post, we are going to demonstrate how to publish to and read from a Kafka topic with only a few clicks using Upstash. The complete project code can be found at [here](https://github.com/upstash/kafka-examples/tree/master/tweet-streaming)
+Upstash offers serverless Kafka topics. In this blog post, we are going to demonstrate how to publish to and read from a Kafka topic with only a few clicks using Upstash. The complete project code can be found [here](https://github.com/upstash/kafka-examples/tree/master/tweet-streaming)
 
-We are going to use an AWS Lambda function to periodically invoke Twitter search api. The function is going to look for tweets containing a keyword we choose and publish those tweets to Upstash's serverless Kafka offering. Once the tweets are stored in Kafka, you can process them with multiple consumers or copy them to a data store using a connector.
+We are going to use an AWS Lambda function to periodically invoke the Twitter search API. The function is going to look for tweets containing a keyword we choose and publish those tweets to Upstash's serverless Kafka offering. Once the tweets are stored in Kafka, you can process them with multiple consumers or copy them to a data store using a connector.
 
 ## Creating the project
 
-Let us start by creating a simple maven project. We will use [Twittered](https://github.com/redouane59/twittered) Java library for Twitter API access, [Kafka-clients](https://kafka.apache.org) for Kafka, [Log4j](https://logging.apache.org/log4j/2.x/) for logging utility and AWS Lambda for serverless compute service. Here are our dependencies,
+Let's start by creating a simple Maven project. We will use the [Twittered](https://github.com/redouane59/twittered) Java library for Twitter API access, [Kafka-clients](https://kafka.apache.org) for Kafka, [Log4j](https://logging.apache.org/log4j/2.x/) for logging utility, and AWS Lambda for serverless compute service. Here are our dependencies,
 
 ```xml
 <dependency>
@@ -39,7 +39,7 @@ Let us start by creating a simple maven project. We will use [Twittered](https:/
 
 ## Create Twitter Developer Account
 
-First, we need to create user credentials to use Twitter API. Sign up for a developer account at [Twitter Developer Portal](https://developer.twitter.com/en). Sign in to developer console. Give a name to your app. We will use bearer token for credentials.
+First, we need to create user credentials to use the Twitter API. Sign up for a developer account at the [Twitter Developer Portal](https://developer.twitter.com/en). Sign in to the developer console. Give a name to your app. We will use a bearer token for credentials.
 
 ![](https://i.imgur.com/E2K5cjj.png)
 
@@ -47,7 +47,7 @@ First, we need to create user credentials to use Twitter API. Sign up for a deve
 
 ## Twitter Client Connection and Tweet Search
 
-TwitterProducer class is responsible for searching Twitter publishing tweets to Kafka.
+The TwitterProducer class is responsible for searching Twitter and publishing tweets to Kafka.
 
 ```java
 public TwitterProducer(String keyword){
@@ -60,7 +60,7 @@ public TwitterProducer(String keyword){
 }
 ```
 
-We are going to schedule our lambda function to run every 15 minutes. So let us search only tweets posted in the last 15 minutes.
+We are going to schedule our Lambda function to run every 15 minutes. So, let's search only for tweets posted in the last 15 minutes.
 
 ```java
  public void run(){
@@ -77,7 +77,7 @@ We are going to schedule our lambda function to run every 15 minutes. So let us 
 
 ## Kafka Producer
 
-Now we want to publish these tweets to a Kafka topic. We need to sign up Upstash console [here](https://console.upstash.com/login). Lets create Kafka cluster in Upstash. You can find instructions [here](/docs/kafka). Upstash Console already gives us the code to connect to the cluster. I just copied below connection piece off Upstash Console. We define bootstrap servers, Kafka username and Kafka password as environment variables.
+Now we want to publish these tweets to a Kafka topic. We need to sign up for the Upstash console [here](https://console.upstash.com/login). Let's create a Kafka cluster in Upstash. You can find instructions [here](/docs/kafka). The Upstash Console already gives us the code to connect to the cluster. I just copied the connection piece below from the Upstash Console. We define bootstrap servers, Kafka username, and Kafka password as environment variables.
 
 ```java
 private KafkaProducer<String, String> createKafkaProducer() {
@@ -117,7 +117,7 @@ private void run() {
 
 ## Setting up with AWS Lambda
 
-AWS can trigger user defined functions based on external events or periodically. We will just schedule our function to run every 15 seconds. We need to provide a class implementing AWS Lambda's RequestHandler interface. Our TweetStreamApp class implements RequestHandler interface. All we need to do is trigger our TwitterProducer object in handleRequest method.
+AWS can trigger user-defined functions based on external events or periodically. We will just schedule our function to run every 15 minutes. We need to provide a class implementing AWS Lambda's RequestHandler interface. Our TweetStreamApp class implements the RequestHandler interface. All we need to do is trigger our TwitterProducer object in the handleRequest method.
 
 ```java
 public class TweetStreamApp implements RequestHandler {
@@ -130,9 +130,9 @@ public class TweetStreamApp implements RequestHandler {
 }
 ```
 
-We have all the parts that we need for our project. Let's build a jar archive containing all the dependencies. Simply invoke `mvn package`.
+We have all the parts that we need for our project. Let's build a JAR archive containing all the dependencies. Simply invoke `mvn package`.
 
-We need an AWS account. Create AWS Lambda function in AWS UI. We are going to make some configuration. Configure "Handler" parameter as tweetStream.TweetStreamApp::handleRequest.
+We need an AWS account. Create an AWS Lambda function in the AWS UI. We are going to make some configurations. Configure the "Handler" parameter as tweetStream.TweetStreamApp::handleRequest.
 
 ![](https://i.imgur.com/BuxspZL.png)
 
@@ -148,7 +148,7 @@ Add a schedule rule in Amazon EventBridge to schedule our function every 15 minu
 
 ![](https://i.imgur.com/srjlDEK.png)
 
-Add a EventBridge trigger for our lambda function. Pick the schedule rule that we created in the previous step.
+Add an EventBridge trigger for our Lambda function. Pick the schedule rule that we created in the previous step.
 
 ![](https://i.imgur.com/gC8lsRB.png)
 
@@ -160,7 +160,7 @@ Let's check Upstash console and verify that our Kafka topic is receiving message
 
 ![](https://i.imgur.com/HNKcTyJ.png)
 
-Lets write a simple Kafka consumer to verify that we can consume all these tweets.
+Let's write a simple Kafka consumer to verify that we can consume all these tweets.
 
 ```java
 public static void main(String[] args) throws Exception {
@@ -199,4 +199,4 @@ It is working :)
 
 ## Conclusion
 
-We wrote a periodic job to search Twitter and save relevant tweets to Kafka entirely serverless. Management of our Kafka cluster is handled by Upstash. We only copied credentials from Upstash Console and started publishing records.
+We wrote a periodic job to search Twitter and save relevant tweets to Kafka in an entirely serverless manner. The management of our Kafka cluster is handled by Upstash. We only copied credentials from the Upstash Console and started publishing records.
