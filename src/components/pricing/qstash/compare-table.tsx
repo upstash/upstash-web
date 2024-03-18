@@ -318,7 +318,7 @@ export default function CompareTable() {
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0"
           >
-            <CompareValue>30 days</CompareValue>
+            <CompareValue>1 year</CompareValue>
           </td>
           <td
             hidden={isMobile ? !showEnterprise : false}
