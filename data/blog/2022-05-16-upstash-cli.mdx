@@ -6,18 +6,18 @@ authors:
 tags: [cli, serverless, redis, kafka, upstash-cli, devops]
 ---
 
-One of the primary goals of Upstash is to enable every developer to create Upstash resources easily using various tools.
-In the past, we have announced [Developer Api](https://developer.upstash.com/), [Terraform Provider](https://upstash.com/blog/redis-terraform), and now it is time for Upstash CLI.
+One of the primary goals of Upstash is to enable every developer to easily create Upstash resources using various tools.
+In the past, we have announced the [Developer API](https://developer.upstash.com/), [Terraform Provider](https://upstash.com/blog/redis-terraform), and now it is time for the Upstash CLI.
 
 ## Announcing @upstash/cli
 
-We are thrilled to announce Upstash command-line tool so that every developer can create their Upstash resources with a single command.
+We are thrilled to announce the Upstash command-line tool so that every developer can create their Upstash resources with a single command.
 
 It is available on [GitHub](https://github.com/upstash/cli), [npm](https://www.npmjs.com/package/@upstash/cli) or [built binaries](https://github.com/upstash/cli/releases/latest)
 
 ## Get started
 
-Upstash CLI requires a developer api key. A new api key can be created in the [Console](/docs/redis/account/developerapi).
+The Upstash CLI requires a developer API key. A new API key can be created in the [Console](/docs/redis/account/developerapi).
 
 ```shell
 npm install -g @upstash/cli
@@ -25,7 +25,7 @@ npm install -g @upstash/cli
 
 Or visit the GitHub [release page](https://github.com/upstash/cli/releases) for prebuilt binaries.
 
-After installing, execute the following command to log in. It will ask for your email and api key:
+After installing, execute the following command to log in. It will ask for your email and API key:
 
 ```ts
 upstash auth login
@@ -33,13 +33,13 @@ upstash auth login
 
 That's all. You are now logged in and can manage your Upstash resources from the command line.
 
-If you are unsure what a command does, use the `--help` flag, and it will explain all available commands and flags.
+If you are unsure what a command does, use the `--help` flag, and it will explain all the available commands and flags.
 
 ```shell
 upstash redis --help
 ```
 
-All parameters can be given via CLI, but the CLI will ask you if a required parameter is missing.
+All parameters can be provided via the CLI, but the CLI will ask you if a required parameter is missing.
 
 ### Creating Resources
 
@@ -49,7 +49,7 @@ All parameters can be given via CLI, but the CLI will ask you if a required para
 upstash redis create --name=cli-powered-db --region=eu-central-1
 ```
 
-You only need to provide the name of your database and region. Other optional flags can be provided like tls, multizone, etc.
+You only need to provide the name of your database and its region. Other optional flags can be provided, like TLS, multizone, etc.
 
 #### Creating Kafka Cluster
 
@@ -57,7 +57,7 @@ You only need to provide the name of your database and region. Other optional fl
 upstash kafka create --name=$name --region=$region
 ```
 
-Similar to redis, kafka resources requires 2 parameters name and region. After creating a region, a topic can be created.
+Similar to Redis, Kafka resources require two parameters: name and region. After creating a region, a topic can be created.
 
 ```ts
 upstash kafka topic create --name=mytopic --cluster-id=$id
@@ -65,7 +65,7 @@ upstash kafka topic create --name=mytopic --cluster-id=$id
 
 #### Other Commands
 
-Upstash CLI includes many different commands to perform CRUD operations on your Upstash Resources.
+The Upstash CLI includes many different commands to perform CRUD operations on your Upstash resources.
 
 - **Team**: This allows you to manage teams and their members
 
@@ -88,7 +88,7 @@ upstash kafka topic
 
 ## Closing words
 
-If you have any questions, please reach out to us on [GitHub](https://github.com/upstash/upstash-cli/issues/new) or the channels below.
+If you have any questions, please reach out to us on [GitHub](https://github.com/upstash/upstash-cli/issues/new) or through the channels below.
 
 Follow us
 on [Discord](https://upstash.com/discord)
