@@ -34,24 +34,24 @@ Diagram:
 
 ## What is Serverless Redis?
 
-Serverless Redis® is a fully managed database as a service product where the pricing is based on per command, so you are only charged what you actually use.
+Serverless Redis® is a fully managed database-as-a-service product where the pricing is based on per command, so you are only charged for what you actually use.
 
-That way you don't have to over provision your servers, and you can scale your application as needed.
+That way, you don't have to over-provision your servers, and you can scale your application as needed.
 
 ## Why Serverless Redis?
 
-By default, Laravel would store the user sessions in files on the web server's disk. That way if the load balancer forwards the user request to a different server, the user session would be lost.
+By default, Laravel would store the user sessions in files on the web server's disk. That way, if the load balancer forwards the user request to a different server, the user session would be lost.
 
-This is why it is important to have a centralized place to store the user sessions and application cache, so that they can be shared between requests and across multiple servers, and not be lost each time the load balancer forwards the request to a different server.
+This is why it is important to have a centralized place to store the user sessions and application cache so that they can be shared between requests and across multiple servers, and not be lost each time the load balancer forwards the request to a different server.
 
-Of course, you can also use your database to store the user sessions and cache data, but for better performance, it is recommended to use Redis® for better performance. If you want to learn more about the performance benefits of the different options, check out this great article here: [Which is the best Laravel cache driver for performance?](https://www.georgebuckingham.com/laravel-cache-driver-performance/).
+Of course, you can also use your database to store the user sessions and cache data, but for better performance, it is recommended to use Redis®. If you want to learn more about the performance benefits of the different options, check out this great article here: [Which is the best Laravel cache driver for performance?](https://www.georgebuckingham.com/laravel-cache-driver-performance/).
 
 ## Horizontal Scaling vs. Vertical Scaling
 
 Just a few words about the difference between horizontal and vertical scaling:
 
 - When you have a single server, you can scale it vertically by adding more resources to it. For example, you can add more CPU cores, RAM, or disk space to **scale-up**.
-- Horizontal scaling on the other side, is when you add more servers that are responsible for serving requests to **scale-out**.
+- Horizontal scaling, on the other hand, is when you add more servers that are responsible for serving requests to **scale-out**.
 
 Here is a simple example of horizontal scaling vs. vertical scaling:
 
@@ -108,7 +108,7 @@ Finally, clear your config cache by running the following command:
 php artisan config:clear
 ```
 
-That way your Laravel application will use the serverless Redis® cluster to store its cache and session data.
+That way, your Laravel application will use the serverless Redis® cluster to store its cache and session data.
 
 ## Conclusion
 
