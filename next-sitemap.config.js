@@ -6,8 +6,9 @@ module.exports = {
   generateIndexSitemap: true,
   generateRobotsTxt: true,
   robotsTxtOptions: {
-	additionalSitemaps: ['https://upstash.com/docs/sitemap.xml'],
+    additionalSitemaps: ["https://upstash.com/docs/sitemap.xml"],
     policies: [
+      { userAgent: "Twitterbot", allow: "/" },
       {
         userAgent: "*",
         allow: "/",
