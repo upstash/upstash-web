@@ -1,9 +1,4 @@
----
-slug: lucia-sveltekit
-title: Type-safe User Authentication in SvelteKit with Lucia, Planetscale, and Upstash Redis
-authors:
-  - chris
-tags: [redis, lucia, svelte, sveltekit]
+**[Middleware](https://lucia-auth.com/basics/handle-requests)** allows Lucia to read the request and response for different frameworks and runtimes.edis, lucia, svelte, sveltekit]
 ---
 
 After our last guide on the Upstash blog scored a spot on the **[Bytes newsletter](https://bytes.dev/archives/209)**, I thought we'd keep the SvelteKit party going.
@@ -12,9 +7,9 @@ As a Svelte super fan, I'm seeing more and more people jumping on board every da
 
 One of the tools that’s still flying under the radar is [Lucia](https://lucia-auth.com/).
 
-In this guide I’m going to show you how to get authentication up and running with Lucia. We will be using PlanetScale for our database needs, and Upstash Redis to handle sessions.
+In this guide, I’m going to show you how to get authentication up and running with Lucia. We will be using PlanetScale for our database needs, and Upstash Redis to handle sessions.
 
-Below is a screenshot of our end goal for this guide. You can find the example repository [here](https://github.com/upstash/examples/tree/main/examples/sveltekit-lucia-redis).
+Below is a screenshot of our end goal for this guide: You can find the example repository [here](https://github.com/upstash/examples/tree/main/examples/sveltekit-lucia-redis).
 
 ![redis-lucia-auth-signin.jpg](/blog/lucia-sveltekit/redis-lucia-auth-signin.jpg)
 
@@ -67,7 +62,7 @@ With that background info, let’s jump right in.
 
 ## **Prerequisites**
 
-To get up and running with the app and following along you need:
+To get up and running with the app and follow along, you need:
 
 - A fundamental understanding of SvelteKit. Handling forms and routing is a plus.
 - Basic familiarity with Drizzle ORM.
@@ -80,11 +75,11 @@ For the sake of efficiency, we won't be creating the entire application from scr
 
 Instead, you can clone the `sveltekit-lucia-redis` directory from the [Upstash examples repo](https://github.com/upstash/examples) to follow along.
 
-After downloading the repository, navigate into the application using the `cd` command and install the dependencies via your preferred package manager and set the `.env` variables by duplicating `.env.example`.
+After downloading the repository, navigate into the application using the `cd` command, install the dependencies via your preferred package manager, and set the `.env` variables by duplicating `.env.example`.
 
 ### Understanding the key parts
 
-Here’s a quick rundown of all the important parts.
+Here’s a quick rundown of all the important parts:
 
 - `src/lib/server/auth/index.ts` - Here’s where we configure Lucia.
 - `src/lib/server/drizzle` - Drizzle helps us to easily create a mySQL schema which we can conveniently push to PlanetScale using Drizzle Kit.
@@ -214,7 +209,7 @@ We'll also import `sequence` which is a helper function that allows us to run mu
 
 Now that we have Lucia configured, we can create our user model.
 
-We'll use Drizzle ORM, since it's all hot and happening right now.
+We'll use Drizzle ORM since it's all hot and happening right now.
 
 <div class="mx-auto my-8 max-w-sm rounded-sm">
   <img
@@ -225,7 +220,7 @@ We'll use Drizzle ORM, since it's all hot and happening right now.
 
 _And their memes are on point. Just look at this one._
 
-Before you can continue, you need to create a database on PlanetScale. And setup the Drizzle config file. This will help the Drizzle CLI to connect to your database.
+Before you can continue, you need to create a database on PlanetScale. And set up the Drizzle config file. This will help the Drizzle CLI to connect to your database.
 
 ```ts title="drizzle.config.ts"
 import dotenv from "dotenv";
@@ -248,7 +243,7 @@ export default {
 } satisfies Config;
 ```
 
-Because we're using the mySQL adapter, Lucia expects our user model to have a specific structure. You can find more information about this in the [docs](https://lucia-auth.com/database-adapters/mysql2).
+Because we're using the MySQL adapter, Lucia expects our user model to have a specific structure. You can find more information about this in the [docs](https://lucia-auth.com/database-adapters/mysql2).
 
 Place the following code in `src/lib/server/drizzle/schema/index.ts`.
 
@@ -374,7 +369,7 @@ Now that was easy!
 
 ## **Creating the routes**
 
-Now that we have Lucia configured, we can create our routes.
+Now that we have Lucia configured, we can create our routes:
 
 Create the following folders in `src/routes`. Don't worry about any files for now, we'll go over them in a bit.
 
@@ -455,13 +450,13 @@ Create a new file in `src/routes/auth/signin/+page.svelte`. I'm going to omit th
 </form>
 ```
 
-The `use:enhance` action will progressively enhance the form, and allow us to show a loading state when the form is submitted. You can read more about enhance [here](https://kit.svelte.dev/docs/form-actions#progressive-enhancement-use-enhance).
+The `use:enhance` action will progressively enhance the form and allow us to show a loading state when the form is submitted. You can read more about enhance [here](https://kit.svelte.dev/docs/form-actions#progressive-enhancement-use-enhance).
 
 The rest of the code is pretty self-explanatory.
 
 #### Handling the signin request
 
-SvelteKit makes it incredibly easy to handle POST requests. All we need to do is create a file `+page.server.ts` in the same directory as the `+page.svelte` file and export a `actions` object with at least a `default` property.
+SvelteKit makes it incredibly easy to handle POST requests. All we need to do is create a file `+page.server.ts` in the same directory as the `+page.svelte` file and export an `actions` object with at least a `default` property.
 
 ```ts title="src/routes/auth/signin/+page.server.ts"
 import { fail, redirect } from "@sveltejs/kit";
@@ -538,7 +533,7 @@ As you can probably tell, Lucia abstracts away a lot of the complexity of authen
   <img src="/blog/lucia-sveltekit/spongebob-magic.jpeg" alt="spongebob meme" />
 </div>
 
-No need to, hash passwords, create sessions, or manage cookies. Lucia does it all for us. And it's all type-safe!
+No need to hash passwords, create sessions, or manage cookies. Lucia does it all for us. And it's all type-safe!
 
 ### Creating the signup page
 
@@ -624,11 +619,11 @@ The signup page is very similar to the signin page, so there's not much to expla
 
 Create a new file in `src/routes/auth/signup/+page.server.ts`.
 
-For the signup we will need to use a similar pattern as with our signup form but there will be few differences starting from data retrieval from the form, field's validation up to the point of creating the user and handling already existing users.
+For the signup, we will need to use a similar pattern as with our signup form, but there will be a few differences starting from data retrieval from the form, field validation up to the point of creating the user, and handling already existing users.
 
 The imports are the same as with the signin page, so we'll skip that part.
 
-We'll start by getting the form data from the request object, and do some basic housekeeping. We'll also check if the passwords match.
+We'll start by getting the form data from the request object and do some basic housekeeping. We'll also check if the passwords match.
 
 ```ts
 const formData = await request.formData();
@@ -692,7 +687,7 @@ const session = await auth.createSession({
 locals.auth.setSession(session);
 ```
 
-Easy peasey lemon squeezy!
+Easy peasy lemon squeezy!
 
 ### Bonus: Creating the signout page
 
@@ -726,7 +721,7 @@ export const POST: RequestHandler = async ({ locals }) => {
 };
 ```
 
-Again Lucia has our back by making it incredibly easy to invalidate sessions. All we need to do now is call this endpoint when the user clicks the sign out button.
+Again, Lucia has our back by making it incredibly easy to invalidate sessions. All we need to do now is call this endpoint when the user clicks the sign-out button.
 
 ```svelte title="src/routes/app/+page.svelte"
 <script lang="ts">
@@ -759,4 +754,4 @@ We've successfully created type-safe authentication with Lucia, PlanetScale, and
 
 Again, you can find the repo for this guide [here](https://github.com/upstash/examples) If you want to learn more about Lucia, I highly recommend checking out the [docs](https://lucia-auth.com/).
 
-Before you move on you should come hang out in the [Upstash Discord](https://discord.gg/hEHsgSHtT7) community — we're having a good ol' time. And also if you want more SvelteKit content, you can find it on my blog [here](https://chrisjayden.com).
+Before you move on, you should come hang out in the [Upstash Discord](https://discord.gg/hEHsgSHtT7) community — we're having a good ol' time. And also, if you want more SvelteKit content, you can find it on my blog [here](https://chrisjayden.com).
