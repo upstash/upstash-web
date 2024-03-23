@@ -6,11 +6,11 @@ authors:
 tags: [redis, database, serverless, nextjs]
 ---
 
-User feedback is important to guide product decisions. We built a widget to help you get feedback from your users. It is a React component which calls Next.js API as its backend. The backend API simply sends the feedback data to Upstash Redis database. Also, you will be able to see and manage the submitted data in [Upstash Console Integrations Page](https://console.upstash.com/integration/feedback)
+User feedback is important for guiding product decisions. We built a widget to help you get feedback from your users. It is a React component that calls a Next.js API as its backend. The backend API simply sends the feedback data to an Upstash Redis database. Also, you will be able to see and manage the submitted data on the [Upstash Console Integrations Page](https://console.upstash.com/integration/feedback)
 
-When you add the component to your Next.js page, an icon will be displayed on bottom right corner. When clicked, feedback form will be visible. Check [the demo](https://upstash-feedback-widget.vercel.app/) to see how it works.
+When you add the component to your Next.js page, an icon will be displayed in the bottom right corner. When clicked, a feedback form will become visible. Check [the demo](https://upstash-feedback-widget.vercel.app/) to see how it works.
 
-See [the Github repo](https://github.com/upstash/feedback) to check out the code. _Currently, the widget is designed to be used in a Next.js application. We welcome your contributions to support others like Nuxt, SvelteKit or Remix_
+See [the GitHub repo](https://github.com/upstash/feedback) to check out the code. _Currently, the widget is designed to be used in a Next.js application. We welcome your contributions to support others like Nuxt, SvelteKit, or Remix_
 
 ![feedback widget](/blog/feedback/f1.png)
 
@@ -41,7 +41,7 @@ export default function MyApp({ Component, pageProps }) {
 }
 ```
 
-Copy/paste the below API code to `pages/api/feedback.js`
+Copy/paste the API code below into `pages/api/feedback.js`
 
 ```javascript
 // pages/api/feedback.js
@@ -64,7 +64,7 @@ export default async function FeedbackWidgetAPI(req, res) {
 }
 ```
 
-You need to create a Redis database at [Upstash](https://console.upstash.com) then replace `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` which can be found at the database details page in Upstash Console.
+You need to create a Redis database at [Upstash](https://console.upstash.com) and then replace `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`, which can be found on the database details page in the Upstash Console.
 
 ### Admin Dashboard
 
@@ -101,8 +101,8 @@ To allow anonymous submission, set any string as a user id just to hide email in
 
 **metadata** : You can attach extra information using the metadata field.
 
-**showOnInitial** : Set true, if you prefer the input dialog to be shown at initial.
+**showOnInitial** : Set to true if you prefer the input dialog to be shown initially.
 
 ### Closing Words
 
-Depending on your interest, we are planning to build new components. You can contribute to our [Github repo](https://github.com/upstash/feedback) and open issues and feature requests. Follow us at [Twitter](https://twitter.com/upstash) and [Discord](https://discord.gg/w9SenAtbme).
+Depending on your interest, we are planning to build new components. You can contribute to our [GitHub repo](https://github.com/upstash/feedback) and open issues and feature requests. Follow us on [Twitter](https://twitter.com/upstash) and [Discord](https://discord.gg/w9SenAtbme).
