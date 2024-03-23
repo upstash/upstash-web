@@ -1,19 +1,19 @@
 ---
 slug: serverless-with-flutter-2
-title: "Fullstack Serverless app with Flutter, Serverless Framework and Upstash(REDIS) - PART 2"
+title: "Fullstack Serverless App with Flutter, Serverless Framework, and Upstash (REDIS) - Part 2"
 authors:
   - rosius
 image: flutter2/cover.png
 tags: [serverless, flutter, upstash, redis]
 ---
 
-Welcome to part 2 of this tutorial series. In the first part, we saw how to build a REST API using Upstash, Serverless Framework, and Redis.
+Welcome to Part 2 of this tutorial series. In the first part, we saw how to build a REST API using Upstash, Serverless Framework, and Redis.
 
 In this part, we'll build a mobile application using Flutter, to consume our REST API endpoints.
 
 Let's get started 🙃
 
-Firstly, you'll need to have flutter installed and running on your computer
+Firstly, you'll need to have Flutter installed and running on your computer
 
 - [Flutter](https://flutter.dev/)
 
@@ -27,7 +27,7 @@ shared_preferences: ^2.0.6
 http: ^0.13.4
 ```
 
-So it should finally look like this
+So, it should finally look like this
 
 ```yaml
 dev_dependencies:
@@ -39,9 +39,9 @@ dev_dependencies:
   http: ^0.13.4
 ```
 
-The `timeago` library is converting Unix timestamps(1636824843) into human-readable format like `a minute ago`, ` 5 mins ago` etc.
+The `timeago` library converts Unix timestamps (1636824843) into a human-readable format like `a minute ago`, `5 mins ago`, etc.
 
-`Once we create a user account, we want to keep track of their `userId`and other minor details. We'll use`shared_preferences`for that. Then we'll use the`http` library for making HTTP calls.
+Once we create a user account, we want to keep track of their `userId` and other minor details. We'll use `shared_preferences` for that. Then we'll use the `http` library for making HTTP calls.
 
 Let's get started...
 
@@ -49,16 +49,16 @@ Let's get started...
 
 The first screen we'll be building is the create user screen, which would consume the create user endpoint.
 
-Here's how the screen looks like
+Here's what the screen looks like
 
 ![c.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1636828712136/N2CTJh_SY.png)
-Don't worry about the bunny pic. Just a placeholder for the imageview.
+Don't worry about the bunny pic. It's just a placeholder for the image view.
 
 Create a folder inside the `lib` folder called `account` and then, create a new file called `create_profile_screen.dart` inside the `account` folder.
 
-Here's how my final `lib` folder structure looks like
+Here's what my final `lib` folder structure looks like
 ![Screen Shot 2021-11-13 at 18.12.40.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1636823613244/NTDxnkuHl.png)
-In order to create a new user, we need a
+To create a new user, we need a
 
 - profile pic URL
 - first name
@@ -112,17 +112,17 @@ static const String  CREATE_USER_PROFILE_URL = "https://5vafvrk8kj.execute-api.u
 
 [Future](https://api.flutter.dev/flutter/dart-async/Future-class.html) is a core Dart class for working with asynchronous operations. A Future object represents a potential value or error that will be available at some time in the future.
 
-The http.Response class contains the data received from a successful http call.
+The http.Response class contains the data received from a successful HTTP call.
 
 The above code uses the `http post` method to send a post request to the `create user endpoint` then, await a response.
 
-If the response status code is 200, then the request was successful, we save the created UserId in shared preferences, and then we move to the homescreen.
+If the response status code is 200, then the request was successful, we save the created UserId in shared preferences, and then we move to the home screen.
 
 Here's a link to the complete source code for this screen [Create Profile Screen](https://github.com/trey-rosius/upstash_mobile/blob/master/lib/account/create_profile_screen.dart).
 
 ## Create a Post
 
-One of our endpoints allowed a user to create a post. Here's how the screen looks like
+One of our endpoints allows a user to create a post. Here's what the screen looks like
 
 ![b.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1636828393818/kz9PPbyDx.png)
 
@@ -132,7 +132,7 @@ In order to create a post, a user needs
 - text
 - imageUrl
 
-Remember that, for demonstrations purposes, we are using a ready made imageUrl. In a real app, you'll have to allow a user to pick their image, upload it to a server, get the image Url, and then use it to create a post.
+Remember that, for demonstration purposes, we are using a ready-made imageUrl. In a real app, you'll have to allow a user to pick their image, upload it to a server, get the image URL, and then use it to create a post.
 
 `CreatePost` method looks similar to `CreateUser` method.
 
@@ -168,7 +168,7 @@ Remember that, for demonstrations purposes, we are using a ready made imageUrl. 
 
 ## List All Posts
 
-The home screen on our application would display a list of all posts created.
+The home screen of our application displays a list of all posts created.
 
 Something like this
 
@@ -255,7 +255,7 @@ class PostAdmin {
 }
 ```
 
-Then ,we convert the `http.Response` to that custom Dart object.
+Then, we convert the `http.Response` to that custom Dart object.
 
 ```javascript
 List<Post> parsePosts(String responseBody) {
@@ -272,19 +272,19 @@ Future<List<Post>> fetchPosts(http.Client client) async {
 }
 ```
 
-The return type for the `fetchPosts` method is a `Future<List<Post>>`.
+The return type of the `fetchPosts` method is a `Future<List<Post>>`.
 
-If you run the fetchPosts() function on a slower device, you might notice the app freezes for a brief moment as it parses and converts the JSON. This is jank, and you want to get rid of it.
+If you run the fetchPosts() function on a slower device, you might notice the app freezes for a brief moment as it parses and converts the JSON. This is jank, and you'll want to get rid of it.
 
-We remove the jank by moving the parsing and conversion to the background using the `compute` function
+We remove the jank by moving the parsing and conversion to the background using the `compute` function.
 
 ```javascript
 compute(parsePosts, response.body);
 ```
 
-The compute() function runs expensive functions in a background isolate and returns the result
+The compute() function runs expensive functions in a background isolate and returns the result.
 
-In the home screen file, we'll use a FutureBuilder widget to asynchronously grab all the posts as a list from your database.
+In the home screen file, we'll use a FutureBuilder widget to asynchronously grab all the posts as a list from the database.
 
 We have to provide two parameters:
 
@@ -294,7 +294,7 @@ A builder function that tells Flutter what to render, depending on the state of 
 
 Note that snapshot.hasData only returns true when the snapshot contains a non-null data value.
 
-Because fetchPosts can only return non-null values, the function should throw an exception even in the case of a “404 Not Found” server response. Throwing an exception sets the snapshot.hasError to true which can be used to display an error message.
+Because fetchPosts can only return non-null values, the function should throw an exception even in the case of a “404 Not Found” server response. Throwing an exception sets the snapshot.hasError to true, which can be used to display an error message.
 
 Otherwise, the spinner will be displayed.
 
@@ -379,23 +379,23 @@ late Future<List<Post>> _posts;
   }
 ```
 
-The reason why we call fetchPosts in initState instead of the build method is because flutter calls the build() method every time it needs to change anything in the view, and this happens surprisingly often. Leaving the fetch call in your build() method floods the API with unnecessary calls and slows down your app.
+The reason why we call fetchPosts in initState instead of the build method is that Flutter calls the build() method every time it needs to change anything in the view, and this happens surprisingly often. Leaving the fetch call in your build() method floods the API with unnecessary calls and slows down your app.
 
 Feel free to go through the [complete source code](https://github.com/trey-rosius/upstash_mobile)
 
-There are still a couple of endpoints to create interfaces for, but what's a good tutorial, without exercises  😂
+There are still a couple of endpoints to create interfaces for, but what's a good tutorial without exercises? 😂
 
 ## Conclusion
 
-In this post series, we looked at how to build a serverless rest API with [Upstash](https://upstash.com/), while consuming them through a mobile application.
+In this post series, we looked at how to build a serverless REST API with [Upstash](https://upstash.com/), while consuming them through a mobile application.
 
-I'll love to see what you build next with Upstash, or how you enhance this tutorial to suit your use case.
+I'd love to see what you build next with Upstash, or how you enhance this tutorial to suit your use case.
 
-If you found this piece helpful, please share on your social media pages.
+If you found this piece helpful, please share it on your social media pages.
 
 Have Questions? Leave a comment.
 
-If you found an error, you know what to do. Leave a comment and I'll be on it ASAP.
+If you find an error, you know what to do. Leave a comment, and I'll be on it ASAP.
 
 Happy Coding ✌🏿
 
