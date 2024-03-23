@@ -8,7 +8,7 @@ tags: [qstash, serverless, callbacks, vercel]
 Earlier this year, we released [QStash](https://upstash.com/qstash), a message queue and scheduler designed for serverless and edge platforms.
 Today we're excited to announce: QStash Callbacks.
 
-QStash solved the problem of using queues and scheduling messages in serverless functions. But until now this was a one way street, where you could only send messages but had no way of accessing the response of the destination API.
+QStash solved the problem of using queues and scheduling messages in serverless functions. But until now, this was a one-way street, where you could only send messages but had no way of accessing the response of the destination API.
 With QStash Callbacks, you can now send messages and get the response pushed back to you.
 
 ## How it works
@@ -42,12 +42,12 @@ curl -X POST \
 }'
 ```
 
-After receiving a response from the destination api, we immediately publish a new message to the callback URL. The message body is a JSON object with the following fields:
+After receiving a response from the destination API, we immediately publish a new message to the callback URL. The message body is a JSON object with the following fields:
 
 ```json
 {
   "status": 200,
-  "sourceMessasgeId": "msg_xxx" // The ID of the message that triggered the callback
+  "sourceMessageId": "msg_xxx" // The ID of the message that triggered the callback
   "headers": {
     "key": ["value"]
   },
