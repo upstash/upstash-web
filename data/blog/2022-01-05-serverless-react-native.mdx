@@ -7,7 +7,7 @@ image: reactnative/cover.jpg
 tags: [serverless, redis, react-native, mobile, aws-lambda]
 ---
 
-In this post, we will use React Native, Serverless framework and Upstash to develop a mobile application for viewing and updating a leaderboard.
+In this post, we will use React Native, the Serverless framework, and Upstash to develop a mobile application for viewing and updating a leaderboard.
 
 We will use React Native to develop the mobile application backed by the Serverless framework, which consists of Python functions running on AWS Lambda.
 
@@ -15,9 +15,9 @@ We will use React Native to develop the mobile application backed by the Serverl
 
 In a typical leaderboard app, user information and scores belonging to users are needed to be stored. Since all of these data should be sorted by scores, using Redis is one of the best possible solutions.
 
-“Sorted Set”, which is supported by Redis is a sorted data type that enables users to do storing, adding, removing and querying by range operations in a very fast manner.
+"Sorted Set", which is supported by Redis, is a sorted data type that enables users to perform storing, adding, removing, and querying by range operations in a very fast manner.
 
-Sorted set is exactly the thing that is needed for storing, updating and displaying a sorted leaderboard.
+A sorted set is exactly what is needed for storing, updating, and displaying a sorted leaderboard.
 
 #### **1.1 - Getting Started with Upstash**
 
@@ -56,15 +56,15 @@ We can do these operations on AWS Lambda functions with Serverless Framework to 
 
 ### **2 - Create Functions with Serverless Framework**
 
-Serverless is a framework which allows us to work with serverless functions of cloud providers such as AWS, Azure, Google Cloud etc. It is a very powerful tool to implement and manage serverless functions from the user side.
+Serverless is a framework that allows us to work with serverless functions of cloud providers such as AWS, Azure, Google Cloud, etc. It is a very powerful tool to implement and manage serverless functions from the user side.
 
-Let’s start by installing and configuring Serverless Framework for AWS. Visit and follow the steps [Serverless quick start](https://www.serverless.com/framework/docs/providers/aws/guide/quick-start).
+Let's start by installing and configuring the Serverless Framework for AWS. Visit and follow the steps in the [Serverless quick start](https://www.serverless.com/framework/docs/providers/aws/guide/quick-start).
 
 After installation, we have handler.py and serverless.yml.
 
 - serverless.yml
 
-  In this file, we will define the functions that we will implement. In our case, we will only need to add new users and get the leaderboard to display. Therefore, defining “addScore” and “getLeaderboard” functions should be enough.
+In this file, we will define the functions that we will implement. In our case, we will only need to add new users and get the leaderboard to display. Therefore, defining "addScore" and "getLeaderboard" functions should be enough.
 
 ```
 	functions:
@@ -80,15 +80,15 @@ After installation, we have handler.py and serverless.yml.
 
 - handler.py
 
-  In this file, we will implement the functions, which are the codes that will be executed in the backend when a http request is sent by a mobile app as defined in serverless.yml file.
+In this file, we will implement the functions, which are the codes that will be executed in the backend when an HTTP request is sent by a mobile app as defined in the serverless.yml file.
 
-  First, we need to import and configure redis, which is the only dependency we have. To add redis dependency to the serverless framework, we need to add the “Serverless Python Requirements” plugin. Run the command,
+First, we need to import and configure Redis, which is the only dependency we have. To add the Redis dependency to the Serverless framework, we need to add the "Serverless Python Requirements" plugin. Run the command,
 
   ```
   serverless plugin install -n serverless-python-requirements
   ```
 
-  Then ensure that the plugin is added to serverless.yml as below.
+Then ensure that the plugin is added to serverless.yml as below.
 
   ```
   plugins:
@@ -97,7 +97,7 @@ After installation, we have handler.py and serverless.yml.
 
   For further detail, please visit [serverless-python-requirements](https://www.serverless.com/plugins/serverless-python-requirements).
 
-  As the last step, we need to create the requirements.txt file in the same directory as serverless.yml. Add the redis dependency to the requirements.txt file as below
+As the last step, we need to create the requirements.txt file in the same directory as serverless.yml. Add the Redis dependency to the requirements.txt file as below
 
   ```
   redis==4.0.2
@@ -117,11 +117,11 @@ After installation, we have handler.py and serverless.yml.
   decode_responses=True)
   ```
 
-  After we have finished the Redis configuration, we can prepare our functions that will be called by users.
+After we have finished the Redis configuration, we can prepare our functions that will be called by users.
 
   We have two functionalities.
 
-  First one is adding new users and scores to the leaderboard. This is a POST request. Users will send their information inside the body of the HTTP request.
+The first one is adding new users and scores to the leaderboard. This is a POST request. Users will send their information inside the body of the HTTP request.
 
   ```
   {"score": 15,"firstname": "Jack","lastname": "Thang"}
@@ -143,9 +143,9 @@ After installation, we have handler.py and serverless.yml.
   return response
   ```
 
-  We can parse the score and user information from the event parameter, which is provided by AWS Lambda.
+We can parse the score and user information from the event parameter, which is provided by AWS Lambda.
 
-  By using the zadd function of redis, we can add users and score to the sorted set “Leaderboard”. Example:
+By using the zadd function of Redis, we can add users and scores to the sorted set "Leaderboard". Example:
 
   ```
   Request body: {"score": 15,"firstname": "Jack","lastname": "Thang"}
@@ -153,7 +153,7 @@ After installation, we have handler.py and serverless.yml.
   Response body: {"message": "Score added successfully!"}
   ```
 
-  Our second function is getLeaderboard. This function accepts GET requests from users and it returns the leaderboard in descending order, which is read from Redis.
+Our second function is getLeaderboard. This function accepts GET requests from users and returns the leaderboard in descending order, which is read from Redis.
 
   ```
   def getLeaderboard(event, context):
@@ -193,11 +193,11 @@ After installation, we have handler.py and serverless.yml.
 
 ### **3 - Developing Mobile App with React Native**
 
-React Native is a framework, which allows us to develop mobile applications for multiple platforms by writing code in Javascript.
+React Native is a framework that allows us to develop mobile applications for multiple platforms by writing code in JavaScript.
 
 To develop mobile applications with React Native, we have to set up our environment and create the project. Please follow the steps to create your first mobile application [environment-setup](https://reactnative.dev/docs/environment-setup).
 
-In our mobile application, there will be two screens. The first one is the screen where users add a new score with user information.
+In our mobile application, there will be two screens. The first one is the screen where users add a new score along with user information.
 
 For the sake of simplicity, we will only request first name, last name and score from the user.
 
@@ -205,7 +205,7 @@ Screen which users submit scores looks like below.
 
 **![](https://lh4.googleusercontent.com/FIRqwt5tR6JLjdao-9AYNc9SmHY0jIUNkkqYgpxRr5yRz1eqhm0A9WbCHCoTZs22g00hptix6Vi8MQac6qcUZ02-jK54naCg5CA1BThH5lycQu78n6rSTLWEBa1rnpLtkTS0OpKk)**
 
-In this screen, when a user enters a score, the application will send a HTTP request to our serverless endpoint
+In this screen, when a user enters a score, the application will send an HTTP request to our serverless endpoint
 
 ```
 https://f571j8y8s1.execute-api.us-east-1.amazonaws.com/add
@@ -251,9 +251,9 @@ async addScore(){
 }
 ```
 
-As you can see, the POST request body contains “firstname”, “lastname”, “score” keys and corresponding values that we get from users.
+As you can see, the POST request body contains "firstname", "lastname", "score" keys and corresponding values that we get from users.
 
-If the response that is sent from the backend contains "Score added successfully!", then this means that the request we sent is received and the score is added successfully.
+undefined"Score added successfully!", then this means that the request we sent is received and the score is added successfully.
 
 **![](https://lh5.googleusercontent.com/US4YUueJZIIlP-vXNgh5ZNVm70y1sDS6J9JQWZS3lPmQ07-ZR_oWaRD6YTD0VEDTvJty_1MhoQrA2ShIQZqxNMytvcQgdZoc4LI16H3OFszIdKTVw_TdYRVbew0TgN4wC7LW8O6P)**
 
