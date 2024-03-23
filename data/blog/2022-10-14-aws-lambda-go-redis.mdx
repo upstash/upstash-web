@@ -8,11 +8,11 @@ tags: [serverless, redis, upstash, aws-lambda, go]
 
 ## Intro
 
-Serverless compute platforms are awesome, but without serverless databases they are too limited.
+Serverless compute platforms are awesome, but without serverless databases, they are too limited.
 
 While I was building the platform for my upcoming course, [The Elements of CI/CD](https://www.elementsofcicd.com?utm_source=upstash_redis&utm_medium=guest_blog&utm_campaign=promotion), I wanted a serverless database since I decided to use [AWS Lambda](https://aws.amazon.com/lambda/) as my server for certain things. The requirements I had were:
 
-1. **Pay as you go pricing**. I don't want to pay per hour or per node, but by usage (requests, storage, etc). It should be very cheap to start using it and as usage ramps up the cost would grow proportionally.
+1. **Pay as you go pricing**. I don't want to pay per hour or per node, but by usage (requests, storage, etc.). It should be very cheap to start using it, and as usage ramps up, the cost would grow proportionally.
 2. **Low latency**. Nobody likes slow responses, so querying the database should be fast from inside AWS regions (e.g. `eu-west-1`).
 3. **Great developer experience (DevX)**. Having a nice interface for the database without having to learn yet another niche DSL, or wasting hours fiddling with a website is preferred.
 
@@ -25,11 +25,11 @@ While I was building the platform for my upcoming course, [The Elements of CI/CD
 - Great DevX?
   - ✅ It's standard Redis. So, yeap.
 
-In this article we are going to see how to use Upstash Redis from inside AWS Lambda, ensure it is fast enough for our needs, whilst at the same time keeping our code maintainable in order to be able to test locally or deploy to a different platform if needed.
+In this article, we are going to see how to use Upstash Redis from inside AWS Lambda, ensure it is fast enough for our needs, whilst at the same time keeping our code maintainable in order to be able to test locally or deploy to a different platform if needed.
 
 ## What are we implementing?
 
-For simplicity, we are going to implement just 3 API endpoints:
+For simplicity, we are going to implement just three API endpoints:
 
 1. The `GET|POST /login` endpoint which accepts a `userId` as a query parameter in a `GET`, or inside a form value submitted with a `POST` request. This endpoint will generate a session ID, store it in Redis, and also set a cookie for subsequent visits. The `GET` just makes it easier to test.🙃
 2. The `GET /lessons/completed` endpoint requires logged in users (i.e. having the cookie with the session ID) and returns a JSON response with all the lessons the user completed and when.
@@ -43,11 +43,11 @@ _Note: In the code below there are a few things missing, thus this is not produc
 
 As you will see below, we are creating two entrypoints, i.e. two executable commands. One will be for a normal local server, and one will be for AWS Lambda. This way, we will be able to test our whole logic locally, and with standard unit/integration tests if we wanted.
 
-The only differences between them is shown in sections 1.2 and 1.3 below.
+The only differences between them are shown in sections 1.2 and 1.3 below.
 
 ### 1.1 Workspace
 
-Before we dive into the code, let's setup our working directory for Go.
+Before we dive into the code, let's set up our working directory for Go.
 
 1. [Download Go](https://go.dev/doc/install).
 2. [Create an Upstash Redis account and database](/docs/redis#create-account) in a region of your choosing. Ideally it should be the same AWS region you will deploy your Lambda. I will be using `eu-west-1` (Europe, Ireland) in this article.
@@ -152,7 +152,7 @@ build-server: clean
 	CGO_ENABLED=0 go build -o build/server cmd/server/main.go
 ```
 
-Don't worry too much for now about the details but this allows us to do:
+Don't worry too much for now about the details, but this allows us to do:
 
 - `make build-server`: Builds the binary for running the server locally (executable `./build/server`).
 - `make build-lambda`: Builds the binary for running the server on AWS Lambda (executable `./build/handler` and `./build/handler.zip`).
@@ -168,7 +168,7 @@ Finally, run `make` once, in order to build everything and make sure your worksp
 
 _For this section we will always be working inside the `~/dev/aws-lambda-upstash-redis/core/lib.go` file._
 
-The following few lines define the API endpoints we discussed earlier, using the amazing [`go-chi`](https://github.com/go-chi/chi/) library.
+The following few lines define the API endpoints we discussed earlier, using the amazing [`go-chi`](https://github.com/go-chi/chi/) library:
 
 ```go
 import (
@@ -196,17 +196,17 @@ func NewMux() *chi.Mux {
 }
 ```
 
-In the snippet above, `r.Group(...)` creates a shared layer where we can apply common middleware for any route defined inside of it. In this case, we add our own middleware `UsersWithSessionOnly`, which as we will see later guarantees that the request contains the cookie with an active session ID.
+In the snippet above, `r.Group(...)` creates a shared layer where we can apply common middleware to any route defined inside of it. In this case, we add our own middleware `UsersWithSessionOnly`, which as we will see later guarantees that the request contains the cookie with an active session ID.
 
 ### 2.1 UsersWithSessionOnly middleware
 
-In this middleware we want to implement the following:
+In this middleware, we want to implement the following:
 
 1. Extract the cookie that contains the session ID, and fail otherwise.
 2. Query Redis to fetch the user details based on the session ID, and fail if the session ID provided is not active.
 3. Store the user ID in the request's `context.Context` in order to make it available to downstream middleware or handlers.
 
-First, we need some boilerplate code for some imports and definitions that are used everywhere.
+First, we need some boilerplate code for imports and definitions that are used everywhere.
 
 ```go
 import (
@@ -306,7 +306,7 @@ func markLessonComplete(w http.ResponseWriter, r *http.Request) {
 
 ### 2.3 listLessonsCompleted(...)
 
-In similar fashion as the previous section, here we just want to return the whole map of lessons completion and return it to the user in a JSON response. We use the [`HGETALL` command](https://redis.io/commands/hgetall/) for this.
+In a similar fashion to the previous section, here we just want to return the whole map of lesson completions and return it to the user in a JSON response. We use the [`HGETALL` command](https://redis.io/commands/hgetall/) for this.
 
 ```go
 func listLessonsCompleted(w http.ResponseWriter, r *http.Request) {
@@ -332,7 +332,7 @@ func listLessonsCompleted(w http.ResponseWriter, r *http.Request) {
 
 ### 2.4 login(...)
 
-Finally, the login endpoint. Once again, please do not copy the following code into production, since it's not doing any kind of validation. For the purposes of this article we are only interested in how it queries Redis and how it sets the cookie for the session ID.
+Finally, the login endpoint. Once again, please do not copy the following code into production, since it's not performing any kind of validation. For the purposes of this article we are only interested in how it queries Redis and how it sets the cookie for the session ID.
 
 The session ID is generated by the [`ksuid`](https://github.com/segmentio/ksuid) library, which has a few advantages over normal UUIDs, and we only consider it active for 1 hour. We use the time-to-live functionality of the [Redis `SET` command](https://redis.io/commands/set/) for automatic removal from the database after one hour.
 
@@ -370,9 +370,9 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 ## 3. Demo - Locally
 
-Phew, that was a lot of code.😅
+Phew, that was a lot of code. 😅
 
-Let's do a quick demo to make sure everything works as expected.
+Let's do a quick demo to ensure everything works as expected.
 
 - First, set the `UPSTASH_REDIS_URL` environment variable to the URL of the database you created in section 1 above. You can find it in the _details_ tab of your database's page (see section 1.1 above).
 
@@ -424,11 +424,11 @@ Looking into the Redis database itself using the recently launched online Data B
 
 ## 4. AWS Lambda
 
-In order to test and deploy to AWS Lambda we are going to use the `sam` cli.
+In order to test and deploy to AWS Lambda, we are going to use the `sam` cli.
 
 - First, setup the [SAM cli](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) and make sure your user/role has the [right permissions](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-permissions.html).
 
-- The `sam` cli needs a Cloudformation template to work, so copy the following into `aws-iac/sam-template.yml`:
+- The `sam` cli needs a CloudFormation template to work, so copy the following into `aws-iac/sam-template.yml`:
 
 ```yaml
 AWSTemplateFormatVersion: "2010-09-09"
@@ -521,7 +521,7 @@ sam local invoke -t aws-iac/sam-template.yml -e sample-event.json
 
 ### 4.2 Security of Upstash Redis URL
 
-In this article, for simplicity we provided the Upstash Redis URL, containing the password, through environment variables. We don't want to hardcode this into the SAM Cloudformation template which is versioned along with our code, hence why we had to manually configure it through the AWS Lambda console.
+In this article, for simplicity, we provided the Upstash Redis URL, containing the password, through environment variables. We don't want to hardcode this into the SAM Cloudformation template which is versioned along with our code, hence why we had to manually configure it through the AWS Lambda console.
 
 There is a better way to do this automatically without modifying the Lambda configuration every time and to avoid having the Redis credentials/URL in plain sight for anyone with console access.
 
@@ -543,8 +543,8 @@ Looking more carefully in the **Log output** section, we can see that the reques
 
 ## Conclusion
 
-I am really amazed by how well Upstash Redis performs, especially since it's hard to find such performance for serverless databases suited for platforms like AWS Lambda.
+I am really amazed by how well Upstash Redis performs, especially since it's hard to find such performance in serverless databases suited for platforms like AWS Lambda.
 
-The Redis API is really convenient, Upstash Redis has top-notch pricing model and awesome developer experience, and it's fast. I love the combination!
+The Redis API is really convenient, Upstash Redis has a top-notch pricing model and an awesome developer experience, and it's fast. I love the combination!
 
 AWS Lambda + Upstash Redis + Go = 🚀❤️
