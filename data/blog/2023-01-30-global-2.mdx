@@ -5,7 +5,7 @@ authors: [enes]
 tags: [redis, edge, announcement]
 ---
 
-I am thrilled to announce to Upstash users that we have just released an updated version of our global database (Redis). The new global database allows you to choose the regions. The nice thing is that you can add, remove regions on a running cluster without a downtime. You can think of each region as a replica which has a copy of your data for low latency and high availability.
+I am thrilled to announce to Upstash users that we have just released an updated version of our global database (Redis). The new global database allows you to choose the regions. The nice thing is that you can add and remove regions on a running cluster without downtime. You can think of each region as a replica that has a copy of your data for low latency and high availability.
 
 ### Designed for the Edge Functions
 
@@ -13,7 +13,7 @@ Edge runtimes, such as Cloudflare Workers and Vercel Edge, provide speed by exec
 
 ### Read Regions Everywhere, Low Latency Anywhere
 
-Global database is designed to minimize the latency for reads. A database has a single primary replica and multiple read replicas. A write command is sent and processed at the primary replica. Then it is replicated to all read replicas. When a client sends a read command, it fetches the response from the nearest read replica (region). Meanwhile, all write requests go to the primary replica for consistency.
+The global database is designed to minimize the latency for reads. A database has a single primary replica and multiple read replicas. A write command is sent and processed at the primary replica. Then it is replicated to all read replicas. When a client sends a read command, it fetches the response from the nearest read replica (region). Meanwhile, all write requests go to the primary replica for consistency.
 
 Our tests show sub-millisecond latency for clients within the same AWS region as the Redis® instance.
 
@@ -27,13 +27,13 @@ Our tests show sub-millisecond latency for clients within the same AWS region as
 
 ### Choose your regions
 
-New global database asks you to choose primary and read regions.
+The new global database asks you to choose primary and read regions.
 
 → Select primary region where the writes happen. So your writes will be faster.
 
 → Select the read regions to cover the most of your user base.
 
-Here the regions supported currently:
+Here are the regions currently supported:
 
 - AWS US-East-1 North Virginia
 - AWS US-West-1 North California
@@ -48,18 +48,18 @@ Here the regions supported currently:
 
 ### Pricing
 
-Same with the previous version, the pricing is based on per command executed. 100K commands cost $0.2. Replications are counted as commands. For example, if you have 1 primary 1 read region, 100K writes will cost $0.4 ($0.2 x 2)
+As with the previous version, the pricing is based on per command executed. 100K commands cost $0.2. Replications are counted as commands. For example, if you have 1 primary 1 read region, 100K writes will cost $0.4 ($0.2 x 2)
 
-Storage costs $0.25 per GB. If you have 1GB data, 4 regions in total then you will pay $1 each month.
+Storage costs $0.25 per GB. If you have 1GB of data and 4 regions in total, then you will pay $1 each month.
 
-The free tier includes 10,000 commands daily, and one read region at max.
+The free tier includes 10,000 commands daily and one read region at max.
 
 ### What’s next and closing words
 
 New regions: We've launched in 8 AWS regions and plan to expand our coverage through new regions and additional cloud providers. If you have a specific request, reach out to us at **[support@upstash.com](mailto:support@upstash.com)**
 
-Region specific primary selection per key: You will be able to select the primary region for a key. For example the key `xyz{us-east-1}` will have us-east-1 as its primary replica. `xyz{here}` will have the closest region as its primary replica. This will enable use cases where applications needs to write to closest replica (low write latency).
+Region-specific primary selection per key: You will be able to select the primary region for a key. For example the key `xyz{us-east-1}` will have us-east-1 as its primary replica. `xyz{here}` will have the closest region as its primary replica. This will enable use cases where applications needs to write to closest replica (low write latency).
 
-Benchmarking app: We are working on an application which will run queries interactively in multiple database product and report the latencies. This application will help you to select the fastest product according to your geographical needs.
+Benchmarking app: We are working on an application that will run queries interactively in multiple database products and report the latencies. This application will help you to select the fastest product according to your geographical needs.
 
 This is an important release for us, so we need your feedback and contributions. Check [the global database documentation](/docs/redis/features/globaldatabase). Reach out to us on [GitHub](https://github.com/upstash/issues/issues/new), [Discord](https://upstash.com/discord) and [Twitter](https://twitter.com/upstash) for your comments and suggestions..
