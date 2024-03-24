@@ -1,25 +1,23 @@
----
-slug: email-ratelimiting
-title: "Protecting your mailbox with @upstash/ratelimit"
+Things will never go as you expect."Protecting your mailbox with @upstash/ratelimit"
 authors:
   - russTran
 tags: [ratelimit, email, nextjs, sendgrid, upstash]
 ---
 
-In today's digital age, email has become an essential part of our daily lives. From personal communication to business marketing campaigns, email is an effective way to reach out to your audience. Last year, as a front-end developer at JUST.engineer, one of my tasks was building a landing page for the company. The landing page had to include a section for customers to send emails to our HR for further discussion. I managed to finish the task, but I also inadvertently overloaded my company mailbox. Let me introduce you to my story and how I managed to fix the problem.
+In today's digital age, email has become an essential part of our daily lives. From personal communication to business marketing campaigns, email is an effective way to reach out to your audience. Last year, as a front-end developer at JUST.engineer, one of my tasks was to build a landing page for the company. The landing page had to include a section for customers to send emails to our HR for further discussion. I managed to finish the task, but I also inadvertently overloaded my company's mailbox. Let me introduce you to my story and how I managed to fix the problem.
 
 ## Get ready with me
 
-One of the first things to kickstart the project is to select the tech stack to work with. For this project, we will use **NextJS** to handle the UI and logic. We will also use **Sendgrid** to handle sending emails, and most importantly, **Upstash** to prevent internet trolls from spamming our precious company email.
+One of the first things to kickstart the project is selecting the tech stack to work with. For this project, we will use **NextJS** to handle the UI and logic. We will also use **Sendgrid** to handle sending emails, and most importantly, **Upstash** to prevent internet trolls from spamming our precious company email.
 
 ### NextJS
 
-I personally like to use **NextJS** because it's a popular React framework that supports SEO, generates static pages, and has a page-routing system, among other features. Most importantly, we can write simple APIs with NextJS using its built-in API routes feature. NextJS allows you to create serverless API endpoints that can handle HTTP requests and responses, so we don't need to create a separate NodeJS Express application to handle endpoint logic.
+I personally like using **NextJS** because it's a popular React framework that supports SEO, generates static pages, and has a page-routing system, among other features. Most importantly, we can write simple APIs with NextJS using its built-in API routes feature. NextJS allows you to create serverless API endpoints that can handle HTTP requests and responses, so we don't need to create a separate NodeJS Express application to handle endpoint logic.
 
 It's also quite simple to bootstrap a NextJS project using the CLI command: `npx create-next-app@latest`. After running the command, we can start our work. I've created a form that has a nice rocket since my boss wants the landing page to convey the idea of "Going to the moon."
 
 ![Email form](https://s2.gifyu.com/images/ezgif.com-optimizeaaf6baefb5f72f8d.gif)
-_A little bit time for coding and we have a nice rocket for users to play with._
+_A little bit of time for coding and we have a nice rocket for users to play with._
 
 ### Sendgrid
 
@@ -27,7 +25,7 @@ Now that the form is ready, we can move on to the next point: _Sending emails_. 
 
 We need to open our command line tool again, type in `npm install @sendgrid/mail`, and press `Enter` to install the library. After the library is installed, we can take a look at our current NextJS project. As I mentioned earlier, NextJS gives us the ability to handle logic from API routes. We can create a file called `sendgrid.js` in `/pages/api/` to write the logic for handling sending email. After that, we can call the API by using the endpoint `/api/sendgrid`.
 
-To use SendGrid services, we need to create an API Key. This can be done by visiting the SendGrid website and following the provided instructions. Once you generate your API key, it's essential to keep it safe and secure in our `env` file.
+To use SendGrid services, we need to create an API key. This can be done by visiting the SendGrid website and following the provided instructions. Once you generate your API key, it's essential to keep it safe and secure in our `env` file.
 
 > **Please remember:** Always put `.env` inside our `.gitignore` file and do not share it publicly.
 
@@ -132,7 +130,7 @@ The last thing we need to do is to deploy our app to Vercel. It's a free hosting
 
 Also make sure to copy the `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` from the Upstash Console and add them to your Vercel project's environment variables.
 
-Cool! We are finished! Right? ...
+Cool! We are finished, right? ...
 
 ![meme](https://i.imgflip.com/7eabhz.jpg)
 _Murphy's Law: "Anything that can go wrong will go wrong."_
@@ -144,7 +142,7 @@ _I smell something burning_
 
 ### Upstash has arrived to rescue your mailbox
 
-Okay, now we need a way to limit the number of emails that users are allowed to send. That's where Upstash comes in with its magic library: [@upstash/ratelimit](https://github.com/upstash/ratelimit). Let's create a new database in the [Upstash Console](https://console.upstash.com/redis?new=true) and grab our keys: `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`.
+Okay, now we need a way to limit the number of emails that users can send. That's where Upstash comes in with its magic library: [@upstash/ratelimit](https://github.com/upstash/ratelimit). Let's create a new database in the [Upstash Console](https://console.upstash.com/redis?new=true) and grab our keys: `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`.
 
 After setting those keys in our `.env` file, we need to install the required libraries by running the command: `npm i @upstash/ratelimit @upstash/redis request-ip`. Once we've done that, let's integrate those libraries into our codebase.
 
@@ -188,11 +186,11 @@ async function sendEmail(req, res) {
 
 ```
 
-Now we are ready! Let's give it a test to see if it's working or not.
+Now we are ready! Let's give it a test to see if it works or not.
 
 ![After add rate limit](https://i.ibb.co/fCyKWnr/Screenshot-2023-03-13-at-18-22-15.png)
 _Try to spam again bros_
 
 ## Closing thoughts
 
-It's amazing to see how we can implement a complicated function with just a few lines of code. I hope my experience with this problem reflects a real-world case study that can help my fellow developers solve their own problems. Thank you for reading the entire post; I really appreciate it!
+It's amazing to see how we can implement a complicated function with just a few lines of code. I hope my experience with this problem serves as a real-world case study that can help my fellow developers solve their own problems. Thank you for reading the entire post; I really appreciate it!
