@@ -21,8 +21,7 @@ export default function Investors({ short = false }) {
               width={100}
               height={100}
               className="aspect-square h-[80px] w-[80px] scale-[1.01] rounded-full
-                object-cover grayscale transition
-                group-hover/investor:mix-blend-normal group-hover/investor:grayscale-0
+                object-cover
                 md:h-[100px] md:w-[100px]"
             />
 
@@ -32,7 +31,7 @@ export default function Investors({ short = false }) {
             >
               {investor.name}
             </h4>
-            <p className="opacity-40">{investor.title}</p>
+            {investor.title && <p className="opacity-40">{investor.title}</p>}
           </a>
         );
       })}

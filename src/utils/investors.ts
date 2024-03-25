@@ -1,28 +1,41 @@
 export const INVESTORS = [
   {
-    name: "Robin Vasan",
-    title: "Founder, Mango Capital",
-    src: "/investors/robin.jpeg",
-    url: "https://www.linkedin.com/in/robinvasan/",
+    name: "a16z",
+    title: "",
+    src: "/investors/a16z.jpg",
+    url: "https://twitter.com/a16z",
   },
   {
-    name: "Naval Ravikant",
-    title: "Founder, AngelList",
-    src: "/investors/naval.png",
-    url: "https://twitter.com/naval",
+    name: "Mango Capital",
+    title: "",
+    src: "/investors/mango.png",
+    url: "https://www.mangocapitalinc.com",
   },
+  {
+    name: "Earlybird",
+    title: "",
+    src: "/investors/early-bird.jpg",
+    url: "https://earlybird.com",
+  },
+  // {
+  //   name: "Robin Vasan",
+  //   title: "Founder, Mango Capital",
+  //   src: "/investors/robin.jpeg",
+  //   url: "https://www.linkedin.com/in/robinvasan/",
+  // },
+
   {
     name: "Guillermo Rauch",
     title: "CEO, Vercel",
     src: "/investors/rauchg.jpg",
     url: "https://twitter.com/rauchg",
   },
-  {
-    name: "Cem Sertoglu",
-    title: "Partner, Earlybird",
-    src: "/investors/cem-sertoglu.jpg",
-    url: "https://www.linkedin.com/in/csertoglu",
-  },
+  // {
+  //   name: "Cem Sertoglu",
+  //   title: "Partner, Earlybird",
+  //   src: "/investors/cem-sertoglu.jpg",
+  //   url: "https://www.linkedin.com/in/csertoglu",
+  // },
   {
     name: "Matias Woloski",
     title: "Founder, Auth0",
@@ -34,6 +47,12 @@ export const INVESTORS = [
     title: "Creator of styled-components",
     src: "/investors/mxstbr.jpeg",
     url: "https://twitter.com/mxstbr",
+  },
+  {
+    name: "Naval Ravikant",
+    title: "Founder, AngelList",
+    src: "/investors/naval.png",
+    url: "https://twitter.com/naval",
   },
   {
     name: "Nuno Job",
@@ -71,12 +90,12 @@ export const INVESTORS = [
     src: "/investors/jake-zeller.jpeg",
     url: "https://twitter.com/jake_zeller",
   },
-  {
-    name: "Dilek Dayinlarli",
-    title: "Partner, ScaleX Ventures",
-    src: "/investors/dilekdayinlarli.jpeg",
-    url: "https://twitter.com/dilekdayinlarli",
-  },
+  // {
+  //   name: "Dilek Dayinlarli",
+  //   title: "Partner, ScaleX Ventures",
+  //   src: "/investors/dilekdayinlarli.jpeg",
+  //   url: "https://twitter.com/dilekdayinlarli",
+  // },
   {
     name: "Morgan Dioli",
     title: "Partner, Ravix Group",
