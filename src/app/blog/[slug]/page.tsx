@@ -35,7 +35,7 @@ export default async function BlogPage({ params }: Props) {
   const indexOfPost = allPosts.findIndex((post) => post.slug === slug);
   const post = allPosts[indexOfPost];
 
-  const dateString = post.date;
+  const dateString = post?.date || new Date();
 
   const isoDatePublished = new Date(dateString).toISOString();
 
