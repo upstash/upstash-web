@@ -5,45 +5,45 @@ authors: [noah]
 tags: [serverless, redis, launchdarkly, java]
 ---
 
-[LaunchDarkly](https://launchdarkly.com/) is a feature management tool for software applications. It provides feature flags to the development teams to control their software product releases and their tests.
+[LaunchDarkly](https://launchdarkly.com/) is a feature management tool for software applications. It provides feature flags to development teams to control their software product releases and tests.
 
 - **Testing code live in production**
 
-  Teams can create groups of users according to their specific identifiers, such as their unique keys, their regions, users’ ages etc.
+  Teams can create groups of users according to their specific identifiers, such as their unique keys, regions, users’ ages, etc.
 
   Test groups can also be created according to the users’ identifiers for testing purposes.
 
-  Even if teams don’t want to classify their users, they can deploy their tests to just some percentage of the users by enabling the feature flags to x% of users.
+  Even if teams don’t want to classify their users, they can deploy their tests to just some percentage of users by enabling the feature flags for x% of users.
 
 - **Feature release management**
 
-  The new deployment, new feature or any additional thing on the software product can be controlled by a feature flag.
+  The new deployment, new feature, or any additional thing in the software product can be controlled by a feature flag.
 
   For example, a team wanted to create a new feature for users in a specific region, let’s say in the USA.
 
-  The thing that team needs to release their new feature in this country is creating a feature flag, which is a kind of a controller for the new feature. By creating rules for this feature flag through a simple UI, teams can adjust their targets for their new feature.
+  The thing that the team needs to release their new feature in this country is to create a feature flag, which acts as a controller for the new feature. By creating rules for this feature flag through a simple UI, teams can adjust their targets for their new feature.
 
-The benefits of Launchdarky do not end here. You can check their [website](<[https://launchdarkly.com/](https://launchdarkly.com/)>) and [use cases](<[https://launchdarkly.com/use-cases/](https://launchdarkly.com/use-cases/)>) for further information.
+The benefits of LaunchDarkly do not end here. You can check their [website](<[https://launchdarkly.com/](https://launchdarkly.com/)>) and [use cases](<[https://launchdarkly.com/use-cases/](https://launchdarkly.com/use-cases/)>) for further information.
 
-LaunchDarkly provides a Redis® integration to make teams able to have Redis-backed feature store. At that point, Serverless Redis® comes into play as an easy, fast and feasible option.
+LaunchDarkly provides a Redis® integration to enable teams to have a Redis-backed feature store. At that point, Serverless Redis® comes into play as an easy, fast and feasible option.
 
 ### **LaunchDarkly Setup**
 
-The first step is creating a personal or team account in [LaunchDarkly](<[https://app.launchdarkly.com/](https://app.launchdarkly.com/)>)
+The first step is to create a personal or team account in [LaunchDarkly](<[https://app.launchdarkly.com/](https://app.launchdarkly.com/)>)
 
-After signing in, we are going to create a feature flag, that we are going to use.
+After signing in, we are going to create a feature flag that we are going to use.
 
 **![](https://lh4.googleusercontent.com/tRmtajXrFWuOo5QaTVKNU2xlTvdF58KTK1Gsb9z5UnzKNPrv4zpd5BE1syoK2XPpFEx971uMEHBdhJfNDFNsyXdrP7SA6XU7thyW6v02YWBpSeHmeR8s3pGQOTwA15MLJqVdruiXSs0Qd_nkpShPtcwvIn86O2bgyeayVDZY6KyPEwZAC0uGjp3pdA)**
 
-To keep things simple in this demo, I am going to create a feature flag with name “test” and this flag will return a boolean value. So, the variations of this flag will be true or false.
+To keep things simple in this demo, I am going to create a feature flag named “test,” and this flag will return a boolean value. So, the variations of this flag will be true or false.
 
 Now, if we would like to enable some specific users, we can add those users as targets for variations of the flag.
 
 **![](https://lh4.googleusercontent.com/qT1pfmJVX6m70eB4VtEHGGSIdFkfjN0QHb0JAbdKqLCijE7I5ntio8aituaukZ48gFJT464kvZifeI-sAhl-MhWOdqq8XQ0mwWMpCEvtQVYImAg06tcl3BK9uEAM44U7qwoh5llYePLtakfHFpLIuzvnxV7Ha1RuInpUb0ZgN78qBLNHSJGkAAj3QQ)**
 
-The users may also be the other development teams in the company. If one of the teams doesn’t want to affect some teams in the same company, then they can prevent them to have the new feature by returning false to those teams.
+The users may also include other development teams in the company. If one of the teams doesn’t want to affect some teams in the same company, then they can prevent them to have the new feature by returning false to those teams.
 
-The other option is creating rules for return values of the feature flag. It is the same logic with an “if” statement.
+Another option is creating rules for the return values of the feature flag. It is the same logic with an “if” statement.
 
 **![](https://lh5.googleusercontent.com/Rqh3R33XybB2bN8bFaF3qtkpjhjhxS3pQO1NTblMTAzP07VTexeKFY_ih-pbR0Eso_Xoy5wy1KX6IUT5RHL5KSMaWZfRjAEBvss28Yu8eeXKtjJhJvtWR3qSClWGilx4XwmnYQ6hSuAEdcpv_XhxGaMKQhk2ixF3aM4SPKI7_8iqhJDmcht1sdGXug)**
 
@@ -51,13 +51,13 @@ The example rule in the screenshot above: If the country of the user is USA, the
 
 There are lots of options to create rules.
 
-The one way that I most loved to adjust the distribution of the flag was percentage rollout. By this option, we can return true to the specified percentage of the users, and false to others.
+One way that I loved most to adjust the distribution of the flag was the percentage rollout. By this option, we can return true to the specified percentage of the users, and false to others.
 
 **![](https://lh5.googleusercontent.com/Rqh3R33XybB2bN8bFaF3qtkpjhjhxS3pQO1NTblMTAzP07VTexeKFY_ih-pbR0Eso_Xoy5wy1KX6IUT5RHL5KSMaWZfRjAEBvss28Yu8eeXKtjJhJvtWR3qSClWGilx4XwmnYQ6hSuAEdcpv_XhxGaMKQhk2ixF3aM4SPKI7_8iqhJDmcht1sdGXug)**
 
 ### **LaunchDarkly Java Client Example**
 
-In this blog, we are going to work on the server side. The demo endpoint is very simple. If the feature flag is false, then return false, else true.
+In this blog, we are going to work on the server-side. The demo endpoint is very simple: If the feature flag is false, then return false, else true.
 
 We are going to follow the instructions on [LaunchDarkly docs](<[https://docs.launchdarkly.com/sdk/server-side/java#getting-started](https://docs.launchdarkly.com/sdk/server-side/java#getting-started)>).
 
@@ -73,7 +73,7 @@ First, we need to install the LaunchDarkly SDK as a dependency.
 implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '5.9.0'
 ```
 
-After that, our LaunchDarkly Java client will be like below.
+After that, our LaunchDarkly Java client will look like the following.
 
 ```java
 package com.example.demo;
@@ -107,11 +107,11 @@ public class ClientSingleton {
 }
 ```
 
-The reason I created LaunchDarkly Java client like this is the warning in their docs.
+I created the LaunchDarkly Java client like this because of the warning in their docs.
 
 **![](https://lh5.googleusercontent.com/NRxMXZTdPnQy7Ecx0Sb-cdQZ_FXIg1J1QwfzK4Y9ewEfECVW57-qH0ivqoSEkr2_FspCWyn-35gyT37wzN4IBMGSaE4vcGbDsOGhnlffw4uRg6dMgAXzmhKezgkvn1fgnXD7RWBwe1G-Y_FIgxbZz2s3UURoZWZy7CML4FkIEehcLuZWthwzWu1VPw)**
 
-In this blog, I created my API endpoint by using [Spring](<[https://start.spring.io/](https://start.spring.io/)>) which I feel comfortable with.
+In this blog, I created my API endpoint using [Spring](<[https://start.spring.io/](https://start.spring.io/)>) with which I feel comfortable.
 
 Here is the simple endpoint:
 
@@ -196,4 +196,4 @@ LaunchDarkly is helping companies to manage their rollouts and deployments by pr
 
 In this blog post, we have utilized feature flags from [LaunchDarkly](<[https://launchdarkly.com/](https://launchdarkly.com/)>) and stored them in Upstash Redis by using the LaunchDarkly Redis integration.
 
-Since this one was just an example demonstrates the integration, the functionality was very basic. LaunchDarkly can be used in so many ways and serverless Redis is ready to store flags.
+Since this was just an example demonstrating the integration, the functionality was very basic. LaunchDarkly can be used in so many ways and serverless Redis is ready to store flags.
