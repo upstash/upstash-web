@@ -6,7 +6,7 @@ tags: [qstash, novu, serverless]
 ---
 
 Today we are looking at a common problem for many developers: A user has kicked
-of a task, which you want to process in a serverless function. If that task may
+off a task, which you want to process in a serverless function. If that task may
 fail, you might want to retry it automatically and also let the user know about
 the outcome.
 
@@ -36,7 +36,7 @@ To follow this tutorial, you need accounts for 3 services:
 
 ## What will we build?
 
-To demonstrate this usecase, we will build a very simple app. The app allows a
+To demonstrate this use case, we will build a very simple app. The app allows a
 user to add two numbers together while randomly throwing an error to simulate a
 more complex scenario. All of the "business" logic is running inside a
 serverless function. After the calculations are done (or have failed) the user
@@ -67,7 +67,7 @@ your favourite code editor in the new directory.
 ## Installing Dependencies
 
 Both QStash and novu expose an HTTP API but to make it easier to work with them,
-we will install the official javascript sdks:
+we will install the official JavaScript SDKs:
 
 ```
 npm install @upstash/qstash @novu/node @novu/notification-center
@@ -204,7 +204,7 @@ export const config = {
 
 ### Frontend
 
-To display the notifications in your UI, we added a very simple UI, you can
+To display the notifications in your UI, we added a very simple UI. You can
 simply use novu's
 [react components](https://docs.novu.co/notification-center/react-components) or
 create a custom UI like we did
@@ -237,7 +237,7 @@ retried automatically and a new notification will show up shortly.
 
 ## Summary
 
-While this usecase was very basic, think about all of the asynchronous tasks
+While this use case was very basic, think about all of the asynchronous tasks
 your users could kick off and if they would be a good fit to run in serverless
 functions.
 
