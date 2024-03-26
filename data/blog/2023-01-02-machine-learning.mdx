@@ -5,7 +5,7 @@ authors: [andreaselia]
 tags: [redis, qstash, openai, nextjs]
 ---
 
-For this blog post, we'll make a few assumptions before continuing, but you should ideally have:
+For this blog post, we'll make a few assumptions before continuing, but ideally, you should have:
 
 - An [Upstash](https://upstash.com?utm_source=andreas1) account where you have a Redis and QStash instance created
 - An [OpenAI](https://openai.com) account with access to your API key
@@ -14,7 +14,7 @@ For this blog post, we'll make a few assumptions before continuing, but you shou
 
 ## Introduction
 
-Have you ever wanted to generate your own stories using AI? With OpenAI's completions API and Upstash's QStash and Redis, it's now easier than ever to create your own custom stories using natural language processing. In this tutorial, we'll walk through the process of setting up and using these tools to generate unique and engaging stories.
+Have you ever wanted to generate your own stories using AI? With OpenAI's completions API and Upstash's QStash and Redis, it's now easier than ever to create your own custom stories using natural language processing. In this tutorial, we'll walk you through the process of setting up and using these tools to generate unique and engaging stories.
 
 ![Create Story Form Preview](https://user-images.githubusercontent.com/5033092/210117050-fafc6ce0-1d02-4901-a6e3-3fb61cb28fd4.png)
 
@@ -26,24 +26,24 @@ View more images of the app:
 
 ## Architecture
 
-You're likely to get a decent understanding of how the app is setup from looking through the code, but as a bit of a higher level overview, there is the image below showing some parts of the application flow and how they communicate.
+You're likely to get a decent understanding of how the app is set up from looking through the code, but as a bit of a higher-level overview, there is the image below showing some parts of the application flow and how they communicate.
 
 ![App Flow](https://user-images.githubusercontent.com/5033092/210117420-ba0f8c26-cc36-4fd3-b2fc-05cb90ff2715.png)
 
 ## Project Setup
 
-First up we'll want to create a Next.js project. This can be done by running the following to create a new Next.js project with TypeScript. You can find out the steps to setup Next.js [here](https://nextjs.com).
+First up, we'll want to create a Next.js project. This can be done by running the following to create a new Next.js project with TypeScript. You can find out the steps to set up Next.js [here](https://nextjs.com).
 
 For the sake of this tutorial, we also have [Tailwind CSS](https://tailwindcss.com/docs/guides/nextjs) ([forms](https://github.com/tailwindlabs/tailwindcss-forms) and [typography](https://github.com/tailwindlabs/tailwindcss-typography) too) installed, but that's totally optional and only for the frontend form styling.
 
-Next up we'll want to install Upstash's QStash and Redis libraries via the following:
+Next up, we'll want to install Upstash's QStash and Redis libraries via the following:
 
 ```bash
 npm install @upstash/qstash
 npm install @upstash/redis
 ```
 
-You'll now want to create a `.env.local` file and populate it with the following keys (and the values from the relevant places).
+You'll now want to create a `.env.local` file and populate it with the following keys (and the values from the relevant sources).
 
 ```bash
 SITE_URL=https://your-project-url.vercel.app
@@ -57,7 +57,7 @@ You can find your QStash and Redis tokens in the [Upstash](https://upstash.com?u
 
 ## Frontend Setup
 
-Next up we'll create the page and form for inputting the story prompt. You'll need a text field for the prompt and a submit button.
+Next up, we'll create the page and form for inputting the story prompt. You'll need a text field for the prompt and a submit button.
 
 ### Story Creation
 
@@ -254,7 +254,7 @@ The `useInterval` hook makes use of the `useEffect` and `useRef` hooks to manage
 
 ## API Setup
 
-First up we'll create the callback, poll and create files, as well as the Redis and QStash library usage.
+First up, we'll create the callback, poll, and create files, as well as the Redis and QStash library usage.
 
 ### Story Creation
 
@@ -303,7 +303,7 @@ export default async function handler(
 }
 ```
 
-We first check that the request method is `POST`, and sends a response with a status code of 400 (indicating a client error) if it is not. We then proceed to destructure the theme, character, and moral fields from the body of the request.
+We first check that the request method is `POST`, and send a response with a status code of 400 (indicating a client error) if it is not. We then proceed to destructure the theme, character, and moral fields from the body of the request.
 
 Next up we call the `publishJSON` method on the `qstashClient` object, which sends a `POST` request to the OpenAI API with a JSON body containing a prompt to generate a children's story based on the values of theme, character, and moral. It also sets several headers, including an authorization header with a token stored in the `QSTASH_TOKEN` environment variable, and a forwarded authorization header for passing through the `OPENAI_API_KEY` which will be used alongside the OpenAI API request.
 
@@ -336,7 +336,7 @@ export default async function handler(
 }
 ```
 
-First off, we first try to decode the body of the incoming request, which will be a base64-encoded string, and if successful, it stores the decoded string in Redis under the same key as what was returned when we sent the initial request to QStash.
+First off, we try to decode the body of the incoming request, which will be a base64-encoded string, and if successful, store the decoded string in Redis under the same key as what was returned when we sent the initial request to QStash.
 
 Finally, we send return a response with a status code of 200 (indicating success) as well as the decoded string. If any errors occur, we will return a response with a status code of 500 (indicating an internal server error) and the error message.
 
@@ -371,7 +371,7 @@ export default async function handler(
 }
 ```
 
-First up, we destructure the `id` from the query object of the request. We then try to retrieve the data stored in Redis under the destructured `id` and if no data is found, it sends a response with a status code of 404 (indicating that the requested resource could not be found) and a message stating so.
+First up, we destructure the `id` from the query object of the request. We then try to retrieve the data stored in Redis under the destructured `id`, and if no data is found, send a response with a status code of 404 (indicating that the requested resource could not be found) and a message stating so.
 
 If data is found belonging to the given key, it sends a response with a status code of 200 (indicating success), and the found data along with it. If any error occurs, we return a response with a status code of 500 (indicating an internal server error) and the relevant error message.
 
@@ -410,7 +410,7 @@ The Redis client is initialized with a URL and token stored in the `UPSTASH_REDI
 
 ## Conclusion
 
-With OpenAI's completions API, as well as Upstash's QStash and Redis, it's easy to generate custom stories using natural language processing. By following this tutorial, you should now be able to set up your own system for generating stories using these tools, and make your own changes and improvements upon it.
+With OpenAI's completions API, as well as Upstash's QStash and Redis, it's easy to generate custom stories using natural language processing. By following this tutorial, you should now be able to set up your own system for generating stories using these tools and make your own changes and improvements to it.
 
 You can view the source code in its entirety [here](https://github.com/andreaselia/storytime).
 
@@ -418,8 +418,8 @@ You can view the source code in its entirety [here](https://github.com/andreasel
 
 Below are a few ideas on what you could do next, using this story generator as a start:
 
-- Update the frontend styling to be a lot more visually appealing and colourful
+- Update the frontend styling to be a lot more visually appealing and colorful
 - Add Dall-E image generation using OpenAI to the stories based on a given prompt
 - Hook the output up to a book printing service via an API, so users can order physical books
 
-There are so many possibilities and directions you could take this, so have fun and enjoy the process. You can even use the work so far as a base for other projects that could make use of OpenAI, QStash and Redis.
+There are so many possibilities and directions you could take this, so have fun and enjoy the process. You can even use the work so far as a base for other projects that could make use of OpenAI, QStash, and Redis.
