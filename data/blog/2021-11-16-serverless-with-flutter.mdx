@@ -1,6 +1,6 @@
 ---
 slug: serverless-with-flutter
-title: "Fullstack Serverless app with Flutter, Serverless Framework and Upstash(REDIS) - PART 1"
+title: "Full-Stack Serverless App with Flutter, Serverless Framework, and Upstash (REDIS) - PART 1"
 authors:
   - rosius
 image: flutter/code.png
@@ -9,26 +9,26 @@ tags: [serverless, flutter, upstash, redis]
 
 (Update: Edge Caching feature is deprecated. For low latencies at edge, use our global configurations. [Learn more](/docs/redis/features/globaldatabase))
 
-In this post, we'll be building a serverless mobile application with Flutter, Serverless Framework,Upstash and Redis for storing data.
+In this post, we'll be building a serverless mobile application with Flutter, Serverless Framework, Upstash, and Redis for storing data.
 
 ### What's Upstash ?
 
-Upstash is a serverless Database for Redis. With Upstash, you pay per-request. This means you're not charged when the database isn't in use.
+Upstash is a serverless database for Redis. With Upstash, you pay per request. This means you're not charged when the database isn't in use.
 
 Upstash configures and manages the database for you.
 It's a strong alternative to other databases like DynamoDB and Fauna, with advantages such as
 
 - low latency
-- Ease of use, just like REDIS API's.
+- Ease of use, just like REDIS APIs.
 
 Here's a [detailed document](/docs/overall/compare?utm_source=rosius1) comparing Upstash with alternative cloud-based solutions, giving you a clear reason as to why you should choose it for your next project.
 
-You can also check out this [article](https://blog.upstash.com/best-database-for-serverless?utm_source=rosius1) making a comparison of all the available serverless databases out there
+You can also check out this [article](https://blog.upstash.com/best-database-for-serverless?utm_source=rosius1) making a comparison of all the available serverless databases out there.
 
 With Upstash,
 
 - You start free and pay only for what you use
-- It has Fast, Durable Storage
+- It has fast, durable storage.
 - You can access your database from anywhere around the globe, with low latency due to global Databases and Edge Caching.
 
 Get Started on [Upstash](https://upstash.com?utm_source=rosius1) For Free Today
@@ -59,7 +59,7 @@ For example, I can use the Redis command `SET` to store the value of my surname 
 SET surname Rosius
 ```
 
-where `surname` is key and Rosius is value.
+where `surname` is the key and Rosius is the value.
 
 One very important thing to take note of with Redis is, always store your data in a way that you can easily retrieve it.
 
@@ -97,7 +97,7 @@ x = x + 1
 SET likes x
 ```
 
-This is completely fine, as long as you are the only one using your application.Which is never the case right.
+This is completely fine, as long as you are the only one using your application. Which is never the case, right?
 
 Once there are >2 people incrementing that same like, the above process(GET,Increment,SET) is no longer atomic.
 So,
@@ -135,14 +135,14 @@ HMSET userProfile:100034  "userId" 100034 "username" "Rosius Ndimofor"
 
 ```
 
-Firstly, the key for our Hash is `userProfile:100034`, then we have `key value` pairs all through. For example `"userId"` is the key and `100034' is the value. We can retrieve specific user profile information such as first name by using the `HGET`command and`userId` like so.
+Firstly, the key for our hash is `userProfile:100034`, then we have `key value` pairs all through. For example, "userId"` is the key and `100034' is the value. We can retrieve specific user profile information such as first name by using the `HGET`command and`userId` like so.
 
 ```
 userId = 100034
 HGET userProfile:{userId} firstName
 ```
 
-Or We can retrieve all user profile information for a particular user using the `GETALL` command like so
+Or we can retrieve all user profile information for a particular user using the `HGETALL` command like so
 
 ```
 userId = 100034
@@ -157,7 +157,7 @@ What if we want to get all the users on our platform?
 
 We've just used a Hash data structure to save user profile information. Now we need to get all the users on our system.
 
-The easiest way to accomplish this is to save the userId's of every user in a List using the command LPUSH(stands for Left Push) like so
+The easiest way to accomplish this is to save the userIds of every user in a list using the command LPUSH (stands for Left Push) like so
 
 ```
 LPUSH "users" userId
@@ -177,7 +177,7 @@ I'm glad you asked. So today, we'll start by creating a CRUD API. Here's the use
 
 We have 2 entities. `Users` and `Posts`.
 
-They share a one to many relationship. So one user can have multiple posts,and one post can only belong to one user.
+They share a one-to-many relationship. So one user can have multiple posts, and one post can only belong to one user.
 
 ![Screen Shot 2021-11-02 at 07.10.42.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1635833557755/L53KPWS9A.png)
 
@@ -191,10 +191,10 @@ A user is allowed
 - Like a post
 - Get a list of all posts
 
-Here's the solutions architectural view
+Here's the solution's architectural view
 
 ![upstash_arch.jpeg](https://cdn.hashnode.com/res/hashnode/image/upload/v1636975851104/kv8szoq2g.jpeg)
-So let's get Started.
+So let's get started.
 
 ## Create an Upstash Account
 
@@ -232,7 +232,7 @@ Here's the initial structure of my serverless project.
 
 ![Screen Shot 2021-10-25 at 07.23.17.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1635143304551/kBddLjgos.png)
 
-Inside that folder, initialize a new node project with the command
+Inside that folder, initialize a new Node project with the command
 
 ```
 npm init
@@ -244,7 +244,7 @@ Next, install the redis client with
 npm install ioredis
 ```
 
-Also, install a universally unique Identifier(uuid) dependency. We'll be using it extensively in this project.
+Also, install a universally unique identifier (UUID) dependency. We'll be using it extensively in this project.
 
 ```
 npm install uuid
@@ -267,7 +267,7 @@ Next, Create 2 folders inside your project called `users` and `posts`. Both of t
 
 ![Screen Shot 2021-10-25 at 07.40.04.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1635144014866/rXX5zB1gG.png)
 
-Let's get started creating our API enpoints
+Let's get started creating our API endpoints
 
 ## Create User
 
@@ -375,7 +375,7 @@ functions:
           method: post
 ```
 
-The name of our function is `createUser`, and it's located in a file called `create.js` which is inside a folder called `user`.Hence the handler `user/create.createUser`.
+The name of our function is `createUser`, and it's located in a file called `create.js` which is inside a folder called `user`. Hence the handler `user/create.createUser`.
 
 Take note of the path `/user`
 
@@ -456,7 +456,7 @@ module.exports.createUser = async (event) => {
 
 ## Update User
 
-Users would love to update their profiles from time to time. So it's just right we provide a user update endpoint.
+Users would love to update their profiles from time to time. So, it's just right we provide a user update endpoint.
 
 The only command we need for this operation is the `HMSET` command and the `userId`.
 
@@ -543,7 +543,7 @@ We pass in the `userId` as a path parameter `/user/{id}`
 
 Using the `HGETALL` command and the hash key, we can get user profile information for a particular user.
 
-Bear in mind that we can also use `HGET` command to get user specific information such as firstName or lastName etc.
+Bear in mind that we can also use the `HGET` command to get user-specific information such as firstName or lastName, etc.
 
 Let's see the code
 
@@ -604,11 +604,11 @@ getUser:
 
 When we wrote the handler for creating users, remember we left pushed (`LPUSH`) userId's into a `users` list.
 
-Now, we have to grab all those id's using the command `LRANGE`.
+Now, we have to grab all those ids using the command `LRANGE`.
 
 > Note: LRANGE is not very efficient if the list of posts start to be very big, and we want to access elements which are in the middle of the list, since Redis Lists are backed by linked lists. If a system is designed for deep pagination of million of items, it is better to resort to Sorted Sets instead.
 
-After getting all userId's, we can then loop through each `id` and get user profile information using `HGETALL`.
+After getting all userIds, we can then loop through each `id` and get user profile information using `HGETALL`.
 
 Let's see how this looks like in code.
 
@@ -659,7 +659,7 @@ listUsers:
 
 ![Screen Shot 2021-10-30 at 08.49.18.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1635580182354/_A4SPsE5p.png)
 
-And that's it for `users` endpoints. You can go ahead and deploy your app, If you haven't done that already.
+And that's it for `users` endpoints. You can go ahead and deploy your app if you haven't done that already.
 
 ```
 sls deploy
@@ -770,7 +770,7 @@ createPost:
         method: post
 ```
 
-Deploy and test.
+Deploy and test..
 
 ![Screen Shot 2021-10-30 at 10.07.22.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1635584856279/SZfhAfbfh.png)
 
@@ -1017,13 +1017,13 @@ I absolutely adore the not soo steep learning curve of Redis, and the fact that 
 
 Always know your access patterns before you begin developing the app.
 
-I had a lot of fun writing this piece, hope you learned a thing or two.
+I had a lot of fun writing this piece. I hope you learned a thing or two.
 
-Did I make a mistake somewhere? A super Sayan like you won't hesitate to let me know.
+Did I make a mistake somewhere? A Super Saiyan like you won't hesitate to let me know.
 
 In the next article, we'll build a Flutter app to consume this API. Stay tuned.
 
-Happy Coding Comrade✌🏿
+Happy coding, comrade! ✌🏿
 
 ## Reference
 
