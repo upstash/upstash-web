@@ -14,7 +14,7 @@ Global Database perfectly fits Fly.io as it is globally replicated. Moreover,
 thanks to its [REST based SDK](https://github.com/upstash/upstash-redis), it
 does not have any connection problem in stateless runtime.
 
-In this article, I will create a basic Node.js application which accesses
+In this article, I will create a basic Node.js application that accesses
 Upstash Redis and deploy it to Fly.io platform.
 
 ### Fly.io Setup
@@ -35,7 +35,7 @@ Upstash Redis and deploy it to Fly.io platform.
   app: `git clone https://github.com/fly-apps/hellonode-builtin`
 - Install dependencies:
   `npm install express @upstash/redis`
-- Update the server.js and replace `url` and `token`:
+- Update the server.js file and replace `url` and `token`:
 
 ```js title="server.js"
 const express = require("express");
@@ -58,7 +58,7 @@ app.get(["/", "/:name"], async (req, res) => {
   }
 });
 
-app.listen(port, () => console.log(`HelloNode app listening on port ${port}!`));
+app.listen(port, () => console.log(`HelloNode app is listening on port ${port}!`));
 ```
 
 ### Run and Deploy
@@ -69,17 +69,17 @@ app.listen(port, () => console.log(`HelloNode app listening on port ${port}!`));
   `flyctl launch`
 - You can redeploy your app with `flyctl deploy`
 
-- See your applications url with `flyctl status`
-- You can also check your application from fly.io dashboard:
+- See your application's URL with `flyctl status`
+- You can also check your application from the fly.io dashboard:
 
 ![](/blog/flyio/dashboard.png)
 
 ## Closing Words
 
-In this article, we have showcased how to use Upstash Redis on Fly.io
+In this article, we have showcased how to use Upstash Redis on the Fly.io
 application platform.
 
-Feel free to reach out us
+Feel free to reach out to us
 on [GitHub](https://github.com/upstash/issues/issues/new)
 , [Discord](https://upstash.com/discord)
 and [Twitter](https://twitter.com/upstash) for any issues or comments.
