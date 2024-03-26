@@ -6,9 +6,9 @@ authors:
 tags: [ai, serverless, redis, langchain]
 ---
 
-In some applications, it may not be feasible to query an LLM when a user requests it. The process of sending a prompt to an API and waiting for its response can be particularly time-consuming. For more complex tasks that involve LangChain, like processing data from a PDF or audio file and feeding it to the LLM, the delay becomes an even bigger hit to user experience.
+In some applications, it may not be feasible to query an LLM when a user requests it. The process of sending a prompt to an API and waiting for its response can be particularly time-consuming. For more complex tasks that involve LangChain, like processing data from a PDF or audio file and feeding it to the LLM, the delay becomes an even bigger hit on user experience.
 
-While streaming _is_ a suitable solution in many cases, it may be more convenient to do everything at some arbitrary point before the user even visits your application. This way, the user can be served the cached response near instantaneously, without having to wait for the LLM to generate it. This is especially useful for applications that use the same input for every user, like a book or news summarizer. But without input from the user, how can we get LangChain to cache a response?
+While streaming _is_ a suitable solution in many cases, it may be more convenient to do everything at some arbitrary point before the user even visits your application. This way, the user can be served the cached response nearly instantaneously, without having to wait for the LLM to generate it. This is especially useful for applications that use the same input for every user, like a book or news summarizer. But without input from the user, how can we get LangChain to cache a response?
 
 We'll need a microservice that we can call on-demand, capable of sending a prompt to [LangChain](https://github.com/langchain-ai/langchainjs) and caching the response using [Upstash Redis](https://upstash.com/docs/redis/overall/getstarted). We'll also be using Upstash's [Rate Limiting SDK](https://github.com/upstash/ratelimit) to ensure that we don't accidentally exceed our rate limit. [QStash](https://upstash.com/docs/qstash/overall/getstarted) is the most versatile way to call our microservice—we can set it up to cache responses whenever we want, even passing a cron job if our application requires it. It also provides a dashboard that we can use to monitor our microservice's usage. In the case that our endpoint is overloaded or something else goes wrong, QStash will retry the HTTP request and ensure that our message is delivered.
 
@@ -41,7 +41,7 @@ bun create hono@latest
 
 ### Installing dependencies
 
-Now, you can now run the following command with the package manager of your choice to install the remaining dependencies:
+Now, you can run the following command with the package manager of your choice to install the remaining dependencies:
 
 ```bash
 bun install @upstash/qstash @upstash/ratelimit @upstash/redis langchain openai
@@ -49,7 +49,7 @@ bun install @upstash/qstash @upstash/ratelimit @upstash/redis langchain openai
 
 ### Configuring the project
 
-As of the time of writing, `create-hono` includes lockfiles in its `.gitignore` by default. While not strictly required, you can update your `.gitignore` to exclude lockfiles as follows:
+As of the time of writing, `create-hono` includes lockfiles in its `.gitignore` by default. While not strictly required, you can update your `.gitignore` to include lockfiles as follows:
 
 ```ignorelist
 node_modules
@@ -84,7 +84,7 @@ type Bindings = {
 const app = new Hono<{ Bindings: Bindings }>();
 ```
 
-The benefit of having two signing keys comes from the fact that you can roll them once without having to update your environment variables, because QStash will automatically try and use the next signing key if the current one fails.
+The benefit of having two signing keys comes from the fact that you can roll them once without having to update your environment variables because QStash will automatically try to use the next signing key if the current one fails.
 
 ### Development
 
@@ -128,7 +128,7 @@ app.use("*", logger());
 
 ### Connecting QStash to Cloudflare Workers
 
-Before we can start developing an API endpoint using Hono.js, we need a way to intercept messages sent by QStash, and discard the request if it has an invalid signature. Thankfully, Hono.js provides a way to implement our own custom middleware, which always runs before handlers. It is robust enough that we can organize our middleware into separate files as we see fit.
+Before we can start developing an API endpoint using Hono.js, we need a way to intercept messages sent by QStash and discard the request if it has an invalid signature. Thankfully, Hono.js provides a way to implement our own custom middleware, which always runs before handlers. It is robust enough that we can organize our middleware into separate files as we see fit.
 
 In our middleware, we can make use of QStash's receiver. Let's create a new file called `src/middleware/verify.ts`, and export a function typed with `MiddlewareHandler`:
 
@@ -233,7 +233,7 @@ const ratelimit = new Ratelimit({
 
 We also provide a `limiter` to the SDK. This is a function that tells the SDK how to rate limit requests. We are using the `slidingWindow` limiter, configured to allow up to 10 requests every 10 seconds.
 
-The SDK also lets us provide an identifier for each request, and it will automatically keep track of the number of requests made within a given time period. In a real-world application, we can use the user's IP address as the identifier, but for the sake of this demo, we will use a constant string to limit all requests with a single ratelimit:
+The SDK also lets us provide an identifier for each request, and it will automatically keep track of the number of requests made within a given time period. In a real-world application, we can use the user's IP address as the identifier, but for the sake of this demo, we will use a constant string to limit all requests with a single rate limit:
 
 ```ts
 // snip
@@ -249,7 +249,7 @@ await next();
 // snip
 ```
 
-If the request is rate-limited, we return a 429 Too Many Requests response. Otherwise, we call `next()` to continue to the next middleware or handler. In the case that we had connected multiple Redis databases to the SDK, it will have to [perform synchronization](https://github.com/upstash/ratelimit?tab=readme-ov-file#asynchronous-synchronization-between-databases) between them. This would have lead to dangling promises on Vercel Edge and Cloudflare Workers, which we can take care of like this:
+If the request is rate-limited, we return a 429 Too Many Requests response. Otherwise, we call `next()` to continue to the next middleware or handler. In the case that we had connected multiple Redis databases to the SDK, it would have to [perform synchronization](https://github.com/upstash/ratelimit?tab=readme-ov-file#asynchronous-synchronization-between-databases) between them. This would have led to dangling promises on Vercel Edge and Cloudflare Workers, which we can take care of like this:
 
 ```ts
 const { pending, success } = await ratelimit.limit(identifier);
@@ -313,9 +313,9 @@ app.post("/api/announce", ratelimit, verify, async (ctx) => {
 // snip
 ```
 
-Here, we import the classes required to set up caching for LangChain. Then, we construct the chain using the OpenAI model and the Upstash Redis cache, passing an Upstash Redis instance to the cache. Again, we'll have to pass our OpenAI API Key to the model manually as it can't be read automatically on Cloudflare Workers.
+Here, we import the classes required to set up caching for LangChain. Then, we construct the chain using the OpenAI model and the Upstash Redis cache, passing an Upstash Redis instance to the cache. Again, we'll have to pass our OpenAI API key to the model manually as it can't be read automatically on Cloudflare Workers.
 
-Then, we access the query that was previously saved to `res.locals`, using it to call the model and log the result. Finally, we return the result as a response, or an empty string if something went wrong. At this stage, we can test our endpoint by sending a POST request to it and checking the response. First, rerun the `deploy` script in your package.json:
+Then, we access the query that was previously saved to `res.locals`, using it to call the model and log the result. Finally, we return the result as a response, or an empty string if something went wrong. At this stage, we can test our endpoint by sending a POST request to it and checking the response. First, rerun the `deploy` script in your `package.json`:
 
 ```bash
 bun run deploy
