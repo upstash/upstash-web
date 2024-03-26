@@ -6,16 +6,16 @@ authors:
 tags: [redis, clerk]
 ---
 
-One of the main use cases of Redis is storing and managing user sessions to maintain the state across requests in web applications. This can be done in several ways, and some of the newer serverless tools offer easy-to-deploy options.
+One of the main use cases of Redis is storing and managing user sessions to maintain state across requests in web applications. This can be done in several ways, and some of the newer serverless tools offer easy-to-deploy options.
 
 User session data management is critical for various business applications. For example, personalization platforms use Redis to store user interactions and preferences, enabling them to offer customized content or product suggestions. In the gaming world, Redis helps manage user data to provide a smooth multiplayer experience by tracking player interactions in real-time. Advertising platforms also rely on Redis to store session data, which optimizes ad delivery and personalizes future campaigns. In the example that follows, we'll specifically focus on an e-commerce application and explore how Redis can be used to manage shopping carts effectively.
 
 ### Project Description
 
-In this blogpost, we will use [Clerk](https://clerk.com), Next.js and Upstash Redis to build a session store for a shopping application. Here is the list of the features we will implement in this project:
+In this blog post, we will use [Clerk](https://clerk.com), Next.js, and Upstash Redis to build a session store for a shopping application. Here is the list of the features we will implement in this project:
 
 - Users will be able to perform sign-up, sign-in and sign-out actions.
-- Each user can add, remove items to their unique shopping carts.
+- Each user can add and remove items from their unique shopping carts.
 - Users will be able to update the item quantities in the shopping cart.
 
 This project has some other features related to QStash and Upstash Ratelimit:
@@ -56,13 +56,13 @@ Creating a new Next.js app in /Users/***/shopstash.
 
 ### Integrating Clerk
 
-Adding Clerk to a project is fairly simple. We'll use Clerk's Next.js SDK for prebuilt components and hooks. First, lets install it:
+Adding Clerk to a project is fairly simple. We'll use Clerk's Next.js SDK for prebuilt components and hooks. First, let's install it:
 
 ```
 npm install clerk@nextjs
 ```
 
-Then, we'll create our application on [Clerk dashboard](https://dashboard.clerk.com/). You can do the the configuration for required sign-up info, based on your choice. Once you create the app, the necessary credentials will be prompted. We'll copy these to `.env.local` file. Here's an example:
+Then, we'll create our application on [Clerk dashboard](https://dashboard.clerk.com/). You can do the configuration for required sign-up info, based on your choice. Once you create the app, the necessary credentials will be prompted. We'll copy these to the `.env.local` file. Here's an example:
 
 ```text title=".env.local"
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_********
@@ -121,7 +121,7 @@ export const config = {
 
 With this, the whole application is protected. If you try to access any page without signing in, you'll be redirected to the index page for authentication.
 
-At this point, our app needs the sign-up and sign-in pages. We're going to provide the navigation to these files from the Header and this component will be rendered based on the active user. If there's an active user, then user will be able to sign-out and see their profile. Else, sign-in and sign-up routes will be shown.
+At this point, our app needs the sign-up and sign-in pages. We're going to provide the navigation to these files from the Header, and this component will be rendered based on the active user. If there's an active user, then the user will be able to sign out and see their profile. Otherwise, sign-in and sign-up routes will be shown.
 
 <ExpandableCode title="app/components/Header.tsx">
 ```tsx
@@ -195,7 +195,7 @@ const SignUpPage = () => {
 export default SignUpPage;
 ````
 
-Sign up page is almost identical to sign in, and we'll implement it in a similar path.
+The sign-up page is almost identical to sign-in, and we'll implement it in a similar path.
 
 ```tsx title="app/sign-in/[[...sign-up]]/page.tsx"
 import { SignIn } from "@clerk/nextjs";
@@ -212,7 +212,7 @@ export default SignInPage;
 
 With the successful integration of Clerk into our project, we are now primed to advance further. The active user feature is in place, setting the stage for us to establish a unique session store on Redis for each distinct user. Our strategy involves retrieving the user ID from Clerk and subsequently storing the session data for said user on Upstash Redis. To illustrate the process, let's consider building a shopping cart. Here, every individual session will retain its respective cart item data.
 
-First and foremost, we need to conceptualize what constitutes a cart item. This will serve as our blueprint as we craft the rest of the application. If you're looking to populate your application with a diverse range of items, tools like ChatGPT can be invaluable. Alternatively, a more direct approach would involve sourcing them from the GitHub repository associated with this example. And, of course, to truly bring your frontend to life, you'll need to design or source suitable image for each item.
+First and foremost, we need to conceptualize what constitutes a cart item. This will serve as our blueprint as we craft the rest of the application. If you're looking to populate your application with a diverse range of items, tools like ChatGPT can be invaluable. Alternatively, a more direct approach would involve sourcing them from the GitHub repository associated with this example. And, of course, to truly bring your frontend to life, you'll need to design or source a suitable image for each item.
 
 ```tsx title="public/items.tsx"
 export const items = [
@@ -716,7 +716,7 @@ With that final snippet of code, our project reaches its conclusion. We've succe
 
 ### Conclusion
 
-The combination of Clerk for user management and Upstash Redis for efficient data storage has been instrumental in the creation of our dynamic cart system. Together, they've formed the backbone of our application, ensuring both security and performance. This project is a great example of how these powerful tools such as Upstash Redis, Clerk used together solves very complex problems smoothly.
+The combination of Clerk for user management and Upstash Redis for efficient data storage has been instrumental in the creation of our dynamic cart system. Together, they've formed the backbone of our application, ensuring both security and performance. This project is a great example of how these powerful tools, such as Upstash Redis and Clerk, used together solve very complex problems smoothly.
 
 Here are some suggestions for further improvements on this project:
 
