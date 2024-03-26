@@ -6,7 +6,7 @@ authors:
 tags: [ python, clip, vector]
 ---
 
-In this tutorial, we will explore how to build an image similarity search engine using [Upstash Vector](https://upstash.com/vector), a vector database for efficient similarity search and [CLIP(Contrastive Language-Image Pretraining)](https://openai.com/blog/clip) <br/>
+In this tutorial, we will explore how to build an image similarity search engine using [Upstash Vector](https://upstash.com/vector), a vector database for efficient similarity search, and [CLIP(Contrastive Language-Image Pretraining)](https://openai.com/blog/clip). <br/>
 
 ## Introduction
 
@@ -24,7 +24,7 @@ To follow this tutorial, you will need:
 - [Numpy](https://numpy.org/install/) installed
 - [Transformers](https://huggingface.co/transformers/installation.html) installed 
 
-You can install the required packages using the following command.
+You can install the required packages using the following command:
 
 ```bash 
 pip install torch pillow upstash_vector transformers numpy
@@ -55,7 +55,7 @@ model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
 
 ## Image Embeddings and Indexing
 
-We'll define a function to transform images into embeddings using the CLIP model and then upsert these embeddings into the Upstash Vector index:
+We'll define a function to transform images into embeddings using the CLIP model and then upsert these embeddings into the Upstash Vector index.
 
 ```python
 # Define image preprocessing
@@ -84,7 +84,7 @@ for filename in os.listdir(image_dir):
 
         id = filename
 
-        index.upsert(vectors = [(id, embedding, {"metadata_field": "metadata_value"})])
+        index.upsert(vectors=[(id, embedding, {"metadata_field": "metadata_value"})])
 
         print(f"Upserted image {filename} with ID {filename}")
 ```
@@ -114,7 +114,7 @@ for i, res in enumerate(result):
     print(f"Rank {i + 1}: ID={res.id}, score={res.score}")
 ```
 
-You should get a result similar to the following:
+You should get a result similar to the following.
 
 ```bash
 Top 5 results:
@@ -127,7 +127,7 @@ Rank 5: ID=Two people.jpg, score=0.837375104
 
 ## Bonus
 
-You can fill the metadata field to the Upstash Vector index to get more information about the vectors. For example, you can store the image URLs in the metadata field and display the images in the search results. <br/>
+You can fill the metadata field in the Upstash Vector index to get more information about the vectors. For example, you can store the image URLs in the metadata field and display the images in the search results. <br/>
 
 ## Full Codes
 
@@ -135,6 +135,6 @@ You can find the full code for this tutorial on [Github](https://github.com/oguz
 
 ## Conclusion
 
-In this tutorial, we have learned how to build an image similarity search engine using CLIP and Upstash Vector. By leveraging CLIP's powerful image embeddings and Upstash Vector's efficient similarity search capabilities, we can quickly find visually similar images based on a query image. <br/>
+In this tutorial, we have learned how to build an image similarity search engine using CLIP and Upstash Vector. By leveraging CLIP's powerful image embeddings and Upstash Vector's efficient similarity search capabilities, we can quickly find visually similar images based on a query image.<br/>
 
 If you have any questions or comments, feel free to reach out to me on **[GitHub](https://github.com/oguzhantasimaz)**. <br/>
