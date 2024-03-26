@@ -20,8 +20,8 @@ All of the resources used in this project can be obtained for free.
 To perform a semantic search we will use the [all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2) model to convert strings to semantic embeddings. This model is trained so that
 semantically similar strings and question-answer pairs result in embeddings with high cosine similarity.
 
-At first, our system will encode the entities in our database and insert them to [Upstash-Vector](https://upstash-vector.mintlify.app/introduction) with their corresponding embeddings. Afterwards, queries will be vectorized and
-the vector database will allow us to retrieve posts with similar embeddings easily. As the database uses the state-of-art [DiskANN](https://dl.acm.org/doi/abs/10.5555/3454287.3455520) method for the nearest neighbor search, we will enjoy
+First, our system will encode the entities in our database and insert them into [Upstash-Vector](https://upstash-vector.mintlify.app/introduction) with their corresponding embeddings. Afterwards, queries will be vectorized and
+the vector database will allow us to easily retrieve posts with similar embeddings. As the database uses the state-of-the-art [DiskANN](https://dl.acm.org/doi/abs/10.5555/3454287.3455520) method for the nearest neighbor search, we will enjoy
 low latency insertion and retrieval. 
 
 ## Codebase
@@ -32,7 +32,7 @@ You can find the Jupyter notebook for this project [here](https://colab.research
 
 #### Initializing the Model
 
-At first, we should select a model to convert strings to semantic embeddings as this process affects the database setup. For our demonstration, we will use
+First, we should select a model to convert strings to semantic embeddings as this process affects the database setup. For our demonstration, we will use
 [all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2). This model provides a fast inference time and is suitable for a semantic search application as
 its training data contains actual query-result pairs from Yahoo and Stack Exchange.
 
@@ -63,13 +63,13 @@ import gzip
 from sentence_transformers import util
 NUM_SAMPLES=10000
 
-#downloading dataset
+# Downloading dataset
 database_filepath = 'data/stackoverflow-python.jsonl.gz'
 
 if not os.path.exists(database_filepath):
     util.http_get('https://public.ukp.informatik.tu-darmstadt.de/reimers/sentence-transformers/datasets/stackoverflow-python.jsonl.gz', database_filepath)
 
-#preparing title and body pairs
+# Preparing title and body pairs
 entities = []
 with gzip.open(database_filepath, 'rt', encoding='utf8') as f_input:
     for i, line in enumerate(f_input):
@@ -84,14 +84,14 @@ print("Number of entities:", len(entities))
 
 ## Preparing the Vector Database
 
-Now that the data and a semantic encoder are ready, we should insert the data to the vector database for retrieval.
+Now that the data and a semantic encoder are ready, we should insert the data into the vector database for retrieval.
 
 #### Creating the Vector Index
 
-Firstly we will create an index using the [Upstash console](https://beta.upstash.com/vector).
+First, we will create an index using the [Upstash console](https://beta.upstash.com/vector).
 During this stage, we should configure the index according to the model.
 As the encoder uses 384-dimensional embeddings, the vector index should be set for 384-size vectors.
-Similarly similarity metric should be set to cosine similarity as this metric is supported for the model.
+Similarly, the similarity metric should be set to cosine similarity as this metric is supported by the model.
 
 You can find more about index creation [here](https://upstash-vector.mintlify.app/vector/overall/getstarted).
 
@@ -99,7 +99,7 @@ You can find more about index creation [here](https://upstash-vector.mintlify.ap
 
 #### Connecting to the Vector Index
 
-We will use Python-SDK to connect to the created index in our application. This SDK can be installed using pip as in the following:
+We will use the Python-SDK to connect to the created index in our application. This SDK can be installed using pip as follows:
 
 ```
 pip install upstash_vector
@@ -125,7 +125,7 @@ Now that the vector index is initialized and connected, we should add entries to
 
 #### Encoding the dataset
 
-Let us begin with encoding entities from StackOverflow. This can be simply done using the model from sentence-transformers package.
+Let us begin by encoding entities from StackOverflow. This can be simply done using the model from the sentence-transformers package.
 
 ```python
 entity_embeddings = encoder.encode(entities, convert_to_tensor=True, show_progress_bar=True, batch_size=256)
@@ -148,7 +148,7 @@ As shown in the following:
 ```python
 import time
 
-#Insert dataset entities with 1000 size pages.
+# Insert dataset entities with 1000 size pages.
 #Maximum page size is 1000.
 PAGE_SIZE = 1000
 end_cursor = -1
@@ -169,8 +169,8 @@ for start_cursor in range(0,len(entities),PAGE_SIZE ):
 
 ## Implementing the Semantic Search
 
-Upon preparing our vector index, the only remaining step is to encode the query and retrieve posts with similar encodings. This is the point using a vector database is beneficial for our project. Using the query method of the index object, we can retrieve
-entities both by id and their vectors. Therefore, the search method has two steps, given a query string, encode the query the index for similar strings. 
+Upon preparing our vector index, the only remaining step is to encode the query and retrieve posts with similar encodings. This is the point where using a vector database is beneficial for our project. Using the query method of the index object, we can retrieve
+entities both by id and their vectors. Therefore, the search method has two steps: given a query string, encode the query and search the index for similar strings.
 This can be implemented as such:
 
 ```python
@@ -200,7 +200,7 @@ Therefore, some queries will yield non-related results as there are no correspon
 
 ## Conclusion
 
-In this blog post, we demonstrated how a semantic search algorithm can be easily implemented using the Upstash-Vector. 
+In this blog post, we demonstrated how a semantic search algorithm can be easily implemented using Upstash-Vector.
 
 If you enjoyed this tutorial, be sure to check out our other tutorials on the [Upstash blog](https://upstash.com/blog). <br/>
 
