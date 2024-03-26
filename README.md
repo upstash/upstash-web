@@ -94,12 +94,12 @@ tags: [announce]
 
 ## Snipsync
 
-We use [snipsync](https://github.com/temporalio/snipsync) to synchronize snippets from other repos (like redis-examples) to the docs, so they are deduplicated.
-Snipsync runs automatically when you do `yarn build`
+We use [snipsync](https://github.com/temporalio/snipsync) to synchronize snippets from other repositories (like redis-examples) to the documentation, ensuring they are deduplicated.
+Snipsync runs automatically when you execute `yarn build`.
 
-### How to use:
+### How to Use:
 
-#### Source files:
+#### Source Files:
 
 Use comments to identify code snippets and the locations where they should be merged.
 In the source repo, wrap the code snippets in comments with a unique snippet identifier like this:
@@ -115,7 +115,7 @@ func HelloUniverse() {
 In the example above, "hellouniverse" is the unique identifier for the code snippet.
 Unique identifiers can contain letters, numbers, hyphens, and underscores.
 
-#### Docs files:
+#### Documentation Files:
 
 In the target files wrap the location with comments that reference the identifier of the code snippet that will be placed there:
 
