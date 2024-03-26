@@ -19,7 +19,7 @@ tags:
   ]
 ---
 
-Maintaining your system's availability is one of the most critical tasks for any product. Unfortunately, people might abuse it by overwhelming your resources, or you want to limit the usage and charge for it. Rate limiting is a standard solution to many of these problems and should work out of the box. After all, you have already built your system and don't want to spend even more time designing a rate-limiting system that works well in a stateless environment such as serverless functions.
+Maintaining your system's availability is one of the most critical tasks for any product. Unfortunately, people might abuse it by overwhelming your resources, or you might want to limit the usage and charge for it. Rate limiting is a standard solution to many of these problems and should work out of the box. After all, you have already built your system and don't want to spend even more time designing a rate-limiting system that works well in a stateless environment such as serverless functions.
 
 ## Announcing @upstash/ratelimit
 
@@ -44,7 +44,7 @@ Keep in mind that some platforms charge you for the execution time of your funct
 
 ### Single regional database
 
-Ratelimiting with a single database is straight forward. You create a database on [Upstash](https://console.upstash.com/) and start using it:
+Rate limiting with a single database is straightforward. You create a database on [Upstash](https://console.upstash.com/) and start using it:
 
 ```ts
 import { Ratelimit } from "@upstash/ratelimit";
@@ -70,8 +70,8 @@ return "Here you go!";
 
 ### Global replicated rate-limiting
 
-Let's assume you have customers in the US and Europe. In this case, you can create two regional redis databases on [Upstash](https://console.upstash.com) and
-your users will enjoy the latency of whichever db is closest to them.
+Let's assume you have customers in the US and Europe. In this case, you can create two regional Redis databases on [Upstash](https://console.upstash.com), and
+your users will enjoy the latency of whichever database is closest to them.
 
 ```ts
 import { GlobalRatelimit } from "@upstash/ratelimit"; // for deno: see above
