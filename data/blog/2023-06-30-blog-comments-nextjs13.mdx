@@ -6,7 +6,7 @@ authors:
 tags: [redis, nextjs, nextauth]
 ---
 
-We will build a comment section for your blog in this tutorial️. The tech stack we will be:
+In this tutorial, we will build a comment section for your blog. The tech stack we will use includes:
 
 1. [NextJS 13](https://nextjs.org/) (in App dir)
 2. [NextAuth](https://next-auth.js.org/) (for Authentication)
@@ -17,7 +17,7 @@ Let's start.
 
 ## Handling Auth with NextAuth
 
-Firstly, we can't just let anyone post a comment, right? Someone could just run a script to spam your blog with comments. Let's first build an Authentication system before letting people post a comment. We will use NextAuth.
+First, we can't just let anyone post a comment, right? Someone could just run a script to spam your blog with comments. Let's first build an authentication system before letting people post a comment. We will use NextAuth.
 
 Install `next-auth` in your project.
 
@@ -25,7 +25,7 @@ Install `next-auth` in your project.
 pnpm install next-auth
 ```
 
-This is the directory structure inside the App Directory
+This is the directory structure inside the app directory:
 
 ```
 .
@@ -146,7 +146,7 @@ pnpm install @upstash/redis
 
 4. Copy these tokens in your `.env.local`.
 
-Lets write our API endpoints now in this directory structure:
+Let's write our API endpoints now in this directory structure:
 
 ```
 .
@@ -183,12 +183,12 @@ const redis = Redis.fromEnv();
 export default redis;
 ```
 
-That was it. Our Redis Client is now set up and all that is left is to set up the API
+That was it. Our Redis client is now set up, and all that is left is to set up the API
 routes for it in our application.
 
 We will be using [Redis Lists](https://redis.io/docs/data-types/lists/) for storing the
 comments. They can act as a stack so the most recent comment is displayed at the top. Sure,
-we can also implement the sorting logic client side but when Redis already provides this data stucture,
+we can also implement the sorting logic client-side, but when Redis already provides this data structure,
 let's use it.
 
 You can see the entire code [here](https://github.com/JDeepD/NextJS13-Comment/tree/main/app/api/comment). Here is the gist of it:
@@ -205,7 +205,7 @@ Our API is now in place. Let's get to integrating the frontend with the backend.
 ## Setting up the Client Side
 
 It isn't that difficult. We just need to hit those endpoints we just created using `fetch`.
-We will be using a library called `swr` for caching and revalidation of comments. But feel
+We will be using a library called `swr` for caching and revalidation of comments, but feel
 free to use other libraries like React Query for it.
 
 We make a `useComment()` hook which will have `onSubmit()` and `onDelete()` handlers
