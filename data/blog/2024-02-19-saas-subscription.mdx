@@ -6,9 +6,9 @@ authors:
 tags: [NextJS, qstash, prisma]
 ---
 
-The most common business model in building a Saas is a subscription model where users pay a certain fee to use your service in a specified time interval. In this article, we will go through the process of adding a subscription service to a NextJS project and the best practices to follow once going into production.
+The most common business model in building a SaaS is a subscription model where users pay a certain fee to use your service in a specified time interval. In this article, we will go through the process of adding a subscription service to a NextJS project and the best practices to follow once going into production.
 
-Our Saas will be helping our users to get a daily dose of motivation quotes every morning on their email at a fee of say, $1 per month.
+Our SaaS will be helping our users to get a daily dose of motivational quotes every morning in their email at a fee of say, $1 per month.
 
 To create your project, paste this command on your terminal and choose Prisma as your ORM; you can opt-out of the rest of the tools. In case you're not familiar with create-t3-app, it is one of the easiest ways to start a nextJS app and add tools like Drizzle, Prisma, trpc, and tailwind. I will be using the Pages router in this article.
 
@@ -18,8 +18,8 @@ pnpm create t3-app@latest
 
 ## Data Modelling
 
-A good data modeling will make your application grow easier and managing your database even more seamless.
-Let's start by first adding the data modelling for our quotes to be sent to our users. Open the schema.prisma
+Good data modeling will make your application grow easier and managing your database even more seamless.
+Let's start by first adding the data modeling for our quotes to be sent to our users. Open the schema.prisma
 file located in your prisma directory and add the following. I will be using postgres but implementation in other
 databases will be fairly the same.
 
@@ -39,8 +39,8 @@ model Users {
 }
 ```
 
-On our users' side, we are recording their name, email, every payment they have ever paid, and their subscription status.
-Let's go ahead and add the last two
+On our users' side, we are recording their name, email, every payment they have made, and their subscription status.
+Let's go ahead and add the last two.
 
 ```title:"schema.prisma"
 model Payments {
@@ -55,7 +55,7 @@ model Subscriptions {
     id              Int     @id @default(autoincrement())
     userId          Int     @unique
     expiryDate      String
-    subsribed       Boolean @default(false)
+    subscribed       Boolean @default(false)
     daysWithService Int     @default(0)
     User            Users   @relation(fields: [userId], references: [id])
 }
@@ -72,7 +72,7 @@ I won't go into the details of hosting your database in this article.
 ## Recording Payments Details
 
 For us to be able to receive money from our users, we need to set up our payment provider.
-There are different options depending on your location. If you're in US, UK, or Canada you can
+There are different options depending on your location. If you're in the US, UK, or Canada you can
 go ahead with Stripe, as it is fairly easy to integrate with different components and setting up
 webhooks is relatively easy. If you're in Africa I would recommend choosing DPO Payments as it is available
 in many countries as compared to Flutterwave and other providers. The choice you make here depends on your
@@ -145,7 +145,7 @@ export default async function postRequest(
             },
             data: {
               expiryDate: nextMonth,
-              subsribed: true,
+              subscribed: true,
               daysWithService: subscribedUser.daysWithService + 31,
             },
           });
@@ -172,20 +172,20 @@ export default async function postRequest(
       console.log(error);
     }
 
-    // make sure to send a respond back according to your payment provider
+    // make sure to send a response back according to your payment provider
   }
 }
 ```
 
 What we did here is we took the response we got back from our payment provider, extracted the userId
-from the email that we got back and recorded the payments in our table as well as doing the subscription
+from the email that we got back and recorded the payments in our table as well as managing the subscription
 logic in our table. We also handled the case where the user has made multiple payments in a row on how it will
 affect the subscription. We also add daysWithService table as 31 meaning this user is subscribed to the service
-for the next month. Ensure you check what data shape your payment provider returns and adjust the above code accordingly.
+for the next month. Ensure you check the data shape your payment provider returns and adjust the above code accordingly.
 
 ## Adding CRON Jobs with Upstash
 
-The last piece of the puzzle is adding CRON jobs to our saas. The main point of adding the CRON
+The last piece of the puzzle is adding CRON jobs to our SaaS. The main point of adding the CRON
 jobs is to unsubscribe the user from getting our service once the subscription ends.
 
 To achieve this, we will be using upstash Qstash Service. Go ahead and create an account and head over
@@ -202,11 +202,11 @@ export default async function updatedSubscription(
   res: NextApiResponse,
 ) {
   try {
-    //go through the subscribers table and check if the subscription is still active
+    // Go through the subscribers table and check if the subscription is still active
     //if it is not active, update the subscription status to false
     const currentSubscribers = await prisma.subscriptions.findMany({});
 
-    //update where the daysWithService == 0 and cancels the days of Subscription
+    // Update where the daysWithService == 0 and cancel the days of Subscription
     const subscribers = await prisma.subscriptions.updateMany({
       where: {
         daysWithService: {
@@ -219,7 +219,7 @@ export default async function updatedSubscription(
       },
     });
 
-    // if the daysOfService is not 0 then reduce the daysWithService by 1
+    // If the daysOfService is not 0 then reduce the daysWithService by 1
     const updatingDays = currentSubscribers.forEach(async (sub) => {
       const { subsribed, daysWithService } = sub;
       if (subsribed && daysWithService > 0) {
@@ -243,9 +243,9 @@ export default async function updatedSubscription(
 ```
 
 Here, we go and update our subscription table according to the remaining days of service.
-If the daysOfService is less than or equal to zero, we set isSubscribed field to false meaning
+If the daysOfService is less than or equal to zero, we set the isSubscribed field to false meaning
 the user subscription has expired, otherwise we reduce the daysOfService by 1.
 
-And those are all the pieces required to add a subscription service to a saas.
+And those are all the pieces required to add a subscription service to a SaaS.
 
-Hope you enjoyed it.
+I hope you enjoyed it.
