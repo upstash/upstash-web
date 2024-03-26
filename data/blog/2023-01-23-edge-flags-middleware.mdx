@@ -5,7 +5,7 @@ authors: [andreas]
 tags: [redis, edge, nextjs, middleware]
 ---
 
-Edge-Flags allow you to easily manage feature flags for your serverless applications. It's built on top of Upstash Redis with powerful geolocation rules.
+Edge-Flags allows you to easily manage feature flags for your serverless applications. It's built on top of Upstash Redis with powerful geolocation rules.
 Today I'll show you a very simple example of how you can use Edge-Flags in a Next.js middleware to rewrite requests based on the location of the user.
 
 ## Create the flag
@@ -13,7 +13,7 @@ Today I'll show you a very simple example of how you can use Edge-Flags in a Nex
 In our example app we only want to make content available to our users in the EU, so we'll [create](https://console.upstash.com/redis?new=true) a new Redis database and then go to the [edge-flags](https://console.upstash.com/edge-flags) page.
 Select the created database and the `production` environment.
 
-Then we can create a new flag named `eu-countries` and add the all countries within the EU.
+Then we can create a new flag named `eu-countries` and add all the countries within the EU.
 
 ![Edge-Flags](/blog/edge-flags-middleware/flag.png)
 
@@ -58,7 +58,7 @@ export const config = {
 };
 ```
 
-3. Create a very sophisticated `/blocked` page
+3. Create a sophisticated `/blocked` page
 
 ```tsx title="app/blocked/page.tsx"
 export default function Page() {
@@ -79,7 +79,7 @@ Make sure to add the environment variables to Vercel either by copying them from
 ## Test it out
 
 <Note title="Geolocation in development">
-  Geolocation data is not avaiable when developing locally. You need to actually
+  Geolocation data is not available when developing locally. You need to actually
   deploy the app to Vercel to test it out.
 </Note>
 
