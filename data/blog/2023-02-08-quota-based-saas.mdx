@@ -8,17 +8,17 @@ tags: [redis, quota, edge, billing, saas, prisma]
 
 In this post, we will show you how to use Upstash to create a quota system for a SaaS application, made with **Next.js** and **Prisma**. We will use Next.js API routes to create a simple API.
 
-In many SaaS application, you may have encountered a quota system. It is a system that limits the number of actions a user can do in a given time.
+In many SaaS applications, you may have encountered a quota system. It is a system that limits the number of actions a user can do in a given time.
 
 In our example, a user can only send **1,000 API requests per month** on the **"Free"** plan. If the user tries to send more than 1,000 API requests, the application will block the user from sending more requests.
 
-Those API requests are used to retrieve the content of a spreadsheet, and turn it into a JSON. This is what [fastsheet](https://fastsheet.co) does, turn any Google Sheets spreadsheet into a JSON API.
+These API requests are used to retrieve the content of a spreadsheet and turn it into JSON. This is what [fastsheet](https://fastsheet.co) does, turn any Google Sheets spreadsheet into a JSON API.
 
 ![Example of fastsheet's quota system](/blog/saas-quota-fastsheet/fastsheet-quota.png)
 
 ## Defining the database schema
 
-As said earlier, we will use Prisma as an ORM to interact with the database. Here is an example of a `User` model which implements a quota system, as well as its `Spreadsheet` model to store _spreadsheets_:
+As mentioned earlier, we will use Prisma as an ORM to interact with the database. Here is an example of a `User` model which implements a quota system, as well as its `Spreadsheet` model to store _spreadsheets_:
 
 ```
 model User {
@@ -40,7 +40,7 @@ model Spreadsheet {
 - The `planId` field is the plan the user is subscribed to.
 - The `quota` field is the number of API requests the user has done in the current month.
 - The `Spreadsheet` model represents a spreadsheet, that is connected to a `User`.
-- A `User` can have multiple `Spreadsheet` linked to it.
+- A `User` can have multiple `Spreadsheets` linked to it.
 
 To keep things simple, we will only handle the `"FREE"` plan, which allows **1,000 API requests per month**.
 
@@ -90,7 +90,7 @@ export default async function handler(
 }
 ```
 
-However there is a problem with this approach, it's not as fast as it should be.
+However, there is a problem with this approach; it's not as fast as it should be.
 
 Indeed, we are creating a database transaction to increase the user's quota **on every API request**.
 
@@ -98,9 +98,9 @@ We access the database to get the user's quota, **create a transaction to increm
 
 This is not optimal for many reasons:
 
-- Your database may be slow, this will slow down your response time.
-- Your database may be far from your server, this will again slow down your response time.
-- This code is harder to make it **Edge compatible**, you need to create multiple database replicas around the world _(not an easy task to do!)_.
+- Your database may be slow; this will slow down your response time.
+- Your database may be far from your server; this will again slow down your response time.
+- This code is harder to make **Edge compatible**; you need to create multiple database replicas around the world _(not an easy task!)_.
 
 ## Using Upstash to increase the user's quota
 
@@ -171,12 +171,12 @@ Using Upstash Redis® makes your code easily scalable, as you can leverage the p
 
 Upstash Redis® makes it very easy to implement a caching system for a serverless environment.
 
-We used it to implement a quota system but the original idea can be applied to much more use-cases, such as caching more database queries, or caching the results of an API request.
+We used it to implement a quota system, but the original idea can be applied to many more use cases, such as caching more database queries or caching the results of an API request.
 
-The final goal of caching is to make your API faster and more likely to consume less resources _(e.g. Planetscale database read/writes queries)_.
+The final goal of caching is to make your API faster and more likely to consume fewer resources _(e.g., Planetscale database read/write queries)_.
 
 In a future article, we will see how to use Upstash QStash to retrieve the user's quota from Redis® and store it in the database, to make sure that the user's quota is always up-to-date and not lost.
 
 ## See it live
 
-If you want to see this kind of optimisation live, you can check out [**fastsheet**](https://fastsheet.co?rel=upstash), an API services that turns your Google Sheets into an API in a few clicks. It's free to use with a generous free tier.
+If you want to see this kind of optimization live, you can check out [**fastsheet**](https://fastsheet.co?rel=upstash), an API service that turns your Google Sheets into an API in a few clicks. It's free to use with a generous free tier.
