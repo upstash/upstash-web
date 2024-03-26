@@ -5,10 +5,10 @@ authors: [andreaselia]
 tags: [redis, replicate, nextjs]
 ---
 
-For this blog post, we'll make a few assumptions before continuing, but you should ideally have:
+For this blog post, we'll make a few assumptions before continuing, but ideally, you should have:
 
 - An [Upstash](https://upstash.com?utm_source=andreas2) account where you have a Redis instance created
-- An [Replicate](https://replicate.com) account with access to your API token
+- A [Replicate](https://replicate.com) account with access to your API token
 - A [Next.js](https://nextjs.com) project to implement our desired functionality
 - A [Vercel](https://vercel.com) account to deploy your project to
 
@@ -30,7 +30,7 @@ If you have some React experience, you should be able to determine how the app a
 
 To start with, you'll of course need a Next.js project. This can be done by following the Next.js setup guide [here](https://nextjs.com), or if you have one already setup, then that's okay too. In this tutorial, we're also using [Tailwind CSS](https://tailwindcss.com/docs/guides/nextjs), but you can of course use any form of styling setup that you prefer.
 
-Now that we have a basic Next.js project setup, we can still Upstash's Redis library by running the command:
+Now that we have a basic Next.js project set up, we can install Upstash's Redis library by running the command:
 
 ```bash
 npm install @upstash/redis
@@ -49,7 +49,7 @@ UPSTASH_REDIS_REST_TOKEN=
 
 ## Setting up the frontend form
 
-To begin with, we'll need a form that handles the form, polling and displaying of completed images.
+To begin with, we'll need a form that handles the submission, polling, and displaying of completed images.
 
 ### Restore Image Form Creation
 
@@ -264,11 +264,11 @@ export default function Home() {
 
 By default, this component displays a form allowing the user to enter the image URL of the image that they'd like to restore, and a couple of options to go alongside it such as whether the image is high resolution, or if the image has scratches that need to be removed. Once the user fills in this information, and submits the form, it sends a **POST** request to `/api/create` along with the form data.
 
-Once this request has been sent to the API and a response has been received with the prediction information that has been returned, the component enters into a polling state that checks sends a **GET** request to `/api/poll` once per second in order to check if the prediction has completed yet. Once a polling request returns a successful response, indicating that Replicate has sent a request to our callback endpoint, we'll now have access to the prediction output.
+Once this request has been sent to the API and a response has been received with the prediction information, the component enters into a polling state that sends a **GET** request to `/api/poll` once per second to check if the prediction has completed yet. Once a polling request returns a successful response, indicating that Replicate has sent a request to our callback endpoint, we'll now have access to the prediction output.
 
 Whilst the polling is ongoing, the form displays a button with the option to cancel the prediction. Once pressed, this sends a **POST** request to `/api/cancel` with the `cancel_url` from the prediction data that we received upon initial creation.
 
-The polling implementation utilises a custom hook to be located in `hooks/useInterval.ts` which allows us to easily and seamlessly work with React's component lifestyle, and provide a more convenient way to handle intervals with callbacks within any given React component. You can read more about this hook [here](https://usehooks-ts.com/react-hook/use-interval) and [here](https://overreacted.io/making-setinterval-declarative-with-react-hooks/) should you want to learn more about it and in greater detail.
+The polling implementation utilizes a custom hook located in `hooks/useInterval.ts`, which allows us to easily and seamlessly work with React's component lifecycle, and provide a more convenient way to handle intervals with callbacks within any given React component. You can read more about this hook [here](https://usehooks-ts.com/react-hook/use-interval) and [here](https://overreacted.io/making-setinterval-declarative-with-react-hooks/) should you want to learn more about it and in greater detail.
 
 ```ts
 import { useEffect, useRef } from "react";
@@ -350,7 +350,7 @@ export default async function handler(
 }
 ```
 
-For our create API endpoint, we first do a simple check to ensure that the incoming request method is a **POST** request, and if not we'll return a simple 400 response. We then proceed to send a **POST** request to Replicate with our Replicate API token. The request body consists of the parameters for the given model `version` which indicates what model we are sending the request to (this is found under the "API" tab on the model you'd like to use). We also pass through the parameters associated with the model with the data from the form on the frontend.
+For our create API endpoint, we first perform a simple check to ensure that the incoming request method is a **POST** request, and if not, we'll return a simple 400 response. We then proceed to send a **POST** request to Replicate with our Replicate API token. The request body consists of the parameters for the given model `version` which indicates what model we are sending the request to (this is found under the "API" tab on the model you'd like to use). We also pass through the parameters associated with the model with the data from the form on the frontend.
 
 Once the request has been sent, we use the returned prediction `id` to store it in Redis, and return the prediction data to the frontend to be used in polling the Redis item until it consists of a completed prediction.
 
@@ -475,12 +475,12 @@ This object will be used within the application to store and retrieve data whils
 
 ## Conclusion
 
-Replicate have a variety of models available that can be used via an API. With Vercel and Upstash, it's easier than ever to utilise machine learning models and deploy usable web applciations.
+Replicate has a variety of models available that can be used via an API. With Vercel and Upstash, it's easier than ever to utilize machine learning models and deploy usable web applications.
 
 If you'd like to view the complete repository, you can access it [here](https://github.com/andreaselia/photorescue).
 
 ## Further Development
 
-This is just a simple example of utilising a rather simple model with Replicate. By simply switching up the form parameters and the version in the API, you can easily change to another model as so long as you have your Replicate API token linked, you'll be able to consume any of the available models.
+This is just a simple example of utilizing a rather simple model with Replicate. By simply switching up the form parameters and the version in the API, you can easily change to another model as long as you have your Replicate API token linked, you'll be able to consume any of the available models.
 
 You can [explore](https://replicate.com/explore) all of Replicate's available models here, and once you find one you'd like to experiment with, you can click on the "API" tab in order to view the usage of it. Here you'll also find buttons for Python, cURL, Cog and Docker, which allow you to test out the model, but it's also useful for knowing which parameters are required, and how they are sent.
