@@ -7,14 +7,14 @@ authors:
 tags: [redis]
 ---
 
-Today we're announcing our brand new SDK for distributed locking: [@upstash/lock](https://github.com/upstash/lock)!
+Today, we're announcing our brand-new SDK for distributed locking: [@upstash/lock](https://github.com/upstash/lock)!
 
 #### TL;DR
 
 You can now use Upstash to create distributed locks for your applications.
-This is useful for applications that need to ensure only one client should access a resource at a time.
+This is useful for applications that need to ensure only one client accesses a resource at a time.
 
-Note that because Upstash Redis uses async replication between replicas, a network failure may cause multiple clients to acquire the lock, so
+Note that because Upstash Redis uses async replication between replicas, a network failure may cause multiple clients to acquire the lock. Therefore,
 this library should be used for performance benefits and situations that require _mostly_ consistent locking.
 
 ```typescript
@@ -43,11 +43,11 @@ If you're interested in learning more about locks, read on!
 
 ## What is a lock?
 
-First, let's explore what a lock is and what kind of applications might need them.
+First, let's explore what a lock is and what kind of applications might need it.
 A lock allows for mutual exclusion, meaning only one client can hold the lock at a time.
 
-Take this example handles of code that handles requests for an ATM network.
-When the bank server receives a request (ie: deposit or withdraw), it should appropriately handle it:
+Take this example of code that handles requests for an ATM network.
+When the bank server receives a request (i.e., deposit or withdraw), it should appropriately handle it:
 
 ```typescript
 // Code adapted from UC Berkeley's CS162
@@ -68,8 +68,8 @@ async function processRequest(op, acctId, amount) {
 }
 ```
 
-Let’s say Alice and Bob both want to deposit `$50` into one account. The expected behavior would be account `1` having `$100`. With the current implementation, the behavior is undefined.
-To demonstrate, here are 2 cases that produce different outputs:
+Let's say Alice and Bob both want to deposit `$50` into one account. The expected behavior would be account `1` having `$100`. With the current implementation, the behavior is undefined.
+To demonstrate, here are two cases that produce different outputs:
 
 **Case 1:** The requests are processed serially. This means that Alice’s request will fully execute, and then Bob’s request will fully execute.
 
@@ -98,8 +98,8 @@ This is great! We get our expected result since both tasks ran serially. However
 |                                      | storeAccount(acct)                   |
 
 Final account balance: `$50`
-Uh oh, now we don’t have the expected behavior! We’ve run into a flaw with our synchronization,
-aka a race condition 👻. The primary problem here is that there is a section of code that we don’t
+Uh oh, now we don't have the expected behavior! We've run into a flaw with our synchronization,
+aka a race condition 👻. The primary problem here is that there is a section of code that we don't
 want to be interleaved. That is, we want some portion of our code to be executed by only one thread
 at a time. This area of code is called the _critical section_. In our example, the critical section is
 
@@ -109,7 +109,7 @@ acct.balance = acct.balance + amount;
 storeAccount(acct);
 ```
 
-We saw that running the 2 requests serially results in the correct behavior,
+We saw that running the two requests serially results in the correct behavior,
 and a lock helps us do exactly that. Specifically, a lock is a synchronization mechanism that allows only
 one thread to execute a specific section of code at a time (mutual exclusion). It ensures that multiple threads
 do not interfere with each other and helps maintain data consistency. Acquiring a lock around our
@@ -138,7 +138,7 @@ using `DEL` to release the lock is not enough. Consider the following scenario:
 3. Thread A lease expires and the lock is released
 4. Thread B acquires the lock
 5. Thread A recovers and releases the lock
-   This is a problem because Thread A was able to release the lock even though it was already acquired by Thread B.
+This is a problem because Thread A was able to release the lock even though it was already acquired by Thread B.
 
 To fix this, a unique UUID is assigned to each lock. When a thread acquires the lock, it stores the UUID and we are
 able to verify that the thread releasing the lock is the same thread that acquired it. A similar mechanism is used for
