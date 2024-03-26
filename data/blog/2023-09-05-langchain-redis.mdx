@@ -6,9 +6,9 @@ authors:
 tags: [ai, serverless, redis, langchain]
 ---
 
-LangChain provides a simple interface to conduct conversations between a human and an AI. It can be easily configured to use `BufferMemory`, enabling you to store conversation history in memory. This may be satisfactory for some use cases, but your apps may also require long-term persistence of chat history. Fortunately, it is just as straightforward to swap this out for an Upstash Redis instance.
+LangChain provides a simple interface for conducting conversations between a human and an AI. It can be easily configured to use `BufferMemory`, enabling you to store conversation history in memory. This may be satisfactory for some use cases, but your apps may also require long-term persistence of chat history. Fortunately, it is just as straightforward to swap this out for an Upstash Redis instance.
 
-LangChain provides multiple integrations for Redis, including `ioredis`, `node-redis` and Upstash Redis. Because the Upstash Redis client works via REST, you can use it to create edge-ready applications that can be deployed to Vercel, Cloudflare Workers, or any other serverless environment. We will be using it to create a simple chat app with memory that persists across sessions.
+LangChain provides multiple integrations for Redis, including `ioredis`, `node-redis`, and Upstash Redis. Because the Upstash Redis client works via REST, you can use it to create edge-ready applications that can be deployed to Vercel, Cloudflare Workers, or any other serverless environment. We will be using it to create a simple chat app with memory that persists across sessions.
 
 You can find the full source code for this demo [here](https://github.com/ap-1/langchain-upstash-redis).
 
@@ -41,7 +41,7 @@ While not strictly required, the Vercel AI SDK will make it easier to stream res
 
 ### Setting environment variables
 
-Finally, we'll need the following environment variables from the prerequisites earlier. Be sure to name them exactly as described here, because otherwise they won't be read automatically! You can add these to a `.env` file in the root of your new project:
+Finally, we'll need the following environment variables from the prerequisites earlier. Be sure to name them exactly as described here because otherwise, they won't be read automatically! You can add these to a `.env` file in the root of your new project:
 
 ```bash
 UPSTASH_REDIS_REST_URL="https://********.upstash.io"
@@ -51,7 +51,7 @@ OPENAI_API_KEY="sk-********"
 
 ## Creating a basic chat client
 
-You'll notice that Next.js has created a number of files for us. We'll only be working with a few files in the `app` directory, so you can go ahead and delete everything currently in `public` and `app`.
+You'll notice that Next.js has created a number of files for us. We'll only be working with a few files in the `app` directory, so you can go ahead and delete everything currently in `public` and `pages`.
 
 To start off, we'll create a basic `app/layout.tsx` to house our app:
 
@@ -132,7 +132,7 @@ Finally, let's render the `messages` above our form:
 
 ## Creating the API endpoint
 
-We can start by creating an `app/api/chat/route.ts` file to house our endpoint. Next.js uses file-based routing for API endpoints as well as pages—this is why the folder structure for this new file matches the default endpoint, `/api/chat`, from before.
+We can start by creating an `pages/api/chat.ts` file to house our endpoint. Next.js uses file-based routing for API endpoints as well as pages—this is why the folder structure for this new file matches the default endpoint, `/api/chat`, from before.
 
 Because we're using Upstash Redis, our endpoint is edge-compatible. We can specify this by exporting `const runtime = "edge"` from our endpoint. In the endpoint itself, we can retrieve the `messages` field that the `useChat` hook populated for us. This allows us to pass the latest message to LangChain:
 
@@ -190,7 +190,7 @@ const chain = new ConversationChain({ llm: model, memory });
 // snip
 ```
 
-We construct a new Redis client using the `Redis` class explorted from `@upstash/redis`. It conveniently provides a method to load environment variables automatically, which mirrors the behavior of `ChatOpenAI`. As long as you named your environment variables correctly, you won't need to pass any additional arguments either of these classes.
+We construct a new Redis client using the `Redis` class exported from `@upstash/redis`. It conveniently provides a method to load environment variables automatically, which mirrors the behavior of `ChatOpenAI`. As long as you named your environment variables correctly, you won't need to pass any additional arguments to either of these classes.
 
 In your app, you may want to use the user's ID or some other unique identifier for the `sessionId` to ensure that messages are not shared between users, but we'll use the current date for the sake of this demo. `UpstashRedisChatMessageHistory` provides more configuration options like `sessionTTL` to set the lifetime of the cache.
 
