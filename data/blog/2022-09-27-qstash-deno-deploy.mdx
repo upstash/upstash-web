@@ -6,15 +6,15 @@ tags: [qstash, serverless, deno, deploy]
 ---
 
 [Deno Deploy](https://deno.com/deploy) is a distributed system that runs
-javascript, typescript and webassembly at the edge, worldwide. You don't need to
-deal with infrastructure at all, but instead just upload your code and you are
+JavaScript, TypeScript, and WebAssembly at the edge, worldwide. You don't need to
+deal with infrastructure at all but instead just upload your code, and you are
 done. [QStash](https://upstash.com/qstash) is a message-queue/scheduler with the
 same benefits, because it is 100% serverless and offers per-request pricing.
 
 Together they can be used to build failure-tolerant asynchronous processing in
 serverless functions with minimal setup.
 
-Let's take a look on how to use QStash together with Deno. To highlight the
+Let's take a look at how to use QStash together with Deno. To highlight the
 simplicity, we will do everything within the code editor at
 [dash.deno.com](https://dash.deno.com)
 
@@ -25,7 +25,7 @@ project by clicking on `Play` ![](/blog/qstash/deno/new_project.png)
 
 ## 2. Edit the handler function
 
-QStash uses HTTP requests to push messages to your API, we offer a simple
+QStash uses HTTP requests to push messages to your API; we offer a simple
 utility to verify the authenticity of each incoming request. Just import the
 `Receiver` class and create a new instance with your secret signing keys.
 Replace the existing code with the following:
@@ -63,8 +63,8 @@ serve(async (req: Request) => {
 
 ## 3. Add your signing keys
 
-Click on the settings button at the top of the screen and then click + Add
-Variable
+Click on the settings button at the top of the screen, and then click '+ Add
+Variable'
 
 Get your `QSTASH_CURRENT_SIGNING_KEY` and `QSTASH_NEXT_SIGNING_KEY` from
 [Upstash](https://console.upstash.com/qstash) and then set them in deno deploy.
@@ -72,11 +72,11 @@ Get your `QSTASH_CURRENT_SIGNING_KEY` and `QSTASH_NEXT_SIGNING_KEY` from
 
 ## 4. Deploy
 
-Simply click on Save & Deploy at the top of the screen.
+Simply click on 'Save & Deploy' at the top of the screen.
 
 ## 5. Publish a message
 
-Make note of the url displayed in the top right. This is the public url of your
+Make note of the URL displayed in the top right. This is the public URL of your
 project.
 
 ```bash
@@ -95,8 +95,8 @@ Listening on http://localhost:8000/
 
 ## Next Steps
 
-That's it, you have successfully created a secure deno API, that receives and
-verifies incoming webhooks from qstash.
+That's it; you have successfully created a secure Deno API that receives and
+verifies incoming webhooks from QStash.
 
 Learn more about publishing a message to qstash
 [here](/docs/qstash/howto/publishing)
