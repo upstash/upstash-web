@@ -8,12 +8,12 @@ tags: [redis, nextjs]
 
 ## Introduction
 
-Did you ever wonder how platforms like [Codeshare](https://codeshare.io) are built? Did you ever try to tackle the challenges of scaling a service like that while maintaining a good developer experience for yourself?
-When I decided to build [Bytecrowds](https://www.bytecrowds.com), I had to learn how to do all these. Doing rigorous research followed by the decision to use [Yjs](https://docs.yjs.dev) for providing text-sharing capabilities, it came time to choose a database. With so many options available on the market, I narrowed down the list using one essential keyword: **simplicity**
+Have you ever wondered how platforms like [Codeshare](https://codeshare.io) are built? Have you ever tried to tackle the challenges of scaling a service like that while maintaining a good developer experience for yourself?
+When I decided to build [Bytecrowds](https://www.bytecrowds.com), I had to learn how to do all of these. Doing rigorous research followed by the decision to use [Yjs](https://docs.yjs.dev) for providing text-sharing capabilities, it came time to choose a database. With so many options available on the market, I narrowed down the list using one essential keyword: **simplicity**
 
 ## Why Upstash?
 
-Even before discovering Upstash, I was interested in Redis® for its simple API. However, using it as a primary database comes with challenges like scaling(you might need this for caching too) and maintaining persistence. At the same time, before securing any sponsorship, you have to be very careful about budgeting an open-source software. Will you pay for the computing power even if it's not used at times? Can you handle a sudden traffic spike and be ready to spend hours working on infrastructure instead of working toward publishing new features, improving existing ones, or fixing some bugs? I, for one, wasn't. So I found Upstash.
+Even before discovering Upstash, I was interested in Redis® for its simple API. However, using it as a primary database comes with challenges like scaling (you might need this for caching too) and maintaining persistence. At the same time, before securing any sponsorship, you have to be very careful about budgeting for open-source software. Will you pay for the computing power even if it's not used at times? Can you handle a sudden traffic spike and be ready to spend hours working on infrastructure instead of working toward publishing new features, improving existing ones, or fixing some bugs? I, for one, wasn't. So I found Upstash.
 
 The Upstash [Redis](/docs/redis) offering matches 3 of my essential criteria: it's **easy to use**, **easy to scale**, and **flexible**. Combine that with [low latency](https://upstash.com/fast), out of the box [REST sdk](https://github.com/upstash/upstash-redis) to use in serverless clients(a **requirement** for Bytecrowds too), global replication and a pay-as-you-go plan for the computing power, to name a few, and you will understand why I chose it for my project.
 
@@ -47,13 +47,13 @@ As Bytecrowds uses [Next.js](https://nextjs.org), a solid choice for integrating
 
 #### Authorization
 
-Bytecrowds handles authorization by creating, on demand, an `authorizedEmails` field that is immutable from the API once set. One of the things I like about Redis® is the multitude of functions available out of the box for routine operations that are also algorithmically designed to be efficient. To give an example, all we need to do to check if the `authorizedEmails` has already been set is to use the [HEXISTS](https://redis.io/commands/hexists/) command, which has O(1) complexity.
+Bytecrowds handles authorization by creating, on demand, an `authorizedEmails` field that is immutable through the API once set. One of the things I like about Redis® is the multitude of functions available out of the box for routine operations that are also algorithmically designed to be efficient. To give an example, all we need to do to check if the `authorizedEmails` has already been set is to use the [HEXISTS](https://redis.io/commands/hexists/) command, which has O(1) complexity.
 
 ### Analytics
 
 Bytecrowds uses an analytics system that handles two categories of data:
 
-- a day's stats, which takes the form of a Redis® hash, named like `year month day` with the following properties:
+- a day's stats, which take the form of a Redis® hash, named like `year month day` with the following properties:
 
 ```javascript
 {
@@ -81,6 +81,6 @@ Want to see Bytecrowds in action? Go to https://www.bytecrowds.com, click on the
 
 ## Ending
 
-It's no secret that being the sole active maintainer of an open-source project is hard, but having the right tools and an auto-scaling infrastructure can be a great support that backs you up to continue working on awesome projects, without having to worry about traffic spikes. Already convinced to give Upstash Redis® a try? [Sign up](https://console.upstash.com/) for a free account, no credit card is required.
+It's no secret that being the sole active maintainer of an open-source project is hard, but having the right tools and an auto-scaling infrastructure can be great support that backs you up to continue working on awesome projects, without having to worry about traffic spikes. Already convinced to give Upstash Redis® a try? [Sign up](https://console.upstash.com/) for a free account, no credit card is required.
 
 To see the full code, check the GitHub [repository](https://github.com/Bytecrowds/bytecrowds). If you have any questions or feedback about this article, reach out to me at tudor.zgimbau@gmail.com.
