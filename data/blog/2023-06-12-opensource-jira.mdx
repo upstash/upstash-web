@@ -6,7 +6,7 @@ authors:
 tags: [redis, svelte, sveltekit, auth.js]
 ---
 
-In this post, I talk about how I built a open-source alternative to Jira Kanban Board using [Upstash](https://upstash.com/), [SvelteKit](https://kit.svelte.dev/), and [Firebase Storage](https://firebase.google.com/docs/storage).
+In this post, I talk about how I built an open-source alternative to Jira Kanban Board using [Upstash](https://upstash.com/), [SvelteKit](https://kit.svelte.dev/), and [Firebase Storage](https://firebase.google.com/docs/storage).
 
 ![Screenshot 2023-05-29 at 2.27.44 PM.png](/blog/opensource-jira/Screenshot_2023-05-29_at_2.27.44_PM.png)
 
@@ -26,13 +26,13 @@ In this post, I talk about how I built a open-source alternative to Jira Kanban 
 
 ## Setting up Upstash Redis
 
-Once you have created an Upstash account and are logged in you are going to go to the Redis tab and create a database.
+Once you have created an Upstash account and are logged in, you are going to go to the Redis tab and create a database.
 
 ![Untitled](/blog/opensource-jira/Untitled.png)
 
 ![Untitled](/blog/opensource-jira/Untitled%201.png)
 
-After you have created your database, you are then going to the Details tab. Scroll down until you find the Connect your database section. Copy the content and save it somewhere safe.
+After you have created your database, you are then going to go to the Details tab. Scroll down until you find the Connect your database section. Copy the content and save it somewhere safe.
 
 ![Untitled](/blog/opensource-jira/Untitled%202.png)
 
@@ -42,7 +42,7 @@ Also, scroll down until you find the REST API section and select the .env button
 
 ## Setting up the project
 
-To set up, just clone the app repo and follow this tutorial to learn everything that's in it. To fork the project, run:
+To set up, just clone the app repo and follow this tutorial to learn everything that's in it. To clone the project, run:
 
 ```bash
 git clone https://github.com/rishi-raj-jain/jira-sveltekit-firebase-storage-upstash-starter
@@ -50,7 +50,7 @@ cd jira-sveltekit-firebase-storage-upstash-starter
 npm install
 ```
 
-Once you have cloned the repo, you are going to create a .env file. You are going to add the items we saved from the above sections.
+Once you have cloned the repo, you are going to create a .env file. You are going to add the items we saved from the sections above.
 
 It should look something like this:
 
@@ -101,7 +101,7 @@ npm run dev
 
 ## Repository Structure
 
-This is the main folder structure for the project. I have squared in red the files that will be discussed further in this post that deals with CRUD Operations, SvelteKit Auth, and File Upload Handler, with the files they are referenced in.
+This is the main folder structure for the project. I have marked in red the files that will be discussed further in this post that deal with CRUD Operations, SvelteKit Auth, and File Upload Handler, with the files they are referenced in.
 
 ![image.png](/blog/opensource-jira/image.png)
 
@@ -177,11 +177,11 @@ export async function GET(event: RequestEvent) {
 
 ## Issue(s) CRUD Operations via Upstash Redis
 
-In this section, we'll be diving deep into how the data fetching, updating and deletion for each issue on Kanban board is done. We make constant use of Upstash DB(via `@upstash/redis`) to fetch, display and refresh data.
+In this section, we'll be diving deep into how the data fetching, updating, and deletion for each issue on the Kanban board is done. We make constant use of Upstash DB (via `@upstash/redis`) to fetch, display, and refresh data.
 
 ### getTask: Fetching the issue data function
 
-The `getTask` function uses Upstash’s `hget` via `id` as the key to make an API request to Upstash for the relevant issue ata, identified by a unique `id`. If that issue is not present (or there is an error), the function is set to return an object with a `{ code: 0 }` so that then the user can be redirected to 404 (issue not found) automatically in SvelteKit’s dynamic route.
+The `getTask` function uses Upstash’s `hget` via `id` as the key to make an API request to Upstash for the relevant issue data, identified by a unique `id`. If that issue is not present (or there is an error), the function is set to return an object with a `{ code: 0 }` so that then the user can be redirected to 404 (issue not found) automatically in SvelteKit’s dynamic route.
 
 ```tsx
 type Task = { [key: string]: any } | null;
@@ -351,7 +351,7 @@ export async function POST(event: RequestEvent) {
 
 ### B. Limit No. Of File Uploads Per User Per Issue Per Minute
 
-Using Rate Limiting, I am able to limit file uploads to upto 2 per authenticated user per task per minute. We’re able to enforce this rate limit based on the user email of the authenticated user and task’s ID. Whenever the upload get’s successfully completed, we update the task in the Upstash DB with the fileURL appended to it.
+Using Rate Limiting, I am able to limit file uploads to up to 2 per authenticated user per task per minute. We’re able to enforce this rate limit based on the user email of the authenticated user and task’s ID. Whenever the upload gets successfully completed, we update the task in the Upstash DB with the fileURL appended to it.
 
 ```tsx
 // File: @/routes/api/content/+server.ts
@@ -393,11 +393,11 @@ export async function POST(event: RequestEvent) {
 
 ## Handling File Uploads and Downloads with Firebase Storage
 
-In this section, we'll be diving deep into how an issue’s file uploads and downloads are handled in secure and authenticated manner on SvelteKit’s edge. We leverage Firebase (v9) Storage to fetch and upload files to.
+In this section, we'll be diving deep into how an issue’s file uploads and downloads are handled in a secure and authenticated manner on SvelteKit’s edge. We leverage Firebase (v9) Storage to fetch and upload files.
 
 ### Ooh, but why not Cloudflare R2 for storage?
 
-While I’ve seen lot of community advocacy for Cloudflare R2’s free storage plan and it’s advantages, the one thing that threw me off was the need to put my credit card at Cloudflare’s disposal before even trying the system out. This made me ponder about other storage solutions, and I landed up to Firebase Storage which offers me 5 GB of free storage, and in case I exceed it, my services will be stopped instead of charging my credit card without my approval and know how of what’s happening.
+While I’ve seen a lot of community advocacy for Cloudflare R2’s free storage plan and its advantages, the one thing that threw me off was the need to put my credit card at Cloudflare’s disposal before even trying the system out. This made me ponder about other storage solutions, and I landed on Firebase Storage which offers me 5 GB of free storage, and in case I exceed it, my services will be stopped instead of charging my credit card without my approval and knowledge of what’s happening.
 
 ### SvelteKit Edge Function to Upload Files to Firebase Storage
 
@@ -585,4 +585,4 @@ There are numerous benefits which’ll make you go with the open source alternat
 
 ## Conclusion
 
-In conclusion, this project has provided valuable experience in implementing Granular Rate Limiting, CRUD data operations, implement Firebase Storage APIs to get and upload files, all of it done at the edge with Upstash’s `@upstash/redis` library!
+In conclusion, this project has provided valuable experience in implementing Granular Rate Limiting, CRUD data operations, and implementing Firebase Storage APIs to get and upload files, all of it done at the edge with Upstash’s `@upstash/redis` library!
