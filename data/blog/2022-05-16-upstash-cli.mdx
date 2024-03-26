@@ -6,18 +6,18 @@ authors:
 tags: [cli, serverless, redis, kafka, upstash-cli, devops]
 ---
 
-One of the primary goals of Upstash is to enable every developer to create Upstash resources easily using various tools.
-In the past, we have announced [Developer Api](https://developer.upstash.com/), [Terraform Provider](https://upstash.com/blog/redis-terraform), and now it is time for Upstash CLI.
+One of the primary goals of Upstash is to enable every developer to easily create Upstash resources using various tools.
+In the past, we have announced the [Developer API](https://developer.upstash.com/), [Terraform Provider](https://upstash.com/blog/redis-terraform), and now it is time for the Upstash CLI.
 
 ## Announcing @upstash/cli
 
-We are thrilled to announce Upstash command-line tool so that every developer can create their Upstash resources with a single command.
+We are thrilled to announce the Upstash command-line tool so that every developer can create their Upstash resources with a single command.
 
 It is available on [GitHub](https://github.com/upstash/cli), [npm](https://www.npmjs.com/package/@upstash/cli) or [built binaries](https://github.com/upstash/cli/releases/latest)
 
 ## Get started
 
-Upstash CLI requires a developer api key. A new api key can be created in the [Console](/docs/redis/account/developerapi).
+Upstash CLI requires a developer API key. A new API key can be created in the [Console](/docs/redis/account/developerapi).
 
 ```shell
 npm install -g @upstash/cli
@@ -25,7 +25,7 @@ npm install -g @upstash/cli
 
 Or visit the GitHub [release page](https://github.com/upstash/cli/releases) for prebuilt binaries.
 
-After installing, execute the following command to log in. It will ask for your email and api key:
+After installing, execute the following command to log in. It will ask for your email and API key:
 
 ```ts
 upstash auth login
@@ -57,7 +57,7 @@ You only need to provide the name of your database and region. Other optional fl
 upstash kafka create --name=$name --region=$region
 ```
 
-Similar to redis, kafka resources requires 2 parameters name and region. After creating a region, a topic can be created.
+Similar to Redis, Kafka resources require 2 parameters: name and region. After creating a region, a topic can be created.
 
 ```ts
 upstash kafka topic create --name=mytopic --cluster-id=$id
@@ -73,13 +73,13 @@ Upstash CLI includes many different commands to perform CRUD operations on your 
 upstash team
 ```
 
-- **Redis**: Create/edit/delete redis databases
+- **Redis**: Create/edit/delete Redis databases
 
 ```shell
 upstash redis
 ```
 
-- **Kafka**: Create/edit/delete kafka clusters and topics
+- **Kafka**: Create/edit/delete Kafka clusters and topics
 
 ```shell
 upstash kafka cluster
