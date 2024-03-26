@@ -6,13 +6,13 @@ authors:
 tags: [go, redis, opentelemetry, Distributed tracing]
 ---
 
-In this tutorial, you will learn how to connect to Upstash Redis database using go-redis client and monitor performance of your app using distributed tracing.
+In this tutorial, you will learn how to connect to an Upstash Redis database using the go-redis client and monitor the performance of your app using distributed tracing.
 
 ## What is go-redis?
 
 [go-redis](https://redis.uptrace.dev/?utm_source=upstash) is a popular Redis client for Golang. Out of the box, it supports Redis Server, Sentinel, and Cluster.
 
-To connect to Upstash Redis database, use the following code:
+To connect to an Upstash Redis database, use the following code:
 
 ```go
 package main
@@ -43,7 +43,7 @@ To execute arbitrary commands, you can also use an alternative API:
 val, err := rdb.Do(ctx, "get", "key").Result()
 if err != nil {
 	if err == redis.Nil {
-		fmt.Println("key does not exists")
+		fmt.Println("key does not exist")
 		return
 	}
 	panic(err)
@@ -64,7 +64,7 @@ Tracing allows to follow requests as they travel through distributed systems. Yo
 
 [OpenTelemetry](https://opentelemetry.uptrace.dev/?utm_source=upstash) is a vendor-neutral standard that allows you to collect and export [traces](https://opentelemetry.uptrace.dev/guide/distributed-tracing.html?utm_source=upstash), [logs](https://opentelemetry.uptrace.dev/guide/logs.html?utm_source=upstash), and [metrics](https://opentelemetry.uptrace.dev/guide/metrics.html?utm_source=upstash).
 
-Otel allows developers to collect and export telemetry data in a vendor agnostic way. With OpenTelemetry, you can [instrument](https://opentelemetry.uptrace.dev/instrumentations/?utm_source=upstash) your application once and then add or change vendors without changing the instrumentation, for example, here is a list [popular DataDog alternatives](https://get.uptrace.dev/compare/datadog-competitors.html?utm_source=upstash) that support OpenTelemetry.
+Otel allows developers to collect and export telemetry data in a vendor-agnostic way. With OpenTelemetry, you can [instrument](https://opentelemetry.uptrace.dev/instrumentations/?utm_source=upstash) your application once and then add or change vendors without changing the instrumentation, for example, here is a list [popular DataDog alternatives](https://get.uptrace.dev/compare/datadog-competitors.html?utm_source=upstash) that support OpenTelemetry.
 
 OpenTelemetry is available for most programming languages and provides interoperability across different languages and environments.
 
@@ -76,7 +76,7 @@ go-redis comes with an OpenTelemetry instrumentation called [redisotel](https://
 go get github.com/go-redis/redis/extra/redisotel/v8
 ```
 
-To instrument Redis client, you need to add the hook provided by redisotel:
+To instrument the Redis client, you need to add the hook provided by redisotel:
 
 ```go
 import (
@@ -89,7 +89,7 @@ rdb := redis.NewClient(&redis.Options{...})
 rdb.AddHook(redisotel.NewTracingHook())
 ```
 
-To make tracing work, you must pass the active [trace context](https://opentelemetry.uptrace.dev/guide/go-tracing.html#context?utm_source=upstash) to go-redis commands, for example:
+To make tracing work, you must pass the active [trace context](https://opentelemetry.uptrace.dev/guide/go-tracing.html#context?utm_source=upstash) to the go-redis commands, for example:
 
 ```go
 ctx := req.Context()
