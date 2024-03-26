@@ -6,7 +6,7 @@ authors:
 tags: [ai, nextjs, redis, langchain, fly]
 ---
 
-In this post, I talk about how I built an open-source Custom Content AI Chatbot with Upstash, Next.js, LangChain and Fly.io. Upstash helped me to schedule model training, offered way of generous rate limiting and caching OpenAI API responses.
+In this post, I talk about how I built an open-source Custom Content AI Chatbot with Upstash, Next.js, LangChain, and Fly.io. Upstash helped me to schedule model training, offered a way of generous rate limiting, and caching OpenAI API responses.
 
 ![Screenshot 2023-10-31 at 9.45.30 PM.png](/blog/ai-chatbot/Screenshot_2023-10-31_at_9.45.30_PM.png)
 
@@ -26,13 +26,13 @@ In this post, I talk about how I built an open-source Custom Content AI Chatbot 
 
 ## ****Setting up Upstash Redis****
 
-Once you have created an Upstash account and are logged in you are going to go to the Redis tab and create a database.
+Once you have created an Upstash account and are logged in, you are going to go to the Redis tab and create a database.
 
 ![screenzy-1682835681607.png](/blog/ai-chatbot/screenzy-1682835681607.png)
 
 ![screenzy-1682836009723.png](/blog/ai-chatbot/screenzy-1682836009723.png)
 
-After you have created your database, you are then going to the Details tab. Scroll down until you find the Connect your database section. Copy the content and save it somewhere safe.
+After you have created your database, you are then going to go to the Details tab. Scroll down until you find the Connect your database section. Copy the content and save it somewhere safe.
 
 ![screenzy-1682836213955.png](/blog/ai-chatbot/screenzy-1682836213955.png)
 
@@ -42,13 +42,13 @@ Also, scroll down until you find the REST API section and select the .env button
 
 ## ****Setting up Upstash QStash****
 
-Once logged in you are going to go to the QStash tab and obtain the `QSTASH_URL`, `QSTASH_TOKEN`, `QSTASH_CURRENT_SIGNING_KEY`, and `QSTASH_NEXT_SIGNING_KEY`. Copy the content and save it somewhere safe.
+Once logged in, you are going to go to the QStash tab and obtain the `QSTASH_URL`, `QSTASH_TOKEN`, `QSTASH_CURRENT_SIGNING_KEY`, and `QSTASH_NEXT_SIGNING_KEY`. Copy the content and save it somewhere safe.
 
 ![Untitled](/blog/ai-chatbot/Untitled.png)
 
 ## ****Setting up the project****
 
-To set up, just clone the app repo and follow this tutorial to learn everything that's in it. To fork the project, run:
+To set up, just clone the app repo and follow this tutorial to learn everything that's in it. To clone the project, run:
 
 ```bash
 git clone https://github.com/rishi-raj-jain/custom-content-ai-chatbot
@@ -91,7 +91,7 @@ npm run dev
 
 ## ****Repository Structure****
 
-This is the main folder structure for the project. I have marked in red the files that will be discussed further in this post that deals with managing the vector store, creating API Routes for chatting with AI trained on your custom content (with caching the responses), and scheduling model training process.
+This is the main folder structure for the project. I have marked in red the files that will be discussed further in this post that deal with managing the vector store, creating API Routes for chatting with AI trained on your custom content (with caching the responses), and scheduling the model training process.
 
 ![image (2).png](/blog/ai-chatbot/image_(2).png)
 
@@ -102,15 +102,15 @@ This is a high-level diagram of how data is flowing and operations that take pla
 ![MacBook Air - 1.png](/blog/ai-chatbot/MacBook_Air_-_1.png)
 
 - When a user asks a question via the chatbot, users’ IP is checked against rate limiting, and a response, if not cached via Upstash Redis, is sought from OpenAI API (then cached) and streamed to the user
-- When an admin requests training of the existing model on given set of URLs, with help of Upstash’s QStash a POST request is made in the serverless after a given delay to fetch the content in the given URLs and update the model (in the background)
+- When an admin requests training of the existing model on a given set of URLs, with the help of Upstash’s QStash, a POST request is made in the serverless after a given delay to fetch the content in the given URLs and update the model (in the background)
 
 ## Setup Chat and Train API Routes in Next.js
 
-In this section, we talk about how we’ve setup the route: `pages/api/chat.js` to enable Cross Origin Requests, Rate Limit the Chat API Calls, Cache and Stream Responses to the users and expose a method to schedule content training on particular URLs, and `pages/api/train.js` to solely perform training on the given URLs but in the background.
+In this section, we talk about how we’ve set up the route: `pages/api/chat.js` to enable Cross-Origin Requests, Rate Limit the Chat API Calls, Cache and Stream Responses to the users, and expose a method to schedule content training on particular URLs, and `pages/api/train.js` to solely perform training on the given URLs but in the background.
 
 ### 1. Enable CORS
 
-Using `cors` package, we’ve enabled [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) in the application to use the chatbot at multiple places, say as a bot on your website. As soon as the API Route is initialized, we run the cors setup as below 👇🏻
+Using the `cors` package, we’ve enabled [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) in the application to use the chatbot at multiple places, say as a bot on your website. As soon as the API Route is initialized, we run the cors setup as below 👇🏻
 
 ```jsx
 // File: pages/api/chat.js
@@ -153,9 +153,9 @@ export function runMiddleware(req, res, fn = cors) {
 
 ### 2. Schedule Content Training Request(s) on given URLs
 
-With Upstash QStash, one can create APIs that are like fire and forget. You don’t need to actively wait for the main function to get finished to get a response but rather do it in the background (optionally, after some given delay). It’s like a cron-job but that runs as per each request and not regularly at scheduled intervals.
+With Upstash QStash, one can create APIs that are like fire and forget. You don’t need to actively wait for the main function to finish to get a response but rather do it in the background (optionally, after some given delay). It’s like a cron-job but runs as per each request and not regularly at scheduled intervals.
 
-In the same chat api route, we accept a request that has an `admin-key` header and if that matches with the server side secret (`ADMIN_KEY`), we schedule content training on the set of URLs passed in the request body after some delay (here `10s`). The content training request after the set delay is made to a given endpoint (here: `https://custom-content-ai-chatbot.fly.dev/api/train`)
+In the same chat API route, we accept a request that has an `admin-key` header and if that matches with the server-side secret (`ADMIN_KEY`), we schedule content training on the set of URLs passed in the request body after some delay (here `10s`). The content training request after the set delay is made to a given endpoint (here: `https://custom-content-ai-chatbot.fly.dev/api/train`)
 
 ```jsx
 // File: pages/api/chat.js
@@ -174,7 +174,7 @@ if (req.headers['admin-key'] === process.env.ADMIN_KEY) {
 }
 ```
 
-Now, let’s dive into what’s there in the train API route (`pages/api/train.js`) 👇🏻
+Now, let’s dive into what’s in the train API route (`pages/api/train.js`) 👇🏻
 
 ```jsx
 // File: pages/api/train.js
@@ -266,7 +266,7 @@ export const ratelimit = {
 }
 ```
 
-Using Rate Limiting, I was **able to make the use of service - totally free and public!** This allowed me to showcase the benefits of the system i.e. the chat responses. Literally anyone can ask 30 questions in a day via the website. We’re able to enforce the rate limit of 30 questions in a day based on `IP address` as the key.
+Using Rate Limiting, I was **able to make the use of the service - totally free and public!** This allowed me to showcase the benefits of the system, i.e., the chat responses. Literally, anyone can ask 30 questions in a day via the website. We’re able to enforce the rate limit of 30 questions in a day based on `IP address` as the key.
 
 ```jsx
 // File: pages/api/chat.js
@@ -293,7 +293,7 @@ if (!result.success) return res.status(400).send('Rate limit exceeded.')
 
 ### 4. Load the saved indexed vector store and ask OpenAI for responses
 
-With all the checks done, we are now heading onto the main work - calling OpenAI API with our custom content and sending the response to the user. To simplify things, we’ll break this into further parts:
+With all the checks done, we are now heading onto the main work - calling the OpenAI API with our custom content and sending the response to the user. To simplify things, we’ll break this into further parts:
 
 - **3.1: Retrieving Saved Vector Store**
 
@@ -332,7 +332,7 @@ export async function loadVectorStore() {
 
 - **3.2: Adding Prompt guidelines to the user queries**
 
-Using [PromptTemplate](https://js.langchain.com/docs/modules/model_io/prompts/prompt_templates/) by LangChain, with the user query we pass the instructions on how to, and in which manner shall the AI answer the question:
+Using [PromptTemplate](https://js.langchain.com/docs/modules/model_io/prompts/prompt_templates/) by LangChain, with the user query, we pass the instructions on how to, and in which manner the AI shall answer the question:
 
 ```jsx
 // File: pages/api/chat.js
@@ -372,7 +372,7 @@ const chain = RetrievalQAChain.fromLLM(model, vectorStore.asRetriever(), prompt)
 
 - **3.3: Stream and Cache Responses**
 
-To cache responses with Upstash Redis, we’ll make use of `UpstashRedisCache` cache library by LangChain. We pass on the existing Redis instance as the client, and pass the caching handler to the `ChatOpenAI` wrapper to use it to cache once responses are delivered:
+To cache responses with Upstash Redis, we’ll make use of the `UpstashRedisCache` cache library by LangChain. We pass on the existing Redis instance as the client, and pass the caching handler to the `ChatOpenAI` wrapper to use it to cache once responses are delivered:
 
 ```jsx
 // File: pages/api/chat.js
@@ -448,6 +448,6 @@ Now we are done with the deployment! Yes, that was all.
 
 ## **Conclusion**
 
-In conclusion, this project has provided valuable experience in implementing OpenAI response caching, rate limiting, and scheduled API requests to train the model, all while using a service that scales with your need, i.e. Upstash.
+In conclusion, this project has provided valuable experience in implementing OpenAI response caching, rate limiting, and scheduled API requests to train the model, all while using a service that scales with your need, i.e., Upstash.
 
 `Next.js`, `Redis`, `TailwindCSS`, `LangChain`, `Serverless Scheduling`
