@@ -6,17 +6,17 @@ image: serverless-databases.jpeg
 tags: [redis, database, serverless, faunadb, dynamodb, awslambda]
 ---
 
-In this article, I will compare the latencies of three serverless databases DynamoDB, FaunaDB, Upstash (Redis) for a common web use case.
+In this article, I will compare the latencies of three serverless databases: DynamoDB, FaunaDB, and Upstash (Redis) for a common web use case.
 
-I created a sample news website and I am recording database related latency with each request to the website. Check [the website](https://news-app-two-omega.vercel.app/) and [the source code](https://github.com/upstash/latency-comparison).
+I created a sample news website and am recording database-related latency with each request to the website. Check [the website](https://news-app-two-omega.vercel.app/) and [the source code](https://github.com/upstash/latency-comparison).
 
-I have inserted 7001 NY Times articles into each database. The articles are collected from New York Times Archive API(all articles of January 2021). I randomly scored each article. At each page request, I query top 10 articles under the `World` section from each database.
+I have inserted 7,001 NY Times articles into each database. The articles are collected from New York Times Archive API(all articles of January 2021). I randomly scored each article. At each page request, I query top 10 articles under the `World` section from each database.
 
-I use serverless functions (AWS Lambda) to load the articles from each database. Response time of fetching 10 articles is being recorded as latency inside the lambda function. Note that the recorded latency is only between the lambda function and the database. It is not the latency between your browser and the server.
+I use serverless functions (AWS Lambda) to load the articles from each database. The response time of fetching 10 articles is being recorded as latency inside the lambda function. Note that the recorded latency is only between the lambda function and the database. It is not the latency between your browser and the server.
 
 After each read request, I update the scores randomly to simulate dynamic data. But I exclude this part from the latency calculation.
 
-First we will examine the application, then we will look at the results:
+First, we will examine the application, then we will look at the results:
 
 ### AWS Lambda Setup
 
@@ -28,7 +28,7 @@ Runtime: nodejs14.x
 
 ### DynamoDB Setup
 
-I created a DynamoDB table in US-West-1 with the read and write capacity 50 (the default value was 5).
+I created a DynamoDB table in US-West-1 with the read and write capacity of 50 (the default value was 5).
 
 My index is GSI with partition key `section (String)` and sort key `view_count (Number)`.
 
@@ -36,7 +36,7 @@ My index is GSI with partition key `section (String)` and sort key `view_count (
 
 ### FaunaDB Setup
 
-FaunaDB is a globally replicated database, afaik there is no way to select a region. I used FQL, assuming GraphQL API may have some overhead.
+FaunaDB is a globally replicated database, afaik there is no way to select a region. I used FQL, assuming the GraphQL API may have some overhead.
 
 I created an index with terms {`section`} and values {`view_count`, `ref`} as below. I made it non-serialized hoping to improve the performance.
 
@@ -70,11 +70,11 @@ values: [
 
 ### Redis Setup
 
-I created a Standard type database in the US-West-1 region in Upstash. I used a Sorted Set per each news category. So all `World` news articles will be in the Sorted Set with key `World`.
+I created a Standard type database in the US-West-1 region on Upstash. I used a Sorted Set per each news category. So all `World` news articles will be in the Sorted Set with key `World`.
 
 ### Initialize Databases
 
-I downloaded the 7001 news articles as a JSON file from NYTimes API site, then created a NodeJS script per each database which reads the JSON and inserts the news record to the database. See the files: [initDynamo.js](https://github.com/upstash/latency-comparison/blob/master/initnewsdb/initDynamo.js), [initFauna.js](https://github.com/upstash/latency-comparison/blob/master/initnewsdb/initFauna.js), [initRedis.js](https://github.com/upstash/latency-comparison/blob/master/initnewsdb/initRedis.js)
+I downloaded the 7,001 news articles as a JSON file from the NYTimes API site, then created a NodeJS script for each database which reads the JSON and inserts the news record into the database. See the files: [initDynamo.js](https://github.com/upstash/latency-comparison/blob/master/initnewsdb/initDynamo.js), [initFauna.js](https://github.com/upstash/latency-comparison/blob/master/initnewsdb/initFauna.js), [initRedis.js](https://github.com/upstash/latency-comparison/blob/master/initnewsdb/initRedis.js)
 
 ### Query DynamoDB
 
@@ -240,7 +240,7 @@ module.exports.load = async (event) => {
 
 ### Query Redis
 
-I used the `ioredis` library to connect and read from Redis in Upstash. I used the [ZREVRANGE](https://redis.io/commands/zrevrange) command to load data from Sorted Set. To minimize the latency, I reused the connection creating the Redis client outside the function. Similar to DynamoDB and FaunaDB, I am updating the scores and sending the latency number to another Redis DB for histogram calculation. See the code:
+I used the `ioredis` library to connect and read from Redis in Upstash. I used the [ZREVRANGE](https://redis.io/commands/zrevrange) command to load data from Sorted Set. To minimize the latency, I reused the connection by creating the Redis client outside the function. Similar to DynamoDB and FaunaDB, I am updating the scores and sending the latency number to another Redis DB for histogram calculation. See the code:
 
 ```javascript
 const Redis = require("ioredis");
@@ -335,7 +335,7 @@ module.exports.load = async (event) => {
 
 ## The Results
 
-Check [the website](https://news-app-two-omega.vercel.app/) for the latest results. You can also reach the latest [histogram data](https://71q1jyiise.execute-api.us-west-1.amazonaws.com/dev/histogram). As long as the website is up and running, we will continue to collect the data and update the histogram. Results as of today (Apr, 12, 2021) shows that Upstash has the lowest latency (~50ms at 99th percentile) where FaunaDB has the highest latency (~900ms at 99th percentile). DynamoDB has (~200ms at 99th percentile)
+Check [the website](https://news-app-two-omega.vercel.app/) for the latest results. You can also reach the latest [histogram data](https://71q1jyiise.execute-api.us-west-1.amazonaws.com/dev/histogram). As long as the website is up and running, we will continue to collect the data and update the histogram. Results as of today (Apr 12, 2021) show that Upstash has the lowest latency (~50ms at the 99th percentile) whereas FaunaDB has the highest latency (~900ms at the 99th percentile). DynamoDB has (~200ms at 99th percentile)
 
 ![alt_text](/blog/results.png "image_tooltip")
 
@@ -345,7 +345,7 @@ Although we measure the latency only for the query part, the cold start still ha
 
 ### Why is FaunaDB slow (in this benchmark)?
 
-In [FaunaDB’s status page](https://status.fauna.com/), you will see latency numbers in hundreds. So I assume my configuration does not have big flaws. There can be two reasons behind this latency difference:
+On [FaunaDB’s status page](https://status.fauna.com/), you will see latency numbers in the hundreds. So I assume my configuration does not have big flaws. There can be two reasons behind this latency difference:
 
 **Strong consistency:** By default, both [DynamoDB](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html) and [Upstash](/docs/overall/consistency) provide eventual consistency for reads. [FaunaDB](https://docs.fauna.com/fauna/current/comparisons/compare-faunadb-vs-dynamodb#consistency-models) provides [Calvin](https://dl.acm.org/doi/10.1145/2213836.2213838) based strong consistency and [isolation](https://docs.fauna.com/fauna/current/concepts/isolation_levels). Strong consistency comes with performance overhead.
 
@@ -363,4 +363,4 @@ Let us know your feedback on [Twitter](https://twitter.com/upstash) or [Discord]
 
 ## Update
 
-There was an active discussion on [HackerNews](https://news.ycombinator.com/item?id=26799074) about the my banchmark and performance of the Fauna. I applied the suggestions and restarted FaunaDB application. That’s why, the number of FaunaDB records in the histogram is less than others.
+There was an active discussion on [HackerNews](https://news.ycombinator.com/item?id=26799074) about my benchmark and the performance of Fauna. I applied the suggestions and restarted FaunaDB application. That’s why, the number of FaunaDB records in the histogram is less than others.
