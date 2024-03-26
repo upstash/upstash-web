@@ -10,10 +10,10 @@ cover_image: Branch.png
 order: 2
 ---
 
-Branch is a personal insurance carrier built on advanced technology that offers affordable home and auto insurance to users. Branch is the only carrier that allows customers to instantly bundle home and auto coverage, and also allow to purchase renters, condo, and umbrella insurance. Branch is a series-C startup with a valuation over a billion dollars.
+Branch is a personal insurance carrier built on advanced technology that offers affordable home and auto insurance to users. Branch is the only carrier that allows customers to instantly bundle home and auto coverage, and also allows the purchase of renters, condo, and umbrella insurance. Branch is a series-C startup with a valuation over a billion dollars.
 #### An entirely serverless tech stack allowing to have a lean development team
 
-Branch’s tech stack is entirely serverless which is rare in a highly regulated industries like insurance. They have been following the managed services philosophy to offload undifferentiated heavy lifting to vendors and focus all of their software development resources on things that differentiate Branch from others. As a result, they managed to have an extremely lean software development team of around 20 people while still delivering new features and launching products in new states much faster than was previously thought possible.
+Branch’s tech stack is entirely serverless, which is rare in highly regulated industries like insurance. They have been following the managed services philosophy to offload undifferentiated heavy lifting to vendors and focus all of their software development resources on things that differentiate Branch from others. As a result, they managed to have an extremely lean software development team of around 20 people while still delivering new features and launching products in new states much faster than was previously thought possible.
 
 <Highlight name="Adithya" title="Software Engineering Manager" photo="adithya.jpeg">
   The biggest compliment that we can give Upstash is that we've never had to
@@ -25,15 +25,15 @@ Branch’s tech stack is entirely serverless which is rare in a highly regulated
 
 #### Beyond AWS: Picking the Right Tool for the Task
 
-Branch mainly rely on AWS as primary cloud provider, use GraphQL with AWS AppSync in all their applications, compute on AWS Lambda, primary database on DynamoDB, Cognito as authentication provider. However their approach has been not to limit themselves to AWS only but to pick the best tools for the job -- which is why they also use multiple other vendors such as Algolia, Neon, and of course Upstash for Redis workload.
+Branch mainly relies on AWS as its primary cloud provider, uses GraphQL with AWS AppSync in all their applications, computes on AWS Lambda, has its primary database on DynamoDB, and uses Cognito as the authentication provider. However their approach has been not to limit themselves to AWS only but to pick the best tools for the job -- which is why they also use multiple other vendors such as Algolia, Neon, and of course Upstash for Redis workload.
 
 #### Journey to truly serverless Upstash Redis
 
-Before Upstash Branch first used Redis Cloud, however it was not meeting their expectations from a serverless set up,
+Before Upstash, Branch first used Redis Cloud; however, it was not meeting their expectations from a serverless setup,
 
 - **Minimum operational load:** They had to think about instance size, memory usage etc. which would shift focus from product engineering. Any time spent on operations like that meant less time spent on core products and what differentiates Branch.
 - **Usage based pricing:** The pricing model also didn't really meet their preference to be billed based on usage.
 - **Support for Rest API:** The need for persistent connections to communicate with Redis was also a problem for Branch, as it caused issues with their compute model. All compute being on AWS Lambda meant every request is isolated, and so every request that needed to work with Redis would have to open its own connection. This meant that 10,000 requests would have 10,000 Lambdas opening 10,000 connections to Redis.
 
-Because of all these reasons, they instead started using Upstash Redis product as a cache to maintain state, like when a workflow was last run, the last record that was processed by a workflow. They also use Redis for its popular rate limiting function and deduplicating messages they receive from services that have at-least-once delivery like webhooks, and messaging queues.
+Because of all these reasons, they instead started using the Upstash Redis product as a cache to maintain state, like when a workflow was last run, the last record that was processed by a workflow. They also use Redis for its popular rate limiting function and deduplicating messages they receive from services that have at-least-once delivery like webhooks, and messaging queues.
 
