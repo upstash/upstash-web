@@ -6,7 +6,7 @@ authors:
 tags: [nextjs, kafka, vercel, cqrs]
 ---
 
-Microservices are a widespread software architecture, and with serverless technologies that allow for granular deployments, they have become even more critical. Event sourcing and command query responsibility segregation (CQRS) are architectural patterns that help you to get the most out of your microservices.
+Microservices are a widespread software architecture, and with serverless technologies that allow for granular deployments, they have become even more crucial. Event sourcing and command query responsibility segregation (CQRS) are architectural patterns that help you to get the most out of your microservices.
 
 ## What is Event Sourcing?
 
@@ -43,7 +43,7 @@ Additionally, we will use Next.js with Apollo GraphQL to build the gateway to ou
 
 ## Prerequisites
 
-You need [an Upstash account](https://console.upstash.com/login) to create the required databases, but the free tier is enough for this tutorial. You also need [an up-to-date installation of Node.js](https://nodejs.org/en). You can install everything else via NPM.
+You need [an Upstash account](https://console.upstash.com/login) to create the required databases, but the free tier is sufficient for this tutorial. You also need [an up-to-date installation of Node.js](https://nodejs.org/en). You can install everything else via NPM.
 
 I also recommend using [GitHub Codespaces](https://github.com/features/codespaces) to run the example because you need a public hostname for QStash.
 
@@ -80,7 +80,7 @@ type Mutation {
 ...
 ```
 
-GraphQL schemas require separate types for queries and mutations, we get one model for read access (`Query`) and one for write access (`Mutation`) out of the box.
+GraphQL schemas require separate types for queries and mutations; we get one model for read access (`Query`) and one for write access (`Mutation`) out of the box.
 
 The query resolvers use `ProjectionStore`, a TypeScript class that works as a client to Upstash Redis.
 
@@ -279,7 +279,7 @@ async loadEvents(offset: number): Promise<TaskEvent[]> {
 ...
 ```
 
-The method expects an `offset`, to ensure that only new events are loaded.
+The method expects an `offset` to ensure that only new events are loaded.
 
 > Background: Every message in Kafka gets an offset number. This number is incremented with each new message. These offsets are used to prevent the double processing of a message. Which is exactly what we want to do.
 
@@ -317,7 +317,7 @@ Again, we use the pipeline feature of Upstash Redis to ensure we only send one r
 
 We will add at least one command to the pipeline. The `create-tasks` and `delete-task` event requires an update to the Redis Set that stores our ID, so it will use two commands. Ultimately, we add the last event `offset` so our `projectionStore` remembers where it left off when the next notification arrives.
 
-The pipeline ensures we only send one request to Upstash, but it also puts the commands [in a transaction](https://github.com/upstash/upstash-redis/blob/351d1078d535b0f2b45b03fa70bdcad832e9b0b0/pkg/redis.ts#L358), which ensures that we only execute all or none of them. This way, we can be sure the `lastOffset` only gets updated when we really updated the state.
+The pipeline ensures we only send one request to Upstash, but it also puts the commands [in a transaction](https://github.com/upstash/upstash-redis/blob/351d1078d535b0f2b45b03fa70bdcad832e9b0b0/pkg/redis.ts#L358), ensuring that we only execute all or none of them. This way, we can be sure the `lastOffset` only gets updated when we really updated the state.
 
 ## Functional Steps
 
@@ -353,7 +353,7 @@ QSTASH_NEXT_SIGNING_KEY=...
 ![Figure 2: Create Database](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/257znciwmil5ir2xts7i.png)
 _Figure 2: Create Database_
 
-After creating the database, you can scroll down to the “REST API” section and copy the `UPSTASH_REDIS_REST_UR`L and `UPSTASH_REDIS_REST_TOKEN` to the `.env.local` file.
+After creating the database, you can scroll down to the “REST API” section and copy the `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` to the `.env.local` file.
 
 ### Creating an Upstash Kafka Database
 
@@ -400,7 +400,7 @@ Start the server with the following commands:
     $ npm i
     $ npm run dev
 
-If you’re running on GitHub Codespaces, you must make the server's port public, as seen in figure 7, to Apollo GraphQL UI can read the schema from the server.
+If you’re running on GitHub Codespaces, you must make the server's port public, as seen in figure 7, so the Apollo GraphQL UI can read the schema from the server.
 
 ![Figure 7: Port configuration](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/ubmscbjo15y3yw824rp5.png)
 _Figure 7: Port configuration_
@@ -539,13 +539,13 @@ Console Output:
 
 ## Summary
 
-Applying the CQRS and Event-Sourcing patterns to serverless computing can help to structure your backends. This makes them more flexible in terms of data modeling and scalability.
+Applying the CQRS and Event-Sourcing patterns to serverless computing can help structure your backends. This makes them more flexible in terms of data modeling and scalability.
 
-Upstash services are ideally suited for this task; they bring all you need. You can store your events in Upstash Kafka, your projected state in Upstash Redis, and let QStash ensure all your services know when updates happen.
+Upstash services are ideally suited for this task; they provide all you need. You can store your events in Upstash Kafka, your projected state in Upstash Redis, and let QStash ensure all your services know when updates happen.
 
 ## Next Steps
 
-The resolvers all run in one function, which makes scaling them independently impossible. But since resolvers are asynchronous in nature, you could move the actual work in a separate API endpoint, so the resolvers just have to redirect. This way, you can scale each resolver as required.
+The resolvers all run in one function, making scaling them independently impossible. But since resolvers are asynchronous in nature, you could move the actual work in a separate API endpoint, so the resolvers just have to redirect. This way, you can scale each resolver as required.
 
 ## Additional Resources
 
