@@ -6,7 +6,7 @@ authors:
 tags: [svelte, sveltekit, todo, serverless, redis, upstash]
 ---
 
-In this post, we will write a simple TODO app
+In this post, we will write a simple TODO app.
 using [SvelteKit](https://kit.svelte.dev/)
 and [Serverless Redis](https://upstash.com) (Upstash).
 
@@ -36,7 +36,7 @@ npm run dev
 
 ### The User Interface
 
-We create a simple form and a list to keep the todo items. It will be empty for now, later we will bind it to the database.
+We create a simple form and a list to keep the todo items. It will be empty for now; later, we will bind it to the database.
 
 ```tsx
 // src/routes/index.svelte
@@ -130,8 +130,8 @@ Now you should see:
 ### Prepare the database
 
 We will keep our data in Upstash Redis.
-So [create an Upstash database](https://console.upstash.com/). We will use HTTP
-based Upstash client which is friendly with Serverless environments. Let's install:
+So, [create an Upstash database](https://console.upstash.com/). We will use HTTP
+based Upstash client, which is friendly with Serverless environments. Let's install:
 
 ```shell
 npm install @upstash/redis
@@ -176,7 +176,7 @@ export default redis;
 
 ### Create API
 
-In the folder, the `js/ts` files is used as API backend. So `index.svelte` -> frontend, `index.ts` -> backend.
+In the folder, the `js/ts` files are used as API backend. So, `index.svelte` -> frontend, `index.ts` -> backend.
 
 Let's create `index.ts` and add the required API methods.
 
@@ -261,7 +261,7 @@ export const get: RequestHandler = async () => {
 };
 ```
 
-> To keep the post simple, I did not add `task deletion` and `taks completion` code here, but you can see them in the github repo.
+To keep the post simple, I did not add `task deletion` and `task completion` code here, but you can see them in the GitHub repo.
 
 Now everything is ready!
 
@@ -273,5 +273,5 @@ Now everything is ready!
 I am planning to implement the same TODO application with Next.js. Then I will
 compare my experience in these frameworks.
 
-Stay tuned and follow us at on [Twitter](https://twitter.com/upstash)
+Stay tuned and follow us on [Twitter](https://twitter.com/upstash)
 and [Discord](https://discord.gg/w9SenAtbme).
