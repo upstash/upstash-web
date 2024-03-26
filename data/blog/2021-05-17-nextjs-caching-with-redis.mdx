@@ -6,9 +6,9 @@ image: nextjscaching.png
 tags: [redis, database, serverless, caching, nextjs]
 ---
 
-Next.js is a very successful web framework which brings together server side rendering and static site generation. SSG speeds up your web site thanks to CDN caching meanwhile SSR helps you with SEO and dynamic data.
+Next.js is a very successful web framework that brings together server-side rendering and static site generation. SSG speeds up your website thanks to CDN caching, meanwhile, SSR helps you with SEO and dynamic data.
 
-Server side rendering is a great feature which helps you to write full stack applications. But if you are not careful, the performance of your Next.js website can be affected easily. In this blog post, I will explain how to leverage Redis to speed up your Next.js API calls. Before that I will briefly mention a simpler way to improve your performance.
+Server-side rendering is a great feature that helps you write full-stack applications. However, if you are not careful, the performance of your Next.js website can easily be affected. In this blog post, I will explain how to leverage Redis to speed up your Next.js API calls. Before that, I will briefly mention a simpler way to improve your performance.
 
 ## Use SWR on your API calls
 
@@ -22,11 +22,11 @@ In the above code, user API will be refreshed every 2 seconds.
 
 ## Caching with Redis
 
-SWR is very simple and effective. But there are cases you will need a server side caching:
+SWR is very simple and effective. However, there are cases where you will need server-side caching:
 
-- Client side caching improves the performance for the clients. But if the number of clients is high, you can experience high load on the server side resources which will eventually affect the client side performance too.
-- If you are consuming an external API with a quota, you will want to control the API usage on the server side. Otherwise, too many clients will consume the API quickly.
-- If you have resources calculated, fetched or processed at the server side using dynamic inputs, client side caching will not be very useful.
+- Client-side caching improves performance for the clients. However, if the number of clients is high, you can experience a high load on the server-side resources, which will eventually affect the client-side performance as well.
+- If you are consuming an external API with a quota, you will want to control the API usage on the server side. Otherwise, too many clients will quickly consume the API.
+- If you have resources calculated, fetched, or processed on the server side using dynamic inputs, client-side caching will not be very useful.
 
 ### Example Project: Covid Tracker
 
@@ -39,7 +39,7 @@ We will use Redis to cache the responses from Covid API so:
 
 ### API Code
 
-The code first checks if we have the API result cached in the Redis. If not, we will get the all country list from the Covid API and sort them by current day’s number of cases and save the top 10 to Redis. While saving to Redis, we set the "EX" 60 parameter which means that Redis will evict the entry in 60 seconds.
+The code first checks if we have the API result cached in Redis. If not, we will get the entire country list from the Covid API, sort them by the current day's number of cases, and save the top 10 to Redis. While saving to Redis, we set the "EX" 60 parameter, which means that Redis will evict the entry in 60 seconds.
 
 ```javascript
 import Redis from "ioredis";
@@ -78,7 +78,7 @@ export default async (req, res) => {
 
 ### UI Code
 
-The UI is a simple React code. We fetch the data from API using SWR.
+The UI is simple React code. We fetch the data from the API using SWR.
 
 ```javascript
 export default function Home() {
