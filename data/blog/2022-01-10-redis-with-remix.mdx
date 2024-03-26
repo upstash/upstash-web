@@ -9,7 +9,7 @@ tags: [redis, remix, serverless]
 
 [Remix](https://remix.run/) is a new take on what it means to be a fullstack React framework, focusing on existing web standards and tying the frontend closely to the backend. This tight coupling is a breath of fresh air when you see how simple it is to load data into your React components or how to process data submitted from a form.
 
-In this article we will see Remix's power by creating a simple [Feature Flag](https://en.wikipedia.org/wiki/Feature_toggle) management system using [Upstash Redis](https://upstash.com/) as the database.
+In this article, we will see Remix's power by creating a simple [Feature Flag](https://en.wikipedia.org/wiki/Feature_toggle) management system using [Upstash Redis](https://upstash.com/) as the database.
 
 Full source code can be [found here](https://github.com/leighhalliday/remix-upstash-redis).
 
@@ -17,7 +17,7 @@ Full source code can be [found here](https://github.com/leighhalliday/remix-upst
 
 You will get a brand new Remix app by running `npx create-remix@latest` and choosing your preferred deployment environment. I went with [Vercel](https://vercel.com/) but it should not make a difference for this tutorial.
 
-There are two ways you can connect to Upstash Redis: The first is through a TCP connection in which you can use any standard Redis client library that you are used to. The second is via Upstash's REST API. We will be going with the second option because it is available in all serverless environments, such as the [Cloudflare Workers](https://workers.cloudflare.com/) environment that Remix can be deployed to. Upstash has a [package](https://www.npmjs.com/package/@upstash/redis) which mimics the actual [Redis commands](https://redis.io/commands), making it easy to know which function to call.
+There are two ways you can connect to Upstash Redis: the first is through a TCP connection in which you can use any standard Redis client library that you are used to. The second is via Upstash's REST API. We will be going with the second option because it is available in all serverless environments, such as the [Cloudflare Workers](https://workers.cloudflare.com/) environment that Remix can be deployed to. Upstash has a [package](https://www.npmjs.com/package/@upstash/redis) which mimics the actual [Redis commands](https://redis.io/commands), making it easy to know which function to call.
 
 We now need a way to store two environment variables needed to connect to our Upstash Redis database. Remix doesn't come with [development env var](https://remix.run/docs/en/v1/guides/envvars) support out of the box, but it can be accomplished by adding [dotenv](https://www.npmjs.com/package/dotenv) as a development dependency.
 
@@ -25,7 +25,7 @@ We now need a way to store two environment variables needed to connect to our Up
 npm add --save-dev dotenv
 ```
 
-In our `.env` file (which should be added to `.gitignore`) we can set up two env vars required to connect to Upstash Redis. The `@upstash/redis` package automatically detects these so there is no need to connect within our code. These values can be found within the Upstash dashboard after creating a new Redis database.
+In our `.env` file (which should be added to `.gitignore`), we can set up two env vars required to connect to Upstash Redis. The `@upstash/redis` package automatically detects these so there is no need to connect within our code. These values can be found within the Upstash dashboard after creating a new Redis database.
 
 ```txt
 UPSTASH_REDIS_REST_URL="https://..."
@@ -62,7 +62,7 @@ To access and manipulate this data we'll use four commands/functions provided by
 
 ## Managing Features
 
-We will be building a page located at `/features` which is in charge of creating and managing (enable/disable/delete) existing features. We will go into detail about what `AddFeature` and `FeatureList` do when we discuss how to load data and then how to write data.
+We will be building a page located at `/features` which is in charge of creating and managing (enabling/disabling/deleting) existing features. We will go into detail about what `AddFeature` and `FeatureList` do when we discuss how to load data and then how to write data.
 
 ```tsx
 // app/routes/features.tsx
@@ -81,7 +81,7 @@ export default function Features() {
 
 A [data loader](https://remix.run/docs/en/v1/guides/data-loading) is an exported function in Remix named `loader` which gets run on the server and returns data that is made available to our React component via a hook.
 
-We are starting with a page to create and manage feature flags, and in this case we want to return all the features. They'll be returned as an array of pairs:
+We are starting with a page to create and manage feature flags, and in this case, we want to return all the features. They'll be returned as an array of pairs:
 
 ```json
 [
@@ -144,7 +144,7 @@ const FeatureList = () => {
 
 ## Form Actions
 
-We've seen how data is loaded, but at this stage we don't actually have any features in our feature flag database! Here is where [form actions](https://remix.run/docs/en/v1/guides/data-writes) come into play. Data is processed in Remix by exporting a function named `action`. Much like `loader`, this is run on the server and it typically returns `json` data that the React component can access via another hook, or it can tell the browser to `redirect` to another page.
+We've seen how data is loaded, but at this stage, we don't actually have any features in our feature flag database! Here is where [form actions](https://remix.run/docs/en/v1/guides/data-writes) come into play. Data is processed in Remix by exporting a function named `action`. Much like `loader`, this is run on the server and it typically returns `json` data that the React component can access via another hook, or it can tell the browser to `redirect` to another page.
 
 The `action` function below actually handles four different types of actions, creating a feature, enabling/disabling a feature, and deleting a feature. We handle this with a `switch` statement that then calls the appropriate Redis function/command.
 
@@ -277,4 +277,4 @@ export default function Index() {
 
 ## Conclusion
 
-In this article we've seen how to use Upstash Redis to create a simple feature flag system in Remix, taking advantage of its data loader and form action server side functions. These allow us to keep the backend and frontend of a specific page tightly coupled, iterating quickly without the need to set up a separate GraphQL API and override standard form submission events on the frontend. Remix as we've seen leans in to web standards around how forms submit their data.
+In this article, we've seen how to use Upstash Redis to create a simple feature flag system in Remix, taking advantage of its data loader and form action server-side functions. These allow us to keep the backend and frontend of a specific page tightly coupled, iterating quickly without the need to set up a separate GraphQL API and override standard form submission events on the frontend. Remix as we've seen leans in to web standards around how forms submit their data.
