@@ -5,8 +5,8 @@ authors: [andreas]
 tags: [redis, edge, nextjs, vercel, global, feature, flag]
 ---
 
-Whether you want to ship without breaking things, run A/B tests or just want to test in production,
-feature flags are a great way to dynamically change the behaviour of your app without redeploying. We're excited to announce the public
+Whether you want to ship without breaking things, run A/B tests, or just want to test in production,
+Feature flags are a great way to dynamically change the behavior of your app without redeploying. We're excited to announce the public
 beta release of our new feature flagging library: [@upstash/edge-flags](https://github.com/upstash/edge-flags).
 
 _Edge Flags_, as the name implies, is a feature flag solution built to run at the edge. It is using [Upstash Redis](https://upstash.com/), a globally replicated serverless Redis service, to store configuration and is
@@ -20,7 +20,7 @@ you covered.
 
 ## How it works
 
-There are two components to this: The [console](https://console.upstash.com/edge-flags) to manage flags and the [typescript sdk](https://github.com/upstash/edge-flags) to use them in your code.
+There are two components to this: the [console](https://console.upstash.com/edge-flags) to manage flags and the [TypeScript SDK](https://github.com/upstash/edge-flags) to use them in your code.
 
 ### Console
 
@@ -29,10 +29,10 @@ There are two components to this: The [console](https://console.upstash.com/edge
 When you go to [console.upstash.com/edge-flags](https://console.upstash.com/edge-flags) for the first time, you need to select a Redis database to use. This database will be used to store the feature flags. If you don't have a Redis database yet, you can [create one for free](https://console.upstash.com/).
 
 In the console, you can create, update and delete flags or temporarily toggle them on or off.
-Each flag can have a [percentage](/docs/redis/sdks/edge-flags/percentage) defined, allowing you to rollout flags gradually to a random subset of your users.
+Each flag can have a [percentage](/docs/redis/sdks/edge-flags/percentage) defined, allowing you to roll out flags gradually to a random subset of your users.
 
 In addition to the percentage, you are able to add rules. Rules can be used to target specific users or groups of users. For example, you can target users geographically or users that have a specific email address domain.
-To learn more about differen rule types, please check out the [rules documentation](/docs/redis/sdks/edge-flags/rules).
+To learn more about different rule types, please check out the [rules documentation](/docs/redis/sdks/edge-flags/rules).
 
 ### Your App
 
@@ -48,7 +48,7 @@ Choose `Global` for the best read latency performance, or select a single region
 
 Make sure to copy the `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` to your `.env` file.
 
-#### 2. Install `@upstash/edge-flags` with your favourite package manager:
+#### 2. Install `@upstash/edge-flags` with your favorite package manager:
 
 ```bash
 npm install @upstash/edge-flags
@@ -137,8 +137,8 @@ Here are some of the things we are planning to add:
 
 ##### Caching strategies
 
-To reduce the requests made to redis and thus decreasing your bill at the end of the month, we will be adding different ways to cache flags.
-Caching flags is a double edged sword: The longer the cache time, the fewer requests to Redis need to be made. But at the same time changes to flags will take longer to propagate.
+To reduce the requests made to Redis and thus decrease your bill at the end of the month, we will be adding different ways to cache flags.
+Caching flags is a double-edged sword: The longer the cache time, the fewer requests to Redis need to be made. But at the same time, changes to flags will take longer to propagate.
 
 We're currently evaluating the following caching strategies:
 
@@ -146,7 +146,7 @@ We're currently evaluating the following caching strategies:
 - Vercel's edge CDN
 - React context
 
-There are pros and cons to each and we would appreciate if you share your feedback and ideas.
+There are pros and cons to each, and we would appreciate it if you share your feedback and ideas.
 
 ##### Support more frameworks and platforms
 
