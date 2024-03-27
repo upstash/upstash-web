@@ -12,7 +12,7 @@ In this post, we will write a simple TODO app using [Remix](https://remix.run/) 
 
 ### Create Remix project
 
-Run the below command:
+Run the command below:
 
 ```shell
 npx create-remix@latest
@@ -20,7 +20,7 @@ npx create-remix@latest
 
 ![create-remix-project](/blog/remixtodo/create-remix-project.png)
 
-The project is ready. Now let's install the dependencies and run:
+The project is ready. Now, let's install the dependencies and run:
 
 ```shell
 npm install
@@ -34,7 +34,7 @@ npm run dev
 
 ### The User Interface
 
-We will build a simple form and a list for todo items:
+We will build a simple form and a list for TODO items:
 
 ```tsx
 // app/routes/index.tsx
@@ -84,7 +84,7 @@ export default function Index() {
 
   return (
     <main className="container">
-      {/* crete form */}
+      {/* create form */}
       <Form ref={formRef} method="post">
         <input
           ref={inputRef}
@@ -97,7 +97,7 @@ export default function Index() {
         />
       </Form>
 
-      {/* uncompleted tasks */}
+      {/* incomplete tasks */}
       <div className="todos">
         {uncheckedTodos.map((todo) => (
           <TodoItem key={todo.id} {...todo} />
@@ -148,7 +148,7 @@ export default function TodoItem({ id, text, status }: Todo) {
 }
 ```
 
-Now it is time to add our CSS file. Create a css file `app/styles/app.css`:
+Now it is time to add our CSS file. Create a CSS file `app/styles/app.css`:
 
 ```css
 :root {
@@ -273,7 +273,7 @@ html {
 }
 ```
 
-Import the css under `root.tsx`:
+Import the CSS under `root.tsx`:
 
 ```tsx
 import {
@@ -307,7 +307,7 @@ Now you should see:
 
 ### Prepare the database
 
-We will keep our data in Upstash Redis. So [create an Upstash database](https://console.upstash.com/). We will use HTTP based Upstash client. Let's install:
+We will keep our data in Upstash Redis. So, [create an Upstash database](https://console.upstash.com/). We will use an HTTP-based Upstash client. Let's install:
 
 ```shell
 npm install @upstash/redis
@@ -319,7 +319,7 @@ Upstash is compatible with Redis API, so you can use any Redis client but you ne
 
 We can add new TODO items by just submitting the form. We save the new items to Redis Hash.
 
-> Copy/paste `UPSTASH_REDIS_REST_URL` ve `UPSTASH_REDIS_REST_TOKEN` from [Upstash console](https://console.upstash.com/).
+> Copy/paste `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` from [Upstash console](https://console.upstash.com/).
 
 ```ts
 // app/routes/index.tsx
@@ -400,9 +400,9 @@ export const action: ActionFunction = async ({ request }) => {
 };
 ```
 
-Now everything is ready! I am planning to implement the same TODO application with Next.js and SvelteKit. Then I will compare my experience in these frameworks.
+Now, everything is ready! I am planning to implement the same TODO application with Next.js and SvelteKit. Then, I will compare my experience with these frameworks.
 
-Stay tuned and follow us at on [Twitter](https://twitter.com/upstash) and [Discord](https://discord.gg/w9SenAtbme).
+Stay tuned and follow us on [Twitter](https://twitter.com/upstash) and [Discord](https://discord.gg/w9SenAtbme).
 
 ##### Project Source Code
 
