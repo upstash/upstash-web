@@ -6,11 +6,11 @@ authors:
 tags: [authenticatio, redis, nextjs]
 ---
 
-In this article we will build a minimal but fully functional authenticated Rest API service, leveraging Next.js API Routes and [Upstash Redis](https://upstash.com/?utm_source=Lorenzo1), that we will use as a superfast storage/cache system both for our data, for our user authentication, and for our JWT handling. Please be aware that this project will not have a front end, but it will only expose API that can be queried with a variety of clients.
+In this article, we will build a minimal but fully functional authenticated Rest API service, leveraging Next.js API Routes and [Upstash Redis](https://upstash.com/?utm_source=Lorenzo1), that we will use as a superfast storage/cache system both for our data, for our user authentication, and for our JWT handling. Please be aware that this project will not have a front end, but it will only expose an API that can be queried with a variety of clients.
 
 # Prerequisites
 
-To follow along with the tutorial you will need:
+To follow along with the tutorial, you will need:
 
 - An Upstash account — [Sign up for a free account here](https://console.upstash.com/?utm_source=Lorenzo1)
 - Basic knowledge of Redis
@@ -24,13 +24,13 @@ To follow along with the tutorial you will need:
 
 ## What we will build
 
-We will code a REST API service that will allow client applications to request data from it (in this specific case a list of movies); we will secure the endpoints using JWT, we will code an API login service to get the token and we also implement a refresh token workflow.
+We will code a REST API service that will allow client applications to request data from it (in this specific case, a list of movies); we will secure the endpoints using JWT, we will code an API login service to get the token, and we will also implement a refresh token workflow.
 
 **We will not focus** on client development (since we are building an ‘unopinionated’ service), but we will provide specifications of our service so that anyone can build a client for it.
 
 ## Repository and Demo
 
-To follow along you may want to clone the project repository
+To follow along, you may want to clone the project repository
 
 [Source on GitHub](https://github.com/popeating/upstash-jwt)
 
@@ -44,16 +44,16 @@ To connect to the service, make a POST HTTP Request passing username (_me@home.o
 
 ## Setting up the Redis Database
 
-First of all, you need to sign-up to [Upstash Redis](https://upstash.com/?utm_source=Lorenzo1) (a free plan will work for testing purposes), once done logging-in in the console you can create a new database:
+First of all, you need to sign up for [Upstash Redis](https://upstash.com/?utm_source=Lorenzo1) (a free plan will work for testing purposes), once done logging in to the console, you can create a new database:
 
 ![](https://miro.medium.com/max/1400/1*FVx2VOHSSoqx7u1_2rzLtQ.png)
 
 Go on by clicking “Create database”, name it MovieManager, and set it as Global.
-We now add some dummy data using the using [Upstash](https://console.upstash.com/?utm_source=Lorenzo1) CLI
+We now add some dummy data using the [Upstash](https://console.upstash.com/?utm_source=Lorenzo1) CLI
 
 ![](https://miro.medium.com/max/1400/1*2SQKoOTvBC4MVzme7MIl9w.png)
 
-We will add some movies as Redis hash (they are basically objects) using the HMSET command:
+We will add some movies as Redis hashes (they are basically objects) using the HMSET command:
 
 ```
     hmset movie:’Dr. Strangelove’ director ‘Stanley Kubrick’ year 1964
@@ -62,7 +62,7 @@ We will add some movies as Redis hash (they are basically objects) using the HMS
     hmset movie:’Django Unchained’ director ‘Quentin Tarantino’ year 2012
 ```
 
-We will also add a user that will be authorized to access the data, user will also be a Redis hash:
+We will also add a user that will be authorized to access the data; the user will also be a Redis hash:
 
 ```
     hmset user:’me@home.org’ password $2b$10$zctxUVDyy3jzvSp68oKpMOnkyra4R.NzOFVh9aii3Y43X7XtetoyK level 0
@@ -70,13 +70,13 @@ We will also add a user that will be authorized to access the data, user will al
 
 > **Please note**: The password is encrypted with `bcrypt` (in plain it is _password_), usually, users that need access to the API register via a website (or grab their credential in a website), in this example we do not provide a register endpoint
 
-Every command entered in [Upstash](https://console.upstash.com/?utm_source=Lorenzo1) CLI should give you an OK reply, if everything is correct and you head to _Data Browser_ and select Hash, you will have the list of the data you inserted
+Every command entered in [Upstash](https://console.upstash.com/?utm_source=Lorenzo1) CLI should give you an OK reply. If everything is correct and you head to _Data Browser_ and select Hash, you will have the list of the data you inserted.
 
 ![](https://miro.medium.com/max/1400/1*rKgKG1BXbTER6_YQzjxq2Q.png)
 
 ## Authorization workflow
 
-As mentioned before, our endpoints are not publicly accessible, so we need a way to authenticate and authorize users. For authentication we provide a login endpoint; for authorization, the protected endpoint requires an Authorization Header, to be sent along with the request. This is how the workflow works in detail:
+As mentioned before, our endpoints are not publicly accessible, so we need a way to authenticate and authorize users. For authentication, we provide a login endpoint; for authorization, the protected endpoint requires an Authorization Header to be sent along with the request. This is how the workflow works in detail:
 
 - The user requests the sign-in endpoint, posting username and password
 - The server tries to authenticate the user, if the user is valid the server creates and sends back a JWT (JSON Web Token) and a Refresh Token, the Refresh Token is also stored on our [Upstash Redis](https://upstash.com/?utm_source=Lorenzo1) instance
@@ -90,19 +90,19 @@ JWT and Refresh Token are in the same format, got almost the same information bu
 
 # Setting up the project
 
-Once we are done with the [Upstash Redis](https://upstash.com/?utm_source=Lorenzo1) database we can begin to initialize our project; first, we create a new Next.js project:
+Once we are done with the [Upstash Redis](https://upstash.com/?utm_source=Lorenzo1) database, we can begin to initialize our project; first, we create a new Next.js project:
 
 ```
     npx create-next-app upstash-jwt
 ```
 
-Then we enter in the newly created folder `upstash-jwt` and we install the required modules:
+Then we enter the newly created folder `upstash-jwt` and install the required modules:
 
 ```
     npm i bcrypt jsonwebtoken @upstash/redis
 ```
 
-Create an `.env.local` file to store your keys and fill with the correct data
+Create an `.env.local` file to store your keys and fill it with the correct data
 
 ```js
  SECRET_TOKEN=
@@ -111,7 +111,7 @@ Create an `.env.local` file to store your keys and fill with the correct data
  UPSTASH_REDIS_REST_TOKEN=
 ```
 
-Create the SECRET_TOKEN and SECRET_RTOKEN that will be used to generate the JWT, please remember that these keys should be kept secret and should be very random/hard to guess, you can use a 64bit to Hex string.
+Create the SECRET_TOKEN and SECRET_RTOKEN that will be used to generate the JWT. Please remember that these keys should be kept secret and should be very random/hard to guess; you can use a 64-bit to Hex string.
 Get the UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN from your [Upstash Console](https://console.upstash.com/?utm_source=Lorenzo1), Details Tab, Rest API Section:
 
 ![](https://miro.medium.com/max/1400/1*ROIjYoETrB2mgvsuH2kxtg.png)
@@ -119,17 +119,17 @@ Get the UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN from your [Upstash C
 We can now start to lay out our endpoints:
 
 **POST /auth/signin**
-It login the user, need the email and password passed as a JSON object `{"email":"email", "password": "password"}`, it returns a JSON object with user's information a JWT, and a Refresh Token.
+It logs in the user, needing the email and password passed as a JSON object `{"email":"email", "password": "password"}`, it returns a JSON object with the user's information, a JWT, and a Refresh Token.
 
 **GET /movies/**
-Return the list of movies as a JSON object, it requires a valid JWT that is passed in the header with this format:
+Returns the list of movies as a JSON object; it requires a valid JWT that is passed in the header with this format:
 _Authorization: Bearer xxx_
 
 **GET /movies/$ID**
-Return the details of the movie with id $ID
+Returns the details of the movie with id $ID
 
 **POST /auth/refresh**
-Generate and return a new JWT, the Refresh Token should be passed as `refreshToken` parameter.
+Generates and returns a new JWT; the Refresh Token should be passed as a `refreshToken` parameter.
 
 # Code for the API routes
 
@@ -181,7 +181,7 @@ export default async (req, res) => {
 };
 ```
 
-Our sign-in endpoint will only accept POST with two parameters: **user** and **password**. First of all, we check if the user is present in our Redis database with:
+Our sign-in endpoint will only accept POST with two parameters: **user** and **password**. First, we check if the user is present in our Redis database with:
 
 ```
     const user = await redis.hgetall(`user:${req.body.user}`);
@@ -193,10 +193,10 @@ If the user is present we compare the encrypted password:
     const validPassword = bcrypt.compare(req.body.password, user.password);
 ```
 
-At this point, if the password match, we can assume the user is authenticated and we can send back a JWT and a refresh Token, we also store the refresh token in our Redis instance.
+At this point, if the password matches, we can assume the user is authenticated and we can send back a JWT and a refresh Token; we also store the refresh token in our Redis instance.
 To do so we use some functions that are in an external file called `utils.js`
 
-It is responsibility of the client to store the returned tokens, use them for authorization when needed, and refresh them when expired
+It is the responsibility of the client to store the returned tokens, use them for authorization when needed, and refresh them when expired
 
 We have a function to generate our Token `generateAccessToken`, one to generate our refresh Token `generateRefreshToken`, and one to store the refresh Token in our Redis `addToList`. This `utils.js` this file will also be used to keep all the other utility functions and references (like the Redis connection, the token verification and refresh, and so on):
 
@@ -308,7 +308,7 @@ export default async (req, res) => {
 };
 ```
 
-it uses the _tokenRefresh_ function from `utils.js` it starts by verifying that the token is valid and can be decoded, then it checks on Redis if the user got a refresh token (the one we stored before with _addToList_), if everything is correct it generates a new JWT, a new refresh Token (and store it again in Redis) and send everything back to the client.
+It uses the _tokenRefresh_ function from `utils.js`. It starts by verifying that the token is valid and can be decoded, then it checks on Redis if the user got a refresh token (the one we stored before with _addToList_). If everything is correct, it generates a new JWT, a new refresh Token (and stores it again in Redis), and sends everything back to the client.
 
 We can test this endpoint using our tool, posting to `http://localhost:3000/api/auth/refresh` and passing the refresh Token as a parameter:
 
@@ -357,7 +357,7 @@ export default async (req, res) => {
 };
 ```
 
-Using the _verifyToken_ function from our `utils.js` we can restrict access to our API endpoint only to users who provide a valid Token. We made a couple of sample queries, the first to get the list of movies
+Using the _verifyToken_ function from our `utils.js`, we can restrict access to our API endpoint only to users who provide a valid Token. We made a couple of sample queries, the first to get the list of movies
 
 ```
     const result = await redis.scan(0, { match: ‘movie:*’ });
@@ -380,8 +380,8 @@ and a single movie details:
 
 # Client perspective
 
-As we said before, we just focused on the server part, this is the main scope of an API, it should be abstract, it’s not a website. The way the client requests the data (programming languages, libraries, and so on) is the client developer's choice, we provide a list of endpoints, what our endpoints are expecting, and what our endpoints return to the client. All handling of the data, refresh delays, and so on are the client strategy.
+As we said before, we just focused on the server part; this is the main scope of an API, it should be abstract, it’s not a website. The way the client requests the data (programming languages, libraries, and so on) is the client developer's choice. We provide a list of endpoints, what our endpoints are expecting, and what our endpoints return to the client. All handling of the data, refresh delays, and so on are the client's strategy.
 
 # What’s next
 
-This is just a basic example of a workflow of a protected API. From here it can only be improved: optimizing how data are stored on Redis, improving login security by storing user data on another Redis instance, checking and validating the data the user send before all, adding more endpoint, returning data in GraphQL format, build a client for your API, limit access to a maximum number of calls per hour, use levels to limit access… extensions and improvement are endless!
+This is just a basic example of a workflow of a protected API. From here, it can only be improved: optimizing how data are stored on Redis, improving login security by storing user data on another Redis instance, checking and validating the data the user sends before all, adding more endpoints, returning data in GraphQL format, building a client for your API, limiting access to a maximum number of calls per hour, using levels to limit access… extensions and improvements are endless!
