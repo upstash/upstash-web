@@ -1,32 +1,32 @@
 ---
 slug: vercel-edge
-title: "Vercel Edge Explained. Use cases, benefits and limitations."
+title: "Vercel Edge Explained: Use Cases, Benefits, and Limitations."
 authors: [enes]
 tags: [vercel, edge]
 ---
 
-Vercel provides edge runtimes which are run at locations close to the caller (client). So your serverless function is replicated to edge locations; when a user calls your endpoint, the code is executed and the response fetched from the location which is closest to your user. This minimizes the latency by canceling out the network latency due to the distance between your client and server.
+Vercel provides edge runtimes that run at locations close to the caller (client). So, your serverless function is replicated to edge locations; when a user calls your endpoint, the code is executed, and the response is fetched from the location closest to your user. This minimizes the latency by canceling out the network latency due to the distance between your client and server.
 
-Note that Vercel also has a CDN product which is called Edge Network. A CDN is a relatively old technology and most people know about it enough, in this article I will focus on edge compute products.
+Note that Vercel also has a CDN product called Edge Network. A CDN is a relatively old technology, and most people know enough about it; in this article, I will focus on edge compute products.
 
 Vercel has two edge compute offerings which enable users to leverage the edge infrastructure. Edge middleware and edge functions:
 
 ### Edge Middleware
 
-Edge middleware intercepts the requests coming to your serverless functions. It is deployed globally on Vercel's [](https://vercel.com/docs/concepts/edge-network/overview)edge locations and runs your server-side code to close to your user's origin. It runs before the request hits the edge cache. So you can update the request before being fetched from cache or processed in the serverless function. Edge Middleware runs on Vercel’s [edge runtime](https://edge-runtime.vercel.sh/packages/runtime) which is a V8 Javascript engine.
+Edge Middleware intercepts the requests coming to your serverless functions. It is deployed globally on Vercel's [](https://vercel.com/docs/concepts/edge-network/overview) edge locations and runs your server-side code close to your user's origin. It runs before the request hits the edge cache. So, you can update the request before being fetched from the cache or processed in the serverless function. Edge Middleware runs on Vercel’s [edge runtime](https://edge-runtime.vercel.sh/packages/runtime) which is a V8 Javascript engine.
 
 ### Edge Functions
 
-Edge functions are serverless functions which are executed at Vercel’s edge locations close to your user’s origin. Just like Edge Middleware, they run on [edge runtime](https://edge-runtime.vercel.sh/packages/runtime) which is a V8 Javascript engine. Thanks to its runtime, it has shorter cold starts than regular serverless functions. Edge functions are run after the cache, in contrast to Edge Middleware.
+Edge Functions are serverless functions that are executed at Vercel’s edge locations close to your user’s origin. Just like Edge Middleware, they run on [edge runtime](https://edge-runtime.vercel.sh/packages/runtime) which is a V8 Javascript engine. Thanks to its runtime, it has shorter cold starts than regular serverless functions. Edge functions are run after the cache, in contrast to Edge Middleware.
 
 ![Untitled-2022-12-13-1936.png](/blog/vercel-edge/vercel-edge.png)
 
 ### Edge Middleware vs Edge Functions
 
-- Edge middleware runs before the backend logic while edge function is positioned to be the backend logic.
-- You can use Edge functions instead of Serverless functions while you can use Edge middleware together with Serverless functions.
-- Edge function is a replacement for serverless functions. Edge middleware helps you to intercept requests coming to serverless functions.
-- Both run on the same infrastructure (Vercel edge) and runtime (Vercel edge runtime).
+- Edge Middleware runs before the backend logic, while Edge Function is positioned to be the backend logic.
+- You can use Edge Functions instead of Serverless functions, while you can use Edge Middleware together with Serverless functions.
+- Edge Function is a replacement for serverless functions. Edge Middleware helps you intercept requests coming to serverless functions.
+- Both run on the same infrastructure (Vercel Edge) and runtime (Vercel Edge Runtime).
 
 ### Use Cases
 
@@ -42,7 +42,7 @@ Edge functions are serverless functions which are executed at Vercel’s edge lo
 
 ### Edge Functions vs Serverless Functions
 
-Edge functions are cheaper and provides you low latency all over the world. Also they do not have the cold start problem so they are faster. But they have more limitations such they do not support Node API and they have more restricted code size and timeout limits.
+Edge Functions are cheaper and provide low latency all over the world. Also, they do not have the cold start problem, so they are faster. But they have more limitations, such as not supporting Node API, and they have more restricted code size and timeout limits.
 
 |                    | Serverless Function | Edge Function                 |
 | ------------------ | ------------------- | ----------------------------- |
@@ -57,7 +57,7 @@ Edge functions are cheaper and provides you low latency all over the world. Also
 
 ### Recap
 
-Vercel Edge functions and middleware are great products which broadens the capabilities of serverless functions. Canceling out the cold starts and providing low latency everywhere make them superior to single region serverless functions. But they still have some restrictions which limits them to some special use cases. It will be exciting to see how these products will evolve and if the developers will adopt them for more use cases.
+Vercel Edge Functions and Middleware are great products that broaden the capabilities of serverless functions. Canceling out the cold starts and providing low latency everywhere make them superior to single-region serverless functions. But they still have some restrictions that limit them to some special use cases. It will be exciting to see how these products evolve and if developers will adopt them for more use cases.
 
 **Links**
 
