@@ -31,7 +31,7 @@ Log in to the Upstash console, navigate to Kafka tab and create a new Kafka clus
 
 ### Deploy FluentBit to Kubernetes
 
-Let’s use official charts to deploy FluentBit.
+Let's use the official charts to deploy FluentBit.
 
 ```shell
 $ helm repo add fluent https://fluent.github.io/helm-charts
@@ -58,7 +58,7 @@ Create new files for each and fill them with the content below:
     Skip_Long_Lines On
 ```
 
-Here we tell FluentBit to use `tail` plugin, which observes the new lines appended to the files specified with Path.
+Here we tell FluentBit to use the `tail` plugin, which observes the new lines appended to the files specified with Path.
 Notice `_upstashed_` value in the `Path` key. Log files are named as `<pod-name>_<namespace>_<container-name-container-id>.log`
 and in this blog post, we want FluentBit to export logs from the pods that reside under `upstashed` namespace only.
 
@@ -135,7 +135,7 @@ So the message becomes:
 }
 ```
 
-Alright! We now want these logs to be exported to Upstash Kafka. Let’s configure FluentBit output plugin as the last step:
+Alright! Now, we want these logs to be exported to Upstash Kafka. Let’s configure FluentBit output plugin as the last step:
 
 `output.conf`
 
@@ -164,7 +164,7 @@ $ helm install fluent-bit -n fluent-bit --create-namespace fluent/fluent-bit \
   --set-file config.outputs=output.conf
 ```
 
-That will deploy fluent-bit daemonsets:
+That will deploy Fluent-Bit daemonsets:
 
 ```shell
 $ kubectl get ds -n fluent-bit
@@ -187,7 +187,7 @@ $ kubectl logs -f ds/fluent-bit -n fluent-bit
 
 ### Create a new pod of which logs are to be exported
 
-Remember we configure FluentBit input to observe logs from `upstashed` namespace only. Let’s create a pod under this
+Remember, we configured FluentBit input to observe logs from the `upstashed` namespace only. Let’s create a pod under this
 namespace that produces random logs:
 
 ```shell
@@ -195,7 +195,7 @@ $ kubectl create ns upstashed
 $ kubectl create deployment random-logger -n upstashed --image=chentex/random-logger:v1.0.1 -- /entrypoint.sh 7500 7500 1000
 ```
 
-This deployment produces random logs and prints to stdout. The arguments are `minLogInterval`, `maxLogInterval` and `numberOfLogs`
+This deployment produces random logs and prints them to stdout. The arguments are `minLogInterval`, `maxLogInterval` and `numberOfLogs`
 respectively. So the above deployment will produce a log every 7.5 seconds and 1000 lines in total:
 
 ```shell
@@ -211,7 +211,7 @@ Now navigate back to Upstash console to see if the pod logs arrive:
 
 ![logs-gif](https://user-images.githubusercontent.com/44522401/206859094-2428d35d-4506-4118-824b-bce8fbfe1156.gif)
 
-It’s that easy!
+It's that easy!
 
 ## Consume Logs from Upstash Kafka
 
@@ -281,7 +281,7 @@ while in the lower tab it is
 curl localhost:8080/logs
 ```
 
-The upper tab retrieves logs from my local kubernetes cluster, where lower logs are received from Upstash Kafka running
+The upper tab retrieves logs from my local Kubernetes cluster, whereas the lower logs are received from Upstash Kafka running
 in `eu-west`. Both are almost synchronized. Upstash rocks, doesn't it?
 
 ## Conclusion
@@ -294,5 +294,5 @@ In this article, we exported particular Kubernetes pod logs to the Upstash Kafka
 process, and act on them. Moreover, after applying a simple filter we exposed these real-time logs to HTTP clients - which do
 not necessarily have access to neither Kubernetes cluster nor Kafka topics.
 
-Now that Kubernetes pod logs are buffered in Upstash Kafka, one can further benefit from this and consume them at other
+Now that Kubernetes pod logs are buffered in Upstash Kafka, one can further benefit from this and consume them in other
 backends, storage drivers, dashboards, observability tools, and the like.
