@@ -18,7 +18,7 @@ tags:
   ]
 ---
 
-Next.js enables developers to build full stack applications with the Server Side Rendering capability. Vercel and Netlify help them to write the backend API with serverless functions. So the next question is what is the ideal database for Next.js apps. In this post, I will review the databases which are popular among the Next.js community. I will comment on how they fit the serverless model. Two things to check:
+Next.js enables developers to build full-stack applications with the Server-Side Rendering capability. Vercel and Netlify help them write the backend API with serverless functions. So, the next question is, what is the ideal database for Next.js apps? In this post, I will review the databases that are popular among the Next.js community. I will comment on how they fit the serverless model. Two things to check:
 
 - Serverless pricing: Is the price pay-per-use? When the database is not in use, do you still have to pay?
 - Serverless connections: Is there support for HTTP based connections? So there should not be any connection problems which are common with serverless functions.
@@ -49,7 +49,7 @@ I have reviewed PlanetScale, Supabase, Upstash, Fauna, DynamoDB and MongoDB Atla
 ## PlanetScale
 
 - [PlanetScale](https://planetscale.com/) is a MySQL compatible database as a service.
-- It is uses [Vitess](https://vitess.io/) at the background. This is great as Vitess is being actively used by giants like Youtube.
+- It uses [Vitess](https://vitess.io/) in the background. This is great as Vitess is being actively used by giants like YouTube.
 - PlanetScale introduced the [database branching](https://docs.planetscale.com/concepts/branching) concept. You can create branches and merge schema changes to your production database just like git. Afaik, this feature is unique for PlanetScale.
 - It has a free tier with 100m reads per month.
 - Paid plans start from $29. The main price components for the paid plan are:
@@ -62,7 +62,7 @@ I have reviewed PlanetScale, Supabase, Upstash, Fauna, DynamoDB and MongoDB Atla
 
 #### My Comments:
 
-- In the home page, it is said that: Trusted By Github, Square, Slack etc. Do these companies use PlanetScale or Vitess? If these companies use PlanetScale then it is great. Otherwise, I do not feel good about this type of marketing. `Trusting Vitess` and `Trusting PlanetScale` are different things
+- On the homepage, it is said that: Trusted By GitHub, Square, Slack, etc. Do these companies use PlanetScale or Vitess? If these companies use PlanetScale, then it is great. Otherwise, I do not feel good about this type of marketing. `Trusting Vitess` and `Trusting PlanetScale` are different things.
 - PlanetScale requires you to use TCP based connections (MySQL connections). This might be a problem for serverless functions as they are stateless. They say the number of connections is not a problem for Vitess but still there is a max connection limit for the plans.
 - Lack of the HTTP/REST API makes it impossible to use PlanetScale from Cloudflare Workers and Vercel Edge platforms because they do not allow TCP connections.
 - Planetscale paid plans start from $29, so the price does not scale to zero. Even if you are not using a DB, you have to use $29 per db at least. I think this is a conflict with the definition of `serverless`.
@@ -76,7 +76,7 @@ I have reviewed PlanetScale, Supabase, Upstash, Fauna, DynamoDB and MongoDB Atla
 
 ## Supabase
 
-- Supabase is a collection of developer tools including database, authentication service, storage. They call themselves as `Open Source Firebase Alternative`
+- Supabase is a collection of developer tools including a database, authentication service, storage. They call themselves an `Open Source Firebase Alternative`.
 - Supabase provides a PostgreSQL database.
 - Just like Firebase, Supabase enables developers to listen to the changes on the database in real time.
 - Supabase provides a RESTful API using PostgREST. This is useful especially if you plan to use Supabase in serverless functions.
@@ -90,7 +90,7 @@ I have reviewed PlanetScale, Supabase, Upstash, Fauna, DynamoDB and MongoDB Atla
 
 #### My Comments:
 
-- Supabase provides database, authentication service, object storage and also `serverless functions` are coming. I am worried that it may be hard for a startup to provide many services with high quality and compete with Firebase backed by Google. I hope they will be successful.
+- Supabase provides a database, authentication service, object storage, and also `serverless functions` are coming. I am worried that it may be hard for a startup to provide many services with high quality and compete with Firebase backed by Google. I hope they will be successful.
 - Just like PlanetScale, I think their pricing is not true serverless. Their paid plans require a fixed monthly cost so it never scales to zero.
 
 #### Useful Links:
@@ -105,7 +105,7 @@ I have reviewed PlanetScale, Supabase, Upstash, Fauna, DynamoDB and MongoDB Atla
 - Upstash provides Redis as a service with per request pricing.
 - It provides both Redis and REST API. So you can use it with both serverless and edge (Cloudflare Workers) functions.
 - Upstash has regional and global options. Global database replicates data to multiple regions.
-- It has a free tier with max 10.000 commands per day. Its pay-as-you-pricing is as follows:
+- It has a free tier with a max of 10,000 commands per day. Its pay-as-you-go pricing is as follows:
   - Commands: $0.2 per 100K commands
   - Storage: $0.25 per GB
 
@@ -149,7 +149,7 @@ I have reviewed PlanetScale, Supabase, Upstash, Fauna, DynamoDB and MongoDB Atla
 
 ## MongoDB Atlas
 
-- Atlas is a MongoDB as a managed service which has serverless, shared and dedicated plans..
+- Atlas is MongoDB as a managed service which has serverless, shared, and dedicated plans.
 - Data (REST) API has been recently [announced](https://docs.atlas.mongodb.com/api/data-api/). This allows you to access your database using HTTP.
 - MongoDB Atlas has a Serverless plan with [some limitations.](https://docs.atlas.mongodb.com/reference/serverless-instance-limitations/) The pricing of this plan is per operations so it scales to zero as expected from a serverless product.
 - Multi region replication is only available with Dedicated plan.
@@ -162,7 +162,7 @@ I have reviewed PlanetScale, Supabase, Upstash, Fauna, DynamoDB and MongoDB Atla
 
 #### My Comments:
 
-- Serverless Plan and Data API tells us that MongoDB Atlas does not ignore the Serverless space. But both solutions are in the preview phase and needs some improvements to be a data solution ideal for serverless applications.
+- The Serverless Plan and Data API tell us that MongoDB Atlas does not ignore the Serverless space. But both solutions are in the preview phase and need some improvements to be a data solution ideal for serverless applications.
 
 #### Useful Links:
 
@@ -173,8 +173,8 @@ I have reviewed PlanetScale, Supabase, Upstash, Fauna, DynamoDB and MongoDB Atla
 ## DynamoDB
 
 - Fully managed NoSQL database with key-value and document data model.
-- The connections are HTTP based so it fits to serverless applications.
-- Pricing is per operation in addition to data transfer cost. So it scales to zero.
+- The connections are HTTP-based so it fits serverless applications.
+- Pricing is per operation in addition to the data transfer cost. So, it scales to zero.
 - By default, the reads are eventually consistent. You can also request strongly consistent reads but it has some [limitations](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html).
 - You can enable multi region replication with extra cost.
 - The pricing:
@@ -187,8 +187,8 @@ I have reviewed PlanetScale, Supabase, Upstash, Fauna, DynamoDB and MongoDB Atla
 
 #### My Comments:
 
-- For me, DynamoDB API is not as intuitive as Redis or MongoDB.
-- There is a vendor lock-in problem. DynamoDB is only at AWS and you can not move your application to another provider without changing the code.
+- For me, the DynamoDB API is not as intuitive as Redis or MongoDB.
+- There is a vendor lock-in problem. DynamoDB is only available on AWS, and you cannot move your application to another provider without changing the code.
 
 #### Useful Links:
 
@@ -198,7 +198,7 @@ I have reviewed PlanetScale, Supabase, Upstash, Fauna, DynamoDB and MongoDB Atla
 
 ## Conclusion
 
-So what is the best database for Next.js? As expected, there is no single answer. But let's give some conditional answers:
+So, what is the best database for Next.js? As expected, there is no single answer. But let's give some conditional answers:
 
 - If you need a relational DB 👉🏻 Supabase or PlanetScale
 - If you need database branching 👉🏻 PlanetScale
