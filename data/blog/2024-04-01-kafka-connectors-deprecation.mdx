@@ -1,0 +1,29 @@
+---
+title: "Kafka Connectors Deprecation Announcement"
+slug: kafka-connectors-deprecation
+authors:
+  - sancar
+tags: [upstash, kafka, connectors]
+---
+
+With this post we announce the deprecation of our Kafka Connectors, why we feel this is necessary and what the future looks like.
+
+Kafka Connectors was born out of a desire to innovate and meet the needs of our community. We thought, "Why not bring the benefits of Kafka Connect to the serverless space? The community will love it!". But as with many ideas, reality had other plans.
+
+Through it all, we've gained invaluable insights — lessons that could only be learned through trial and error, through the messy process of experimentation. We've come to appreciate the complexity of the serverless space and the challenges it poses for a tool like Kafka Connect. Along the way, we encountered some serious roadblocks that ultimately led us to make the decision to deprecate Kafka Connectors. Let's address them directly:
+
+**High maintenance cost**: While Kafka Connect promises to consistently connect everything within Kafka, the reality is that maintaining a serverless, multi-tenant framework requires a level of effort beyond our expectations. As maintainers, we've faced problems caused by third-party databases/warehouses, their connector implementations, or version inconsistencies between the connector and the database it connects to. Troubleshooting and supporting every third-party integration became increasingly unsustainable. 
+
+**Failure log management**: Providing error logs to our users has been challenging. Kafka Connect lacks adequate mechanisms to separate user logs, making it impossible for us to provide users with relevant error logs. Despite the possibility of reporting failures in Kafka Connect, not all connector implementations do this correctly. In some cases, the connectors would appear to be working but would silently log errors, sometimes without the exact reason for the failure. These inconsistencies often resulted in manual efforts to sift through the logs, a slow and unscalable approach.
+
+**The complexity of version upgrades:** The complexity of version upgrades is a story as old as time. Users would report bugs in specific Connector versions, and the only way we could provide a fix was through a non-backward-compatible update. Balancing different users' needs while maintaining compatibility between Connector versions proved to be a significant challenge. The cost and effort associated with supporting every requested version of the connector were not sustainable in terms of infrastructure and maintenance.
+
+**Dependency on Kafka versions**: Certain Connector implementations couldn't transition to newer Kafka versions, effectively handcuffing us to older versions. This dependency limited our ability to upgrade Kafka brokers.
+
+**So what's the plan now?** We're doubling down on what we do best: providing you with a robust Kafka infrastructure. While we are deprecating Kafka Connect, Kafka itself and the schema registry remain at the core of our ecosystem. We know this deprecation may directly impact your infrastructure, so we want to provide you with [all the resources you need](https://upstash.com/docs/kafka/connect/migration) to roll your own Kafka Connect framework. Also, while you won't be able to create new connectors in the future, we guarantee that your existing connectors will continue to work for the next six months until October 1, 2024. This grace period should allow enough time for any necessary adjustments or transitions. If you have any questions or need further assistance, please feel free to reach out to us at [support@upstash.com](mailto::support@upstash.com) or join our community on [Discord](https://discord.gg/w9SenAtbme). We're here to help!
+
+Thank you for being a part of our community. We're very grateful for the opportunity to have had Kafka Connect as a part of our offering to you, and as one serverless experiment ends, another opportunity begins.
+
+We look forward to what's next, all the best.
+
+The Upstash Team
