@@ -6,11 +6,11 @@ authors:
 tags: [ai, serverless, redis, replicate]
 ---
 
-In this article, we will show you how to rate limit a Next.js app using Upstash Redis. We will be rebuilding [lofianime.com](https://www.lofianime.com/), an app that generates AI images with a Stable Diffusion model on Replicate. We will focus predominantly on how to implement Upstash rate limiting with a Redis database. You can checkout the original source code for this project on [GitHub](https://github.com/alpinecodex/lofianime).
+In this article, we will show you how to rate limit a Next.js app using Upstash Redis. We will be rebuilding [lofianime.com](https://www.lofianime.com/), an app that generates AI images with a Stable Diffusion model on Replicate. We will focus predominantly on how to implement Upstash rate limiting with a Redis database. You can check out the original source code for this project on [GitHub](https://github.com/alpinecodex/lofianime).
 
 ## Why use Upstash?
 
-To avoid high API costs incurred from using hosted AI models, it’s imperative that we rate limit our API routes. Upstash provides an SDK that allows us to easily do this.
+To avoid high API costs incurred from using hosted AI models, it's imperative that we rate limit our API routes. Upstash provides an SDK that allows us to easily do this.
 
 ## Getting Started
 
@@ -18,7 +18,7 @@ We will create a Next.js application and deploy it to Vercel. Alternatively, you
 
 ## Project Setup
 
-Create a new Next.js project. Make sure to enable the `App Router`, and `tailwindCSS`. We will use Javascript instead of Typescript for sake of simplicity.
+Create a new Next.js project. Make sure to enable the `App Router`, and `tailwindCSS`. We will use Javascript instead of Typescript for the sake of simplicity.
 
 ```bash
 npx create-next-app@latest
@@ -114,7 +114,7 @@ export async function POST(request) {
 }
 ```
 
-Let’s break this code down. We first create a Redis client using the Upstash SDK. We then use that client to create a RateLimit of 5 requests with a fixed window of 1440 minutes, or 24 hours. Then, we create an instance of Replicate for our image generation. Using Next.js route handlers, we define a function to handle `POST` requests. In this example, we limit all requests for the app. However, by getting an `email` or `IP address`, we can rate limit on an individual visitor level. In our `POST` function, we check if the user has remaining generations. If they have reached their limit, we return a response with a `429` HTTP status code and set the headers with the limit and the remaining amount.
+Let's break this code down. We first create a Redis client using the Upstash SDK. We then use that client to create a RateLimit of 5 requests with a fixed window of 1440 minutes, or 24 hours. Then, we create an instance of Replicate for our image generation. Using Next.js route handlers, we define a function to handle `POST` requests. In this example, we limit all requests for the app. However, by getting an `email` or `IP address`, we can rate limit on an individual visitor level. In our `POST` function, we check if the user has remaining generations. If they have reached their limit, we return a response with a `429` HTTP status code and set the headers with the limit and the remaining amount.
 If the user does have remaining generations, we grab the prompt from the request and run the Replicate model using the SDK. Then, we return the output of the model with the Upstash Redis limit data in the response headers.
 
 ## Building the UI
@@ -207,17 +207,17 @@ const nextConfig = {
 module.exports = nextConfig;
 ```
 
-Let’s break this code down. We created a simple React form that will submit the user prompt to our API route. When we receive a response, we set a state variable with the image URL and then render the image in the UI. Finally, we updated `next.config.js` so that we can remotely load images from Replicate.
+Let's break this code down. We created a simple React form that will submit the user prompt to our API route. When we receive a response, we set a state variable with the image URL and then render the image in the UI. Finally, we updated `next.config.js` so that we can remotely load images from Replicate.
 **And it works!** If we inspect the network tab of the browser developer tools, we can see the rate limit as well as the number of generations remaining in the headers of our API route response. If we reach the limit, the API will return a 429 status code and will not allow us to generate any more images.
 Congratulations! You just created a Next.js app that generates images with AI that is rate limited using Upstash Redis. Not too bad, right?
 
 ## Possible Next Steps
 
-There are many enhancements we can add to make this project even better. Here are a few good examples if you’re feeling lucky:
+There are many enhancements we can add to make this project even better. Here are a few good examples if you're feeling lucky:
 
 ### Add authentication and personal rate limiting
 
-As mentioned above, we could add user authentication using a library such as [Auth.js](https://authjs.dev/) that would allow us to rate limit on an individual basis. We can create an identifier by using the user’s email and use this to rate limit:
+As mentioned above, we could add user authentication using a library such as [Auth.js](https://authjs.dev/) that would allow us to rate limit on an individual basis. We can create an identifier by using the user's email and use this to rate limit:
 
 ```jsx
 const identifier = session.user.email;
