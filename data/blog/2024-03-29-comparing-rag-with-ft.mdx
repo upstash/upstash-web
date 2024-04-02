@@ -1,0 +1,241 @@
+---
+title: "Comparing Retrieval-Augmented Generation With Fine-Tuning"
+slug: comparing-rag-with-ft
+authors:
+  - "kay"
+tags: [llm, ai, rag, fine-tuning]
+---
+
+Large language models (LLMs) like GPT-4 or Claude Opus know the answer to many 
+questions. Their creators trained them on the Internet, so they are jacks of all 
+trades. However, this training takes a long time and huge amounts of computing 
+power, so it isn’t done every day or even every week. Depending on the LLM, the 
+data it knows can be weeks or months old. Also, it might not remember where it 
+found it, so it can’t reliably quote sources. This makes working with LLMs hard, 
+as they can’t answer questions on fresh topics. Retrieval-augmented generation 
+(RAG) and fine-tuning are ways to solve this issue by giving LLMs access to new 
+information. This article will explain both approaches and compare them with 
+each other.
+
+## What is RAG?
+
+RAG is a technique that lets an LLM incorporate additional data sources into its
+prompts instead of just the user input. This enables the model to use data it 
+wasn’t trained with because it didn’t exist at training time or wasn’t deemed 
+important enough. It also gives the model access to an actual data source that 
+it can quote instead of just remembering the gist of it.
+
+## How Does RAG Work?
+
+RAG works in two stages: the setup stage and the retrieval stage. Let’s look 
+into them in more detail.
+
+### The Setup Stage
+
+In this stage, you collect and prepare the data you want to include in the 
+prompts later. It contains the following steps:
+
+
+![Figure 1: RAG setup stage](/blog/rag-vs-ft/rag-setup.png "Figure 1: RAG setup stage")
+
+Figure 1: RAG setup stage
+
+#### 1. Collecting the Data
+
+First, you collect all the data you want to use for augmentation, such as 
+documents, code files, blog posts, etc.
+
+#### 2. Splitting the Data
+
+Next, you split the data into chunks. The size of the chunks depends on your use 
+case and the LLM's capabilities. 
+
+For example, to quote research papers, you might split them per section so the 
+chunks aren’t too big for the embedding step while keeping semantically related 
+information together (e.g., conclusion data is one chunk.) 
+
+Similarly, you might split the data by modules, classes, or functions if you're 
+trying to build a code search.
+
+#### 3. Embed Data
+
+To make the data searchable, you must convert each chunk into vector embeddings. 
+These are huge lists of numbers that encode the text in chunks. This is done 
+using so-called embedding models. 
+
+#### 4. Storing the Data
+
+Finally, when you have embedded chunks, you can store them in a vector database 
+[like Upstash Vector](https://upstash.com/docs/vector/overall/getstarted) to 
+make them available at prompting time. 
+
+After completing all the steps, you can use your data in the retrieval stage.
+
+### The Retrieval Stage
+
+You execute this stage every time you send a prompt to your LLM. It consists of 
+the following steps:
+
+
+![Figure 2: Rag retrieval stage](/blog/rag-vs-ft/rag-retrieval.png "Figure 2: Rag retrieval stage")
+
+Figure 2: Rag retrieval stage
+
+#### 1. Embedding the Prompt
+
+The first step is converting the prompt text into a vector embedding with the 
+same LLM you used to create the embeddings in the setup stage. This way, the 
+vector database can reliably compare the prompt with the data. 
+
+It’s a good idea to remove filler words from the prompt before this step to make
+the search more accurate. 
+
+#### 2. Searching the Database
+
+Then, you need to send the embedding to the vector database to get the chunks 
+that are related to them. 
+
+You can filter these results to ensure they match the prompt. 
+
+#### 3. Combine the Prompt With the Results
+
+Now that you have the search results, you can combine them with the input prompt
+to create an enriched prompt that will give you answers based on your data. 
+
+You can start the prompt by telling the model about the data and how it should 
+base its response on it, adding which chunk it found the related information. 
+
+Then, add the user input at the end, which you append to the prompt.
+
+#### 4. Generate Response
+
+Finally, you send the enriched prompt to your LLM to generate the response to 
+your question.
+
+## What is Fine-Tuning?
+
+Like RAG, fine-tuning is a technique for training LLMs with additional data. It 
+can improve the output quality of general LLMs like GPT or Claude (i.e., focus 
+them on specific subject areas for a task) and teach a small model know-how in 
+a particular subject to make it a specialist that performs in that one subject 
+as good as a general model, but faster. All this without adding more data to 
+your prompts, which are limited in size and cost more per request as they grow.
+
+## How Does Fine-Tuning Work?
+
+Fine-tuning has only one stage: the training stage. The fine-tuned model will 
+work as a regular LLM, so you don’t have to fetch or add data to the prompts 
+later.
+
+### The Training Stage
+
+In the training stage, you collect, prepare, and present your data to a model.
+
+![Figure 3: Fine-tuning training stage](/blog/rag-vs-ft/fine-tuning.png "Figure 3: Fine-tuning training stage")
+
+Figure 3: Fine-tuning training stage
+
+#### 1. Collecting Data
+
+First, you collect the data required for the training.
+
+For example, if you want to train a model to write all outputs in the style of 
+Shakespeare, you could gather all of his books. 
+
+Suppose you want to prevent a model from accidentally answering in the context 
+of a different subject area (i.e. when terms have different meanings in separate
+fields). You could collect a list of these terms and their definitions.
+
+If you want to teach a small model about a specific field, gather all the data 
+you can find on this field.
+
+#### 2. Converting the Data
+
+In the best case, your data is already in a Q&A form so you can skip this step. 
+If not, the conversion process is highly specific to your goal, but in general, 
+the result is a list of inputs and desired outputs, where the outputs are based 
+on the collected data.
+
+Fine-tuning aims to remove the need to constantly modify prompts before sending 
+it to a model, which is what we’re doing with RAG. However, this isn’t an issue 
+in the training stage, so that you can use any LLM for support.
+
+Tell Claude Opus, or GPT-4, it should answer your questions in Shakespeare's 
+style. Use the collected data to give some examples of particularly well-written
+sections. Each of these prompts might be very long, and so might the outputs, 
+especially if you let it answer multiple questions in one go. However, you will
+only do this until you’re satisfied with the results. 
+
+After that, you can take the list of inputs and outputs to the next step.
+
+#### 3. Training the Model
+
+Now that you have all the data in a well-suited format for fine-tuning, you can 
+start the training process and feed a model of this data. After this step, 
+you’ll have a tuned model you can use just like a regular model but without 
+prompt modifications.
+
+## When to Use RAG and When Fine-Tuning?
+
+Now that you understand these two approaches and how they work let’s check out 
+when to use them.
+
+### Accessing Constantly Changing Data
+
+RAG can give models access to new data that changes frequently. You can do it 
+regularly by updating the records in your vector database.
+
+
+### Grounding a Model in Facts
+
+RAG is a good approach when you need your model to represent specific 
+information faithfully. Models tend to respect the information given in their 
+prompts as the truth. 
+
+### Quoting Correct Sources
+
+RAG is also well suited when you need your model to quote the source of the 
+information it presents.
+
+### Modifying Output Style
+
+Fine-tuning is the way to teach a model about writing styles or output formats. 
+The example approach is good for teaching skills that are hard to explain.
+
+### Focusing on a Specific Field
+
+Fine-tuning is also good for teaching a model to focus on a specific field. Just
+ensure your training data includes ambiguous terms and answers that always come 
+from your field.
+
+### Optimizing Prompts
+
+Fine-tuning is the best way to move the data you always add to your prompts into
+the model weights. This can save money, as you don’t have to pay for big prompts
+anymore, and it can also improve response time.
+
+### Training for Big Contexts
+
+Fine-tuning is also good if your prompts require a big context. Getting all the 
+RAG data needed to make an informed decision into the prompt might not always be
+possible. Even if your chunks are small, you might still need hundreds of them
+to address every edge case.
+
+### Turning Small Models into Specialists
+
+General models are usually slow, but smaller models aren’t as sophisticated.
+However, fine-tuning can teach a small model about a specific field. You can 
+even use general models to generate the training data. The trained model might 
+perform with the quality of a general model in its field but with much faster 
+response times.
+
+## Summary
+
+RAG and fine-tuning are different approaches to adding new information to an 
+existing model. They have different pros and cons and overlapping use cases.
+
+Need accurate and up-to-date data? RAG is the way to go, but keep prompt sizes 
+in mind!
+
+Want to save on prompt size or teach a small model new tricks? Fine-tuning is a 
+good choice, but ensure you can collect or generate the required data!
