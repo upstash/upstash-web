@@ -28,6 +28,7 @@ const LanguagesLabel = {
   rs: "Rust",
   rb: "Ruby",
   java: "Java",
+  elixir: "Elixir",
 };
 
 export async function generateStaticParams(): Promise<Props["params"][]> {
