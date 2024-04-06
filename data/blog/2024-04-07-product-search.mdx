@@ -42,7 +42,7 @@ Once you have created an Upstash account and are logged in, go to the Vector tab
 
 ![Create an Upstash Vector](/blog/integrating-vector-search-in-e-commerce-platforms-with-upstash-vector/vector-tab.png)
 
-Enter the index name of your choice (say, `article`) and set the vector dimensions to be of 1536.
+Enter the index name of your choice (say, `products`) and set the vector dimensions to be of 512.
 
 ![Create An Upstash Vector Index](/blog/integrating-vector-search-in-e-commerce-platforms-with-upstash-vector/vector-create.png)
 
@@ -87,20 +87,20 @@ pip install python_dotenv torch pillow transformers numpy
 
 The above command installs the following packages:
 
-- FastAPI
-- Uvicorn
-- Upstash Python Module
-- python_dotenv
-- PyTorch
-- Pillow
-- Numpy
-- Transformers
+- `fastapi`: A modern, fast (high-performance), web framework for building APIs with Python 3.6+ based on standard Python type hints.
+- `uvicorn[standard]`: A lightning-fast ASGI server. The `[standard]` part indicates that you're installing Uvicorn with the standard set of dependencies.
+- `upstash_vector`: A serverless Vector SDK (python) from Upstash.
+- `python_dotenv`: A package to manage environment variables in a .env file.
+- `torch`: A popular open-source machine learning library for Python, PyTorch.
+- `pillow`: The Python Imaging Library (PIL) for opening many different image file formats.
+- `numpy`: A package for scientific computing with Python.
+- `transformers`: A library (by Hugging Face) for Natural Language Processing (NLP) tasks, providing implementations of state-of-the-art pre-trained models such as BERT, GPT, and others.
 
-TODO
+Once they are installed, let's move on to creating a function to generate vector embeddings from text input(s).
 
 ## Generate Text Embeddings using CLIPTextModel
 
-TODO
+Let's define a function to transform text into embeddings using the CLIPText model. Append the following code to `main.py` file:
 
 ```python
 import torch
@@ -123,13 +123,17 @@ def getTextEmbeddings(text):
     return pooled_output[0]
 ```
 
-TODO
+The code above does the following:
 
-TODO
+- Initializes CLIPProcessor, which preprocesses text inputs for the CLIP model. It is using the **openai/clip-vit-base-patch32** variant.
+- Initializes CLIPTextModel, which represents the text-processing component of the CLIP model, using the same variant as the processor.
+- Creates a function named `getTextEmbeddings` that takes a text input, preprocesses it using the initialized processor, feeds it into the CLIPTextModel, and returns the pooled output, which represents the vector embedding of the text.
+
+Let's move on to generating vector embeddings of images with CLIP model.
 
 ## Generate Image Embeddings using CLIPModel
 
-TODO
+Let's define a function (along with some helper functions) to fetch, and transform images into embeddings using the CLIP model. Append the following code to `main.py` file:
 
 ```python
 import torch
@@ -163,11 +167,18 @@ def getImageEmbeddings(image):
     return embedding.astype(np.float32)
 ```
 
-TODO
+The code above does the following:
+
+- Initializes CLIPModel, which represents the image-processing component of the CLIP model, using the **openai/clip-vit-base-patch32** variant.
+- Defines a series of transformations using `torchvision.transforms` to preprocess the input image, including resizing, conversion to tensor, and normalization.
+- Creates a `getImage` function that takes a URL as input, fetches the corresponding image from the internet, and returns it as a PIL image object.
+- Creates a `getImageEmbeddings` function that preprocesses the input image using the defined transformations, feeds it into the CLIPModel to obtain image features, and returns the embedding as a numpy array.
+
+With that done, let's use both the vector embeddings generator functions in FastAPI endpoints.
 
 ## Dynamically update Upstash Vector Index with new products
 
-TODO
+With increasing inventory, e-commerce are ever growing. Hence, to visualize things like in real-time, you are going to create an API that would dynamically create embeddings of the products from it's attributes such as image, title and description and store them in the Upstash Vector index. This helps keeps the data up-to-date, resulting in accurate responses to user searches. Append the following code to `main.py` file:
 
 ```python
 @app.post("/api/add")
@@ -199,13 +210,16 @@ async def add(request: Request):
             index.upsert(vectors = [(random.random(), embedding.tolist(), product)])
 ```
 
-TODO
+The code above does the following:
 
-TODO
+- The endpoint parses the request body to extract product data.
+- For each product, it checks if it has an image, title, or description field.
+- If present, it generates vector embeddings using `getImageEmbeddings` or `getTextEmbeddings` functions.
+- It then inserts these embeddings into Upstash Vector index along with metadata using the upsert method, ensuring that the index is dynamically updated with new product information.
 
 ## Dynamically search from Upstash Vector Index for similar products
 
-TODO
+For the UI to render rich product information responses to user queries, you are going to return the relevant product information by creating an endpoint it can talk to. Such an endpoint would be responsible to search for the relevant products based on the user prompt, including link to images. Append the following code to `main.py` file:
 
 ```python
 @app.post("/api/chat")
@@ -227,7 +241,25 @@ async def chat(request: Request):
     return [item for item in output if item.score > 0.8]
 ```
 
-TODO
+The code above does the following:
+
+- The endpoint parses the request body to extract user messages.
+- It retrieves the latest user input from the messages.
+- If the input contains an image URL, it generates embeddings using `getImageEmbeddings`; otherwise, it uses `getTextEmbeddings` for text input.
+- The generated embeddings are used to query the Upstash Vector index with the query method, specifying to retrieve the top 3 relevant vectors along with their metadata.
+- Finally, it filters and returns results with a similarity score higher than 0.8, ensuring relevant product recommendations are provided to the user.
+
+### Run the FastAPI Application (Locally)
+
+Execute the following command in another terminal window to build and preview your FastAPI application:
+
+```bash
+uvicorn main:app --reload
+```
+
+The app should be running on [localhost:8000](http://localhost:8000/).
+
+Now, let's move on to creating the user interface for users to interact with.
 
 ## Create a new Astro application
 
