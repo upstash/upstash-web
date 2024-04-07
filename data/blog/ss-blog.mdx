@@ -6,16 +6,58 @@ authors:
 tags: [upstash, vector, nextjs, javascript, vercel]
 ---
 
-Welcome to a new blog post. In this blog we will create a semantic search engine for docs the repositories on Github using Upstash Vector.
+Welcome to a new blog post. In this blog we will create a semantic search engine for docs repositories on Github using Upstash Vector.
 
 ## What is Semantic Search?
-Semantic search basically means "searching with meaning". In a very simple search, we take the user input and look for it in out database. When we do this
-returning a result that contains the word "soccer" instead of "football" is not very likely but while creating a search engine this is what we want to achieve.
-Semantic search helps us with this issue. In semantic search, search domain is kept in the database as embeddings which are multi-dimensional vectors that are 
-created considering the relations of words. In this approach, search queries are turned into embeddings too. So, returning "soccer" when the query is "football"
-becomes possible.
+Semantic search basically means "searching with meaning". In a very simple search, we take the user input and look for it in out database. When we do this returning a result that contains the word "soccer" instead of "football" is not very likely but while creating a search engine this is what we want to achieve.
+Semantic search helps us with this issue. In semantic search, search domain is kept in the database as embeddings which are multi-dimensional vectors that are created considering the relations of words. In this approach, search queries are turned into embeddings too. So, returning "soccer" when the query is "football" becomes possible.
 
 ## Project Description
-The project will be implemented on Next.js using Jsxx for front-end and Javascript for back-end. Since this is a tutorial UI design is very simple. Tools that
-will be used are Github API, Langchain, OpenAI Embeddings and Upstash Vector. Github repo of the project is
-[here](https://github.com/kaanguneyli/semantic_search_for_docs), also you can deploy the project on Vercel using the button on the Readme file of the project.
+The project will be implemented on Next.js using Jsxx for front-end and Javascript for back-end. Since this is a tutorial UI design is very simple. Tools that will be used are Github API, Langchain, OpenAI Embeddings and Upstash Vector. Github repo of the project is [here](https://github.com/kaanguneyli/semantic_search_for_docs), also you can deploy the project on Vercel using the button on the Readme file of the project. You can install the required libraries using the commands below:
+
+```bash
+
+```
+
+## Get Started
+
+### Create a Next.js Application
+To create a new project, first direct to the directory that you want to create your project in using your terminal. Then, run the following command:
+```bash
+npx create-next-app@latest
+```
+When prompted choose a name for your project and pick `Yes` for the options:
+- Use Tailwind CSS (this is for UI design)
+- Use "App Router"
+
+### Set up Upstash Vector
+Go to [Upstash Console](https://console.upstash.com/login) and create an account if you don't have already. Then, login to your account and go to Vector using the bar at the top of the page. After that click `Create Index`.
+
+-- create index pic
+
+Then pick a name for your database as you like and choose the appropriate options for your location and embedding model. In this tutorial, we are using the values from the below image.
+
+-- index specifics pic
+
+Then pick your plan as you like and click `Create`. Now your database is ready.
+
+### Create the environment variables
+Now create a file called `.env` in your project and add it to the `.gitignore` file if you are considering to add this project to your Github account. In this file, we will store our API keys. To get your Upstash Vector keys go to the database you created, go to the tab `details` and copy the content under `.env` tab as in the image
+
+-- Upstash .env pic 
+
+You also need an OpenAI API key for the project. Once you add it too, your `.env` file should look like this
+```bash
+# .env
+
+UPSTASH_VECTOR_REST_URL="..."
+UPSTASH_VECTOR_REST_TOKEN="..."
+OPENAI_API_KEY="..."
+```
+Now, you ready to start the implementation.
+## Read and Parse the Repository
+## Add Documents to Upstash Vector
+## Search Queries
+
+
+
