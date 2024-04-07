@@ -6,13 +6,16 @@ authors:
 tags: [vector, rag, upstash, astro]
 ---
 
-In this step-by-step guide, I talk about how I built a Tweet Scheduler using Upstash QStash, Upstash Redis, Next.js Server Actions and Vercel. Scheduling Twitter posts helps you maintain a consistent presence, engage with your audience at optimal times, and efficiently manage your content strategy.
+Imagine an online fashion retailer aiming to provide a seamless shopping experience. With the help of vector embeddings, the platform is able to store a representation of all of it's inventory (products) to create personalized product recommendations in real-time. This allows the retailer to closely match the expectations of the user when they are searching for a given product, whether via it's attributes or by uploading an image. As a result, users feel understood and catered to, leading to higher engagement and increased sales.
+
+In this guide, you will learn how to create vector embeddings of images and text that can be used to tailor personalized product recommendations. Further, you will learn how to dynamically search for similar products based on user input.
 
 ## Prerequisites
 
 You will need the following:
 
-- [Node.js 18](https://nodejs.org/en/blog/announcements/v18-release-announce) or later
+- [Node.js 18](https://nodejs.org/en/blog/announcements/v18-release-announce/) or later
+- [Python 3.6+](https://www.python.org/downloads/release/python-360/) or later
 - An [Upstash](https://upstash.com) account
 
 ## Tech Stack
@@ -25,16 +28,6 @@ Following technologies are used in this guide:
 | [FastAPI](https://fastapi.tiangolo.com) | A high performance framework to build APIs with Python 3.8+. |
 | [Astro](https://astro.build) | Framework for building fast, modern websites with serverless backend support. |
 | [TailwindCSS](https://tailwindcss.com) | CSS framework for building custom designs. |
-
-## Table Of Contents
-
-- [Create an Upstash Vector Index](#create-an-upstash-vector-index)
-- [Create a new FastAPI application](#create-a-new-fastapi-application)
-- [Generate Text Embeddings using CLIPTextModel](#generate-text-embeddings-using-cliptextmodel)
-- [Generate Image Embeddings using CLIPModel](#generate-image-embeddings-using-clipmodel)
-- [Dynamically update Upstash Vector Index with new products](#dynamically-update-upstash-vector-index-with-new-products)
-- [Dynamically search from Upstash Vector Index for similar products](#dynamically-search-from-upstash-vector-index-for-similar-products)
-- [Create a new Astro application](#create-a-new-astro-application)
 
 ## Create an Upstash Vector Index
 
@@ -63,11 +56,11 @@ cd ecommerce-vector-search-server
 touch main.py
 ```
 
-The commands above create a directory named `ecommerce-vector-search-server` with `main.py` file in it.
+The commands above create a directory named `ecommerce-vector-search-server` with an empty `main.py` file in it.
 
-Once you have cloned the repo, create an .env file. You are going to add the secret keys obtained in the sections above.
+Once you have cloned the repo, create an `.env` file. You are going to add the secret keys obtained in the sections above.
 
-The .env file should contain the following keys:
+The `.env` file should contain the following keys:
 
 ```bash
 # .env
@@ -96,7 +89,26 @@ The above command installs the following packages:
 - `numpy`: A package for scientific computing with Python.
 - `transformers`: A library (by Hugging Face) for Natural Language Processing (NLP) tasks, providing implementations of state-of-the-art pre-trained models such as BERT, GPT, and others.
 
-Once they are installed, let's move on to creating a function to generate vector embeddings from text input(s).
+Once they are installed, append the following to the `main.py` file:
+
+```python
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+
+# Initialize FastAPI App
+app = FastAPI()
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+```
+
+Now, let's move on to creating a function to generate vector embeddings from text input(s).
 
 ## Generate Text Embeddings using CLIPTextModel
 
@@ -173,6 +185,24 @@ The code above does the following:
 - Defines a series of transformations using `torchvision.transforms` to preprocess the input image, including resizing, conversion to tensor, and normalization.
 - Creates a `getImage` function that takes a URL as input, fetches the corresponding image from the internet, and returns it as a PIL image object.
 - Creates a `getImageEmbeddings` function that preprocesses the input image using the defined transformations, feeds it into the CLIPModel to obtain image features, and returns the embedding as a numpy array.
+
+## Create Upstash Vector Client
+
+Using `upstash_vector` library, you are able to create a connectionless client in your FastAPI application that allows you to store, delete, and query vector embeddings from an Upstash Vector index. Append the following code to main.py file:
+
+```python
+import upstash_vector as uv
+from dotenv import dotenv_values
+
+# Load environment variables
+env_config = dotenv_values(".env")
+
+# Initialize Upstash Vector Index
+index = uv.Index(
+    url=env_config["UPSTASH_VECTOR_REST_URL"],
+    token=env_config["UPSTASH_VECTOR_REST_TOKEN"]
+)
+```
 
 With that done, let's use both the vector embeddings generator functions in FastAPI endpoints.
 
@@ -339,9 +369,96 @@ The above command installs the following:
 
 - `ai` library to build AI-powered streaming text and chat UIs.
 
-### Build Chat (with Product Recommendations) User Interface
+## Build Chat (with Product Recommendations) User Interface
 
-TODO
+To display product recommendations in a visually appealing format, including product images, titles, and descriptions, create a `Recommend.jsx` file inside the `src` directory with the following code:
+
+```tsx
+// File: src/Recommend.jsx
+
+import { useChat } from "ai/react";
+
+export default function () {
+  const { messages, handleSubmit, input, handleInputChange } = useChat({
+    api: "http://localhost:8000/api/chat",
+  });
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="mt-12 flex w-full max-w-[300px] flex-col"
+    >
+      <input
+        id="input"
+        name="prompt"
+        value={input}
+        autoComplete="off"
+        onChange={handleInputChange}
+        placeholder="Describe the product you're looking for."
+        className="mt-3 min-w-[300px] rounded border px-2 py-1 outline-none focus:border-black"
+      />
+      <button
+        type="submit"
+        className="mt-3 max-w-max rounded border px-3 py-1 outline-none hover:bg-black hover:text-white"
+      >
+        Find &rarr;
+      </button>
+      {messages.map((message, i) =>
+        message.role === "assistant" ? (
+          <div className="mt-3 border-t pt-3 flex flex-col">
+            {
+              JSON.parse(message.content).map((product, _) => (
+                <div key={product.metadata.image} className="mt-3 flex flex-col">
+                    <img alt={product.metadata.title} src={product.metadata.image} />
+                    <span>{product.metadata.title}</span>
+                    <span>{product.metadata.description}</span>
+                </div>
+              ))}
+          </div>
+        ) : (
+          <div className="mt-3 border-t pt-3" key={i}>
+            {message.content}
+          </div>
+        )
+      )}
+    </form>
+  );
+}
+```
+
+The code above does the following:
+
+- Utilizes the `useChat` hook to manage chat functionality.
+- Renders an input field for the user to describe the product they're looking for and a button to submit the query.
+- Upon submission, it sends the user input to the specified API endpoint (http://localhost:8000/api/chat).
+- Renders the messages received from the API, displaying product recommendations returned by the server.
+- Product recommendations are displayed as images along with their titles and descriptions.
+
+To use this `Recommend` component on the index route of your Astro application, make the following changes in `src/pages/index.astro` file:
+
+```diff
+---
++ import Recommend from '../Recommend'
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Astro</title>
+  </head>
+  <body class="flex w-screen flex-col items-center">
+-   <h1>Astro</h1>
++   <Recommend client:load />
+  </body>
+</html>
+```
+
+The changes above do the following:
+
+- Imports the Recommend component.
+- Uses Astro's [client:load directive](https://docs.astro.build/en/reference/directives-reference/#clientload) to hydrate it immediately as it's loaded.
 
 ### Test the Astro Application (Locally)
 
@@ -359,12 +476,10 @@ The app should be running on [localhost:4321](http://localhost:4321/).
 
 For more detailed insights, explore the references cited in this post.
 
-- [GitHub Repo](https://github.com/rishi-raj-jain/schedule-qstash-queue-upstash)
-- [Twitter OAuth 2.0 Flow](https://developer.twitter.com/en/docs/authentication/oauth-2-0/authorization-code)
-- [Generating Twitter App Tokens](https://developer.twitter.com/en/docs/authentication/oauth-2-0/bearer-tokens)
-- [React Form Hooks](https://react.dev/reference/react-dom/hooks)
-- [Next.js Server Actions](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions-and-mutations)
+- [GitHub Repo](https://github.com/rishi-raj-jain/ecommerce-vector-search)
 
 ## Conclusion
 
-In this guide, you learned how to build a robust Tweet Scheduler leveraging Upstash's powerful Redis database and QStash queue. Upstash's scalability ensures reliable storage and scheduling of tweets combined with seamless deployment on Vercel create a fully automated system.
+In this guide, you have learned how to enhance user experience by dynamically generating product recommendations based on what they are looking for. With Upstash Vector, you get the ability to store vectors in an index, perform top-K vector search queries and create relevant product recommendations for each user search, all within few lines of code.
+
+If you have any questions or comments, feel free to reach out to me on [GitHub](https://github.com/rishi-raj-jain).
