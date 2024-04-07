@@ -1,12 +1,12 @@
 ---
 title: "Building a Semantic Search Engine using Upstash Vector"
-slug: tweet-scheduler
+slug: semantic-search-for-docs
 authors:
   - kaan
 tags: [upstash, vector, nextjs, javascript, vercel]
 ---
 
-Welcome to a new blog post. In this blog we will create a semantic search engine for docs repositories on Github using Upstash Vector.
+Welcome to a new blog post. In this blog we will create a semantic search engine for out docs repository on Github using Upstash Vector.
 
 ## What is Semantic Search?
 Semantic search basically means "searching with meaning". In a very simple search, we take the user input and look for it in out database. When we do this returning a result that contains the word "soccer" instead of "football" is not very likely but while creating a search engine this is what we want to achieve.
@@ -55,9 +55,240 @@ UPSTASH_VECTOR_REST_TOKEN="..."
 OPENAI_API_KEY="..."
 ```
 Now, you ready to start the implementation.
-## Read and Parse the Repository
-## Add Documents to Upstash Vector
-## Search Queries
+
+## Implementation
+All of our code will be under the `app` directory.
+We need to implement these 3 properties:
+- Read the repository and create chunks (`app/components/ParseRepo.jsx`)
+- Create an API endpoint that upserts the documents to Upstash Vector (`app/api/addDocuments/route.js`)
+- Create an API endpoint that searches queries (`app/api/search/route.js`)
+
+### Create the User Interface
+
+Firstly, we need to take the owner name and repo name of the target repository from the user. So, we need two html forms and one submit button. These two forms have to assign their values to some variables, therefore we need to use the `useState` function. We also want to disable the submit button when a submit is getting processed and we want to display the chunks that our scripts will create. These two jobs are dependent on user input too. So, we need to use `useState` again. 
+
+We also have to specify that what our program has to do when the user gives input. So, we have to implement `handleInputChange` and `handleSubmit` functions. These functions will update the values of our two important variables. `handleSubmit` will also send the input to our parser script which will be implemented shortly.
+
+Code below is our implementation that covers all these properties. 
+
+```jsx
+// app/page.jsx
+
+'use client';
+
+import { useState } from 'react';
+import { parseMarkdowns } from '@/components/ParseRepo';
+//import { Document } from "langchain/document";
+
+const Home = () => {
+
+  // create variables that will be set based on the input
+  const [submitting, setSubmitting] = useState(false);
+  const [inputText, setInputText] = useState({owner: '', repo: ''});
+  const [contents, setContents] = useState([]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setInputText((prevState) => ({
+      ...prevState,
+      [name]: value
+    }));
+  };
+
+  // when the input is submitted run the parser script
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    const res = await parseMarkdowns(inputText.owner, inputText.repo);
+    setContents(res);
+    setSubmitting(false);
+  };
+
+  return (
+    <div>
+      <form onSubmit={handleSubmit}>
+        <label>
+          <span>Owner: </span>
+          <input
+            type="text"
+            name="owner"
+            value={inputText.owner}
+            onChange={handleInputChange}
+            placeholder='Owner name'
+            required
+          />
+        </label>
+      </form>
+      <form onSubmit={handleSubmit}>
+        <label>
+          <span>Repo: </span>
+          <input
+            type="text"
+            name="repo"
+            value={inputText.repo}
+            onChange={handleInputChange}
+            placeholder='Repo name'
+            required
+          />
+        </label>
+        <button
+          type='submit'
+          disabled={submitting}
+        >
+          {submitting ? 'Submitting...' : 'Submit'}
+        </button>
+        <div>
+          {submitting && (
+            <div>You submitted: {inputText.owner} / {inputText.repo}</div>
+          )}
+        </div>
+      </form>
+      <div>
+        {contents} 
+      </div>
+    </div>
+  );
+}
+
+export default Home;
+```
+
+
+The code above returns the user interface but it does not get shown to the user yet. This is because Next.js shows the `layout.jsx` file to the user. So, we have to create and implement it too. Also, we have to add our web application's metadata to that file.
+
+We will create the file in a way that it creates a very simple layout for its children files. (one page in our case) This approach is useful whille creating dynamic pages.
+
+
+```jsx
+//app/layout.jsx
+
+export const metadata = {
+  title: "semantic search engine for docs",
+  description: "semantic search engine for docs"
+}
+
+
+const RootLayout = ( {children} ) => {
+  return (
+    <html lang='en'>
+      <body>
+        <div className='main'></div>
+        <main className='app'>
+          {children}
+        </main>
+      </body>
+    </html>
+  )
+}
+
+export default RootLayout;
+```
+
+### Parse The Repo
+This part is about creating the ``parseMarkdown`` function which was referred in the first part as the parser script. More specifically, we will the the following operations:
+- Access the repo
+- Extract the `.md` or `.mdx` files
+- Create smaller chunks from the files
+- `POST` the created chunks to API
+
+To access the repo we need to use the Github API and to create chunks we need some Langchain libraries. Let's start with adding the imports and creating the objects
+
+```jsx
+// components/ParseRepo.jsx
+
+import { Octokit } from "@octokit/core";
+import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
+import { Document } from "langchain/document";
+
+const octokit = new Octokit();  // Github API client
+
+const splitter = RecursiveCharacterTextSplitter.fromLanguage("markdown", {
+  chunkSize: 500,  // You can change this according to your needs
+  chunkOverlap: 0,   // You can change this according to your needs
+});
+
+
+const parseMarkdowns = async (owner, repo, path = '') => {
+  // we will fill this part in this section
+};
+  
+export { parseMarkdowns };
+```
+
+While implementing the ``parseMarkdown`` function, we will follow a recursive approach. Each call of the function will handle a different directory. The function will hold the markdown files and directories in separate lists.
+
+Markdown files will be read using the Github API and then they will be converted to ``Document`` objects from Langchain. Converting the files to document makes us able to add metadata to them. Thanks to that while searching we won't have to look for the resulting query in the files again, we can immediately return the file name too. 
+
+Then, we have to implement a for loop that calls the `parseMarkdown` for each directory we found. So, we reach not only the markdowns that are in the master directory, but the ones that take place under the subdirectories.
+
+Finally, we split the documents we have just created using Langchain's docuemnt splitter and create a `POST` request that sends the ouput of this function to our endpoint which we create after this. This part will also be called in every recursive call in order to lower the number of documents sent in one call.
+
+```jsx
+// components/ParseRepo.jsx
+const parseMarkdowns = async (owner, repo, path = '') => {
+  try {
+    // Access the directory using GitHub API
+    const response = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
+      owner,
+      repo,
+      path,
+    });
+    const files = response.data;
+
+    // Filter out the Markdown files
+    const markdowns = files.filter(file => {
+      return file.type === 'file' && (file.name.endsWith('.md') || file.name.endsWith('.mdx'));
+    });
+
+    // Filter out the directories
+    const directories = files.filter(file => file.type === 'dir');
+
+    // Get the contents of the Markdown files
+    const contents = await Promise.all(markdowns.map(async (file) => {
+      const fileResponse = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
+        owner,
+        repo,
+        path: file.path,
+      });
+
+      // Decode the content from base64
+      const content = Buffer.from(fileResponse.data.content, 'base64').toString('utf-8');
+
+      // Create a Document object using the content from the Markdown file
+      const document = new Document({ metadata: {name: file.path}, pageContent: content });
+      return document;
+      
+    }));
+
+    // Recursively search subdirectories for Markdown files
+    for (const directory of directories) {
+      await parseMarkdowns(owner, repo, directory.path);
+    }
+
+    // Split the documents into chunks and post them to the api
+    let output = [];
+    output = await splitter.splitDocuments(contents);
+    try {
+      const response = await fetch('/api/addDocument', {
+        method: 'POST',
+        body: JSON.stringify(output),
+      });
+      return JSON.stringify(response);
+      
+    } catch (error) { 
+      console.error("Error in POST:", error);
+      return output;
+    }
+
+  } catch (error) {
+    console.error("Error in GET:", error);
+    return [];
+  }
+};
+```
+
+### Add Documents to Upstash Vector
+### Search Queries
 
 
 
