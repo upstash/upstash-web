@@ -33,6 +33,7 @@ npm run dev
 is going to be sufficient to run the project on [localhost:3000](http://localhost:3000/).
 
 If you need further clarification, you can refer to the [Readme](https://github.com/kaanguneyli/semantic_search_for_docs) or the [Next.js documentation](https://nextjs.org/learn-pages-router/basics/create-nextjs-app)
+___
 ### Set up Upstash Vector
 Go to [Upstash Console](https://console.upstash.com/login) and create an account if you don't have already. Then, login to your account and go to Vector using the bar at the top of the page. After that click `Create Index`.
 
@@ -40,10 +41,10 @@ Go to [Upstash Console](https://console.upstash.com/login) and create an account
 
 Then pick a name for your database as you like and choose the appropriate options for your location and embedding model. Since we are using OpenAI's `text-embedding-3-small` in this tutorial, we picked `1536` as dimension and `COSINE` as metric. If you are using any other model, you have to check the documentation see which values you have to choose.
 
--- index specifics pic
+![index specifics](/blog/semantic-search-for-docs/index-specifics.png)
 
 Then pick your plan as you like and click `Create`. Your database is ready for you.
-
+___
 ### Create the environment variables
 Now create a file called `.env` in your project and add it to the `.gitignore` file if you are considering to add this project to your Github account. In this file, we will store our API keys. To get your Upstash Vector keys go to the database you created, go to the tab `details` and copy the content under `.env` tab as in the image
 
@@ -185,7 +186,7 @@ const RootLayout = ( {children} ) => {
 
 export default RootLayout;
 ```
-
+___
 ### Parse The Repo
 This part is about creating the ``parseMarkdown`` function which was referred in the first part as the parser script. More specifically, we will implement the following properties:
 - Access the repo
@@ -287,7 +288,7 @@ Finally, we split the documents we have just created using Langchain's document 
   }
 
 ```
-
+___
 ### Add Documents to Upstash Vector
 
 In this step, we will start to create the first API endpoint, that upserts the chunks we have just created to our Upstash Vector database. To complete this task, what we have to do is the following:
@@ -357,7 +358,7 @@ We have created the necessary objects, now we have to create the embeddings and 
 ```
 
 From now on, when a user submits an input, it will be parsed and upserted to the vector database. If you like, you can check whether the operation is successful or not from the `Logs` tab in Vercel or you can simply go to your relevant vector database on `Upstash Console` and check the `Data Browser` tab. Your documents will be visible there if the upsert is successful.
-
+___
 ### Search Queries
 
 Finally, we have to create the enpoint of searching. This time, we will create a folder called `search` under `api` and create the `route.js` file again.
