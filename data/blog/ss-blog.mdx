@@ -1,14 +1,18 @@
-Welcome to a new blog post. In this blog, we will create a semantic search engine for out docs repository on Github using Upstash Vector.
+Welcome to a new blog post. In this blog, we will create a semantic search engine for any docs repository on Github using Upstash Vector.
 
 ## What is Semantic Search?
-Semantic search basically means "searching with meaning". In a very simple search, we take the user input and look for it in out database. When we do this returning a result that contains the word "soccer" instead of "football" is not very likely but while creating a search engine this is what we want to achieve.
+Semantic search basically means "searching with meaning". In a simple search, we take the user input and look for it in the database. When we do this returning a result that contains the word "soccer" instead of "football" is not very likely but while creating a search engine this is what we want to achieve.
+
 Semantic search helps us with this issue. In semantic search, search domain is kept in the database as embeddings which are multi-dimensional vectors that are created considering the relations of words. In this approach, search queries are turned into embeddings too. So, returning "soccer" when the query is "football" becomes possible.
 
 ## Project Description
-The project will be implemented on Next.js using Jsxx for front-end and Javascript for back-end. Since this is a tutorial UI design is very simple. Tools that will be used are Github API, Langchain, OpenAI Embeddings and Upstash Vector. Github repo of the project is [here](https://github.com/kaanguneyli/semantic_search_for_docs), also you can deploy the project on Vercel using the button on the Readme file of the project. You can install the required libraries using the commands below:
+The project will be implemented on Next.js using Javascript (jsx for frontend, js for backend). Since this is a tutorial UI design will be kept very simple. Tools that will be used are Github API, Langchain, OpenAI Embeddings and Upstash Vector. Github repo of the project is [here](https://github.com/kaanguneyli/semantic_search_for_docs), also you can deploy the project to your Vercel account using the button on the Readme file of the project. You can install the required libraries using the commands below:
 
 ```bash
-
+npm install -g create-next-ap
+npm install @octokit/core
+npm install -S langchain
+npm install -S @upstash/vector
 ```
 
 ## Get Started
@@ -19,7 +23,7 @@ To create a new project, first direct to the directory that you want to create y
 npx create-next-app@latest
 ```
 When prompted choose a name for your project and pick `Yes` for the options:
-- Use Tailwind CSS (this is for UI design)
+- Use Tailwind CSS (for UI design)
 - Use "App Router"
 
 ### Set up Upstash Vector
@@ -31,7 +35,7 @@ Then pick a name for your database as you like and choose the appropriate option
 
 -- index specifics pic
 
-Then pick your plan as you like and click `Create`. Now your database is ready.
+Then pick your plan as you like and click `Create`. Your database is ready for you.
 
 ### Create the environment variables
 Now create a file called `.env` in your project and add it to the `.gitignore` file if you are considering to add this project to your Github account. In this file, we will store our API keys. To get your Upstash Vector keys go to the database you created, go to the tab `details` and copy the content under `.env` tab as in the image
@@ -49,7 +53,7 @@ OPENAI_API_KEY="..."
 Now, you ready to start the implementation.
 
 ## Implementation
-All of our code will be under the `app` directory.
+Most of our code will be under the `app` directory since we have chosen to use the app router when we were creating the project.
 We need to implement these 3 properties:
 - Read the repository and create chunks (`app/components/ParseRepo.jsx`)
 - Create an API endpoint that upserts the documents to Upstash Vector (`app/api/addDocuments/route.js`)
@@ -57,7 +61,7 @@ We need to implement these 3 properties:
 
 ### Create the User Interface
 
-Firstly, we need to take the owner name and repo name of the target repository from the user. So, we need two html forms and one submit button. These two forms have to assign their values to some variables, therefore we need to use the `useState` function. We also want to disable the submit button when a submit is getting processed and we want to display the chunks that our scripts will create. These two jobs are dependent on user input too. So, we need to use `useState` again. 
+Firstly, we need to take the owner name and repo name of the target repository from the user. So, we need two forms and one submit button. These two forms have to assign their values to some variables, therefore we need to use the `useState` function. We also want to disable the submit button when a submit is getting processed. This job is dependent on user input too. So, we need to use `useState` again. 
 
 We also have to specify that what our program has to do when the user gives input. So, we have to implement `handleInputChange` and `handleSubmit` functions. These functions will update the values of our two important variables. `handleSubmit` will also send the input to our parser script which will be implemented shortly.
 
@@ -70,7 +74,6 @@ Code below is our implementation that covers all these properties.
 
 import { useState } from 'react';
 import { parseMarkdowns } from '@/components/ParseRepo';
-//import { Document } from "langchain/document";
 
 const Home = () => {
 
@@ -148,7 +151,7 @@ export default Home;
 
 The code above returns the user interface but it does not get shown to the user yet. This is because Next.js shows the `layout.jsx` file to the user. So, we have to create and implement it too. Also, we have to add our web application's metadata to that file.
 
-We will create the file in a way that it creates a very simple layout for its children files. (one page in our case) This approach is useful whille creating dynamic pages.
+We will create the file in a way that it creates a very simple layout for its children files. (one page in our case) This approach is very useful while creating dynamic pages.
 
 
 ```jsx
@@ -177,13 +180,13 @@ export default RootLayout;
 ```
 
 ### Parse The Repo
-This part is about creating the ``parseMarkdown`` function which was referred in the first part as the parser script. More specifically, we will the the following operations:
+This part is about creating the ``parseMarkdown`` function which was referred in the first part as the parser script. More specifically, we will implement the following properties:
 - Access the repo
-- Extract the `.md` or `.mdx` files
+- Extract the files with extenisons `.md` or `.mdx`
 - Create smaller chunks from the files
-- `POST` the created chunks to API
+- `POST` the chunks to API
 
-To access the repo we need to use the Github API and to create chunks we need some Langchain libraries. Let's start with adding the imports and creating the objects
+To access the repo we need to use the Github API and to create the chunks we need some libraries from Langchain. Let's start with adding these imports and creating the objects
 
 ```jsx
 // components/ParseRepo.jsx
@@ -207,13 +210,13 @@ const parseMarkdowns = async (owner, repo, path = '') => {
 export { parseMarkdowns };
 ```
 
-While implementing the ``parseMarkdown`` function, we will follow a recursive approach. Each call of the function will handle a different directory. The function will hold the markdown files and directories in separate lists.
+While implementing the ``parseMarkdown`` function, we will follow a recursive approach. Each call of the function will handle a different directory. The function will hold the two lists which hold the markdown files and directories that are located in the current directory.
 
-Markdown files will be read using the Github API and then they will be converted to ``Document`` objects from Langchain. Converting the files to document makes us able to add metadata to them. Thanks to that while searching we won't have to look for the resulting query in the files again, we can immediately return the file name too. 
+Markdown files will be read using the Github API and then they will be converted to ``Document`` objects from Langchain library. Converting the files to document makes us able to add metadata to them. Thanks to that while searching we won't have to look for the resulting query in the files again, we can immediately return the file name too. 
 
-Then, we have to implement a for loop that calls the `parseMarkdown` for each directory we found. So, we reach not only the markdowns that are in the master directory, but the ones that take place under the subdirectories.
+Then, we have to implement a for loop that calls the `parseMarkdown` for each directory we have found. So, we reach not only the markdowns that are in the master directory, but the ones that take place under the subdirectories.
 
-Finally, we split the documents we have just created using Langchain's docuemnt splitter and create a `POST` request that sends the ouput of this function to our endpoint which we create after this. This part will also be called in every recursive call in order to lower the number of documents sent in one call.
+Finally, we split the documents we have just created using Langchain's document splitter and create a `POST` request that sends the output of this function to our endpoint which we are going to create after this section. This part will also be called in every recursive call in order to lower the number of documents posted in one call.
 
 ```jsx
 
@@ -280,7 +283,7 @@ Finally, we split the documents we have just created using Langchain's docuemnt 
 
 ### Add Documents to Upstash Vector
 
-In this step, we will start to create the first API endpoint, that upserts the chunks we have just created to our Upstash Vector database. To complete this task, what we have to do is:
+In this step, we will start to create the first API endpoint, that upserts the chunks we have just created to our Upstash Vector database. To complete this task, what we have to do is the following:
 - Receive the `POST` request
 - Create the index
 - Create the embeddings
@@ -288,7 +291,7 @@ In this step, we will start to create the first API endpoint, that upserts the c
 - Add the embeddings to database
 - Return response
 
-To create the endpoint, we have to create a folder called `api` and create a folder that names our endpoint inside. In our case this folder's name will be `addDocuments`. For implementation of the endpoint Next.js requires the files name to be `route.js`.(`.js` part can change according to language.) 
+To create the endpoint, we have to create a folder called `api` and create a folder that names our endpoint inside. In our case this folder's name will be `addDocuments`. For implementation of endpoints Next.js requires the file's name to be `route.js`.( `.js` part can change according to language.) 
 
 To start our implementation, we have to specify the necessary libraries and create a function that handles the `POST` request and it should look like this. Also, we have to receive the message that was sent from the frontend. We can add the successful and unsuccesful responses too.
 
@@ -297,8 +300,7 @@ To start our implementation, we have to specify the necessary libraries and crea
 
 import { Index } from "@upstash/vector";
 import { OpenAIEmbeddings } from "@langchain/openai";
-import { UpstashVectorStore } from "@langchain/community/vectorstores/upstash"; 
-//import { Document } from "langchain/document";
+import { UpstashVectorStore } from "@langchain/community/vectorstores/upstash";
 
 export async function POST (req) {
   // Get the data from the request
@@ -321,7 +323,7 @@ export async function POST (req) {
 }
 ```
 
-Now, we have to create our Upstash Vector Index object and OpenAI Embeddings objects. To create the OpenAI Embeddings we will use the library from Langchain. These objecte require our API keys as arguments. We have added them to environment variables before, so we can specify them like below. Also, to use OpenAI Embeddings, we have to specify an embedding model. Previously, we have mentioned that this we will use the `text-embedding-3-small` model, so we add it too.
+Now, we have to create our Upstash Vector Index object and OpenAI Embeddings objects. To create the OpenAI Embeddings we will use the library from Langchain. These objects require our API keys as arguments. We have added them to environment variables before, so we can specify them like below. Also, to use OpenAI Embeddings, we have to specify an embedding model. Previously, we have mentioned that  we will use the `text-embedding-3-small` model, so we add it too.
 
 ```js
     // Create an Index object
@@ -337,7 +339,7 @@ Now, we have to create our Upstash Vector Index object and OpenAI Embeddings obj
     });
 ```
 
-We have created the necessary object, now we just have to create the embeddings and add them to our database. To do this, we will use the `UpstashVectorStore` object from Langchain. This code very simple.
+We have created the necessary objects, now we have to create the embeddings and add them to our database. To do this, we will use the `UpstashVectorStore` object from Langchain.
 
 ```js
     // Create a VectorStore object
@@ -347,13 +349,13 @@ We have created the necessary object, now we just have to create the embeddings 
     await vectorStore.addDocuments(data);
 ```
 
-From now on, when a user submits an input, it will parsed and upserted to the vector database. If you like, you can check whether the operation is successful or not from the `Logs` tab in Vercel or you can simply go to your relevant vector database on `Upstash Console` and check the `Data Browser` tab. Your documents will be visible there in a successful upsert.
+From now on, when a user submits an input, it will be parsed and upserted to the vector database. If you like, you can check whether the operation is successful or not from the `Logs` tab in Vercel or you can simply go to your relevant vector database on `Upstash Console` and check the `Data Browser` tab. Your documents will be visible there if the upsert is successful.
 
 ### Search Queries
 
 Finally, we have to create the enpoint of searching. This time, we will create a folder called `search` under `api` and create the `route.js` file again.
 
-This time we will handle `GET` request because search will receive its queries from the URL. For example `https://semantic-search-for-docs.vercel.app/api/search?query=computer` will search the query `computer`. (The project is deployed to vercel and named `semantic-search-for-docs` and the `prompt` variable we will declare in this section is assigned to the string `query` in this example.)
+This time we will handle `GET` request because search will receive its queries from the URL. For example `https://semantic-search-for-docs.vercel.app/api/search?query=computer` will search the query `computer`. (In this example the project is deployed to vercel and named `semantic-search-for-docs` and the `prompt` variable we will declare in this section is assigned to the string `query`.)
 
 Things we have implement in this part are as follows:
 - Receive query from URL
@@ -442,5 +444,8 @@ Finally, we have to create the response to able to return our results to the use
         });
 ```
 
-With that, our implementation is completed.
+With that, we complete the implementation.
 
+## Conclusion
+
+In this blog, we developed a simple program that can create semantic search engines for any docs repository on Github using Upstash Vector database. If you would like learn more about Upstash, you can visit other [blog posts](https://upstash.com/blog). Also, if you have any questions or face any issues feel free to contact me from the [project's repository](https://github.com/kaanguneyli/semantic_search_for_docs) or my [Linkedin account](https://www.linkedin.com/feed/).
