@@ -37,18 +37,18 @@ ___
 ### Set up Upstash Vector
 Go to [Upstash Console](https://console.upstash.com/login) and create an account if you don't have already. Then, login to your account and go to Vector using the bar at the top of the page. After that click `Create Index`.
 
-![create-index](/blog/semantic-search-for-docs/create-index.png) 
+![create-index](create-index.png) 
 
 Then pick a name for your database as you like and choose the appropriate options for your location and embedding model. Since we are using OpenAI's `text-embedding-3-small` in this tutorial, we picked `1536` as dimension and `COSINE` as metric. If you are using any other model, you have to check the documentation see which values you have to choose.
 
-![index-specifics](/blog/semantic-search-for-docs/index-specifics.png)
+![index-specifics](index-specifics.png)
 
 Then pick your plan as you like and click `Create`. Your database is ready for you.
 ___
 ### Create the environment variables
 Now create a file called `.env` in your project and add it to the `.gitignore` file if you are considering to add this project to your Github account. In this file, we will store our API keys. To get your Upstash Vector keys go to the database you created, go to the tab `details` and copy the content under `.env` tab as in the image
 
-![connect_env](/blog/semantic-search-for-docs/connect_env.png) 
+![connect_env](connect_env.png) 
 
 You also need an OpenAI API key for the project. Once you add it too, your `.env` file should look like this
 ```bash
