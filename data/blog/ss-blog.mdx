@@ -9,7 +9,7 @@ Semantic search helps us with this issue. In semantic search, search domain is k
 The project will be implemented on Next.js using Javascript (jsx for frontend, js for backend). Since this is a tutorial UI design will be kept very simple. Tools that will be used are Github API, Langchain, OpenAI Embeddings and Upstash Vector. Github repo of the project is [here](https://github.com/kaanguneyli/semantic_search_for_docs), also you can deploy the project to your Vercel account using the button on the Readme file of the project. You can install the required libraries using the commands below:
 
 ```bash
-npm install -g create-next-ap
+npm install -g create-next-app
 npm install @octokit/core
 npm install -S langchain
 npm install -S @upstash/vector
@@ -26,6 +26,13 @@ When prompted choose a name for your project and pick `Yes` for the options:
 - Use Tailwind CSS (for UI design)
 - Use "App Router"
 
+From now on, when you are at the directory of your project the command
+```bash
+npm run dev
+```
+is going to be sufficient to run the project on [localhost:3000](http://localhost:3000/).
+
+If you need further clarification, you can refer to the [Readme](https://github.com/kaanguneyli/semantic_search_for_docs) or the [Next.js documentation](https://nextjs.org/learn-pages-router/basics/create-nextjs-app)
 ### Set up Upstash Vector
 Go to [Upstash Console](https://console.upstash.com/login) and create an account if you don't have already. Then, login to your account and go to Vector using the bar at the top of the page. After that click `Create Index`.
 
@@ -355,7 +362,7 @@ From now on, when a user submits an input, it will be parsed and upserted to the
 
 Finally, we have to create the enpoint of searching. This time, we will create a folder called `search` under `api` and create the `route.js` file again.
 
-This time we will handle `GET` request because search will receive its queries from the URL. For example `https://semantic-search-for-docs.vercel.app/api/search?query=computer` will search the query `computer`. (In this example the project is deployed to vercel and named `semantic-search-for-docs` and the `prompt` variable we will declare in this section is assigned to the string `query`.)
+This time we will handle `GET` request because search will receive its queries from the URL. For example if the project is running on local `http://localhost:3000/api/search?query=computer` will search the query `computer`. (In this example the `prompt` variable we will declare in this section is assigned to the string `query`.)
 
 Things we have implement in this part are as follows:
 - Receive query from URL
