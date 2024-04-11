@@ -6,7 +6,7 @@ authors:
 tags: [nextjs, redis, vercel, streams, openai]
 ---
 
-In this post, I todo.
+Curious how various applications leverage AI streaming responses for real-time interactions, from chatbot conversations to dynamic content updates? That's where streaming responses come into play. In this comprehensive guide, you will learn how to leverage Server-Sent Events (SSE) to implement streaming in Next.js endpoints with LangChain and OpenAI's language models. Further, you will learn how to cache the streaming responses with Upstash.
 
 ## Prerequisites
 
@@ -14,12 +14,34 @@ You will need the following:
 
 - [Node.js 18](https://nodejs.org/en/blog/announcements/v18-release-announce/) or later
 - An [OpenAI](https://platform.openai.com/api-keys) account
-- (Optional) An [Upstash](https://upstash.com/) account
-- (Optional) A [Vercel](https://vercel.com/) account
+- An [Upstash](https://upstash.com/) account
+- A [Vercel](https://vercel.com/) account
+
+## Tech Stack
+
+| Technology | Description |
+| --- | --- |
+| [Upstash](https://upstash.com) | Serverless database platform. You're going to use Upstash Redis to cache OpenAI API responses. |
+| [OpenAI](https://platform.openai.com) | An artificial intelligence research lab focused on developing advanced AI technologies. |
+| [LangChain](https://js.langchain.com) | Framework for developing applications powered by language models. |
+| [Next.js](https://nextjs.org) | The React Framework for the Web. |
+| [Vercel](https://vercel.com) | A cloud platform for deploying and scaling web applications. |
 
 ## Generate an OpenAI Token
 
 Using OpenAI API, you're able to create chatbot responses using AI. Any request to OpenAI API requires an authorization token. To obtain the token, navigate to the [API Keys](https://platform.openai.com/api-keys) in your OpenAI account, and click the **Create new secret key** button. Copy and securely store this token for later use as **OPENAI_API_KEY** environment variable.
+
+## Setting up Upstash Redis
+
+Once you have created an Upstash account and are logged in you are going to go to the Redis tab and create a database.
+
+![Upstash Redis Tab](/blog/rag-chatbot-upstash/redis-tab.png)
+
+![Create An Upstash Redis Instance](/blog/rag-chatbot-upstash/redis-create.png)
+
+Scroll down until you find the REST API section and select the `.env` button. Copy the content and save it somewhere safe.
+
+![Upstash Redis Rest API](/blog/rag-chatbot-upstash/redis-rest.png)
 
 ## Create a new Next.js application
 
@@ -48,12 +70,13 @@ npm run dev
 The app should be running on [localhost:3000](http://localhost:3000). Stop the development server to install LangChain dependencies in the application by executing the following command:
 
 ```bash
-npm install @langchain/openai
+npm install @langchain/openai @langchain/community
 ```
 
 The command installed the following library:
 
 - `@langchain/openai`: A LangChain package to interface with the OpenAI series of models.
+- `@langchain/community`: A collection of third party integrations for plug-n-play with LangChain core.
 
 Now, create a `.env` file at the root of your project. You are going to add the `OPENAI_API_KEY` you obtained earlier.
 
@@ -64,6 +87,10 @@ It should look something like this:
 
 # OpenAI Environment Variable
 OPENAI_API_KEY="..."
+
+# Upstash Redis Environment Variables
+UPSTASH_REDIS_REST_URL="..."
+UPSTASH_REDIS_REST_TOKEN="..."
 ```
 
 To create API endpoints in Next.js, you will use Next.js [Route Handlers](https://nextjs.org/docs/app/building-your-application/routing/route-handlers) which allow you to serve responses over Web [Request](https://developer.mozilla.org/docs/Web/API/Request) and [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) APIs. To start creating an API route in Next.js that streams responses to the user, execute the following command:
@@ -76,6 +103,24 @@ mkdir app/lib
 <Note type="tip">
   The `-p` flag creates parent directories for the `chat` directory if they're missing.
 </Note>
+
+## Instantiate an Upstash Redis Cache Client
+
+With `UpstashRedisCache` class, you can initialize a Redis cache client for caching OpenAI API responses within a few lines of code. Create a file `upstashCache.tsx` inside the `app/lib` directory:
+
+```tsx
+// File: app/lib/upstashCache.tsx
+
+import { UpstashRedisCache } from "@langchain/community/caches/upstash_redis";
+
+// See https://docs.upstash.com/redis/howto/connectwithupstashredis#quick-start for connection options
+export default new UpstashRedisCache({
+  config: {
+    url: process.env.UPSTASH_REDIS_REST_URL,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN,
+  },
+});
+```
 
 ## Creating Server-Sent Events API in Next.js App Router
 
@@ -125,9 +170,9 @@ With this, you have created an endpoint that is able to stream responses. In the
 
 ## Streaming OpenAI Completion API responses with LangChain Callbacks
 
-The OpenAI [Completion API](https://platform.openai.com/docs/guides/text-generation/completions-api) provides a powerful tool for generating text based on given prompt(s), useful in various real-life scenarios such as content generation and language translation. Integrating LangChain callbacks enables real-time streaming of responses, enhancing interactivity and responsiveness in applications.
+The OpenAI [Completion API](https://platform.openai.com/docs/guides/text-generation/completions-api) provides a powerful tool for generating text based on given prompt(s), useful in various real-life scenarios such as content generation and language translation. Integrating LangChain callbacks enables real-time streaming of responses, increasing perceived responsiveness in applications.
 
-Create a file named `completionModel.tsx` in `app/lib` directory, defining a `completionModel` function which initializes an OpenAI instance with streaming enabled and LangChain callbacks, facilitating real-time text generation and streaming of responses.
+Create a file named `completionModel.tsx` in `app/lib` directory, defining a function which initializes an OpenAI instance with streaming enabled and LangChain callbacks, generating text in real-time.
 
 ```tsx
 // File: app/lib/completionModel.tsx
@@ -165,7 +210,7 @@ The code above does the following:
 - `handleLLMNewToken`: A callback invoked when a new token is generated by the language model. It enqueues the encoded token to the controller.
 - `handleLLMEnd`: An asynchronous callback invoked when the language model generation is complete. It closes the controller.
 
-Further, create a file named `route.ts` with the following code in the `app/api/stream/completion` directory. The changes from the initial streaming route handler that you created have been higlighted below as additions:
+Further, create a file named `route.ts` with the following code in the `app/api/stream/completion` directory. The changes from the initial streaming route handler that you created have been higlighted below:
 
 ```diff
 // File: app/api/stream/completion/route.ts
@@ -176,14 +221,14 @@ export const dynamic = "force-dynamic";
 + import { completionModel } from "@/app/lib/completionModel";
 
 export async function POST(request: Request) {
-+   // Obtain the user message from request's body
-+   const { message } = await request.json();
++  // Obtain the user message from request's body
++  const { message } = await request.json();
   const encoder = new TextEncoder();
   // Create a streaming response
   const customReadable = new ReadableStream({
     async start(controller) {
-+       // Generate a streaming response from OpenAI with LangChain
-+       await completionModel(controller, encoder).invoke(message);
++      // Generate a streaming response from OpenAI with LangChain
++      await completionModel(controller, encoder).invoke(message);
     },
   });
   // Return the stream response and keep the connection alive
@@ -205,11 +250,41 @@ Apart from what you did earlier to create a streaming endpoint in Next.js, the c
 - Extracts user message from the request body using `request.json()`.
 - Inside the `start` method of the ReadableStream, the `completionModel` function is invoked asynchronously with the message obtained from the request. This function generates a streaming response from OpenAI with LangChain.
 
-TODO: Cache responses with Upstash
+To cache user queries and their responses with Upstash, import the Upstash Redis cache client into the `completionModel` function as follows:
+
+```diff
+import { OpenAI } from "@langchain/openai";
++ import cache from '@/app/lib/upstashCache';
+
+export const completionModel = (
+  controller: ReadableStreamDefaultController,
+  encoder: TextEncoder
+) =>
+  new OpenAI({
++   cache,
+    streaming: true,
+    temperature: 0.9,
+    callbacks: [
+      {
+        handleLLMNewToken(token) {
+          controller.enqueue(encoder.encode(token));
+        },
+        async handleLLMEnd(output) {
+          console.log(output.generations[0][0].text);
+          controller.close();
+        },
+      },
+    ],
+  });
+```
+
+With minimal changes, you have enabled caching of the OpenAI Completion API responses with Upstash.
+
+Now, let's move on to learning how OpenAI Chat Completion API responses can be streamed in Next.js endpoints.
 
 ## Streaming OpenAI Chat Completion API responses with LangChain Callbacks
 
-The OpenAI [Chat Completion API](https://platform.openai.com/docs/guides/text-generation/chat-completions-api) provides a powerful tool for generating real-time conversational responses based on provided messages. Its applications span from building chatbots capable of engaging in natural dialogues to enhancing customer support systems with AI-driven interaction capabilities. This API enables developers to create dynamic and responsive conversational interfaces.
+The OpenAI [Chat Completion API](https://platform.openai.com/docs/guides/text-generation/chat-completions-api) provides a powerful tool for generating real-time conversational responses based on provided messages. The applications span from building chatbots capable of engaging in natural dialogues to enhancing customer support systems with AI-driven interaction capabilities. It enables developers to create dynamic and responsive conversational interfaces.
 
 Create a file named `chatCompletionModel.tsx` in `app/lib` directory, defining a `chatCompletionModel` function which creates a streaming interface for OpenAI's Chat Completion API with LangChain callbacks, facilitating real-time conversation generation based on provided messages.
 
@@ -259,7 +334,7 @@ The code above does the following:
 - `handleLLMNewToken`: A callback invoked when a new token is generated by the language model. It enqueues the encoded token to the controller.
 - `handleLLMEnd`: An asynchronous callback invoked when the language model generation is complete. It closes the controller.
 
-Further, create a file named `route.ts` with the following code in the `app/api/stream/completion/chat` directory. The changes from the initial streaming route handler that you created have been higlighted below as additions:
+Further, create a file named `route.ts` with the following code in the `app/api/stream/completion/chat` directory. The changes from the initial streaming route handler that you created have been higlighted below:
 
 ```diff
 // File: app/api/stream/completion/chat/route.ts
@@ -300,17 +375,54 @@ export async function POST(request: Request) {
 
 Apart from what you did earlier to create a streaming endpoint in Next.js, the code additions above do the following:
 
-- Imports the `chatCompletionModel` function.
+- Imports the `chatCompletionModel` function and `ConversationMessage` type definition.
 - Extracts the messages in conversation from the request body using `request.json()`.
 - Inside the `start` method of the ReadableStream, the `chatCompletionModel` function is invoked asynchronously after transformed messages array. Each message is transformed into an array containing the role and content of the message. This function generates a streaming response from OpenAI with LangChain.
 
-TODO: Cache responses with Upstash
+To cache the chat history with Upstash, import the Upstash Redis cache client into the `chatCompletionModel` function as follows:
+
+```diff
++ import cache from '@/app/lib/upstashCache';
+import { ChatOpenAI } from "@langchain/openai";
+
+export type ConversationMessage = {
+  role: string;
+  content: string;
+};
+
+export type ConversationMessages = ConversationMessage[];
+
+export const chatCompletionModel = (
+  controller: ReadableStreamDefaultController,
+  encoder: TextEncoder
+) =>
+  new ChatOpenAI({
++   cache,
+    streaming: true,
+    temperature: 0.9,
+    callbacks: [
+      {
+        handleLLMNewToken(token) {
+          controller.enqueue(encoder.encode(token));
+        },
+        async handleLLMEnd(output) {
+          console.log(output.generations[0][0].text);
+          controller.close();
+        },
+      },
+    ],
+  });
+```
+
+With minimal changes, you have enabled caching of the entire chat history with Upstash.
+
+Now, let's move on to creating the client side React components to consume the streaming endpoints.
 
 ## Setup Next.js frontend to listen to Server-Sent Events
 
 In this section, you will learn how to setup a minimal listener to Server-Sent Events API messages, and an approach to manage the state of messages exchanged between user and AI.
 
-### Listening to Server-Sent Events API in React Frontend
+### Listening to Server-Sent Events API in React
 
 To listen to SSE API in our client-side component in React, you are going to initiate a POST request to the specified API route. Upon receiving a response, you would decode the incoming data as a string using `TextDecoderStream` method, and continuously read the data from stream.
 
@@ -350,6 +462,8 @@ export default function () {
   return <></>
 }
 ```
+
+### Managing state of the conversation in React
 
 To manage the state of the conversation between the user and chatbot, you can use state variables. You would update the state variables `messages` and `latestMessage` to store the conversation history and the latest message, respectively. By updating these state variables within the loop that processes incoming data from the SSE API, you can ensure real-time updates of the conversation display. The code additions to achieve the same are as follows:
 
@@ -409,9 +523,13 @@ export default function () {
 The code additions above do the following:
 
 - A state variable is declared to store the incoming data stream received from the SSE API.
-- Upon receiving a complete message (indicated by `done` being true), the latest received message is added to the `messages` state array. This message is formatted with a role of "assistant" to distinguish it from user messages. Also, the latest message state is reset to an empty string to prepare for the next incoming message.
+- Upon receiving a complete message (indicated by `done` being true), the latest received message is added to the `messages` state array. This message is formatted with a role of **assistant** to distinguish it from user messages. Also, the latest message state is reset to an empty string to prepare for the next incoming message.
 - As data is received incrementally (not yet forming a complete message), it is appended to the `incomingMessage` variable.
 - The latest message state is updated with the concatenated incoming data, ensuring real-time updates as new data arrives.
+
+Great! With the reactive `latestMessage` and `messages` variables, you can now create dynamic user interfaces.
+
+> That was a lot of learning! You’re all done now ✨
 
 ## Deploy to Vercel
 
