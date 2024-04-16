@@ -6,11 +6,11 @@ authors:
 tags: [redis, cloudflare]
 ---
 
-Cloudflare has recently released the Upstash Integration for the Cloudflare Workers. This makes it even easier to use Upstash products on Workers. In this blog post, we're going use Upstash Redis integration to build a serverless URL shortener.
+Cloudflare has recently released the Upstash Integration for the Cloudflare Workers. This makes it even easier to use Upstash products on Workers. In this blog post, we're going to use Upstash Redis integration to build a serverless URL shortener.
 
 ## Getting Started
 
-Here are the steps of building this project:
+Here are the steps for building this project:
 
 - Set up an Upstash database
 - Create the Worker on Cloudflare
@@ -132,7 +132,7 @@ Clicking on the application will direct you to the application details page, whe
 
 ![Add integration](/blog/cloudflare-url-shortener/add-integration.png)
 
-On the Integration page, connect to your Upstash account. Then, select the `url-shortener` database from the dropdown menu. Finalize the process by pressing **Save button**.
+On the Integration page, connect to your Upstash account. Then, select the `url-shortener` database from the dropdown menu. Finalize the process by pressing the **Save button**.
 
 **Note:** Please don't make any changes in the secret names on the **Configure secrets** step. These credentials will be automatically picked up by `Redis.fromEnv(env)` line in the code as `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`.
 
@@ -140,11 +140,11 @@ On the Integration page, connect to your Upstash account. Then, select the `url-
 
 ### Implementing URL Shortener
 
-Our implementation will rather be a simple one. It will have two functionalities:
+Our implementation will be a rather simple one. It will have two functionalities:
 
 - When a URL is sent using the POST method, a randomly generated key will be assigned to that URL. This key-URL pair will be stored in Redis for retrieval. The key will be appended as a path to the Worker URL and sent to the user in the `<YOUR_WORKER_URL>/<KEY>` format.
 
-- When user accesses the Worker URL with previously added key as a path, corresponding value of the key will be retrieved from Redis. The user will then be redirected to this URL with a `307` response code.
+- When a user accesses the Worker URL with a previously added key as a path, the corresponding value of the key will be retrieved from Redis. The user will then be redirected to this URL with a `307` response code.
 
 We will implement the application in the `src/worker.ts` file. Below is the basic implementation of our URL Shortener:
 
@@ -238,6 +238,6 @@ As you've discovered, the combination of serverless functions and the power of U
 
 Remember, this guide is just the beginning. There's no limit to how you can expand and improve this project.
 
-Should any questions or problems, feel free to reach out to me at fahreddin@upstash.com.
+Should you have any questions or problems, feel free to reach out to me at fahreddin@upstash.com.
 
 Happy coding!

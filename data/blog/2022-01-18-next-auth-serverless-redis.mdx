@@ -7,9 +7,9 @@ image: nextauth/cover.png
 tags: [redis, serverless, nextjs]
 ---
 
-[Next.js](https://nextjs.org/) is one of the most popular frontend frameworks with React at its core. It can generate static HTML or render dynamically on the client and server. This makes it a versatile tool for applications and websites of every type. And the best thing is, it’s open-source, and you can use it free of charge!
+[Next.js](https://nextjs.org/) is one of the most popular frontend frameworks with React at its core. It can generate static HTML or render dynamically on the client and server. This makes it a versatile tool for applications and websites of every type, and the best thing is, it’s open-source, and you can use it free of charge!
 
-[NextAuth](https://next-auth.js.org/) is a third-party library for Next.js that helps you integrate different identity providers and databases. You can save your users time at sign up and still have all their essential account information in your chosen database. NextAuth comes with support for over 50 authentication providers, including GitHub, Google, Facebook, Coinbase, and many more.
+[NextAuth](https://next-auth.js.org/) is a third-party library for Next.js that helps you integrate different identity providers and databases. You can save your users time at sign-up and still have all their essential account information in your chosen database. NextAuth comes with support for over 50 authentication providers, including GitHub, Google, Facebook, Coinbase, and many more.
 
 ## NextAuth Upstash Redis® Adapter
 
@@ -21,11 +21,11 @@ So, let’s dive into NextAuth with this freshly released adapter.
 
 ## NextAuth Example with Upstash Redis
 
-You should have at least version 16.13.2 of Node.js installed for this tutorial. You also need a [GitHub](https://github.com/join) and [Upstash account](https://console.upstash.com/login).
+You should have at least version 16.13.2 of Node.js installed for this tutorial. You also need a [GitHub](https://github.com/join) and an [Upstash account](https://console.upstash.com/login).
 
 ### Setting up the Application
 
-You need to create a basic Next.js app; the learn-starter template is okay for this example.
+You need to create a basic Next.js app; the learn-starter template is suitable for this example.
 
 You can use the following command:
 
@@ -69,7 +69,7 @@ export default NextAuth({
 });
 ```
 
-The `UpstashRedisAdapter` wraps the `upstashRedisClient,` and you supply it with the Upstash credentials from the environment variables. In this example, they will be loaded via the dotenv package from a `.env` file in our application root directory. The same goes for the GitHub provider.
+The `UpstashRedisAdapter` wraps the `upstashRedisClient`, and you supply it with the Upstash credentials from the environment variables. In this example, they will be loaded via the dotenv package from a `.env` file in our application root directory. The same goes for the GitHub provider.
 
 ### Setting up the Environment Variables
 
@@ -86,7 +86,7 @@ You get the Upstash credentials from [the Upstash console](https://console.upsta
 
 <img src="/img/blog/nextauth/n1.png" width="400"></img>
 
-You get the GitHub provider credentials when registering[ a new OAuth Application](https://github.com/settings/applications/new) for your GitHub account. Figure 2 shows the registration form. To run the example on your local machine, you should use [http://localhost:3000](http://localhost:3000) as URLs.
+You get the GitHub provider credentials when registering [a new OAuth Application](https://github.com/settings/applications/new) for your GitHub account. Figure 2 shows the registration form. To run the example on your local machine, you should use [http://localhost:3000](http://localhost:3000) as URLs.
 
 ![next auth](/blog/nextauth/n2.png)
 
@@ -164,10 +164,10 @@ UpstashRedisAdapter(
 );
 ```
 
-This way, you can be safe that users of multiple apps don’t collide in your database.
+This way, you can ensure that users of multiple apps don’t collide in your database.
 
 ## Conclusion
 
-NextAuth is a handy library to set up authentication for your applications without hassle. The same ease of use is what you can expect from Upstash Redis, a simple Redis database hosting service. With the new NextAuth database adapter for Upstash Redis, these to create a powerful synergy that lets you churn out new applications in no time!
+NextAuth is a handy library for setting up authentication for your applications without hassle. The same ease of use is what you can expect from Upstash Redis, a simple Redis database hosting service. With the new NextAuth database adapter for Upstash Redis, these create a powerful synergy that lets you churn out new applications in no time!
 
 Upstash Redis is a serverless database; you only pay for what you use, so you can test and iterate on multiple MVPs without worrying about an enormous bill for an app that doesn’t even have users.
