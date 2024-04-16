@@ -6,13 +6,13 @@ image: pipeline.png
 tags: [redis, database, serverless, pipeline]
 ---
 
-Upstash supports the REST API in addition to the native Redis API. REST API helps developers to access their Redis without connection issues from serverless and edge functions. But if you execute multiple Redis commands in the same function then this means you will make a call to the database multiple times. One of our community members (@MasterGates) came with a great suggestion in our Discord channel. Pipeline API:
+Upstash supports the REST API in addition to the native Redis API. The REST API helps developers access their Redis without connection issues from serverless and edge functions. However, if you execute multiple Redis commands in the same function, this means you will make a call to the database multiple times. One of our community members (@MasterGates) came with a great suggestion in our Discord channel. Pipeline API:
 
 ![pipeline api](/blog/pipeline.png "image_tooltip")
 
 ## Pipeline API
 
-Pipeline API is just adaptation of Redis PIPELINE command to the REST API. You send multiple commands in a single http request, the responses are returned in a single request. This improves the performance of your application by reducing the RTT (round trip time) as well as decreasing the socket I/O.
+The Pipeline API is just an adaptation of the Redis PIPELINE command to the REST API. You send multiple commands in a single HTTP request, and the responses are returned in a single request. This improves the performance of your application by reducing the RTT (round trip time) as well as decreasing socket I/O.
 
 Request syntax:
 
@@ -42,8 +42,8 @@ Response syntax:
 
 ## Ordering Guarantee and Atomicity
 
-Upstash guarantees the commands in the pipeline are executed in the same order. But the atomicity is not guaranteed. Commands sent by other clients can interleave with the pipeline. Some commands may fail while the remaining are executed with success.
+Upstash guarantees that the commands in the pipeline are executed in the same order. However, atomicity is not guaranteed. Commands sent by other clients can interleave with the pipeline. Some commands may fail while the remaining are executed with success.
 
-Another limitation of pipeline API is your commands should be independent, so response of a command should not be needed by another command in the pipeline.
+Another limitation of the pipeline API is that your commands should be independent, so the response of a command should not be needed by another command in the pipeline.
 
-Check [our documentation](/docs/features/restapi) to learn more about Upstash REST API. We continue to develop the API guided by our users so please share your feedback on [twitter](https://twitter.com) or [discord](https://discord.gg/w9SenAtbme).
+Check our documentation to learn more about the Upstash REST API. We continue to develop the API guided by our users, so please share your feedback on Twitter or Discord.

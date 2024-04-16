@@ -6,13 +6,13 @@ authors:
 tags: [redis, deno, performance, serverless]
 ---
 
-In this article on Upstash for Redis and the Performance API we see how you can best use Upstash for Redis in a Deno app. **Upstash for Redis** is a serverless database ideal for **server-side caching**. A web app I was working on was scoring poorly on **Initial Server Response Time**. Lighthouse was reporting **500 ms**. By adding an Upstash cache I took this down to **below 150 ms** and passed the audit. The difficult part was not adding the cache. As it happens, working out where to use the cache was critical. Only by measuring performance was I able to **identify the bottleneck** to boost performance with minimal work. We take a closer look at performance measurement in this article.
+In this article on Upstash for Redis and the Performance API, we see how you can best use Upstash for Redis in a Deno app. **Upstash for Redis** is a serverless database ideal for **server-side caching**. A web app I was working on was scoring poorly on **Initial Server Response Time**. Lighthouse was reporting **500 ms**. By adding an Upstash cache I took this down to **below 150 ms** and passed the audit. The difficult part was not adding the cache; as it happens, working out where to use the cache was critical. Only by measuring performance was I able to **identify the bottleneck** to boost performance with minimal work. We take a closer look at performance measurement in this article.
 
 My project was a Deno Fresh web app. Deno has instant builds and deploys. This makes it a dream environment to work in for optimization. The feedback loop is short. You can code up an optimization locally, push it to the server and be able to test the remote site instantly.
 
 ### Stack
 
-Here I will talk about improving the performance using a skeleton app. It uses the following tooling:
+Here, I will talk about improving the performance using a skeleton app. It uses the following tooling:
 
 - [`upstash_redis`](https://deno.land/x/upstash_redis): a Deno module for working with Upstash for Redis
 - [Deno Fresh](https://fresh.deno.dev/docs/introduction): a new, production-ready Framework for building server-side rendered (SSR) apps in Deno
@@ -95,7 +95,7 @@ Performance measurement should typically be the first step in optimization. The 
 
 ### `timeEvent`: Performance Helper Function
 
-Now we know the basics, lets create a `timeEvent` function. It will take an array of `PerformanceMeasure` objects and a function we want to time as inputs. `timeEvent` will create a start mark, invoke the passed in function, then immediately create a finish mark. Finally, it will mutate the array of `PerformanceMeasure` objects it received as input, adding the new one. Here is the code from `utils/performance.ts`:
+Now that we know the basics, let's create a `timeEvent` function. It will take an array of `PerformanceMeasure` objects and a function we want to time as inputs. `timeEvent` will create a start mark, invoke the passed in function, then immediately create a finish mark. Finally, it will mutate the array of `PerformanceMeasure` objects it received as input, adding the new one. Here is the code from `utils/performance.ts`:
 
 ```ts
 export async function timeEvent<EventReturnType>(
@@ -164,7 +164,7 @@ export const handler: Handlers<Data> = {
 };
 ```
 
-The `timeEvent` function returns the result of the function which we pass into it. This property lets us just wrap the two data helper functions we had previously in `timeEvent` calls. We are running locally here. For a production app, you need to run measurements on your live site, since [backbone connections](https://en.wikipedia.org/wiki/Internet_backbone) on your server will perform differently to local ones. When running on the server use a logging service like Logtail to record the measures.
+The `timeEvent` function returns the result of the function that we pass into it. This property lets us just wrap the two data helper functions we had previously in `timeEvent` calls. We are running locally here. For a production app, you need to run measurements on your live site, since [backbone connections](https://en.wikipedia.org/wiki/Internet_backbone) on your server will perform differently to local ones. When running on the server use a logging service like Logtail to record the measures.
 
 ![Upstash for Redis and Performance API: screen capture shows measures for analytics views and web-mention-likes, duration for each is just over 2 seconds](/blog/redis-and-performance-api/redis-and-performance-api-initial-measures.png "Initial Measures")
 
@@ -198,7 +198,7 @@ const redis = new Redis({
 });
 ```
 
-First we have to initialize an Upstash for Redis object. You need the `UPSTASH_REDIS_REST_TOKEN` and `UPSTASH_REDIS_REST_URL` values from the Upstash console. It is [quick to set up an Upstash account](https://console.upstash.com/) if you do not yet have one. Add both values (`UPSTASH_REDIS_REST_TOKEN` and `UPSTASH_REDIS_REST_URL`) to a `.env` file in the project root directory.
+First, we have to initialize an Upstash for Redis object. You need the `UPSTASH_REDIS_REST_TOKEN` and `UPSTASH_REDIS_REST_URL` values from the Upstash console. It is [quick to set up an Upstash account](https://console.upstash.com/) if you do not yet have one. Add both values (`UPSTASH_REDIS_REST_TOKEN` and `UPSTASH_REDIS_REST_URL`) to a `.env` file in the project root directory.
 
 Notice in the first line, above, we use the `upstash` key from the import map which we set up earlier. This is more convenient than adding the full import URL in each TypeScript file. When the next release of `upstash_redis` becomes available you will only have to update the version number in one place.
 
@@ -258,6 +258,6 @@ Refreshing the page (a couple of times) with Upstash for Redis integrated into b
 
 ## Upstash for Redis and the Performance API: Wrapping Up
 
-Here we saw how you can use the JavaScript performance API to help guide your decisions on where to focus your optimization efforts. Beyond that we saw how you can implement Upstash for Redis in Deno Fresh. Finally we discovered that Deno supports Web APIs server side, flattening the learning curve. The other huge benefit of Deno for optimization is instant deploys, giving you a short feedback loop and letting you move quicker when fine-tuning performance.
+Here, we saw how you can use the JavaScript Performance API to help guide your decisions on where to focus your optimization efforts. Beyond that we saw how you can implement Upstash for Redis in Deno Fresh. Finally we discovered that Deno supports Web APIs server side, flattening the learning curve. The other huge benefit of Deno for optimization is instant deploys, giving you a short feedback loop and letting you move quicker when fine-tuning performance.
 
-I hope found you reading about Upstash for Redis and the Performance API valuable. If you are new to Deno or Deno Fresh, take a look at some of the [content I have created on getting started with Deno](https://rodneylab.com/tags/deno/). You can [open the full code for the app on GitHub](https://github.com/rodneylab/upstash-redis-deno-perf).
+I hope you found reading about Upstash for Redis and the Performance API valuable. If you are new to Deno or Deno Fresh, take a look at some of the [content I have created on getting started with Deno](https://rodneylab.com/tags/deno/). You can [open the full code for the app on GitHub](https://github.com/rodneylab/upstash-redis-deno-perf).

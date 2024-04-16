@@ -36,14 +36,14 @@ Our Schema Registry for Upstash Kafka is designed to seamlessly integrate with y
 
 Since it is compatible with the Confluent Schema Registry, you can use it with available tools right away.
 
-Get the required parameters from related Kafka instace page at [Upstash Console](https://console.upstash.com).
+Get the required parameters from the related Kafka instance page at [Upstash Console](https://console.upstash.com).
 Scroll down to the `REST API` section to find the values you need:
 
 - `UPSTASH_KAFKA_REST_URL`
 - `UPSTASH_KAFKA_REST_USERNAME`
 - `UPSTASH_KAFKA_REST_PASSWORD`
 
-You can use it with the `KafkaAvroSerializer/Deserializer` in Producer/Consumer.
+You can use it with the `KafkaAvroSerializer/Deserializer` in the Producer/Consumer.
 
 Producer example:
 
@@ -60,7 +60,7 @@ try (var producer = new KafkaProducer<String, org.apache.avro.GenericRecord>(pro
   }
 ```
 
-Or you can use it with the `AvroConverter` in your Connectors as follows:
+Or you can use it with the `AvroConverter` in your connectors as follows:
 
 ```json
 {
@@ -82,14 +82,14 @@ Or you can use it with the `AvroConverter` in your Connectors as follows:
 }
 ```
 
-You can also use it programatically via java client [SchemaRegistryClient](https://github.com/confluentinc/schema-registry/blob/master/client/src/main/java/io/confluent/kafka/schemaregistry/client/SchemaRegistryClient.java) and
-view/modify the contents via Third party UI tools. Check our [documentation here](https://upstash.com/docs/kafka/schema-registry/schemahowto) for details about how to configure them.
+You can also use it programmatically via Java client [SchemaRegistryClient](https://github.com/confluentinc/schema-registry/blob/master/client/src/main/java/io/confluent/kafka/schemaregistry/client/SchemaRegistryClient.java) and
+view/modify the contents via third-party UI tools. Check our [documentation here](https://upstash.com/docs/kafka/schema-registry/schemahowto) for details about how to configure them.
 
 ## Get Started Today!
 
 The introduction of Schema Registry for Upstash Kafka is a significant milestone in our commitment to providing a comprehensive and user-friendly data streaming experience. Whether you're a seasoned Kafka user or just getting started, our Schema Registry will allow you to manage your data schemas effectively.
 
-For more details and insights of Schema Registry for Upstash Kafka, you can explore our [documentation here](https://upstash.com/docs/kafka/schema-registry/schemaintroduction).
+For more details and insights on Schema Registry for Upstash Kafka, you can explore our [documentation here](https://upstash.com/docs/kafka/schema-registry/schemaintroduction).
 
 If you have any questions or need assistance, you can reach out to our support team at [support@upstash.com](mailto:support@upstash.com) or join our community on [Discord](https://discord.gg/w9SenAtbme).
 Don't forget to stay updated by following us on [Twitter](https://twitter.com/upstash), and happy streaming!

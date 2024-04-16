@@ -1,6 +1,6 @@
 ---
 slug: redis-message-queue
-title: "Make your own Message Queue with Redis and Typescript"
+title: "Make Your Own Message Queue with Redis and TypeScript"
 description: Learn to build a high-performance message queue with Redis. Discover key steps for setup, message handling, and best practices in this concise guide.
 authors:
   - oguzhan
@@ -10,7 +10,7 @@ draft: true
 
 Have you ever tried to create your own Message Queue but faced challenges?
 If so, you're not alone. In this tutorial, we're going to build a message queue from scratch using Redis lists.
-While there are several methods to construct message queues with Redis, such as streams, lists, and pub/subs, we'll focus on the simplest and most straightforward approach: Lists. Join me as we delve into this practical guide.
+While there are several methods to construct message queues with Redis, such as streams, lists, and pub/subs, we'll focus on the simplest and most straightforward approach: lists. Join me as we delve into this practical guide.
 
 ## **What we’ll be using**
 
@@ -36,7 +36,7 @@ redis://XXXXe@social-XXX-39281.upstash.io:39281
 
 ## Project Kickoff
 
-Let's start our Typescript project using Bun. The choice isn't just because it's faster than Node—it's also much easier to set up. And yes, it's impressively fast too! 🚀
+Let's start our TypeScript project using Bun. The choice isn't just because it's faster than Node—it's also much easier to set up. And yes, it's impressively fast too! 🚀
 
 ```bash
 mkdir upstash-mq
@@ -114,7 +114,7 @@ To make the `data` generic, we need to first make the `Job` itself generic. The 
 We could create a separate Redis instance for each `Job` element, but managing this would be complex.
 
 Fortunately, our approach allows for easy configuration of the Redis instance within the queue, and we can simply pass this instance as needed. The same principle applies to `queueName`. Since we'll frequently use it to save jobs to queues, our jobs must be aware of their parent queues.
-To able to save jobs into queues we need a two thing, a lua script to interact with Redis and some utilies.
+To be able to save jobs into queues, we need two things: a Lua script to interact with Redis and some utilities.
 
 Let's create our utilities first:
 
@@ -139,7 +139,7 @@ export const convertToJSONString = <T>(
 ```
 
 Since manually creating our queue name each time we use Redis isn't ideal, we've made a utility called `formatMessageQueueKey`.
-This utility simply concatenates strings together. Additionally, we need to serialize our data to store in Redis - we can't just pass JS objects as a data source they need to be converted into string first.
+This utility simply concatenates strings together. Additionally, we need to serialize our data to store in Redis - we can't just pass JS objects as a data source; they need to be converted into strings first.
 Given that data is generic, we've implemented a generic function, `convertToJSONString`, for this purpose.
 
 Now, let's add our first lua script:
@@ -460,7 +460,7 @@ Now that we have the Job's data, we pass this data to our `worker`. If it execut
 Side note: Users can now listen for emitted updates like this.
 
 ```typescript
-queue.on("succedded", (jobId) => console.log("Succeeded jobId", jobId));
+queue.on("succeeded", (jobId) => console.log("Succeeded jobId", jobId));
 ```
 
 Let's move on to `finishJob`
@@ -574,10 +574,10 @@ const queue = new Queue({
 
 async function main() {
   await generateQueueItems(queue, 20);
-  console.log("Sleep starting 5 sec");
+  console.log("Sleep starting for 5 sec");
   await sleep(5000);
 
-  queue.on("succedded", (jobId) => console.log("Succeeded jobId", jobId));
+  queue.on("succeeded", (jobId) => console.log("Succeeded jobId", jobId));
   await queue.process<Payload>((job) => {
     console.log("Processing job:", job.data);
     sleep(1000);
@@ -603,7 +603,7 @@ async function generateQueueItems(queue: Queue, itemCount: number) {
 
 - Implement retry logic with exponential backoffs for both Redis access and worker processes.
 - Develop an 'at least once' guarantee mechanism.
-- Try to execute workers in service workers for better performance
+- Try to execute workers in Service Workers for better performance
 - Add scheduled jobs
 
 ## Wrap up

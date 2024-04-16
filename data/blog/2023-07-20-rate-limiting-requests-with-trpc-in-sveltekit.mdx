@@ -6,7 +6,7 @@ authors:
 tags: [svelte, trpc, ratelimit]
 ---
 
-Recently, I found myself tasked with creating an upvote feature in an app I was working on. The app is using [Sveltekit](https://kit.svelte.dev/) along with [tRPC](https://trpc.io/). Each upvote is recorded in a Redis instance
+Recently, I found myself tasked with creating an upvote feature in an app I was working on. The app is using [Sveltekit](https://kit.svelte.dev/) along with [tRPC](https://trpc.io/). Each upvote is recorded in a Redis instance.
 
 After deploying this feature to our beta users, we noticed that our logs and Redis database were going “brrrrr” 💨
 
@@ -28,11 +28,11 @@ _And no, I didn’t use AI to create these cats…_ 🤫
 
 In this app, there are pictures of 4 different cats. As a visitor, you can high five these cats. Each request is managed through the [tRPC middleware](https://trpc.io/docs/server/middlewares). This middleware conducts a check based on the user's IP to determine if any rate limitations apply.
 
-Before we start, this is tutorial is not limited to upvoting (or in this case a high five) but this can be applied to many different use-cases. With all of that said, let’s dive in.
+Before we start, this tutorial is not limited to upvoting (or in this case, a high five) but can be applied to many different use-cases. With all of that said, let’s dive in.
 
 ## **Prerequisites**
 
-To get up and running with the app and following along you need:
+To get up and running with the app and follow along, you need:
 
 - A fundamental understanding of SvelteKit, primarily regarding routes and server-side data loading.
 - Basic to intermediate familiarity with tRPC, covering topics like routes, middleware, queries, and mutations.
@@ -42,7 +42,7 @@ To get up and running with the app and following along you need:
 
 For the sake of efficiency, we won't be creating the entire application from scratch given that there’s a bit of initial boilerplate. Instead, you can clone the `sveltekit-trpc-ratelimit` directory from the [Upstash examples repo](https://github.com/upstash/examples).
 
-After successfully downloading the repository, navigate into the application using the `cd` command and install the necessary dependencies via your preferred package manager and set the `.env` variables by duplicating `.env.example`.
+After successfully downloading the repository, navigate into the application using the `cd` command, install the necessary dependencies via your preferred package manager, and set the `.env` variables by duplicating `.env.example`.
 
 ### **Understanding the key parts**
 
@@ -50,7 +50,7 @@ Here’s a quick rundown of all the important parts.
 
 - `src/lib/api`- This holds all tRPC logic, including routers and middleware.
   - `src/lib/api/routes/cat.router.ts`– It specifies all logic for querying and mutating cat-related actions.
-  - `src/lib/api/middlewares/ratelimitMidleware.ts` – The middleware that manages each request and can potentially block it when the rate limit has exceeded.
+  - `src/lib/api/middlewares/ratelimitMiddleware.ts` – The middleware that manages each request and can potentially block it when the rate limit has been exceeded.
 - `src/routes/+page.server.ts` - Renders the initial cats on the server.
 - `src/routes/+page.svelte` - Loops through all the cats and showcases a cat in the `CatCard.svelte` component.
 - `src/lib/components/CatCard.svelte` - This component is where the magic happens. It displays the cat and allows the user to high five a cat.
@@ -114,7 +114,7 @@ Each time a cat is high-fived we’ll refetch the cats using `invalidateAll()` t
 
 ### Implementing the UI
 
-This component might look a bit daunting, but in essence all we’re doing is importing the tRPC client API and setting up the mutation that takes care of the high five. 👋
+This component might look a bit daunting, but in essence, all we’re doing is importing the tRPC client API and setting up the mutation that takes care of the high five. 👋
 
 ```svelte title="CatCard.svelte"
 <script lang="ts">
@@ -255,7 +255,7 @@ This component might look a bit daunting, but in essence all we’re doing is im
 </li>
 ```
 
-When the high five button is clicked, a request is made to the tRPC route, where we check whether the cat exists and we'll store high five in Redis.
+When the high five button is clicked, a request is made to the tRPC route, where we check whether the cat exists and we'll store the high five in Redis.
 
 ```ts title="cat.router.ts"
 import { TRPCError } from "@trpc/server";
@@ -329,7 +329,7 @@ With that initial code in place, we’re ready to implement the rate limiting fe
 
 I’ve chosen to use [tRPC middleware](https://trpc.io/docs/server/middlewares) rather than directly adding the code to the route itself. This improves code readability, but it can also be potentially re-used for other routes.
 
-In this example, our use case is rather specific use case but in your application you might get away with using one rate limit for all your routes. Probably the most common use case for protecting each route in advance is to be prepared for a DDoS attack.
+In this example, our use case is rather specific, but in your application, you might get away with using one rate limit for all your routes. Probably the most common use case for protecting each route in advance is to be prepared for a DDoS attack.
 
 ![brace yourselves ddos meme](/blog/rate-limiting-requests-with-trpc-in-sveltekit/brace-yourselves-meme.png)
 
@@ -361,7 +361,7 @@ The `identifier` for the rate limit is then created using the `path` and the
 The identifiers used in the rate limiter can be constant strings to limit all requests with a single rate limit, or they can be user-specific like userID, API key, IP address for individual limits.
 
 ```ts title="ratelimitMiddleware.ts"
-// Rest of code ommitted for brevity
+// Rest of code omitted for brevity
 middleware(async ({ path, next, ctx: { getClientAddress, setHeaders } }) => {
   const ip = getClientAddress();
   const identifier = `${path}-${ip}`;
@@ -427,7 +427,7 @@ import publicProcedure from "$lib/api/procedures/publicProcedure";
 import { router } from "$lib/api/trpc";
 import { redis } from "$lib/config/upstash";
 
-import highfiveRatelimitMiddleware from "../middlewares/ratelimitMidleware";
+import highfiveRatelimitMiddleware from "../middlewares/ratelimitMiddleware";
 import { ZCatSchema } from "./cat.schema";
 import cats from "./cats.json";
 
@@ -458,7 +458,7 @@ export const catRouter = router({
 });
 ```
 
-The `.use(highfiveRatelimitMiddleware)`means that every time the `highfive` route is called, it will pass through our rate limit middleware before being processed.
+The `.use(highfiveRatelimitMiddleware)` means that every time the `highfive` route is called, it will pass through our rate limit middleware before being processed.
 
 You might be curious to see how this looks from a user perspective. Below is a quick video showcasing what happens when the rate limit is reached.
 

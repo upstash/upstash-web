@@ -6,13 +6,13 @@ image: kafkalaunch/cover.jpg
 tags: [serverless, kafka, edge]
 ---
 
-We are thrilled to announce Upstash Kafka today. [Upstash Kafka](/docs/kafka) is the first Serverless Kafka offering. With a pay-per-request model, you can have a fully managed Kafka cluster without paying hundreds of dollars. With the free tier, you can create a Kafka cluster in seconds and without entering your credit card. The [Upstash](https://upstash.com) team takes care of availability, maintenance, scaling, upgrades and all the other tedious stuff while you focus on your app.
+We are thrilled to announce Upstash Kafka today. [Upstash Kafka](/docs/kafka) is the first Serverless Kafka offering. With a pay-per-request model, you can have a fully managed Kafka cluster without paying hundreds of dollars. With the free tier, you can create a Kafka cluster in seconds without entering your credit card. The [Upstash](https://upstash.com) team takes care of availability, maintenance, scaling, upgrades, and all the other tedious stuff while you focus on your app.
 
 ### Why Kafka?
 
-When we first launched our Redis service, it quickly became popular in the serverless community. More than 8,000 databases have been created since February. This number is much higher than we expected when we first launched Upstash. We continue to improve our Redis service. But we also realized how great is the need for data solutions that fit into the new serverless world.
+When we first launched our Redis service, it quickly became popular in the serverless community. More than 8,000 databases have been created since February. This number is much higher than we expected when we first launched Upstash. We continue to improve our Redis service. But we also realized how great the need for data solutions that fit into the new serverless world is.
 
-We started to think about what our next service should be. We were impressed by Apache Kafka's increasingly critical role in modern architectures. More and more use cases require Kafka as the central nerve system to deal with the increasing complexity. Meanwhile, Kafka is still difficult to set up and maintain. Current Kafka Cloud offerings are expensive and complex. We were excited when we realized the potential of Serverless Kafka, where any developer can leverage Kafka without worrying about servers and the next bill. A Kafka service that offers a lightweight REST API in addition to the Kafka protocol so you can send your messages from serverless and edge functions (AWS Lambda, Cloudflare Workers etc).
+We started to think about what our next service should be. We were impressed by Apache Kafka's increasingly critical role in modern architectures. More and more use cases require Kafka as the central nervous system to deal with the increasing complexity. Meanwhile, Kafka is still difficult to set up and maintain. Current Kafka Cloud offerings are expensive and complex. We were excited when we realized the potential of Serverless Kafka, where any developer can leverage Kafka without worrying about servers and the next bill. A Kafka service that offers a lightweight REST API in addition to the Kafka protocol so you can send your messages from serverless and edge functions (AWS Lambda, Cloudflare Workers, etc).
 
 ### What is Serverless Kafka?
 
@@ -24,13 +24,13 @@ We believe a serverless data service requires the following criteria:
 
 ### Developer First
 
-Upstash is built by developers. We believe we know what developers love. They love simplicity and ease of use without sacrificing performance and power. This is not easy and not possible on the first day. Our strategy is to target the developers' love above all else. Our pricing should be simple and trap-free. Our user interface should be clean and quiet. Our APIs should be easy to learn and intuitive. And we should all be open to developers’ feedback. We believe these are behind the success of Upstash Redis and apply the same to Upstash Kafka. We believe we can make a big difference when we look at existing Kafka offerings.
+Upstash is built by developers. We believe we know what developers love. They love simplicity and ease of use without sacrificing performance and power. This is not easy and not possible on the first day. Our strategy is to target developers' love above all else. Our pricing should be simple and trap-free. Our user interface should be clean and quiet. Our APIs should be easy to learn and intuitive. And we should all be open to developers’ feedback. We believe these are behind the success of Upstash Redis and apply the same to Upstash Kafka. We believe we can make a big difference when we look at existing Kafka offerings.
 
 ### Simple Pricing
 
-Upstash Kafka price is based on the number of messages produced and consumed. Single zone cluster costs $0.2 per 100K messages. Multi zone cluster, which we recommend for production, costs $0.6 per 100K messages. The storage costs $0.25 per GB. We do not charge for bandwidth or number of partitions. We do not apply different prices for reads and writes. Our users should be able to calculate their cost easily.
+Upstash Kafka's price is based on the number of messages produced and consumed. A single-zone cluster costs $0.2 per 100K messages. A multi-zone cluster, which we recommend for production, costs $0.6 per 100K messages. The storage costs $0.25 per GB. We do not charge for bandwidth or the number of partitions. We do not apply different prices for reads and writes. Our users should be able to calculate their cost easily.
 
-To avoid surprise bills, Upstash guarantees that your monthly cost for a cluster will not exceed the ceiling price (price cap). The price cap for single zone clusters is $120 per month, for multi zone clusters, it is $360 per month. Check [our pricing page](/docs/kafka/pricing) for more details.
+To avoid surprise bills, Upstash guarantees that your monthly cost for a cluster will not exceed the ceiling price (price cap). The price cap for single-zone clusters is $120 per month, for multi-zone clusters, it is $360 per month. Check [our pricing page](/docs/kafka/pricing) for more details.
 
 ### REST API
 
@@ -40,11 +40,11 @@ Kafka is a very powerful technology. The difficulty is that if a product is very
 
 ### Upstash vs Confluent
 
-We know Confluent also calls its product serverless but we do not think it is true serverless. Confluent charges per partition but also they have base cost. This means price can not scale to zero, so you should pay even when you are not using the cluster at all. Only the basic offering has zero base cost but it is not recommended for production. The standard and dedicated offerings can get expensive quickly as they have hourly base cost in addition to bandwidth, partition count fees.
+We know Confluent also calls its product serverless but we do not think it is true serverless. Confluent charges per partition but also they have a base cost. This means the price cannot scale to zero, so you should pay even when you are not using the cluster at all. Only the basic offering has zero base cost but it is not recommended for production. The standard and dedicated offerings can get expensive quickly as they have an hourly base cost in addition to bandwidth, partition count fees.
 
 ### Upstash vs AWS MSK
 
-AWS MSK is everything but serverless. They charge per instance per hour. A reliable system (3 brokers, m5large) starts from $450 monthly.
+AWS MSK is everything but serverless. They charge per instance per hour. A reliable system (3 brokers, m5.large) starts from $450 monthly.
 
 ### What’s Next and Closing Words
 
@@ -55,4 +55,4 @@ Upstash Kafka is our first step into the messaging world. It is a big step. We h
 
 You can [check our documentation](/docs/kafka) to learn more. And you can start using Serverless Kafka for free by [creating an Upstash account](https://console.upstash.com/).
 
-We love to improve [Upstash](https://upstash.com) by your feedback. Let us know your thoughts on [Twitter](https://twitter.com/upstash) or [Discord](https://discord.gg/w9SenAtbme).
+We love to improve [Upstash](https://upstash.com) with your feedback. Let us know your thoughts on [Twitter](https://twitter.com/upstash) or [Discord](https://discord.gg/w9SenAtbme).
