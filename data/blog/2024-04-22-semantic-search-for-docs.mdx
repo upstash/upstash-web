@@ -6,30 +6,36 @@ Semantic search basically means "searching with meaning". In a simple search, we
 Semantic search helps us with this issue. In semantic search, search domain is kept in the database as embeddings which are multi-dimensional vectors that are created considering the relations of words. In this approach, search queries are turned into embeddings too. So, returning "soccer" when the query is "football" becomes possible.
 
 ## Project Description
-The project will be implemented on Next.js using Javascript (jsx for frontend, js for backend). Since this is a tutorial UI design will be kept very simple. Tools that will be used are Github API, Langchain, OpenAI Embeddings and Upstash Vector. Github repo of the project is [here](https://github.com/kaanguneyli/semantic_search_for_docs), also you can deploy the project to your Vercel account using the button on the Readme file of the project. You can install the required libraries using the commands below:
+The project will be implemented on Next.js using Javascript (jsx for frontend, js for backend). Since this is a tutorial UI design will be kept very simple. Tools that will be used are Github API, Langchain, OpenAI Embeddings and Upstash Vector. Github repo of the project is [here](https://github.com/kaanguneyli/semantic_search_for_docs), also you can deploy the project to your Vercel account using the button on the Readme file of the project.
+
+## Get Started
+
+### Create a Next.js Application
+To create a new project, first direct to the directory that you want to create your project in using your terminal. Then, run the following commands:
 
 ```bash
 npm install -g create-next-app
+npx create-next-app@latest
+```
+
+When prompted choose a name for your project and pick `Yes` for the options:
+- Use Tailwind CSS (for UI design)
+- Use "App Router"
+
+After this step, go to your project's folder with the `cd` command and install the necessary libraries
+
+```bash
 npm install @octokit/core
 npm install -S langchain
 npm install -S @upstash/vector
 ```
 
-## Get Started
-
-### Create a Next.js Application
-To create a new project, first direct to the directory that you want to create your project in using your terminal. Then, run the following command:
-```bash
-npx create-next-app@latest
-```
-When prompted choose a name for your project and pick `Yes` for the options:
-- Use Tailwind CSS (for UI design)
-- Use "App Router"
-
 From now on, when you are at the directory of your project the command
+
 ```bash
 npm run dev
 ```
+
 is going to be sufficient to run the project on [localhost:3000](http://localhost:3000/).
 
 If you need further clarification, you can refer to the [Readme](https://github.com/kaanguneyli/semantic_search_for_docs) or the [Next.js documentation](https://nextjs.org/learn-pages-router/basics/create-nextjs-app)
@@ -37,18 +43,24 @@ ___
 ### Set up Upstash Vector
 Go to [Upstash Console](https://console.upstash.com/login) and create an account if you don't have already. Then, login to your account and go to Vector using the bar at the top of the page. After that click `Create Index`.
 
--- create index pic
+![create-index](../../public/blog/semantic-search-for-docs/create-index.png) 
 
 Then pick a name for your database as you like and choose the appropriate options for your location and embedding model. Since we are using OpenAI's `text-embedding-3-small` in this tutorial, we picked `1536` as dimension and `COSINE` as metric. If you are using any other model, you have to check the documentation see which values you have to choose.
 
-![index specifics](/blog/semantic-search-for-docs/index-specifics.png)
+![index-specifics](../../public/blog/semantic-search-for-docs/index-specifics.png)
 
-Then pick your plan as you like and click `Create`. Your database is ready for you.
+Then pick your plan as you like and click `Create`.
+
+![choose-plan](../../public/blog/semantic-search-for-docs/choose-plan.png)
+
+Your database is ready for you.
+
+![details](../../public/blog/semantic-search-for-docs/details.png)
 ___
 ### Create the environment variables
 Now create a file called `.env` in your project and add it to the `.gitignore` file if you are considering to add this project to your Github account. In this file, we will store our API keys. To get your Upstash Vector keys go to the database you created, go to the tab `details` and copy the content under `.env` tab as in the image
 
--- Upstash .env pic 
+![connect_env](../../public/blog/semantic-search-for-docs/connect_env.png) 
 
 You also need an OpenAI API key for the project. Once you add it too, your `.env` file should look like this
 ```bash
@@ -88,7 +100,6 @@ const Home = () => {
   // create variables that will be set based on the input
   const [submitting, setSubmitting] = useState(false);
   const [inputText, setInputText] = useState({owner: '', repo: ''});
-  const [contents, setContents] = useState([]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -98,12 +109,11 @@ const Home = () => {
     }));
   };
 
-  // when the input is submitted run the parser script
+    // when the input is submitted run the parser script
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
     const res = await parseMarkdowns(inputText.owner, inputText.repo);
-    setContents(res);
     setSubmitting(false);
   };
 
@@ -146,9 +156,6 @@ const Home = () => {
           )}
         </div>
       </form>
-      <div>
-        {contents} 
-      </div>
     </div>
   );
 }
@@ -163,7 +170,7 @@ We will create the file in a way that it creates a very simple layout for its ch
 
 
 ```jsx
-//app/layout.jsx
+// app/layout.jsx
 
 export const metadata = {
   title: "semantic search engine for docs",
