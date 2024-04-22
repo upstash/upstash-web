@@ -321,6 +321,12 @@ export const authors: Record<string,
         title: "Software Developer (Guest Author)",
         url: "https://cahidarda.github.io/",
         image: "arda.png",
+    },
+    anthony: {
+        name: "Anthony Accomazzo",
+        title: "Co-founder @ Sequin",
+        url: "https://sequin.io/",
+        image: "acco.jpg",
     }
 };
 

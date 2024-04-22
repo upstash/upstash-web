@@ -6,9 +6,9 @@ tags: [nextjs, edge, redis, vercel]
 tweet: https://twitter.com/upstash/status/1550473438657388545
 ---
 
-Recently, Next.js team has announced [Next 12.2](https://nextjs.org/blog/next-12-2#edge-api-routes-experimental). The most exciting news for me is the [Edge API Routes](https://nextjs.org/docs/api-routes/edge-api-routes). Edge API Routes enable developers to run their APIs at edge locations. This is a great news if you need low latency all over the world.
+Recently, the Next.js team has announced [Next 12.2](https://nextjs.org/blog/next-12-2#edge-api-routes-experimental). The most exciting news for me is the [Edge API Routes](https://nextjs.org/docs/api-routes/edge-api-routes). Edge API Routes enable developers to run their APIs at edge locations. This is great news if you need low latency all over the world.
 
-In this article, I will create a basic API which will count the page views per each edge location. I will use [Upstash Global Redis](/docs/redis/features/globaldatabase) to keep the page counts. Because Upstash replicates the data to multiple regions, it helps to keep the latency low. I will deploy the Next.js application to Vercel which supports the Edge runtime.
+In this article, I will create a basic API that will count the page views for each edge location. I will use [Upstash Global Redis](/docs/redis/features/globaldatabase) to keep the page counts. Because Upstash replicates the data to multiple regions, it helps keep the latency low. I will deploy the Next.js application to Vercel which supports the Edge runtime.
 
 ### Project Setup
 
@@ -16,7 +16,7 @@ In this article, I will create a basic API which will count the page views per e
 
 - Install Upstash Redis client: `npm install @upstash/redis`
 
-<Note>You can use any Redis client, but we recommend @upstash/redis</Note>
+<Note>You can use any Redis client, but we recommend @upstash/redis.</Note>
 
 - Create a Global Redis database on [Upstash](https://console.upstash.com) and copy the REST URL and token.
 

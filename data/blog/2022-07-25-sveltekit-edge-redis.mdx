@@ -28,7 +28,7 @@ npm i
 npm run dev
 ```
 
-Currently, it’s non-functional since it’s not getting the user’s city or storing the list of cities anywhere. In this blog post, we’ll fix both of those issues.
+Currently, it's non-functional since it's not getting the user's city or storing the list of cities anywhere. In this blog post, we’ll fix both of those issues.
 
 Let’s quickly orient ourselves in the project. `src/routes/+page.svelte` corresponds to the page we’ll see at the root route. It receives a `data` prop that includes the list of visits and the city of the current user and a `form` prop that will contain the result of submitting the form.
 
@@ -44,7 +44,7 @@ In `src/routes/+page.server.ts` we have our [`load` function](https://kit.svelte
 
 ## Getting the user’s location
 
-Since we’re planning to deploy the app to Vercel, we can use Vercel’s [edge headers](https://vercel.com/docs/concepts/edge-network/headers) to get the user’s city and country. [x-vercel-ip-country](https://vercel.com/docs/concepts/edge-network/headers#x-vercel-ip-country) will have the country code of the user and [x-vercel-ip-city](https://vercel.com/docs/concepts/edge-network/headers#x-vercel-ip-city) will have the city of the user. This is all based off of the user’s IP address, so it won’t be 100% accurate. However, it will be good enough for our purposes.
+Since we’re planning to deploy the app to Vercel, we can use Vercel’s [edge headers](https://vercel.com/docs/concepts/edge-network/headers) to get the user’s city and country. [x-vercel-ip-country](https://vercel.com/docs/concepts/edge-network/headers#x-vercel-ip-country) will have the country code of the user and [x-vercel-ip-city](https://vercel.com/docs/concepts/edge-network/headers#x-vercel-ip-city) will have the city of the user. This is all based off of the user's IP address, so it won't be 100% accurate. However, it will be good enough for our purposes.
 
 The relevant headers names are already in `src/lib/constants.ts` for our use. Import them at the top of `src/routes/+page.server.ts`.
 
@@ -72,7 +72,7 @@ function get_country_name(country_code: string | null) {
 
 This method will retrieve the city and country from the request headers, falling back to “unknown” if it’s not set. Note how this function uses the web `Intl.DisplayNames` API to get the country name from the country code—no NPM package required! This API will be available when we deploy to [Vercel Edge Functions](https://vercel.com/docs/concepts/functions/edge-functions/edge-functions-api).
 
-This will work great when deployed, but these headers won’t be automatically set when developing. Fortunately, the starter project already adds custom code in SvelteKit’s [handle hook](https://kit.svelte.dev/docs/hooks#server-hooks-handle) to add these headers in development.
+This will work great when deployed, but these headers won't be automatically set when developing. Fortunately, the starter project already adds custom code in SvelteKit’s [handle hook](https://kit.svelte.dev/docs/hooks#server-hooks-handle) to add these headers in development.
 
 ```tsx
 import type { Handle } from "@sveltejs/kit";

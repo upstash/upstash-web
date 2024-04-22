@@ -6,21 +6,21 @@ authors:
 tags: [serverless, kafka, apache, spark, react-native, cassandra]
 ---
 
-The data collected from users in real-time are very essential for improving the product, reacting on time, and growing much faster. For collecting, preparing, and storing data, we can use the serverless Kafka with one of the most common open-source streaming tools, which is Spark Streaming.
+The data collected from users in real-time is very essential for improving the product, reacting on time, and growing much faster. For collecting, preparing, and storing data, we can use the serverless Kafka with one of the most common open-source streaming tools, which is Spark Streaming.
 
 In this blog post, we will use Serverless Kafka to collect logs from a mobile application developed using React Native and send these logs to Apache Spark for streaming into the Cassandra Database.
 
 ### **A Simple Data Pipeline**
 
-Building data pipelines is commonly used way for collecting, preparing, and storing the data to get the insights of the running product.
+Building data pipelines is a commonly used way for collecting, preparing, and storing the data to get insights into the running product.
 
 In general, a data pipeline has three fundamental elements. These are source, processing steps, and destination.
 
-Source can be any data producer such as a mobile app, a web application etc. In our case, the source will be our mobile application, which is already developed in the previous blog post [“Send React Native Logs to Serverless Kafka”](https://upstash.com/blog/react-native-logs-kafka).
+Source can be any data producer such as a mobile app, a web application, etc. In our case, the source will be our mobile application, which is already developed in the previous blog post [“Send React Native Logs to Serverless Kafka”](https://upstash.com/blog/react-native-logs-kafka).
 
 Processing steps are serverless Kafka and Apache Spark for collecting and streaming logs.
 
-In this scenario, our destination will be Cassandra database. However, the destination can be anything such as a monitoring tool, or any data warehouse.
+In this scenario, our destination will be the Cassandra database. However, the destination can be anything such as a monitoring tool, or any data warehouse.
 
 In summary, we will develop a simple data pipeline, which consists of serverless Kafka, Apache Spark, and Cassandra. The steps of the flow will be as following:
 
@@ -36,7 +36,7 @@ In summary, we will develop a simple data pipeline, which consists of serverless
 
 ### **From React Native App to Serverless Kafka**
 
-We will start with our source of data, which is the logs from mobile app.
+We will start with our source of data, which is the logs from the mobile app.
 
 Installation and configuration steps can be followed from the [previous blog](https://upstash.com/blog/react-native-logs-kafka), where the app and serverless Kafka are described.
 
@@ -87,11 +87,11 @@ Streamed data must arrive at an endpoint according to the use cases of the data.
 
 In our case, we will save the data collected from users with Kafka and streamed with Spark into our Cassandra database.
 
-Cassandra is a distributed NoSQL database, which provides high availability, high performance, and scalability for very large amount of data. For more detailed information and installation procedure, please see its [documentation](https://cassandra.apache.org/doc/latest/).
+Cassandra is a distributed NoSQL database, which provides high availability, high performance, and scalability for a very large amount of data. For more detailed information and installation procedure, please see its [documentation](https://cassandra.apache.org/doc/latest/).
 
-In our demo project, we are going to design our database just for storing the log messages that comes from serverless Kafka topics, users.purchase and users.error. Therefore, we are going to create a keyspace called “app” and create two tables for these two topics. Our tables will be “purchases” and “errors”.
+In our demo project, we are going to design our database just for storing the log messages that come from serverless Kafka topics, users.purchase and users.error. Therefore, we are going to create a keyspace called “app” and create two tables for these two topics. Our tables will be “purchases” and “errors”.
 
-In these two tables, there will be two columns, “message” and “time”. The log messages that will be streamed are going to be saved into “message” column and its timestamp will be saved into the “time” column. To keep demo simple, we are going to work with just this information.
+In these two tables, there will be two columns: “message” and “time”. The log messages that will be streamed are going to be saved into “message” column and its timestamp will be saved into the “time” column. To keep the demo simple, we are going to work with just this information.
 
 First, let’s create a keyspace in our database. We are going to use CQL “Cassandra Query Language” for doing operations on the database. Here is the [documentation](https://cassandra.apache.org/doc/latest/cassandra/cql/ddl.html) of it.
 
@@ -178,7 +178,7 @@ Firstly, we need to create a maven project and add the dependencies below to pom
 </dependencies>
 ```
 
-While adding these dependencies, be sure that all Spark related dependencies have the same version on their artifactId to prevent any possible error which may occurs. In our case, the version is 2.11.
+While adding these dependencies, be sure that all Spark related dependencies have the same version on their artifactId to prevent any possible error which may occur. In our case, the version is 2.11.
 
 - **Spark Streaming**
 
@@ -278,7 +278,7 @@ streamingContext.awaitTermination();
 
 - **Structured Streaming**
 
-Structure streaming is a newer fashion compared to Spark streaming. It is better designed and optimized. It does not focus on batch processing as Spark streaming does. It processes the data and print or save it according to the choice of the user, such as “complete”, “append” or “update”.
+Structured streaming is a newer approach compared to Spark streaming. It is better designed and optimized. It does not focus on batch processing as Spark streaming does. It processes the data and print or save it according to the choice of the user, such as “complete”, “append” or “update”.
 
 At first, we need to create our Spark session.
 
@@ -357,7 +357,7 @@ time  | message
 
 ### **Conclusion**
 
-Data pipelines are built for doing the following processes over data: collecting, processing, streaming to an endpoint.
+Data pipelines are built for performing the following processes over data: collecting, processing, and streaming to an endpoint.
 
 In this blog post, we have implemented a simple pipeline by using serverless Kafka from Upstash to collect the data from the mobile application, Apache Spark to stream the data from serverless Kafka to our Cassandra database. At the end, we have used Cassandra as our database.
 

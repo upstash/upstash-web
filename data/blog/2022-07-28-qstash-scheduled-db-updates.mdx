@@ -10,7 +10,7 @@ For many applications, there is a need to insert or update data in your database
 regularly. For example fetching metrics from somewhere or tracking the price of items.
 You might want to update these every day, every hour, or every minute. Traditionally you
 would have to setup a server, create a repeating job using `cron` or something
-else and then maintain it. This server would continously fetch updated prices
+else and then maintain it. This server would continuously fetch updated prices
 from an API and then insert them into your database.
 
 What if you could just do this within your existing Next.js application without
@@ -18,15 +18,15 @@ any additional infrastructure?
 
 [QStash](https://upstash.com/qstash) allows you to create schedules using [CRON](https://crontab.guru) and
 will send an `HTTP` request to your API, whenever it triggers. This allows you
-to run your business logic inside a serverless functions on a schedule.
+to run your business logic inside serverless functions on a schedule.
 
 ## What will we build?
 
-In this post we will build a simple
+In this post, we will build a simple
 [application](https://qstash-examples-periodic-data-updates.vercel.app) to
 continuously fetch the current USD price of Bitcoin from
 [blockchain.info](https://blockchain.info/ticker) and store it in a Redis
-database. I chose Redis here, because it's very simple to setup, but you can use
+database. I chose Redis here because it's very simple to set up, but you can use
 any other database if you want.
 
 ## Application
@@ -39,7 +39,7 @@ We need two dependencies to build our example:
 - [@upstash/redis](https://github.com/upstash/upstash-redis) - Redis will serve
   as the database.
 - [@upstash/qstash](https://github.com/upstash/sdk-qstash-ts) - The QStash sdk
-  allows us to verify incoming webhooks from Upstash
+  allows us to verify incoming webhooks from Upstash.
 
 Install them with:
 
@@ -61,7 +61,7 @@ import { verifySignature } from "@upstash/qstash/nextjs";
 import { Redis } from "@upstash/redis";
 ```
 
-Next we create the actual handler function. Please note, that it is not exported
+Next, we create the actual handler function. Please note that it is not exported
 yet!
 
 The first step is to get fresh data from the API (blockchain.info in this
@@ -139,7 +139,7 @@ You can either push your code to a git repository and deploy it to Vercel, or
 you can deploy it directly from your local machine using the
 [vercel cli](https://vercel.com/docs/cli).
 
-For a more indepth tutorial on how to deploy to Vercel, check out this
+For a more in-depth tutorial on how to deploy to Vercel, check out this
 [quickstart](/docs/qstash/quickstarts/vercel-nextjs#4-deploy-to-vercel).
 
 After you have deployed your app, it is time to add your secrets to your
@@ -177,7 +177,7 @@ The final step is to create a schedule that will trigger our handler function.
 
 ## Wrapping up
 
-That's it, your serverless function will now be called periodically and will insert
+That's it; your serverless function will now be called periodically and will insert
 new data into the database.
 
 After a while, you can check the data in the database. We have also created a

@@ -11,16 +11,16 @@ About [2 weeks ago](/blog/edgecaching-benchmark) we compared the performance and
 
 
 Deno KV is similar in its architecture to Upstash Redis. Both stores have a primary region where all writes are sent to and then replicated to all other regions. Reads are served from the closest region to the client.
-There are a ton of differences in the available features, because Redis has a ton of features that KV doesn't have, but we'll just focus on simple read and writes for now.
+There are many differences in the available features because Redis has many features that KV doesn't have, but we'll just focus on simple reads and writes for now.
 
 
-We will do 2 different benchmarks, both using Deno deploy to run the code for both of them.
-In both cases the KV store and Redis will have all available read regions enabled.
+We will conduct two different benchmarks, both using Deno Deploy to run the code.
+In both cases, the KV store and Redis will have all available read regions enabled.
 
 1. Invoking from 20 regions around the world using [planetfall.io](https://planetfall.io).
 2. Invoking from a single region with a much higher load.
 
-Afterwards we'll compare the results and talk about tradeoffs and pricing.
+Afterwards, we'll compare the results and talk about trade-offs and pricing.
 
 ## The Benchmark
 
@@ -36,7 +36,7 @@ I chose a rather small keyspace, to ensure we're getting some cache hits without
 
 ## Code
 
-The function itself is very simple, it just reads from Redis, reads from KV and then return those latencies to be evaluated later.
+The function itself is very simple; it just reads from Redis, reads from KV, and then returns those latencies to be evaluated later.
 
 ```ts title="main.ts"
 app.get("/test", async (c) => {
@@ -119,7 +119,7 @@ In order to test this theory, I've run a second benchmark, where I'm just invoki
 </a>
 
 Both services are much faster in this scenario, but Deno KV is still slower than Upstash Redis.
-Here are the latencies for single a region, with delta to global latency in parenthesis:
+Here are the latencies for a single region, with delta to global latency in parentheses:
 
 |         | Deno KV      | Upstash Redis |
 |---------|-------------:|--------------:|
@@ -156,7 +156,7 @@ The bottom line is that if you're reading more than 8kb per request, Upstash is 
 
 ## Conclusion
 
-Using Deno KV feels pretty good to use since it's on the same platform, you don't need to manage a separate account and using it doesn't require any extra setup. However the performance and cost is nowhere near Upstash.
-It is also limited by what you can do with it. Setting and getting values, while being the most common operations, is not all you can do with Redis. Check out our [examples](https://upstash.com/examples) to find a lot of ideas and usecases for Redis.
+Using Deno KV feels pretty good since it's on the same platform; you don't need to manage a separate account, and using it doesn't require any extra setup. However, the performance and cost are nowhere near Upstash.
+It is also limited in what you can do with it. Setting and getting values, while being the most common operations, are not all you can do with Redis. Check out our [examples](https://upstash.com/examples) to find a lot of ideas and usecases for Redis.
 
 Come say hi and ask questions about any of this in our [Discord](https://upstash.com/discord) or over on [X](https://x.com/upstash).

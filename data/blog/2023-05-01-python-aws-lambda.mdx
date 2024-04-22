@@ -6,17 +6,17 @@ authors:
 tags: [redis, python, aws-lambda]
 ---
 
-In this blog post, I will be guiding you through building a serverless URL shortener service built on the Upstash Redis, AWS Lambda (Python) and AWS API Gateway. The main purpose of this blogpost is demonstrating the process of creating a Python Lambda function, connecting it to the Redis and consuming it via an API.
+In this blog post, I will guide you through building a serverless URL shortener service built on Upstash Redis, AWS Lambda (Python), and AWS API Gateway. The main purpose of this blog post is to demonstrate the process of creating a Python Lambda function, connecting it to Redis, and consuming it via an API.
 
 You may reach an implementation of the project via: [URL Shortener](https://url-shortener-kappa-jet.vercel.app/)
 
 ![app](/blog/python-lambda/app-bg.png)
 
-**NOTE** : The output URLs are for demonstration purposes, an active URL shortener would have an shorter and simpler domain address, so our focus here is on the functionality.
+**NOTE**: The output URLs are for demonstration purposes; an active URL shortener would have a shorter and simpler domain address, so our focus here is on the functionality.
 
 ### Project Description
 
-The project consists of one database on Upstash Redis, two Python Lambda functions and an API Gateway on AWS. Users may use either the web interface or the API to consume the shortener service.
+The project consists of one database on Upstash Redis, two Python Lambda functions, and an API Gateway on AWS. Users may use either the web interface or the API to consume the shortener service.
 
 The `shortener` Lambda function creates a shortened URL key from a long URL provided in an HTTP request query. It then stores the short URL key and its corresponding long URL value in Upstash Redis, before returning the short URL to the user.
 
@@ -28,17 +28,17 @@ Finally, we'll create an API Gateway to consume the Lambda functions. This API w
 
 ### Setting up the Upstash Redis
 
-We can create our Redis Database on [Upstash Console](https://console.upstash.com/). After logging in, click the _Create Database_ button. It'll take few seconds and you are all set up. Then, copy and paste the `UPSTASH_REDIS_REST_HOST`, `UPSTASH_REDIS_REST_PORT` and `UPSTASH_REDIS_REST_PASSWORD` variables from _Details_ section to a file. We are going to use these keys in the AWS environment variables.
+We can create our Redis Database on [Upstash Console](https://console.upstash.com/). After logging in, click the _Create Database_ button. It'll take a few seconds, and you are all set up. Then, copy and paste the `UPSTASH_REDIS_REST_HOST`, `UPSTASH_REDIS_REST_PORT` and `UPSTASH_REDIS_REST_PASSWORD` variables from _Details_ section to a file. We are going to use these keys in the AWS environment variables.
 
 ### Creating the Serverless Functions on AWS Lambda
 
-Next up, we will be creating our serverless Python functions. After logging in to AWS, direct to [AWS Lambda](https://aws.amazon.com/lambda/). From the Dashboard, create the lambda function.
+Next up, we will create our serverless Python functions. After logging in to AWS, direct to [AWS Lambda](https://aws.amazon.com/lambda/). From the Dashboard, create the lambda function.
 
 ![function creation](/blog/python-lambda/function-creation-bg.png)
 
 ### Lambda Function for URL Shortening
 
-The first thing to do is adding the environment variables. From the `shortener` function overview, go to **Configuration > Environment variables > Edit > Add environment variable**. Then, type in the `UPSTASH_REDIS_REST_HOST`, `UPSTASH_REDIS_REST_PORT` and `UPSTASH_REDIS_REST_PASSWORD` as the keys, and their corresponding values from Upstash Console.
+The first thing to do is add the environment variables. From the `shortener` function overview, go to **Configuration > Environment variables > Edit > Add environment variable**. Then, type in the `UPSTASH_REDIS_REST_HOST`, `UPSTASH_REDIS_REST_PORT` and `UPSTASH_REDIS_REST_PASSWORD` as the keys, and their corresponding values from Upstash Console.
 
 Now we can start coding. Return back to the **Code** section of `shortener` function, and paste the code below. This will provide us the connection to Upstash Redis Database.
 
@@ -56,12 +56,12 @@ redis_client = redis.Redis(
 )
 ```
 
-Then we will be implementing our main shortener algorithm. What this code snippet below does is,
+Then we will implement our main shortener algorithm. What the code snippet below does is:
 
 - getting the query parameter `long_url` from the API Request URL,
 - generating a random 7 character key for the shortened URL,
-- setting the value of this key on Upstash Redis to the long url,
-- returning a HTTP 200 Response with the our full short url in the body of the response.
+- setting the value of this key on Upstash Redis to the long URL,
+- returning an HTTP 200 Response with our full short URL in the body of the response.
 
 Just below the Redis client creation, add the `generate_short_url` and `lambda_handler` functions.
 
@@ -109,15 +109,15 @@ def lambda_handler(event, context):
 ```
 
 Then click **Deploy**.
-Even though the codes are ready; if you [test the lambda](https://docs.aws.amazon.com/lambda/latest/dg/testing-functions.html) now, you will get the response below from the Lambda
+Even though the codes are ready; if you [test the lambda](https://docs.aws.amazon.com/lambda/latest/dg/testing-functions.html) now, you will get the response below from Lambda
 
 `Unable to import module 'lambda_function': No module named 'redis'`
 
-That is because, in order to use the external Python libraries we need to create our own libraries as a custom package and then find a way to attach the package to Lambda. There are several ways to resolve this, but my go-to solution would be using Lambda Layers. Don't let that confuse you, it's rather a simple process.
+That is because, in order to use the external Python libraries, we need to create our own libraries as a custom package and then find a way to attach the package to Lambda. There are several ways to resolve this, but my go-to solution would be using Lambda Layers. Don't let that confuse you, it's rather a simple process.
 
 ### Creating the Layer
 
-First up, we have to create and zip the package. Go to your local terminal and type in the commands below. That will create a. `requirements-package.zip` file in the packages folder with Redis installed.
+First up, we have to create and zip the package. Go to your local terminal and type in the commands below. That will create a `requirements-package.zip` file in the packages folder with Redis installed.
 
 ```shell
 mkdir packages
@@ -142,16 +142,16 @@ When the layer is created, we need to connect this layer to our `shortener` func
 
 ![adding layers](/blog/python-lambda/layer-adding-bg.png)
 
-Now, we should be able to shorten the urls. What remains, is retrieving the long url from the `short_url` key, and redirecting the browser to that URL. For that, we are going to create a `redirector` lambda function.
+Now, we should be able to shorten the URLs. What remains is retrieving the long URL from the `short_url` key and redirecting the browser to that URL. For that, we are going to create a `redirector` lambda function.
 
 ### Lambda Function for URL Redirection
 
-Process of creating `redirector` lambda is the same as described above. Here are the steps once again:
+The process of creating `redirector` lambda is the same as described above. Here are the steps once again:
 
 - Creating a lambda function named `redirector` from the Lambda dashboard.
 - Setting the environment variables.
 - Typing in the code given just below.
-- Creating a layer with the `requirements-package.zip` file. (We may use the `redis-library-layer` again, requirements are just same in this case.)
+- Creating a layer with the `requirements-package.zip` file. (We may use the `redis-library-layer` again, requirements are the same in this case.)
 - Adding the layer to the lambda function.
 
 Here's the main algorithm for the redirector lambda.
@@ -199,7 +199,7 @@ def format_url_for_redirection(url):
     return url
 ```
 
-Just like that, our lambdas are all ready! Although this is functional, in order to make this URL shortener an accessible service, we have to find a way to run our lambdas. There are several ways to consume lambda functions, but for this implementation we'll use the **AWS API Gateway**.
+Just like that, our lambdas are all ready! Although this is functional, to make this URL shortener an accessible service, we have to find a way to run our lambdas. There are several ways to consume lambda functions, but for this implementation we'll use the **AWS API Gateway**.
 
 ### Creating the API Gateway on AWS
 
@@ -215,7 +215,7 @@ Then click on the `/shortener` path in the **Resources** and head to **Actions >
 
 ![creating resource](/blog/python-lambda/resource-creation-bg.png)
 
-We have connected the shortener function to our API, so we can now shorten our URLs. However, we need the `redirector` Lambda function to be connected to the API for our service to work. Click on the `/` in the **Resources**, head to **Actions > Create Resource**.
+We have connected the shortener function to our API, so we can now shorten our URLs. However, we need the `redirector` Lambda function connected to the API for our service to work. Click on the `/` in the **Resources**, head to **Actions > Create Resource**.
 
 ![short url](/blog/python-lambda/short-url-bg.png)
 
@@ -223,9 +223,9 @@ Click on the `/{short_url}` in the **Resources** section, then **Actions > Creat
 
 ![short url resource](/blog/python-lambda/short-url-resource-bg.png)
 
-Finally, our API is set up. The final step is deploying the API. Go to **Actions > Deploy API > Create New Stage** Type in the necessary fields and deploy. We now have an public API. In the **Stages** section, you can see the public Invoke URL for your API.
+Finally, our API is set up. The final step is deploying the API. Go to **Actions > Deploy API > Create New Stage**. Type in the necessary fields and deploy. We now have a public API. In the **Stages** section, you can see the public Invoke URL for your API.
 
-There is a final task to do, triggering the Lambda Functions via the `serverless-shortener-API` gateway.
+There is a final task to do: triggering the Lambda Functions via the `serverless-shortener-API` gateway.
 
 Go to the `shortener` Lambda function, within the **Function overview** section, click the **Add Trigger** button.
 
@@ -235,12 +235,12 @@ When you add the trigger to both of the functions, our public API and the Lambda
 
 `<YOUR_INVOKE_URL>/shortener?short_url="<LONG_URL>"`
 
-To trigger the `redirector` function, you'll need the reponse from the `shortener` function. The triggering URL for the `redirector` has the structure below:
+To trigger the `redirector` function, you'll need the response from the `shortener` function. The triggering URL for the `redirector` has the structure below:
 
 `<YOUR_INVOKE_URL>/<SHORT_URL_KEY>`
 
-When you click it or send a HTTP Request to it, you'll be redirected to your long URL.
-Actually, our service is ready, but we'll create a web interface as a little bit of sparkle.
+When you click it or send an HTTP Request to it, you'll be redirected to your long URL.
+Actually, our service is ready, but we'll create a web interface as a bit of sparkle.
 
 ### Creating the Web Interface and Handling Function Usage
 
@@ -248,7 +248,7 @@ We'll use HTML, Bootstrap and JavaScript for the frontend. When the user types i
 
 ![app](/blog/python-lambda/app-bg.png)
 
-This is rather simple website with few elements. First, add the following line to the `<head>` block of the HTML code in order to use the Bootstrap features.
+This is a rather simple website with a few elements. First, add the following line to the `<head>` block of the HTML code in order to use the Bootstrap features.
 
 `<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"/>`
 
@@ -278,7 +278,7 @@ Within the `<body>` block, we'll have the main HTML elements.
 </div>
 ```
 
-After adding the elements, only the data fetching from the API Gateway remains. We'll handle that with JavaScript. Before the end of the `<body>` part, insert the url fetching functionality. Don’t forget the replace `<INVOKE_URL>` with the one from your AWS API Gateway.
+After adding the elements, only the data fetching from the API Gateway remains. We'll handle that with JavaScript. Before the end of the `<body>` part, insert the URL fetching functionality. Don’t forget to replace `<INVOKE_URL>` with the one from your AWS API Gateway.
 
 ```html
 <!-- Add Bootstrap JS -->
@@ -308,10 +308,10 @@ After adding the elements, only the data fetching from the API Gateway remains. 
 
 ### Final Words and Project Improvements
 
-We've implemented the main features for our serverless URL shortener project. I hope it had been a clear demonstration of creating Python Lambda functions and consuming them. I'll also have some suggestions for improving the project, if you'd like to keep working on this project.
+We've implemented the main features for our serverless URL shortener project. I hope it has been a clear demonstration of creating Python Lambda functions and consuming them. I'll also have some suggestions for improving the project, if you'd like to keep working on this project.
 
-- [Setting a custom domain](https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-custom-domains.html) for the URL shortener. The `Invoke URL` given by the AWS, is rather a complex one. Since this project's main purpose was demonstrating AWS Lambda and Upstash Redis, I didn't want to make this post longer with it. But If you'd like you could change the URL to a simpler and shorter one from the AWS API Gateway.
-- Implementing Upstash Ratelimit for the API. I have used free tier services for this project, but if you're intended to build an active and public service, you should consider setting up a request limit in order to avoid unexpected costs.
+- [Setting a custom domain](https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-custom-domains.html) for the URL shortener. The `Invoke URL` given by AWS is rather complex. Since this project's main purpose was demonstrating AWS Lambda and Upstash Redis, I didn't want to make this post longer with it. But If you'd like you could change the URL to a simpler and shorter one from the AWS API Gateway.
+- Implementing Upstash Rate Limit for the API. I have used free tier services for this project, but if you intend to build an active and public service, you should consider setting up a request limit to avoid unexpected costs.
 - Hosting this project on Vercel.
 
 Thanks for reading.

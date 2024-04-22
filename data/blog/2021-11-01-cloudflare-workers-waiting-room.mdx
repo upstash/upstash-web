@@ -1,6 +1,6 @@
 ---
 slug: cloudflare-workers-waiting-room
-title: "Build your own Waiting Room for your Web site with Cloudflare Workers and Serverless Redis"
+title: "Build Your Own Waiting Room for Your Website with Cloudflare Workers and Serverless Redis"
 authors: [enes]
 image: waitingroom/cover.jpg
 tags: [serverless, cloudflare-workers, cloudflare, edge, redis]
@@ -10,7 +10,7 @@ In this blog post, we will implement a waiting room page for your website.
 
 ### Why?
 
-High number of visitors on your website is a good thing generally but not always. Sudden high traffic may easily overwhelm your applications which may disrupt your services completely. Waiting room is a solution that helps you to control the traffic and protect your resources during traffic surges. [Cloudflare Waiting Room](https://www.cloudflare.com/waiting-room/) is a good solution but it is only available for business and enterprise accounts. Don’t worry, in this blog we will build a waiting room for any type of web site using Cloudflare Workers and Upstash Redis.
+A high number of visitors on your website is generally a good thing but not always. Sudden high traffic may easily overwhelm your applications which may disrupt your services completely. A waiting room is a solution that helps you control the traffic and protect your resources during traffic surges. [Cloudflare Waiting Room](https://www.cloudflare.com/waiting-room/) is a good solution but it is only available for business and enterprise accounts. Don't worry, in this blog we will build a waiting room for any type of website using Cloudflare Workers and Upstash Redis.
 
 ### How?
 
@@ -19,19 +19,19 @@ There are two parameters to control the waiting room.
 - **Max session duration**: How long can a visitor stay idle on the web site?
 - **Max website capacity**: How many visitors can the website allow at the same time?
 
-When a visitor enters our website, we will generate a unique key (like a session key) and keep it in Redis. We will put this key to the Redis with an expiration time which is the **max session duration**. Before letting a visitor into the website, we will check the dbsize of the Redis. If the size is higher than the **max website capacity, **then we will forward the visitor to the waiting room. The waiting room is a static html but refreshes every 30 seconds. That is, once every 30 seconds, the visitor can be allowed to enter the website if there is availability.
+When a visitor enters our website, we will generate a unique key (like a session key) and store it in Redis. We will put this key to the Redis with an expiration time which is the **max session duration**. Before letting a visitor into the website, we will check the dbsize of the Redis. If the size is higher than the **max website capacity, **then we will forward the visitor to the waiting room. The waiting room is a static HTML page but refreshes every 30 seconds. That is, once every 30 seconds, the visitor can be allowed to enter the website if there is availability.
 
-The unique key that we generated also is written to the visitor requests as a cookie. So the requests of the same visitor will have the same key. This is required to check if a visitor has already a session inside the website when the capacity is full. So as a visitor you are allowed to enter the website even if the capacity is full as long as your key exists in the Redis keyspace. If you stay idle longer than the max session duration, then your key will be deleted from Redis. And if the capacity is full when you send a request you will be forwarded to the waiting room.
+The unique key that we generated is also written to the visitor's requests as a cookie. So the requests of the same visitor will have the same key. This is required to check if a visitor has already a session inside the website when the capacity is full. So, as a visitor, you are allowed to enter the website even if the capacity is full as long as your key exists in the Redis keyspace. If you stay idle longer than the max session duration, then your key will be deleted from Redis. And if the capacity is full when you send a request you will be forwarded to the waiting room.
 
 We will implement this logic at Cloudflare Workers. We will use Upstash as a Redis store. Now let’s explain the background of these technology decisions.
 
 ### Why Cloudflare Workers?
 
-Waiting room implementation will intercept all requests to your website. So its performance overhead should be minimal. Cloudflare Workers leverages Cloudflare edge infrastructure, so it gives you the minimum latency globally. Also unlike AWS Lambda, it does not have a cold start problem. It is a serverless technology so scalability is not a problem too.
+The waiting room implementation will intercept all requests to your website. So, its performance overhead should be minimal. Cloudflare Workers leverages Cloudflare edge infrastructure, so it gives you the minimum latency globally. Also, unlike AWS Lambda, it does not have a cold start problem. It is a serverless technology, so scalability is not a problem either.
 
 ### Why Upstash Redis?
 
-You need to check the current size of the website before allowing each new visitor. Cloudflare Workers is stateless so you need to keep this information externally. Redis is the best choice with its low latency. But Redis offerings require TCP based connections which are not supported by Cloudflare Workers. Upstash is the only Redis offering with a built in REST API. Also thanks to Global replication it gives you low latency all over the world.
+You need to check the current size of the website before allowing each new visitor. Cloudflare Workers is stateless so you need to keep this information externally. Redis is the best choice with its low latency. But Redis offerings require TCP-based connections, which are not supported by Cloudflare Workers. Upstash is the only Redis offering with a built in REST API. Also, thanks to global replication, it provides low latency all over the world.
 
 ### Step by Step Implementation
 
@@ -223,7 +223,7 @@ const default_html = `
 
 In the above code, you can edit the `waiting_room_html` variable. It is the static html of the waiting room page.
 
-handleRequest method returns either getDefaultResponse or getWaitingRoomResponse depending on the availability of your website.
+The handleRequest method returns either getDefaultResponse or getWaitingRoomResponse depending on the availability of your website.
 
 #### `4` Run Locally
 
@@ -245,7 +245,7 @@ And then open the same url on Safari (or Chrome incognito), you will see:
 
 Wait for longer than 30 seconds. You should see the page in waiting room will refresh and enter the website.
 
-Our local does not forward to a real website so we see the 404 page of Cloudflare, that’s ok.
+Our local setup does not forward to a real website, so we see the 404 page of Cloudflare, which is okay.
 
 #### `5` Publish
 
@@ -265,14 +265,14 @@ Now let’s route our worker to your website. First your domain's nameservers sh
 
 ### Conclusion
 
-We have successfully built a waiting room without touching our application code thanks to Cloudflare Workers and Upstash Redis. We believe this is another indicator of how powerful edge functions become together with Upstash.
+We have successfully built a waiting room without touching our application code, thanks to Cloudflare Workers and Upstash Redis. We believe this is another indicator of how powerful edge functions become together with Upstash.
 
 There are things to improve:
 
 - Estimated waiting time: We could calculate and show average waiting time.
 - Fair and ordered queue: Currently waiting visitors randomly enter the site when there is availability. We might keep a queue and try to let visitors in an ordered way.
 
-Both of the above improvements require keeping more state and making more remote calls. That’s why we preferred to skip those. If your use case strictly requires those, you may check [this blog](https://blog.cloudflare.com/building-waiting-room-on-workers-and-durable-objects/) to be inspired from Cloudflare team’s work on their enterprise solution.
+Both of the above improvements require maintaining more state and making more remote calls. That’s why we preferred to skip those. If your use case strictly requires those, you may check [this blog](https://blog.cloudflare.com/building-waiting-room-on-workers-and-durable-objects/) to be inspired from Cloudflare team’s work on their enterprise solution.
 
 Check [the source code](https://github.com/upstash/waiting-room).
 
