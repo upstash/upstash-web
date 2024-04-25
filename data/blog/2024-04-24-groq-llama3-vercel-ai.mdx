@@ -1,0 +1,133 @@
+---
+slug: groq-llama3-vercel-ai
+title: "Trying Llama3 on Groq with Vercel AI"
+authors: [enes]
+tags: [ai, groq, vercel, llama3, openai]
+---
+
+I have a list of things to try. Recently, after the ChatGPT and AI storm, this list is growing very fast. Groq and Vercel AI are on this list. Today, I will create a very basic app which will utilize both. I just want to experience these technologies and try to understand the hype behind them.
+
+Groq is an inference engine that stands out with its speed. It is based on the LPU architecture where LLMs perform faster compared to GPUs.
+
+Vercel AI is a generalist SDK that helps JavaScript and TypeScript developers build AI applications with ease. It is useful when you are developing user-facing applications that need common AI components like chat and communication with LLM providers.
+
+Llama3 is the newest LLM model from Meta. People say it is very fast and smart. We will see.
+
+I will create a basic AI chat application using Vercel AI, and it will use Llama3-70b as the LLM model. We will host the model on Groq and see if Groq is really as fast as advertised.
+
+### Let’s Code!
+
+We will start by creating a Next.js app. (Enable Tailwind and accept the defaults for other options.)
+
+```bash
+ pnpm dlx create-next-app llama3-chat
+```
+
+Go to the new directory:
+
+```bash
+cd llama3-chat
+```
+
+Now install the dependencies:
+
+```bash
+pnpm install ai openai zod
+```
+
+We will use the OpenAI SDK as our client, as most inference providers are already compatible with the OpenAI API.
+
+Create a `.env.local` file and add the following:
+
+```bash
+API_KEY=COPY_THIS_API_KEY_FROM_GROQ_CLOUD
+BASE_URL=https://api.groq.com/openai/v1
+```
+
+You can create a free account on [Groq Cloud](https://console.groq.com/).
+
+Now, create a route handler, `app/api/chat/route.ts`
+
+```tsx
+import OpenAI from 'openai';
+import { OpenAIStream, StreamingTextResponse } from 'ai';
+ 
+// Create an OpenAI API client (that's edge friendly!)
+const openai = new OpenAI({
+    apiKey: process.env.API_KEY,
+    baseURL: process.env.BASE_URL,
+});
+ 
+export const dynamic = 'force-dynamic';
+ 
+export async function POST(req: Request) {
+  const { messages } = await req.json();
+ 
+  // Ask OpenAI for a streaming chat completion given the prompt
+  const response = await openai.chat.completions.create({
+    model: 'llama3-70b-8192',
+    stream: true,
+    messages,
+  });
+ 
+  // Convert the response into a friendly text-stream
+  const stream = OpenAIStream(response);
+  // Respond with the stream
+  return new StreamingTextResponse(stream);
+}
+```
+
+We have selected `llama3-70b-8192` as our model. However, you can select any other model supported by Groq. Check [this page](https://console.groq.com/docs/models) for a list of supported models.
+
+Finally, create `app/page.tsx` and add the following for UI:
+
+```tsx
+'use client';
+ 
+import { useChat } from 'ai/react';
+ 
+export default function Chat() {
+  const { messages, input, handleInputChange, handleSubmit } = useChat();
+  return (
+    <div className="flex flex-col w-full max-w-md py-24 mx-auto stretch">
+      {messages.map(m => (
+        <div key={m.id} className="whitespace-pre-wrap">
+          {m.role === 'user' ? 'User: ' : 'AI: '}
+          {m.content}
+        </div>
+      ))}
+ 
+      <form onSubmit={handleSubmit}>
+        <input
+          className="fixed bottom-0 w-full max-w-md p-2 mb-8 border border-gray-300 rounded shadow-xl"
+          value={input}
+          placeholder="Say something..."
+          onChange={handleInputChange}
+        />
+      </form>
+    </div>
+  );
+}
+```
+
+This is a quite minimalistic UI with a chat screen and a button. However, it is good enough to showcase AI Chat.
+
+Run your application with:
+
+```bash
+pnpm run dev
+```
+
+![blog/groq-llama3/groq-llama3.png](/blog/groq-llama3/groq-llama3.png)
+
+### Conclusion
+
+I don't have much experience in either frontend or LLM development. However, current tools make application development so easy that I was able to create an LLM chat application in just a few minutes. It was impressive.
+
+Llama3 on Groq was very impressive, mainly due to its speed. There is a significant performance difference; it's faster compared to OpenAI GPT-4. I can't attribute this speed solely to Groq because Llama3 is already fast on other inference engines, for example, I tried it with [together.ai](http://together.ai/). Therefore, I need to do more research to make a statement about Groq’s performance.
+
+This is very subjective, but I found the Llama3 overly concise. ChatGPT-4 is slower, but its answers are more verbose and well-formed, I think. Maybe I should configure Llama3 accordingly. However, it is very impressive to see such performance from an open model. Thank you, Meta. 👏🏻
+
+I liked the Vercel AI SDK. It's especially helpful because it provides ready-to-use components, such as a chat box. Additionally, the streaming support is excellent. I could have spent hours implementing streaming support myself.
+
+Thank you for reading, and [follow us on X](https://www.notion.so/New-Upstash-com-0b73374f807147079af9cafeb991c12f?pvs=21) for more posts like this.
