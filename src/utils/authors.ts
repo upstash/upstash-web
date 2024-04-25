@@ -327,6 +327,12 @@ export const authors: Record<string,
         title: "Co-founder @ Sequin",
         url: "https://sequin.io/",
         image: "acco.jpg",
+    },
+    kaanguneyli: {
+        name: "Bilge Kaan Güneyli",
+        title: "Software Developer (Guest Author)",
+        url: "https://github.com/kaanguneyli",
+        image: "kaanguneyli.jpg"
     }
 };
 
