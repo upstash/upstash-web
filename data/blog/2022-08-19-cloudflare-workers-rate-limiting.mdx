@@ -116,11 +116,11 @@ Okay, the tutorial is over (it was easy, right?), now let's get into some detail
 
 ### Isn't it costly to make remote call for each request?
 
-It might be if we did not use an ephemeral cache. [The ephemeral cache](https://github.com/upstash/ratelimit#ephemeral-cache) is a map object defined outside the handler. The rate limiting SDK uses it to cache identifiers while the serverless function is active (hot). It is important to define it outside the handler, so it will be a global variable. Cloudflare Workers does not guarantee different invocations will use the same variable but still it helps much to cache it during peak traffic.
+It might be if we did not use an ephemeral cache. [The ephemeral cache](https://upstash.com/docs/oss/sdks/ts/ratelimit/features#caching) is a map object defined outside the handler. The rate limiting SDK uses it to cache identifiers while the serverless function is active (hot). It is important to define it outside the handler, so it will be a global variable. Cloudflare Workers does not guarantee different invocations will use the same variable but still it helps much to cache it during peak traffic.
 
 ### Why not Global Database?
 
-Upstash Global databases replicate Redis data to multiple regions. It perfectly fits for many edge use cases. But for rate-limiting, we do not need to replicate data in one region to all other regions. Rate limiting sessions have local scopes. We could still use a global database, but that would be unnecessarily costly as each update would be replicated to all over the world. That's why we chose to create multiple regional databases as [the rate-limiting SDK recommends](https://github.com/upstash/ratelimit#multiregion-replicated-ratelimiting).
+Upstash Global databases replicate Redis data to multiple regions. It perfectly fits for many edge use cases. But for rate-limiting, we do not need to replicate data in one region to all other regions. Rate limiting sessions have local scopes. We could still use a global database, but that would be unnecessarily costly as each update would be replicated to all over the world. That's why we chose to create multiple regional databases as [the rate-limiting SDK recommends](https://upstash.com/docs/oss/sdks/ts/ratelimit/features#multi-region).
 
 ### IP as the identifier
 
