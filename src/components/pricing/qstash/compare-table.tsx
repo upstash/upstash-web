@@ -403,6 +403,7 @@ export default function CompareTable() {
           </td>
         </tr>
 
+        
         <tr>
           <th className="px-0 py-4 text-left font-normal text-white/60">
             Max Schedule Count
@@ -419,6 +420,56 @@ export default function CompareTable() {
             className="bg-emerald-300/10 px-4 py-0"
           >
             <CompareValue type="number">100</CompareValue>
+          </td>
+          <td
+            hidden={isMobile ? !showEnterprise : false}
+            className="bg-white/3 px-4 py-0"
+          >
+            <CompareValue>Custom</CompareValue>
+          </td>
+        </tr>
+
+        <tr>
+          <th className="px-0 py-4 text-left font-normal text-white/60">
+            Max Queue Count
+          </th>
+          {/**/}
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="bg-white/3 px-4 py-0"
+          >
+            <CompareValue type="number">10</CompareValue>
+          </td>
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="bg-emerald-300/10 px-4 py-0"
+          >
+            <CompareValue type="number">100</CompareValue>
+          </td>
+          <td
+            hidden={isMobile ? !showEnterprise : false}
+            className="bg-white/3 px-4 py-0"
+          >
+            <CompareValue>Custom</CompareValue>
+          </td>
+        </tr>
+
+         <tr>
+          <th className="px-0 py-4 text-left font-normal text-white/60">
+            Max Queue Parallelism
+          </th>
+          {/**/}
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="bg-white/3 px-4 py-0"
+          >
+            <CompareValue type="number">2</CompareValue>
+          </td>
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="bg-emerald-300/10 px-4 py-0"
+          >
+            <CompareValue type="number">10</CompareValue>
           </td>
           <td
             hidden={isMobile ? !showEnterprise : false}
