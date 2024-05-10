@@ -10,17 +10,17 @@ Hey there, wonderful members of our Qstash community! We've had quite a busy mon
 
 **Ordered Delivery and Smarter Concurrency Control**
 
-Ever wished for ordered delivery and the ability to limit concurrency to prevent overloading your endpoints? You're not alone! These features have been highly requested in our Discord channel, and we're delighted to announce that they're now part of Qstash.
+Ever wished for ordered delivery and the ability to limit concurrency to prevent overloading your endpoints? You're not alone! These features have been highly requested in our Discord channel, and we're delighted to announce that they're now part of QStash.
 
-![Community](/blog/qstash-fifo/community.png)
+![Community](/blog/QStash-fifo/community.png)
 
 Implementing these features took some time, but we wanted to ensure they were both reliable and user-friendly. 
 
-Here,at last, introducing our latest API addition: **Qstash Queue!**
+Here,at last, introducing our latest API addition: **QStash Queue!**
 
 **Ordered Delivery: Keeping Things in Line**
 
-With Qstash Queue, we've introduced ordered delivery by default. This means your messages will be queued and sent one by one, ensuring a smooth flow of data. Even if one message encounters an issue, like an unresponsive endpoint or an error, it will be retried until successful or moved to DLQ. During all these, all messages will wait patiently.
+With QStash Queue, we've introduced ordered delivery by default. This means your messages will be queued and sent one by one, ensuring a smooth flow of data. Even if one message encounters an issue, like an unresponsive endpoint or an error, it will be retried until successful or moved to DLQ. During all these, all messages will wait patiently.
 
 Setting up ordered delivery is as simple as choosing a queue name:
 
@@ -33,7 +33,7 @@ See [the documentation](https://upstash.com/docs/qstash/features/queues#fifo) fo
 
 **Parallelism: Finding the Perfect Balance**
 
-Need a bit of parallelism but want to keep it in check? Qstash Queue lets you configure the parallelism level to your liking: 
+Need a bit of parallelism but want to keep it in check? QStash Queue lets you configure the parallelism level to your liking: 
 
 
 ```bash 
@@ -79,8 +79,8 @@ But wait, there's more! We've got a bunch of exciting ideas in the pipeline, alo
 - Creating a dedicated space for Queues, because they deserve it!
 - And of course, a few surprises up our sleeves that we're keeping under wraps for now.
 
-If you're part of the Qstash community, we want to hear from you! Join us on [Discord](https://upstash.com/discord) to share your thoughts, ideas, and any challenges you're facing. We're here to listen and deliver solutions tailored to your needs.
+If you're part of the QStash community, we want to hear from you! Join us on [Discord](https://upstash.com/discord) to share your thoughts, ideas, and any challenges you're facing. We're here to listen and deliver solutions tailored to your needs.
 
 And hey, don't forget to stay in the loop with all our latest features and updates by following us on [Twitter](https://twitter.com/upstash)!
 
-Let's keep making Qstash better together. See you in the community!
+Let's keep making QStash better together. See you in the community!

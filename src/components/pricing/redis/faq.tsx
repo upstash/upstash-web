@@ -115,7 +115,7 @@ export default function FAQ() {
 
       <AccordionItem value="item-9">
         <AccordionTrigger>
-          Is there a contract requirement for Pro Plans?
+          Is there a contract requirement for Pro databases?
         </AccordionTrigger>
         <AccordionContent>
           There is no requirement for long-term contracts as the minimum term is
@@ -126,9 +126,9 @@ export default function FAQ() {
       </AccordionItem>
 
       <AccordionItem value="item-10">
-        <AccordionTrigger>How is the Enterprise plan priced?</AccordionTrigger>
+        <AccordionTrigger>How is the Ultimate database priced?</AccordionTrigger>
         <AccordionContent>
-          In Enterprise plans, a custom price is set based on specific
+          For Ultimate databases, a custom price is set based on specific
           requirements of the customer. For more information email us at{" "}
           <a href="sales@upstash.com">sales@upstash.com</a>
         </AccordionContent>
