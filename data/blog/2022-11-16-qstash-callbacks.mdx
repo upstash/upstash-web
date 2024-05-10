@@ -33,7 +33,7 @@ To add a callback URL, you can use the `Upstash-Callback` header:
 
 ```bash
 curl -X POST \
-  https://qstash.upstash.com/v1/publish/<DESTINATION_URL_OR_TOPIC> \
+  https://qstash.upstash.io/v2/publish/<DESTINATION_URL_OR_TOPIC> \
   -H 'Content-Type: application/json' \
   -H 'Authorization: Bearer <QSTASH_TOKEN>' \
   -H 'Upstash-Callback: https://my-project.vercel.app/api/callback' \
