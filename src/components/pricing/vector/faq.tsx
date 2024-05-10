@@ -81,14 +81,6 @@ export default function FAQ() {
         </AccordionContent>
       </AccordionItem>
 
-      <AccordionItem value="item-7">
-        <AccordionTrigger>How many databases can I create?</AccordionTrigger>
-        <AccordionContent>
-          You can create up to 10 databases for free and beyond this you will be
-          charged $0.5 per database up to 100 databases.
-        </AccordionContent>
-      </AccordionItem>
-
       <AccordionItem value="item-8">
         <AccordionTrigger>
           How much is the price for bandwidth?
@@ -122,15 +114,6 @@ export default function FAQ() {
           just one month, and you have the flexibility to cancel anytime. But
           note that even if you cancel within the month, you will be billed for
           the minimum term of 1 full month.
-        </AccordionContent>
-      </AccordionItem>
-
-      <AccordionItem value="item-10">
-        <AccordionTrigger>How is the Enterprise plan priced?</AccordionTrigger>
-        <AccordionContent>
-          In Enterprise plans, a custom price is set based on specific
-          requirements of the customer. For more information email us at{" "}
-          <a href="sales@upstash.com">sales@upstash.com</a>
         </AccordionContent>
       </AccordionItem>
 

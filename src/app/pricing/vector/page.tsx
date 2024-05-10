@@ -24,18 +24,6 @@ export default function PricingVectorPage() {
       <ProductToggle product={"/vector"} />
 
       <div className="mt-16 md:mt-20">
-        {/**/}
-        <div className="-mt-10 mb-10 grid place-items-center">
-          <div className="rounded-2xl border-2 border-dashed border-orange-400/10 bg-orange-600/10 px-10 py-6 text-sm text-orange-300/80">
-            <h5 className="font-semibold">Important Notice</h5>
-            <p>
-              The prices shown are introductory and may be subject to
-              adjustments in the future.
-            </p>
-          </div>
-        </div>
-        {/**/}
-
         <PricingTable />
 
         <div className="mt-10 md:mt-20">
