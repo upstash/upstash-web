@@ -333,6 +333,12 @@ export const authors: Record<string,
         title: "Software Developer (Guest Author)",
         url: "https://github.com/kaanguneyli",
         image: "kaanguneyli.jpg"
+    },
+    merlin: {
+        name: "Merlin Carter",
+        title: "Developer Educator (Guest Author)",
+        url: "https://www.linkedin.com/in/merlin-carter-bb303ab2/",
+        image: "merlin.png"
     }
 };
 
