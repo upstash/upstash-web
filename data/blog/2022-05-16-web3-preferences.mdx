@@ -46,7 +46,7 @@ Install dependencies:
 
 Configure Redis SDK and export the handler function.
 
-```javascript:api/store.js
+```javascript title="api/store.js"
 import { Redis } from "@upstash/redis"
 const redis = Redis.fromEnv()
 
@@ -63,7 +63,7 @@ export default async function handler(req, res) {
 
 Similarly, configure Redis SDK and export the handler.
 
-```javascript:api/[accountAddress].js
+```javascript title="api/[accountAddress].js"
 import { Redis } from "@upstash/redis"
 const redis = Redis.fromEnv()
 
@@ -79,7 +79,7 @@ export default async function handler(req, res) {
 
 #### Set your variables for the project
 
-```javascript:index.js
+```javascript title="index.js"
 const [accountAddress, setAccountAddress] = useState(null)
 const [themePreference, setThemePreference] = useState("light")
 const [greetingMessage, setGreetingMessage] = useState("Anonymous Person")

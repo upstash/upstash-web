@@ -93,7 +93,7 @@ The above command installs the following packages:
 
 Once they are installed, append the following to the `main.py` file:
 
-```python
+```python title="main.py"
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -116,7 +116,7 @@ Now, let's move on to creating a function to generate vector embeddings from tex
 
 Let's define a function to transform text into embeddings using the CLIPText model. Append the following code to `main.py` file:
 
-```python
+```python title="main.py"
 import torch
 from torchvision import transforms
 from transformers import CLIPProcessor, CLIPTextModel
@@ -149,7 +149,7 @@ Let's move on to generating vector embeddings of images with CLIP model.
 
 Let's define a function (along with some helper functions) to fetch, and transform images into embeddings using the CLIP model. Append the following code to `main.py` file:
 
-```python
+```python title="main.py"
 import torch
 import requests
 from PIL import Image
@@ -192,7 +192,7 @@ The code above does the following:
 
 Using `upstash_vector` library, you are able to create a connectionless client in your FastAPI application that allows you to store, delete, and query vector embeddings from an Upstash Vector index. Append the following code to main.py file:
 
-```python
+```python title="main.py"
 import upstash_vector as uv
 from dotenv import dotenv_values
 
@@ -212,7 +212,7 @@ With that done, let's use both the vector embeddings generator functions in Fast
 
 With increasing inventory, e-commerce are ever growing. Hence, to visualize things like in real-time, you are going to create an API that would dynamically create embeddings of the products from it's attributes such as image, title and description and store them in the Upstash Vector index. This helps keeps the data up-to-date, resulting in accurate responses to user searches. Append the following code to `main.py` file:
 
-```python
+```python title="main.py"
 @app.post("/api/add")
 async def add(request: Request):
     # Load JSON data from the request body
@@ -253,7 +253,7 @@ The code above does the following:
 
 For the UI to render rich product information responses to user queries, you are going to return the relevant product information by creating an endpoint it can talk to. Such an endpoint would be responsible to search for the relevant products based on the user prompt, including link to images. Append the following code to `main.py` file:
 
-```python
+```python title="main.py"
 @app.post("/api/chat")
 async def chat(request: Request):
     # Load JSON data from the request body
@@ -375,9 +375,7 @@ The above command installs the following:
 
 To display product recommendations in a visually appealing format, including product images, titles, and descriptions, create a `Recommend.jsx` file inside the `src` directory with the following code:
 
-```tsx
-// File: src/Recommend.jsx
-
+```tsx title="src/Recommend.jsx"
 import { useChat } from "ai/react";
 
 export default function () {
@@ -437,9 +435,11 @@ The code above does the following:
 
 To use this `Recommend` component on the index route of your Astro application, make the following changes in `src/pages/index.astro` file:
 
-```diff
+```astro title="src/pages/index.astro" ins={4,17} del={16}
 ---
-+ import Recommend from '../Recommend'
+// File: src/pages/index.astro
+
+import Recommend from '../Recommend'
 ---
 
 <html lang="en">
@@ -451,8 +451,8 @@ To use this `Recommend` component on the index route of your Astro application, 
     <title>Astro</title>
   </head>
   <body class="flex w-screen flex-col items-center">
--   <h1>Astro</h1>
-+   <Recommend client:load />
+    <h1>Astro</h1>
+    <Recommend client:load />
   </body>
 </html>
 ```

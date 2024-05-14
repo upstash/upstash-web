@@ -125,11 +125,10 @@ function Highlight(props: {
 }
 
 const components = {
-  table,
   img,
+  table,
   FullWidth,
   Highlight,
   Note: PostNote,
   ExpandableCode,
-  pre: CopyFeaturePre,
 };

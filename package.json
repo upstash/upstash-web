@@ -37,6 +37,7 @@
     "react-spring": "^9.7.3",
     "react-use-intercom": "^5.3.0",
     "react-wrap-balancer": "^0.5.0",
+    "rehype-expressive-code": "^0.35.3",
     "remark": "^15.0.1",
     "remark-html": "^16.0.1",
     "sharp": "^0.33.2",
