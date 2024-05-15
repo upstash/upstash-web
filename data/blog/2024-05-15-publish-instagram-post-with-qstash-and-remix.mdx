@@ -1,0 +1,292 @@
+---
+slug: publish-instagram-post-with-qstash-and-remix
+title: "Publish Instagram Post with QStash and Remix"
+authors:
+  - amit
+tags: [qstash, remix, fly.io]
+---
+
+In this guide, you'll learn how to publish an Instagram post without making your users wait long for it to be published on Instagram.
+
+## Prerequisites
+
+You'll need the following:
+
+- **[Node.js 18](https://nodejs.org/en/blog/announcements/v18-release-announce)** or later
+- An **[Upstash](https://upstash.com/)** account
+- **[Meta for Developer](https://developers.facebook.com/apps/)** account
+- A **[Fly.io](https://fly.io/)** Account
+
+## Tech Stack
+
+| Technology                             | Description                                                                     |
+| -------------------------------------- | ------------------------------------------------------------------------------- |
+| [Upstash](https://upstash.com)         | QStash is a message queue and task scheduler designed for serverless runtimes.  |
+| [Remix](https://remix.run)             | Framework for building full-stack web applications with focus on Web Standards. |
+| [Tailwindcss](https://tailwindcss.com) | CSS framework for building custom designs.                                      |
+| [Fly.io](https://fly.io)               | A platform for running full stack apps and databases close to your users.       |
+
+## Steps
+
+To complete this guide and deploy your own article recommendation system, you'll need to follow these steps:
+
+- **[Set up the Remix project](#set-up-the-project)**
+- **[Obtain the QStash secret key](#obtain-the-qstash-secret-key)**
+- **[Create a CF worker Endpoint](#create-a-cf-worker-endpoint)**
+- **[Create a callback Endpoint](#create-a-callback-endpoint)**
+- **[Create a QStash with a scheduler](#create-a-qstash-with-a-scheduler)**
+- **[Deploy To Fly.io](#deploy-to-flyio)**
+- **[Conclusion](#conclusion)**
+
+## **Set up the project**
+
+To set up remix project, please follow along the following link that will guide to learn everything that's in it.
+
+```bash
+# run the following command to create a remix template
+npx create-remix@latest --template remix-run/blues-stack
+
+# Install the dependencies
+npm install
+```
+
+## **Obtain the QStash secret key**
+
+Once you have created an Upstash account and are logged in, go to the QStash tab.
+
+Now, scroll down till you see the **Environment Keys section**, and click the **copy** button and save it somewhere safe to be used further in your application.
+
+![QStash.png](/blog/qstash/env-keys.png)
+
+Once you have setup the Remix project, create an `.env` file if it doesn’t exists. You are going to add the secret keys obtained in the sections above.
+
+The `.env` file should contain the following keys:
+
+```bash
+##REQUIRED FOR SENDING
+QSTASH_URL="https://qstash.upstash.io/v2/publish/"
+QSTASH_TOKEN="<your-qstash-token>"
+
+##REQUIRED FOR RECEIVING
+QSTASH_CURRENT_SIGNING_KEY="<your-current-signing-key>"
+QSTASH_NEXT_SIGNING_KEY="<your-next-signing-key>"
+```
+
+With that done, the configuration set up is complete on your end. You can now see the application in action by executing the following command in your terminal and visiting **[localhost:3000](http://localhost:3000/)**.
+
+```bash
+npm run dev
+```
+
+Follow along to understand the relevant parts of the code that allow you to successfully build your own Instagram post engine.
+
+## **Create a CF worker Endpoint**
+
+We will create a Cloudflare worker endpoint with the following command.
+
+```bash
+# You don’t need CF worker endpoint to implement QStash feature.
+# You can build on any endpoint.
+# this will install the CF packages and lead you through setup.
+
+npm create cloudflare@latest
+```
+
+Once setup is complete copy the following code in your index.(js|ts) file
+
+```tsx
+import { Receiver } from "@upstash/qstash";
+
+export interface Env {
+  QSTASH_CURRENT_SIGNING_KEY: string;
+  QSTASH_NEXT_SIGNING_KEY: string;
+}
+
+export default {
+  async fetch(
+    request: Request,
+    env: Env,
+    ctx: ExecutionContext,
+  ): Promise<Response> {
+    const c = new Receiver({
+      currentSigningKey: env.QSTASH_CURRENT_SIGNING_KEY,
+      nextSigningKey: env.QSTASH_NEXT_SIGNING_KEY,
+    });
+
+    const body = await request.text();
+
+    const isValid = await c
+      .verify({
+        signature: request.headers.get("Upstash-Signature")!,
+        body,
+      })
+      .catch((err) => {
+        console.error(err);
+        return false;
+      });
+    if (!isValid) {
+      return new Response("Invalid signature", { status: 401 });
+    }
+
+    return new Response(body);
+  },
+};
+```
+
+## **Create a callback Endpoint**
+
+A callback endpoint is necessary because once we initiate the QStash with a scheduler, the destination endpoint (in our case, a CF worker) will call our callback endpoint and provide the necessary information.
+
+```tsx
+// Assuming that you have already created a container using the following API:
+// https://graph.facebook.com/v19.0/${igBusinessId}/media?image_url=${mediaUrl}&caption=${encodedCaption}&access_token=${profileKey}
+
+// file name - api.instagram.post.callback.tsx
+
+// use case - to publish the Instagram post on user's account.
+// you can build any usecase to run a backgound job.
+/*
+Steps:
+1. create IG media container
+2. check the status of the media container ID
+3. once the container is ready to publish with a status code - `FINISHED`, we are
+ready to publish the post on user account
+*/
+
+import { json } from "@remix-run/node";
+import type { ActionFunctionArgs } from "@remix-run/node";
+import { Client, Receiver } from "@upstash/qstash";
+
+const receiver = new Receiver({
+  currentSigningKey: process.env.QSTASH_CURRENT_SIGNING_KEY as string,
+  nextSigningKey: process.env.QSTASH_NEXT_SIGNING_KEY as string,
+});
+
+export async function loader() {
+  return json({ result: "api-endpoint-name" });
+}
+
+export async function action({ request }: ActionFunctionArgs) {
+  try {
+    const signature: any = request.headers.get("Upstash-Signature");
+    const payload = await request.text();
+
+    const isValid = await receiver.verify({
+      body: payload,
+      signature,
+      url: "https://domain-name/api/instagram/post/callback", // api.instagram.post.callback - name of the file
+    });
+
+    if (isValid) {
+      const parsedPayload = JSON.parse(payload);
+      const scheduleId = parsedPayload.scheduleId;
+
+      // responses from qstash are base64-encoded
+      const decoded = atob(parsedPayload.body);
+      const parsedDecodedBody = JSON.parse(decoded);
+      const {
+        igBusinessId,
+        mediaContainerId,
+        profileKey,
+        userType,
+        publishPostId,
+      } = parsedDecodedBody;
+
+      const containerStatusResponse = await fetch(
+        `https://graph.facebook.com/${mediaContainerId}?access_token=${profileKey}&fields=status_code`,
+        {
+          method: "GET",
+        },
+      );
+
+      const containerStatusResult = await containerStatusResponse.json();
+
+      if (containerStatusResult?.status_code === "FINISHED") {
+        const response = await fetch(
+          `https://graph.facebook.com/v19.0/${igBusinessId}/media_publish?access_token=${profileKey}&creation_id=${mediaContainerId}`,
+          {
+            method: "POST",
+          },
+        );
+
+        const result = await response.json();
+
+        // save the result in the database if you want
+
+        // once the job is complete delete the scheduler
+        const client = new Client({
+          token: process.env.QSTASH_TOKEN as string,
+        });
+        const schedules = client.schedules;
+        await schedules.delete(scheduleId);
+
+        return json({ success: "published successfully" }, { status: 200 });
+      }
+    }
+
+    return json({ success: "not published yet" }, { status: 200 });
+  } catch (error) {
+    return json(null, { status: 400 });
+  }
+}
+```
+
+### **Create a QStash with a scheduler**
+
+We instantiate the QStash on CTA (in our case, when the user clicks the publish button).
+
+```tsx
+const client = new Client({
+  token: process.env.QSTASH_TOKEN as string,
+});
+const schedules = client.schedules;
+await schedules.create({
+  destination: "https://<your-cloudflare-worker-endpoint>.workers.dev",
+  cron: "*/5 * * * *",
+  method: "POST",
+  headers: {
+    "content-type": "application/json",
+  },
+  // body payload will be according to your use-case
+  body: JSON.stringify({
+    igBusinessId,
+    mediaContainerId,
+    profileKey,
+    userType,
+    igHandle,
+    publishPostId: publishPostResult.id,
+  }),
+  callback: "your-callback-endpoint-which-we-created-earlier", // https://domain-name/api/instagram/post/callback
+});
+```
+
+> That was a lot of learning! You’re all done now ✨
+
+## **Deploy to Fly.io**
+
+The Remix template comes in with a baked-in setup for **[Fly.io](http://fly.io/)**, specifically pertaining to:
+
+- Dockerfile
+- fly.toml
+- .dockerignore
+
+Once you have a **[Fly.io](https://fly.io/)** account, you can **[create an app](https://fly.io/docs/flyctl/launch/)** in Fly.io by executing the following command in your terminal at the root directory:
+
+```bash
+*# Create an app based on the baked-in configuration in your account
+# This will result only in the change of app name in existing fly.toml*
+
+fly launch
+```
+
+and **[deploy to Fly.io](https://fly.io/docs/flyctl/deploy/)** executing the following command in your terminal:
+
+```bash
+*# Deploy the app based on the configuration created above*
+
+fly deploy
+```
+
+## **Conclusion**
+
+In this guide, you learned how to publish an Instagram post using QStash. With QStash, you gain the ability to alleviate the load on your application and execute the job in the background, all with just a few lines of code.
