@@ -607,25 +607,25 @@ export default function CompareTable() {
             hidden={isMobile ? !showFree : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
-            <CompareValue suffix="Coming soon" />
+            <CompareValue type="boolean" />
           </td>
           <td
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0 align-top"
           >
-            <CompareValue suffix="Coming soon" />
+            <CompareValue type="boolean" />
           </td>
           <td
             hidden={isMobile ? !showFixed : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
-            <CompareValue suffix="Coming soon" />
+            <CompareValue type="boolean" />
           </td>
           <td
             hidden={isMobile ? !showPro : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
-            <CompareValue suffix="Coming soon" />
+            <CompareValue type="boolean" />
           </td>
         </tr>
 
@@ -638,25 +638,25 @@ export default function CompareTable() {
             hidden={isMobile ? !showFree : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
-            <CompareValue suffix="Coming soon" />
+            <CompareValue type="boolean" />
           </td>
           <td
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0 align-top"
           >
-            <CompareValue suffix="Coming soon" />
+            <CompareValue type="boolean" />
           </td>
           <td
             hidden={isMobile ? !showFixed : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
-            <CompareValue suffix="Coming soon" />
+            <CompareValue type="boolean" />
           </td>
           <td
             hidden={isMobile ? !showPro : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
-            <CompareValue suffix="Coming soon" />
+            <CompareValue type="boolean" />
           </td>
         </tr>
 
