@@ -1,6 +1,6 @@
 ---
 slug: publish-instagram-post-with-qstash-and-remix
-title: "Publish Instagram Post with QStash and Remix"
+title: "Streamline Instagram Posts: Using Remix and QStash"
 authors:
   - amit
 tags: [qstash, remix, fly.io]
@@ -32,7 +32,7 @@ To complete this guide and deploy your own article recommendation system, you'll
 
 - **[Set up the Remix project](#set-up-the-project)**
 - **[Obtain the QStash secret key](#obtain-the-qstash-secret-key)**
-- **[Create a CF worker Endpoint](#create-a-cf-worker-endpoint)**
+- **[Create a Cloudflare Workers Endpoint](#create-a-Cloudflare-worker-endpoint)**
 - **[Create a callback Endpoint](#create-a-callback-endpoint)**
 - **[Create a QStash with a scheduler](#create-a-qstash-with-a-scheduler)**
 - **[Deploy To Fly.io](#deploy-to-flyio)**
@@ -80,14 +80,14 @@ npm run dev
 
 Follow along to understand the relevant parts of the code that allow you to successfully build your own Instagram post engine.
 
-## **Create a CF worker Endpoint**
+## **Create a Cloudflare Workers Endpoint**
 
-We will create a Cloudflare worker endpoint with the following command.
+We will create a Cloudflare Workers endpoint with the following command.
 
 ```bash
-# You don’t need CF worker endpoint to implement QStash feature.
+# You don’t need Cloudflare Workers endpoint to implement QStash feature.
 # You can build on any endpoint.
-# this will install the CF packages and lead you through setup.
+# this will install the Cloudflare packages and lead you through setup.
 
 npm create cloudflare@latest
 ```
@@ -135,7 +135,7 @@ export default {
 
 ## **Create a callback Endpoint**
 
-A callback endpoint is necessary because once we initiate the QStash with a scheduler, the destination endpoint (in our case, a CF worker) will call our callback endpoint and provide the necessary information.
+A callback endpoint is necessary because once we initiate the QStash with a scheduler, the destination endpoint (in our case, a Cloudflare Workers) will call our callback endpoint and provide the necessary information.
 
 ```tsx
 // Assuming that you have already created a container using the following API:
