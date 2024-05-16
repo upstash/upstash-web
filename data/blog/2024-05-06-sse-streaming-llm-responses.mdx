@@ -220,23 +220,23 @@ The code above does the following:
 
 Further, create a file named `route.ts` with the following code in the `app/api/stream/completion` directory. The changes from the initial streaming route handler that you created have been higlighted below:
 
-```diff
+```tsx title="app/api/stream/completion/route.ts" ins={6,9,10,15,16}
 // File: app/api/stream/completion/route.ts
 
 // Prevents this route's response from being cached on Vercel
 export const dynamic = "force-dynamic";
 
-+ import { completionModel } from "@/app/lib/completionModel";
+import { completionModel } from "@/app/lib/completionModel";
 
 export async function POST(request: Request) {
-+  // Obtain the user message from request's body
-+  const { message } = await request.json();
+  // Obtain the user message from request's body
+  const { message } = await request.json();
   const encoder = new TextEncoder();
   // Create a streaming response
   const customReadable = new ReadableStream({
     async start(controller) {
-+      // Generate a streaming response from OpenAI with LangChain
-+      await completionModel(controller, encoder).invoke(message);
+      // Generate a streaming response from OpenAI with LangChain
+      await completionModel(controller, encoder).invoke(message);
     },
   });
   // Return the stream response and keep the connection alive
@@ -260,16 +260,18 @@ Apart from what you did earlier to create a streaming endpoint in Next.js, the c
 
 To cache user queries and their responses with Upstash, import the Upstash Redis cache client into the `completionModel` function as follows:
 
-```diff
+```tsx title="app/lib/completionModel.tsx" ins={4,11}
+// File: app/lib/completionModel.tsx
+
 import { OpenAI } from "@langchain/openai";
-+ import cache from '@/app/lib/upstashCache';
+import cache from '@/app/lib/upstashCache';
 
 export const completionModel = (
   controller: ReadableStreamDefaultController,
   encoder: TextEncoder
 ) =>
   new OpenAI({
-+   cache,
+    cache,
     streaming: true,
     temperature: 0.9,
     callbacks: [
@@ -344,28 +346,28 @@ The code above does the following:
 
 Further, create a file named `route.ts` with the following code in the `app/api/stream/completion/chat` directory. The changes from the initial streaming route handler that you created have been higlighted below:
 
-```diff
+```tsx title="app/api/stream/completion/chat/route.ts" ins={6-9,13,14,18-21}
 // File: app/api/stream/completion/chat/route.ts
 
 // Prevents this route's response from being cached on Vercel
 export const dynamic = "force-dynamic";
 
-+ import {
-+   type ConversationMessage,
-+   chatCompletionModel,
-+ } from "@/app/lib/chatCompletionModel";
+import {
+  type ConversationMessage,
+  chatCompletionModel,
+} from "@/app/lib/chatCompletionModel";
 
 export async function POST(request: Request) {
-+   // Obtain the conversation messages from request's body
-+   const { messages = [] } = await request.json();
+  // Obtain the conversation messages from request's body
+  const { messages = [] } = await request.json();
   const encoder = new TextEncoder();
   // Create a streaming response
   const customReadable = new ReadableStream({
     async start(controller) {
-+       // Generate a streaming response from OpenAI with LangChain
-+       await chatCompletionModel(controller, encoder).invoke(
-+         messages.map((i: ConversationMessage) => [i["role"], i["content"]])
-+       );
+      // Generate a streaming response from OpenAI with LangChain
+      await chatCompletionModel(controller, encoder).invoke(
+        messages.map((i: ConversationMessage) => [i["role"], i["content"]])
+      );
     },
   });
   // Return the stream response and keep the connection alive
@@ -389,8 +391,10 @@ Apart from what you did earlier to create a streaming endpoint in Next.js, the c
 
 To cache the chat history with Upstash, import the Upstash Redis cache client into the `chatCompletionModel` function as follows:
 
-```diff
-+ import cache from '@/app/lib/upstashCache';
+```tsx title="app/lib/chatCompletionModel.tsx" ins={3,18}
+// File: app/lib/chatCompletionModel.tsx
+
+import cache from '@/app/lib/upstashCache';
 import { ChatOpenAI } from "@langchain/openai";
 
 export type ConversationMessage = {
@@ -405,7 +409,7 @@ export const chatCompletionModel = (
   encoder: TextEncoder
 ) =>
   new ChatOpenAI({
-+   cache,
+    cache,
     streaming: true,
     temperature: 0.9,
     callbacks: [
@@ -475,15 +479,17 @@ export default function () {
 
 To manage the state of the conversation between the user and chatbot, you can use state variables. You would update the state variables `messages` and `latestMessage` to store the conversation history and the latest message, respectively. By updating these state variables within the loop that processes incoming data from the SSE API, you can ensure real-time updates of the conversation display. The code additions to achieve the same are as follows:
 
-```diff
+```tsx title="app/page.tsx" ins={5,6,9,10,29,34-41,44-46}
+// File: app/page.tsx
+
 "use client";
 
-+ import { useEffect, useState } from "react";
-+ import { ConversationMessages } from "@/app/lib/chatCompletionModel";
+import { useEffect, useState } from "react";
+import { ConversationMessages } from "@/app/lib/chatCompletionModel";
 
 export default function () {
-+  const [latestMessage, setLatestMessage] = useState<string>("");
-+  const [messages, setMessages] = useState<ConversationMessages>([]);
+  const [latestMessage, setLatestMessage] = useState<string>("");
+  const [messages, setMessages] = useState<ConversationMessages>([]);
 
   const obtainAPIResponse = async (apiRoute: string, apiData: any) => {
     // Initiate the first call to connect to SSE API
@@ -502,24 +508,24 @@ export default function () {
       .pipeThrough(new TextDecoderStream())
       .getReader();
 
-+    let incomingMessage = "";
+    let incomingMessage = "";
 
     while (true) {
       const { value, done } = await reader.read();
       if (done) {
-+        // Insert the response received into the messages state
-+        setMessages((messages) => [
-+          ...messages,
-+          { role: "assistant", content: incomingMessage },
-+        ]);
-+        // Reset the latest message's state received 
-+        setLatestMessage("");
+        // Insert the response received into the messages state
+        setMessages((messages) => [
+          ...messages,
+          { role: "assistant", content: incomingMessage },
+        ]);
+        // Reset the latest message's state received 
+        setLatestMessage("");
         break;
       }
       if (value) {
-+        // Append the incoming data to latest message's value
-+        incomingMessage += value;
-+        setLatestMessage(incomingMessage);
+        // Append the incoming data to latest message's value
+        incomingMessage += value;
+        setLatestMessage(incomingMessage);
       }
     }
   };

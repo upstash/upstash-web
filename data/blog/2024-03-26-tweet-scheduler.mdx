@@ -166,19 +166,19 @@ Once that is done, you would now see a `ui` directory inside the `app/components
 
 Next, open up the `app/layout.tsx` file, and make the following additions:
 
-```diff
-+ // File: app/layout.tsx
+```tsx title="app/layout.tsx" ins={4,6,7,9-12,27,30}
+// File: app/layout.tsx
 
 import './globals.css'
-+ import { cn } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 import type { Metadata } from 'next'
-+ import { Inter } from 'next/font/google'
-+ import { Toaster } from '@/components/ui/toaster'
+import { Inter } from 'next/font/google'
+import { Toaster } from '@/components/ui/toaster'
 
-+ const fontSans = Inter({
-+   subsets: ['latin'],
-+   variable: '--font-sans',
-+ })
+const fontSans = Inter({
+  subsets: ['latin'],
+  variable: '--font-sans',
+})
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -193,10 +193,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-+       className={cn(fontSans.variable, 'min-w-screen flex min-h-screen flex-col items-center justify-center bg-background font-sans antialiased')}
+        className={cn(fontSans.variable, 'min-w-screen flex min-h-screen flex-col items-center justify-center bg-background font-sans antialiased')}
       >
-         {children}
-+        <Toaster />
+        {children}
+        <Toaster />
       </body>
     </html>
   )

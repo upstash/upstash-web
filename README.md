@@ -62,7 +62,7 @@
 ![](public/readme/code-title.png)
 
 ````mdx
-```javascript title:"pages/api/hello.ts"
+```javascript title="pages/api/hello.ts"
 import type { NextRequest } from 'next/server';
 import { Redis } from '@upstash/redis';
 ```
@@ -71,7 +71,7 @@ import { Redis } from '@upstash/redis';
 ![](public/readme/code-showLineNumber.png)
 
 ````mdx
-```javascript:pages/api/hello.ts showLineNumbers {5-8,12}
+```javascript title="pages/api/hello.ts" ins={1} del={2}
 import type { NextRequest } from 'next/server';
 import { Redis } from '@upstash/redis'
 ```

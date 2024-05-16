@@ -1,5 +1,4 @@
 import "../post.css";
-import "../code.css";
 
 import { ReactNode } from "react";
 import { Metadata } from "next";
