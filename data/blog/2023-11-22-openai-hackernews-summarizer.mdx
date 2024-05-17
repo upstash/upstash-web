@@ -546,8 +546,8 @@ Now, it's time to make our APIs we will start with `summarize` end point.
 import { NextResponse } from "next/server";
 
 import { setArticles } from "@/commands/set";
-import { getSummarizedArticles } from "@/services/summarizer";
-import { verifySignatureAppRouter } from "@upstash/qstash/dist/nextjs";
+import { getSummarizedArticles } from "@/serviceks/summarizer";
+import { verifySignatureAppRouter } from "@upstash/qstash/nextjs";
 
 export const maxDuration = 300;
 
