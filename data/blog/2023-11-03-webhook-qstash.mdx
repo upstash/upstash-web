@@ -140,7 +140,7 @@ Now we can create the API endpoint that QStash will call. We will create a new f
 
 ```tsx
 import { NextRequest, NextResponse } from "next/server";
-import { verifySignatureEdge } from "@upstash/qstash/dist/nextjs";
+import { verifySignatureEdge } from "@upstash/qstash/nextjs";
 
 // QStash will call this endpoint with the data it received earlier.
 async function handler(_req: NextRequest) {
