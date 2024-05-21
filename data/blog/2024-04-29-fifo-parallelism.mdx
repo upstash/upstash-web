@@ -52,15 +52,19 @@ curl -XPOST https://qstash.upstash.io/v2/batch -H 'Authorization: Bearer XXX'  -
     -d '
      [
       {
-        "destination": "https://example.com/destination1"
-        "topic" : myTopic, 
+        "destination": "myTopic",
         "body" : "message" 
       },
       {
-        "destination": "https://example.com/destination2"
+        "destination": "myTopic",
+        "body" : "message",
+        "queue": "MY_QUEUE"
       },
       {
         "destination": "https://example.com/destination2"
+      },
+      {
+        "destination": "https://example.com/destination2",
         "queue": "MY_QUEUE"
       }
      ]'
