@@ -6,7 +6,7 @@ authors:
 tags: [vector, rag, upstash, expo, chatbot, llama, ai]
 ---
 
-Vercel KV is an invaluable tool for web projects, yet its extensive use can lead to a rapid increase in the number of HTTP requests, potentially impacting performance. While pipelines offer a way to batch commands and reduce these requests, they can be cumbersome to implement. Is there a solution that combines the efficiency of pipelines with the simplicity of basic Redis commands? In comes ***auto-pipelining*** – offering a seamless way to enhance performance without the coding complexity.
+Vercel KV is an invaluable tool for web projects, yet its extensive use can lead to a rapid increase in the number of HTTP requests, potentially impacting performance.While Redis pipelines offer a way to batch commands and reduce requests, they can be difficult to implement. Is there a solution that combines the efficiency of pipelines with the simplicity of basic Redis commands? In comes ***auto-pipelining*** – offering a seamless way to enhance performance without the coding complexity.
 
 ## The Problem
 
@@ -80,7 +80,7 @@ private async deferExecution() {
 }
 ```
 
-Upon calling `deferExecution`, the command yields control of the Node main thread. The next `GET` command in the sequence then gains control of the thread and proceeds with its execution, doing exactly the same thing as the first `GET`: Adding itself to the active pipeline and yielding the control of the thread.
+Upon calling `deferExecution`, the command yields control of the Node.js main thread. The next `GET` command in the sequence then gains control of the thread and proceeds with its execution, doing exactly the same thing as the first `GET`: Adding itself to the active pipeline and yielding the control of the thread.
 
 Here is the auto pipeline logic as pseudo-code:
 
@@ -126,4 +126,4 @@ After enabling auto-pipelining, this process is optimized with the flip of a swi
 
 Before the implementation of auto-pipelining, these Redis requests led to a significant number of individual HTTP requests, slowing down page load times. However, with auto-pipelining enabled, these requests are efficiently batched into pipelines, reducing the number of HTTP requests required. Consequently, the page load time is improved, decreasing from around 450ms to around 200ms.
 
-The v0 team initially shipped auto-pipelining as a hack for themselves. Now, the code has been upstreamed in Upstash’s Redis client version 1.31.3, allowing everyone to benefit from it by activating a simple option in the Redis client. Additionally, it’s now enabled by default in Vercel KV version 2.0.0.
+The v0 team initially shipped auto-pipelining as a hack for themselves. Auto-pipelining is now available in v1.31.3 of Upstash’s Redis client, as well as v2.0 of Vercel KV. Continue reading to learn more about how it works.
