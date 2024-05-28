@@ -91,22 +91,22 @@ let commandIndex: number;
 
 const executeCommand = (command) => {
   activePipeline = activePipeline || createNewPipeline();
-	activePipeline.addCommand(command);
-	commandIndex++;
-	
-	const pipelinePromise = deferExecution().then(() => {
-		if (!pipelinePromises.has(activePipeline) {
-			const pipelinePromise = pipeline.exec();
+  activePipeline.addCommand(command);
+  commandIndex++;
+  
+  const pipelinePromise = deferExecution().then(() => {
+    if (!pipelinePromises.has(activePipeline) {
+      const pipelinePromise = pipeline.exec();
 
       pipelinePromises.set(pipeline, pipelinePromise);
       activePipeline = null;
       commandIndex = 0
-		};
-		return pipelinePromises.get(pipeline)!;
-	});
-	
-	const result = await pipelinePromise;
-	return result[commandIndex];
+    };
+    return pipelinePromises.get(activePipeline)!;
+  });
+  
+  const result = await pipelinePromise;
+  return result[commandIndex];
 };
 ```
 
