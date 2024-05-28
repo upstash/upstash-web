@@ -126,4 +126,4 @@ After enabling auto-pipelining, this process is optimized with the flip of a swi
 
 Before the implementation of auto-pipelining, these Redis requests led to a significant number of individual HTTP requests, slowing down page load times. However, with auto-pipelining enabled, these requests are efficiently batched into pipelines, reducing the number of HTTP requests required. Consequently, the page load time is improved, decreasing from around 450ms to around 200ms.
 
-The v0 team initially shipped auto-pipelining as a hack for themselves. Auto-pipelining is now available in v1.31.3 of Upstash’s Redis client, as well as v2.0 of Vercel KV. Continue reading to learn more about how it works.
+The v0 team initially shipped auto-pipelining as a hack for themselves. Auto-pipelining is now available in v1.31.3 of Upstash’s Redis client, as well as v2.0 of Vercel KV. 
