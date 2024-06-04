@@ -352,4 +352,8 @@ export const authors: Record<
         title: "CTO @ Vercel (Guest Author)",
         image: "malte.jpeg",
     },
+    metin: {
+        name: "Metin Dumandag",
+        title: "Software Engineer @Upstash",
+    },
 };

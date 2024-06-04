@@ -1,0 +1,241 @@
+---
+title: "Introducing Chat Completions For QStash"
+slug: introducing-chat-completions-for-qstash
+authors:
+  - metin
+tags: [announce]
+---
+
+QStash was heavily utilized to perform chat completions using large language
+models as the task scheduler. It is capable of performing tasks that take
+a lot of time, notify you with callbacks when it is done, or retry the task
+if something goes wrong, along with other nice features.
+
+In our pursuit of becoming a serverless data platform, we are introducing
+new products and capabilities to make it easier for our users to ship
+various applications faster, with prices that scales to zero.
+
+With that in mind, we are happy to announce LLM based chat completion APIs
+and seamless integration of it with all the existing QStash features!
+
+## Chat Completions
+
+We are starting by providing 2 models that can be used to perform multi
+or single turn chat completion tasks.
+
+With this endpoint, you will be capable of answering questions,
+generating all kinds of texts, writing and debugging code,
+doing translations between various languages, and all kinds of tasks
+you can think of by using the top open source large language models.
+
+```shell
+# Get a single turn response
+curl "https://qstash.upstash.io/llm/v1/chat/completions" \
+    -X POST \
+    -H "Authorization: Bearer QSTASH_TOKEN" \
+    -H "Content-Type: application/json" \
+    -d '{
+        "model": "meta-llama/Meta-Llama-3-8B-Instruct",
+        "messages": [
+            {
+                "role": "user",
+                "content": "What is the capital of Turkey?"
+            }
+        ]
+    }'
+
+# Or, get a multi turn response by passing the message history
+curl "https://qstash.upstash.io/llm/v1/chat/completions" \
+    -X POST \
+    -H "Authorization: Bearer QSTASH_TOKEN" \
+    -H "Content-Type: application/json" \
+    -d '{
+        "model": "meta-llama/Meta-Llama-3-8B-Instruct",
+        "messages": [
+            {
+                "role": "user",
+                "content": "What is the capital of Turkey?"
+            },
+            {
+                "role":"assistant",
+                "content":"The capital of Turkey is Ankara."
+            },
+            {
+                "role": "user",
+                "content": "What is the population of that city?"
+            }
+        ]
+    }'
+
+# Or, get the responses in smaller chunks in a streaming manner
+curl "https://qstash.upstash.io/llm/v1/chat/completions" \
+    -X POST \
+    -N \
+    -H "Authorization: Bearer QSTASH_TOKEN" \
+    -H "Content-Type: application/json" \
+    -d '{
+        "model": "meta-llama/Meta-Llama-3-8B-Instruct",
+        "messages": [
+            {
+                "role": "user",
+                "content": "What is a serverless data platform?"
+            }
+        ],
+        "stream": true
+    }'
+```
+
+This endpoint is also compatible with the OpenAI REST API. That will allow you
+to use a wide variety of tools and libraries by changing just the endpoint.
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://qstash.upstash.io/llm/v1",
+    api_key="QSTASH_TOKEN",
+)
+
+chat_completion = client.chat.completions.create(
+    messages=[
+        {
+            "role": "user",
+            "content": "Test message from the OpenAI client",
+        }
+    ],
+    model="meta-llama/Meta-Llama-3-8B-Instruct",
+)
+
+print(chat_completion)
+```
+
+For the model inference, we are using [vLLM](https://docs.vllm.ai/en/stable/)
+as a high-throughput and memory efficient engine, to deliver the maximum
+performance on high-end hardware.
+
+For the time being, we will be supporting the following models.
+
+- `meta-llama/Meta-Llama-3-8B-Instruct`
+- `mistralai/Mistral-7B-Instruct-v0.2`
+
+We are planning to add more models with various sizes along the way, so feel
+free to reach us if you are in need of a certain mode or have some model
+recommendations.
+
+See our [pricing page](https://upstash.com/pricing/qstash) for more
+information about the limits and pricing of chat completions.
+
+## Integration with QStash
+
+The chat completions API is really useful on its own, but the important news
+is that we have integrated it into existing QStash APIs seamlessly.
+
+You can now publish or enqueue a LLM chat completion by specifying
+destination as the `api/llm`.
+
+```shell
+curl "https://qstash.upstash.io/v2/publish/api/llm" \
+    -X POST \
+    -H "Authorization: Bearer QSTASH_TOKEN" \
+    -H "Content-Type: application/json" \
+    -H "Upstash-Callback: https://your-callbak-url.com/" \
+    -d '{
+        "model": "meta-llama/Meta-Llama-3-8B-Instruct",
+        "messages": [
+            {
+                "role": "user",
+                "content": "Write me a python function that calculates the nth fibonacci number"
+            }
+        ]
+    }'
+```
+
+This way, when the result of the chat completion request is ready, the callback
+will be notified with it.
+
+With publish and enqueue APIs, all the existing QStash features work, such as
+delays, retries, ordered delivery, or controlled parallelism without an extra
+effort.
+
+```shell
+# Publish a chat completion task that will be executed after 1 minute
+# delay with at most 2 retries
+curl "https://qstash.upstash.io/v2/publish/api/llm" \
+    -X POST \
+    -H "Authorization: Bearer QSTASH_TOKEN" \
+    -H "Content-Type: application/json" \
+    -H "Upstash-Callback: https://your-callbak-url.com/" \
+    -H "Upstash-Delay: 1m" \
+    -H "Upstash-Retries: 2" \
+    -d '{
+        "model": "meta-llama/Meta-Llama-3-8B-Instruct",
+        "messages": [
+            {
+                "role": "user",
+                "content": "List 10 places to go in the Mediterranean coast"
+            }
+        ]
+    }'
+
+# Enqueue a chat completion task with ordered delivery and
+# controlled parallelism (inherited from the queue)
+curl "https://qstash.upstash.io/v2/enqueue/queue-name/api/llm" \
+    -X POST \
+    -H "Authorization: Bearer QSTASH_TOKEN" \
+    -H "Content-Type: application/json" \
+    -H "Upstash-Callback: https://your-callbak-url.com/" \
+    -d '{
+        "model": "meta-llama/Meta-Llama-3-8B-Instruct",
+        "messages": [
+            {
+                "role": "user",
+                "content": "What is wrong with this Python code?\na=3\nprintt(a)"
+            }
+        ]
+    }'
+```
+
+Also, in case you exceed your rate limits for the chat completions, QStash
+makes sure to retry your completion requests when the limit would reset, saving
+you from retrying prematurely. This happens automatically in publish, enqueue, or
+batch endpoints.
+
+```shell
+# If the second request and onward fails due to rate limit error, they will be
+# retried when the rate limit resets automatically.
+curl "https://qstash.upstash.io/v2/batch" \
+    -X POST \
+    -H "Authorization: Bearer QSTASH_TOKEN" \
+    -H "Content-Type: application/json" \
+    -d '[
+        {
+            "destination": "api/llm",
+            "body": {...},
+            "headers": {...}
+        },
+        {
+            "destination": "api/llm",
+            "body": {...},
+            "headers": {...}
+        },
+        ...
+    ]'
+```
+
+Feel free to play with all of these APIs and tell us your feedback in
+[Discord](https://upstash.com/discord). We would be happy to assist you
+along the way, and improve the QStash with your feedback!
+
+## Spoiler: Future of QStash
+
+We envision QStash to be a tool to orchestrate your application logic with
+various APIs that composes nicely, like a workflow.
+
+Soon, you will be able to write code that defines what to do, and let the
+QStash handle scheduling, delaying, retrying, joining, or forking
+long-running jobs and let you ship your application faster and safer.
+
+The LLM chat completion API is first of hopefully many of the APIs that will
+be supported by QStash natively. We plan to bring more capabilities to QStash
+soon, and let you compose all of them orthogonally with each other with type
+safe code through our SDKs.
