@@ -355,5 +355,6 @@ export const authors: Record<
     metin: {
         name: "Metin Dumandag",
         title: "Software Engineer @Upstash",
+        image: "metin.jpg",
     },
 };
