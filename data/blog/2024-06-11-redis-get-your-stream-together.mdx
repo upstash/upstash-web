@@ -8,7 +8,7 @@ tags: [upstash, redis]
 
 S* stands for Stream, what were you expecting? Yes, there is an interesting bug in Redis Stream and I want to talk about it.
 
-A disclaimer before we start. This is not a rant. Software has bugs; we are humans after all (in a world where AIs still make worse mistakes, this is a bit awkward to say). This was just interesting enough to talk about. As a matter of fact, while working on this one, I realized we have a an issue in our implementation as well.
+A disclaimer before we start. This is not a rant. Software has bugs; we are humans after all (in a world where AIs still make worse mistakes, this is a bit awkward to say). This was just interesting enough to talk about. As a matter of fact, while working on this one, I realized we have a an issue in our implementation as well. 
 
 This is interesting to me because the spec is really well-written. It is so detailed that it must have been written after the implementation. Such a detailed spec cannot be written before the implementation. At least, this is true for me. I need to write most of the code to create a good design/spec/doc. So, this behavior must have broken in Redis at some point. I will not dig into the details of where it broke; our friendly rivals at RedisLabs can do that, I think.
 
@@ -113,7 +113,7 @@ If the spec is not clear to you at this point, no worries. I will try to get int
 
 ### Bug
 
-I will use the same commands as an example that I shared in [the bug report](TODO sancar put link here) on the Redis repo.
+I will use the same commands as an example that I shared in [the bug report](https://github.com/redis/redis/issues/13337) on the Redis repo.
 
 ```
 127.0.0.1:6379> XGROUP CREATE planets processing $ MKSTREAM
