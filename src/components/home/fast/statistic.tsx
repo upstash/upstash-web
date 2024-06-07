@@ -21,7 +21,7 @@ export default function FastStatistic() {
         )}
       >
         <FastCard>
-          <FastCardValue>15B</FastCardValue>
+          <FastCardValue>25B</FastCardValue>
           <FastCardTitle>REDIS COMMANDS / WEEK</FastCardTitle>
         </FastCard>
 
