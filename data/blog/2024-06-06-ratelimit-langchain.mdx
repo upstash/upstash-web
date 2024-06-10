@@ -6,7 +6,7 @@ authors:
 tags: [upstash, ratelimit, langchain]
 ---
 
-In this post, we will showcase how [Upstash Ratelimit](https://upstash.com/docs/oss/sdks/ts/ratelimit/overview) can be used in LangChain.
+In this post, we will showcase how [Upstash Ratelimit](https://upstash.com/docs/oss/sdks/ts/ratelimit/overview) can be used in LangChain in Javascript and in Python.
 
 ### Motivation
 
@@ -23,6 +23,12 @@ Start by installing `@upstash/ratelimit` and `@langchain/community` (you can fin
 
 ```bash
 npm install @upstash/ratelimit @langchain/community
+```
+
+If you are using Python, run:
+
+```bash
+pip install upstash-ratelimit langchain-community
 ```
 
 Then, set the environment variables `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`. You can get these environment variables by going to [the Upstash console](https://console.upstash.com/redis) and [creating a redis instance](https://upstash.com/docs/redis/overall/getstarted).
@@ -55,10 +61,15 @@ const chain = new RunnableLambda({ func: (str: string): string => str });
 Finally, create a callback and invoke the chain:
 
 ```tsx
+import {
+  UpstashRatelimitHandler,
+  UpstashRatelimitError,
+} from "@langchain/community/callbacks/handlers/upstash_ratelimit";
+
 const user_id = getUserId(); // your own method to get user ids
 
 try {
-  const response = await chain.invoke("hello world", {
+  const response = await chain.invoke("Hello World!", {
     callbacks: [
       new UpstashRatelimitHandler(user_id, {
         requestRatelimit: ratelimit,
@@ -68,14 +79,50 @@ try {
   console.log(response);
 } catch (err) {
   if (err instanceof UpstashRatelimitError) {
-    console.log("Handling ratelimit.");
+    console.log("Handling ratelimit!");
   }
 }
 ```
 
+Here is the same code written in Python:
+
+```py
+from upstash_redis import Redis
+from upstash_ratelimit import Ratelimit, FixedWindow
+
+from langchain_core.runnables import RunnableLambda
+from langchain_community.callbacks import UpstashRatelimitError, UpstashRatelimitHandler
+
+# your own method to get user ids
+const user_id = getUserId();
+
+# mock chain
+chain = RunnableLambda(str)
+
+# init ratelimiter
+ratelimit = Ratelimit(
+    redis=Redis.from_env(),
+    # 10 requests per window, where window size is 60 seconds:
+    limiter=FixedWindow(max_requests=10, window=60),
+)
+
+try:
+    response = chain.invoke("Hello World!", {
+        "callbacks": [
+            UpstashRatelimitHandler(
+                identifier=user_id,
+                request_ratelimit: ratelimit,
+            )
+        ]
+    })
+except UpstashRatelimitError:
+    print("Handling ratelimit!")
+
+```
+
 Note that we initialize the callback when we invoke the chain. This is because the handler has a state which needs to be reset with each invocation.
 
-In the configuration above, the handler will allow 10 requests per minute for each user. However, this is not the only way to configure the handler.
+In the configuration above, the handler will allow 10 requests per minute for each user. However, this is not the only way to configure the handler. To learn more about Ratelimit callbacks in LangChain, see the Upstash Ratelimit Callback documentation for [TypeScript](https://js.langchain.com/v0.2/docs/integrations/callbacks/upstash_ratelimit_callback) and [Python](https://python.langchain.com/v0.2/docs/integrations/callbacks/upstash_ratelimit/).
 
 You can also rate limit based on the number of tokens. You can configure the handler to rate limit based on requests, number of tokens, or both. To add token-based rate limiting, use the `tokenRatelimit` parameter when initializing the handler:
 
