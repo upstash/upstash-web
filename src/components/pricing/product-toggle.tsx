@@ -13,10 +13,10 @@ export default function ProductToggle({ product }: { product: string }) {
   return (
     <div className="flex justify-center">
       <div className="flex gap-3 rounded-xl border border-white/5 p-2">
-        {["/", "/kafka", "/vector", "/qstash"].map((key) => {
+        {["/redis", "/kafka", "/vector", "/qstash"].map((key) => {
           const isActive = product === key;
 
-          const isRedis = key === "/";
+          const isRedis = key === "/redis";
           const isKafka = key === "/kafka";
           const isVector = key === "/vector";
           const isQStash = key === "/qstash";

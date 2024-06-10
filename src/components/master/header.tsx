@@ -17,7 +17,6 @@ import NewNavigation from "./new-nav";
 
 export default function Header({ className, ...props }: HTMLProps<any>) {
   const segment = useSelectedLayoutSegment();
-  console.log(segment);
 
   const { affiliateCode } = useGetAffiliateCodeFromApi();
   const [fix, setFix] = useState(false);
