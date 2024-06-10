@@ -320,7 +320,7 @@ export const authors: Record<
     },
     arda: {
         name: "Cahid Arda Oz",
-        title: "Software Developer (Guest Author)",
+        title: "Software Engineer @Upstash",
         url: "https://cahidarda.github.io/",
         image: "arda.png",
     },
