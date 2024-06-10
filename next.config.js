@@ -26,6 +26,7 @@ const nextConfig = {
       source: "/docs",
       destination: "https://upstash.mintlify.dev/docs",
     },
+    { source: "/pricing", destination: "/pricing/redis" },
     {
       source: "/docs/:match*",
       destination: "https://upstash.mintlify.dev/docs/:match*",
