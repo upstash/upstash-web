@@ -27,7 +27,7 @@ Recently, we added [ordered-delivery support](https://upstash.com/blog/qstash-fi
 
 QStash uses our Redis implementation to store all the necessary state. It's a perfect dogfooding case. We rely on our own product for another offering, catching some interesting bugs that can only occur in production.
 
-For the new ordered-delivery support, we decided to use Redis Streams. As part of the feature, it was really convenient to provide the number of messages in the queue that are not yet delivered. This is where the `lag` field of [XINFO GROUPS](https://redis.io/docs/latest/commands/xinfo-groups/) comes in, and that is where things become interesting.
+For the new ordered-delivery support, we decided to use Redis Streams (our own home-baked implementation of Streams—phew, we dodged a lawsuit there). As part of the feature, it was really convenient to provide the number of messages in the queue that are not yet delivered. This is where the `lag` field of [XINFO GROUPS](https://redis.io/docs/latest/commands/xinfo-groups/) comes in, and that is where things become interesting.
 
 ### Story
 
