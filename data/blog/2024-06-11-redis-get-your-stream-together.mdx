@@ -8,7 +8,7 @@ tags: [upstash, redis]
 
 S* stands for Stream, what were you expecting? Yes, there is an interesting bug in Redis Stream and I want to talk about it.
 
-A disclaimer before we start. This is not a rant. Software has bugs; we are humans after all (in a world where AIs still make worse mistakes, this is a bit awkward to say). This was just interesting enough to talk about. As a matter of fact, while working on this one, I realized we have a an issue in our implementation as well. 
+A disclaimer before we start. This is not a rant. Software has bugs; we are humans after all (in a world where AIs still make worse mistakes, this is a bit awkward to say). This was just interesting enough to talk about. As a matter of fact, while working on this one, I realized we have an issue in our implementation as well.
 
 This is interesting to me because the spec is really well-written. It is so detailed that it must have been written after the implementation. Such a detailed spec cannot be written before the implementation. At least, this is true for me. I need to write most of the code to create a good design/spec/doc. So, this behavior must have broken in Redis at some point. I will not dig into the details of where it broke; our friendly rivals at RedisLabs can do that, I think.
 
@@ -55,7 +55,7 @@ So far, so good. The implementation of this fix is really simple. The problem ar
 
 #### miniredis
 
-We were using [miniredis](https://github.com/alicebob/miniredis), a `Pure Go Redis server for Go unit tests`. - Did I mention that we implemented the Redis spec and QStash in Go? - This library is perfect for QStash because we don't need to spin up Upstash Redis clusters to test QStash. The first small issue was that lag is not yet implemented in miniredis. It is a non-profit project with a single maintainer, so it is acceptable. As a responsible open-source contributor, I decided to add the missing feature and contribute back to open-source. https://github.com/alicebob/miniredis/pull/377
+We were using [miniredis](https://github.com/alicebob/miniredis), a `Pure Go Redis server for Go unit tests`. - Did I mention that we implemented the Redis spec and QStash in Go? - This library is perfect for QStash because we don't need to spin up Upstash Redis clusters to test QStash. The first small issue was that lag is not yet implemented in miniredis. It is a non-profit project with a single maintainer, so it is acceptable. As a responsible open-source contributor, I decided to add the missing feature and contribute back to open-source with [a pull request](https://github.com/alicebob/miniredis/pull/377)
 
 But there was a problem. The Redis spec and the original Redis do not behave the same. Knowing I would not like the answer, I asked the question to the maintainer (alicebob).
 
@@ -224,3 +224,5 @@ According to both the spec and the latest state, the lag should be 0. It is a us
 Our solution was to reset the `entries-read` to `entries-added`. We relied on the logical definition of `entries-read` being a `logical counter` rather than an exact one.
 
 If you read this far, thanks for your attention. We will continue to do our best to deliver the best experience for our services. Please join us on [Discord](https://upstash.com/discord) and share your thoughts if you see anything wrong or see room for improvement.
+
+UPDATE: A quick-fix came from the redis team [here](https://github.com/redis/redis/pull/13338)
