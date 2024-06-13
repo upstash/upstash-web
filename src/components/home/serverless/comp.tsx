@@ -94,7 +94,6 @@ export function ProductFeatureItem({
       className={cx(
         "flex",
         // product === Product.REDIS && "text-red-300",
-        // product === Product.KAFKA && "text-blue-300",
         // product === Product.QSTASH && "text-purple-300",
         className,
       )}

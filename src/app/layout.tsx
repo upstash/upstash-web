@@ -88,7 +88,7 @@ const title = "Upstash: Serverless Data Platform";
 const description =
   "Designed for the serverless with per-request pricing and Redis®/Kafka® API.";
 
-  export async function generateMetadata () {
+export async function generateMetadata() {
   return {
     metadataBase: new URL(SITE_URL),
     title: {
@@ -98,11 +98,11 @@ const description =
     description,
     keywords: [
       "redis",
-      "kafka",
+      "vector",
       "qstash",
       "serverless database",
       "global database",
-      "serverless kafka",
+      "serverless vector",
     ],
     openGraph: {
       type: "website",
@@ -127,7 +127,7 @@ const description =
     },
     manifest: `${SITE_URL}/site.webmanifest`,
     alternates: {
-      canonical: './',
-    }
+      canonical: "./",
+    },
   };
 }

@@ -1,6 +1,5 @@
 export enum Product {
   REDIS = "Redis",
-  KAFKA = "Kafka",
   QSTASH = "QStash",
   VECTOR = "Vector",
 }

@@ -64,9 +64,6 @@ export default function HttpRestApi() {
             <Pre hidden={product !== Product.REDIS}>
               <code className="lang-js">{CODE[Product.REDIS]}</code>
             </Pre>
-            <Pre hidden={product !== Product.KAFKA}>
-              <code className="lang-js">{CODE[Product.KAFKA]}</code>
-            </Pre>
             <Pre hidden={product !== Product.QSTASH}>
               <code className="lang-js">{CODE[Product.QSTASH]}</code>
             </Pre>{" "}
@@ -105,35 +102,6 @@ const redis = new Redis({
 })
    
 const data = await redis.set('foo', 'bar');`,
-  [Product.KAFKA]: `// Producer
-import { Kafka } from "@upstash/kafka"
-
-const kafka = new Kafka({
-  url: "https://dart-vader-9500-eu1-rest-kafka.upstash.io",
-  username: "USERNAME",
-  password: "PASSWORD",
-})
-
-const p = kafka.producer()
-const res = await p.produce("<my.topic>", { hello: "world" } )
-
-// Consumer
-import { Kafka } from "@upstash/kafka"
-
-const kafka = new Kafka({
-  url: "https://dart-vader-9500-eu1-rest-kafka.upstash.io",
-  username: "USERNAME",
-  password: "PASSWORD",
-})
-
-const c = kafka.consumer()
-
-const messages = await c.consume({
-  consumerGroupId: "group_1",
-  instanceId: "instance_1",
-  topics: ["test.topic"],
-  autoOffsetReset: "earliest",
-})`,
   [Product.QSTASH]: `fetch("https://qstash.upstash.io/v2/publish/https://example.com", {
   body: "{ 'hello': 'world' }",
   headers: {

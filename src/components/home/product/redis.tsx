@@ -46,7 +46,7 @@ export default function ServerlessRedis() {
             track("button.docs.redis");
           }}
         >
-          Read the docs
+          Docs
         </Button>
         <Button
           href="https://github.com/upstash/examples/tree/main/examples"
@@ -56,7 +56,7 @@ export default function ServerlessRedis() {
             track("button.examples.redis");
           }}
         >
-          View examples
+          Examples
         </Button>
       </div>
     </ProductBox>

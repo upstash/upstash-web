@@ -79,7 +79,6 @@ export function ProductFeatureItem({
       className={cx(
         "flex md:w-5/6",
         product === Product.REDIS && "text-red-100",
-        product === Product.KAFKA && "text-blue-100",
         product === Product.QSTASH && "text-purple-100",
         product === Product.VECTOR && "text-orange-100",
         className,
@@ -90,7 +89,6 @@ export function ProductFeatureItem({
         className={cx(
           "mr-2 shrink-0 text-2xl text-[inherit]",
           product === Product.REDIS && "text-red-300",
-          product === Product.KAFKA && "text-blue-300",
           product === Product.QSTASH && "text-purple-300",
           product === Product.VECTOR && "text-orange-300",
           className,

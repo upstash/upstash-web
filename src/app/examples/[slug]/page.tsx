@@ -9,7 +9,6 @@ import Balancer from "react-wrap-balancer";
 import Button from "@/components/button";
 import Container from "@/components/container";
 import { ICON_NAMES } from "@/components/icon";
-import IconKafka from "@/components/icon-kafka";
 import IconQStash from "@/components/icon-qstash";
 import IconRedis from "@/components/icon-redis";
 
@@ -101,20 +100,6 @@ export default async function BlogPage({ params }: Props) {
                               aria-label="Upstash Redis Icon"
                             />
                             <span>Redis</span>
-                          </span>
-                        );
-                      } else if (item === "kafka") {
-                        return (
-                          <span
-                            key={item}
-                            className="flex items-center gap-2 rounded
-                            bg-red-400/10 p-1.5 pr-2 leading-none text-red-200"
-                          >
-                            <IconKafka
-                              width={16}
-                              aria-label="Upstash Kafka Icon"
-                            />
-                            <span>Kafka</span>
                           </span>
                         );
                       } else if (item === "qstash") {
