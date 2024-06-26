@@ -6,7 +6,7 @@ authors:
 tags: [upstash, redis]
 ---
 
-S* stands for Stream, what were you expecting? Yes, there is an interesting bug in Redis Stream and I want to talk about it.
+S* stands for Streams, what were you expecting? Yes, there is an interesting bug in Redis Streams and I want to talk about it.
 
 A disclaimer before we start. This is not a rant. Software has bugs; we are humans after all (in a world where AIs still make worse mistakes, this is a bit awkward to say). This was just interesting enough to talk about. As a matter of fact, while working on this one, I realized we have an issue in our implementation as well.
 
@@ -14,9 +14,9 @@ This is interesting to me because the spec is really well-written. It is so deta
 
 This blog will be in four sections for your convenience if you want to skip some of it.
 
-- [Use Case](#use-case): Why are we using Redis Stream XINFO to get lag?
+- [Use Case](#use-case): Why are we using Redis Streams XINFO to get lag?
 - [Story](#story): How did we realize that there is a bug in the original Redis as well?
-- [Specification](#specification): Description of how stream group lag is defined.
+- [Specification](#specification): Description of how a stream group lag is defined.
 - [Bug](#bug): Redis bug as of version 7.2.4, example runs, outputs, and their descriptions.
 
 ### Use Case
