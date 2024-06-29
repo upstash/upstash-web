@@ -3,6 +3,20 @@ slug: implementing-upstash-kafka-with-cloudflare-workers
 title: "Handling Billions of LLM Logs with Upstash Kafka and Cloudflare Workers"
 authors:
   - cole
+tags:
+  [
+    kafka,
+    upstash,
+    cloudflare workers,
+    serverless,
+    llm observability,
+    log processing,
+    scalable architecture,
+    event streaming,
+    ai infrastructure,
+    distributed systems,
+    batch processing,
+  ]
 ---
 
 ## Problem
@@ -568,3 +582,7 @@ Now, we only log in ClickHouse if the Postgres transaction was successful. To ha
 ## Conclusion
 
 That's a wrap on our Kafka journey! By implementing Kafka with Cloudflare Workers, we've successfully scaled our logging infrastructure to handle billions of LLM logs. This solution decoupled log ingestion from processing, enabled efficient batch processing, and provided flexibility for both real-time and historical data analysis. While complex, this architecture has proven robust for high-volume, variable-load scenarios common in AI applications.
+
+### [Helicone](https://helicone.ai)
+
+We're an open-source LLM observability platform that provides deep visibility into AI operations at scale. Our infrastructure, as described in this blog, allows us to handle billions of logs, offering real-time insights and analytics for your LLM applications. Whether you're a startup or an enterprise, Helicone helps you optimize performance, control costs, and ensure reliability. Ready to supercharge your AI observability? Visit Helicone.ai to get started.
