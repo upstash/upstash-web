@@ -320,7 +320,7 @@ export const authors: Record<
   },
   arda: {
     name: "Cahid Arda Oz",
-    title: "Software Developer (Guest Author)",
+    title: "Software Engineer @Upstash",
     url: "https://cahidarda.github.io/",
     image: "arda.png",
   },
@@ -346,6 +346,11 @@ export const authors: Record<
     name: "Amit Mirgal",
     title: "Software Engineer (Guest Author)",
     image: "amit.jpeg",
+  },
+  malte: {
+    name: "Malte Ubl",
+    title: "CTO @ Vercel (Guest Author)",
+    image: "malte.jpeg",
   },
   cole: {
     name: "Cole Gottdank",

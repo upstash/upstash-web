@@ -87,12 +87,6 @@ const repositories = [
     category: Category.SDK,
   },
   {
-    url: "https://github.com/upstash/upstash-kafka",
-    title: "Kafka JS SDK",
-    description: "HTTP based Kafka client for edge and serverless runtimes.",
-    category: Category.SDK,
-  },
-  {
     url: "https://github.com/upstash/sdk-qstash-ts",
     title: "QStash SDK",
     description: "HTTP based SDK for QStash.",

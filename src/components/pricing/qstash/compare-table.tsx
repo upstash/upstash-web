@@ -337,13 +337,13 @@ export default function CompareTable() {
             hidden={isMobile ? !showFree : false}
             className="bg-white/3 px-4 py-0"
           >
-            <CompareValue>2 min</CompareValue>
+            <CompareValue>15 minutes</CompareValue>
           </td>
           <td
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0"
           >
-            <CompareValue>5 min</CompareValue>
+            <CompareValue>2 hours</CompareValue>
           </td>
           <td
             hidden={isMobile ? !showEnterprise : false}

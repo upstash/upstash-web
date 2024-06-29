@@ -12,7 +12,7 @@ Hey there, wonderful members of our Qstash community! We've had quite a busy mon
 
 Ever wished for ordered delivery and the ability to limit concurrency to prevent overloading your endpoints? You're not alone! These features have been highly requested in our Discord channel, and we're delighted to announce that they're now part of QStash.
 
-![Community](/blog/QStash-fifo/community.png)
+![Community](/blog/qstash-fifo/community.png)
 
 Implementing these features took some time, but we wanted to ensure they were both reliable and user-friendly. 
 
@@ -52,15 +52,19 @@ curl -XPOST https://qstash.upstash.io/v2/batch -H 'Authorization: Bearer XXX'  -
     -d '
      [
       {
-        "destination": "https://example.com/destination1"
-        "topic" : myTopic, 
+        "destination": "myTopic",
         "body" : "message" 
       },
       {
-        "destination": "https://example.com/destination2"
+        "destination": "myTopic",
+        "body" : "message",
+        "queue": "MY_QUEUE"
       },
       {
         "destination": "https://example.com/destination2"
+      },
+      {
+        "destination": "https://example.com/destination2",
         "queue": "MY_QUEUE"
       }
      ]'

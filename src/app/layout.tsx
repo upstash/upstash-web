@@ -86,9 +86,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
 const title = "Upstash: Serverless Data Platform";
 const description =
-  "Designed for the serverless with per-request pricing and Redis®/Kafka® API.";
+  "Upstash is a serverless data platform providing low latency and high scalability for real-time applications. Optimize your data infrastructure with Upstash's managed services for Redis, Vector, QStash, and other key data technologies.";
 
-  export async function generateMetadata () {
+export async function generateMetadata() {
   return {
     metadataBase: new URL(SITE_URL),
     title: {
@@ -98,11 +98,11 @@ const description =
     description,
     keywords: [
       "redis",
-      "kafka",
+      "vector",
       "qstash",
       "serverless database",
       "global database",
-      "serverless kafka",
+      "serverless vector",
     ],
     openGraph: {
       type: "website",
@@ -127,7 +127,7 @@ const description =
     },
     manifest: `${SITE_URL}/site.webmanifest`,
     alternates: {
-      canonical: './',
-    }
+      canonical: "./",
+    },
   };
 }

@@ -16,7 +16,7 @@ export default function HomeHeroProducts({
 }) {
   return (
     <div
-      className="mt-8 grid gap-2 md:mt-16 md:grid-cols-2 xl:grid-cols-4"
+      className="mt-8 grid gap-2 md:mt-16 md:grid-cols-3"
       onMouseLeave={() => setActiveProduct(undefined)}
     >
       <HomeHeroProduct
@@ -35,25 +35,6 @@ export default function HomeHeroProducts({
           )}
         >
           Create Database
-        </HeroProductCta>
-      </HomeHeroProduct>
-
-      <HomeHeroProduct
-        href="https://console.upstash.com"
-        activeProduct={activeProduct}
-        onMouseEnter={() => setActiveProduct(Product.KAFKA)}
-      >
-        <HeroProductTitle>
-          <span>Kafka</span>
-          <span className="text-[.9em] opacity-20">®</span>
-        </HeroProductTitle>
-        <HeroProductDesc>Serverless Kafka and Connectors</HeroProductDesc>
-        <HeroProductCta
-          className={cx(
-            activeProduct === Product.KAFKA && "!bg-blue-500 !text-white",
-          )}
-        >
-          Create Cluster
         </HeroProductCta>
       </HomeHeroProduct>
 
@@ -140,9 +121,6 @@ function HomeHeroProduct({
             switch (activeProduct) {
               case Product.REDIS:
                 segment.track("button.create.redis");
-                break;
-              case Product.KAFKA:
-                segment.track("button.create.kafka");
                 break;
               case Product.QSTASH:
                 segment.track("button.create.qstash");

@@ -1,0 +1,129 @@
+---
+title: "Cutting the v0.dev Load Time in Half with Auto-Pipelining"
+slug: vercel-auto-pipeline
+authors:
+  - malte
+tags: [redis, upstash, vercel, pipeline]
+---
+
+Vercel KV is an invaluable tool for web projects, yet its extensive use can lead to a rapid increase in the number of HTTP requests, potentially impacting performance. While Redis pipelines offer a way to batch commands and reduce requests, they can be difficult to implement. Is there a solution that combines the efficiency of pipelines with the simplicity of basic Redis commands? In comes ***auto-pipelining*** – offering a seamless way to enhance performance without the coding complexity.
+
+## The Problem
+
+Imagine you've built a webpage where Redis is extensively used as a data source. Multiple components making their own Redis calls, with some being rendered multiple times with varying content.
+
+This setup can generate a significant number of requests to Redis each time the webpage is opened. The sheer volume of requests introduces considerable overhead, impacting performance. Additionally, in environments like Cloudflare Workers, where the number of concurrent HTTP requests is severely limited, this becomes a critical issue.
+
+### Regular Pipelines
+
+A conventional solution in such situations is to use Redis pipelines. Instead of sending requests one by one, pipelines allow you to collect multiple commands and execute them together. This way, a single HTTP request carries multiple Redis commands, significantly reducing the number of HTTP requests and improving performance.
+
+```tsx
+import { kv } from '@vercel/kv';
+
+const pipeline = kv.pipeline();
+
+pipeline.set("foo", "bar");
+pipeline.get("foo");
+
+const res = await pipeline.exec();
+console.log(res); // ["OK", "bar"]
+```
+
+### Cons of Pipelines
+
+However, using pipelines introduces significant overhead from a programmer's perspective. The pipeline API differs from the standard Redis API, making enabling or disabling it a non-trivial task.
+
+Moreover, if you need to request data for different components within a single pipeline, you must write the fetching logic separate from where the data will be used. This separation can lead to a fragmented and less maintainable codebase.
+
+## Auto-Pipelining
+
+Auto-pipelining addresses these issues seamlessly. With auto-pipelining, you can enable pipeline functionality in your project without changing your existing code. You can continue using Redis as usual, while the Redis client automatically batches commands whenever possible, enhancing performance effortlessly.
+
+Let's explore how auto-pipelining optimizes a common scenario: fetching values for multiple keys:
+
+```tsx
+const keys = ["key1", "key2", "key3"];
+
+const values = await Promise.all(keys.map(key => kv.get(key)));
+```
+
+Without pipelines, this code will send three HTTP requests to Redis. However, with auto-pipelining enabled, these requests will be batched into a single HTTP request.
+
+### Auto-Pipelines for idiomatic React Server Components
+
+React Server Components (RSC) can fetch their own data. A common example is a tweet component that might be implemented like this
+
+```tsx
+async function Tweet({id}) {
+  const tweet = kv.get(`tweets:${id}`)
+  return <div>{tweet.text}</div>
+}
+```
+
+If you call this component in a loop like
+
+```tsx
+{tweetIds.map(id => <Tweet id={id} />)}
+```
+
+you trigger the same N backend requests as in the example above. Once again, activating auto-pipelining batches the N commands into a single pipeline while retaining the idiomatic react code.
+
+### How it works
+
+Auto-pipelining works by maintaining an 'active pipeline' in the background. Commands add themselves to the pipeline and invoke `deferExecution`:
+
+```tsx
+private async deferExecution() {
+  await Promise.resolve()
+  return await Promise.resolve()
+}
+```
+
+Upon calling `deferExecution`, the command yields control of the Node.js main thread. The next `GET` command in the sequence then gains control of the thread and proceeds with its execution, doing exactly the same thing as the first `GET`: Adding itself to the active pipeline and yielding the control of the thread.
+
+Here is the auto pipeline logic as pseudo-code:
+
+```tsx
+let activePipeline: Pipeline;
+let pipelinePromises: new WeakMap<Pipeline, Promise<Array<unknown>>>();
+let commandIndex: number;
+
+const executeCommand = (command) => {
+  activePipeline = activePipeline || createNewPipeline();
+  activePipeline.addCommand(command);
+  commandIndex++;
+  
+  const pipelinePromise = deferExecution().then(() => {
+    if (!pipelinePromises.has(activePipeline) {
+      const pipelinePromise = pipeline.exec();
+
+      pipelinePromises.set(pipeline, pipelinePromise);
+      activePipeline = null;
+      commandIndex = 0
+    };
+    return pipelinePromises.get(activePipeline)!;
+  });
+  
+  const result = await pipelinePromise;
+  return result[commandIndex];
+};
+```
+
+After adding itself to the active pipeline, the third `GET` also calls `deferExecution`. At this point, since there are no other commands to yield to, one of the deferred `GET` commands will regain control and execute the pipeline.
+
+This pipeline returns three results in our example, each corresponding to the initial commands. Each command tracks the index of its argument, ensuring it receives the correct result from the batch response.
+
+The code behind the auto-pipelining logic is available [here](https://github.com/upstash/redis-js/blob/main/pkg/auto-pipeline.ts).
+
+## Auto-Pipelining in v0.dev
+
+The impact of auto-pipelining on v0.dev's performance is evident from the improvement in the landing page. The landing page showcases examples from past queries and generations. First, it fetches the list of items to display and then makes individual fetches for each item, resulting in numerous Redis requests.
+
+![Untitled](/blog/autopipeline/a.png)
+
+After enabling auto-pipelining, this process is optimized with the flip of a switch. Now, the second part, which used to involve multiple individual fetches, is consolidated into a single pipeline operation.
+
+Before the implementation of auto-pipelining, these Redis requests led to a significant number of individual HTTP requests, slowing down page load times. However, with auto-pipelining enabled, these requests are efficiently batched into pipelines, reducing the number of HTTP requests required. Consequently, the page load time is improved, decreasing from around 450ms to around 200ms.
+
+The v0 team initially shipped auto-pipelining as a hack for themselves. Auto-pipelining is now available in v1.31.3 of Upstash’s Redis client, as well as v2.0 of Vercel KV. 

@@ -6,13 +6,11 @@ import { HTMLProps } from "react";
 import cx from "@/utils/cx";
 
 import Icon, { ICON_NAMES } from "@/components/icon";
-import IconKafka from "@/components/icon-kafka";
 import IconQStash from "@/components/icon-qstash";
 import IconRedis from "@/components/icon-redis";
 
 export const ProductsLabel = {
   redis: "Redis",
-  kafka: "Kafka",
   qstash: "QStash",
 };
 
@@ -23,7 +21,7 @@ const LanguagesLabel = {
   rs: "Rust",
   rb: "Ruby",
   java: "Java",
-  elixir: "Elixir"
+  elixir: "Elixir",
 };
 
 export default function ExampleFilter({
@@ -241,9 +239,8 @@ function FormContent({
     <>
       <Child>
         <div className="flex w-[100%] flex-row items-center justify-between gap-2 space-y-0.5 sm:block md:gap-1">
-          {["redis", "kafka", "qstash"].map((key) => {
+          {["redis", "qstash"].map((key) => {
             const isRedis = key === "redis";
-            const isKafka = key === "kafka";
             const isQStash = key === "qstash";
             const isActive = selectedProducts.includes(key);
 
@@ -265,7 +262,6 @@ function FormContent({
                 }}
                 className={cx(
                   isRedis && isActive && "bg-red-200/10",
-                  isKafka && isActive && "bg-blue-200/10",
                   isQStash && isActive && "bg-purple-200/10",
                   "bg-white/3 py-3",
                 )}
@@ -273,12 +269,6 @@ function FormContent({
                   <>
                     {isRedis && (
                       <IconRedis
-                        width={20}
-                        className={cx("grayscale", isActive && "grayscale-0")}
-                      />
-                    )}
-                    {isKafka && (
-                      <IconKafka
                         width={20}
                         className={cx("grayscale", isActive && "grayscale-0")}
                       />

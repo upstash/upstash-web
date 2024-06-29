@@ -6,7 +6,6 @@ import Image from "next/image";
 import cx from "@/utils/cx";
 import Balancer from "react-wrap-balancer";
 
-import IconKafka from "@/components/icon-kafka";
 import IconQStash from "@/components/icon-qstash";
 import IconRedis from "@/components/icon-redis";
 
@@ -92,15 +91,6 @@ function ExampleProducts({
               key={product}
               width={24}
               aria-label="Upstash Redis Icon"
-              className=""
-            />
-          );
-        } else if (product === "kafka") {
-          return (
-            <IconKafka
-              key={product}
-              width={24}
-              aria-label="Upstash Kafka Icon"
               className=""
             />
           );

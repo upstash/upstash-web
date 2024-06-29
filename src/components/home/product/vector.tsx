@@ -46,7 +46,7 @@ export default function ServerlessVector() {
             track("button.docs.vector");
           }}
         >
-          Read the docs
+          Docs
         </Button>
         <Button
           href="https://drive.google.com/drive/u/1/folders/1_W7MgkKGJmbfVQ_QiW_6qcfq0JZYFnhw"
@@ -56,7 +56,7 @@ export default function ServerlessVector() {
             track("button.examples.vector");
           }}
         >
-          View examples
+          Examples
         </Button>
       </div>
     </ProductBox>

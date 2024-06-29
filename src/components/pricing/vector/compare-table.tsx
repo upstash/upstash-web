@@ -423,19 +423,21 @@ export default function CompareTable() {
             <CompareValue type="list">
               <span>N. Virginia, AWS</span>
               <span>Ireland, AWS</span>
+              <span>Iowa, GCP</span>
             </CompareValue>
           </td>
           <td
-            hidden={isMobile ? !showPayg : false}
+              hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0 align-top"
           >
             <CompareValue type="list">
               <span>N. Virginia, AWS</span>
               <span>Ireland, AWS</span>
+              <span>Iowa, GCP</span>
             </CompareValue>
           </td>
           <td
-            hidden={isMobile ? !showFixed : false}
+              hidden={isMobile ? !showFixed : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
             <CompareValue type="list">

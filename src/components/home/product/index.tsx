@@ -10,7 +10,6 @@ import {
   SectionHeaderTitle,
 } from "@/components/home/section-header";
 
-import Kafka from "./kafka";
 import QStash from "./qstash";
 import Redis from "./redis";
 import Vector from "./vector";
@@ -32,11 +31,10 @@ export default function HomeServerless({}: ISectionHeader) {
         </SectionHeader>
 
         {/* table */}
-        <div className="mt-10 grid gap-4 md:mt-20 md:grid-cols-2 md:gap-6">
+        <div className="mt-10 grid gap-4 md:mt-20 md:grid-cols-3 md:gap-6">
           <Redis />
-          <Kafka />
-          <QStash />
           <Vector />
+          <QStash />
         </div>
       </Container>
     </section>

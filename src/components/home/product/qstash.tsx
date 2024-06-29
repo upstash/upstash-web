@@ -47,7 +47,7 @@ export default function ServerlessQStash() {
             track("button.docs.qstash");
           }}
         >
-          Read the docs
+          Docs
         </Button>
         <Button
           href="https://github.com/upstash/examples/tree/main/examples"
@@ -57,7 +57,7 @@ export default function ServerlessQStash() {
             track("button.examples.qstash");
           }}
         >
-          View examples
+          Examples
         </Button>
       </div>
     </ProductBox>
