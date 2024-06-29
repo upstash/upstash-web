@@ -347,4 +347,10 @@ export const authors: Record<
     title: "Software Engineer (Guest Author)",
     image: "amit.jpeg",
   },
+  cole: {
+    name: "Cole Gottdank",
+    title: "Co-Founder @ Helicone (Guest Author)",
+    url: "https://helicone.ai",
+    image: "cole.jpeg",
+  },
 };
