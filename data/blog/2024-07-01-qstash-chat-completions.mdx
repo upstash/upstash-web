@@ -29,65 +29,83 @@ doing translations between various languages, and all kinds of tasks
 you can think of by using the state of the art open source
 large language models.
 
-```shell
-# Get a single turn response
-curl "https://qstash.upstash.io/llm/v1/chat/completions" \
-    -X POST \
-    -H "Authorization: Bearer QSTASH_TOKEN" \
-    -H "Content-Type: application/json" \
-    -d '{
-        "model": "meta-llama/Meta-Llama-3-8B-Instruct",
-        "messages": [
-            {
-                "role": "user",
-                "content": "What is the capital of Turkey?"
-            }
-        ]
-    }'
+```js
+import { Client } from "@upstash/qstash";
 
-# Or, get a multi turn response by passing the message history
-curl "https://qstash.upstash.io/llm/v1/chat/completions" \
-    -X POST \
-    -H "Authorization: Bearer QSTASH_TOKEN" \
-    -H "Content-Type: application/json" \
-    -d '{
-        "model": "meta-llama/Meta-Llama-3-8B-Instruct",
-        "messages": [
-            {
-                "role": "user",
-                "content": "What is the capital of Turkey?"
-            },
-            {
-                "role":"assistant",
-                "content":"The capital of Turkey is Ankara."
-            },
-            {
-                "role": "user",
-                "content": "What is the population of that city?"
-            }
-        ]
-    }'
+const client = new Client({
+  token: "<QSTASH_TOKEN>",
+});
 
-# Or, get the responses in smaller chunks in a streaming manner
-curl "https://qstash.upstash.io/llm/v1/chat/completions" \
-    -X POST \
-    -N \
-    -H "Authorization: Bearer QSTASH_TOKEN" \
-    -H "Content-Type: application/json" \
-    -d '{
-        "model": "meta-llama/Meta-Llama-3-8B-Instruct",
-        "messages": [
-            {
-                "role": "user",
-                "content": "What is a serverless data platform?"
-            }
-        ],
-        "stream": true
-    }'
+// Get a single turn response
+let response = await client.chat().create({
+  provider: "upstash",
+  model: "meta-llama/Meta-Llama-3-8B-Instruct",
+  messages: [
+    {
+      role: "user",
+      content: "What is the capital of Turkey?",
+    },
+  ],
+});
+console.log(response);
+
+// Or, get a multi turn response by passing the message history
+response = await client.chat().create({
+  provider: "upstash",
+  model: "meta-llama/Meta-Llama-3-8B-Instruct",
+  messages: [
+    {
+      role: "user",
+      content: "What is the capital of Turkey?",
+    },
+    {
+      role: "assistant",
+      content: "The capital of Turkey is Ankara.",
+    },
+    {
+      role: "user",
+      content: "What is the population of that city?",
+    },
+  ],
+});
+console.log(response);
 ```
 
+To provide shorter time to first token for responsive user facing
+interfaces, you can use streaming to receive chunks of chat completion
+response as they become available.
+
+```js
+import { Client } from "@upstash/qstash";
+
+const client = new Client({
+  token: "<QSTASH_TOKEN>",
+});
+
+const response = await client.chat().create({
+  provider: "upstash",
+  model: "meta-llama/Meta-Llama-3-8B-Instruct",
+  messages: [
+    {
+      role: "user",
+      content: "What is the capital of Turkey?",
+    },
+  ],
+  stream: true,
+});
+
+for await (const chunk of response) {
+  console.log(chunk);
+}
+```
+
+Similar to the code snippets shown above, we have updated the Python SDK
+to provide similar support for the chat completions, as well as supporting
+all of them over REST.
+
 This endpoint is also compatible with the OpenAI REST API. That will allow you
-to use a wide variety of tools and libraries by changing just the endpoint.
+to use a wide variety of tools and libraries by changing just the endpoint, like
+the official OpenAI Python SDK.
 
 ```python
 from openai import OpenAI
@@ -134,21 +152,26 @@ is that we have integrated it into existing QStash APIs seamlessly.
 You can now publish or enqueue a LLM chat completion by specifying
 destination as the `api/llm`.
 
-```shell
-curl "https://qstash.upstash.io/v2/publish/api/llm" \
-    -X POST \
-    -H "Authorization: Bearer QSTASH_TOKEN" \
-    -H "Content-Type: application/json" \
-    -H "Upstash-Callback: https://your-callbak-url.com/" \
-    -d '{
-        "model": "meta-llama/Meta-Llama-3-8B-Instruct",
-        "messages": [
-            {
-                "role": "user",
-                "content": "Write me a python function that calculates the nth fibonacci number"
-            }
-        ]
-    }'
+```js
+import { Client } from "@upstash/qstash";
+
+const client = new Client({
+  token: "<QSTASH_TOKEN>",
+});
+
+await client.publishJSON({
+  api: "llm",
+  body: {
+    model: "meta-llama/Meta-Llama-3-8B-Instruct",
+    messages: [
+      {
+        role: "user",
+        content: "Write me a python function that calculates the nth fibonacci number",
+      },
+    ],
+  },
+  callback: "https://your-callbak-url.com/",
+});
 ```
 
 This way, when the result of the chat completion request is ready, the callback
@@ -158,42 +181,46 @@ With publish and enqueue APIs, all the existing QStash features work, such as
 delays, retries, ordered delivery, or controlled parallelism without an extra
 effort.
 
-```shell
-# Publish a chat completion task that will be executed after 1 minute
-# delay with at most 2 retries
-curl "https://qstash.upstash.io/v2/publish/api/llm" \
-    -X POST \
-    -H "Authorization: Bearer QSTASH_TOKEN" \
-    -H "Content-Type: application/json" \
-    -H "Upstash-Callback: https://your-callbak-url.com/" \
-    -H "Upstash-Delay: 1m" \
-    -H "Upstash-Retries: 2" \
-    -d '{
-        "model": "meta-llama/Meta-Llama-3-8B-Instruct",
-        "messages": [
-            {
-                "role": "user",
-                "content": "List 10 places to go in the Mediterranean coast"
-            }
-        ]
-    }'
+```js
+import { Client } from "@upstash/qstash";
 
-# Enqueue a chat completion task with ordered delivery and
-# controlled parallelism (inherited from the queue)
-curl "https://qstash.upstash.io/v2/enqueue/queue-name/api/llm" \
-    -X POST \
-    -H "Authorization: Bearer QSTASH_TOKEN" \
-    -H "Content-Type: application/json" \
-    -H "Upstash-Callback: https://your-callbak-url.com/" \
-    -d '{
-        "model": "meta-llama/Meta-Llama-3-8B-Instruct",
-        "messages": [
-            {
-                "role": "user",
-                "content": "What is wrong with this Python code?\na=3\nprintt(a)"
-            }
-        ]
-    }'
+const client = new Client({
+  token: "<QSTASH_TOKEN>",
+});
+
+// Publish a chat completion task that will be executed after 1 minute
+// delay with at most 2 retries
+await client.publishJSON({
+  api: "llm",
+  body: {
+    model: "meta-llama/Meta-Llama-3-8B-Instruct",
+    messages: [
+      {
+        role: "user",
+        content: "List 10 places to go in the Mediterranean coast",
+      },
+    ],
+  },
+  callback: "https://your-callbak-url.com/",
+  delay: 60,
+  retries: 2,
+});
+
+// Enqueue a chat completion task with ordered delivery and
+// controlled parallelism (inherited from the queue)
+await client.queue({queueName: "chat-queue"}).enqueueJSON({
+  api: "llm",
+  body: {
+    model: "meta-llama/Meta-Llama-3-8B-Instruct",
+    messages: [
+      {
+        role: "user",
+        content: "List 10 places to go in the Mediterranean coast",
+      },
+    ],
+  },
+  callback: "https://your-callbak-url.com/",
+});
 ```
 
 Also, in case you exceed your rate limits for the chat completions, QStash
@@ -201,26 +228,25 @@ makes sure to retry your completion requests when the limit would reset, saving
 you from retrying prematurely. This happens automatically in publish, enqueue, or
 batch endpoints.
 
-```shell
+```js
+import { Client } from "@upstash/qstash";
+
+const client = new Client({
+  token: "<QSTASH_TOKEN>",
+});
+
 # If the second request and onward fails due to rate limit error, they will be
 # retried when the rate limit resets automatically.
-curl "https://qstash.upstash.io/v2/batch" \
-    -X POST \
-    -H "Authorization: Bearer QSTASH_TOKEN" \
-    -H "Content-Type: application/json" \
-    -d '[
-        {
-            "destination": "api/llm",
-            "body": {...},
-            "headers": {...}
-        },
-        {
-            "destination": "api/llm",
-            "body": {...},
-            "headers": {...}
-        },
-        ...
-    ]'
+await client.batchJSON([
+  {
+    api: "llm",
+    body: {/* chat request body */},
+  },
+  {
+    api: "llm",
+    body: {/* chat request body */},
+  }
+])
 ```
 
 Feel free to play with all of these APIs and tell us your feedback in
