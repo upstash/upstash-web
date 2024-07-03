@@ -519,13 +519,13 @@ export default function CompareTable() {
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0"
           >
-            <CompareValue type="number">10M</CompareValue>
+            <CompareValue>10M</CompareValue>
           </td>
           <td
             hidden={isMobile ? !showEnterprise : false}
             className="bg-white/3 px-4 py-0"
           >
-            <CompareValue type="number">1B</CompareValue>
+            <CompareValue>1B</CompareValue>
           </td>
         </tr>
       </tbody>
