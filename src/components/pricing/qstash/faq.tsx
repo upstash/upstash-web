@@ -109,6 +109,17 @@ export default function FAQ() {
           </table>
         </AccordionContent>
       </AccordionItem>
+
+      <AccordionItem value="item-4">
+        <AccordionTrigger>
+          How are the LLM chat completions priced?
+        </AccordionTrigger>
+        <AccordionContent>
+          LLM chat completions are priced separately than the plan.
+          Pricing is based on the tokens used (including input and output tokens),
+          with the price of <code>$0.3</code> per million tokens.
+        </AccordionContent>
+      </AccordionItem>
     </Accordion.Root>
   );
 }

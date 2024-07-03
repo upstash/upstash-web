@@ -454,7 +454,7 @@ export default function CompareTable() {
           </td>
         </tr>
 
-         <tr>
+        <tr>
           <th className="px-0 py-4 text-left font-normal text-white/60">
             Max Queue Parallelism
           </th>
@@ -476,6 +476,56 @@ export default function CompareTable() {
             className="bg-white/3 px-4 py-0"
           >
             <CompareValue>Custom</CompareValue>
+          </td>
+        </tr>
+
+        <tr>
+          <th className="px-0 py-4 text-left font-normal text-white/60">
+            Max LLM Chat Completions per Day
+          </th>
+          {/**/}
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="bg-white/3 px-4 py-0"
+          >
+            <CompareValue type="number">300</CompareValue>
+          </td>
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="bg-emerald-300/10 px-4 py-0"
+          >
+            <CompareValue type="number">30000</CompareValue>
+          </td>
+          <td
+            hidden={isMobile ? !showEnterprise : false}
+            className="bg-white/3 px-4 py-0"
+          >
+            <CompareValue type="number">300000</CompareValue>
+          </td>
+        </tr>
+
+        <tr>
+          <th className="px-0 py-4 text-left font-normal text-white/60">
+            Max LLM Chat Completion Tokens per Day
+          </th>
+          {/**/}
+          <td
+            hidden={isMobile ? !showFree : false}
+            className="bg-white/3 px-4 py-0"
+          >
+            <CompareValue type="number">10000</CompareValue>
+          </td>
+          <td
+            hidden={isMobile ? !showPayg : false}
+            className="bg-emerald-300/10 px-4 py-0"
+          >
+            <CompareValue type="number">10M</CompareValue>
+          </td>
+          <td
+            hidden={isMobile ? !showEnterprise : false}
+            className="bg-white/3 px-4 py-0"
+          >
+            <CompareValue type="number">1B</CompareValue>
           </td>
         </tr>
       </tbody>
