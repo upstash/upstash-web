@@ -30,7 +30,7 @@ you can think of by using the state of the art open source
 large language models.
 
 ```js
-import { Client } from "@upstash/qstash";
+import { Client, upstash } from "@upstash/qstash";
 
 const client = new Client({
   token: "<QSTASH_TOKEN>",
@@ -38,7 +38,7 @@ const client = new Client({
 
 // Get a single turn response
 let response = await client.chat().create({
-  provider: "upstash",
+  provider: upstash(),
   model: "meta-llama/Meta-Llama-3-8B-Instruct",
   messages: [
     {
@@ -47,11 +47,12 @@ let response = await client.chat().create({
     },
   ],
 });
+
 console.log(response);
 
 // Or, get a multi turn response by passing the message history
 response = await client.chat().create({
-  provider: "upstash",
+  provider: upstash(),
   model: "meta-llama/Meta-Llama-3-8B-Instruct",
   messages: [
     {
@@ -68,6 +69,7 @@ response = await client.chat().create({
     },
   ],
 });
+
 console.log(response);
 ```
 
@@ -76,14 +78,14 @@ interfaces, you can use streaming to receive chunks of chat completion
 response as they become available.
 
 ```js
-import { Client } from "@upstash/qstash";
+import { Client, upstash } from "@upstash/qstash";
 
 const client = new Client({
   token: "<QSTASH_TOKEN>",
 });
 
 const response = await client.chat().create({
-  provider: "upstash",
+  provider: upstash(),
   model: "meta-llama/Meta-Llama-3-8B-Instruct",
   messages: [
     {
@@ -153,14 +155,14 @@ You can now publish or enqueue a LLM chat completion by specifying
 destination as the `api/llm`.
 
 ```js
-import { Client } from "@upstash/qstash";
+import { Client, upstash } from "@upstash/qstash";
 
 const client = new Client({
   token: "<QSTASH_TOKEN>",
 });
 
 await client.publishJSON({
-  api: "llm",
+  api: { name: "llm", provider: upstash() },
   body: {
     model: "meta-llama/Meta-Llama-3-8B-Instruct",
     messages: [
@@ -182,7 +184,7 @@ delays, retries, ordered delivery, or controlled parallelism without an extra
 effort.
 
 ```js
-import { Client } from "@upstash/qstash";
+import { Client, upstash } from "@upstash/qstash";
 
 const client = new Client({
   token: "<QSTASH_TOKEN>",
@@ -191,7 +193,7 @@ const client = new Client({
 // Publish a chat completion task that will be executed after 1 minute
 // delay with at most 2 retries
 await client.publishJSON({
-  api: "llm",
+  api: { name: "llm", provider: upstash() },
   body: {
     model: "meta-llama/Meta-Llama-3-8B-Instruct",
     messages: [
@@ -209,7 +211,7 @@ await client.publishJSON({
 // Enqueue a chat completion task with ordered delivery and
 // controlled parallelism (inherited from the queue)
 await client.queue({queueName: "chat-queue"}).enqueueJSON({
-  api: "llm",
+  api: { name: "llm", provider: upstash() },
   body: {
     model: "meta-llama/Meta-Llama-3-8B-Instruct",
     messages: [
@@ -229,7 +231,7 @@ you from retrying prematurely. This happens automatically in publish, enqueue, o
 batch endpoints.
 
 ```js
-import { Client } from "@upstash/qstash";
+import { Client, upstash } from "@upstash/qstash";
 
 const client = new Client({
   token: "<QSTASH_TOKEN>",
@@ -239,11 +241,11 @@ const client = new Client({
 # retried when the rate limit resets automatically.
 await client.batchJSON([
   {
-    api: "llm",
+    api: { name: "llm", provider: upstash() },
     body: {/* chat request body */},
   },
   {
-    api: "llm",
+    api: { name: "llm", provider: upstash() },
     body: {/* chat request body */},
   }
 ])
