@@ -1,0 +1,432 @@
+---
+
+title: "Building an Email Scheduler Using QStash Python SDK"
+slug: email-scheduler-qstash
+authors: [abdullahenes]
+tags: [qstash, python, sdk, sendgrid, django]
+---
+
+In this blog, we will demonstrate how to build an email scheduler using the [QStash Python SDK](https://upstash.com/docs/oss/sdks/py/qstash/overview) in combination with [SendGrid](https://sendgrid.com/en-us/solutions/email-api) and Django.
+
+
+Here is a [live demo](https://email-scheduler-dun.vercel.app/scheduler/schedule-email) of the project deployed on Vercel for you to try it out.
+
+![Email Scheduler](/blog/email-scheduler.png)
+
+### Motivation
+
+Being able to schedule emails is quite important for many applications. Whether you are sending reminders, newsletters, or notifications, automating your emails ensures your messages are always delivered on time which can save you lots of time. Using QStash, it has never been easier to schedule messages to be sent at a later time. After reading this post all your emails will be delivered on time, every time.
+
+### Prerequisites
+
+To follow along with this tutorial, you will need:
+
+1. Basic knowledge of Python and Django.
+2. A SendGrid account and API key for sending emails.
+3. An Upstash account to get your QStash token.
+
+### Project Setup
+
+#### Install Necessary Packages
+
+Install QStash Python SDK, Django, SendGrid and other necessary packages:
+
+```bash
+pip install qstash-python django sendgrid python-dotenv croniter
+```
+
+QStash Python SDK is used to interact with QStash, SendGrid is used to send emails, django is used to create the web application, croniter is used to validate CRON expressions, and python-dotenv is used to load environment variables from a `.env` file.
+
+#### Create a Django Project
+
+First, set up a new Django project. Navigate to your desired directory and run:
+
+```bash
+django-admin startproject email_scheduler
+cd email_scheduler
+django-admin startapp scheduler
+```
+
+#### Configure Django Settings
+
+Add `scheduler` to your `INSTALLED_APPS` and set `APPEND_SLASH` to `False` in the project's `settings.py`:
+
+```python
+INSTALLED_APPS = [
+    ...
+    'scheduler',
+]
+
+APPEND_SLASH = False
+```
+
+
+Add your SendGrid and QStash configurations to your .env file:
+
+```python
+SENDGRID_API_KEY = 'your_sendgrid_api_key'
+SENDGRID_SENDER_EMAIL_ADDRESS = 'your_sender_email_address'
+QSTASH_TOKEN = 'your_qstash_token'
+DEPLOYED_URL = 'your_deployed_url'
+```
+
+### Implementing the Email Scheduler
+
+#### Getting Environment Variables
+
+In `scheduler/utils/helpers.py`, create a helper function to get environment variables:
+
+```python
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+env_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../config/.env'))
+load_dotenv(dotenv_path=env_path)
+
+def get_env_variable(var_name):
+    try:
+        return os.getenv(var_name)
+    except KeyError:
+        message = f"Expected environment variable '{var_name}' not set."
+        raise Exception(message)
+```
+
+#### Send Emails Using SendGrid
+
+In `scheduler/utils/send_email.py`, create a function to send emails using SendGrid:
+
+```python
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
+from .helpers import get_env_variable
+
+def send_email(to_email, subject, content):
+    message = Mail(
+        from_email=get_env_variable('SENDGRID_SENDER_EMAIL_ADDRESS'),
+        to_emails=to_email,
+        subject=subject,
+        plain_text_content=content)
+    try:
+        sg = SendGridAPIClient(get_env_variable('SENDGRID_API_KEY'))
+        response = sg.send(message)
+    except Exception as e:
+        print(e.message)
+
+    return response
+```
+
+#### Schedule Emails Using QStash
+
+Create a function to schedule emails using QStash in `scheduler/utils/email_scheduler.py`:
+
+```python
+from upstash_qstash import Client
+from .helpers import get_env_variable
+
+def schedule_email(email_data, delay):
+    client = Client(get_env_variable("QSTASH_TOKEN"))
+    client.publish_json({
+        "url": get_env_variable("DEPLOYED_URL"),
+        "body": email_data,
+        "delay": delay,
+    })
+```
+
+And another function to the same file to schedule emails using CRON expressions:
+
+```python
+def schedule_email_cronjob(email_data, cron_string):
+    client = Client(get_env_variable("QSTASH_TOKEN"))
+    schedules = client.schedules()
+    response = schedules.create({
+        "destination": get_env_variable("DEPLOYED_URL"),
+        "cron": cron_string,
+        "body": email_data
+    })
+    return response
+```
+
+#### Create a Django View to Handle Scheduling
+
+In `scheduler/views.py`, add a view to handle email scheduling requests:
+
+```python
+from croniter import croniter
+from django.shortcuts import render
+from django.http import JsonResponse
+from datetime import datetime
+from django.views.decorators.csrf import csrf_exempt
+import json
+from .utils.email_scheduler import schedule_email, schedule_email_cronjob
+from .utils.send_email import send_email
+
+@csrf_exempt
+def schedule_email_view(request):
+    email_scheduled = False
+    
+    if request.method == 'POST':
+        to_email = request.POST.get('to_email')
+        subject = request.POST.get('subject')
+        content = request.POST.get('content')
+        schedule_date_str = request.POST.get('schedule_date')
+        cron_string = request.POST.get('cron_string')
+
+        email_data = {
+            'to_email': to_email,
+            'subject': subject,
+            'content': content
+        }
+
+        if cron_string:
+            # Validate cron string format
+            if not croniter.is_valid(cron_string):
+                return render(request, 'schedule_email.html', {
+                    'email_scheduled': email_scheduled,
+                    'error': 'Invalid cron string format. Please enter a valid cron string.'
+                })
+            # Schedule with cron string
+            schedule_email_cronjob(email_data, cron_string)
+            email_scheduled = True
+
+        elif schedule_date_str:
+            # Schedule with specific date and time
+            schedule_date = datetime.strptime(schedule_date_str, '%Y-%m-%dT%H:%M')
+            current_date = datetime.now()
+
+            # Check if schedule date is in the past
+            if schedule_date < current_date:
+                return render(request, 'schedule_email.html', {
+                    'email_scheduled': email_scheduled,
+                    'error': 'Schedule date cannot be in the past.'
+                })
+            
+            # Check if schedule date is in the future more than a week (free pricing limit)
+            if (schedule_date - current_date).total_seconds() > 604800:
+                return render(request, 'schedule_email.html', {
+                    'email_scheduled': email_scheduled,
+                    'error': 'Schedule date cannot be more than a week in the future for free pricing.'
+                })
+            
+            delay = int((schedule_date - current_date).total_seconds())
+            schedule_email(email_data, delay)
+            email_scheduled = True
+            
+        else:
+            return render(request, 'schedule_email.html', {
+                'email_scheduled': email_scheduled,
+                'error': 'Please provide either a schedule date or a cron string.'
+            })
+
+        return render(request, 'schedule_email.html', {'email_scheduled': email_scheduled})
+    
+    return render(request, 'schedule_email.html', {'email_scheduled': email_scheduled})
+```
+
+We use the `@csrf_exempt` decorator to allow POST requests without CSRF tokens. This view handles both specific date and time scheduling and CRON string scheduling. The `schedule_email` function schedules emails to be sent after a specific delay, while the `schedule_email_cronjob` function schedules emails based on a CRON expression.
+
+#### Create a Django View to Handle Email Sending
+
+In `scheduler/views.py`, add a view to handle email sending requests:
+
+```python
+@csrf_exempt
+def send_email_view(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        to_email = data['to_email']
+        subject = data['subject']
+        content = data['content']
+        
+        response = send_email(to_email, subject, content)
+        return JsonResponse({'status': response.status_code})
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+```
+
+The URL of this view will be used as the destination URL in the QStash message once it is deployed. The view receives the email data as a JSON object and sends the email using the `send_email` function.
+
+#### Create URL Patterns
+
+In `scheduler/urls.py`, add URL patterns for the views:
+
+```python
+from django.urls import path
+from .views import schedule_email_view, send_email_view
+
+urlpatterns = [
+    path('schedule-email', schedule_email_view, name='schedule-email'),
+    path('send-email', send_email_view, name='send-email'),
+]
+```
+
+#### Update the Project's URL Patterns
+We will also add the URL patterns for the `scheduler` app to the project's URL patterns in `email_scheduler/urls.py`:
+
+```python
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path('scheduler/', include('scheduler.urls')),
+]
+```
+
+#### Create a Template for Scheduling Emails
+
+Create a template `scheduler/templates/schedule_email.html`:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule Email</title>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/128/1504/1504569.png" type="image/x-icon">
+</head>
+<body>
+    <div class="container">
+        <h1>Schedule an Email</h1>
+        <form method="post" action="{% url 'schedule-email' %}">
+            {% csrf_token %}
+            <label for="to_email">To Email:</label>
+            <input type="email" id="to_email" name="to_email" placeholder="recipient@example.com" required><br>
+        
+            <label for="subject">Subject:</label>
+            <input type="text" id="subject" name="subject" placeholder="Your subject here" required><br>
+        
+            <label for="content">Content:</label>
+            <textarea id="content" name="content" placeholder="Your email content here" required></textarea><br>
+            
+            <label for="schedule_date">Schedule Date and Time (UTC+0):</label>
+            <input type="datetime-local" id="schedule_date" name="schedule_date"><br>
+
+            <label for="cron_string">Cron String (UTC+0):</label>
+            <input type="text" id="cron_string" name="cron_string" placeholder="* * * * *"><br>
+            <small>Enter a valid cron string. Example: "0 9 * * *" for 9 AM every day.</small><br>
+            
+            <button type="submit">Schedule Email</button>
+        </form>
+        {% if email_scheduled %}
+            <div class="notification" id="notification">Email scheduled successfully!</div>
+        {% endif %}
+        {% if error %}
+            <div class="notification" id="notification">{{ error }}</div>
+        {% endif %}
+
+    </div>
+    <div class="footer">
+        <p>Powered by  
+            <a href="https://www.upstash.com" target="_blank">
+              <img src="https://upstash.com/logo/upstash-white-bg.svg" alt="Upstash Logo">
+            </a> 
+          </p>
+          
+    </div>
+</body>
+</html>
+
+```
+
+You can also add some CSS to style the template:
+
+```css
+<style>
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        background-color: #f0f0f0;
+        color: #333;
+        margin: 0;
+        padding: 0; 
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-direction: column;
+        background-image: url('https://static.vecteezy.com/system/resources/previews/003/047/634/original/abstract-white-fluid-wave-background-free-vector.jpg'); /* Adjust the path as necessary */
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+    .container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 500px;
+        margin-top: 100px;
+    }
+    h1 {
+        text-align: center;
+        color: #333;
+    }
+    form {
+        display: flex;
+        flex-direction: column;
+    }
+    label {
+        margin-top: 10px;
+        font-weight: bold;
+        color: #333;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+    input, textarea {
+        padding: 10px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    button {
+        background-color: #08CB91;
+        color: #f0f0f0;
+        padding: 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 20px;
+        font-size: 18px;
+        font-weight: bold;
+    }
+    button:hover {
+        background-color: #6BE0BD;
+    }
+    .notification {
+        background-color: #f0f0f0;
+        color: #333;
+        padding: 10px;
+        border-radius: 4px;
+        margin-top: 20px;
+        text-align: center;
+        font-weight: normal;
+        font-family: Helvetica Neue, sans-serif;
+    }
+    .footer {
+        margin-top: 20px;
+        text-align: center;
+        color: #333;
+    }
+    .footer img {
+        vertical-align: middle;
+        width: 100px;
+    }
+    textarea {
+        resize: vertical;
+        max-height: 250px;
+        min-height: 40px;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+</style>
+```
+And with that, the project is complete!
+
+### Conclusion
+
+In this tutorial, we have shown how to build an email scheduler using the QStash Python SDK, SendGrid, and Django. This project helps you automate your emails, ensuring you communicate with your users consistently and on time.
+
+For more detailed information, explore the [Upstash QStash documentation](https://upstash.com/docs/qstash/overall/getstarted). You can find the complete source code for this project on the [GitHub repository](https://github.com/Abdusshh/email_scheduler_qstash_python). For any questions or feedback, feel free to reach out to me on [LinkedIn](https://www.linkedin.com/in/abdullah-enes-g%C3%BCle%C5%9F/). 
+
+---
