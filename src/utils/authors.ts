@@ -358,4 +358,10 @@ export const authors: Record<
     url: "https://helicone.ai",
     image: "cole.jpeg",
   },
+  abdullahenes: {
+    name: "Abdullah Enes Gules",
+    title: "Software Engineer (Guest Author)",
+    url: "https://www.linkedin.com/in/abdullah-enes-g%C3%BCle%C5%9F/",
+    image: "abdullahenes.jpg",
+  },
 };
