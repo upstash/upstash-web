@@ -6,6 +6,7 @@ import { PricingPlans } from "@/utils/type";
 import useIsMobile from "@/hooks/use-is-mobile";
 
 import CompareValue from "../compare-value";
+import {IconCreditCard, IconDatabase} from "@tabler/icons-react";
 
 export default function CompareTable() {
   const isMobile = useIsMobile();
@@ -147,337 +148,493 @@ export default function CompareTable() {
       </thead>
 
       <tbody>
-        <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
-            Max Messages per Day
-          </th>
-          {/**/}
-          <td
-            hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue type="number">500</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPayg : false}
-            className="bg-emerald-300/10 px-4 py-0"
-          >
-            <CompareValue type="number">500000</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showEnterprise : false}
-            className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue>up to 100M</CompareValue>
-          </td>
-        </tr>
+      <tr>
+        <th
+            colSpan={isMobile ? 2 : 5}
+            className="sticky top-20 z-10 p-0 text-left md:top-0"
+        >
+          <div className="-ml-4 flex h-24 items-center bg-gradient-to-r from-zinc-900 to-zinc-950 px-4 md:h-16">
+              <span className="flex items-center gap-2 text-lg font-semibold">
+                <span className="flex items-center rounded-full bg-white/10 p-2">
+                  <IconDatabase width="20" height="20" strokeWidth={1.5}/>
+                </span>
 
-        <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
-            Max Requests per Second
-          </th>
-          {/**/}
-          <td
-            hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue type="number">100</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPayg : false}
-            className="bg-emerald-300/10 px-4 py-0"
-          >
-            <CompareValue type="number">100</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showEnterprise : false}
-            className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue>Custom</CompareValue>
-          </td>
-        </tr>
+                <span>Capacity</span>
+              </span>
+          </div>
+        </th>
+      </tr>
 
-        <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
-            Max Message Size
-          </th>
-          {/**/}
-          <td
+      <tr>
+        <th className="px-0 py-4 text-left font-normal text-white/60">
+          Max Messages per Day
+        </th>
+        {/**/}
+        <td
             hidden={isMobile ? !showFree : false}
             className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue type="size" suffix="MB">
-              1
-            </CompareValue>
-          </td>
-          <td
+        >
+          <CompareValue type="number">500</CompareValue>
+        </td>
+        <td
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0"
-          >
-            <CompareValue type="size" suffix="MB">
-              1
-            </CompareValue>
-          </td>
-          <td
+        >
+          <CompareValue type="number">500000</CompareValue>
+        </td>
+        <td
             hidden={isMobile ? !showEnterprise : false}
             className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue type="size" suffix="MB">
-              10
-            </CompareValue>
-          </td>
-        </tr>
+        >
+          <CompareValue>up to 100M</CompareValue>
+        </td>
+      </tr>
 
-        <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
-            Max Number of Topics
-          </th>
-          {/**/}
-          <td
+      <tr>
+        <th className="px-0 py-4 text-left font-normal text-white/60">
+          Max Requests per Second
+        </th>
+        {/**/}
+        <td
             hidden={isMobile ? !showFree : false}
             className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue>1</CompareValue>
-          </td>
-          <td
+        >
+          <CompareValue type="number">100</CompareValue>
+        </td>
+        <td
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0"
-          >
-            <CompareValue>20</CompareValue>
-          </td>
-          <td
+        >
+          <CompareValue type="number">100</CompareValue>
+        </td>
+        <td
             hidden={isMobile ? !showEnterprise : false}
             className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue>Infinite</CompareValue>
-          </td>
-        </tr>
+        >
+          <CompareValue>Custom</CompareValue>
+        </td>
+      </tr>
 
-        <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
-            Max Number of Endpoints per Topic
-          </th>
-          {/**/}
-          <td
+      <tr>
+        <th className="px-0 py-4 text-left font-normal text-white/60">
+          Max Message Size
+        </th>
+        {/**/}
+        <td
             hidden={isMobile ? !showFree : false}
             className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue>100</CompareValue>
-          </td>
-          <td
+        >
+          <CompareValue type="size" suffix="MB">
+            1
+          </CompareValue>
+        </td>
+        <td
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0"
-          >
-            <CompareValue>100</CompareValue>
-          </td>
-          <td
+        >
+          <CompareValue type="size" suffix="MB">
+            1
+          </CompareValue>
+        </td>
+        <td
             hidden={isMobile ? !showEnterprise : false}
             className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue>Infinite</CompareValue>
-          </td>
-        </tr>
+        >
+          <CompareValue type="size" suffix="MB">
+            10
+          </CompareValue>
+        </td>
+      </tr>
 
-        <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
-            Max Retry Count
-          </th>
-          {/**/}
-          <td
+      <tr>
+        <th className="px-0 py-4 text-left font-normal text-white/60">
+          Max Number of Topics
+        </th>
+        {/**/}
+        <td
             hidden={isMobile ? !showFree : false}
             className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue>3</CompareValue>
-          </td>
-          <td
+        >
+          <CompareValue>1</CompareValue>
+        </td>
+        <td
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0"
-          >
-            <CompareValue>5</CompareValue>
-          </td>
-          <td
+        >
+          <CompareValue>20</CompareValue>
+        </td>
+        <td
             hidden={isMobile ? !showEnterprise : false}
             className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue>20</CompareValue>
-          </td>
-        </tr>
+        >
+          <CompareValue>Infinite</CompareValue>
+        </td>
+      </tr>
 
-        <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
-            Max Delay
-          </th>
-          {/**/}
-          <td
+      <tr>
+        <th className="px-0 py-4 text-left font-normal text-white/60">
+          Max Number of Endpoints per Topic
+        </th>
+        {/**/}
+        <td
             hidden={isMobile ? !showFree : false}
             className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue>7 days</CompareValue>
-          </td>
-          <td
+        >
+          <CompareValue>100</CompareValue>
+        </td>
+        <td
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0"
-          >
-            <CompareValue>1 year</CompareValue>
-          </td>
-          <td
+        >
+          <CompareValue>100</CompareValue>
+        </td>
+        <td
             hidden={isMobile ? !showEnterprise : false}
             className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue>Custom</CompareValue>
-          </td>
-        </tr>
+        >
+          <CompareValue>Infinite</CompareValue>
+        </td>
+      </tr>
 
-        <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
-            Max HTTP Connection Timeout
-          </th>
-          {/**/}
-          <td
+      <tr>
+        <th className="px-0 py-4 text-left font-normal text-white/60">
+          Max Retry Count
+        </th>
+        {/**/}
+        <td
             hidden={isMobile ? !showFree : false}
             className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue>15 minutes</CompareValue>
-          </td>
-          <td
+        >
+          <CompareValue>3</CompareValue>
+        </td>
+        <td
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0"
-          >
-            <CompareValue>2 hours</CompareValue>
-          </td>
-          <td
+        >
+          <CompareValue>5</CompareValue>
+        </td>
+        <td
             hidden={isMobile ? !showEnterprise : false}
             className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue>Custom</CompareValue>
-          </td>
-        </tr>
+        >
+          <CompareValue>20</CompareValue>
+        </td>
+      </tr>
 
-        <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
-            Max DLQ Retention
-          </th>
-          {/**/}
-          <td
+      <tr>
+        <th className="px-0 py-4 text-left font-normal text-white/60">
+          Max Delay
+        </th>
+        {/**/}
+        <td
             hidden={isMobile ? !showFree : false}
             className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue>3 days</CompareValue>
-          </td>
-          <td
+        >
+          <CompareValue>7 days</CompareValue>
+        </td>
+        <td
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0"
-          >
-            <CompareValue>7 days</CompareValue>
-          </td>
-          <td
+        >
+          <CompareValue>1 year</CompareValue>
+        </td>
+        <td
             hidden={isMobile ? !showEnterprise : false}
             className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue>30 days</CompareValue>
-          </td>
-        </tr>
+        >
+          <CompareValue>Custom</CompareValue>
+        </td>
+      </tr>
 
-        <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
-            Max DLQ Size (Number of Messages)
-          </th>
-          {/**/}
-          <td
+      <tr>
+        <th className="px-0 py-4 text-left font-normal text-white/60">
+          Max HTTP Connection Timeout
+        </th>
+        {/**/}
+        <td
             hidden={isMobile ? !showFree : false}
             className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue type="number">1000</CompareValue>
-          </td>
-          <td
+        >
+          <CompareValue>15 minutes</CompareValue>
+        </td>
+        <td
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0"
-          >
-            <CompareValue type="number">10000</CompareValue>
-          </td>
-          <td
+        >
+          <CompareValue>2 hours</CompareValue>
+        </td>
+        <td
             hidden={isMobile ? !showEnterprise : false}
             className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue>Custom</CompareValue>
-          </td>
-        </tr>
+        >
+          <CompareValue>Custom</CompareValue>
+        </td>
+      </tr>
 
-        
-        <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
-            Max Schedule Count
-          </th>
-          {/**/}
-          <td
+      <tr>
+        <th className="px-0 py-4 text-left font-normal text-white/60">
+          Max DLQ Retention
+        </th>
+        {/**/}
+        <td
             hidden={isMobile ? !showFree : false}
             className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue type="number">10</CompareValue>
-          </td>
-          <td
+        >
+          <CompareValue>3 days</CompareValue>
+        </td>
+        <td
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0"
-          >
-            <CompareValue type="number">100</CompareValue>
-          </td>
-          <td
+        >
+          <CompareValue>7 days</CompareValue>
+        </td>
+        <td
             hidden={isMobile ? !showEnterprise : false}
             className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue>Custom</CompareValue>
-          </td>
-        </tr>
+        >
+          <CompareValue>30 days</CompareValue>
+        </td>
+      </tr>
 
-        <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
-            Max Queue Count
-          </th>
-          {/**/}
-          <td
+      <tr>
+        <th className="px-0 py-4 text-left font-normal text-white/60">
+          Max DLQ Size (Number of Messages)
+        </th>
+        {/**/}
+        <td
             hidden={isMobile ? !showFree : false}
             className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue type="number">10</CompareValue>
-          </td>
-          <td
+        >
+          <CompareValue type="number">1000</CompareValue>
+        </td>
+        <td
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0"
-          >
-            <CompareValue type="number">100</CompareValue>
-          </td>
-          <td
+        >
+          <CompareValue type="number">10000</CompareValue>
+        </td>
+        <td
             hidden={isMobile ? !showEnterprise : false}
             className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue>Custom</CompareValue>
-          </td>
-        </tr>
+        >
+          <CompareValue>Custom</CompareValue>
+        </td>
+      </tr>
 
-         <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
-            Max Queue Parallelism
-          </th>
-          {/**/}
-          <td
+
+      <tr>
+        <th className="px-0 py-4 text-left font-normal text-white/60">
+          Max Schedule Count
+        </th>
+        {/**/}
+        <td
             hidden={isMobile ? !showFree : false}
             className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue type="number">2</CompareValue>
-          </td>
-          <td
+        >
+          <CompareValue type="number">10</CompareValue>
+        </td>
+        <td
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0"
-          >
-            <CompareValue type="number">10</CompareValue>
-          </td>
-          <td
+        >
+          <CompareValue type="number">100</CompareValue>
+        </td>
+        <td
             hidden={isMobile ? !showEnterprise : false}
             className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue>Custom</CompareValue>
-          </td>
-        </tr>
+        >
+          <CompareValue>Custom</CompareValue>
+        </td>
+      </tr>
+
+      <tr>
+        <th className="px-0 py-4 text-left font-normal text-white/60">
+          Max Queue Count
+        </th>
+        {/**/}
+        <td
+            hidden={isMobile ? !showFree : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue type="number">10</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPayg : false}
+            className="bg-emerald-300/10 px-4 py-0"
+        >
+          <CompareValue type="number">100</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showEnterprise : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue>Custom</CompareValue>
+        </td>
+      </tr>
+
+      <tr>
+        <th className="px-0 py-4 text-left font-normal text-white/60">
+          Max Queue Parallelism
+        </th>
+        {/**/}
+        <td
+            hidden={isMobile ? !showFree : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue type="number">2</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPayg : false}
+            className="bg-emerald-300/10 px-4 py-0"
+        >
+          <CompareValue type="number">10</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showEnterprise : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue>Custom</CompareValue>
+        </td>
+      </tr>
+      <tr>
+        <th className="px-0 py-4 text-left font-normal text-white/60">
+          Max LLM Requests Per Day
+        </th>
+        {/**/}
+        <td
+            hidden={isMobile ? !showFree : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue type="number">300</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPayg : false}
+            className="bg-emerald-300/10 px-4 py-0"
+        >
+          <CompareValue type="number">30000</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showEnterprise : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue type="number">300000</CompareValue>
+        </td>
+      </tr>
+      <tr>
+        <th className="px-0 py-4 text-left font-normal text-white/60">
+          Max LLM Tokens Per Day
+        </th>
+        {/**/}
+        <td
+            hidden={isMobile ? !showFree : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue type="number">10000</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPayg : false}
+            className="bg-emerald-300/10 px-4 py-0"
+        >
+          <CompareValue>10M</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showEnterprise : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue>1B</CompareValue>
+        </td>
+      </tr>
+
+      <tr>
+        <th
+            colSpan={isMobile ? 2 : 5}
+            className="sticky top-20 z-10 p-0 text-left md:top-0"
+        >
+          <div className="-ml-4 flex h-24 items-center bg-gradient-to-r from-zinc-900 to-zinc-950 px-4 md:h-16">
+              <span className="flex items-center gap-2 text-lg font-semibold">
+                <span className="flex items-center rounded-full bg-white/10 p-2">
+                  <IconCreditCard width="20" height="20" strokeWidth={1.5}/>
+                </span>
+                <span>Price</span>
+              </span>
+          </div>
+        </th>
+      </tr>
+
+      <tr>
+        <th className="px-0 py-4 text-left font-normal text-white/60">
+          Monthly price
+        </th>
+        {/**/}
+        <td
+            hidden={isMobile ? !showFree : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue>Free</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPayg : false}
+            className="bg-emerald-300/10 px-4 py-0"
+        >
+          <CompareValue>None</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showEnterprise : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue>
+            Starts from $180
+          </CompareValue>
+        </td>
+      </tr>
+      <tr>
+        <th className="px-0 py-4 text-left font-normal text-white/60">
+          Message price
+        </th>
+        {/**/}
+        <td
+            hidden={isMobile ? !showFree : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue>Free</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPayg : false}
+            className="bg-emerald-300/10 px-4 py-0"
+        >
+          <CompareValue>$1 per 100K</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showEnterprise : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue>None</CompareValue>
+        </td>
+      </tr>
+      <tr>
+        <th className="px-0 py-4 text-left font-normal text-white/60">
+          LLM price
+        </th>
+        {/**/}
+        <td
+            hidden={isMobile ? !showFree : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue>Free</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPayg : false}
+            className="bg-emerald-300/10 px-4 py-0"
+        >
+          <CompareValue>$0.3 per 1M tokens</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showEnterprise : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue>$0.3 per 1M tokens</CompareValue>
+        </td>
+      </tr>
       </tbody>
     </table>
   );
