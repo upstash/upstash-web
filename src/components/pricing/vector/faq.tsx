@@ -16,43 +16,26 @@ export default function FAQ() {
           How can I upgrade to pay as you go from free tier?
         </AccordionTrigger>
         <AccordionContent>
-          Once you enter your credit card , your database will be upgraded to
+          Once you enter your credit card , your index will be upgraded to
           the pay-as-you-go plan and limits will be updated.
-        </AccordionContent>
-      </AccordionItem>
-
-      <AccordionItem value="item-2">
-        <AccordionTrigger>How does the budget work?</AccordionTrigger>
-        <AccordionContent>
-          With the Pay As you go plan, you can set a maximum monthly budget for
-          your database so that you won't be charged beyond this chosen limit.
-          We'll keep you informed by sending email notifications once you reach
-          70% and 90% of your monthly budget. This notifications will let you
-          either adjust your budget limit or upgrade to the Pro tier. Note that
-          if your usage exceeds your monthly budget cap, your database will be
-          rate limited and your cost will not exceed your chosen budget limit.
         </AccordionContent>
       </AccordionItem>
 
       <AccordionItem value="item-3">
         <AccordionTrigger>
-          Are all Redis commands counted in billing?
+          What is the limit for topk?
         </AccordionTrigger>
         <AccordionContent>
-          Operational commands like AUTH, INFO, PING, QUIT, COMMAND will not be
-          charged.
+          1000 is the default limit for topk.
         </AccordionContent>
       </AccordionItem>
 
       <AccordionItem value="item-4">
         <AccordionTrigger>
-          Are read and write commands same price?
+          Are query and upsert requests same price?
         </AccordionTrigger>
         <AccordionContent>
-          Yes. But for Global databases, the write commands are replicated to
-          all read regions in addition to primary region. Replications (write
-          operations) are also counted as commands. For example, if you have 1
-          primary 1 read region, 100K writes will cost $0.4 ($0.2 x 2)
+          Yes. 
         </AccordionContent>
       </AccordionItem>
 
@@ -60,15 +43,12 @@ export default function FAQ() {
         <AccordionTrigger>How is the storage cost calculated?</AccordionTrigger>
         <AccordionContent>
           The storage cost is charged at a rate of $0.25 per GB total storage.
-          Total storage is determined by adding up the storage at all replicas
-          and regions. Even if you do not access your data, we have to keep it
+          Even if you do not access your data, we have to keep it
           persistent in Cloud Provider’s block storage (eg AWS EBS, S3) for
           durability. To calculate the total storage cost, we take daily average
           of your data size and multiply with $0.25 at the end of the month. For
-          instance, if you have 1 GB data in your database throughout month, you
-          will pay $0.25. If you are using your database as a cache; then it is
-          a good practice to set a timeout (EXPIRE) for your keys to minimize
-          the cost.
+          instance, if you have 1 GB data in your index throughout month, you
+          will pay $0.25.
         </AccordionContent>
       </AccordionItem>
 
@@ -77,7 +57,7 @@ export default function FAQ() {
         <AccordionContent>
           Yes, we can provide free trials for Pro and Enterprise plans for
           testing and PoC purposes. Email us at{" "}
-          <a href="sales@upstash.com">sales@upstash.com</a>
+          <a href="support@upstash.com">support@upstash.com</a>
         </AccordionContent>
       </AccordionItem>
 
@@ -119,12 +99,11 @@ export default function FAQ() {
 
       <AccordionItem value="item-11">
         <AccordionTrigger>
-          How is the Professional Support priced?
+          Do you have the Professional Support plan?
         </AccordionTrigger>
         <AccordionContent>
           Professional support includes a dedicated service desk along and a
-          Slack/Discord channel with a committed response time SLA. It is $1600
-          per year + 10% of your monthly bill. Check{" "}
+          Slack/Discord channel with a committed response time SLA. Check{" "}
           <a href="https://upstash.com/docs/common/help/prosupport">
             https://upstash.com/docs/common/help/prosupport
           </a>{" "}

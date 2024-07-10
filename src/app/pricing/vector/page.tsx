@@ -9,6 +9,8 @@ import ProductToggle from "@/components/pricing/product-toggle";
 import CompareTable from "@/components/pricing/vector/compare-table";
 import Enterprise from "@/components/pricing/vector/enterprise";
 import PricingTable from "@/components/pricing/vector/pricing-table";
+import Container from "@/components/container";
+import FAQ from "@/components/pricing/vector/faq";
 
 export default function PricingVectorPage() {
   const structuredFaqSchema = generateFaqSchema(VectorFaqJson);
@@ -23,28 +25,40 @@ export default function PricingVectorPage() {
       />
       <ProductToggle product={"/vector"} />
 
-      <div className="mt-16 md:mt-20">
-        <PricingTable />
+        <div className="mt-16 md:mt-20">
+            <PricingTable/>
 
-        <div className="mt-10 md:mt-20">
-          <Enterprise />
+            <div className="mt-10 md:mt-20">
+                <Enterprise/>
+            </div>
+
+            <div className="mt-32 md:mt-40">
+                <header>
+                    <PageHeaderTitle as="h2" className="md:text-4xl">
+                        Compare Plans
+                    </PageHeaderTitle>
+                    <PageHeaderDesc className="mt-2 md:text-xl">
+                        Plans that scale to all sizes.
+                    </PageHeaderDesc>
+                </header>
+
+                <div className="mt-12 md:mt-16">
+                    <CompareTable/>
+                </div>
+            </div>
+
+            <div className="mt-32 md:mt-40">
+                <Container className="max-w-screen-md">
+                    <PageHeaderTitle as="h2" className="mb md:text-4xl">
+                        FAQ
+                    </PageHeaderTitle>
+                    <div className="mt-10">
+                        <FAQ/>
+                    </div>
+                </Container>
+            </div>
+
         </div>
-
-        <div className="mt-32 md:mt-40">
-          <header>
-            <PageHeaderTitle as="h2" className="md:text-4xl">
-              Compare Plans
-            </PageHeaderTitle>
-            <PageHeaderDesc className="mt-2 md:text-xl">
-              Plans that scale to all sizes.
-            </PageHeaderDesc>
-          </header>
-
-          <div className="mt-12 md:mt-16">
-            <CompareTable />
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

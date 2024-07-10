@@ -136,12 +136,11 @@ export default function FAQ() {
 
       <AccordionItem value="item-11">
         <AccordionTrigger>
-          How is the Professional Support priced?
+          Do you have the Professional Support plan?
         </AccordionTrigger>
         <AccordionContent>
           Professional support includes a dedicated service desk along and a
-          Slack/Discord channel with a committed response time SLA. It is $1600
-          per year + 10% of your monthly bill. Check{" "}
+          Slack/Discord channel with a committed response time SLA. Check{" "}
           <a href="https://upstash.com/docs/common/help/prosupport">
             https://upstash.com/docs/common/help/prosupport
           </a>{" "}
