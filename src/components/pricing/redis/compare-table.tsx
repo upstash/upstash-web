@@ -822,7 +822,7 @@ export default function CompareTable() {
             className="bg-white/3 px-4 py-0 align-top"
           >
             <CompareValue type="list">
-              <Tooltip content="mTLS ensures two-way authentication where both client and server authenticate each other at the same time in the authentication protocol.">
+              <Tooltip content="Once TLS is enabled, the data transfer between the client and database is encrypted.">
                 TLS
               </Tooltip>
             </CompareValue>
@@ -834,6 +834,9 @@ export default function CompareTable() {
             <CompareValue type="list">
               <Tooltip content="Once TLS is enabled, the data transfer between the client and database is encrypted.">
                 TLS
+              </Tooltip>
+              <Tooltip content="You can set the IP addresses which will have access to your database.">
+                IP Allowlisting
               </Tooltip>
             </CompareValue>
           </td>
@@ -852,7 +855,7 @@ export default function CompareTable() {
                 VPC Peering
               </Tooltip>
               <Tooltip content="You can set the IP addresses which will have access to your database.">
-                IP Whitelisting
+                IP Allowlisting
               </Tooltip>
               <Tooltip content="Private Link helps you to access to Upstash Cluster with a private network link inside AWS infrastructure.">
                 Private Link
@@ -874,7 +877,7 @@ export default function CompareTable() {
                 VPC Peering
               </Tooltip>
               <Tooltip content="You can set the IP addresses which will have access to your database.">
-                IP Whitelisting
+                IP Allowlisting
               </Tooltip>
               <Tooltip content="Private Link helps you to access to Upstash Cluster with a private network link inside AWS infrastructure.">
                 Private Link
