@@ -836,7 +836,7 @@ export default function CompareTable() {
                 TLS
               </Tooltip>
               <Tooltip content="You can set the IP addresses which will have access to your database.">
-                IP Whitelisting
+                IP Allowlisting
               </Tooltip>
             </CompareValue>
           </td>
@@ -855,7 +855,7 @@ export default function CompareTable() {
                 VPC Peering
               </Tooltip>
               <Tooltip content="You can set the IP addresses which will have access to your database.">
-                IP Whitelisting
+                IP Allowlisting
               </Tooltip>
               <Tooltip content="Private Link helps you to access to Upstash Cluster with a private network link inside AWS infrastructure.">
                 Private Link
@@ -877,7 +877,7 @@ export default function CompareTable() {
                 VPC Peering
               </Tooltip>
               <Tooltip content="You can set the IP addresses which will have access to your database.">
-                IP Whitelisting
+                IP Allowlisting
               </Tooltip>
               <Tooltip content="Private Link helps you to access to Upstash Cluster with a private network link inside AWS infrastructure.">
                 Private Link
