@@ -546,6 +546,39 @@ export default function CompareTable() {
       </tr>
 
       <tr>
+        <th className="px-0 text-left font-normal text-white/60">
+          Uptime SLA
+        </th>
+        {/**/}
+        <td
+            hidden={isMobile ? !showFree : false}
+            className="bg-white/3 px-4 py-0 align-top"
+        >
+          <CompareValue type="boolean" valid={false}/>
+        </td>
+        <td
+            hidden={isMobile ? !showPayg : false}
+            className="bg-emerald-300/10 px-4 py-0 align-top"
+        >
+          <CompareValue className="border-b-0">
+            <div>
+              99.9%
+            </div>
+          </CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showEnterprise : false}
+            className="bg-white/3 px-4 py-0 align-top"
+        >
+          <CompareValue className="border-b-0">
+            <div>
+              99.99%
+            </div>
+          </CompareValue>
+        </td>
+      </tr>
+
+      <tr>
         <th
             colSpan={isMobile ? 2 : 5}
             className="sticky top-20 z-10 p-0 text-left md:top-0"

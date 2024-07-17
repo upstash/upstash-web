@@ -1145,15 +1145,16 @@ export default function CompareTable() {
         <td
             hidden={isMobile ? !showFree : false}
             className="bg-white/3 px-4 py-0 align-top"
-        />
+        >
+          <CompareValue type="boolean" valid={false}/>
+        </td>
         <td
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0 align-top"
         >
           <CompareValue className="border-b-0">
             <div>
-              <div>Regional: 99.99%</div>
-              <div>Global: 99.99%</div>
+              99.9%
             </div>
           </CompareValue>
         </td>
@@ -1163,8 +1164,7 @@ export default function CompareTable() {
         >
           <CompareValue className="border-b-0">
             <div>
-              <div>Regional: 99.99%</div>
-              <div>Global: 99.99%</div>
+              99.99%
             </div>
           </CompareValue>
         </td>
@@ -1174,8 +1174,7 @@ export default function CompareTable() {
         >
           <CompareValue className="border-b-0">
             <div>
-              <div>Regional: 99.99%</div>
-              <div>Global: 99.99%</div>
+              99.99%
             </div>
           </CompareValue>
         </td>
