@@ -97,6 +97,14 @@ export default function FAQ() {
         </AccordionContent>
       </AccordionItem>
 
+      <AccordionItem value="item-7">
+        <AccordionTrigger>How many indexes can I create?</AccordionTrigger>
+        <AccordionContent>
+          You can create up to 10 indexes for free and beyond this you will be
+          charged $0.5 per index up to 100 databases.
+        </AccordionContent>
+      </AccordionItem>
+
       <AccordionItem value="item-11">
         <AccordionTrigger>
           Do you have the Professional Support plan?
