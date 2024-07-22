@@ -1,0 +1,226 @@
+---
+
+title: "Building AI Applications using Upstash Redis, Upstash Vector and Vercel AI SDK"
+slug: vercel-ai-sdk
+authors:
+  - noah
+tags: [vector, vercel, ai, redis]
+---
+
+In this blog post, we will delve into the AI applications that can be created using Upstash Redis, Upstash Vector, and the Vercel AI SDK. We'll explore the unique features and capabilities of each tool, highlighting how they can be integrated to build powerful and efficient AI solutions. As we examine the functionalities of these tools, we will also take a glance at example applications briefly.
+
+## Upstash Vector
+
+Let’s first understand vectors and vector databases.
+
+Vector databases are specialized data storage systems designed to store and retrieve data in a numerical array format, known as vectors. These databases efficiently handle large volumes of high-dimensional vectors, making them ideal for managing complex data structures. Key benefits of using vector databases:
+
+**Efficiency**: These databases offer efficient storage and retrieval of high-dimensional vectors, reducing computational load and speeding up query responses in AI applications.
+
+**Accuracy**: Optimized search algorithms ensure that vector databases accurately find the most relevant data points, enhancing the performance of systems that require data classification, such as recommendation engines and fraud detection systems.
+
+**Real-Time Processing**: With the ability to process data in real-time, vector databases are ideal for applications requiring immediate responses, such as chatbots and real-time analytics.
+
+The vectors in AI usually represent the embeddings-based model of objects that capture the essential features or characteristics in the context of the application. For instance, in a natural language processing-based AI application, a vector may represent the semantics of the given text, speech or document. In an image processing-based application, the vectors represent the features of the given image.
+
+Now, let’s dive deep into the Upstash Vector.
+
+Upstash Vector is a serverless vector database that utilizes DiskANN as the vector similarity search algorithm with 3 types of similarity functions: Cosine, Euclidian distance and dot product. As Upstash Vector is serverless, it has a pay-as-you-go pricing and a free tier that supports people who want to explore.
+
+You can find more details about the algorithm and similarity functions used in Upstash Vector in [Upstash docs]( https://upstash.com/docs/vector/features).
+
+In addition to its low-cost high-performance search capability, it provides Rest API and SDKs in Typescript and Python to make the integration with Upstash Vector into our codebase easily.
+
+To integrate with Upstash Vector, we need to login to [console]( https://console.upstash.com/vector) first. Once we logged in, we can create a vector Index by by clicking on the `Create Index` button. In the pop-up modal, we can name our index, select the region where the index resides. After that, we can select an embedding model to be used to extract embeddings from the given object before writing to Upstash Vector index. There are some pre-defined open-source embedding models in Upstash that can be used. Otherwise, we can select `Custom` so that we can set dimensions of the vectors according to the external embedding model that we use.
+
+Lastly, we can select the similarity function that calculates the distance between vectors. There are 3 similarity functions defined in Upstash: Cosine, Euclidean distance and dot product. You can learn more about the similarity functions in [Upstash docs](https://upstash.com/docs/vector/features/similarityfunctions).
+
+![](https://lh7-us.googleusercontent.com/docsz/AD_4nXeZasluKvi4yg0-GfG1TyY63WCPFQY7D-t2i4amJ8pKEMXndiN6mwLoBmUHfQLwOYqe-dPBc-orYeJFCJxDrsAGveHGl2r1j7LYgcfclTqlHevrmmHHVi3Rcs5WlA35FPhE8KRSfS2J-Jk87HFIWGj8UCQn?key=aR1rhXlq2erlQyJvYn-H0A)
+
+In the next screen, we can select a plan that is suitable for us.
+
+Once we complete the index creation, we can integrate Upstash Vector with our codebase. I will use Typescript in this blog post, however, Python or Go SDKs can also be used. We can follow the integration guide given under `Details` tab on Upstash Vector console. We first need to install the `@upstash/vector` dependency.
+
+```
+npm i @upstash/vector
+```
+
+Now we can connect, write and query with the following methods easily.
+
+```typescript
+import { Index } from "@upstash/vector"
+const index = new Index({
+	url: <UPSTASH-VECTOR-ENDPOINT>,
+	token: <UPSTASH-VECTOR-TOKEN>,
+})
+await index.upsert({
+	id: "id1",
+	vector: […],
+	metadata: { metadata_field: "metadata_value" },
+});
+await index.query({
+	vector: […],
+	topK: 1,
+	includeVectors: true,
+	includeMetadata: true,
+});
+```
+
+## Vercel AI SDK
+
+The Vercel AI SDK is a TypeScript toolkit designed to streamline the integration of AI capabilities into web applications. It supports various frameworks like React, Next.js, Vue, Svelte, and Node.js, enabling developers to build AI-powered applications efficiently. The Vercel AI SDK consists of 3 main concepts:
+
+### AI SDK Core
+
+The Vercel AI SDK Core is an integral component of the Vercel AI SDK, designed to streamline the integration of artificial intelligence capabilities into web applications. This core module provides a unified API that facilitates the use of large language models (LLMs) to generate text, structured objects, and tool calls.
+
+The most common usage example is using `generateText` or `streamText` API. Let’s quickly use them in Typescript.
+
+First, import the Vercel AI SDK by running the following command on terminal.
+
+```
+`npm i ai`
+```
+
+Then, we can use `generateText` API as an example. Vercel AI SDK provides integration with some known model providers, such as OpenAI, Antropic, Google, Mistral an so on. We will use OpenAI in this example, but others are as simple as OpenAI integration.
+
+``` typescript
+import { generateText } from "ai"
+import { openai } from "@ai-sdk/openai"
+const { text } = await generateText({
+	model: openai("gpt-4-turbo"),
+	prompt: "What is love?"
+})
+```
+
+### AI SDK UI
+
+The Vercel AI SDK UI is a framework-agnostic toolkit that is designed to help developers to build interactive chat, completion, and assistant applications with some additional functionalities such as creation of chat interfaces, generative AI components and state management.
+
+The most common usage examples are `useChat` and `useCompletion` hooks. `useChat` provides streaming of chat messages by abstracting state management for the needed type of inputs and outputs such as messages, loading states and errors. `useCompletion` allows developers to manage text completions within AI applications, handles chat input state and automatically updates the UI as new completions arrive from your provider.
+
+Here, let’s see how to use `useChat` quickly as an example for AI SDK UI.
+
+```typescript
+const { messages, input, handleInputChange, handleSubmit} =
+	useChat({
+		api: "api/chat",
+		initialMessages: […],
+		onResponse(response) {},
+		streamMode: "text",
+	});
+```
+
+As you can see, it takes the API endpoint to call when message is sent, a function when the response received, and it manages state itself.
+
+### AI SDK RSC
+
+This part of the Vercel AI SDK is for server-side rendering. The purpose of AI SDK RSC is providing support for the large language model (LLM) to generate and stream UI directly from the server to the client via React Server Components (RSC).
+
+AI SDK RSC has multiple functions to support streaming outputs for server-side rendered UIs. For more details about them, please visit [Vercel AI SDK RSC docs](https://sdk.vercel.ai/docs/ai-sdk-rsc). In this blog, we will just examine one function to see how it works. For this purpose, let’s understand how to use `streamUI` function.
+
+```typescript
+const result = await streamUI({
+	model: openai('gpt-4o'),
+	prompt: 'Get the weather for San Francisco',
+	text: ({ content }) => <div>{content}</div>,
+	tools: {},
+});
+```
+
+As it can be seen, `streamUI` is also working like AI SDK Core functions. The main difference is streaming rendered UI from server.
+
+In short, Vercel AI SDK helps developers to build AI applications in all parts of the software development from backend to frontend.
+
+## Upstash Redis
+
+In AI applications, Upstash Redis can be used mainly for rate limiting to protect APIs and LLM model usage, caching purposes or storing message history in a AI chatbot application.
+
+We should first create a Redis database on [Upstash console](https://console.upstash.com/redis).
+
+**![](https://lh7-us.googleusercontent.com/docsz/AD_4nXfoRrR5l7DZO6e9V2WCAhLbnPbbo0g5-fXV_i1IrB0E0oi0UlhRaF6iMU_sbGfPoJFOmmp2U0IRdA2oZfmkkzHzij7m_EVh7uvWC2099eyNEjQrAuZ9_z0pz_WlRYmYec0O8_V6z_yEzUk3J8E3n58ToTk?key=aR1rhXlq2erlQyJvYn-H0A)**
+
+Once we create the Redis database, then we can integrate Redis with our codebase to write and query the data, which can be a caching data, message history, conversation state etc. To do that, we should install the Upstash Redis SDK first.
+
+```
+npm i @upstash/redis
+```
+
+Then, we can connect our Redis database from the code.
+
+```typescript
+import { Redis } from '@upstash/redis'
+const redis = new Redis({
+	url: <UPSTASH-REDIS-ENDPOINT>,
+	token: <UPSTASH-REDIS-TOKEN>,
+})
+const data = await redis.set('foo', 'bar');
+```
+
+If we want to use Redis for rate limiting, we can use rate limiting SDK provided by Upstash as well. The dependency to be installed is different for rate limiting SDK.
+
+```
+npm install @upstash/ratelimit
+```
+
+Now, to implement rate limiting;
+
+```typescript
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+
+// Create a new ratelimiter, that allows 10 requests per 10 seconds
+const ratelimit = new Ratelimit({
+	redis: Redis.fromEnv(),
+	limiter: Ratelimit.slidingWindow(10, "10 s"),
+	analytics: true,
+	/**
+	* Optional prefix for the keys used in redis. This is useful if you want to share a redis
+	* instance with other applications and want to avoid key collisions.5
+	*/
+	prefix: "prefix",
+});
+
+// Use a constant string to limit all requests with a single ratelimit
+// Or use a userID, apiKey or ip address for individual limits.
+const identifier = "identifier";
+const { success } = await ratelimit.limit(identifier);
+if (!success) {
+	return "Unable to process at this time";
+}
+// rest of the code
+```
+
+## Using Upstash Redis and Vector with Vercel AI SDK
+
+Now, what can be done with the tools explained above? So many things...
+
+RAG chatbots are the most common generative AI applications that can be built with Vercel AI SDK and Upstash Vector database. Retrieval-Augmented Generation (RAG) is an advanced framework that significantly enhances the capabilities of chatbots and other conversational AI systems. It merges two critical components —retrieval and generation— to deliver more accurate, contextually relevant, and informative responses. The RAG chatbots use vector database as a retriever, that stores and gives the history of the chat in a embedding format that can be used for generating the next response from the LLM model. With this way, the LLM model can generate responses which are relevant with the context of the conversation and learn from the past talk.
+
+For this kind of chatbot applications, Upstash Vector is a perfect vector database which can be the retriever. On top of the integration with the Upstash Vector, we can use `streamText` or `streamObject` APIs of Vercel AI SDK Core component in the backend side to generate and stream the response coming from the LLM models such as OpenAI, Anthropic, Mistral etc. On the frontend side, we can leverage the `useChat` hook of the Vercel AI SDK UI component, which is a powerful framework that handles the chat UI and the state management. You can see an example RAG application in the [DegreeGuru blog post](https://upstash.com/blog/degree-guru). 
+
+One other common example AI application type that can be built easily with Vercel AI SDK is recommendation systems. A recommendation system is one of the most important features of an e-commerce platform. It uses the personal preferences and history of the user to identify the interests of the user to give useful recommendations. While building the recommendation system, Vercel AI SDK Core can help us to extract embeddings of the user data easily by using `embed` function. Let’s see the example code below.
+
+```typescript
+import { embed } from 'ai';
+import { openai } from '@ai-sdk/openai';
+// 'embedding' is a single embedding object (number[])
+const { embedding } = await embed({
+	model: openai.embedding('text-embedding-3-small'),
+	value: 'sunny day at the beach',
+});
+```
+
+After extracting the embeddings, which is actually the semantic data in a numeric array format, we can store the output in Upstash Vector. Those embeddings can be queried and classified as per the user habits and used in future recommendations.
+
+The `embed` function that extracts embeddings from the input in Vercel AI SDK Core can be used in any kind of machine learning application, such as semantic search, image search, content summarization and so on. The developers can insert the vector embeddings extracted by this function into the Upstash Vector database so that products can analyze the inputs based on the embeddings without needing to store the raw data, which is useless for AI algorithms. The last example application is Customer review’s AI summary. In this example application, we can extract the embeddings from the given texts, which are customer reviews of a product and store it in the vector database. Later, the analysts can use the vectors to get the summary of the data by prompting to a LLM model, with Vercel AI SDK Core again.
+
+The last example that we can discuss in this blog post is fraud/anomaly detection systems. In a very basic format of anomaly detection, developers need to classify the transactions, or user behaviours so that they can detect if there is any unusual movement. For that purpose, Upstash vector database can be used to create vectors to locate in the n-dimensional space. Once the interactions of the users are located in the space via storing vectors in Upstash Vector, the analyzer tools can get the similarity of the incoming interaction with the interactions in vector space. These similarity scores can help to identify if the interaction is normal or not.
+
+In all the example applications that we discussed above, we can utilize Upstash Rate limiting feature for any kind of heavy operation, such as generating texts, calling AI models to extract embeddings etc. Thanks to rate limiting, we can protect our operations from the burst of traffic. In addition to that, Upstash Redis can be a great place to store the raw user data for our application, such as message history, cache of the prompts that we use for LLM models and so on.
+
+## Conclusion
+
+In this blog post, we discovered that Upstash Redis, Upstash Vector, and the Vercel AI SDK form a valuable combination for constructing advanced AI applications. These tools work together to efficiently manage data, process information, and deploy AI models. The examples provided demonstrate the versatility of this technology stack in creating a range of AI solutions.
+
+For further examples, you can check [Upstash blogs]( https://upstash.com/blog) and [Vercel templates](https://vercel.com/templates?type=ai).
