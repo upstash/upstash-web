@@ -50,7 +50,7 @@ export default function PricingTable() {
 
       {/* PAYG */}
 
-      <div className="flex flex-col items-center gap-6 rounded-3xl border-2 border-white/20 bg-white/10 px-4 py-8">
+      <div className="flex flex-col items-center gap-6 rounded-3xl bg-white/5 px-4 py-8">
         <div className="grow">
           <h4 className="mb-2 text-xl font-semibold text-emerald-400">
             Pay as you go
@@ -95,8 +95,8 @@ export default function PricingTable() {
 
       {/* PRO 2K */}
 
-      <div className="flex flex-col items-center gap-6 rounded-3xl bg-white/5 px-4 py-8">
-        <div>
+      <div className="flex flex-col items-center gap-6 rounded-3xl border-2 border-white/20 bg-white/10 px-4 py-8">
+        <div className="grow">
           <h4 className="mb-2 text-xl font-semibold text-emerald-400">
             Pro 2K
           </h4>
@@ -110,10 +110,9 @@ export default function PricingTable() {
           <p className="text-white/40">+$100 ✕ read region</p>
         </div>
 
-        <div>
+        <div className="grow">
           <div className="text-white/80">
-            For businesses with consistent high-capacity loads and predictable
-            costs.
+            Unlimited commands for a fixed price.
           </div>
         </div>
 
