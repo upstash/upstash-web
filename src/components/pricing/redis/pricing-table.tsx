@@ -112,7 +112,7 @@ export default function PricingTable() {
 
         <div className="grow">
           <div className="text-white/80">
-            Unlimited commands and enterprise-level performance for a fixed price.
+            Unlimited commands and high performance for a fixed price.
           </div>
         </div>
 
@@ -162,7 +162,7 @@ export default function PricingTable() {
 
         <div className="grow">
           <div className="text-white/80">
-            Everything in Pro2k at higher capacity, ideal for high-load applications.
+            Ideal for handling high-capacity loads at a fixed price.
           </div>
         </div>
 
