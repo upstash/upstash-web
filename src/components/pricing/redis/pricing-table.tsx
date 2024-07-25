@@ -62,7 +62,7 @@ export default function PricingTable() {
 
         <div className="grow">
           <div className="text-white/80">
-            For use cases with bursting traffic.
+            Flexible pricing for variable traffic.
           </div>
         </div>
 
@@ -112,8 +112,7 @@ export default function PricingTable() {
 
         <div>
           <div className="text-white/80">
-            For businesses with consistent high-capacity loads and predictable
-            costs.
+            Unlimited commands and high performance for a fixed price.
           </div>
         </div>
 
