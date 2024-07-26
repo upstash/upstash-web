@@ -1,12 +1,12 @@
 ---
-title: "NerdCoach"
+title: "Build a career coach with Upstash"
 slug: nerdcoach
 authors:
   - rishi
 tags: [sdk, rag, openai, vector, chatbot, ai, vercel]
 ---
 
-TODO
+In this post, you will learn how to build your own career coach with Upstash Vector, Upstash Redis, OpenAI API, Clerk, Next.js App Router, and Vercel. Upstash RAG Chat SDK simplifies the per-user management of vector embeddings, chat history, and dynamic (with latest) relevant context generation. Specifically, Upstash Redis stores the per-user chat history, while Upstash Vector handles all vector embeddings within each user's namespace.
 
 ## Prerequisites
 
@@ -280,11 +280,11 @@ export default async function getUserSession() {
 }
 ```
 
-Now, let's move on to define an instance of Upstash's RAGChat SDK.
+Now, let's move on to define an instance of Upstash's RAG Chat SDK.
 
 ## Instantiating Upstash RAG Chat SDK with OpenAI
 
-Upstash's `RAGChat` SDK aims at simplifying the developer experience for creating rag applications, via a simplified method of instantiating an instance, generating vector embeddings of any kind of data, and querying the AI with the dynamically generated context-aware for a response.
+Upstash's RAG Chat SDK aims at simplifying the developer experience for creating rag applications, via a simplified method of instantiating an instance, generating vector embeddings of any kind of data, and querying the AI with the dynamically generated context-aware for a response.
 
 To define an instance, create a file named `rag.server.ts` in the `lib` directory with the following code:
 
@@ -311,11 +311,11 @@ export default new RAGChat({
 })
 ```
 
-In the code above, a new `RAGChat` instance using the OpenAI model `gpt-3.5-turbo` with a prompt template for the chat interaction is defined, aiming to provide career advice based on context and chat history.
+In the code above, a new RAG Chat instance using the OpenAI model `gpt-3.5-turbo` with a prompt template for the chat interaction is defined, aiming to provide career advice based on context and chat history.
 
 With the utilities setup, let's move on to creating API endpoints for ingesting PDFs and streaming chat responses from AI.
 
-## Fetch Chat History API Endpoint
+## Chat History API Endpoint in Next.js App Router
 
 Create a file named `route.ts` in the `app/api/chat/history` directory that retrieves the chat history of a user with the following code:
 
@@ -345,7 +345,7 @@ export async function GET() {
 
 The code above retrieves upto 100 chat messages for the authenticated user and returns them as a JSON response. If the user session is not found, it responds with a 403 status.
 
-Now, let's move on to create a chat endpoint using the RAGChat SDK.
+Now, let's move on to create a chat endpoint using the RAG Chat SDK.
 
 ## Chat API Endpoint in Next.js App Router
 
@@ -388,7 +388,7 @@ export async function POST(request: Request) {
 
 The code above fetches the user session and chat messages, verifies the user's session, and adds relevant context dynamically. Then, it returns a streaming response using the `aiUseChatAdapter` function.
 
-Now, let's move on to create a context endpoint using the RAGChat SDK.
+Now, let's move on to create a context endpoint using the RAG Chat SDK.
 
 ## Context API Endpoint in Next.js App Router
 
@@ -430,9 +430,9 @@ The code above defines a POST method that fetches the user session and uploaded 
   With a per-user namespace, you easily seperate the chat context for each user.
 </Note>
 
-## TODO
+## Building the chatbot interface
 
-TODO
+To start building the application's user interface, open the `app/page.tsx` file and replace the existing code with the following:
 
 ```tsx
 // File: app/page.tsx
@@ -670,4 +670,4 @@ For more detailed insights, explore the references cited in this post.
 
 ## Conclusion
 
-TODO
+In this blog, you learned how to build a career coach application using Upstash Vector, Upstash Redis, OpenAI API, Clerk, Next.js App Router, and Vercel. You set up Upstash to manage vector embeddings and chat history, configured Clerk for user authentication, and integrated OpenAI for AI-powered responses. The blog walked you through creating API endpoints for chat interactions, adding context from user-uploaded PDFs, and building a user interface with authentication and file upload functionalities.
