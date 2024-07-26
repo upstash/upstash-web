@@ -364,4 +364,10 @@ export const authors: Record<
     url: "https://www.linkedin.com/in/abdullah-enes-g%C3%BCle%C5%9F/",
     image: "abdullahenes.jpg",
   },
+  ibrahim: {
+    name: "Ibrahim Gurses",
+    title: "Software Engineer @Peaka (Guest Author)",
+    url: "https://x.com/ibrahimgrses",
+    image: "ibrahim.png",
+  },
 };
