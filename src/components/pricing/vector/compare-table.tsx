@@ -283,6 +283,37 @@ export default function CompareTable() {
 
       <tr>
         <th className="px-0 text-left font-normal text-white/60">
+          Max Namespaces
+        </th>
+        {/**/}
+        <td
+            hidden={isMobile ? !showFree : false}
+            className="bg-white/3 px-4 py-0 align-top"
+        >
+          <CompareValue type="number">100</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPayg : false}
+            className="bg-emerald-300/10 px-4 py-0 align-top"
+        >
+          <CompareValue type="number">1000</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showFixed : false}
+            className="bg-white/3 px-4 py-0 align-top"
+        >
+          <CompareValue type="number">1000</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPro : false}
+            className="bg-white/3 px-4 py-0 align-top"
+        >
+          <CompareValue type="number">10000</CompareValue>
+        </td>
+      </tr>
+
+      <tr>
+        <th className="px-0 text-left font-normal text-white/60">
           Daily Query / Update Limit
         </th>
         {/**/}
@@ -357,7 +388,46 @@ export default function CompareTable() {
 
       <tr>
         <th className="px-0 text-left font-normal text-white/60">
-          Max Metadata Size
+          Max Data Per Vector
+        </th>
+        {/**/}
+        <td
+            hidden={isMobile ? !showFree : false}
+            className="bg-white/3 px-4 py-0 align-top"
+        >
+          <CompareValue type="size" suffix="MB">
+            1
+          </CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPayg : false}
+            className="bg-emerald-300/10 px-4 py-0 align-top"
+        >
+          <CompareValue type="size" suffix="MB">
+            1
+          </CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showFixed : false}
+            className="bg-white/3 px-4 py-0 align-top"
+        >
+          <CompareValue type="size" suffix="MB">
+            1
+          </CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPro : false}
+            className="bg-white/3 px-4 py-0 align-top"
+        >
+          <CompareValue type="size" suffix="MB">
+            1
+          </CompareValue>
+        </td>
+      </tr>
+
+      <tr>
+        <th className="px-0 text-left font-normal text-white/60">
+          Max Data / Metadata Size
         </th>
         {/**/}
         <td
