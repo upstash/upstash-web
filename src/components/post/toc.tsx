@@ -30,9 +30,9 @@ export default function PostTOC({ toc }: Props) {
       {/* content */}
       <div className="p-6 pt-0">
         <ul className="list-inside list-disc space-y-2">
-          {toc.items.map(({ title, url }) => {
+          {toc.items.map(({ title, url }, idx) => {
             return (
-              <li key={url}>
+              <li key={idx}>
                 <a
                   href={url}
                   className="text-emerald-600 dark:text-emerald-400"
