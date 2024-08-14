@@ -370,4 +370,9 @@ export const authors: Record<
     url: "https://x.com/ibrahimgrses",
     image: "ibrahim.png",
   },
+  metin: {
+    name: "Metin Dumandag",
+    title: "Software Engineer @Upstash",
+    image: "metin.jpg",
+  },
 };
