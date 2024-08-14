@@ -885,7 +885,7 @@ export default function CompareTable() {
                         className="border-b-0"
                         valid={false}
                         after={
-                            <Tooltip content="Available with Enterprise support subscription.">
+                            <Tooltip content="Available with Enterprise subscription.">
                                 <IconInfoCircle
                                     className="ml-1 opacity-60"
                                     stroke={1.2}
@@ -1020,7 +1020,7 @@ export default function CompareTable() {
                         className="border-b-0"
                         valid={false}
                         after={
-                            <Tooltip content="Available with Enterprise support subscription.">
+                            <Tooltip content="Available with Enterprise subscription.">
                                 <IconInfoCircle
                                     className="ml-1 opacity-60"
                                     stroke={1.2}
@@ -1039,7 +1039,7 @@ export default function CompareTable() {
                         className="border-b-0"
                         valid={false}
                         after={
-                            <Tooltip content="Available with Enterprise support subscription.">
+                            <Tooltip content="Available with Enterprise subscription.">
                                 <IconInfoCircle
                                     className="ml-1 opacity-60"
                                     stroke={1.2}
@@ -1058,7 +1058,7 @@ export default function CompareTable() {
                         className="border-b-0"
                         valid={false}
                         after={
-                            <Tooltip content="Available with Enterprise support subscription.">
+                            <Tooltip content="Available with Enterprise subscription.">
                                 <IconInfoCircle
                                     className="ml-1 opacity-60"
                                     stroke={1.2}
@@ -1152,7 +1152,7 @@ export default function CompareTable() {
                         className="border-b-0"
                         valid={false}
                         after={
-                            <Tooltip content="Available with Enterprise support subscription.">
+                            <Tooltip content="Available with Enterprise subscription.">
                                 <IconInfoCircle
                                     className="ml-1 opacity-60"
                                     stroke={1.2}
@@ -1171,7 +1171,7 @@ export default function CompareTable() {
                         className="border-b-0"
                         valid={false}
                         after={
-                            <Tooltip content="Available with Enterprise support subscription.">
+                            <Tooltip content="Available with Enterprise subscription.">
                                 <IconInfoCircle
                                     className="ml-1 opacity-60"
                                     stroke={1.2}
@@ -1269,7 +1269,7 @@ export default function CompareTable() {
                         className="border-b-0"
                         valid={false}
                         after={
-                            <Tooltip content="Available with Enterprise support subscription.">
+                            <Tooltip content="Available with Enterprise subscription.">
                                 <IconInfoCircle
                                     className="ml-1 opacity-60"
                                     stroke={1.2}
@@ -1315,7 +1315,7 @@ export default function CompareTable() {
                         className="border-b-0"
                         valid={false}
                         after={
-                            <Tooltip content="Available with Enterprise support subscription.">
+                            <Tooltip content="Available with Enterprise subscription.">
                                 <IconInfoCircle
                                     className="ml-1 opacity-60"
                                     stroke={1.2}
@@ -1334,7 +1334,7 @@ export default function CompareTable() {
                         className="border-b-0"
                         valid={false}
                         after={
-                            <Tooltip content="Available with Enterprise support subscription.">
+                            <Tooltip content="Available with Enterprise subscription.">
                                 <IconInfoCircle
                                     className="ml-1 opacity-60"
                                     stroke={1.2}
@@ -1353,7 +1353,7 @@ export default function CompareTable() {
                         className="border-b-0"
                         valid={false}
                         after={
-                            <Tooltip content="Available with Enterprise support subscription.">
+                            <Tooltip content="Available with Enterprise subscription.">
                                 <IconInfoCircle
                                     className="ml-1 opacity-60"
                                     stroke={1.2}
@@ -1523,7 +1523,7 @@ export default function CompareTable() {
                         className="border-b-0"
                         valid={false}
                         after={
-                            <Tooltip content="Available with Enterprise support subscription.">
+                            <Tooltip content="Available with Enterprise subscription.">
                                 <IconInfoCircle
                                     className="ml-1 opacity-60"
                                     stroke={1.2}
@@ -1542,7 +1542,7 @@ export default function CompareTable() {
                         className="border-b-0"
                         valid={false}
                         after={
-                            <Tooltip content="Available with Enterprise support subscription.">
+                            <Tooltip content="Available with Enterprise subscription.">
                                 <IconInfoCircle
                                     className="ml-1 opacity-60"
                                     stroke={1.2}
@@ -1561,7 +1561,7 @@ export default function CompareTable() {
                         className="border-b-0"
                         valid={false}
                         after={
-                            <Tooltip content="Available with Enterprise support subscription.">
+                            <Tooltip content="Available with Enterprise subscription.">
                                 <IconInfoCircle
                                     className="ml-1 opacity-60"
                                     stroke={1.2}
@@ -1676,7 +1676,7 @@ export default function CompareTable() {
                         className="border-b-0"
                         valid={false}
                         after={
-                            <Tooltip content="Available with Enterprise support subscription.">
+                            <Tooltip content="Available with Enterprise subscription.">
                                 <IconInfoCircle
                                     className="ml-1 opacity-60"
                                     stroke={1.2}
@@ -1695,7 +1695,7 @@ export default function CompareTable() {
                         className="border-b-0"
                         valid={false}
                         after={
-                            <Tooltip content="Available with Enterprise support subscription.">
+                            <Tooltip content="Available with Enterprise subscription.">
                                 <IconInfoCircle
                                     className="ml-1 opacity-60"
                                     stroke={1.2}
@@ -1714,7 +1714,7 @@ export default function CompareTable() {
                         className="border-b-0"
                         valid={false}
                         after={
-                            <Tooltip content="Available with Enterprise support subscription.">
+                            <Tooltip content="Available with Enterprise subscription.">
                                 <IconInfoCircle
                                     className="ml-1 opacity-60"
                                     stroke={1.2}
@@ -1746,7 +1746,7 @@ export default function CompareTable() {
                         className="border-b-0"
                         valid={false}
                         after={
-                            <Tooltip content="Available with Enterprise support subscription.">
+                            <Tooltip content="Available with Enterprise subscription.">
                                 <IconInfoCircle
                                     className="ml-1 opacity-60"
                                     stroke={1.2}

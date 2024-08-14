@@ -6,7 +6,7 @@ export default function PricingTableEnterprise() {
   return (
     <div className="items-center rounded-3xl border-2 border-emerald-300/10 bg-emerald-300/3 px-10 py-8 text-left text-emerald-100 md:mx-32 md:flex md:px-16 md:py-10">
       <div className="grow">
-        <h4 className="text-2xl font-semibold text-emerald-400">Ultimate</h4>
+        <h4 className="text-2xl font-semibold text-emerald-400">Enterprise</h4>
         <p className="">For businesses with advanced needs.</p>
 
         <Button
@@ -19,23 +19,26 @@ export default function PricingTableEnterprise() {
       </div>
 
       <div className="mt-6 md:mt-0">
-        <ul className="space-y-2">
-          <li className="flex items-center gap-1">
-            <Icon /> Scales over a billion of vectors
-          </li>
-          <li className="flex items-center gap-1">
-            <Icon /> Custom configurations
-          </li>
-          <li className="flex items-center gap-1">
-            <Icon /> Advanced security options
-          </li>
-        </ul>
+          <ul className="space-y-2">
+              <li className="flex items-center gap-1">
+                  <Icon/> Professional support with SLA
+              </li>
+              <li className="flex items-center gap-1">
+                  <Icon/> Scales over a billion of vectors
+              </li>
+              <li className="flex items-center gap-1">
+                  <Icon/> Custom configurations
+              </li>
+              <li className="flex items-center gap-1">
+                  <Icon/> Advanced security options
+              </li>
+          </ul>
       </div>
 
-      <Button
-        type="button"
-        href="mailto:support@upstash.com"
-        className="-ml-1 mt-6 bg-emerald-400 font-medium text-zinc-950 md:hidden"
+        <Button
+            type="button"
+            href="mailto:support@upstash.com"
+            className="-ml-1 mt-6 bg-emerald-400 font-medium text-zinc-950 md:hidden"
       >
         Contact Us
       </Button>

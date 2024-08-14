@@ -126,9 +126,9 @@ export default function FAQ() {
       </AccordionItem>
 
       <AccordionItem value="item-10">
-        <AccordionTrigger>How is the Ultimate database priced?</AccordionTrigger>
+        <AccordionTrigger>How is the Enterprise subscription priced?</AccordionTrigger>
         <AccordionContent>
-          For Ultimate databases, a custom price is set based on specific
+          For Enterprise subscription, a custom price is set based on specific
           requirements of the customer. For more information email us at{" "}
           <a href="sales@upstash.com">sales@upstash.com</a>
         </AccordionContent>
