@@ -1,0 +1,155 @@
+---
+title: "We Made RAG Chat Development Easier Than Ever"
+slug: rag-chat
+authors:
+  - oguzhan
+tags: [vector, ai, rag, redis]
+---
+
+
+Are you tired of wrestling with complex frameworks and piecing together multiple services just to build a simple RAG (Retrieval-Augmented Generation) chat application? We've been there too, and that's why we're excited to introduce `@upstash/rag-chat`, our new SDK designed to make RAG development a breeze.
+
+## The Problem with Current RAG Development
+
+Developing RAG applications has been a complex process:
+
+- Learning curve: Mastering frameworks like Langchain or LlamaIndex takes time.
+- Multiple services: You often need to juggle vector stores, LLM pipelines, and Redis for chat histories.
+- Integration challenges: Connecting your RAG system to a UI brings its own set of problems, from rate limiting to session handling.
+
+## The RAG Struggle is Real
+
+Let's face it, building RAG apps used to be about as fun as a root canal. You'd spend ages wrapping your head around Langchain or LlamaIndex, only to find yourself drowning in a sea of vector stores, LLM pipelines, and Redis instances. And don't even get me started on the joys of hooking all that up to a UI. Rate limiting? Session handling?
+
+## Enter RAG Chat: Your New Best Friend
+
+We've been there, done that, and got the "I Survived RAG Development" t-shirt. That's why we cooked up the RAG Chat SDK. It's like having a secret weapon that turns you into a RAG superhero overnight. No cape required (but highly recommended for dramatic effect).
+
+Want to see some magic? Check this out:
+
+```typescript
+import { RAGChat, openai } from "@upstash/rag-chat";
+
+// Abracadabra! Your RAG Chat is born
+const ragChat = new RAGChat({
+  model: openai("gpt-4-turbo"),
+});
+
+// Feed it some brain food
+await ragChat.context.add({
+  type: "text",
+  data: "Light travels at 299,792,458 meters per second. That's like, really fast.",
+});
+
+await ragChat.context.add({
+  type: "pdf",
+  fileSource: "./data/mind_blowing_physics.pdf",
+});
+
+// Ask it something cool
+const response = await ragChat.chat("How fast is light, and can I outrun it?");
+
+console.log(response.output);
+// Spoiler: No, you can't outrun light. Unless you're The Flash. Are you The Flash?
+```
+
+Boom! Just like that, you've got a RAG chat app up and running. No sweat, no tears, just pure coding bliss.
+
+## But Wait, There's More!
+
+Think that's cool? Hold onto your keyboards, because RAG Chat is like the Swiss Army knife of AI development:
+
+1. It plays nice with all the cool LLM kids on the block - OpenAI, TogetherAI, MistralAI, Groq, you name it.
+2. Upstash has got your back with everything you need - vector storage, Redis for remembering all those witty chat comebacks, and LLM integration.
+3. Wanna get fancy? Go nuts with the advanced settings. It's like customizing your perfect pizza, but for code.
+4. Broke developer alert! Use Ollama for local development and save those precious dollars for coffee.
+5. Built-in analytics.
+
+## Level Up Your RAG Game
+
+For those of you who like to live dangerously (a.k.a. advanced users), here's how you can turn your RAG Chat into a supercharged, turbo-boosted beast:
+
+```typescript
+const ragChat = new RAGChat({
+  model: openrouter("model-name", { apiKey: "super-secret-key" }),
+  vector: new Index(),
+  redis: new Redis(),
+  ratelimit: new Ratelimit({
+    redis: new Redis(),
+    limiter: Ratelimit.tokenBucket(1, "1d", 1),
+    prefix: "@upstash/rag-chat-ratelimit",
+  }),
+  namespace: "cooler-than-cool-namespace",
+  sessionId: "user-session-42",
+  promptFn: ({ context, question, chatHistory }) => {
+    // Your chance to play puppet master with the AI
+  }
+});
+```
+
+## Debugging: Because Even Superheroes Need a Sidekick
+
+Developing locally? Turn on debug mode and watch the magic happen:
+
+```typescript
+const ragChat = new RAGChat({
+  debug: true,
+  // Other cool stuff here
+});
+```
+
+Going live? Hook it up with some fancy analytics:
+
+```typescript
+const ragChat = new RAGChat({
+  model: openai("chatgpt-3-turbo", {
+    analytics: { name: "helicone", token: "helicone-secret-handshake" }
+  }),
+  // More awesomeness
+});
+```
+
+Or get all CSI with Langsmith tracing:
+
+```typescript
+const ragChat = new RAGChat({
+  model: openai("chatgpt-3-turbo", {
+    analytics: { name: "langsmith", token: "langchain-detective-badge" }
+  }),
+  // You know the drill
+});
+```
+
+## Already Using Vercel's AI SDK? No Sweat!
+
+Switching to RAG Chat is easier than convincing a cat to take a nap:
+
+```typescript
+import { openai } from "@ai-sdk/openai";
+
+const ragChat = new RAGChat({
+  model: openai("gpt-3.5-turbo"),
+  vector,
+  redis: new Redis({
+    token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+    url: process.env.UPSTASH_REDIS_REST_URL!,
+  }),
+  sessionId: "ai-sdk-session",
+  namespace: "ai-sdk",
+});
+```
+
+## Why RAG Chat is Your New Coding BFF
+
+1. It's simpler than a two-piece puzzle.
+2. More flexible than a yoga instructor.
+3. More comprehensive than your high school textbook (and way more fun).
+4. Faster than your cat when it hears a can opener.
+
+## Let's Wrap This Up!
+
+So there you have it, folks! RAG Chat is here to turn your RAG development nightmares into sweet, code-filled dreams. Whether you're building the next big chatbot or just trying to impress your rubber duck, RAG Chat's got your back.
+
+Ready to join the RAG revolution? Dive into our docs at [docs.upstash.com/rag-chat](https://upstash.com/docs/vector/sdks/rag-chat/gettingstarted) and start building something awesome!
+
+Got questions? Bright ideas? Terrible puns? We're all ears! Hit up our support team or join the party on our community forum. With `@upstash/rag-chat`, you can set up a fully functional RAG chat system in just a few lines of code.
