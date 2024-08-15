@@ -15,7 +15,9 @@ export default function CompareTable() {
 
   const showFree = selectedPlans === PricingPlans.Free;
   const showPayg = selectedPlans === PricingPlans.PayAsYouGo;
-  const showEnterprise = selectedPlans == PricingPlans.Enterprise;
+  const showPro1 = selectedPlans === PricingPlans.Pro1M;
+  const showPro10 = selectedPlans === PricingPlans.Pro10M;
+
 
   const onPlanChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value as PricingPlans;
@@ -25,126 +27,169 @@ export default function CompareTable() {
   return (
     <table className="w-full border-separate border-spacing-x-1 border-spacing-y-0">
       <colgroup>
-        <col className="w-1/3 md:w-1/4" />
-        <col className="w-1/3 md:w-1/4" />
-        <col className="w-1/3 md:w-1/4" />
-        <col className="w-1/3 md:w-1/4" />
+        <col className="w-1/3 md:w-1/5"/>
+        <col className="w-1/3 md:w-1/5"/>
+        <col className="w-1/3 md:w-1/5"/>
+        <col className="w-1/3 md:w-1/5"/>
+        <col className="w-1/3 md:w-1/5"/>
       </colgroup>
 
       {/**/}
 
       <thead>
-        <tr>
-          <td className="p-0" />
-          <th
+      <tr>
+        <td className="p-0"/>
+        <th
             hidden={isMobile ? !showFree : false}
             className="border-b-2 border-b-zinc-950 bg-white/3 px-0
              py-3 text-xs font-medium uppercase
           tracking-wider text-white/80"
-          >
-            Free
-          </th>
-          <th
+        >
+          Free
+        </th>
+        <th
             hidden={isMobile ? !showPayg : false}
             className="border-b-2 border-b-zinc-950 bg-emerald-300/10 px-0
              py-3 text-xs font-medium uppercase
           tracking-wider text-white/80"
-          >
-            Usage Based Pricing
-          </th>
-          <th
-            hidden={isMobile ? !showEnterprise : false}
+        >
+          Usage Based Pricing
+        </th>
+        <th
+            hidden={isMobile ? !showPro1 : false}
             className="border-b-2 border-b-zinc-950 bg-white/3 px-0
              py-3 text-xs font-medium uppercase
             tracking-wider text-white/80"
-          >
-            Fixed Pricing
-          </th>
-        </tr>
+        >
+          Fixed Pricing
+        </th>
+        <th
+            hidden={isMobile ? !showPro10 : false}
+            className="border-b-2 border-b-zinc-950 bg-white/3 px-0
+             py-3 text-xs font-medium uppercase
+            tracking-wider text-white/80"
+        >
+          Fixed Pricing
+        </th>
+      </tr>
 
-        <tr className="sticky top-20 z-20 md:top-0">
-          <td className="" />
-          <th
+      <tr className="sticky top-20 z-20 md:top-0">
+        <td className=""/>
+        <th
             hidden={isMobile ? !showFree : false}
             className="border-b border-b-zinc-800 bg-zinc-950 p-0"
-          >
-            <div className="flex h-24 flex-col items-center justify-center bg-white/3">
-              <h4 className="hidden text-lg font-semibold text-emerald-400 md:block">
-                Free
-              </h4>
+        >
+          <div className="flex h-24 flex-col items-center justify-center bg-white/3">
+            <h4 className="hidden text-lg font-semibold text-emerald-400 md:block">
+              Free
+            </h4>
 
-              <select
+            <select
                 className="bg-transparent px-4 py-2 font-semibold md:hidden"
                 onChange={onPlanChange}
                 value={PricingPlans.Free}
-              >
-                <option value={PricingPlans.Free} disabled>
-                  Free
-                </option>
-                <option value={PricingPlans.PayAsYouGo}>Pay as you go</option>
-                <option value={PricingPlans.Enterprise}>Pro</option>
-              </select>
-            </div>
-          </th>
-          <th
+            >
+              <option value={PricingPlans.Free} disabled>
+                Free
+              </option>
+              <option value={PricingPlans.PayAsYouGo}>Pay as you go</option>
+              <option value={PricingPlans.Enterprise}>Pro</option>
+            </select>
+          </div>
+        </th>
+        <th
             hidden={isMobile ? !showPayg : false}
             className="border-b border-b-zinc-800 bg-zinc-950 p-0"
-          >
-            <div className="flex h-24 flex-col items-center justify-center bg-emerald-300/10">
-              <h4 className="hidden text-lg font-semibold text-emerald-400 md:block">
-                Pay as you go
-              </h4>
+        >
+          <div className="flex h-24 flex-col items-center justify-center bg-emerald-300/10">
+            <h4 className="hidden text-lg font-semibold text-emerald-400 md:block">
+              Pay as you go
+            </h4>
 
-              <select
+            <select
                 className="bg-transparent px-4 py-2 font-semibold md:hidden"
                 onChange={onPlanChange}
                 value={PricingPlans.PayAsYouGo}
-              >
-                <option value={PricingPlans.Free}>Free</option>
-                <option value={PricingPlans.PayAsYouGo} disabled>
-                  Pay as you go
-                </option>
-                <option value={PricingPlans.Enterprise}>Pro</option>
-              </select>
+            >
+              <option value={PricingPlans.Free}>Free</option>
+              <option value={PricingPlans.PayAsYouGo} disabled>
+                Pay as you go
+              </option>
+              <option value={PricingPlans.Enterprise}>Pro</option>
+            </select>
 
-              <h5 className="flex items-baseline font-semibold">
-                $1
-                <span className="ml-1 text-base font-normal opacity-40">
+            <h5 className="flex items-baseline font-semibold">
+              $1
+              <span className="ml-1 text-base font-normal opacity-40">
                   / 100K messages
                 </span>
-              </h5>
-            </div>
-          </th>
-          <th
-            hidden={isMobile ? !showEnterprise : false}
+            </h5>
+          </div>
+        </th>
+        <th
+            hidden={isMobile ? !showPro1 : false}
             className="border-b border-b-zinc-800 bg-zinc-950 p-0"
-          >
-            <div className="flex h-24 flex-col items-center justify-center bg-white/3">
-              <h4 className="hidden text-lg font-semibold text-emerald-400 md:block">
-                Pro
-              </h4>
+        >
+          <div className="flex h-24 flex-col items-center justify-center bg-white/3">
+            <h4 className="hidden text-lg font-semibold text-emerald-400 md:block">
+              Pro 1M
+            </h4>
 
-              <select
+            <select
                 className="bg-transparent px-4 py-2 font-semibold md:hidden"
                 onChange={onPlanChange}
-                value={PricingPlans.Enterprise}
-              >
-                <option value={PricingPlans.Free}>Free</option>
-                <option value={PricingPlans.PayAsYouGo}>Pay as you go</option>
-                <option value={PricingPlans.Enterprise} disabled>
-                  Pro
-                </option>
-              </select>
+                value={PricingPlans.Pro1M}
+            >
+              <option value={PricingPlans.Free}>Free</option>
+              <option value={PricingPlans.PayAsYouGo}>Pay as you go</option>
+              <option value={PricingPlans.Pro1M} disabled>
+                Pro 1M
+              </option>
+              <option value={PricingPlans.Pro10M}>Pro 10M</option>
+            </select>
 
-              <h5 className="flex items-baseline font-semibold">
-                $180
-                <span className="ml-1 text-base font-normal opacity-40">
+            <h5 className="flex items-baseline font-semibold">
+            $180
+              <span className="ml-1 text-base font-normal opacity-40">
                   / month
                 </span>
-              </h5>
-            </div>
-          </th>
-        </tr>
+            </h5>
+          </div>
+        </th>
+
+        <th
+            hidden={isMobile ? !showPro10 : false}
+            className="border-b border-b-zinc-800 bg-zinc-950 p-0"
+        >
+          <div className="flex h-24 flex-col items-center justify-center bg-white/3">
+            <h4 className="hidden text-lg font-semibold text-emerald-400 md:block">
+              Pro 10M
+            </h4>
+
+            <select
+                className="bg-transparent px-4 py-2 font-semibold md:hidden"
+                onChange={onPlanChange}
+                value={PricingPlans.Pro10M}
+            >
+              <option value={PricingPlans.Free}>Free</option>
+              <option value={PricingPlans.PayAsYouGo}>Pay as you go</option>
+              <option value={PricingPlans.Pro1M}>Pro 1M</option>
+              <option value={PricingPlans.Pro10M} disabled>
+                Pro 10M
+              </option>
+            </select>
+
+            <h5 className="flex items-baseline font-semibold">
+            $420
+              <span className="ml-1 text-base font-normal opacity-40">
+                  / month
+                </span>
+            </h5>
+          </div>
+        </th>
+
+
+      </tr>
       </thead>
 
       <tbody>
@@ -183,10 +228,16 @@ export default function CompareTable() {
           <CompareValue type="number">500000</CompareValue>
         </td>
         <td
-            hidden={isMobile ? !showEnterprise : false}
+            hidden={isMobile ? !showPro1 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>up to 100M</CompareValue>
+          <CompareValue>1M</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPro10 : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue>10M</CompareValue>
         </td>
       </tr>
 
@@ -208,10 +259,16 @@ export default function CompareTable() {
           <CompareValue type="number">100</CompareValue>
         </td>
         <td
-            hidden={isMobile ? !showEnterprise : false}
+            hidden={isMobile ? !showPro1 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>Custom</CompareValue>
+          <CompareValue>500</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPro10 : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue>1000</CompareValue>
         </td>
       </tr>
 
@@ -237,7 +294,15 @@ export default function CompareTable() {
           </CompareValue>
         </td>
         <td
-            hidden={isMobile ? !showEnterprise : false}
+            hidden={isMobile ? !showPro1 : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue type="size" suffix="MB">
+            10
+          </CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPro10 : false}
             className="bg-white/3 px-4 py-0"
         >
           <CompareValue type="size" suffix="MB">
@@ -264,10 +329,16 @@ export default function CompareTable() {
           <CompareValue>20</CompareValue>
         </td>
         <td
-            hidden={isMobile ? !showEnterprise : false}
+            hidden={isMobile ? !showPro1 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>Infinite</CompareValue>
+          <CompareValue>Custom</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPro10 : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue>Custom</CompareValue>
         </td>
       </tr>
 
@@ -289,10 +360,16 @@ export default function CompareTable() {
           <CompareValue>100</CompareValue>
         </td>
         <td
-            hidden={isMobile ? !showEnterprise : false}
+            hidden={isMobile ? !showPro1 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>Infinite</CompareValue>
+          <CompareValue>Custom</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPro10 : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue>Custom</CompareValue>
         </td>
       </tr>
 
@@ -314,10 +391,16 @@ export default function CompareTable() {
           <CompareValue>5</CompareValue>
         </td>
         <td
-            hidden={isMobile ? !showEnterprise : false}
+            hidden={isMobile ? !showPro1 : false}
             className="bg-white/3 px-4 py-0"
         >
           <CompareValue>20</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPro10 : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue>100</CompareValue>
         </td>
       </tr>
 
@@ -339,7 +422,13 @@ export default function CompareTable() {
           <CompareValue>1 year</CompareValue>
         </td>
         <td
-            hidden={isMobile ? !showEnterprise : false}
+            hidden={isMobile ? !showPro1 : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue>Custom</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPro10 : false}
             className="bg-white/3 px-4 py-0"
         >
           <CompareValue>Custom</CompareValue>
@@ -364,7 +453,13 @@ export default function CompareTable() {
           <CompareValue>2 hours</CompareValue>
         </td>
         <td
-            hidden={isMobile ? !showEnterprise : false}
+            hidden={isMobile ? !showPro1 : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue>Custom</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPro10 : false}
             className="bg-white/3 px-4 py-0"
         >
           <CompareValue>Custom</CompareValue>
@@ -389,10 +484,16 @@ export default function CompareTable() {
           <CompareValue>7 days</CompareValue>
         </td>
         <td
-            hidden={isMobile ? !showEnterprise : false}
+            hidden={isMobile ? !showPro1 : false}
             className="bg-white/3 px-4 py-0"
         >
           <CompareValue>30 days</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPro10 : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue>1 year</CompareValue>
         </td>
       </tr>
 
@@ -414,7 +515,13 @@ export default function CompareTable() {
           <CompareValue type="number">10000</CompareValue>
         </td>
         <td
-            hidden={isMobile ? !showEnterprise : false}
+            hidden={isMobile ? !showPro1 : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue>Custom</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPro10 : false}
             className="bg-white/3 px-4 py-0"
         >
           <CompareValue>Custom</CompareValue>
@@ -440,10 +547,16 @@ export default function CompareTable() {
           <CompareValue type="number">100</CompareValue>
         </td>
         <td
-            hidden={isMobile ? !showEnterprise : false}
+            hidden={isMobile ? !showPro1 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>Custom</CompareValue>
+          <CompareValue>1000</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPro10 : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue>1000</CompareValue>
         </td>
       </tr>
 
@@ -465,10 +578,16 @@ export default function CompareTable() {
           <CompareValue type="number">100</CompareValue>
         </td>
         <td
-            hidden={isMobile ? !showEnterprise : false}
+            hidden={isMobile ? !showPro1 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>Custom</CompareValue>
+          <CompareValue>1000</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPro10 : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue>1000</CompareValue>
         </td>
       </tr>
 
@@ -490,7 +609,13 @@ export default function CompareTable() {
           <CompareValue type="number">10</CompareValue>
         </td>
         <td
-            hidden={isMobile ? !showEnterprise : false}
+            hidden={isMobile ? !showPro1 : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue>Custom</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPro10 : false}
             className="bg-white/3 px-4 py-0"
         >
           <CompareValue>Custom</CompareValue>
@@ -514,7 +639,13 @@ export default function CompareTable() {
           <CompareValue type="number">30000</CompareValue>
         </td>
         <td
-            hidden={isMobile ? !showEnterprise : false}
+            hidden={isMobile ? !showPro1 : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue type="number">300000</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPro10 : false}
             className="bg-white/3 px-4 py-0"
         >
           <CompareValue type="number">300000</CompareValue>
@@ -538,7 +669,13 @@ export default function CompareTable() {
           <CompareValue>10M</CompareValue>
         </td>
         <td
-            hidden={isMobile ? !showEnterprise : false}
+            hidden={isMobile ? !showPro1 : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue>1B</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPro10 : false}
             className="bg-white/3 px-4 py-0"
         >
           <CompareValue>1B</CompareValue>
@@ -560,14 +697,20 @@ export default function CompareTable() {
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0 align-top"
         >
+          <CompareValue type="boolean" valid={false}/>
+        </td>
+        <td
+            hidden={isMobile ? !showPro1 : false}
+            className="bg-white/3 px-4 py-0 align-top"
+        >
           <CompareValue className="border-b-0">
             <div>
-              99.9%
+              99.99%
             </div>
           </CompareValue>
         </td>
         <td
-            hidden={isMobile ? !showEnterprise : false}
+            hidden={isMobile ? !showPro10 : false}
             className="bg-white/3 px-4 py-0 align-top"
         >
           <CompareValue className="border-b-0">
@@ -612,11 +755,19 @@ export default function CompareTable() {
           <CompareValue>None</CompareValue>
         </td>
         <td
-            hidden={isMobile ? !showEnterprise : false}
+            hidden={isMobile ? !showPro1 : false}
             className="bg-white/3 px-4 py-0"
         >
           <CompareValue>
-            Starts from $180
+            $180
+          </CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPro10 : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue>
+            $420
           </CompareValue>
         </td>
       </tr>
@@ -638,7 +789,13 @@ export default function CompareTable() {
           <CompareValue>$1 per 100K</CompareValue>
         </td>
         <td
-            hidden={isMobile ? !showEnterprise : false}
+            hidden={isMobile ? !showPro1 : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue>None</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPro10 : false}
             className="bg-white/3 px-4 py-0"
         >
           <CompareValue>None</CompareValue>
@@ -662,7 +819,13 @@ export default function CompareTable() {
           <CompareValue>$0.3 per 1M tokens</CompareValue>
         </td>
         <td
-            hidden={isMobile ? !showEnterprise : false}
+            hidden={isMobile ? !showPro1 : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue>$0.3 per 1M tokens</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPro10 : false}
             className="bg-white/3 px-4 py-0"
         >
           <CompareValue>$0.3 per 1M tokens</CompareValue>

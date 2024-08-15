@@ -16,5 +16,7 @@ export enum PricingPlans {
   Pro = "pro",
   Pro2K = "pro2k",
   Pro10K = "pro10k",
+  Pro1M = "pro1m",
+  Pro10M = "pro10m",
   Enterprise = "enterprise",
 }
