@@ -8,17 +8,14 @@ import IconQStash from "@/components/icon-qstash";
 import IconRedis from "@/components/icon-redis";
 import IconVector from "@/components/icon-vector";
 
-type Product = "/redis" | "/kafka" | "/vector" | "/qstash";
-
-const productConfig: Record<
-  Product,
-  { name: string; Icon: React.ComponentType<{ width: number }> }
-> = {
+const productConfig = {
   "/redis": { name: "Redis", Icon: IconRedis },
   "/kafka": { name: "Kafka", Icon: IconKafka },
   "/vector": { name: "Vector", Icon: IconVector },
   "/qstash": { name: "QStash", Icon: IconQStash },
-};
+} as const;
+
+type Product = keyof typeof productConfig;
 
 export default function ProductToggle({ product }: { product: Product }) {
   return (
