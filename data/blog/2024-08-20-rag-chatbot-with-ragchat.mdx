@@ -1,11 +1,11 @@
 ---
 title : Building a PDF Chatbot with Upstash RAGChat
 slug : rag-chatbot-with-ragchat
+draft : true
 authors:
   - eray
 tags: [vector, rag, upstash, ragchat, chatbot, ai]
 ---
-# Building a PDF Chatbot with Upstash RAGChat
 
 Chatbots are becoming increasingly sophisticated, leveraging advanced AI models to provide human-like interactions. In this project, we combine the power of Upstash RAGChat and OpenAI's GPT-4 to create a chatbot that can process and understand PDF documents.
 
@@ -21,6 +21,7 @@ Chatbots are becoming increasingly sophisticated, leveraging advanced AI models 
 
 ## How It Works
 Note: This section doesn't cover the entire codebase. We'll focus on crucial parts of the project to clarify implementation details. For example, we won't discuss design and UI details but will focus on the more functional aspects of the project. For those interested in these details, you can examine the [source code](https://github.com/upstash/chat-with-pdf). 
+
 ### 1. RagCHAT Initilizaton
 We start by initializing the RAGChat object with an AI model. We chose OpenAI's GPT-4-turbo model. The method is straightforward; we import the required packages and specify the model. Although this is a short piece of code, it's good practice to create a separate file to keep the project organized. Thus, we created the `rag-chat.ts` file.
 ```typescript
@@ -61,6 +62,7 @@ export default async function handler(
         res.status(405).json({ error: `Method '${req.method}' Not Allowed` })
     }
 }
+
 ```
 The `extractTextFromPDF` function is responsible for extracting text from the file. This method uses the `pdf-parse` library to extract the text content from the number array representing the PDF.
 ``` typescript
