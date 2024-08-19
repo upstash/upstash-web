@@ -375,4 +375,10 @@ export const authors: Record<
     title: "Software Engineer @Upstash",
     image: "metin.jpg",
   },
+  yunus: {
+    name: "Yunus Emre Ozdemir",
+    title: "Software Engineer @Upstash",
+    url: "https://github.com/yunusemreozdemir",
+    image: "yunus.jpg",
+  },
 };

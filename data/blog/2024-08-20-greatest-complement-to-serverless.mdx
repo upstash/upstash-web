@@ -1,0 +1,538 @@
+---
+title: "Greatest Complement to Serverless"
+slug: greatest-complement-to-serverless
+authors:
+  - yunus
+tags: [upstash, redis, qstash, vector, ai, vercel]
+---
+
+In this post, we will design a Serverless Scalable AI-Powered Applicant Search Engine together.
+
+You will find great features that you can incorporate in your application and solutions to common problems encountered in serverless.
+
+And by the end of this journey, I hope you will see how beautifully Upstash complements the serverless architecture.
+
+Let’s get right into it.
+
+## Idea
+
+- **Serverless:** Everything is hosted on [Vercel](https://vercel.com/).
+
+- **Scalable:** Handles any level of traffic with ease and predictable, linear cost scaling.
+
+- **AI-Powered:** Utilizes powerful natural language understanding of embedding models and LLMs.
+
+- **Applicant Search Engine:** Recruiters can search & rank applicants using natural language.
+
+### **Meet Purple Squirrel**
+
+Open Source implementation of this project is on GitHub! Find at [upstash/purple-squirrel](https://github.com/upstash/purple-squirrel)
+There is also a live demo you can explore! Find at [purple-squirrel.vercel.app](https://purple-squirrel.vercel.app/)
+
+![purple-squirrel.png](/blog/greatest-complement-to-serverless/purple-squirrel.png)
+
+<Note type="info">
+  Some features described in this article are implemented a little differently in Purple Squirrel since they were not released yet at the time of development.
+</Note>
+
+<details>
+  <summary>Purple Squirrel has many additional features you can explore ⬇️</summary>
+
+    - Detailed UI made with [NextUI](https://nextui.org/) components.
+    - Authentication and Role Based Access Control with [Clerk](https://clerk.com/).
+    - Dynamically routed Application Pages for positions.
+    - Admin Dashboard
+        - Manage open positions
+        - Change accepted application methods
+        - Assign Recruiter & Admin roles
+    - Recruiter Console
+        - Query Terminal
+        - Saved & Recent Queries
+</details>
+
+## General Architecture
+
+![overview.png](/blog/greatest-complement-to-serverless/overview.png)
+
+**Application Stage**
+
+1. Applicants send their resumes to the company's inbox.
+2. These emails go through the **Email Pipeline** which consists of several Vercel Serverless and Edge Functions orchestrated by QStash.
+3. Extracted data is saved to Upstash Redis and Upstash Vector.
+
+**Search Stage**
+
+1. Recruiters interact with Frontend hosted on Vercel.
+2. Frontend calls **Search Engine**, which consists of several Vercel Edge Functions.
+3. Search Engine queries Upstash Vector and retrieves data from Upstash Redis.
+
+We will further break down this architecture throughout this article.
+
+### Set up a Global, Scalable Database with Upstash Redis
+
+![redis.png](/blog/greatest-complement-to-serverless/redis.png)
+
+We have many different types of data to store in our application. We will use Upstash Redis, a serverless key-value database.
+
+**Why should you use Upstash Redis?**
+
+**Serverless:** No server management, easy setup, automatic scaling.
+
+**Scales to Zero:** Only pay for what you really use.
+
+**Global Replication:** Fast anywhere, Upstash replicates your data for the best latency all over the world.
+
+**Setup**
+
+1. Create a Redis database using [Upstash Console](https://console.upstash.com/) or [Upstash CLI](https://github.com/upstash/cli). Set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` in your `.env` file.
+
+```bash
+UPSTASH_REDIS_REST_URL=<YOUR_URL>
+UPSTASH_REDIS_REST_TOKEN=<YOUR_TOKEN>
+```
+    
+2. Install `@upstash/redis`:
+    
+```bash
+npm install @upstash/redis
+```
+    
+3. Initialize `redis`:
+    
+```tsx
+import { Redis } from '@upstash/redis';
+
+const redis = Redis.fromEnv();
+```
+    
+
+**Usage**
+
+Here are demonstrations of different types of data operations used in Purple Squirrel. Check out the repository to discover other use-cases.
+
+1. Tracking setup status with `SET` & `GET`:
+    
+```tsx
+await redis.set("setup:status", true);
+const setupStatus = await redis.get("setup:status");
+```
+    
+2. Generating applicant IDs with `INCR`:
+    
+```tsx
+const applicantID = await redis.incr("applicant:id:generator");
+```
+    
+3. Saving and retrieving applicant data with `JSON.SET` and `JSON.GET`:
+    
+```tsx
+await redis.json.set(`applicant#${id}`, "$", JSON.stringify(applicantData));
+const applicantData = await redis.json.get(`applicant#${id}`, "$"); 
+```
+    
+4. List operations on recent queries, `LRANGE` & `LPUSH`:
+    
+```tsx
+// Get the last 30 queries
+const queries = await redis.lrange(`recent:queries#${userId}`, 0, 29);
+// Insert a new query
+await redis.lpush(`recent:queries#${userId}`, data); 
+```
+    
+
+## Email Pipeline
+
+![qstash_plan.png](/blog/greatest-complement-to-serverless/qstash_plan.png)
+
+Let’s start by imagining a workflow like this with four serverless functions:
+
+`search-unseen`
+
+1. Searches unseen emails in inbox through an IMAP connection.
+2. Passes their ids.
+
+`fetch-unseen`
+
+1. Fetches the mail with the given id via IMAP connection.
+2. Uploads the resume to a file store.
+3. Parses the text of the resume.
+4. Passes mail data forward.
+
+`parse-mail`
+
+1. Calls an LLM with mail data to extract information from the resume.
+2. Passes mail data and response forward.
+
+`create-applicant`
+
+1. Generates an applicant id.
+2. Stores the applicant data in Upstash Redis and Vector.
+
+Now we have some problems to solve:
+
+### Schedule Serverless Functions with QStash Schedules
+
+**Problem:** Serverless functions are short-lived invocations that need to be triggered to execute. How can we listen an inbox then?
+
+**Solution:** We can use QStash Schedules to call `search-unseen` periodically.
+
+![schedule.png](/blog/greatest-complement-to-serverless/schedule.png)
+
+**Setup**
+
+1. Create an Upstash account and get your [QStash token](https://console.upstash.com/qstash). Set it in your `.env` file.
+    
+```bash
+QSTASH_TOKEN=<YOUR_TOKEN>
+```
+    
+2. Install `@upstash/qstash`
+    
+```bash
+npm install @upstash/qstash
+```
+    
+
+**Initialize Client**
+
+```tsx
+import { Client } from "@upstash/qstash";
+
+const client = new Client({ token: process.env.QSTASH_TOKEN as string });
+```
+
+**Create a Schedule**
+
+```tsx
+const schedules = client.schedules;
+await schedules.create({
+            destination: `${BASE_URL}/api/mail-pipeline/search-unseen`,
+            cron: cron, // a cron expression
+            retries: 0,
+        });
+```
+
+### Secure Your Public API with QStash Request Signing
+
+**Problem:** Now we have public APIs that can be called by anyone. How can we make sure that only our calls through QStash are accepted?
+
+**Solution:** We can use QStash Request Signing.
+
+![verify.png](/blog/greatest-complement-to-serverless/verify.png)
+
+**Setup**
+
+Get your QStash signing keys from the [QStash Console](https://console.upstash.com/qstash). Set them in your `.env` file.
+    
+```bash
+QSTASH_CURRENT_SIGNING_KEY=<YOUR_CURRENT_SIGNING_KEY>
+QSTASH_NEXT_SIGNING_KEY=<YOUR_NEXT_SIGNING_KEY>
+```
+
+**Initialize Receiver**
+
+Initialize a receiver with your signing keys in the `search-unseen` function, which will verify the incoming requests.
+
+```tsx
+import { Receiver } from "@upstash/qstash";
+
+const receiver = new Receiver({
+  currentSigningKey: process.env.QSTASH_CURRENT_SIGNING_KEY as string,
+  nextSigningKey: process.env.QSTASH_NEXT_SIGNING_KEY as string,
+});
+```
+
+**Verify Request**
+
+Check the signature in the `search-unseen` function.
+
+```tsx
+export async function POST(req: Request) {
+  const signature = req.headers.get("Upstash-Signature");
+  const body = await req.json();
+
+  if (!signature) {
+    return new Response("Unauthorized", {
+      status: 401,
+    });
+  }
+
+  const isValid = await receiver.verify({
+    body: JSON.stringify(body),
+    signature,
+    url: `${QSTASH_TARGET_URL}/api/mail-pipeline/search-unseen`,
+  });
+
+  if (!isValid) {
+    return new Response("Unauthorized", {
+      status: 401,
+    });
+  }
+  ...
+}
+```
+
+### Chain Serverless Functions with QStash Publish
+
+**Problem:** Serverless functions have very short maximum durations. Our operations can’t complete in one function duration so we split them. However, we can't simply call the next function, as the connection closes when the previous function times out, leading to the failure of subsequent functions.
+
+**Solution:** We can use QStash Publish to call the next function.
+
+![publish.png](/blog/greatest-complement-to-serverless/publish.png)
+
+```tsx
+const res = await client.publishJSON({
+    url: `${QSTASH_TARGET_URL}/api/mail-pipeline/fetch-unseen`,
+    body: { mailID: mailID },
+    retries: 0,
+});
+```
+
+### Fan Out with QStash Batching
+
+**Problem:** Serverless functions have very limited number of concurrent connections. If we try to publish a lot of messages in `search-unseen` to invoke `fetch-unseen` functions with different mail ids, we will timeout.
+
+**Solution:** We can use QStash Batching to publish all messages in batch.
+
+![batch.png](/blog/greatest-complement-to-serverless/batch.png)
+
+```tsx
+const msgs = mailIDs.map((mailID) => {
+    return {
+        url: `${QSTASH_TARGET_URL}/api/mail-pipeline/fetch-unseen`,
+        body: {
+            mailID: mailID,
+        },
+        retries: 0,
+    };
+});
+const res = await client.batchJSON(msgs);
+```
+
+### Control Parallelism Level with QStash Queue
+
+**Problem:** Now we run into a different bottleneck. Number of concurrent IMAP connections are limited by mail services. This causes most of our `fetch-unseen` functions to fail.
+
+**Solution:** We can use QStash Queue with Controlled Parallelism to queue our messages and deliver them in order to with a limited number of concurrent invocations.
+
+![queue.png](/blog/greatest-complement-to-serverless/queue.png)
+
+**Setup**
+
+Create a queue with controlled parallelism in the `set-settings` function.
+
+```tsx
+const queue = client.queue({
+    queueName: "mail-fetch-queue",
+});
+
+await queue.upsert({
+    parallelism: 2,
+});
+```
+
+**Batch Enqueue Messages**
+
+```tsx
+const msgs = mailIDs.map((mailID) => {
+    return {
+        queueName: "mail-fetch-queue",
+        url: `${QSTASH_TARGET_URL}/api/mail-pipeline/fetch-unseen`,
+        body: {
+            mailID: mailID,
+        },
+        retries: 0,
+    };
+});
+const res = await client.batchJSON(msgs);
+```
+
+### Serverless Way of Working with LLMs: QStash LLM
+
+**Problem:** In our mail pipeline, we need to extract some information from resumes. We can use LLMs for this task. But LLM response times can vary a lot, due to input or provider related reasons, leading to timeouts in serverless functions.
+
+**Solution:** There is no need to wait for LLM responses in serverless functions. With QStash LLM, we can call models hosted by Upstash or even OpenAI and give a callback function to evaluate their responses.
+
+![llm.png](/blog/greatest-complement-to-serverless/llm.png)
+
+```tsx
+import { Client, openai } from "@upstash/qstash";
+
+const client = new Client({
+    token: process.env.QSTASH_TOKEN as string,
+});
+
+const result = await client.publishJSON({
+    api: { name: "llm", provider: openai({ token: process.env.OPENAI_API_KEY as string }) },
+    body: {
+        model: "gpt-4o-mini",
+        messages: [
+            {
+            role: "system",
+            content: SYSTEM_MESSAGE,
+            },
+            {
+            role: "user",
+            content: USER_MESSAGE,
+            },
+        ],
+    },
+    callback: `${QSTASH_TARGET_URL}/api/mail-pipeline/create-applicant`,
+});
+```
+
+### Don’t Let Errors Go in Silence with QStash Callbacks
+
+**Problem:** All kinds of errors can arise when processing of natural data with LLMs. We don’t want these errors to go in silence and lose proper applications.
+
+**Solution:** We can use QStash Callbacks to catch, analyze and store information about applications that failed to complete the pipeline.
+
+![callback.png](/blog/greatest-complement-to-serverless/callback.png)
+
+```tsx
+const result = await client.publishJSON({
+    api: { name: "llm", provider: openai({ token: process.env.OPENAI_API_KEY as string }) },
+    body: {
+        ...
+    },
+    callback: `${QSTASH_TARGET_URL}/api/mail-pipeline/create-applicant`,
+    failureCallback: `${QSTASH_TARGET_URL}/api/mail-pipeline/handle-callback',
+});
+```
+
+### Embed Resumes with Upstash Vector Embeddings
+
+Now we can create and store the resume embeddings of applicants using embedding models provided by Upstash.
+
+**Setup**
+
+1. Create a Vector Index with `BAAI/bge-m3` Embedding Model using [Upstash Console](https://console.upstash.com/) or [Upstash CLI](https://github.com/upstash/cli). Set `UPSTASH_VECTOR_REST_URL` and `UPSTASH_VECTOR_REST_TOKEN` in your `.env` file.
+
+```bash
+UPSTASH_VECTOR_REST_URL=<YOUR_URL>
+UPSTASH_VECTOR_REST_TOKEN=<YOUR_TOKEN>
+```
+    
+2. Install `@upstash/vector`:
+    
+```bash
+npm install @upstash/vector
+```
+    
+3. Initialize `index`:
+    
+```tsx
+import { Index } from "@upstash/vector";
+
+const index = new Index();
+```
+
+**Upsert**
+
+```tsx
+await index.upsert({
+    id: `${applicantID}_application`,
+    data: resumeText,
+});
+```
+
+**Our Refined Diagram:**
+
+![qstash_final.png](/blog/greatest-complement-to-serverless/qstash_final.png)
+
+## Search Engine
+
+Purple Squirrel’s search engine consists of two functions:
+
+`flash-rank`
+
+1. Ranks according to semantic similarity between resumes and search query.
+2. Scales similarity scores.
+3. Filters applications based on position, location, years of experience, application status and stars given by recruiters.
+
+`deep-rank`
+
+1. Calls `flash-rank`.
+2. Reranks the top results via LLM response.
+
+We will design a function similar to `flash-rank`. You can find the complete implementation of these functions in the Purple Squirrel repository.
+
+### Fast Similarity Search with Upstash Vector
+
+Now we can make a semantic similarity search between resumes and search queries using Upstash Vector.
+
+```tsx
+const results = await index.query({
+  data: "TypeScript, Next.js, Redis, React, Vue, Svelte, Contributions to open source projects, Experience in Serverless Applications",
+  topK: 20,
+});
+```
+
+### Metadata Filtering with Upstash Vector
+
+**Problem:** We would want to filter the results based on metadata like location, years of experience, application status and stars given by recruiters. We could do this filtering in the frontend but we would need to fetch a lot of unnecessary data, if not all, to make sure we got the topK results.
+
+**Solution:** Use Upstash Vector’s Metadata Filtering.
+
+![metadata_filtering.png](/blog/greatest-complement-to-serverless/metadata_filtering.png)
+
+**Upsert with Metadata**
+
+```tsx
+await index.upsert({
+    id: `${applicantID}_application`,
+    data: resumeText,
+    metadata: {
+        "countryCode": "FR",
+        "status": "shortlisted",
+        "stars": 5,
+        "yoe": 13
+    }
+});
+```
+
+**Query with Metadata Filtering**
+
+```tsx
+const results = await index.query({
+    data: "TypeScript, Next.js, Redis, React, Vue, Svelte, Contributions to open source projects, Experience in Serverless Applications",
+    topK: 20,
+    filter: "countryCode IN ('FR', 'DE') AND status IN ('shortlisted') AND stars >= 5 AND yoe >= 10",
+});
+```
+
+### Efficient Filtering with Upstash Vector Namespaces
+
+**Problem:** We also need to filter the results based on the position the applicant applied to. We could use metadata filtering here too but we would be making unnecessary comparisons and might hit the metadata filtering budget.
+
+**Solution:** Instead, we can use Upstash Vector Namespaces to only query between applicants that applied to a position, leading to reduced comparisons and faster queries.
+
+![namespaces.png](/blog/greatest-complement-to-serverless/namespaces.png)
+
+**Upsert with Namespace**
+
+```tsx
+const namespace = index.namespace(`${positionId}`);
+
+await namespace.upsert({
+    id: `${applicantID}_application`,
+    data: resumeText,
+    metadata: {
+        ...
+    }
+});
+```
+
+**Query within Namespace**
+
+```tsx
+const results = await namespace.query({
+    data: "TypeScript, Next.js, Redis, React, Vue, Svelte, Contributions to open source projects, Experience in Serverless Applications",
+    topK: 20,
+    filter: "countryCode IN ('FR', 'DE') AND status IN ('shortlisted') AND stars >= 5 AND yoe >= 10",
+});
+```
+
+## Conclusion
+
+If you have read this far, thank you for your attention. I think Upstash is the greatest complement to serverless and I hope this article was a compelling demonstration of this.
