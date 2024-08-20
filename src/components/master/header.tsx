@@ -66,8 +66,8 @@ export default function Header({ className, ...props }: HTMLProps<any>) {
               hideIcon
               href={
                 affiliateCode
-                  ? `https://console.upstash.com/?code=${affiliateCode}&landingDistinctId=${posthogDistincId}`
-                  : `https://console.upstash.com/?landingDistinctId=${posthogDistincId}`
+                  ? `https://upstash-console-v2-git-posthog-web-test-console-upstash.vercel.app/?code=${affiliateCode}&landingDistinctId=${posthogDistincId}`
+                  : `https://upstash-console-v2-git-posthog-web-test-console-upstash.vercel.app/?landingDistinctId=${posthogDistincId}`
               }
               className={cx("", fix ? "bg-emerald-500" : "")}
             >
