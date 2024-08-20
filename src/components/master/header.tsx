@@ -17,9 +17,8 @@ import { Logo } from "@/components/logo";
 import NewNavigation from "./new-nav";
 
 export default function Header({ className, ...props }: HTMLProps<any>) {
-  const [posthogDistincId, setPosthogDistincId] = useState("");
+  const [posthogDistinctId, setPosthogDistinctId] = useState("");
   const segment = useSelectedLayoutSegment();
-
   const { affiliateCode } = useGetAffiliateCodeFromApi();
   const [fix, setFix] = useState(false);
   const { scrollY } = useScroll();
@@ -33,8 +32,28 @@ export default function Header({ className, ...props }: HTMLProps<any>) {
   });
 
   useEffect(() => {
-    if (posthog.__loaded) setPosthogDistincId(posthog.get_distinct_id());
+    const getDistinctId = () => {
+      if (posthog.__loaded && posthog.get_distinct_id()) {
+        setPosthogDistinctId(posthog.get_distinct_id());
+      } else {
+        setTimeout(getDistinctId, 100); // Retry after 100ms
+      }
+    };
+
+    getDistinctId();
   }, []);
+
+  const loginUrl = posthogDistinctId
+    ? affiliateCode
+      ? `https://upstash-console-v2-git-posthog-web-test-console-upstash.vercel.app/?code=${affiliateCode}&landingDistinctId=${posthogDistinctId}`
+      : `https://upstash-console-v2-git-posthog-web-test-console-upstash.vercel.app/?landingDistinctId=${posthogDistinctId}`
+    : "#";
+
+  // const loginUrl = posthogDistinctId
+  // ? affiliateCode
+  //   ? `https://console.upstash.com/?code=${affiliateCode}&landingDistinctId=${posthogDistinctId}`
+  //   : `https://console.upstash.com/?landingDistinctId=${posthogDistinctId}`
+  // : "#";
 
   return (
     <header
@@ -56,20 +75,24 @@ export default function Header({ className, ...props }: HTMLProps<any>) {
               <Logo />
             </Link>
           </div>
-
           <NewNavigation />
-
           <div className="flex justify-end">
             <Button
               target="_self"
               type="button"
               hideIcon
-              href={
-                affiliateCode
-                  ? `https://upstash-console-v2-git-posthog-web-test-console-upstash.vercel.app/?code=${affiliateCode}&landingDistinctId=${posthogDistincId}`
-                  : `https://upstash-console-v2-git-posthog-web-test-console-upstash.vercel.app/?landingDistinctId=${posthogDistincId}`
-              }
-              className={cx("", fix ? "bg-emerald-500" : "")}
+              href={loginUrl}
+              className={cx(
+                "",
+                fix ? "bg-emerald-500" : "",
+                !posthogDistinctId && "cursor-not-allowed opacity-50",
+              )}
+              disabled={!posthogDistinctId}
+              onClick={(e) => {
+                if (!posthogDistinctId) {
+                  e.preventDefault();
+                }
+              }}
             >
               Login
             </Button>
