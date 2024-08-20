@@ -1,11 +1,12 @@
 "use client";
 
-import React, { HTMLProps, useState } from "react";
+import React, { HTMLProps, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSelectedLayoutSegment } from "next/navigation";
 
 import cx from "@/utils/cx";
 import { useMotionValueEvent, useScroll } from "framer-motion";
+import posthog from "posthog-js";
 
 import { useGetAffiliateCodeFromApi } from "@/hooks/use-affiliate-code";
 
@@ -16,6 +17,7 @@ import { Logo } from "@/components/logo";
 import NewNavigation from "./new-nav";
 
 export default function Header({ className, ...props }: HTMLProps<any>) {
+  const [posthogDistincId, setPosthogDistincId] = useState("");
   const segment = useSelectedLayoutSegment();
 
   const { affiliateCode } = useGetAffiliateCodeFromApi();
@@ -29,6 +31,10 @@ export default function Header({ className, ...props }: HTMLProps<any>) {
       setFix(false);
     }
   });
+
+  useEffect(() => {
+    if (posthog.__loaded) setPosthogDistincId(posthog.get_distinct_id());
+  }, []);
 
   return (
     <header
@@ -60,8 +66,8 @@ export default function Header({ className, ...props }: HTMLProps<any>) {
               hideIcon
               href={
                 affiliateCode
-                  ? `https://console.upstash.com/?code=${affiliateCode}`
-                  : "https://console.upstash.com"
+                  ? `https://console.upstash.com/?code=${affiliateCode}&landingDistinctId=${posthogDistincId}`
+                  : `https://console.upstash.com/?landingDistinctId=${posthogDistincId}`
               }
               className={cx("", fix ? "bg-emerald-500" : "")}
             >
