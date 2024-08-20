@@ -31,7 +31,8 @@
     "src/**/*.ts",
     "src/**/*.tsx",
     ".next/types/**/*.ts",
-    ".contentlayer/generated"
+    ".contentlayer/generated",
+    "src/lib/posthog/index.js"
   ],
   "exclude": ["node_modules"]
 }
