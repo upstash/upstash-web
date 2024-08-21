@@ -37,7 +37,6 @@ export default function Header({ className, ...props }: HTMLProps<any>) {
             "NEXT_PUBLIC_POSTHOG_KEY or NEXT_PUBLIC_POSTHOG_HOST cannot be undefined or empty!",
           );
         }
-
         const posthogInstance = posthog.init(posthogKey, {
           api_host: posthogHost,
           person_profiles: "identified_only",
@@ -46,13 +45,20 @@ export default function Header({ className, ...props }: HTMLProps<any>) {
         });
         if (posthogInstance?.get_distinct_id()) {
           setPosthogDistinctId(posthogInstance.get_distinct_id());
-        } else {
-          setTimeout(getDistinctId, 100);
+          return true;
         }
+        return false;
       }
     };
-    getDistinctId();
-  }, [posthog]);
+
+    const intervalId = setInterval(() => {
+      if (getDistinctId()) {
+        clearInterval(intervalId);
+      }
+    }, 100);
+
+    return () => clearInterval(intervalId);
+  }, []);
 
   const loginUrl = useMemo(() => {
     if (!posthogDistinctId) return "#";
