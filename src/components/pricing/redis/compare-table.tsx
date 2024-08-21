@@ -20,8 +20,11 @@ import Button from "@/components/button";
 import Tooltip from "@/components/tooltip";
 
 import CompareValue from "../compare-value";
+import { usePrepareLoginUrl } from "@/hooks/use-prepare-login-url";
 
 export default function CompareTable() {
+    const { loginUrl } = usePrepareLoginUrl();
+
     const isMobile = useIsMobile();
 
     const [selectedPlans, setSelectedPlans] = useState(PricingPlans.Free);
@@ -1973,7 +1976,7 @@ export default function CompareTable() {
                             target="_self"
                             type="button"
                             hideIcon
-                            href="https://console.upstash.com"
+                            href={loginUrl}
                             className="bg-zinc-50 font-medium text-zinc-950"
                         >
                             Start Now
@@ -1986,7 +1989,7 @@ export default function CompareTable() {
                             target="_self"
                             type="button"
                             hideIcon
-                            href="https://console.upstash.com"
+                            href={loginUrl}
                             className="bg-emerald-400 font-medium text-zinc-950"
                         >
                             Start Now
@@ -1999,7 +2002,7 @@ export default function CompareTable() {
                             target="_self"
                             type="button"
                             hideIcon
-                            href="https://console.upstash.com"
+                            href={loginUrl}
                             className="bg-zinc-50 font-medium text-zinc-950"
                         >
                             Start Now
@@ -2015,7 +2018,7 @@ export default function CompareTable() {
                             target="_self"
                             type="button"
                             hideIcon
-                            href="https://console.upstash.com"
+                            href={loginUrl}
                             className="bg-zinc-50 font-medium text-zinc-950"
                         >
                             Start Now

@@ -10,6 +10,8 @@ import Script from "next/script";
 import { SITE_URL } from "@/utils/const";
 import cx from "@/utils/cx";
 
+import { PHProvider } from "@/lib/posthog";
+import PostHogPageView from "@/lib/posthog/posthog-page-view";
 import { SegmentProvider } from "@/lib/segment/provider";
 
 import Analytics from "@/components/Analytics";
@@ -50,36 +52,41 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         "min-h-screen scroll-smooth bg-zinc-950 text-sm text-zinc-50 antialiased md:text-base",
       )}
     >
-      <body className="pt-[70px] md:pt-[80px]">
-        <Suspense>
-          <Analytics />
-        </Suspense>
-        <SegmentProvider writeKey={process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY!}>
-          <Header />
-          <HeaderMobile />
-          {children}
-          <Footer />
-        </SegmentProvider>
+      <PHProvider>
+        <body className="pt-[70px] md:pt-[80px]">
+          <Suspense>
+            <Analytics />
+          </Suspense>
+          <SegmentProvider
+            writeKey={process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY!}
+          >
+            <Header />
+            <HeaderMobile />
+            <PostHogPageView />
+            {children}
+            <Footer />
+          </SegmentProvider>
 
-        {process.env.NODE_ENV !== "development" && (
-          <>
-            <Script
-              strategy="afterInteractive"
-              src={`https://www.googletagmanager.com/gtag/js?id=G-QW5KRSTDM0`}
-            />
-            <Script
-              id="ga"
-              strategy="afterInteractive"
-              dangerouslySetInnerHTML={{
-                __html: ` window.dataLayer = window.dataLayer || [];
+          {process.env.NODE_ENV !== "development" && (
+            <>
+              <Script
+                strategy="afterInteractive"
+                src={`https://www.googletagmanager.com/gtag/js?id=G-QW5KRSTDM0`}
+              />
+              <Script
+                id="ga"
+                strategy="afterInteractive"
+                dangerouslySetInnerHTML={{
+                  __html: ` window.dataLayer = window.dataLayer || [];
                             function gtag(){ dataLayer.push(arguments); }
                             gtag('js', new Date());
                             gtag('config', 'G-QW5KRSTDM0');`,
-              }}
-            />
-          </>
-        )}
-      </body>
+                }}
+              />
+            </>
+          )}
+        </body>
+      </PHProvider>
     </html>
   );
 }

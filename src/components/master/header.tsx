@@ -1,13 +1,13 @@
 "use client";
 
-import React, { HTMLProps, useState } from "react";
+import { HTMLProps, useState } from "react";
 import Link from "next/link";
 import { useSelectedLayoutSegment } from "next/navigation";
 
 import cx from "@/utils/cx";
 import { useMotionValueEvent, useScroll } from "framer-motion";
 
-import { useGetAffiliateCodeFromApi } from "@/hooks/use-affiliate-code";
+import { usePrepareLoginUrl } from "@/hooks/use-prepare-login-url";
 
 import Button from "@/components/button";
 import Container from "@/components/container";
@@ -16,18 +16,13 @@ import { Logo } from "@/components/logo";
 import NewNavigation from "./new-nav";
 
 export default function Header({ className, ...props }: HTMLProps<any>) {
+  const { loginUrl, posthogDistinctId } = usePrepareLoginUrl();
   const segment = useSelectedLayoutSegment();
-
-  const { affiliateCode } = useGetAffiliateCodeFromApi();
   const [fix, setFix] = useState(false);
   const { scrollY } = useScroll();
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    if (latest > 10) {
-      setFix(true);
-    } else {
-      setFix(false);
-    }
+    setFix(latest > 10);
   });
 
   return (
@@ -50,20 +45,24 @@ export default function Header({ className, ...props }: HTMLProps<any>) {
               <Logo />
             </Link>
           </div>
-
           <NewNavigation />
-
           <div className="flex justify-end">
             <Button
               target="_self"
               type="button"
               hideIcon
-              href={
-                affiliateCode
-                  ? `https://console.upstash.com/?code=${affiliateCode}`
-                  : "https://console.upstash.com"
-              }
-              className={cx("", fix ? "bg-emerald-500" : "")}
+              href={loginUrl}
+              className={cx(
+                "",
+                fix ? "bg-emerald-500" : "",
+                !posthogDistinctId && "cursor-not-allowed opacity-50",
+              )}
+              disabled={!posthogDistinctId}
+              onClick={(e) => {
+                if (!posthogDistinctId) {
+                  e.preventDefault();
+                }
+              }}
             >
               Login
             </Button>

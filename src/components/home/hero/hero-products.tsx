@@ -1,8 +1,9 @@
-import React, { Children, cloneElement, HTMLProps, ReactElement } from "react";
+import { Children, cloneElement, HTMLProps, ReactElement } from "react";
 
 import cx from "@/utils/cx";
 import { Product } from "@/utils/type";
 
+import { usePrepareLoginUrl } from "@/hooks/use-prepare-login-url";
 import { useSegment } from "@/hooks/use-segment";
 
 import Button, { IButton } from "@/components/button";
@@ -14,13 +15,15 @@ export default function HomeHeroProducts({
   activeProduct?: Product;
   setActiveProduct: (product?: Product) => void;
 }) {
+  const { loginUrl } = usePrepareLoginUrl();
+
   return (
     <div
       className="mt-8 grid gap-2 md:mt-16 md:grid-cols-3"
       onMouseLeave={() => setActiveProduct(undefined)}
     >
       <HomeHeroProduct
-        href="https://console.upstash.com"
+        href={loginUrl}
         activeProduct={activeProduct}
         onMouseEnter={() => setActiveProduct(Product.REDIS)}
       >
@@ -39,7 +42,7 @@ export default function HomeHeroProducts({
       </HomeHeroProduct>
 
       <HomeHeroProduct
-        href="https://console.upstash.com"
+        href={loginUrl}
         activeProduct={activeProduct}
         onMouseEnter={() => setActiveProduct(Product.VECTOR)}
       >
@@ -60,7 +63,7 @@ export default function HomeHeroProducts({
       </HomeHeroProduct>
 
       <HomeHeroProduct
-        href="https://console.upstash.com"
+        href={loginUrl}
         activeProduct={activeProduct}
         onMouseEnter={() => setActiveProduct(Product.QSTASH)}
       >
