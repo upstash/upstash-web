@@ -1,14 +1,13 @@
 "use client";
 
-import React, { HTMLProps, useEffect, useMemo, useState } from "react";
+import { HTMLProps, useState } from "react";
 import Link from "next/link";
 import { useSelectedLayoutSegment } from "next/navigation";
 
 import cx from "@/utils/cx";
 import { useMotionValueEvent, useScroll } from "framer-motion";
-import posthog from "posthog-js";
 
-import { useGetAffiliateCodeFromApi } from "@/hooks/use-affiliate-code";
+import { usePrepareLoginUrl } from "@/hooks/use-prepare-login-url";
 
 import Button from "@/components/button";
 import Container from "@/components/container";
@@ -17,44 +16,14 @@ import { Logo } from "@/components/logo";
 import NewNavigation from "./new-nav";
 
 export default function Header({ className, ...props }: HTMLProps<any>) {
-  const [posthogDistinctId, setPosthogDistinctId] = useState("");
+  const { loginUrl, posthogDistinctId } = usePrepareLoginUrl();
   const segment = useSelectedLayoutSegment();
-  const { affiliateCode } = useGetAffiliateCodeFromApi();
   const [fix, setFix] = useState(false);
   const { scrollY } = useScroll();
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setFix(latest > 10);
   });
-
-  useEffect(() => {
-    const getDistinctId = () => {
-      const distinctId = localStorage.getItem("distinctId");
-      return Boolean(distinctId) ? distinctId : false;
-    };
-
-    const intervalId = setInterval(() => {
-      const id = getDistinctId();
-      if (id) {
-        console.log("Found id here", id);
-        setPosthogDistinctId(id);
-        clearInterval(intervalId);
-      }
-    }, 100);
-
-    return () => clearInterval(intervalId);
-  }, []);
-
-  const loginUrl = useMemo(() => {
-    if (!posthogDistinctId) return "#";
-    const baseUrl =
-      "https://upstash-console-v2-git-posthog-web-test-console-upstash.vercel.app/";
-    const params = new URLSearchParams({
-      landingDistinctId: posthogDistinctId,
-    });
-    if (affiliateCode) params.append("code", affiliateCode);
-    return `${baseUrl}?${params.toString()}`;
-  }, [posthogDistinctId, affiliateCode]);
 
   return (
     <header

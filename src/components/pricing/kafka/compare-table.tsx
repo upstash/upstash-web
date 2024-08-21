@@ -12,6 +12,7 @@ import {
 } from "@tabler/icons-react";
 
 import useIsMobile from "@/hooks/use-is-mobile";
+import { usePrepareLoginUrl } from "@/hooks/use-prepare-login-url";
 
 import Button from "@/components/button";
 import Tooltip from "@/components/tooltip";
@@ -19,6 +20,8 @@ import Tooltip from "@/components/tooltip";
 import CompareValue from "../compare-value";
 
 export default function CompareTable() {
+  const { loginUrl } = usePrepareLoginUrl();
+
   const isMobile = useIsMobile();
 
   const [selectedPlans, setSelectedPlans] = useState(PricingPlans.Free);
@@ -433,7 +436,10 @@ export default function CompareTable() {
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0"
           >
-            <CompareValue type="size" suffix="TB" className="border-b-0"
+            <CompareValue
+              type="size"
+              suffix="TB"
+              className="border-b-0"
               after={
                 <Tooltip content="Free up to 1TB per month. Beyond that, $0.1 per GB.">
                   <IconInfoCircle
@@ -451,7 +457,10 @@ export default function CompareTable() {
             hidden={isMobile ? !showPro2 : false}
             className="bg-white/3 px-4 py-0"
           >
-            <CompareValue type="size" suffix="TB" className="border-b-0"
+            <CompareValue
+              type="size"
+              suffix="TB"
+              className="border-b-0"
               after={
                 <Tooltip content="Upon hitting this limit, we'll prompt you to upgrade without stopping your traffic.">
                   <IconInfoCircle
@@ -469,7 +478,10 @@ export default function CompareTable() {
             hidden={isMobile ? !showPro10 : false}
             className="bg-white/3 px-4 py-0"
           >
-            <CompareValue type="size" suffix="TB" className="border-b-0"
+            <CompareValue
+              type="size"
+              suffix="TB"
+              className="border-b-0"
               after={
                 <Tooltip content="Upon hitting this limit, we'll prompt you to upgrade without stopping your traffic.">
                   <IconInfoCircle
@@ -1163,7 +1175,7 @@ export default function CompareTable() {
                 target="_self"
                 type="button"
                 hideIcon
-                href="https://console.upstash.com"
+                href={loginUrl}
                 className="bg-zinc-50 font-medium text-zinc-950"
               >
                 Start Now
@@ -1176,7 +1188,7 @@ export default function CompareTable() {
                 target="_self"
                 type="button"
                 hideIcon
-                href="https://console.upstash.com"
+                href={loginUrl}
                 className="bg-emerald-400 font-medium text-zinc-950"
               >
                 Start Now
@@ -1189,7 +1201,7 @@ export default function CompareTable() {
                 target="_self"
                 type="button"
                 hideIcon
-                href="https://console.upstash.com"
+                href={loginUrl}
                 className="bg-zinc-50 font-medium text-zinc-950"
               >
                 Start Now
@@ -1205,7 +1217,7 @@ export default function CompareTable() {
                 target="_self"
                 type="button"
                 hideIcon
-                href="https://console.upstash.com"
+                href={loginUrl}
                 className="bg-zinc-50 font-medium text-zinc-950"
               >
                 Start Now
