@@ -36,6 +36,7 @@ export default function Header({ className, ...props }: HTMLProps<any>) {
     const intervalId = setInterval(() => {
       const id = getDistinctId();
       if (id) {
+        console.log("Found id here", id);
         setPosthogDistinctId(id);
         clearInterval(intervalId);
       }
