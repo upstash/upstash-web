@@ -6,7 +6,7 @@ import { useSelectedLayoutSegment } from "next/navigation";
 
 import cx from "@/utils/cx";
 import { useMotionValueEvent, useScroll } from "framer-motion";
-import { usePostHog } from "posthog-js/react";
+import posthog from "posthog-js";
 
 import { useGetAffiliateCodeFromApi } from "@/hooks/use-affiliate-code";
 
@@ -22,7 +22,6 @@ export default function Header({ className, ...props }: HTMLProps<any>) {
   const { affiliateCode } = useGetAffiliateCodeFromApi();
   const [fix, setFix] = useState(false);
   const { scrollY } = useScroll();
-  const posthog = usePostHog();
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setFix(latest > 10);
@@ -30,10 +29,26 @@ export default function Header({ className, ...props }: HTMLProps<any>) {
 
   useEffect(() => {
     const getDistinctId = () => {
-      if (posthog.__loaded && posthog.get_distinct_id()) {
-        setPosthogDistinctId(posthog.get_distinct_id());
-      } else {
-        setTimeout(getDistinctId, 100);
+      if (typeof window !== "undefined") {
+        const posthogKey = process.env.NEXT_PUBLIC_POSTHOG_KEY;
+        const posthogHost = process.env.NEXT_PUBLIC_POSTHOG_HOST;
+        if (!posthogKey || !posthogHost) {
+          throw new Error(
+            "NEXT_PUBLIC_POSTHOG_KEY or NEXT_PUBLIC_POSTHOG_HOST cannot be undefined or empty!",
+          );
+        }
+
+        const posthogInstance = posthog.init(posthogKey, {
+          api_host: posthogHost,
+          person_profiles: "identified_only",
+          capture_pageview: false,
+          capture_pageleave: true,
+        });
+        if (posthogInstance?.get_distinct_id()) {
+          setPosthogDistinctId(posthogInstance.get_distinct_id());
+        } else {
+          setTimeout(getDistinctId, 100);
+        }
       }
     };
     getDistinctId();
