@@ -29,30 +29,14 @@ export default function Header({ className, ...props }: HTMLProps<any>) {
 
   useEffect(() => {
     const getDistinctId = () => {
-      if (typeof window !== "undefined") {
-        const posthogKey = process.env.NEXT_PUBLIC_POSTHOG_KEY;
-        const posthogHost = process.env.NEXT_PUBLIC_POSTHOG_HOST;
-        if (!posthogKey || !posthogHost) {
-          throw new Error(
-            "NEXT_PUBLIC_POSTHOG_KEY or NEXT_PUBLIC_POSTHOG_HOST cannot be undefined or empty!",
-          );
-        }
-        const posthogInstance = posthog.init(posthogKey, {
-          api_host: posthogHost,
-          person_profiles: "identified_only",
-          capture_pageview: false,
-          capture_pageleave: true,
-        });
-        if (posthogInstance?.get_distinct_id()) {
-          setPosthogDistinctId(posthogInstance.get_distinct_id());
-          return true;
-        }
-        return false;
-      }
+      const distinctId = localStorage.getItem("distinctId");
+      return Boolean(distinctId) ? distinctId : false;
     };
 
     const intervalId = setInterval(() => {
-      if (getDistinctId()) {
+      const id = getDistinctId();
+      if (id) {
+        setPosthogDistinctId(id);
         clearInterval(intervalId);
       }
     }, 100);
