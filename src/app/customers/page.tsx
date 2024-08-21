@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 
@@ -11,7 +13,7 @@ import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
 
-export default async function CustomerPage() {
+export default function CustomerPage() {
   const { loginUrl, posthogDistinctId } = usePrepareLoginUrl();
 
   let customers = allCustomers.filter((o) => !o.draft);
