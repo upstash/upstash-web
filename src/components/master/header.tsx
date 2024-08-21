@@ -6,7 +6,7 @@ import { useSelectedLayoutSegment } from "next/navigation";
 
 import cx from "@/utils/cx";
 import { useMotionValueEvent, useScroll } from "framer-motion";
-import posthog from "posthog-js";
+import { usePostHog } from "posthog-js/react";
 
 import { useGetAffiliateCodeFromApi } from "@/hooks/use-affiliate-code";
 
@@ -22,6 +22,7 @@ export default function Header({ className, ...props }: HTMLProps<any>) {
   const { affiliateCode } = useGetAffiliateCodeFromApi();
   const [fix, setFix] = useState(false);
   const { scrollY } = useScroll();
+  const posthog = usePostHog();
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     if (latest > 10) {
@@ -36,7 +37,7 @@ export default function Header({ className, ...props }: HTMLProps<any>) {
       if (posthog.__loaded && posthog.get_distinct_id()) {
         setPosthogDistinctId(posthog.get_distinct_id());
       } else {
-        setTimeout(getDistinctId, 100); // Retry after 100ms
+        setTimeout(getDistinctId, 100);
       }
     };
 
