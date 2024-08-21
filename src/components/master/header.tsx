@@ -1,6 +1,6 @@
 "use client";
 
-import React, { HTMLProps, useEffect, useState } from "react";
+import React, { HTMLProps, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSelectedLayoutSegment } from "next/navigation";
 
@@ -25,11 +25,7 @@ export default function Header({ className, ...props }: HTMLProps<any>) {
   const posthog = usePostHog();
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    if (latest > 10) {
-      setFix(true);
-    } else {
-      setFix(false);
-    }
+    setFix(latest > 10);
   });
 
   useEffect(() => {
@@ -40,21 +36,19 @@ export default function Header({ className, ...props }: HTMLProps<any>) {
         setTimeout(getDistinctId, 100);
       }
     };
-
     getDistinctId();
-  }, []);
+  }, [posthog]);
 
-  const loginUrl = posthogDistinctId
-    ? affiliateCode
-      ? `https://upstash-console-v2-git-posthog-web-test-console-upstash.vercel.app/?code=${affiliateCode}&landingDistinctId=${posthogDistinctId}`
-      : `https://upstash-console-v2-git-posthog-web-test-console-upstash.vercel.app/?landingDistinctId=${posthogDistinctId}`
-    : "#";
-
-  // const loginUrl = posthogDistinctId
-  // ? affiliateCode
-  //   ? `https://console.upstash.com/?code=${affiliateCode}&landingDistinctId=${posthogDistinctId}`
-  //   : `https://console.upstash.com/?landingDistinctId=${posthogDistinctId}`
-  // : "#";
+  const loginUrl = useMemo(() => {
+    if (!posthogDistinctId) return "#";
+    const baseUrl =
+      "https://upstash-console-v2-git-posthog-web-test-console-upstash.vercel.app/";
+    const params = new URLSearchParams({
+      landingDistinctId: posthogDistinctId,
+    });
+    if (affiliateCode) params.append("code", affiliateCode);
+    return `${baseUrl}?${params.toString()}`;
+  }, [posthogDistinctId, affiliateCode]);
 
   return (
     <header
