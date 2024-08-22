@@ -20,6 +20,7 @@ if (typeof window !== "undefined") {
     person_profiles: "identified_only",
     capture_pageview: false, // Disable automatic pageview capture, as we capture manually
     capture_pageleave: true,
+    autocapture: false,
     loaded: function (posthog) {
       localStorage.setItem("distinctId", posthog.get_distinct_id());
     },
