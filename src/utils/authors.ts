@@ -375,4 +375,10 @@ export const authors: Record<
     title: "Software Engineer @Upstash",
     image: "metin.jpg",
   },
+  terryzhang: {
+    name: "Terry Zhang",
+    title: "Founder&CEO @llamagen.ai (Guest Author)",
+    url: "https://x.com/terrychinaz",
+    image: "terryzhang.png",
+  },
 };
