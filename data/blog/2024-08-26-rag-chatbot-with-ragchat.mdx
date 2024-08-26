@@ -1,6 +1,7 @@
 ---
 title : Building a PDF Chatbot with Upstash RAGChat
 slug : rag-chatbot-with-ragchat
+draft : true
 authors:
   - eray
 tags: [vector, rag, upstash, ragchat, chatbot, ai]
@@ -11,15 +12,15 @@ Chatbots are becoming increasingly sophisticated, leveraging advanced AI models 
 ## Project Overview
 ### Key Components
 1. PDF Upload and Text Extraction
-	*  Users start by uploading a PDF.
-	* The file is then processed, and its text content is extracted.
-	* This extracted information is provided to OpenAI's GPT model.
+    *  Users start by uploading a PDF.
+    * The file is then processed, and its text content is extracted.
+    * This extracted information is provided to OpenAI's GPT model.
 2. Chat interface
-	* A user-friendly chat interface allows users to interact with the extracted content.
-	* User messages are sent to the backend, where the RAGChat model processes them and returns responses.
+    * A user-friendly chat interface allows users to interact with the extracted content.
+    * User messages are sent to the backend, where the RAGChat model processes them and returns responses.
 
 ## How It Works
-Note: This section doesn't cover the entire codebase. We'll focus on crucial parts of the project to clarify implementation details. For example, we won't discuss design and UI details but will focus on the more functional aspects of the project. For those interested in these details, you can examine the [source code](https://github.com/upstash/chat-with-pdf). 
+Note: This section doesn't cover the entire codebase. We'll focus on crucial parts of the project to clarify implementation details. For example, we won't discuss design and UI details but will focus on the more functional aspects of the project. For those interested in these details, you can examine the [source code](https://github.com/upstash/chat-with-pdf).
 
 ### 1. RagCHAT Initilizaton
 We start by initializing the RAGChat object with an AI model. We chose OpenAI's GPT-4-turbo model. The method is straightforward; we import the required packages and specify the model. Although this is a short piece of code, it's good practice to create a separate file to keep the project organized. Thus, we created the `rag-chat.ts` file.
@@ -35,24 +36,30 @@ export const ragChat = new RAGChat({
 
 ### 2. Uploading PDF and Text Extraction
 
-The `pdf-extractor.ts` file handles the PDF upload and text extraction process. When a user uploads a PDF, the file is sent to the server where it is parsed, and the text content is extracted. This file creates a response for `/api/pdf-extractor` endpoint. After extracting the text, we provide it to the RAGChat model to process and understand the file's content. To do this, we import the RAGChat object created in the first part. Additionally, to handle requests, we import the necessary Next.js packages.
+The `pdf-extractor.ts` file handles the PDF upload and text extraction process by using Upstash RAGChat. When a user uploads a PDF, an identical file having the same filename is created under the uploads directory. Normally we would upload the file to a server then process it, however we wanted to keep things simple to focus on the other parts of the application. When the file upload is finished, the file is processed by the built-in parser of RAGChat object and the its content is added to the context of embedding model.
 
 ``` typescript
 import { NextApiRequest, NextApiResponse } from 'next'
 import { ragChat } from '@/utils/rag-chat'
-
-const pdf = require('pdf-parse')
+import path from 'path'
 
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse
 ) {
     if (req.method === 'POST') {
-        const data = req.body.data
-        const text = await extractTextFromPDF(data)
-        ragChat.context.add({
-            type: 'text',
-            data: text,
+        if (!req.body.data) {
+            res.status(400).json({ error: 'Missing data' })
+            return
+        }
+        
+        // Clear the context before adding new data
+        await ragChat.context.deleteEntireContext() 
+
+        const fileSource = req.body.data
+        await ragChat.context.add({
+            type: 'pdf',
+            fileSource: path.join(process.cwd(), '/uploads/', fileSource),
         })
         res.status(200).json({
             message: 'PDF extracted successfully',
@@ -60,20 +67,6 @@ export default async function handler(
     } else {
         res.status(405).json({ error: `Method '${req.method}' Not Allowed` })
     }
-}
-
-```
-The `extractTextFromPDF` function is responsible for extracting text from the file. This method uses the `pdf-parse` library to extract the text content from the number array representing the PDF.
-``` typescript
-async function extractTextFromPDF(data: number[]): Promise<string> {
-    // Convert the array of numbers back to a Buffer
-    const buffer = Buffer.from(data)
-    const pdfData = await pdf(buffer)
-    let pdfText = pdfData.text
-    // also add number check
-    pdfText = pdfText.replace(/[^\p{L}\p{N}]/gu, ' ')
-    pdfText = pdfText.replace(/\s+/g, ' ').trim()
-    return pdfText
 }
 ```
 
@@ -163,7 +156,7 @@ const handleFileChange = async (
         }
     }
 ```
-4- The last part is mostly about UI. It is not a complex design, yet it is effective and useful. 
+4- The last part is mostly about UI. It is not a complex design, yet it is effective and useful.
 ```typescript
  return (
         <div className="flex flex-col items-center justify-center h-screen">
