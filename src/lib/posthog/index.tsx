@@ -22,6 +22,7 @@ if (typeof window !== "undefined") {
     cross_subdomain_cookie: true,
     capture_pageleave: true,
     autocapture: false,
+    persistence: "cookie",
     loaded: function (posthog) {
       localStorage.setItem("distinctId", posthog.get_distinct_id());
     },
