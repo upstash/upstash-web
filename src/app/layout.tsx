@@ -10,7 +10,6 @@ import { SITE_URL } from "@/utils/const";
 import cx from "@/utils/cx";
 
 import { PHProvider } from "@/lib/posthog";
-import PostHogPageView from "@/lib/posthog/posthog-page-view";
 import { SegmentProvider } from "@/lib/segment/provider";
 
 import Analytics from "@/components/Analytics";
@@ -61,7 +60,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           >
             <Header />
             <HeaderMobile />
-            <PostHogPageView />
+            {/* <PostHogPageView /> */}
             {children}
             <Footer />
           </SegmentProvider>

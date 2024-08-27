@@ -26,7 +26,6 @@ if (typeof window !== "undefined") {
     rate_limiting: {
       events_burst_limit: 1000,
       events_per_second: 100,
-    },
   });
 }
 
