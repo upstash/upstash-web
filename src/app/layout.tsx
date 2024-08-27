@@ -1,8 +1,7 @@
-import "./globals.css";
 import "@upstash/claps/style.css";
+import "./globals.css";
 
 import { ReactNode, Suspense } from "react";
-import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import localFont from "next/font/local";
 import Script from "next/script";
@@ -11,7 +10,6 @@ import { SITE_URL } from "@/utils/const";
 import cx from "@/utils/cx";
 
 import { PHProvider } from "@/lib/posthog";
-import PostHogPageView from "@/lib/posthog/posthog-page-view";
 import { SegmentProvider } from "@/lib/segment/provider";
 
 import Analytics from "@/components/Analytics";
@@ -62,7 +60,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           >
             <Header />
             <HeaderMobile />
-            <PostHogPageView />
+            {/* <PostHogPageView /> */}
             {children}
             <Footer />
           </SegmentProvider>
