@@ -23,9 +23,9 @@ if (typeof window !== "undefined") {
     capture_pageleave: true,
     autocapture: false,
     persistence: "cookie",
-    loaded: function (posthog) {
-      localStorage.setItem("distinctId", posthog.get_distinct_id());
-    },
+    rate_limiting: {
+      events_burst_limit: 1000,
+      events_per_second: 100,
   });
 }
 
