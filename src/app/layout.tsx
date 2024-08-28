@@ -43,7 +43,6 @@ const interDisplay = localFont({
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
-      dangerouslySetInnerHTML={{ __html: `<script>hello world</script>` }}
       lang="en"
       className={cx(
         inter.variable,
@@ -68,6 +67,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
           {process.env.NODE_ENV !== "development" && (
             <>
+              <Script
+                id="ph_referral_track"
+                strategy="beforeInteractive"
+                dangerouslySetInnerHTML={{
+                  __html:
+                    "if(!document.referrer.endsWith('upstash.com')) document.cookie=`ph_referral_track=${document.referrer}; domain=.upstash.com`",
+                }}
+              />
               <Script
                 strategy="afterInteractive"
                 src={`https://www.googletagmanager.com/gtag/js?id=G-QW5KRSTDM0`}
