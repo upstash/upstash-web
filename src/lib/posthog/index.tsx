@@ -6,7 +6,10 @@ import React from "react";
 import posthog from "posthog-js";
 import { PostHogProvider } from "posthog-js/react";
 
-if (typeof window !== "undefined") {
+if (
+  typeof window !== "undefined" &&
+  process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
+) {
   const posthogKey = process.env.NEXT_PUBLIC_POSTHOG_KEY;
   const posthogHost = process.env.NEXT_PUBLIC_POSTHOG_HOST;
   if (!posthogKey || !posthogHost) {
@@ -26,6 +29,7 @@ if (typeof window !== "undefined") {
     rate_limiting: {
       events_burst_limit: 1000,
       events_per_second: 100,
+    },
   });
 }
 

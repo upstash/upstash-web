@@ -1,10 +1,6 @@
-import { usePrepareLoginUrl } from "@/hooks/use-prepare-login-url";
-
 import Button from "@/components/button";
 
 export default function PricingTable() {
-  const { loginUrl } = usePrepareLoginUrl();
-
   return (
     <div className="grid gap-6 md:grid-cols-3">
       {/**/}
@@ -39,7 +35,7 @@ export default function PricingTable() {
             target="_self"
             type="button"
             hideIcon
-            href={loginUrl}
+            href="https://console.upstash.com"
             className="bg-zinc-50 font-medium text-zinc-950"
           >
             Start Now
@@ -79,7 +75,7 @@ export default function PricingTable() {
             target="_self"
             type="button"
             hideIcon
-            href={loginUrl}
+            href="https://console.upstash.com"
             className="bg-zinc-50 font-medium text-zinc-950"
           >
             Start Now
@@ -122,7 +118,7 @@ export default function PricingTable() {
             target="_self"
             type="button"
             hideIcon
-            href={loginUrl}
+            href="https://console.upstash.com"
             className="bg-zinc-50 font-medium text-zinc-950"
           >
             Start Now

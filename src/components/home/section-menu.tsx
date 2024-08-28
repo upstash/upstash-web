@@ -12,8 +12,6 @@ import {
 } from "framer-motion";
 import { animateScroll, Link as SpyLink } from "react-scroll";
 
-import { usePrepareLoginUrl } from "@/hooks/use-prepare-login-url";
-
 import Button from "@/components/button";
 import { LogoIcon } from "@/components/logo";
 
@@ -22,7 +20,6 @@ export default function SectionMenu({
   className,
   ...props
 }: HTMLMotionProps<any> & {}) {
-  const { loginUrl, posthogDistinctId } = usePrepareLoginUrl();
   const [show, setShow] = useState(false);
   const { scrollY } = useScroll();
 
@@ -92,8 +89,7 @@ export default function SectionMenu({
             type="button"
             hideIcon
             className="bg-emerald-500"
-            disabled={!posthogDistinctId}
-            href={loginUrl}
+            href="https://console.upstash.com"
           >
             Login
           </Button>
