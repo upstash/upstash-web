@@ -12,7 +12,6 @@ import {
 } from "@tabler/icons-react";
 
 import useIsMobile from "@/hooks/use-is-mobile";
-import { usePrepareLoginUrl } from "@/hooks/use-prepare-login-url";
 
 import Button from "@/components/button";
 import Tooltip from "@/components/tooltip";
@@ -20,8 +19,6 @@ import Tooltip from "@/components/tooltip";
 import CompareValue from "../compare-value";
 
 export default function CompareTable() {
-  const { loginUrl } = usePrepareLoginUrl();
-
   const isMobile = useIsMobile();
 
   const [selectedPlans, setSelectedPlans] = useState(PricingPlans.Free);
@@ -1175,7 +1172,7 @@ export default function CompareTable() {
                 target="_self"
                 type="button"
                 hideIcon
-                href={loginUrl}
+                href="https://console.upstash.com"
                 className="bg-zinc-50 font-medium text-zinc-950"
               >
                 Start Now
@@ -1188,7 +1185,7 @@ export default function CompareTable() {
                 target="_self"
                 type="button"
                 hideIcon
-                href={loginUrl}
+                href="https://console.upstash.com"
                 className="bg-emerald-400 font-medium text-zinc-950"
               >
                 Start Now
@@ -1201,7 +1198,7 @@ export default function CompareTable() {
                 target="_self"
                 type="button"
                 hideIcon
-                href={loginUrl}
+                href="https://console.upstash.com"
                 className="bg-zinc-50 font-medium text-zinc-950"
               >
                 Start Now
@@ -1217,7 +1214,7 @@ export default function CompareTable() {
                 target="_self"
                 type="button"
                 hideIcon
-                href={loginUrl}
+                href="https://console.upstash.com"
                 className="bg-zinc-50 font-medium text-zinc-950"
               >
                 Start Now

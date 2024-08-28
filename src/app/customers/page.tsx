@@ -5,8 +5,6 @@ import Link from "next/link";
 
 import { allCustomers } from "contentlayer/generated";
 
-import { usePrepareLoginUrl } from "@/hooks/use-prepare-login-url";
-
 import Bg from "@/components/bg";
 import Button from "@/components/button";
 import Container from "@/components/container";
@@ -14,8 +12,6 @@ import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
 
 export default function CustomerPage() {
-  const { loginUrl, posthogDistinctId } = usePrepareLoginUrl();
-
   let customers = allCustomers.filter((o) => !o.draft);
   customers = customers.sort((a, b) => (a.order || 99) - (b.order || 99));
 
@@ -83,8 +79,7 @@ export default function CustomerPage() {
                       target="_self"
                       type="button"
                       hideIcon
-                      disabled={!posthogDistinctId}
-                      href={loginUrl}
+                      href="https://console.upstash.com"
                       className="bg-emerald-400 text-emerald-950"
                     >
                       Read more

@@ -43,6 +43,7 @@ const interDisplay = localFont({
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
+      dangerouslySetInnerHTML={{ __html: `<script>hello world</script>` }}
       lang="en"
       className={cx(
         inter.variable,

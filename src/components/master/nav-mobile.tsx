@@ -4,15 +4,11 @@ import Link, { LinkProps } from "next/link";
 import cx from "@/utils/cx";
 import { allJobs } from "contentlayer/generated";
 
-import { usePrepareLoginUrl } from "@/hooks/use-prepare-login-url";
-
 import Button from "@/components/button";
 
 const jobLength = allJobs.filter((o) => !o.draft).length;
 
 export default function NavMobile({ hidden }: HTMLProps<HTMLDivElement> & {}) {
-  const { loginUrl } = usePrepareLoginUrl();
-
   return (
     <nav
       className={cx(
@@ -38,7 +34,7 @@ export default function NavMobile({ hidden }: HTMLProps<HTMLDivElement> & {}) {
         type="button"
         target="_self"
         hideIcon
-        href={loginUrl}
+        href="https://console.upstash.com"
         className="my-6 justify-center bg-emerald-400 py-3 font-display text-lg font-medium text-zinc-950"
       >
         Login
