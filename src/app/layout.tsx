@@ -71,8 +71,18 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 id="ph_referral_track"
                 strategy="beforeInteractive"
                 dangerouslySetInnerHTML={{
-                  __html:
-                    "if(!document.referrer.endsWith('upstash.com')) document.cookie=`ph_referral_track=${document.referrer}; domain=.upstash.com`",
+                  __html: `
+                    function removeTrailingSlash(url) {
+                        return url.endsWith('/') ? url.slice(0, -1) : url;
+                    }
+
+                    (function() {
+                      var referrer = document.referrer;
+                      if (!referrer.endsWith('upstash.com/')) {
+                        document.cookie = 'ph_referral_track=' + removeTrailingSlash(referrer) + '; domain=.upstash.com';
+                      }
+                    })();
+                  `,
                 }}
               />
               <Script
