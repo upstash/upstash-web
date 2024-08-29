@@ -78,7 +78,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
                     (function() {
                       var referrer = document.referrer;
-                      if (!referrer.endsWith('upstash.com/')) {
+                      if (!referrer.includes('upstash.com')) {
                         document.cookie = 'ph_referral_track=' + removeTrailingSlash(referrer) + '; domain=.upstash.com';
                       }
                     })();
