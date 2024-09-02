@@ -60,7 +60,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           >
             <Header />
             <HeaderMobile />
-            {/* <PostHogPageView /> */}
             {children}
             <Footer />
           </SegmentProvider>
