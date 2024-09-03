@@ -1,0 +1,169 @@
+---
+
+title: "Adding Semantic Search into a Strapi Application"
+slug: strapi-semantic-search
+authors:
+  - noah
+tags: [vector, strapi, ai, semantic]
+---
+
+Semantic search is a searching technique that allows users/searchers to find relevant content that matches the query by its meaning.
+
+This technique uses vector representations of the content to find the most relevant results in the search domain.
+
+To do the semantic search, we first need to extract vector embeddings of the query by using embedding models. Once we have the vector embeddings of the query, we compare it with the existing vector embeddings of the content items. The comparison should be based on the distance between vectors in N-dimensional vector space, where N is the size of the vectors.
+
+In this blog post, we will develop semantic search functionality integrated into our Strapi application. To do that, we will first create Upstash Vector database to use as embedding storage and retriever. After that, we will create our example Strapi application which will basically have books and their descriptions as the content. Semantic search will be done based on the books and their descriptions we have in our content-driven Strapi application.
+
+## Strapi Application Setup
+
+Let’s get to know Strapi first.
+
+[Strapi](https://strapi.io) is an open-source headless Content Management System (CMS) that allows developers to manage content through an API while providing a customizable and user-friendly interface.
+
+Unlike traditional CMS platforms, which typically include both front-end and back-end functionality and their integration, Strapi focuses on providing a back-end content delivery, enabling developers to choose any front-end technology they prefer. This “headless” architecture of Strapi decouples the front-end from the back-end, offering the flexibility of consuming the content from any kind of framework or language.
+
+Strapi provides this flexibility by giving access to the content by REST APIs. This allows the frontend applications to retrieve the data in a common format without any coupled integration.
+
+Lastly, Strapi provides fully managed cloud hosting for Strapi applications and their contents. The cloud hosting makes development much easier to maintain. However, in this blog post, we will do the development on our local host since the purpose of the blog post is to integrate semantic search into Strapi apps.
+
+Now, let’s build our Strapi application. We will first install Strapi on our local host. Before doing that, the following requirements must be installed:
+
+-   [Node.js](https://nodejs.org): Only [Active LTS or Maintenance LTS versions](https://nodejs.org/en/about/previous-releases) are supported (currently v18 and v20). Odd-number releases of Node, known as "current" versions of Node.js, are not supported (e.g. v19, v21).
+-   Your preferred Node.js package manager:
+-   [npm](https://docs.npmjs.com/cli/v6/commands/npm-install) (v6 and above)
+-   [yarn](https://yarnpkg.com/getting-started/install)
+-   [Python](https://www.python.org/downloads/) (if using a SQLite database)
+
+After installing the prerequisites, we can create our first Strapi application by running the following command in the terminal.
+
+```
+npx create-strapi-app@latest bookstore --quickstart
+```
+
+This command will open a browser page automatically. Once we complete the installation and the form on the browser, we will be able to access to the admin panel of the application.
+
+![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXcAVi3DjVQ5D4bfpjCx6F0PlQ99VlIglUuWM2lbSLyw4eQQz3efC-vQppQ8p1WZiCFN5kNURbsIWdsxddV6Pk6FtwXDi45aQkp3Hz-Z3A7p4PUrE3grAFivDN7RuAo9s2b27HC8SoMq4WxI3Yd9eYltukEKtWP9qAkd_jjBzLOidNE5SUblvvA?key=DP3-DrNAl4OVGPU6ksIo3g)
+
+The admin panel runs in [http://localhost:1337/admin](http://localhost:1337/admin) and can be opened when we run `npm run develop` command as well.
+
+Our barebones Strapi application is ready. Now, we will create our first content, which is basically a database that is going to store books in our bookstore.
+
+To create a bookstore database, let’s go to the Content-Type Builder tab. On this page, we can create a collection type, and name it `book`, since the collection will consist of books.
+
+![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXeCWaz29EEYtFjqG1ZFNubA9-OqZGsi4bqOksDJu6BwmhkWDptNndFKKbP1fLZ01HbH1MiCJWY9ZuPlSr-sERGSDplMxi0R9SSJIfshdfJklKJ-s-yGsljfyMrFJMhQl2FzgnGMgQ24uBBqviQEatNtYbkuS3We5PrMkYI7H0N-0gKHMCfTXCc?key=DP3-DrNAl4OVGPU6ksIo3g)
+
+When we click `continue`, the next step is configuring the attributes of the collection items. In this demo, we will have `name`, `description`, `price` and `author` just to keep the demo simple. Strapi provides a bunch of data types for configuring attributes.
+
+![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXemdxcjZXXfKOW1FzYvO7o9J1vUzvSrXXhiz8BvrOzIuGoANLPv_N__qGe039g0zeVd5J3ysUY2O0x_sJlXy5Np9-dx71NW2bYj5YW1DARAZopa7x1iIAWHVBrlXna-Wdz-JmgkXw3_vwxxtmMAC2X6zbpsdBCNEwHh3I-MWe0-NOvWGGfMeks?key=DP3-DrNAl4OVGPU6ksIo3g)
+
+In our case, `name` and `author` will be short text, `description` will be long text and the `price` will be number. Once we complete the attribute creation steps, we should click `Save` to create the data collection. When we save our changes, the Strapi application restarts itself to load the changes.
+
+Now, we can go back to the `Content Manager` tab and see the new `book` collection that we have just created.
+
+![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXc-mkwrD2oPu1mzKE8i04Em0OL61duX5qm8uSYF0Gd4hhkDftdpM5MSNxrEE4eddPkPi7AyRiITESqUtVdQSIARSrzAvVQLWFIX2nj3-5H3IfkHG4TJbAf58-ynwdJ9J_EIHLfj5wH7I0HILBz4dtDa9x0hz8S22d3hSEjU-2tg64GArUsep_M?key=DP3-DrNAl4OVGPU6ksIo3g)
+
+Our Strapi application is ready now!
+
+## Upstash Vector Setup
+
+Upstash Vector is a serverless vector database designed to work with vector embeddings. In this blog post, we will store the vector representations of the data that we insert into the Strapi book collection.
+
+We will follow the [Upstash Documentation]( https://upstash.com/docs/vector/overall/getstarted) for creating the Upstash Vector database.
+
+First, log in to the [Upstash Console](https://console.upstash.com/vector) and create the Index. In the pop-up that is raised, we will set up our vector index. We should use a built-in embedding model of Upstash Vector. In this demo, we can use `bge-base-en-v1.5` model. The vector size of this model is 768, and we can use `Cosine` metric for distance calculation. You can learn more about the metrics in [Upstash Vector docs](https://upstash.com/docs/vector/features/similarityfunctions).
+
+![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXcNgEM5XA8uHlpvnUWq3NBkhxBrbeQHSbXxdh5NHzloF3Db3z-Td5C1jf55AUdvKEJlSuA207jJtfVX2EqOjAlf20X0IVprem9mIU4lwPB5CJydqc9CipzV-PgPUZ8zxTS_hkzrWv52zo7IMVuwmzyKLbekA3Bsm06yLKIoHYvbshT0CdqQsfA?key=DP3-DrNAl4OVGPU6ksIo3g)
+
+Now the vector index is ready. We will need the endpoint and token later when we integrate Upstash Vector with the Strapi application.
+
+## Integrating Upstash Vector with Strapi Application
+
+We have all the resources ready. Now we can connect the Upstash Vector index to the Strapi bookstore application.
+
+For a semantic search, we should extract the vector embeddings of every new book in our bookstore. Therefore, we should send the data of a new book when there is a new entry in the Strapi application. Strapi provides lifecycle methods to intervene in the lifecycle of the data ingestion and queries in the application. It lets developers execute additional logic when there is an event.
+
+In this demo, we will use `afterCreate` lifecycle hook. Strapi provides lifecycle hooks for every action taken in the application. You can learn more about lifecycle events in [Strapi docs](https://docs.strapi.io/dev-docs/backend-customization/models#lifecycle-hooks).
+
+`afterCreate` hook is executed after creating an entry in the collection completed. This hook is where we will send the data to the Upstash Vector index to extract the embeddings of the data and store them.
+
+To connect to Upstash Vector, we will use typescript SDK it by installing with the following command.
+
+```
+npm install @upstash/vector
+```
+
+To manipulate the lifecycle of `books` collection, we need to create a `lifecycles.js` file in the `./src/api/[api-name]/content-types/[content-type-name]/` folder. We will write the following code into this script, which is a very basic implementation for demonstration.
+
+```javascript
+'use strict';
+
+module.exports = {
+	beforeCreate(event) {
+		// let's do a 20% discount everytime
+		event.params.data.price = event.params.data.price * 0.8;
+	},
+
+	afterCreate(event) {
+		const {Index} = require("@upstash/vector");
+		const { result, params } = event;
+		// do something to the result;
+		const index = new Index({
+			url: "<UPSTASH-VECTOR-ENDPOINT>",
+			token: "<UPSTASH-VECTOR-TOKEN>",
+		})
+
+		index.upsert({
+			id: params.data.name.toString(),
+			data: params.data.toString(),
+			metadata: {metadata_field: "metadata_value"},
+		}).then(r => console.log("Indexed into Upstash Vector"));
+	},
+};
+```
+
+Do not forget to fill in the URL and token that you copied from the Upstash console.
+
+This code basically will send the whole data of a new entry. That data will be vectorized and stored in the Upstash vector index. The `id` of the vectors will be equal to the name of the books.
+
+Lastly, we can test the integration with an example entry. If the admin panel is closed, we can open it back by running the following command in the terminal.
+
+```
+npm run develop
+```
+
+Let’s create a new entry from the `Content Manager` tab.
+
+![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXfZROj8V5o_0iTa6PYORJVRpIZF8gFXynLQ-tNg0KiFbZPgghPqZJLkkPfGKDIumVT1n77nv5op_DYs0O9lIqPcUbbI8UoRmcLwUaa3Kw71IeoRO1qcqqH2iAVMDssYXHndr0zaT284LNFPi_3c2Nr30NdumIo4qcl398fiyLu0tbBi7tKp_WE?key=DP3-DrNAl4OVGPU6ksIo3g)
+
+After saving and publishing this entry, we can test by accessing ` [http://localhost:1337/api/books`](http://localhost:1337/api/books%60) on the browser. In addition to that, we should see the vector of this new book entry in our Upstash vector index. We can check it by going back to the Upstash console and opening the `Data Browser` tab.
+
+![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXfuSAGk4nYgEy6AWeFC6e66axvwR7ubDUhuuypMnO1OSeaW_DSWR9Ufd7sSHSEFAHGKBAawlDVMOEyFvpYdSpmcEJl0s_cyGxcewCJSNnNvDgp93YOjYnSc-QKG5FXPHju2eqUbPoflt2UxU2tjLDxnMUARcsXfBU4UZzTwRNRHfjMNuKfQJ9I?key=DP3-DrNAl4OVGPU6ksIo3g)
+
+As can be seen above, with the lifecycle manipulation on the Strapi application, there will be a vector for every book that we create in the Strapi collection. For semantic searching among the books, we can put the following code wherever the users do the search calls.
+
+```javascript
+const {Index} = require("@upstash/vector");
+
+const index = new Index({
+	url: "<UPSTASH-VECTOR-ENDPOINT>",
+	token: "<UPSTASH-VECTOR-TOKEN>",
+})
+
+index.query(
+	data="Enter the query",
+	top_k=10,
+	include_vectors=True,
+	include_metadata=True
+)
+```
+
+The code above will list the top 10 related records. It can be fine-tuned according to the need of the application.
+
+## Conclusion
+
+In this blog, we created the semantic search feature for an example Strapi application by integrating it with Upstash Vector. The semantic search can be used by the users to find the most relevant books with their search. The similarity function that we used in the Upstash Vector can bring the most relevant books by comparing the meaning of the queried text with the data of the books.
+
+Of course, this project was just a demo, so it was pretty simple. However, Strapi is almost fully customizable and user-friendly. More complex Strapi applications connected with Upstash Vector can be built by configuring the lifecycle of the Strapi collection, as we did above.
+
+I hope this blog helps you all!
