@@ -21,7 +21,7 @@ if (
   posthog.init(posthogKey, {
     api_host: posthogHost,
     person_profiles: "identified_only",
-    capture_pageview: true,
+    capture_pageview: false,
     cross_subdomain_cookie: true,
     capture_pageleave: true,
     autocapture: false,
