@@ -2,6 +2,7 @@ import "@upstash/claps/style.css";
 import "./globals.css";
 
 import { ReactNode, Suspense } from "react";
+import dynamic from "next/dynamic";
 import { Inter } from "next/font/google";
 import localFont from "next/font/local";
 import Script from "next/script";
@@ -16,6 +17,10 @@ import Analytics from "@/components/Analytics";
 import Footer from "@/components/master/footer";
 import Header from "@/components/master/header";
 import HeaderMobile from "@/components/master/header-mobile";
+
+const PostHogPageView = dynamic(() => import("@/lib/posthog/page-view"), {
+  ssr: false,
+});
 
 const inter = Inter({
   variable: "--font-sans",
@@ -52,6 +57,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     >
       <PHProvider>
         <body className="pt-[70px] md:pt-[80px]">
+          <PostHogPageView />
           <Suspense>
             <Analytics />
           </Suspense>
