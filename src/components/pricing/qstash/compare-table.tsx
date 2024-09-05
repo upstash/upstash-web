@@ -332,13 +332,13 @@ export default function CompareTable() {
             hidden={isMobile ? !showPro1 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>Custom</CompareValue>
+          <CompareValue>1000</CompareValue>
         </td>
         <td
             hidden={isMobile ? !showPro10 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>Custom</CompareValue>
+          <CompareValue>2000</CompareValue>
         </td>
       </tr>
 
@@ -363,13 +363,13 @@ export default function CompareTable() {
             hidden={isMobile ? !showPro1 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>Custom</CompareValue>
+          <CompareValue>1000</CompareValue>
         </td>
         <td
             hidden={isMobile ? !showPro10 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>Custom</CompareValue>
+          <CompareValue>2000</CompareValue>
         </td>
       </tr>
 
@@ -425,13 +425,13 @@ export default function CompareTable() {
             hidden={isMobile ? !showPro1 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>Custom</CompareValue>
+          <CompareValue>infinite</CompareValue>
         </td>
         <td
             hidden={isMobile ? !showPro10 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>Custom</CompareValue>
+          <CompareValue>infinite</CompareValue>
         </td>
       </tr>
 
@@ -456,13 +456,13 @@ export default function CompareTable() {
             hidden={isMobile ? !showPro1 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>Custom</CompareValue>
+          <CompareValue>6 hours</CompareValue>
         </td>
         <td
             hidden={isMobile ? !showPro10 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>Custom</CompareValue>
+          <CompareValue>12 hours</CompareValue>
         </td>
       </tr>
 
@@ -493,7 +493,7 @@ export default function CompareTable() {
             hidden={isMobile ? !showPro10 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>1 year</CompareValue>
+          <CompareValue>3 months</CompareValue>
         </td>
       </tr>
 
@@ -512,19 +512,19 @@ export default function CompareTable() {
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0"
         >
-          <CompareValue type="number">10000</CompareValue>
+          <CompareValue type="number">Infinite</CompareValue>
         </td>
         <td
             hidden={isMobile ? !showPro1 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>Custom</CompareValue>
+          <CompareValue>Infinite</CompareValue>
         </td>
         <td
             hidden={isMobile ? !showPro10 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>Custom</CompareValue>
+          <CompareValue>Infinite</CompareValue>
         </td>
       </tr>
 
@@ -556,7 +556,7 @@ export default function CompareTable() {
             hidden={isMobile ? !showPro10 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>1000</CompareValue>
+          <CompareValue>10000</CompareValue>
         </td>
       </tr>
 
@@ -612,13 +612,73 @@ export default function CompareTable() {
             hidden={isMobile ? !showPro1 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>Custom</CompareValue>
+          <CompareValue>10</CompareValue>
         </td>
         <td
             hidden={isMobile ? !showPro10 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>Custom</CompareValue>
+          <CompareValue>10</CompareValue>
+        </td>
+      </tr>
+      <tr>
+        <th className="px-0 py-4 text-left font-normal text-white/60">
+          Max Events Size
+        </th>
+        {/**/}
+        <td
+            hidden={isMobile ? !showFree : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue type="number">10000</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPayg : false}
+            className="bg-emerald-300/10 px-4 py-0"
+        >
+          <CompareValue type="number">10000</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPro1 : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue type="number">100000</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPro10 : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue type="number">100000</CompareValue>
+        </td>
+      </tr>
+      <tr>
+        <th className="px-0 py-4 text-left font-normal text-white/60">
+          Max Events Retention
+        </th>
+        {/**/}
+        <td
+            hidden={isMobile ? !showFree : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue>3 days</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPayg : false}
+            className="bg-emerald-300/10 px-4 py-0"
+        >
+          <CompareValue>7 days</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPro1 : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue>30 days</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPro10 : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue>3 months</CompareValue>
         </td>
       </tr>
       <tr>
