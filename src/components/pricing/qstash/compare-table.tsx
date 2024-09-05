@@ -332,13 +332,13 @@ export default function CompareTable() {
             hidden={isMobile ? !showPro1 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>Custom</CompareValue>
+          <CompareValue>1000</CompareValue>
         </td>
         <td
             hidden={isMobile ? !showPro10 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>Custom</CompareValue>
+          <CompareValue>2000</CompareValue>
         </td>
       </tr>
 
@@ -363,13 +363,13 @@ export default function CompareTable() {
             hidden={isMobile ? !showPro1 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>Custom</CompareValue>
+          <CompareValue>1000</CompareValue>
         </td>
         <td
             hidden={isMobile ? !showPro10 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>Custom</CompareValue>
+          <CompareValue>2000</CompareValue>
         </td>
       </tr>
 
@@ -425,13 +425,13 @@ export default function CompareTable() {
             hidden={isMobile ? !showPro1 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>Custom</CompareValue>
+          <CompareValue>Unlimited</CompareValue>
         </td>
         <td
             hidden={isMobile ? !showPro10 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>Custom</CompareValue>
+          <CompareValue>Unlimited</CompareValue>
         </td>
       </tr>
 
@@ -456,13 +456,13 @@ export default function CompareTable() {
             hidden={isMobile ? !showPro1 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>Custom</CompareValue>
+          <CompareValue>6 hours</CompareValue>
         </td>
         <td
             hidden={isMobile ? !showPro10 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>Custom</CompareValue>
+          <CompareValue>12 hours</CompareValue>
         </td>
       </tr>
 
@@ -493,41 +493,9 @@ export default function CompareTable() {
             hidden={isMobile ? !showPro10 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>1 year</CompareValue>
+          <CompareValue>3 months</CompareValue>
         </td>
       </tr>
-
-      <tr>
-        <th className="px-0 py-4 text-left font-normal text-white/60">
-          Max DLQ Size (Number of Messages)
-        </th>
-        {/**/}
-        <td
-            hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0"
-        >
-          <CompareValue type="number">1000</CompareValue>
-        </td>
-        <td
-            hidden={isMobile ? !showPayg : false}
-            className="bg-emerald-300/10 px-4 py-0"
-        >
-          <CompareValue type="number">10000</CompareValue>
-        </td>
-        <td
-            hidden={isMobile ? !showPro1 : false}
-            className="bg-white/3 px-4 py-0"
-        >
-          <CompareValue>Custom</CompareValue>
-        </td>
-        <td
-            hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0"
-        >
-          <CompareValue>Custom</CompareValue>
-        </td>
-      </tr>
-
 
       <tr>
         <th className="px-0 py-4 text-left font-normal text-white/60">
@@ -556,7 +524,7 @@ export default function CompareTable() {
             hidden={isMobile ? !showPro10 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>1000</CompareValue>
+          <CompareValue>10000</CompareValue>
         </td>
       </tr>
 
@@ -612,13 +580,13 @@ export default function CompareTable() {
             hidden={isMobile ? !showPro1 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>Custom</CompareValue>
+          <CompareValue>10</CompareValue>
         </td>
         <td
             hidden={isMobile ? !showPro10 : false}
             className="bg-white/3 px-4 py-0"
         >
-          <CompareValue>Custom</CompareValue>
+          <CompareValue>10</CompareValue>
         </td>
       </tr>
       <tr>
