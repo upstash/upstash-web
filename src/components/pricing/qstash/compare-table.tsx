@@ -494,6 +494,7 @@ export default function CompareTable() {
             className="bg-white/3 px-4 py-0"
         >
           <CompareValue>3 months</CompareValue>
+
         </td>
       </tr>
 
@@ -587,6 +588,36 @@ export default function CompareTable() {
             className="bg-white/3 px-4 py-0"
         >
           <CompareValue>10</CompareValue>
+        </td>
+      </tr>
+      <tr>
+        <th className="px-0 py-4 text-left font-normal text-white/60">
+          Max Events Size
+        </th>
+        {/**/}
+        <td
+            hidden={isMobile ? !showFree : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue type="number">10000</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPayg : false}
+            className="bg-emerald-300/10 px-4 py-0"
+        >
+          <CompareValue type="number">10000</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPro1 : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue type="number">100000</CompareValue>
+        </td>
+        <td
+            hidden={isMobile ? !showPro10 : false}
+            className="bg-white/3 px-4 py-0"
+        >
+          <CompareValue type="number">100000</CompareValue>
         </td>
       </tr>
       <tr>

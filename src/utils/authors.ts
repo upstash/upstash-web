@@ -281,8 +281,8 @@ export const authors: Record<
     image: "murillo.png",
   },
   yusuf: {
-    name: "Yusuf Kimirti",
-    title: "Sofware Engineer @Upstash",
+    name: "Yusuf",
+    title: "Software Engineer @Upstash",
     image: "yusuf.jpg",
   },
   valon: {
