@@ -4,9 +4,11 @@ import { ComponentProps, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
 import cx from "@/utils/cx";
-import { IconCheck, IconCopy } from "@tabler/icons-react";
 import { MDXContent } from "@content-collections/mdx/react";
+import { IconCheck, IconCopy } from "@tabler/icons-react";
 import Balancer from "react-wrap-balancer";
+
+import PostTOC from "@/components/post/toc";
 
 import ExpandableCode from "./expandable-code";
 import PostNote from "./note";
@@ -90,10 +92,7 @@ function Highlight(props: {
 }) {
   return (
     <FullWidth>
-      <div
-        className="group/highlight grid place-items-center gap-6 rounded-4xl
-        border-4 border-white/5 p-10 text-center md:px-20 md:py-16"
-      >
+      <div className="group/highlight grid place-items-center gap-6 rounded-4xl border-4 border-white/5 p-10 text-center md:px-20 md:py-16">
         {props.photo && (
           <Image
             src={`/customer/${props.photo}`}
@@ -104,10 +103,7 @@ function Highlight(props: {
           />
         )}
 
-        <p
-          className="bg-gradient-to-br from-white to-[#6DBEA6] bg-clip-text
-          text-xl font-medium text-transparent"
-        >
+        <p className="bg-gradient-to-br from-white to-[#6DBEA6] bg-clip-text text-xl font-medium text-transparent">
           <Balancer>{props.children}</Balancer>
         </p>
 
@@ -127,6 +123,7 @@ const components = {
   img,
   FullWidth,
   Highlight,
+  nav: PostTOC,
   Note: PostNote,
   ExpandableCode,
   pre: CopyFeaturePre,

@@ -1,11 +1,13 @@
 import { authors } from "@/utils/authors";
 import { defineCollection, defineConfig } from "@content-collections/core";
 import { compileMDX } from "@content-collections/mdx";
+import rehypeToc from "@jsdevtools/rehype-toc";
 import rt, { ReadTimeResults } from "reading-time";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypePrettyCode from "rehype-pretty-code";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
+import { Pluggable } from "unified";
 
 export const customers = defineCollection({
   name: "Customer",
@@ -76,9 +78,15 @@ export const posts = defineCollection({
   }),
   transform: async (doc, ctx) => {
     const mdx = await compileMDX(ctx, doc, {
-      remarkPlugins: [remarkGfm],
+      // remarkPlugins: [remarkGfm] as unknown as Pluggable[],
       rehypePlugins: [
         rehypeSlug,
+        [
+          rehypeToc,
+          {
+            headings: ["h2", "h3"],
+          },
+        ],
         [
           rehypePrettyCode,
           {
@@ -98,15 +106,6 @@ export const posts = defineCollection({
             },
             onVisitHighlightedWord(node: any) {
               node.properties.className = ["word--highlighted"];
-            },
-          },
-        ],
-        [
-          rehypeAutolinkHeadings,
-          {
-            properties: {
-              className: ["subheading-anchor"],
-              ariaLabel: "Link to section",
             },
           },
         ],
@@ -138,38 +137,3 @@ export const posts = defineCollection({
 export default defineConfig({
   collections: [customers, jobs, posts],
 });
-
-//  remarkPlugins: [remarkGfm],
-//  rehypePlugins: [
-//   rehypeSlug,
-//   [
-//     rehypePrettyCode,
-//     {
-//       theme: {
-//         dark: "poimandres",
-//         light: "github-light",
-//       },
-//       onVisitLine(node: any) {
-//         // Prevent lines from collapsing in `display: grid` mode, and allow empty
-//         // lines to be copy/pasted
-//         if (node.children.length === 0) {
-//           node.children = [{ type: "text", value: " " }];
-//         }
-//       },
-//       onVisitHighlightedLine(node: any) {
-//         node.properties.className.push("line--highlighted");
-//       },
-//       onVisitHighlightedWord(node: any) {
-//         node.properties.className = ["word--highlighted"];
-//       },
-//     },
-//   ],
-//   [
-//     rehypeAutolinkHeadings,
-//     {
-//       properties: {
-//         className: ["subheading-anchor"],
-//         ariaLabel: "Link to section",
-//       },
-//     },
-//   ],

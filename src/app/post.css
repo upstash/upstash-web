@@ -28,7 +28,7 @@
   @apply list-decimal pl-2 marker:text-zinc-500;
 }
 
-.post ul li {
+.post ul li:not(.toc-item) {
   @apply relative pl-6;
 }
 
