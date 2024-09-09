@@ -52,4 +52,4 @@ If your Kafka use case can be covered with Upstash Qstash, we will provide credi
 
 ### Conclusion
 
-We are excited about the future of Upstash Workflow and believe that this tool brings benefits to the serverless space that allow for building seriously robust, event-driven workflows. We also want to be fully transparent about our intentions with Kafka and sincerely apologize if this deprecation announcement causes you any inconvenience. If you are affected by these changes and need help with your migration or have any questions, please get in touch with us at [support@upstash.com](mailto:support@upstash.com). We are here to help you.
+We are excited about the future of Upstash Workflow and believe that it brings benefits to the serverless space that allow for building seriously robust, event-driven workflows. We also want to be fully transparent about our intentions with Kafka and sincerely apologize if this deprecation announcement causes you any inconvenience. If you are affected by these changes and need help with your migration or have any questions, please get in touch with us at [support@upstash.com](mailto:support@upstash.com). We are here to help you.
