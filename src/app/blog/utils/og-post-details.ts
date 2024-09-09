@@ -10,7 +10,6 @@ export async function getPostDetails(slug: string) {
   if (!response.ok) {
     throw new Error("Post not found");
   }
-  const post = await response.json();
 
-  return post;
+  return await response.json();
 }
