@@ -2,12 +2,11 @@ import { authors } from "@/utils/authors";
 import { defineCollection, defineConfig } from "@content-collections/core";
 import { compileMDX } from "@content-collections/mdx";
 import rehypeToc from "@jsdevtools/rehype-toc";
+// import { transformerCopyButton } from "@rehype-pretty/transformers";
 import rt, { ReadTimeResults } from "reading-time";
-import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypePrettyCode from "rehype-pretty-code";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
-import { Pluggable } from "unified";
 
 export const customers = defineCollection({
   name: "Customer",
@@ -90,23 +89,26 @@ export const posts = defineCollection({
         [
           rehypePrettyCode,
           {
-            theme: {
-              dark: "poimandres",
-              light: "github-light",
-            },
-            onVisitLine(node: any) {
-              // Prevent lines from collapsing in `display: grid` mode, and allow empty
-              // lines to be copy/pasted
-              if (node.children.length === 0) {
-                node.children = [{ type: "text", value: " " }];
-              }
-            },
-            onVisitHighlightedLine(node: any) {
-              node.properties.className.push("line--highlighted");
-            },
-            onVisitHighlightedWord(node: any) {
-              node.properties.className = ["word--highlighted"];
-            },
+            theme: "poimandres",
+            // onVisitLine(node: any) {
+            //   // Prevent lines from collapsing in `display: grid` mode, and allow empty
+            //   // lines to be copy/pasted
+            //   if (node.children.length === 0) {
+            //     node.children = [{ type: "text", value: " " }];
+            //   }
+            // },
+            // onVisitHighlightedLine(node: any) {
+            //   node.properties.className.push("line--highlighted");
+            // },
+            // onVisitHighlightedWord(node: any) {
+            //   node.properties.className = ["word--highlighted"];
+            // },
+            // transformers: [
+            //   transformerCopyButton({
+            //     visibility: "always",
+            //     feedbackDuration: 3_000,
+            //   }),
+            // ],
           },
         ],
       ],

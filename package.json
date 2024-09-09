@@ -15,6 +15,7 @@
     "@jsdevtools/rehype-toc": "^3.0.2",
     "@radix-ui/react-navigation-menu": "^1.2.0",
     "@radix-ui/react-tooltip": "^1.1.2",
+    "@rehype-pretty/transformers": "^0.13.2",
     "@segment/analytics-next": "^1.72.2",
     "@tabler/icons-react": "^2.47.0",
     "@upstash/claps": "1.0.0-beta.4",

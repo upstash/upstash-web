@@ -35,7 +35,7 @@ function CopyFeaturePre(props: ComponentProps<"pre">) {
     }, 3000);
   }, [hasCopied]);
   if (props && !props["data-language"]) {
-    return <pre {...props} />;
+    return <pre {...props} className="" />;
   }
 
   return (
@@ -57,13 +57,17 @@ function CopyFeaturePre(props: ComponentProps<"pre">) {
           "cursor-pointer rounded-md",
           "",
           hasCopied
-            ? "text-emerald-600"
+            ? "bg-white text-emerald-600"
             : "text-zinc-400 hover:text-zinc-600 dark:text-zinc-600 dark:hover:text-zinc-200",
         )}
       >
-        {hasCopied ? <IconCheck stroke={1.5} /> : <IconCopy stroke={1.5} />}
+        {hasCopied ? (
+          <IconCheck size={20} stroke={1.5} />
+        ) : (
+          <IconCopy size={20} stroke={1.5} />
+        )}
       </button>
-      <pre {...props} />
+      <pre {...props} className="" />
     </div>
   );
 }
