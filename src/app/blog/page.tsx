@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { BANNED_TAGS } from "@/utils/const";
-import { Post } from "contentlayer/generated";
+import type { Post } from "@content";
 import { countBy, flatten, omit } from "lodash";
 
 import Bg from "@/components/bg";

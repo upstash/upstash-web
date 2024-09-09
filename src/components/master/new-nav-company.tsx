@@ -6,7 +6,7 @@ import {
   IconUserPlus,
   IconUsers,
 } from "@tabler/icons-react";
-import { allJobs } from "contentlayer/generated";
+import { allJobs } from "@content";
 
 import {
   ListItem,

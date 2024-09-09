@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { allCustomers } from "contentlayer/generated";
+import { allCustomers } from "@content";
 
 import Bg from "@/components/bg";
 import Button from "@/components/button";

@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import cx from "@/utils/cx";
-import type { Post } from "contentlayer/generated";
+import type { Post } from "@content";
 import { DateTime } from "luxon";
 import Balancer from "react-wrap-balancer";
 
@@ -44,7 +44,7 @@ export default function PostListCard({ data }: { data: Post }) {
 
         <div className="mt-1 flex grow items-center gap-2">
           <Link
-            href={`/blog/author/${authorsData[0].id}`}
+            href={`/blog/author/${authorsData[0].username}`}
             className="opacity-80
             hover:text-emerald-500 hover:underline
             dark:hover:text-emerald-400"

@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import cx from "@/utils/cx";
-import type { Post } from "contentlayer/generated";
+import type { Post } from "@content";
 
 type Props = {
   post: Post;

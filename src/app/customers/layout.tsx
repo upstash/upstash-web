@@ -7,7 +7,7 @@ import { Metadata } from "next";
 import { SITE_URL } from "@/utils/const";
 
 const title = "Upstash Customers";
-const description = "TODO:FIX";
+const description = ""; // TODO: add description
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

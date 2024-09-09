@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import type { Post } from "contentlayer/generated";
+import type { Post } from "@content";
 import { DateTime } from "luxon";
 import Balancer from "react-wrap-balancer";
 
@@ -35,7 +35,7 @@ export default function PostGridCard({ data }: { data: Post }) {
           <div key={author.name} className="mt-2 flex grow items-center gap-4">
             <div className="flex grow flex-col items-start">
               <Link
-                href={`/blog/author/${author.id}`}
+                href={`/blog/author/${author.username}`}
                 className="font-medium opacity-80 hover:text-emerald-500
                 hover:underline
                 dark:hover:text-emerald-400"

@@ -5,7 +5,7 @@ import Image from "next/image";
 
 import cx from "@/utils/cx";
 import { IconCheck, IconCopy } from "@tabler/icons-react";
-import { useMDXComponent } from "next-contentlayer/hooks";
+import { MDXContent } from "@content-collections/mdx/react";
 import Balancer from "react-wrap-balancer";
 
 import ExpandableCode from "./expandable-code";
@@ -16,11 +16,9 @@ interface MdxProps {
 }
 
 export function Mdx({ code }: MdxProps) {
-  const Component = useMDXComponent(code);
-
   return (
     <div className="post leading-p">
-      <Component components={{ ...components }} />
+      <MDXContent code={code} components={{ ...components }} />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import type { Job } from "contentlayer/generated";
+import type { Job } from "@content";
 import Balancer from "react-wrap-balancer";
 
 import Button from "@/components/button";
@@ -21,7 +21,7 @@ export default function CareerHeader({ job }: Props) {
         <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
           {[
             { title: "Experience", value: job.experience },
-            { title: "Job type", value: job.type },
+            { title: "Job type", value: job.how },
             { title: "Location", value: job.location },
           ].map((o) => {
             return (
