@@ -26,10 +26,7 @@ export default function DesignedForTheEdge() {
       {/* body */}
       <div className="relative z-0 h-[320px]">
         {/* upstash */}
-        <div
-          className="absolute left-1/2 top-1/2 z-0 flex
-          h-[490px] w-[490px] -translate-x-1/2 -translate-y-1/2 items-center justify-center"
-        >
+        <div className="absolute left-1/2 top-1/2 z-0 flex h-[490px] w-[490px] -translate-x-1/2 -translate-y-1/2 items-center justify-center">
           {/* circles line */}
           <svg
             className="absolute left-0 top-0 z-0"

@@ -25,8 +25,8 @@ export async function generateStaticParams(): Promise<Props["params"][]> {
 }
 
 export async function generateMetadata({
-                                         params,
-                                       }: {
+  params,
+}: {
   params: Props["params"];
 }) {
   const job = allJobs.find((job: Job) => job.slug === params.slug) as Job;

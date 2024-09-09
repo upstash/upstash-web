@@ -17,16 +17,16 @@ export default function FAQ() {
         </AccordionTrigger>
         <AccordionContent>
           <p>
-
-            Retries are also charged as messages. Below are some message examples:
+            Retries are also charged as messages. Below are some message
+            examples:
           </p>
 
           <ul className="mt-4 list-disc space-y-2 pl-6">
             <li className="space-y-2">
               <p>
                 <b>
-                  Publish to single API endpoint, it succeeds after single retry. Here you would be charged for
-                  2 messages
+                  Publish to single API endpoint, it succeeds after single
+                  retry. Here you would be charged for 2 messages
                 </b>
               </p>
 

@@ -12,7 +12,7 @@
 /* - */
 
 [data-rehype-pretty-code-figure] {
-  @apply relative text-sm rounded-xl overflow-hidden bg-emerald-900/5 dark:bg-white/5;
+  @apply relative overflow-hidden rounded-xl bg-emerald-900/5 text-sm dark:bg-white/5;
 }
 
 [data-rehype-pretty-code-figure] pre {
@@ -26,7 +26,7 @@
 }
 
 [data-rehype-pretty-code-figure] [data-line] {
-  @apply inline-block px-4 py-1 border-l-4 border-transparent;
+  @apply inline-block border-l-4 border-transparent px-4 py-1;
 }
 
 [data-rehype-pretty-code-figure] [data-line-numbers] > [data-line]::before {

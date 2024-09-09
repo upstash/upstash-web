@@ -40,18 +40,17 @@ export default function NewNavigation() {
         </NavigationMenu.Link>
       </NavigationMenu.Item>
 
-
-        <NavigationMenu.Item>
-            <NavigationMenu.Link
-                className={cx(
-                    "flex select-none items-center gap-0.5 rounded-full px-3 py-2",
-                    "opacity-60 hover:bg-white/5 hover:opacity-100",
-                )}
-                href="/blog"
-            >
-                Blog
-            </NavigationMenu.Link>
-        </NavigationMenu.Item>
+      <NavigationMenu.Item>
+        <NavigationMenu.Link
+          className={cx(
+            "flex select-none items-center gap-0.5 rounded-full px-3 py-2",
+            "opacity-60 hover:bg-white/5 hover:opacity-100",
+          )}
+          href="/blog"
+        >
+          Blog
+        </NavigationMenu.Link>
+      </NavigationMenu.Item>
 
       <ItemCompany />
       <ItemSupport />

@@ -67,7 +67,7 @@ Toc.Summary = function TocSummary({
         onClick={() => {
           setIsOpen(!isOpen);
         }}
-        className="grow text-sm  tracking-wide"
+        className="grow text-sm tracking-wide"
       >
         {children}
       </span>

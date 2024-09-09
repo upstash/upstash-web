@@ -22,10 +22,7 @@ export default function PostListCard({ data }: { data: Post }) {
     >
       <div className="grow">
         {isAnnouncement && (
-          <h5
-            className="-ml-0.5 mb-2 inline-flex rounded-full bg-amber-500/20 px-2 py-1 text-xs
-            uppercase tracking-wide text-amber-900 md:mb-4 dark:text-amber-100"
-          >
+          <h5 className="-ml-0.5 mb-2 inline-flex rounded-full bg-amber-500/20 px-2 py-1 text-xs uppercase tracking-wide text-amber-900 md:mb-4 dark:text-amber-100">
             Announcement
           </h5>
         )}
@@ -33,8 +30,7 @@ export default function PostListCard({ data }: { data: Post }) {
         <h3 className="font-display text-xl font-semibold md:leading-tight">
           <Balancer>
             <Link
-              className="transition hover:text-emerald-500 hover:underline
-            dark:hover:text-emerald-400"
+              className="transition hover:text-emerald-500 hover:underline dark:hover:text-emerald-400"
               href={`/blog/${slug}`}
             >
               {title}
@@ -45,9 +41,7 @@ export default function PostListCard({ data }: { data: Post }) {
         <div className="mt-1 flex grow items-center gap-2">
           <Link
             href={`/blog/author/${authorsData[0].username}`}
-            className="opacity-80
-            hover:text-emerald-500 hover:underline
-            dark:hover:text-emerald-400"
+            className="opacity-80 hover:text-emerald-500 hover:underline dark:hover:text-emerald-400"
           >
             {authorsData[0].name}
           </Link>
@@ -63,8 +57,7 @@ export default function PostListCard({ data }: { data: Post }) {
         height={50}
         alt={authorsData[0].name}
         src={authorsData[0].image}
-        className="aspect-square shrink-0 rounded-full
-        border-2 border-emerald-900/10 object-cover dark:border-emerald-500/40"
+        className="aspect-square shrink-0 rounded-full border-2 border-emerald-900/10 object-cover dark:border-emerald-500/40"
       />
     </article>
   );

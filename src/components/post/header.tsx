@@ -37,8 +37,7 @@ export default function PostHeader({ post }: Props) {
                 height={64}
                 alt={author.name}
                 src={author.image}
-                className="aspect-square shrink-0 rounded-full object-cover
-                border-2 border-emerald-900/10 dark:border-emerald-500/40"
+                className="aspect-square shrink-0 rounded-full border-2 border-emerald-900/10 object-cover dark:border-emerald-500/40"
               />
               <Link
                 href={`/blog/author/${author.username}`}

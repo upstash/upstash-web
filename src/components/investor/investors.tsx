@@ -20,15 +20,10 @@ export default function Investors({ short = false }) {
               src={investor.src}
               width={100}
               height={100}
-              className="aspect-square h-[80px] w-[80px] scale-[1.01] rounded-full
-                object-cover
-                md:h-[100px] md:w-[100px]"
+              className="aspect-square h-[80px] w-[80px] scale-[1.01] rounded-full object-cover md:h-[100px] md:w-[100px]"
             />
 
-            <h4
-              className="mt-4 font-display text-xl font-medium transition
-            group-hover/investor:text-emerald-400 group-hover/investor:underline"
-            >
+            <h4 className="mt-4 font-display text-xl font-medium transition group-hover/investor:text-emerald-400 group-hover/investor:underline">
               {investor.name}
             </h4>
             {investor.title && <p className="opacity-40">{investor.title}</p>}

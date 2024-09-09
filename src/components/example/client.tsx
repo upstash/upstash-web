@@ -116,8 +116,8 @@ export const Client: React.FC<Props> = ({
   });
 
   return (
-    <div className="grid items-start gap-4 text-left sm:auto-cols-[1fr_4fr] sm:grid-flow-col  sm:gap-10 lg:flex-row lg:items-start lg:gap-10">
-      <div className="mt-2  sm:mt-[4.5rem] lg:w-full">
+    <div className="grid items-start gap-4 text-left sm:auto-cols-[1fr_4fr] sm:grid-flow-col sm:gap-10 lg:flex-row lg:items-start lg:gap-10">
+      <div className="mt-2 sm:mt-[4.5rem] lg:w-full">
         <ExampleFilter
           selectedProducts={selectedProducts}
           setSelectedProduct={setSelectedProduct}

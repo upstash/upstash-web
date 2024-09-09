@@ -1,4 +1,4 @@
-import  { allPosts } from "@content";
+import { allPosts } from "@content";
 import type { Post } from "@content";
 import { DateTime } from "luxon";
 
@@ -15,4 +15,3 @@ export async function getData(count?: number): Promise<Post[]> {
 
   return posts;
 }
-

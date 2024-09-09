@@ -40,10 +40,7 @@ export default function CustomerPage() {
               return (
                 <Link
                   key={customer.slug}
-                  className="group/customer-comp flex flex-col items-center gap-6
-                  rounded-4xl border-4 border-white/5 bg-gradient-to-br p-10
-                  transition hover:from-[#00E9A3]/0
-                  hover:to-[#00E9A3]/10 md:p-16"
+                  className="group/customer-comp flex flex-col items-center gap-6 rounded-4xl border-4 border-white/5 bg-gradient-to-br p-10 transition hover:from-[#00E9A3]/0 hover:to-[#00E9A3]/10 md:p-16"
                   href={`/customers/${customer.slug}`}
                 >
                   <Image
@@ -57,11 +54,7 @@ export default function CustomerPage() {
                   <hr className="w-1/4 border-0 border-b border-white/5" />
 
                   <div className="flex grow items-center">
-                    <p
-                      className="bg-gradient-to-br from-white
-                    to-[#6DBEA6] bg-clip-text
-                    text-xl font-semibold text-transparent"
-                    >
+                    <p className="bg-gradient-to-br from-white to-[#6DBEA6] bg-clip-text text-xl font-semibold text-transparent">
                       “ {customer.highlight} ”
                     </p>
                   </div>
@@ -71,10 +64,7 @@ export default function CustomerPage() {
                     <span className="opacity-40">{customer.user_title}</span>
                   </div>
 
-                  <div
-                    className="mt-auto hidden h-10
-                   group-hover/customer-comp:block"
-                  >
+                  <div className="mt-auto hidden h-10 group-hover/customer-comp:block">
                     <Button
                       target="_self"
                       type="button"
