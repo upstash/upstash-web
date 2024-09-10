@@ -25,8 +25,8 @@ export default function PricingTable() {
         <div className="">
           <h4 className="mb-2 text-xl font-semibold text-emerald-400">Free</h4>
 
-          <h5 className="text-3xl font-semibold">$0</h5>
-          <p className="text-white/40">-</p>
+          <h5 className="text-2xl font-semibold">$0</h5>
+          <p className="text-sm text-white/40">-</p>
         </div>
 
         <div className="grow">
@@ -37,10 +37,12 @@ export default function PricingTable() {
 
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
-        <div>
-          <p className="text-white/40">Daily Command Limit</p>
-          <p className="font-semibold">10,000</p>
-        </div>
+        <p className="text-white/80">
+          10,000 commands{" "}
+          <span className="font-semibold underline decoration-zinc-500">
+            daily
+          </span>
+        </p>
 
         <div className="flex flex-wrap justify-center gap-1.5">
           <FeatureTag active>
@@ -107,8 +109,8 @@ export default function PricingTable() {
             Pay as you go
           </h4>
 
-          <h5 className="text-3xl font-semibold">$0.2</h5>
-          <p className="text-white/40">per 100K commands</p>
+          <h5 className="text-2xl font-semibold">$0.2</h5>
+          <p className="text-sm text-white/40">per 100K commands</p>
         </div>
 
         <div className="grow">
@@ -119,10 +121,12 @@ export default function PricingTable() {
 
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
-        <div>
-          <p className="text-white/40">Max Commands Per Second</p>
-          <p className="font-semibold">1,000</p>
-        </div>
+        <p className="text-white/80">
+          1,000 commands{" "}
+          <span className="font-semibold underline decoration-zinc-500">
+            per second
+          </span>
+        </p>
 
         <div className="flex flex-wrap justify-center gap-1.5">
           <FeatureTag active>
@@ -189,13 +193,13 @@ export default function PricingTable() {
             Pro 2K
           </h4>
 
-          <h5 className="flex items-baseline text-3xl font-semibold">
+          <h5 className="flex items-baseline text-2xl font-semibold">
             $280
             <span className="ml-1 text-base font-normal opacity-40">
               / month
             </span>
           </h5>
-          <p className="text-white/40">+$100 ✕ read region</p>
+          <p className="text-sm text-white/40">+$100 ✕ read region</p>
         </div>
 
         <div>
@@ -206,10 +210,12 @@ export default function PricingTable() {
 
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
-        <div>
-          <p className="text-white/40">Max Commands Per Second</p>
-          <p className="font-semibold">2,000</p>
-        </div>
+        <p className="text-white/80">
+          2,000 commands{" "}
+          <span className="font-semibold underline decoration-zinc-500">
+            per second
+          </span>
+        </p>
 
         <div className="flex flex-wrap justify-center gap-1.5">
           <FeatureTag active>

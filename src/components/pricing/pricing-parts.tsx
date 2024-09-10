@@ -20,10 +20,10 @@ export function FeatureTag({
   return (
     <div
       className={cx(
-        "inline-flex items-center gap-1 rounded-full border border-zinc-500/10 py-1 pl-2 pr-3 text-sm",
+        "inline-flex items-center gap-1 rounded-full border border-transparent py-1 pl-2 pr-3 text-sm",
         active
           ? "border-emerald-400/10 bg-emerald-400/5"
-          : "border-dashed bg-white/10 opacity-30",
+          : "bg-white/10 opacity-30",
         className,
       )}
       {...props}
