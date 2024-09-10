@@ -22,7 +22,7 @@ export function FeatureTag({
       className={cx(
         "inline-flex items-center gap-1 rounded-full border border-transparent py-1 pl-2 pr-3 text-sm",
         active
-          ? "border-emerald-400/10 bg-emerald-400/5"
+          ? "border-emerald-400/10 bg-emerald-400/5 text-emerald-100"
           : "bg-white/10 opacity-30",
         className,
       )}

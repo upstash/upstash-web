@@ -12,7 +12,7 @@ import {
 } from "@tabler/icons-react";
 
 import Button from "@/components/button";
-import { FeatureTag } from "@/components/pricing/pricing-parts";
+import { FeatureTag, Hr } from "@/components/pricing/pricing-parts";
 
 export default function PricingTable() {
   return (
@@ -35,16 +35,9 @@ export default function PricingTable() {
           </div>
         </div>
 
-        <hr className="w-2/3 border-0 border-b border-b-white/5" />
+        <Hr />
 
-        <p className="text-white/80">
-          10,000 commands{" "}
-          <span className="font-semibold underline decoration-zinc-500">
-            daily
-          </span>
-        </p>
-
-        <div className="flex flex-wrap justify-center gap-1.5">
+        <div className="flex flex-wrap justify-center gap-1">
           <FeatureTag active>
             <IconPercentage75 width="16" height="16" strokeWidth={1.5} />
             Persistence
@@ -86,7 +79,9 @@ export default function PricingTable() {
           </FeatureTag>
         </div>
 
-        <hr className="w-2/3 border-0 border-b border-b-white/5" />
+        <Hr />
+
+        <p className="text-emerald-200">10,000 commands daily</p>
 
         <div>
           <Button
@@ -94,7 +89,7 @@ export default function PricingTable() {
             type="button"
             hideIcon
             href="https://console.upstash.com"
-            className="bg-zinc-50 font-medium text-zinc-950"
+            className="bg-zinc-50 text-zinc-950"
           >
             Start Now
           </Button>
@@ -103,7 +98,7 @@ export default function PricingTable() {
 
       {/* PAYG */}
 
-      <div className="flex flex-col items-center gap-6 rounded-3xl border-2 border-white/20 bg-white/10 px-4 py-8">
+      <div className="flex flex-col items-center gap-6 rounded-3xl border-2 border-white/20 bg-white/5 px-4 py-8">
         <div className="grow">
           <h4 className="mb-2 text-xl font-semibold text-emerald-400">
             Pay as you go
@@ -119,16 +114,9 @@ export default function PricingTable() {
           </div>
         </div>
 
-        <hr className="w-2/3 border-0 border-b border-b-white/5" />
+        <Hr />
 
-        <p className="text-white/80">
-          1,000 commands{" "}
-          <span className="font-semibold underline decoration-zinc-500">
-            per second
-          </span>
-        </p>
-
-        <div className="flex flex-wrap justify-center gap-1.5">
+        <div className="flex flex-wrap justify-center gap-1">
           <FeatureTag active>
             <IconPercentage75 width="16" height="16" strokeWidth={1.5} />
             Persistence
@@ -170,7 +158,9 @@ export default function PricingTable() {
           </FeatureTag>
         </div>
 
-        <hr className="w-2/3 border-0 border-b border-b-white/5" />
+        <Hr />
+
+        <p className="text-emerald-200">1,000 commands per second</p>
 
         <div>
           <Button
@@ -178,7 +168,7 @@ export default function PricingTable() {
             type="button"
             hideIcon
             href="https://console.upstash.com"
-            className="bg-zinc-50 font-medium text-zinc-950"
+            className="bg-emerald-400 text-emerald-950"
           >
             Start Now
           </Button>
@@ -208,16 +198,9 @@ export default function PricingTable() {
           </div>
         </div>
 
-        <hr className="w-2/3 border-0 border-b border-b-white/5" />
+        <Hr />
 
-        <p className="text-white/80">
-          2,000 commands{" "}
-          <span className="font-semibold underline decoration-zinc-500">
-            per second
-          </span>
-        </p>
-
-        <div className="flex flex-wrap justify-center gap-1.5">
+        <div className="flex flex-wrap justify-center gap-1">
           <FeatureTag active>
             <IconPercentage75 width="16" height="16" strokeWidth={1.5} />
             Persistence
@@ -259,7 +242,9 @@ export default function PricingTable() {
           </FeatureTag>
         </div>
 
-        <hr className="w-2/3 border-0 border-b border-b-white/5" />
+        <Hr />
+
+        <p className="text-emerald-200">2,000 commands per second</p>
 
         <div>
           <Button
@@ -267,7 +252,7 @@ export default function PricingTable() {
             type="button"
             hideIcon
             href="https://console.upstash.com"
-            className="bg-zinc-50 font-medium text-zinc-950"
+            className="bg-zinc-50 text-zinc-950"
           >
             Start Now
           </Button>
