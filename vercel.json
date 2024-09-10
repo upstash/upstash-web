@@ -5,10 +5,6 @@
       "destination": "https://upstash.com/docs/redis"
     },
     {
-      "source": "/kafka",
-      "destination": "https://upstash.com/docs/kafka"
-    },
-    {
       "source": "/qstash",
       "destination": "https://upstash.com/docs/qstash"
     },
