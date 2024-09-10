@@ -1,4 +1,18 @@
+import * as React from "react";
+
+import {
+  IconApps,
+  IconHeartbeat,
+  IconListSearch,
+  IconLock,
+  IconPercentage75,
+  IconShieldLock,
+  IconUserCircle,
+  IconWorld,
+} from "@tabler/icons-react";
+
 import Button from "@/components/button";
+import { FeatureTag } from "@/components/pricing/pricing-parts";
 
 export default function PricingTable() {
   return (
@@ -8,7 +22,7 @@ export default function PricingTable() {
       {/* FREE */}
 
       <div className="flex flex-col items-center gap-6 rounded-3xl bg-white/5 px-4 py-8">
-        <div className="grow">
+        <div className="">
           <h4 className="mb-2 text-xl font-semibold text-emerald-400">Free</h4>
 
           <h5 className="text-3xl font-semibold">$0</h5>
@@ -24,13 +38,50 @@ export default function PricingTable() {
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
         <div>
-          <p className="text-white/40">Max Commands Per Second</p>
-          <p className="font-semibold">1,000</p>
-        </div>
-
-        <div>
           <p className="text-white/40">Daily Command Limit</p>
           <p className="font-semibold">10,000</p>
+        </div>
+
+        <div className="flex flex-wrap justify-center gap-1.5">
+          <FeatureTag active>
+            <IconPercentage75 width="16" height="16" strokeWidth={1.5} />
+            Persistence
+          </FeatureTag>
+
+          <FeatureTag active>
+            <IconApps width="16" height="16" strokeWidth={1.5} />
+            REST API
+          </FeatureTag>
+
+          <FeatureTag active>
+            <IconLock width="16" height="16" strokeWidth={1.5} />
+            TLS
+          </FeatureTag>
+
+          <FeatureTag>
+            <IconWorld width="16" height="16" strokeWidth={1.5} />
+            Global
+          </FeatureTag>
+
+          <FeatureTag>
+            <IconHeartbeat width="16" height="16" strokeWidth={1.5} />
+            Uptime SLA
+          </FeatureTag>
+
+          <FeatureTag>
+            <IconUserCircle width="16" height="16" strokeWidth={1.5} />
+            RBAC
+          </FeatureTag>
+
+          <FeatureTag>
+            <IconShieldLock width="16" height="16" strokeWidth={1.5} />
+            SOC-2
+          </FeatureTag>
+
+          <FeatureTag>
+            <IconListSearch width="16" height="16" strokeWidth={1.5} />
+            Monitoring
+          </FeatureTag>
         </div>
 
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
@@ -73,9 +124,46 @@ export default function PricingTable() {
           <p className="font-semibold">1,000</p>
         </div>
 
-        <div>
-          <p className="text-white/40">Daily Command Limit</p>
-          <p className="font-semibold">Unlimited</p>
+        <div className="flex flex-wrap justify-center gap-1.5">
+          <FeatureTag active>
+            <IconPercentage75 width="16" height="16" strokeWidth={1.5} />
+            Persistence
+          </FeatureTag>
+
+          <FeatureTag active>
+            <IconApps width="16" height="16" strokeWidth={1.5} />
+            REST API
+          </FeatureTag>
+
+          <FeatureTag active>
+            <IconLock width="16" height="16" strokeWidth={1.5} />
+            TLS
+          </FeatureTag>
+
+          <FeatureTag active>
+            <IconWorld width="16" height="16" strokeWidth={1.5} />
+            Global
+          </FeatureTag>
+
+          <FeatureTag>
+            <IconHeartbeat width="16" height="16" strokeWidth={1.5} />
+            Uptime SLA
+          </FeatureTag>
+
+          <FeatureTag>
+            <IconUserCircle width="16" height="16" strokeWidth={1.5} />
+            RBAC
+          </FeatureTag>
+
+          <FeatureTag>
+            <IconShieldLock width="16" height="16" strokeWidth={1.5} />
+            SOC-2
+          </FeatureTag>
+
+          <FeatureTag>
+            <IconListSearch width="16" height="16" strokeWidth={1.5} />
+            Monitoring
+          </FeatureTag>
         </div>
 
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
@@ -123,9 +211,46 @@ export default function PricingTable() {
           <p className="font-semibold">2,000</p>
         </div>
 
-        <div>
-          <p className="text-white/40">Daily Command Limit</p>
-          <p className="font-semibold">Unlimited</p>
+        <div className="flex flex-wrap justify-center gap-1.5">
+          <FeatureTag active>
+            <IconPercentage75 width="16" height="16" strokeWidth={1.5} />
+            Persistence
+          </FeatureTag>
+
+          <FeatureTag active>
+            <IconApps width="16" height="16" strokeWidth={1.5} />
+            REST API
+          </FeatureTag>
+
+          <FeatureTag active>
+            <IconLock width="16" height="16" strokeWidth={1.5} />
+            TLS
+          </FeatureTag>
+
+          <FeatureTag active>
+            <IconWorld width="16" height="16" strokeWidth={1.5} />
+            Global
+          </FeatureTag>
+
+          <FeatureTag active>
+            <IconHeartbeat width="16" height="16" strokeWidth={1.5} />
+            Uptime SLA
+          </FeatureTag>
+
+          <FeatureTag active>
+            <IconUserCircle width="16" height="16" strokeWidth={1.5} />
+            RBAC
+          </FeatureTag>
+
+          <FeatureTag active>
+            <IconShieldLock width="16" height="16" strokeWidth={1.5} />
+            SOC-2
+          </FeatureTag>
+
+          <FeatureTag active>
+            <IconListSearch width="16" height="16" strokeWidth={1.5} />
+            Monitoring
+          </FeatureTag>
         </div>
 
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
