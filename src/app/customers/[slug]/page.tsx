@@ -2,7 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { allCustomers, Customer } from "contentlayer/generated";
+import { allCustomers } from "@content";
+import type { Customer } from "@content";
 
 import Container from "@/components/container";
 import { Mdx } from "@/components/post/mdx";
@@ -63,7 +64,7 @@ export default async function BlogPage({ params }: Props) {
 
           <div className="">
             <Container className="max-w-screen-md">
-              <Mdx code={customer.body.code} />
+              <Mdx code={customer.mdx} />
             </Container>
           </div>
         </article>

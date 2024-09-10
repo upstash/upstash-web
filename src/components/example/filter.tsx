@@ -115,7 +115,7 @@ function ExampleFilterDesktop({
   return (
     <form className="hidden gap-4 sm:grid">
       <Child className="sm:-mt-10">
-        <div className="flex items-center ">
+        <div className="flex items-center">
           <h4 className="text-sm uppercase tracking-widest opacity-60">
             Filter
           </h4>
@@ -174,10 +174,10 @@ function ExampleFilterMobile({
   queriedPlatforms,
 }) {
   return (
-    <div className="block  sm:hidden">
+    <div className="block sm:hidden">
       <Toc>
         <Toc.Summary className="pl-3">
-          <div className="flex items-center ">
+          <div className="flex items-center">
             <h4 className="text-sm uppercase tracking-widest text-white/90 opacity-100">
               Filter
             </h4>

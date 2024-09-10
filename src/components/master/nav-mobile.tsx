@@ -2,7 +2,7 @@ import React, { HTMLProps, ReactNode } from "react";
 import Link, { LinkProps } from "next/link";
 
 import cx from "@/utils/cx";
-import { allJobs } from "contentlayer/generated";
+import { allJobs } from "@content";
 
 import Button from "@/components/button";
 
@@ -60,10 +60,7 @@ function NavLink({
     >
       {children}
       {href === "/careers" && (
-        <span
-          className="flex items-center rounded-full bg-emerald-300/20
-          px-1.5 py-1 font-mono text-sm leading-none text-emerald-500"
-        >
+        <span className="flex items-center rounded-full bg-emerald-300/20 px-1.5 py-1 font-mono text-sm leading-none text-emerald-500">
           {jobLength}
         </span>
       )}

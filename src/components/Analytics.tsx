@@ -1,9 +1,10 @@
 "use client";
 
-import { GTM_ID, pageview } from "@/lib/google/gtm";
+import { useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import Script from "next/script";
-import { useEffect } from "react";
+
+import { GTM_ID, pageview } from "@/lib/google/gtm";
 
 export default function Analytics() {
   const pathname = usePathname();

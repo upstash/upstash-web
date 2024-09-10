@@ -6,11 +6,6 @@ public/sw*
 public/workbox*
 .DS_Store
 *.local
-
 .vercel
-
 .env
-
-# Contentlayer
-.contentlayer
-package-lock.json
+.content-collections

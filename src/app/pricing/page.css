@@ -11,7 +11,7 @@ code {
 }
 
 .mini-table {
-  @apply rounded-xl text-sm border-2 border-zinc-100;
+  @apply rounded-xl border-2 border-zinc-100 text-sm;
 }
 
 .mini-table :where(th, td) {

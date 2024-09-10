@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
 
-import { allJobs } from "contentlayer/generated";
+import { allJobs } from "@content";
 
 import Bg from "@/components/bg";
 import Container from "@/components/container";

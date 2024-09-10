@@ -1,4 +1,5 @@
-import { allPosts, Post } from "contentlayer/generated";
+import { allPosts } from "@content";
+import type { Post } from "@content";
 import { DateTime } from "luxon";
 
 export async function getData(count?: number): Promise<Post[]> {
@@ -14,4 +15,3 @@ export async function getData(count?: number): Promise<Post[]> {
 
   return posts;
 }
-

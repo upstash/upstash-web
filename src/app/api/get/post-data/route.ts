@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 //@ts-ignore
-import { allPosts } from "contentlayer/generated";
+import { allPosts } from "@content";
 
 export async function GET(req: NextRequest) {
   const slug = req.nextUrl.searchParams.get("slug");

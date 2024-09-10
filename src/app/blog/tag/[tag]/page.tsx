@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { Post } from "contentlayer/generated";
+import type { Post } from "@content";
 import { uniq } from "lodash";
 
 import Bg from "@/components/bg";

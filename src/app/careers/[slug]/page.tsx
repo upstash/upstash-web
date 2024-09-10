@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
 
 import { SITE_URL } from "@/utils/const";
-import type { Job } from "contentlayer/generated";
-import { allJobs } from "contentlayer/generated";
+import { allJobs } from "@content";
+import type { Job } from "@content";
 
 import Bg from "@/components/bg";
 import CareerHeader from "@/components/career/header";
@@ -78,7 +78,7 @@ export default async function BlogPage({ params }: Props) {
           <PageBodyGradient />
 
           <Container className="max-w-screen-md">
-            <Mdx code={job.body.code} />
+            <Mdx code={job.mdx} />
           </Container>
         </div>
       </article>

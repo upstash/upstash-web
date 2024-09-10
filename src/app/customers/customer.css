@@ -3,5 +3,5 @@
 }
 
 .customer-post p:first-of-type {
-  @apply text-xl font-medium leading-normal
+  @apply text-xl font-medium leading-normal;
 }

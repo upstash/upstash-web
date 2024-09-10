@@ -1,9 +1,8 @@
 import { notFound } from "next/navigation";
 
-import { generateBlogSchema } from "@/utils/structured-schema-generators";
-import { getTableOfContents } from "@/utils/toc";
-import type { Post } from "contentlayer/generated";
-import { allPosts } from "contentlayer/generated";
+// import { generateBlogSchema } from "@/utils/structured-schema-generators";
+import type { Post } from "@content";
+import { allPosts } from "@content";
 
 import Bg from "@/components/bg";
 import Container from "@/components/container";
@@ -13,7 +12,6 @@ import PostHeader from "@/components/post/header";
 import { Mdx } from "@/components/post/mdx";
 import OtherPostCard from "@/components/post/other-post";
 import PostTags from "@/components/post/tags";
-import PostTOC from "@/components/post/toc";
 
 type Props = {
   params: {
@@ -35,26 +33,24 @@ export default async function BlogPage({ params }: Props) {
   const indexOfPost = allPosts.findIndex((post) => post.slug === slug);
   const post = allPosts[indexOfPost];
 
-  const dateString = post?.date || new Date();
+  // const dateString = post?.date || new Date();
 
-  const isoDatePublished = new Date(dateString).toISOString();
+  // const isoDatePublished = new Date(dateString).toISOString();
 
-  const structuredBlogSchema = generateBlogSchema({
-    blogName: post.title,
-    blogDescription:
-      post.description ||
-      "Articles and tutorials on serverless technologies from Upstash and community",
-    keywords: post.tags,
-    authorName: post.authorsData[0].name,
-    authorUrl: post.authorsData[0].url,
-    datePublished: isoDatePublished,
-  });
+  // const structuredBlogSchema = generateBlogSchema({
+  //   blogName: post.title || "Upstash Blog",
+  //   blogDescription:
+  //     post.description ||
+  //     "Articles and tutorials on serverless technologies from Upstash and community",
+  //   keywords: post.tags,
+  //   authorName: post.authorsData[0].name,
+  //   authorUrl: post.authorsData[0].url || "",
+  //   datePublished: isoDatePublished,
+  // });
 
   if (!post) {
     notFound();
   }
-
-  const toc = await getTableOfContents(post.body.raw);
 
   const nextPost = indexOfPost > 0 ? allPosts[indexOfPost - 1] : undefined;
   const prevPost =
@@ -62,12 +58,12 @@ export default async function BlogPage({ params }: Props) {
 
   return (
     <main className="relative z-0">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: structuredBlogSchema,
-        }}
-      />
+      {/*<script*/}
+      {/*  type="application/ld+json"*/}
+      {/*  dangerouslySetInnerHTML={{*/}
+      {/*    __html: structuredBlogSchema,*/}
+      {/*  }}*/}
+      {/*/>*/}
       <Bg />
 
       <article>
@@ -79,11 +75,8 @@ export default async function BlogPage({ params }: Props) {
           <PageBodyGradient isBlogPage />
 
           <Container className="max-w-screen-md">
-            {/* toc */}
-            <PostTOC toc={toc} />
-
             {/* content */}
-            <Mdx code={post.body.code} />
+            <Mdx code={post.mdx} />
 
             {/* Tags- */}
             <PostTags post={post} />

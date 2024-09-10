@@ -19,7 +19,7 @@ export default function PageBodyGradient({
               "from-zinc-100/80 to-zinc-50",
               "dark:from-white/3 dark:to-zinc-950",
             ]
-          : "from-white/3 to-zinc-950 ",
+          : "from-white/3 to-zinc-950",
         className,
       )}
       {...props}

@@ -17,7 +17,7 @@
     "baseUrl": "./src",
     "paths": {
       "@/*": ["./*"],
-      "contentlayer/generated": ["../.contentlayer/generated"]
+      "@content": ["../.content-collections/generated"]
     },
     "plugins": [
       {
@@ -31,7 +31,6 @@
     "src/**/*.ts",
     "src/**/*.tsx",
     ".next/types/**/*.ts",
-    ".contentlayer/generated"
   ],
   "exclude": ["node_modules"]
 }

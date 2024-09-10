@@ -1,19 +1,22 @@
 "use client";
 
+import { ComponentProps } from "react";
+
 import cx from "@/utils/cx";
-import { TableOfContents } from "@/utils/toc";
 
-type Props = {
-  toc: TableOfContents;
-};
+export default function PostTOC({ children, ...props }: ComponentProps<"nav">) {
+  // if there are no children, don't render the TOC
+  if (!children) return null;
 
-export default function PostTOC({ toc }: Props) {
-  if (!toc?.items) return null;
+  // if there is ‘toc’ contains the classNames
+  const { className } = props;
+  if (!className?.includes("toc")) {
+    return <nav children={children} {...props} />;
+  }
 
   return (
     <details
-      className="group/toc mb-10 rounded-xl
-      bg-emerald-700/10 dark:bg-white/3"
+      className="group/toc mb-10 rounded-xl bg-emerald-700/10 dark:bg-white/3"
       role="navigation"
       aria-label="Table of contents"
     >
@@ -29,20 +32,7 @@ export default function PostTOC({ toc }: Props) {
 
       {/* content */}
       <div className="p-6 pt-0">
-        <ul className="list-inside list-disc space-y-2">
-          {toc.items.map(({ title, url }, idx) => {
-            return (
-              <li key={idx}>
-                <a
-                  href={url}
-                  className="text-emerald-600 dark:text-emerald-400"
-                >
-                  {title}
-                </a>
-              </li>
-            );
-          })}
-        </ul>
+        <ul className="list-inside list-disc space-y-2">{children}</ul>
       </div>
     </details>
   );

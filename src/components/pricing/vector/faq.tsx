@@ -16,39 +16,32 @@ export default function FAQ() {
           How can I upgrade to pay as you go from free tier?
         </AccordionTrigger>
         <AccordionContent>
-          Once you enter your credit card , your index will be upgraded to
-          the pay-as-you-go plan and limits will be updated.
+          Once you enter your credit card , your index will be upgraded to the
+          pay-as-you-go plan and limits will be updated.
         </AccordionContent>
       </AccordionItem>
 
       <AccordionItem value="item-3">
-        <AccordionTrigger>
-          What is the limit for topk?
-        </AccordionTrigger>
-        <AccordionContent>
-          1000 is the default limit for topk.
-        </AccordionContent>
+        <AccordionTrigger>What is the limit for topk?</AccordionTrigger>
+        <AccordionContent>1000 is the default limit for topk.</AccordionContent>
       </AccordionItem>
 
       <AccordionItem value="item-4">
         <AccordionTrigger>
           Are query and upsert requests same price?
         </AccordionTrigger>
-        <AccordionContent>
-          Yes. 
-        </AccordionContent>
+        <AccordionContent>Yes.</AccordionContent>
       </AccordionItem>
 
       <AccordionItem value="item-5">
         <AccordionTrigger>How is the storage cost calculated?</AccordionTrigger>
         <AccordionContent>
           The storage cost is charged at a rate of $0.25 per GB total storage.
-          Even if you do not access your data, we have to keep it
-          persistent in Cloud Provider’s block storage (eg AWS EBS, S3) for
-          durability. To calculate the total storage cost, we take daily average
-          of your data size and multiply with $0.25 at the end of the month. For
-          instance, if you have 1 GB data in your index throughout month, you
-          will pay $0.25.
+          Even if you do not access your data, we have to keep it persistent in
+          Cloud Provider’s block storage (eg AWS EBS, S3) for durability. To
+          calculate the total storage cost, we take daily average of your data
+          size and multiply with $0.25 at the end of the month. For instance, if
+          you have 1 GB data in your index throughout month, you will pay $0.25.
         </AccordionContent>
       </AccordionItem>
 

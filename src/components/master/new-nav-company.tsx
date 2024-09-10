@@ -1,12 +1,12 @@
 import React from "react";
 
+import { allJobs } from "@content";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import {
   IconMoodSmileBeam,
   IconUserPlus,
   IconUsers,
 } from "@tabler/icons-react";
-import { allJobs } from "contentlayer/generated";
 
 import {
   ListItem,
@@ -21,10 +21,7 @@ export default function NewNavigationItemCompany() {
     <NavigationMenu.Item>
       <NewNavigationTrigger>
         Company{" "}
-        <span
-          className="ml-1 flex items-center rounded-full
-          bg-emerald-400/20 px-1.5 py-1 font-mono text-sm leading-none text-emerald-400"
-        >
+        <span className="ml-1 flex items-center rounded-full bg-emerald-400/20 px-1.5 py-1 font-mono text-sm leading-none text-emerald-400">
           {jobLength}
         </span>
       </NewNavigationTrigger>
@@ -45,10 +42,7 @@ export default function NewNavigationItemCompany() {
             title1={
               <>
                 Careers
-                <span
-                  className="ml-1 inline-flex items-center rounded-full bg-purple-200
-          px-1.5 py-1 font-mono text-sm leading-none text-purple-800"
-                >
+                <span className="ml-1 inline-flex items-center rounded-full bg-purple-200 px-1.5 py-1 font-mono text-sm leading-none text-purple-800">
                   {jobLength}
                 </span>
               </>
