@@ -2,7 +2,6 @@ import { HOME_SECTIONS } from "@/utils/const";
 
 import Bg from "@/components/bg";
 import Container from "@/components/container";
-import PriceKafka from "@/components/home/price/kafka";
 import PriceQStash from "@/components/home/price/qstash";
 import PriceRedis from "@/components/home/price/redis";
 import {
@@ -37,7 +36,6 @@ export default function HomeServerless() {
         {/* table */}
         <div className="mt-10 grid gap-4 md:mt-20 md:grid-cols-3 md:gap-6">
           <PriceRedis />
-          <PriceKafka />
           <PriceQStash />
         </div>
       </Container>

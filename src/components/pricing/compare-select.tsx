@@ -12,7 +12,7 @@ export default function CompareSelect({
   ...props
 }: HTMLProps<HTMLSelectElement> & {
   value: PricingPlans;
-  product: "redis" | "qstash" | "kafka";
+  product: "redis" | "qstash";
   selectedPlans: PricingPlans[];
 }) {
   const onChangeEvent = (
@@ -49,7 +49,7 @@ export default function CompareSelect({
         Pay as you go
       </option>
 
-      {["redis", "kafka"].includes(product) && (
+      {["redis"].includes(product) && (
         <>
           <option
             value={PricingPlans.Pro2K}
