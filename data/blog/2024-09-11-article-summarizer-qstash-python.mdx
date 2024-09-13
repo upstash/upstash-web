@@ -6,15 +6,15 @@ authors: [abdullahenes]
 tags: [qstash, python, retry-after, django, redis, llm, vercel]
 ---
 
-In this article, we'll build an application to summarise hundreds of online articles at once. To create these summaries, we'll use QStash's LLM integration to call an OpenAI LLM. This not only allows us to bypass platform-specific function execution limits but also massively reduces our billed function execution duration.
+In this article, we'll build an application to summarise hundreds of online articles at once. To create these summaries, we'll use QStash's LLM integration to call an Upstash-hosted LLM. This not only allows us to bypass platform-specific function execution limits but also massively reduces our billed function execution duration.
 
-You'll learn how to work around OpenAI's API rate limits, which could otherwise be a problem when making many calls in parallel. The result will be hundreds of neatly summarised online articles created at the same time, ready for you to read or further process.
+You'll learn how to work around API rate limits, which could otherwise be a problem when making many calls in parallel. The result will be hundreds of neatly summarised online articles created at the same time, ready for you to read or further process.
 
 ### Motivation
 
-Almost all publically available APIs have a rate limit applied to them, a maximum amount of requests you can make in a certain time frame. And, of course, depending on the API, hitting those limits is usually relatively easy. For example, Twitter is known for having very restrictive API rate limits, even for expensive premium tiers of their API. 
+Almost all publicly available APIs have a rate limit applied to them, a maximum amount of requests you can make in a certain time frame. And, of course, depending on the API, hitting those limits is usually relatively easy. For example, Twitter is known for having very restrictive API rate limits, even for expensive premium tiers of their API.
 
-OpenAI, the service we'll use to summarize articles, implements a similar rate limit, albeit less restrictive than Twitter. If you depend on a rate-limited API for your service, you're forced to implement some kind of workaround (i.e. throttling) that leads to a more complex codebase. 
+If you depend on a rate-limited API for your service, you're forced to implement some kind of workaround (i.e. throttling) that leads to a more complex codebase.
 
 With Upstash QStash, a message scheduler for the serverless environment, we don't need to worry about throttling mechanisms under high API load. Our API requests are automatically retried when hitting our rate limits to make sure every request gets processed.
 
@@ -25,9 +25,8 @@ To follow along, you'll need:
 - A basic understanding of Python and Django.
 - An Upstash account to obtain your QStash token and Redis URL.
 - A Vercel account to deploy the web application.
-- An OpenAI API key to use for summarization.
 
-<Note>In this blog we used OpenAI's GPT 3.5 LLM model for summarization. You can also use [Upstash hosted models](https://upstash.com/docs/qstash/features/llm#upstash-hosted-models) for summarization.</Note>
+<Note>In this blog we used Meta's Llama-3-8B-Instruct model hosted on Upstash for summarization. You can also use other [Upstash-hosted models](https://upstash.com/docs/qstash/features/llm#upstash-hosted-models) or OpenAI's models for summarization.</Note>
 
 ### Project Overview
 
@@ -35,7 +34,11 @@ The project consists of two main components:
 
 1. A Django web application that receives article summaries and saves them to our Redis database. We'll deploy this application to Vercel.
 
-2. A Python script that sends articles to OpenAI for summarization using QStash's LLM API support. The script will iterate over 1000 articles stored in Redis, send each one to OpenAI for summarization, and save the summaries back in Redis. We'll use QStash's queue system to handle the parallel processing of these tasks. We will also set the `Retry-After` header to handle API rate limits.
+2. A Python script that sends articles to our Upstash hosted model for summarization using QStash's LLM API support. The script will iterate over 1000 articles stored in Redis, send each one to our model for summarization, and save the summaries back in Redis. We'll use QStash's queue system to handle the parallel processing of these tasks.
+
+If we want to use one of OpenAI's models, we can still use QStash to handle the rate limits. What we need to do is create another endpoint in our Django application, call it from the Python script using QStash, call the OpenAI model to create the summary, and return the value of the `x-ratelimit-reset-requests` header in the `Retry-After` header to QStash to handle the rate limits.
+
+Thankfully, when we use an Upstash-hosted model, and the rate limits are exceeded, QStash automatically schedules the retry of publishing or enqueuing chat completion tasks depending on the reset time of the rate limits. This way, we don't need to worry about handling the rate limits ourselves.
 
 ### Project Setup
 
@@ -76,10 +79,9 @@ ALLOWED_HOSTS = ['.vercel.app', '127.0.0.1', 'localhost']
 APPEND_SLASH = False
 ```
 
-Add QStash configurations, OpenAI API key, and other environment variables to a `.env` file in the project root:
+Add QStash configurations and other environment variables to a `.env` file in the project root:
 
 ```text title:".env"
-OPENAI_API_KEY=your_openai_api_key
 QSTASH_TOKEN=your_qstash_token
 DEPLOYMENT_URL=your_deployment_url
 UPSTASH_REDIS_REST_URL=your_upstash_redis_rest_url
@@ -94,7 +96,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 QSTASH_TOKEN = os.getenv('QSTASH_TOKEN')
 DEPLOYMENT_URL = os.getenv('DEPLOYMENT_URL')
 UPSTASH_REDIS_REST_URL = os.getenv('UPSTASH_REDIS_REST_URL')
@@ -111,7 +112,7 @@ app = application
 
 #### 1. Creating a Django View to Use as a Callback URL
 
-We'll create a Django view to use as our callback URL. This view will handle the summary data sent by QStash and save it to our Redis database. We will use the `upstash_redis` package to interact with our Redis database. We will also add the `csrf_exempt` decorator to the view to allow POST requests without CSRF tokens.
+We'll create a Django view to use as our callback URL. This view will handle the summary data sent by QStash and save it in our Redis database. We will use the `upstash_redis` package to interact with our Redis database. We will also add the `csrf_exempt` decorator to the view to allow POST requests without CSRF tokens.
 
 First, we decode the base64-encoded data, extract the summary, and save it to Redis using the article ID as the key.
 
@@ -135,7 +136,7 @@ def redis_callback_view(request):
         # Parse the decoded body to JSON format
         decoded_data = json.loads(decoded_body)
 
-        # Extract the summary from the decoded OpenAI response
+        # Extract the summary from the decoded response
         summary = decoded_data['choices'][0]['message']['content']
 
         # Extract the article ID from the query parameters
@@ -211,12 +212,12 @@ To easily deploy our app, we can create a GitHub repository and push our Django 
 
 #### 5. Creating the Queue and Sending Summarization Requests
 
-We'll create a queue with parallelism set to 2, meaning two summarization tasks can run concurrently. Then, we'll iterate over 1000 articles stored in Redis, sending each one to OpenAI for summarization. We'll make sure to set the Retry-After header to 60 seconds to handle OpenAI's per-minute rate limit, and we'll also set the callback URL to our deployed Django application with the article ID as a query parameter.
+We'll create a queue with parallelism set to 2, meaning two summarization tasks can run concurrently. Then, we'll iterate over 1000 articles stored in Redis, sending each one to our model for summarization. We'll also set the callback URL to our deployed Django application with the article ID as a query parameter.
 
 ```python title:"summarize_articles.py"
 from upstash_redis import Redis
 from qstash import QStash
-from qstash.chat import openai
+from qstash.chat import upstash
 from dotenv import load_dotenv
 import os
 
@@ -224,17 +225,19 @@ load_dotenv()
 redis = Redis.from_env()
 qstash_client = QStash(os.getenv("QSTASH_TOKEN"))
 
+# Create a queue with parallelism set to 2
 qstash_client.queue.upsert("articles-queue", parallelism=2)
 
+# We have 1000 articles that we want to summarise
 for i in range(1, 1001):
 
     article = redis.get(f"article_{i}")
 
     result = qstash_client.message.enqueue_json(
         queue="articles-queue",
-        api={"name": "llm", "provider": openai(os.getenv("OPENAI_API_KEY"))},
+        api={"name": "llm", "provider": upstash()},
         body={
-            "model": "gpt-3.5-turbo",
+            "model": "meta-llama/Meta-Llama-3-8B-Instruct",
             "messages": [
                 {
                     "role": "user",
@@ -243,7 +246,6 @@ for i in range(1, 1001):
             ],
         },
         callback=f'{os.getenv("DEPLOYMENT_URL")}/redis-callback?article_id={i}',
-        headers={"Retry-After": "60",},
     )
 
 print(result)
