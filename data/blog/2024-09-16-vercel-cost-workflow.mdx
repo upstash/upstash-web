@@ -19,18 +19,36 @@ If your bill is high because of number of invocations then you can leave this po
 ## What is Vercel Functions Duration Cost?
 
 Vercel runs your backend logic in serverless functions. They run it AWS Lambda and charge users based on number of invocations and executime time. Also each Vercel plan has a timeout for the duration of the function. 
-
-
-| Plan       | Default Timeout | Max Timeout | Included in Plan | Price for extra |
-|------------|-----------------|-------------|------------------|-----------------|
-| Hobby      | 10 seconds      | 60 seconds  | 100 hours        | N/A             |
-| Pro        | 15 seconds      | 5 minutes   | 1000 hours       | $0.18 per hour  |
-                                 
+          
+<table>
+<tr>
+<th>Plan </th>
+<th>Default Timeout </th>
+<th>Max Timeout </th>
+<th>Included in Plan </th>
+<th>Price for extra </th>
+</tr>
+<tr>
+<td> Hobby </td>
+<td>10 seconds </td>
+<td>60 seconds </td>
+<td>100 hours </td>
+<td>N/A  </td>
+</tr>
+<tr>
+<td> Pro </td>
+<td>15 seconds </td>
+<td>5 minutes </td>
+<td>1000 hours </td>
+<td>0.18 per hour  </td>
+</tr>
+</table>
+                            
 
 ## Upstash Workflow and function duration costs
 Upstash Workflow is a messaging system which helps you orchestrate serverless functions. You still host the function code but Workflow manages the execution of the functions. It retries in case of a failure, it preserves the order of the tasks. One another important feature of Workflow is that you can offload API calls to Workflow. So instead of waiting for the API response in the function, you can offload the API call to Workflow. If you need the response of the API call, Workflow will retrigger the function with response of the API call. This is very useful to call a long running API in a serverless function. Because you do not spend the time of the function for waiting the API response. 
 
-![Workflow Context Call.png](blog/workflow/workflow.png)
+![Workflow Context Call.png](/blog/workflow/workflow.png)
 
 
 In the image, you see two ways of implementing a serverless function which calls an external API. Nowadays, many functions call AI APIs which tends to take long with highly variable response times. If the GPU of your inference service is busy, the response time can be very high. In the first implementation, the function waits for the API response. In the second implementation, the function offloads the API call to Workflow. Workflow calls the API and when the response is ready, it re-triggers the function with the response. The function does not wait for the API response and does not consume the function duration time.
@@ -46,7 +64,7 @@ The only drawback of the second approach is it increases the number of invocatio
 Vercel has a timeout for the duration of the function. If the function runs longer than the timeout, Vercel kills the function. This is a problem if you have long running tasks. For example, you may need to call an API which takes ~90 seconds to respond. In this case, you can not use Vercel's hobby plan for this task as the max duration is 60 seconds. 
 
 
-![Workflow Context Call.png](blog/workflow/workflow-timeouts.png)
+![Workflow Context Call.png](/blog/workflow/workflow-timeouts.png)
 
 The above image shows two approaches, the first one runs an API call in the function, but because the response time exceeds the max timeout, the function is killed. The second approach offloads the API call to Workflow. Workflow calls the API and when the response is ready, it re-triggers the function with the response. The function does not wait for the API response and does not consume the function duration time. With the second approach, you do not worry about the function timeouts.
 
