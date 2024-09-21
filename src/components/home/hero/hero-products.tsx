@@ -1,4 +1,4 @@
-import React, { Children, cloneElement, HTMLProps, ReactElement } from "react";
+import { Children, cloneElement, HTMLProps, ReactElement } from "react";
 
 import cx from "@/utils/cx";
 import { Product } from "@/utils/type";

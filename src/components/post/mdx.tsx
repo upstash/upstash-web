@@ -4,9 +4,11 @@ import { ComponentProps, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
 import cx from "@/utils/cx";
+import { MDXContent } from "@content-collections/mdx/react";
 import { IconCheck, IconCopy } from "@tabler/icons-react";
-import { useMDXComponent } from "next-contentlayer/hooks";
 import Balancer from "react-wrap-balancer";
+
+import PostTOC from "@/components/post/toc";
 
 import ExpandableCode from "./expandable-code";
 import PostNote from "./note";
@@ -16,11 +18,9 @@ interface MdxProps {
 }
 
 export function Mdx({ code }: MdxProps) {
-  const Component = useMDXComponent(code);
-
   return (
     <div className="post leading-p">
-      <Component components={{ ...components }} />
+      <MDXContent code={code} components={{ ...components }} />
     </div>
   );
 }
@@ -35,7 +35,7 @@ function CopyFeaturePre(props: ComponentProps<"pre">) {
     }, 3000);
   }, [hasCopied]);
   if (props && !props["data-language"]) {
-    return <pre {...props} />;
+    return <pre {...props} className="" />;
   }
 
   return (
@@ -57,13 +57,17 @@ function CopyFeaturePre(props: ComponentProps<"pre">) {
           "cursor-pointer rounded-md",
           "",
           hasCopied
-            ? "text-emerald-600"
+            ? "bg-white text-emerald-600"
             : "text-zinc-400 hover:text-zinc-600 dark:text-zinc-600 dark:hover:text-zinc-200",
         )}
       >
-        {hasCopied ? <IconCheck stroke={1.5} /> : <IconCopy stroke={1.5} />}
+        {hasCopied ? (
+          <IconCheck size={20} stroke={1.5} />
+        ) : (
+          <IconCopy size={20} stroke={1.5} />
+        )}
       </button>
-      <pre {...props} />
+      <pre {...props} className="" />
     </div>
   );
 }
@@ -92,10 +96,7 @@ function Highlight(props: {
 }) {
   return (
     <FullWidth>
-      <div
-        className="group/highlight grid place-items-center gap-6 rounded-4xl
-        border-4 border-white/5 p-10 text-center md:px-20 md:py-16"
-      >
+      <div className="group/highlight grid place-items-center gap-6 rounded-4xl border-4 border-white/5 p-10 text-center md:px-20 md:py-16">
         {props.photo && (
           <Image
             src={`/customer/${props.photo}`}
@@ -106,10 +107,7 @@ function Highlight(props: {
           />
         )}
 
-        <p
-          className="bg-gradient-to-br from-white to-[#6DBEA6] bg-clip-text
-          text-xl font-medium text-transparent"
-        >
+        <p className="bg-gradient-to-br from-white to-[#6DBEA6] bg-clip-text text-xl font-medium text-transparent">
           <Balancer>{props.children}</Balancer>
         </p>
 
@@ -129,6 +127,7 @@ const components = {
   img,
   FullWidth,
   Highlight,
+  nav: PostTOC,
   Note: PostNote,
   ExpandableCode,
   pre: CopyFeaturePre,

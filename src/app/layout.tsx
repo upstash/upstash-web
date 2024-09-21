@@ -1,8 +1,8 @@
-import "./globals.css";
 import "@upstash/claps/style.css";
+import "./globals.css";
 
 import { ReactNode, Suspense } from "react";
-import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import { Inter } from "next/font/google";
 import localFont from "next/font/local";
 import Script from "next/script";
@@ -10,12 +10,17 @@ import Script from "next/script";
 import { SITE_URL } from "@/utils/const";
 import cx from "@/utils/cx";
 
+import { PHProvider } from "@/lib/posthog";
 import { SegmentProvider } from "@/lib/segment/provider";
 
 import Analytics from "@/components/Analytics";
 import Footer from "@/components/master/footer";
 import Header from "@/components/master/header";
 import HeaderMobile from "@/components/master/header-mobile";
+
+const PostHogPageView = dynamic(() => import("@/lib/posthog/page-view"), {
+  ssr: false,
+});
 
 const inter = Inter({
   variable: "--font-sans",
@@ -50,36 +55,59 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         "min-h-screen scroll-smooth bg-zinc-950 text-sm text-zinc-50 antialiased md:text-base",
       )}
     >
-      <body className="pt-[70px] md:pt-[80px]">
-        <Suspense>
-          <Analytics />
-        </Suspense>
-        <SegmentProvider writeKey={process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY!}>
-          <Header />
-          <HeaderMobile />
-          {children}
-          <Footer />
-        </SegmentProvider>
+      <PHProvider>
+        <body className="pt-[70px] md:pt-[80px]">
+          <PostHogPageView />
+          <Suspense>
+            <Analytics />
+          </Suspense>
+          <SegmentProvider
+            writeKey={process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY!}
+          >
+            <Header />
+            <HeaderMobile />
+            {children}
+            <Footer />
+          </SegmentProvider>
 
-        {process.env.NODE_ENV !== "development" && (
-          <>
-            <Script
-              strategy="afterInteractive"
-              src={`https://www.googletagmanager.com/gtag/js?id=G-QW5KRSTDM0`}
-            />
-            <Script
-              id="ga"
-              strategy="afterInteractive"
-              dangerouslySetInnerHTML={{
-                __html: ` window.dataLayer = window.dataLayer || [];
+          {process.env.NODE_ENV !== "development" && (
+            <>
+              <Script
+                id="ph_referral_track"
+                strategy="beforeInteractive"
+                dangerouslySetInnerHTML={{
+                  __html: `
+                    function removeTrailingSlash(url) {
+                        return url.endsWith('/') ? url.slice(0, -1) : url;
+                    }
+
+                    (function() {
+                      var referrer = document.referrer;
+                      if (!referrer.includes('upstash.com')) {
+                        document.cookie = 'ph_referral_track=' + removeTrailingSlash(referrer) + '; domain=.upstash.com';
+                      }
+                    })();
+                  `,
+                }}
+              />
+              <Script
+                strategy="afterInteractive"
+                src={`https://www.googletagmanager.com/gtag/js?id=G-QW5KRSTDM0`}
+              />
+              <Script
+                id="ga"
+                strategy="afterInteractive"
+                dangerouslySetInnerHTML={{
+                  __html: ` window.dataLayer = window.dataLayer || [];
                             function gtag(){ dataLayer.push(arguments); }
                             gtag('js', new Date());
                             gtag('config', 'G-QW5KRSTDM0');`,
-              }}
-            />
-          </>
-        )}
-      </body>
+                }}
+              />
+            </>
+          )}
+        </body>
+      </PHProvider>
     </html>
   );
 }

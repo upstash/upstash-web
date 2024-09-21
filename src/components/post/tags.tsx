@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import cx from "@/utils/cx";
-import type { Post } from "contentlayer/generated";
+import type { Post } from "@content";
 
 type Props = {
   post: Post;
@@ -9,10 +9,7 @@ type Props = {
 
 export default function PostTags({ post }: Props) {
   return (
-    <div
-      className="flex flex-wrap justify-center gap-2 border-y border-zinc-200
-    py-6 dark:border-zinc-900"
-    >
+    <div className="flex flex-wrap justify-center gap-2 border-y border-zinc-200 py-6 dark:border-zinc-900">
       {/*<Link href="/">Return to all articles</Link>*/}
 
       {post.tags.map((tag: string) => (

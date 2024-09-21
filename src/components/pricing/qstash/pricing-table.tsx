@@ -11,7 +11,7 @@ export default function PricingTable() {
         <div className="grow">
           <h4 className="mb-2 text-xl font-semibold text-emerald-400">Free</h4>
 
-          <h5 className="text-3xl font-semibold">$0</h5>
+          <h5 className="text-2xl font-semibold">$0</h5>
           <p className="text-white/40">-</p>
         </div>
 
@@ -56,7 +56,7 @@ export default function PricingTable() {
             Pay as you go
           </h4>
 
-          <h5 className="text-3xl font-semibold">$1</h5>
+          <h5 className="text-2xl font-semibold">$1</h5>
           <p className="text-white/40">per 100K messages</p>
         </div>
 
@@ -99,7 +99,7 @@ export default function PricingTable() {
         <div>
           <h4 className="mb-2 text-xl font-semibold text-emerald-400">Pro</h4>
 
-          <h5 className="flex items-baseline text-3xl font-semibold">
+          <h5 className="flex items-baseline text-2xl font-semibold">
             $180
             <span className="ml-1 text-base font-normal opacity-40">
               / month

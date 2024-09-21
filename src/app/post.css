@@ -12,7 +12,7 @@
 }
 
 .post blockquote {
-  @apply rounded-xl bg-emerald-700/10 p-4 dark:bg-white/5 md:p-6;
+  @apply rounded-xl bg-emerald-700/10 p-4 md:p-6 dark:bg-white/5;
 }
 
 .post ul,
@@ -28,7 +28,7 @@
   @apply list-decimal pl-2 marker:text-zinc-500;
 }
 
-.post ul li {
+.post ul li:not(.toc-item) {
   @apply relative pl-6;
 }
 
@@ -55,8 +55,7 @@
 }
 
 .post code:not(pre > code) {
-  @apply rounded border border-emerald-800/10 bg-emerald-500/10
-    px-1 py-0.5 text-[0.86em] dark:border-white/3 dark:bg-emerald-100/10;
+  @apply rounded border border-emerald-800/10 bg-emerald-500/10 px-1 py-0.5 text-[0.86em] dark:border-white/3 dark:bg-emerald-100/10;
 }
 
 .post .subheading-anchor {

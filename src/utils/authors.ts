@@ -281,8 +281,8 @@ export const authors: Record<
     image: "murillo.png",
   },
   yusuf: {
-    name: "Yusuf Kimirti",
-    title: "Sofware Engineer @Upstash",
+    name: "Yusuf",
+    title: "Software Engineer @Upstash",
     image: "yusuf.jpg",
   },
   valon: {
@@ -374,5 +374,11 @@ export const authors: Record<
     name: "Metin Dumandag",
     title: "Software Engineer @Upstash",
     image: "metin.jpg",
+  },
+  terryzhang: {
+    name: "Terry Zhang",
+    title: "Founder&CEO @llamagen.ai (Guest Author)",
+    url: "https://x.com/terrychinaz",
+    image: "terryzhang.png",
   },
 };

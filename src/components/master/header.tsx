@@ -1,6 +1,6 @@
 "use client";
 
-import React, { HTMLProps, useState } from "react";
+import { HTMLProps, useState } from "react";
 import Link from "next/link";
 import { useSelectedLayoutSegment } from "next/navigation";
 
@@ -17,17 +17,12 @@ import NewNavigation from "./new-nav";
 
 export default function Header({ className, ...props }: HTMLProps<any>) {
   const segment = useSelectedLayoutSegment();
-
   const { affiliateCode } = useGetAffiliateCodeFromApi();
   const [fix, setFix] = useState(false);
   const { scrollY } = useScroll();
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    if (latest > 10) {
-      setFix(true);
-    } else {
-      setFix(false);
-    }
+    setFix(latest > 10);
   });
 
   return (
@@ -50,9 +45,7 @@ export default function Header({ className, ...props }: HTMLProps<any>) {
               <Logo />
             </Link>
           </div>
-
           <NewNavigation />
-
           <div className="flex justify-end">
             <Button
               target="_self"

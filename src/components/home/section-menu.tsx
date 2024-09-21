@@ -1,6 +1,6 @@
 "use client";
 
-import { HTMLProps, useEffect, useState } from "react";
+import { HTMLProps, useState } from "react";
 
 import { HOME_SECTIONS } from "@/utils/const";
 import cx from "@/utils/cx";
@@ -10,9 +10,7 @@ import {
   useMotionValueEvent,
   useScroll,
 } from "framer-motion";
-import { animateScroll, Events, Link as SpyLink } from "react-scroll";
-
-import { useSegment } from "@/hooks/use-segment";
+import { animateScroll, Link as SpyLink } from "react-scroll";
 
 import Button from "@/components/button";
 import { LogoIcon } from "@/components/logo";
@@ -32,23 +30,6 @@ export default function SectionMenu({
       setShow(false);
     }
   });
-
-  useEffect(() => {
-    Events.scrollEvent.register("begin", function () {
-      // console.log("begin", arguments);
-    });
-
-    Events.scrollEvent.register("end", function () {
-      // console.log("end", arguments);
-    });
-
-    return () => {
-      Events.scrollEvent.remove("begin");
-      Events.scrollEvent.remove("end");
-    };
-  }, [show]);
-
-  const segment = useSegment();
 
   return (
     <motion.div

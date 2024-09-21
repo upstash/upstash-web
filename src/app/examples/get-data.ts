@@ -4,7 +4,7 @@ const example = z.object({
   id: z.string(),
   githubUrl: z.string(),
   title: z.string(),
-  products: z.array(z.enum(["redis", "kafka", "qstash"])),
+  products: z.array(z.enum(["redis","kafka", "qstash"])),
   stack: z.array(z.string()).default([]),
   useCases: z.array(z.string()).default([]),
   languages: z.array(z.string()).default([]),

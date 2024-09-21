@@ -1,0 +1,126 @@
+---
+title: "Building a RAG Chatbot Using Langflow and Upstash Vector"
+slug: langflow-upstash-vector
+authors: [yusuf]
+tags: [qstash, python, sdk, sendgrid, django]
+---
+
+![RAG Chatbot Workflow](/blog/vector-langflow/final-workflow.png)
+
+In this blog, we will show you how to build a Retrieval-Augmented Generation (RAG) chatbot using Langflow and Upstash Vector. We'll leverage the integration of Upstash Vector with Langflow to create a chatbot that combines the power of large language models (LLMs) with vector search capabilities.
+For the LLM component, we'll use OpenAI's `gpt-4o-mini`, which is available as a Langflow component.
+
+Langflow is a tool that simplifies building complex LLM workflows by using graph-based structures. It offers many integrations, including Upstash Vector, which makes it easy to add vector-based search to your applications.
+
+You can also download the complete workflow file from [here](https://gist.github.com/ytkimirti/654e0a2b10e2546df00fdf3dd9817fee).
+
+## 1. Setting Up the Project
+
+There are several ways to use Langflow. You can install it locally, use the Langflow Docker image, or access it directly from the [DataStax website](https://www.datastax.com/products/langflow).
+
+Go to [DataStax Langflow](https://www.datastax.com/products/langflow) dashboard and create a new project with the "Blank" template.
+
+![Langflow Dashboard](/blog/vector-langflow/empty-langflow.png)
+
+## 2. Creating a Simple Chatbot
+
+Let's start by creating a basic OpenAI chatbot that echoes back the user's input. In Langflow, you can create nodes by searching for them in the left panel and dragging them onto the canvas.
+
+![Simple chatbot](/blog/vector-langflow/simple-chatbot.png)
+
+Langflow works by connecting inputs and outputs of different components.
+You can run the workflow by clicking the run button on the component you want to execute.
+You can also view the output of a component by clicking the eye icon next to the output connection.
+
+![Simple chatbot output](/blog/vector-langflow/simple-chatbot-out.png)
+
+## 3. Adding the OpenAI API Key
+
+To make this workflow functional, you will need an OpenAI API key. You can create one from the [OpenAI dashboard](https://platform.openai.com).
+
+It's best practice to avoid entering your API key directly in the workflow. Instead, add it as a global environment variable.
+
+To do this:
+
+- Click the globe icon next to the "OpenAI API Key" input.
+- Select "Add Environment Variable."
+- Make sure to set the variable type to "Credential."
+
+![Adding environment variable](/blog/vector-langflow/variable-astra.png)
+
+After setting the environment variable, you can test the chatbot. Enter some text into the "Chat Input" component and press the "Run" button on the OpenAI component. The small eye icon next to the output connections shows the result of the current run.
+
+![Output of simple chatbot](/blog/vector-langflow/simple-chatbot-out.png)
+
+## 4. Creating an Upstash Vector Index
+
+Next, we’ll create an Upstash Vector index. Go to the [Upstash console](https://console.upstash.com/vector), click the "Create Index" button, and follow the steps to create a new free index.
+
+![Creating a new index](/blog/vector-langflow/create-vector.png)
+
+Choose an embedding model from the list. For this example, we’ll use `bge-m3`.
+
+![Initialized vector index](/blog/vector-langflow/vector-initialized.png)
+
+## 5. Inserting Data into the Upstash Vector Index
+
+You can insert data into the index directly via the Upstash console’s "Data Browser" tab. However, in this example, we’ll use a Langflow workflow to insert data.
+
+Create a workflow as shown below:
+
+![Upsert workflow](/blog/vector-langflow/insert-workflow.png)
+
+In this workflow:
+
+- The "File" component converts an uploaded file into a string.
+- The "Split" component splits the string into chunks of 1,000 characters.
+- The "Upstash" component upserts the data into the Upstash Vector index.
+
+The text chunks are automatically converted to vector embeddings, thanks to the `bge-m3` model selected during index creation.
+
+Upload a file to the "File" component and press the "Run" button on the "Upstash" component to insert data. You can verify the data in the "Data Browser" tab of the Upstash Vector console.
+
+![Upstash Vector Data Browser](/blog/vector-langflow/search-none.png)
+
+You can also perform a vector search within the index. The search string will be converted into a vector embedding, and the closest matches will be returned.
+
+![Upstash Vector Search](/blog/vector-langflow/search-fox.png)
+
+## 6. Adding RAG to the Chatbot
+
+Now, let's enhance the chatbot by adding a step that searches the Upstash Vector index for relevant context based on the user’s input.
+
+Create a "Prompt" component with a prompt that takes `{context}` and `{question}` as inputs.
+
+![Prompt](/blog/vector-langflow/prompt.png)
+
+Next, build the rest of the workflow as shown below:
+
+![RAG Chatbot Workflow](/blog/vector-langflow/final-workflow.png)
+
+The workflow will function as follows:
+
+1. The user inputs a question.
+2. The "Upstash" component searches the Upstash Vector index for context related to the user input.
+3. The "Parse Data" component extracts the text from the search results.
+4. Both the user’s input and the retrieved context are passed to the "Prompt" component.
+5. The prompt is then passed to the OpenAI component, which generates a response.
+6. The response is displayed to the user.
+
+You can test the chatbot by entering a question into the "Chat Input" component and pressing the "Run" button on the "OpenAI" component.
+
+![Output of RAG Chatbot](/blog/vector-langflow/chatbot-out.png)
+
+You can also check the output of the "Upstash" component to see the context retrieved from the vector index.
+
+![Upstash Vector Output](/blog/vector-langflow/comp-output.png)
+
+By default, the "Upstash" component returns the top 4 results. For more accurate results, you can increase the `topK` parameter in the component settings.
+
+## Conclusion
+
+In this tutorial, we demonstrated how to build a simple RAG chatbot using Langflow and Upstash Vector. This chatbot uses vector search to retrieve relevant context, enhancing its ability to generate more accurate and relevant responses.
+
+You can also download the complete workflow file from [here](https://gist.github.com/ytkimirti/654e0a2b10e2546df00fdf3dd9817fee).
+
+For more details on Upstash Vector, check out the [Upstash Vector documentation](https://upstash.com/docs/vector).

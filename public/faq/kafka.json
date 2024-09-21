@@ -9,10 +9,6 @@
       "answer": "With the Pay As you go plan, you can set a maximum monthly budget for your database so that you won't be charged beyond this chosen limit.We'll keep you informed by sending email notifications once you reach70% and 90% of your monthly budget. This notifications will leteither adjust your budget limit or upgrade to the Pro tier. Note thatif your usage exceeds your monthly budget cap, your database will berate limited and your cost will not exceed your chosen budget limit."
     },
     {
-      "question": "Are all Kafka operations counted in billing?",
-      "answer": "Consume operations with no response are not counted."
-    },
-    {
       "question": "How is the storage cost calculated?",
       "answer": "The storage cost is charged at a rate of $0.25 per GB total storage.\n\t  Total storage is determined by adding up the storage at all replicas.\n\t  Even if you do not access your data, we have to keep it persistent in\n\t  Cloud Provider’s block storage (eg AWS EBS, S3) for durability. To\n\t  calculate the total storage cost, we take daily average of your data\n\t  size and multiply with $0.25 at the end of the month. For instance, if\n\t  you have 1 GB data in your cluster throughout month, you will pay\n\t  $0.25. If you are using your cluster as a cache; then it is a good\n\t  practice to set a timeout (EXPIRE) for your keys to minimize the cost."
     },
