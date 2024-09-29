@@ -6,7 +6,7 @@ authors:
 tags: [sdk, fireworks, clerk, ai, vercel]
 ---
 
-In this post, you will learn how to build your scheduled transcriber with Upstash Qstash, Upstash Redis, Fireworks Transcription API, Clerk, Next.js App Router, and Vercel. TODO
+In this tutorial, you will learn how to build a scheduled audio transcription system using Upstash QStash for task scheduling and Fireworks AI for transcription. You will also learn techniques for secure file uploads to Cloudflare R2, user authentication with Clerk, and data storage with Upstash Redis.
 
 ## Prerequisites
 
@@ -282,42 +282,6 @@ export default function RootLayout({
 
 In the code changes above, you have imported the `Toaster` component, and made sure that it is present in your entire Next.js application. It enables you to show toast notifications from anywhere in your code via the `useToast` React hook.
 
-Now, let's move on to implementing the transcription history API endpoint.
-
-## Transcriptions History API Endpoint in Next.js App Router
-
-Create a file named `route.ts` in the `app/api/history` directory that retrieves all the transcriptions done for a particular user in a paginated form, with the following code:
-
-```tsx
-// File: app/api/history/route.ts
-
-export const runtime = 'nodejs'
-
-export const dynamic = 'force-dynamic'
-
-export const fetchCache = 'force-no-store'
-
-import redis from '@/lib/redis.server'
-import { auth } from '@clerk/nextjs/server'
-import { NextResponse, type NextRequest } from 'next/server'
-
-export async function GET(request: NextRequest) {
-  const { userId } = auth()
-  if (!userId) return new Response(null, { status: 403 })
-  const count = 10
-  const audioNames = []
-  const searchParams = request.nextUrl.searchParams
-  const start = parseInt(searchParams.get('start') ?? '0')
-  const [_, items] = await redis.hscan(userId, start, { count })
-  for (let i = 0; i < items.length; i += 2) audioNames.push({ key: items[i], value: items[i + 1] })
-  return NextResponse.json(audioNames)
-}
-```
-
-The Next.js API endpoint retrieves the transcription history for authenticated users by checking their authentication status with Clerk. It uses Redis to fetch the data in a paginated format and returns the transcription history as a JSON response, allowing clients to specify a starting point for retrieval.
-
-Now, let's move on to implementing the audio transcription API endpoint.
-
 ## Transcribe Audio API Endpoint in Next.js App Router
 
 Create a file named `route.ts` in the `app/api/transcribe` directory that transcribes an audio after fetching it from Cloudflare R2, with the following code:
@@ -370,224 +334,367 @@ async function handler(request: Request) {
 }
 ```
 
-The code above defines a Next.js API endpoint for transcribing audio files using the Fireworks AI service. It utilizes the `verifySignatureAppRouter` middleware from Upstash QStash to ensure secure requests. The handler fetches the audio file from Cloudflare R2, processes it into a `FormData` object, and sends it to the Fireworks API for transcription. Upon receiving the transcription response, it stores the results in Upstash Redis, associating them with the user's unique identifier.
+The Next.js API endpoint above is for transcribing audio files using Fireworks AI. It leverages the `verifySignatureAppRouter` middleware from Upstash QStash for request authentication. The handler function performs the following operations:
 
-## Building the chatbot interface
+1. Retrieves the audio file from Cloudflare R2
+2. Converts the audio data into a `FormData` object
+3. Sends a POST request to the Fireworks API for transcription
+4. Processes the API response
+5. Stores the transcription result in Upstash Redis
 
-To start building the application's user interface, open the `app/page.tsx` file and replace the existing code with the following:
+The Redis storage uses a composite key structure, combining the user's identifier with the filename, to associate transcriptions with specific users.
+
+Now, let's create the endpoint that schedules the transcription of audio files.
+
+## Scheduling Audio Transcriptions API Endpoint in Next.js App Router
+
+Scheduling transcriptions allows for asynchronous processing of audio files, freeing up resources for other tasks while the transcription is being performed. This is particularly useful in scenarios where multiple users require transcriptions, as it prevents resource contention and ensures that each user's request is processed at the latest.
+
+Create a file named `route.ts` in the `app/api/schedule` for scheduling audio transcriptions, with the following code:
+
+```tsx
+// File: app/api/schedule/route.ts
+
+export const runtime = 'nodejs'
+
+export const dynamic = 'force-dynamic'
+
+export const fetchCache = 'force-no-store'
+
+import redis from '@/lib/redis.server'
+import { Client } from '@upstash/qstash'
+
+if (!process.env.QSTASH_TOKEN) throw new Error(`QSTASH_TOKEN environment variable is not found.`)
+
+const client = new Client({ token: process.env.QSTASH_TOKEN })
+
+export async function POST(request: Request) {
+  const { fileName } = await request.json()
+  await Promise.all([
+    client.publishJSON({
+      delay: 10,
+      body: { fileName },
+      url: `${process.env.DEPLOYMENT_URL}/api/transcribe`,
+    }),
+    redis.hset(fileName.split(process.env.RANDOM_SEPERATOR)[0], {
+      [fileName.split(process.env.RANDOM_SEPERATOR)[1]]: {
+        transcribed: false,
+      },
+    }),
+  ])
+  return new Response()
+}
+```
+
+The code above defines a Next.js API endpoint that schedules the transcription of audio files using Upstash QStash. It first verifies the request signature to ensure the request is from QStash, then it fetches the audio file from Cloudflare R2, converts it into a `FormData` object, and sends it to the Fireworks API for transcription. Upon receiving the transcription response, it updates the transcription status in Upstash Redis.
+
+Now, let's create the endpoint that generates presigned URLs for uploaded files.
+
+## Using Presigned URLs for Large Audio File Uploads
+
+When dealing with large audio files, it's crucial to implement an efficient upload mechanism. One effective approach is to use presigned URLs, which allow for direct uploads to cloud storage services like Amazon S3 or Cloudflare R2. This method offers several advantages over server-side uploads:
+
+- **Reduced server load**: The audio file is uploaded directly to the storage service, bypassing your application server.
+- **Improved performance**: Large files can be uploaded faster and more reliably.
+- **Scalability**: This approach can handle multiple large file uploads simultaneously without overwhelming your server resources.
+
+Create a file named `route.ts` in the `app/api/upload` for generating presigned URLs for uploaded files, with the following code:
+
+```tsx
+// File: app/api/upload/route.ts
+
+export const runtime = 'nodejs'
+
+export const dynamic = 'force-dynamic'
+
+export const fetchCache = 'force-no-store'
+
+import { uploadS3Object } from '@/lib/storage.server'
+import { auth } from '@clerk/nextjs/server'
+import { NextResponse, type NextRequest } from 'next/server'
+
+export async function GET(request: NextRequest) {
+  const { userId } = auth()
+  if (!userId) return new Response(null, { status: 403 })
+  const searchParams = request.nextUrl.searchParams
+  const fileName = searchParams.get('fileName')
+  const contentType = searchParams.get('contentType')
+  if (!fileName || !contentType) return new Response(null, { status: 500 })
+  const signedObject = await uploadS3Object(`${userId}${process.env.RANDOM_SEPERATOR}${fileName}`, contentType)
+  return NextResponse.json(signedObject)
+}
+```
+
+The code above defines a Next.js API route handler for GET requests. The handler authenticates the user via Clerk, extracts `fileName` and `contentType` from query parameters, and generates a signed URL for S3 object upload. It then returns a signed object as a JSON response. The route is secured with Clerk, requiring user authentication and validating necessary parameters before processing the upload.
+
+Now, let's create the endpoint that retrieves signed URLs for uploaded files.
+
+## Retrieving Signed URLs for Cloudflare R2 Files
+
+To manage per-user uploads efficiently, you would want to prefix filenames with the user's ID obtained from Clerk. This approach simplifies file organization and access control in Cloudflare R2. When uploading, we concatenate the user ID with the filename using a unique separator. For retrieval, we verify that the requested filename starts with the authenticated user's ID, ensuring users can only access their own files. This method provides a simple yet effective way to segregate and secure user data in cloud storage.
+
+Create a file named `route.ts` in the `app/api/get` for retrieving signed URLs for uploaded files, with the following code:
+
+```tsx
+// File: app/api/get/route.ts
+
+export const runtime = 'nodejs'
+
+export const dynamic = 'force-dynamic'
+
+export const fetchCache = 'force-no-store'
+
+import { getS3Object } from '@/lib/storage.server'
+import { auth } from '@clerk/nextjs/server'
+import { type NextRequest } from 'next/server'
+
+export async function GET(request: NextRequest) {
+  const { userId } = auth()
+  if (!userId) return new Response(null, { status: 403 })
+  const searchParams = request.nextUrl.searchParams
+  const fileName = searchParams.get('fileName')
+  if (!fileName) return new Response(null, { status: 400 })
+  if (!fileName.startsWith(userId)) return new Response(null, { status: 403 })
+  const signedUrl = await getS3Object(fileName)
+  return new Response(signedUrl)
+}
+```
+
+The code above uses Clerk for authentication and extracts a `fileName` from query parameters. It includes additional security by checking if the filename starts with the user's ID. If all checks pass, it calls a `getS3Object` function to generate a signed URL for retrieving the object and returns this URL in the response.
+
+Now, let's create the endpoint that retrieves all the transcriptions done for a particular user in a paginated form.
+
+## Transcriptions History API Endpoint in Next.js App Router
+
+Create a file named `route.ts` in the `app/api/history` directory that retrieves all the transcriptions done for a particular user in a paginated form, with the following code:
+
+```tsx
+// File: app/api/history/route.ts
+
+export const runtime = 'nodejs'
+
+export const dynamic = 'force-dynamic'
+
+export const fetchCache = 'force-no-store'
+
+import redis from '@/lib/redis.server'
+import { auth } from '@clerk/nextjs/server'
+import { NextResponse, type NextRequest } from 'next/server'
+
+export async function GET(request: NextRequest) {
+  const { userId } = auth()
+  if (!userId) return new Response(null, { status: 403 })
+  const count = 10
+  const audioNames = []
+  const searchParams = request.nextUrl.searchParams
+  const start = parseInt(searchParams.get('start') ?? '0')
+  const [_, items] = await redis.hscan(userId, start, { count })
+  for (let i = 0; i < items.length; i += 2) audioNames.push({ key: items[i], value: items[i + 1] })
+  return NextResponse.json(audioNames)
+}
+```
+
+The Next.js API endpoint retrieves the transcription history for authenticated users by checking their authentication status with Clerk. It uses Redis to fetch the data in a paginated format and returns the transcription history as a JSON response, allowing clients to specify a starting point for retrieval.
+
+Now, let's create the interface for the application.
+
+## Building the application interface
+
+Open the `app/page.tsx` file, and replace the existing code with the following:
 
 ```tsx
 // File: app/page.tsx
 
-'use client'
-
-import { useChat } from 'ai/react'
-import { useUser } from '@clerk/nextjs'
-import { useEffect, useState } from 'react'
 import { useToast } from '@/components/ui/use-toast'
+import { SignInButton, SignedIn, SignedOut, UserButton, useUser } from '@clerk/nextjs'
+import { LoaderCircle, RotateCw, Upload } from 'lucide-react'
+import { ChangeEvent, useEffect, useState } from 'react'
 
 export default function Page() {
   const { toast } = useToast()
   const { isSignedIn } = useUser()
-  const [disabled, setDisabled] = useState(true)
-  const { messages, input, handleInputChange, handleSubmit, setMessages } = useChat()
+  const [audios, setAudios] = useState<any[]>([])
+  const fetchAudios = (start = 0) => {
+    if (start === 0) setAudios([])
+    fetch('/api/history?start=' + start)
+      .then((res) => res.json())
+      .then((res) => {
+        setAudios((existingAudios) => [...existingAudios, ...res])
+        if (res.length === 10) fetchAudios(start + 10)
+      })
+  }
   useEffect(() => {
-    if (isSignedIn) {
-      fetch('/api/chat/history')
-        .then((res) => res.json())
-        .then((res) => {
-          if (res?.messages?.length > 0) setMessages(res.messages)
-        })
-        .finally(() => setDisabled(false))
-    }
-  }, [isSignedIn])
+    fetchAudios()
+  }, [])
   return (
     <div className="mx-auto flex w-full max-w-md flex-col py-8">
-     {/* Rest of components */}
-    </div>
-  )
-}
-```
-
-The code above begins with importing the React hooks for managing the state of the user, the conversation, and invoke toast elements. As the component is mounted (and if the user's logged in state changes), the chat history for the user is fetched.
-
-Now, perform the following additions to be able to add user-uploaded PDF(s) to their vector index namespace:
-
-```diff
-// File: app/page.tsx
-
-'use client'
-
-import { useChat } from 'ai/react'
-import { useUser } from '@clerk/nextjs'
-import { useEffect, useState } from 'react'
-import { useToast } from '@/components/ui/use-toast'
-
-export default function Page() {
-  // useState and useEffect code
-  return (
-    <div className="mx-auto flex w-full max-w-md flex-col py-8">
-+      <input
-+          type="file"
-+          id="fileInput"
-+          className="hidden"
-+          accept="application/pdf"
-+          onChange={() => {
-+            const fileInput = document.getElementById('fileInput') as HTMLInputElement
-+            if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
-+              toast({
-+                duration: 2000,
-+                variant: 'destructive',
-+                description: 'No file attached.',
-+              })
-+              return
-+            }
-+            const fileData = fileInput.files[0]
-+            const formData = new FormData()
-+            formData.append('file', fileData)
-+            const loadingToast = toast({
-+              duration: 10000,
-+              description: "Adding your PDF to AI's knowledge...",
-+            })
-+            fetch('/api/upsert', {
-+              method: 'POST',
-+              body: formData,
-+            }).then((res) => {
-+              loadingToast.dismiss()
-+              if (res.ok) {
-+                toast({
-+                  duration: 2000,
-+                  description: "Added the PDF to AI's knowledge succesfully.",
-+                })
-+              } else {
-+                toast({
-+                  duration: 2000,
-+                  variant: 'destructive',
-+                  description: "Failed to add the PDF to AI's knowledge.",
-+                })
-+              }
-+            })
-+          }}
-+        />
-     {/* Rest of components */}
-    </div>
-  )
-}
-```
-
-The code above defines an `input` element that only accepts a pdf file from the user. When a PDF is uploaded, via the `onChange` callback, it `POST`s the file to `/api/upsert` api endpoint. Once that's done, it displays a toast indiciating if the operation was a success.
-
-Now, perform the following additions to switch states depending on user authentication status:
-
-```diff
-// File: app/page.tsx
-
-'use client'
-
-import { useChat } from 'ai/react'
-import { useEffect, useState } from 'react'
-import { useToast } from '@/components/ui/use-toast'
-- import { useUser } from '@clerk/nextjs'
-+ import MemoizedMD from '@/components/memoized-react-markdown'
-+ import { SignInButton, SignedIn, SignedOut, UserButton, useUser } from '@clerk/nextjs'
-
-export default function Page() {
-  // useState and useEffect code
-  return (
-    <div className="mx-auto flex w-full max-w-md flex-col py-8">
-      {/* Input component */}
-+      <div className="flex flex-row items-start justify-between">
-+        <span className="text-xl font-semibold">NerdCoach</span>
-+        <SignedIn>
-+          <div className="size-[28px] rounded-full bg-black/10">
-+            <UserButton />
-+          </div>
-+        </SignedIn>
-+      </div>
-+      {isSignedIn ? (
-+        disabled ? (
-+          <div className="mt-8 flex flex-col gap-y-2">
-+            <div className="h-[30px] animate-pulse bg-black/10" />
-+            <div className="h-[30px] animate-pulse bg-black/10" />
-+            <div className="h-[30px] animate-pulse bg-black/10" />
-+          </div>
-+        ) : (
-+          messages.map(({ content }, idx) => <MemoizedMD key={idx} message={content} />)
-+        )
-+      ) : (
-+        <div className="mt-8 flex max-w-max flex-col justify-center">
-+          <SignedOut>
-+            <div className="rounded border px-3 py-1 shadow transition duration-300 hover:shadow-md">
-+              <SignInButton mode="modal">Sign in to use NerdCoach &rarr;</SignInButton>
-+            </div>
-+          </SignedOut>
-+        </div>
-+      )}
-     {/* Rest of components */}
-    </div>
-  )
-}
-```
-
-The code above creates a signed in and out state of the application for the user. If the user is signed in, it displays their image via `UserButton` component with additional actions, and a default loading state of their chat history. If the user is signed out, it shows a `Sign in to use Nerdcoach` button.
-
-Now, perform the following additions to add an input for user to submit their prompt and upload PDF file:
-
-```diff
-// File: app/page.tsx
-
-'use client'
-
-import { useChat } from 'ai/react'
-import { useEffect, useState } from 'react'
-import { useToast } from '@/components/ui/use-toast'
-import MemoizedMD from '@/components/memoized-react-markdown'
-import { SignInButton, SignedIn, SignedOut, UserButton, useUser } from '@clerk/nextjs'
-+ import { Upload } from 'lucide-react'
-+ import { Input } from '@/components/ui/input'
-+ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-
-export default function Page() {
-  // useState and useEffect code
-  return (
-    <div className="mx-auto flex w-full max-w-md flex-col py-8">
-      {/* Input component */}
       {/* Rest of components */}
-+      <div className="fixed bottom-0 mb-8 flex w-full max-w-[82vw] flex-row items-center shadow sm:max-w-md">
-+        <div className="cursor-pointer border bg-white px-2 py-1 pt-2 text-gray-400 hover:text-gray-800">
-+          <TooltipProvider>
-+            <Tooltip>
-+              <TooltipTrigger
-+                onClick={() => {
-+                  const tmp = document.querySelector(`[id="fileInput"]`) as HTMLInputElement
-+                  tmp?.click()
-+                }}
-+              >
-+                <Upload className="size-[20px]" />
-+              </TooltipTrigger>
-+              <TooltipContent>
-+                <span>Upload Resume</span>
-+              </TooltipContent>
-+            </Tooltip>
-+          </TooltipProvider>
-+        </div>
-+        <Input
-+          value={input}
-+          disabled={disabled}
-+          className="!rounded-none"
-+          onChange={handleInputChange}
-+          placeholder="Ask something..."
-+          onKeyDown={(e) => {
-+            if (e.key.toLowerCase() == 'enter') handleSubmit()
-+          }}
-+        />
-+      </div>
     </div>
   )
 }
 ```
 
-The code above defines an `input` element which after the user submits their prompt, calls the `/api/chat` endpoint. It also defines a `TooltipProvider` component which invokes the PDF file uploader `input` if a user clicks the upload icon.
+The code above implements a file upload functionality for audio files. It uses Clerk for authentication, manages state with React hooks, and interacts with API endpoints for file upload and audio history retrieval. The component renders a user interface with conditional elements based on the user's authentication status and handles file selection and upload processes.
+
+Now, let's add the remaining components to the interface.
+
+```tsx
+// File: app/page.tsx
+
+// Existing imports
+
+export default function Page() {
+  // Existing state, hooks and toast variables
+  return (
+    <div className="mx-auto flex w-full max-w-md flex-col py-8">
+       <input
+        capture
+        type="file"
+        id="fileInput"
+        className="hidden"
+        accept="audio/*"
+        onChange={(e: ChangeEvent<HTMLInputElement>) => {
+          if (!isSignedIn) {
+            toast({
+              duration: 2000,
+              variant: 'destructive',
+              description: 'You are not signed in.',
+            })
+            return
+          }
+          const file: File | null | undefined = e.target.files?.[0]
+          if (!file) {
+            toast({
+              duration: 2000,
+              variant: 'destructive',
+              description: 'No file attached.',
+            })
+            return
+          }
+          const reader = new FileReader()
+          reader.onload = async (event) => {
+            const fileData = event.target?.result
+            if (fileData) {
+              const presignedURL = new URL('/api/upload', window.location.href)
+              presignedURL.searchParams.set('fileName', file.name)
+              presignedURL.searchParams.set('contentType', file.type)
+              toast({
+                duration: 10000,
+                description: 'Uploading your file to Cloudflare R2...',
+              })
+              fetch(presignedURL.toString())
+                .then((res) => res.json())
+                .then((res) => {
+                  const body = new File([fileData], file.name, { type: file.type })
+                  fetch(res[0], {
+                    body,
+                    method: 'PUT',
+                  })
+                    .then((uploadRes) => {
+                      if (uploadRes.ok) {
+                        toast({
+                          duration: 2000,
+                          description: 'Upload to Cloudflare R2 succesfully.',
+                        })
+                        fetch('/api/schedule', {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify({ fileName: res[1] }),
+                        }).then((res) => {
+                          fetchAudios()
+                          if (res.ok) {
+                            toast({
+                              duration: 2000,
+                              description: 'Scheduled transcription of the audio.',
+                            })
+                          }
+                        })
+                      } else {
+                        toast({
+                          duration: 2000,
+                          variant: 'destructive',
+                          description: 'Failed to upload to Cloudflare R2.',
+                        })
+                      }
+                    })
+                    .catch((err) => {
+                      console.log(err)
+                      toast({
+                        duration: 2000,
+                        variant: 'destructive',
+                        description: 'Failed to upload to Cloudflare R2.',
+                      })
+                    })
+                })
+            }
+          }
+          reader.readAsArrayBuffer(file)
+        }}
+      />
+      <div className="flex flex-row items-start justify-between">
+        <span className="text-xl font-semibold">Transcriber</span>
+        <SignedIn>
+          <div className="size-[28px] rounded-full bg-black/10">
+            <UserButton />
+          </div>
+        </SignedIn>
+      </div>
+      {isSignedIn ? (
+        <div className="mb-24 flex w-full flex-col">
+          {audios.map((audio, key) => (
+            <div key={key} className="mt-3 flex flex-col gap-y-3">
+              <span className="text-gray-400">
+                {key + 1}. {audio.key}
+              </span>
+              {audio.value.transcribed ? (
+                <span className="text-gray-600">{audio.value.transcription}</span>
+              ) : (
+                <div className="flex flex-row items-center gap-x-1">
+                  <LoaderCircle size={16} className="animate-spin text-gray-600" />
+                  <span className="text-gray-600">Transcription in progress...</span>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="mt-8 flex max-w-max flex-col justify-center">
+          <SignedOut>
+            <div className="rounded border px-3 py-1 shadow transition duration-300 hover:shadow-md">
+              <SignInButton mode="modal">Sign in to use Transcriber &rarr;</SignInButton>
+            </div>
+          </SignedOut>
+        </div>
+      )}
+      {isSignedIn && (
+        <div className="fixed bottom-0 mb-8 flex w-full max-w-max flex-row items-center gap-x-3">
+          <button
+            onClick={() => {
+              const tmp = document.querySelector(`[id="fileInput"]`) as HTMLInputElement
+              tmp?.click()
+            }}
+            className="flex flex-row items-center gap-x-3 rounded border px-5 py-2 text-gray-400 outline-none hover:border-black hover:text-gray-800"
+          >
+            <Upload className="size-[20px]" />
+            <span>Upload Audio</span>
+          </button>
+          <button
+            onClick={() => fetchAudios()}
+            className="flex flex-row items-center gap-x-3 rounded border px-5 py-2 text-gray-400 outline-none hover:border-black hover:text-gray-800"
+          >
+            <RotateCw size={16} />
+            <span>Refresh</span>
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+```
+
+The code above displays a list of uploaded audio files with their transcription status, showing either the completed transcription or a loading indicator. The interface includes authentication features, allowing users to sign in and upload audio files. It also provides buttons for uploading new audio files and refreshing the list of transcriptions.
 
 > That was a lot of learning! You’re all done now ✨
 
@@ -612,4 +719,4 @@ For more detailed insights, explore the references cited in this post.
 
 ## Conclusion
 
-(TODO) In this blog, you learned how to build a career coach application using Upstash Vector, Upstash Redis, OpenAI API, Clerk, Next.js App Router, and Vercel. You set up Upstash to manage vector embeddings and chat history, configured Clerk for user authentication, and integrated OpenAI for AI-powered responses. The blog walked you through creating API endpoints for chat interactions, adding context from user-uploaded PDFs, and building a user interface with authentication and file upload functionalities.
+In this blog, you learned how to build an audio transcription system using Upstash QStash, Upstash Redis, Fireworks AI, Clerk, Next.js App Router, Cloudflare R2, and Vercel. You set up Upstash QStash to schedule transcriptions, maintain per-user transcription history and audio file references, configured Clerk for user authentication, and integrated Fireworks API to generate AI-powered transcription. The tutorial also covered how to upload files to Cloudflare R2 using presigned URLs and retrieve them using signed URLs. Finally, you deployed the application on Vercel.
