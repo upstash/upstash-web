@@ -1,7 +1,6 @@
 ---
-title: "Build a career coach with Upstash"
-slug: nerdcoach
-draft: true
+title: "Build a RAG Chatbot with Upstash, OpenAI, Clerk, and Next.js"
+slug: rag-chatbot-upstash-openai-clerk-nextjs
 authors:
   - rishi
 tags: [sdk, rag, openai, vector, chatbot, ai, vercel]
@@ -10,9 +9,7 @@ tags: [sdk, rag, openai, vector, chatbot, ai, vercel]
 In this post, you will learn how to build your own career coach with Upstash Vector, Upstash Redis, OpenAI API, Clerk, Next.js App Router, and Vercel. Upstash RAG Chat SDK simplifies the per-user management of vector embeddings, chat history, and dynamic (with latest) relevant context generation. Specifically, Upstash Redis stores the per-user chat history, while Upstash Vector handles all vector embeddings within each user's namespace.
 
 ## Prerequisites
-
 You will need the following:
-
 - [Node.js 18](https://nodejs.org/en/blog/announcements/v18-release-announce) or later
 - A [Clerk](https://dashboard.clerk.com) account
 - An [Upstash](https://console.upstash.com) account
@@ -20,14 +17,11 @@ You will need the following:
 - A [Vercel](https://vercel.com/dashboard) account
 
 ## Tech Stack
-
-| Technology | Description |
-| --- | --- |
-| [Next.js](https://nextjs.org) | The React Framework for the Web. |
-| [Clerk](https://clerk.com) | User Management Platform. You are going to use it to add authentication to your application. |
-| [Upstash](https://upstash.com) | Serverless database platform. You are going to use both Upstash Vector and Upstash Redis for storing vector embeddings and conversation history. |
-| [OpenAI](https://platform.openai.com) | An artificial intelligence research lab focused on developing advanced AI technologies. |
-| [Vercel](https://vercel.com) | A cloud platform for deploying and scaling web applications. |
+- [Next.js](https://nextjs.org) :The React Framework for the Web.
+- [Clerk](https://clerk.com) :User Management Platform. You are going to use it to add authentication to your application.
+- [Upstash](https://upstash.com) :Serverless database platform. You are going to use both Upstash Vector and Upstash Redis for storing vector embeddings and conversation history.
+- [OpenAI](https://platform.openai.com) :An artificial intelligence research lab focused on developing advanced AI technologies.
+- [Vercel](https://vercel.com) :A cloud platform for deploying and scaling web applications. 
 
 ## Generate an OpenAI Token
 

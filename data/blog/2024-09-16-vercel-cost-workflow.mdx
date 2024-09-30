@@ -1,0 +1,159 @@
+---
+
+title: "Get Rid of Function Timeouts and Reduce Vercel Costs"
+slug: vercel-cost-workflow
+authors: [enes]
+tags: [qstash, workflow, vercel]
+---
+
+Vercel is an excellent platform for hosting static sites and serverless functions. It's user-friendly and offers a free tier. However, if you're not careful, you can quickly exceed the tier limits and incur costs. In this post, I'll show you how Upstash Workflow can help manage Vercel costs, specifically function duration costs.
+
+Vercel charges have many dimensions. Here, we will focus on costs caused by serverless function execution time. This post is for you if:
+-  You experience function timeouts or can't run long tasks due to Vercel's timeout limits.
+-  Your bill shows you exceed the tier limits for Function Duration, resulting in charges.
+
+## What is Vercel Functions Duration Cost?
+
+Vercel executes your backend logic using serverless functions on AWS Lambda. You're charged based on the amount of invocations and total execution time. Additionally, each Vercel plan specifies a certain time each function can run at maximum.          
+<table>
+  <thead>
+    <tr>
+      <th scope="col">Plan</th>
+      <th scope="col">Default Timeout</th>
+      <th scope="col">Max Timeout</th>
+      <th scope="col">Included in Plan</th>
+      <th scope="col">Price for extra</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">Hobby</th>
+      <td>10 seconds</td>
+      <td>60 seconds</td>
+      <td>100 hours</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <th scope="row">Pro</th>
+      <td>15 seconds</td>
+      <td>5 minutes</td>
+      <td>1000 hours</td>
+      <td>$0.18 per hour</td>
+    </tr>
+  </tbody>
+</table>
+                            
+
+## Traditional Approach vs. Upstash Workflow
+
+Upstash Workflow is a messaging system that helps you manage serverless functions. Your code still runs on your own server, and Workflow manages the execution for you. 
+
+Workflow allows you to offload API calls. Instead of waiting for an API response within a serverless function, trigger the API call, and your function will continue executing when the API response is ready. 
+
+There's no risk of function timeout, in fact, this offloaded API call can take much longer than the function timeout. Also, you don't pay for the idle time of the function while waiting for the API response.
+
+![Workflow Context Call.png](/blog/workflow/workflow.png)
+
+The above image shows two ways to implement a serverless function that calls an external API:
+
+**Traditional Approach**
+- Function waits for API response
+- Risk of timeout if API call takes too long
+- Full duration charged, regardless of response time
+
+**With Upstash Workflow**
+- Function offloads API call to Workflow
+- Workflow re-triggers function when response is ready
+- No risk of timeout
+- No idle time charged
+
+Many functions now call AI APIs, which often have long and highly variable response times. If the GPU of your inference service is busy, the response time can be very high, to the point where a regular serverless function runs the risk of timeout.
+
+Using Upstash Workflow also makes your function much more reliable with automatic retries on failure and a detailed dashboard to monitor active, scheduled, and completed workflows.
+
+Note that the traditional approach invokes your function once, while the second approach invokes it twice due to the re-trigger with the response. This is usually not a problem, as the cost of a re-trigger is negligible. That said, if your current bill is sensitive to invocation count, we recommend evaluating this trade-off for your use case.
+
+## Upstash Workflow and function timeouts
+
+Vercel imposes a limit on function duration. If a function exceeds this limit, Vercel terminates it. This timeout is a problem for long-running tasks. For example, all API calls inside a single function can only add up to a maximum of 60 seconds (assuming the pro plan). Even then, unless you leave additional space for API call latency variations, you run the risk of timeout.
+
+![Workflow Context Call.png](/blog/workflow/workflow-timeouts.png)
+
+The image above again illustrates two approaches:
+
+**Traditional Approach**
+- Function waits for API response
+- Function terminates if response time exceeds timeout limit
+- Full duration charged, even if function terminates
+
+**With Upstash Workflow**
+- Function offloads API call to Workflow
+- Workflow re-triggers function when response is ready
+- No risk of timeout
+- No idle time charged
+
+Alas, there are no more function timeouts, even for operations that take much longer than the platform's maximum allowed duration.
+
+## What about cost of Workflow?
+
+Aren't we just moving costs from one bucket to another? No, because Workflow charges usage per call and is not tied to function duration. We created a scheduling mechanism efficient enough that we do not spend resources waiting. Each `context.call()` execution calls two QStash requests, and 100,000 QStash requests cost $1. If you want to reduce your serverless bill, prevent timeouts, and increase reliability as a nice side-effect, using Workflow will get you there.
+
+## Code Example
+
+Let's implement the traditional serverless function approach by calling an API directly from a Next.js API route.
+
+```typescript api/traditional/route.ts
+export default async function handler(req: Request, res: Response) {
+  const response = await fetch('https://api.example.com', {
+    body: JSON.stringify({ hello: "world" })
+  });
+
+  const data = await response.json();
+  
+  res.status(200).json(data);
+}
+```
+
+Now let's implement the Upstash Workflow approach, where we offload the API call to Workflow:
+
+```typescript api/workflow/route.ts
+import { serve } from "@upstash/qstash/nextjs"
+
+export const POST = serve(async (context) => {    
+  const response = await context.call(
+    "call-example-api", // Name (appears in dashboard)
+    "https://api.example.com", // URL
+    "POST", // Method
+    JSON.stringify({ hello: "world" }) // Body
+  )
+  
+  await context.run("process-api-response", async () => {
+    // ... do anything with the response
+  })
+})
+```                       
+
+The above is a Vercel serverless function. When you call your workflow URL, the function executes until the `context.call()` function. Upon executing `context.call("call-example-api")`, the Vercel function ends, to not count idle time towards your function duration.
+
+ Upstash Workflow then calls the example API and awaits the response. Only once the response is ready, it re-triggers the function with the response. The function then skips steps until the `context.run("process-api-response")` step. 
+ 
+ This approach executes a single function multiple times, with a different portion executed each time to optimize for minimum execution time. 
+
+## Conclusion
+
+In this post, I explained how to run long-running tasks and reduce Vercel costs using Upstash Workflow. Besides other built-in features like automatic retries, schedules, detailed monitoring and parallelism, it's a valuable feature that enables you to execute time-consuming tasks on Vercel.
+
+Thank you for reading, and [follow us on X](https://x.com/upstash) for more posts like this.
+
+
+
+```
+
+
+
+
+
+
+
+
+

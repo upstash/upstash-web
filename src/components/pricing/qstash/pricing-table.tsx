@@ -119,12 +119,12 @@ export default function PricingTable() {
 
         <div>
           <p className="text-white/40">Max Messages per Day</p>
-          <p className="font-semibold">up to 100M</p>
+          <p className="font-semibold">Up to 100M</p>
         </div>
 
         <div>
           <p className="text-white/40">Max Requests per Second</p>
-          <p className="font-semibold">Custom</p>
+          <p className="font-semibold">Up to 1000</p>
         </div>
 
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
