@@ -55,7 +55,7 @@ const nextConfig = {
         source: "/(.*)",
         headers: [
           {
-            key: "Content-Security-Policy",
+            key: "Content-Security-Policy-Report-Only",
             value: cspHeader.replace(/\n/g, ""),
           },
         ],
