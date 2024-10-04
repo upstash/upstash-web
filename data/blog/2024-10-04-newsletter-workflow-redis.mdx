@@ -308,8 +308,6 @@ export async function checkSubscription(email: string): Promise<boolean> {
 
 To send emails, we'll use our own email API that we developed in a previous blog post about creating an [Email Scheduler with QStash Python SDK](https://upstash.com/blog/email-scheduler-qstash-python).
 
-Here's the `email.ts` file:
-
 ```typescript title="src/lib/email.ts"
 export async function sendEmail(message: string, email: string) {
   console.log(`Sending email to ${email}`);
@@ -354,8 +352,6 @@ export type SubscriptionData = {
 ### Subscribe API Route
 
 We'll create an API route that handles subscription requests. When a user submits the subscription form, this endpoint will check if the user is already subscribed and enqueue a workflow to handle sending emails based on the user's chosen frequency.
-
-Here's the `/api/subscribe/route.ts` file:
 
 ```typescript title="src/app/api/subscribe/route.ts"
 import { NextRequest, NextResponse } from "next/server";
@@ -466,8 +462,6 @@ export const POST = async (request: NextRequest) => {
 
 Since we have a subscription route, we need an unsubscribe route as well. When a request is made, we'll check if the user is subscribed and remove their data from Redis. We'll also send a confirmation email.
 
-Here's the `/api/unsubscribe/route.ts` file:
-
 ```typescript title="src/app/api/unsubscribe/route.ts"
 import { NextRequest, NextResponse } from "next/server";
 import { redis } from "@/lib/redis";
@@ -525,8 +519,6 @@ Our workflow will do the following:
     - Check if the user is still subscribed.
     - Send the newsletter email.
     - Repeat until a set number of newsletters have been sent since we don't want an infinite loop.
-
-Here's the `/api/workflow/route.ts` file:
 
 ```typescript title="src/app/api/workflow/route.ts"
 import { serve } from "@upstash/qstash/nextjs";
@@ -629,8 +621,6 @@ You can access and monitor your workflows from the [Upstash Console](https://con
 
 Let's set up the main page of our application. This page will include the subscription form and a link to the unsubscribe page.
 
-Here's the `page.tsx` file:
-
 ```tsx title="src/app/page.tsx"
 import SubscriptionForm from "@/components/SubscriptionForm";
 import Link from "next/link";
@@ -665,8 +655,6 @@ export default function Home() {
 ### Unsubscribe Page Component
 
 Finally, let's create the unsubscription page.
-
-Here's the `unsubscribe/page.tsx` file:
 
 ```tsx title="src/app/unsubscribe/page.tsx"
 import UnsubscribePage from "@/components/UnsubscribeForm";
