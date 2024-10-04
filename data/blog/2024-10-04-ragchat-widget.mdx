@@ -1,0 +1,141 @@
+---
+title: "Add a Chatbot to Your Site in 5 Minutes"
+slug: ragchat-widget
+authors:
+  - yunus
+tags: [sdk, rag, openai, vector, chatbot, ai, vercel]
+---
+
+Let’s set up a chatbot on your site in 5 minutes.
+
+## Project Setup
+
+If you already have a project, you can skip this step.
+
+We will use the Blog template from Vercel:
+```bash
+pnpm create next-app --example https://github.com/vercel/examples/tree/main/solutions/blog blog
+cd blog
+```
+
+Let's update the Next.js version and start the development server:
+```bash
+pnpm update next@14.2.14
+pnpm dev
+```
+
+You can now visit [http://localhost:3000](http://localhost:3000) to see the blog.
+
+## Environment Setup
+
+### OpenAI Setup
+
+Got to [OpenAI Platform -> Dashboard -> API keys](https://platform.openai.com/api-keys) and create a new API key, copy it and save it somewhere safe.
+
+### Upstash Vector Setup
+
+Go to [Upstash Console - Vector](https://console.upstash.com/vector) and create a new Index:
+
+![Create an Upstash Vector Index](/blog/ragchat-widget/create-index.png)
+
+Scroll down to **Connect** section, and select **.env**. Copy the content and save it somewhere safe.
+
+![Vector Index Environment Variables](/blog/ragchat-widget/vector-env.png)
+
+Create a `.env` file in the root of your project and add the following environment variables with the values you copied:
+
+```bash
+UPSTASH_VECTOR_REST_URL=<YOUR_URL>
+UPSTASH_VECTOR_REST_TOKEN=<YOUR_TOKEN>
+OPENAI_API_KEY=<YOUR_API_KEY>
+```
+
+## Chatbot Setup
+
+Install the `@upstash/ragchat-widget` package:
+
+```bash
+pnpm add @upstash/ragchat-widget
+```
+
+Import the `ChatWidget` component in `app/layout.tsx`:
+
+```tsx
+...
+import { ChatWidget } from "@upstash/ragchat-widget";
+...
+```
+
+Add the `ChatWidget` component to the layout:
+
+```tsx
+...
+        <main className="flex-auto min-w-0 mt-6 flex flex-col px-2 md:px-0">
+          <Navbar />
+          <ChatWidget />
+          {children}
+          <Footer />
+          <Analytics />
+          <SpeedInsights />
+        </main>
+...
+```
+
+You can now see the chatbot widget on your site.
+
+## Provide Context to the Chatbot
+
+<Note type="tip">
+  Is your data in another format? `@upstash/rag-chat` provides [native content processors](https://upstash.com/docs/vector/sdks/rag-chat/gettingstarted#managing-your-knowledge-base) and [Unstructured integration](https://upstash.com/docs/vector/sdks/rag-chat/integrations/unstructured) to embed PDFs, CSVs, Web Pages, and more.
+</Note>
+
+Now we will provide the blog posts as context to the chatbot.
+
+First we install the `@upstash/rag-chat` package to use its native content processors:
+
+```bash
+pnpm add @upstash/rag-chat
+```
+
+Then we create a route handler to add the blog posts as context in `app/api/add-context/route.ts`:
+
+```ts
+import { RAGChat, openai } from "@upstash/rag-chat";
+import fs from 'fs'
+
+const ragChat = new RAGChat({
+  model: openai("gpt-4o-mini")
+});
+
+export async function GET(request: Request) {
+    const files = fs.readdirSync(process.cwd() + "/app/blog/posts");
+    for (const file of files) {
+        await ragChat.context.add({
+            type: "text-file",
+            fileSource: process.cwd() + "/app/blog/posts/" + file,
+          });
+    }
+    return new Response("Context added");
+}
+```
+
+Finally, we visit the `http://localhost:3000/api/add-context` to add the blog posts as context. You should see the message "Context added".
+
+Try asking questions related to the blog posts in the chatbot:
+- What are the advantages of using Vim?
+- Spaces or tabs, which one should I use?
+- Tell me the importance of static typing.
+
+## Deploy
+
+You can deploy your site to Vercel with the following command:
+
+```bash
+vercel
+```
+
+## Next Steps
+
+- Explore [RAG Chat Features](https://upstash.com/docs/vector/sdks/rag-chat/features) to learn more about the capabilities of RAG Chat.
+- Monitor your RAG application with [Helicone](https://upstash.com/docs/vector/sdks/rag-chat/integrations/helicone) or [LangSmith](https://upstash.com/docs/vector/sdks/rag-chat/integrations/langsmith) Integrations.
+- Visit [RAG Chat Integrations](https://upstash.com/docs/vector/sdks/rag-chat/integrations/overview) to explore integrated Models, Frameworks and Processors.
