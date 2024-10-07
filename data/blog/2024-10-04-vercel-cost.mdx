@@ -1,78 +1,80 @@
 ---
-
 title: "Say Farewell to Surprise Vercel Bills"
 slug: vercel-cost
 authors: [arda]
 tags: [qstash, vercel, cost]
 ---
 
-If you've been following discussions around Vercel lately, you might recall [this tweet](https://x.com/zemotion/status/1798558292681343039):
+One of the primary adoption drivers for serverless infrastructure is the promise to scale automatically on-demand into basically "infinite" compute power. On the one hand, this scaling allows you to perfectly serve sudden increases in usage. You're only charged for exactly what you use.
+
+What could go wrong with basically infinitely scalable, on-demand infrastructure? It turns out, when used wrong, it leads to some alarming surprise bills like in [this tweet](https://x.com/zemotion/status/1798558292681343039):
 
 ![tweet 1](/blog/vercel-cost/cost-tweet-1.png)
 
-In short, they exceeded their plan’s GB hours and ended up with an unexpectedly high bill.
+In short, they've received a massive bill for exceeding their included function execution amount. As it turns out, this was _totally avoidable_ and is more of a usage than a Vercel issue, but we'll get to that in a second.
 
-This is not an isolated incident. Many users have shared similar experiences, like [this one](https://x.com/shoeboxdnb/status/1643639119824801793):
+This certainly wasn't the only time function execution bills caused serious confusion, like in [this tweet](https://x.com/shoeboxdnb/status/1643639119824801793):
 
 ![tweet 2](/blog/vercel-cost/cost-tweet-2.png)
 
-[In another case](https://x.com/yacineMTB/status/1828427645689962853), a user's app went viral, leading to unexpected bandwidth charges:
+Or take this [app going viral](https://x.com/yacineMTB/status/1828427645689962853):
 
-![tweet 2](/blog/vercel-cost/cost-tweet-3.png)
+![tweet 3](/blog/vercel-cost/cost-tweet-3.png)
 
-To Vercel’s credit, they often respond swiftly to these situations. In the first case, [they immediately reached out to resolve the issue](https://x.com/leeerob/status/1798584053786107970):
+### What's the problem?
 
-![tweet 2](/blog/vercel-cost/vercel-response-1.png)
+Judging by the above horror cases, Vercel seems like a risky place for deployment, right?
 
-And in the second case, [they provided a refund](https://x.com/shoeboxdnb/status/1648752967217213440):
+**Well, not really.**
 
-![tweet 2](/blog/vercel-cost/vercel-response-2.png)
+All of those cases were not only avoidable, but it also helps to understand that sudden, unexpected usage charges are rarely in the interest of the platform providing the services, either.
 
-Vercel is working hard to improve its handling of such situations. Lee Robinson has even written about ways to avoid unexpected charges in his blog “[Introducing Spend Management](https://vercel.com/blog/introducing-spend-management-realtime-usage-alerts-sms-notifications).”
+What's not immediately visible above is, for example, that one of these "totally unexpected" usage charges was the result of scaling up to 500.000 users basically overnight and not setting a [spend limit](https://vercel.com/blog/introducing-spend-management-realtime-usage-alerts-sms-notifications), disregarding [12 prior emails](https://x.com/leeerob/status/1798584053786107970) and personal outreach from a Vercel rep to check in about these charges. Another surprise charge has received a complete bill waiver.
 
-However, there’s still room for improvement. That’s where Upstash comes in. In this post, I’ll explore how Upstash can help you avoid these surprise bills and optimize your workflows.
+Now, even in the light of Vercel handling these cases well, it's best to avoid getting into such a situation in the first place. In this article, I'll show **four ways to avoid receiving a surprise cloud bill**.
 
-### Efficient Caching with Redis
+### Caching with Redis
 
-Upstash's core product, [Upstash Redis](https://upstash.com/docs/redis/overall/getstarted), is a simple yet powerful key-value store with many commands that can reduce serverless costs.
+Upstash's core product, [Upstash Redis](https://upstash.com/docs/redis/overall/getstarted), is a performant key-value store that massively speeds up your app and reduces serverless costs by avoiding repeated database or API calls. The results are noticeably faster response times and lower costs.
 
-Upstash Redis supports [global replication](https://upstash.com/docs/redis/features/globaldatabase), allowing read requests to be served from the closest replica, reducing latency and costs for read-heavy applications.
+Upstash Redis supports global replication for serving requests from the closest replica, reducing latency and costs for read-heavy applications. For more details on Redis caching and how it optimizes performance, check out this related blog article: [Next.js Caching with Redis](https://upstash.com/blog/nextjs-caching-with-redis)
 
-One effective way to use Upstash Redis is for caching, reducing the need for repeated database or API calls. This leads to faster response times and lower costs, especially in serverless environments. For more details on Redis caching and how it optimizes performance, check out our blog: [Next.js Caching with Redis](https://upstash.com/blog/nextjs-caching-with-redis).
-
-Upstash Redis is accessible through its [REST API](https://upstash.com/docs/redis/features/restapi) and the Official Upstash SDKs for [Python](https://upstash.com/docs/redis/sdks/py/overview) and [TypeScript](https://upstash.com/docs/redis/sdks/ts/overview). You can check out the [documentation](https://upstash.com/docs/redis/overall/getstarted) for more details.
+Upstash Redis is accessible through both API and the official packages for Python and TypeScript. You can check out the [documentation](https://upstash.com/docs/redis/overall/getstarted) for more details.
 
 ### Upstash Workflow
 
-[Upstash Workflow](https://upstash.com/docs/qstash/workflow/getstarted) is another powerful tool that allows you to manage long-running business logic, typically difficult in serverless environments. It’s built on top of [QStash](https://upstash.com/docs/qstash/overall/getstarted), Upstash’s serverless messaging and scheduling solution.
+[Upstash Workflow](https://upstash.com/docs/qstash/workflow/getstarted) is a powerful tool for managing long-running business logic, which is typically difficult in serverless environments. It's built on top of Upstash's serverless messaging and scheduling solution, QStash, to support scheduling, automatic retries on failure, parallelism, and much more out of the box.
 
-Here's an example of how you can define a series of tasks that span long durations:
+Here's a minimal code example of a durable, long-running serverless workflow:
 
-```jsx
-import { serve } from "@upstash/qstash/nextjs";
+```tsx api/workflow/route.ts
+import { serve } from "@upstash/qstash/nextjs"
 
 export const POST = serve(async (context) => {
-  const result = await context.run("first step", async () => {
-    // logic for step 1
-  });
+  await context.run("step-1", async () => {
+    // process an image
+  })
 
-  await context.sleep("pause for an hour", 60 * 60);
+  // wait an hour
+  await context.sleep("step-2", 60 * 60)
 
-  const result = await context.run("second step", async () => {
-    // logic for step 2
-  });
-});
+  await context.run("step-3", async () => {
+    // send a reminder email
+  })
+})
 ```
 
-One of the coolest features of Upstash Workflow is the `context.call` method. In a nutshell; you can delegate the work of calling an API and waiting for its response to QStash, and use the response in your workflow!
+One of the most useful features of Upstash Workflow are **long-running API calls**.
+
+In summary, you can offload any HTTP request and have it run for much longer than your serverles function timeout allows. You're not billed for any idle waiting time, and your code execution automatically resumes when the API response is ready.
 
 ![workflow context call](https://upstash.com/blog/workflow/workflow.png)
 
-For more information on how this can help reduce costs, check out our blog post: [Get Rid of Function Timeouts and Reduce Vercel Costs](https://upstash.com/blog/vercel-cost-workflow) and our demo app where we compare the cost of external calls with and without Upstash Workflow to demonstrate cost reduction by up to 90%. See [our post on X](https://x.com/upstash/status/1840784050254155802) for more information.
+For more information on how this reduces serverless cost by up to 90%, check out our blog post: [Get Rid of Function Timeouts and Reduce Vercel Costs](https://upstash.com/blog/vercel-cost-workflow).
 
-### Traffic Management with Rate Limiting
+### Rate Limiting
 
-To avoid unexpected bills, the Upstash Ratelimit SDKs for [Python](https://upstash.com/docs/redis/sdks/ratelimit-py/overview) and [TypeScript](https://upstash.com/docs/redis/sdks/ratelimit-ts/overview) can be a game changer. It helps limit the number of requests from users, IP addresses, or any other identifier, saving costs and protecting your app from overload.
+Upstash Ratelimit is a tool for limiting the number of requests a specific IP address, userId, or a custom identifier can make to your services in a particular timeframe.
 
 ```jsx
 import { Ratelimit } from "@upstash/ratelimit";
@@ -84,47 +86,42 @@ const ratelimit = new Ratelimit({
   analytics: true,
 });
 
-const { success } = await ratelimit.limit(identifier);
+// 👇 rate-limit by user IP
+const { success } = await ratelimit.limit("127.0.0.1");
 
 if (!success) {
-  return "Too many requests. Please try again later.";
+  return { error: "Too many requests. Please try again later."};
 }
-doExpensiveCalculation();
+
+// ... actual request logic
 ```
 
-You can [enable analytics](https://upstash.com/docs/redis/sdks/ratelimit-ts/features#analytics-and-dashboard) to monitor the usage from our dashboard:
+You can [enable analytics](https://upstash.com/docs/redis/sdks/ratelimit-ts/features#analytics-and-dashboard) to monitor the usage from your dashboard:
 
 ![analytics dashboard](https://mintlify.s3-us-west-1.amazonaws.com/upstash/img/ratelimit/dashboard.png)
 
 In addition to basic rate limiting, the SDKs offer enhanced security features to protect your endpoints from attacks.
 
-- By [caching ratelimited identifiers](https://upstash.com/docs/redis/sdks/ratelimit-ts/features#caching), the client can block further requests from ratelimited identifiers without querying Redis, cutting costs and reducing latency, especially during a DDOS attack.
+- By [caching rate-limited identifiers](https://upstash.com/docs/redis/sdks/ratelimit-ts/features#caching), the client blocks requests without querying Redis, cutting costs and reducing latency especially during a DDOS attack.
 - The [traffic protection feature](https://upstash.com/docs/redis/sdks/ratelimit-ts/traffic-protection) in the TypeScript SDK allows you to block specific IPs, countries, or other identifiers. You can also enable the [Auto IP Deny List](https://upstash.com/docs/redis/sdks/ratelimit-ts/traffic-protection#auto-ip-deny-list) to automatically block malicious IP addresses from public deny lists.
 
 ### Semantic Caching with Upstash Vector
 
-If you're incorporating LLMs into your apps, you're likely familiar with how much they can cost in the long run. A great way to manage these expenses is by using Upstash SDKs (available in [TypeScript](https://github.com/upstash/semantic-cache) and [Python](https://github.com/upstash/semantic-cache-py)) for semantic caching. These SDKs allow you to cache responses to similar requests, which is especially valuable in LLM-based apps, helping reduce costs while enhancing performance.
+If you're using LLMs in your apps, you're likely familiar with how expensive they can be in the long run. A great way to manage these expenses is using our semantic caching package (available in [TypeScript](https://github.com/upstash/semantic-cache) and [Python](https://github.com/upstash/semantic-cache-py)).
+
+Here's the idea: Often, similar questions can be answered with the same response. By caching an AI response based on one user input, another question with similar user input (for example the same prompt, but phrased differently), can be answered from the cache, because the answer is the same. The answer will be both faster as it comes from the cache and cheaper as no separate AI round trip is needed.
 
 ![Semantic Cache](https://github.com/upstash/semantic-cache-py/blob/master/assets/how-semantic-cache-works.png?raw=true)
 
-The semantic cache SDKs leverage [Upstash Vector](https://upstash.com/docs/vector/overall/getstarted), a scalable vector store that we demonstrated in our [Wikipedia demo app](https://upstash.com/blog/indexing-wikipedia), where we embedded articles from the most spoken languages.
-
-This demo is powered by another tool in our suite: the [rag-chat SDK](https://upstash.com/docs/vector/sdks/rag-chat/gettingstarted), which streamlines the integration of rate limiting, vector stores, chat histories, streaming, and LLMs.
-
-```jsx
-import { RAGChat } from "@upstash/rag-chat";
-
-const ragChat = new RAGChat();
-
-// Add data to the context
-await ragChat.context.add("Light travels at approximately 299,792,458 meters per second.");
-
-// Ask a question
-const response = await ragChat.chat("Explain the speed of light.");
-```
+Under the hood our semantic cache leverages Upstash Vector, a performant & scalable vector database. Just to demonstrate how scalable our vector store really is, we [indexed the entire Wikipedia in 11 languages](https://upstash.com/blog/indexing-wikipedia) just for fun a couple weeks ago.
 
 ### Conclusion
 
-Managing costs in serverless applications can be tricky, especially with unexpected traffic spikes leading to surprise bills. While Vercel offers some safeguards, tools like Upstash Redis for caching, Upstash Workflow for background jobs & delegating API calls, and Ratelimit for controlling traffic provide additional layers of protection.
+Managing costs in serverless applications is important, especially with unexpected traffic spikes leading to surprise bills. In this article, we talked about four ways to reduce serverless cost:
 
-By using these tools, you can optimize performance while keeping costs in check. Whether it’s limiting requests or caching expensive responses, Upstash helps you avoid surprises and ensure your app remains efficient and cost-effective. Start integrating these solutions today to stay in control of both your app and your budget!
+- Redis for caching
+- Workflow for background jobs & offloading API calls
+- Ratelimit for controlling traffic
+- Semantic Cache for optimizing AI apps
+
+With these tools, you can optimize performance and keep costs low. Whether it's limiting requests or caching expensive responses, we help you run an efficient and cost-effective app.
