@@ -1,0 +1,228 @@
+---
+
+title: "Adding Semantic Search to a Directus Application"
+slug: directus-semantic-search
+authors:
+  - noah
+tags: [vector, directus, ai, semantic]
+---
+
+In my [previous blog](https://upstash.com/blog/strapi-semantic-search), we reviewed how to add semantic search to a Strapi Application. In this blog post, we will explore how to add semantic search to a Directus application, another popular headless CMS tool among content management frameworks.
+
+We will first briefly talk about what semantic search is. After that, we will set up the tools we will use in this demo. We will first create a Directus application, which will work as our headless content management system that provides APIs that can be queried by any kind of application, such as website apps, mobile apps, etc. Later, we will set up the Upstash Vector to be used as embedding storage and retriever for the semantic search. Lastly, we will integrate these two tools to enable semantic search among the content we store in the Directus application.
+
+## What is Semantic Search?
+
+Semantic search is a search technique that focuses on understanding the meaning and intent behind a query rather than just matching keywords.
+
+To match the meaning of the query, this technique uses vector representations of the data by extracting the embeddings of the content. The embedding vectors of the data are extracted by using LLM algorithms. Each element of the vector represents a feature-meaning of the data.
+
+In semantic search, the matching result by meaning is obtained by comparing the distance between the stored vectors and the vector of the query.
+
+## Directus Application Setup
+
+Let’s do our typical start and learn about Directus first.
+
+[Directus](https://directus.io) is an open-source data platform that provides a headless CMS (content management system) and APIs for managing content.
+
+Directus allows users to create, manage, and access data via a customizable admin UI and APIs without requiring any specific front-end type. It's often used to manage content for websites, mobile apps, and other digital projects.
+
+A couple of things that Directus offers in addition to its headless architecture:
+
+- RESTful API and GraphQL support, making it easy to query and manipulate data across various platforms.
+- It works with any SQL database (e.g., MySQL, PostgreSQL, SQLite), allowing developers to manage existing databases without altering their structure.
+- The platform includes a user-friendly admin panel allowing owners to manage the data.
+- It offers advanced user management, allowing users to define roles and permissions for different team members.
+- Cloud environment to run the Directus app.
+
+All good? Now, we can create our first Directus app.
+
+We can run the Directus apps in either the Directus cloud or our local machine. We will deploy our Directus app to our local in this demo.
+
+The recommended way to run the Directus app is by running it in Docker. Of course, it can also be run without a container, but an isolated container can be much easier to deploy and run. Never mind, you can create the app with both Docker and NPM.
+
+To deploy with Docker, you should run:
+
+```
+docker run \
+-p 8055:8055 \
+-e SECRET=replace-with-secure-random-value \
+directus/directus
+```
+
+If you have to use NPM, that’s also okay. You can create an initial Directus app by running:
+
+```
+npm init directus-project@latest <project-name>
+```
+
+> You need to have Node18 to run Directus when this blog is posted. As mentioned, Docker is the recommended way.
+
+While creating the Directus app, it asks for the database to be used in the app. We will select SQLite for this basic demo.
+
+```
+**Choose your database client**
+PostgreSQL / Redshift
+CockroachDB (Beta)
+MySQL / MariaDB / Aurora
+❯ SQLite
+Microsoft SQL Server
+Oracle Database
+```
+
+To start the app, we should run:
+
+```
+cd <project-name>
+npx directus start
+```
+
+Once the app runs, you can open the admin panel by going to `http://0.0.0.0:8055/admin`. 
+
+![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXd4k9KjzMGxIE5JPyWkwbAp_KHkU3GSAqTgM2m4zSkdGf6EySJoj9fUx8bihVxnmGeMPVDdLYy2RCbtDgU6V_lVvuzYIkE91y9L80TKb5QEI6K7njI4jMnVO1Flslk70veMNDLLpC0plEg_brDu36JGdFam?key=fRetwLkHYMaVOu9inenb-w)
+
+In our example case, we will create a data collection. This data collection will contain data about books, such as titles, authors and summaries, similar to what we did in the [previous blog](https://upstash.com/blog/strapi-semantic-search).
+
+You can click ' Create collection ' to create that data collection. We can name the collection `books` and keep the rest of the configuration default.  
+
+The collection was created initially without any field. Now, we can add some fields. Let's start with `title` and `author`.  Both fields will be `String`. 
+
+![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXc1MqygGx3cBBw_ZSEV1tnbTjxiBqBsQNEFsTINxD8L9uc5C-7xQZ27wNSK_z_qf_G6a9nt5umnoKeOfUMrqIvh15YtSdRsKoP8bqfNfRSo0gWRGBDfJnsFHYHwvgwK3-BQrbDI4tknTGOraHwmmondRCri?key=fRetwLkHYMaVOu9inenb-w)
+
+In addition to these fields, we will add one more field, `Summary`. This field will contain the short review of the books and will enable us to create vector embeddings from. 
+
+The type of this field will be `Text`.
+
+![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXdndE4IYJ9_e0DT-PpG12YcbvUnqNAVLidQHMvhxoTgJR7K8Phf4PWTP-HP1HyyjDQWEtAUl4fbNaskrC4UUIPyKL1O9C_4CDsFEYqm-qt0QEbxs6L9sc8TPsvaUkYYW-d3x-wqk_GMnUXBcAKfY-8-xm9b?key=fRetwLkHYMaVOu9inenb-w)
+
+Perfect! The collection and its fields are ready. We can reach the books by querying `http://0.0.0.0:8055/items/books`. It should return an empty list for now.
+
+Now we can move to the Upstash Vector setup.
+
+## Upstash Vector Setup
+
+Upstash Vector is a serverless database built to handle vector embeddings. In this post, we’ll save the vector representations of data added to the Directus book collection. The embedding data stored in Upstash Vector will be queried when a semantic search executed. 
+
+We'll refer to the [Upstash documentation](https://upstash.com/docs/vector/overall/getstarted) to create the Upstash Vector database.
+
+Similar to what we have done in [the previous blog](https://upstash.com/blog/strapi-semantic-search#upstash-vector-setup), we will start by logging into the Upstash Console and creating an Index. In the setup pop-up, we'll configure our vector index using a built-in Upstash Vector embedding model. For this demo, we'll use the **bge-base-en-v1.5** model, which has a vector size of 768. We'll also select the Cosine metric for distance calculation. For more information on metrics, refer to the [Upstash Vector documentation](https://upstash.com/docs/vector/features/similarityfunctions).
+
+![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXfLiD1DW5BjtnZjBWbwijYlLKqyIRBH5LbsnF4-jhZyxQR_fA5aaUQWlOOYNP3teelhrtzGQbgLKtMNCv-L-0aSikaFcac5chbXeClsvgJl4Uga7RWaygib5UMC1bU8j6dibvVafRsM9WnXL-qFv3KJSoM?key=fRetwLkHYMaVOu9inenb-w)
+
+We will keep the endpoint and token to use in the Directus app later. 
+
+## Integrating Upstash Vector with Directus Application
+
+Now, it is time for the action!
+
+We need vector embeddings of every data we store in our Directus book collection. To do that, we will need to extract vector embeddings and write to the Upstash Vector Index every time a new book is entered into the collection. 
+
+Directus provides `Custom API Hooks`, which allow custom logic to be run when a specified event occurs within the application. There are different types of events to choose from. For our case, we will use the `<collection>.items.create` event. This hook that listens to this event is triggered when there is a new item in the given collection. 
+
+The easiest way to listen to that event is by creating a custom extension in the Directus application. To create the extension, we should run the following commands:
+
+```
+cd extensions
+npx create-directus-extension@latest
+```
+
+This command will ask you to select the type of the extension. We should choose `hook`. 
+
+```
+**Choose the extension type** (Use arrow keys)
+interface
+display
+layout
+module
+panel
+theme
+❯ hook
+...
+```
+
+In the next steps of the extension creation, we need to define the extension name, which will be `upstash-vector` in this example case. 
+
+The last question is the language of the extension, JS or TS. I will select TS for that example extension. 
+
+Once the command is done, we need to run the extension in another terminal window. 
+
+```
+cd <extension-name>
+npm run dev
+```
+
+After that, restart the app and check if the extension is shown on the admin UI.
+
+![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXdNbK5_6rKhpNEGZeg9Cw041PnckckQEnpzI0CdLIN-1iLnihOK-s05ZV-Q_23zwpr2uOQmVSgBH-z3sJqnJZD8hiuH7e_aDl1oGzHl0RNYcd2DImH9rc_xmeqr4Kqg5HfJbjaDBOTD8a6i03ipNQ6FzuwS?key=fRetwLkHYMaVOu9inenb-w)
+
+Now, we can add the event listener to the extension. We need to create an `index.ts` under the `src` folder in the extension. 
+
+Since this extension will write to the Upstash Vector Index, it needs to connect to the Upstash Vector. For that, we will use Typescript SDK by installing it with the following command.
+
+```
+npm install @upstash/vector
+```
+
+The `index.ts` file is executed to plug the extension into the Directus application. It will contain our `items.create` event listener, and the new item will be added to the Upstash Vector Index whenever there is a new item in the collection. 
+
+```typescript
+import { defineHook } from '@directus/extensions-sdk';  
+import { Index } from '@upstash/vector';  
+  
+export default defineHook(({ action }) => {  
+  
+	action('items.create', async ({ collection, payload }) => {  
+		if (collection !== 'books') return;  
+		console.log('Item created!');  
+		const index = new Index({  
+			url: "<UPSTASH-VECTOR-ENDPOINT>",  
+			token: "<UPSTASH-VECTOR-TOKEN>",  
+		})  
+		index.upsert({  
+			id: `${payload.title}.${payload.author}`,  
+			data: `${payload.summary}`,  
+			metadata: {metadata_field: "metadata_value"},  
+		}).then(r => console.log("Indexed into Upstash Vector"));  
+	});  
+});
+```
+
+Remember to replace the endpoint and token placeholder with the Upstash Vector endpoint and token from the [Upstash console](https://console.upstash.com/vector).
+
+Now, it is time to test the integration. For this, we will create an item as an example. We can create an item from the `content` tab in the admin panel.
+
+![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXdXvDj19fS4qtN3QwJiCbhuu-FMoOHtXNlDE9SMeNoFDTGfMou--9bIhkf98tYnewTQNOrW1r-p_iYORwe1boZrZAFSmW4SnO1A1qov8ghY10R8e4lDeLVGaiuQuIYJVFWP5Bdgo9MfWo_LvTPhyWq4Dtis?key=fRetwLkHYMaVOu9inenb-w)
+
+Let's pick a book and write it to the Directus `books` collection. 
+
+![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXfUuWxsYs8TTVzpccQfQrEpd3bGsVwOmalygRwnxE6HBNTYV981aJnnDQl7vyYZORH5hOfBzZl9jnm8JE4WqWRRPdJU5dqDHdveioYouk2NcmzIQqsaWwAxpMgVH2eW9gHH8aWXm0arlHsMx5PGnF4brcVl?key=fRetwLkHYMaVOu9inenb-w)
+
+Once we save the new item, we should be able to see the vector representation of the book summary in the data browser tab of the Upstash Vector Index console.
+
+![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXe5azf1A_uIlRXo9zN0NOXLgZ_I9k2rCB92iEzKecfKMpV3X1FX_W1ySDH5Rryjq_uYRoPvvOCdvi3BHzsiR1Lquuov15FaXrRf7ez9tsGVyiBHP0xBhw_47CMpNHA9zqagLvqr8r7OT_g3-HZcmzKNGjP2?key=fRetwLkHYMaVOu9inenb-w)
+
+Vector representations of the items in the Directus data collection were needed for semantic search. With this Directus extension, every item will have its embeddings stored in the Upstash Vector automatically. 
+
+A semantic search can be done by querying the Upstash Vector Index with the given search. The most basic implementation of the query can be seen below. 
+
+```typescript
+const {Index} = require("@upstash/vector");
+ 
+const index = new Index({
+	url: "<UPSTASH-VECTOR-ENDPOINT>",
+	token: "<UPSTASH-VECTOR-TOKEN>",
+})
+ 
+index.query(
+	data="Enter the query",
+	top_k=10,
+	include_vectors=True,
+	include_metadata=True
+)
+```
+
+This basic implementation is for returning the first 10 most relevant results of the semantic search.
+
+## Conclusion
+
+In this blog, we implemented a semantic search for a simple Directus application by integrating it with Upstash Vector. The similarity function in Upstash Vector compares the query's meaning with the book data to find the best matches. This allows users to search for books and retrieve the most relevant results based on the meaning of their queries. 
