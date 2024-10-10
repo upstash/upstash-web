@@ -360,7 +360,7 @@ export const authors: Record<
   },
   abdullahenes: {
     name: "Abdullah Enes Gules",
-    title: "Software Engineer (Guest Author)",
+    title: "Software Engineer @Upstash",
     url: "https://www.linkedin.com/in/abdullah-enes-g%C3%BCle%C5%9F/",
     image: "abdullahenes.jpg",
   },
