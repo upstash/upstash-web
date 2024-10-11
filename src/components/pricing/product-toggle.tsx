@@ -10,7 +10,6 @@ import IconVector from "@/components/icon-vector";
 
 const productConfig = {
   "/redis": { name: "Redis", Icon: IconRedis },
-  "/kafka": { name: "Kafka", Icon: IconKafka },
   "/vector": { name: "Vector", Icon: IconVector },
   "/qstash": { name: "QStash", Icon: IconQStash },
 } as const;
