@@ -64,8 +64,8 @@ export default function FAQ() {
           and regions. Even if you do not access your data, we have to keep it
           persistent in Cloud Provider’s block storage (eg AWS EBS, S3) for
           durability. To calculate the total storage cost, we take daily average
-          of your data size and multiply with $0.25 at the end of the month. For
-          instance, if you have 1 GB data in your database throughout month, you
+          of your total data size in all replicase and multiply with $0.25 at the end of the month. For
+          instance, if you have 1 GB data in your replicas throughout month, you
           will pay $0.25. If you are using your database as a cache; then it is
           a good practice to set a timeout (EXPIRE) for your keys to minimize
           the cost.
