@@ -8,13 +8,13 @@ tags: [serverless, redis, upstash, vercel, feature-flags]
 
 Updates are part of every software; you need to fix bugs, add new features, and generally iterate to make things more secure, reliable, or faster.
 
-But coupling new features or changes in general with deployment isn’t always a good idea. Sometimes you follow recurring deployment schedules, but the marketing team isn’t ready to announce the new feature. If the changes are hardcoded, the marketing team might need a developer to activate or deactivate them.
+But coupling new features or changes in general with deployment isnât always a good idea. Sometimes you follow recurring deployment schedules, but the marketing team isnât ready to announce the new feature. If the changes are hardcoded, the marketing team might need a developer to activate or deactivate them.
 
-Feature flags, or feature toggles, are a way to decouple your changes from a deployment. You implement a change, but you hide it behind an if-statement; as long as a variable is false, the software will use the version before your change; if the variable is `true`, it will be the new version. If the variable's value comes from a database the marketing team can access, they can toggle these changes without needing code changes.
+Feature flags, or feature toggles, are a way to decouple your changes from a deployment. You implement a change, but you hide it behind an if-statement; as long as a variable is false, the software will use the version before your change; if the variable is `true`, it will be the new version. If the variable's value comes from a database that the marketing team can access, they can toggle these changes without needing code changes.
 
-Upstash Redis® is such a database. It’s a simple key-value store you can use to store your feature flags. Since it’s blazingly fast, it doesn’t add much to your latency to check for multiple different flags in your application.
+Upstash RedisÂ® is such a database. Itâs a simple key-value store you can use to store your feature flags. Since itâs blazingly fast, it doesnât add much to your latency to check for multiple different flags in your application.
 
-This tutorial will teach you how to build a simple feature flag mechanism for your Next.js app. We will deploy on Vercel and use Upstash Redis® as storage.
+This tutorial will teach you how to build a simple feature flag mechanism for your Next.js app. We will deploy on Vercel and use Upstash RedisÂ® as storage.
 
 ### Prerequisites
 
@@ -24,15 +24,15 @@ Because we use NPM, you also need a current installation of [Node.js](https://no
 
 ### Initializing a Next.js Project
 
-Our first step is creating a new Next.js project. You do this with the following command:
+Our first step is to create a new Next.js project. You do this with the following command:
 
 ```bash
 $ npx create-next-app upstash-next-feature-flags
 ```
 
-### Creating the Upstash Redis® Connection
+### Creating the Upstash RedisÂ® Connection
 
-Next, we must connect our Next.js app with an Upstash Redis® database. For this, we need to install the `@upstash/redis` package and create a small wrapper around it.
+Next, we must connect our Next.js app with an Upstash RedisÂ® database. For this, we need to install the `@upstash/redis` package and create a small wrapper around it.
 
 ```
 $ npm i @upstash/redis
@@ -55,7 +55,7 @@ export async function flagIsActive(flagName) {
 }
 ```
 
-We will get the API credentials from environment variables to set them up later in this tutorial. The `flagIsActive` function will query Redis® and convert the returned value to a `boolean`. This conversion is necessary because we will save the flag as a number in Redis.
+We will get the API credentials from environment variables to set them up later in this tutorial. The `flagIsActive` function will query RedisÂ® and convert the returned value to a `boolean`. This conversion is necessary because we will save the flag as a number in Redis.
 
 ### Creating the API Route
 
@@ -76,7 +76,7 @@ export default async function handler(request, response) {
   if (newSortingAlgorithm) sort = selectionSort;
 
   const { numbers } = request.body;
-  const sorted = sort(numbers);
+  the sorted = sort(numbers);
 
   response.status(200).json({
     numbers: sorted,
@@ -88,7 +88,7 @@ export default async function handler(request, response) {
 const bucketSort = (arr, size = 5) => {
   const min = Math.min(...arr);
   const max = Math.max(...arr);
-  const buckets = Array.from(
+  the buckets = Array.from(
     { length: Math.floor((max - min) / size) + 1 },
     () => [],
   );
@@ -102,9 +102,9 @@ const bucketSort = (arr, size = 5) => {
 const selectionSort = (arr) => {
   const a = [...arr];
   for (let i = 0; i < a.length; i++) {
-    const min = a
+    the min = a
       .slice(i + 1)
-      .reduce((acc, val, j) => (val < a[acc] ? j + i + 1 : acc), i);
+      .reduced((acc, val, j) => (val < a[acc] ? j + i + 1 : acc), i);
     if (min !== i) [a[i], a[min]] = [a[min], a[i]];
   }
   return a;
@@ -113,7 +113,7 @@ const selectionSort = (arr) => {
 
 This API route is a simple number sorter. It takes an array of unsorted numbers and will use one of two sorting algorithms to sort them.
 
-These sorting algorithms stand for any change you want to “toggle” in your application. Put them both into your code and switch between them via the `flagIsActive` function by changing the value in Redis.
+These sorting algorithms stand for any change you want to âtoggleâ in your application. Put them both into your code and switch between them via the `flagIsActive` function by changing the value in Redis.
 
 We call the `flagIsActive` function and give it the name of the flag we want to check. If the flag is set to `1` in Redis, this function returns `true`; otherwise, it will return `false`.
 
@@ -121,27 +121,27 @@ After sorting, the API route responds with the sorted array.
 
 ### Pushing the Project to GitHub
 
-After implementing everything, we need to push the project to a repository on GitHub to make it accessible for Verce’ls deployment service. [GitHub explains how to create a repository in their docs](https://docs.github.com/en/get-started/quickstart/create-a-repo).
+After implementing everything, we need to push the project to a repository on GitHub to make it accessible for Vercel's deployment service. [GitHub explains how to create a repository in their docs](https://docs.github.com/en/get-started/quickstart/create-a-repo).
 
 Creating an empty repository will automatically show you how you can link it with the project we created.
 
-### Creating an Upstash Redis® Database
+### Creating an Upstash RedisÂ® Database
 
 You can create a new database in [the Upstash console](https://console.upstash.com/). Figure 1 shows a good config for this tutorial.
 
 ![Figure 1: Database configuration](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/0690e037umqy8w19cvj8.png)
 
-As Figure 1 says, one database is free, so you won’t have to pay anything for this tutorial.
+As Figure 1 says, one database is free, so you wonât have to pay anything for this tutorial.
 
 Keep the browser tab with the Upstash console open because we need it later to gather the database credentials.
 
 ### Linking the GitHub Repository with Vercel
 
-If you use your GitHub account to log into Vercel, adding a GitHub repository only takes a few clicks. In Figure 2, you see the top left of the Vercel dashboard; click on “Add New…” and choose “Project.”
+If you use your GitHub account to log into Vercel, adding a GitHub repository only takes a few clicks. In Figure 2, you see the top left of the Vercel dashboard; click on âAdd Newâ¦â and choose âProject.â
 
 ![Figure 2: Create a new Vercel project](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/ckg6ninjnqfu6up9jjvl.png)
 
-Choose “Continue with GitHub” and one of the “import” buttons that belong to the repository you created in the previous step.
+Choose âContinue with GitHubâ and one of the âimportâ buttons that belong to the repository you created in the previous step.
 
 ![Figure 3: Import Git Repository](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/0nqnjcqemjxjy7i17krc.png)
 
@@ -153,7 +153,7 @@ They are called `UPSTASH_TOKEN` and `UPSTASH_URL`, and you find them in your Ups
 
 ![Figure 5: Upstash Database credentials](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/alnvk28gsybwtjfm33i1.png)
 
-When you press the big “Deploy” button, Vercel will clone your GitHub repository and deploy it on its infrastructure.
+When you press the big âDeployâ button, Vercel will clone your GitHub repository and deploy it on its infrastructure.
 
 ### Switching Between Implementations with Redis
 
@@ -165,7 +165,7 @@ Figure 6 illustrates where to find the CLI and the command we need to execute to
 
 ![Figure 6: Upstash Redis CLI](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/hu3po5tkvuaayx01tgtd.png)
 
-If we would delete `newSortingAlgorithm` or set it to `0`, it would switch the flag back to `false,` and our API route would use the old algorithm.
+If we were to delete `newSortingAlgorithm` or set it to `0`, it would switch the flag back to `false`, and our API route would use the old algorithm.
 
 ### Using the API Route
 
@@ -180,7 +180,7 @@ The following command sends such an object:
      API_ROUTE_URL
 ```
 
-You have to find the correct API_ROUTE_URL in Vercel. You should see a “Domains” category in your project on the Vercel dashboard, like in Figure 7.
+You have to find the correct API_ROUTE_URL in Vercel. You should see a âDomainsâ category in your project on the Vercel dashboard, like in Figure 7.
 
 ![Figure 7: Vercel project view](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/nv9nch9r5cvkp9dp1m4w.png)
 
@@ -188,6 +188,6 @@ The response should be a JSON object that includes the sorted `numbers` and a `n
 
 ### Summary
 
-Feature flags are an excellent way to decouple deployments from feature releases. They turn a hard-coded change into setting a simple value in a database, which gives more flexibility to your teams and gives more power to non-technical people.
+Feature flags are an excellent way to decouple deployments from feature releases. They transform a hard-coded change into the setting of a simple value in a database, which gives more flexibility to your teams and more power to non-technical people.
 
-With a fast database like Upstash Redis, it’s easy to implement the feature flag pattern for your application without sacrificing much of your performance. Upstash Redis has sub-second access times, and you can deploy it near your FaaS if required. All that with on-demand pricing, so you never pay for resources you don’t use.
+With a fast database like Upstash Redis, itâs easy to implement the feature flag pattern for your application without sacrificing much of your performance. Upstash Redis has sub-second access times, and you can deploy it near your FaaS if required. All that with on-demand pricing, so you never pay for resources you donât use.
