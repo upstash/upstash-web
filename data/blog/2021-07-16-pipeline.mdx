@@ -6,7 +6,7 @@ image: pipeline.png
 tags: [redis, database, serverless, pipeline]
 ---
 
-Upstash supports the REST API in addition to the native Redis API. The REST API helps developers access their Redis without connection issues from serverless and edge functions. However, if you execute multiple Redis commands in the same function, this means you will make a call to the database multiple times. One of our community members (@MasterGates) came with a great suggestion in our Discord channel. Pipeline API:
+Upstash supports the REST API in addition to the native Redis API. The REST API helps developers access their Redis without connection issues from serverless and edge functions. However, if you execute multiple Redis commands in the same function, this means you will make a call to the database multiple times. One of our community members (@MasterGates) came up with a great suggestion in our Discord channel: Pipeline API:
 
 ![pipeline api](/blog/pipeline.png "image_tooltip")
 
@@ -42,8 +42,8 @@ Response syntax:
 
 ## Ordering Guarantee and Atomicity
 
-Upstash guarantees that the commands in the pipeline are executed in the same order. However, atomicity is not guaranteed. Commands sent by other clients can interleave with the pipeline. Some commands may fail while the remaining are executed with success.
+Upstash guarantees that the commands in the pipeline are executed in the same order. However, atomicity is not guaranteed. Commands sent by other clients can interleave with the pipeline. Some commands may fail while the remaining ones are executed with success.
 
-Another limitation of the pipeline API is that your commands should be independent, so the response of a command should not be needed by another command in the pipeline.
+Another limitation of the pipeline API is that your commands should be independent, so the response of one command should not be needed by another command in the pipeline.
 
-Check our documentation to learn more about the Upstash REST API. We continue to develop the API guided by our users, so please share your feedback on Twitter or Discord.
+Check our documentation to learn more about the Upstash REST API. We continue to develop the API, guided by our users, so please share your feedback on Twitter or Discord.
