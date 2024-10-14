@@ -6,12 +6,12 @@ image: roadmap.png
 tags: [redis, database, nextjs]
 ---
 
-We have been developing example applications to showcase how easy and practical it is to develop serverless applications with Redis. So far, the most popular of those [examples](https://github.com/upstash/examples) is the Roadmap Voting Application. When we started using it in real life, we encountered two main problems:
+We have been developing example applications to showcase how easy and practical it is to develop serverless applications with Redis. So far, the most popular of these [examples](https://github.com/upstash/examples) is the Roadmap Voting Application. As we started to use it in real life, we encountered two main problems:
 
 - We started to see spam entries. The application does not have an admin dashboard, so one had to connect to Redis to delete an entry.
-- We released some features on the list, but there was no way to flag them as released and remove them from the voting list.
+- We released some features on the list but there was no way to flag them as released and remove them from the voting list.
 
-To solve both, we decided to add authentication. Thanks to authentication:
+To solve these problems, we decided to add authentication. Thanks to authentication:
 
 - Users must sign in to add new feature requests.
 - We can set ourselves as admins, so we can remove or release the feature requests.
@@ -26,4 +26,4 @@ released.
 
 You can easily create and deploy a Roadmap Voting App for your project. Follow the steps in the [repo](https://github.com/upstash/roadmap). You won't need to write any code, but you will have to update the environment variables to configure Redis and Auth0.
 
-If you prefer the simpler version without Auth0, check our [examples repo](https://github.com/upstash/redis-examples/tree/master/roadmap-voting-app) for the older version.
+If you prefer a simpler version without Auth0, check out our [examples repo](https://github.com/upstash/redis-examples/tree/master/roadmap-voting-app) for the older version.
