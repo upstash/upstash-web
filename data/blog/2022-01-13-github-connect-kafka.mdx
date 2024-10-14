@@ -1,23 +1,23 @@
 ---
 slug: github-connect-kafka
-title: "Send Github Events to Kafka Using Vercel Functions"
+title: "Send GitHub Events to Kafka Using Vercel Functions"
 authors: [enes]
 tags: [kafka, github, vercel]
 ---
 
-In this post, we will showcase how to send Github events to Kafka. We will use Vercel functions as a webhook to send events to Upstash Kafka.
+In this post, we will showcase how to send GitHub events to Kafka. We will use Vercel functions as a webhook to send events to Upstash Kafka.
 
-You can send all types of repository events to Kafka. We will use Kafka as a persistent hub for our data thanks to its replication and durability capability. Storing Github events in Kafka opens possibilities for both streaming and batching use cases. You can replicate the events to a database for analytical purposes. At the same time, you can run real time processes to trigger alerts for your security team.
+You can send all types of repository events to Kafka. We will use Kafka as a persistent hub for our data thanks to its replication and durability capabilities. Storing GitHub events in Kafka opens possibilities for both streaming and batching use cases. You can replicate the events to a database for analytical purposes. At the same time, you can run real-time processes to trigger alerts for your security team.
 
 ![kafka github 1](/blog/kafkagithub/g1.png)
 
 ### Step 1: Kafka Setup
 
-We will use Upstash Kafka which has a REST API and is designed for serverless functions. You can create a free Kafka cluster on [Upstash](https://console.upstash.com). Create a topic with the name 'github-events'. When the cluster is ready, find the REST API section. You will need REST_URL, REST_USERNAME and REST_PASSWORD in the next step.
+We will use Upstash Kafka which has a REST API and is designed for serverless functions. You can create a free Kafka cluster on [Upstash](https://console.upstash.com). Create a topic with the name 'github-events'. When the cluster is ready, find the REST API section. You will need REST_URL, REST_USERNAME, and REST_PASSWORD in the next step.
 
-### Step 2: Webhook with Vercel functions
+### Step 2: Webhook with Vercel Functions
 
-In this step, we will implement a webhook which will receive a post request and produce an event to Upstash Kafka using the REST API. We will use Vercel functions but you can choose your familiar platform (e.g. AWS Lambda).
+In this step, we will implement a webhook that will receive a post request and produce an event to Upstash Kafka using the REST API. We will use Vercel functions, but you can choose your familiar platform (e.g., AWS Lambda).
 
 Create an empty Next.js app and add the following function (/pages/api/kafka.js)
 
@@ -41,7 +41,7 @@ export default async function handler(req, res) {
 }
 ```
 
-You need to replace `address`, `user`, and `pass` with the values that you copied from Upstash console.
+You need to replace `address`, `user`, and `pass` with the values that you copied from the Upstash console.
 
 Deploy your app to Vercel:
 
@@ -66,13 +66,13 @@ curl https://full-mantis-14187-us1-rest-kafka.upstash.io/consume/GROUP_NAME/GROU
 
 Note: Creating a consumer group can take some time, so run the curl command multiple times if it returns empty.
 
-### Step 3: Github Configuration
+### Step 3: GitHub Configuration
 
-Now we have our webhook ready so we can link our Github repo to it. In your repo page, click on `Settings > Webhooks > Add webhook`. In the form, enter the url of your Vercel function, select the event types that you want to be sent.
+Now we have our webhook ready so we can link our GitHub repo to it. On your repo page, click on `Settings > Webhooks > Add webhook`. In the form, enter the URL of your Vercel function, select the event types that you want to be sent.
 
 ![kafka github 2](/blog/kafkagithub/g2.png)
 
-Now, you can test your webhook by pushing a commit to your repo. You can also check the recent deliveries and redeliver an event using the Github dashboard for testing.
+Now, you can test your webhook by pushing a commit to your repo. You can also check the recent deliveries and redeliver an event using the GitHub dashboard for testing.
 
 ![kafka github 3](/blog/kafkagithub/g3.png)
 
@@ -84,4 +84,4 @@ In case of any issue, check the Vercel function logs (`Vercel > View function lo
 
 ### Conclusion
 
-Github webhooks enable developers to run custom logic triggered by the repository events. In this article, we have used Github webhooks to produce events for Kafka. Once the data is stored in Kafka, there are many possible way to leverage the data.
+GitHub webhooks enable developers to run custom logic triggered by repository events. In this article, we have used GitHub webhooks to produce events for Kafka. Once the data is stored in Kafka, there are many possible ways to leverage the data.
