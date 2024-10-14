@@ -1,28 +1,28 @@
 ---
 slug: fastly-compute-edge-with-redis
-title: "Use Redis® in Fastly Compute"
+title: "Use RedisÂ® with Fastly Compute"
 authors: [enes]
 image: fastly/cover.png
 tags: [serverless, fastly, edge, redis]
 ---
 
-- This example uses an older version of Fastly CLI. Check [this article](/docs/redis/quickstarts/fastlycompute) for an up-to-date version.
+- This example uses an older version of the Fastly CLI. Check [this article](/docs/redis/quickstarts/fastlycompute) for an up-to-date version.
 
-In this post, we will write a simple application which will run on [Fastly Compute@Edge](https://docs.fastly.com/products/compute-at-edge). The application will access [Upstash Redis](https://upstash.com) to keep track of page views.
+In this post, we will write a simple application that will run on [Fastly Compute@Edge](https://docs.fastly.com/products/compute-at-edge). The application will access [Upstash Redis](https://upstash.com) to keep track of page views.
 
 ### Motivation
 
-Edge Computing is one of the most exciting trends in recent years. CDN services like Cloudflare and Fastly started to enable users to run their applications on their edge infrastructure. This helps developers to build globally distributed, high performance applications.
+Edge Computing is one of the most exciting trends in recent years. CDN services like Cloudflare and Fastly have started to enable users to run their applications on their edge infrastructure. This helps developers build globally distributed, high-performance applications.
 
-Compute@Edge is the serverless platform from Fastly. You can write your code in Rust, AssemblyScript, Javascript and run in Fastly’s edge network. Fastly Compute functions are stateless. This means developers should keep their application state at an external storage. But Fastly uses WebAssembly as the runtime for the functions and it does not allow TCP connections. Upstash Redis® is a perfect solution for Fastly Compute functions with REST API, global replication and serverless pricing.
+Compute@Edge is the serverless platform from Fastly. You can write your code in Rust, AssemblyScript, JavaScript, and run it in Fastlyâs edge network. Fastly Compute functions are stateless. This means developers should keep their application state in external storage. But Fastly uses WebAssembly as the runtime for the functions and it does not allow TCP connections. Upstash RedisÂ® is a perfect solution for Fastly Compute functions with a REST API, global replication, and serverless pricing.
 
 See [the code](https://github.com/upstash/examples/tree/master/examples/using-fastly-compute) and [the demo](https://horribly-organic-spider.edgecompute.app)
 
 ## Project Setup
 
-Create a database in the [Upstash Console](https://console.upstash.com/). Prefer Global Database for low latency from edge locations.
+Create a database in the [Upstash Console](https://console.upstash.com/). Prefer a Global Database for low latency from edge locations.
 
-Install fastly cli:
+Install Fastly CLI:
 
 ```
 brew install fastly/tap/fastly
@@ -34,10 +34,10 @@ Configure your CLI with your Fastly account:
 fastly configure
 ```
 
-Create a folder and init your project by running `fastly compute init` inside the folder:
+Create a folder and initialize your project by running `fastly compute init` inside the folder:
 
 ```shell
-➜  using-fastly-compute git:(master) ✗ fastly compute init
+â  using-fastly-compute git:(master) â fastly compute init
 
 Creating a new Compute@Edge project.
 
@@ -66,10 +66,10 @@ Starter kit:
     https://github.com/fastly/compute-starter-kit-javascript-default
 Choose option or paste git URL: [1]
 
-✓ Initializing...
-✓ Fetching package template...
-✓ Updating package manifest...
-✓ Initializing package...
+â Initializing...
+â Fetching package template...
+â Updating package manifest...
+â Initializing package...
 
 Initialized package using-fastly-compute to:
 
@@ -89,7 +89,7 @@ Install upstash-redis and flight-path:
 npm install @upstash/redis flight-path
 ```
 
-Update your webpack.config.js adding these plugins:
+Update your webpack.config.js by adding these plugins:
 
 ```json
 plugins: [
@@ -120,13 +120,13 @@ You need to create a Fastly Compute Service and paste your Fastly Service Id abo
 
 ![alt_text](/blog/fastly/serviceid.png "image_tooltip")
 
-Also you need to add the Upstash REST URL as a backend to your Fastly Compute Service. Fastly Compute requires any external network connection to be registered as a backend. On services screen, click `Edit Configuration` > `Clone version x to edit` > `Origins` > `Create a host`
+Also, you need to add the Upstash REST URL as a backend to your Fastly Compute Service. Fastly Compute requires any external network connection to be registered as a backend. On the services screen, click `Edit Configuration` > `Clone version x to edit` > `Origins` > `Create a host`.
 
-After adding the host, click to edit icon to add a name for the host. Set the name as `upstash-db` which will be equal to the `backend` option while we are configuring the upstash-redis client. Remove the `https://` part from the url. Finally click on `Activate` button on top right corner to activate the configuration with the current deployment.
+After adding the host, click the edit icon to add a name for the host. Set the name as `upstash-db`, which will be equal to the `backend` option while we are configuring the upstash-redis client. Remove the `https://` part from the URL. Finally, click on the `Activate` button on the top right corner to activate the configuration with the current deployment.
 
 ![alt_text](/blog/fastly/edithost.png "image_tooltip")
 
-`Local_server.backends.upstash-db` is required for you to run your function locally. Replace url with the REST url of your Upstash Database.
+`Local_server.backends.upstash-db` is required for you to run your function locally. Replace the URL with the REST URL of your Upstash Database.
 
 ## Implementation
 
@@ -145,18 +145,18 @@ const redis = new Redis({
 });
 
 router.get("/", async (req, res) => {
-  const count = await redis.incr("count");
+  the count = await redis.incr("count");
   res.send(`Fastly with Upstash! Count: ${count}`);
 });
 
 router.listen();
 ```
 
-You need to copy and paste REST URL and token from the [Upstash console](https://console.upstash.com)
+You need to copy and paste the REST URL and token from the [Upstash console](https://console.upstash.com).
 
-We simply connect to Upstash using [upstash-redis](https://github.com/upstash/upstash-redis) client. We increment a counter and return the response.
+We simply connect to Upstash using the [upstash-redis](https://github.com/upstash/upstash-redis) client. We increment a counter and return the response.
 
-Note that you can not use other Redis® clients as they use TCP connection which is not supported by Fastly Compute.
+Note that you cannot use other RedisÂ® clients as they use a TCP connection which is not supported by Fastly Compute.
 
 While authenticating with `auth()`, you need to add `backend: upstash-db` as an extra request option. This is required as Fastly Compute requires any external network connection to be registered as a backend.
 
@@ -176,13 +176,13 @@ Build and deploy your function with:
 fastly compute publish
 ```
 
-Your application will be built and deployed by Fastly. The command will log the url so you can test if it is working:
+Your application will be built and deployed by Fastly. The command will log the URL so you can test if it is working:
 
 [https://horribly-organic-spider.edgecompute.app](https://horribly-organic-spider.edgecompute.app)
 
 ## Closing Words
 
-In this article we have created a very simple application which runs on Fastly Compute at Edge using Upstash. We love to improve [Upstash](https://upstash.com) and our content by your feedback. Let us know your thoughts on [Twitter](https://twitter.com/upstash) or [Discord](https://discord.gg/w9SenAtbme).
+In this article, we have created a very simple application that runs on Fastly Compute at Edge using Upstash. We love to improve [Upstash](https://upstash.com) and our content with your feedback. Let us know your thoughts on [Twitter](https://twitter.com/upstash) or [Discord](https://discord.gg/w9SenAtbme).
 
 ## External Links
 

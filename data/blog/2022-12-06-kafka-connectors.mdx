@@ -6,41 +6,41 @@ authors:
 tags: [kafka, serverless, announcement]
 ---
 
-Here at Upstash, we provide Serverless Kafka with a per usage pricing which is loved and used extensively.
-There was a main ingredient missing from this until now, which is Kafka Connectors.
+Here at Upstash, we provide Serverless Kafka with a per-usage pricing model that is loved and extensively used.
+There was a main ingredient missing from this until now, which is the Kafka Connectors.
 
-## What is Kafka Connect ?
+## What is Kafka Connect?
 
-One of the main usecases of Kafka is to use it as a bridge between different systems
+One of the main use cases of Kafka is to use it as a bridge between different systems,
 so that these services are decoupled from each other.
 
-You can collect your data from different databases to Kafka to be used later from various decoupled
+You can collect data from different databases to Kafka to be used later by various decoupled
 applications for your needs.
-Also you may need to store what is in your Kafka topics to a well known database/datalake for analytical queries.
+Also, you may need to store what is in your Kafka topics in a well-known database/datalake for analytical queries.
 
 [Kafka Connect](https://kafka.apache.org/documentation/#connect) is here so that you don't need to implement
-a single line of code to Connect external systems to Kafka.
+a single line of code to connect external systems to Kafka.
 
-There is still a problem tough. You need to set up and manage connectors yourself.
-As we always do, we don't want our users to manage a server or a process.
-And again, we are here to get that burden of your shoulders.
+There is still a problem though. You need to set up and manage connectors yourself.
+As we always do, we don't want our users to manage a server or process.
+And again, we are here to take that burden off your shoulders.
 
-To help you, we are proudly announcing **managed**, **low latency** and **free** [Upstash Kafka Connectors](/docs/kafka/connect).
+To help you, we are proudly announcing **managed**, **low latency**, and **free** [Upstash Kafka Connectors](/docs/kafka/connect).
 
 With **Upstash Serverless Kafka Connectors**,
 
 - You don't need to worry about the health/scale of your Kafka Connectors. It is 24/7 **managed** by our team for you.
-- Your Kafka Connectors are right besides your Kafka Cluster so that you benefit them with **low latency**.
-- And unlike the Managed Kafka Connect Providers, it is **free**. You only pay for per message activity on your
+- Your Kafka Connectors are right beside your Kafka Cluster, so you benefit from them with **low latency**.
+- And unlike the Managed Kafka Connect Providers, it is **free**. You only pay for the per-message activity on your
   Kafka topics. There is no additional cost for using Upstash Kafka Connectors.
 
-We will be starting with following connectors:
+We will be starting with the following connectors:
 
 - [Mongo Source Connector](/docs/kafka/mongosource)
 - [Mongo Sink Connector](/docs/kafka/mongosink)
 - [Debezium Mongo Source Connector](/docs/kafka/debeziummongo)
-- [Debezium Mysql Source Connector](/docs/kafka/debeziummysql)
-- [Debezium PostgreSql Source Connector](/docs/kafka/debeziumpsql)
+- [Debezium MySQL Source Connector](/docs/kafka/debeziummysql)
+- [Debezium PostgreSQL Source Connector](/docs/kafka/debeziumpsql)
 - [Aiven JDBC Source Connector](/docs/kafka/aivenjdbcsource)
 - [Aiven JDBC Sink Connector](/docs/kafka/aivenjdbcsink)
 

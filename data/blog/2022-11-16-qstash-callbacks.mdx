@@ -6,9 +6,9 @@ tags: [qstash, serverless, callbacks, vercel]
 ---
 
 Earlier this year, we released [QStash](https://upstash.com/qstash), a message queue and scheduler designed for serverless and edge platforms.
-Today we're excited to announce: QStash Callbacks.
+Today, we're excited to announce: QStash Callbacks.
 
-QStash solved the problem of using queues and scheduling messages in serverless functions. But until now this was a one way street, where you could only send messages but had no way of accessing the response of the destination API.
+QStash solved the problem of using queues and scheduling messages in serverless functions. But until now, this was a one-way street, where you could only send messages but had no way of accessing the response of the destination API.
 With QStash Callbacks, you can now send messages and get the response pushed back to you.
 
 ## How it works
@@ -23,8 +23,8 @@ With QStash Callbacks, you can now send a message and get the response pushed ba
 
 1. You publish a message to QStash with a callback URL.
 2. QStash sends the message to the destination API and waits for a response.
-3. QStash waits for the response
-4. The response status, body and headers are sent to the callback URL.
+3. QStash waits for the response.
+4. The response status, body, and headers are sent to the callback URL.
 
 ## How to use it
 
@@ -42,12 +42,12 @@ curl -X POST \
 }'
 ```
 
-After receiving a response from the destination api, we immediately publish a new message to the callback URL. The message body is a JSON object with the following fields:
+After receiving a response from the destination API, we immediately publish a new message to the callback URL. The message body is a JSON object with the following fields:
 
 ```json
 {
   "status": 200,
-  "sourceMessasgeId": "msg_xxx" // The ID of the message that triggered the callback
+  "sourceMessageId": "msg_xxx", // The ID of the message that triggered the callback
   "headers": {
     "key": ["value"]
   },
@@ -60,9 +60,9 @@ You should then [verify the signature](/docs/qstash/howto/signature) just like y
 
 ### Example
 
-Using callbacks opens up a lot of new use cases. For example, you can now use QStash to call 3rd party APIs and use the response to update your database.
+Using callbacks opens up a lot of new use cases. For example, you can now use QStash to call third-party APIs and use the response to update your database.
 
-[Dom](https://twitter.com/dom__inic) from our friends at [Vercel](https://vercel.com) has already built an example project that uses QStash callbacks to call the DALL-E API and store the generated images in redis to show them in the UI.
+[Dom](https://twitter.com/dom__inic) from our friends at [Vercel](https://vercel.com) has already built an example project that uses QStash callbacks to call the DALL-E API and store the generated images in Redis to show them in the UI.
 Check it out here:
 
 - [Source Code](https://github.com/domeccleston/dalle-2)
@@ -70,7 +70,7 @@ Check it out here:
 
 ### Future
 
-Please let us know what you would like to build with callbacks or if you have feedback on [Twitter](https://twitter.com/upstash) or [Discord](https://upstash.com/discord), we're excited to see what you come up with!
+Please let us know what you would like to build with callbacks or if you have feedback on [Twitter](https://twitter.com/upstash) or [Discord](https://upstash.com/discord); we're excited to see what you come up with!
 
 For a more in-depth guide on how to use callbacks, please visit our
 [documentation](/docs/qstash/features/callbacks).

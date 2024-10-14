@@ -19,13 +19,13 @@ tags:
   ]
 ---
 
-Maintaining your system's availability is one of the most critical tasks for any product. Unfortunately, people might abuse it by overwhelming your resources, or you want to limit the usage and charge for it. Rate limiting is a standard solution to many of these problems and should work out of the box. After all, you have already built your system and don't want to spend even more time designing a rate-limiting system that works well in a stateless environment such as serverless functions.
+Maintaining your system's availability is one of the most critical tasks for any product. Unfortunately, people might abuse it by overwhelming your resources, or you may want to limit the usage and charge for it. Rate limiting is a standard solution to many of these problems and should work out of the box. After all, you have already built your system and don't want to spend even more time designing a rate-limiting system that works well in a stateless environment such as serverless functions.
 
 ## Announcing @upstash/ratelimit
 
-Available on [GitHub](https://github.com/upstash/ratelimit), [npm](https://www.npmjs.com/package/@upstash/ratelimit) or [Deno](https://deno.land/x/upstash_ratelimit)
+Available on [GitHub](https://github.com/upstash/ratelimit), [npm](https://www.npmjs.com/package/@upstash/ratelimit), or [Deno](https://deno.land/x/upstash_ratelimit)
 
-Today we are releasing `@upstash/ratelimit`, a solution for rate-limiting in serverless environments, such as Vercel, Cloudflare, Deno, Fastly and Netlify. It is built on top of [Upstash Serverless Redis](https://upstash.com/redis) and provides rate-limiting solutions using one or more databases to offer a low latency experience for your users worldwide!
+Today we are releasing `@upstash/ratelimit`, a solution for rate-limiting in serverless environments, such as Vercel, Cloudflare, Deno, Fastly, and Netlify. It is built on top of [Upstash Serverless Redis](https://upstash.com/redis) and provides rate-limiting solutions using one or more databases to offer a low-latency experience for your users worldwide!
 
 ## Get started
 
@@ -35,7 +35,7 @@ We provide two methods:
 
 - `limit(identifier: string): Promise<RatelimitResponse>`
 
-`limit` will return `true` or `false` and some metadata about remaining requests and can be used if you want to reject all requests beyond your set limit.
+`limit` will return `true` or `false` and some metadata about the remaining requests and can be used if you want to reject all requests beyond your set limit.
 
 - `blockUntilReady(identifier: string, timeout: number): Promise<RatelimitResponse>`
 
@@ -44,7 +44,7 @@ Keep in mind that some platforms charge you for the execution time of your funct
 
 ### Single regional database
 
-Ratelimiting with a single database is straight forward. You create a database on [Upstash](https://console.upstash.com/) and start using it:
+Ratelimiting with a single database is straightforward. You create a database on [Upstash](https://console.upstash.com/) and start using it:
 
 ```ts
 import { Ratelimit } from "@upstash/ratelimit";
@@ -57,7 +57,7 @@ const ratelimit = new Ratelimit({
 });
 
 // Use a constant string to limit all requests with a single ratelimit
-// Or use a userID, apiKey or ip address for individual limits.
+// Or use a userID, apiKey, or IP address for individual limits.
 const identifier = "api";
 const { success } = await ratelimit.limit(identifier);
 
@@ -68,13 +68,13 @@ doExpensiveCalculation();
 return "Here you go!";
 ```
 
-### Global replicated rate-limiting
+### Global replicated rate limiting
 
-Let's assume you have customers in the US and Europe. In this case, you can create two regional redis databases on [Upstash](https://console.upstash.com) and
-your users will enjoy the latency of whichever db is closest to them.
+Let's assume you have customers in the US and Europe. In this case, you can create two regional Redis databases on [Upstash](https://console.upstash.com),
+and your users will enjoy the latency of whichever DB is closest to them.
 
 ```ts
-import { GlobalRatelimit } from "@upstash/ratelimit"; // for deno: see above
+import { GlobalRatelimit } from "@upstash/ratelimit"; // for Deno: see above
 import { Redis } from "@upstash/redis";
 
 // Create a new ratelimiter, that allows 10 requests per 10 seconds
