@@ -6,7 +6,7 @@ authors:
 tags: [kafka, serverless, announcement]
 ---
 
-Today, we are thrilled to announce a significant enhancement to Upstash Kafka – the introduction of a Schema Registry! This powerful addition allows you to manage your data schemas seamlessly, ensuring data consistency and compatibility throughout your Kafka ecosystem.
+Today, we are thrilled to announce a significant enhancement to Upstash Kafka â the introduction of a Schema Registry! This powerful addition allows you to manage your data schemas seamlessly, ensuring data consistency and compatibility throughout your Kafka ecosystem.
 
 ## What is a Schema Registry?
 
@@ -30,7 +30,7 @@ Our Schema Registry for Upstash Kafka is designed to seamlessly integrate with y
 
 **High Availability:** Upstash Kafka Schema Registry is designed for high availability, ensuring that your schema management remains reliable, even in demanding environments.
 
-**Generous Pricing:** On our free plan, you can work with up to 100 schemas without any cost. If your needs expand, our pay-as-you-go plan allows up to 1000 schemas.
+**Generous Pricing:** In our free plan, you can work with up to 100 schemas without any cost. If your needs expand, our pay-as-you-go plan allows up to 1000 schemas.
 
 ## How To Use
 
@@ -50,7 +50,7 @@ Producer example:
 ```java
 Properties props = new Properties();
 //....
-props.put("value.serializer, "io.confluent.kafka.serializers.KafkaAvroSerializer");
+props.put("value.serializer", "io.confluent.kafka.serializers.KafkaAvroSerializer");
 props.put("schema.registry.url", UPSTASH_KAFKA_REST_URL + "/schema-registry");
 props.put("basic.auth.credentials.source", "USER_INFO");
 props.put("basic.auth.user.info", UPSTASH_KAFKA_REST_USERNAME + ":" + UPSTASH_KAFKA_REST_PASSWORD);
@@ -87,9 +87,9 @@ view/modify the contents via third-party UI tools. Check our [documentation here
 
 ## Get Started Today!
 
-The introduction of Schema Registry for Upstash Kafka is a significant milestone in our commitment to providing a comprehensive and user-friendly data streaming experience. Whether you're a seasoned Kafka user or just getting started, our Schema Registry will allow you to manage your data schemas effectively.
+The introduction of the Schema Registry for Upstash Kafka is a significant milestone in our commitment to providing a comprehensive and user-friendly data streaming experience. Whether you're a seasoned Kafka user or just getting started, our Schema Registry will enable you to manage your data schemas effectively.
 
 For more details and insights on Schema Registry for Upstash Kafka, you can explore our [documentation here](https://upstash.com/docs/kafka/schema-registry/schemaintroduction).
 
-If you have any questions or need assistance, you can reach out to our support team at [support@upstash.com](mailto:support@upstash.com) or join our community on [Discord](https://discord.gg/w9SenAtbme).
+ If you have any questions or need assistance, you can reach out to our support team at [support@upstash.com](mailto:support@upstash.com) or join our community on [Discord](https://discord.gg/w9SenAtbme).
 Don't forget to stay updated by following us on [Twitter](https://twitter.com/upstash), and happy streaming!
