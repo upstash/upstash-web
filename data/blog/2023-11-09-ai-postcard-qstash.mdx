@@ -6,9 +6,9 @@ authors:
 tags: [ai, qstash]
 ---
 
-In this article, we will look at how to make an AI Postcard sending app at a high level. We will focus mainly on scheduling tasks with [Upstash QStash](https://upstash.com/docs/qstash/overall/getstarted), a serverless message queue and task scheduler.
+In this article, we will look at how to create an AI Postcard sending app at a high level. We will focus mainly on scheduling tasks with [Upstash QStash](https://upstash.com/docs/qstash/overall/getstarted), a serverless message queue and task scheduler.
 
-This app uses the [Next.js 13 App Router](https://nextjs.org/) (hosted on [Vercel](https://vercel.com/)), [Upstash QStash](https://upstash.com/docs/qstash/overall/getstarted) for task scheduling, [Upstash Redis](https://upstash.com/docs/redis/overall/getstarted) for cache, [Replicate AI](https://replicate.com/) for [SDXL](https://stablediffusionxl.com/) image generation, and [Resend](https://resend.com/) for HTTP email sending.
+This app uses the [Next.js 13 App Router](https://nextjs.org/) (hosted on [Vercel](https://vercel.com/)), [Upstash QStash](https://upstash.com/docs/qstash/overall/getstarted) for task scheduling, [Upstash Redis](https://upstash.com/docs/redis/overall/getstarted) for caching, [Replicate AI](https://replicate.com/) for [SDXL](https://stablediffusionxl.com/) image generation, and [Resend](https://resend.com/) for HTTP email sending.
 
 ## Project Setup
 
@@ -42,36 +42,36 @@ QSTASH_TOKEN=
 RESEND_API_KEY=
 ```
 
-Make sure that you **add your environment variables within Vercel** in your project settings as well! Otherwise the app will **not** work.
+Make sure that you **add your environment variables within Vercel** in your project settings as well! Otherwise, the app will **not** work.
 
-_NOTE: To get all of these values, you will need an account with each of the services. But don't worry, they are free!_
+_NOTE: To obtain all of these values, you will need an account with each of the services. But don't worry, they are free!_
 
 Pay attention to the domain that your app is deployed on. This could be your own custom domain if you configured it, or a default one given by Vercel. We will need this domain for later in the project.
 
 ## App Architecture
 
-How that we have our project deployed to Vercel and are ready to start building, let's quickly go over the app architecture. Here is the flow of the app:
+Now that we have our project deployed to Vercel and are ready to start building, let's briefly review the app architecture. Here is the flow of the app:
 
-1. A user fills out a form with an email address for the recipient, a body message for the email, a prompt for the image, and sets a date and a time of day to send the postcard.
+1. A user fills out a form with an email address for the recipient, a body message for the email, a prompt for the image, and sets a date and time of day to send the postcard.
 2. We handle the form submission on an API route and publish a message to QStash.
-3. When the specified time approaches, QStash sends the message to another API route in our app. This API route catches the message from QStash, sends a request to Replicate to generate the image, and caches the ID of the Replicate generation in Redis with our email information.
-4. Once the image is finished generating, Replicate sends a webhook to another API route in our app. This route catches the webhook and retrieves the cached information from Redis by the Replicate generation ID. This key value pair includes all necessary info for the email. We then send an email using Resend to the postcard recipient with the image attached.
+3. When the specified time approaches, QStash sends the message to another API route in our app. This API route catches the message from QStash, sends a request to Replicate to generate the image, and caches the ID of the Replicate generation in Redis along with our email information.
+4. Once the image is finished generating, Replicate sends a webhook to another API route in our app. This route catches the webhook and retrieves the cached information from Redis by the Replicate generation ID. This key-value pair includes all necessary info for the email. We then send an email using Resend to the postcard recipient with the image attached.
 
 ![App Architecture](/blog/ai-postcard/architecture.png)
 
 ## Making the Form
 
-Now that we have an idea of how the app works, let's dive into writing some code!
+Now that we understand how the app works, let's dive into writing some code!
 
-We'll start by creating the form. To create a nice looking form quickly, I am using [shadcn/ui](https://ui.shadcn.com/). However, you can use whatever you would like to create the form!
+We'll start by creating the form. To create a nice-looking form quickly, I am using [shadcn/ui](https://ui.shadcn.com/). However, you can use whatever you would like to create the form!
 
 In a `components` directory in the root of your project, go ahead and create the file `form.tsx`. This form will have 5 inputs:
 
-1. Email address of the recipient
-2. Message for the postcard (email body)
-3. Prompt for the image
-4. Date to send the postcard (limited to the next 7 days)
-5. Time of day to send (limited to morning, afternoon, and evening)
+1. Email address of the recipient.
+2. Message for the postcard (email body).
+3. Prompt for the image.
+4. Date to send the postcard (limited to the next 7 days).
+5. Time of day to send (limited to morning, afternoon, and evening).
 
 Here is a shortened version of the form I created. Reference the [GitHub repository](https://github.com/alpinecodex/postcard) for the full code:
 
@@ -86,7 +86,7 @@ export default function MainForm() {
 
     const hour = timeMapping[values.time as TimeKey];
 
-    const date = new Date(values.date);
+    the date = new Date(values.date);
     date.setHours(hour, 0, 0, 0);
 
     const timestamp = date.getTime() / 1000;
@@ -115,7 +115,7 @@ export default function MainForm() {
                 <FormLabel>Email of Postcard Recipient</FormLabel>
                 <FormControl>
                   <Input placeholder="example@gmail.com" {...field} />
-                </FormControl>
+                </FormControl
                 <FormDescription>
                   Who do you want to send an email to?
                 </FormDescription>
@@ -140,7 +140,7 @@ export default function MainForm() {
             )}
           />
           <FormField
-            control={form.control}
+            control={form.control
             name="prompt"
             render={({ field }) => (
               <FormItem>
@@ -153,7 +153,7 @@ export default function MainForm() {
                 </FormControl>
                 <FormDescription>
                   Prompt for the postcard image.
-                </FormDescription>
+                </FormDescription
                 <FormMessage />
               </FormItem>
             )}
@@ -198,7 +198,7 @@ export default function MainForm() {
                       initialFocus
                     />
                   </PopoverContent>
-                </Popover>
+                </Popover
                 <FormDescription>
                   Pick a date to send the postcard.
                 </FormDescription>
@@ -208,24 +208,23 @@ export default function MainForm() {
           />
           <FormField
             control={form.control}
-            name="time"
+            name="time
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Time of Day</FormLabel>
                 <FormControl>
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
+                    defaultValue={field.value}>
                     <SelectTrigger className="w-[180px]">
                       <SelectValue placeholder="Time of day" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="morning">Morning</SelectItem>
                       <SelectItem value="afternoon">Afternoon</SelectItem>
-                      <SelectItem value="evening">Evening</SelectItem>
+                      <SelectItem value="evening">Evening</SelectItem
                     </SelectContent>
-                  </Select>
+                  </Select
                 </FormControl>
                 <FormDescription>
                   Time of day to send the postcard.
@@ -245,190 +244,3 @@ export default function MainForm() {
 ```
 
 ![Form](/blog/ai-postcard/form.png)
-
-Then, add the form to your main `page.tsx` file in the `app` directory:
-
-``` typescript
-import MainForm from "@/components/form";
-
-export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <MainForm />
-    </main>
-  );
-}
-```
-
-There's one key piece of this code we should point out. In the `onSubmit` function, We are creating a `timestamp` variable that has a UNIX datetime that will specify when we want the postcard to send. We are combining the date from a datepicker component with a time of day that the user selects. Make sure that this timestamp is in seconds, not milliseconds.
-
-## Making the API Routes
-
-We will make 3 API routes for this project:
-
-1. `/api/schedule`
-2. `/api/ai`
-3. `/api/email`
-
-Let's start with the first one. Create the file `route.ts` in your `app/api/schedule` directory. Add the following code:
-
-``` typescript
-type RequestBody = {
-  email: string;
-  prompt: string;
-  message: string;
-  timestamp: number;
-};
-
-import { Client } from "@upstash/qstash";
-import { NextResponse } from "next/server";
-
-const qstashClient = new Client({
-  token: process.env.QSTASH_TOKEN || "",
-});
-
-export async function POST(request: Request) {
-  const body: RequestBody = await request.json();
-  const host = request.headers.get("host");
-
-  const qstashResponse = await qstashClient.publishJSON({
-    url: `https://${host}/api/ai`,
-    body: body,
-    notBefore: body?.timestamp,
-  });
-
-  return NextResponse.json(qstashResponse);
-}
-```
-
-In this route, we are grabbing the data pushed through the form and publishing it as a message to QStash. In our message, we pass the URL that QStash will send our message to. Since this is our own API route, we will use the `host` header to grab our domain and pass it in the `url`. We also add a parameter `notBefore`. This is where we pass in the timestamp we created to tell QStash when to send the message.
-
-Let's create the next API route. Create a `route.ts` file in `app/api/ai` and add the following code:
-
-``` typescript
-import { NextResponse } from "next/server";
-import Replicate from "replicate";
-
-const redis =
-  !!process.env.UPSTASH_REDIS_REST_URL && !!process.env.UPSTASH_REDIS_REST_TOKEN
-    ? new Redis({
-        url: process.env.UPSTASH_REDIS_REST_URL,
-        token: process.env.UPSTASH_REDIS_REST_TOKEN,
-      })
-    : undefined;
-
-const replicate = new Replicate({
-  auth: process.env.REPLICATE_API_TOKEN || "",
-});
-
-export async function POST(request: Request) {
-  try {
-    const body: RequestBody = await request.json();
-    const output = await replicate.predictions.create({
-      version:
-        "563a66acc0b39e5308e8372bed42504731b7fec3bc21f2fcbea413398690f3ec", // CHANGE THE MODEL IF DESIRED
-      input: {
-        prompt: "In the style of HISGH. " + body.prompt
-      },
-      webhook: "https://example.com/api/email", // CHANGE THIS TO YOUR GIVEN DOMAIN IN VERCEL
-    });
-
-    await redis!.hset(output?.id, body);
-
-    return NextResponse.json(output);
-  } catch (error) {
-    console.log(error);
-    return NextResponse.json("An error occurred. Please try again later.", {
-      status: 500,
-    });
-  }
-}
-
-```
-
-Let's break this code down. We create instances of Redis and Replicate and grab the post data from the QStash message. Then, we create a prediction using Replicate and set a webhook URL. _Note: Make sure to set this URL as your assigned domain in Vercel plus the correct API route._ Finally, we cache the body of the QStash message in Redis with the ID of the Replicate prediction.
-
-For the final API route, create a `route.ts` file in `app/api/email` and add the following code:
-
-``` typescript
-type Postcard = {
-  email: string;
-  message: string;
-};
-
-import { NextResponse } from "next/server";
-import { Prediction } from "replicate";
-import redis from "@/lib/redis";
-import resend from "@/lib/resend";
-import { EmailTemplate } from "@/components/email";
-
-export async function POST(request: Request) {
-  const body: Prediction = await request.json();
-  const postcard = (await redis?.hgetall(body?.id)) as Postcard;
-
-  const data = await resend.emails.send({
-    from: "onboarding@resend.dev",
-    to: [postcard?.email],
-    subject: "AI POSTCARD!!!",
-    react: EmailTemplate({
-      message: postcard?.message,
-      image: body?.output[0],
-    }) as React.ReactElement,
-  });
-
-  return NextResponse.json(data);
-}
-```
-
-This simple API route catches the webhook that Replicate sends. Using the ID of the Replicate prediction sent in the webhook body, we retrieve the cached data that includes the email recipient and body. Lastly, we send an email using Resend with the AI image in the body.
-
-But wait... You may be wondering what the `EmailTemplate` is. Well, Resend actually allows us to define emails as JSX. So, before you test your app, make sure to add an `email.tsx` file in your `components` directory that looks something like this:
-
-``` typescript
-import * as React from "react";
-
-interface EmailTemplateProps {
-  message: string;
-  image: string;
-}
-
-export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
-  message,
-  image,
-}) => (
-  <div>
-    <img src={image} width={100} height={100} alt="Postcard image." />
-    <p>{message}</p>
-  </div>
-);
-```
-
-This is a very simple example, so feel free to customize your email component.
-
-And that's it! We should be good to now test our app. After you push your code to Vercel, go ahead and submit a test postcard. In QStash, you will now see a new message that is waiting to be sent to the endpoint we specified.
-
-![QStash Dashboard](/blog/ai-postcard/dashboard.png)
-
-Once it sends, it will trigger the AI image generation in Replicate. You can also see the generation status within the Replicate dashboard. Finally, Replicate will send a webhook to our email endpoint which will send an email with the generated image! Pretty cool, right?
-
-![Email](/blog/ai-postcard/email.png)
-
-_Note for emails: If you don't see the email right away but are expecting it, make sure to check your spam._
-
-## QStash and Upstash Redis
-
-QStash and Redis enabled us to make this app with ease! Queues, schedules, and cache can be complex pieces to implement in an app, but thanks to Upstash, we were able to easily incorporate them in the best full-stack React framework! Not to mention, it only took a couple of lines of code using their well thought out SDKs.
-
-## Possible Improvements
-
-While we skipped over it in this article, it's a best practice to verify the request coming from QStash to validate that it is safe. [Here are the docs on how to do that](https://upstash.com/docs/qstash/howto/signature).
-
-Verify your domain in Resend. By default, you will only be able to send emails to yourself in Resend. To send emails to other recipients, you will need to [add a domain and verify it](https://resend.com/docs/dashboard/domains/introduction).
-
-While we are using one specific SDXL model on Replicate, [there are many other models to choose from](https://replicate.com/explore). Change the model ID in the `api/ai` route and update the parameters to change the model.
-
-## About the Author
-
-[Cameron Youngblood](https://twitter.com/youngbloodcyb) is a Full Stack Developer at [Ampry Software](https://www.ampry.com/) and a contributor to [Alpine Codex](https://www.alpinecodex.com/).
-
-Star this project on [GitHub](https://github.com/alpinecodex/postcard)!
