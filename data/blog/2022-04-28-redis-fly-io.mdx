@@ -11,11 +11,11 @@ When your application is global, your data needs to be global. You can run
 regular [Redis as a Fly.io app](https://fly.io/docs/reference/redis/) but the
 problem is it is located in a single region. On the other hand, Upstash Redis
 Global Database perfectly fits Fly.io as it is globally replicated. Moreover,
-thanks to its [REST based SDK](https://github.com/upstash/upstash-redis), it
-does not have any connection problem in stateless runtime.
+thanks to its [REST-based SDK](https://github.com/upstash/upstash-redis), it
+does not have any connection problems in stateless runtime.
 
-In this article, I will create a basic Node.js application which accesses
-Upstash Redis and deploy it to Fly.io platform.
+In this article, I will create a basic Node.js application that accesses
+Upstash Redis and deploy it on the Fly.io platform.
 
 ### Fly.io Setup
 
@@ -27,7 +27,7 @@ Upstash Redis and deploy it to Fly.io platform.
 
 - Create a free Global Database
   on [Upstash Console](https://console.upstash.com/)
-- Copy the REST_URL and REST_TOKEN, you will use them in the next step.
+- Copy the REST_URL and REST_TOKEN. You will use them in the next step.
 
 ### Application Code
 
@@ -65,21 +65,21 @@ app.listen(port, () => console.log(`HelloNode app listening on port ${port}!`));
 
 - Run the application locally:
   `node server.js`
-- Launch and deploy to fly.io:
+- Launch and deploy on fly.io:
   `flyctl launch`
 - You can redeploy your app with `flyctl deploy`
 
-- See your applications url with `flyctl status`
-- You can also check your application from fly.io dashboard:
+- See your application's URL with `flyctl status`
+- You can also check your application from the fly.io dashboard:
 
 ![](/blog/flyio/dashboard.png)
 
 ## Closing Words
 
-In this article, we have showcased how to use Upstash Redis on Fly.io
+In this article, we have showcased how to use Upstash Redis on the Fly.io
 application platform.
 
-Feel free to reach out us
+Feel free to reach out to us
 on [GitHub](https://github.com/upstash/issues/issues/new)
 , [Discord](https://upstash.com/discord)
 and [Twitter](https://twitter.com/upstash) for any issues or comments.
