@@ -77,7 +77,7 @@ export const posts = defineCollection({
   }),
   transform: async (doc, ctx) => {
     const mdx = await compileMDX(ctx, doc, {
-      // remarkPlugins: [remarkGfm] as unknown as Pluggable[],
+      remarkPlugins: [remarkGfm],
       rehypePlugins: [
         rehypeSlug,
         [

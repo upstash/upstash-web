@@ -18,19 +18,23 @@ export default function PricingTableEnterprise() {
         </Button>
       </div>
 
+
+
+
+
       <div className="mt-6 md:mt-0">
         <ul className="space-y-2">
+          <li className="flex items-center gap-1">
+            <Icon /> 100K+ commands per second
+          </li>
+          <li className="flex items-center gap-1">
+            <Icon /> Unlimited bandwidth and database count
+          </li>
           <li className="flex items-center gap-1">
             <Icon /> Professional support with SLA
           </li>
           <li className="flex items-center gap-1">
-            <Icon /> Guaranteed scalability and performance
-          </li>
-          <li className="flex items-center gap-1">
-            <Icon /> Custom configurations
-          </li>
-          <li className="flex items-center gap-1">
-            <Icon /> Advanced security options
+            <Icon /> Dedicated resources for isolation
           </li>
         </ul>
       </div>
