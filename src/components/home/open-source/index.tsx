@@ -3,8 +3,6 @@ import { HTMLProps } from "react";
 import { HOME_SECTIONS } from "@/utils/const";
 import cx from "@/utils/cx";
 
-import Bg from "@/components/bg";
-import Container from "@/components/container";
 import {
   SourceBox,
   SourceDesc,
@@ -16,6 +14,7 @@ import {
   SectionHeaderSummary,
   SectionHeaderTitle,
 } from "@/components/home/section-header";
+import { Bg, Container } from "@/components";
 
 export interface ISectionHeader extends HTMLProps<HTMLDivElement> {}
 

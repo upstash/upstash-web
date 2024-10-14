@@ -3,10 +3,8 @@ import Link from "next/link";
 import type { Post } from "@content";
 import { uniq } from "lodash";
 
-import Bg from "@/components/bg";
-import PostGridCard from "@/components/blog/grid-item";
-import Container from "@/components/container";
-import PageHeaderTitle from "@/components/page-header-title";
+import { PostGridCard } from "@/components/blog";
+import { Bg, Container, PageHeaderTitle } from "@/components";
 
 import { getData } from "../../utils/helpers";
 

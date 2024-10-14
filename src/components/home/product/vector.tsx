@@ -6,8 +6,7 @@ import { Product } from "@/utils/type";
 
 import { useSegment } from "@/hooks/use-segment";
 
-import Button from "@/components/button";
-import IconVector from "@/components/icon-vector";
+import {Button, IconVector} from "@/components";
 
 import {
   ProductBox,

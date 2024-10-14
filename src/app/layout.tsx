@@ -5,7 +5,6 @@ import { ReactNode, Suspense } from "react";
 import dynamic from "next/dynamic";
 import { Inter } from "next/font/google";
 import localFont from "next/font/local";
-import Script from "next/script";
 
 import { SITE_URL } from "@/utils/const";
 import cx from "@/utils/cx";
@@ -13,10 +12,8 @@ import cx from "@/utils/cx";
 import { PHProvider } from "@/lib/posthog";
 import { SegmentProvider } from "@/lib/segment/provider";
 
-import Analytics from "@/components/Analytics";
-import Footer from "@/components/master/footer";
-import Header from "@/components/master/header";
-import HeaderMobile from "@/components/master/header-mobile";
+import { Footer, Header, HeaderMobile } from "@/components/master";
+import { Analytics, ThirdPartyScripts } from "@/components";
 
 const PostHogPageView = dynamic(() => import("@/lib/posthog/page-view"), {
   ssr: false,
@@ -69,43 +66,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             {children}
             <Footer />
           </SegmentProvider>
-
-          {process.env.NODE_ENV !== "development" && (
-            <>
-              <Script
-                id="ph_referral_track"
-                strategy="beforeInteractive"
-                dangerouslySetInnerHTML={{
-                  __html: `
-                    function removeTrailingSlash(url) {
-                        return url.endsWith('/') ? url.slice(0, -1) : url;
-                    }
-
-                    (function() {
-                      var referrer = document.referrer;
-                      if (!referrer.includes('upstash.com')) {
-                        document.cookie = 'ph_referral_track=' + removeTrailingSlash(referrer) + '; domain=.upstash.com';
-                      }
-                    })();
-                  `,
-                }}
-              />
-              <Script
-                strategy="afterInteractive"
-                src={`https://www.googletagmanager.com/gtag/js?id=G-QW5KRSTDM0`}
-              />
-              <Script
-                id="ga"
-                strategy="afterInteractive"
-                dangerouslySetInnerHTML={{
-                  __html: ` window.dataLayer = window.dataLayer || [];
-                            function gtag(){ dataLayer.push(arguments); }
-                            gtag('js', new Date());
-                            gtag('config', 'G-QW5KRSTDM0');`,
-                }}
-              />
-            </>
-          )}
+          <ThirdPartyScripts />
         </body>
       </PHProvider>
     </html>

@@ -6,11 +6,8 @@ import { authors } from "@/utils/authors";
 import markdownToHtml from "@/utils/markdownToHtml";
 import Balancer from "react-wrap-balancer";
 
-import Button from "@/components/button";
-import Container from "@/components/container";
 import { ICON_NAMES } from "@/components/icon";
-import IconQStash from "@/components/icon-qstash";
-import IconRedis from "@/components/icon-redis";
+import { Button, Container, IconQStash, IconRedis } from "@/components";
 
 import { getData, type Example } from "../get-data";
 

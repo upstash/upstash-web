@@ -3,14 +3,14 @@
 import VectorFaqJson from "@/../public/faq/vector.json";
 import { generateFaqSchema } from "@/utils/structured-schema-generators";
 
-import Container from "@/components/container";
-import PageHeaderDesc from "@/components/page-header-desc";
-import PageHeaderTitle from "@/components/page-header-title";
-import ProductToggle from "@/components/pricing/product-toggle";
-import CompareTable from "@/components/pricing/vector/compare-table";
-import Enterprise from "@/components/pricing/vector/enterprise";
-import FAQ from "@/components/pricing/vector/faq";
-import PricingTable from "@/components/pricing/vector/pricing-table";
+import {
+  CompareTable,
+  Enterprise,
+  FAQ,
+  PricingTable,
+  ProductToggle,
+} from "@/components/pricing";
+import { Container, PageHeaderDesc, PageHeaderTitle } from "@/components";
 
 export default function PricingVectorPage() {
   const structuredFaqSchema = generateFaqSchema(VectorFaqJson);

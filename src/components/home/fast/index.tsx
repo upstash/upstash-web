@@ -3,7 +3,7 @@
 import { HOME_SECTIONS } from "@/utils/const";
 import cx from "@/utils/cx";
 
-import Bg from "@/components/bg";
+import {Bg} from "@/components";
 import Statistic from "@/components/home/fast/statistic";
 
 export default function Fast() {

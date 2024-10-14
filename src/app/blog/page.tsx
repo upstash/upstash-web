@@ -4,12 +4,8 @@ import { BANNED_TAGS } from "@/utils/const";
 import type { Post } from "@content";
 import { countBy, flatten, omit } from "lodash";
 
-import Bg from "@/components/bg";
-import PostGridCard from "@/components/blog/grid-item";
-import PopularTag from "@/components/blog/popular-tag";
-import Container from "@/components/container";
-import PageHeaderDesc from "@/components/page-header-desc";
-import PageHeaderTitle from "@/components/page-header-title";
+import { PopularTag, PostGridCard } from "@/components/blog";
+import { Bg, Container, PageHeaderDesc, PageHeaderTitle } from "@/components";
 
 import { getData } from "./utils/helpers";
 
