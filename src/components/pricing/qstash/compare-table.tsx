@@ -2,11 +2,12 @@ import * as React from "react";
 import { ChangeEvent, useState } from "react";
 
 import { PricingPlans } from "@/utils/type";
-import { IconCreditCard, IconDatabase } from "@tabler/icons-react";
+import {IconCreditCard, IconDatabase, IconInfoCircle} from "@tabler/icons-react";
 
 import useIsMobile from "@/hooks/use-is-mobile";
 
 import CompareValue from "../compare-value";
+import Tooltip from "@/components/tooltip";
 
 export default function CompareTable() {
   const isMobile = useIsMobile();
@@ -488,7 +489,7 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 py-4 text-left font-normal text-white/60">
-            Max Schedule Count
+            Max Active Schedules
           </th>
           {/**/}
           <td
@@ -501,19 +502,43 @@ export default function CompareTable() {
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0"
           >
-            <CompareValue type="number">1000</CompareValue>
+            <CompareValue type="number"  after={
+                <Tooltip content="Free up to 1000. Beyond that, $0.01 per active schedule.">
+                <IconInfoCircle
+                    className="ml-1 opacity-60"
+                    stroke={1.2}
+                    aria-label="Info"
+                />
+              </Tooltip>
+            }>1000</CompareValue>
           </td>
           <td
             hidden={isMobile ? !showPro1 : false}
             className="bg-white/3 px-4 py-0"
           >
-            <CompareValue>10000</CompareValue>
+            <CompareValue  after={
+              <Tooltip content="Free up to 10K. Beyond that, $0.01 per active schedule.">
+                <IconInfoCircle
+                    className="ml-1 opacity-60"
+                    stroke={1.2}
+                    aria-label="Info"
+                />
+              </Tooltip>
+            }>10000</CompareValue>
           </td>
           <td
             hidden={isMobile ? !showPro10 : false}
             className="bg-white/3 px-4 py-0"
           >
-            <CompareValue>10000</CompareValue>
+            <CompareValue  after={
+              <Tooltip content="Free up to 50K. Beyond that, $0.01 per active schedule.">
+                <IconInfoCircle
+                    className="ml-1 opacity-60"
+                    stroke={1.2}
+                    aria-label="Info"
+                />
+              </Tooltip>
+            }>50000</CompareValue>
           </td>
         </tr>
 
