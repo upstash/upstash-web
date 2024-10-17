@@ -381,4 +381,10 @@ export const authors: Record<
     url: "https://x.com/terrychinaz",
     image: "terryzhang.png",
   },
+  yunus: {
+    name: "Yunus Emre Ozdemir",
+    title: "Software Engineer @Upstash",
+    url: "https://github.com/yunusemreozdemir",
+    image: "yunus.jpg",
+  },
 };
