@@ -302,7 +302,7 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 py-4 text-left font-normal text-white/60">
-            Max Number of Topics
+            Max Number of URL Groups
           </th>
           {/**/}
           <td
@@ -333,7 +333,7 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 py-4 text-left font-normal text-white/60">
-            Max Number of Endpoints per Topic
+            Max Number of Endpoints per URL Group
           </th>
           {/**/}
           <td
