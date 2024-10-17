@@ -2,13 +2,13 @@ import Link from "next/link";
 
 import cx from "@/utils/cx";
 
-import Container from "@/components/container";
 import {
   FastCard,
   FastCardTitle,
   FastCardValue,
 } from "@/components/home/fast/card";
 import Icon, { ICON_NAMES } from "@/components/icon";
+import { Container } from "@/components";
 
 export default function FastStatistic() {
   return (

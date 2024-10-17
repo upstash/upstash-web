@@ -2,8 +2,7 @@ import { HTMLProps } from "react";
 
 import { HOME_SECTIONS } from "@/utils/const";
 
-import Bg from "@/components/bg";
-import Container from "@/components/container";
+import {Bg, Container} from "@/components";
 import {
   SectionHeader,
   SectionHeaderSummary,

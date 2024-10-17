@@ -2,13 +2,14 @@ import { Metadata } from "next";
 
 import Balancer from "react-wrap-balancer";
 
-import Bg from "@/components/bg";
-import Container from "@/components/container";
-import * as AboutIcon from "@/components/investor/icons";
-import Investors from "@/components/investor/investors";
-import PageBodyGradient from "@/components/page-body-gradient";
-import PageHeaderDesc from "@/components/page-header-desc";
-import PageHeaderTitle from "@/components/page-header-title";
+import { Investors, InvestorsIcons } from "@/components/investor";
+import {
+  Bg,
+  Container,
+  PageBodyGradient,
+  PageHeaderDesc,
+  PageHeaderTitle,
+} from "@/components";
 
 export const metadata: Metadata = {
   title: "About",
@@ -88,21 +89,21 @@ const MISSIONS = [
     title: "Fast",
     desc: "We understand that every millisecond matters to you.",
     icon: (
-      <AboutIcon.Fast className="text-[60px] text-emerald-400 md:text-[70px]" />
+      <InvestorsIcons.Fast className="text-[60px] text-emerald-400 md:text-[70px]" />
     ),
   },
   {
     title: "Simple",
     desc: "Keep the things as simple as possible but not simpler.",
     icon: (
-      <AboutIcon.Simple className="text-[60px] text-emerald-400 md:text-[70px]" />
+      <InvestorsIcons.Simple className="text-[60px] text-emerald-400 md:text-[70px]" />
     ),
   },
   {
     title: "Robust",
     desc: "We aim to earn your trust with robust solutions.",
     icon: (
-      <AboutIcon.Robust className="text-[60px] text-emerald-400 md:text-[70px]" />
+      <InvestorsIcons.Robust className="text-[60px] text-emerald-400 md:text-[70px]" />
     ),
   },
 ];

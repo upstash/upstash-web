@@ -5,11 +5,13 @@ import Link from "next/link";
 
 import { allCustomers } from "@content";
 
-import Bg from "@/components/bg";
-import Button from "@/components/button";
-import Container from "@/components/container";
-import PageHeaderDesc from "@/components/page-header-desc";
-import PageHeaderTitle from "@/components/page-header-title";
+import {
+  Bg,
+  Button,
+  Container,
+  PageHeaderDesc,
+  PageHeaderTitle,
+} from "@/components";
 
 export default function CustomerPage() {
   let customers = allCustomers.filter((o) => !o.draft);

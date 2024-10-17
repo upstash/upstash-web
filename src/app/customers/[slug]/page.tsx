@@ -5,8 +5,8 @@ import { notFound } from "next/navigation";
 import { allCustomers } from "@content";
 import type { Customer } from "@content";
 
-import Container from "@/components/container";
-import { Mdx } from "@/components/post/mdx";
+import { Mdx } from "@/components/post";
+import { Container } from "@/components";
 
 type Props = {
   params: {
