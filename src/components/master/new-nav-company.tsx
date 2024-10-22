@@ -1,5 +1,3 @@
-import React from "react";
-
 import { allJobs } from "@content";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import {
