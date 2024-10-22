@@ -48,7 +48,7 @@ const result = await semanticCache.get("which is the most populated city in the 
 
 ## **Code Breakdown**
 
-### - **Creating the Vector Index**
+### **Creating the Vector Index**
 
 ```jsx
 const index = new Index()
@@ -56,7 +56,7 @@ const index = new Index()
 
 - This initializes the **vector index**. It will store the embeddings for each key (query) used in the cache.
 
-### - **Creating the Semantic Cache**
+### **Creating the Semantic Cache**
 
 ```jsx
 const semanticCache = new SemanticCache({ index, minProximity: 0.95 });
@@ -65,7 +65,7 @@ const semanticCache = new SemanticCache({ index, minProximity: 0.95 });
 - This creates an instance of the **semantic cache** connected to the vector index.
 - **`minProximity: 0.95`**: This parameter sets the **similarity threshold**. Only queries with a similarity score of **0.95 or higher** will result in a cache hit.
 
-### - **Setting a Cache Entry**
+### **Setting a Cache Entry**
 
 ```jsx
 await semanticCache.set("largest city in USA by population", "New York")
@@ -76,7 +76,7 @@ await semanticCache.set("largest city in USA by population", "New York")
     - **Value:** `"New York"`
 - An **embedding** is generated for the key and saved in the vector index.
 
-### - **Introducing a Delay**
+### **Introducing a Delay**
 
 ```jsx
 await delay(1000);
@@ -84,7 +84,7 @@ await delay(1000);
 
 - This simulates a **1-second pause**, similar to real-world scenarios where different users ask queries at different times.
 
-### - **Retrieving a Value with a Similar Query**
+### **Retrieving a Value with a Similar Query**
 
 ```jsx
 const result = await semanticCache.get("which is the most populated city in the USA?");
