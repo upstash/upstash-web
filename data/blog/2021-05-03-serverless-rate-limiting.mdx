@@ -6,23 +6,23 @@ image: ratelimit.png
 tags: [redis, database, serverless, lambda, rate-limiting]
 ---
 
-One of the best things about serverless is its ability to scale even in case of huge traffic spikes. But unfortunately, scaling is not free, both financially and technically. Thatâs why developers need to control their applicationsâ scalability. Here are the main reasons you will need a rate limiting mechanism in your serverless application:
+One of the best things about serverless is its ability to scale even in case of huge traffic spikes. But unfortunately, scaling is not free both financially and technically. Thatâs why developers need to control their applications' scalability. Here are the main reasons you will need a rate-limiting mechanism in your serverless application:
 
-**1- Protect your resources:** If youâre providing a public API, traffic spikes can degrade the quality of the service, and may lead to a service outage for all your users. You need to protect your system against such cascading failures as well as self-inflicted DDoS incidents. A bug in your application can trigger such problems in your system. An internal process that retries an endpoint indefinitely in case of a failure can easily exhaust your resources.
+**1- Protect your resources:** If youâre providing a public API, traffic spikes can degrade the quality of the service and may lead to a service outage for all your users. You need to protect your system against such cascading failures as well as self-inflicted DDoS incidents. A bug in your application can trigger such problems in your system. An internal process that retries an endpoint indefinitely in case of failure can easily exhaust your resources.
 
-**2- Manage user quotas:** You may want to define quotas for your users for fair use of your services. Also, you may need quotas if you provide your services in different pricing tiers.
+**2- Manage user quotas:** You may want to define quotas for your users for the fair use of your services. Also, you may need quotas if you provide your services in different pricing tiers.
 
-**3- Control the cost:** There are many real-life examples of how an uncontrolled system can cause large bills. This is quite a risk for serverless applications, thanks to its highly scalable nature. Rate limiting will help you control these costs.
+**3- Control the cost:** There are many real-life examples of how an uncontrolled system can cause large bills. This is quite a risk for serverless applications thanks to their highly scalable nature. Rate limiting will help you control these costs.
 
 ### Solutions
 
-There are multiple alternative rate limiting solutions at different layers. I will list 3 main ones with a brief pros/cons analysis.
+There are multiple alternative rate-limiting solutions in different layers. I will list 3 main ones with a brief pros/cons analysis.
 
 **1- Concurrency Level of Function:**
 
-Cloud providers create multiple containers to scale your serverless function executions. You can set a limit for the max number of concurrent containers/instances. Although this can help you to limit concurrency, it does not control how many times your function will be called in a second.
+Cloud providers create multiple containers to scale your serverless function executions. You can set a limit for the maximum number of concurrent containers/instances. Although this can help you to limit concurrency, it does not control how many times your function will be called in a second.
 
-Here is how you can limit concurrency for [AWS Lambda](https://aws.amazon.com/blogs/compute/managing-aws-lambda-function-concurrency/) and [Google Cloud Functions](https://cloud.google.com/functions/docs/max-instances#setting_max_instances_limits).
+Here how you can limit concurrency for [AWS Lambda](https://aws.amazon.com/blogs/compute/managing-aws-lambda-function-concurrency/) and [Google Cloud Functions](https://cloud.google.com/functions/docs/max-instances#setting_max_instances_limits).
 
 Pros:
 
@@ -31,11 +31,11 @@ Pros:
 
 Cons:
 
-- Not a complete solution. Only controls concurrency. The number of executions per second is not limited.
+- Not a complete solution. Only controls concurrency. Number of executions per second is not limited.
 
 **2- Rate limiting on API Gateway**
 
-If you are accessing your functions through API Gateway, you can apply your rate limiting policy onto API Gateway. Both [AWS](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-request-throttling.html) and [GCP](https://medium.com/google-cloud/rate-limit-your-api-usage-with-cloud-endpoints-quotas-1270da55d2bf) have guides on how to configure their solutions.
+If you are accessing your functions through an API Gateway, you can apply your rate-limiting policy to the API Gateway. Both [AWS](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-request-throttling.html) and [GCP](https://medium.com/google-cloud/rate-limit-your-api-usage-with-cloud-endpoints-quotas-1270da55d2bf) have guides on how to configure their solutions.
 
 Pros:
 
@@ -54,7 +54,7 @@ This is the most complete and powerful solution. There are many Redis-based rate
 Pros:
 
 - Powerful, you can implement customized logic that fits your user model.
-- Scalable solution. See how Github uses Redis for rate limiting.
+- Scalable solution. See how GitHub uses Redis for rate limiting
 - Rich ecosystem, many open-source libraries: [redis_rate](https://github.com/go-redis/redis_rate), [redis-cell](https://github.com/brandur/redis-cell), [node-ratelimiter](https://github.com/tj/node-ratelimiter)
 
 Cons:
@@ -63,7 +63,7 @@ Cons:
 
 ### Code: Rate Limiting with Redis
 
-Thanks to rate limiting libraries, it is very easy to apply rate limiting to your application code. Here below, the example code limits the execution of an AWS Lambda function per IP per second:
+Thanks to rate-limiting libraries, it is very easy to apply rate limiting to your application code. Here below the example code limits the execution of an AWS Lambda function per IP per second:
 
 ```javascript
 const RateLimiter = require("async-ratelimiter");
@@ -77,8 +77,8 @@ const rateLimiter = new RateLimiter({
 });
 
 module.exports.hello = async (event) => {
-  the clientIp = getClientIp(event) || "NA";
-  const limit = await rateLimiter.get({ id: clientIp });
+  const clientIp = getClientIp(event) || "NA";
+  the limit = await the rateLimiter.get({ id: clientIp });
   if (!limit.remaining) {
     return {
       statusCode: 429,
@@ -107,8 +107,4 @@ Visit [the tutorial](/docs/tutorials/rate-limiting) for the full example.
 
 [https://medium.com/google-cloud/rate-limit-your-api-usage-with-cloud-endpoints-quotas-1270da55d2bf](https://medium.com/google-cloud/rate-limit-your-api-usage-with-cloud-endpoints-quotas-1270da55d2bf)
 
-[https://github.blog/2021-04-05-how-we-scaled-github-api-sharded-replicated-rate-limiter-redis/](https://github.blog/2021-04-05-how-we-scaled-github-api-sharded-replicated-rate-limiter-redis/)
-
-[https://redis.io/commands/incr#pattern-rate-limiter](https://redis.io/commands/incr#pattern-rate-limiter)
-
-[https://stripe.com/blog/rate-limiters](https://stripe.com/blog/rate-limiters)
+[https://github.blog/2021-04-05-how-we-scaled-github-api-shar...
