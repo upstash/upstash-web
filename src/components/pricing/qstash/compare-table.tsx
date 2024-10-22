@@ -280,7 +280,7 @@ export default function CompareTable() {
             className="bg-emerald-300/10 px-4 py-0"
           >
             <CompareValue type="size" suffix="MB">
-              1
+              10
             </CompareValue>
           </td>
           <td
@@ -288,7 +288,7 @@ export default function CompareTable() {
             className="bg-white/3 px-4 py-0"
           >
             <CompareValue type="size" suffix="MB">
-              10
+              50
             </CompareValue>
           </td>
           <td
@@ -296,7 +296,7 @@ export default function CompareTable() {
             className="bg-white/3 px-4 py-0"
           >
             <CompareValue type="size" suffix="MB">
-              10
+              50
             </CompareValue>
           </td>
         </tr>
@@ -316,7 +316,7 @@ export default function CompareTable() {
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0"
           >
-            <CompareValue>20</CompareValue>
+            <CompareValue>100</CompareValue>
           </td>
           <td
             hidden={isMobile ? !showPro1 : false}
@@ -634,67 +634,6 @@ export default function CompareTable() {
           </td>
         </tr>
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
-            Max LLM Requests Per Day
-          </th>
-          {/**/}
-          <td
-            hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue type="number">300</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPayg : false}
-            className="bg-emerald-300/10 px-4 py-0"
-          >
-            <CompareValue type="number">30000</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPro1 : false}
-            className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue type="number">300000</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue type="number">300000</CompareValue>
-          </td>
-        </tr>
-        <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
-            Max LLM Tokens Per Day
-          </th>
-          {/**/}
-          <td
-            hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue type="number">10000</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPayg : false}
-            className="bg-emerald-300/10 px-4 py-0"
-          >
-            <CompareValue>10M</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPro1 : false}
-            className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue>1B</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue>1B</CompareValue>
-          </td>
-        </tr>
-
-        <tr>
           <th className="px-0 text-left font-normal text-white/60">
             Uptime SLA
           </th>
@@ -803,36 +742,6 @@ export default function CompareTable() {
             className="bg-white/3 px-4 py-0"
           >
             <CompareValue>None</CompareValue>
-          </td>
-        </tr>
-        <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
-            LLM price
-          </th>
-          {/**/}
-          <td
-            hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue>Free</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPayg : false}
-            className="bg-emerald-300/10 px-4 py-0"
-          >
-            <CompareValue>$0.3 per 1M tokens</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPro1 : false}
-            className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue>$0.3 per 1M tokens</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue>$0.3 per 1M tokens</CompareValue>
           </td>
         </tr>
       </tbody>
