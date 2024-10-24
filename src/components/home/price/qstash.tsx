@@ -11,7 +11,7 @@ import {
   PriceTitle,
   PriceValue,
 } from "@/components/home/price/comp";
-import IconQStash from "@/components/icon-qstash";
+import { IconQStash } from "@/components";
 
 export default function PriceQStash() {
   const segment = useSegment();

@@ -1,10 +1,7 @@
 import type { Post } from "@content";
 
-import Bg from "@/components/bg";
-import PostListCard from "@/components/blog/list-item";
-import Container from "@/components/container";
-import PageHeaderDesc from "@/components/page-header-desc";
-import PageHeaderTitle from "@/components/page-header-title";
+import {Bg, Container, PageHeaderDesc, PageHeaderTitle} from "@/components";
+import {PostListCard} from "@/components/blog";
 
 import { getData } from "../utils/helpers";
 

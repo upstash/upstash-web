@@ -6,8 +6,7 @@ import { Product } from "@/utils/type";
 
 import { useSegment } from "@/hooks/use-segment";
 
-import Button from "@/components/button";
-import IconRedis from "@/components/icon-redis";
+import {Button, IconRedis} from "@/components";
 
 import {
   ProductBox,

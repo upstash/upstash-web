@@ -103,7 +103,7 @@ Refresh the page, you should be redirected to the blocked page after 3 times.
 
 ### Less Remote Call with Caching
 
-It is not efficient to make a remote call with each request. A useful feature of the @uptash/ratelimit package is that it caches data as long as the edge function is "hot". This means that data is only fetched from Redis when the function is "cold", reducing the number of remote calls. Caching can be implemented by declaring the `ratelimit` object outside the handler `function middleware`.
+It is not efficient to make a remote call with each request. A useful feature of the @upstash/ratelimit package is that it caches data as long as the edge function is "hot". This means that data is only fetched from Redis when the function is "cold", reducing the number of remote calls. Caching can be implemented by declaring the `ratelimit` object outside the handler `function middleware`.
 
 ### Rate Limiting Algorithms
 

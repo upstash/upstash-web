@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import cx from "@/utils/cx";
 
-import Container from "@/components/container";
+import {Container} from "@/components";
 import FastResult from "@/components/fast/result";
 
 const Globe = dynamic(() => import("@/components/home/fast/globe2"), {
