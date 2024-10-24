@@ -65,6 +65,7 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react": "^7.35.2",
     "eslint-plugin-tailwindcss": "^3.17.4",
+    "hast-util-from-html-isomorphic": "^2.0.0",
     "postcss": "^8.4.45",
     "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.6",

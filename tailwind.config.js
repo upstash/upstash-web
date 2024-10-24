@@ -4,7 +4,7 @@ const plugin = require("tailwindcss/plugin");
 /** @type {import("tailwindcss").Config} */
 module.exports = {
   darkMode: "media",
-  content: ["./src/**/*.{ts,tsx}", "./post/**/*.mdx", "./public/**/*.svg"],
+  content: ["content-collections.ts", "./src/**/*.{ts,tsx}", "./post/**/*.mdx", "./public/**/*.svg"],
   theme: {
     extend: {
       fontFamily: {

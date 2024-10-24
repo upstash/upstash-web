@@ -18,10 +18,6 @@ export default function PricingTableEnterprise() {
         </Button>
       </div>
 
-
-
-
-
       <div className="mt-6 md:mt-0">
         <ul className="space-y-2">
           <li className="flex items-center gap-1">

@@ -1,0 +1,12 @@
+.next
+node_modules
+.idea
+public/ui
+public/sw*
+public/workbox*
+.DS_Store
+*.local
+.vercel
+.env
+.content-collections
+**/*.md*
