@@ -37,7 +37,9 @@ You will need the following:
 
 ## Generate an OpenAI Token
 
-Using OpenAI API, you're able to obtain vector embeddings of the articles, and create chatbot responses using AI. Any request to OpenAI API requires an authorization token. To obtain the token, navigate to the [API Keys](https://platform.openai.com/api-keys) in your OpenAI account, and click the **Create new secret key** button. Copy and securely store this token for later use as **OPENAI_API_KEY** environment variable.
+Using OpenAI API, you're able to obtain vector embeddings of the articles, and create chatbot responses using AI. Any request to OpenAI API requires an authorization token. To obtain the token, navigate to the [API Keys](https://platform.openai.com/api-keys) in your OpenAI account, and click the **Create new secret key** button.
+
+Copy and securely store this token for later use as **OPENAI_API_KEY** environment variable.
 
 ## Generate a GitHub Developer Token
 
@@ -51,9 +53,9 @@ To interact with the GitHub API, you will need to create a personal access token
 - Select the scopes or permissions you'd like to grant this token.
 - Click the **Generate token** button at the bottom of the page.
 
-Copy your new personal access token, and save it somewhere safe.
+Copy your new personal access token and save it somewhere safe.
 
-## Setting up Upstash QStash
+## Set up Upstash QStash
 
 To schedule POST requests to the endpoint fetching, translating, and committing translated content to the GitHub at a given interval, you will use QStash. Go to the **QStash** tab and scroll down to the **Request Builder** tab.
 
@@ -373,9 +375,9 @@ export const POST = serve(
 )
 ```
 
-### TODO
+### Programmatically trigger a re-deploy to Vercel 
 
-TODO
+Once all the files are succesfully translated and commited to GitHub, you will want to re-deploy the website to Vercel. To trigger a re-deploy, add the following code:
 
 ```tsx {7-8}
 // File: app/api/workflow/route.ts
@@ -393,7 +395,7 @@ export const POST = serve(
 )
 ```
 
-The code above displays a list of uploaded audio files with their transcription status, showing either the completed transcription or a loading indicator. The interface includes authentication features, allowing users to sign in and upload audio files. It also provides buttons for uploading new audio files and refreshing the list of transcriptions.
+In the code above, if the `VERCEL_DEPLOY_HOOK_URL` environment variable is set, it creates a POST request to it, which in-turn starts the process of deploying your website to Vercel.
 
 > That was a lot of learning! You’re all done now ✨
 
@@ -418,7 +420,7 @@ The repository, is now ready to deploy to Vercel. Use the following steps to dep
 - In **Settings**, update the `Environment Variables` to match those in your local `.env` file.
 - Deploy! 🚀
 
-## Triggering the workflow using QStash
+## Trigger the workflow using QStash
 
 TODO
 
