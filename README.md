@@ -9,14 +9,14 @@
 ![](public/readme/note-default.png)
 
 ```mdx
-<Note>You can use any Redis® client, but we recommend @upstash/redis</Note>
+<Note>You can use any RedisÂ® client, but we recommend @upstash/redis</Note>
 ```
 
 ![](public/readme/note-info.png)
 
 ```mdx
 <Note type="info">
-  You can use any Redis® client, but we recommend @upstash/redis
+  You can use any RedisÂ® client, but we recommend @upstash/redis
 </Note>
 ```
 
@@ -24,7 +24,7 @@
 
 ```mdx
 <Note type="tip">
-  You can use any Redis® client, but we recommend @upstash/redis
+  You can use any RedisÂ® client, but we recommend @upstash/redis
 </Note>
 ```
 
@@ -32,7 +32,7 @@
 
 ```mdx
 <Note type="caution">
-  You can use any Redis® client, but we recommend @upstash/redis
+  You can use any RedisÂ® client, but we recommend @upstash/redis
 </Note>
 ```
 
@@ -40,7 +40,7 @@
 
 ```mdx
 <Note type="danger">
-  You can use any Redis® client, but we recommend @upstash/redis
+  You can use any RedisÂ® client, but we recommend @upstash/redis
 </Note>
 ```
 
@@ -48,10 +48,10 @@
 
 ```mdx
 <Note title="custom">
-  You can use any Redis® client, but we recommend @upstash/redis
+  You can use any RedisÂ® client, but we recommend @upstash/redis
 </Note>
 <Note title="custom" danger>
-  You can use any Redis® client, but we recommend @upstash/redis
+  You can use any RedisÂ® client, but we recommend @upstash/redis
 </Note>
 ```
 
@@ -94,14 +94,14 @@ tags: [announce]
 
 ## Snipsync
 
-We use [snipsync](https://github.com/temporalio/snipsync) to synchronize snippets from other repos (like redis-examples) to the docs, so they are deduplicated.
-Snipsync runs automatically when you do `yarn build`
+We use [snipsync](https://github.com/temporalio/snipsync) to synchronize snippets from other repos (like redis-examples) to the docs, so they are deduplicated.  
+Snipsync runs automatically when you do `yarn build`.
 
 ### How to use:
 
 #### Source files:
 
-Use comments to identify code snippets and the locations where they should be merged.
+Use comments to identify code snippets and the locations where they should be merged.  
 In the source repo, wrap the code snippets in comments with a unique snippet identifier like this:
 
 ```go
@@ -112,12 +112,12 @@ func HelloUniverse() {
 // @@@SNIPEND
 ```
 
-In the example above, "hellouniverse" is the unique identifier for the code snippet.
+In the example above, "hellouniverse" is the unique identifier for the code snippet.  
 Unique identifiers can contain letters, numbers, hyphens, and underscores.
 
 #### Docs files:
 
-In the target files wrap the location with comments that reference the identifier of the code snippet that will be placed there:
+In the target files, wrap the location with comments that reference the identifier of the code snippet that will be placed there:
 
 <!--SNIPSTART hellouniverse-->
 <!--SNIPEND-->
