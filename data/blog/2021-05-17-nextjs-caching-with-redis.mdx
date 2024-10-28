@@ -1,45 +1,46 @@
+```markdown
 ---
 slug: nextjs-caching-with-redis
-title: Speed up your Next.js application with Redis
+title: Speed Up Your Next.js Application With Redis
 authors: [noah]
 image: nextjscaching.png
 tags: [redis, database, serverless, caching, nextjs]
 ---
 
-Next.js is a very successful web framework which brings together server side rendering and static site generation. SSG speeds up your web site thanks to CDN caching meanwhile SSR helps you with SEO and dynamic data.
+Next.js is a very successful web framework that brings together server-side rendering and static site generation. SSG speeds up your website thanks to CDN caching, while SSR helps you with SEO and dynamic data.
 
-Server side rendering is a great feature which helps you to write full stack applications. But if you are not careful, the performance of your Next.js website can be affected easily. In this blog post, I will explain how to leverage Redis to speed up your Next.js API calls. Before that I will briefly mention a simpler way to improve your performance.
+Server-side rendering is a great feature that helps you write full-stack applications. But if you are not careful, the performance of your Next.js website can be affected easily. In this blog post, I will explain how to leverage Redis to speed up your Next.js API calls. Before that, I will briefly mention a simpler way to improve your performance.
 
-## Use SWR on your API calls
+## Use SWR on Your API Calls
 
-[SWR](https://github.com/vercel/swr) is a very smart data fetching library. It uses the HTTP cache invalidation strategy (stale-while-revalidate) described by [HTTP RFC 5861](https://datatracker.ietf.org/doc/html/rfc5861). When you call an API with SWR, it instantly returns the cached data but asynchronously it fetches the current data and updates your UI. You can also set refreshInterval depending on your tolerance to staleness.
+[SWR](https://github.com/vercel/swr) is a very smart data fetching library. It uses the HTTP cache invalidation strategy (stale-while-revalidate) described by [HTTP RFC 5861](https://datatracker.ietf.org/doc/html/rfc5861). When you call an API with SWR, it instantly returns the cached data, but asynchronously it fetches the current data and updates your UI. You can also set `refreshInterval` depending on your tolerance for staleness.
 
 ```
 const { data: user } = useSWR('/api/user', { refreshInterval: 2000 })
 ```
 
-In the above code, user API will be refreshed every 2 seconds.
+In the above code, the user API will be refreshed every 2 seconds.
 
-## Caching with Redis
+## Caching With Redis
 
-SWR is very simple and effective. But there are cases you will need a server side caching:
+SWR is very simple and effective. But there are cases where you will need server-side caching:
 
-- Client side caching improves the performance for the clients. But if the number of clients is high, you can experience high load on the server side resources which will eventually affect the client side performance too.
+- Client-side caching improves the performance for the clients. But if the number of clients is high, you can experience a high load on the server-side resources, which will eventually affect client-side performance too.
 - If you are consuming an external API with a quota, you will want to control the API usage on the server side. Otherwise, too many clients will consume the API quickly.
-- If you have resources calculated, fetched or processed at the server side using dynamic inputs, client side caching will not be very useful.
+- If you have resources calculated, fetched, or processed on the server side using dynamic inputs, client-side caching will not be very useful.
 
 ### Example Project: Covid Tracker
 
-In this project, we will use [Javier Aviles’ Covid API](https://github.com/javieraviles/covidAPI) and find the top 10 countries with the most number of cases. Check [the website](https://next-caching-with-redis.vercel.app/) and the [source code](https://github.com/upstash/examples/tree/master/examples/next-caching-with-redis).
+In this project, we will use [Javier Avilesâ Covid API](https://github.com/javieraviles/covidAPI) and find the top 10 countries with the most cases. Check [the website](https://next-caching-with-redis.vercel.app/) and the [source code](https://github.com/upstash/examples/tree/master/examples/next-caching-with-redis).
 
-We will use Redis to cache the responses from Covid API so:
+We will use Redis to cache the responses from the Covid API so:
 
 - The response will be much faster. If you check [the website](https://next-caching-with-redis.vercel.app/), you will see that calling the Covid API is hundreds of milliseconds while fetching from Redis is 1-2 milliseconds.
 - We will not overwhelm the Covid API with too many requests.
 
 ### API Code
 
-The code first checks if we have the API result cached in the Redis. If not, we will get the all country list from the Covid API and sort them by current day’s number of cases and save the top 10 to Redis. While saving to Redis, we set the "EX" 60 parameter which means that Redis will evict the entry in 60 seconds.
+The code first checks if we have the API result cached in Redis. If not, we will get the entire country list from the Covid API, sort them by the current dayâs number of cases, and save the top 10 to Redis. While saving to Redis, we set the "EX" 60 parameter, which means that Redis will evict the entry in 60 seconds.
 
 ```javascript
 import Redis from "ioredis";
@@ -78,7 +79,7 @@ export default async (req, res) => {
 
 ### UI Code
 
-The UI is a simple React code. We fetch the data from API using SWR.
+The UI is a simple React code. We fetch the data from the API using SWR.
 
 ```javascript
 export default function Home() {
@@ -134,7 +135,7 @@ export default function Home() {
       </main>
 
       <footer className={styles.footer}>
-        This is a sample project for the blogpost &nbsp;
+        This is a sample project for the blog post &nbsp;
         <a
           href="https://blog.upstash.com/nextjs-caching-with-redis"
           target="_blank"
@@ -157,3 +158,4 @@ export default function Home() {
 [https://coronavirus-19-api.herokuapp.com/countries](https://coronavirus-19-api.herokuapp.com/countries)
 
 [https://github.com/javieraviles/covidAPI](https://github.com/javieraviles/covidAPI)
+```
