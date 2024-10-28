@@ -8,13 +8,13 @@ tags: [redis, database, serverless, terraform]
 
 ## Announcing Upstash Terraform Provider
 
-We are thrilled to announce that now our Upstash Terraform Provider is publicly available. Our core principle is always being developer friendly. We have announced [REST Api](/docs/features/restapi) recently. Now it is time to expand our tools with the [terraform provider plugin](https://github.com/upstash/terraform-provider-upstash).
+We are thrilled to announce that our Upstash Terraform Provider is now publicly available. Our core principle is always being developer-friendly. We announced [REST Api](/docs/features/restapi) recently. Now it is time to expand our tools with the [terraform provider plugin](https://github.com/upstash/terraform-provider-upstash).
 
-[Terraform](https://www.terraform.io/) is a useful automation tool that lets you define your infrastructure as code. Collaboration becomes crazy easy in this way and every configuration change is persisted so everybody knows what is going on at the infrastructure.
+[Terraform](https://www.terraform.io/) is a useful automation tool that lets you define your infrastructure as code. Collaboration becomes incredibly easy this way, and every configuration change is persisted, so everybody knows what is going on with the infrastructure.
 
-After community requests, we have developed our terraform provider and now it is publicly available in the [terraform marketplace](https://registry.terraform.io/providers/upstash/upstash/latest).
+After community requests, we have developed our terraform provider, and now it is publicly available in the [terraform marketplace](https://registry.terraform.io/providers/upstash/upstash/latest).
 
-If you want to use our plugin it is just 4 lines of configuration snipped and to create a database is very simple.
+If you want to use our plugin, it is just 4 lines of configuration snippet, and creating a database is very simple.
 
 ```json
 terraform {
@@ -33,7 +33,7 @@ provider "upstash" {
 
 ```
 
-You can get an [API_KEY](/docs/howto/developerapi) from the Upstash Console. Also EMAIL is the email you registered for Upstash. Now, we have defined our provider. Let’s create a database:
+You can get an [API_KEY](/docs/howto/developerapi) from the Upstash Console. Also, EMAIL is the email you registered with Upstash. Now, we have defined our provider. Letâs create a database:
 
 ```json
 resource "upstash_database" "mydb" {
@@ -44,7 +44,7 @@ resource "upstash_database" "mydb" {
 }
 ```
 
-Now execute following commands:
+Now execute the following commands:
 
 ```shell
 terraform init
@@ -56,4 +56,4 @@ This simple code snippet will create a database. You can find the full example c
 
 ## Future Work
 
-We want to continue expanding our tools and 3rd party integrations. You can upvote our [roadmap](https://roadmap.upstash.com/). Also we would appreciate it if you give us feedback on our terraform provider at [twitter](https://twitter.com) or [discord](https://upstash.com/discord). It is hosted [at github. ](https://github.com/upstash/terraform-provider-upstash)
+We want to continue expanding our tools and 3rd party integrations. You can upvote our [roadmap](https://roadmap.upstash.com/). Also, we would appreciate it if you could give us feedback on our terraform provider on [twitter](https://twitter.com) or [discord](https://upstash.com/discord). It is hosted [at github. ](https://github.com/upstash/terraform-provider-upstash)
