@@ -1,30 +1,34 @@
+Here's the markdown file with grammatical corrections:
+
 ---
-slug: redis-cloudflare-workers
-title: "Redis® @ Edge with Cloudflare Workers "
-authors: [enes]
-image: cloudflare.png
+
+slug: redis-cloudflare-workers  
+title: "RedisÂ® @ Edge with Cloudflare Workers"  
+authors: [enes]  
+image: cloudflare.png  
 tags: [redis, database, serverless, cloudflare, edge computing]
+
 ---
 
 Computing at the Edge is one of the most exciting capabilities in recent years. CDN allows you to keep your files closer to your users. Edge computing allows you to run your applications closer to your users. This helps developers to build globally distributed, performant applications.
 
-Cloudflare Workers is the leading product in this space right now. It gives you a serverless processing environment without cold starts. You leverage Cloudflare's global network to minimize latency of your applications. You can write your functions in Javascript, Rust, C and C++.
+Cloudflare Workers is the leading product in this space right now. It gives you a serverless processing environment without cold starts. You leverage Cloudflare's global network to minimize the latency of your applications. You can write your functions in JavaScript, Rust, C, and C++.
 
-Similar to Serverless functions (AWS Lambda etc.), Cloudflare Workers are stateless. As you can see in [Cloudflare’s survey](https://workers.cloudflare.com/node), developers are asking ways to connect their databases from Edge functions. Unfortunately, most databases are not designed for serverless environments, they require persistent connections. We developed the REST API over Redis® to enable serverless edge functions to access Upstash in the simplest and fastest way possible.
+Similar to Serverless functions (AWS Lambda etc.), Cloudflare Workers are stateless. As you can see in [Cloudflareâs survey](https://workers.cloudflare.com/node), developers are asking for ways to connect their databases from Edge functions. Unfortunately, most databases are not designed for serverless environments, as they require persistent connections. We developed the REST API over RedisÂ® to enable serverless edge functions to access Upstash in the simplest and fastest way possible.
 
 ### Comparing with Cloudflare Workers KV
 
 Cloudflare has a basic Key Value store that you can use to store the state of your Edge functions. Upstash Redis excels against Cloudflare KV in several aspects:
 
-- Cloudflare KV provides only basic get/set/delete functionality. Upstash gives you all Redis data structures where you can build much more sophisticated functionality (Hashes, Lists, SortedSets, ranges, appends, increments etc).
+- Cloudflare KV provides only basic get/set/delete functionality. Upstash gives you all Redis data structures where you can build much more sophisticated functionality (Hashes, Lists, SortedSets, ranges, appends, increments, etc.).
 - Cloudflare KV is designed to be accessible from the Cloudflare ecosystem while you can access and consume the Upstash Redis from anywhere as it supports both Redis and REST API. You can offload your data from Edge to Redis then process by any Redis client.
-- Cloudflare KV is optimized for read heavy applications. The writes can take 60 seconds to be replicated to other locations. The write latencies are in milliseconds for Upstash.
+- Cloudflare KV is optimized for read-heavy applications. The writes can take 60 seconds to be replicated to other locations. The write latencies are in milliseconds for Upstash.
 
-Now let’s write a simple example to showcase the power of Cloudflare+Redis combination.
+Now letâs write a simple example to showcase the power of the Cloudflare+Redis combination.
 
 ### Analytics at Edge
 
-Web analytics is a very common need for all website owners. Google Analytics is powerful but many developers do not like sharing their traffic data with Google and injecting cookies to users’ browsers. As your website traffic comes through CDN, you can easily track your traffic at the Edge layer. Here we will implement a very simple example to showcase tracking user traffic from Cloudflare Workers. We will intercept the traffic in the Cloudflare Workers and save the user requests to Upstash Redis. Then we will write a basic standalone application which will analyse the requests and give me the following information on a selected day:
+Web analytics is a very common need for all website owners. Google Analytics is powerful, but many developers do not like sharing their traffic data with Google and injecting cookies into usersâ browsers. As your website traffic comes through CDN, you can easily track your traffic at the Edge layer. Here we will implement a very simple example to showcase tracking user traffic from Cloudflare Workers. We will intercept the traffic in the Cloudflare Workers and save the user requests to Upstash Redis. Then we will write a basic standalone application which will analyze the requests and give me the following information on a selected day:
 
 - Page views
 - Unique visitors
@@ -33,17 +37,17 @@ Web analytics is a very common need for all website owners. Google Analytics is 
 
 ### Setup
 
-If you do not have one, create a database following this [guide](/docs/). In the database page, click the button REST API and copy the REST URL. If you have a Cloudflare account, you can create a Workers function or you can use [the playground](https://cloudflareworkers.com/#36ebe026bf3510a2e5acace89c09829f:about:blank) without an account too.
+If you do not have one, create a database following this [guide](/docs/). On the database page, click the button REST API and copy the REST URL. If you have a Cloudflare account, you can create a Workers function or you can use [the playground](https://cloudflareworkers.com/#36ebe026bf3510a2e5acace89c09829f:about:blank) without an account too.
 
 :::note
-Select **Global Database** while creating Upstash database. Global database replicates data to multiple regions to lower the latency from the edge functions.
+Select **Global Database** while creating the Upstash database. The global database replicates data to multiple regions to lower the latency from the edge functions.
 :::
 
 ### Cloudflare Workers Code
 
 Cloudflare Workers function accepts `request` as a parameter. Using the REST API of Upstash, I record the request to a Redis List. I use the current date as the key for the Redis List. So we record the requests per day in separate Lists.
 
-Upstash REST API requires an endpoint and a token. After creating a database, you can copy the endpoint and token from [the console](https://console.upstash.com/) clicking to the `REST API` button. Update your Cloudflare Workers function with the below code, replacing endpoint and token:
+Upstash REST API requires an endpoint and a token. After creating a database, you can copy the endpoint and token from [the console](https://console.upstash.com/) by clicking the `REST API` button. Update your Cloudflare Workers function with the below code, replacing the endpoint and token:
 
 ```javascript
 const endpoint = "REPLACE_UPSTASH_REST_ENDPOINT";
@@ -80,7 +84,7 @@ addEventListener("fetch", (event) => {
 
 ### Analytics Tool Code
 
-Now let’s write a simple command line application which will take the date as an argument and return us analytics data. Create a folder and run `npm init`. Then install the Redis client with `npm install ioredis`. Copy `.env.example` as `.env` file and set your Redis URL (ioredis). Update the index.js with below:
+Now letâs write a simple command-line application that will take the date as an argument and return us analytics data. Create a folder and run `npm init`. Then install the Redis client with `npm install ioredis`. Copy `.env.example` as `.env` file and set your Redis URL (ioredis). Update the index.js with below:
 
 ```javascript
 const Redis = require("ioredis");
@@ -106,7 +110,7 @@ redis.lrange(datestr, "0", "-1", function (err, result) {
     console.error(err);
   } else {
     console.log(
-      "Upstash Redis Connection Successful. Analyzing the access logs...",
+      "Upstash Redis Connection Successful. Analyzing the access logs..."
     );
     if (!result || result.length === 0) {
       console.log("Could not find any access logs for the date:" + datestr);
@@ -169,6 +173,6 @@ You can think of this example as a starting point. You can develop a rich web ap
 REST API is the first step in our Edge story. We are planning two important developments this year.
 
 - Edge Caching: (Update: This was released, however deprecated for now. [Learn more](https://blog.upstash.com/edge-caching-benchmark)) Right now, all your REST requests come to your database region. We will support Edge Caching soon, so your REST requests will be cached at all edge locations globally. This will enable Upstash Redis to provide low latency all around the world like the Cloudflare KV.
-- Global Replicated Databases: (Update: This is released, [learn more](https://blog.upstash.com/global-database)) Global (multi region) replication will replicate your data to multiple regions. So all requests (both Redis and REST API) will go to the closest location. This will give you low latency globally with the least sacrifice on consistency.
+- Global Replicated Databases: (Update: This is released, [learn more](https://blog.upstash.com/global-database)) Global (multi-region) replication will replicate your data to multiple regions. So all requests (both Redis and REST API) will go to the closest location. This will give you low latency globally with the least sacrifice on consistency.
 
-I am planning to write a blog post dedicated to our Edge roadmap. Stay tuned and follow us on [twitter](https://twitter.com/upstash).
+I am planning to write a blog post dedicated to our Edge roadmap. Stay tuned and follow us on [Twitter](https://twitter.com/upstash).
