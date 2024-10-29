@@ -1,3 +1,4 @@
+```markdown
 ---
 slug: serverless-database-connections
 title: "Challenge of Serverless: Database Connections"
@@ -10,13 +11,13 @@ tags: [redis, database, serverless, aws lambda]
 
 #### UPDATE: We have built [@upstash/redis](https://github.com/upstash/upstash-redis) to solve the issues explained in this article. It is HTTP based, designed and tested for serverless runtimes for efficient connection handling.
 
-Designing a database for serverless, the biggest challenge in our mind was to build an infrastructure which supports per request pricing in a profitable way. We believe Upstash has achieved this. After we launched the product, we saw that there was another major challenge: Database connections!
+Designing a database for serverless, the biggest challenge in our minds was to build an infrastructure that supports per request pricing in a profitable way. We believe Upstash has achieved this. After we launched the product, we saw that there was another major challenge: Database connections!
 
-As you know, Serverless Functions scale from 0 to infinity. This means when your functions get a lot of traffic, the cloud provider creates new containers (lambda functions) in parallel and scales out your backend. If you create a new database connection within the function then you can rapidly reach the connection limit of your database.
+As you know, Serverless Functions scale from 0 to infinity. This means when your functions get a lot of traffic, the cloud provider creates new containers (lambda functions) in parallel and scales out your backend. If you create a new database connection within the function, then you can rapidly reach the connection limit of your database.
 
-If you try to cache the connection outside the lambda functions then another problem occurs. When AWS freezes your Lambda function, it does not close the connection. So you may end up with many idle/zombie connections which can still threaten.
+If you try to cache the connection outside the lambda functions, then another problem occurs. When AWS freezes your Lambda function, it does not close the connection. So you may end up with many idle/zombie connections that can still threaten.
 
-This problem is not specific to Redis, it applies to all databases which rely on TCP connections (Mysql, Postgre, MongoDB etc). You can see the serverless community is creating solutions like [serverless-mysql](https://github.com/jeremydaly/serverless-mysql). These are client-side solutions. As Upstash, we have the advantage of implementing and maintaining the server-side. So we decided to mitigate the problem by monitoring the connections and evicting the idle ones. So here the algorithm: As max-concurrent-connection, we have two limits for a database, soft-limit and hard-limit. When a database reaches the soft-limit we start to terminate the idle connections. We continue to accept new connection requests until the hard-limit is reached. If the database reaches the hard limit then we start rejecting new connections.
+This problem is not specific to Redis; it applies to all databases that rely on TCP connections (Mysql, Postgre, MongoDB, etc.). You can see the serverless community is creating solutions like [serverless-mysql](https://github.com/jeremydaly/serverless-mysql). These are client-side solutions. As Upstash, we have the advantage of implementing and maintaining the server side. So we decided to mitigate the problem by monitoring the connections and evicting the idle ones. So here's the algorithm: For max concurrent connections, we have two limits for a database, soft-limit and hard-limit. When a database reaches the soft-limit, we start to terminate the idle connections. We continue to accept new connection requests until the hard-limit is reached. If the database reaches the hard-limit, then we start rejecting new connections.
 
 ### Connection Eviction Algorithm
 
@@ -39,7 +40,7 @@ Note that the max concurrent connection limits listed in the [Upstash docs](/doc
 
 ### Ephemeral Connections
 
-After deploying the above algorithm, we have seen a great decrease in the number of rejected connections in all regions. But still if you want to be on the safe side, you can solve the problem on your side too. Instead of reusing the connection, you can open the Redis connection inside the function but also close them whenever you are done with Redis as below:
+After deploying the above algorithm, we have seen a great decrease in the number of rejected connections in all regions. But still, if you want to be on the safe side, you can solve the problem on your side too. Instead of reusing the connection, you can open the Redis connection inside the function but also close them whenever you are done with Redis as below:
 
 ```javascript
 exports.handler = async (event) => {
@@ -61,20 +62,20 @@ The above code helps you to minimize the concurrent connection count. People ask
 
 ### Are Redis Connections Really Lightweight?
 
-We have run a benchmark test to see how lightweight the Redis connections are. In this test we compare the latency numbers of two approaches:
+We have run a benchmark test to see how lightweight the Redis connections are. In this test, we compare the latency numbers of two approaches:
 
-1- EPHEMERAL CONNECTIONS: We do not reuse the connection. Instead we create a new connection for each command and close the connection immediately. We record the latency of client creation, ping() and client.quit() together. See the `benchEphemeral()` method in the code section below.
+1- EPHEMERAL CONNECTIONS: We do not reuse the connection. Instead, we create a new connection for each command and close the connection immediately. We record the latency of client creation, ping(), and client.quit() together. See the `benchEphemeral()` method in the code section below.
 
-2- REUSE CONNECTIONS: We create a connection once and reuse the same connection for all commands. Here, we record the latency of `ping()` operation. See the `benchReuse()` method below.
+2- REUSE CONNECTIONS: We create a connection once and reuse the same connection for all commands. Here, we record the latency of the `ping()` operation. See the `benchReuse()` method below.
 
 ```javascript
 async function benchReuse() {
   const client = new Redis(options);
   const hist = hdr.build();
   for (let index = 0; index < total; index++) {
-    let start = performance.now() * 1000; // to μs
+    let start = performance.now() * 1000; // to Î¼s
     client.ping();
-    let end = performance.now() * 1000; // to μs
+    let end = performance.now() * 1000; // to Î¼s
     hist.recordValue(end - start);
     await delay(10);
   }
@@ -85,11 +86,11 @@ async function benchReuse() {
 async function benchEphemeral() {
   const hist = hdr.build();
   for (let index = 0; index < total; index++) {
-    let start = performance.now() * 1000; // to μs
+    let start = performance.now() * 1000; // to Î¼s
     const client = new Redis(options);
     client.ping();
     client.quit();
-    let end = performance.now() * 1000; // to μs
+    let end = performance.now() * 1000; // to Î¼s
     hist.recordValue(end - start);
     await delay(10);
   }
@@ -103,12 +104,12 @@ We ran this benchmark code in AWS EU-WEST-1 region in two different setups. The 
 
 We have seen the overhead of creating and closing a new connection (ephemeral approach) is only 75 microseconds (99th percentile). The overhead is very similar in the interzone setup (80 microseconds).
 
-Then we decided to repeat the same test inside AWS Lambda functions. The results were different. Especially when we set the memory of Lambda function low (128Mb), we have seen bigger overhead of Redis connections. We have seen latency overhead up to 6-7 msec inside AWS Lambda functions.
+Then we decided to repeat the same test inside AWS Lambda functions. The results were different. Especially when we set the memory of the Lambda function low (128Mb), we have seen bigger overhead of Redis connections. We have seen latency overhead up to 6-7 msec inside AWS Lambda functions.
 
 Our conclusions about the Redis connections:
 
 - Redis connections are really lightweight on a system with a reasonable amount of CPU power. Even on t2.micro.
-- CPU power with the default AWS Lambda configuration is very poor, which significantly increases the cost of TCP connections with respect to total execution time of the Lambda function.
+- CPU power with the default AWS Lambda configuration is very poor, which significantly increases the cost of TCP connections with respect to the total execution time of the Lambda function.
 - If you use Lambda functions with the default/minimum memory, then you would better cache the Redis connection outside the function.
 
 ### Frozen Container => Zombie Connection
@@ -132,11 +133,11 @@ module.exports.hello = async (event) => {
 
 **STEP2 - timer-5sec:** AWS freezes the container after a short time.
 
-**STEP3 - time-60sec:** Upstash has a timeout of 60 seconds for idle connections. So it kills the connection, but can not get ACK from the client as it is frozen. So server connection goes into state [FIN_WAIT_2](https://kb.iu.edu/d/ajmi).
+**STEP3 - time-60sec:** Upstash has a timeout of 60 seconds for idle connections. So it kills the connection, but cannot get ACK from the client as it is frozen. So server connection goes into state [FIN_WAIT_2](https://kb.iu.edu/d/ajmi).
 
 **STEP4 - time-90sec:** Upstash server kills the connection completely, exiting from FIN_WAIT_2 state.
 
-**STEP5 - time-95sec:** Client sends the same request and gets ETIMEDOUT exception. Because the client assumes the connection is open but it is not. 🤦🏻 🤦🏻 🤦🏻
+**STEP5 - time-95sec:** Client sends the same request and gets ETIMEDOUT exception. Because the client assumes the connection is open but it is not. ð¤¦ð» ð¤¦ð» ð¤¦ð»
 
 **STEP6 - time-396sec:** 5 minutes after the last request, AWS kills the container completely.
 
@@ -146,11 +147,11 @@ As you can see above, AWS thaws a container and reuses the connection. But the c
 
 We changed Upstash connection timeout to 310 seconds assuming that AWS terminates an idle function in 300 seconds. After this change, the problem disappeared. The problem here is AWS is not transparent when they terminate idle functions. So we need to continue testing and try to detect if the issue happens again.
 
-This issue is quite similar to [the issue](https://github.com/jeremydaly/serverless-mysql/issues/57#issuecomment-580144732) seen on serverless-mysql library. In the comments, it has been suggested to retry the request upon the ETIMEDOUT exception. But retrying has two drawbacks. First you may retry a write request which might have been processed and timed out with a real network problem. The second problem is the extra latency of the failed request.
+This issue is quite similar to [the issue](https://github.com/jeremydaly/serverless-mysql/issues/57#issuecomment-580144732) seen on the serverless-mysql library. In the comments, it has been suggested to retry the request upon the ETIMEDOUT exception. But retrying has two drawbacks. First, you may retry a write request which might have been processed and timed out with a real network problem. The second problem is the extra latency of the failed request.
 
 ### GraphQL Helps Too
 
-One way to get rid of connection issues to have connectionless API. Upstash supports [GraphQL API](/docs/graphql/aboutgraphqlapi) in addition to Redis protocol. GraphQL is HTTP based so it does not have the connection limit issue. Check the docs for supported commands. Beware that GraphQL API has a latency overhead (about 5msec) over Redis protocol.
+One way to get rid of connection issues is to have a connectionless API. Upstash supports [GraphQL API](/docs/graphql/aboutgraphqlapi) in addition to the Redis protocol. GraphQL is HTTP based so it does not have the connection limit issue. Check the docs for supported commands. Beware that GraphQL API has a latency overhead (about 5msec) over Redis protocol.
 
 ### Conclusion
 
@@ -158,9 +159,10 @@ We customize Upstash databases for a smooth experience for serverless applicatio
 
 As a conclusion, our recommendation for the serverless use cases:
 
-- If your use case is latency sensitive (e.g. 6msec is big for you) then reuse the Redis client.
+- If your use case is latency-sensitive (e.g. 6msec is big for you) then reuse the Redis client.
 - If you experience a very high number of concurrent clients (over 1000) then reuse the Redis client.
-- If your use case is not latency sensitive then open/close the Redis client inside the function.
-- If your function has at least 1GB memory then open/close the Redis client inside the function.
+- If your use case is not latency-sensitive, then open/close the Redis client inside the function.
+- If your function has at least 1GB memory, then open/close the Redis client inside the function.
 
 Let us know your feedback on [Twitter](https://twitter.com/upstash) or [Discord](https://upstash.com/discord).
+```
