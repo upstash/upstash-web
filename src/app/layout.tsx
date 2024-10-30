@@ -3,7 +3,7 @@ import "./globals.css";
 
 import { ReactNode, Suspense } from "react";
 import dynamic from "next/dynamic";
-import { Inter } from "next/font/google";
+import { Inter, Inter_Tight } from "next/font/google";
 import localFont from "next/font/local";
 import Script from "next/script";
 
@@ -22,27 +22,14 @@ const PostHogPageView = dynamic(() => import("@/lib/posthog/page-view"), {
   ssr: false,
 });
 
-const inter = Inter({
+const fontText = Inter({
   variable: "--font-sans",
   subsets: ["latin"],
 });
 
-const interDisplay = localFont({
+const fontDisplay = Inter_Tight({
   variable: "--font-display",
-  src: [
-    {
-      path: "./fonts/Inter-DisplayMedium.woff2",
-      weight: "500",
-    },
-    {
-      path: "./fonts/Inter-DisplaySemiBold.woff2",
-      weight: "600",
-    },
-    {
-      path: "./fonts/Inter-DisplayBold.woff2",
-      weight: "700",
-    },
-  ],
+  subsets: ["latin"],
 });
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -50,33 +37,33 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html
       lang="en"
       className={cx(
-        inter.variable,
-        interDisplay.variable,
+        fontText.variable,
+        fontDisplay.variable,
         "min-h-screen scroll-smooth bg-zinc-950 text-sm text-zinc-50 antialiased md:text-base",
       )}
     >
-      <PHProvider>
-        <body className="pt-[70px] md:pt-[80px]">
-          <PostHogPageView />
-          <Suspense>
-            <Analytics />
-          </Suspense>
-          <SegmentProvider
-            writeKey={process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY!}
-          >
-            <Header />
-            <HeaderMobile />
-            {children}
-            <Footer />
-          </SegmentProvider>
+    <PHProvider>
+      <body className="pt-[70px] md:pt-[80px]">
+      <PostHogPageView />
+      <Suspense>
+        <Analytics />
+      </Suspense>
+      <SegmentProvider
+        writeKey={process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY!}
+      >
+        <Header />
+        <HeaderMobile />
+        {children}
+        <Footer />
+      </SegmentProvider>
 
-          {process.env.NODE_ENV !== "development" && (
-            <>
-              <Script
-                id="ph_referral_track"
-                strategy="beforeInteractive"
-                dangerouslySetInnerHTML={{
-                  __html: `
+      {process.env.NODE_ENV !== "development" && (
+        <>
+          <Script
+            id="ph_referral_track"
+            strategy="beforeInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
                     function removeTrailingSlash(url) {
                         return url.endsWith('/') ? url.slice(0, -1) : url;
                     }
@@ -88,26 +75,26 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                       }
                     })();
                   `,
-                }}
-              />
-              <Script
-                strategy="afterInteractive"
-                src={`https://www.googletagmanager.com/gtag/js?id=G-QW5KRSTDM0`}
-              />
-              <Script
-                id="ga"
-                strategy="afterInteractive"
-                dangerouslySetInnerHTML={{
-                  __html: ` window.dataLayer = window.dataLayer || [];
+            }}
+          />
+          <Script
+            strategy="afterInteractive"
+            src={`https://www.googletagmanager.com/gtag/js?id=G-QW5KRSTDM0`}
+          />
+          <Script
+            id="ga"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: ` window.dataLayer = window.dataLayer || [];
                             function gtag(){ dataLayer.push(arguments); }
                             gtag('js', new Date());
                             gtag('config', 'G-QW5KRSTDM0');`,
-                }}
-              />
-            </>
-          )}
-        </body>
-      </PHProvider>
+            }}
+          />
+        </>
+      )}
+      </body>
+    </PHProvider>
     </html>
   );
 }
