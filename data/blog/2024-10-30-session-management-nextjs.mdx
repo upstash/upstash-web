@@ -1,0 +1,236 @@
+---
+
+title: "Session Management in Next.js Using Redis"
+slug: session-management-nextjs
+authors:
+  - noah
+tags: [redis, nextjs, session, webApp]
+---
+
+In this guide, we will walk through session management in a Next.js app using Upstash Redis by learning what a “session” means in a web application, why Redis is a go-to choice for session management, how to set up an Upstash Redis database, and finally, how to integrate it into a Next.js application.
+
+### What is “Session”?
+
+In a web application, “session” is a temporary, server-side storage mechanism used to maintain the state of a user's interaction with the application across multiple HTTP requests in a certain time interval.
+
+Since HTTP is a stateless protocol, meaning each request is independent and doesn't "remember" previous interactions, sessions allow the server to track and store user-specific data such as authentication status, preferences, or any kind of activities of the user during their time on the website.
+
+Sessions typically work by storing a unique session ID on the client side, usually in a cookie. The server uses this ID to retrieve data related to the user session from a session storage, like Redis in this blog, every time the user interacts with the site.
+
+Session in a web application is a great way to handle the following user interactions and state management:
+
+- **User Authentication**: Sessions help authenticate users and remember their logged-in state across pages or even after refreshing.
+- **Personalization**: Sessions allow the server to store and retrieve data such as user preferences, authentication status, etc.
+- **Security**: Proper session management can enhance app security, such as protecting against CSRF and ensuring unauthorized users don’t access restricted areas.
+
+### Why Redis for Session Management?
+
+Why not :)
+
+There are multiple reasons for using Redis as a session store for session management. Here are some advantages arising from Redis' structure:
+
+- **Data Architecture**: Redis is an in-memory key-value store. The key-value pairs can be stored in hashes, where a hash is a record type structured as a collection of field-value pairs. This structure perfectly fits to the session management data type to maintain all the session data, such as username, user preference etc. in a key-value format in a hash per user session.
+
+- **Data Expiry**: Redis has a built-in functionality to delete expired data. This helps web applications to keep user sessions time-bound.
+
+- **Low Latency**: Due to its “in-memory” nature, Redis is extremely fast. That’s why it is commonly used for user sessions and cache data.
+
+- **Scalability**: Redis is built to handle large volumes of data and high-throughput traffic.
+
+Also, we can simply compare Redis with one of the most common ways of storing user session data, client-side cookies, to decide which way we want to follow in our web applications. Some advantages of Redis as a session storage over client-side cookies:
+
+- **Less vulnerable to user tampering**: Cookies are visible to the users and are manipulatable by the user. Redis allows us to protect user data from being manipulated by users.
+
+- **Less data transferred between client and server:** Since we store all session information in the Redis, we don’t need to store anything in the client machine.
+
+- **Storing only “SessionId” in client machine:** If we use Redis, we only need sessionId to get for each request to know in which session this request is.
+
+### Creating Upstash Redis Database
+
+Before jumping into the Upstash Redis setup, we should first understand the advantages of the Upstash Redis. It wouldn't make any sense to use the tools we're going to use without understanding why they should be used, right?
+
+Let’s see the main benefits of using Upstash Redis:
+
+- **Serverless:** Upstash Redis is a serverless database. You don’t need to maintain the infrastructure, worry about the scaling of the database or any other low-level configuration. You just create the database and use it.
+
+- **Global Data Distribution:** Upstash allows you to deploy your Redis instance in regions close to your users, reducing latency even further. This is particularly beneficial for globally distributed applications, ensuring that session storage is fast and responsive regardless of the user's location.
+
+- **Pay as you Go:** There is no entrance price. You pay only for what you use. You can see the [pricing details](https://upstash.com/pricing).
+
+Ok,  if we have no more questions about why we use Upstash Redis for session management, we can create the Upstash Redis database.
+
+We will create a Redis database through [Upstash console](https://console.upstash.com/redis).
+
+Let’s create a Redis database by clicking the “Create Database” button. This tutorial will show once again how easy and fast it is to create an Upstash Redis database.
+
+In the modal that appears, we will select a name for our database and select a region for it. It could be better to select the same region with your service.
+
+After clicking on next button, we will select the pricing plan. Pay as you go with max budget limit is my favourite!
+
+Now, our Redis database is ready. We can see the database endpoint, the password to connect to the database and its port on the Redis dashboard. We will need this information when we want to connect to the database from the web application.
+
+![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXe4aZGFsyJR-GUC-nna-Gi7jlqdi02NUhN5yMbAbpsDNXafij7EuvtKHdXBIZA3r_SyuEQt57V1nMJ9-0LoO6F-rEjDB6032Q7lIw-tLdqWu7JAd9IhY1vkGXVUiFx01CiQsDKs-kdDg5SpVTp7MpMokRCb?key=Wj2CT6AA1M1XZTqemqn9F2xy)
+
+That’s it!
+
+### Using Upstash Redis in Nextjs App
+
+Let’s see how Redis will work within the web application infrastructure:
+
+- We first get the request from the client browser without any sessionId.
+
+- Since there is no sessionId in the request, we create one sessionId and create a hash in Redis.
+
+- Return the sessionId as a cookie in the response to the client machine.
+
+- When we receive a new HTTP request with sessionId, we retrieve the necessary session data from Redis and use it when responding to the client.
+
+Here is the sequence diagram of the service and its connection with Redis to visualize the process better:
+
+![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXc6My-5er262jYp-BPPMJS4lz8ahPip9C4wnpElVEEf4S1gMUt7OYdaIUWj55YY6aJRzcHABNJ81maHAatcxt9uJwD6J_btwD4kV8hA5tVlAFNv72QpupIs48Vmlxz0rmXk_oPQWL9uN6RkTG_rtKb4K_o5?key=Wj2CT6AA1M1XZTqemqn9F2xy)
+
+If everything is good, we can create a Nextjs app by running the following command in a terminal unless you have a Nextjs app.
+
+```
+npx create-next-app@latest <project-name>
+```
+
+Now we need to install the Upstash Redis Typescript SDK.
+
+```
+cd <project-name>
+npm install @upstash/redis
+```
+
+After installing the required dependency, we can now create an interface for managing session ID in the cookies of the user’s browser and interacting with the Upstash Redis, the session storage of our app.
+
+We will implement this interface in `/app/lib/sessionManager.tsx` file.
+
+```typescript
+import { Redis } from '@upstash/redis'
+import { cookies } from 'next/headers'
+
+export const redis = new Redis({
+    url: '<UPSTASH-REDIS-URL>',
+    token: 'UPSTASH-REDIS-TOKEN',
+})
+
+type SessionId = string;
+type Key = 'userName' | 'sessionStatus'; // other keys of the session data can be added.
+
+export async function getSessionId(): SessionId | undefined {
+    const cookieStore = await cookies();
+    return cookieStore.get("session-id")?.value;
+}
+
+async function setSessionId(sessionId: SessionId): void {
+    const cookieStore = await cookies();
+    cookieStore.set("session-id", sessionId);
+}
+
+export async function getSessionIdAndCreateIfMissing() {
+    const sessionId = await getSessionId();
+    if (!sessionId) {
+        const newSessionId = crypto.randomUUID();
+        await setSessionId(newSessionId);
+
+        return newSessionId;
+  }
+
+  return sessionId;
+}
+
+export async function get(key: Key, username: string = "") {
+    const sessionId = await getSessionId();
+    if (!sessionId) {
+        return null;
+  }
+  return await redis.hget(`session-${username}-${sessionId}`, key);
+}
+
+export async function getAll(username: string = "") {
+    const sessionId = await getSessionId();
+    if (!sessionId) {
+        return null;
+  }
+  return await redis.hgetall(`session-${username}-${sessionId}`);
+}
+
+export async function set(key: Key, value: string, username: string = "") {
+    const sessionId = await getSessionIdAndCreateIfMissing();
+    await redis.hset(`session-${username}-${sessionId}`, { [key]: value });
+    return redis.expire(`session-${username}-${sessionId}`, 900);
+}
+```
+
+Let’s examine these functions.
+
+- **getSessionId**: We will store the session ID in the cookies of the users’ browsers. This function is to get the session ID from the browser cookies sent to the API inside the HTTP call.
+
+- **setSessionId**: This function sets the session ID cookie to the given session ID parameter.
+
+- **getSessionIdAndCreateIfMissing**: This function calls the `getSessionId` to get the existing session ID from the cookies and sets the new random UUID as the new session ID unless there is already a session ID in the user’s browser. This function also adds the new session ID to the cookies to send back to the browser.
+
+- **getSessionData**: We will call this function to get the session data from Redis. It will get the session data of the given key from the Upstash Redis and return it.
+
+- **getAllSessionData**: This function gets all the session data. It gets all the key-value pairs of the session hash from the Upstash Redis.
+
+- **setSessionData**: We will set key-value pairs of the given session in this function.
+
+Since the utility functions to manage session IDs and session storage via Upstash Redis, we can now implement an API that uses these functions.
+
+The API will be very simple. It will receive the username from the path. Once it receives a request, it will first check if the session ID exists in the cookies. If there is no session ID in the cookies, it will generate a new ID and set it in the cookies in the response. If the session ID exists, it will check if there is a key in the Upstash Redis in the hash that represents the session. If there is no, it will create key-value pairs in that hash.
+
+Let’s code!
+
+The API will be created by using the app routers of the Nextjs.
+
+We should create a file under `app/api/user/`[username]` named `route.tsx`.
+
+```typescript
+ import * as sessionStore from '../../lib/session'
+
+ export async function GET(request: Request,{ params }: { params: Promise<{ user: string }> }){
+      const userName = (await params).user;
+      const sessionId = await sessionStore.getSessionIdAndCreateIfMissing();
+      const sessionStatus = await sessionStore.get('sessionStatus', userName);
+      if(sessionStatus == null) {
+            console.log('There is no active session.');
+            await sessionStore.set('sessionStatus', 'ACTIVE', userName);
+      }
+      return Response.json({ userName: userName, sessionId: sessionId });
+}
+
+```
+
+This route file will allow Nextjs to resolve the request sent to the `<URL>:3000/api/user/<username>` to the HTTP methods defined inside of itself.
+
+Now, we will see it in action. Let’s run the Nextjs app by going to the root directory from the terminal and running the following command:
+
+```
+npm run dev
+```
+
+Now, we can open the API endpoint, `http://localhost:3000/api/user/noah` on a browser. When you open it, you should see the username and the session ID returned:
+
+```
+{"userName":"noah","sessionId":"804814dc-10fc-4b0a-a4c1-321f4b54d399"}
+```
+
+If you right-click and inspect, you will see the session-id set in the cookies by going to the “Application” tab.
+
+![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXcMIEUPDlMQw8sBwMwFZCd40zgtyqagV2EAC33j3q3x3ux5GzuQ9gUe7R8N-FRxtTh-7KChL5RmP7l61LP1pB-irUysIa6ErxL8q-7ZOKq43yoFO1Mq_DjVfI6o3vZnSasjvqIs9ED34fhLn_Rx1CEKN1DG?key=Wj2CT6AA1M1XZTqemqn9F2xy)
+
+We can also check Upstash Redis if the session is created in the database or not. To check it, we should go back to the [Upstash Redis console](https://console.upstash.com/redis), open the Redis database and open the `Data Browser` tab.
+
+The `Data Browser` tab will show the session data as shown below.
+
+![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXf13iNpFZW2SnZZNDn9IKuvNND4SHyqQViAYlQVFwyjrb5bQ-DvCJ-itNMZL4BgmHP1dLCQVpWArKNVbTGrJ6eSykJVgGr8-2SG0IiwLAgSFWx4KonFLfhQ8_aQi2EQcQlPKlpwRObHL6OT-iJdzNUhvU-k?key=Wj2CT6AA1M1XZTqemqn9F2xy)
+
+### Conclusion
+
+Managing sessions in a Next.js app with Upstash Redis offers a scalable and efficient solution. In this blog post, we created a Nextjs app and integrated it with the Upstash Redis to use it as a session management storage.
+
+By setting up a Redis database and integrating it seamlessly with Next.js, you can handle session storage effectively without traditional server-side complications. This approach is ideal for developers looking for performance and simplicity in session management.
+
+Hopefully, this guide has provided a clear pathway for implementing the Upstash Redis as a reliable session store in your Next.js applications.
