@@ -4,7 +4,6 @@ import "./globals.css";
 import { ReactNode, Suspense } from "react";
 import dynamic from "next/dynamic";
 import { Inter, Inter_Tight } from "next/font/google";
-import localFont from "next/font/local";
 import Script from "next/script";
 
 import { SITE_URL } from "@/utils/const";
