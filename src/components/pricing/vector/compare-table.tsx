@@ -1,6 +1,6 @@
-import * as React from "react";
-import { ChangeEvent, useState } from "react";
-
+import Button from "@/components/button";
+import Tooltip from "@/components/tooltip";
+import useIsMobile from "@/hooks/use-is-mobile";
 import { PricingPlans } from "@/utils/type";
 import {
   IconCreditCard,
@@ -9,12 +9,8 @@ import {
   IconInfoCircle,
   IconRocket,
 } from "@tabler/icons-react";
-
-import useIsMobile from "@/hooks/use-is-mobile";
-
-import Button from "@/components/button";
-import Tooltip from "@/components/tooltip";
-
+import * as React from "react";
+import { ChangeEvent, useState } from "react";
 import CompareValue from "../compare-value";
 
 export default function CompareTable() {

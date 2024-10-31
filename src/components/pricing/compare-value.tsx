@@ -1,9 +1,8 @@
 "use client";
 
+import cx from "@/utils/cx";
 import * as React from "react";
 import { Children, HTMLProps } from "react";
-
-import cx from "@/utils/cx";
 
 export default function CompareValue({
   type = "plain",

@@ -1,5 +1,5 @@
-import * as React from "react";
-
+import Button from "@/components/button";
+import { FeatureTag, Hr } from "@/components/pricing/pricing-parts";
 import {
   IconApps,
   IconHeartbeat,
@@ -10,9 +10,7 @@ import {
   IconUserCircle,
   IconWorld,
 } from "@tabler/icons-react";
-
-import Button from "@/components/button";
-import { FeatureTag, Hr } from "@/components/pricing/pricing-parts";
+import * as React from "react";
 
 export default function PricingTable() {
   return (

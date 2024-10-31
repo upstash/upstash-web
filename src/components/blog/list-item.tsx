@@ -1,9 +1,8 @@
-import Image from "next/image";
-import Link from "next/link";
-
 import cx from "@/utils/cx";
 import type { Post } from "@content";
 import { DateTime } from "luxon";
+import Image from "next/image";
+import Link from "next/link";
 import Balancer from "react-wrap-balancer";
 
 export default function PostListCard({ data }: { data: Post }) {

@@ -1,5 +1,3 @@
-import { HOME_SECTIONS } from "@/utils/const";
-
 import Bg from "@/components/bg";
 import Container from "@/components/container";
 import {
@@ -11,6 +9,7 @@ import DesignedForTheEdge from "@/components/home/serverless/designed-for-the-ed
 import GlobalLowLatency from "@/components/home/serverless/global-low-latency";
 import HttpRestApi from "@/components/home/serverless/http-rest-api";
 import PriceScaleToZero from "@/components/home/serverless/price-scale-to-zero";
+import { HOME_SECTIONS } from "@/utils/const";
 
 export default function HomeServerless() {
   return (

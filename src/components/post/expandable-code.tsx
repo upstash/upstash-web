@@ -1,10 +1,8 @@
 "use client";
 
-import { HTMLProps, useState } from "react";
-
-import cx from "@/utils/cx";
-
 import { IconArrow } from "@/components/post/toc";
+import cx from "@/utils/cx";
+import { HTMLProps, useState } from "react";
 
 export default function ExpandableCode({
   children,

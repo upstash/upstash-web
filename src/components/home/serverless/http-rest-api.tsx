@@ -1,13 +1,10 @@
 "use client";
 
-import { HTMLProps, ReactNode, useEffect, useState } from "react";
-
 import cx from "@/utils/cx";
 import { Product } from "@/utils/type";
 import Prism from "prismjs";
-
+import { HTMLProps, ReactNode, useEffect, useState } from "react";
 import { ServerlessBox, ServerlessSummary, ServerlessTitle } from "./comp";
-
 import "prismjs/components/prism-python";
 import "prismjs/themes/prism-tomorrow.css";
 

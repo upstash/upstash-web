@@ -1,12 +1,10 @@
+import Container from "@/components/container";
+import { Mdx } from "@/components/post/mdx";
+import { allCustomers } from "@content";
+import type { Customer } from "@content";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-
-import { allCustomers } from "@content";
-import type { Customer } from "@content";
-
-import Container from "@/components/container";
-import { Mdx } from "@/components/post/mdx";
 
 type Props = {
   params: {

@@ -1,7 +1,7 @@
 "use client";
 
-import { HTMLProps, useState } from "react";
-
+import Button from "@/components/button";
+import { LogoIcon } from "@/components/logo";
 import { HOME_SECTIONS } from "@/utils/const";
 import cx from "@/utils/cx";
 import {
@@ -10,10 +10,8 @@ import {
   useMotionValueEvent,
   useScroll,
 } from "framer-motion";
+import { HTMLProps, useState } from "react";
 import { animateScroll, Link as SpyLink } from "react-scroll";
-
-import Button from "@/components/button";
-import { LogoIcon } from "@/components/logo";
 
 export default function SectionMenu({
   children,

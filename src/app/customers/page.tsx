@@ -1,15 +1,13 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
-
-import { allCustomers } from "@content";
-
 import Bg from "@/components/bg";
 import Button from "@/components/button";
 import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
+import { allCustomers } from "@content";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function CustomerPage() {
   let customers = allCustomers.filter((o) => !o.draft);

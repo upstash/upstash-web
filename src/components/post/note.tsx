@@ -1,6 +1,5 @@
-import { ReactNode, SVGProps } from "react";
-
 import cx from "@/utils/cx";
+import { ReactNode, SVGProps } from "react";
 
 export default function PostNote({
   children,

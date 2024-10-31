@@ -1,5 +1,4 @@
 import cx from "@/utils/cx";
-
 import { ServerlessBox, ServerlessSummary, ServerlessTitle } from "./comp";
 
 export default function GlobalLowLatency() {

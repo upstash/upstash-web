@@ -1,5 +1,3 @@
-import React, { PropsWithChildren } from "react";
-
 import cx from "@/utils/cx";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import {
@@ -8,6 +6,7 @@ import {
   NavigationMenuTriggerProps,
 } from "@radix-ui/react-navigation-menu";
 import { IconChevronDown } from "@tabler/icons-react";
+import React, { PropsWithChildren } from "react";
 
 export default function NewNavigationRoot({ children }: PropsWithChildren) {
   return (

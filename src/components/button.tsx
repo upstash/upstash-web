@@ -1,8 +1,6 @@
-import { HTMLProps, ReactNode } from "react";
-
-import cx from "@/utils/cx";
-
 import Icon, { ICON_NAMES, IconProps } from "@/components/icon";
+import cx from "@/utils/cx";
+import { HTMLProps, ReactNode } from "react";
 
 export interface IButton extends HTMLProps<HTMLAnchorElement> {
   children?: ReactNode;

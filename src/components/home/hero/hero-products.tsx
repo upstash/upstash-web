@@ -1,11 +1,8 @@
-import { Children, cloneElement, HTMLProps, ReactElement } from "react";
-
+import Button, { IButton } from "@/components/button";
+import { useSegment } from "@/hooks/use-segment";
 import cx from "@/utils/cx";
 import { Product } from "@/utils/type";
-
-import { useSegment } from "@/hooks/use-segment";
-
-import Button, { IButton } from "@/components/button";
+import { Children, cloneElement, HTMLProps, ReactElement } from "react";
 
 export default function HomeHeroProducts({
   activeProduct,
