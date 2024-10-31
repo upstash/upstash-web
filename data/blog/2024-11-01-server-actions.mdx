@@ -56,9 +56,8 @@ export default function Claps({ slug }: { slug: string }) {
   }, [slug]);
 
   return (
-    <div ...>
+    <div>
       <button
-        ...
         onClick={() => { // Increment the number of claps
           clap(slug).then((clapped) => {
             if (clapped) {
@@ -108,9 +107,8 @@ export default async function Claps({ slug }: { slug: string }) {
 
 export default function Button({ claps, onClick }) {
   return (
-    <div ...>
+    <div>
       <button
-        ...
         onClick={() => onClick()} {/* Increment the number of claps */}
       >
         <span className="text-xl">👏</span>
