@@ -8,23 +8,31 @@ import type { Glossary } from "@content";
 import { allGlossaries } from "@content";
 import Link from "next/link";
 
+type GlossaryGrouped = {
+  [key: string]: Glossary[];
+};
+
 export default function HomePage() {
   const glossary = allGlossaries.filter((o) => !o.draft);
 
   const glossarySorted = glossary.sort((a, b) =>
     a.title.localeCompare(b.title),
   );
-  const glossaryGrouped = glossarySorted.reduce((acc, item) => {
-    const letter = item.title[0].toUpperCase();
-    if (!LETTERS.includes(letter)) {
-      acc["#"] = acc["#"] || [];
-      acc["#"].push(item);
+
+  const glossaryGrouped = glossarySorted.reduce<GlossaryGrouped>(
+    (acc, item) => {
+      const letter = item.title[0].toUpperCase();
+      if (!LETTERS.includes(letter)) {
+        acc["#"] = acc["#"] || [];
+        acc["#"].push(item);
+        return acc;
+      }
+      acc[letter] = acc[letter] || [];
+      acc[letter].push(item);
       return acc;
-    }
-    acc[letter] = acc[letter] || [];
-    acc[letter].push(item);
-    return acc;
-  }, {});
+    },
+    {},
+  );
 
   return (
     <>
@@ -86,6 +94,7 @@ export default function HomePage() {
                       <li key={glossary.slug} className="py-2 sm:py-4">
                         <h3>
                           <Link
+                            passHref
                             href={`/glossary/${glossary.slug}`}
                             className="font-display text-lg font-semibold text-emerald-400"
                           >
