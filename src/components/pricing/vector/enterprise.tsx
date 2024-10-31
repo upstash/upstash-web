@@ -1,6 +1,5 @@
-import * as React from "react";
-
 import Button from "@/components/button";
+import * as React from "react";
 
 export default function PricingTableEnterprise() {
   return (

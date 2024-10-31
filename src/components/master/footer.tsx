@@ -1,10 +1,8 @@
-import { HTMLProps } from "react";
-
-import cx from "@/utils/cx";
-
 import Button from "@/components/button";
 import Container from "@/components/container";
 import { Logo } from "@/components/logo";
+import cx from "@/utils/cx";
+import { HTMLProps } from "react";
 
 export interface IAppFooter extends HTMLProps<HTMLDivElement> {}
 

@@ -1,11 +1,9 @@
+import Container from "@/components/container";
+import FastResult from "@/components/fast/result";
+import cx from "@/utils/cx";
 import { Metadata } from "next";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-
-import cx from "@/utils/cx";
-
-import Container from "@/components/container";
-import FastResult from "@/components/fast/result";
 
 const Globe = dynamic(() => import("@/components/home/fast/globe2"), {
   ssr: false,

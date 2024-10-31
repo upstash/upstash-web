@@ -1,6 +1,5 @@
-import { useContext } from "react";
-
 import { SegmentContext } from "@/lib/segment/provider";
+import { useContext } from "react";
 
 // Create an analytics hook that we can use with other components.
 export const useSegment = () => {

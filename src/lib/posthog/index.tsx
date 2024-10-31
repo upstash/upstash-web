@@ -1,10 +1,9 @@
 // app/providers.js
 "use client";
 
-import React from "react";
-
 import posthog from "posthog-js";
 import { PostHogProvider } from "posthog-js/react";
+import React from "react";
 
 if (
   typeof window !== "undefined" &&

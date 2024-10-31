@@ -1,3 +1,5 @@
+import Icon, { ICON_NAMES } from "@/components/icon";
+import cx from "@/utils/cx";
 import {
   Children,
   cloneElement,
@@ -5,11 +7,6 @@ import {
   ReactElement,
   ReactNode,
 } from "react";
-
-import cx from "@/utils/cx";
-
-import Icon, { ICON_NAMES } from "@/components/icon";
-
 import { Category } from "./index";
 
 export function SourceBox({

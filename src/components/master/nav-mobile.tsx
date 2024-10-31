@@ -1,10 +1,8 @@
-import React, { HTMLProps, ReactNode } from "react";
-import Link, { LinkProps } from "next/link";
-
+import Button from "@/components/button";
 import cx from "@/utils/cx";
 import { allJobs } from "@content";
-
-import Button from "@/components/button";
+import Link, { LinkProps } from "next/link";
+import React, { HTMLProps, ReactNode } from "react";
 
 const jobLength = allJobs.filter((o) => !o.draft).length;
 

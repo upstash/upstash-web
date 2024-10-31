@@ -1,7 +1,6 @@
 "use client";
 
 import React, { PropsWithChildren, useEffect, useMemo } from "react";
-
 import { Segment } from "./segment";
 
 export const SegmentContext = React.createContext<Segment | null>(null);

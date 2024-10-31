@@ -1,18 +1,14 @@
 "use client";
 
-import { HTMLProps, useState } from "react";
-import Link from "next/link";
-import { useSelectedLayoutSegment } from "next/navigation";
-
-import cx from "@/utils/cx";
-import { useMotionValueEvent, useScroll } from "framer-motion";
-
-import { useGetAffiliateCodeFromApi } from "@/hooks/use-affiliate-code";
-
 import Button from "@/components/button";
 import Container from "@/components/container";
 import { Logo } from "@/components/logo";
-
+import { useGetAffiliateCodeFromApi } from "@/hooks/use-affiliate-code";
+import cx from "@/utils/cx";
+import { useMotionValueEvent, useScroll } from "framer-motion";
+import Link from "next/link";
+import { useSelectedLayoutSegment } from "next/navigation";
+import { HTMLProps, useState } from "react";
 import NewNavigation from "./new-nav";
 
 export default function Header({ className, ...props }: HTMLProps<any>) {

@@ -1,14 +1,10 @@
 "use client";
 
-import React from "react";
-
-import { Product } from "@/utils/type";
-
-import { useSegment } from "@/hooks/use-segment";
-
 import Button from "@/components/button";
 import IconQStash from "@/components/icon-qstash";
-
+import { useSegment } from "@/hooks/use-segment";
+import { Product } from "@/utils/type";
+import React from "react";
 import {
   ProductBox,
   ProductFeature,

@@ -1,23 +1,22 @@
-import Link from "next/link";
-
-import { allGlossaries } from "@content";
-import type { Glossary } from "@content";
-
 import Bg from "@/components/bg";
 import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
+import { LETTERS } from "@/utils/const";
 import cx from "@/utils/cx";
-
-const keys = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+import type { Glossary } from "@content";
+import { allGlossaries } from "@content";
+import Link from "next/link";
 
 export default function HomePage() {
   const glossary = allGlossaries.filter((o) => !o.draft);
 
-  const glossarySorted = glossary.sort((a, b) => a.title.localeCompare(b.title));
+  const glossarySorted = glossary.sort((a, b) =>
+    a.title.localeCompare(b.title),
+  );
   const glossaryGrouped = glossarySorted.reduce((acc, item) => {
     const letter = item.title[0].toUpperCase();
-    if (!keys.includes(letter)) {
+    if (!LETTERS.includes(letter)) {
       acc["#"] = acc["#"] || [];
       acc["#"].push(item);
       return acc;
@@ -28,64 +27,81 @@ export default function HomePage() {
   }, {});
 
   return (
-    <main className="relative z-0 text-center">
-      <Bg />
+    <>
+      <span
+        id="↑"
+        className="pointer-events-none absolute top-0 size-4 opacity-0"
+      />
 
-      <section className="py-10 md:py-20">
-        <Container className="max-w-screen-lg">
-          <header>
-            <PageHeaderTitle>Glossary</PageHeaderTitle>
-            <PageHeaderDesc className="mt-2">
-              A glossary of terms and concepts used in the world of software
-              development.
-            </PageHeaderDesc>
-          </header>
+      <main className="relative z-0 text-center">
+        <Bg />
 
-          <div className="mt-6 text-xl font-mono inline-flex gap-[1ch]">
-            {["#", ...keys].map((letter) => (
-              <a key={letter}
-                 href={`#${letter}`}
-                 className={
-                   cx(
-                     glossaryGrouped[letter] ? "text-emerald-400" : "opacity-20 pointer-events-none",
-                   )
-                 }>
-                {letter}
-              </a>
-            ))}
-          </div>
+        <section className="mt-10 md:mt-20">
+          <Container className="max-w-screen-lg">
+            <header>
+              <PageHeaderTitle>Glossary</PageHeaderTitle>
+              <PageHeaderDesc className="mt-2">
+                A glossary of terms and concepts used in the world of software
+                development.
+              </PageHeaderDesc>
+            </header>
+          </Container>
+        </section>
 
-        </Container>
-      </section>
+        <div className="sticky top-20 z-10 mx-12 mt-4 inline-flex flex-wrap justify-center gap-[1ch] rounded-xl bg-zinc-950 px-4 py-2 font-mono text-lg">
+          {["#", ...LETTERS, "↑"].map((letter) => (
+            <a
+              key={letter}
+              href={`#${letter}`}
+              className={cx(
+                glossaryGrouped[letter] || letter === "↑"
+                  ? "text-emerald-400"
+                  : "pointer-events-none opacity-20",
+              )}
+            >
+              {letter}
+            </a>
+          ))}
+        </div>
 
-      <section className="pb-40">
-        <Container className="max-w-screen-md space-y-6 text-left">
-          {
-            Object.entries(glossaryGrouped).map(([letter, items]: [string, Glossary[]]) => (
-              <div key={letter} id={letter}>
-                <h2 className="text-2xl font-bold mt-6 mb-2">
-                  {letter}
-                </h2>
-                <ul className="space-y-4">
-                  {
-                    items.map((glossary) => (
-                      <li key={glossary.slug}>
-                        <Link href={`/glossary/${glossary.slug}`}
-                              className="font-display text-xl font-semibold text-emerald-400 group-hover/job-item:underline">
-                          {glossary.title}
-                        </Link>
-                        <p className="mt-1 opacity-80">
-                          {glossary.summary}
-                        </p>
+        <section className="mt-8 pb-40 md:mt-20">
+          <Container className="max-w-screen-lg text-left">
+            {Object.entries(glossaryGrouped).map(
+              ([letter, items]: [string, Glossary[]]) => (
+                <div
+                  key={letter}
+                  id={letter}
+                  className="scroll-mt-44 gap-4 border-t border-t-zinc-800 py-8 sm:grid sm:scroll-mt-32 sm:grid-cols-5"
+                >
+                  {/* title */}
+                  <div className="py-4">
+                    <h2 className="sticky top-32 text-6xl font-bold opacity-10 sm:text-8xl">
+                      {letter}
+                    </h2>
+                  </div>
+
+                  {/* list */}
+                  <ul className="col-span-4 grid gap-4 sm:grid-cols-2">
+                    {items.map((glossary) => (
+                      <li key={glossary.slug} className="py-2 sm:py-4">
+                        <h3>
+                          <Link
+                            href={`/glossary/${glossary.slug}`}
+                            className="font-display text-lg font-semibold text-emerald-400"
+                          >
+                            {glossary.title}
+                          </Link>
+                        </h3>
+                        <p className="opacity-60">{glossary.summary}</p>
                       </li>
-                    ))
-                  }
-                </ul>
-              </div>
-            ))
-          }
-        </Container>
-      </section>
-    </main>
+                    ))}
+                  </ul>
+                </div>
+              ),
+            )}
+          </Container>
+        </section>
+      </main>
+    </>
   );
 }

@@ -1,10 +1,8 @@
 import "../post.css";
 import "../code.css";
-
-import { ReactNode } from "react";
-import { Metadata } from "next";
-
 import { SITE_URL } from "@/utils/const";
+import { Metadata } from "next";
+import { ReactNode } from "react";
 
 const title = "Upstash Blog";
 const description = "Articles and tutorials from Upstash and community.";

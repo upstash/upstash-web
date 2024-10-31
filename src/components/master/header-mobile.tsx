@@ -1,15 +1,12 @@
 "use client";
 
-import { HTMLProps, useEffect, useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-
-import cx from "@/utils/cx";
-
 import Container from "@/components/container";
 import Icon, { ICON_NAMES } from "@/components/icon";
 import { Logo } from "@/components/logo";
-
+import cx from "@/utils/cx";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { HTMLProps, useEffect, useState } from "react";
 import NavMobile from "./nav-mobile";
 
 export interface IAppHeader extends HTMLProps<HTMLHeadElement> {}

@@ -1,6 +1,5 @@
 import { authors } from "@/utils/authors";
 import { ImageResponse } from "@vercel/og";
-
 import { baseUrl, getPostDetails } from "../utils/og-post-details";
 
 export const runtime = "edge";

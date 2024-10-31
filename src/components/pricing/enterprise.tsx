@@ -1,6 +1,5 @@
-import * as React from "react";
-
 import Button from "@/components/button";
+import * as React from "react";
 
 export default function PricingTableEnterprise() {
   return (
@@ -17,10 +16,6 @@ export default function PricingTableEnterprise() {
           Contact Us
         </Button>
       </div>
-
-
-
-
 
       <div className="mt-6 md:mt-0">
         <ul className="space-y-2">

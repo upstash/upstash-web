@@ -1,11 +1,9 @@
-import { notFound } from "next/navigation";
-
-import { allGlossaries } from "@content";
-import type { Job } from "@content";
-
 import Bg from "@/components/bg";
 import Container from "@/components/container";
 import { Mdx } from "@/components/post/mdx";
+import { allGlossaries } from "@content";
+import type { Job } from "@content";
+import { notFound } from "next/navigation";
 
 type Props = {
   params: {
@@ -22,11 +20,13 @@ export async function generateStaticParams(): Promise<Props["params"][]> {
 }
 
 export async function generateMetadata({
-                                         params,
-                                       }: {
+  params,
+}: {
   params: Props["params"];
 }) {
-  const glossary = allGlossaries.find((job: Job) => job.slug === params.slug) as Job;
+  const glossary = allGlossaries.find(
+    (job: Job) => job.slug === params.slug,
+  ) as Job;
   // const url = `${SITE_URL}/glossary/${glossary.slug}`;
 
   return {
@@ -49,14 +49,10 @@ export default async function BlogPage({ params }: Props) {
 
       <article>
         <Container className="max-w-screen-md">
-          <h1>
-            {glossary.title}
-          </h1>
-          <h3>
-            {glossary.summary}
-          </h3>
+          <h1>{glossary.title}</h1>
+          <h3>{glossary.summary}</h3>
 
-          <hr/>
+          <hr />
 
           <Mdx code={glossary.mdx} />
         </Container>

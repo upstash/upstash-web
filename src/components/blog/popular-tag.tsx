@@ -1,7 +1,6 @@
-import Link from "next/link";
-
 import { TAG_NAMES } from "@/utils/const";
 import cx from "@/utils/cx";
+import Link from "next/link";
 
 export default function BlogPopularTag({ data }: { data: [string, number][] }) {
   const colors = [

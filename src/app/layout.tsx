@@ -1,21 +1,17 @@
 import "@upstash/claps/style.css";
 import "./globals.css";
-
-import { ReactNode, Suspense } from "react";
-import dynamic from "next/dynamic";
-import { Inter, Inter_Tight } from "next/font/google";
-import Script from "next/script";
-
-import { SITE_URL } from "@/utils/const";
-import cx from "@/utils/cx";
-
-import { PHProvider } from "@/lib/posthog";
-import { SegmentProvider } from "@/lib/segment/provider";
-
 import Analytics from "@/components/Analytics";
 import Footer from "@/components/master/footer";
 import Header from "@/components/master/header";
 import HeaderMobile from "@/components/master/header-mobile";
+import { PHProvider } from "@/lib/posthog";
+import { SegmentProvider } from "@/lib/segment/provider";
+import { SITE_URL } from "@/utils/const";
+import cx from "@/utils/cx";
+import dynamic from "next/dynamic";
+import { Inter, Inter_Tight } from "next/font/google";
+import Script from "next/script";
+import { ReactNode, Suspense } from "react";
 
 const PostHogPageView = dynamic(() => import("@/lib/posthog/page-view"), {
   ssr: false,
@@ -41,28 +37,28 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         "min-h-screen scroll-smooth bg-zinc-950 text-sm text-zinc-50 antialiased md:text-base",
       )}
     >
-    <PHProvider>
-      <body className="pt-[70px] md:pt-[80px]">
-      <PostHogPageView />
-      <Suspense>
-        <Analytics />
-      </Suspense>
-      <SegmentProvider
-        writeKey={process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY!}
-      >
-        <Header />
-        <HeaderMobile />
-        {children}
-        <Footer />
-      </SegmentProvider>
+      <PHProvider>
+        <body className="pt-[70px] md:pt-[80px]">
+          <PostHogPageView />
+          <Suspense>
+            <Analytics />
+          </Suspense>
+          <SegmentProvider
+            writeKey={process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY!}
+          >
+            <Header />
+            <HeaderMobile />
+            {children}
+            <Footer />
+          </SegmentProvider>
 
-      {process.env.NODE_ENV !== "development" && (
-        <>
-          <Script
-            id="ph_referral_track"
-            strategy="beforeInteractive"
-            dangerouslySetInnerHTML={{
-              __html: `
+          {process.env.NODE_ENV !== "development" && (
+            <>
+              <Script
+                id="ph_referral_track"
+                strategy="beforeInteractive"
+                dangerouslySetInnerHTML={{
+                  __html: `
                     function removeTrailingSlash(url) {
                         return url.endsWith('/') ? url.slice(0, -1) : url;
                     }
@@ -74,26 +70,26 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                       }
                     })();
                   `,
-            }}
-          />
-          <Script
-            strategy="afterInteractive"
-            src={`https://www.googletagmanager.com/gtag/js?id=G-QW5KRSTDM0`}
-          />
-          <Script
-            id="ga"
-            strategy="afterInteractive"
-            dangerouslySetInnerHTML={{
-              __html: ` window.dataLayer = window.dataLayer || [];
+                }}
+              />
+              <Script
+                strategy="afterInteractive"
+                src={`https://www.googletagmanager.com/gtag/js?id=G-QW5KRSTDM0`}
+              />
+              <Script
+                id="ga"
+                strategy="afterInteractive"
+                dangerouslySetInnerHTML={{
+                  __html: ` window.dataLayer = window.dataLayer || [];
                             function gtag(){ dataLayer.push(arguments); }
                             gtag('js', new Date());
                             gtag('config', 'G-QW5KRSTDM0');`,
-            }}
-          />
-        </>
-      )}
-      </body>
-    </PHProvider>
+                }}
+              />
+            </>
+          )}
+        </body>
+      </PHProvider>
     </html>
   );
 }

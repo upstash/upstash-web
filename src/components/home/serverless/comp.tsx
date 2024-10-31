@@ -1,10 +1,8 @@
-import React, { Children, cloneElement, HTMLProps, ReactElement } from "react";
-
-import cx from "@/utils/cx";
-import { Product } from "@/utils/type";
-
 import Button from "@/components/button";
 import Icon, { ICON_NAMES } from "@/components/icon";
+import cx from "@/utils/cx";
+import { Product } from "@/utils/type";
+import React, { Children, cloneElement, HTMLProps, ReactElement } from "react";
 
 export function ServerlessBox({
   children,

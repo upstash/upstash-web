@@ -1,9 +1,7 @@
 import "./glossary.css";
-
-import { ReactNode } from "react";
-import { Metadata } from "next";
-
 import { SITE_URL } from "@/utils/const";
+import { Metadata } from "next";
+import { ReactNode } from "react";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

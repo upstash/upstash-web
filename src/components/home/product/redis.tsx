@@ -1,14 +1,10 @@
 "use client";
 
-import React from "react";
-
-import { Product } from "@/utils/type";
-
-import { useSegment } from "@/hooks/use-segment";
-
 import Button from "@/components/button";
 import IconRedis from "@/components/icon-redis";
-
+import { useSegment } from "@/hooks/use-segment";
+import { Product } from "@/utils/type";
+import React from "react";
 import {
   ProductBox,
   ProductFeature,

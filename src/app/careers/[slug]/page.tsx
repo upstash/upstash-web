@@ -1,14 +1,12 @@
-import { notFound } from "next/navigation";
-
-import { SITE_URL } from "@/utils/const";
-import { allJobs } from "@content";
-import type { Job } from "@content";
-
 import Bg from "@/components/bg";
 import CareerHeader from "@/components/career/header";
 import Container from "@/components/container";
 import PageBodyGradient from "@/components/page-body-gradient";
 import { Mdx } from "@/components/post/mdx";
+import { SITE_URL } from "@/utils/const";
+import { allJobs } from "@content";
+import type { Job } from "@content";
+import { notFound } from "next/navigation";
 
 type Props = {
   params: {

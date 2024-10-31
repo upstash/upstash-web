@@ -1,15 +1,12 @@
 "use client";
 
-import { ComponentProps, useEffect, useRef, useState } from "react";
-import Image from "next/image";
-
+import PostTOC from "@/components/post/toc";
 import cx from "@/utils/cx";
 import { MDXContent } from "@content-collections/mdx/react";
 import { IconCheck, IconCopy } from "@tabler/icons-react";
+import Image from "next/image";
+import { ComponentProps, useEffect, useRef, useState } from "react";
 import Balancer from "react-wrap-balancer";
-
-import PostTOC from "@/components/post/toc";
-
 import ExpandableCode from "./expandable-code";
 import PostNote from "./note";
 

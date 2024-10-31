@@ -1,8 +1,7 @@
-import * as React from "react";
-
 import cx from "@/utils/cx";
 import * as Accordion from "@radix-ui/react-accordion";
 import { IconPlus } from "@tabler/icons-react";
+import * as React from "react";
 
 const AccordionItem = React.forwardRef(
   (

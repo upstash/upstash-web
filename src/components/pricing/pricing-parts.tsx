@@ -1,7 +1,6 @@
+import cx from "@/utils/cx";
 import * as React from "react";
 import { ComponentProps } from "react";
-
-import cx from "@/utils/cx";
 
 export function Hr({ className }: ComponentProps<"hr">) {
   return (

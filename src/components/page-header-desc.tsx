@@ -1,6 +1,5 @@
-import { HTMLProps } from "react";
-
 import cx from "@/utils/cx";
+import { HTMLProps } from "react";
 import Balancer from "react-wrap-balancer";
 
 type IPageHeaderDesc = HTMLProps<HTMLParagraphElement> & {};

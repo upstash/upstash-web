@@ -1,12 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
-
 import type { Example } from "@/app/examples/get-data";
-import { authors } from "@/utils/authors";
-
 import Button from "@/components/button";
-
+import { authors } from "@/utils/authors";
+import React, { useState } from "react";
 import { Example as Box } from "./comp";
 import ExampleFilter from "./filter";
 
