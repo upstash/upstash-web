@@ -63,7 +63,7 @@
 }
 
 .post h2 {
-  @apply text-2xl md:mt-16 md:text-4xl;
+  @apply text-2xl md:mt-16 md:text-3xl;
 }
 
 .post h3 {

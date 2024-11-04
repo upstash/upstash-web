@@ -31,7 +31,7 @@ function CopyFeaturePre(props: ComponentProps<"pre">) {
       setHasCopied(false);
     }, 3000);
   }, [hasCopied]);
-  if (props && !props["data-language"]) {
+  if (props && !props["data-language" as keyof typeof props]) {
     return <pre {...props} className="" />;
   }
 

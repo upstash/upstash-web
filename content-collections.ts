@@ -68,6 +68,7 @@ export const glossary = defineCollection({
   schema: (z) => ({
     title: z.string(),
     summary: z.string(),
+    relations: z.array(z.string()).optional(),
     draft: z.boolean().optional(),
   }),
   transform: async (doc, ctx) => {
