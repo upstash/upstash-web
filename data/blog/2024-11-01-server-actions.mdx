@@ -100,7 +100,7 @@ export default async function Claps({ slug }: { slug: string }) {
 }
 ```
 
-2. Server Action is then passed down to a Client Component so that it can be used with `onClick`.
+2. Event handlers such as `onClick` cannot be used in Server Components. Therefore we need to separate the `Button` as a Client Component and pass the `clap` Server Action down to it.
 
 ```tsx
 "use client";
@@ -129,7 +129,7 @@ As shown in the design with Client Components, you can also use Server Actions t
 
 ### Server Actions in Next.js and Security
 
-Server Actions are basically publicly accessible HTTP endpoints that only use the `POST` method. Even if they are not imported elsewhere in your code they are public, you should treat them as such and secure them.
+Server Actions are basically publicly accessible HTTP endpoints that only use the `POST` method. Even if they are not imported elsewhere in your code they are public, you should treat them as such and secure them. For more information on Server Actions Security you can check the [Next.js documentation](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions-and-mutations#security).
 
 - **Authentication and Authorization:** You should always check if the user is allowed to invoke this action.
 - **Validating Arguments:** Keep in mind that TypeScript annotations you provide to the function are not not enforced, you should manually validate the types of arguments or use a tool like `zod`.
@@ -139,7 +139,7 @@ Server Actions are basically publicly accessible HTTP endpoints that only use th
   Next.js recommends using [React taint APIs](https://nextjs.org/docs/app/building-your-application/data-fetching/fetching#preventing-sensitive-data-from-being-exposed-to-the-client) to prevent specific data from being exposed to the client.
 </Note>
 
-Next.js 15 RC 2 also introduced some enhancements to improve the security of Server Actions:
+[Next.js 15 RC 2 also introduced some enhancements](https://nextjs.org/blog/next-15-rc2#enhanced-security-for-server-actions) to improve the security of Server Actions:
 
 - **Dead Code Elimination:** IDs of unused Server Actions won’t be exposed.
 - **Secure Action IDs:** Unguessable IDs are created periodically between builds.
