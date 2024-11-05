@@ -6,9 +6,13 @@
 
 #### Note
 
+![](public/readme/note-default.png)
+
 ```mdx
 <Note>You can use any RedisÂ® client, but we recommend @upstash/redis</Note>
 ```
+
+![](public/readme/note-info.png)
 
 ```mdx
 <Note type="info">
@@ -16,11 +20,15 @@
 </Note>
 ```
 
+![](public/readme/note-tip.png)
+
 ```mdx
 <Note type="tip">
   You can use any RedisÂ® client, but we recommend @upstash/redis
 </Note>
 ```
+
+![](public/readme/note-caution.png)
 
 ```mdx
 <Note type="caution">
@@ -28,11 +36,15 @@
 </Note>
 ```
 
+![](public/readme/note-danger.png)
+
 ```mdx
 <Note type="danger">
   You can use any RedisÂ® client, but we recommend @upstash/redis
 </Note>
 ```
+
+![](public/readme/note-custom-title.png)
 
 ```mdx
 <Note title="custom">
@@ -47,12 +59,16 @@
 
 #### Code Block
 
+![](public/readme/code-title.png)
+
 ````mdx
 ```javascript title:"pages/api/hello.ts"
 import type { NextRequest } from 'next/server';
 import { Redis } from '@upstash/redis';
 ```
 ````
+
+![](public/readme/code-showLineNumber.png)
 
 ````mdx
 ```javascript:pages/api/hello.ts showLineNumbers {5-8,12}
@@ -64,6 +80,8 @@ import { Redis } from '@upstash/redis'
 ---
 
 #### Announcing (Confetti)
+
+![](public/readme/announce.png)
 
 ```mdx
 ---
@@ -99,7 +117,7 @@ Unique identifiers can contain letters, numbers, hyphens, and underscores.
 
 #### Docs files:
 
-In the target files wrap the location with comments that reference the identifier of the code snippet that will be placed there:
+In the target files, wrap the location with comments that reference the identifier of the code snippet that will be placed there:
 
 <!--SNIPSTART hellouniverse-->
 <!--SNIPEND-->
