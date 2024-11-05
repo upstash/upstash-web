@@ -6,52 +6,40 @@
 
 #### Note
 
-![](public/readme/note-default.png)
-
 ```mdx
-<Note>You can use any Redis® client, but we recommend @upstash/redis</Note>
+<Note>You can use any RedisÂ® client, but we recommend @upstash/redis</Note>
 ```
-
-![](public/readme/note-info.png)
 
 ```mdx
 <Note type="info">
-  You can use any Redis® client, but we recommend @upstash/redis
+  You can use any RedisÂ® client, but we recommend @upstash/redis
 </Note>
 ```
-
-![](public/readme/note-tip.png)
 
 ```mdx
 <Note type="tip">
-  You can use any Redis® client, but we recommend @upstash/redis
+  You can use any RedisÂ® client, but we recommend @upstash/redis
 </Note>
 ```
-
-![](public/readme/note-caution.png)
 
 ```mdx
 <Note type="caution">
-  You can use any Redis® client, but we recommend @upstash/redis
+  You can use any RedisÂ® client, but we recommend @upstash/redis
 </Note>
 ```
-
-![](public/readme/note-danger.png)
 
 ```mdx
 <Note type="danger">
-  You can use any Redis® client, but we recommend @upstash/redis
+  You can use any RedisÂ® client, but we recommend @upstash/redis
 </Note>
 ```
 
-![](public/readme/note-custom-title.png)
-
 ```mdx
 <Note title="custom">
-  You can use any Redis® client, but we recommend @upstash/redis
+  You can use any RedisÂ® client, but we recommend @upstash/redis
 </Note>
 <Note title="custom" danger>
-  You can use any Redis® client, but we recommend @upstash/redis
+  You can use any RedisÂ® client, but we recommend @upstash/redis
 </Note>
 ```
 
@@ -59,16 +47,12 @@
 
 #### Code Block
 
-![](public/readme/code-title.png)
-
 ````mdx
 ```javascript title:"pages/api/hello.ts"
 import type { NextRequest } from 'next/server';
 import { Redis } from '@upstash/redis';
 ```
 ````
-
-![](public/readme/code-showLineNumber.png)
 
 ````mdx
 ```javascript:pages/api/hello.ts showLineNumbers {5-8,12}
@@ -80,8 +64,6 @@ import { Redis } from '@upstash/redis'
 ---
 
 #### Announcing (Confetti)
-
-![](public/readme/announce.png)
 
 ```mdx
 ---
