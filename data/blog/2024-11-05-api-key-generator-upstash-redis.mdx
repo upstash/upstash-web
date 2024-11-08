@@ -6,38 +6,47 @@ author_image: https://avatars.githubusercontent.com/u/124523386?s=400&u=cbafa782
 tags: [redis, serverless, api, cloudflare-workers, tutorial]
 ---
 
-# Building a Serverless API Key Generator with Upstash Redis
+API keys are like the front-door keys to your service—they let users in while keeping things secure. In this blog, I’ll walk you through building a simple, secure API key generator using Upstash Redis for fast, serverless data storage and Cloudflare Workers to handle requests at the edge. Whether you’re setting up a new service or adding keys to an existing app, you’ll learn how to generate, store, and validate API keys to keep everything running smoothly and efficiently.
 
-Efficiently managing API keys is essential for securing and scaling modern applications. In this tutorial, we’ll build a serverless API Key Generator using Upstash Redis for fast, reliable storage and Cloudflare Workers for global distribution.
+## What is an API Key?
 
-🔗 **Quick Links**:
-- Live Demo: [dub.sh/keyflow](https://dub.sh/keyflow)
-- Source Code: [git.new/keyflow](https://git.new/keyflow)
-  
+An API key is a unique code that identifies and authenticates a user or application trying to access your API. Think of it like a personal pass: when someone wants to use your service, they need to show this “key” to prove they’re allowed in. API keys help you control who can access your resources, and they’re often used to track usage, enforce limits, or prevent unauthorized access. They’re a straightforward way to manage API access and keep your data secure.
 
-## Why Use Upstash Redis?
+## **What We'll Build**
 
-Upstash Redis is particularly suited for this project because of its serverless-first design and global distribution, allowing for low-latency, high-performance API key validation. Here’s how it meets Keyflow's needs:
+In this guide, we’ll create an api key generator that provides two core functionalities:
 
-1. **Serverless-First**: Optimized for serverless environments, making it ideal for integration with Cloudflare Workers.
-2. **Global Distribution**: Provides low-latency access worldwide, ensuring fast response times for API key validation.
-3. **Data Persistence**: Automatic data persistence without additional configuration simplifies our setup.
-4. **Cost-Effective**: Pay-per-request pricing aligns with serverless cost models.
-5. **Developer-Friendly**: REST API interface enables seamless use within Cloudflare Workers.
+1. Generating new API keys with custom settings
+2. Validating API keys while retrieving their metadata
 
-## Prerequisites
+Key features will include:
 
-You’ll need the following to get started:
-- A [Cloudflare Workers](https://workers.cloudflare.com/) account
-- An [Upstash](https://upstash.com/) account
-- Node.js installed locally
+- Customizable key prefixes
+- Expiration dates
+- Rate limiting
+- Metadata storage
+- Owner identification
+
+### Let's visualize our API key system
+
+This diagram illustrates the interaction between the client, our Cloudflare Worker, and Upstash Redis for both creating and validating API keys. With this overview in mind, let's start building our system.
+
+![https://1wkkahasy6a0u3rf.public.blob.vercel-storage.com/blog/mermaid-diagram-2024-11-08-153609-LjqIaZNv8n7UsRSgACGbmHPfEGYfnt.png](https://1wkkahasy6a0u3rf.public.blob.vercel-storage.com/blog/mermaid-diagram-2024-11-08-153609-LjqIaZNv8n7UsRSgACGbmHPfEGYfnt.png)
+
+## **Prerequisites**
+
+To follow along, you’ll need:
+
+- A [**Cloudflare Workers**](https://workers.cloudflare.com/) account
+- An [**Upstash**](https://upstash.com/) account
+- Node.js installed on your local machine
 
 ## Project Structure
 
 Our project will have the following structure:
 
 ```
-keyflow/
+folder-name/
 ├── src/
 │   ├── config/
 │   │   ├── generateApiKey.ts
@@ -54,18 +63,49 @@ keyflow/
 └── wrangler.toml
 ```
 
-## Step 1: Project Setup
+## **Step 1: Project Setup**
 
-First, let's set up our project:
+Let's start by setting up our project and installing the necessary dependencies.
+
+### **Create a new project directory**
+
+Open your terminal and run the following commands:
 
 ```bash
 mkdir keyflow
 cd keyflow
 npm init -y
-npm install hono @upstash/redis @hono/zod-validator
 ```
 
-Create a `wrangler.toml` file in the root directory:
+### **Install dependencies**
+
+We'll need a few packages for our project:
+
+```bash
+npm install hono @upstash/redis @upstash/ratelimit @hono/zod-validator zod wrangler
+```
+
+`@upstash/redis`: Upstash Redis client for serverless environments
+`@upstash/ratelimit`: Rate limiting library for Upstash Redis
+`@hono/zod-validator`: Request validation middleware for Hono
+`zod`: TypeScript-first schema validation library
+`wrangler`: Cloudflare's CLI for Workers development and deployment
+
+### **Set up Upstash Redis**
+
+1. Log in to your Upstash account and create a new Redis database
+
+![https://1wkkahasy6a0u3rf.public.blob.vercel-storage.com/blog/e639568c-7434-4986-aa6d-738d705e8139-UQ4NIDP70Hsu7hFdZt0n51fXmJQ91s.png](https://1wkkahasy6a0u3rf.public.blob.vercel-storage.com/blog/e639568c-7434-4986-aa6d-738d705e8139-UQ4NIDP70Hsu7hFdZt0n51fXmJQ91s.png)
+
+1. Once created, navigate to the "REST API" section
+
+![https://1wkkahasy6a0u3rf.public.blob.vercel-storage.com/706941d5-30bd-4fc8-8f5a-8c5c209638bd-7EfBnVEoMAL73Y7NizXz1IEbUXLgGM.png](https://1wkkahasy6a0u3rf.public.blob.vercel-storage.com/706941d5-30bd-4fc8-8f5a-8c5c209638bd-7EfBnVEoMAL73Y7NizXz1IEbUXLgGM.png)
+
+1. Copy the `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` in the `.env` section
+
+### **Configure Cloudflare Workers**
+
+Create a `wrangler.toml` file in your project root with the following content:
 
 ```toml
 name = "keyflow"
@@ -77,13 +117,13 @@ UPSTASH_REDIS_REST_URL = "your-redis-url"
 UPSTASH_REDIS_REST_TOKEN = "your-redis-token"
 ```
 
-Replace `"your-redis-url"` and `"your-redis-token"` with your Upstash Redis credentials.
+Replace `"your-redis-url"` and `"your-redis-token"` with the values you copied from Upstash.
 
-## Step 2: Define API Types
+## **Step 2: Defining API Types**
 
-Create a file `src/types/api.ts`:
+Let's start by defining our TypeScript interfaces for our API requests and responses. These types will help us maintain type safety throughout our application. Create a new file `src/types/api.ts`:
 
-```typescript
+```tsx
 export type CreateKeyRequest = {
   apiId: string;
   prefix?: string;
@@ -125,13 +165,14 @@ export type Env = {
   UPSTASH_REDIS_REST_URL: string;
   UPSTASH_REDIS_REST_TOKEN: string;
 };
+
 ```
 
-## Step 3: Implement API Key Generation
+## **Step 3: Implementing API Key Generation**
 
-Create a file `src/config/generateApiKey.ts`:
+Now, let's create a utility function to generate our API keys. Create a new file `src/config/generateApiKey.ts`:
 
-```typescript
+```tsx
 export function generateApiKey(
   prefix: string | undefined,
   byteLength: number,
@@ -143,132 +184,122 @@ export function generateApiKey(
     .replace(/=/g, "");
   return prefix ? `${prefix}_${key}` : key;
 }
+
 ```
 
-## Step 4: Implement Schema Validation
+This function generates a random API key using cryptographically secure random bytes, encodes it in base64, and makes it URL-safe.
 
-Create a file `src/config/schema-validation.ts`:
-
-```typescript
-import { z } from "zod";
-
-export const createApiKeySchema = z.object({
-  apiId: z.string(),
-  prefix: z.string().optional(),
-  byteLength: z.number().int().min(16).max(32).optional(),
-  ownerId: z.string().optional(),
-  name: z.string(),
-  meta: z.record(z.unknown()).optional(),
-  expires: z.number().optional(),
-  ratelimit: z.object({
-    type: z.enum(["fast", "consistent"]),
-    limit: z.number().int().positive(),
-    refillRate: z.number().int().positive(),
-    refillInterval: z.number().int().positive(),
-  }).optional(),
-});
-
-export const verifyApiKeySchema = z.object({
-  key: z.string(),
-});
-```
-
-## Step 5: Implement Rate Limiting
+## Step 4: Implement Rate Limiting
 
 Create a file `src/lib/ratelimit.ts`:
 
-```typescript
-import { Context, Next } from "hono";
+```tsx
+import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis/cloudflare";
+import type { Context, Next } from "hono";
+import { env } from "hono/adapter";
+import type { Env } from "../types/api";
 
+// Middleware for rate limiting
 export async function rateLimitMiddleware(c: Context, next: Next) {
-  const redis = new Redis({
-    url: c.env.UPSTASH_REDIS_REST_URL,
-    token: c.env.UPSTASH_REDIS_REST_TOKEN,
-  });
+	const { UPSTASH_REDIS_REST_TOKEN, UPSTASH_REDIS_REST_URL } = env<Env>(c);
 
-  const ip = c.req.header("CF-Connecting-IP") || "unknown";
-  const key = `ratelimit:${ip}`;
+	const redis = new Redis({
+		url: UPSTASH_REDIS_REST_URL,
+		token: UPSTASH_REDIS_REST_TOKEN,
+	});
 
-  const [current, time] = await redis.mget<[number, number]>(key, `${key}:time`);
-  const now = Date.now();
+	const ratelimit = new Ratelimit({
+		redis: redis,
+		limiter: Ratelimit.slidingWindow(5, "30 s"),
+	});
 
-  if (current && time && now - time < 60000) {
-    if (current > 100) {
-      return c.text("Rate limit exceeded", 429);
-    }
-    await redis.incr(key);
-  } else {
-    await redis.mset(key, 1, `${key}:time`, now);
-  }
+	const ip = c.req.header("CF-Connecting-IP") || "127.0.0.1";
+	const { success, limit, remaining, reset } = await ratelimit.limit(ip);
 
-  await next();
+	if (!success) {
+		return c.json({ error: "Rate limit exceeded" }, 429);
+	}
+
+	c.header("X-RateLimit-Limit", limit.toString());
+	c.header("X-RateLimit-Remaining", remaining.toString());
+	c.header("X-RateLimit-Reset", reset.toString());
+
+	await next();
 }
 ```
 
-## Step 6: Implement Create API Key Route
+## **Step 5: Creating the API Routes**
+
+Let's set up our main application file and create our API routes. This file sets up our Hono application with two main routes: `/keys/create` for generating new API keys and `/keys/verify` for validating existing keys with three separate files.   
+
+### 1. Implement Create API Key Route
 
 Create a file `src/routes/create.ts`:
 
-```typescript
-import { zValidator } from "@hono/zod-validator";
-import { Redis } from "@upstash/redis/cloudflare";
-import { Hono } from "hono";
-import { generateApiKey } from "../config/generateApiKey";
-import { createApiKeySchema } from "../config/schema-validation";
-import type { CreateKeyRequest, CreateKeyResponse, Env } from "../types/api";
+```tsx
+import { zValidator } from "@hono/zod-validator"
+import { Redis } from "@upstash/redis/cloudflare"
+import { Hono } from "hono"
+import { generateApiKey } from "../config/generateApiKey"
+import { createApiKeySchema } from "../config/schema-validation"
+import type { CreateKeyRequest, CreateKeyResponse, Env } from "../types/api"
 
 const create = new Hono<{
-  Bindings: Env;
-}>();
+  Bindings: Env
+}>()
 
 create.post(
   "/create",
   zValidator("json", createApiKeySchema, (result, c) => {
     if (!result.success) {
-      return c.text("Invalid!", 400);
+      return c.text("Invalid!", 400)
     }
   }),
   async (c) => {
-    const { UPSTASH_REDIS_REST_TOKEN, UPSTASH_REDIS_REST_URL } = c.env;
+    // Initialize Redis client
+    const { UPSTASH_REDIS_REST_TOKEN, UPSTASH_REDIS_REST_URL } = c.env
     const redis = new Redis({
       url: UPSTASH_REDIS_REST_URL,
       token: UPSTASH_REDIS_REST_TOKEN,
-    });
-    const body = await c.req.json<CreateKeyRequest>();
+    })
 
-    const keyId = crypto.randomUUID();
-    const key = generateApiKey(body.prefix, body.byteLength || 16);
+    const body = await c.req.json<CreateKeyRequest>()
+
+    // Generate unique identifier and API key
+    const keyId = crypto.randomUUID()
+    const key = generateApiKey(body.prefix, body.byteLength || 16)
 
     const keyData = {
       ...body,
       key,
       keyId,
       createdAt: Date.now(),
-    };
+    }
 
-    const encodedKey = encodeURIComponent(key);
+    const encodedKey = encodeURIComponent(key)
 
     try {
-      await redis.set(`key:${keyId}`, JSON.stringify(keyData));
-      await redis.set(`lookup:${encodedKey}`, keyId);
+      // Store key data and lookup reference in Redis
+      await redis.set(`key:${keyId}`, JSON.stringify(keyData))
+      await redis.set(`lookup:${encodedKey}`, keyId)
 
-      return c.json<CreateKeyResponse>({ key, keyId });
+      return c.json<CreateKeyResponse>({ key, keyId })
     } catch (error) {
-      console.error("Error in /keys/create:", error);
-      return c.json({ error: "Internal Server Error" }, 500);
+      console.error("Error in /keys/create:", error)
+      return c.json({ error: "Internal Server Error" }, 500)
     }
-  },
-);
+  }
+)
 
-export default create;
+export default create
 ```
 
-## Step 7: Implement Verify API Key Route
+### 2. Implement Verify API Key Route
 
 Create a file `src/routes/verify.ts`:
 
-```typescript
+```tsx
 import { zValidator } from "@hono/zod-validator";
 import { Redis } from "@upstash/redis/cloudflare";
 import { Hono } from "hono";
@@ -280,112 +311,107 @@ import type {
   VerifyKeyResponse,
 } from "../types/api";
 
-const verify = new Hono<{
-  Bindings: Env;
-}>();
+// Initialize Hono app with environment bindings
+const verify = new Hono<{ Bindings: Env }>();
 
+// Define POST route for verifying an API key
 verify.post(
   "/verify",
+  // Validate request body against schema
   zValidator("json", verifyApiKeySchema, (result, c) => {
     if (!result.success) {
-      return c.text("Invalid!", 400);
+      return c.text("Invalid!", 400); // Return 400 if validation fails
     }
   }),
   async (c) => {
+    // Set up Redis with environment variables
     const { UPSTASH_REDIS_REST_TOKEN, UPSTASH_REDIS_REST_URL } = c.env;
     const redis = new Redis({
       url: UPSTASH_REDIS_REST_URL,
       token: UPSTASH_REDIS_REST_TOKEN,
     });
+
     const body = await c.req.json<VerifyKeyRequest>();
+    if (!body.key) {
+      return c.json({ error: "key is required" }, 400); // Require key in the request body
+    }
+
+    const encodedKey = encodeURIComponent(body.key);
+    const keyId = await redis.get<string>(`lookup:${encodedKey}`); // Retrieve key ID using encoded key
+
+    if (!keyId) {
+      return c.json<VerifyKeyResponse>({ valid: false }); // Key not found
+    }
+
+    const keyDataString = await redis.get<string>(`key:${keyId}`); // Retrieve key data by key ID
+
+    if (!keyDataString || typeof keyDataString !== "string") {
+      return c.json<VerifyKeyResponse>({ valid: false }); // Key data missing or invalid
+    }
+
+    let keyData: CreateKeyRequest & {
+      key: string;
+      keyId: string;
+      createdAt: number;
+    };
+
     try {
-      if (!body.key) {
-        return c.json({ error: "key is required" }, 400);
-      }
-
-      const encodedKey = encodeURIComponent(body.key);
-      const keyId = await redis.get<string>(`lookup:${encodedKey}`);
-
-      if (!keyId) {
-        return c.json<VerifyKeyResponse>({ valid: false });
-      }
-
-      const keyDataString = await redis.get<string>(`key:${keyId}`);
-
-      if (!keyDataString || typeof keyDataString !== "string") {
-        return c.json<VerifyKeyResponse>({ valid: false });
-      }
-
-      let keyData: CreateKeyRequest & {
-        key: string;
-        keyId: string;
-        createdAt: number;
-      };
-
-      try {
-        keyData = JSON.parse(keyDataString);
-      } catch (parseError) {
-        console.error("Key data parse error:", parseError);
-        await Promise.all([
-          redis.del(`key:${keyId}`),
-          redis.del(`lookup:${encodedKey}`),
-        ]);
-        return c.json(
-          {
-            error: "Invalid key data in storage",
-            details: parseError instanceof Error ? parseError.message : "Unknown parse error",
-            valid: false,
-          },
-          500,
-        );
-      }
-
-      if (keyData.expires && keyData.expires < Date.now()) {
-        await Promise.all([
-          redis.del(`key:${keyId}`),
-          redis.del(`lookup:${encodedKey}`),
-        ]);
-        return c.json<VerifyKeyResponse>({ valid: false });
-      }
-
-      const response: VerifyKeyResponse = {
-        valid: true,
-        ownerId: keyData.ownerId,
-        meta: keyData.meta,
-        expires: keyData.expires,
-      };
-
-      if (keyData.ratelimit) {
-        response.ratelimit = {
-          limit: keyData.ratelimit.limit,
-          remaining: keyData.ratelimit.limit,
-          reset: Date.now() + keyData.ratelimit.refillInterval,
-        };
-      }
-
-      return c.json(response);
-    } catch (error) {
-      console.error("Error in /keys/verify:", error);
+      keyData = JSON.parse(keyDataString); // Parse key data
+    } catch (parseError) {
+      // Handle parse error by deleting invalid data
+      console.error("Key data parse error:", parseError);
+      await Promise.all([
+        redis.del(`key:${keyId}`),
+        redis.del(`lookup:${encodedKey}`),
+      ]);
       return c.json(
         {
-          error: "Internal Server Error",
-          details: error instanceof Error ? error.message : "Unknown error",
+          error: "Invalid key data in storage",
+          details: parseError instanceof Error ? parseError.message : "Unknown parse error",
           valid: false,
         },
         500,
       );
     }
+
+    // Check if key has expired
+    if (keyData.expires && keyData.expires < Date.now()) {
+      await Promise.all([
+        redis.del(`key:${keyId}`),
+        redis.del(`lookup:${encodedKey}`),
+      ]);
+      return c.json<VerifyKeyResponse>({ valid: false });
+    }
+
+    // Formulate response with validation status and metadata
+    const response: VerifyKeyResponse = {
+      valid: true,
+      ownerId: keyData.ownerId,
+      meta: keyData.meta,
+      expires: keyData.expires,
+    };
+
+    if (keyData.ratelimit) {
+      response.ratelimit = {
+        limit: keyData.ratelimit.limit,
+        remaining: keyData.ratelimit.limit,
+        reset: Date.now() + keyData.ratelimit.refillInterval,
+      };
+    }
+
+    return c.json(response); // Return verification response
   },
 );
 
 export default verify;
+
 ```
 
-## Step 8: Create Main Application File
+### 3. Implement the Main file index.ts
 
-Create a file `src/index.ts`:
+implement the main file `src/index.ts` to import `create.ts`, `verify.ts`, and `rateLimitMiddleWare`
 
-```typescript
+```tsx
 import { Hono } from "hono";
 import { rateLimitMiddleware } from "./lib/ratelimit";
 import create from "./routes/create";
@@ -398,38 +424,67 @@ const app = new Hono<{
 
 app.use("*", rateLimitMiddleware);
 
+// add the create file route and verify file route
 app.route("/", create);
 app.route("/", verify);
 
 export default app;
+
 ```
 
-## Step 9: Deployment
+## Step 6: Deployment
 
 Deploy your Keyflow application to Cloudflare Workers:
 
 1. Install Wrangler:
-   ```bash
-   npm install -g wrangler
-   ```
-
+    
+    ```bash
+    npm install -g wrangler
+    ```
+    
 2. Authenticate with Cloudflare:
-   ```bash
-   wrangler login
-   ```
-
+    
+    ```bash
+    wrangler login
+    ```
+    
 3. Deploy your worker:
-   ```bash
-   wrangler deploy
-   ```
+    
+    ```bash
+    wrangler deploy
+    ```
+    
 
-## Step 10: Testing Your API
+## **Step 7: Deployment**
 
-Test your deployed API:
+Now that we have our application ready, let's deploy it to Cloudflare Workers:
 
-### Creating a New API Key
+1. Make sure you have the Wrangler CLI installed:
+    
+    ```
+    npm install -g wrangler
+    ```
+    
+2. Authenticate with your Cloudflare account:
+    
+    ```
+    wrangler login
+    ```
+    
+3. Deploy your worker:
+    
+    ```
+    wrangler deploy
+    ```
+    
 
-```bash
+## **Step 8: Testing Your API**
+
+Let's test our newly deployed API:
+
+### **Creating a New API Key**
+
+```
 curl -X POST https://keyflow.<your-subdomain>.workers.dev/keys/create \
   -H "Content-Type: application/json" \
   -d '{
@@ -444,9 +499,9 @@ curl -X POST https://keyflow.<your-subdomain>.workers.dev/keys/create \
   }'
 ```
 
-### Verifying an API Key
+### **Verifying an API Key**
 
-```bash
+```
 curl -X POST https://keyflow.<your-subdomain>.workers.dev/keys/verify \
   -H "Content-Type: application/json" \
   -d '{
@@ -454,17 +509,18 @@ curl -X POST https://keyflow.<your-subdomain>.workers.dev/keys/verify \
   }'
 ```
 
-Replace `<your-subdomain>` with your Cloudflare Workers subdomain and `prod_AbC123XyZ...` with an actual key generated from the create endpoint.
+Replace `<your-subdomain>` with your Cloudflare Workers subdomain and `prod_AbC123XyZ...` with an actual key generated from the create endpoint.
 
 ## Conclusion
 
-You've successfully built Keyflow, a serverless API key management system using Upstash Redis and Cloudflare Workers. This system provides a solid foundation for managing API keys in your applications, with features like custom prefixes, expiration dates, and metadata storage.
+Creating an API key generator is a key step in securing your application's APIs and managing who can access your services. By building a system that can generate, validate, and manage API keys, you add a strong layer of access control that helps keep your data safe and organized.
 
-## Next Steps
+Here’s a quick rundown of what goes into a solid API key generator:
 
-To enhance Keyflow further, consider implementing:
-- Key rotation capabilities
-- Usage analytics
-- Batch key operations
-- Custom validation rules
-- Enhanced rate limiting options
+1. **Secure Key Generation**: Unique, secure keys that include options like custom prefixes or set lengths make each key distinct and harder to guess.
+2. **Validation and Expiration**: Adding checks and expiration dates ensures each key is valid only for a set time, making it easy to control and limit access as needed.
+3. **Metadata and Rate Limits**: Storing extra information with each key and setting rate limits lets you monitor key usage, track activity, and avoid any abuse of your API.
+
+Using tools like Upstash Redis and Cloudflare Workers makes it easy to build a serverless and globally distributed key management system that scales well and works efficiently.
+
+With this foundation, you’re set up to keep access to your APIs secure and manageable, giving you peace of mind that your resources are protected and easy to monitor.
