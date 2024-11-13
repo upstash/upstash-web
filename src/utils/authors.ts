@@ -388,7 +388,7 @@ export const authors: Record<
     image: "yunus.jpg",
   },
     evans: {
-      name: "Yunus Emre Ozdemir",
+      name: "Evansso",
       title: "Software Developer - Guest Author",
       url: "https://x.com/evansso_",
       image: "evans.jpg",
