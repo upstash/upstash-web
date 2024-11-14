@@ -1,11 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
-import cx from "@/utils/cx";
-import useSWR from "swr";
-
 import { useSegment } from "@/hooks/use-segment";
+import cx from "@/utils/cx";
+import { useEffect, useState } from "react";
+import useSWR from "swr";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 

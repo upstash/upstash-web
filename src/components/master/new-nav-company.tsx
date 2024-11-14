@@ -1,5 +1,3 @@
-import React from "react";
-
 import { allJobs } from "@content";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import {
@@ -7,7 +5,7 @@ import {
   IconUserPlus,
   IconUsers,
 } from "@tabler/icons-react";
-
+import React from "react";
 import {
   ListItem,
   NewNavigationContent,

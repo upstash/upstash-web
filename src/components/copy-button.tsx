@@ -1,12 +1,10 @@
 "use client";
 
-import * as React from "react";
-import { HTMLAttributes } from "react";
-
+import Icon, { ICON_NAMES } from "@/components/icon";
 import cx from "@/utils/cx";
 import copy from "copy-to-clipboard";
-
-import Icon, { ICON_NAMES } from "@/components/icon";
+import * as React from "react";
+import { HTMLAttributes } from "react";
 
 export interface Props extends HTMLAttributes<HTMLButtonElement> {
   code: string;

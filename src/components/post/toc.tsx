@@ -1,8 +1,7 @@
 "use client";
 
-import { ComponentProps } from "react";
-
 import cx from "@/utils/cx";
+import { ComponentProps } from "react";
 
 export default function PostTOC({ children, ...props }: ComponentProps<"nav">) {
   // if there are no children, don't render the TOC

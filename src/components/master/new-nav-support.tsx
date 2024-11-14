@@ -1,5 +1,3 @@
-import React from "react";
-
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import {
   IconBrandDiscord,
@@ -7,7 +5,7 @@ import {
   IconBrandX,
   IconMail,
 } from "@tabler/icons-react";
-
+import React from "react";
 import {
   ListItem,
   NewNavigationContent,

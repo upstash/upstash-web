@@ -1,13 +1,20 @@
 ---
 title: "Scheduling Audio Transcriptions with QStash"
 slug: scheduled-transcriber
-draft: true
 authors:
   - rishi
 tags: [sdk, fireworks, clerk, ai, vercel]
 ---
 
-In this tutorial, you will learn how to build a scheduled audio transcription system using Upstash QStash for task scheduling and Fireworks AI for transcription. You will also learn techniques for secure file uploads to Cloudflare R2, user authentication with Clerk, and data storage with Upstash Redis.
+In this tutorial, you will learn how to build a scheduled audio transcription system using Upstash QStash for task scheduling and Fireworks AI for AI-powered transcriptions. You will also learn techniques to secure file uploads to Cloudflare R2, authenticate users with Clerk, store and fetch data from Upstash Redis.
+
+With focus on being able to scale, updating state of the users, history of transcriptions, and offloading the transcription work to background workers, the application heavily relies on QStash. The application will allow users to upload audio files that need to be transcribed, create a background process to schedule the transcription, update the history of transcriptions (for the particular user), and then display it back to them in the frontend.  
+
+## Demo
+
+Before jumping into the technical stuff, let me give you a sneak peek of what you will build in this tutorial.
+
+<video src="https://github.com/user-attachments/assets/9d1484be-2a69-4659-8873-5f8a2f3eb8eb" controls></video>
 
 ## Prerequisites
 

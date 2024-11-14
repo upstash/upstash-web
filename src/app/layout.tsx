@@ -3,8 +3,7 @@ import "./globals.css";
 
 import { ReactNode, Suspense } from "react";
 import dynamic from "next/dynamic";
-import { Inter } from "next/font/google";
-import localFont from "next/font/local";
+import { Inter, Inter_Tight } from "next/font/google";
 
 import { SITE_URL } from "@/utils/const";
 import cx from "@/utils/cx";
@@ -19,27 +18,14 @@ const PostHogPageView = dynamic(() => import("@/lib/posthog/page-view"), {
   ssr: false,
 });
 
-const inter = Inter({
+const fontText = Inter({
   variable: "--font-sans",
   subsets: ["latin"],
 });
 
-const interDisplay = localFont({
+const fontDisplay = Inter_Tight({
   variable: "--font-display",
-  src: [
-    {
-      path: "./fonts/Inter-DisplayMedium.woff2",
-      weight: "500",
-    },
-    {
-      path: "./fonts/Inter-DisplaySemiBold.woff2",
-      weight: "600",
-    },
-    {
-      path: "./fonts/Inter-DisplayBold.woff2",
-      weight: "700",
-    },
-  ],
+  subsets: ["latin"],
 });
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -47,8 +33,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html
       lang="en"
       className={cx(
-        inter.variable,
-        interDisplay.variable,
+        fontText.variable,
+        fontDisplay.variable,
         "min-h-screen scroll-smooth bg-zinc-950 text-sm text-zinc-50 antialiased md:text-base",
       )}
     >

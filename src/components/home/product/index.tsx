@@ -2,12 +2,12 @@ import { HTMLProps } from "react";
 
 import { HOME_SECTIONS } from "@/utils/const";
 
-import {Bg, Container} from "@/components";
 import {
   SectionHeader,
   SectionHeaderSummary,
   SectionHeaderTitle,
 } from "@/components/home/section-header";
+import { Bg, Container } from "@/components";
 
 import QStash from "./qstash";
 import Redis from "./redis";

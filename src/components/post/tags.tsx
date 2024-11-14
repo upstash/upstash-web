@@ -1,7 +1,6 @@
-import Link from "next/link";
-
 import cx from "@/utils/cx";
 import type { Post } from "@content";
+import Link from "next/link";
 
 type Props = {
   post: Post;

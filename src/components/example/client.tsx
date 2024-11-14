@@ -5,8 +5,7 @@ import React, { useState } from "react";
 import type { Example } from "@/app/examples/get-data";
 import { authors } from "@/utils/authors";
 
-import {Button} from "@/components";
-
+import { Button } from "@/components";
 import { Example as Box } from "./comp";
 import ExampleFilter from "./filter";
 

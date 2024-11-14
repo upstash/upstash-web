@@ -4,8 +4,7 @@ import React from "react";
 
 import { useSegment } from "@/hooks/use-segment";
 
-import {IconRedis} from "@/components";
-
+import { IconRedis } from "@/components";
 import {
   PriceBadge,
   PriceBox,

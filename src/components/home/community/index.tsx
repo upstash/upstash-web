@@ -2,14 +2,13 @@ import React from "react";
 
 import { HOME_SECTIONS } from "@/utils/const";
 
-import {Bg, Container} from "@/components";
 import {
   SectionHeader,
   SectionHeaderSummary,
   SectionHeaderTitle,
 } from "@/components/home/section-header";
 import Icon, { ICON_NAMES } from "@/components/icon";
-
+import { Bg, Container } from "@/components";
 import {
   CommunityBox,
   CommunityBoxButton,

@@ -1,10 +1,7 @@
-import { HTMLProps } from "react";
-import Image from "next/image";
-
-import cx from "@/utils/cx";
-
 import { LogoIcon } from "@/components/logo";
-
+import cx from "@/utils/cx";
+import Image from "next/image";
+import { HTMLProps } from "react";
 import { ServerlessBox, ServerlessSummary, ServerlessTitle } from "./comp";
 
 export default function DesignedForTheEdge() {

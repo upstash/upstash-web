@@ -1,11 +1,13 @@
+import Tooltip from "@/components/tooltip";
+import useIsMobile from "@/hooks/use-is-mobile";
+import { PricingPlans } from "@/utils/type";
+import {
+  IconCreditCard,
+  IconDatabase,
+  IconInfoCircle,
+} from "@tabler/icons-react";
 import * as React from "react";
 import { ChangeEvent, useState } from "react";
-
-import { PricingPlans } from "@/utils/type";
-import { IconCreditCard, IconDatabase } from "@tabler/icons-react";
-
-import useIsMobile from "@/hooks/use-is-mobile";
-
 import CompareValue from "../compare-value";
 
 export default function CompareTable() {
@@ -279,7 +281,7 @@ export default function CompareTable() {
             className="bg-emerald-300/10 px-4 py-0"
           >
             <CompareValue type="size" suffix="MB">
-              1
+              10
             </CompareValue>
           </td>
           <td
@@ -287,7 +289,7 @@ export default function CompareTable() {
             className="bg-white/3 px-4 py-0"
           >
             <CompareValue type="size" suffix="MB">
-              10
+              50
             </CompareValue>
           </td>
           <td
@@ -295,14 +297,14 @@ export default function CompareTable() {
             className="bg-white/3 px-4 py-0"
           >
             <CompareValue type="size" suffix="MB">
-              10
+              50
             </CompareValue>
           </td>
         </tr>
 
         <tr>
           <th className="px-0 py-4 text-left font-normal text-white/60">
-            Max Number of Topics
+            Max Number of URL Groups
           </th>
           {/**/}
           <td
@@ -315,7 +317,7 @@ export default function CompareTable() {
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0"
           >
-            <CompareValue>20</CompareValue>
+            <CompareValue>100</CompareValue>
           </td>
           <td
             hidden={isMobile ? !showPro1 : false}
@@ -333,7 +335,7 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 py-4 text-left font-normal text-white/60">
-            Max Number of Endpoints per Topic
+            Max Number of Endpoints per URL Group
           </th>
           {/**/}
           <td
@@ -488,7 +490,7 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 py-4 text-left font-normal text-white/60">
-            Max Schedule Count
+            Max Active Schedules
           </th>
           {/**/}
           <td
@@ -501,19 +503,56 @@ export default function CompareTable() {
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0"
           >
-            <CompareValue type="number">1000</CompareValue>
+            <CompareValue
+              type="number"
+              after={
+                <Tooltip content="Free up to 1000. Beyond that, $0.01 per active schedule.">
+                  <IconInfoCircle
+                    className="ml-1 opacity-60"
+                    stroke={1.2}
+                    aria-label="Info"
+                  />
+                </Tooltip>
+              }
+            >
+              1000
+            </CompareValue>
           </td>
           <td
             hidden={isMobile ? !showPro1 : false}
             className="bg-white/3 px-4 py-0"
           >
-            <CompareValue>10000</CompareValue>
+            <CompareValue
+              after={
+                <Tooltip content="Free up to 10K. Beyond that, $0.01 per active schedule.">
+                  <IconInfoCircle
+                    className="ml-1 opacity-60"
+                    stroke={1.2}
+                    aria-label="Info"
+                  />
+                </Tooltip>
+              }
+            >
+              10000
+            </CompareValue>
           </td>
           <td
             hidden={isMobile ? !showPro10 : false}
             className="bg-white/3 px-4 py-0"
           >
-            <CompareValue>10000</CompareValue>
+            <CompareValue
+              after={
+                <Tooltip content="Free up to 50K. Beyond that, $0.01 per active schedule.">
+                  <IconInfoCircle
+                    className="ml-1 opacity-60"
+                    stroke={1.2}
+                    aria-label="Info"
+                  />
+                </Tooltip>
+              }
+            >
+              50000
+            </CompareValue>
           </td>
         </tr>
 
@@ -608,67 +647,6 @@ export default function CompareTable() {
             <CompareValue type="number">100000</CompareValue>
           </td>
         </tr>
-        <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
-            Max LLM Requests Per Day
-          </th>
-          {/**/}
-          <td
-            hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue type="number">300</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPayg : false}
-            className="bg-emerald-300/10 px-4 py-0"
-          >
-            <CompareValue type="number">30000</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPro1 : false}
-            className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue type="number">300000</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue type="number">300000</CompareValue>
-          </td>
-        </tr>
-        <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
-            Max LLM Tokens Per Day
-          </th>
-          {/**/}
-          <td
-            hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue type="number">10000</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPayg : false}
-            className="bg-emerald-300/10 px-4 py-0"
-          >
-            <CompareValue>10M</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPro1 : false}
-            className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue>1B</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue>1B</CompareValue>
-          </td>
-        </tr>
-
         <tr>
           <th className="px-0 text-left font-normal text-white/60">
             Uptime SLA
@@ -778,36 +756,6 @@ export default function CompareTable() {
             className="bg-white/3 px-4 py-0"
           >
             <CompareValue>None</CompareValue>
-          </td>
-        </tr>
-        <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
-            LLM price
-          </th>
-          {/**/}
-          <td
-            hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue>Free</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPayg : false}
-            className="bg-emerald-300/10 px-4 py-0"
-          >
-            <CompareValue>$0.3 per 1M tokens</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPro1 : false}
-            className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue>$0.3 per 1M tokens</CompareValue>
-          </td>
-          <td
-            hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0"
-          >
-            <CompareValue>$0.3 per 1M tokens</CompareValue>
           </td>
         </tr>
       </tbody>

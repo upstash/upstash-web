@@ -1,8 +1,7 @@
-import Image from "next/image";
-import Link from "next/link";
-
 import type { Post } from "@content";
 import { DateTime } from "luxon";
+import Image from "next/image";
+import Link from "next/link";
 import Balancer from "react-wrap-balancer";
 
 export default function PostGridCard({ data }: { data: Post }) {

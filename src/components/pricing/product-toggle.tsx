@@ -1,12 +1,10 @@
-import * as React from "react";
-import Link from "next/link";
-
-import cx from "@/utils/cx";
-import { motion } from "framer-motion";
-
 import IconQStash from "@/components/icon-qstash";
 import IconRedis from "@/components/icon-redis";
 import IconVector from "@/components/icon-vector";
+import cx from "@/utils/cx";
+import { motion } from "framer-motion";
+import Link from "next/link";
+import * as React from "react";
 
 export default function ProductToggle({ product }: { product: string }) {
   return (
