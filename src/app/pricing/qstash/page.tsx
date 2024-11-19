@@ -4,7 +4,7 @@ import QStashFaqJson from "@/../public/faq/qstash.json";
 import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
-import Enterprise from "@/components/pricing/enterprise";
+import Enterprise from "@/components/pricing/qstash/enterprise";
 import ProductToggle from "@/components/pricing/product-toggle";
 import CompareTable from "@/components/pricing/qstash/compare-table";
 import FAQ from "@/components/pricing/qstash/faq";
