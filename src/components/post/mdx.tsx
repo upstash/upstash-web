@@ -50,18 +50,15 @@ function CopyFeaturePre(props: ComponentProps<"pre">) {
         }}
         className={cx(
           "absolute right-5 top-5",
-          "flex items-center justify-center p-1",
-          "cursor-pointer rounded-md",
-          "",
-          hasCopied
-            ? "bg-white text-emerald-600"
-            : "text-zinc-400 hover:text-zinc-600 dark:text-zinc-600 dark:hover:text-zinc-200",
+          "flex items-center justify-center p-2",
+          "cursor-pointer rounded-md bg-white/5",
+          hasCopied ? "text-primary bg-white" : "text-white/60",
         )}
       >
         {hasCopied ? (
-          <IconCheck size={20} stroke={1.5} />
+          <IconCheck size={16} stroke={2} />
         ) : (
-          <IconCopy size={20} stroke={1.5} />
+          <IconCopy size={16} stroke={2} />
         )}
       </button>
       <pre {...props} className="" />

@@ -2,6 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --color-bg: #fafafa;
+  --color-primary: #34d399;
+  --color-text: #022c22;
+  --color-text-mute: #52525b;
+}
+
+/* dark */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #09090b;
+    --color-primary: #10b981;
+    --color-text: #ecfdf5;
+    --color-text-mute: #a1a1aa;
+  }
+}
+
 @layer base {
   select {
     @apply appearance-none bg-no-repeat !pr-12;

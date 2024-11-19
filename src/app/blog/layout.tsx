@@ -33,9 +33,5 @@ export const metadata: Metadata = {
 };
 
 export default function BlogLayout({ children }: { children: ReactNode }) {
-  return (
-    <div className="bg-zinc-50 pb-20 text-emerald-950 dark:bg-transparent dark:text-inherit">
-      {children}
-    </div>
-  );
+  return <div className="pb-20">{children}</div>;
 }
