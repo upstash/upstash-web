@@ -31,14 +31,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="en"
-      className={cx(
-        fontText.variable,
-        fontDisplay.variable,
-        "min-h-screen scroll-smooth bg-zinc-950 text-sm text-zinc-50 antialiased md:text-base",
-      )}
+      className={cx(fontText.variable, fontDisplay.variable, "scroll-smooth")}
     >
       <PHProvider>
-        <body className="pt-[70px] md:pt-[80px]">
+        <body
+          className={cx(
+            "min-h-screen pt-[70px] antialiased md:pt-[80px]",
+            "text-text text-sm md:text-base",
+            "bg-bg",
+          )}
+        >
           <PostHogPageView />
           <Suspense>
             <Analytics />

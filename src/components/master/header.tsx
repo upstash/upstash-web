@@ -24,8 +24,9 @@ export default function Header({ className, ...props }: HTMLProps<any>) {
   return (
     <header
       className={cx(
-        "fixed inset-x-0 top-0 z-50 hidden bg-zinc-950/80 backdrop-blur transition will-change-auto md:block",
+        "fixed inset-x-0 top-0 z-50 hidden md:block",
         segment === "pricing" && "absolute",
+        fix && "bg-bg",
         className,
       )}
       {...props}
@@ -33,7 +34,8 @@ export default function Header({ className, ...props }: HTMLProps<any>) {
       <Container>
         <div
           className={cx(
-            "flex items-center border-b border-b-white/5 py-5 md:grid md:grid-cols-6",
+            "flex items-center py-5 md:grid md:grid-cols-6",
+            "border-b border-b-black/5 dark:border-b-white/5",
           )}
         >
           <div className="flex">
@@ -41,7 +43,9 @@ export default function Header({ className, ...props }: HTMLProps<any>) {
               <Logo />
             </Link>
           </div>
+
           <NewNavigation />
+
           <div className="flex justify-end">
             <Button
               target="_self"
@@ -52,7 +56,7 @@ export default function Header({ className, ...props }: HTMLProps<any>) {
                   ? `https://console.upstash.com/?code=${affiliateCode}`
                   : "https://console.upstash.com"
               }
-              className={cx("", fix ? "bg-emerald-500" : "")}
+              className={cx("", fix ? "!bg-primary" : "")}
             >
               Login
             </Button>

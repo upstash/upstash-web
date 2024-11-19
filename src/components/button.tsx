@@ -20,10 +20,13 @@ export default function Button({
   ...props
 }: IButton) {
   const classes = {
-    button: `gap-1 px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-zinc-50 bg-white/5
-    hover:bg-emerald-400 hover:text-emerald-950
-    disabled:bg-white/5 disabled:text-zinc-50`,
-    link: `gap-0.5 hover:text-emerald-400 hover:underline`,
+    button: cx(
+      "gap-1 px-4 sm:px-5 py-1.5 sm:py-2 rounded-full",
+      "text-text bg-black/5 dark:bg-white/10",
+      "hover:bg-emerald-400 hover:text-emerald-950",
+      "disabled:bg-white/5 disabled:text-zinc-50",
+    ),
+    link: cx("gap-0.5 hover:underline"),
   };
 
   return (
