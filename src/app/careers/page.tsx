@@ -36,10 +36,10 @@ export default function HomePage() {
             return (
               <Link
                 key={job.slug}
-                className="group/job-item grid rounded-lg bg-white/3 p-6 transition hover:bg-emerald-200/5 md:rounded-3xl md:p-8"
+                className="group/job-item bg-bg-mute grid rounded-lg p-6 transition md:rounded-3xl md:p-8"
                 href={`/careers/${job.slug}`}
               >
-                <h2 className="font-display text-xl font-semibold text-emerald-400 group-hover/job-item:underline">
+                <h2 className="text-primary-text font-display text-xl font-semibold group-hover/job-item:underline">
                   {job.title}
                 </h2>
 
@@ -47,10 +47,7 @@ export default function HomePage() {
 
                 <div className="mt-6 flex flex-wrap items-center gap-1">
                   {job.skills.map((skill: string) => (
-                    <span
-                      className="rounded bg-white/3 px-3 py-1 text-zinc-400"
-                      key={skill}
-                    >
+                    <span className="rounded bg-bg px-3 py-1" key={skill}>
                       {skill}
                     </span>
                   ))}
