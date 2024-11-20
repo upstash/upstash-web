@@ -8,7 +8,9 @@ module.exports = {
     extend: {
       colors: {
         bg: "var(--color-bg)",
+        "bg-mute": "var(--color-bg-mute)",
         primary: "var(--color-primary)",
+        "primary-text": "var(--color-primary-text)",
         text: "var(--color-text)",
         "text-mute": "var(--color-text-mute)",
       },

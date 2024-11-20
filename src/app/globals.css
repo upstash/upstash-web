@@ -4,7 +4,9 @@
 
 :root {
   --color-bg: #fafafa;
+  --color-bg-mute: rgb(6 95 70 / 0.05);
   --color-primary: #34d399;
+  --color-primary-text: #059669;
   --color-text: #022c22;
   --color-text-mute: #52525b;
 }
@@ -13,7 +15,10 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --color-bg: #09090b;
+
+    --color-bg-mute: rgb(167 243 208 / 0.05);
     --color-primary: #10b981;
+    --color-primary-text: #34d399;
     --color-text: #ecfdf5;
     --color-text-mute: #a1a1aa;
   }
