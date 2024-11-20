@@ -39,11 +39,11 @@ export default function NewNavigationRoot({ children }: PropsWithChildren) {
         </NavigationMenu.Indicator>
       </NavigationMenu.List>
 
-      <div className="absolute left-20 right-0 top-full flex w-full justify-center perspective-[2000px]">
+      <div className="perspective-[2000px] absolute left-20 right-0 top-full flex w-full justify-center">
         <NavigationMenu.Viewport
           className={cx(
             "relative mt-[7px] bg-white text-zinc-900",
-            "origin-[top_center] overflow-hidden rounded-xl",
+            "origin-[top_center] overflow-hidden rounded-xl shadow-2xl",
             "transition-[width,_height] duration-300",
             "data-[state=open]:animate-scaleIn",
             "data-[state=open]:animate-scaleIn",
@@ -62,8 +62,8 @@ export function NewNavigationTrigger({ children }: NavigationMenuTriggerProps) {
     <NavigationMenu.Trigger
       className={cx(
         "group flex select-none items-center gap-0.5",
-        "rounded-full px-3 py-2",
-        "opacity-60 hover:bg-white/5 hover:opacity-100",
+        "rounded-full px-3 py-2 text-text-mute",
+        "hover:bg-white/5 hover:opacity-100",
         "data-[state=open]:bg-white/5",
         "data-[state=open]:opacity-100",
       )}
@@ -119,6 +119,7 @@ const ListItem = React.forwardRef(
             "flex select-none items-center gap-5 rounded-xl p-5",
             "bg-black/5",
             "hover:bg-black/10",
+            "hover:bg-emerald-50 hover:text-emerald-900",
             className,
           )}
           ref={forwardedRef}

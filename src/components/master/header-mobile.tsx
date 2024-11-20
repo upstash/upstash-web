@@ -23,7 +23,7 @@ export default function Header({ className, ...props }: IAppHeader) {
     <header
       className={cx(
         "fixed inset-x-0 top-0 z-50 py-4 md:hidden",
-        "border-b border-b-white/5 bg-zinc-950",
+        "border-b border-b-black/5 bg-bg dark:border-b-white/5",
         className,
       )}
       {...props}
@@ -38,7 +38,7 @@ export default function Header({ className, ...props }: IAppHeader) {
 
           <button
             type="button"
-            className="flex items-center justify-center p-2 opacity-60"
+            className="flex items-center justify-center p-2 opacity-70"
             onClick={() => setShowMenu((prev) => !prev)}
           >
             {showMenu ? (
