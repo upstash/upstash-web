@@ -11,12 +11,12 @@ export default function NavMobile({ hidden }: HTMLProps<HTMLDivElement> & {}) {
     <nav
       className={cx(
         "absolute inset-x-0 top-full z-10 mt-px flex-col p-6",
-        "bg-zinc-950 shadow-2xl",
+        "bg-bg shadow-2xl",
         hidden ? "flex" : "hidden",
       )}
     >
       {/* items */}
-      <div className="flex flex-col divide-y divide-white/5">
+      <div className="flex flex-col divide-y divide-black/5 dark:divide-white/5">
         {NavItems.map((item) => {
           return (
             <NavLink key={item.href} href={item.href}>
@@ -33,7 +33,7 @@ export default function NavMobile({ hidden }: HTMLProps<HTMLDivElement> & {}) {
         target="_self"
         hideIcon
         href="https://console.upstash.com"
-        className="my-6 justify-center bg-emerald-400 py-3 font-display text-lg font-medium text-zinc-950"
+        className="my-6 justify-center !bg-primary py-3 font-display text-lg font-medium"
       >
         Login
       </Button>
@@ -58,7 +58,7 @@ function NavLink({
     >
       {children}
       {href === "/careers" && (
-        <span className="flex items-center rounded-full bg-emerald-300/20 px-1.5 py-1 font-mono text-sm leading-none text-emerald-500">
+        <span className="flex items-center rounded-full bg-emerald-300/20 px-1.5 py-1 font-mono text-sm leading-none text-primary">
           {jobLength}
         </span>
       )}

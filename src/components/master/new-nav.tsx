@@ -16,7 +16,7 @@ export default function NewNavigation() {
         <NavigationMenu.Link
           className={cx(
             "flex select-none items-center gap-0.5 rounded-full px-4 py-2",
-            "opacity-60 hover:bg-white/5 hover:opacity-100",
+            "text-text-mute hover:bg-white/5 hover:opacity-100",
             isPricing ? "bg-white/5 opacity-100" : "",
           )}
           href="/pricing"
@@ -29,7 +29,7 @@ export default function NewNavigation() {
         <NavigationMenu.Link
           className={cx(
             "flex select-none items-center gap-0.5 rounded-full px-3 py-2",
-            "opacity-60 hover:bg-white/5 hover:opacity-100",
+            "text-text-mute hover:bg-white/5 hover:opacity-100",
           )}
           href="/docs"
         >
@@ -41,7 +41,7 @@ export default function NewNavigation() {
         <NavigationMenu.Link
           className={cx(
             "flex select-none items-center gap-0.5 rounded-full px-3 py-2",
-            "opacity-60 hover:bg-white/5 hover:opacity-100",
+            "text-text-mute hover:bg-white/5 hover:opacity-100",
           )}
           href="/blog"
         >

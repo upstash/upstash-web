@@ -18,7 +18,7 @@ export default function NewNavigationItemCompany() {
       <NewNavigationTrigger>Support</NewNavigationTrigger>
 
       <NewNavigationContent>
-        <div className="grid w-[440px] gap-4 p-6">
+        <div className="grid w-[440px] gap-2 p-4">
           <ListItem
             href="/discord"
             title1="Discord"
