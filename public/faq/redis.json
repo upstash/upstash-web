@@ -30,7 +30,7 @@
     },
     {
       "question": "How much is the price for bandwidth?",
-      "answer": "For pay is you go plan, it is free up to monthly bandwidth limit of 200GB. Beyond that, we charge $0.03 for each additional GB data transfer.\nFor Pro and Enterprise plans, it is charged at a rate of $0.03 per GB for all the usage throughout the month. For use cases with high volume, you may consider VPC Peering which minimizes the data transfer cost. Contact us at support@upstash.com for details.\nPrice can change depending on cloud provider's fee for the incoming traffic. $0.03 is when the client is in the same region."
+      "answer": "For pay is you go plan, it is free up to monthly bandwidth limit of 200GB. Beyond that, we charge $0.03 for each additional GB data transfer.\nFor Pro and Enterprise plans, it is charged at a rate of $0.03 per GB for all the usage throughout the month up to the plan's limit. Any usage beyond that is charged at a rate of $0.10 per GB. For use cases with high volume, you may consider VPC Peering which minimizes the data transfer cost. Contact us at support@upstash.com for details.\nPrice can change depending on cloud provider's fee for the incoming traffic. $0.03 is when the client is in the same region."
     },
     {
       "question": "Is there a contract requirement for Pro Plans?",
