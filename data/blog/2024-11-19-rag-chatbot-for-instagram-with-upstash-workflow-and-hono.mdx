@@ -1,0 +1,338 @@
+---
+slug: rag-chatbot-for-instagram-with-upstash-workflow-and-hono
+title: "RAG Chatbot for Instagram with Upstash Workflow and Hono"
+authors:
+  - amit
+tags: [qstash, nextjs, vercel, hono]
+---
+
+In this guide, you'll learn how to create a RAG chatbot using Upstash Workflow and Hono without making your users wait long for a response on Instagram.
+
+## Prerequisites
+
+You'll need the following:
+
+- [**Node.js 18**](https://nodejs.org/en/blog/announcements/v18-release-announce) or later
+- An [**Upstash**](https://upstash.com/) account
+- [**Meta for Developer**](https://developers.facebook.com/apps/) account
+- A [**Vercel**](https://vercel.com) Account
+
+## Tech Stack
+
+| Technology                              | Description                                                                                                                            |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| [Upstash](https://upstash.com)          | workflow is a serverless messaging and scheduling solution.                                                                            |
+| [TailwindCSS](https://tailwindcss.com/) | CSS framework for building custom designs.                                                                                             |
+| [Hono](https://hono.dev)                | Hono web application framework.                                                                                                        |
+| [Vercel](https://vercel.com)            | Vercel is a platform for developers that provides the tools, workflows, and infrastructure you need to build and deploy your web apps. |
+
+## Steps
+
+To complete this guide and deploy your own article recommendation system, you'll need to follow these steps:
+
+- **[Set up the hono project](#set-up-the-hono-project)**
+- **[Create .env and Install required packages](#create-env-and-install-required-packages)**
+- **[Project Structure](#project-structure)**
+- **[Create a hono Endpoint](#create-a-hono-endpoint)**
+- **[Create a RAG function](#create-a-rag-function)**
+- **[How does a RAG chatbot work](#how-does-a-rag-chatbot-work)**
+- **[Deploy To Vercel](#deploy-to-vercel)**
+- **[Conclusion](#conclusion)**
+
+## **Set up the hono project**
+
+To set up hono, please follow along the following link that will guide to learn everything that's in it.
+
+[hono - https://hono.dev/docs/getting-started/basic](https://hono.dev/docs/getting-started/basic)
+
+```bash
+# run the following command to create a hono template
+npm create hono@latest my-app
+
+# Move into my-app and install the dependencies.
+cd my-app
+npm i
+```
+
+## **Create .env and Install required packages**
+
+Once you have set up the hono project, create an `.env` file if it doesn't exist. You are going to add the secret keys that we require to create a RAG chatbot.
+
+The `.env` file should contain the following keys:
+
+```bash
+ENVIRONMENT=development
+
+# check the upstash document for local development
+# https://upstash.com/docs/workflow/howto/local-development
+UPSTASH_WORKFLOW_URL=<local-development>
+
+SUPABASE_URL=<get_from_supabase_dashboard>
+SUPABASE_KEY=<get_from_supabase_dashboard>
+
+OPENAI_API_KEY=<get_from_openai_dashboard>
+
+IG_ACCESS_TOKEN_ID=<get_from_meta_developer_dashboard>
+IG_ACCESS_TOKEN_ENCRYPTION_KEY=<get_from_meta_developer_dashboard>
+```
+
+```bash
+# make sure you install the required packages
+
+npm install @ai-sdk/openai @supabase/supabase-js @upstash/qstash ai hono zod vercel
+```
+
+This is how your package.json should look:
+
+```ts
+{
+	"name": "rag-hono-app",
+	"scripts": {
+		"start": "vercel dev",
+		"deploy": "vercel"
+	},
+	"dependencies": {
+		"@ai-sdk/openai": "^0.0.66",
+		"@supabase/supabase-js": "^2.45.4",
+		"@upstash/workflow": "^0.1.4",
+		"ai": "^3.4.9",
+		"hono": "^4.6.3",
+		"zod": "^3.23.8"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.9.3",
+		"vercel": "^37.8.0"
+	}
+}
+```
+
+With that done, the configuration set up is complete on your end. You can now see the application in action by executing the following command in your terminal and visiting **[localhost:3000](http://localhost:3000/)**.
+
+```bash
+npm run dev
+```
+
+Follow along to understand the relevant parts of the code that allow you to successfully build your own RAG chatbot.
+
+## **Project Structure**
+
+![folder-structure.png](/blog/workflow/folder-structure.png)
+
+We will create a Cloudflare worker endpoint with the following command.
+
+```bash
+# You don’t need CF worker endpoint to implement QStash feature.
+# You can build on any endpoint.
+# this will install the CF packages and lead you through setup.
+
+npm create cloudflare@latest
+```
+
+Once setup is complete copy the following code in your index.(js|ts) file
+
+```tsx
+import { Receiver } from "@upstash/qstash";
+
+export interface Env {
+  QSTASH_CURRENT_SIGNING_KEY: string;
+  QSTASH_NEXT_SIGNING_KEY: string;
+}
+
+export default {
+  async fetch(
+    request: Request,
+    env: Env,
+    ctx: ExecutionContext,
+  ): Promise<Response> {
+    const c = new Receiver({
+      currentSigningKey: env.QSTASH_CURRENT_SIGNING_KEY,
+      nextSigningKey: env.QSTASH_NEXT_SIGNING_KEY,
+    });
+
+    const body = await request.text();
+
+    const isValid = await c
+      .verify({
+        signature: request.headers.get("Upstash-Signature")!,
+        body,
+      })
+      .catch((err) => {
+        console.error(err);
+        return false;
+      });
+    if (!isValid) {
+      return new Response("Invalid signature", { status: 401 });
+    }
+
+    return new Response(body);
+  },
+};
+```
+
+## **Create a Hono Endpoint**
+
+We will create a hono `/worker` endpoint with the following command.
+
+```ts
+import { serve, type WorkflowBindings } from "@upstash/workflow/hono";
+import { Hono } from "hono";
+import { env } from "hono/adapter";
+import { handle } from "hono/vercel";
+import { generateRagResponse } from "../services/rag";
+import { sendIgMessage } from "../services/sendIgMessage";
+
+export const config = {
+  runtime: "edge",
+};
+
+interface Bindings extends WorkflowBindings {
+  ENVIRONMENT: "development" | "production";
+  SUPABASE_URL: string;
+  SUPABASE_KEY: string;
+  UPSTASH_WORKFLOW_URL: string;
+  INSTAGRAM_ACCESS_TOKEN: string;
+  // more...
+}
+
+interface Input {
+  text: string;
+  recipientId: string;
+}
+
+const app = new Hono<{ Bindings: Bindings }>().basePath("/api");
+
+app.post("/workflow", async (c) => {
+  const {
+    ENVIRONMENT,
+    SUPABASE_URL,
+    SUPABASE_KEY,
+    UPSTASH_WORKFLOW_URL,
+    INSTAGRAM_ACCESS_TOKEN,
+    // more if required...
+  } = env(c);
+
+  const handler = serve<unknown, Bindings>(
+    async (context) => {
+      const input = context.requestPayload as Input;
+      const { reply } = await context.run("rag-chatbot", async () => {
+        const response = await generateRagResponse({
+          // adjust according to your use-case
+        });
+        return response;
+      });
+
+      await context.run("send-ig-message", async () => {
+        await fetch("https://graph.instagram.com/v21.0/me/messages", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${INSTAGRAM_ACCESS_TOKEN}`,
+          },
+          body: JSON.stringify({
+            recipient: {
+              id: input.recipientId,
+            },
+            message: {
+              text: reply,
+            },
+          }),
+        });
+      });
+    },
+    {
+      // baseUrl is not necessary in production
+      baseUrl: ENVIRONMENT === "development" ? UPSTASH_WORKFLOW_URL : undefined,
+    },
+  );
+
+  return await handler(c);
+});
+
+export default handle(app);
+```
+
+### **Create a RAG function**
+
+We instantiate the QStash on CTA (in our case, when the user clicks the publish button).
+
+```ts
+import { openai } from "@ai-sdk/openai";
+import { convertToCoreMessages, generateObject, generateText, tool } from "ai";
+import { z } from "zod";
+
+interface Message {
+	role: "system" | "user" | "assistant" | "function" | "data" | "tool";
+	content: string;
+}
+
+export const generateRagResponse = async ({
+	content
+	// adjust according to your use-case
+}: {
+	content: string;
+}) => {
+	let reply = "";
+
+	const messages: Message[] = [
+		{
+			role: "user",
+			content: content,
+		},
+	];
+
+	try {
+		const result = await generateText({
+			model: openai("gpt-4o-2024-08-06"),
+			system: `add according to your use-case`,
+			messages: convertToCoreMessages(messages),
+			tools: {
+				toolone: tool({
+					description: ``,
+					parameters: z.object({
+						content: z
+							.string()
+							.describe("describe your tool"),
+					}),
+					execute: async ({ content }) =>
+						// add function,
+				}),
+				tooltwo: tool({
+					description: ``,
+					parameters: z.object({
+						content: z
+							.string()
+							.describe("describe your tool"),
+					}),
+					execute: async ({ content }) =>
+						// add function,
+				}),
+				// more tools if required
+			},
+			maxSteps: 5,
+		});
+
+		reply = result.text;
+	} catch (error) {
+		console.error("error => ", error);
+	}
+
+	return { reply };
+};
+```
+
+> That was a lot of learning! You’re all done now ✨
+
+## **How Does a RAG Chatbot Work?**
+
+<video width="100%" controls>
+  <source src="/blog/workflow/rag-chatbot.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
+
+## **Deploy to Vercel**
+
+If you have a Vercel account, you can deploy by linking the Git repository.
+
+## **Conclusion**
+
+In this guide, you learned how to create a RAG chatbot using Upstash Workflow. With workflow, you gain the ability to alleviate the load on your application and execute the complex job with ease, all with just a few lines of code.
