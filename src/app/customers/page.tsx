@@ -5,6 +5,7 @@ import Button from "@/components/button";
 import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
+import cx from "@/utils/cx";
 import { allCustomers } from "@content";
 import Image from "next/image";
 import Link from "next/link";
@@ -38,21 +39,40 @@ export default function CustomerPage() {
               return (
                 <Link
                   key={customer.slug}
-                  className="group/customer-comp flex flex-col items-center gap-6 rounded-4xl border-4 border-white/5 bg-gradient-to-br p-10 transition hover:from-[#00E9A3]/0 hover:to-[#00E9A3]/10 md:p-16"
+                  className={cx(
+                    "group/customer-comp relative flex flex-col items-center gap-6 p-10 transition md:p-16",
+                    "overflow-hidden rounded-4xl border-4 border-bg-mute",
+                  )}
                   href={`/customers/${customer.slug}`}
                 >
+                  <span className="absolute inset-0 bg-gradient-to-br hover:from-emerald-500/20 hover:to-emerald-500/0" />
+
                   <Image
                     src={`/customer/${customer.company_logo}`}
                     alt={customer.company_name}
                     width={500}
                     height={20}
-                    className="h-8 max-w-full object-contain"
+                    className="h-8 max-w-full object-contain dark:hidden"
+                  />
+                  <Image
+                    src={`/customer/${customer.company_logo_dark}`}
+                    alt={customer.company_name}
+                    width={500}
+                    height={20}
+                    className="hidden h-8 max-w-full object-contain dark:block"
                   />
 
-                  <hr className="w-1/4 border-0 border-b border-white/5" />
+                  <hr className="w-1/4 border-0 border-b border-black/5 dark:border-white/5" />
 
                   <div className="flex grow items-center">
-                    <p className="bg-gradient-to-br from-white to-[#6DBEA6] bg-clip-text text-xl font-semibold text-transparent">
+                    <p
+                      className={cx(
+                        "text-xl font-semibold text-transparent",
+                        "bg-gradient-to-br bg-clip-text",
+                        "from-primary-text to-text",
+                        "dark:from-white dark:to-emerald-300",
+                      )}
+                    >
                       “ {customer.highlight} ”
                     </p>
                   </div>
@@ -63,13 +83,7 @@ export default function CustomerPage() {
                   </div>
 
                   <div className="mt-auto hidden h-10 group-hover/customer-comp:block">
-                    <Button
-                      target="_self"
-                      type="button"
-                      hideIcon
-                      href="https://console.upstash.com"
-                      className="bg-emerald-400 text-emerald-950"
-                    >
+                    <Button type="button" hideIcon className="!bg-primary">
                       Read more
                     </Button>
                   </div>
