@@ -5,7 +5,7 @@ export default function PricingTableEnterprise() {
   return (
     <div className="flex flex-col items-center justify-center rounded-3xl bg-bg-mute px-10 py-8 md:flex-row md:px-16 md:py-10 md:text-left">
       <div>
-        <h4 className="text-2xl font-semibold text-emerald-400">Enterprise</h4>
+        <h4 className="text-2xl font-semibold text-primary-text">Enterprise</h4>
         <p className="">For businesses with advanced needs.</p>
 
         <Button
