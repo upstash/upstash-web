@@ -19,16 +19,16 @@ export default function PricingTable() {
 
       {/* FREE */}
 
-      <div className="flex flex-col items-center gap-6 rounded-3xl bg-white/5 px-4 py-8">
+      <div className="flex flex-col items-center gap-6 rounded-3xl bg-bg-mute px-4 py-8">
         <div className="">
-          <h4 className="mb-2 text-xl font-semibold text-emerald-400">Free</h4>
+          <h4 className="mb-2 text-xl font-semibold text-primary-text">Free</h4>
 
           <h5 className="text-2xl font-semibold">$0</h5>
-          <p className="text-sm text-white/40">-</p>
+          <p className="text-sm text-text-mute">-</p>
         </div>
 
         <div className="grow">
-          <div className="text-white/80">
+          <div className="text-text-mute">
             Perfect for prototypes and hobby projects.
           </div>
         </div>
@@ -77,9 +77,7 @@ export default function PricingTable() {
           </FeatureTag>
         </div>
 
-        <Hr />
-
-        <p className="text-emerald-200">10,000 commands daily</p>
+        {/*<p className="text-primary-text">10,000 commands daily</p>*/}
 
         <div>
           <Button
@@ -87,7 +85,7 @@ export default function PricingTable() {
             type="button"
             hideIcon
             href="https://console.upstash.com"
-            className="bg-zinc-50 text-zinc-950"
+            className="!bg-white !text-black shadow"
           >
             Start Now
           </Button>
@@ -96,18 +94,18 @@ export default function PricingTable() {
 
       {/* PAYG */}
 
-      <div className="flex flex-col items-center gap-6 rounded-3xl border-2 border-white/20 bg-white/5 px-4 py-8">
+      <div className="flex flex-col items-center gap-6 rounded-3xl border-2 border-primary bg-white px-4 py-8">
         <div className="grow">
-          <h4 className="mb-2 text-xl font-semibold text-emerald-400">
+          <h4 className="mb-2 text-xl font-semibold text-primary-text">
             Pay as you go
           </h4>
 
           <h5 className="text-2xl font-semibold">$0.2</h5>
-          <p className="text-sm text-white/40">per 100K commands</p>
+          <p className="text-sm text-text-mute">per 100K commands</p>
         </div>
 
         <div className="grow">
-          <div className="text-white/80">
+          <div className="text-text-mute">
             Flexible pricing for variable traffic.
           </div>
         </div>
@@ -156,9 +154,7 @@ export default function PricingTable() {
           </FeatureTag>
         </div>
 
-        <Hr />
-
-        <p className="text-emerald-200">1,000 commands per second</p>
+        {/*<p className="text-primary-text">1,000 commands per second</p>*/}
 
         <div>
           <Button
@@ -166,7 +162,7 @@ export default function PricingTable() {
             type="button"
             hideIcon
             href="https://console.upstash.com"
-            className="bg-emerald-400 text-emerald-950"
+            className="!bg-primary !text-white shadow"
           >
             Start Now
           </Button>
@@ -175,23 +171,23 @@ export default function PricingTable() {
 
       {/* PRO 2K */}
 
-      <div className="flex flex-col items-center gap-6 rounded-3xl bg-white/5 px-4 py-8">
+      <div className="flex flex-col items-center gap-6 rounded-3xl bg-bg-mute px-4 py-8">
         <div>
-          <h4 className="mb-2 text-xl font-semibold text-emerald-400">
+          <h4 className="mb-2 text-xl font-semibold text-primary-text">
             Pro 2K
           </h4>
 
           <h5 className="flex items-baseline text-2xl font-semibold">
             $280
-            <span className="ml-1 text-base font-normal opacity-40">
+            <span className="ml-1 text-base font-normal text-text-mute">
               / month
             </span>
           </h5>
-          <p className="text-sm text-white/40">+$100 ✕ read region</p>
+          <p className="text-sm text-text-mute">+$100 ✕ read region</p>
         </div>
 
         <div>
-          <div className="text-white/80">
+          <div className="text-text-mute">
             Unlimited commands and high performance for a fixed price.
           </div>
         </div>
@@ -240,9 +236,7 @@ export default function PricingTable() {
           </FeatureTag>
         </div>
 
-        <Hr />
-
-        <p className="text-emerald-200">2,000 commands per second</p>
+        {/*<p className="text-primary-text">2,000 commands per second</p>*/}
 
         <div>
           <Button
@@ -250,7 +244,7 @@ export default function PricingTable() {
             type="button"
             hideIcon
             href="https://console.upstash.com"
-            className="bg-zinc-50 text-zinc-950"
+            className="!bg-white !text-black shadow"
           >
             Start Now
           </Button>
