@@ -9,7 +9,9 @@ import HomeProduct from "@/components/home/product";
 import HomeServerless from "@/components/home/serverless";
 import { useSetAffiliateCodeToSessionStorage } from "@/hooks/use-affiliate-code-session-storage";
 import * as React from "react";
-import { IntercomProvider } from "react-use-intercom";
+import {ChatWidget} from "@upstash/rag-chat-widget"
+// import "@upstash/rag-chat-widget/dist/client/styles.mjs"
+
 
 export default function Home({
   searchParams,
@@ -19,11 +21,12 @@ export default function Home({
   useSetAffiliateCodeToSessionStorage(searchParams);
 
   return (
-    <IntercomProvider
-      appId={process.env.NEXT_PUBLIC_INTERCOM_APP_ID as string}
-      autoBoot
-    >
+    // <IntercomProvider
+    //   appId={process.env.NEXT_PUBLIC_INTERCOM_APP_ID as string}
+    //   autoBoot
+    // >
       <main className="overflow-x-hidden text-center">
+        <ChatWidget />
         <HomeHero />
         <HomeFast />
         <HomeServerless />
@@ -31,6 +34,6 @@ export default function Home({
         <HomeOpenSource />
         <HomeCommunity />
       </main>
-    </IntercomProvider>
+    // </IntercomProvider>
   );
 }
