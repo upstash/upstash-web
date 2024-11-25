@@ -22,20 +22,20 @@ export default function CompareValue({
 }) {
   return (
     <span
-      className={`flex items-center justify-center border-b border-b-white/3 py-5 ${className}`}
+      className={`flex items-center justify-center border-b border-bg-mute py-5 ${className}`}
       {...props}
     >
-      {prefix && <span className="mr-1 text-white/40">{prefix}</span>}
+      {prefix && <span className="mr-1 text-text-mute">{prefix}</span>}
 
       {type === "plain" && children}
 
       {type === "size" && children}
 
       {type === "boolean" && (
-        <span className="text-zinc-400">
+        <span className="text-text-mute">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className={cx(valid ? "text-emerald-400" : "text-white/10")}
+            className={cx("text-primary-text", valid && "opacity-20")}
             width="20"
             height="20"
             viewBox="0 0 24 24"
@@ -58,7 +58,7 @@ export default function CompareValue({
       {type === "list" && children && (
         <span className="flex flex-wrap items-center justify-center gap-1 text-left">
           {Children.map(children, (child) => (
-            <span className="rounded bg-emerald-300/5 px-2 py-1.5 text-sm leading-none">
+            <span className="rounded bg-bg-mute px-2 py-1.5 text-sm leading-none">
               {child}
             </span>
           ))}
@@ -67,7 +67,7 @@ export default function CompareValue({
 
       {type === "number" && Number(children).toLocaleString()}
 
-      {suffix && <span className="ml-1 text-white/40">{suffix}</span>}
+      {suffix && <span className="ml-1 opacity-60">{suffix}</span>}
       {after}
     </span>
   );

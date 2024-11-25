@@ -21,10 +21,11 @@ export default function Button({
 }: IButton) {
   const classes = {
     button: cx(
-      "gap-1 px-4 sm:px-5 py-1.5 sm:py-2 rounded-full",
-      "text-text bg-black/5 dark:bg-white/10",
-      "hover:bg-emerald-400 hover:text-emerald-950",
+      "gap-1 px-4 sm:px-5 py-1.5 sm:py-2 rounded-full font-medium",
+      "text-text bg-bg-mute",
+      "hover:opacity-60",
       "disabled:bg-white/5 disabled:text-zinc-50",
+      className,
     ),
     link: cx("gap-0.5 hover:underline"),
   };
@@ -35,7 +36,6 @@ export default function Button({
       className={cx(
         "group/link-new inline-flex cursor-pointer items-center transition",
         classes[type],
-        className,
       )}
       {...props}
     >
