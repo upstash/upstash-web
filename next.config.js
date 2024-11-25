@@ -25,7 +25,6 @@ const nextConfig = {
         ? "http://localhost:3000"
         : "https://upstash.com",
   },
-  experimental: { outputFileTracingIncludes: { "/api/**/*": ["./node_modules/**/*.wasm", "./node_modules/tiktoken/**/*.wasm"], "/*": ["./cache/**/*"], }, serverComponentsExternalPackages: ["sharp", "onnxruntime-node", "tiktoken"], },
   reactStrictMode: false,
   images: {
     remotePatterns: [
