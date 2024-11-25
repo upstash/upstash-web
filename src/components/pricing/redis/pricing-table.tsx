@@ -154,8 +154,6 @@ export default function PricingTable() {
           </FeatureTag>
         </div>
 
-        {/*<p className="text-primary-text">1,000 commands per second</p>*/}
-
         <div>
           <Button
             target="_self"

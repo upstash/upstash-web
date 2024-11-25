@@ -1,4 +1,6 @@
 import Button from "@/components/button";
+import { Hr } from "@/components/pricing/pricing-parts";
+import * as React from "react";
 
 export default function PricingTable() {
   return (
@@ -7,33 +9,31 @@ export default function PricingTable() {
 
       {/* FREE */}
 
-      <div className="flex flex-col items-center gap-6 rounded-3xl bg-white/5 px-6 py-8">
-        <div className="grow">
-          <h4 className="mb-2 text-xl font-semibold text-emerald-400">Free</h4>
+      <div className="flex flex-col items-center gap-6 rounded-3xl bg-bg-mute px-4 py-8">
+        <div className="">
+          <h4 className="mb-2 text-xl font-semibold text-primary-text">Free</h4>
 
           <h5 className="text-2xl font-semibold">$0</h5>
-          <p className="text-white/40">-</p>
+          <p className="text-text-mute">-</p>
         </div>
 
         <div className="grow">
-          <div className="text-white/80">
+          <div className="text-text-mute">
             Perfect for prototypes and hobby projects.
           </div>
         </div>
 
-        <hr className="w-2/3 border-0 border-b border-b-white/5" />
+        <Hr />
 
         <div>
-          <p className="text-white/40">Max Messages per Day</p>
+          <p className="text-text-mute">Max Messages per Day</p>
           <p className="font-semibold">500</p>
         </div>
 
         <div>
-          <p className="text-white/40">Max Requests per Second</p>
+          <p className="text-text-mute">Max Requests per Second</p>
           <p className="font-semibold">100</p>
         </div>
-
-        <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
         <div>
           <Button
@@ -41,7 +41,7 @@ export default function PricingTable() {
             type="button"
             hideIcon
             href="https://console.upstash.com"
-            className="bg-zinc-50 font-medium text-zinc-950"
+            className="!bg-white !text-black shadow"
           >
             Start Now
           </Button>
@@ -50,31 +50,31 @@ export default function PricingTable() {
 
       {/* PAYG */}
 
-      <div className="flex flex-col items-center gap-6 rounded-3xl border-2 border-white/20 bg-white/10 px-4 py-8">
+      <div className="flex flex-col items-center gap-6 rounded-3xl border-2 border-primary bg-emerald-500/10 px-4 py-8">
         <div className="grow">
-          <h4 className="mb-2 text-xl font-semibold text-emerald-400">
+          <h4 className="mb-2 text-xl font-semibold text-primary-text">
             Pay as you go
           </h4>
 
           <h5 className="text-2xl font-semibold">$1</h5>
-          <p className="text-white/40">per 100K messages</p>
+          <p className="text-text-mute">per 100K messages</p>
         </div>
 
         <div className="grow">
-          <div className="text-white/80">
+          <div className="text-text-mute">
             For use cases with bursting traffic.
           </div>
         </div>
 
-        <hr className="w-2/3 border-0 border-b border-b-white/5" />
+        <Hr />
 
         <div>
-          <p className="text-white/40">Max Messages per Day</p>
+          <p className="text-text-mute">Max Messages per Day</p>
           <p className="font-semibold">500,000</p>
         </div>
 
         <div>
-          <p className="text-white/40">Max Requests per Second</p>
+          <p className="text-text-mute">Max Requests per Second</p>
           <p className="font-semibold">100</p>
         </div>
 
@@ -86,7 +86,7 @@ export default function PricingTable() {
             type="button"
             hideIcon
             href="https://console.upstash.com"
-            className="bg-zinc-50 font-medium text-zinc-950"
+            className="!bg-primary !text-white shadow"
           >
             Start Now
           </Button>
@@ -95,9 +95,9 @@ export default function PricingTable() {
 
       {/* ENTERPRISE */}
 
-      <div className="flex flex-col items-center gap-6 rounded-3xl bg-white/5 px-6 py-8">
+      <div className="flex flex-col items-center gap-6 rounded-3xl bg-bg-mute px-4 py-8">
         <div>
-          <h4 className="mb-2 text-xl font-semibold text-emerald-400">Pro</h4>
+          <h4 className="mb-2 text-xl font-semibold text-primary-text">Pro</h4>
 
           <h5 className="flex items-baseline text-2xl font-semibold">
             $180
@@ -105,29 +105,27 @@ export default function PricingTable() {
               / month
             </span>
           </h5>
-          <p className="text-white/40">Starting from</p>
+          <p className="text-text-mute">Starting from</p>
         </div>
 
         <div>
-          <div className="text-white/80">
+          <div className="text-text-mute">
             For businesses with consistent high-capacity loads and predictable
             costs.
           </div>
         </div>
 
-        <hr className="w-2/3 border-0 border-b border-b-white/5" />
+        <Hr />
 
         <div>
-          <p className="text-white/40">Max Messages per Day</p>
+          <p className="text-text-mute">Max Messages per Day</p>
           <p className="font-semibold">Up to 100M</p>
         </div>
 
         <div>
-          <p className="text-white/40">Max Requests per Second</p>
+          <p className="text-text-mute">Max Requests per Second</p>
           <p className="font-semibold">Up to 1000</p>
         </div>
-
-        <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
         <div>
           <Button
@@ -135,7 +133,7 @@ export default function PricingTable() {
             type="button"
             hideIcon
             href="https://console.upstash.com"
-            className="bg-zinc-50 font-medium text-zinc-950"
+            className="!bg-white !text-black shadow"
           >
             Start Now
           </Button>

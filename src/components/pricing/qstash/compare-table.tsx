@@ -42,25 +42,25 @@ export default function CompareTable() {
           <td className="p-0" />
           <th
             hidden={isMobile ? !showFree : false}
-            className="border-b-2 border-b-zinc-950 bg-white/3 px-0 py-3 text-xs font-medium uppercase tracking-wider text-white/80"
+            className="border-b-2 border-b-bg bg-bg-mute px-0 py-3 text-xs font-medium uppercase tracking-wider text-text-mute"
           >
             Free
           </th>
           <th
             hidden={isMobile ? !showPayg : false}
-            className="border-b-2 border-b-zinc-950 bg-emerald-300/10 px-0 py-3 text-xs font-medium uppercase tracking-wider text-white/80"
+            className="border-b-2 border-b-bg bg-emerald-500/10 px-0 py-3 text-xs font-medium uppercase tracking-wider text-text-mute"
           >
             Usage Based Pricing
           </th>
           <th
             hidden={isMobile ? !showPro1 : false}
-            className="border-b-2 border-b-zinc-950 bg-white/3 px-0 py-3 text-xs font-medium uppercase tracking-wider text-white/80"
+            className="border-b-2 border-b-bg bg-bg-mute px-0 py-3 text-xs font-medium uppercase tracking-wider text-text-mute"
           >
             Fixed Pricing
           </th>
           <th
             hidden={isMobile ? !showPro10 : false}
-            className="border-b-2 border-b-zinc-950 bg-white/3 px-0 py-3 text-xs font-medium uppercase tracking-wider text-white/80"
+            className="border-b-2 border-b-bg bg-bg-mute px-0 py-3 text-xs font-medium uppercase tracking-wider text-text-mute"
           >
             Fixed Pricing
           </th>
@@ -70,10 +70,10 @@ export default function CompareTable() {
           <td className="" />
           <th
             hidden={isMobile ? !showFree : false}
-            className="border-b border-b-zinc-800 bg-zinc-950 p-0"
+            className="border-b border-b-bg bg-bg p-0"
           >
-            <div className="flex h-24 flex-col items-center justify-center bg-white/3">
-              <h4 className="hidden text-lg font-semibold text-emerald-400 md:block">
+            <div className="flex h-24 flex-col items-center justify-center bg-bg-mute">
+              <h4 className="hidden text-lg font-semibold text-primary-text md:block">
                 Free
               </h4>
 
@@ -92,10 +92,10 @@ export default function CompareTable() {
           </th>
           <th
             hidden={isMobile ? !showPayg : false}
-            className="border-b border-b-zinc-800 bg-zinc-950 p-0"
+            className="border-b border-b-bg bg-bg p-0"
           >
-            <div className="flex h-24 flex-col items-center justify-center bg-emerald-300/10">
-              <h4 className="hidden text-lg font-semibold text-emerald-400 md:block">
+            <div className="flex h-24 flex-col items-center justify-center bg-emerald-500/10">
+              <h4 className="hidden text-lg font-semibold text-primary-text md:block">
                 Pay as you go
               </h4>
 
@@ -121,10 +121,10 @@ export default function CompareTable() {
           </th>
           <th
             hidden={isMobile ? !showPro1 : false}
-            className="border-b border-b-zinc-800 bg-zinc-950 p-0"
+            className="border-b border-b-bg bg-bg p-0"
           >
-            <div className="flex h-24 flex-col items-center justify-center bg-white/3">
-              <h4 className="hidden text-lg font-semibold text-emerald-400 md:block">
+            <div className="flex h-24 flex-col items-center justify-center bg-bg-mute">
+              <h4 className="hidden text-lg font-semibold text-primary-text md:block">
                 Pro 1M
               </h4>
 
@@ -152,10 +152,10 @@ export default function CompareTable() {
 
           <th
             hidden={isMobile ? !showPro10 : false}
-            className="border-b border-b-zinc-800 bg-zinc-950 p-0"
+            className="border-b border-b-bg bg-bg p-0"
           >
-            <div className="flex h-24 flex-col items-center justify-center bg-white/3">
-              <h4 className="hidden text-lg font-semibold text-emerald-400 md:block">
+            <div className="flex h-24 flex-col items-center justify-center bg-bg-mute">
+              <h4 className="hidden text-lg font-semibold text-primary-text md:block">
                 Pro 10M
               </h4>
 
@@ -187,9 +187,9 @@ export default function CompareTable() {
         <tr>
           <th
             colSpan={isMobile ? 2 : 5}
-            className="sticky top-20 z-10 p-0 text-left md:top-0"
+            className="sticky top-20 z-10 border-y border-bg bg-bg p-0 text-left md:top-0"
           >
-            <div className="-ml-4 flex h-24 items-center bg-gradient-to-r from-zinc-900 to-zinc-950 px-4 md:h-16">
+            <div className="-ml-4 flex h-24 items-center bg-gradient-to-r from-bg-mute to-bg px-4 md:h-16">
               <span className="flex items-center gap-2 text-lg font-semibold">
                 <span className="flex items-center rounded-full bg-white/10 p-2">
                   <IconDatabase width="20" height="20" strokeWidth={1.5} />
@@ -202,13 +202,13 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
+          <th className="px-0 py-4 text-left font-normal text-text-mute">
             Max Messages per Day
           </th>
           {/**/}
           <td
             hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue type="number">500</CompareValue>
           </td>
@@ -220,26 +220,26 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPro1 : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>1M</CompareValue>
           </td>
           <td
             hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>10M</CompareValue>
           </td>
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
+          <th className="px-0 py-4 text-left font-normal text-text-mute">
             Max Requests per Second
           </th>
           {/**/}
           <td
             hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue type="number">100</CompareValue>
           </td>
@@ -251,26 +251,26 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPro1 : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>500</CompareValue>
           </td>
           <td
             hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>1000</CompareValue>
           </td>
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
+          <th className="px-0 py-4 text-left font-normal text-text-mute">
             Max Message Size
           </th>
           {/**/}
           <td
             hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue type="size" suffix="MB">
               1
@@ -286,7 +286,7 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPro1 : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue type="size" suffix="MB">
               50
@@ -294,7 +294,7 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue type="size" suffix="MB">
               50
@@ -303,13 +303,13 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
+          <th className="px-0 py-4 text-left font-normal text-text-mute">
             Max Number of URL Groups
           </th>
           {/**/}
           <td
             hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>1</CompareValue>
           </td>
@@ -321,26 +321,26 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPro1 : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>1000</CompareValue>
           </td>
           <td
             hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>2000</CompareValue>
           </td>
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
+          <th className="px-0 py-4 text-left font-normal text-text-mute">
             Max Number of Endpoints per URL Group
           </th>
           {/**/}
           <td
             hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>100</CompareValue>
           </td>
@@ -352,26 +352,26 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPro1 : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>1000</CompareValue>
           </td>
           <td
             hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>2000</CompareValue>
           </td>
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
+          <th className="px-0 py-4 text-left font-normal text-text-mute">
             Max Retry Count
           </th>
           {/**/}
           <td
             hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>3</CompareValue>
           </td>
@@ -383,26 +383,26 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPro1 : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>20</CompareValue>
           </td>
           <td
             hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>100</CompareValue>
           </td>
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
+          <th className="px-0 py-4 text-left font-normal text-text-mute">
             Max Delay
           </th>
           {/**/}
           <td
             hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>7 days</CompareValue>
           </td>
@@ -414,26 +414,26 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPro1 : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>Unlimited</CompareValue>
           </td>
           <td
             hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>Unlimited</CompareValue>
           </td>
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
+          <th className="px-0 py-4 text-left font-normal text-text-mute">
             Max HTTP Connection Timeout
           </th>
           {/**/}
           <td
             hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>15 minutes</CompareValue>
           </td>
@@ -445,26 +445,26 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPro1 : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>6 hours</CompareValue>
           </td>
           <td
             hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>12 hours</CompareValue>
           </td>
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
+          <th className="px-0 py-4 text-left font-normal text-text-mute">
             Max DLQ Retention
           </th>
           {/**/}
           <td
             hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>3 days</CompareValue>
           </td>
@@ -476,26 +476,26 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPro1 : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>30 days</CompareValue>
           </td>
           <td
             hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>3 months</CompareValue>
           </td>
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
+          <th className="px-0 py-4 text-left font-normal text-text-mute">
             Max Active Schedules
           </th>
           {/**/}
           <td
             hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue type="number">10</CompareValue>
           </td>
@@ -520,7 +520,7 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPro1 : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue
               after={
@@ -538,7 +538,7 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue
               after={
@@ -557,13 +557,13 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
+          <th className="px-0 py-4 text-left font-normal text-text-mute">
             Max Queue Count
           </th>
           {/**/}
           <td
             hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue type="number">10</CompareValue>
           </td>
@@ -575,26 +575,26 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPro1 : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>1000</CompareValue>
           </td>
           <td
             hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>1000</CompareValue>
           </td>
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
+          <th className="px-0 py-4 text-left font-normal text-text-mute">
             Max Queue Parallelism
           </th>
           {/**/}
           <td
             hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue type="number">2</CompareValue>
           </td>
@@ -606,25 +606,25 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPro1 : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>10</CompareValue>
           </td>
           <td
             hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>10</CompareValue>
           </td>
         </tr>
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
+          <th className="px-0 py-4 text-left font-normal text-text-mute">
             Max Events Size
           </th>
           {/**/}
           <td
             hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue type="number">10000</CompareValue>
           </td>
@@ -636,25 +636,25 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPro1 : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue type="number">100000</CompareValue>
           </td>
           <td
             hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue type="number">100000</CompareValue>
           </td>
         </tr>
         <tr>
-          <th className="px-0 text-left font-normal text-white/60">
+          <th className="px-0 text-left font-normal text-text-mute">
             Uptime SLA
           </th>
           {/**/}
           <td
             hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0 align-top"
+            className="bg-bg-mute px-4 py-0 align-top"
           >
             <CompareValue type="boolean" valid={false} />
           </td>
@@ -666,7 +666,7 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPro1 : false}
-            className="bg-white/3 px-4 py-0 align-top"
+            className="bg-bg-mute px-4 py-0 align-top"
           >
             <CompareValue className="border-b-0">
               <div>99.99%</div>
@@ -674,7 +674,7 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0 align-top"
+            className="bg-bg-mute px-4 py-0 align-top"
           >
             <CompareValue className="border-b-0">
               <div>99.99%</div>
@@ -685,9 +685,9 @@ export default function CompareTable() {
         <tr>
           <th
             colSpan={isMobile ? 2 : 5}
-            className="sticky top-20 z-10 p-0 text-left md:top-0"
+            className="sticky top-20 z-10 border-y border-bg bg-bg p-0 text-left md:top-0"
           >
-            <div className="-ml-4 flex h-24 items-center bg-gradient-to-r from-zinc-900 to-zinc-950 px-4 md:h-16">
+            <div className="-ml-4 flex h-24 items-center bg-gradient-to-r from-bg-mute to-bg px-4 md:h-16">
               <span className="flex items-center gap-2 text-lg font-semibold">
                 <span className="flex items-center rounded-full bg-white/10 p-2">
                   <IconCreditCard width="20" height="20" strokeWidth={1.5} />
@@ -699,13 +699,13 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
+          <th className="px-0 py-4 text-left font-normal text-text-mute">
             Monthly price
           </th>
           {/**/}
           <td
             hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>Free</CompareValue>
           </td>
@@ -717,25 +717,25 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPro1 : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>$180</CompareValue>
           </td>
           <td
             hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>$420</CompareValue>
           </td>
         </tr>
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-white/60">
+          <th className="px-0 py-4 text-left font-normal text-text-mute">
             Message price
           </th>
           {/**/}
           <td
             hidden={isMobile ? !showFree : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>Free</CompareValue>
           </td>
@@ -747,13 +747,13 @@ export default function CompareTable() {
           </td>
           <td
             hidden={isMobile ? !showPro1 : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>None</CompareValue>
           </td>
           <td
             hidden={isMobile ? !showPro10 : false}
-            className="bg-white/3 px-4 py-0"
+            className="bg-bg-mute px-4 py-0"
           >
             <CompareValue>None</CompareValue>
           </td>
