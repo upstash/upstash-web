@@ -1,4 +1,4 @@
-import { AFFILIATE_CODE } from "@/app/constants";
+import { AFFILIATE_CODE } from "@/constants";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 

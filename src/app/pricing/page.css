@@ -1,5 +1,5 @@
 code {
-  @apply rounded bg-emerald-300/10 px-1.5 py-1 font-mono text-sm font-medium text-emerald-200;
+  @apply rounded bg-bg-mute px-1.5 py-1 font-mono text-sm font-medium text-primary-text;
 }
 
 .faq [data-state="open"] + [data-state="closed"] {
@@ -7,11 +7,11 @@ code {
 }
 
 .faq .faq-body a {
-  @apply text-emerald-400 underline;
+  @apply text-primary-text underline;
 }
 
 .mini-table {
-  @apply rounded-xl border-2 border-zinc-100 text-sm;
+  @apply rounded-xl border-2 border-bg-mute text-sm;
 }
 
 .mini-table :where(th, td) {
@@ -19,20 +19,21 @@ code {
 }
 
 .mini-table th {
-  @apply bg-zinc-100 text-left;
+  @apply bg-bg-mute text-left;
 }
 
 .mini-table td {
-  @apply min-w-[120px] border-b border-zinc-100;
+  @apply min-w-[120px] border-b border-b-bg-mute;
 }
 
 .faq .mini-table {
-  @apply border-zinc-800;
+  @apply border-b-bg-mute;
 }
+
 .faq .mini-table th {
-  @apply bg-zinc-800;
+  @apply bg-bg-mute;
 }
 
 .faq .mini-table td {
-  @apply border-b-zinc-800;
+  @apply border-b-bg-mute;
 }

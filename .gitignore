@@ -3,6 +3,7 @@ node_modules
 .idea
 public/ui
 public/sw*
+public/*.xml
 public/workbox*
 .DS_Store
 *.local

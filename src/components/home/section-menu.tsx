@@ -62,7 +62,7 @@ export default function SectionMenu({
           }
           className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-zinc-100"
         >
-          <LogoIcon lightBg height={30} />
+          <LogoIcon height={30} />
         </SpyLink>
 
         <div className={cx("flex items-center")}>

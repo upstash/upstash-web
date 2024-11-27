@@ -24,9 +24,9 @@ export default function CareerHeader({ job }: Props) {
             { title: "Location", value: job.location },
           ].map((o) => {
             return (
-              <div key={o.title} className="inline-flex gap-1 text-lg">
-                <span className="opacity-40">{o.title}:</span>
-                <span>{o.value}</span>
+              <div key={o.title} className="inline-flex gap-1">
+                <span className="opacity-60">{o.title}:</span>
+                <span className="font-semibold">{o.value}</span>
               </div>
             );
           })}
@@ -35,10 +35,7 @@ export default function CareerHeader({ job }: Props) {
         {/* skills */}
         <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
           {job.skills.map((skill: string) => (
-            <span
-              className="rounded bg-white/3 px-3 py-1 text-zinc-400"
-              key={skill}
-            >
+            <span className="bg-bg-mute rounded px-3 py-1" key={skill}>
               {skill}
             </span>
           ))}
@@ -47,7 +44,7 @@ export default function CareerHeader({ job }: Props) {
         <Button
           type="button"
           href="mailto:jobs@upstash.com"
-          className="mt-10 bg-emerald-400 text-zinc-950"
+          className="mt-10 !bg-primary"
         >
           Apply now
         </Button>

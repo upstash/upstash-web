@@ -4,7 +4,7 @@ import { ComponentProps } from "react";
 
 export function Hr({ className }: ComponentProps<"hr">) {
   return (
-    <hr className={cx("w-2/3 border-0 border-b border-b-white/5", className)} />
+    <hr className={cx("w-2/3 border-0 border-b border-bg-mute", className)} />
   );
 }
 
@@ -19,10 +19,9 @@ export function FeatureTag({
   return (
     <div
       className={cx(
-        "inline-flex items-center gap-1 rounded-full border border-transparent py-1 pl-2 pr-3 text-sm",
-        active
-          ? "border-emerald-400/10 bg-emerald-400/5 text-emerald-100"
-          : "bg-white/10 opacity-30",
+        "inline-flex items-center gap-1 border border-transparent py-1 pl-2 pr-3 text-sm",
+        "rounded-full bg-emerald-600/10",
+        active ? "border-emerald-700/30" : "opacity-40",
         className,
       )}
       {...props}
