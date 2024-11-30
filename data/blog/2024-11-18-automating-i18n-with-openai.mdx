@@ -35,9 +35,17 @@ You will need the following:
 | [GitHub](https://github.com) | Version control system for managing code repositories. |
 | [Vercel](https://vercel.com) | A cloud platform for deploying and scaling web applications. |
 
-## High Level
+## High-Level Data Flow and Operations
 
-![Application Summary](/blog/automating-i18n/summary.png)
+![](/blog/automating-i18n/summary.png)
+
+When the `/api/workflow` route is invoked, it begins an automatic process which does the following:
+- Self-invokes the `/api/workflow` route to fetch content of a GitHub directory
+- Goes over each file to:
+  - Self-invokes the `/api/workflow` route to fetch content of the file
+  - Self-invokes the `/api/workflow` route to power translation using OpenAI
+  - Self-invokes the `/api/workflow` route to commit the translated file to the GitHub directory
+- Self-invokes the `/api/workflow` route to deploy the GitHub repository to Vercel via a hook
 
 ## Generate an OpenAI Token
 
