@@ -140,13 +140,24 @@ To create API endpoints in Next.js, you will use Next.js [Route Handlers](https:
 
 ```bash
 mkdir -p app/api/workflow
-mkdir app/blogs
+mkdir -p app/blogs/en
+mkdir app/blogs/fr
 mkdir app/[lang]
 ```
 
 <Note type="tip">
   The `-p` flag creates parent directories of a directory if they're missing.
 </Note>
+
+Finnaly, create a sample markdown file named `first.md` in the `app/blogs/en` directory with the following:
+
+```md
+# First
+
+![](https://placehold.co/600x400)
+
+This is the first blog post.
+```
 
 ## Create i18n (Dynamic) Blogs in Next.js App Router
 
@@ -205,11 +216,11 @@ export default async function ({ params: { lang } }: { Promise<{ lang: string }>
 }
 ```
 
-### TODO
+### Creating a Workflow API Endpoint for Automating Translation Workflow
 
-TODO
+In this section, we will create a `route.ts` file that serves as the API endpoint for the workflow. This file will handle the incoming requests to automate the translation process.
 
-Create a file named `route.ts` in the `app/api/workflow` directory with the following code:
+First, create a file named `route.ts` in the `app/api/workflow` directory with the following code which fetches the list of the files in the directory that is received in request payload:
 
 ```tsx
 // File: app/api/workflow/route.ts
@@ -258,9 +269,7 @@ export const POST = serve(
 )
 ```
 
-### TODO
-
-TODO
+Add the code below which iterates over the fetched files from the GitHub repository. For each file, it fetches its content and prepares it for translation.
 
 ```tsx {7-10}
 // File: app/api/workflow/route.ts
@@ -285,7 +294,7 @@ export const POST = serve(
 )
 ```
 
-TODO
+Further, add the code as follows to prepare the payload for the OpenAI translation request. This includes setting up the model and the messages that will be sent to the OpenAI API.
 
 ```tsx {11-28}
 // File: app/api/workflow/route.ts
@@ -328,7 +337,7 @@ export const POST = serve(
 )
 ```
 
-TODO
+To commit the translated content back to the GitHub repository in the appropriate language folder, add the code as follows:
 
 ```tsx {11-12, 14-41}
 // File: app/api/workflow/route.ts
