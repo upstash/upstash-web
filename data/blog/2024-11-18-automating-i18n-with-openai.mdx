@@ -404,8 +404,6 @@ export const POST = serve(
 
 In the code above, if the `VERCEL_DEPLOY_HOOK_URL` environment variable is set, it creates a POST request to it, which in-turn starts the process of deploying your website to Vercel.
 
-> That was a lot of learning! You’re all done now ✨
-
 ## Deploy to Vercel
 
 Create a `vercel.json` file to disable automatic Vercel deployments so that we can manually choose when to trigger a deploy:
@@ -427,15 +425,18 @@ The repository, is now ready to deploy to Vercel. Use the following steps to dep
 - In **Settings**, update the `Environment Variables` to match those in your local `.env` file.
 - Deploy! 🚀
 
-## Trigger the workflow using QStash
+## Trigger the Workflow API route using QStash
 
-TODO
+The Next.js application you have built operates automatically and initiates the workflow upon activation. To start the automatic process of translating the markdown files, committing them to GitHub, and deploying to Vercel, invoke the `/api/workflow` route using Upstash QStash as follows:
 
 ![](/blog/automating-i18n/qstash-trigger.png)
 
-TODO
+- Configure the Destination URL to point to your Vercel project link, appending `/api/workflow` to it.
+- Ensure that the request Headers include `Content-Type` set to `application/json`.
 
-## More Information
+> That was a lot of learning! You’re all done now ✨
+
+## References
 
 For more detailed insights, explore the references cited in this post.
 
