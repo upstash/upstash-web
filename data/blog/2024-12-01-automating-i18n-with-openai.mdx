@@ -5,15 +5,27 @@ tags: [workflow, QStash, openai, ai, vercel]
 title: "Automating Internationalization (i18n) with OpenAI"
 ---
 
-TODO - In this tutorial, you will learn how to build a scheduled audio transcription system using Upstash QStash for task scheduling and Fireworks AI for AI-powered transcriptions. You will also learn techniques to secure file uploads to Cloudflare R2, authenticate users with Clerk, store and fetch data from Upstash Redis.
+In this tutorial, you will learn how to automate Internationalization (i18n) for websites using Upstash QStash for task scheduling and OpenAI for translations. You will also learn to interact with the GitHub API and create automated API calls in your Next.js application, capable of running from 15 minutes up to 12 hours, going beyond the usual timeout limits.
 
-TODO - With focus on being able to scale, updating state of the users, history of transcriptions, and offloading the transcription work to background workers, the application heavily relies on QStash. The application will allow users to upload audio files that need to be transcribed, create a background process to schedule the transcription, update the history of transcriptions (for the particular user), and then display it back to them in the frontend.  
+The application will be designed for scalability, enabling the translation of blog content into multiple languages while utilizing GitHub for code management. It leverages Upstash QStash to delegate the entire process to background workers, ensuring efficient task handling with in-built retry mechanism.
 
 ## Demo
 
 Before jumping into the technical stuff, let me give you a sneak peek of what you will build in this tutorial.
 
 <video src="https://github.com/user-attachments/assets/4df0dd4c-f8ae-4bb6-8d3b-4bf45a088124" controls></video>
+
+## High-Level Data Flow and Operations
+
+![Summarize the flow of operations](/blog/automating-i18n/summary.png)
+
+When the `/api/workflow` route is invoked, it begins an automatic process which does the following:
+- Self-invokes the `/api/workflow` route to fetch content of a GitHub directory.
+- it then loops over each file to:
+  - Self-invokes the `/api/workflow` route to fetch content of the file.
+  - Self-invokes the `/api/workflow` route to power translation using OpenAI.
+  - Self-invokes the `/api/workflow` route to commit the translated file to the GitHub directory.
+- Self-invokes the `/api/workflow` route to deploy the GitHub repository to Vercel via a hook.
 
 ## Prerequisites
 
@@ -34,18 +46,6 @@ You will need the following:
 | [OpenAI](https://platform.openai.com) | An artificial intelligence research lab focused on developing advanced AI technologies. |
 | [GitHub](https://github.com) | Version control system for managing code repositories. |
 | [Vercel](https://vercel.com) | A cloud platform for deploying and scaling web applications. |
-
-## High-Level Data Flow and Operations
-
-![](/blog/automating-i18n/summary.png)
-
-When the `/api/workflow` route is invoked, it begins an automatic process which does the following:
-- Self-invokes the `/api/workflow` route to fetch content of a GitHub directory
-- it then loops over each file to:
-  - Self-invokes the `/api/workflow` route to fetch content of the file
-  - Self-invokes the `/api/workflow` route to power translation using OpenAI
-  - Self-invokes the `/api/workflow` route to commit the translated file to the GitHub directory
-- Self-invokes the `/api/workflow` route to deploy the GitHub repository to Vercel via a hook
 
 ## Generate an OpenAI Token
 
@@ -429,7 +429,7 @@ The repository, is now ready to deploy to Vercel. Use the following steps to dep
 
 The Next.js application you have built operates automatically and initiates the workflow upon activation. To start the automatic process of translating the markdown files, committing them to GitHub, and deploying to Vercel, invoke the `/api/workflow` route using Upstash QStash as follows:
 
-![](/blog/automating-i18n/qstash-trigger.png)
+![Trigger Translation using QStash](/blog/automating-i18n/qstash-trigger.png)
 
 - Configure the Destination URL to point to your Vercel project link, appending `/api/workflow` to it.
 - Ensure that the request Headers include `Content-Type` set to `application/json`.
