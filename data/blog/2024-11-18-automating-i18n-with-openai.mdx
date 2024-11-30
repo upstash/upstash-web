@@ -41,7 +41,7 @@ You will need the following:
 
 When the `/api/workflow` route is invoked, it begins an automatic process which does the following:
 - Self-invokes the `/api/workflow` route to fetch content of a GitHub directory
-- Goes over each file to:
+- it then loops over each file to:
   - Self-invokes the `/api/workflow` route to fetch content of the file
   - Self-invokes the `/api/workflow` route to power translation using OpenAI
   - Self-invokes the `/api/workflow` route to commit the translated file to the GitHub directory
@@ -148,9 +148,9 @@ mkdir app/[lang]
   The `-p` flag creates parent directories of a directory if they're missing.
 </Note>
 
-## TODO
+## Create i18n (Dynamic) Blogs in Next.js App Router
 
-TODO
+The initial step in constructing dynamic blogs within the Next.js App Router using Markdown involves reading the Markdown files and converting them into HTML. To achieve this, you will utilize rehype and remark plugins to process the Markdown and generate HTML that can be rendered on the front end. Begin by creating a file named `app/[lang]/blogs.tsx` with the following code:
 
 ```tsx
 // File: app/[lang]/blogs.tsx
@@ -181,7 +181,7 @@ export const getDictionary = async (locale: string) => {
 }
 ```
 
-TODO
+Next, create a file named `app/[lang]/page.tsx` with the following code, which invokes the `getDictionary` function in the relevant directories and renders the HTML on the front end. To ensure that the pages are generated statically, utilize the `generateStaticParams` function as demonstrated in the code below:
 
 ```tsx
 // File: app/[lang]/page.tsx
@@ -194,8 +194,9 @@ export async function generateStaticParams() {
   }))
 }
 
-export default async function Page({ params: { lang } }: { params: { lang: string } }) {
-  const dict = await getDictionary(lang)
+export default async function ({ params: { lang } }: { Promise<{ lang: string }> }) {
+  const pageLang = await lang
+  const dict = await getDictionary(pageLang)
   return (
     <div className="prose flex flex-col gap-4">
       {dict.length > 0 ? dict.map((item, ind) => <div key={ind} dangerouslySetInnerHTML={{ __html: item }} />) : <span>No data</span>}
@@ -203,8 +204,6 @@ export default async function Page({ params: { lang } }: { params: { lang: strin
   )
 }
 ```
-
-TODO
 
 ## TODO
 
