@@ -5,31 +5,30 @@ export default function PricingTableEnterprise() {
   return (
     <div className="flex flex-col items-center justify-center rounded-3xl bg-bg-mute px-10 py-8 md:flex-row md:px-16 md:py-10 md:text-left">
       <div>
-        <h4 className="text-2xl font-semibold text-primary-text">Enterprise</h4>
-        <p className="">For businesses with advanced needs.</p>
+        <h4 className="text-2xl font-semibold text-primary-text">Free</h4>
+        <p className="">Perfect for prototypes and hobby projects.</p>
 
         <Button
           type="button"
-          href="mailto:sales@upstash.com"
-          className="-ml-1 mt-4 hidden !bg-primary !text-black md:inline-flex"
+          className="-ml-1 mt-4 hidden !bg-primary !text-white md:inline-flex"
         >
-          Contact Us
+          Start Free
         </Button>
       </div>
 
       <div className="mt-6 md:ml-24 md:mt-0">
         <ul className="space-y-2">
           <li className="flex items-center gap-1">
-            <Icon /> 100K+ commands per second
+            <Icon /> 1,000 commands per second
           </li>
           <li className="flex items-center gap-1">
-            <Icon /> Unlimited bandwidth and database count
+            <Icon /> 10,000 daily command limit
           </li>
           <li className="flex items-center gap-1">
-            <Icon /> Professional support with SLA
+            <Icon /> --Professional support with SLA
           </li>
           <li className="flex items-center gap-1">
-            <Icon /> Dedicated resources for isolation
+            <Icon /> --Dedicated resources for isolation
           </li>
         </ul>
       </div>
@@ -37,9 +36,9 @@ export default function PricingTableEnterprise() {
       <Button
         type="button"
         href="mailto:support@upstash.com"
-        className="-ml-1 mt-6 !bg-primary !text-black md:hidden"
+        className="-ml-1 mt-6 !bg-primary !text-white md:hidden"
       >
-        Contact Us
+        Start Free
       </Button>
     </div>
   );

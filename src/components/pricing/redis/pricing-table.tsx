@@ -19,7 +19,7 @@ export default function PricingTable() {
 
       {/* FREE */}
 
-      <div className="flex flex-col items-center gap-6 rounded-3xl bg-bg-mute px-4 py-8">
+      {/*<div className="flex flex-col items-center gap-6 rounded-3xl bg-bg-mute px-4 py-8">
         <div className="">
           <h4 className="mb-2 text-xl font-semibold text-primary-text">Free</h4>
 
@@ -77,8 +77,6 @@ export default function PricingTable() {
           </FeatureTag>
         </div>
 
-        {/*<p className="text-primary-text">10,000 commands daily</p>*/}
-
         <div>
           <Button
             target="_self"
@@ -90,11 +88,11 @@ export default function PricingTable() {
             Start Now
           </Button>
         </div>
-      </div>
+      </div>*/}
 
       {/* PAYG */}
 
-      <div className="flex flex-col items-center gap-6 rounded-3xl border-2 border-primary bg-emerald-500/10 px-4 py-8">
+      <div className="flex flex-col items-center gap-6 rounded-3xl bg-bg-mute px-4 py-8">
         <div className="grow">
           <h4 className="mb-2 text-xl font-semibold text-primary-text">
             Pay as you go
@@ -160,7 +158,7 @@ export default function PricingTable() {
             type="button"
             hideIcon
             href="https://console.upstash.com"
-            className="!bg-primary !text-white shadow"
+            className="!bg-white !text-black shadow"
           >
             Start Now
           </Button>
@@ -175,10 +173,92 @@ export default function PricingTable() {
             Pro 2K
           </h4>
 
-          <h5 className="flex items-baseline text-2xl font-semibold">
+          <h5 className="flex items-baseline justify-center text-2xl font-semibold">
             $280
             <span className="ml-1 text-base font-normal text-text-mute">
               / month
+            </span>
+          </h5>
+          <p className="text-sm text-text-mute">+$100 ✕ read region</p>
+        </div>
+
+        <div>
+          <div className="text-text-mute">
+            Unlimited commands and high performance for a fixed price.
+          </div>
+        </div>
+
+        <Hr />
+
+        <div className="flex flex-wrap justify-center gap-1">
+          <FeatureTag active>
+            <IconPercentage75 width="16" height="16" strokeWidth={1.5} />
+            Persistence
+          </FeatureTag>
+
+          <FeatureTag active>
+            <IconApps width="16" height="16" strokeWidth={1.5} />
+            REST API
+          </FeatureTag>
+
+          <FeatureTag active>
+            <IconLock width="16" height="16" strokeWidth={1.5} />
+            TLS
+          </FeatureTag>
+
+          <FeatureTag active>
+            <IconWorld width="16" height="16" strokeWidth={1.5} />
+            Global
+          </FeatureTag>
+
+          <FeatureTag active>
+            <IconHeartbeat width="16" height="16" strokeWidth={1.5} />
+            Uptime SLA
+          </FeatureTag>
+
+          <FeatureTag active>
+            <IconUserCircle width="16" height="16" strokeWidth={1.5} />
+            RBAC
+          </FeatureTag>
+
+          <FeatureTag active>
+            <IconShieldLock width="16" height="16" strokeWidth={1.5} />
+            SOC-2
+          </FeatureTag>
+
+          <FeatureTag active>
+            <IconListSearch width="16" height="16" strokeWidth={1.5} />
+            Monitoring
+          </FeatureTag>
+        </div>
+
+        {/*<p className="text-primary-text">2,000 commands per second</p>*/}
+
+        <div>
+          <Button
+            target="_self"
+            type="button"
+            hideIcon
+            href="https://console.upstash.com"
+            className="!bg-white !text-black shadow"
+          >
+            Start Now
+          </Button>
+        </div>
+      </div>
+
+      {/* Enterprise */}
+
+      <div className="flex flex-col items-center gap-6 rounded-3xl bg-bg-mute px-4 py-8">
+        <div>
+          <h4 className="mb-2 text-xl font-semibold text-primary-text">
+            Enterprise
+          </h4>
+
+          <h5 className="flex items-baseline justify-center text-2xl font-semibold">
+            &nbsp;
+            <span className="ml-1 text-base font-normal text-text-mute">
+              Contact us
             </span>
           </h5>
           <p className="text-sm text-text-mute">+$100 ✕ read region</p>
