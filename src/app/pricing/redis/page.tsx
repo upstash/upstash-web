@@ -24,10 +24,10 @@ export default function PricingRedisPage() {
       />
       <ProductToggle product={"/redis"} />
 
-      <div className="mt-16 md:mt-20">
+      <div className="mt-12 md:mt-20">
         <PricingTable />
 
-        <div className="mt-10 md:mt-20">
+        <div className="mt-6 md:mt-16">
           <Enterprise />
         </div>
 
