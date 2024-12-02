@@ -92,7 +92,7 @@ export default function PricingTable() {
 
       {/* PAYG */}
 
-      <div className="flex flex-col items-center gap-6 rounded-3xl bg-bg-mute px-4 py-8">
+      <div className="flex flex-col items-center gap-6 rounded-3xl bg-white px-4 py-8 shadow dark:bg-bg-mute">
         <div className="grow">
           <h4 className="mb-2 text-xl font-semibold text-primary-text">
             Pay as you go
@@ -158,7 +158,7 @@ export default function PricingTable() {
             type="button"
             hideIcon
             href="https://console.upstash.com"
-            className="!bg-white !text-black shadow"
+            className="!bg-primary !text-white"
           >
             Start Now
           </Button>
@@ -167,7 +167,7 @@ export default function PricingTable() {
 
       {/* PRO 2K */}
 
-      <div className="flex flex-col items-center gap-6 rounded-3xl bg-bg-mute px-4 py-8">
+      <div className="flex flex-col items-center gap-6 rounded-3xl bg-white px-4 py-8 shadow dark:bg-bg-mute">
         <div>
           <h4 className="mb-2 text-xl font-semibold text-primary-text">
             Pro 2K
@@ -240,7 +240,7 @@ export default function PricingTable() {
             type="button"
             hideIcon
             href="https://console.upstash.com"
-            className="!bg-white !text-black shadow"
+            className="!bg-primary !text-white"
           >
             Start Now
           </Button>
@@ -249,7 +249,7 @@ export default function PricingTable() {
 
       {/* Enterprise */}
 
-      <div className="flex flex-col items-center gap-6 rounded-3xl bg-bg-mute px-4 py-8">
+      <div className="flex flex-col items-center gap-6 rounded-3xl bg-white px-4 py-8 shadow dark:bg-bg-mute">
         <div>
           <h4 className="mb-2 text-xl font-semibold text-primary-text">
             Enterprise
@@ -266,53 +266,18 @@ export default function PricingTable() {
 
         <div>
           <div className="text-text-mute">
-            Unlimited commands and high performance for a fixed price.
+            For businesses with advanced needs.
           </div>
         </div>
 
         <Hr />
 
-        <div className="flex flex-wrap justify-center gap-1">
-          <FeatureTag active>
-            <IconPercentage75 width="16" height="16" strokeWidth={1.5} />
-            Persistence
-          </FeatureTag>
-
-          <FeatureTag active>
-            <IconApps width="16" height="16" strokeWidth={1.5} />
-            REST API
-          </FeatureTag>
-
-          <FeatureTag active>
-            <IconLock width="16" height="16" strokeWidth={1.5} />
-            TLS
-          </FeatureTag>
-
-          <FeatureTag active>
-            <IconWorld width="16" height="16" strokeWidth={1.5} />
-            Global
-          </FeatureTag>
-
-          <FeatureTag active>
-            <IconHeartbeat width="16" height="16" strokeWidth={1.5} />
-            Uptime SLA
-          </FeatureTag>
-
-          <FeatureTag active>
-            <IconUserCircle width="16" height="16" strokeWidth={1.5} />
-            RBAC
-          </FeatureTag>
-
-          <FeatureTag active>
-            <IconShieldLock width="16" height="16" strokeWidth={1.5} />
-            SOC-2
-          </FeatureTag>
-
-          <FeatureTag active>
-            <IconListSearch width="16" height="16" strokeWidth={1.5} />
-            Monitoring
-          </FeatureTag>
-        </div>
+        <ul className="flex flex-wrap justify-center gap-1">
+          <li>100K+ commands per second</li>
+          <li>Unlimited bandwidth and database count</li>
+          <li>Professional support with SLA</li>
+          <li>Dedicated resources for isolation</li>
+        </ul>
 
         {/*<p className="text-primary-text">2,000 commands per second</p>*/}
 
@@ -322,7 +287,7 @@ export default function PricingTable() {
             type="button"
             hideIcon
             href="https://console.upstash.com"
-            className="!bg-white !text-black shadow"
+            className="!bg-primary !text-white"
           >
             Start Now
           </Button>

@@ -8,10 +8,7 @@ export default function PricingTableEnterprise() {
         <h4 className="text-2xl font-semibold text-primary-text">Free</h4>
         <p className="">Perfect for prototypes and hobby projects.</p>
 
-        <Button
-          type="button"
-          className="-ml-1 mt-4 hidden !bg-primary !text-white md:inline-flex"
-        >
+        <Button type="button" className="-ml-1 mt-4 hidden md:inline-flex">
           Start Free
         </Button>
       </div>
@@ -36,7 +33,7 @@ export default function PricingTableEnterprise() {
       <Button
         type="button"
         href="mailto:support@upstash.com"
-        className="-ml-1 mt-6 !bg-primary !text-white md:hidden"
+        className="-ml-1 mt-6 md:hidden"
       >
         Start Free
       </Button>
