@@ -335,7 +335,7 @@ export default function CompareTable() {
                 >
                   <IconCoin
                     aria-label="Pricing"
-                    className="ml-1 stroke-emerald-400 opacity-60"
+                    className="ml-1 stroke-primary"
                     stroke={1.2}
                   />
                 </Tooltip>
@@ -418,7 +418,7 @@ export default function CompareTable() {
                 >
                   <IconCoin
                     aria-label="Pricing"
-                    className="ml-1 stroke-emerald-400 opacity-60"
+                    className="ml-1 stroke-primary"
                     stroke={1.2}
                   />
                 </Tooltip>

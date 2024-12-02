@@ -27,7 +27,7 @@ export default function Button({
       "disabled:bg-white/5 disabled:text-zinc-50",
       className,
     ),
-    link: cx("gap-0.5 hover:underline"),
+    link: cx("gap-0.5 hover:underline", className),
   };
 
   return (
