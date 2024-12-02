@@ -1,5 +1,6 @@
 "use client";
 
+import "./page.css";
 import { ParsedUrlQueryInput } from "querystring";
 import HomeCommunity from "@/components/home/community";
 import HomeFast from "@/components/home/fast";

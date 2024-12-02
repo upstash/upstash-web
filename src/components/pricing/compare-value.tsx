@@ -35,7 +35,7 @@ export default function CompareValue({
         <span className="text-text-mute">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className={cx("text-primary-text", valid && "opacity-20")}
+            className={cx(valid ? "text-primary-text" : "opacity-20")}
             width="20"
             height="20"
             viewBox="0 0 24 24"
