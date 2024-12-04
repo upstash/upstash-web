@@ -2,7 +2,6 @@
 
 import Button from "@/components/button";
 import IconVector from "@/components/icon-vector";
-import { useSegment } from "@/hooks/use-segment";
 import { Product } from "@/utils/type";
 import React from "react";
 import {
@@ -13,8 +12,6 @@ import {
 } from "./comp";
 
 export default function ServerlessVector() {
-  const { track } = useSegment();
-
   return (
     <ProductBox
       product={Product.VECTOR}
@@ -38,9 +35,6 @@ export default function ServerlessVector() {
           href="/docs/vector"
           className="bg-orange-100 text-orange-950 hover:bg-orange-100 hover:text-orange-950"
           type="button"
-          onClick={() => {
-            track("button.docs.vector");
-          }}
         >
           Docs
         </Button>
@@ -48,9 +42,6 @@ export default function ServerlessVector() {
           href="https://drive.google.com/drive/u/1/folders/1_W7MgkKGJmbfVQ_QiW_6qcfq0JZYFnhw"
           className="hover:bg-orange-100 hover:text-orange-950"
           type="button"
-          onClick={() => {
-            track("button.examples.vector");
-          }}
         >
           Examples
         </Button>

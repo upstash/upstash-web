@@ -3,7 +3,6 @@ import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import { useSelectedLayoutSegment } from "next/navigation";
 import React from "react";
 import ItemCompany from "./new-nav-company";
-import ItemResource from "./new-nav-resource";
 import NewNavigationRoot from "./new-nav-root";
 import ItemSupport from "./new-nav-support";
 
