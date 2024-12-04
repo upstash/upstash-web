@@ -37,7 +37,7 @@ export default function Header({ className, ...props }: HTMLProps<any>) {
         <div
           className={cx(
             "flex items-center py-5 md:grid md:grid-cols-6",
-            "border-b border-b-black/5 dark:border-b-white/5",
+            "border-b border-b-white/5",
           )}
         >
           <div className="flex">
