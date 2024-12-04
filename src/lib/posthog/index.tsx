@@ -24,7 +24,6 @@ export const PHProvider = ({ children }: PropsWithChildren<{}>) => {
   const cookieConsent = useGlobalStore((state) => state.cookieConsent);
 
   useEffect(() => {
-    console.log("USE EFFECT");
     if (
       typeof window !== "undefined" &&
       process.env.NEXT_PUBLIC_VERCEL_ENV === "production" &&
@@ -39,7 +38,6 @@ export const PHProvider = ({ children }: PropsWithChildren<{}>) => {
         );
       }
 
-      console.log("INITIALIZING", !posthog.__loaded);
       if (!posthog.__loaded) {
         posthog.init(posthogKey, getPostHogConfig());
       }
