@@ -1,4 +1,5 @@
 import Button from "@/components/button";
+import { useGetAffiliateCodeFromApi } from "@/hooks/use-affiliate-code";
 import cx from "@/utils/cx";
 import { allJobs } from "@content";
 import Link, { LinkProps } from "next/link";
@@ -7,6 +8,8 @@ import React, { HTMLProps, ReactNode } from "react";
 const jobLength = allJobs.filter((o) => !o.draft).length;
 
 export default function NavMobile({ hidden }: HTMLProps<HTMLDivElement> & {}) {
+  const { affiliateCode } = useGetAffiliateCodeFromApi();
+
   return (
     <nav
       className={cx(
@@ -32,7 +35,11 @@ export default function NavMobile({ hidden }: HTMLProps<HTMLDivElement> & {}) {
         type="button"
         target="_self"
         hideIcon
-        href="https://console.upstash.com"
+        href={
+          affiliateCode
+            ? `https://console.upstash.com/?code=${affiliateCode}`
+            : "https://console.upstash.com"
+        }
         className="my-6 justify-center !bg-primary py-3 font-display text-lg font-medium"
       >
         Login

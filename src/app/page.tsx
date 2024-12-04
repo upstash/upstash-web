@@ -24,7 +24,7 @@ export default function Home({
       appId={process.env.NEXT_PUBLIC_INTERCOM_APP_ID as string}
       autoBoot
     >
-      <main className="overflow-x-hidden text-center">
+      <main className="text-center">
         <HomeHero />
         <HomeFast />
         <HomeServerless />
