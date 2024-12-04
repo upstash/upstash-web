@@ -42,7 +42,8 @@
     "sharp": "^0.33.5",
     "shiki": "^1.16.2",
     "swr": "^2.2.5",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "zustand": "^5.0.1"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.8.3",
