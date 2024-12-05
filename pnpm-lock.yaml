@@ -26,6 +26,9 @@ importers:
       '@upstash/claps':
         specifier: 1.0.0-beta.4
         version: 1.0.0-beta.4(@babel/core@7.25.8)
+      '@vercel/functions':
+        specifier: ^1.5.1
+        version: 1.5.1
       '@vercel/og':
         specifier: ^0.6.2
         version: 0.6.3
@@ -2254,6 +2257,15 @@ packages:
 
   '@upstash/redis@1.34.3':
     resolution: {integrity: sha512-VT25TyODGy/8ljl7GADnJoMmtmJ1F8d84UXfGonRRF8fWYJz7+2J6GzW+a6ETGtk4OyuRTt7FRSvFG5GvrfSdQ==}
+
+  '@vercel/functions@1.5.1':
+    resolution: {integrity: sha512-cCdrWa4sUkNE8WjZu9ODA4Q3d92Y333bCL3zebvQ8XCOH0MCy37q3rQ02sJU93mn7BuZyEk5hWBnEtfOb6Sr2Q==}
+    engines: {node: '>= 16'}
+    peerDependencies:
+      '@aws-sdk/credential-provider-web-identity': '*'
+    peerDependenciesMeta:
+      '@aws-sdk/credential-provider-web-identity':
+        optional: true
 
   '@vercel/og@0.6.3':
     resolution: {integrity: sha512-aoCrC9FqkeA+WEEb9CwSmjD0rGlFeNqbUsI41JPmKWR9Hx6FFn86tvH96O5HZMF6VAXTGHxa3nPH3BokROpdgA==}
@@ -8083,6 +8095,8 @@ snapshots:
   '@upstash/redis@1.34.3':
     dependencies:
       crypto-js: 4.2.0
+
+  '@vercel/functions@1.5.1': {}
 
   '@vercel/og@0.6.3':
     dependencies:
