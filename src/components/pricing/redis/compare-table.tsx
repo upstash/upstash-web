@@ -433,15 +433,15 @@ export default function CompareTable() {
             className="bg-white/3 px-4 py-0 align-top"
           >
             <CompareValue type="size" suffix="MB">
-              200
+              500
             </CompareValue>
           </td>
           <td
             hidden={isMobile ? !showPro10 : false}
             className="bg-white/3 px-4 py-0 align-top"
           >
-            <CompareValue type="size" suffix="MB">
-              500
+            <CompareValue type="size" suffix="GB">
+              1
             </CompareValue>
           </td>
         </tr>

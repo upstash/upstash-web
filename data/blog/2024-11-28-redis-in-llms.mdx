@@ -1,0 +1,164 @@
+---
+title: "Redis Use Cases in LLM Applications"
+slug: redis-in-llms
+authors:
+  - noah
+tags: [redis, LLM, serverless, cache, ratelimiter, session]
+---
+
+Large Language Model (LLM) based applications are everywhere. Being everywhere requires ability of handling high-speed data processing, efficient session management, and real-time responsiveness to deliver seamless user experiences.
+
+Redis, with its in-memory architecture and versatility, is uniquely positioned to meet these needs. By offering sub-millisecond latency, rich data structures, and real-time processing capabilities, Redis enables developers to optimize LLM workflows in LLM applications effectively.
+
+In this blog post, we will explore some use cases where Redis, and particularly serverless Upstash Redis, improves the performance and scalability of LLM applications and how it makes life easier for LLM applications.
+
+## Redis: A Quick Overview
+
+Now let's quickly summarize what Redis is and what it does. Before examining how Redis can be used in LLM-based applications and what it is useful for, we need to remember what Redis is.
+
+Redis is a high-performance, in-memory data store known for its speed and flexibility.
+
+Unlike traditional databases, Redis operates in memory, making it super fast for both read and write operations. It supports a wide range of data structures, such as strings, lists, sets, and hashes, making it adaptable to diverse application needs.
+
+**What Makes Redis Unique?**
+
+- **Sub-Millisecond Latency**: Redis delivers lightning-fast performance thanks to its in-memory architecture, ideal for applications requiring real-time responsiveness.
+
+- **Versatile Data Structures**: From caching to session storage and real-time analytics, Redis handles it all. This flexibility enables Redis to handle diverse workloads, from simple caching to complex data pipelines.
+
+- **Ease of Use**: Simple commands and developer-friendly APIs make Redis accessible to beginners and experts alike.
+
+**What is Upstash Redis?**
+
+Redis is perfect. What about managing it? This is where Upstash Redis comes into play.
+
+Upstash Redis takes the power of Redis and makes it serverless. This means you don’t have to manage infrastructure, worry about scaling, or deal with provisioning resources. Upstash Redis offers:
+
+- **Serverless Architecture**: There is no need to provision, configure, or manage servers. The system automatically scales to accommodate the needs of your application, handling traffic spikes and heavy workloads by itself.
+
+- **Pay-as-You-Go Pricing**: Only pay for what you actually consume, which reduces the costs significantly.
+
+- **Global Availability**: Data is accessible with low latency, no matter where your users are located.
+
+With these features, Upstash Redis is particularly suited for modern AI applications, where scalability, speed, and simplicity are paramount.
+
+Now, let’s look at some of the most common Redis use cases in LLM applications.
+
+## Caching
+
+Thanks to its speedy architecture, caching is the first use case that comes to our minds when we speak about Redis. This use case is applicable for LLM based applications as well.
+
+What do we cache in LLM applications? And why do we need to cache them?
+
+The most common use case is caching the responses for common inputs. Caching allows the application to store responses for frequently asked questions or common queries so that the application can bring the response to the customer.
+
+Just to give an example, let’s assume that you have an application that requires authentication with password. This application also provides a chatbot for customer support. I am pretty sure that there will be tons of questions like “I forgot my password, how to reset it?”, “Reset password”, “Can’t remember my password”, etc. I know that because I am also one of these customers . The answers for all these questions are same. By caching the response in Redis, we can easily return the same answer and guidance to these customers without calling the LLM every time.
+
+Upstash also provides a semantic-cache tool for developers who want to cache the LLM responses according to their meaning. It uses the Upstash Vector. You can find details about it in [the Github repository](https://github.com/upstash/semantic-cache).
+
+Now let’s quickly see what we gain when we cache the responses of LLMs.
+
+- **Reducing Latency**: Everything is for the customers! We need to deliver the output – response as quickly as possible. However, LLM applications often involve computationally expensive processes to understand the input and generate the output. These operations can take several seconds to execute, particularly for large models. By caching the responses for the same type of questions, the requester won’t wait that long.
+
+- **Minimize Computational Costs**: Computers are not free. If we are running the LLM by ourselves, we pay the cost of the environment. Otherwise, again, we pay for the API cost of LLM providers such as OpenAI. So, if we don’t call the LLM, we pay less. Simple logic but saves money.
+
+- **Ensure Consistent Responses:** LLMs may produce slightly different responses for the same query due to their probabilistic nature. While this variability is useful in some scenarios, it’s not desirable for repetitive queries. Caching ensures users receive consistent answers to identical queries, improving reliability.
+
+## Session Management
+
+The next use case that I would like to explain is the session management.
+
+Session management is something required for all type of applications. Therefore, it is a common use case for LLM applications as well.
+
+LLM applications often need to tailor their responses based on user-specific data, such as preferences, past interactions, or progress. Storing session data allows the application to track and remember user-specific details, providing a more personalized experience. Thanks to the sessions, LLMs can produce better responses aligning with the user preferences in LLM applications.
+
+You can find the more detailed and instructive blog post specifically about the session management with Redis in [here](https://upstash.com/blog/session-management-nextjs).
+
+## As we always do, let's review what we gain by using Redis for session management in Redis:
+
+- **Personalization:** LLM applications are mostly for interacting with users. Every user prefers personalized context, and personalized experience in the application. When considering that, personalized LLM response, LLM suggestion to the user is desired for most of the LLM applications. Session management with Redis helps storing the user preferences globally so that LLMs can use that data to produce its output.
+
+- **Context Retention:** For applications like chatbots or virtual assistants, retaining session context is essential to ensure continuity in conversations. Without session management, every query would be treated as standalone, leading to disjointed or irrelevant responses.
+
+## Storing Chat Conversation History
+
+Chatbots are probably the most common use case of LLMs. There is a user sitting and writing something to the application and LLM responds. For most of these applications, storing chat history is required to provide users a context-aware, personalized, and efficient interactions with the language model.
+
+Redis is an excellent choice for storing chat histories in LLM applications due to its speed, scalability, and support for data structures that align with conversational data needs.
+
+Now, let’s see what we accomplish by using Redis as chat conversion storage.
+
+- **Context Awareness:** context awareness of an LLM application refers to the ability of the model to understand and respond based on the current and past interactions in a conversation. It involves maintaining a coherent understanding of what has been discussed, user intentions, and implicit references throughout an interaction.
+Just as an example, if a user asks, “Can you check my order status?” and later says, “Cancel it,” the chatbot needs the earlier query to understand what "it" refers to. The LLM uses the chat history to understand what they are talking about.
+
+- **Personalization:** Retaining chat history enables personalization, as the LLM can learn about user preferences, recurring questions, and specific needs over time. This can lead to customized recommendations, tailored support, and a more engaging user experience.
+
+You can check out [one of the previous blogs](https://upstash.com/blog/langchain-redis) which is about how to store chat conversation history of chatbots to see how to use Upstash Redis as a chat history storage.
+
+## Rate limiting
+
+Rate limiting is a technique used to control the number of requests a user or client can make to a system, server, or API within a specific period.
+
+A rate limiter is like a security guard that defending a building. That guard tracks the number of people coming in. If there are more people than that building can handle, the guard stops the flow and wait someone to leave the building for letting new person in. From that analogy, we can understand that rate limiting is super important for applications, especially for LLM applications.
+
+LLM applications by nature executes computationally expensive processes, we must hire that security guard, a.k.a rate limiter, to prevent unexpectedly excessive calls. Now, what is the win here? Let’s see some of them.
+
+- **Protecting Resources:** LLMs are computationally expensive to run, requiring significant CPU, GPU, or memory resources for each query. Without rate limiting, a few users or applications could monopolize resources, leaving others unable to access the system.
+
+- **Cost Management:** As I said, LLMs are not that cheap. Every service have a budget, or a service might be restricting the rate according to their users’ subscriptions. For these type of use cases, rate limiting ensures that no user exceeds their allocated quota, helping manage expenses and avoid unexpected bills.
+
+- **Security:** In addition to that, rate limiting can protect our resources from malicious attacks, such as Distributed Denial of Service (DDoS). Because if we limit the request rate, no one can bombard the service.
+
+So, we all agree that rate limiting is needed. Now let’s see the best way of implementing rate limiting in our apps: Upstash Ratelimiter!
+
+Upstash provides Ratelimiter SDK, which uses Upstash Redis as global rate limiter. It is super easy to configure and use.
+
+You should first install the package.
+
+```
+npm install @upstash/ratelimit
+```
+
+Then, you will just need to pass your Upstash Redis into the Ratelimiter SDK and it is ready to use.
+
+```typescript
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+// Create a new ratelimiter, that allows 10 requests per 10 seconds
+const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(10, "10 s"),
+  analytics: true,
+  /**
+  * Optional prefix for the keys used in redis. This is useful if you want to share a redis
+  * instance with other applications and want to avoid key collisions. The default prefix is
+  * "@upstash/ratelimit"
+  */
+  prefix: "@upstash/ratelimit",
+});
+// Use a constant string to limit all requests with a single ratelimit
+// Or use a userID, apiKey or ip address for individual limits.
+const identifier = "api";
+const { success } = await ratelimit.limit(identifier);
+if (!success) {
+  return "Unable to process at this time";
+}
+call_LLM_API();
+return "Here you go!";
+```
+
+You can check the [Upstash Ratelimiter Github repository](https://github.com/upstash/ratelimit-js) for more details.
+
+## Real-Time Event Streaming for Dynamic Triggers
+
+Many LLM applications rely on real-time data to generate actionable insights or responses. Redis’s support for event streaming and Pub/Sub capabilities makes it an ideal choice for such scenarios. Applications can use Redis Streams to capture and process high-throughput data streams, enabling real-time triggers for LLMs.
+
+For example, a social media monitoring tool might use Redis to track live tweets related to a specific topic. Each incoming tweet is stored as an event in a Redis stream, and the LLM processes these events to generate summaries, detect trends, or respond dynamically.
+
+## Conclusion
+
+In this blog post, we explored the some of the Redis use cases in LLM applications.
+
+As it can also be seen in the blog, Redis is useful in almost everywhere of an LLM application thanks to its versatile data structures that can support any type of operation, its in-memory architecture and its TTL support. Serverless Redis is even better since you don’t have to deal with anything and just do your business and use Serverless Redis wherever you need.
+
+Enjoy LLMs with Redis!
