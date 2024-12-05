@@ -1,11 +1,11 @@
 "use client";
 
-import Icon, { ICON_NAMES } from "@/components/icon";
-import IconQStash from "@/components/icon-qstash";
-import IconRedis from "@/components/icon-redis";
-import cx from "@/utils/cx";
 import * as React from "react";
-import { HTMLProps } from "react";
+
+import cx from "@/utils/cx";
+
+import Icon, { ICON_NAMES } from "@/components/icon";
+import { IconQStash, IconRedis } from "@/components";
 
 export const ProductsLabel = {
   redis: "Redis",
@@ -420,7 +420,11 @@ function FormContent({
   );
 }
 
-function Child({ className, children, ...props }: HTMLProps<HTMLDivElement>) {
+function Child({
+  className,
+  children,
+  ...props
+}: React.HTMLProps<HTMLDivElement>) {
   return (
     <div className={cx("border-b border-b-white/5 pb-4", className)} {...props}>
       {children}
@@ -428,7 +432,11 @@ function Child({ className, children, ...props }: HTMLProps<HTMLDivElement>) {
   );
 }
 
-function Toc({ className, children, ...props }: HTMLProps<HTMLDetailsElement>) {
+function Toc({
+  className,
+  children,
+  ...props
+}: React.HTMLProps<HTMLDetailsElement>) {
   return (
     <details
       open={true}
@@ -447,7 +455,7 @@ Toc.Summary = function TocSummary({
   className,
   children,
   ...props
-}: HTMLProps<HTMLDetailsElement> & { count?: number }) {
+}: React.HTMLProps<HTMLDetailsElement> & { count?: number }) {
   return (
     <summary
       className={cx(
@@ -474,7 +482,7 @@ function Item({
   className,
   checked,
   onChange = () => {},
-}: HTMLProps<HTMLLabelElement> & {
+}: React.HTMLProps<HTMLLabelElement> & {
   icon?: React.ReactNode;
   value: string;
   label: string;

@@ -1,10 +1,13 @@
 "use client";
 
-import Button from "@/components/button";
-import IconVector from "@/components/icon-vector";
-import { useSegment } from "@/hooks/use-segment";
-import { Product } from "@/utils/type";
 import React from "react";
+
+import { Product } from "@/utils/type";
+
+import { useSegment } from "@/hooks/use-segment";
+
+import { Button, IconVector } from "@/components";
+
 import {
   ProductBox,
   ProductFeature,

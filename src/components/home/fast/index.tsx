@@ -1,9 +1,10 @@
 "use client";
 
-import Bg from "@/components/bg";
-import Statistic from "@/components/home/fast/statistic";
 import { HOME_SECTIONS } from "@/utils/const";
 import cx from "@/utils/cx";
+
+import Statistic from "@/components/home/fast/statistic";
+import { Bg } from "@/components";
 
 export default function Fast() {
   return (

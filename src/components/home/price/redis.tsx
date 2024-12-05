@@ -1,8 +1,10 @@
 "use client";
 
-import IconRedis from "@/components/icon-redis";
-import { useSegment } from "@/hooks/use-segment";
 import React from "react";
+
+import { useSegment } from "@/hooks/use-segment";
+
+import { IconRedis } from "@/components";
 import {
   PriceBadge,
   PriceBox,

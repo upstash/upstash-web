@@ -1,10 +1,9 @@
-import Bg from "@/components/bg";
-import Container from "@/components/container";
-import PageHeaderDesc from "@/components/page-header-desc";
-import PageHeaderTitle from "@/components/page-header-title";
-import { allJobs } from "@content";
 import { Metadata } from "next";
 import Link from "next/link";
+
+import { allJobs } from "@content";
+
+import {Bg, Container, PageHeaderDesc, PageHeaderTitle} from "@/components";
 
 const description =
   "Help us build the cutting edge data platform for the serverless era.";

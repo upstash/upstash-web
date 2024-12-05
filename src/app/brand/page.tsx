@@ -1,10 +1,9 @@
-import Bg from "@/components/bg";
-import Container from "@/components/container";
-import CopyButton from "@/components/copy-button";
-import PageHeaderTitle from "@/components/page-header-title";
-import cx from "@/utils/cx";
-import { Metadata } from "next";
 import { HTMLAttributes } from "react";
+import { Metadata } from "next";
+
+import cx from "@/utils/cx";
+
+import {Bg, Container, CopyButton, PageHeaderTitle} from "@/components";
 
 export const metadata: Metadata = {
   title: "Brand Assets",

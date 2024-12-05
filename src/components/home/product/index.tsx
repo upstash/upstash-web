@@ -1,12 +1,14 @@
-import Bg from "@/components/bg";
-import Container from "@/components/container";
+import { HTMLProps } from "react";
+
+import { HOME_SECTIONS } from "@/utils/const";
+
 import {
   SectionHeader,
   SectionHeaderSummary,
   SectionHeaderTitle,
 } from "@/components/home/section-header";
-import { HOME_SECTIONS } from "@/utils/const";
-import { HTMLProps } from "react";
+import { Bg, Container } from "@/components";
+
 import QStash from "./qstash";
 import Redis from "./redis";
 import Vector from "./vector";

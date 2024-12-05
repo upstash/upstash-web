@@ -1,6 +1,8 @@
-import Button from "@/components/button";
-import cx from "@/utils/cx";
 import { HTMLProps } from "react";
+
+import cx from "@/utils/cx";
+
+import {Button} from "@/components";
 
 export function CommunityBox({
   children,

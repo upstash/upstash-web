@@ -1,15 +1,17 @@
-import Bg from "@/components/bg";
-import Container from "@/components/container";
-import PageBodyGradient from "@/components/page-body-gradient";
-import Clap from "@/components/post/claps";
-import PostHeader from "@/components/post/header";
-import { Mdx } from "@/components/post/mdx";
-import OtherPostCard from "@/components/post/other-post";
-import PostTags from "@/components/post/tags";
+import { notFound } from "next/navigation";
+
 // import { generateBlogSchema } from "@/utils/structured-schema-generators";
 import type { Post } from "@content";
 import { allPosts } from "@content";
-import { notFound } from "next/navigation";
+
+import {
+  Clap,
+  Mdx,
+  OtherPostCard,
+  PostHeader,
+  PostTags,
+} from "@/components/post";
+import { Bg, Container, PageBodyGradient } from "@/components";
 
 type Props = {
   params: {

@@ -1,12 +1,14 @@
-import Container from "@/components/container";
+import Link from "next/link";
+
+import cx from "@/utils/cx";
+
 import {
   FastCard,
   FastCardTitle,
   FastCardValue,
 } from "@/components/home/fast/card";
 import Icon, { ICON_NAMES } from "@/components/icon";
-import cx from "@/utils/cx";
-import Link from "next/link";
+import { Container } from "@/components";
 
 export default function FastStatistic() {
   return (

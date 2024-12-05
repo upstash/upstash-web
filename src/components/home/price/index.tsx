@@ -1,5 +1,5 @@
-import Bg from "@/components/bg";
-import Container from "@/components/container";
+import { HOME_SECTIONS } from "@/utils/const";
+
 import PriceQStash from "@/components/home/price/qstash";
 import PriceRedis from "@/components/home/price/redis";
 import {
@@ -8,7 +8,7 @@ import {
   SectionHeaderTitle,
 } from "@/components/home/section-header";
 import Icon, { ICON_NAMES } from "@/components/icon";
-import { HOME_SECTIONS } from "@/utils/const";
+import { Bg, Container } from "@/components";
 
 export default function HomeServerless() {
   return (
