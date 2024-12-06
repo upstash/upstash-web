@@ -1,7 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server"
 import { geolocation } from "@vercel/functions"
 
-// All EU/EEA country codes
+// All EU/EEA countries with GDPR codes
+// source: https://www.gdpradvisor.co.uk/gdpr-countries
 const GDPR_COUNTRIES = new Set([
 	"AT", // Austria
 	"BE", // Belgium
