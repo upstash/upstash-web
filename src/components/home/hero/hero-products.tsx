@@ -1,5 +1,4 @@
 import Button, { IButton } from "@/components/button";
-import { useSegment } from "@/hooks/use-segment";
 import cx from "@/utils/cx";
 import { Product } from "@/utils/type";
 import { Children, cloneElement, HTMLProps, ReactElement } from "react";
@@ -87,8 +86,6 @@ function HomeHeroProduct({
   href?: string;
   activeProduct?: Product;
 }) {
-  const segment = useSegment();
-
   const childs = Children.map(children, (child: ReactElement) => {
     return cloneElement(child, {
       ...child.props,
@@ -110,25 +107,7 @@ function HomeHeroProduct({
       )}
       {...props}
     >
-      {href && (
-        <a
-          className="absolute inset-0 z-10"
-          href={href}
-          onClick={(e) => {
-            switch (activeProduct) {
-              case Product.REDIS:
-                segment.track("button.create.redis");
-                break;
-              case Product.QSTASH:
-                segment.track("button.create.qstash");
-                break;
-              case Product.VECTOR:
-                segment.track("button.create.vector");
-                break;
-            }
-          }}
-        />
-      )}
+      {href && <a className="absolute inset-0 z-10" href={href} />}
       {childs}
     </div>
   );

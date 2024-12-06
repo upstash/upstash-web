@@ -1,6 +1,7 @@
 "use client";
 
 import { ParsedUrlQueryInput } from "querystring";
+import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 import HomeCommunity from "@/components/home/community";
 import HomeFast from "@/components/home/fast";
 import HomeHero from "@/components/home/hero";
@@ -24,6 +25,7 @@ export default function Home({
       autoBoot
     >
       <main className="overflow-x-hidden text-center">
+        <CookieConsentBanner />
         <HomeHero />
         <HomeFast />
         <HomeServerless />
