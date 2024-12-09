@@ -36,31 +36,29 @@ const GDPR_COUNTRIES = new Set([
 	"SE", // Sweden
 ])
 
-export type GeolocationResponse = {
-	country: string
-	isEuropean: boolean
-}
-export const GET = (request: NextRequest) => {
-	const { country = "US" } = geolocation(request)
-	const isEuropean = GDPR_COUNTRIES.has(country)
-
-	return new NextResponse(
-		JSON.stringify({ country, isEuropean }),
-		{
-			status: 200,
-			headers: {
-				'Content-Type': 'application/json',
-				...corsHeaders
-			},
-		}
-	)
-}
-
-export const corsHeaders = {
+const corsHeaders = {
 	'Access-Control-Allow-Origin': '*',
 	'Access-Control-Allow-Methods': 'GET',
 	'Access-Control-Allow-Headers': 'Content-Type',
 	'Access-Control-Max-Age': '86400',
+}
+
+export type GeolocationResponse = {
+	country: string
+	isEuropean: boolean
+}
+
+export const GET = (request: NextRequest) => {
+	const { country = "US" } = geolocation(request)
+	const isEuropean = GDPR_COUNTRIES.has(country)
+
+	return new NextResponse(JSON.stringify({ country, isEuropean }), {
+		status: 200,
+		headers: {
+			'Content-Type': 'application/json',
+			...corsHeaders
+		},
+	})
 }
 
 export const OPTIONS = () => {
