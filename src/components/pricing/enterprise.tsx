@@ -20,24 +20,27 @@ export default function PricingTableEnterprise() {
       <div className="mt-6 md:mt-0">
         <ul className="space-y-2">
           <li className="flex items-center gap-1">
-            <Icon /> 100K+ commands per second
+            <Icon/> 100K+ commands per second
           </li>
           <li className="flex items-center gap-1">
-            <Icon /> Unlimited bandwidth and database count
+            <Icon/> Unlimited bandwidth and database count
           </li>
           <li className="flex items-center gap-1">
-            <Icon /> Professional support with SLA
+            <Icon/> Professional support with SLA
           </li>
           <li className="flex items-center gap-1">
-            <Icon /> Dedicated resources for isolation
+            <Icon/> HIPAA and Single Sign On (SSO) support
+          </li>
+          <li className="flex items-center gap-1">
+            <Icon/> Dedicated resources for isolation
           </li>
         </ul>
       </div>
 
       <Button
-        type="button"
-        href="mailto:support@upstash.com"
-        className="-ml-1 mt-6 bg-emerald-400 font-medium text-zinc-950 md:hidden"
+          type="button"
+          href="mailto:support@upstash.com"
+          className="-ml-1 mt-6 bg-emerald-400 font-medium text-zinc-950 md:hidden"
       >
         Contact Us
       </Button>
