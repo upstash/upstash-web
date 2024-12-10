@@ -4,23 +4,29 @@ import { useGlobalStore } from "@/lib/global-store";
 import { useEffect, useState } from "react";
 
 export const CookieConsentBanner = () => {
-  const { cookieConsent, setCookieConsent } = useGlobalStore();
+  const { cookieConsent, setCookieConsent, isHydrated } = useGlobalStore();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    if (!isHydrated) return;
+    if (cookieConsent) {
+      setVisible(false);
+      return;
+    }
+
     async function checkLocation() {
       const res = await fetch("/api/geolocation");
 
       const data = await res.json();
 
-      setVisible(!cookieConsent && data.isEuropean);
+      setVisible(data.isEuropean);
       if (!data.isEuropean) {
         setCookieConsent(true);
       }
     }
 
     checkLocation();
-  }, [cookieConsent]);
+  }, [cookieConsent, isHydrated, setCookieConsent]);
 
   if (!visible) return;
 
