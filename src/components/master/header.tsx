@@ -24,7 +24,7 @@ export default function Header({ className, ...props }: HTMLProps<any>) {
   return (
     <header
       className={cx(
-        "fixed inset-x-0 top-0 z-50 hidden md:block",
+        "fixed inset-x-0 top-0 z-50 hidden bg-transparent md:block",
         segment === "pricing" && "absolute",
         fix && "bg-bg",
         className,
