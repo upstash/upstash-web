@@ -83,7 +83,7 @@ export default function PricingTable() {
             type="button"
             hideIcon
             href="https://console.upstash.com"
-            className="!bg-white !text-black shadow"
+            className="!bg-primary shadow"
           >
             Start Now
           </Button>
@@ -158,7 +158,7 @@ export default function PricingTable() {
             type="button"
             hideIcon
             href="https://console.upstash.com"
-            className="!bg-white !text-black shadow"
+            className="!bg-primary shadow"
           >
             Start Now
           </Button>
@@ -240,7 +240,7 @@ export default function PricingTable() {
             type="button"
             hideIcon
             href="https://console.upstash.com"
-            className="!bg-white !text-black shadow"
+            className="!bg-primary shadow"
           >
             Start Now
           </Button>

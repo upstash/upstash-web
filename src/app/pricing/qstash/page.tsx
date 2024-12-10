@@ -15,22 +15,31 @@ export default function PricingQStashPage() {
   const structuredFaqSchema = generateFaqSchema(QStashFaqJson);
 
   return (
-    <div>
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: structuredFaqSchema,
         }}
       />
-      <ProductToggle product={"/qstash"} />
 
-      <div className="mt-16 md:mt-20">
-        <PricingTable />
-        <div className="mt-10 md:mt-20">
-          <Enterprise />
-        </div>
+      <section>
+        <Container>
+          <ProductToggle product={"/qstash"} />
 
-        <div className="mt-32 md:mt-40">
+          <div className="mt-16 md:mt-20">
+            <PricingTable />
+          </div>
+
+          <div className="mt-10 md:mt-20">
+            <Enterprise />
+          </div>
+        </Container>
+      </section>
+
+      {/* Compare Table */}
+      <section className="mt-32 md:mt-40">
+        <Container className="max-w-screen-xl">
           <header>
             <PageHeaderTitle as="h2" className="md:text-4xl">
               Compare Plans
@@ -43,19 +52,20 @@ export default function PricingQStashPage() {
           <div className="mt-12 md:mt-16">
             <CompareTable />
           </div>
-        </div>
+        </Container>
+      </section>
 
-        <div className="mt-32 md:mt-40">
-          <Container className="max-w-screen-md">
-            <PageHeaderTitle as="h2" className="mb md:text-4xl">
-              FAQ
-            </PageHeaderTitle>
-            <div className="mt-10">
-              <FAQ />
-            </div>
-          </Container>
-        </div>
-      </div>
-    </div>
+      {/* FAQ */}
+      <section className="mt-32 md:mt-40">
+        <Container className="max-w-screen-md">
+          <PageHeaderTitle as="h2" className="mb md:text-4xl">
+            FAQ
+          </PageHeaderTitle>
+          <div className="mt-10">
+            <FAQ />
+          </div>
+        </Container>
+      </section>
+    </>
   );
 }
