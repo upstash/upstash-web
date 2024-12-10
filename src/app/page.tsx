@@ -1,7 +1,6 @@
 "use client";
 
 import { ParsedUrlQueryInput } from "querystring";
-import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 import HomeCommunity from "@/components/home/community";
 import HomeFast from "@/components/home/fast";
 import HomeHero from "@/components/home/hero";
@@ -9,7 +8,6 @@ import HomeOpenSource from "@/components/home/open-source";
 import HomeProduct from "@/components/home/product";
 import HomeServerless from "@/components/home/serverless";
 import { useSetAffiliateCodeToSessionStorage } from "@/hooks/use-affiliate-code-session-storage";
-import * as React from "react";
 import { IntercomProvider } from "react-use-intercom";
 
 export default function Home({
@@ -25,7 +23,6 @@ export default function Home({
       autoBoot
     >
       <main className="overflow-x-hidden text-center">
-        <CookieConsentBanner />
         <HomeHero />
         <HomeFast />
         <HomeServerless />

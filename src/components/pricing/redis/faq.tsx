@@ -99,10 +99,10 @@ export default function FAQ() {
           </p>
           <p>
             For Pro and Enterprise plans, it is charged at a rate of $0.03 per
-            GB for all the usage throughout the month up to the plan's limit. Any usage beyond 
-            that is charged at a rate of $0.10 per GB. For use cases with high
-            volume, you may consider VPC Peering which minimizes the data
-            transfer cost. Contact us at{" "}
+            GB for all the usage throughout the month up to the plan's limit.
+            Any usage beyond that is charged at a rate of $0.10 per GB. For use
+            cases with high volume, you may consider VPC Peering which minimizes
+            the data transfer cost. Contact us at{" "}
             <a href="support@upstash.com">support@upstash.com</a> for details.
           </p>
           <p>
