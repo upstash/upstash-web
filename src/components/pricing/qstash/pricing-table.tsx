@@ -9,7 +9,7 @@ export default function PricingTable() {
 
       {/* FREE */}
 
-      <div className="flex flex-col items-center gap-6 rounded-3xl bg-bg-mute px-4 py-8">
+      <div className="flex flex-col items-center gap-6 rounded-3xl bg-white px-4 py-8 shadow dark:bg-bg-mute">
         <div className="">
           <h4 className="mb-2 text-xl font-semibold text-primary-text">Free</h4>
 
@@ -41,7 +41,7 @@ export default function PricingTable() {
             type="button"
             hideIcon
             href="https://console.upstash.com"
-            className="!bg-white !text-black shadow"
+            className="!bg-primary shadow"
           >
             Start Now
           </Button>
@@ -50,7 +50,7 @@ export default function PricingTable() {
 
       {/* PAYG */}
 
-      <div className="flex flex-col items-center gap-6 rounded-3xl border-2 border-primary bg-emerald-500/10 px-4 py-8">
+      <div className="flex flex-col items-center gap-6 rounded-3xl bg-white px-4 py-8 shadow dark:bg-bg-mute">
         <div className="grow">
           <h4 className="mb-2 text-xl font-semibold text-primary-text">
             Pay as you go
@@ -86,16 +86,16 @@ export default function PricingTable() {
             type="button"
             hideIcon
             href="https://console.upstash.com"
-            className="!bg-primary !text-white shadow"
+            className="!bg-primary shadow"
           >
             Start Now
           </Button>
         </div>
       </div>
 
-      {/* ENTERPRISE */}
+      {/* Pro */}
 
-      <div className="flex flex-col items-center gap-6 rounded-3xl bg-bg-mute px-4 py-8">
+      <div className="flex flex-col items-center gap-6 rounded-3xl bg-white px-4 py-8 shadow dark:bg-bg-mute">
         <div>
           <h4 className="mb-2 text-xl font-semibold text-primary-text">Pro</h4>
 
@@ -133,7 +133,7 @@ export default function PricingTable() {
             type="button"
             hideIcon
             href="https://console.upstash.com"
-            className="!bg-white !text-black shadow"
+            className="!bg-primary shadow"
           >
             Start Now
           </Button>
