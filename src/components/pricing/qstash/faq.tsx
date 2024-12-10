@@ -73,7 +73,6 @@ export default function FAQ() {
           QStash API starts to return exceptions.
         </AccordionContent>
       </AccordionItem>
-
     </Accordion.Root>
   );
 }
