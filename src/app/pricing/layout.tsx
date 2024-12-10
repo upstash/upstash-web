@@ -27,9 +27,7 @@ export default function PricingLayout({ children }: { children: ReactNode }) {
           </header>
         </Container>
 
-        <div className="mt-6 md:mt-8">
-          <Container>{children}</Container>
-        </div>
+        <div className="mt-6 md:mt-8">{children}</div>
       </section>
     </main>
   );

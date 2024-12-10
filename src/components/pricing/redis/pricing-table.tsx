@@ -19,7 +19,7 @@ export default function PricingTable() {
 
       {/* FREE */}
 
-      {/*<div className="flex flex-col items-center gap-6 rounded-3xl bg-bg-mute px-4 py-8">
+      <div className="flex flex-col items-center gap-6 rounded-3xl bg-white px-4 py-8 shadow dark:bg-bg-mute">
         <div className="">
           <h4 className="mb-2 text-xl font-semibold text-primary-text">Free</h4>
 
@@ -88,7 +88,7 @@ export default function PricingTable() {
             Start Now
           </Button>
         </div>
-      </div>*/}
+      </div>
 
       {/* PAYG */}
 
@@ -158,7 +158,7 @@ export default function PricingTable() {
             type="button"
             hideIcon
             href="https://console.upstash.com"
-            className="!bg-primary !text-white"
+            className="!bg-white !text-black shadow"
           >
             Start Now
           </Button>
@@ -240,54 +240,7 @@ export default function PricingTable() {
             type="button"
             hideIcon
             href="https://console.upstash.com"
-            className="!bg-primary !text-white"
-          >
-            Start Now
-          </Button>
-        </div>
-      </div>
-
-      {/* Enterprise */}
-
-      <div className="flex flex-col items-center gap-6 rounded-3xl bg-white px-4 py-8 shadow dark:bg-bg-mute">
-        <div>
-          <h4 className="mb-2 text-xl font-semibold text-primary-text">
-            Enterprise
-          </h4>
-
-          <h5 className="flex items-baseline justify-center text-2xl font-semibold">
-            &nbsp;
-            <span className="ml-1 text-base font-normal text-text-mute">
-              Contact us
-            </span>
-          </h5>
-          <p className="text-sm text-text-mute">+$100 ✕ read region</p>
-        </div>
-
-        <div>
-          <div className="text-text-mute">
-            For businesses with advanced needs.
-          </div>
-        </div>
-
-        <Hr />
-
-        <ul className="flex flex-wrap justify-center gap-1">
-          <li>100K+ commands per second</li>
-          <li>Unlimited bandwidth and database count</li>
-          <li>Professional support with SLA</li>
-          <li>Dedicated resources for isolation</li>
-        </ul>
-
-        {/*<p className="text-primary-text">2,000 commands per second</p>*/}
-
-        <div>
-          <Button
-            target="_self"
-            type="button"
-            hideIcon
-            href="https://console.upstash.com"
-            className="!bg-primary !text-white"
+            className="!bg-white !text-black shadow"
           >
             Start Now
           </Button>

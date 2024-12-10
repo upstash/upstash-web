@@ -1,6 +1,7 @@
 "use client";
 
 import cx from "@/utils/cx";
+import { IconCircleCheckFilled } from "@tabler/icons-react";
 import * as React from "react";
 import { Children, HTMLProps } from "react";
 
@@ -32,27 +33,10 @@ export default function CompareValue({
       {type === "size" && children}
 
       {type === "boolean" && (
-        <span className="text-text-mute">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className={cx(valid ? "text-primary-text" : "opacity-20")}
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            strokeWidth="1.25"
-            stroke="currentColor"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <title> </title>
-            <path
-              d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-1.293 5.953a1 1 0 0 0 -1.32 -.083l-.094 .083l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.403 1.403l.083 .094l2 2l.094 .083a1 1 0 0 0 1.226 0l.094 -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z"
-              strokeWidth="0"
-              fill="currentColor"
-            />
-          </svg>
-        </span>
+        <IconCircleCheckFilled
+          className={cx(valid ? "text-primary-text" : "opacity-20")}
+          size="24"
+        />
       )}
 
       {type === "list" && children && (
