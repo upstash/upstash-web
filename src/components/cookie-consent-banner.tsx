@@ -1,3 +1,5 @@
+"use client";
+
 import { useGlobalStore } from "@/lib/global-store";
 import { useEffect, useState } from "react";
 

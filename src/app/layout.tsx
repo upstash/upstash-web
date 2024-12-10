@@ -5,13 +5,13 @@ import Footer from "@/components/master/footer";
 import Header from "@/components/master/header";
 import HeaderMobile from "@/components/master/header-mobile";
 import { PHProvider } from "@/lib/posthog";
-
 import { SITE_URL } from "@/utils/const";
 import cx from "@/utils/cx";
 import dynamic from "next/dynamic";
 import { Inter, Inter_Tight } from "next/font/google";
 import Script from "next/script";
 import { ReactNode, Suspense } from "react";
+import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 
 const PostHogPageView = dynamic(() => import("@/lib/posthog/page-view"), {
   ssr: false,
@@ -44,10 +44,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <Analytics />
           </Suspense>
 
-            <Header />
-            <HeaderMobile />
-            {children}
-            <Footer />
+          <Header />
+          <HeaderMobile />
+          {children}
+          <Footer />
+          <CookieConsentBanner />
 
           {process.env.NODE_ENV !== "development" && (
             <>
