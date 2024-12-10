@@ -1,7 +1,6 @@
 "use client";
 
 import IconRedis from "@/components/icon-redis";
-
 import React from "react";
 import {
   PriceBadge,
@@ -17,7 +16,7 @@ export default function PriceRedis() {
   return (
     <PriceBox>
       <header>
-        <IconRedis className="inline-flex mb-4" />
+        <IconRedis className="mb-4 inline-flex" />
         <PriceTitle>Redis</PriceTitle>
       </header>
 

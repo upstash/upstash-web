@@ -387,10 +387,10 @@ export const authors: Record<
     url: "https://github.com/yunusemreozdemir",
     image: "yunus.jpg",
   },
-    evans: {
-      name: "Evansso",
-      title: "Software Developer - Guest Author",
-      url: "https://x.com/evansso_",
-      image: "evans.jpg",
-    },
+  evans: {
+    name: "Evansso",
+    title: "Software Developer - Guest Author",
+    url: "https://x.com/evansso_",
+    image: "evans.jpg",
+  },
 };
