@@ -60,13 +60,13 @@ export default function HomeHeroProducts({
       </HomeHeroProductTab>
 
       <HomeHeroProductTab
-        active={activeProduct === Product.Workflow}
+        active={activeProduct === Product.WORKFLOW}
         onClick={() => {
-          setActiveProduct(Product.Workflow);
+          setActiveProduct(Product.WORKFLOW);
         }}
         className={cx(
           "text-purple-100",
-          activeProduct === Product.Workflow && "!bg-purple-50 text-purple-700",
+          activeProduct === Product.WORKFLOW && "!bg-purple-50 text-purple-700",
         )}
       >
         <IconEmpty width={24} />

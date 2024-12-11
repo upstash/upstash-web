@@ -14,8 +14,9 @@ export default function HomeHeroBg({
         "radius-full opacity-10 blur-[50px] md:blur-[100px]",
         "bg-emerald-500",
         activeProduct === Product.REDIS && "bg-red-500",
-        activeProduct === Product.QSTASH && "bg-purple-500",
         activeProduct === Product.VECTOR && "bg-orange-500",
+        activeProduct === Product.QSTASH && "bg-blue-500",
+        activeProduct === Product.WORKFLOW && "bg-purple-500",
       )}
     />
   );

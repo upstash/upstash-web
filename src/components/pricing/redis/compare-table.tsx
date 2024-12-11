@@ -1517,7 +1517,7 @@ export default function CompareTable() {
                 type="button"
                 hideIcon
                 href="https://console.upstash.com"
-                className="!bg-primary"
+                className="bg-primary"
               >
                 Start Now
               </Button>
@@ -1530,7 +1530,7 @@ export default function CompareTable() {
                 type="button"
                 hideIcon
                 href="https://console.upstash.com"
-                className="!bg-primary"
+                className="bg-primary"
               >
                 Start Now
               </Button>
@@ -1543,7 +1543,7 @@ export default function CompareTable() {
                 type="button"
                 hideIcon
                 href="https://console.upstash.com"
-                className="!bg-primary"
+                className="bg-primary"
               >
                 Start Now
               </Button>
@@ -1556,7 +1556,7 @@ export default function CompareTable() {
                 type="button"
                 hideIcon
                 href="https://console.upstash.com"
-                className="!bg-primary"
+                className="bg-primary"
               >
                 Start Now
               </Button>
@@ -1569,7 +1569,7 @@ export default function CompareTable() {
                 type="button"
                 hideIcon
                 href="https://console.upstash.com"
-                className="!bg-primary"
+                className="bg-primary"
               >
                 Start Now
               </Button>

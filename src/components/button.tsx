@@ -21,24 +21,18 @@ export default function Button({
 }: IButton) {
   const classes = {
     button: cx(
+      "inline-flex items-center transition",
       "gap-1 px-4 sm:px-5 py-1.5 sm:py-2 rounded-full font-medium",
       "text-text bg-bg-mute",
       "hover:opacity-60",
       "disabled:bg-white/5 disabled:text-zinc-50",
       className,
     ),
-    link: cx("gap-0.5 hover:underline", className),
+    link: cx("inline-flex items-center gap-0.5 hover:underline", className),
   };
 
   return (
-    <a
-      target="_blank"
-      className={cx(
-        "group/link-new inline-flex cursor-pointer items-center transition",
-        classes[type],
-      )}
-      {...props}
-    >
+    <a target="_blank" className={classes[type]} {...props}>
       {children && <span>{children}</span>}
       {icon ? (
         <span className="ml-auto">{icon}</span>

@@ -2,7 +2,7 @@ export enum Product {
   REDIS = "Redis",
   VECTOR = "Vector",
   QSTASH = "QStash",
-  Workflow = "Workflow",
+  WORKFLOW = "Workflow",
 }
 
 export enum CodeExample {

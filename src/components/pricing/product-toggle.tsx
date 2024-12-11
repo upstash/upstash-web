@@ -25,7 +25,7 @@ export default function ProductToggle({ product }: { product: string }) {
                 "relative flex cursor-pointer select-none items-center gap-1",
                 "rounded-lg px-3 py-1.5 transition",
                 "hover:bg-bg-mute",
-                isActive && "!text-black",
+                isActive && "text-black",
               )}
             >
               {isActive && (
