@@ -2,7 +2,6 @@
 
 import Button from "@/components/button";
 import IconQStash from "@/components/icon-qstash";
-import { useSegment } from "@/hooks/use-segment";
 import { Product } from "@/utils/type";
 import React from "react";
 import {
@@ -13,7 +12,6 @@ import {
 } from "./comp";
 
 export default function ServerlessQStash() {
-  const { track } = useSegment();
   return (
     <ProductBox
       product={Product.QSTASH}
@@ -39,9 +37,6 @@ export default function ServerlessQStash() {
           href="/docs/qstash"
           className="bg-purple-100 text-purple-950 hover:bg-purple-100 hover:text-purple-950"
           type="button"
-          onClick={() => {
-            track("button.docs.qstash");
-          }}
         >
           Docs
         </Button>
@@ -49,9 +44,6 @@ export default function ServerlessQStash() {
           href="https://github.com/upstash/examples/tree/main/examples"
           className="hover:bg-purple-100 hover:text-purple-950"
           type="button"
-          onClick={() => {
-            track("button.examples.qstash");
-          }}
         >
           Examples
         </Button>

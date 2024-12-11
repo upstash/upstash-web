@@ -2,7 +2,6 @@
 
 import Button from "@/components/button";
 import IconRedis from "@/components/icon-redis";
-import { useSegment } from "@/hooks/use-segment";
 import { Product } from "@/utils/type";
 import React from "react";
 import {
@@ -13,7 +12,6 @@ import {
 } from "./comp";
 
 export default function ServerlessRedis() {
-  const { track } = useSegment();
   return (
     <ProductBox product={Product.REDIS} className="mdd:col-span-2 bg-red-200/5">
       <header>
@@ -38,9 +36,6 @@ export default function ServerlessRedis() {
           href="/docs/redis"
           className="bg-red-100 text-red-950 hover:bg-red-100 hover:text-red-950"
           type="button"
-          onClick={() => {
-            track("button.docs.redis");
-          }}
         >
           Docs
         </Button>
@@ -48,9 +43,6 @@ export default function ServerlessRedis() {
           href="https://github.com/upstash/examples/tree/main/examples"
           className="hover:bg-red-100 hover:text-red-950"
           type="button"
-          onClick={() => {
-            track("button.examples.redis");
-          }}
         >
           Examples
         </Button>

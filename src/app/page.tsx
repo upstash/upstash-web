@@ -8,7 +8,6 @@ import HomeOpenSource from "@/components/home/open-source";
 import HomeProduct from "@/components/home/product";
 import HomeServerless from "@/components/home/serverless";
 import { useSetAffiliateCodeToSessionStorage } from "@/hooks/use-affiliate-code-session-storage";
-import * as React from "react";
 import { IntercomProvider } from "react-use-intercom";
 
 export default function Home({

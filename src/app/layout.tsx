@@ -1,11 +1,11 @@
 import "@upstash/claps/style.css";
 import "./globals.css";
 import Analytics from "@/components/Analytics";
+import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 import Footer from "@/components/master/footer";
 import Header from "@/components/master/header";
 import HeaderMobile from "@/components/master/header-mobile";
 import { PHProvider } from "@/lib/posthog";
-import { SegmentProvider } from "@/lib/segment/provider";
 import { SITE_URL } from "@/utils/const";
 import cx from "@/utils/cx";
 import dynamic from "next/dynamic";
@@ -43,14 +43,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <Suspense>
             <Analytics />
           </Suspense>
-          <SegmentProvider
-            writeKey={process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY!}
-          >
-            <Header />
-            <HeaderMobile />
-            {children}
-            <Footer />
-          </SegmentProvider>
+
+          <Header />
+          <HeaderMobile />
+          {children}
+          <Footer />
+          <CookieConsentBanner />
 
           {process.env.NODE_ENV !== "development" && (
             <>
