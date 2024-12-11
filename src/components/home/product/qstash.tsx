@@ -17,8 +17,8 @@ export default function ServerlessQStash() {
       product={Product.QSTASH}
       className="mdd:col-span-2 bg-purple-200/5"
     >
-      <header>
-        <IconQStash className="mb-4" width={40} />
+      <header className="flex items-center gap-4">
+        <IconQStash width={32} />
         <ProductTitle>QStash</ProductTitle>
       </header>
 
@@ -35,17 +35,16 @@ export default function ServerlessQStash() {
       <div className="mt-auto grid gap-4 sm:grid-cols-2">
         <Button
           href="/docs/qstash"
-          className="bg-purple-100 text-purple-950 hover:bg-purple-100 hover:text-purple-950"
           type="button"
         >
           Docs
         </Button>
         <Button
           href="https://github.com/upstash/examples/tree/main/examples"
-          className="hover:bg-purple-100 hover:text-purple-950"
+          className="bg-purple-100 text-purple-950 hover:bg-purple-100 hover:text-purple-950"
           type="button"
         >
-          Examples
+          Publish Messages
         </Button>
       </div>
     </ProductBox>

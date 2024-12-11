@@ -1,6 +1,6 @@
 import React, { SVGProps } from "react";
 
-export default function IconQStash({
+export default function IconEmpty({
   width = 36,
   ...props
 }: SVGProps<SVGSVGElement>) {
@@ -13,12 +13,11 @@ export default function IconQStash({
       viewBox="0 0 32 32"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      aria-label="Upstash QStash"
       {...props}
     >
-      <rect width="32" height="32" rx="7" fill="#2563EB" />
+      <rect width="32" height="32" rx="7" fill="#9333EA" />
       <path
-        d="M16 16H28M16 16V4M16 16H4M16 16V28M16 16L23 9M16 16L23 23M16 16L9 9M16 16L9 23"
+        d="M7 7H25L7 16H25L7 25H25"
         stroke="white"
         strokeWidth="3"
         strokeLinecap="round"

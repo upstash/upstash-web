@@ -15,17 +15,14 @@ export default function IconEmpty({
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >
-      <g clipPath="url(#logo-empty)">
-        <path
-          d="M24.8889 0H7.11111C3.18375 0 0 3.18375 0 7.11111V24.8889C0 28.8162 3.18375 32 7.11111 32H24.8889C28.8162 32 32 28.8162 32 24.8889V7.11111C32 3.18375 28.8162 0 24.8889 0Z"
-          fill="#ffffff"
-        />
-      </g>
-      <defs>
-        <clipPath id="logo-qstash">
-          <rect width="32" height="32" fill="white" />
-        </clipPath>
-      </defs>
+      <rect width="32" height="32" rx="7" fill="#9333EA" />
+      <path
+        d="M7 7H25L7 16H25L7 25H25"
+        stroke="white"
+        stroke-width="3"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
     </svg>
   );
 }

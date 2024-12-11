@@ -6,7 +6,6 @@ import Prism from "prismjs";
 import { HTMLProps, ReactNode, useEffect, useState } from "react";
 import { ServerlessBox, ServerlessSummary, ServerlessTitle } from "./comp";
 import "prismjs/components/prism-python";
-import "prismjs/themes/prism-tomorrow.css";
 
 export default function HttpRestApi() {
   const [product, setProduct] = useState<Product>(Product.VECTOR);

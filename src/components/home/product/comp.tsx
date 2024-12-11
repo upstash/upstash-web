@@ -39,7 +39,7 @@ export function ProductTitle({
   return (
     <h4
       className={cx(
-        "flex items-center gap-2 font-display text-xl font-semibold md:text-2xl",
+        "flex items-center gap-2 font-display text-xl font-semibold md:text-3xl",
         className,
       )}
     >

@@ -104,12 +104,12 @@ export default function PricingTable() {
           </div>
         </div>
 
+        <Hr />
+
         <div>
           <p className="text-text-mute">Daily Query / Update Limit</p>
-          <p className="text-sm font-semibold">1M</p>
+          <p className="font-semibold">1M</p>
         </div>
-
-        <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
         <div>
           <Button
