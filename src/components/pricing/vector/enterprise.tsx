@@ -12,7 +12,7 @@ export default function PricingTableEnterprise() {
         <Button
           type="button"
           href="mailto:sales@upstash.com"
-          className="-ml-1 mt-4 hidden !bg-primary md:inline-flex"
+          className="-ml-1 mt-4 hidden bg-primary md:inline-flex"
         >
           Contact Us
         </Button>
@@ -42,7 +42,7 @@ export default function PricingTableEnterprise() {
       <Button
         type="button"
         href="mailto:support@upstash.com"
-        className="-ml-1 mt-6 !bg-primary md:hidden"
+        className="-ml-1 mt-6 bg-primary md:hidden"
       >
         Contact Us
       </Button>

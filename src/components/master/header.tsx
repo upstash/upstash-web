@@ -58,7 +58,7 @@ export default function Header({ className, ...props }: HTMLProps<any>) {
                   ? `https://console.upstash.com/?code=${affiliateCode}`
                   : "https://console.upstash.com"
               }
-              className={cx("", fix ? "!bg-primary" : "")}
+              className={cx(fix && "bg-white text-black")}
             >
               Login
             </Button>

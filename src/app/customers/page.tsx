@@ -83,7 +83,7 @@ export default function CustomerPage() {
                   </div>
 
                   <div className="mt-auto hidden h-10 group-hover/customer-comp:block">
-                    <Button type="button" hideIcon className="!bg-primary">
+                    <Button type="button" hideIcon className="bg-primary">
                       Read more
                     </Button>
                   </div>

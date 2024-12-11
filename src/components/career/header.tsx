@@ -35,7 +35,7 @@ export default function CareerHeader({ job }: Props) {
         {/* skills */}
         <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
           {job.skills.map((skill: string) => (
-            <span className="bg-bg-mute rounded px-3 py-1" key={skill}>
+            <span className="rounded bg-bg-mute px-3 py-1" key={skill}>
               {skill}
             </span>
           ))}
@@ -44,7 +44,7 @@ export default function CareerHeader({ job }: Props) {
         <Button
           type="button"
           href="mailto:jobs@upstash.com"
-          className="mt-10 !bg-primary"
+          className="mt-10 bg-primary"
         >
           Apply now
         </Button>

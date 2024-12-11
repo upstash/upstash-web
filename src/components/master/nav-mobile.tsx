@@ -40,7 +40,7 @@ export default function NavMobile({ hidden }: HTMLProps<HTMLDivElement> & {}) {
             ? `https://console.upstash.com/?code=${affiliateCode}`
             : "https://console.upstash.com"
         }
-        className="my-6 justify-center !bg-primary py-3 font-display text-lg font-medium"
+        className="my-6 justify-center bg-primary py-3 font-display text-lg font-medium"
       >
         Login
       </Button>
