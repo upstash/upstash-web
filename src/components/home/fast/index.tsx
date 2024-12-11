@@ -9,17 +9,17 @@ export default function Fast() {
   return (
     <section
       id={HOME_SECTIONS.FAST}
-      className="relative z-0 my-10 hidden h-[400px] overflow-hidden md:block md:h-[500px]"
+      className="relative z-0 mt-20 hidden h-[400px] overflow-hidden md:mt-32 md:block md:h-[500px]"
     >
-      <Bg className="top-44 h-1/2" />
+      <Bg className="!top-24" />
 
       {/* slogan */}
       <h5
         className={cx(
-          "pointer-events-none absolute inset-x-0 -top-8 -z-20",
+          "pointer-events-none absolute inset-x-0 -top-4 -z-20",
           "font-display text-[13vw] font-bold leading-tight",
           "bg-gradient-to-t bg-clip-text text-transparent",
-          "from-emerald-300/5 to-emerald-200/[0.03]",
+          "from-emerald-300/10 to-emerald-200/5",
         )}
       >
         Fast Anywhere

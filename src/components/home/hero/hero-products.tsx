@@ -1,184 +1,116 @@
-import Button, { IButton } from "@/components/button";
-import { useSegment } from "@/hooks/use-segment";
+import IconEmpty from "@/components/icon-empty";
+import IconQStash from "@/components/icon-qstash";
+import IconRedis from "@/components/icon-redis";
+import IconVector from "@/components/icon-vector";
 import cx from "@/utils/cx";
 import { Product } from "@/utils/type";
-import { Children, cloneElement, HTMLProps, ReactElement } from "react";
+import React from "react";
 
 export default function HomeHeroProducts({
   activeProduct,
   setActiveProduct,
 }: {
   activeProduct?: Product;
-  setActiveProduct: (product?: Product) => void;
+  setActiveProduct: (product: Product) => void;
 }) {
   return (
-    <div
-      className="mt-8 grid gap-2 md:mt-16 md:grid-cols-3"
-      onMouseLeave={() => setActiveProduct(undefined)}
-    >
-      <HomeHeroProduct
-        href="https://console.upstash.com"
-        activeProduct={activeProduct}
-        onMouseEnter={() => setActiveProduct(Product.REDIS)}
+    <>
+      <HomeHeroProductTab
+        active={activeProduct === Product.REDIS}
+        onClick={() => {
+          setActiveProduct(Product.REDIS);
+        }}
+        className={cx(
+          "text-red-100",
+          activeProduct === Product.REDIS && "!bg-red-50 text-red-700",
+        )}
       >
-        <HeroProductTitle>
-          <span>Redis</span>
-          <span className="text-[.9em] opacity-20">®*</span>
-        </HeroProductTitle>
-        <HeroProductDesc>Serverless database with Redis API</HeroProductDesc>
-        <HeroProductCta
-          className={cx(
-            activeProduct === Product.REDIS && "!bg-red-500 !text-white",
-          )}
-        >
-          Create Database
-        </HeroProductCta>
-      </HomeHeroProduct>
+        <IconRedis width={24} />
+        <span>
+          Redis <span className="text-[.9em] opacity-40">®*</span>
+        </span>
+      </HomeHeroProductTab>
 
-      <HomeHeroProduct
-        href="https://console.upstash.com"
-        activeProduct={activeProduct}
-        onMouseEnter={() => setActiveProduct(Product.VECTOR)}
+      <HomeHeroProductTab
+        active={activeProduct === Product.VECTOR}
+        onClick={() => {
+          setActiveProduct(Product.VECTOR);
+        }}
+        className={cx(
+          "text-orange-100",
+          activeProduct === Product.VECTOR && "!bg-orange-50 text-orange-700",
+        )}
       >
-        <HeroProductTitle>
-          <span>Vector</span>
-          <span className="ml-0.5 rounded bg-orange-500 px-1.5 py-1 text-xs font-semibold leading-none tracking-wide">
-            NEW
-          </span>
-        </HeroProductTitle>
-        <HeroProductDesc>Serverless Vector Database</HeroProductDesc>
-        <HeroProductCta
-          className={cx(
-            activeProduct === Product.VECTOR && "!bg-orange-500 !text-white",
-          )}
-        >
-          Create Index
-        </HeroProductCta>
-      </HomeHeroProduct>
+        <IconVector width={24} />
+        <span>Vector</span>
+      </HomeHeroProductTab>
 
-      <HomeHeroProduct
-        href="https://console.upstash.com"
-        activeProduct={activeProduct}
-        onMouseEnter={() => setActiveProduct(Product.QSTASH)}
+      <HomeHeroProductTab
+        active={activeProduct === Product.QSTASH}
+        onClick={() => {
+          setActiveProduct(Product.QSTASH);
+        }}
+        className={cx(
+          "text-purple-100",
+          activeProduct === Product.QSTASH && "!bg-purple-50 text-purple-700",
+        )}
       >
-        <HeroProductTitle>
-          <span>QStash</span>
-        </HeroProductTitle>
-        <HeroProductDesc>Messaging for the Serverless</HeroProductDesc>
-        <HeroProductCta
-          className={cx(
-            activeProduct === Product.QSTASH && "!bg-purple-500 !text-white",
-          )}
-        >
-          Publish Messages
-        </HeroProductCta>
-      </HomeHeroProduct>
-    </div>
+        <IconQStash width={24} />
+        <span>QStash</span>
+      </HomeHeroProductTab>
+
+      <HomeHeroProductTab
+        active={activeProduct === Product.Workflow}
+        onClick={() => {
+          setActiveProduct(Product.Workflow);
+        }}
+        className={cx(
+          "text-purple-100",
+          activeProduct === Product.Workflow && "!bg-purple-50 text-purple-700",
+        )}
+      >
+        <IconEmpty width={24} />
+        <span>Workflow</span>
+      </HomeHeroProductTab>
+
+      <HomeHeroProductTab disabled>
+        <IconEmpty width={24} className="opacity-10" />
+        <span className="opacity-30">Search</span>
+      </HomeHeroProductTab>
+    </>
   );
 }
 
-function HomeHeroProduct({
+function HomeHeroProductTab({
   children,
+  active,
   className,
-  href,
-  activeProduct,
   ...props
-}: HTMLProps<HTMLDivElement> & {
-  href?: string;
-  activeProduct?: Product;
-}) {
-  const segment = useSegment();
-
-  const childs = Children.map(children, (child: ReactElement) => {
-    return cloneElement(child, {
-      ...child.props,
-      activeProduct,
-      href,
-    });
-  });
-
-  return (
-    <div
-      className={cx(
-        "group/hero-product",
-        "relative flex flex-col items-center p-6 md:p-8",
-        "cursor-default bg-white/5 backdrop-blur transition",
-        "rounded-lg",
-        "xl:first:!rounded-l-4xl xl:last:!rounded-r-4xl",
-        "hover:scale-[1.02] hover:bg-white/10",
-        className,
-      )}
-      {...props}
-    >
-      {href && (
-        <a
-          className="absolute inset-0 z-10"
-          href={href}
-          onClick={(e) => {
-            switch (activeProduct) {
-              case Product.REDIS:
-                segment.track("button.create.redis");
-                break;
-              case Product.QSTASH:
-                segment.track("button.create.qstash");
-                break;
-              case Product.VECTOR:
-                segment.track("button.create.vector");
-                break;
-            }
-          }}
-        />
-      )}
-      {childs}
-    </div>
-  );
-}
-
-function HeroProductTitle({
-  children,
-  className,
-}: HTMLProps<HTMLHeadingElement>) {
-  return (
-    <h3
-      className={cx(
-        "flex items-center gap-1 text-zinc-50",
-        "font-display text-xl font-medium leading-none md:text-2xl",
-        className,
-      )}
-    >
-      {children}
-    </h3>
-  );
-}
-
-function HeroProductDesc({
-  children,
-  className,
-}: HTMLProps<HTMLParagraphElement>) {
-  return (
-    <p className={cx("mt-2 grow opacity-60 xl:mx-4", className)}>{children}</p>
-  );
-}
-
-function HeroProductCta({
-  children,
-  className,
-  activeProduct,
-  ...props
-}: IButton & {
-  activeProduct?: Product;
+}: React.ComponentProps<"button"> & {
+  active?: boolean;
 }) {
   return (
-    <Button
+    <button
       type="button"
       className={cx(
-        "mt-4 hidden md:inline-flex",
-        activeProduct ? "bg-white/3 text-zinc-50" : "bg-zinc-50 text-zinc-950",
+        "px-6 py-6 text-center sm:px-8",
+        "font-display text-2xl font-medium leading-none",
+        "border-2 border-b-0 border-white/10",
+        "rounded-t-2xl text-white hover:bg-white/10 md:rounded-t-3xl",
+        active && "font-semibold",
+        props.disabled && "hidden cursor-not-allowed lg:flex",
         className,
       )}
       {...props}
     >
-      {children}
-    </Button>
+      <span
+        className={cx(
+          "flex items-center justify-center gap-2",
+          active ? "" : "opacity-80",
+        )}
+      >
+        {children}
+      </span>
+    </button>
   );
 }

@@ -25,7 +25,7 @@ export function FastCardValue({
   return (
     <div
       className={cx(
-        "font-display text-3xl font-semibold text-emerald-400 md:text-4xl",
+        "font-display text-3xl font-semibold md:text-4xl",
         className,
       )}
       {...props}
@@ -44,7 +44,7 @@ export function FastCardTitle({
 }) {
   return (
     <h5
-      className="mt-1 text-xs uppercase tracking-widest text-emerald-200 opacity-40"
+      className="mt-1 text-xs uppercase tracking-widest text-text-mute"
       {...props}
     >
       {children}

@@ -2,11 +2,11 @@
 
 import "./page.css";
 import { ParsedUrlQueryInput } from "querystring";
+import Container from "@/components/container";
 import HomeCommunity from "@/components/home/community";
 import HomeFast from "@/components/home/fast";
 import HomeHero from "@/components/home/hero";
-import HomeOpenSource from "@/components/home/open-source";
-import HomeProduct from "@/components/home/product";
+import HomeHeroPartner from "@/components/home/hero/hero-customer";
 import HomeServerless from "@/components/home/serverless";
 import { useSetAffiliateCodeToSessionStorage } from "@/hooks/use-affiliate-code-session-storage";
 import * as React from "react";
@@ -26,11 +26,16 @@ export default function Home({
     >
       <main className="text-center">
         <HomeHero />
-        <HomeFast />
+
+        <div className="pt-20">
+          <Container className="max-w-screen-md">
+            <HomeHeroPartner />
+          </Container>
+        </div>
+
         <HomeServerless />
-        <HomeProduct />
-        <HomeOpenSource />
         <HomeCommunity />
+        <HomeFast />
       </main>
     </IntercomProvider>
   );
