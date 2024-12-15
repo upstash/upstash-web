@@ -1,3 +1,4 @@
+import Button from "@/components/button";
 import Tooltip from "@/components/tooltip";
 import useIsMobile from "@/hooks/use-is-mobile";
 import cx from "@/utils/cx";
@@ -22,15 +23,25 @@ export default function CompareTable() {
     setSelectedPlans(value);
   };
 
-  function Col({ plan, children, className, ...props }) {
+  function Col({
+    plan,
+    className,
+    feature = false,
+    ...props
+  }: React.ComponentProps<"td"> & {
+    plan: boolean;
+    feature?: boolean;
+  }) {
     return (
       <td
         hidden={isMobile ? !plan : false}
-        className={cx(className)}
+        className={cx(
+          "bg-bg-mute px-4 py-0 align-top",
+          feature && "bg-emerald-600/20 dark:bg-emerald-800/20",
+          className,
+        )}
         {...props}
-      >
-        {children}
-      </td>
+      />
     );
   }
 
@@ -51,25 +62,26 @@ export default function CompareTable() {
           <td className="p-0" />
           <Col
             plan={showFree}
-            className="border-b-2 border-b-bg bg-bg-mute px-0 py-3 text-xs font-medium uppercase tracking-wider text-text-mute"
+            className="border-b-2 border-b-bg px-0 py-3 text-xs font-medium uppercase tracking-wider text-text-mute"
           >
             Free
           </Col>
           <Col
             plan={showPayg}
-            className="border-b-2 border-b-bg bg-emerald-500/10 px-0 py-3 text-xs font-medium uppercase tracking-wider text-text-mute"
+            feature
+            className="border-b-2 border-b-bg px-0 py-3 text-xs font-medium uppercase tracking-wider text-text-mute"
           >
             Usage Based Pricing
           </Col>
           <Col
             plan={showPro1}
-            className="border-b-2 border-b-bg bg-bg-mute px-0 py-3 text-xs font-medium uppercase tracking-wider text-text-mute"
+            className="border-b-2 border-b-bg px-0 py-3 text-xs font-medium uppercase tracking-wider text-text-mute"
           >
             Fixed Pricing
           </Col>
           <Col
             plan={showPro10}
-            className="border-b-2 border-b-bg bg-bg-mute px-0 py-3 text-xs font-medium uppercase tracking-wider text-text-mute"
+            className="border-b-2 border-b-bg px-0 py-3 text-xs font-medium uppercase tracking-wider text-text-mute"
           >
             Fixed Pricing
           </Col>
@@ -92,7 +104,7 @@ export default function CompareTable() {
             </div>
           </Col>
           <Col plan={showPayg} className="border-b border-b-bg bg-bg p-0">
-            <div className="flex h-24 flex-col items-center justify-center bg-emerald-500/10">
+            <div className="flex h-24 flex-col items-center justify-center bg-emerald-600/20 dark:bg-emerald-800/20">
               <h4 className="hidden text-lg font-semibold text-primary-text md:block">
                 Pay as you go
               </h4>
@@ -162,16 +174,16 @@ export default function CompareTable() {
             Max Messages per Day
           </th>
           {/**/}
-          <Col plan={showFree} className="bg-bg-mute px-4 py-0">
+          <Col plan={showFree}>
             <CompareValue type="number">500</CompareValue>
           </Col>
-          <Col plan={showPayg} className="bg-emerald-300/10 px-4 py-0">
+          <Col plan={showPayg} feature>
             <CompareValue type="number">500000</CompareValue>
           </Col>
-          <Col plan={showPro1} className="bg-bg-mute px-4 py-0">
+          <Col plan={showPro1}>
             <CompareValue>1M</CompareValue>
           </Col>
-          <Col plan={showPro10} className="bg-bg-mute px-4 py-0">
+          <Col plan={showPro10}>
             <CompareValue>10M</CompareValue>
           </Col>
         </tr>
@@ -181,16 +193,16 @@ export default function CompareTable() {
             Max Requests per Second
           </th>
           {/**/}
-          <Col plan={showFree} className="bg-bg-mute px-4 py-0">
+          <Col plan={showFree}>
             <CompareValue type="number">100</CompareValue>
           </Col>
-          <Col plan={showPayg} className="bg-emerald-300/10 px-4 py-0">
+          <Col plan={showPayg} feature>
             <CompareValue type="number">100</CompareValue>
           </Col>
-          <Col plan={showPro1} className="bg-bg-mute px-4 py-0">
+          <Col plan={showPro1}>
             <CompareValue>500</CompareValue>
           </Col>
-          <Col plan={showPro10} className="bg-bg-mute px-4 py-0">
+          <Col plan={showPro10}>
             <CompareValue>1000</CompareValue>
           </Col>
         </tr>
@@ -200,22 +212,22 @@ export default function CompareTable() {
             Max Message Size
           </th>
           {/**/}
-          <Col plan={showFree} className="bg-bg-mute px-4 py-0">
+          <Col plan={showFree}>
             <CompareValue type="size" suffix="MB">
               1
             </CompareValue>
           </Col>
-          <Col plan={showPayg} className="bg-emerald-300/10 px-4 py-0">
+          <Col plan={showPayg} feature>
             <CompareValue type="size" suffix="MB">
               10
             </CompareValue>
           </Col>
-          <Col plan={showPro1} className="bg-bg-mute px-4 py-0">
+          <Col plan={showPro1}>
             <CompareValue type="size" suffix="MB">
               50
             </CompareValue>
           </Col>
-          <Col plan={showPro10} className="bg-bg-mute px-4 py-0">
+          <Col plan={showPro10}>
             <CompareValue type="size" suffix="MB">
               50
             </CompareValue>
@@ -227,16 +239,16 @@ export default function CompareTable() {
             Max Number of URL Groups
           </th>
           {/**/}
-          <Col plan={showFree} className="bg-bg-mute px-4 py-0">
+          <Col plan={showFree}>
             <CompareValue>1</CompareValue>
           </Col>
-          <Col plan={showPayg} className="bg-emerald-300/10 px-4 py-0">
+          <Col plan={showPayg} feature>
             <CompareValue>100</CompareValue>
           </Col>
-          <Col plan={showPro1} className="bg-bg-mute px-4 py-0">
+          <Col plan={showPro1}>
             <CompareValue>1000</CompareValue>
           </Col>
-          <Col plan={showPro10} className="bg-bg-mute px-4 py-0">
+          <Col plan={showPro10}>
             <CompareValue>2000</CompareValue>
           </Col>
         </tr>
@@ -246,16 +258,16 @@ export default function CompareTable() {
             Max Number of Endpoints per URL Group
           </th>
           {/**/}
-          <Col plan={showFree} className="bg-bg-mute px-4 py-0">
+          <Col plan={showFree}>
             <CompareValue>100</CompareValue>
           </Col>
-          <Col plan={showPayg} className="bg-emerald-300/10 px-4 py-0">
+          <Col plan={showPayg} feature>
             <CompareValue>100</CompareValue>
           </Col>
-          <Col plan={showPro1} className="bg-bg-mute px-4 py-0">
+          <Col plan={showPro1}>
             <CompareValue>1000</CompareValue>
           </Col>
-          <Col plan={showPro10} className="bg-bg-mute px-4 py-0">
+          <Col plan={showPro10}>
             <CompareValue>2000</CompareValue>
           </Col>
         </tr>
@@ -265,16 +277,16 @@ export default function CompareTable() {
             Max Retry Count
           </th>
           {/**/}
-          <Col plan={showFree} className="bg-bg-mute px-4 py-0">
+          <Col plan={showFree}>
             <CompareValue>3</CompareValue>
           </Col>
-          <Col plan={showPayg} className="bg-emerald-300/10 px-4 py-0">
+          <Col plan={showPayg} feature>
             <CompareValue>5</CompareValue>
           </Col>
-          <Col plan={showPro1} className="bg-bg-mute px-4 py-0">
+          <Col plan={showPro1}>
             <CompareValue>20</CompareValue>
           </Col>
-          <Col plan={showPro10} className="bg-bg-mute px-4 py-0">
+          <Col plan={showPro10}>
             <CompareValue>100</CompareValue>
           </Col>
         </tr>
@@ -284,16 +296,16 @@ export default function CompareTable() {
             Max Delay
           </th>
           {/**/}
-          <Col plan={showFree} className="bg-bg-mute px-4 py-0">
+          <Col plan={showFree}>
             <CompareValue>7 days</CompareValue>
           </Col>
-          <Col plan={showPayg} className="bg-emerald-300/10 px-4 py-0">
+          <Col plan={showPayg} feature>
             <CompareValue>1 year</CompareValue>
           </Col>
-          <Col plan={showPro1} className="bg-bg-mute px-4 py-0">
+          <Col plan={showPro1}>
             <CompareValue>Unlimited</CompareValue>
           </Col>
-          <Col plan={showPro10} className="bg-bg-mute px-4 py-0">
+          <Col plan={showPro10}>
             <CompareValue>Unlimited</CompareValue>
           </Col>
         </tr>
@@ -303,16 +315,16 @@ export default function CompareTable() {
             Max HTTP Connection Timeout
           </th>
           {/**/}
-          <Col plan={showFree} className="bg-bg-mute px-4 py-0">
+          <Col plan={showFree}>
             <CompareValue>15 minutes</CompareValue>
           </Col>
-          <Col plan={showPayg} className="bg-emerald-300/10 px-4 py-0">
+          <Col plan={showPayg} feature>
             <CompareValue>2 hours</CompareValue>
           </Col>
-          <Col plan={showPro1} className="bg-bg-mute px-4 py-0">
+          <Col plan={showPro1}>
             <CompareValue>6 hours</CompareValue>
           </Col>
-          <Col plan={showPro10} className="bg-bg-mute px-4 py-0">
+          <Col plan={showPro10}>
             <CompareValue>12 hours</CompareValue>
           </Col>
         </tr>
@@ -322,16 +334,16 @@ export default function CompareTable() {
             Max DLQ Retention
           </th>
           {/**/}
-          <Col plan={showFree} className="bg-bg-mute px-4 py-0">
+          <Col plan={showFree}>
             <CompareValue>3 days</CompareValue>
           </Col>
-          <Col plan={showPayg} className="bg-emerald-300/10 px-4 py-0">
+          <Col plan={showPayg} feature>
             <CompareValue>7 days</CompareValue>
           </Col>
-          <Col plan={showPro1} className="bg-bg-mute px-4 py-0">
+          <Col plan={showPro1}>
             <CompareValue>30 days</CompareValue>
           </Col>
-          <Col plan={showPro10} className="bg-bg-mute px-4 py-0">
+          <Col plan={showPro10}>
             <CompareValue>3 months</CompareValue>
           </Col>
         </tr>
@@ -341,10 +353,10 @@ export default function CompareTable() {
             Max Active Schedules
           </th>
           {/**/}
-          <Col plan={showFree} className="bg-bg-mute px-4 py-0">
+          <Col plan={showFree}>
             <CompareValue type="number">10</CompareValue>
           </Col>
-          <Col plan={showPayg} className="bg-emerald-300/10 px-4 py-0">
+          <Col plan={showPayg} feature>
             <CompareValue
               type="number"
               after={
@@ -356,7 +368,7 @@ export default function CompareTable() {
               1000
             </CompareValue>
           </Col>
-          <Col plan={showPro1} className="bg-bg-mute px-4 py-0">
+          <Col plan={showPro1}>
             <CompareValue
               after={
                 <Tooltip content="Free up to 10K. Beyond that, $0.01 per active schedule.">
@@ -367,7 +379,7 @@ export default function CompareTable() {
               10000
             </CompareValue>
           </Col>
-          <Col plan={showPro10} className="bg-bg-mute px-4 py-0">
+          <Col plan={showPro10}>
             <CompareValue
               after={
                 <Tooltip content="Free up to 50K. Beyond that, $0.01 per active schedule.">
@@ -385,16 +397,16 @@ export default function CompareTable() {
             Max Queue Count
           </th>
           {/**/}
-          <Col plan={showFree} className="bg-bg-mute px-4 py-0">
+          <Col plan={showFree}>
             <CompareValue type="number">10</CompareValue>
           </Col>
-          <Col plan={showPayg} className="bg-emerald-300/10 px-4 py-0">
+          <Col plan={showPayg} feature>
             <CompareValue type="number">100</CompareValue>
           </Col>
-          <Col plan={showPro1} className="bg-bg-mute px-4 py-0">
+          <Col plan={showPro1}>
             <CompareValue>1000</CompareValue>
           </Col>
-          <Col plan={showPro10} className="bg-bg-mute px-4 py-0">
+          <Col plan={showPro10}>
             <CompareValue>1000</CompareValue>
           </Col>
         </tr>
@@ -404,16 +416,16 @@ export default function CompareTable() {
             Max Queue Parallelism
           </th>
           {/**/}
-          <Col plan={showFree} className="bg-bg-mute px-4 py-0">
+          <Col plan={showFree}>
             <CompareValue type="number">2</CompareValue>
           </Col>
-          <Col plan={showPayg} className="bg-emerald-300/10 px-4 py-0">
+          <Col plan={showPayg} feature>
             <CompareValue type="number">10</CompareValue>
           </Col>
-          <Col plan={showPro1} className="bg-bg-mute px-4 py-0">
+          <Col plan={showPro1}>
             <CompareValue>10</CompareValue>
           </Col>
-          <Col plan={showPro10} className="bg-bg-mute px-4 py-0">
+          <Col plan={showPro10}>
             <CompareValue>10</CompareValue>
           </Col>
         </tr>
@@ -422,16 +434,16 @@ export default function CompareTable() {
             Max Events Size
           </th>
           {/**/}
-          <Col plan={showFree} className="bg-bg-mute px-4 py-0">
+          <Col plan={showFree}>
             <CompareValue type="number">10000</CompareValue>
           </Col>
-          <Col plan={showPayg} className="bg-emerald-300/10 px-4 py-0">
+          <Col plan={showPayg} feature>
             <CompareValue type="number">10000</CompareValue>
           </Col>
-          <Col plan={showPro1} className="bg-bg-mute px-4 py-0">
+          <Col plan={showPro1}>
             <CompareValue type="number">100000</CompareValue>
           </Col>
-          <Col plan={showPro10} className="bg-bg-mute px-4 py-0">
+          <Col plan={showPro10}>
             <CompareValue type="number">100000</CompareValue>
           </Col>
         </tr>
@@ -440,21 +452,18 @@ export default function CompareTable() {
             Uptime SLA
           </th>
           {/**/}
-          <Col plan={showFree} className="bg-bg-mute px-4 py-0 align-top">
+          <Col plan={showFree}>
             <CompareValue type="boolean" valid={false} />
           </Col>
-          <Col
-            plan={showPayg}
-            className="bg-emerald-300/10 px-4 py-0 align-top"
-          >
+          <Col plan={showPayg} feature>
             <CompareValue type="boolean" valid={false} />
           </Col>
-          <Col plan={showPro1} className="bg-bg-mute px-4 py-0 align-top">
+          <Col plan={showPro1}>
             <CompareValue className="">
               <div>99.99%</div>
             </CompareValue>
           </Col>
-          <Col plan={showPro10} className="bg-bg-mute px-4 py-0 align-top">
+          <Col plan={showPro10}>
             <CompareValue className="">
               <div>99.99%</div>
             </CompareValue>
@@ -470,16 +479,16 @@ export default function CompareTable() {
             Monthly price
           </th>
           {/**/}
-          <Col plan={showFree} className="bg-bg-mute px-4 py-0">
+          <Col plan={showFree}>
             <CompareValue>Free</CompareValue>
           </Col>
-          <Col plan={showPayg} className="bg-emerald-300/10 px-4 py-0">
+          <Col plan={showPayg} feature>
             <CompareValue>None</CompareValue>
           </Col>
-          <Col plan={showPro1} className="bg-bg-mute px-4 py-0">
+          <Col plan={showPro1}>
             <CompareValue>$180</CompareValue>
           </Col>
-          <Col plan={showPro10} className="bg-bg-mute px-4 py-0">
+          <Col plan={showPro10}>
             <CompareValue>$420</CompareValue>
           </Col>
         </tr>
@@ -488,17 +497,67 @@ export default function CompareTable() {
             Message price
           </th>
           {/**/}
-          <Col plan={showFree} className="bg-bg-mute px-4 py-0">
+          <Col plan={showFree}>
             <CompareValue>Free</CompareValue>
           </Col>
-          <Col plan={showPayg} className="bg-emerald-300/10 px-4 py-0">
+          <Col plan={showPayg} feature>
             <CompareValue>$1 per 100K</CompareValue>
           </Col>
-          <Col plan={showPro1} className="bg-bg-mute px-4 py-0">
+          <Col plan={showPro1}>
             <CompareValue>None</CompareValue>
           </Col>
-          <Col plan={showPro10} className="bg-bg-mute px-4 py-0">
+          <Col plan={showPro10}>
             <CompareValue>None</CompareValue>
+          </Col>
+        </tr>
+
+        {/**/}
+
+        <tr>
+          <td className="p-0" />
+          <Col plan={showFree} className="py-4">
+            <Button
+              target="_self"
+              type="button"
+              hideIcon
+              href="https://console.upstash.com"
+              className="bg-primary"
+            >
+              Start Now
+            </Button>
+          </Col>
+          <Col plan={showPayg} feature className="py-4">
+            <Button
+              target="_self"
+              type="button"
+              hideIcon
+              href="https://console.upstash.com"
+              className="bg-primary"
+            >
+              Start Now
+            </Button>
+          </Col>
+          <Col plan={showPro1} className="py-4">
+            <Button
+              target="_self"
+              type="button"
+              hideIcon
+              href="https://console.upstash.com"
+              className="bg-primary"
+            >
+              Start Now
+            </Button>
+          </Col>
+          <Col plan={showPro10} className="py-4">
+            <Button
+              target="_self"
+              type="button"
+              hideIcon
+              href="https://console.upstash.com"
+              className="bg-primary"
+            >
+              Start Now
+            </Button>
           </Col>
         </tr>
       </tbody>
