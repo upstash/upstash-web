@@ -2,6 +2,7 @@ import IconEmpty from "@/components/icon-empty";
 import IconQStash from "@/components/icon-qstash";
 import IconRedis from "@/components/icon-redis";
 import IconVector from "@/components/icon-vector";
+import IconWorkflow from "@/components/icon-workflow";
 import cx from "@/utils/cx";
 import { Product } from "@/utils/type";
 import React from "react";
@@ -51,8 +52,8 @@ export default function HomeHeroProducts({
           setActiveProduct(Product.QSTASH);
         }}
         className={cx(
-          "text-purple-100",
-          activeProduct === Product.QSTASH && "!bg-purple-50 text-purple-700",
+          "text-blue-100",
+          activeProduct === Product.QSTASH && "!bg-blue-50 text-blue-700",
         )}
       >
         <IconQStash width={24} />
@@ -69,7 +70,7 @@ export default function HomeHeroProducts({
           activeProduct === Product.WORKFLOW && "!bg-purple-50 text-purple-700",
         )}
       >
-        <IconEmpty width={24} />
+        <IconWorkflow width={24} />
         <span>Workflow</span>
       </HomeHeroProductTab>
 
