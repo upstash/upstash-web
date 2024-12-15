@@ -17,38 +17,12 @@ export default function IconVector({
       {...props}
     >
       <rect width="32" height="32" rx="7" fill="#F97316" />
-      <circle cx="16" cy="16" r="4" fill="white" />
-      <circle cx="26" cy="16" r="3" fill="white" />
-      <circle cx="16" cy="26" r="3" fill="white" />
-      <circle
-        cx="23.0711"
-        cy="23.0711"
-        r="3"
-        transform="rotate(-45 23.0711 23.0711)"
-        fill="white"
-      />
-      <circle
-        cx="23.0711"
-        cy="8.92893"
-        r="3"
-        transform="rotate(-135 23.0711 8.92893)"
-        fill="white"
-      />
-      <circle cx="6" cy="16" r="3" fill="white" />
-      <circle cx="16" cy="6" r="3" fill="white" />
-      <circle
-        cx="8.92893"
-        cy="8.92893"
-        r="3"
-        transform="rotate(-45 8.92893 8.92893)"
-        fill="white"
-      />
-      <circle
-        cx="8.92893"
-        cy="23.0711"
-        r="3"
-        transform="rotate(-135 8.92893 23.0711)"
-        fill="white"
+      <path
+        d="M16 16H27M16 16V5M16 16H5M16 16V27M16 16L23 9M16 16L23 23M16 16L9 9M16 16L9 23"
+        stroke="white"
+        strokeWidth="3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );

@@ -4,7 +4,7 @@ import {
   HeroTabFeatureTitle,
   HeroTabFeatureUl,
 } from "@/components/home/hero/hero-tab";
-import CodeRedis from "@/components/home/serverless/code-redis";
+import CodeQStash from "@/components/home/serverless/code-qstash";
 import cx from "@/utils/cx";
 import { IconCircle1, IconCircle2, IconCircle3 } from "@tabler/icons-react";
 import React from "react";
@@ -121,10 +121,8 @@ export function HeroTabQStash({
         </HeroTabFeatureCont>
       </div>
 
-      <div className="w-full rounded-2xl bg-bg">
-        <div className="min-h-full rounded-2xl bg-blue-950/30 p-8">
-          <CodeRedis />
-        </div>
+      <div className="code-qstash w-full rounded-2xl bg-bg">
+        <CodeQStash />
       </div>
     </div>
   );

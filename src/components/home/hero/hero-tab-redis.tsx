@@ -121,10 +121,8 @@ export function HeroTabRedis({
         </HeroTabFeatureCont>
       </div>
 
-      <div className="w-full rounded-2xl bg-bg">
-        <div className="min-h-full rounded-2xl bg-red-950/30 p-8">
-          <CodeRedis />
-        </div>
+      <div className="code-redis w-full rounded-2xl bg-bg">
+        <CodeRedis />
       </div>
     </div>
   );

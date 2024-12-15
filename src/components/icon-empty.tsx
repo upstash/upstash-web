@@ -15,14 +15,7 @@ export default function IconEmpty({
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >
-      <rect width="32" height="32" rx="7" fill="#9333EA" />
-      <path
-        d="M7 7H25L7 16H25L7 25H25"
-        stroke="white"
-        stroke-width="3"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
+      <rect width="32" height="32" rx="7" fill="#fff" />
     </svg>
   );
 }

@@ -4,75 +4,52 @@ import cx from "@/utils/cx";
 import Prism from "prismjs";
 import { HTMLProps, ReactNode, useEffect, useState } from "react";
 
-// import "prismjs/components/prism-python";
-// import "prismjs/components/prism-go";
-// import "prismjs/components/prism-java";
-// import "prismjs/components/prism-php";
-
 enum Language {
-  JS = "JavaScript",
-  PHP = "PHP",
-  PY = "Python",
-  GO = "Go",
-  JAVA = "Java",
+  RAG = "RAG",
+  Cache = "Semantic cache",
+  Search = "Semantic search",
 }
 
-export default function CodeVector() {
-  const [lang, setLang] = useState<Language>(Language.JS);
+export default function CodeRedis() {
+  const [lang, setLang] = useState<Language>(Language.RAG);
 
   useEffect(() => {
+    console.log(lang);
     Prism.highlightAll();
   }, [lang]);
 
   return (
-    <>
-      <div className="flex items-center gap-px">
-        {Object.values(Language).map((key) => {
+    <div className="grid grid-cols-3 items-start gap-8 rounded-2xl bg-orange-950/30 p-6">
+      <div className="grid gap-2">
+        {Object.values(Language).map((value) => {
           return (
-            <label
-              key={key}
+            <button
+              key={value}
               className={cx(
-                "cursor-pointer select-none bg-white bg-opacity-10 px-4 py-1 text-sm text-white",
-                "transition first:rounded-l-lg last:rounded-r-lg hover:bg-opacity-20",
-                key === lang && "!bg-opacity-20",
+                "h-10 cursor-pointer select-none px-6 text-left text-white",
+                "rounded-lg transition hover:bg-opacity-20",
+                "border border-transparent bg-white bg-opacity-10",
+                value === lang && "border-white font-medium",
               )}
+              onClick={() => setLang(value)}
             >
-              <input
-                className="pointer-events-none absolute opacity-0"
-                type="radio"
-                value={key}
-                name="product"
-                onChange={(e) => {
-                  setLang(e.target.value as Language);
-                }}
-              />
-              <span>{key}</span>
-            </label>
+              {value}
+            </button>
           );
         })}
       </div>
 
       {/* body */}
-      <div className="code-vector mt-6 grid rounded-xl">
-        <div className="p-0">
-          <Pre hidden={lang !== Language.JS}>
-            <code className="lang-js">{CODE[Language.JS]}</code>
-          </Pre>
-          <Pre hidden={lang !== Language.PHP}>
-            <code className="lang-php">{CODE[Language.PHP]}</code>
-          </Pre>{" "}
-          <Pre hidden={lang !== Language.PY}>
-            <code className="lang-py">{CODE[Language.PY]}</code>
-          </Pre>{" "}
-          <Pre hidden={lang !== Language.GO}>
-            <code className="lang-go">{CODE[Language.GO]}</code>
-          </Pre>{" "}
-          <Pre hidden={lang !== Language.JAVA}>
-            <code className="lang-java">{CODE[Language.JAVA]}</code>
-          </Pre>
-        </div>
+      <div className="col-span-2">
+        {Object.values(Language).map((value) => {
+          return (
+            <Pre key={value} hidden={value !== lang}>
+              <code className="lang-js">{CODE[value]}</code>
+            </Pre>
+          );
+        })}
       </div>
-    </>
+    </div>
   );
 }
 
@@ -93,16 +70,14 @@ function Pre({
 }
 
 const CODE = {
-  [Language.JS]: `import { Redis } from '@upstash/redis'
+  [Language.RAG]: `import { Redis } from '@upstash/redis';
 
-const redis = new Redis({
-  url: 'https://obi-wan-kenobi-31346.upstash.io',
-  token: 'TOKEN',
-})
-   
-const data = await redis.set('foo', 'bar');`,
-  [Language.PHP]: ``,
-  [Language.PY]: ``,
-  [Language.GO]: ``,
-  [Language.JAVA]: ``,
+const redis = new Redis({ 
+  url: 'UPSTASH_REDIS_REST_URL', 
+  token: 'UPSTASH_REDIS_REST_TOKEN'
+});
+
+const data = await redis.get('key');`,
+  [Language.Cache]: `var b = 3;`,
+  [Language.Search]: `var c = 4;`,
 };

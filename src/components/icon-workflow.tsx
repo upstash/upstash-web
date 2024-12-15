@@ -1,6 +1,6 @@
 import React, { SVGProps } from "react";
 
-export default function IconEmpty({
+export default function IconWorkflow({
   width = 36,
   ...props
 }: SVGProps<SVGSVGElement>) {

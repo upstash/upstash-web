@@ -4,7 +4,7 @@ import {
   HeroTabFeatureTitle,
   HeroTabFeatureUl,
 } from "@/components/home/hero/hero-tab";
-import CodeRedis from "@/components/home/serverless/code-redis";
+import CodeVector from "@/components/home/serverless/code-vector";
 import cx from "@/utils/cx";
 import { IconCircle1, IconCircle2, IconCircle3 } from "@tabler/icons-react";
 import React from "react";
@@ -121,10 +121,8 @@ export function HeroTabVector({
         </HeroTabFeatureCont>
       </div>
 
-      <div className="w-full rounded-2xl bg-bg">
-        <div className="min-h-full rounded-2xl bg-orange-950/30 p-8">
-          <CodeRedis />
-        </div>
+      <div className="code-redis w-full rounded-2xl bg-bg">
+        <CodeVector />
       </div>
     </div>
   );

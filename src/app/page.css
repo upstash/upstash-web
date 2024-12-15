@@ -147,5 +147,12 @@ pre[class*="language-"] {
 .code-qstash .token.attr-value,
 .code-qstash .token.regex,
 .code-qstash .token.variable {
+  color: #93c5fd;
+}
+.code-workflow .token.string,
+.code-workflow .token.char,
+.code-workflow .token.attr-value,
+.code-workflow .token.regex,
+.code-workflow .token.variable {
   color: #d8b4fe;
 }
