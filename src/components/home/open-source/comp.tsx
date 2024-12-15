@@ -33,7 +33,7 @@ export function SourceBox({
       target="_blank"
       className={cx(
         "group/source-box flex flex-col rounded-3xl p-6 md:p-8",
-        "bg-white/5 backdrop-blur transition",
+        "bg-white/5 transition",
         "hover:scale-[1.02] hover:bg-white/10",
         className,
       )}
