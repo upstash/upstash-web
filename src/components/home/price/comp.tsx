@@ -13,7 +13,7 @@ export function PriceBox({
     <div
       className={cx(
         "group/price-box grid place-items-center gap-4 p-6 md:gap-6 md:p-8",
-        "rounded-4xl bg-white bg-opacity-5 backdrop-blur transition",
+        "rounded-4xl bg-white bg-opacity-5 transition",
         "hover:scale-[1.02] hover:bg-opacity-10",
         className,
       )}
