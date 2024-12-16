@@ -26,7 +26,7 @@ export function HeroTabQStash({
       <div className="grid w-full gap-8 md:grid-cols-3">
         <HeroTabFeatureCont className="bg-blue-900/10">
           <HeroTabFeatureTitle className="text-blue-700">
-            Highly Available, <br /> Infinitely Scalable
+            Serverless <br /> Messaging
           </HeroTabFeatureTitle>
           <HeroTabFeatureUl>
             <HeroTabFeatureLi>
@@ -35,7 +35,7 @@ export function HeroTabQStash({
                 stroke={2}
                 className="shrink-0 text-blue-700"
               />
-              99.99% uptime guarantee
+              Effortless communication between serverless functions
             </HeroTabFeatureLi>
             <HeroTabFeatureLi>
               <IconCircle2
@@ -43,7 +43,7 @@ export function HeroTabQStash({
                 stroke={2}
                 className="shrink-0 text-blue-700"
               />
-              Automatic scaling to meet your demands
+              Decouple your microservices architecture
             </HeroTabFeatureLi>
             <HeroTabFeatureLi>
               <IconCircle3
@@ -51,14 +51,14 @@ export function HeroTabQStash({
                 stroke={2}
                 className="shrink-0 text-blue-700"
               />
-              No server management required
+              Scale your messaging infrastructure without limits
             </HeroTabFeatureLi>
           </HeroTabFeatureUl>
         </HeroTabFeatureCont>
 
         <HeroTabFeatureCont className="bg-blue-900/10">
           <HeroTabFeatureTitle className="text-blue-700">
-            Global <br /> Low Latency
+            Scheduled Tasks <br /> with CRON
           </HeroTabFeatureTitle>
           <HeroTabFeatureUl>
             <HeroTabFeatureLi>
@@ -67,7 +67,7 @@ export function HeroTabQStash({
                 stroke={2}
                 className="shrink-0 text-blue-700"
               />
-              Lightning-fast response times worldwide
+              Easily set up recurring tasks and jobs
             </HeroTabFeatureLi>
             <HeroTabFeatureLi>
               <IconCircle2
@@ -75,7 +75,7 @@ export function HeroTabQStash({
                 stroke={2}
                 className="shrink-0 text-blue-700"
               />
-              Multi-region replication options
+              Flexible scheduling with CRON syntax
             </HeroTabFeatureLi>
             <HeroTabFeatureLi>
               <IconCircle3
@@ -83,14 +83,14 @@ export function HeroTabQStash({
                 stroke={2}
                 className="shrink-0 text-blue-700"
               />
-              Optimize for your users, wherever they are
+              Automate your workflows with precision
             </HeroTabFeatureLi>
           </HeroTabFeatureUl>
         </HeroTabFeatureCont>
 
         <HeroTabFeatureCont className="bg-blue-900/10">
           <HeroTabFeatureTitle className="text-blue-700">
-            Durable, <br /> Persistent Storage
+            Intelligent <br /> Retry Mechanism
           </HeroTabFeatureTitle>
           <HeroTabFeatureUl>
             <HeroTabFeatureLi>
@@ -99,7 +99,7 @@ export function HeroTabQStash({
                 stroke={2}
                 className="shrink-0 text-blue-700"
               />
-              In-memory speed with disk-like persistence
+              Automatically retry failed tasks
             </HeroTabFeatureLi>
             <HeroTabFeatureLi>
               <IconCircle2
@@ -107,7 +107,7 @@ export function HeroTabQStash({
                 stroke={2}
                 className="shrink-0 text-blue-700"
               />
-              Data safety without sacrificing performance
+              Ensure task completion in unreliable environments
             </HeroTabFeatureLi>
             <HeroTabFeatureLi>
               <IconCircle3
@@ -115,7 +115,7 @@ export function HeroTabQStash({
                 stroke={2}
                 className="shrink-0 text-blue-700"
               />
-              Automatic backups
+              Configurable retry policies to suit your needs
             </HeroTabFeatureLi>
           </HeroTabFeatureUl>
         </HeroTabFeatureCont>

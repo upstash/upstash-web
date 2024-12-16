@@ -1,8 +1,11 @@
 "use client";
 
-import cx from "@/utils/cx";
+import {
+  CodePre,
+  CodeTabButton,
+} from "@/components/home/serverless/code-redis";
 import Prism from "prismjs";
-import { HTMLProps, ReactNode, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 enum Language {
   Scheduling = "Scheduling",
@@ -24,18 +27,13 @@ export default function CodeRedis() {
       <div className="grid gap-2">
         {Object.values(Language).map((value) => {
           return (
-            <button
+            <CodeTabButton
               key={value}
-              className={cx(
-                "h-10 cursor-pointer select-none px-6 text-left text-white",
-                "rounded-lg transition hover:bg-opacity-20",
-                "border border-transparent bg-white bg-opacity-10",
-                value === lang && "border-white font-medium",
-              )}
+              active={value === lang}
               onClick={() => setLang(value)}
             >
               {value}
-            </button>
+            </CodeTabButton>
           );
         })}
       </div>
@@ -44,29 +42,13 @@ export default function CodeRedis() {
       <div className="col-span-2">
         {Object.values(Language).map((value) => {
           return (
-            <Pre key={value} hidden={value !== lang}>
+            <CodePre key={value} hidden={value !== lang}>
               <code className="lang-js">{CODE[value]}</code>
-            </Pre>
+            </CodePre>
           );
         })}
       </div>
     </div>
-  );
-}
-
-function Pre({
-  children,
-  ...props
-}: HTMLProps<HTMLPreElement> & {
-  children: ReactNode;
-}) {
-  return (
-    <pre
-      className="no-scrollbar !m-0 !bg-transparent !p-0 !font-[inherit] !text-[.9em]"
-      {...props}
-    >
-      {children}
-    </pre>
   );
 }
 

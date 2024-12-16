@@ -2,7 +2,6 @@
 
 import "./page.css";
 import { ParsedUrlQueryInput } from "querystring";
-import Container from "@/components/container";
 import HomeCommunity from "@/components/home/community";
 import HomeFast from "@/components/home/fast";
 import HomeHero from "@/components/home/hero";
@@ -25,13 +24,7 @@ export default function Home({
     >
       <main className="text-center">
         <HomeHero />
-
-        <div className="pt-20">
-          <Container className="max-w-screen-md">
-            <HomeHeroPartner />
-          </Container>
-        </div>
-
+        <HomeHeroPartner />
         <HomeServerless />
         <HomeCommunity />
         <HomeFast />

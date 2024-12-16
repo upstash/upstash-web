@@ -26,7 +26,7 @@ export function HeroTabVector({
       <div className="grid w-full gap-8 md:grid-cols-3">
         <HeroTabFeatureCont className="bg-orange-900/10">
           <HeroTabFeatureTitle className="text-orange-700">
-            Highly Available, <br /> Infinitely Scalable
+            Massive <br /> Scalability
           </HeroTabFeatureTitle>
           <HeroTabFeatureUl>
             <HeroTabFeatureLi>
@@ -35,7 +35,7 @@ export function HeroTabVector({
                 stroke={2}
                 className="shrink-0 text-orange-700"
               />
-              99.99% uptime guarantee
+              Effortlessly handle hundreds of millions of vectors
             </HeroTabFeatureLi>
             <HeroTabFeatureLi>
               <IconCircle2
@@ -43,7 +43,7 @@ export function HeroTabVector({
                 stroke={2}
                 className="shrink-0 text-orange-700"
               />
-              Automatic scaling to meet your demands
+              Seamless scaling as your data grows
             </HeroTabFeatureLi>
             <HeroTabFeatureLi>
               <IconCircle3
@@ -51,14 +51,14 @@ export function HeroTabVector({
                 stroke={2}
                 className="shrink-0 text-orange-700"
               />
-              No server management required
+              Maintain performance at any scale
             </HeroTabFeatureLi>
           </HeroTabFeatureUl>
         </HeroTabFeatureCont>
 
         <HeroTabFeatureCont className="bg-orange-900/10">
           <HeroTabFeatureTitle className="text-orange-700">
-            Global <br /> Low Latency
+            Disk-Based <br /> Algorithm for Efficiency
           </HeroTabFeatureTitle>
           <HeroTabFeatureUl>
             <HeroTabFeatureLi>
@@ -67,7 +67,7 @@ export function HeroTabVector({
                 stroke={2}
                 className="shrink-0 text-orange-700"
               />
-              Lightning-fast response times worldwide
+              Optimize storage and performance
             </HeroTabFeatureLi>
             <HeroTabFeatureLi>
               <IconCircle2
@@ -75,7 +75,7 @@ export function HeroTabVector({
                 stroke={2}
                 className="shrink-0 text-orange-700"
               />
-              Multi-region replication options
+              Cost-effective solution for large datasets
             </HeroTabFeatureLi>
             <HeroTabFeatureLi>
               <IconCircle3
@@ -83,14 +83,14 @@ export function HeroTabVector({
                 stroke={2}
                 className="shrink-0 text-orange-700"
               />
-              Optimize for your users, wherever they are
+              Balance between speed and resource usage
             </HeroTabFeatureLi>
           </HeroTabFeatureUl>
         </HeroTabFeatureCont>
 
         <HeroTabFeatureCont className="bg-orange-900/10">
           <HeroTabFeatureTitle className="text-orange-700">
-            Durable, <br /> Persistent Storage
+            Powerful Metadata <br /> Store with SQL Support
           </HeroTabFeatureTitle>
           <HeroTabFeatureUl>
             <HeroTabFeatureLi>
@@ -99,7 +99,7 @@ export function HeroTabVector({
                 stroke={2}
                 className="shrink-0 text-orange-700"
               />
-              In-memory speed with disk-like persistence
+              Rich querying capabilities with familiar SQL syntax
             </HeroTabFeatureLi>
             <HeroTabFeatureLi>
               <IconCircle2
@@ -107,7 +107,7 @@ export function HeroTabVector({
                 stroke={2}
                 className="shrink-0 text-orange-700"
               />
-              Data safety without sacrificing performance
+              Easily combine vector similarity search with metadata filtering
             </HeroTabFeatureLi>
             <HeroTabFeatureLi>
               <IconCircle3
@@ -115,7 +115,7 @@ export function HeroTabVector({
                 stroke={2}
                 className="shrink-0 text-orange-700"
               />
-              Automatic backups
+              Flexible data organization and retrieval
             </HeroTabFeatureLi>
           </HeroTabFeatureUl>
         </HeroTabFeatureCont>
