@@ -1,0 +1,458 @@
+---
+authors: [rishi]
+slug: automating-i18n-with-openai
+tags: [workflow, QStash, openai, ai, vercel]
+title: "Automating Internationalization (i18n) with OpenAI"
+---
+
+In this tutorial, you will learn how to automate Internationalization (i18n) for websites using Upstash QStash for task scheduling and OpenAI for translations. You will also learn to interact with the GitHub API and create automated API calls in your Next.js application, capable of running for 15 minutes (upto 12 hours), going beyond the usual timeout limits.
+
+The application will be designed for scalability, enabling the translation of blog content into multiple languages while utilizing GitHub for code management. It leverages Upstash QStash to delegate the entire process to background workers, ensuring efficient task handling with in-built retry mechanism.
+
+## Demo
+
+Before jumping into the technical stuff, let me give you a sneak peek of what you will build in this tutorial.
+
+<video src="https://github.com/user-attachments/assets/4df0dd4c-f8ae-4bb6-8d3b-4bf45a088124" controls></video>
+
+## High-Level Data Flow and Operations
+
+![Summarize the flow of operations](/blog/automating-i18n/summary.png)
+
+When the `/api/workflow` route is invoked, it begins an automatic process which does the following:
+- Self-invokes the `/api/workflow` route to fetch content of a GitHub directory.
+- it then loops over each file to:
+  - Self-invokes the `/api/workflow` route to fetch content of the file.
+  - Self-invokes the `/api/workflow` route to power translation using OpenAI.
+  - Self-invokes the `/api/workflow` route to commit the translated file to the GitHub directory.
+- Self-invokes the `/api/workflow` route to deploy the GitHub repository to Vercel via a hook.
+
+## Prerequisites
+
+You will need the following:
+
+- [Node.js 18](https://nodejs.org/en/blog/announcements/v18-release-announce) or later
+- An [Upstash](https://console.upstash.com) account
+- An [OpenAI](https://openai.com) account
+- A [GitHub](https://github.com) account
+- A [Vercel](https://vercel.com/dashboard) account
+
+## Tech Stack
+
+| Technology | Description |
+| --- | --- |
+| [Next.js](https://nextjs.org) | The React Framework for the Web. |
+| [Upstash](https://upstash.com) | Serverless database platform. You are going to use Upstash QStash for scheduling jobs via Upstash Workflow SDK. |
+| [OpenAI](https://platform.openai.com) | An artificial intelligence research lab focused on developing advanced AI technologies. |
+| [GitHub](https://github.com) | Version control system for managing code repositories. |
+| [Vercel](https://vercel.com) | A cloud platform for deploying and scaling web applications. |
+
+## Generate an OpenAI Token
+
+Using OpenAI API, you're able to obtain vector embeddings of the articles, and create chatbot responses using AI. Any request to OpenAI API requires an authorization token. To obtain the token, navigate to the [API Keys](https://platform.openai.com/api-keys) in your OpenAI account, and click the **Create new secret key** button.
+
+Copy and securely store this token for later use as **OPENAI_API_KEY** environment variable.
+
+## Generate a GitHub Developer Token
+
+To interact with the GitHub API, you will need to create a personal access token. Follow these steps to generate your GitHub developer token:
+
+- Go to your GitHub account and navigate to **Settings**.
+- In the left sidebar, click on **Developer settings**.
+- Click on **Personal access tokens** and then on **Tokens (classic)**.
+- Click the **Generate new token** button.
+- Give your token a descriptive name, such as **Upstash Integration Token**.
+- Select the scopes or permissions you'd like to grant this token.
+- Click the **Generate token** button at the bottom of the page.
+
+Copy your new personal access token and save it somewhere safe.
+
+## Set up Upstash QStash
+
+To schedule POST requests to the endpoint fetching, translating, and committing translated content to the GitHub at a given interval, you will use QStash. Go to the **QStash** tab and scroll down to the **Request Builder** tab.
+
+![Upstash QStash Tab](/blog/automating-i18n/qstash-env.png)
+
+Now, copy the QStash token, and save it somewhere safe.
+
+## Create a new Next.js application
+
+Let’s get started by creating a new Next.js project. Open your terminal and run the following command:
+
+```bash
+npx create-next-app@latest my-app
+```
+
+When prompted, choose:
+
+- `Yes` when prompted to use TypeScript.
+- `No` when prompted to use ESLint.
+- `Yes` when prompted to use Tailwind CSS.
+- `No` when prompted to use `src/` directory.
+- `Yes` when prompted to use App Router.
+- `No` when prompted to use Turbopack.
+- `No` when prompted to customize the default import alias (`@/*`).
+
+Once that is done, move into the project directory and start the app in developement mode by executing the following command:
+
+```bash
+cd my-app
+npm run dev
+```
+
+The app should be running on [localhost:3000](http://localhost:3000). Stop the development server to install the necessary dependencies with the following commands:
+
+```bash
+npm install @upstash/qstash
+npm install fast-glob server-only
+npm install rehype-sanitize rehype-stringify remark-parse remark-rehype unified
+```
+
+The libraries installed include:
+
+- `@upstash/qstash`: SDK to interact with your Upstash QStash instance over HTTP requests.
+- `server-only`: This is a marker package to indicate that a module can only be used in Server Components.
+- `fast-glob`: A fast and efficient globbing library for Node.js, used for pattern matching and file discovery.
+- `rehype-sanitize`: A library for sanitizing HTML in Markdown files to prevent XSS attacks.
+- `rehype-stringify`: A library for generating HTML from a unified syntax tree.
+- `remark-parse`: A library for parsing Markdown into a syntax tree.
+- `remark-rehype`: A library for converting Markdown to HTML.
+- `unified`: A library for processing and transforming syntax trees, used for Markdown to HTML conversion.
+
+Now, create a `.env` file at the root of your project. You are going to add the `QSTASH_TOKEN`, `OPENAI_API_KEY`, `GITHUB_TOKEN`, and `VERCEL_DEPLOY_HOOK_URL`.
+
+It should look something like this:
+
+```bash
+# .env
+
+# Upstash QStash Environment Variable
+QSTASH_TOKEN="..."
+# OpenAI Environment Variable
+OPENAI_API_KEY="sk-proj-..."
+# GitHub Environment Variable
+GITHUB_TOKEN="github_pat_..."
+# Vercel Hook Environment Variable
+VERCEL_DEPLOY_HOOK_URL="https://api.vercel.com/v1/integrations/deploy/.../..."
+```
+
+To create API endpoints in Next.js, you will use Next.js [Route Handlers](https://nextjs.org/docs/app/building-your-application/routing/route-handlers) which allow you to serve responses over Web [Request](https://developer.mozilla.org/docs/Web/API/Request) and [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) APIs. To start creating API routes in Next.js that streams responses to the user, execute the following commands:
+
+```bash
+mkdir -p app/api/workflow
+mkdir -p app/blogs/en
+mkdir app/blogs/fr
+mkdir app/[lang]
+```
+
+<Note type="tip">
+  The `-p` flag creates parent directories of a directory if they're missing.
+</Note>
+
+Finnaly, create a sample markdown file named `first.md` in the `app/blogs/en` directory with the following:
+
+```md
+# First
+
+![](https://placehold.co/600x400)
+
+This is the first blog post.
+```
+
+## Create i18n (Dynamic) Blogs in Next.js App Router
+
+The initial step in constructing dynamic blogs within the Next.js App Router using Markdown involves reading the Markdown files and converting them into HTML. To achieve this, you will utilize rehype and remark plugins to process the Markdown and generate HTML that can be rendered on the front end. Begin by creating a file named `app/[lang]/blogs.tsx` with the following code:
+
+```tsx
+// File: app/[lang]/blogs.tsx
+
+import { globSync } from 'fast-glob'
+import { existsSync, readFileSync } from 'fs'
+import { join } from 'path'
+import rehypeSanitize from 'rehype-sanitize'
+import rehypeStringify from 'rehype-stringify'
+import remarkParse from 'remark-parse'
+import remarkRehype from 'remark-rehype'
+import 'server-only'
+import { unified } from 'unified'
+
+const blogDir = join(process.cwd(), 'app', 'blogs')
+
+export const getDictionary = async (locale: string) => {
+  const langDir = join(blogDir, locale)
+  if (!existsSync(langDir)) return []
+  const files = globSync('**/*.md', { cwd: langDir })
+  return await Promise.all(
+    files.map(async (file) => {
+      const content = readFileSync(join(langDir, file))
+      const result = await unified().use(remarkParse).use(remarkRehype).use(rehypeSanitize).use(rehypeStringify).process(content)
+      return String(result)
+    }),
+  )
+}
+```
+
+Next, create a file named `app/[lang]/page.tsx` with the following code, which invokes the `getDictionary` function in the relevant directories and renders the HTML on the front end. To ensure that the pages are generated statically, utilize the `generateStaticParams` function as demonstrated in the code below:
+
+```tsx
+// File: app/[lang]/page.tsx
+
+import { getDictionary } from './blogs'
+
+export async function generateStaticParams() {
+  return ['en', 'fr'].map((lang) => ({
+    lang,
+  }))
+}
+
+export default async function ({ params: { lang } }: { Promise<{ lang: string }> }) {
+  const pageLang = await lang
+  const dict = await getDictionary(pageLang)
+  return (
+    <div className="prose flex flex-col gap-4">
+      {dict.length > 0 ? dict.map((item, ind) => <div key={ind} dangerouslySetInnerHTML={{ __html: item }} />) : <span>No data</span>}
+    </div>
+  )
+}
+```
+
+### Creating a Workflow API Endpoint for Automating Translation Workflow
+
+In this section, we will create a `route.ts` file that serves as the API endpoint for the workflow. This file will handle the incoming requests to automate the translation process.
+
+First, create a file named `route.ts` in the `app/api/workflow` directory with the following code which fetches the list of the files in the directory that is received in request payload:
+
+```tsx
+// File: app/api/workflow/route.ts
+
+import { serve } from '@upstash/qstash/nextjs'
+import { CommitRequest, FolderContents, OpenAiResponse, RequestPayload, TranslationRequest } from './types'
+
+const defaultRequestPayload: RequestPayload = {
+  repo: 'rishi-raj-jain/scheduled-i18n-nextjs-app',
+  folder: 'app/blogs/en',
+  newLang: 'fr',
+}
+
+const githubHeaders = {
+  'Content-Type': 'application/json',
+  Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+}
+
+const openaiHeaders = {
+  'Content-Type': 'application/json',
+  Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+}
+
+export const POST = serve(
+  async (context) => {
+    // Destructure the request payload or use default values
+    const {
+      repo = defaultRequestPayload.repo,
+      folder = defaultRequestPayload.folder,
+      newLang = defaultRequestPayload.newLang,
+    } = (context.requestPayload as RequestPayload) || defaultRequestPayload
+
+    // If any of the required fields are missing, exit early
+    if (!folder || !repo || !newLang) return
+
+    // Construct the URL to fetch the folder contents from GitHub
+    const fetchUrl = `https://api.github.com/repos/${repo}/contents/${folder}`
+    // Fetch the folder contents
+    const fetchResult = await context.call<FolderContents[]>(`fetch-${repo}-${folder}`, fetchUrl, 'GET')
+    
+    // Rest of the flow
+  },
+  {
+    verbose: true,
+  },
+)
+```
+
+Add the code below which iterates over the fetched files from the GitHub repository. For each file, it fetches its content and prepares it for translation.
+
+```tsx {7-10}
+// File: app/api/workflow/route.ts
+
+export const POST = serve(
+  async (context) => {
+    // Existing code
+    
+    // Iterate over each file in the folder
+    for (const file of fetchResult) {
+      // Fetch the content of the file
+      const fileContent = await context.call<string>(`fetch-${folder}/${file.name}`, file.download_url, 'GET', null, githubHeaders)
+    
+      // Rest of the flow
+    }
+    
+    // Rest of the flow
+  },
+  {
+    verbose: true,
+  },
+)
+```
+
+Further, add the code as follows to prepare the payload for the OpenAI translation request. This includes setting up the model and the messages that will be sent to the OpenAI API.
+
+```tsx {11-28}
+// File: app/api/workflow/route.ts
+
+export const POST = serve(
+  async (context) => {
+    // Existing code
+    
+    // Iterate over each file in the folder
+    for (const file of fetchResult) {
+      // Existing code
+
+      // Prepare the translation request payload
+      const translationRequest: TranslationRequest = {
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: `Only respond with the translation of the markdown. No other or unrelated text or characters. Make sure to avoid translating links, HTML tags, code blocks, image links.`,
+          },
+          {
+            role: 'user',
+            content: `Translate the following text to ${newLang} locale:\n\n${fileContent}`,
+          },
+        ],
+        max_tokens: 4000,
+      }
+
+      // Call the OpenAI API to get the translation
+      const translationResult = await context.call<OpenAiResponse>(`translate-${folder}/${file.name}`, 'https://api.openai.com/v1/chat/completions', 'POST', translationRequest, openaiHeaders)
+    
+      // Rest of the flow
+    }
+    
+    // Rest of the flow
+  },
+  {
+    verbose: true,
+  },
+)
+```
+
+To commit the translated content back to the GitHub repository in the appropriate language folder, add the code as follows:
+
+```tsx {11-12, 14-41}
+// File: app/api/workflow/route.ts
+
+export const POST = serve(
+  async (context) => {
+    // Existing code
+    
+    // Iterate over each file in the folder
+    for (const file of fetchResult) {
+      // Existing code
+
+      // Determine the new folder path for the translated file
+      const newFolder = folder.replace('en', newLang)
+
+      // Commit the translated file to the new folder
+      await context.run(`commit-${newFolder}/${file.name}`, async () => {
+        const existingFileUrl = `https://api.github.com/repos/${repo}/contents/${newFolder}/${file.name}`
+        const existingFileResponse = await fetch(existingFileUrl, {
+          headers: githubHeaders,
+        })
+
+        // Check if the file already exists and get its SHA if it does
+        let sha = null
+        if (existingFileResponse.ok) {
+          const existingFileResponseJson = await existingFileResponse.json()
+          sha = existingFileResponseJson?.['sha']
+        }
+
+        // Prepare the commit request payload
+        const commitRequest: CommitRequest = {
+          message: `Add translated file ${file.name} to ${newLang} locale`,
+          content: Buffer.from(translationResult.choices[0].message.content.trim()).toString('base64'),
+        }
+        if (sha) commitRequest['sha'] = sha
+
+        // Commit the translated file to GitHub
+        await fetch(existingFileUrl, {
+          method: 'PUT',
+          headers: githubHeaders,
+          body: JSON.stringify(commitRequest),
+        })
+      })
+    }
+    
+    // Rest of the flow
+  },
+  {
+    verbose: true,
+  },
+)
+```
+
+### Programmatically trigger a re-deploy to Vercel 
+
+Once all the files are succesfully translated and commited to GitHub, you will want to re-deploy the website to Vercel. To trigger a re-deploy, add the following code:
+
+```tsx {7-8}
+// File: app/api/workflow/route.ts
+
+export const POST = serve(
+  async (context) => {
+    // Existing code
+    
+    // Trigger a deployment to Vercel if the deploy hook URL is set
+    if (process.env.VERCEL_DEPLOY_HOOK_URL) await context.call('deploy-to-vercel', process.env.VERCEL_DEPLOY_HOOK_URL, 'POST')
+  },
+  {
+    verbose: true,
+  },
+)
+```
+
+In the code above, if the `VERCEL_DEPLOY_HOOK_URL` environment variable is set, it creates a POST request to it, which in-turn starts the process of deploying your website to Vercel.
+
+## Deploy to Vercel
+
+Create a `vercel.json` file to disable automatic Vercel deployments so that we can manually choose when to trigger a deploy:
+
+```json
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "git": {
+    "deploymentEnabled": false
+  }
+}
+```
+
+The repository, is now ready to deploy to Vercel. Use the following steps to deploy 👇🏻
+
+- Start by creating a GitHub repository containing your app's code.
+- Then, navigate to the Vercel Dashboard and create a **New Project**.
+- Link the new project to the GitHub repository you just created.
+- In **Settings**, update the `Environment Variables` to match those in your local `.env` file.
+- Deploy! 🚀
+
+## Trigger the Workflow API route using QStash
+
+The Next.js application you have built operates automatically and initiates the workflow upon activation. To start the automatic process of translating the markdown files, committing them to GitHub, and deploying to Vercel, invoke the `/api/workflow` route using Upstash QStash as follows:
+
+![Trigger Translation using QStash](/blog/automating-i18n/qstash-trigger.png)
+
+- Configure the Destination URL to point to your Vercel project link, appending `/api/workflow` to it.
+- Ensure that the request Headers include `Content-Type` set to `application/json`.
+
+> That was a lot of learning! You’re all done now ✨
+
+## References
+
+For more detailed insights, explore the references cited in this blog.
+
+- [GitHub Repository](https://github.com/rishi-raj-jain/scheduled-i18n-nextjs-app)
+- [Upstash QStash](https://upstash.com/docs/QStash/features/schedules)
+- [Upstash QStash Workflow SDK](https://upstash.com/docs/workflow/getstarted)
+
+## Conclusion
+
+In this blog, you learned how to automate the internationalization of a Next.js application using Upstash QStash, OpenAI, and GitHub through a seamless workflow managed by Upstash Workflow. This workflow operates as an automatic process, allowing you to simply trigger and forget, as they self-invoke the necessary APIs to handle translations and deployments of your application. Additionally, breaking the entire process into independent steps proves to be beneficial for tracking progress in the Upstash dashboard, making it easier to monitor each phase of the workflow and troubleshoot if needed.
