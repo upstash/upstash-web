@@ -26,7 +26,7 @@ export function HeroTabWorkflow({
       <div className="grid w-full gap-8 md:grid-cols-3">
         <HeroTabFeatureCont className="bg-purple-900/10">
           <HeroTabFeatureTitle className="text-purple-700">
-            Highly Available, <br /> Infinitely Scalable
+            Serverless <br /> Function Orchestration
           </HeroTabFeatureTitle>
           <HeroTabFeatureUl>
             <HeroTabFeatureLi>
@@ -35,7 +35,7 @@ export function HeroTabWorkflow({
                 stroke={2}
                 className="shrink-0 text-purple-700"
               />
-              99.99% uptime guarantee
+              Effortlessly coordinate complex serverless workflows
             </HeroTabFeatureLi>
             <HeroTabFeatureLi>
               <IconCircle2
@@ -43,7 +43,7 @@ export function HeroTabWorkflow({
                 stroke={2}
                 className="shrink-0 text-purple-700"
               />
-              Automatic scaling to meet your demands
+              Integrate and manage multiple functions with ease
             </HeroTabFeatureLi>
             <HeroTabFeatureLi>
               <IconCircle3
@@ -51,14 +51,14 @@ export function HeroTabWorkflow({
                 stroke={2}
                 className="shrink-0 text-purple-700"
               />
-              No server management required
+              Streamline your serverless architecture
             </HeroTabFeatureLi>
           </HeroTabFeatureUl>
         </HeroTabFeatureCont>
 
         <HeroTabFeatureCont className="bg-purple-900/10">
           <HeroTabFeatureTitle className="text-purple-700">
-            Global <br /> Low Latency
+            Eliminate <br /> Function Timeouts
           </HeroTabFeatureTitle>
           <HeroTabFeatureUl>
             <HeroTabFeatureLi>
@@ -67,7 +67,7 @@ export function HeroTabWorkflow({
                 stroke={2}
                 className="shrink-0 text-purple-700"
               />
-              Lightning-fast response times worldwide
+              Execute long-running processes without constraints
             </HeroTabFeatureLi>
             <HeroTabFeatureLi>
               <IconCircle2
@@ -75,7 +75,7 @@ export function HeroTabWorkflow({
                 stroke={2}
                 className="shrink-0 text-purple-700"
               />
-              Multi-region replication options
+              No more arbitrary time limits on your operations
             </HeroTabFeatureLi>
             <HeroTabFeatureLi>
               <IconCircle3
@@ -83,14 +83,14 @@ export function HeroTabWorkflow({
                 stroke={2}
                 className="shrink-0 text-purple-700"
               />
-              Optimize for your users, wherever they are
+              Focus on your logic, not on timing workarounds
             </HeroTabFeatureLi>
           </HeroTabFeatureUl>
         </HeroTabFeatureCont>
 
         <HeroTabFeatureCont className="bg-purple-900/10">
           <HeroTabFeatureTitle className="text-purple-700">
-            Durable, <br /> Persistent Storage
+            Automatic <br /> Error Recovery
           </HeroTabFeatureTitle>
           <HeroTabFeatureUl>
             <HeroTabFeatureLi>
@@ -99,7 +99,7 @@ export function HeroTabWorkflow({
                 stroke={2}
                 className="shrink-0 text-purple-700"
               />
-              In-memory speed with disk-like persistence
+              Built-in resilience for your workflows
             </HeroTabFeatureLi>
             <HeroTabFeatureLi>
               <IconCircle2
@@ -107,7 +107,7 @@ export function HeroTabWorkflow({
                 stroke={2}
                 className="shrink-0 text-purple-700"
               />
-              Data safety without sacrificing performance
+              Automatically retry failed steps
             </HeroTabFeatureLi>
             <HeroTabFeatureLi>
               <IconCircle3
@@ -115,7 +115,7 @@ export function HeroTabWorkflow({
                 stroke={2}
                 className="shrink-0 text-purple-700"
               />
-              Automatic backups
+              Ensure robust execution even in unpredictable environments
             </HeroTabFeatureLi>
           </HeroTabFeatureUl>
         </HeroTabFeatureCont>
