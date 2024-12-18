@@ -1,20 +1,22 @@
 ---
 authors: [rishi]
-slug: automating-i18n-with-openai
+slug: automating-website-content-translation-with-openai
 tags: [workflow, QStash, openai, ai, vercel]
 draft: true
-title: "Automating Internationalization (i18n) with OpenAI"
+title: "Automating Website Content Translation with OpenAI"
 ---
 
-In this tutorial, you will learn how to automate Internationalization (i18n) for websites using Upstash QStash for task scheduling and OpenAI for translations. You will also learn to interact with the GitHub API and create automated API calls in your Next.js application, capable of running for 15 minutes (upto 12 hours), going beyond the usual timeout limits.
+In this tutorial, you will learn how to automate i18n translation of a website using Upstash Workflow for task scheduling and OpenAI for translations. You will also learn to interact with the GitHub API and create automated API calls in your Next.js application, capable of running for 15 minutes (upto 12 hours), going beyond the usual timeout limits.
 
-The application will be designed for scalability, enabling the translation of blog content into multiple languages while utilizing GitHub for code management. It leverages Upstash QStash to delegate the entire process to background workers, ensuring efficient task handling with in-built retry mechanism.
+The application will be designed for scalability, enabling the translation of blog content into multiple languages while utilizing GitHub for code management. It leverages Upstash Workflow to delegate the entire process to background workers, ensuring efficient task handling with in-built retry mechanism.
 
 ## Demo
 
 Before jumping into the technical stuff, let me give you a sneak peek of what you will build in this tutorial.
 
 <video src="https://github.com/user-attachments/assets/4df0dd4c-f8ae-4bb6-8d3b-4bf45a088124" controls></video>
+
+Check out the complete code at &rarr; [GitHub Repository](https://github.com/rishi-raj-jain/scheduled-i18n-nextjs-app)
 
 ## High-Level Data Flow and Operations
 
@@ -43,7 +45,7 @@ You will need the following:
 | Technology | Description |
 | --- | --- |
 | [Next.js](https://nextjs.org) | The React Framework for the Web. |
-| [Upstash](https://upstash.com) | Serverless database platform. You are going to use Upstash QStash for scheduling jobs via Upstash Workflow SDK. |
+| [Upstash](https://upstash.com) | Serverless database platform. You are going to use Upstash Workflow for scheduling jobs. |
 | [OpenAI](https://platform.openai.com) | An artificial intelligence research lab focused on developing advanced AI technologies. |
 | [GitHub](https://github.com) | Version control system for managing code repositories. |
 | [Vercel](https://vercel.com) | A cloud platform for deploying and scaling web applications. |
@@ -104,14 +106,14 @@ npm run dev
 The app should be running on [localhost:3000](http://localhost:3000). Stop the development server to install the necessary dependencies with the following commands:
 
 ```bash
-npm install @upstash/qstash
+npm install @upstash/workflow
 npm install fast-glob server-only
 npm install rehype-sanitize rehype-stringify remark-parse remark-rehype unified
 ```
 
 The libraries installed include:
 
-- `@upstash/qstash`: SDK to interact with your Upstash QStash instance over HTTP requests.
+- `@upstash/workflow`: SDK to interact with your Upstash Workflow instance over HTTP requests.
 - `server-only`: This is a marker package to indicate that a module can only be used in Server Components.
 - `fast-glob`: A fast and efficient globbing library for Node.js, used for pattern matching and file discovery.
 - `rehype-sanitize`: A library for sanitizing HTML in Markdown files to prevent XSS attacks.
@@ -226,7 +228,7 @@ First, create a file named `route.ts` in the `app/api/workflow` directory with t
 ```tsx
 // File: app/api/workflow/route.ts
 
-import { serve } from '@upstash/qstash/nextjs'
+import { serve } from '@upstash/workflow/nextjs'
 import { CommitRequest, FolderContents, OpenAiResponse, RequestPayload, TranslationRequest } from './types'
 
 const defaultRequestPayload: RequestPayload = {
@@ -241,11 +243,10 @@ const githubHeaders = {
 }
 
 const openaiHeaders = {
-  'Content-Type': 'application/json',
   Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
 }
 
-export const POST = serve(
+export const { POST } = serve(
   async (context) => {
     // Destructure the request payload or use default values
     const {
@@ -260,7 +261,7 @@ export const POST = serve(
     // Construct the URL to fetch the folder contents from GitHub
     const fetchUrl = `https://api.github.com/repos/${repo}/contents/${folder}`
     // Fetch the folder contents
-    const fetchResult = await context.call<FolderContents[]>(`fetch-${repo}-${folder}`, fetchUrl, 'GET')
+    const { body: fetchResult } = await context.call<FolderContents[]>(`fetch-${repo}-${folder}`, { url: fetchUrl, method: 'GET' })
     
     // Rest of the flow
   },
@@ -282,7 +283,7 @@ export const POST = serve(
     // Iterate over each file in the folder
     for (const file of fetchResult) {
       // Fetch the content of the file
-      const fileContent = await context.call<string>(`fetch-${folder}/${file.name}`, file.download_url, 'GET', null, githubHeaders)
+      const { body: fileContent } = await context.call<string>(`fetch-${folder}/${file.name}`, { url: file.download_url, method: 'GET', headers: githubHeaders })
     
       // Rest of the flow
     }
@@ -325,7 +326,7 @@ export const POST = serve(
       }
 
       // Call the OpenAI API to get the translation
-      const translationResult = await context.call<OpenAiResponse>(`translate-${folder}/${file.name}`, 'https://api.openai.com/v1/chat/completions', 'POST', translationRequest, openaiHeaders)
+      const translationResult = await context.call<OpenAiResponse>(`translate-${folder}/${file.name}`, { url: 'https://api.openai.com/v1/chat/completions', method: 'POST', headers: openaiHeaders, body: translationRequest })
     
       // Rest of the flow
     }
@@ -404,7 +405,7 @@ export const POST = serve(
     // Existing code
     
     // Trigger a deployment to Vercel if the deploy hook URL is set
-    if (process.env.VERCEL_DEPLOY_HOOK_URL) await context.call('deploy-to-vercel', process.env.VERCEL_DEPLOY_HOOK_URL, 'POST')
+    if (process.env.VERCEL_DEPLOY_HOOK_URL) await context.call('deploy-to-vercel', { url: process.env.VERCEL_DEPLOY_HOOK_URL, method: 'POST' })
   },
   {
     verbose: true,
@@ -452,8 +453,8 @@ For more detailed insights, explore the references cited in this blog.
 
 - [GitHub Repository](https://github.com/rishi-raj-jain/scheduled-i18n-nextjs-app)
 - [Upstash QStash](https://upstash.com/docs/QStash/features/schedules)
-- [Upstash QStash Workflow SDK](https://upstash.com/docs/workflow/getstarted)
+- [Upstash Workflow](https://upstash.com/docs/workflow/getstarted)
 
 ## Conclusion
 
-In this blog, you learned how to automate the internationalization of a Next.js application using Upstash QStash, OpenAI, and GitHub through a seamless workflow managed by Upstash Workflow. This workflow operates as an automatic process, allowing you to simply trigger and forget, as they self-invoke the necessary APIs to handle translations and deployments of your application. Additionally, breaking the entire process into independent steps proves to be beneficial for tracking progress in the Upstash dashboard, making it easier to monitor each phase of the workflow and troubleshoot if needed.
+In this blog, you learned how to automate the internationalization (i18n) translation of a website using Upstash QStash, OpenAI, and GitHub through a seamless and automatic set of actions managed by Upstash Workflow. This workflow operates as an automatic process, allowing you to simply trigger and forget, as they self-invoke the necessary APIs to handle translations and deployments of your application. Additionally, breaking the entire process into independent steps proves to be beneficial for tracking progress in the Upstash dashboard, making it easier to monitor each phase of the workflow and troubleshoot if needed.
