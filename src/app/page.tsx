@@ -27,8 +27,8 @@ export default function Home({
         <HomeHero />
         <HomeHeroPartner />
         <HomeServerless />
-        <HomeCommunity />
         <HomeFast />
+        <HomeCommunity />
       </main>
     </IntercomProvider>
   );

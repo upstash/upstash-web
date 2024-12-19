@@ -59,18 +59,18 @@ pre[class*="language-"] {
 }
 
 .token.punctuation {
-  color: #ffffff80;
+  color: #ffffff;
 }
 
 .token.tag,
 .token.attr-name,
 .token.namespace,
 .token.deleted {
-  color: #ffffff80;
+  color: #ffffff;
 }
 
 .token.function-name {
-  color: #ffffff80;
+  color: #ffffff;
 }
 
 .token.boolean,
@@ -105,7 +105,7 @@ pre[class*="language-"] {
 .token.operator,
 .token.entity,
 .token.url {
-  color: #ffffff80;
+  color: #ffffff;
 }
 
 .token.important,
