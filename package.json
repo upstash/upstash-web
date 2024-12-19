@@ -43,7 +43,8 @@
     "shiki": "^1.23.1",
     "swr": "^2.2.5",
     "zod": "^3.23.8",
-    "zustand": "^5.0.1"
+    "zustand": "^5.0.1",
+    "usehooks-ts": "^3.1.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.8.3",
