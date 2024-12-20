@@ -60,7 +60,7 @@ importers:
         specifier: ^4.2.3
         version: 4.2.3(next@14.2.15(@babel/core@7.25.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
       posthog-js:
-        specifier: latest
+        specifier: 1.203.0
         version: 1.203.0
       prismjs:
         specifier: ^1.29.0
