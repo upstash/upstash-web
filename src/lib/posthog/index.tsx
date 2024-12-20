@@ -13,6 +13,7 @@ const getPostHogConfig = () =>
     cross_subdomain_cookie: true,
     capture_pageleave: true,
     autocapture: false,
+    opt_out_capturing_by_default: true,
     persistence: "cookie",
     rate_limiting: {
       events_burst_limit: 1000,
@@ -40,6 +41,8 @@ export const PHProvider = ({ children }: PropsWithChildren<{}>) => {
 
       if (!posthog.__loaded) {
         posthog.init(posthogKey, getPostHogConfig());
+
+        posthog.opt_in_capturing();
       }
     }
   }, [cookieConsent]);

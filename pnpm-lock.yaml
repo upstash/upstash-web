@@ -60,8 +60,8 @@ importers:
         specifier: ^4.2.3
         version: 4.2.3(next@14.2.15(@babel/core@7.25.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
       posthog-js:
-        specifier: ^1.161.0
-        version: 1.173.0
+        specifier: 1.203.0
+        version: 1.203.0
       prismjs:
         specifier: ^1.29.0
         version: 1.29.0
@@ -4638,8 +4638,8 @@ packages:
     resolution: {integrity: sha512-56rxCq7G/XfB4EkXq9Egn5GCqugWvDFjafDOThIdMBsI15iqPqR5r15TfSr1YPYeEI19YeaXMCbY6u88Y76GLQ==}
     engines: {node: ^10 || ^12 || >=14}
 
-  posthog-js@1.173.0:
-    resolution: {integrity: sha512-Qow8ZLPXB6ejR7Vu679CbBYwhSj4RKd0m896ggme1SDjBIu0dWJgWLpx34hKrtZ7EStW7r4qf5+xmktgAwa3Jg==}
+  posthog-js@1.203.0:
+    resolution: {integrity: sha512-f8yvxZDVH30cjZZY8D9D6YyOqFh1S0aFUqi9k94PAQkN6szJTD/84lyjiFlCfJePr8M8C0iedZPev3A68mWbng==}
 
   preact@10.24.3:
     resolution: {integrity: sha512-Z2dPnBnMUfyQfSQ+GBdsGa16hz35YmLmtTLhM169uW944hYL6xzTYkJjC07j+Wosz733pMWx0fgON3JNw1jJQA==}
@@ -5287,6 +5287,7 @@ packages:
 
   sudo-prompt@9.2.1:
     resolution: {integrity: sha512-Mu7R0g4ig9TUuGSxJavny5Rv0egCEtpZRNMrZaYS1vxkiIxGiGUwoezU3LazIQ+KE04hTrTfNPgxU5gzi7F5Pw==}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
   supports-color@5.5.0:
     resolution: {integrity: sha512-QjVjwdXIt408MIiAqCX4oUKsgU2EqAGzs2Ppkm4aQYbjm+ZEWEcW4SfFNTr4uMNZma0ey4f5lgLrkB0aX0QMow==}
@@ -11129,7 +11130,7 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
-  posthog-js@1.173.0:
+  posthog-js@1.203.0:
     dependencies:
       core-js: 3.38.1
       fflate: 0.4.8
