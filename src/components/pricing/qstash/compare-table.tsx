@@ -497,7 +497,7 @@ export default function CompareTable() {
             hidden={isMobile ? !showFree : false}
             className="bg-white/3 px-4 py-0"
           >
-            <CompareValue type="number">3 days</CompareValue>
+            <CompareValue>3 days</CompareValue>
           </td>
           <td
             hidden={isMobile ? !showPayg : false}
@@ -509,13 +509,13 @@ export default function CompareTable() {
             hidden={isMobile ? !showPro1 : false}
             className="bg-white/3 px-4 py-0"
           >
-            <CompareValue type="number">14 days</CompareValue>
+            <CompareValue>14 days</CompareValue>
           </td>
           <td
             hidden={isMobile ? !showPro10 : false}
             className="bg-white/3 px-4 py-0"
           >
-            <CompareValue type="number">14 days</CompareValue>
+            <CompareValue>14 days</CompareValue>
           </td>
         </tr>
         
