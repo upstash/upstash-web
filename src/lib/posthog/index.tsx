@@ -14,6 +14,7 @@ const getPostHogConfig = () =>
     capture_pageleave: true,
     autocapture: false,
     persistence: "cookie",
+    opt_out_capturing_by_default: true,
     rate_limiting: {
       events_burst_limit: 1000,
       events_per_second: 100,
@@ -39,10 +40,18 @@ export const PHProvider = ({ children }: PropsWithChildren<{}>) => {
       }
 
       if (!posthog.__loaded) {
+        posthog.opt_in_capturing();
         posthog.init(posthogKey, getPostHogConfig());
       }
     }
   }, [cookieConsent]);
 
-  return <PostHogProvider client={posthog}>{children}</PostHogProvider>;
+  return (
+    <PostHogProvider
+      client={posthog}
+      options={{ opt_out_capturing_by_default: true }}
+    >
+      {children}
+    </PostHogProvider>
+  );
 };

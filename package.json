@@ -29,7 +29,7 @@
     "luxon": "^3.5.0",
     "next": "^14.2.8",
     "next-sitemap": "^4.2.3",
-    "posthog-js": "^1.161.0",
+    "posthog-js": "latest",
     "prismjs": "^1.29.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

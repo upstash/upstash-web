@@ -20,6 +20,7 @@ export const CookieConsentBanner = () => {
       const data = await res.json();
 
       setVisible(data.isEuropean);
+
       if (!data.isEuropean) {
         setCookieConsent(true);
       }
@@ -54,7 +55,7 @@ export const CookieConsentBanner = () => {
           onClick={() => {
             setVisible(false);
           }}
-          className="flex h-6 w-6 items-center justify-center rounded-full transition-colors hover:bg-emerald-500"
+          className="flex items-center justify-center w-6 h-6 transition-colors rounded-full hover:bg-emerald-500"
         >
           x
         </button>
