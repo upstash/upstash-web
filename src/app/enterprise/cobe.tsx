@@ -43,7 +43,7 @@ export default function EnterpriseCobe() {
   }, [isDarkMode]);
 
   return (
-    <div className="relative -z-10 -mt-60 aspect-video h-[500px] w-full overflow-hidden">
+    <div className="relative -z-10 -mt-52 aspect-video h-[500px] w-full overflow-hidden">
       <span className="absolute inset-x-0 bottom-0 z-10 h-full bg-gradient-to-t from-bg" />
 
       <canvas
