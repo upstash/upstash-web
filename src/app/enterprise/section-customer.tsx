@@ -6,7 +6,7 @@ import cx from "@/utils/cx";
 
 export default function SectionCustomer() {
   return (
-    <section className="relative py-10 md:py-32">
+    <section className="relative py-10 md:py-24">
       <Bg className="opacity-20" />
 
       <Container>
@@ -29,36 +29,34 @@ export default function SectionCustomer() {
               key={id}
               className={cx(
                 "group relative flex flex-col justify-center md:col-span-3",
-                "rounded-2xl p-10 md:rounded-4xl",
+                "rounded-2xl px-10 py-8 md:rounded-4xl md:px-16 md:py-10",
                 "bg-white shadow-sm",
-                "transition hover:shadow-2xl",
+                "transition hover:shadow-xl",
                 "md:first:col-span-4",
                 "md:last:col-span-4",
                 "dark:bg-bg-mute dark:hover:bg-white/10",
               )}
             >
-              <blockquote>
-                <p
-                  className={cx(
-                    "text-balance font-medium md:text-xl",
-                    "bg-gradient-to-r bg-clip-text text-transparent",
-                    "from-emerald-900 to-emerald-600",
-                    "dark:from-emerald-200 dark:to-emerald-500",
-                  )}
-                >
-                  “{quote}”
-                </p>
-              </blockquote>
-
-              <figcaption className="mt-4 text-text-mute">{who}</figcaption>
-
-              <span
+              <blockquote
                 className={cx(
-                  "mt-6 flex h-10 items-center justify-center text-text",
+                  "text-balance font-medium md:text-xl",
+                  "bg-gradient-to-r bg-clip-text text-transparent",
+                  "from-emerald-900 to-emerald-600",
+                  "dark:from-emerald-200 dark:to-emerald-500",
                 )}
               >
-                {logo}
-              </span>
+                <p>“{quote}”</p>
+              </blockquote>
+
+              <figcaption className="relative mt-6 flex h-10 items-center justify-center">
+                <span className="absolute h-full -translate-y-4 opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                  {who}
+                </span>
+
+                <span className="absolute inline-flex h-full transition duration-300 group-hover:translate-y-4 group-hover:opacity-0">
+                  {logo}
+                </span>
+              </figcaption>
             </figure>
           ))}
         </div>
