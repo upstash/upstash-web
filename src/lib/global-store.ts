@@ -7,6 +7,9 @@ type GlobalStore = {
 
   isHydrated: boolean;
   setIsHydrated: (isHydrated: boolean) => void;
+
+  isInited: boolean;
+  setIsInited: (isInited: boolean) => void;
 };
 
 export const useGlobalStore = create(
@@ -17,6 +20,9 @@ export const useGlobalStore = create(
 
       isHydrated: false,
       setIsHydrated: (isHydrated) => set({ isHydrated }),
+
+      isInited: false,
+      setIsInited: (isInited: boolean) => set({ isInited })
     }),
     {
       name: "global-store",
