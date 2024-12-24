@@ -23,6 +23,7 @@ const getPostHogConfig = () =>
 
 export const PHProvider = ({ children }: PropsWithChildren<{}>) => {
   const cookieConsent = useGlobalStore((state) => state.cookieConsent);
+  const setIsInited = useGlobalStore((state) => state.setIsInited);
 
   useEffect(() => {
     if (
@@ -43,6 +44,7 @@ export const PHProvider = ({ children }: PropsWithChildren<{}>) => {
         posthog.init(posthogKey, getPostHogConfig());
 
         posthog.opt_in_capturing();
+        setIsInited(true)
       }
     }
   }, [cookieConsent]);
