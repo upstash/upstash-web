@@ -21,10 +21,11 @@ import {
   IconTimeline,
   IconUserSearch,
 } from "@tabler/icons-react";
+import React from "react";
 
 export default function SectionFeature() {
   return (
-    <section className="relative -mt-16 pb-10 md:pb-32">
+    <section className="relative -mt-16 pb-10 md:pb-24">
       <Bg className="opacity-20" />
 
       <Container className="max-w-screen-2xl">
@@ -36,43 +37,42 @@ export default function SectionFeature() {
         </div>
 
         <div className="mt-16 flex flex-wrap justify-center gap-2 md:grid-cols-3 md:gap-4">
-          {FEATURES.map((feature, index) => {
+          {FEATURES.map(({ title, desc, icon }) => {
             return (
-              <TooltipRoot delayDuration={0}>
-                <TooltipTrigger>
-                  <div
-                    key={index}
-                    className={cx(
-                      "group flex items-center justify-center gap-2 px-6 py-4",
-                      "rounded-3xl border-2 border-bg-mute bg-bg-mute",
-                      "transition hover:border-white hover:bg-white hover:shadow-xl",
-                      "dark:hover:border-bg-mute dark:hover:bg-bg-mute",
-                    )}
-                  >
-                    {feature.icon && (
-                      <span
-                        className={cx(
-                          "inline-flex size-8 shrink-0 items-center justify-center transition md:size-10",
-                          "rounded-full bg-primary dark:bg-bg-mute dark:group-hover:bg-primary",
-                        )}
-                      >
-                        {feature.icon}
-                      </span>
-                    )}
+              <React.Fragment key={title.toString()}>
+                <TooltipRoot delayDuration={0}>
+                  <TooltipTrigger>
+                    <div
+                      className={cx(
+                        "group flex items-center justify-center gap-2 px-6 py-4",
+                        "rounded-3xl border-2 border-bg-mute bg-bg-mute",
+                        "transition hover:border-white hover:bg-white hover:shadow-xl",
+                        "dark:hover:border-bg-mute dark:hover:bg-bg-mute",
+                      )}
+                    >
+                      {icon && (
+                        <span
+                          className={cx(
+                            "inline-flex size-8 shrink-0 items-center justify-center transition md:size-10",
+                            "rounded-full bg-primary dark:bg-bg-mute dark:group-hover:bg-primary",
+                          )}
+                        >
+                          {icon}
+                        </span>
+                      )}
 
-                    <h4 className="font-semibold md:text-lg">
-                      {feature.title}
-                    </h4>
+                      <h4 className="font-semibold md:text-lg">{title}</h4>
 
-                    {/*<p className="hidden text-text-mute group-hover:flex">*/}
-                    {/*  {feature.desc}*/}
-                    {/*</p>*/}
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent hideWhenDetached={true}>
-                  {feature.desc}
-                </TooltipContent>
-              </TooltipRoot>
+                      {/*<p className="hidden text-text-mute group-hover:flex">*/}
+                      {/*  {feature.desc}*/}
+                      {/*</p>*/}
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent hideWhenDetached={true}>
+                    {desc}
+                  </TooltipContent>
+                </TooltipRoot>
+              </React.Fragment>
             );
           })}
         </div>
