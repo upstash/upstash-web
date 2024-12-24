@@ -27,6 +27,7 @@ export default function SectionWhy() {
                 "group flex items-center justify-between gap-2 p-8 md:px-16 md:py-12",
                 "rounded-3xl bg-white shadow-sm dark:bg-bg-mute",
                 "cursor-default transition",
+                "dark:hover:bg-white/10",
               )}
             >
               <div className="text-left md:w-1/2">
