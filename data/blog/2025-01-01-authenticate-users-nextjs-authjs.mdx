@@ -1,0 +1,133 @@
+---
+authors: [rishi]
+slug: authenticate-users-nextjs-authjs
+tags: [redis, database, serverless, vercel]
+title: "Authenticate users in Next.js with Auth.js"
+---
+
+In this tutorial, you will learn how to automate Internationalization (i18n) for websites using Upstash QStash for task scheduling and OpenAI for translations. You will also learn to interact with the GitHub API and create automated API calls in your Next.js application, capable of running for 15 minutes (upto 12 hours), going beyond the usual timeout limits.
+
+The application will be designed for scalability, enabling the translation of blog content into multiple languages while utilizing GitHub for code management. It leverages Upstash QStash to delegate the entire process to background workers, ensuring efficient task handling with in-built retry mechanism.
+
+## Prerequisites
+
+You will need the following:
+
+- [Node.js 18](https://nodejs.org/en/blog/announcements/v18-release-announce) or later
+- An [Upstash](https://console.upstash.com) account
+- A [Vercel](https://vercel.com/dashboard) account
+
+## Tech Stack
+
+| Technology | Description |
+| --- | --- |
+| [Next.js](https://nextjs.org) | The React Framework for the Web. |
+| [Upstash](https://upstash.com) | Serverless database platform. You are going to use Upstash QStash for scheduling jobs via Upstash Workflow SDK. |
+| [Vercel](https://vercel.com) | A cloud platform for deploying and scaling web applications. |
+
+## Setting up Upstash Redis
+
+In your Upstash dashboard, go to **Redis** tab and create a database.
+
+![Create An Upstash Redis Instance](/blog/scheduled-transcriber/redis-create.png)
+
+Scroll down until you find the REST API section, and select the `.env` button. Copy the content and save it somewhere safe.
+
+![Upstash Redis Environment Variables](/blog/scheduled-transcriber/redis-env.png)
+
+## Create a new Next.js application
+
+Let’s get started by creating a new Next.js project. Open your terminal and run the following command:
+
+```bash
+npx create-next-app@latest my-app
+```
+
+When prompted, choose:
+
+- `Yes` when prompted to use TypeScript.
+- `No` when prompted to use ESLint.
+- `Yes` when prompted to use Tailwind CSS.
+- `No` when prompted to use `src/` directory.
+- `Yes` when prompted to use App Router.
+- `No` when prompted to use Turbopack.
+- `No` when prompted to customize the default import alias (`@/*`).
+
+Once that is done, move into the project directory and start the app in developement mode by executing the following command:
+
+```bash
+cd my-app
+npm run dev
+```
+
+The app should be running on [localhost:3000](http://localhost:3000). Stop the development server to install the necessary dependencies with the following commands:
+
+```bash
+npm install @upstash/redis
+```
+
+The libraries installed include:
+
+- `@upstash/redis`: SDK to interact over HTTP requests with Redis, built on top of Upstash REST API.
+
+Now, create a `.env` file at the root of your project. You are going to use the `AUTH_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` obtained earlier.
+
+It should look something like this:
+
+```bash
+# .env
+
+# Auth.js Environment Variables
+AUTH_SECRET="..."
+AUTH_GOOGLE_SECRET="...-..."
+AUTH_GOOGLE_ID="..-...apps.googleusercontent.com"
+
+# Upstash Redis Environment Variables
+UPSTASH_REDIS_REST_URL="https://...upstash.io"
+UPSTASH_REDIS_REST_TOKEN="..."
+```
+
+To create API endpoints in Next.js, you will use Next.js [Route Handlers](https://nextjs.org/docs/app/building-your-application/routing/route-handlers) which allow you to serve responses over Web [Request](https://developer.mozilla.org/docs/Web/API/Request) and [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) APIs. To start creating API routes in Next.js that streams responses to the user, execute the following commands:
+
+```bash
+mkdir -p app/api/workflow
+mkdir -p app/blogs/en
+mkdir app/blogs/fr
+mkdir app/[lang]
+```
+
+<Note type="tip">
+  The `-p` flag creates parent directories of a directory if they're missing.
+</Note>
+
+Finnaly, create a sample markdown file named `first.md` in the `app/blogs/en` directory with the following:
+
+```md
+# First
+
+![](https://placehold.co/600x400)
+
+This is the first blog post.
+```
+
+## Deploy to Vercel
+
+The repository is now ready to deploy to Vercel. Use the following steps to deploy 👇🏻
+
+- Start by creating a GitHub repository containing your app's code.
+- Then, navigate to the Vercel Dashboard and create a **New Project**.
+- Link the new project to the GitHub repository you just created.
+- In **Settings**, update the `Environment Variables` to match those in your local `.env` file.
+- Deploy! 🚀
+
+> That was a lot of learning! You’re all done now ✨
+
+## References
+
+For more detailed insights, explore the references cited in this blog.
+
+- [GitHub Repository](https://github.com/rishi-raj-jain/scheduled-i18n-nextjs-app)
+
+## Conclusion
+
+In this blog, you learned how to automate the internationalization of a Next.js application using Upstash QStash, OpenAI, and GitHub through a seamless workflow managed by Upstash Workflow. This workflow operates as an automatic process, allowing you to simply trigger and forget, as they self-invoke the necessary APIs to handle translations and deployments of your application. Additionally, breaking the entire process into independent steps proves to be beneficial for tracking progress in the Upstash dashboard, making it easier to monitor each phase of the workflow and troubleshoot if needed.
