@@ -53,7 +53,7 @@ When prompted, choose:
 - `No` when prompted to use Turbopack.
 - `No` when prompted to customize the default import alias (`@/*`).
 
-Once that is done, move into the project directory and start the app in developement mode by executing the following command:
+Once that is done, move into the project directory and start the app in development mode by executing the following command:
 
 ```bash
 cd my-app
@@ -63,16 +63,20 @@ npm run dev
 The app should be running on [localhost:3000](http://localhost:3000). Stop the development server to install the necessary dependencies with the following commands:
 
 ```bash
-npm install @upstash/redis
+npm install @upstash/redis @auth/core @auth/upstash-redis-adapter nanoid next-auth
 ```
 
 The libraries installed include:
 
-- `@upstash/redis`: SDK to interact over HTTP requests with Redis, built on top of Upstash REST API.
+- `@upstash/redis`: SDK to interact with Upstash Redis via HTTP requests.
+- `@auth/core`: Core package for handling authentication in Auth.js.
+- `@auth/upstash-redis-adapter`: Adapter for integrating Auth.js with Upstash Redis.
+- `nanoid`: A library for generating unique, secure IDs.
+- `next-auth`: Authentication solution built for Next.js.
 
-Now, create a `.env` file at the root of your project. You are going to use the `AUTH_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` obtained earlier.
+Now, create a `.env` file at the root of your project. You are going to use the `AUTH_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` values.
 
-It should look something like this:
+The `.env` file should have the following:
 
 ```bash
 # .env
@@ -87,28 +91,493 @@ UPSTASH_REDIS_REST_URL="https://...upstash.io"
 UPSTASH_REDIS_REST_TOKEN="..."
 ```
 
-To create API endpoints in Next.js, you will use Next.js [Route Handlers](https://nextjs.org/docs/app/building-your-application/routing/route-handlers) which allow you to serve responses over Web [Request](https://developer.mozilla.org/docs/Web/API/Request) and [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) APIs. To start creating API routes in Next.js that streams responses to the user, execute the following commands:
+TODO
 
-```bash
-mkdir -p app/api/workflow
-mkdir -p app/blogs/en
-mkdir app/blogs/fr
-mkdir app/[lang]
+```tsx
+// File: app/api/auth/[...nextauth]/route.ts
+
+export const runtime = 'edge'
+
+import { handlers } from '@/lib/auth'
+
+export const { GET, POST } = handlers
 ```
 
-<Note type="tip">
-  The `-p` flag creates parent directories of a directory if they're missing.
-</Note>
+TODO
 
-Finnaly, create a sample markdown file named `first.md` in the `app/blogs/en` directory with the following:
+```tsx
+// File: app/api/refresh/route.ts
 
-```md
-# First
+export const runtime = 'edge'
 
-![](https://placehold.co/600x400)
+export const dynamic = 'force-dynamic'
 
-This is the first blog post.
+export const fetchCache = 'force-no-store'
+
+import { auth } from '@/lib/auth'
+import redis from '@/lib/redis'
+import { UserType } from '@/lib/types'
+import { encode } from '@auth/core/jwt'
+import { cookies } from 'next/headers'
+import { NextResponse } from 'next/server'
+
+export async function GET(request: Request) {
+  const useSecureCookie = request.url.startsWith('https:')
+  const salt = useSecureCookie ? '__Secure-authjs.session-token' : 'authjs.session-token'
+  if (!process.env.AUTH_SECRET) return new NextResponse(null, { status: 500 })
+  const [session, cookieStore] = await Promise.all([auth(), cookies()])
+  if (!session?.user?.email) return new NextResponse(null, { status: 400 })
+  const userByEmail = await redis.get(`user:email:${session.user.email}`)
+  const userData = await redis.get<UserType>(`user:${userByEmail}`)
+  if (!userData?.email) cookieStore.set(salt, toString(), { secure: useSecureCookie, path: '/', httpOnly: true, sameSite: 'lax', maxAge: 0 })
+  else {
+    const { image, password, ...rest } = userData
+    const saltVal = await encode({ salt, secret: process.env.AUTH_SECRET, token: { ...rest, picture: image } })
+    cookieStore.set(salt, saltVal, { secure: useSecureCookie, path: '/', httpOnly: true, sameSite: 'lax' })
+  }
+  return new NextResponse()
+}
 ```
+
+TODO
+
+```tsx
+// File: app/api/user/route.ts
+
+export const runtime = 'edge'
+
+export const dynamic = 'force-dynamic'
+
+export const fetchCache = 'force-no-store'
+
+import { auth } from '@/lib/auth'
+import redis from '@/lib/redis'
+import { UserType } from '@/lib/types'
+import { NextResponse } from 'next/server'
+
+export async function POST(request: Request) {
+  try {
+    const session = await auth()
+    if (!session?.user?.email) return new NextResponse(null, { status: 400 })
+    const body = await request.json()
+    const userByEmail = await redis.get(`user:email:${session.user.email}`)
+    const userData = await redis.get<UserType>(`user:${userByEmail}`)
+    if (!userData) return new NextResponse(null, { status: 404 })
+    if (body.name) userData.name = body.name
+    if (body.image) userData.image = body.image
+    await redis.set(`user:${userByEmail}`, userData)
+    return new NextResponse()
+  } catch (e: any) {
+    const message = e.message || e.toString()
+    console.log(message)
+    return new NextResponse(message, { status: 500 })
+  }
+}
+```
+
+TODO
+
+```tsx
+// File: lib/auth.ts
+
+import { UpstashRedisAdapter } from '@auth/upstash-redis-adapter'
+import NextAuth from 'next-auth'
+import providers from './providers'
+import redis from './redis'
+
+export const { handlers, signIn, signOut, auth } = NextAuth(() => ({
+  providers,
+  session: { strategy: 'jwt' },
+  adapter: UpstashRedisAdapter(redis),
+}))
+```
+
+TODO
+
+```tsx
+// File: lib/redis.ts
+
+import { Redis } from '@upstash/redis'
+
+export default new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+})
+```
+
+TODO
+
+```tsx
+// File: lib/providers.ts
+
+import { nanoid } from 'nanoid'
+import Credentials from 'next-auth/providers/credentials'
+import Google from 'next-auth/providers/google'
+import { comparePassword, generateRandomString, hashPassword } from './credentials'
+import redis from './redis'
+import { UserType } from './types'
+
+export default [
+  Google,
+  Credentials({
+    credentials: {
+      email: {},
+      password: {},
+    },
+    authorize: async (credentials, request) => {
+      let type
+      try {
+        const tmp = new URL(request.url).searchParams.get('kind')
+        if (tmp && typeof tmp === 'string') type = tmp
+      } catch (e) {}
+      if (!type || !credentials.email || typeof credentials.email !== 'string' || !credentials.password || typeof credentials.password !== 'string') return null
+      const randomizedPassword = await generateRandomString(credentials.password)
+      const userByEmail = await redis.get<string | null | undefined>(`user:email:${credentials.email}`)
+      if (userByEmail) {
+        if (type !== 'in') {
+          console.log(`can not sign in in a non sign-in mode.`)
+          throw new Error(`can not sign in in a non sign-in mode.`)
+        }
+        const user = await redis.get<UserType>(`user:${userByEmail}`)
+        if (!user) {
+          console.log(`Found the user by email from user:email:${userByEmail}, but the user object is missing at user:${userByEmail}`)
+          return null
+        }
+        if (user.password) {
+          const hashedPassword = await hashPassword(randomizedPassword)
+          const isPasswordCorrect = await comparePassword(user.password, hashedPassword)
+          if (isPasswordCorrect) {
+            const { password, ...rest } = user
+            return rest
+          }
+          throw new Error(`incorrect password for credentials.`)
+        }
+        throw new Error(`you are using some other authentication method already, but not credentials.`)
+      } else {
+        if (type !== 'up') {
+          console.log(`can not sign up in a non sign-up mode.`)
+          throw new Error(`can not sign up in a non sign-up mode.`)
+        }
+        const newUser = {
+          name: null,
+          image: null,
+          emailVerified: null,
+          email: credentials.email,
+          password: randomizedPassword,
+        }
+        const tmp = nanoid()
+        await redis.set(`user:email:${credentials.email}`, tmp)
+        await redis.set(`user:${tmp}`, newUser)
+        return newUser
+      }
+    },
+  }),
+]
+```
+
+TODO
+
+```tsx
+// File: lib/types.ts
+
+export interface UserType {
+  id?: string
+  email: string
+  name?: string
+  image?: string
+  password?: string
+  emailVerified?: string
+}
+```
+
+TODO
+
+```tsx
+// File: lib/credentials.ts
+
+export function generateRandomToken() {
+  const array = new Uint8Array(20)
+  crypto.getRandomValues(array)
+  return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('')
+}
+
+export function generateRandomString(inputValue: string) {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(inputValue)
+  return crypto.subtle.digest('SHA-256', data).then((hashBuffer) => {
+    return Array.from(new Uint8Array(hashBuffer))
+      .map((byte) => byte.toString(16).padStart(2, '0'))
+      .join('')
+  })
+}
+
+export async function hashPassword(password: string) {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(password)
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+  return Array.from(new Uint8Array(hashBuffer))
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('')
+}
+
+export async function comparePassword(password: string, hash: string) {
+  const hashedPassword = await hashPassword(password)
+  return hashedPassword === hash
+}
+```
+
+TODO
+
+```tsx
+// File: middleware.ts
+
+export { auth as middleware } from '@/lib/auth'
+
+export const config = {
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+}
+```
+
+TODO
+
+```tsx
+// File: app/NextAuthProvider.tsx
+
+'use client'
+
+import { SessionProvider } from 'next-auth/react'
+
+type Props = {
+  children?: React.ReactNode
+}
+
+export default function ({ children }: Props) {
+  return <SessionProvider>{children}</SessionProvider>
+}
+```
+
+TODO
+
+```tsx
+// File: app/csrf.tsx
+
+'use client'
+
+import { getCsrfToken } from 'next-auth/react'
+import { useEffect, useState } from 'react'
+
+export function CSRFInput() {
+  const [csrfToken, setCsrfToken] = useState<string>()
+  useEffect(() => {
+    getCsrfToken().then((res) => setCsrfToken(res))
+  }, [])
+  return <input type="hidden" name="csrfToken" defaultValue={csrfToken} />
+}
+```
+
+TODO
+
+```tsx
+// File: app/provider.tsx
+
+'use client'
+
+import { Button } from '@/components/ui/button'
+import { Icon } from '@iconify/react'
+import { signIn } from 'next-auth/react'
+
+export default function ({ provider, prefix }: { prefix: string; provider: { name: string; id: string } }) {
+  return (
+    <Button onClick={() => signIn(provider.id)} key={provider.name} variant="outline" className="flex w-full gap-x-3">
+      {provider.id === 'google' && <Icon fontSize={18} icon="flat-color-icons:google" />}
+      {provider.id === 'github' && <Icon fontSize={18} icon="mage:github" />}
+      {provider.id === 'facebook' && <Icon fontSize={18} icon="logos:facebook" />}
+      <span className="text-black">
+        {prefix} with {provider.name}
+      </span>
+    </Button>
+  )
+}
+```
+
+TODO
+
+```tsx
+// File: app/page.tsx
+
+'use client'
+
+import { signOut, useSession } from 'next-auth/react'
+
+export default function () {
+  const { data, status } = useSession()
+  return (
+    <>
+      {JSON.stringify({ data, status })}
+      <button onClick={() => signOut()}>Sign Out</button>
+    </>
+  )
+}
+```
+
+TODO
+
+```tsx
+// File: app/signin/page.tsx
+
+export const runtime = 'edge'
+
+import { CSRFInput } from '@/app/csrf'
+import Provider from '@/app/provider'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { auth } from '@/lib/auth'
+import providers from '@/lib/providers'
+import { unstable_noStore } from 'next/cache'
+import Link from 'next/link'
+import { redirect } from 'next/navigation'
+
+export default async function () {
+  unstable_noStore()
+  const session = await auth()
+  if (session) redirect('/')
+  return (
+    <div className="border md:border-white/10 flex items-center justify-center py-12">
+      <div className="mx-auto grid w-[350px] gap-6">
+        <div className="grid gap-2 text-center">
+          <h1 className="text-3xl font-bold">Sign In</h1>
+          <p className="text-balance text-muted-foreground">Enter your email below to sign in to your account</p>
+        </div>
+        {providers
+          .filter((provider) => (typeof provider === 'function' ? provider({}).id : provider.id) !== 'credentials')
+          .map((provider) => (
+            <Provider
+              prefix="Sign in"
+              key={typeof provider === 'function' ? provider({}).name : provider.name}
+              provider={typeof provider === 'function' ? provider({}) : provider}
+            />
+          ))}
+        <p className="text-gray-300 text-xs text-center">OR</p>
+        <form method="POST" className="grid gap-4" action="/api/auth/callback/credentials?kind=in">
+          <div className="grid gap-2">
+            <Label htmlFor="email">Email</Label>
+            <Input name="email" id="email" type="email" placeholder="m@example.com" required />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="password">Password</Label>
+            <Input name="password" id="password" type="password" required />
+            <CSRFInput />
+          </div>
+          <Button type="submit" className="w-full">
+            Sign In
+          </Button>
+        </form>
+        <div className="mt-4 text-center text-sm">
+          Don&apos;t have an account?{' '}
+          <Link href="/signup" className="underline">
+            Sign up
+          </Link>
+        </div>
+      </div>
+    </div>
+  )
+}
+```
+
+TODO
+
+```tsx
+// File: app/signup/page.tsx
+
+export const runtime = 'edge'
+
+import { CSRFInput } from '@/app/csrf'
+import Provider from '@/app/provider'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { auth } from '@/lib/auth'
+import providers from '@/lib/providers'
+import { unstable_noStore } from 'next/cache'
+import Link from 'next/link'
+import { redirect } from 'next/navigation'
+
+export default async function () {
+  unstable_noStore()
+  const session = await auth()
+  if (session) redirect('/')
+  return (
+    <div className="border md:border-white/10 flex items-center justify-center py-12">
+      <div className="mx-auto grid w-[350px] gap-6">
+        <div className="grid gap-2 text-center">
+          <h1 className="text-3xl font-bold">Sign Up</h1>
+          <p className="text-balance text-muted-foreground">Enter your email below to sign up with an account</p>
+        </div>
+        {providers
+          .filter((provider) => (typeof provider === 'function' ? provider({}).id : provider.id) !== 'credentials')
+          .map((provider) => (
+            <Provider
+              prefix="Sign up"
+              key={typeof provider === 'function' ? provider({}).name : provider.name}
+              provider={typeof provider === 'function' ? provider({}) : provider}
+            />
+          ))}
+        <p className="text-gray-300 text-xs text-center">OR</p>
+        <form method="POST" className="grid gap-4" action="/api/auth/callback/credentials?kind=up">
+          <div className="grid gap-2">
+            <Label htmlFor="email">Email</Label>
+            <Input name="email" id="email" type="email" placeholder="m@example.com" required />
+          </div>
+          <div className="grid gap-2">
+            <div className="flex items-center">
+              <Label htmlFor="password">Password</Label>
+            </div>
+            <Input name="password" id="password" type="password" required />
+            <CSRFInput />
+          </div>
+          <Button type="submit" className="w-full">
+            Sign Up
+          </Button>
+        </form>
+        <div className="mt-4 text-center text-sm">
+          Don&apos;t have an account?{' '}
+          <Link href="/signin" className="underline">
+            Sign In
+          </Link>
+        </div>
+      </div>
+    </div>
+  )
+}
+```
+
+TODO
+
+```tsx
+// File: app/layout.tsx
+
+import './globals.css'
+import NextAuthProvider from './NextAuthProvider'
+
+export default function ({
+  children,
+}: Readonly<{
+  children: React.ReactNode
+}>) {
+  return (
+    <html lang="en">
+      <body className="bg-white text-black antialiased">
+        <NextAuthProvider>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col">{children}</div>
+        </NextAuthProvider>
+      </body>
+    </html>
+  )
+}
+```
+
+TODO
 
 ## Deploy to Vercel
 
