@@ -21,10 +21,7 @@ export default function HomeHeroProducts({
         onClick={() => {
           setActiveProduct(Product.REDIS);
         }}
-        className={cx(
-          "text-red-100",
-          activeProduct === Product.REDIS && "!bg-red-50 text-red-700",
-        )}
+        className={cx(activeProduct === Product.REDIS && "text-red-600")}
       >
         <IconRedis width={24} />
         <span>
@@ -37,10 +34,7 @@ export default function HomeHeroProducts({
         onClick={() => {
           setActiveProduct(Product.VECTOR);
         }}
-        className={cx(
-          "text-orange-100",
-          activeProduct === Product.VECTOR && "!bg-orange-50 text-orange-700",
-        )}
+        className={cx(activeProduct === Product.VECTOR && "text-orange-600")}
       >
         <IconVector width={24} />
         <span>Vector</span>
@@ -51,10 +45,7 @@ export default function HomeHeroProducts({
         onClick={() => {
           setActiveProduct(Product.QSTASH);
         }}
-        className={cx(
-          "text-blue-100",
-          activeProduct === Product.QSTASH && "!bg-blue-50 text-blue-700",
-        )}
+        className={cx(activeProduct === Product.QSTASH && "text-blue-600")}
       >
         <IconQStash width={24} />
         <span>QStash</span>
@@ -65,10 +56,7 @@ export default function HomeHeroProducts({
         onClick={() => {
           setActiveProduct(Product.WORKFLOW);
         }}
-        className={cx(
-          "text-purple-100",
-          activeProduct === Product.WORKFLOW && "!bg-purple-50 text-purple-700",
-        )}
+        className={cx(activeProduct === Product.WORKFLOW && "text-purple-600")}
       >
         <IconWorkflow width={24} />
         <span>Workflow</span>
@@ -94,22 +82,17 @@ function HomeHeroProductTab({
     <button
       type="button"
       className={cx(
-        "px-6 py-6 text-center sm:px-8",
-        "font-display text-2xl font-medium leading-none",
-        "border-2 border-b-0 border-white/10",
-        "rounded-t-2xl text-white hover:bg-white/10 md:rounded-t-3xl",
-        active && "font-semibold",
+        "flex items-center justify-center text-center",
+        "h-16 px-8",
+        "font-display text-2xl font-medium leading-none text-text-mute",
+        "rounded-2xl rounded-b-none border-2 border-bg-mute border-b-transparent",
+        active && "h-20 border-b-white bg-white",
         props.disabled && "hidden cursor-not-allowed lg:flex",
         className,
       )}
       {...props}
     >
-      <span
-        className={cx(
-          "flex items-center justify-center gap-2",
-          active ? "" : "opacity-80",
-        )}
-      >
+      <span className={cx("flex items-center justify-center gap-2")}>
         {children}
       </span>
     </button>

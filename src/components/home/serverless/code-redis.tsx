@@ -21,7 +21,7 @@ export default function CodeRedis() {
   }, [lang]);
 
   return (
-    <div className="grid grid-cols-3 items-start gap-8 rounded-2xl bg-red-950/30 p-6">
+    <div className="code-redis bg-pre-bg grid w-full grid-cols-3 items-start gap-6 rounded-2xl p-6">
       <div className="grid gap-2">
         {Object.values(Language).map((value) => {
           return (

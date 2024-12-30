@@ -11,12 +11,12 @@ export function CommunityBox({
     <div
       className={cx(
         "group/community-box flex flex-col items-center p-6 md:p-8",
-        "bg-white/5 transition",
+        "bg-bg-mute transition",
         "rounded-lg first:rounded-t-3xl last:rounded-b-3xl",
         "md:rounded-lg md:first:rounded-t-lg md:last:rounded-b-lg",
         "lg:first:rounded-t-lg lg:last:rounded-b-lg",
         "lg:first:!rounded-l-4xl lg:last:!rounded-r-4xl",
-        "hover:bg-white/10",
+        "hover:scale-[1.02] hover:bg-emerald-500/10",
         className,
       )}
       {...props}
@@ -33,7 +33,7 @@ export function CommunityBoxTitle({
 }: HTMLProps<HTMLHeadingElement>) {
   return (
     <h4
-      className={cx("font-display text-xl md:text-2xl", className)}
+      className={cx("font-display text-xl font-medium md:text-2xl", className)}
       {...props}
     >
       {children}
@@ -47,7 +47,7 @@ export function CommunityBoxDesc({
   ...props
 }: HTMLProps<HTMLParagraphElement>) {
   return (
-    <p className={cx("mb-6 mt-2 opacity-40", className)} {...props}>
+    <p className={cx("mb-6 mt-2 text-text-mute", className)} {...props}>
       {children}
     </p>
   );
@@ -62,7 +62,7 @@ export function CommunityBoxButton({
     <Button
       className={cx(
         "mt-auto",
-        "group-hover/community-box:bg-emerald-400 group-hover/community-box:text-emerald-950",
+        "group-hover/community-box:bg-primary",
         className,
       )}
       {...props}
