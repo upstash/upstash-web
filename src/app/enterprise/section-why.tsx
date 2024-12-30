@@ -223,8 +223,8 @@ const WHY = [
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
+          fillRule="evenodd"
+          clipRule="evenodd"
           d="M187.331 129.862A67.502 67.502 0 0 1 161.5 135h-94A67.504 67.504 0 0 1 5.138 93.331 67.5 67.5 0 0 1 67.5 0h94a67.498 67.498 0 0 1 62.362 93.331 67.493 67.493 0 0 1-36.531 36.531Z"
           fill="#064E3B"
         />

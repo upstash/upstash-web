@@ -1,129 +1,98 @@
 import {
+  HeroTabFeatureBullet,
   HeroTabFeatureCont,
   HeroTabFeatureLi,
   HeroTabFeatureTitle,
   HeroTabFeatureUl,
 } from "@/components/home/hero/hero-tab";
 import CodeQStash from "@/components/home/serverless/code-qstash";
-import cx from "@/utils/cx";
 import { IconCircle1, IconCircle2, IconCircle3 } from "@tabler/icons-react";
 import React from "react";
 
-export function HeroTabQStash({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+export function HeroTabQStash() {
   return (
-    <div
-      className={cx(
-        "grid place-items-center gap-8 rounded-4xl p-10",
-        "bg-blue-50 text-blue-950",
-        className,
-      )}
-      {...props}
-    >
-      {/* bullets */}
+    <>
       <div className="grid w-full gap-8 md:grid-cols-3">
-        <HeroTabFeatureCont className="bg-blue-900/10">
-          <HeroTabFeatureTitle className="text-blue-700">
+        <HeroTabFeatureCont>
+          <HeroTabFeatureTitle>
             Serverless <br /> Messaging
           </HeroTabFeatureTitle>
           <HeroTabFeatureUl>
             <HeroTabFeatureLi>
-              <IconCircle1
-                size={24}
-                stroke={2}
-                className="shrink-0 text-blue-700"
-              />
+              <HeroTabFeatureBullet>
+                <IconCircle1 stroke={1.5} />
+              </HeroTabFeatureBullet>
               Effortless communication between serverless functions
             </HeroTabFeatureLi>
             <HeroTabFeatureLi>
-              <IconCircle2
-                size={24}
-                stroke={2}
-                className="shrink-0 text-blue-700"
-              />
+              <HeroTabFeatureBullet>
+                <IconCircle2 stroke={1.5} />
+              </HeroTabFeatureBullet>
               Decouple your microservices architecture
             </HeroTabFeatureLi>
             <HeroTabFeatureLi>
-              <IconCircle3
-                size={24}
-                stroke={2}
-                className="shrink-0 text-blue-700"
-              />
+              <HeroTabFeatureBullet>
+                <IconCircle3 stroke={1.5} />
+              </HeroTabFeatureBullet>
               Scale your messaging infrastructure without limits
             </HeroTabFeatureLi>
           </HeroTabFeatureUl>
         </HeroTabFeatureCont>
 
-        <HeroTabFeatureCont className="bg-blue-900/10">
-          <HeroTabFeatureTitle className="text-blue-700">
+        <HeroTabFeatureCont>
+          <HeroTabFeatureTitle>
             Scheduled Tasks <br /> with CRON
           </HeroTabFeatureTitle>
           <HeroTabFeatureUl>
             <HeroTabFeatureLi>
-              <IconCircle1
-                size={24}
-                stroke={2}
-                className="shrink-0 text-blue-700"
-              />
+              <HeroTabFeatureBullet>
+                <IconCircle1 stroke={1.5} />
+              </HeroTabFeatureBullet>
               Easily set up recurring tasks and jobs
             </HeroTabFeatureLi>
             <HeroTabFeatureLi>
-              <IconCircle2
-                size={24}
-                stroke={2}
-                className="shrink-0 text-blue-700"
-              />
+              <HeroTabFeatureBullet>
+                <IconCircle2 stroke={1.5} />
+              </HeroTabFeatureBullet>
               Flexible scheduling with CRON syntax
             </HeroTabFeatureLi>
             <HeroTabFeatureLi>
-              <IconCircle3
-                size={24}
-                stroke={2}
-                className="shrink-0 text-blue-700"
-              />
+              <HeroTabFeatureBullet>
+                <IconCircle3 stroke={1.5} />
+              </HeroTabFeatureBullet>
               Automate your workflows with precision
             </HeroTabFeatureLi>
           </HeroTabFeatureUl>
         </HeroTabFeatureCont>
 
-        <HeroTabFeatureCont className="bg-blue-900/10">
-          <HeroTabFeatureTitle className="text-blue-700">
+        <HeroTabFeatureCont>
+          <HeroTabFeatureTitle>
             Intelligent <br /> Retry Mechanism
           </HeroTabFeatureTitle>
           <HeroTabFeatureUl>
             <HeroTabFeatureLi>
-              <IconCircle1
-                size={24}
-                stroke={2}
-                className="shrink-0 text-blue-700"
-              />
+              <HeroTabFeatureBullet>
+                <IconCircle1 stroke={1.5} />
+              </HeroTabFeatureBullet>
               Automatically retry failed tasks
             </HeroTabFeatureLi>
             <HeroTabFeatureLi>
-              <IconCircle2
-                size={24}
-                stroke={2}
-                className="shrink-0 text-blue-700"
-              />
+              <HeroTabFeatureBullet>
+                <IconCircle2 stroke={1.5} />
+              </HeroTabFeatureBullet>
               Ensure task completion in unreliable environments
             </HeroTabFeatureLi>
             <HeroTabFeatureLi>
-              <IconCircle3
-                size={24}
-                stroke={2}
-                className="shrink-0 text-blue-700"
-              />
+              <HeroTabFeatureBullet>
+                <IconCircle3 stroke={1.5} />
+              </HeroTabFeatureBullet>
               Configurable retry policies to suit your needs
             </HeroTabFeatureLi>
           </HeroTabFeatureUl>
         </HeroTabFeatureCont>
       </div>
 
-      <div className="code-qstash w-full rounded-2xl bg-bg">
-        <CodeQStash />
-      </div>
-    </div>
+      <CodeQStash />
+    </>
   );
 }

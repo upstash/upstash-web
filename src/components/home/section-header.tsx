@@ -43,7 +43,7 @@ export function SectionHeaderSummary({
   return (
     <p
       className={cx(
-        "mx-4 mt-2 text-lg opacity-40 md:mx-auto md:text-2xl",
+        "mx-4 mt-2 text-lg opacity-50 md:mx-auto md:text-2xl",
         className,
       )}
       {...props}

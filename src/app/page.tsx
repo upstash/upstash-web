@@ -6,6 +6,7 @@ import HomeCommunity from "@/components/home/community";
 import HomeFast from "@/components/home/fast";
 import HomeHero from "@/components/home/hero";
 import HomeHeroPartner from "@/components/home/hero/hero-customer";
+import HomeProductNew from "@/components/home/product-new";
 import HomeServerless from "@/components/home/serverless";
 import { useSetAffiliateCodeToSessionStorage } from "@/hooks/use-affiliate-code-session-storage";
 import * as React from "react";
@@ -25,6 +26,7 @@ export default function Home({
     >
       <main className="text-center">
         <HomeHero />
+        <HomeProductNew />
         <HomeHeroPartner />
         <HomeServerless />
         <HomeFast />

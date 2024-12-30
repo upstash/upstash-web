@@ -13,6 +13,7 @@ module.exports = {
         "primary-text": "var(--color-primary-text)",
         text: "var(--color-text)",
         "text-mute": "var(--color-text-mute)",
+        "pre-bg": "var(--color-pre-bg)",
       },
       fontFamily: {
         sans: ["var(--font-sans)"],

@@ -23,7 +23,7 @@ export default function CodeWorkflow() {
   }, [lang]);
 
   return (
-    <div className="grid grid-cols-3 items-start gap-8 rounded-2xl bg-purple-950/10 p-6">
+    <div className="code-workflow grid grid-cols-3 items-start gap-8">
       <div className="grid gap-2">
         {Object.values(Language).map((value) => {
           return (

@@ -9,7 +9,7 @@ export function HeroTabFeatureCont({
     <article
       className={cx(
         "flex flex-col gap-4 rounded-2xl p-8 text-left",
-        // "bg-red-900/10",
+        "bg-bg-mute",
         className,
       )}
       {...props}
@@ -24,8 +24,7 @@ export function HeroTabFeatureTitle({
   return (
     <h4
       className={cx(
-        "font-display text-2xl font-semibold",
-        // "text-red-700",
+        "font-display text-2xl font-semibold leading-tight",
         className,
       )}
       {...props}
@@ -45,9 +44,13 @@ export function HeroTabFeatureLi({
   ...props
 }: React.ComponentProps<"li">) {
   return (
-    <li
-      className={cx("flex items-start gap-2 py-1 font-medium", className)}
-      {...props}
-    />
+    <li className={cx("flex items-start gap-2 py-1", className)} {...props} />
   );
+}
+
+export function HeroTabFeatureBullet({
+  className,
+  ...props
+}: React.ComponentProps<"span">) {
+  return <span className={cx("shrink-0 text-primary", className)} {...props} />;
 }
