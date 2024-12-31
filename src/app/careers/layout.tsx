@@ -1,4 +1,4 @@
-import "../post.css";
+import "../../styles/post.css";
 import { SITE_URL } from "@/utils/const";
 import { Metadata } from "next";
 import { ReactNode } from "react";

@@ -1,5 +1,5 @@
-import "../post.css";
-import "../code.css";
+import "../../styles/post.css";
+import "../../styles/code.css";
 import { SITE_URL } from "@/utils/const";
 import { Metadata } from "next";
 import { ReactNode } from "react";

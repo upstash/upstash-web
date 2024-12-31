@@ -4,8 +4,10 @@ import {
   CodePre,
   CodeTabButton,
 } from "@/components/home/serverless/code-redis";
+import cx from "@/utils/cx";
+import { IconChevronRight } from "@tabler/icons-react";
 import Prism from "prismjs";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 enum Language {
   Scheduling = "Scheduling",
@@ -23,16 +25,22 @@ export default function CodeRedis() {
   }, [lang]);
 
   return (
-    <div className="code-qstash bg-pre-bg grid grid-cols-3 items-start gap-8">
+    <div className="bg-pre-bg col-span-3 flex w-full items-start gap-8 rounded-2xl p-6">
       <div className="grid gap-2">
         {Object.values(Language).map((value) => {
+          const active = value === lang;
           return (
             <CodeTabButton
               key={value}
-              active={value === lang}
+              active={active}
               onClick={() => setLang(value)}
             >
-              {value}
+              <span className="grow">{value}</span>
+              <IconChevronRight
+                className={cx("shrink-0 opacity-0", active && "opacity-50")}
+                size={20}
+                stroke={1.5}
+              />
             </CodeTabButton>
           );
         })}

@@ -1,6 +1,7 @@
 "use client";
 
 import cx from "@/utils/cx";
+import { IconChevronRight } from "@tabler/icons-react";
 import Prism from "prismjs";
 import React, { useEffect, useState } from "react";
 
@@ -21,16 +22,22 @@ export default function CodeRedis() {
   }, [lang]);
 
   return (
-    <div className="code-redis bg-pre-bg grid w-full grid-cols-3 items-start gap-6 rounded-2xl p-6">
+    <div className="bg-pre-bg col-span-3 flex w-full items-start gap-8 rounded-2xl p-6">
       <div className="grid gap-2">
         {Object.values(Language).map((value) => {
+          const active = value === lang;
           return (
             <CodeTabButton
               key={value}
-              active={value === lang}
+              active={active}
               onClick={() => setLang(value)}
             >
-              {value}
+              <span className="grow">{value}</span>
+              <IconChevronRight
+                className={cx("shrink-0 opacity-0", active && "opacity-50")}
+                size={20}
+                stroke={1.5}
+              />
             </CodeTabButton>
           );
         })}
@@ -67,13 +74,7 @@ const data = await redis.get('key');`,
 
 export function CodePre({ className, ...props }: React.ComponentProps<"pre">) {
   return (
-    <pre
-      className={cx(
-        "no-scrollbar !m-0 !bg-transparent !p-0 !font-[inherit] !text-[.9em]",
-        className,
-      )}
-      {...props}
-    />
+    <pre className={cx("no-scrollbar !text-[.86em]", className)} {...props} />
   );
 }
 
@@ -85,10 +86,11 @@ export function CodeTabButton({
   return (
     <button
       className={cx(
-        "h-10 cursor-pointer select-none px-6 text-left text-white/80",
-        "rounded-lg transition hover:bg-opacity-20",
-        "border border-transparent bg-white bg-opacity-10",
-        active && "border-white/50 font-medium text-white",
+        "flex h-10 select-none items-center gap-4 px-6 text-left text-white/80",
+        "cursor-pointer rounded-lg transition",
+        "bg-white bg-opacity-10",
+        "hover:bg-opacity-20",
+        active && "bg-opacity-100 !text-text hover:bg-opacity-100",
         className,
       )}
       {...props}

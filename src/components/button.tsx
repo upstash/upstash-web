@@ -22,7 +22,7 @@ export default function Button({
   const classes = {
     button: cx(
       "inline-flex items-center transition",
-      "gap-1 px-4 sm:px-5 py-1.5 sm:py-2 rounded-full font-medium",
+      "gap-1 px-4 sm:px-5 py-1.5 sm:py-2 rounded-2xl font-medium",
       "text-text bg-bg-mute",
       "hover:opacity-60",
       "disabled:bg-white/5 disabled:text-zinc-50",

@@ -84,9 +84,9 @@ function HomeHeroProductTab({
       className={cx(
         "flex items-center justify-center text-center",
         "h-16 px-8",
-        "font-display text-2xl font-medium leading-none text-text-mute",
-        "rounded-2xl rounded-b-none border-2 border-bg-mute border-b-transparent",
-        active && "h-20 border-b-white bg-white",
+        "font-display text-2xl font-semibold leading-none text-text-mute",
+        "rounded-2xl rounded-b-none border-2 border-b-0 border-bg-mute",
+        active && "h-20 border-white bg-white",
         props.disabled && "hidden cursor-not-allowed lg:flex",
         className,
       )}

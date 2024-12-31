@@ -8,7 +8,7 @@ export function HeroTabFeatureCont({
   return (
     <article
       className={cx(
-        "flex flex-col gap-4 rounded-2xl p-8 text-left",
+        "flex h-full flex-col gap-4 rounded-2xl p-8 text-left",
         "bg-bg-mute",
         className,
       )}
