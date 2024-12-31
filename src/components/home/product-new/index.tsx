@@ -11,16 +11,16 @@ export default function HomeProductNew() {
   const [activeProduct, setActiveProduct] = useState<Product>(Product.REDIS);
 
   return (
-    <section>
+    <section className="relative z-10">
       <Container>
-        <div className="relative z-10 flex items-end justify-center gap-1 md:mt-6">
+        <div className="flex items-end justify-center gap-1 md:mt-6">
           <HomeHeroProducts
             activeProduct={activeProduct}
             setActiveProduct={setActiveProduct}
           />
         </div>
 
-        <div className="relative z-0 -mt-1 grid place-items-center gap-6 rounded-3xl border-2 border-bg-mute bg-white p-8">
+        <div className="-mt-0.5 grid place-items-center gap-8 rounded-4xl border-2 border-bg-mute bg-white p-8">
           {activeProduct === Product.REDIS && <HeroTabRedis />}
           {activeProduct === Product.VECTOR && <HeroTabVector />}
           {activeProduct === Product.QSTASH && <HeroTabQStash />}

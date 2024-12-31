@@ -12,87 +12,85 @@ import React from "react";
 export function HeroTabRedis() {
   return (
     <>
-      <div className="grid w-full gap-6 md:grid-cols-3">
-        <HeroTabFeatureCont>
-          <HeroTabFeatureTitle>
-            Highly Available, <br /> Infinitely Scalable
-          </HeroTabFeatureTitle>
-          <HeroTabFeatureUl>
-            <HeroTabFeatureLi>
-              <HeroTabFeatureBullet>
-                <IconCircle1 stroke={1.5} />
-              </HeroTabFeatureBullet>
-              99.99% uptime guarantee
-            </HeroTabFeatureLi>
-            <HeroTabFeatureLi>
-              <HeroTabFeatureBullet>
-                <IconCircle2 stroke={1.5} />
-              </HeroTabFeatureBullet>
-              Automatic scaling to meet your demands
-            </HeroTabFeatureLi>
-            <HeroTabFeatureLi>
-              <HeroTabFeatureBullet>
-                <IconCircle3 stroke={1.5} />
-              </HeroTabFeatureBullet>
-              No server management required
-            </HeroTabFeatureLi>
-          </HeroTabFeatureUl>
-        </HeroTabFeatureCont>
-
-        <HeroTabFeatureCont>
-          <HeroTabFeatureTitle>
-            Global <br /> Low Latency
-          </HeroTabFeatureTitle>
-          <HeroTabFeatureUl>
-            <HeroTabFeatureLi>
-              <HeroTabFeatureBullet>
-                <IconCircle1 stroke={1.5} />
-              </HeroTabFeatureBullet>
-              Lightning-fast response times worldwide
-            </HeroTabFeatureLi>
-            <HeroTabFeatureLi>
-              <HeroTabFeatureBullet>
-                <IconCircle2 stroke={1.5} />
-              </HeroTabFeatureBullet>
-              Multi-region replication options
-            </HeroTabFeatureLi>
-            <HeroTabFeatureLi>
-              <HeroTabFeatureBullet>
-                <IconCircle3 stroke={1.5} />
-              </HeroTabFeatureBullet>
-              Optimize for your users, wherever they are
-            </HeroTabFeatureLi>
-          </HeroTabFeatureUl>
-        </HeroTabFeatureCont>
-
-        <HeroTabFeatureCont>
-          <HeroTabFeatureTitle>
-            Durable, <br /> Persistent Storage
-          </HeroTabFeatureTitle>
-          <HeroTabFeatureUl>
-            <HeroTabFeatureLi>
-              <HeroTabFeatureBullet>
-                <IconCircle1 stroke={1.5} />
-              </HeroTabFeatureBullet>
-              In-memory speed with disk-like persistence
-            </HeroTabFeatureLi>
-            <HeroTabFeatureLi>
-              <HeroTabFeatureBullet>
-                <IconCircle2 stroke={1.5} />
-              </HeroTabFeatureBullet>
-              Data safety without sacrificing performance
-            </HeroTabFeatureLi>
-            <HeroTabFeatureLi>
-              <HeroTabFeatureBullet>
-                <IconCircle3 stroke={1.5} />
-              </HeroTabFeatureBullet>
-              Automatic backups
-            </HeroTabFeatureLi>
-          </HeroTabFeatureUl>
-        </HeroTabFeatureCont>
-      </div>
-
       <CodeRedis />
+
+      <HeroTabFeatureCont>
+        <HeroTabFeatureTitle>
+          Highly Available, <br /> Infinitely Scalable
+        </HeroTabFeatureTitle>
+        <HeroTabFeatureUl>
+          <HeroTabFeatureLi>
+            <HeroTabFeatureBullet>
+              <IconCircle1 stroke={1.5} />
+            </HeroTabFeatureBullet>
+            99.99% uptime guarantee
+          </HeroTabFeatureLi>
+          <HeroTabFeatureLi>
+            <HeroTabFeatureBullet>
+              <IconCircle2 stroke={1.5} />
+            </HeroTabFeatureBullet>
+            Automatic scaling to meet your demands
+          </HeroTabFeatureLi>
+          <HeroTabFeatureLi>
+            <HeroTabFeatureBullet>
+              <IconCircle3 stroke={1.5} />
+            </HeroTabFeatureBullet>
+            No server management required
+          </HeroTabFeatureLi>
+        </HeroTabFeatureUl>
+      </HeroTabFeatureCont>
+
+      <HeroTabFeatureCont>
+        <HeroTabFeatureTitle>
+          Global <br /> Low Latency
+        </HeroTabFeatureTitle>
+        <HeroTabFeatureUl>
+          <HeroTabFeatureLi>
+            <HeroTabFeatureBullet>
+              <IconCircle1 stroke={1.5} />
+            </HeroTabFeatureBullet>
+            Lightning-fast response times worldwide
+          </HeroTabFeatureLi>
+          <HeroTabFeatureLi>
+            <HeroTabFeatureBullet>
+              <IconCircle2 stroke={1.5} />
+            </HeroTabFeatureBullet>
+            Multi-region replication options
+          </HeroTabFeatureLi>
+          <HeroTabFeatureLi>
+            <HeroTabFeatureBullet>
+              <IconCircle3 stroke={1.5} />
+            </HeroTabFeatureBullet>
+            Optimize for your users, wherever they are
+          </HeroTabFeatureLi>
+        </HeroTabFeatureUl>
+      </HeroTabFeatureCont>
+
+      <HeroTabFeatureCont>
+        <HeroTabFeatureTitle>
+          Durable, <br /> Persistent Storage
+        </HeroTabFeatureTitle>
+        <HeroTabFeatureUl>
+          <HeroTabFeatureLi>
+            <HeroTabFeatureBullet>
+              <IconCircle1 stroke={1.5} />
+            </HeroTabFeatureBullet>
+            In-memory speed with disk-like persistence
+          </HeroTabFeatureLi>
+          <HeroTabFeatureLi>
+            <HeroTabFeatureBullet>
+              <IconCircle2 stroke={1.5} />
+            </HeroTabFeatureBullet>
+            Data safety without sacrificing performance
+          </HeroTabFeatureLi>
+          <HeroTabFeatureLi>
+            <HeroTabFeatureBullet>
+              <IconCircle3 stroke={1.5} />
+            </HeroTabFeatureBullet>
+            Automatic backups
+          </HeroTabFeatureLi>
+        </HeroTabFeatureUl>
+      </HeroTabFeatureCont>
     </>
   );
 }

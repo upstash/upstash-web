@@ -1,5 +1,6 @@
 import "@upstash/claps/style.css";
-import "./globals.css";
+import "../styles/globals.css";
+import "../styles/prism.css";
 import Analytics from "@/components/Analytics";
 import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 import Footer from "@/components/master/footer";
@@ -37,7 +38,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <body
           className={cx(
             "min-h-screen pt-[70px] antialiased md:pt-[80px]",
-            "text-text text-sm md:text-base",
+            "text-sm text-text md:text-base",
             "bg-bg",
           )}
         >

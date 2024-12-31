@@ -6,7 +6,7 @@ import React from "react";
 
 export default function HomeHero() {
   return (
-    <section className="relative z-10 py-16">
+    <section className="relative z-0 py-16">
       {/*bg*/}
       <div
         className={cx(
@@ -24,7 +24,7 @@ export default function HomeHero() {
             "tracking-tight transition",
             "font-display text-6xl font-bold leading-none md:text-[8rem]",
             "bg-gradient-to-r bg-clip-text text-transparent",
-            "from-emerald-950 via-emerald-600 to-amber-500",
+            "from-primary-text via-primary to-amber-500",
           )}
         >
           Serverless <br />
@@ -39,10 +39,7 @@ export default function HomeHero() {
         <div className="mt-6">
           <Button
             type="button"
-            className={cx(
-              "bg-primary-text !px-8 text-lg text-bg",
-              "bg-gradient-to-r from-primary-text to-primary",
-            )}
+            className={cx("bg-primary !px-8 text-lg text-bg")}
             href="https://console.upstash.com"
             icon={<IconArrowRight stroke={1.5} size={24} />}
           >
