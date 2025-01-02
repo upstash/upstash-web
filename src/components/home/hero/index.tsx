@@ -1,3 +1,4 @@
+import Bg from "@/components/bg";
 import Button from "@/components/button";
 import Container from "@/components/container";
 import cx from "@/utils/cx";
@@ -7,15 +8,7 @@ import React from "react";
 export default function HomeHero() {
   return (
     <section className="relative z-0 py-16">
-      {/*bg*/}
-      <div
-        className={cx(
-          "absolute left-1/2 top-1/2 -z-10 h-3/4 w-full max-w-screen-xl md:top-2/3",
-          "-translate-x-1/2 -translate-y-1/2",
-          "radius-full opacity-10 blur-[50px] md:blur-[100px]",
-          "bg-emerald-500",
-        )}
-      />
+      <Bg className="!top-1/2 -translate-y-1/2" />
 
       <Container>
         {/*hero title*/}

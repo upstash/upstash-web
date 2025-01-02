@@ -15,10 +15,8 @@ export default function HomeHeroPartner() {
       <Container>
         {/* title */}
         <SectionHeader>
-          <SectionHeaderTitle className="text-2xl md:text-4xl">
-            Meet our Customers
-          </SectionHeaderTitle>
-          <SectionHeaderSummary className="text-lg md:text-xl">
+          <SectionHeaderTitle>Meet our Customers</SectionHeaderTitle>
+          <SectionHeaderSummary>
             Upstash enables companies of all sizes to create at the moment of
             inspiration
           </SectionHeaderSummary>
@@ -35,11 +33,11 @@ export default function HomeHeroPartner() {
               className={cx(
                 "group flex flex-col overflow-hidden px-16 py-8",
                 "rounded-2xl bg-white md:rounded-4xl",
-                "hover:shadow-2xl",
+                "transition hover:shadow-2xl",
                 quote && "col-span-3 md:col-span-2",
               )}
             >
-              <span className="flex h-12 items-center justify-center group-hover:text-primary">
+              <span className="flex h-12 items-center justify-center text-text-mute transition group-hover:text-primary">
                 {icon}
               </span>
 

@@ -32,13 +32,13 @@ export default function PriceScaleToZero() {
         ].map(({ title, value }, index) => (
           <div
             key={title}
-            className="flex grow flex-col justify-center rounded-xl bg-black/20 px-4 py-2 md:h-20"
+            className="flex grow flex-col justify-center rounded-xl bg-bg px-4 py-2 md:h-20"
           >
             <span className="text-sm opacity-40">{title}</span>
             <span
               className={cx(
-                "text-xl text-amber-200 md:text-2xl",
-                index === 2 && "text-emerald-300",
+                "text-xl text-amber-500 md:text-2xl dark:text-amber-200",
+                index === 2 && "text-primary",
               )}
             >
               {value}

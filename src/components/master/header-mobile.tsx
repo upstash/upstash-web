@@ -32,7 +32,7 @@ export default function Header({ className, ...props }: IAppHeader) {
       className={cx(
         "fixed inset-x-0 top-0 z-50 py-4 md:hidden",
         "border-b border-b-white/5",
-        fix && "bg-bg",
+        fix && "bg-bg shadow",
         className,
       )}
       {...props}
