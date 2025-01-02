@@ -1,5 +1,4 @@
 import Button from "@/components/button";
-import Icon, { ICON_NAMES } from "@/components/icon";
 import cx from "@/utils/cx";
 import { Product } from "@/utils/type";
 import React, { Children, cloneElement, HTMLProps, ReactElement } from "react";
@@ -12,7 +11,7 @@ export function ServerlessBox({
     <div
       className={cx(
         "group/box-body relative z-0 grid gap-6 p-6 md:gap-8 md:p-8",
-        "bg-bg-mute",
+        "bg-white dark:bg-bg-mute",
         "rounded-3xl md:rounded-4xl",
         className,
       )}
@@ -57,7 +56,9 @@ export function ServerlessSummary({
   children,
   className,
 }: HTMLProps<HTMLParagraphElement>) {
-  return <p className={cx("mt-2 opacity-40 md:mt-3", className)}>{children}</p>;
+  return (
+    <p className={cx("mt-2 text-text-mute md:mt-3", className)}>{children}</p>
+  );
 }
 
 export function ProductFeature({
@@ -75,29 +76,4 @@ export function ProductFeature({
   });
 
   return <ul className={cx("space-y-2", className)}>{childs}</ul>;
-}
-
-export function ProductFeatureItem({
-  children,
-  className,
-  product,
-}: HTMLProps<HTMLLIElement> & {
-  product?: Product;
-}) {
-  return (
-    <li
-      className={cx(
-        "flex",
-        // product === Product.REDIS && "text-red-300",
-        // product === Product.QSTASH && "text-purple-300",
-        className,
-      )}
-    >
-      <Icon
-        icon={ICON_NAMES.CircleCheck}
-        className={cx("mr-2 text-2xl text-emerald-400")}
-      />
-      {children}
-    </li>
-  );
 }

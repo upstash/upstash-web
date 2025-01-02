@@ -3,7 +3,7 @@
 import cx from "@/utils/cx";
 import { Product } from "@/utils/type";
 import Prism from "prismjs";
-import { HTMLProps, ReactNode, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ServerlessBox, ServerlessSummary, ServerlessTitle } from "./comp";
 import "prismjs/components/prism-python";
 
@@ -35,8 +35,8 @@ export default function HttpRestApi() {
               <label
                 key={key}
                 className={cx(
-                  "cursor-pointer select-none bg-white bg-opacity-3 px-4 py-1 text-sm first:rounded-l-full last:rounded-r-full",
-                  value === product && "bg-opacity-10",
+                  "cursor-pointer select-none bg-bg px-4 py-1 text-sm first:rounded-l-full last:rounded-r-full",
+                  value === product && "bg-primary text-white",
                 )}
               >
                 <input
@@ -55,8 +55,8 @@ export default function HttpRestApi() {
         </div>
 
         {/* body */}
-        <div className="mt-4 grid rounded-xl bg-black/20 md:h-[276px]">
-          <div className="no-scrollbar overflow-y-scroll p-4 md:px-6">
+        <div className="mt-4 grid rounded-xl md:h-[276px]">
+          <div className="no-scrollbar overflow-y-scroll rounded-2xl bg-pre-bg p-4 md:px-6">
             <Pre hidden={product !== Product.REDIS}>
               <code className="lang-js">{CODE[Product.REDIS]}</code>
             </Pre>
@@ -73,19 +73,9 @@ export default function HttpRestApi() {
   );
 }
 
-function Pre({
-  children,
-  ...props
-}: HTMLProps<HTMLPreElement> & {
-  children: ReactNode;
-}) {
+export function Pre({ className, ...props }: React.ComponentProps<"pre">) {
   return (
-    <pre
-      className="no-scrollbar !m-0 !bg-transparent !p-0 !font-[inherit] !text-sm"
-      {...props}
-    >
-      {children}
-    </pre>
+    <pre className={cx("no-scrollbar !text-[.86em]", className)} {...props} />
   );
 }
 
