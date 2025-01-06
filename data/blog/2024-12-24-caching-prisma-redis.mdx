@@ -1,0 +1,185 @@
+---
+title: "Caching Prisma Queries with Upstash Redis"
+slug: caching-prisma-redis
+authors:
+  - noah
+tags: [redis, SQL, prisma, cache]
+---
+
+In my previous [blog post](https://upstash.com/blog/redis-in-sql-apps), we went through the benefits of caching, common caching techniques, how to cache SQL data by using Upstash Redis in different code samples.
+
+As we examined the details and benefits of caching SQL queries with Upstash Redis, now we can go further and see some actions. For this purpose, we can start with a commonly used ORM, Prisma, to start seeing how caching with Upstash Redis works for database queries.
+
+In this blog post, we’ll explore how to integrate Upstash Redis with Prisma to cache queries by using cache-aside technique, reduce database load, and boost application performance.
+
+## What is Prisma?
+
+Before setting up Prisma, let’s check out some terms and what Prisma does.
+
+Firstly, Prisma is an Object Relational Mapper (ORM) tool that provides an interface between the application and a database.
+
+ORM is a programming technique that allows developers to interact with a database using high-level, object-oriented code instead of writing raw SQL queries. Simply, it provides a bridge that connects relational databases and object-oriented programming languages.
+
+An ORM maps database tables to programmatic language classes or models. Each row in a table corresponds to an instance of a class. This is basically the data modelling that we do in our applications written in object-oriented languages. ORM makes this for us and it provides methods instead of writing SQL queries. The programmer can call the methods on objects or classes to perform CRUD operations.
+
+For example, querying a `users` table in raw SQL looks like this:
+
+```sql
+SELECT * FROM users WHERE id = 1;
+```
+
+Using an ORM, the same query might look like this:
+
+```javascript
+const user = await user.findUnique({ where: { id: 1 } });
+```
+
+So, an ORM does the work required to interact with the database and make the data drawn into the executed program usable in the code, providing great convenience to the developer.
+
+Prisma is the one of the most common and easy-to-use ORMs in the software applications.
+
+Here are a few indicators of why Prisma is a good ORM choice:
+
+- **Type-Safe Queries**: Prisma auto-generates a TypeScript client based on your database schema, ensuring you catch errors during development instead of at runtime.
+
+- **Simplified Data Modeling**: With the `schema.prisma` file, you can define your database structure using a declarative syntax, which Prisma translates into the necessary SQL or API calls. We will see an example of how to write a model in this file to generate table via Prisma.
+
+- **Multi-Database Support**: Prisma works with popular databases like PostgreSQL, MySQL, SQLite, MongoDB, and more. You can find out the databases in [Prisma docs](https://www.prisma.io/docs/orm/overview/databases).
+
+- **Migration Management**: Prisma provides an easy-to-use migration system for keeping your database schema in sync with your codebase.
+
+Prisma also provides CLI and Studio (a web-based database GUI) to make database management even easier.
+
+## Prisma Setup
+
+Now, let’s see how it is installed and how it works in an application.
+
+Since the main focus of this blog post is caching the Prisma queries, we can just use a very simple SQLite database in local to perform some Prisma operations to demonstrate Prisma working.
+
+We should install the `sqlite3` first to ensure that our app can connect to and interact with the SQLite database. As I mentioned, SQLite setup is just for demonstrating how Prisma works with a database. If you have any other preferences, then you can find the integration of your database type with Prisma in the [Prisma docs](https://www.prisma.io/docs/orm/overview/databases).
+
+Go to the project directory in terminal and install SQLite here.
+
+```
+npm install sqlite3
+```
+
+Now we should install Prisma CLI to be able to utilize the Prisma ORM.
+
+```
+npm install prisma --save-dev
+```
+
+Then initialize Prisma. This initialization will create a `prisma` directory with a `schema.prisma` file. The `schema.prisma` file is where you define your database structure (models, fields, etc.)
+
+```
+npx prisma init
+```
+
+Now, we will define the Prisma schema. Let’s open `prisma/schema.prisma` file in an editor.
+
+This file consists of three blocks. The first block is the generator which configures Prisma to generate the client used in your Node.js application. The second is the datasource block. In this block, we will give the required information about our database to make Prisma connect. The last block contains the database models that we can define the tables in our database and their fields, including data types and constraints.
+
+Let’s see an example below.
+
+```
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "sqlite"
+  url  = env("DATABASE_URL")
+}
+model user {
+  id  Int  @id @default(autoincrement())
+  name  String
+  email String @unique
+  age  Int?
+}
+```
+
+As we can see, we give the database url, by indicating its type. By the way, do not forget to set a DATABASE_URL environment variable in your project. For connecting other database types, you can check the [Prisma docs](https://www.prisma.io/docs/orm/overview/databases). In our sample case, we can just set it to `file:./dev.db`.
+
+In addition to that, we define the `user` table by defining its columns with their types and contraints. You can create more sophisticated models with different database types according to what you need. But for this demo, we can go with this basic setup.
+
+To sync our schema with the database by creating the necessary tables, we should run the migration command. The `–name` flag gives the name to this migration, making it easier to track schema changes.
+
+```
+npx prisma migrate dev --name init
+```
+
+Our SQLite database with Prisma ORM is ready now.
+
+## Upstash Redis Setup
+
+This is the quickest section to complete. We’ve done this step thousand times. However, we will go through the steps quickly here as well to make this blog post a complete guide from the beginning. Anyone has done any of these steps, they can just jump to the steps that they need.
+
+We will create a Redis database through [Upstash console](https://console.upstash.com/redis).
+
+Let’s create a Redis database by clicking the “Create database” button and complete the steps in the modal popped up.
+
+Do not forget to select the read replicas of the Upstash Redis database when selecting the region of the database. You can find out the benefits of the global Redis in my previous [blog post](https://upstash.com/blog/redis-in-sql-apps).
+
+![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXcaaFU4czcKmj4Rsc7I1vKzrqlEb8UhvEiljm6BUOQ2AsZ5dpRP54yThbZoq4cK7WGYKld0gP26ONr6QfW6TRf_Rbf0rMepk6PCuakPJFg2DsZ9ioYd2D-3dgA0ubWLuYtcZgnb4A?key=WRhUVurcYt3ejFrs7pnK5ZzR)
+
+The Redis database is ready. The only remaining thing in our Upstash Redis setup is the initialization of the Redis client in our application. For this, we will need to install the Upstash Redis SDK first.
+
+```
+npm install @upstash/redis
+```
+
+Then we should our Redis endpoint and password from the Upstash Console. Then, configure the Redis client in the code that we are going to connect to the Upstash Redis.
+
+## Caching Prisma Queries with Upstash Redis
+
+As I mentioned earlier in this blog, we will use the cache-aside strategy. To do that, we will first check the cache if the requested data by the given query exist or not. If exist, then we will fetch it from Upstash Redis and return it. Otherwise, we will query the SQL database by using Prisma client generated in the section above and populate the cache with the data retrieved from the SQL database.
+
+```javascript
+import { Redis } from '@upstash/redis';
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
+const redis = new Redis({
+  url: '<UPSTASH-REDIS-ENDPOINT>',
+  token: '<UPSTASH-REDIS-TOKEN>',
+})
+
+async function getUser(userId: string) {
+  const cacheKey = `user:${userId}`;
+  
+  // Check cache
+  const cachedUser = await redis.get(cacheKey);
+  if (cachedUser) {
+    console.log("Cache hit");
+    return JSON.parse(cachedUser);
+  }
+  
+  // Query database
+  console.log("Cache miss");
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+  // Store in cache
+  if (user) {
+    await redis.set(cacheKey, JSON.stringify(user), { ex: 3600 }); // Cache for 1 hour
+  }
+  return user;
+}
+```
+
+As it can be seen in this example, `prisma.<tableName>.findUnique()` method with the parameter that defines the conditions of the query enables the developers to query the SQL database in a code format.
+
+Just as an example, we could retrieve the all users in the user table by using the `findMany()` function as below:
+
+```javascript
+const user = await prisma.user.findMany();
+```
+
+## Conclusion
+
+In this blog post, we went through how to integrate Prisma with Upstash Redis for caching the Prisma queries.
+
+Both Prisma and Upstash Redis are pretty straightforward and easy to use. In addition to their developer-friendly architecture, they are quite impactful. Prisma can save tons of development time thanks to its mapping feature that enables the database management in the coding format. Caching Prisma queries with Upstash Redis can also reduce the latency of the data retrieval significantly and reduce the load on the main SQL database of the application.
+
+I hope this blog helps you all!
