@@ -60,19 +60,19 @@ We should install the `sqlite3` first to ensure that our app can connect to and 
 
 Go to the project directory in terminal and install SQLite here.
 
-```
+```shell
 npm install sqlite3
 ```
 
 Now we should install Prisma CLI to be able to utilize the Prisma ORM.
 
-```
+```shell
 npm install prisma --save-dev
 ```
 
 Then initialize Prisma. This initialization will create a `prisma` directory with a `schema.prisma` file. The `schema.prisma` file is where you define your database structure (models, fields, etc.)
 
-```
+```shell
 npx prisma init
 ```
 
@@ -82,7 +82,7 @@ This file consists of three blocks. The first block is the generator which confi
 
 Let’s see an example below.
 
-```
+```javascript
 generator client {
   provider = "prisma-client-js"
 }
@@ -124,7 +124,7 @@ Do not forget to select the read replicas of the Upstash Redis database when sel
 
 The Redis database is ready. The only remaining thing in our Upstash Redis setup is the initialization of the Redis client in our application. For this, we will need to install the Upstash Redis SDK first.
 
-```
+```shell
 npm install @upstash/redis
 ```
 
