@@ -11,7 +11,7 @@ Upstash Vector now supports sparse and hybrid indexes!
 
 Up until now, Upstash Vector supported dense indexes for semantic similarity
 searches. While dense indexes are a powerful and well-established approach,
-they're not always the most effective solution for every type of data and search query.
+they're not always the most effective solution for every type of data and query.
 
 Before exploring the new types of indexes, let's recap what dense indexes
 are and where they are useful. Imagine each piece of data you store — whether
@@ -28,17 +28,17 @@ related to [semiconductors](https://en.wikipedia.org/wiki/Semiconductor),
 the dense vector value would still reserves space for the
 "geographical relevance" dimension and assign it a value, possibly close
 to zero. This type of indexes are excellent at capturing overall similarity
-and semantic relantionships.
+and semantic relationships.
 
 ![dense-vector](/blog/sparse-and-hybrid-indexes/dense-vector.png)
 
-However, semantic search over dense indexes can strugle for out-of-domain queries
+However, semantic search over dense indexes can struggle for out-of-domain queries
 that the embedding model is trained on, or fail to provide best results for queries
 containing rare words or features, such as industry-specific jargon.
 
 Sparse indexes take a different approach, focusing on efficiency and specificity.
 Instead of storing a value for every dimension, they only store the non-zero or,
-more generally, the significant values out of the much higher dimensionional space.
+more generally, the significant values out of the much higher dimensional space.
 This is particularly useful when dealing with data that has a large number of
 potential features, but only a small subset of those features are active or relevant
 for any given data item. It's conceptually similar to a keyword search, but
@@ -64,7 +64,7 @@ have different numbers of features or attributes, so you can avoid padding vecto
 zeros to a fixed length.
 
 However, exact keyword or feature search over sparse indexes can fail to capture
-contextual information or even strugle with queries containing synonym keywords.
+contextual information or even struggle with queries containing synonym keywords.
 
 Now, let's consider the common scenario where your data exhibits both dense and sparse
 characteristics. For example, you might have text documents where you want to capture
