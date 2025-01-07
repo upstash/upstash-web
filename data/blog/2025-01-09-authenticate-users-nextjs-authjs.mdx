@@ -29,11 +29,11 @@ You will need the following:
 
 In your Upstash dashboard, go to **Redis** tab and create a database.
 
-![Create An Upstash Redis Instance](/blog/scheduled-transcriber/redis-create.png)
+![Create An Upstash Redis Instance](/blog/authenticate-users/redis-create.png)
 
 Scroll down until you find the REST API section, and select the `.env` button. Copy the content and save it somewhere safe.
 
-![Upstash Redis Environment Variables](/blog/scheduled-transcriber/redis-env.png)
+![Upstash Redis Environment Variables](/blog/authenticate-users/redis-env.png)
 
 ## Create a new Next.js application
 
@@ -63,7 +63,8 @@ npm run dev
 The app should be running on [localhost:3000](http://localhost:3000). Stop the development server to install the necessary dependencies with the following commands:
 
 ```bash
-npm install @upstash/redis @auth/core @auth/upstash-redis-adapter nanoid next-auth
+npm install @upstash/redis nanoid
+npm install next-auth @auth/core @auth/upstash-redis-adapter
 ```
 
 The libraries installed include:
@@ -139,7 +140,7 @@ export async function GET(request: Request) {
 }
 ```
 
-TODO
+In the code above, an Edge-compatible API route for refreshing a user's session is being created. It fetches the user session and related data from Redis, verifies the user's email, and updates the session cookie. If the user data is invalid or missing, the session cookie is cleared; otherwise, a new signed token is generated and stored in the cookie.
 
 ```tsx
 // File: app/api/user/route.ts
@@ -175,7 +176,7 @@ export async function POST(request: Request) {
 }
 ```
 
-TODO
+In the code above, an Edge-compatible API route for updating user data is being created. It authenticates the user, fetches their data from Redis using their email, and updates their information (e.g., name or image) based on the request body. If the user is not found or an error occurs, appropriate status codes and responses are returned.
 
 ```tsx
 // File: lib/auth.ts
@@ -290,7 +291,16 @@ export interface UserType {
 }
 ```
 
-TODO
+The `UserType` interface defines the structure of a user object in the application. It includes: 
+
+- `id` (optional): A unique identifier for the user.
+- `email` (required): The user's email address.
+- `name` (optional): The user's name.
+- `image` (optional): A URL or path to the user's profile image.
+- `password` (optional): The user's hashed password.
+- `emailVerified` (optional): A timestamp or string indicating if/when the user's email was verified. 
+
+This interface serves as a type definition for user data throughout the application.
 
 ```tsx
 // File: lib/credentials.ts
@@ -326,7 +336,12 @@ export async function comparePassword(password: string, hash: string) {
 }
 ```
 
-TODO
+In the code above, Edge-compatiable utility functions for generating and managing secure tokens and hashed passwords are defined:
+
+- `generateRandomToken`: Creates a cryptographically secure random token by generating a 20-byte random array and converting it into a hexadecimal string.
+- `generateRandomString`: Accepts an input string, encodes it to bytes, hashes it using SHA-256, and returns the hash as a hexadecimal string. Useful for generating consistent, unique strings derived from input values.
+- `hashPassword`: Hashes a plaintext password using SHA-256 and converts the resulting hash to a hexadecimal string. This is used for securely storing passwords.
+- `comparePassword`: Compares a plaintext password to a hashed password by hashing the input and checking if it matches the stored hash.
 
 ```tsx
 // File: middleware.ts
