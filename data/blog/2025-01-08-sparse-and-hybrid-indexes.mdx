@@ -74,9 +74,6 @@ power of hybrid indexes comes into play.
 Hybrid indexes cleverly combine dense and sparse indexing techniques, allowing you to
 leverage the strengths of both approaches within a single system.
 
-This expansion of our indexing capabilities gives you more fine-grained control and opens
-doors to new applications.
-
 Before moving on to the next section, where we explore how to use these new index types,
 let us also mention that both sparse and hybrid indexes support all the features available
 to dense indexes, like [namespaces](https://upstash.com/docs/vector/features/namespaces),
@@ -208,6 +205,13 @@ results = index.query(
 See [Hybrid Indexes](https://upstash.com/docs/vector/features/hybridindexes) documentation
 for the more information regarding customizing queries, and using different fusion algorithms to
 rerank dense and sparse search results.
+
+## Indexing Wikipedia, Again
+
+We have also updated the [Wikipedia Semantic Search](https://wikipedia-semantic-search.vercel.app)
+demo by indexing Wikipedia articles again, this time with hybrid indexes, using different
+dense and sparse embedding models. You can perform dense, sparse, or hybrid
+search queries over it and compare the results yourself.
 
 ## Closing Words
 
