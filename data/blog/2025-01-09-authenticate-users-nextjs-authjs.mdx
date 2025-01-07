@@ -193,7 +193,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth(() => ({
 }))
 ```
 
-TODO
+## Instantiate the Upstash Redis Client
+
+Create a file named `redis.ts` in the `lib` directory with the following code:
 
 ```tsx
 // File: lib/redis.ts
@@ -206,7 +208,7 @@ export default new Redis({
 })
 ```
 
-TODO
+In the code above, an instance of Edge-compatible Redis client is exported to be used throughout the application.
 
 ```tsx
 // File: lib/providers.ts
@@ -353,7 +355,7 @@ export const config = {
 }
 ```
 
-TODO
+In the code above, the middleware is created by re-exporting the `auth` function from the `@/lib/auth` module. The middleware applies authentication to all routes except API routes, static files, image assets, and the favicon, as specified by the `matcher` configuration. This ensures non-excluded routes are protected by the authentication logic set with Auth.js.
 
 ```tsx
 // File: app/NextAuthProvider.tsx
@@ -371,7 +373,7 @@ export default function ({ children }: Props) {
 }
 ```
 
-TODO
+In the code above, a client-side React component is created to wrap the application with NextAuth's `SessionProvider`. The component accepts `children` as props and ensures that the wrapped components have access to the user session context provided by NextAuth. This setup is essential for managing authentication state across the application in Next.js.
 
 ```tsx
 // File: app/csrf.tsx
@@ -390,7 +392,7 @@ export function CSRFInput() {
 }
 ```
 
-TODO
+In the code above, a client-side React component is exported that fetches a CSRF token using NextAuth's `getCsrfToken` function and stores it in a state variable. The component renders a hidden input field containing the CSRF token, allowing secure form submissions by including the token as a hidden value. This is useful for protecting against cross-site request forgery attacks.
 
 ```tsx
 // File: app/provider.tsx
@@ -405,8 +407,6 @@ export default function ({ provider, prefix }: { prefix: string; provider: { nam
   return (
     <Button onClick={() => signIn(provider.id)} key={provider.name} variant="outline" className="flex w-full gap-x-3">
       {provider.id === 'google' && <Icon fontSize={18} icon="flat-color-icons:google" />}
-      {provider.id === 'github' && <Icon fontSize={18} icon="mage:github" />}
-      {provider.id === 'facebook' && <Icon fontSize={18} icon="logos:facebook" />}
       <span className="text-black">
         {prefix} with {provider.name}
       </span>
@@ -415,7 +415,7 @@ export default function ({ provider, prefix }: { prefix: string; provider: { nam
 }
 ```
 
-TODO
+In the code above, a React component for rendering a customizable sign-in button for different authentication providers is exported. It accepts `provider` (containing `name` and `id`) and `prefix` as props. The button triggers the `signIn` function for the specified provider and dynamically displays an icon and label based on the provider's `id`.
 
 ```tsx
 // File: app/page.tsx
@@ -435,7 +435,7 @@ export default function () {
 }
 ```
 
-TODO
+In the code above, a client-side React component that displays the user's session data and provides a "Sign Out" button is exported. It uses NextAuth's `useSession` hook to retrieve the session data and status, displaying them as a JSON string. The `signOut` function is called when the button is clicked, allowing the user to log out.
 
 ```tsx
 // File: app/signin/page.tsx
@@ -592,7 +592,7 @@ export default function ({
 }
 ```
 
-TODO
+In the code above, the Next.js layout is wrapping the entire page in global styles and authentication context. It imports `globals.css` for global styling and `NextAuthProvider` to manage authentication state. The `children` prop represents the nested page content, which is wrapped in a styled container with responsive padding and a maximum width, providing a consistent layout for all pages. 
 
 ## Deploy to Vercel
 
@@ -610,7 +610,7 @@ The repository is now ready to deploy to Vercel. Use the following steps to depl
 
 For more detailed insights, explore the references cited in this blog.
 
-- [GitHub Repository](https://github.com/rishi-raj-jain/scheduled-i18n-nextjs-app)
+- [GitHub Repository](https://github.com/rishi-raj-jain/google-credentials-authjs-upstash)
 
 ## Conclusion
 
