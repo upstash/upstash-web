@@ -82,99 +82,13 @@ The `.env` file should have the following:
 ```bash
 # .env
 
-# Auth.js Environment Variables
+# Auth.js Environment Variable
 AUTH_SECRET="..."
 
 # Upstash Redis Environment Variables
 UPSTASH_REDIS_REST_URL="https://...upstash.io"
 UPSTASH_REDIS_REST_TOKEN="..."
 ```
-
-TODO
-
-```tsx
-// File: app/api/auth/[...nextauth]/route.ts
-
-export const runtime = 'edge'
-
-import { handlers } from '@/lib/auth'
-
-export const { GET, POST } = handlers
-```
-
-TODO
-
-```tsx
-// File: app/api/refresh/route.ts
-
-export const runtime = 'edge'
-
-export const dynamic = 'force-dynamic'
-
-export const fetchCache = 'force-no-store'
-
-import { auth } from '@/lib/auth'
-import redis from '@/lib/redis'
-import { UserType } from '@/lib/types'
-import { encode } from '@auth/core/jwt'
-import { cookies } from 'next/headers'
-import { NextResponse } from 'next/server'
-
-export async function GET(request: Request) {
-  const useSecureCookie = request.url.startsWith('https:')
-  const salt = useSecureCookie ? '__Secure-authjs.session-token' : 'authjs.session-token'
-  if (!process.env.AUTH_SECRET) return new NextResponse(null, { status: 500 })
-  const [session, cookieStore] = await Promise.all([auth(), cookies()])
-  if (!session?.user?.email) return new NextResponse(null, { status: 400 })
-  const userByEmail = await redis.get(`user:email:${session.user.email}`)
-  const userData = await redis.get<UserType>(`user:${userByEmail}`)
-  if (!userData?.email) cookieStore.set(salt, toString(), { secure: useSecureCookie, path: '/', httpOnly: true, sameSite: 'lax', maxAge: 0 })
-  else {
-    const { image, password, ...rest } = userData
-    const saltVal = await encode({ salt, secret: process.env.AUTH_SECRET, token: { ...rest, picture: image } })
-    cookieStore.set(salt, saltVal, { secure: useSecureCookie, path: '/', httpOnly: true, sameSite: 'lax' })
-  }
-  return new NextResponse()
-}
-```
-
-In the code above, an Edge-compatible API route for refreshing a user's session is being created. It fetches the user session and related data from Redis, verifies the user's email, and updates the session cookie. If the user data is invalid or missing, the session cookie is cleared; otherwise, a new signed token is generated and stored in the cookie.
-
-```tsx
-// File: app/api/user/route.ts
-
-export const runtime = 'edge'
-
-export const dynamic = 'force-dynamic'
-
-export const fetchCache = 'force-no-store'
-
-import { auth } from '@/lib/auth'
-import redis from '@/lib/redis'
-import { UserType } from '@/lib/types'
-import { NextResponse } from 'next/server'
-
-export async function POST(request: Request) {
-  try {
-    const session = await auth()
-    if (!session?.user?.email) return new NextResponse(null, { status: 400 })
-    const body = await request.json()
-    const userByEmail = await redis.get(`user:email:${session.user.email}`)
-    const userData = await redis.get<UserType>(`user:${userByEmail}`)
-    if (!userData) return new NextResponse(null, { status: 404 })
-    if (body.name) userData.name = body.name
-    if (body.image) userData.image = body.image
-    await redis.set(`user:${userByEmail}`, userData)
-    return new NextResponse()
-  } catch (e: any) {
-    const message = e.message || e.toString()
-    console.log(message)
-    return new NextResponse(message, { status: 500 })
-  }
-}
-```
-
-In the code above, an Edge-compatible API route for updating user data is being created. It authenticates the user, fetches their data from Redis using their email, and updates their information (e.g., name or image) based on the request body. If the user is not found or an error occurs, appropriate status codes and responses are returned.
 
 ## Instantiate the Upstash Redis Client
 
@@ -192,6 +106,8 @@ export default new Redis({
 ```
 
 In the code above, an Edge-compatible Redis client instance is exported to be used throughout the application.
+
+## Helpers
 
 ```tsx
 // File: lib/providers.ts
@@ -343,6 +259,92 @@ export const { handlers, signIn, signOut, auth } = NextAuth(() => ({
 
 In the code above, authentication is being set up via creating the the `handlers`, `signIn`, `signOut`, and `auth` functions using a custom configuration. It uses a JWT-based session strategy, the `UpstashRedisAdapter` to connect to a Upstash Redis database for storing user data, and an array of authentication providers defined in the `providers` module. This setup enables seamless integration of authentication and session management with Upstash Redis as the backend.
 
+## API Routes
+
+```tsx
+// File: app/api/auth/[...nextauth]/route.ts
+
+export const runtime = 'edge'
+
+import { handlers } from '@/lib/auth'
+
+export const { GET, POST } = handlers
+```
+
+TODO
+
+```tsx
+// File: app/api/refresh/route.ts
+
+export const runtime = 'edge'
+
+export const dynamic = 'force-dynamic'
+
+export const fetchCache = 'force-no-store'
+
+import { auth } from '@/lib/auth'
+import redis from '@/lib/redis'
+import { UserType } from '@/lib/types'
+import { encode } from '@auth/core/jwt'
+import { cookies } from 'next/headers'
+import { NextResponse } from 'next/server'
+
+export async function GET(request: Request) {
+  const useSecureCookie = request.url.startsWith('https:')
+  const salt = useSecureCookie ? '__Secure-authjs.session-token' : 'authjs.session-token'
+  if (!process.env.AUTH_SECRET) return new NextResponse(null, { status: 500 })
+  const [session, cookieStore] = await Promise.all([auth(), cookies()])
+  if (!session?.user?.email) return new NextResponse(null, { status: 400 })
+  const userByEmail = await redis.get(`user:email:${session.user.email}`)
+  const userData = await redis.get<UserType>(`user:${userByEmail}`)
+  if (!userData?.email) cookieStore.set(salt, toString(), { secure: useSecureCookie, path: '/', httpOnly: true, sameSite: 'lax', maxAge: 0 })
+  else {
+    const { image, password, ...rest } = userData
+    const saltVal = await encode({ salt, secret: process.env.AUTH_SECRET, token: { ...rest, picture: image } })
+    cookieStore.set(salt, saltVal, { secure: useSecureCookie, path: '/', httpOnly: true, sameSite: 'lax' })
+  }
+  return new NextResponse()
+}
+```
+
+In the code above, an Edge-compatible API route for refreshing a user's session is being created. It fetches the user session and related data from Redis, verifies the user's email, and updates the session cookie. If the user data is invalid or missing, the session cookie is cleared; otherwise, a new signed token is generated and stored in the cookie.
+
+```tsx
+// File: app/api/user/route.ts
+
+export const runtime = 'edge'
+
+export const dynamic = 'force-dynamic'
+
+export const fetchCache = 'force-no-store'
+
+import { auth } from '@/lib/auth'
+import redis from '@/lib/redis'
+import { UserType } from '@/lib/types'
+import { NextResponse } from 'next/server'
+
+export async function POST(request: Request) {
+  try {
+    const session = await auth()
+    if (!session?.user?.email) return new NextResponse(null, { status: 400 })
+    const body = await request.json()
+    const userByEmail = await redis.get(`user:email:${session.user.email}`)
+    const userData = await redis.get<UserType>(`user:${userByEmail}`)
+    if (!userData) return new NextResponse(null, { status: 404 })
+    if (body.name) userData.name = body.name
+    if (body.image) userData.image = body.image
+    await redis.set(`user:${userByEmail}`, userData)
+    return new NextResponse()
+  } catch (e: any) {
+    const message = e.message || e.toString()
+    console.log(message)
+    return new NextResponse(message, { status: 500 })
+  }
+}
+```
+
+In the code above, an Edge-compatible API route for updating user data is being created. It authenticates the user, fetches their data from Redis using their email, and updates their information (e.g., name or image) based on the request body. If the user is not found or an error occurs, appropriate status codes and responses are returned.
+
 ```tsx
 // File: middleware.ts
 
@@ -354,6 +356,8 @@ export const config = {
 ```
 
 In the code above, the middleware is created by re-exporting the `auth` function from the `@/lib/auth` module. The middleware applies authentication to all routes except API routes, static files, image assets, and the favicon, as specified by the `matcher` configuration. This ensures non-excluded routes are protected by the authentication logic set with Auth.js.
+
+## UI
 
 ```tsx
 // File: app/NextAuthProvider.tsx
