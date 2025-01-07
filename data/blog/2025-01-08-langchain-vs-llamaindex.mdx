@@ -1,0 +1,180 @@
+---
+title: "LangChain vs LlamaIndex"
+slug: langchain-vs-llamaindex
+authors:
+  - "mehmet-emin"
+tags: [llm, langchain, llamaindex]
+---
+
+Large language models are everywhere! From the famous ChatGPT to the popular chatbot "Grok" of X (formerly named Twitter), they are getting more and more involved in our lives for each passing day. However these models are not limited to those chatting interfaces. In fact, you can design your own applications powered by LLMs using frameworks such as LangChain or LlamaIndex.
+
+In this blog, we will explore the features of these two frameworks and review their pros and cons. Before we move on, here is a preview of the comparison:
+
+## LangChain vs. LlamaIndex
+
+
+| Feature               | LangChain                                | LlamaIndex                             |
+|-----------------------|------------------------------------------|----------------------------------------|
+| **Focus**            | Workflow and tool integration            | Document indexing and querying         |
+| **Use Cases**        | Multi-step workflows, dynamic agents     | Large-scale data retrieval             |
+| **Memory Support**   | Built-in for conversational context      | Limited, context tied to queries       |
+| **Tool Integration** | Dynamic tool usage (e.g., calculators)   | Primarily for querying data            |
+| **Customization**    | Highly customizable chains and agents    | Strong in custom indices and queries   |
+| **Versatility**    | Highly versatile    | Specialized for certain tasks   |
+
+
+
+## What are they doing in general? 
+
+LangChain and LlamaIndex are two frameworks that aim to help developers using and fine-tuning already existing LLMs. Although they offer a variety of tools, LangChain and LlamaIndex commonly provide functionalities based on vector embeddings, which are the numeric represantations of different types of data including audio, image or documents. By making calculations on these embeddings, they create relationships between elements and enhance the power of LLMs. Upstash also has a service related to these embeddings: [Upstash Vector](https://upstash.com/docs/vector/overall/getstarted)
+
+LlamaIndex's primary focus is on data, more specifically searching, indexing and integrating it. For instance, you can enlarge the knowledge database of an LLM by incorporating external resources, using LangChain and its RAG functionalities. RAG stands for the Retrieval-Augmented Generation, which is a technique that combines LLMs and knowledge bases without needing to re-train the model. You will often encounter the term RAG while dealing with LLMs.  
+
+On the other hand, LangChain should be considered as a more general framework, providing set of tools to build many NLP applications. It helps you interact with LLMs more easily and combine them with its features such as chains, agents and prompts. We will discover those components later in this article. 
+
+
+![Figure 1: General Overview](/blog/langchain-vs-llamaindex/llama-vs-lang.png)
+
+Figure 1: General Overview
+
+
+## Main Features
+
+As the name suggests, LlamaIndex is best known for its indexing mechanism. It forms the basis of converting an unstructured data such as a bunch of documents into a well-structured numerical form while conserving their semantic meaning. The most popular among many indexes is VectorStoreIndex. For this transformation task, LlamaIndex usually splits your files into parts called "Node"s by several chunking methods. Then, you can generate an embedding for this chunks using a pre-trained model such as Hugging Face Embedding. The last step of this small pipeline is storing and saving the results. Below is an example of how you can perform those operations by LlamaIndex Python package:
+
+
+```python
+from llama_index import SimpleDirectoryReader, Document, GPTVectorStoreIndex
+from sentence_transformers import SentenceTransformer
+
+# Load and chunk data
+documents = SimpleDirectoryReader("data").load_data()
+
+# Initialize Hugging Face embedding model
+hf_model = SentenceTransformer("all-MiniLM-L6-v2")
+
+# Custom embedding function
+def hf_embed(texts):
+    return hf_model.encode(texts)
+
+# Apply Hugging Face embeddings during indexing
+index = GPTVectorStoreIndex.from_documents(documents, embed_fn=hf_embed)
+
+# Save the index for later use
+index.storage_context.persist("index_folder")
+```
+
+LangChain is also able to process your data and integrate it through LLM models. It has its own data loader modules and its own text splitter similar to LlamaIndex. You can generate your embeddings from those and create vectors, too. However one should be aware that LlamaIndex is heavily focused on this functionality and therefore provides advanced mechanisms like hierarchical data structuring or seamless query integration.
+
+In addition to indexes, one of the most important components for LlamaIndex is query and more specifically, Query Engine. Queries in LlamaIndex are how users retrieve relevant information from an index. A query is processed by the index to find and return the most relevant data chunks or summaries. The backbone of how this is handled is query engines. They vary from key-based to tree-based ones but the key aspects are in common: They are customizable engines, which retrieve information from the indexes using several techniques to find meaningful similarities and use LLMs to generate a response regarding the initial investigation. With the help of LlamaIndex, you exceed the limits of commercial GPT's, by working with huge datasets but ensuring it is still relevant. Context preservation across queries is also a significant advantage of LlamaIndex queries over GPT's.
+
+While it is typically, again, more straightforward than LlamaIndex, LangChain also offers a similar mechanism, although it is not named query engines. Usually, retriever part of the pipeline does the job to find relevant information and the chain combines multiple steps until the final response. But just as in the indexes, LlamaIndex is more specialized on efficient querying. Its query engines are highly optimized for different use cases. 
+
+
+![Figure 2: A RAG Pipeline With LlamaIndex](/blog/langchain-vs-llamaindex/llamaindex-pipeline.png)
+
+Figure 2: A RAG Pipeline With LlamaIndex
+
+
+Let's get into prompts, one notion you might have come across a lot during the last couple of years. They are essentially the inputs you feed into LLMs. LangChain excels at setting an environment for custom prompts with many templates, allowing for dynamic constructs of inputs. Templates remove the burden of rewriting initials in each prompt you are willing to give. Here is a really basic example of template usage via LangChain Python package:
+
+```python
+from langchain.prompts import PromptTemplate
+
+# Define a custom prompt
+template = "You are a helpful assistant. Answer the following question concisely: {question}"
+prompt = PromptTemplate(
+    input_variables=["question"],  # Placeholder for dynamic input
+    template=template
+)
+
+# Use the custom prompt
+formatted_prompt = prompt.format(question="What is LangChain?")
+print(formatted_prompt)
+```
+
+There are lots of other things to do with prompts in LangChain. You can use conditional branches to switch between different templates or you can combine different prompts sequentially, which will bring us to notion of chains later. Moreover, you can include examples of inputs and outputs to improve your LLM further on spesific tasks.  
+
+You should know that a simple prompt template such as the one in the above can also be generated in LlamaIndex's core module. However, as you seek more customization and more flexible prompts, LangChain will increasingly meet your needs with ease.
+
+Beside prompts, another thing LangChain outperforms other frameworks is chains. Chains are what LangChain is named after, since it is the essence of pipelines you use in order to develop an LLM-Powered applications. It denotes the sequence of operations in which one’s output goes into another’s output. In this context, LangChain provides a robust set of tools to automate multi-step tasks. Each chain step is a modular standalone function or component. They are able to be combined in a dynamic fashion such that flow is changed based on conditions determined by intermediary results. 
+
+To maintain these functionalities and more, LangChain offers predefined chains that you can directly use and various tools that you can directly integrate to your workflow. Moreover, it has a memory management system that makes chains maintain their state between steps, meaning that it preserves the context in long term. Below is a simple instance of how you can use LangChain for creating chains:
+
+
+```python
+from langchain.chains import SequentialChain
+from langchain.prompts import PromptTemplate
+from langchain.llms import OpenAI
+from langchain.tools import tool
+
+# 1. Define a custom tool
+@tool
+def fetch_document_tool(query: str) -> str:
+    # Simulate fetching a document (replace with actual retrieval logic)
+    documents = {
+        "LangChain": "LangChain is a framework for building applications powered by LLMs.",
+        "LlamaIndex": "LlamaIndex specializes in indexing and querying external data efficiently."
+    }
+    return documents.get(query, "No document found.")
+
+# 2. Define the summarization LLM
+llm = OpenAI(model="text-davinci-003", temperature=0)
+
+# 3. Create prompt templates
+fetch_prompt = PromptTemplate(
+    input_variables=["query"],
+    template="Fetch information about {query}."
+)
+
+summarize_prompt = PromptTemplate(
+    input_variables=["document"],
+    template="Summarize the following text: {document}"
+)
+
+# 4. Define a chain
+chain = SequentialChain(
+    chains=[
+        # Fetch the document
+        llm.bind_prompt_template(fetch_prompt),
+        # Summarize the document
+        llm.bind_prompt_template(summarize_prompt)
+    ],
+    input_variables=["query"],
+    output_variables=["summary"]
+)
+
+# 5. Run the chain
+result = chain.run({"query": "LangChain"})
+print(result["summary"])
+```
+
+As you can probably guess so far, LlamaIndex has features similar to LangChain chains, too. In fact, it is called “Workflow” in LlamaIndex. Workflows are designed primarily for document-centric tasks, such as querying or synthesizing information from indexed data. They also support sequential steps but lack integration to APIs, databases. In contrast to LangChain, they do not have many pre-built tools or long term memory. 
+
+
+If you are designing an application with LLMs, there is a high probability that you demand more than just giving queries and getting written responses. You need actions. Agents get involved right there. Based on the user input and intermediary results, they decide which action to take at each step.  LangChain comes up with prebuilt agent types such as zero-shot-react and conversational-react-description. For instance, conversational-react-description adds memory for maintaining context across conversations, which is best used for multi-turn dialogues where context from previous interactions matters.
+
+
+![Figure 3: Structure of A LangChain App](/blog/langchain-vs-llamaindex/langchain-pipeline.jpg)
+
+Figure 3: Structure of a LangChain App
+
+
+
+LlamaIndex does not natively support dynamic agents like LangChain. However, you can simulate agent-like behavior through Workflows or custom logic built on top of query engines. LlamaIndex focuses on document-querying pipelines and lacks built-in dynamic agent capabilities.
+
+## When to Use Which One
+
+There are lots of other components and services of both frameworks we could not mention today. However, luckily you can explore LangChain in much more detail in this [blog post](https://upstash.com/blog/langchain-explained) 
+
+Still, as you can observe from the instances of main components that we cover above, the areas LangChain and LlamaIndex excel at differ a lot. Despite we often touched on that both frameworks give chance to  handle almost each task to some extent, it is more reasonable to decide which one to use according to the task you are dealing with. 
+
+LlamaIndex is best suited for tasks focused on data retrieval and searching. Its deep integration with indices and query engines makes it a more streamlined choice for RAG tasks with huge datasets. It offers a simple, user-friendly interface and therefore may be the best choice if you plan to go with a basic internal search or knowledge management. It is particularly effective when working with complex or unstructured documents that wait to be transformed and integrated into your project. 
+
+On the other hand, LangChain is ideal for tasks requiring complex workflows, dynamic tool usage, and multi-step reasoning. If your application involves chaining various tools, like APIs, calculators, or search engines, or needs to maintain conversational context across interactions, LangChain offers the flexibility and features to handle these scenarios efficiently. Its ability to dynamically decide which tool to use, makes it well-suited for general-purpose tasks beyond document querying. Additionally, LangChain's memory modules allow it to perform greatly in use cases that require retaining context over multiple interactions, such as chatbots or interactive assistants. In short, LangChain stands out for its versatility and adaptability in building robust applications with large language models.
+
+## Conclusion
+
+One should carefully consider all the needs of their new application before choosing the framework they will work on. Although these two frameworks contend in the LLM world, they are actually specialized on different parts. 
+
+
