@@ -69,11 +69,11 @@ npm install next-auth @auth/core @auth/upstash-redis-adapter
 
 The libraries installed include:
 
-- `@upstash/redis`: SDK to interact with Upstash Redis via HTTP requests.
-- `@auth/core`: Core package for handling authentication in Auth.js.
-- `@auth/upstash-redis-adapter`: Adapter for integrating Auth.js with Upstash Redis.
 - `nanoid`: A library for generating unique, secure IDs.
 - `next-auth`: Authentication solution built for Next.js.
+- `@auth/core`: Core package for handling authentication in Auth.js.
+- `@upstash/redis`: SDK to interact with Upstash Redis via HTTP requests.
+- `@auth/upstash-redis-adapter`: Adapter for integrating Auth.js with Upstash Redis.
 
 Now, create a `.env` file at the root of your project. You are going to use the `AUTH_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` values.
 
@@ -177,21 +177,6 @@ export async function POST(request: Request) {
 ```
 
 In the code above, an Edge-compatible API route for updating user data is being created. It authenticates the user, fetches their data from Redis using their email, and updates their information (e.g., name or image) based on the request body. If the user is not found or an error occurs, appropriate status codes and responses are returned.
-
-```tsx
-// File: lib/auth.ts
-
-import { UpstashRedisAdapter } from '@auth/upstash-redis-adapter'
-import NextAuth from 'next-auth'
-import providers from './providers'
-import redis from './redis'
-
-export const { handlers, signIn, signOut, auth } = NextAuth(() => ({
-  providers,
-  session: { strategy: 'jwt' },
-  adapter: UpstashRedisAdapter(redis),
-}))
-```
 
 ## Instantiate the Upstash Redis Client
 
@@ -344,6 +329,23 @@ In the code above, Edge-compatiable utility functions for generating and managin
 - `generateRandomString`: Accepts an input string, encodes it to bytes, hashes it using SHA-256, and returns the hash as a hexadecimal string. Useful for generating consistent, unique strings derived from input values.
 - `hashPassword`: Hashes a plaintext password using SHA-256 and converts the resulting hash to a hexadecimal string. This is used for securely storing passwords.
 - `comparePassword`: Compares a plaintext password to a hashed password by hashing the input and checking if it matches the stored hash.
+
+```tsx
+// File: lib/auth.ts
+
+import { UpstashRedisAdapter } from '@auth/upstash-redis-adapter'
+import NextAuth from 'next-auth'
+import providers from './providers'
+import redis from './redis'
+
+export const { handlers, signIn, signOut, auth } = NextAuth(() => ({
+  providers,
+  session: { strategy: 'jwt' },
+  adapter: UpstashRedisAdapter(redis),
+}))
+```
+
+In the code above, authentication is being set up via creating the the `handlers`, `signIn`, `signOut`, and `auth` functions using a custom configuration. It uses a JWT-based session strategy, the `UpstashRedisAdapter` to connect to a Upstash Redis database for storing user data, and an array of authentication providers defined in the `providers` module. This setup enables seamless integration of authentication and session management with Upstash Redis as the backend.
 
 ```tsx
 // File: middleware.ts
