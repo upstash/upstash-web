@@ -75,7 +75,7 @@ The libraries installed include:
 - `@upstash/redis`: SDK to interact with Upstash Redis via HTTP requests.
 - `@auth/upstash-redis-adapter`: Adapter for integrating Auth.js with Upstash Redis.
 
-Now, create a `.env` file at the root of your project. You are going to use the `AUTH_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` values.
+Now, create a `.env` file at the root of your project. You are going to use the `AUTH_SECRET`, `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` values.
 
 The `.env` file should have the following:
 
@@ -84,8 +84,6 @@ The `.env` file should have the following:
 
 # Auth.js Environment Variables
 AUTH_SECRET="..."
-AUTH_GOOGLE_SECRET="...-..."
-AUTH_GOOGLE_ID="..-...apps.googleusercontent.com"
 
 # Upstash Redis Environment Variables
 UPSTASH_REDIS_REST_URL="https://...upstash.io"
@@ -193,20 +191,18 @@ export default new Redis({
 })
 ```
 
-In the code above, an instance of Edge-compatible Redis client is exported to be used throughout the application.
+In the code above, an Edge-compatible Redis client instance is exported to be used throughout the application.
 
 ```tsx
 // File: lib/providers.ts
 
 import { nanoid } from 'nanoid'
 import Credentials from 'next-auth/providers/credentials'
-import Google from 'next-auth/providers/google'
 import { comparePassword, generateRandomString, hashPassword } from './credentials'
 import redis from './redis'
 import { UserType } from './types'
 
 export default [
-  Google,
   Credentials({
     credentials: {
       email: {},
