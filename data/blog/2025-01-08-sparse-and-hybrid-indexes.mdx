@@ -1,0 +1,221 @@
+---
+title: "Introducing Sparse and Hybrid Indexes"
+slug: sparse-and-hybrid-indexes
+authors:
+  - metin
+tags: [vector, ai, rag]
+---
+
+We are excited to announce a significant upgrade to our vector index.
+Upstash Vector now supports sparse and hybrid indexes!
+
+Up until now, Upstash Vector supported dense indexes for semantic similarity
+searches. While dense indexes are a powerful and well-established approach,
+they're not always the most effective solution for every type of data and query.
+
+Before exploring the new types of indexes, let's recap what dense indexes
+are and where they are useful. Imagine each piece of data you store — whether
+it's text, images, audio, or something else — as a point in a high-dimensional
+vector space. A dense index essentially creates a detailed "map" of this space,
+where every single dimension is explicitly represented. This means each data
+item needs a vector with a value for every dimension in the space.
+
+Let's take a look at our [Wikipedia index](https://upstash.com/blog/indexing-wikipedia).
+A dense vector for each paragraph of a Wikipedia article might have a
+dimension for historical time period, geographical relevance,
+cultural significance, scientific domain, and so on. Even if it is a paragraph
+related to [semiconductors](https://en.wikipedia.org/wiki/Semiconductor),
+the dense vector value would still reserves space for the
+"geographical relevance" dimension and assign it a value, possibly close
+to zero. This type of indexes are excellent at capturing overall similarity
+and semantic relationships.
+
+![dense-vector](/blog/sparse-and-hybrid-indexes/dense-vector.png)
+
+However, semantic search over dense indexes can struggle for out-of-domain queries
+that the embedding model is trained on, or fail to provide best results for queries
+containing rare words or features, such as industry-specific jargon.
+
+Sparse indexes take a different approach, focusing on efficiency and specificity.
+Instead of storing a value for every dimension, they only store the non-zero or,
+more generally, the significant values out of the much higher dimensional space.
+This is particularly useful when dealing with data that has a large number of
+potential features, but only a small subset of those features are active or relevant
+for any given data item. It's conceptually similar to a keyword search, but
+operating in the realm of vectors.
+
+Returning to our semiconductor paragraph example, a sparse index might only record
+the important keywords that are actually in the paragraph, like the keywords
+"semiconductor", "conductor", "insulator", "electrical", "current", without wasting
+space on all the other possible keywords. This makes sparse indexes ideal for
+situations where data has variable-length features or attributes, such as text documents,
+product catalogs with many optional attributes, or user profiles with diverse interests.
+
+![sparse-vector](/blog/sparse-and-hybrid-indexes/sparse-vector.png)
+
+Sparse indexes offer several advantages. They use less storage space because they
+only keep track of the relevant dimensions of the data. This leads to faster retrieval
+times, particularly for queries that focus on specific features or attributes.
+The search algorithm doesn't have to sift through irrelevant dimensions. Another benefit
+is that it is easier to understand why two items are considered similar because the
+index only considers the shared non-zero dimensions. This makes debugging and explaining
+search results easier. Finally, sparse indexes are great for data where different items
+have different numbers of features or attributes, so you can avoid padding vectors with
+zeros to a fixed length.
+
+However, exact keyword or feature search over sparse indexes can fail to capture
+contextual information or even struggle with queries containing synonym keywords.
+
+Now, let's consider the common scenario where your data exhibits both dense and sparse
+characteristics. For example, you might have text documents where you want to capture
+both the overall semantic meaning and specific keywords or topics. This is where the
+power of hybrid indexes comes into play.
+
+Hybrid indexes cleverly combine dense and sparse indexing techniques, allowing you to
+leverage the strengths of both approaches within a single system.
+
+Before moving on to the next section, where we explore how to use these new index types,
+let us also mention that both sparse and hybrid indexes support all the features available
+to dense indexes, like [namespaces](https://upstash.com/docs/vector/features/namespaces),
+[metadata filtering](https://upstash.com/docs/vector/features/filtering), and
+[resumable queries](https://upstash.com/docs/vector/features/resumablequery).
+
+## Using Sparse Indexes
+
+Go to [Upstash Console](https://console.upstash.com) to create a sparse index.
+
+While creating the index, you can choose between doing the sparse vector
+embedding yourself, or use one of the Upstash-hosted
+[sparse embedding models](https://upstash.com/docs/vector/features/embeddingmodels#models)
+to do it for you.
+
+Using an Upstash-hosted model allows you to upsert and query with raw text data
+instead of sparse vectors.
+
+In our SDKs and REST APIs, sparse vectors are represented with two arrays of equal
+sizes: A 32-bit integer array for indices of the non-zero valued dimensions, and
+a 32-bit float array for the values of the non-zero valued dimensions.
+
+```python
+from upstash_vector import Index, Vector
+from upstash_vector.types import SparseVector
+
+index = Index(
+    url="UPSTASH_VECTOR_REST_URL",
+    token="UPSTASH_VECTOR_REST_TOKEN",
+)
+
+# For indexes created with custom sparse embedding models
+index.upsert(
+    vectors=[
+        Vector(
+            id="id-0",
+            sparse_vector=SparseVector([123, 2224, 55001], [0.95, 0.83, 0.82]),
+            metadata={"url": "https://en.wikipedia.org/wiki/Semiconductor"},
+        ),
+    ]
+)
+
+results = index.query(
+    sparse_vector=SparseVector([123, 5123], [0.75, 0.15]),
+    top_k=5,
+    include_metadata=True,
+)
+
+# For indexes created with Upstash-hosted sparse embedding models
+index.upsert(
+    vectors=[
+        Vector(
+            id="id-0",
+            data="A semiconductor is a material that is between the conductor and insulator in ability to conduct electrical current.",
+            metadata={"url": "https://en.wikipedia.org/wiki/Semiconductor"},
+        ),
+    ]
+)
+
+results = index.query(
+    data="Is semiconductor an insulator?",
+    top_k=5,
+    include_metadata=True,
+)
+```
+
+See [Sparse Indexes](https://upstash.com/docs/vector/features/sparseindexes) documentation
+for the more information regarding customizing queries, and Upsthash-hosted sparse
+embedding models.
+
+## Using Hybrid Indexes
+
+Go to [Upstash Console](https://console.upstash.com) to create a hybrid index.
+
+While creating the index, you can choose between doing the dense and sparse vector
+embeddings yourself, or use one of the Upstash-hosted
+[dense and sparse embedding models](https://upstash.com/docs/vector/features/embeddingmodels#models)
+to do it for you.
+
+Using an Upstash-hosted model allows you to upsert and query with raw text data
+instead of dense and sparse vectors.
+
+```python
+from upstash_vector import Index, Vector
+from upstash_vector.types import SparseVector
+
+index = Index(
+    url="UPSTASH_VECTOR_REST_URL",
+    token="UPSTASH_VECTOR_REST_TOKEN",
+)
+
+# For indexes created with custom dense and sparse embedding models
+index.upsert(
+    vectors=[
+        Vector(
+            id="id-0",
+            vector=[0.01, 0.90, 0.95, ...],
+            sparse_vector=SparseVector([123, 2224, 55001], [0.95, 0.83, 0.82]),
+            metadata={"url": "https://en.wikipedia.org/wiki/Semiconductor"},
+        ),
+    ]
+)
+
+results = index.query(
+    vector=[0.15, 0.88, 0.94, ...],
+    sparse_vector=SparseVector([123, 5123], [0.75, 0.15]),
+    top_k=5,
+    include_metadata=True,
+)
+
+# For indexes created with Upstash-hosted sparse embedding models
+index.upsert(
+    vectors=[
+        Vector(
+            id="id-0",
+            data="A semiconductor is a material that is between the conductor and insulator in ability to conduct electrical current.",
+            metadata={"url": "https://en.wikipedia.org/wiki/Semiconductor"},
+        ),
+    ]
+)
+
+results = index.query(
+    data="Is semiconductor an insulator?",
+    top_k=5,
+    include_metadata=True,
+)
+```
+
+See [Hybrid Indexes](https://upstash.com/docs/vector/features/hybridindexes) documentation
+for the more information regarding customizing queries, and using different fusion algorithms to
+rerank dense and sparse search results.
+
+## Indexing Wikipedia, Again
+
+We have also updated the [Wikipedia Semantic Search](https://wikipedia-semantic-search.vercel.app)
+demo by indexing Wikipedia articles again, this time with hybrid indexes, using different
+dense and sparse embedding models. You can perform dense, sparse, or hybrid
+search queries over it and compare the results yourself.
+
+## Closing Words
+
+With sparse and hybrid indexes, Upstash Vector supports a wider range of use cases.
+Whether your data is better represented as dense, sparse, or hybrid vectors, these
+new index types give you the tools to build more efficient and accurate applications.
+Try them out today and let us know how they enhance your AI and RAG workflows!
