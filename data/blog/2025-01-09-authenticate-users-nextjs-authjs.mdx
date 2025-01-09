@@ -109,6 +109,8 @@ In the code above, an Edge-compatible Redis client instance is exported to be us
 
 ## Helpers
 
+Create a file named `types.ts` in the `lib` directory with the following code:
+
 ```tsx
 // File: lib/types.ts
 
@@ -132,6 +134,8 @@ The `UserType` interface defines the structure of a user object in the applicati
 - `emailVerified` (optional): A timestamp or string indicating if/when the user's email was verified. 
 
 This interface serves as a type definition for user data throughout the application.
+
+Further, create a file named `credentials.ts` in the `lib` directory with the following code:
 
 ```tsx
 // File: lib/credentials.ts
@@ -174,6 +178,8 @@ In the code above, Edge-compatiable utility functions for generating and managin
 - `hashPassword`: Hashes a plaintext password using SHA-256 and converts the resulting hash to a hexadecimal string. This is used for securely storing passwords.
 - `comparePassword`: Compares a plaintext password to a hashed password by hashing the input and checking if it matches the stored hash.
 
+Further, create a file named `auth.ts` in the `lib` directory with the following code:
+
 ```tsx
 // File: lib/auth.ts
 
@@ -190,6 +196,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth(() => ({
 ```
 
 In the code above, authentication is being set up via creating the the `handlers`, `signIn`, `signOut`, and `auth` functions using a custom configuration. It uses a JWT-based session strategy, the `UpstashRedisAdapter` to connect to a Upstash Redis database for storing user data, and an array of authentication providers defined in the `providers` module. This setup enables seamless integration of authentication and session management with Upstash Redis as the backend.
+
+Finally, create a file named `providers.ts` in the `lib` directory with the following code:
 
 ```tsx
 // File: lib/providers.ts
