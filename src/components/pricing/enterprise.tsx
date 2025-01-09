@@ -6,7 +6,7 @@ export default function PricingTableEnterprise() {
     <div className="items-center rounded-3xl border-2 border-emerald-300/10 bg-emerald-300/3 px-10 py-8 text-left text-emerald-100 md:mx-32 md:flex md:px-16 md:py-10">
       <div className="grow">
         <h4 className="text-2xl font-semibold text-emerald-400">Enterprise</h4>
-        <p className="">For businesses with advanced needs.</p>
+        <p className="">For businesses with advanced needs</p>
 
         <Button
           type="button"
