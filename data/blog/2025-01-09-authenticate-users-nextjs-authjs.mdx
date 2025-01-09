@@ -25,7 +25,7 @@ You will need the following:
 | [Upstash](https://upstash.com) | Serverless database platform. You are going to use Upstash QStash for scheduling jobs via Upstash Workflow SDK. |
 | [Vercel](https://vercel.com) | A cloud platform for deploying and scaling web applications. |
 
-## Setting up Upstash Redis
+## Set up an Upstash Redis instance
 
 In your Upstash dashboard, go to **Redis** tab and create a database.
 
@@ -110,74 +110,6 @@ In the code above, an Edge-compatible Redis client instance is exported to be us
 ## Helpers
 
 ```tsx
-// File: lib/providers.ts
-
-import { nanoid } from 'nanoid'
-import Credentials from 'next-auth/providers/credentials'
-import { comparePassword, generateRandomString, hashPassword } from './credentials'
-import redis from './redis'
-import { UserType } from './types'
-
-export default [
-  Credentials({
-    credentials: {
-      email: {},
-      password: {},
-    },
-    authorize: async (credentials, request) => {
-      let type
-      try {
-        const tmp = new URL(request.url).searchParams.get('kind')
-        if (tmp && typeof tmp === 'string') type = tmp
-      } catch (e) {}
-      if (!type || !credentials.email || typeof credentials.email !== 'string' || !credentials.password || typeof credentials.password !== 'string') return null
-      const randomizedPassword = await generateRandomString(credentials.password)
-      const userByEmail = await redis.get<string | null | undefined>(`user:email:${credentials.email}`)
-      if (userByEmail) {
-        if (type !== 'in') {
-          console.log(`can not sign in in a non sign-in mode.`)
-          throw new Error(`can not sign in in a non sign-in mode.`)
-        }
-        const user = await redis.get<UserType>(`user:${userByEmail}`)
-        if (!user) {
-          console.log(`Found the user by email from user:email:${userByEmail}, but the user object is missing at user:${userByEmail}`)
-          return null
-        }
-        if (user.password) {
-          const hashedPassword = await hashPassword(randomizedPassword)
-          const isPasswordCorrect = await comparePassword(user.password, hashedPassword)
-          if (isPasswordCorrect) {
-            const { password, ...rest } = user
-            return rest
-          }
-          throw new Error(`incorrect password for credentials.`)
-        }
-        throw new Error(`you are using some other authentication method already, but not credentials.`)
-      } else {
-        if (type !== 'up') {
-          console.log(`can not sign up in a non sign-up mode.`)
-          throw new Error(`can not sign up in a non sign-up mode.`)
-        }
-        const newUser = {
-          name: null,
-          image: null,
-          emailVerified: null,
-          email: credentials.email,
-          password: randomizedPassword,
-        }
-        const tmp = nanoid()
-        await redis.set(`user:email:${credentials.email}`, tmp)
-        await redis.set(`user:${tmp}`, newUser)
-        return newUser
-      }
-    },
-  }),
-]
-```
-
-In the code above, an array of authentication providers (Google and custom credentials-based) is exported. The Credentials provider handles both sign-in and sign-up logic: it checks if the user exists in Redis and either validates their password or creates a new user. If signing in, it compares the provided password (hashed using a random string) with the stored password; if signing up, it creates a new user entry in Upstash Redis. The code uses Upstash Redis for user data storage and ensures that the process is done in either sign-up or sign-in mode based on the kind parameter in the URL.
-
-```tsx
 // File: lib/types.ts
 
 export interface UserType {
@@ -258,6 +190,74 @@ export const { handlers, signIn, signOut, auth } = NextAuth(() => ({
 ```
 
 In the code above, authentication is being set up via creating the the `handlers`, `signIn`, `signOut`, and `auth` functions using a custom configuration. It uses a JWT-based session strategy, the `UpstashRedisAdapter` to connect to a Upstash Redis database for storing user data, and an array of authentication providers defined in the `providers` module. This setup enables seamless integration of authentication and session management with Upstash Redis as the backend.
+
+```tsx
+// File: lib/providers.ts
+
+import { nanoid } from 'nanoid'
+import Credentials from 'next-auth/providers/credentials'
+import { comparePassword, generateRandomString, hashPassword } from './credentials'
+import redis from './redis'
+import { UserType } from './types'
+
+export default [
+  Credentials({
+    credentials: {
+      email: {},
+      password: {},
+    },
+    authorize: async (credentials, request) => {
+      let type
+      try {
+        const tmp = new URL(request.url).searchParams.get('kind')
+        if (tmp && typeof tmp === 'string') type = tmp
+      } catch (e) {}
+      if (!type || !credentials.email || typeof credentials.email !== 'string' || !credentials.password || typeof credentials.password !== 'string') return null
+      const randomizedPassword = await generateRandomString(credentials.password)
+      const userByEmail = await redis.get<string | null | undefined>(`user:email:${credentials.email}`)
+      if (userByEmail) {
+        if (type !== 'in') {
+          console.log(`can not sign in in a non sign-in mode.`)
+          throw new Error(`can not sign in in a non sign-in mode.`)
+        }
+        const user = await redis.get<UserType>(`user:${userByEmail}`)
+        if (!user) {
+          console.log(`Found the user by email from user:email:${userByEmail}, but the user object is missing at user:${userByEmail}`)
+          return null
+        }
+        if (user.password) {
+          const hashedPassword = await hashPassword(randomizedPassword)
+          const isPasswordCorrect = await comparePassword(user.password, hashedPassword)
+          if (isPasswordCorrect) {
+            const { password, ...rest } = user
+            return rest
+          }
+          throw new Error(`incorrect password for credentials.`)
+        }
+        throw new Error(`you are using some other authentication method already, but not credentials.`)
+      } else {
+        if (type !== 'up') {
+          console.log(`can not sign up in a non sign-up mode.`)
+          throw new Error(`can not sign up in a non sign-up mode.`)
+        }
+        const newUser = {
+          name: null,
+          image: null,
+          emailVerified: null,
+          email: credentials.email,
+          password: randomizedPassword,
+        }
+        const tmp = nanoid()
+        await redis.set(`user:email:${credentials.email}`, tmp)
+        await redis.set(`user:${tmp}`, newUser)
+        return newUser
+      }
+    },
+  }),
+]
+```
+
+In the code above, an array of authentication providers (Google and custom credentials-based) is exported. The Credentials provider handles both sign-in and sign-up logic: it checks if the user exists in Redis and either validates their password or creates a new user. If signing in, it compares the provided password (hashed using a random string) with the stored password; if signing up, it creates a new user entry in Upstash Redis. The code uses Upstash Redis for user data storage and ensures that the process is done in either sign-up or sign-in mode based on the kind parameter in the URL.
 
 ## API Routes
 
@@ -613,6 +613,9 @@ The repository is now ready to deploy to Vercel. Use the following steps to depl
 For more detailed insights, explore the references cited in this blog.
 
 - [GitHub Repository](https://github.com/rishi-raj-jain/google-credentials-authjs-upstash)
+- [Auth.js - Credentials Authentication](https://authjs.dev/getting-started/authentication/credentials)
+- [Auth.js - Upstash Redis Adapter](https://authjs.dev/getting-started/adapters/upstash-redis)
+- [Next.js - Cookies](https://nextjs.org/docs/app/api-reference/functions/cookies)
 
 ## Conclusion
 
