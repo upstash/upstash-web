@@ -47,9 +47,9 @@ export const CookieConsentBanner = () => {
           onClick={() => {
             setCookieConsent(true);
           }}
-          className="rounded-full bg-white px-3 py-1.5 text-xs transition-colors hover:bg-gray-100"
+          className="flex items-center rounded-full bg-white px-3 pb-1 pt-1.5 text-xs transition-colors hover:bg-gray-100"
         >
-          Accept
+          <p>Accept</p>
         </button>
         <button
           onClick={() => {
