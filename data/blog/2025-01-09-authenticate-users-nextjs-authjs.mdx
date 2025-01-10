@@ -271,7 +271,7 @@ export default [
 
 In the code above, an array of custom, credentials-based authentication provider is exported. The Credentials provider handles both sign-in and sign-up logic: it checks if the user exists in Redis and either validates their password or creates a new user. If signing in, it compares the provided password (hashed using a random string) with the stored password; if signing up, it creates a new user entry in Upstash Redis. The code uses Upstash Redis for user data storage and ensures that the process is done in either sign-up or sign-in mode based on the kind parameter in the URL.
 
-## API Routes
+## Set up Authentication API Routes powered by Auth.js
 
 ```tsx
 // File: app/api/auth/[...nextauth]/route.ts
@@ -356,6 +356,8 @@ export async function POST(request: Request) {
 ```
 
 In the code above, an Edge-compatible API route for updating user data is being created. It authenticates the user, fetches their data from Redis using their email, and updates their information (e.g., name or image) based on the request body. If the user is not found or an error occurs, appropriate status codes and responses are returned.
+
+## Set up Next.js Middleware with Auth.js
 
 ```tsx
 // File: middleware.ts
