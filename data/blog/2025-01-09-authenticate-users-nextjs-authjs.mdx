@@ -15,7 +15,6 @@ You will need the following:
 
 - [Node.js 18](https://nodejs.org/en/blog/announcements/v18-release-announce) or later
 - An [Upstash](https://console.upstash.com) account
-- A [Vercel](https://vercel.com/dashboard) account
 
 ## Tech Stack
 
@@ -609,16 +608,6 @@ export default function ({
 ```
 
 In the code above, the Next.js layout is wrapping the entire page in global styles and authentication context. It imports `globals.css` for global styling and `NextAuthProvider` to manage authentication state. The `children` prop represents the nested page content, which is wrapped in a styled container with responsive padding and a maximum width, providing a consistent layout for all pages. 
-
-## Deploy to Vercel
-
-The repository is now ready to deploy to Vercel. Use the following steps to deploy 👇🏻
-
-- Start by creating a GitHub repository containing your app's code.
-- Then, navigate to the Vercel Dashboard and create a **New Project**.
-- Link the new project to the GitHub repository you just created.
-- In **Settings**, update the `Environment Variables` to match those in your local `.env` file.
-- Deploy! 🚀
 
 > That was a lot of learning! You’re all done now ✨
 
