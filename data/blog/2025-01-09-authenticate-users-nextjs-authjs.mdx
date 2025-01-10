@@ -267,7 +267,7 @@ export default [
 
 In the code above, an array of custom, credentials-based authentication provider is exported. The Credentials provider handles both sign-in and sign-up logic: it checks if the user exists in Redis and either validates their password or creates a new user. If signing in, it compares the provided password (hashed using a random string) with the stored password; if signing up, it creates a new user entry in Upstash Redis. The code uses Upstash Redis for user data storage and ensures that the process is done in either sign-up or sign-in mode based on the kind parameter in the URL.
 
-## Set up Authentication API Routes powered by Auth.js
+## Set up Authentication API Routes (powered by Auth.js)
 
 ```tsx
 // File: app/api/auth/[...nextauth]/route.ts
@@ -369,6 +369,8 @@ In the code above, the middleware is created by re-exporting the `auth` function
 
 ## UI
 
+Create a file named `NextAuthProvider.tsx` in the `app` directory with the following code:
+
 ```tsx
 // File: app/NextAuthProvider.tsx
 
@@ -386,6 +388,8 @@ export default function ({ children }: Props) {
 ```
 
 In the code above, a client-side React component is created to wrap the application with NextAuth's `SessionProvider`. The component accepts `children` as props and ensures that the wrapped components have access to the user session context provided by NextAuth. This setup is essential for managing authentication state across the application in Next.js.
+
+Create a file named `csrf.tsx` in the `app` directory with the following code:
 
 ```tsx
 // File: app/csrf.tsx
@@ -405,6 +409,8 @@ export function CSRFInput() {
 ```
 
 In the code above, a client-side React component is exported that fetches a CSRF token using NextAuth's `getCsrfToken` function and stores it in a state variable. The component renders a hidden input field containing the CSRF token, allowing secure form submissions by including the token as a hidden value. This is useful for protecting against cross-site request forgery attacks.
+
+Create a file named `provider.tsx` in the `app` directory with the following code:
 
 ```tsx
 // File: app/provider.tsx
@@ -429,6 +435,8 @@ export default function ({ provider, prefix }: { prefix: string; provider: { nam
 
 In the code above, a React component for rendering a customizable sign-in button for different authentication providers is exported. It accepts `provider` (containing `name` and `id`) and `prefix` as props. The button triggers the `signIn` function for the specified provider and dynamically displays an icon and label based on the provider's `id`.
 
+Update the file named `page.tsx` in the `app` directory with the following code:
+
 ```tsx
 // File: app/page.tsx
 
@@ -448,6 +456,8 @@ export default function () {
 ```
 
 In the code above, a client-side React component that displays the user's session data and provides a "Sign Out" button is exported. It uses NextAuth's `useSession` hook to retrieve the session data and status, displaying them as a JSON string. The `signOut` function is called when the button is clicked, allowing the user to log out.
+
+Create a file named `page.tsx` in the `app/signin` directory with the following code:
 
 ```tsx
 // File: app/signin/page.tsx
@@ -512,7 +522,7 @@ export default async function () {
 }
 ```
 
-TODO
+Create a file named `page.tsx` in the `app/signup` directory with the following code:
 
 ```tsx
 // File: app/signup/page.tsx
@@ -579,7 +589,7 @@ export default async function () {
 }
 ```
 
-TODO
+Update the file named `layout.tsx` in the `app` directory with the following code:
 
 ```tsx
 // File: app/layout.tsx
