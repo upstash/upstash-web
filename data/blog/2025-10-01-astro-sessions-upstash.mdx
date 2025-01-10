@@ -1,0 +1,41 @@
+---
+authors: [rishi]
+slug: astro-sessions-upstash
+tags: [redis, database, serverless, vercel]
+title: "Authenticate users in Next.js with Auth.js"
+---
+
+## TODO
+
+```bash
+npm create astro@latest
+```
+
+## TODO
+
+```bash
+npx astro add node
+```
+
+## TODO
+
+```tsx
+import node from '@astrojs/node';
+import { defineConfig } from 'astro/config';
+
+export default defineConfig({
+  adapter: node({
+    mode: 'standalone'
+  }),
+  experimental: { // [!code ++]
+    session: { // [!code ++]
+      driver: "upstash", // [!code ++]
+      options: { // [!code ++]
+        base: "unstorage", // [!code ++]
+        url: process.env.UPSTASH_REDIS_REST_URL, // [!code ++]
+        token: process.env.UPSTASH_REDIS_REST_TOKEN, // [!code ++]
+      } // [!code ++]
+    } // [!code ++]
+  } // [!code ++]
+});
+```
