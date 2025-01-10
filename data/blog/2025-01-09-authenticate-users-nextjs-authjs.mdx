@@ -269,6 +269,8 @@ In the code above, an array of custom, credentials-based authentication provider
 
 ## Set up Authentication API Routes (powered by Auth.js)
 
+Create a file named `route.ts` in the `app/api/auth/[...nextauth]` directory with the following code:
+
 ```tsx
 // File: app/api/auth/[...nextauth]/route.ts
 
@@ -280,6 +282,8 @@ export const { GET, POST } = handlers
 ```
 
 In the code above, two endpoint handlers `GET` and `POST` are exported that are handled by the `handlers` function exported from `@/lib/auth.ts` file.
+
+Create a file named `route.ts` in the `app/api/refresh` directory with the following code:
 
 ```tsx
 // File: app/api/refresh/route.ts
@@ -316,6 +320,8 @@ export async function GET(request: Request) {
 ```
 
 In the code above, an Edge-compatible API route for refreshing a user's session is being created. It fetches the user session and related data from Redis, verifies the user's email, and updates the session cookie. If the user data is invalid or missing, the session cookie is cleared; otherwise, a new signed token is generated and stored in the cookie.
+
+Create a file named `route.ts` in the `app/api/user` directory with the following code:
 
 ```tsx
 // File: app/api/user/route.ts
