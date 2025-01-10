@@ -107,7 +107,7 @@ export default new Redis({
 
 In the code above, an Edge-compatible Redis client instance is exported to be used throughout the application.
 
-## Helpers
+## Set up User Types and Credentials Helpers
 
 Create a file named `types.ts` in the `lib` directory with the following code:
 
@@ -178,7 +178,9 @@ In the code above, Edge-compatiable utility functions for generating and managin
 - `hashPassword`: Hashes a plaintext password using SHA-256 and converts the resulting hash to a hexadecimal string. This is used for securely storing passwords.
 - `comparePassword`: Compares a plaintext password to a hashed password by hashing the input and checking if it matches the stored hash.
 
-Further, create a file named `auth.ts` in the `lib` directory with the following code:
+## Using Upstash Redis adapter with Auth.js
+
+Create a file named `auth.ts` in the `lib` directory with the following code:
 
 ```tsx
 // File: lib/auth.ts
@@ -197,7 +199,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth(() => ({
 
 In the code above, authentication is being set up via creating the the `handlers`, `signIn`, `signOut`, and `auth` functions using a custom configuration. It uses a JWT-based session strategy, the `UpstashRedisAdapter` to connect to a Upstash Redis database for storing user data, and an array of authentication providers defined in the `providers` module. This setup enables seamless integration of authentication and session management with Upstash Redis as the backend.
 
-Finally, create a file named `providers.ts` in the `lib` directory with the following code:
+## Set up Custom Authentication provider with Auth.js
+
+Create a file named `providers.ts` in the `lib` directory with the following code:
 
 ```tsx
 // File: lib/providers.ts
