@@ -522,6 +522,8 @@ export default async function () {
 }
 ```
 
+In the code above, a sign-in page is being created. It checks if a user session already exists; if so, it redirects to the homepage. The page displays a sign-in form where users can enter their email and password, along with options to sign in using various providers. It also includes a CSRF token for security and a link to the sign-up page for new users.
+
 Create a file named `page.tsx` in the `app/signup` directory with the following code:
 
 ```tsx
@@ -588,6 +590,8 @@ export default async function () {
   )
 }
 ```
+
+In the code above, a sign-up page is being created. It checks if a user session already exists; if so, it redirects to the homepage. The page displays a sign-up form where users can enter their email and password, along with options to sign in using various providers. It also includes a CSRF token for security and a link to the sign-in page for existing users.
 
 Update the file named `layout.tsx` in the `app` directory with the following code:
 
