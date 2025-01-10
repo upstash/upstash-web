@@ -443,6 +443,33 @@ export default function ({ provider, prefix }: { prefix: string; provider: { nam
 
 In the code above, a React component for rendering a customizable sign-in button for different authentication providers is exported. It accepts `provider` (containing `name` and `id`) and `prefix` as props. The button triggers the `signIn` function for the specified provider and dynamically displays an icon and label based on the provider's `id`.
 
+Update the file named `layout.tsx` in the `app` directory with the following code:
+
+```tsx
+// File: app/layout.tsx
+
+import './globals.css'
+import NextAuthProvider from './NextAuthProvider'
+
+export default function ({
+  children,
+}: Readonly<{
+  children: React.ReactNode
+}>) {
+  return (
+    <html lang="en">
+      <body className="bg-white text-black antialiased">
+        <NextAuthProvider>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col">{children}</div>
+        </NextAuthProvider>
+      </body>
+    </html>
+  )
+}
+```
+
+In the code above, the Next.js layout is wrapping the entire page in global styles and authentication context. It imports `globals.css` for global styling and `NextAuthProvider` to manage authentication state. The `children` prop represents the nested page content, which is wrapped in a styled container with responsive padding and a maximum width, providing a consistent layout for all pages.
+
 Update the file named `page.tsx` in the `app` directory with the following code:
 
 ```tsx
@@ -464,6 +491,8 @@ export default function () {
 ```
 
 In the code above, a client-side React component that displays the user's session data and provides a "Sign Out" button is exported. It uses NextAuth's `useSession` hook to retrieve the session data and status, displaying them as a JSON string. The `signOut` function is called when the button is clicked, allowing the user to log out.
+
+## Build a dynamic Sign-in page (using Auth.js)
 
 Create a file named `page.tsx` in the `app/signin` directory with the following code:
 
@@ -531,6 +560,8 @@ export default async function () {
 ```
 
 In the code above, a sign-in page is being created. It checks if a user session already exists; if so, it redirects to the homepage. The page displays a sign-in form where users can enter their email and password, along with options to sign in using various providers. It also includes a CSRF token for security and a link to the sign-up page for new users.
+
+## Build a dynamic Sign-up page (using Auth.js)
 
 Create a file named `page.tsx` in the `app/signup` directory with the following code:
 
@@ -600,33 +631,6 @@ export default async function () {
 ```
 
 In the code above, a sign-up page is being created. It checks if a user session already exists; if so, it redirects to the homepage. The page displays a sign-up form where users can enter their email and password, along with options to sign in using various providers. It also includes a CSRF token for security and a link to the sign-in page for existing users.
-
-Update the file named `layout.tsx` in the `app` directory with the following code:
-
-```tsx
-// File: app/layout.tsx
-
-import './globals.css'
-import NextAuthProvider from './NextAuthProvider'
-
-export default function ({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
-  return (
-    <html lang="en">
-      <body className="bg-white text-black antialiased">
-        <NextAuthProvider>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col">{children}</div>
-        </NextAuthProvider>
-      </body>
-    </html>
-  )
-}
-```
-
-In the code above, the Next.js layout is wrapping the entire page in global styles and authentication context. It imports `globals.css` for global styling and `NextAuthProvider` to manage authentication state. The `children` prop represents the nested page content, which is wrapped in a styled container with responsive padding and a maximum width, providing a consistent layout for all pages. 
 
 > That was a lot of learning! You’re all done now ✨
 
