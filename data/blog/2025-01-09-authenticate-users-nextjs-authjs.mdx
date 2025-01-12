@@ -375,7 +375,7 @@ export const config = {
 
 In the code above, the middleware is created by re-exporting the `auth` function from the `@/lib/auth` module. The middleware applies authentication to all routes except API routes, static files, image assets, and the favicon, as specified by the `matcher` configuration. This ensures non-excluded routes are protected by the authentication logic set with Auth.js.
 
-## UI
+## Use Auth.js in Next.js App Router Components
 
 Create a file named `NextAuthProvider.tsx` in the `app` directory with the following code:
 
@@ -469,6 +469,8 @@ export default function ({
 ```
 
 In the code above, the Next.js layout is wrapping the entire page in global styles and authentication context. It imports `globals.css` for global styling and `NextAuthProvider` to manage authentication state. The `children` prop represents the nested page content, which is wrapped in a styled container with responsive padding and a maximum width, providing a consistent layout for all pages.
+
+## Load the user authentication state in a client-side page
 
 Update the file named `page.tsx` in the `app` directory with the following code:
 
