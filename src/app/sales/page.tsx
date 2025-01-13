@@ -28,7 +28,7 @@ export default function HomePage() {
 
           <p className="mt-6">
             <Button asChild variant="primary">
-              <a target="_blank" href="">
+              <a target="_blank" href="https://calendly.com/upstash">
                 <IconCalendarDot size={24} /> Book a meeting directly
               </a>
             </Button>
@@ -130,7 +130,7 @@ function BigText({
         "pointer-events-none -mb-[5vw] whitespace-nowrap",
         "font-display text-[12vw] font-bold leading-tight",
         "bg-gradient-to-br bg-clip-text text-transparent",
-        "from-primary via-yellow-400 to-primary-text opacity-50",
+        "from-primary via-yellow-400 to-primary-text",
         className,
       )}
     >
