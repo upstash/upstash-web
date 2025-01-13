@@ -1,5 +1,6 @@
 import Button from "@/components/button";
 import { IconCircleCheckFilled } from "@tabler/icons-react";
+import Link from "next/link";
 import * as React from "react";
 
 export default function PricingTableEnterprise() {
@@ -10,11 +11,11 @@ export default function PricingTableEnterprise() {
         <p className="">For businesses with advanced needs.</p>
 
         <Button
-          type="button"
-          href="mailto:sales@upstash.com"
-          className="-ml-1 mt-4 hidden bg-primary md:inline-flex"
+          asChild
+          variant="primary"
+          className="-ml-1 mt-4 hidden md:inline-flex"
         >
-          Contact Us
+          <Link href="/sales">Contact Us</Link>
         </Button>
       </div>
 
@@ -39,12 +40,8 @@ export default function PricingTableEnterprise() {
         </ul>
       </div>
 
-      <Button
-        type="button"
-        href="mailto:support@upstash.com"
-        className="-ml-1 mt-6 bg-primary md:hidden"
-      >
-        Contact Us
+      <Button asChild variant="primary" className="-ml-1 mt-6 md:hidden">
+        <Link href="/sales">Contact Us</Link>
       </Button>
     </div>
   );

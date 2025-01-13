@@ -162,7 +162,7 @@ function ActionButtons({
       className={cx(
         "grid place-items-center rounded-lg",
         "inset-2 z-10 transition md:absolute md:bg-emerald-500/80 md:opacity-0",
-        "group-hover/logo-box:opacity-100",
+        "group-hover:opacity-100",
         className,
       )}
       {...props}
@@ -205,7 +205,7 @@ function LogoBox({
   return (
     <div
       className={cx(
-        "group/logo-box relative flex flex-col items-center justify-center gap-6 py-14",
+        "group relative flex flex-col items-center justify-center gap-6 py-14",
         "rounded-2xl border border-zinc-800 bg-zinc-950",
         className,
       )}

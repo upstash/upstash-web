@@ -1,4 +1,4 @@
-import Button, { IButton } from "@/components/button";
+import Button from "@/components/button";
 import cx from "@/utils/cx";
 import { HTMLProps, ReactNode } from "react";
 
@@ -12,7 +12,7 @@ export function PriceBox({
   return (
     <div
       className={cx(
-        "group/price-box grid place-items-center gap-4 p-6 md:gap-6 md:p-8",
+        "group grid place-items-center gap-4 p-6 md:gap-6 md:p-8",
         "rounded-4xl bg-white bg-opacity-5 transition",
         "hover:scale-[1.02] hover:bg-opacity-10",
         className,
@@ -107,17 +107,21 @@ export function PriceHr({ className }: HTMLProps<HTMLHRElement> & {}) {
   );
 }
 
-export function PriceButton({ children, className, ...props }: IButton) {
+export function PriceButton({
+  children,
+  className,
+  ...props
+}: React.ComponentProps<"a">) {
   return (
     <Button
+      asChild
       className={cx(
         "opacity-20 transition",
-        "group-hover/price-box:text-emerald-400 group-hover/price-box:opacity-100",
+        "group-hover:text-emerald-400 group-hover:opacity-100",
         className,
       )}
-      {...props}
     >
-      {children}
+      <a {...props}>{children}</a>
     </Button>
   );
 }

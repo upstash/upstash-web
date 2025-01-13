@@ -36,10 +36,10 @@ export default function HomePage() {
             return (
               <Link
                 key={job.slug}
-                className="group/job-item bg-bg-mute grid rounded-lg p-6 transition md:rounded-3xl md:p-8"
+                className="group grid rounded-lg bg-bg-mute p-6 transition md:rounded-3xl md:p-8"
                 href={`/careers/${job.slug}`}
               >
-                <h2 className="text-primary-text font-display text-xl font-semibold group-hover/job-item:underline">
+                <h2 className="font-display text-xl font-semibold text-primary-text group-hover:underline">
                   {job.title}
                 </h2>
 

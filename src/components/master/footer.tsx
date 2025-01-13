@@ -2,6 +2,7 @@ import Button from "@/components/button";
 import Container from "@/components/container";
 import { Logo } from "@/components/logo";
 import cx from "@/utils/cx";
+import { IconArrowUpRight } from "@tabler/icons-react";
 import { HTMLProps } from "react";
 
 export interface IAppFooter extends HTMLProps<HTMLDivElement> {}
@@ -23,33 +24,37 @@ export default function Footer({ className, ...props }: IAppFooter) {
           </p>
 
           <div className="mt-2 flex flex-col items-center gap-4 md:flex-row">
-            <Button
+            <a
+              target="_blank"
               href="/docs/common/help/support"
-              className="opacity-60 hover:opacity-100"
+              className="inline-flex items-center gap-1 opacity-60 hover:opacity-100"
             >
-              Contact Us
-            </Button>
-            <Button
+              Contact Us <IconArrowUpRight size={20} />
+            </a>
+            <a
+              target="_blank"
               href="/trust/privacy.pdf"
-              className="opacity-60 hover:opacity-100"
+              className="inline-flex items-center gap-1 opacity-60 hover:opacity-100"
             >
-              Privacy Policy
-            </Button>
-            <Button
+              Privacy Policy <IconArrowUpRight size={20} />
+            </a>
+            <a
+              target="_blank"
               href="/trust/terms.pdf"
-              className="opacity-60 hover:opacity-100"
+              className="inline-flex items-center gap-1 opacity-60 hover:opacity-100"
             >
-              Terms of Service
-            </Button>
+              Terms of Service <IconArrowUpRight size={20} />
+            </a>
           </div>
 
           <Button
-            href="https://status.upstash.com/"
+            asChild
             className="mt-10 whitespace-nowrap rounded-full bg-emerald-400/10 px-4 py-1 text-emerald-500"
-            hideIcon
           >
-            <span className="-ml-1 mr-2 inline-flex h-3 w-3 animate-pulse rounded-full bg-current" />
-            <span className="">Status</span>
+            <a target="_blank" href="https://status.upstash.com/">
+              <span className="-ml-1 mr-2 inline-flex h-3 w-3 animate-pulse rounded-full bg-current" />
+              <span className="">Status</span>
+            </a>
           </Button>
 
           <div className="mt-10 space-y-2 text-xs opacity-40">

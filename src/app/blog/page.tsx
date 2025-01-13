@@ -46,7 +46,7 @@ export default async function BlogPage() {
 
           <div className="mt-10 flex justify-center">
             <Link
-              className="bg-primary flex justify-center gap-1 rounded-full px-5 py-3 transition"
+              className="flex justify-center gap-1 rounded-full bg-primary px-5 py-3 transition"
               href={`/blog/all`}
             >
               Show all posts

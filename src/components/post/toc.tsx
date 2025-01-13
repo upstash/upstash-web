@@ -15,7 +15,7 @@ export default function PostTOC({ children, ...props }: ComponentProps<"nav">) {
 
   return (
     <details
-      className="group/toc mb-10 rounded-xl bg-emerald-700/10 dark:bg-white/3"
+      className="group mb-10 rounded-xl bg-emerald-700/10 dark:bg-white/3"
       role="navigation"
       aria-label="Table of contents"
     >

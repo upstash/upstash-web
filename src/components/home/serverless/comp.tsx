@@ -1,6 +1,7 @@
 import Button from "@/components/button";
 import cx from "@/utils/cx";
 import { Product } from "@/utils/type";
+import { IconArrowUpRight } from "@tabler/icons-react";
 import React, { Children, cloneElement, HTMLProps, ReactElement } from "react";
 
 export function ServerlessBox({
@@ -10,7 +11,7 @@ export function ServerlessBox({
   return (
     <div
       className={cx(
-        "group/box-body relative z-0 grid gap-6 p-6 md:gap-8 md:p-8",
+        "group relative z-0 grid gap-6 p-6 md:gap-8 md:p-8",
         "bg-white dark:bg-bg-mute",
         "rounded-3xl md:rounded-4xl",
         className,
@@ -25,7 +26,6 @@ export function ServerlessTitle({
   children,
   className,
   link,
-  title,
 }: HTMLProps<HTMLHeadElement> & {
   link?: string;
 }) {
@@ -38,14 +38,12 @@ export function ServerlessTitle({
     >
       {children}
       {link && (
-        <span className="inline-flex translate-y-1/4 text-emerald-400 opacity-0 transition group-hover/box-body:translate-y-0 group-hover/box-body:opacity-100">
-          <Button
-            href={link}
-            iconProps={{
-              className: "text-3xl opacity-100",
-              title,
-            }}
-          />
+        <span className="inline-flex opacity-0 transition group-hover:opacity-100">
+          <Button asChild className="!p-1">
+            <a href={link} target="_blank">
+              <IconArrowUpRight size={24} className="opacity-100" />
+            </a>
+          </Button>
         </span>
       )}
     </h4>

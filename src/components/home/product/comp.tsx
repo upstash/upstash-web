@@ -21,7 +21,7 @@ export function ProductBox({
   return (
     <div
       className={cx(
-        "group/box-body relative z-0 grid gap-4 p-6 text-left md:gap-6 md:p-8",
+        "group relative z-0 grid gap-4 p-6 text-left md:gap-6 md:p-8",
         "bg-white/3",
         "rounded-3xl md:rounded-4xl",
         className,

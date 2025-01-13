@@ -50,13 +50,11 @@ export default async function BlogPage({ params }: Props) {
       <article className="py-16">
         <Container className="max-w-screen-md">
           <Link
-            className="group/back-link inline-flex h-10 items-center justify-center gap-2 rounded-full bg-white/5 px-4 hover:w-auto hover:bg-white/10 hover:text-emerald-500"
+            className="group inline-flex h-10 items-center justify-center gap-2 rounded-full bg-white/5 px-4 hover:w-auto hover:bg-white/10 hover:text-emerald-500"
             href="/glossary"
           >
-            <IconArrowLeft className="shrink-0 opacity-50 group-hover/back-link:opacity-100" />
-            <span className="hidden group-hover/back-link:block">
-              Back to Glossary
-            </span>
+            <IconArrowLeft className="shrink-0 opacity-50 group-hover:opacity-100" />
+            <span className="hidden group-hover:block">Back to Glossary</span>
           </Link>
 
           <header className="mt-10">

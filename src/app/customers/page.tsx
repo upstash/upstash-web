@@ -40,7 +40,7 @@ export default function CustomerPage() {
                 <Link
                   key={customer.slug}
                   className={cx(
-                    "group/customer-comp relative flex flex-col items-center gap-6 p-10 transition md:p-16",
+                    "group relative flex flex-col items-center gap-6 p-10 transition md:p-16",
                     "overflow-hidden rounded-4xl border-4 border-bg-mute",
                   )}
                   href={`/customers/${customer.slug}`}
@@ -77,15 +77,13 @@ export default function CustomerPage() {
                     </p>
                   </div>
 
-                  <div className="mt-auto grid h-10 group-hover/customer-comp:hidden">
+                  <div className="mt-auto grid h-10 group-hover:hidden">
                     <span className="opacity-80">{customer.user_name}</span>
                     <span className="opacity-40">{customer.user_title}</span>
                   </div>
 
-                  <div className="mt-auto hidden h-10 group-hover/customer-comp:block">
-                    <Button type="button" hideIcon className="bg-primary">
-                      Read more
-                    </Button>
+                  <div className="mt-auto hidden h-10 group-hover:block">
+                    <Button variant="primary">Read more</Button>
                   </div>
                 </Link>
               );

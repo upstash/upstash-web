@@ -2,6 +2,8 @@ import Bg from "@/components/bg";
 import Button from "@/components/button";
 import Container from "@/components/container";
 import cx from "@/utils/cx";
+import { IconArrowUpRight } from "@tabler/icons-react";
+import Link from "next/link";
 
 export default function SectionHero() {
   return (
@@ -31,12 +33,10 @@ export default function SectionHero() {
           </p>
 
           <div className="mt-10">
-            <Button
-              type="button"
-              className="bg-primary text-lg text-bg"
-              href="https://console.upstash.com"
-            >
-              Contact Us
+            <Button asChild variant="primary" className="text-lg">
+              <Link href="/sales">
+                Contact Us <IconArrowUpRight size={24} />
+              </Link>
             </Button>
           </div>
         </div>

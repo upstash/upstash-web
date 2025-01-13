@@ -12,7 +12,7 @@ export default function PageBodyGradient({
     <div
       className={cx(
         "absolute inset-x-0 top-0 -z-10 h-[800px]",
-        "to-bg bg-gradient-to-b",
+        "bg-gradient-to-b to-bg",
         "from-black/3 dark:from-white/3",
         className,
       )}
