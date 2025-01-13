@@ -26,9 +26,9 @@ export default function Home({
       <main className="text-center">
         <HomeHero />
         <HomeProductNew />
+        <HomeFast />
         <HomeHeroPartner />
         <HomeServerless />
-        <HomeFast />
         <HomeCommunity />
       </main>
     </IntercomProvider>

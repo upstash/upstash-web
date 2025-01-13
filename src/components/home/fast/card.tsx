@@ -25,7 +25,7 @@ export function FastCardValue({
   return (
     <div
       className={cx(
-        "font-display text-3xl font-semibold md:text-4xl",
+        "font-display text-3xl font-semibold tabular-nums text-primary md:text-4xl dark:text-inherit",
         className,
       )}
       {...props}
@@ -43,10 +43,7 @@ export function FastCardTitle({
   children: ReactNode;
 }) {
   return (
-    <h5
-      className="mt-1 text-xs uppercase tracking-widest text-text-mute"
-      {...props}
-    >
+    <h5 className="mt-1 opacity-60" {...props}>
       {children}
     </h5>
   );

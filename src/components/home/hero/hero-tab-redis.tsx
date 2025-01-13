@@ -12,8 +12,6 @@ import React from "react";
 export function HeroTabRedis() {
   return (
     <>
-      <CodeRedis />
-
       <HeroTabFeatureCont>
         <HeroTabFeatureTitle>
           Highly Available, <br /> Infinitely Scalable
@@ -91,6 +89,8 @@ export function HeroTabRedis() {
           </HeroTabFeatureLi>
         </HeroTabFeatureUl>
       </HeroTabFeatureCont>
+
+      <CodeRedis />
     </>
   );
 }

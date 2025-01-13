@@ -64,3 +64,9 @@
     transform: translate3d(-50%, 0, 0);
   }
 }
+
+@keyframes animate-gradient {
+  to {
+    background-position: 100% 100%;
+  }
+}
