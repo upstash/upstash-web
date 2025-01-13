@@ -9,12 +9,12 @@ export interface ButtonProps
 }
 
 const buttonVariants = cva(
-  "inline-flex items-center gap-1 px-4 py-1.5 sm:px-5 sm:py-2 rounded-2xl font-medium transition hover:shadow-sm",
+  "inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-3 rounded-2xl font-medium transition hover:shadow-sm",
   {
     variants: {
       variant: {
         default:
-          "bg-bg-mute text-text hover:bg-white disabled:bg-white/5 disabled:text-zinc-50",
+          "bg-bg-mute text-text hover:bg-emerald-700/20 disabled:bg-white/5 disabled:text-zinc-50",
         primary:
           "bg-primary text-white hover:bg-primary-text disabled:bg-white/5 disabled:text-zinc-50",
       },
