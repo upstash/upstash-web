@@ -32,17 +32,19 @@ export default function NavMobile({ hidden }: HTMLProps<HTMLDivElement> & {}) {
 
       {/* login */}
       <Button
-        type="button"
-        target="_self"
-        hideIcon
-        href={
-          affiliateCode
-            ? `https://console.upstash.com/?code=${affiliateCode}`
-            : "https://console.upstash.com"
-        }
-        className="my-6 justify-center bg-primary py-3 font-display text-lg font-medium"
+        asChild
+        variant="primary"
+        className="my-6 py-3 font-display text-lg font-medium"
       >
-        Login
+        <a
+          href={
+            affiliateCode
+              ? `https://console.upstash.com/?code=${affiliateCode}`
+              : "https://console.upstash.com"
+          }
+        >
+          Login
+        </a>
       </Button>
     </nav>
   );

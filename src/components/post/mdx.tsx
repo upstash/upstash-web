@@ -89,7 +89,7 @@ function Highlight(props: {
 }) {
   return (
     <FullWidth>
-      <div className="group/highlight grid place-items-center gap-6 rounded-4xl border-4 border-bg-mute p-10 text-center md:px-20 md:py-16">
+      <div className="group grid place-items-center gap-6 rounded-4xl border-4 border-bg-mute p-10 text-center md:px-20 md:py-16">
         {props.photo && (
           <Image
             src={`/customer/${props.photo}`}

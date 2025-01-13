@@ -726,47 +726,31 @@ export default function CompareTable() {
         <tr>
           <td className="p-0" />
           <Col plan={showFree} className="py-4">
-            <Button
-              target="_self"
-              type="button"
-              hideIcon
-              href="https://console.upstash.com"
-              className="bg-white text-black"
-            >
-              Start Now
+            <Button asChild variant="primary">
+              <a target="_self" href="https://console.upstash.com">
+                Start Now
+              </a>
             </Button>
           </Col>
           <Col plan={showPayg} feature className="py-4">
-            <Button
-              target="_self"
-              type="button"
-              hideIcon
-              href="https://console.upstash.com"
-              className="bg-primary"
-            >
-              Start Now
+            <Button asChild variant="primary">
+              <a target="_self" href="https://console.upstash.com">
+                Start Now
+              </a>
             </Button>
           </Col>
           <Col plan={showFixed} className="py-4">
-            <Button
-              target="_self"
-              type="button"
-              hideIcon
-              href="https://console.upstash.com"
-              className="bg-white text-black"
-            >
-              Start Now
+            <Button asChild variant="primary">
+              <a target="_self" href="https://console.upstash.com">
+                Start Now
+              </a>
             </Button>
           </Col>
           <Col plan={showPro} className="py-4">
-            <Button
-              target="_self"
-              type="button"
-              hideIcon
-              href="https://console.upstash.com"
-              className="bg-white text-black"
-            >
-              Start Now
+            <Button asChild variant="primary">
+              <a target="_self" href="https://console.upstash.com">
+                Start Now
+              </a>
             </Button>
           </Col>
         </tr>

@@ -35,8 +35,8 @@ export default function ServerlessRedis() {
 
       <div className="mt-auto flex items-center gap-2">
         <Button
-          type="button"
-          href="https://console.upstash.com"
+          // type="button"
+          // href="https://console.upstash.com"
           className="grow bg-red-100 text-red-950 hover:bg-red-100 hover:text-red-950"
         >
           Create Database

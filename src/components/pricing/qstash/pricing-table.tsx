@@ -36,14 +36,10 @@ export default function PricingTable() {
         </div>
 
         <div>
-          <Button
-            target="_self"
-            type="button"
-            hideIcon
-            href="https://console.upstash.com"
-            className="bg-primary"
-          >
-            Start Now
+          <Button asChild variant="primary">
+            <a target="_self" href="https://console.upstash.com">
+              Start Now
+            </a>
           </Button>
         </div>
       </div>
@@ -81,14 +77,10 @@ export default function PricingTable() {
         <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
         <div>
-          <Button
-            target="_self"
-            type="button"
-            hideIcon
-            href="https://console.upstash.com"
-            className="bg-primary"
-          >
-            Start Now
+          <Button asChild variant="primary">
+            <a target="_self" href="https://console.upstash.com">
+              Start Now
+            </a>
           </Button>
         </div>
       </div>
@@ -128,14 +120,10 @@ export default function PricingTable() {
         </div>
 
         <div>
-          <Button
-            target="_self"
-            type="button"
-            hideIcon
-            href="https://console.upstash.com"
-            className="bg-primary"
-          >
-            Start Now
+          <Button asChild variant="primary">
+            <a target="_self" href="https://console.upstash.com">
+              Start Now
+            </a>
           </Button>
         </div>
       </div>

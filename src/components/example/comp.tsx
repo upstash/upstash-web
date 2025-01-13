@@ -33,8 +33,7 @@ export function Example({
   return (
     <article
       className={cx(
-        "group/example-box p-6",
-        "flex flex-col gap-2",
+        "group flex flex-col gap-2 p-6",
         "rounded-xl bg-white/5",
         "transition hover:bg-emerald-300/10",
         className,

@@ -1,6 +1,7 @@
 import Button from "@/components/button";
 import Container from "@/components/container";
 import type { Job } from "@content";
+import { IconArrowUpRight } from "@tabler/icons-react";
 import Balancer from "react-wrap-balancer";
 
 type Props = {
@@ -41,12 +42,10 @@ export default function CareerHeader({ job }: Props) {
           ))}
         </div>
 
-        <Button
-          type="button"
-          href="mailto:jobs@upstash.com"
-          className="mt-10 bg-primary"
-        >
-          Apply now
+        <Button asChild variant="primary" className="mt-10">
+          <a href="mailto:jobs@upstash.com" target="_blank">
+            Apply now <IconArrowUpRight size={20} />
+          </a>
         </Button>
       </Container>
     </header>

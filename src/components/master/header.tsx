@@ -49,18 +49,17 @@ export default function Header({ className, ...props }: HTMLProps<any>) {
           <NewNavigation />
 
           <div className="flex justify-end">
-            <Button
-              target="_self"
-              type="button"
-              hideIcon
-              href={
-                affiliateCode
-                  ? `https://console.upstash.com/?code=${affiliateCode}`
-                  : "https://console.upstash.com"
-              }
-              className={cx(fix && "bg-white text-black")}
-            >
-              Login
+            <Button asChild className={cx(fix && "bg-white text-black")}>
+              <a
+                target="_self"
+                href={
+                  affiliateCode
+                    ? `https://console.upstash.com/?code=${affiliateCode}`
+                    : "https://console.upstash.com"
+                }
+              >
+                Login
+              </a>
             </Button>
           </div>
         </div>

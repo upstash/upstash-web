@@ -10,7 +10,7 @@ export function CommunityBox({
   return (
     <div
       className={cx(
-        "group/community-box flex flex-col items-center p-6 md:p-8",
+        "group flex flex-col items-center p-6 md:p-8",
         "bg-bg-mute transition",
         "rounded-lg first:rounded-t-3xl last:rounded-b-3xl",
         "md:rounded-lg md:first:rounded-t-lg md:last:rounded-b-lg",
@@ -60,15 +60,16 @@ export function CommunityBoxButton({
 }: HTMLProps<HTMLAnchorElement>) {
   return (
     <Button
+      asChild
       className={cx(
-        "mt-auto",
-        "group-hover/community-box:bg-primary",
+        "mt-auto bg-white !text-text",
+        "group-hover:bg-primary group-hover:!text-white",
         className,
       )}
-      {...props}
-      type="button"
     >
-      {children}
+      <a target="_blank" {...props}>
+        {children}
+      </a>
     </Button>
   );
 }

@@ -82,14 +82,10 @@ export default function SectionMenu({
         </div>
 
         <div className="flex justify-end">
-          <Button
-            target="_self"
-            type="button"
-            hideIcon
-            className="bg-emerald-500"
-            href="https://console.upstash.com"
-          >
-            Login
+          <Button asChild>
+            <a href="https://console.upstash.com" target="_self">
+              Login
+            </a>
           </Button>
         </div>
       </div>

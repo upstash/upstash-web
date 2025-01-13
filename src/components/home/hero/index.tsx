@@ -2,7 +2,7 @@ import Bg from "@/components/bg";
 import Button from "@/components/button";
 import Container from "@/components/container";
 import cx from "@/utils/cx";
-import { IconArrowRight } from "@tabler/icons-react";
+import { IconArrowUpRight } from "@tabler/icons-react";
 import React from "react";
 
 export default function HomeHero() {
@@ -30,13 +30,10 @@ export default function HomeHero() {
         </h2>
 
         <div className="mt-6">
-          <Button
-            type="button"
-            className={cx("bg-primary !px-8 text-lg text-bg")}
-            href="https://console.upstash.com"
-            icon={<IconArrowRight stroke={1.5} size={24} />}
-          >
-            Create Database
+          <Button asChild variant="primary" className="!px-8 text-lg">
+            <a href="https://console.upstash.com" target="_self">
+              Start for Free <IconArrowUpRight size={24} />
+            </a>
           </Button>
         </div>
       </Container>

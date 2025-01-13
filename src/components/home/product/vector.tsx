@@ -32,15 +32,15 @@ export default function ServerlessVector() {
 
       <div className="mt-auto flex items-center gap-2">
         <Button
-          href="/docs/vector"
-          type="button"
+          // href="/docs/vector"
+          // type="button"
           className="shrink-0"
         >
           Docs
         </Button>
         <Button
-          href="https://drive.google.com/drive/u/1/folders/1_W7MgkKGJmbfVQ_QiW_6qcfq0JZYFnhw"
-          className="grow bg-orange-100 text-orange-950 hover:bg-orange-100 hover:text-orange-950"
+          // href="https://drive.google.com/drive/u/1/folders/1_W7MgkKGJmbfVQ_QiW_6qcfq0JZYFnhw"
+          // className="grow bg-orange-100 text-orange-950 hover:bg-orange-100 hover:text-orange-950"
           type="button"
         >
           Create Index

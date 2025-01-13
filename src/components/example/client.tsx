@@ -1,7 +1,6 @@
 "use client";
 
 import type { Example } from "@/app/examples/get-data";
-import Button from "@/components/button";
 import { authors } from "@/utils/authors";
 import React, { useState } from "react";
 import { Example as Box } from "./comp";
@@ -145,13 +144,12 @@ export const Client: React.FC<Props> = ({
             }}
           />
 
-          <Button
+          <a
             className="hidden sm:flex"
             href="https://github.com/upstash/examples#contributing"
-            type="button"
           >
             Contribute
-          </Button>
+          </a>
         </div>
 
         <div className="mt-10 grid grow gap-4 py-4 sm:grid-cols-2 sm:gap-6 md:mt-0">

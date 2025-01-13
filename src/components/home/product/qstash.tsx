@@ -34,13 +34,13 @@ export default function ServerlessQStash() {
 
       <div className="mt-auto grid gap-4 sm:grid-cols-2">
         <Button
-          href="/docs/qstash"
+          // href="/docs/qstash"
           type="button"
         >
           Docs
         </Button>
         <Button
-          href="https://github.com/upstash/examples/tree/main/examples"
+          // href="https://github.com/upstash/examples/tree/main/examples"
           className="bg-purple-100 text-purple-950 hover:bg-purple-100 hover:text-purple-950"
           type="button"
         >
