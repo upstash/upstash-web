@@ -31,11 +31,7 @@ export default function NavMobile({ hidden }: HTMLProps<HTMLDivElement> & {}) {
       </div>
 
       {/* login */}
-      <Button
-        asChild
-        variant="primary"
-        className="my-6 py-3 font-display text-lg font-medium"
-      >
+      <Button asChild variant="primary" className="my-6">
         <a
           href={
             affiliateCode

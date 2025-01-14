@@ -33,7 +33,7 @@ export default function SectionHero() {
           </p>
 
           <div className="mt-10">
-            <Button asChild variant="primary" className="text-lg">
+            <Button asChild variant="primary">
               <Link href="/sales">
                 Contact Us <IconArrowUpRight size={24} />
               </Link>
