@@ -62,8 +62,8 @@ export function CommunityBoxButton({
     <Button
       asChild
       className={cx(
-        "mt-auto bg-white !text-text",
-        "group-hover:bg-primary group-hover:!text-white",
+        "mt-auto bg-white",
+        "group-hover:bg-primary group-hover:text-white",
         className,
       )}
     >

@@ -6,6 +6,7 @@ import PageHeaderTitle from "@/components/page-header-title";
 import cx from "@/utils/cx";
 import { IconCalendarDot } from "@tabler/icons-react";
 import { Metadata } from "next";
+import React from "react";
 
 export const metadata: Metadata = {
   title: "Sales",
@@ -36,7 +37,9 @@ export default function HomePage() {
         </header>
 
         <section className="mt-20 md:mt-24">
-          <BigText>Let's Connect</BigText>
+          <BigText className="xl:-mb-[70px] xl:text-[160px]">
+            Let's Connect
+          </BigText>
 
           <div className="relative z-0 mx-auto max-w-[640px] rounded-2xl border-2 border-dashed border-zinc-200 bg-white p-10 text-left shadow-xl md:p-14">
             <form className="grid gap-4 md:grid-cols-2 md:gap-6">
@@ -122,13 +125,9 @@ function BigText({
 }) {
   return (
     <h5
-      style={{
-        backgroundSize: "400% 400%",
-        animation: "animate-gradient 12s infinite alternate",
-      }}
       className={cx(
-        "pointer-events-none -mb-[5vw] whitespace-nowrap",
-        "font-display text-[12vw] font-bold leading-tight",
+        "pointer-events-none -mb-[5vw] whitespace-nowrap xl:-mb-[70px]",
+        "font-display text-[12vw] font-bold leading-tight xl:text-[160px]",
         "bg-gradient-to-br bg-clip-text text-transparent",
         "from-primary via-yellow-400 to-primary-text",
         className,

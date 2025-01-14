@@ -30,7 +30,7 @@ export default function HomeHero() {
         </h2>
 
         <div className="mt-6">
-          <Button asChild variant="primary" className="!px-8 text-lg">
+          <Button asChild variant="primary" className="px-8">
             <a href="https://console.upstash.com" target="_self">
               Start for Free <IconArrowUpRight size={24} />
             </a>

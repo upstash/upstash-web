@@ -29,26 +29,25 @@ export default function HttpRestApi() {
       <div>
         {/* tab */}
         <div className="flex items-center gap-px">
-          {Object.keys(Product).map((key) => {
-            const value = Product[key as keyof typeof Product];
+          {[Product.REDIS, Product.VECTOR, Product.QSTASH].map((p) => {
             return (
               <label
-                key={key}
+                key={p}
                 className={cx(
                   "cursor-pointer select-none bg-bg px-4 py-1 text-sm first:rounded-l-full last:rounded-r-full",
-                  value === product && "bg-primary text-white",
+                  p === product && "bg-primary text-white",
                 )}
               >
                 <input
                   className="pointer-events-none absolute opacity-0"
                   type="radio"
-                  value={value}
+                  value={p}
                   name="product"
                   onChange={(e) => {
                     setProduct(e.target.value as Product);
                   }}
                 />
-                <span>{value}</span>
+                <span>{p}</span>
               </label>
             );
           })}
