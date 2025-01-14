@@ -82,5 +82,22 @@ export const { POST } = serve<UserRequest>(
 );`,
   [Language.Event]: `var b = 3;`,
   [Language.Auth]: `var c = 4;`,
-  [Language.Customer]: `var d = 5;`,
+  [Language.Customer]: `await context.run("new-signup", async () => {
+  await sendEmail("Welcome to the platform", email)
+})
+
+await context.sleep("wait-for-3-days", 60 * 60 * 24 * 3)
+
+while (true) {
+  const state = await context.run("check-user-state", async () => {
+    return await getUserState()
+  })
+
+  if (state === "non-active") {
+    await context.run("send-email-non-active", async () => {
+      await sendEmail("Email to non-active users", email)
+    })
+  } 
+  await context.sleep("wait-for-1-month", 60 * 60 * 24 * 30)
+}`,
 };

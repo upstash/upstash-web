@@ -58,18 +58,61 @@ export default function CodeRedis() {
 }
 
 const CODE = {
-  [Language.Caching]: `import { Redis } from '@upstash/redis';
+  [Language.Caching]: `const redis = new Redis.fromEnv();
+const cacheKey = \`item:\${itemId}\`;
 
-const redis = new Redis({ 
-  url: 'UPSTASH_REDIS_REST_URL', 
-  token: 'UPSTASH_REDIS_REST_TOKEN'
+// Check cache
+const cachedItem = await redis.get(cacheKey);
+if (cachedItem) {
+  console.log("Cache hit");
+  return JSON.parse(cachedItem);
+}`,
+[Language.Session]: `const getSession = async (key: Key) => {
+  const sessionId = await getSessionId();
+  return redis.hget(\`s:\${sessionId}\`, key);
+};
+
+const setSession = async (key: Key, value: string) => {
+  const sessionId = await getSessionIdAndCreateIfMissing();
+  const sessionKey = \`s:\${sessionId}\`;
+  await redis.hset(sessionKey, { [key]: value });
+  return redis.expire(sessionKey, 900);
+};
+`,
+[Language.Rate]: `const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(10, "10 s"),
 });
 
-const data = await redis.get('key');`,
-  [Language.Session]: `var b = 3;`,
-  [Language.Rate]: `var c = 4;`,
-  [Language.Leaderboards]: `var d = 5;`,
-  [Language.Chat]: `var e = 6;`,
+const identifier = getIpAddress();
+const { success } = await ratelimit.limit(identifier);
+
+if (!success) {
+  return res.status(429).send("Too many requests");
+}
+`,
+[Language.Leaderboards]: `const redis = Redis.fromEnv();
+
+const LEADERBOARD_KEY = "game-leaderboard";
+
+export const updateScore = async (playerName: string, score: number) =>
+  await redis.zadd(LEADERBOARD_KEY, { score, member: playerName });
+
+export const getTopPlayers = async (top: number) =>
+  (await redis.zrevrange(LEADERBOARD_KEY, 0, top - 1)).map(
+    (entry) => ({ player: entry.member, score: entry.score })
+  );`,
+[Language.Chat]: `const redis = Redis.fromEnv();
+
+const CHAT_HISTORY_KEY = (userId: string) => \`chat-history:\${userId}\`;
+
+export const saveMessage = async (userId: string, message: string) => {
+  await redis.lpush(CHAT_HISTORY_KEY(userId), message); // Add message to history
+  await redis.ltrim(CHAT_HISTORY_KEY(userId), 0, 99); // Keep only the latest 100 messages
+};
+
+export const getChatHistory = async (userId: string) =>
+  await redis.lrange(CHAT_HISTORY_KEY(userId), 0, -1); `,
 };
 
 export function CodePre({ className, ...props }: React.ComponentProps<"pre">) {
