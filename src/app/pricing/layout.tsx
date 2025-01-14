@@ -11,7 +11,17 @@ export const metadata: Metadata = {
   description: "We manage everything for you.",
 };
 
-export default function PricingLayout({ children }: { children: ReactNode }) {
+interface PricingLayoutProps {
+  children: ReactNode;
+  pageTitle?: string;
+  pageDescription?: string;
+}
+
+export default function PricingLayout({
+  children,
+  pageTitle = "Pricing",
+  pageDescription = "Pay only for what you use with per-request pricing.",
+}: PricingLayoutProps) {
   return (
     <main className="relative z-0 text-center">
       <Bg className="opacity-10" />
@@ -20,10 +30,8 @@ export default function PricingLayout({ children }: { children: ReactNode }) {
         <Container className="max-w-screen-lg">
           {/* header */}
           <header>
-            <PageHeaderTitle>Pricing</PageHeaderTitle>
-            <PageHeaderDesc className="mt-2">
-              Pay only for what you use with per-request pricing.
-            </PageHeaderDesc>
+            <PageHeaderTitle>{pageTitle}</PageHeaderTitle>
+            <PageHeaderDesc className="mt-2">{pageDescription}</PageHeaderDesc>
           </header>
         </Container>
 
