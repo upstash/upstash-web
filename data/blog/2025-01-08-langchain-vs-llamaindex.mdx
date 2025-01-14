@@ -173,6 +173,12 @@ LlamaIndex is best suited for tasks focused on data retrieval and searching. Its
 
 On the other hand, LangChain is ideal for tasks requiring complex workflows, dynamic tool usage, and multi-step reasoning. If your application involves chaining various tools, like APIs, calculators, or search engines, or needs to maintain conversational context across interactions, LangChain offers the flexibility and features to handle these scenarios efficiently. Its ability to dynamically decide which tool to use, makes it well-suited for general-purpose tasks beyond document querying. Additionally, LangChain's memory modules allow it to perform greatly in use cases that require retaining context over multiple interactions, such as chatbots or interactive assistants. In short, LangChain stands out for its versatility and adaptability in building robust applications with large language models.
 
+## Extra
+
+Before ending this blog, we would like to mention another framework which may even more simplify the process of building and integrating AI-Powered features into web applications: Vercel AI SDK. This tool supports APIs for AI Models such as OpenAI or HuggingFace, while also being optimized for real time applications. 
+
+One of the use-cases of Vercel AI SDK along with LangChain could be the scenario that LangChain manages LLM workflows, chains and agents whereas Vercel AI SDK acts as a frontend layer, providing the UI and handling communications with LangChain APIs. Moreover, you can use Vercel AI SDK to serve data retrieved from LlamaIndex indexes in a user-friendly web interface and to stream query results from LlamaIndex as they are processed. For more information, check out the [official documentation](https://sdk.vercel.ai/docs/introduction).
+
 ## Conclusion
 
 One should carefully consider all the needs of their new application before choosing the framework they will work on. Although these two frameworks contend in the LLM world, they are actually specialized on different parts. 
