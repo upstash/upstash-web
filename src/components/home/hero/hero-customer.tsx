@@ -32,9 +32,9 @@ export default function HomeHeroPartner() {
               key={name}
               className={cx(
                 "group flex flex-col overflow-hidden px-6 py-4 sm:py-6",
-                "rounded-2xl bg-white md:rounded-4xl",
+                "rounded-2xl bg-white md:rounded-4xl dark:bg-bg-mute dark:hover:bg-white",
                 "transition hover:shadow-2xl",
-                quote && "col-span-3 py-8 sm:px-16 md:col-span-2",
+                quote && "col-span-3 py-8 sm:px-16 sm:py-10 md:col-span-2",
               )}
             >
               <span className="flex h-12 items-center justify-center text-text-mute transition group-hover:text-primary">
@@ -45,7 +45,8 @@ export default function HomeHeroPartner() {
                 <p
                   className={cx(
                     "mt-4 grow md:text-xl",
-                    "text-balance text-text-mute",
+                    "text-balance text-text-mute dark:text-text",
+                    "dark:group-hover:text-bg",
                   )}
                 >
                   “{quote}”

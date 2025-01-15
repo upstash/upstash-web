@@ -43,7 +43,7 @@ export default async function BlogPage({ params: { author } }: Props) {
           <span className="font-bold">{author}</span>
         </PageHeaderTitle>
         <div className="mt-4">
-          <Link className="text-primary hover:underline" href="/blog">
+          <Link className="text-primary-text hover:underline" href="/blog">
             Back to all posts
           </Link>
         </div>

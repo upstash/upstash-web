@@ -1,6 +1,7 @@
 import Bg from "@/components/bg";
 import PostGridCard from "@/components/blog/grid-item";
 import PopularTag from "@/components/blog/popular-tag";
+import Button from "@/components/button";
 import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
@@ -45,12 +46,9 @@ export default async function BlogPage() {
           </div>
 
           <div className="mt-10 flex justify-center">
-            <Link
-              className="flex justify-center gap-1 rounded-full bg-primary px-5 py-3 transition"
-              href={`/blog/all`}
-            >
-              Show all posts
-            </Link>
+            <Button asChild variant="primary">
+              <Link href={`/blog/all`}>Show all posts</Link>
+            </Button>
           </div>
         </Container>
       </section>

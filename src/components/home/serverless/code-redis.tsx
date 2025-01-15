@@ -136,7 +136,7 @@ export function CodeTabButton({
         "cursor-pointer whitespace-nowrap rounded-lg transition",
         "bg-white bg-opacity-10",
         "hover:bg-opacity-20",
-        active && "bg-opacity-100 !text-text hover:bg-opacity-100",
+        active && "!bg-opacity-100 text-text dark:text-bg",
         className,
       )}
       {...props}

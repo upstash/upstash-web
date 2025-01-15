@@ -128,7 +128,7 @@ const ListItem = React.forwardRef(
             {icon}
           </div>
           <div>
-            <h4 className="font-semibold">{title1}</h4>
+            <h4 className="inline-flex items-center font-semibold">{title1}</h4>
             <p className="opacity-80">{children}</p>
           </div>
         </a>

@@ -20,7 +20,7 @@ export default function HomeProductNew() {
           />
         </div>
 
-        <div className="-mx-6 -mt-0.5 grid gap-2 border-2 border-bg-mute bg-white p-6 sm:mx-auto sm:grid-cols-3 sm:place-items-center sm:gap-8 sm:rounded-4xl sm:p-8">
+        <div className="-mx-6 -mt-0.5 grid gap-2 border-2 border-bg-mute bg-white p-6 sm:mx-auto sm:grid-cols-3 sm:place-items-center sm:gap-8 sm:rounded-4xl sm:p-8 dark:-mt-0 dark:border-0 dark:bg-bg-mute dark:bg-white/10">
           {activeProduct === Product.REDIS && <HeroTabRedis />}
           {activeProduct === Product.VECTOR && <HeroTabVector />}
           {activeProduct === Product.QSTASH && <HeroTabQStash />}
