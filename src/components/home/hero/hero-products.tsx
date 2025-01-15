@@ -104,8 +104,8 @@ function HomeHeroProductTab({
         "flex grow items-center justify-center text-center sm:grow-0",
         "h-12 md:h-16 md:px-8",
         "font-display text-lg font-semibold leading-none text-text-mute md:text-2xl",
-        "rounded-2xl rounded-b-none border-2 border-b-0 border-bg-mute bg-bg",
-        active && "border-white bg-white md:h-20",
+        "rounded-2xl rounded-b-none border-2 border-b-0 border-bg-mute bg-bg dark:border-0 dark:bg-bg-mute",
+        active && "border-white bg-white md:h-20 dark:bg-white/10",
         props.disabled && "hidden cursor-not-allowed lg:flex",
         className,
       )}

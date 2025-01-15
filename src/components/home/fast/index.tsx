@@ -15,12 +15,15 @@ export default function Fast() {
 
       {/* slogan */}
       <h5
+        style={{
+          animationDuration: "4s",
+        }}
         className={cx(
           "absolute inset-x-0 -z-20",
           "font-display text-[12vw] font-bold leading-tight xl:text-[180px]",
           "whitespace-nowrap",
           "bg-gradient-to-br bg-clip-text text-transparent",
-          "from-primary-text via-primary to-yellow-300",
+          "animate-pulse from-primary-text via-primary to-yellow-300",
         )}
       >
         Fast Anywhere
@@ -31,7 +34,16 @@ export default function Fast() {
         src="/globe-light.png"
         alt="upstash region map"
         className={cx(
-          "absolute inset-x-0 left-1/2 top-[10vw] -z-10 -translate-x-1/2 xl:top-[130px]",
+          "absolute inset-x-0 left-1/2 top-[8vw] -z-10 -translate-x-1/2 xl:top-[110px] dark:hidden",
+          "w-full max-w-screen-2xl rounded-full",
+          "shadow-[0px_0px_80px_rgba(16,185,129,.3)]",
+        )}
+      />
+      <img
+        src="/globe-dark.png"
+        alt="upstash region map"
+        className={cx(
+          "absolute inset-x-0 left-1/2 top-[8vw] -z-10 hidden -translate-x-1/2 xl:top-[110px] dark:block",
           "w-full max-w-screen-2xl rounded-full",
           "shadow-[0px_0px_80px_rgba(16,185,129,.3)]",
         )}
