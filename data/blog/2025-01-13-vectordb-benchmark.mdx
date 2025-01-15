@@ -127,7 +127,7 @@ Populate and search latencies here are shown in 99th and 99.9th percentiles.
 
 ![graphs](/blog/vectordb-benchmark/graphs.png) 
 
-For Supabase/pgvector, we created the index before upserting the data in nq768, and created the index after upserting the data in cohere768. That’s why nq768 took significantly longer to populate the index compared to cohere768. For cohere768, index creation took another hour.
+For Supabase/pgvector, we created the index before upserting the data in nq768, and created the index after upserting the data in cohere768. That’s why nq768 took significantly longer to populate the index compared to cohere768. For cohere768, index creation took another hour, which is included in the table and graph above.
 
 <Note type="tip">
 Supabase support suggests creating the index before upserting your data because this approach spreads out the time that would otherwise be spend during index creation and is the most reliable.
