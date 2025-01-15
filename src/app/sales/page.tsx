@@ -1,10 +1,10 @@
 import Bg from "@/components/bg";
+import BigText from "@/components/bigtext";
 import Button from "@/components/button";
 import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
-import cx from "@/utils/cx";
-import { IconCalendarDot } from "@tabler/icons-react";
+import { IconCalendarDot, IconSend2 } from "@tabler/icons-react";
 import { Metadata } from "next";
 import React from "react";
 
@@ -84,7 +84,7 @@ export default function HomePage() {
               </div>
 
               <div className="md:col-span-2">
-                <p className="text-sm text-text-mute">
+                <p className="text-balance text-sm text-text-mute">
                   By submitting you agree to the{" "}
                   <a
                     className="underline"
@@ -106,34 +106,14 @@ export default function HomePage() {
               </div>
 
               <div className="md:col-span-2">
-                <Button type="submit">Submit</Button>
+                <Button type="submit" variant="primary">
+                  Submit <IconSend2 size={20} />
+                </Button>
               </div>
             </form>
           </div>
         </section>
       </Container>
     </main>
-  );
-}
-
-function BigText({
-  className,
-  children,
-}: {
-  className?: string;
-  children?: React.ReactNode;
-}) {
-  return (
-    <h5
-      className={cx(
-        "pointer-events-none -mb-[5vw] whitespace-nowrap xl:-mb-[70px]",
-        "font-display text-[12vw] font-bold leading-tight xl:text-[160px]",
-        "bg-gradient-to-br bg-clip-text text-transparent",
-        "from-primary via-yellow-400 to-primary-text",
-        className,
-      )}
-    >
-      {children}
-    </h5>
   );
 }

@@ -14,7 +14,7 @@ export function HeroTabQStash() {
     <>
       <HeroTabFeatureCont>
         <HeroTabFeatureTitle>
-          Serverless <br /> Messaging
+          Serverless <br className="hidden sm:block" /> Messaging
         </HeroTabFeatureTitle>
         <HeroTabFeatureUl>
           <HeroTabFeatureLi>
@@ -40,7 +40,7 @@ export function HeroTabQStash() {
 
       <HeroTabFeatureCont>
         <HeroTabFeatureTitle>
-          Scheduled Tasks <br /> with CRON
+          Scheduled Tasks <br className="hidden sm:block" /> with CRON
         </HeroTabFeatureTitle>
         <HeroTabFeatureUl>
           <HeroTabFeatureLi>
@@ -66,7 +66,7 @@ export function HeroTabQStash() {
 
       <HeroTabFeatureCont>
         <HeroTabFeatureTitle>
-          Intelligent <br /> Retry Mechanism
+          Intelligent <br className="hidden sm:block" /> Retry Mechanism
         </HeroTabFeatureTitle>
         <HeroTabFeatureUl>
           <HeroTabFeatureLi>
@@ -91,7 +91,6 @@ export function HeroTabQStash() {
       </HeroTabFeatureCont>
 
       <CodeQStash />
-      
     </>
   );
 }

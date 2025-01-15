@@ -24,17 +24,17 @@ export default function HomeHeroPartner() {
 
         <div
           className={cx(
-            "mt-16 grid grid-cols-3 gap-4 rounded-2xl md:mt-24 md:grid-cols-4 md:gap-6",
+            "mt-16 grid grid-cols-3 gap-2 rounded-2xl md:mt-24 md:grid-cols-4 md:gap-6",
           )}
         >
           {customers.map(({ name, icon, quote }) => (
             <div
               key={name}
               className={cx(
-                "group flex flex-col overflow-hidden px-16 py-8",
+                "group flex flex-col overflow-hidden px-6 py-4 sm:py-6",
                 "rounded-2xl bg-white md:rounded-4xl",
                 "transition hover:shadow-2xl",
-                quote && "col-span-3 md:col-span-2",
+                quote && "col-span-3 py-8 sm:px-16 md:col-span-2",
               )}
             >
               <span className="flex h-12 items-center justify-center text-text-mute transition group-hover:text-primary">
@@ -147,7 +147,7 @@ const customers = [
 
     icon: (
       <svg
-        height="28"
+        height="26"
         viewBox="0 0 179 46"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -170,7 +170,7 @@ const customers = [
     name: "Branch",
     icon: (
       <svg
-        height="42"
+        height="40"
         viewBox="0 0 175 56"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -218,7 +218,7 @@ const customers = [
     name: "Maker.co",
     icon: (
       <svg
-        height="19"
+        height="18"
         xmlns="http://www.w3.org/2000/svg"
         fill="currentColor"
         viewBox="0 0 122.51 24"
@@ -232,7 +232,7 @@ const customers = [
     name: "NZXT",
     icon: (
       <svg
-        height="22"
+        height="20"
         viewBox="0 0 94 24"
         fill="currentColor"
         xmlns="http://www.w3.org/2000/svg"
@@ -249,7 +249,7 @@ const customers = [
 
     icon: (
       <svg
-        height="30"
+        height="28"
         viewBox="0 0 62 24"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -267,7 +267,7 @@ const customers = [
     name: "Vercel",
     icon: (
       <svg
-        height="26"
+        height="25"
         viewBox="0 0 103 24"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -283,7 +283,7 @@ const customers = [
     name: "Supabase",
     icon: (
       <svg
-        height="32"
+        height="28"
         viewBox="0 0 136 26"
         fill="currentColor"
         xmlns="http://www.w3.org/2000/svg"
@@ -383,7 +383,7 @@ const customers = [
     icon: (
       <svg
         fill="none"
-        height="30"
+        height="24"
         viewBox="0 0 334 56"
         xmlns="http://www.w3.org/2000/svg"
       >
@@ -404,7 +404,7 @@ const customers = [
     name: "Ding",
     icon: (
       <svg
-        height="30"
+        height="28"
         viewBox="0 0 105 35"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"

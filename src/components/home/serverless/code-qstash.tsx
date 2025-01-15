@@ -25,7 +25,7 @@ export default function CodeRedis() {
   }, [lang]);
 
   return (
-    <div className="col-span-3 flex w-full items-start gap-8 rounded-2xl bg-pre-bg p-6">
+    <div className="flex w-full items-start gap-8 rounded-2xl bg-pre-bg p-6 sm:col-span-3">
       <div className="grid gap-2">
         {Object.values(Language).map((value) => {
           const active = value === lang;

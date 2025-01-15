@@ -33,7 +33,7 @@ export default function HomeCommunity() {
           <CommunityBox>
             <Icon
               icon={ICON_NAMES.FileText}
-              className="mb-4 text-4xl group-hover:text-primary md:text-5xl"
+              className="mb-4 hidden text-4xl group-hover:text-primary sm:inline-flex md:text-5xl"
               strokeWidth="1"
             />
             <CommunityBoxTitle>Blog</CommunityBoxTitle>
@@ -48,7 +48,7 @@ export default function HomeCommunity() {
           <CommunityBox>
             <Icon
               icon={ICON_NAMES.Discord}
-              className="mb-4 text-4xl group-hover:text-primary md:text-5xl"
+              className="mb-4 hidden text-4xl group-hover:text-primary sm:inline-flex md:text-5xl"
               strokeWidth="1"
             />
             <CommunityBoxTitle>Discord</CommunityBoxTitle>
@@ -64,7 +64,7 @@ export default function HomeCommunity() {
           <CommunityBox>
             <Icon
               icon={ICON_NAMES.Twitter}
-              className="mb-4 text-4xl group-hover:text-primary md:text-5xl"
+              className="mb-4 hidden text-4xl group-hover:text-primary sm:inline-flex md:text-5xl"
               strokeWidth="1"
             />
             <CommunityBoxTitle>Twitter</CommunityBoxTitle>
@@ -80,7 +80,7 @@ export default function HomeCommunity() {
           <CommunityBox>
             <Icon
               icon={ICON_NAMES.Github}
-              className="mb-4 text-4xl group-hover:text-primary md:text-5xl"
+              className="mb-4 hidden text-4xl group-hover:text-primary sm:inline-flex md:text-5xl"
               strokeWidth="1"
             />
             <CommunityBoxTitle>Github</CommunityBoxTitle>
