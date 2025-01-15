@@ -1,9 +1,9 @@
-import Bg from "@/components/bg";
-import Container from "@/components/container";
-import { Client } from "@/components/example/client";
-import PageHeaderDesc from "@/components/page-header-desc";
-import PageHeaderTitle from "@/components/page-header-title";
 import React from "react";
+import Bg from "../../src/components/bg";
+import Container from "../../src/components/container";
+import { Client } from "../../src/components/example/client";
+import PageHeaderDesc from "../../src/components/page-header-desc";
+import PageHeaderTitle from "../../src/components/page-header-title";
 import { getData, type Example } from "./get-data";
 
 // TODO: set canonical url

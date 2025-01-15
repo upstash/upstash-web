@@ -1,6 +1,7 @@
 import Button from "@/components/button";
 import cx from "@/utils/cx";
-import { HTMLProps } from "react";
+import { IconArrowUpRight } from "@tabler/icons-react";
+import React, { HTMLProps } from "react";
 
 export function CommunityBox({
   children,
@@ -62,13 +63,17 @@ export function CommunityBoxButton({
     <Button
       asChild
       className={cx(
-        "mt-auto bg-white",
+        "mt-auto",
         "group-hover:bg-primary group-hover:text-white",
         className,
       )}
     >
       <a target="_blank" {...props}>
         {children}
+        <IconArrowUpRight
+          size={20}
+          className="opacity-50 group-hover:opacity-100"
+        />
       </a>
     </Button>
   );

@@ -1,12 +1,12 @@
-import Bg from "@/components/bg";
-import Container from "@/components/container";
-import PageHeaderDesc from "@/components/page-header-desc";
-import PageHeaderTitle from "@/components/page-header-title";
-import { LETTERS } from "@/utils/const";
-import cx from "@/utils/cx";
-import type { Glossary } from "@content";
-import { allGlossaries } from "@content";
 import Link from "next/link";
+import type { Glossary } from "../../.content-collections/generated";
+import { allGlossaries } from "../../.content-collections/generated";
+import Bg from "../../src/components/bg";
+import Container from "../../src/components/container";
+import PageHeaderDesc from "../../src/components/page-header-desc";
+import PageHeaderTitle from "../../src/components/page-header-title";
+import { LETTERS } from "../../src/utils/const";
+import cx from "../../src/utils/cx";
 
 type GlossaryGrouped = {
   [key: string]: Glossary[];
@@ -95,7 +95,7 @@ export default function HomePage() {
                         <h3>
                           <Link
                             passHref
-                            href={`/glossary/${glossary.slug}`}
+                            href={`/archive/glossary/${glossary.slug}`}
                             className="font-display text-lg font-semibold text-emerald-400"
                           >
                             {glossary.title}
