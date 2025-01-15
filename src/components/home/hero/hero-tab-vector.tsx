@@ -12,8 +12,6 @@ import React from "react";
 export function HeroTabVector() {
   return (
     <>
-      <CodeVector />
-
       <HeroTabFeatureCont>
         <HeroTabFeatureTitle>
           Massive <br /> Scalability
@@ -23,7 +21,7 @@ export function HeroTabVector() {
             <HeroTabFeatureBullet>
               <IconCircle1 stroke={1.5} />
             </HeroTabFeatureBullet>
-            Effortlessly handle hundreds of millions of vectors
+            Handle hundreds of millions of vectors
           </HeroTabFeatureLi>
           <HeroTabFeatureLi>
             <HeroTabFeatureBullet>
@@ -96,6 +94,7 @@ export function HeroTabVector() {
           </HeroTabFeatureLi>
         </HeroTabFeatureUl>
       </HeroTabFeatureCont>
+      <CodeVector />
     </>
   );
 }

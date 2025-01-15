@@ -61,15 +61,38 @@ export default function CodeRedis() {
 }
 
 const CODE = {
-  [Language.Scheduling]: `import { Redis } from '@upstash/redis';
+  [Language.Scheduling]: `import { Client } from "@upstash/qstash";
 
-const redis = new Redis({ 
-  url: 'UPSTASH_REDIS_REST_URL', 
-  token: 'UPSTASH_REDIS_REST_TOKEN'
+const client = new Client({ token: "QSTASH_TOKEN" });
+await client.schedules.create({
+  destination: "https://example.com",
+  cron: "* * * * *",
 });
+`,
+  [Language.Auto]: `const client = new Client({ token: "QSTASH_TOKEN" });
+const res = await client.publishJSON({
+  url: "https://my-api...",
+  body: { hello: "world" },
+  retries: 2,
+});`,
+  [Language.Queues]: `const client = new Client({ token: "QSTASH_TOKEN" });
 
-const data = await redis.get('key');`,
-  [Language.Auto]: `var b = 3;`,
-  [Language.Queues]: `var c = 4;`,
-  [Language.Callbacks]: `var c = 4;`,
+const queue = client.queue({
+  queueName: "my-queue"
+})
+
+await queue.enqueueJSON({
+  url: "https://example.com",
+  body: {
+    "Hello": "World"
+  }
+})`,
+  [Language.Callbacks]: `import { Client } from "@upstash/qstash";
+
+const client = new Client({ token: "QSTASH_TOKEN" });
+const res = await client.publishJSON({
+  url: "https://my-api...",
+  body: { hello: "world" },
+  callback: "https://my-callback...",
+});`,
 };

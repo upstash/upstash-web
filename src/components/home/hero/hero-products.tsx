@@ -61,11 +61,6 @@ export default function HomeHeroProducts({
         <IconWorkflow width={24} />
         <span>Workflow</span>
       </HomeHeroProductTab>
-
-      <HomeHeroProductTab disabled>
-        <IconEmpty width={24} className="opacity-10" />
-        <span className="opacity-30">Search</span>
-      </HomeHeroProductTab>
     </>
   );
 }

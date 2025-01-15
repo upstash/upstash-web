@@ -60,14 +60,38 @@ export default function CodeRedis() {
 }
 
 const CODE = {
-  [Language.RAG]: `import { Redis } from '@upstash/redis';
+  [Language.RAG]: `context = index.query(vector=question_embedding, top_k=5, include_metadata=True)
+prompt = f"Question:{question}\\n\\nContext: {context}"
 
-const redis = new Redis({ 
-  url: 'UPSTASH_REDIS_REST_URL', 
-  token: 'UPSTASH_REDIS_REST_TOKEN'
-});
+response = openai.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "system", 
+            "content": 'You are a helpful assistant, answer the question using the context.'},
+                      {"role": "user", "content": prompt}
+            ])`,
+  [Language.Cache]: `const semanticCache = new SemanticCache({ index, minProximity: 0.95 });
 
-const data = await redis.get('key');`,
-  [Language.Cache]: `var b = 3;`,
-  [Language.Search]: `var c = 4;`,
+await semanticCache.set("Capital of Turkey", "Ankara");
+// 👇 outputs: "Ankara"
+const result = await semanticCache.get("What is Turkey's capital?");
+
+await semanticCache.set("year in which the Berlin wall fell", "1989");
+// 👇 outputs "1989"
+const result = await semanticCache.get("what's the year the Berlin wall destroyed?");
+}
+`,
+  [Language.Search]: `store = UpstashVectorStore(
+    embedding=True,  # Embedding option enabled
+)
+
+documents = [
+    Document(page_content="Upstash Vector is a scalable vector database."),
+    Document(page_content="LangChain is a framework for building intelligent apps."),
+]
+
+store.add_documents(documents)
+
+# Perform a similarity search
+query = "What is LangChain?"
+results = store.similarity_search(query, k=3)`,
 };
