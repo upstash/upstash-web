@@ -1,10 +1,13 @@
-import Bg from "@/components/bg";
-import Container from "@/components/container";
-import { Mdx } from "@/components/post/mdx";
-import { allGlossaries, Glossary } from "@content";
 import { IconArrowLeft } from "@tabler/icons-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import {
+  allGlossaries,
+  Glossary,
+} from "../../../.content-collections/generated";
+import Bg from "../../../src/components/bg";
+import Container from "../../../src/components/container";
+import { Mdx } from "../../../src/components/post/mdx";
 
 type Props = {
   params: {
@@ -83,7 +86,7 @@ export default async function BlogPage({ params }: Props) {
                 return (
                   <li key={glossary.slug}>
                     <Link
-                      href={`/glossary/${glossary.slug}`}
+                      href={`/archive/glossary/${glossary.slug}`}
                       className="text-emerald-500 hover:underline"
                     >
                       {glossary.title}

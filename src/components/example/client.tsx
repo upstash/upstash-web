@@ -1,8 +1,8 @@
 "use client";
 
-import type { Example } from "@/app/examples/get-data";
 import { authors } from "@/utils/authors";
 import React, { useState } from "react";
+import type { Example } from "../../../archive/examples/get-data";
 import { Example as Box } from "./comp";
 import ExampleFilter from "./filter";
 
