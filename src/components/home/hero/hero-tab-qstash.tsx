@@ -12,8 +12,6 @@ import React from "react";
 export function HeroTabQStash() {
   return (
     <>
-      <CodeQStash />
-
       <HeroTabFeatureCont>
         <HeroTabFeatureTitle>
           Serverless <br /> Messaging
@@ -91,6 +89,9 @@ export function HeroTabQStash() {
           </HeroTabFeatureLi>
         </HeroTabFeatureUl>
       </HeroTabFeatureCont>
+
+      <CodeQStash />
+      
     </>
   );
 }

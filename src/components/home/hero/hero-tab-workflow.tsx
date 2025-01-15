@@ -12,7 +12,6 @@ import React from "react";
 export function HeroTabWorkflow() {
   return (
     <>
-      <CodeWorkflow />
 
       <HeroTabFeatureCont>
         <HeroTabFeatureTitle>
@@ -23,7 +22,7 @@ export function HeroTabWorkflow() {
             <HeroTabFeatureBullet>
               <IconCircle1 stroke={1.5} />
             </HeroTabFeatureBullet>
-            Effortlessly coordinate complex serverless workflows
+            Coordinate complex serverless workflows
           </HeroTabFeatureLi>
           <HeroTabFeatureLi>
             <HeroTabFeatureBullet>
@@ -91,6 +90,9 @@ export function HeroTabWorkflow() {
           </HeroTabFeatureLi>
         </HeroTabFeatureUl>
       </HeroTabFeatureCont>
+
+      <CodeWorkflow />
+      
     </>
   );
 }
