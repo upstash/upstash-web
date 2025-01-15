@@ -18,7 +18,7 @@ import {
 export default function HomeCommunity() {
   return (
     <section id={HOME_SECTIONS.COMMUNITY} className="relative py-16 md:py-28">
-      <Bg className="top-32 h-1/2 bg-yellow-500" />
+      <Bg />
 
       <Container>
         {/* header */}
