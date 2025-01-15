@@ -89,24 +89,15 @@ const NavItems: {
     href: "/blog",
   },
   {
-    name: "Examples",
-    href: "/examples",
-  },
-
-  {
     name: "Careers",
     href: "/careers",
-  },
-  {
-    name: "Customers",
-    href: "/customers",
   },
   {
     name: "About",
     href: "/about",
   },
   {
-    name: "Discord",
-    href: "https://upstash.com/discord",
+    name: "Contact Us",
+    href: "/sales",
   },
 ];

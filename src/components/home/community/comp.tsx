@@ -47,7 +47,7 @@ export function CommunityBoxDesc({
   ...props
 }: HTMLProps<HTMLParagraphElement>) {
   return (
-    <p className={cx("mb-6 mt-2 text-text-mute", className)} {...props}>
+    <p className={cx("mb-4 mt-2 text-text-mute sm:mb-6", className)} {...props}>
       {children}
     </p>
   );

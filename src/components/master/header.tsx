@@ -46,7 +46,9 @@ export default function Header({ className, ...props }: HTMLProps<any>) {
             </Link>
           </div>
 
-          <NewNavigation />
+          <div className="col-span-4">
+            <NewNavigation />
+          </div>
 
           <div className="flex justify-end">
             <Button asChild className={cx(fix && "bg-white text-black")}>

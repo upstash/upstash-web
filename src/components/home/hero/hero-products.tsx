@@ -1,4 +1,3 @@
-import IconEmpty from "@/components/icon-empty";
 import IconQStash from "@/components/icon-qstash";
 import IconRedis from "@/components/icon-redis";
 import IconVector from "@/components/icon-vector";
@@ -23,9 +22,19 @@ export default function HomeHeroProducts({
         }}
         className={cx(activeProduct === Product.REDIS && "text-red-600")}
       >
-        <IconRedis width={24} />
+        {
+          <IconRedis
+            className={cx(
+              "hidden w-5 shrink-0 sm:block md:w-6",
+              activeProduct === Product.REDIS && "block",
+            )}
+          />
+        }
         <span>
-          Redis <span className="text-[.9em] opacity-40">®*</span>
+          Redis{" "}
+          <span className="hidden text-[.9em] opacity-40 sm:inline-flex">
+            ®*
+          </span>
         </span>
       </HomeHeroProductTab>
 
@@ -36,7 +45,12 @@ export default function HomeHeroProducts({
         }}
         className={cx(activeProduct === Product.VECTOR && "text-orange-600")}
       >
-        <IconVector width={24} />
+        <IconVector
+          className={cx(
+            "hidden w-5 shrink-0 sm:block md:w-6",
+            activeProduct === Product.VECTOR && "block",
+          )}
+        />
         <span>Vector</span>
       </HomeHeroProductTab>
 
@@ -47,7 +61,12 @@ export default function HomeHeroProducts({
         }}
         className={cx(activeProduct === Product.QSTASH && "text-blue-600")}
       >
-        <IconQStash width={24} />
+        <IconQStash
+          className={cx(
+            "hidden w-5 shrink-0 sm:block md:w-6",
+            activeProduct === Product.QSTASH && "block",
+          )}
+        />
         <span>QStash</span>
       </HomeHeroProductTab>
 
@@ -58,7 +77,12 @@ export default function HomeHeroProducts({
         }}
         className={cx(activeProduct === Product.WORKFLOW && "text-purple-600")}
       >
-        <IconWorkflow width={24} />
+        <IconWorkflow
+          className={cx(
+            "hidden w-5 shrink-0 sm:block md:w-6",
+            activeProduct === Product.WORKFLOW && "block",
+          )}
+        />
         <span>Workflow</span>
       </HomeHeroProductTab>
     </>
@@ -77,11 +101,11 @@ function HomeHeroProductTab({
     <button
       type="button"
       className={cx(
-        "flex items-center justify-center text-center",
-        "h-16 px-8",
-        "font-display text-2xl font-semibold leading-none text-text-mute",
-        "rounded-2xl rounded-b-none border-2 border-b-0 border-bg-mute",
-        active && "h-20 border-white bg-white",
+        "flex grow items-center justify-center text-center sm:grow-0",
+        "h-12 md:h-16 md:px-8",
+        "font-display text-lg font-semibold leading-none text-text-mute md:text-2xl",
+        "rounded-2xl rounded-b-none border-2 border-b-0 border-bg-mute bg-bg",
+        active && "border-white bg-white md:h-20",
         props.disabled && "hidden cursor-not-allowed lg:flex",
         className,
       )}

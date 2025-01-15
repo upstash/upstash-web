@@ -12,10 +12,9 @@ import React from "react";
 export function HeroTabWorkflow() {
   return (
     <>
-
       <HeroTabFeatureCont>
         <HeroTabFeatureTitle>
-          Serverless <br /> Function Orchestration
+          Serverless <br className="hidden sm:block" /> Function Orchestration
         </HeroTabFeatureTitle>
         <HeroTabFeatureUl>
           <HeroTabFeatureLi>
@@ -41,7 +40,7 @@ export function HeroTabWorkflow() {
 
       <HeroTabFeatureCont>
         <HeroTabFeatureTitle>
-          Eliminate <br /> Function Timeouts
+          Eliminate <br className="hidden sm:block" /> Function Timeouts
         </HeroTabFeatureTitle>
         <HeroTabFeatureUl>
           <HeroTabFeatureLi>
@@ -67,7 +66,7 @@ export function HeroTabWorkflow() {
 
       <HeroTabFeatureCont>
         <HeroTabFeatureTitle>
-          Automatic <br /> Error Recovery
+          Automatic <br className="hidden sm:block" /> Error Recovery
         </HeroTabFeatureTitle>
         <HeroTabFeatureUl>
           <HeroTabFeatureLi>
@@ -92,7 +91,6 @@ export function HeroTabWorkflow() {
       </HeroTabFeatureCont>
 
       <CodeWorkflow />
-      
     </>
   );
 }

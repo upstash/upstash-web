@@ -15,7 +15,7 @@ export default function HomeHero() {
         <h1
           className={cx(
             "tracking-tight transition",
-            "font-display text-6xl font-bold leading-none md:text-[8rem]",
+            "font-display text-5xl font-bold leading-none md:text-[8rem]",
             "bg-gradient-to-r bg-clip-text text-transparent",
             "from-primary-text via-primary to-amber-500",
           )}

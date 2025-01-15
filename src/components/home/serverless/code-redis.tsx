@@ -22,8 +22,8 @@ export default function CodeRedis() {
   }, [lang]);
 
   return (
-    <div className="col-span-3 flex w-full items-start gap-8 rounded-2xl bg-pre-bg p-6">
-      <div className="grid gap-2">
+    <div className="flex w-full flex-col items-start gap-8 rounded-2xl bg-pre-bg p-6 sm:col-span-3 sm:flex-row md:gap-12">
+      <div className="flex flex-wrap gap-2 sm:grid">
         {Object.values(Language).map((value) => {
           const active = value === lang;
           return (
@@ -34,7 +34,10 @@ export default function CodeRedis() {
             >
               <span className="grow">{value}</span>
               <IconChevronRight
-                className={cx("shrink-0 opacity-0", active && "opacity-50")}
+                className={cx(
+                  "hidden shrink-0 opacity-0 sm:inline-flex",
+                  active && "opacity-50",
+                )}
                 size={20}
                 stroke={1.5}
               />
@@ -44,7 +47,7 @@ export default function CodeRedis() {
       </div>
 
       {/* body */}
-      <div className="col-span-2">
+      <div className="w-full overflow-y-auto">
         {Object.values(Language).map((value) => {
           return (
             <CodePre key={value} hidden={value !== lang}>
@@ -67,7 +70,7 @@ if (cachedItem) {
   console.log("Cache hit");
   return JSON.parse(cachedItem);
 }`,
-[Language.Session]: `const getSession = async (key: Key) => {
+  [Language.Session]: `const getSession = async (key: Key) => {
   const sessionId = await getSessionId();
   return redis.hget(\`s:\${sessionId}\`, key);
 };
@@ -79,7 +82,7 @@ const setSession = async (key: Key, value: string) => {
   return redis.expire(sessionKey, 900);
 };
 `,
-[Language.Rate]: `const ratelimit = new Ratelimit({
+  [Language.Rate]: `const ratelimit = new Ratelimit({
   redis: Redis.fromEnv(),
   limiter: Ratelimit.slidingWindow(10, "10 s"),
 });
@@ -91,7 +94,7 @@ if (!success) {
   return res.status(429).send("Too many requests");
 }
 `,
-[Language.Leaderboards]: `const redis = Redis.fromEnv();
+  [Language.Leaderboards]: `const redis = Redis.fromEnv();
 
 const LEADERBOARD_KEY = "game-leaderboard";
 
@@ -102,7 +105,7 @@ export const getTopPlayers = async (top: number) =>
   (await redis.zrevrange(LEADERBOARD_KEY, 0, top - 1)).map(
     (entry) => ({ player: entry.member, score: entry.score })
   );`,
-[Language.Chat]: `const redis = Redis.fromEnv();
+  [Language.Chat]: `const redis = Redis.fromEnv();
 
 const CHAT_HISTORY_KEY = (userId: string) => \`chat-history:\${userId}\`;
 
@@ -129,8 +132,8 @@ export function CodeTabButton({
   return (
     <button
       className={cx(
-        "flex h-10 select-none items-center gap-4 px-6 text-left text-white/80",
-        "cursor-pointer rounded-lg transition",
+        "flex h-8 select-none items-center gap-8 px-3 text-left text-white/80 sm:h-10 sm:px-6",
+        "cursor-pointer whitespace-nowrap rounded-lg transition",
         "bg-white bg-opacity-10",
         "hover:bg-opacity-20",
         active && "bg-opacity-100 !text-text hover:bg-opacity-100",

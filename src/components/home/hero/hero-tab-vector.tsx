@@ -14,7 +14,7 @@ export function HeroTabVector() {
     <>
       <HeroTabFeatureCont>
         <HeroTabFeatureTitle>
-          Massive <br /> Scalability
+          Massive <br className="hidden sm:block" /> Scalability
         </HeroTabFeatureTitle>
         <HeroTabFeatureUl>
           <HeroTabFeatureLi>
@@ -40,7 +40,7 @@ export function HeroTabVector() {
 
       <HeroTabFeatureCont>
         <HeroTabFeatureTitle>
-          Disk-Based <br /> Algorithm for Efficiency
+          Disk-Based <br className="hidden sm:block" /> Algorithm for Efficiency
         </HeroTabFeatureTitle>
         <HeroTabFeatureUl>
           <HeroTabFeatureLi>
@@ -68,7 +68,8 @@ export function HeroTabVector() {
 
       <HeroTabFeatureCont>
         <HeroTabFeatureTitle>
-          Powerful Metadata <br /> Store with SQL Support
+          Powerful Metadata <br className="hidden sm:block" /> Store with SQL
+          Support
         </HeroTabFeatureTitle>
         <HeroTabFeatureUl>
           <HeroTabFeatureLi>
@@ -94,6 +95,7 @@ export function HeroTabVector() {
           </HeroTabFeatureLi>
         </HeroTabFeatureUl>
       </HeroTabFeatureCont>
+
       <CodeVector />
     </>
   );

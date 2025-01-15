@@ -10,7 +10,7 @@ import React, { PropsWithChildren } from "react";
 
 export default function NewNavigationRoot({ children }: PropsWithChildren) {
   return (
-    <NavigationMenu.Root className="relative z-50 col-span-4 flex w-full items-center justify-center">
+    <NavigationMenu.Root className="relative z-50 flex w-full items-center justify-center">
       <NavigationMenu.List className="flex items-center">
         {children}
 

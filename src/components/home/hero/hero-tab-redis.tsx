@@ -14,7 +14,8 @@ export function HeroTabRedis() {
     <>
       <HeroTabFeatureCont>
         <HeroTabFeatureTitle>
-          Highly Available, <br /> Infinitely Scalable
+          Highly Available, <br className="hidden sm:block" /> Infinitely
+          Scalable
         </HeroTabFeatureTitle>
         <HeroTabFeatureUl>
           <HeroTabFeatureLi>
@@ -40,7 +41,7 @@ export function HeroTabRedis() {
 
       <HeroTabFeatureCont>
         <HeroTabFeatureTitle>
-          Global <br /> Low Latency
+          Global <br className="hidden sm:block" /> Low Latency
         </HeroTabFeatureTitle>
         <HeroTabFeatureUl>
           <HeroTabFeatureLi>
@@ -66,7 +67,7 @@ export function HeroTabRedis() {
 
       <HeroTabFeatureCont>
         <HeroTabFeatureTitle>
-          Durable, <br /> Persistent Storage
+          Durable, <br className="hidden sm:block" /> Persistent Storage
         </HeroTabFeatureTitle>
         <HeroTabFeatureUl>
           <HeroTabFeatureLi>

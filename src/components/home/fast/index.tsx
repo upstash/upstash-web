@@ -20,7 +20,7 @@ export default function Fast() {
           "font-display text-[12vw] font-bold leading-tight xl:text-[180px]",
           "whitespace-nowrap",
           "bg-gradient-to-br bg-clip-text text-transparent",
-          "from-primary-text via-primary via-30% to-yellow-300",
+          "from-primary-text via-primary to-yellow-300",
         )}
       >
         Fast Anywhere
