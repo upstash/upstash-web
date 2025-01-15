@@ -34,11 +34,7 @@ export default function NewNavigationItemCompany() {
           <ListItem href="/github" title1="Github" icon={<IconBrandGithub />}>
             Explore Our Code on GitHub
           </ListItem>
-          <ListItem
-            href="mailto:support@upstash.com"
-            title1="Email"
-            icon={<IconMail />}
-          >
+          <ListItem href="/sales" title1="Contact Us" icon={<IconMail />}>
             Send an Email to Support
           </ListItem>
         </div>
