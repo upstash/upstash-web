@@ -9,7 +9,7 @@ export default function Fast() {
   return (
     <section
       id={HOME_SECTIONS.FAST}
-      className="relative z-0 mt-20 h-[320px] overflow-hidden sm:h-[400px] md:mt-32 xl:h-[500px]"
+      className="relative -z-10 mt-20 h-[320px] overflow-hidden sm:h-[400px] md:mt-32 xl:h-[500px]"
     >
       <Bg className="!top-24" />
 

@@ -1,3 +1,4 @@
+import Bg from "@/components/bg";
 import Container from "@/components/container";
 import {
   SectionHeader,
@@ -9,7 +10,7 @@ import cx from "@/utils/cx";
 export default function HomeHeroPartner() {
   return (
     <section className="relative pt-32">
-      {/*<Bg />*/}
+      <Bg />
 
       <Container>
         {/* title */}
