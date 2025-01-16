@@ -1,5 +1,3 @@
-"use client";
-
 import QStashFaqJson from "@/../public/faq/qstash.json";
 import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";

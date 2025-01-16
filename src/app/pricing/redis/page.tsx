@@ -1,5 +1,3 @@
-"use client";
-
 import RedisFaqJson from "@/../public/faq/redis.json";
 import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";

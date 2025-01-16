@@ -1,3 +1,5 @@
+"use client";
+
 import IconQStash from "@/components/icon-qstash";
 import IconRedis from "@/components/icon-redis";
 import IconVector from "@/components/icon-vector";
