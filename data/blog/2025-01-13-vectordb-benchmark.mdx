@@ -141,7 +141,7 @@ Supabase support suggests creating the index before upserting your data because 
 | Pinecone | ~15.24 |
 | Supabase/pgvector | ~5.65 |
 
-We calculated the cost per 1M vectors based on the number of vectors we upserted and the total cost that was reflected to us.
+We calculated the cost per 1M vectors based on the number of vectors we upserted and the total cost that was reflected to us. Although this includes queries, the number of queries is quite small compared to upserts (a few thousand versus millions), so we might as well just say upserts. Additionally, for Supabase, a Pro account is required, which costs $25 and is included in the calculation.
 
 ![cost](/blog/vectordb-benchmark/cost.png)
 
