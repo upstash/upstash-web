@@ -108,7 +108,7 @@ Now, let's see the results!
 
 ### **Performance Comparison**  
 
-| Workload | Provider | Populate Latency | Search Latency | Recall | Population Time |
+| Workload | Provider | Populate Latency (p99 / p99.9) | Query Latency (p99 / p99.9) | Recall | Population Time |
 | --- | --- | --- | --- | --- | --- |
 | nq768 (2.6M) | Upstash | 1900ms / 21000ms | 670ms / 1400ms | 0.84 | 1h 47m 11.3s |
 | nq768 (2.6M) | Pinecone | 760ms / 11000ms | 260ms / 19000ms | 0.91 | 40m 16.5s |
@@ -117,9 +117,9 @@ Now, let's see the results!
 | cohere768 (10M) | Pinecone | 730ms / 1200ms | 360ms / 2200ms | 0.96 | 2h 20m 49s |
 | cohere768 (10M) | Supabase pgvector | - | 3000ms / 3500ms | 0.92 | 7h 50m 6s |
 
-Populate and search latencies here are shown in 99th and 99.9th percentiles.
+You can scroll horizontally to view the full table.
 
-*Population* is the operation of adding vectors to the database. Index creation is the operation of creating an index in the database which allows for efficient search.
+**Population** is the operation of adding vectors to the database. Index creation is the operation of creating an index in the database which allows for efficient search.
 
 **Recall** is a measure of how many of the top-k results are relevant to the query. The higher the recall, the more relevant the results are to the query. *Recall = TP / (TP + FN)* where TP = True Positives and FN = False Negatives.
 
