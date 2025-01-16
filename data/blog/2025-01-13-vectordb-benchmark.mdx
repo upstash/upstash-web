@@ -100,7 +100,16 @@ vsb --database=supabase --workload=your_workload \
 ```
 </details>
 
-We created all the vector databases in `us-east-1` region and created a GCP instance in `us-central1-a` region to run the benchmarks.
+We created all the vector databases in `us-east-1` region and set up a GCP instance in `us-central1` region to run the benchmarks.
+
+Since Upstash Vector and Pinecone are serverless, we did not need to configure any settings while creating the databases and running the benchmarks.
+
+For Supabase/pgvector, we used the 8XL compute instance to host the database while indexing and querying which has the following specifications:
+- CPU: 32-core ARM (dedicated),
+- Memory: 128 GB
+- Max DB Size (Recommended): 4 TB
+
+The choice was based on ensuring that the index fits into the `maintenance_work_mem` variable and for our largest workload cohere768, the index was around 40GBs. Additionally, our database size was  approximately 140GBs in total which is way less than the recommended max DB size for this instance. While not running the benchmarks, we changed the compute instance type to the cheapest one (nano) to keep the cost low.
 
 Now, let's see the results!
 
@@ -149,7 +158,7 @@ We calculated the cost per 1M vectors based on the number of vectors we upserted
 
 - Upstash Vector is the cheapest and offers good performance.
 - Pinecone offers strong performance at a much higher price.
-- pgvector in Supabase is cheap and highly configurable but needs careful planning (RAM, disk size, index creation timing).
+- pgvector in Supabase is cheap and highly configurable, but it's slower and not as easy to use as the other services.
 
 ## Observations & Challenges
 
