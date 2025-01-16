@@ -1,5 +1,3 @@
-"use client";
-
 import VectorFaqJson from "@/../public/faq/vector.json";
 import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
