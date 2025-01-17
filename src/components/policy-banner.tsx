@@ -3,22 +3,32 @@ import { useState } from "react";
 export const PolicyBanner = () => {
   const [isVisible, setIsVisible] = useState(true);
 
-  if (!isVisible) return null;
+  if (!isVisible) return;
 
   return (
     <div className="w-full border-b border-[#2A2A2A] bg-[#1A1A1A]">
-      <div className="flex items-center justify-between px-10 py-3 mx-auto max-w-7xl">
+      <div className="flex items-center justify-center gap-4 px-10 py-3 mx-auto max-w-7xl">
         <div className="flex items-center gap-x-3">
-          <span className="text-sm font-medium text-[#00E699]">Updates</span>
           <span className="text-sm text-gray-300">
-            We've updated our Terms and Privacy Policy. Please review the
-            changes.
+            We've updated our{" "}
             <a
-              href="/terms"
-              className="ml-2 text-[#00E699] underline hover:text-[#00ff99]"
+              href="/trust/terms.pdf"
+              className="text-[#00E699] underline hover:text-[#00ff99]"
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              Learn more
+              Terms
+            </a>{" "}
+            and our{" "}
+            <a
+              href="/trust/privacy.pdf"
+              className="text-[#00E699] underline hover:text-[#00ff99]"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Privacy Policy
             </a>
+            . Please review the changes.
           </span>
         </div>
         <button
@@ -32,3 +42,5 @@ export const PolicyBanner = () => {
     </div>
   );
 };
+
+export default PolicyBanner;
