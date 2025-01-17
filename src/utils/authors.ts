@@ -393,4 +393,9 @@ export const authors: Record<
     url: "https://x.com/evansso_",
     image: "evans.jpg",
   },
+  mehmetemin: {
+    name: "Mehmet Emin Atak",
+    title: "Software Developer - Guest Author",
+    image: "mehmet-emin.jpg",
+  },
 };
