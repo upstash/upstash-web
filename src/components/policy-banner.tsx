@@ -11,7 +11,7 @@ export const PolicyBanner = () => {
       <div className="relative mx-auto flex max-w-7xl items-center gap-4 py-3">
         <div className="w-full text-center">
           <span className="text-sm text-gray-300">
-            We've updated our{" "}
+            Our{" "}
             <a
               href="/trust/terms.pdf"
               className="text-[#00E699] underline hover:text-[#00ff99]"
@@ -27,9 +27,9 @@ export const PolicyBanner = () => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              DPA
-            </a>
-            . Please review the changes.
+              Data Protection Agreement
+            </a>{" "}
+            have been updated. Review the changes.
           </span>
         </div>
         <button
@@ -43,5 +43,3 @@ export const PolicyBanner = () => {
     </div>
   );
 };
-
-export default PolicyBanner;
