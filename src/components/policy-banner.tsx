@@ -32,13 +32,16 @@ export const PolicyBanner = () => {
             have been updated. Review the changes.
           </span>
         </div>
-        <button
-          onClick={() => setIsVisible(false)}
-          className="absolute right-10 text-gray-400 transition-colors hover:text-white"
+        <div
+          onClick={() => {
+            console.log("click");
+            setIsVisible(false);
+          }}
+          className="absolute right-10 cursor-pointer text-gray-400 transition-colors hover:text-white"
           aria-label="Close banner"
         >
           <IconX />
-        </button>
+        </div>
       </div>
     </div>
   );
