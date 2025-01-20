@@ -9,6 +9,7 @@ import { useMotionValueEvent, useScroll } from "framer-motion";
 import Link from "next/link";
 import { useSelectedLayoutSegment } from "next/navigation";
 import { HTMLProps, useState } from "react";
+import { PolicyBanner } from "../policy-banner";
 import NewNavigation from "./new-nav";
 
 export default function Header({ className, ...props }: HTMLProps<any>) {
@@ -30,6 +31,7 @@ export default function Header({ className, ...props }: HTMLProps<any>) {
       )}
       {...props}
     >
+      <PolicyBanner />
       <Container>
         <div
           className={cx(
