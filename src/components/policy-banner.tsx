@@ -29,7 +29,7 @@ export const PolicyBanner = () => {
             >
               Data Protection Agreement
             </a>{" "}
-            have been updated. Review the changes.
+            have been updated. Review changes.
           </span>
         </div>
         <div
