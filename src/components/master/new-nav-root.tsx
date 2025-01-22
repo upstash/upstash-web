@@ -123,7 +123,7 @@ const ListItem = React.forwardRef(
           )}
           ref={forwardedRef}
         >
-          <div className="flex h-full w-10 shrink-0 items-center justify-center rounded-full bg-black/5">
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-black/5">
             {icon}
           </div>
           <div>
