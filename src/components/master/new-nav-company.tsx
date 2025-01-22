@@ -39,9 +39,11 @@ export default function NewNavigationItemCompany() {
             href="/careers"
             title1={
               <>
-                Careers
-                <span className="ml-1 inline-flex items-center rounded-full bg-purple-200 px-1.5 py-1 font-mono text-sm leading-none text-purple-800">
-                  {jobLength}
+                <span className="flex">
+                  Careers
+                  <span className="ml-1 inline-flex items-center rounded-full bg-purple-200 px-1.5 py-1 font-mono text-sm leading-none text-purple-800">
+                    {jobLength}
+                  </span>
                 </span>
               </>
             }
