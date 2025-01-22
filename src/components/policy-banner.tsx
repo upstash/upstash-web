@@ -1,10 +1,23 @@
+"use client";
+
+import { useGlobalStore } from "@/lib/global-store";
 import { IconX } from "@tabler/icons-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export const PolicyBanner = () => {
-  const [isVisible, setIsVisible] = useState(true);
+  const {
+    isTermsUpdateAcknowledged,
+    setIsTermsUpdateAcknowledged,
+    isHydrated,
+  } = useGlobalStore();
+  const [visible, setVisible] = useState(false);
 
-  if (!isVisible) return;
+  useEffect(() => {
+    if (!isHydrated) return;
+    setVisible(!isTermsUpdateAcknowledged);
+  }, [isHydrated, isTermsUpdateAcknowledged]);
+
+  if (!visible) return;
 
   return (
     <div className="w-full border-b border-[#2A2A2A] bg-[#1A1A1A]">
@@ -33,10 +46,7 @@ export const PolicyBanner = () => {
           </span>
         </div>
         <div
-          onClick={() => {
-            console.log("click");
-            setIsVisible(false);
-          }}
+          onClick={() => setIsTermsUpdateAcknowledged(true)}
           className="absolute right-10 cursor-pointer text-gray-400 transition-colors hover:text-white"
           aria-label="Close banner"
         >
