@@ -550,7 +550,7 @@ export default function CompareTable() {
               suffix="GB"
               className="border-b-0"
               after={
-                <Tooltip content="Free up to 200GB per month. Beyond that, $0.03 per GB.">
+                <Tooltip content="Free up to 200GB per month. Beyond that, we'll prompt you to upgrade and start charging at rate $0.03 per GB.">
                   <IconInfoCircle
                     className="ml-1 opacity-60"
                     stroke={1.2}
@@ -1893,7 +1893,7 @@ export default function CompareTable() {
           >
             <CompareValue
               after={
-                <Tooltip content="Free up to 200GB per month. Beyond that, $0.03 per GB.">
+                <Tooltip content="Free up to 200GB per month. Beyond that, we'll prompt you to upgrade and start charging at rate $0.03 per GB.">
                   <IconInfoCircle
                     className="ml-1 opacity-60"
                     stroke={1.2}
