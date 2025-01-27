@@ -8,6 +8,8 @@ tags: [workflow, rag, ai, next.js, serverless]
 
 In this tutorial, we'll build a sophisticated email analysis system that automatically processes emails and their attachments on _forward_ action using LLMs. We'll be combining DeepSeek R1's strong analysis capabilities with [Upstash Workflow](https://github.com/upstash/workflow-js)'s reliable agent framework.
 
+You can access the final version of the project [here](https://github.com/upstash/email-analysis-agent).
+
 ## What are we building exactly?
 
 Our system will:
@@ -89,6 +91,18 @@ export const { POST } = serve<EmailPayload>(async (context) => {
 
   // Agents definitions and tasks will come here
 });
+```
+
+To use the `pdf-parse` library, we need to do a small update in the `next.config.js` file.
+
+```typescript title="next.config.js"
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  serverExternalPackages: ["pdf-parse"]
+};
+
+export default nextConfig;
 ```
 
 #### 2.2 PDF Processing Agent
