@@ -1,12 +1,14 @@
 ---
 slug: email-analysis-agent
-title: "Building an AI-Powered Email Analysis Workflow with DeepSeek R1"
+title: "Building an AI-Powered Email Analysis Workflow with DeepSeek"
 authors:
   - fahreddin
 tags: [workflow, rag, ai, next.js, serverless]
 ---
 
-In this tutorial, we'll build a sophisticated email analysis system that automatically processes emails and their attachments on _forward_ action using LLMs. We'll be combining DeepSeek R1's strong analysis capabilities with [Upstash Workflow](https://github.com/upstash/workflow-js)'s reliable agent framework.
+In the fast-paced business environment, managing email communications efficiently can be the difference between staying ahead and falling behind. Imagine having an AI assistant that could automatically analyze incoming emails, understand attached documents and suggest professional responses - all while maintaining the context of the conversation. 
+In this tutorial, we'll build exactly that: an email analysis system that automatically processes emails and their attachments using LLMs. We'll combine DeepSeek V3's strong analysis capabilities with [Upstash Workflow](https://github.com/upstash/workflow-js)'s reliable agent framework to create a system that can help streamline your email commmunication workflow.
+
 
 You can access the final version of the project [here](https://github.com/upstash/email-analysis-agent).
 
@@ -16,14 +18,12 @@ Our system will:
 
 - Orchestrate the whole process using [Upstash Workflow Agents](https://upstash.com/docs/workflow/agents/overview) with reliable/durable execution in serverless environment
 - Automatically process forwarded emails using [Zapier](https://zapier.com/) as a webhook trigger
-- Analyze email content and PDF attachments using DeepSeek R1
+- Analyze email content and PDF attachments using DeepSeek V3
 - Send professional email response suggestions through [Resend](https://resend.com)
 
 ## Technical Architecture
 
 Let's dive into how our system works under the hood. We're implementing a multi-agent architecture where each agent specializes in specific tasks. Each agent is attached with a necessary tool.
-
-You can access the final version of the project [here](https://github.com/upstash/email-analysis-agent/blob/master/app/analyze/route.ts).
 
 ## Getting Started
 
@@ -47,14 +47,14 @@ npm install @upstash/workflow ai zod pdf-parse resend
 Create a `.env` file in your project root.
 
 ```bash title=".env"
-OPENAI_API_KEY=
+DEEPSEEK_API_KEY=
 QSTASH_TOKEN=
 RESEND_API_KEY=
 ```
 
-- For `QSTASH_TOKEN`, please navigate to `https://console.upstash.com/qstash`.
-- For `RESEND_API_KEY`, sign up on `https://resend.com` and create yourself an API key.
-- For `OPENAI_KEY`, please sign up on deepseek
+- For `QSTASH_TOKEN`, please navigate to [Upstash Console](https://console.upstash.com/qstash).
+- For `RESEND_API_KEY`, sign up on [Resend](https://resend.com) and create yourself an API key.
+- For `DEEPSEEK_API_KEY`, please sign up on [DeepSeek](https://platform.deepseek.com/) and create an API key.
 
 ### Step 2: Creating the Analysis Endpoint
 
@@ -79,6 +79,7 @@ type EmailPayload = {
   subject: string;
   to: string;
   attachment?: string;
+  attachment_type?: string;
 };
 
 // Initialize Resend client
@@ -87,7 +88,12 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 // Workflow endpoint
 export const { POST } = serve<EmailPayload>(async (context) => {
   const { message, subject, to, attachment } = context.requestPayload;
-  const model = context.agents.openai("gpt-4");
+  const model = context.agents.openai("deepseek-chat",
+    {
+      baseURL: "https://api.deepseek.com",
+      apiKey: process.env.DEEPSEEK_API_KEY
+    }
+  );
 
   // Agents definitions and tasks will come here
 });
@@ -118,7 +124,12 @@ Now, let's create our first agent in the `serve` method.
 ```typescript title="app/api/analyze/route.ts"
 export const { POST } = serve<EmailPayload>(async (context) => {
   const { message, subject, to, attachment } = context.requestPayload;
-  const model = context.agents.openai("gpt-4");
+  const model = context.agents.openai("deepseek-chat",
+    {
+      baseURL: "https://api.deepseek.com",
+      apiKey: process.env.DEEPSEEK_API_KEY
+    }
+  );
 
 	 const pdfAgent = context.agents.agent({
 	    model,
@@ -132,8 +143,8 @@ export const { POST } = serve<EmailPayload>(async (context) => {
 	                attachmentUrl: z.string().describe('URL of the PDF attachment')
 	            }),
 	            execute: async ({ attachmentUrl }) => {
-	                if (!attachmentUrl) {
-	                    return { content: '' };
+	                if (!attachmentUrl || attachment_type !== "application/pdf") {
+	                    return "NO_ATTACHMENT";
 	                }
 
 	                const response = await fetch(attachmentUrl);
@@ -171,7 +182,13 @@ Here's how we bring everything together:
 ```typescript title="app/api/analyze/route.ts"
 export const { POST } = serve<EmailPayload>(async (context) => {
   const { message, subject, to, attachment } = context.requestPayload;
-  const model = context.agents.openai('gpt-4');
+  const model = context.agents.openai("deepseek-chat",
+    {
+      baseURL: "https://api.deepseek.com",
+      apiKey: process.env.DEEPSEEK_API_KEY
+    }
+  );
+
 
   // ... agent definitions ...
 
@@ -181,6 +198,7 @@ export const { POST } = serve<EmailPayload>(async (context) => {
     const { text } = await context.agents.task({
       agent: pdfAgent,
       prompt: `Process this PDF attachment using the processPDF tool.
+              If the attachment doesn't exist or is not a PDF, tool returns NO_ATTACHMENT string.
               Attachment URL: ${attachment}
               
               Extract and summarize the key information from this PDF.
@@ -272,6 +290,14 @@ In the **Test** step, you can test the backend using the specific email you've s
 #### 3.4 Publish the Zap
 
 Using the **Publish** button on top right, release a version for your Zap. Then, we are ready to go!
+
+## Testing the System
+
+Now that we have everything set up, we can test the system by forwarding an email to the dedicated email address. The system will automatically process the email and its attachments, and send a professional email response suggestion back to you.
+
+After the email is processed, you can check the logs on the Upstash Console to see the execution
+
+![upstash logs](/blog/email-analysis-agent/upstash-console.png)
 
 ## Next Steps and Possible Improvements
 
