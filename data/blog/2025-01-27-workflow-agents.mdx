@@ -1,0 +1,145 @@
+---
+title: "Introducing Workflow Agents"
+slug: workflow-agents
+authors: [arda]
+tags: [llm, tools, qstash, workflow, agents]
+---
+
+## **Introducing Agents in Upstash Workflow: Durable, Scalable, and Reliable**
+
+Building workflows for agents often comes with unique challenges: handling long-running tasks, avoiding timeouts, managing serverless constraints, and ensuring resilience in the face of failures. With the new **Agents API** in Upstash Workflow, we are tackling these challenges head-on, making it easier than ever to build, execute, and debug workflows involving agents.
+
+### **Why Agents?**
+
+Agents, particularly those leveraging AI tools, are becoming an integral part of modern applications. They can analyze, optimize, and coordinate tasks autonomously or collaboratively. However, the typical implementation of agents faces several hurdles:
+
+1. **Timeouts in Serverless Environments**  
+   Many agent tasks can take longer than serverless functions allow, leading to failed executions.
+
+2. **Transient Errors and Retries**  
+   A transient network or server error can disrupt your workflow, with no guarantees of recovery.
+
+3. **Lack of Durability**  
+   In traditional setups, if a serverless function crashes, all progress is lost.
+
+The **Agents API** in Upstash Workflow resolves these issues by combining the power of QStash.
+
+---
+
+### **Features of the Agents API**
+
+The **Agents API** is built with extensibility, and reliability in mind. With this API, you can:
+
+- Run individual agents or orchestrate collaboration among a group of agents.  
+- Integrate any tool compatible with AI SDK or LangChain.  
+- Reliably invoke agents without concerns about timeouts or transient errors.  
+
+For example, here's a simplified workflow endpoint for an agent:  
+
+```typescript
+import { z } from "zod";
+import { serve } from "@upstash/workflow/nextjs";
+
+export const { POST } = serve<{ prompt: string }>(async (context) => {
+  const communicatorAgent = context.agents.agent({
+    model: context.agents.openai("gpt-3.5-turbo"),
+    name: "communicatorAgent",
+    maxSteps: 2,
+    tools: {
+      communicationTool: tool({
+        description: "Share your inner thoughts with the caller.",
+        parameters: z.object({ message: z.string() }),
+        execute: async ({ message }) => {
+          console.log("Inner thought:", message);
+          return "success";
+        },
+      }),
+    },
+    background:
+      "Answer questions directed towards you. Use the communication tool at least once before responding.",
+  });
+
+  const task = context.agents.task({
+    agent: communicatorAgent,
+    prompt: context.requestPayload.prompt,
+  });
+
+  const { text } = await task.run();
+  console.log("Final response:", text);
+});
+```
+
+After invoking the endpoint, you will see the following logs in Upstash Console:
+
+![agent-run-logs.png](/blog/workflow/agent-run-logs.png)
+
+To learn more about all the features available in the Agents API, check out the [Features page](https://upstash.com/docs/workflow/agents/features).
+
+---
+
+### **Agent Use Cases**
+
+Our rich set of examples demonstrates how you can use agents to build advanced workflows:  
+
+- **Prompt Chaining**: Structure tasks into a series of sequential reasoning steps.  
+- **Evaluator-Optimizer**: Use feedback loops to iteratively refine results.  
+- **Parallelization**: Distribute subtasks among multiple agents and aggregate their outputs.  
+- **Orchestrator-Workers**: Coordinate multiple agents to handle complex or large-scale operations.
+
+Check out our [examples page](https://upstash.com/docs/workflow/agents/examples) for inspiration.
+
+---
+
+### **How It Works**
+
+With the Workflow SDK, you define a single endpoint and break your process into **steps**. When this endpoint is called, the SDK executes the first step and sends the results to QStash. The endpoint is then re-invoked with the results of the previous execution, allowing the next step to continue seamlessly. This loop continues until all steps are completed.
+
+Key benefits include:  
+- **Durability**: If a step fails, QStash retries up to three times. For persistent failures, a customizable `failureFunction` allows you to handle them gracefully.  
+- **Scalability**: Each step runs independently, enabling efficient handling of long-running tasks without exceeding runtime limits.  
+- **Reliability**: By leveraging QStash, the workflow is resilient against transient errors and interruptions.
+
+This design is particularly powerful for **agents**, where workflows often involve complex interactions like tool invocation, iterative reasoning, or parallel execution.
+
+## Future Plans  
+
+We’re constantly working to improve the **Agents API** to make it even more powerful and versatile. Here’s what’s coming next:  
+
+- **Support for Additional LLM Providers**: Extend compatibility beyond OpenAI to include other popular LLM providers, offering more flexibility and choice.  
+- **Human Interaction Support**: Introduce human-in-the-loop capabilities using the [**Workflow Wait for Event** feature](https://upstash.com/docs/workflow/howto/events), enabling workflows to pause and resume based on human input or intervention.  
+
+Stay tuned for these exciting updates!  
+
+### **Get Started Today**
+
+To start using agents, follow these steps:
+
+1. Install the Workflow SDK:
+   ```bash
+   npm install @upstash/workflow ai zod
+   ```
+
+2. Set up your workflow endpoint and define your agents.  
+3. [Start your local QStash server](https://upstash.com/docs/workflow/howto/local-development) for testing.  
+4. [Trigger workflows via our client API](https://upstash.com/docs/workflow/howto/start).  
+
+Visit our [Getting Started Guide](https://upstash.com/docs/workflow/agents/getting-started) to dive in and explore the possibilities.
+
+---
+
+### **Why Upstash Workflow is Unique**
+
+Our focus is on making agent workflows:  
+- **Durable**: Recover from failures effortlessly.
+- **Scalable**: Handle long-running and complex tasks without serverless limitations.
+- **Extensible**: Easily integrate tools and customize your agent's behavior.
+
+---
+
+### **Join the Future of Workflow Automation**
+
+Agents are transforming how we build scalable, intelligent systems. With Upstash Workflow’s **Agents API**, you can take full advantage of these capabilities while overcoming the common pitfalls of serverless environments.
+
+Start building with **Upstash Workflow Agents** today and experience reliable, scalable, and debuggable workflows. 🚀
+
+[Get Started Now](https://upstash.com/docs/workflow/agents/getting-started)
