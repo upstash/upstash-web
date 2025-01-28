@@ -117,7 +117,7 @@ The PDF Processing Agent is the workhorse behind our document analysis capabilit
 
 The heart of this agent is its `processPDF` tool. When given a PDF URL(File URL of the mail attachment), it springs into action: downloading the document, converting into a format it can read and extracting the text content.
 
-The tool(function) calling is a native feature of OpenAI compatible LLMs, and it shapes the core of the Upstash Workflow Agent library. To learn more you can see the [OpenAI Function Calling Docs](https://platform.openai.com/docs/guides/function-calling) or [tools section](https://upstash.com/docs/workflow/agents/features#tools) in Upstash Workflow Agents docs.
+The tool (function) calling is a native feature of OpenAI compatible LLMs, and it shapes the core of the Upstash Workflow Agent library. To learn more you can see the [OpenAI Function Calling Docs](https://platform.openai.com/docs/guides/function-calling) or [tools section](https://upstash.com/docs/workflow/agents/features#tools) in Upstash Workflow Agents docs.
 
 Now, let's create our first agent in the `serve` method.
 
@@ -131,37 +131,37 @@ export const { POST } = serve<EmailPayload>(async (context) => {
     }
   );
 
-	 const pdfAgent = context.agents.agent({
-	    model,
-	    name: 'pdfAgent',
-	    maxSteps: 3,
-	    background: 'You are a specialist in extracting and summarizing key information from PDF documents.',
-	    tools: {
-	        processPDF: tool({
-	            description: 'Process and extract text from PDF attachments',
-	            parameters: z.object({
-	                attachmentUrl: z.string().describe('URL of the PDF attachment')
-	            }),
-	            execute: async ({ attachmentUrl }) => {
-	                if (!attachmentUrl || attachment_type !== "application/pdf") {
-	                    return "NO_ATTACHMENT";
-	                }
+  const pdfAgent = context.agents.agent({
+    model,
+    name: 'pdfAgent',
+    maxSteps: 3,
+    background: 'You are a specialist in extracting and summarizing key information from PDF documents.',
+    tools: {
+      processPDF: tool({
+        description: 'Process and extract text from PDF attachments',
+        parameters: z.object({
+          attachmentUrl: z.string().describe('URL of the PDF attachment')
+        }),
+        execute: async ({ attachmentUrl }) => {
+          if (!attachmentUrl || attachment_type !== "application/pdf") {
+            return "NO_ATTACHMENT";
+          }
 
-	                const response = await fetch(attachmentUrl);
-	                const fileContent = await response.arrayBuffer();
-	                const buffer = Buffer.from(fileContent);
+          const response = await fetch(attachmentUrl);
+          const fileContent = await response.arrayBuffer();
+          const buffer = Buffer.from(fileContent);
 
-	                try {
-	                    const data = await pdf(buffer);
-	                    return { content: data.text };
-	                } catch (error) {
-	                    console.error('Error parsing PDF:', error);
-	                    return { content: 'Unable to extract PDF content' };
-	                }
-	            }
-	        })
-	    }
-	});
+          try {
+            const data = await pdf(buffer);
+            return { content: data.text };
+          } catch (error) {
+            console.error('Error parsing PDF:', error);
+            return { content: 'Unable to extract PDF content' };
+          }
+        }
+      })
+    }
+  });
 });
 ```
 
