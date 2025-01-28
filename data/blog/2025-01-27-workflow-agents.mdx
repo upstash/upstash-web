@@ -13,14 +13,11 @@ Building workflows for agents often comes with unique challenges: handling long-
 
 Agents, particularly those leveraging AI tools, are becoming an integral part of modern applications. They can analyze, optimize, and coordinate tasks autonomously or collaboratively. However, the typical implementation of agents faces several hurdles:
 
-1. **Timeouts in Serverless Environments**  
-   Many agent tasks can take longer than serverless functions allow, leading to failed executions.
+- **Timeouts in Serverless Environments:** Many agent tasks can take longer than serverless functions allow, leading to failed executions.
 
-2. **Transient Errors and Retries**  
-   A transient network or server error can disrupt your workflow, with no guarantees of recovery.
+- **Transient Errors and Retries:** A transient network or server error can disrupt your workflow, with no guarantees of recovery.
 
-3. **Lack of Durability**  
-   In traditional setups, if a serverless function crashes, all progress is lost.
+- **Lack of Durability:** In traditional setups, if a serverless function crashes, all progress is lost.
 
 The **Agents API** in Upstash Workflow resolves these issues by combining the power of QStash.
 
@@ -114,14 +111,14 @@ Stay tuned for these exciting updates!
 
 To start using agents, follow these steps:
 
-1. Install the Workflow SDK:
+- Install the Workflow SDK:
    ```bash
    npm install @upstash/workflow ai zod
    ```
 
-2. Set up your workflow endpoint and define your agents.  
-3. [Start your local QStash server](https://upstash.com/docs/workflow/howto/local-development) for testing.  
-4. [Trigger workflows via our client API](https://upstash.com/docs/workflow/howto/start).  
+- Set up your workflow endpoint and define your agents.  
+- [Start your local QStash server](https://upstash.com/docs/workflow/howto/local-development) for testing.  
+- [Trigger workflows via our client API](https://upstash.com/docs/workflow/howto/start).  
 
 Visit our [Getting Started Guide](https://upstash.com/docs/workflow/agents/getting-started) to dive in and explore the possibilities.
 
