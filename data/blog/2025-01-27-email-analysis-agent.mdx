@@ -1,14 +1,14 @@
 ---
 slug: email-analysis-agent
-title: "Building an AI-Powered Email Analysis Workflow with DeepSeek"
+title: "Building Email Analysis Agent with DeepSeek"
 authors:
   - fahreddin
 tags: [workflow, rag, ai, next.js, serverless]
 ---
 
-In the fast-paced business environment, managing email communications efficiently can be the difference between staying ahead and falling behind. Imagine having an AI assistant that could automatically analyze incoming emails, understand attached documents and suggest professional responses - all while maintaining the context of the conversation. 
-In this tutorial, we'll build exactly that: an email analysis system that automatically processes emails and their attachments using LLMs. We'll combine DeepSeek V3's strong analysis capabilities with [Upstash Workflow](https://github.com/upstash/workflow-js)'s reliable agent framework to create a system that can help streamline your email commmunication workflow.
+Imagine having an AI assistant that could automatically analyze incoming emails, understand attached documents and suggest professional responses - all while maintaining the context of the conversation. 
 
+In this tutorial, we'll build exactly that: an email analysis system that automatically processes emails and their attachments using LLM. We'll combine DeepSeek V3's strong analysis capabilities with [Upstash Workflow](https://github.com/upstash/workflow-js)'s reliable Agent framework to create a system that can help streamline your email commmunication workflow.
 
 You can access the final version of the project [here](https://github.com/upstash/email-analysis-agent).
 
@@ -19,7 +19,7 @@ Our system will:
 - Orchestrate the whole process using [Upstash Workflow Agents](https://upstash.com/docs/workflow/agents/overview) with reliable/durable execution in serverless environment
 - Automatically process forwarded emails using [Zapier](https://zapier.com/) as a webhook trigger
 - Analyze email content and PDF attachments using DeepSeek V3
-- Send professional email response suggestions through [Resend](https://resend.com)
+- Send the email response suggestions through [Resend](https://resend.com)
 
 ## Technical Architecture
 
@@ -44,7 +44,7 @@ npm install @upstash/workflow ai zod pdf-parse resend
 
 #### Environment Setup
 
-Create a `.env` file in your project root.
+Create a `.env` file in your project root. We need QStash token for the workflow and agents.
 
 ```bash title=".env"
 DEEPSEEK_API_KEY=
