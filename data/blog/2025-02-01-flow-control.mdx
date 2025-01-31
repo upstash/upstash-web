@@ -1,0 +1,130 @@
+---
+slug: QStash-flowControl
+title: "Parallelism and Rate Limit for Workflow And QStash"
+authors:
+    - sancar
+tags: [QStash, workflow, announcement]
+---
+## Parallelism and Rate Limits for Workflows and QStash  
+
+We are excited to announce the release of **Flow-Control**, a new feature that lets you set **Rate** and **Parallelism** limits for QStash Publish and Workflows.  
+
+This blog is divided into four sections for easier reading:  
+- [Motivation](#motivation): Why we developed Flow-Control.  
+- [How It Works](#how-it-works): Understanding rate limiting and parallelism.  
+- [How to Use It](#how-to-use-it): Practical examples of implementing Flow-Control in QStash and Workflows.  
+- [What Happened to Queues](#what-happened-to-queues): Changes from the previous queue-based system and the benefits of the new approach.  
+
+## Motivation  
+
+Our community drives our development. We’ve heard your feedback on two key points:  
+
+- **Workflows**: Our [Workflows](https://upstash.com/docs/workflow/agents/overview) product is gaining traction. However, it launched without built-in rate or parallelism limits. The existing parallelism control via Queues was unsuitable for Workflows.  
+- **Queue Limitations**: Many users relied on Queue Parallelism to prevent bursts on their endpoints. However, queues had per-plan limits due to memory/CPU allocation constraints. The new design removes these restrictions, allowing you to configure limits based on your application’s needs without worrying about plan limits.  
+
+To solve these issues, we developed Flow-Control, which works for both Workflows and QStash.  
+
+## How It Works  
+
+- **Rate Limit**: This defines the maximum number of calls per second. Calls within the same `FlowControl` key contribute to the rate count. Instead of rejecting excess calls, QStash queues them for execution in later seconds, respecting the limit.  
+- **Parallelism Limit**: This controls the number of concurrent executions. Unlike rate limiting, execution duration matters. At no time will there be more than the specified number of active calls.  
+- **Using Rate and Parallelism Together**: Both parameters can be combined. For example, with a rate of 10 per second and parallelism of 20, if each request takes a minute to complete, QStash will trigger 10 calls in the first second and another 10 in the next. Since none of them will have finished, the system will wait until one completes before triggering another.  
+
+## How to Use It  
+
+### QStash  
+
+Here’s an example of using Flow-Control with QStash:  
+
+```js
+const client = new Client({ token: "<QStash_TOKEN>" });
+
+await client.publishJSON({
+    url: "https://my-api...",
+    body: { hello: "world" },
+    flowControl: { key: "app1", parallelism: 3, rate: 10 },
+});
+```
+
+For more details and other SDKs, see the documentation [here](https://upstash.com/docs/QStash/features/rate).  
+
+### Workflows  
+
+There are two main use cases for Flow-Control in Workflows:  
+1. [Limiting the Workflow Environment](#limiting-the-workflow-environment): Controlling the execution environment.  
+2. [Limiting External API Calls](#limiting-external-api-calls): Preventing excessive requests to external services.  
+
+#### Limiting the Workflow Environment  
+
+To limit the execution environment, configure the following:  
+
+1. **In the `serve` method**:  
+
+```js
+export const { POST } = serve<string>(
+    async (context) => {
+        await context.run("step-1", async () => {
+            return someWork();
+        });
+    },
+    {
+        flowControl: { key: "app1", parallelism: 3, rate: 10 }
+    }
+);
+```
+
+For more details, see the documentation on [Rate](https://upstash.com/docs/workflow/basics/serve#rate) and [Parallelism](https://upstash.com/docs/workflow/basics/serve#parallelism).  
+
+2. **In the `trigger` method**:  
+
+```js
+import { Client } from "@upstash/workflow";
+
+const client = new Client({ token: "<QStash_TOKEN>" });
+const { workflowRunId } = await client.trigger({
+    url: "https://workflow-endpoint.com",
+    body: "hello there!",
+    flowControl: { key: "app1", parallelism: 3, rate: 10 }
+});
+```
+
+For more details, see the documentation [here](https://upstash.com/docs/workflow/basics/client#trigger-workflow).  
+
+#### Limiting External API Calls  
+
+To limit requests to an external API, use `context.call`:  
+
+```js 
+import { serve } from "@upstash/workflow/nextjs";
+
+export const { POST } = serve<{ topic: string }>(async (context) => {
+  const request = context.requestPayload;
+
+  const response = await context.call(
+    "generate-long-essay", // Step name
+    {
+      url: "https://api.openai.com/v1/chat/completions",
+      method: "POST",
+      body: {/*****/},
+      flowControl: { key: "app1", parallelism: 3, rate: 10 }
+    }
+  );
+});
+```
+
+For more details, see the documentation [here](https://upstash.com/docs/workflow/basics/context#context-call).  
+
+## What Happened to Queues?  
+
+Previously, rate and parallelism control were managed through Queues. However, this approach was complex and costly. The main issue was that a single failed message could block the queue.  
+
+With Flow-Control:  
+- Rate and parallelism limits are applied without blocking new publishes due to failures.  
+- Queues are still available for FIFO (first-in, first-out) processing. If strict message ordering is required, queues with parallelism set to `1` should be used.  
+- We plan to phase out queue-based parallelism once all users have migrated to Flow-Control.  
+
+If you are using queue parallelism greater than `1`, we recommend switching to the new feature.  
+
+## Conclusion  
+
+We hope this feature improves your experience! If you have any feedback or suggestions, join us on [Discord](https://upstash.com/discord) and let us know. We’re here to build what you need.  
