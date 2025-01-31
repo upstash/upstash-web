@@ -1,28 +1,28 @@
 ---
-slug: QStash-flowControl
+slug: QStash-rateLimit
 title: "Parallelism and Rate Limit for Workflow And QStash"
 authors:
     - sancar
 tags: [QStash, workflow, announcement]
 ---
-## Parallelism and Rate Limits for Workflows and QStash  
+## Parallelism and Rate Limits for Workflow and QStash  
 
-We are excited to announce the release of **Flow-Control**, a new feature that lets you set **Rate** and **Parallelism** limits for QStash Publish and Workflows.  
+We are excited to announce the release of **Flow-Control**, a new feature that lets you set **Rate** and **Parallelism** limits for QStash Publish and Workflow.  
 
 This blog is divided into four sections for easier reading:  
 - [Motivation](#motivation): Why we developed Flow-Control.  
 - [How It Works](#how-it-works): Understanding rate limiting and parallelism.  
-- [How to Use It](#how-to-use-it): Practical examples of implementing Flow-Control in QStash and Workflows.  
+- [How to Use It](#how-to-use-it): Practical examples of implementing Flow-Control in QStash and Workflow.  
 - [What Happened to Queues](#what-happened-to-queues): Changes from the previous queue-based system and the benefits of the new approach.  
 
 ## Motivation  
 
 Our community drives our development. We’ve heard your feedback on two key points:  
 
-- **Workflows**: Our [Workflows](https://upstash.com/docs/workflow/agents/overview) product is gaining traction. However, it launched without built-in rate or parallelism limits. The existing parallelism control via Queues was unsuitable for Workflows.  
+- **Workflow**: Our [Workflow](https://upstash.com/docs/workflow/agents/overview) product is gaining traction. However, it launched without built-in rate or parallelism limits. The existing parallelism control via Queues was not suitable for Workflow.  
 - **Queue Limitations**: Many users relied on Queue Parallelism to prevent bursts on their endpoints. However, queues had per-plan limits due to memory/CPU allocation constraints. The new design removes these restrictions, allowing you to configure limits based on your application’s needs without worrying about plan limits.  
 
-To solve these issues, we developed Flow-Control, which works for both Workflows and QStash.  
+To solve these issues, we developed Flow-Control, which works for both Workflow and QStash.  
 
 ## How It Works  
 
@@ -48,9 +48,9 @@ await client.publishJSON({
 
 For more details and other SDKs, see the documentation [here](https://upstash.com/docs/QStash/features/rate).  
 
-### Workflows  
+### Workflow  
 
-There are two main use cases for Flow-Control in Workflows:  
+There are two main use cases for Flow-Control in Workflow:  
 1. [Limiting the Workflow Environment](#limiting-the-workflow-environment): Controlling the execution environment.  
 2. [Limiting External API Calls](#limiting-external-api-calls): Preventing excessive requests to external services.  
 
