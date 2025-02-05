@@ -5,15 +5,14 @@ import * as React from "react";
 
 export default function PricingTableEnterprise() {
   return (
-    <div className="flex flex-col items-center justify-center rounded-3xl border-2 border-primary bg-bg-mute px-10 py-8 md:flex-row md:px-16 md:py-10 md:text-left">
+    <div className="flex flex-col items-center justify-center rounded-3xl border-2 border-primary-text bg-bg-mute px-10 py-8 md:flex-row md:px-16 md:py-10 md:text-left">
       <div>
         <h4 className="text-2xl font-semibold text-primary-text">Enterprise</h4>
         <p className="">For businesses with advanced needs.</p>
 
         <Button
           asChild
-          variant="primary"
-          className="-ml-1 mt-4 hidden md:inline-flex"
+          className="-ml-1 mt-4 hidden bg-white shadow-sm md:inline-flex"
         >
           <Link href="/contact">Contact Us</Link>
         </Button>
@@ -40,7 +39,7 @@ export default function PricingTableEnterprise() {
         </ul>
       </div>
 
-      <Button asChild variant="primary" className="-ml-1 mt-6 md:hidden">
+      <Button asChild className="-ml-1 mt-6 bg-white shadow-sm md:hidden">
         <Link href="/contact">Contact Us</Link>
       </Button>
     </div>

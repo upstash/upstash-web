@@ -3,12 +3,12 @@
 @tailwind utilities;
 
 :root {
-  --color-bg: #f4f4f5;
+  --color-bg: oklch(0.985 0 0); /*50*/
   --color-bg-mute: rgb(4 120 87 / 0.08);
-  --color-primary: #10b981;
-  --color-primary-text: #047857;
+  --color-primary: oklch(0.696 0.17 162.48); /*500*/
+  --color-primary-text: oklch(0.508 0.118 165.612); /*700*/
   --color-text: #022c22;
-  --color-text-mute: #52525b;
+  --color-text-mute: oklch(0.552 0.016 285.938);
   --color-pre-bg: #09090b;
 }
 
@@ -17,10 +17,10 @@
   :root {
     --color-bg: #09090b;
     --color-bg-mute: rgb(236 253 245 / 0.06);
-    --color-primary: #10b981;
-    --color-primary-text: #34d399;
+    --color-primary: oklch(0.696 0.17 162.48); /*500*/
+    --color-primary-text: oklch(0.765 0.177 163.223); /*400*/
     --color-text: #ecfdf5;
-    --color-text-mute: #a1a1aa;
+    --color-text-mute: oklch(0.705 0.015 286.067);
     --color-pre-bg: #09090b;
   }
 }
