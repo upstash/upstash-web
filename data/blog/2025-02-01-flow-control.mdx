@@ -42,7 +42,7 @@ const client = new Client({ token: "<QStash_TOKEN>" });
 await client.publishJSON({
     url: "https://my-api...",
     body: { hello: "world" },
-    flowControl: { key: "app1", parallelism: 3, rate: 10 },
+    flowControl: { key: "app1", parallelism: 3, ratePerSecond: 10 },
 });
 ```
 
@@ -74,7 +74,7 @@ export const { POST } = serve<string>(
         });
     },
     {
-        flowControl: { key: "app1", parallelism: 3, rate: 10 }
+        flowControl: { key: "app1", parallelism: 3, ratePerSecond: 10 }
     }
 );
 ```
@@ -90,7 +90,7 @@ const client = new Client({ token: "<QStash_TOKEN>" });
 const { workflowRunId } = await client.trigger({
     url: "https://workflow-endpoint.com",
     body: "hello there!",
-    flowControl: { key: "app1", parallelism: 3, rate: 10 }
+    flowControl: { key: "app1", parallelism: 3, ratePerSecond: 10 }
 });
 ```
 
@@ -112,7 +112,7 @@ export const { POST } = serve<{ topic: string }>(async (context) => {
       url: "https://api.openai.com/v1/chat/completions",
       method: "POST",
       body: {/*****/},
-      flowControl: { key: "app1", parallelism: 3, rate: 10 }
+      flowControl: { key: "app1", parallelism: 3, ratePerSecond: 10 }
     }
   );
 });
