@@ -34,7 +34,7 @@ export default function NewNavigationItemCompany() {
           <ListItem href="/github" title1="Github" icon={<IconBrandGithub />}>
             Explore Our Code on GitHub
           </ListItem>
-          <ListItem href="/sales" title1="Contact Us" icon={<IconMail />}>
+          <ListItem href="/contact" title1="Contact Us" icon={<IconMail />}>
             Send an Email to Support
           </ListItem>
         </div>

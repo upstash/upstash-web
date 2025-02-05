@@ -34,7 +34,7 @@ export default function SectionHero() {
 
           <div className="mt-10">
             <Button asChild variant="primary">
-              <Link href="/sales">
+              <Link href="/contact">
                 Contact Us <IconArrowUpRight size={24} />
               </Link>
             </Button>

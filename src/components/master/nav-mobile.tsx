@@ -98,6 +98,6 @@ const NavItems: {
   },
   {
     name: "Contact Us",
-    href: "/sales",
+    href: "/contact",
   },
 ];
