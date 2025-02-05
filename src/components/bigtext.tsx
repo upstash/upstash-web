@@ -1,6 +1,15 @@
 import cx from "@/utils/cx";
 import React from "react";
 
+/*
+Example Usage:
+
+<BigText className="xl:-mb-[70px] xl:text-[160px]">
+  Let's Connect
+</BigText>
+
+ */
+
 export default function BigText({
   className,
   children,
