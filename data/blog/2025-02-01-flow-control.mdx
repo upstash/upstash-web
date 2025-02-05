@@ -13,7 +13,7 @@ This blog is divided into four sections for easier reading:
 - [Motivation](#motivation): Why we developed Flow-Control.  
 - [How It Works](#how-it-works): Understanding rate limiting and parallelism.  
 - [How to Use It](#how-to-use-it): Practical examples of implementing Flow-Control in QStash and Workflow.  
-- [What Happened to Queues](#what-happened-to-queues): Changes from the previous queue-based system and the benefits of the new approach.  
+- [What Happened to Queues](#what-happened-to-queues): Differences between Queues and Flow-Control  
 
 ## Motivation  
 
@@ -26,8 +26,8 @@ To solve these issues, we developed Flow-Control, which works for both Workflow 
 
 ## How It Works  
 
-- **Rate Limit**: This defines the maximum number of calls per second. Calls within the same `FlowControl` key contribute to the rate count. Instead of rejecting excess calls, QStash queues them for execution in later seconds, respecting the limit.  
-- **Parallelism Limit**: This controls the number of concurrent executions. Unlike rate limiting, execution duration matters. At no time will there be more than the specified number of active calls.  
+- **Rate Limit**: This defines the maximum number of calls per second. Calls within the same `FlowControl` key contribute to the rate count. Instead of rejecting excess calls, QStash delays them for execution in later seconds, respecting the limit.  
+- **Parallelism Limit**: This controls the number of concurrent executions. Unlike rate limiting, execution duration matters. At no time will there be more than the specified number of active calls. If the limit is reached, other publishes will wait until a slot is available and, once one finishes, they will continue.
 - **Using Rate and Parallelism Together**: Both parameters can be combined. For example, with a rate of 10 per second and parallelism of 20, if each request takes a minute to complete, QStash will trigger 10 calls in the first second and another 10 in the next. Since none of them will have finished, the system will wait until one completes before triggering another.  
 
 ## How to Use It  
@@ -56,9 +56,15 @@ There are two main use cases for Flow-Control in Workflow:
 
 #### Limiting the Workflow Environment  
 
-To limit the execution environment, configure the following:  
+To limit the execution environment, you need to configure both the `serve` and `trigger` methods. 
+When configured, all the steps of the workflow will respect the limits.
+Due to the nature of the Workflow SDK, QStash calls the `serve` method multiple times. This means that to stay within the limits 
+of the deployed environments, the given rate will be applied to all calls going from QStash servers to the `serve` method.
 
-1. **In the `serve` method**:  
+Note that if there are multiple Workflows running in the same environment, their steps can interleave, but overall rate and parallelism limits will be respected 
+if they share the same `flowControl` key.
+
+- **In the `serve` method**:  
 
 ```js
 export const { POST } = serve<string>(
@@ -75,7 +81,7 @@ export const { POST } = serve<string>(
 
 For more details, see the documentation on [Rate](https://upstash.com/docs/workflow/basics/serve#rate) and [Parallelism](https://upstash.com/docs/workflow/basics/serve#parallelism).  
 
-2. **In the `trigger` method**:  
+- **In the `trigger` method**:  
 
 ```js
 import { Client } from "@upstash/workflow";
@@ -101,7 +107,7 @@ export const { POST } = serve<{ topic: string }>(async (context) => {
   const request = context.requestPayload;
 
   const response = await context.call(
-    "generate-long-essay", // Step name
+    "generate-long-essay", 
     {
       url: "https://api.openai.com/v1/chat/completions",
       method: "POST",
@@ -116,13 +122,15 @@ For more details, see the documentation [here](https://upstash.com/docs/workflow
 
 ## What Happened to Queues?  
 
-Previously, rate and parallelism control were managed through Queues. However, this approach was complex and costly. The main issue was that a single failed message could block the queue.  
+Previously, parallelism control were managed through Queues. However, this approach was hard to manage for our users. The main issue was that a single failed message could block the queue.  
+The reason is that QStash Queues were initially designed for FIFO use cases with single parallelism.
+This means that until a message has either been successfully processed or exhausted all its configured retries, the queue does not proceed to the next message.
+While this design remains useful for strict FIFO requirements, it does not work well for rate-limiting and concurrency use cases.
 
-With Flow-Control:  
-- Rate and parallelism limits are applied without blocking new publishes due to failures.  
-- Queues are still available for FIFO (first-in, first-out) processing. If strict message ordering is required, queues with parallelism set to `1` should be used.  
-- We plan to phase out queue-based parallelism once all users have migrated to Flow-Control.  
+With Flow-Control, rate and parallelism limits are applied without blocking new publishes due to failures.  
 
+Queues are still available for FIFO (first-in, first-out) processing. If strict message ordering is required, queues with parallelism set to `1` should be used.  
+We plan to phase out parallelism option of the Queues, once all users have migrated to Flow-Control.  
 If you are using queue parallelism greater than `1`, we recommend switching to the new feature.  
 
 ## Conclusion  
