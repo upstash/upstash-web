@@ -1,0 +1,69 @@
+---
+slug: workflow-competitiors
+title: "May the best one win! Upstash Workflow vs Competitors"
+authors:
+  - sancar
+tags: [qstash, workflow, LLM]
+---
+
+Hey there! In this post, we're diving into a comparison of Upstash Workflow with two of its close competitors: Trigger.dev and Inngest. We'll break down the key differences, pros, and cons of each platform to help you make the best choice for your needs. 
+So, let's see how these platforms stack up against each other!
+
+### Upstash Workflow vs Trigger.dev
+
+Trigger.dev decided to host users' code on their server back in mid-2014 with their v3 release. You can read about their transition in their [blog post](https://trigger.dev/blog/v3-announcement#what-about-triggerdev-v2). 
+- __The advantage__:An easier and more familiar API. No need to provide an API to split the code into steps, as all the code will run on their environment.
+- __The downside__: You need to switch to Trigger.dev for your hosting environment. If you prefer another serverless environment like Vercel or Cloudflare Workers (see all Upstash supported platforms [here](https://upstash.com/docs/workflow/quickstarts/platforms)), Trigger.dev may not be an option. Alternatively, you would need to split your codebase into two different services.
+
+### Upstash Workflow vs Inngest
+
+Upstash Workflow is more comparable to Inngest, with some small differences in design decisions. The APIs are almost the same. We had QStash, and their API made sense, so we built the Workflow around QStash, mimicking the Inngest API. Their entire API is built around `events` to trigger any registered function/functions. Our API is designed to give the feeling that you are calling a standard REST API.
+
+Here is a simplified comparison of the features of Upstash Workflow and Inngest:
+
+| Feature                      | Upstash Workflow            | Inngest                                |
+|------------------------------|-----------------------------|----------------------------------------|
+| Sleep/SleepUntil             | +                           | +                                      |
+| Flow Control                 | Rate/Parallelism            | Rate/Parallelism/Debounce/Priority     |
+| Invoke Function              | +                           | +                                      |
+| Offload Slow REST API        | +                           | Only for AI                            |
+| Local Development            | GUI missing (coming soon)   | +                                      |
+| Wait/Notify Between Workflows| +                           | +                                      |
+| Agents API                   | +                           | +                                      |
+
+Details about some features are mentioned below:
+
+- __Local Development__: We don't have UI support for local development yet, but it is planned.
+- __Offload Waiting for Third-Party Slow Services__:
+    - Upstash Workflow:
+        - We offer a general solution for any external URL with `context.call`.
+        - We also have built-in integrations for some external APIs:
+            - [OpenAI](https://upstash.com/docs/workflow/integrations/openai)
+            - [Anthropic](https://upstash.com/docs/workflow/integrations/anthropic)
+            - [Resend](https://upstash.com/docs/workflow/integrations/resend)
+            - [Vercel AI SDK](https://upstash.com/docs/workflow/integrations/ai-sdk)
+    - Inngest partially solved this for AI, but not for other services. See [here](https://www.inngest.com/docs/features/inngest-functions/steps-workflows/step-ai-orchestration).
+
+- __Agents API__: AI agents are autonomous intelligent systems that perform specific tasks without human intervention. The Agents API enables building these complex systems on serverless environments, reducing costs. Both services provide Agents APIs:
+- [Inngest AgentKit](https://agentkit.inngest.com/concepts/models)
+- [Upstash Workflow Agents](https://upstash.com/docs/workflow/agents/overview)
+
+## Pricing
+
+All three platforms offer a free tier with limited executions per month. They all follow a pay-as-you-go pricing model, but there are some differences:
+
+- Upstash Workflow and Inngest charge based on the number of executions.
+- Trigger.dev charges based on execution time.
+
+Each platform offers different plans with various features, making direct comparisons challenging. Here are the links to their pricing pages so you can determine which one best fits your needs:
+- [Upstash Workflow Pricing](https://upstash.com/pricing)
+- [Inngest Pricing](https://www.inngest.com/pricing)
+- [Trigger.dev Pricing](https://trigger.dev/pricing)
+
+## Conclusion
+
+In conclusion, each platform—Upstash Workflow, Trigger.dev, and Inngest—offers unique features and capabilities. The best choice depends on your specific needs and preferences. We hope this comparison helps you choose the platform that best fits your requirements. We are constantly improving Upstash Workflow API to fill the gaps via listening our users. If you need a feature, or if you need more comparisons with other products, please let us know in our [Discord](https://upstash.com/discord).
+
+Thanks for reading, and happy coding!
+
+
