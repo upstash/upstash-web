@@ -10,6 +10,16 @@ export enum CodeExample {
   fetch = "JavaScript (Fetch)",
 }
 
+export enum PricingRedis {
+  Free = "free",
+  PayAsYouGo = "payAsYouGo",
+  Fixed250MB = "fixed250mb",
+  Fixed1GB = "fixed1gb",
+  Fixed5GB = "fixed5gb",
+  Fixed12GB = "fixed12gb",
+  Enterprise = "enterprise",
+}
+
 export enum PricingPlans {
   Free = "free",
   PayAsYouGo = "payAsYouGo",
