@@ -26,7 +26,7 @@ export default function PricingTable() {
 
       <div className="flex flex-col items-center gap-4 rounded-3xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:bg-bg-mute">
         <div className="grow">
-          <h4 className="mb-2 py-2 text-xl font-bold text-primary-text">
+          <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
             Free
           </h4>
 
@@ -35,7 +35,7 @@ export default function PricingTable() {
         </div>
 
         <div className="grow">
-          <div className="text-balance rounded-lg bg-bg-mute p-4 text-primary-text">
+          <div className="text-balance rounded-lg bg-bg-mute px-3 py-2 text-sm text-primary-text">
             Perfect for prototypes and hobby projects.
           </div>
         </div>
@@ -46,15 +46,15 @@ export default function PricingTable() {
             <p className="font-semibold text-primary-text">100</p>
           </div>
 
-          <div className="py-3">
+          {/* <div className="py-3">
             <p className="text-text-mute">Request Size</p>
             <p className="font-semibold text-primary-text">1 MB</p>
-          </div>
+          </div>*/}
 
-          <div className="py-3">
+          {/*<div className="py-3">
             <p className="text-text-mute">Data Size</p>
             <p className="font-semibold text-primary-text">256 MB</p>
-          </div>
+          </div>*/}
 
           <div className="py-3">
             <p className="text-text-mute">Concurrent Connections</p>
@@ -80,7 +80,7 @@ export default function PricingTable() {
 
       <div className="flex flex-col items-center gap-4 rounded-3xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:bg-bg-mute">
         <div className="grow">
-          <h4 className="mb-2 py-2 text-xl font-bold text-primary-text">
+          <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
             Pay as you go
           </h4>
 
@@ -89,7 +89,7 @@ export default function PricingTable() {
         </div>
 
         <div className="grow">
-          <div className="text-balance rounded-lg bg-bg-mute p-4 text-primary-text">
+          <div className="text-balance rounded-lg bg-bg-mute px-3 py-2 text-sm text-primary-text">
             Flexible pricing for variable traffic.
           </div>
         </div>
@@ -100,15 +100,15 @@ export default function PricingTable() {
             <p className="font-semibold text-primary-text">1,000</p>
           </div>
 
-          <div className="py-3">
+          {/*<div className="py-3">
             <p className="text-text-mute">Request Size</p>
             <p className="font-semibold text-primary-text">1 MB</p>
-          </div>
+          </div>*/}
 
-          <div className="py-3">
+          {/*<div className="py-3">
             <p className="text-text-mute">Data Size</p>
             <p className="font-semibold text-primary-text">100 GB</p>
-          </div>
+          </div>*/}
 
           <div className="py-3">
             <p className="text-text-mute">Concurrent Connections</p>
@@ -134,9 +134,9 @@ export default function PricingTable() {
 
       <div className="flex flex-col items-center gap-4 rounded-3xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:bg-bg-mute">
         <div className="grow">
-          <h4 className="mb-2 text-xl font-semibold text-primary-text">
+          <h4 className="mb-4 text-xl font-semibold text-primary-text">
             <select
-              className="w-auto rounded-xl bg-bg-mute px-4 py-2 font-bold"
+              className="w-auto rounded-xl bg-bg-mute px-4 py-1 font-bold"
               value={selectedPlans}
               onChange={onPlanChange}
             >
@@ -166,7 +166,7 @@ export default function PricingTable() {
         </div>
 
         <div className="grow">
-          <div className="text-balance rounded-lg bg-bg-mute p-4 text-primary-text">
+          <div className="text-balance rounded-lg bg-bg-mute px-3 py-2 text-sm text-primary-text">
             For consistent loads with predictable costs.
           </div>
         </div>
@@ -182,7 +182,7 @@ export default function PricingTable() {
             </p>
           </div>
 
-          <div className="py-3">
+          {/*<div className="py-3">
             <p className="text-text-mute">Request Size</p>
             <p className="font-semibold text-primary-text">
               {showFixed250MB && <>1</>}
@@ -190,9 +190,9 @@ export default function PricingTable() {
               {showFixed5GB && <>5</>}
               {showFixed12GB && <>5</>} MB
             </p>
-          </div>
+          </div>*/}
 
-          <div className="py-3">
+          {/*        <div className="py-3">
             <p className="text-text-mute">Data Size</p>
             <p className="font-semibold text-primary-text">
               {showFixed250MB && <>250 MB</>}
@@ -200,7 +200,7 @@ export default function PricingTable() {
               {showFixed5GB && <>5 GB</>}
               {showFixed12GB && <>12 GB</>}
             </p>
-          </div>
+          </div>*/}
 
           <div className="py-3">
             <p className="text-text-mute">Concurrent Connections</p>

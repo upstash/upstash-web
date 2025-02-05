@@ -4,26 +4,46 @@ import Button from "@/components/button";
 import Tooltip from "@/components/tooltip";
 import useIsMobile from "@/hooks/use-is-mobile";
 import cx from "@/utils/cx";
-import { PricingPlans } from "@/utils/type";
-import { IconCoin, IconCreditCard, IconInfoCircle } from "@tabler/icons-react";
+import { PricingRedis } from "@/utils/type";
+import { IconCoin, IconInfoCircle } from "@tabler/icons-react";
 import * as React from "react";
 import { ChangeEvent, useState } from "react";
 import CompareValue from "../compare-value";
 
 export default function CompareTable() {
-  const isMobile = useIsMobile();
+  const [selectedPlans, setSelectedPlans] = useState(PricingRedis.Free);
+  const [selectedFixed, setSelectedFixed] = useState(PricingRedis.Fixed250MB);
 
-  const [selectedPlans, setSelectedPlans] = useState(PricingPlans.Free);
+  const showFree = selectedPlans === PricingRedis.Free;
+  const showPayg = selectedPlans === PricingRedis.PayAsYouGo;
+  const showFixed250MB = selectedPlans === PricingRedis.Fixed250MB;
+  const showFixed1GB = selectedPlans === PricingRedis.Fixed1GB;
+  const showFixed5GB = selectedPlans === PricingRedis.Fixed5GB;
+  const showFixed12GB = selectedPlans === PricingRedis.Fixed12GB;
+  const showEnterprise = selectedPlans === PricingRedis.Enterprise;
 
-  const showFree = selectedPlans === PricingPlans.Free;
-  const showPayg = selectedPlans === PricingPlans.PayAsYouGo;
-  const showPro2 = selectedPlans === PricingPlans.Pro2K;
-  const showPro10 = selectedPlans === PricingPlans.Pro10K;
-  const showEnterprise = selectedPlans === PricingPlans.Enterprise;
+  const showFixed =
+    showFixed250MB || showFixed1GB || showFixed5GB || showFixed12GB;
+
+  const selectedFixed250MB = selectedFixed === PricingRedis.Fixed250MB;
+  const selectedFixed1GB = selectedFixed === PricingRedis.Fixed1GB;
+  const selectedFixed5GB = selectedFixed === PricingRedis.Fixed5GB;
+  const selectedFixed12GB = selectedFixed === PricingRedis.Fixed12GB;
 
   const onPlanChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    const value = event.target.value as PricingPlans;
+    const value = event.target.value as PricingRedis;
     setSelectedPlans(value);
+
+    if (
+      [
+        PricingRedis.Fixed250MB,
+        PricingRedis.Fixed1GB,
+        PricingRedis.Fixed5GB,
+        PricingRedis.Fixed12GB,
+      ].includes(value)
+    ) {
+      setSelectedFixed(value);
+    }
   };
 
   function Col({
@@ -37,8 +57,15 @@ export default function CompareTable() {
   }) {
     return (
       <td
-        hidden={isMobile ? !plan : false}
         className={cx(
+          // mobile
+          "hidden",
+          plan && "table-cell",
+
+          // desktop
+          "md:table-cell",
+
+          // other
           "bg-bg-mute px-4 py-0 align-top",
           feature && "bg-emerald-600/20 dark:bg-emerald-800/20",
           className,
@@ -51,7 +78,6 @@ export default function CompareTable() {
   return (
     <table className="w-full border-separate border-spacing-x-1 border-spacing-y-0">
       <colgroup>
-        <col className="w-1/2 md:w-1/6" />
         <col className="w-1/2 md:w-1/6" />
         <col className="w-1/2 md:w-1/6" />
         <col className="w-1/2 md:w-1/6" />
@@ -78,13 +104,7 @@ export default function CompareTable() {
             Usage Based Pricing
           </Col>
           <Col
-            plan={showPro2}
-            className="border-b-2 border-b-bg px-0 py-3 text-xs font-medium uppercase tracking-wider text-text-mute"
-          >
-            Fixed Pricing
-          </Col>
-          <Col
-            plan={showPro10}
+            plan={showFixed}
             className="border-b-2 border-b-bg px-0 py-3 text-xs font-medium uppercase tracking-wider text-text-mute"
           >
             Fixed Pricing
@@ -99,33 +119,34 @@ export default function CompareTable() {
 
         <tr className="sticky top-20 z-20 md:top-0">
           <td className="" />
+
           <Col plan={showFree} className="border-b border-b-bg bg-bg p-0">
             <div className="flex h-24 flex-col items-center justify-center bg-bg-mute">
-              <h4 className="hidden text-lg font-semibold text-primary-text md:block">
+              <h4 className="hidden py-1 text-lg font-semibold text-primary-text md:block">
                 Free
               </h4>
 
               <MobileSelectCol
                 onChange={onPlanChange}
-                value={PricingPlans.Free}
+                value={PricingRedis.Free}
               />
 
-              <h5 className="flex items-baseline font-semibold">-</h5>
+              <h5 className="mt-1 flex items-baseline font-semibold">-</h5>
             </div>
           </Col>
 
           <Col plan={showPayg} className="border-b border-b-bg bg-bg p-0">
             <div className="flex h-24 flex-col items-center justify-center bg-emerald-600/20 dark:bg-emerald-800/20">
-              <h4 className="hidden text-lg font-semibold text-primary-text md:block">
+              <h4 className="hidden py-1 text-lg font-semibold text-primary-text md:block">
                 Pay as you go
               </h4>
 
               <MobileSelectCol
                 onChange={onPlanChange}
-                value={PricingPlans.PayAsYouGo}
+                value={PricingRedis.PayAsYouGo}
               />
 
-              <h5 className="flex items-baseline font-semibold">
+              <h5 className="mt-1 flex items-baseline font-semibold">
                 $0.2
                 <span className="ml-1 text-base font-normal opacity-40">
                   / 100K commands
@@ -134,39 +155,26 @@ export default function CompareTable() {
             </div>
           </Col>
 
-          <Col plan={showPro2} className="border-b border-b-bg bg-bg p-0">
+          <Col plan={showFixed} className="border-b border-b-bg bg-bg p-0">
             <div className="flex h-24 flex-col items-center justify-center bg-bg-mute">
-              <h4 className="hidden text-lg font-semibold text-primary-text md:block">
-                Pro 2K
-              </h4>
-
               <MobileSelectCol
                 onChange={onPlanChange}
-                value={PricingPlans.Pro2K}
-              />
+                value={selectedFixed}
+                className="mb-0 hidden py-1 text-lg font-semibold text-primary-text shadow-sm md:block"
+              >
+                <option value={PricingRedis.Fixed250MB}>Fixed 250MB</option>
+                <option value={PricingRedis.Fixed1GB}>Fixed 1GB</option>
+                <option value={PricingRedis.Fixed5GB}>Fixed 5GB</option>
+                <option value={PricingRedis.Fixed12GB}>Fixed 12GB</option>
+              </MobileSelectCol>
 
-              <h5 className="flex items-baseline font-semibold">
-                $280
-                <span className="ml-1 text-base font-normal opacity-40">
-                  / month
-                </span>
-              </h5>
-            </div>
-          </Col>
+              <MobileSelectCol onChange={onPlanChange} value={selectedFixed} />
 
-          <Col plan={showPro10} className="border-b border-b-bg bg-bg p-0">
-            <div className="flex h-24 flex-col items-center justify-center bg-bg-mute">
-              <h4 className="hidden text-lg font-semibold text-primary-text md:block">
-                Pro 10K
-              </h4>
-
-              <MobileSelectCol
-                onChange={onPlanChange}
-                value={PricingPlans.Pro10K}
-              />
-
-              <h5 className="flex items-baseline font-semibold">
-                $680
+              <h5 className="mt-1 flex items-baseline font-semibold">
+                {selectedFixed250MB && <>$7</>}
+                {selectedFixed1GB && <>$20</>}
+                {selectedFixed5GB && <>$77</>}
+                {selectedFixed12GB && <>$180</>}
                 <span className="ml-1 text-base font-normal opacity-40">
                   / month
                 </span>
@@ -176,16 +184,16 @@ export default function CompareTable() {
 
           <Col plan={showEnterprise} className="border-b border-b-bg bg-bg p-0">
             <div className="flex h-24 flex-col items-center justify-center bg-bg-mute">
-              <h4 className="hidden text-lg font-semibold text-primary-text md:block">
+              <h4 className="hidden py-1 text-lg font-semibold text-primary-text md:block">
                 Enterprise
               </h4>
 
               <MobileSelectCol
                 onChange={onPlanChange}
-                value={PricingPlans.Enterprise}
+                value={PricingRedis.Enterprise}
               />
 
-              <h5 className="flex items-baseline font-semibold">
+              <h5 className="mt-1 flex items-baseline font-semibold">
                 -
                 <span className="ml-1 text-base font-normal opacity-40">
                   / month
@@ -200,7 +208,7 @@ export default function CompareTable() {
 
       <tbody>
         <tr>
-          <StickyRow colSpan={isMobile ? 2 : 6}>Capacity</StickyRow>
+          <StickyRow>Capacity</StickyRow>
         </tr>
 
         {/*MAX COMMANDS PER SECOND*/}
@@ -218,12 +226,21 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue type="number">1000</CompareValue>
           </Col>
-          <Col plan={showPro2}>
-            <CompareValue type="number">2000</CompareValue>
+          <Col plan={showFixed}>
+            {selectedFixed250MB && (
+              <CompareValue type="number">1000</CompareValue>
+            )}
+            {selectedFixed1GB && (
+              <CompareValue type="number">1000</CompareValue>
+            )}
+            {selectedFixed5GB && (
+              <CompareValue type="number">2000</CompareValue>
+            )}
+            {selectedFixed12GB && (
+              <CompareValue type="number">2000</CompareValue>
+            )}
           </Col>
-          <Col plan={showPro10}>
-            <CompareValue type="number">10000</CompareValue>
-          </Col>
+
           <Col plan={showEnterprise}>
             <CompareValue type="number">10000</CompareValue>
           </Col>
@@ -242,11 +259,20 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue>Unlimited</CompareValue>
           </Col>
-          <Col plan={showPro2}>
-            <CompareValue>Unlimited</CompareValue>
-          </Col>
-          <Col plan={showPro10}>
-            <CompareValue>Unlimited</CompareValue>
+          <Col plan={showFixed}>
+            {/* TODO: doğru mu */}
+            {selectedFixed250MB && (
+              <CompareValue type="number">1000</CompareValue>
+            )}
+            {selectedFixed1GB && (
+              <CompareValue type="number">1000</CompareValue>
+            )}
+            {selectedFixed5GB && (
+              <CompareValue type="number">1000</CompareValue>
+            )}
+            {selectedFixed12GB && (
+              <CompareValue type="number">1000</CompareValue>
+            )}
           </Col>
           <Col plan={showEnterprise}>
             <CompareValue>Unlimited</CompareValue>
@@ -307,16 +333,29 @@ export default function CompareTable() {
               1
             </CompareValue>
           </Col>
-          <Col plan={showPro2}>
-            <CompareValue type="size" suffix="MB">
-              10
-            </CompareValue>
+          <Col plan={showFixed}>
+            {selectedFixed250MB && (
+              <CompareValue type="size" suffix="MB">
+                1
+              </CompareValue>
+            )}
+            {selectedFixed1GB && (
+              <CompareValue type="size" suffix="MB">
+                1
+              </CompareValue>
+            )}
+            {selectedFixed5GB && (
+              <CompareValue type="size" suffix="MB">
+                5
+              </CompareValue>
+            )}
+            {selectedFixed12GB && (
+              <CompareValue type="size" suffix="MB">
+                5
+              </CompareValue>
+            )}
           </Col>
-          <Col plan={showPro10}>
-            <CompareValue type="size" suffix="MB">
-              100
-            </CompareValue>
-          </Col>
+
           <Col plan={showEnterprise}>
             <CompareValue type="size" suffix="MB">
               100
@@ -378,26 +417,29 @@ export default function CompareTable() {
               100
             </CompareValue>
           </Col>
-          <Col plan={showPro2}>
-            <CompareValue type="size" suffix="MB">
-              500
-            </CompareValue>
-<<<<<<< HEAD
-          </td>
-          <td
-            hidden={isMobile ? !showPro10 : false}
-            className="bg-bg-mute px-4 py-0 align-top"
-          >
-            <CompareValue type="size" suffix="GB">
-              1
-=======
+          <Col plan={showFixed}>
+            {selectedFixed250MB && (
+              <CompareValue type="size" suffix="MB">
+                100
+              </CompareValue>
+            )}
+            {selectedFixed1GB && (
+              <CompareValue type="size" suffix="MB">
+                100
+              </CompareValue>
+            )}
+            {selectedFixed5GB && (
+              <CompareValue type="size" suffix="MB">
+                200
+              </CompareValue>
+            )}
+            {selectedFixed12GB && (
+              <CompareValue type="size" suffix="MB">
+                200
+              </CompareValue>
+            )}
           </Col>
-          <Col plan={showPro10}>
-            <CompareValue type="size" suffix="MB">
-              500
->>>>>>> bf616a9 (fix redis pricing)
-            </CompareValue>
-          </Col>
+
           <Col plan={showEnterprise}>
             <CompareValue type="size" suffix="MB">
               500
@@ -423,16 +465,29 @@ export default function CompareTable() {
               10
             </CompareValue>
           </Col>
-          <Col plan={showPro2}>
-            <CompareValue type="size" suffix="GB">
-              50
-            </CompareValue>
+          <Col plan={showFixed}>
+            {selectedFixed250MB && (
+              <CompareValue type="size" suffix="MB">
+                250
+              </CompareValue>
+            )}
+            {selectedFixed1GB && (
+              <CompareValue type="size" suffix="GB">
+                1
+              </CompareValue>
+            )}
+            {selectedFixed5GB && (
+              <CompareValue type="size" suffix="GB">
+                5
+              </CompareValue>
+            )}
+            {selectedFixed12GB && (
+              <CompareValue type="size" suffix="GB">
+                12
+              </CompareValue>
+            )}
           </Col>
-          <Col plan={showPro10}>
-            <CompareValue type="size" suffix="GB">
-              100
-            </CompareValue>
-          </Col>
+
           <Col plan={showEnterprise}>
             <CompareValue type="size" suffix="GB">
               100
@@ -454,11 +509,19 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue type="number">1000</CompareValue>
           </Col>
-          <Col plan={showPro2}>
-            <CompareValue type="number">2000</CompareValue>
-          </Col>
-          <Col plan={showPro10}>
-            <CompareValue type="number">5000</CompareValue>
+          <Col plan={showFixed}>
+            {selectedFixed250MB && (
+              <CompareValue type="number">256</CompareValue>
+            )}
+            {selectedFixed1GB && (
+              <CompareValue type="number">1000</CompareValue>
+            )}
+            {selectedFixed5GB && (
+              <CompareValue type="number">5000</CompareValue>
+            )}
+            {selectedFixed12GB && (
+              <CompareValue type="number">10000</CompareValue>
+            )}
           </Col>
           <Col plan={showEnterprise}>
             <CompareValue type="number">5000</CompareValue>
@@ -484,81 +547,85 @@ export default function CompareTable() {
               suffix="GB"
               className="border-b-0"
               after={
-<<<<<<< HEAD
                 <Tooltip content="Free up to 200GB per month. Beyond that, we'll prompt you to upgrade and start charging at rate $0.03 per GB.">
-                  <IconInfoCircle
-                    className="ml-1 opacity-60"
-                    stroke={1.2}
-                    aria-label="Info"
-                  />
-=======
-                <Tooltip content="Free up to 200GB per month. Beyond that, $0.03 per GB.">
                   <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
->>>>>>> bf616a9 (fix redis pricing)
                 </Tooltip>
               }
             >
               200
             </CompareValue>
           </Col>
-          <Col plan={showPro2}>
-            <CompareValue
-              type="size"
-              suffix="TB"
-              className="border-b-0"
-              after={
-<<<<<<< HEAD
-                <Tooltip content="Upon hitting this limit, we'll prompt you to upgrade and increase your bandwidth rate from $0.03 to $0.10 per GB.">
-                  <IconInfoCircle
-                    className="ml-1 opacity-60"
-                    stroke={1.2}
-                    aria-label="Info"
-                  />
-=======
-                <Tooltip content="Upon hitting this limit, we'll prompt you to upgrade without stopping your traffic.">
-                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
->>>>>>> bf616a9 (fix redis pricing)
-                </Tooltip>
-              }
-            >
-              5
-            </CompareValue>
+          <Col plan={showFixed}>
+            {selectedFixed250MB && (
+              <CompareValue
+                type="size"
+                suffix="GB"
+                className="border-b-0"
+                after={
+                  <Tooltip content="Upon hitting this limit, we'll prompt you to upgrade and increase your bandwidth rate from $0.03 to $0.10 per GB.">
+                    <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                  </Tooltip>
+                }
+              >
+                100
+              </CompareValue>
+            )}
+            {selectedFixed1GB && (
+              <CompareValue
+                type="size"
+                suffix="TB"
+                className="border-b-0"
+                after={
+                  <Tooltip content="Upon hitting this limit, we'll prompt you to upgrade and increase your bandwidth rate from $0.03 to $0.10 per GB.">
+                    <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                  </Tooltip>
+                }
+              >
+                5
+              </CompareValue>
+            )}
+            {selectedFixed5GB && (
+              <CompareValue
+                type="size"
+                suffix="GB"
+                className="border-b-0"
+                after={
+                  <Tooltip content="Upon hitting this limit, we'll prompt you to upgrade and increase your bandwidth rate from $0.03 to $0.10 per GB.">
+                    <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                  </Tooltip>
+                }
+              >
+                200
+              </CompareValue>
+            )}
+            {selectedFixed12GB && (
+              <CompareValue
+                type="size"
+                suffix="GB"
+                className="border-b-0"
+                after={
+                  <Tooltip content="Upon hitting this limit, we'll prompt you to upgrade and increase your bandwidth rate from $0.03 to $0.10 per GB.">
+                    <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                  </Tooltip>
+                }
+              >
+                800
+              </CompareValue>
+            )}
           </Col>
-          <Col plan={showPro10}>
-            <CompareValue
-              type="size"
-              suffix="TB"
-              className="border-b-0"
-              after={
-<<<<<<< HEAD
-                <Tooltip content="Upon hitting this limit, we'll prompt you to upgrade and increase your bandwidth rate from $0.03 to $0.10 per GB.">
-                  <IconInfoCircle
-                    className="ml-1 opacity-60"
-                    stroke={1.2}
-                    aria-label="Info"
-                  />
-=======
-                <Tooltip content="Upon hitting this limit, we'll prompt you to upgrade without stopping your traffic.">
-                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
->>>>>>> bf616a9 (fix redis pricing)
-                </Tooltip>
-              }
-            >
-              10
-            </CompareValue>
-          </Col>
+
           <Col plan={showEnterprise}>
             <CompareValue
               type="size"
-              suffix="TB"
+              suffix="GB"
               className="border-b-0"
               after={
-                <Tooltip content="Upon hitting this limit, we'll prompt you to upgrade without stopping your traffic.">
+                <Tooltip content="Upon hitting this limit, we'll prompt you to upgrade and increase your bandwidth rate from $0.03 to $0.10 per GB.">
                   <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                 </Tooltip>
               }
             >
-              10
+              2000
             </CompareValue>
           </Col>
         </tr>
@@ -566,7 +633,7 @@ export default function CompareTable() {
         {/**/}
 
         <tr>
-          <StickyRow colSpan={isMobile ? 2 : 6}>Features</StickyRow>
+          <StickyRow>Features</StickyRow>
         </tr>
 
         {/*SUPPORTED PLATFORMS*/}
@@ -588,14 +655,7 @@ export default function CompareTable() {
               <span>FLY</span>
             </CompareValue>
           </Col>
-          <Col plan={showPro2}>
-            <CompareValue type="list">
-              <span>AWS</span>
-              <span>GCP</span>
-              <span>FLY</span>
-            </CompareValue>
-          </Col>
-          <Col plan={showPro10}>
+          <Col plan={showFixed}>
             <CompareValue type="list">
               <span>AWS</span>
               <span>GCP</span>
@@ -623,10 +683,7 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue type="boolean" />
           </Col>
-          <Col plan={showPro2}>
-            <CompareValue type="boolean" />
-          </Col>
-          <Col plan={showPro10}>
+          <Col plan={showFixed}>
             <CompareValue type="boolean" />
           </Col>
           <Col plan={showEnterprise}>
@@ -646,10 +703,7 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue type="boolean" />
           </Col>
-          <Col plan={showPro2}>
-            <CompareValue type="boolean" />
-          </Col>
-          <Col plan={showPro10}>
+          <Col plan={showFixed}>
             <CompareValue type="boolean" />
           </Col>
           <Col plan={showEnterprise}>
@@ -676,10 +730,7 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue type="boolean" />
           </Col>
-          <Col plan={showPro2}>
-            <CompareValue type="boolean" />
-          </Col>
-          <Col plan={showPro10}>
+          <Col plan={showFixed}>
             <CompareValue type="boolean" />
           </Col>
           <Col plan={showEnterprise}>
@@ -699,17 +750,7 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue type="boolean" valid={false} />
           </Col>
-          <Col plan={showPro2}>
-            <CompareValue
-              type="boolean"
-              after={
-                <Tooltip content="Coming soon.">
-                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
-                </Tooltip>
-              }
-            />
-          </Col>
-          <Col plan={showPro10}>
+          <Col plan={showFixed}>
             <CompareValue
               type="boolean"
               after={
@@ -743,12 +784,10 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue>Primary Replicas</CompareValue>
           </Col>
-          <Col plan={showPro2}>
+          <Col plan={showFixed}>
             <CompareValue>All Replicas</CompareValue>
           </Col>
-          <Col plan={showPro10}>
-            <CompareValue>All Replicas</CompareValue>
-          </Col>
+
           <Col plan={showEnterprise}>
             <CompareValue>All Replicas</CompareValue>
           </Col>
@@ -775,12 +814,7 @@ export default function CompareTable() {
               }
             />
           </Col>
-          <Col plan={showPro2}>
-            <CompareValue>
-              <div>99.99%</div>
-            </CompareValue>
-          </Col>
-          <Col plan={showPro10}>
+          <Col plan={showFixed}>
             <CompareValue>
               <div>99.99%</div>
             </CompareValue>
@@ -795,7 +829,7 @@ export default function CompareTable() {
         {/**/}
 
         <tr>
-          <StickyRow colSpan={isMobile ? 2 : 6}>Security and Privacy</StickyRow>
+          <StickyRow>Security and Privacy</StickyRow>
         </tr>
 
         <tr>
@@ -809,12 +843,10 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue type="boolean" />
           </Col>
-          <Col plan={showPro2}>
+          <Col plan={showFixed}>
             <CompareValue type="boolean" />
           </Col>
-          <Col plan={showPro10}>
-            <CompareValue type="boolean" />
-          </Col>
+
           <Col plan={showEnterprise}>
             <CompareValue type="boolean" />
           </Col>
@@ -831,12 +863,10 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue type="boolean" />
           </Col>
-          <Col plan={showPro2}>
+          <Col plan={showFixed}>
             <CompareValue type="boolean" />
           </Col>
-          <Col plan={showPro10}>
-            <CompareValue type="boolean" />
-          </Col>
+
           <Col plan={showEnterprise}>
             <CompareValue type="boolean" />
           </Col>
@@ -861,7 +891,7 @@ export default function CompareTable() {
               }
             />
           </Col>
-          <Col plan={showPro2}>
+          <Col plan={showFixed}>
             <CompareValue
               type="boolean"
               valid={false}
@@ -872,17 +902,7 @@ export default function CompareTable() {
               }
             />
           </Col>
-          <Col plan={showPro10}>
-            <CompareValue
-              type="boolean"
-              valid={false}
-              after={
-                <Tooltip content="Available with Enterprise subscription.">
-                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
-                </Tooltip>
-              }
-            />
-          </Col>
+
           <Col plan={showEnterprise}>
             <CompareValue
               type="boolean"
@@ -907,7 +927,7 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue type="boolean" valid={false} />
           </Col>
-          <Col plan={showPro2}>
+          <Col plan={showFixed}>
             <CompareValue
               type="boolean"
               after={
@@ -917,16 +937,7 @@ export default function CompareTable() {
               }
             />
           </Col>
-          <Col plan={showPro10}>
-            <CompareValue
-              type="boolean"
-              after={
-                <Tooltip content="Coming soon.">
-                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
-                </Tooltip>
-              }
-            />
-          </Col>
+
           <Col plan={showEnterprise}>
             <CompareValue
               type="boolean"
@@ -950,18 +961,7 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue type="boolean" valid={false} />
           </Col>
-          <Col plan={showPro2}>
-            <CompareValue
-              type="boolean"
-              valid={false}
-              after={
-                <Tooltip content="Available with Enterprise subscription.">
-                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
-                </Tooltip>
-              }
-            />
-          </Col>
-          <Col plan={showPro10}>
+          <Col plan={showFixed}>
             <CompareValue
               type="boolean"
               valid={false}
@@ -996,10 +996,7 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue type="boolean" valid={false} />
           </Col>
-          <Col plan={showPro2}>
-            <CompareValue type="boolean" />
-          </Col>
-          <Col plan={showPro10}>
+          <Col plan={showFixed}>
             <CompareValue type="boolean" />
           </Col>
           <Col plan={showEnterprise}>
@@ -1018,12 +1015,10 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue type="boolean" valid={false} />
           </Col>
-          <Col plan={showPro2}>
+          <Col plan={showFixed}>
             <CompareValue type="boolean" />
           </Col>
-          <Col plan={showPro10}>
-            <CompareValue type="boolean" />
-          </Col>
+
           <Col plan={showEnterprise}>
             <CompareValue type="boolean" />
           </Col>
@@ -1050,10 +1045,7 @@ export default function CompareTable() {
               }
             />
           </Col>
-          <Col plan={showPro2}>
-            <CompareValue type="boolean" />
-          </Col>
-          <Col plan={showPro10}>
+          <Col plan={showFixed}>
             <CompareValue type="boolean" />
           </Col>
           <Col plan={showEnterprise}>
@@ -1082,18 +1074,7 @@ export default function CompareTable() {
               }
             />
           </Col>
-          <Col plan={showPro2}>
-            <CompareValue
-              type="boolean"
-              valid={false}
-              after={
-                <Tooltip content="Available with Enterprise subscription.">
-                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
-                </Tooltip>
-              }
-            />
-          </Col>
-          <Col plan={showPro10}>
+          <Col plan={showFixed}>
             <CompareValue
               type="boolean"
               valid={false}
@@ -1120,7 +1101,7 @@ export default function CompareTable() {
         {/**/}
 
         <tr>
-          <StickyRow colSpan={isMobile ? 2 : 6}>Observability</StickyRow>
+          <StickyRow>Observability</StickyRow>
         </tr>
 
         {/**/}
@@ -1136,10 +1117,7 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue type="boolean" valid={false} />
           </Col>
-          <Col plan={showPro2}>
-            <CompareValue type="boolean" />
-          </Col>
-          <Col plan={showPro10}>
+          <Col plan={showFixed}>
             <CompareValue type="boolean" />
           </Col>
           <Col plan={showEnterprise}>
@@ -1158,10 +1136,7 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue type="boolean" valid={false} />
           </Col>
-          <Col plan={showPro2}>
-            <CompareValue type="boolean" />
-          </Col>
-          <Col plan={showPro10}>
+          <Col plan={showFixed}>
             <CompareValue type="boolean" />
           </Col>
           <Col plan={showEnterprise}>
@@ -1180,17 +1155,7 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue type="boolean" valid={false} />
           </Col>
-          <Col plan={showPro2}>
-            <CompareValue
-              type="boolean"
-              after={
-                <Tooltip content="Coming soon.">
-                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
-                </Tooltip>
-              }
-            />
-          </Col>
-          <Col plan={showPro10}>
+          <Col plan={showFixed}>
             <CompareValue
               type="boolean"
               after={
@@ -1231,18 +1196,7 @@ export default function CompareTable() {
               }
             />
           </Col>
-          <Col plan={showPro2}>
-            <CompareValue
-              type="boolean"
-              valid={false}
-              after={
-                <Tooltip content="Available with Enterprise subscription.">
-                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
-                </Tooltip>
-              }
-            />
-          </Col>
-          <Col plan={showPro10}>
+          <Col plan={showFixed}>
             <CompareValue
               type="boolean"
               valid={false}
@@ -1269,7 +1223,7 @@ export default function CompareTable() {
         {/**/}
 
         <tr>
-          <StickyRow colSpan={isMobile ? 2 : 6}>Support</StickyRow>
+          <StickyRow>Support</StickyRow>
         </tr>
 
         <tr>
@@ -1283,10 +1237,7 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue type="boolean" />
           </Col>
-          <Col plan={showPro2}>
-            <CompareValue type="boolean" />
-          </Col>
-          <Col plan={showPro10}>
+          <Col plan={showFixed}>
             <CompareValue type="boolean" />
           </Col>
           <Col plan={showEnterprise}>
@@ -1305,10 +1256,7 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue type="boolean" />
           </Col>
-          <Col plan={showPro2}>
-            <CompareValue type="boolean" />
-          </Col>
-          <Col plan={showPro10}>
+          <Col plan={showFixed}>
             <CompareValue type="boolean" />
           </Col>
           <Col plan={showEnterprise}>
@@ -1335,18 +1283,7 @@ export default function CompareTable() {
               }
             />
           </Col>
-          <Col plan={showPro2}>
-            <CompareValue
-              type="boolean"
-              valid={false}
-              after={
-                <Tooltip content="Available with Enterprise subscription.">
-                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
-                </Tooltip>
-              }
-            />
-          </Col>
-          <Col plan={showPro10}>
+          <Col plan={showFixed}>
             <CompareValue
               type="boolean"
               valid={false}
@@ -1389,12 +1326,7 @@ export default function CompareTable() {
               }
             />
           </Col>
-          <Col plan={showPro2}>
-            <CompareValue>
-              <div>99.99%</div>
-            </CompareValue>
-          </Col>
-          <Col plan={showPro10}>
+          <Col plan={showFixed}>
             <CompareValue>
               <div>99.99%</div>
             </CompareValue>
@@ -1409,19 +1341,7 @@ export default function CompareTable() {
         {/**/}
 
         <tr>
-          <th
-            colSpan={isMobile ? 2 : 6}
-            className="sticky top-20 z-10 border-y border-bg bg-bg p-0 text-left md:top-0"
-          >
-            <div className="-ml-4 flex h-24 items-center bg-gradient-to-r from-bg-mute to-bg px-4 md:h-16">
-              <span className="flex items-center gap-2 text-lg font-semibold">
-                <span className="flex items-center rounded-full bg-white/10 p-2">
-                  <IconCreditCard size={24} strokeWidth={1.5} />
-                </span>
-                <span>Price</span>
-              </span>
-            </div>
-          </th>
+          <StickyRow>Price</StickyRow>
         </tr>
 
         {/* MONTHLY PRICE */}
@@ -1431,22 +1351,44 @@ export default function CompareTable() {
           </th>
           {/**/}
           <Col plan={showFree}>
-            <CompareValue>Free</CompareValue>
+            <CompareValue>
+              Free
+              <br />
+              &nbsp;
+            </CompareValue>
           </Col>
           <Col plan={showPayg} feature>
-            <CompareValue>None</CompareValue>
-          </Col>
-          <Col plan={showPro2}>
             <CompareValue>
-              $280 <br />
-              +($100 ✕ read region)
+              -
+              <br />
+              &nbsp;
             </CompareValue>
           </Col>
-          <Col plan={showPro10}>
-            <CompareValue>
-              $680 <br />
-              +($200 ✕ read region)
-            </CompareValue>
+          <Col plan={showFixed}>
+            {selectedFixed250MB && (
+              <CompareValue>
+                $7 <br />
+                +($5 ✕ read region)
+              </CompareValue>
+            )}
+            {selectedFixed1GB && (
+              <CompareValue>
+                $20 <br />
+                +($10 ✕ read region)
+              </CompareValue>
+            )}
+            {selectedFixed5GB && (
+              <CompareValue>
+                $77 <br />
+                +($35 ✕ read region)
+              </CompareValue>
+            )}
+            {selectedFixed12GB && (
+              <CompareValue>
+                $180 <br />
+                +($90 ✕ read region)
+              </CompareValue>
+            )}
           </Col>
           <Col plan={showEnterprise}>
             <CompareValue>
@@ -1467,14 +1409,11 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue>$0.2 per 100K</CompareValue>
           </Col>
-          <Col plan={showPro2}>
-            <CompareValue>None</CompareValue>
-          </Col>
-          <Col plan={showPro10}>
-            <CompareValue>None</CompareValue>
+          <Col plan={showFixed}>
+            <CompareValue>-</CompareValue>
           </Col>
           <Col plan={showEnterprise}>
-            <CompareValue>None</CompareValue>
+            <CompareValue>-</CompareValue>
           </Col>
         </tr>
         <tr>
@@ -1488,11 +1427,11 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue>$0.25 per GB</CompareValue>
           </Col>
-          <Col plan={showPro2}>
-            <CompareValue>$0.25 per GB</CompareValue>
-          </Col>
-          <Col plan={showPro10}>
-            <CompareValue>$0.25 per GB</CompareValue>
+          <Col plan={showFixed}>
+            {selectedFixed250MB && <CompareValue>$0.25 per GB</CompareValue>}
+            {selectedFixed1GB && <CompareValue>$0.25 per GB</CompareValue>}
+            {selectedFixed5GB && <CompareValue>$0.25 per GB</CompareValue>}
+            {selectedFixed12GB && <CompareValue>$0.25 per GB</CompareValue>}
           </Col>
           <Col plan={showEnterprise}>
             <CompareValue>$0.25 per GB</CompareValue>
@@ -1510,62 +1449,59 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue
               after={
-<<<<<<< HEAD
-                <Tooltip content="Free up to 200GB per month. Beyond that, we'll prompt you to upgrade and start charging at rate $0.03 per GB.">
-                  <IconInfoCircle
-                    className="ml-1 opacity-60"
-                    stroke={1.2}
-                    aria-label="Info"
-                  />
-=======
                 <Tooltip content="Free up to 200GB per month. Beyond that, $0.03 per GB.">
                   <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
->>>>>>> bf616a9 (fix redis pricing)
                 </Tooltip>
               }
             >
               Free
             </CompareValue>
           </Col>
-          <Col plan={showPro2}>
-            <CompareValue
-              after={
-<<<<<<< HEAD
-                <Tooltip content="Price can change depending on cloud provider's fee. $0.03 is when the client is in the same region until plan's limit, $0.10 beyond that.">
-                  <IconInfoCircle
-                    className="ml-1 opacity-60"
-                    stroke={1.2}
-                    aria-label="Info"
-                  />
-=======
-                <Tooltip content="Price can change depending on cloud provider's fee. $0.03 is when the client is in the same region.">
-                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
->>>>>>> bf616a9 (fix redis pricing)
-                </Tooltip>
-              }
-            >
-              $0.03 per GB
-            </CompareValue>
-          </Col>
-          <Col plan={showPro10}>
-            <CompareValue
-              after={
-<<<<<<< HEAD
-                <Tooltip content="Price can change depending on cloud provider's fee. $0.03 is when the client is in the same region until plan's limit, $0.10 beyond that.">
-                  <IconInfoCircle
-                    className="ml-1 opacity-60"
-                    stroke={1.2}
-                    aria-label="Info"
-                  />
-=======
-                <Tooltip content="Price can change depending on cloud provider's fee. $0.03 is when the client is in the same region.">
-                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
->>>>>>> bf616a9 (fix redis pricing)
-                </Tooltip>
-              }
-            >
-              $0.03 per GB
-            </CompareValue>
+          <Col plan={showFixed}>
+            {selectedFixed250MB && (
+              <CompareValue
+                after={
+                  <Tooltip content="Price can change depending on cloud provider's fee. $0.03 is when the client is in the same region.">
+                    <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                  </Tooltip>
+                }
+              >
+                $0.03 per GB
+              </CompareValue>
+            )}
+            {selectedFixed1GB && (
+              <CompareValue
+                after={
+                  <Tooltip content="Price can change depending on cloud provider's fee. $0.03 is when the client is in the same region.">
+                    <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                  </Tooltip>
+                }
+              >
+                $0.03 per GB
+              </CompareValue>
+            )}
+            {selectedFixed5GB && (
+              <CompareValue
+                after={
+                  <Tooltip content="Price can change depending on cloud provider's fee. $0.03 is when the client is in the same region.">
+                    <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                  </Tooltip>
+                }
+              >
+                $0.03 per GB
+              </CompareValue>
+            )}
+            {selectedFixed12GB && (
+              <CompareValue
+                after={
+                  <Tooltip content="Price can change depending on cloud provider's fee. $0.03 is when the client is in the same region.">
+                    <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                  </Tooltip>
+                }
+              >
+                $0.03 per GB
+              </CompareValue>
+            )}
           </Col>
           <Col plan={showEnterprise}>
             <CompareValue
@@ -1598,14 +1534,7 @@ export default function CompareTable() {
               </a>
             </Button>
           </Col>
-          <Col plan={showPro2} className="py-4">
-            <Button asChild variant="primary">
-              <a target="_self" href="https://console.upstash.com">
-                Start Now
-              </a>
-            </Button>
-          </Col>
-          <Col plan={showPro10} className="py-4">
+          <Col plan={showFixed} className="py-4">
             <Button asChild variant="primary">
               <a target="_self" href="https://console.upstash.com">
                 Start Now
@@ -1625,25 +1554,43 @@ export default function CompareTable() {
   );
 }
 
-function MobileSelectCol({ ...props }: React.ComponentProps<"select">) {
+function MobileSelectCol({
+  children,
+  className,
+  ...props
+}: React.ComponentProps<"select">) {
   return (
     <select
-      className="mb-2 bg-white px-4 py-2 font-semibold md:hidden"
+      className={cx(
+        "mb-2 bg-white px-4 py-2 font-semibold md:hidden",
+        className,
+      )}
       {...props}
     >
-      <option value={PricingPlans.Free}>Free</option>
-      <option value={PricingPlans.PayAsYouGo}>Pay as you go</option>
-      <option value={PricingPlans.Pro2K}>Pro 2K</option>
-      <option value={PricingPlans.Pro10K}>Pro 10K</option>
-      <option value={PricingPlans.Enterprise}>Enterprise</option>
+      {children ? (
+        children
+      ) : (
+        <>
+          <option value={PricingRedis.Free}>Free</option>
+          <option value={PricingRedis.PayAsYouGo}>Pay as you go</option>
+          <option value={PricingRedis.Fixed250MB}>Fixed 250MB</option>
+          <option value={PricingRedis.Fixed1GB}>Fixed 1GB</option>
+          <option value={PricingRedis.Fixed5GB}>Fixed 5GB</option>
+          <option value={PricingRedis.Fixed12GB}>Fixed 12GB</option>
+          <option value={PricingRedis.Enterprise}>Enterprise</option>
+        </>
+      )}
     </select>
   );
 }
 
 function StickyRow({ children, ...props }: React.ComponentProps<"th">) {
+  const isMobile = useIsMobile();
+
   return (
     <th
       className="sticky top-20 z-10 border-y-2 border-bg bg-bg p-0 text-left md:top-0"
+      colSpan={isMobile ? 2 : 5}
       {...props}
     >
       <div className="-ml-4 flex h-24 items-center bg-gradient-to-r from-bg-mute to-bg px-4 text-lg font-semibold md:h-16">
