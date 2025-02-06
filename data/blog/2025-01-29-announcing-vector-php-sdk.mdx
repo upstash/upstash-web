@@ -1,0 +1,105 @@
+---
+slug: announcing-vector-php-sdk
+title: "Announcing our PHP SDKs for Vector"
+authors:
+  - jorge
+tags: [php, laravel, vector, announcement]
+---
+
+On January 31st, 2024, [we announced the public release of Upstash Vector](/blog/introducing-vector-database), our serverless vector database.
+Upstash Vector allows you to store and query vector data, enabling you to build applications such as semantic search, recommendation engines, RAG, and more.
+
+Today, we are excited to announce the official PHP SDKs for Upstash Vector.
+These SDKs make it easy to integrate Upstash Vector into your applications, whether you're building a web app, CLI tool, or library.
+
+### Upstash Vector for PHP
+
+The Vector SDK for PHP is our core SDK, enabling seamless integration with Upstash Vector from any PHP project or framework.
+
+Installing our SDK is easy with Composer:
+
+```bash
+composer require upstash/vector
+```
+
+Using our SDK should feel familiar if you’ve worked with our other SDKs, such as JavaScript, Python, or Go.
+
+```php
+use Upstash\Vector\Index;
+use Upstash\Vector\VectorUpsert;
+use Upstash\Vector\VectorQuery;
+
+$index = new Index(
+  url: 'UPSTASH_VECTOR_REST_URL',
+  token: 'UPSTASH_VECTOR_REST_TOKEN',
+);
+
+$index->upsertMany([
+  new VectorUpsert(
+    id: 'id-1',
+    vector: [0.1, 0.2],
+    metadata: ['metadata_field' => 'metadata_value1']
+  ),
+  new VectorUpsert(
+    id: 'id-2',
+    vector: [0.3, 0.4],
+    metadata: ['metadata_field' => 'metadata_value2']
+  ),
+]);
+
+$results = $index->query(new VectorQuery(vector: [ 0.6, 0.9 ], topK: 10));
+
+// ...
+```
+
+We've also prepared a quick start guide for the PHP SDK, available [here](https://docs.upstash.com/reference/vector-php-sdk).
+
+### Upstash Vector for Laravel
+
+Building on the Vector SDK for PHP, we’ve created a Laravel-specific SDK that simplifies integrating Upstash Vector into your Laravel application.
+
+You can install the SDK for Laravel using Composer:
+
+```bash
+composer require upstash/vector-laravel
+```
+
+Our Laravel SDK is automatically configured, and the only step required is adding the Upstash Vector environment variables to your `.env` file.
+
+```dotenv
+UPSTASH_VECTOR_REST_URL=
+UPSTASH_VECTOR_REST_TOKEN=
+```
+
+Once you’ve set up the environment variables, you can start using the SDK in your Laravel application.
+
+```php
+use Upstash\Vector\Laravel\Facades\Vector;
+use Upstash\Vector\VectorUpsert;
+use Upstash\Vector\VectorQuery;
+
+Vector::upsertMany([
+  new VectorUpsert(
+    id: 'id-1',
+    vector: [0.1, 0.2],
+    metadata: ['metadata_field' => 'metadata_value1']
+  ),
+  new VectorUpsert(
+    id: 'id-2',
+    vector: [0.3, 0.4],
+    metadata: ['metadata_field' => 'metadata_value2']
+  ),
+]);
+
+$results = Vector::query(new VectorQuery(vector: [ 0.6, 0.9 ], topK: 10));
+ 
+// ...
+```
+
+### Closing Thoughts & Future
+
+We're excited to see the growth of Upstash Vector and what the PHP ecosystem will build with it!
+
+So my question for you is...
+
+*What will you build?*
