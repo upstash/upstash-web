@@ -398,4 +398,9 @@ export const authors: Record<
     title: "Software Developer - Guest Author",
     image: "mehmet-emin.jpg",
   },
+  jorge: {
+    name: "Jorge Lapa",
+    title: "Software Engineer @Upstash",
+    image: "jorge.png",
+  },
 };
