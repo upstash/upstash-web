@@ -1,0 +1,145 @@
+---
+slug: how-ive-built-envflow-using-laravel-and-upstash-redis
+title: "How I've built Envflow using Laravel & Upstash Redis"
+authors:
+  - jorge
+tags: [laravel, redis]
+---
+
+I've recently been inspired by Nuno Maduro's project, [Pyre](https://pyre.link/).
+It is a web app that allows you to send short-lived secret messages to anyone you want. These messages are encrypted at rest,
+and only you or the person with whom you share the decryption link can read them.
+
+I wanted to build something similar with Upstash Redis, so I chose a niche: sharing environment variables.
+I bet that at some point, you've had to share secrets with your teammates and wondered how to build a system
+that allows you to do it securely.
+
+Introducing [Envflow](https://envflow-production-kkhmdq.laravel.cloud), a Laravel sample project I built that
+uses Upstash Redis as its primary database for storing and sharing encrypted data.
+
+I'll take you through the process of building this project, from start to finish skipping over the boring details.
+
+### The Stack
+First, I've chosen to embrace PHP and build the project using the famous TALL stack:
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Alpine JS](https://alpinejs.dev/)
+- [Laravel](https://laravel.com/)
+- [Livewire](https://livewire.laravel.com/)
+- [Upstash Redis](https://upstash.com)
+
+### Database
+I needed a place to store encrypted data that could expire after a certain amount of time while being fast and cost-effective.
+As you might have guessed, I chose Upstash Redis.
+
+Upstash Redis is a serverless, Redis-compatible database so it was actually perfect for this use-case.
+
+<Note>
+Psst… We have a Getting Started guide for Upstash Redis and Laravel!
+
+[Find out more](https://upstash.com/docs/redis/quickstarts/laravel)
+</Note>
+
+### Routes / Endpoints
+
+Envflow runs on three main routes, plus an auxiliary route that explains what the project is about.
+Those routes can be found on the [`routes/web.php`](https://github.com/heyjorgedev/envflow/blob/main/routes/web.php) file.
+
+#### Homepage
+
+The homepage route not only acts as a landing page for the project but also includes a Livewire Form that allows you to encrypt
+your environment variables. On this page you can set the amount of times the environment variables can be decrypted and for
+how long they will be valid.
+
+PUT PICTURE HERE
+
+You can find the Livewire Page Component on [`app/Livewire/EncryptEnvPage.php`](https://github.com/heyjorgedev/envflow/blob/main/app/Livewire/EncryptEnvPage.php)
+and the according template on [`resources/views/livewire/encrypt-env-page.blade.php`](https://github.com/heyjorgedev/envflow/blob/main/resources/views/livewire/encrypt-env-page.blade.php).
+
+#### Success Page
+
+The success page is a simple page that displays two ways to share the decryption link: one includes the decryption key,
+while the other separates the decryption key from the link.
+
+PUT PICTURE HERE
+
+You can find the Livewire Page Component on [`app/Livewire/SuccessPage.php`](https://github.com/heyjorgedev/envflow/blob/main/app/Livewire/SuccessPage.php)
+and the according template on [`resources/views/livewire/success-page.blade.php`](https://github.com/heyjorgedev/envflow/blob/main/resources/views/livewire/success-page.blade.php).
+
+#### Decryption Page
+
+This page is where all the magic of decryption happens, remember we don't store the encryption key in our Upstash Redis database,
+we only store the encrypted value which is a bunch of giberish. The main job of the Decryption page is to take the decryption key and try
+to decrypt the environment variables.
+
+PUT PICTURE HERE
+
+You can find the Livewire Page Component on [`app/Livewire/DecryptEnvPage.php`](https://github.com/heyjorgedev/envflow/blob/main/app/Livewire/DecryptEnvPage.php)
+and the according template on [`resources/views/livewire/decrypt-env-page.blade.php`](https://github.com/heyjorgedev/envflow/blob/main/resources/views/livewire/decrypt-env-page.blade.php).
+
+### Actions
+
+For this project I've used the Action/Executor pattern to organize the main components of business logic in my application.
+This allows me for future reusability, testability and maintainability when the code grows, it also allows me to share such
+behaviors between different parts of my application, let's say, a future API... Who knows?...
+
+You can find the Actions on [`app/Actions`](https://github.com/heyjorgedev/envflow/tree/main/app/Actions) but I would like to you
+the [Encrypt](https://github.com/heyjorgedev/envflow/blob/main/app/Actions/EncryptEnvFile.php)
+and [Decrypt](https://github.com/heyjorgedev/envflow/blob/main/app/Actions/DecryptEnvFile.php)
+actions since they are the main components that handle the encryption and decryption of the environment variables.
+
+### Encryption
+
+I was pretty lucky that Laravel has a built-in [Encryption helper](https://laravel.com/docs/11.x/encryption) but I needed something a bit
+different since I wanted to provide a custom encryption key generated at runtime.
+
+After some digging, I found a way! We can use Laravel's underlying class `Illuminate\Encryption\Encrypter`.
+
+```php
+use Illuminate\Encryption\Encrypter;
+
+$encrypter = new Encrypter(
+  'custom-encryption-key', // this is the one we would want to generate
+  config('app.cipher'), // we'll use Laravel default cipher
+);
+
+// Hooray! We can now encrypt our value
+$encryptedValue = $encrypter->encryptString($value);
+```
+
+Okay... So we got encryption working, if you've been checking the files I've been sharing, you might have noticed that this code can
+be found on the [Encrypt](https://github.com/heyjorgedev/envflow/blob/main/app/Actions/EncryptEnvFile.php)
+and [Decrypt](https://github.com/heyjorgedev/envflow/blob/main/app/Actions/DecryptEnvFile.php) Actions.
+
+### Storage
+
+We've covered how we use Actions and Laravel's native `Encrypter` class to Encrypt and Decrypt our values, but we've not yet covered
+how we store them in Upstash Redis.
+
+That code lives on the [`StoreEnvFile`](https://github.com/heyjorgedev/envflow/blob/main/app/Actions/StoreEnvFile.php) Action.
+
+I want to highlight a few things from that file, the following code.
+
+```php
+// ...
+
+RedisFacade::pipeline(function (Redis $pipe) use (...) {
+    $options = ['EX' => $ttl]; // here is where we set the expiration time
+    $pipe->set("envfile:$id", $encrypted->value, $options);
+    $pipe->set("envfile:$id:shareLimit", $shareLimit, $options);
+});
+
+// ...
+```
+
+On the code above you can see a Redis pipeline being used, that will make sure that all the commands are executed in a single
+transaction. This is important because we don't want to store the encrypted value if the set commands fail.
+
+### Conclusion
+
+I hope you've enjoyed this post and that it has helped you understand how I built Envflow.
+
+I think there are a lot of applications that can use Upstash Redis as a primary database, even tho Redis here was used as a KV store
+it can do so much more than that and I'll make sure I will cover it in future artiles with another project that I'll be working on.
+
+The source code for this project is available on [GitHub](https://github.com/heyjorgedev/envflow), feel free to check it out and contribute
+if you have any ideas or suggestions (or find any bugs).
