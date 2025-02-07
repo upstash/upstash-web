@@ -50,7 +50,7 @@ The homepage route not only acts as a landing page for the project but also incl
 your environment variables. On this page you can set the amount of times the environment variables can be decrypted and for
 how long they will be valid.
 
-PUT PICTURE HERE
+![Envflow homepage](/blog/how-ive-built-envflow-using-laravel-and-upstash-redis/envflow-homepage.png)
 
 You can find the Livewire Page Component on [`app/Livewire/EncryptEnvPage.php`](https://github.com/heyjorgedev/envflow/blob/main/app/Livewire/EncryptEnvPage.php)
 and the according template on [`resources/views/livewire/encrypt-env-page.blade.php`](https://github.com/heyjorgedev/envflow/blob/main/resources/views/livewire/encrypt-env-page.blade.php).
@@ -60,7 +60,7 @@ and the according template on [`resources/views/livewire/encrypt-env-page.blade.
 The success page is a simple page that displays two ways to share the decryption link: one includes the decryption key,
 while the other separates the decryption key from the link.
 
-PUT PICTURE HERE
+![Envflow success page](/blog/how-ive-built-envflow-using-laravel-and-upstash-redis/envflow-success.png)
 
 You can find the Livewire Page Component on [`app/Livewire/SuccessPage.php`](https://github.com/heyjorgedev/envflow/blob/main/app/Livewire/SuccessPage.php)
 and the according template on [`resources/views/livewire/success-page.blade.php`](https://github.com/heyjorgedev/envflow/blob/main/resources/views/livewire/success-page.blade.php).
@@ -71,7 +71,7 @@ This page is where all the magic of decryption happens, remember we don't store 
 we only store the encrypted value which is a bunch of giberish. The main job of the Decryption page is to take the decryption key and try
 to decrypt the environment variables.
 
-PUT PICTURE HERE
+![Envflow decryption page](/blog/how-ive-built-envflow-using-laravel-and-upstash-redis/envflow-decrypt.png)
 
 You can find the Livewire Page Component on [`app/Livewire/DecryptEnvPage.php`](https://github.com/heyjorgedev/envflow/blob/main/app/Livewire/DecryptEnvPage.php)
 and the according template on [`resources/views/livewire/decrypt-env-page.blade.php`](https://github.com/heyjorgedev/envflow/blob/main/resources/views/livewire/decrypt-env-page.blade.php).
