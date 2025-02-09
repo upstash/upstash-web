@@ -5,7 +5,6 @@ import PageHeaderTitle from "@/components/page-header-title";
 import Enterprise from "@/components/pricing/enterprise";
 import ProductToggle from "@/components/pricing/product-toggle";
 import CompareTable from "@/components/pricing/redis/compare-table";
-import FAQ from "@/components/pricing/redis/faq";
 import PricingTable from "@/components/pricing/redis/pricing-table";
 import { generateFaqSchema } from "@/utils/structured-schema-generators";
 
@@ -30,7 +29,7 @@ export default function PricingRedisPage() {
           </div>
 
           <div className="mt-6 md:mt-16">
-            <Enterprise />
+            <div>PROD PACK</div>
           </div>
         </Container>
       </section>
@@ -55,12 +54,9 @@ export default function PricingRedisPage() {
 
       {/* FAQ */}
       <section className="mt-32 md:mt-40">
-        <Container className="max-w-screen-md">
-          <PageHeaderTitle as="h2" className="mb md:text-4xl">
-            FAQ
-          </PageHeaderTitle>
+        <Container>
           <div className="mt-10">
-            <FAQ />
+            <Enterprise />
           </div>
         </Container>
       </section>

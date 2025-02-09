@@ -6,7 +6,6 @@ import PageBodyGradient from "@/components/page-body-gradient";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
 import { Metadata } from "next";
-import Balancer from "react-wrap-balancer";
 
 export const metadata: Metadata = {
   title: "About",
@@ -49,8 +48,8 @@ export default function HomePage() {
                   <h3 className="mt-4 font-display text-xl font-semibold">
                     {mission.title}
                   </h3>
-                  <p className="mx-12 mt-2 opacity-60 md:mx-6">
-                    <Balancer>{mission.desc}</Balancer>
+                  <p className="mx-12 mt-2 text-balance opacity-60 md:mx-6">
+                    {mission.desc}
                   </p>
                 </div>
               );

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { HTMLProps } from "react";
-import Balancer from "react-wrap-balancer";
 import Container from "../../../src/components/container";
 import IconQStash from "../../../src/components/icon-qstash";
 import IconRedis from "../../../src/components/icon-redis";
@@ -207,8 +206,8 @@ export default async function BlogPage({ params }: Props) {
           {/* post */}
           <div className="order-1 md:col-span-2">
             <article>
-              <h1 className="font-display text-4xl font-bold !leading-title md:text-5xl">
-                <Balancer>{example.title}</Balancer>
+              <h1 className="text-balance font-display text-4xl font-bold !leading-title md:text-5xl">
+                {example.title}
               </h1>
 
               <div

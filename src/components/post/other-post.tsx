@@ -1,7 +1,6 @@
 import cx from "@/utils/cx";
 import type { Post } from "@content";
 import NextLink from "next/link";
-import Balancer from "react-wrap-balancer";
 
 type Props = {
   post?: Post;
@@ -23,8 +22,8 @@ export default function OtherPostCard({ post, align = "left" }: Props) {
       <span className="text-sm uppercase opacity-50">
         {align === "right" ? "Next post" : "Previous post"}
       </span>
-      <h4 className="mt-2 font-display text-xl font-medium md:text-2xl">
-        <Balancer>{post.title}</Balancer>
+      <h4 className="mt-2 text-balance font-display text-xl font-medium md:text-2xl">
+        {post.title}
       </h4>
     </NextLink>
   ) : (
