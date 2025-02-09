@@ -12,30 +12,17 @@ export const INVESTORS = [
     url: "https://www.mangocapitalinc.com",
   },
   {
-    name: "Earlybird",
+    name: "Bek Ventures",
     title: "",
-    src: "/investors/early-bird.jpg",
-    url: "https://earlybird.com",
+    src: "/investors/bek-ventures.png",
+    url: "https://www.bekventures.com",
   },
-  // {
-  //   name: "Robin Vasan",
-  //   title: "Founder, Mango Capital",
-  //   src: "/investors/robin.jpeg",
-  //   url: "https://www.linkedin.com/in/robinvasan/",
-  // },
-
   {
     name: "Guillermo Rauch",
     title: "CEO, Vercel",
     src: "/investors/rauchg.jpg",
     url: "https://twitter.com/rauchg",
   },
-  // {
-  //   name: "Cem Sertoglu",
-  //   title: "Partner, Earlybird",
-  //   src: "/investors/cem-sertoglu.jpg",
-  //   url: "https://www.linkedin.com/in/csertoglu",
-  // },
   {
     name: "Matias Woloski",
     title: "Founder, Auth0",
@@ -90,12 +77,6 @@ export const INVESTORS = [
     src: "/investors/jake-zeller.jpeg",
     url: "https://twitter.com/jake_zeller",
   },
-  // {
-  //   name: "Dilek Dayinlarli",
-  //   title: "Partner, ScaleX Ventures",
-  //   src: "/investors/dilekdayinlarli.jpeg",
-  //   url: "https://twitter.com/dilekdayinlarli",
-  // },
   {
     name: "Morgan Dioli",
     title: "Partner, Ravix Group",
