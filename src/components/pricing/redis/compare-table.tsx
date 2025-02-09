@@ -131,7 +131,7 @@ export default function CompareTable() {
                 value={PricingRedis.Free}
               />
 
-              <h5 className="mt-1 flex items-baseline font-semibold">-</h5>
+              <h5 className="mt-1 flex items-baseline text-text-mute">-</h5>
             </div>
           </Col>
 
@@ -193,12 +193,7 @@ export default function CompareTable() {
                 value={PricingRedis.Enterprise}
               />
 
-              <h5 className="mt-1 flex items-baseline font-semibold">
-                -
-                <span className="ml-1 text-base font-normal opacity-40">
-                  / month
-                </span>
-              </h5>
+              <h5 className="mt-1 flex items-baseline text-text-mute">-</h5>
             </div>
           </Col>
         </tr>
@@ -260,7 +255,6 @@ export default function CompareTable() {
             <CompareValue>Unlimited</CompareValue>
           </Col>
           <Col plan={showFixed}>
-            {/* TODO: doğru mu */}
             {selectedFixed250MB && (
               <CompareValue type="number">1000</CompareValue>
             )}
