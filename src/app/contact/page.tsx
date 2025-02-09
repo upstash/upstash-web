@@ -49,7 +49,7 @@ export default function HomePage() {
 
           <Link href="">
             <span>
-              <b>Write</b> <span className="opacity-60">us an Email</span>
+              <b>Send</b> <span className="opacity-60">us an Email</span>
             </span>
             <IconMail size={40} strokeWidth={1.5} />
           </Link>

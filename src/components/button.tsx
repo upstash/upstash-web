@@ -9,7 +9,7 @@ export interface ButtonProps
 }
 
 const buttonVariants = cva(
-  "inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-3 rounded-2xl font-medium transition hover:shadow-sm",
+  "inline-flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition hover:shadow-sm",
   {
     variants: {
       variant: {

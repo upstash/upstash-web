@@ -42,33 +42,18 @@ export default function PricingTable() {
 
         <div className="w-full divide-y divide-bg-mute px-6">
           <div className="py-3">
-            <p className="text-text-mute">Commands per Second</p>
-            <p className="font-semibold text-primary-text">100</p>
-          </div>
-
-          {/* <div className="py-3">
-            <p className="text-text-mute">Request Size</p>
-            <p className="font-semibold text-primary-text">1 MB</p>
-          </div>*/}
-
-          {/*<div className="py-3">
             <p className="text-text-mute">Data Size</p>
             <p className="font-semibold text-primary-text">256 MB</p>
-          </div>*/}
-
-          <div className="py-3">
-            <p className="text-text-mute">Concurrent Connections</p>
-            <p className="font-semibold text-primary-text">100</p>
           </div>
 
           <div className="py-3">
-            <p className="text-text-mute">Monthly Bandwidth</p>
-            <p className="font-semibold text-primary-text">10 GB</p>
+            <p className="text-text-mute">Monthly Commands</p>
+            <p className="font-semibold text-primary-text">500 K</p>
           </div>
         </div>
 
         <div>
-          <Button asChild variant="primary">
+          <Button asChild>
             <a target="_self" href="https://console.upstash.com">
               Start Now
             </a>
@@ -78,7 +63,7 @@ export default function PricingTable() {
 
       {/* PAYG */}
 
-      <div className="flex flex-col items-center gap-4 rounded-3xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:bg-bg-mute">
+      <div className="flex flex-col items-center gap-4 rounded-3xl border-2 border-primary bg-white p-6 shadow sm:gap-6 sm:p-8 dark:bg-bg-mute">
         <div className="grow">
           <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
             Pay as you go
@@ -96,23 +81,8 @@ export default function PricingTable() {
 
         <div className="w-full divide-y divide-bg-mute px-6">
           <div className="py-3">
-            <p className="text-text-mute">Commands per Second</p>
-            <p className="font-semibold text-primary-text">1,000</p>
-          </div>
-
-          {/*<div className="py-3">
-            <p className="text-text-mute">Request Size</p>
-            <p className="font-semibold text-primary-text">1 MB</p>
-          </div>*/}
-
-          {/*<div className="py-3">
             <p className="text-text-mute">Data Size</p>
             <p className="font-semibold text-primary-text">100 GB</p>
-          </div>*/}
-
-          <div className="py-3">
-            <p className="text-text-mute">Concurrent Connections</p>
-            <p className="font-semibold text-primary-text">1,000</p>
           </div>
 
           <div className="py-3">
@@ -173,42 +143,12 @@ export default function PricingTable() {
 
         <div className="w-full divide-y divide-bg-mute px-6">
           <div className="py-3">
-            <p className="text-text-mute">Commands per Second</p>
-            <p className="font-semibold text-primary-text">
-              {showFixed250MB && <>1,000</>}
-              {showFixed1GB && <>1,000</>}
-              {showFixed5GB && <>2,000</>}
-              {showFixed12GB && <>2,000</>}
-            </p>
-          </div>
-
-          {/*<div className="py-3">
-            <p className="text-text-mute">Request Size</p>
-            <p className="font-semibold text-primary-text">
-              {showFixed250MB && <>1</>}
-              {showFixed1GB && <>1</>}
-              {showFixed5GB && <>5</>}
-              {showFixed12GB && <>5</>} MB
-            </p>
-          </div>*/}
-
-          {/*        <div className="py-3">
             <p className="text-text-mute">Data Size</p>
             <p className="font-semibold text-primary-text">
               {showFixed250MB && <>250 MB</>}
               {showFixed1GB && <>1 GB</>}
               {showFixed5GB && <>5 GB</>}
               {showFixed12GB && <>12 GB</>}
-            </p>
-          </div>*/}
-
-          <div className="py-3">
-            <p className="text-text-mute">Concurrent Connections</p>
-            <p className="font-semibold text-primary-text">
-              {showFixed250MB && <>256</>}
-              {showFixed1GB && <>1,000</>}
-              {showFixed5GB && <>5,000</>}
-              {showFixed12GB && <>10,000</>}
             </p>
           </div>
 
@@ -224,7 +164,7 @@ export default function PricingTable() {
         </div>
 
         <div>
-          <Button asChild variant="primary">
+          <Button asChild>
             <a target="_self" href="https://console.upstash.com">
               Start Now
             </a>
