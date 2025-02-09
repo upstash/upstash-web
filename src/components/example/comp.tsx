@@ -5,7 +5,6 @@ import IconRedis from "@/components/icon-redis";
 import cx from "@/utils/cx";
 import Image from "next/image";
 import { Dispatch, HTMLProps, SetStateAction } from "react";
-import Balancer from "react-wrap-balancer";
 
 export function Example({
   className,
@@ -40,9 +39,14 @@ export function Example({
       )}
       {...props}
     >
-      <h3 className={cx("font-display text-2xl font-semibold", className)}>
+      <h3
+        className={cx(
+          "text-balance font-display text-2xl font-semibold",
+          className,
+        )}
+      >
         <a className="hover:text-emerald-400" href={`/examples/${slug}`}>
-          <Balancer>{title}</Balancer>
+          {title}
         </a>
       </h3>
 

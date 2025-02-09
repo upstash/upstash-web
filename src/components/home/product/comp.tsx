@@ -2,7 +2,6 @@ import Icon, { ICON_NAMES } from "@/components/icon";
 import cx from "@/utils/cx";
 import { Product } from "@/utils/type";
 import React, { Children, cloneElement, HTMLProps, ReactElement } from "react";
-import Balancer from "react-wrap-balancer";
 
 export function ProductBox({
   children,
@@ -39,11 +38,11 @@ export function ProductTitle({
   return (
     <h4
       className={cx(
-        "flex items-center gap-2 font-display text-xl font-semibold md:text-3xl",
+        "flex items-center gap-2 text-balance font-display text-xl font-semibold md:text-3xl",
         className,
       )}
     >
-      <Balancer>{children}</Balancer>
+      {children}
     </h4>
   );
 }

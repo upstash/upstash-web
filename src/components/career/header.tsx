@@ -2,7 +2,6 @@ import Button from "@/components/button";
 import Container from "@/components/container";
 import type { Job } from "@content";
 import { IconArrowUpRight } from "@tabler/icons-react";
-import Balancer from "react-wrap-balancer";
 
 type Props = {
   job: Job;
@@ -13,8 +12,8 @@ export default function CareerHeader({ job }: Props) {
     <header className="py-20 text-center">
       <Container className="max-w-screen-lg">
         {/* title */}
-        <h1 className="mx-4 mt-2 font-display text-4xl font-bold !leading-title md:text-6xl">
-          <Balancer>{job.title}</Balancer>
+        <h1 className="mx-4 mt-2 text-balance font-display text-4xl font-bold !leading-title md:text-6xl">
+          {job.title}
         </h1>
 
         {/* meta */}

@@ -7,7 +7,7 @@ import {
 } from "@/components/home/section-header";
 import cx from "@/utils/cx";
 
-export default function HomeHeroPartner() {
+export default function HomeHeroCustomer() {
   return (
     <section className="relative pt-32">
       <Bg />
