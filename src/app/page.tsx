@@ -26,7 +26,7 @@ export default function Home({
     >
       <main className="text-center">
         <HomeHero />
-        {/* TODO: code kısmında vscode şeklinde sekmeli olacak  */}
+        {/* TODO: Redesign */}
         <HomeProductNew />
         <HomeFast />
         <HomeServerless />

@@ -65,6 +65,7 @@ export default function SectionCustomer() {
   );
 }
 
+// TODO: Replace with real data
 const CUSTOMERS = [
   {
     id: "zapier",
