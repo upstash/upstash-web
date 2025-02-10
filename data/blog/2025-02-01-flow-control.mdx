@@ -19,7 +19,7 @@ This blog is divided into four sections for easier reading:
 
 Our community drives our development. We’ve heard your feedback on two key points:  
 
-- **Workflow**: Our [Workflow](https://upstash.com/docs/workflow/agents/overview) product is gaining traction. However, it launched without built-in rate or parallelism limits. The existing parallelism control via Queues was not suitable for Workflow.  
+- **Workflow**: Our [Workflow](https://upstash.com/docs/workflow/getstarted) product is gaining traction. However, it launched without built-in rate or parallelism limits. The existing parallelism control via Queues was not suitable for Workflow.  
 - **Queue Limitations**: Many users relied on Queue Parallelism to prevent bursts on their endpoints. However, queues had per-plan limits due to memory/CPU allocation constraints. The new design removes these restrictions, allowing you to configure limits based on your application’s needs without worrying about plan limits.  
 
 To solve these issues, we developed Flow-Control, which works for both Workflow and QStash.  
@@ -46,7 +46,7 @@ await client.publishJSON({
 });
 ```
 
-For more details and other SDKs, see the documentation [here](https://upstash.com/docs/QStash/features/rate).  
+For more details and other SDKs, see the documentation [here](https://upstash.com/docs/qstash/features/flow-control).  
 
 ### Workflow  
 
