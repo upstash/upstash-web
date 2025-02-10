@@ -78,15 +78,15 @@ export default function HomePage() {
               />
             </LogoBox>
             {/*light-color1*/}
-            <LogoBox className="bg-emerald-300 py-6 md:col-span-6">
+            {/*<LogoBox className="bg-emerald-300 py-6 md:col-span-6">
               <span className="font-semibold text-black">#6ee7b7</span>
               <ActionButtons copyCode="#6ee7b7" />
-            </LogoBox>
+            </LogoBox>*/}
             {/*light-color2*/}
-            <LogoBox className="bg-emerald-500 py-6 md:col-span-6">
+            {/*<LogoBox className="bg-emerald-500 py-6 md:col-span-6">
               <span className="font-semibold text-black">#10b981</span>
               <ActionButtons copyCode="#10b981" />
-            </LogoBox>
+            </LogoBox>*/}
 
             {/*redis*/}
             <LogoBox className="md:col-span-6">
@@ -206,7 +206,7 @@ function LogoBox({
     <div
       className={cx(
         "group relative flex flex-col items-center justify-center gap-6 py-14",
-        "rounded-2xl border border-zinc-800 bg-zinc-950",
+        "rounded-2xl border border-bg-mute bg-zinc-950",
         className,
       )}
       {...props}
