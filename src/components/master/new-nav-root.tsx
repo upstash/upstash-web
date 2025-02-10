@@ -6,6 +6,7 @@ import {
   NavigationMenuTriggerProps,
 } from "@radix-ui/react-navigation-menu";
 import { IconChevronDown } from "@tabler/icons-react";
+import Link from "next/link";
 import React, { PropsWithChildren } from "react";
 
 export default function NewNavigationRoot({ children }: PropsWithChildren) {
@@ -106,15 +107,18 @@ export function NewNavigationContent({
 interface ListItemProps extends NavigationMenuLinkProps {
   icon?: React.ReactNode;
   title1?: React.ReactNode;
+  href: string;
 }
 
 const ListItem = React.forwardRef(
   (props: ListItemProps, forwardedRef: React.ForwardedRef<any>) => {
-    const { children, className, title1, icon, ...otherProps } = props;
+    const { children, href, className, title1, icon, ...otherProps } = props;
 
     return (
       <NavigationMenu.Link asChild {...otherProps}>
-        <a
+        <Link
+          ref={forwardedRef}
+          href={href}
           className={cx(
             "flex select-none items-center gap-5 rounded-xl p-5",
             "bg-black/5",
@@ -122,16 +126,15 @@ const ListItem = React.forwardRef(
             "hover:bg-emerald-50 hover:text-emerald-900",
             className,
           )}
-          ref={forwardedRef}
         >
-          <div className="flex h-full w-10 shrink-0 items-center justify-center rounded-full bg-black/5">
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-black/5">
             {icon}
           </div>
           <div>
             <h4 className="inline-flex items-center font-semibold">{title1}</h4>
             <p className="opacity-80">{children}</p>
           </div>
-        </a>
+        </Link>
       </NavigationMenu.Link>
     );
   },
