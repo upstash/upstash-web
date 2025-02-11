@@ -1,0 +1,85 @@
+---
+slug: using-upstash-redis-for-laravel-sessions
+title: "Using Upstash Redis for Laravel Sessions"
+authors:
+  - jorge
+tags: [laravel, php, redis]
+---
+
+HTTP is a stateless protocol, meaning that every request made to a server is independent and doesn't
+retain any knowledge of previous requests. This can be a challenge when building dynamic web applications
+that require storing user-specific data, such as authentication credentials or user preferences, across multiple
+requests. To overcome this limitation, web applications rely on sessions to store and retrieve data between requests.
+
+Laravel, one of the most popular PHP frameworks, offers a flexible and robust session management system to handle such stateful needs.
+
+While Laravel's default session driver
+[uses a sqlite database](https://github.com/laravel/laravel/blob/eb8085cf77bc5165d1af0b90bd9cdfb406d65299/.env.example#L31),
+it supports multiple other session drivers - one of the most powerful and scalable being Redis.
+
+In this article, we'll explore how you can configure Redis as the session driver in Laravel to boost performance and
+scalability, while overcoming the statelessness of HTTP.
+
+
+### Creating a database
+
+Upstash Redis is a fully managed, serverless Redis-compatible service that lets you set up a database in seconds.
+With a generous free tier, you can explore its features without any commitments.
+
+You can sign up for a free account on [Upstash](https://console.upstash.com/redis) and create a Redis-compatible database.
+
+![Upstash Console - Create database](/blog/using-upstash-redis-for-laravel-sessions/create-database.png)
+
+### Configuring Laravel
+
+After creating your Redis database, you'll need to configure Laravel to use it as the session driver.
+
+You can grab the `.env` file configuration from the **Connect to your database** section on your Upstash Console.
+
+![Upstash Console - Connect to your database](/blog/using-upstash-redis-for-laravel-sessions/connect-to-your-database.png)
+
+It will look something like this:
+
+```dotenv
+REDIS_HOST="tls://nearby-lioness-11228.upstash.io"
+REDIS_PORT=6379
+REDIS_PASSWORD="********"
+
+# To use Upstash Redis as a cache store, uncomment the following two lines:
+#CACHE_STORE="redis"
+#REDIS_CACHE_DB="0"
+
+# To use Upstash Redis as the session driver, uncomment the following line:
+#SESSION_DRIVER="redis"
+
+# To use Upstash Redis as the queue connection, uncomment the following line:
+#QUEUE_CONNECTION="redis"
+```
+
+Our configuration is almost ready, we just need to uncomment the `SESSION_DRIVER` variable to our `.env` file and everything should work.
+
+```dotenv
+REDIS_HOST="tls://nearby-lioness-11228.upstash.io"
+REDIS_PORT=6379
+REDIS_PASSWORD="********"
+
+# To use Upstash Redis as a cache store, uncomment the following two lines:
+#CACHE_STORE="redis"
+#REDIS_CACHE_DB="0"
+
+# To use Upstash Redis as the session driver, uncomment the following line:
+SESSION_DRIVER="redis"
+
+# To use Upstash Redis as the queue connection, uncomment the following line:
+#QUEUE_CONNECTION="redis"
+```
+
+Hooray, we're done! Now, when you run your application, Laravel will use Upstash Redis as the session driver.
+
+### Conclusion
+
+This article was a quick one but that speaks to how easy it is to integrate both [Laravel](https://laravel.com/)
+and [Upstash Redis](https://upstash.com/redis) as your session driver. We hope you found this article helpful and
+that it inspires you to explore more about Redis and Laravel.
+
+If you have any questions or feedback, please don't hesitate to reach out to us on [X](https://x.com/upstash).
