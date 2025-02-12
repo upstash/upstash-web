@@ -1,4 +1,5 @@
 import EnterpriseCobe from "@/app/enterprise/cobe";
+import SectionContact from "@/app/enterprise/section-contact";
 import SectionCustomer from "@/app/enterprise/section-customer";
 import SectionFeature from "@/app/enterprise/section-feature";
 import SectionHero from "@/app/enterprise/section-hero";
@@ -18,6 +19,7 @@ export default function HomePage() {
       <SectionFeature />
       <SectionWhy />
       <SectionCustomer />
+      <SectionContact />
     </main>
   );
 }
