@@ -9,7 +9,7 @@ const Tooltip = ({
   content: React.ReactNode;
 }) => {
   return (
-    <Tooltip1.Provider>
+    <Tooltip1.Provider delayDuration={250}>
       <Tooltip1.Root>
         <Tooltip1.Trigger>{children}</Tooltip1.Trigger>
 
