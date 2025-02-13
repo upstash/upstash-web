@@ -26,7 +26,7 @@ export default function HomeHero() {
 
         {/* hero subtitle*/}
         <h2 className={cx("mt-2 text-lg md:text-2xl", "text-text-mute")}>
-          The single platform to all your data needs
+          The single platform for all your data needs
         </h2>
 
         <div className="mt-6">
