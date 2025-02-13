@@ -1830,7 +1830,19 @@ export default function CompareTable() {
             hidden={isMobile ? !showPayg : false}
             className="bg-emerald-300/10 px-4 py-0"
           >
-            <CompareValue>$0.2 per 100K</CompareValue>
+            <CompareValue
+              after={
+                <Tooltip content="The write commands are replicated to all read regions in addition to primary region so the replications are counted as commands. For example, if you have one primary and one read region, 100K writes will cost $0.4 ($0.2 x 2).">
+                  <IconInfoCircle
+                    className="ml-1 opacity-60"
+                    stroke={1.2}
+                    aria-label="Info"
+                  />
+                </Tooltip>
+              }
+            >
+              $0.2 per 100K
+            </CompareValue>
           </td>
           <td
             hidden={isMobile ? !showPro2 : false}
