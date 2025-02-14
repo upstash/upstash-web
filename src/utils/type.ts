@@ -16,7 +16,10 @@ export enum PricingRedis {
   Fixed250MB = "fixed250mb",
   Fixed1GB = "fixed1gb",
   Fixed5GB = "fixed5gb",
-  Fixed12GB = "fixed12gb",
+  Fixed10GB = "fixed10gb",
+  Fixed50GB = "fixed50gb",
+  Fixed100GB = "fixed100gb",
+  Fixed500GB = "fixed500gb",
   Enterprise = "enterprise",
 }
 

@@ -11,7 +11,10 @@ export default function PricingTable() {
   const showFixed250MB = selectedPlans === PricingRedis.Fixed250MB;
   const showFixed1GB = selectedPlans === PricingRedis.Fixed1GB;
   const showFixed5GB = selectedPlans === PricingRedis.Fixed5GB;
-  const showFixed12GB = selectedPlans === PricingRedis.Fixed12GB;
+  const showFixed10GB = selectedPlans === PricingRedis.Fixed10GB;
+  const showFixed50GB = selectedPlans === PricingRedis.Fixed50GB;
+  const showFixed100GB = selectedPlans === PricingRedis.Fixed100GB;
+  const showFixed500GB = selectedPlans === PricingRedis.Fixed500GB;
 
   const onPlanChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value as PricingRedis;
@@ -113,15 +116,21 @@ export default function PricingTable() {
               <option value={PricingRedis.Fixed250MB}>Fixed 250MB</option>
               <option value={PricingRedis.Fixed1GB}>Fixed 1GB</option>
               <option value={PricingRedis.Fixed5GB}>Fixed 5GB</option>
-              <option value={PricingRedis.Fixed12GB}>Fixed 12GB</option>
+              <option value={PricingRedis.Fixed10GB}>Fixed 10GB</option>
+              <option value={PricingRedis.Fixed50GB}>Fixed 50GB</option>
+              <option value={PricingRedis.Fixed100GB}>Fixed 100GB</option>
+              <option value={PricingRedis.Fixed500GB}>Fixed 500GB</option>
             </select>
           </h4>
 
           <h5 className="flex items-baseline justify-center text-2xl font-semibold">
-            {showFixed250MB && <>$7</>}
+            {showFixed250MB && <>$10</>}
             {showFixed1GB && <>$20</>}
-            {showFixed5GB && <>$77</>}
-            {showFixed12GB && <>$180</>}
+            {showFixed5GB && <>$100</>}
+            {showFixed10GB && <>$200</>}
+            {showFixed50GB && <>$400</>}
+            {showFixed100GB && <>$800</>}
+            {showFixed500GB && <>$1500</>}
             <span className="ml-1 text-base font-normal text-text-mute">
               / month
             </span>
@@ -130,8 +139,11 @@ export default function PricingTable() {
           <p className="text-sm text-text-mute">
             {showFixed250MB && <>$5</>}
             {showFixed1GB && <>$10</>}
-            {showFixed5GB && <>$35</>}
-            {showFixed12GB && <>$90</>} ✕ read region
+            {showFixed5GB && <>$50</>}
+            {showFixed10GB && <>$100</>}
+            {showFixed50GB && <>$200</>}
+            {showFixed100GB && <>$400</>}
+            {showFixed500GB && <>$750</>}✕ read region
           </p>
         </div>
 
@@ -148,17 +160,23 @@ export default function PricingTable() {
               {showFixed250MB && <>250 MB</>}
               {showFixed1GB && <>1 GB</>}
               {showFixed5GB && <>5 GB</>}
-              {showFixed12GB && <>12 GB</>}
+              {showFixed10GB && <>10 GB</>}
+              {showFixed50GB && <>50 GB</>}
+              {showFixed100GB && <>100 GB</>}
+              {showFixed500GB && <>500 GB</>}
             </p>
           </div>
 
           <div className="py-3">
             <p className="text-text-mute">Monthly Bandwidth</p>
             <p className="font-semibold text-primary-text">
-              {showFixed250MB && <>100</>}
-              {showFixed1GB && <>200</>}
-              {showFixed5GB && <>800</>}
-              {showFixed12GB && <>2,000</>} GB
+              {showFixed250MB && <>50GB</>}
+              {showFixed1GB && <>100GB</>}
+              {showFixed5GB && <>500GB</>}
+              {showFixed10GB && <>1TB</>}
+              {showFixed50GB && <>5TB</>}
+              {showFixed100GB && <>10TB</>}
+              {showFixed500GB && <>50TB</>}
             </p>
           </div>
         </div>
