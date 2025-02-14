@@ -1,4 +1,5 @@
-import RedisFaqJson from "@/../public/faq/redis.json";
+"use client";
+
 import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
@@ -6,26 +7,43 @@ import Enterprise from "@/components/pricing/enterprise";
 import ProductToggle from "@/components/pricing/product-toggle";
 import CompareTable from "@/components/pricing/redis/compare-table";
 import PricingTable from "@/components/pricing/redis/pricing-table";
-import { generateFaqSchema } from "@/utils/structured-schema-generators";
+import { PricingRedis } from "@/utils/type";
+import { ChangeEvent, useState } from "react";
 
 export default function PricingRedisPage() {
-  const structuredFaqSchema = generateFaqSchema(RedisFaqJson);
+  const [selectedPlan, setSelectedPlan] = useState(PricingRedis.Free);
+  const [selectedFixed, setSelectedFixed] = useState(PricingRedis.Fixed250MB);
+
+  const onChangePlan = (event: ChangeEvent<HTMLSelectElement>) => {
+    const value = event.target.value as PricingRedis;
+    setSelectedPlan(value);
+
+    if (
+      [
+        PricingRedis.Fixed250MB,
+        PricingRedis.Fixed1GB,
+        PricingRedis.Fixed5GB,
+        PricingRedis.Fixed10GB,
+        PricingRedis.Fixed50GB,
+        PricingRedis.Fixed100GB,
+        PricingRedis.Fixed500GB,
+      ].includes(value)
+    ) {
+      setSelectedFixed(value);
+    }
+  };
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: structuredFaqSchema,
-        }}
-      />
-
       <section>
         <Container>
           <ProductToggle product={"/redis"} />
 
           <div className="mt-12 md:mt-20">
-            <PricingTable />
+            <PricingTable
+              selectedFixed={selectedFixed}
+              onChangePlan={onChangePlan}
+            />
           </div>
 
           <div className="mt-6 md:mt-16">
@@ -47,7 +65,11 @@ export default function PricingRedisPage() {
           </header>
 
           <div className="mt-12 md:mt-16">
-            <CompareTable />
+            <CompareTable
+              selectedPlan={selectedPlan}
+              selectedFixed={selectedFixed}
+              onChangePlan={onChangePlan}
+            />
           </div>
         </Container>
       </section>

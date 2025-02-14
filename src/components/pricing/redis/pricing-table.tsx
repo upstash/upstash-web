@@ -3,23 +3,22 @@
 import Button from "@/components/button";
 import { PricingRedis } from "@/utils/type";
 import * as React from "react";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent } from "react";
 
-export default function PricingTable() {
-  const [selectedPlans, setSelectedPlans] = useState(PricingRedis.Fixed250MB);
-
-  const showFixed250MB = selectedPlans === PricingRedis.Fixed250MB;
-  const showFixed1GB = selectedPlans === PricingRedis.Fixed1GB;
-  const showFixed5GB = selectedPlans === PricingRedis.Fixed5GB;
-  const showFixed10GB = selectedPlans === PricingRedis.Fixed10GB;
-  const showFixed50GB = selectedPlans === PricingRedis.Fixed50GB;
-  const showFixed100GB = selectedPlans === PricingRedis.Fixed100GB;
-  const showFixed500GB = selectedPlans === PricingRedis.Fixed500GB;
-
-  const onPlanChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    const value = event.target.value as PricingRedis;
-    setSelectedPlans(value);
-  };
+export default function PricingTable({
+  selectedFixed,
+  onChangePlan,
+}: {
+  selectedFixed: PricingRedis;
+  onChangePlan: (event: ChangeEvent<HTMLSelectElement>) => void;
+}) {
+  const showFixed250MB = selectedFixed === PricingRedis.Fixed250MB;
+  const showFixed1GB = selectedFixed === PricingRedis.Fixed1GB;
+  const showFixed5GB = selectedFixed === PricingRedis.Fixed5GB;
+  const showFixed10GB = selectedFixed === PricingRedis.Fixed10GB;
+  const showFixed50GB = selectedFixed === PricingRedis.Fixed50GB;
+  const showFixed100GB = selectedFixed === PricingRedis.Fixed100GB;
+  const showFixed500GB = selectedFixed === PricingRedis.Fixed500GB;
 
   return (
     <div className="grid gap-6 md:grid-cols-3">
@@ -110,8 +109,8 @@ export default function PricingTable() {
           <h4 className="mb-4 text-xl font-semibold text-primary-text">
             <select
               className="w-auto rounded-xl bg-bg-mute px-4 py-1 font-bold"
-              value={selectedPlans}
-              onChange={onPlanChange}
+              value={selectedFixed}
+              onChange={onChangePlan}
             >
               <option value={PricingRedis.Fixed250MB}>Fixed 250MB</option>
               <option value={PricingRedis.Fixed1GB}>Fixed 1GB</option>

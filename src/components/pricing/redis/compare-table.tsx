@@ -7,23 +7,27 @@ import cx from "@/utils/cx";
 import { PricingRedis } from "@/utils/type";
 import { IconCoin, IconInfoCircle } from "@tabler/icons-react";
 import * as React from "react";
-import { ChangeEvent, useState } from "react";
 import CompareValue from "../compare-value";
 
-export default function CompareTable() {
-  const [selectedPlans, setSelectedPlans] = useState(PricingRedis.Free);
-  const [selectedFixed, setSelectedFixed] = useState(PricingRedis.Fixed250MB);
-
-  const showFree = selectedPlans === PricingRedis.Free;
-  const showPayg = selectedPlans === PricingRedis.PayAsYouGo;
-  const showFixed250MB = selectedPlans === PricingRedis.Fixed250MB;
-  const showFixed1GB = selectedPlans === PricingRedis.Fixed1GB;
-  const showFixed5GB = selectedPlans === PricingRedis.Fixed5GB;
-  const showFixed10GB = selectedPlans === PricingRedis.Fixed10GB;
-  const showFixed50GB = selectedPlans === PricingRedis.Fixed50GB;
-  const showFixed100GB = selectedPlans === PricingRedis.Fixed100GB;
-  const showFixed500GB = selectedPlans === PricingRedis.Fixed500GB;
-  const showEnterprise = selectedPlans === PricingRedis.Enterprise;
+export default function CompareTable({
+  selectedPlan,
+  selectedFixed,
+  onChangePlan,
+}: {
+  selectedPlan: PricingRedis;
+  selectedFixed: PricingRedis;
+  onChangePlan: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+}) {
+  const showFree = selectedPlan === PricingRedis.Free;
+  const showPayg = selectedPlan === PricingRedis.PayAsYouGo;
+  const showFixed250MB = selectedPlan === PricingRedis.Fixed250MB;
+  const showFixed1GB = selectedPlan === PricingRedis.Fixed1GB;
+  const showFixed5GB = selectedPlan === PricingRedis.Fixed5GB;
+  const showFixed10GB = selectedPlan === PricingRedis.Fixed10GB;
+  const showFixed50GB = selectedPlan === PricingRedis.Fixed50GB;
+  const showFixed100GB = selectedPlan === PricingRedis.Fixed100GB;
+  const showFixed500GB = selectedPlan === PricingRedis.Fixed500GB;
+  const showEnterprise = selectedPlan === PricingRedis.Enterprise;
 
   const showFixed =
     showFixed250MB ||
@@ -41,25 +45,6 @@ export default function CompareTable() {
   const selectedFixed50GB = selectedFixed === PricingRedis.Fixed50GB;
   const selectedFixed100GB = selectedFixed === PricingRedis.Fixed100GB;
   const selectedFixed500GB = selectedFixed === PricingRedis.Fixed500GB;
-
-  const onPlanChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    const value = event.target.value as PricingRedis;
-    setSelectedPlans(value);
-
-    if (
-      [
-        PricingRedis.Fixed250MB,
-        PricingRedis.Fixed1GB,
-        PricingRedis.Fixed5GB,
-        PricingRedis.Fixed10GB,
-        PricingRedis.Fixed50GB,
-        PricingRedis.Fixed100GB,
-        PricingRedis.Fixed500GB,
-      ].includes(value)
-    ) {
-      setSelectedFixed(value);
-    }
-  };
 
   function Col({
     plan,
@@ -142,7 +127,7 @@ export default function CompareTable() {
               </h4>
 
               <MobileSelectCol
-                onChange={onPlanChange}
+                onChange={onChangePlan}
                 value={PricingRedis.Free}
               />
 
@@ -157,7 +142,7 @@ export default function CompareTable() {
               </h4>
 
               <MobileSelectCol
-                onChange={onPlanChange}
+                onChange={onChangePlan}
                 value={PricingRedis.PayAsYouGo}
               />
 
@@ -173,7 +158,7 @@ export default function CompareTable() {
           <Col plan={showFixed} className="border-b border-b-bg bg-bg p-0">
             <div className="flex h-24 flex-col items-center justify-center bg-bg-mute">
               <MobileSelectCol
-                onChange={onPlanChange}
+                onChange={onChangePlan}
                 value={selectedFixed}
                 className="mb-0 hidden py-1 text-lg font-semibold text-primary-text shadow-sm md:block"
               >
@@ -186,7 +171,7 @@ export default function CompareTable() {
                 <option value={PricingRedis.Fixed500GB}>Fixed 500GB</option>
               </MobileSelectCol>
 
-              <MobileSelectCol onChange={onPlanChange} value={selectedFixed} />
+              <MobileSelectCol onChange={onChangePlan} value={selectedFixed} />
 
               <h5 className="mt-1 flex items-baseline font-semibold">
                 {selectedFixed250MB && <>$10</>}
@@ -210,7 +195,7 @@ export default function CompareTable() {
               </h4>
 
               <MobileSelectCol
-                onChange={onPlanChange}
+                onChange={onChangePlan}
                 value={PricingRedis.Enterprise}
               />
 
