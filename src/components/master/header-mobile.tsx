@@ -3,6 +3,7 @@
 import Container from "@/components/container";
 import Icon, { ICON_NAMES } from "@/components/icon";
 import { Logo } from "@/components/logo";
+import { PolicyBanner } from "@/components/policy-banner";
 import cx from "@/utils/cx";
 import { useMotionValueEvent, useScroll } from "framer-motion";
 import Link from "next/link";
@@ -30,15 +31,16 @@ export default function Header({ className, ...props }: IAppHeader) {
   return (
     <header
       className={cx(
-        "fixed inset-x-0 top-0 z-50 py-4 md:hidden",
+        "fixed inset-x-0 top-0 z-50 md:hidden",
         "border-b border-b-white/5",
         fix && "bg-bg shadow",
         className,
       )}
       {...props}
     >
+      <PolicyBanner />
       <Container>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between py-4">
           <div className="flex">
             <Link href="/">
               <Logo height={30} />
