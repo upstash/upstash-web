@@ -44,7 +44,7 @@ export default function SectionFeature() {
                   <TooltipTrigger>
                     <div
                       className={cx(
-                        "group flex items-center justify-center gap-2 px-6 py-4",
+                        "group flex items-center justify-center gap-2 px-4 py-3 md:px-6 md:py-4",
                         "rounded-3xl border-2 border-bg-mute bg-bg-mute",
                         "transition hover:border-white hover:bg-white hover:shadow-xl",
                         "dark:hover:border-bg-mute dark:hover:bg-bg-mute",
@@ -53,8 +53,8 @@ export default function SectionFeature() {
                       {icon && (
                         <span
                           className={cx(
-                            "inline-flex size-8 shrink-0 items-center justify-center transition md:size-10",
-                            "rounded-full bg-primary dark:bg-bg-mute dark:group-hover:bg-primary",
+                            "inline-flex size-7 shrink-0 items-center justify-center transition md:size-10",
+                            "rounded-full bg-primary text-white dark:bg-bg-mute dark:group-hover:bg-primary",
                           )}
                         >
                           {icon}
@@ -83,7 +83,7 @@ export default function SectionFeature() {
 
 export const FEATURES = [
   {
-    icon: <IconInfinity size={24} stroke={1.5} />,
+    icon: <IconInfinity className="size-4 md:size-6" stroke={1.5} />,
     title: <>Unlimited Number of Databases</>,
     desc: (
       <>
@@ -94,7 +94,7 @@ export const FEATURES = [
   },
 
   {
-    icon: <IconShield size={24} stroke={1.5} />,
+    icon: <IconShield className="size-4 md:size-6" stroke={1.5} />,
     title: <>HIPAA Compliance</>,
     desc: (
       <>
@@ -105,7 +105,7 @@ export const FEATURES = [
   },
 
   {
-    icon: <IconProgressHelp size={24} stroke={1.5} />,
+    icon: <IconProgressHelp className="size-4 md:size-6" stroke={1.5} />,
     title: <>Professional Support with Response Time SLA</>,
     desc: (
       <>
@@ -116,7 +116,7 @@ export const FEATURES = [
   },
 
   {
-    icon: <IconUserSearch size={24} stroke={1.5} />,
+    icon: <IconUserSearch className="size-4 md:size-6" stroke={1.5} />,
     title: <>Dedicated Account Manager</>,
     desc: (
       <>
@@ -127,7 +127,7 @@ export const FEATURES = [
   },
 
   {
-    icon: <IconPasswordUser size={24} stroke={1.5} />,
+    icon: <IconPasswordUser className="size-4 md:size-6" stroke={1.5} />,
     title: <>Single Sign-On (SSO)</>,
     desc: (
       <>
@@ -138,7 +138,7 @@ export const FEATURES = [
   },
 
   {
-    icon: <IconListSearch size={24} stroke={1.5} />,
+    icon: <IconListSearch className="size-4 md:size-6" stroke={1.5} />,
     title: <>Access Logs</>,
     desc: (
       <>
@@ -149,7 +149,7 @@ export const FEATURES = [
   },
 
   {
-    icon: <IconPointer size={24} stroke={1.5} />,
+    icon: <IconPointer className="size-4 md:size-6" stroke={1.5} />,
     title: <>Dedicated Infrastructure</>,
     desc: (
       <>
@@ -160,7 +160,7 @@ export const FEATURES = [
   },
 
   {
-    icon: <IconTimeline size={24} stroke={1.5} />,
+    icon: <IconTimeline className="size-4 md:size-6" stroke={1.5} />,
     title: <>Custom SLAs</>,
     desc: (
       <>
@@ -171,7 +171,7 @@ export const FEATURES = [
   },
 
   {
-    icon: <IconChartLine size={24} stroke={1.5} />,
+    icon: <IconChartLine className="size-4 md:size-6" stroke={1.5} />,
     title: <>Advanced Analytics</>,
     desc: (
       <>
@@ -182,7 +182,7 @@ export const FEATURES = [
   },
 
   {
-    icon: <IconLifebuoy size={24} stroke={1.5} />,
+    icon: <IconLifebuoy className="size-4 md:size-6" stroke={1.5} />,
     title: <>Priority Support</>,
     desc: (
       <>
@@ -193,7 +193,7 @@ export const FEATURES = [
   },
 
   {
-    icon: <IconShieldCheckered size={24} stroke={1.5} />,
+    icon: <IconShieldCheckered className="size-4 md:size-6" stroke={1.5} />,
     title: <>Compliance and Governance</>,
     desc: (
       <>
