@@ -250,22 +250,22 @@ export default function CompareTable() {
                       <table className="mini-table mt-2">
                         <thead>
                           <tr>
-                            <th>Extra Limit</th>
+                            <th>Limit</th>
                             <th>Price</th>
                           </tr>
                         </thead>
                         <tbody>
                           <tr>
-                            <td>10MB</td>
-                            <td>$50</td>
+                            <td>2000</td>
+                            <td>$150</td>
                           </tr>
                           <tr>
-                            <td>50MB</td>
-                            <td>$80</td>
+                            <td>5000</td>
+                            <td>$200</td>
                           </tr>
                           <tr>
-                            <td>100MB</td>
-                            <td>$120</td>
+                            <td>10000</td>
+                            <td>$300</td>
                           </tr>
                         </tbody>
                       </table>
@@ -681,7 +681,7 @@ export default function CompareTable() {
                 suffix="GB"
                 className="border-b-0"
                 after={
-                  <Tooltip content="Upon hitting this limit, it will either be upgraded or limited depending on auto-upgrade setting.">
+                  <Tooltip content="Upon hitting this limit, the DB will either be upgraded or limited depending on auto-upgrade setting.">
                     <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                   </Tooltip>
                 }
@@ -695,7 +695,7 @@ export default function CompareTable() {
                 suffix="GB"
                 className="border-b-0"
                 after={
-                  <Tooltip content="Upon hitting this limit, it will either be upgraded or limited depending on auto-upgrade setting.">
+                  <Tooltip content="Upon hitting this limit, the DB will either be upgraded or limited depending on auto-upgrade setting.">
                     <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                   </Tooltip>
                 }
@@ -709,7 +709,7 @@ export default function CompareTable() {
                 suffix="GB"
                 className="border-b-0"
                 after={
-                  <Tooltip content="Upon hitting this limit, it will either be upgraded or limited depending on auto-upgrade setting.">
+                  <Tooltip content="Upon hitting this limit, the DB will either be upgraded or limited depending on auto-upgrade setting.">
                     <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                   </Tooltip>
                 }
@@ -723,7 +723,7 @@ export default function CompareTable() {
                 suffix="TB"
                 className="border-b-0"
                 after={
-                  <Tooltip content="Upon hitting this limit, it will either be upgraded or limited depending on auto-upgrade setting.">
+                  <Tooltip content="Upon hitting this limit, the DB will either be upgraded or limited depending on auto-upgrade setting.">
                     <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                   </Tooltip>
                 }
@@ -737,7 +737,7 @@ export default function CompareTable() {
                 suffix="TB"
                 className="border-b-0"
                 after={
-                  <Tooltip content="Upon hitting this limit, it will either be upgraded or limited depending on auto-upgrade setting.">
+                  <Tooltip content="Upon hitting this limit, the DB will either be upgraded or limited depending on auto-upgrade setting.">
                     <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                   </Tooltip>
                 }
@@ -751,7 +751,7 @@ export default function CompareTable() {
                 suffix="TB"
                 className="border-b-0"
                 after={
-                  <Tooltip content="Upon hitting this limit, it will either be upgraded or limited depending on auto-upgrade setting.">
+                  <Tooltip content="Upon hitting this limit, the DB will either be upgraded or limited depending on auto-upgrade setting.">
                     <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                   </Tooltip>
                 }
@@ -765,7 +765,7 @@ export default function CompareTable() {
                 suffix="TB"
                 className="border-b-0"
                 after={
-                  <Tooltip content="Upon hitting this limit, it will either be upgraded or limited depending on auto-upgrade setting.">
+                  <Tooltip content="Upon hitting this limit, the DB will either be upgraded or limited depending on auto-upgrade setting.">
                     <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                   </Tooltip>
                 }
@@ -1146,26 +1146,10 @@ export default function CompareTable() {
           </Col>
 
           <Col plan={showPayg} feature>
-            <CompareValue
-              type="boolean"
-              valid={false}
-              after={
-                <Tooltip content="Available with Prod Pack.">
-                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
-                </Tooltip>
-              }
-            />
+            <CompareValue type="boolean" valid={false} />
           </Col>
           <Col plan={showFixed}>
-            <CompareValue
-              type="boolean"
-              valid={false}
-              after={
-                <Tooltip content="Available with Prod Pack.">
-                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
-                </Tooltip>
-              }
-            />
+            <CompareValue type="boolean" valid={false} />
           </Col>
 
           <Col plan={showEnterprise}>

@@ -176,7 +176,7 @@ export default function PricingTable() {
               {showFixed10GB && <>1TB</>}
               {showFixed50GB && <>5TB</>}
               {showFixed100GB && <>10TB</>}
-              {showFixed500GB && <>50TB</>}
+              {showFixed500GB && <>20TB</>}
             </p>
           </div>
         </div>
