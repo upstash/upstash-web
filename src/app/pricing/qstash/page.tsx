@@ -22,14 +22,14 @@ export default function PricingQStashPage() {
       />
 
       <section>
-        <Container>
+        <Container className="max-w-screen-lg">
           <ProductToggle product={"/qstash"} />
 
-          <div className="mt-16 md:mt-20">
+          <div className="mt-12 md:mt-20">
             <PricingTable />
           </div>
 
-          <div className="mt-10 md:mt-20">
+          <div className="mt-6 md:mt-16">
             <Enterprise />
           </div>
         </Container>

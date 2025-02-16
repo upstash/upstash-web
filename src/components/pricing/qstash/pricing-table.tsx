@@ -1,5 +1,4 @@
 import Button from "@/components/button";
-import { Hr } from "@/components/pricing/pricing-parts";
 import * as React from "react";
 
 export default function PricingTable() {
@@ -9,30 +8,31 @@ export default function PricingTable() {
 
       {/* FREE */}
 
-      <div className="flex flex-col items-center gap-6 rounded-3xl bg-white px-4 py-8 shadow dark:bg-bg-mute">
-        <div className="">
-          <h4 className="mb-2 text-xl font-semibold text-primary-text">Free</h4>
+      <div className="flex flex-col items-center gap-4 rounded-4xl border-2 border-primary bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
+        <div className="grow">
+          <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
+            Free
+          </h4>
 
           <h5 className="text-2xl font-semibold">$0</h5>
           <p className="text-text-mute">-</p>
         </div>
 
         <div className="grow">
-          <div className="text-text-mute">
+          <div className="text-balance rounded-lg bg-bg-mute px-3 py-2 text-sm text-primary-text dark:text-text-mute">
             Perfect for prototypes and hobby projects.
           </div>
         </div>
 
-        <Hr />
-
-        <div>
-          <p className="text-text-mute">Max Messages per Day</p>
-          <p className="font-semibold">500</p>
-        </div>
-
-        <div>
-          <p className="text-text-mute">Max Requests per Second</p>
-          <p className="font-semibold">100</p>
+        <div className="w-full px-6 *:border-b *:border-bg-mute">
+          <div className="py-3">
+            <p className="text-text-mute">Messages per Day</p>
+            <p className="font-semibold">500</p>
+          </div>
+          <div className="py-3">
+            <p className="text-text-mute">Requests per Second</p>
+            <p className="font-semibold">100</p>
+          </div>
         </div>
 
         <div>
@@ -46,9 +46,9 @@ export default function PricingTable() {
 
       {/* PAYG */}
 
-      <div className="flex flex-col items-center gap-6 rounded-3xl bg-white px-4 py-8 shadow dark:bg-bg-mute">
+      <div className="flex flex-col items-center gap-4 rounded-4xl border-2 border-primary bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
         <div className="grow">
-          <h4 className="mb-2 text-xl font-semibold text-primary-text">
+          <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
             Pay as you go
           </h4>
 
@@ -57,24 +57,21 @@ export default function PricingTable() {
         </div>
 
         <div className="grow">
-          <div className="text-text-mute">
+          <div className="text-balance rounded-lg bg-bg-mute px-3 py-2 text-sm text-primary-text dark:text-text-mute">
             For use cases with bursting traffic.
           </div>
         </div>
 
-        <Hr />
-
-        <div>
-          <p className="text-text-mute">Max Messages per Day</p>
-          <p className="font-semibold">500,000</p>
+        <div className="w-full px-6 *:border-b *:border-bg-mute">
+          <div className="py-3">
+            <p className="text-text-mute">Messages per Day</p>
+            <p className="font-semibold">500,000</p>
+          </div>
+          <div className="py-3">
+            <p className="text-text-mute">Requests per Second</p>
+            <p className="font-semibold">100</p>
+          </div>
         </div>
-
-        <div>
-          <p className="text-text-mute">Max Requests per Second</p>
-          <p className="font-semibold">100</p>
-        </div>
-
-        <hr className="w-2/3 border-0 border-b border-b-white/5" />
 
         <div>
           <Button asChild variant="primary">
@@ -87,9 +84,9 @@ export default function PricingTable() {
 
       {/* Pro */}
 
-      <div className="flex flex-col items-center gap-6 rounded-3xl bg-white px-4 py-8 shadow dark:bg-bg-mute">
-        <div>
-          <h4 className="mb-2 text-xl font-semibold text-primary-text">Pro</h4>
+      <div className="flex flex-col items-center gap-4 rounded-4xl border-2 border-primary bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
+        <div className="grow">
+          <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">Pro</h4>
 
           <h5 className="flex items-baseline text-2xl font-semibold">
             $180
@@ -100,23 +97,22 @@ export default function PricingTable() {
           <p className="text-text-mute">Starting from</p>
         </div>
 
-        <div>
-          <div className="text-text-mute">
+        <div className="grow">
+          <div className="text-balance rounded-lg bg-bg-mute px-3 py-2 text-sm text-primary-text dark:text-text-mute">
             For businesses with consistent high-capacity loads and predictable
             costs.
           </div>
         </div>
 
-        <Hr />
-
-        <div>
-          <p className="text-text-mute">Max Messages per Day</p>
-          <p className="font-semibold">Up to 100M</p>
-        </div>
-
-        <div>
-          <p className="text-text-mute">Max Requests per Second</p>
-          <p className="font-semibold">Up to 1000</p>
+        <div className="w-full px-6 *:border-b *:border-bg-mute">
+          <div className="py-3">
+            <p className="text-text-mute">Messages per Day</p>
+            <p className="font-semibold">Up to 100M</p>
+          </div>
+          <div className="py-3">
+            <p className="text-text-mute">Requests per Second</p>
+            <p className="font-semibold">Up to 1000</p>
+          </div>
         </div>
 
         <div>

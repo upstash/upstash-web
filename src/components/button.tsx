@@ -14,9 +14,11 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-bg-mute text-text hover:bg-emerald-700/20 dark:hover:bg-primary disabled:bg-white/5 disabled:text-zinc-50",
+          "bg-bg-mute shadow-sm text-primary-text hover:bg-emerald-700/20 disabled:bg-white/5 disabled:text-zinc-50",
         primary:
           "bg-primary text-white hover:bg-primary-text disabled:bg-white/5 disabled:text-zinc-50",
+        secondary:
+          "bg-white text-text dark:text-bg disabled:bg-white/5 disabled:text-zinc-50",
       },
     },
     defaultVariants: {

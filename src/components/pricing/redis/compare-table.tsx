@@ -122,7 +122,7 @@ export default function CompareTable({
 
           <Col plan={showFree} className="border-b border-b-bg bg-bg p-0">
             <div className="flex h-24 flex-col items-center justify-center bg-bg-mute">
-              <h4 className="hidden py-1 text-lg font-semibold text-primary-text md:block">
+              <h4 className="hidden py-1 text-lg font-bold text-primary-text md:block">
                 Free
               </h4>
 
@@ -137,7 +137,7 @@ export default function CompareTable({
 
           <Col plan={showPayg} className="border-b border-b-bg bg-bg p-0">
             <div className="flex h-24 flex-col items-center justify-center bg-emerald-600/20 dark:bg-emerald-800/20">
-              <h4 className="hidden py-1 text-lg font-semibold text-primary-text md:block">
+              <h4 className="hidden py-1 text-lg font-bold text-primary-text md:block">
                 Pay as you go
               </h4>
 
@@ -160,7 +160,7 @@ export default function CompareTable({
               <MobileSelectCol
                 onChange={onChangePlan}
                 value={selectedFixed}
-                className="mb-0 hidden py-1 text-lg font-semibold text-primary-text shadow-sm md:block"
+                className="mb-0 hidden py-1 text-lg font-bold text-primary-text shadow-sm md:block"
               >
                 <option value={PricingRedis.Fixed250MB}>Fixed 250MB</option>
                 <option value={PricingRedis.Fixed1GB}>Fixed 1GB</option>
@@ -190,7 +190,7 @@ export default function CompareTable({
 
           <Col plan={showEnterprise} className="border-b border-b-bg bg-bg p-0">
             <div className="flex h-24 flex-col items-center justify-center bg-bg-mute">
-              <h4 className="hidden py-1 text-lg font-semibold text-primary-text md:block">
+              <h4 className="hidden py-1 text-lg font-bold text-primary-text md:block">
                 Enterprise
               </h4>
 
@@ -1610,7 +1610,7 @@ export default function CompareTable({
             </Button>
           </Col>
           <Col plan={showEnterprise} className="py-4">
-            <Button asChild variant="primary">
+            <Button asChild variant="secondary">
               <a target="_self" href="https://upstash.com/contact">
                 Contact Us
               </a>

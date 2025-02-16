@@ -26,7 +26,7 @@ export default function PricingTable({
 
       {/* FREE */}
 
-      <div className="flex flex-col items-center gap-4 rounded-3xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:bg-bg-mute">
+      <div className="flex flex-col items-center gap-4 rounded-4xl border-2 border-primary bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
         <div className="grow">
           <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
             Free
@@ -37,25 +37,25 @@ export default function PricingTable({
         </div>
 
         <div className="grow">
-          <div className="text-balance rounded-lg bg-bg-mute px-3 py-2 text-sm text-primary-text">
+          <div className="text-balance rounded-lg bg-bg-mute px-3 py-2 text-sm text-primary-text dark:text-text-mute">
             Perfect for prototypes and hobby projects.
           </div>
         </div>
 
-        <div className="w-full divide-y divide-bg-mute px-6">
+        <div className="w-full px-6 *:border-b *:border-bg-mute">
           <div className="py-3">
             <p className="text-text-mute">Data Size</p>
-            <p className="font-semibold text-primary-text">256 MB</p>
+            <p className="font-semibold">256 MB</p>
           </div>
 
           <div className="py-3">
             <p className="text-text-mute">Monthly Commands</p>
-            <p className="font-semibold text-primary-text">500 K</p>
+            <p className="font-semibold">500 K</p>
           </div>
         </div>
 
         <div>
-          <Button asChild>
+          <Button asChild variant="primary">
             <a target="_self" href="https://console.upstash.com">
               Start Now
             </a>
@@ -65,7 +65,7 @@ export default function PricingTable({
 
       {/* PAYG */}
 
-      <div className="flex flex-col items-center gap-4 rounded-3xl border-2 border-primary bg-white p-6 shadow sm:gap-6 sm:p-8 dark:bg-bg-mute">
+      <div className="flex flex-col items-center gap-4 rounded-4xl border-2 border-primary bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
         <div className="grow">
           <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
             Pay as you go
@@ -76,20 +76,20 @@ export default function PricingTable({
         </div>
 
         <div className="grow">
-          <div className="text-balance rounded-lg bg-bg-mute px-3 py-2 text-sm text-primary-text">
+          <div className="text-balance rounded-lg bg-bg-mute px-3 py-2 text-sm text-primary-text dark:text-text-mute">
             Flexible pricing for variable traffic.
           </div>
         </div>
 
-        <div className="w-full divide-y divide-bg-mute px-6">
+        <div className="w-full px-6 *:border-b *:border-bg-mute">
           <div className="py-3">
             <p className="text-text-mute">Data Size</p>
-            <p className="font-semibold text-primary-text">100 GB</p>
+            <p className="font-semibold">100 GB</p>
           </div>
 
           <div className="py-3">
             <p className="text-text-mute">Monthly Bandwidth</p>
-            <p className="font-semibold text-primary-text">Unlimited</p>
+            <p className="font-semibold">Unlimited</p>
           </div>
         </div>
 
@@ -104,7 +104,7 @@ export default function PricingTable({
 
       {/* Fixed */}
 
-      <div className="flex flex-col items-center gap-4 rounded-3xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:bg-bg-mute">
+      <div className="flex flex-col items-center gap-4 rounded-4xl border-2 border-primary bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
         <div className="grow">
           <h4 className="mb-4 text-xl font-semibold text-primary-text">
             <select
@@ -147,15 +147,15 @@ export default function PricingTable({
         </div>
 
         <div className="grow">
-          <div className="text-balance rounded-lg bg-bg-mute px-3 py-2 text-sm text-primary-text">
+          <div className="text-balance rounded-lg bg-bg-mute px-3 py-2 text-sm text-primary-text dark:text-text-mute">
             For consistent loads with predictable costs.
           </div>
         </div>
 
-        <div className="w-full divide-y divide-bg-mute px-6">
+        <div className="w-full px-6 *:border-b *:border-bg-mute">
           <div className="py-3">
             <p className="text-text-mute">Data Size</p>
-            <p className="font-semibold text-primary-text">
+            <p className="font-semibold">
               {showFixed250MB && <>250 MB</>}
               {showFixed1GB && <>1 GB</>}
               {showFixed5GB && <>5 GB</>}
@@ -168,7 +168,7 @@ export default function PricingTable({
 
           <div className="py-3">
             <p className="text-text-mute">Monthly Bandwidth</p>
-            <p className="font-semibold text-primary-text">
+            <p className="font-semibold">
               {showFixed250MB && <>50GB</>}
               {showFixed1GB && <>100GB</>}
               {showFixed5GB && <>500GB</>}
@@ -181,7 +181,7 @@ export default function PricingTable({
         </div>
 
         <div>
-          <Button asChild>
+          <Button asChild variant="primary">
             <a target="_self" href="https://console.upstash.com">
               Start Now
             </a>
