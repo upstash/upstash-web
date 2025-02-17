@@ -23,13 +23,18 @@ export default function FastStatistic() {
         )}
       >
         <FastCard>
-          <FastCardValue>25B</FastCardValue>
-          <FastCardTitle>Redis Commands / Week</FastCardTitle>
+          <FastCardValue>40B</FastCardValue>
+          <FastCardTitle>Redis Commands</FastCardTitle>
         </FastCard>
 
         <FastCard>
-          <FastCardValue>15B</FastCardValue>
-          <FastCardTitle>Vector Commands / Week</FastCardTitle>
+          <FastCardValue>90M</FastCardValue>
+          <FastCardTitle>QStash Messages</FastCardTitle>
+        </FastCard>
+
+        <FastCard>
+          <FastCardValue>8M</FastCardValue>
+          <FastCardTitle>Vector Queries</FastCardTitle>
         </FastCard>
 
         <FastCard>

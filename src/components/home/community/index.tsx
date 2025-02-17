@@ -6,6 +6,7 @@ import {
   SectionHeaderTitle,
 } from "@/components/home/section-header";
 import Icon, { ICON_NAMES } from "@/components/icon";
+import { IconBrandX } from "@tabler/icons-react";
 import React from "react";
 import {
   CommunityBox,
@@ -61,10 +62,10 @@ export default function HomeCommunity() {
           </CommunityBox>
 
           <CommunityBox>
-            <Icon
-              icon={ICON_NAMES.Twitter}
+            <IconBrandX
+              size={48}
               className="mb-4 hidden text-4xl group-hover:text-primary sm:inline-flex md:text-5xl"
-              strokeWidth="1"
+              strokeWidth={1}
             />
             <CommunityBoxTitle>X</CommunityBoxTitle>
             <CommunityBoxDesc>
