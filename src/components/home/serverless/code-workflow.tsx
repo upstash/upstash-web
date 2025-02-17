@@ -61,77 +61,81 @@ export default function CodeWorkflow() {
 }
 
 const CODE = {
-  [Language.AI]: ` const datasetUrl = await context.run("get-dataset-url", async () => {
-      return await getDatasetUrl(request.datasetId)
-    })
+  [Language.AI]: `// Step 1: Get the dataset URL
+const datasetUrl = await context.run("get-dataset-url", async () => {
+  return await getDatasetUrl(request.datasetId)
+});
 
-    const { body: dataset } = await context.call("download-dataset", {
-      url: datasetUrl,
-      method: "GET"
-    })
+// Step 2: Download the dataset
+const { body: dataset } = await context.call("download-dataset", {
+  url: datasetUrl,
+  method: "GET"
+});
 
-    const response = await context.api.openai.call(
-        "Call OpenAI",
-        {
-          token: "OPENAI_API_KEY",
-          operation: "chat.completions.create",
-          body: {
-            model: "gpt-4o",
-            messages: [
-              { role: "user", content: "Analyze this data chunk: \${JSON.stringify(dataset)}" },
-            ],
-          },
-        }
-      );`,
-  [Language.Event]: ` // Step 1: request order processing
-  await context.run("request order processing", async () => {
-    await requestProcessing(orderId)
-  })
+// Step 3: Analyze the dataset with LLM
+const response = await context.api.openai.call(
+  "Call OpenAI",
+  {
+    token: "OPENAI_API_KEY",
+    operation: "chat.completions.create",
+    body: {
+      model: "gpt-4o",
+      messages: [
+        { role: "user", content: \`Analyze this data chunk: \${JSON.stringify(dataset)}\` },
+      ],
+    },
+  }
+);`,
+  [Language.Event]: `// Step 1: request order processing
+await context.run("request order processing", async () => {
+  await requestProcessing(orderId);
+});
 
-  // Step 2: Wait for the order to be processed
-  const { eventData, timeout } = await context.waitForEvent(
-    "wait for order processing",
-    \`order-\${orderId}\`,
-    {
-      timeout: "10m" // 10 minutes timeout
-    }
-  );
-  
-  // Step 3: Log the processed order
-  await context.run("process-order", async () => {
-    console.log(\`Order \${orderId} processed:\`, processedData);
-  });`,
+// Step 2: Wait for the order to be processed
+const { eventData, timeout } = await context.waitForEvent(
+  "wait for order processing",
+  \`order-\${orderId}\`,
+  {
+    timeout: "10m" // 10 minutes timeout
+  }
+);
+
+// Step 3: Log the processed order
+await context.run("process-order", async () => {
+  console.log(\`Order \${orderId} processed:\`, eventData);
+});`,
   [Language.Parallel]: `const [coffeeBeansAvailable, cupsAvailable, milkAvailable] =
-    await Promise.all([
-      ctx.run("check-coffee-beans", () => checkInventory("coffee-beans")),
-      ctx.run("check-cups", () => checkInventory("cups")),
-      ctx.run("check-milk", () => checkInventory("milk")),
-    ])
+  await Promise.all([
+    context.run("check-coffee-beans", () => checkInventory("coffee-beans")),
+    context.run("check-cups", () => checkInventory("cups")),
+    context.run("check-milk", () => checkInventory("milk")),
+  ]);
 
-  // If all ingedients available, brew coffee
-  if (coffeeBeansAvailable && cupsAvailable && milkAvailable) {
-    const price = await ctx.run("brew-coffee", async () => {
-      return await brewCoffee({ style: "cappuccino" })
-    })
+// If all ingedients available, brew coffee
+if (coffeeBeansAvailable && cupsAvailable && milkAvailable) {
+  const price = await context.run("brew-coffee", async () => {
+    return await brewCoffee({ style: "cappuccino" });
+  });
 
-    await printReceipt(price)
-  }`,
+  await printReceipt(price);
+};`,
   [Language.Customer]: `await context.run("new-signup", async () => {
-  await sendEmail("Welcome to the platform", email)
-})
+  await sendEmail("Welcome to the platform", email);
+});
 
-await context.sleep("wait-for-3-days", 60 * 60 * 24 * 3)
+await context.sleep("wait-for-3-days", "3d");
 
 while (true) {
   const state = await context.run("check-user-state", async () => {
-    return await getUserState()
-  })
+    return await getUserState();
+  });
 
   if (state === "non-active") {
     await context.run("send-email-non-active", async () => {
-      await sendEmail("Email to non-active users", email)
-    })
-  } 
-  await context.sleep("wait-for-1-month", 60 * 60 * 24 * 30)
-}`,
+      await sendEmail("Email to non-active users", email);
+    });
+  };
+
+  await context.sleep("wait-for-1-month", "30d");
+};`,
 };

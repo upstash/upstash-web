@@ -62,20 +62,23 @@ export default function CodeRedis() {
 
 const CODE = {
   [Language.Scheduling]: `import { Client } from "@upstash/qstash";
-
 const client = new Client({ token: "QSTASH_TOKEN" });
+
 await client.schedules.create({
   destination: "https://example.com",
   cron: "* * * * *",
 });
 `,
-  [Language.Auto]: `const client = new Client({ token: "QSTASH_TOKEN" });
+  [Language.Auto]: `import { Client } from "@upstash/qstash";
+const client = new Client({ token: "QSTASH_TOKEN" });
+
 const res = await client.publishJSON({
   url: "https://my-api...",
   body: { hello: "world" },
   retries: 2,
 });`,
-  [Language.Queues]: `const client = new Client({ token: "QSTASH_TOKEN" });
+  [Language.Queues]: `import { Client } from "@upstash/qstash";
+const client = new Client({ token: "QSTASH_TOKEN" });
 
 const queue = client.queue({
   queueName: "my-queue"
@@ -88,8 +91,8 @@ await queue.enqueueJSON({
   }
 })`,
   [Language.Callbacks]: `import { Client } from "@upstash/qstash";
-
 const client = new Client({ token: "QSTASH_TOKEN" });
+
 const res = await client.publishJSON({
   url: "https://my-api...",
   body: { hello: "world" },

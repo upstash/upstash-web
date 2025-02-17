@@ -60,38 +60,50 @@ export default function CodeRedis() {
 }
 
 const CODE = {
-  [Language.RAG]: `context = index.query(vector=question_embedding, top_k=5, include_metadata=True)
-prompt = f"Question:{question}\\n\\nContext: {context}"
+  [Language.RAG]: `import { Index } from "@upstash/vector";
+const index = new Index();
 
-response = openai.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "system", 
-            "content": 'You are a helpful assistant, answer the question using the context.'},
-                      {"role": "user", "content": prompt}
-            ])`,
-  [Language.Cache]: `const semanticCache = new SemanticCache({ index, minProximity: 0.95 });
+const context = await index.query({
+  data: "What is Quantum Mechanics?",
+  topK: 5,
+  includeMetadata: true,
+});
+
+const prompt = \`Question: \${question} - Context: \${JSON.stringify(context)}\`;
+
+const response = await openai.chat.completions.create({
+  model: "gpt-3.5-turbo",
+  messages: [
+    { role: "system", content: "You are a helpful assistant, answer the question using the context." },
+    { role: "user", content: prompt },
+  ],
+});`,
+
+  [Language.Cache]: `import { Index } from "@upstash/vector";
+import { SemanticCache } from "@upstash/semantic-cache";
+
+const index = new Index();
+const semanticCache = new SemanticCache({ index, minProximity: 0.95 });
 
 await semanticCache.set("Capital of Turkey", "Ankara");
 // 👇 outputs: "Ankara"
-const result = await semanticCache.get("What is Turkey's capital?");
+const result1 = await semanticCache.get("What is Turkey's capital?");
 
 await semanticCache.set("year in which the Berlin wall fell", "1989");
 // 👇 outputs "1989"
-const result = await semanticCache.get("what's the year the Berlin wall destroyed?");
-}
-`,
-  [Language.Search]: `store = UpstashVectorStore(
-    embedding=True,  # Embedding option enabled
-)
+const result2 = await semanticCache.get("what's the year the Berlin wall destroyed?");`,
 
-documents = [
-    Document(page_content="Upstash Vector is a scalable vector database."),
-    Document(page_content="LangChain is a framework for building intelligent apps."),
-]
+  [Language.Search]: `import { Index } from "@upstash/vector";
+const index = new Index();
 
-store.add_documents(documents)
+const documents = [
+  { id: "doc1", data: "Upstash Vector is a scalable vector database." },
+  { id: "doc2", data: "LangChain is a framework for building intelligent apps." },
+];
 
-# Perform a similarity search
-query = "What is LangChain?"
-results = store.similarity_search(query, k=3)`,
+await index.upsert(documents);
+
+// Perform a similarity search
+const query = "What is LangChain?";
+const results = await store.query({ data: query, topK: 3 });`,
 };

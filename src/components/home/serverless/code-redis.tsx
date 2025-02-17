@@ -61,7 +61,9 @@ export default function CodeRedis() {
 }
 
 const CODE = {
-  [Language.Caching]: `const redis = new Redis.fromEnv();
+  [Language.Caching]: `import { Redis } from "@upstash/redis";
+const redis = Redis.fromEnv();
+
 const cacheKey = \`item:\${itemId}\`;
 
 // Check cache
@@ -70,19 +72,26 @@ if (cachedItem) {
   console.log("Cache hit");
   return JSON.parse(cachedItem);
 }`,
-  [Language.Session]: `const getSession = async (key: Key) => {
+  [Language.Session]: `import { Redis } from "@upstash/redis";
+const redis = Redis.fromEnv();
+
+const getSession = async (key: string) => {
   const sessionId = await getSessionId();
   return redis.hget(\`s:\${sessionId}\`, key);
 };
 
-const setSession = async (key: Key, value: string) => {
+const setSession = async (key: string, value: string) => {
   const sessionId = await getSessionIdAndCreateIfMissing();
   const sessionKey = \`s:\${sessionId}\`;
   await redis.hset(sessionKey, { [key]: value });
-  return redis.expire(sessionKey, 900);
+  await redis.expire(sessionKey, 900);
+  return sessionId;
 };
 `,
-  [Language.Rate]: `const ratelimit = new Ratelimit({
+  [Language.Rate]: `import { Redis } from "@upstash/redis";
+import { Ratelimit } from "@upstash/ratelimit";
+
+const ratelimit = new Ratelimit({
   redis: Redis.fromEnv(),
   limiter: Ratelimit.slidingWindow(10, "10 s"),
 });
@@ -91,31 +100,32 @@ const identifier = getIpAddress();
 const { success } = await ratelimit.limit(identifier);
 
 if (!success) {
-  return res.status(429).send("Too many requests");
+  return res.status(429).json({ "error": "Too many requests" });
 }
 `,
-  [Language.Leaderboards]: `const redis = Redis.fromEnv();
+  [Language.Leaderboards]: `import { Redis } from "@upstash/redis";
+const redis = Redis.fromEnv();
 
 const LEADERBOARD_KEY = "game-leaderboard";
 
 export const updateScore = async (playerName: string, score: number) =>
   await redis.zadd(LEADERBOARD_KEY, { score, member: playerName });
 
-export const getTopPlayers = async (top: number) =>
-  (await redis.zrevrange(LEADERBOARD_KEY, 0, top - 1)).map(
-    (entry) => ({ player: entry.member, score: entry.score })
-  );`,
-  [Language.Chat]: `const redis = Redis.fromEnv();
+export const getTopPlayers = async (top: number) => {
+  return await redis.zrange(LEADERBOARD_KEY, 0, top - 1, { rev: true, withScores: true });
+};`,
+  [Language.Chat]: `import { Redis } from "@upstash/redis";
+const redis = Redis.fromEnv();
 
-const CHAT_HISTORY_KEY = (userId: string) => \`chat-history:\${userId}\`;
+const getChatHistoryKey = (userId: string) => \`chat-history:\${userId}\`;
 
 export const saveMessage = async (userId: string, message: string) => {
-  await redis.lpush(CHAT_HISTORY_KEY(userId), message); // Add message to history
-  await redis.ltrim(CHAT_HISTORY_KEY(userId), 0, 99); // Keep only the latest 100 messages
+  await redis.lpush(getChatHistoryKey(userId), message); // Add message to history
+  await redis.ltrim(getChatHistoryKey(userId), 0, 99); // Keep only the latest 100 messages
 };
 
 export const getChatHistory = async (userId: string) =>
-  await redis.lrange(CHAT_HISTORY_KEY(userId), 0, -1); `,
+  await redis.lrange(getChatHistoryKey(userId), 0, -1); `,
 };
 
 export function CodePre({ className, ...props }: React.ComponentProps<"pre">) {
