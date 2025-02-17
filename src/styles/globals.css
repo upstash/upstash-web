@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --color-bg: oklch(0.98 0 0); /*50*/
+  --color-bg: oklch(0.97 0 0); /*50*/
   --color-bg-mute: rgb(4 120 87 / 0.08);
   --color-primary: oklch(0.696 0.17 162.48); /*500*/
   --color-primary-text: oklch(0.508 0.118 165.612); /*700*/
