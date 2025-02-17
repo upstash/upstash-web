@@ -347,7 +347,6 @@ export default function CompareTable() {
             Max Events Retention
           </th>
           {/**/}
-          {/*TODO: fix td -> Col*/}
           <td
             hidden={isMobile ? !showFree : false}
             className="bg-bg-mute px-4 py-0"
