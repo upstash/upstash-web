@@ -77,8 +77,8 @@ const NavItems: {
   children?: ReactNode;
 }[] = [
   {
-    name: "Pricing",
-    href: "/pricing",
+    name: "Enterprise",
+    href: "/enterprise",
   },
   {
     name: "Docs",
@@ -87,6 +87,10 @@ const NavItems: {
   {
     name: "Blog",
     href: "/blog",
+  },
+  {
+    name: "Pricing",
+    href: "/pricing",
   },
   {
     name: "Careers",
