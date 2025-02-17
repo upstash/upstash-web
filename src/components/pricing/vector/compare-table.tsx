@@ -179,7 +179,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
+          <th className="px-0 text-left font-normal">
             Max Vectors x Dimensions
           </th>
           {/**/}
@@ -206,9 +206,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            Max Dimensions
-          </th>
+          <th className="px-0 text-left font-normal">Max Dimensions</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="number">1536</CompareValue>
@@ -225,9 +223,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            Max Namespaces
-          </th>
+          <th className="px-0 text-left font-normal">Max Namespaces</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="number">100</CompareValue>
@@ -244,7 +240,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
+          <th className="px-0 text-left font-normal">
             Daily Query / Update Limit
           </th>
           {/**/}
@@ -267,7 +263,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
+          <th className="px-0 text-left font-normal">
             Max Metadata Per Vector
           </th>
           {/**/}
@@ -294,9 +290,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            Max Data Per Vector
-          </th>
+          <th className="px-0 text-left font-normal">Max Data Per Vector</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="size" suffix="MB">
@@ -321,7 +315,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
+          <th className="px-0 text-left font-normal">
             Max Data / Metadata Size
           </th>
           {/**/}
@@ -354,7 +348,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">Regions</th>
+          <th className="px-0 text-left font-normal">Regions</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="list">
@@ -385,9 +379,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            API and SDKs
-          </th>
+          <th className="px-0 text-left font-normal">API and SDKs</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="list">
@@ -424,9 +416,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            Live Index Updates
-          </th>
+          <th className="px-0 text-left font-normal">Live Index Updates</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" />
@@ -443,9 +433,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            Scale to Zero
-          </th>
+          <th className="px-0 text-left font-normal">Scale to Zero</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" />
@@ -462,9 +450,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            Sparse Vectors
-          </th>
+          <th className="px-0 text-left font-normal">Sparse Vectors</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue suffix="Coming soon" />
@@ -481,9 +467,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            Namespaces
-          </th>
+          <th className="px-0 text-left font-normal">Namespaces</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" />
@@ -500,9 +484,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            Metadata Filtering
-          </th>
+          <th className="px-0 text-left font-normal">Metadata Filtering</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" />
@@ -519,9 +501,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            Uptime SLA
-          </th>
+          <th className="px-0 text-left font-normal">Uptime SLA</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" valid={false} />
@@ -550,9 +530,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            Community Support
-          </th>
+          <th className="px-0 text-left font-normal">Community Support</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" />
@@ -569,9 +547,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            Email Support
-          </th>
+          <th className="px-0 text-left font-normal">Email Support</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" />
@@ -588,7 +564,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
+          <th className="px-0 text-left font-normal">
             Dedicated Support and Slack Channel
           </th>
           {/**/}
@@ -613,9 +589,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-text-mute">
-            Monthly Price
-          </th>
+          <th className="px-0 text-left font-normal">Monthly Price</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue>Free</CompareValue>
@@ -632,9 +606,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-text-mute">
-            Request Price
-          </th>
+          <th className="px-0 text-left font-normal">Request Price</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue>Free</CompareValue>
@@ -650,9 +622,7 @@ export default function CompareTable() {
           </Col>
         </tr>
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-text-mute">
-            Storage Price
-          </th>
+          <th className="px-0 text-left font-normal">Storage Price</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue>Free</CompareValue>
@@ -669,9 +639,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-text-mute">
-            Bandwidth Price
-          </th>
+          <th className="px-0 text-left font-normal">Bandwidth Price</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue>Free</CompareValue>

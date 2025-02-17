@@ -6,7 +6,6 @@ import {
   SectionHeaderTitle,
 } from "@/components/home/section-header";
 import Icon, { ICON_NAMES } from "@/components/icon";
-import { HOME_SECTIONS } from "@/utils/const";
 import React from "react";
 import {
   CommunityBox,
@@ -17,7 +16,7 @@ import {
 
 export default function HomeCommunity() {
   return (
-    <section id={HOME_SECTIONS.COMMUNITY} className="relative py-16 md:py-28">
+    <section className="relative z-10 py-8 md:py-16">
       <Bg />
 
       <Container>

@@ -172,7 +172,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-text-mute">
+          <th className="px-0 py-4 text-left font-normal">
             Max Messages per Day
           </th>
           {/**/}
@@ -191,7 +191,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-text-mute">
+          <th className="px-0 py-4 text-left font-normal">
             Max Requests per Second
           </th>
           {/**/}
@@ -210,9 +210,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-text-mute">
-            Max Message Size
-          </th>
+          <th className="px-0 py-4 text-left font-normal">Max Message Size</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="size" suffix="MB">
@@ -237,7 +235,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-text-mute">
+          <th className="px-0 py-4 text-left font-normal">
             Max Number of URL Groups
           </th>
           {/**/}
@@ -256,7 +254,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-text-mute">
+          <th className="px-0 py-4 text-left font-normal">
             Max Number of Endpoints per URL Group
           </th>
           {/**/}
@@ -275,9 +273,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-text-mute">
-            Max Retry Count
-          </th>
+          <th className="px-0 py-4 text-left font-normal">Max Retry Count</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue>3</CompareValue>
@@ -294,9 +290,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-text-mute">
-            Max Delay
-          </th>
+          <th className="px-0 py-4 text-left font-normal">Max Delay</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue>7 days</CompareValue>
@@ -313,7 +307,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-text-mute">
+          <th className="px-0 py-4 text-left font-normal">
             Max HTTP Connection Timeout
           </th>
           {/**/}
@@ -332,9 +326,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-text-mute">
-            Max DLQ Retention
-          </th>
+          <th className="px-0 py-4 text-left font-normal">Max DLQ Retention</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue>3 days</CompareValue>
@@ -351,7 +343,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-text-mute">
+          <th className="px-0 py-4 text-left font-normal">
             Max Events Retention
           </th>
           {/**/}
@@ -382,7 +374,7 @@ export default function CompareTable() {
           </td>
         </tr>
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-text-mute">
+          <th className="px-0 py-4 text-left font-normal">
             Max Active Schedules
           </th>
           {/**/}
@@ -426,9 +418,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-text-mute">
-            Max Queue Count
-          </th>
+          <th className="px-0 py-4 text-left font-normal">Max Queue Count</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="number">10</CompareValue>
@@ -445,7 +435,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-text-mute">
+          <th className="px-0 py-4 text-left font-normal">
             Max Queue Parallelism
           </th>
           {/**/}
@@ -463,9 +453,7 @@ export default function CompareTable() {
           </Col>
         </tr>
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-text-mute">
-            Max Events Size
-          </th>
+          <th className="px-0 py-4 text-left font-normal">Max Events Size</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="number">10000</CompareValue>
@@ -508,9 +496,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-text-mute">
-            Monthly price
-          </th>
+          <th className="px-0 py-4 text-left font-normal">Monthly price</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue>Free</CompareValue>
@@ -526,9 +512,7 @@ export default function CompareTable() {
           </Col>
         </tr>
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-text-mute">
-            Message price
-          </th>
+          <th className="px-0 py-4 text-left font-normal">Message price</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue>Free</CompareValue>

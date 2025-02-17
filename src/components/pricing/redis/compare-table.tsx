@@ -215,7 +215,7 @@ export default function CompareTable({
         {/*MAX COMMANDS PER SECOND*/}
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
+          <th className="px-0 text-left font-normal">
             <Tooltip content="This is the number of commands that your database can process per second.">
               Max commands per second
             </Tooltip>
@@ -295,7 +295,7 @@ export default function CompareTable({
 
         {/*MAX REQUEST SIZE*/}
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
+          <th className="px-0 text-left font-normal">
             <Tooltip content="The max size of a single request/command.">
               Max request size
             </Tooltip>
@@ -394,7 +394,7 @@ export default function CompareTable({
 
         {/*MAX RECORD SIZE*/}
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
+          <th className="px-0 text-left font-normal">
             <Tooltip content="This is the maximum size per your entry. The entry can be String, List, Set, Hash etc.">
               Max record size
             </Tooltip>
@@ -493,7 +493,7 @@ export default function CompareTable({
 
         {/*MAX DATA SIZE*/}
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
+          <th className="px-0 text-left font-normal">
             <Tooltip content="When limit is reached, if eviction is enabled, some entries will be evicted to allow new writes. Otherwise, write commands will be rejected.">
               Max data size
             </Tooltip>
@@ -556,7 +556,7 @@ export default function CompareTable({
 
         {/*MAX CONCURRENT CONNECTIONS*/}
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
+          <th className="px-0 text-left font-normal">
             <Tooltip content="When the limit is reached, your idle connections may be terminated. You will not experience any issue unless all of your connections are active. Even in that case; most Redis clients reconnect automatically. You can use REST API if you expect very high number of concurrent connections.">
               Max concurrent connections
             </Tooltip>
@@ -635,7 +635,7 @@ export default function CompareTable({
 
         {/*MAX MONTHLY BANDWIDTH*/}
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
+          <th className="px-0 text-left font-normal">
             <Tooltip content="The max data transfer (bandwidth) limit per month.">
               Max monthly bandwidth
             </Tooltip>
@@ -775,9 +775,7 @@ export default function CompareTable({
 
         {/*SUPPORTED PLATFORMS*/}
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            Supported platforms
-          </th>
+          <th className="px-0 text-left font-normal">Supported platforms</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="list">
@@ -814,9 +812,7 @@ export default function CompareTable({
 
         {/*PERSISTENCE*/}
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            Persistence
-          </th>
+          <th className="px-0 text-left font-normal">Persistence</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" />
@@ -834,9 +830,7 @@ export default function CompareTable({
 
         {/*REST API*/}
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            REST API
-          </th>
+          <th className="px-0 text-left font-normal">REST API</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" />
@@ -854,9 +848,7 @@ export default function CompareTable({
 
         {/*GLOBAL REPLICATION*/}
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            Global replication
-          </th>
+          <th className="px-0 text-left font-normal">Global replication</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue
@@ -881,9 +873,7 @@ export default function CompareTable({
 
         {/*STRONG CONSISTENCY*/}
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            Strong consistency
-          </th>
+          <th className="px-0 text-left font-normal">Strong consistency</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" valid={false} />
@@ -908,9 +898,7 @@ export default function CompareTable({
 
         {/*HIGH AVAILABILITY*/}
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            High Availability
-          </th>
+          <th className="px-0 text-left font-normal">High Availability</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue>Primary Replicas</CompareValue>
@@ -930,9 +918,7 @@ export default function CompareTable({
         {/**/}
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            Uptime SLA
-          </th>
+          <th className="px-0 text-left font-normal">Uptime SLA</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" valid={false} />
@@ -971,9 +957,7 @@ export default function CompareTable({
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            TLS Encryption
-          </th>
+          <th className="px-0 text-left font-normal">TLS Encryption</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" />
@@ -991,9 +975,7 @@ export default function CompareTable({
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            IP Allowlist
-          </th>
+          <th className="px-0 text-left font-normal">IP Allowlist</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" />
@@ -1011,9 +993,7 @@ export default function CompareTable({
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            Role based access
-          </th>
+          <th className="px-0 text-left font-normal">Role based access</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" valid={false} />
@@ -1047,9 +1027,7 @@ export default function CompareTable({
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            Encryption at REST
-          </th>
+          <th className="px-0 text-left font-normal">Encryption at REST</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" valid={false} />
@@ -1083,7 +1061,7 @@ export default function CompareTable({
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
+          <th className="px-0 text-left font-normal">
             <Tooltip content="Upstash Global regions are SOC-2 certified.">
               SOC-2 Compliance
             </Tooltip>
@@ -1122,9 +1100,7 @@ export default function CompareTable({
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            Private Link
-          </th>
+          <th className="px-0 text-left font-normal">Private Link</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" valid={false} />
@@ -1144,9 +1120,7 @@ export default function CompareTable({
 
         {/**/}
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            VPC Peering
-          </th>
+          <th className="px-0 text-left font-normal">VPC Peering</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" valid={false} />
@@ -1163,9 +1137,7 @@ export default function CompareTable({
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            Single Sign-On (SSO)
-          </th>
+          <th className="px-0 text-left font-normal">Single Sign-On (SSO)</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" valid={false} />
@@ -1183,9 +1155,7 @@ export default function CompareTable({
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            HIPAA Compliance
-          </th>
+          <th className="px-0 text-left font-normal">HIPAA Compliance</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" valid={false} />
@@ -1210,9 +1180,7 @@ export default function CompareTable({
         {/**/}
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            Grafana Integration
-          </th>
+          <th className="px-0 text-left font-normal">Grafana Integration</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" valid={false} />
@@ -1245,9 +1213,7 @@ export default function CompareTable({
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            Datadog Integration
-          </th>
+          <th className="px-0 text-left font-normal">Datadog Integration</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" valid={false} />
@@ -1280,9 +1246,7 @@ export default function CompareTable({
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            New Relic Integration
-          </th>
+          <th className="px-0 text-left font-normal">New Relic Integration</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" valid={false} />
@@ -1315,9 +1279,7 @@ export default function CompareTable({
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            Access Logging
-          </th>
+          <th className="px-0 text-left font-normal">Access Logging</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" valid={false} />
@@ -1340,9 +1302,7 @@ export default function CompareTable({
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            Community Support
-          </th>
+          <th className="px-0 text-left font-normal">Community Support</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" />
@@ -1359,9 +1319,7 @@ export default function CompareTable({
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            Email Support
-          </th>
+          <th className="px-0 text-left font-normal">Email Support</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" />
@@ -1378,9 +1336,7 @@ export default function CompareTable({
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            Uptime SLA
-          </th>
+          <th className="px-0 text-left font-normal">Uptime SLA</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" valid={false} />
@@ -1417,7 +1373,7 @@ export default function CompareTable({
         {/**/}
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
+          <th className="px-0 text-left font-normal">
             Dedicated support and Slack channel
           </th>
           {/**/}
@@ -1441,9 +1397,7 @@ export default function CompareTable({
 
         {/* MONTHLY PRICE */}
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-text-mute">
-            Monthly price
-          </th>
+          <th className="px-0 text-left font-normal">Monthly price</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue>
@@ -1509,9 +1463,7 @@ export default function CompareTable({
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-text-mute">
-            Request price
-          </th>
+          <th className="px-0 text-left font-normal">Request price</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue>Free</CompareValue>
@@ -1539,9 +1491,7 @@ export default function CompareTable({
           </Col>
         </tr>
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-text-mute">
-            Storage price
-          </th>
+          <th className="px-0 text-left font-normal">Storage price</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue>Free</CompareValue>
@@ -1558,9 +1508,7 @@ export default function CompareTable({
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal text-text-mute">
-            Bandwidth price
-          </th>
+          <th className="px-0 text-left font-normal">Bandwidth price</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue>Free</CompareValue>

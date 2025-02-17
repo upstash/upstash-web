@@ -53,17 +53,20 @@ export default function PricingRedisPage() {
               <h3 className="text-xl font-bold">Prod Pack</h3>
               <h5 className="opacity-80">Recommended for production use.</h5>
             </header>
-            <ul className="my-4 flex flex-wrap justify-center gap-2 md:gap-1">
+            <ul className="my-4 flex flex-wrap justify-center gap-2">
               {[
                 "Uptime SLA",
                 "RBAC",
                 "SOC-2",
-                "Private Link",
+                "Encryption at Rest",
                 "Prometheus",
                 "Datadog",
               ].map((value) => {
                 return (
-                  <li className="inline-flex items-center gap-1 rounded-full border border-purple-300 py-1 pl-2 pr-3 text-sm font-medium">
+                  <li
+                    key={value}
+                    className="inline-flex items-center gap-1 rounded-full border border-purple-300 py-1 pl-2 pr-3 text-sm font-medium"
+                  >
                     <IconDiscountCheckFilled size={20} /> {value}
                   </li>
                 );

@@ -13,7 +13,7 @@ export function ServerlessBox({
       className={cx(
         "group relative z-0 grid gap-6 p-6 md:gap-8 md:p-8",
         "bg-white dark:bg-bg-mute",
-        "rounded-3xl md:rounded-4xl",
+        "rounded-3xl shadow-sm hover:shadow-xl md:rounded-4xl",
         className,
       )}
     >

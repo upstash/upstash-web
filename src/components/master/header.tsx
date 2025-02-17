@@ -51,7 +51,7 @@ export default function Header({ className, ...props }: HTMLProps<any>) {
           </div>
 
           <div className="flex justify-end">
-            <Button asChild className={cx(fix && "bg-white text-black")}>
+            <Button asChild variant={fix ? "primary" : "default"}>
               <a
                 target="_self"
                 href={

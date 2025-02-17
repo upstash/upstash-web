@@ -9,7 +9,7 @@ import cx from "@/utils/cx";
 
 export default function HomeHeroCustomer() {
   return (
-    <section className="relative pt-32">
+    <section className="relative z-10 py-8 md:py-16">
       <Bg />
 
       <Container>
@@ -32,9 +32,8 @@ export default function HomeHeroCustomer() {
               key={name}
               className={cx(
                 "group flex flex-col overflow-hidden px-4 py-3 sm:py-4",
-                "rounded-2xl bg-white md:rounded-4xl dark:bg-bg-mute dark:hover:bg-white",
-                "transition hover:shadow-2xl",
-                quote && "col-span-3 py-8 sm:px-16 sm:py-10",
+                "rounded-2xl bg-bg-mute md:rounded-4xl dark:bg-bg-mute dark:hover:bg-white",
+                quote && "col-span-3 bg-white py-8 shadow-sm sm:px-16 sm:py-10",
               )}
             >
               <span className="flex h-10 items-center justify-center opacity-80 transition group-hover:text-primary group-hover:opacity-100">

@@ -12,12 +12,12 @@ export function CommunityBox({
     <div
       className={cx(
         "group flex flex-col items-center p-6 md:p-8",
-        "bg-bg-mute transition",
+        "bg-white transition dark:bg-bg-mute",
         "rounded-lg first:rounded-t-3xl last:rounded-b-3xl",
         "md:rounded-lg md:first:rounded-t-lg md:last:rounded-b-lg",
         "lg:first:rounded-t-lg lg:last:rounded-b-lg",
         "lg:first:!rounded-l-4xl lg:last:!rounded-r-4xl",
-        "hover:scale-[1.02] hover:bg-emerald-500/10",
+        "hover:shadow-xl",
         className,
       )}
       {...props}
@@ -34,7 +34,10 @@ export function CommunityBoxTitle({
 }: HTMLProps<HTMLHeadingElement>) {
   return (
     <h4
-      className={cx("font-display text-xl font-medium md:text-2xl", className)}
+      className={cx(
+        "font-display text-xl font-semibold group-hover:text-primary md:text-2xl",
+        className,
+      )}
       {...props}
     >
       {children}
@@ -60,20 +63,10 @@ export function CommunityBoxButton({
   ...props
 }: HTMLProps<HTMLAnchorElement>) {
   return (
-    <Button
-      asChild
-      className={cx(
-        "mt-auto",
-        "group-hover:bg-primary group-hover:text-white",
-        className,
-      )}
-    >
+    <Button asChild className={cx("", className)}>
       <a target="_blank" {...props}>
         {children}
-        <IconArrowUpRight
-          size={20}
-          className="opacity-50 group-hover:opacity-100"
-        />
+        <IconArrowUpRight size={20} />
       </a>
     </Button>
   );

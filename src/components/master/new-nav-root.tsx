@@ -64,9 +64,9 @@ export function NewNavigationTrigger({ children }: NavigationMenuTriggerProps) {
       className={cx(
         "group flex select-none items-center gap-0.5",
         "rounded-full px-3 py-2 text-text-mute",
-        "hover:bg-white/5 hover:opacity-100",
+        "hover:bg-white/5 hover:text-primary-text",
         "data-[state=open]:bg-white/5",
-        "data-[state=open]:opacity-100",
+        "data-[state=open]:text-primary-text",
       )}
     >
       {children}
