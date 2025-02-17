@@ -1,5 +1,6 @@
 import "@upstash/claps/style.css";
-import "./globals.css";
+import "../styles/globals.css";
+import "../styles/prism.css";
 import Analytics from "@/components/Analytics";
 import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 import Footer from "@/components/master/footer";
@@ -31,14 +32,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="en"
-      className={cx(
-        fontText.variable,
-        fontDisplay.variable,
-        "min-h-screen scroll-smooth bg-zinc-950 text-sm text-zinc-50 antialiased md:text-base",
-      )}
+      className={cx(fontText.variable, fontDisplay.variable, "scroll-smooth")}
     >
       <PHProvider>
-        <body className="pt-[70px] md:pt-[80px]">
+        <body
+          className={cx(
+            "min-h-screen pt-[70px] antialiased md:pt-[80px]",
+            "text-sm text-text md:text-base",
+            "bg-bg",
+          )}
+        >
           <PostHogPageView />
           <Suspense>
             <Analytics />

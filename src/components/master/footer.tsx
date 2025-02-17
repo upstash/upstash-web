@@ -1,7 +1,9 @@
 import Button from "@/components/button";
 import Container from "@/components/container";
 import { Logo } from "@/components/logo";
+import OutLink from "@/components/out-link";
 import cx from "@/utils/cx";
+import Link from "next/link";
 import { HTMLProps } from "react";
 
 export interface IAppFooter extends HTMLProps<HTMLDivElement> {}
@@ -18,38 +20,30 @@ export default function Footer({ className, ...props }: IAppFooter) {
 
           <Logo />
 
-          <p className="mt-10 opacity-60">
+          <p className="mt-10 text-text-mute">
             © {new Date().getFullYear()} Upstash, Inc. Based in California.
           </p>
 
-          <div className="mt-2 flex flex-col items-center gap-4 md:flex-row">
-            <Button
-              href="/docs/common/help/support"
-              className="opacity-60 hover:opacity-100"
+          <div className="mt-2 flex flex-col items-center gap-4 text-text-mute md:flex-row">
+            <Link
+              href="/contact"
+              className="hover:text-primary hover:underline"
             >
               Contact Us
-            </Button>
-            <Button
-              href="/trust/privacy.pdf"
-              className="opacity-60 hover:opacity-100"
-            >
-              Privacy Policy
-            </Button>
-            <Button
-              href="/trust/terms.pdf"
-              className="opacity-60 hover:opacity-100"
-            >
-              Terms of Service
-            </Button>
+            </Link>
+            <OutLink href="/trust/privacy.pdf">Privacy Policy</OutLink>
+            <OutLink href="/trust/terms.pdf">Terms of Service</OutLink>
           </div>
 
+          {/* TODO: fix color */}
           <Button
-            href="https://status.upstash.com/"
-            className="mt-10 whitespace-nowrap rounded-full bg-emerald-400/10 px-4 py-1 text-emerald-500"
-            hideIcon
+            asChild
+            className="mt-10 whitespace-nowrap rounded-full bg-emerald-400/10 !py-2 px-4 text-emerald-500"
           >
-            <span className="-ml-1 mr-2 inline-flex h-3 w-3 animate-pulse rounded-full bg-current" />
-            <span className="">Status</span>
+            <a target="_blank" href="https://status.upstash.com/">
+              <span className="-ml-1 mr-2 inline-flex h-3 w-3 animate-pulse rounded-full bg-current" />
+              <span className="">Status</span>
+            </a>
           </Button>
 
           <div className="mt-10 space-y-2 text-xs opacity-40">

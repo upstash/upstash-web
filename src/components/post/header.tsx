@@ -3,7 +3,6 @@ import type { Post } from "@content";
 import { DateTime } from "luxon";
 import Image from "next/image";
 import Link from "next/link";
-import Balancer from "react-wrap-balancer";
 
 type Props = {
   post: Post;
@@ -23,8 +22,8 @@ export default function PostHeader({ post }: Props) {
         </div>
 
         {/* title */}
-        <h1 className="mx-4 mt-2 font-display text-4xl font-bold !leading-title md:text-6xl">
-          <Balancer>{post.title}</Balancer>
+        <h1 className="mx-4 mt-2 text-balance font-display text-4xl font-bold !leading-title md:text-6xl">
+          {post.title}
         </h1>
 
         <div className="mt-8 flex flex-col items-center justify-center gap-8 md:flex-row">
@@ -35,11 +34,11 @@ export default function PostHeader({ post }: Props) {
                 height={64}
                 alt={author.name}
                 src={author.image}
-                className="aspect-square shrink-0 rounded-full border-2 border-emerald-900/10 object-cover dark:border-emerald-500/40"
+                className="aspect-square shrink-0 rounded-full object-cover"
               />
               <Link
                 href={`/blog/author/${author.username}`}
-                className="mt-2 font-medium hover:text-emerald-400 hover:underline"
+                className="mt-2 font-medium hover:underline"
               >
                 {author.name}
               </Link>

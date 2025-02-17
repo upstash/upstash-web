@@ -62,7 +62,7 @@ export default function SectionMenu({
           }
           className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-zinc-100"
         >
-          <LogoIcon lightBg height={30} />
+          <LogoIcon height={30} />
         </SpyLink>
 
         <div className={cx("flex items-center")}>
@@ -82,14 +82,10 @@ export default function SectionMenu({
         </div>
 
         <div className="flex justify-end">
-          <Button
-            target="_self"
-            type="button"
-            hideIcon
-            className="bg-emerald-500"
-            href="https://console.upstash.com"
-          >
-            Login
+          <Button asChild>
+            <a href="https://console.upstash.com" target="_self">
+              Login
+            </a>
           </Button>
         </div>
       </div>

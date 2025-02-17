@@ -1,7 +1,7 @@
 import Button from "@/components/button";
 import Container from "@/components/container";
 import type { Job } from "@content";
-import Balancer from "react-wrap-balancer";
+import { IconArrowUpRight } from "@tabler/icons-react";
 
 type Props = {
   job: Job;
@@ -12,8 +12,8 @@ export default function CareerHeader({ job }: Props) {
     <header className="py-20 text-center">
       <Container className="max-w-screen-lg">
         {/* title */}
-        <h1 className="mx-4 mt-2 font-display text-4xl font-bold !leading-title md:text-6xl">
-          <Balancer>{job.title}</Balancer>
+        <h1 className="mx-4 mt-2 text-balance font-display text-4xl font-bold !leading-title md:text-6xl">
+          {job.title}
         </h1>
 
         {/* meta */}
@@ -24,9 +24,9 @@ export default function CareerHeader({ job }: Props) {
             { title: "Location", value: job.location },
           ].map((o) => {
             return (
-              <div key={o.title} className="inline-flex gap-1 text-lg">
-                <span className="opacity-40">{o.title}:</span>
-                <span>{o.value}</span>
+              <div key={o.title} className="inline-flex gap-1">
+                <span className="opacity-60">{o.title}:</span>
+                <span className="font-semibold">{o.value}</span>
               </div>
             );
           })}
@@ -35,21 +35,16 @@ export default function CareerHeader({ job }: Props) {
         {/* skills */}
         <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
           {job.skills.map((skill: string) => (
-            <span
-              className="rounded bg-white/3 px-3 py-1 text-zinc-400"
-              key={skill}
-            >
+            <span className="rounded bg-bg-mute px-3 py-1" key={skill}>
               {skill}
             </span>
           ))}
         </div>
 
-        <Button
-          type="button"
-          href="mailto:jobs@upstash.com"
-          className="mt-10 bg-emerald-400 text-zinc-950"
-        >
-          Apply now
+        <Button asChild variant="primary" className="mt-10">
+          <a href="mailto:jobs@upstash.com" target="_blank">
+            Apply now <IconArrowUpRight size={20} />
+          </a>
         </Button>
       </Container>
     </header>

@@ -1,5 +1,3 @@
-"use client";
-
 import VectorFaqJson from "@/../public/faq/vector.json";
 import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
@@ -15,23 +13,31 @@ export default function PricingVectorPage() {
   const structuredFaqSchema = generateFaqSchema(VectorFaqJson);
 
   return (
-    <div>
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: structuredFaqSchema,
         }}
       />
-      <ProductToggle product={"/vector"} />
 
-      <div className="mt-16 md:mt-20">
-        <PricingTable />
+      <section>
+        <Container className="max-w-screen-lg">
+          <ProductToggle product={"/vector"} />
 
-        <div className="mt-10 md:mt-20">
-          <Enterprise />
-        </div>
+          <div className="mt-12 md:mt-20">
+            <PricingTable />
+          </div>
 
-        <div className="mt-32 md:mt-40">
+          <div className="mt-6 md:mt-16">
+            <Enterprise />
+          </div>
+        </Container>
+      </section>
+
+      {/* Compare Table */}
+      <section className="mt-32 md:mt-40">
+        <Container className="max-w-screen-xl">
           <header>
             <PageHeaderTitle as="h2" className="md:text-4xl">
               Compare Plans
@@ -44,19 +50,20 @@ export default function PricingVectorPage() {
           <div className="mt-12 md:mt-16">
             <CompareTable />
           </div>
-        </div>
+        </Container>
+      </section>
 
-        <div className="mt-32 md:mt-40">
-          <Container className="max-w-screen-md">
-            <PageHeaderTitle as="h2" className="mb md:text-4xl">
-              FAQ
-            </PageHeaderTitle>
-            <div className="mt-10">
-              <FAQ />
-            </div>
-          </Container>
-        </div>
-      </div>
-    </div>
+      {/* FAQ */}
+      <section className="mt-32 md:mt-40">
+        <Container className="max-w-screen-md">
+          <PageHeaderTitle as="h2" className="mb md:text-4xl">
+            FAQ
+          </PageHeaderTitle>
+          <div className="mt-10">
+            <FAQ />
+          </div>
+        </Container>
+      </section>
+    </>
   );
 }

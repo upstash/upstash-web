@@ -1,6 +1,5 @@
 import cx from "@/utils/cx";
 import { HTMLProps, ReactNode } from "react";
-import Balancer from "react-wrap-balancer";
 
 type IPageHeaderTitle = HTMLProps<HTMLHeadingElement> & {
   children: ReactNode;
@@ -16,20 +15,20 @@ export default function PageHeaderTitle({
   const Tag = as;
 
   const size = {
-    h1: "text-4xl md:text-6xl",
-    h2: "text-3xl md:text-5xl",
+    h1: "text-4xl md:text-5xl",
+    h2: "text-2xl md:text-4xl",
   };
 
   return (
     <Tag
       className={cx(
-        "font-display font-bold !leading-title",
+        "text-balance font-display font-semibold !leading-title",
         size[as],
         className,
       )}
       {...props}
     >
-      <Balancer>{children}</Balancer>
+      {children}
     </Tag>
   );
 }

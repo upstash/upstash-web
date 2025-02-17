@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function PricingLayout({ children }: { children: ReactNode }) {
   return (
     <main className="relative z-0 text-center">
-      <Bg className="opacity-10" />
+      <Bg />
 
       <section className="py-16 md:pb-32 md:pt-20">
         <Container className="max-w-screen-lg">
@@ -27,9 +27,7 @@ export default function PricingLayout({ children }: { children: ReactNode }) {
           </header>
         </Container>
 
-        <div className="mt-6 md:mt-8">
-          <Container>{children}</Container>
-        </div>
+        <div className="mt-6 md:mt-8">{children}</div>
       </section>
     </main>
   );

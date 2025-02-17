@@ -434,7 +434,7 @@ function Toc({ className, children, ...props }: HTMLProps<HTMLDetailsElement>) {
       open={true}
       role="navigation"
       aria-label="Use Cases"
-      className={cx("group/toc", className)}
+      className={cx("group", className)}
       {...props}
     >
       {children}

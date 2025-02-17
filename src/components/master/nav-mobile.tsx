@@ -1,4 +1,5 @@
 import Button from "@/components/button";
+import { useGetAffiliateCodeFromApi } from "@/hooks/use-affiliate-code";
 import cx from "@/utils/cx";
 import { allJobs } from "@content";
 import Link, { LinkProps } from "next/link";
@@ -7,16 +8,18 @@ import React, { HTMLProps, ReactNode } from "react";
 const jobLength = allJobs.filter((o) => !o.draft).length;
 
 export default function NavMobile({ hidden }: HTMLProps<HTMLDivElement> & {}) {
+  const { affiliateCode } = useGetAffiliateCodeFromApi();
+
   return (
     <nav
       className={cx(
         "absolute inset-x-0 top-full z-10 mt-px flex-col p-6",
-        "bg-zinc-950 shadow-2xl",
+        "bg-bg shadow-2xl",
         hidden ? "flex" : "hidden",
       )}
     >
       {/* items */}
-      <div className="flex flex-col divide-y divide-white/5">
+      <div className="flex flex-col divide-y divide-black/5 dark:divide-white/5">
         {NavItems.map((item) => {
           return (
             <NavLink key={item.href} href={item.href}>
@@ -28,14 +31,16 @@ export default function NavMobile({ hidden }: HTMLProps<HTMLDivElement> & {}) {
       </div>
 
       {/* login */}
-      <Button
-        type="button"
-        target="_self"
-        hideIcon
-        href="https://console.upstash.com"
-        className="my-6 justify-center bg-emerald-400 py-3 font-display text-lg font-medium text-zinc-950"
-      >
-        Login
+      <Button asChild variant="primary" className="my-6">
+        <a
+          href={
+            affiliateCode
+              ? `https://console.upstash.com/?code=${affiliateCode}`
+              : "https://console.upstash.com"
+          }
+        >
+          Login
+        </a>
       </Button>
     </nav>
   );
@@ -58,7 +63,7 @@ function NavLink({
     >
       {children}
       {href === "/careers" && (
-        <span className="flex items-center rounded-full bg-emerald-300/20 px-1.5 py-1 font-mono text-sm leading-none text-emerald-500">
+        <span className="flex items-center rounded-full bg-emerald-300/20 px-1.5 py-1 font-mono text-sm leading-none text-primary">
           {jobLength}
         </span>
       )}
@@ -72,8 +77,8 @@ const NavItems: {
   children?: ReactNode;
 }[] = [
   {
-    name: "Pricing",
-    href: "/pricing",
+    name: "Enterprise",
+    href: "/enterprise",
   },
   {
     name: "Docs",
@@ -84,24 +89,19 @@ const NavItems: {
     href: "/blog",
   },
   {
-    name: "Examples",
-    href: "/examples",
+    name: "Pricing",
+    href: "/pricing",
   },
-
   {
     name: "Careers",
     href: "/careers",
-  },
-  {
-    name: "Customers",
-    href: "/customers",
   },
   {
     name: "About",
     href: "/about",
   },
   {
-    name: "Discord",
-    href: "https://upstash.com/discord",
+    name: "Contact Us",
+    href: "/contact",
   },
 ];

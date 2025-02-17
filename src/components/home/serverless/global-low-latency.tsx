@@ -20,11 +20,11 @@ export default function GlobalLowLatency() {
           <div
             key={i}
             className={cx(
-              "flex h-10 w-[8px] items-end rounded-full bg-black/20 md:h-16",
+              "flex h-10 w-[8px] items-end rounded-full bg-bg-mute md:h-16",
               i > 15 && "hidden md:flex",
             )}
           >
-            <span className={cx("h-4 w-full rounded-full bg-emerald-400")} />
+            <span className={cx("h-4 w-full rounded-full bg-primary")} />
           </div>
         ))}
       </div>

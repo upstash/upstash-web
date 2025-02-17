@@ -1,0 +1,108 @@
+/**
+ * prism.js Dark theme for JavaScript, CSS and HTML
+ */
+
+code[class*="language-"],
+pre[class*="language-"] {
+  background: none;
+  color: #e4e4e7;
+  /*font-size: 1em;*/
+  hyphens: none;
+  line-height: 1.5;
+  tab-size: 2;
+  text-align: left;
+  white-space: pre;
+  word-break: normal;
+  word-spacing: normal;
+  word-wrap: normal;
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+  overflow: auto;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+  background: none;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+  white-space: normal;
+}
+
+.token.comment,
+.token.block-comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #ffffff50;
+}
+
+.token.punctuation {
+  color: #ffffff;
+}
+
+.token.tag,
+.token.attr-name,
+.token.namespace,
+.token.deleted {
+  color: #ffffff;
+}
+
+.token.function-name {
+  color: #ffffff;
+}
+
+.token.boolean,
+.token.number,
+.token.function {
+  color: #ffffff;
+}
+
+.token.property,
+.token.class-name,
+.token.constant,
+.token.symbol {
+  color: #e9d5ff;
+}
+
+.token.selector,
+.token.important,
+.token.atrule,
+.token.keyword,
+.token.builtin {
+  color: #e9d5ff;
+}
+
+.token.string,
+.token.char,
+.token.attr-value,
+.token.regex,
+.token.variable {
+  color: #34d399;
+}
+
+.token.operator,
+.token.entity,
+.token.url {
+  color: #ffffff;
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+.token.inserted {
+  color: #34d399;
+}

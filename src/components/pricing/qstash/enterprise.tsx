@@ -1,68 +1,48 @@
 import Button from "@/components/button";
+import { IconCircleCheckFilled } from "@tabler/icons-react";
+import Link from "next/link";
 import * as React from "react";
 
 export default function PricingTableEnterprise() {
   return (
-    <div className="items-center rounded-3xl border-2 border-emerald-300/10 bg-emerald-300/3 px-10 py-8 text-left text-emerald-100 md:mx-32 md:flex md:px-16 md:py-10">
-      <div className="grow">
-        <h4 className="text-2xl font-semibold text-emerald-400">Enterprise</h4>
+    <div className="flex flex-col items-center justify-center rounded-3xl border-2 border-bg-mute bg-bg-mute px-10 py-8 md:flex-row md:px-16 md:py-10 md:text-left">
+      <div>
+        <h4 className="text-2xl font-semibold text-primary-text">Enterprise</h4>
         <p className="">For businesses with advanced needs.</p>
 
         <Button
-          type="button"
-          href="mailto:sales@upstash.com"
-          className="-ml-1 mt-4 hidden bg-emerald-400 font-medium text-zinc-950 md:inline-flex"
+          asChild
+          variant="secondary"
+          className="-ml-1 mt-4 hidden md:inline-flex"
         >
-          Contact Us
+          <Link href="/contact">Contact Us</Link>
         </Button>
       </div>
 
-      <div className="mt-6 md:mt-0">
+      <div className="mt-6 md:ml-24 md:mt-0">
         <ul className="space-y-2">
           <li className="flex items-center gap-1">
-            <Icon /> 100M+ messages daily
+            <IconCircleCheckFilled size={20} className="fill-primary-text" />{" "}
+            100M+ messages daily
           </li>
           <li className="flex items-center gap-1">
-            <Icon /> Unlimited bandwidth
+            <IconCircleCheckFilled size={20} className="fill-primary-text" />{" "}
+            Unlimited bandwidth
           </li>
           <li className="flex items-center gap-1">
-            <Icon /> Professional support with SLA
+            <IconCircleCheckFilled size={20} className="fill-primary-text" />{" "}
+            Professional support with SLA
           </li>
           <li className="flex items-center gap-1">
-            <Icon /> Dedicated resources for isolation
+            <IconCircleCheckFilled size={20} className="fill-primary-text" />{" "}
+            Dedicated resources for isolation
           </li>
         </ul>
       </div>
 
-      <Button
-        type="button"
-        href="mailto:support@upstash.com"
-        className="-ml-1 mt-6 bg-emerald-400 font-medium text-zinc-950 md:hidden"
-      >
-        Contact Us
+      <Button asChild variant="secondary" className="-ml-1 mt-6 md:hidden">
+        <Link href="/contact">Contact Us</Link>
       </Button>
     </div>
   );
 }
-
-const Icon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="inline-flex text-emerald-400"
-    width="20"
-    height="20"
-    viewBox="0 0 24 24"
-    strokeWidth="1.25"
-    stroke="currentColor"
-    fill="none"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <title> </title>
-    <path
-      d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-1.293 5.953a1 1 0 0 0 -1.32 -.083l-.094 .083l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.403 1.403l.083 .094l2 2l.094 .083a1 1 0 0 0 1.226 0l.094 -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z"
-      strokeWidth="0"
-      fill="currentColor"
-    />
-  </svg>
-);
