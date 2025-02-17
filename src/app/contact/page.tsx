@@ -62,7 +62,11 @@ export default function HomePage() {
 
           <hr className="bordeer-b mx-24 my-6 border-0 border-b-2 border-dashed border-bg-mute md:mx-32" />
 
-          <Link href="/discord" className="bg-bg-mute shadow-none">
+          <Link
+            href="https://discord.gg/jUxUYE4nEB"
+            target="_blank"
+            className="bg-bg-mute shadow-none"
+          >
             <span>
               <b className="text-primary-text">Join</b>{" "}
               <span className="opacity-60">our Discord Community</span>
@@ -70,7 +74,11 @@ export default function HomePage() {
             <IconBrandDiscord size={40} strokeWidth={1.5} />
           </Link>
 
-          <Link href="/x" target="_blank" className="bg-bg-mute shadow-none">
+          <Link
+            href="https://x.com/upstash"
+            target="_blank"
+            className="bg-bg-mute shadow-none"
+          >
             <span>
               <b className="text-primary-text">Follow</b>{" "}
               <span className="opacity-60">us on X</span>
@@ -79,7 +87,7 @@ export default function HomePage() {
           </Link>
 
           <Link
-            href="/github"
+            href="https://github.com/upstash"
             target="_blank"
             className="bg-bg-mute shadow-none"
           >
