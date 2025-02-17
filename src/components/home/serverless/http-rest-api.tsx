@@ -82,29 +82,32 @@ const CODE = {
   [Product.REDIS]: `import { Redis } from '@upstash/redis'
 
 const redis = new Redis({
-  url: 'https://obi-wan-kenobi-31346.upstash.io',
-  token: 'TOKEN',
+  url: "<UPSTASH_REDIS_REST_URL>",
+  token: "<UPSTASH_REDIS_REST_TOKEN>",
 })
    
-const data = await redis.set('foo', 'bar');`,
-  [Product.QSTASH]: `fetch("https://qstash.upstash.io/v2/publish/https://example.com", {
-  body: "{ 'hello': 'world' }",
-  headers: {
-    Authorization: "Bearer XXX",
-    "Content-Type": "application/json",
-    "Upstash-Forward-My-Header": "my-value"
+const data = await redis.set("foo', "bar");`,
+  [Product.QSTASH]: `import { Client } from "@upstash/qstash";
+
+const client = new Client({
+  token: "<QSTASH_TOKEN>",
+});
+
+const res = await client.publishJSON({
+  url: "https://my-api...",
+  body: {
+    hello: "world",
   },
-  method: "POST"
-})`,
-  [Product.VECTOR]: `from upstash_vector import Index
+});`,
+  [Product.VECTOR]: `import { Index } from "@upstash/vector";
 
-index = Index(url="https://master-yoda-eu1-vector.upstash.io/query", token="XXX")
+const index = new Index<Metadata>({
+  url: "<UPSTASH_VECTOR_REST_URL>",
+  token: "<UPSTASH_VECTOR_REST_TOKEN>",
+});
 
-index.upsert(
-  vectors=[("id-1", [0.72, 0.7], {"meta_key": "meta_value"})]
-)
-
-index.query(
-  vector=[0.72, 0.7], top_k=1, include_vectors=True, include_metadata=True
-)`,
+await index.upsert([{
+  id: 'tokyo',
+  data: "Tokyo is the capital of Japan.",
+}])`,
 };
