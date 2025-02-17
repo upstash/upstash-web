@@ -62,7 +62,7 @@ export default function NewNavigation() {
             "contact" === segment ? "bg-bg-mute text-primary-text" : "",
           )}
         >
-          <Link href="/contact">Support</Link>
+          <Link href="/contact">Contact Us</Link>
         </NavigationMenu.Link>
       </NavigationMenu.Item>
 

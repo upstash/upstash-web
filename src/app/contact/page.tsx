@@ -5,6 +5,8 @@ import PageHeaderTitle from "@/components/page-header-title";
 import cx from "@/utils/cx";
 import {
   IconBrandDiscord,
+  IconBrandGithub,
+  IconBrandX,
   IconCalendarEvent,
   IconMail,
   IconMessageDots,
@@ -32,34 +34,60 @@ export default function HomePage() {
           </PageHeaderDesc>
         </header>
 
-        <div className="mx-auto mt-20 grid max-w-2xl gap-4 md:gap-6">
+        <div className="mx-auto mt-20 grid max-w-2xl gap-4">
           <Link href="https://calendly.com/upstash" target="_blank">
             <span>
-              <b>Book</b> <span className="opacity-60">a Meeting</span>
+              <b className="text-primary-text">Book</b>{" "}
+              <span className="opacity-60">a Meeting</span>
             </span>
             <IconCalendarEvent size={40} strokeWidth={1.5} />
           </Link>
 
+          {/* TODO: link? */}
           <Link href="" target="_blank">
             <span>
-              <b>Chat</b> <span className="opacity-60">with Team</span>
+              <b className="text-primary-text">Chat</b>{" "}
+              <span className="opacity-60">with Team</span>
             </span>
             <IconMessageDots size={40} strokeWidth={1.5} />
           </Link>
 
-          <Link href="">
+          <Link href="mailto:support@upstash.com" target="_blank">
             <span>
-              <b>Send</b> <span className="opacity-60">us an Email</span>
+              <b className="text-primary-text">Send</b>{" "}
+              <span className="opacity-60">us an Email</span>
             </span>
             <IconMail size={40} strokeWidth={1.5} />
           </Link>
 
-          <Link href="" target="_blank">
+          <hr className="bordeer-b mx-24 my-6 border-0 border-b-2 border-dashed border-bg-mute md:mx-32" />
+
+          <Link href="/discord" className="bg-bg-mute shadow-none">
             <span>
-              <b>Join</b>{" "}
+              <b className="text-primary-text">Join</b>{" "}
               <span className="opacity-60">our Discord Community</span>
             </span>
             <IconBrandDiscord size={40} strokeWidth={1.5} />
+          </Link>
+
+          <Link href="/x" target="_blank" className="bg-bg-mute shadow-none">
+            <span>
+              <b className="text-primary-text">Follow</b>{" "}
+              <span className="opacity-60">us on X</span>
+            </span>
+            <IconBrandX size={40} strokeWidth={1.5} />
+          </Link>
+
+          <Link
+            href="/github"
+            target="_blank"
+            className="bg-bg-mute shadow-none"
+          >
+            <span>
+              <b className="text-primary-text">Explore</b>{" "}
+              <span className="opacity-60">our code on GitHub</span>
+            </span>
+            <IconBrandGithub size={40} strokeWidth={1.5} />
           </Link>
         </div>
       </Container>
@@ -71,7 +99,10 @@ function Link({ className, ...props }: React.ComponentProps<"a">) {
   return (
     <a
       className={cx(
-        "group flex items-center justify-between rounded-3xl border-2 border-transparent bg-white p-6 text-left text-xl shadow-sm hover:border-primary hover:bg-emerald-50 hover:text-primary-text md:rounded-4xl md:p-8 md:text-2xl",
+        "group flex items-center justify-between",
+        "rounded-3xl border-2 border-transparent bg-white p-4 text-left text-xl shadow-sm",
+        "md:rounded-4xl md:p-7 md:text-2xl",
+        "hover:border-primary hover:bg-emerald-50 hover:text-primary-text",
         className,
       )}
       {...props}

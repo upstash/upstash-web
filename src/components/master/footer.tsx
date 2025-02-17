@@ -3,6 +3,7 @@ import Container from "@/components/container";
 import { Logo } from "@/components/logo";
 import OutLink from "@/components/out-link";
 import cx from "@/utils/cx";
+import Link from "next/link";
 import { HTMLProps } from "react";
 
 export interface IAppFooter extends HTMLProps<HTMLDivElement> {}
@@ -24,7 +25,12 @@ export default function Footer({ className, ...props }: IAppFooter) {
           </p>
 
           <div className="mt-2 flex flex-col items-center gap-4 text-text-mute md:flex-row">
-            <OutLink href="/docs/common/help/support">Contact Us</OutLink>
+            <Link
+              href="/contact"
+              className="hover:text-primary hover:underline"
+            >
+              Contact Us
+            </Link>
             <OutLink href="/trust/privacy.pdf">Privacy Policy</OutLink>
             <OutLink href="/trust/terms.pdf">Terms of Service</OutLink>
           </div>
