@@ -2,7 +2,6 @@ import Bg from "@/components/bg";
 import Button from "@/components/button";
 import Container from "@/components/container";
 import cx from "@/utils/cx";
-import { IconArrowUpRight } from "@tabler/icons-react";
 import Link from "next/link";
 
 export default function SectionHero() {
@@ -34,9 +33,7 @@ export default function SectionHero() {
 
           <div className="mt-10">
             <Button asChild variant="primary">
-              <Link href="/contact">
-                Contact Us <IconArrowUpRight size={24} />
-              </Link>
+              <Link href="/contact">Contact Us</Link>
             </Button>
           </div>
         </div>

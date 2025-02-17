@@ -1,15 +1,14 @@
 import cx from "@/utils/cx";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
+import { IconArrowUpRight } from "@tabler/icons-react";
 import Link from "next/link";
 import { useSelectedLayoutSegment } from "next/navigation";
 import React from "react";
 import ItemCompany from "./new-nav-company";
 import NewNavigationRoot from "./new-nav-root";
-import ItemSupport from "./new-nav-support";
 
 export default function NewNavigation() {
   const segment = useSelectedLayoutSegment();
-  const isPricing = "pricing" === segment;
 
   return (
     <NewNavigationRoot>
@@ -17,23 +16,12 @@ export default function NewNavigation() {
         <NavigationMenu.Link
           asChild
           className={cx(
-            "flex select-none items-center gap-0.5 rounded-full px-3 py-2",
+            "flex select-none items-center gap-0.5 rounded-full px-4 py-2",
             "text-text-mute hover:bg-white/5 hover:text-primary-text",
+            "pricing" === segment ? "bg-bg-mute text-primary-text" : "",
           )}
         >
-          <Link href="/docs">Docs</Link>
-        </NavigationMenu.Link>
-      </NavigationMenu.Item>
-
-      <NavigationMenu.Item>
-        <NavigationMenu.Link
-          asChild
-          className={cx(
-            "flex select-none items-center gap-0.5 rounded-full px-3 py-2",
-            "text-text-mute hover:bg-white/5 hover:text-primary-text",
-          )}
-        >
-          <Link href="/blog">Blog</Link>
+          <Link href="/pricing">Pricing</Link>
         </NavigationMenu.Link>
       </NavigationMenu.Item>
 
@@ -43,7 +31,7 @@ export default function NewNavigation() {
           className={cx(
             "flex select-none items-center gap-0.5 rounded-full px-4 py-2",
             "text-text-mute hover:bg-white/5 hover:text-primary-text",
-            isPricing ? "bg-white/5 opacity-100" : "",
+            "enterprise" === segment ? "bg-bg-mute text-primary-text" : "",
           )}
         >
           <Link href="/enterprise">Enterprise</Link>
@@ -54,17 +42,43 @@ export default function NewNavigation() {
         <NavigationMenu.Link
           asChild
           className={cx(
-            "flex select-none items-center gap-0.5 rounded-full px-4 py-2",
+            "flex select-none items-center gap-0.5 rounded-full px-3 py-2",
             "text-text-mute hover:bg-white/5 hover:text-primary-text",
-            isPricing ? "bg-white/5 opacity-100" : "",
+            "blog" === segment ? "bg-bg-mute text-primary-text" : "",
           )}
         >
-          <Link href="/pricing">Pricing</Link>
+          <Link href="/blog">Blog</Link>
         </NavigationMenu.Link>
       </NavigationMenu.Item>
 
       <ItemCompany />
-      <ItemSupport />
+
+      <NavigationMenu.Item>
+        <NavigationMenu.Link
+          asChild
+          className={cx(
+            "flex select-none items-center gap-0.5 rounded-full px-3 py-2",
+            "text-text-mute hover:bg-white/5 hover:text-primary-text",
+            "contact" === segment ? "bg-bg-mute text-primary-text" : "",
+          )}
+        >
+          <Link href="/contact">Support</Link>
+        </NavigationMenu.Link>
+      </NavigationMenu.Item>
+
+      <NavigationMenu.Item>
+        <NavigationMenu.Link
+          asChild
+          className={cx(
+            "flex select-none items-center gap-0.5 rounded-full px-3 py-2",
+            "text-text-mute hover:bg-white/5 hover:text-primary-text",
+          )}
+        >
+          <Link href="/docs">
+            Docs <IconArrowUpRight className="opacity-60" size={16} />
+          </Link>
+        </NavigationMenu.Link>
+      </NavigationMenu.Item>
     </NewNavigationRoot>
   );
 }
