@@ -50,7 +50,7 @@ export default function PricingRedisPage() {
           {/* PROD PACK */}
           <div className="mt-6 rounded-4xl border-2 border-dotted border-purple-300 bg-gradient-to-b from-purple-50 to-white p-8 text-purple-800 md:mt-16 md:p-12 dark:border-0 dark:from-purple-500/10 dark:to-purple-500/30 dark:text-purple-200">
             <header>
-              <h3 className="text-xl font-bold">Prod Pack</h3>
+              <h3 className="text-xl font-bold">PROD PACK</h3>
               <h5 className="opacity-80">Recommended for production use.</h5>
             </header>
             <ul className="my-4 flex flex-wrap justify-center gap-2">
@@ -72,9 +72,8 @@ export default function PricingRedisPage() {
                 );
               })}
             </ul>
-            <p className="text-xs opacity-60">
-              Optionally, separate for each database
-            </p>
+
+            <p className="font-semibold">$200 per database</p>
           </div>
         </Container>
       </section>

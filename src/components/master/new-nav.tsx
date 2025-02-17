@@ -16,12 +16,13 @@ export default function NewNavigation() {
         <NavigationMenu.Link
           asChild
           className={cx(
-            "flex select-none items-center gap-0.5 rounded-full px-4 py-2",
+            "flex select-none items-center gap-0.5 rounded-full px-3 py-2",
             "text-text-mute hover:bg-white/5 hover:text-primary-text",
-            "pricing" === segment ? "bg-bg-mute text-primary-text" : "",
           )}
         >
-          <Link href="/pricing">Pricing</Link>
+          <Link href="/docs">
+            Docs <IconArrowUpRight className="opacity-60" size={16} />
+          </Link>
         </NavigationMenu.Link>
       </NavigationMenu.Item>
 
@@ -31,10 +32,10 @@ export default function NewNavigation() {
           className={cx(
             "flex select-none items-center gap-0.5 rounded-full px-4 py-2",
             "text-text-mute hover:bg-white/5 hover:text-primary-text",
-            "enterprise" === segment ? "bg-bg-mute text-primary-text" : "",
+            "pricing" === segment ? "bg-bg-mute text-primary-text" : "",
           )}
         >
-          <Link href="/enterprise">Enterprise</Link>
+          <Link href="/pricing">Pricing</Link>
         </NavigationMenu.Link>
       </NavigationMenu.Item>
 
@@ -57,12 +58,12 @@ export default function NewNavigation() {
         <NavigationMenu.Link
           asChild
           className={cx(
-            "flex select-none items-center gap-0.5 rounded-full px-3 py-2",
+            "flex select-none items-center gap-0.5 rounded-full px-4 py-2",
             "text-text-mute hover:bg-white/5 hover:text-primary-text",
-            "contact" === segment ? "bg-bg-mute text-primary-text" : "",
+            "enterprise" === segment ? "bg-bg-mute text-primary-text" : "",
           )}
         >
-          <Link href="/contact">Contact Us</Link>
+          <Link href="/enterprise">Enterprise</Link>
         </NavigationMenu.Link>
       </NavigationMenu.Item>
 
@@ -72,11 +73,10 @@ export default function NewNavigation() {
           className={cx(
             "flex select-none items-center gap-0.5 rounded-full px-3 py-2",
             "text-text-mute hover:bg-white/5 hover:text-primary-text",
+            "contact" === segment ? "bg-bg-mute text-primary-text" : "",
           )}
         >
-          <Link href="/docs">
-            Docs <IconArrowUpRight className="opacity-60" size={16} />
-          </Link>
+          <Link href="/contact">Contact Us</Link>
         </NavigationMenu.Link>
       </NavigationMenu.Item>
     </NewNavigationRoot>

@@ -66,9 +66,9 @@ export default function HomeCommunity() {
               className="mb-4 hidden text-4xl group-hover:text-primary sm:inline-flex md:text-5xl"
               strokeWidth="1"
             />
-            <CommunityBoxTitle>Twitter</CommunityBoxTitle>
+            <CommunityBoxTitle>X</CommunityBoxTitle>
             <CommunityBoxDesc>
-              Follow us on Twitter to stay up to date with the latest news from
+              Follow us on X to stay up to date with the latest news from
               Upstash.
             </CommunityBoxDesc>
             <CommunityBoxButton href="https://twitter.com/upstash">
