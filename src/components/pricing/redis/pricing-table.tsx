@@ -142,7 +142,7 @@ export default function PricingTable({
             {showFixed10GB && <>$100</>}
             {showFixed50GB && <>$200</>}
             {showFixed100GB && <>$400</>}
-            {showFixed500GB && <>$750</>}✕ read region
+            {showFixed500GB && <>$750</>}✕ read regions
           </p>
         </div>
 

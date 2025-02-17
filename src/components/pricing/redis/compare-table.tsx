@@ -1417,43 +1417,43 @@ export default function CompareTable({
             {selectedFixed250MB && (
               <CompareValue>
                 $10 <br />
-                +($5 ✕ read region)
+                +($5 ✕ read regions)
               </CompareValue>
             )}
             {selectedFixed1GB && (
               <CompareValue>
                 $20 <br />
-                +($10 ✕ read region)
+                +($10 ✕ read regions)
               </CompareValue>
             )}
             {selectedFixed5GB && (
               <CompareValue>
                 $100 <br />
-                +($50 ✕ read region)
+                +($50 ✕ read regions)
               </CompareValue>
             )}
             {selectedFixed10GB && (
               <CompareValue>
                 $200 <br />
-                +($100 ✕ read region)
+                +($100 ✕ read regions)
               </CompareValue>
             )}
             {selectedFixed50GB && (
               <CompareValue>
                 $400 <br />
-                +($200 ✕ read region)
+                +($200 ✕ read regions)
               </CompareValue>
             )}
             {selectedFixed100GB && (
               <CompareValue>
                 $800 <br />
-                +($400 ✕ read region)
+                +($400 ✕ read regions)
               </CompareValue>
             )}
             {selectedFixed500GB && (
               <CompareValue>
                 $1500 <br />
-                +($750 ✕ read region)
+                +($750 ✕ read regions)
               </CompareValue>
             )}
           </Col>
