@@ -1630,7 +1630,7 @@ function MobileSelectCol({
   return (
     <select
       className={cx(
-        "mb-2 bg-white px-4 py-2 font-semibold md:hidden",
+        "mb-2 bg-white px-4 py-2 font-semibold md:hidden dark:bg-bg-mute",
         className,
       )}
       {...props}

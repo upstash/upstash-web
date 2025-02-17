@@ -47,32 +47,31 @@ export default function PricingRedisPage() {
             />
           </div>
 
-          <div className="mt-6 md:mt-16">
-            <div className="rounded-4xl border-2 border-dotted border-purple-300 bg-gradient-to-b from-purple-50 to-white p-8 text-purple-800 md:p-8">
-              <header>
-                <h3 className="text-lg font-bold">Prod Pack</h3>
-                <h5 className="opacity-80">Recommended for production use.</h5>
-              </header>
-              <ul className="my-4 flex flex-wrap justify-center gap-2 md:gap-1">
-                {[
-                  "Uptime SLA",
-                  "RBAC",
-                  "SOC-2",
-                  "Private Link",
-                  "Prometheus",
-                  "Datadog",
-                ].map((value) => {
-                  return (
-                    <li className="inline-flex items-center gap-1 rounded-full border border-purple-300 py-1 pl-2 pr-3 text-sm font-medium">
-                      <IconDiscountCheckFilled size={20} /> {value}
-                    </li>
-                  );
-                })}
-              </ul>
-              <p className="text-xs opacity-60">
-                Optionally, separate for each database
-              </p>
-            </div>
+          {/* PROD PACK */}
+          <div className="mt-6 rounded-4xl border-2 border-dotted border-purple-300 bg-gradient-to-b from-purple-50 to-white p-8 text-purple-800 md:mt-16 md:p-12 dark:border-0 dark:from-purple-500/10 dark:to-purple-500/30 dark:text-purple-200">
+            <header>
+              <h3 className="text-xl font-bold">Prod Pack</h3>
+              <h5 className="opacity-80">Recommended for production use.</h5>
+            </header>
+            <ul className="my-4 flex flex-wrap justify-center gap-2 md:gap-1">
+              {[
+                "Uptime SLA",
+                "RBAC",
+                "SOC-2",
+                "Private Link",
+                "Prometheus",
+                "Datadog",
+              ].map((value) => {
+                return (
+                  <li className="inline-flex items-center gap-1 rounded-full border border-purple-300 py-1 pl-2 pr-3 text-sm font-medium">
+                    <IconDiscountCheckFilled size={20} /> {value}
+                  </li>
+                );
+              })}
+            </ul>
+            <p className="text-xs opacity-60">
+              Optionally, separate for each database
+            </p>
           </div>
         </Container>
       </section>
