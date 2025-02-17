@@ -20,7 +20,7 @@ export default function GlobalLowLatency() {
           <div
             key={i}
             className={cx(
-              "flex h-10 w-[8px] items-end rounded-full bg-bg md:h-16",
+              "flex h-10 w-[8px] items-end rounded-full bg-bg-mute md:h-16",
               i > 15 && "hidden md:flex",
             )}
           >

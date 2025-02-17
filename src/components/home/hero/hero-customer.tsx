@@ -24,20 +24,20 @@ export default function HomeHeroCustomer() {
 
         <div
           className={cx(
-            "mt-16 grid grid-cols-3 gap-2 rounded-2xl md:mt-24 md:grid-cols-4 md:gap-6",
+            "mt-16 grid grid-cols-3 gap-2 rounded-2xl md:mt-24 md:grid-cols-6 md:gap-6",
           )}
         >
           {customers.map(({ name, icon, quote }) => (
             <div
               key={name}
               className={cx(
-                "group flex flex-col overflow-hidden px-6 py-4 sm:py-6",
+                "group flex flex-col overflow-hidden px-4 py-3 sm:py-4",
                 "rounded-2xl bg-white md:rounded-4xl dark:bg-bg-mute dark:hover:bg-white",
                 "transition hover:shadow-2xl",
-                quote && "col-span-3 py-8 sm:px-16 sm:py-10 md:col-span-2",
+                quote && "col-span-3 py-8 sm:px-16 sm:py-10",
               )}
             >
-              <span className="flex h-12 items-center justify-center text-text-mute transition group-hover:text-primary">
+              <span className="flex h-10 items-center justify-center opacity-80 transition group-hover:text-primary group-hover:opacity-100">
                 {icon}
               </span>
 
@@ -71,7 +71,7 @@ const customers = [
     ),
     icon: (
       <svg
-        height="28"
+        height="24"
         viewBox="0 0 105 28"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -130,7 +130,7 @@ const customers = [
     icon: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        height="32"
+        height="27"
         viewBox="0 0 46 24"
         fill="none"
       >
@@ -148,7 +148,7 @@ const customers = [
 
     icon: (
       <svg
-        height="26"
+        height="21"
         viewBox="0 0 179 46"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -171,7 +171,7 @@ const customers = [
     name: "Branch",
     icon: (
       <svg
-        height="40"
+        height="32"
         viewBox="0 0 175 56"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -219,7 +219,7 @@ const customers = [
     name: "Maker.co",
     icon: (
       <svg
-        height="18"
+        height="14"
         xmlns="http://www.w3.org/2000/svg"
         fill="currentColor"
         viewBox="0 0 122.51 24"
@@ -233,7 +233,7 @@ const customers = [
     name: "NZXT",
     icon: (
       <svg
-        height="20"
+        height="16"
         viewBox="0 0 94 24"
         fill="currentColor"
         xmlns="http://www.w3.org/2000/svg"
@@ -250,7 +250,7 @@ const customers = [
 
     icon: (
       <svg
-        height="28"
+        height="22"
         viewBox="0 0 62 24"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -268,7 +268,7 @@ const customers = [
     name: "Vercel",
     icon: (
       <svg
-        height="25"
+        height="22"
         viewBox="0 0 103 24"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -284,7 +284,7 @@ const customers = [
     name: "Supabase",
     icon: (
       <svg
-        height="28"
+        height="24"
         viewBox="0 0 136 26"
         fill="currentColor"
         xmlns="http://www.w3.org/2000/svg"
@@ -306,7 +306,7 @@ const customers = [
     name: "Materialize",
     icon: (
       <svg
-        height="32"
+        height="23"
         viewBox="0 0 242 43"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -353,7 +353,7 @@ const customers = [
     name: "Tinybird",
     icon: (
       <svg
-        height="40"
+        height="32"
         viewBox="0 0 107 32"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -384,7 +384,7 @@ const customers = [
     icon: (
       <svg
         fill="none"
-        height="24"
+        height="18"
         viewBox="0 0 334 56"
         xmlns="http://www.w3.org/2000/svg"
       >
@@ -405,7 +405,7 @@ const customers = [
     name: "Ding",
     icon: (
       <svg
-        height="28"
+        height="22"
         viewBox="0 0 105 35"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -421,7 +421,7 @@ const customers = [
     name: "Texture",
     icon: (
       <svg
-        height="34"
+        height="28"
         viewBox="0 0 148 45"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
