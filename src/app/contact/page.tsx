@@ -13,14 +13,8 @@ import {
   IconMail,
   IconMessageDots,
 } from "@tabler/icons-react";
-import { Metadata } from "next";
 import React from "react";
 import { useIntercom } from "react-use-intercom";
-
-// export const metadata: Metadata = {
-//   title: "Sales",
-//   description: "Unlock the full potential of Upstash for your business.",
-// };
 
 export default function HomePage() {
   const { showMessages } = useIntercom();
