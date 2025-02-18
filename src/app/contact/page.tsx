@@ -1,3 +1,5 @@
+"use client";
+
 import Bg from "@/components/bg";
 import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
@@ -11,15 +13,11 @@ import {
   IconMail,
   IconMessageDots,
 } from "@tabler/icons-react";
-import { Metadata } from "next";
 import React from "react";
-
-export const metadata: Metadata = {
-  title: "Sales",
-  description: "Unlock the full potential of Upstash for your business.",
-};
+import { useIntercom } from "react-use-intercom";
 
 export default function HomePage() {
+  const { showMessages } = useIntercom();
   return (
     <main className="relative z-0 py-16 text-center md:py-24">
       <Bg />
@@ -43,8 +41,11 @@ export default function HomePage() {
             <IconCalendarEvent size={40} strokeWidth={1.5} />
           </Link>
 
-          {/* TODO: link? */}
-          <Link href="" target="_blank">
+          <Link
+            onClick={() => {
+              showMessages();
+            }}
+          >
             <span>
               <b className="text-primary-text">Chat</b>{" "}
               <span className="opacity-60">with Team</span>

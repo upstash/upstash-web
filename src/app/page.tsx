@@ -19,20 +19,15 @@ export default function Home({
   useSetAffiliateCodeToSessionStorage(searchParams);
 
   return (
-    <IntercomProvider
-      appId={process.env.NEXT_PUBLIC_INTERCOM_APP_ID as string}
-      autoBoot
-    >
-      <main className="text-center">
-        <HomeHero />
-        {/* TODO: Redesign */}
-        <HomeProductNew />
-        <HomeFast />
-        <HomeServerless />
-        <HomeHeroCustomer />
-        {/* TODO: Enterprise */}
-        <HomeCommunity />
-      </main>
-    </IntercomProvider>
+    <main className="text-center">
+      <HomeHero />
+      {/* TODO: Redesign */}
+      <HomeProductNew />
+      <HomeFast />
+      <HomeServerless />
+      <HomeHeroCustomer />
+      {/* TODO: Enterprise */}
+      <HomeCommunity />
+    </main>
   );
 }
