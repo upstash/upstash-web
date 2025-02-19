@@ -1,0 +1,285 @@
+---
+slug: hacker-news-x-agent
+title: "Building a Hacker News Twitter Agent"
+authors:
+  - yunus
+tags: [workflow, ai, next.js, serverless]
+---
+
+In this tutorial, we will build an Agent that fetches the latest top stories from Hacker News and tweets a summary.
+
+You can find the full source code on [GitHub](https://github.com/upstash/hacker-news-x-agent).
+
+To see the agent in action, follow [@hackernewsagent](https://x.com/hackernewsagent) on X.
+
+## How It Works
+
+- Upstash Workflow orchestrates the execution of the route on serverless functions, split into step functions. Reducing function execution costs by eliminating the need to wait for agent calls to complete.
+- It also provides a comprehensive agents API that allows you to create, and run agents with tools and tasks.
+- QStash is used to schedule the agent to run every two hours.
+- Top stories are fetched from Hacker News and URLs are scraped for content.
+- Previously visited stories are tracked using Redis.
+- The story summary is tweeted using the X API.
+
+![Diagram](/blog/hacker-news-x-agent/diagram.png)
+
+## Fetching a Top Story from Hacker News
+
+<Note type="info">
+  This is a step by step analysis of the code. If you want to set up your own agent, we have a detailed guide on the [README](https://github.com/upstash/hacker-news-x-agent/blob/master/README.md).
+</Note>
+
+We will create a `@upstash/workflow` route to orchestrate the agents. You can find the full code in the [app/api/tweet/route.ts](https://github.com/upstash/hacker-news-x-agent/blob/master/app/api/tweet/route.ts).
+
+### Fetching the Top Stories
+
+We will use the `@agentic/hacker-news` package to fetch the top stories from Hacker News, no API key required.
+
+`hn.getTopStories()` returns an array of item IDs.
+
+```typescript
+import { HackerNewsClient } from "@agentic/hacker-news";
+
+const TOP_SLICE = 100;
+
+const hn = new HackerNewsClient();
+const top100 = (await hn.getTopStories()).slice(0, TOP_SLICE);
+
+```
+
+### Picking an Unvisited Story
+
+We will use `@upstash/redis` to keep track of the visited stories. We will pick the top unvisited story.
+
+- To keep track of the visited stories, we will use a Redis set.
+- We will add the ID of the story to the set once we have visited it.
+- To check if a story has been visited, we will use `smismember` command. Passing the key of the set and an array of IDs will return an array of booleans indicating if corresponding IDs are members of the set.
+- We will find the index of the first unvisited story and retrieve its information using `hn.getItem()`.
+
+```typescript
+import { Redis } from "@upstash/redis";
+
+const redis = Redis.fromEnv();
+
+const top1Unvisited =
+  top100[(await redis.smismember("visited", top100)).findIndex((v) => v === 0)];
+await redis.sadd("visited", top1Unvisited);
+const item = await hn.getItem(top1Unvisited);
+const title = item.title;
+const url = item.url;
+
+```
+
+### Scraping the Story
+
+Given the URL of the story by Hacker News, we will scrape the content of the story using `cheerio`.
+
+1. Fetch the HTML content of the story using `fetch`.
+2. Load the HTML content into `cheerio`, a library for parsing HTML.
+3. Remove unwanted elements from the content and extract the main content.
+4. Clean the content by removing extra spaces and newlines.
+
+```typescript
+import * as cheerio from "cheerio";
+import { SELECTORS_TO_REMOVE } from "@/app/constants";
+
+if (!url) {
+  return {
+    title,
+    url,
+    content: "",
+  };
+}
+
+const html = await fetch(url).then((res) => res.text());
+
+const $ = cheerio.load(html);
+
+SELECTORS_TO_REMOVE.forEach((selector) => {
+  $(selector).remove();
+});
+
+let $content = $('main, article, [role="main"]');
+
+if (!$content.length) {
+  $content = $("body");
+}
+
+const content = $content
+  .text()
+  .replace(/\s+/g, " ")
+  .replace(/\n\s*/g, "\n")
+  .trim();
+
+return {
+  title,
+  url,
+  content,
+};
+
+```
+
+### Creating the `hackerNewsTool`
+
+To provide the functionality we developed to our agent, we will create an AI SDK compatible tool, specifying the description, parameters, and execution function.
+
+```typescript
+import { z } from "zod";
+import { tool } from "ai";
+
+tool({
+  description:
+    "A tool for fetching the top 1 unvisited Hacker News article. It returns an " +
+    "object with the title, url, and content of the article. It does not take any " +
+    "parameters, so give an empty object as a parameter. You absolutely should not " +
+    "give an empty string directly as a parameter.",
+  parameters: z.object({}),
+  execute: async ({}) => {
+    // Fetching the Top Stories
+    // Picking an Unseen Story
+    // Scraping the Story
+  },
+});
+
+```
+
+## Tweeting the Story
+
+### Tweeting with `twitter-api-v2`
+
+We will use the `twitter-api-v2` package to tweet the story summary.
+
+```typescript
+import { TwitterApi } from "twitter-api-v2";
+
+const v2Client = new TwitterApi({
+  appKey: process.env.TWITTER_CONSUMER_KEY!,
+  appSecret: process.env.TWITTER_CONSUMER_SECRET!,
+  accessToken: process.env.TWITTER_ACCESS_TOKEN,
+  accessSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
+}).readWrite.v2;
+await v2Client.tweet(tweet);
+
+```
+
+### Creating the `twitterTool`
+
+We will create another tool to provide the functionality of tweeting the story summary to our agent.
+
+```typescript
+import { z } from "zod";
+import { tool } from "ai";
+
+tool({
+  description:
+    "A tool for posting a tweet. It takes an object as a parameter with a `tweet` " +
+    "field that contains the tweet to post which is a string. You absolutely should " +
+    "not give the string directly as a parameter.",
+  parameters: z.object({
+    tweet: z.string().describe("The tweet to post."),
+  }),
+  execute: async ({ tweet }: { tweet: string }) => {
+    // Tweeting with `twitter-api-v2`
+    return tweet;
+  },
+});
+
+```
+
+## Orchestration
+
+### Creating the `hackerNewsTwitterAgent`
+
+Now that we have the necessary tools, we can create an agent and provide the tools to it. We will also specify the background and max steps for the agent.
+
+``` typescript
+const model = context.agents.openai("gpt-4o-mini");
+
+const hackerNewsTwitterAgent = context.agents.agent({
+  model,
+  name: "hackerNewsTwitterAgent",
+  maxSteps: 2,
+  tools: {
+    hackerNewsTool: tool({...}), // hackerNewsTool we created
+    twitterTool: tool({...}), // twitterTool we created
+  },
+  background:
+    "You are an AI assistant that helps people stay up-to-date with the latest news. " +
+    "You can fetch the top 1 unvisited Hacker News article and post it to Twitter " +
+    "using the `hackerNewsTool` and `twitterTool` tools respectively. You will be " +
+    "called every hour to fetch a new article and post it to Twitter. You must create " +
+    "a 250 character tweet summary of the article. Provide links in the tweet if " +
+    "possible.",
+});
+  ```
+
+### Runnning the task
+
+We can now run our task using the agent we created.
+
+```typescript
+const task = context.agents.task({
+  agent: hackerNewsTwitterAgent,
+  prompt:
+    "Fetch the top 1 unvisited Hacker News article and post it to Twitter.",
+});
+
+await task.run();
+
+```
+
+### Defining the Workflow Route
+
+We will create a `@upstash/workflow` route to orchestrate the agents. We will use the `serve` function to define the route. Our agents API is accessible through the context object in the route.
+
+```typescript
+import { serve } from "@upstash/workflow/nextjs";
+
+export const { POST } = serve<{ prompt: string }>(async (context) => {
+  // hackerNewsTwitterAgent definition here
+  // Runnning the task here
+});
+
+```
+
+### Securing the Route
+
+Setting up the following environment variables will automatically secure the calls to the workflow endpoint, making sure only requests signed by QStash are allowed. You can learn more about how to [Secure an endpoint with our guide](https://upstash.com/docs/workflow/howto/security).
+
+```bash
+# To make sure requests are coming from the right source
+QSTASH_CURRENT_SIGNING_KEY=
+QSTASH_NEXT_SIGNING_KEY=
+```
+
+### Setting up a Cron Job
+
+Using the Request Builder in [QStash Console](https://console.upstash.com/qstash), we can set up a cron job to fetch the top unvisited Hacker News article and post its summary to Twitter every two hours.
+
+![QStash Schedule](/blog/hacker-news-x-agent/qstash-schedule.png)
+
+## Results
+
+We have successfully built an agent that fetches the latest top stories from Hacker News and tweets a summary, using `@upstash/workflow` agents orchestration.
+
+Here is an example result:
+
+Hacker News Item: https://news.ycombinator.com/item?id=42952605
+
+![Hacker News Top Stories](/blog/hacker-news-x-agent/top-stories.png)
+
+Story: https://www.sergey.fyi/articles/gemini-flash-2
+
+![Hacker News Story](/blog/hacker-news-x-agent/story.png)
+
+![Workflow Logs](/blog/hacker-news-x-agent/workflow-run.png)
+
+Agent Tweet: https://x.com/hackernewsagent/status/1887410941374914755
+
+![Agent Tweet](/blog/hacker-news-x-agent/tweet.png)
+
+## Next Steps
+
+- Follow [@hackernewsagent](https://x.com/hackernewsagent) on X to keep up with the latest Hacker News stories.
+- Check out the [repository](https://github.com/upstash/hacker-news-x-agent) and set up your own agent.
+- Learn more about the `@upstash/workflow` agents orchestration in the [Upstash documentation](https://upstash.com/docs/workflow/agents/overview).
