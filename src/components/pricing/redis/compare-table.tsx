@@ -6,6 +6,7 @@ import useIsMobile from "@/hooks/use-is-mobile";
 import cx from "@/utils/cx";
 import { PricingRedis } from "@/utils/type";
 import { IconCoin, IconInfoCircle } from "@tabler/icons-react";
+import Link from "next/link";
 import * as React from "react";
 import CompareValue from "../compare-value";
 
@@ -1537,9 +1538,7 @@ export default function CompareTable({
           </Col>
           <Col plan={showEnterprise} className="py-4">
             <Button asChild variant="secondary">
-              <a target="_self" href="https://upstash.com/contact">
-                Contact Us
-              </a>
+              <Link href={"/enterprise"}>Learn More</Link>
             </Button>
           </Col>
         </tr>
