@@ -40,13 +40,13 @@ Here’s an example of using Flow-Control with QStash:
 const client = new Client({ token: "<QStash_TOKEN>" });
 
 await client.publishJSON({
-    url: "https://my-api...",
-    body: { hello: "world" },
-    flowControl: { key: "app1", parallelism: 3, ratePerSecond: 10 },
+  url: "https://my-api...",
+  body: { hello: "world" },
+  flowControl: { key: "app1", parallelism: 3, ratePerSecond: 10 },
 });
 ```
 
-For more details and other SDKs, see the documentation [here](https://upstash.com/docs/qstash/features/flow-control).  
+For more details and other SDKs, see the documentation [here](https://upstash.com/docs/qstash/features/flowcontrol).  
 
 ### Workflow  
 
@@ -68,18 +68,18 @@ if they share the same `flowControl` key.
 
 ```js
 export const { POST } = serve<string>(
-    async (context) => {
-        await context.run("step-1", async () => {
-            return someWork();
-        });
-    },
-    {
-        flowControl: { key: "app1", parallelism: 3, ratePerSecond: 10 }
-    }
+  async (context) => {
+    await context.run("step-1", async () => {
+      return someWork();
+    });
+  },
+  {
+    flowControl: { key: "app1", parallelism: 3, ratePerSecond: 10 }
+  }
 );
 ```
 
-For more details, see the documentation on [Rate](https://upstash.com/docs/workflow/basics/serve#rate) and [Parallelism](https://upstash.com/docs/workflow/basics/serve#parallelism).  
+For more details, see the documentation [here](https://upstash.com/docs/workflow/basics/serve#flowcontrol).
 
 - **In the `trigger` method**:  
 
@@ -88,9 +88,9 @@ import { Client } from "@upstash/workflow";
 
 const client = new Client({ token: "<QStash_TOKEN>" });
 const { workflowRunId } = await client.trigger({
-    url: "https://workflow-endpoint.com",
-    body: "hello there!",
-    flowControl: { key: "app1", parallelism: 3, ratePerSecond: 10 }
+  url: "https://workflow-endpoint.com",
+  body: "hello there!",
+  flowControl: { key: "app1", parallelism: 3, ratePerSecond: 10 }
 });
 ```
 
