@@ -17,7 +17,7 @@ export default function FastStatistic() {
 
       <div
         className={cx(
-          "flex flex-col items-center gap-4 p-6 shadow-md md:flex-row",
+          "grid grid-cols-2 items-center gap-4 p-6 shadow-md md:flex-row",
           "rounded-2xl bg-bg backdrop-blur dark:bg-bg-mute",
           "md:gap-12 md:rounded-4xl md:px-12 md:py-6",
         )}

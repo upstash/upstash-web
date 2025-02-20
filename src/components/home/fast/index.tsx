@@ -59,7 +59,7 @@ export default function Fast() {
       />
 
       {/* data */}
-      <div className="absolute inset-x-0 -bottom-4 z-20 flex flex-col items-center justify-center md:bottom-0">
+      <div className="absolute inset-x-0 bottom-0 z-20 flex flex-col items-center justify-center">
         <Statistic />
         <p className="mt-2 italic">* weekly average</p>
       </div>
