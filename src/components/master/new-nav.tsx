@@ -1,6 +1,5 @@
 import cx from "@/utils/cx";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
-import { IconArrowUpRight } from "@tabler/icons-react";
 import Link from "next/link";
 import { useSelectedLayoutSegment } from "next/navigation";
 import React from "react";
@@ -20,9 +19,7 @@ export default function NewNavigation() {
             "text-text-mute hover:bg-white/5 hover:text-primary-text",
           )}
         >
-          <Link href="/docs">
-            Docs <IconArrowUpRight className="opacity-60" size={16} />
-          </Link>
+          <Link href="/docs">Docs</Link>
         </NavigationMenu.Link>
       </NavigationMenu.Item>
 
