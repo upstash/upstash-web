@@ -55,20 +55,20 @@ const registerUser = createWorkflow(async (context: WorkflowContext<{userList: s
     context.invoke("start-onboarding-workflow", {
       workflow: onboardingWorkflow,
       body: { userId }
-    }, 
+    }), 
     context.invoke("start-trial-workflow", {
       workflow: trialWorkflow,
       body: { userId }
-    }
+    })
   ])
   // ...
 })
 
-export const { POST } = serveMany([
+export const { POST } = serveMany({
   trialWorkflow, 
   onboardingWorkflow, 
   registerUser
-])
+})
 ```
 
 With this new feature, it’s now possible to return data at the end of a workflow.
@@ -90,13 +90,13 @@ We listened—and now, we’ve introduced a public API to fetch workflow run det
 import { Client } from "@upstash/workflow";
 
 const client = new Client({ token: "<QSTASH_TOKEN>" });
-const runs = await client.logs();
+const { runs } = await client.logs();
 
 // Filter by workflow run ID
-const runs =  await client.logs({ workflowRunId: "<WORKFLOW_RUN_ID>"});
+const { runs } =  await client.logs({ workflowRunId: "<WORKFLOW_RUN_ID>"});
 
 // Filter by workflow URL
-const runs =  await client.logs({ workflowUrl: "<WORKFLOW_URL>"});
+const { runs } =  await client.logs({ workflowUrl: "<WORKFLOW_URL>"});
 ```
 
 This API returns the current state of a workflow, along with details about completed and in-progress steps.
@@ -123,9 +123,11 @@ export const { POST } = serve(
   async (context) => {
     // ...
   }, {
-    flowControlKey: "userOnboardingWorkflow",
-    ratePerSec: 50,
-    parallelism: 10,
+    flowControl: {
+      key: "userOnboardingWorkflow",
+      ratePerSecond: 50,
+      parallelism: 10,
+    }
   }
 )
 ```
@@ -146,9 +148,11 @@ export const { POST } = serve(
     ...
     const { data } = await context.call("Call LLM to generate summary", {
       // ...
-      flowControlKey: "llmProviderLimit",
-      rate: 50,
-      parallelism: 10,
+      flowControl: {
+        key: "llmProviderLimit",
+        ratePerSecond: 50,
+        parallelism: 10,
+      }
     })
     ...
   }
