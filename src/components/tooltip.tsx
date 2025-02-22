@@ -16,6 +16,7 @@ const Tooltip = ({
         <Tooltip1.Trigger
           onClick={(e) => {
             e.stopPropagation();
+            e.preventDefault();
             setOpen(true);
           }}
           className="text-left underline decoration-primary-text decoration-dashed underline-offset-2"
