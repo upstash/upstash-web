@@ -17,7 +17,7 @@ const Tooltip = ({
 
         <Tooltip1.Portal>
           <Tooltip1.Content
-            className="max-w-xl select-none rounded-xl bg-white p-4 text-zinc-950 drop-shadow-2xl will-change-[transform,opacity]"
+            className="max-w-xl rounded-xl bg-white p-4 text-zinc-950 drop-shadow-2xl will-change-[transform,opacity]"
             sideOffset={5}
           >
             {content}
