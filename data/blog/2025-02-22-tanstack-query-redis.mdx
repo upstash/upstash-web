@@ -1,0 +1,175 @@
+---
+title: "Using TanStack Query with Upstash Redis"
+slug: tanstack-query-redis
+authors:
+  - noah
+tags: [redis, TanStack, nextjs, cache]
+---
+
+We've probably all used [Tanstack](https://tanstack.com) in our web applications at least once. TanStack is a collection of open-source libraries for building user interfaces, primarily in React. They focus on providing headless, type-safe, and performant utilities. The followings are the most common libraries in the TanStack ecosystem:
+
+- **TanStack Table**: A headless UI tool for creating tables and data grids with additional features like sorting, filtering, pagination, and virtualization.
+- **TanStack Query**: A library for managing server state and data fetching, making it easier to handle asynchronous operations and caching.
+- **TanStack Router**: A type-safe router for React applications, providing navigation and URL management.
+- **TanStack Form**: A utility for managing form state and validation.
+
+In this blog post, we will explore how to integrate Redis with TanStack Query using Next.js App Router securely to persist and restore cached data efficiently.
+
+## What is Tanstack Query?
+
+TanStack Query is a data-fetching and state synchronization tool that simplifies working with asynchronous data (e.g., from APIs). It abstracts complex client-side tasks such as:
+
+- **Automatic background fetching**: Keeps data fresh by refetching it when necessary.
+- **Cache management**: Reduces unnecessary API calls by maintaining a cache of fetched data.
+- **Data synchronization**: Ensures UI consistency by keeping fetched data synchronized with the server.
+- **Pagination and infinite scrolling**: Helps in efficiently loading large datasets.
+- **Optimistic updates**: Improves UI responsiveness by updating data before confirmation from the server.
+
+Tanstack Query (formerly known as React Query) library primarily used in React (but also compatible with other frameworks like Solid, Svelte, and Vue).
+
+Despite its robust caching mechanisms, TanStack Query's in-memory cache is volatile. Once the application reloads, the cache is lost. By integrating Redis, we can persist the cache and restore it efficiently. By integrating TanStack Query qith Redis securely, we gain additional benefits:
+
+- **Persistence**: Ensure data is available even after a page refresh or app restart.
+- **Reduced API Calls**: Avoid redundant network requests by retrieving pre-fetched data from Redis.
+- **Cross-Session Availability**: Users can resume from where they left off without re-fetching data.
+**Improved Performance**: Redis is an in-memory data store, making read operations extremely fast.
+
+## Persisting TanStack Query cache with Redis
+
+Here, the goal is to persist the React Query cache in Redis and restore it when needed while ensuring that Redis credentials remain hidden on the server-side.
+
+By default, TanStack Query stores its cache in JavaScript’s runtime memory, meaning it lives only in the browser's RAM and is cleared when the page reloads or the session ends. This works well for short-lived data needs, but it has limitations for applications that require persistent, shared, or cross-session cache.
+
+TanStack Query enables the developers to implement custom persistent caching storage. Using Redis as a TanStack Query persister solves these issues by providing a persistent, fast, and scalable cache that can be shared across sessions, devices, or users.
+
+So this time, we will manipulate the TanStack Query’s built-in caching mechanism a bit to integrate it with the Upstash Redis database. Since the default is the browser cache, global Redis database could take more time. On the other hand, it can be the best option if we want to persist the client state in a global shared cache storage.
+
+Let’s go through the implementation steps one-by-one.
+
+I assume that you already have an Upstash Redis database, and you know how to create it if you have not created one yet. If not, you can follow the instructions [here](https://upstash.com/docs/redis/overall/getstarted).
+
+Now, we can create a new Nextjs application if you don’t have it yet by running following commands on terminal.
+
+```
+npx create-next-app@latest <project-name>
+```
+
+Go into the project folder and install the required dependencies.
+
+```
+cd <project-name>
+npm install @tanstack/react-query @upstash/redis
+```
+
+In the code, we need to start with creating the Redis utility for managing the interaction with the Upstash Redis. To do this, we need to create a `redis.tsx` file under `lib/` folder.
+
+```typescript
+import { Redis } from  '@upstash/redis';
+
+const  redis  =  new  Redis({
+	url:  '<UPSTASH-REDIS-URL>',
+	token:  '<UPSTASH-REDIS-TOKEN>',
+})
+
+export  async  function  saveCache(key:  string, data:  unknown) {
+	await  redis.set(key, JSON.stringify(data));
+}
+
+export  async  function  getCache(key:  string) {
+	const  data  =  await  redis.get(key);
+	return  data  ?  JSON.parse(data  as  string) :  undefined;
+}
+```
+
+In this code block, do not forget to replace the Upstash Redis database url and token placeholders with the values that you get from the Upstash Redis console.
+
+Now we need a React Query persister that uses Redis as the persister. To do that, let’s write the persister in `lib/redisPersister.tsx` file.
+
+```typescript
+import { saveCache, getCache } from  './redis';
+
+export  const  redisPersister  = {
+	persistClient:  async (client:  unknown) =>  saveCache('react-query-cache', client),
+	restoreClient:  async () =>  getCache('react-query-cache'),
+	removeClient:  async () =>  saveCache('react-query-cache', null),
+};
+```
+
+Now, we will use this Redis persister in TanStack Query by implementing the custom provider to be used in the app layout. Let’s write that provider in `app/providers.tsx`.
+
+```typescript
+'use client';
+import { QueryClient, QueryClientProvider } from  '@tanstack/react-query';
+import { PersistQueryClientProvider } from  '@tanstack/react-query-persist-client';
+import { redisPersister } from  './lib/redisPersister';
+
+const  queryClient  =  new  QueryClient();
+
+export  function  Providers({ children }: { children:  React.ReactNode }) {
+	return (
+	<PersistQueryClientProvider  client={queryClient}  persistOptions={{ persister:  redisPersister }}>
+		<QueryClientProvider  client={queryClient}>{children}</QueryClientProvider>
+	</PersistQueryClientProvider>
+	);
+}
+```
+
+Finally, we will use this custom `PersistQueryClientProvider` in the `layout.tsx`. This will finalize the integration of the Redis with the TanStack Query.
+
+```typescript
+import { Providers } from  './providers';
+
+export  default  function  RootLayout({ children }: { children:  React.ReactNode }) {
+	return (
+		<html  lang="en">
+			<body>
+				<Providers>{children}</Providers>
+			</body>
+		</html>
+	);
+}
+```
+
+## Testing the Integration
+
+To test the integration and see how it works, we can create an API that uses TanStack Query in this application. To do that, let’s create the API in `app/page.tsx`.
+
+```typescript
+'use client';
+import { useQuery } from  '@tanstack/react-query';
+
+function  FetchData() {
+	const { data, isLoading } =  useQuery({ queryKey: ['testData'], queryFn:  async () => {
+		const  response  =  "Hello World!";
+		return  response;
+}});
+
+if (isLoading) return  <p>Loading...</p>;
+
+return  <pre>{JSON.stringify(data, null, 2)}</pre>;
+}
+
+export  default  function  HomePage() {
+	return  <FetchData  />;
+}
+```
+
+Here, we use TanStack query that returns a static string and there is no remote call since this is just an example that is written for demonstration. You can populate the TanStack Query usage according to your needs.
+
+To see this in action, let’s run the application:
+
+```
+npm run dev
+```
+
+And open the `localhttp://localhost:3000`. This will make you use the TanStack Query with the Redis persister. Once you access to the API, you can go back to your Upstash Redis console, click to the `Data Browser` tab and see the client data similar to the screenshot below.
+
+![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXfsMQYy7IbEqq3QDpFpZ1KqpDWbQThSGq47iGIa59IW4KzNeiX1pCo7OA2tR_O7pKCAVB1DjJNjJrS2207QZ1DAZ2CRhtcRDEoyFg-lOmhNOyUQ24g8aJAElm8hfPZMuShlDbT6pg?key=ez03LxEeuUvSNWnST5nJ0Dwq)
+
+## Conclusion
+
+By integrating Redis with TanStack Query in Next.js App Router, we achieve persistent caching, reduced API calls, and an overall improved user experience. This approach ensures that cached data can be efficiently restored across sessions, making applications more responsive and efficient.
+
+The implementation follows best practices for handling server-state effectively and can be adapted based on specific project needs.
+
+I hope this blog helps you all!
