@@ -14,7 +14,6 @@ import dynamic from "next/dynamic";
 import { Inter, Inter_Tight } from "next/font/google";
 import Script from "next/script";
 import { ReactNode, Suspense } from "react";
-import { IntercomProvider } from "react-use-intercom";
 
 const PostHogPageView = dynamic(() => import("@/lib/posthog/page-view"), {
   ssr: false,
