@@ -63,7 +63,7 @@ export default function HttpRestApi() {
               <code className="lang-js">{CODE[Product.QSTASH]}</code>
             </Pre>{" "}
             <Pre hidden={product !== Product.VECTOR}>
-              <code className="lang-py">{CODE[Product.VECTOR]}</code>
+              <code className="lang-js">{CODE[Product.VECTOR]}</code>
             </Pre>
           </div>
         </div>
