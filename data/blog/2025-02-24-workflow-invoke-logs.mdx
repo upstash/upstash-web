@@ -28,7 +28,7 @@ This is especially useful when you need to:
 import { WorkflowContext } from "@upstash/workflow";
 import { createWorkflow, serveMany } from "@upstash/workflow/nextjs";
  
-// 👇 Onboarding user workflow
+// 👇 User onboarding workflow
 const onboardingWorkflow = createWorkflow(async (context) => {
   const data = await context.run("send-onboarding-email", async () => {
     // Execute business logic here
@@ -37,20 +37,20 @@ const onboardingWorkflow = createWorkflow(async (context) => {
   return data
 })
 
-// 👇 Managing trial subscription workflow
+// 👇 Trial subscription workflow
 const trialWorkflow = createWorkflow(async (context) => {
-    const data = await context.run("start-trial", async () => {
+  const data = await context.run("start-trial", async () => {
     // Execute business logic here
   })
   // ...
   return data
 })
 
-// 👇 User registration workflow 
-//  It invokes the onboarding and trial workflows
-const registerUser = createWorkflow(async (context: WorkflowContext<{userList: string}>) => {
+// 👇 User registration workflow
+const registerUserWorkflow = createWorkflow(async (context: WorkflowContext<{userId: string}>) => {
   const { userId } = context.requestPayload
 
+  // Invoke two workflows concurrently and await their completion
   await Promise.all([
     context.invoke("start-onboarding-workflow", {
       workflow: onboardingWorkflow,
@@ -67,7 +67,7 @@ const registerUser = createWorkflow(async (context: WorkflowContext<{userList: s
 export const { POST } = serveMany([
   trialWorkflow, 
   onboardingWorkflow, 
-  registerUser
+  registerUserWorkflow
 ])
 ```
 
@@ -104,7 +104,7 @@ Essentially, it provides all the information you see on our dashboard.
 
 <Note>This API provides a complete overview of the workflow run, including step outputs and the request payload. You can still build a simpler version by manipulating a data source inside the workflow itself.</Note>
 
-Check out the [documentation](https://upstash.com/docs/workflow/rest/runs/runs) for more details.
+Check out the [documentation](https://upstash.com/docs/workflow/rest/runs/logs) for more details.
 
 ## Flow-Control
 
@@ -162,7 +162,7 @@ Check out the [documentation](https://upstash.com/docs/workflow/howto/flow-contr
 Upstash Workflow requires a publicly available server to reach for requests.
 
 During the development where application is not deployed yet, this might be a friction factor for our users.
-They had to open a local-tunnel and use that address to trigger workflow runs. Although this approach remains very useful, we decided to distribute a development server for our users.
+They had to open a local-tunnel and use that address to trigger workflow runs. Although this approach remains very useful, we decided to distribute a development server.
 
 You can install the local development server via our NPX package.
 
