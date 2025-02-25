@@ -134,6 +134,17 @@ RedisFacade::pipeline(function (Redis $pipe) use (...) {
 On the code above you can see a Redis pipeline being used, that will make sure that all the commands are executed in a single
 transaction. This is important because we don't want to store the encrypted value if the set commands fail.
 
+### Deployment
+
+For deployment I've used the recently released [Laravel Cloud](https://cloud.laravel.com).
+
+Deploying to Laravel Cloud was incredibly easy, it took me less than a minute to go from repository to a fully deployed app with
+an attached Redis instance and a provisioned domain. Even now, deployments take less than 30 seconds. 🚀
+
+![Laravel Cloud for Envflow](/blog/how-ive-built-envflow-using-laravel-and-upstash-redis/envflow-cloud.png)
+
+You can visit the deployed production environment at [https://envflow.laravel.cloud](https://envflow.laravel.cloud).
+
 ### Conclusion
 
 I hope you've enjoyed this post and that it has helped you understand how I built Envflow.
