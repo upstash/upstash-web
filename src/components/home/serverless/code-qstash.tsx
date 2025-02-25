@@ -25,8 +25,8 @@ export default function CodeRedis() {
   }, [lang]);
 
   return (
-    <div className="flex w-full items-start gap-8 rounded-2xl bg-pre-bg p-6 sm:col-span-3">
-      <div className="grid gap-2">
+    <div className="flex w-full min-w-0 flex-col items-start gap-8 rounded-2xl bg-pre-bg p-6 sm:col-span-3 sm:flex-row md:gap-12">
+      <div className="flex flex-wrap gap-2 sm:grid">
         {Object.values(Language).map((value) => {
           const active = value === lang;
           return (
@@ -47,7 +47,7 @@ export default function CodeRedis() {
       </div>
 
       {/* body */}
-      <div className="col-span-2">
+      <div className="w-full overflow-y-auto overflow-x-scroll">
         {Object.values(Language).map((value) => {
           return (
             <CodePre key={value} hidden={value !== lang}>
