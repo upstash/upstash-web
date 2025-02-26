@@ -5,9 +5,8 @@ import {
   HeroTabFeatureTitle,
   HeroTabFeatureUl,
 } from "@/components/home/hero/hero-tab";
-import CodeRedis from "@/components/home/serverless/code-redis";
 import { IconCircle1, IconCircle2, IconCircle3 } from "@tabler/icons-react";
-import React from "react";
+import { CodeSnippetsRedis } from "../serverless/code-snippets-redis";
 
 export function HeroTabRedis() {
   return (
@@ -91,7 +90,7 @@ export function HeroTabRedis() {
         </HeroTabFeatureUl>
       </HeroTabFeatureCont>
 
-      <CodeRedis />
+      <CodeSnippetsRedis />
     </>
   );
 }

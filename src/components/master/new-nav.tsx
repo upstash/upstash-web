@@ -68,7 +68,7 @@ export default function NewNavigation() {
         <NavigationMenu.Link
           asChild
           className={cx(
-            "flex select-none items-center gap-0.5 rounded-full px-3 py-2",
+            "flex select-none items-center gap-0.5 whitespace-nowrap rounded-full px-3 py-2",
             "text-text-mute hover:bg-white/5 hover:text-primary-text",
             "contact" === segment ? "bg-bg-mute text-primary-text" : "",
           )}

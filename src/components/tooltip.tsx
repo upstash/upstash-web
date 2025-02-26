@@ -1,5 +1,5 @@
 import * as Tooltip1 from "@radix-ui/react-tooltip";
-import React from "react";
+import React, { useState } from "react";
 
 const Tooltip = ({
   children,
@@ -8,16 +8,25 @@ const Tooltip = ({
   children: React.ReactNode;
   content: React.ReactNode;
 }) => {
+  const [open, setOpen] = useState(false);
+
   return (
-    <Tooltip1.Provider delayDuration={200}>
-      <Tooltip1.Root>
-        <Tooltip1.Trigger className="text-left underline decoration-primary-text decoration-dashed underline-offset-2">
+    <Tooltip1.Provider>
+      <Tooltip1.Root open={open} delayDuration={200} onOpenChange={setOpen}>
+        <Tooltip1.Trigger
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            setOpen(true);
+          }}
+          className="text-left underline decoration-primary-text decoration-dashed underline-offset-2"
+        >
           {children}
         </Tooltip1.Trigger>
 
         <Tooltip1.Portal>
           <Tooltip1.Content
-            className="max-w-xl select-none rounded-xl bg-white p-4 text-zinc-950 drop-shadow-2xl will-change-[transform,opacity]"
+            className="max-w-xl rounded-xl bg-white p-4 text-zinc-950 drop-shadow-2xl will-change-[transform,opacity]"
             sideOffset={5}
           >
             {content}
