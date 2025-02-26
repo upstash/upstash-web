@@ -5,9 +5,8 @@ import {
   HeroTabFeatureTitle,
   HeroTabFeatureUl,
 } from "@/components/home/hero/hero-tab";
-import CodeQStash from "@/components/home/serverless/code-qstash";
 import { IconCircle1, IconCircle2, IconCircle3 } from "@tabler/icons-react";
-import React from "react";
+import { CodeSnippetsQStash } from "../serverless/code-snippets-qstash";
 
 export function HeroTabQStash() {
   return (
@@ -90,7 +89,7 @@ export function HeroTabQStash() {
         </HeroTabFeatureUl>
       </HeroTabFeatureCont>
 
-      <CodeQStash />
+      <CodeSnippetsQStash />
     </>
   );
 }

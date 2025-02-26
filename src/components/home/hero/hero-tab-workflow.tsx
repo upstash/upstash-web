@@ -5,9 +5,8 @@ import {
   HeroTabFeatureTitle,
   HeroTabFeatureUl,
 } from "@/components/home/hero/hero-tab";
-import CodeWorkflow from "@/components/home/serverless/code-workflow";
 import { IconCircle1, IconCircle2, IconCircle3 } from "@tabler/icons-react";
-import React from "react";
+import { CodeSnippetsWorkflow } from "../serverless/code-snippets-workflow";
 
 export function HeroTabWorkflow() {
   return (
@@ -90,7 +89,7 @@ export function HeroTabWorkflow() {
         </HeroTabFeatureUl>
       </HeroTabFeatureCont>
 
-      <CodeWorkflow />
+      <CodeSnippetsWorkflow />
     </>
   );
 }
