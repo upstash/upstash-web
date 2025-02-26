@@ -24,7 +24,7 @@ export default function SectionWhy() {
             <article
               key={index}
               className={cx(
-                "group flex items-center justify-between gap-2 p-8 md:px-16 md:py-12",
+                "group flex flex-col-reverse items-center justify-between gap-4 p-8 sm:flex-row sm:gap-2 md:px-16 md:py-12",
                 "rounded-3xl bg-white shadow-sm dark:bg-bg-mute",
                 "cursor-default transition",
                 "dark:hover:bg-white/10",
