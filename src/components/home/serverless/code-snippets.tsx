@@ -1,6 +1,8 @@
 import cx from "@/utils/cx";
 import { IconChevronRight } from "@tabler/icons-react";
 import Prism from "prismjs";
+import "prismjs/plugins/line-numbers/prism-line-numbers.js";
+import "prismjs/plugins/line-numbers/prism-line-numbers.css";
 import { useEffect, useState } from "react";
 
 const LANGUAGES_MAP = {
@@ -41,25 +43,25 @@ export const CodeSnippets = ({ data }: Props) => {
   }, [snippet.code]);
 
   return (
-    <div className="col-span-1 flex w-full overflow-hidden rounded-xl sm:col-span-3">
+    <div className="col-span-1 flex w-full flex-col overflow-hidden rounded-2xl bg-black sm:col-span-3 md:flex-row">
       {/* EXAMPLE SELECTION */}
-      <div className="w-[258px] min-w-0 bg-black">
-        <div className="bg-zinc-800 px-6 py-4 text-left text-[13px] text-white/40">
-          EXAMPLES
+      <div className="w-full min-w-[100px] overflow-hidden md:w-[258px]">
+        <div className="hidden h-10 items-center bg-zinc-800 px-6 text-[13px] text-white/40 md:flex">
+          <span className="translate-y-[2px]">EXAMPLES</span>
         </div>
-        <div className="px-3 py-4">
+        <div className="flex w-full flex-wrap justify-center px-3 py-4 md:block">
           {data.map((example, idx) => (
             <button
               key={idx}
               onClick={() => setExampleIdx(idx)}
               className={cx(
-                "flex h-10 w-full items-center text-nowrap rounded-md px-3 transition-colors",
+                "flex h-[32px] items-center whitespace-nowrap rounded-md px-3 transition-colors md:w-full",
                 exampleIdx === idx
                   ? "justify-between bg-white text-black"
                   : "text-white hover:bg-white/10",
               )}
             >
-              {example.title}
+              <span className="truncate">{example.title}</span>
               {exampleIdx === idx && (
                 <IconChevronRight size={20} className="text-black/50" />
               )}
@@ -69,18 +71,18 @@ export const CodeSnippets = ({ data }: Props) => {
       </div>
 
       {/* LANGUAGE SELECTION */}
-      <div className="flex-grow">
+      <div className="min-w-0 flex-grow">
         {/* TABS */}
-        <div className="flex bg-zinc-800 pt-2">
+        <div className="flex h-10 border-l-2 border-[#3D3D3F] bg-zinc-800 px-1 pt-2">
           {example.snippets.map((snippet, idx) => (
             <button
               key={idx}
               onClick={() => setSnippetIdx(idx)}
               className={cx(
-                "px-5 py-[12px] text-[13px]",
+                "flex h-full items-center px-5 text-[13px]",
                 snippetIdx === idx
-                  ? "border-t-2 border-emerald-500 border-b-transparent bg-black pt-[10px] text-white"
-                  : "text-white/60",
+                  ? "border-t-2 border-emerald-500 bg-black text-white"
+                  : "border-t-2 border-transparent text-white/60",
               )}
             >
               {LANGUAGES_MAP[snippet.language]}
@@ -89,9 +91,11 @@ export const CodeSnippets = ({ data }: Props) => {
         </div>
 
         {/* CODE BODY */}
-        <div className="h-full bg-black p-6">
-          <pre className={"no-scrollbar text-left !text-[.86em]"}>
-            <code className={`lang-${snippet.language}`}>
+        <div className="h-full w-full border-l-2 border-white/10 px-[6px] py-6">
+          <pre className="no-scrollbar !overflow-y-hidden !overflow-x-scroll !text-[.86em]">
+            <code
+              className={`lang-${snippet.language} line-numbers leading-[1.4] [&>.line-numbers-rows]:!border-r-0`}
+            >
               {snippet.code.trim()}
             </code>
           </pre>
