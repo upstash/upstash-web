@@ -33,7 +33,7 @@ export function Example({
     <article
       className={cx(
         "group flex flex-col gap-2 border p-6 dark:border-none",
-        "rounded-xl bg-white/30 dark:bg-white/5",
+        "rounded-xl bg-bg-mute",
         "transition hover:bg-emerald-300/10",
         className,
       )}
@@ -45,7 +45,7 @@ export function Example({
           className,
         )}
       >
-        <a className="hover:text-emerald-400" href={`/examples/${slug}`}>
+        <a className="hover:text-primary-text" href={`/examples/${slug}`}>
           {title}
         </a>
       </h3>
@@ -154,10 +154,8 @@ function Pill({
     <>
       <button
         className={cx(
-          "rounded border border-black/5 px-2 py-1 leading-none text-black/60 dark:border-white/5 dark:text-white/60",
-          selected
-            ? "bg-emerald-400/20 text-black/80 dark:bg-emerald-400/10 dark:text-white"
-            : "",
+          "rounded border border-emerald-800/10 px-2 py-1 leading-none text-text-mute",
+          selected ? "bg-emerald-400/20 text-primary-text dark:bg-primary" : "",
         )}
         onClick={(e) => {
           if (!selected) {

@@ -136,7 +136,7 @@ export const Client: React.FC<Props> = ({
           <input
             type="search"
             aria-label="Search"
-            className="bg-white-100/80 w-1/2 rounded-full px-4 py-2 transition focus:outline-none focus:ring-2 focus:ring-emerald-400/40 dark:bg-white/5 dark:placeholder:text-white/40"
+            className="bg-white-100 w-1/2 rounded-full border border-emerald-800/40 px-4 py-2 transition focus:outline-none focus:ring-2 focus:ring-emerald-400/40 dark:bg-white/5 dark:placeholder:text-white/40"
             value={exampleQuery}
             placeholder="Search for an example..."
             onChange={(e) => {
