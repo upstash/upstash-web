@@ -32,8 +32,8 @@ export function Example({
   return (
     <article
       className={cx(
-        "group flex flex-col gap-2 p-6",
-        "rounded-xl bg-white/5",
+        "group flex flex-col gap-2 border p-6 dark:border-none",
+        "rounded-xl bg-white/30 dark:bg-white/5",
         "transition hover:bg-emerald-300/10",
         className,
       )}
@@ -139,7 +139,7 @@ function ExampleStack({
   );
 }
 
-export function Pill({
+function Pill({
   stackTitle,
   selected,
   selectedStacks,
@@ -154,8 +154,10 @@ export function Pill({
     <>
       <button
         className={cx(
-          "rounded border border-white/5 px-2 py-1 leading-none text-white/60",
-          selected ? "bg-emerald-400/10 text-white" : "",
+          "rounded border border-black/5 px-2 py-1 leading-none text-black/60 dark:border-white/5 dark:text-white/60",
+          selected
+            ? "bg-emerald-400/20 text-black/80 dark:bg-emerald-400/10 dark:text-white"
+            : "",
         )}
         onClick={(e) => {
           if (!selected) {

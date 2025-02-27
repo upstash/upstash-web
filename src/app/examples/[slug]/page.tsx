@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { HTMLProps } from "react";
-import Container from "../../../src/components/container";
-import IconQStash from "../../../src/components/icon-qstash";
-import IconRedis from "../../../src/components/icon-redis";
-import { authors } from "../../../src/utils/authors";
-import markdownToHtml from "../../../src/utils/markdownToHtml";
+import Container from "../../../components/container";
+import IconQStash from "../../../components/icon-qstash";
+import IconRedis from "../../../components/icon-redis";
+import { authors } from "../../../utils/authors";
+import markdownToHtml from "../../../utils/markdownToHtml";
 import { getData, type Example } from "../get-data";
 
 type Props = {

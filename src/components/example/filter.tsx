@@ -311,7 +311,7 @@ function FormContent({
               })
             ) : (
               <div className="grid h-[100%] w-[100%] items-center justify-center">
-                <p className="text-white/40">No stacks found</p>
+                <p className="dark:text-white/40">No stacks found</p>
               </div>
             )}
           </div>
@@ -485,8 +485,8 @@ function Item({
     <label
       className={cx(
         "flex grow cursor-pointer select-none items-center gap-2",
-        "rounded px-4 py-2 text-zinc-400 hover:bg-white/5",
-        checked && "text-zinc-50",
+        "rounded px-4 py-2 text-zinc-400 hover:bg-white/5 dark:text-zinc-400",
+        checked && "text-zinc-800 dark:text-zinc-50",
         className,
       )}
     >
