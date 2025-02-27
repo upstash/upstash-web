@@ -1,7 +1,7 @@
-import "../../src/styles/post.css";
+import "../../styles/post.css";
 import { Metadata } from "next";
 import { ReactNode } from "react";
-import { SITE_URL } from "../../src/utils/const";
+import { SITE_URL } from "../../utils/const";
 
 const title = "Upstash Examples";
 const description =
