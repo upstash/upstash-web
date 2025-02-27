@@ -176,7 +176,7 @@ function ExampleFilterMobile({
       <Toc>
         <Toc.Summary className="pl-3">
           <div className="flex items-center">
-            <h4 className="text-sm uppercase tracking-widest text-white/90 opacity-100">
+            <h4 className="text-sm uppercase tracking-widest opacity-100">
               Filter
             </h4>
             {isFilterDirty && (
