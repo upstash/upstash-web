@@ -422,7 +422,7 @@ function FormContent({
 
 function Child({ className, children, ...props }: HTMLProps<HTMLDivElement>) {
   return (
-    <div className={cx("border-b border-b-white/5 pb-4", className)} {...props}>
+    <div className={cx("border-b border-bg-mute pb-4", className)} {...props}>
       {children}
     </div>
   );
@@ -452,7 +452,7 @@ Toc.Summary = function TocSummary({
     <summary
       className={cx(
         "flex select-none list-none items-center gap-2",
-        "mb-px h-10 cursor-pointer select-none rounded px-4 text-white/40 hover:bg-white/3",
+        "mb-px h-10 cursor-pointer select-none rounded px-4 text-text-mute hover:bg-bg-mute",
         className,
       )}
       {...props}
@@ -485,8 +485,8 @@ function Item({
     <label
       className={cx(
         "flex grow cursor-pointer select-none items-center gap-2",
-        "rounded px-4 py-2 text-zinc-400 hover:bg-white/5 dark:text-zinc-400",
-        checked && "text-zinc-800 dark:text-zinc-50",
+        "rounded px-4 py-2 text-text-mute hover:bg-bg-mute",
+        checked && "text-text",
         className,
       )}
     >
@@ -501,8 +501,8 @@ function Item({
       ) : (
         <span
           className={cx(
-            "relative h-4 w-4 rounded border border-white/10",
-            checked && "border-emerald-400",
+            "relative h-4 w-4 rounded border border-zinc-800/30 dark:border-white/20",
+            checked && "!border-primary",
           )}
         >
           <Icon
@@ -510,7 +510,7 @@ function Item({
             className={cx(
               "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2",
               "text-sm opacity-0 transition duration-100",
-              checked && "text-emerald-400 opacity-100",
+              checked && "text-primary opacity-100",
             )}
           />
         </span>

@@ -32,7 +32,7 @@ export function Example({
   return (
     <article
       className={cx(
-        "group flex flex-col gap-2 border p-6 dark:border-none",
+        "group flex flex-col gap-2 border-none p-6",
         "rounded-xl bg-bg-mute",
         "transition hover:bg-emerald-300/10",
         className,
@@ -154,8 +154,10 @@ function Pill({
     <>
       <button
         className={cx(
-          "rounded border border-emerald-800/10 px-2 py-1 leading-none text-text-mute",
-          selected ? "bg-emerald-400/20 text-primary-text dark:bg-primary" : "",
+          "rounded border border-emerald-800/10 px-2 py-1 leading-none text-text-mute dark:border-white/20",
+          selected
+            ? "dark:bg-primary/40 !border-transparent bg-emerald-400/20 text-primary-text"
+            : "",
         )}
         onClick={(e) => {
           if (!selected) {
