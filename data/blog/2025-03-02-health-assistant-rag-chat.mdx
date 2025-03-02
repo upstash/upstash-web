@@ -1,6 +1,9 @@
 ---
-title: Health Assistant Chatbot
-
+title: "Building a RAG Chatbot for the Health Domain with Next.js"
+slug: health-assistant-rag-chat
+authors:
+  - elifnur
+tags: [rag, vector, health, ai]
 ---
 
 # Health Assistant Chatbot 
@@ -28,12 +31,11 @@ Retrieval-Augmented Generation (RAG) is an AI model that optimizes its responses
 ### Data Collection And Storage
 Data collection of this project is handled by Scrapy, an open-source and powerful web-crawling framework written in Python. We start by [initializing a Scrapy project](https://docs.scrapy.org/en/latest/intro/tutorial.html#creating-a-project) and [customizing our spider](https://github.com/Elifnurdeniz/Health-Assistant-Chat-Bot/tree/main/health_scraper/health_scraper/spiders) based on the data source. The `parse_page` function in the [spider](https://github.com/Elifnurdeniz/Health-Assistant-Chat-Bot/blob/main/health_scraper/health_scraper/spiders/get_content_and_store.py) collects selected sections' data, splits them into chunks, generates vector embeddings for them, and uploads those embeddings to the Upstash Vector Database. 
 
-</br>
 
 To run the crawler locally, follow these steps:
 - Clone the repository: `git clone https://github.com/YOUR_GITHUB_ACCOUNT/Health-Assistant-Chat-Bot.git`
 - Create a .env file in the `health_scraper` folder as in the [example](https://github.com/Elifnurdeniz/Health-Assistant-Chat-Bot/blob/main/health_scraper/.env.example). It will look like this:
-```
+```javascript
 UPSTASH_VECTOR_REST_URL=
 UPSTASH_VECTOR_REST_TOKEN=
 
@@ -42,12 +44,11 @@ OPENAI_API_KEY=
 If you don't already have an Upstash Vector Database, create one [here](https://console.upstash.com/vector) and set 1536 as the vector dimensions, which is the one used by Open AI embeddings. Similarly, if you dont have an Open AI key, creare one [here](https://openai.com/index/openai-api/).
 - Then, run the crawlers in order of `docker compose up collect links` and `docker compose up fetch_content`. This will create a container running your crawler.
 
-</br>
 
 To customize your crawler, you can change the code segment that handles data extractions as in this example:
-```elements = response.xpath("//div[contains(@class, 'content-repository-content')]//p | //div[contains(@class, 'content-repository-content')]//li")```.
+```javascript
+elements = response.xpath("//div[contains(@class, 'content-repository-content')]//p | //div[contains(@class, 'content-repository-content')]//li")```.
 
-</br>
 
 ❗ Note: Running crawler may take time. To see the progress, you can check check the logs or monitor your vector database from your Upstash account. 
 
@@ -58,7 +59,7 @@ To customize your crawler, you can change the code segment that handles data ext
 #### Retrieval with Upstash Vector Database
 The core of our data retrieval process utilizes Upstash's Vector Database, which allows for quick similarity searches of data vectors. When a user submits a query, our system retrieves the most relevant information by comparing the query's vector representation against our database of health-related vectors.
 
-```
+```javascript
 // app/vectorstore/UpstashVectorStore.js
 
 
@@ -116,7 +117,7 @@ return results;
 
 The `UpstashVectorStore` class is used in `api/route.tsx` as a retriever.
 
-```
+```javascript
 const vectorstore = new UpstashVectorStore(new OpenAIEmbeddings());
 const documents = await vectorstore.similaritySearch(currentMessageContent, 6);
 const context = (documents.map((doc) => doc.pageContent)).join("\n");
@@ -126,14 +127,14 @@ const context = (documents.map((doc) => doc.pageContent)).join("\n");
 The frontend implementation for our Health Assistant chatbot uses the `useChat` hook from Vercel AI's SDK. The `useChat` hook is initialized with an api endpoint, which it uses to send and receive messages. `initialMessages` are pre-defined messages that appear when the chat interface loads. In this case, a welcoming message is set up to greet users. The `onResponse` callback function is triggered when a response is received from the backend after a user submits their query. 
 
 `messages`, `input`, `handleInputChange`, `handleSubmit`, and `setInput` are part of the state management utilities provided by useChat. These handle the input field changes, submit actions, and update the messages displayed in the chat interface. 
-```
+```javascript
 // /app/page.tsx
 
 
 ```
 #### Agent Template
 You can determine the behaviour of your chatbot using an agent template. The template begins by defining the AI assistant's identity as `HealthAssistant`, emphasizing its purpose to provide systematic and data-driven health information and stay within the context. Where applicable, responses include URLs to sources for further reading and enhancing the credibility of the information. `previousMessages` are added to the template for increased sense of context. 
-```
+```javascript
 // /app/api/route.tsx
 
 const AGENT_SYSTEM_TEMPLATE = `
@@ -158,7 +159,7 @@ const AGENT_SYSTEM_TEMPLATE = `
 
 #### Streaming Response
 Streaming text functionality is crucial for maintaining a smooth and engaging user experience, especially when handling complex queries that require thoughtful and detailed responses. We implemented streaming responses using [Vercel AI](https://sdk.vercel.ai/docs/reference/ai-sdk-core/stream-text) and [OpenAI](https://sdk.vercel.ai/providers/ai-sdk-providers/openai)'s capabilities. The `streamText` function from Vercel AI's SDK is used to initiate a streaming response. This function takes a model and a prompt, which is the `AGENT_SYSTEM_TEMPLATE`, as parameters. As the AI generates responses, they are immediately sent back to the user, simulating a natural and dynamic conversation flow.
-```
+```javascript
 import { streamText } from "ai";
 import { openai } from '@ai-sdk/openai';
 
@@ -193,7 +194,7 @@ export async function POST(req: NextRequest) {
 #### Rate Limiting
 Managing the flow of requests is crucial to maintain performance and prevent abuse. This is where Upstash rate limiting comes into play, ensuring that our resources are not overwhelmed by too many requests from a single user or IP address in a short period. We initialize a Redis client using `Redis.fromEnv()` with the `UPSTASH_VECTOR_REST_URL` and `UPSTASH_VECTOR_REST_TOKEN` provided in `.env` file. 
 When a user hits the rate limit, a custom error message is sent back, politely informing them to try again later.
-```
+```javascript
 // /app/api/route.tsx
 
 import { Ratelimit } from "@upstash/ratelimit";
@@ -222,7 +223,7 @@ export async function POST(req: NextRequest) {
 The required packages can be installed by `npm install` command. After that, a `.env` file should be created in the root folder as in the [example](https://github.com/Elifnurdeniz/Health-Assistant-Chat-Bot/blob/main/.env.example). 
 
 It will look like the following:
-```
+```javascript
 UPSTASH_VECTOR_REST_URL=
 UPSTASH_VECTOR_REST_TOKEN=
 
