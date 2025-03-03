@@ -58,40 +58,51 @@ Go into the project folder and install the required dependencies.
 
 ```
 cd <project-name>
-npm install @tanstack/react-query @upstash/redis
+npm install @upstash/redis @tanstack/react-query @tanstack/react-query-persist-client
 ```
 
 In the code, we need to start with creating the Redis utility for managing the interaction with the Upstash Redis. To do this, we need to create a `redis.tsx` file under `lib/` folder.
 
 ```typescript
-import { Redis } from  '@upstash/redis';
+"use server"
 
-const  redis  =  new  Redis({
-	url:  '<UPSTASH-REDIS-URL>',
-	token:  '<UPSTASH-REDIS-TOKEN>',
+import { PersistedClient } from '@tanstack/react-query-persist-client';
+import { Redis } from '@upstash/redis';
+
+const redis = new Redis({
+	url: "<UPSTASH_REDIS_REST_URL>",
+	token: "<UPSTASH_REDIS_REST_TOKEN>",
 })
 
-export  async  function  saveCache(key:  string, data:  unknown) {
-	await  redis.set(key, JSON.stringify(data));
+export async function saveCache(key: string, data: PersistedClient) {
+	await redis.set(key, JSON.stringify(data));
 }
 
-export  async  function  getCache(key:  string) {
-	const  data  =  await  redis.get(key);
-	return  data  ?  JSON.parse(data  as  string) :  undefined;
+export async function getCache(key: string): Promise<PersistedClient | undefined> {
+	const data = await redis.get(key) as PersistedClient | undefined;
+	return data;
 }
+
+export async function removeFromCache(key: string) {
+	await redis.del(key);
+}
+
 ```
+
+The `"use server"` directive ensures the code runs on the server side, keeping Redis credentials secure. Without it, the code would run on the client side, exposing sensitive information and leading to potential security risks.
 
 In this code block, do not forget to replace the Upstash Redis database url and token placeholders with the values that you get from the Upstash Redis console.
 
 Now we need a React Query persister that uses Redis as the persister. To do that, let’s write the persister in `lib/redisPersister.tsx` file.
 
 ```typescript
-import { saveCache, getCache } from  './redis';
+import { PersistedClient } from '@tanstack/react-query-persist-client';
+import { saveCache, getCache, removeFromCache } from './redis';
 
-export  const  redisPersister  = {
-	persistClient:  async (client:  unknown) =>  saveCache('react-query-cache', client),
-	restoreClient:  async () =>  getCache('react-query-cache'),
-	removeClient:  async () =>  saveCache('react-query-cache', null),
+export const redisPersister = {
+	persistClient: async (client: PersistedClient) => saveCache('react-query-cache', client),
+	restoreClient: async () => getCache('react-query-cache'),
+	removeClient: async () => removeFromCache('react-query-cache'),
 };
 ```
 
@@ -99,17 +110,18 @@ Now, we will use this Redis persister in TanStack Query by implementing the cust
 
 ```typescript
 'use client';
-import { QueryClient, QueryClientProvider } from  '@tanstack/react-query';
-import { PersistQueryClientProvider } from  '@tanstack/react-query-persist-client';
-import { redisPersister } from  './lib/redisPersister';
 
-const  queryClient  =  new  QueryClient();
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+import { redisPersister } from './lib/redisPersister';
 
-export  function  Providers({ children }: { children:  React.ReactNode }) {
+const queryClient = new QueryClient();
+
+export function Providers({ children }: { children: React.ReactNode }) {
 	return (
-	<PersistQueryClientProvider  client={queryClient}  persistOptions={{ persister:  redisPersister }}>
-		<QueryClientProvider  client={queryClient}>{children}</QueryClientProvider>
-	</PersistQueryClientProvider>
+		<PersistQueryClientProvider client={queryClient} persistOptions={{ persister: redisPersister }}>
+			<QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+		</PersistQueryClientProvider>
 	);
 }
 ```
@@ -117,11 +129,11 @@ export  function  Providers({ children }: { children:  React.ReactNode }) {
 Finally, we will use this custom `PersistQueryClientProvider` in the `layout.tsx`. This will finalize the integration of the Redis with the TanStack Query.
 
 ```typescript
-import { Providers } from  './providers';
+import { Providers } from './providers';
 
-export  default  function  RootLayout({ children }: { children:  React.ReactNode }) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
 	return (
-		<html  lang="en">
+		<html lang="en">
 			<body>
 				<Providers>{children}</Providers>
 			</body>
@@ -136,21 +148,23 @@ To test the integration and see how it works, we can create an API that uses Tan
 
 ```typescript
 'use client';
-import { useQuery } from  '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 
-function  FetchData() {
-	const { data, isLoading } =  useQuery({ queryKey: ['testData'], queryFn:  async () => {
-		const  response  =  "Hello World!";
-		return  response;
-}});
+function FetchData() {
+	const { data, isLoading } = useQuery({
+		queryKey: ['testData'], queryFn: async () => {
+			const response = "Hello World!";
+			return response;
+		}
+	});
 
-if (isLoading) return  <p>Loading...</p>;
+	if (isLoading) return <p>Loading...</p>;
 
-return  <pre>{JSON.stringify(data, null, 2)}</pre>;
+	return <pre>{JSON.stringify(data, null, 2)}</pre>;
 }
 
-export  default  function  HomePage() {
-	return  <FetchData  />;
+export default function HomePage() {
+	return <FetchData />;
 }
 ```
 
@@ -165,6 +179,32 @@ npm run dev
 And open the `localhttp://localhost:3000`. This will make you use the TanStack Query with the Redis persister. Once you access to the API, you can go back to your Upstash Redis console, click to the `Data Browser` tab and see the client data similar to the screenshot below.
 
 ![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXfsMQYy7IbEqq3QDpFpZ1KqpDWbQThSGq47iGIa59IW4KzNeiX1pCo7OA2tR_O7pKCAVB1DjJNjJrS2207QZ1DAZ2CRhtcRDEoyFg-lOmhNOyUQ24g8aJAElm8hfPZMuShlDbT6pg?key=ez03LxEeuUvSNWnST5nJ0Dwq)
+
+## Production Considerations
+
+The implementation shown in this tutorial is a minimal example without user authentication or data isolation.
+
+In a real-world production application, you may want to isolate cache data between users with user-specific keys:
+
+```typescript
+// Updated redisPersister.tsx
+export const redisPersister = (userId: string) => ({
+  persistClient: async (client: PersistedClient) => 
+    saveCache(`react-query-cache:${userId}`, client),
+  restoreClient: async () => getCache(`react-query-cache:${userId}`),
+  removeClient: async () => removeFromCache(`react-query-cache:${userId}`),
+});
+```
+
+For a production-ready implementation, you should consider the following points too:
+
+- **Authentication**: Secure your server actions to ensure users can only access their own cache data. See NextJS documentation on [server action authentication](https://nextjs.org/docs/app/building-your-application/authentication#server-actions).
+
+- **Rate Limiting**: Implement rate limiting to protect your Redis instance from excessive requests. The [Upstash Ratelimit library](https://github.com/upstash/ratelimit-js) provides an easy solution compatible with Upstash Redis.
+
+## Conclusion
+
+By integrating Redis with TanStack Query in Next.js, we've created a system for persistent caching that improves user experience while reducing API calls. When implementing this solution in production, ensure you've addressed user isolation, authentication, and rate limiting to create a secure and scalable system.
 
 ## Conclusion
 
