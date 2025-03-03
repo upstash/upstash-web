@@ -1,20 +1,22 @@
 "use client";
 
-import { HTMLProps, useEffect, useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-
-import cx from "@/utils/cx";
-
 import Container from "@/components/container";
 import Icon, { ICON_NAMES } from "@/components/icon";
 import { Logo } from "@/components/logo";
-
+import { PolicyBanner } from "@/components/policy-banner";
+import cx from "@/utils/cx";
+import { useMotionValueEvent, useScroll } from "framer-motion";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { HTMLProps, useEffect, useState } from "react";
 import NavMobile from "./nav-mobile";
 
 export interface IAppHeader extends HTMLProps<HTMLHeadElement> {}
 
 export default function Header({ className, ...props }: IAppHeader) {
+  const [fix, setFix] = useState(false);
+  const { scrollY } = useScroll();
+
   const [showMenu, setShowMenu] = useState(false);
   const pathname = usePathname();
 
@@ -22,17 +24,23 @@ export default function Header({ className, ...props }: IAppHeader) {
     setShowMenu(false);
   }, [pathname]);
 
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    setFix(latest > 10);
+  });
+
   return (
     <header
       className={cx(
-        "fixed inset-x-0 top-0 z-50 py-4 md:hidden",
-        "border-b border-b-white/5 bg-zinc-950",
+        "fixed inset-x-0 top-0 z-50 md:hidden",
+        "border-b border-b-white/5",
+        fix && "bg-bg shadow",
         className,
       )}
       {...props}
     >
+      <PolicyBanner />
       <Container>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between py-4">
           <div className="flex">
             <Link href="/">
               <Logo height={30} />
@@ -41,7 +49,7 @@ export default function Header({ className, ...props }: IAppHeader) {
 
           <button
             type="button"
-            className="flex items-center justify-center p-2 opacity-60"
+            className="flex items-center justify-center p-2 opacity-70"
             onClick={() => setShowMenu((prev) => !prev)}
           >
             {showMenu ? (

@@ -1,5 +1,3 @@
-import React from "react";
-
 import { allJobs } from "@content";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import {
@@ -7,7 +5,7 @@ import {
   IconUserPlus,
   IconUsers,
 } from "@tabler/icons-react";
-
+import React from "react";
 import {
   ListItem,
   NewNavigationContent,
@@ -21,18 +19,17 @@ export default function NewNavigationItemCompany() {
     <NavigationMenu.Item>
       <NewNavigationTrigger>
         Company{" "}
-        <span className="ml-1 flex items-center rounded-full bg-emerald-400/20 px-1.5 py-1 font-mono text-sm leading-none text-emerald-400">
+        <span className="ml-1 flex items-center rounded-full bg-emerald-400/20 px-1.5 py-1 font-mono text-sm leading-none text-emerald-700 dark:text-primary">
           {jobLength}
         </span>
       </NewNavigationTrigger>
 
       <NewNavigationContent>
-        <div className="grid w-[440px] gap-4 p-6">
+        <div className="grid w-[440px] gap-2 p-4">
           <ListItem
             href="/customers"
             title1="Customers"
             icon={<IconMoodSmileBeam strokeWidth={1.5} />}
-            className="hover:bg-amber-50 hover:text-amber-900"
           >
             The teams we empower
           </ListItem>
@@ -42,13 +39,12 @@ export default function NewNavigationItemCompany() {
             title1={
               <>
                 Careers
-                <span className="ml-1 inline-flex items-center rounded-full bg-purple-200 px-1.5 py-1 font-mono text-sm leading-none text-purple-800">
+                <span className="ml-1 inline-flex items-center rounded-full bg-emerald-400/20 px-1.5 py-1 font-mono text-sm leading-none text-emerald-700 dark:text-primary">
                   {jobLength}
                 </span>
               </>
             }
             icon={<IconUserPlus strokeWidth={1.5} />}
-            className="hover:bg-purple-50 hover:text-purple-900"
           >
             Help us build the cutting edge data platform
           </ListItem>
@@ -57,7 +53,6 @@ export default function NewNavigationItemCompany() {
             href="/about"
             title1="About"
             icon={<IconUsers strokeWidth={1.5} />}
-            className="hover:bg-emerald-50 hover:text-emerald-900"
           >
             Data Platform for Developers
           </ListItem>

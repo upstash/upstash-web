@@ -16,6 +16,7 @@ export const customers = defineCollection({
     company_name: z.string(),
     company_url: z.string(),
     company_logo: z.string(),
+    company_logo_dark: z.string(),
     user_name: z.string(),
     user_title: z.string(),
     user_photo: z.string(),
@@ -47,6 +48,28 @@ export const jobs = defineCollection({
     how: z.string(),
     location: z.string(),
     skills: z.array(z.string()),
+    draft: z.boolean().optional(),
+  }),
+  transform: async (doc, ctx) => {
+    const mdx = await compileMDX(ctx, doc);
+    const slug = doc._meta.path;
+
+    return {
+      ...doc,
+      mdx,
+      slug,
+    };
+  },
+});
+
+export const glossary = defineCollection({
+  name: "Glossary",
+  directory: "./data/glossary",
+  include: "*.mdx",
+  schema: (z) => ({
+    title: z.string(),
+    summary: z.string(),
+    relations: z.array(z.string()).optional(),
     draft: z.boolean().optional(),
   }),
   transform: async (doc, ctx) => {
@@ -124,5 +147,5 @@ export const posts = defineCollection({
 });
 
 export default defineConfig({
-  collections: [customers, jobs, posts],
+  collections: [customers, jobs, glossary, posts],
 });

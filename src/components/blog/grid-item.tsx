@@ -1,24 +1,20 @@
-import Image from "next/image";
-import Link from "next/link";
-
 import type { Post } from "@content";
 import { DateTime } from "luxon";
-import Balancer from "react-wrap-balancer";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function PostGridCard({ data }: { data: Post }) {
   const { title, slug, date, authorsData } = data;
 
   return (
-    <article className="flex h-full flex-col justify-between rounded-3xl bg-emerald-900/5 p-6 md:p-8 dark:bg-white/5">
+    <article className="flex h-full flex-col justify-between rounded-3xl bg-bg-mute p-6 md:p-8">
       <h3 className="pr-4 font-display text-3xl font-semibold leading-tight md:pr-12">
-        <Balancer>
-          <Link
-            href={`/blog/${slug}`}
-            className="block transition hover:text-emerald-500 hover:underline dark:hover:text-emerald-400"
-          >
-            {title}
-          </Link>
-        </Balancer>
+        <Link
+          href={`/blog/${slug}`}
+          className="block transition hover:text-primary-text hover:underline"
+        >
+          {title}
+        </Link>
       </h3>
 
       <div
@@ -31,7 +27,7 @@ export default function PostGridCard({ data }: { data: Post }) {
             <div className="flex grow flex-col items-start">
               <Link
                 href={`/blog/author/${author.username}`}
-                className="font-medium opacity-80 hover:text-emerald-500 hover:underline dark:hover:text-emerald-400"
+                className="hover:text-primary hover:underline"
               >
                 {author.name}
               </Link>
@@ -46,7 +42,7 @@ export default function PostGridCard({ data }: { data: Post }) {
               height={64}
               alt={author.name}
               src={author.image}
-              className="aspect-square shrink-0 rounded-full border-2 border-emerald-900/10 object-cover dark:border-emerald-500/40"
+              className="aspect-square shrink-0 rounded-full object-cover"
             />
           </div>
         ))}

@@ -1,7 +1,3 @@
-import React from "react";
-
-import { HOME_SECTIONS } from "@/utils/const";
-
 import Bg from "@/components/bg";
 import Container from "@/components/container";
 import {
@@ -10,7 +6,8 @@ import {
   SectionHeaderTitle,
 } from "@/components/home/section-header";
 import Icon, { ICON_NAMES } from "@/components/icon";
-
+import { IconBrandX } from "@tabler/icons-react";
+import React from "react";
 import {
   CommunityBox,
   CommunityBoxButton,
@@ -20,8 +17,8 @@ import {
 
 export default function HomeCommunity() {
   return (
-    <section id={HOME_SECTIONS.COMMUNITY} className="relative py-16 md:py-28">
-      <Bg className="top-32 h-1/2 bg-yellow-500" />
+    <section className="relative z-10 py-8 md:py-16">
+      <Bg />
 
       <Container>
         {/* header */}
@@ -36,7 +33,7 @@ export default function HomeCommunity() {
           <CommunityBox>
             <Icon
               icon={ICON_NAMES.FileText}
-              className="mb-4 text-4xl group-hover/community-box:text-emerald-400 md:text-5xl"
+              className="mb-4 hidden text-4xl group-hover:text-primary sm:inline-flex md:text-5xl"
               strokeWidth="1"
             />
             <CommunityBoxTitle>Blog</CommunityBoxTitle>
@@ -51,7 +48,7 @@ export default function HomeCommunity() {
           <CommunityBox>
             <Icon
               icon={ICON_NAMES.Discord}
-              className="mb-4 text-4xl group-hover/community-box:text-emerald-400 md:text-5xl"
+              className="mb-4 hidden text-4xl group-hover:text-primary sm:inline-flex md:text-5xl"
               strokeWidth="1"
             />
             <CommunityBoxTitle>Discord</CommunityBoxTitle>
@@ -65,14 +62,14 @@ export default function HomeCommunity() {
           </CommunityBox>
 
           <CommunityBox>
-            <Icon
-              icon={ICON_NAMES.Twitter}
-              className="mb-4 text-4xl group-hover/community-box:text-emerald-400 md:text-5xl"
-              strokeWidth="1"
+            <IconBrandX
+              size={48}
+              className="mb-4 hidden text-4xl group-hover:text-primary sm:inline-flex md:text-5xl"
+              strokeWidth={1}
             />
-            <CommunityBoxTitle>Twitter</CommunityBoxTitle>
+            <CommunityBoxTitle>X</CommunityBoxTitle>
             <CommunityBoxDesc>
-              Follow us on Twitter to stay up to date with the latest news from
+              Follow us on X to stay up to date with the latest news from
               Upstash.
             </CommunityBoxDesc>
             <CommunityBoxButton href="https://twitter.com/upstash">
@@ -83,7 +80,7 @@ export default function HomeCommunity() {
           <CommunityBox>
             <Icon
               icon={ICON_NAMES.Github}
-              className="mb-4 text-4xl group-hover/community-box:text-emerald-400 md:text-5xl"
+              className="mb-4 hidden text-4xl group-hover:text-primary sm:inline-flex md:text-5xl"
               strokeWidth="1"
             />
             <CommunityBoxTitle>Github</CommunityBoxTitle>

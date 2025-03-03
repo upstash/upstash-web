@@ -1,10 +1,7 @@
-import { HTMLProps } from "react";
-import Image from "next/image";
-
-import cx from "@/utils/cx";
-
 import { LogoIcon } from "@/components/logo";
-
+import cx from "@/utils/cx";
+import Image from "next/image";
+import { HTMLProps } from "react";
 import { ServerlessBox, ServerlessSummary, ServerlessTitle } from "./comp";
 
 export default function DesignedForTheEdge() {
@@ -36,11 +33,41 @@ export default function DesignedForTheEdge() {
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
-            <circle opacity="0.1" cx="245" cy="245" r="47.5" stroke="white" />
-            <circle opacity="0.08" cx="245" cy="245" r="96.5" stroke="white" />
-            <circle opacity="0.06" cx="245" cy="245" r="146.5" stroke="white" />
-            <circle opacity="0.04" cx="245" cy="245" r="195.5" stroke="white" />
-            <circle opacity="0.02" cx="245" cy="245" r="244.5" stroke="white" />
+            <circle
+              opacity="0.1"
+              cx="245"
+              cy="245"
+              r="47.5"
+              stroke="currentColor"
+            />
+            <circle
+              opacity="0.08"
+              cx="245"
+              cy="245"
+              r="96.5"
+              stroke="currentColor"
+            />
+            <circle
+              opacity="0.06"
+              cx="245"
+              cy="245"
+              r="146.5"
+              stroke="currentColor"
+            />
+            <circle
+              opacity="0.04"
+              cx="245"
+              cy="245"
+              r="195.5"
+              stroke="currentColor"
+            />
+            <circle
+              opacity="0.02"
+              cx="245"
+              cy="245"
+              r="244.5"
+              stroke="currentColor"
+            />
           </svg>
 
           <LogoIcon />
@@ -220,7 +247,7 @@ function ProductIn({ children, className }: HTMLProps<HTMLDivElement> & {}) {
     <span
       className={cx(
         "flex h-12 w-12 shrink-0 items-center justify-center",
-        "rounded-full bg-white",
+        "rounded-full bg-bg-mute dark:bg-white",
         className,
       )}
     >

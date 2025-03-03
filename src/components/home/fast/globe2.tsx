@@ -1,12 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-
+import useIntersectionObserver from "@/hooks/use-intersection-observer";
 import cx from "@/utils/cx";
 import createGlobe from "cobe";
+import { useEffect, useRef, useState } from "react";
 import { useSpring } from "react-spring";
-
-import useIntersectionObserver from "@/hooks/use-intersection-observer";
 
 export default function GlobeClient() {
   const divRef = useRef<any>();

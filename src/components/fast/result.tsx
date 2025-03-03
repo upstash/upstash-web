@@ -1,17 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
 import cx from "@/utils/cx";
+import { useEffect, useState } from "react";
 import useSWR from "swr";
-
-import { useSegment } from "@/hooks/use-segment";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export default function FastResult() {
   const [r, setR] = useState<number>();
-  const segment = useSegment();
+
   return (
     <div>
       <header className="flex items-center justify-between border-b border-b-zinc-900 py-3 text-xs uppercase tracking-widest text-zinc-600 md:py-2">
@@ -19,7 +16,6 @@ export default function FastResult() {
         <span className="flex items-center gap-1">
           <button
             onClick={() => {
-              segment.track("button.fast-anywhere.refresh");
               setR(Date.now());
             }}
             type="button"

@@ -1,7 +1,3 @@
-import { Metadata } from "next";
-
-import Balancer from "react-wrap-balancer";
-
 import Bg from "@/components/bg";
 import Container from "@/components/container";
 import * as AboutIcon from "@/components/investor/icons";
@@ -9,6 +5,7 @@ import Investors from "@/components/investor/investors";
 import PageBodyGradient from "@/components/page-body-gradient";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
+import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "About",
@@ -31,7 +28,7 @@ export default function HomePage() {
             </PageHeaderTitle>
 
             <PageHeaderDesc className="mt-2">
-              <span className="grid gap-1 md:gap-2">
+              <span className="grid gap-1">
                 <span>We manage everything for you.</span>
                 <span>You focus on more important things.</span>
                 <span>
@@ -51,8 +48,8 @@ export default function HomePage() {
                   <h3 className="mt-4 font-display text-xl font-semibold">
                     {mission.title}
                   </h3>
-                  <p className="mx-12 mt-2 opacity-60 md:mx-6">
-                    <Balancer>{mission.desc}</Balancer>
+                  <p className="mx-12 mt-2 text-balance opacity-60 md:mx-6">
+                    {mission.desc}
                   </p>
                 </div>
               );
@@ -88,21 +85,21 @@ const MISSIONS = [
     title: "Fast",
     desc: "We understand that every millisecond matters to you.",
     icon: (
-      <AboutIcon.Fast className="text-[60px] text-emerald-400 md:text-[70px]" />
+      <AboutIcon.Fast className="text-[60px] text-primary md:text-[70px]" />
     ),
   },
   {
     title: "Simple",
     desc: "Keep the things as simple as possible but not simpler.",
     icon: (
-      <AboutIcon.Simple className="text-[60px] text-emerald-400 md:text-[70px]" />
+      <AboutIcon.Simple className="text-[60px] text-primary md:text-[70px]" />
     ),
   },
   {
     title: "Robust",
     desc: "We aim to earn your trust with robust solutions.",
     icon: (
-      <AboutIcon.Robust className="text-[60px] text-emerald-400 md:text-[70px]" />
+      <AboutIcon.Robust className="text-[60px] text-primary md:text-[70px]" />
     ),
   },
 ];

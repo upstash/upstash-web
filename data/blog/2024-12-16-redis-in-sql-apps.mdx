@@ -1,0 +1,215 @@
+---
+title: "Speed up your Database with Global Redis"
+slug: redis-in-sql-apps
+authors:
+  - noah
+tags: [redis, SQL, serverless, global, cache]
+---
+
+A software application is only as valuable as it can meet the needs of its customers. When we consider the needs of customers, the first demands we encounter is the speed of application and the data reliability. However, as applications grow and expand globally, SQL databases often become a performance bottleneck due to increased query volumes, higher latencies, and geographically spreaded user bases.
+
+To address these problems when the application grows, caching is one of the first solution to reduce the load on primary database for repeated queries and reduce the latency when users submit queries. When we talk about cache, the same tool comes to mind for each of us, right? Yes, that is Redis. Redis is a perfect tool for caching the data to reduce the load and make the applications faster. Upstash also provides Redis replication globally distributed, which will make the applications much faster than even a regular cache.
+
+In this blog, we’ll explore the technical advantages of integrating Global Redis with SQL databases, discuss its impact on latency and scalability, and provide hands-on examples for using Global Redis with PostgreSQL and MySQL.  
+
+## Benefits of Caching
+
+Let’s first examine why we should use caching.
+
+There are two main benefits of caching that I would like to mention in this blog: reducing database load and reducing latency to the users.
+
+### Reducing Database Load
+
+SQL databases excel at managing structured data and complex queries, but under heavy load, they can become a bottleneck. High volumes of repeated queries for the same data—such as product details, user profiles, or frequently accessed settings—consume significant CPU and I/O resources. By caching these results, the number of queries hitting the database is drastically reduced, allowing the database to focus on more critical tasks like transaction processing and updates.
+
+For example:
+-   Without caching: A popular feature on a website generates millions of identical database queries daily, slowing down performance for other operations.
+-   With caching: Frequently accessed query results are stored in a high-speed cache like Redis, reducing database query rates by over 90%.
+
+### Reducing Latency
+
+Decreasing the database load was for the system health to ensure the data reliability. Caching also improves the time that user requests and queries take.
+
+When applications repeatedly query the database for the same data, the data retrieval will always take long time. Especially if these queries create a large load on the database, all these delays can increase further. This is particularly problematic for applications requiring real-time data access or handling high query volumes, where even small delays can significantly impact performance.
+
+Caching solves this problem by storing frequently accessed data in memory, which is much faster to retrieve than querying the database. By reducing the dependency on database queries for repeated requests, caching minimizes network travel and avoids the computational overhead of executing complex queries. As a result, response times are dramatically improved, enabling applications to deliver faster, more consistent performance even under heavy load or in distributed environments.
+
+## Common Caching Strategies
+
+It’s also important to understand the two primary caching strategies used in application performance optimization: **cache-aside** and **write-through**. Each approach has its use cases and trade-offs, depending on the application’s requirements.
+
+**Cache-aside** is the most common caching technique. In this technique, the application checks the cache for data first. If the data is not in the cache (cache miss), it retrieves the data from the database and writes it into the cache for future use.
+
+Here is a simple diagram that shows how cache-aside works, which might you all have already seen it in somewhere before coming to this blog.
+
+
+![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXelKYmE0InB2W9oGQLdBbiu7u48jfJoFq0y7QTTjF8zXzwMuTDDUTM5REltXA3MHpUuYVQO1gukpBHSl2F_YiPl0yk2qdcN6C_r3u89LCJ6mz0Yj6M2z3BKdWfhhgn5ewNtc8aMug?key=xa7BZ1Ja-5irquLLBMCW-KA3)
+
+The advantage of this caching is that the cache size is optimized, and the cache data is reloaded when needed by the users. On the other hand, the disadvantage is that the data won’t be available after the cache cleaned when its TTL is over. At that time, the cache will be reloaded when the user request that data. In this case, that user will have to wait for the query to be done. But of course, the next requests will be able to get the data from the cache again.
+
+In a **write-through** strategy, every write operation to the database is immediately written to the cache as well. This ensures that the cache is always up-to-date with the latest data from the database.
+
+Here is a simple diagram of write-through caching:
+
+
+![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXfVBE0a0cp0oWhCOMCNms8D-CNEXVM25Yt58aYUYD5k-kGfPNCXZlOzQeCNjR26qqBNSIfE3q4CbbfxDLQPv7cTMufOONV6Euo5roPjIh1pu_Re2j5fmBUVamMxRq758kDJJDZWDg?key=xa7BZ1Ja-5irquLLBMCW-KA3)
+
+This strategy ensures data consistency between the cache and the database and none of the requests experience higher latency because the data will be already available without waiting for a request from the user. However, the disadvantage is that the cache contains all the data, even if it is not needed. In addition to that, every write operation will gain latency since the data will be written to the cache as well.
+
+## What is Global Redis? Benefits of Global Redis
+
+Let’s now investigate how to improve the performance of the SQL database further.
+
+Another source of the latency is the location of the database. In most cases, primary database located in specific regions. However, the data should be reachable in the closest location so that we can minimize the delay caused by the distance to the data store.
+
+This problem can be prevented by using a globally distributed Redis, provided by Upstash.
+
+Global Redis is a distributed caching solution that replicates data across multiple geographical locations, ensuring low-latency access for globally distributed applications.
+
+Let’s quickly see how to create global Redis. First, login to the [Upstash console](https://console.upstash.com/redis).
+
+After login, we can create a Redis database here. Upstash provides multiple locations to locate read replicas.
+
+
+![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXebRyJQsgRH19FP6dcpWevRrjsAH4la9sb9LmvKo7DMAXbWvPJKR1rwKK46NJhRoUeq88zq-C9EII8TrjwmbEcVeJGXTZZbsqdZ6QElmhr2JBnTLpOC4p8ZPh1UwfGcLV2iaOrxKg?key=xa7BZ1Ja-5irquLLBMCW-KA3)
+
+Once selecting the read locations, you can select your plan and finally create your Redis database. That’s all!
+
+In the console, you can add/remove the regions after creating the database as well.
+
+
+![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXe4DtZjMX6VKfz4LrZbYOKZu039zkbpoz_geHKLIT41ix9py83KYB36w7S6sO420EiYs9f5hw0Ob0IQ6RjbQgXF8fe28eFCoogHhQ65hjkPvDrhFfqQ0YRj138H93KlxBQgNH6lWg?key=xa7BZ1Ja-5irquLLBMCW-KA3)
+
+Global Redis databases are mostly used by the applications that are globally distributed and the applications that are running at the edge.
+
+### Low latency for globally distributed applications
+
+In globally distributed systems, latency often becomes a bottleneck due to the physical distance between users and the central database or cache. Global Redis addresses this by replicating data across multiple geographically distributed nodes.
+
+When a user requests data, the closest cache node serves the request, drastically reducing network travel time. This localized access ensures faster response times and a consistent user experience, regardless of the user’s location.
+
+Let’s say, if a user located in Tokyo, but the database is in Dublin, then the distance will delay the response to the user. If there is a read replica of the Upstash Redis in Europe, then the request can be routed to the closest read replica, which is the one in Europe in this case.
+
+  
+### Low latency data for edge runtimes (e.g. Cloudflare Workers)
+
+Edge runtimes are environments designed to execute code at the network's edge, close to the end user. Edge runtimes distribute application logic across multiple edge locations worldwide. This architecture minimizes the physical distance between users and the execution of their requests, significantly reducing latency and improving performance.
+
+While edge runtimes bring computation closer to users, they still need access to data for most operations, such as retrieving user-specific information, session tokens, or configurations. Without a caching layer, each request would still require a round trip to a central database, negating much of the latency benefit. This is where Global Redis play a critical role, as they replicate frequently used data to the edge, ensuring low-latency access.
+
+## Example code 1: PostgreSQL with Node.js
+
+Caching with global Redis is perfect. Now, we will see a code sample that implements the cache-aside strategy with Upstash Redis and a Postgresql database.
+
+We should first install SDKs that we will use to connect to the data stores.
+
+```
+npm install pg upstash/redis
+```
+
+Once we have the dependencies installed, then we can connect to the data stores, Upstash Redis and Postgres.
+
+```javascript
+const { Redis } = require('@upstash/redis'); // Upstash Redis SDK
+const { Client } = require('pg');
+
+const redis = new Redis({
+  url: <UPSTASH_REDIS_REST_URL>,
+  token: <UPSTASH_REDIS_REST_TOKEN>,
+})
+
+const client = new Client({
+  user: 'username',
+  password: 'password',
+  host: 'host',
+  port: 'port_number',
+  database: 'database_name',
+});
+
+client.connect();
+```
+
+Now let’s write the function in our data access layer. This function can be modified as per your needs.
+
+Let’s say we want to show the user information on our website by userId. In this case, we should have a function that gets the userId as parameter
+
+```javascript
+async function getUserData(userId) {
+  // Check cache first
+  const cachedData = await redis.get(userId);
+  if (cachedData) {
+    console.log('Cache hit');
+    return JSON.parse(cachedData);
+  }
+  // Fallback to database
+  console.log('Cache miss');
+  const query = 'SELECT * FROM users WHERE id = $1';
+  const { rows } = await client.query(query, [userId]);
+  await redis.set(userId, JSON.stringify(rows), { EX: 300 }); // Cache for 5 minutes
+  return rows;
+}
+```
+
+Here it is! Now this function will first check if the user information available in the closest Redis database to the requester’s region. If it is not available, it will query the requested data from Postgresql database and write the returned data to the Upstash Redis primary region. The data written to the primary region will be copied to all the read replicas automatically.
+
+## Example code 2: MYSQL with Python
+
+Now, let’s see another example. This time, we will do the same cache implementation, but the main database will be MYSQL this time. Also, we will write this function in Python to see how it works in Python-based applications.
+
+As usual, we will download the dependencies that we will use for connecting the database first.
+
+```
+pip install upstash-redis upstash-redis
+```
+
+Now, we can initialize the clients and connect them.
+
+```python
+import upstash_redis
+import mysql.connector
+import json
+
+# Initialize Upstash Redis client
+redis_client = upstash_redis.Redis(
+  url='<your-upstash-redis-url>',
+  token='<your-upstash-token>'
+)
+
+# Initialize MySQL client
+db = mysql.connector.connect(
+  host="<your-mysql-host>",
+  user="<your-mysql-user>",
+  password="<your-mysql-password>",
+  database="<your-database-name>"
+)
+
+cursor = db.cursor(dictionary=True)
+```
+
+Connections are ready. Now we will implement the similar function that we implemented in the previous section.
+
+```python
+def get_user_data(userId):
+  # Check the cache for the data
+  cache_data = redis_client.get(key)
+  if cache_data:
+    print("Cache hit")
+    return json.loads(cache_data)
+    
+  # If cache miss, query the MySQL database
+  print("Cache miss")
+  cursor.execute("SELECT * FROM users WHERE key = %s", (userId))
+  result = cursor.fetchone()
+  if result:
+    # Store the data in the cache with a TTL of 1 hour
+    redis_client.set(key, json.dumps(result), ex=3600)
+  return result
+```
+
+## Conclusion
+
+By integrating Global Redis into your architecture, you can achieve significant performance gains for SQL-based applications, particularly in globally distributed environments. With low-latency access, reduced database load, and compatibility with edge runtimes, Global Redis can address the performance challenges of the applications with SQL databases.
+
+In this blog post, we went through the benefits of caching with global Redis and examined some examples. These were just basic examples that could be extended more depending on your needs.
+
+I hope this blog can be a good start for you to start leveraging the power of global Redis.

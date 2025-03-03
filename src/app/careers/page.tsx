@@ -1,12 +1,10 @@
-import { Metadata } from "next";
-import Link from "next/link";
-
-import { allJobs } from "@content";
-
 import Bg from "@/components/bg";
 import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
+import { allJobs } from "@content";
+import { Metadata } from "next";
+import Link from "next/link";
 
 const description =
   "Help us build the cutting edge data platform for the serverless era.";
@@ -38,10 +36,10 @@ export default function HomePage() {
             return (
               <Link
                 key={job.slug}
-                className="group/job-item grid rounded-lg bg-white/3 p-6 transition hover:bg-emerald-200/5 md:rounded-3xl md:p-8"
+                className="group grid rounded-lg bg-bg-mute p-6 transition md:rounded-3xl md:p-8"
                 href={`/careers/${job.slug}`}
               >
-                <h2 className="font-display text-xl font-semibold text-emerald-400 group-hover/job-item:underline">
+                <h2 className="font-display text-xl font-semibold text-primary-text group-hover:underline">
                   {job.title}
                 </h2>
 
@@ -49,10 +47,7 @@ export default function HomePage() {
 
                 <div className="mt-6 flex flex-wrap items-center gap-1">
                   {job.skills.map((skill: string) => (
-                    <span
-                      className="rounded bg-white/3 px-3 py-1 text-zinc-400"
-                      key={skill}
-                    >
+                    <span className="rounded bg-bg px-3 py-1" key={skill}>
                       {skill}
                     </span>
                   ))}

@@ -1,7 +1,7 @@
-import * as React from "react";
+"use client";
 
 import * as Accordion from "@radix-ui/react-accordion";
-
+import * as React from "react";
 import {
   AccordionContent,
   AccordionItem,
@@ -73,40 +73,6 @@ export default function FAQ() {
         </AccordionTrigger>
         <AccordionContent>
           QStash API starts to return exceptions.
-        </AccordionContent>
-      </AccordionItem>
-
-      <AccordionItem value="item-3">
-        <AccordionTrigger>
-          What are the prices for Pro/Enterprise plans?
-        </AccordionTrigger>
-        <AccordionContent>
-          <table className="mini-table">
-            <thead>
-              <tr>
-                <th>Plan</th>
-                <th>Max Messages per Day</th>
-                <th>Price (per month)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Pro 1M</td>
-                <td>1M</td>
-                <td>$180</td>
-              </tr>
-              <tr>
-                <td>Pro 10M</td>
-                <td>10M</td>
-                <td>$420</td>
-              </tr>
-              <tr>
-                <td>Enterprise</td>
-                <td>100M</td>
-                <td>$1800</td>
-              </tr>
-            </tbody>
-          </table>
         </AccordionContent>
       </AccordionItem>
     </Accordion.Root>

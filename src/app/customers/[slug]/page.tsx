@@ -1,12 +1,10 @@
+import Container from "@/components/container";
+import { Mdx } from "@/components/post/mdx";
+import type { Customer } from "@content";
+import { allCustomers } from "@content";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-
-import { allCustomers } from "@content";
-import type { Customer } from "@content";
-
-import Container from "@/components/container";
-import { Mdx } from "@/components/post/mdx";
 
 type Props = {
   params: {
@@ -37,7 +35,7 @@ export default async function BlogPage({ params }: Props) {
           <div className="border-b border-white/5 py-4">
             <Link
               href="/customers"
-              className="inline-flex opacity-40 hover:opacity-80"
+              className="inline-flex opacity-60 hover:opacity-100"
             >
               ← Back to Customers
             </Link>
@@ -48,10 +46,7 @@ export default async function BlogPage({ params }: Props) {
       <main className="relative z-0">
         <article className="customer-post">
           <header className="py-20 text-center">
-            <Container className="relative max-w-screen-lg">
-              <div className="absolute inset-x-0 top-0 z-10 h-40 bg-gradient-to-b from-zinc-950 to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 z-10 h-40 bg-gradient-to-t from-zinc-950 to-transparent" />
-
+            <Container className="max-w-screen-lg">
               <Image
                 src={`/customer/${customer.cover_image}`}
                 alt={customer.company_name}

@@ -1,13 +1,10 @@
 "use client";
 
-import { Dispatch, HTMLProps, SetStateAction } from "react";
-import Image from "next/image";
-
-import cx from "@/utils/cx";
-import Balancer from "react-wrap-balancer";
-
 import IconQStash from "@/components/icon-qstash";
 import IconRedis from "@/components/icon-redis";
+import cx from "@/utils/cx";
+import Image from "next/image";
+import { Dispatch, HTMLProps, SetStateAction } from "react";
 
 export function Example({
   className,
@@ -35,17 +32,21 @@ export function Example({
   return (
     <article
       className={cx(
-        "group/example-box p-6",
-        "flex flex-col gap-2",
-        "rounded-xl bg-white/5",
+        "group flex flex-col gap-2 border-none p-6",
+        "rounded-xl bg-bg-mute",
         "transition hover:bg-emerald-300/10",
         className,
       )}
       {...props}
     >
-      <h3 className={cx("font-display text-2xl font-semibold", className)}>
-        <a className="hover:text-emerald-400" href={`/examples/${slug}`}>
-          <Balancer>{title}</Balancer>
+      <h3
+        className={cx(
+          "text-balance font-display text-2xl font-semibold",
+          className,
+        )}
+      >
+        <a className="hover:text-primary-text" href={`/examples/${slug}`}>
+          {title}
         </a>
       </h3>
 
@@ -138,7 +139,7 @@ function ExampleStack({
   );
 }
 
-export function Pill({
+function Pill({
   stackTitle,
   selected,
   selectedStacks,
@@ -153,8 +154,10 @@ export function Pill({
     <>
       <button
         className={cx(
-          "rounded border border-white/5 px-2 py-1 leading-none text-white/60",
-          selected ? "bg-emerald-400/10 text-white" : "",
+          "rounded border border-emerald-800/10 px-2 py-1 leading-none text-text-mute dark:border-white/20",
+          selected
+            ? "dark:bg-primary/40 !border-transparent bg-emerald-400/20 text-primary-text"
+            : "",
         )}
         onClick={(e) => {
           if (!selected) {

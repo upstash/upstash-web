@@ -1,12 +1,12 @@
-import * as React from "react";
-import Link from "next/link";
-
-import cx from "@/utils/cx";
-import { motion } from "framer-motion";
+"use client";
 
 import IconQStash from "@/components/icon-qstash";
 import IconRedis from "@/components/icon-redis";
 import IconVector from "@/components/icon-vector";
+import cx from "@/utils/cx";
+import { motion } from "framer-motion";
+import Link from "next/link";
+import * as React from "react";
 
 const productConfig = {
   "/redis": { name: "Redis", Icon: IconRedis },
@@ -19,7 +19,7 @@ type Product = keyof typeof productConfig;
 export default function ProductToggle({ product }: { product: Product }) {
   return (
     <div className="flex justify-center">
-      <div className="flex gap-3 rounded-xl border border-white/5 p-2">
+      <div className="flex gap-3 rounded-xl border-2 border-bg-mute p-1">
         {(Object.keys(productConfig) as Product[]).map((key) => {
           const isActive = product === key;
           const { name, Icon } = productConfig[key];
@@ -30,15 +30,15 @@ export default function ProductToggle({ product }: { product: Product }) {
               href={`/pricing${key}`}
               className={cx(
                 "relative flex cursor-pointer select-none items-center gap-1",
-                "rounded-lg px-3 py-1.5 text-zinc-400 transition",
-                "hover:bg-white/10",
-                isActive && "!text-zinc-950 hover:bg-transparent",
+                "rounded-lg px-3 py-1.5 transition",
+                "hover:bg-bg-mute",
+                isActive && "text-black",
               )}
             >
               {isActive && (
                 <motion.span
                   layoutId="bg"
-                  className="absolute left-0 top-0 -z-10 h-full w-full rounded-lg bg-white drop-shadow-2xl"
+                  className="absolute left-0 top-0 -z-10 h-full w-full rounded-lg bg-white shadow"
                   transition={{
                     duration: 0.2,
                   }}

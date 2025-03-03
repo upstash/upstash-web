@@ -1,12 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
-
-import type { Example } from "@/app/examples/get-data";
 import { authors } from "@/utils/authors";
-
-import Button from "@/components/button";
-
+import React, { useState } from "react";
+import type { Example } from "../../app/examples/get-data";
 import { Example as Box } from "./comp";
 import ExampleFilter from "./filter";
 
@@ -136,11 +132,11 @@ export const Client: React.FC<Props> = ({
         />
       </div>
       <div className="grid grid-flow-row auto-rows-[6_min]">
-        <div className="flex w-full flex-col gap-6 border-b border-b-white/5 py-4 sm:flex-row sm:justify-between">
+        <div className="flex w-full flex-col items-center gap-6 border-b border-b-white/5 py-4 sm:flex-row sm:justify-between">
           <input
             type="search"
             aria-label="Search"
-            className="w-1/2 rounded-full bg-white/5 px-4 py-2 transition placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-emerald-400/40"
+            className="bg-white-100 w-full rounded-full border border-emerald-800/40 px-4 py-2 transition focus:outline-none focus:ring-2 focus:ring-emerald-400/40 md:w-1/2 dark:border-none dark:bg-white/5 dark:placeholder:text-white/40"
             value={exampleQuery}
             placeholder="Search for an example..."
             onChange={(e) => {
@@ -148,13 +144,12 @@ export const Client: React.FC<Props> = ({
             }}
           />
 
-          <Button
+          <a
             className="hidden sm:flex"
             href="https://github.com/upstash/examples#contributing"
-            type="button"
           >
             Contribute
-          </Button>
+          </a>
         </div>
 
         <div className="mt-10 grid grow gap-4 py-4 sm:grid-cols-2 sm:gap-6 md:mt-0">

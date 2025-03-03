@@ -1,3 +1,5 @@
+import Icon, { ICON_NAMES } from "@/components/icon";
+import cx from "@/utils/cx";
 import {
   Children,
   cloneElement,
@@ -5,11 +7,6 @@ import {
   ReactElement,
   ReactNode,
 } from "react";
-
-import cx from "@/utils/cx";
-
-import Icon, { ICON_NAMES } from "@/components/icon";
-
 import { Category } from "./index";
 
 export function SourceBox({
@@ -35,8 +32,8 @@ export function SourceBox({
     <a
       target="_blank"
       className={cx(
-        "group/source-box flex flex-col rounded-3xl p-6 md:p-8",
-        "bg-white/5 backdrop-blur transition",
+        "group flex flex-col rounded-3xl p-6 md:p-8",
+        "bg-white/5 transition",
         "hover:scale-[1.02] hover:bg-white/10",
         className,
       )}
@@ -70,7 +67,7 @@ export function SourceTitle({
         <span
           className={cx(
             "inline-flex translate-y-1/4 items-center opacity-0 transition",
-            "group-hover/source-box:translate-y-0 group-hover/source-box:opacity-100",
+            "group-hover:translate-y-0 group-hover:opacity-100",
             props.category === Category.SDK && "text-emerald-400",
             props.category === Category.Template && "text-yellow-400",
             props.category === Category.Integration && "text-pink-400",

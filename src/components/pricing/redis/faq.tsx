@@ -1,7 +1,7 @@
-import * as React from "react";
+"use client";
 
 import * as Accordion from "@radix-ui/react-accordion";
-
+import * as React from "react";
 import {
   AccordionContent,
   AccordionItem,
@@ -64,11 +64,11 @@ export default function FAQ() {
           and regions. Even if you do not access your data, we have to keep it
           persistent in Cloud Provider’s block storage (eg AWS EBS, S3) for
           durability. To calculate the total storage cost, we take daily average
-          of your total data size in all replicase and multiply with $0.25 at the end of the month. For
-          instance, if you have 1 GB data in your replicas throughout month, you
-          will pay $0.25. If you are using your database as a cache; then it is
-          a good practice to set a timeout (EXPIRE) for your keys to minimize
-          the cost.
+          of your total data size in all replicase and multiply with $0.25 at
+          the end of the month. For instance, if you have 1 GB data in your
+          replicas throughout month, you will pay $0.25. If you are using your
+          database as a cache; then it is a good practice to set a timeout
+          (EXPIRE) for your keys to minimize the cost.
         </AccordionContent>
       </AccordionItem>
 
@@ -101,9 +101,10 @@ export default function FAQ() {
           </p>
           <p>
             For Pro and Enterprise plans, it is charged at a rate of $0.03 per
-            GB for all the usage throughout the month. For use cases with high
-            volume, you may consider VPC Peering which minimizes the data
-            transfer cost. Contact us at{" "}
+            GB for all the usage throughout the month up to the plan's limit.
+            Any usage beyond that is charged at a rate of $0.10 per GB. For use
+            cases with high volume, you may consider VPC Peering which minimizes
+            the data transfer cost. Contact us at{" "}
             <a href="support@upstash.com">support@upstash.com</a> for details.
           </p>
           <p>

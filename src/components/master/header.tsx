@@ -1,18 +1,15 @@
 "use client";
 
-import { HTMLProps, useState } from "react";
-import Link from "next/link";
-import { useSelectedLayoutSegment } from "next/navigation";
-
-import cx from "@/utils/cx";
-import { useMotionValueEvent, useScroll } from "framer-motion";
-
-import { useGetAffiliateCodeFromApi } from "@/hooks/use-affiliate-code";
-
 import Button from "@/components/button";
 import Container from "@/components/container";
 import { Logo } from "@/components/logo";
-
+import { useGetAffiliateCodeFromApi } from "@/hooks/use-affiliate-code";
+import cx from "@/utils/cx";
+import { useMotionValueEvent, useScroll } from "framer-motion";
+import Link from "next/link";
+import { useSelectedLayoutSegment } from "next/navigation";
+import { HTMLProps, useState } from "react";
+import { PolicyBanner } from "../policy-banner";
 import NewNavigation from "./new-nav";
 
 export default function Header({ className, ...props }: HTMLProps<any>) {
@@ -28,16 +25,19 @@ export default function Header({ className, ...props }: HTMLProps<any>) {
   return (
     <header
       className={cx(
-        "fixed inset-x-0 top-0 z-50 hidden bg-zinc-950/80 backdrop-blur transition will-change-auto md:block",
+        "fixed inset-x-0 top-0 z-50 hidden bg-transparent md:block",
         segment === "pricing" && "absolute",
+        fix && "bg-bg shadow",
         className,
       )}
       {...props}
     >
+      <PolicyBanner />
       <Container>
         <div
           className={cx(
-            "flex items-center border-b border-b-white/5 py-5 md:grid md:grid-cols-6",
+            "flex items-center py-5 md:grid md:grid-cols-6",
+            "border-b border-b-white/5",
           )}
         >
           <div className="flex">
@@ -45,20 +45,23 @@ export default function Header({ className, ...props }: HTMLProps<any>) {
               <Logo />
             </Link>
           </div>
-          <NewNavigation />
+
+          <div className="col-span-4">
+            <NewNavigation />
+          </div>
+
           <div className="flex justify-end">
-            <Button
-              target="_self"
-              type="button"
-              hideIcon
-              href={
-                affiliateCode
-                  ? `https://console.upstash.com/?code=${affiliateCode}`
-                  : "https://console.upstash.com"
-              }
-              className={cx("", fix ? "bg-emerald-500" : "")}
-            >
-              Login
+            <Button asChild variant={fix ? "primary" : "default"}>
+              <a
+                target="_self"
+                href={
+                  affiliateCode
+                    ? `https://console.upstash.com/?code=${affiliateCode}`
+                    : "https://console.upstash.com"
+                }
+              >
+                Login
+              </a>
             </Button>
           </div>
         </div>

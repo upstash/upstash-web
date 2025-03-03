@@ -1,10 +1,8 @@
 "use client";
 
-import { HTMLProps, useState } from "react";
-
-import cx from "@/utils/cx";
-
 import { IconArrow } from "@/components/post/toc";
+import cx from "@/utils/cx";
+import { HTMLProps, useState } from "react";
 
 export default function ExpandableCode({
   children,
@@ -34,7 +32,7 @@ function Toc({ className, children, ...props }: HTMLProps<HTMLDetailsElement>) {
     <details
       role="navigation"
       aria-label="Use Cases"
-      className={cx("group/toc", className)}
+      className={cx("group", className)}
       {...props}
     >
       {children}

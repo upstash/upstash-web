@@ -1,14 +1,9 @@
 "use client";
 
-import React from "react";
-
-import { Product } from "@/utils/type";
-
-import { useSegment } from "@/hooks/use-segment";
-
 import Button from "@/components/button";
 import IconQStash from "@/components/icon-qstash";
-
+import { Product } from "@/utils/type";
+import React from "react";
 import {
   ProductBox,
   ProductFeature,
@@ -17,14 +12,13 @@ import {
 } from "./comp";
 
 export default function ServerlessQStash() {
-  const { track } = useSegment();
   return (
     <ProductBox
       product={Product.QSTASH}
       className="mdd:col-span-2 bg-purple-200/5"
     >
-      <header>
-        <IconQStash className="mb-4" width={40} />
+      <header className="flex items-center gap-4">
+        <IconQStash width={32} />
         <ProductTitle>QStash</ProductTitle>
       </header>
 
@@ -40,24 +34,17 @@ export default function ServerlessQStash() {
 
       <div className="mt-auto grid gap-4 sm:grid-cols-2">
         <Button
-          href="/docs/qstash"
-          className="bg-purple-100 text-purple-950 hover:bg-purple-100 hover:text-purple-950"
+          // href="/docs/qstash"
           type="button"
-          onClick={() => {
-            track("button.docs.qstash");
-          }}
         >
           Docs
         </Button>
         <Button
-          href="https://github.com/upstash/examples/tree/main/examples"
-          className="hover:bg-purple-100 hover:text-purple-950"
+          // href="https://github.com/upstash/examples/tree/main/examples"
+          className="bg-purple-100 text-purple-950 hover:bg-purple-100 hover:text-purple-950"
           type="button"
-          onClick={() => {
-            track("button.examples.qstash");
-          }}
         >
-          Examples
+          Publish Messages
         </Button>
       </div>
     </ProductBox>

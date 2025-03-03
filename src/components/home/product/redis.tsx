@@ -1,14 +1,9 @@
 "use client";
 
-import React from "react";
-
-import { Product } from "@/utils/type";
-
-import { useSegment } from "@/hooks/use-segment";
-
 import Button from "@/components/button";
 import IconRedis from "@/components/icon-redis";
-
+import { Product } from "@/utils/type";
+import React from "react";
 import {
   ProductBox,
   ProductFeature,
@@ -17,12 +12,13 @@ import {
 } from "./comp";
 
 export default function ServerlessRedis() {
-  const { track } = useSegment();
   return (
     <ProductBox product={Product.REDIS} className="mdd:col-span-2 bg-red-200/5">
-      <header>
-        <IconRedis className="mb-4" width={40} />
-        <ProductTitle>Serverless KV with Redis API</ProductTitle>
+      <header className="flex items-center gap-4">
+        <IconRedis width={32} />
+        <ProductTitle>
+          Redis <span className="text-[.9em] opacity-20">®*</span>
+        </ProductTitle>
       </header>
 
       <ProductFeature product={Product.REDIS}>
@@ -37,26 +33,13 @@ export default function ServerlessRedis() {
         </ProductFeatureItem>
       </ProductFeature>
 
-      <div className="mt-auto grid gap-4 sm:grid-cols-2">
+      <div className="mt-auto flex items-center gap-2">
         <Button
-          href="/docs/redis"
-          className="bg-red-100 text-red-950 hover:bg-red-100 hover:text-red-950"
-          type="button"
-          onClick={() => {
-            track("button.docs.redis");
-          }}
+          // type="button"
+          // href="https://console.upstash.com"
+          className="grow bg-red-100 text-red-950 hover:bg-red-100 hover:text-red-950"
         >
-          Docs
-        </Button>
-        <Button
-          href="https://github.com/upstash/examples/tree/main/examples"
-          className="hover:bg-red-100 hover:text-red-950"
-          type="button"
-          onClick={() => {
-            track("button.examples.redis");
-          }}
-        >
-          Examples
+          Create Database
         </Button>
       </div>
     </ProductBox>

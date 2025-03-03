@@ -1,11 +1,9 @@
-import type { Post } from "@content";
-
 import Bg from "@/components/bg";
 import PostListCard from "@/components/blog/list-item";
 import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
-
+import type { Post } from "@content";
 import { getData } from "../utils/helpers";
 
 export default async function BlogPage() {
@@ -43,7 +41,7 @@ export default async function BlogPage() {
               const posts: Post[] = postsByMonth[key];
               return (
                 <div key={key}>
-                  <h4 className="pl-2 font-display text-2xl font-medium opacity-40 dark:opacity-20">
+                  <h4 className="pl-2 font-display text-xl font-medium opacity-30 dark:opacity-20">
                     {key}
                   </h4>
                   <div className="mt-2 grid gap-0.5">

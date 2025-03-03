@@ -1,0 +1,59 @@
+---
+slug: ollama-deepseek
+title: "Run Deepseek R1 on your local machine using Ollama"
+authors:
+  - noah
+tags: [ai, ollama, deepseek]
+---
+
+The great thing about open-source LLM models is that you can run them on your local machine, so you do not pay the providers while developing your application. In this mini tutorial, we will show you how to run Deepseek R1 on your local machine using Ollama. We will run Deepseek R1 on the command line and also run it in a JavaScript/Node application.
+
+## Install Ollama
+
+Ollama is an excellent tool for running LLMs on your local machine. It's easy to install and use, and you can set it up on your Mac, Windows, or Linux computer. To install Ollama, you can follow the steps on the [Ollama website](https://ollama.com/download).
+
+## Install Deepseek R1 Model
+Once you have installed Ollama, now you should install the Deepseek R1 model. Depending on your computer's resources and internet speed, you may prefer to download one of the smaller distilled versions of Deepseek R1.
+![](/blog/deepseek-ollama/models.png)
+
+Run the following command:
+```bash
+ollama run deepseek-r1
+```
+
+Ollama will download the model and you can start chatting on the command line.
+![](/blog/deepseek-ollama/cli.png)
+
+## Run Deepseek R1 in a JavaScript/Node application
+Now, let's run Deepseek R1 in a JavaScript/Node application. First, create a new Node project and install the Ollama client library.
+```bash
+npm init -y
+npm install ollama
+touch index.js
+```
+
+Update the `index.js` file with the following code:
+```js
+import ollama from "ollama";
+
+const response = await ollama.chat({
+  model: "deepseek-r1:1.5b",
+  messages: [{ role: "user", content: "Why is the sky blue?" }],
+});
+
+console.log(response.message.content);
+```
+
+
+Run the application:
+```bash
+node index.js
+```
+
+You should see something like this:
+![](/blog/deepseek-ollama/node.png)
+
+
+That's it! You have now run Deepseek R1 on your local machine using Ollama. It was easy, right?
+
+Follow us on [Twitter](https://x.com/upstash) for more tutorials and posts like this.

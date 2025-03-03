@@ -1,57 +1,48 @@
-import { HTMLProps, ReactNode } from "react";
-
 import cx from "@/utils/cx";
+import { Slot } from "@radix-ui/react-slot";
+import { cva, VariantProps } from "class-variance-authority";
 
-import Icon, { ICON_NAMES, IconProps } from "@/components/icon";
-
-export interface IButton extends HTMLProps<HTMLAnchorElement> {
-  children?: ReactNode;
-  hideIcon?: boolean;
-  icon?: ReactNode;
-  iconProps?: IconProps;
-  type?: "button" | "link";
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean;
 }
+
+const buttonVariants = cva(
+  "inline-flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition hover:shadow-sm",
+  {
+    variants: {
+      variant: {
+        default:
+          "bg-bg-mute shadow-sm text-primary-text hover:bg-emerald-700/20 disabled:bg-white/5 disabled:text-zinc-50",
+        primary:
+          "bg-primary text-white hover:bg-primary-text disabled:bg-white/5 disabled:text-zinc-50",
+        secondary:
+          "bg-white text-text dark:text-bg disabled:bg-white/5 disabled:text-zinc-50",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  },
+);
 
 export default function Button({
   children,
   className,
-  hideIcon,
-  icon,
-  type = "link",
-  iconProps,
+  variant,
+  asChild = false,
   ...props
-}: IButton) {
-  const classes = {
-    button: `gap-1 px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-zinc-50 bg-white/5
-    hover:bg-emerald-400 hover:text-emerald-950
-    disabled:bg-white/5 disabled:text-zinc-50`,
-    link: `gap-0.5 hover:text-emerald-400 hover:underline`,
-  };
+}: ButtonProps) {
+  const Comp = asChild ? Slot : "button";
 
   return (
-    <a
-      target="_blank"
-      className={cx(
-        "group/link-new inline-flex cursor-pointer items-center transition",
-        classes[type],
-        className,
-      )}
+    <Comp
+      type="button"
+      className={cx(buttonVariants({ variant, className }))}
       {...props}
     >
-      {children && <span>{children}</span>}
-      {icon ? (
-        <span className="ml-auto">{icon}</span>
-      ) : hideIcon ? null : (
-        <Icon
-          icon={ICON_NAMES.ArrowUpRight}
-          {...iconProps}
-          className={cx(
-            "ml-auto opacity-60",
-            // "transition group-hover/link-new:opacity-100",
-            iconProps?.className,
-          )}
-        />
-      )}
-    </a>
+      {children}
+    </Comp>
   );
 }

@@ -1,6 +1,5 @@
-import { HTMLProps, ReactNode } from "react";
-
 import cx from "@/utils/cx";
+import { HTMLProps, ReactNode } from "react";
 
 export interface IContainer extends HTMLProps<HTMLDivElement> {
   children: ReactNode;

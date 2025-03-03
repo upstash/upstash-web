@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg: oklch(0.97 0 0); /*50*/
+  --color-bg-mute: rgb(4 120 87 / 0.08);
+  --color-primary: oklch(0.696 0.17 162.48); /*500*/
+  --color-primary-text: oklch(0.508 0.118 165.612); /*700*/
+  --color-text: #022c22;
+  --color-text-mute: oklch(0.552 0.016 285.938);
+  --color-pre-bg: #09090b;
+}
+
+/* dark */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #09090b;
+    --color-bg-mute: rgb(236 253 245 / 0.06);
+    --color-primary: oklch(0.696 0.17 162.48); /*500*/
+    --color-primary-text: oklch(0.765 0.177 163.223); /*400*/
+    --color-text: #ecfdf5;
+    --color-text-mute: oklch(0.705 0.015 286.067);
+    --color-pre-bg: #09090b;
+  }
+}
+
+@layer base {
+  select {
+    @apply appearance-none bg-no-repeat !pr-12;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.6rem center;
+    background-size: 1.5em 1.5em;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply text-balance;
+  }
+
+  p {
+    @apply text-pretty;
+  }
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+}
+
+@keyframes animate-slide {
+  0% {
+    transform: translateZ(0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes animate-gradient {
+  to {
+    background-position: 100% 100%;
+  }
+}

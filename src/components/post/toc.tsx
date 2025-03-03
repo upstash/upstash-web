@@ -1,8 +1,7 @@
 "use client";
 
-import { ComponentProps } from "react";
-
 import cx from "@/utils/cx";
+import { ComponentProps } from "react";
 
 export default function PostTOC({ children, ...props }: ComponentProps<"nav">) {
   // if there are no children, don't render the TOC
@@ -16,7 +15,7 @@ export default function PostTOC({ children, ...props }: ComponentProps<"nav">) {
 
   return (
     <details
-      className="group/toc mb-10 rounded-xl bg-emerald-700/10 dark:bg-white/3"
+      className="group mb-10 rounded-xl bg-emerald-700/10 dark:bg-white/3"
       role="navigation"
       aria-label="Table of contents"
     >

@@ -1,0 +1,34 @@
+/* Language-specific
+
+.code-redis .token.string,
+.code-redis .token.char,
+.code-redis .token.attr-value,
+.code-redis .token.regex,
+.code-redis .token.variable {
+  color: #fca5a5;
+}
+
+.code-vector .token.string,
+.code-vector .token.char,
+.code-vector .token.attr-value,
+.code-vector .token.regex,
+.code-vector .token.variable {
+  color: #fdba74;
+}
+
+.code-qstash .token.string,
+.code-qstash .token.char,
+.code-qstash .token.attr-value,
+.code-qstash .token.regex,
+.code-qstash .token.variable {
+  color: #93c5fd;
+}
+
+.code-workflow .token.string,
+.code-workflow .token.char,
+.code-workflow .token.attr-value,
+.code-workflow .token.regex,
+.code-workflow .token.variable {
+  color: #d8b4fe;
+}
+*/

@@ -1,11 +1,7 @@
 "use client";
 
-import React from "react";
-
-import { useSegment } from "@/hooks/use-segment";
-
 import IconRedis from "@/components/icon-redis";
-
+import React from "react";
 import {
   PriceBadge,
   PriceBox,
@@ -17,8 +13,6 @@ import {
 } from "./comp";
 
 export default function PriceRedis() {
-  const segment = useSegment();
-
   return (
     <PriceBox>
       <header>
@@ -53,12 +47,7 @@ export default function PriceRedis() {
 
       <PriceHr />
 
-      <PriceButton
-        href="/pricing"
-        onClick={() => segment.track("button.pricing.redis")}
-      >
-        More information
-      </PriceButton>
+      <PriceButton href="/pricing">More information</PriceButton>
     </PriceBox>
   );
 }

@@ -1,0 +1,650 @@
+---
+authors: [rishi]
+slug: authenticate-users-nextjs-authjs
+tags: [redis, database, serverless, vercel]
+title: "Authenticate users in Next.js with Auth.js"
+---
+
+In this tutorial, you will learn to implement user authentication in a Next.js application using Auth.js and Upstash Redis. You will learn how to set up the required environment, create custom authentication provider for secure user sign-in and sign-up, and integrate Upstash Redis as the database for managing sessions.
+
+## Prerequisites
+
+You will need the following:
+
+- [Node.js 18](https://nodejs.org/en/blog/announcements/v18-release-announce) or later
+- An [Upstash](https://console.upstash.com) account
+
+## Tech Stack
+
+| Technology | Description |
+| --- | --- |
+| [Next.js](https://nextjs.org) | The React Framework for the Web. |
+| [Upstash](https://upstash.com) | Serverless database platform. You are going to use Upstash Redis for managing sessions and user information. |
+
+## Set up an Upstash Redis instance
+
+In your Upstash dashboard, go to **Redis** tab and create a database.
+
+![Create An Upstash Redis Instance](/blog/authenticate-users/redis-create.png)
+
+Scroll down until you find the REST API section, and select the `.env` button. Copy the content and save it somewhere safe.
+
+![Upstash Redis Environment Variables](/blog/authenticate-users/redis-env.png)
+
+## Create a new Next.js application
+
+Let’s get started by creating a new Next.js project. Open your terminal and run the following command:
+
+```bash
+npx create-next-app@latest my-app
+```
+
+When prompted, choose:
+
+- `Yes` when prompted to use TypeScript.
+- `No` when prompted to use ESLint.
+- `Yes` when prompted to use Tailwind CSS.
+- `No` when prompted to use `src/` directory.
+- `Yes` when prompted to use App Router.
+- `No` when prompted to use Turbopack.
+- `No` when prompted to customize the default import alias (`@/*`).
+
+Once that is done, move into the project directory and start the app in development mode by executing the following command:
+
+```bash
+cd my-app
+npm run dev
+```
+
+The app should be running on [localhost:3000](http://localhost:3000). Stop the development server to install the necessary dependencies with the following commands:
+
+```bash
+npm install @upstash/redis nanoid
+npm install next-auth @auth/core @auth/upstash-redis-adapter
+```
+
+The libraries installed include:
+
+- `nanoid`: A library for generating unique, secure IDs.
+- `next-auth`: Authentication solution built for Next.js.
+- `@auth/core`: Core package for handling authentication in Auth.js.
+- `@upstash/redis`: SDK to interact with Upstash Redis via HTTP requests.
+- `@auth/upstash-redis-adapter`: Adapter for integrating Auth.js with Upstash Redis.
+
+Now, create a `.env` file at the root of your project. You are going to use the `AUTH_SECRET`, `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` values.
+
+The `.env` file should have the following:
+
+```bash
+# .env
+
+# Auth.js Environment Variable
+AUTH_SECRET="..."
+
+# Upstash Redis Environment Variables
+UPSTASH_REDIS_REST_URL="https://...upstash.io"
+UPSTASH_REDIS_REST_TOKEN="..."
+```
+
+## Instantiate the Upstash Redis Client
+
+Create a file named `redis.ts` in the `lib` directory with the following code:
+
+```tsx
+// File: lib/redis.ts
+
+import { Redis } from '@upstash/redis'
+
+export default new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+})
+```
+
+In the code above, an Edge-compatible Redis client instance is exported to be used throughout the application.
+
+## Set up User Types and Credentials Helpers
+
+Create a file named `types.ts` in the `lib` directory with the following code:
+
+```tsx
+// File: lib/types.ts
+
+export interface UserType {
+  id?: string
+  email: string
+  name?: string
+  image?: string
+  password?: string
+  emailVerified?: string
+}
+```
+
+The `UserType` interface defines the structure of a user object in the application. It includes: 
+
+- `id` (optional): A unique identifier for the user.
+- `email` (required): The user's email address.
+- `name` (optional): The user's name.
+- `image` (optional): A URL or path to the user's profile image.
+- `password` (optional): The user's hashed password.
+- `emailVerified` (optional): A timestamp or string indicating if/when the user's email was verified. 
+
+This interface serves as a type definition for user data throughout the application.
+
+Further, create a file named `credentials.ts` in the `lib` directory with the following code:
+
+```tsx
+// File: lib/credentials.ts
+
+export function generateRandomToken() {
+  const array = new Uint8Array(20)
+  crypto.getRandomValues(array)
+  return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('')
+}
+
+export function generateRandomString(inputValue: string) {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(inputValue)
+  return crypto.subtle.digest('SHA-256', data).then((hashBuffer) => {
+    return Array.from(new Uint8Array(hashBuffer))
+      .map((byte) => byte.toString(16).padStart(2, '0'))
+      .join('')
+  })
+}
+
+export async function hashPassword(password: string) {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(password)
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+  return Array.from(new Uint8Array(hashBuffer))
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('')
+}
+
+export async function comparePassword(password: string, hash: string) {
+  const hashedPassword = await hashPassword(password)
+  return hashedPassword === hash
+}
+```
+
+In the code above, Edge-compatiable utility functions for generating and managing secure tokens and hashed passwords are defined:
+
+- `generateRandomToken`: Creates a cryptographically secure random token by generating a 20-byte random array and converting it into a hexadecimal string.
+- `generateRandomString`: Accepts an input string, encodes it to bytes, hashes it using SHA-256, and returns the hash as a hexadecimal string. Useful for generating consistent, unique strings derived from input values.
+- `hashPassword`: Hashes a plaintext password using SHA-256 and converts the resulting hash to a hexadecimal string. This is used for securely storing passwords.
+- `comparePassword`: Compares a plaintext password to a hashed password by hashing the input and checking if it matches the stored hash.
+
+## Using Upstash Redis adapter with Auth.js
+
+Create a file named `auth.ts` in the `lib` directory with the following code:
+
+```tsx
+// File: lib/auth.ts
+
+import { UpstashRedisAdapter } from '@auth/upstash-redis-adapter'
+import NextAuth from 'next-auth'
+import providers from './providers'
+import redis from './redis'
+
+export const { handlers, signIn, signOut, auth } = NextAuth(() => ({
+  providers,
+  session: { strategy: 'jwt' },
+  adapter: UpstashRedisAdapter(redis),
+}))
+```
+
+In the code above, authentication is being set up via creating the the `handlers`, `signIn`, `signOut`, and `auth` functions using a custom configuration. It uses a JWT-based session strategy, the `UpstashRedisAdapter` to connect to a Upstash Redis database for storing user data, and an array of authentication providers defined in the `providers` module. This setup enables seamless integration of authentication and session management with Upstash Redis as the backend.
+
+## Set up Custom Authentication provider with Auth.js
+
+Create a file named `providers.ts` in the `lib` directory with the following code:
+
+```tsx
+// File: lib/providers.ts
+
+import { nanoid } from 'nanoid'
+import Credentials from 'next-auth/providers/credentials'
+import { comparePassword, generateRandomString, hashPassword } from './credentials'
+import redis from './redis'
+import { UserType } from './types'
+
+export default [
+  Credentials({
+    credentials: {
+      email: {},
+      password: {},
+    },
+    authorize: async (credentials, request) => {
+      let type
+      try {
+        const tmp = new URL(request.url).searchParams.get('kind')
+        if (tmp && typeof tmp === 'string') type = tmp
+      } catch (e) {}
+      if (!type || !credentials.email || typeof credentials.email !== 'string' || !credentials.password || typeof credentials.password !== 'string') return null
+      const randomizedPassword = await generateRandomString(credentials.password)
+      const userByEmail = await redis.get<string | null | undefined>(`user:email:${credentials.email}`)
+      if (userByEmail) {
+        if (type !== 'in') {
+          console.log(`can not sign in in a non sign-in mode.`)
+          throw new Error(`can not sign in in a non sign-in mode.`)
+        }
+        const user = await redis.get<UserType>(`user:${userByEmail}`)
+        if (!user) {
+          console.log(`Found the user by email from user:email:${userByEmail}, but the user object is missing at user:${userByEmail}`)
+          return null
+        }
+        if (user.password) {
+          const hashedPassword = await hashPassword(randomizedPassword)
+          const isPasswordCorrect = await comparePassword(user.password, hashedPassword)
+          if (isPasswordCorrect) {
+            const { password, ...rest } = user
+            return rest
+          }
+          throw new Error(`incorrect password for credentials.`)
+        }
+        throw new Error(`you are using some other authentication method already, but not credentials.`)
+      } else {
+        if (type !== 'up') {
+          console.log(`can not sign up in a non sign-up mode.`)
+          throw new Error(`can not sign up in a non sign-up mode.`)
+        }
+        const newUser = {
+          name: null,
+          image: null,
+          emailVerified: null,
+          email: credentials.email,
+          password: randomizedPassword,
+        }
+        const tmp = nanoid()
+        await redis.set(`user:email:${credentials.email}`, tmp)
+        await redis.set(`user:${tmp}`, newUser)
+        return newUser
+      }
+    },
+  }),
+]
+```
+
+In the code above, an array of custom, credentials-based authentication provider is exported. The Credentials provider handles both sign-in and sign-up logic: it checks if the user exists in Redis and either validates their password or creates a new user. If signing in, it compares the provided password (hashed using a random string) with the stored password; if signing up, it creates a new user entry in Upstash Redis. The code uses Upstash Redis for user data storage and ensures that the process is done in either sign-up or sign-in mode based on the kind parameter in the URL.
+
+## Set up Authentication API Routes (powered by Auth.js)
+
+Create a file named `route.ts` in the `app/api/auth/[...nextauth]` directory with the following code:
+
+```tsx
+// File: app/api/auth/[...nextauth]/route.ts
+
+export const runtime = 'edge'
+
+import { handlers } from '@/lib/auth'
+
+export const { GET, POST } = handlers
+```
+
+In the code above, two endpoint handlers `GET` and `POST` are exported that are handled by the `handlers` function exported from `@/lib/auth.ts` file.
+
+Create a file named `route.ts` in the `app/api/refresh` directory with the following code:
+
+```tsx
+// File: app/api/refresh/route.ts
+
+export const runtime = 'edge'
+
+export const dynamic = 'force-dynamic'
+
+export const fetchCache = 'force-no-store'
+
+import { auth } from '@/lib/auth'
+import redis from '@/lib/redis'
+import { UserType } from '@/lib/types'
+import { encode } from '@auth/core/jwt'
+import { cookies } from 'next/headers'
+import { NextResponse } from 'next/server'
+
+export async function GET(request: Request) {
+  const useSecureCookie = request.url.startsWith('https:')
+  const salt = useSecureCookie ? '__Secure-authjs.session-token' : 'authjs.session-token'
+  if (!process.env.AUTH_SECRET) return new NextResponse(null, { status: 500 })
+  const [session, cookieStore] = await Promise.all([auth(), cookies()])
+  if (!session?.user?.email) return new NextResponse(null, { status: 400 })
+  const userByEmail = await redis.get(`user:email:${session.user.email}`)
+  const userData = await redis.get<UserType>(`user:${userByEmail}`)
+  if (!userData?.email) cookieStore.set(salt, toString(), { secure: useSecureCookie, path: '/', httpOnly: true, sameSite: 'lax', maxAge: 0 })
+  else {
+    const { image, password, ...rest } = userData
+    const saltVal = await encode({ salt, secret: process.env.AUTH_SECRET, token: { ...rest, picture: image } })
+    cookieStore.set(salt, saltVal, { secure: useSecureCookie, path: '/', httpOnly: true, sameSite: 'lax' })
+  }
+  return new NextResponse()
+}
+```
+
+In the code above, an Edge-compatible API route for refreshing a user's session is being created. It fetches the user session and related data from Redis, verifies the user's email, and updates the session cookie. If the user data is invalid or missing, the session cookie is cleared; otherwise, a new signed token is generated and stored in the cookie.
+
+Create a file named `route.ts` in the `app/api/user` directory with the following code:
+
+```tsx
+// File: app/api/user/route.ts
+
+export const runtime = 'edge'
+
+export const dynamic = 'force-dynamic'
+
+export const fetchCache = 'force-no-store'
+
+import { auth } from '@/lib/auth'
+import redis from '@/lib/redis'
+import { UserType } from '@/lib/types'
+import { NextResponse } from 'next/server'
+
+export async function POST(request: Request) {
+  try {
+    const session = await auth()
+    if (!session?.user?.email) return new NextResponse(null, { status: 400 })
+    const body = await request.json()
+    const userByEmail = await redis.get(`user:email:${session.user.email}`)
+    const userData = await redis.get<UserType>(`user:${userByEmail}`)
+    if (!userData) return new NextResponse(null, { status: 404 })
+    if (body.name) userData.name = body.name
+    if (body.image) userData.image = body.image
+    await redis.set(`user:${userByEmail}`, userData)
+    return new NextResponse()
+  } catch (e: any) {
+    const message = e.message || e.toString()
+    console.log(message)
+    return new NextResponse(message, { status: 500 })
+  }
+}
+```
+
+In the code above, an Edge-compatible API route for updating user data is being created. It authenticates the user, fetches their data from Redis using their email, and updates their information (e.g., name or image) based on the request body. If the user is not found or an error occurs, appropriate status codes and responses are returned.
+
+## Set up Next.js Middleware with Auth.js
+
+Create a file named `middleware.ts` in the root directory of your project with the following code:
+
+```tsx
+// File: middleware.ts
+
+export { auth as middleware } from '@/lib/auth'
+
+export const config = {
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+}
+```
+
+In the code above, the middleware is created by re-exporting the `auth` function from the `@/lib/auth` module. The middleware applies authentication to all routes except API routes, static files, image assets, and the favicon, as specified by the `matcher` configuration. This ensures non-excluded routes are protected by the authentication logic set with Auth.js.
+
+## Use Auth.js in Next.js App Router Components
+
+Create a file named `NextAuthProvider.tsx` in the `app` directory with the following code:
+
+```tsx
+// File: app/NextAuthProvider.tsx
+
+'use client'
+
+import { SessionProvider } from 'next-auth/react'
+
+type Props = {
+  children?: React.ReactNode
+}
+
+export default function ({ children }: Props) {
+  return <SessionProvider>{children}</SessionProvider>
+}
+```
+
+In the code above, a client-side React component is created to wrap the application with NextAuth's `SessionProvider`. The component accepts `children` as props and ensures that the wrapped components have access to the user session context provided by NextAuth. This setup is essential for managing authentication state across the application in Next.js.
+
+Create a file named `csrf.tsx` in the `app` directory with the following code:
+
+```tsx
+// File: app/csrf.tsx
+
+'use client'
+
+import { getCsrfToken } from 'next-auth/react'
+import { useEffect, useState } from 'react'
+
+export function CSRFInput() {
+  const [csrfToken, setCsrfToken] = useState<string>()
+  useEffect(() => {
+    getCsrfToken().then((res) => setCsrfToken(res))
+  }, [])
+  return <input type="hidden" name="csrfToken" defaultValue={csrfToken} />
+}
+```
+
+In the code above, a client-side React component is exported that fetches a CSRF token using NextAuth's `getCsrfToken` function and stores it in a state variable. The component renders a hidden input field containing the CSRF token, allowing secure form submissions by including the token as a hidden value. This is useful for protecting against cross-site request forgery attacks.
+
+Create a file named `provider.tsx` in the `app` directory with the following code:
+
+```tsx
+// File: app/provider.tsx
+
+'use client'
+
+import { Button } from '@/components/ui/button'
+import { Icon } from '@iconify/react'
+import { signIn } from 'next-auth/react'
+
+export default function ({ provider, prefix }: { prefix: string; provider: { name: string; id: string } }) {
+  return (
+    <Button onClick={() => signIn(provider.id)} key={provider.name} variant="outline" className="flex w-full gap-x-3">
+      {provider.id === 'google' && <Icon fontSize={18} icon="flat-color-icons:google" />}
+      <span className="text-black">
+        {prefix} with {provider.name}
+      </span>
+    </Button>
+  )
+}
+```
+
+In the code above, a React component for rendering a customizable sign-in button for different authentication providers is exported. It accepts `provider` (containing `name` and `id`) and `prefix` as props. The button triggers the `signIn` function for the specified provider and dynamically displays an icon and label based on the provider's `id`.
+
+Update the file named `layout.tsx` in the `app` directory with the following code:
+
+```tsx
+// File: app/layout.tsx
+
+import './globals.css'
+import NextAuthProvider from './NextAuthProvider'
+
+export default function ({
+  children,
+}: Readonly<{
+  children: React.ReactNode
+}>) {
+  return (
+    <html lang="en">
+      <body className="bg-white text-black antialiased">
+        <NextAuthProvider>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col">{children}</div>
+        </NextAuthProvider>
+      </body>
+    </html>
+  )
+}
+```
+
+In the code above, the Next.js layout is wrapping the entire page in global styles and authentication context. It imports `globals.css` for global styling and `NextAuthProvider` to manage authentication state. The `children` prop represents the nested page content, which is wrapped in a styled container with responsive padding and a maximum width, providing a consistent layout for all pages.
+
+## Load the user authentication state in a client-side page
+
+Update the file named `page.tsx` in the `app` directory with the following code:
+
+```tsx
+// File: app/page.tsx
+
+'use client'
+
+import { signOut, useSession } from 'next-auth/react'
+
+export default function () {
+  const { data, status } = useSession()
+  return (
+    <>
+      {JSON.stringify({ data, status })}
+      <button onClick={() => signOut()}>Sign Out</button>
+    </>
+  )
+}
+```
+
+In the code above, a client-side React component that displays the user's session data and provides a "Sign Out" button is exported. It uses NextAuth's `useSession` hook to retrieve the session data and status, displaying them as a JSON string. The `signOut` function is called when the button is clicked, allowing the user to log out.
+
+## Build a dynamic Sign-in page (using Auth.js)
+
+Create a file named `page.tsx` in the `app/signin` directory with the following code:
+
+```tsx
+// File: app/signin/page.tsx
+
+export const runtime = 'edge'
+
+import { CSRFInput } from '@/app/csrf'
+import Provider from '@/app/provider'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { auth } from '@/lib/auth'
+import providers from '@/lib/providers'
+import { unstable_noStore } from 'next/cache'
+import Link from 'next/link'
+import { redirect } from 'next/navigation'
+
+export default async function () {
+  unstable_noStore()
+  const session = await auth()
+  if (session) redirect('/')
+  return (
+    <div className="border md:border-white/10 flex items-center justify-center py-12">
+      <div className="mx-auto grid w-[350px] gap-6">
+        <div className="grid gap-2 text-center">
+          <h1 className="text-3xl font-bold">Sign In</h1>
+          <p className="text-balance text-muted-foreground">Enter your email below to sign in to your account</p>
+        </div>
+        {providers
+          .filter((provider) => (typeof provider === 'function' ? provider({}).id : provider.id) !== 'credentials')
+          .map((provider) => (
+            <Provider
+              prefix="Sign in"
+              key={typeof provider === 'function' ? provider({}).name : provider.name}
+              provider={typeof provider === 'function' ? provider({}) : provider}
+            />
+          ))}
+        <p className="text-gray-300 text-xs text-center">OR</p>
+        <form method="POST" className="grid gap-4" action="/api/auth/callback/credentials?kind=in">
+          <div className="grid gap-2">
+            <Label htmlFor="email">Email</Label>
+            <Input name="email" id="email" type="email" placeholder="m@example.com" required />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="password">Password</Label>
+            <Input name="password" id="password" type="password" required />
+            <CSRFInput />
+          </div>
+          <Button type="submit" className="w-full">
+            Sign In
+          </Button>
+        </form>
+        <div className="mt-4 text-center text-sm">
+          Don&apos;t have an account?{' '}
+          <Link href="/signup" className="underline">
+            Sign up
+          </Link>
+        </div>
+      </div>
+    </div>
+  )
+}
+```
+
+In the code above, a sign-in page is being created. It checks if a user session already exists; if so, it redirects to the homepage. The page displays a sign-in form where users can enter their email and password, along with options to sign in using various providers. It also includes a CSRF token for security and a link to the sign-up page for new users.
+
+## Build a dynamic Sign-up page (using Auth.js)
+
+Create a file named `page.tsx` in the `app/signup` directory with the following code:
+
+```tsx
+// File: app/signup/page.tsx
+
+export const runtime = 'edge'
+
+import { CSRFInput } from '@/app/csrf'
+import Provider from '@/app/provider'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { auth } from '@/lib/auth'
+import providers from '@/lib/providers'
+import { unstable_noStore } from 'next/cache'
+import Link from 'next/link'
+import { redirect } from 'next/navigation'
+
+export default async function () {
+  unstable_noStore()
+  const session = await auth()
+  if (session) redirect('/')
+  return (
+    <div className="border md:border-white/10 flex items-center justify-center py-12">
+      <div className="mx-auto grid w-[350px] gap-6">
+        <div className="grid gap-2 text-center">
+          <h1 className="text-3xl font-bold">Sign Up</h1>
+          <p className="text-balance text-muted-foreground">Enter your email below to sign up with an account</p>
+        </div>
+        {providers
+          .filter((provider) => (typeof provider === 'function' ? provider({}).id : provider.id) !== 'credentials')
+          .map((provider) => (
+            <Provider
+              prefix="Sign up"
+              key={typeof provider === 'function' ? provider({}).name : provider.name}
+              provider={typeof provider === 'function' ? provider({}) : provider}
+            />
+          ))}
+        <p className="text-gray-300 text-xs text-center">OR</p>
+        <form method="POST" className="grid gap-4" action="/api/auth/callback/credentials?kind=up">
+          <div className="grid gap-2">
+            <Label htmlFor="email">Email</Label>
+            <Input name="email" id="email" type="email" placeholder="m@example.com" required />
+          </div>
+          <div className="grid gap-2">
+            <div className="flex items-center">
+              <Label htmlFor="password">Password</Label>
+            </div>
+            <Input name="password" id="password" type="password" required />
+            <CSRFInput />
+          </div>
+          <Button type="submit" className="w-full">
+            Sign Up
+          </Button>
+        </form>
+        <div className="mt-4 text-center text-sm">
+          Don&apos;t have an account?{' '}
+          <Link href="/signin" className="underline">
+            Sign In
+          </Link>
+        </div>
+      </div>
+    </div>
+  )
+}
+```
+
+In the code above, a sign-up page is being created. It checks if a user session already exists; if so, it redirects to the homepage. The page displays a sign-up form where users can enter their email and password, along with options to sign in using various providers. It also includes a CSRF token for security and a link to the sign-in page for existing users.
+
+> That was a lot of learning! You’re all done now ✨
+
+## References
+
+For more detailed insights, explore the references cited in this blog.
+
+- [GitHub Repository](https://github.com/rishi-raj-jain/credentials-authjs-upstash)
+- [Auth.js - Credentials Authentication](https://authjs.dev/getting-started/authentication/credentials)
+- [Auth.js - Upstash Redis Adapter](https://authjs.dev/getting-started/adapters/upstash-redis)
+- [Next.js - Cookies](https://nextjs.org/docs/app/api-reference/functions/cookies)
+
+## Conclusion
+
+In this tutorial, you learnt how to implement user authentication in a Next.js application using Auth.js and Upstash Redis. You learnt the setup of environment variables, the creation of a Redis client, and the implementation of a custom authentication provider. Additionally, you learnt how to set up API routes in Next.js for handling user sign-in and sign-up processes, as well as session management. By following these steps, you can effectively manage user authentication and data storage in your Next.js applications with Upstash Redis.

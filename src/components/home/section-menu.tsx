@@ -1,7 +1,7 @@
 "use client";
 
-import { HTMLProps, useState } from "react";
-
+import Button from "@/components/button";
+import { LogoIcon } from "@/components/logo";
 import { HOME_SECTIONS } from "@/utils/const";
 import cx from "@/utils/cx";
 import {
@@ -10,10 +10,8 @@ import {
   useMotionValueEvent,
   useScroll,
 } from "framer-motion";
+import { HTMLProps, useState } from "react";
 import { animateScroll, Link as SpyLink } from "react-scroll";
-
-import Button from "@/components/button";
-import { LogoIcon } from "@/components/logo";
 
 export default function SectionMenu({
   children,
@@ -64,7 +62,7 @@ export default function SectionMenu({
           }
           className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-zinc-100"
         >
-          <LogoIcon lightBg height={30} />
+          <LogoIcon height={30} />
         </SpyLink>
 
         <div className={cx("flex items-center")}>
@@ -84,14 +82,10 @@ export default function SectionMenu({
         </div>
 
         <div className="flex justify-end">
-          <Button
-            target="_self"
-            type="button"
-            hideIcon
-            className="bg-emerald-500"
-            href="https://console.upstash.com"
-          >
-            Login
+          <Button asChild>
+            <a href="https://console.upstash.com" target="_self">
+              Login
+            </a>
           </Button>
         </div>
       </div>

@@ -1,8 +1,6 @@
-import NextLink from "next/link";
-
 import cx from "@/utils/cx";
 import type { Post } from "@content";
-import Balancer from "react-wrap-balancer";
+import NextLink from "next/link";
 
 type Props = {
   post?: Post;
@@ -15,22 +13,20 @@ export default function OtherPostCard({ post, align = "left" }: Props) {
       href={`/blog/${post.slug}`}
       className={cx(
         "flex flex-col p-6 text-left",
-        "cursor-pointer rounded-xl text-inherit transition",
-        "bg-emerald-600/10",
-        "hover:bg-emerald-600/20",
-        "dark:bg-zinc-800",
-        "dark:hover:bg-emerald-200/10 dark:hover:text-emerald-400 dark:hover:underline",
+        "cursor-pointer rounded-xl transition",
+        "bg-black/5 dark:bg-white/5",
+        "hover:text-primary hover:underline",
         align === "right" && "text-right",
       )}
     >
-      <span className="text-sm uppercase opacity-60">
+      <span className="text-sm uppercase opacity-50">
         {align === "right" ? "Next post" : "Previous post"}
       </span>
-      <h4 className="mt-2 font-display text-xl font-medium md:text-2xl">
-        <Balancer>{post.title}</Balancer>
+      <h4 className="mt-2 text-balance font-display text-xl font-medium md:text-2xl">
+        {post.title}
       </h4>
     </NextLink>
   ) : (
-    <div className="flex rounded-xl bg-emerald-600/10 dark:bg-zinc-900" />
+    <div className="flex rounded-xl bg-black/5 dark:bg-white/5" />
   );
 }

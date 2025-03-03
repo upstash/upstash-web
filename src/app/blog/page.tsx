@@ -1,16 +1,14 @@
-import Link from "next/link";
-
-import { BANNED_TAGS } from "@/utils/const";
-import type { Post } from "@content";
-import { countBy, flatten, omit } from "lodash";
-
 import Bg from "@/components/bg";
 import PostGridCard from "@/components/blog/grid-item";
 import PopularTag from "@/components/blog/popular-tag";
+import Button from "@/components/button";
 import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
-
+import { BANNED_TAGS } from "@/utils/const";
+import type { Post } from "@content";
+import { countBy, flatten, omit } from "lodash";
+import Link from "next/link";
 import { getData } from "./utils/helpers";
 
 export default async function BlogPage() {
@@ -48,12 +46,9 @@ export default async function BlogPage() {
           </div>
 
           <div className="mt-10 flex justify-center">
-            <Link
-              className="flex justify-center gap-1 rounded-full bg-emerald-400 px-5 py-3 text-emerald-950 transition"
-              href={`/blog/all`}
-            >
-              Show all posts
-            </Link>
+            <Button asChild variant="primary">
+              <Link href={`/blog/all`}>Show all posts</Link>
+            </Button>
           </div>
         </Container>
       </section>

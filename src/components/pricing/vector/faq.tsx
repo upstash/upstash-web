@@ -1,7 +1,7 @@
-import * as React from "react";
+"use client";
 
 import * as Accordion from "@radix-ui/react-accordion";
-
+import * as React from "react";
 import {
   AccordionContent,
   AccordionItem,

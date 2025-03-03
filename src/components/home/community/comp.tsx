@@ -1,8 +1,7 @@
-import { HTMLProps } from "react";
-
-import cx from "@/utils/cx";
-
 import Button from "@/components/button";
+import cx from "@/utils/cx";
+import { IconArrowUpRight } from "@tabler/icons-react";
+import React, { HTMLProps } from "react";
 
 export function CommunityBox({
   children,
@@ -12,13 +11,13 @@ export function CommunityBox({
   return (
     <div
       className={cx(
-        "group/community-box flex flex-col items-center p-6 md:p-8",
-        "bg-white/5 transition",
+        "group flex flex-col items-center p-6 md:p-8",
+        "bg-white transition dark:bg-bg-mute",
         "rounded-lg first:rounded-t-3xl last:rounded-b-3xl",
         "md:rounded-lg md:first:rounded-t-lg md:last:rounded-b-lg",
         "lg:first:rounded-t-lg lg:last:rounded-b-lg",
         "lg:first:!rounded-l-4xl lg:last:!rounded-r-4xl",
-        "hover:scale-[1.02] hover:bg-white/10",
+        "hover:shadow-xl",
         className,
       )}
       {...props}
@@ -35,7 +34,10 @@ export function CommunityBoxTitle({
 }: HTMLProps<HTMLHeadingElement>) {
   return (
     <h4
-      className={cx("font-display text-xl md:text-2xl", className)}
+      className={cx(
+        "font-display text-xl font-semibold group-hover:text-primary md:text-2xl",
+        className,
+      )}
       {...props}
     >
       {children}
@@ -49,7 +51,7 @@ export function CommunityBoxDesc({
   ...props
 }: HTMLProps<HTMLParagraphElement>) {
   return (
-    <p className={cx("mb-6 mt-2 opacity-40", className)} {...props}>
+    <p className={cx("mb-4 mt-2 text-text-mute sm:mb-6", className)} {...props}>
       {children}
     </p>
   );
@@ -61,16 +63,11 @@ export function CommunityBoxButton({
   ...props
 }: HTMLProps<HTMLAnchorElement>) {
   return (
-    <Button
-      className={cx(
-        "mt-auto",
-        "group-hover/community-box:bg-emerald-400 group-hover/community-box:text-emerald-950",
-        className,
-      )}
-      {...props}
-      type="button"
-    >
-      {children}
+    <Button asChild className={cx("", className)}>
+      <a target="_blank" {...props}>
+        {children}
+        <IconArrowUpRight size={20} />
+      </a>
     </Button>
   );
 }

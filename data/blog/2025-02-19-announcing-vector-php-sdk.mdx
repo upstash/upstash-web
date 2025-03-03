@@ -1,0 +1,135 @@
+---
+slug: announcing-vector-php-sdk
+title: "Announcing our PHP SDKs for Vector"
+authors:
+  - jorge
+tags: [php, laravel, vector, announcement]
+---
+
+On January 31st, 2024, [we announced the public release of Upstash Vector](/blog/introducing-vector-database), our serverless vector database designed for storing and querying vector data.
+With Upstash Vector, you can build powerful applications like semantic search, recommendation engines, RAG, and more.
+
+Today, we're excited to launch the official PHP SDKs for Upstash Vector, making it easier than ever to integrate vector search into your PHP applications, whether you're building a web app, CLI tool, or library.
+
+If you're already familiar with our SDKs for JavaScript, Python, or Go, you'll feel right at home.
+
+### Upstash Vector for PHP
+
+Upstash Vector for PHP is a generic SDK that can be integrated into any PHP application independently of the framework you're using.
+
+You can install the SDK using Composer:
+
+```bash
+composer require upstash/vector
+```
+
+The following snippet shows a basic example of how to use the SDK to upsert vectors and query them.
+
+Just remember that to use the snippet below your Index must be configured with 1536 dimensions, otherwise update the code accordingly.
+
+```php
+use Upstash\Vector\Index;
+use Upstash\Vector\VectorUpsert;
+use Upstash\Vector\VectorQuery;
+
+use function Upstash\Vector\createRandomVector;
+
+$index = new Index(
+  url: 'UPSTASH_VECTOR_REST_URL',
+  token: 'UPSTASH_VECTOR_REST_TOKEN',
+);
+
+$index->upsertMany([
+  new VectorUpsert(
+    id: 'id-1',
+    vector: createRandomVector(dimensions: 1536),
+    metadata: ['metadata_field' => 'metadata_value1']
+  ),
+  new VectorUpsert(
+    id: 'id-2',
+    vector: createRandomVector(dimensions: 1536),
+    metadata: ['metadata_field' => 'metadata_value2']
+  ),
+]);
+
+$results = $index->query(new VectorQuery(
+  vector: createRandomVector(dimensions: 1536),
+  topK: 10,
+));
+
+// ...
+```
+We've also prepared a quick start guide for the PHP SDK, available [here](https://upstash.com/docs/vector/sdks/php/getting-started).
+
+### Upstash Vector for Laravel
+
+With the growing popularity of Laravel we know that many developers would like to use Upstash Vector in their Laravel applications.
+
+Upstash Vector for Laravel not only makes it easier to natively integrate our Vector index into your application by providing
+a simple Facade that you can interact with the Index but also ships with the ability to connect to multiple indexes at the same time.
+
+You can install the SDK for Laravel using Composer:
+
+```bash
+composer require upstash/vector-laravel
+```
+
+Our Laravel SDK is automatically configured, and the only step required is adding the Upstash Vector environment variables to your `.env` file.
+
+```dotenv
+UPSTASH_VECTOR_REST_URL=
+UPSTASH_VECTOR_REST_TOKEN=
+```
+
+Once you've set up the environment variables, you can start using our `Vector` Facade to interact with the Vector Index.
+
+```php
+use Upstash\Vector\Laravel\Facades\Vector;
+use Upstash\Vector\VectorUpsert;
+use Upstash\Vector\VectorQuery;
+
+use function Upstash\Vector\createRandomVector;
+
+Vector::upsertMany([
+  new VectorUpsert(
+    id: 'id-1',
+    vector: createRandomVector(dimensions: 1536),
+    metadata: ['metadata_field' => 'metadata_value1']
+  ),
+  new VectorUpsert(
+    id: 'id-2',
+    vector: createRandomVector(dimensions: 1536),
+    metadata: ['metadata_field' => 'metadata_value2']
+  ),
+]);
+
+$results = Vector::query(new VectorQuery(
+  vector: createRandomVector(dimensions: 1536),
+  topK: 10,
+));
+ 
+// ...
+```
+
+### What Can You Build with Upstash Vector?
+
+With a vector database, you can power a wide range of applications, from simple similarity search to advanced recommendation systems.
+Whether you're enhancing search functionality, personalizing content, or building AI-driven experiences,
+Upstash Vector gives you the flexibility to bring your ideas to life.
+
+To demonstrate its capabilities, we built [Semantic Emoji](https://semantic-emoji-production-tay68r.laravel.cloud), an open-source project that uses a dataset of emojis to power a semantic search engine with our new Laravel SDK.
+
+Check it out on [GitHub](https://github.com/upstash/laravel-semantic-emoji) and start building!
+
+### Closing Thoughts
+
+We live in an exciting time where the tools to build almost anything are becoming more accessible and affordable.
+AI continues to evolve at a rapid pace, shaping user expectations for search experiences that go beyond simple keywords to truly understand meaning.
+As developers, it's up to us to deliver on that promise.
+
+Personally, I'm thrilled about this announcement—I can't wait to see what the community creates with Upstash Vector.
+I know I'll be shipping some wild and fun experiments myself!
+
+So now, I ask you…
+
+***What will you build?***

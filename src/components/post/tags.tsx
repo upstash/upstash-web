@@ -1,7 +1,6 @@
-import Link from "next/link";
-
 import cx from "@/utils/cx";
 import type { Post } from "@content";
+import Link from "next/link";
 
 type Props = {
   post: Post;
@@ -18,10 +17,8 @@ export default function PostTags({ post }: Props) {
           href={`/blog/tag/${tag}`}
           className={cx(
             "rounded-full px-3 py-1 font-medium transition",
-            "bg-emerald-600/20 text-emerald-800",
-            "hover:bg-emerald-600/40",
-            "dark:bg-zinc-900 dark:text-zinc-300",
-            "dark:hover:bg-emerald-950 dark:hover:text-emerald-400",
+            "bg-black/10 dark:bg-white/10",
+            "hover:underline",
           )}
         >
           {tag}

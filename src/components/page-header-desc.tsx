@@ -1,7 +1,5 @@
-import { HTMLProps } from "react";
-
 import cx from "@/utils/cx";
-import Balancer from "react-wrap-balancer";
+import { HTMLProps } from "react";
 
 type IPageHeaderDesc = HTMLProps<HTMLParagraphElement> & {};
 
@@ -11,8 +9,11 @@ export default function PageHeaderDesc({
   ...props
 }: IPageHeaderDesc) {
   return (
-    <p className={cx("text-lg opacity-60 md:text-2xl", className)} {...props}>
-      <Balancer>{children}</Balancer>
+    <p
+      className={cx("text-balance text-lg opacity-60 md:text-xl", className)}
+      {...props}
+    >
+      {children}
     </p>
   );
 }
