@@ -10,9 +10,9 @@ Hey there! In this post, we’re diving into a comparison of Upstash Workflow wi
 So, let’s see how these platforms stack up against each other!
 
 The comparison will be based on three main aspects:
-- Features
-- Pricing
-- Limits
+- [Features](#features)
+- [Pricing](#pricing)
+- [Limits](#limits)
 
 ## Features
 
@@ -67,15 +67,15 @@ All three platforms offer a free tier with limited executions per month. They al
 Since all platforms have different parameters to calculate cost, it is not easy to compare. 
 We will simulate a single scenario on each platform to compare the pricing.
 - Use-case scenarios: 
-    1- 1M runs with average 5 steps per run. (5M steps)
-    2- 1M runs with average 10 steps per run. (10M steps)
+    - __Case 1__: 1M runs with average 5 steps per run. (5M steps)
+    - __Case 2__: 1M runs with average 10 steps per run. (10M steps)
 
 We can say that in terms of predictabily and cost calculation, Upstash Workflow is the easiest to calculate. 
 Inngest is also almost as easy as Upstash Workflow, but Trigger.dev is a bit harder to calculate.
 
 Leaving the links to our calculations and pricing pages here so that you can compare and run different scenarios:
-- [Trigger.dev](#trigger.dev) ->https://trigger.dev/pricing
-- [Upstash Workflow](#upstash_workflow) -> https://upstash.com/pricing
+- [Trigger.dev](#triggerdev) ->https://trigger.dev/pricing
+- [Upstash Workflow](#upstash-workflow) -> https://upstash.com/pricing
 - [Inngest](#inngest) https://www.inngest.com/pricing
 
 #### Trigger.dev
@@ -112,22 +112,28 @@ To summarize, total cost could be $48 to $2,093 depending on how long the runs a
 Upstash Workflow charges $1 per 100K steps. And the pay-as-you-go model allows 500K steps per day, which is 15M per month.  
 This is more than our scenarios.
 
-_1M runs with average 5 steps per run_
+__Case 1:__ 1M runs with average 5 steps per run
+
 Upstash Cost = 5M steps / 100K steps * $1 = $50  
-_1M runs with average 10 steps per run_
+
+__Case 2:__ 1M runs with average 10 steps per run
+
 Upstash Cost = 10M steps / 100K steps * $1 = $100
 
 We also need to consider the cost of the deployed envrinment. Again, we are assuming that this is a website deployed on Vercel.
 Function Duration Cost will be small as Upstash Workflow allows offloading REST API calls. 
 Note that users need to be careful here. If you use an SDK instead of a REST API, you cannot offload the call.
 Vercel on the Pro plan gives 1,000 GB-hour/month included, then $0.18 per GB-hour.
-Let’s assume a 128 MB function size and 0.5s duration per call.  
+Let’s assume a 128 MB function size and 1s duration per call.  
 5M calls * 128 MB * 1s = 640 GB-hour, which is included in the Pro plan.
 10M calls * 128 MB * 1s = 1280 GB-hour => 1280-1000(comes with the plan) = 280 GB-hour * $0.18 = $50.40
 
-_1M runs with average 5 steps per run_
+__Case 1:__ 1M runs with average 5 steps per run
+
 Vercel Cost = $20 
-_1M runs with average 10 steps per run_
+
+__Case 2:__ 1M runs with average 10 steps per run
+
 Vercel Cost = $20 + $50.4(Extra Function Duration cost)
 
 Total cost will be 
@@ -145,13 +151,16 @@ Their pricing is a bit more complicated than Upstash Workflow, to accomodate the
 Let's try to run same scenarios on Inngest. 
 As far as I understand the calculator, they take the minimum of the totals costs depending of the plans, and apply that only.
 
-_1M runs with average 5 steps per run_
+__Case 1:__ 1M runs with average 5 steps per run
+
 Inngest Cost = $50(base price) +  = $50 + $90
    - Base Price = $50(base price) 
   - Run Cost = (1M - 100K(free-runs)) * $5/50K) = $90
   - Step Cost = 0$ (as averange of 5 steps per run is included)
   - Total =  = $50 + $90 = $140
-_1M runs with average 10 steps per run_
+
+__Case 2:__ 1M runs with average 10 steps per run
+
 Inngest Cost(Basic Plan) = Base Price + Run Cost + Step Cost
   - Base Price = $50
   - Run Cost = (1M - 100K(free-runs)) * $5/50K) = $90
@@ -167,24 +176,29 @@ Applied Inngest Cost = min($540, $450) = $450
 Here, the function duration costs will be higher than Upstash Workflow because Inngest does not have a feature to offload REST API calls.  
 But the cost of Inngest is already higher than Upstash Workflow. Let's assume same Vercel cost as Upstash Workflow with a warning.
 
-_1M runs with average 5 steps per run_
+__Case 1:__ 1M runs with average 5 steps per run
+
 Vercel Cost = $20 
-_1M runs with average 10 steps per run_
+
+__Case 2:__ 1M runs with average 10 steps per run
+
 Vercel Cost = $20 + $50.4(Extra Function Duration cost)
 
 Total cost will be 
 - $160($140+$20) for 1M runs with average 5 steps per run
 - $500.4($450+$50.4) for 1M runs with average 10 steps per run
-*with a warning that Vercel Function Duration Cost can be higher due to limited Rest call offloading.
+*with a warning that Vercel Function Duration Cost can be higher due to not having option of offloading Rest Calls.
 
 ### Pricing Conclusion
 
 We looked at the costs of each platform with 5M steps per month, let’s say 5 steps per run. 
 
 Although Trigger.dev can be the most cost-effective, Upstash Workflow is close. 
-And when compared to the $70 predictable cost versus $48-$2,093 of Trigger.dev, Upstash Workflow would be a better choice. 
+And when compared to the $70/$170 predictable cost versus $48-$2,093 of Trigger.dev, Upstash Workflow would be a better choice. 
 
-And when we compare Inngest, Upstash Workflow is also a better choice with a $70 cost compared to $520 for Inngest.
+And when we compare Inngest, Upstash Workflow is also a better choice with
+- $70 cost of a Upstash Workflow compared to $160 for Inngest.
+- $170 cost of a Upstash Workflow compared to $500 for Inngest.
 
 ### Limits
 
