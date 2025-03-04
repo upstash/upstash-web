@@ -124,21 +124,15 @@ We also need to consider the cost of the deployed envrinment. Again, we are assu
 Function Duration Cost will be small as Upstash Workflow allows offloading REST API calls. 
 Note that users need to be careful here. If you use an SDK instead of a REST API, you cannot offload the call.
 Vercel on the Pro plan gives 1,000 GB-hour/month included, then $0.18 per GB-hour.
-Let’s assume a 128 MB function size and 1s duration per call.  
-5M calls * 128 MB * 1s = 640 GB-hour, which is included in the Pro plan.
-10M calls * 128 MB * 1s = 1280 GB-hour => 1280-1000(comes with the plan) = 280 GB-hour * $0.18 = $50.40
-
-__Case 1:__ 1M runs with average 5 steps per run
+Let’s assume a 128 MB function size and 500ms duration per call.  
+5M calls * 128 MB * 500ms = 320 GB-hour, which is included in the Pro plan.
+10M calls * 128 MB * 500ms = 640 GB-hour, which is also included in the Pro plan.
 
 Vercel Cost = $20 
 
-__Case 2:__ 1M runs with average 10 steps per run
-
-Vercel Cost = $20 + $50.4(Extra Function Duration cost)
-
 Total cost will be 
 - $70($50+$20) for 1M runs with average 5 steps per run
-- $170.4($100+$70.4) for 1M runs with average 10 steps per run
+- $120($100+$20) for 1M runs with average 10 steps per run
 
 #### Inngest
 
@@ -174,19 +168,13 @@ Inngest Cost(Pro Plan) = $350(base price) + 0(for runs as 5M run sare included) 
 Applied Inngest Cost = min($540, $450) = $450
 
 Here, the function duration costs will be higher than Upstash Workflow because Inngest does not have a feature to offload REST API calls.  
-But the cost of Inngest is already higher than Upstash Workflow. Let's assume same Vercel cost as Upstash Workflow with a warning.
-
-__Case 1:__ 1M runs with average 5 steps per run
+But the cost of Inngest is already higher than Upstash Workflow. Let's assume same Vercel cost as same as Upstash Workflow with a warning.
 
 Vercel Cost = $20 
 
-__Case 2:__ 1M runs with average 10 steps per run
-
-Vercel Cost = $20 + $50.4(Extra Function Duration cost)
-
 Total cost will be 
 - $160($140+$20) for 1M runs with average 5 steps per run
-- $500.4($450+$50.4) for 1M runs with average 10 steps per run
+- $470($450+$20) for 1M runs with average 10 steps per run
 *with a warning that Vercel Function Duration Cost can be higher due to not having option of offloading Rest Calls.
 
 ### Pricing Conclusion
@@ -198,7 +186,7 @@ And when compared to the $70/$170 predictable cost versus $48-$2,093 of Trigger.
 
 And when we compare Inngest, Upstash Workflow is also a better choice with
 - $70 cost of a Upstash Workflow compared to $160 for Inngest.
-- $170 cost of a Upstash Workflow compared to $500 for Inngest.
+- $120 cost of a Upstash Workflow compared to $470 for Inngest.
 
 ### Limits
 
