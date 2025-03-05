@@ -18,6 +18,20 @@ You can find the full source code on [GitHub](https://github.com/upstash/hacker-
 
 To see the agent in action, follow [@hackernewsagent](https://x.com/hackernewsagent) on X.
 
+## Example result
+
+Hacker News Item: https://news.ycombinator.com/item?id=43228816
+
+Story: https://edition.cnn.com/science/live-news/moon-landing-blue-ghost-03-02-25/index.html
+
+![Hacker News Story](/blog/hacker-news-x-agent/story.png)
+
+![Workflow Logs](/blog/hacker-news-x-agent/workflow-run.png)
+
+Agent Tweet: https://x.com/hackernewsagent/status/1896440551198580788
+
+![Agent Tweet](/blog/hacker-news-x-agent/tweet.png)
+
 ## How the Agent Works
 
 - Upstash Workflow orchestrates our serverless functions to reduce serverless cost and increase reliability.
@@ -39,7 +53,7 @@ We will create a workflow route to orchestrate the agent. You can find the full 
 
 ### Fetching the Top Stories
 
-We will use the `@agentic/hacker-news` package to fetch the top stories from Hacker News, no API key required.
+We will use the [@agentic/hacker-news](https://agentic.so/tools/hacker-news) package to fetch the top stories from Hacker News, no API key required.
 
 `hn.getTopStories()` returns an array of item IDs.
 
@@ -58,7 +72,7 @@ We will use `@upstash/redis` to keep track of the visited stories. We will pick 
 
 - To keep track of the visited stories, we will use a Redis set.
 - We will add the ID of the story to the set once we have visited it.
-- To check if a story has been visited, we will use `smismember` command. Passing the key of the set and an array of IDs will return an array of booleans indicating if corresponding IDs are members of the set.
+- To check if a story has been visited, we will use the `smismember` command. Passing the key of the set and an array of IDs will return an array of booleans indicating if corresponding IDs are members of the set.
 - We will find the index of the first unvisited story and retrieve its information using `hn.getItem()`.
 
 ```typescript
@@ -76,7 +90,7 @@ const url = item.url;
 
 ### Scraping the Story
 
-Given the URL of the story by Hacker News, we will scrape the content of the story using `cheerio`.
+Given the URL of a story by Hacker News, we will scrape the content of the story using `cheerio`.
 
 1. Fetch the HTML content of the story using `fetch`.
 2. Load the HTML content into `cheerio`, a library for parsing HTML.
@@ -154,7 +168,7 @@ We will use `context.call` to call the Ideogram API. This method prevents us fro
 Another cool trick we are doing here is passing `DESIGN` as the style type and using a color palette to get a more consistent style across the images.
 
 ```typescript
-const { body: ideogramResult } = (await context.call(
+const { body: ideogramResult } = (await context.call<IdeogramResponse>(
   "call image generation API",
   {
     url: "https://api.ideogram.ai/generate",
@@ -181,7 +195,7 @@ const { body: ideogramResult } = (await context.call(
       "Api-Key": process.env.IDEOGRAM_API_KEY!,
     },
   }
-)) as { body: IdeogramResponse };
+));
 ```
 
 ### Tweeting with `twitter-api-v2`
@@ -294,7 +308,7 @@ const hackerNewsTwitterAgent = context.agents.agent({
 });
 ```
 
-### Runnning the task
+### Running the task
 
 We can now run our task using the agent we created.
 
@@ -357,22 +371,6 @@ We have successfully built an agent that:
 - tweets a summary 
 
 All fully autonomously, implemented using `@upstash/workflow` agents for convenience.
-
----
-
-## Example result
-
-Hacker News Item: https://news.ycombinator.com/item?id=43228816
-
-Story: https://edition.cnn.com/science/live-news/moon-landing-blue-ghost-03-02-25/index.html
-
-![Hacker News Story](/blog/hacker-news-x-agent/story.png)
-
-![Workflow Logs](/blog/hacker-news-x-agent/workflow-run.png)
-
-Agent Tweet: https://x.com/hackernewsagent/status/1896440551198580788
-
-![Agent Tweet](/blog/hacker-news-x-agent/tweet.png)
 
 ## Next Steps
 
