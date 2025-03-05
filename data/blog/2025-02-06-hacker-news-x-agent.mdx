@@ -1,26 +1,31 @@
 ---
 slug: hacker-news-x-agent
-title: "Building a Hacker News Twitter Agent"
+title: "Building an autonomous AI Twitter Agent"
 authors:
   - yunus
 tags: [workflow, ai, next.js, serverless]
 ---
 
-In this tutorial, we will build an Agent that fetches the latest top stories from Hacker News, generates a summary and image, and tweets the story.
+In this article, we'll build a completely autonomous AI agent that:
+
+- finds the latest top story
+- generates a summary and cover image
+- tweets about the story
+
+using one of the most modern, convenient approaches to building AI agent workflows.
 
 You can find the full source code on [GitHub](https://github.com/upstash/hacker-news-x-agent).
 
 To see the agent in action, follow [@hackernewsagent](https://x.com/hackernewsagent) on X.
 
-## How It Works
+## How the Agent Works
 
-- Upstash Workflow orchestrates the execution of the route on serverless functions, split into step functions. Reducing function execution costs by eliminating the need to wait for agent calls to complete.
-- It also provides a comprehensive agents API that allows you to create, and run agents with tools and tasks.
-- QStash is used to schedule the agent to run every two hours.
-- Top stories are fetched from Hacker News and URLs are scraped for content.
-- Previously visited stories are tracked using Redis.
-- An image is generated using Ideogram API.
-- The story summary is tweeted using the X API.
+- Upstash Workflow orchestrates our serverless functions to reduce serverless cost and increase reliability.
+- Workflow provides a built-in API for creating, extending, and running agents.
+- We use QStash to schedule the agent to run every two hours.
+- The agent autonomously fetches the top story from HackerNews.
+- The agent summarizes the story, generates a cover image using the Ideogram API & publishes the story to X.
+- We track previously visited stories using Redis to avoid duplicates.
 
 ![Diagram](/blog/hacker-news-x-agent/diagram.png)
 
@@ -30,7 +35,7 @@ To see the agent in action, follow [@hackernewsagent](https://x.com/hackernewsag
   This is a step by step analysis of the code. If you want to set up your own agent, we have a detailed guide on the [README](https://github.com/upstash/hacker-news-x-agent/blob/master/README.md).
 </Note>
 
-We will create a `@upstash/workflow` route to orchestrate the agents. You can find the full code in the [app/api/tweet/route.ts](https://github.com/upstash/hacker-news-x-agent/blob/master/app/api/tweet/route.ts).
+We will create a workflow route to orchestrate the agent. You can find the full code in the [app/api/tweet/route.ts](https://github.com/upstash/hacker-news-x-agent/blob/master/app/api/tweet/route.ts).
 
 ### Fetching the Top Stories
 
@@ -117,7 +122,7 @@ return {
 };
 ```
 
-### Creating the `hackerNewsTool`
+### Creating the HackerNews Tool
 
 To provide the functionality we developed to our agent, we will create an AI SDK compatible tool, specifying the description, parameters, and execution function.
 
@@ -142,9 +147,11 @@ tool({
 
 ## Tweeting the Story
 
-### Generating an image
+### Generating an Image
 
-We will use `context.call` to call the Ideogram API. `context.call` enables us to perform HTTP calls as a workflow step. We won't need to actively wait for the call to complete, preventing function timeouts and reducing costs. A cool trick we are doing here is passing `DESIGN` as the style type and using a color palette to get a more consistent style across the images.
+We will use `context.call` to call the Ideogram API. This method prevents us from hitting serverless limits and calls our API back when our image is ready. Our function automatically closes while idle to avoid serverless charges.
+
+Another cool trick we are doing here is passing `DESIGN` as the style type and using a color palette to get a more consistent style across the images.
 
 ```typescript
 const { body: ideogramResult } = (await context.call(
@@ -224,7 +231,7 @@ const twitterResult = context.run("post image to Twitter", async () => {
 });
 ```
 
-### Creating the `twitterTool`
+### Creating the Twitter Tool
 
 We will create another tool to provide the functionality of generating an image and posting a tweet to Twitter to our agent. In this case, we will use `WorkflowTool` with `executeAsStep` set to `false`. This is because by default every tool is wrapped with `context.run` to be executed as a step function. Since we will be using `context.call` and `context.run` inside our tool, we don't want it to be wrapped with `context.run`.
 
@@ -315,7 +322,7 @@ await task.run();
 
 ### Defining the Workflow Route
 
-We will create a `@upstash/workflow` route to orchestrate the agents. We will use the `serve` function to define the route. Our agents API is accessible through the context object in the route.
+We will create a workflow route by using Upstash Workflow's `serve` function. This is the file our agent will live in:
 
 ```typescript
 import { serve } from "@upstash/workflow/nextjs";
@@ -326,9 +333,9 @@ export const { POST } = serve<{ prompt: string }>(async (context) => {
 });
 ```
 
-### Securing the Route
+### Securing our agent
 
-Setting up the following environment variables will automatically secure the calls to the workflow endpoint, making sure only requests signed by QStash are allowed. You can learn more about how to [Secure an endpoint with our guide](https://upstash.com/docs/workflow/howto/security).
+Setting the following environment variables will automatically secure all calls to our workflow route. Now, only requests signed by QStash are allowed. You can learn more about how to [secure an endpoint with our guide](https://upstash.com/docs/workflow/howto/security).
 
 ```bash
 # To make sure requests are coming from the right source
@@ -338,15 +345,22 @@ QSTASH_NEXT_SIGNING_KEY=
 
 ### Setting up a Cron Job
 
-Using the Request Builder in [QStash Console](https://console.upstash.com/qstash), we can set up a cron job to fetch the top unvisited Hacker News article and post its summary to Twitter every two hours.
+Using the Request Builder in [QStash Console](https://console.upstash.com/qstash), we'll set up a cron job to run our agent every two hours by using the CRON expression `0 */2 * * *`:
 
 ![QStash Schedule](/blog/hacker-news-x-agent/qstash-schedule.png)
 
-## Results
+## Result
 
-We have successfully built an agent that fetches the latest top stories from Hacker News, generates an image and tweets a summary, using `@upstash/workflow` agents orchestration.
+We have successfully built an agent that:
+- fetches the latest top story from Hacker News
+- generates an image 
+- tweets a summary 
 
-Here is an example result:
+All fully autonomously, implemented using `@upstash/workflow` agents for convenience.
+
+---
+
+## Example result
 
 Hacker News Item: https://news.ycombinator.com/item?id=43228816
 
@@ -363,5 +377,5 @@ Agent Tweet: https://x.com/hackernewsagent/status/1896440551198580788
 ## Next Steps
 
 - Follow [@hackernewsagent](https://x.com/hackernewsagent) on X to keep up with the latest Hacker News stories.
-- Check out the [repository](https://github.com/upstash/hacker-news-x-agent) and set up your own agent.
-- Learn more about the `@upstash/workflow` agents orchestration in the [Upstash documentation](https://upstash.com/docs/workflow/agents/overview).
+- Check out the [repository](https://github.com/upstash/hacker-news-x-agent) and create your own autonomous AI agent.
+- Learn more about Upstash Workflow agents in the [Upstash documentation](https://upstash.com/docs/workflow/agents/overview).
