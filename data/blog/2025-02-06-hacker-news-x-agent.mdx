@@ -168,7 +168,7 @@ We will use `context.call` to call the Ideogram API. This method prevents us fro
 Another cool trick we are doing here is passing `DESIGN` as the style type and using a color palette to get a more consistent style across the images.
 
 ```typescript
-const { body: ideogramResult } = (await context.call<IdeogramResponse>(
+const { body: ideogramResult } = await context.call<IdeogramResponse>(
   "call image generation API",
   {
     url: "https://api.ideogram.ai/generate",
@@ -195,7 +195,7 @@ const { body: ideogramResult } = (await context.call<IdeogramResponse>(
       "Api-Key": process.env.IDEOGRAM_API_KEY!,
     },
   }
-));
+);
 ```
 
 ### Tweeting with `twitter-api-v2`
