@@ -143,19 +143,24 @@ To provide the functionality we developed to our agent, we will create an AI SDK
 ```typescript
 import { z } from "zod";
 import { tool } from "ai";
+import { serve } from "@upstash/workflow/nextjs";
 
-tool({
-  description:
-    "A tool for fetching the top 1 unvisited Hacker News article. It returns an " +
-    "object with the title, url, and content of the article. It does not take any " +
-    "parameters, so give an empty object as a parameter. You absolutely should not " +
-    "give an empty string directly as a parameter.",
-  parameters: z.object({}),
-  execute: async ({}) => {
-    // Fetching the Top Stories
-    // Picking an Unseen Story
-    // Scraping the Story
-  },
+export const { POST } = serve<{ prompt: string }>(async (context) => {
+  ...
+      hackerNewsTool: tool({
+        description:
+          "A tool for fetching the top 1 unvisited Hacker News article. It returns an " +
+          "object with the title, url, and content of the article. It does not take any " +
+          "parameters, so give an empty object as a parameter. You absolutely should not " +
+          "give an empty string directly as a parameter.",
+        parameters: z.object({}),
+        execute: async ({}) => {
+          // Fetching the Top Stories
+          // Picking an Unseen Story
+          // Scraping the Story
+        },
+      });
+  ...
 });
 ```
 
@@ -251,33 +256,38 @@ We will create another tool to provide the functionality of generating an image 
 
 ```typescript
 import { WorkflowTool } from "@upstash/workflow";
+import { serve } from "@upstash/workflow/nextjs";
 
-new WorkflowTool({
-  description:
-    "A tool for generating an image and posting a tweet to Twitter. It takes an " +
-    "object as a parameter with `tweet` and `imagePrompt` fields. The `tweet` field " +
-    "contains the tweet to post which is a string, and the `imagePrompt` field contains " +
-    "the prompt to generate an image for the tweet which is a string. You absolutely " +
-    "should not give the strings directly as parameters.",
-  schema: z.object({
-    tweet: z.string().describe("The tweet to post."),
-    imagePrompt: z
-      .string()
-      .describe("The prompt to generate an image for the tweet."),
-  }),
-  invoke: async ({
-    tweet,
-    imagePrompt,
-  }: {
-    tweet: string;
-    imagePrompt: string;
-  }) => {
-    // Generating an image
-    // Tweeting with `twitter-api-v2`
-    return twitterResult;
-  },
-  executeAsStep: false,
-}),
+export const { POST } = serve<{ prompt: string }>(async (context) => {
+  ...
+      twitterTool: new WorkflowTool({
+        description:
+          "A tool for generating an image and posting a tweet to Twitter. It takes an " +
+          "object as a parameter with `tweet` and `imagePrompt` fields. The `tweet` field " +
+          "contains the tweet to post which is a string, and the `imagePrompt` field contains " +
+          "the prompt to generate an image for the tweet which is a string. You absolutely " +
+          "should not give the strings directly as parameters.",
+        schema: z.object({
+          tweet: z.string().describe("The tweet to post."),
+          imagePrompt: z
+            .string()
+            .describe("The prompt to generate an image for the tweet."),
+        }),
+        invoke: async ({
+          tweet,
+          imagePrompt,
+        }: {
+          tweet: string;
+          imagePrompt: string;
+        }) => {
+          // Generating an image
+          // Tweeting with `twitter-api-v2`
+          return twitterResult;
+        },
+        executeAsStep: false,
+      }),
+  ...
+});
 ```
 
 ## Orchestration
