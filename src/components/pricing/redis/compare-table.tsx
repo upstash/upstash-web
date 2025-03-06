@@ -6,6 +6,7 @@ import useIsMobile from "@/hooks/use-is-mobile";
 import cx from "@/utils/cx";
 import { PricingRedis } from "@/utils/type";
 import { IconCoin, IconInfoCircle } from "@tabler/icons-react";
+import Link from "next/link";
 import * as React from "react";
 import CompareValue from "../compare-value";
 
@@ -1450,11 +1451,7 @@ export default function CompareTable({
             <CompareValue
               after={
                 <Tooltip content="The write commands are replicated to all read regions in addition to primary region so the replications are counted as commands. For example, if you have one primary and one read region, 100K writes will cost $0.4 ($0.2 x 2).">
-                  <IconInfoCircle
-                    className="ml-1 opacity-60"
-                    stroke={1.2}
-                    aria-label="Info"
-                  />
+                  <IconInfoCircle stroke={1.5} size={24} />
                 </Tooltip>
               }
             >
@@ -1537,9 +1534,7 @@ export default function CompareTable({
           </Col>
           <Col plan={showEnterprise} className="py-4">
             <Button asChild variant="secondary">
-              <a target="_self" href="https://upstash.com/contact">
-                Contact Us
-              </a>
+              <Link href={"/enterprise"}>Learn More</Link>
             </Button>
           </Col>
         </tr>

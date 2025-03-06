@@ -3,21 +3,28 @@
 import IconQStash from "@/components/icon-qstash";
 import IconRedis from "@/components/icon-redis";
 import IconVector from "@/components/icon-vector";
+import IconWorkflow from "@/components/icon-workflow";
 import cx from "@/utils/cx";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import * as React from "react";
 
-export default function ProductToggle({ product }: { product: string }) {
+const productConfig = {
+  "/redis": { name: "Redis", Icon: IconRedis },
+  "/vector": { name: "Vector", Icon: IconVector },
+  "/qstash": { name: "QStash", Icon: IconQStash },
+  "/workflow": { name: "Workflow", Icon: IconWorkflow },
+} as const;
+
+type Product = keyof typeof productConfig;
+
+export default function ProductToggle({ product }: { product: Product }) {
   return (
     <div className="flex justify-center">
       <div className="flex gap-3 rounded-xl border-2 border-bg-mute p-1">
-        {["/redis", "/vector", "/qstash"].map((key) => {
+        {(Object.keys(productConfig) as Product[]).map((key) => {
           const isActive = product === key;
-
-          const isRedis = key === "/redis";
-          const isVector = key === "/vector";
-          const isQStash = key === "/qstash";
+          const { name, Icon } = productConfig[key];
 
           return (
             <Link
@@ -40,15 +47,9 @@ export default function ProductToggle({ product }: { product: string }) {
                 />
               )}
               <>
-                {isRedis && <IconRedis width={20} />}
-                {isVector && <IconVector width={20} />}
-                {isQStash && <IconQStash width={20} />}
+                <Icon width={20} />
               </>
-              <span className="grow px-1 font-medium">
-                {isRedis && "Redis"}
-                {isVector && "Vector"}
-                {isQStash && "QStash"}
-              </span>
+              <span className="grow px-1 font-medium">{name}</span>
             </Link>
           );
         })}

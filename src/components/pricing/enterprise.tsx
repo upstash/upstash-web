@@ -15,7 +15,7 @@ export default function PricingTableEnterprise() {
           variant="secondary"
           className="-ml-1 mt-4 hidden md:inline-flex"
         >
-          <Link href="/contact">Contact Us</Link>
+          <Link href="/enterprise">Learn More</Link>
         </Button>
       </div>
 
@@ -41,7 +41,7 @@ export default function PricingTableEnterprise() {
       </div>
 
       <Button asChild variant="secondary" className="-ml-1 mt-6 md:hidden">
-        <Link href="/contact">Contact Us</Link>
+        <Link href="/enterprise">Learn More</Link>
       </Button>
     </div>
   );

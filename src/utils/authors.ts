@@ -403,4 +403,14 @@ export const authors: Record<
     title: "Software Engineer @Upstash",
     image: "jorge.png",
   },
+  mehmettokgoz: {
+    name: "Mehmet Tokgöz",
+    title: "Software Engineer @Upstash",
+    image: "mehmettokgoz.jpg",
+  },
+  elifnur: {
+    name: "Elif Nur Deniz",
+    title: "Software Developer - Guest Author",
+    image: "elifnur.jpeg",
+  }
 };

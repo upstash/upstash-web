@@ -94,7 +94,7 @@ from langchain_core.runnables import RunnableLambda
 from langchain_community.callbacks import UpstashRatelimitError, UpstashRatelimitHandler
 
 # your own method to get user ids
-const user_id = getUserId();
+user_id = getUserId();
 
 # mock chain
 chain = RunnableLambda(str)
@@ -111,7 +111,7 @@ try:
         "callbacks": [
             UpstashRatelimitHandler(
                 identifier=user_id,
-                request_ratelimit: ratelimit,
+                request_ratelimit=ratelimit,
             )
         ]
     })

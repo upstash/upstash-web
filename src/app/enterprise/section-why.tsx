@@ -24,13 +24,13 @@ export default function SectionWhy() {
             <article
               key={index}
               className={cx(
-                "group flex items-center justify-between gap-2 p-8 md:px-16 md:py-12",
+                "group flex flex-col-reverse items-center justify-between gap-4 p-8 text-center sm:flex-row sm:gap-2 sm:text-left md:px-16 md:py-12",
                 "rounded-3xl bg-white shadow-sm dark:bg-bg-mute",
                 "cursor-default transition",
                 "dark:hover:bg-white/10",
               )}
             >
-              <div className="text-left md:w-1/2">
+              <div className="md:w-1/2">
                 <h4 className="text-lg font-semibold leading-tight text-primary-text md:text-xl">
                   {title}
                 </h4>

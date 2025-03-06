@@ -108,9 +108,9 @@ function Link({ className, ...props }: React.ComponentProps<"a">) {
   return (
     <a
       className={cx(
-        "group flex items-center justify-between transition",
-        "rounded-3xl border-2 border-transparent bg-white p-4 text-left text-xl shadow-sm dark:bg-bg-mute",
-        "md:rounded-4xl md:p-7 md:text-2xl",
+        "group flex cursor-pointer items-center justify-between transition",
+        "rounded-3xl border-2 border-transparent bg-white px-4 py-3 text-left text-xl shadow-sm dark:bg-bg-mute",
+        "md:rounded-4xl md:p-6 md:text-2xl",
         "hover:border-primary hover:bg-emerald-50 hover:text-primary-text dark:hover:text-bg",
         className,
       )}

@@ -1,0 +1,205 @@
+---
+
+title: "Workflow Updates: Invoke, Logs, Flow-Control and Dev Server"
+slug: workflow-updates
+authors: [mehmettokgoz]
+tags: [workflow, qstash]
+---
+
+We’ve been working hard to implement some of the most requested features for Upstash Workflow, and we’re excited to share them with you:
+
+1. **Invoke API** – Call other workflows from within a workflow.
+2. **Logs API** – Retrieve workflow execution details.
+3. **Flow Control** - Limit the rate and parallelism of workflow steps.
+4. **Local Development Server** – Test and debug workflows locally before deployment.
+
+We’ve already provided detailed documentation for each of these features, but I’ll walk you through them to explain how they can benefit you.
+
+## Invoke API
+
+Running steps concurrently within a workflow is great—but running multiple workflows concurrently within a workflow is even better!
+With `context.invoke()`, you can start another workflow run inside a workflow, just like a step, and await its completion.
+
+This is especially useful when you need to:
+- Execute separate logic branches concurrently and wait for their completion.
+- Fan out workflows to process a set of records in parallel.
+
+```javascript title:"route.ts"
+import { WorkflowContext } from "@upstash/workflow";
+import { createWorkflow, serveMany } from "@upstash/workflow/nextjs";
+ 
+// 👇 User onboarding workflow
+const onboardingWorkflow = createWorkflow(async (context) => {
+  const data = await context.run("send-onboarding-email", async () => {
+    // Execute business logic here
+  })
+  // ...
+  return data
+})
+
+// 👇 Trial subscription workflow
+const trialWorkflow = createWorkflow(async (context) => {
+  const data = await context.run("start-trial", async () => {
+    // Execute business logic here
+  })
+  // ...
+  return data
+})
+
+// 👇 User registration workflow
+const registerUserWorkflow = createWorkflow(async (context: WorkflowContext<{userId: string}>) => {
+  const { userId } = context.requestPayload
+
+  // Invoke two workflows concurrently and await their completion
+  await Promise.all([
+    context.invoke("start-onboarding-workflow", {
+      workflow: onboardingWorkflow,
+      body: { userId }
+    }), 
+    context.invoke("start-trial-workflow", {
+      workflow: trialWorkflow,
+      body: { userId }
+    })
+  ])
+  // ...
+})
+
+export const { POST } = serveMany({
+  trialWorkflow, 
+  onboardingWorkflow, 
+  registerUserWorkflow
+])
+```
+
+With this new feature, it’s now possible to return data at the end of a workflow.
+This data is  returned to the caller of `context.invoke()` and stored in the logs.
+
+<Note type="info">
+The request body and response of the workflow are type-safe, and you’ll be warned if you attempt to invoke a workflow with the wrong input type.  
+</Note>
+
+Check out the [documentation](https://upstash.com/docs/workflow/howto/invoke) for more details.
+
+## Logs
+
+Our console provides powerful monitoring for workflow runs. However, many users requested an API to integrate tracking and monitoring directly into their own applications.
+
+We listened—and now, we’ve introduced a public API to fetch workflow run details.
+
+```javascript title:"route.ts"
+import { Client } from "@upstash/workflow";
+
+const client = new Client({ token: "<QSTASH_TOKEN>" });
+const { runs } = await client.logs();
+
+// Filter by workflow run ID
+const { runs } =  await client.logs({ workflowRunId: "<WORKFLOW_RUN_ID>"});
+
+// Filter by workflow URL
+const { runs } =  await client.logs({ workflowUrl: "<WORKFLOW_URL>"});
+```
+
+This API returns the current state of a workflow, along with details about completed and in-progress steps.
+Essentially, it provides all the information you see on our dashboard.
+
+<Note>This API provides a complete overview of the workflow run, including step outputs and the request payload. You can still build a simpler version by manipulating a data source inside the workflow itself.</Note>
+
+Check out the [documentation](https://upstash.com/docs/workflow/rest/runs/logs) for more details.
+
+## Flow-Control
+
+There is no limit on the number of parallel steps in Upstash Workflow.
+You can run as many steps as you’d like. However, some users have requested more control over the parallelism and rate-limit of workflow steps.
+
+- Rate refers to the number of new requests started per second (i.e., the number of steps initiated). When the rate is limited, steps will wait until the next second to start if too many steps have already been initiated.
+- Parallelism refers to the number of concurrent requests (i.e., active steps). When parallelism is limited, steps will wait until there is available capacity.
+
+Both of these configurations are associated with a flow-control key. You can limit these values at the workflow level using the following configuration:
+
+```typescript
+import { serve } from "@upstash/workflow/nextjs"
+
+export const { POST } = serve(
+  async (context) => {
+    // ...
+  }, {
+    flowControl: {
+      key: "userOnboardingWorkflow",
+      ratePerSecond: 50,
+      parallelism: 10,
+    }
+  }
+)
+```
+
+<Note type="info">
+Multiple workflows can share the same limits by using the same flow-control key.  
+</Note>
+
+Although this configuration applies to all steps in a workflow, you can customize the configuration for `context.call()` steps separately if your external service requires stricter flow control.
+
+For example, suppose you have an AI inference provider that limits you to a maximum of 10 concurrent requests. You can use a dedicated flow-control key for this provider and set its value to 10, allowing you to enforce this limit across all your workflows.
+
+```javascript
+import { serve } from "@upstash/workflow/nextjs"
+
+export const { POST } = serve(
+  async (context) => {
+    ...
+    const { data } = await context.call("Call LLM to generate summary", {
+      // ...
+      flowControl: {
+        key: "llmProviderLimit",
+        ratePerSecond: 50,
+        parallelism: 10,
+      }
+    })
+    ...
+  }
+)
+```
+
+Check out the [documentation](https://upstash.com/docs/workflow/howto/flow-control) for more details.
+
+## Development Server
+
+Upstash Workflow requires a publicly available server to reach for requests.
+
+During the development where application is not deployed yet, this might be a friction factor for our users.
+They had to open a local-tunnel and use that address to trigger workflow runs. Although this approach remains very useful, we decided to distribute a development server.
+
+You can install the local development server via our NPX package.
+
+```bash
+npx @upstash/qstash-cli qstash dev 
+```
+
+or pull the Docker image:
+
+```bash
+docker run -p 8080:8080 public.ecr.aws/upstash/qstash:2.20.8 qstash dev
+```
+
+This will run a local development server and will give you the credentials for a test user.
+
+```bash
+QSTASH_URL=http://127.0.0.1:8080
+QSTASH_TOKEN=eyJVc2VySUQiOiJkZWZhdWx0VXNlciIsIlBhc3N3b3JkIjoiZGVmYXVsdFBhc3N3b3JkIn0=
+QSTASH_CURRENT_SIGNING_KEY=sig_5Ag5v2D1zVHzSAnxTc3LZ97nb7Df
+QSTASH_NEXT_SIGNING_KEY=sig_6otveSLQEeKfTj7sxj5cM3DW8J4L
+```
+
+Once you change the environment variables, the requests will be directed to your local QStash server so that you can test and run workflows without exposing your application via local tunnel.
+
+<Note>We don’t have a UI for the local development server yet. However, you can fetch data, such as logs, by using the Workflow client.</Note>
+
+Check out the [documentation](https://upstash.com/docs/workflow/howto/local-development) for more details.
+
+## Conclusion
+
+We launched Workflow as an extension to Upstash QStash last year, and since then, it has gained significant engagement from our community.
+Recently, we introduced a dedicated Workflow tab in our console, positioning it as a standalone product.
+
+With valuable feedback from our community, we’re eager to improve Workflow and introduce new features. 
+You can join our Discord channel to submit any feature requests or use the Intercom chatbox in our console.
+

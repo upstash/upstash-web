@@ -5,9 +5,8 @@ import {
   HeroTabFeatureTitle,
   HeroTabFeatureUl,
 } from "@/components/home/hero/hero-tab";
-import CodeVector from "@/components/home/serverless/code-vector";
 import { IconCircle1, IconCircle2, IconCircle3 } from "@tabler/icons-react";
-import React from "react";
+import { CodeSnippetsVector } from "../serverless/code-snippets-vector";
 
 export function HeroTabVector() {
   return (
@@ -96,7 +95,7 @@ export function HeroTabVector() {
         </HeroTabFeatureUl>
       </HeroTabFeatureCont>
 
-      <CodeVector />
+      <CodeSnippetsVector />
     </>
   );
 }

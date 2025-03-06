@@ -17,7 +17,7 @@ export default function IconWorkflow({
     >
       <rect width="32" height="32" rx="7" fill="#9333EA" />
       <path
-        d="M7 7H25L7 16H25L7 25H25"
+        d="M8 8H24L8 16H24L8 24H24"
         stroke="white"
         strokeWidth="3"
         strokeLinecap="round"

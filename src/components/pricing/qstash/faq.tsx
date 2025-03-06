@@ -32,7 +32,7 @@ export default function FAQ() {
 
               <ol className="list-decimal space-y-2 pl-6">
                 <li>
-                  You make a request to <code>/v1/publish/[your-api-url]</code>
+                  You make a request to <code>/v2/publish/[your-api-url]</code>
                 </li>
                 <li>
                   We make an HTTP request to your API and it returns a 500
@@ -58,7 +58,7 @@ export default function FAQ() {
 
               <ol className="list-decimal space-y-2 pl-6">
                 <li>
-                  You make a request to <code>/v1/publish/[your-api-url]</code>
+                  You make a request to <code>/v2/publish/[your-api-url]</code>
                 </li>
                 <li>We make an HTTP request to each of your endpoints.</li>
               </ol>
@@ -73,6 +73,31 @@ export default function FAQ() {
         </AccordionTrigger>
         <AccordionContent>
           QStash API starts to return exceptions.
+        </AccordionContent>
+      </AccordionItem>
+
+      <AccordionItem value="item-3">
+        <AccordionTrigger>
+          How is the Max Message Size Limit applied?
+        </AccordionTrigger>
+        <AccordionContent>
+        <ul className="mt-4 list-disc space-y-2 pl-6">
+            <li className="space-y-2">
+              <p>
+                If the body send to QStash is larger than the limit, the endpoint returns http 412 error stating that quota is exceeded.
+              </p>
+            </li>
+            <li className="space-y-2">
+              <p>
+                When /v2/batch endpoint is used, each request body is subjected to the quota on its own. 
+              </p>
+            </li>
+            <li className="space-y-2">
+              <p>
+                When the response of called endpoint is larger than the limit, the message is trimmed after the limit. And stored in the DLQ/Events as trimmed.
+              </p>
+            </li>
+          </ul>
         </AccordionContent>
       </AccordionItem>
     </Accordion.Root>

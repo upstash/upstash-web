@@ -22,20 +22,20 @@ export default function PricingTableEnterprise() {
       <div className="mt-6 md:ml-24 md:mt-0">
         <ul className="space-y-2">
           <li className="flex items-center gap-1">
-            <IconCircleCheckFilled size={20} className="fill-primary-text" />
+            <IconCircleCheckFilled size={20} className="fill-primary-text" />{" "}
+            100M+ steps daily
+          </li>
+          <li className="flex items-center gap-1">
+            <IconCircleCheckFilled size={20} className="fill-primary-text" />{" "}
+            Unlimited bandwidth
+          </li>
+          <li className="flex items-center gap-1">
+            <IconCircleCheckFilled size={20} className="fill-primary-text" />{" "}
             Professional support with SLA
           </li>
           <li className="flex items-center gap-1">
-            <IconCircleCheckFilled size={20} className="fill-primary-text" />
-            Scales over a billion of vectors
-          </li>
-          <li className="flex items-center gap-1">
-            <IconCircleCheckFilled size={20} className="fill-primary-text" />
-            Custom configurations
-          </li>
-          <li className="flex items-center gap-1">
-            <IconCircleCheckFilled size={20} className="fill-primary-text" />
-            Advanced security options
+            <IconCircleCheckFilled size={20} className="fill-primary-text" />{" "}
+            Dedicated resources for isolation
           </li>
         </ul>
       </div>

@@ -1,6 +1,5 @@
 import cx from "@/utils/cx";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
-import { IconArrowUpRight } from "@tabler/icons-react";
 import Link from "next/link";
 import { useSelectedLayoutSegment } from "next/navigation";
 import React from "react";
@@ -20,9 +19,7 @@ export default function NewNavigation() {
             "text-text-mute hover:bg-white/5 hover:text-primary-text",
           )}
         >
-          <Link href="/docs">
-            Docs <IconArrowUpRight className="opacity-60" size={16} />
-          </Link>
+          <Link href="/docs">Docs</Link>
         </NavigationMenu.Link>
       </NavigationMenu.Item>
 
@@ -71,7 +68,7 @@ export default function NewNavigation() {
         <NavigationMenu.Link
           asChild
           className={cx(
-            "flex select-none items-center gap-0.5 rounded-full px-3 py-2",
+            "flex select-none items-center gap-0.5 whitespace-nowrap rounded-full px-3 py-2",
             "text-text-mute hover:bg-white/5 hover:text-primary-text",
             "contact" === segment ? "bg-bg-mute text-primary-text" : "",
           )}
