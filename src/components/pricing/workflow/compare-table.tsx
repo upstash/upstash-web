@@ -119,7 +119,7 @@ export default function CompareTable() {
               <h5 className="flex items-baseline font-semibold">
                 $1
                 <span className="ml-1 text-base font-normal opacity-40">
-                  / 100K messages
+                  / 100K steps
                 </span>
               </h5>
             </div>
@@ -173,7 +173,7 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 py-4 text-left font-normal">
-            Max Messages per Day
+            Max Steps per Day
           </th>
           {/**/}
           <Col plan={showFree}>
@@ -192,6 +192,25 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 py-4 text-left font-normal">
+            Max Steps per Workflow Run
+          </th>
+          {/**/}
+          <Col plan={showFree}>
+            <CompareValue type="number">1000</CompareValue>
+          </Col>
+          <Col plan={showPayg} feature>
+            <CompareValue type="number">1000</CompareValue>
+          </Col>
+          <Col plan={showPro1}>
+            <CompareValue type="number">1000</CompareValue>
+          </Col>
+          <Col plan={showPro10}>
+            <CompareValue type="number">1000</CompareValue>
+          </Col>
+        </tr>
+
+        <tr>
+          <th className="px-0 py-4 text-left font-normal">
             Max Requests per Second
           </th>
           {/**/}
@@ -202,10 +221,10 @@ export default function CompareTable() {
             <CompareValue type="number">100</CompareValue>
           </Col>
           <Col plan={showPro1}>
-            <CompareValue>500</CompareValue>
+            <CompareValue type="number">500</CompareValue>
           </Col>
           <Col plan={showPro10}>
-            <CompareValue>1000</CompareValue>
+            <CompareValue type="number">1000</CompareValue>
           </Col>
         </tr>
 
@@ -235,44 +254,6 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal">
-            Max Number of URL Groups
-          </th>
-          {/**/}
-          <Col plan={showFree}>
-            <CompareValue>1</CompareValue>
-          </Col>
-          <Col plan={showPayg} feature>
-            <CompareValue>100</CompareValue>
-          </Col>
-          <Col plan={showPro1}>
-            <CompareValue>1000</CompareValue>
-          </Col>
-          <Col plan={showPro10}>
-            <CompareValue>2000</CompareValue>
-          </Col>
-        </tr>
-
-        <tr>
-          <th className="px-0 py-4 text-left font-normal">
-            Max Number of Endpoints per URL Group
-          </th>
-          {/**/}
-          <Col plan={showFree}>
-            <CompareValue>100</CompareValue>
-          </Col>
-          <Col plan={showPayg} feature>
-            <CompareValue>100</CompareValue>
-          </Col>
-          <Col plan={showPro1}>
-            <CompareValue>1000</CompareValue>
-          </Col>
-          <Col plan={showPro10}>
-            <CompareValue>2000</CompareValue>
-          </Col>
-        </tr>
-
-        <tr>
           <th className="px-0 py-4 text-left font-normal">Max Retry Count</th>
           {/**/}
           <Col plan={showFree}>
@@ -290,7 +271,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal">Max Delay</th>
+          <th className="px-0 py-4 text-left font-normal">Max Sleep Duration</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue>7 days</CompareValue>
@@ -308,7 +289,7 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 py-4 text-left font-normal">
-            Max HTTP Connection Timeout
+            Max HTTP Response Duration
           </th>
           {/**/}
           <Col plan={showFree}>
@@ -360,85 +341,7 @@ export default function CompareTable() {
             <CompareValue>14 days</CompareValue>
           </Col>
         </tr>
-        <tr>
-          <th className="px-0 py-4 text-left font-normal">
-            Max Active Schedules
-          </th>
-          {/**/}
-          <Col plan={showFree}>
-            <CompareValue type="number">10</CompareValue>
-          </Col>
-          <Col plan={showPayg} feature>
-            <CompareValue
-              type="number"
-              after={
-                <Tooltip content="Free up to 1000. Beyond that, $0.01 per active schedule.">
-                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
-                </Tooltip>
-              }
-            >
-              1000
-            </CompareValue>
-          </Col>
-          <Col plan={showPro1}>
-            <CompareValue
-              after={
-                <Tooltip content="Free up to 10K. Beyond that, $0.01 per active schedule.">
-                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
-                </Tooltip>
-              }
-            >
-              10000
-            </CompareValue>
-          </Col>
-          <Col plan={showPro10}>
-            <CompareValue
-              after={
-                <Tooltip content="Free up to 50K. Beyond that, $0.01 per active schedule.">
-                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
-                </Tooltip>
-              }
-            >
-              50000
-            </CompareValue>
-          </Col>
-        </tr>
-
-        <tr>
-          <th className="px-0 py-4 text-left font-normal">Max Queue Count</th>
-          {/**/}
-          <Col plan={showFree}>
-            <CompareValue type="number">10</CompareValue>
-          </Col>
-          <Col plan={showPayg} feature>
-            <CompareValue type="number">100</CompareValue>
-          </Col>
-          <Col plan={showPro1}>
-            <CompareValue>1000</CompareValue>
-          </Col>
-          <Col plan={showPro10}>
-            <CompareValue>1000</CompareValue>
-          </Col>
-        </tr>
-
-        <tr>
-          <th className="px-0 py-4 text-left font-normal">
-            Max Queue Parallelism
-          </th>
-          {/**/}
-          <Col plan={showFree}>
-            <CompareValue type="number">2</CompareValue>
-          </Col>
-          <Col plan={showPayg} feature>
-            <CompareValue type="number">10</CompareValue>
-          </Col>
-          <Col plan={showPro1}>
-            <CompareValue>10</CompareValue>
-          </Col>
-          <Col plan={showPro10}>
-            <CompareValue>10</CompareValue>
-          </Col>
-        </tr>
+        
         <tr>
           <th className="px-0 py-4 text-left font-normal">Max Events Size</th>
           {/**/}
@@ -521,28 +424,28 @@ export default function CompareTable() {
           <td className="p-0" />
           <Col plan={showFree} className="py-4">
             <Button asChild variant="primary">
-              <a target="_self" href="https://console.upstash.com/qstash">
+              <a target="_self" href="https://console.upstash.com/workflow">
                 Start Now
               </a>
             </Button>
           </Col>
           <Col plan={showPayg} feature className="py-4">
             <Button asChild variant="primary">
-              <a target="_self" href="https://console.upstash.com/qstash">
+              <a target="_self" href="https://console.upstash.com/workflow">
                 Start Now
               </a>
             </Button>
           </Col>
           <Col plan={showPro1} className="py-4">
             <Button asChild variant="primary">
-              <a target="_self" href="https://console.upstash.com">
+              <a target="_self" href="https://console.upstash.com/workflow">
                 Start Now
               </a>
             </Button>
           </Col>
           <Col plan={showPro10} className="py-4">
             <Button asChild variant="primary">
-              <a target="_self" href="https://console.upstash.com/qstash">
+              <a target="_self" href="https://console.upstash.com/workflow">
                 Start Now
               </a>
             </Button>

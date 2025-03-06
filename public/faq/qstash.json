@@ -7,6 +7,10 @@
     {
       "question": "What happens when we hit daily max messages limit?",
       "answer": "QStash API starts to return exceptions."
+    }, 
+    {
+      "question": "How is the Max Message Size Limit applied?", 
+      "answer": "If the body send to QStash is larger than the limit, the endpoint returns http 412 error stating that quota is exceeded. When /v2/batch endpoint is used, each request body is subjected to the quota on its own. When the response of called endpoint is larger than the limit, the message is trimmed after the limit. And stored in the DLQ/Events as trimmed."
     }
   ]
 }
