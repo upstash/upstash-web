@@ -1,0 +1,389 @@
+---
+slug: hacker-news-x-agent
+title: "Building an autonomous AI Twitter Agent"
+authors:
+  - yunus
+tags: [workflow, ai, next.js, serverless]
+---
+
+In this article, we'll build a completely autonomous AI agent that:
+
+- finds the latest top story
+- generates a summary and cover image
+- tweets about the story
+
+using one of the most modern, convenient approaches to building AI agent workflows.
+
+You can find the full source code on [GitHub](https://github.com/upstash/hacker-news-x-agent).
+
+To see the agent in action, follow [@hackernewsagent](https://x.com/hackernewsagent) on X.
+
+## Example result
+
+[Hacker News Item](https://news.ycombinator.com/item?id=43228816)
+
+[Story: Firefly ‘Blue Ghost’ lunar lander touches down on the moon](https://edition.cnn.com/science/live-news/moon-landing-blue-ghost-03-02-25/index.html)
+
+![Hacker News Story](/blog/hacker-news-x-agent/story.png)
+
+![Workflow Logs](/blog/hacker-news-x-agent/workflow-run.png)
+
+[Agent Tweet](https://x.com/hackernewsagent/status/1896440551198580788)
+
+![Agent Tweet](/blog/hacker-news-x-agent/tweet.png)
+
+## How the Agent Works
+
+- Upstash Workflow orchestrates our serverless functions to reduce serverless cost and increase reliability.
+- Workflow provides a built-in API for creating, extending, and running agents.
+- We use QStash to schedule the agent to run every two hours.
+- The agent autonomously fetches the top story from HackerNews.
+- The agent summarizes the story, generates a cover image using the Ideogram API & publishes the story to X.
+- We track previously visited stories using Redis to avoid duplicates.
+
+![Diagram](/blog/hacker-news-x-agent/diagram.png)
+
+## Fetching a Top Story from Hacker News
+
+<Note type="info">
+  This is a step by step analysis of the code. If you want to set up your own agent, we have a detailed guide on the [README](https://github.com/upstash/hacker-news-x-agent/blob/master/README.md).
+</Note>
+
+We will create a workflow route to orchestrate the agent. You can find the full code in the [app/api/tweet/route.ts](https://github.com/upstash/hacker-news-x-agent/blob/master/app/api/tweet/route.ts).
+
+### Fetching the Top Stories
+
+We will use the [@agentic/hacker-news](https://agentic.so/tools/hacker-news) package to fetch the top stories from Hacker News, no API key required.
+
+`hn.getTopStories()` returns an array of item IDs.
+
+```typescript
+import { HackerNewsClient } from "@agentic/hacker-news";
+
+const TOP_SLICE = 100;
+
+const hn = new HackerNewsClient();
+const top100 = (await hn.getTopStories()).slice(0, TOP_SLICE);
+```
+
+### Picking an Unvisited Story
+
+We will use `@upstash/redis` to keep track of the visited stories. We will pick the top unvisited story.
+
+- To keep track of the visited stories, we will use a Redis set.
+- We will add the ID of the story to the set once we have visited it.
+- To check if a story has been visited, we will use the `smismember` command. Passing the key of the set and an array of IDs will return an array of booleans indicating if corresponding IDs are members of the set.
+- We will find the index of the first unvisited story and retrieve its information using `hn.getItem()`.
+
+```typescript
+import { Redis } from "@upstash/redis";
+
+const redis = Redis.fromEnv();
+
+const top1Unvisited =
+  top100[(await redis.smismember("visited", top100)).findIndex((v) => v === 0)];
+await redis.sadd("visited", top1Unvisited);
+const item = await hn.getItem(top1Unvisited);
+const title = item.title;
+const url = item.url;
+```
+
+### Scraping the Story
+
+Given the URL of a story by Hacker News, we will scrape the content of the story using `cheerio`.
+
+1. Fetch the HTML content of the story using `fetch`.
+2. Load the HTML content into `cheerio`, a library for parsing HTML.
+3. Remove unwanted elements from the content and extract the main content.
+4. Clean the content by removing extra spaces and newlines.
+
+```typescript
+import * as cheerio from "cheerio";
+import { SELECTORS_TO_REMOVE } from "@/app/constants";
+
+if (!url) {
+  return {
+    title,
+    url,
+    content: "",
+  };
+}
+
+const html = await fetch(url).then((res) => res.text());
+
+const $ = cheerio.load(html);
+
+SELECTORS_TO_REMOVE.forEach((selector) => {
+  $(selector).remove();
+});
+
+let $content = $('main, article, [role="main"]');
+
+if (!$content.length) {
+  $content = $("body");
+}
+
+const content = $content
+  .text()
+  .replace(/\s+/g, " ")
+  .replace(/\n\s*/g, "\n")
+  .trim();
+
+return {
+  title,
+  url,
+  content,
+};
+```
+
+### Creating the HackerNews Tool
+
+To provide the functionality we developed to our agent, we will create an AI SDK compatible tool, specifying the description, parameters, and execution function.
+
+```typescript
+import { z } from "zod";
+import { tool } from "ai";
+import { serve } from "@upstash/workflow/nextjs";
+
+export const { POST } = serve<{ prompt: string }>(async (context) => {
+  ...
+      hackerNewsTool: tool({
+        description:
+          "A tool for fetching the top 1 unvisited Hacker News article. It returns an " +
+          "object with the title, url, and content of the article. It does not take any " +
+          "parameters, so give an empty object as a parameter. You absolutely should not " +
+          "give an empty string directly as a parameter.",
+        parameters: z.object({}),
+        execute: async ({}) => {
+          // Fetching the Top Stories
+          // Picking an Unseen Story
+          // Scraping the Story
+        },
+      });
+  ...
+});
+```
+
+## Tweeting the Story
+
+### Generating an Image
+
+We will use `context.call` to call the Ideogram API. This method prevents us from hitting serverless limits and calls our API back when our image is ready. Our function automatically closes while idle to avoid serverless charges.
+
+Another cool trick we are doing here is passing `DESIGN` as the style type and using a color palette to get a more consistent style across the images.
+
+```typescript
+const { body: ideogramResult } = await context.call<IdeogramResponse>(
+  "call image generation API",
+  {
+    url: "https://api.ideogram.ai/generate",
+    method: "POST",
+    body: {
+      image_request: {
+        model: "V_2",
+        prompt: imagePrompt,
+        aspect_ratio: "ASPECT_16_9",
+        magic_prompt_option: "AUTO",
+        style_type: "DESIGN",
+        color_palette: {
+          members: [
+            { color_hex: "#FF6D00" },
+            { color_hex: "#FFCA12" },
+            { color_hex: "#58BAE7" },
+            { color_hex: "#DDDDDD" },
+          ],
+        },
+      },
+    },
+    headers: {
+      "Content-Type": "application/json",
+      "Api-Key": process.env.IDEOGRAM_API_KEY!,
+    },
+  }
+);
+```
+
+### Tweeting with `twitter-api-v2`
+
+We will use the `twitter-api-v2` package to upload the image to Twitter and post the tweet.
+
+**Initializing the Twitter client**
+
+```typescript
+const client = new TwitterApi({
+  appKey: process.env.TWITTER_CONSUMER_KEY!,
+  appSecret: process.env.TWITTER_CONSUMER_SECRET!,
+  accessToken: process.env.TWITTER_ACCESS_TOKEN,
+  accessSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
+}).readWrite;
+```
+
+**Uploading the image to Twitter**
+
+```typescript
+const blob = await fetch(ideogramResult.data[0].url).then((res) =>
+  res.blob()
+);
+const arrayBuffer = await blob.arrayBuffer();
+const buffer = Buffer.from(arrayBuffer);
+const mediaId = await client.v1.uploadMedia(buffer, {
+  mimeType: "image/jpeg",
+});
+```
+
+**Posting the tweet**
+
+```typescript
+await client.v2.tweet(tweet, { media: { media_ids: [mediaId] } });
+```
+
+**Combining the steps**
+
+We will use `context.run` to run these steps in a single step function.
+
+```typescript
+const twitterResult = context.run("post image to Twitter", async () => {
+  // Initializing the Twitter client
+  // Uploading the image to Twitter
+  // Posting the tweet
+  return tweet;
+});
+```
+
+### Creating the Twitter Tool
+
+We will create another tool to provide the functionality of generating an image and posting a tweet to Twitter to our agent. In this case, we will use `WorkflowTool` with `executeAsStep` set to `false`. This is because by default every tool is wrapped with `context.run` to be executed as a step function. Since we will be using `context.call` and `context.run` inside our tool, we don't want it to be wrapped with `context.run`.
+
+```typescript
+import { WorkflowTool } from "@upstash/workflow";
+import { serve } from "@upstash/workflow/nextjs";
+
+export const { POST } = serve<{ prompt: string }>(async (context) => {
+  ...
+      twitterTool: new WorkflowTool({
+        description:
+          "A tool for generating an image and posting a tweet to Twitter. It takes an " +
+          "object as a parameter with `tweet` and `imagePrompt` fields. The `tweet` field " +
+          "contains the tweet to post which is a string, and the `imagePrompt` field contains " +
+          "the prompt to generate an image for the tweet which is a string. You absolutely " +
+          "should not give the strings directly as parameters.",
+        schema: z.object({
+          tweet: z.string().describe("The tweet to post."),
+          imagePrompt: z
+            .string()
+            .describe("The prompt to generate an image for the tweet."),
+        }),
+        invoke: async ({
+          tweet,
+          imagePrompt,
+        }: {
+          tweet: string;
+          imagePrompt: string;
+        }) => {
+          // Generating an image
+          // Tweeting with `twitter-api-v2`
+          return twitterResult;
+        },
+        executeAsStep: false,
+      }),
+  ...
+});
+```
+
+## Orchestration
+
+### Creating the `hackerNewsTwitterAgent`
+
+Now that we have the necessary tools, we can create an agent and provide the tools to it. We will also specify the background and max steps for the agent.
+
+``` typescript
+const model = context.agents.openai("gpt-4o-mini");
+
+const hackerNewsTwitterAgent = context.agents.agent({
+  model,
+  name: "hackerNewsTwitterAgent",
+  maxSteps: 2,
+  tools: {
+    hackerNewsTool: tool({...}), // hackerNewsTool we created
+    twitterTool: tool({...}), // twitterTool we created
+  },
+  background:
+    "You are an AI assistant that helps people stay up-to-date with the latest news. " +
+    "You can fetch the top 1 unvisited Hacker News article and post it to Twitter " +
+    "using the `hackerNewsTool` and `twitterTool` tools respectively. You will be " +
+    "called every hour to fetch a new article and post it to Twitter. You must create " +
+    "a 250 character tweet summary of the article. Provide links in the tweet if " +
+    "possible. Make sure to generate an image related to the tweet and post it along " +
+    "with the tweet.",
+});
+```
+
+### Running the task
+
+We can now run our task using the agent we created.
+
+```typescript
+const task = context.agents.task({
+  agent: hackerNewsTwitterAgent,
+  prompt:
+    "Fetch the top 1 unvisited Hacker News article and post it to Twitter. Generated image will be posted " +
+    "to Twitter with the tweet so it should be related to the tweet. Sometimes the articles are " +
+    "written in first person, so make sure to change the first person to third person point of view in tweet. " +
+    "Do not change the urls in the tweet. Do not post inappropriate content in tweet or " +
+    "image. Make sure the tweet is short and concise, has no more than 250 characters. Generate " +
+    "a visually appealing illustration related to the article. The image " +
+    "should be clean, simple, and engaging—ideal for social media scrolling. Use an isometric " +
+    "or minimal flat design style with smooth gradients and soft shadows. Avoid clutter, excessive " +
+    "details, or small text. If the image includes arrows or lines, make them slightly thick and " +
+    "black for clarity. Do not include logos or branding. The illustration should convey the article’s " +
+    "theme in a creative and inviting way. Try to give a concrete description of the image. In the " +
+    "tweet, make sure to put the url of the article two lines below the tweet, with Check it out " +
+    "here or similar expression before it. Do not call a tool twice in parallel.",
+});
+
+await task.run();
+```
+
+### Defining the Workflow Route
+
+We will create a workflow route by using Upstash Workflow's `serve` function. This is the file our agent will live in:
+
+```typescript
+import { serve } from "@upstash/workflow/nextjs";
+
+export const { POST } = serve<{ prompt: string }>(async (context) => {
+  // hackerNewsTwitterAgent definition here
+  // Runnning the task here
+});
+```
+
+### Securing our agent
+
+Setting the following environment variables will automatically secure all calls to our workflow route. Now, only requests signed by QStash are allowed. You can learn more about how to [secure an endpoint with our guide](https://upstash.com/docs/workflow/howto/security).
+
+```bash
+# To make sure requests are coming from the right source
+QSTASH_CURRENT_SIGNING_KEY=
+QSTASH_NEXT_SIGNING_KEY=
+```
+
+### Setting up a Cron Job
+
+Using the Request Builder in [QStash Console](https://console.upstash.com/qstash), we'll set up a cron job to run our agent every two hours by using the CRON expression `0 */2 * * *`:
+
+![QStash Schedule](/blog/hacker-news-x-agent/qstash-schedule.png)
+
+## Result
+
+We have successfully built an agent that:
+- fetches the latest top story from Hacker News
+- generates an image 
+- tweets a summary 
+
+All fully autonomously, implemented using `@upstash/workflow` agents for convenience.
+
+## Next Steps
+
+- Follow [@hackernewsagent](https://x.com/hackernewsagent) on X to keep up with the latest Hacker News stories.
+- Check out the [repository](https://github.com/upstash/hacker-news-x-agent) and create your own autonomous AI agent.
+- Learn more about Upstash Workflow agents in the [Upstash documentation](https://upstash.com/docs/workflow/agents/overview).
