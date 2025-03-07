@@ -51,7 +51,7 @@ export const SearchBar = () => {
 
 Our custom `useDebounce` hook is fairly simple, it looks like this:
 
-```tsx title="hooks/use-debounce.ts" {1,3-5} use-debounce.ts
+```tsx title="hooks/use-debounce.ts" use-debounce.ts
 import { useEffect, useState } from "react";
 
 export function useDebounce<T>(value: T, delay: number = 500): T {
@@ -73,7 +73,7 @@ export function useDebounce<T>(value: T, delay: number = 500): T {
 
 Now, to actually set the state and collect user input, we'll keep the JSX minimal: a single input with space to render out the results below. This is _not_ a guide on CSS. However, in production I've been using shadcn's `Dialog` component along with some custom styling that you can copy after this article.
 
-```tsx {12-20} title="components/search-bar.tsx"
+```tsx {12-19} title="components/search-bar.tsx"
 "use client";
 
 import { useState } from "react";
@@ -97,7 +97,7 @@ export const SearchBar = () => {
 };
 ```
 
-## 2. Sending Search Query to our Backend
+## 2. Sending the Search Query to our Backend
 
 The following code uses JStack to send data to our Next.js API. You can just as easily send a simple fetch request to any backend of your choice and pass the encoded search query as a query parameter.
 
@@ -204,7 +204,7 @@ export const SearchBar = () => {
 
 You may notice that we also keep track of previous results in a `prevResultsRef`. This is a small detail to maintain current results while a user requests new data. It's not really needed for the search to work, but it improves the user experience later on by preventing flickering during a query retry.
 
-When we enter a query, we now see that a single (because of the debounce) request for our term is made to our backend:
+When we enter a query, we now see that a single request for our term is made to our backend (because of the debounce):
 
 <img src="/blog/building-high-quality-search/single-backend-request.png" />
 
@@ -281,7 +281,7 @@ export const publicProcedure = j.procedure;
 
 We now laid the ground work: we created a hybrid vector index, inserted searchable documents into it and set up the Upstash Vector SDK to now programatically access this data from our app.
 
-# 4. (Optional) Re-rank and Weight Documents
+## 4. (Optional) Re-rank and Weight Documents
 
 I wanted to include this step even though it is not relevant to our search demo. In real-world applications, you'll often find re-rankers and custom weights assigned to documents. For example, a document may be prioritized in search based on:
 
@@ -293,7 +293,7 @@ You can get as complex as you want, and realistically, this plays a role when bu
 
 Still, I find it super interesting to put demos and small-to-medium sized applications into perspective with actual enterprise work.
 
-## 5. Return and Render Documents on the Frontend
+## 5. Render Documents on the Frontend
 
 We're all ready to use the vector index to process the user query and find relevant documents:
 
@@ -433,7 +433,7 @@ export const SearchBar = () => {
 
 We just built a typo-tolerant full-text + semantic search engine! The results look like this:
 
-<Video id="my-video-id" />
+<Video id="ERjZGKwO8OkSKd002kkZaW36MHcyBV4wqumGx27ff502s" />
 
 One thing I would like to see that Upstash Vector does not yet support is custom re-ranking of results and synonyms. These could improve the search quality even more. Other than that, I really liked how easy this was to implement, and that the best results are usually at or near the top of the search.
 
