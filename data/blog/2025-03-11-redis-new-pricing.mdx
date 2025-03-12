@@ -1,42 +1,76 @@
 ---
 slug: redis-new-pricing
-title: "New Pricing for Upstash Redis"
+title: "New Pricing and Increased Limits for Upstash Redis"
 draft: true
 authors:
   - enes
 tags: [redis, serverless]
 ---
 
-We're introducing new pricing plans to better meet the needs of our diverse user base.
+Upstash provides managed Redis with global low latency and multi-region replication. In the past, we've offered three types of plans for Upstash Redis:
 
-### **Key Changes:**
+1. **Free Tier**: Includes 10K free commands/day
+2. **Pay-as-You-Go**: $0.2 per additional 100,000 commands
+3. **Pro Plans**: Fixed price for unlimited commands
 
-1. **Larger Free Tier**:
-    - The free tier will now include **500K requests per month**, an increase from the previous 10K daily limit.
-2. **Pay-as-You-Go (PAYG) Updates**:
-    - We are removing the bandwidth limit. First 200GB bandwidth is free, beyond that $0.03 per GB as before.
-    - Max storage limit is increased to 100GB from 10GB.
-3. **Pro Plans Removed**:
-    - Pro plans are being phased out. Instead, we're introducing a **Prod Pack** add-on for production features like SOC-2 compliance, Uptime SLA, and advanced monitoring.
-    - This will be available for all plans at **$200/month per DB**.
-4. **New Fixed Plans**:
-    - These plans offer fixed storage and bandwidth at a set price. The smallest plan starts at **$10/month** for 256MB of storage.
-    - There will be auto-upgrade option if you prefer scale up.
+Today, we're excited to expand our Free Tier and offer more flexible fixed-price plans.
 
-### **Transition Details:**
+Let's go through the changes one by one.
 
-- These changes will apply to **new databases** and **existing free/PAYG databases** starting **March 1, 2025**.
-- Pro customers will be contacted later for transition options.
+---
 
-### **Why These Changes?**
+### 1. Increased Free Tier
 
-We’ve listened to your feedback:
+- The Free Tier now includes 500K commands per month instead of the previous 10K daily limit.
+- Perfect for development, testing and small production workloads.
 
-- Some users prefer to remain on a pay-as-you-go plan, even when they require higher bandwidth and storage.
-- Some users prefer **fixed plans** over PAYG, especially in non-serverless environments.
-- There’s growing demand for **production features** like SOC-2 and SLA, but many don’t want to upgrade to Pro plans.
-- Users with **high bandwidth** needs often face unexpectedly high costs when throughput increases.
+---
 
-Our goal is to balance these needs and create plans that scale from startups to enterprises, work for both serverless and traditional environments, and are easy to understand. Please take a look at our [new pricing here](https://upstash.com/docs/redis/overall/pricing).
+### 2. Increased Pay-as-You-Go Limits
 
-We don't expect a significant cost increase for most users. Your feedback continues to guide these improvements, and we appreciate your input.
+You can now increase storage or bandwidth without being forced to upgrade to a higher-priced tier.
+
+- Increased storage limit: Previously 10GB, now 100GB.
+- The first 200GB of bandwidth per month is now free, with no cap on total bandwidth.
+- Beyond the free bandwidth, we continue to charge $0.03 per additional GB as before.
+
+---
+
+### 3. On-demand Production Features with New Prod Pack
+
+We are introducing a new feature called Prod Pack. This optional add-on allows you to add production-grade features for individual databases.
+
+- Includes SOC-2 compliance, uptime SLA and advanced monitoring (Prometheus, Grafana, Datadog), PrivateLink, and RBAC.
+- Available for any database (including Pay-as-You-Go) at $200/month per DB.
+
+---
+
+### 4. Introducing New Fixed Plans
+
+Based on your feedback, we've reworked our fixed pricing options. Unlike our previous Pro Plans, which started at $280/month per DB, our new fixed plans start at $10/month per DB. With these new, cheaper fixed plans, we aim to cover use cases of Upstash Redis for non-serverless environments.
+
+- Each Fixed Plan includes a set amount of storage and bandwidth at a predictable monthly price.
+- Choose from multiple sizes (250MB, 1GB, 5GB, 10GB, 50GB, 100GB or 500GB).
+- Optional auto-scaling as your usage grows.
+
+---
+
+### Transition Timeline
+
+**Our new pricing structure and increased limits apply to new databases and existing Free or Pay-as-You-Go databases starting today, March 12, 2025.** Our Pro customers will have plenty of time to switch plans, and we'll be reaching out to them individually to help them choose the best option for their needs.
+
+---
+
+### What This Means For You
+
+Our new pricing structure is based on your feedback. We've heard:
+
+- Some people prefer Fixed Plans over Pay-as-You-Go, especially in non-serverless environments.
+- Production features shouldn't require a plan change and should be an add-on you can add at any time.
+- Higher bandwidth and storage are now available on the Pay-as-You-Go plan.
+
+With these changes and increased limits, we want to make it easy to start small, scale granularly, and add enterprise features as you need them - all without paying for what you don't use. Our goal with this new pricing is to be as intuitive as possible and support use cases from small startups to large enterprises.
+
+For a complete overview of our new pricing for Upstash Redis, visit: https://upstash.com/pricing/redis
+
+Questions about how these changes affect your specific use case? Contact our team at support@upstash.com.
