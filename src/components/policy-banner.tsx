@@ -20,7 +20,7 @@ export const PolicyBanner = () => {
   if (!visible) return;
 
   return (
-    <div className="flex w-full items-center justify-center bg-black py-3 text-sm text-zinc-200">
+    <div className="flex w-full items-center justify-center bg-black px-4 py-3 text-sm text-zinc-200">
       <span className=" ">
         Our{" "}
         <a
