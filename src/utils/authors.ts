@@ -7,11 +7,6 @@ export const authors: Record<
     url?: string;
   }
 > = {
-  lisa: {
-    name: "Lisa Natsumi",
-    title: "Engineer @Upstash",
-    image: "pp-lisa.jpg",
-  },
   enes: {
     name: "Enes Akar",
     title: "Cofounder @Upstash",
@@ -20,7 +15,7 @@ export const authors: Record<
   },
   noah: {
     name: "Noah Fischer",
-    title: "DevRel @Upstash",
+    title: "Software Engineer, Guest Author",
     url: "https://twitter.com/noahfschr",
     image: "noah.jpg",
   },
