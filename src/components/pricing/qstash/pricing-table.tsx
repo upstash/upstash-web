@@ -53,7 +53,7 @@ export default function PricingTable() {
           </h4>
 
           <h5 className="text-2xl font-semibold">$1</h5>
-          <p className="text-text-mute">per 100K messages</p>
+          <p className="text-sm text-text-mute">per 100K messages</p>
         </div>
 
         <div className="grow">
@@ -94,7 +94,7 @@ export default function PricingTable() {
               / month
             </span>
           </h5>
-          <p className="text-text-mute">Starting from</p>
+          <p className="text-sm text-text-mute">Starting from</p>
         </div>
 
         <div className="grow">
