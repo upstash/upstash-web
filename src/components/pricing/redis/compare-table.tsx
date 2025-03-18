@@ -376,12 +376,12 @@ export default function CompareTable({
             )}
             {selectedFixed100GB && (
               <CompareValue type="size" suffix="MB">
-                10
+                100
               </CompareValue>
             )}
             {selectedFixed500GB && (
               <CompareValue type="size" suffix="MB">
-                10
+                100
               </CompareValue>
             )}
           </Col>
