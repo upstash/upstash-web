@@ -229,13 +229,13 @@ export default function CompareTable() {
             <CompareValue type="number">100</CompareValue>
           </Col>
           <Col plan={showPayg} feature>
-            <CompareValue type="number">1000</CompareValue>
+            <CompareValue type="number">10_000</CompareValue>
           </Col>
           <Col plan={showFixed}>
-            <CompareValue type="number">1000</CompareValue>
+            <CompareValue type="number">10_000</CompareValue>
           </Col>
           <Col plan={showPro}>
-            <CompareValue type="number">10000</CompareValue>
+            <CompareValue type="number">Unlimited</CompareValue>
           </Col>
         </tr>
 
