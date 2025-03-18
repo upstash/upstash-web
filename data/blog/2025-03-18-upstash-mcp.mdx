@@ -62,7 +62,9 @@ server.tool(
 
 The code above demonstrates the basic principles of the Model Context Protocol (MCP). We're creating a translation service that Claude can interact with programmatically.
 
-We define a tool called `translate` with a schema that specifies what parameters it accepts: a `text` string and a `targetLanguage` (limited to Spanish, French, or German).
+We define a tool called `translate` with a Zod schema that specifies what parameters it accepts: 
+- `text` as a string
+- `targetLanguage` as a string (limited to Spanish, French, or German).
 
 When an AI assistant calls this tool, it passes the required parameters enforced by [Zod](https://github.com/colinhacks/zod) (an open-source schema validation library), and our function processes them. In a production environment, you'd replace the placeholder translation with an actual API call to a service like DeepL or Google Translate.
 
