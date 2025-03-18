@@ -1115,23 +1115,6 @@ export default function CompareTable({
 
         {/**/}
         <tr>
-          <th className="px-0 text-left font-normal">VPC Peering</th>
-          {/**/}
-          <Col plan={showFree}>
-            <CompareValue type="boolean" valid={false} />
-          </Col>
-          <Col plan={showPayg} feature>
-            <CompareValue type="boolean" valid={false} />
-          </Col>
-          <Col plan={showFixed}>
-            <CompareValue type="boolean" valid={false} />
-          </Col>
-          <Col plan={showEnterprise}>
-            <CompareValue type="boolean" valid={true} />
-          </Col>
-        </tr>
-
-        <tr>
           <th className="px-0 text-left font-normal">Single Sign-On (SSO)</th>
           {/**/}
           <Col plan={showFree}>
