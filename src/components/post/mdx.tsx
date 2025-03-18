@@ -9,6 +9,7 @@ import { ComponentProps, useEffect, useRef, useState } from "react";
 import ExpandableCode from "./expandable-code";
 import PostNote from "./note";
 import { MuxVideoPlayer } from "./mux-video-player";
+import { Frame } from "./frame";
 
 interface MdxProps {
   code: string;
@@ -132,5 +133,6 @@ const components = {
   Note: PostNote,
   ExpandableCode,
   pre: CopyFeaturePre,
-  Video: MuxVideoPlayer
+  Video: MuxVideoPlayer,
+  Frame,
 };
