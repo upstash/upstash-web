@@ -1,0 +1,419 @@
+---
+slug: intercom-resend-agent
+title: "Building an AI Agent for Intercom Using Resend"
+authors:
+  - yunus
+tags: [workflow, ai, next.js, serverless]
+---
+
+## Introduction
+
+In this article, we'll build a completely autonomous AI agent that:
+- Analyzes Intercom messages for emergencies and generates summaries
+- Sends an email notification using Resend
+
+Building on top of this project, you can easily bring intelligence to your support system. Feel free to skip to the [Building an AI Agent for Intercom](#building-an-ai-agent-for-intercom) section.
+
+You can find the full source code on [GitHub](https://github.com/upstash/intercom-resend-agent).
+
+To see the agent in action, checkout [the Demo](https://intercom-resend-agent.vercel.app/).
+
+## Example Result
+
+### Intercom App
+![App](/blog/intercom-resend-agent/intercom-full.png)
+
+### Workflow Run
+![Workflow](/blog/intercom-resend-agent/run.png)
+
+### Email Notification
+![Mail](/blog/intercom-resend-agent/mail.png)
+
+## Understanding AI Agents
+
+### What are AI agents?
+
+AI agents are autonomous systems that can perform complex tasks and make decisions using the power of LLMs. With the help of `tools`, they can interact with the world and perform actions.
+
+### What are tools?
+
+Tools are basically code that can be executed by the agent, so you can create tools that can interact with any API. There are many ready tools available for common tasks from web search to image generation:
+- [LangChain Tools](https://js.langchain.com/docs/integrations/tools/)
+- [Agentic Tools](https://agentic.so/tools/bing)
+
+### Use cases for AI agents
+
+AI agents can be used to automate impressively many traditionally human intervention required tasks.
+
+Checkout our previous projects to see example use cases:
+- [Hacker News Twitter Agent](https://x.com/hackernewsagent)
+- [Cross Reference Research Agent](https://agents-researcher.vercel.app/)
+- [Image Generation with Workflow](https://image-gen-with-workflow.vercel.app/)
+
+### Benefits of using AI agents for customer support
+
+Customer support is a complex task that requires a lot of human intervention. AI agents can help automate some of this process and reduce the workload of customer support professionals.
+
+## Upstash Workflow Agents
+
+Why would you use Upstash Workflow for building an AI agent?
+- Upstash Workflow helps us build Durable, Reliable and Performant Serverless Functions.
+- Workflow orchestrates our serverless functions to reduce serverless cost and increase reliability.
+- Workflow provides a built-in API for creating, extending, and running agents.
+
+## What is Intercom?
+
+Intercom is a company that specializes in business messaging, providing businesses with a way to chat with their customers.
+
+Check them out at [intercom.com](https://www.intercom.com/).
+
+### Intercom limitations that inspired this project
+
+Intercom has a built in AI Agent, Fin, which is a great tool to integrate to your support system. However, it may not be able to accommodate your specific needs and customer support workflows in mind. By extending our solution, you can catch any event using Intercom's webhooks and build custom agentic workflows.
+
+## What is Resend?
+
+Resend is the new email API for developers. It's designed for you to build, test, and send transactional emails at scale.
+
+Check them out at [resend.com](https://resend.com/).
+
+## What is Clerk?
+
+Clerk is a complete suite of embeddable UIs, flexible APIs, and admin dashboards to authenticate and manage your users.
+
+Check them out at [clerk.com](https://clerk.com/).
+
+**Why do we need Clerk?**
+
+In our current example, we are sending the urgency classified emails with summaries back to users for demonstration purposes so we need their emails, in a real world implementation, you would want to send these to support team members. However, it is still beneficial to have a user authentication system in place with email addresses.
+
+## Building an AI Agent for Intercom with Resend
+
+### Tech Stack
+
+- **App:** Next.js
+- **Deployment:** Vercel
+- **Agentic Workflows:** Upstash Workflow
+- **Customer Support:** Intercom
+- **Email Service:** Resend
+- **Authentication:** Clerk
+- **LLM:** OpenAI
+
+### Design
+
+![Design](/blog/intercom-resend-agent/flow.png)
+
+1. User sends a message via Intercom
+2. Intercom sends a webhook to trigger the workflow
+3. Workflow provides the agent with the `emailTool`
+4. Agent uses the `emailTool` to send an email notification
+5. Email is sent via Resend
+6. Support Team receives the email notification
+
+## Step-by-step Implementation
+
+<Note type="info">
+  This is a step by step analysis of the code. If you want to set up your own agent, we have a detailed guide on the [README](https://github.com/upstash/intercom-resend-agent/blob/master/README.md). We detail how to set up Clerk, Intercom, and Resend there.
+</Note>
+
+You can find the full implementation of the workflow here: [app/api/workflow/route.ts](https://github.com/upstash/intercom-resend-agent/blob/main/app/api/workflow/route.ts)
+
+### Extracting Message Info from Intercom Webhook Payload
+
+- We are using webhooks for two events, `conversation.user.created` and `conversation.user.replied`.
+- Upon receiving a webhook, we extract the message info from the payload.
+- Message info consists of `author`, `created_at`, and `body` information.
+
+```typescript
+...
+const messageInfo = await context.run(
+  "Get Ticket Info",
+  async (): Promise<MessageInfo> => {
+    const input = context.requestPayload as
+      | ConversationCreatedPayload
+      | ConversationRepliedPayload;
+
+    if (input.topic === "conversation.user.created") {
+      const item = input.data.item;
+
+      return {
+        author: item.source.author,
+        created_at: item.created_at,
+        body: item.source.body,
+      };
+    } else {
+      const item = input.data.item;
+
+      return {
+        author: item.conversation_parts.conversation_parts[0].author,
+        created_at: item.conversation_parts.conversation_parts[0].created_at,
+        body: item.conversation_parts.conversation_parts[0].body,
+      };
+    }
+  }
+);
+...
+```
+
+### Initializing the Model
+
+We will use OpenAI's GPT-4o mini model to classify the message urgency and generate a summary. You can change the model to any other model you want.
+
+```typescript
+...
+const model = context.agents.openai("gpt-4o-mini");
+...
+```
+
+### Building the resendAgent
+
+In this part, we will:
+- Figure out how to call Resend
+- Build the invoke part of the tool
+- Assemble the tool with the invoke part we built
+- Create the agent with the tool we assembled
+
+#### Calling Resend
+
+<Note>In our current example, we are sending the urgency classified emails with summaries back to users for demonstration purposes so we need their emails, in a real world implementation, you would want to send these to support team members.</Note>
+
+- We will use the built in `resend` API of Workflow to send an email.
+- We will set the subject based on the urgency classification.
+- We will include the summary, formatted date of the message, information about the customer and the content of the message inside the body of the email.
+
+```typescript
+...
+const { status } = await context.api.resend.call("Call Resend", {
+  token: process.env.RESEND_API_KEY!,
+  body: {
+    from: "Acme <agent@yemreoz.com>",
+    to: [messageInfo.author.email],
+    subject: urgent
+      ? "Urgent Support Request"
+      : "Non-Urgent Support Request",
+    html: `<p>This Intercom message requires your ${
+      urgent ? "urgent attention" : "attention"
+    }:</p>
+      <p><strong>Summary:</strong> ${summary}</p>
+      <p><strong>Created At:</strong> ${new Date(
+        messageInfo.created_at * 1000
+      ).toLocaleString()}</p>
+      <p><strong>Author:</strong><br>
+      Type: ${messageInfo.author.type}<br>
+      ID: ${messageInfo.author.id}<br>
+      Name: ${messageInfo.author.name}<br>
+      Email: ${messageInfo.author.email}</p>
+      <p><strong>Message:</strong><br>${messageInfo.body}</p>`,
+  },
+  headers: {
+    "content-type": "application/json",
+  },
+});
+...
+```
+
+#### Creating the Invoke Part of the Tool
+
+- Invoke will take two parameters, urgency classification and the summary of the message.
+- We will wrap the `context.api.resend.call` portion from the previous section.
+
+```typescript
+...
+invoke: async ({
+  urgent,
+  summary,
+}: {
+  urgent: boolean;
+  summary: string;
+}) => {
+  if (!summary) {
+    console.log("No summary");
+    return;
+  }
+
+  // Code from Calling Resend
+
+  return status;
+},
+...
+```
+
+#### Assembling the Tool
+
+- We will give a description of the tool for the agent to understand, including what the tool does and how to call it.
+- We will give a schema for the parameters of the tool.
+- We will give the invoke part we created.
+- We will set `executeAsStep` to `false`. This is because by default every tool is wrapped with `context.run` to be executed as a step function. Since we will be using `context.api.resend.call` inside our tool, we don't want it to be wrapped with `context.run`.
+
+```typescript
+...
+emailTool: new WorkflowTool({
+  description:
+    "A tool for sending an email to a recipient. It takes an object as a parameter" +
+    "with `urgent` and `summary` fields. The `urgent` field is a boolean that indicates " +
+    "whether the message is urgent or not. The `summary` field contains the summary of the " +
+    "message, which is a string and will be included in the email body. You absolutely should " +
+    "not give the string or boolean directly as parameter, always include them in an object.",
+  schema: z.object({
+    urgent: z
+      .boolean()
+      .describe("Whether the message is urgent or not."),
+    summary: z.string().describe("The summary of the message."),
+  }),
+  invoke: // Code from Creating the Invoke Part of the Tool
+  executeAsStep: false,
+}),
+...
+```
+
+#### Assembling the Agent
+
+Now we can create an agent with the model we initialized and the tool we assembled. We will also give it a background description.
+
+```typescript
+...
+const resendAgent = context.agents.agent({
+  model,
+  name: "resendAgent",
+  maxSteps: 1,
+  tools: {
+    emailTool: // Code from Assembling the Tool
+  },
+  background:
+    "You are an AI assistant that decides if a support message is urgent or not. " +
+    "You will use the `emailTool` tool to send an email to the recipient.",
+});
+...
+```
+
+### Creating and Running the Task
+
+Now we can create a task with the agent that includes the prompt and run it.
+
+```typescript
+...
+const task = context.agents.task({
+  agent: resendAgent,
+  prompt:
+    "Here is the message: " +
+    messageInfo.body +
+    "Is this message urgent? Use the `emailTool` tool to send an email to the recipient if it is urgent. " +
+    "`emailTool` takes an object as a parameter with `urgent` and `summary` fields. " +
+    "The `urgent` field is a boolean that indicates whether the message is urgent or not. " +
+    "The `summary` field contains the summary of the message. " +
+    "You absolutely should not give the string or boolean directly as parameter, always include them in an object." +
+    URGENCY_CLASSIFICATION_PROMPT,
+});
+
+await task.run();
+...
+```
+
+### Assembling the Workflow Route
+
+Using the code we have written so far, we can assemble the workflow route. You can find the full implementation of the workflow here: [app/api/workflow/route.ts](https://github.com/upstash/intercom-resend-agent/blob/main/app/api/workflow/route.ts).
+
+```typescript
+import { serve } from "@upstash/workflow/nextjs";
+import { WorkflowTool } from "@upstash/workflow";
+
+import { z } from "zod";
+
+import { URGENCY_CLASSIFICATION_PROMPT } from "../constants";
+import {
+  MessageInfo,
+  ConversationCreatedPayload,
+  ConversationRepliedPayload,
+} from "../types";
+
+export const { POST } = serve(
+  async (context) => {
+    // Code from Extracting the Message Info from Intercom Webhook Payload
+
+    // Code from Initializing the Model
+
+    // Code from Building the resendAgent
+
+    // Code from Creating and Running the Task
+  },
+  {
+    retries: 0,
+  }
+);
+```
+
+## Use Case: Handling Intercom Emergencies
+
+We use the prompt below to classify the urgency of the message.
+
+- Urgent messages are those that directly impact production systems, prevent users from accessing critical features, or pose security threats.
+- Non-urgent messages are those that report minor bugs or feature requests that do not affect critical workflows.
+
+```typescript
+export const URGENCY_CLASSIFICATION_PROMPT = `
+Urgency Classification for Support Messages
+
+You are an AI assistant responsible for classifying support messages as urgent or non-urgent based on their content.
+
+A message is considered urgent if it indicates an issue that:
+
+- Directly impacts production systems, such as outages, degraded performance, or broken functionality.
+- Prevents users from accessing critical features or results in data loss.
+- Poses security threats, such as data breaches or unauthorized access.
+- Requires immediate attention from engineers or support teams.
+
+A message is non-urgent if it:
+
+- Reports minor bugs or feature requests that do not affect critical workflows.
+- Requests general information, guidance, or non-time-sensitive troubleshooting.
+- Mentions an issue in a non-production environment, such as staging or development.
+
+Instructions:
+
+Carefully analyze the message content and determine if it meets the criteria for urgency.
+If the message is urgent, summarize the key issue in a few words and escalate it.
+If the message is non-urgent, respond accordingly without escalation.
+
+Example Classifications:
+
+Urgent:
+
+"Our checkout system is down, and customers can't complete purchases."
+"Users are reporting that they can no longer log in to their accounts."
+"Our API is returning 500 errors for all requests in production."
+
+Non-Urgent:
+
+"Can I get an update on the feature request for dark mode?"
+"There's a typo in the FAQ section on our website."
+"The search bar styling looks different on mobile devices."
+
+Ensure that only truly urgent cases are escalated to prevent unnecessary alerts.`;
+```
+
+## Conclusion
+
+In this article, we've created a fully autonomous AI agent that monitors Intercom messages, classifies their urgency, and sends emails with summaries via Resend. By leveraging Upstash Workflow Agents, we've built a reliable and scalable solution that can process support messages in real-time. This integration bridges the gap between customer support tools and AI agents, making it easier for support teams to prioritize and respond to urgent issues efficiently without requiring constant human monitoring.
+
+### Potential Improvements
+
+- **Customizable Urgency Criteria:** Define your own urgency classification criteria specific to your business needs.
+- **Response Automation:** Extend the agent to automatically respond to common customer inquiries, reducing response time.
+- **Sentiment Analysis:** Incorporate sentiment analysis to detect customer frustration or satisfaction.
+- **Multi-channel Support:** Expand the agent to monitor and respond to messages from various channels (Slack, Discord, etc.).
+- **Escalation Workflow:** Create a tiered escalation system that routes issues to different team members based on severity and expertise.
+- **Customize the Email Template:** Customize or create your own email templates for different types of messages.
+
+### Ideas for Extending the Agent
+
+- **Knowledge Base Integration:** Connect the agent to your knowledge base to suggest relevant content to customers.
+- **SLA Monitoring:** Track response times and alert the team when SLAs are at risk of being breached.
+- **Issue Categorization:** Categorize support tickets by product area, technical domain, or required expertise.
+- **Follow-up Scheduling:** Automatically schedule follow-ups for issues that require additional attention.
+- **Feedback Collection:** Implement automated feedback collection after issues are resolved.
+- **Trend Reporting:** Generate weekly or monthly reports on common issues and customer pain points.
+
+Don't forget to check out:
+- [The project at GitHub](https://github.com/upstash/intercom-resend-agent)
+- [The agent in action](https://intercom-resend-agent.vercel.app/)
+- [Upstash Workflow Agents documentation](https://upstash.com/docs/workflow/agents/overview)
