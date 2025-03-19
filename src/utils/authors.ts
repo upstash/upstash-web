@@ -9,7 +9,7 @@ export const authors: Record<
 > = {
   enes: {
     name: "Enes Akar",
-    title: "Cofounder @Upstash",
+    title: "Co-Founder @Upstash",
     url: "https://twitter.com/enesakar",
     image: "enes.png",
   },
@@ -412,5 +412,5 @@ export const authors: Record<
     name: "Elif Nur Deniz",
     title: "Software Developer - Guest Author",
     image: "elifnur.jpeg",
-  }
+  },
 };

@@ -1,5 +1,6 @@
 import Container from "@/components/container";
 import { Mdx } from "@/components/post/mdx";
+import { capitalize } from "@/utils/capitalize";
 import type { Customer } from "@content";
 import { allCustomers } from "@content";
 import Image from "next/image";
@@ -76,7 +77,7 @@ export async function generateMetadata({
   const customer = allCustomers.find(
     (customer) => customer.slug === params.slug,
   ) as Customer;
-  const title = customer.company_name;
+  const title = capitalize(customer.company_name);
   const description = customer.highlight;
   const baseUrl = process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}`
