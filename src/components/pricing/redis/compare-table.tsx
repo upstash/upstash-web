@@ -1030,7 +1030,7 @@ export default function CompareTable({
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal">Encryption at REST</th>
+          <th className="px-0 text-left font-normal">Encryption at rest</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" valid={false} />
