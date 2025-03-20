@@ -235,7 +235,7 @@ export default function CompareTable() {
             <CompareValue type="number">10000</CompareValue>
           </Col>
           <Col plan={showPro}>
-            <CompareValue type="number">10000</CompareValue>
+            <CompareValue type="number">Unlimited</CompareValue>
           </Col>
         </tr>
 
