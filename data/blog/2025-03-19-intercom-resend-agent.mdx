@@ -118,6 +118,43 @@ In our current example, we are sending the urgency classified emails with summar
 
 You can find the full implementation of the workflow here: [app/api/workflow/route.ts](https://github.com/upstash/intercom-resend-agent/blob/main/app/api/workflow/route.ts)
 
+### Intercom Webhook Verification
+
+Intercom sends a webhook to trigger the workflow. We need to verify the webhook signature to ensure the request is coming from Intercom.
+- We get the `x-hub-signature` header from the request.
+- Using our `INTERCOM_CLIENT_SECRET` environment variable and the request body, we compute the signature ourselves.
+- We compare the computed signature with the `x-hub-signature` header.
+- If the signatures match, we know the request is coming from Intercom.
+
+```typescript
+...
+const verified = await context.run("Verify Intercom Webhook", async () => {
+  const signatureHeader = context.headers.get("x-hub-signature");
+  const clientSecret = process.env.INTERCOM_CLIENT_SECRET;
+  const body = context.requestPayload;
+
+  if (!signatureHeader || !clientSecret || !body) {
+    return false;
+  }
+  const computedSignature =
+    "sha1=" +
+    crypto
+      .createHmac("sha1", clientSecret)
+      .update(JSON.stringify(body), "utf8")
+      .digest("hex");
+
+  return crypto.timingSafeEqual(
+    Buffer.from(computedSignature),
+    Buffer.from(signatureHeader)
+  );
+});
+
+if (!verified) {
+  return;
+}
+...
+```
+
 ### Extracting Message Info from Intercom Webhook Payload
 
 - We are using webhooks for two events, `conversation.user.created` and `conversation.user.replied`.
@@ -328,6 +365,8 @@ import {
 
 export const { POST } = serve(
   async (context) => {
+    // Code from Intercom Webhook Verification
+
     // Code from Extracting the Message Info from Intercom Webhook Payload
 
     // Code from Initializing the Model
