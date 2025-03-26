@@ -413,4 +413,9 @@ export const authors: Record<
     title: "Software Developer - Guest Author",
     image: "elifnur.jpeg",
   },
+  omerfaruq: {
+    name: "Ömer Faruk Bayram",
+    title: "Software Developer - Guest Author",
+    image: "omerfaruq.jpg",
+  },
 };

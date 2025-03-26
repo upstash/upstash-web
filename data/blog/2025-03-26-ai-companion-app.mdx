@@ -1,0 +1,445 @@
+---
+title: "Building a Personalized AI Companion with Long-Term Memory"
+slug: build-ai-companion-app
+authors:
+  - omerfaruq
+tags: [redis, memory, semantic memory]
+---
+
+## Introduction to AI Companions
+
+The concept of AI companions has been around for decades, with science fiction often depicting robots or virtual assistants that can learn, adapt, and interact with humans in a highly personalized manner. Today, with advancements in artificial intelligence, natural language processing, and cloud computing, it's possible to build AI companions that can remember past conversations, understand context, and provide meaningful interactions.
+
+In this tutorial, we'll explore how to build a personalized AI companion using modern technologies like Upstash Redis for data storage, mem0 for semantic memory management, and Next.js for the frontend. 
+
+What sets our AI companion apart from regular chatbots is its ability to remember past conversations and use that context to provide more personalized responses. This creates a much more engaging user experience, as the AI can reference previous topics, remember user preferences, and maintain continuity across multiple sessions.
+
+By the end of this tutorial, you'll have a fully functional AI companion with long-term memory that can:
+
+1. Engage in natural conversations with users
+2. Remember details from previous interactions
+3. Retrieve relevant past conversations based on context
+4. Store and manage chat history efficiently
+
+## What is mem0?
+
+mem0 is a powerful semantic memory management system specifically designed for AI applications. Unlike traditional databases that just store and retrieve data, mem0 manages conversational context and memories in a way that makes them accessible to AI models in a meaningful, semantic way.
+
+Here's why mem0 is essential for building truly intelligent AI companions:
+
+- **Semantic Memory Storage**: mem0 doesn't just store conversations; it understands their meaning and context, making it possible to retrieve relevant memories based on semantic similarity rather than just keywords.
+
+- **Efficient Retrieval**: When a user mentions something related to a previous conversation, mem0 can retrieve that context even if the exact words aren't used.
+
+- **Scalable Architecture**: mem0 is designed to handle large amounts of conversational data without performance degradation.
+
+- **Simple Integration**: With its straightforward API, mem0 integrates easily with modern AI applications and language models.
+
+When combined with Upstash Redis for session storage and chat management, mem0 forms the backbone of our AI companion's ability to remember, learn, and provide truly personalized interactions.
+
+
+## Technical Architecture
+
+Our AI companion uses a modern stack centered around these key components:
+
+- **Next.js**: For the frontend interface and API routes
+- **Upstash Redis**: For storing chat history and session management
+- **mem0**: For semantic memory storage and retrieval
+- **OpenAI**: For generating intelligent AI responses
+
+## Implementation
+
+Let's dive into the core components of our AI companion application.
+
+### 1. Storing Chat History with Upstash Redis
+
+The first component we'll implement is chat history storage using Upstash Redis. This allows our app to maintain conversations across sessions.
+
+We'll create a module to handle all Redis operations for chat history. This provides a clean abstraction layer for our application to interact with the database:
+
+```typescript title="lib/chat-history.ts"
+import { Redis } from "@upstash/redis";
+
+const redis = Redis.fromEnv();
+const CHAT_HISTORY_LIMIT = 100;
+
+const getChatHistoryKey = (userId: string, conversationId: string) => 
+  `chat-history:${userId}:${conversationId}`;
+
+const getUserConversationsPattern = (userId: string) => 
+  `chat-history:${userId}:*`;
+
+export type MessageRole = "user" | "assistant" | "system";
+
+export interface Message {
+  id?: string;  
+  role: MessageRole;
+  content: string;
+  timestamp: string;
+}
+
+export const saveMessage = async (
+  userId: string, 
+  conversationId: string, 
+  message: Message
+) => {
+  try {
+    await redis.lpush(getChatHistoryKey(userId, conversationId), JSON.stringify(message));
+    await redis.ltrim(getChatHistoryKey(userId, conversationId), 0, CHAT_HISTORY_LIMIT - 1);
+    return message;
+  } catch (error) {
+    console.error('Error saving message:', error);
+    throw error;
+  }
+};
+
+export const getChatHistory = async (
+  userId: string, 
+  conversationId: string
+): Promise<Message[]> => {
+  try {
+    const history = await redis.lrange(getChatHistoryKey(userId, conversationId), 0, -1);
+    const messages: Message[] = history.map(msg => {
+      // Parse message...
+    });
+    return messages.reverse();
+  } catch (error) {
+    console.error('Error getting chat history:', error);
+    return [];
+  }
+};
+
+// Additional functions for conversation management...
+```
+
+Upstash Redis provides serverless Redis that works perfectly for our needs. We structure our chat data with a key pattern that includes both the user ID and conversation ID, allowing us to support multiple users and multiple conversations per user.
+
+Let's break down what's happening in this code:
+
+- We initialize a Redis client using environment variables with `Redis.fromEnv()`
+- We define a message limit of 100 to prevent unlimited growth of conversation history
+- We create helper functions for key generation following Redis best practices
+- We define a `Message` interface to ensure type safety throughout our application
+- The `saveMessage` function:
+  - Pushes new messages to the front of a Redis list
+  - Trims the list to keep only the most recent messages
+  - Returns the saved message for convenience
+- The `getChatHistory` function:
+  - Retrieves all messages in the list
+  - Parses the JSON strings back into Message objects
+  - Returns messages in chronological order (reverse of how they're stored)
+
+This approach allows for efficient storage and retrieval of chat history, which is critical for maintaining a natural conversation flow with our AI companion.
+
+### 2. Memory Management with mem0
+
+The core innovation of our AI companion is its ability to remember past conversations and retrieve relevant information. For this, we'll implement a memory system using mem0:
+
+```typescript title="lib/memory.ts"
+import MemoryClient, { Message, Memory } from 'mem0ai';
+
+// Initialize the Memory client
+const memory = new MemoryClient({ apiKey: process.env.MEM0_API_KEY || '' });
+
+// Adds a conversation to memory using Mem0's API
+export const addMemory = async (
+  userId: string,
+  messages: Message[],
+  metadata?: Record<string, unknown>
+): Promise<void> => {
+  try {
+    // Format messages for Mem0
+    const formattedMessages = messages.map(msg => ({
+      role: msg.role,
+      content: msg.content
+    }));
+
+    // Add memory using Mem0 client
+    await memory.add(formattedMessages, {
+      user_id: userId,
+      version: "v2",
+      metadata: metadata || {}
+    });
+  } catch (error) {
+    console.error('[MEMORY] Error adding memory:', error);
+  }
+};
+
+
+// Searches memories based on a query
+export const searchMemories = async (
+  userId: string,
+  query: string,
+  limit: number = 5
+): Promise<Memory[]> => {
+  try {
+    const result = await memory.search(query, {
+      user_id: userId,
+      version: "v2",
+      filters: { AND: [{ user_id: userId }] },
+      limit
+    });
+    return result;
+  } catch (error) {
+    console.error('[MEMORY] Error searching memories:', error);
+    return [];
+  }
+};
+
+// Formats memories as a string for AI context
+export const formatMemoriesForAI = (memories: Memory[]): string => {
+  console.log('Memories:', memories);
+  if (!memories || memories.length === 0) {
+    return '';
+  }
+
+  try {
+    const formattedMemories = memories
+      .map((entry, index: number) => {
+        const memoryText = JSON.stringify(entry);
+        return `Memory ${index + 1}: ${memoryText}`;
+      })
+      .join('\n\n');
+
+    return `## Relevant memories from past conversations:\n${formattedMemories}`;
+  } catch (error) {
+    console.error('[MEMORY] Error formatting memories:', error);
+    return '';
+  }
+};
+```
+
+In this section we implemented several functions of mem0:
+- **`addMemory`** stores conversations in mem0, ensuring past interactions are retained. By utilizing this approach, we are giving a long-term memory to our AI bot, enabling more meaningful interactions.
+- **`searchMemories`** retrieves relevant past conversations using semantic search. In this method, we can retrieve user-specific information relevant to the recent user messages.
+- **`formatMemoriesForAI`** formats the retrieved memories into a string that can be used as context for the AI response.
+
+### 3. AI Response Generation
+
+Now let's implement the AI response generation with memory-augmented context:
+
+```typescript title="lib/ai.ts"
+import OpenAI from 'openai';
+import { Message, MessageRole } from './chat-history';
+import { searchMemories, formatMemoriesForAI, getAllMemories } from './memory';
+
+// Initialize OpenAI client
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+// Define the system message for the AI
+const getSystemMessage = (memories: string): Message => ({
+  role: 'system',
+  content: `You are a helpful AI companion with memory of past conversations. 
+  Be friendly, conversational, and personable. 
+  You should remember details about the user and reference them appropriately.
+  ${memories ? `\n\n${memories}` : ''}`,
+  timestamp: new Date().toISOString(),
+});
+
+// Process a user message and generate an AI response
+export const processMessage = async (
+  userId: string,
+  userMessage: string,
+  history: Message[]
+): Promise<string> => {
+  try {
+    // Get relevant memories or recent memories if none specific
+    let memories = await searchMemories(userId, userMessage);
+    let formattedMemories = formatMemoriesForAI(memories);
+    
+    if (!formattedMemories) {
+      memories = await getAllMemories(userId);
+      formattedMemories = formatMemoriesForAI(memories);
+    }
+    
+    // Prepare conversation for OpenAI
+    const systemMessage = getSystemMessage(formattedMemories);
+    const recentHistory = history.slice(-15); // Get last 15 messages
+    
+    const messages = [
+      {
+        role: systemMessage.role as MessageRole,
+        content: systemMessage.content,
+      },
+      ...recentHistory.map(msg => ({
+        role: msg.role as MessageRole,
+        content: msg.content,
+      })),
+    ];
+    
+    // Call the OpenAI API
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages,
+      temperature: 0.7,
+      max_tokens: 1000,
+    });
+    
+    return response.choices[0].message.content || "I'm sorry, I'm having trouble generating a response right now.";
+  } catch (error) {
+    console.error('[AI] Error in AI processing:', error);
+    return "I'm sorry, I'm having trouble generating a response right now.";
+  }
+};
+```
+
+The AI processing flow:
+
+1. Search for relevant memories based on the user's message
+2. Format these memories into a structured prompt
+3. Combine the memory context with recent chat history
+4. Generate a response using the OpenAI API
+
+
+### 4. API Routes for Chat Processing
+
+Finally, let's implement the API endpoint that ties everything together:
+
+```typescript title="app/api/chat/route.ts"
+import { NextResponse } from "next/server";
+import { processMessage } from "@/lib/ai";
+import { getChatHistory, saveMessage, Message } from "@/lib/chat-history";
+import { addMemory } from "@/lib/memory";
+import { v4 as uuidv4 } from "uuid";
+
+/**
+ * Chat API endpoint
+ */
+export async function POST(req: Request) {
+  try {
+    // Get the request body
+    const body = await req.json();
+    const { userId, message, conversationId: requestConversationId } = body;
+    
+    if (!userId) {
+      return NextResponse.json({ error: "User ID is required" }, { status: 400 });
+    }
+
+    if (!message || typeof message !== 'string') {
+      return NextResponse.json({ error: "Message is required and must be a string" }, { status: 400 });
+    }
+    
+    // Use the provided conversationId or generate a new one
+    const conversationId = requestConversationId || uuidv4();
+    
+    // Get chat history and create user message
+    const chatHistory = await getChatHistory(userId, conversationId);
+    
+    const userMessage: Message = {
+      id: uuidv4(),
+      role: "user",
+      content: message,
+      timestamp: new Date().toISOString(),
+    };
+    
+    await saveMessage(userId, conversationId, userMessage);
+    
+    // Process the message with AI
+    const aiResponseContent = await processMessage(
+      userId,
+      message,
+      [...chatHistory, userMessage]
+    );
+    
+    // Validate and save AI response
+    if (!aiResponseContent || aiResponseContent.trim() === '') {
+      throw new Error('AI returned an empty response');
+    }
+    
+    const aiMessage: Message = {
+      id: uuidv4(),
+      role: "assistant",
+      content: aiResponseContent,
+      timestamp: new Date().toISOString(),
+    };
+    
+    await saveMessage(userId, conversationId, aiMessage);
+    
+    // Process memory
+    await addMemory(userId, [userMessage, aiMessage], { conversationId });
+    
+    // Return the AI response
+    return NextResponse.json({
+      message: aiResponseContent,
+      timestamp: new Date().toISOString(),
+      messageId: aiMessage.id
+    });
+    
+  } catch (error) {
+    console.error("[CHAT] Error processing chat:", error);
+    return NextResponse.json(
+      { 
+        error: "Failed to process chat message",
+        message: error instanceof Error ? error.message : String(error),
+        timestamp: new Date().toISOString()
+      },
+      { status: 500 }
+    );
+  }
+}
+```
+
+This API route handles the entire chat flow:
+
+1. Validates the incoming request
+2. Retrieves relevant chat history
+3. Processes the user message
+4. Generates an AI response
+5. Saves both the user message and AI response
+6. Stores the conversation in memory for future reference
+
+## Getting Started
+
+To run this project yourself, you'll need to sign up for accounts with:
+- [Upstash](https://upstash.com/) for Redis
+- [OpenAI](https://platform.openai.com/) for AI capabilities
+- [Mem0](https://mem0.ai/) for memory management
+
+Each of these services offers free tiers that are sufficient for testing and development purposes. 
+After setting up your accounts, follow these steps:
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/omerfaruq/ai-companion.git
+   cd ai-companion
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Set up your environment variables in a `.env` file:
+   ```
+   UPSTASH_REDIS_REST_URL=your_redis_url
+   UPSTASH_REDIS_REST_TOKEN=your_redis_token
+   OPENAI_API_KEY=your_openai_key
+   MEM0_API_KEY=your_mem0_key
+   ```
+
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+5. Open [http://localhost:3000](http://localhost:3000) to view your AI companion in action.
+
+Once you've got the application running, try having a few conversations with your AI companion. Ask it questions, share information about yourself, and then return later to see if it remembers details from your previous conversations.
+
+## Conclusion
+
+By leveraging Upstash Redis for session and chat storage, and mem0 for semantic memory, we've built a truly intelligent AI companion that remembers conversations over time and provides personalized responses.
+
+This architecture is not only powerful but also cost-effective and scalable, as it leverages serverless technologies that only charge you for what you use. The combination of these services creates a seamless user experience.
+
+## Next Steps
+
+There are many ways to enhance this AI companion further:
+
+- Add user authentication for secure, personalized companions
+- Add support for voice interactions
+- Create a mobile app version using the same backend
+
+By building on this foundation, you can create increasingly sophisticated AI companions that offer genuine value to users through personalization and memory.
