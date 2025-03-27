@@ -131,12 +131,71 @@ There is also a downside: as a connection is established, you may hit the maximu
 
 ### NodeJS
 
-[TODO]
+We can observe this behavior also on NodeJS, let's use Hono as an example here.
+
+The following code creates a new router that has a `/increment-counter` handler that increments a counter in redis. If you look closer at the code,
+you'll notice that the `redis` client is created inside of the handler, although this works perfectly fine it will initialize a new connection
+for every request, which is not what we want.
+
+```js
+import { Hono } from 'hono';
+import { serve } from '@hono/node-server'
+import { Redis } from "ioredis"
+
+const app = new Hono();
+
+app.get('/increment-counter', async (c) => {
+    const client = new Redis("rediss://default:password@select-chow-54631.upstash.io:6379");
+
+    const count = await client.incr('counter');
+    
+    return c.json({
+        count,
+    });
+});
+
+serve(app);
+```
+
+Let's modify the following code to re-use the same redis client for all requests.
+
+```js
+import { Hono } from 'hono';
+import { serve } from '@hono/node-server'
+import { Redis } from "ioredis"
+
+const app = new Hono();
+
+const client = new Redis("rediss://default:password@select-chow-54631.upstash.io:6379");
+
+app.get('/increment-counter', async (c) => {
+    const count = await client.incr('counter');
+    
+    return c.json({
+        count,
+    });
+});
+
+serve(app);
+```
+
+Not only that 1 line change made all the difference in memory & latency it can also potentially save you money if you are running on an
+Upstash Redis Pay as you go Plan since the AUTH & INFO commands are not being executed on every request.
 
 ### Serverless Environments
 
-[TODO]
+I assume that you've read the NodeJS section of this article and that you are familiar with the changes we did to our code to be able to re-use
+the redis connections. If you are not, please read it first.
+
+On serverless enviromments like Vercel, AWS Lambda or Google Cloud Functions the same approach can be used, cloud
+providers usually keep the environment that the serverless function ran warm for some time to be able to process future requests
+and even tho that time might not be long we can always recycle the same redis connection for future requests.
+
 
 ## Closing
 
-[TODO]
+So remember, TCP connections can be expensive to initialize, latency is our enemy in this case and we should always try to reuse connections.
+Those principals apply to other third-party services that communicate over the internet and the examples mentioned in this article also apply.
+
+I hope you enjoyed this quick, mostly accurate journey through the lifecycle of redis connections. If there is anything that I missed or
+explained in a wrong way please [reach out to me on X](https://x.com/heyjorgedev).
