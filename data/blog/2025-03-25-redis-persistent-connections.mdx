@@ -44,29 +44,22 @@ In fact, the diagram above already shows one of the steps that happens when we o
 
 ## TLS handshake
 
-There are different versions of TLS, so it's hard to illustrate what actually happens in the handshake, but we'll try to explain what happens in the most common version, TLS 1.2.
+There are different versions of TLS, so it's hard to illustrate every possible handshake variation. However, we will focus on TLS 1.3, the latest version, which is faster and more secure than previous versions.
 
-TLS 1.2 is a newer version of TLS that was released in 2015 and is the most commonly used version today.
+TLS 1.3 was finalized in 2018 (RFC 8446) and has since been widely adopted due to its improved security and performance. It reduces handshake latency and removes insecure cryptographic algorithms used in earlier versions like TLS 1.2.
 
-The TLS handshake is slightly more complex than the TCP handshake. It is a three-way handshake between the client and the server and between the server and the client.
+Unlike TLS 1.2, which required multiple round trips for key exchange and authentication, TLS 1.3 performs these steps in a single round trip, making it significantly faster.
 
 ```mermaid
 sequenceDiagram
     participant Client
     participant Redis Server
 
-    %% TLS 1.2 Handshake
-    Client->>Redis Server: ClientHello (Supported ciphers, TLS version, Random)
-    Redis Server->>Client: ServerHello (Chosen cipher, TLS version, Random)
-    Redis Server->>Client: Certificate (Server's public key)
-    Redis Server->>Client: ServerHelloDone
-    
-    Client->>Redis Server: ClientKeyExchange (Pre-Master Secret encrypted with Server's public key)
-    Client->>Redis Server: ChangeCipherSpec (Start using shared secret)
+    %% TLS 1.3 Handshake
+    Client->>Redis Server: ClientHello (Supported ciphers, TLS version, Random, Key Share)
+    Redis Server->>Client: ServerHello (Chosen cipher, TLS version, Random, Key Share)
+    Redis Server->>Client: EncryptedExtensions + Certificate + CertificateVerify + Finished
     Client->>Redis Server: Finished (Encrypted handshake message)
-
-    Redis Server->>Client: ChangeCipherSpec (Start using shared secret)
-    Redis Server->>Client: Finished (Encrypted handshake message)
 ```
 
 ## Connect to Redis
@@ -103,18 +96,11 @@ sequenceDiagram
     Redis Server->>Client: SYN-ACK (Acknowledge)
     Client->>Redis Server: ACK (Connection established)
 
-    %% TLS 1.2 Handshake
-    Client->>Redis Server: ClientHello (Supported ciphers, TLS version, Random)
-    Redis Server->>Client: ServerHello (Chosen cipher, TLS version, Random)
-    Redis Server->>Client: Certificate (Server's public key)
-    Redis Server->>Client: ServerHelloDone
-    
-    Client->>Redis Server: ClientKeyExchange (Pre-Master Secret encrypted with Server's public key)
-    Client->>Redis Server: ChangeCipherSpec (Start using shared secret)
+    %% TLS 1.3 Handshake
+    Client->>Redis Server: ClientHello (Supported ciphers, TLS version, Random, Key Share)
+    Redis Server->>Client: ServerHello (Chosen cipher, TLS version, Random, Key Share)
+    Redis Server->>Client: EncryptedExtensions + Certificate + CertificateVerify + Finished
     Client->>Redis Server: Finished (Encrypted handshake message)
-
-    Redis Server->>Client: ChangeCipherSpec (Start using shared secret)
-    Redis Server->>Client: Finished (Encrypted handshake message)
 
     %% AUTH Command
     Client->>Redis Server: AUTH mypassword (Sent as "*2\r\n$4\r\nAUTH\r\n$10\r\nmypassword\r\n")
@@ -133,9 +119,9 @@ If you are a PHP developer, you know that when you use php fpm or apache, you bu
 
 This means that if you're using redis as a cache or session driver, you pay the price of establishing a new redis connection for each request, and as we've seen, this can be costly.
 
-Laravel has [recently introduced](https://github.com/laravel/laravel/commit/55738c0c4e17e6eeff52f5486293e5f5e6be511c) a new environment variable called REDIS_PERSISTENT which can be used to tell predis or phpredis to keep connections open between requests and reuse them for subsequent requests.
+Laravel has [recently introduced](https://github.com/laravel/laravel/commit/55738c0c4e17e6eeff52f5486293e5f5e6be511c) a new environment variable called `REDIS_PERSISTENT` which can be used to tell predis or phpredis to keep connections open between requests and reuse them for subsequent requests.
 
-```env
+```bash
 REDIS_PERSISTENT=true
 ```
 
