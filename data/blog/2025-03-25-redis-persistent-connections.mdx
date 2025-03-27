@@ -179,8 +179,8 @@ app.get('/increment-counter', async (c) => {
 serve(app);
 ```
 
-Not only that 1 line change made all the difference in memory & latency it can also potentially save you money if you are running on an
-Upstash Redis Pay as you go Plan since the AUTH & INFO commands are not being executed on every request.
+Moving the client outside of the scope of the handler will allow us to re-use the same client for multiple requests. This not only will decrease your
+response times but also will reduce the memory usage of your application.
 
 ### Serverless Environments
 
@@ -190,6 +190,9 @@ the redis connections. If you are not, please read it first.
 On serverless enviromments like Vercel, AWS Lambda or Google Cloud Functions the same approach can be used, cloud
 providers usually keep the environment that the serverless function ran warm for some time to be able to process future requests
 and even tho that time might not be long we can always recycle the same redis connection for future requests.
+
+Remember that in serverless environments you usually pay for the amount of time of your invokation so reducing the amount of time that is needed
+would improve your bills.
 
 
 ## Closing
