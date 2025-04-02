@@ -1,0 +1,138 @@
+---
+title: "Introducing Context7: Up-to-Date Docs for LLMs and AI Code Editors"
+slug: context7-llmtxt-cursor
+authors:
+  - enes
+tags: [vector, context7, ai, llm, coding-assistants, dev-tools]
+---
+
+I've spent the last year building with AI coding assistants. They're magical — when they work. But unless you're using a popular library that hasn't changed much since the model's training cutoff, they often generate broken code.
+
+---
+
+### The Problem with Cursor, Windsurf, and LLMs in General
+
+LLMs are trained on old data. That's fine if you're using React from 2021. But if you're using newer versions of libraries — Next.js 15, Tailwind 4, or others — LLMs often generate broken code or make up APIs.
+
+Libraries get updated a lot, APIs change, and with each passing day, models rely on more and more outdated information for the code they generate. Plus, the more specific your question, the more likely you are to get hallucinated code that doesn't work and waste time verifying the AI's generations. This back and forth is just frustrating.
+
+Especially if you're using libraries that were released after the model's knowledge cutoff, LLMs will hallucinate APIs that don't exist or give generic answers that aren't helpful. Copying the docs for these tools helps, but they're often bloated, you hit token limits, and you probably have to copy them page by page — the LLM misses the big picture.
+
+---
+
+### The Solution: Context7
+
+**Clean, version-specific documentation to get better answers and no more hallucinations.**
+
+Context7 provides your coding assistants with always up-to-date, version-specific documentation - and it works for any LLM or AI code editor. It pulls real, working code snippets straight from the official documentation. Filtered by version and ready to paste into Cursor, Claude, or any LLM.
+
+Context7 delivers clean code snippets and explanations by indexing an entire project's documentation, pre-processing and cleaning up each part, and filtering on demand using a proprietary ranking algorithm. This works wonders for both frequently updated frameworks like Next.js, as well as lesser-known packages that LLMs weren't trained on.
+
+- ✅ Up-to-date, version-specific documentation
+- ✅ Real, working code examples from the source
+- ✅ Concise, relevant information with no filler
+- ✅ Free for personal use
+- ✅ Integration with Model Context Protocol (MCP) servers and tools
+
+---
+
+### How Context7 Works
+
+- **Get a wrong or outdated code example**
+
+  We asked `claude-3.7-sonnet`, one of the newest and most capable AI coding assistants, to write an `@upstash/redis` command that it probably hasn't been trained on. Even after explicitly mentioning the linter error, the model is unable to generate correct code.
+
+  <Frame><img src="/blog/context7/01-generated-code.png" /></Frame>
+
+- **Copy documentation from Context7**
+
+  We select `Upstash Redis` as the library we want to search (choose any library you like — e.g. Next.js, React, etc.), enter `stream trim` as our search term, and copy the link.
+
+  <Frame><img src="/blog/context7/02-copy-context.png" /></Frame>
+
+- **Paste into Cursor**
+
+  <Frame><img src="/blog/context7/03-context-link.png" /></Frame>
+
+- **Get working code**
+
+  <Frame><img src="/blog/context7/04-fixed-code.png" /></Frame>
+
+Here are the steps we take to provide high-quality documentation on demand:
+
+1. Parse: Extract code snippets and examples from the documentation.
+2. Enrich: Add short explanations and metadata using LLMs.
+3. Vectorize: Embed the content for semantic search.
+4. Rerank: Score results for relevance using a custom algorithm.
+5. Cache: Serve requests from Redis for best performance.
+
+The result: Accurate code examples that Cursor, Claude, and other LLMs can use to generate correct, high-quality code.
+
+---
+
+### The Best Part: It's Free
+
+We're building Context7 at Upstash, and we're running it on our own infrastructure. That means we can keep it free for personal and educational use. We just want to help other devs save time and get better AI code output.
+
+---
+
+### Use Cases
+
+- Manual: Copy-paste snippets into tools like Cursor or Claude.
+
+  _Example: "Build a Next.js API with Hono. Use this context: [Context7 link]"._
+
+- MCP (coming soon): Use our MCP server to automatically feed docs into coding assistants.
+- Agents (coming soon): Let AI agents pull accurate documentation via the Context7 API.
+
+---
+
+### Create an llms.txt for Any Library
+
+Think of `llms.txt` files as `robots.txt`, but for LLMs. While `robots.txt` tells crawlers what to read, `llms.txt` gives LLMs optimized, pre-processed summaries of your docs - ideal for language models.
+
+We automatically create these LLM files for open-source packages, but with a twist: you can specifically search them for topics you care about — feeding the LLM highly specific, factually correct knowledge without hitting token limits.
+
+---
+
+### If You're a Library Author
+
+Add your project at [https://context7.com/add-package](https://context7.com/add-package) or send it via PR at [our GitHub](https://github.com/upstash/context7/tree/master/packages). We'll automatically create a searchable `llms.txt` for your library in minutes.
+
+---
+
+### Assistants vs Agents: What's the Difference?
+
+You may have noticed that I've used the terms _assistants_ and _agents_ almost interchangeably throughout this article. Technically, there is a difference:
+
+- **Assistants** (e.g. Cursor, Copilot): You're still doing most of the coding — these tools just help you code faster.
+- **Agents** (e.g. V0, Replit): They write full apps or components for you.
+- **Hybrid tools** like Cursor & Windsurf combine both modes.
+
+💡 If you're a beginner or non-technical, agents are great. For intermediate or advanced devs, assistants give you more control.
+
+---
+
+### Why Cursor and Windsurf Work So Well with Context7
+
+Context7 was designed with tools like Cursor and Windsurf in mind. These are AI-first code editors based on VSCode, and they let you bring your own context directly into the chat or inline completions. That's where Context7 shines.
+
+Instead of relying on the model's outdated memory, you can insert up-to-date snippets from official documentation, filtered by version, stripped of noise, and ready to go. It's like giving your assistant a pair of glasses.
+
+You can use Context7 with any LLM-powered editor or agent, but Cursor and Windsurf make the experience seamless. Both also have generous free levels, so it's easy to give them a try if you haven't already.
+
+---
+
+### Roadmap
+
+- Public MCP server (in private preview - join the waitlist!).
+- APIs/SDKs for easy access.
+- Support older versions and private packages.
+- Snippet search and multi-package support.
+- Filter by language (Python, JS, etc.).
+
+---
+
+### Let's Improve Context7 Together
+
+Context7 just launched, and we'd love to hear your feedback. Share your ideas at context7@upstash.com or chat on [GitHub](https://github.com/upstash/context7). Let's make AI coding better together.
