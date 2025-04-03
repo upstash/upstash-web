@@ -11,6 +11,8 @@ import { PricingRedis } from "@/utils/type";
 import { IconDiscountCheckFilled } from "@tabler/icons-react";
 import { ChangeEvent, useState } from "react";
 
+export const PROD_PACK_ID = "prod-pack-card";
+
 export default function PricingRedisPage() {
   const [selectedPlan, setSelectedPlan] = useState(PricingRedis.Free);
   const [selectedFixed, setSelectedFixed] = useState(PricingRedis.Fixed250MB);
@@ -48,7 +50,10 @@ export default function PricingRedisPage() {
           </div>
 
           {/* PROD PACK */}
-          <div className="mt-6 rounded-4xl border-2 border-dotted border-purple-300 bg-gradient-to-b from-purple-50 to-white p-8 text-purple-800 md:mt-16 md:p-12 dark:border-0 dark:from-purple-500/10 dark:to-purple-500/30 dark:text-purple-200">
+          <div
+            id={PROD_PACK_ID}
+            className="mt-6 rounded-4xl border-2 border-dotted border-purple-300 bg-gradient-to-b from-purple-50 to-white p-8 text-purple-800 md:mt-16 md:p-12 dark:border-0 dark:from-purple-500/10 dark:to-purple-500/30 dark:text-purple-200"
+          >
             <header>
               <h3 className="text-xl font-bold">PROD PACK</h3>
               <h5 className="opacity-80">Recommended for production use.</h5>
