@@ -30,6 +30,15 @@ export const PolicyBanner = () => {
           rel="noopener noreferrer"
         >
           Terms
+        </a>
+        ,{" "}
+        <a
+          href="/trust/privacy.pdf"
+          className="text-emerald-300 underline hover:text-primary"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Privacy Policy
         </a>{" "}
         and{" "}
         <a
