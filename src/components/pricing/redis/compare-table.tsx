@@ -9,6 +9,7 @@ import { IconCoin, IconInfoCircle } from "@tabler/icons-react";
 import Link from "next/link";
 import * as React from "react";
 import CompareValue from "../compare-value";
+import { ProdPackIcon } from "../prod-pack-icon";
 
 export default function CompareTable({
   selectedPlan,
@@ -1308,22 +1309,10 @@ export default function CompareTable({
             <CompareValue type="boolean" valid={false} />
           </Col>
           <Col plan={showPayg} feature>
-            <CompareValue
-              after={
-                <Tooltip content="Available with Prod Pack.">
-                  <IconInfoCircle stroke={1.5} size={24} />
-                </Tooltip>
-              }
-            />
+            <CompareValue after={<ProdPackIcon />} />
           </Col>
           <Col plan={showFixed}>
-            <CompareValue
-              after={
-                <Tooltip content="Available with Prod Pack.">
-                  <IconInfoCircle stroke={1.5} size={24} />
-                </Tooltip>
-              }
-            />
+            <CompareValue after={<ProdPackIcon />} />
           </Col>
           <Col plan={showEnterprise}>
             <CompareValue>
