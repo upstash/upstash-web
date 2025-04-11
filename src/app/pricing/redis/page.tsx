@@ -7,12 +7,11 @@ import Enterprise from "@/components/pricing/enterprise";
 import ProductToggle from "@/components/pricing/product-toggle";
 import CompareTable from "@/components/pricing/redis/compare-table";
 import PricingTable from "@/components/pricing/redis/pricing-table";
+import { PROD_PACK_SECTION_ID } from "@/constants";
 import cx from "@/utils/cx";
 import { PricingRedis } from "@/utils/type";
 import { IconCircleCheckFilled } from "@tabler/icons-react";
 import { ChangeEvent, useState } from "react";
-
-export const PROD_PACK_ID = "prod-pack-card";
 
 const ProdPackButton = ({ className }: { className?: string }) => {
   return (
@@ -65,7 +64,7 @@ export default function PricingRedisPage() {
 
           {/* PROD PACK */}
           <div
-            id={PROD_PACK_ID}
+            id={PROD_PACK_SECTION_ID}
             className="mt-6 rounded-4xl bg-white p-4 md:mt-16 dark:bg-bg-mute"
           >
             <div className="mb-4 grid grid-cols-1 gap-4 rounded-3xl border-2 border-purple-200 bg-gradient-to-r from-purple-50 to-white px-16 py-10 text-center text-purple-800 md:grid-cols-2 md:flex-row md:items-start md:gap-0 md:text-left dark:border-purple-600/20 dark:bg-gradient-to-r dark:from-purple-950/10 dark:to-purple-900/10 dark:text-purple-200">

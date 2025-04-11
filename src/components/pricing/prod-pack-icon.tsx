@@ -1,4 +1,4 @@
-import { PROD_PACK_ID } from "@/app/pricing/redis/page";
+import { PROD_PACK_SECTION_ID } from "@/constants";
 
 export const ProdPackIcon = () => {
   return (
@@ -6,7 +6,7 @@ export const ProdPackIcon = () => {
       className="cursor-pointer text-primary-text hover:underline"
       onClick={(e) => {
         e.preventDefault();
-        document.getElementById(PROD_PACK_ID)?.scrollIntoView({
+        document.getElementById(PROD_PACK_SECTION_ID)?.scrollIntoView({
           behavior: "smooth",
           block: "center",
         });
