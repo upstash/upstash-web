@@ -9,6 +9,7 @@ import { IconCoin, IconInfoCircle } from "@tabler/icons-react";
 import Link from "next/link";
 import * as React from "react";
 import CompareValue from "../compare-value";
+import { ProdPackIcon } from "../prod-pack-icon";
 
 export default function CompareTable({
   selectedPlan,
@@ -376,12 +377,12 @@ export default function CompareTable({
             )}
             {selectedFixed100GB && (
               <CompareValue type="size" suffix="MB">
-                10
+                100
               </CompareValue>
             )}
             {selectedFixed500GB && (
               <CompareValue type="size" suffix="MB">
-                10
+                100
               </CompareValue>
             )}
           </Col>
@@ -1030,7 +1031,7 @@ export default function CompareTable({
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal">Encryption at REST</th>
+          <th className="px-0 text-left font-normal">Encryption at rest</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" valid={false} />
@@ -1114,23 +1115,6 @@ export default function CompareTable({
         </tr>
 
         {/**/}
-        <tr>
-          <th className="px-0 text-left font-normal">VPC Peering</th>
-          {/**/}
-          <Col plan={showFree}>
-            <CompareValue type="boolean" valid={false} />
-          </Col>
-          <Col plan={showPayg} feature>
-            <CompareValue type="boolean" valid={false} />
-          </Col>
-          <Col plan={showFixed}>
-            <CompareValue type="boolean" valid={false} />
-          </Col>
-          <Col plan={showEnterprise}>
-            <CompareValue type="boolean" valid={true} />
-          </Col>
-        </tr>
-
         <tr>
           <th className="px-0 text-left font-normal">Single Sign-On (SSO)</th>
           {/**/}
@@ -1325,22 +1309,10 @@ export default function CompareTable({
             <CompareValue type="boolean" valid={false} />
           </Col>
           <Col plan={showPayg} feature>
-            <CompareValue
-              after={
-                <Tooltip content="Available with Prod Pack.">
-                  <IconInfoCircle stroke={1.5} size={24} />
-                </Tooltip>
-              }
-            />
+            <CompareValue after={<ProdPackIcon />} />
           </Col>
           <Col plan={showFixed}>
-            <CompareValue
-              after={
-                <Tooltip content="Available with Prod Pack.">
-                  <IconInfoCircle stroke={1.5} size={24} />
-                </Tooltip>
-              }
-            />
+            <CompareValue after={<ProdPackIcon />} />
           </Col>
           <Col plan={showEnterprise}>
             <CompareValue>

@@ -95,11 +95,11 @@ export const FEATURES = [
 
   {
     icon: <IconShield className="size-4 md:size-6" stroke={1.5} />,
-    title: <>HIPAA Compliance</>,
+    title: <>SOC2 and HIPAA</>,
     desc: (
       <>
-        Ensure the privacy and security of healthcare-related data with
-        HIPAA-compliant infrastructure.
+        Ensure the privacy and security of your data with
+        SOC2 and HIPAA-compliant infrastructure.
       </>
     ),
   },

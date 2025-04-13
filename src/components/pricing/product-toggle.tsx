@@ -20,8 +20,8 @@ type Product = keyof typeof productConfig;
 
 export default function ProductToggle({ product }: { product: Product }) {
   return (
-    <div className="flex justify-center">
-      <div className="flex gap-3 rounded-xl border-2 border-bg-mute p-1">
+    <div className="flex items-center justify-center">
+      <div className="flex gap-0 rounded-xl border-2 border-bg-mute p-1 sm:gap-3">
         {(Object.keys(productConfig) as Product[]).map((key) => {
           const isActive = product === key;
           const { name, Icon } = productConfig[key];
@@ -31,8 +31,8 @@ export default function ProductToggle({ product }: { product: Product }) {
               key={key}
               href={`/pricing${key}`}
               className={cx(
-                "relative flex cursor-pointer select-none items-center gap-1",
-                "rounded-lg px-3 py-1.5 transition",
+                "relative flex cursor-pointer select-none items-center gap-0 sm:gap-1",
+                "rounded-lg px-1.5 py-1.5 transition sm:px-3",
                 "hover:bg-bg-mute",
                 isActive && "text-black",
               )}

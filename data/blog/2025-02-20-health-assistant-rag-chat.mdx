@@ -1,0 +1,303 @@
+---
+title: "Building a RAG Chatbot for the Health Domain with Next.js"
+slug: health-assistant-rag-chat
+authors: [elifnur]
+tags: [rag, vector, health, ai]
+---
+
+
+## Introduction
+In this tutorial, we'll dive into how we built a modern Health Assistant application using Next.js, Upstash, Vercel AI SDK, LangChain, and OpenAI. The Health Assistant project exemplifies how Retrieval-Augmented Generation (RAG) can be utilized to customize a chatbot for the health domain. Our goal is to create an interactive platform that uses AI to provide insights and advice to users for their health-related questions. 
+
+The project repository can be found [here](https://github.com/Elifnurdeniz/Health-Assistant-Chat-Bot).
+
+## Tech Stack
+- Data Collection: [Scrapy Crawler](https://scrapy.org/)
+- Application: [Next.js](https://nextjs.org/)
+- Vector Database: [Upstash](https://upstash.com/docs/vector/overall/getstarted)
+- LLM Orchestration: [Langchain.js](https://js.langchain.com)
+- Generative Model: [OpenAI](https://openai.com/)
+- Middleware: [Vercel AI SDK](https://vercel.com/ai)
+- Rate Limiting: [Upstash](https://upstash.com/docs/redis/sdks/ratelimit-ts/overview)
+
+
+## Getting Started
+
+### What is a RAG Chatbot?
+
+Retrieval-Augmented Generation (RAG) is a technique that is used to optimize Large Language Models (LLMs) by retrieving relevant information from an external knowledge base before generating an answer. It has 2 main phases:
+1. **Retrieval Phase**: When a user asks a question, the chatbot first searches through a large database of previously stored knowledge bases to find relevant information. Vector databases provide the opportunity for similarity searches and retrieve related data.
+2. **Generation Phase**: The relevant information obtained during the retrieval phase is then fed into a generative AI model. Once the response is created, it is displayed to the user in real-time using streaming properties.
+
+### Data Collection And Storage
+Data collection for this project is handled by Scrapy, an open-source and powerful web-crawling framework written in Python. We start by [initializing a Scrapy project](https://docs.scrapy.org/en/latest/intro/tutorial.html#creating-a-project) and [customizing our spider](https://github.com/Elifnurdeniz/Health-Assistant-Chat-Bot/tree/main/health_scraper/health_scraper/spiders) based on the data source. The `parse_page` function in the [spider](https://github.com/Elifnurdeniz/Health-Assistant-Chat-Bot/blob/main/health_scraper/health_scraper/spiders/get_content_and_store.py) collects selected sections' data, splits them into chunks, generates vector embeddings for them, and uploads those embeddings to the Upstash Vector Database. 
+
+To run the crawler locally, follow these steps:
+- Clone the repository: `git clone https://github.com/Elifnurdeniz/Health-Assistant-Chat-Bot.git`
+- Create a .env file in the `health_scraper` folder as in the [example](https://github.com/Elifnurdeniz/Health-Assistant-Chat-Bot/blob/main/health_scraper/.env.example). It will look like this:
+
+```ts
+UPSTASH_VECTOR_REST_URL=
+UPSTASH_VECTOR_REST_TOKEN=
+
+OPENAI_API_KEY=
+```
+
+If you don't already have an Upstash Vector Database, create one [here](https://console.upstash.com/vector) and set 1536 as the vector dimensions, which is the one used by Open AI embeddings. Similarly, if you don't have an Open AI key, create one [here](https://openai.com/index/openai-api/).
+- Then, run the crawlers in order of `docker-compose up collect links` and `docker-compose up fetch_content`. This will create a container running your crawler.
+
+To customize your crawler, you can change the code segment that handles data extractions as in this example:
+
+```ts
+elements = response.xpath("//div[contains(@class, 'content-repository-content')]//p | //div[contains(@class, 'content-repository-content')]//li")
+```
+
+<Note title="Note">Running a crawler may take time. To see the progress, you can check the logs or monitor your vector database from your Upstash  Console, Vector Data Browser Tab.</Note>
+
+<img src="https://github.com/user-attachments/assets/6c3caae2-189e-4305-9f78-4a15f1038149" alt="Crawler progress" width={800} height={400} />
+
+### Data Retrieval And Response Generation
+
+#### Retrieval with Upstash Vector Database
+The core of our data retrieval process utilizes Upstash's Vector Database, which allows for quick similarity searches of data vectors. When a user submits a query, our system retrieves the most relevant information by comparing the query's vector representation against our database of health-related vectors.
+
+```js
+// app/vectorstore/UpstashVectorStore.js
+
+async similaritySearchVectorWithScore(query, k, filter) {
+  const result = await this.index.query({
+    vector: query,
+    topK: k,
+    includeVectors: false,
+    includeMetadata: true,
+  });
+
+  const results = [];
+  for (let i = 0; i < result.length; i++) {
+    results.push([
+      new Document({
+        pageContent: JSON.stringify(result[i]?.metadata) || "",
+      }),
+    ]);
+  }
+  
+  return results;
+}
+
+async maxMarginalRelevanceSearch(query, options) {
+  const queryEmbedding = await this.embeddings.embedQuery(query);
+  const result = await this.index.query({
+    vector: queryEmbedding,
+    topK: options.fetchK ?? 20,
+    includeVectors: true,
+    includeMetadata: true,
+  });
+  const embeddingList = result.map((r) => r.vector)
+
+  const mmrIndexes = maximalMarginalRelevance(
+    queryEmbedding,
+    embeddingList,
+    options.lambda,
+    options.k
+  );
+  const topMmrMatches = mmrIndexes.map((idx) => result[idx]);
+  
+  const results = [];
+  for (let i = 0; i < topMmrMatches.length; i++) {
+    results.push(
+      new Document({
+        pageContent: JSON.stringify(topMmrMatches[i]?.metadata) || "",
+      }),
+    );
+  }
+
+  return results;
+}
+```
+
+The `UpstashVectorStore` class is used in `api/route.tsx` as a retriever.
+
+```ts
+const vectorstore = new UpstashVectorStore(new OpenAIEmbeddings());
+const documents = await vectorstore.similaritySearch(currentMessageContent, 6);
+const context = (documents.map((doc) => doc.pageContent)).join("\n");
+```
+
+#### Handling User And AI Messages
+The frontend implementation for our Health Assistant chatbot uses the `useChat` hook from Vercel AI SDK. The `useChat` hook is initialized with an API endpoint, which it uses to send and receive messages. `initialMessages` are pre-defined messages that appear when the chat interface loads. In this case, a welcoming message is set up to greet users. The `onResponse` callback function handles the response received from the API endpoint. It gets triggered whit the response from the API endpoint.
+`messages`, `input`, `handleInputChange`, `handleSubmit`, and `setInput` are part of the state management utilities provided by useChat. These handle the input field changes, submit actions, and update the messages displayed in the chat interface. 
+
+```tsx
+// /app/page.tsx
+
+// ...
+
+const { messages, input, handleInputChange, handleSubmit, setInput } =
+useChat({
+  api: "/api",
+  initialMessages: [
+    {
+      id: "0",
+      role: "system",
+      content: `**Welcome to Health Assistant**
+
+    Your AI-powered assistant for navigating the world of health and wellness.`,
+    },
+  ],
+  onResponse: async (response) => {
+    console.log("🔥 onResponse triggered!", response);
+
+    setStreaming(false);
+  },
+});
+
+const onClickQuestion = (value: string) => {
+  setInput(value);
+  setTimeout(() => {
+    formRef.current?.dispatchEvent(
+      new Event("submit", {
+        cancelable: true,
+        bubbles: true,
+      }),
+    );
+  }, 1);
+};
+
+const onSubmit = useCallback(
+  (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    handleSubmit(e);
+    setStreaming(true);
+  },
+  [handleSubmit],
+);
+
+// ...
+```
+
+#### Agent Template
+You can determine the behavior of your chatbot using an agent template. The template begins by defining the AI assistant's identity as `HealthAssistant`, emphasizing its purpose to provide systematic and data-driven health information and stay within the context. Where applicable, responses include URLs to sources for further reading and enhancing the credibility of the information. `previousMessages` are added to the template for an increased sense of context. 
+
+```tsx
+// /app/api/route.tsx
+
+const AGENT_SYSTEM_TEMPLATE = `
+  You are an artificial intelligence assistant named HealthAssistant, 
+    providing systematic and data-driven health information.
+
+  Begin your answers with a greeting and end with a relevant health tip.
+
+  Your responses should be precise and factual, with an emphasis on 
+    using the context provided and providing URLs from the context all the time.
+
+  Don't repeat yourself in responses, and if an answer is unavailable 
+    in the retrieved content, state that you don't know.
+
+  Now, answer the message below:
+  ${currentMessageContent}
+
+  Based on the context below:
+  ${context}
+
+  And the previous messages:
+  ${previousMessages.map((message: ChatMessage) => message.content).join("\n")}
+`;
+```
+
+#### Streaming Response
+Streaming text functionality is crucial for maintaining a smooth and engaging user experience, especially when handling complex queries that require thoughtful and detailed responses. We implemented streaming responses using [Vercel AI SDK](https://sdk.vercel.ai/docs/reference/ai-sdk-core/stream-text) and [OpenAI](https://sdk.vercel.ai/providers/ai-sdk-providers/openai)'s capabilities. The `streamText` function from Vercel AI SDK is used to initiate a streaming response. This function takes a model and a prompt, which is the `AGENT_SYSTEM_TEMPLATE`, as parameters. As the AI generates responses, they are immediately sent back to the user, simulating a natural and dynamic conversation flow.
+
+```tsx
+// /app/api/route.tsx
+
+import { streamText } from "ai";
+import { openai } from '@ai-sdk/openai';
+
+// ...
+
+export async function POST(req: NextRequest) {
+    try {
+
+    const model = openai('gpt-4o-mini');
+
+    // ...
+    
+    const result = await streamText({
+        model: model,
+        prompt: AGENT_SYSTEM_TEMPLATE,
+    })
+
+    return result.toDataStreamResponse();
+    
+    } catch (e) {
+        if (e instanceof Error) {
+            console.error(e.message);
+        } else {
+            console.error(String(e));
+        }
+        return NextResponse.json({ error: e instanceof Error ? e.message : String(e) }, { status: 500 });
+    }
+}
+
+```
+
+#### Rate Limiting
+Managing the flow of requests is crucial to maintain performance and prevent abuse. This is where Upstash rate limiting comes into play, ensuring that our resources are not overwhelmed by too many requests from a single user or IP address in a short period. We initialize a Redis client using `Redis.fromEnv()` with the `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` provided in `.env` file. 
+When a user hits the rate limit, a custom error message is sent back, politely informing them to try again later.
+
+```tsx
+// /app/api/route.tsx
+
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+
+// ...
+
+const redis = Redis.fromEnv();
+const ratelimit = new Ratelimit({
+    redis: redis,
+    limiter: Ratelimit.slidingWindow(1, "10 s"),
+});
+
+// ...
+
+export async function POST(req: NextRequest) {
+    try {
+        const ip = req.headers.get("x-forwarded-for") ?? "127.0.0.1";
+        const { success } = await ratelimit.limit(ip);
+
+        if (!success) {
+            const customString =
+                "Oops! It seems you've reached the rate limit. Please try again later.";
+
+            return NextResponse.json({ error: customString }, { status: 429 });
+        }
+
+        // ...
+    }
+}
+```
+
+### Running Health Assistant Locally
+The required packages can be installed by `npm install` command. After that, a `.env` file should be created in the root folder as in the [example](https://github.com/Elifnurdeniz/Health-Assistant-Chat-Bot/blob/main/.env.example). 
+It will look like the following:
+
+```ts
+UPSTASH_VECTOR_REST_URL=
+UPSTASH_VECTOR_REST_TOKEN=
+
+UPSTASH_REDIS_REST_URL=
+UPSTASH_REDIS_REST_TOKEN=
+
+OPENAI_API_KEY=
+```
+
+Once the variables are set, you can run the application by `npm run dev` command. And, done! You can start asking your questions to your chatbot from `http://localhost:3000` address.
+
+### Deploying To Vercel
+Deploying a Next.js application with [Vercel](https://nextjs.org/learn/pages-router/deploying-nextjs-app-deploy) is quite easy. By uploading your repository to GitHub and authorizing Vercel, you can deploy your app easily.
+
+## Conclusion
+In this tutorial, we explored the technologies behind our Health Assistant chatbot. With the integration of Next.js, Upstash, and Vercel AI SDK with OpenAI's powerful models, we've built a robust and interactive platform that responds accurately to health-related inquiries and also enhances user engagement through real-time interactions and intelligent response generation.
+
+We hope this guide is useful to enhance your own projects using similar technologies. The Health Assistant chatbot brings critical benefits to the health domain by letting users instantly access vital health information anytime and helping them make informed health decisions. With right adjustments made to the crawler, the same access can be provided in any domain.

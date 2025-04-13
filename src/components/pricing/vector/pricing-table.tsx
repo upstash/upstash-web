@@ -88,7 +88,7 @@ export default function PricingTable() {
               / month
             </span>
           </h5>
-          <p className="text-text-mute">-</p>
+          <p className="text-sm text-text-mute">-</p>
         </div>
 
         <div className="grow">

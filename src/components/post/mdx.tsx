@@ -8,6 +8,8 @@ import Image from "next/image";
 import { ComponentProps, useEffect, useRef, useState } from "react";
 import ExpandableCode from "./expandable-code";
 import PostNote from "./note";
+import { MuxVideoPlayer } from "./mux-video-player";
+import { Frame } from "./frame";
 
 interface MdxProps {
   code: string;
@@ -51,7 +53,7 @@ function CopyFeaturePre(props: ComponentProps<"pre">) {
           "absolute right-5 top-5",
           "flex items-center justify-center p-2",
           "cursor-pointer rounded-md bg-white/5",
-          hasCopied ? "bg-white text-primary" : "text-white/60",
+          hasCopied ? "text-primary" : "text-white/60",
         )}
       >
         {hasCopied ? (
@@ -131,4 +133,6 @@ const components = {
   Note: PostNote,
   ExpandableCode,
   pre: CopyFeaturePre,
+  Video: MuxVideoPlayer,
+  Frame,
 };
