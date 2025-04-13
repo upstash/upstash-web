@@ -1,0 +1,220 @@
+---
+title: "Build a Smart AI Assistant with Dify and Upstash: Rate Limiting + Vector Search"
+slug: dify-ai-assistant
+authors:
+  - elifnur
+tags: [rag, vector, ai]
+---
+
+
+In this blog, we will walk you through building a powerful, personalizable AI assistant using [Dify AI](https://dify.ai/) and [Upstash](https://upstash.com/). This assistant can:
+
+- **Store content** and **search knowledge from uploaded files** using Upstash Vector Database and Dify file uploading feature
+- **Perform Google searches** when prompted and store search results for further usage
+- **Control request frequency** using Upstash Redis-based rate limiting tool developed specifically for the Dify platform
+
+
+
+---
+
+## What is Dify AI?
+
+[Dify AI](https://dify.ai/) is an open-source LLM app development platform that allows you to:
+- Build AI applications visually in one workspace, with no or minimal coding
+- Create workflows, chatbots, AI agents, chatflows, and text generators
+- Use built-in plugins or develop your own to customize your application
+
+It integrates with OpenAI, Anthropic, and many other LLM providers.
+
+---
+
+
+## Application Overview
+
+We built an AI assistant app in Dify that:
+
+1. Accepts file uploads (PDFs, docs) and stores their content in **Upstash Vector**, when users start their queries with `UPLOAD`.
+2. Allows users to run **Google searches** via a plugin when users give queries starting with `SEARCH:`, followed by their question.
+3. **Rate-limits user requests** using a custom Dify Plugin backed by **Upstash Redis**.
+4. Responds to user queries using data retrieved from the vector database.
+
+You can build this entire app using:
+- [Dify](https://dify.ai/)'s visual Chatflow builder
+- Our open-source [Upstash Rate Limit Plugin](https://github.com/Elifnurdeniz/Upstash-Rate-Limiting-Plugin-For-Dify)
+- HTTP blocks and Python Code blocks
+
+Let’s walk through it.
+
+---
+
+## Step 1: Setting Up Dify
+
+1. Create an account on [Dify AI](https://dify.ai/)
+2. Create a new **Chatflow App**
+3. Enable the **File Upload** feature under Features
+4. Start the **Chatflow** application with the following structure:
+
+![Chatflow](/blog/dify-ai/ss1.png)
+
+
+
+---
+
+## Step 2: Enable Rate Limiting with Upstash Plugin
+
+We developed and published a custom Dify Plugin that connects to [Upstash Rate Limiting](https://upstash.com/docs/redis/sdks/ratelimit-py/overview). The code repository for the plugin can be found [here](https://github.com/Elifnurdeniz/Upstash-Rate-Limiting-Plugin-For-Dify).
+
+### Plugin Features:
+![Plugin Features](/blog/dify-ai/ss2.png)
+- **Fixed** or **Sliding Window** Rate Limiting
+- **Per-user** or **Global** Scope
+- Configurable **max requests** in a selected time interval (**window size**) and **rate per request**
+
+### How to Use:
+1. Install the plugin from the [Dify Marketplace](https://cloud.dify.ai/tools)
+
+![Marketplace](/blog/dify-ai/ss3.png)
+2. Provide your `Upstash Redis REST URL` and `Token` to authorize the plugin
+3. Add it as the first step in your Chatflow and configure it for your application
+4. Add a follow-up `If-Else` block to check if the rate limit is exceeded and check if the plugin status variable contains success
+
+![If-else](/blog/dify-ai/ss4.png)
+
+This will prevent abusive traffic and provide fair usage across users.
+
+Also, additional output variables can be used to enhance the application:
+
+![Outputs](/blog/dify-ai/ss5.png)
+
+---
+
+## Step 3: Storing Uploaded Documents in Upstash Vector
+
+If the user provides files to be uploaded:
+1. Extract the file contents using a Doc Extractor tool
+2. Split the extracted text into chunks with a Code Block
+
+```py
+// Split To Chunks
+import requests
+def main(text: str) -> dict:
+    chunks = [sentence.strip().replace('"', '').replace("\n", "") for sentence in text[0].split(".") if sentence.strip()]
+    
+    return {
+        "result": chunks
+    }
+```
+
+3. For each chunk, make an HTTP POST request to:
+
+```javascript
+https://<your-upstash-vector-rest-url>/upsert-data/{{#sys.user_id#}}
+```
+
+Using `user_id` in the URL creates a new namespace for each user and provides the uniqueness of the assistant.
+
+To be able to perform requests, your `REST TOKEN` should be added to the authorization section as `Bearer`.
+
+4. Send the following JSON body:
+```json
+{
+"id": "{{#sys.workflow_run_id#}}-{{#iteration.index#}}",   // Provides a unique ID for each chunk
+"data": "{{#iteration.item#}}", 
+"metadata": { "resource": "Doc Upload" }
+}
+```
+
+Overall, this branch will follow the below logic:
+![Doc-branch](/blog/dify-ai/ss6.png)
+
+For the application to follow this logic, users should simply type `UPLOAD` as the query.
+
+---
+
+## Step 4: Google Search Integration
+
+We added a Google Search Plugin to:
+- Make a Google search with the given prompt
+- Take links and snippets from the search
+- Store those results in the Upstash Vector Database!
+
+![Search-branch](/blog/dify-ai/ss7.png)
+
+To perform a search:
+- Users simply type a query like `SEARCH: what is Upstash?`
+- A conditional block checks if the query starts with `SEARCH:`
+- It routes to the search tool and then to the rest of the logic
+
+`Flatten JSON` code block takes the Google search JSON result and returns them as a string named `result`. Then, LLM uses this formatted string to generate a response and passes it to the user.
+```py
+// Flatten JSON
+def main(searchResult: list) -> dict:
+    formatted = []
+    for item in searchResult[0]["organic_results"]:
+        title = item.get("title", "No Title")
+        snippet = item.get("snippet", "No Snippet")
+        link = item.get("link", "No Link")
+        formatted.append(f"Title: {title}\nSnippet: {snippet}\nLink: {link}")
+
+    return {
+        "result": "\n---\n".join(formatted)
+    }
+```
+
+
+`Vectorize` code block splits search results into chunks and in the next iteration block, they are upserted to the vector database using HTTP requests.
+
+```py
+def main(searchResult: list) -> dict:
+    if not searchResult or "organic_results" not in searchResult[0]:
+        return {"chunks": []}
+
+    chunks = []
+    for item in searchResult[0]["organic_results"]:
+        title = item.get("title", "")
+        snippet = item.get("snippet", "")
+        link = item.get("link", "")
+
+        if snippet:
+            content = f"{title}. {snippet} ({link})"
+            chunks.append(content.strip())
+
+    return {
+        "result": chunks
+    }
+```
+
+
+---
+
+## Step 5: Knowledge Retrieval From Vector DB
+
+When a user asks a question:
+1. Retrieve the relevant data from Upstash Vector using the `/query-data` endpoint
+![Retrieval](/blog/dify-ai/ss8.png)
+2. Add `Content-Type: application/json` to the Headers and add JSON body like the following:
+```json
+{
+  "data": "{{#sys.query#}}",    // user prompt
+  "top_k": 6,      // determines how many vectors will be retrieved
+  "includeVectors": false, 
+  "includeMetadata": true,
+  "includeData": true
+}
+```
+3. Append them to your LLM context
+4. Let the LLM generate a final response
+
+You can combine knowledge from both **file contents** and **search results** that were stored previously to provide accurate answers.
+
+---
+
+## Conclusion
+
+- **Upstash Rate-Limit Plugin** handles traffic control for fair usage and protects your app from overload
+- **Upstash Vector Database** enables your assistant to learn and recall user-provided documents and search results over time
+- **Dify** allows you to orchestrate complex AI logic visually, with almost zero backend code
+
+With this setup, you’re not just building a chatbot, you’re creating an AI assistant that learns from user input and customizes its context accordingly. Upstash handles both memory and traffic, while Dify orchestrates the logic.
+
+By following this tutorial, you can build your own AI assistants in minutes with Dify + Upstash.
