@@ -11,6 +11,7 @@ import { PROD_PACK_SECTION_ID } from "@/constants";
 import cx from "@/utils/cx";
 import { PricingRedis } from "@/utils/type";
 import { IconCircleCheckFilled } from "@tabler/icons-react";
+import Link from "next/link";
 import { ChangeEvent, useState } from "react";
 
 const ProdPackButton = ({ className }: { className?: string }) => {
@@ -115,6 +116,13 @@ export default function PricingRedisPage() {
             <PageHeaderDesc className="mt-2 md:text-xl">
               Plans that scale to all sizes.
             </PageHeaderDesc>
+
+            <Link
+              className="text-emerald-950 underline opacity-60 dark:text-emerald-500 dark:opacity-100"
+              href={"https://upstash.com/docs/redis/overall/pricing"}
+            >
+              See documents for Quotas and FAQ
+            </Link>
           </header>
 
           <div className="mt-12 md:mt-16">
