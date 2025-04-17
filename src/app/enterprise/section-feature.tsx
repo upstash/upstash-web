@@ -42,7 +42,7 @@ export default function SectionFeature() {
             return (
               <React.Fragment key={title.toString()}>
                 <TooltipRoot delayDuration={0}>
-                  <TooltipTrigger>
+                  <TooltipTrigger className="!cursor-default">
                     <div
                       className={cx(
                         "group flex items-center justify-center gap-2 px-4 py-3 md:px-6 md:py-4",
