@@ -9,6 +9,7 @@ import {
 } from "@/components/tooltip-base";
 import cx from "@/utils/cx";
 import {
+  IconBrandSlack,
   IconChartLine,
   IconInfinity,
   IconLifebuoy,
@@ -98,8 +99,8 @@ export const FEATURES = [
     title: <>SOC2 and HIPAA</>,
     desc: (
       <>
-        Ensure the privacy and security of your data with
-        SOC2 and HIPAA-compliant infrastructure.
+        Ensure the privacy and security of your data with SOC2 and
+        HIPAA-compliant infrastructure.
       </>
     ),
   },
@@ -111,6 +112,16 @@ export const FEATURES = [
       <>
         Get professional support with guaranteed response times to keep your
         operations running smoothly.
+      </>
+    ),
+  },
+  {
+    icon: <IconBrandSlack className="size-4 md:size-6" stroke={1.5} />,
+    title: <>Dedicated Slack Channel</>,
+    desc: (
+      <>
+        Connect with our support team through a dedicated Slack channel for
+        real-time assistance and collaboration.
       </>
     ),
   },
