@@ -29,7 +29,7 @@ export default function SectionFeature() {
     <section className="relative -mt-16 pb-10 md:pb-24">
       <Bg className="opacity-20" />
 
-      <Container className="max-w-screen-2xl">
+      <Container className="max-w-[1700px]">
         <div>
           <PageHeaderTitle as="h2">Enterprise Features</PageHeaderTitle>
           <PageHeaderDesc className="mt-2">
