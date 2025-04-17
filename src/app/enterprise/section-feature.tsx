@@ -48,7 +48,7 @@ export default function SectionFeature() {
                         "group flex items-center justify-center gap-2 px-4 py-3 md:px-6 md:py-4",
                         "rounded-3xl border-2 border-bg-mute bg-bg-mute",
                         "transition hover:border-white hover:bg-white hover:shadow-xl",
-                        "dark:hover:border-bg-mute dark:hover:bg-bg-mute",
+                        "dark:hover:border-bg-mute dark:hover:bg-slate-300/20",
                       )}
                     >
                       {icon && (
@@ -63,10 +63,6 @@ export default function SectionFeature() {
                       )}
 
                       <h4 className="font-semibold md:text-lg">{title}</h4>
-
-                      {/*<p className="hidden text-text-mute group-hover:flex">*/}
-                      {/*  {feature.desc}*/}
-                      {/*</p>*/}
                     </div>
                   </TooltipTrigger>
                   <TooltipContent hideWhenDetached={true}>
