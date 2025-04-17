@@ -1,0 +1,40 @@
+---
+title: "Increasing Limits for Upstash Redis"
+slug: limits-increase
+authors: [enes]
+draft: true
+tags: [redis, pricing limits]
+---
+
+## What is changing?
+
+We're increasing the limits for Upstash Redis.
+
+| Limit | New value | Old value |
+|-------|-----------|-----------|
+| Max throughput | 10k requests per second | 1k requests per second |
+| Max request size | 10MB | 1MB |
+| Max concurrent connections | 10k | 1k |
+
+
+All the plans that have lower limits than the new ones are affected (including free and pay-as-you-go plans).
+
+
+## Why are we increasing the limits?
+
+We see many users experiencing friction when using Upstash Redis due to these limits. A serverless database should scale with minimal issues.
+
+## Why did/do we have limits?
+
+Although the ultimate goal is to scale infinitely, we need some resource planning assumptions to provide a good experience for all users. Also, we use these limits to encourage users to find the right plan for their use cases without big overcharges.
+
+
+## Should you do anything?
+
+No, you don't need to do anything. We will apply the new limits to your Redis DB automatically without downtime.
+
+
+## What if you need more?
+If you need more, you can always [contact us](https://upstash.com/contact) for a custom plan.
+
+Tell us how we are doing at our X account [@upstash](https://x.com/upstash) or [Discord](https://upstash.com/discord).
