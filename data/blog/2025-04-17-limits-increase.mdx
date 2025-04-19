@@ -1,41 +1,50 @@
 ---
-title: "Increasing Limits for Upstash Redis"
-slug: limits-increase
+title: "Increasing Upstash Redis Limits by 10x"
+slug: 10x-limits-increase
 authors: [enes]
-draft: true
-tags: [redis, pricing limits]
+tags: [redis, pricing, limits]
 ---
 
-## What is changing?
+## What Is Changing?
 
-We're increasing the limits for Upstash Redis [second time in 2 months](https://upstash.com/blog/redis-new-pricing).
+Thanks to recent infrastructure improvements, we're increasing three core Upstash Redis limits by **10x** — while maintaining the same high standards of performance and reliability. These increases are rolling out across all plans, including Free and Pay-as-You-Go.
+
+This is the [second time in two months](https://upstash.com/blog/redis-new-pricing) we've raised our Redis limits.
+
+---
+
+## New vs. Old Limits
 
 | Limit | Old  | New  |
-|-------|-----------|-----------|
-| Max throughput (tps) | 1k | 10k  |
-| Max request size | 1MB | 10MB |
-| Max concurrent connections | 1k | 10k |
+|-------|------|------|
+| Max throughput (TPS)       | 1k   | 10k  |
+| Max request size           | 1MB  | 10MB |
+| Max concurrent connections | 1k   | 10k  |
 
+All plans that previously had lower limits — including Free, Pay-as-You-Go, and Fixed Plans — will now have the new higher limits.
 
-All the plans that have lower limits than the new ones are affected (including free and pay-as-you-go plans).
+---
 
+## Why the Increase?
 
-## Why are we increasing the limits?
+Month over month, Upstash Redis is powering more production workloads than ever: high concurrency, large payloads, and large-scale user traffic. The old limits occasionally became bottlenecks.
 
-We see many users experiencing friction when using Upstash Redis due to these limits. A serverless database should scale with minimal issues.
+We want Upstash to be the go-to platform for building serious, high-quality software — whether you're shipping a weekend side project or scaling to millions of users.
 
-## Why did/do we have limits?
+These new limits reflect the platform we're building: high performance, zero infrastructure to manage, and the ability to grow with you.
 
-Although the ultimate goal is to scale infinitely, we need some resource planning assumptions to provide a good experience for all users. Also, we use these limits to encourage users to find the right plan for their use cases without big overcharges.
+---
 
+## No Action Required
 
-## Should you do anything?
+The new limits apply automatically to all existing and future databases. No config changes required. No downtime.
 
-No, you don't need to do anything. We will apply the new limits to your Redis DB automatically without downtime.
+---
 
+## Need Even More?
 
-## What if you need more?
-If you need more, you can always [contact us](https://upstash.com/contact) for a custom plan.
+By increasing throughput, request size, and connection limits, we're making it easy to start small and scale as you grow — without paying for what you don't use. These new changes are designed to support all use cases, from small startups to large enterprises.
 
-Tell us how we are doing at our X account [@upstash](https://x.com/upstash) or [Discord](https://upstash.com/discord).
+If you need even higher limits, [get in touch](https://upstash.com/contact) and we'll set you up with a custom plan.
 
+We'd love to hear your feedback on X [@upstash](https://x.com/upstash) or [Discord](https://upstash.com/discord)!
