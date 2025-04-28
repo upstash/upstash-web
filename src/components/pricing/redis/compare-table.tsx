@@ -283,10 +283,10 @@ export default function CompareTable({
               <CompareValue type="number">10000</CompareValue>
             )}
             {selectedFixed100GB && (
-              <CompareValue type="number">10000</CompareValue>
+              <CompareValue type="number">16000</CompareValue>
             )}
             {selectedFixed500GB && (
-              <CompareValue type="number">10000</CompareValue>
+              <CompareValue type="number">16000</CompareValue>
             )}
           </Col>
 
