@@ -268,19 +268,19 @@ export default function CompareTable({
           </Col>
           <Col plan={showFixed}>
             {selectedFixed250MB && (
-              <CompareValue type="number">1000</CompareValue>
+              <CompareValue type="number">10000</CompareValue>
             )}
             {selectedFixed1GB && (
-              <CompareValue type="number">1000</CompareValue>
+              <CompareValue type="number">10000</CompareValue>
             )}
             {selectedFixed5GB && (
-              <CompareValue type="number">2000</CompareValue>
+              <CompareValue type="number">10000</CompareValue>
             )}
             {selectedFixed10GB && (
-              <CompareValue type="number">2000</CompareValue>
+              <CompareValue type="number">10000</CompareValue>
             )}
             {selectedFixed50GB && (
-              <CompareValue type="number">2000</CompareValue>
+              <CompareValue type="number">10000</CompareValue>
             )}
             {selectedFixed100GB && (
               <CompareValue type="number">10000</CompareValue>
@@ -305,7 +305,7 @@ export default function CompareTable({
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="size" suffix="MB">
-              1
+              10
             </CompareValue>
           </Col>
           <Col plan={showPayg} feature>
@@ -346,38 +346,38 @@ export default function CompareTable({
                 </Tooltip>
               }
             >
-              1
+              10
             </CompareValue>
           </Col>
           <Col plan={showFixed}>
             {selectedFixed250MB && (
               <CompareValue type="size" suffix="MB">
-                1
+                10
               </CompareValue>
             )}
             {selectedFixed1GB && (
               <CompareValue type="size" suffix="MB">
-                1
+                10
               </CompareValue>
             )}
             {selectedFixed5GB && (
               <CompareValue type="size" suffix="MB">
-                5
+                20
               </CompareValue>
             )}
             {selectedFixed10GB && (
               <CompareValue type="size" suffix="MB">
-                5
+                30
               </CompareValue>
             )}
             {selectedFixed50GB && (
               <CompareValue type="size" suffix="MB">
-                10
+                50
               </CompareValue>
             )}
             {selectedFixed100GB && (
               <CompareValue type="size" suffix="MB">
-                100
+                75
               </CompareValue>
             )}
             {selectedFixed500GB && (
@@ -389,7 +389,7 @@ export default function CompareTable({
 
           <Col plan={showEnterprise}>
             <CompareValue type="size" suffix="MB">
-              100
+              500
             </CompareValue>
           </Col>
         </tr>
@@ -461,12 +461,12 @@ export default function CompareTable({
             )}
             {selectedFixed5GB && (
               <CompareValue type="size" suffix="MB">
-                200
+                300
               </CompareValue>
             )}
             {selectedFixed10GB && (
               <CompareValue type="size" suffix="MB">
-                200
+                400
               </CompareValue>
             )}
             {selectedFixed50GB && (
@@ -481,7 +481,7 @@ export default function CompareTable({
             )}
             {selectedFixed500GB && (
               <CompareValue type="size" suffix="GB">
-                1
+                5
               </CompareValue>
             )}
           </Col>
@@ -565,57 +565,20 @@ export default function CompareTable({
           </th>
           {/**/}
           <Col plan={showFree}>
-            <CompareValue type="number">100</CompareValue>
+            <CompareValue type="number">10000</CompareValue>
           </Col>
           <Col plan={showPayg} feature>
-            <CompareValue
-              type="number"
-              after={
-                <Tooltip
-                  content={
-                    <>
-                      <h4 className="font-semibold">Custom Limit Pricing</h4>
-                      <table className="mini-table mt-2">
-                        <thead>
-                          <tr>
-                            <th>Limit</th>
-                            <th>Price</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td>2000</td>
-                            <td>$200</td>
-                          </tr>
-                          <tr>
-                            <td>5000</td>
-                            <td>$400</td>
-                          </tr>
-                          <tr>
-                            <td>10000</td>
-                            <td>$600</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </>
-                  }
-                >
-                  <IconCoin className="ml-1" stroke={1.5} size={24} />
-                </Tooltip>
-              }
-            >
-              1000
-            </CompareValue>
+            <CompareValue type="number">10000</CompareValue>
           </Col>
           <Col plan={showFixed}>
             {selectedFixed250MB && (
-              <CompareValue type="number">256</CompareValue>
+              <CompareValue type="number">10000</CompareValue>
             )}
             {selectedFixed1GB && (
-              <CompareValue type="number">1000</CompareValue>
+              <CompareValue type="number">10000</CompareValue>
             )}
             {selectedFixed5GB && (
-              <CompareValue type="number">5000</CompareValue>
+              <CompareValue type="number">10000</CompareValue>
             )}
             {selectedFixed10GB && (
               <CompareValue type="number">10000</CompareValue>

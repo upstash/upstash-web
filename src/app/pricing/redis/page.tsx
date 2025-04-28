@@ -121,7 +121,7 @@ export default function PricingRedisPage() {
               className="text-emerald-950 underline opacity-60 dark:text-emerald-500 dark:opacity-100"
               href={"https://upstash.com/docs/redis/overall/pricing"}
             >
-              See documents for Quotas and FAQ
+              Check Quotas & FAQ Docs
             </Link>
           </header>
 
