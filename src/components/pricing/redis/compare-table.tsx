@@ -224,7 +224,7 @@ export default function CompareTable({
           </th>
           {/**/}
           <Col plan={showFree}>
-            <CompareValue type="number">1000</CompareValue>
+            <CompareValue type="number">10000</CompareValue>
           </Col>
           <Col plan={showPayg} feature>
             <CompareValue
@@ -263,7 +263,7 @@ export default function CompareTable({
                 </Tooltip>
               }
             >
-              1000
+              10000
             </CompareValue>
           </Col>
           <Col plan={showFixed}>
