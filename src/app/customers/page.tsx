@@ -1,13 +1,13 @@
 "use client";
 
 import Bg from "@/components/bg";
+import { getBlogLogo } from "@/components/blog/blog-logos";
 import Button from "@/components/button";
 import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
 import cx from "@/utils/cx";
 import { allCustomers } from "@content";
-import Image from "next/image";
 import Link from "next/link";
 
 export default function CustomerPage() {
@@ -36,6 +36,7 @@ export default function CustomerPage() {
         <Container className="">
           <div className="grid gap-8 md:grid-cols-2">
             {customers.map((customer) => {
+              const Logo = getBlogLogo(customer.slug);
               return (
                 <Link
                   key={customer.slug}
@@ -47,20 +48,7 @@ export default function CustomerPage() {
                 >
                   <span className="absolute inset-0 bg-gradient-to-br hover:from-emerald-500/20 hover:to-emerald-500/0" />
 
-                  <Image
-                    src={`/customer/${customer.company_logo}`}
-                    alt={customer.company_name}
-                    width={500}
-                    height={20}
-                    className="h-8 max-w-full object-contain dark:hidden"
-                  />
-                  <Image
-                    src={`/customer/${customer.company_logo_dark}`}
-                    alt={customer.company_name}
-                    width={500}
-                    height={20}
-                    className="hidden h-8 max-w-full object-contain dark:block"
-                  />
+                  <Logo className="h-8 max-w-full object-contain text-black dark:text-white" />
 
                   <hr className="w-1/4 border-0 border-b border-black/5 dark:border-white/5" />
 
