@@ -76,7 +76,10 @@ export async function generateMetadata({
 }) {
   const customer = allCustomers.find(
     (customer) => customer.slug === params.slug,
-  ) as Customer;
+  );
+  if (!customer) {
+    return {};
+  }
   const title = capitalize(customer.company_name);
   const description = customer.highlight;
   const baseUrl = process.env.VERCEL_URL
