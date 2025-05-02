@@ -1,0 +1,157 @@
+---
+title: F*ck Clean Code, You Need an Idea
+slug: vibe-coding
+authors: [josh]
+tags: [ai, dev-tools]
+---
+
+There's a software development philosophy that aligns perfectly with my understanding of shipping ideas extremely fast. I've seen it work again and again over the past year. 
+
+It helped me launch several side projects that did incredibly well (like [ProfanityAPI](https://www.profanity.dev/), which now powers a Canadian game studio), and led to multiple projects ranking #1 on Google. Others have used the same approach to turn rough ideas into real products that eventually raised funding.
+
+**The philosophy is called vibe coding.**
+
+If you're not living under a rock, you've probably heard of it. You trade clean code and full understanding of the codebase for extreme shipping velocity. The term comes from the extremely cracked engineer Andrej Karpathy:
+
+<Frame>
+  <img src="/blog/vibe-coding/karpathy-vibe-coding.png" />
+</Frame>
+
+His idea is simple: LLMs have gotten so good you can rely on them to turn your basic idea into working code quickly.
+
+**The trade-off: You will write pretty bad code.**
+
+And that's completely fine. The goal at this stage is to find interest and to see if the idea has potential (more on how to do this later). Code quality, scalability, and best practices come after traction, not before.
+
+When you're building - whether it's for work, a side project, or even a friend's website - you're always somewhere on the spectrum between software quality and shipping speed. You can't maximize both. It looks something like this:
+
+<Frame>
+  <img src="/blog/vibe-coding/quality-vs-speed.png" />
+</Frame>
+
+Until I have real users and real feedback, I stay on the far right of that spectrum. We don't need to be 10x engineers, we just need to move fast.
+
+---
+
+## 1. Clean Code Won't Get You Anywhere
+
+That's a pretty bold statement, and to be fair, it's not always true. If you're working on a growing product with real traction, clean code does matter. It helps you stay productive in the codebase and makes it easier to bring others on board later. In fact, the largest codebase I've ever worked in was also the cleanest. Clean code and scaling often go together pretty well.
+
+But this article isn't about scaling; it's about side projects.
+
+If you're like me and love building things, writing clean, scalable code too early is the single biggest mistake I see. I used to spend hours on design systems, infra, and well-structured code on products that didn't have a single user to care about it.
+
+**So how do we fix that?**
+
+---
+
+## 2. You NEED to Ship
+
+Shipping your idea is not optional. It's the only way anything good will happen. Whether you're trying to turn a side project into a business, learn something new, or add it to your resume and move on, it all starts with this:
+
+1. Get your idea working
+2. Get feedback
+3. Scale (or polish it for your portfolio)
+
+Only in step 3 does it make sense to worry about clean code or scalability.
+
+As devs, we take pride in building well-structured codebases. When working on an Upstash repo, you bet I pay attention that my commits are clean and structured. But that way of working can be dangerous when you apply it to side projects.
+
+Building a scalable platform that could theoretically handle 100,000, or even millions of users, is impressive.
+
+**But no one's there. No users, no feedback, nothing.**
+
+I spent so many hours and nights fixing bugs on software where there's no one to experience those bugs. It's improving something no one's using.
+
+Shipping _fast_, and I mean days or weeks at most, is _by far_ the single most important thing about building side projects. No one will use our projects because they look great or have few bugs. They'll use it if it solves a real problem, even if it looks like trash.
+
+---
+
+## 3. Practical Tips
+
+I'm not here to tell you what your goals should be. But I can tell you what's worked exceptionally well for me:
+
+**Ship a basic prototype that delivers _even a little value_ to absolutely _anyone_.**
+
+Once I have an idea, my process looks like this:
+
+1. Make a short list of features the MVP needs to include
+2. Give myself two weeks of evenings and weekends to build it
+3. Remove anything that doesn't fit in that timeline as I go
+
+It's tempting to delay launching a project that isn't public, because no one will know. But that kills momentum. Get the idea out there as soon as possible.
+
+This two-week challenge is an incredible way to get rid of perfectionism. Especially in the early stages of building a side project, perfectionism is not your friend, it's an enemy. Treat it like one.
+
+The most successful side projects I've launched all followed the same simple pattern:
+
+1. Build something interesting
+2. Talk about it on social media
+
+And I'll talk about the specific tools I use later on in this article. That's it. You don't need anything else.
+
+_"But Josh, you already have an audience! Anything could work if you have an audience!"._
+
+While the second part is just wrong, that's exactly why I started making content: to get beta testers for an idea I built. I followed this same process from day one. My first YouTube videos are still up. You grow an audience the same way you build traction:
+
+Build ideas and talk about them.
+
+---
+
+## My Anti-Stack: What I actively avoid while building
+
+I actively avoid the following things during early development:
+
+- No authentication
+- No relational database
+- No payments
+
+Now, every one of these things has its place in a production-grade app. But they only start to matter once your idea gains real traction. Before that, they slow you down.
+
+---
+
+### No Authentication
+
+I don't care about authentication until I see real interest in the idea, usually by posting about it on social media. Nobody's using the app yet, it's just an idea on localhost:3000.
+
+The right time to add auth is when you're getting ready to let early users in. At that point, you'll need a way to log people in. But until I've shared the idea publicly and seen signs of interest, I don't do authentication.
+
+### No relational database
+
+Relational databases are not great for shipping a prototype quickly. I'd always think about schema changes and migrations after the AI has changed any code involving the db. They're great for maturing products, but I avoid them during early stages of development.
+
+Redis is one of my favorite tools for shipping fast, because it just doesn't care. No schemas, no migrations, just throw in data (or let the AI do it) and go on. As a bonus, Redis is performant out of the box, so if the idea gains traction and you let early users in, you won't have to worry about performance.
+
+### No payments
+
+This one's pretty straightforward. I never add payments early on.
+
+Some people like to put a payment link on their landing page to gauge interest. But I usually wait and watch how many people use the product and how much they use it. If people are actively using the product and there's a clear demand for more, it makes sense to start thinking about monetization.
+
+---
+
+## My Stack
+
+**For building:**
+
+- Cursor - like VSCode on steroids
+- Upstash Redis - fast, reliable Redis store
+- v0 - great for generating rough UI
+
+**For sharing ideas and MVPs on social media:**
+
+- Screen Studio - great for screen recordings (but expensive, free OBS works too)
+- Xnapper or any good screenshot tool - makes your product shots look clean
+- Good design - matters a lot on Twitter, especially for screenshots and demos
+
+If you're building in public, clean visuals make a big difference. People scroll fast and you want your project to catch attention.
+
+---
+
+## Final Words
+
+You don't need clean code. You need to find an idea, build a basic prototype, and post about it as soon as possible. You can always clean things up later once other people care and you're getting real feedback. Until then, every hour spent polishing your app is slowing your momentum to launch.
+
+The best projects I've made started pretty trashy, but they were useful trash. 
+
+Go build something! Ship it, then talk about it. That's all I ever do, and it works really well. It will work just as well for you. The rest will follow :)
