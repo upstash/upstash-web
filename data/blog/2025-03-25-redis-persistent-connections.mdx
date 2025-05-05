@@ -1,0 +1,204 @@
+---
+title: "Redis connection lifecycle and how to optimise it"
+slug: redis-persistent-connections
+authors:
+  - jorge
+tags: [redis,laravel,node,serverless]
+---
+
+The redis protocol (RESP) uses TCP as the medium for communication between server and client.
+
+In this article I will explain how upstash redis establishes a connection and how/why keeping it alive is important for the performance of your application.
+
+## What is TCP
+
+There are a number of articles that go deep into the details of TCP, so I will not cover them all here, but it is important that we understand a little bit of what it is and how it works.
+
+TCP is a stateful protocol. This means that when you open a connection to a server, the server keeps track of the connection and knows whether the client is still connected or not.
+
+Here is a list of articles I find interesting for understanding TCP and the TCP handshake:
+
+- https://www.cloudflare.com/en-gb/learning/ddos/glossary/tcp-ip/
+- https://www.guru99.com/tcp-3-way-handshake.html
+
+And a really funny but accurate short from Youtuber Justin Garrison:
+
+- https://www.youtube.com/shorts/R6WN4_bBB1Q
+
+## TCP handshake
+
+The first step that happens when you open a connection to a server is the handshake. This involves the client and server exchanging some messages.
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Redis Server
+
+    %% TCP Handshake
+    Client->>Redis Server: SYN (Synchronize)
+    Redis Server->>Client: SYN-ACK (Acknowledge)
+    Client->>Redis Server: ACK (Connection established)
+```
+
+In fact, the diagram above already shows one of the steps that happens when we open a redis connection. This is just the beginning, but we can already see that 3 messages have been exchanged between the client and the server.
+
+## TLS handshake
+
+There are different versions of TLS, so it's hard to illustrate every possible handshake variation. However, we will focus on TLS 1.3, the latest version, which is faster and more secure than previous versions.
+
+TLS 1.3 was finalized in 2018 (RFC 8446) and has since been widely adopted due to its improved security and performance. It reduces handshake latency and removes insecure cryptographic algorithms used in earlier versions like TLS 1.2.
+
+Unlike TLS 1.2, which required multiple round trips for key exchange and authentication, TLS 1.3 performs these steps in a single round trip, making it significantly faster.
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Redis Server
+
+    %% TLS 1.3 Handshake
+    Client->>Redis Server: ClientHello (Supported ciphers, TLS version, Random, Key Share)
+    Redis Server->>Client: ServerHello (Chosen cipher, TLS version, Random, Key Share)
+    Redis Server->>Client: EncryptedExtensions + Certificate + CertificateVerify + Finished
+    Client->>Redis Server: Finished (Encrypted handshake message)
+```
+
+## Connect to Redis
+
+Redis uses the Redis Serialisation Protocol (or RESP) to communicate with the server, messages on the RESP protocol are exchanged over TCP, and one of the first messages sent when you interact with an Upstash Redis server is the `AUTH` message.
+
+This diagram shows the number of messages exchanged between the server and the client when you send an AUTH message to the server.
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Redis Server
+
+    %% AUTH Command
+    Client->>Redis Server: AUTH mypassword (Sent as "*2\r\n$4\r\nAUTH\r\n$10\r\nmypassword\r\n")
+    Redis Server->>Client: +OK (Sent as "+OK\r\n")
+```
+
+If you would like to read more about how the Redis protocol (RESP) works, you can visit this page: https://redis.io/docs/reference/protocol-spec/
+
+## Tying it all together
+
+We have established that Redis uses TCP to communicate between the client and the server. Upstash Redis uses TLS by default, so if you think about what is needed for your server to connect to Upstash Redis, we have a TCP handshake, a TLS handshake and a RESP message to authenticate. After all that, you can start issuing commands to a Redis server.
+
+The diagram below shows the entire lifecycle of establishing a Redis connection.
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Redis Server
+
+    %% TCP Handshake
+    Client->>Redis Server: SYN (Synchronize)
+    Redis Server->>Client: SYN-ACK (Acknowledge)
+    Client->>Redis Server: ACK (Connection established)
+
+    %% TLS 1.3 Handshake
+    Client->>Redis Server: ClientHello (Supported ciphers, TLS version, Random, Key Share)
+    Redis Server->>Client: ServerHello (Chosen cipher, TLS version, Random, Key Share)
+    Redis Server->>Client: EncryptedExtensions + Certificate + CertificateVerify + Finished
+    Client->>Redis Server: Finished (Encrypted handshake message)
+
+    %% AUTH Command
+    Client->>Redis Server: AUTH mypassword (Sent as "*2\r\n$4\r\nAUTH\r\n$10\r\nmypassword\r\n")
+    Redis Server->>Client: +OK (Sent as "+OK\r\n")
+```
+
+As you can see it can be very expensive to make this connection every time a request is made to your application, we want our applications to be fast, sharp, I mean that is the whole reason why we have really fast storage engines like Upstash Redis.
+
+In the following section we will learn how to optimise our core to ensure that we can use these connections for future requests.
+
+## How can we optimize this?
+
+### Laravel
+
+If you are a PHP developer, you know that when you use php fpm or apache, you build the state of the world on every request. PHP is a stateless language, so it allocates memory on request, boots your framework of choice, processes the request and then releases the memory, flushing its state.
+
+This means that if you're using redis as a cache or session driver, you pay the price of establishing a new redis connection for each request, and as we've seen, this can be costly.
+
+Laravel has [recently introduced](https://github.com/laravel/laravel/commit/55738c0c4e17e6eeff52f5486293e5f5e6be511c) a new environment variable called `REDIS_PERSISTENT` which can be used to tell predis or phpredis to keep connections open between requests and reuse them for subsequent requests.
+
+```bash
+REDIS_PERSISTENT=true
+```
+
+If you use redis on a different server from the one on which your application is running, this will bring great performance improvements.
+
+There is also a downside: as a connection is established, you may hit the maximum concurrent connections limit of your redis server.
+
+### NodeJS
+
+We can observe this behavior also on NodeJS, let's use Hono as an example here.
+
+The following code creates a new router that has a `/increment-counter` handler that increments a counter in redis. If you look closer at the code,
+you'll notice that the `redis` client is created inside of the handler, although this works perfectly fine it will initialize a new connection
+for every request, which is not what we want.
+
+```js
+import { Hono } from 'hono';
+import { serve } from '@hono/node-server'
+import { Redis } from "ioredis"
+
+const app = new Hono();
+
+app.get('/increment-counter', async (c) => {
+    const client = new Redis("rediss://default:password@select-chow-54631.upstash.io:6379");
+
+    const count = await client.incr('counter');
+    
+    return c.json({
+        count,
+    });
+});
+
+serve(app);
+```
+
+Let's modify the following code to re-use the same redis client for all requests.
+
+```js
+import { Hono } from 'hono';
+import { serve } from '@hono/node-server'
+import { Redis } from "ioredis"
+
+const app = new Hono();
+
+const client = new Redis("rediss://default:password@select-chow-54631.upstash.io:6379");
+
+app.get('/increment-counter', async (c) => {
+    const count = await client.incr('counter');
+    
+    return c.json({
+        count,
+    });
+});
+
+serve(app);
+```
+
+Moving the client outside of the scope of the handler will allow us to re-use the same client for multiple requests. This not only will decrease your
+response times but also will reduce the memory usage of your application.
+
+### Serverless Environments
+
+I assume that you've read the NodeJS section of this article and that you are familiar with the changes we did to our code to be able to re-use
+the redis connections. If you are not, please read it first.
+
+On serverless enviromments like Vercel, AWS Lambda or Google Cloud Functions the same approach can be used, cloud
+providers usually keep the environment that the serverless function ran warm for some time to be able to process future requests
+and even tho that time might not be long we can always recycle the same redis connection for future requests.
+
+Remember that in serverless environments you usually pay for the amount of time of your invokation so reducing the amount of time that is needed
+would improve your bills.
+
+
+## Closing
+
+So remember, TCP connections can be expensive to initialize, latency is our enemy in this case and we should always try to reuse connections.
+Those principals apply to other third-party services that communicate over the internet and the examples mentioned in this article also apply.
+
+I hope you enjoyed this quick, mostly accurate journey through the lifecycle of redis connections. If there is anything that I missed or
+explained in a wrong way please [reach out to me on X](https://x.com/heyjorgedev).
