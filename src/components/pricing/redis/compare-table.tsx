@@ -456,7 +456,7 @@ export default function CompareTable({
             )}
             {selectedFixed1GB && (
               <CompareValue type="size" suffix="MB">
-                100
+                200
               </CompareValue>
             )}
             {selectedFixed5GB && (
