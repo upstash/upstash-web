@@ -15,6 +15,8 @@ const buttonVariants = cva(
       variant: {
         default:
           "bg-bg-mute shadow-sm text-primary-text hover:bg-emerald-700/20 disabled:bg-white/5 disabled:text-zinc-50",
+        defaultDark:
+          "bg-emerald-800/20 dark:bg-bg-mute dark:hover:bg-emerald-800/30 text-primary-text hover:bg-emerald-800/30 disabled:bg-white/5 disabled:text-zinc-50",
         primary:
           "bg-primary text-white hover:bg-primary-text disabled:bg-white/5 disabled:text-zinc-50",
         secondary:
