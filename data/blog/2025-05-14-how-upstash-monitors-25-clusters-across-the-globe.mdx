@@ -1,0 +1,168 @@
+---
+slug: oncall
+title: "How Upstash Monitors 25+ Clusters Across the Globe"
+authors: [ilter]
+image: pipeline.png
+tags: [sre, devops, monitoring, aws, gcp, fly.io, uptime, oncall, alert, metrics]
+---
+
+# How Upstash Monitors 25+ Clusters Across the Globe
+
+At Upstash, our infrastructure is built to be **cloud-agnostic by design**. Whether our services are running on **AWS**, **GCP**, or **Fly.io**, everything works the same. This consistency is crucial for a globally distributed platform that delivers serverless data infrastructure with low latency and high availability.
+
+But this model introduces operational complexity. We currently run **over 25 isolated Kubernetes clusters** across multiple providers and regions. Without a well-architected monitoring system, maintaining visibility — let alone managing incidents — would be chaotic.
+
+Here’s how we’ve built an observability stack that supports our scale, enables fast incident response, and empowers a small SRE team to operate confidently and securely.
+
+---
+
+## Monitoring Was a First-Class Concern from Day One
+
+From our very first cluster, we knew observability would be a cornerstone of reliable operations. That’s why we embedded monitoring into our infrastructure from the start — not as an afterthought.
+
+Since Kubernetes is the backbone of our deployment model, **Prometheus** was the natural choice for time-series metric collection. Every cluster runs its own Prometheus instance to scrape system and application metrics. We use **Alertmanager** to route alerts, and we apply a **standardized set of rules** across all clusters to ensure consistent visibility.
+
+This uniformity means we can detect common failure patterns in any cluster, regardless of its cloud provider or region.
+
+---
+
+## Federation as a Core Architectural Decision
+
+One of the most impactful decisions we made early on was to build **Prometheus federation** into our architecture from the beginning.
+
+Each Prometheus instance in a cluster exports **application metrics** to a **central Prometheus**. This gives us a **global view** across all clusters and tenants, enabling:
+
+- **Complex, multi-cluster queries**
+- **Cross-region performance comparisons**
+- **Centralized dashboards and alerts**
+- **Reduced cognitive load** during incident response
+
+This is especially important because Upstash operates a **multi-tenant architecture**. Latency issues or errors might initially affect just one tenant in one cluster. But only by seeing the **big picture** can we detect trends, correlate behaviors, and act before minor issues become widespread outages.
+
+---
+
+## Scaling Metric Collection with Custom Exporters
+
+As clusters grow, so does the volume of metrics. Every Prometheus instance has a memory and disk footprint proportional to the number of time series it tracks. In high-traffic clusters, running an in-cluster Prometheus just for application metrics became increasingly expensive.
+
+To solve this, we built a **custom exporter** that acts like a Prometheus endpoint but doesn’t store metrics. Instead, it **reverse proxies metrics** to the central Prometheus, which scrapes them directly.
+
+This architecture offloads processing from large clusters while preserving federation and visibility. It’s a simple but powerful way to **scale efficiently**.
+
+---
+
+## Metamonitoring: Monitoring the Monitors
+
+It’s not enough to monitor the platform — we also need to monitor the **monitoring stack itself**.
+
+Every Prometheus instance sends **heartbeat signals to Opsgenie** at regular intervals. If a Prometheus instance goes down, we’re alerted within seconds. This **metamonitoring** ensures that our observability tools are just as reliable as the systems they monitor.
+
+---
+
+## Incident Response and On-Call Operations
+
+All of this monitoring feeds into one critical process: **incident response**.
+
+We run a **24/7 on-call rotation** with both a **primary and a backup** responder at all times. If the primary doesn’t acknowledge an alert, the backup is immediately notified. Alerts are routed through **Slack** and **Opsgenie**, ensuring visibility wherever our team is.
+
+Because all alerts are built on top of clean, federated, and actionable data, our engineers can go from alert to resolution **without wasting time hunting for context**. Standardized dashboards, templated alerts, and consistent metrics across clusters allow even newly onboarded engineers to navigate incidents confidently.
+
+---
+
+## Teleport: Secure, Granular Access for Incident Collaboration
+
+Fast response requires fast access — but not at the expense of security.
+
+We use **Teleport** to manage secure, role-based access to our production environments. It provides **auditable, just-in-time access**, which is essential when incidents require **collaboration beyond the SRE team**.
+
+During incidents, we can **include core software engineers** in the investigation without compromising our security posture. Using Teleport’s granular access controls, we assign the minimum necessary permissions for each role, always enforcing the **principle of least privilege**.
+
+This setup allows us to remain agile during incidents, while keeping **security as a top priority**.
+
+---
+
+## Thanos for Long-Term Infrastructure Monitoring
+
+While application metrics are federated to a central Prometheus for real-time aggregation and alerting, we use **Thanos** to aggregate and store **infrastructure-level metrics** — such as node health, system usage, and cluster performance — across all clusters.
+
+These metrics aren't needed in our complex cross-cluster application queries, so we intentionally **exclude them from central Prometheus** to reduce its resource usage. Instead, Thanos gives us:
+
+- **Global visibility** into infrastructure health
+- **Long-term retention** for historical comparisons
+- A way to **troubleshoot slow-moving or hidden infrastructure issues**
+
+---
+
+## Centralized Logging with Humio
+
+Metrics tell us when something is wrong — **logs tell us why**.
+
+To complement our Prometheus-based monitoring, we collect logs from **every application** across all clusters and send them to **Humio** for centralized storage and analysis.
+
+In Humio, we’ve set up:
+
+- **Alert rules** that scan logs for error patterns, anomalies, or specific failure conditions
+- **Slack and Opsgenie integrations** to notify our team when critical log-based alerts fire
+- **Dashboards** that aggregate logs by service, tenant, or cluster to give us real-time insights into application behavior
+
+Humio’s speed and search capabilities allow us to **move fast in incident response**, often finding answers before the metrics even update.
+
+---
+
+## Security Visibility with Falco and eBPF
+
+While metrics and logs help us ensure performance and reliability, we also need visibility into **runtime security events** — especially at the network and kernel level.
+
+To monitor for **malicious behavior and suspicious access patterns**, we use **Falco**, a powerful open-source runtime security tool built on **eBPF**. Falco monitors incoming connections to our applications and generates structured logs for any activity that deviates from expected behavior.
+
+All Falco logs are sent to a **central observability cluster**, where we’ve deployed an **Elasticsearch instance**. This gives us:
+
+- **Near real-time insight** into potentially malicious connections
+- A way to **correlate security signals** across services and regions
+- The ability to **act fast**, blocking sources before damage is done
+
+Detecting malicious activity isn’t always straightforward, but this setup surfaces anomalous behavior clearly and with minimal false positives. Thanks to eBPF, we achieve all of this with **minimal performance overhead** — even at scale.
+
+---
+
+## UpstashBot: Automation, Visibility, and Safe Access for Everyone
+
+To reduce friction during incidents and improve collaboration, we developed **UpstashBot** — an internal Slack tool that plays a central role in both **monitoring** and **incident response**.
+
+Engineers can use UpstashBot to:
+
+- Query metrics or check dashboards directly from Slack
+- Pull real-time status reports for services or tenants
+- Investigate issues **without jumping between tools**
+- **Initiate incident workflows**, even if they're not on the SRE team
+
+Crucially, **UpstashBot isn’t just for SREs**. It empowers **core software engineers** and other stakeholders to contribute to incident response while still honoring **granular access permissions**. We’ve integrated role-based controls so users can only access the data and actions appropriate for their role — all without leaving the comfort of Slack.
+
+By combining visibility, security, and collaboration, UpstashBot helps us maintain a fast, safe, and scalable response process — especially during high-pressure events.
+
+---
+
+## Why This Architecture Matters
+
+Upstash is a **multi-cloud, multi-region, multi-tenant platform** — and we run it with a **small, focused SRE team**. That’s only possible because our observability system is:
+
+- **Centralized** for visibility
+- **Federated** for scale
+- **Secure** by design
+- **Efficient** in resource usage
+- **Automated** for speed
+- And **standardized** for ease of use
+
+This observability stack is not just a technical layer — it’s how we **scale our operations**, manage on-call effectively, and uphold our reliability promise to customers.
+
+---
+
+## Final Thoughts
+
+Monitoring isn’t just about metrics. It’s about **empowering your team**.
+
+By designing observability into our architecture from day one — with Prometheus, federation, Thanos, Humio, Falco, Teleport, and internal tooling — we’ve built a monitoring system that supports our product, our customers, and our engineers.
+
+It allows us to respond quickly, scale confidently, and sleep at night — even with 25+ clusters running around the globe.
+
+And if you're building a distributed platform of your own, here's our advice: **invest in observability early. Your future self (and your on-call team) will thank you.**
