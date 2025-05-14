@@ -2,20 +2,20 @@
 
 import IconQStash from "@/components/icon-qstash";
 import IconRedis from "@/components/icon-redis";
+import IconSearch from "@/components/icon-search";
 import IconVector from "@/components/icon-vector";
 import IconWorkflow from "@/components/icon-workflow";
 import cx from "@/utils/cx";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import * as React from "react";
-import {IconSearch} from "@tabler/icons-react";
 
 const productConfig = {
   "/redis": { name: "Redis", Icon: IconRedis },
   "/vector": { name: "Vector", Icon: IconVector },
   "/qstash": { name: "QStash", Icon: IconQStash },
-    "/workflow": { name: "Workflow", Icon: IconWorkflow },
-    "/search": { name: "Search", Icon: IconSearch },
+  "/workflow": { name: "Workflow", Icon: IconWorkflow },
+  "/search": { name: "Search", Icon: IconSearch },
 } as const;
 
 type Product = keyof typeof productConfig;
