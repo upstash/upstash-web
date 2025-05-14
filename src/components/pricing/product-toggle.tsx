@@ -8,12 +8,14 @@ import cx from "@/utils/cx";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import * as React from "react";
+import {IconSearch} from "@tabler/icons-react";
 
 const productConfig = {
   "/redis": { name: "Redis", Icon: IconRedis },
   "/vector": { name: "Vector", Icon: IconVector },
   "/qstash": { name: "QStash", Icon: IconQStash },
-  "/workflow": { name: "Workflow", Icon: IconWorkflow },
+    "/workflow": { name: "Workflow", Icon: IconWorkflow },
+    "/search": { name: "Search", Icon: IconSearch },
 } as const;
 
 type Product = keyof typeof productConfig;
