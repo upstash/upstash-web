@@ -44,7 +44,7 @@ const HeroProductTagline = ({ activeProduct }: { activeProduct: Product }) => {
       <div className="flex justify-center gap-3">
         <a href={docsLink} target="_blank">
           <Button variant={"defaultDark"} className="h-[42px] px-5">
-            Documents
+            Documentation
             <IconNotes size={24} />
           </Button>
         </a>
