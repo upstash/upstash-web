@@ -22,7 +22,7 @@ export default function FAQ() {
         </AccordionContent>
       </AccordionItem>
 
-      <AccordionItem value="item-1">
+      <AccordionItem value="item-2">
         <AccordionTrigger>
           How can I upgrade to pay as you go from free tier?
         </AccordionTrigger>
@@ -39,7 +39,7 @@ export default function FAQ() {
         <AccordionContent>1000 is the default limit for topk.</AccordionContent>
       </AccordionItem>
 
-      <AccordionItem value="item-3">
+      <AccordionItem value="item-4">
         <AccordionTrigger>
           In payg billing, what is counted as a query?
         </AccordionTrigger>
@@ -49,7 +49,7 @@ export default function FAQ() {
         </AccordionContent>
       </AccordionItem>
 
-      <AccordionItem value="item-3">
+      <AccordionItem value="item-5">
         <AccordionTrigger>
           What is reranking? When should I use it?
         </AccordionTrigger>
@@ -60,14 +60,14 @@ export default function FAQ() {
         </AccordionContent>
       </AccordionItem>
 
-      <AccordionItem value="item-4">
+      <AccordionItem value="item-6">
         <AccordionTrigger>
           Are search and upsert requests same price?
         </AccordionTrigger>
         <AccordionContent>Yes.</AccordionContent>
       </AccordionItem>
 
-      <AccordionItem value="item-6">
+      <AccordionItem value="item-7">
         <AccordionTrigger>Are there free trials?</AccordionTrigger>
         <AccordionContent>
           Yes, we can provide free trials for Pro and Enterprise plans for
@@ -88,7 +88,7 @@ export default function FAQ() {
         </AccordionContent>
       </AccordionItem>
 
-      <AccordionItem value="item-7">
+      <AccordionItem value="item-9">
         <AccordionTrigger>How many collections can I create?</AccordionTrigger>
         <AccordionContent>
           You can create up to 10 collections for free and beyond this you will
@@ -96,14 +96,14 @@ export default function FAQ() {
         </AccordionContent>
       </AccordionItem>
 
-      <AccordionItem value="item-7">
+      <AccordionItem value="item-10">
         <AccordionTrigger>How many indexes can I create?</AccordionTrigger>
         <AccordionContent>
           You can create up to 10,000 indexes in a single collection.
         </AccordionContent>
       </AccordionItem>
 
-      <AccordionItem value="item-7">
+      <AccordionItem value="item-11">
         <AccordionTrigger>How many documents can I create?</AccordionTrigger>
         <AccordionContent>
           You can create as many documents as possible within pay-as-you-go
