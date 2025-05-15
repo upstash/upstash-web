@@ -167,7 +167,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal">Max Index</th>
+          <th className="px-0 text-left font-normal">Max Indexes</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="number">10</CompareValue>
