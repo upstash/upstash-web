@@ -9,6 +9,7 @@ import cx from "@/utils/cx";
 import { Product } from "@/utils/type";
 import { IconArrowUpRight, IconNotes, IconPlus } from "@tabler/icons-react";
 import React, { useState } from "react";
+import { HeroTabSearch } from "../hero/hero-tab-search";
 
 const taglines = {
   [Product.REDIS]: {
@@ -31,6 +32,11 @@ const taglines = {
     docsLink: "https://upstash.com/docs/workflow",
     consoleLink: "https://console.upstash.com/workflow",
   },
+  [Product.SEARCH]: {
+    title: "Serverless AI search at scale",
+    docsLink: "https://upstash.com/docs/search",
+    consoleLink: "https://console.upstash.com/search",
+  },
 } as const;
 
 const HeroProductTagline = ({ activeProduct }: { activeProduct: Product }) => {
@@ -44,7 +50,7 @@ const HeroProductTagline = ({ activeProduct }: { activeProduct: Product }) => {
       <div className="flex justify-center gap-3">
         <a href={docsLink} target="_blank">
           <Button variant={"defaultDark"} className="h-[42px] px-5">
-            Documents
+            Documentation
             <IconNotes size={24} />
           </Button>
         </a>
@@ -54,9 +60,12 @@ const HeroProductTagline = ({ activeProduct }: { activeProduct: Product }) => {
               ? "Create Database"
               : activeProduct === Product.VECTOR
                 ? "Create Index"
-                : "Upstash Console"}
+                : activeProduct === Product.SEARCH
+                  ? "Create Collection"
+                  : "Upstash Console"}
             {activeProduct === Product.REDIS ||
-            activeProduct === Product.VECTOR ? (
+            activeProduct === Product.VECTOR ||
+            activeProduct === Product.SEARCH ? (
               <IconPlus size={24} />
             ) : (
               <IconArrowUpRight size={24} />
@@ -94,6 +103,7 @@ export default function HomeProductNew() {
             {activeProduct === Product.VECTOR && <HeroTabVector />}
             {activeProduct === Product.QSTASH && <HeroTabQStash />}
             {activeProduct === Product.WORKFLOW && <HeroTabWorkflow />}
+            {activeProduct === Product.SEARCH && <HeroTabSearch />}
           </div>
         </div>
       </Container>
