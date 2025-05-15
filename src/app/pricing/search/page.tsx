@@ -1,4 +1,4 @@
-import VectorFaqJson from "@/../public/faq/vector.json";
+import SearchFaqJson from "@/../public/faq/search.json";
 import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
@@ -8,8 +8,8 @@ import FAQ from "@/components/pricing/search/faq";
 import PricingTable from "@/components/pricing/search/pricing-table";
 import { generateFaqSchema } from "@/utils/structured-schema-generators";
 
-export default function PricingVectorPage() {
-  const structuredFaqSchema = generateFaqSchema(VectorFaqJson);
+export default function PricingSearchPage() {
+  const structuredFaqSchema = generateFaqSchema(SearchFaqJson);
 
   return (
     <>
@@ -27,7 +27,6 @@ export default function PricingVectorPage() {
           <div className="mt-12 md:mt-20">
             <PricingTable />
           </div>
-
         </Container>
       </section>
 
