@@ -29,28 +29,30 @@ export default function HttpRestApi() {
       <div>
         {/* tab */}
         <div className="flex items-center gap-px">
-          {[Product.REDIS, Product.VECTOR, Product.QSTASH].map((p) => {
-            return (
-              <label
-                key={p}
-                className={cx(
-                  "cursor-pointer select-none bg-bg-mute px-4 py-1 text-sm first:rounded-l-full last:rounded-r-full",
-                  p === product && "bg-primary text-white",
-                )}
-              >
-                <input
-                  className="pointer-events-none absolute opacity-0"
-                  type="radio"
-                  value={p}
-                  name="product"
-                  onChange={(e) => {
-                    setProduct(e.target.value as Product);
-                  }}
-                />
-                <span>{p}</span>
-              </label>
-            );
-          })}
+          {[Product.REDIS, Product.VECTOR, Product.QSTASH, Product.SEARCH].map(
+            (p) => {
+              return (
+                <label
+                  key={p}
+                  className={cx(
+                    "cursor-pointer select-none bg-bg-mute px-4 py-1 text-sm first:rounded-l-full last:rounded-r-full",
+                    p === product && "bg-primary text-white",
+                  )}
+                >
+                  <input
+                    className="pointer-events-none absolute opacity-0"
+                    type="radio"
+                    value={p}
+                    name="product"
+                    onChange={(e) => {
+                      setProduct(e.target.value as Product);
+                    }}
+                  />
+                  <span>{p}</span>
+                </label>
+              );
+            },
+          )}
         </div>
 
         {/* body */}
@@ -64,6 +66,9 @@ export default function HttpRestApi() {
             </Pre>{" "}
             <Pre hidden={product !== Product.VECTOR}>
               <code className="lang-js">{CODE[Product.VECTOR]}</code>
+            </Pre>
+            <Pre hidden={product !== Product.SEARCH}>
+              <code className="lang-js">{CODE[Product.SEARCH]}</code>
             </Pre>
           </div>
         </div>
@@ -110,4 +115,16 @@ await index.upsert([{
   id: 'tokyo',
   data: "Tokyo is the capital of Japan.",
 }])`,
+  [Product.SEARCH]: `import { Search } from "@upstash/search";
+
+const client = new Search({
+  url: "<UPSTASH_SEARCH_REST_URL>",
+  token: "<UPSTASH_SEARCH_REST_TOKEN>",
+});
+
+await client.index("movies").upsert([{
+    id: "star-wars",
+    data: "Star Wars is a sci-fi space opera.",
+    fields: { title: "Star Wars", genre: "sci-fi", category: "classic" }
+}]);`,
 };

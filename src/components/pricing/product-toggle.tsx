@@ -2,6 +2,7 @@
 
 import IconQStash from "@/components/icon-qstash";
 import IconRedis from "@/components/icon-redis";
+import IconSearch from "@/components/icon-search";
 import IconVector from "@/components/icon-vector";
 import IconWorkflow from "@/components/icon-workflow";
 import cx from "@/utils/cx";
@@ -14,6 +15,7 @@ const productConfig = {
   "/vector": { name: "Vector", Icon: IconVector },
   "/qstash": { name: "QStash", Icon: IconQStash },
   "/workflow": { name: "Workflow", Icon: IconWorkflow },
+  "/search": { name: "Search", Icon: IconSearch },
 } as const;
 
 type Product = keyof typeof productConfig;
