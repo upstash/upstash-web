@@ -64,7 +64,7 @@ export default function CompareTable() {
             plan={showFree}
             className="border-b-2 border-b-bg px-0 py-3 text-xs font-medium uppercase tracking-wider text-text-mute"
           >
-            Limit of 1 Free Collection
+            1 Free Collection
           </Col>
           <Col
             plan={showPayg}
