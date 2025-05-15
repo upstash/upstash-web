@@ -1,0 +1,48 @@
+{
+  "faq": [
+    {
+      "question": "Can I use Upstash Search in production?",
+      "answer": "The current version of Upstash Search is in Preview/Early Access. We do not guarantee the uptime SLAs for this service for now. So you can use it on your own risk."
+    },
+    {
+      "question": "How can I upgrade to pay as you go from free tier?",
+      "answer": "Once you enter your credit card, your database will be upgraded to the pay-as-you-go plan and limits will be updated."
+    },
+    {
+      "question": "What is the max limit (topk) for queries?",
+      "answer": "1000 is the default limit for topk."
+    },
+    {
+      "question": "In payg billing, what is counted as a query?",
+      "answer": "Search and upsert requests are counted as billing requests. Reranking requests have a separate billing."
+    },
+    {
+      "question": "What is reranking? When should I use it?",
+      "answer": "It is a feature that re-ranks the results of a query using LLM models. It is useful for improving the quality of the results. You can enable it when you are not happy with the results of the default ranking."
+    },
+    {
+      "question": "Are search and upsert requests same price?",
+      "answer": "Yes."
+    },
+    {
+      "question": "Are there free trials?",
+      "answer": "Yes, we can provide free trials for Pro and Enterprise plans for testing and PoC purposes. Email us at support@upstash.com"
+    },
+    {
+      "question": "How much is the price for bandwidth?",
+      "answer": "We don't charge for bandwidth separately. It is included in the query based price."
+    },
+    {
+      "question": "How many collections can I create?",
+      "answer": "You can create up to 10 collections for free and beyond this you will be charged $1 per collection up to 100 collections."
+    },
+    {
+      "question": "How many indexes can I create?",
+      "answer": "You can create up to 10,000 indexes in a single collection."
+    },
+    {
+      "question": "How many documents can I create?",
+      "answer": "You can create as many documents as possible within pay-as-you-go plan's max data size limit which is 50GB. If you need more, please contact us at support@upstash.com."
+    }
+  ]
+}
