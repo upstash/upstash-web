@@ -64,7 +64,7 @@ export default function CompareTable() {
             plan={showFree}
             className="border-b-2 border-b-bg px-0 py-3 text-xs font-medium uppercase tracking-wider text-text-mute"
           >
-            Limit of 10 Free Indexes
+            Limit of 1 Free Collection
           </Col>
           <Col
             plan={showPayg}
@@ -167,6 +167,20 @@ export default function CompareTable() {
         </tr>
 
         <tr>
+          <th className="px-0 text-left font-normal">Max Collections</th>
+          {/**/}
+          <Col plan={showFree}>
+            <CompareValue type="number">1</CompareValue>
+          </Col>
+          <Col plan={showPayg} feature>
+            <CompareValue type="number">100</CompareValue>
+          </Col>
+          <Col plan={showPro}>
+            <CompareValue type="plain">Unlimited</CompareValue>
+          </Col>
+        </tr>
+
+        <tr>
           <th className="px-0 text-left font-normal">Max Indexes</th>
           {/**/}
           <Col plan={showFree}>
@@ -214,6 +228,28 @@ export default function CompareTable() {
           <Col plan={showPro}>
             <CompareValue type="size" suffix="MB">
               1
+            </CompareValue>
+          </Col>
+        </tr>
+
+        <tr>
+          <th className="px-0 text-left font-normal">
+            Max Fields Size per Document
+          </th>
+          {/**/}
+          <Col plan={showFree}>
+            <CompareValue type="size" suffix="KB">
+              48
+            </CompareValue>
+          </Col>
+          <Col plan={showPayg} feature>
+            <CompareValue type="size" suffix="KB">
+              48
+            </CompareValue>
+          </Col>
+          <Col plan={showPro}>
+            <CompareValue type="size" suffix="KB">
+              48
             </CompareValue>
           </Col>
         </tr>
@@ -366,7 +402,7 @@ export default function CompareTable() {
             <CompareValue>Free</CompareValue>
           </Col>
           <Col plan={showPayg} feature>
-            <CompareValue>$0.1 per 1K documents</CompareValue>
+            <CompareValue>$0.1 per 1K docs/month</CompareValue>
           </Col>
           <Col plan={showPro}>
             <CompareValue>Custom</CompareValue>
@@ -381,7 +417,7 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue
               after={
-                <Tooltip content="100 documents is counted as 1 request">
+                <Tooltip content="100 documents are counted as 1 request">
                   <IconInfoCircle
                     className="ml-1 opacity-60"
                     stroke={1.2}

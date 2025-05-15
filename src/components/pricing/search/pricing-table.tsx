@@ -86,8 +86,6 @@ export default function PricingTable() {
         </div>
       </div>
 
-      {/* FIXED */}
-
       <div className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
         <div className="grow">
           <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">Pro</h4>
