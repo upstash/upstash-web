@@ -617,7 +617,7 @@ export default function CompareTable({
               className="border-b-0"
               after={
                 <Tooltip content="Free up to 200GB per month. Beyond that $0.03 per GB.">
-                  <IconInfoCircle stroke={1.5} size={24} />
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                 </Tooltip>
               }
             >
@@ -632,7 +632,7 @@ export default function CompareTable({
                 className="border-b-0"
                 after={
                   <Tooltip content="Upon hitting this limit, the DB will either be upgraded or limited depending on auto-upgrade setting.">
-                    <IconInfoCircle stroke={1.5} size={24} />
+                    <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                   </Tooltip>
                 }
               >
@@ -646,7 +646,7 @@ export default function CompareTable({
                 className="border-b-0"
                 after={
                   <Tooltip content="Upon hitting this limit, the DB will either be upgraded or limited depending on auto-upgrade setting.">
-                    <IconInfoCircle stroke={1.5} size={24} />
+                    <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                   </Tooltip>
                 }
               >
@@ -660,7 +660,7 @@ export default function CompareTable({
                 className="border-b-0"
                 after={
                   <Tooltip content="Upon hitting this limit, the DB will either be upgraded or limited depending on auto-upgrade setting.">
-                    <IconInfoCircle stroke={1.5} size={24} />
+                    <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                   </Tooltip>
                 }
               >
@@ -674,7 +674,7 @@ export default function CompareTable({
                 className="border-b-0"
                 after={
                   <Tooltip content="Upon hitting this limit, the DB will either be upgraded or limited depending on auto-upgrade setting.">
-                    <IconInfoCircle stroke={1.5} size={24} />
+                    <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                   </Tooltip>
                 }
               >
@@ -688,7 +688,7 @@ export default function CompareTable({
                 className="border-b-0"
                 after={
                   <Tooltip content="Upon hitting this limit, the DB will either be upgraded or limited depending on auto-upgrade setting.">
-                    <IconInfoCircle stroke={1.5} size={24} />
+                    <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                   </Tooltip>
                 }
               >
@@ -702,7 +702,7 @@ export default function CompareTable({
                 className="border-b-0"
                 after={
                   <Tooltip content="Upon hitting this limit, the DB will either be upgraded or limited depending on auto-upgrade setting.">
-                    <IconInfoCircle stroke={1.5} size={24} />
+                    <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                   </Tooltip>
                 }
               >
@@ -716,7 +716,7 @@ export default function CompareTable({
                 className="border-b-0"
                 after={
                   <Tooltip content="Upon hitting this limit, the DB will either be upgraded or limited depending on auto-upgrade setting.">
-                    <IconInfoCircle stroke={1.5} size={24} />
+                    <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                   </Tooltip>
                 }
               >
@@ -820,7 +820,7 @@ export default function CompareTable({
               type="boolean"
               after={
                 <Tooltip content="Free tier allows max one read replica.">
-                  <IconInfoCircle stroke={1.5} size={24} />
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                 </Tooltip>
               }
             />
@@ -854,7 +854,7 @@ export default function CompareTable({
               type="boolean"
               after={
                 <Tooltip content="Coming soon.">
-                  <IconInfoCircle stroke={1.5} size={24} />
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                 </Tooltip>
               }
             />
@@ -872,7 +872,7 @@ export default function CompareTable({
             <CompareValue>
               Primary Replicas{" "}
               <Tooltip content="Read Replicas available with Prod Pack.">
-                <IconInfoCircle stroke={1.5} size={24} />
+                <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
               </Tooltip>
             </CompareValue>
           </Col>
@@ -880,7 +880,7 @@ export default function CompareTable({
             <CompareValue>
               Primary Replicas{" "}
               <Tooltip content="Read Replicas available with Prod Pack.">
-                <IconInfoCircle stroke={1.5} size={24} />
+                <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
               </Tooltip>
             </CompareValue>
           </Col>
@@ -902,7 +902,7 @@ export default function CompareTable({
             <CompareValue
               after={
                 <Tooltip content="Available with Prod Pack.">
-                  <IconInfoCircle stroke={1.5} size={24} />
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                 </Tooltip>
               }
             />
@@ -911,7 +911,7 @@ export default function CompareTable({
             <CompareValue
               after={
                 <Tooltip content="Available with Prod Pack.">
-                  <IconInfoCircle stroke={1.5} size={24} />
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                 </Tooltip>
               }
             />
@@ -973,7 +973,7 @@ export default function CompareTable({
             <CompareValue
               after={
                 <Tooltip content="Available with Prod Pack.">
-                  <IconInfoCircle stroke={1.5} size={24} />
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                 </Tooltip>
               }
             />
@@ -982,7 +982,7 @@ export default function CompareTable({
             <CompareValue
               after={
                 <Tooltip content="Available with Prod Pack.">
-                  <IconInfoCircle stroke={1.5} size={24} />
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                 </Tooltip>
               }
             />
@@ -1003,7 +1003,7 @@ export default function CompareTable({
             <CompareValue
               after={
                 <Tooltip content="Available with Prod Pack.">
-                  <IconInfoCircle stroke={1.5} size={24} />
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                 </Tooltip>
               }
             />
@@ -1012,7 +1012,7 @@ export default function CompareTable({
             <CompareValue
               after={
                 <Tooltip content="Available with Prod Pack.">
-                  <IconInfoCircle stroke={1.5} size={24} />
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                 </Tooltip>
               }
             />
@@ -1038,7 +1038,7 @@ export default function CompareTable({
             <CompareValue
               after={
                 <Tooltip content="Available with Prod Pack.">
-                  <IconInfoCircle stroke={1.5} size={24} />
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                 </Tooltip>
               }
             />
@@ -1047,7 +1047,7 @@ export default function CompareTable({
             <CompareValue
               after={
                 <Tooltip content="Available with Prod Pack.">
-                  <IconInfoCircle stroke={1.5} size={24} />
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                 </Tooltip>
               }
             />
@@ -1131,7 +1131,7 @@ export default function CompareTable({
             <CompareValue
               after={
                 <Tooltip content="Available with Prod Pack.">
-                  <IconInfoCircle stroke={1.5} size={24} />
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                 </Tooltip>
               }
             />
@@ -1140,7 +1140,7 @@ export default function CompareTable({
             <CompareValue
               after={
                 <Tooltip content="Available with Prod Pack.">
-                  <IconInfoCircle stroke={1.5} size={24} />
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                 </Tooltip>
               }
             />
@@ -1160,7 +1160,7 @@ export default function CompareTable({
             <CompareValue
               after={
                 <Tooltip content="Available with Prod Pack.">
-                  <IconInfoCircle stroke={1.5} size={24} />
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                 </Tooltip>
               }
             />
@@ -1169,7 +1169,7 @@ export default function CompareTable({
             <CompareValue
               after={
                 <Tooltip content="Available with Prod Pack.">
-                  <IconInfoCircle stroke={1.5} size={24} />
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                 </Tooltip>
               }
             />
@@ -1189,7 +1189,7 @@ export default function CompareTable({
             <CompareValue
               after={
                 <Tooltip content="Available with Prod Pack.">
-                  <IconInfoCircle stroke={1.5} size={24} />
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                 </Tooltip>
               }
             />
@@ -1198,7 +1198,7 @@ export default function CompareTable({
             <CompareValue
               after={
                 <Tooltip content="Available with Prod Pack.">
-                  <IconInfoCircle stroke={1.5} size={24} />
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                 </Tooltip>
               }
             />
@@ -1386,7 +1386,7 @@ export default function CompareTable({
             <CompareValue
               after={
                 <Tooltip content="The write commands are replicated to all read regions in addition to primary region so the replications are counted as commands. For example, if you have one primary and one read region, 100K writes will cost $0.4 ($0.2 x 2).">
-                  <IconInfoCircle stroke={1.5} size={24} />
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                 </Tooltip>
               }
             >
@@ -1427,7 +1427,7 @@ export default function CompareTable({
             <CompareValue
               after={
                 <Tooltip content="Free up to 200GB per month. Beyond that, $0.03 per GB.">
-                  <IconInfoCircle stroke={1.5} size={24} />
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                 </Tooltip>
               }
             >
