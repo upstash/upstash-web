@@ -7,9 +7,25 @@ import Enterprise from "@/components/pricing/enterprise";
 import ProductToggle from "@/components/pricing/product-toggle";
 import CompareTable from "@/components/pricing/redis/compare-table";
 import PricingTable from "@/components/pricing/redis/pricing-table";
+import { PROD_PACK_SECTION_ID } from "@/constants";
+import cx from "@/utils/cx";
 import { PricingRedis } from "@/utils/type";
-import { IconDiscountCheckFilled } from "@tabler/icons-react";
+import { IconCircleCheckFilled } from "@tabler/icons-react";
+import Link from "next/link";
 import { ChangeEvent, useState } from "react";
+
+const ProdPackButton = ({ className }: { className?: string }) => {
+  return (
+    <div
+      className={cx(
+        "w-fit rounded-xl bg-purple-200 px-4 py-2 font-medium text-purple-950 dark:bg-purple-50",
+        className,
+      )}
+    >
+      +$200 per database
+    </div>
+  );
+};
 
 export default function PricingRedisPage() {
   const [selectedPlan, setSelectedPlan] = useState(PricingRedis.Free);
@@ -48,32 +64,44 @@ export default function PricingRedisPage() {
           </div>
 
           {/* PROD PACK */}
-          <div className="mt-6 rounded-4xl border-2 border-dotted border-purple-300 bg-gradient-to-b from-purple-50 to-white p-8 text-purple-800 md:mt-16 md:p-12 dark:border-0 dark:from-purple-500/10 dark:to-purple-500/30 dark:text-purple-200">
-            <header>
-              <h3 className="text-xl font-bold">PROD PACK</h3>
-              <h5 className="opacity-80">Recommended for production use.</h5>
-            </header>
-            <ul className="my-4 flex flex-wrap justify-center gap-2">
-              {[
-                "Uptime SLA",
-                "RBAC",
-                "SOC-2",
-                "Encryption at Rest",
-                "Prometheus",
-                "Datadog",
-              ].map((value) => {
-                return (
-                  <li
-                    key={value}
-                    className="inline-flex items-center gap-1 rounded-full border border-purple-300 py-1 pl-2 pr-3 text-sm font-medium"
-                  >
-                    <IconDiscountCheckFilled size={20} /> {value}
-                  </li>
-                );
-              })}
-            </ul>
+          <div
+            id={PROD_PACK_SECTION_ID}
+            className="mt-6 rounded-4xl bg-white p-4 md:mt-16 dark:bg-bg-mute"
+          >
+            <div className="mb-4 grid grid-cols-1 gap-4 rounded-3xl border-2 border-purple-200 bg-gradient-to-r from-purple-50 to-white px-16 py-10 text-center text-purple-800 md:grid-cols-2 md:flex-row md:items-start md:gap-0 md:text-left dark:border-purple-600/20 dark:bg-gradient-to-r dark:from-purple-950/10 dark:to-purple-900/10 dark:text-purple-200">
+              <header>
+                <h3 className="text-xl font-semibold">Prod Pack</h3>
+                <h5 className="whitespace-normal opacity-80 lg:whitespace-nowrap">
+                  Recommended for production use
+                </h5>
+                <ProdPackButton className="mt-3 hidden md:block" />
+              </header>
 
-            <p className="font-semibold">$200 per database</p>
+              <div className="h-full w-full lg:pl-8">
+                <ul className="flex flex-shrink flex-wrap items-center justify-center gap-1 md:items-start md:justify-start">
+                  {[
+                    "Uptime SLA",
+                    "RBAC",
+                    "Encryption at Rest",
+                    "SOC-2",
+                    "Prometheus",
+                    "Datadog",
+                  ].map((value) => {
+                    return (
+                      <li
+                        key={value}
+                        className="flex items-center gap-1 whitespace-nowrap rounded-full border border-purple-300 bg-purple-50 py-1 pl-2 pr-3 text-purple-800 dark:border-purple-300 dark:bg-purple-200 dark:text-purple-950"
+                      >
+                        <IconCircleCheckFilled size={20} /> {value}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+              <ProdPackButton className="block justify-self-center md:hidden" />
+            </div>
+
+            <Enterprise />
           </div>
         </Container>
       </section>
@@ -88,6 +116,13 @@ export default function PricingRedisPage() {
             <PageHeaderDesc className="mt-2 md:text-xl">
               Plans that scale to all sizes.
             </PageHeaderDesc>
+
+            <Link
+              className="text-emerald-950 underline opacity-60 dark:text-emerald-500 dark:opacity-100"
+              href={"https://upstash.com/docs/redis/overall/pricing"}
+            >
+              Check Quotas & FAQ Docs
+            </Link>
           </header>
 
           <div className="mt-12 md:mt-16">
@@ -97,13 +132,6 @@ export default function PricingRedisPage() {
               onChangePlan={onChangePlan}
             />
           </div>
-        </Container>
-      </section>
-
-      {/* FAQ */}
-      <section className="mt-32 md:mt-40">
-        <Container className="max-w-screen-lg">
-          <Enterprise />
         </Container>
       </section>
     </>

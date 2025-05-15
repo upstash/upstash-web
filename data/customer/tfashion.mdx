@@ -1,0 +1,55 @@
+---
+company_name: T-Fashion
+company_url: tfashion.ai
+user_name: Mehmet Ali Peker
+user_title: Co-Founder
+user_photo: tfashion-mehmet.jpg
+highlight: "Upstash has not only replaced our need for traditional Redis clusters but also enhanced our ability to scale while maintaining cost efficiency, making it an integral part of our tech stack."
+cover_image: cover-tfashion.jpg
+order: 8
+---
+
+### Meet T-Fashion:
+
+T-Fashion is an AI-powered platform transforming the fashion industry with trend forecasting and an AI design studio. By analyzing millions of images and social media trends, it provides brands with accurate predictions, actionable insights, and generative design tools to stay ahead in a fast-paced market.
+
+**A tech stack for data-intensive operations and high-performance AI workflows**
+
+T-Fashion’s modern stack includes:
+
+- **Frontend**: Next.js, React, TypeScript, and Tailwind CSS
+- **Backend**: Node.js, Apollo GraphQL, MongoDB, PostgreSQL, and Upstash
+- **Data Infrastructure**: S3, Apache Spark for ETL processes and big data computations
+- **AI Services**: Python-based deep learning models for design generation and trend analysis
+- **Deployment and Infrastructure**: AWS (Lambda, EC2, ECS, EMR, S3, SQS, etc.), Terraform, and Docker
+- **Search**: Typesense for ultra-fast and relevant searches
+
+**Upstash plays a pivotal role in our operations across various domains:**
+1. **Session Management:** Storing tokens and efficiently manage user sessions through Upstash.
+2. **Caching:** Hot data, such as trend insights and user preferences, is cached for quick access. Upstash also manages cursors for lazy load events, ensuring optimal performance during data-heavy operations.
+3. **Internal Service State Management:** Our AI-driven services, including the apparel inference engine and AI fashion designer, use Upstash to manage state and deduplicate tasks in AWS SQS, streamlining workflows and minimizing redundancy.
+4. **Job Management:** Internal services expose REST APIs consumed by our backend. API and workers manage job states via Upstash, ensuring efficient task handling and better operational clarity.
+5. **Data Processing:** Upstash’s Redis features provide flexibility for ad-hoc workflows, enabling quick queuing and processing of specific items. This complements AWS SQS setup for tasks that require lightweight, dynamic handling without the overhead of traditional queues.
+
+<Highlight
+  name="Mehmet Ali Peker"
+  title="Co-Founder"
+  photo="tfashion-mehmet.jpg"
+>
+Prior to using Upstash, we relied on an AWS ElastiCache cluster for our Redis needs. While it served its purpose, it often felt over-provisioned for our use cases. Most of the time, the cluster capacity far exceeded our requirements, making it an inefficient and cost-heavy solution. Though there were times when we fully utilized the cluster, these instances were rare and didn’t justify the consistent high costs.
+</Highlight>
+
+Another challenge was our multi-region setup. Our main operations run in Ireland, but to save costs and access a broader range of GPU instances, we host AI and batch services in US regions. To ensure fast data access for these services, we needed to deploy separate Redis clusters. If Upstash hadn’t been available, we would have faced difficult trade-offs—either deploying additional ElastiCache clusters, which didn’t make financial sense, or considering alternatives like DynamoDB, which lacks the flexibility required for our use case.
+
+**After Upstash: How did Upstash improve things? What was its impact?**
+
+Upstash proved to be an enabler for our multi-region operations and cost optimization. With its serverless and pay-as-you-go model, it allowed us to scale our caching infrastructure dynamically, accommodating both low and high traffic scenarios seamlessly. This flexibility perfectly suits our backend APIs and internally deployed services.
+
+The impact of Upstash has been significant:
+
+- **Cost Efficiency**: We can replicate production environments without doubling our costs, as Upstash’s pricing model ensures we only pay for what we use.
+- **Ease of Deployment**: Deploying caching services across regions has become simple and efficient, supporting our globally distributed workloads.
+- **Operational Simplicity**: The intuitive dashboard has been invaluable for debugging and monitoring, streamlining our workflow.
+- **Scalability**: It handles fluctuating traffic effortlessly, ensuring consistent performance without the need for manual intervention.
+
+Upstash has not only replaced our need for traditional Redis clusters but also enhanced our ability to scale flexibly while maintaining cost efficiency, making it an integral part of our tech stack.

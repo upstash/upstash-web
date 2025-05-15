@@ -9,6 +9,7 @@ import { IconCoin, IconInfoCircle } from "@tabler/icons-react";
 import Link from "next/link";
 import * as React from "react";
 import CompareValue from "../compare-value";
+import { ProdPackIcon } from "../prod-pack-icon";
 
 export default function CompareTable({
   selectedPlan,
@@ -223,7 +224,7 @@ export default function CompareTable({
           </th>
           {/**/}
           <Col plan={showFree}>
-            <CompareValue type="number">1000</CompareValue>
+            <CompareValue type="number">10000</CompareValue>
           </Col>
           <Col plan={showPayg} feature>
             <CompareValue
@@ -262,30 +263,30 @@ export default function CompareTable({
                 </Tooltip>
               }
             >
-              1000
+              10000
             </CompareValue>
           </Col>
           <Col plan={showFixed}>
             {selectedFixed250MB && (
-              <CompareValue type="number">1000</CompareValue>
+              <CompareValue type="number">10000</CompareValue>
             )}
             {selectedFixed1GB && (
-              <CompareValue type="number">1000</CompareValue>
+              <CompareValue type="number">10000</CompareValue>
             )}
             {selectedFixed5GB && (
-              <CompareValue type="number">2000</CompareValue>
+              <CompareValue type="number">10000</CompareValue>
             )}
             {selectedFixed10GB && (
-              <CompareValue type="number">2000</CompareValue>
+              <CompareValue type="number">10000</CompareValue>
             )}
             {selectedFixed50GB && (
-              <CompareValue type="number">2000</CompareValue>
+              <CompareValue type="number">10000</CompareValue>
             )}
             {selectedFixed100GB && (
-              <CompareValue type="number">10000</CompareValue>
+              <CompareValue type="number">16000</CompareValue>
             )}
             {selectedFixed500GB && (
-              <CompareValue type="number">10000</CompareValue>
+              <CompareValue type="number">16000</CompareValue>
             )}
           </Col>
 
@@ -304,7 +305,7 @@ export default function CompareTable({
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="size" suffix="MB">
-              1
+              10
             </CompareValue>
           </Col>
           <Col plan={showPayg} feature>
@@ -345,50 +346,50 @@ export default function CompareTable({
                 </Tooltip>
               }
             >
-              1
+              10
             </CompareValue>
           </Col>
           <Col plan={showFixed}>
             {selectedFixed250MB && (
               <CompareValue type="size" suffix="MB">
-                1
+                10
               </CompareValue>
             )}
             {selectedFixed1GB && (
               <CompareValue type="size" suffix="MB">
-                1
+                10
               </CompareValue>
             )}
             {selectedFixed5GB && (
               <CompareValue type="size" suffix="MB">
-                5
+                20
               </CompareValue>
             )}
             {selectedFixed10GB && (
               <CompareValue type="size" suffix="MB">
-                5
+                30
               </CompareValue>
             )}
             {selectedFixed50GB && (
               <CompareValue type="size" suffix="MB">
-                10
+                50
               </CompareValue>
             )}
             {selectedFixed100GB && (
               <CompareValue type="size" suffix="MB">
-                10
+                75
               </CompareValue>
             )}
             {selectedFixed500GB && (
               <CompareValue type="size" suffix="MB">
-                10
+                100
               </CompareValue>
             )}
           </Col>
 
           <Col plan={showEnterprise}>
             <CompareValue type="size" suffix="MB">
-              100
+              500
             </CompareValue>
           </Col>
         </tr>
@@ -455,17 +456,17 @@ export default function CompareTable({
             )}
             {selectedFixed1GB && (
               <CompareValue type="size" suffix="MB">
-                100
+                200
               </CompareValue>
             )}
             {selectedFixed5GB && (
               <CompareValue type="size" suffix="MB">
-                200
+                300
               </CompareValue>
             )}
             {selectedFixed10GB && (
               <CompareValue type="size" suffix="MB">
-                200
+                400
               </CompareValue>
             )}
             {selectedFixed50GB && (
@@ -480,7 +481,7 @@ export default function CompareTable({
             )}
             {selectedFixed500GB && (
               <CompareValue type="size" suffix="GB">
-                1
+                5
               </CompareValue>
             )}
           </Col>
@@ -564,57 +565,20 @@ export default function CompareTable({
           </th>
           {/**/}
           <Col plan={showFree}>
-            <CompareValue type="number">100</CompareValue>
+            <CompareValue type="number">10000</CompareValue>
           </Col>
           <Col plan={showPayg} feature>
-            <CompareValue
-              type="number"
-              after={
-                <Tooltip
-                  content={
-                    <>
-                      <h4 className="font-semibold">Custom Limit Pricing</h4>
-                      <table className="mini-table mt-2">
-                        <thead>
-                          <tr>
-                            <th>Limit</th>
-                            <th>Price</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td>2000</td>
-                            <td>$200</td>
-                          </tr>
-                          <tr>
-                            <td>5000</td>
-                            <td>$400</td>
-                          </tr>
-                          <tr>
-                            <td>10000</td>
-                            <td>$600</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </>
-                  }
-                >
-                  <IconCoin className="ml-1" stroke={1.5} size={24} />
-                </Tooltip>
-              }
-            >
-              1000
-            </CompareValue>
+            <CompareValue type="number">10000</CompareValue>
           </Col>
           <Col plan={showFixed}>
             {selectedFixed250MB && (
-              <CompareValue type="number">256</CompareValue>
+              <CompareValue type="number">10000</CompareValue>
             )}
             {selectedFixed1GB && (
-              <CompareValue type="number">1000</CompareValue>
+              <CompareValue type="number">10000</CompareValue>
             )}
             {selectedFixed5GB && (
-              <CompareValue type="number">5000</CompareValue>
+              <CompareValue type="number">10000</CompareValue>
             )}
             {selectedFixed10GB && (
               <CompareValue type="number">10000</CompareValue>
@@ -985,7 +949,7 @@ export default function CompareTable({
           <th className="px-0 text-left font-normal">IP Allowlist</th>
           {/**/}
           <Col plan={showFree}>
-            <CompareValue type="boolean" />
+            <CompareValue type="boolean" valid={false} />
           </Col>
           <Col plan={showPayg} feature>
             <CompareValue type="boolean" />
@@ -1030,7 +994,7 @@ export default function CompareTable({
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal">Encryption at REST</th>
+          <th className="px-0 text-left font-normal">Encryption at rest</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" valid={false} />
@@ -1114,23 +1078,6 @@ export default function CompareTable({
         </tr>
 
         {/**/}
-        <tr>
-          <th className="px-0 text-left font-normal">VPC Peering</th>
-          {/**/}
-          <Col plan={showFree}>
-            <CompareValue type="boolean" valid={false} />
-          </Col>
-          <Col plan={showPayg} feature>
-            <CompareValue type="boolean" valid={false} />
-          </Col>
-          <Col plan={showFixed}>
-            <CompareValue type="boolean" valid={false} />
-          </Col>
-          <Col plan={showEnterprise}>
-            <CompareValue type="boolean" valid={true} />
-          </Col>
-        </tr>
-
         <tr>
           <th className="px-0 text-left font-normal">Single Sign-On (SSO)</th>
           {/**/}
@@ -1325,22 +1272,10 @@ export default function CompareTable({
             <CompareValue type="boolean" valid={false} />
           </Col>
           <Col plan={showPayg} feature>
-            <CompareValue
-              after={
-                <Tooltip content="Available with Prod Pack.">
-                  <IconInfoCircle stroke={1.5} size={24} />
-                </Tooltip>
-              }
-            />
+            <CompareValue after={<ProdPackIcon />} />
           </Col>
           <Col plan={showFixed}>
-            <CompareValue
-              after={
-                <Tooltip content="Available with Prod Pack.">
-                  <IconInfoCircle stroke={1.5} size={24} />
-                </Tooltip>
-              }
-            />
+            <CompareValue after={<ProdPackIcon />} />
           </Col>
           <Col plan={showEnterprise}>
             <CompareValue>

@@ -9,6 +9,7 @@ import {
 } from "@/components/tooltip-base";
 import cx from "@/utils/cx";
 import {
+  IconBrandSlack,
   IconChartLine,
   IconInfinity,
   IconLifebuoy,
@@ -28,7 +29,7 @@ export default function SectionFeature() {
     <section className="relative -mt-16 pb-10 md:pb-24">
       <Bg className="opacity-20" />
 
-      <Container className="max-w-screen-2xl">
+      <Container className="max-w-[1700px]">
         <div>
           <PageHeaderTitle as="h2">Enterprise Features</PageHeaderTitle>
           <PageHeaderDesc className="mt-2">
@@ -41,13 +42,13 @@ export default function SectionFeature() {
             return (
               <React.Fragment key={title.toString()}>
                 <TooltipRoot delayDuration={0}>
-                  <TooltipTrigger>
+                  <TooltipTrigger className="!cursor-default">
                     <div
                       className={cx(
                         "group flex items-center justify-center gap-2 px-4 py-3 md:px-6 md:py-4",
                         "rounded-3xl border-2 border-bg-mute bg-bg-mute",
                         "transition hover:border-white hover:bg-white hover:shadow-xl",
-                        "dark:hover:border-bg-mute dark:hover:bg-bg-mute",
+                        "dark:hover:border-bg-mute dark:hover:bg-slate-300/20",
                       )}
                     >
                       {icon && (
@@ -62,10 +63,6 @@ export default function SectionFeature() {
                       )}
 
                       <h4 className="font-semibold md:text-lg">{title}</h4>
-
-                      {/*<p className="hidden text-text-mute group-hover:flex">*/}
-                      {/*  {feature.desc}*/}
-                      {/*</p>*/}
                     </div>
                   </TooltipTrigger>
                   <TooltipContent hideWhenDetached={true}>
@@ -95,10 +92,10 @@ export const FEATURES = [
 
   {
     icon: <IconShield className="size-4 md:size-6" stroke={1.5} />,
-    title: <>HIPAA Compliance</>,
+    title: <>SOC2 and HIPAA</>,
     desc: (
       <>
-        Ensure the privacy and security of healthcare-related data with
+        Ensure the privacy and security of your data with SOC2 and
         HIPAA-compliant infrastructure.
       </>
     ),
@@ -111,6 +108,16 @@ export const FEATURES = [
       <>
         Get professional support with guaranteed response times to keep your
         operations running smoothly.
+      </>
+    ),
+  },
+  {
+    icon: <IconBrandSlack className="size-4 md:size-6" stroke={1.5} />,
+    title: <>Dedicated Slack Channel</>,
+    desc: (
+      <>
+        Connect with our support team through a dedicated Slack channel for
+        real-time assistance and collaboration.
       </>
     ),
   },

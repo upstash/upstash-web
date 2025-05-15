@@ -33,13 +33,13 @@ export default function HomePage() {
         </header>
 
         <div className="mx-auto mt-20 grid max-w-2xl gap-4">
-          <Link href="https://calendly.com/upstash" target="_blank">
+          {/* <Link href="https://calendly.com/upstash" target="_blank">
             <span>
               <b className="text-primary-text">Book</b>{" "}
               <span className="opacity-60">a Meeting</span>
             </span>
             <IconCalendarEvent size={40} strokeWidth={1.5} />
-          </Link>
+          </Link> */}
 
           <Link
             onClick={() => {

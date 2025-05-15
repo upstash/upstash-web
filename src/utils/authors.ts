@@ -7,20 +7,15 @@ export const authors: Record<
     url?: string;
   }
 > = {
-  lisa: {
-    name: "Lisa Natsumi",
-    title: "Engineer @Upstash",
-    image: "pp-lisa.jpg",
-  },
   enes: {
     name: "Enes Akar",
-    title: "Cofounder @Upstash",
+    title: "Co-Founder @Upstash",
     url: "https://twitter.com/enesakar",
     image: "enes.png",
   },
   noah: {
     name: "Noah Fischer",
-    title: "DevRel @Upstash",
+    title: "Software Engineer, Guest Author",
     url: "https://twitter.com/noahfschr",
     image: "noah.jpg",
   },
@@ -398,6 +393,11 @@ export const authors: Record<
     title: "Software Developer - Guest Author",
     image: "mehmet-emin.jpg",
   },
+  josh: {
+    name: "Josh",
+    title: "DevRel @Upstash",
+    image: "josh.png",
+  },
   jorge: {
     name: "Jorge Lapa",
     title: "Software Engineer @Upstash",
@@ -412,5 +412,10 @@ export const authors: Record<
     name: "Elif Nur Deniz",
     title: "Software Developer - Guest Author",
     image: "elifnur.jpeg",
-  }
+  },
+  omerfaruq: {
+    name: "Ömer Faruk Bayram",
+    title: "Software Developer - Guest Author",
+    image: "omerfaruq.jpg",
+  },
 };

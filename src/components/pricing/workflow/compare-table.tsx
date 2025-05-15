@@ -208,6 +208,25 @@ export default function CompareTable() {
             <CompareValue type="number">1000</CompareValue>
           </Col>
         </tr>
+        
+        <tr>
+          <th className="px-0 py-4 text-left font-normal">
+            Max Concurrent Steps
+          </th>
+          {/**/}
+          <Col plan={showFree}>
+            <CompareValue>Unlimited</CompareValue>
+          </Col>
+          <Col plan={showPayg} feature>
+            <CompareValue>Unlimited</CompareValue>
+          </Col>
+          <Col plan={showPro1}>
+            <CompareValue>Unlimited</CompareValue>
+          </Col>
+          <Col plan={showPro10}>
+            <CompareValue>Unlimited</CompareValue>
+          </Col>
+        </tr>
 
         <tr>
           <th className="px-0 py-4 text-left font-normal">
@@ -325,7 +344,7 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 py-4 text-left font-normal">
-            Max Events Retention
+            Max Logs Retention
           </th>
           {/**/}
           <Col plan={showFree}>
@@ -341,23 +360,7 @@ export default function CompareTable() {
             <CompareValue>14 days</CompareValue>
           </Col>
         </tr>
-        
-        <tr>
-          <th className="px-0 py-4 text-left font-normal">Max Events Size</th>
-          {/**/}
-          <Col plan={showFree}>
-            <CompareValue type="number">10000</CompareValue>
-          </Col>
-          <Col plan={showPayg} feature>
-            <CompareValue type="number">10000</CompareValue>
-          </Col>
-          <Col plan={showPro1}>
-            <CompareValue type="number">100000</CompareValue>
-          </Col>
-          <Col plan={showPro10}>
-            <CompareValue type="number">100000</CompareValue>
-          </Col>
-        </tr>
+      
         <tr>
           <th className="px-0 text-left font-normal text-text-mute">
             Uptime SLA

@@ -1,0 +1,106 @@
+---
+title: "Context7 MCP: Up-to-Date Docs for Any Cursor Prompt"
+slug: context7-mcp
+authors:
+  - josh
+tags: [vector, context7, ai, llm, coding-assistants, dev-tools, mcp]
+---
+
+Last month, we introduced [Context7](/blog/context7-llmtxt-cursor) - a way to stop Cursor, Claude or any LLM from generating broken, outdated code.
+
+The idea: feed your LLM the latest documentation for the libraries you're using — so it doesn't rely on old training data.
+
+Today, we're launching our biggest update yet: The **Context7 MCP** - a direct integration with Cursor, Windsurf, or any LLM client that supports the [Model Context Protocol (MCP)](https://www.anthropic.com/news/model-context-protocol).
+
+---
+
+### Why Context7 Exists
+
+LLMs rely on outdated training data. When you're using newer versions of libraries or frameworks, they often hallucinate:
+
+- ❌ **Broken code** from outdated versions
+- ❌ **Made-up APIs** that never existed
+- ❌ **Vague answers** that aren't helpful
+
+For fast-moving libraries or frameworks like Next.js, Zod, Tailwind, or React Query, using LLMs by themselves doesn't work well.
+
+---
+
+### Introducing: The Context7 MCP
+
+In the first version of Context7, you had to copy a link from our site and paste it into your prompt. Now, just say “use context7” in Cursor — and you're done.
+
+Examples:
+- "How does the new Next.js `after()` function work? use context7"
+- "How do I invalidate a query in React Query? use context7"
+- "Protect this route with NextAuth, use context7"
+
+We fetch the latest docs and code examples straight from the official documentation and inject them into the model's context.
+
+Just:
+
+- 1️⃣ Write your prompt normally
+- 2️⃣ Tell the LLM to use context7
+- 3️⃣ Get working code in official-documentation quality
+
+---
+
+### How It Works: Model Context Protocol (MCP)
+
+The Context7 MCP uses the Model Context Protocol, [Anthropic's Model Context Protocol](https://www.anthropic.com/news/model-context-protocol), an open standard that lets LLMs talk to external tools like Context7. 
+
+When you add “use context7” (or something similar, like "get the docs using context7") to a prompt, we:
+
+1. Detect the library or framework you're asking about
+2. Pull the latest documentation & code examples
+3. Filter the documentation by topic (e.g. “routing”, “validation”, “middleware”)
+4. Inject it straight into the LLM's input
+
+---
+
+### Getting Started
+
+#### Requirements
+
+- Node.js >= v18.0.0
+- Cursor, Windsurf, Claude Desktop, or another MCP Client
+
+#### Install in Cursor
+
+Go to: `Settings` -> `Cursor Settings` -> `MCP` -> `Add new global MCP server`
+
+Or paste this into your Cursor `~/.cursor/mcp.json` file:
+
+```json
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"]
+    }
+  }
+}
+```
+
+#### Install in Windsurf
+
+Add this to your Windsurf MCP config file:
+
+```json
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"]
+    }
+  }
+}
+```
+
+---
+
+### Try Context7 Today - It's Free
+
+Context7 is built & maintained by the Upstash team and completely free to use. Try it out and we'd love to hear your feedback - we're working hard to improve it.
+
+Have feedback or questions about the project? Let me know at josh@upstash.com or [create an issue on GitHub](https://github.com/upstash/context7/issues/new).
