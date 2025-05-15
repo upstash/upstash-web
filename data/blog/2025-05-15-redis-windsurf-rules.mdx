@@ -1,17 +1,26 @@
-# Improving Upstash Redis Code Generation with Windsurf Rules and Context7
-Language models like ChatGPT, Claude and Cursor can help with coding, but they often make mistakes. **Why?** LLMs are trained on fixed and often outdated data. They hallucinate when they don't have up-to-date information about new APIs, old APIs, or buggy code. Platforms like Windsurf or Cursor started to integrate additional user rules to be persisted in the context and help LLMs write better codes.
+---
+title: "Improving Upstash Redis Code Generation with Windsurf Rules and Context7"
+slug: windsurf-rules-for-redis
+authors:
+  - elifnur
+tags: [redis, context7, LLM]
+---
+
+Language models like ChatGPT, Claude, etc. can help with coding, but they often make mistakes. **Why?** LLMs are trained on fixed and often outdated data. They hallucinate when they don't have up-to-date information about new APIs, old APIs, or buggy code. Platforms like Windsurf or Cursor started to integrate additional user-defined rules to be persisted in the context and help LLMs write better code. In this blog, we will talk about adding rules to platforms and how Context7 handles LLM mistakes automatically.
 
 ## Windsurf Rules
 Windsurf’s Cascade AI allows custom rules that the model automatically follows when generating code. These rules act like constant hints and tips. 
 
-For example for a simple prompt like `How to use 'mget' function in Upstash Redis Python?`
+For example, a simple prompt like `How to use the 'mget' function in Upstash Redis Python?` is given to Claude with and without specifying rules.
 
-With no rules file Claude generates the following code:
+With no rules file, Claude generates the following code:
+
 ```tsx
 values = redis.mget(["key1", "key2", "key3"])
 ```
 
 After adding this rule:
+
 ```md
 -   When using `redis.mget()`, always pass each key as a separate argument:
     Correct: `redis.mget("name", "email", "age")`
@@ -19,6 +28,7 @@ After adding this rule:
 ```
 
 LLM generates `mget()` codes without using list brackets:
+
 ```tsx
 // Correct way
 values = redis.mget("key1", "key2", "key3")
@@ -28,8 +38,9 @@ values = redis.mget(["key1", "key2", "key3"])
 ```
 
 ### Generating Rules
-To generate rules, click on the settings icon in Windsurf app:
-![Windsurf Rules](/blog/windsurf.png)
+To generate rules, click on the settings icon in the Windsurf app:
+
+![Windsurf Rules](/blog/redis-rules/windsurf.png)
 
 You can generate rules at either the global level or the workspace level.
 * `global_rules.md` - rules applied across all workspaces
@@ -39,16 +50,18 @@ Similarly, you can generate rules for Cursor by following this [guide](https://d
 
 ### Best Practices For Rules
 [Windsurf rules documentation](https://docs.windsurf.com/windsurf/cascade/memories#best-practices) suggests the following practices:
-* Keep rules simple, concise, and specific. Rules that are too long or vague may confuse Cascade.
-* There’s no need to add generic rules (e.g. “write good code”), as these are already baked into Cascade’s training data.
-* Format your rules using bullet points, numbered lists, and markdown. These are easier for Cascade to follow compared to a long paragraph.
-* XML tags can be an effective way to communicate and group similar rules together.
-* Rules files are limited to 6000 characters each. Any content above 6000 characters will be truncated and Cascade will not be aware of them.
+- Keep rules simple, concise, and specific. Rules that are too long or vague may confuse Cascade.
+- There’s no need to add generic rules (e.g. “write good code”), as these are already baked into Cascade’s training data.
+- Format your rules using bullet points, numbered lists, and markdown. These are easier for Cascade to follow compared to a long paragraph.
+- XML tags can be an effective way to communicate and group similar rules together.
+- Rules files are limited to 6000 characters each. Any content above 6000 characters will be truncated, and Cascade will not be aware of them.
 
 ### Context7 by Upstash: Up-to-date Documentation for LLMs
-Even with rules, LLMs can struggle if their knowledge is stale. That’s where [Context7 MCP Server](https://github.com/upstash/context7) comes in. Context7 provides dynamically fetched, version-specific docs and working code examples from the official documentations directly into your AI assistant’s context. 
+Even with rules, LLMs can struggle if their knowledge is stale. That’s where [Context7 MCP Server](https://github.com/upstash/context7) comes in. Context7 provides dynamically fetched, version-specific docs and working code examples from the official documentation directly into your AI assistant’s context. 
 
-Using Context7 together with Windsurf/Cursor rules is powerful. With this integration, the LLM now has the latest docs (thanks to Context7) and explicit project rules (thanks to Windsurf and Cursor). This combination drastically reduces hallucinations. For example, if you ask Windsurf to `use context7` when giving prompt, the model will follow your Redis rules and use the real code snippets from the docs.
+![Context7](/blog/redis-rules/context7.png)
+
+Using Context7 together with Windsurf/Cursor rules is powerful. With this integration, the LLM now has the latest docs (thanks to Context7) and explicit project rules (thanks to Windsurf and Cursor). This combination drastically reduces hallucinations. For example, if you ask Windsurf to `use context7` when giving a prompt as in the [example](https://github.com/upstash/context7?tab=readme-ov-file#-with-context7), the model will follow your own rules and use the real code snippets from the docs.
 
 
 ## Rules For Upstash Redis SDK 
@@ -56,10 +69,10 @@ We generated rules for Upstash Redis Typescript and Python SDK to fix common mis
 
 ### 1. Rules For TypeScript SDK
 
-#### <Non-existing functions>
+#### &lt;Non-existing functions&gt;
 These functions do not exist in Upstash Redis SDK and should be avoided:
 - `zrangebyscore`:
-```ts
+```tsx
 // Wrong
 await redis.zrangebyscore('myzset', 1, 2, { withScores: true });
 
@@ -67,12 +80,12 @@ await redis.zrangebyscore('myzset', 1, 2, { withScores: true });
 await redis.zrange("key", 1, 2, { byScore: true })
 ```
 -	`redis.watch, redis.multi(), transaction.exec()` these functions do not exist.
-#### </Non-existing functions>
+#### &lt;/Non-existing functions&gt;
 
-#### <Wrongly assumed non-existing functions>
+#### &lt;Wrongly assumed non-existing functions&gt;
 These functions do exist, and should be used as documented:
 -	HEXPIRE, HEXPIREAT, HEXPIRETIME, HPERSIST, HPEXPIRE, HPEXPIREAT, HPEXPIRETIME
-    ```tsx
+```tsx
     redis.hexpire("my-key", "my-field", 1);
     redis.hexpireat("my-key", "my-field", Math.floor(Date.now() / 1000) + 10);
     redis.hexpiretime("my-key", "my-field");
@@ -80,7 +93,8 @@ These functions do exist, and should be used as documented:
     redis.hpexpire("my-key", "my-field", 1000);
     redis.hpexpireat("my-key", "my-field", Date.now() + 1000);
     redis.hpexpiretime("my-key", "my-field");
-    ```
+```
+
 -	MultiRegionRatelimit:
 ```tsx
 import { MultiRegionRatelimit } from "@upstash/ratelimit";
@@ -104,9 +118,9 @@ const ratelimit = new Ratelimit({
   enableProtection: true
 });
 ```
-#### </Wrongly assumed non-existing functions>
+#### &lt;/Wrongly assumed non-existing functions&gt;
 
-#### <Format Issues>
+#### &lt;Format Issues&gt;
 -	`redis.zrange()` returns a flat list like `['one', 1, 'two', 2, 'three', 3]`, not a list of objects like `[{ score: 1, member: 'one' }, { score: 2, member: 'two' }] `
 -	When using `redis.hmget()`, pass each key as a separate argument:
     * Correct: `await redis.hmget('myhash', 'field1', 'field3');`
@@ -124,28 +138,27 @@ const ratelimit = new Ratelimit({
 -	When using `redis.zinterstore()` and `zunionstore`, specify the number of keys:
     * Correct: `await redis.zinterstore('result', 2, ['zset1', 'zset2'])`
     * Wrong: `await redis.zinterstore('result', ['zset1', 'zset2'])`
--	When using `redis.xadd()` with a specific id, give an ID greater than the previous ones.
+-	When using `redis.xadd()` with a specific ID, give an ID greater than the previous ones.
 -	`ratelimit.resetUsedTokens()` returns a `Promise<void>`, not a `Boolean`.
--	When using `redis.get()`, do not `JSON.parse()` the results, it is already in JSON format.
+-	When using `redis.get()`, do not `JSON.parse()` the result, it is already in JSON format.
 -	When using `redis.zadd()`, specify the fields:
-```
-# Correct
+```tsx
+// Correct
 redis.zadd(
     "leaderboard",
     { score: 100, member: "player1" },
     { score: 200, member: "player2" },
-  );
-  
-# Wrong
+);  
+// Wrong
 redis.zadd('leaderboard', { 'player1': 100, 'player2': 200});
 ```
 -	`redis.json.strappend()` expects stringified input:
     * Correct: `redis.json.strappend('doc', '$.str', JSON.stringify("world!"));`
     * Wrong: `redis.json.strappend('doc', '$.str', "world!");`
-#### </Format Issues>
+#### &lt;/Format Issues&gt;
     
 ### 2. Rules For Python SDK
-#### <Non-existing functions>
+#### &lt;Non-existing functions&gt;
 These functions do not exist in Upstash Redis SDK and should be avoided:
 -	`redis.del_()` function does not exist; the correct version is `redis.delete()`
 -	`ratelimit.limit()` Response object has no attribute `reset_after`, correct usage is `reset`.
@@ -153,9 +166,9 @@ These functions do not exist in Upstash Redis SDK and should be avoided:
 -	`redis.zrange` doesn’t have a `byscore` argument:
     * Correct: `redis.zrange("zset1", 2, 4, sortby="BYSCORE")`
     * Wrong: `redis.zrange("zset1", 2, 4, byscore=True)`
-#### </Non-existing functions>
+#### &lt;/Non-existing functions&gt;
 
-#### <Wrongly assumed non-existing functions>
+#### &lt;Wrongly assumed non-existing functions&gt;
 These functions do exist, and should be used as documented:
 -	HEXPIRE, HEXPIREAT, HEXPIRETIME, HPERSIST, HPEXPIRE, HPEXPIREAT, HPEXPIRETIME, HPTTL, HTTL
 ```tsx
@@ -169,16 +182,16 @@ redis.hpexpiretime(hash_name, field)
 redis.hpttl(hash_name, field)
 redis.httl(hash_name, field)
 ```
-#### </Wrongly assumed non-existing functions>
-#### <Implementation Issues>
--	Do not use `asyncio` library or `await` with synchronous Redis:
+#### &lt;/Wrongly assumed non-existing functions&gt;
+#### &lt;Implementation Issues&gt;
+-	Do not use the `asyncio` library or `await` with synchronous Redis:
 ```py
 from upstash_redis.asyncio import Redis  ## async
 from upstash_redis import Redis  ## sync
 ```
 -	`upstash_ratelimit` expects a sync Redis, not an async one.
-#### </ Implementation Issues>
-#### <Format Issues>
+#### &lt;/ Implementation Issues&gt;
+#### &lt;Format Issues&gt;
 -	When using `redis.bitop()`, give parameters separately, not in a list:
     * Correct:` redis.bitop("AND", "dest1", "key1", "key2")`
     * Wrong: `redis.bitop("AND", "dest1", ["key1", "key2"])`
@@ -199,16 +212,16 @@ redis.json.mset([
     {"key": "doc2", "path": "$", "value": {"name": "Bob", "age": 35}}
 ])
 ```
--	`redis.evalsha()`, `evalro`and `eval` takes its keys and arguments in a list:
+-	`redis.evalsha()`, `evalro` and `eval` take their keys and arguments in a list:
     * Correct: `redis.evalsha(script_sha, keys=["user:1:visits"], args=[1])`
     * Wrong: `redis.evalsha(script_sha, 1, "user:1:visits", 1)`
--	When using `redis.sinter()`, `sinterstore`, `sunion`, `sunionstore`, `sdiff` and `sdiffstore`, give keys separately:
+-	When using `redis.sinter()`, `sinterstore`, `sunion`, `sunionstore`, `sdiff`, and `sdiffstore`, give keys separately:
     * Correct: `redis.sinter("set1", "set2")`
     * Wrong: `redis.sinter(["set1", "set2"])`
 -	When using `redis.mget()`, do not give keys in a list:
     * Correct: `redis.mget("key1", "key2", "key3")`
     * Wrong: `redis.mget(["key1", "key2", "key3"])`
-#### </Format Issues>
+#### &lt;/Format Issues&gt;
 
 ## Final Words
-In summary, Windsurf rules give the AI assistant persistent guidance about your codebase and style. Context7 provides up-to-date, versioned docs so the model doesn’t rely on outdated knowledge. Together, they make AI-assisted software development far more reliable. Give Windsurf/Cursor a try by adding a rules file with Upstash-specific notes, and encourage the model to “use context7” in prompts to see the results yourselves. With these tools, even common LLM mistakes (wrong commands, bad formatting, hallucinated assumptions) can be spotted and corrected automatically, leading to correct TypeScript or Python code that matches the real Upstash Redis APIs.
+In summary, Windsurf rules give the AI assistant persistent guidance about your codebase and style. Context7 provides up-to-date, versioned docs so the model doesn’t rely on outdated knowledge. Together, they make AI-assisted software development far more reliable. Give Windsurf/Cursor a try by adding a rules file with Upstash-specific notes, and encourage the model to “use context7” in prompts to see the results yourselves! With these tools, even common LLM mistakes (wrong commands, bad formatting, hallucinated assumptions) can be spotted and corrected automatically, leading to correct TypeScript or Python code that matches the real Upstash Redis APIs.
