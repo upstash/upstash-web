@@ -229,8 +229,6 @@ func (c *Context) contextRun(stepName string, stepFunc func()) any {
 }
 ```
 
-![Executing Next Step](/blog/workflow-orchestration/second-step.png)
-
 This repeats for every step:
 
 - Run a step
@@ -240,10 +238,11 @@ This repeats for every step:
     
 > 💡 Each step in your workflow is executed via its _own_ HTTP request.
 
+![Executing Next Step](/blog/workflow-orchestration/second-step.png)
+
 Since your route handler is re-run on every step (from the top), anything _outside_ of context functions will get executed **every time** — even if it’s unrelated to the current step.
   
-> 💡 Don’t put non-deterministic logic (like Math.random() or API calls) outside of step wrappers. If you do, they’ll run over and over.
-
+Don’t put non-deterministic logic (like Math.random() or API calls) outside of step wrappers. If you do, they’ll run over and over.
 Stick to this pattern:
 
 ```typescript
@@ -316,7 +315,7 @@ That works great on systems with dedicated resources — But in web apps? Especi
 
 You can’t just `sleep(10000)` in an API handler and expect it to behave. You’ll hit timeouts, burn resources, and potentially lock up the whole process. In some environments, it’s outright impossible because you’re not allowed to hold the line open that long.
 
-That’s why traditional sleep just doesn’t fit modern serverless patterns — unless you have something like workflow orchestration to simulate it properly. You can pause your workflow using:
+That’s why traditional sleep just doesn’t fit modern serverless patterns — unless you have something like workflow orchestration to simulate it properly. With workflow orchestartion, you can pause the execution using:
 
 ```javascript
 await context.sleep("pause-for-a-day", 86400);
@@ -330,10 +329,12 @@ Here’s how it works:
 - The Workflow engine schedules a new HTTP request for the next step, but delays it in its priority queue
 - Your app is completely idle in the meantime
 
+![Sleep](/blog/workflow-orchestration/sleep.png)
+
 **No memory usage. No compute running. No billing.**
 
 Because it’s just a timestamped entry on disk, the cost is practically zero. You could sleep for a minute or two weeks — doesn't matter.
-When the time comes, which means the priority of the entry got high, a new HTTP request will be sent to execute the next step after the sleep.
+When the time comes, which means the priority of the entry in the priority queue got high, a new HTTP request will be sent to execute the next step after the sleep.
 
 > 💡 Sleep in serverless without paying for idling — because nothing is idling.
 
@@ -350,6 +351,8 @@ That’s where `context.waitForEvent()` in Upstash Workflow comes in.
 When your workflow hits a `waitForEvent` step, it exits — but tells Upstash: _“Pause here and wait for event XYZ.”_ No new request is scheduled. Instead, we store a little waiter object tied to the workflow state, just sitting there doing nothing.
 
 Later, when you call `notify()` from an external system (like a user action, webhook, whatever), Upstash checks: _“Is anyone waiting on this?”_ If yes, it spins up the next HTTP call to resume the workflow from where it left off — with the new data injected in the state.
+
+![Sleep](/blog/workflow-orchestration/wait.png)
 
 Like sleep, the cost is nearly zero. Just some disk storage to remember the paused state. And when the event arrives? Boom — you’re back in action.
 
