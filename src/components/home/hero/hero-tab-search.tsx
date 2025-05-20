@@ -7,85 +7,78 @@ import {
 } from "@/components/home/hero/hero-tab";
 import { IconCircle1, IconCircle2, IconCircle3 } from "@tabler/icons-react";
 import { CodeSnippetsSearch } from "../serverless/code-snippets-search";
-import { CodeSnippetsWorkflow } from "../serverless/code-snippets-workflow";
 
 export function HeroTabSearch() {
   return (
     <>
       <HeroTabFeatureCont>
-        <HeroTabFeatureTitle>
-          Serverless <br className="hidden sm:block" /> Function Orchestration
-        </HeroTabFeatureTitle>
+        <HeroTabFeatureTitle>Lightweight & Efficient</HeroTabFeatureTitle>
         <HeroTabFeatureUl>
           <HeroTabFeatureLi>
             <HeroTabFeatureBullet>
               <IconCircle1 stroke={1.5} />
             </HeroTabFeatureBullet>
-            Coordinate complex serverless workflows
+            Set up in minutes
           </HeroTabFeatureLi>
           <HeroTabFeatureLi>
             <HeroTabFeatureBullet>
               <IconCircle2 stroke={1.5} />
             </HeroTabFeatureBullet>
-            Integrate and manage multiple functions with ease
+            Plug-and-play AI search with great defaults
           </HeroTabFeatureLi>
           <HeroTabFeatureLi>
             <HeroTabFeatureBullet>
               <IconCircle3 stroke={1.5} />
             </HeroTabFeatureBullet>
-            Streamline your serverless architecture
+            Optimized for speed and simplicity
           </HeroTabFeatureLi>
         </HeroTabFeatureUl>
       </HeroTabFeatureCont>
 
       <HeroTabFeatureCont>
-        <HeroTabFeatureTitle>
-          Eliminate <br className="hidden sm:block" /> Function Timeouts
-        </HeroTabFeatureTitle>
+        <HeroTabFeatureTitle>Fast, Relevant Results</HeroTabFeatureTitle>
         <HeroTabFeatureUl>
           <HeroTabFeatureLi>
             <HeroTabFeatureBullet>
               <IconCircle1 stroke={1.5} />
             </HeroTabFeatureBullet>
-            Execute long-running processes without constraints
+            Combines semantic & full-text search for relevancy
           </HeroTabFeatureLi>
           <HeroTabFeatureLi>
             <HeroTabFeatureBullet>
               <IconCircle2 stroke={1.5} />
             </HeroTabFeatureBullet>
-            No more arbitrary time limits on your operations
+            Understands user search intent
           </HeroTabFeatureLi>
           <HeroTabFeatureLi>
             <HeroTabFeatureBullet>
               <IconCircle3 stroke={1.5} />
             </HeroTabFeatureBullet>
-            Focus on your logic, not on timing workarounds
+            Smart ranking shows the best matches first
           </HeroTabFeatureLi>
         </HeroTabFeatureUl>
       </HeroTabFeatureCont>
 
       <HeroTabFeatureCont>
-        <HeroTabFeatureTitle>
-          Automatic <br className="hidden sm:block" /> Error Recovery
-        </HeroTabFeatureTitle>
+        <HeroTabFeatureTitle>Scales Automatically</HeroTabFeatureTitle>
         <HeroTabFeatureUl>
           <HeroTabFeatureLi>
             <HeroTabFeatureBullet>
               <IconCircle1 stroke={1.5} />
             </HeroTabFeatureBullet>
-            Built-in resilience for your workflows
+            Perfect for serverless and modern stacks like Next.js
           </HeroTabFeatureLi>
           <HeroTabFeatureLi>
             <HeroTabFeatureBullet>
               <IconCircle2 stroke={1.5} />
             </HeroTabFeatureBullet>
-            Automatically retry failed steps
+            Scales to any data size
           </HeroTabFeatureLi>
           <HeroTabFeatureLi>
             <HeroTabFeatureBullet>
               <IconCircle3 stroke={1.5} />
             </HeroTabFeatureBullet>
-            Ensure robust execution even in unpredictable environments
+            No infrastructure, clusters or servers to manage
           </HeroTabFeatureLi>
         </HeroTabFeatureUl>
       </HeroTabFeatureCont>
