@@ -53,9 +53,9 @@ Because we use Kubernetes for deployment, [Prometheus](https://prometheus.io/) w
 
 Using those metrics, a tool called [Alertmanager](https://prometheus.io/docs/alerting/latest/alertmanager/) deduplicates, groups, and routes alerts to our email and OpsGenie if it detects errors or problematic cluster behavior.
 
-To give you an idea, here's what our Prometheus looks like:
+To give you an idea, here's what our alerts look like:
 
-![Alertmanager overview](/blog/how-we-scale-upstash/prometheus.png)
+![Alertmanager overview](/blog/how-we-scale-upstash/alertmanager.png)
 
 As a side note: If alerts weren't grouped and there'd be a large outage, we might get hundreds to thousands of alerts simultaneously. That's not just spam; it would distract us from finding the core problem.
 
