@@ -4,7 +4,6 @@ title: "How Upstash Monitors 25+ Clusters Across the Globe"
 authors: [ilter]
 tags:
   [sre, devops, monitoring, aws, gcp, fly.io, uptime, oncall, alert, metrics]
-draft: true
 ---
 
 We're building Upstash's infrastructure to be **cloud-agnostic by design**. Everything works the same whether our services run on **AWS**, **GCP**, or **Fly.io**. This consistency and standardization (as I'll get into later) make it much easier to keep our promise of
@@ -54,9 +53,9 @@ Because we use Kubernetes for deployment, [Prometheus](https://prometheus.io/) w
 
 Using those metrics, a tool called [Alertmanager](https://prometheus.io/docs/alerting/latest/alertmanager/) deduplicates, groups, and routes alerts to our email and OpsGenie if it detects errors or problematic cluster behavior.
 
-The alert overview looks like this:
+To give you an idea, here's what our Prometheus looks like:
 
-![Alertmanager overview](/blog/how-we-scale-upstash/graphana-2.png)
+![Alertmanager overview](/blog/how-we-scale-upstash/prometheus.png)
 
 As a side note: If alerts weren't grouped and there'd be a large outage, we might get hundreds to thousands of alerts simultaneously. That's not just spam; it would distract us from finding the core problem.
 
