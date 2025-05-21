@@ -383,7 +383,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal">Query Price</th>
+          <th className="px-0 text-left font-normal">Request Price</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue>Free</CompareValue>

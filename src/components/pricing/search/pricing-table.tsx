@@ -55,7 +55,7 @@ export default function PricingTable() {
           </h4>
 
           <h5 className="text-2xl font-semibold">$0.05</h5>
-          <p className="text-sm text-text-mute">per 1K queries</p>
+          <p className="text-sm text-text-mute">per 1K requests</p>
         </div>
 
         <div className="grow">
