@@ -11,6 +11,29 @@ import type { Post } from "@content";
 import { allPosts } from "@content";
 import { notFound } from "next/navigation";
 
+/**
+ * Finds the adjacent non-draft posts (next and previous) for a given index
+ */
+function getAdjacentPosts(posts: Post[], currentIndex: number) {
+  let nextPost: Post | undefined = undefined;
+  for (let i = currentIndex - 1; i >= 0; i--) {
+    if (!posts[i].draft) {
+      nextPost = posts[i];
+      break;
+    }
+  }
+
+  let prevPost: Post | undefined = undefined;
+  for (let i = currentIndex + 1; i < posts.length; i++) {
+    if (!posts[i].draft) {
+      prevPost = posts[i];
+      break;
+    }
+  }
+
+  return { nextPost, prevPost };
+}
+
 type Props = {
   params: {
     slug: string;
@@ -50,9 +73,7 @@ export default async function BlogPage({ params }: Props) {
     notFound();
   }
 
-  const nextPost = indexOfPost > 0 ? allPosts[indexOfPost - 1] : undefined;
-  const prevPost =
-    indexOfPost < allPosts.length - 1 ? allPosts[indexOfPost + 1] : undefined;
+  const { nextPost, prevPost } = getAdjacentPosts(allPosts, indexOfPost);
 
   return (
     <main className="relative z-0">
