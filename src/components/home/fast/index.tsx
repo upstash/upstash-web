@@ -31,7 +31,7 @@ export default function Fast() {
 
       {/* globe */}
       <img
-        src="/globe-light.png"
+        src="/globe-light.webp"
         alt="upstash region map"
         className={cx(
           "absolute inset-x-0 left-1/2 top-[8vw] -z-10 -translate-x-1/2 xl:top-[110px] dark:hidden",
@@ -40,7 +40,7 @@ export default function Fast() {
         )}
       />
       <img
-        src="/globe-dark.png"
+        src="/globe-dark.webp"
         alt="upstash region map"
         className={cx(
           "absolute inset-x-0 left-1/2 top-[8vw] -z-10 hidden -translate-x-1/2 xl:top-[110px] dark:block",
