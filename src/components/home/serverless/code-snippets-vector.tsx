@@ -75,7 +75,7 @@ response = openai.chat.completions.create(
     ],
   },
   {
-    title: "Caching",
+    title: "Semantic Caching",
     snippets: [
       {
         language: "js",

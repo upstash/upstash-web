@@ -3,6 +3,7 @@ export enum Product {
   VECTOR = "Vector",
   QSTASH = "QStash",
   WORKFLOW = "Workflow",
+  SEARCH = "Search",
 }
 
 export enum CodeExample {
