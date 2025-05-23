@@ -197,7 +197,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal">Monthly Query Limit</th>
+          <th className="px-0 text-left font-normal">Monthly Request Limit</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="size" suffix="K">
