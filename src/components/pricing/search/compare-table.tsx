@@ -64,7 +64,7 @@ export default function CompareTable() {
             plan={showFree}
             className="border-b-2 border-b-bg px-0 py-3 text-xs font-medium uppercase tracking-wider text-text-mute"
           >
-            1 Free Collection
+            1 Free Database
           </Col>
           <Col
             plan={showPayg}
@@ -167,7 +167,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal">Max Collections</th>
+          <th className="px-0 text-left font-normal">Max Databases</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="number">1</CompareValue>

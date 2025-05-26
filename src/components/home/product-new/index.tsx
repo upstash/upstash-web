@@ -56,13 +56,11 @@ const HeroProductTagline = ({ activeProduct }: { activeProduct: Product }) => {
         </a>
         <a href={consoleLink} target="_blank">
           <Button variant={"primary"} className="h-[42px] px-5">
-            {activeProduct === Product.REDIS
+            {activeProduct === Product.REDIS || activeProduct === Product.SEARCH
               ? "Create Database"
               : activeProduct === Product.VECTOR
                 ? "Create Index"
-                : activeProduct === Product.SEARCH
-                  ? "Create Collection"
-                  : "Upstash Console"}
+                : "Upstash Console"}
             {activeProduct === Product.REDIS ||
             activeProduct === Product.VECTOR ||
             activeProduct === Product.SEARCH ? (

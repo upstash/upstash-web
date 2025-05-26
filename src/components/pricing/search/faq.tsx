@@ -89,17 +89,17 @@ export default function FAQ() {
       </AccordionItem>
 
       <AccordionItem value="item-9">
-        <AccordionTrigger>How many collections can I create?</AccordionTrigger>
+        <AccordionTrigger>How many databases can I create?</AccordionTrigger>
         <AccordionContent>
-          You can create up to 10 collections for free and beyond this you will
-          be charged $1 per collection up to 100 collections.
+          You can create up to 10 databases for free and beyond this you will be
+          charged $1 per database up to 100 databases.
         </AccordionContent>
       </AccordionItem>
 
       <AccordionItem value="item-10">
         <AccordionTrigger>How many indexes can I create?</AccordionTrigger>
         <AccordionContent>
-          You can create up to 10,000 indexes in a single collection.
+          You can create up to 10,000 indexes in a single database.
         </AccordionContent>
       </AccordionItem>
 
