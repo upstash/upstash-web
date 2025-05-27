@@ -12,23 +12,29 @@ Most search products today are slow to set up, hard to scale, and surprisingly e
 
 We're building Upstash Search to be:
 
-- Simple and developer friendly
-- Fast & accurate
-- Ready to scale to _any_ data size with no extra setup
+- Simple and developer-friendly
+- Fast and accurate
+- Ready to scale to any data size with no extra setup
 
 ---
 
 ## Why We're Building Search
 
-We talked to a lot of developers using search in real apps. Two problems came up over and over:
+We talked to a lot of developers using search in real apps. Three problems came up over and over:
 
-### 1. Too Complicated
+### 1. Search Doesn't Understand Meaning
+
+❌ Most search products match exact keywords. When your users search "how do I cancel my subscription", they get zero results because your docs say "unsubscribe" or "manage billing". I've seen this happen in real apps and it's really frustrating as a user 💀
+
+✅ Upstash Search understands what users mean, not just what they type. It knows "cancel subscription", "unsubscribe", and "stop billing" all mean the same thing. We achieve this by combining traditional full-text search with AI-powered semantic search.
+
+### 2. Too Complicated
 
 ❌ Other products (we'll avoid names here) feel like they were built for large enterprises first. You need to learn a whole system and a lot of platform-specific features, even if you only need basic search.
 
-✅ With Upstash Search, you can start in minutes. There's no infrastructure to manage and no long docs to read before you see results. Create a collection, add documents, make a query and it just works.
+✅ With Upstash Search, you can start in minutes. There's no infrastructure to manage and no long docs to read before you see results. Create a collection, add documents, make a query, and it just works.
 
-### 2. Cost
+### 3. Too Expensive
 
 ❌ Some products look affordable at first, but the cost adds up fast. This can be because of intransparent licensing rules, hidden usage fees, or scaling costs that spike without warning. Even small apps can end up with big bills once they grow.
 
@@ -40,15 +46,15 @@ We talked to a lot of developers using search in real apps. Two problems came up
 
 Before starting work on search, we've laid out the most important points we want to optimize for. As we're letting users into our preview version, we're constantly iterating on these:
 
-- **👉 Getting Started is plug-and-play**
+- **👉 Getting started is plug-and-play**
 
         You can get started in minutes. No cluster setup and no complicated dashboards. Create a collection, insert documents, and you're ready to search.
 
 - **👉 Hybrid semantic & full-text search**
 
-        To deliver the best possible results, we combine full-text and semantic search. That way, even vague queries capture user search intent and can return great results.
+        To deliver the best possible results, we combine full-text and semantic search. That way, even vague queries capture user search intent and return great results.
 
-- **👉 We scale with your data**
+- **👉 Scales with your data**
 
         We've scaled Upstash Redis to handle billions of requests per day. We're using that same experience to build Search. It can handle anything from a small blog to massive data sizes.
 
@@ -62,8 +68,8 @@ Before starting work on search, we've laid out the most important points we want
 
 Under the hood, Upstash Search uses a mix of:
 
-- **Full-text search** to find exact keyword matches.
-- **Semantic search** to find matches based on meaning and intent.
+- **Full-text search** to find exact keyword matches
+- **Semantic search** to find matches based on meaning and intent
 - **Smart ranking** to order the best results first
 
 Search also supports advanced filters, so you can limit results by city, tag, type, or anything else your app needs.
@@ -74,11 +80,11 @@ Search also supports advanced filters, so you can limit results by city, tag, ty
 
 Here's where Upstash Search really shines:
 
-- **👉 Content search for blogs, docs and wikis**
+- **👉 Content search for blogs, docs, and wikis**
 
         Automatically handle typos, questions, or vague queries. Readers get the right article without needing perfect phrasing.
 
-- **👉 E-Commerce product search**
+- **👉 E-commerce product search**
 
         Match on meaning, not just keywords. A search for "jogging shoes" can return "running sneakers" without any extra setup.
 
@@ -90,6 +96,6 @@ Here's where Upstash Search really shines:
 
 ## Try It Today - We'd Love Your Feedback! 👀
 
-Whether you're building a quick prototype or scaling a product, Upstash Search helps you ship accuare search, fast.
+Whether you're building a quick prototype or scaling a product, Upstash Search helps you ship accurate search, fast.
 
 → [Try Upstash Search](https://upstash-dx-1894.mintlify.app/search/overall/getstarted)
