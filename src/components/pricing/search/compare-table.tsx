@@ -255,6 +255,28 @@ export default function CompareTable() {
         </tr>
 
         <tr>
+          <th className="px-0 text-left font-normal">
+            Max Content Length per Document
+          </th>
+          {/**/}
+          <Col plan={showFree}>
+            <CompareValue type="size" suffix="character">
+              1500
+            </CompareValue>
+          </Col>
+          <Col plan={showPayg} feature>
+            <CompareValue type="size" suffix="character">
+              1500
+            </CompareValue>
+          </Col>
+          <Col plan={showPro}>
+            <CompareValue type="size" suffix="character">
+              1500
+            </CompareValue>
+          </Col>
+        </tr>
+
+        <tr>
           <th className="px-0 text-left font-normal">Total Max Data Size</th>
           {/**/}
           <Col plan={showFree}>
