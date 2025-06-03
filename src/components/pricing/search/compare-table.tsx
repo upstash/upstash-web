@@ -213,28 +213,30 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal">Max Size per Document</th>
+          <th className="px-0 text-left font-normal">
+            Max Content Size per Document
+          </th>
           {/**/}
           <Col plan={showFree}>
-            <CompareValue type="size" suffix="MB">
-              1
+            <CompareValue type="size" suffix="characters">
+              1500
             </CompareValue>
           </Col>
           <Col plan={showPayg} feature>
-            <CompareValue type="size" suffix="MB">
-              1
+            <CompareValue type="size" suffix="characters">
+              1500
             </CompareValue>
           </Col>
           <Col plan={showPro}>
-            <CompareValue type="size" suffix="MB">
-              1
+            <CompareValue type="size" suffix="characters">
+              1500
             </CompareValue>
           </Col>
         </tr>
 
         <tr>
           <th className="px-0 text-left font-normal">
-            Max Fields Size per Document
+            Max Metadata Size per Document
           </th>
           {/**/}
           <Col plan={showFree}>
@@ -250,28 +252,6 @@ export default function CompareTable() {
           <Col plan={showPro}>
             <CompareValue type="size" suffix="KB">
               48
-            </CompareValue>
-          </Col>
-        </tr>
-
-        <tr>
-          <th className="px-0 text-left font-normal">
-            Max Content Length per Document
-          </th>
-          {/**/}
-          <Col plan={showFree}>
-            <CompareValue type="size" suffix="character">
-              1500
-            </CompareValue>
-          </Col>
-          <Col plan={showPayg} feature>
-            <CompareValue type="size" suffix="character">
-              1500
-            </CompareValue>
-          </Col>
-          <Col plan={showPro}>
-            <CompareValue type="size" suffix="character">
-              1500
             </CompareValue>
           </Col>
         </tr>
