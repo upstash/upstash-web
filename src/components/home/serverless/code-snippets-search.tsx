@@ -22,7 +22,7 @@ const results = await client.index("movies").search({
       {
         language: "py",
         code: `
-# sAI-powered semantic search with reranking
+# AI-powered semantic search with reranking
 results = client.index("movies").search(
   query="space opera with jedi",
   limit=5,
