@@ -124,7 +124,7 @@ const client = new Search({
 
 await client.index("movies").upsert([{
     id: "star-wars",
-    data: "Star Wars is a sci-fi space opera.",
-    fields: { title: "Star Wars", genre: "sci-fi", category: "classic" }
+    content: { title: "Star Wars is a sci-fi space opera." },
+    metadata: { genre: "sci-fi", category: "classic" }
 }]);`,
 };
