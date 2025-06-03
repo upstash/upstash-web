@@ -419,7 +419,7 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue
               after={
-                <Tooltip content="100 documents are counted as 1 request">
+                <Tooltip content="Up to 100 documents are counted as 1 request">
                   <IconInfoCircle
                     className="ml-1 opacity-60"
                     stroke={1.2}
