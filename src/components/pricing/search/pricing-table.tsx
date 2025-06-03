@@ -90,7 +90,7 @@ export default function PricingTable() {
         <div className="grow">
           <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">Pro</h4>
 
-          <h5 className="flex items-baseline text-2xl font-semibold">TBD</h5>
+          <h5 className="flex items-baseline text-2xl font-semibold">Coming Soon</h5>
           <p className="text-sm text-text-mute">-</p>
         </div>
 

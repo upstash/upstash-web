@@ -19,6 +19,17 @@ const results = await client.index("movies").search({
 });
 `,
       },
+      {
+        language: "py",
+        code: `
+# sAI-powered semantic search with reranking
+results = client.index("movies").search(
+  query="space opera with jedi",
+  limit=5,
+  reranking=true
+)
+`,
+      },
     ],
   },
   {
@@ -28,13 +39,13 @@ const results = await client.index("movies").search({
         language: "js",
         code: `
 // Fetch documents by IDs
-const documents = await client.index("movies").fetch({
+const documents = await index.fetch({
   ids: ["star-wars", "inception"],
 });
 
 // Pagination with id prefix
 const { nextCursor, documents: rangeDocuments } = await index.range({
-  cursor: 0,
+  cursor: "0",
   limit: 5,
   prefix: "in"
 });
@@ -48,6 +59,30 @@ await index.delete({
 await index.reset();
         `,
       },
+      {
+        language: "py",
+        code: `
+# Fetch documents by IDs
+documents = index.fetch(
+  ids=["star-wars", "inception"]
+)
+
+# Pagination with id prefix
+rangeResults = index.range(
+  cursor="0",
+  limit=5,
+  prefix="in"
+)
+
+# Delete documents
+index.delete(
+  ids=["star-wars"]
+)
+
+# Reset index
+index.reset()
+        `,
+      },
     ],
   },
   {
@@ -58,18 +93,30 @@ await index.reset();
         code: `
 await client.index("products").upsert([
   {
-    data: "Noise cancelling wireless headphones",
-    fields: { inStock: true, price: 299 },
+    content: { description: "Noise cancelling wireless headphones" },
+    metadata: { inStock: true, price: 299 },
   },
 ]);
 
 const results = await client.index("products").search({
   query: "wireless headphones",
-  filter: {
-    inStock: true,
-    price: { $lt: 350 }
-  },
 });
+        `,
+      },
+      {
+        language: "py",
+        code: `
+index.upsert(
+  documents=[{
+    id: "headphones-0",
+    content: { description: "Noise cancelling wireless headphones" },
+    metadata: { inStock: true, price: 299 },
+  }]
+)
+
+results = index.search(
+  query="wireless headphones"
+)
         `,
       },
     ],
