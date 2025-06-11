@@ -4,23 +4,23 @@ title: "How Serverless Workflows Actually Work?"
 authors:
   - mehmettokgoz
 tags: [workflow, qstash, messaging, serverless]
-draft: true
 ---
 
-In this post, we’ll take a look under the hood at how Upstash Workflow works — enabling you to build serverless APIs that are reliable by default.
+In this post, we'll take a look under the hood at how Upstash Workflow works. It enables you to build serverless APIs that are reliable by default.
 
 As you scale your app and your backend grows in complexity, a lot can go wrong (especially in serverless 💀). Getting rate-limited by an AI provider, functions timing out, slow or unreliable third-party responses, and more.
 
 **Workflow orchestration** is a model that helps you handle these issues gracefully by turning complex logic into a series of reliable, isolated steps. 
 
-Using Upstash Workflow as our example, we’ll explore how features like:
+Using Upstash Workflow as our example, we'll learn how:
+
 - automatic retries
 - automatic failure handling
 - executing logic in parallel (for performance)
 - pausing API execution for hours or even days
 - waiting for async events
 
-are handled seamlessly under the hood.
+are handled under the hood.
 
 While there are different orchestration patterns, this post will focus on how Upstash approaches the problem — where your code runs within your infrastructure, and we take care of the orchestration layer that ties everything together.
 
