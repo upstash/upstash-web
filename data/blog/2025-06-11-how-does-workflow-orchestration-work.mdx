@@ -40,22 +40,22 @@ Here's what that might look like as pseudocode in a Next.js endpoint:
 
 ```javascript
 import {
-	crawl,
-	summarizeWebpage,
-	textToVoice,
-	saveResultsToDb
+    crawl,
+    summarizeWebpage,
+    textToVoice,
+    saveResultsToDb
 } from "@/app/util";
 
 export async function GET(request: Request) {
-	const requestPayload = await request.json()
-	const websiteUrl = data.websiteUrl;
+    const requestPayload = await request.json()
+    const websiteUrl = data.websiteUrl;
 
-	const data = crawl(websiteUrl)
-	const summarizedContent = summarizeWebpage(data)
-	const voiceBlob = textToVoice(summarizedContent)
-	saveResultsToDb(websiteUrl, voiceBlob)
+    const data = crawl(websiteUrl)
+    const summarizedContent = summarizeWebpage(data)
+    const voiceBlob = textToVoice(summarizedContent)
+    saveResultsToDb(websiteUrl, voiceBlob)
 
-	return
+    return
 }
 ```
 
@@ -103,40 +103,40 @@ We can build this retry-aware model manually:
 
 ```javascript
 import {
-	crawl,
-	summarizeWebpage,
-	textToVoice,
-	saveResultsToDb,
+    crawl,
+    summarizeWebpage,
+    textToVoice,
+    saveResultsToDb,
 } from "@/app/util";
 
 export async function GET(request: Request) {
-	const requestPayload = await request.json()
-	const websiteUrl = data.websiteUrl;
-	const requestId = data.requestId
+    const requestPayload = await request.json()
+    const websiteUrl = data.websiteUrl;
+    const requestId = data.requestId
 
-	let data = query_result_for_step(request_id, "crawl")
-	if (data == undefined) {
-		data = crawl(websiteUrl)
-		save_result_for_step(request_id, "crawl", data)
-	}
+    let data = query_result_for_step(request_id, "crawl")
+    if (data == undefined) {
+        data = crawl(websiteUrl)
+        save_result_for_step(request_id, "crawl", data)
+    }
 
-	let summarizedContent = query_result_for_step(request_id, "LLM")
-	if (summarizedContent == undefined) {
-		summarizedContent = summarizeWebpage(data)
-		save_result_for_step(request_id, "LLM", summarizedContent)
-	}
+    let summarizedContent = query_result_for_step(request_id, "LLM")
+    if (summarizedContent == undefined) {
+        summarizedContent = summarizeWebpage(data)
+        save_result_for_step(request_id, "LLM", summarizedContent)
+    }
 
-	let voiceBlob = query_result_for_step(request_id, "TTS")
-	if (voiceBlob == undefined) {
-		voiceBlob = textToVoice(summarizedContent)
-		save_result_for_step(request_id, "TTS", voiceBlob)
-	}
+    let voiceBlob = query_result_for_step(request_id, "TTS")
+    if (voiceBlob == undefined) {
+        voiceBlob = textToVoice(summarizedContent)
+        save_result_for_step(request_id, "TTS", voiceBlob)
+    }
 
-	saveResultsToDb(request_id, voiceBlob)
+    saveResultsToDb(request_id, voiceBlob)
 
-	remove_result_for_step(request_id, "crawl")
-	remove_result_for_step(request_id, "LLM")
-	remove_result_for_step(request_id, "TTS")
+    remove_result_for_step(request_id, "crawl")
+    remove_result_for_step(request_id, "LLM")
+    remove_result_for_step(request_id, "TTS")
 
     return
 }
@@ -233,14 +233,14 @@ You can think of it like this (simplified):
 
 ```go
 func (c *Context) contextRun(stepName string, stepFunc func()) any {
-	result, ok := c.state[c.currentStepId]
-	if ok {
-		return result
-	} else {
-		const resultOfStep = stepFunc()
-		submitResultAndScheduleNewRequest(resultOfStep)
-		exit()
-	}
+    result, ok := c.state[c.currentStepId]
+    if ok {
+        return result
+    } else {
+        const resultOfStep = stepFunc()
+        submitResultAndScheduleNewRequest(resultOfStep)
+        exit()
+    }
 }
 ```
 
