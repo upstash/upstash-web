@@ -1,0 +1,431 @@
+---
+slug: workflow-orchestration
+title: "Building Highly Reliable Serverless Apps"
+authors:
+  - mehmettokgoz
+tags: [workflow, qstash, messaging, serverless]
+draft: true
+---
+
+In this post, we'll learn how to build serverless APIs that are reliable by default.
+
+As you scale your app and your backend grows in complexity, a lot can go wrong (especially in serverless 💀). Getting rate-limited by an AI provider, functions timing out, slow or unreliable third-party responses, and more.
+
+**Workflow orchestration** is a model that helps you handle these issues gracefully by turning complex logic into a series of reliable, isolated steps. 
+
+Using Upstash Workflow as an example, we'll learn how to implement
+
+- automatic retries
+- automatic failure handling
+- executing logic in parallel (for performance)
+- pausing API execution for hours or even days
+- waiting for async events
+
+...in your serverless APIs. All using your own infrastructure and code. The goal is to give you a practical mental model for building a robust serverless app.
+
+If I do my job well, you'll walk away with a few solid “aha” moments you can use to make your next serverless app far more reliable.
+
+---
+
+## The problem
+
+Before we look at the benefits of workflow orchestration and how you can use them for your own app, let's talk about what's wrong with standard HTTP-based apps.
+
+Let's look at one of our own projects ([Radio Hacker News](https://radio-hackernews-web.vercel.app)) as a real example. It's built with workflow orchestration and does the following:
+
+- Retrieves the top articles from Hacker News
+- Summarizes them into podcast content using an LLM service
+- Converts that content into audio via a text-to-speech API
+
+Here's what that might look like as pseudocode in a Next.js endpoint:
+
+```javascript
+import {
+	crawl,
+	summarizeWebpage,
+	textToVoice,
+	saveResultsToDb
+} from "@/app/util";
+
+export async function GET(request: Request) {
+	const requestPayload = await request.json()
+	const websiteUrl = data.websiteUrl;
+
+	const data = crawl(websiteUrl)
+	const summarizedContent = summarizeWebpage(data)
+	const voiceBlob = textToVoice(summarizedContent)
+	saveResultsToDb(websiteUrl, voiceBlob)
+
+	return
+}
+```
+
+Looks doable, right? But once we start building this, we'll run into some problems:
+
+- APIs might return unexpected results or fail
+- Our requests might be rate-limited
+- Some steps take a long time to complete
+- The whole system is potentially expensive
+
+And here's what that means in practice:
+
+- If **any step fails**, the whole request fails
+- Slow steps can time out, especially on serverless platforms
+- It's hard to manage rate-limits or parallelism. For example if our text-to-speech provider only allows 5 concurrent jobs
+- There's no monitoring unless we add it ourselves
+
+So what can we do?
+
+---
+
+## Two Common Workarounds (and Why They Suck 💀)
+
+### 1. Split Steps Across Endpoints
+
+This is a classic approach: break each step into its own endpoint and communicate asynchronously between them.
+
+You might think, _“I'll just use Kafka for that.”_ And yeah, Kafka lets services talk to each other. But it's not made for serverless. It needs always-on consumers and a decent amount of setup. (If you're a long-time Upstash user, you may remember our serverless Kafka. We eventually retired it because it didn't fit modern serverless workflows.)
+
+That's why we built **QStash**, a better alternative for async messaging in serverless apps. It's HTTP-based, pay-as-you-go, and offers features like retries and callbacks. But at the end of the day, QStash is still fairly low-level. _You_ still have to wire together the flow and manage state manually.
+
+---
+
+### Build Retry-Friendly Endpoints
+
+This second option starts to resemble what workflow orchestration does.
+
+Let's say we don't want to split our logic across multiple endpoints, and we don't want to manage async queues. Instead, we keep the logic in one endpoint and make it stateful.
+
+Each step stores its result server-side. That way, when something fails, we can retry the whole request and skip steps that already succeeded.
+
+Think of it like this: our request hits the LLM service, succeeds, stores the result, then fails on the text-to-speech step. Instead of re-calling the LLM and consuming more tokens, we just resume from where it left off.
+
+We can build this retry-aware model manually:
+
+```javascript
+import {
+	crawl,
+	summarizeWebpage,
+	textToVoice,
+	saveResultsToDb,
+} from "@/app/util";
+
+export async function GET(request: Request) {
+	const requestPayload = await request.json()
+	const websiteUrl = data.websiteUrl;
+	const requestId = data.requestId
+
+	let data = query_result_for_step(request_id, "crawl")
+	if (data == undefined) {
+		data = crawl(websiteUrl)
+		save_result_for_step(request_id, "crawl", data)
+	}
+
+	let summarizedContent = query_result_for_step(request_id, "LLM")
+	if (summarizedContent == undefined) {
+		summarizedContent = summarizeWebpage(data)
+		save_result_for_step(request_id, "LLM", summarizedContent)
+	}
+
+	let voiceBlob = query_result_for_step(request_id, "TTS")
+	if (voiceBlob == undefined) {
+		voiceBlob = textToVoice(summarizedContent)
+		save_result_for_step(request_id, "TTS", voiceBlob)
+	}
+
+	saveResultsToDb(request_id, voiceBlob)
+
+	remove_result_for_step(request_id, "crawl")
+	remove_result_for_step(request_id, "LLM")
+	remove_result_for_step(request_id, "TTS")
+
+    return
+}
+```
+
+In this version, if an error occurs, we can manually restart the endpoint with the same `request_id`, and it will skip any steps that have already completed. But even with this setup, we have to build the failure recovery system and monitoring layer ourselves.
+
+Also, we lack many other benefits of workflow orchestration like long sleep periods and waiting for external events.
+
+**This is where Upstash Workflow comes in** 🦹‍♂️ - we handle all this orchestration logic for you.
+
+---
+
+## Building Seriously Reliable Applications
+
+Upstash Workflow allows us to write multi-step applications in a **simple and serverless-friendly** way and handles:
+
+- API failures or temporary outages
+- Serverless timeouts
+- Rate limits
+- Step-by-step progress
+
+In the previous section, I already hinted at how this kind of system works. We need two things:
+
+- **Separate async execution for each step**
+- **Persistent state to store and reuse step results**
+
+That's exactly what **Upstash Workflow** gives you. You write your workflow as a single endpoint, using the context functions we provide. Here's what that looks like:
+
+```javascript
+import {
+  crawl,
+  saveResultsToDb,
+  summarizeWebpage,
+  textToVoice,
+} from "@/app/util";
+
+export const { POST } = serve(async (workflow) => {
+  const requestPayload = workflow.requestPayload;
+  const websiteUrl = requestPayload.websiteUrl;
+
+  const data = await workflow.run("crawl-webpage", () => {
+    return crawl(websiteUrl);
+  });
+
+  const summarizedContent = await workflow.run("summarize", () => {
+    return summarizeWebpage(data);
+  });
+
+  const voiceBlob = await workflow.run("text-to-voice", () => {
+    return textToVoice(summarizedContent);
+  });
+
+  await workflow.run("save-to-db", () => {
+    saveResultsToDb(websiteUrl, voiceBlob);
+  });
+});
+```
+
+Let's break down how this works under the hood:
+
+---
+
+### Trigger
+
+When you trigger a workflow, you're not directly running your logic. You're just telling Upstash: “Here's my request payload. Start this workflow run.”
+
+The trigger request returns instantly with a `runId`, and Upstash takes it from there. It saves the payload and begins executing your workflow asynchronously (and step by step) by making HTTP calls to your app.
+
+![First Step Execution](/blog/workflow-orchestration/first-step-execution.png)
+
+Each of these HTTP requests includes the workflow state:
+
+- The original request payload
+- Which steps have already completed
+- The result of each step
+
+> 💡 That's how we know exactly what to skip or run.
+
+---
+
+### **Sequential steps**
+
+Upstash calls your API for each step, and your workflow logic starts executing from the top.
+
+When you use `workflow.run("step-name", fn)`, the workflow engine checks the state to see if that step has already been run.
+
+- Step already done? We just return the result from workflow state.
+- Step not done yet? We run the step function, save the result, and stop right there.
+
+The rest of your route doesn't run. A new HTTP request will be scheduled to pick up the next step.
+
+You can think of it like this (simplified):
+
+```go
+func (c *Context) contextRun(stepName string, stepFunc func()) any {
+	result, ok := c.state[c.currentStepId]
+	if ok {
+		return result
+	} else {
+		const resultOfStep = stepFunc()
+		submitResultAndScheduleNewRequest(resultOfStep)
+		exit()
+	}
+}
+```
+
+This repeats for every step:
+
+- Run a step
+- Return result to Upstash
+- Upstash saves it
+- Then it calls your app again with updated workflow state to handle the next step
+
+> 💡 Each step in your workflow is executed via its _own_ HTTP request.
+
+![Executing Next Step](/blog/workflow-orchestration/second-step.png)
+
+Because your API route is re-run on every step (from the top), anything _outside_ of context functions will get executed every time, even if it's unrelated to the current step.
+
+Avoid putting non-deterministic logic (like Math.random() or API calls) outside of step wrappers. They'd run over and over.
+
+Instead, stick to this pattern:
+
+```typescript
+export const { POST } = serve(async (context) => {
+  const data = await context.run("step-1", async () => {
+    // safe: only runs once
+  });
+
+  const result = await context.run("step-2", async () => {
+    // safe: only runs once
+  });
+
+  // avoid putting side effects here
+});
+```
+
+If a step throws an error, Upstash doesn't just crash. It:
+
+1. Records the failure
+2. Automatically retries (based on your config)
+3. Re-sends the same HTTP request with the same state
+
+No data is lost and already-completed steps are skipped. Only the failed step runs again. If all retries are exhausted and you've defined a failure function, Upstash will call that so you can gracefully run custom error handling logic.
+
+> 💡 You don't need to build retry logic. It's built-in and fully customizable.
+
+![Retry Process](/blog/workflow-orchestration/retry.png)
+
+To zoom out, workflow orchestration:
+
+- Keeps track of state
+- Breaks your logic into separate HTTP calls
+- Skips completed steps for each request
+- Retries failed ones
+- Continues until the whole workflow finishes
+
+---
+
+### Parallel steps
+
+Parallel execution is one of the things that makes modern computers powerful. We can use multiple threads to do multiple things concurrently for better performance.
+
+But in serverless? That kind of OS-level concurrency isn't really a thing. We're not managing threads; we're just responding to HTTP requests, one at a time.
+
+That's where workflows come in. We can simulate real parallelism: not at the OS level, but at the orchestration level.
+
+Here's how it works with Upstash Workflow:
+
+If we run multiple workflow functions **without** awaiting them sequentially (like inside a `Promise.all()`), our orchestration engine notices. It sees: _“Hey, these steps are all unfulfilled and independent. Let's fan them out.”_
+
+![Parallel Steps Plan](/blog/workflow-orchestration/parallel-request.png)
+
+Upstash sees that these steps need to run, and then schedules one HTTP requests per step to your app. Each request shows up with the right context and executes just that one step. When all of them finish, Upstash picks up the next sequential step in the workflow.
+
+![Parallel Steps Execution](/blog/workflow-orchestration/parallel-execution.png)
+
+---
+
+### Sleep
+
+Sleeping is one of the most low-level things you can do in a program. It basically tells the system, "pause everything right here, and wake me up later". The OS handles it by moving your thread from active to a sleeping state, holding onto all its memory and execution context until the time is up.
+
+That works great on systems with dedicated resources. But in web apps? Especially serverless or user-facing HTTP endpoints?
+
+You can't just `sleep(10000)` in an API handler and expect it to behave. You'll hit timeouts, burn resources, and potentially lock up the process. In some environments, it's not even possible because you're not allowed to hold the connection open that long.
+
+That's why traditional sleep doesn't fit modern serverless patterns. Unless we have something like workflow orchestration to simulate it properly. With workflow orchestartion, we can pause the execution using:
+
+```javascript
+await workflow.sleep("pause-for-a-day", 86400);
+```
+
+This exits your app. The next step is delayed for the specified duration.
+
+Here's how it works:
+
+- When the sleep step runs, it sends metadata (sleep ID + duration) to Upstash
+- The Workflow engine schedules a new HTTP request for the next step, but delays it in its priority queue
+- Your API is completely unused in the meantime (e.g. you're not being charged)
+
+![Sleep](/blog/workflow-orchestration/sleep.png)
+
+Because it's just a timestamped entry on disk, the cost is practically zero. You could sleep for a minute or two weeks, it doesn't matter.
+
+When the time comes, which means the priority of the entry in the priority queue got high, a new HTTP request will be sent to execute the next step after the sleep.
+
+> 💡 Using this pattern, we can `sleep` in serverless environments without paying for idle compute.
+
+---
+
+### Waiting for an event
+
+Waiting for an external signal is another low-level trick computers have been doing forever. Usually, it's something like a semaphore (a little counter you increase or decrease to block or resume execution).
+
+Super useful. But also not something that works out of the box in serverless environments.
+
+You can't exactly block an HTTP function and say, _“Hold on, I'll continue this later when a user clicks a button.”_
+
+That's where `workflow.waitForEvent()` in Upstash Workflow comes in.
+
+When your workflow hits a `waitForEvent` step, it exits but tells Upstash: _“Pause here and wait for event XYZ.”_
+
+No new request is scheduled. Instead, we store a little waiter object tied to the workflow state, just sitting there doing nothing.
+
+Later, when you call `notify()` from an external system (like a user action, webhook, whatever), Upstash checks: _“Is anyone waiting on this?”_ If yes, it spins up the next HTTP call to resume the workflow from where it left off.
+
+![Sleep](/blog/workflow-orchestration/wait.png)
+
+Like sleep, the cost is nearly zero. Just some disk storage to remember the paused state.
+
+---
+
+### External calls
+
+We all execute fetch requests inside our applications. That means your app is sitting there, connection open, using up memory and I/O while it waits for the response.
+
+That's fine for quick calls. But if the external API is slow (or worse, unreliable - for example with temporary outages) you're paying for compute just to sit around and wait.
+
+Upstash Workflow handles this smarter with `workflow.call()`.
+
+Instead of making the call yourself, you hand it off. Your app tells Upstash: _“Hey, go hit this endpoint for me and come back when you've got something.”_
+
+Then your app exits completely. No server running. No I/O. No memory used. Nothing billed.
+
+Upstash takes care of the outbound call. Once it gets the response, it stores it in the workflow state and then triggers the next step by making a new HTTP request to your app, now with the external call's result.
+
+It's like outsourcing the waiting part. Your app just declares what to do, and Upstash handles the waiting and retrying.
+
+> 💡 Especially great for slow external APIs so you're not paying compute to wait.
+
+---
+
+## FAQ
+
+_**Q: If you store the result of every step, doesn't that get expensive for you?**_
+
+A: Yeah... kind of. But we cap each workflow run at 100MB of state. That's more than enough for 99% of use cases, and it protects us (and you) from someone going wild and stuffing an entire movie script into state.
+
+_**Q: How do I know you'll actually call my endpoint? Can the request gets lost?**_
+
+A: Under the hood, Upstash Workflow use the same engine we built for reliable serverless messaging. It guarantees at-least-once delivery, and has been tested under extremely high load. It's infra we already run at scale.
+
+_**Q: How do you scale Upstash Workflow?**_
+
+**A:** Our workflow engine is fully distributed. If you need more throughput, we just spin up more nodes. It's built to scale horizontally in seconds.
+
+_**Q: Is this only useful for serverless apps?**_
+
+**A:** No! It works great for serverless, but honestly the benefits apply to normal apps too. You get cleaner code, less error-handling, and fewer moving parts regardless.
+
+---
+
+## TL;DR
+
+Workflow orchestration lets you:
+
+- Write multi-step flows in a single endpoint
+- Run each step in isolation
+- Retry failures automatically
+- Pause execution without using compute
+- React to external events
+- Flow control the step execution rate and parallelism
+- Monitor the progress with a built-in logging dashboard
+
+All you do is define your steps and we handle the rest.
+
+If you're building complex flows or deal with unreliable APIs (like AI APIs) give Upstash Workflow a try!
+
+We'd love to hear your feedback!
