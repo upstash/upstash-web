@@ -1,29 +1,28 @@
 ---
 slug: workflow-orchestration
-title: "Building Highly Reliable Serverless Apps"
+title: "How Serverless Workflows Actually Work?"
 authors:
   - mehmettokgoz
 tags: [workflow, qstash, messaging, serverless]
 draft: true
 ---
 
-In this post, we'll learn how to build serverless APIs that are reliable by default.
+In this post, we’ll take a look under the hood at how Upstash Workflow works — enabling you to build serverless APIs that are reliable by default.
 
 As you scale your app and your backend grows in complexity, a lot can go wrong (especially in serverless 💀). Getting rate-limited by an AI provider, functions timing out, slow or unreliable third-party responses, and more.
 
 **Workflow orchestration** is a model that helps you handle these issues gracefully by turning complex logic into a series of reliable, isolated steps. 
 
-Using Upstash Workflow as an example, we'll learn how to implement
-
+Using Upstash Workflow as our example, we’ll explore how features like:
 - automatic retries
 - automatic failure handling
 - executing logic in parallel (for performance)
 - pausing API execution for hours or even days
 - waiting for async events
 
-...in your serverless APIs. All using your own infrastructure and code. The goal is to give you a practical mental model for building a robust serverless app.
+are handled seamlessly under the hood.
 
-If I do my job well, you'll walk away with a few solid “aha” moments you can use to make your next serverless app far more reliable.
+While there are different orchestration patterns, this post will focus on how Upstash approaches the problem — where your code runs within your infrastructure, and we take care of the orchestration layer that ties everything together.
 
 ---
 
@@ -400,7 +399,7 @@ A: Yeah... kind of. But we cap each workflow run at 100MB of state. That's more 
 
 _**Q: How do I know you'll actually call my endpoint? Can the request gets lost?**_
 
-A: Under the hood, Upstash Workflow use the same engine we built for reliable serverless messaging. It guarantees at-least-once delivery, and has been tested under extremely high load. It's infra we already run at scale.
+A: Under the hood, Upstash Workflow use the same engine we built for reliable serverless messaging, QStash. It guarantees at-least-once delivery, and has been tested under extremely high load. It's infra we already run at scale.
 
 _**Q: How do you scale Upstash Workflow?**_
 
