@@ -227,44 +227,7 @@ export default function CompareTable({
             <CompareValue type="number">10000</CompareValue>
           </Col>
           <Col plan={showPayg} feature>
-            <CompareValue
-              type="number"
-              after={
-                <Tooltip
-                  content={
-                    <>
-                      <h4 className="font-semibold">Custom Limit Pricing</h4>
-                      <table className="mini-table mt-2">
-                        <thead>
-                          <tr>
-                            <th>Limit</th>
-                            <th>Price</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td>2000</td>
-                            <td>$150</td>
-                          </tr>
-                          <tr>
-                            <td>5000</td>
-                            <td>$200</td>
-                          </tr>
-                          <tr>
-                            <td>10000</td>
-                            <td>$300</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </>
-                  }
-                >
-                  <IconCoin className="ml-1" stroke={1.5} size={24} />
-                </Tooltip>
-              }
-            >
-              10000
-            </CompareValue>
+            <CompareValue type="number">10000</CompareValue>
           </Col>
           <Col plan={showFixed}>
             {selectedFixed250MB && (
