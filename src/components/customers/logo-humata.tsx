@@ -6,14 +6,14 @@ export const LogoHumata = (props: React.SVGProps<SVGSVGElement>) => (
     {...props}
   >
     <path
-      fill-rule="evenodd"
-      clip-rule="evenodd"
+      fillRule="evenodd"
+      clipRule="evenodd"
       d="M8.29616 10.5263C7.83107 10.5263 7.45405 10.9033 7.45405 11.3684V20.6316C7.45405 21.0967 7.83107 21.4737 8.29616 21.4737H11.2435V24H8.29616C6.43583 24 4.92773 22.4919 4.92773 20.6316V11.3684C4.92773 9.50809 6.43583 8 8.29616 8H11.2435V10.5263H8.29616Z"
       fill="currentColor"
     ></path>
     <path
-      fill-rule="evenodd"
-      clip-rule="evenodd"
+      fillRule="evenodd"
+      clipRule="evenodd"
       d="M25.1384 21.4737C25.6035 21.4737 25.9805 21.0967 25.9805 20.6316V11.3684C25.9805 10.9033 25.6035 10.5263 25.1384 10.5263H22.191V8H25.1384C26.9987 8 28.5068 9.50809 28.5068 11.3684V20.6316C28.5068 22.4919 26.9987 24 25.1384 24H22.191V21.4737H25.1384Z"
       fill="currentColor"
     ></path>
