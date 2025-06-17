@@ -6,6 +6,9 @@ module.exports = {
   content: ["./src/**/*.{ts,tsx}", "./post/**/*.mdx", "./public/**/*.svg"],
   theme: {
     extend: {
+      screens: {
+        xs: "420px",
+      },
       colors: {
         bg: "var(--color-bg)",
         "bg-mute": "var(--color-bg-mute)",

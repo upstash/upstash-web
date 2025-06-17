@@ -47,7 +47,7 @@ const HeroProductTagline = ({ activeProduct }: { activeProduct: Product }) => {
       <h2 className="text-2xl font-medium text-emerald-800 dark:text-text">
         {title}
       </h2>
-      <div className="flex justify-center gap-3">
+      <div className="flex flex-col justify-center gap-3 sm:flex-row">
         <a href={docsLink} target="_blank">
           <Button variant={"defaultDark"} className="h-[42px] px-5">
             Documentation
@@ -81,7 +81,7 @@ export default function HomeProductNew() {
   return (
     <section className="relative z-10 sm:mt-4">
       <Container>
-        <div className="flex items-end justify-center md:gap-2">
+        <div className="md:text-ba flex items-end justify-center md:gap-1 lg:gap-2">
           <HomeHeroProducts
             activeProduct={activeProduct}
             setActiveProduct={setActiveProduct}
