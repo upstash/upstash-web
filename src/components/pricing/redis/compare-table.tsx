@@ -226,7 +226,7 @@ export default function CompareTable({
           <Col plan={showFree}>
             <CompareValue type="number">10000</CompareValue>
           </Col>
-          <Col plan={showPayg}>
+          <Col plan={showPayg} feature>
             <CompareValue type="number">10000</CompareValue>
           </Col>
           <Col plan={showFixed}>
