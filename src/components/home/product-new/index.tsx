@@ -47,7 +47,7 @@ const HeroProductTagline = ({ activeProduct }: { activeProduct: Product }) => {
       <h2 className="text-2xl font-medium text-emerald-800 dark:text-text">
         {title}
       </h2>
-      <div className="flex flex-col justify-center gap-3 sm:flex-row">
+      <div className="xs:flex-row flex flex-col justify-center gap-3">
         <a href={docsLink} target="_blank">
           <Button variant={"defaultDark"} className="h-[42px] px-5">
             Documentation
