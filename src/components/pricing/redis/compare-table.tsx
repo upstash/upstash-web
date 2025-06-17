@@ -289,10 +289,6 @@ export default function CompareTable({
                         </thead>
                         <tbody>
                           <tr>
-                            <td>10MB</td>
-                            <td>$50</td>
-                          </tr>
-                          <tr>
                             <td>50MB</td>
                             <td>$80</td>
                           </tr>
