@@ -5,7 +5,7 @@ export const LogoZapier = (props: React.SVGProps<SVGSVGElement>) => (
     xmlns="http://www.w3.org/2000/svg"
     {...props}
   >
-    <g clip-path="url(#clip0_11_69)">
+    <g clipPath="url(#clip0_11_69)">
       <path
         d="M25.0038 19.1865L24.9893 19.1404L34.1765 10.7297V6.67719H19.4372V10.7297H28.241L28.2555 10.7685L19.1581 19.1865V23.2389H34.3245V19.1865H25.0038Z"
         fill="currentColor"
