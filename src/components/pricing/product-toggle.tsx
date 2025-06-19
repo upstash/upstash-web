@@ -23,7 +23,7 @@ type Product = keyof typeof productConfig;
 export default function ProductToggle({ product }: { product: Product }) {
   return (
     <div className="flex items-center justify-center">
-      <div className="flex gap-0 rounded-xl border-2 border-bg-mute p-1 sm:gap-3">
+      <div className="flex flex-wrap justify-center gap-0 rounded-xl border-2 border-bg-mute p-1 sm:gap-3 md:flex-nowrap">
         {(Object.keys(productConfig) as Product[]).map((key) => {
           const isActive = product === key;
           const { name, Icon } = productConfig[key];
