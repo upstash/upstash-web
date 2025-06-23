@@ -1,0 +1,164 @@
+---
+title: Building a seriously reliable serverless API
+slug: build-reliable-serverless-api
+authors: [josh]
+tags: [qstash]
+---
+
+## Building a robust API with QStash
+
+A few days ago, the internet broke. GCP, AWS, Cloudflare, nearly every major cloud provider had downtime:
+
+<Frame>
+  <img src="/blog/qstash-retry/outage.png" />
+</Frame>
+
+Most web apps (ofc mine included) rely on third-party APIs like OpenAI, an email service, or payment processor, to work properly. When _they_ go down, so does our app.
+
+Common third-party APIs I rely on:
+
+- Sending emails (order confirmations, password resets, onboarding sequences)
+- Syncing data on a schedule (nightly exports, analytics pipelines)
+- Sending scheduled or delayed notifications (reminders, digest emails, scheduled posts)
+- Integrating with APIs that are unreliable or rate-limited (AI, gov APIs, niche SaaS tools)
+
+What happens when one of those APIs has a temporary outage? Maybe it's down for a few minutes, or it's just slow to respond because of overload. This happens pretty often (especially with certain AI providers that I'll avoid naming here 🤡), and it can cause users to think our apps are broken.
+
+**Important disclaimer: The quick tip I'll show you in this article won't stop an outage.**
+
+But it will make sure every failed request gets queued and retried automatically so our apps recover without losing any data. **As if nothing ever happened.**
+
+Upstash QStash is a simple way to send your API requests so they automatically retry if they fail. It's a lightweight layer that wraps your API calls and retries them for you.
+
+<Frame>
+  <img src="/blog/qstash-retry/qstash-benefits.png" />
+</Frame>
+
+Let's look at how QStash makes our API a lot more robust.
+
+---
+
+## What is QStash?
+
+QStash is a serverless message queue with built-in retry mechanisms:
+
+- Automatic retry with exponential backoff
+- Dead letter queue for failed jobs
+- No infrastructure to manage
+- Works with any HTTP endpoint
+
+And if multiple retries (even with exponential backoff) fail, they are added to a separate DLQ (Dead Letter Queue) where you can view all failed jobs and replay them manually:
+
+<Frame>
+  <img src="/blog/qstash-retry/dashboard-dlq.png" />
+</Frame>
+
+---
+
+## Usage
+
+Going from regular fetch calls -> automatically retried requests with a Dead Letter Queue could not be easier.
+
+Instead of fetch:
+
+```typescript title="route.ts"
+try {
+  await fetch("https://api.my-service.com/v1/send-order-confirmation-email", {
+    method: "POST",
+    body: JSON.stringify({
+      to: customer.email,
+      template: "order-confirmation",
+      orderId: order.id,
+    }),
+  });
+} catch (error) {
+  // data is lost
+  // or we can build a retry mechanism ourselves
+}
+```
+
+We use QStash in an almost fetch-compatible API:
+
+```typescript title="route.ts"
+import { Client } from "@upstash/qstash";
+
+const qstash = new Client({ token: "..." });
+
+await qstash.publishJSON({
+  url: "https://api.my-service.com/v1/send-order-confirmation-email",
+  body: {
+    to: customer.email,
+    template: "order-confirmation",
+    orderId: order.id,
+  },
+  // 👇 automatically retried on failure, defaults to 3
+  retries: 5,
+});
+```
+
+And we get full observability and monitoring out of the box:
+
+<Frame>
+  <img src="/blog/qstash-retry/dashboard.png" />
+</Frame>
+
+---
+
+## How The Built-In Retry Mechanism Works
+
+When a request fails, QStash doesn't just hammer the API again and again. It uses an "exponential backoff" strategy, waiting a bit longer between each attempt to give the struggling service a chance to recover.
+
+By default, it will try 3 times, but you can easily increase this for critical tasks. QStash also understands HTTP status codes, so it knows whether a failure is temporary and worth retrying, or a permanent error.
+
+And for the rare cases where even repeated retries don't work, the request lands in the Dead Letter Queue (DLQ) to guarantee no data is lost.
+
+You can then check the failed jobs in the QStash dashboard and, once you've fixed the problem (e.g. a bug in your code), republish the messages from the DLQ with a single click.
+
+---
+
+## Real-World Examples
+
+Here are 2 examples I'm using QStash for in production. I've used it for much more complex microservice management, but I'll keep it with these two examples for simplicity.
+
+After initializing QStash once, we can use it across our entire app:
+
+```typescript
+import { Client } from "@upstash/qstash";
+
+const qstash = new Client({ token: "..." });
+```
+
+### Example 1: AI Content Analysis
+
+```typescript title="route.ts"
+// 👇 AI api calls can be slow or just fail (i'll avoid names here 🤡)
+await qstash.publishJSON({
+  url: "https://api.my-service.com/v1/analyze-content",
+  body: {
+    documentId: doc.id,
+    text: doc.body,
+  },
+});
+```
+
+### Example 2: Social Media Scheduling
+
+```typescript title="route.ts"
+// 👇 schedule a social media post (e.g. twitter)
+await qstash.publishJSON({
+  url: "https://api.my-service.com/v1/post-scheduled-tweet",
+  body: {
+    content: post.content,
+    userId: user.id,
+    scheduledTime: post.publishAt,
+  },
+  // 👇 time to post at
+  notBefore: post.publishAt,
+});
+```
+
+You can [get started](https://upstash.com/docs/qstash/overall/getstarted) with QStash in literally minutes.
+
+---
+
+Cheers for reading! If you have any feedback or would like to be a guest author on Upstash, let me know at `josh@upstash.com` 🙌
