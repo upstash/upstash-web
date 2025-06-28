@@ -1,0 +1,194 @@
+---
+title: Quick Apply: Building a Serverless AI Interview Assistant
+slug: build-serverless-ai-interview-assistant
+authors: [akif]
+tags: [redis, vector, ai, llm]
+---
+
+Job interviews are ripe for AI disruption. What if an AI could handle the initial screening conversation with candidates, freeing up human recruiters until it’s time to engage the top prospects? I set out to explore this idea by building **Upstash Quick Apply**, a **serverless**, **LLM-powered** interview assistant. In this post, I’ll share why this problem matters and how I built a solution using **Upstash Redis** and **Upstash Vector** – all while focusing on developer experience and rapid iteration. In short, Upstash Quick Apply is a chatbot that collects job applications through a conversational interface
+It greets the candidate, asks a series of prescreening questions defined by the recruiter, evaluates answers in real-time, and even lets the candidate ask questions about the company. The entire interaction is stored and scored automatically, with minimal human intervention needed. Here’s what this app can do:
+Conversational Q&A flow: Instead of static forms, the candidate experiences a friendly back-and-forth interview. The assistant sequentially asks predefined questions (from a JSON config) and records the answers
+Real-time answer evaluation: As answers come in, the app assigns scores based on keywords or criteria set by the recruiter (configured in job-config.json), tallying up a total score out of 100. This score is included in the final output to the recruiter (via email and a Google Sheet).
+Document-powered responses: If the candidate asks follow-up questions about the company or position, the assistant retrieves relevant info from company documents (which have been indexed in a vector database) and responds factually
+. If it doesn’t know an answer from the docs, it flags the recruiter instead of hallucinating.
+Seamless integrations: After the Q&A, the candidate can upload their CV PDF, which is saved to a Google Drive folder for the recruiter’s review
+. All Q&A data and scores are logged to a Google Sheet and emailed.
+Modern UX: The interface supports light/dark mode and is mobile responsive
+, ensuring a smooth candidate experience.
+With these capabilities, Quick Apply tackles a real pain point: initial screening interviews are time-consuming and repetitive. By automating them, companies can scale their hiring funnel while candidates get instant interactions instead of waiting weeks. From a developer’s perspective, this project is a showcase of how to combine Large Language Models (LLMs) with serverless data services to create a dynamic, production-ready app without managing infrastructure. Next, let’s dive into the motivation and then the technical journey.
+
+##Why Build an AI for Screening Interviews?
+
+As a developer, I’m always looking for processes that can be improved with a bit of automation and creativity. Hiring is one of those processes: recruiting teams often sift through hundreds of applications, asking the same basic questions to each applicant. Why not delegate those repetitive conversations to an AI assistant? This would let human recruiters focus on deeper interviews and personalized interaction with only the most promising candidates. From the candidate’s side, a chat-based application process could be more engaging than filling out yet another form. Candidates can get immediate feedback (e.g. an AI that responds “Great, you have 5 years of experience with Python – that’s a strong match for this role!”) and even ask questions like “What’s the company culture like?” in real time. It transforms the dreaded multi-step form into a conversational experience. The idea also showcases the power of developer experience with serverless tools. I wanted to build this app quickly, iterate on it, and deploy it globally without spinning up or babysitting servers. That goal made my technology choices clear: Upstash Redis for managing stateful chat sessions, Upstash Vector for semantic search on documents, and a hosted LLM (OpenAI’s GPT-4) to drive the conversation. Upstash’s serverless model means I can leverage these databases with zero ops overhead – no clusters to scale or manage. As the Upstash team says, it “takes the power of Redis and makes it serverless,” so you don’t worry about infrastructure or scaling and only pay for what you use
+. In other words, serverless Redis allows me to just focus on building the app
+.
+What is Upstash Quick Apply?
+Upstash Quick Apply is the resulting application – essentially a smart chatbot interviewer deployed as a web app. Here’s a quick rundown of how it works and what technology it uses under the hood:
+Conversation flow: The app uses a chat-style interface to simulate an interview. It begins with a greeting and then asks a series of prescreening questions (customized per job). For example: “Hi! Thanks for your interest in the Software Engineer role. First, could you tell me about your experience with Python?” The sequence and wording of questions are defined by the recruiter in a JSON config file.
+Real-time scoring: As each answer comes in, Quick Apply evaluates it instantly. The evaluation can be as simple as keyword matching (using rules from the config) or as advanced as calling an LLM to rate the answer. In the current version, the recruiter provides point values for ideal answers in the config. For instance, if the question is "Do you have experience with cloud computing?" the config might specify: “if answer contains ‘AWS’ or ‘Azure’, score += 10”. The assistant tallies points as it goes, so by the end of the Q&A it has a total score for the candidate
+.
+LLM-powered assistant: The chatbot itself is powered by OpenAI’s API (you can use GPT-3.5 or GPT-4). It’s not just a script of predetermined questions – it’s an AI assistant. This means the assistant can paraphrase questions, engage in small talk if needed, and crucially, handle unexpected queries from the candidate. For example, if the candidate asks “What are the core values of the company?”, our assistant didn’t have this as a preset question. But it’s prepared: we gave it access to company docs (more on that next), so it can answer such questions based on actual data rather than guesswork.
+Document retrieval with vectors: All relevant documents (company handbook, job description, FAQ, etc.) are indexed in Upstash Vector. Upstash Vector is a serverless vector database for storing high-dimensional embeddings and doing similarity search
+. In practice, I embedded the text of each document (using OpenAI embeddings) and stored those vectors in Upstash Vector. When the candidate asks a question, the app generates an embedding for the query and performs a similarity search in Upstash Vector to fetch the most relevant document snippets. These snippets are then provided to the LLM as context to formulate an accurate answer. This ensures the AI’s answers about the company are grounded in real, up-to-date information and not just made up. If no relevant info is found (similarity score below a threshold), the assistant knows to defer – it might respond with “I’ll pass that question to our team to follow up.” (No hallucinations here!)
+Integration with recruiter tools: At the end of the chat, the assistant asks the candidate to upload their résumé (PDF). The file is saved to a Google Drive folder designated by the recruiter. The Q&A transcript and the candidate’s score are appended to a Google Sheet for easy review. The recruiter also gets an email summary immediately, containing the applicant’s answers and score
+. This ties the AI workflow back into the existing tools that hiring teams use, so nothing falls through the cracks.
+Tech stack and deployment: The app is built with Next.js 13 (React) using the App Router. It’s entirely serverless – leveraging Edge Functions for ultra-low latency where possible. Upstash Redis and Vector handle state and search, and they’re both accessed via REST APIs/SDKs with global endpoints. This means I can deploy the application on Vercel (for example) and have it interact with the nearest Upstash region efficiently. There is no traditional server or database server for me to maintain. All configuration (like Upstash credentials, OpenAI key, etc.) lives in environment variables, making it easy to deploy and scale. The open-source GitHub repository has all the code and setup instructions – check it out here: akifitu/upstash_quick_apply.
+With the overview out of the way, let's break down some of the interesting technical bits, especially how Upstash Redis and Upstash Vector come into play.
+Architecture Overview
+Under the hood, Upstash Quick Apply’s architecture consists of three main pieces working in tandem:
+Front-end – Provides the chat UI and handles user interactions (sending messages, uploading files, toggling dark mode, etc.). The front-end calls backend APIs for any heavy lifting.
+Backend APIs (serverless functions) – This is the “brain” of the assistant. For each new message or action, the front-end calls a backend function (for example, POST /api/chat when the user sends an answer or query). The backend function orchestrates the LLM calls and data fetching. It retrieves the conversation history from Redis, pulls any needed context from Vector, calls the OpenAI API with a constructed prompt, and returns the AI’s reply (which the front-end then displays). There are also backend functions for finalizing the process (saving to Google Sheet, sending email, etc.).
+Upstash databases (Redis & Vector) – These are the global data layers that make the app stateful and intelligent:
+Upstash Redis stores session data, primarily the chat history for each candidate session. It might also store intermediate info like the candidate’s partial score as the interview progresses. We use Redis because of its low-latency reads/writes and its natural ability to handle ephemeral session data (with an optional TTL). In Quick Apply, all conversations are saved to Upstash Redis for session memory
+, allowing the assistant to remember earlier answers when formulating later questions or answers.
+Upstash Vector stores the embeddings of documents provided by the company (and possibly even the embeddings of the user’s answers for advanced analysis, though in this use case we mostly use it for company docs). By querying this vector index, the assistant can do semantic look-ups – e.g. find the paragraph in the employee handbook that best matches “core values” when asked. The vector DB enables contextual retrieval during chats
+.
+Here’s a simplified flow for a typical interaction:
+Initial Greeting: The frontend calls /api/start (for instance) when a user begins. The backend generates a unique session ID and stores an empty conversation log in Redis. It might also pre-load system prompts or any necessary setup.
+Question-Answer Loop: For each question from the assistant or answer from the user, the frontend calls the chat API. The backend will append the new message to the conversation stored in Redis (e.g., using a Redis list or stream). If the message is from the user (candidate), and it’s an answer to a prescreening question, the backend will update the score (according to rules). If the message is a user query (candidate asks something), the backend will perform a vector search on Upstash Vector to gather relevant info, then call the LLM. If the message is from the assistant, it’s usually the next question or a follow-up.
+LLM Prompt Composition: Each time the assistant needs to respond (either asking next question or answering a candidate’s query), the backend composes a prompt for the LLM. This prompt typically includes:
+A summary or inclusion of relevant conversation history (retrieved from Redis) to maintain context.
+Any relevant docs or facts (retrieved from Vector if needed for user queries).
+The next question or answer the assistant should provide (or just let the model continue the conversation).
+We might use a system message to enforce the assistant’s role (e.g. “You are an HR assistant that only provides factual information from the provided documents…” etc.).
+Completion and Handoff: After the final question (or if the user has no more questions), the frontend calls a completion API. The backend then takes the final data (score, answers, chat log), writes to the Google Sheet, sends the email, etc. It may clear the Redis session or mark it completed (possibly keeping it for record-keeping). The candidate is thanked and the session ends.
+Throughout this flow, Upstash Redis and Vector are the persistent backbone. Let’s look more closely at how we use each one.
+Upstash Redis for Chat Memory and State
+Maintaining chat context is crucial for a coherent AI interview. With Upstash Redis, we get a fast, simple way to store and retrieve this context on each turn. Redis is an excellent choice for storing chat histories in LLM applications due to its speed, scalability, and convenient data structures
+. And since Upstash Redis is serverless and cloud-based, it can serve a globally distributed audience with sub-millisecond latency access to the chat data
+. In Quick Apply, I treat each interview session as a Redis key (or set of keys). For example, I might use a Redis list data structure to append messages:
+
+'''typescript
+import { Redis } from "@upstash/redis";
+
+// Initialize a Redis client (Upstash provides global REST endpoints via env vars)
+const redis = Redis.fromEnv();  // uses UPSTASH_REDIS_REST_URL and token from .env
+
+// When a new session starts:
+const sessionId = crypto.randomUUID();
+await redis.rpush(`session:${sessionId}:messages`, JSON.stringify({
+  role: "assistant", content: "Hello! Thanks for applying..." 
+}));
+
+// When the user sends a message (e.g. an answer):
+await redis.rpush(`session:${sessionId}:messages`, JSON.stringify({
+  role: "user", content: userAnswer 
+}));
+
+// Later, to retrieve conversation history for context:
+const history = await redis.lrange(`session:${sessionId}:messages`, 0, -1);
+const messages = history.map(item => JSON.parse(item));  // array of {role, content}
+'''
+In this snippet, each message (assistant or user) is stored as a JSON string in a Redis list. This makes it easy to prepend system messages or slice the history if needed (for example, keeping the last N messages for context to avoid prompt bloat). Upstash Redis handles this storage with no fuss – we didn’t need to set up any servers or worry about memory, yet we get the performance benefits of in-memory Redis. The serverless architecture and pay-as-you-go model of Upstash also mean that if one day we have a spike of 10,000 concurrent interviews, the service will scale automatically and we only pay for the throughput/commands used
+. Another advantage of using Redis here is the TTL (time-to-live) feature. For privacy and cost reasons, we might not want to keep every chat log forever. With Upstash, we can set an expiration on the session key (for example, expire in 30 days or once the position is closed). A single command can ensure the data auto-deletes after a set time. Beyond conversation history, Redis also holds some transient state:
+The current question index (to know which question to ask next).
+The running score total for the candidate.
+Perhaps a flag if the candidate has finished the preset questions and moved to the Q&A phase.
+Storing these in Redis is straightforward using key-value pairs or a hash. For example:
+
+'''typescript
+await redis.hset(`session:${sessionId}:state`, {
+  currentQuestion: 3,
+  score: 20
+});
+'''
+
+Using a Redis hash for state lets us update and fetch multiple fields atomically. Why use Redis at all for state? Couldn’t we just keep this in memory on the server? In a serverless environment (like Vercel functions or Cloudflare Workers), you don’t have a persistent server memory – each invocation could be on a different machine. So you need an external store for anything that persists beyond a single function call. Redis is perfect for this scenario: lightweight, extremely fast, and designed for exactly this kind of ephemeral session state. And using Upstash Redis means it's available globally and scales without any additional work from me, the developer. As one Upstash blog aptly put it: with serverless Redis, “you don’t have to deal with anything, just do your business”
+
+ – and that sums up the developer experience here.
+Upstash Vector for Document Retrieval (No Hallucination Answers)
+The unique selling point of Quick Apply is that it can answer candidate questions with real information. To enable this, we rely on Upstash Vector, which is a managed vector database service. Vector databases are designed for scenarios like semantic search, where you compare the meaning of texts via embeddings. Upstash Vector allowed me to store and query embedding vectors on a serverless model, eliminating the hosting and management complexities
+
+ that usually come with setting up something like FAISS or Pinecone. Indexing the documents: During the setup phase, I took the relevant text documents (such as a PDF containing company FAQs, a job description text, etc.) and generated embeddings for each chunk of text. Upstash Vector can even handle creating embeddings for you if you use their API with certain models, but in my case I used OpenAI’s embedding endpoint for full control. For each document or chunk, I stored an entry in the vector index with:
+The vector embedding (a list of floats).
+Some metadata (e.g., which document it came from, maybe a title or section reference).
+An ID.
+This was done using the Upstash Vector SDK or REST API. For example, using the TypeScript SDK:
+
+'''typescript
+import { Index } from "@upstash/vector";
+
+const vectorIndex = new Index({
+  url: process.env.UPSTASH_VECTOR_REST_URL!, 
+  token: process.env.UPSTASH_VECTOR_REST_TOKEN!
+});
+
+// Assume `documents` is an array of {id: string, embedding: number[], text: string}
+for (const doc of documents) {
+  await vectorIndex.upsert({
+    id: doc.id,
+    vector: doc.embedding,
+    metadata: { text: doc.text.substring(0, 200) }  // store snippet or title
+  });
+}
+'''
+Upstash Vector’s API is simple – you provide your index URL and a token (from the Upstash console when you create the Vector index). Each upsert call writes a vector and optional metadata. Once everything is indexed, the data store is ready to answer similarity queries. Querying for answers: Now, when the candidate asks a question during the interview (and it’s outside the scope of the preset Q&A), I treat it as a query against the knowledge base. For instance, if they ask "What are the growth opportunities in this role?", the backend will:
+Generate an embedding for the question (using the same embedding model used for the index).
+Query Upstash Vector for the top K nearest vectors (I might choose top 3 or 5) with a call like:
+
+'''typescript
+const results = await vectorIndex.query({
+  vector: questionEmbedding,
+  topK: 3,
+  // include vectors not needed for now, just get metadata
+  includeVectors: false,
+  includeMetadata: true
+});
+''' 
+The results will contain the IDs or metadata of the best matches. From those, I can retrieve the stored text snippet (I included some text in metadata for quick use; or I could store an ID and separately have a map of ID->full text).
+Construct the prompt for OpenAI with something like: “The candidate asked: '<question>'. Here are relevant excerpts from our company docs:\n\nExcerpt 1: ...\nExcerpt 2: ... \nBased on these, please answer the candidate’s question.”
+The OpenAI completion will then yield a factual answer that hopefully stays true to the provided context. If the results come back empty or not relevant (e.g., similarity scores below a threshold), I instead have the assistant reply that this question will be forwarded to a human (essentially declining to answer).
+By using Upstash Vector in this way, Quick Apply provides accurate, specific answers and avoids the common pitfall of LLMs making things up. We only answer based on what we know from the indexed data. This is a pattern known as Retrieval-Augmented Generation (RAG), and it’s a popular way to make LLMs more reliable for enterprise use cases. From a developer standpoint, Upstash Vector again saved me a ton of effort. I didn’t have to set up a separate vector database server or service – Upstash handled it. I also benefit from its serverless scalability; if the document set grows to millions of vectors, Upstash Vector’s underlying DiskANN algorithm can handle efficient searches, and I don’t have to change anything in my code
+. The integration was as easy as installing the SDK and calling upsert and query methods as shown above.
+LLM Orchestration and Multi-Step Form Flow
+At the heart of Quick Apply is the LLM (Large Language Model) which drives the conversation. While this is not an Upstash product, it’s worth noting how we integrate it because it ties together the Redis and Vector pieces we discussed. The conversation can be seen as a multi-step form presented through a chat. Each “step” is a question from the assistant and an answer from the user, much like a form page asking for one piece of information. The difference is the dynamic nature: the assistant can respond to the user’s input in a more flexible way (e.g., acknowledge an answer, possibly ask a clarification if needed, etc.). But at a high level, we still have a predetermined sequence of questions to cover. To implement this, the logic (in pseudocode) goes something like:
+
+'''typescript
+// Pseudo-code for the chat logic
+for (let i = 0; i < questions.length; i++) {
+  const question = questions[i];
+  const assistantMsg = await askAssistant(question);  // LLM says the question
+  saveToRedis(sessionId, assistantMsg);
+
+  const userMsg = await waitForUserResponse();  // gets the user's answer input
+  saveToRedis(sessionId, userMsg);
+
+  // Evaluate and score the answer
+  const points = evaluateAnswer(question, userMsg.content);
+  score += points;
+
+  // (Optional) If user answer or message contains a follow-up question from them:
+  if (userMsg.content.includes("?")) {
+    const faqAnswer = await handleUserQuery(userMsg.content);
+    saveToRedis(sessionId, faqAnswer);
+    // The assistant's answer to user query is sent back to user immediately.
+    // Then we continue the loop to the next preset question (if any left).
+  }
+}
+'''
+In this pseudo-code, questions is the list from the JSON config. The function askAssistant(question) would actually use the OpenAI API to generate how the assistant should word the question. (In practice, I could also just use the question text from the config directly, but using the LLM even for asking can make it sound more natural or adjust tone.) evaluateAnswer applies the scoring rules. For example, for a yes/no question, if the answer is “yes” and the config says yes = 5 points, no = 0, then give 5. Or for an open-ended question like "Describe your experience with X", we might have keywords or even use the LLM to rate the answer. One could do something fancy like prompt GPT-4: "Rate the candidate's answer on a scale of 1-5 for the following question..." but that introduces more API calls and cost. In our case, the config approach was sufficient and more deterministic. The handleUserQuery function encapsulates the RAG flow described earlier: vector search and LLM answer. It might return an assistant message either with an answer or a polite deferral. All the while, Upstash Redis is logging each message and Upstash Vector is standing by whenever needed for queries. By the end of the loop, we have gathered all answers and a score. Finally, the summary step runs:
+
+'''typescript
+// After loop, interview is done:
+await finalizeApplication(sessionId, score);
+
+// This function might do:
+function finalizeApplication(sessionId, score) {
+  const chatLog = redis.lrange(`session:${sessionId}:messages`, 0, -1);
+  const answers = extractUserAnswers(chatLog);
+  saveToGoogleSheet(answers, score);
+  sendEmailNotification(answers, score);
+}
+'''
+We send the answers and score to the sheet and via email. (The Google integrations use their respective APIs/SDKs – beyond the scope of this post, but straightforward with service account credentials.) At this point, the candidate may still have the option to ask any last questions (“Do you have any other questions for me?”). The chat UI allows that, and we again leverage the vector search if they do. Once they’re satisfied, the session ends.
+
+## Developer Experience Wins 🏆
+Looking back at building Upstash Quick Apply, a few things stand out from a developer experience perspective:
+Rapid prototyping: Using Upstash and a serverless front-end, I was able to get a working prototype up quickly. I didn’t have to set up databases manually; creating a new Redis database and Vector index in Upstash took just a few clicks, and I immediately had REST endpoints to use. Schema management was minimal (just storing JSON blobs and vectors).
+Scalability without effort: As a solo builder, I worry about scaling only when my app becomes popular. With Upstash, I got out-of-the-box scalability. Redis is known to handle large throughput, and Upstash’s multi-tenant, globally available infrastructure means my app can serve users from New York to London with low latency. If 1000 users try the Quick Apply simultaneously, Upstash will handle the load, and I won’t be paged at midnight to add more servers. This auto-scaling, no-ops model is exactly what you want when exploring new ideas (and even in production)
+.
+Integrated security & simplicity: All communication to Upstash services is done via secure REST calls with tokens. This simplified my backend code – I could call the Upstash endpoints directly from edge functions, without needing a VPC or complex networking. It also means local development was easy (just needed the env vars). The Upstash SDKs (for Redis and Vector) abstracted the HTTP calls, so method calls felt like normal database operations. For example, redis.rpush in my code under the hood does an HTTP POST to the Upstash Redis REST URL – but I don’t have to think about that most of the time.
+Cost efficiency: Upstash’s usage-based pricing is friendly for projects like this. During development and testing (with low traffic), the costs are essentially zero on the free tier. If this were to scale, it would scale cost in line with usage, which is easy to justify. This let me experiment without needing to budget for a Redis VM or a vector DB instance idling 24/7.
+In summary, the combination of a serverless runtime (Next.js on Vercel) with serverless data layers (Upstash Redis/Vector) and a hosted AI service (OpenAI) created a powerful stack where each piece is fully managed. I could focus on the product logic – the flow of the interview – rather than on infrastructure. This is the kind of developer experience that makes building complex apps enjoyable.
+Conclusion
+We started with the question: Why not let AI handle the tedious first round of interviews? With Upstash Quick Apply, I demonstrated that it's not only feasible, but also relatively straightforward given the right tools. By narrating my thought process throughout this build, I hope I highlighted how Upstash Redis and Upstash Vector enabled a seamless developer experience for an LLM-powered application. The result is a conversational, intelligent interview assistant that delivers on the promise of saving time for recruiters and providing instant engagement for candidates. Circling back to the beginning – the problem was the inefficiency and delay in screening applicants. The solution we built addresses it head-on: candidates can “quick apply” through a chat, and recruiters get the distilled results almost immediately. All the heavy lifting (maintaining context, retrieving relevant info, scoring responses) happens behind the scenes with our serverless AI stack. And if you’re a developer eyeing similar use cases, the key takeaway is that services like Upstash can dramatically cut down the complexity of implementing state and search in your AI applications. As a bonus, the entire Upstash Quick Apply project is open source – feel free to check it out, run it, or extend it for your own needs. In the age of LLMs, small projects can punch above their weight. With only a few hundred lines of code, we created an app that converses, evaluates, searches, and integrates with external systems – all powered by cloud services that scale automatically. That’s something worth sharing (I’ll certainly be tweeting about it 😄). Whether you’re an HR tech enthusiast or a developer excited about AI, I hope this story gave you inspiration and practical insights. Now, if you’ll excuse me, I have a meeting with my AI assistant – it’s time to “interview” the next batch of candidates! 🚀
