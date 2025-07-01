@@ -10,12 +10,12 @@ export default function SectionContact() {
         <div className="rounded-4xl bg-bg-mute p-12 md:py-20">
           <PageHeaderTitle as="h2">Get an Enterprise trial.</PageHeaderTitle>
           <PageHeaderDesc className="mt-2">
-            Discover the value of Upstash for your organization. We'll give you
-            a product trial and discuss your requirements.
+            Discover the value of Upstash for your organization. We can discuss your requirements and give you
+            a product trial
           </PageHeaderDesc>
 
           <Button asChild variant="primary" className="mt-6">
-            <a href="https://calendly.com/upstash" target="_blank">
+            <a href="https://cal.com/sertug" target="_blank">
               Book a Meeting
             </a>
           </Button>
