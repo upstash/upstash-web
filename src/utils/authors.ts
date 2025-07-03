@@ -418,4 +418,8 @@ export const authors: Record<
     title: "Software Developer - Guest Author",
     image: "omerfaruq.jpg",
   },
+  akif: {name: "Muhammed Akif Kaya",
+    title: "Software Developer - Guest Author",
+    image: "akif.jpeg",
+   },
 };
