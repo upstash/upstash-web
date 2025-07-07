@@ -308,7 +308,7 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 py-4 text-left font-normal">
-            Max HTTP Connection Timeout
+            Max HTTP Response Duration
           </th>
           {/**/}
           <Col plan={showFree}>
