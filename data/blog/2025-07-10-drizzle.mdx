@@ -121,11 +121,11 @@ When you have a popular table like `users` that's referenced by hundreds of cach
 
 ---
 
-## Solution 1: Lua Scripts for Atomic Operations
+## Solution 1: Lua Scripts
 
 Upstash Redis has full support for Lua script evaluation.
 
-Lua scripts solve the round-trip problem by executing multiple Redis commands atomically on the server side:
+Lua scripts solve the round-trip problem by executing multiple Redis commands on the server side:
 
 ```lua
 -- Invalidation script that combines SUNION and DEL
