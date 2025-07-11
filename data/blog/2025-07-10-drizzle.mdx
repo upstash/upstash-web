@@ -6,13 +6,22 @@ authors:
 tags: [drizzle, redis, caching, hash, lua]
 ---
 
-Modern web applications demand lightning-fast database performance, and traditional SQL databases weren't built for the speed requirements of today's edge computing and serverless environments. Enter intelligent caching: an approach that combines the reliability of SQL with the blazing speed of Redis.
+A while ago, we had the opportunity to collab with Drizzle ORM.
 
-In this deep dive, we'll explore how Upstash Redis & Drizzle caching integration improves SQL performance, and how we used Lua scripts and hash data structure to optimize the integration.
+Seeing how this TypeScript ORM is absolutely loved by the community, our decision to say "yes 😳" was a no-brainer:
+
+<Frame>
+  <img src="/blog/drizzle-orm/people-love-drizzle-orm.png" />
+</Frame>
+
+In this article, we'll see how our Upstash Redis x Drizzle caching integration improves SQL performance, and how we used Lua scripts and hash data structure to optimize the integration.
+
+---
 
 ## The Challenge: SQL Performance in Modern Applications
 
-Traditional SQL databases excel at consistency and complex relationships, but they can struggle with:
+Traditional SQL databases are great at consistency and modeling complex relationships, but they can struggle with:
+
 - **High latency** in distributed environments
 - **Connection pooling limitations** in serverless functions
 - **Repetitive query overhead** for frequently accessed data
@@ -20,39 +29,45 @@ Traditional SQL databases excel at consistency and complex relationships, but th
 
 The solution? A caching layer that understands your data relationships and automatically manages cache invalidation.
 
-## How the Intelligent Caching Works
+---
 
-### The Read Path: Cache-First with Fallback
+## How the Upstash x Drizzle Caching Works
 
-When you execute a query with Drizzle caching enabled, the integration first checks Redis for a cached result:
-  - **Cache Miss**: If not found, the query executes against your database. The result is stored in Redis with metadata about dependent tables
-  - **Cache Hit**: Subsequent identical queries return instantly from Redis without having to hit the database
+### Improving Read Performance: Cache-First with Fallback
+
+When you execute a query with Drizzle caching enabled, our integration first checks Redis for a cached result:
+  - **Cache Miss**: If not found, the query reads from your database. The result is stored in Redis with metadata about dependent tables
+  - **Cache Hit**: Subsequent identical queries return instantly from Redis without having to read from the relational database
 
 ```typescript
-// This query will check Redis first, then hit the database if needed
+// This query checks Redis first and only reads from the database if needed
 const users = await db.select().from(usersTable)
   .where(eq(usersTable.status, 'active'))
   .$withCache();
 ```
 
-### The Write Path: Intelligent Invalidation
+---
 
-The magic happens during write operations. When you modify data, the integration automatically:
+### Smart Invalidation for Write Operations
+
+The magic happens during write operations. When you modify data in your relational database, our integration automatically:
 
 1. **Identifies Dependencies**: Determines which cached queries depend on the modified tables
 2. **Batch Invalidation**: Removes all affected cache entries
 
 ```typescript
-// This insert will automatically invalidate all cached queries that depend on usersTable
+// This insert automatically invalidates all cached queries that depend on usersTable
 await db.insert(usersTable).values({ 
   email: 'new@user.com', 
   status: 'active' 
 });
 ```
 
-## Building a Simple Cache: The Naive Approach
+---
 
-Let's start with the simplest possible implementation to understand the problems we need to solve. When caching a query result, we need to:
+## Building a Simple Cache: The "Naive" Approach
+
+Let's start with the simplest possible implementation to understand the problems our caching integration solves. When caching a query result, we need to:
 
 1. Store the cached value
 2. Track which tables this query depends on for invalidation
@@ -79,9 +94,11 @@ await redis.del(...hashesToInvalidate);
 
 This works by finding all cached items that depend on the modified tables, then deleting them.
 
-## The Problems with the Naive Approach
+---
 
-While functional, this naive implementation has two critical performance issues.
+## The Problems with this "Naive" Approach
+
+While it technically works, this naive implementation has two performance issues.
 
 ### Problem 1: Multiple Round Trips
 
@@ -102,7 +119,11 @@ await redis.del(...hashesToInvalidate);
 
 When you have a popular table like `users` that's referenced by hundreds of cached queries, a single update could trigger the deletion of hundreds of individual Redis keys. With hundreds or thousands of keys, this can potentially become too slow.
 
+---
+
 ## Solution 1: Lua Scripts for Atomic Operations
+
+Upstash Redis has full support for Lua script evaluation.
 
 Lua scripts solve the round-trip problem by executing multiple Redis commands atomically on the server side:
 
@@ -136,6 +157,8 @@ end
 - **Single round trip**: All operations happen server-side
 - **Reduced latency**: No network overhead between operations
 - **Consistency**: No risk of partial updates due to network issues
+
+---
 
 ## Solution 2: Hash-Based Storage for Efficient Deletion
 
@@ -179,6 +202,8 @@ await redis.del('__CT__users,posts');
 
 To see what the Lua scripts look like in the end, you can check the implementation in the [Drizzle repository](https://github.com/drizzle-team/drizzle-orm/blob/ac1dcd9d1c4b8f171479af4a5dd731db1e164f58/drizzle-orm/src/cache/upstash/cache.ts#L1).
 
+---
+
 ## Advanced Techniques: Tags and Auto-Invalidation
 
 ### Cache Tags for Granular Control
@@ -211,9 +236,11 @@ const monthlyStats = await db.select()
 await db.$cache?.invalidate({ tables: ['analyticsTable'] });
 ```
 
+---
+
 ## Real-World Use Cases
 
-Now that we've covered the technical foundations of the integration, let's explore how these concepts translate into practical applications.
+Now that we've covered the technical side of the integration, let's see how these concepts translate into practical applications.
 
 ### E-commerce Product Catalog
 
@@ -246,22 +273,26 @@ const articles = await db.select()
 await db.$cache?.invalidate({ tags: 'published_articles' });
 ```
 
+---
+
 ## Conclusion
 
-The Upstash Redis & Drizzle caching integration delivers significant SQL query optimization resulting lowered query response times, reduced database load, and minimal code changes.
+The Upstash Redis & Drizzle caching integration can drastically improve SQL query performance and reduce database load with (pretty) minimal code changes.
 
-When you enable the feature, you can expect:
+When you enable the cache, you can expect:
 
 - **Dramatically faster** query response times for cached data
 - **Reduced database load** and improved scalability
 
-Upstash Redis's global distribution and serverless-first architecture with pay-as-you-go pricing provide the perfect foundation for modern applications—whether you're building e-commerce platforms, analytics dashboards, or content management systems.
+Upstash Redis's global distribution and serverless-first architecture with pay-as-you-go pricing are a great foundation for modern applications.
 
-Ready to supercharge your database queries? Get started with Upstash Redis and Drizzle today.
+Perfect for e-commerce platforms, analytics dashboards, content management systems and more.
+
+---
 
 ## Further Reading
 
-Want to dive deeper? Here are some essential resources you can check out:
+Want to dive deeper? Here are some great resources I recommend you check out:
 
 - **[Upstash Redis & Drizzle Integration Guide](https://upstash.com/docs/redis/integrations/drizzle)**
 - **[Drizzle Caching Documentation](https://orm.drizzle.team/docs/cache)**
