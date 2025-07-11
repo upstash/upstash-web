@@ -1,0 +1,270 @@
+---
+title: "Caching Drizzle Queries with Upstash Redis"
+slug: drizzle-integration
+authors:
+  - arda
+tags: [drizzle, redis, caching, hash, lua]
+---
+
+Modern web applications demand lightning-fast database performance, and traditional SQL databases weren't built for the speed requirements of today's edge computing and serverless environments. Enter intelligent caching: an approach that combines the reliability of SQL with the blazing speed of Redis.
+
+In this deep dive, we'll explore how Upstash Redis & Drizzle caching integration improves SQL performance, and how we used Lua scripts and hash data structure to optimize the integration.
+
+## The Challenge: SQL Performance in Modern Applications
+
+Traditional SQL databases excel at consistency and complex relationships, but they can struggle with:
+- **High latency** in distributed environments
+- **Connection pooling limitations** in serverless functions
+- **Repetitive query overhead** for frequently accessed data
+- **Scaling bottlenecks** under heavy read loads
+
+The solution? A caching layer that understands your data relationships and automatically manages cache invalidation.
+
+## How the Intelligent Caching Works
+
+### The Read Path: Cache-First with Fallback
+
+When you execute a query with Drizzle caching enabled, the integration first checks Redis for a cached result:
+  - **Cache Miss**: If not found, the query executes against your database. The result is stored in Redis with metadata about dependent tables
+  - **Cache Hit**: Subsequent identical queries return instantly from Redis without having to hit the database
+
+```typescript
+// This query will check Redis first, then hit the database if needed
+const users = await db.select().from(usersTable)
+  .where(eq(usersTable.status, 'active'))
+  .$withCache();
+```
+
+### The Write Path: Intelligent Invalidation
+
+The magic happens during write operations. When you modify data, the integration automatically:
+
+1. **Identifies Dependencies**: Determines which cached queries depend on the modified tables
+2. **Batch Invalidation**: Removes all affected cache entries
+
+```typescript
+// This insert will automatically invalidate all cached queries that depend on usersTable
+await db.insert(usersTable).values({ 
+  email: 'new@user.com', 
+  status: 'active' 
+});
+```
+
+## Building a Simple Cache: The Naive Approach
+
+Let's start with the simplest possible implementation to understand the problems we need to solve. When caching a query result, we need to:
+
+1. Store the cached value
+2. Track which tables this query depends on for invalidation
+
+### Simple Cache Storage
+
+```typescript
+// When adding an item to the cache
+await redis.set(itemHash, cachedValue);
+await Promise.all(
+  dependentTables.map((table) => redis.sadd(table, itemHash))
+);
+```
+
+This approach stores the cached result as a key-value pair and tracks dependencies by adding the item hash to sets named after each dependent table.
+
+### Simple Cache Invalidation
+
+```typescript
+// When invalidating based on table changes
+const hashesToInvalidate = await redis.sunion(dependentTables);
+await redis.del(...hashesToInvalidate);
+```
+
+This works by finding all cached items that depend on the modified tables, then deleting them.
+
+## The Problems with the Naive Approach
+
+While functional, this naive implementation has two critical performance issues.
+
+### Problem 1: Multiple Round Trips
+
+The invalidation process requires **two separate Redis operations**:
+1. First, we call `SUNION` to get the list of keys to delete
+2. Then, we call `DEL` with the result from step 1
+
+This creates a **round-trip dependency** where the second operation must wait for the first to complete.
+
+### Problem 2: Slow Mass Deletion
+
+The `DEL` command can become a bottleneck when invalidating many keys:
+
+```typescript
+// This could potentially delete thousands of keys
+await redis.del(...hashesToInvalidate);
+```
+
+When you have a popular table like `users` that's referenced by hundreds of cached queries, a single update could trigger the deletion of hundreds of individual Redis keys. With hundreds or thousands of keys, this can potentially become too slow.
+
+## Solution 1: Lua Scripts for Atomic Operations
+
+Lua scripts solve the round-trip problem by executing multiple Redis commands atomically on the server side:
+
+```lua
+-- Invalidation script that combines SUNION and DEL
+local tables = KEYS  -- table names passed as keys
+local keysToDelete = {}
+
+if #tables > 0 then
+  -- Get all hashes that depend on these tables
+  local hashesToInvalidate = redis.call('SUNION', unpack(tables))
+  
+  -- Prepare for deletion
+  for _, hash in ipairs(hashesToInvalidate) do
+    keysToDelete[#keysToDelete + 1] = hash
+  end
+  
+  -- Add table sets themselves to deletion list
+  for _, table in ipairs(tables) do
+    keysToDelete[#keysToDelete + 1] = table
+  end
+  
+  -- Single atomic deletion
+  if #keysToDelete > 0 then
+    redis.call('DEL', unpack(keysToDelete))
+  end
+end
+```
+
+**Benefits of Lua scripts:**
+- **Single round trip**: All operations happen server-side
+- **Reduced latency**: No network overhead between operations
+- **Consistency**: No risk of partial updates due to network issues
+
+## Solution 2: Hash-Based Storage for Efficient Deletion
+
+Even with Lua scripts, deleting hundreds of individual keys may be slower than we would like. Redis hashes provide a much more efficient solution:
+
+### The Hash-Based Approach
+
+Instead of storing each cached query as a separate Redis key, we group queries depending on the same tables into hashes:
+
+```typescript
+// Old approach: Each query gets its own key
+await redis.set('query_hash_1', result1);
+await redis.set('query_hash_2', result2);
+await redis.set('query_hash_3', result3);
+
+// New approach: Group queries by table dependencies
+const compositeKey = 'users,posts'; // hash key for users and posts tables
+await redis.hset(compositeKey, {
+  'query_hash_1': result1,
+  'query_hash_2': result2,
+  'query_hash_3': result3
+});
+```
+
+### Why Hashes Are Much Faster
+
+When invalidating queries that depend on the `users` table:
+
+```typescript
+// Old way: Delete many individual keys (slow)
+await redis.del('query_hash_1', 'query_hash_2', /* ...hundreds more... */);
+
+// New way: Delete entire hash table (fast)
+await redis.del('__CT__users,posts');
+```
+
+**Performance advantages:**
+- **Single deletion operation**: One `DEL` command removes hundreds of cached queries
+- **Memory efficiency**: Redis can free entire hash tables in one operation
+- **Atomic cleanup**: All related queries are invalidated together
+
+To see what the Lua scripts look like in the end, you can check the implementation in the [Drizzle repository](https://github.com/drizzle-team/drizzle-orm/blob/ac1dcd9d1c4b8f171479af4a5dd731db1e164f58/drizzle-orm/src/cache/upstash/cache.ts#L1).
+
+## Advanced Techniques: Tags and Auto-Invalidation
+
+### Cache Tags for Granular Control
+
+Beyond table-based invalidation, Drizzle supports custom tags for fine-grained cache control:
+
+```typescript
+// Cache with a custom tag
+const premiumUsers = await db.select().from(usersTable)
+  .where(eq(usersTable.plan, 'premium'))
+  .$withCache({ tag: 'premium_users' });
+
+// Later, invalidate just this specific query
+await db.$cache?.invalidate({ tags: 'premium_users' });
+```
+
+### Auto vs Manual Invalidation
+
+**Automatic Invalidation** (default): Queries are invalidated when dependent tables change, ensuring data consistency but with more aggressive cache clearing.
+
+**Manual Invalidation**: For scenarios where eventual consistency is acceptable, you can disable auto-invalidation and manually control when to clear the cache:
+
+```typescript
+// Won't be automatically invalidated - good for analytics data
+const monthlyStats = await db.select()
+  .from(analyticsTable)
+  .$withCache({ autoInvalidate: false });
+
+// Manually invalidate when needed (e.g., daily batch job)
+await db.$cache?.invalidate({ tables: ['analyticsTable'] });
+```
+
+## Real-World Use Cases
+
+Now that we've covered the technical foundations of the integration, let's explore how these concepts translate into practical applications.
+
+### E-commerce Product Catalog
+
+```typescript
+// Cache product listings with automatic invalidation
+const products = await db.select()
+  .from(productsTable)
+  .where(eq(productsTable.active, true))
+  .$withCache({ tag: 'active_products' });
+
+// When inventory changes, cache is automatically invalidated
+await db.update(productsTable)
+  .set({ stock: newStock })
+  .where(eq(productsTable.id, productId));
+```
+
+### Content Management
+
+```typescript
+// Cache published articles with manual invalidation
+const articles = await db.select()
+  .from(articlesTable)
+  .where(eq(articlesTable.status, 'published'))
+  .$withCache({ 
+    autoInvalidate: false,
+    tag: 'published_articles'
+  });
+
+// Manually invalidate when content is updated
+await db.$cache?.invalidate({ tags: 'published_articles' });
+```
+
+## Conclusion
+
+The Upstash Redis & Drizzle caching integration delivers significant SQL query optimization resulting lowered query response times, reduced database load, and minimal code changes.
+
+When you enable the feature, you can expect:
+
+- **Dramatically faster** query response times for cached data
+- **Reduced database load** and improved scalability
+
+Upstash Redis's global distribution and serverless-first architecture with pay-as-you-go pricing provide the perfect foundation for modern applications—whether you're building e-commerce platforms, analytics dashboards, or content management systems.
+
+Ready to supercharge your database queries? Get started with Upstash Redis and Drizzle today.
+
+## Further Reading
+
+Want to dive deeper? Here are some essential resources you can check out:
+
+- **[Upstash Redis & Drizzle Integration Guide](https://upstash.com/docs/redis/integrations/drizzle)**
+- **[Drizzle Caching Documentation](https://orm.drizzle.team/docs/cache)**
+- **[Getting Started with Upstash Redis](https://upstash.com/docs/redis/overall/getstarted)**
+- **[Upstash Rate Limit SDK (TypeScript)](https://upstash.com/docs/redis/sdks/ratelimit-ts/overview)** - Another powerful SDK that leverages Lua scripts for optimal performance
+- **[Upstash Rate Limit SDK (Python)](https://upstash.com/docs/redis/sdks/ratelimit-py/overview)** - Python implementation of the Rate Limit SDK.
