@@ -219,17 +219,17 @@ export default function CompareTable() {
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="size" suffix="characters">
-              1500
+              4096
             </CompareValue>
           </Col>
           <Col plan={showPayg} feature>
             <CompareValue type="size" suffix="characters">
-              1500
+              4096
             </CompareValue>
           </Col>
           <Col plan={showPro}>
             <CompareValue type="size" suffix="characters">
-              1500
+              4096
             </CompareValue>
           </Col>
         </tr>
