@@ -22,7 +22,7 @@ const ProdPackButton = ({ className }: { className?: string }) => {
         className,
       )}
     >
-      +$200 per database
+      +$200/month per database
     </div>
   );
 };
