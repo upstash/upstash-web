@@ -1,0 +1,197 @@
+---
+title: "Building Smart Autocomplete with Redis Sorted Sets"
+slug: redis-autocomplete-popularity-ranking
+authors: [alitarik]
+tags: [redis, search]
+---
+
+Search and autocomplete are widely used components in modern applications, but most implementations treat all suggestions equally. What if your autocomplete system could learn from user behavior and continuously improve its suggestions? In this deep dive, we'll explore how Redis Sorted Sets can power an intelligent autocomplete system that adapts to user preferences and becomes more accurate over time.
+
+## The Idea of Smart Autocomplete Systems
+
+Traditional autocomplete systems are built on prefix matching but fall short in understanding user intent and behavior patterns. They typically return results in lexicographic order without considering user preferences or popularity.
+
+Our enhanced approach introduces **behavioral learning** into the autocomplete feature. The system tracks which suggestions users actually select and promotes popular choices to the top of future results. This creates a feedback loop where the autocomplete becomes more intuitive and useful as more users interact with it.
+
+## Why This Matters for Search Applications
+
+Consider a movie search application: when users type "int", they might see "Interceptor", "Interstate 60", or "Interstellar" matches. In a traditional system, these would appear alphabetically. However, if users consistently click on "Interstellar", it will naturally become the top suggestion result for autocomplete.
+
+<Frame>
+  <img src="/blog/redis-autocomplete/autocomplete.png" />
+</Frame>
+
+
+This behavioral adaptation is particularly valuable for:
+- **Content discovery platforms** where user preferences vary widely
+- **E-commerce search** where trending products should appear first
+- **Documentation sites** where popular queries indicate common use cases
+- **Any search interface** that serves diverse user needs
+
+## Understanding Redis Sorted Sets for Autocomplete
+
+Before diving into our enhanced algorithm, it's crucial to understand why Redis Sorted Sets are a decent data structure for autocomplete systems. A sorted set combines the unique element properties of a set with the ordering capabilities of a list, where each member has an associated score that determines its position. In our algorithm, we will be using two sorted sets: one for prefix matching and the other is to keep scores. The relation between them will be based on the titles.
+
+### The Foundation: Lexicographic Ordering
+
+Redis Sorted Sets maintain lexicographic (alphabetical) ordering when all members have the same score. This property is fundamental to prefix matching because it allows us to:
+
+1. **Store all prefixes** of searchable terms in a single data structure
+2. **Use ZRANK** to find the starting position of any prefix in O(log N) time
+3. **Leverage ZSCAN** to efficiently retrieve all matches beginning from that position
+
+For example, if we're indexing "INTERSTELLAR", we store these entries in our sorted set:
+- Score: 0, Member: "I"
+- Score: 0, Member: "IN" 
+- Score: 0, Member: "INT"
+- Score: 0, Member: "INTE"
+- Score: 0, Member: "INTER"
+- Score: 0, Member: "INTERSTELLAR$Interstellar" (complete entry with display format)
+
+The `$` delimiter separates the searchable term from the display format, allowing us to maintain case-sensitive display while supporting case-insensitive search.
+
+## The Dual Sorted Set Architecture
+
+Our enhanced system employs **two specialized sorted sets** that work in harmony:
+
+### 1. The Matching Engine: `movies`
+This sorted set contains all prefixes and complete terms, enabling fast prefix lookups. Every searchable term is split into its prefixes, creating a comprehensive index for autocomplete matching.
+
+### 2. The Popularity Tracker: `movie-popularity`  
+This separate sorted set tracks the popularity scores for complete titles. Each time a user selects a suggestion, we increment its score using Redis's `ZINCRBY` operation. This creates a real-time popularity ranking that influences future suggestions.
+
+### The Algorithmic Flow
+
+```mermaid
+graph TD
+    A[User types 'int'] --> B[ZRANK: Find lexicographic position of 'INT']
+    B --> C[ZSCAN: Retrieve matches starting from position (movies set)]
+    C --> D[Filter: Extract complete terms containing '$']
+    D --> E[ZMSCORE: Get popularity scores for all matches (movie-popularity set)]
+    E --> F[Rank: Return highest-scored suggestion]
+    G[User selects suggestion] --> H[ZINCRBY: Increment popularity score]
+    H --> I[Future searches: Higher scored items rank first]
+    I --> A
+```
+
+This creates a continuous learning loop where user behavior directly influences future autocomplete suggestions, making the system more accurate over time.
+
+## The Core Algorithm Implementation
+
+The beauty of this system lies in its simplicity and efficiency. Let's examine the core functions that make the magic happen:
+
+### Step 1: Populating the Redis Sorted Sets
+
+Before your autocomplete system can serve suggestions, you need to populate Redis with all possible prefixes and titles. If you already have an array of titles (for example, from your database or a static list), you can use the following approach:
+
+```typescript
+import { Redis } from '@upstash/redis';
+
+const redis = new Redis({
+  url: process.env.NEXT_PUBLIC_UPSTASH_REDIS_URL!,
+  token: process.env.NEXT_PUBLIC_UPSTASH_REDIS_TOKEN!,
+});
+
+// Example: your list of titles
+const titles = [
+  "Interceptor",
+  "Interstate 60",
+  "Interstellar",
+  // ... more titles
+];
+
+async function populateAutocomplete() {
+  // Insert prefixes and full titles into the 'movies' sorted set
+  for (const title of titles) {
+    let term = title.toUpperCase();
+    let terms = [];
+    for (let i = 1; i < term.length; i++) {
+      terms.push({ score: 0, member: term.substring(0, i) });
+    }
+    terms.push({ score: 0, member: term });
+    terms.push({ score: 0, member: term + "$" + title });
+    await redis.zadd("movies", ...terms);
+  }
+
+  // Insert all titles into the 'movie-popularity' sorted set for popularity tracking
+  await redis.zadd("movie-popularity", ...titles.map(title => ({
+    score: 0,
+    member: title.toUpperCase()
+  })));
+
+}
+
+populateAutocomplete();
+```
+
+**What this does:**
+- Inserts every possible prefix and the full title (with display formatting) into the `movies` sorted set.
+- Initializes the `movie-popularity` sorted set with all titles, ready for popularity tracking.
+
+This setup ensures your autocomplete system is ready to provide suggestions and track popularity from the very first user interaction.
+
+
+### Step 2: Intelligent Query Matching
+
+The heart of our system is the `matchQuery` function, which demonstrates the power of combining multiple Redis operations:
+
+```typescript
+export const matchQuery = async (query: string): Promise<string | null> => {
+  const upperQuery = query.toUpperCase();
+  
+  // Step 1: Find starting position using lexicographic ordering
+  let rank = await redis.zrank("movies", upperQuery);
+  if (rank === null) return null;
+
+  // Step 2: Efficiently scan for matches from that position
+  const scanResult = await redis.zscan("movies", rank, { 
+    match: `${upperQuery}*$*`, 
+    count: 1000 
+  });
+
+  // Step 3: Extract complete entries and get their popularity scores
+  const completeTitles = scanResult[1].filter((el, idx) => 
+    idx % 2 === 0 && el.includes('$')
+  );
+  
+  const baseNames = completeTitles.map(title => title.split("$")[0]);
+  const scores = await redis.zmscore("movie-popularity", baseNames);
+
+  // Step 4: Return the highest-scored (most popular) match
+  const maxScore = Math.max(...scores);
+  const bestMatchIndex = scores.indexOf(maxScore);
+  return completeTitles[bestMatchIndex].split("$")[1];
+};
+```
+
+### Adaptive Popularity
+
+On query submits, we increment the score of the title/query by one so that it goes up in the line for suggestions. The beauty of this approach is its simplicity—there's no complex scoring algorithm or machine learning required. The system naturally learns from collective user behavior.
+
+
+```typescript
+const onSubmit = async (title: string) => {
+  // Handle submit logic here
+  await redis.zincrby("movie-popularity", 1, title.toUpperCase());
+};
+```
+
+## Performance Analysis
+
+The efficiency of this approach becomes apparent when examining the computational complexity:
+
+- **ZRANK**: O(log N) - Logarithmic lookup time
+- **ZSCAN**: O(log N + M) - Where M is the number of returned elements
+- **ZMSCORE**: O(M) - Where M is the number of matched results, not the total dataset size
+- **ZINCRBY**: O(log N) - Atomic increment with logarithmic complexity
+
+This complexity profile ensures that response times remain consistent as your application scales and the performance characteristics remain predictable.
+
+## Conclusion: Building Intelligence Into Infrastructure
+
+If you have reached this far, you now know how to create an intelligent and adaptive autocomplete infrastructure without involving AI. It is fast, and will yield more reliable and more accurate suggestions over time as it trains with the user preferences and selections.
+
+---
+
+*Want to discuss Redis optimization strategies or share your own implementations? Join the conversation on [Discord](https://upstash.com/discord) or connect with the Upstash community.*
+
