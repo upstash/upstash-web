@@ -17,13 +17,12 @@ Dub is an open-source link management tool tailored for the evolving needs of mo
 2. CSS: Tailwind, Radix UI
 3. Auth: NextAuth.js
 4. Deployments & CI/CD: Vercel
-5. Database(s):
-
-- Upstash Redis for lightning fast link retrieval
-- Planetscale for relational SQL storage
-- Tinybird for time-series analytics data
-- Cron jobs: Upstash QStash
-- Payments: Stripe
+5. Payments: Stripe
+6. Cron jobs: Upstash QStash
+7. Database(s):
+    - Upstash Redis for lightning fast link retrieval
+    - Planetscale for relational SQL storage
+    - Tinybird for time-series analytics data
 
 In this stack, Dub's performance is accelerated further with its strategic database selections: Upstash Redis ensures very fast link retrievals (via key-value pairs): https://github.com/dubinc/dub/blob/main/apps/web/lib/upstash.ts.
 On the automation front, Upstash QStash plays the key role managing cron jobs efficiently https://github.com/dubinc/dub/blob/main/apps/web/app/api/cron/import/short/utils.ts#L164.
