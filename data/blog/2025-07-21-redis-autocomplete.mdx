@@ -98,11 +98,11 @@ See how we use `$` to split the search version from the display version? This wa
 
 ## How We Store the Data
 
-We use two special lists in Redis to make our autocomplete work:
+We use two Redis sorted sets to make our autocomplete work:
 
-### 1. Movie Titles List: `movies` 
+### 1. Movie Titles List
 
-Think of this like a dictionary that helps us find movies quickly. When someone types "int", we can instantly find all movies that start with those letters.
+Let's keep track of a sorted set called `movies`. Think of this like a dictionary that helps us find movies quickly. When someone types "int", we can instantly find all movies that start with those letters.
 
 For example, if we have the movie "Interstellar", we store:
 - "i"
@@ -111,11 +111,11 @@ For example, if we have the movie "Interstellar", we store:
 - "inte"
 - And so on...
 
-This makes searching super fast!
+### 2. Popular Movies List
 
-### 2. Popular Movies List: `movie-popularity`
+Let's also keep track of a sorted set called `movie-popularity`. This is our "trending movies" list. 
 
-This is our "trending movies" list. Every time someone clicks on a movie in the search results, that movie gets more popular. The most clicked movies show up first in future searches.
+Every time someone clicks on a movie in the search results, that movie gets more popular by incrementing its score using `ZINCRBY`. The most clicked movies show up first in future searches.
 
 It's like how Netflix shows you trending movies - the more people watch something, the higher it appears in recommendations.
 
