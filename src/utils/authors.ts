@@ -422,4 +422,9 @@ export const authors: Record<
     title: "Software Developer - Guest Author",
     image: "akif.jpeg",
    },
+   alitarik: {
+    name: "Ali Tarık Şahin",
+    title: "Software Engineer @Upstash",
+    image: "alitarik.jpeg",
+  }
 };
