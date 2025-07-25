@@ -5,12 +5,12 @@ authors: [alitarik]
 tags: [redis, search]
 ---
 
-Have you ever noticed how search boxes suggest words as you type? Turns out, most of these suggestions show up in a simple alphabetical order and aren't super helpful. 
+Have you ever noticed how search boxes suggest words as you type? Turns out, most of these suggestions show up in a simple alphabetical order and aren't super helpful.
 
 But what if a search box could get smarter over time?
 
 Learning from what people actually click on and showing the most popular results first?
- 
+
 **This is what we'll build:**
 
 <Frame>
@@ -61,11 +61,13 @@ This smart ranking system works really well for:
 Let's understand why Redis Sorted Sets are great for building an autocomplete system.
 
 A Redis Sorted Set is like a smart list where:
+
 - Each item is unique (like a set)
 - Each item has a score (for ordering)
 - Items can be quickly sorted by their scores
 
 For our autocomplete system, we'll use two sorted sets:
+
 1. One for matching text prefixes (e.g. "int" matches "interstellar")
 2. Another for tracking how popular each suggestion is
 
@@ -104,20 +106,17 @@ We use two Redis sorted sets to make our autocomplete work:
 
 Let's keep track of a sorted set called `movies`. Think of this like a dictionary that helps us find movies quickly. When someone types "int", we can instantly find all movies that start with those letters.
 
-For example, if we have the movie "Interstellar", we store:
-- "i"
-- "in" 
-- "int"
-- "inte"
-- And so on...
+The first occurrence of "int" will be found by `ZRANK` and then starting from that position the full movie names with wild card `INT*$*` will be fetched.
 
 ### 2. Popular Movies List
 
-Let's also keep track of a sorted set called `movie-popularity`. This is our "trending movies" list. 
+Let's also keep track of a sorted set called `movie-popularity`. This is our "trending movies" list.
 
 Every time someone clicks on a movie in the search results, that movie gets more popular by incrementing its score using `ZINCRBY`. The most clicked movies show up first in future searches.
 
 It's like how Netflix shows you trending movies - the more people watch something, the higher it appears in recommendations.
+
+In our case, after finding out the exact matches for `INT*$*`, we go and check their scores at `movie-popularity` to get the most popular ones.
 
 ---
 
@@ -151,8 +150,8 @@ First, we need to add our movie titles to Redis so we can search them later. You
 import { Redis } from "@upstash/redis";
 
 const redis = new Redis({
-  url: process.env.NEXT_PUBLIC_UPSTASH_REDIS_URL!,
-  token: process.env.NEXT_PUBLIC_UPSTASH_REDIS_TOKEN!,
+  url: process.env.UPSTASH_REDIS_URL!,
+  token: process.env.UPSTASH_REDIS_TOKEN!,
 });
 
 // Example: your list of titles
@@ -192,6 +191,7 @@ populateAutocomplete();
 Let's break down what the code above does:
 
 1. For each movie title, we store:
+
    - All possible partial matches (like "INT", "INTE", "INTER" for "Interstellar")
    - The complete title itself
    - A formatted version for display
@@ -239,7 +239,7 @@ export const matchQuery = async (query: string): Promise<string | null> => {
 
 ### Learning from User Choices
 
-When someone selects a movie title, we add 1 point to its score. Movies with more points show up higher in the suggestions list. It's that simple! 
+When someone selects a movie title, we add 1 point to its score. Movies with more points show up higher in the suggestions list. It's that simple!
 
 The system gets smarter over time by keeping track of what people actually choose.
 
@@ -258,18 +258,18 @@ Let's look at how fast this solution is by breaking down the time each operation
 
 - **ZRANK**: O(log N) - Logarithmic lookup time
 - **ZSCAN**: O(log N + M) - Where M is the number of returned elements
-- **ZMSCORE**: O(M) - Where M is the number of matched results, not the total dataset size
+- **ZMSCORE**: O(N) - Where N is the number of matched results, not the total dataset size
 - **ZINCRBY**: O(log N) - Atomic increment with logarithmic complexity
 
-As we add more movie titles, the performance stays consistent. 
+As we add more movie titles, the performance stays consistent.
 
 ---
 
 ## Conclusion: What We Built Together
 
-You've just learned how to build a smart search box that gets better over time without any AI! 
+You've just learned how to build a smart search box that gets better over time without any AI!
 
-Our autocomplete learns from what people choose and uses that information to show better suggestions. 
+Our autocomplete learns from what people choose and uses that information to show better suggestions.
 
 It's fast, simple, and becomes more helpful the more people use it.
 
