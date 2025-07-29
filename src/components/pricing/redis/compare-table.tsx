@@ -720,7 +720,6 @@ export default function CompareTable({
             <CompareValue type="list">
               <span>AWS</span>
               <span>GCP</span>
-              <span>FLY</span>
               <span>Vercel</span>
             </CompareValue>
           </Col>
