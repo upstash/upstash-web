@@ -5,7 +5,6 @@ import { LogoHumata } from "../customers/logo-humata";
 import { LogoMaker } from "../customers/logo-maker";
 import { LogoMarkprompt } from "../customers/logo-markprompt";
 import { LogoNiftykit } from "../customers/logo-niftykit";
-import { LogoPrelude } from "../customers/logo-prelude";
 import { LogoTFashion } from "../customers/logo-tfashion";
 import { LogoZapier } from "../customers/logo-zapier";
 
@@ -16,7 +15,6 @@ const blogLogos = {
   maker: LogoMaker,
   markprompt: LogoMarkprompt,
   niftykit: LogoNiftykit,
-  prelude: LogoPrelude,
   tfashion: LogoTFashion,
   zapier: LogoZapier,
   gail: LogoGail,
