@@ -1,5 +1,6 @@
 import { LogoBranch } from "../customers/logo-branch";
 import { LogoDubsh } from "../customers/logo-dubsh";
+import { LogoGail } from "../customers/logo-gail";
 import { LogoHumata } from "../customers/logo-humata";
 import { LogoMaker } from "../customers/logo-maker";
 import { LogoMarkprompt } from "../customers/logo-markprompt";
@@ -18,6 +19,7 @@ const blogLogos = {
   prelude: LogoPrelude,
   tfashion: LogoTFashion,
   zapier: LogoZapier,
+  gail: LogoGail,
 } as const;
 
 export const getBlogLogo = (name: string) => {
