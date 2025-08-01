@@ -3,12 +3,12 @@ import Container from "@/components/container";
 import { LogoBranch } from "@/components/customers/logo-branch";
 import { LogoDubsh } from "@/components/customers/logo-dubsh";
 import { LogoFly } from "@/components/customers/logo-fly";
+import { LogoGail } from "@/components/customers/logo-gail";
 import { LogoHashnode } from "@/components/customers/logo-hashnode";
 import { LogoHumata } from "@/components/customers/logo-humata";
 import { LogoMaker } from "@/components/customers/logo-maker";
 import { LogoNiftykit } from "@/components/customers/logo-niftykit";
 import { LogoNzxt } from "@/components/customers/logo-nzxt";
-import { LogoPrelude } from "@/components/customers/logo-prelude";
 import { LogoSupabase } from "@/components/customers/logo-supabase";
 import { LogoTFashion } from "@/components/customers/logo-tfashion";
 import { LogoTinybird } from "@/components/customers/logo-tinybird";
@@ -125,8 +125,8 @@ const customers = [
     icon: <LogoHumata height={32} />,
   },
   {
-    name: "Prelude",
-    icon: <LogoPrelude height={24} />,
+    name: "Gail",
+    icon: <LogoGail height={18} />,
   },
   {
     name: "Maker.co",
