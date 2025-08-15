@@ -5,13 +5,13 @@ authors: [alitarik]
 tags: [aisdk, redis, ratelimit, search]
 ---
 
-As you know, AI SDK v5 is out, and together with this new release it already took its place at the top three among the most popular libraries.
+AI SDK v5 is out, and together with this new release it already took its place at the top three among the most popular libraries.
 
-Personally, I am not an AI expert, I only use such models to realize the ideas that comes to my mind time to time. So I don't want to waste time on the hustle of configurations, settings, etc.
+Personally, I am not an AI expert, I only use such models to realize the ideas that come to my mind from time to time. So I don't want to waste time on the hassle of configurations, settings, etc.
 
-That's why the more abstraction they put, the more useful and production-ready tools we have. In this sense, they did a great job standardizing the interaction with the AI models, and with the newest release enhanced the developer experience.
+That's why the more abstraction they put, the more useful and production-ready tools we have. In this sense, they did a great job standardizing the interaction with AI models, and with the newest release enhanced the developer experience.
 
-Speaking of abstractions and developer experience, Upstash products are also quite handy, and focused on hiding the complexity from the developers, providing cool SDKs.
+Speaking of abstractions and developer experience, Upstash products are also quite handy and focused on hiding the complexity from developers, providing cool SDKs.
 
 Here in this blog, we're gonna go through how Upstash products go hand in hand with the AI SDK, and how to make the best out of AI SDK utilizing those:
 
@@ -23,11 +23,11 @@ Let's start!
 
 The simplest win? Stop paying for the same response twice. AI SDK v5 has built-in caching via lifecycle callbacks, and it works perfectly with Upstash Redis.
 
-Working with LLM calls, most of the time, means that you will have some time consuming snippets in your code. This might come to unbearable points depending on the purpose of your application.
+Working with LLM calls, most of the time, means that you will have some time-consuming snippets in your code. This might come to unbearable points depending on the purpose of your application.
 
-At that point, caching comes into play to mitigate the costs of such calls, and with a couple extra lines, Upstash Redis will handle the caching for you, saving you from unnecessary calls when your project scales up.
+At that point, caching comes into play to mitigate the costs of such calls, and with a couple of extra lines, Upstash Redis will handle the caching for you, saving you from unnecessary calls when your project scales up.
 
-Here is an example from [AI SDK docs](https://ai-sdk.dev/docs/advanced/caching#using-lifecycle-callbacks) where you cache a one hour long LLM call:
+Here is an example from [AI SDK docs](https://ai-sdk.dev/docs/advanced/caching#using-lifecycle-callbacks) where you cache a one-hour-long LLM call:
 
 ```ts title="app/api/chat/route.ts"
 import { openai } from "@ai-sdk/openai";
@@ -77,7 +77,7 @@ export async function POST(req: Request) {
 
 Nothing kills an AI app faster than hitting rate limits. Add protection at multiple levels:
 
-Nowadays, rate limiting is a must-do in case your app goes beyond your expectation and gets viral. It is simple to implement and important to manage and have control over your API routes.
+Nowadays, rate limiting is a must-do in case your app goes beyond your expectation and gets viral. It is simple to implement and important to have control over your API routes.
 
 Plus, Upstash Ratelimit has more features than just rate limiting. Here are some examples:
 
@@ -130,9 +130,9 @@ export async function POST(req: NextRequest) {
 
 Grant your LLM models access to any knowledge base you provide.
 
-Providing search component as a tool to models gives you the flexibility to utilize all Upstash Search facilities. Considering the semantic search capability, your LLM model will be able to fetch the most accurate results and will stop hallucinating.
+Providing a search component as a tool to models gives you the flexibility to utilize all Upstash Search facilities. Considering the semantic search capability, your LLM model will be able to fetch the most accurate results and will stop hallucinating.
 
-Here's an example use case where a chatbot learns and remembers:
+Here's an [example use case](https://x.com/cahidarda/status/1954946013141033128) where a chatbot learns and remembers:
 
 ```ts title="app/api/chat/route.ts"
 import { openai } from "@ai-sdk/openai";
@@ -194,9 +194,9 @@ The magic is that the AI decides when to use these tools automatically. User men
 
 ## 4. Serverless, Limitless (Upstash Workflow)
 
-As you all know, serverless platforms like Vercel, Cloudflare or others come with their limitations, like you cannot run a task or a function forever, right? You have to stop somewhere.
+As you all know, serverless platforms like Vercel, Cloudflare, or others come with their limitations—like you cannot run a task or a function forever, right? You have to stop somewhere.
 
-Or do you? Upstash Workflow gives you a workaround on long-running tasks such as these LLM calls. Your application might be working on a pipelined several calls, but if you run all of them continuously you may face the serverless limitations. But Upstash Workflow overcomes this issue and provides you a smooth experience in the integration.
+Or do you? Upstash Workflow gives you a workaround for long-running tasks such as these LLM calls. Your application might be working on pipelined several calls, but if you run all of them continuously, you may face the serverless limitations. But Upstash Workflow overcomes this issue and provides you a smooth experience in the integration.
 
 You feel like you're building your API as usual, trusting Workflow to handle the rest.
 
@@ -212,7 +212,7 @@ So check out the [Agents API](https://upstash.com/docs/workflow/agents/overview)
 
 Building AI apps is the easy part. Making them production-ready? That's where most people get stuck.
 
-AI SDK v5 handles the AI complexity - streaming, tool calling, multi-model support. Upstash handles the infrastructure complexity - caching, persistence, search, and workflows.
+AI SDK v5 handles the AI complexity—streaming, tool calling, multi-model support. Upstash handles the infrastructure complexity—caching, persistence, search, and workflows.
 
 Together, they let you focus on what you want to build.
 
