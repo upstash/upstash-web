@@ -192,19 +192,118 @@ The magic is that the AI decides when to use these tools automatically. User men
 
 ---
 
-## 4. Serverless, Limitless (Upstash Workflow)
+## 4. Resumable Streams (Upstash Workflow & Redis)
 
-As you all know, serverless platforms like Vercel, Cloudflare, or others come with their limitations—like you cannot run a task or a function forever, right? You have to stop somewhere.
+Ever had your AI chat break mid-conversation because of a network hiccup or page refresh? Traditional LLM streams die when connections drop, forcing users to restart expensive generations.
 
-Or do you? Upstash Workflow gives you a workaround for long-running tasks such as these LLM calls. Your application might be working on pipelined several calls, but if you run all of them continuously, you may face the serverless limitations. But Upstash Workflow overcomes this issue and provides you a smooth experience in the integration.
+The solution? Build streams that survive anything - network outages, page refreshes, even closing your laptop. This creates an incredible user experience where conversations continue seamlessly no matter what happens.
 
-You feel like you're building your API as usual, trusting Workflow to handle the rest.
+Here's how to build truly (durable LLM streams)[https://upstash.com/blog/resumable-llm-streams] using Upstash Workflow & Redis and and the AI SDK:
 
-So check out the [Agents API](https://upstash.com/docs/workflow/agents/overview) to see how Upstash Workflow and AI agents can work in harmony.
+```ts title="app/api/llm-stream/route.ts"
+import {
+  MessageType,
+  StreamStatus,
+  type ChunkMessage,
+  type MetadataMessage,
+} from "@/lib/message-schema";
+import { redis } from "@/utils";
+import { openai } from "@ai-sdk/openai";
+import { serve } from "@upstash/workflow/nextjs";
+import { streamText } from "ai";
 
-<Frame>
-  <img src="/blog/ai-sdk-and-upstash/logs-multi.png" />
-</Frame>
+interface LLMStreamResponse {
+  success: boolean;
+  sessionId: string;
+  totalChunks: number;
+  fullContent: string;
+}
+
+export const { POST } = serve(async (context) => {
+  const { prompt, sessionId } = context.requestPayload as {
+    prompt?: string;
+    sessionId?: string;
+  };
+
+  if (!prompt || !sessionId) {
+    throw new Error("Prompt and sessionId are required");
+  }
+
+  const streamKey = `llm:stream:${sessionId}`;
+
+  await context.run("mark-stream-start", async () => {
+    const metadataMessage: MetadataMessage = {
+      type: MessageType.METADATA,
+      status: StreamStatus.STARTED,
+      completedAt: new Date().toISOString(),
+      totalChunks: 0,
+      fullContent: "",
+    };
+
+    await redis.xadd(streamKey, "*", metadataMessage);
+    await redis.publish(streamKey, { type: MessageType.METADATA });
+  });
+
+  const res = await context.run("generate-llm-response", async () => {
+    const result = await new Promise<LLMStreamResponse>(
+      async (resolve, reject) => {
+        let fullContent = "";
+        let chunkIndex = 0;
+
+        const { textStream } = streamText({
+          model: openai("gpt-4o"),
+          prompt,
+          onError: (err) => reject(err),
+          onFinish: async () => {
+            resolve({
+              success: true,
+              sessionId,
+              totalChunks: chunkIndex,
+              fullContent,
+            });
+          },
+        });
+
+        for await (const chunk of textStream) {
+          if (chunk) {
+            fullContent += chunk;
+            chunkIndex++;
+
+            const chunkMessage: ChunkMessage = {
+              type: MessageType.CHUNK,
+              content: chunk,
+            };
+
+            await redis.xadd(streamKey, "*", chunkMessage);
+            await redis.publish(streamKey, { type: MessageType.CHUNK });
+          }
+        }
+      },
+    );
+
+    return result;
+  });
+
+  await context.run("mark-stream-end", async () => {
+    const metadataMessage: MetadataMessage = {
+      type: MessageType.METADATA,
+      status: StreamStatus.COMPLETED,
+      completedAt: new Date().toISOString(),
+      totalChunks: res.totalChunks,
+      fullContent: res.fullContent,
+    };
+
+    await redis.xadd(streamKey, "*", metadataMessage);
+    await redis.publish(streamKey, { type: MessageType.METADATA });
+  });
+});
+```
+
+**What else can be achieved with workflow?** As you know, serverless platforms like Vercel, Cloudflare, or others come with their limitations—you cannot run a task or function forever, right? You have to stop somewhere.
+
+Upstash Workflow gives you a workaround for long-running tasks such as these LLM calls. Your application might be working on pipelined several calls, but if you run all of them continuously, you may face serverless limitations. But Upstash Workflow overcomes this issue and provides you a smooth experience in the integration.
+
+You feel like you're building your API as usual, trusting Workflow to handle the rest. Check out the [Agents API](https://upstash.com/docs/workflow/agents/overview) to see how Upstash Workflow and AI agents can work in harmony.
 
 ---
 
