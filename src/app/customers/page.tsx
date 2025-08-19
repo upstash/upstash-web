@@ -24,8 +24,8 @@ export default function CustomerPage() {
           <header>
             <PageHeaderTitle>Meet our Customers</PageHeaderTitle>
             <PageHeaderDesc className="mt-2">
-              Upstash enables companies of all sizes to create at the moment of
-              inspiration
+              Upstash powers companies of every size and industry, from
+              cutting-edge AI to everyday retail.
             </PageHeaderDesc>
           </header>
         </Container>
