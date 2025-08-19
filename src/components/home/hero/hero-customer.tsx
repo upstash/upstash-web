@@ -11,6 +11,7 @@ import { LogoGitbook } from "@/components/customers/logo-gitbook";
 import { LogoHashnode } from "@/components/customers/logo-hashnode";
 import { LogoHumata } from "@/components/customers/logo-humata";
 import { LogoMaker } from "@/components/customers/logo-maker";
+import { LogoMidjourney } from "@/components/customers/logo-midjourney";
 import { LogoOpenart } from "@/components/customers/logo-openart";
 import { LogoSupabase } from "@/components/customers/logo-supabase";
 import { LogoTFashion } from "@/components/customers/logo-tfashion";
@@ -34,8 +35,8 @@ export default function HomeHeroCustomer() {
         <SectionHeader>
           <SectionHeaderTitle>Meet our Customers</SectionHeaderTitle>
           <SectionHeaderSummary>
-            Upstash enables companies of all sizes to create at the moment of
-            inspiration
+            Upstash powers companies of every size and industry, from
+            cutting-edge AI to everyday retail
           </SectionHeaderSummary>
         </SectionHeader>
 
@@ -88,7 +89,7 @@ export default function HomeHeroCustomer() {
         {/* CARDS */}
         <div
           className={cx(
-            "mt-16 flex flex-wrap justify-center gap-2 rounded-2xl md:mt-16 md:gap-6",
+            "mt-16 flex flex-wrap justify-center gap-2 rounded-2xl px-4 md:mt-16 md:gap-6",
           )}
         >
           {customers
@@ -161,6 +162,10 @@ const customers = [
   {
     name: "Supabase",
     icon: <LogoSupabase height={24} />,
+  },
+  {
+    name: "Midjourney",
+    icon: <LogoMidjourney height={30} />,
   },
   {
     name: "Fly.io",
