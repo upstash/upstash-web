@@ -22,6 +22,7 @@ import {
   SectionHeaderTitle,
 } from "@/components/home/section-header";
 import cx from "@/utils/cx";
+import Link from "next/link";
 
 export default function HomeHeroCustomer() {
   return (
@@ -46,30 +47,42 @@ export default function HomeHeroCustomer() {
         >
           {customers
             .filter((c) => c.quote)
-            .map(({ name, icon, quote }, index) => (
-              <div
-                key={name}
-                className={cx(
-                  "group flex flex-col overflow-hidden px-4 py-3 sm:py-4",
-                  "rounded-2xl bg-bg-mute md:rounded-4xl dark:bg-bg-mute dark:hover:bg-white",
-                  "col-span-3 bg-white py-8 shadow-sm transition-colors sm:px-16 sm:py-10",
-                  index === 2 && "md:translate-x-[calc(50%+12px)]",
-                )}
-              >
-                <span className="flex h-10 items-center justify-center text-text transition-colors group-hover:text-primary group-hover:opacity-100 dark:text-white dark:opacity-80">
-                  {icon}
-                </span>
-                <p
+            .map(({ name, icon, quote, slug }, index) => {
+              const content = (
+                <div
                   className={cx(
-                    "mt-4 grow md:text-xl",
-                    "text-balance text-text-mute dark:text-text",
-                    "transition-colors dark:group-hover:text-bg",
+                    "group flex h-full flex-col overflow-hidden px-4 py-3 sm:py-4",
+                    "rounded-2xl bg-bg-mute md:rounded-4xl dark:bg-bg-mute dark:hover:bg-white",
+                    "col-span-3 bg-white py-8 shadow-sm transition-colors sm:px-16 sm:py-10",
+                    index === 2 && "md:translate-x-[calc(50%+12px)]",
                   )}
                 >
-                  “{quote}”
-                </p>
-              </div>
-            ))}
+                  <span className="flex h-10 items-center justify-center text-text transition-colors group-hover:text-primary group-hover:opacity-100 dark:text-white dark:opacity-80">
+                    {icon}
+                  </span>
+                  <p
+                    className={cx(
+                      "mt-4 grow md:text-xl",
+                      "text-balance text-text-mute dark:text-text",
+                      "transition-colors dark:group-hover:text-bg",
+                    )}
+                  >
+                    “{quote}”
+                  </p>
+                </div>
+              );
+              return slug ? (
+                <Link
+                  key={name}
+                  href={`/customers/${slug}`}
+                  className="col-span-3"
+                >
+                  {content}
+                </Link>
+              ) : (
+                <div key={name}>{content}</div>
+              );
+            })}
         </div>
 
         {/* CARDS */}
@@ -80,17 +93,25 @@ export default function HomeHeroCustomer() {
         >
           {customers
             .filter((c) => !c.quote)
-            .map(({ name, icon }) => (
-              <div
-                key={name}
-                className={cx(
-                  "group flex h-[72px] w-[180px] flex-col items-center justify-center",
-                  "rounded-2xl bg-bg-mute transition-colors hover:text-primary md:rounded-4xl dark:bg-bg-mute dark:hover:bg-white",
-                )}
-              >
-                {icon}
-              </div>
-            ))}
+            .map(({ name, icon, slug }) => {
+              const cell = (
+                <div
+                  className={cx(
+                    "group flex h-[72px] w-[180px] flex-col items-center justify-center",
+                    "rounded-2xl bg-bg-mute transition-colors hover:text-primary md:rounded-4xl dark:bg-bg-mute dark:hover:bg-white",
+                  )}
+                >
+                  {icon}
+                </div>
+              );
+              return slug ? (
+                <Link key={name} href={`/customers/${slug}`}>
+                  {cell}
+                </Link>
+              ) : (
+                <div key={name}>{cell}</div>
+              );
+            })}
         </div>
       </Container>
     </section>
@@ -100,6 +121,7 @@ export default function HomeHeroCustomer() {
 const customers = [
   {
     name: "Dub.co",
+    slug: "dub",
     quote: (
       <>
         The Upstash JS SDK is incredibly easy to use – all I needed to do was
@@ -111,6 +133,7 @@ const customers = [
   },
   {
     name: "Zapier",
+    slug: "zapier",
     quote: (
       <>
         We chose Upstash specifically because it offers an HTTP interface for
@@ -121,6 +144,7 @@ const customers = [
   },
   {
     name: "OpenArt",
+    slug: "openart",
     icon: <LogoOpenart height={20} />,
     quote: (
       <>
@@ -143,18 +167,22 @@ const customers = [
   },
   {
     name: "Branch",
+    slug: "branch",
     icon: <LogoBranch height={32} />,
   },
   {
     name: "Humata",
+    slug: "humata",
     icon: <LogoHumata height={32} />,
   },
   {
     name: "Gail",
+    slug: "gail",
     icon: <LogoGail height={20} />,
   },
   {
     name: "Maker.co",
+    slug: "maker",
     icon: <LogoMaker height={24} />,
   },
   {
@@ -175,6 +203,7 @@ const customers = [
   },
   {
     name: "Dropee",
+    slug: "dropee",
     icon: <LogoDropee height={30} className="translate-y-[-2px]" />,
   },
   // {
