@@ -24,8 +24,8 @@ export default function CustomerPage() {
           <header>
             <PageHeaderTitle>Meet our Customers</PageHeaderTitle>
             <PageHeaderDesc className="mt-2">
-              Upstash enables companies of all sizes to create at the moment of
-              inspiration
+              Upstash powers companies of every size and industry, from
+              cutting-edge AI to everyday retail.
             </PageHeaderDesc>
           </header>
         </Container>
@@ -48,7 +48,7 @@ export default function CustomerPage() {
                 >
                   <span className="absolute inset-0 bg-gradient-to-br hover:from-emerald-500/20 hover:to-emerald-500/0" />
 
-                  <Logo className="h-8 max-w-full object-contain text-black dark:text-white" />
+                  <Logo className="h-9 max-w-[150px] object-contain text-black dark:text-white" />
 
                   <hr className="w-1/4 border-0 border-b border-black/5 dark:border-white/5" />
 

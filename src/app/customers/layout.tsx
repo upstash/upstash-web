@@ -6,7 +6,7 @@ import { ReactNode } from "react";
 
 const title = "Upstash Customers";
 const description =
-  "Upstash enables companies of all sizes to create at the moment of inspiration";
+  "Upstash powers companies of every size and industry, from cutting-edge AI to everyday retail.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

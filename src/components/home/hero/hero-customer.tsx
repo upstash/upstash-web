@@ -1,17 +1,20 @@
 import Bg from "@/components/bg";
 import Container from "@/components/container";
 import { LogoBranch } from "@/components/customers/logo-branch";
+import { LogoClickfunnels } from "@/components/customers/logo-clickfunnels";
+import { LogoCustomerio } from "@/components/customers/logo-customerio";
+import { LogoDropee } from "@/components/customers/logo-dropee";
 import { LogoDubsh } from "@/components/customers/logo-dubsh";
 import { LogoFly } from "@/components/customers/logo-fly";
 import { LogoGail } from "@/components/customers/logo-gail";
+import { LogoGitbook } from "@/components/customers/logo-gitbook";
 import { LogoHashnode } from "@/components/customers/logo-hashnode";
 import { LogoHumata } from "@/components/customers/logo-humata";
 import { LogoMaker } from "@/components/customers/logo-maker";
-import { LogoNiftykit } from "@/components/customers/logo-niftykit";
-import { LogoNzxt } from "@/components/customers/logo-nzxt";
+import { LogoMidjourney } from "@/components/customers/logo-midjourney";
+import { LogoOpenart } from "@/components/customers/logo-openart";
 import { LogoSupabase } from "@/components/customers/logo-supabase";
 import { LogoTFashion } from "@/components/customers/logo-tfashion";
-import { LogoTinybird } from "@/components/customers/logo-tinybird";
 import { LogoVercel } from "@/components/customers/logo-vercel";
 import { LogoZapier } from "@/components/customers/logo-zapier";
 import {
@@ -20,6 +23,7 @@ import {
   SectionHeaderTitle,
 } from "@/components/home/section-header";
 import cx from "@/utils/cx";
+import Link from "next/link";
 
 export default function HomeHeroCustomer() {
   return (
@@ -31,8 +35,8 @@ export default function HomeHeroCustomer() {
         <SectionHeader>
           <SectionHeaderTitle>Meet our Customers</SectionHeaderTitle>
           <SectionHeaderSummary>
-            Upstash enables companies of all sizes to create at the moment of
-            inspiration
+            Upstash powers companies of every size and industry, from
+            cutting-edge AI to everyday retail
           </SectionHeaderSummary>
         </SectionHeader>
 
@@ -44,50 +48,71 @@ export default function HomeHeroCustomer() {
         >
           {customers
             .filter((c) => c.quote)
-            .map(({ name, icon, quote }) => (
-              <div
-                key={name}
-                className={cx(
-                  "group flex flex-col overflow-hidden px-4 py-3 sm:py-4",
-                  "rounded-2xl bg-bg-mute md:rounded-4xl dark:bg-bg-mute dark:hover:bg-white",
-                  "col-span-3 bg-white py-8 shadow-sm transition-colors sm:px-16 sm:py-10",
-                )}
-              >
-                <span className="flex h-10 items-center justify-center text-text transition-colors group-hover:text-primary group-hover:opacity-100 dark:text-white dark:opacity-80">
-                  {icon}
-                </span>
-                <p
+            .map(({ name, icon, quote, slug }, index) => {
+              const content = (
+                <div
                   className={cx(
-                    "mt-4 grow md:text-xl",
-                    "text-balance text-text-mute dark:text-text",
-                    "transition-colors dark:group-hover:text-bg",
+                    "group flex h-full flex-col overflow-hidden px-4 py-3 sm:py-4",
+                    "rounded-2xl bg-bg-mute md:rounded-4xl dark:bg-bg-mute dark:hover:bg-white",
+                    "col-span-3 bg-white py-8 shadow-sm transition-colors sm:px-16 sm:py-10",
+                    index === 2 && "md:translate-x-[calc(50%+12px)]",
                   )}
                 >
-                  “{quote}”
-                </p>
-              </div>
-            ))}
+                  <span className="flex h-10 items-center justify-center text-text transition-colors group-hover:text-primary group-hover:opacity-100 dark:text-white dark:opacity-80">
+                    {icon}
+                  </span>
+                  <p
+                    className={cx(
+                      "mt-4 grow md:text-xl",
+                      "text-balance text-text-mute dark:text-text",
+                      "transition-colors dark:group-hover:text-bg",
+                    )}
+                  >
+                    “{quote}”
+                  </p>
+                </div>
+              );
+              return slug ? (
+                <Link
+                  key={name}
+                  href={`/customers/${slug}`}
+                  className="col-span-3"
+                >
+                  {content}
+                </Link>
+              ) : (
+                <div key={name}>{content}</div>
+              );
+            })}
         </div>
 
         {/* CARDS */}
         <div
           className={cx(
-            "mt-16 flex flex-wrap justify-center gap-2 rounded-2xl md:mt-24 md:gap-6",
+            "mt-16 flex flex-wrap justify-center gap-2 rounded-2xl px-4 md:mt-16 md:gap-6",
           )}
         >
           {customers
             .filter((c) => !c.quote)
-            .map(({ name, icon }) => (
-              <div
-                key={name}
-                className={cx(
-                  "group flex h-[72px] w-[180px] flex-col items-center justify-center",
-                  "rounded-2xl bg-bg-mute transition-colors hover:text-primary md:rounded-4xl dark:bg-bg-mute dark:hover:bg-white",
-                )}
-              >
-                {icon}
-              </div>
-            ))}
+            .map(({ name, icon, slug }) => {
+              const cell = (
+                <div
+                  className={cx(
+                    "group flex h-[72px] w-[180px] flex-col items-center justify-center",
+                    "rounded-2xl bg-bg-mute transition-colors hover:text-primary md:rounded-4xl dark:bg-bg-mute dark:hover:bg-white",
+                  )}
+                >
+                  {icon}
+                </div>
+              );
+              return slug ? (
+                <Link key={name} href={`/customers/${slug}`}>
+                  {cell}
+                </Link>
+              ) : (
+                <div key={name}>{cell}</div>
+              );
+            })}
         </div>
       </Container>
     </section>
@@ -97,6 +122,7 @@ export default function HomeHeroCustomer() {
 const customers = [
   {
     name: "Dub.co",
+    slug: "dub",
     quote: (
       <>
         The Upstash JS SDK is incredibly easy to use – all I needed to do was
@@ -108,6 +134,7 @@ const customers = [
   },
   {
     name: "Zapier",
+    slug: "zapier",
     quote: (
       <>
         We chose Upstash specifically because it offers an HTTP interface for
@@ -117,36 +144,16 @@ const customers = [
     icon: <LogoZapier height={24} />,
   },
   {
-    name: "Branch",
-    icon: <LogoBranch height={32} />,
-  },
-  {
-    name: "Humata",
-    icon: <LogoHumata height={32} />,
-  },
-  {
-    name: "Gail",
-    icon: <LogoGail height={18} />,
-  },
-  {
-    name: "Maker.co",
-    icon: <LogoMaker height={24} />,
-  },
-  {
-    name: "NiftyKit",
-    icon: <LogoNiftykit height={21} />,
-  },
-  {
-    name: "TFashion",
-    icon: <LogoTFashion height={18} />,
-  },
-  {
-    name: "NZXT",
-    icon: <LogoNzxt height={16} />,
-  },
-  {
-    name: "Fly.io",
-    icon: <LogoFly height={22} />,
+    name: "OpenArt",
+    slug: "openart",
+    icon: <LogoOpenart height={20} />,
+    quote: (
+      <>
+        Developer experience became significantly better than what we
+        experienced with traditional cloud service providers. The observability
+        improvements alone were game-changing for our small team.
+      </>
+    ),
   },
   {
     name: "Vercel",
@@ -157,11 +164,56 @@ const customers = [
     icon: <LogoSupabase height={24} />,
   },
   {
-    name: "Tinybird",
-    icon: <LogoTinybird height={32} />,
+    name: "Midjourney",
+    icon: <LogoMidjourney height={30} />,
+  },
+  {
+    name: "Fly.io",
+    icon: <LogoFly height={22} />,
+  },
+  {
+    name: "Branch",
+    slug: "branch",
+    icon: <LogoBranch height={32} />,
+  },
+  {
+    name: "Humata",
+    slug: "humata",
+    icon: <LogoHumata height={32} />,
+  },
+  {
+    name: "Gail",
+    slug: "gail",
+    icon: <LogoGail height={20} />,
+  },
+  {
+    name: "Maker.co",
+    slug: "maker",
+    icon: <LogoMaker height={24} />,
+  },
+  {
+    name: "ClickFunnels",
+    icon: <LogoClickfunnels height={18} />,
+  },
+  {
+    name: "GitBook",
+    icon: <LogoGitbook height={23} />,
+  },
+  {
+    name: "Customer.io",
+    icon: <LogoCustomerio height={18} />,
   },
   {
     name: "Hashnode",
     icon: <LogoHashnode height={18} />,
   },
+  {
+    name: "Dropee",
+    slug: "dropee",
+    icon: <LogoDropee height={30} className="translate-y-[-2px]" />,
+  },
+  // {
+  //   name: "TFashion",
+  //   icon: <LogoTFashion height={18} />,
+  // },
 ];
