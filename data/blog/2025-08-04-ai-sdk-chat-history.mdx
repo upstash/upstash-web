@@ -1,5 +1,5 @@
 ---
-title: "Storing AI SDK Chat History with Redis"
+title: "Saving AI SDK v5 Chat Messages in Redis"
 slug: ai-sdk-chat-history
 authors:
   - "josh"
@@ -31,7 +31,7 @@ export async function loadChat(id: string): Promise<UIMessage[]> {
 // ... rest of the file
 ```
 
-I find Redis to be by far the easiest and fastest way to store ai chat histories (i promise they didn't make me say this because i work at upstash 💀).
+I find Redis to be by far the easiest and fastest way to save chat messages in the ai sdk v5 (i promise they didn't make me say this because i work at upstash 💀).
 
 Redis allows us to:
 
@@ -46,12 +46,12 @@ Basically, it's the perfect tool for this job. I'll show you how this works in t
 
 ## The Problem: Chat Messages Live in Memory
 
-The AI SDK's default behavior stores messages in memory. This works super well for demos and fast local setup. In real applications, users expect persistence (i know this because i've launched my side projects without persistence and got flamed for it):
+The AI SDK's default behavior saves messages in memory. This works super well for demos and fast local setup. In real applications, users expect persistence (i know this because i've launched my side projects without persistence and got flamed for it):
 
 - Going back to previous chats
 - Sharing conversations with others
 
-Luckily, the AI SDK v5 makes this extremely easy for us. They have absolutely cooked with this release.
+Luckily, the AI SDK v5 makes saving chat messages extremely easy for us. They have absolutely cooked with this release.
 ---
 
 ## Step 1: Reducing network traffic

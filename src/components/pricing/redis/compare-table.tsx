@@ -1037,7 +1037,7 @@ export default function CompareTable({
 
         {/**/}
         <tr>
-          <th className="px-0 text-left font-normal">Single Sign-On (SSO)</th>
+          <th className="px-0 text-left font-normal">SAML Single Sign-On (SSO)</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" valid={false} />

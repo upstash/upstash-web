@@ -148,8 +148,9 @@ const customers = [
     icon: <LogoOpenart height={20} />,
     quote: (
       <>
-        Upstash's observability and serverless DX were game-changing for our
-        small team, letting us ship OpenArt One-Click Story fast.
+        Developer experience became significantly better than what we
+        experienced with traditional cloud service providers. The observability
+        improvements alone were game-changing for our small team.
       </>
     ),
   },
