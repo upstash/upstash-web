@@ -1,0 +1,226 @@
+---
+slug: redis-timeseries
+title: "Storing Time Series Data in Redis: From Naive to Native"
+authors:
+  - arda
+tags: [redis, streams, timeseries]
+---
+
+Time series data is everywhere in modern applications - from stock prices and sensor readings to system metrics and user analytics. If you're building an application that needs to track values over time, you've probably wondered: what's the best way to store this data in Redis?
+
+In this post, we'll explore different approaches to storing time series data in Redis, starting with simple solutions and evolving toward more sophisticated ones. We'll assume we're storing daily data points - one value per day - which is a common pattern for many applications like tracking daily active users, stock prices, or IoT sensor aggregates.
+
+## The Challenge: Daily Stock Prices
+
+Imagine we're building a financial application that tracks daily stock prices. Each day, we need to store the closing price of various stocks. Our data looks like this:
+
+```
+AAPL: 2025-01-01 -> $180.50
+AAPL: 2025-01-02 -> $182.25
+AAPL: 2025-01-03 -> $179.80
+...
+```
+
+We need to efficiently:
+- Add new daily prices
+- Update existing prices (market corrections)
+- Query price ranges by date
+- Handle missing data points (market holidays)
+- Support multiple stocks with different trading histories
+
+Let's explore how different Redis data structures handle these requirements.
+
+## Approach 1: The Naive List
+
+Our first instinct might be to use Redis Lists - they're ordered, easy to understand, and perfect for time-ordered data, right?
+
+```javascript
+// Store daily prices in a list
+await redis.lpush('stock:AAPL', {
+  date: '2025-01-01',
+  price: 180.50
+});
+
+await redis.lpush('stock:AAPL', {
+  date: '2025-01-02', 
+  price: 182.25
+});
+```
+
+To query a date range:
+
+```javascript
+// Get all data and filter client-side
+const allData = await redis.lrange('stock:AAPL', 0, -1);
+const filtered = allData
+  .map(item => JSON.parse(item))
+  .filter(item => item.date >= '2025-01-01' && item.date <= '2025-01-10');
+```
+
+### The Pitfalls
+
+This naive approach quickly reveals its limitations:
+
+1. **Upsert Nightmare**: Imagine you need to correct the price for January 2nd. You'd need to:
+   - Fetch the entire list
+   - Find the matching date
+   - Remove the old entry
+   - Insert the corrected entry at the right position
+   - Push everything back
+
+2. **No Random Access**: You can't jump to a specific date without fetching everything. For example, if AAPL started trading in 1980 but GOOG started in 2004, you can't use index-based queries effectively. You always need to fetch and filter.
+
+The list approach works for simple append-only scenarios, but falls apart when you need updates or range queries.
+
+## Approach 2: The Less Naive Sorted Set
+
+Sorted Sets offer a significant improvement. We can use timestamps as scores and store our data as members:
+
+```javascript
+// Using timestamp as score (Unix timestamp)
+const timestamp = new Date('2025-01-01').getTime();
+await redis.zadd('stock:AAPL', { score: timestamp, member: '180.50' });
+
+const timestamp2 = new Date('2025-01-02').getTime();
+await redis.zadd('stock:AAPL', { score: timestamp2, member: '182.25' });
+```
+
+Querying becomes much more efficient:
+
+```javascript
+// Get prices between two dates
+const startTs = new Date('2025-01-01').getTime();
+const endTs = new Date('2025-01-10').getTime();
+
+const prices = await redis.zrange(
+  'stock:AAPL', 
+  startTs, 
+  endTs, 
+  { byScore: true, withScores: true }
+);
+```
+
+### The Hidden Pitfall
+
+Sorted Sets solve many problems, but introduce a subtle issue. Consider this scenario:
+
+```javascript
+// Day 1: AAPL closes at $180.50
+const timestamp1 = new Date('2025-01-01').getTime();
+await redis.zadd('stock:AAPL', { score: timestamp1, member: '180.50'});
+
+// Day 2: Market is closed (holiday), but price remains $180.50
+const timestamp2 = new Date('2025-01-02').getTime();
+await redis.zadd('stock:AAPL', { score: timestamp2, member: '180.50' });
+
+console.log(await redis.zcard('stock:AAPL')); // Still 1!
+```
+
+**The problem**: Sorted Sets only allow unique members. If the stock price doesn't change between days (common during market holidays or stable periods), `ZADD` only updates the score (timestamp) instead of adding a new entry.
+
+Here's the Redis behavior in action:
+
+```javascript
+const res1 = await redis.zadd('racer_scores', { score: 100, member: 'Wood' });
+console.log(res1);  // >>> 1 (new member added)
+
+const res2 = await redis.zadd('racer_scores', { score: 200, member: 'Wood' });  
+console.log(res2);  // >>> 0 (member exists, only score updated)
+```
+
+### Workaround: Composite Members
+
+A workaround is combining timestamp and value:
+
+```javascript
+// Include timestamp in the member to ensure uniqueness
+await redis.zadd('stock:AAPL', { score: timestamp1, member: `${timestamp1}:180.50` });
+await redis.zadd('stock:AAPL', { score: timestamp2, member: `${timestamp2}:180.50` });
+```
+
+But now every read/write operation requires parsing this composite format, making your code more complex and error-prone.
+
+## Approach 3: Redis Stream
+
+Redis Streams, introduced in Redis 5.0, provide a log-like data structure perfect for time series:
+
+```javascript
+// Add entries to a stream
+await redis.xadd('stock:AAPL', '*', {'price': '180.50', 'volume': '1000000'});
+await redis.xadd('stock:AAPL', '*', {'price': '182.25', 'volume': '1200000'});
+
+// Query by time range
+const results = await redis.xrange(
+  'stock:AAPL',
+  '1640995200000-0',  // Start timestamp
+  '1641340800000-0'   // End timestamp
+);
+
+// Query latest N entries
+const latest = await redis.xrevrange('stock:AAPL', '+', '-', 10);
+```
+
+The `*` tells Redis to auto-generate a timestamp-based ID like `1642345200000-0`.
+
+### Advantages of Streams
+
+1. **Natural Time Ordering**: Entries are automatically ordered by timestamp
+2. **Multiple Fields**: Each entry can contain multiple fields (price, volume, etc.)
+3. **Range Queries**: Built-in support for time-based queries
+
+Streams also offer additional capabilities like **Consumer Groups** for processing data with multiple consumers, which can be valuable for distributed architectures.
+
+### Memory Efficiency
+
+A critical advantage of streams is their memory efficiency compared to lists and sorted sets, especially for large time series datasets.
+
+Lists and sorted sets must be fully loaded into memory before operations can be performed. This means accessing even a single data point from a million-entry sorted set requires loading all million entries into memory first. Streams operate differently on Upstash Redis - they only load the data relevant to your specific query into memory.
+
+This efficiency enables streams to handle years of historical data without memory pressure, making them ideal for large-scale applications. Our [QStash](https://upstash.com/docs/qstash/overall/getstarted) product demonstrates this at scale, using streams to power tens of millions of requests daily and serving as the foundation for [Upstash Workflow](https://upstash.com/docs/workflow/getstarted).
+
+### Stream Limitations for Time Series
+
+While Streams solve many problems, they have some limitations for pure time series use cases:
+
+1. **No Native Aggregations**: You can't ask "what's the average price over the last 7 days?" without client-side processing
+2. **Limited Mathematical Operations**: No built-in support for statistical functions
+
+## Approach 4: The Native Solution - Redis TimeSeries
+
+Redis TimeSeries is a purpose-built module for time series data that addresses all the limitations we've encountered. It's not yet available in Upstash Redis, but it's on our roadmap!
+
+Here's what the core functionality looks like:
+
+```bash
+# Create a time series
+TS.CREATE stock:AAPL LABELS symbol AAPL
+
+# Add data points
+TS.ADD stock:AAPL 1640995200000 180.50
+TS.ADD stock:AAPL 1641081600000 182.25
+
+# Query range
+TS.RANGE stock:AAPL 1640995200000 1641081600000
+
+# Get aggregated data (daily average)
+TS.RANGE stock:AAPL - + AGGREGATION avg 86400000
+
+# Query multiple series by labels
+TS.MRANGE - + FILTER symbol=AAPL
+```
+
+The beauty of Redis TimeSeries is its simplicity combined with powerful features like automatic aggregations, labels for categorization, and efficient storage optimized specifically for time-based data.
+
+## Conclusion
+
+For **Upstash Redis**, **Streams are clearly the best choice** for time series data today. They outshine Lists and Sorted Sets with memory efficiency that scales to millions of data points, and built-in range queries without complex workarounds.
+
+The scalability of Redis Streams on Upstash Redis is proven in production: both [QStash](https://upstash.com/docs/qstash) and [Upstash Workflow](https://upstash.com/docs/workflow/getstarted) process tens of millions of time-ordered events daily using this approach.
+
+While Redis TimeSeries offers native aggregations and specialized optimizations, it's not yet available in Upstash Redis—though it's on our roadmap. Until then, Streams provide the perfect balance of performance and functionality for your time series needs.
+
+[Follow us on X](https://x.com/upstash) for updates on TimeSeries availability and other exciting features!
+
+## Further Reading
+
+- [Redis TimeSeries Documentation](https://redis.io/docs/latest/develop/data-types/timeseries/) - Official Redis TimeSeries guide
