@@ -213,14 +213,10 @@ The beauty of Redis TimeSeries is its simplicity combined with powerful features
 
 ## Conclusion
 
-For **Upstash Redis**, **Streams are clearly the best choice** for time series data today. They outshine Lists and Sorted Sets with memory efficiency that scales to millions of data points, and built-in range queries without complex workarounds.
+For **Upstash Redis**, Streams are the best choice for time series data today. They outshine Lists and Sorted Sets with memory efficiency that scales to millions of data points, and built-in range queries without complex workarounds.
 
 The scalability of Redis Streams on Upstash Redis is proven in production: both [QStash](https://upstash.com/docs/qstash) and [Upstash Workflow](https://upstash.com/docs/workflow/getstarted) process tens of millions of time-ordered events daily using this approach.
 
-While Redis TimeSeries offers native aggregations and specialized optimizations, it's not yet available in Upstash Redis—though it's on our roadmap. Until then, Streams provide the perfect balance of performance and functionality for your time series needs.
+While Redis TimeSeries offers native aggregations and specialized optimizations, it's not yet available in Upstash Redis, but it's on our roadmap. Until then, Streams provide the perfect balance of performance and functionality for your time series needs.
 
 [Follow us on X](https://x.com/upstash) for updates on TimeSeries availability and other exciting features!
-
-## Further Reading
-
-- [Redis TimeSeries Documentation](https://redis.io/docs/latest/develop/data-types/timeseries/) - Official Redis TimeSeries guide
