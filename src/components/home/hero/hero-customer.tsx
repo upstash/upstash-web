@@ -13,6 +13,7 @@ import { LogoHumata } from "@/components/customers/logo-humata";
 import { LogoMaker } from "@/components/customers/logo-maker";
 import { LogoMidjourney } from "@/components/customers/logo-midjourney";
 import { LogoOpenart } from "@/components/customers/logo-openart";
+import { LogoOpenrouter } from "@/components/customers/logo-openrouter";
 import { LogoPaulSmith } from "@/components/customers/logo-paul-smith";
 import { LogoSupabase } from "@/components/customers/logo-supabase";
 import { LogoTFashion } from "@/components/customers/logo-tfashion";
@@ -178,6 +179,18 @@ const customers = [
     icon: <LogoPaulSmith height={22} />,
   },
   {
+    name: "Openrouter",
+    icon: <LogoOpenrouter height={22} />,
+  },
+  {
+    name: "GitBook",
+    icon: <LogoGitbook height={23} />,
+  },
+  {
+    name: "Customer.io",
+    icon: <LogoCustomerio height={18} />,
+  },
+  {
     name: "Branch",
     slug: "branch",
     icon: <LogoBranch height={32} />,
@@ -201,14 +214,6 @@ const customers = [
     name: "ClickFunnels",
     icon: <LogoClickfunnels height={18} />,
     slug: "clickfunnels",
-  },
-  {
-    name: "GitBook",
-    icon: <LogoGitbook height={23} />,
-  },
-  {
-    name: "Customer.io",
-    icon: <LogoCustomerio height={18} />,
   },
   {
     name: "Hashnode",
