@@ -426,5 +426,10 @@ export const authors: Record<
     name: "Ali Tarık Şahin",
     title: "Software Engineer @Upstash",
     image: "alitarik.jpeg",
-  }
+  },
+  mtahasylmz: {
+    name: "Mustafa Taha Söylemez",
+    title: "Software Developer - Guest Author",
+    image: "mtahasylmz.jpeg",
+  },
 };
