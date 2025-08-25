@@ -135,7 +135,7 @@ export const FEATURES = [
 
   {
     icon: <IconPasswordUser className="size-4 md:size-6" stroke={1.5} />,
-    title: <>Single Sign-On (SSO)</>,
+    title: <>SAML Single Sign-On (SSO)</>,
     desc: (
       <>
         Simplify and secure user access with enterprise-grade single sign-on

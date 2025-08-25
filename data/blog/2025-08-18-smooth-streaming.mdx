@@ -1,0 +1,273 @@
+---
+title: "Smooth Text Streaming in AI SDK v5"
+slug: smooth-streaming
+authors:
+  - "josh"
+tags: [llm, ai, ui, ux]
+---
+
+There's one pattern I've noticed over and over again in some of the most polished AI chat interfaces. This pattern is used by huge companies like Anthropic in production and make the AI chat experience feel extremely natural.
+
+This pattern is called **smooth text streaming**. Here's how it looks:
+
+<Frame>
+  <Video id="1wdPEVE00pWqYLT4QMqIFzNkGLN5prSrqrBnE0000bW7nU" />
+</Frame>
+
+Most AI apps show text appearing in chunks as it arrives from the server. This works functionally, but can create a jarring user experience where text appears in bursts instead of flowing naturally.
+
+The difference is subtle but **massive** for user experience.
+
+---
+
+## The Problem: Default Text Streaming
+
+By default, the AI SDK streams text in chunks as they arrive from the server. This means if the server sends "Hello " then "world!", you see both chunks appear instantly when they arrive.
+
+I'm not a fan of this pattern because text appears in bursts as we get the chunks from the server, so the reading experience feels more unnatural.
+
+I found that decoupling **network streaming** from **visual streaming** was a really good way to achieve super smooth streams. We receive chunks from the server, buffer them, and display them character-by-character at a consistent speed.
+
+---
+
+## Solution 1: Built-in Smooth Streaming
+
+The AI SDK has a built-in smooth streaming feature:
+
+```typescript title="route.ts"
+import { smoothStream, streamText } from 'ai';
+
+const result = streamText({
+  model,
+  prompt,
+  experimental_transform: smoothStream({
+    delayInMs: 20, // optional: defaults to 10ms
+    chunking: 'line', // optional: defaults to 'word'
+  }),
+});
+```
+
+With some more work, we can also make this stream at the character level. To be honest, if you want basic smooth streaming, this is a great way to go.
+
+However, I found that this approach was not very flexible and also (obviously) experimental. Instead, I experimented with a frontend hook that:
+
+- buffers chunks as they arrive from the server
+- animates them character by character
+- allows for custom speed and chunking
+
+This approach is super flexible and can be used with any text you want to animate. We're already using this in production, people love it and I think it's the best of both worlds.
+
+---
+
+## Solution 2: Building a Stream Hook
+
+Let's build a smooth streaming hook that manages the typewriter animation independently from network chunks:
+
+```typescript title="hooks/use-stream.ts"
+import { useEffect, useRef, useState, useCallback } from 'react'
+
+export const useStream = () => {
+  // 👇 internal buffer of chunks as they arrive from the server
+  const [parts, setParts] = useState<string[]>([])
+
+  // 👇 the currently visible text
+  const [stream, setStream] = useState('')
+
+  const frame = useRef<number | null>(null)
+  const lastTimeRef = useRef<number>(0)
+  const streamIndexRef = useRef<number>(0)
+  const isAnimatingRef = useRef(false)
+
+  const addPart = useCallback((part: string) => {
+    if (part) {
+      setParts((prev) => [...prev, part])
+    }
+  }, [])
+
+  const reset = useCallback(() => {
+    setParts([])
+    setStream('')
+    streamIndexRef.current = 0
+    if (frame.current) {
+      cancelAnimationFrame(frame.current)
+    }
+    frame.current = null
+    lastTimeRef.current = 0
+    isAnimatingRef.current = false
+  }, [])
+```
+
+This hook maintains two separate states:
+
+- `parts`: Raw chunks as they arrive from the server
+- `stream`: The currently visible text (animated character by character)
+
+---
+
+## Step 2: The Animation Logic
+
+The smooth streaming happens in the `useEffect` that handles the typewriter animation:
+
+```typescript title="hooks/use-stream.ts (continued)"
+useEffect(() => {
+  if (isAnimatingRef.current) return;
+
+  // 👇 milliseconds per character
+  // 5 works really well for me
+  const typewriterSpeed = 5;
+
+  const fullText = parts.join("");
+
+  if (streamIndexRef.current >= fullText.length) {
+    setStream(fullText);
+    return;
+  }
+
+  isAnimatingRef.current = true;
+
+  const animate = (time: number) => {
+    if (streamIndexRef.current < fullText.length) {
+      if (time - lastTimeRef.current > typewriterSpeed) {
+        streamIndexRef.current++;
+        setStream(fullText.slice(0, streamIndexRef.current));
+        lastTimeRef.current = time;
+      }
+      frame.current = requestAnimationFrame(animate);
+    } else {
+      isAnimatingRef.current = false;
+    }
+  };
+
+  frame.current = requestAnimationFrame(animate);
+
+  return () => {
+    if (frame.current) {
+      cancelAnimationFrame(frame.current);
+    }
+    isAnimatingRef.current = false;
+  };
+}, [parts]);
+```
+
+This animation:
+
+- Uses `requestAnimationFrame` for smooth 60fps animation
+- Controls speed with `typewriterSpeed` (5ms per character = ~200 chars/sec)
+- Prevents multiple animations from running simultaneously
+- Cleans up properly to avoid memory leaks
+
+---
+
+## Step 3: The Streaming Component
+
+Now we wrap everything in a component that integrates with the AI SDK.
+
+To be totally transparent, you can use this component for _any text_ you want to animate 🗿. There is no limitation or special sauce that makes it specific to the AI SDK: any text you might have (even a hard-coded string) can be animated with this component.
+
+```typescript title="components/streaming-message.tsx"
+import { memo, useCallback, useEffect, useRef } from "react";
+
+export const StreamingMessage = memo(
+  ({ text, animate = false }: { text: string; animate?: boolean }) => {
+    const contentRef = useRef("");
+    const { stream, addPart } = useStream();
+
+    useEffect(() => {
+      if (!text || !animate) return;
+
+      if (contentRef.current !== text) {
+        const delta = text.slice(contentRef.current.length);
+        if (delta) {
+          addPart(delta);
+        }
+        contentRef.current = text;
+      }
+    }, [text, animate, addPart]);
+
+    if (!animate) return text;
+
+    return stream ?? text ?? "";
+  },
+);
+```
+
+The component is pretty simple. It:
+
+- Calculates the **delta** (new text since last update)
+- Adds only new text to the animation queue
+- Uses `memo` for performance optimization
+
+---
+
+## Step 4: Integrating with AI SDK
+
+Using the streaming component with the AI SDK is incredibly simple. Here's a quick example:
+
+```tsx title="components/chat.tsx"
+import { useChat } from '@ai-sdk/react'
+import { StreamingMessage } from './streaming-message'
+import { useState } from 'react'
+
+export const Chat = () => {
+  const [input, setInput] = useState('')
+  const { messages, sendMessage } = useChat()
+
+  return (
+    <div>
+      {messages.map((message) => (
+        <div key={message.id}>
+          {message.parts.map((part) => {
+            if (part.type === 'text') {
+              return (
+                <StreamingMessage
+                  text={part.text}
+                  animate={message.role === 'assistant'}
+                />
+              )
+            }
+          })}
+        </div>
+      ))}
+
+      <form onSubmit={() => sendMessage({ text: input })}>
+        <input value={input} onChange={(e) => setInput(e.target.value)} />
+        <button type="submit">Send</button>
+      </form>
+    </div>
+  )
+}
+```
+
+With this, all AI responses are streamed in character by character. User messages appear instantly since they're already complete.
+
+---
+
+## Results
+
+**Before (chunky streaming):**
+- Text appears exactly as we get it from the server
+- To me feels like an unnatural reading experience
+
+**After (smooth streaming):**
+- Consistent animation
+- Users can read along as text appears
+- Interface feels conversational and polished
+
+There is a point to be made that this smooth streaming can artifically delay the response, but I found UX-wise it's quite the opposite. Because there is a slight delay, combining multiple tool calls looks incredibly fluid and one output blends into the next.
+
+---
+
+## Performance
+
+This approach is surprisingly efficient:
+
+- Uses `requestAnimationFrame` to match display refresh rate
+- Only re-renders when visible text changes
+
+You can configure the typewriter effect to go as fast as you like. I find 5ms per character (200 chars/second) is very readable and not too slow.
+
+---
+
+## Congratulations!
+
+We've built a smooth streaming text animation that makes AI responses feel natural and polished. We receive chunks from the server as fast as possible, but stream them to users at a consistent, readable pace.

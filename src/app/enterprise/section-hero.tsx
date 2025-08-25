@@ -33,7 +33,7 @@ export default function SectionHero() {
 
           <div className="mt-10">
             <Button asChild variant="primary">
-              <Link href="/enterprise">Learn More</Link>
+              <Link href="https://upstash.com/docs/redis/overall/enterprise#enterprise-features">Learn More</Link>
             </Button>
           </div>
         </div>
