@@ -35,14 +35,14 @@ I found that decoupling **network streaming** from **visual streaming** was a re
 The AI SDK has a built-in smooth streaming feature:
 
 ```typescript title="route.ts"
-import { smoothStream, streamText } from 'ai';
+import { smoothStream, streamText } from "ai";
 
 const result = streamText({
   model,
   prompt,
   experimental_transform: smoothStream({
     delayInMs: 20, // optional: defaults to 10ms
-    chunking: 'line', // optional: defaults to 'word'
+    chunking: "line", // optional: defaults to 'word'
   }),
 });
 ```
@@ -64,37 +64,40 @@ This approach is super flexible and can be used with any text you want to animat
 Let's build a smooth streaming hook that manages the typewriter animation independently from network chunks:
 
 ```typescript title="hooks/use-stream.ts"
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export const useStream = () => {
   // 👇 internal buffer of chunks as they arrive from the server
-  const [parts, setParts] = useState<string[]>([])
+  const [parts, setParts] = useState<string[]>([]);
 
   // 👇 the currently visible text
-  const [stream, setStream] = useState('')
+  const [stream, setStream] = useState("");
 
-  const frame = useRef<number | null>(null)
-  const lastTimeRef = useRef<number>(0)
-  const streamIndexRef = useRef<number>(0)
-  const isAnimatingRef = useRef(false)
+  const frame = useRef<number | null>(null);
+  const lastTimeRef = useRef<number>(0);
+  const streamIndexRef = useRef<number>(0);
+  const isAnimatingRef = useRef(false);
 
   const addPart = useCallback((part: string) => {
     if (part) {
-      setParts((prev) => [...prev, part])
+      setParts((prev) => [...prev, part]);
     }
-  }, [])
+  }, []);
 
   const reset = useCallback(() => {
-    setParts([])
-    setStream('')
-    streamIndexRef.current = 0
+    setParts([]);
+    setStream("");
+    streamIndexRef.current = 0;
     if (frame.current) {
-      cancelAnimationFrame(frame.current)
+      cancelAnimationFrame(frame.current);
     }
-    frame.current = null
-    lastTimeRef.current = 0
-    isAnimatingRef.current = false
-  }, [])
+    frame.current = null;
+    lastTimeRef.current = 0;
+    isAnimatingRef.current = false;
+  }, []);
+
+  return { stream, addPart, reset };
+};
 ```
 
 This hook maintains two separate states:
@@ -204,26 +207,26 @@ The component is pretty simple. It:
 Using the streaming component with the AI SDK is incredibly simple. Here's a quick example:
 
 ```tsx title="components/chat.tsx"
-import { useChat } from '@ai-sdk/react'
-import { StreamingMessage } from './streaming-message'
-import { useState } from 'react'
+import { useChat } from "@ai-sdk/react";
+import { useState } from "react";
+import { StreamingMessage } from "./streaming-message";
 
 export const Chat = () => {
-  const [input, setInput] = useState('')
-  const { messages, sendMessage } = useChat()
+  const [input, setInput] = useState("");
+  const { messages, sendMessage } = useChat();
 
   return (
     <div>
       {messages.map((message) => (
         <div key={message.id}>
           {message.parts.map((part) => {
-            if (part.type === 'text') {
+            if (part.type === "text") {
               return (
                 <StreamingMessage
                   text={part.text}
-                  animate={message.role === 'assistant'}
+                  animate={message.role === "assistant"}
                 />
-              )
+              );
             }
           })}
         </div>
@@ -234,8 +237,8 @@ export const Chat = () => {
         <button type="submit">Send</button>
       </form>
     </div>
-  )
-}
+  );
+};
 ```
 
 With this, all AI responses are streamed in character by character. User messages appear instantly since they're already complete.
@@ -245,10 +248,12 @@ With this, all AI responses are streamed in character by character. User message
 ## Results
 
 **Before (chunky streaming):**
+
 - Text appears exactly as we get it from the server
 - To me feels like an unnatural reading experience
 
 **After (smooth streaming):**
+
 - Consistent animation
 - Users can read along as text appears
 - Interface feels conversational and polished
@@ -271,3 +276,5 @@ You can configure the typewriter effect to go as fast as you like. I find 5ms pe
 ## Congratulations!
 
 We've built a smooth streaming text animation that makes AI responses feel natural and polished. We receive chunks from the server as fast as possible, but stream them to users at a consistent, readable pace.
+
+I got this idea from building a side project. You can see a full demo video of the chat experience [on the homepage](https://contentport.io).
