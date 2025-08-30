@@ -1,0 +1,159 @@
+---
+title: "Better Context7 Output Quality with Code Scoring"
+publishedAt: "2025-09-01"
+summary: "Introducing c7score, a new library for measuring and ensuring high-quality code snippets in Context7's documentation repository."
+draft: true
+---
+
+Even the most advanced LLMs still hallucinate, which can at times make their outputs unreliable or even misleading. In the context of code generation, they may produce outdated code from previous package versions or code that simply doesn't work.
+
+Context7 is an MCP server that equips clients like Cursor and Windsurf with tools their LLMs can use to access Context7's documentation repository. When a user provides a prompt, these tools enable the LLM to:
+
+1. Determine the corresponding Context7 library.
+2. Retrieve the relevant documentation snippets from the Context7 library.
+3. Use these snippets to inform code generation.
+
+However, we can't just give the LLMs *any* snippet, otherwise we may be reinforcing the behavior that we are trying to correct.
+
+**How can we avoid giving LLMs low quality snippets?** Meet c7score, a library for measuring snippet quality.
+
+---
+
+## Defining Quality
+
+An early challenge during c7score's development was defining what quality truly means. Since our goal was to build a library that would be used in conjunction with Context7, which helps provide developers with up-to-date code ready to be used in their project, quality meant code that is relevant, clean, and correct.
+
+---
+
+## Previous Approaches
+
+Previous approaches varied in methodology but shared the same underlying concept: comparing the Context7 snippets with the original source.
+
+### Github Scraping + Content Priority
+
+Given a library's Github documentation URL, the repository's files were parsed and fed into Gemini to identify the 10 most important pieces of information about the library. A second Gemini call checked whether the corresponding library snippets on the Context7 website included those key details.
+
+❌ **This simple approach made two assumptions:**
+
+1. Context7 documentation sources are solely from Github.
+2. The most important information about a library is in its Github repository.
+
+### Gemini Tools + Content Priority + Pattern Matching + Static Code Analysis
+
+The Github scraping component was replaced by Gemini's Google Search tool, allowing Gemini to pull information about the library's documentation from any website. As in the previous approach, an additional model call determined whether the information retrieved through Google Search appeared in the Context7 snippets. After that, rule-based text inspection metrics verified that the snippets were formatted properly and contained only the necessary information, while linters ensured that the code's syntax was correct.
+
+❌ **Static code analysis wasn't the right tool for this problem:**
+
+1. Each programming language represented in Context7 would need its own linter.
+2. Differences between linters introduced inconsistencies.
+3. Linters require self-contained code, which the snippets don't often have.
+
+❌ **Having an LLM select important information is a subjective and vague task.**
+
+---
+
+## Introducing c7score
+
+Now, Gemini uses Google Search to create common developer questions about the overall product that the library represents and evaluates how well these questions are answered by the snippets. We add a second LLM-based evaluation metric to examine qualities that require human-like judgement, beyond what typical text inspection metrics can catch. These include aspects such as syntax correctness, clear wording, and the uniqueness of information across snippets. We also keep the rule-based text inspection from the previous version.
+
+A comparison feature is available, enabling users to compare libraries with the same product, but parsed from different sources. For example, consider the library `/tailwindlabs/tailwindcss`, which was sourced from Github, and `/context7/tailwindcss`, from the `tailwindcss` documentation.
+
+---
+
+## Getting Started
+
+c7score is integrated with Context7 to control which snippet sources your LLM assistant uses. Though, you can also install it directly as an npm package.
+
+### Installing with npm
+
+```bash
+npm i @upstash/c7score
+```
+
+### Package Usage
+
+To use the package, you can call the `getScore` method to evaluate individual libraries or the `compareLibraries` method to compare two libraries.
+
+```tsx
+var c7score = require("@upstash/c7score") 
+c7score.getScore("/vercel/next.js");
+c7score.compareLibraries("/context7/nextjs", "/vercel/next.js")
+```
+
+Both methods are heavily customizable and have the following configuration options:
+
+```tsx
+{
+    report: 
+        {
+            console: boolean
+            folderPath: string
+        } 
+    weights: 
+        {
+            question: number,
+            llm: number,
+            formatting: number,
+            metadata: number,
+            initialization: number
+        } 
+    llm:
+        {
+            temperature: number,
+            topP: number,
+            topK: number,
+        }
+    prompt:
+        {
+            searchTopics: string,
+            questionEvaluation: string,
+            llmEvaluation: string
+        }
+}
+```
+
+### Package Outputs
+
+Here's what our `getScore` method produces when we run it on `/vercel/next.js` using the default configuration.
+
+```
+== Average Score ==
+
+59.78003773584906
+
+== Questions Score ==
+
+60.13
+
+== Questions Explanation ==
+
+The provided context is highly effective for questions about core Next.js features such as routing, layouts, performance optimization, and the server/client component model.
+However, it lacks specific implementation details for building complex UI components from scratch or integrating third-party libraries for advanced effects like animations.
+
+== LLM Score ==
+
+72.2
+
+== LLM Explanation ==
+
+The score is primarily lowered by a significant lack of unique information, as most snippets repeat one of two command patterns: creating a project from an example or running the development server.
+The snippets themselves are very clear, well-described, and contain almost no syntax errors, with only one incorrect command found.
+
+== Formatting Score ==
+
+64.15094339622641
+
+== Project Metadata Score ==
+
+100
+
+== Initialization Score ==
+
+94.33962264150944
+```
+
+---
+
+## Conclusion
+
+`c7score` keeps the context your LLM assistant sees at production quality, so you can trust the code it delivers. Explore the package on npm [here](https://www.npmjs.com/package/@shannonrumsey/context-trace).
