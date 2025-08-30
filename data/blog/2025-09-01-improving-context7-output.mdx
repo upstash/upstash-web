@@ -1,8 +1,9 @@
 ---
 title: "Better Context7 Output Quality with Code Scoring"
-publishedAt: "2025-09-01"
-summary: "Introducing c7score, a new library for measuring and ensuring high-quality code snippets in Context7's documentation repository."
-draft: true
+slug: "better-context7-output"
+authors:
+  - shannon
+tags: [context7]
 ---
 
 Even the most advanced LLMs still hallucinate, which can at times make their outputs unreliable or even misleading. In the context of code generation, they may produce outdated code from previous package versions or code that simply doesn't work.
@@ -13,7 +14,7 @@ Context7 is an MCP server that equips clients like Cursor and Windsurf with tool
 2. Retrieve the relevant documentation snippets from the Context7 library.
 3. Use these snippets to inform code generation.
 
-However, we can't just give the LLMs *any* snippet, otherwise we may be reinforcing the behavior that we are trying to correct.
+However, we can't just give the LLMs _any_ snippet, otherwise we may be reinforcing the behavior that we are trying to correct.
 
 **How can we avoid giving LLMs low quality snippets?** Meet c7score, a library for measuring snippet quality.
 
@@ -75,28 +76,28 @@ npm i @upstash/c7score
 To use the package, you can call the `getScore` method to evaluate individual libraries or the `compareLibraries` method to compare two libraries.
 
 ```tsx
-var c7score = require("@upstash/c7score") 
+var c7score = require("@upstash/c7score");
 c7score.getScore("/vercel/next.js");
-c7score.compareLibraries("/context7/nextjs", "/vercel/next.js")
+c7score.compareLibraries("/context7/nextjs", "/vercel/next.js");
 ```
 
 Both methods are heavily customizable and have the following configuration options:
 
 ```tsx
 {
-    report: 
+    report:
         {
             console: boolean
             folderPath: string
-        } 
-    weights: 
+        }
+    weights:
         {
             question: number,
             llm: number,
             formatting: number,
             metadata: number,
             initialization: number
-        } 
+        }
     llm:
         {
             temperature: number,

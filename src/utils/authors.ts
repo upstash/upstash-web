@@ -398,6 +398,11 @@ export const authors: Record<
     title: "DevRel @Upstash",
     image: "josh.png",
   },
+  shannon: {
+    name: "Shannon",
+    title: "Engineer @Context7",
+    image: "shannon.png",
+  },
   jorge: {
     name: "Jorge Lapa",
     title: "Software Engineer @Upstash",
