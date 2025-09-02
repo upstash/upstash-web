@@ -17,7 +17,7 @@ Context7 is an MCP server that equips clients like Cursor and Windsurf with tool
 
 However, we can't just give the LLMs _any_ snippet, otherwise we may be reinforcing the behavior that we are trying to correct.
 
-**How can we avoid giving LLMs low quality snippets?** Meet c7score, a library for measuring snippet quality.
+_How can we avoid giving LLMs low quality snippets?_ Meet c7score, a library for measuring snippet quality.
 
 ---
 
@@ -35,7 +35,7 @@ Previous approaches varied in methodology but shared the same underlying concept
 
 Given a library's Github documentation URL, the repository's files were parsed and fed into Gemini to identify the 10 most important pieces of information about the library. A second Gemini call checked whether the corresponding library snippets on the Context7 website included those key details.
 
-❌ **This simple approach made two assumptions:**
+❌ This simple approach made two assumptions:
 
 1. Context7 documentation sources are solely from Github.
 2. The most important information about a library is in its Github repository.
@@ -44,25 +44,25 @@ Given a library's Github documentation URL, the repository's files were parsed a
 
 The Github scraping component was replaced by Gemini's Google Search tool, allowing Gemini to pull information about the library's documentation from any website. As in the previous approach, an additional model call determined whether the information retrieved through Google Search appeared in the Context7 snippets. After that, rule-based text inspection metrics verified that the snippets were formatted properly and contained only the necessary information, while linters ensured that the code's syntax was correct.
 
-❌ **Static code analysis wasn't the right tool for this problem:**
+❌ Static code analysis wasn't the right tool for this problem:
 
 1. Each programming language represented in Context7 would need its own linter.
 2. Differences between linters introduced inconsistencies.
 3. Linters require self-contained code, which the snippets don't often have.
 
-❌ **Having an LLM select important information is a subjective and vague task.**
+❌ Having an LLM select important information is a subjective and vague task.
 
 ---
 
-## Introducing c7score
+## c7score
 
 Now, Gemini uses Google Search to create common developer questions about the overall product that the library represents and evaluates how well these questions are answered by the snippets. We add a second LLM-based evaluation metric to examine qualities that require human-like judgement, beyond what typical text inspection metrics can catch. These include aspects such as syntax correctness, clear wording, and the uniqueness of information across snippets. We also keep the rule-based text inspection from the previous version.
 
-A comparison feature is available, enabling users to compare libraries with the same product, but parsed from different sources. For example, consider the library `/tailwindlabs/tailwindcss`, which was sourced from Github, and `/context7/tailwindcss`, from the `tailwindcss` documentation.
+A comparison feature is available, enabling users to compare libraries with the same product, but parsed from different sources. For example, consider the library `/tailwindlabs/tailwindcss`, which was sourced from Github, and `/websites/tailwindcss`, from the `tailwindcss` documentation.
 
 ---
 
-## Getting Started
+## Getting started
 
 c7score is integrated with Context7 to control which snippet sources your LLM assistant uses. Though, you can also install it directly as an npm package.
 
@@ -77,9 +77,10 @@ npm i @upstash/c7score
 To use the package, you can call the `getScore` method to evaluate individual libraries or the `compareLibraries` method to compare two libraries.
 
 ```tsx
-var c7score = require("@upstash/c7score");
-c7score.getScore("/vercel/next.js");
-c7score.compareLibraries("/context7/nextjs", "/vercel/next.js");
+import { compareLibraries, getScore } from "@upstash/c7score";
+
+await getScore("/vercel/next.js");
+await compareLibraries("/websites/nextjs", "/vercel/next.js");
 ```
 
 Both methods are heavily customizable and have the following configuration options:
@@ -88,8 +89,10 @@ Both methods are heavily customizable and have the following configuration optio
 {
     report:
         {
-            console: boolean
-            folderPath: string
+            console: boolean;
+		        folderPath: string;
+		        humanReadable: boolean;
+		        returnScore: boolean;
         }
     weights:
         {
@@ -105,7 +108,7 @@ Both methods are heavily customizable and have the following configuration optio
             topP: number,
             topK: number,
         }
-    prompt:
+    prompts:
         {
             searchTopics: string,
             questionEvaluation: string,
@@ -129,8 +132,7 @@ Here's what our `getScore` method produces when we run it on `/vercel/next.js` u
 
 == Questions Explanation ==
 
-The provided context is highly effective for questions about core Next.js features such as routing, layouts, performance optimization, and the server/client component model.
-However, it lacks specific implementation details for building complex UI components from scratch or integrating third-party libraries for advanced effects like animations.
+The provided context is highly effective for questions about core Next.js features such as routing, layouts, performance optimization, and the server/client component model. However, it lacks specific implementation details for building complex UI components from scratch or integrating third-party libraries for advanced effects like animations.
 
 == LLM Score ==
 
@@ -138,8 +140,7 @@ However, it lacks specific implementation details for building complex UI compon
 
 == LLM Explanation ==
 
-The score is primarily lowered by a significant lack of unique information, as most snippets repeat one of two command patterns: creating a project from an example or running the development server.
-The snippets themselves are very clear, well-described, and contain almost no syntax errors, with only one incorrect command found.
+The score is primarily lowered by a significant lack of unique information, as most snippets repeat one of two command patterns: creating a project from an example or running the development server. The snippets themselves are very clear, well-described, and contain almost no syntax errors, with only one incorrect command found.
 
 == Formatting Score ==
 
