@@ -62,11 +62,11 @@ const filtered = allData
 This naive approach quickly reveals its limitations:
 
 1. **Upsert Nightmare**: Imagine you need to correct the price for January 2nd. You'd need to:
-   - Fetch the entire list
-   - Find the matching date
-   - Remove the old entry
-   - Insert the corrected entry at the right position
-   - Push everything back
+  - Fetch the entire list
+  - Find the matching date
+  - Remove the old entry
+  - Insert the corrected entry at the right position
+  - Push everything back
 
 2. **No Random Access**: You can't jump to a specific date without fetching everything. For example, if AAPL started trading in 1980 but GOOG started in 2004, you can't use index-based queries effectively. You always need to fetch and filter.
 
