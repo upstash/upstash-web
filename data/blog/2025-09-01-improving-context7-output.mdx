@@ -86,41 +86,37 @@ Both methods are heavily customizable and have the following configuration optio
 
 ```tsx
 {
-    report:
-        {
-            console: boolean;
-		        folderPath: string;
-		        humanReadable: boolean;
-		        returnScore: boolean;
-        }
-    weights:
-        {
-            question: number,
-            llm: number,
-            formatting: number,
-            metadata: number,
-            initialization: number
-        }
-    llm:
-        {
-            temperature: number,
-            topP: number,
-            topK: number,
-        }
-    prompts:
-        {
-            searchTopics: string,
-            questionEvaluation: string,
-            llmEvaluation: string
-        }
-}
+  report: {
+    console: boolean;
+    folderPath: string;
+    humanReadable: boolean;
+    returnScore: boolean;
+  };
+  weights: {
+    question: number;
+    llm: number;
+    formatting: number;
+    metadata: number;
+    initialization: number;
+  };
+  llm: {
+    temperature: number;
+    topP: number;
+    topK: number;
+  };
+  prompts: {
+    searchTopics: string;
+    questionEvaluation: string;
+    llmEvaluation: string;
+  };
+};
 ```
 
 ### Package Outputs
 
 Here's what our `getScore` method produces when we run it on `/vercel/next.js` using the default configuration.
 
-```
+```txt
 == Average Score ==
 
 59.78003773584906
@@ -131,7 +127,11 @@ Here's what our `getScore` method produces when we run it on `/vercel/next.js` u
 
 == Questions Explanation ==
 
-The provided context is highly effective for questions about core Next.js features such as routing, layouts, performance optimization, and the server/client component model. However, it lacks specific implementation details for building complex UI components from scratch or integrating third-party libraries for advanced effects like animations.
+The provided context is highly effective for questions about core Next.js
+features such as routing, layouts, performance optimization, and the
+server/client component model. However, it lacks specific implementation
+details for building complex UI components from scratch or integrating
+third-party libraries for advanced effects like animations.
 
 == LLM Score ==
 
@@ -139,7 +139,11 @@ The provided context is highly effective for questions about core Next.js featur
 
 == LLM Explanation ==
 
-The score is primarily lowered by a significant lack of unique information, as most snippets repeat one of two command patterns: creating a project from an example or running the development server. The snippets themselves are very clear, well-described, and contain almost no syntax errors, with only one incorrect command found.
+The score is primarily lowered by a significant lack of unique information,
+as most snippets repeat one of two command patterns: creating a project
+from an example or running the development server. The snippets themselves
+are very clear, well-described, and contain almost no syntax errors,
+with only one incorrect command found.
 
 == Formatting Score ==
 
