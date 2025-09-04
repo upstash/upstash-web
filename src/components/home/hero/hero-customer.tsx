@@ -15,6 +15,7 @@ import { LogoMidjourney } from "@/components/customers/logo-midjourney";
 import { LogoOpenart } from "@/components/customers/logo-openart";
 import { LogoOpenrouter } from "@/components/customers/logo-openrouter";
 import { LogoPaulSmith } from "@/components/customers/logo-paul-smith";
+import { LogoScira } from "@/components/customers/logo-scira";
 import { LogoSupabase } from "@/components/customers/logo-supabase";
 import { LogoTFashion } from "@/components/customers/logo-tfashion";
 import { LogoVercel } from "@/components/customers/logo-vercel";
@@ -50,14 +51,14 @@ export default function HomeHeroCustomer() {
         >
           {customers
             .filter((c) => c.quote)
-            .map(({ name, icon, quote, slug }, index) => {
+            .map(({ name, icon, quote, slug, url }, index) => {
               const content = (
                 <div
                   className={cx(
                     "group flex h-full flex-col overflow-hidden px-4 py-3 sm:py-4",
                     "rounded-2xl bg-bg-mute md:rounded-4xl dark:bg-bg-mute dark:hover:bg-white",
                     "col-span-3 bg-white py-8 shadow-sm transition-colors sm:px-16 sm:py-10",
-                    index === 2 && "md:translate-x-[calc(50%+12px)]",
+                    // index === 2 && "md:translate-x-[calc(50%+12px)]",
                   )}
                 >
                   <span className="flex h-10 items-center justify-center text-text transition-colors group-hover:text-primary group-hover:opacity-100 dark:text-white dark:opacity-80">
@@ -74,10 +75,10 @@ export default function HomeHeroCustomer() {
                   </p>
                 </div>
               );
-              return slug ? (
+              return slug || url ? (
                 <Link
                   key={name}
-                  href={`/customers/${slug}`}
+                  href={slug ? `/customers/${slug}` : url ? url : ""}
                   className="col-span-3"
                 >
                   {content}
@@ -96,7 +97,7 @@ export default function HomeHeroCustomer() {
         >
           {customers
             .filter((c) => !c.quote)
-            .map(({ name, icon, slug }) => {
+            .map(({ name, icon, slug, url }) => {
               const cell = (
                 <div
                   className={cx(
@@ -107,8 +108,11 @@ export default function HomeHeroCustomer() {
                   {icon}
                 </div>
               );
-              return slug ? (
-                <Link key={name} href={`/customers/${slug}`}>
+              return slug || url ? (
+                <Link
+                  key={name}
+                  href={slug ? `/customers/${slug}` : url ? url : ""}
+                >
                   {cell}
                 </Link>
               ) : (
@@ -154,6 +158,19 @@ const customers = [
         Developer experience became significantly better than what we
         experienced with traditional cloud service providers. The observability
         improvements alone were game-changing for our small team.
+      </>
+    ),
+  },
+  {
+    name: "Scira",
+    url: "https://github.com/zaidmukaddam/scira",
+    icon: <LogoScira height={30} />,
+    quote: (
+      <>
+        Upstash Redis has been one of the best and most affordable Redis
+        providers I’ve used, it's super fast and reliable for caching and rate
+        limiting. For cron-style scheduling, QStash has been perfect: flexible,
+        supports custom headers and timezones, and has had zero downtime.
       </>
     ),
   },
