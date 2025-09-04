@@ -230,15 +230,15 @@ export class WebhookClient {
 }
 ```
 
-As you can see, we're now making use of the `secret` we passed to the constructor. This secret is used to sign the payload and is given to the webhook subscriber (a user of marblecms).
+As you can see, we're now making use of the `secret` we passed to the constructor. This secret is used to sign the payload and is given to the webhook subscriber (Marble users).
 
-In their own webhook endpoint, they will be able to verify that this request actually came from marble (and not from a potential attacker) by verifying the signature.
+In their own webhook endpoint, they will be able to verify that this request actually came from Marble (and not from a potential attacker) by verifying the signature.
 
 ---
 
 ### 4. Verifying the signature
 
-Your users (or in this case, marble users) can verify that the webhook is actually coming from you:
+Your users (or in this case, Marble users) can verify that the webhook is actually coming from you:
 
 ```typescript
 import { createHmac, timingSafeEqual } from "node:crypto";
