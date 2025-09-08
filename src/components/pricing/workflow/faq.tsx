@@ -69,12 +69,43 @@ export default function FAQ() {
       </AccordionItem>
       <AccordionItem value="item-4">
         <AccordionTrigger>
-          What happens when request per second limit is reached?
+          Is there a rate limit ?
         </AccordionTrigger>
         <AccordionContent>
-          When the limit is reached QStash API starts to return exception, the Workflow SDK 
-          in this case throttles for a second and retries the call until the retry limit is reached.
-          After that, the workflow run fails and recorded in DLQ(dead letter queue).
+        <ul className="mt-4 list-disc space-y-2 pl-6">
+            <li className="space-y-2">
+              <p>
+                There is no request per second limit for operational API's as listed above:
+              </p>
+              <ul className="mt-4 list-disc space-y-2 pl-6">
+              <li> trigger, publish, enqueue, notify, wait, batch</li>
+              </ul>
+            </li>
+            <li className="space-y-2">
+              <p> Other endpoints (like logs,messages etc) have rps limit. When limit is reached, Rest API returns 
+                "Too Many Request" with 429 status code.
+              </p>
+              <ul className="mt-4 list-disc space-y-2 pl-6">
+              <li> Free: 100 rps</li>
+              <li> Pay as you go: 100 rps</li>
+              <li> Fixed 1M: 500 rps</li>
+              <li> Fixed 10M: 1000 rps</li>
+              </ul>
+            </li>
+            <li className="space-y-2">
+              <p>
+                We have parallelism limit when calling the user endpoint from QStash. 
+                This limits number of parallel calls that can happen at the same time, other calls are queued to be done 
+                later. The quotas per plan is as follows:
+              </p>
+                <ul className="mt-4 list-disc space-y-2 pl-6">
+                <li> Free: 10</li>
+                <li> Pay as you go: 100</li>
+                <li> Fixed 1M: 200</li>
+                <li> Fixed 10M: 1000 </li>
+              </ul>
+            </li>
+          </ul>
         </AccordionContent>
       </AccordionItem>
       <AccordionItem value="item-5">

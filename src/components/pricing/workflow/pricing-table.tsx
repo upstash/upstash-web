@@ -29,10 +29,6 @@ export default function PricingTable() {
             <p className="text-text-mute">Steps per Day</p>
             <p className="font-semibold">500</p>
           </div>
-          <div className="py-3">
-            <p className="text-text-mute">Requests per Second</p>
-            <p className="font-semibold">100</p>
-          </div>
         </div>
 
         <div>
@@ -65,11 +61,7 @@ export default function PricingTable() {
         <div className="w-full px-6 *:border-b *:border-bg-mute">
           <div className="py-3">
             <p className="text-text-mute">Steps per Day</p>
-            <p className="font-semibold">500,000</p>
-          </div>
-          <div className="py-3">
-            <p className="text-text-mute">Requests per Second</p>
-            <p className="font-semibold">100</p>
+            <p className="font-semibold">Unlimited</p>
           </div>
         </div>
 
@@ -82,11 +74,11 @@ export default function PricingTable() {
         </div>
       </div>
 
-      {/* Pro */}
+      {/* Fixed */}
 
       <div className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
         <div className="grow">
-          <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">Pro</h4>
+          <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">Fixed</h4>
 
           <h5 className="flex items-baseline text-2xl font-semibold">
             $180
@@ -108,10 +100,6 @@ export default function PricingTable() {
           <div className="py-3">
             <p className="text-text-mute">Steps per Day</p>
             <p className="font-semibold">Up to 100M</p>
-          </div>
-          <div className="py-3">
-            <p className="text-text-mute">Requests per Second</p>
-            <p className="font-semibold">Up to 1000</p>
           </div>
         </div>
 
