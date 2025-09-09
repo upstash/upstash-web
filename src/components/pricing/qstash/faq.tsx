@@ -109,7 +109,7 @@ export default function FAQ() {
         <ul className="mt-4 list-disc space-y-2 pl-6">
             <li className="space-y-2">
               <p>
-                There is no request per second limit for operational API's as listed above:
+                There is no request per second limit for operational API's as listed below:
               </p>
               <ul className="mt-4 list-disc space-y-2 pl-6">
               <li> trigger, publish, enqueue, notify, wait, batch</li>
