@@ -17,8 +17,8 @@ export default function CompareTable() {
 
   const showFree = selectedPlans === PricingPlans.Free;
   const showPayg = selectedPlans === PricingPlans.PayAsYouGo;
-  const showPro1 = selectedPlans === PricingPlans.Pro1M;
-  const showPro10 = selectedPlans === PricingPlans.Pro10M;
+  const showFixed1 = selectedPlans === PricingPlans.Pro1M;
+  const showFixed10 = selectedPlans === PricingPlans.Pro10M;
 
   const onPlanChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value as PricingPlans;
@@ -76,13 +76,13 @@ export default function CompareTable() {
             Usage Based Pricing
           </Col>
           <Col
-            plan={showPro1}
+            plan={showFixed1}
             className="border-b-2 border-b-bg px-0 py-3 text-xs font-medium uppercase tracking-wider text-text-mute"
           >
             Fixed Pricing
           </Col>
           <Col
-            plan={showPro10}
+            plan={showFixed10}
             className="border-b-2 border-b-bg px-0 py-3 text-xs font-medium uppercase tracking-wider text-text-mute"
           >
             Fixed Pricing
@@ -124,10 +124,10 @@ export default function CompareTable() {
               </h5>
             </div>
           </Col>
-          <Col plan={showPro1} className="border-b border-b-bg bg-bg p-0">
+          <Col plan={showFixed1} className="border-b border-b-bg bg-bg p-0">
             <div className="flex h-24 flex-col items-center justify-center bg-bg-mute">
               <h4 className="hidden text-lg font-semibold text-primary-text md:block">
-                Pro 1M
+                Fixed 1M
               </h4>
 
               <MobileSelectCol
@@ -144,10 +144,10 @@ export default function CompareTable() {
             </div>
           </Col>
 
-          <Col plan={showPro10} className="border-b border-b-bg bg-bg p-0">
+          <Col plan={showFixed10} className="border-b border-b-bg bg-bg p-0">
             <div className="flex h-24 flex-col items-center justify-center bg-bg-mute">
               <h4 className="hidden text-lg font-semibold text-primary-text md:block">
-                Pro 10M
+                Fixed 10M
               </h4>
 
               <MobileSelectCol
@@ -177,16 +177,73 @@ export default function CompareTable() {
           </th>
           {/**/}
           <Col plan={showFree}>
-            <CompareValue type="number">500</CompareValue>
+            <CompareValue type="number">1000</CompareValue>
           </Col>
           <Col plan={showPayg} feature>
-            <CompareValue type="number">500000</CompareValue>
+            <CompareValue>Unlimited</CompareValue>
           </Col>
-          <Col plan={showPro1}>
+          <Col plan={showFixed1}>
             <CompareValue>1M</CompareValue>
           </Col>
-          <Col plan={showPro10}>
+          <Col plan={showFixed10}>
             <CompareValue>10M</CompareValue>
+          </Col>
+        </tr>
+
+        {/*MAX MONTHLY BANDWIDTH*/}
+        <tr>
+          <th className="px-0 text-left font-normal">
+            <Tooltip content="The max total data size going out from QStash to user endpoints per month.">
+              Max Monthly Bandwidth
+            </Tooltip>
+          </th>
+          {/**/}
+          <Col plan={showFree}>
+            <CompareValue type="size" suffix="GB" className="border-b-0">
+              50
+            </CompareValue>
+          </Col>
+          <Col plan={showPayg} feature>
+            <CompareValue
+              type="size"
+              suffix="GB"
+              className="border-b-0"
+              after={
+                <Tooltip content="Free up to 50GB per month. Beyond that $0.05 per GB.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            >
+              50
+            </CompareValue>
+          </Col>
+          <Col plan={showFixed1}>
+              <CompareValue
+                type="size"
+                suffix="TB"
+                className="border-b-0"
+                after={
+                  <Tooltip content="Free up to 1TB per month. Beyond that $0.05 per GB.">
+                    <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                  </Tooltip>
+                }
+              >
+                1
+              </CompareValue>
+          </Col>
+          <Col plan={showFixed10}>
+              <CompareValue
+                type="size"
+                suffix="TB"
+                className="border-b-0"
+                after={
+                  <Tooltip content="Free up to 5TB per month. Beyond that $0.05 per GB.">
+                    <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                  </Tooltip>
+                }
+              >
+                5
+              </CompareValue>
           </Col>
         </tr>
 
@@ -201,10 +258,10 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue type="number">1000</CompareValue>
           </Col>
-          <Col plan={showPro1}>
+          <Col plan={showFixed1}>
             <CompareValue type="number">1000</CompareValue>
           </Col>
-          <Col plan={showPro10}>
+          <Col plan={showFixed10}>
             <CompareValue type="number">1000</CompareValue>
           </Col>
         </tr>
@@ -220,30 +277,11 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue>Unlimited</CompareValue>
           </Col>
-          <Col plan={showPro1}>
+          <Col plan={showFixed1}>
             <CompareValue>Unlimited</CompareValue>
           </Col>
-          <Col plan={showPro10}>
+          <Col plan={showFixed10}>
             <CompareValue>Unlimited</CompareValue>
-          </Col>
-        </tr>
-
-        <tr>
-          <th className="px-0 py-4 text-left font-normal">
-            Max Requests per Second
-          </th>
-          {/**/}
-          <Col plan={showFree}>
-            <CompareValue type="number">100</CompareValue>
-          </Col>
-          <Col plan={showPayg} feature>
-            <CompareValue type="number">100</CompareValue>
-          </Col>
-          <Col plan={showPro1}>
-            <CompareValue type="number">500</CompareValue>
-          </Col>
-          <Col plan={showPro10}>
-            <CompareValue type="number">1000</CompareValue>
           </Col>
         </tr>
 
@@ -260,12 +298,12 @@ export default function CompareTable() {
               10
             </CompareValue>
           </Col>
-          <Col plan={showPro1}>
+          <Col plan={showFixed1}>
             <CompareValue type="size" suffix="MB">
               50
             </CompareValue>
           </Col>
-          <Col plan={showPro10}>
+          <Col plan={showFixed10}>
             <CompareValue type="size" suffix="MB">
               50
             </CompareValue>
@@ -281,10 +319,10 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue>5</CompareValue>
           </Col>
-          <Col plan={showPro1}>
+          <Col plan={showFixed1}>
             <CompareValue>20</CompareValue>
           </Col>
-          <Col plan={showPro10}>
+          <Col plan={showFixed10}>
             <CompareValue>100</CompareValue>
           </Col>
         </tr>
@@ -298,10 +336,10 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue>1 year</CompareValue>
           </Col>
-          <Col plan={showPro1}>
+          <Col plan={showFixed1}>
             <CompareValue>Unlimited</CompareValue>
           </Col>
-          <Col plan={showPro10}>
+          <Col plan={showFixed10}>
             <CompareValue>Unlimited</CompareValue>
           </Col>
         </tr>
@@ -317,10 +355,10 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue>2 hours</CompareValue>
           </Col>
-          <Col plan={showPro1}>
+          <Col plan={showFixed1}>
             <CompareValue>6 hours</CompareValue>
           </Col>
-          <Col plan={showPro10}>
+          <Col plan={showFixed10}>
             <CompareValue>12 hours</CompareValue>
           </Col>
         </tr>
@@ -334,10 +372,10 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue>7 days</CompareValue>
           </Col>
-          <Col plan={showPro1}>
+          <Col plan={showFixed1}>
             <CompareValue>30 days</CompareValue>
           </Col>
-          <Col plan={showPro10}>
+          <Col plan={showFixed10}>
             <CompareValue>3 months</CompareValue>
           </Col>
         </tr>
@@ -353,10 +391,10 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue>7 days</CompareValue>
           </Col>
-          <Col plan={showPro1}>
+          <Col plan={showFixed1}>
             <CompareValue>14 days</CompareValue>
           </Col>
-          <Col plan={showPro10}>
+          <Col plan={showFixed10}>
             <CompareValue>14 days</CompareValue>
           </Col>
         </tr>
@@ -372,12 +410,12 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue type="boolean" valid={false} />
           </Col>
-          <Col plan={showPro1}>
+          <Col plan={showFixed1}>
             <CompareValue className="">
               <div>99.99%</div>
             </CompareValue>
           </Col>
-          <Col plan={showPro10}>
+          <Col plan={showFixed10}>
             <CompareValue className="">
               <div>99.99%</div>
             </CompareValue>
@@ -397,10 +435,10 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue>None</CompareValue>
           </Col>
-          <Col plan={showPro1}>
+          <Col plan={showFixed1}>
             <CompareValue>$180</CompareValue>
           </Col>
-          <Col plan={showPro10}>
+          <Col plan={showFixed10}>
             <CompareValue>$420</CompareValue>
           </Col>
         </tr>
@@ -413,10 +451,10 @@ export default function CompareTable() {
           <Col plan={showPayg} feature>
             <CompareValue>$1 per 100K</CompareValue>
           </Col>
-          <Col plan={showPro1}>
+          <Col plan={showFixed1}>
             <CompareValue>None</CompareValue>
           </Col>
-          <Col plan={showPro10}>
+          <Col plan={showFixed10}>
             <CompareValue>None</CompareValue>
           </Col>
         </tr>
@@ -439,14 +477,14 @@ export default function CompareTable() {
               </a>
             </Button>
           </Col>
-          <Col plan={showPro1} className="py-4">
+          <Col plan={showFixed1} className="py-4">
             <Button asChild variant="primary">
               <a target="_self" href="https://console.upstash.com/workflow">
                 Start Now
               </a>
             </Button>
           </Col>
-          <Col plan={showPro10} className="py-4">
+          <Col plan={showFixed10} className="py-4">
             <Button asChild variant="primary">
               <a target="_self" href="https://console.upstash.com/workflow">
                 Start Now
@@ -467,8 +505,8 @@ function MobileSelectCol({ ...props }: React.ComponentProps<"select">) {
     >
       <option value={PricingPlans.Free}>Free</option>
       <option value={PricingPlans.PayAsYouGo}>Pay as you go</option>
-      <option value={PricingPlans.Pro1M}>Pro 1M</option>
-      <option value={PricingPlans.Pro10M}>Pro 10M</option>
+      <option value={PricingPlans.Pro1M}>Fixed 1M</option>
+      <option value={PricingPlans.Pro10M}>Fixed 10M</option>
     </select>
   );
 }

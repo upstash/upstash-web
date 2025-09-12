@@ -72,7 +72,7 @@ export default function FAQ() {
           What happens when we hit daily max messages limit?
         </AccordionTrigger>
         <AccordionContent>
-          QStash API starts to return exceptions.
+          QStash API starts to return "daily ratelimit YOUR_QUOTA exceeded" with 429 status code.
         </AccordionContent>
       </AccordionItem>
 
@@ -100,6 +100,50 @@ export default function FAQ() {
           </ul>
         </AccordionContent>
       </AccordionItem>
+
+      <AccordionItem value="item-4">
+        <AccordionTrigger>
+          Is there a rate limit ?
+        </AccordionTrigger>
+        <AccordionContent>
+        <ul className="mt-4 list-disc space-y-2 pl-6">
+            <li className="space-y-2">
+              <p>
+                There is no request per second limit for operational API's as listed below:
+              </p>
+              <ul className="mt-4 list-disc space-y-2 pl-6">
+              <li> trigger, publish, enqueue, notify, wait, batch</li>
+              </ul>
+            </li>
+            <li className="space-y-2">
+              <p> Other endpoints (like logs,messages etc) have rps limit. When limit is reached, API returns 
+                "Too Many Requests" with 429 status code.
+              </p>
+              <ul className="mt-4 list-disc space-y-2 pl-6">
+              <li> Free: 100 rps</li>
+              <li> Pay as you go: 100 rps</li>
+              <li> Fixed 1M: 500 rps</li>
+              <li> Fixed 10M: 1000 rps</li>
+              </ul>
+            </li>
+            <li className="space-y-2">
+              <p>
+                We have parallelism limit when calling the user endpoint from QStash. 
+                This limits number of parallel calls that can happen at the same time, other calls are queued to be done 
+                later. The quotas per plan is as follows:
+              </p>
+                <ul className="mt-4 list-disc space-y-2 pl-6">
+                <li> Free: 10</li>
+                <li> Pay as you go: 100</li>
+                <li> Fixed 1M: 200</li>
+                <li> Fixed 10M: 1000 </li>
+              </ul>
+            </li>
+          </ul>
+        </AccordionContent>
+      </AccordionItem>
+
+
     </Accordion.Root>
   );
 }
