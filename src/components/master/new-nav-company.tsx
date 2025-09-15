@@ -1,6 +1,7 @@
 import { allJobs } from "@content";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import {
+  IconBrandOpenSource,
   IconMoodSmileBeam,
   IconUserPlus,
   IconUsers,
@@ -55,6 +56,14 @@ export default function NewNavigationItemCompany() {
             icon={<IconUsers strokeWidth={1.5} />}
           >
             Data Platform for Developers
+          </ListItem>
+
+          <ListItem
+            href="/open-source"
+            title1="Open-Source Program"
+            icon={<IconBrandOpenSource strokeWidth={1.5} />}
+          >
+            We sponsor open-source projects
           </ListItem>
         </div>
       </NewNavigationContent>
