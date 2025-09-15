@@ -9,7 +9,7 @@ export const Benefits = () => {
             <div className="absolute inset-px rounded-xl bg-bg lg:rounded-l-4xl" />
             <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] lg:rounded-l-[calc(2rem+1px)]">
               <div className="px-8 pt-8 text-left sm:px-10 sm:pt-10">
-                <p className="mt-2 text-lg font-medium tracking-tight text-white">
+                <p className="mt-2 text-lg font-medium tracking-tight">
                   $1,000 Monthly credit grant
                 </p>
                 <p className="mt-2 max-w-lg text-sm/6 opacity-60">
@@ -22,14 +22,14 @@ export const Benefits = () => {
                 <div className="relative mx-auto h-full w-full max-w-xs">
                   <div className="relative h-full w-full overflow-hidden rounded-xl bg-gray-900/25 shadow-2xl">
                     <div className="absolute inset-0 rounded-xl bg-gradient-to-b from-black/10 to-black/30" />
-                    <div className="relative flex h-full flex-col text-white">
-                      <div className="relative flex w-full flex-1 flex-col items-start gap-6 bg-neutral-900/50 p-7">
+                    <div className="relative flex h-full flex-col">
+                      <div className="relative flex w-full flex-1 flex-col items-start gap-6 bg-neutral-900/100 dark:bg-neutral-900/50 p-7">
                         <div className="flex-1 pt-2">
                           <div className="size-6 md:size-8">
                             <UpstashLogo />
                           </div>
                         </div>
-                        <div className="flex flex-col text-left">
+                        <div className="flex text-white flex-col text-left">
                           <p className="text-xs opacity-60">Card Number</p>
                           <p className="text-sm uppercase">
                             6277 7564 2527 4778
@@ -100,7 +100,7 @@ export const Benefits = () => {
                           </svg>
                         </div>
                       </div>
-                      <div className="relative z-10 flex h-20 w-full items-center justify-between bg-[#131416] px-7 text-center">
+                      <div className="relative text-white z-10 flex h-20 w-full items-center justify-between bg-[#131416] px-7 text-center">
                         <div className="flex flex-col text-left">
                           <p className="text-xs opacity-60">Card holder name</p>
                           <p className="text-sm uppercase">Upstash OSS</p>
@@ -122,7 +122,7 @@ export const Benefits = () => {
             <div className="absolute inset-px rounded-xl bg-bg max-lg:rounded-t-4xl" />
             <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] max-lg:rounded-t-[calc(2rem+1px)]">
               <div className="px-8 pt-8 text-left sm:px-10 sm:pt-10">
-                <p className="mt-2 text-lg font-medium tracking-tight text-white">
+                <p className="mt-2 text-lg font-medium tracking-tight">
                   Technical help
                 </p>
                 <p className="mt-2 max-w-lg text-sm/6 opacity-60">
@@ -145,7 +145,7 @@ export const Benefits = () => {
             <div className="absolute inset-px rounded-xl bg-bg" />
             <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] text-left">
               <div className="px-8 pt-8 sm:px-10 sm:pt-10">
-                <p className="mt-2 text-lg font-medium tracking-tight text-white">
+                <p className="mt-2 text-lg font-medium tracking-tight">
                   Direct team access
                 </p>
                 <p className="mt-2 max-w-lg text-sm/6 opacity-60">
@@ -168,10 +168,10 @@ export const Benefits = () => {
             <div className="absolute inset-px rounded-xl bg-bg max-lg:rounded-b-4xl lg:rounded-r-4xl" />
             <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] max-lg:rounded-b-[calc(2rem+1px)] lg:rounded-r-[calc(2rem+1px)]">
               <div className="px-8 pt-8 text-left sm:px-10 sm:pt-10">
-                <p className="mt-2 text-lg font-medium tracking-tight text-white">
+                <p className="mt-2 text-lg font-medium tracking-tight">
                   Co-Marketing with Upstash
                 </p>
-                <p className="mt-2 max-w-lg text-sm/6 text-white/60">
+                <p className="mt-2 max-w-lg text-sm/6">
                   We help publish technical articles about your business &
                   Upstash to our audience. Nice side-effect: High-quality
                   backlinks for your project.

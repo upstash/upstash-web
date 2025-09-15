@@ -52,7 +52,7 @@ export const ApplyNow = () => {
         <div className="text-left">
           <label
             htmlFor="name"
-            className="mb-2 block text-sm font-medium text-white"
+            className="mb-2 block text-sm font-medium"
           >
             Your name <span className="text-red-400">*</span>
           </label>
@@ -63,7 +63,7 @@ export const ApplyNow = () => {
             required
             value={formData.name}
             onChange={handleInputChange}
-            className="w-full rounded-xl border border-emerald-800/40 bg-white/5 px-4 py-3 text-white transition placeholder:text-white/40 focus:border-emerald-400/60 focus:outline-none focus:ring-2 focus:ring-emerald-400/40"
+            className="w-full rounded-xl border border-emerald-800/40 bg-white/5 px-4 py-3 transition  focus:border-emerald-400/60 focus:outline-none focus:ring-2 focus:ring-emerald-400/40"
             placeholder="Enter your full name"
           />
         </div>
@@ -71,7 +71,7 @@ export const ApplyNow = () => {
         <div className="text-left">
           <label
             htmlFor="twitter"
-            className="mb-2 block text-sm font-medium text-white"
+            className="mb-2 block text-sm font-medium"
           >
             Twitter/X username <span className="text-red-400">*</span>
           </label>
@@ -82,7 +82,7 @@ export const ApplyNow = () => {
             required
             value={formData.twitter}
             onChange={handleInputChange}
-            className="w-full rounded-xl border border-emerald-800/40 bg-white/5 px-4 py-3 text-white transition placeholder:text-white/40 focus:border-emerald-400/60 focus:outline-none focus:ring-2 focus:ring-emerald-400/40"
+            className="w-full rounded-xl border border-emerald-800/40 bg-white/5 px-4 py-3 transition  focus:border-emerald-400/60 focus:outline-none focus:ring-2 focus:ring-emerald-400/40"
             placeholder="@username"
           />
         </div>
@@ -90,7 +90,7 @@ export const ApplyNow = () => {
         <div className="text-left">
           <label
             htmlFor="githubRepo"
-            className="mb-2 block text-sm font-medium text-white"
+            className="mb-2 block text-sm font-medium"
           >
             GitHub repo <span className="text-red-400">*</span>
           </label>
@@ -101,7 +101,7 @@ export const ApplyNow = () => {
             required
             value={formData.githubRepo}
             onChange={handleInputChange}
-            className="w-full rounded-xl border border-emerald-800/40 bg-white/5 px-4 py-3 text-white transition placeholder:text-white/40 focus:border-emerald-400/60 focus:outline-none focus:ring-2 focus:ring-emerald-400/40"
+            className="w-full rounded-xl border border-emerald-800/40 bg-white/5 px-4 py-3 transition  focus:border-emerald-400/60 focus:outline-none focus:ring-2 focus:ring-emerald-400/40"
             placeholder="https://github.com/username/repository"
           />
         </div>
@@ -109,10 +109,10 @@ export const ApplyNow = () => {
         <div className="text-left">
           <label
             htmlFor="notes"
-            className="mb-2 block text-sm font-medium text-white"
+            className="mb-2 block text-sm font-medium"
           >
             Additional notes{" "}
-            <span className="font-normal text-white/60">(optional)</span>
+            <span className="font-normal/60">(optional)</span>
           </label>
           <textarea
             id="notes"
@@ -120,7 +120,7 @@ export const ApplyNow = () => {
             rows={4}
             value={formData.notes}
             onChange={handleInputChange}
-            className="w-full resize-none rounded-xl border border-emerald-800/40 bg-white/5 px-4 py-3 text-white transition placeholder:text-white/40 focus:border-emerald-400/60 focus:outline-none focus:ring-2 focus:ring-emerald-400/40"
+            className="w-full resize-none rounded-xl border border-emerald-800/40 bg-white/5 px-4 py-3 transition  focus:border-emerald-400/60 focus:outline-none focus:ring-2 focus:ring-emerald-400/40"
             placeholder="Tell us about your project, how you plan to use Upstash, or any other relevant information..."
           />
         </div>
