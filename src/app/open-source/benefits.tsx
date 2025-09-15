@@ -171,7 +171,7 @@ export const Benefits = () => {
                 <p className="mt-2 text-lg font-medium tracking-tight">
                   Co-Marketing with Upstash
                 </p>
-                <p className="mt-2 max-w-lg text-sm/6">
+                <p className="mt-2 max-w-lg text-sm/6 opacity-60">
                   We help publish technical articles about your business &
                   Upstash to our audience. Nice side-effect: High-quality
                   backlinks for your project.
