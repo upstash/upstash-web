@@ -91,7 +91,7 @@ const redis = new Redis({
   token: "<UPSTASH_REDIS_REST_TOKEN>",
 })
    
-const data = await redis.set("foo', "bar");`,
+const data = await redis.set("foo", "bar");`,
   [Product.QSTASH]: `import { Client } from "@upstash/qstash";
 
 const client = new Client({
