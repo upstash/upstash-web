@@ -461,7 +461,9 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 py-4 text-left font-normal">
-            Max Queue Parallelism
+            <Tooltip content="Max Parallelism that can be set per Queue">
+              Max Queue Parallelism
+            </Tooltip>
           </th>
           {/**/}
           <Col plan={showFree}>
@@ -475,6 +477,27 @@ export default function CompareTable() {
           </Col>
           <Col plan={showFixed10}>
             <CompareValue>10</CompareValue>
+          </Col>
+        </tr>
+
+        <tr>
+          <th className="px-0 py-4 text-left font-normal">
+            <Tooltip content="Excess publishes will be delayed until old publishes finish. They will not be rejected.">
+              Max Parallelism
+            </Tooltip>
+          </th>
+          {/**/}
+          <Col plan={showFree}>
+            <CompareValue>10</CompareValue>
+          </Col>
+          <Col plan={showPayg} feature>
+            <CompareValue>100</CompareValue>
+          </Col>
+          <Col plan={showFixed1}>
+            <CompareValue>200</CompareValue>
+          </Col>
+          <Col plan={showFixed10}>
+            <CompareValue>1000</CompareValue>
           </Col>
         </tr>
 
