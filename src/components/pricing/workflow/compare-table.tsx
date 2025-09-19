@@ -268,20 +268,22 @@ export default function CompareTable() {
         
         <tr>
           <th className="px-0 py-4 text-left font-normal">
-            Max Concurrent Steps
+            <Tooltip content="Excess steps will be delayed until old steps finish. They will not be rejected.">
+              Max Concurrent Steps
+            </Tooltip>
           </th>
           {/**/}
           <Col plan={showFree}>
-            <CompareValue>Unlimited</CompareValue>
+            <CompareValue>10</CompareValue>
           </Col>
           <Col plan={showPayg} feature>
-            <CompareValue>Unlimited</CompareValue>
+            <CompareValue>100</CompareValue>
           </Col>
           <Col plan={showFixed1}>
-            <CompareValue>Unlimited</CompareValue>
+            <CompareValue>200</CompareValue>
           </Col>
           <Col plan={showFixed10}>
-            <CompareValue>Unlimited</CompareValue>
+            <CompareValue>1000</CompareValue>
           </Col>
         </tr>
 
