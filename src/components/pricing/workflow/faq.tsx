@@ -49,6 +49,30 @@ export default function FAQ() {
         </AccordionContent>
       </AccordionItem>
       <AccordionItem value="item-2">
+          <AccordionTrigger>
+            What happens when we hit `Steps per Day`/`Monthly Bandwidth` limit?
+          </AccordionTrigger>
+          <AccordionContent>
+              <ul className="mt-4 list-disc space-y-2 pl-6">
+              <li className="space-y-2">
+                <p>
+                  Both of these quotas are soft limits. Your requests will not be rejected immediately on rare 
+            quota hits. We'll reach out for an upgrade if the quota is exceeded consistently.
+                </p>
+                <ul className="mt-4 list-disc space-y-2 pl-6">
+                <li>Fixed 1M will be upgraded into Fixed 10M.</li>
+                <li>Fixed 10M will be upgraded into a Custom Enterprise Plan.</li>
+                </ul>
+              </li>
+              <li className="space-y-2">
+                <p>If we can't reach you, the limits will be applied. Workflow is built on top of QStash. A step is a call from the QStash server to Workflow url or an external url.
+            When the limit is reached QStash API starts to return exception, the Workflow SDK 
+            in this case throttles for a second and retries the call until the retry limit is reached.
+            After that, the workflow run fails and recorded in DLQ(dead letter queue).
+                </p>
+              </li>
+            </ul>
+          </AccordionContent>
         <AccordionTrigger>
           What happens when we hit daily max steps limit?
         </AccordionTrigger>

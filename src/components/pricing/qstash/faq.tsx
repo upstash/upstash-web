@@ -69,10 +69,29 @@ export default function FAQ() {
 
       <AccordionItem value="item-2">
         <AccordionTrigger>
-          What happens when we hit daily max messages limit?
+          What happens when we hit "Messages per Day" / "Monthly Bandwidth" limit?
         </AccordionTrigger>
         <AccordionContent>
-          QStash API starts to return "daily ratelimit YOUR_QUOTA exceeded" with 429 status code.
+           <ul className="mt-4 list-disc space-y-2 pl-6">
+            <li className="space-y-2">
+              <p>
+                Both of these quotas are soft limits. Your requests will not be rejected immediately on rare 
+          quota hits. We'll reach out for an upgrade if the quota is exceeded consistently.
+              </p>
+              <ul className="mt-4 list-disc space-y-2 pl-6">
+              <li>Fixed 1M will be upgraded into Fixed 10M.</li>
+              <li>Fixed 10M will be upgraded into a Custom Enterprise Plan.</li>
+              </ul>
+            </li>
+            <li className="space-y-2">
+              <p>If we can't reach you, your API's can get following errors respectively. 
+              </p>
+              <ul className="mt-4 list-disc space-y-2 pl-6">
+              <li>When `Messages per Day` is reached, QStash API will return "daily ratelimit YOUR_QUOTA exceeded" with 429 status code.</li>
+              <li>When `Monthly Bandwidth` is reached, QStash API will return "monthly bandwidth exceeded" with 429 status code.</li>
+              </ul>
+            </li>
+          </ul>
         </AccordionContent>
       </AccordionItem>
 
