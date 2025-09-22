@@ -183,10 +183,32 @@ export default function CompareTable() {
             <CompareValue>Unlimited</CompareValue>
           </Col>
           <Col plan={showFixed1}>
-            <CompareValue>1M</CompareValue>
+              <CompareValue
+                type="size"
+                suffix="M"
+                className="border-b-0"
+                after={
+                  <Tooltip content="We'll reach out for an upgrade if the quota is exceeded consistently.">
+                    <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                  </Tooltip>
+                }
+              >
+                1
+              </CompareValue>
           </Col>
           <Col plan={showFixed10}>
-            <CompareValue>10M</CompareValue>
+              <CompareValue
+                type="size"
+                suffix="M"
+                className="border-b-0"
+                after={
+                  <Tooltip content="We'll reach out for an upgrade if the quota is exceeded consistently.">
+                    <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                  </Tooltip>
+                }
+              >
+                10
+              </CompareValue>
           </Col>
         </tr>
 
@@ -223,7 +245,7 @@ export default function CompareTable() {
                 suffix="TB"
                 className="border-b-0"
                 after={
-                  <Tooltip content="Free up to 1TB per month. Beyond that $0.05 per GB.">
+                  <Tooltip content="We'll reach out for an upgrade if the quota is exceeded consistently.">
                     <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                   </Tooltip>
                 }
@@ -237,7 +259,7 @@ export default function CompareTable() {
                 suffix="TB"
                 className="border-b-0"
                 after={
-                  <Tooltip content="Free up to 5TB per month. Beyond that $0.05 per GB.">
+                  <Tooltip content="We'll reach out for an upgrade if the quota is exceeded consistently.">
                     <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
                   </Tooltip>
                 }
