@@ -396,6 +396,32 @@ async function storeAbstracts(papers: ArxivPaper[]) {
 }
 ```
 
+To ensure our database remains current with the latest research, we implement Upstash QStash for scheduled task execution. Given our deployment on Vercel, we need to prevent function timeouts that can occur with extended processing intervals. We address this by exposing a public API endpoint on our server, enabling our QStash instance to trigger the daily database update function reliably.
+```typescript
+// src/app/api/arxiv_reneval/route.ts
+import { verifySignatureAppRouter } from "@upstash/qstash/nextjs"
+import { fetchAndUpsertYesterday} from "@/services/arxiv"
+
+async function handler(request: Request) {
+  console.log("Fetching and upserting yesterday's papers...")
+  await fetchAndUpsertYesterday()
+  console.log("Fetching and upserting yesterday's papers completed")
+  return Response.json({ success: true })
+}
+
+export const POST = verifySignatureAppRouter(handler)
+```
+
+A scheduler can be configured through the Upstash Console to automatically trigger requests to this endpoint daily at 6:00 AM UTC.
+
+<Frame>
+  <img src="/blog/mastra-article-agent/qstash_mastra_schedule.png" />
+</Frame>
+
+With this scheduler configuration in place, our server will perform automated database updates each morning, ensuring continuous data freshness.
+
+We should also provide credentials for our QStash instance, all required env variables are given in the example env file.
+
 That's pretty much it. If you want, you can try and play around with the code. Just fork the repositories and start developing. You can go to the [Mastra part's repository here](https://github.com/mtahasylmz/agents-mastra) and [the other repo here](https://github.com/mtahasylmz/mastraWithUpstash). After forking them:
 
 - Clone them to your local machine.
