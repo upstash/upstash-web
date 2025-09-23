@@ -51,7 +51,7 @@ const AccordionTrigger = React.forwardRef(
           {...props}
           ref={forwardedRef}
         >
-          {children}
+          <span className="text-left leading-relaxed text-pretty">{children}</span>
           <IconPlus
             strokeWidth={1.5}
             className={cx(
