@@ -27,7 +27,7 @@ export default function PricingTable() {
         <div className="w-full px-6 *:border-b *:border-bg-mute">
           <div className="py-3">
             <p className="text-text-mute">Steps per Day</p>
-            <p className="font-semibold">500</p>
+            <p className="font-semibold">1000</p>
           </div>
         </div>
 
