@@ -17,6 +17,8 @@ export default function PricingTableProductionPack() {
           {[
             "Uptime SLA",
             "SOC-2",
+            "Prometheus",
+            "Datadog",
           ].map((value) => {
             return (
               <li
