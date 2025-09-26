@@ -38,7 +38,7 @@ const ProdPackButton = ({ className }: { className?: string }) => {
   return (
     <div
       className={cx(
-        "w-fit rounded-xl bg-purple-200 px-4 py-2 font-medium text-purple-950 dark:bg-purple-50",
+        "w-fit rounded-xl bg-purple-200 px-4 py-2 font-medium text-purple-800 dark:bg-purple-50",
         className,
       )}
     >

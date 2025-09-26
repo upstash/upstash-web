@@ -13,7 +13,7 @@ export default function PricingTableEnterprise() {
         <Button
           asChild
           variant="secondary"
-          className="mt-4 hidden bg-amber-200 text-amber-800 transition-colors hover:bg-white md:inline-flex dark:bg-amber-50 dark:text-amber-950"
+          className="mt-4 hidden bg-amber-200 text-amber-800 transition-colors hover:bg-white md:inline-flex dark:bg-amber-50 dark:text-amber-800"
         >
           <Link href="/enterprise">Learn More</Link>
         </Button>
