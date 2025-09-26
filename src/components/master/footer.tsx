@@ -35,16 +35,27 @@ export default function Footer({ className, ...props }: IAppFooter) {
             <OutLink href="/trust/terms.pdf">Terms of Service</OutLink>
           </div>
 
-          {/* TODO: fix color */}
-          <Button
-            asChild
-            className="mt-10 whitespace-nowrap rounded-full bg-emerald-400/10 !py-2 px-4 text-emerald-500"
-          >
-            <a target="_blank" href="https://status.upstash.com/">
-              <span className="-ml-1 mr-2 inline-flex h-3 w-3 animate-pulse rounded-full bg-current" />
-              <span className="">Status</span>
-            </a>
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              asChild
+              className="mt-10 whitespace-nowrap rounded-full bg-emerald-400/10 !py-2 px-4 text-emerald-500"
+            >
+              <a target="_blank" href="https://status.upstash.com/">
+                <span className="-ml-1 mr-2 inline-flex h-3 w-3 animate-pulse rounded-full bg-current" />
+                <span className="">Status</span>
+              </a>
+            </Button>
+
+            <Button
+              asChild
+              className="mt-10 whitespace-nowrap rounded-full bg-emerald-400/10 !py-2 px-4 text-emerald-500"
+            >
+              <a target="_blank" href="https://latency.upstash.io/">
+                <span className="-ml-1 mr-2 inline-flex h-3 w-3 animate-pulse rounded-full bg-current" />
+                <span className="">Latency</span>
+              </a>
+            </Button>
+          </div>
 
           <div className="mt-10 space-y-2 text-xs opacity-40">
             <p>
