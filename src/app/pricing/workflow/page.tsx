@@ -3,10 +3,12 @@ import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
 import ProductToggle from "@/components/pricing/product-toggle";
+import ProdPack from "@/components/pricing/qstash/prod-pack";
 import CompareTable from "@/components/pricing/workflow/compare-table";
 import Enterprise from "@/components/pricing/workflow/enterprise";
 import FAQ from "@/components/pricing/workflow/faq";
 import PricingTable from "@/components/pricing/workflow/pricing-table";
+import { PROD_PACK_SECTION_ID } from "@/constants";
 import { generateFaqSchema } from "@/utils/structured-schema-generators";
 
 export default function PricingWorkflowPage() {
@@ -29,7 +31,12 @@ export default function PricingWorkflowPage() {
             <PricingTable />
           </div>
 
-          <div className="mt-6 md:mt-16">
+          {/* PROD PACK */}
+          <div
+            id={PROD_PACK_SECTION_ID}
+            className="mt-6 rounded-4xl bg-white p-4 md:mt-16 dark:bg-bg-mute"
+          >
+            <ProdPack />
             <Enterprise />
           </div>
         </Container>

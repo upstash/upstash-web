@@ -7,6 +7,8 @@ import CompareTable from "@/components/pricing/qstash/compare-table";
 import Enterprise from "@/components/pricing/qstash/enterprise";
 import FAQ from "@/components/pricing/qstash/faq";
 import PricingTable from "@/components/pricing/qstash/pricing-table";
+import ProdPack from "@/components/pricing/qstash/prod-pack";
+import { PROD_PACK_SECTION_ID } from "@/constants";
 import { generateFaqSchema } from "@/utils/structured-schema-generators";
 
 export default function PricingQStashPage() {
@@ -29,7 +31,12 @@ export default function PricingQStashPage() {
             <PricingTable />
           </div>
 
-          <div className="mt-6 md:mt-16">
+          {/* PROD PACK */}
+          <div
+            id={PROD_PACK_SECTION_ID}
+            className="mt-6 rounded-4xl bg-white p-4 md:mt-16 dark:bg-bg-mute"
+          >
+            <ProdPack />
             <Enterprise />
           </div>
         </Container>

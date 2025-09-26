@@ -1,25 +1,24 @@
 {
-    "faq": [
-        {
-            "question": "What is a step?",
-            "answer": "A step is a single call from the QStash server to Workflow url or an external url. If the call fails and retried, that is also counted as an extra step.  Each Workflow Run composed of multiple steps. A workflow run can be a a couple of steps or hundreds of steps depending on how many `context` functions are used. context.run, context.sleep, context.sleepUntil, or context.waitForEvent commands generate a single steps. The context.call command generates two steps. `context.call/sleep` function calls corresponds to a single step.  Parallel steps are counted as a two steps."
-        },
-        {
-            "question": "What happens when we hit daily max steps limit?",
-            "answer": "Workflow is built on top of QStash. A step is a call from the QStash server to Workflow url or an external url. When the limit is reached QStash API starts to return exception, the Workflow SDK in this case throttles for a second and retries the call until the retry limit is reached. After that, the workflow run fails and recorded in DLQ(dead letter queue)."
-        },
-        {
-            "question": "What is a request? ",
-            "answer": "Workflow is built on top of QStash. A request is any call to the QStash Rest API."
-        },
-        {
-            "question": "What happens when request per second limit is reached?",
-            "answer": "When the limit is reached QStash API starts to return exception, the Workflow SDK in this case throttles for a second and retries the call until the retry limit is reached. After that, the workflow run fails and recorded in DLQ(dead letter queue)."
-        }, 
-        {
-            "question": "How is the Max Message Size Limit applied?",
-            "answer": "When a workflow run is is triggered, if the body length is larger than the limit, the endpoint returns http 412, and Workflow SDK logs an error stating that quota is exceeded. And the workflow run marked as failed and recorded in DLQ(dead letter queue). Between each step, The Workflow SDK makes calls to QStash API. On these calls, response of context.run/context.call/context.invoke are also subjected to the max message size quota. If they exceed the quota, the workflow run fails and recorded in DLQ(dead letter queue)."
-        }
-    ]
-  }
-  
+  "faq": [
+    {
+      "question": "What is a step?",
+      "answer": "A step is a single call from the QStash server to Workflow url or an external url. If the call fails and retried, that is also counted as an extra step.  Each Workflow Run composed of multiple steps. A workflow run can be a a couple of steps or hundreds of steps depending on how many `context` functions are used. context.run, context.sleep, context.sleepUntil, or context.waitForEvent commands generate a single steps. The context.call command generates two steps. `context.call/sleep` function calls corresponds to a single step.  Parallel steps are counted as a two steps."
+    },
+    {
+      "question": "What happens when we hit daily max steps limit?",
+      "answer": "Workflow is built on top of QStash. A step is a call from the QStash server to Workflow url or an external url. When the limit is reached QStash API starts to return exception, the Workflow SDK in this case throttles for a second and retries the call until the retry limit is reached. After that, the workflow run fails and recorded in DLQ(dead letter queue)."
+    },
+    {
+      "question": "What is a request? ",
+      "answer": "Workflow is built on top of QStash. A request is any call to the QStash Rest API."
+    },
+    {
+      "question": "What happens when request per second limit is reached?",
+      "answer": "When the limit is reached QStash API starts to return exception, the Workflow SDK in this case throttles for a second and retries the call until the retry limit is reached. After that, the workflow run fails and recorded in DLQ(dead letter queue)."
+    },
+    {
+      "question": "How is the Max Message Size Limit applied?",
+      "answer": "When a workflow run is is triggered, if the body length is larger than the limit, the endpoint returns http 412, and Workflow SDK logs an error stating that quota is exceeded. And the workflow run marked as failed and recorded in DLQ(dead letter queue). Between each step, The Workflow SDK makes calls to QStash API. On these calls, response of context.run/context.call/context.invoke are also subjected to the max message size quota. If they exceed the quota, the workflow run fails and recorded in DLQ(dead letter queue)."
+    }
+  ]
+}

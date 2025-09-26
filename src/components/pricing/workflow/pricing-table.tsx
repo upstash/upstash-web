@@ -1,7 +1,21 @@
+"use client"
+
 import Button from "@/components/button";
+import { PricingPlans } from "@/utils/type";
 import * as React from "react";
+import { ChangeEvent, useState } from "react";
 
 export default function PricingTable() {
+    const [selectedFixed, setSelectedFixed] = useState(PricingPlans.Pro1M);
+    
+    const showFixed1M = selectedFixed === PricingPlans.Pro1M;
+    const showFixed10M = selectedFixed === PricingPlans.Pro10M;
+    
+    const onChangePlan = (event: ChangeEvent<HTMLSelectElement>) => {
+      const value = event.target.value as PricingPlans;
+      setSelectedFixed(value);
+    };
+
   return (
     <div className="grid gap-6 md:grid-cols-3">
       {/**/}
@@ -27,7 +41,7 @@ export default function PricingTable() {
         <div className="w-full px-6 *:border-b *:border-bg-mute">
           <div className="py-3">
             <p className="text-text-mute">Steps per Day</p>
-            <p className="font-semibold">500</p>
+            <p className="font-semibold">1000</p>
           </div>
         </div>
 
@@ -78,15 +92,28 @@ export default function PricingTable() {
 
       <div className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
         <div className="grow">
-          <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">Fixed</h4>
+          <h4 className="mb-4 text-xl font-semibold text-primary-text">
+            <select
+              className="w-auto rounded-xl bg-bg-mute px-4 py-1 font-bold"
+              value={selectedFixed}
+              onChange={onChangePlan}
+            >
+              <option value={PricingPlans.Pro1M}>Fixed 1M</option>
+              <option value={PricingPlans.Pro10M}>Fixed 10M</option>
+            </select>
+          </h4>
 
-          <h5 className="flex items-baseline text-2xl font-semibold">
-            $180
-            <span className="ml-1 text-base font-normal opacity-40">
+          <h5 className="flex items-baseline justify-center text-2xl font-semibold">
+            {showFixed1M && <>$180</>}
+            {showFixed10M && <>$420</>}
+            <span className="ml-1 text-base font-normal text-text-mute">
               / month
             </span>
           </h5>
-          <p className="text-sm text-text-mute">Starting from</p>
+
+          <p className="text-sm text-text-mute">
+            -
+          </p>
         </div>
 
         <div className="grow">
@@ -99,7 +126,10 @@ export default function PricingTable() {
         <div className="w-full px-6 *:border-b *:border-bg-mute">
           <div className="py-3">
             <p className="text-text-mute">Steps per Day</p>
-            <p className="font-semibold">Up to 100M</p>
+            <p className="font-semibold">
+              {showFixed1M && <>1M steps</>}
+              {showFixed10M && <>10M steps</>}
+            </p>
           </div>
         </div>
 

@@ -7,6 +7,7 @@ import CompareTable from "@/components/pricing/vector/compare-table";
 import Enterprise from "@/components/pricing/vector/enterprise";
 import FAQ from "@/components/pricing/vector/faq";
 import PricingTable from "@/components/pricing/vector/pricing-table";
+import { PROD_PACK_SECTION_ID } from "@/constants";
 import { generateFaqSchema } from "@/utils/structured-schema-generators";
 
 export default function PricingVectorPage() {
@@ -29,7 +30,11 @@ export default function PricingVectorPage() {
             <PricingTable />
           </div>
 
-          <div className="mt-6 md:mt-16">
+          {/* PROD PACK */}
+          <div
+            id={PROD_PACK_SECTION_ID}
+            className="mt-6 rounded-4xl bg-white p-4 md:mt-16 dark:bg-bg-mute"
+          >
             <Enterprise />
           </div>
         </Container>
