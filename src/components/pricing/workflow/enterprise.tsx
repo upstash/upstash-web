@@ -23,6 +23,10 @@ export default function PricingTableEnterprise() {
         <ul className="space-y-2">
           <li className="flex items-center gap-1">
             <IconCircleCheckFilled size={20} className="fill-amber-600" />
+            Everything in <b className="font-bold">Prod Pack</b>
+          </li>
+          <li className="flex items-center gap-1">
+            <IconCircleCheckFilled size={20} className="fill-amber-600" />
             100M+ steps daily
           </li>
           <li className="flex items-center gap-1">
