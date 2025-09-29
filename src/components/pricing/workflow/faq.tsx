@@ -73,6 +73,8 @@ export default function FAQ() {
               </li>
             </ul>
           </AccordionContent>
+      </AccordionItem>
+      <AccordionItem value="item-3">
         <AccordionTrigger>
           What happens when we hit daily max steps limit?
         </AccordionTrigger>
@@ -82,15 +84,7 @@ export default function FAQ() {
             in this case throttles for a second and retries the call until the retry limit is reached.
             After that, the workflow run fails and recorded in DLQ(dead letter queue).
         </AccordionContent>
-      </AccordionItem>
-      <AccordionItem value="item-3">
-      <AccordionTrigger>
-          What is a request?
-        </AccordionTrigger>
-        <AccordionContent>
-          Workflow is built on top of QStash. A request is any call to the QStash Rest API. 
-        </AccordionContent>
-      </AccordionItem>
+      </AccordionItem>  
       <AccordionItem value="item-4">
         <AccordionTrigger>
           Is there a rate limit ?
@@ -120,15 +114,9 @@ export default function FAQ() {
               <p>
                 We have parallelism limit when calling the user endpoint from QStash. 
                 This limits number of parallel calls that can happen at the same time, other calls are queued to be done 
-                later. The quotas per plan is as follows:
+                later. See "Max Concurrent Steps" on the main pricing table above. 
               </p>
-                <ul className="mt-4 list-disc space-y-2 pl-6">
-                <li> Free: 10</li>
-                <li> Pay as you go: 100</li>
-                <li> Fixed 1M: 200</li>
-                <li> Fixed 10M: 1000 </li>
-              </ul>
-            </li>
+           </li>
           </ul>
         </AccordionContent>
       </AccordionItem>

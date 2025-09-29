@@ -149,14 +149,8 @@ export default function FAQ() {
               <p>
                 We have parallelism limit when calling the user endpoint from QStash. 
                 This limits number of parallel calls that can happen at the same time, other calls are queued to be done 
-                later. The quotas per plan is as follows:
+                later. See "Max Parallelism" on the main pricing table above. 
               </p>
-                <ul className="mt-4 list-disc space-y-2 pl-6">
-                <li> Free: 10</li>
-                <li> Pay as you go: 100</li>
-                <li> Fixed 1M: 200</li>
-                <li> Fixed 10M: 1000 </li>
-              </ul>
             </li>
           </ul>
         </AccordionContent>
