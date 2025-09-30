@@ -524,25 +524,31 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal text-text-mute">
-            Uptime SLA
-          </th>
+          <th className="px-0 text-left font-normal">Uptime SLA</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" valid={false} />
           </Col>
           <Col plan={showPayg} feature>
-            <CompareValue type="boolean" valid={false} />
+            <CompareValue
+              after={
+                <Tooltip content="Available with Prod Pack.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            />
           </Col>
           <Col plan={showFixed1}>
-            <CompareValue className="">
-              <div>99.99%</div>
-            </CompareValue>
+            <CompareValue
+              after={
+                <Tooltip content="Available with Prod Pack.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            />
           </Col>
           <Col plan={showFixed10}>
-            <CompareValue className="">
-              <div>99.99%</div>
-            </CompareValue>
+            <CompareValue type="boolean" />
           </Col>
         </tr>
 

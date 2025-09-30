@@ -1223,25 +1223,6 @@ export default function CompareTable({
           </Col>
         </tr>
 
-        <tr>
-          <th className="px-0 text-left font-normal">Uptime SLA</th>
-          {/**/}
-          <Col plan={showFree}>
-            <CompareValue type="boolean" valid={false} />
-          </Col>
-          <Col plan={showPayg} feature>
-            <CompareValue after={<ProdPackIcon />} />
-          </Col>
-          <Col plan={showFixed}>
-            <CompareValue after={<ProdPackIcon />} />
-          </Col>
-          <Col plan={showEnterprise}>
-            <CompareValue>
-              <div>99.99%</div>
-            </CompareValue>
-          </Col>
-        </tr>
-
         {/**/}
 
         <tr>
