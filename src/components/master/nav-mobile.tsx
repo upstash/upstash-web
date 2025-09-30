@@ -71,6 +71,9 @@ function NavLink({
   );
 }
 
+const isDev = process.env.NODE_ENV === "development";
+const docsHref = isDev ? "/docs" : "https://upstash.com/docs";
+
 const NavItems: {
   name: string;
   href: string;
@@ -78,7 +81,7 @@ const NavItems: {
 }[] = [
   {
     name: "Docs",
-    href: "/docs",
+    href: docsHref,
   },
   {
     name: "Pricing",
