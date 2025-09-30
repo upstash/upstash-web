@@ -8,6 +8,7 @@ import NewNavigationRoot from "./new-nav-root";
 
 export default function NewNavigation() {
   const segment = useSelectedLayoutSegment();
+  const isDev = process.env.NODE_ENV === "development";
 
   return (
     <NewNavigationRoot>
@@ -19,9 +20,11 @@ export default function NewNavigation() {
             "text-text-mute hover:bg-white/5 hover:text-primary-text",
           )}
         >
-          <Link href="/docs" prefetch={false}>
-            Docs
-          </Link>
+          {isDev ? (
+            <Link href="/docs">Docs</Link>
+          ) : (
+            <a href="https://upstash.com/docs">Docs</a>
+          )}
         </NavigationMenu.Link>
       </NavigationMenu.Item>
 
