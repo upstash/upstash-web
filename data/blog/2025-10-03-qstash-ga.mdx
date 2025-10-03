@@ -23,8 +23,9 @@ Since the project has begun, we made lots of changes and improvements. While itâ
 * **Vertical Scalability**:
   QStash consists of a `compute layer` and a separate `persistence layer`.
 
-  * The `compute layer` runs four server processes, and more can be added if needed. Alerts track system metrics, and when CPU becomes a bottleneck, new processes are spawned to distribute the load.
-  * The `persistence layer` is more complex. It currently uses seven persistent Redis databases (hosted by Upstash) that power the main logic. Scaling is achieved by adding more databases as needed.
+  * The `compute layer` runs on several processes, and more can be added if needed. Alerts track system metrics, and when CPU becomes a bottleneck, new processes are spawned to distribute the load.
+Also it is important note that these processes also enables `redundancy`, meaning if some fail others can continue the job without interruption.
+  * The `persistence layer` is more complex. It currently uses a pool of persistent Redis databases (hosted by Upstash) that power the main logic. Scaling is achieved by adding more databases as needed.
 
 * **Separate Logging System**:
   Previously, logs shared the same persistence layer as the main system, creating unnecessary load when query load increases. We solved this by:
