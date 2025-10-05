@@ -170,7 +170,7 @@ This stores all the configuration and state for an MCP session. Initially, it co
 ```
 
 **State Parameters** (`state_<...>`)
-These map OAuth state parameters to session IDs, allowing the system to reconnect the OAuth callback with the original session that initiated the flow.
+These map OAuth state parameters to session IDs, making it possible to get the session data using a state ID:
 
 ```json
 {
@@ -192,7 +192,7 @@ Across all three examples, we see common patterns that make Redis an ideal choic
 
 **Rich Data Structures**: Streams for event streams, Hashes for session data, and simple key-value pairs for state. Redis provides the right data structure for each use case.
 
-**Built-in Expiration**: All three use cases benefit from automatic cleanup via TTLs. OAuth tokens, event streams, and session data can all expire automatically without manual garbage collection.
+**Built-in Expiration**: Automatic cleanup via TTLs. OAuth tokens, event streams, and session data can all expire automatically without manual garbage collection.
 
 **Serverless-Friendly**: With solutions like [Upstash Redis](/), you get a fully managed, serverless Redis that scales to zero when not in use. Perfect for MCP implementations that might have variable workloads.
 
