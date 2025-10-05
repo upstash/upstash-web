@@ -1,0 +1,221 @@
+---
+slug: mcp-with-redis
+title: "Powering MCP with Redis"
+authors:
+  - arda
+tags: [redis, mcp, model-context-protocol, ai, serverless]
+---
+
+The Model Context Protocol (MCP) is rapidly becoming the standard way to connect AI models with external tools and data sources. As MCP adoption grows, developers are discovering that building robust, production-ready MCP implementations requires more than just following the spec: It requires the right infrastructure. In this post, we'll explore how Redis powers three different MCP use cases: coordinating distributed serverless functions in Vercel's SSE implementation, enabling event resumability for long-running streams, and managing secure OAuth flows with Clerk.
+
+## Understanding MCP Transports
+
+Before diving into our examples, let's briefly cover how MCP handles communication. [MCP supports two transports](https://modelcontextprotocol.io/docs/learn/architecture#transport-layer): **Stdio** for local servers and **Streamable HTTP** for remote servers. In the past, there was also an [SSE (Server-Sent Events) transport](https://modelcontextprotocol.io/legacy/concepts/transports#server-sent-events-sse-deprecated) for remote servers, which is now deprecated.
+
+The transition from SSE to Streamable HTTP represents an evolution in how MCP handles real-time communication, but many existing implementations still rely on the SSE pattern. Let's look at how Redis helped solve one of the key challenges in that model.
+
+## Use Case 1: SSE with Redis Pub/Sub
+
+When Vercel CTO Malte built their [MCP handler](https://github.com/vercel/mcp-handler/blob/fc9b09acb86d4e5378e8417bb49f3b31f265f29e/src/handler/mcp-api-handler.ts), he faced a classic serverless challenge: how do you coordinate between multiple endpoints when each request might be handled by a different serverless function?
+
+In the SSE transport model, there are two critical endpoints: `/sse` for maintaining the connection and `/message` for receiving client messages. Here's the problem: in a serverless environment like Vercel, these endpoints are completely isolated. They don't share memory, and a request to `/message` might be handled by an entirely different function instance than the one handling `/sse`.
+
+The solution? Redis Pub/Sub. [As Malte explained on X](https://x.com/cramforce/status/1899164989455507901):
+
+![malte-mcp-redis-tweet](/blog/mcp-with-redis/malte-tweet.png)
+
+The implementation uses Redis channels to coordinate between the endpoints. When a client sends a message to `/message`, that endpoint publishes to a Redis channel that the `/sse` endpoint is subscribed to. The `/sse` endpoint processes the request and publishes the response back through another channel that `/message` is listening to.
+
+![malte-mcp-redis-tweet](/blog/mcp-with-redis/mcp-redis-mermaid-diagram.png)
+
+This pattern effectively turns Redis into a message bus that bridges the gap between isolated serverless functions, allowing them to work together as if they were part of the same process. While SSE is now deprecated in favor of Streamable HTTP (meaning new MCP implementations should use the modern transport), this remains an excellent example of how the pattern of using Redis for coordination between isolated serverless functions remains valuable for many other use cases beyond MCP.
+
+## Use Case 2: Event Store for Resumability
+
+One of the most powerful features of MCP's [Streamable HTTP transport](https://modelcontextprotocol.io/specification/2025-06-18/basic/transports#resumability-and-redelivery) is its support for resumability. This feature allows clients to continue a stream from where it left off in case of a disconnection—critical for production applications where network interruptions are inevitable.
+
+### Understanding MCP Streams
+
+To understand why resumability matters, we need to understand what MCP streams consist of. Some operations, like calling a simple tool, return a single response. But tools can also return multiple events during execution using methods like [server.sendLoggingMessage](https://github.com/modelcontextprotocol/typescript-sdk/blob/856d9ec9dda71d6cc760ee69487e9768f367c22b/src/examples/server/jsonResponseStreamableHttp.ts#L50). These multi-event streams are where resumability becomes crucial—if a client disconnects halfway through, it should be able to pick up where it left off rather than starting over.
+
+### Implementing EventStore with Redis
+
+The MCP SDK defines an [EventStore interface](https://github.com/modelcontextprotocol/typescript-sdk/blob/29b65b0ce7d400e385c4152d68c6008fc81f5473/src/server/streamableHttp.ts#L29) that requires two methods: `storeEvent` for adding events and `replayEventsAfter` for retrieving events starting from a specific event ID. The SDK includes an [in-memory implementation](https://github.com/modelcontextprotocol/typescript-sdk/blob/856d9ec9dda71d6cc760ee69487e9768f367c22b/src/examples/shared/inMemoryEventStore.ts#L9C14-L9C32), but for production use, you need persistent storage.
+
+Here's a Redis-based implementation of the EventStore:
+
+```typescript
+import { Redis } from '@upstash/redis';
+import { JSONRPCMessage } from '@modelcontextprotocol/sdk/types.js';
+import { EventStore } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
+
+export class RedisEventStore implements EventStore {
+  private redis: Redis;
+
+  constructor(params: ConstructorParameters<typeof Redis>[0]) {
+    this.redis = new Redis(params);
+  }
+
+  /**
+   * Stores an event in a Redis Stream
+   * Implements EventStore.storeEvent
+   */
+  async storeEvent(streamId: string, message: JSONRPCMessage): Promise<string> {
+    const eventId = await this.redis.xadd(`stream:${streamId}`, '*', {
+      message: JSON.stringify(message),
+    });
+    return eventId;
+  }
+
+  /**
+   * Replays events that occurred after a specific event ID
+   * Implements EventStore.replayEventsAfter
+   */
+  async replayEventsAfter(
+    lastEventId: string,
+    { send }: { send: (eventId: string, message: JSONRPCMessage) => Promise<void> }
+  ): Promise<string> {
+    if (!lastEventId) {
+      return '';
+    }
+
+    // Extract the stream ID from the lastEventId
+    const streamId = lastEventId.split('-')[0]; // Assuming the stream ID is part of the key
+    if (!streamId) {
+      return '';
+    }
+
+    let nextId = lastEventId;
+    while (true) {
+      // Fetch events from the stream starting AFTER the next ID (exclusive)
+      const events = await this.redis.xrange(`stream:${streamId}`, `(${nextId}`, '+', 10);
+
+      // Convert the returned object to an array of entries
+      const eventEntries = Object.entries(events);
+      
+      if (eventEntries.length === 0) {
+        break; // No more events to replay
+      }
+
+      for (const [eventId, fields] of eventEntries) {
+        // Ensure fields.message exists and parse it
+        if (fields && typeof fields === 'object' && 'message' in fields && typeof fields.message === 'string') {
+          const message = JSON.parse(fields.message) as JSONRPCMessage;
+          await send(eventId, message);
+          nextId = eventId; // Update the next ID to the current event ID
+        }
+      }
+    }
+
+    return streamId;
+  }
+}
+```
+
+This implementation uses Redis Streams, which are perfect for this use case.
+
+### A Limitation
+
+There's one important caveat to be aware of: when a tool sends multiple events, the [streamId is set to `_GET_stream`](https://github.com/modelcontextprotocol/typescript-sdk/blob/main/src/server/streamableHttp.ts#L156), and this constant remains the same across different streams and users. This means that if two users are simultaneously using the same tool that sends multiple events, their events could be mixed up in the same stream.
+
+I've [opened an issue](https://github.com/modelcontextprotocol/typescript-sdk/issues/1004) about this on the official repository. Depending on the resolution, we may need to adjust the implementation, and I'll update this post accordingly if needed.
+
+## Use Case 3: Clerk's MCP OAuth Implementation
+
+The [MCP specification includes support for authentication and authorization](https://modelcontextprotocol.io/specification/2025-06-18/basic/authorization), allowing MCP servers to securely authenticate clients and control access to resources. The spec supports multiple authentication schemes, including OAuth 2.0, which is particularly useful for integrating with existing identity providers and enabling user-scoped access to tools and data.
+
+Clerk has built a comprehensive [OAuth client for MCP](https://github.com/clerk/mcp-tools/) by implementing the [OAuthClientProvider interface](https://github.com/modelcontextprotocol/typescript-sdk/blob/e0de0829019a4eab7af29c05f9a7ec13364f121e/src/client/auth.ts#L38) from the MCP SDK. Their implementation demonstrates another critical use case for Redis in MCP applications. If you want to get started with their MCP tools, check out their [demo repository](https://github.com/clerk/mcp-demo) which provides a great starting point.
+
+### Why Storage Matters for OAuth
+
+As Clerk explains in their [documentation](https://github.com/clerk/mcp-tools?tab=readme-ov-file#stores), persistent storage is essential for MCP OAuth implementations for two key reasons:
+
+1. **The OAuth flow spans multiple endpoints** - initialization, OAuth callback, and MCP requests could all be handled by different serverless functions without shared memory
+2. **MCP connections are long-running** - relying on in-memory storage would bloat memory requirements as the application scales, and any server restart would invalidate all sessions
+
+### What Gets Stored in Redis
+
+Clerk's Redis store manages three types of data, each with a specific purpose in the OAuth flow:
+
+**PKCE Verifiers** (`pkce_verifier_<...>`)
+These are stored when starting the OAuth flow and read again after the user grants access. They're part of the [PKCE (Proof Key for Code Exchange) flow](https://clerk.com/docs/guides/configure/auth-strategies/oauth/how-clerk-implements-oauth#public-clients-and-pkce), which provides additional security for OAuth in public clients by ensuring the application that started the flow is the same one completing it (as defined in [RFC 7636](https://datatracker.ietf.org/doc/html/rfc7636)).
+
+```json
+{
+  "value": "X5QoY...",
+  "created_at": "2025-10-03T06:27:06.928Z",
+  "updated_at": "2025-10-03T06:27:06.928Z"
+}
+```
+
+**Session Data** (`session_<...>`)
+This stores all the configuration and state for an MCP session. Initially, it contains the MCP endpoint, OAuth configuration, and client credentials. After the user grants access, it's updated with access and refresh tokens. Finally, an `authComplete` flag is added when the flow is finished.
+
+```json
+{
+  "value": {
+    "mcpEndpoint": "http://localhost:3001/mcp",
+    "oauthRedirectUrl": "http://localhost:3000/oauth_callback",
+    "oauthScopes": "openid profile email",
+    "mcpClientName": "Clerk MCP Demo",
+    "mcpClientVersion": "0.0.1",
+    "oauthClientUri": "http://example.com",
+    "oauthPublicClient": false,
+    "clientId": "8bA...",
+    "clientSecret": "GF6J..."
+  },
+  "created_at": "2025-10-03T06:27:06.882Z",
+  "updated_at": "2025-10-03T06:27:06.882Z"
+}
+```
+
+**State Parameters** (`state_<...>`)
+These map OAuth state parameters to session IDs, allowing the system to reconnect the OAuth callback with the original session that initiated the flow.
+
+```json
+{
+  "value": "618d7b...",
+  "created_at": "2025-10-03T06:27:03.585Z",
+  "updated_at": "2025-10-03T06:27:03.585Z"
+}
+```
+
+This architecture allows the OAuth flow to work seamlessly across distributed serverless functions while maintaining security and session integrity.
+
+## Why Redis is Perfect for MCP
+
+Across all three examples, we see common patterns that make Redis an ideal choice for MCP infrastructure:
+
+**Low Latency**: MCP operations often need to be fast. Redis's in-memory architecture provides the sub-millisecond response times needed for real-time AI interactions.
+
+**Pub/Sub Capabilities**: As we saw with Vercel's implementation, Redis Pub/Sub enables elegant coordination between distributed components without the complexity of a full message queue.
+
+**Rich Data Structures**: Sorted Sets for event streams, Hashes for session data, and simple key-value pairs for state—Redis provides the right data structure for each use case without requiring multiple databases.
+
+**Built-in Expiration**: All three use cases benefit from automatic cleanup via TTLs. OAuth tokens, event streams, and session data can all expire automatically without manual garbage collection.
+
+**Serverless-Friendly**: With solutions like Upstash Redis, you get a fully managed, serverless Redis that scales to zero when not in use—perfect for MCP implementations that might have variable workloads.
+
+## Beyond MCP Spec Features: Redis in the Broader AI Ecosystem
+
+While we've focused on features explicitly defined in the MCP specification, Redis's utility extends far beyond these core capabilities. The patterns we've explored—event storage, session management, and distributed coordination—apply across the entire AI application stack. Our recent blog posts showcase several of these patterns:
+
+- [**AI SDK integration**](https://upstash.com/blog/ai-sdk-and-upstash) - Using Redis to enhance the Vercel AI SDK
+- [**Smooth streaming**](https://upstash.com/blog/smooth-streaming) - Managing streaming responses efficiently
+- [**Chat history**](https://upstash.com/blog/ai-sdk-chat-history) - Persisting conversation context
+
+Beyond our own examples, the community has built impressive Redis-powered tools for AI applications. The [ai-sdk-tools suite from Midday](https://github.com/midday-ai/ai-sdk-tools) includes a [tool result caching package](https://www.npmjs.com/package/@ai-sdk-tools/cache) that uses Redis to cache AI SDK tool results, as [shown in this example](https://x.com/pontusab/status/1974883301644259446), dramatically improving performance and reducing costs.
+
+Whether you're building MCP servers, AI agents, or full AI applications, Redis provides the infrastructure layer that makes your systems production-ready, scalable, and performant.
+
+## Conclusion
+
+The Model Context Protocol is still young, but it's quickly becoming essential infrastructure for AI applications. As we've seen through these three examples, Redis plays a crucial role in making MCP implementations robust and production-ready:
+
+- **Coordination** between distributed serverless functions
+- **Resumability** for long-running streams
+- **Secure session management** for OAuth flows
+
+If you're building with MCP, whether on the server or client side, Redis should be in your toolkit. Its combination of speed, flexibility, and serverless-friendly architecture makes it the perfect companion for MCP-powered AI applications.
+
+Ready to start building? Check out [Upstash Redis](https://upstash.com/redis) for a serverless Redis solution that scales with your MCP applications.
