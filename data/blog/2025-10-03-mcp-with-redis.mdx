@@ -28,15 +28,15 @@ The implementation uses Redis channels to coordinate between the endpoints. When
 
 ![malte-mcp-redis-tweet](/blog/mcp-with-redis/mcp-redis-mermaid-diagram.png)
 
-This pattern effectively turns Redis into a message bus that bridges the gap between isolated serverless functions, allowing them to work together as if they were part of the same process. While SSE is now deprecated in favor of Streamable HTTP (meaning new MCP implementations should use the modern transport), this remains an excellent example of how the pattern of using Redis for coordination between isolated serverless functions remains valuable for many other use cases beyond MCP.
+This pattern effectively turns Redis into a message bus that bridges the gap between isolated serverless functions, allowing them to work together as if they were part of the same process. While SSE is now deprecated in favor of Streamable HTTP (meaning new MCP implementations should use the modern transport), this remains as an excellent example of using Redis for coordination between isolated serverless functions.
 
 ## Use Case 2: Event Store for Resumability
 
-One of the most powerful features of MCP's [Streamable HTTP transport](https://modelcontextprotocol.io/specification/2025-06-18/basic/transports#resumability-and-redelivery) is its support for resumability. This feature allows clients to continue a stream from where it left off in case of a disconnection—critical for production applications where network interruptions are inevitable.
+One of the most powerful features of MCP's Streamable HTTP transport is its [support for resumability](https://modelcontextprotocol.io/specification/2025-06-18/basic/transports#resumability-and-redelivery). This feature allows clients to continue a stream from where it left off in case of a disconnection. This is critical for production applications where network interruptions are inevitable.
 
 ### Understanding MCP Streams
 
-To understand why resumability matters, we need to understand what MCP streams consist of. Some operations, like calling a simple tool, return a single response. But tools can also return multiple events during execution using methods like [server.sendLoggingMessage](https://github.com/modelcontextprotocol/typescript-sdk/blob/856d9ec9dda71d6cc760ee69487e9768f367c22b/src/examples/server/jsonResponseStreamableHttp.ts#L50). These multi-event streams are where resumability becomes crucial—if a client disconnects halfway through, it should be able to pick up where it left off rather than starting over.
+To understand why resumability matters, we need to understand what MCP streams consist of. Some operations, like calling a simple tool, return a single response. But tools can also return multiple events during execution using methods like [server.sendLoggingMessage](https://github.com/modelcontextprotocol/typescript-sdk/blob/856d9ec9dda71d6cc760ee69487e9768f367c22b/src/examples/server/jsonResponseStreamableHttp.ts#L50). These multi-event streams are where resumability becomes crucial. If a client disconnects halfway through, it should be able to pick up where it left off rather than starting over.
 
 ### Implementing EventStore with Redis
 
@@ -128,7 +128,7 @@ Clerk has built a comprehensive [OAuth client for MCP](https://github.com/clerk/
 
 ### Why Storage Matters for OAuth
 
-As Clerk explains in their [documentation](https://github.com/clerk/mcp-tools?tab=readme-ov-file#stores), persistent storage is essential for MCP OAuth implementations for two key reasons:
+As Clerk explains in their [`mcp-tools` repository](https://github.com/clerk/mcp-tools/tree/b0c946c97c41f248289c31174d0d5c84e977c55c?tab=readme-ov-file#stores), persistent storage is essential for MCP OAuth implementations for two key reasons:
 
 1. **The OAuth flow spans multiple endpoints** - initialization, OAuth callback, and MCP requests could all be handled by different serverless functions without shared memory
 2. **MCP connections are long-running** - relying on in-memory storage would bloat memory requirements as the application scales, and any server restart would invalidate all sessions
@@ -142,7 +142,7 @@ These are stored when starting the OAuth flow and read again after the user gran
 
 ```json
 {
-  "value": "X5QoY...",
+  "value": "XoYQ...",
   "created_at": "2025-10-03T06:27:06.928Z",
   "updated_at": "2025-10-03T06:27:06.928Z"
 }
@@ -161,8 +161,8 @@ This stores all the configuration and state for an MCP session. Initially, it co
     "mcpClientVersion": "0.0.1",
     "oauthClientUri": "http://example.com",
     "oauthPublicClient": false,
-    "clientId": "8bA...",
-    "clientSecret": "GF6J..."
+    "clientId": "8Yb2...",
+    "clientSecret": "64YG..."
   },
   "created_at": "2025-10-03T06:27:06.882Z",
   "updated_at": "2025-10-03T06:27:06.882Z"
@@ -174,7 +174,7 @@ These map OAuth state parameters to session IDs, allowing the system to reconnec
 
 ```json
 {
-  "value": "618d7b...",
+  "value": "dX61...",
   "created_at": "2025-10-03T06:27:03.585Z",
   "updated_at": "2025-10-03T06:27:03.585Z"
 }
@@ -186,23 +186,22 @@ This architecture allows the OAuth flow to work seamlessly across distributed se
 
 Across all three examples, we see common patterns that make Redis an ideal choice for MCP infrastructure:
 
-**Low Latency**: MCP operations often need to be fast. Redis's in-memory architecture provides the sub-millisecond response times needed for real-time AI interactions.
+**Low Latency**: MCP operations often need to be fast. Redis's in-memory architecture provides the response times needed for real-time AI interactions.
 
 **Pub/Sub Capabilities**: As we saw with Vercel's implementation, Redis Pub/Sub enables elegant coordination between distributed components without the complexity of a full message queue.
 
-**Rich Data Structures**: Sorted Sets for event streams, Hashes for session data, and simple key-value pairs for state—Redis provides the right data structure for each use case without requiring multiple databases.
+**Rich Data Structures**: Streams for event streams, Hashes for session data, and simple key-value pairs for state. Redis provides the right data structure for each use case.
 
 **Built-in Expiration**: All three use cases benefit from automatic cleanup via TTLs. OAuth tokens, event streams, and session data can all expire automatically without manual garbage collection.
 
-**Serverless-Friendly**: With solutions like Upstash Redis, you get a fully managed, serverless Redis that scales to zero when not in use—perfect for MCP implementations that might have variable workloads.
+**Serverless-Friendly**: With solutions like [Upstash Redis](/), you get a fully managed, serverless Redis that scales to zero when not in use. Perfect for MCP implementations that might have variable workloads.
 
 ## Beyond MCP Spec Features: Redis in the Broader AI Ecosystem
 
-While we've focused on features explicitly defined in the MCP specification, Redis's utility extends far beyond these core capabilities. The patterns we've explored—event storage, session management, and distributed coordination—apply across the entire AI application stack. Our recent blog posts showcase several of these patterns:
+While we've focused on features explicitly defined in the MCP specification, Redis's utility extends far beyond the patterns we've explored when it comes to powering AI. Our recent blog posts showcase several of these patterns:
 
 - [**AI SDK integration**](https://upstash.com/blog/ai-sdk-and-upstash) - Using Redis to enhance the Vercel AI SDK
-- [**Smooth streaming**](https://upstash.com/blog/smooth-streaming) - Managing streaming responses efficiently
-- [**Chat history**](https://upstash.com/blog/ai-sdk-chat-history) - Persisting conversation context
+- [**Chat history**](https://upstash.com/blog/ai-sdk-chat-history) - Persisting messaging history
 
 Beyond our own examples, the community has built impressive Redis-powered tools for AI applications. The [ai-sdk-tools suite from Midday](https://github.com/midday-ai/ai-sdk-tools) includes a [tool result caching package](https://www.npmjs.com/package/@ai-sdk-tools/cache) that uses Redis to cache AI SDK tool results, as [shown in this example](https://x.com/pontusab/status/1974883301644259446), dramatically improving performance and reducing costs.
 
@@ -210,12 +209,9 @@ Whether you're building MCP servers, AI agents, or full AI applications, Redis p
 
 ## Conclusion
 
-The Model Context Protocol is still young, but it's quickly becoming essential infrastructure for AI applications. As we've seen through these three examples, Redis plays a crucial role in making MCP implementations robust and production-ready:
+The Model Context Protocol is still young, but it's quickly becoming essential infrastructure for AI applications. As we've seen through these three examples, Redis plays a crucial role in making MCP implementations robust and production-ready through:
 
-- **Coordination** between distributed serverless functions
-- **Resumability** for long-running streams
-- **Secure session management** for OAuth flows
+- **Speed and Flexibility**: Its combination of speed, flexibility, and serverless-friendly architecture
+- **Cost Reduction**: Caching capabilities that reduce expensive API calls and computations
 
-If you're building with MCP, whether on the server or client side, Redis should be in your toolkit. Its combination of speed, flexibility, and serverless-friendly architecture makes it the perfect companion for MCP-powered AI applications.
-
-Ready to start building? Check out [Upstash Redis](https://upstash.com/redis) for a serverless Redis solution that scales with your MCP applications.
+If you're building with MCP, whether on the server or client side, Redis should be in your toolkit as the perfect companion for MCP-powered AI applications. With Upstash Redis, you can get started in seconds today with a globally available, serverless Redis that scales to zero when not in use.
