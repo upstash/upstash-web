@@ -55,7 +55,8 @@ The theme of the pricing changes is twofold:
 
 **1. Ensure users can scale without worrying about hitting limits in production.**
     
-    - The `Max Requests Per Second` limit has been removed for mission-critical endpoints. This limit was difficult to work with for webhooks configured with third-party services, since a quota exceed error from a REST API is not something you can easily handle. Now, we will accept all requests without rejecting them and store them in our persistence layer.
+    - The `Max Requests Per Second` limit has been removed for mission-critical endpoints. The endpoints that trigger publishing a message(`publish`,`enqueue`,`batch`) etc does not have this limit anymore. This limit was difficult to work with for webhooks configured with third-party services, since a quota exceed error from a REST API is not something you can easily handle. Now, we will accept all requests without rejecting them and store them in our persistence layer.
+For details of which operations have the limit you can check FAQ at the end of the [pricing page]((https://upstash.com/pricing/qstash)
     - The limits like `Max Messages Per Day` or `Max Monthly Bandwidth` is either removed or made soft-limit to avoid service distruption. I will go into details 
 on the next section per plan.        
         
@@ -108,6 +109,6 @@ With this, there’s no need to set up ngrok locally. You can also easily integr
 
 We’re excited to see QStash mature into a product that helps developers build their own products in production. With this announcement, QStash is officially GA—more powerful, easier to use, and backed by new pricing changes and features.
 
-As always, thank you for reading! We’d love to hear your feedback. Reach out to us anytime via [Discord](https://upstash.com/discord).
+As always, thank you for reading! We’d love to hear your feedback. Reach out to us anytime via [Discord](https://upstash.com/discord), [our website](https://upstash.com/) chat or support@upstash.com
 
 And hey—don’t forget to stay in the loop with all our latest features and updates by following us on [Twitter](https://twitter.com/upstash)!
