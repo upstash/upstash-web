@@ -24,7 +24,7 @@ Since the project has begun, we made lots of changes and improvements. While itâ
   QStash consists of a `compute layer` and a separate `persistence layer`.
 
   * The `compute layer` runs on several processes, and more can be added if needed. Alerts track system metrics, and when CPU becomes a bottleneck, new processes are spawned to distribute the load.
-Also it is important note that these processes also enables `redundancy`, meaning if some fail others can continue the job without interruption.
+Also it is important note that these processes enables `redundancy`, meaning if some fail others can continue the job without interruption.
   * The `persistence layer` is more complex. It currently uses a pool of persistent Redis databases (hosted by Upstash) that power the main logic. Scaling is achieved by adding more databases as needed.
 
 * **Separate Logging System**:
