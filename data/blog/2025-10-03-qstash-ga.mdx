@@ -1,0 +1,114 @@
+---
+title: "QStash Goes GA: Stronger, Smarter, and Production-Ready"
+slug: qstash-qa
+authors:
+  - sancar
+tags: [qstash, workflow]
+---
+
+We’ve come a long way in developing QStash and Workflows. Both are now more scalable and resilient to burst loads. Thanks to these improvements, we’re excited to announce that **QStash and Workflows are Generally Available (GA)**.
+
+In this blog, We’ll cover:
+
+* The tech behind Scalable and Robust QStash.
+* Pricing changes designed to make scaling easier.
+* The new **Prod Pack**, which includes an uptime SLA and monitoring integrations.
+
+Let’s dive in.
+
+## The tech behind Scalable and Robust QStash
+
+Since the project has begun, we made lots of changes and improvements. While it’s hard to summarize everything, here are the core improvements that make QStash production-ready today:
+
+* **Vertical Scalability**:
+  QStash consists of a `compute layer` and a separate `persistence layer`.
+
+  * The `compute layer` runs on several processes, and more can be added if needed. Alerts track system metrics, and when CPU becomes a bottleneck, new processes are spawned to distribute the load.
+Also it is important note that these processes enables `redundancy`, meaning if some fail others can continue the job without interruption.
+  * The `persistence layer` is more complex. It currently uses a pool of persistent Redis databases (hosted by Upstash) that power the main logic. Scaling is achieved by adding more databases as needed.
+
+* **Separate Logging System**:
+  Previously, logs shared the same persistence layer as the main system, creating unnecessary load when query load increases. We solved this by:
+
+  * Writing all logs to Redis Streams.
+  * Having a separate process load them into per-user SQLite databases.
+    This allows logs to be queried without impacting the performance of the main system.
+
+* **Memory Protection**:
+  Spikes in outbound HTTP calls could cause processes to run out of memory before scaling kicked in. To prevent this:
+
+  * Compute processes now include memory checks.
+  * When memory usage is high, they slow down message loading from the persistence layer.
+    With this and our alerting system in-place, we can ack in-time to add more processes to the system without any downtime.
+
+* **Fair Usage (Noisy Neighbor Prevention)**:
+  Without safeguards, a single heavy user could use all the memory, delaying deliveries for everyone else. To address this:
+
+  * We introduced a `Max Parallelism` quota that limits concurrent calls per user.
+  * This ensures fair message delivery across all users.
+
+## Pricing changes
+
+Let’s first discuss the main updates that apply to all users, then we’ll cover changes to individual plans.
+
+The theme of the pricing changes is twofold:
+
+**1. Ensure users can scale without worrying about hitting limits in production.**
+    
+    - The `Max Requests Per Second` limit has been removed for mission-critical endpoints. The endpoints that trigger publishing a message(`publish`,`enqueue`,`batch`) etc does not have this limit anymore. This limit was difficult to work with for webhooks configured with third-party services, since a quota exceed error from a REST API is not something you can easily handle. Now, we will accept all requests without rejecting them and store them in our persistence layer.
+For details of which operations have the limit you can check FAQ at the end of the [pricing page]((https://upstash.com/pricing/qstash)
+    - The limits like `Max Messages Per Day` or `Max Monthly Bandwidth` is either removed or made soft-limit to avoid service distruption. I will go into details 
+on the next section per plan.        
+        
+**2. Protect our AWS bills.**
+    
+    - We noticed that a small number of users generate very high bandwidth usage. To address this, we added bandwidth quotas. Don’t worry—this is a soft limit across all plans. We will not stop your traffic when you hit the quota. Instead, we will kindly ask you to upgrade if you exceed the limit frequently.
+        
+
+Here is our changes for each category of users:
+
+- **Free Plan** → You are our word-of-mouth champions—the ones who convince your companies that QStash is cool. We didn’t forget you:
+    
+    - `Max Messages Per Day` increased from **500 → 1000** so that you can get started without a worry. 
+        
+- **Pay-as-you-go Users** → Our startup builders who love scale-to-zero pricing while getting to production. We heard your feedback: you didn’t like the `Max Messages Per Day` limit and didn’t want to upgrade to a fixed plan because your traffic wasn’t high yet. We’ve removed this limit entirely. If (and hopefully when) your traffic grows, you’ll be ready.
+    
+- **Fixed Plans** → Our users who love predictable bills and already have steady usage. We also heard that you don’t want your service disrupted when you hit limits. That’s why we made `Max Messages Per Day` and `Max Bandwidth Per Month` **soft limits**. When you hit a quota, servers will no longer return an error—your service won’t break. Instead, we’ll monitor usage and ask you to upgrade if you consistently exceed quotas.
+
+Here is the link for you if you are curious about other existing quotas per plan 
+- [QStash Pricing](https://upstash.com/pricing/qstash)
+- [Workflow Pricing](https://upstash.com/pricing/workflow)
+
+
+## Prod Pack
+
+With the GA launch, we’re also introducing a **Prod Pack** for QStash. For **$200 per month**, it includes:
+
+- Uptime SLA guarantee ([see details](https://upstash.com/docs/common/help/sla)).  
+  This gives you peace of mind that your mission-critical workloads will stay online, backed by a contractual uptime commitment.  
+
+- Two new monitoring integrations: Prometheus and Datadog.  
+  These integrations make it easier to track performance, set up alerts, and quickly troubleshoot issues without leaving your existing monitoring stack.  
+
+## Recent UI Improvements
+
+For those who haven’t had the chance to explore our console recently, we introduced two major updates:
+
+1. **Workflow Logs Redesign** → Previously, we reused the QStash logs interface, which wasn’t well-suited for workflows. Now, the Workflow Logs screen has been fully redesigned with easier debugging as the main focus. The feedback has been fantastic so far, and we hope you enjoy it too.
+    
+2. **Local Development Mode** → You can now enable `Local Development` in the console, which will:
+    
+    - Guide you to run a local qstash-server.
+        
+    - Allow you to use the same console in your browser with your local server to publish messages, check logs, and more.
+        
+
+With this, there’s no need to set up ngrok locally. You can also easily integrate QStash into your CI testing environments thanks to the local qstash-server.
+
+## Wrapping up
+
+We’re excited to see QStash mature into a product that helps developers build their own products in production. With this announcement, QStash is officially GA—more powerful, easier to use, and backed by new pricing changes and features.
+
+As always, thank you for reading! We’d love to hear your feedback. Reach out to us anytime via [Discord](https://upstash.com/discord), [our website](https://upstash.com/) chat or support@upstash.com
+
+And hey—don’t forget to stay in the loop with all our latest features and updates by following us on [Twitter](https://twitter.com/upstash)!
