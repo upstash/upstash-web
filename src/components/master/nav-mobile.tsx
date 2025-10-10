@@ -22,7 +22,7 @@ export default function NavMobile({ hidden }: HTMLProps<HTMLDivElement> & {}) {
       <div className="flex flex-col divide-y divide-black/5 dark:divide-white/5">
         {NavItems.map((item) => {
           return (
-            <NavLink key={item.href} href={item.href}>
+            <NavLink key={item.href} href={item.href} prefetch={item.prefetch}>
               {item.name}
               {item.children}
             </NavLink>
@@ -74,11 +74,13 @@ function NavLink({
 const NavItems: {
   name: string;
   href: string;
+  prefetch?: boolean;
   children?: ReactNode;
 }[] = [
   {
     name: "Docs",
     href: "/docs",
+    prefetch: false
   },
   {
     name: "Pricing",

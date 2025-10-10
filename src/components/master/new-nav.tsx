@@ -19,7 +19,7 @@ export default function NewNavigation() {
             "text-text-mute hover:bg-white/5 hover:text-primary-text",
           )}
         >
-          <Link href="/docs">Docs</Link>
+          <Link prefetch={false} href="/docs">Docs</Link>
         </NavigationMenu.Link>
       </NavigationMenu.Item>
 
