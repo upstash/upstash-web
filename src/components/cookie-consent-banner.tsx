@@ -2,6 +2,7 @@
 
 import { useGlobalStore } from "@/lib/global-store";
 import { useEffect, useState } from "react";
+import { z } from "zod";
 
 export const CookieConsentBanner = () => {
   const { cookieConsent, setCookieConsent, isHydrated } = useGlobalStore();
@@ -14,11 +15,55 @@ export const CookieConsentBanner = () => {
       return;
     }
 
+    const GEO_CACHE_KEY = "geo:is_eu";
+    const GEO_CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+    const cacheSchema = z.object({
+      isEuropean: z.boolean(),
+      expiresAt: z.number().int().nonnegative(),
+    });
+
+    function getCachedIsEuropean(): boolean | null {
+      try {
+        const raw = localStorage.getItem(GEO_CACHE_KEY);
+        if (!raw) return null;
+        const parsed = cacheSchema.safeParse(JSON.parse(raw));
+        if (!parsed.success) {
+          localStorage.removeItem(GEO_CACHE_KEY);
+          return null;
+        }
+        if (Date.now() > parsed.data.expiresAt) {
+          localStorage.removeItem(GEO_CACHE_KEY);
+          return null;
+        }
+        return parsed.data.isEuropean;
+      } catch {
+        return null;
+      }
+    }
+
+    function setCachedIsEuropean(isEuropean: boolean) {
+      const expiresAt = Date.now() + GEO_CACHE_TTL_MS;
+      localStorage.setItem(
+        GEO_CACHE_KEY,
+        JSON.stringify({ isEuropean, expiresAt }),
+      );
+    }
+
     async function checkLocation() {
+      const cached = getCachedIsEuropean();
+      if (cached !== null) {
+        setVisible(cached);
+        if (!cached) {
+          setCookieConsent(true);
+        }
+        return;
+      }
+
       const res = await fetch("/api/geolocation");
+      const data = (await res.json()) as { isEuropean: boolean };
 
-      const data = await res.json();
-
+      setCachedIsEuropean(data.isEuropean);
       setVisible(data.isEuropean);
 
       if (!data.isEuropean) {
@@ -55,7 +100,7 @@ export const CookieConsentBanner = () => {
           onClick={() => {
             setVisible(false);
           }}
-          className="flex items-center justify-center w-6 h-6 transition-colors rounded-full hover:bg-emerald-500"
+          className="flex h-6 w-6 items-center justify-center rounded-full transition-colors hover:bg-emerald-500"
         >
           x
         </button>
