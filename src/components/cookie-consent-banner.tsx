@@ -4,7 +4,8 @@ import { useGlobalStore } from "@/lib/global-store";
 import { useEffect, useState } from "react";
 
 export const CookieConsentBanner = () => {
-  const { cookieConsent, setCookieConsent, isHydrated } = useGlobalStore();
+  const { isEu, setIsEu, cookieConsent, setCookieConsent, isHydrated } =
+    useGlobalStore();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -15,11 +16,17 @@ export const CookieConsentBanner = () => {
     }
 
     async function checkLocation() {
+      if (isEu !== null && isEu !== undefined) {
+        setVisible(isEu);
+        return;
+      }
+
       const res = await fetch("/api/geolocation");
 
       const data = await res.json();
 
       setVisible(data.isEuropean);
+      setIsEu(data.isEuropean);
 
       if (!data.isEuropean) {
         setCookieConsent(true);
@@ -27,7 +34,7 @@ export const CookieConsentBanner = () => {
     }
 
     checkLocation();
-  }, [cookieConsent, isHydrated, setCookieConsent]);
+  }, [cookieConsent, isHydrated, setCookieConsent, isEu, setIsEu]);
 
   if (!visible) return;
 
@@ -55,7 +62,7 @@ export const CookieConsentBanner = () => {
           onClick={() => {
             setVisible(false);
           }}
-          className="flex items-center justify-center w-6 h-6 transition-colors rounded-full hover:bg-emerald-500"
+          className="flex h-6 w-6 items-center justify-center rounded-full transition-colors hover:bg-emerald-500"
         >
           x
         </button>
