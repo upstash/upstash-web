@@ -1,15 +1,14 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-type GlobalStore = {
-  /**
-   * A cache of the /api/geolocation response to check whether the user is in the EU
-   */
-  isEu: boolean | null;
-  setIsEu: (isEuCached: boolean | null) => void;
+// Pending: initial state
+// Pending-eu: user is in the EU, but consent is pending
+// Granted: user has granted consent
+type CookieConsentState = "pending" | "pending-eu" | "granted";
 
-  cookieConsent: boolean;
-  setCookieConsent: (consent: boolean) => void;
+type GlobalStore = {
+  cookieConsent: CookieConsentState;
+  setCookieConsent: (consent: CookieConsentState) => void;
 
   isHydrated: boolean;
   setIsHydrated: (isHydrated: boolean) => void;
@@ -24,10 +23,7 @@ type GlobalStore = {
 export const useGlobalStore = create(
   persist<GlobalStore>(
     (set) => ({
-      isEu: null,
-      setIsEu: (isEuCached) => set({ isEu: isEuCached }),
-
-      cookieConsent: false,
+      cookieConsent: "pending",
       setCookieConsent: (consent) => set({ cookieConsent: consent }),
 
       isHydrated: false,
@@ -42,7 +38,21 @@ export const useGlobalStore = create(
     }),
     {
       name: "global-store",
-      version: 1,
+      version: 2,
+      migrate: (state, version) => {
+        if (version === 1) {
+          const stateV1 = state as { cookieConsent: boolean } & Omit<
+            GlobalStore,
+            "cookieConsent"
+          >;
+          return {
+            ...stateV1,
+            cookieConsent:
+              stateV1.cookieConsent === true ? "granted" : "pending",
+          };
+        }
+        return state as GlobalStore;
+      },
       onRehydrateStorage: (state) => {
         return () => state.setIsHydrated(true);
       },

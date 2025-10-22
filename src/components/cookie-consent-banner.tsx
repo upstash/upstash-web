@@ -4,37 +4,33 @@ import { useGlobalStore } from "@/lib/global-store";
 import { useEffect, useState } from "react";
 
 export const CookieConsentBanner = () => {
-  const { isEu, setIsEu, cookieConsent, setCookieConsent, isHydrated } =
-    useGlobalStore();
+  const { cookieConsent, setCookieConsent, isHydrated } = useGlobalStore();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    setVisible(cookieConsent === "pending-eu");
+  }, [cookieConsent]);
+
+  useEffect(() => {
     if (!isHydrated) return;
-    if (cookieConsent) {
-      setVisible(false);
-      return;
-    }
+
+    // No need to check location if consent is already granted or pending-eu
+    if (cookieConsent !== "pending") return;
 
     async function checkLocation() {
-      if (isEu !== null && isEu !== undefined) {
-        setVisible(isEu);
-        return;
-      }
-
       const res = await fetch("/api/geolocation");
 
       const data = await res.json();
 
-      setVisible(data.isEuropean);
-      setIsEu(data.isEuropean);
-
-      if (!data.isEuropean) {
-        setCookieConsent(true);
+      if (data.isEuropean) {
+        setCookieConsent("pending-eu");
+      } else {
+        setCookieConsent("granted");
       }
     }
 
     checkLocation();
-  }, [cookieConsent, isHydrated, setCookieConsent, isEu, setIsEu]);
+  }, [isHydrated, setCookieConsent]);
 
   if (!visible) return;
 
@@ -52,7 +48,7 @@ export const CookieConsentBanner = () => {
       <div className="flex items-center gap-2.5">
         <button
           onClick={() => {
-            setCookieConsent(true);
+            setCookieConsent("granted");
           }}
           className="flex items-center rounded-full bg-white px-3 pb-1 pt-1.5 text-xs transition-colors hover:bg-gray-100"
         >
