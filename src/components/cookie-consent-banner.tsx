@@ -8,26 +8,29 @@ export const CookieConsentBanner = () => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    setVisible(cookieConsent === "pending-eu");
+  }, [cookieConsent]);
+
+  useEffect(() => {
     if (!isHydrated) return;
-    if (cookieConsent) {
-      setVisible(false);
-      return;
-    }
+
+    // No need to check location if consent is already granted or pending-eu
+    if (cookieConsent !== "pending") return;
 
     async function checkLocation() {
       const res = await fetch("/api/geolocation");
 
       const data = await res.json();
 
-      setVisible(data.isEuropean);
-
-      if (!data.isEuropean) {
-        setCookieConsent(true);
+      if (data.isEuropean) {
+        setCookieConsent("pending-eu");
+      } else {
+        setCookieConsent("granted");
       }
     }
 
     checkLocation();
-  }, [cookieConsent, isHydrated, setCookieConsent]);
+  }, [isHydrated, setCookieConsent]);
 
   if (!visible) return;
 
@@ -45,7 +48,7 @@ export const CookieConsentBanner = () => {
       <div className="flex items-center gap-2.5">
         <button
           onClick={() => {
-            setCookieConsent(true);
+            setCookieConsent("granted");
           }}
           className="flex items-center rounded-full bg-white px-3 pb-1 pt-1.5 text-xs transition-colors hover:bg-gray-100"
         >
@@ -55,7 +58,7 @@ export const CookieConsentBanner = () => {
           onClick={() => {
             setVisible(false);
           }}
-          className="flex items-center justify-center w-6 h-6 transition-colors rounded-full hover:bg-emerald-500"
+          className="flex h-6 w-6 items-center justify-center rounded-full transition-colors hover:bg-emerald-500"
         >
           x
         </button>
