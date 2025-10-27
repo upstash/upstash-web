@@ -3,6 +3,15 @@ import { NextResponse } from "next/server";
 import { AFFILIATE_CODE } from "./constants";
 
 export function middleware(request: NextRequest) {
+  // Handle developer.upstash.com redirect
+  const hostname = request.headers.get("host");
+  if (hostname === "developer.upstash.com") {
+    return NextResponse.redirect(
+      "https://upstash.com/docs/devops/developer-api",
+      301, // Permanent redirect for SEO
+    );
+  }
+
   const queryParams = request.nextUrl.searchParams; // `URLSearchParams`
   const affiliateCode = queryParams.get(AFFILIATE_CODE);
 
