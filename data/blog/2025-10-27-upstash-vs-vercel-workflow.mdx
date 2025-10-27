@@ -1,5 +1,5 @@
 ---
-title: "Vercel Workflow vs Upstash Workflow: When Vibes Meet Reality"
+title: "Vercel Workflow vs Upstash Workflow"
 slug: upstash-vs-vercel-workflow
 authors:
   - sancar
@@ -7,21 +7,15 @@ tags: [vercel, workflow, ai, serverless]
 ---
 
 Vercel just announced [Vercel Workflow](https://useworkflow.dev/), their new take on durable workflows.
-It looks clean, smooth, and fits right into the Vercel ecosystem.
-But here’s the thing: **looking nice and working well in production are two different stories.**
+It looks clean, smooth, and fits right into the Vercel ecosystem. While Vercel’s new product is a good step in the right direction, it’s still missing the parts that matter when you go to production.
 
-At [Upstash](https://upstash.com/docs/introduction), we’ve been running **Upstash Workflow** in production for over a year. It’s built to handle real traffic, real failures, and real customers. It’s also built on top of QStash, which is designed for more technically inclined developers who prefer to avoid any “magic” and maintain full control. I won’t go into the details of QStash today and will mostly compare the Workflow products only.
+At [Upstash](https://upstash.com/docs/introduction), we’ve been running **Upstash Workflow** in production for over a year. It’s built to handle real traffic, real failures, and real customers. It’s also built on top of QStash, which is designed for more technically inclined developers who prefer to avoid any magic and maintain full control. I won’t go into the details of QStash today and will mostly compare the Workflow products only.
 
-So, while Vercel’s new product is fun to play with, it’s still missing the parts that matter when you leave the demo stage.
-
-If you don’t want to read the whole post:
-**Vercel Workflow is a nice toy for vibe coders. Upstash Workflow is for teams that actually need things to run reliably.**
-
-Let me start with the common `compiler directive magic` debate and why it is not the crucial point to discuss. Then I’ll mention where **Vercel Workflow** will fall short with the features they currently have.
+Let me start with the common `compiler directive magic` debate and why it’s not the most crucial point to discuss. Then I’ll mention where **Vercel Workflow** falls short with its current features. Finally, I’ll touch on a feature that Vercel got right and what we plan to do about it.
 
 ## The Compiler Directive Debate
 
-One of the hot topics around Vercel Workflow is their use of **compiler directives** the `"use workflow"` magic comment that turns regular functions into workflows.
+One of the hot topics around Vercel Workflow is its use of **compiler directives**, the `"use workflow"` magic comment that turns regular functions into workflows.
 It’s clever and makes the code look cleaner:
 
 ```ts
@@ -65,12 +59,12 @@ async function welcome(ctx: WorkflowContext<string>) {
 See the difference? It’s mostly about hiding the `ctx` part.
 
 There’s been debate about whether hiding this logic is good or bad. Some say, “it’s too much magic.” Others love how simple it looks.
-Honestly, both sides have a point. Vercel knows its audience, people who want things to just work, quickly.
+Honestly, both sides have a point. Vercel knows its audience: developers who want things to just work quickly.
 
-It’s a bit like **Apple vs. Linux**: one hides the complexity, the other gives you full control.
+It’s a bit like **Apple vs. Linux**—one hides the complexity, the other gives you full control.
 But in the end, the compiler magic doesn’t really change how the system works.
 
-The real difference comes down to **features**, and that’s where things matter in production.
+The real difference comes down to **features**, and that’s what truly matters in production.
 
 ## 1. Failure Handling That Actually Works
 
@@ -78,16 +72,16 @@ Every real system fails. APIs go down. Services time out. Retries aren’t enoug
 So what happens when a workflow fails?
 
 In Vercel Workflow, it seems... it just goes to the logs.
-The problem? You need to poll the logs somewhere to check if there’s a failed one.
+The problem? You need to poll the logs somewhere to check for failed runs.
 If needed, you have to write retry code yourself.
-Once you start doing retries, you also need to do some bookkeeping to track what has been retried and what’s still waiting for attention.
+Once you start doing retries, you also need bookkeeping to track what’s been retried and what’s still waiting for attention.
 
 In **Upstash Workflow**, failure handling is built into the core.
 We track everything. You can:
 
-* Write a `failureEndpoint` or `failureFunction` to handle failures without polling any endpoint.
+* Write a `failureEndpoint` or `failureFunction` to handle failures without polling.
 * Find every failure in your **Dead Letter Queue (DLQ)**.
-* **Retry**, **Resume**, or **Delete** (dismiss) failed runs. Available from both the UI or via API.
+* **Retry**, **Resume**, or **Delete** (dismiss) failed runs, either from the UI or via API.
 
 You’ll never lose an important operation again.
 
@@ -99,7 +93,7 @@ See:
 ## 2. Scheduling Beyond “Hello World”
 
 Vercel’s scheduling looks simple and clean. For small demos, it is.
-To remind you, the following is what is [suggested](https://x.com/rauchg/status/1981426366982824387) at the moment:
+To remind you, the following is what’s [suggested](https://x.com/rauchg/status/1981426366982824387) at the moment:
 
 ```ts
 async function daily() {
@@ -114,17 +108,17 @@ async function daily() {
 
 In production, you’ll quickly run into missing pieces.
 
-Need to delete a user’s scheduled task? Change a schedule’s interval? Search for schedule related runs?
+Need to delete a user’s scheduled task? Change a schedule’s interval? Search for schedule-related runs?
 You’ll have to build all that bookkeeping yourself.
 
 With **Upstash Workflow**, scheduling is first class.
-You can manage schedules from the UI or API, change intervals, and track all runs in one place. You can even search the logs for schedule related executions.
+You can manage schedules from the UI or API, change intervals, and track all runs in one place. You can even search logs for schedule-related executions.
 
 See: [Scheduling in Upstash Workflow](https://upstash.com/docs/workflow/howto/schedule)
 
-## 3. Flow Control: Reactive vs Proactive
+## 3. Flow Control: Reactive vs. Proactive
 
-Every service you integrate with - OpenAI, Stripe, email APIs - has rate limits.
+Every service you integrate with—OpenAI, Stripe, email APIs—has rate limits.
 Vercel’s approach is reactive: call the API, hit a rate limit, catch it, then throw `RetryLater` to try again.
 That sounds okay until your app scales. Then it becomes a retry storm, wasted executions, extra cost, and unnecessary load.
 
@@ -138,7 +132,7 @@ See: [Flow Control Documentation](https://upstash.com/docs/workflow/features/flo
 
 Vercel’s UI is minimal. There’s no search, no filters, and no way to find a specific workflow by ID.
 
-That’s fine for a weekend project, but if you have millions of workflow runs per day like our users, you need serious visibility.
+If you have millions of workflow runs per day, like our users, you need more visibility.
 When one of your customers asks what happened with their action last week, you should be able to find it instantly.
 
 Upstash Workflow gives you full observability:
@@ -147,31 +141,57 @@ Upstash Workflow gives you full observability:
 * Link workflows to your specific users or actions using [labels](https://upstash.com/docs/workflow/basics/client/trigger#param-label).
 * Investigate and fix problems right from the dashboard.
 
-That’s how you run workflows at scale.
-
-
 ## 5. Platforms and Languages That Actually Exist
 
 Vercel Workflow provides a **"World" interface** to make the API usable on platforms other than Vercel.
-In theory, that sounds nice. In practice, there are only a few toy implementations, and there’s little incentive for the community to maintain or productionize them. Most of the real-world use cases will stay locked inside the Vercel ecosystem.
+In practice, there are only a few toy implementations, and there’s little incentive for the community to maintain or productionize them. Most real-world use cases will stay locked inside the Vercel ecosystem.
 
 **Upstash Workflow**, on the other hand, supports multiple platforms out of the box.
-You can deploy and run your workflows in 9 different platforms including Vercel, Claudflare, Tanstack. 
+You can deploy and run your workflows on 9 different platforms, including Vercel, Cloudflare, and TanStack.
 
-See the full list at [Supported Platforms](https://upstash.com/docs/workflow/quickstarts/platforms) page.
+See the full list on the [Supported Platforms](https://upstash.com/docs/workflow/quickstarts/platforms) page.
 
 Beyond platforms, **we also support multiple languages**.
-TypeScript is just the start . *Python** is already available, and **Go** is on the way.
+TypeScript is just the start. **Python** is already available, and **Go** is on the way.
 
-It’s unlikely that Vercel will ever provide first-class support for any other language, which limits their workflow ecosystem to a single stack.
+It’s unlikely that Vercel will ever provide first-class support for other languages, which limits their workflow ecosystem to a single stack.
+
+## 6. The Feature That Vercel Got Right
+
+Vercel Workflow introduced proper support for `webhook` use cases from day one. This is useful for third-party services that don’t block your call but instead invoke a callback URL when the job is finished. Many heavy workloads, such as generating images or videos, use this kind of API today.
+To give you an idea, here’s an example from [their main page](https://useworkflow.dev):
+
+```ts
+import { createWebhook, fetch } from "workflow";
+
+export async function validatePaymentMethod(rideId) {
+  "use workflow";
+
+  // Create a new webhook
+  const webhook = createWebhook();
+
+  // Every webhook has a URL that can be used to resume
+  // the workflow
+  await fetch("https://api.example-payments.com/validate-method", {
+    method: "POST",
+    body: JSON.stringify({ rideId, callback: webhook.url }),
+  });
+
+  // Suspend the workflow until the webhook is invoked
+  const { request } = await webhook;
+
+  const confirmation = await request.json();
+
+  return { rideId, status: confirmation.status };
+}
+```
+
+Now that we’ve seen it in action and people like the API, we realized this should have been provided much earlier.
+The good news is that we’ve already started working on it, and it should be deployed in a couple of weeks.
 
 ## Wrapping Up
 
-Vercel Workflow is a cool experiment. It’s smooth, fun, and easy to play with. If you’re prototyping or “vibe coding,” you’ll probably enjoy it.
+Vercel is addressing an important problem with Vercel Workflow. With this new tool, the aim is to reduce user costs and simplify their workloads. They’ve made a good start but are still missing features that are essential for production systems.
 
-But when you need something **durable, observable, and production ready**, the cracks start to show.
-Retries, scheduling, rate limits, observability. These are the boring parts that become **critical** once you go live.
-
-That’s why we built **Upstash Workflow**. It’s been battle tested for a year and handles everything from AI pipelines to billing systems without hidden costs or retry chaos.
-
-I couldn't touch on all the features we have. Check out our [documentation](https://upstash.com/docs/workflow/getstarted) for more. Or come and ask via our support channels [Discord](https://upstash.com/discord), [our website](https://upstash.com) chat popup, reach out at [support@upstash.com](mailto:support@upstash.com). 
+I couldn’t cover all the features we offer here. Check out our [documentation](https://upstash.com/docs/workflow/getstarted) for more.
+Or reach out through our support channels: [Discord](https://upstash.com/discord), the chat popup on [our website](https://upstash.com), or [support@upstash.com](mailto:support@upstash.com).
