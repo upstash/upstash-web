@@ -1,0 +1,123 @@
+---
+title: "The Easiest Way to Add Realtime in Next.js"
+slug: about-upstash-realtime
+authors:
+  - josh
+tags: [realtime, redis]
+---
+
+## Adding Realtime Features to Next.js sucks 💀
+
+I mean things like:
+
+- Realtime streams for Vercel AI SDK
+- Live dashboards
+- Live notifications and updates
+- Live cursors or 'who is online' indicators
+- Progress tracking for file uploads or long-running tasks
+
+And this is definitely not for lack of SaaS you could use for just this purpose. Existing services are:
+
+- Expensive & have unclear pricing (Ably)
+- Not type-safe with a bad developer experience (Pusher)
+- Awesome (Convex, Supabase), but hard to add realtime without migrating your entire stack
+
+---
+
+## The Goal for Upstash Realtime
+
+I wanted a realtime service that was
+
+- 100% type-safe in front- and backend
+- Deployable to Vercel and other serverless platforms
+- Priced based on events, not connection time
+- Usable with any existing database (Neon, Planetscale, everything)
+
+So we're building Upstash Realtime to be just that. The easiest way to add realtime features to any Next.js app. Setup takes 2 minutes and deployable to Vercel, Cloudflare or others.
+
+---
+
+## I hated all existing ways to do this 🤡
+
+I got the idea for Realtime from building an open-source SaaS called [Contentport](https://www.contentport.io/). When you post a tweet through contentport, we run the posting logic in an Upstash Workflow that's automatically retried on failure.
+
+This way, even if the Twitter API is down, our AI provider has an outage, or _anything else_ goes wrong, we can guarantee extremely high reliability to the person posting.
+
+But because this logic runs in a background job, there is no connection between client and the posting logic. In other words, there is no way to tell the client about the current status (e.g. 'processing', 'posting', or 'success').
+
+<Frame>
+<img src="/blog/realtime/client-disconnect.jpg" />
+</Frame>
+
+To send status updates to the client in real-time, I needed some kind of message broker.
+
+I was very unhappy with Pusher and did not want to migrate our existing Neon Postgres database over to Convex just for realtime features. And turns out, our most mature product, Upstash Redis, has everything I needed to make this work: Pub/sub and Redis Streams.
+
+---
+
+## Quick Example
+
+Let's build a simple example that sends realtime updates from a server action to the client.
+
+First, we install the package:
+
+```bash
+npm install @upstash/realtime
+```
+
+Then we define events using zod:
+
+```typescript title="lib/realtime.ts"
+import { InferRealtimeEvents, Realtime } from "@upstash/realtime";
+import z from "zod/v4";
+import { redis } from "./redis";
+
+const schema = {
+  notification: z.object({
+    message: z.string(),
+  }),
+};
+
+const realtime = new Realtime({ schema, redis });
+export type RealtimeEvents = InferRealtimeEvents<typeof realtime>;
+```
+
+Send events in any route handler:
+
+```typescript title="route.ts"
+import { realtime } from "@/lib/realtime";
+
+await realtime.emit("notification", { message: "Hello world!" });
+```
+
+Subscribe to events in your React component:
+
+```tsx title="page.tsx"
+import { RealtimeEvents } from "@/lib/realtime";
+import { useRealtime } from "@upstash/realtime/client";
+
+useRealtime<RealtimeEvents>({
+  event: "notification",
+  onData: ({ message }) => {
+    console.log(message);
+  },
+});
+```
+
+That's it! We now have fully type-safe realtime updates from server to client. 
+
+--- 
+
+## Disclaimer
+
+Upstash Realtime is not meant as a 1:1 Pusher replacement because we use HTTP and not sockets like Pusher.
+
+So while HTTP is probably more reliable, for extremely high frequency updates (>15-20 per second), I recommend Pusher because of their socket connection.
+
+But for anything else, like high-frequency AI chunk updates from Vercel's AI SDK, live dashboards or live chat messages, we're building Upstash Realtime to be the go-to.
+
+You should try it, it's super easy to start!
+
+---
+
+Thanks for reading! 🙌 Have questions or feedback? Reach out to me directly [@joshtriedcoding](https://x.com/joshtriedcoding).
