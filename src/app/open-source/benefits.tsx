@@ -23,13 +23,13 @@ export const Benefits = () => {
                   <div className="relative h-full w-full overflow-hidden rounded-xl bg-gray-900/25 shadow-2xl">
                     <div className="absolute inset-0 rounded-xl bg-gradient-to-b from-black/10 to-black/30" />
                     <div className="relative flex h-full flex-col">
-                      <div className="relative flex w-full flex-1 flex-col items-start gap-6 bg-neutral-900/100 dark:bg-neutral-900/50 p-7">
+                      <div className="relative flex w-full flex-1 flex-col items-start gap-6 bg-neutral-900/100 p-7 dark:bg-neutral-900/50">
                         <div className="flex-1 pt-2">
                           <div className="size-6 md:size-8">
                             <UpstashLogo />
                           </div>
                         </div>
-                        <div className="flex text-white flex-col text-left">
+                        <div className="flex flex-col text-left text-white">
                           <p className="text-xs opacity-60">Card Number</p>
                           <p className="text-sm uppercase">
                             6277 7564 2527 4778
@@ -56,7 +56,7 @@ export const Benefits = () => {
                                 d="M-124.445 498.012C-136.32 419.077 -126.853 399.598 -55.0021 337.335C-4.45087 293.529 78.6563 234.105 193.108 191.828C287.611 156.92 342.11 68.2273 307.885 47.9926C330.965 10.8217 331.314 -19.2976 315.916 -60.6865"
                                 stroke="url(#paint0_linear_1731_5369)"
                                 stroke-opacity="0.48"
-                                stroke-width="66.9487"
+                                strokeWidth="66.9487"
                                 stroke-linecap="round"
                               />
                             </g>
@@ -100,7 +100,7 @@ export const Benefits = () => {
                           </svg>
                         </div>
                       </div>
-                      <div className="relative text-white z-10 flex h-20 w-full items-center justify-between bg-[#131416] px-7 text-center">
+                      <div className="relative z-10 flex h-20 w-full items-center justify-between bg-[#131416] px-7 text-center text-white">
                         <div className="flex flex-col text-left">
                           <p className="text-xs opacity-60">Card holder name</p>
                           <p className="text-sm uppercase">Upstash OSS</p>
