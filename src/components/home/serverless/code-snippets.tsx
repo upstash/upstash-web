@@ -94,7 +94,7 @@ export const CodeSnippets = ({ data }: Props) => {
         <div className="h-[278px] min-h-0 w-full border-0 border-white/10 px-[6px] py-6 md:border-l-2">
           <pre className="no-scrollbar h-full !overflow-x-scroll !overflow-y-scroll !text-[.86em]">
             <code
-              className={`lang-${snippet.language} line-numbers leading-[1.4] [&>.line-numbers-rows]:!border-r-0`}
+              className={`language-${snippet.language} line-numbers leading-[1.4] [&>.line-numbers-rows]:!border-r-0`}
             >
               {snippet.code.trim()}
             </code>
