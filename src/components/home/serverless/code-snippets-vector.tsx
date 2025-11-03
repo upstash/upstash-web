@@ -99,10 +99,8 @@ const result2 = await semanticCache.get("what's the year the Berlin wall destroy
       {
         language: "py",
         code: `
-from upstash_vector import Index
 from upstash_vector import SemanticCache
 
-index = Index.from_env()
 cache = SemanticCache(
     url="<UPSTASH_VECTOR_REST_URL>",
     token="<UPSTASH_VECTOR_REST_TOKEN>",

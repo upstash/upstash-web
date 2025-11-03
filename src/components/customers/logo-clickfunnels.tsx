@@ -5,7 +5,7 @@ export const LogoClickfunnels = (props: React.SVGProps<SVGSVGElement>) => (
     fill="currentColor"
     {...props}
   >
-    <g clip-path="url(#clip0_2265_791)">
+    <g clipPath="url(#clip0_2265_791)">
       <path
         d="M9.33147 21.5011L5.75944 24.0006L4.27907 22.9263L5.81099 18.3571L5.45011 17.8701L0.559741 17.8343L0 16.1083L3.96237 13.2865V12.6849L0.036825 9.82732L0.618661 8.10132H5.00084L9.33147 21.5011Z"
         fill="currentColor"

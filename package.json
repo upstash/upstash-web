@@ -27,6 +27,8 @@
     "clsx": "^1.2.1",
     "cobe": "^0.6.3",
     "copy-to-clipboard": "^3.3.3",
+    "embla-carousel-autoplay": "^8.6.0",
+    "embla-carousel-react": "^8.6.0",
     "encoding": "^0.1.13",
     "framer-motion": "^11.18.2",
     "lodash": "^4.17.21",
