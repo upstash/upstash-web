@@ -8,15 +8,15 @@ tags: [realtime, ai, workflow]
 
 A few weeks ago, I accidentally created a new Upstash product: Upstash Realtime. It's a Pusher/Ably alternative using Redis Streams to add realtime features to your app. Perfect for Next.js and absolutely deployable to Vercel (because that's what I use).
 
-Most AI chat apps have a problem. If you lose connection, refresh the page, or close your laptop, you lose the entire AI generation. You need to start over and wait for the whole thing again.
-
-This sucks especially for long generations with expensive models or when running complex AI workflows that take 20+ seconds.
-
-So here's a quick demo of what we're building 👇
+Here's a quick demo of what we're building 👇
 
 <Frame>
   <Video id="5P53zxMXfIL5NoM3nq4J7VHX8KQDferRDPTGsTrFwl8" />
 </Frame>
+
+Most AI chat apps have a problem. If you lose connection, refresh the page, or close your laptop, you lose the entire AI generation. You need to start over and wait for the whole thing again.
+
+This sucks especially for long generations with expensive models or when running complex AI workflows that take 20+ seconds.
 
 An AI chat that:
 
@@ -31,6 +31,8 @@ From an engineering perspective, I'd illustrate it like this:
 <Frame>
   <img src="/blog/realtime-ai-sdk/overview.jpeg" />
 </Frame>
+
+By the way, everything we're building here is [100% open-source](https://github.com/joschan21/durable-llm-streams).
 ---
 
 ## Setup
@@ -376,7 +378,9 @@ We've moved all persistent connections away from the Publisher (piece of logic t
 4. Workflow generates AI response, emits chunks to Realtime
 5. Frontend receives chunks in real-time via SSE
 
-<Frame><img src="/blog/realtime-ai-sdk/overview-2.jpeg" /></Frame>
+<Frame>
+  <img src="/blog/realtime-ai-sdk/overview-2.jpeg" />
+</Frame>
 
 **If connection breaks:**
 
