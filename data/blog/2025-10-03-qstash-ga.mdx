@@ -56,7 +56,7 @@ The theme of the pricing changes is twofold:
 **1. Ensure users can scale without worrying about hitting limits in production.**
     
     - The `Max Requests Per Second` limit has been removed for mission-critical endpoints. The endpoints that trigger publishing a message(`publish`,`enqueue`,`batch`) etc does not have this limit anymore. This limit was difficult to work with for webhooks configured with third-party services, since a quota exceed error from a REST API is not something you can easily handle. Now, we will accept all requests without rejecting them and store them in our persistence layer.
-For details of which operations have the limit you can check FAQ at the end of the [pricing page]((https://upstash.com/pricing/qstash)
+For details of which operations have the limit you can check FAQ at the end of the [pricing page](https://upstash.com/pricing/qstash)
     - The limits like `Max Messages Per Day` or `Max Monthly Bandwidth` is either removed or made soft-limit to avoid service distruption. I will go into details 
 on the next section per plan.        
         
