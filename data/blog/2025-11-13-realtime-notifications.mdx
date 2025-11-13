@@ -1,0 +1,352 @@
+---
+title: "Realtime Notifications with Next.js 16 & Vercel"
+slug: nextjs-16-realtime-notifications
+authors:
+  - josh
+tags: [realtime]
+---
+
+You and me are about to build a Next.js realtime notification system.
+
+We'll build an app where we send a message in a Next.js 16 server action. This message is automatically delivered to all connected clients in real-time. This also works in route handlers or server components, basically anywhere :]
+
+Here's a 30-second demo 👇
+
+<Frame>
+  <Video id="Fw1Ticy9fW02WRuedkgEk01OncK201VI93fObCfKSXZxnA" />
+</Frame>
+
+---
+
+## Real-time in Nextjs 16
+
+All moderns apps (Slack 💀, Discord, Twitter) have a mechanism for real-time updates. When something happens (e.g. sending a chat message), other people see it immediately without refreshing the page.
+
+To make this extremely easy, I made Upstash Realtime. Here's an overview:
+
+- Setup takes 60 seconds
+- Clean APIs & first-class TypeScript support
+- Extremely fast, zero dependencies, 1.9kB gzipped
+- Deploy anywhere: Vercel, Netlify, etc.
+- 100% type-safe using zod v4 or zod mini
+- Automatic connection management w/ message delivery guarantee
+
+---
+
+## Setup
+
+First let's install the package:
+
+```bash title="Terminal"
+npm install @upstash/realtime
+```
+
+We'll need a Redis database from [Upstash Console](https://console.upstash.com). Create one (it's free), then copy your REST URL and token.
+
+Add them to your `.env`:
+
+```env title=".env"
+UPSTASH_REDIS_REST_URL=https://your-redis-url.upstash.io
+UPSTASH_REDIS_REST_TOKEN=your-redis-token
+```
+
+---
+
+## Step 1: Configure realtime
+
+Let's create `lib/redis.ts` to initialize our Redis client:
+
+```typescript title="lib/redis.ts"
+import { Redis } from "@upstash/redis";
+
+export const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
+```
+
+Now let's create `lib/realtime.ts` with our event schema:
+
+```typescript title="lib/realtime.ts"
+import { InferRealtimeEvents, Realtime } from "@upstash/realtime";
+import { z } from "zod/v4";
+import { redis } from "./redis";
+
+const schema = {
+  notification: {
+    created: z.object({
+      message: z.string(),
+      date: z.string(),
+    }),
+  },
+};
+
+export const realtime = new Realtime({ schema, redis });
+export type RealtimeEvents = InferRealtimeEvents<typeof realtime>;
+```
+
+We create a `notification.created` event with a Zod schema. The `RealtimeEvents` type gives us full type safety across our entire app.
+
+---
+
+## Step 2: Set up route handler
+
+Create `app/api/realtime/route.ts`:
+
+```typescript title="app/api/realtime/route.ts"
+import { realtime } from "@/lib/realtime";
+import { handle } from "@upstash/realtime";
+
+export const GET = handle({ realtime });
+```
+
+This route automatically handles all the routing, connection management, and event streaming for us :]
+
+---
+
+## Step 3: Publish events (e.g. in a server action)
+
+Upstash Realtime works anywhere on the server. Route handlers, server components or in this example server actions. Let's see how it works with Next.js 16 server actions.
+
+Create an `app/actions.ts` to publish notifications:
+
+```typescript title="app/actions.ts"
+"use server";
+
+import { realtime } from "@/lib/realtime";
+import { headers } from "next/headers";
+
+export async function publishNotification(
+  prevState: { success?: boolean; error?: string } | null,
+  formData: FormData,
+) {
+  const message = formData.get("message") as string;
+
+  await realtime.emit("notification.created", {
+    message: message.trim(),
+    date: new Date().toISOString(),
+  });
+
+  return { success: true };
+}
+```
+
+When the user submits a form, we emit the event w/ Upstash Realtime. All connected clients subscribed to that channel receive it instantly.
+
+---
+
+## Step 4: Build a (basic) form component
+
+Create `app/components/notification-form.tsx`:
+
+```typescript title="app/components/notification-form.tsx"
+"use client"
+
+import { publishNotification } from "../actions"
+import { useActionState, useEffect, useRef } from "react"
+
+export function NotificationForm() {
+  const [state, formAction, isPending] = useActionState(
+    publishNotification,
+    null
+  )
+  const formRef = useRef<HTMLFormElement>(null)
+
+  useEffect(() => {
+    if (state?.success && !isPending) {
+      formRef.current?.reset()
+    }
+  }, [state?.success, isPending])
+
+  return (
+    <form ref={formRef} action={formAction} className="w-full space-y-4">
+      <input
+        id="message"
+        name="message"
+        type="text"
+        placeholder="Enter your notification message..."
+        required
+        disabled={isPending}
+        className="w-full px-4 py-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+      />
+
+      {state?.error && (
+        <p className="text-sm text-red-500 dark:text-red-400">{state.error}</p>
+      )}
+
+      {state?.success && !isPending && (
+        <p className="text-sm text-emerald-600 dark:text-emerald-400">
+          Notification published successfully!
+        </p>
+      )}
+
+      <button
+        type="submit"
+        disabled={isPending}
+        className="w-full px-6 py-3 bg-emerald-500 hover:bg-emerald-600 disabled:bg-zinc-300 dark:disabled:bg-zinc-800 text-white font-medium rounded-lg transition-colors disabled:cursor-not-allowed flex items-center justify-center gap-2"
+      >
+        {isPending ? (
+          <>
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            Publishing...
+          </>
+        ) : (
+          "Publish Notification"
+        )}
+      </button>
+    </form>
+  )
+}
+```
+
+This is a standard Next.js form using `useActionState` to call our server action. Honestly nothing special here, but it's really useful for a basic loading state during submission.
+
+---
+
+## Step 5: Subscribe to real-time events
+
+Now for the nice part. Create `app/components/notification-list.tsx`:
+
+```typescript title="app/components/notification-list.tsx"
+"use client"
+
+import { useRealtime } from "@upstash/realtime/client"
+import type { RealtimeEvents } from "@/lib/realtime"
+import { useState } from "react"
+
+type Notification = {
+  message: string
+  date: string
+}
+
+export function NotificationList() {
+  const [notifications, setNotifications] = useState<Notification[]>([])
+
+  useRealtime<RealtimeEvents>({
+    event: "notification.created",
+    history: true,
+    onData(data) {
+      setNotifications((prev) => [data, ...prev])
+    },
+  })
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(date)
+  }
+
+  return (
+    <div className="w-full space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+          Live Notifications
+        </h2>
+        {notifications.length > 0 && (
+          <span className="px-2.5 py-0.5 text-xs font-medium bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-full">
+            {notifications.length}
+          </span>
+        )}
+      </div>
+
+      <div className="space-y-3">
+        {notifications.length === 0 ? (
+          <div className="text-center py-12 px-4 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-lg">
+            <div className="text-4xl mb-2">🔔</div>
+            <p className="text-zinc-500 dark:text-zinc-400 text-sm">
+              No notifications yet. Publish your first message above!
+            </p>
+          </div>
+        ) : (
+          notifications.map((notification, index) => (
+            <div
+              key={index}
+              className="p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-sm hover:shadow-md transition-shadow animate-in fade-in slide-in-from-top-2 duration-300"
+            >
+              <p className="text-zinc-800 dark:text-zinc-200 font-medium">
+                {notification.message}
+              </p>
+              <div className="mt-2 flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+                <span>{formatDate(notification.date)}</span>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  )
+}
+```
+
+The `useRealtime` hook:
+- Listens for `notification.created` events
+- Automatically loads history (so new clients see past notifications)
+- Updates our state with new data
+
+The types are 100% inferred from our Zod schema so TypeScript knows exactly what type `data` has in the `onData` callback.
+
+---
+
+## Step 6: Building a (basic) UI
+
+Finally, let's update `app/page.tsx`:
+
+```tsx title="app/page.tsx"
+import { NotificationForm } from "./components/notification-form"
+import { NotificationList } from "./components/notification-list"
+
+export default function Home() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-zinc-900">
+      <div className="container mx-auto px-4 py-12 max-w-4xl">
+        <header className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-zinc-900 dark:text-zinc-100 mb-3">
+            Real-Time Notifications
+          </h1>
+          <p className="text-zinc-600 dark:text-zinc-400 text-lg">
+            Powered by Upstash Realtime
+          </p>
+        </header>
+
+        <div className="grid gap-8 lg:grid-cols-2">
+          <div className="space-y-6">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-lg p-6">
+              <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-4">
+                Publish a Notification
+              </h2>
+              <NotificationForm />
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-lg p-6">
+            <NotificationList />
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+```
+
+---
+
+## Summary
+
+1. Any user submits a notification through the form
+2. Server Action publishes the event to Upstash Realtime with `realtime.emit()`
+3. Upstash Realtime stores the event in Redis and pushes it to all connected clients
+4. All connected clients receive the event via `useRealtime` hook
+
+---
+
+## Deploy to Vercel
+
+This works out of the box on Vercel. But I wrote a full documentation guide on deployment here: [https://upstash.com/docs/realtime/features/serverless](https://upstash.com/docs/realtime/features/serverless).
+
+---
+
+Appreciate you for reading! 🙌 Questions or feedback? Always DM me [@joshtriedcoding](https://x.com/joshtriedcoding) or email me at `josh@upstash.com`.
