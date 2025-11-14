@@ -29,10 +29,6 @@
       "destination": "https://github.com/upstash"
     },
     {
-      "source": "/report",
-      "destination": "https://github.com/upstash/issues/issues/new"
-    },
-    {
       "source": "/redis-api-compatibility",
       "destination": "https://upstash.com/docs/redis/features/restapi#rest-redis-api-compatibility"
     }
