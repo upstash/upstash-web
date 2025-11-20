@@ -16,6 +16,7 @@ export default function PricingTableProductionPack() {
         <ul className="flex flex-shrink flex-wrap items-center justify-center gap-1 md:items-start md:justify-start">
           {[
             "Uptime SLA",
+            "Encryption at Rest",
             "SOC-2",
             "Prometheus",
             "Datadog",
