@@ -6,6 +6,7 @@ import useIsMobile from "@/hooks/use-is-mobile";
 import cx from "@/utils/cx";
 import { PricingPlans } from "@/utils/type";
 import { IconInfoCircle } from "@tabler/icons-react";
+import Link from "next/link";
 import * as React from "react";
 import { ChangeEvent, useState } from "react";
 import CompareValue from "../compare-value";
@@ -19,6 +20,7 @@ export default function CompareTable() {
   const showPayg = selectedPlans === PricingPlans.PayAsYouGo;
   const showFixed1 = selectedPlans === PricingPlans.Pro1M;
   const showFixed10 = selectedPlans === PricingPlans.Pro10M;
+  const showEnterprise = selectedPlans === PricingPlans.Enterprise;
 
   const onPlanChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value as PricingPlans;
@@ -50,11 +52,12 @@ export default function CompareTable() {
   return (
     <table className="w-full border-separate border-spacing-x-1 border-spacing-y-0">
       <colgroup>
-        <col className="w-1/1 md:w-1/5" />
-        <col className="w-1/1 md:w-1/5" />
-        <col className="w-1/1 md:w-1/5" />
-        <col className="w-1/1 md:w-1/5" />
-        <col className="w-1/1 md:w-1/5" />
+        <col className="w-1/1 md:w-1/6" />
+        <col className="w-1/1 md:w-1/6" />
+        <col className="w-1/1 md:w-1/6" />
+        <col className="w-1/1 md:w-1/6" />
+        <col className="w-1/1 md:w-1/6" />
+        <col className="w-1/1 md:w-1/6" />
       </colgroup>
 
       {/**/}
@@ -86,6 +89,12 @@ export default function CompareTable() {
             className="border-b-2 border-b-bg px-0 py-3 text-xs font-medium uppercase tracking-wider text-text-mute"
           >
             Fixed Pricing
+          </Col>
+          <Col
+            plan={showEnterprise}
+            className="border-b-2 border-b-bg px-0 py-3 text-xs font-medium uppercase tracking-wider text-text-mute"
+          >
+            Enterprise
           </Col>
         </tr>
 
@@ -163,12 +172,27 @@ export default function CompareTable() {
               </h5>
             </div>
           </Col>
+
+          <Col plan={showEnterprise} className="border-b border-b-bg bg-bg p-0">
+            <div className="flex h-24 flex-col items-center justify-center bg-bg-mute">
+              <h4 className="hidden text-lg font-semibold text-primary-text md:block">
+                Enterprise
+              </h4>
+
+              <MobileSelectCol
+                onChange={onPlanChange}
+                value={PricingPlans.Enterprise}
+              />
+
+              <h5 className="flex items-baseline text-text-mute">-</h5>
+            </div>
+          </Col>
         </tr>
       </thead>
 
       <tbody>
         <tr>
-          <StickyRow colSpan={isMobile ? 2 : 5}>Capacity</StickyRow>
+          <StickyRow colSpan={isMobile ? 2 : 6}>Capacity</StickyRow>
         </tr>
 
         <tr>
@@ -209,6 +233,9 @@ export default function CompareTable() {
               >
                 10
               </CompareValue>
+          </Col>
+          <Col plan={showEnterprise}>
+            <CompareValue type="plain">100M+</CompareValue>
           </Col>
         </tr>
 
@@ -267,6 +294,9 @@ export default function CompareTable() {
                 5
               </CompareValue>
           </Col>
+          <Col plan={showEnterprise}>
+            <CompareValue>Unlimited</CompareValue>
+          </Col>
         </tr>
 
         <tr>
@@ -292,6 +322,9 @@ export default function CompareTable() {
               50
             </CompareValue>
           </Col>
+          <Col plan={showEnterprise}>
+            <CompareValue type="plain">Custom</CompareValue>
+          </Col>
         </tr>
 
         <tr>
@@ -310,6 +343,9 @@ export default function CompareTable() {
           </Col>
           <Col plan={showFixed10}>
             <CompareValue>2000</CompareValue>
+          </Col>
+          <Col plan={showEnterprise}>
+            <CompareValue type="plain">Custom</CompareValue>
           </Col>
         </tr>
 
@@ -330,6 +366,9 @@ export default function CompareTable() {
           <Col plan={showFixed10}>
             <CompareValue>2000</CompareValue>
           </Col>
+          <Col plan={showEnterprise}>
+            <CompareValue type="plain">Custom</CompareValue>
+          </Col>
         </tr>
 
         <tr>
@@ -347,6 +386,9 @@ export default function CompareTable() {
           <Col plan={showFixed10}>
             <CompareValue>100</CompareValue>
           </Col>
+          <Col plan={showEnterprise}>
+            <CompareValue type="plain">Custom</CompareValue>
+          </Col>
         </tr>
 
         <tr>
@@ -363,6 +405,9 @@ export default function CompareTable() {
           </Col>
           <Col plan={showFixed10}>
             <CompareValue>Unlimited</CompareValue>
+          </Col>
+          <Col plan={showEnterprise}>
+            <CompareValue type="plain">Custom</CompareValue>
           </Col>
         </tr>
 
@@ -383,6 +428,9 @@ export default function CompareTable() {
           <Col plan={showFixed10}>
             <CompareValue>12 hours</CompareValue>
           </Col>
+          <Col plan={showEnterprise}>
+            <CompareValue type="plain">Custom</CompareValue>
+          </Col>
         </tr>
 
         <tr>
@@ -399,6 +447,9 @@ export default function CompareTable() {
           </Col>
           <Col plan={showFixed10}>
             <CompareValue>3 months</CompareValue>
+          </Col>
+          <Col plan={showEnterprise}>
+            <CompareValue type="plain">Custom</CompareValue>
           </Col>
         </tr>
 
@@ -418,6 +469,9 @@ export default function CompareTable() {
           </Col>
           <Col plan={showFixed10}>
             <CompareValue>14 days</CompareValue>
+          </Col>
+          <Col plan={showEnterprise}>
+            <CompareValue type="plain">Custom</CompareValue>
           </Col>
         </tr>
         <tr>
@@ -462,6 +516,9 @@ export default function CompareTable() {
               50000
             </CompareValue>
           </Col>
+          <Col plan={showEnterprise}>
+            <CompareValue type="plain">Custom</CompareValue>
+          </Col>
         </tr>
 
         <tr>
@@ -478,6 +535,9 @@ export default function CompareTable() {
           </Col>
           <Col plan={showFixed10}>
             <CompareValue>1000</CompareValue>
+          </Col>
+          <Col plan={showEnterprise}>
+            <CompareValue type="plain">Custom</CompareValue>
           </Col>
         </tr>
 
@@ -500,6 +560,9 @@ export default function CompareTable() {
           <Col plan={showFixed10}>
             <CompareValue>10</CompareValue>
           </Col>
+          <Col plan={showEnterprise}>
+            <CompareValue type="plain">Custom</CompareValue>
+          </Col>
         </tr>
 
         <tr>
@@ -521,6 +584,15 @@ export default function CompareTable() {
           <Col plan={showFixed10}>
             <CompareValue>1000</CompareValue>
           </Col>
+          <Col plan={showEnterprise}>
+            <CompareValue type="plain">Custom</CompareValue>
+          </Col>
+        </tr>
+
+        {/**/}
+
+        <tr>
+          <StickyRow colSpan={isMobile ? 2 : 6}>Features</StickyRow>
         </tr>
 
         <tr>
@@ -548,12 +620,279 @@ export default function CompareTable() {
             />
           </Col>
           <Col plan={showFixed10}>
+            <CompareValue
+              after={
+                <Tooltip content="Available with Prod Pack.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            />
+          </Col>
+          <Col plan={showEnterprise}>
+            <CompareValue type="boolean" />
+          </Col>
+        </tr>
+
+        {/**/}
+
+        <tr>
+          <StickyRow colSpan={isMobile ? 2 : 6}>Security and Privacy</StickyRow>
+        </tr>
+
+        <tr>
+          <th className="px-0 text-left font-normal">Encryption at rest</th>
+          {/**/}
+          <Col plan={showFree}>
+            <CompareValue type="boolean" valid={false} />
+          </Col>
+          <Col plan={showPayg} feature>
+            <CompareValue
+              after={
+                <Tooltip content="Available with Prod Pack.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            />
+          </Col>
+          <Col plan={showFixed1}>
+            <CompareValue
+              after={
+                <Tooltip content="Available with Prod Pack.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            />
+          </Col>
+          <Col plan={showFixed10}>
+            <CompareValue
+              after={
+                <Tooltip content="Available with Prod Pack.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            />
+          </Col>
+          <Col plan={showEnterprise}>
             <CompareValue type="boolean" />
           </Col>
         </tr>
 
         <tr>
-          <StickyRow colSpan={isMobile ? 2 : 5}>Price</StickyRow>
+          <th className="px-0 text-left font-normal">
+            <Tooltip content="Upstash Global regions are SOC-2 certified.">
+              SOC-2 Compliance
+            </Tooltip>
+          </th>
+          {/**/}
+          <Col plan={showFree}>
+            <CompareValue type="boolean" valid={false} />
+          </Col>
+          <Col plan={showPayg} feature>
+            <CompareValue
+              after={
+                <Tooltip content="Available with Prod Pack.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            />
+          </Col>
+          <Col plan={showFixed1}>
+            <CompareValue
+              after={
+                <Tooltip content="Available with Prod Pack.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            />
+          </Col>
+          <Col plan={showFixed10}>
+            <CompareValue
+              after={
+                <Tooltip content="Available with Prod Pack.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            />
+          </Col>
+          <Col plan={showEnterprise}>
+            <CompareValue type="boolean" />
+          </Col>
+        </tr>
+
+        <tr>
+          <th className="px-0 text-left font-normal">SAML Single Sign-On (SSO)</th>
+          {/**/}
+          <Col plan={showFree}>
+            <CompareValue type="boolean" valid={false} />
+          </Col>
+          <Col plan={showPayg} feature>
+            <CompareValue type="boolean" valid={false} />
+          </Col>
+          <Col plan={showFixed1}>
+            <CompareValue type="boolean" valid={false} />
+          </Col>
+          <Col plan={showFixed10}>
+            <CompareValue type="boolean" valid={false} />
+          </Col>
+          <Col plan={showEnterprise}>
+            <CompareValue type="boolean" valid={true} />
+          </Col>
+        </tr>
+
+        {/**/}
+
+        <tr>
+          <StickyRow colSpan={isMobile ? 2 : 6}>Observability</StickyRow>
+        </tr>
+
+        <tr>
+          <th className="px-0 text-left font-normal">Prometheus Integration</th>
+          {/**/}
+          <Col plan={showFree}>
+            <CompareValue type="boolean" valid={false} />
+          </Col>
+          <Col plan={showPayg} feature>
+            <CompareValue
+              after={
+                <Tooltip content="Available with Prod Pack.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            />
+          </Col>
+          <Col plan={showFixed1}>
+            <CompareValue
+              after={
+                <Tooltip content="Available with Prod Pack.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            />
+          </Col>
+          <Col plan={showFixed10}>
+            <CompareValue
+              after={
+                <Tooltip content="Available with Prod Pack.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            />
+          </Col>
+          <Col plan={showEnterprise}>
+            <CompareValue type="boolean" />
+          </Col>
+        </tr>
+
+        <tr>
+          <th className="px-0 text-left font-normal">Datadog Integration</th>
+          {/**/}
+          <Col plan={showFree}>
+            <CompareValue type="boolean" valid={false} />
+          </Col>
+          <Col plan={showPayg} feature>
+            <CompareValue
+              after={
+                <Tooltip content="Available with Prod Pack.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            />
+          </Col>
+          <Col plan={showFixed1}>
+            <CompareValue
+              after={
+                <Tooltip content="Available with Prod Pack.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            />
+          </Col>
+          <Col plan={showFixed10}>
+            <CompareValue
+              after={
+                <Tooltip content="Available with Prod Pack.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            />
+          </Col>
+          <Col plan={showEnterprise}>
+            <CompareValue type="boolean" />
+          </Col>
+        </tr>
+
+        {/**/}
+
+        <tr>
+          <StickyRow colSpan={isMobile ? 2 : 6}>Support</StickyRow>
+        </tr>
+
+        <tr>
+          <th className="px-0 text-left font-normal">Community Support</th>
+          {/**/}
+          <Col plan={showFree}>
+            <CompareValue type="boolean" />
+          </Col>
+          <Col plan={showPayg} feature>
+            <CompareValue type="boolean" />
+          </Col>
+          <Col plan={showFixed1}>
+            <CompareValue type="boolean" />
+          </Col>
+          <Col plan={showFixed10}>
+            <CompareValue type="boolean" />
+          </Col>
+          <Col plan={showEnterprise}>
+            <CompareValue type="boolean" />
+          </Col>
+        </tr>
+
+        <tr>
+          <th className="px-0 text-left font-normal">Email Support</th>
+          {/**/}
+          <Col plan={showFree}>
+            <CompareValue type="boolean" />
+          </Col>
+          <Col plan={showPayg} feature>
+            <CompareValue type="boolean" />
+          </Col>
+          <Col plan={showFixed1}>
+            <CompareValue type="boolean" />
+          </Col>
+          <Col plan={showFixed10}>
+            <CompareValue type="boolean" />
+          </Col>
+          <Col plan={showEnterprise}>
+            <CompareValue type="boolean" />
+          </Col>
+        </tr>
+
+        <tr>
+          <th className="px-0 text-left font-normal">
+            Dedicated support and Slack channel
+          </th>
+          {/**/}
+          <Col plan={showFree}>
+            <CompareValue type="boolean" valid={false} />
+          </Col>
+          <Col plan={showPayg} feature>
+            <CompareValue type="boolean" valid={false} />
+          </Col>
+          <Col plan={showFixed1}>
+            <CompareValue type="boolean" valid={false} />
+          </Col>
+          <Col plan={showFixed10}>
+            <CompareValue type="boolean" valid={false} />
+          </Col>
+          <Col plan={showEnterprise}>
+            <CompareValue type="boolean" valid={true} />
+          </Col>
+        </tr>
+
+        {/**/}
+
+        <tr>
+          <StickyRow colSpan={isMobile ? 2 : 6}>Price</StickyRow>
         </tr>
 
         <tr>
@@ -571,6 +910,9 @@ export default function CompareTable() {
           <Col plan={showFixed10}>
             <CompareValue>$420</CompareValue>
           </Col>
+          <Col plan={showEnterprise}>
+            <CompareValue>Custom</CompareValue>
+          </Col>
         </tr>
         <tr>
           <th className="px-0 py-4 text-left font-normal">Message price</th>
@@ -586,6 +928,9 @@ export default function CompareTable() {
           </Col>
           <Col plan={showFixed10}>
             <CompareValue>None</CompareValue>
+          </Col>
+          <Col plan={showEnterprise}>
+            <CompareValue>Custom</CompareValue>
           </Col>
         </tr>
 
@@ -621,6 +966,11 @@ export default function CompareTable() {
               </a>
             </Button>
           </Col>
+          <Col plan={showEnterprise} className="py-4">
+            <Button asChild variant="secondary">
+              <Link href="/enterprise">Learn More</Link>
+            </Button>
+          </Col>
         </tr>
       </tbody>
     </table>
@@ -637,6 +987,7 @@ function MobileSelectCol({ ...props }: React.ComponentProps<"select">) {
       <option value={PricingPlans.PayAsYouGo}>Pay as you go</option>
       <option value={PricingPlans.Pro1M}>Fixed 1M</option>
       <option value={PricingPlans.Pro10M}>Fixed 10M</option>
+      <option value={PricingPlans.Enterprise}>Enterprise</option>
     </select>
   );
 }

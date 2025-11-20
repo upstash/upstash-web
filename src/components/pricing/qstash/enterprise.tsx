@@ -41,6 +41,10 @@ export default function PricingTableEnterprise() {
             <IconCircleCheckFilled size={20} className="fill-amber-600" />
             Dedicated resources for isolation
           </li>
+          <li className="flex items-center gap-1">
+            <IconCircleCheckFilled size={20} className="fill-amber-600" />
+            SAML SSO
+          </li>
         </ul>
       </div>
 

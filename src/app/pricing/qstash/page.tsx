@@ -44,7 +44,7 @@ export default function PricingQStashPage() {
 
       {/* Compare Table */}
       <section className="mt-32 md:mt-40">
-        <Container className="max-w-screen-xl">
+        <Container className="max-w-screen-2xl">
           <header>
             <PageHeaderTitle as="h2" className="md:text-4xl">
               Compare Plans
