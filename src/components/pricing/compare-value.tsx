@@ -1,7 +1,6 @@
 "use client";
 
-import cx from "@/utils/cx";
-import { IconCircleCheckFilled } from "@tabler/icons-react";
+import { IconCircleCheckFilled, IconCircleXFilled } from "@tabler/icons-react";
 import * as React from "react";
 import { Children, HTMLProps } from "react";
 
@@ -33,10 +32,13 @@ export default function CompareValue({
       {type === "size" && children}
 
       {type === "boolean" && (
-        <IconCircleCheckFilled
-          className={cx(valid ? "text-primary-text" : "opacity-20")}
-          size="24"
-        />
+        <>
+          {valid ? (
+            <IconCircleCheckFilled className="text-primary-text" size="24" />
+          ) : (
+            <IconCircleXFilled className="opacity-20" size="24" />
+          )}
+        </>
       )}
 
       {type === "list" && children && (
