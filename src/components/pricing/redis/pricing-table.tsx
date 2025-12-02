@@ -27,7 +27,7 @@ export default function PricingTable({
       {/* FREE */}
 
       <div className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
-        <div className="grow">
+        <div className="grow min-h-[120px]">
           <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
             Free
           </h4>
@@ -66,7 +66,7 @@ export default function PricingTable({
       {/* PAYG */}
 
       <div className="flex flex-col items-center gap-4 rounded-4xl border-2 border-primary bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
-        <div className="grow">
+        <div className="grow min-h-[120px]">
           <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
             Pay as you go
           </h4>
@@ -105,7 +105,7 @@ export default function PricingTable({
       {/* Fixed */}
 
       <div className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
-        <div className="grow">
+        <div className="grow min-h-[120px]">
           <h4 className="mb-4 text-xl font-semibold text-primary-text">
             <select
               className="w-auto rounded-xl bg-bg-mute px-4 py-1 font-bold"
@@ -144,6 +144,7 @@ export default function PricingTable({
             {showFixed100GB && <>$400</>}
             {showFixed500GB && <>$750</>} ✕ read regions
           </p>
+          <p className="text-sm text-text-mute">No per-command pricing</p>
         </div>
 
         <div className="grow">
