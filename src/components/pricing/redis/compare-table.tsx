@@ -1333,7 +1333,7 @@ export default function CompareTable({
             </CompareValue>
           </Col>
           <Col plan={showFixed}>
-            <CompareValue>-</CompareValue>
+            <CompareValue>No per-command pricing</CompareValue>
           </Col>
           <Col plan={showEnterprise}>
             <CompareValue>Custom</CompareValue>
