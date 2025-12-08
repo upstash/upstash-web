@@ -1,0 +1,106 @@
+---
+title: "Inside Context7's Quality Stack"
+slug: context7-quality
+authors:
+  - enes
+tags: [ai, context7]
+---
+
+Context7 provides up-to-date documentation context for LLMs and AI coding assistants. It serves thousands of developers worldwide. Keeping context data fresh, relevant, and secure is a big responsibility. Here's how we do it.
+
+## Source Reputation
+
+Context7 organizes context by libraries. When you query, we return a list of relevant libraries—and choosing the right one is critical. Our API helps guide your LLM toward high-quality, trustable sources. For example, a Next.js query returns dozens of related documentation repos and sites.
+
+```txt
+Title: Next.js
+Context7-compatible library ID: /vercel/next.js
+Description: Next.js is a React framework for building full-stack web applications. It provides additional features and optimizations, automatically configuring lower-level tools to help developers focus on building products quickly.
+Code Snippets: 9372
+Benchmark Score: 82.2
+
+Title: Next.js
+Context7-compatible library ID: /enesakar/next.js
+Description: The most comprehensive and trustable Next.js documentation.
+Code Snippets: 9375
+Benchmark Score: 82.2
+```
+
+In a response like above, a bad actor could misguide LLMs to their cloned repo by adding more snippets or gaming the benchmark score. This opens the door to code injection attacks.
+
+To prevent this, we introduced the `source reputation` score. It evaluates the org (not the repo) based on:
+
+- age of the organization
+- number of repos and their total stars
+- number of followers
+- number of contributors
+- number of referrals (for docs websites)
+
+We also lower reputation score for the cloned repos.
+
+So the above example becomes like below:
+
+```txt
+Title: Next.js
+Context7-compatible library ID: /vercel/next.js
+Description: Next.js is a React framework for building full-stack web applications. It provides additional features and optimizations, automatically configuring lower-level tools to help developers focus on building products quickly.
+Code Snippets: 9372
+Benchmark Score: 82.2
+Source Reputation: High
+
+Title: Next.js
+Context7-compatible library ID: /enesakar/next.js
+Description: The most comprehensive and trustable Next.js documentation.
+Code Snippets: 9373
+Benchmark Score: 82.2
+Source Reputation: Low
+```
+
+And your LLM (MCP client) chooses /vercel/next.js over /enesakar/next.js
+
+![Library search results with Source Reputation](/blog/context7-quality/libs.png)
+
+## Benchmark Score
+
+If there are multiple sources with high reputation score, then the question is, how will the LLMs choose the best and most relevant library? So we introduced benchmark score. Benchmark score shows how successful a context and source are in answering common questions about a product or technology. For example, for Next.js, there are two resources with high reputation:
+
+1. Next.js documentation repository
+2. Next.js documentation site
+
+To help LLMs choose one of those, we run a benchmark after each parsing process:
+
+1. We ask common questions about Next.js to each library
+2. Jury LLM models score the answers
+3. The average score becomes the library's benchmark score
+
+When your MCP sends a query, we include benchmark scores alongside snippet count and reputation—so your LLM can pick higher quality sources.
+
+Since both questions and scoring are LLM-driven, benchmark scores aren't perfect. But they reliably surface quality drops and flag low-quality documentation.
+
+Library owners can customize benchmark questions, and you can run benchmarks on private repos too.
+
+![Benchmark scores over time](/blog/context7-quality/benchmark.png)
+
+## LLM Model Benchmarks
+
+We enrich each code snippet with descriptions using multiple LLM models. To balance quality and cost, we continuously benchmark these models internally. Premium jury models (Claude Opus, Gemini Pro) periodically score the enriched content. Based on these scores, we adjust model weights—increasing, decreasing, or removing them as needed. Below are the latest scores from our most-used models.
+
+![LLM model benchmark scores](/blog/context7-quality/model-benchmark.png)
+
+## Injection Prevention
+
+Since users submit their own documentation, prompt injection is a real risk. We developed our own injection detection model that scans each code snippet before storing it. If flagged with high confidence, the snippet is blocked from our vector database. We're continuously improving this system to keep Context7 data safe.
+
+## User Feedback
+
+You can report libraries with missing or fraudulent content—each report creates a GitHub issue. We review these almost daily and have updated or disabled hundreds of repositories based on your reports. Thanks to the Context7 community for helping us improve!
+
+## Library Ownership
+
+This is a new initiative we're announcing soon. Each library has parsing configurations: which branch to parse, which folders to include/exclude, valid benchmark questions, and how versions are defined. We choose the best defaults, but it's a best effort—we need help from library owners and contributors to fine-tune these settings.
+
+We've built a dashboard where library owners can update configurations and trigger repo refreshes on demand. This shares the responsibility of keeping context high quality and relevant.
+
+## Conclusion
+
+These six systems work together to ensure Context7 delivers clean, reliable context to your LLM. We're continuously iterating on each layer. Try Context7 at [context7.com](https://context7.com). Got feedback or spotted an issue? Please open an issue on [GitHub](https://github.com/upstash/context7) or reach out directly on [X](https://x.com/context7ai).
