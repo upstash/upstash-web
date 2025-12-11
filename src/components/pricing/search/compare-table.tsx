@@ -414,7 +414,19 @@ export default function CompareTable() {
           <th className="px-0 text-left font-normal">Reranking Price</th>
           {/**/}
           <Col plan={showFree}>
-            <CompareValue>Free</CompareValue>
+            <CompareValue
+              after={
+                <Tooltip content="Free up to 1K rerankings, the rest fallbacks to default reranking.">
+                  <IconInfoCircle
+                    className="ml-1 opacity-60"
+                    stroke={1.2}
+                    aria-label="Info"
+                  />
+                </Tooltip>
+              }
+            >
+              Free
+            </CompareValue>
           </Col>
           <Col plan={showPayg} feature>
             <CompareValue
