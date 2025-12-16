@@ -1,0 +1,426 @@
+---
+title: "Figma-Style Live Cursors with Next.js and Upstash Realtime"
+slug: realtime-cursors-next-16
+authors:
+  - josh
+tags: [realtime]
+---
+
+If you've ever used Figma (a very popular design tool we also use at Upstash) you know they've got this cool feature where you can see other people's cursor move in real-time.
+
+Let's build live cursors that let you see other users moving around your page. And it's probably way simpler than you think.
+
+Here's a quick demo 👇
+
+<Frame>
+  <Video id="026fi701lvRGnEtsd3OgpRSXtLhGmbALdSzBYc6cJbgKg" />
+</Frame>
+
+There's also a live demo on the web: https://realtime-cursors.vercel.app/
+
+---
+
+## The stack
+
+- Next.js 16 App Router
+- [Upstash Realtime](https://upstash.com/docs/realtime/overall/quickstart) for realtime communication
+- TypeScript because we're not animals 🐖
+
+---
+
+## Setting up realtime
+
+First, let's configure our Realtime instance. Let's define what events we're sending. In our case, cursor updates with batched positions:
+
+```typescript title="lib/realtime.ts"
+import { InferRealtimeEvents, Realtime } from "@upstash/realtime";
+import { Redis } from "@upstash/redis";
+import { z } from "zod";
+
+const redis = Redis.fromEnv();
+
+const schema = {
+  update: z.object({
+    id: z.string(),
+    positions: z.array(
+      z.object({
+        x: z.number(),
+        y: z.number(),
+        t: z.number(), // timestamp offset in ms
+      }),
+    ),
+  }),
+};
+
+export const realtime = new Realtime({
+  schema,
+  redis,
+});
+
+export type RealtimeEvents = InferRealtimeEvents<typeof realtime>;
+```
+
+The `positions` array is especially important here. Instead of sending every single mouse move, we batch them up with timestamps. This is really, really useful to not only have less network overhead, but also to make processing on the receiving clients less memory-intensive.
+
+We can make every `useRealtime` call in our app type-safe by creating a central hook like so:
+
+```typescript title="lib/realtime-client.ts"
+import { createRealtime } from "@upstash/realtime/client"
+import { RealtimeEvents } from "./realtime"
+
+export const { useRealtime } = createRealtime<RealtimeEvents>()
+```
+
+This way, `useRealtime` knows all possible events and their data types whenever we use it anywhere in our app. We'll see this in action in a second.
+
+And lastly, let's wrap our app in a `RealtimeProvider`:
+
+```tsx title="components/providers.tsx"
+"use client"
+
+import { RealtimeProvider } from "@upstash/realtime/client"
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return <RealtimeProvider>{children}</RealtimeProvider>
+}
+```
+
+---
+
+## The useCursors hook
+
+This is probably the most important hook of this build. It handles the batching of outgoing cursor positions, receiving & animating other cursors and also cleans up stale cursors after a while of no movement.
+
+We use the native `requestAnimationFrame` method for animations. This is great for smooth 60-FPS animations because this API matches the user's display refresh rate.
+
+```typescript title="lib/use-cursors.ts"
+"use client";
+
+import { useRealtime } from "@/lib/realtime-client";
+import { generateUsername } from "@/lib/utils";
+import { useEffect, useRef, useState } from "react";
+
+type Cursor = {
+  id: string;
+  x: number;
+  y: number;
+  lastSeen: number;
+};
+
+const BATCHING_TIME = 500;
+
+export function useCursors() {
+  const myId = useRef("");
+  const [otherCursors, setOtherCursors] = useState<Record<string, Cursor>>({});
+  const pendingPositions = useRef<{ x: number; y: number; t: number }[]>([]);
+  const batchStartTime = useRef<number>(0);
+
+  useEffect(() => {
+    if (!myId.current) myId.current = generateUsername();
+  }, []);
+
+  useRealtime({
+    events: ["update"],
+    onData({ data }) {
+      if (data.id === myId.current || data.positions.length === 0) return;
+
+      // 👇 let's replay the recording
+      const startTime = performance.now();
+      const totalDuration = data.positions[data.positions.length - 1].t;
+
+      const animate = (currentTime: number) => {
+        const elapsed = currentTime - startTime;
+
+        let targetIndex = 0;
+        for (let i = 0; i < data.positions.length; i++) {
+          if (data.positions[i].t <= elapsed) {
+            targetIndex = i;
+          } else {
+            break;
+          }
+        }
+
+        const pos = data.positions[targetIndex];
+        setOtherCursors((prev) => ({
+          ...prev,
+          [data.id]: {
+            id: data.id,
+            x: pos.x,
+            y: pos.y,
+            lastSeen: Date.now(),
+          },
+        }));
+
+        if (elapsed < totalDuration) requestAnimationFrame(animate);
+      };
+
+      requestAnimationFrame(animate);
+    },
+  });
+
+  // 👇 batch and send cursor updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (pendingPositions.current.length === 0) return;
+
+      fetch("/api/cursor", {
+        method: "POST",
+        body: JSON.stringify({
+          id: myId.current,
+          positions: pendingPositions.current,
+        }),
+      });
+      pendingPositions.current = [];
+      batchStartTime.current = 0;
+    }, BATCHING_TIME);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // 👇 clean up stale cursors every 2 seconds
+  useEffect(() => {
+    const cleanup = setInterval(() => {
+      const now = Date.now();
+      setOtherCursors((prev) => {
+        const updated = { ...prev };
+        for (const id in updated) {
+          if (now - updated[id].lastSeen > 10000) {
+            delete updated[id];
+          }
+        }
+        return updated;
+      });
+    }, 2000);
+
+    return () => clearInterval(cleanup);
+  }, []);
+
+  const updateCursor = (x: number, y: number) => {
+    const now = Date.now();
+
+    if (batchStartTime.current === 0) {
+      batchStartTime.current = now;
+    }
+
+    const offset = now - batchStartTime.current;
+    pendingPositions.current.push({ x, y, t: offset });
+  };
+
+  return { otherCursors, updateCursor, myId: myId.current };
+}
+```
+
+When we receive a batch of positions, we don't just jump to the final position. We replay them using `requestAnimationFrame` to match the original timing. This makes all cursor movements look smooth and natural :]
+
+---
+
+## Building the UI: Cursor components
+
+We need two cursor components. One for other users and one for the current user:
+
+```tsx title="components/Cursor.tsx"
+import { getUserColor } from "@/lib/utils";
+
+type CursorProps = {
+  id: string;
+  x: number;
+  y: number;
+};
+
+export function Cursor({ id, x, y }: CursorProps) {
+  const color = getUserColor(id);
+
+  return (
+    <div
+      className="pointer-events-none absolute"
+      style={{
+        left: x,
+        top: y,
+        transform: "translate(-2px, -2px)",
+      }}
+    >
+      {/* 👇 cursor pointer */}
+      <svg
+        width="25"
+        height="25"
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.2))" }}
+      >
+        <path
+          d="M3 3L3 17L8 12L13 12L3 3Z"
+          fill={color}
+          stroke="white"
+          strokeWidth="1.5"
+          strokeLinejoin="round"
+        />
+      </svg>
+
+      {/* 👇 name tag */}
+      <div
+        className="absolute left-2 top-5 whitespace-nowrap rounded-full px-2 py-1 text-sm font-medium text-white shadow-lg"
+        style={{
+          backgroundColor: color,
+        }}
+      >
+        @{id}
+      </div>
+    </div>
+  );
+}
+```
+
+Each user gets a consistent color based on their username.
+
+Now, this next step is technically optional: We're hiding the user's default cursor and replacing it with a custom cursor. To be honest, this looks great on demos but might not be needed for production applications (because users could be confused why their cursor is messed up 👀).
+
+Anyway, I wanna show you how to do it. So let's create a component for the current user's cursor:
+
+```tsx title="components/CurrentCursor.tsx"
+import { useLayoutEffect, useState } from "react";
+import { Cursor } from "./Cursor";
+
+export const CurrentCursor = ({ id }: { id: string }) => {
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  useLayoutEffect(() => {
+    const handleMouseMove = (event: MouseEvent) => {
+      setMousePos({ x: event.clientX, y: event.clientY });
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, []);
+
+  return <Cursor x={mousePos.x} y={mousePos.y} id={id} />;
+};
+```
+
+---
+
+## Utility functions
+
+Some helpers for random usernames and consistent colors:
+
+```typescript title="lib/utils.ts"
+const ADJECTIVES = [
+  "happy",
+  "clever",
+  "bright",
+  "swift",
+];
+
+const NOUNS = [
+  "panda",
+  "tiger",
+  "eagle",
+  "dolphin",
+];
+
+export function generateUsername(): string {
+  const adjective = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
+  const noun = NOUNS[Math.floor(Math.random() * NOUNS.length)];
+  return `${adjective}${noun}`;
+}
+
+export function getUserColor(userId: string) {
+  const COLORS = [
+    "#E879F9",
+    "#FBBF24",
+    "#34D399",
+    "#60A5FA",
+  ];
+
+  const index = userId
+    .split("")
+    .reduce((acc, char) => acc + char.charCodeAt(0), 0);
+
+  return COLORS[index % COLORS.length];
+}
+```
+
+---
+
+## API routes
+
+Let's create 2 API routes to make emitting and receiving realtime events work:
+
+```typescript
+// app/api/cursor/route.ts
+import { realtime } from "@/lib/realtime";
+import { NextRequest } from "next/server";
+
+export async function POST(request: NextRequest) {
+  const body = await request.json();
+  await realtime.emit("update", body);
+
+  return Response.json({ success: true });
+}
+
+// app/api/realtime/route.ts
+import { handle } from "@upstash/realtime";
+import { realtime } from "@/lib/realtime";
+
+export const GET = handle({ realtime });
+```
+
+The first route receives batched cursor updates and broadcasts them. The second route automatically handles the SSE connection for `@upstash/realtime` to work properly.
+
+---
+
+## Last step: the main page
+
+Now we bring it all together:
+
+```tsx title="app/page.tsx"
+"use client";
+
+import { CurrentCursor } from "@/components/CurrentCursor";
+import { Cursor } from "@/components/Cursor";
+import { useCursors } from "@/lib/use-cursors";
+
+export default function Home() {
+  const { otherCursors, updateCursor, myId } = useCursors();
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    updateCursor(e.clientX, e.clientY);
+  };
+
+  return (
+    <div
+      className="relative h-screen w-screen cursor-none bg-zinc-50 dark:bg-zinc-900"
+      onMouseMove={handleMouseMove}
+    >
+      <div className="absolute left-4 top-4 text-sm text-zinc-600 dark:text-zinc-400">
+        You are: {myId || "..."}
+      </div>
+
+      {Object.values(otherCursors).map((cursor) => (
+        <Cursor key={cursor.id} id={cursor.id} x={cursor.x} y={cursor.y} />
+      ))}
+      <CurrentCursor id={myId} />
+    </div>
+  );
+}
+```
+
+---
+
+## We are done! 🎉
+
+And that's it! We now have Figma-style live cursors with:
+
+- ✅ Realtime cursors powered by Upstash Realtime
+- ✅ Smooth animations via position batching
+- ✅ Random usernames with consistent colors
+- ✅ Automatic cleanup of stale cursors
+
+The batching approach is important. Instead of sending 60+ events per second, we batch positions every 500ms and replay them on the receiving end. That's not just more efficient, but also a lot cheaper (depending on where you host your app).
+
+Try this by opening the app in two browser windows and looking at the cursors!
+
+Thanks for reading 🙌
