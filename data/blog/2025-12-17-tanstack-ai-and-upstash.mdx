@@ -1,0 +1,381 @@
+---
+title: "TanStack AI Powered by Upstash"
+slug: tanstack-ai-and-upstash
+authors: [alitarik]
+tags: [tanstack, redis, ratelimit, search]
+---
+
+TanStack just dropped their new AI library, and if you've used TanStack Query or Router before, you know they build great stuff.
+
+TanStack AI makes it easy to add AI features to your app. It works with any AI provider (OpenAI, Anthropic, etc.) and has a clean, type-safe API for tools.
+
+In this post, I'll show you how to pair TanStack AI with Upstash to build real-world features. We'll also compare the approach with Vercel's AI SDK where relevant—both are great libraries with different trade-offs.
+
+---
+
+## Quick Look at TanStack AI
+
+Before we dive in, here's what a basic TanStack AI setup looks like:
+
+```ts title="app/api/chat/route.ts"
+import { chat, toStreamResponse } from "@tanstack/ai";
+import { openai } from "@tanstack/ai-openai";
+
+export async function POST(request: Request) {
+  const { messages } = await request.json();
+
+  const stream = chat({
+    adapter: openai(),
+    messages,
+    model: "gpt-4o",
+  });
+
+  return toStreamResponse(stream);
+}
+```
+
+That's it. A working chat endpoint in 10 lines. Now let's make it production-ready.
+
+---
+
+## 1. Cache Tool Results with Upstash Redis
+
+When your AI uses tools—like looking up products, or fetching data from external APIs—those calls add up fast. Each API request takes time and often costs money. If users keep asking similar questions, you end up paying for the same data over and over again.
+
+Upstash Redis is serverless and HTTP-based, meaning zero connection management and instant availability. Perfect for caching tool results.
+
+### How TanStack AI Does It
+
+TanStack AI doesn't have a built-in middleware layer for tool caching yet. Instead, you handle caching directly inside the `.server()` function. This gives you full control over what gets cached, how long it stays cached, and how the cache keys are generated.
+
+Here's an example tool with Redis caching:
+
+```ts title="app/api/chat/route.ts"
+import { chat, toStreamResponse, toolDefinition } from "@tanstack/ai";
+import { openai } from "@tanstack/ai-openai";
+import { Redis } from "@upstash/redis";
+import { z } from "zod";
+
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
+
+const getWeatherDef = toolDefinition({
+  name: "get_weather",
+  description: "Get the current weather for a location",
+  inputSchema: z.object({
+    location: z.string().describe("City name like San Francisco, CA"),
+  }),
+  outputSchema: z.object({
+    temperature: z.number(),
+    conditions: z.string(),
+  }),
+});
+
+const getWeather = getWeatherDef.server(async ({ location }) => {
+  const cacheKey = `weather:${location.toLowerCase()}`;
+
+  // Check cache first
+  const cached = await redis.get(cacheKey);
+  if (cached) return cached;
+
+  // Fetch fresh data
+  const res = await fetch(`https://api.weather.com/v1/current?q=${location}`);
+  const data = await res.json();
+
+  // Save for 30 minutes
+  await redis.set(cacheKey, data, { ex: 1800 });
+  return data;
+});
+
+export async function POST(request: Request) {
+  const { messages } = await request.json();
+
+  const stream = chat({
+    adapter: openai(),
+    messages,
+    model: "gpt-4o",
+    tools: [getWeather],
+  });
+
+  return toStreamResponse(stream);
+}
+```
+
+With this setup, the first time someone asks "What's the weather in Tokyo?", it fetches from the API. The next time anyone asks the same question within 30 minutes, the response comes from Redis in milliseconds. For AI apps where costs can spiral quickly, this kind of caching is essential.
+
+TanStack AI has a `ToolCallManager` for handling tool execution, but it doesn't expose hooks for caching yet—something that could be a nice addition to the library in the future.
+
+### How AI SDK Does It
+
+If you're coming from Vercel's AI SDK, the [ai-sdk-tools/cache](https://github.com/midday-ai/ai-sdk-tools/blob/main/packages/cache/src/backends/redis.ts) package provides a cleaner pattern. You can wrap any tool with caching without modifying the tool itself:
+
+```ts title="AI SDK approach"
+import { createCached } from "@ai-sdk-tools/cache";
+import { Redis } from "@upstash/redis";
+
+const expensiveWeatherTool = tool({
+  description: "Get weather data",
+  parameters: z.object({ location: z.string() }),
+  execute: async ({ location }) => {
+    return await weatherAPI.get(location); // 2s response time
+  },
+});
+
+// Just wrap it with Redis - zero changes to the tool itself
+const cached = createCached({ cache: Redis.fromEnv() });
+const weatherTool = cached(expensiveWeatherTool);
+
+// First call: 2s | Next calls: <1ms ⚡
+```
+
+The caching logic lives outside your tool, which makes it reusable across multiple tools. You can check out the [ai-sdk tools](https://ai-sdk-tools.dev/cache) to see its implementation.
+
+---
+
+## 2. Protect Your API with Upstash Ratelimit
+
+AI API calls are expensive. A single request can cost a few cents, and that adds up fast when you have real users. One viral moment, a bot attack, or even just enthusiastic users can drain your budget in hours.
+
+This is where Upstash Ratelimit shines. **Upstash Ratelimit works with any HTTP endpoint.** It doesn't matter if you're using TanStack AI, AI SDK, or any other framework—you just wrap your endpoint and you're protected. There's no library-specific integration needed.
+
+Here's how to add rate limiting to your TanStack AI endpoint:
+
+```ts title="app/api/chat/route.ts"
+import { chat, toStreamResponse } from "@tanstack/ai";
+import { openai } from "@tanstack/ai-openai";
+import { Redis } from "@upstash/redis";
+import { Ratelimit } from "@upstash/ratelimit";
+import { NextRequest } from "next/server";
+
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
+
+const ratelimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.fixedWindow(10, "60s"), // 10 requests per minute
+});
+
+export async function POST(req: NextRequest) {
+  const ip = req.headers.get("x-forwarded-for") ?? "unknown";
+  const { success } = await ratelimit.limit(ip);
+
+  if (!success) {
+    return new Response("Too many requests. Try again later.", { status: 429 });
+  }
+
+  const { messages } = await req.json();
+
+  const stream = chat({
+    adapter: openai(),
+    messages,
+    model: "gpt-4o",
+  });
+
+  return toStreamResponse(stream);
+}
+```
+
+This setup allows each IP address to make 10 requests per minute. When they hit the limit, they get a clear error message.
+
+For production apps, you might want to rate limit by user ID instead of IP (for authenticated users), or set different limits for different endpoints.
+
+The same pattern works for [AI SDK rate limiting](https://ai-sdk.dev/docs/advanced/rate-limiting) too—just wrap the endpoint the same way.
+
+---
+
+## 3. Build a Smart Knowledge Base with Upstash Search
+
+One of the most powerful things you can do with an AI assistant is give it access to a knowledge base. Instead of relying solely on what the model was trained on, your AI can search through your own data and give accurate, up-to-date answers.
+
+Upstash Search handles this for you. It's a semantic search service that understands the meaning behind queries. You upload your content, and it automatically creates embeddings and indexes everything.
+
+Here's how to give your TanStack AI assistant a knowledge base:
+
+```ts title="app/api/chat/route.ts"
+import { chat, toStreamResponse, toolDefinition, maxIterations } from "@tanstack/ai";
+import { openai } from "@tanstack/ai-openai";
+import { Search } from "@upstash/search";
+import { z } from "zod";
+
+const search = new Search({
+  url: process.env.UPSTASH_SEARCH_REST_URL!,
+  token: process.env.UPSTASH_SEARCH_REST_TOKEN!,
+});
+
+const index = search.index("notes");
+
+// Tool to save new info
+const saveNoteDef = toolDefinition({
+  name: "save_note",
+  description: "Save information for later",
+  inputSchema: z.object({
+    content: z.string().describe("The information to save"),
+  }),
+  outputSchema: z.object({ saved: z.boolean() }),
+});
+
+const saveNote = saveNoteDef.server(async ({ content }) => {
+  await index.upsert({
+    id: crypto.randomUUID(),
+    content: { text: content },
+  });
+  return { saved: true };
+});
+
+// Tool to find saved info
+const findNotesDef = toolDefinition({
+  name: "find_notes",
+  description: "Search for saved information",
+  inputSchema: z.object({
+    query: z.string().describe("What to search for"),
+  }),
+  outputSchema: z.array(z.object({
+    text: z.string(),
+    score: z.number(),
+  })),
+});
+
+const findNotes = findNotesDef.server(async ({ query }) => {
+  const results = await index.search({ query, limit: 5 });
+  return results.map((r) => ({
+    text: r.content.text,
+    score: r.score,
+  }));
+});
+
+export async function POST(request: Request) {
+  const { messages } = await request.json();
+
+  const stream = chat({
+    adapter: openai(),
+    messages,
+    model: "gpt-4o",
+    tools: [saveNote, findNotes],
+    agentLoopStrategy: maxIterations(5),
+  });
+
+  return toStreamResponse(stream);
+}
+```
+
+With this setup, your AI can have conversations like:
+
+- **User**: "Remember that my project deadline is December 20th"
+- **AI**: *saves to knowledge base* "Got it, I've noted that your project deadline is December 20th."
+- **User**: "When is my deadline again?"
+- **AI**: *searches knowledge base* "Your project deadline is December 20th."
+
+The AI decides automatically when to save and when to search. 
+
+The AI SDK approach is similar—you create tools that interact with a search index. Check out their [knowledge base agent cookbook](https://ai-sdk.dev/cookbook/node/knowledge-base-agent#setting-up-the-knowledge-base) for comparison.
+
+---
+
+## 4. Persist Chat History with Upstash Redis
+
+Persistence in chat history is an essential feature for any chat app. If you are to go for any production ready chat app, losing chat progress on page refresh is of course unacceptable. For any serious AI application, you need to save chat history.
+
+Upstash Redis is perfect for this. It's fast, serverless, and handles JSON data natively. You can store entire conversation histories and retrieve them instantly.
+
+### How TanStack AI Does It
+
+TanStack AI doesn't have an `onFinish` hook built into the response helpers, so you need to wrap the stream yourself to capture the full response. It's a few more lines of code, but it gives you complete control over what gets saved and when.
+
+Here's how to add chat persistence:
+
+```ts title="app/api/chat/route.ts"
+import { chat, toStreamResponse } from "@tanstack/ai";
+import { openai } from "@tanstack/ai-openai";
+import { Redis } from "@upstash/redis";
+
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
+
+type Message = { role: "user" | "assistant"; content: string };
+
+export async function POST(request: Request) {
+  const { messages, chatId } = await request.json();
+
+  // Load old messages
+  const history = await redis.get<Message[]>(`chat:${chatId}`) || [];
+  const newMessage = messages[messages.length - 1];
+  const allMessages = [...history, newMessage];
+
+  const stream = chat({
+    adapter: openai(),
+    messages: allMessages,
+    model: "gpt-4o",
+  });
+
+  // Wrap stream to capture the response
+  const wrapped = async function* () {
+    let response = "";
+
+    for await (const chunk of stream) {
+      if (chunk.type === "content") {
+        response += chunk.delta ?? "";
+      }
+      yield chunk;
+    }
+
+    // Save updated history when stream ends
+    await redis.set(`chat:${chatId}`, [
+      ...allMessages,
+      { role: "assistant", content: response },
+    ]);
+  };
+
+  return toStreamResponse(wrapped());
+}
+```
+
+Now users can close their browser, come back later, and their conversation is still there. You can also build features like chat history sidebars, conversation sharing, and cross-device syncing.
+
+An `onFinish` callback would be a nice addition to TanStack AI in the future—it would make this pattern cleaner.
+
+### How AI SDK Does It
+
+AI SDK has a built-in `onFinish` callback that makes saving history much cleaner:
+
+```ts title="AI SDK approach"
+return result.toUIMessageStreamResponse({
+  originalMessages: messages,
+  onFinish: async ({ messages }) => {
+    await redis.set(`chat:history:${id}`, messages);
+  },
+});
+```
+
+We wrote a full guide on this approach: [Saving AI SDK v5 Chat Messages in Redis](/blog/ai-sdk-chat-history). It covers loading history, generating message IDs, and building the frontend.
+
+---
+
+
+## Wrap Up
+
+Building AI features is exciting, but making them production-ready requires more than just calling an LLM. You need caching to avoid paying for the same data twice, rate limiting to stay in control of costs and traffic, search to give your AI accurate domain-specific knowledge, and persistence so users don't lose their conversations.
+
+Upstash gives you all of these with minimal setup. Everything runs serverless over HTTP, so you don't have to manage infrastructure. You just focus on building.
+
+TanStack AI is still a new library, but it's already showing promise with its type-safe tools and clean API. Some things are easier in AI SDK right now (like tool caching wrappers and `onFinish` hooks), but TanStack AI is definitely worth trying—especially if you value TypeScript inference.
+
+Pick what you need and ship.
+
+---
+
+## References
+
+- [TanStack AI Documentation](https://tanstack.com/ai/latest/docs/getting-started/overview)
+- [Upstash Redis](https://upstash.com/docs/redis/overall/getstarted)
+- [Upstash Ratelimit](https://upstash.com/docs/redis/sdks/ratelimit-ts/overview)
+- [Upstash Search](https://upstash.com/docs/search/overall/getstarted)
+
+---
+
+Thanks for reading! If you'd like to see Upstash products with ai-sdk check out [This blog](https://upstash.com/blog/ai-sdk-and-upstash).
