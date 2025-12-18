@@ -515,48 +515,6 @@ export default function CompareTable({
           </Col>
         </tr>
 
-        {/*MAX CONCURRENT CONNECTIONS*/}
-        <tr>
-          <th className="px-0 text-left font-normal">
-            <Tooltip content="When the limit is reached, your idle connections may be terminated. You will not experience any issue unless all of your connections are active. Even in that case; most Redis clients reconnect automatically. You can use REST API if you expect very high number of concurrent connections.">
-              Max concurrent connections
-            </Tooltip>
-          </th>
-          {/**/}
-          <Col plan={showFree}>
-            <CompareValue type="number">10000</CompareValue>
-          </Col>
-          <Col plan={showPayg} feature>
-            <CompareValue type="number">10000</CompareValue>
-          </Col>
-          <Col plan={showFixed}>
-            {selectedFixed250MB && (
-              <CompareValue type="number">10000</CompareValue>
-            )}
-            {selectedFixed1GB && (
-              <CompareValue type="number">10000</CompareValue>
-            )}
-            {selectedFixed5GB && (
-              <CompareValue type="number">10000</CompareValue>
-            )}
-            {selectedFixed10GB && (
-              <CompareValue type="number">10000</CompareValue>
-            )}
-            {selectedFixed50GB && (
-              <CompareValue type="number">10000</CompareValue>
-            )}
-            {selectedFixed100GB && (
-              <CompareValue type="number">10000</CompareValue>
-            )}
-            {selectedFixed500GB && (
-              <CompareValue type="number">100000</CompareValue>
-            )}
-          </Col>
-          <Col plan={showEnterprise}>
-            <CompareValue type="number">100000</CompareValue>
-          </Col>
-        </tr>
-
         {/*MAX MONTHLY BANDWIDTH*/}
         <tr>
           <th className="px-0 text-left font-normal">
