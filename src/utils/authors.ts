@@ -437,4 +437,9 @@ export const authors: Record<
     title: "Software Developer - Guest Author",
     image: "mtahasylmz.jpeg",
   },
+    adamskerjwold: {
+    name: "Adam Skerjwold",
+    title: "Founder @Streamlined",
+    image: "adamskerjwold.png",
+  },
 };
