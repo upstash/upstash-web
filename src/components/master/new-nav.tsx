@@ -40,16 +40,14 @@ export default function NewNavigation() {
         <NavigationMenu.Link
           asChild
           className={cx(
-            "flex select-none items-center gap-0.5 rounded-full px-3 py-2",
+            "flex select-none items-center gap-0.5 rounded-full px-4 py-2",
             "text-text-mute hover:bg-white/5 hover:text-primary-text",
-            "blog" === segment ? "bg-bg-mute text-primary-text" : "",
+            "customers" === segment ? "bg-bg-mute text-primary-text" : "",
           )}
         >
-          <Link href="/blog">Blog</Link>
+          <Link href="/customers">Customers</Link>
         </NavigationMenu.Link>
       </NavigationMenu.Item>
-
-      <ItemCompany />
 
       <NavigationMenu.Item>
         <NavigationMenu.Link
@@ -68,14 +66,16 @@ export default function NewNavigation() {
         <NavigationMenu.Link
           asChild
           className={cx(
-            "flex select-none items-center gap-0.5 whitespace-nowrap rounded-full px-3 py-2",
+            "flex select-none items-center gap-0.5 rounded-full px-3 py-2",
             "text-text-mute hover:bg-white/5 hover:text-primary-text",
-            "contact" === segment ? "bg-bg-mute text-primary-text" : "",
+            "blog" === segment ? "bg-bg-mute text-primary-text" : "",
           )}
         >
-          <Link href="/contact">Contact Us</Link>
+          <Link href="/blog">Blog</Link>
         </NavigationMenu.Link>
       </NavigationMenu.Item>
+
+      <ItemCompany />
     </NewNavigationRoot>
   );
 }

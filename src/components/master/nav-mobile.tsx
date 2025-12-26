@@ -87,24 +87,28 @@ const NavItems: {
     href: "/pricing",
   },
   {
-    name: "Blog",
-    href: "/blog",
-  },
-  {
     name: "Customers",
     href: "/customers",
   },
   {
-    name: "Careers",
-    href: "/careers",
+    name: "Enterprise",
+    href: "/enterprise",
+  },
+  {
+    name: "Blog",
+    href: "/blog",
   },
   {
     name: "About",
     href: "/about",
   },
   {
-    name: "Enterprise",
-    href: "/enterprise",
+    name: "Careers",
+    href: "/careers",
+  },
+  {
+    name: "Open-Source Program",
+    href: "/open-source",
   },
   {
     name: "Contact Us",

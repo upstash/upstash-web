@@ -2,7 +2,7 @@ import { allJobs } from "@content";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import {
   IconBrandOpenSource,
-  IconMoodSmileBeam,
+  IconMail,
   IconUserPlus,
   IconUsers,
 } from "@tabler/icons-react";
@@ -28,11 +28,11 @@ export default function NewNavigationItemCompany() {
       <NewNavigationContent>
         <div className="grid w-[440px] gap-2 p-4">
           <ListItem
-            href="/customers"
-            title1="Customers"
-            icon={<IconMoodSmileBeam strokeWidth={1.5} />}
+            href="/about"
+            title1="About"
+            icon={<IconUsers strokeWidth={1.5} />}
           >
-            The teams we empower
+            Data Platform for Developers
           </ListItem>
 
           <ListItem
@@ -51,19 +51,19 @@ export default function NewNavigationItemCompany() {
           </ListItem>
 
           <ListItem
-            href="/about"
-            title1="About"
-            icon={<IconUsers strokeWidth={1.5} />}
-          >
-            Data Platform for Developers
-          </ListItem>
-
-          <ListItem
             href="/open-source"
             title1="Open-Source Program"
             icon={<IconBrandOpenSource strokeWidth={1.5} />}
           >
             We sponsor open-source projects
+          </ListItem>
+
+          <ListItem
+            href="/contact"
+            title1="Contact Us"
+            icon={<IconMail strokeWidth={1.5} />}
+          >
+            Get in touch with our team
           </ListItem>
         </div>
       </NewNavigationContent>
