@@ -23,6 +23,8 @@ export default function PricingLayout({ children }: { children: ReactNode }) {
             <PageHeaderTitle>Pricing</PageHeaderTitle>
             <PageHeaderDesc className="mt-2">
               Pay only for what you use with per-request pricing.
+              <br />
+              Or choose a Fixed plan for consistent usage with a flat price.
             </PageHeaderDesc>
           </header>
         </Container>
