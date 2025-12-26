@@ -1,0 +1,37 @@
+---
+company_name: Streamlined
+company_url: https://streamlined.so
+user_name: Adam Skerjwold
+user_title: Founder
+user_photo: profile-adamskerjwold.png
+highlight: "Upstash was the only platform that let us coordinate real-time webhooks, background jobs, and bulk syncs under shared rate limits — without artificial concurrency ceilings or compute lock-in."
+cover_image: cover-streamlined.jpg
+order: 28
+---
+
+Streamlined is an analytics and automation platform built on top of HighLevel CRM. We sync contacts, conversations, tasks, and pipeline data at scale — all through external APIs with strict rate limits of **200,000 requests per account per day**.
+
+As the platform grew, the challenge wasn’t running background jobs. It was **coordinating real-time webhooks, long-running syncs, and bulk operations safely** while staying under rate limits, controlling costs, and scaling predictably.
+
+#### Streamlined’s Technical Stack: Where Upstash fits in
+
+Streamlined runs across multiple serverless runtimes, choosing compute based on the workload rather than the workflow engine.
+
+Upstash acts as the **coordination layer** across all asynchronous work, ensuring every job respects external API limits — regardless of where it runs.
+
+#### Switching to Upstash Workflow and QStash
+
+Before choosing Upstash, Streamlined evaluated several workflow platforms, including Trigger.dev, Inngest, Cloudflare Workflows, and custom concurrency systems built with Durable Objects. Each fell short in one critical area: **shared flow control across different types of work**.
+
+With Upstash, Streamlined was able to:
+- Remove hard concurrency ceilings imposed by workflow platforms
+- Coordinate real-time webhooks, background jobs, and bulk syncs under the same rate limits
+- Run compute where it made sense without being locked into a single runtime
+
+The impact was immediate. At peak usage, workflow-related compute costs dropped from **~$1,500/month to ~$40/month**, while overall workload increased by nearly **10×**.
+
+<Highlight name="Adam Skerjwold" title="Founder" photo="profile-adamskerjwold.png">
+  Upstash gives us the freedom to build our system without being boxed in by compute or concurrency limits.
+</Highlight>
+
+Today, Streamlined scales predictably with real usage, not platform-imposed limits. Upstash handles the hard problems of flow control, durability, and coordination, letting the team focus on building product instead of infrastructure.
