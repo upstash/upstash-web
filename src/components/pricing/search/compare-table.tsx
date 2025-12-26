@@ -159,7 +159,7 @@ export default function CompareTable() {
             </CompareValue>
           </Col>
           <Col plan={showPayg} feature>
-            <CompareValue>Unlimited</CompareValue>
+            <CompareValue suffix="M">2</CompareValue>
           </Col>
           <Col plan={showPro}>
             <CompareValue>Unlimited</CompareValue>
