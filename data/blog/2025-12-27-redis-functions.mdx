@@ -1,0 +1,94 @@
+---
+title: "Redis functions are here!"
+slug: redis-functions-are-here
+authors: [josh, arda]
+tags: [redis]
+draft: true
+---
+
+We just added Redis Functions support to our Upstash Redis SDK. If you're not familiar with Redis Functions, they're basically a way to write and store custom Lua scripts directly in Redis that you can call whenever you need them. 
+
+Think of Redis Functions as saved procedures for Redis. Instead of sending your Lua code every time you want to run it (like with `EVAL`), you load a function once and then just call it by name. Redis keeps track of your functions server-side, and they're available until you explicitly remove them.
+
+---
+
+## Example
+
+First, let's write a Lua function and load it into Redis:
+
+```tsx id="code-laRqsilaqhArgFeSzLSFJ"
+import { Redis } from "@upstash/redis";
+
+const redis = new Redis({
+  url: "YOUR_REDIS_URL",
+  token: "YOUR_REDIS_TOKEN",
+});
+
+const code = `
+#!lua name=mylib
+redis.register_function('double', function(keys, args)
+  return tonumber(args[1]) * 2
+end)
+`;
+
+// 👇 load the function
+await redis.functions.load({ code });
+```
+
+Then we can call our function whenever we need:
+
+```typescript
+// '[]' are keys, ["21"] is the arg
+const result = await redis.functions.call("double", [], ["21"]);
+console.log(result); // 42
+```
+
+---
+
+## Available Methods
+
+Here's an overview of the new `redis.functions` namespace:
+
+- **`load()`** - Upload your Lua code to Redis
+- **`call()`** - Run a function (read or write)
+- **`callRo()`** - Run a read-only function
+- **`list()`** - See what functions are loaded
+- **`stats()`** - Get statistics about loaded functions
+- **`delete()`** - Remove a function
+- **`flush()`** - Remove all functions
+
+All of these work with pipelines too, so you can batch function calls with other Redis commands.
+
+---
+
+## Read-Only Functions
+
+If a function only reads data, mark it with the `no-writes` flag. This tells Redis that your function won't modify anything, so you get better performance:
+
+- Redis can run the function in read-only contexts (like on replicas)
+- You can use `callRo()` which is optimized for read operations
+- Redis will actively prevent writes, e.g. if you accidentally try to modify data
+
+Here's how to declare a read-only function:
+
+```typescript
+const readOnlyCode = `
+#!lua name=mylib
+redis.register_function{
+  function_name='get_value',
+  callback=function(keys, args)
+    return redis.call('GET', keys[1])
+  end,
+  flags={'no-writes'}
+}
+`;
+
+await redis.functions.load({ code: readOnlyCode });
+
+// 👇 we use `callRo` for read-only functions
+const value = await redis.functions.callRo("get_value", ["mykey"], []);
+```
+
+---
+
+That's it. If you've been running Lua scripts with `EVAL`, this is a cleaner way to organize and reuse that logic. Appreciate you for reading 🙌
