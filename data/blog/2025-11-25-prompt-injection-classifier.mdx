@@ -1,0 +1,40 @@
+---
+title: "Context7's Prompt Injection Filter"
+slug: prompt-injection-classifier
+authors: [shannon]
+tags: [context7, ai]
+---
+
+Prompt injections are a frequent and serious issue that AI systems face. If left undetected, they can leak sensitive information, cause the LLM to violate its system instructions, or trigger unexpected behavior. This issue is especially concerning in MCP ecosystems, where LLM outputs can directly impact production code. 
+
+Our internal classification layer identifies and filters suspicious prompts before they ever reach the LLM.
+
+---
+
+### The Classifier
+
+Because of the complexity and variety of prompt injections, rule-based approaches are often insufficient. Instead, we used an encoder-only classifier, which we chose over the popular decoder-only architecture because of its strengths in natural language understanding.
+
+Encoder-only models learn each token in a sequence by considering the tokens around it, both before and after, rather than just those in one direction. These models are typically pre-trained with objectives like masked token prediction and next sentence prediction, which encourage the model to learn deeper representations of sentence structure and meaning. This is a crucial feature for a model that classifies a sentence based on subtleties, since the difference between a benign and malicious input can be as small as a single word or character.
+
+### Synthetic Data Generation
+
+We developed a synthetic dataset that mimics the kinds of examples our classifier would see in practice. By incorporating realistic indirect prompt injections, we captured attack patterns that typical classifier datasets overlook.
+
+
+To introduce diversity and complexity into the dataset, we used back-translation as follows:
+
+1. Identify overly common trigrams in the dataset
+2. Isolate sentences that contain those trigrams
+3. Translate them into a specified language, then back into English 
+
+### Results
+
+On a hand-crafted evaluation set, the base classifier achieved a macro F1 of 72%. After fine-tuning on our synthetic dataset, performance improved to 86% on the hand-crafted evaluation set and 99% on the synthetic test set.
+
+---
+
+### Takeaways
+
+- Fine-tuning the classifier on a dataset tailored to our use case significantly improved performance
+- Prompt injections are constantly evolving, so our classifier will need to be iteratively updated
