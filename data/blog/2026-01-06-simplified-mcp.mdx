@@ -1,0 +1,62 @@
+---
+title: "Integrating Upstash MCP is a lot easier now"
+slug: simplified-upstash-mcp
+authors: [josh]
+tags: [redis]
+---
+
+Setting up our MCP used to require choosing between transport modes (stdio vs SSE) and configuring a proxy if you picked the SSE route. That created unnecessary friction. We've reworked the setup so it's easy to integrate Upstash MCP into Claude, Cursor, Claude Desktop, or Copilot.
+
+## What Improved
+
+### 1. Claude Code CLI (Recommended)
+
+Before, you had to manually open and edit configuration files in your editor. Now, if you're working with Claude, you can add the Upstash MCP server in just one command:
+
+```typescript
+claude mcp add upstash -- npx -y @upstash/mcp-server@latest \
+  --email <UPSTASH_EMAIL> \
+  --api-key <UPSTASH_API_KEY>
+```
+
+If you're on a team and share a project, you can add it to `.mcp.json` with the `--scope project` flag:
+
+```typescript
+claude mcp add upstash --scope project -- npx -y @upstash/mcp-server@latest \
+  --email <UPSTASH_EMAIL> \
+  --api-key <UPSTASH_API_KEY>
+```
+
+This saves the configuration to your project's `.mcp.json` file so everyone on the team uses the same setup.
+
+---
+
+### 2. Cleaner configuration format
+
+While Claude Code is probably the easiest way to add the MCP, not everyone uses it. We've also changed the classic configuration to use explicit flags (`--email` and `--api-key`) instead of relying on argument order (previously, your credentials were just listed as values where their position in the args array determined what they were).
+
+Now each value has a clear label to make the config more readable:
+
+```json title=".mcp.json" {8,10}
+{
+  "mcpServers": {
+    "upstash": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/mcp-server@latest",
+        "--email",
+        "<UPSTASH_EMAIL>",
+        "--api-key",
+        "<UPSTASH_API_KEY>"
+      ]
+    }
+  }
+}
+```
+
+**Removed SSE Endpoint**
+
+We removed the SSE (Server-Sent Events) setup with the proxy approach. The deprecated `mcp.upstash.io` endpoint is gone, and we're focusing on the more straightforward stdio methods that work across all clients.
+
+Thanks for reading and I hope you have fun with the MCP!! 🙌
