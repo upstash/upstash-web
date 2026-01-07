@@ -44,7 +44,7 @@ We're intentionally making this trade-off. Filtering and ranking documentation i
 <Frame>
   <img src="/blog/ideas-for-new-context7/new-infra.png" />
 </Frame>
-l
+
 We apply reranking for both library queries and context queries. Instead of handing back everything the vector database finds:
 
 - We give the best results early, preventing LLMs from making repeated calls
@@ -81,7 +81,7 @@ console.log(libraries[0].id); // "/facebook/react"
 
 ### Getting documentation
 
-We replaced `getDocs` with `getContext`. Instead of managing pagination, modes, and topics, you just ask a question:
+We replaced `getDocs` with `getContext`. Instead of managing pagination and modes, we now just ask a question:
 
 ```typescript
 // Get documentation context as plain text (default)
@@ -98,9 +98,9 @@ const docs = await client.getContext("How do I use hooks?", "/facebook/react", {
 console.log(docs[0].title, docs[0].content);
 ```
 
-By default you get back a string of the most relevant docs concatenated together. If you need structured data, pass `{ type: "json" }`. The server-side reranker takes care of the complexity that was caused by `mode` and `pagination` before.
+By default we get back a string of the most relevant docs concatenated together. If you need structured data, pass `{ type: "json" }`. The server-side reranker takes care of the complexity that was caused by `mode` and `pagination` before.
 
-We also dropped `defaultMaxResults`. The API now returns what's relevant without manual tuning.
+We also dropped `defaultMaxResults`. The API now returns relevant results without manual tuning.
 
 ---
 
@@ -108,9 +108,9 @@ We also dropped `defaultMaxResults`. The API now returns what's relevant without
 
 Judging from feedback, especially on Twitter, context bloat is the number 1 issue that holds people back from using Context7. Especially with the explosion of Opus 4.5, an extremely good but expensive model, it's more than enough to use a single or very few pieces of accurate documentation.
 
-By reranking on our side, we move that filtering cost from the user (who likely uses an expensive model) to us (where we can use more cost-efficient models because re-ranking is fairly simple & fast).
+By reranking on our side, we move that filtering cost from the user (who likely uses an expensive model) to us (where we can use more cost-efficient models because reranking is fairly simple & fast).
 
-As a nice bonus, the MCP also becomes simpler. Instead of managing pagination and modes, the LLM just asks a question and gets an answer.
+As a nice bonus, the MCP also becomes simpler.
 
 ---
 
