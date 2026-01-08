@@ -372,26 +372,6 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal">Max Retry Count</th>
-          {/**/}
-          <Col plan={showFree}>
-            <CompareValue>3</CompareValue>
-          </Col>
-          <Col plan={showPayg} feature>
-            <CompareValue>5</CompareValue>
-          </Col>
-          <Col plan={showFixed1}>
-            <CompareValue>20</CompareValue>
-          </Col>
-          <Col plan={showFixed10}>
-            <CompareValue>100</CompareValue>
-          </Col>
-          <Col plan={showEnterprise}>
-            <CompareValue type="plain">Custom</CompareValue>
-          </Col>
-        </tr>
-
-        <tr>
           <th className="px-0 py-4 text-left font-normal">Max Delay</th>
           {/**/}
           <Col plan={showFree}>
