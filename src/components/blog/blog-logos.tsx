@@ -9,6 +9,7 @@ import { LogoMarkprompt } from "../customers/logo-markprompt";
 import { LogoNiftykit } from "../customers/logo-niftykit";
 import { LogoOpenart } from "../customers/logo-openart";
 import { LogoPaulSmith } from "../customers/logo-paul-smith";
+import { LogoStreamlined } from "../customers/logo-streamlined";
 import { LogoTFashion } from "../customers/logo-tfashion";
 import { LogoZapier } from "../customers/logo-zapier";
 
@@ -26,6 +27,7 @@ const blogLogos = {
   gail: LogoGail,
   ["paul-smith"]: LogoPaulSmith,
   clickfunnels: LogoClickfunnels,
+  streamlined: LogoStreamlined,
 } as const;
 
 export const getBlogLogo = (name: string) => {

@@ -1,0 +1,269 @@
+---
+title: "Why We Chose QStash and Upstash Workflow at Scale"
+slug: qstash-workflow-at-scale
+authors: [adamskerjwold]
+tags: [qstash, workflow]
+---
+
+<Note type="info">
+  This article was written by Adam Skerjwold, Founder of Streamlined.
+  We have been supporting Adam as he scales his application using QStash and Upstash Workflow.
+  During this time, Adam evaluated several workflow platforms to find the best fit for Streamlined's needs.
+  We believe his experience will be valuable to others who are considering workflow solutions at scale.
+  <br /> 
+  We thank Adam for sharing his insights and experience in this guest article!
+</Note>
+
+
+**Streamlined** is an analytics and automation platform built on top of HighLevel CRM. 
+We sync contacts, conversations, tasks, and pipeline data — all through external APIs that enforce strict rate limits: **200,000 requests per account per day**.
+
+The core challenge wasn't running background jobs. 
+It was **coordinating work safely across workflows, queues, and real-time webhooks** while staying under external rate limits, controlling costs, and scaling predictably.
+
+I evaluated several workflow platforms:
+- Trigger.dev
+- Cloudflare Workflows
+- Inngest
+- Custom concurrency systems using Cloudflare Durable Objects
+
+Eventually, I landed on **QStash + Upstash Workflow**. Here's why.
+
+---
+
+## The Three Constraints That Matter
+
+After experimenting across platforms, I found that workflow tools live or die by three constraints:
+
+1. **Concurrency Limits** 
+2. **Flow Control** 
+3. **Compute Choices**
+
+Upstash was the only platform that addressed all three cleanly.
+
+---
+
+## 1. Concurrency Limits: The Scaling Wall
+
+Concurrency limits are the silent killer of workflow systems.
+
+- **Trigger.dev** enforces strict concurrency caps, even on higher tiers
+- **Inngest** has similar limits
+- Once you hit those ceilings, your only options are throttling, failures, or expensive upgrades
+
+As your workload grows, you don't gradually degrade — you **slam into a wall**.
+
+Upstash, by contrast:
+- Has no hard concurrency ceiling
+- Scales based on usage rather than artificial caps
+- Lets you model concurrency around *external constraints*, not platform limits
+
+This removed a major source of operational anxiety.
+
+---
+
+## 2. Compute Choices: Avoiding Lock-In
+
+With Trigger.dev:
+- You're forced onto their compute
+- Costs scale aggressively with usage
+- You pay heavily when workloads pile up
+
+The problem wasn't CPU time — it was being locked into expensive compute for mostly **IO-bound tasks**.
+
+After moving orchestration to Upstash, we run compute where it makes sense:
+- Cloudflare Workers for webhook handlers and pipelines
+- Vercel Functions for API routes
+- Other serverless runtimes as needed
+
+**The result:** At peak, we were paying ~$1,500/month for workflows. After switching, compute dropped to ~$40/month while handling significantly more work.
+
+Upstash's **bring-your-own-compute** model gives us cost flexibility, runtime flexibility, and the ability to change infrastructure decisions without rewriting workflows.
+
+---
+
+## 3. Flow Control: The Real Differentiator
+
+This is the biggest reason we chose Upstash.
+
+### Not Everything Is a Workflow
+
+In our system, we have:
+- **Real-time webhooks** that should execute immediately
+- **Fast background jobs** that complete quickly
+- **Slow historical syncs** that can wait hours or days
+
+All of these hit the **same external APIs** with shared rate limits. The critical insight: **all work types must be coordinated together**, not siloed.
+
+### How We Implement Flow Control
+
+We define channel configurations that map to different throughput requirements:
+
+```typescript
+const highlevel_channel_configs = {
+    fast: {
+        // 30/min, 43,200/day — for real-time webhooks
+        parallelism: 2,
+        rate: 5,
+        period: "10s"
+    },
+    sync: {
+        // 102/min, 146,880/day — for background sync jobs
+        parallelism: 4,
+        rate: 17,
+        period: "10s"
+    },
+    max: {
+        // 198,720/day — for bulk operations
+        rate: 23,
+        period: "10s"
+    }
+}
+
+function highlevelFlowControl(
+    channel: "fast" | "sync" | "max",
+    { install_id, app_key }: { install_id: string; app_key: string }
+) {
+    // Each customer installation gets its own rate limit bucket
+    const install_key = `${channel}_${app_key}_${install_id}`
+    return {
+        flowControl: {
+            key: install_key,
+            ...highlevel_channel_configs[channel]
+        }
+    }
+}
+```
+
+The same flow control applies to both **workflows and standalone messages**:
+
+```typescript
+// Standalone message — webhook trigger dispatching
+await qstash.send<TriggerPayload>(
+    "https://streamlined.so/example/endpoint",
+    payload,
+    highlevelFlowControl("max", { install_id: location_id, app_key })
+)
+
+// Workflow invocation — contact sync pipeline
+await qstash.publishJSON<SyncContactPayload>({
+    url: "https://streamlined.so/example/workflow",
+    body: { contact_id, location_id, app_key },
+    ...highlevelFlowControl("sync", { install_id: location_id, app_key })
+})
+```
+
+This is the key: **both paths share the same rate limit bucket**. 
+When a historical backfill is saturating the `sync` channel, real-time webhooks still flow through `fast` at full speed. 
+When bulk operations need maximum throughput, they use `max`. All coordinated, all respecting external API limits.
+
+No other platform we evaluated could do this cleanly. 
+Trigger.dev doesn't support shared flow control across job types. 
+Cloudflare Workflows and Inngest have step-based execution — but neither offers unified flow control across arbitrary queued messages.
+
+---
+
+## Why Not Cloudflare Workflows?
+
+Cloudflare Workflows came close to being our choice.
+
+**Pros:**
+- Cheap
+- Native to Cloudflare
+- Clean step-based execution
+
+**The problems:**
+
+First, **runtime limitations**. Cloudflare Workflows only run on Cloudflare Workers. That means no Node.js runtime, limited memory (128MB), and no access to the broader Node ecosystem. If your workflow needs more memory or a specific Node.js library, you're stuck.
+
+Second, and the real deal-breaker: **no concurrency control for external resources**.
+
+We tried building our own concurrency system using Cloudflare Durable Objects. It was complex, fragile under edge cases, limited to workflows only, and impossible to share cleanly across arbitrary queued jobs.
+
+Here's the thing: if I built the same concurrency control system today with Durable Objects, **it would cost about the same as what I pay Upstash**. Except I'd also own the maintenance, debugging, and operational complexity forever.
+
+That math is insane. We run a *lot* of workflows. The value Upstash provides for the cost is genuinely unreasonable — in a good way. Paying them to solve this problem instead of building it ourselves was an obvious decision.
+
+---
+
+## Step-Based Execution
+
+Steps matter because:
+- You don't want to retry an entire workflow when one API call fails
+- Idempotency becomes manageable
+- Expensive operations (like LLM calls) aren't repeated on retry
+
+We wrap Upstash's workflow context in a thin abstraction:
+
+```typescript
+class Workflow<Payload> {
+    private context: WorkflowContext<Payload>
+
+    async step<T>(name: string, fn: () => Promise<T>): Promise<T> {
+        return await this.context.run(name, fn)
+    }
+}
+```
+
+This lets us wrap our steps in OpenTelemetry spans:
+
+```typescript
+const contact = await workflow.step("fetch-contact-data", async () => {
+    return await getContact({ location_id, contact_id, app_key })
+})
+
+if (contact === "not-found") {
+    await workflow.step("delete-contact", async () => {
+        await drizzle
+            .update(contacts)
+            .set({ deleted_at: new Date().toISOString() })
+            .where(eq(contacts.contact_id, contact_id))
+    })
+    return
+}
+
+await workflow.step("sync-messages", async () => {
+    await syncContactMessages({ contact_id, location_id, app_key })
+})
+
+await workflow.step("sync-tasks", async () => {
+    await syncContactTasks({ contact_id, location_id, app_key })
+})
+```
+
+Each step is durable. If `sync-messages` fails after `fetch-contact-data` succeeds, we retry from `sync-messages` — not from the beginning.
+
+Upstash preserves the benefits of step-based execution **without** forcing compute or concurrency trade-offs.
+
+---
+
+## Results
+
+Today, we:
+- Run **~10× more workload**
+- Pay **~50% of what we paid before**
+- Have **no hard concurrency ceiling**
+- Scale predictably without architectural rewrites
+
+Upstash scales with real usage, not artificial limits.
+
+---
+
+## What Could Be Better
+
+Even as a happy customer, there are features I'd love to see:
+- Priority queues (fast vs slow jobs)
+- Combined concurrency keys
+- Per-step concurrency constraints
+
+But even without these, Upstash already solves problems that every serious integration eventually hits.
+
+---
+
+## Takeaway
+
+If you're building serverless workflows, CRM integrations, high-volume webhooks, rate-limited API consumers, or IO-heavy background systems — **Upstash QStash and Upstash Workflow is the most flexible and scalable workflow platform available today**.
+
+Open compute. No artificial concurrency ceilings. Real flow control across all work types.
+
+It's the first system I've used that doesn't fight you as you scale.
