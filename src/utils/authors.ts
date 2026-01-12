@@ -423,11 +423,12 @@ export const authors: Record<
     title: "Software Developer - Guest Author",
     image: "omerfaruq.jpg",
   },
-  akif: {name: "Muhammed Akif Kaya",
+  akif: {
+    name: "Muhammed Akif Kaya",
     title: "Software Developer - Guest Author",
     image: "akif.jpeg",
-   },
-   alitarik: {
+  },
+  alitarik: {
     name: "Ali Tarık Şahin",
     title: "Software Engineer @Upstash",
     image: "alitarik.jpeg",
@@ -437,9 +438,9 @@ export const authors: Record<
     title: "Software Developer - Guest Author",
     image: "mtahasylmz.jpeg",
   },
-    adamskerjwold: {
-    name: "Adam Skerjwold",
+  adamskjervold: {
+    name: "Adam Skjervold",
     title: "Founder @Streamlined",
-    image: "adamskerjwold.png",
+    image: "adamskjervold.png",
   },
 };
