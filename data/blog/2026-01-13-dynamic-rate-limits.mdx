@@ -1,0 +1,157 @@
+---
+title: "Introducing Dynamic Rate-Limits for Upstash Ratelimit"
+slug: dynamic-rate-limits
+authors: [josh]
+tags: [redis, ratelimit]
+---
+
+Rate limiting apps is usually static. You pick a number (say, 100 requests per 10 seconds), create a rate limiter, and that's it:
+
+```ts {6, 10}
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+
+const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(10, "10s"),
+});
+
+// check rate limit for a user
+const { success } = await ratelimit.limit("user_123");
+```
+
+This approach works great until we need to change the limit. Maybe you're running a sale and need to temporarily increase limits. Or you're seeing unusually high traffic and want to decrease the limit for a while.
+
+Up until now (at least with Upstash Ratelimit) you had two choices:
+
+- Redeploy your app with a new config (slow)
+- Create multiple rate limiter instances and swap between them
+
+---
+
+## Introducing dynamic limits
+
+We just added a `dynamicLimits` flag that lets you change rate limits at runtime. The limit check happens in Redis, so all serverless functions see the same limit instantly.
+
+Here's how it works:
+
+```ts {7,11}
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+
+const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(10, "10s"),
+  dynamicLimits: true, // enable dynamic limits
+});
+
+// set a global dynamic limit
+await ratelimit.setDynamicLimit({ limit: 5 });
+
+// all subsequent checks use the new limit
+const { success } = await ratelimit.limit("user_123");
+
+// check current limit
+const { dynamicLimit } = await ratelimit.getDynamicLimit(); // returns 5
+
+// remove dynamic limit (falls back to default)
+await ratelimit.setDynamicLimit({ limit: false });
+```
+
+The dynamic limit overrides your default limit for all identifiers. So if you set a dynamic limit of 5, every user gets 5 requests per window instead of the default 10.
+
+---
+
+## How it works under the hood
+
+The feature is built directly into the Lua scripts that run in Redis. Every time you call `limit()`, the script:
+
+1. Checks if a dynamic limit exists in Redis
+2. Uses that limit if found, otherwise uses the default
+3. Returns both the result and which limit was applied
+
+This means one Redis call per check, same as before. We're not adding extra roundtrips.
+
+It works with:
+
+- `fixedWindow`
+- `slidingWindow`
+- `tokenBucket`
+
+It doesn't work with `cachedFixedWindow` because that algorithm caches results locally, which doesn't play well with limits that can change on every request.
+
+---
+
+## Some example use cases
+
+**Traffic spikes**: Temporarily lower limits during unexpected traffic.
+
+```ts
+// oh no, we're getting hammered
+await ratelimit.setDynamicLimit({ limit: 5 });
+
+// later
+await ratelimit.setDynamicLimit({ limit: false });
+```
+
+**Rollouts**: If you're testing new limits, you can now adjust them without redeploying.
+
+```ts
+// start with a low limit
+await ratelimit.setDynamicLimit({ limit: 50 });
+
+// monitoring looks good, increase it
+await ratelimit.setDynamicLimit({ limit: 100 });
+```
+
+---
+
+## A quick note about the ephemeral cache
+
+By default, Upstash Ratelimit keeps an in-memory cache of identifiers (e.g. a user ID) that have exceeded their rate limit. This is a performance optimization for serverless functions.
+
+Here's what it does: when someone exceeds their rate limit, we store their identifier and the reset timestamp in a Map. The next time that identifier makes a request, we check the in-memory cache first. If they're still blocked, we reject the request immediately without calling Redis. That saves time and money.
+
+The ephemeral cache automatically clears an identifier when the reset time passes.
+
+**Why you might want to disable this cache with dynamic limits:**
+
+If you increase a limit at runtime, the cache won't know about it for a short period. Identifiers blocked in the cache will keep getting rejected until their reset time passes, even though they'd be allowed under the new limit.
+
+So if you plan to frequently adjust limits up and down, I'd recommend turn off the ephemeral cache:
+
+```ts
+const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(10, "10s"),
+  dynamicLimits: true,
+  ephemeralCache: undefined, // disable cache
+});
+```
+
+If you only lower limits or do it rarely, I recommend leaving the cache on. Just know that raising limits won't unblock cached identifiers immediately.
+
+---
+
+## Also a quick note on the TokenBucket algo
+
+The TokenBucket algorithm works differently than counter-based algorithms like fixed window. It stores the number of remaining tokens in Redis. If you lower the limit and a user runs out of tokens, they'll need to wait for the refill interval even if you raise the limit again.
+
+This is just how token buckets work. The other algorithms (fixedWindow and slidingWindow) don't have this issue because they count requests instead of storing state.
+
+---
+
+## Wrapping up
+
+Right now, dynamic limits only work with single-region rate limiters. We're planning to support multi-region in a future release.
+
+The dynamic limits are available now in the latest version of `@upstash/ratelimit`.
+
+```bash
+npm install @upstash/ratelimit@latest
+```
+
+The implementation is simple and the performance impact is zero (still one Redis call per check). Give it a try if you need runtime control over your rate limits.
+
+Appreciate you for reading 🙌
+
