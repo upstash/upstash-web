@@ -1,0 +1,66 @@
+---
+slug: context7-quality-and-safety
+title: "Quality and Safety in Context7"
+authors: [shannon]
+tags: [context7, security, mcp]
+
+---
+
+Context7 delivers high-quality retrieval while prioritizing safety at every stage of the retrieval process.
+
+## Ensuring high-quality retrieval
+
+One of the ways we ensure high-quality results for your coding assistant is by creating a library benchmark. This benchmark is built by generating questions that closely resemble what a developer would ask an LLM about a library. We then evaluate how well the library answers those questions over time. 
+
+These scores impact the library in two key ways:
+
+1. They determine which libraries are prioritized during documentation retrieval.
+2. They give library developers visibility into where their documentation can be improved.
+
+<Frame>
+  <img src="/blog/context7-quality-and-safety/scores_over_time.png" />
+</Frame>
+
+---
+
+## Trust and safety built into ranking
+
+In addition to benchmark performance, Context7 computes a trust score that influences how libraries are ranked during documentation retrieval.
+
+The scores are calculated using signals derived from the source of the library:
+
+- Repository signals, which indicate whether a library is maintained and reliable, such as account activity and community reception.
+- Website signals, which reflect broader indicators, including domain reputation and overall site quality.
+
+Together, the benchmark and trust scores help distinguish between libraries with similar content, ensuring developers receive information that is both relevant and trustworthy.
+
+In addition to automatic ranking, developers can customize what libraries are retrieved by specifying under **Public Library Access** in the **Libraries** tab on their Context7 dashboard.
+
+---
+
+## Protection against malicious content
+
+As an additional safeguard, Context7 uses a prompt injection classifier trained specifically for this system to prevent potentially dangerous documentation from being stored or used. 
+
+<Frame>
+  <img src="/blog/context7-quality-and-safety/classifier_pipeline.png" />
+</Frame>
+
+---
+
+## Protecting your data and infrastructure
+
+While we have extensive guardrails for data being sent to the MCP client, we apply the same protections to data sent from the client. Context7 limits retrieval inputs to the minimum information required for lookup, and does not ingest your code, conversation history, or any sensitive data.
+
+Beyond data handling, Context7 uses SOC 2-compliant infrastructure. Enterprise customers can also enable SSO and access dedicated audit trails.
+
+---
+
+## Takeaways
+
+- Benchmarks are used to ensure high-quality retrieval
+- Trust scores are used to prioritize reliable and well-established libraries
+- Prompt injection attempts are detected and discarded
+- Minimal information is used for retrieval
+- Context7 runs on SOC 2-compliant infrastructure
+- SSO and audit trails are available for enterprise customers
