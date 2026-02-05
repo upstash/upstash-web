@@ -1,0 +1,108 @@
+---
+slug: context7-quality-and-safety
+title: "Quality and Safety in Context7"
+authors: [shannon]
+tags: [context7, security, mcp, quality, ai, retrieval]
+
+---
+
+Context7 delivers high-quality retrieval while prioritizing safety at every stage of the retrieval process.
+
+## Ensuring high-quality retrieval
+
+One of the ways Context7 ensures high-quality results for coding assistants is by creating a library benchmark. This benchmark is built by generating questions that closely resemble what a developer would ask an LLM about a library. We then evaluate how well the library answers those questions over time.
+Library scores can be found on the Context7 website under the **Benchmark** tab.
+
+These scores impact libraries in two key ways:
+
+1. They determine which libraries are prioritized during documentation retrieval. A high benchmark score indicates that a library is effective at answering developer questions, and is therefore favored when choosing between similar libraries with lower scores.
+2. They provide library owners visibility into potential areas of improvement in their documentation. For example, documentation may include detailed installation instructions but lack concrete examples of how the library can be used in specific projects.
+
+<Frame>
+  <img src="/blog/context7-quality-and-safety/scores_over_time.png" />
+</Frame>
+
+To further improve retrieval quality, code snippets undergo a deduplication process designed to increase snippet diversity while reducing unnecessary context bloat. This process begins by checking for exact matches, followed by cosine similarity to identify near-duplicate snippets. An additional filter is then applied to ensure that similar snippets are genuinely non-unique.
+Informational snippets follow a similar approach; however, their text-based nature makes deduplication substantially simpler. For these snippets, we check for exact matches and overlapping content above a specified threshold.
+
+Context7 also includes a version analyzer that detects multi-version documentation structures. When such structures are identified, older versions are excluded during parsing so that only the most recent documentation is stored. This prevents outdated or duplicate documentation from being used during retrieval. Older versions are still supported, but must be explicitly configured by the library owner.
+
+<Frame>
+  <img src="/blog/context7-quality-and-safety/version_filter.png" />
+</Frame>
+
+---
+
+## Trust and safety built into ranking
+
+In addition to benchmark performance, Context7 computes a trust score that influences how libraries are ranked during documentation retrieval. These scores are calculated using signals derived from the library’s source.
+
+For repositories, trust scores are based on indicators that suggest whether a library is actively maintained and reliable, including:
+
+- The number of repositories owned by the account or organization
+- The total number of stars across repositories
+- Account age
+- Activity level
+- Follower count
+- Overall profile completeness
+
+For websites, where different metadata is available, we rely on broader indicators, such as:
+
+- TLS usage
+- Overall site presentation
+- Domain authority
+- Number of backlinks
+- Number of unique referring domains
+
+Together, benchmark and trust scores help distinguish between libraries with similar content, ensuring that developers receive information that is both relevant and trustworthy.
+
+Libraries and skills can also be **verified**, which is indicated by a checkmark next to their name on the Context7 website. A library can obtain verified status in one of three ways:
+
+1. Achieving a trust score of at least 9
+2. Ranking in the top 100 libraries by average MCP usage with a trust score of 6 or higher
+3. Being claimed by the library owner
+
+Verified status indicates that a library is either highly trustworthy or associated with a well-established organization. In some cases, this designation allows for leniency, such as imperfect website formatting, while still signaling reliability. While verified status is currently used as a visual indicator on the website, we plan to integrate this metric directly into the ranking system to further optimize for trust and quality.
+
+<Frame>
+  <img src="/blog/context7-quality-and-safety/verified_library.png" />
+</Frame>
+
+Beyond automatic ranking, developers can further customize retrieval behavior by specifying which libraries are accessible under **Public Library Access** in the Libraries tab of the Context7 dashboard.
+
+---
+
+## Protection against malicious content
+
+<Frame>
+  <img src="/blog/context7-quality-and-safety/classifier_pipeline.png" />
+</Frame>
+
+Because anyone can submit a repository or website to Context7, it is necessary to actively defend against malicious submissions in order to protect both the system and its users. To address this, Context7 employs a two-pass prompt-injection detection pipeline that combines complementary detection stages. This approach allows us to block potentially dangerous documentation from being stored or used while minimizing false positives, ensuring that benign submissions are not incorrectly rejected.
+With the introduction of Skills, we developed an additional prompt-injection pipeline specifically designed for `Skills.md` files, which differ from traditional code or documentation in structure and intent. While these pipelines share a common foundation, they are adapted to best suit the type of content being evaluated.
+
+<Frame>
+  <img src="/blog/context7-quality-and-safety/classifier_example.png" />
+</Frame>
+
+We continuously monitor documentation and skills flagged as potential injections and regularly update our classifier pipelines to ensure they remain effective against evolving attack techniques.
+
+---
+
+## Protecting user data and infrastructure
+
+While we maintain extensive guardrails for data being sent *to* the MCP client, we apply the same protections to data sent *from* the client. Context7 limits retrieval inputs to the minimum information required for lookup and does not ingest user code, conversation history, or other sensitive data.
+
+Beyond data handling, Context7 operates on SOC 2-compliant infrastructure. Enterprise customers can also enable SSO and access dedicated audit trails.
+
+---
+
+## Takeaways
+
+- Benchmarks are used to ensure high-quality retrieval
+- Trust scores prioritize reliable and well-established libraries
+- Deduplication and version analysis reduce redundancy and prevent outdated documentation from influencing retrieval
+- Prompt-injection attempts are detected and discarded using content-aware detection pipelines
+- Retrieval operates on minimal required input data
+- Context7 runs on SOC 2-compliant infrastructure
+- SSO and audit trails are available for enterprise customers
