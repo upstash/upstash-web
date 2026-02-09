@@ -79,7 +79,7 @@ export const INVESTORS = [
   },
   {
     name: "Morgan Dioli",
-    title: "Partner, Ravix Group",
+    title: "Investor/Advisor, Ravix Group",
     src: "/investors/morgan-dioli.jpeg",
     url: "https://www.linkedin.com/in/morgan-dioli-author-cfo",
   },
