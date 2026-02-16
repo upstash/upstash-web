@@ -38,9 +38,9 @@ export default function SectionFeature() {
         </div>
 
         <div className="mt-16 flex flex-wrap justify-center gap-2 md:grid-cols-3 md:gap-4">
-          {FEATURES.map(({ title, desc, icon }) => {
+          {FEATURES.map(({ title, desc, icon }, index) => {
             return (
-              <React.Fragment key={title.toString()}>
+              <React.Fragment key={index}>
                 <TooltipRoot delayDuration={0}>
                   <TooltipTrigger className="!cursor-default">
                     <div

@@ -34,6 +34,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html
       lang="en"
       className={cx(fontText.variable, fontDisplay.variable, "scroll-smooth")}
+      suppressHydrationWarning
     >
       <PHProvider>
         <IntercomWrapper>
