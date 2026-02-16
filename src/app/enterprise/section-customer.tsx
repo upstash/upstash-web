@@ -15,7 +15,7 @@ export default function SectionCustomer() {
 
       <Container>
         <div>
-          <PageHeaderTitle as="h2">Success Stories</PageHeaderTitle>
+          <PageHeaderTitle as="h2">Enterprise Success Stories</PageHeaderTitle>
           <PageHeaderDesc className="mt-2">
             Discover how our customers are leveraging Upstash to achieve their
             goals.
