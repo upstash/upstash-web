@@ -141,12 +141,14 @@ export default function HomeHeroCustomer() {
             "mt-16 flex flex-wrap justify-center gap-2 rounded-2xl px-4 md:mt-16 md:gap-6",
           )}
         >
-          {customers.map(({ name, icon, slug }) => {
+          {customers.slice(0, 10).map(({ name, icon, slug }) => {
             const cell = (
               <div
                 className={cx(
                   "group flex h-[72px] w-[180px] flex-col items-center justify-center",
-                  "rounded-2xl bg-bg-mute transition-colors hover:text-primary md:rounded-4xl dark:bg-bg-mute dark:hover:bg-white",
+                  "rounded-2xl bg-bg-mute transition-colors md:rounded-4xl dark:bg-bg-mute",
+                  slug &&
+                    "transition-all hover:text-primary hover:shadow-sm dark:hover:bg-white",
                 )}
               >
                 {icon}
@@ -161,6 +163,12 @@ export default function HomeHeroCustomer() {
             );
           })}
         </div>
+        <Link
+          href={"/customers"}
+          className="block pt-8 text-xl font-semibold underline"
+        >
+          and many more...
+        </Link>
       </Container>
     </section>
   );
@@ -173,7 +181,15 @@ const customers = [
   },
   {
     name: "Supabase",
+    slug: "supabase",
     icon: <LogoSupabase height={24} />,
+    quote: (
+      <>
+        At our scale, it's important to use the right tool for the right
+        workload. Upstash lets us power low-latency edge use cases globally,
+        while still keeping our overall architecture simple and cost-effective.
+      </>
+    ),
   },
   {
     name: "Midjourney",
@@ -189,7 +205,7 @@ const customers = [
     icon: <LogoPaulSmith height={22} />,
     quote: (
       <>
-        Upstash's global Redis has been a game changer — low latency, zero
+        Upstash's global Redis has been a game changer. Low latency, zero
         downtime, and easy to use across frontend and backend. With brilliant
         customer service and fast response times, we deliver the best shopping
         experience.
@@ -201,8 +217,16 @@ const customers = [
     icon: <LogoOpenrouter height={22} />,
   },
   {
-    name: "GitBook",
-    icon: <LogoGitbook height={23} />,
+    name: "OpenArt",
+    slug: "openart",
+    icon: <LogoOpenart height={20} />,
+    quote: (
+      <>
+        Developer experience became significantly better than what we
+        experienced with traditional cloud service providers. The observability
+        improvements alone were game-changing for our small team.
+      </>
+    ),
   },
   {
     name: "Customer.io",
@@ -232,16 +256,8 @@ const customers = [
     icon: <LogoZapier height={24} />,
   },
   {
-    name: "OpenArt",
-    slug: "openart",
-    icon: <LogoOpenart height={20} />,
-    quote: (
-      <>
-        Developer experience became significantly better than what we
-        experienced with traditional cloud service providers. The observability
-        improvements alone were game-changing for our small team.
-      </>
-    ),
+    name: "GitBook",
+    icon: <LogoGitbook height={23} />,
   },
   {
     name: "Branch",

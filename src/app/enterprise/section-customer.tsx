@@ -2,8 +2,8 @@ import Bg from "@/components/bg";
 import Container from "@/components/container";
 import { LogoBranch } from "@/components/customers/logo-branch";
 import { LogoMaker } from "@/components/customers/logo-maker";
-import { LogoNiftykit } from "@/components/customers/logo-niftykit";
-import { LogoZapier } from "@/components/customers/logo-zapier";
+import { LogoPaulSmith } from "@/components/customers/logo-paul-smith";
+import { LogoSupabase } from "@/components/customers/logo-supabase";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
 import cx from "@/utils/cx";
@@ -71,25 +71,27 @@ export default function SectionCustomer() {
 
 const CUSTOMERS = [
   {
-    id: "niftykit",
-    who: "CTO, NiftyKit",
-    logo: <LogoNiftykit height={26} />,
+    id: "paul-smith",
+    who: "Business System Architect, Paul Smith",
+    logo: <LogoPaulSmith height={22} />,
     quote: (
       <>
-        Upstash service has been bulletproof, with almost zero issues, and their
-        support team is some of the most incredible people. They helped us
-        troubleshoot issues down to the code level
+        Upstash's global Redis has been a game changer. Low latency, zero
+        downtime, and easy to use across frontend and backend. With brilliant
+        customer service and fast response times, we deliver the best shopping
+        experience.
       </>
     ),
   },
   {
-    id: "zapier",
-    who: "VP of Product, Zapier",
-    logo: <LogoZapier height={24} />,
+    id: "supabase",
+    who: "CTO, Supabase",
+    logo: <LogoSupabase height={24} />,
     quote: (
       <>
-        We chose Upstash specifically because it offers an HTTP interface for
-        Redis, which perfectly suited our needs
+        At our scale, it's important to use the right tool for the right
+        workload. Upstash lets us power low-latency edge use cases globally,
+        while still keeping our overall architecture simple and cost-effective.
       </>
     ),
   },
@@ -98,7 +100,11 @@ const CUSTOMERS = [
     who: "Software Engineer, Maker",
     logo: <LogoMaker height={32} />,
     quote: (
-      <>Upstash Redis helped us combine Primary Database and Caching Needs</>
+      <>
+        The ability to exceed the resident memory of the machine that Upstash
+        has built opens up more possibilities, and allows reading and writing
+        directly to Redis and skipping the middle-man
+      </>
     ),
   },
   {

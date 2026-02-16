@@ -25,7 +25,7 @@
     "@vercel/og": "^0.6.5",
     "class-variance-authority": "^0.7.1",
     "clsx": "^1.2.1",
-    "cobe": "^0.6.3",
+    "cobe": "^0.6.5",
     "copy-to-clipboard": "^3.3.3",
     "embla-carousel-autoplay": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
