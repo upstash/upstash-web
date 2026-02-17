@@ -524,14 +524,13 @@ export default function CompareTable({
           </th>
           {/**/}
           <Col plan={showFree}>
-            <CompareValue type="size" suffix="GB" className="border-b-0">
+            <CompareValue type="size" suffix="GB">
               10
             </CompareValue>
           </Col>
           <Col plan={showPayg} feature>
             <CompareValue
               type="size"
-              className="border-b-0"
               after={
                 <Tooltip content="Free up to 200GB per month. Beyond that $0.03 per GB.">
                   <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
@@ -546,7 +545,6 @@ export default function CompareTable({
               <CompareValue
                 type="size"
                 suffix="GB"
-                className="border-b-0"
                 after={
                   <Tooltip content="Upon hitting this limit, the DB will either be upgraded or limited depending on auto-upgrade setting.">
                     <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
@@ -560,7 +558,6 @@ export default function CompareTable({
               <CompareValue
                 type="size"
                 suffix="GB"
-                className="border-b-0"
                 after={
                   <Tooltip content="Upon hitting this limit, the DB will either be upgraded or limited depending on auto-upgrade setting.">
                     <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
@@ -574,7 +571,6 @@ export default function CompareTable({
               <CompareValue
                 type="size"
                 suffix="GB"
-                className="border-b-0"
                 after={
                   <Tooltip content="Upon hitting this limit, the DB will either be upgraded or limited depending on auto-upgrade setting.">
                     <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
@@ -588,7 +584,6 @@ export default function CompareTable({
               <CompareValue
                 type="size"
                 suffix="TB"
-                className="border-b-0"
                 after={
                   <Tooltip content="Upon hitting this limit, the DB will either be upgraded or limited depending on auto-upgrade setting.">
                     <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
@@ -602,7 +597,6 @@ export default function CompareTable({
               <CompareValue
                 type="size"
                 suffix="TB"
-                className="border-b-0"
                 after={
                   <Tooltip content="Upon hitting this limit, the DB will either be upgraded or limited depending on auto-upgrade setting.">
                     <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
@@ -616,7 +610,6 @@ export default function CompareTable({
               <CompareValue
                 type="size"
                 suffix="TB"
-                className="border-b-0"
                 after={
                   <Tooltip content="Upon hitting this limit, the DB will either be upgraded or limited depending on auto-upgrade setting.">
                     <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
@@ -630,7 +623,6 @@ export default function CompareTable({
               <CompareValue
                 type="size"
                 suffix="TB"
-                className="border-b-0"
                 after={
                   <Tooltip content="Upon hitting this limit, the DB will either be upgraded or limited depending on auto-upgrade setting.">
                     <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
@@ -643,8 +635,52 @@ export default function CompareTable({
           </Col>
 
           <Col plan={showEnterprise}>
-            <CompareValue type="size" className="border-b-0">
-              Unlimited
+            <CompareValue type="size">Unlimited</CompareValue>
+          </Col>
+        </tr>
+
+        {/*MAX DATABASES*/}
+        <tr>
+          <th className="px-0 text-left font-normal">
+            <Tooltip content="Number of databases you can create.">
+              Max Databases
+            </Tooltip>
+          </th>
+          {/**/}
+          <Col plan={showFree}>
+            <CompareValue type="number" className="border-b-0">
+              1
+            </CompareValue>
+          </Col>
+          <Col plan={showPayg} feature>
+            <CompareValue
+              type="number"
+              className="border-b-0"
+              after={
+                <Tooltip content="First 10 free, $0.5 per DB after.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            >
+              100
+            </CompareValue>
+          </Col>
+          <Col plan={showFixed}>
+            <CompareValue
+              type="number"
+              className="border-b-0"
+              after={
+                <Tooltip content="First 10 free, $0.5 per DB after.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            >
+              100
+            </CompareValue>
+          </Col>
+          <Col plan={showEnterprise}>
+            <CompareValue type="plain" className="border-b-0">
+              Custom
             </CompareValue>
           </Col>
         </tr>
