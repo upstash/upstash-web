@@ -1,7 +1,7 @@
 import Button from "@/components/button";
 import Container from "@/components/container";
 import type { Job } from "@content";
-import { IconArrowUpRight } from "@tabler/icons-react";
+import { IconArrowUpRight, IconInfoCircle } from "@tabler/icons-react";
 
 type Props = {
   job: Job;
@@ -15,6 +15,17 @@ export default function CareerHeader({ job }: Props) {
         <h1 className="mx-4 mt-2 text-balance font-display text-4xl font-bold !leading-title md:text-6xl">
           {job.title}
         </h1>
+
+        {/* frozen warning */}
+        {job.frozen && (
+          <div className="mx-auto mt-6 flex max-w-lg items-center gap-3 rounded-xl border border-primary/20 bg-bg-mute px-5 py-3 text-left text-sm text-text-mute">
+            <IconInfoCircle size={20} className="shrink-0" />
+            <p>
+              This position is not actively hiring, but you can still submit
+              your CV for future reference.
+            </p>
+          </div>
+        )}
 
         {/* meta */}
         <div className="mt-6 flex flex-wrap items-center justify-center gap-4">

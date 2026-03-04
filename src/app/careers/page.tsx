@@ -39,9 +39,17 @@ export default function HomePage() {
                 className="group grid rounded-lg bg-bg-mute p-6 transition md:rounded-3xl md:p-8"
                 href={`/careers/${job.slug}`}
               >
-                <h2 className="font-display text-xl font-semibold text-primary-text group-hover:underline">
-                  {job.title}
-                </h2>
+                <div className="flex items-center gap-3">
+                  <h2 className="font-display text-xl font-semibold text-primary-text group-hover:underline">
+                    {job.title}
+                  </h2>
+
+                  {job.frozen && (
+                    <span className="shrink-0 rounded-full border border-primary/20 bg-bg-mute px-2.5 py-0.5 text-xs text-text-mute">
+                      Not actively hiring
+                    </span>
+                  )}
+                </div>
 
                 <p className="mt-1 opacity-80">{job.summary}</p>
 

@@ -46,6 +46,7 @@ export const jobs = defineCollection({
     how: z.string(),
     location: z.string(),
     skills: z.array(z.string()),
+    frozen: z.boolean().optional(),
     draft: z.boolean().optional(),
   }),
   transform: async (doc, ctx) => {
