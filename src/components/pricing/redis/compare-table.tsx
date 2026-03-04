@@ -639,6 +639,62 @@ export default function CompareTable({
           </Col>
         </tr>
 
+        {/*MAX INDEX COUNT*/}
+        <tr>
+          <th className="px-0 text-left font-normal">
+            <Tooltip content="Max number of search indexes you can create">
+              Max index count
+            </Tooltip>
+          </th>
+          {/**/}
+          <Col plan={showFree}>
+            <CompareValue type="number">1</CompareValue>
+          </Col>
+          <Col plan={showPayg} feature>
+            <CompareValue type="number">10</CompareValue>
+          </Col>
+          <Col plan={showFixed}>
+            {selectedFixed250MB && <CompareValue type="number">2</CompareValue>}
+            {selectedFixed1GB && <CompareValue type="number">3</CompareValue>}
+            {selectedFixed5GB && <CompareValue type="number">5</CompareValue>}
+            {selectedFixed10GB && <CompareValue type="number">10</CompareValue>}
+            {selectedFixed50GB && <CompareValue type="number">50</CompareValue>}
+            {selectedFixed100GB && <CompareValue type="number">100</CompareValue>}
+            {selectedFixed500GB && <CompareValue type="number">500</CompareValue>}
+          </Col>
+          <Col plan={showEnterprise}>
+            <CompareValue type="plain">Custom</CompareValue>
+          </Col>
+        </tr>
+
+        {/*MAX DOCUMENTS PER INDEX*/}
+        <tr>
+          <th className="px-0 text-left font-normal">
+            <Tooltip content="Max number of documents in a single search index">
+              Max documents per index
+            </Tooltip>
+          </th>
+          {/**/}
+          <Col plan={showFree}>
+            <CompareValue type="size">10K</CompareValue>
+          </Col>
+          <Col plan={showPayg} feature>
+            <CompareValue type="size">1M</CompareValue>
+          </Col>
+          <Col plan={showFixed}>
+            {selectedFixed250MB && <CompareValue type="size">100K</CompareValue>}
+            {selectedFixed1GB && <CompareValue type="size">250K</CompareValue>}
+            {selectedFixed5GB && <CompareValue type="size">500K</CompareValue>}
+            {selectedFixed10GB && <CompareValue type="size">1M</CompareValue>}
+            {selectedFixed50GB && <CompareValue type="size">5M</CompareValue>}
+            {selectedFixed100GB && <CompareValue type="size">10M</CompareValue>}
+            {selectedFixed500GB && <CompareValue type="size">50M</CompareValue>}
+          </Col>
+          <Col plan={showEnterprise}>
+            <CompareValue type="plain">Custom</CompareValue>
+          </Col>
+        </tr>
+
         {/*MAX DATABASES*/}
         <tr>
           <th className="px-0 text-left font-normal">
