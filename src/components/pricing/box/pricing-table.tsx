@@ -66,8 +66,8 @@ export default function PricingTable() {
             <p className="font-semibold">$0.1 / GB per month</p>
           </div>
           <div className="py-3">
-            <p className="text-text-mute">Box Type</p>
-            <p className="font-semibold">Small (2 CPU, 2 GB)</p>
+            <p className="text-text-mute">Box Spec</p>
+            <p className="font-semibold">2 CPU, 2GB mem</p>
           </div>
         </div>
 
