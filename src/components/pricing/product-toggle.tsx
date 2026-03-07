@@ -1,5 +1,6 @@
 "use client";
 
+import IconBox from "@/components/icon-box";
 import IconQStash from "@/components/icon-qstash";
 import IconRedis from "@/components/icon-redis";
 import IconSearch from "@/components/icon-search";
@@ -16,6 +17,7 @@ const productConfig = {
   "/qstash": { name: "QStash", Icon: IconQStash },
   "/workflow": { name: "Workflow", Icon: IconWorkflow },
   "/search": { name: "Search", Icon: IconSearch },
+  "/box": { name: "Box", Icon: IconBox },
 } as const;
 
 type Product = keyof typeof productConfig;

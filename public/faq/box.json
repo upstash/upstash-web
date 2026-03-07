@@ -1,0 +1,36 @@
+{
+  "faq": [
+    {
+      "question": "What does active CPU hour mean?",
+      "answer": "You are billed based on how much CPU your code actually consumes, measured in core-hours. For example, using 100% of 2 cores for one hour costs $0.2, while using 10% of a single core for one hour costs $0.01. When a box is idle with no CPU usage, no charges apply."
+    },
+    {
+      "question": "What happens when a box is idle?",
+      "answer": "After 30 minutes of inactivity, the box is automatically frozen. Storage is preserved, but all running processes are stopped. When a new request comes in, the box wakes up automatically, similar to how AWS Lambda cold-starts on demand. No manual intervention is needed. You are only charged for the CPU time your code actually uses. If the box is idle with no CPU usage, there is no CPU charge. Storage charges still apply at $0.1 per GB per month."
+    },
+    {
+      "question": "What is included in storage billing?",
+      "answer": "Storage is billed at $0.1 per GB per month and includes all data on disk, including snapshots. The maximum storage per box is 10 GB for the Small box type."
+    },
+    {
+      "question": "What are the free tier limits?",
+      "answer": "The free tier includes up to 10 concurrent boxes, 5 CPU hours per month, and $1 of LLM token usage per month. After the token limit, the API returns 400 Bad Request."
+    },
+    {
+      "question": "How does LLM token usage work?",
+      "answer": "Each box includes Upstash-provided LLM token usage for the built-in AI agent. On the Free plan, this is capped at $1 per month. On Pay as you go, the cap is $100 per month. After the limit is reached, you can either contact us to increase it or bring your own key (BYOK) for any LLM provider, which is available on all plans."
+    },
+    {
+      "question": "Can I run more than 100 concurrent boxes?",
+      "answer": "Yes. The default quota for Pay as you go is 100 concurrent boxes. This is a soft limit that can be increased on request, similar to AWS service quotas. Just contact us and we'll raise your limit."
+    },
+    {
+      "question": "Where are boxes hosted?",
+      "answer": "Boxes currently run on AWS us-east-1. We are planning to add more regions soon."
+    },
+    {
+      "question": "Can I use my own Docker container?",
+      "answer": "Yes, custom Docker container support is planned and coming soon."
+    }
+  ]
+}
