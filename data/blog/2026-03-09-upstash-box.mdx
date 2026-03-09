@@ -1,0 +1,90 @@
+---
+title: "Upstash Box: Give your agents a computer"
+slug: upstash-box
+authors: [enes]
+tags: [ai, box, serverless]
+---
+
+Today we are launching Upstash Box, a cloud computer for your agents. It comes with durable storage, serverless scaling, and usage-based pricing.
+
+We built Box to power Context7. Now we are making it available to everyone.
+
+## How it works
+
+```tsx
+import { Box, Runtime, ClaudeCode } from "@upstash/box";
+
+const box = await Box.create({
+  runtime: Runtime.Node,
+  agent: { model: ClaudeCode.Opus_4_6 },
+});
+
+// Run an agent inside your box
+const run = await box.agent.run({
+  prompt: "Set up a Next.js project with Tailwind",
+});
+console.log(run.result);
+
+// Or run any command directly
+await box.exec.command("npm run build");
+```
+
+Every box is an isolated container with its own filesystem, network, and durable storage. You control it through the SDK or the CLI.
+
+## More than a sandbox
+
+Upstash Box is more than a sandbox. Sandboxes are designed to run agent-generated code. Box can do this too, but it goes much further:
+
+### 1- Infinite lifespan
+
+Most sandboxes have a timeout or max lifespan. You can keep Upstash Box forever. To keep costs low, we freeze your box after 1 hour of idle time. When a request comes in, we make it ready instantly.
+
+### 2- Durable
+
+Regular sandboxes are ephemeral, which means all data is lost when the sandbox shuts down. Upstash Box has durable block storage. You can rely on it to keep your agent's memory and history. This makes a new use case possible: `Agent Server`.
+
+### 3- Serverless
+
+You do not need any instance or server maintenance. You can scale to hundreds of boxes in seconds without any infrastructure to manage.
+
+### 4- Pay for active CPU, not the wall clock
+
+Price scales to zero — you only pay for the duration that your boxes are actively running. We charge per CPU/core usage, not clock time. For example, using 100% of 2 cores for one hour costs **$0.2**, while using 10% of a single core for one hour costs **$0.01**. When a box is idle with no CPU usage, no CPU charges apply. You only pay for storage at $0.10/GB per month — minimal compared to compute costs.
+
+## Use Cases
+
+We already use Box extensively inside Context7, and we expect to discover even more use cases with you. Here are the ones that stand out:
+
+### 1- Agent server
+
+The most exciting feature of Box is that it gives you the best of both worlds: durability and serverless nature. Durability lets you host agents as long-running services that keep their history, context, and the ability to improve over time. The serverless model means no fixed costs and no provisioning — but you can still scale up when needed.
+
+A concrete example: we are building this for Context7. Today, Context7 serves the same docs to everyone. With Box, we can create a dedicated Box per user. Each Box runs a docs search agent that remembers every query, learns which libraries and sections the user cares about, and builds a personalized context index over time. The more you use it, the better it gets at finding relevant documentation. The Box freezes when idle and costs nothing, but wakes instantly with all its history intact when the user comes back.
+
+This is the pattern: one Box per tenant, each with its own durable state. You get per-user personalization without managing any infrastructure.
+
+### 2- Multi-agent orchestration
+
+With Box, you can control multiple boxes using the async Node SDK. You can build workflows where you run different agents with different roles. The most basic example is a PR review workflow. You can assign 3 agents to review a PR and share their findings. Once all 3 agents return their responses, a jury model can synthesize the findings into a final evaluation and post comments on GitHub.
+
+### 3- Testing and development
+
+Box makes it easy to run parallel test scenarios at scale. For example, at Context7 we use Box to benchmark LLMs for context extraction over documentation. We spin up 5 Boxes in parallel — each running a different model (Claude Opus 4.6, GPT-5.2, Gemini 3 Pro, DeepSeek V3.2, GLM-5) against the same documentation files and prompts. We then calculate the hallucination percentage and accuracy score to find the best model for context extraction. The entire benchmark runs in minutes, because all models execute simultaneously in their own isolated Boxes.
+
+### 4- Safe agent execution
+
+When you process code or build scripts from unknown sources, you don't want to risk your own infrastructure. Box gives you a fully isolated environment where untrusted code can run safely.
+
+At Context7, we generate documentation from thousands of open-source repositories. Many of these repos contain RST files with Sphinx build scripts — arbitrary Python code from sources we do not control. We spin up a dedicated Box per repo, run `pip install` and `sphinx-build` inside it, extract the clean HTML output, and destroy the Box. If a build script does something unexpected, it is contained. Nothing touches Context7's infrastructure. Only the clean output comes out.
+
+## Roadmap
+
+Box is just getting started. Here is what we are planning next:
+
+1. Supporting more BYOM agents like Amp, OpenCode, etc.
+2. Supporting custom runtimes, so you can define your own runtime using something similar to Dockerfiles.
+3. Hosted agent services like OpenClaw — so you can deploy and run long-lived agents without managing any infrastructure yourself.
+
+Box is available today with a free tier — 5 CPU hours and up to 10 concurrent boxes. Pay-as-you-go starts at $0.10 per active CPU hour. Get started at [console.upstash.com/box](https://console.upstash.com/box).
+
+We look forward to your feedback on [Twitter](https://x.com/upstash), [Discord](https://discord.gg/jUxUYE4nEB), and our [support channels](/contact).
