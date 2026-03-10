@@ -2,10 +2,10 @@ import BoxFaqJson from "@/../public/faq/box.json";
 import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
-import ProductToggle from "@/components/pricing/product-toggle";
 import CompareTable from "@/components/pricing/box/compare-table";
 import FAQ from "@/components/pricing/box/faq";
 import PricingTable from "@/components/pricing/box/pricing-table";
+import ProductToggle from "@/components/pricing/product-toggle";
 import { generateFaqSchema } from "@/utils/structured-schema-generators";
 
 export default function PricingBoxPage() {
@@ -28,6 +28,13 @@ export default function PricingBoxPage() {
             <PricingTable />
           </div>
 
+          <div className="mx-auto mt-8 w-3/4 rounded-xl bg-amber-100 px-6 py-3 text-center text-sm text-amber-800">
+            Upstash Box is in{" "}
+            <span className="font-medium underline underline-offset-2 hover:text-amber-900">
+              Developer Preview
+            </span>
+            ! APIs and pricing may change.
+          </div>
         </Container>
       </section>
 
