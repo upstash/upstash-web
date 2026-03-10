@@ -92,10 +92,7 @@ export default function CompareTable() {
                 Free
               </h4>
 
-              <MobileSelectCol
-                onChange={onPlanChange}
-                value={BoxPlan.Free}
-              />
+              <MobileSelectCol onChange={onPlanChange} value={BoxPlan.Free} />
 
               <h5 className="flex items-baseline font-semibold">-</h5>
             </div>
@@ -131,9 +128,7 @@ export default function CompareTable() {
                 value={BoxPlan.Enterprise}
               />
 
-              <h5 className="flex items-baseline font-semibold">
-                Custom
-              </h5>
+              <h5 className="flex items-baseline font-semibold">Custom</h5>
             </div>
           </Col>
         </tr>
@@ -161,7 +156,7 @@ export default function CompareTable() {
                 </Tooltip>
               }
             >
-              100 (default)
+              1000 (default)
             </CompareValue>
           </Col>
           <Col plan={showEnterprise}>
