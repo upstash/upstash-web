@@ -63,19 +63,27 @@ A concrete example: we are building this for Context7. Today, Context7 serves th
 
 This is the pattern: one Box per tenant, each with its own durable state. You get per-user personalization without managing any infrastructure.
 
+![Context7 Agent Server on Upstash Box](/blog/box/agent-server.png)
+
 ### 2- Multi-agent orchestration
 
 With Box, you can control multiple boxes using the async Node SDK. You can build workflows where you run different agents with different roles. The most basic example is a PR review workflow. You can assign 3 agents to review a PR and share their findings. Once all 3 agents return their responses, a jury model can synthesize the findings into a final evaluation and post comments on GitHub.
 
+![Multi-Agent PR Review on Upstash Box](/blog/box/multi-agent.png)
+
 ### 3- Testing and development
 
 Box makes it easy to run parallel test scenarios at scale. For example, at Context7 we use Box to benchmark LLMs for context extraction over documentation. We spin up 5 Boxes in parallel — each running a different model (Claude Opus 4.6, GPT-5.2, Gemini 3 Pro, DeepSeek V3.2, GLM-5) against the same documentation files and prompts. We then calculate the hallucination percentage and accuracy score to find the best model for context extraction. The entire benchmark runs in minutes, because all models execute simultaneously in their own isolated Boxes.
+
+![Context7 LLM Benchmarking with Upstash Box](/blog/box/llm-benchmark.png)
 
 ### 4- Safe agent execution
 
 When you process code or build scripts from unknown sources, you don't want to risk your own infrastructure. Box gives you a fully isolated environment where untrusted code can run safely.
 
 At Context7, we generate documentation from thousands of open-source repositories. Many of these repos contain RST files with Sphinx build scripts — arbitrary Python code from sources we do not control. We spin up a dedicated Box per repo, run `pip install` and `sphinx-build` inside it, extract the clean HTML output, and destroy the Box. If a build script does something unexpected, it is contained. Nothing touches Context7's infrastructure. Only the clean output comes out.
+
+![Context7 Safe Doc Generation with Upstash Box](/blog/box/safe-execution.png)
 
 ## Roadmap
 
