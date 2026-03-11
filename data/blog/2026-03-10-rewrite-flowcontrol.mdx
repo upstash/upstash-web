@@ -12,8 +12,6 @@ Over time, we realized that our original implementation was limiting what we cou
 
 This post explains why we did the rewrite, what problems we solved, and how the new implementation works.
 
-# Why Did We Need a Rewrite?
-
 The original flow control implementation had several structural limitations:
 
 1. It did not adapt immediately to configuration changes.
@@ -21,26 +19,55 @@ The original flow control implementation had several structural limitations:
 3. It was difficult to provide observability.
 4. It gave limited control to users.
 
-Each of these problems became more visible as usage of QStash grew.
+Each of these problems became more visible as usage of QStash grew. Let's visit each of them one by one and see how they are improved.
 
 **1. Rate Limits Could Not Adapt to Changes**: In the old implementation, rate limiting was implemented using a **Redis SortedSet**.
 
-Messages were stored with a **score representing the timestamp** when they should be delivered. That timestamp was calculated when the message was published, based on the `rate` assigned to that message.This meant the delivery schedule was fixed at publish time. If a user later changed the rate configuration, the timestamps of already queued messages could not be updated. As a result:
+Messages were stored with a **score representing the timestamp** when they should be delivered. That timestamp was calculated when the message was published, based on the `rate` assigned to that message. This meant the delivery schedule was fixed at publish time. If a user later changed the rate configuration, the timestamps of already queued messages could not be updated. As a result:
 
   * Old messages continued to follow the previous rate.
   * New messages followed the updated configuration.
 
-This created inconsistent behavior and made dynamic rate adjustments impossible.
+Let's say that a user wants to publish 1 message every 10 minutes and 6 publishes are made at the same time.  
+In the old flow control, all messages are put into the Redis SortedSet with their delivery times assigned as the scores, as shown below:
 
-**2. Fairness Issues**: Another challenge was fairness in scheduling messages. The scheduling logic was split between Redis (the storage layer) and The QStash server process. Because there was **no global lock ordering message execution**, different workers could make scheduling decisions independently. This occasionally caused unfair ordering of messages, especially under high load.
+![](/blog/qstash/rewrite/oldflowcontrol.png)
 
-**3. Lack of Observability**: The old implementation also made it very difficult to understand what was happening inside the system.There was **no central place where the current `rate` or `parallelism` configuration was stored**. Instead, these values were embedded directly in the messages themselves. Because of this, users had no way to see, what rate was currently applied, how many executions had already occurred in the current rate window, the active rate period and when it started, the current parallel execution countWith the new implementation, all of these metrics are visible.
+Consider that the user wants to change the rate to 1 message every second at this point to quickly drain the messages.  
+And 3 new messages arrive.
 
-We also track **global parallelism**, which is defined by plan limits and enforced through the same flow control mechanism.This visibility helps users understand whether their current plan is sufficient for their workloads.
+![](/blog/qstash/rewrite/oldflowcontrol_change.png)
+
+Since this SortedSet contains messages from all of our users, it is not possible to reallocate them later if the rate changes.  
+Since old messages will stay as is, this means the user has to wait for all the messages to finish for 50 minutes.
+
+And if the user wants to reduce the rate instead—for example, instead of a message every 10 minutes, the user decides to send a message every half an hour—we could not change it again. The new messages are just placed after 50 minutes.
+
+In the new implementation, we decided to use a wait list before putting messages into the final SortedSet. The wait list will be consumed by another timing mechanism according to the latest `period` and will be put into the final SortedSet for delivery.
+
+![](/blog/qstash/rewrite/newflowcontrol.png)
+
+Since the new messages will just be placed on the wait list, we can now consume and deliver them according to the latest `rate` and `period`.
+
+**2. Fairness Issues**: Another challenge was fairness in scheduling messages. The scheduling logic was split between Redis (the storage layer) and the QStash server process. Because there was **no global lock ordering message execution**, different workers could make scheduling decisions independently. This occasionally caused unfair ordering of messages, especially under high load.
+
+Another fairness problem was with the `rate` implementation mentioned above. Remember that we placed 3 new high-rate messages without changing the old ones.
+
+![](/blog/qstash/rewrite/oldflowcontrol_change.png)
+
+These messages will be fired before the existing messages, even though they came later.
+
+But in the case of the new implementation, the wait list works in FIFO (First In, First Out) order; therefore, fairness is preserved.
+
+**3. Lack of Observability**: The old implementation also made it very difficult to understand what was happening inside the system. There was **no central place where the current `rate` or `parallelism` configuration was stored**. Instead, these values were embedded directly in the messages themselves.
+
+Because of this, users had no way to see what rate was currently applied, how many executions had already occurred in the current rate window, the active rate period and when it started, or the current parallel execution count. With the new implementation, all of these metrics are visible.
+
+We also track **global parallelism**, which is defined by plan limits and enforced through the same flow control mechanism. This visibility helps users understand whether their current plan is sufficient for their workloads.
 
 You can explore these metrics in the **Flow Control tab** in the console for both QStash and Workflow.
 
-![FlowControlMetrics](/blog/qstash/flowcontroldark.png)
+![FlowControlMetrics](/blog/qstash/rewrite/flowcontroldark.png)
 
 Relevant documentation:
 
@@ -48,7 +75,9 @@ Relevant documentation:
   * [QStash Rest API](https://upstash.com/docs/qstash/api-refence/flow-control/get-flow-control-key)
   * [Workflow Rest API](https://upstash.com/docs/workflow/rest/flow-control/get)
 
-**4. Limited User Control**: Because the old system stored configuration on each message, users could not change flow control behavior without publishing new messages. This meant there was no way to dynamically adjust the system. The new implementation introduces a **Flow Control Management API** that allows users to override the rate or parallelism dynamically. Users can now **pin** a rate or parallelism value that overrides the values embedded in messages.This enables several new use cases.
+**4. Limited User Control**: Because the old system stored configuration on each message, users could not change flow control behavior without publishing new messages. This meant there was no way to dynamically adjust the system.
+
+The new implementation introduces a **Flow Control Management API** that allows users to override the rate or parallelism dynamically. Users can now **pin** a rate or parallelism value that overrides the values embedded in messages. This enables several new use cases.
 
   - **Temporarily slowing traffic**: If a downstream service experiences load issues, users can temporarily reduce the rate of requests without redeploying their system.
 
@@ -70,8 +99,7 @@ Because the logic now runs on the storage side, Redis only returns messages when
 
 # Lessons From This Rewrite
 
-Rewriting a feature is rarely the first choice. In many cases, incremental improvements are the better path.
-However, when the underlying architecture prevents important improvements, a rewrite can become necessary.
+Rewriting a feature is rarely the first choice. In many cases, incremental improvements are the better path. However, when the underlying architecture prevents important improvements, a rewrite can become necessary.
 
 The new flow control implementation gives us:
 
