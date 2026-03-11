@@ -651,7 +651,11 @@ export default function CompareTable({
             <CompareValue type="number">1</CompareValue>
           </Col>
           <Col plan={showPayg} feature>
-            <CompareValue type="number">10</CompareValue>
+            <CompareValue type="number" after={
+              <Tooltip content="Default quota. Request an increase anytime.">
+                <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+              </Tooltip>
+            }>10</CompareValue>
           </Col>
           <Col plan={showFixed}>
             {selectedFixed250MB && <CompareValue type="number">2</CompareValue>}
@@ -679,7 +683,11 @@ export default function CompareTable({
             <CompareValue type="size">10K</CompareValue>
           </Col>
           <Col plan={showPayg} feature>
-            <CompareValue type="size">1M</CompareValue>
+            <CompareValue type="size" after={
+              <Tooltip content="Default quota. Request an increase anytime.">
+                <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+              </Tooltip>
+            }>1M</CompareValue>
           </Col>
           <Col plan={showFixed}>
             {selectedFixed250MB && <CompareValue type="size">100K</CompareValue>}
