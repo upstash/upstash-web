@@ -1,0 +1,83 @@
+---
+slug: nitpick-pr-reviews-arena
+title: "Nitpick: Turning PR Reviews Into an Arena"
+authors: [ilter]
+tags: [ai, developer-tools, code-review]
+---
+
+Since the first day we started implementing Box backend, it was all excitement for the whole team.
+
+Bringing compute power next to storage, query, search, and index capabilities feels like home. Suddenly, the full picture is there. Any idea I get, I can build end to end in Upstash. It was possible before too, sure. But my laziness usually won over my excitement. Now things have changed.
+
+Recent AI developments made one thing obvious: agents doing work for us is inevitable. And honestly, it should be. It gives ultimate speed and focus in workflow. Because not all the time you can be 100% of you. Some days are long, tiring, full of incident response and context switching. Then you still need to ship the next feature.
+
+And guess what? Bugs are watching us from the edge cases.
+
+I truly believe it is our utmost responsibility as engineers to go to production bug-free. That is one of the most ethical things we should be doing.
+
+## Why I built Nitpick
+
+Agents were already part of my workflow for reviews, even for self-review. First step was always the same: throw the change at multiple agents, compare outputs, validate findings, then manually triage everything.
+
+This helped a lot:
+- Fewer wrong findings
+- Better coverage of "what can go wrong?"
+- A second (third, fourth) brain when mine is tired
+
+But the process itself was repetitive. Ask. Validate. Review. Repeat.
+
+So I asked myself: why am I doing this manually every single time? If only there was a better way.
+
+So I built one. Mostly for myself.
+
+Let me introduce you **Nitpick**.
+
+## What Nitpick does
+
+Nitpick runs a full PR review arena from your terminal.
+
+You give it a GitHub PR, and it spins up multiple reviewer roles in parallel, runs scanners, verifies findings, lets you triage them, and gives you a final verdict with a merge recommendation.
+
+It comes with:
+- 5 AI reviewer roles: `security`, `performance`, `architecture`, `testing`, `dx`
+- 3 automated scanners: `secrets`, `linter`, `dependencies`
+- PR summary and walkthrough before findings
+- A separate verifier agent to confirm/adjust/reject findings
+- Triage flow to accept or dismiss each finding
+- Markdown report with blockers, risk score, suggested commits
+- Optional GitHub PR review comments (`--post-review`)
+
+So instead of "review chaos," you get a structured arena.
+
+## The flow I wanted (and now have)
+
+1. Pick repository and PR interactively (or pass the PR URL directly)
+2. Choose reviewer roles
+3. Run all reviewers and scanners in parallel
+4. Read AI summary of what changed and where risk is concentrated
+5. Triage findings one by one
+6. Generate final verdict: merge / merge with caution / block
+7. Optionally post review comments back to GitHub
+
+That's it. Fast, repeatable, auditable.
+
+## Why this matters to me
+
+Nitpick is not about replacing engineering judgment. It is about protecting it when energy is low and the clock is not on your side.
+
+After a long day, your brain naturally misses edges. Nitpick is the system that keeps looking anyway.
+
+And the best part: it fits exactly how I already work. I was already inviting multiple agents into the process. I just stopped doing it manually and turned it into a tool.
+
+From "I should probably run one more check" to "all checks are already done."
+
+I have also added tiny graphics that make the process a bit more fun than having just lines of strings flowing on your terminal. It does not bring extra functionality, but it brings a sip of fun.
+
+## Closing
+
+If you also believe bugs are watching us from the edge cases, Nitpick is for you.
+
+I built it because I wanted better review quality without adding more mental overhead. If it helps other teams ship safer and faster, even better.
+
+My laziness still exists, by the way.
+Now it just has better tooling.
