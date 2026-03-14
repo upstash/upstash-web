@@ -1,0 +1,121 @@
+---
+title: "Rewriting Flow Control in QStash and Workflow"
+slug: rewrite-flow-control
+authors:
+  - sancar
+tags: [qstash, workflow]
+---
+
+Flow control is one of the core features of **QStash**. It allows developers to control how fast messages are delivered and how many requests can run concurrently using **rate limits** and **parallelism**.
+
+Over time, we realized that our original implementation was limiting what we could offer to users. To address these limitations, we rewrote the flow control system from the ground up.
+
+This post explains why we did the rewrite, what problems we solved, and how the new implementation works.
+
+The original flow control implementation had several structural limitations:
+
+1. It did not adapt immediately to configuration changes.
+2. It had fairness issues when scheduling messages.
+3. It was difficult to provide observability.
+4. It gave limited control to users.
+
+Each of these problems became more visible as usage of QStash grew. Let's visit each of them one by one and see how they are improved.
+
+## 1. Rate Limits Could Not Adapt to Changes
+
+In the old implementation, rate limiting was implemented using a **Redis SortedSet**.
+
+Messages were stored with a **score representing the timestamp** when they should be delivered. That timestamp was calculated when the message was published, based on the `rate` assigned to that message. This meant the delivery schedule was fixed at publish time. If a user later changed the rate configuration, the timestamps of already queued messages could not be updated. As a result:
+
+  * Old messages continued to follow the previous rate.
+  * New messages followed the updated configuration.
+
+Let's say that a user wants to publish 1 message every 10 minutes and 6 publishes are made at the same time.  
+In the old flow control, all messages are put into the Redis SortedSet with their delivery times assigned as the scores, as shown below:
+
+![](/blog/qstash/rewrite/oldflowcontrol.png)
+
+Consider that the user wants to change the rate to 1 message every second at this point to quickly drain the messages.  
+And 3 new messages arrive.
+
+![](/blog/qstash/rewrite/oldflowcontrol_change.png)
+
+Since this SortedSet contains messages from all of our users, it is not easy to reallocate them later if the rate changes.  
+Relocation is technically possible but practically impossible since it requires checking all tasks in the shared sorted set. 
+As result of this, since old messages will stay as is, this means the user has to wait for all the messages to finish for 50 minutes.
+
+And if the user wants to reduce the rate instead—for example, instead of a message every 10 minutes, the user decides to send a message every half an hour—we could not change it again. The new messages are just placed after 50 minutes.
+
+In the new implementation, we decided to use a wait list before putting messages into the final SortedSet. The wait list will be consumed by another timing mechanism according to the latest `period` and will be put into the final SortedSet for delivery.
+
+![](/blog/qstash/rewrite/newflowcontrol.png)
+
+Since the new messages will just be placed on the wait list, we can now consume and deliver them according to the latest `rate` and `period`.
+
+## 2. Fairness Issues
+
+Another challenge was fairness in scheduling messages. The scheduling logic was split between Redis (the storage layer) and the QStash server process. There was multiple parallel threads trying to coordinate the `rate` and `parallelism` limits. This was causing fairness problems where an old task is postponed muliple times and new messages are delivered instead. With the new implementation, old the logic is handled in single place on the Redis via Lua Script which makes the implementation much easier. And there is no threads racing each other to maintain the limits.
+
+Another fairness problem was with the `rate` implementation mentioned above. Remember that we placed 3 new high-rate messages without changing the old ones.
+
+![](/blog/qstash/rewrite/oldflowcontrol_change.png)
+
+These messages will be fired before the existing messages, even though they came later.
+
+But in the case of the new implementation, the wait list works in FIFO (First In, First Out) order; therefore, fairness is preserved.
+
+## 3. Lack of Observability
+
+The old implementation also made it very difficult to understand what was happening inside the system. There was **no central place where the current `rate` or `parallelism` configuration was stored**. Instead, these values were embedded directly in the messages themselves.
+
+Because of this, users had no way to see what rate was currently applied, how many executions had already occurred in the current rate window, the active rate period and when it started, or the current parallel execution count. With the new implementation, all of these metrics are visible.
+
+We also track **global parallelism**, which is defined by plan limits and enforced through the same flow control mechanism. This visibility helps users understand whether their current plan is sufficient for their workloads.
+
+You can explore these metrics in the **Flow Control tab** in the console for both QStash and Workflow.
+
+![FlowControlMetrics](/blog/qstash/rewrite/flowcontroldark.png)
+
+Relevant documentation:
+
+  * [Flow Control Management API](https://upstash.com/docs/qstash/features/flowcontrol#management-api)
+  * [QStash Rest API](https://upstash.com/docs/qstash/api-refence/flow-control/get-flow-control-key)
+  * [Workflow Rest API](https://upstash.com/docs/workflow/rest/flow-control/get)
+
+## 4. Limited User Control
+
+Because the old system stored configuration on each message, users could not change flow control behavior without publishing new messages. This meant there was no way to dynamically adjust the system.
+
+The new implementation introduces a **Flow Control Management API** that allows users to override the rate or parallelism dynamically. Users can now **pin** a rate or parallelism value that overrides the values embedded in messages. This enables several new use cases.
+
+  - **Temporarily slowing traffic**: If a downstream service experiences load issues, users can temporarily reduce the rate of requests without redeploying their system.
+
+  - **Increasing throughput dynamically**: Sometimes users discover that their services can handle more traffic than originally configured. Instead of redeploying everything, they can increase rate or parallelism directly from the console or API.
+
+  - **Pausing and resuming traffic**: With dynamic control available, it became straightforward to add **pause and resume** functionality. Users can temporarily pause message delivery and resume it later without losing queued messages.
+
+Documentation: [Management API for Flow Control](https://upstash.com/docs/qstash/features/flowcontrol#management-api)
+
+## How We Rebuilt Flow Control
+
+The main issue with the previous design was that most scheduling decisions were made inside the QStash server process. The server continuously fetched messages from Redis, decided whether they were allowed to run, and delayed them again if they were not ready. This resulted in many small round trips between QStash and Redis, unnecessary bandwidth usage, and fairness issues since decisions were made outside the storage layer.
+
+In the new implementation, we moved the scheduling logic directly into Redis using Lua scripts. This allows all decisions to be executed atomically under the same lock, ensuring fair ordering and eliminating race conditions between workers.
+
+We also unified the implementation of **rate limits** and **parallelism**. Instead of maintaining separate mechanisms, both are now tracked through the same waitlist structure stored in Redis. This simplified the design and made the behavior consistent across different flow control configurations.
+
+Because the logic now runs on the storage side, Redis only returns messages when they are actually ready to be delivered. QStash no longer needs to fetch messages just to postpone them again. This reduces network overhead while improving fairness and performance.
+
+## Lessons From This Rewrite
+
+Rewriting a feature is rarely the first choice. In many cases, incremental improvements are the better path. However, when the underlying architecture prevents important improvements, a rewrite can become necessary.
+
+The new flow control implementation gives us:
+
+* Better fairness
+* Strong observability
+* Dynamic user control
+* A simpler and more extensible architecture
+
+It also makes it much easier for us to add new features in the future. We have already pans for [Debounce](https://github.com/orgs/upstash/discussions/158) and [Priority](https://github.com/orgs/upstash/discussions/183)
+If you have ideas or feature requests related to flow control, please reach out via [Discord](https://discord.gg/jUxUYE4nEB)
