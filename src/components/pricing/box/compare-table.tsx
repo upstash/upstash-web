@@ -234,7 +234,7 @@ export default function CompareTable() {
             <CompareValue>30 minutes</CompareValue>
           </Col>
           <Col plan={showPayg} feature>
-            <CompareValue>30 minutes</CompareValue>
+            <CompareValue>1 hour</CompareValue>
           </Col>
           <Col plan={showEnterprise}>
             <CompareValue>Custom</CompareValue>
