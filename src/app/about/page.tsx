@@ -10,6 +10,9 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "About",
   description: "We manage everything for you.",
+  alternates: {
+    canonical: "/about",
+  },
 };
 
 export default function HomePage() {

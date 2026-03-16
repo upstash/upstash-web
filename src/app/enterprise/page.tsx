@@ -9,6 +9,9 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Enterprise",
   description: "Unlock the full potential of Upstash for your business.",
+  alternates: {
+    canonical: "/enterprise",
+  },
 };
 
 export default function HomePage() {

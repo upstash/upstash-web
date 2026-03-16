@@ -15,6 +15,9 @@ export const metadata: Metadata = {
     template: `%s | ${title}`,
   },
   description,
+  alternates: {
+    canonical: "/customers",
+  },
 };
 
 export default function CustomersLayout({ children }: { children: ReactNode }) {

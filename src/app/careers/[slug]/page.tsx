@@ -35,6 +35,9 @@ export async function generateMetadata({
   return {
     title,
     description,
+    alternates: {
+      canonical: `/careers/${job.slug}`,
+    },
     openGraph: {
       type: "website",
       locale: "en_US",

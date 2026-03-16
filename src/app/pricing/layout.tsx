@@ -9,6 +9,9 @@ import { ReactNode } from "react";
 export const metadata: Metadata = {
   title: "Pricing",
   description: "We manage everything for you.",
+  alternates: {
+    canonical: "/pricing",
+  },
 };
 
 export default function PricingLayout({ children }: { children: ReactNode }) {

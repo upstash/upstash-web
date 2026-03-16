@@ -26,6 +26,9 @@ export async function generateMetadata({
 }) {
   return {
     title: `Tag: ${params.tag}`,
+    alternates: {
+      canonical: `/blog/tag/${params.tag}`,
+    },
   };
 }
 

@@ -26,6 +26,9 @@ export async function generateMetadata({
 }) {
   return {
     title: `${params.author}'s Posts`,
+    alternates: {
+      canonical: `/blog/author/${params.author}`,
+    },
   };
 }
 

@@ -8,6 +8,9 @@ import { HTMLAttributes } from "react";
 
 export const metadata: Metadata = {
   title: "Brand Assets",
+  alternates: {
+    canonical: "/brand",
+  },
 };
 
 export default function HomePage() {
