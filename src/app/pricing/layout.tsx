@@ -8,7 +8,7 @@ import { ReactNode } from "react";
 
 export const metadata: Metadata = {
   title: "Pricing",
-  description: "We manage everything for you.",
+  description: "Upstash pricing. Pay-per-request serverless Redis, Vector, QStash, Workflow and Box. Start free, scale with usage, or choose fixed plans.",
   alternates: {
     canonical: "/pricing",
   },
