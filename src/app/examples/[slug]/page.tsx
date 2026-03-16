@@ -46,10 +46,23 @@ export async function generateMetadata({
     };
   }
 
+  const description = `${example.title} — an Upstash example using ${example.products.join(", ")}${example.stack.length ? ` with ${example.stack.join(", ")}` : ""}. View source code and get started.`;
+
   return {
     title: example.title,
+    description,
     alternates: {
       canonical: `/examples/${example.slug}`,
+    },
+    openGraph: {
+      title: example.title,
+      description,
+      url: `/examples/${example.slug}`,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: example.title,
+      description,
     },
   };
 }
