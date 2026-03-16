@@ -1,6 +1,7 @@
 import Container from "@/components/container";
 import { Mdx } from "@/components/post/mdx";
 import { capitalize } from "@/utils/capitalize";
+import { SITE_URL } from "@/utils/const";
 import type { Customer } from "@content";
 import { allCustomers } from "@content";
 import Image from "next/image";
@@ -82,18 +83,18 @@ export async function generateMetadata({
   }
   const title = capitalize(customer.company_name);
   const description = customer.highlight;
-  const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : "http://localhost:3000";
 
   return {
     title,
     description,
+    alternates: {
+      canonical: `/customers/${customer.slug}`,
+    },
     openGraph: {
       type: "article",
       title,
       description,
-      url: `${baseUrl}/customers/${customer.slug}`,
+      url: `${SITE_URL}/customers/${customer.slug}`,
     },
 
     twitter: {
