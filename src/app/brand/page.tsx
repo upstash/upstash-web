@@ -6,10 +6,26 @@ import cx from "@/utils/cx";
 import { Metadata } from "next";
 import { HTMLAttributes } from "react";
 
+const title = "Brand Assets";
+const description =
+  "Download official Upstash logos, icons, and brand assets for use in your projects, articles, and integrations.";
+
 export const metadata: Metadata = {
-  title: "Brand Assets",
+  title,
+  description,
   alternates: {
     canonical: "/brand",
+  },
+  openGraph: {
+    type: "website",
+    title,
+    description,
+    url: "/brand",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
   },
 };
 

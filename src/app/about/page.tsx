@@ -7,11 +7,26 @@ import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
 import { Metadata } from "next";
 
+const title = "About";
+const description =
+  "Learn about Upstash — the serverless data platform behind Redis, Vector, QStash, and Workflow. Meet the team and investors building the future of serverless infrastructure.";
+
 export const metadata: Metadata = {
-  title: "About",
-  description: "We manage everything for you.",
+  title,
+  description,
   alternates: {
     canonical: "/about",
+  },
+  openGraph: {
+    type: "website",
+    title,
+    description,
+    url: "/about",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
   },
 };
 
