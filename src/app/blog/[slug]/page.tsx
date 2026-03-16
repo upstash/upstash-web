@@ -6,6 +6,7 @@ import PostHeader from "@/components/post/header";
 import { Mdx } from "@/components/post/mdx";
 import OtherPostCard from "@/components/post/other-post";
 import PostTags from "@/components/post/tags";
+import { SITE_URL } from "@/utils/const";
 // import { generateBlogSchema } from "@/utils/structured-schema-generators";
 import type { Post } from "@content";
 import { allPosts } from "@content";
@@ -126,18 +127,17 @@ export async function generateMetadata({
   const description =
     post.description ||
     "Articles and tutorials on serverless technologies from Upstash and community";
-  const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : "http://localhost:3000";
-
   return {
     title,
     description,
+    alternates: {
+      canonical: `/blog/${post.slug}`,
+    },
     openGraph: {
       type: "article",
       title,
       description,
-      url: `${baseUrl}/blog/${post.slug}`,
+      url: `${SITE_URL}/blog/${post.slug}`,
     },
 
     twitter: {
