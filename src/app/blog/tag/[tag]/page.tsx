@@ -24,8 +24,23 @@ export async function generateMetadata({
 }: {
   params: Props["params"];
 }) {
+  const description = `Browse all Upstash blog posts about ${params.tag}. Tutorials, guides, and articles on ${params.tag} for serverless developers.`;
   return {
     title: `Tag: ${params.tag}`,
+    description,
+    alternates: {
+      canonical: `/blog/tag/${params.tag}`,
+    },
+    openGraph: {
+      title: `${params.tag} Articles | Upstash Blog`,
+      description,
+      url: `/blog/tag/${params.tag}`,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${params.tag} Articles | Upstash Blog`,
+      description,
+    },
   };
 }
 

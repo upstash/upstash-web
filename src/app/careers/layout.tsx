@@ -14,6 +14,9 @@ export const metadata: Metadata = {
     template: `%s | ${title}`,
   },
   description,
+  alternates: {
+    canonical: "/careers",
+  },
   openGraph: {
     type: "website",
     locale: "en_US",

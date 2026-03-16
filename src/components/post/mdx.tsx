@@ -76,7 +76,7 @@ function table(props: ComponentProps<"table">) {
 }
 
 function img(props: ComponentProps<"img">) {
-  return <img className="mx-auto block rounded-xl" alt="" {...props} />;
+  return <img className="mx-auto block rounded-xl" {...props} alt={props.alt || ""} />;
 }
 
 function FullWidth(props: ComponentProps<"div">) {

@@ -14,6 +14,9 @@ export const metadata: Metadata = {
     template: `%s | ${title}`,
   },
   description,
+  alternates: {
+    canonical: "/examples",
+  },
 };
 
 export default function ExamplesLayout({ children }: { children: ReactNode }) {

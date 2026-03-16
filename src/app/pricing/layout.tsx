@@ -6,9 +6,27 @@ import PageHeaderTitle from "@/components/page-header-title";
 import { Metadata } from "next";
 import { ReactNode } from "react";
 
+const title = "Pricing";
+const description =
+  "Upstash pricing. Pay-per-request serverless Redis, Vector, QStash, Workflow and Box. Start free, scale with usage, or choose fixed plans.";
+
 export const metadata: Metadata = {
-  title: "Pricing",
-  description: "We manage everything for you.",
+  title,
+  description,
+  alternates: {
+    canonical: "/pricing",
+  },
+  openGraph: {
+    type: "website",
+    title,
+    description,
+    url: "/pricing",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+  },
 };
 
 export default function PricingLayout({ children }: { children: ReactNode }) {

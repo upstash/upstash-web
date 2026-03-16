@@ -53,7 +53,7 @@ export default async function TwImage({
           </div>
 
           <footer tw="absolute bottom-0 left-[70px] right-[70px] flex items-center justify-center bg-white text-gray-600 rounded-t-[30px]">
-            <p tw="text-3xl my-4 leading-[1] ">blog.upstash.com</p>
+            <p tw="text-3xl my-4 leading-[1] ">upstash.com/blog</p>
           </footer>
         </div>
       ),

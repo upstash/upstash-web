@@ -12,6 +12,9 @@ const description =
 export const metadata: Metadata = {
   title: "Careers",
   description,
+  alternates: {
+    canonical: "/careers",
+  },
 };
 
 export default function HomePage() {

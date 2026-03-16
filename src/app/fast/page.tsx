@@ -13,6 +13,9 @@ export const metadata: Metadata = {
   title: "Fast",
   description:
     "An AWS Lambda function from different regions reads from Upstash Redis and records latency.",
+  alternates: {
+    canonical: "/fast",
+  },
 };
 
 export default function HomePage() {

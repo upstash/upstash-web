@@ -6,8 +6,6 @@ import PageHeaderDesc from "../../components/page-header-desc";
 import PageHeaderTitle from "../../components/page-header-title";
 import { getData, type Example } from "./get-data";
 
-// TODO: set canonical url
-
 // this page is statically generated and cached for 1 minute
 export const revalidate = 60;
 
