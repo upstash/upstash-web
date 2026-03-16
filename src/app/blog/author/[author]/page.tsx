@@ -24,10 +24,22 @@ export async function generateMetadata({
 }: {
   params: Props["params"];
 }) {
+  const description = `Read all blog posts by ${params.author} on the Upstash blog. Tutorials, guides, and insights on serverless technologies.`;
   return {
     title: `${params.author}'s Posts`,
+    description,
     alternates: {
       canonical: `/blog/author/${params.author}`,
+    },
+    openGraph: {
+      title: `${params.author}'s Posts | Upstash Blog`,
+      description,
+      url: `/blog/author/${params.author}`,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${params.author}'s Posts | Upstash Blog`,
+      description,
     },
   };
 }
