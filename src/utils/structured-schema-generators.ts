@@ -1,25 +1,29 @@
 export const generateBlogSchema = ({
-  blogName,
-  blogDescription,
+  headline,
+  description,
   keywords,
   authorName,
   authorUrl,
   datePublished,
+  url,
+  image,
 }: {
-  blogName: string;
-  blogDescription: string;
+  headline: string;
+  description: string;
   keywords: string[];
   authorName: string;
   authorUrl: string;
   datePublished: string;
+  url: string;
+  image?: string;
 }) => {
-  const jsonLdBlog = {
+  const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
-    headline: blogName,
-    description: blogDescription,
-    keywords: keywords.join(" "),
-    datePublished: datePublished,
+    headline,
+    description,
+    keywords: keywords.join(", "),
+    datePublished,
     author: [
       {
         "@type": "Person",
@@ -27,9 +31,23 @@ export const generateBlogSchema = ({
         url: authorUrl,
       },
     ],
+    publisher: {
+      "@type": "Organization",
+      name: "Upstash",
+      url: "https://upstash.com",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://upstash.com/icons/favicon-32x32.png",
+      },
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": url,
+    },
+    ...(image ? { image } : {}),
   };
 
-  return JSON.stringify(jsonLdBlog);
+  return JSON.stringify(jsonLd);
 };
 
 export const generateFaqSchema = ({

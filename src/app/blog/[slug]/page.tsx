@@ -7,7 +7,7 @@ import { Mdx } from "@/components/post/mdx";
 import OtherPostCard from "@/components/post/other-post";
 import PostTags from "@/components/post/tags";
 import { SITE_URL } from "@/utils/const";
-// import { generateBlogSchema } from "@/utils/structured-schema-generators";
+import { generateBlogSchema } from "@/utils/structured-schema-generators";
 import type { Post } from "@content";
 import { allPosts } from "@content";
 import { notFound } from "next/navigation";
@@ -55,35 +55,36 @@ export default async function BlogPage({ params }: Props) {
   const indexOfPost = allPosts.findIndex((post) => post.slug === slug);
   const post = allPosts[indexOfPost];
 
-  // const dateString = post?.date || new Date();
-
-  // const isoDatePublished = new Date(dateString).toISOString();
-
-  // const structuredBlogSchema = generateBlogSchema({
-  //   blogName: post.title || "Upstash Blog",
-  //   blogDescription:
-  //     post.description ||
-  //     "Articles and tutorials on serverless technologies from Upstash and community",
-  //   keywords: post.tags,
-  //   authorName: post.authorsData[0].name,
-  //   authorUrl: post.authorsData[0].url || "",
-  //   datePublished: isoDatePublished,
-  // });
-
   if (!post) {
     notFound();
   }
+
+  const isoDatePublished = new Date(post.date).toISOString();
+  const postUrl = `${SITE_URL}/blog/${post.slug}`;
+
+  const structuredBlogSchema = generateBlogSchema({
+    headline: post.title || "Upstash Blog",
+    description:
+      post.description ||
+      "Articles and tutorials on serverless technologies from Upstash and community",
+    keywords: post.tags,
+    authorName: post.authorsData[0].name,
+    authorUrl: post.authorsData[0].url || "",
+    datePublished: isoDatePublished,
+    url: postUrl,
+    image: `${SITE_URL}/blog/${post.slug}/opengraph-image`,
+  });
 
   const { nextPost, prevPost } = getAdjacentPosts(allPosts, indexOfPost);
 
   return (
     <main className="relative z-0">
-      {/*<script*/}
-      {/*  type="application/ld+json"*/}
-      {/*  dangerouslySetInnerHTML={{*/}
-      {/*    __html: structuredBlogSchema,*/}
-      {/*  }}*/}
-      {/*/>*/}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: structuredBlogSchema,
+        }}
+      />
       <Bg />
 
       <article>
