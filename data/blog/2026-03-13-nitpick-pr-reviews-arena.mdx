@@ -1,36 +1,36 @@
 ---
 slug: nitpick-pr-reviews-arena
-title: "Nitpick: Turning PR Reviews Into an Arena"
+title: "I Built 5 AI Agents to Review My PRs"
 authors: [ilter]
 tags: [ai, developer-tools, code-review]
 ---
 
-Since the first day we started implementing Box backend, it was all excitement for the whole team.
+We recently launched [Upstash Box](/blog/upstash-box) — a cloud computer for your agents with durable storage, serverless scaling, and usage-based pricing. Since day one of building the backend, the team has been pretty fired up about it.
 
-Bringing compute power next to storage, query, search, and index capabilities feels like home. Suddenly, the full picture is there. Any idea I get, I can build end to end in Upstash. It was possible before too, sure. But my laziness usually won over my excitement. Now things have changed.
+Having Box changed how fast I can prototype. I can go from idea to working multi-agent flow much faster now. I could do that before too, but honestly I would postpone half of them.
 
-Recent AI developments made one thing obvious: agents doing work for us is inevitable. And honestly, it should be. It gives ultimate speed and focus in workflow. Because not all the time you can be 100% of you. Some days are long, tiring, full of incident response and context switching. Then you still need to ship the next feature.
+I don't think agents are magic, but they are very useful on tired days. Some days are long, full of incidents and context switching, and you still need to ship.
 
 And guess what? Bugs are watching us from the edge cases.
 
-I truly believe it is our utmost responsibility as engineers to go to production bug-free. That is one of the most ethical things we should be doing.
+I care a lot about not shipping avoidable bugs. The problem is that after a long day, I miss things I normally would catch.
+
+So I wrote my own PR review bot and called it Nitpick.
 
 ## Why I built Nitpick
 
-Agents were already part of my workflow for reviews, even for self-review. First step was always the same: throw the change at multiple agents, compare outputs, validate findings, then manually triage everything.
+Agents were already part of my workflow for reviews, even for self-review. The first step was always the same: throw the change at multiple agents, compare outputs, validate findings, then manually triage everything.
 
-This helped a lot:
+This already helped a lot:
 - Fewer wrong findings
 - Better coverage of "what can go wrong?"
 - A second (third, fourth) brain when mine is tired
 
-But the process itself was repetitive. Ask. Validate. Review. Repeat.
+But the process itself was the problem. I was doing the same thing every time and it was boring me to death.
 
-So I asked myself: why am I doing this manually every single time? If only there was a better way.
+So I automated it. Mostly for myself.
 
-So I built one. Mostly for myself.
-
-Let me introduce you [**Nitpick**](https://github.com/ilterkavlak/nitpick).
+Let me introduce you to [**Nitpick**](https://github.com/ilterkavlak/nitpick).
 
 ## What Nitpick does
 
@@ -47,7 +47,7 @@ It comes with:
 - Markdown report with blockers, risk score, suggested commits
 - Optional GitHub PR review comments (`--post-review`)
 
-So instead of "review chaos," you get a structured arena.
+So instead of review chaos, you get a repeatable flow.
 
 ## The flow I wanted (and now have)
 
@@ -59,25 +59,35 @@ So instead of "review chaos," you get a structured arena.
 6. Generate final verdict: merge / merge with caution / block
 7. Optionally post review comments back to GitHub
 
-That's it. Fast, repeatable, auditable.
+That is basically it. Fast and repeatable.
+
+## How Nitpick uses Upstash Box
+
+The hard part of running five reviewers at once is not the AI calls. It is giving each one its own isolated environment where it can clone the repo, read files, run linters, and do its thing without stepping on the others. That is what Box handles.
+
+Each reviewer role gets its own Box. The security reviewer is digging through auth flows in one container while the performance reviewer is profiling hot paths in another. They do not share state, they do not block each other, and when they are done, their findings get collected and passed to the verifier.
+
+The nice part is I did not have to think about any of the infra. Box is serverless — containers spin up when Nitpick needs them and go away when the review is done. I do not manage instances, I do not pay for idle time.
+
+Nitpick is stateless between runs for now. Each review starts fresh, produces a markdown report, and optionally posts comments back to GitHub. But Box supports durable storage, so persisting review history across runs is something I want to explore next.
 
 ## Why this matters to me
 
-Nitpick is not about replacing engineering judgment. It is about protecting it when energy is low and the clock is not on your side.
+Nitpick is not about replacing engineering judgment. It is about backing me up when energy is low and I am rushing.
 
-After a long day, your brain naturally misses edges. Nitpick is the system that keeps looking anyway.
+After a long day, your brain misses edges. Nitpick keeps looking anyway.
 
 And the best part: it fits exactly how I already work. I was already inviting multiple agents into the process. I just stopped doing it manually and turned it into a tool.
 
-From "I should probably run one more check" to "all checks are already done."
+Now the checks are done before I even think about running them.
 
-I have also added tiny graphics that make the process a bit more fun than having just lines of strings flowing on your terminal. It does not bring extra functionality, but it brings a sip of fun.
+I also added tiny graphics to make the process more fun than watching lines of text flow in your terminal. They do not add extra functionality, but they add a bit of joy.
 
 ## Closing
 
-If you also believe bugs are watching us from the edge cases, Nitpick is for you.
+If you also feel bugs are hiding in edge cases, Nitpick might be useful for you.
 
 I built it because I wanted better review quality without adding more mental overhead. If it helps other teams ship safer and faster, even better.
 
-My laziness still exists, by the way.
-Now it just has better tooling.
+My laziness still exists.
+Now it just has better tooling around it.
