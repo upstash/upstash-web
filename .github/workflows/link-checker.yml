@@ -1,0 +1,24 @@
+name: Link Checker
+
+on:
+  pull_request:
+  schedule:
+    - cron: '0 2 * * *'
+
+jobs:
+  check-links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: lycheeverse/lychee-action@v2
+        with:
+          args: --no-progress --exclude 'http://localhost' '**/*.ts' '**/*.tsx' '**/*.mdx'
+          fail: true
+
+      - name: Notify Slack on failure
+        if: failure() && github.event_name == 'schedule'
+        run: |
+          curl -X POST ${{ secrets.SLACK_WEBHOOK_URL }} \
+            -H 'Content-type: application/json' \
+            -d '{"text": "🔴 Dead links detected in nightly link check. <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View run>"}'
