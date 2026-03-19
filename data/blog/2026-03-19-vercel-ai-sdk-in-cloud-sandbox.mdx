@@ -216,15 +216,12 @@ export async function POST(req: Request) {
 
 Each request runs in the same isolated sandbox, and you have full control over what the agent sees and does. Pass in tools, context, files, whatever your agent needs.
 
-<Note>
-  A note on security: In this example, the user's prompt is interpolated
-  directly into a shell string. I think this example gets the point across well,
-  but in production you'll want to avoid this. Instead, we can write the prompt to
-  Upstash Redis and read it from inside the sandbox (that way user input never
-  touches the shell).
-</Note>
-
 Of course, you can also create a snapshot of the base environment with all packages already installed, and spin up a new box from it for every request. That way, you'd get a clear filesystem every time.
+
+A note on security:
+
+1. For the dynamic prompt, the user's prompt is interpolated into a shell string. I think this example gets the point across well, but in production we want to avoid this. Instead, we can write the prompt to Upstash Redis and read it from inside the sandbox.
+2. In this example, the Anthropic key is passed as an environment variable, which means code running inside the sandbox can read it. Upstash Box hides API keys for built-in agents (Claude Code, Codex), but custom agent keys set via `env` are currently accessible. We're working on a mechanism to create hidden credentials.
 
 ---
 
