@@ -214,6 +214,14 @@ export async function POST(req: Request) {
 }
 ```
 
+<Note>
+  A note on security: In this example, the user's prompt is interpolated
+  directly into a shell string. I think this example gets the point across well,
+  but in production you'll want to avoid this. Instead, we can write the prompt to
+  Upstash Redis and read it from inside the sandbox (that way user input never
+  touches the shell).
+</Note>
+
 Each request runs in the same isolated sandbox, and you have full control over what the agent sees and does. Pass in tools, context, files, whatever your agent needs.
 
 Of course, you can also create a snapshot of the base environment with all packages already installed, and spin up a new box from it for every request. That way, you'd get a clear filesystem every time.
