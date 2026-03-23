@@ -34,7 +34,7 @@ You can't just call the agent in a single endpoint and wait for completion. You 
 
 Polling is wasteful. The webhook approach is much cleaner, and both Box and Workflow support it natively:
 
-```typescript title:"pages/api/workflow.ts"
+```typescript title:"api/workflow/route.ts"
 import { serve } from "@upstash/workflow/nextjs";
 import { Box } from "@upstash/box";
 
@@ -73,7 +73,7 @@ Another pattern I used a lot: running multiple agents in parallel and combining 
 
 Going back to the PR demo — we needed to generate client-side code for TypeScript, Go, and Python SDKs. These are independent tasks, so there's no reason to run them sequentially. Each agent gets its own Box instance with the relevant repo cloned:
 
-```typescript
+```typescript title:"api/workflow/route.ts"
 import { serve } from "@upstash/workflow/nextjs";
 import { Box } from "@upstash/box";
 
@@ -119,7 +119,7 @@ Sometimes you need a human to review or approve before the pipeline continues. F
 
 With a traditional endpoint, this is fragile — you're exposed to timeouts and errors the entire time you're waiting for user input. With Workflow, you can pause execution on an event and resume when the user responds:
 
-```typescript
+```typescript title:"api/workflow/route.ts"
 import { serve } from "@upstash/workflow/nextjs";
 import { Box } from "@upstash/box";
 
@@ -150,7 +150,7 @@ When you're running many Box instances across parallel workflows with human-in-t
 
 Workflow makes this straightforward. For success, you add a final step to delete the Box. For failures, you use the failure callback:
 
-```typescript
+```typescript title:"api/workflow/route.ts"
 import { serve } from "@upstash/workflow/nextjs";
 import { Box } from "@upstash/box";
 
@@ -160,14 +160,14 @@ export const { POST } = serve(
 
     await context.run("delete-box", async () => {
       const box = await Box.get(boxId);
-      await Box.delete()
+      await box.delete()
     });
   },
   {
     failureFunction: async ({ context }) => {
       const { boxId } = context.requestPayload;
       const box = await Box.get(boxId);
-      await Box.delete()
+      await box.delete()
     },
   }
 );
