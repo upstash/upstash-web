@@ -1,0 +1,187 @@
+---
+title: "Box + Workflow: Patterns for Orchestrating Async Agents"
+slug: box-workflow-orchestrate-agents
+authors: [mehmettokgoz]
+tags: [box, workflow]
+---
+
+If you've been following our updates, you know we recently launched [Upstash Box](/docs/box) — an isolated execution environment with built-in capabilities for running AI agents. It takes the infrastructure headache out of building agentic applications so you can focus on the actual product.
+
+While building demo applications to test Upstash Box before the launch, I kept running into the same problem: orchestration. I was spinning up multiple agents in my pipelines. Some tasks ran longer than serverless timeouts allowed, and I often needed to run boxes in parallel and combine results.
+
+The answer was [Upstash Workflow](/docs/workflow). The two products turned out to be a natural fit.
+
+In this post, I'll walk through the patterns I found most useful when combining Box with Workflow.
+
+While I'm using Upstash products here, these patterns apply to any agent orchestration scenario — so even if you're using a different sandbox product or orchestration engine, this should be helpful.
+
+## 1. Long-Running Async Tasks
+
+One of the first challenges I hit was running tasks that exceeded serverless timeouts. 
+
+For example, I built a demo app that generates client-side changes based on a server-side PR. The flow is: an agent analyzes the PR and summarizes the changes, then another agent generates the corresponding client-side SDK code.
+
+<Note type="note">
+This is a real pain point we've been struggling with. We tried alternative approaches like OpenAPI but they didn't fit our needs. This project was the result of that brainstorming.
+</Note>
+
+Both steps can take a while, especially for large PRs — easily longer than any serverless function allows.
+
+You can't just call the agent in a single endpoint and wait for completion. You have two options:
+
+- Poll the result periodically until it's done.
+- Pass a webhook callback URL and let the agent notify you when it finishes.
+
+Polling is wasteful. The webhook approach is much cleaner, and both Box and Workflow support it natively:
+
+```typescript title="api/workflow/route.ts"
+import { serve } from "@upstash/workflow/nextjs";
+import { Box } from "@upstash/box";
+
+export const { POST } = serve(
+  async (context) => {
+    // ...
+
+    const webhook = await context.createWebhook("sdk-agent-webhook-step");
+
+    await context.run("generate-sdk-code", async () => {
+      const box = await Box.get(boxId);
+
+      await box.agent.run({
+        prompt: ...,
+        webhook: { url: webhook.webhookUrl },
+      });
+    });
+
+    const { request } = await context.waitForWebhook("wait-agent", webhook, "1h");
+    const { output } = await request.json();
+
+    // ...
+  }
+);
+```
+
+With this pattern, the task can take minutes or even hours. While the workflow waits on the callback, there's no active serverless execution — so you're not paying for idle time. When the agent finishes and hits the webhook, the workflow resumes automatically.
+
+<Note type="tip">
+A useful tip: you can instruct the agent to persist its output to a file in Box storage, then read the file directly instead of parsing the webhook payload. This is especially handy when the output is large.
+</Note>
+
+## 2. Parallel Agents with Combined Results
+
+Another pattern I used a lot: running multiple agents in parallel and combining their outputs.
+
+Going back to the PR demo — we needed to generate client-side code for TypeScript, Go, and Python SDKs. These are independent tasks, so there's no reason to run them sequentially. Each agent gets its own Box instance with the relevant repo cloned:
+
+```typescript title="api/workflow/route.ts"
+import { serve } from "@upstash/workflow/nextjs";
+import { Box } from "@upstash/box";
+
+export const { POST } = serve(
+  async (context) => {
+    // ...
+
+    const pythonWebhook = await context.createWebhook("python-webhook");
+    const golangWebhook = await context.createWebhook("golang-webhook");
+    const typescriptWebhook = await context.createWebhook("typescript-webhook");
+
+    await context.run("generate-python-client", async () => {
+      // ...
+      await pythonBox.agent.run({...});
+    });
+
+    await context.run("generate-golang-client", async () => {
+      // ...
+      await golangBox.agent.run({...});
+    });
+
+    await context.run("generate-typescript-client", async () => {
+      // ...
+      await typescriptBox.agent.run({...});
+    });
+
+    await Promise.all([
+      context.waitForWebhook("wait-python-agent", pythonWebhook, "1h"),
+      context.waitForWebhook("wait-golang-agent", golangWebhook, "1h"),
+      context.waitForWebhook("wait-typescript-agent", typescriptWebhook, "1h")
+    ])
+
+    // ...
+  }
+);
+```
+
+The workflow kicks off three Box instances in parallel, each with its own execution lifecycle. It only continues once all three have completed. Box's Git integration makes cloning and working with repos straightforward.
+
+## 3. Human-in-the-Loop Agents
+
+Sometimes you need a human to review or approve before the pipeline continues. For example, a user might want to review generated code before it gets deployed.
+
+With a traditional endpoint, this is fragile — you're exposed to timeouts and errors the entire time you're waiting for user input. With Workflow, you can pause execution on an event and resume when the user responds:
+
+```typescript title="api/workflow/route.ts"
+import { serve } from "@upstash/workflow/nextjs";
+import { Box } from "@upstash/box";
+
+export const { POST } = serve(
+  async (context) => {
+    // ...
+
+    const { eventData } = await context.waitForEvent<ApproveEvent>("ask-user-deployment", `deploy-${appId}`);
+
+    if (eventData.approved) {
+      await context.run("deploy-app", async () => {
+        await box.exec.command("vercel deploy")
+      });
+    }
+
+    // ...
+  }
+);
+```
+
+I used this in another demo — a v0-style app where the agent generates code and deploys it to Vercel, but only if the user approves. If the user doesn't approve, they can send feedback as part of the event payload, and the agent adjusts accordingly.
+
+Same as before — no active execution while waiting.
+
+## 4. Box Lifecycle Management
+
+When you're running many Box instances across parallel workflows with human-in-the-loop steps, cleaning up completed instances gets tricky fast. In a simple synchronous flow, you just delete the Box when you're done. But with async pipelines and long-running tasks, you need reliable cleanup regardless of whether the pipeline succeeded or failed.
+
+Workflow makes this straightforward. For success, you add a final step to delete the Box. For failures, you use the failure callback:
+
+```typescript title="api/workflow/route.ts"
+import { serve } from "@upstash/workflow/nextjs";
+import { Box } from "@upstash/box";
+
+export const { POST } = serve(
+  async (context) => {
+    // ...
+
+    await context.run("delete-box", async () => {
+      const box = await Box.get(boxId);
+      await box.delete()
+    });
+  },
+  {
+    failureFunction: async ({ context }) => {
+      const { boxId } = context.requestPayload;
+      const box = await Box.get(boxId);
+      await box.delete()
+    },
+  }
+);
+```
+
+This guarantees cleanup in every case — no leaked instances, no manual intervention needed.
+
+
+## Wrapping Up
+
+The agentic application space is moving fast, and new use cases keep emerging. As an infrastructure company focused on developer experience, we always dogfood our own products to understand the real pain points firsthand.
+
+In my experience, sandboxed execution and workflow orchestration are a natural pairing. Box handles the hard parts of running and scaling agents, and Workflow handles the coordination — async tasks, parallelism, human-in-the-loop flows, and reliable cleanup. These were real problems I ran into, and combining the two products was consistently the answer.
+
+I think we'll see this pattern become more common across the industry, not just from us. I'm proud that Upstash offers both products together — giving developers a complete solution for building and orchestrating agentic applications.
+
+If you have feedback or want to chat about these patterns, feel free to reach out [support@upstash.com](mailto:support@upstash.com).
