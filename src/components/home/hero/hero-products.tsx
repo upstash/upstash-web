@@ -1,6 +1,6 @@
 import IconQStash from "@/components/icon-qstash";
 import IconRedis from "@/components/icon-redis";
-import IconSearch from "@/components/icon-search";
+import IconBox from "@/components/icon-box";
 import IconVector from "@/components/icon-vector";
 import IconWorkflow from "@/components/icon-workflow";
 import cx from "@/utils/cx";
@@ -91,19 +91,19 @@ export default function HomeHeroProducts({
       </HomeHeroProductTab>
 
       <HomeHeroProductTab
-        active={activeProduct === Product.SEARCH}
+        active={activeProduct === Product.BOX}
         onClick={() => {
-          setActiveProduct(Product.SEARCH);
+          setActiveProduct(Product.BOX);
         }}
-        className={cx(activeProduct === Product.SEARCH && "text-amber-400")}
+        className={cx(activeProduct === Product.BOX && "text-emerald-500")}
       >
-        <IconSearch
+        <IconBox
           className={cx(
             "hidden w-5 shrink-0 sm:block md:w-6",
-            activeProduct === Product.SEARCH && "block",
+            activeProduct === Product.BOX && "block",
           )}
         />
-        <span>Search</span>
+        <span>Box</span>
       </HomeHeroProductTab>
     </>
   );
