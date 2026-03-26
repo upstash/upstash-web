@@ -4,6 +4,7 @@ export enum Product {
   QSTASH = "QStash",
   WORKFLOW = "Workflow",
   SEARCH = "Search",
+  BOX = "Box",
 }
 
 export enum CodeExample {

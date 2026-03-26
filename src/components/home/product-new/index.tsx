@@ -9,7 +9,7 @@ import cx from "@/utils/cx";
 import { Product } from "@/utils/type";
 import { IconArrowUpRight, IconNotes, IconPlus } from "@tabler/icons-react";
 import React, { useState } from "react";
-import { HeroTabSearch } from "../hero/hero-tab-search";
+import { HeroTabBox } from "../hero/hero-tab-box";
 
 const taglines = {
   [Product.REDIS]: {
@@ -37,6 +37,11 @@ const taglines = {
     docsLink: "https://upstash.com/docs/search",
     consoleLink: "https://console.upstash.com/search",
   },
+  [Product.BOX]: {
+    title: "Secure cloud containers for AI agents",
+    docsLink: "https://upstash.com/docs/box",
+    consoleLink: "https://console.upstash.com/box",
+  },
 } as const;
 
 const HeroProductTagline = ({ activeProduct }: { activeProduct: Product }) => {
@@ -60,10 +65,13 @@ const HeroProductTagline = ({ activeProduct }: { activeProduct: Product }) => {
               ? "Create Database"
               : activeProduct === Product.VECTOR
                 ? "Create Index"
-                : "Upstash Console"}
+                : activeProduct === Product.BOX
+                  ? "Create Box"
+                  : "Upstash Console"}
             {activeProduct === Product.REDIS ||
             activeProduct === Product.VECTOR ||
-            activeProduct === Product.SEARCH ? (
+            activeProduct === Product.SEARCH ||
+            activeProduct === Product.BOX ? (
               <IconPlus size={24} />
             ) : (
               <IconArrowUpRight size={24} />
@@ -101,7 +109,7 @@ export default function HomeProductNew() {
             {activeProduct === Product.VECTOR && <HeroTabVector />}
             {activeProduct === Product.QSTASH && <HeroTabQStash />}
             {activeProduct === Product.WORKFLOW && <HeroTabWorkflow />}
-            {activeProduct === Product.SEARCH && <HeroTabSearch />}
+            {activeProduct === Product.BOX && <HeroTabBox />}
           </div>
         </div>
       </Container>
