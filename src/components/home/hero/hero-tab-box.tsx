@@ -66,7 +66,7 @@ export function HeroTabBox() {
             <HeroTabFeatureBullet>
               <IconCircle1 stroke={1.5} />
             </HeroTabFeatureBullet>
-            Serverless — no infrastructure to manage
+            Serverless, no infrastructure to manage
           </HeroTabFeatureLi>
           <HeroTabFeatureLi>
             <HeroTabFeatureBullet>

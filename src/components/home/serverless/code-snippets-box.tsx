@@ -1,12 +1,12 @@
 import { CodeSnippets, CodeSnippetsData } from "./code-snippets";
 
 export const CodeSnippetsBox = () => {
-  return <CodeSnippets data={data} />;
+  return <CodeSnippets data={data} codeBodyClassName="h-[420px]" />;
 };
 
 const data: CodeSnippetsData = [
   {
-    title: "Create a Box and run an agent",
+    title: "Run an agent",
     snippets: [
       {
         language: "js",
@@ -31,7 +31,7 @@ console.log(run.result)
     ],
   },
   {
-    title: "Git workflows with AI agents",
+    title: "Open a PR",
     snippets: [
       {
         language: "js",
@@ -60,7 +60,7 @@ await box.agent.run({
     ],
   },
   {
-    title: "File management",
+    title: "Upload & analyze a PDF",
     snippets: [
       {
         language: "js",
@@ -89,6 +89,35 @@ const run = await box.agent.run({
 })
 
 console.log(run.result)
+`,
+      },
+    ],
+  },
+  {
+    title: "Expose a port",
+    snippets: [
+      {
+        language: "js",
+        code: `
+import { Box } from "@upstash/box"
+
+const box = await Box.create({ runtime: "node" })
+
+// Start a web server on port 3000
+await box.exec.command("cd /work && npm install express")
+await box.files.write({
+  path: "/work/server.js",
+  content: \`
+    const express = require('express')
+    const app = express()
+    app.get('/', (req, res) => res.send('Hello from Box!'))
+    app.listen(3000)
+  \`,
+})
+await box.exec.command("node /work/server.js &")
+
+// Create a preview URL
+const preview = await box.getPreviewUrl(3000)
 `,
       },
     ],
