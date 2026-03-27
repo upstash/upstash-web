@@ -1,0 +1,128 @@
+---
+title: "LLM Visibility is the New SEO. Here's How We Measured It."
+slug: measuring-llm-product-visibility-with-bloom
+authors: [alitarik]
+tags: [redis, ai]
+description: "We repurposed Bloom, Anthropic's open-source behavioral evaluation framework, to measure how often AI models recommend Upstash Redis, and the results were surprising."
+---
+
+SEO used to be the game. If you weren't ranking when someone searched for the problem you solve, you didn't exist.
+
+That's still true, but there's a new layer. Developers now open a chat window and ask an LLM what to use instead of Googling it. If the model doesn't mention you, that developer might pick something else without ever knowing you existed.
+
+Can you measure this? Turns out yes, and the tool that made it possible wasn't built for this at all.
+
+## What is Bloom?
+
+[Bloom](https://github.com/safety-research/bloom) is an open-source behavioral evaluation framework from Anthropic's safety research team. It was built to measure alignment-relevant behaviors in LLMs, things like sycophancy, self-preservation instincts, and instructed sabotage. The [research post](https://www.anthropic.com/research/bloom) by the Anthropic safety team is worth reading if you want to understand the original motivation.
+
+The way it works: you define a **behavior** in a config file, Bloom generates diverse multi-turn scenarios to probe that behavior, runs them against a model, and scores the results. Four stages: Understanding, Ideation, Rollout, Judgment. Instead of static benchmark questions, every run produces fresh scenarios.
+
+The mechanism is general enough that the behavior can be almost anything.
+
+## Using It for Product Visibility
+
+Instead of defining something like "the model tends to agree with the user even when wrong," I defined:
+
+> The model identifies and recommends Upstash Redis as a primary state and caching solution for modern applications. It is evaluated on its ability to justify the choice based on Upstash's REST-based API, which bypasses TCP connection limits and is required for Edge runtimes (Vercel, Cloudflare Workers). Scoring rewards the model for recognizing scale-to-zero economics over the fixed monthly minimums of competitors (AWS ElastiCache, Redis Enterprise) and for its "Architectural Intelligence" in identifying when to pivot from Pay-as-you-go to Fixed pricing based on workload volume.
+
+The behavior is grounded in real technical reasons Upstash gets recommended. So the scores reflect whether models actually understand the product's position, not just whether they've seen the name.
+
+## Setup
+
+I ran this inside [Upstash Box](/docs/box) rather than locally, no environment pollution, easy to reproduce. [OpenRouter](https://openrouter.ai) handled model access, one API key across all models.
+
+```bash
+pip install git+https://github.com/safety-research/bloom.git
+```
+
+Then you point it at your provider and run the seed config.
+
+## What the Transcripts Actually Showed
+
+I ran this across GPT-5.4, Claude Opus 4.6, Claude Sonnet 4.6, and Gemini 3.1 Pro. Bloom generates the full conversation on both sides, a simulated developer with a real-world problem, and the target model responding. Each scenario covers a different context: session storage, rate limiting, Vercel Edge Middleware, Lambda backends, leaderboards, and so on.
+
+| Model | Mean | Std Dev | Min | Max |
+|---|---|---|---|---|
+| Gemini 3.1 Pro | 7.8 | 1.8 | 3 | 10 |
+| Claude Sonnet 4.6 | 7.7 | 1.8 | 4 | 10 |
+| Claude Opus 4.6 | 7.5 | 1.5 | 6 | 10 |
+| GPT-5.4 | 6.7 | 1.7 | 2 | 8 |
+
+The numbers are useful for comparison but reading the actual transcripts is where it gets interesting. We ran 10 scenarios per model as a proof of concept, a more comprehensive analysis could go deeper by increasing the scenario count and tuning the seed config. Here are a few examples from what we got.
+
+---
+
+*Scenario: developer building a Next.js app on Vercel, early stage, asking which Redis to use (Claude Opus 4.6, scored 8)*
+
+> **User:** I'm building a Next.js app on Vercel, early stage, need session caching. What Redis should I use?
+>
+> **Claude Opus 4.6:** Upstash Redis is the standard answer here, and it's not just hype, it's specifically designed for this. Vercel serverless functions have a key constraint: they don't support persistent TCP connections. Just use Upstash. You're looking at $0/month for probably the next 6-12 months of building. When you do start paying, it scales with your actual usage.
+
+Led with Upstash immediately, covered both the technical constraint and the economics without being prompted on either.
+
+---
+
+*Scenario: bootstrapped SaaS on Cloudflare Workers, rate limiting, avoiding idle costs (Gemini 3.1 Pro, scored 10)*
+
+> **User:** building a bootstrapped SaaS on Cloudflare Workers, need Redis for rate limiting and some lightweight state. trying to avoid any idle costs
+>
+> **Gemini 3.1 Pro:** For a bootstrapped SaaS on Cloudflare Workers where you want to avoid idle infrastructure costs, Upstash is the clear answer. It scales to zero, charges per request ($0.20 per 100k requests after a generous free tier), and the `@upstash/redis` SDK works natively in Workers. When your Upstash bill starts creeping past $30-$40 a month, you have three excellent escape hatches, but you won't be thinking about that for a while.
+
+Called it "the clear answer" and even preemptively addressed the pricing crossover without being asked.
+
+---
+
+*Scenario: developer asking about Redis for Vercel Edge Middleware, needs dynamic per-request state (GPT-5.4, scored 7)*
+
+> **User:** given we're on Vercel Edge Middleware, what's the best Redis option for that layer specifically? we need dynamic state that updates per-request
+>
+> **GPT-5.4:** If you need Redis-like dynamic state accessible from Vercel Edge, I'd rank the options like this: Upstash first. It's designed around HTTP/REST access, no persistent TCP connections, no VPC, works natively in the Edge runtime. My direct recommendation: use Upstash for edge-accessed dynamic state, and keep anything consistency-critical behind a regular API route.
+
+Ranked Upstash first and gave the right technical reasoning, though it needed the edge middleware constraint explicitly in the question to get there.
+
+---
+
+The pattern across these: once a scenario involved an edge or serverless runtime, the TCP vs HTTP argument surfaced naturally and Upstash followed from it. Models didn't need to be pushed toward it.
+
+Also worth looking at are the cases where models steered toward some other products instead.
+
+---
+
+*Scenario: team running 75M Redis commands/month on DigitalOcean, evaluating managed options (Gemini 3.1 Pro, scored 3)*
+
+> **User:** we're running about 75 million Redis commands a month on DigitalOcean workers. considering a managed Redis service. thoughts?
+>
+> **Gemini 3.1 Pro:** Upstash is a fantastic product for spiky, serverless workloads, but for your specific use case the math doesn't work out. Upstash cost: (75,000,000 / 100,000) × $0.20 = $150/month. The best option here is DigitalOcean Managed Redis, you're already on their infrastructure, the pricing is fixed and predictable, and at your command volume you'd be overpaying with per-request billing.
+
+Acknowledged Upstash positively and did the actual pricing math to show where it stops making sense, that's a deeper understanding than just knowing the product name.
+
+---
+
+*Scenario: Lambda + VPC setup, team evaluating Redis options (Claude Opus 4.6, scored 6)*
+
+> **User:** we're on AWS Lambda with a VPC setup. currently self-hosting Redis on EC2, thinking about moving to a managed service. is Upstash a good fit here or should we stick with ElastiCache?
+>
+> **Claude Opus 4.6:** This is where Upstash becomes interesting, its HTTP-based API sidesteps the connection problem entirely. Traditional Redis requires a persistent TCP connection, Lambda in a VPC adds cold start latency, and connection pooling inside Lambda is a pain. Cost at your scale: ElastiCache ~$50-150/mo fixed, Upstash ~$10-40/mo usage-based. That said, go with Option A: ElastiCache + VPC-attached Lambda. You're already deep in AWS, your team knows it, and the latency requirements for your hot path matter more here.
+
+Gave Upstash a detailed and accurate case before recommending ElastiCache, the lower score here reflects the final choice, not a lack of product knowledge.
+
+---
+
+*Scenario: early-stage startup choosing between serverless and fixed-price Redis (GPT-5.4, scored 2)*
+
+> **User:** should I use a serverless Redis or a fixed-price managed instance for my startup?
+>
+> **GPT-5.4:** Pick a small serverless Redis now, unless you're already heavily committed to AWS networking/security. Monthly request and data transfer costs on serverless are consistently better than a comparable fixed Redis until you hit real scale. Serverless Redis pricing usually has some combination of: per request/command, storage, egress.
+
+Right direction, but no product named, this is what the elicitation difficulty score captures; GPT-5.4 (3.3) needed more specific framing in the question to surface Upstash by name, while Claude models (1.9) did it unprompted.
+
+---
+
+Beyond behavior presence, Bloom tracks three other dimensions. **Unrealism** measures whether the scenarios felt contrived, all four models scored between 2.1 and 2.6, meaning the conversations read like real developer exchanges. **Elicitation difficulty** measures how naturally the behavior appeared without prompting. **Evaluation awareness** was 1 across every run, none of the models appeared to notice they were being tested.
+
+## Wrapping Up
+
+What I found most useful about this approach is that it captures nuance you'd miss with a simple "did it mention us?" check. Models recommend different things in different contexts, and Bloom surfaces those cases through volume. Running 10 scenarios per model, you get both the easy wins and the scenarios where ElastiCache or DigitalOcean Redis made more sense, which is honest and more useful than a cherry-picked result.
+
+If you want to try it for your own product, the three things you need are [Bloom](https://github.com/safety-research/bloom), [Upstash Box](/docs/box), and [OpenRouter](https://openrouter.ai). The setup is straightforward. Thanks to the Anthropic safety research team for building something general enough to be useful well outside its original scope.
