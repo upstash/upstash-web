@@ -12,15 +12,13 @@ const data: CodeSnippetsData = [
         language: "js",
         code: `
 import { Redis } from "@upstash/redis";
+
 const redis = Redis.fromEnv();
 
-const cacheKey = \`item:\${itemId}\`;
+const item = await redis.get("item:123");
 
-// Check cache
-const cachedItem = await redis.get(cacheKey);
-if (cachedItem) {
-  console.log("Cache hit");
-  return JSON.parse(cachedItem);
+if (item) {
+  return item;
 }
 `,
       },
@@ -31,13 +29,9 @@ from upstash_redis import Redis
 
 redis = Redis.from_env()
 
-cache_key = f"item:{item_id}"
-
-# Check cache
-cached_item = redis.get(cache_key)
-if cached_item:
-    print("Cache hit")
-    return json.loads(cached_item)
+item = redis.get("item:123")
+if item:
+    return item
 `,
       },
     ],
@@ -49,6 +43,7 @@ if cached_item:
         language: "js",
         code: `
 import { Redis } from "@upstash/redis";
+
 const redis = Redis.fromEnv();
 
 const getSession = async (key: string) => {
@@ -116,7 +111,7 @@ redis = Redis.from_env()
 
 ratelimit = Ratelimit(
     redis=redis,
-    limiter=SlidingWindow(max_requests=10, window=10, unit="s")
+    limiter=SlidingWindow(max_requests=10, window=10)
 )
 
 identifier = get_ip_address()
@@ -135,6 +130,7 @@ if not result.allowed:
         language: "js",
         code: `
 import { Redis } from "@upstash/redis";
+
 const redis = Redis.fromEnv();
 
 const LEADERBOARD_KEY = "game-leaderboard";
@@ -172,6 +168,7 @@ def get_top_players(top: int):
         language: "js",
         code: `
 import { Redis } from "@upstash/redis";
+
 const redis = Redis.fromEnv();
 
 const getChatHistoryKey = (userId: string) => \`chat-history:\${userId}\`;
@@ -191,6 +188,7 @@ export const getChatHistory = async (userId: string) =>
 from upstash_redis import Redis
 
 redis = Redis.from_env()
+
 def save_message(user_id: str, message: str) -> None:
     key = f"chat:{user_id}"
     redis.lpush(key, message)

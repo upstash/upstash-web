@@ -29,7 +29,7 @@ const response = await context.api.openai.call(
     token: "OPENAI_API_KEY",
     operation: "chat.completions.create",
     body: {
-      model: "gpt-4o",
+      model: "gpt-5.4",
       messages: [
         { role: "user", content: \`Analyze this data chunk: \${JSON.stringify(dataset)}\` },
       ],
@@ -52,12 +52,13 @@ response = await context.call("download-dataset", url=dataset_url, method="GET")
 dataset = response.body
 
 # Step 3: Analyze the dataset with LLM
-response = await context.api.openai.call(
+response = await context.call(
     "call-openai",
-    token="OPENAI_API_KEY",
-    operation="chat.completions.create",
+    url="https://api.openai.com/v1/chat/completions",
+    method="POST",
+    headers={"authorization": f"Bearer {os.getenv('OPENAI_API_KEY')}"},
     body={
-        "model": "gpt-4o-mini",
+        "model": "gpt-5.4",
         "messages": [
             {
                 "role": "user",
