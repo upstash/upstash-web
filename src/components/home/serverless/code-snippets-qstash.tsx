@@ -12,6 +12,7 @@ const data: CodeSnippetsData = [
         language: "js",
         code: `
 import { Client } from "@upstash/qstash";
+
 const client = new Client({ token: "<QSTASH_TOKEN>" });
 
 await client.schedules.create({
@@ -24,6 +25,7 @@ await client.schedules.create({
         language: "py",
         code: `
 from qstash import QStash
+
 client = QStash("<QSTASH_TOKEN>")
 
 client.schedule.create(
@@ -41,6 +43,7 @@ client.schedule.create(
         language: "js",
         code: `
 import { Client } from "@upstash/qstash";
+
 const client = new Client({ token: "<QSTASH_TOKEN>" });
 
 const res = await client.publishJSON({
@@ -54,6 +57,7 @@ const res = await client.publishJSON({
         language: "py",
         code: `
 from qstash import QStash
+
 client = QStash("<QSTASH_TOKEN>")
 
 client.message.publish_json(
@@ -72,6 +76,7 @@ client.message.publish_json(
         language: "js",
         code: `
 import { Client } from "@upstash/qstash";
+
 const client = new Client({ token: "<QSTASH_TOKEN>" });
 
 const queue = client.queue({
@@ -90,6 +95,7 @@ await queue.enqueueJSON({
         language: "py",
         code: `
 from qstash import QStash
+
 client = QStash("<QSTASH_TOKEN>")
 
 queue_name = "my-queue"
@@ -111,6 +117,7 @@ client.message.enqueue_json(
         language: "js",
         code: `
 import { Client } from "@upstash/qstash";
+
 const client = new Client({ token: "<QSTASH_TOKEN>" });
 
 const res = await client.publishJSON({
@@ -124,6 +131,7 @@ const res = await client.publishJSON({
         language: "py",
         code: `
 from qstash import QStash
+
 client = QStash("<QSTASH_TOKEN>")
 
 client.message.publish_json(

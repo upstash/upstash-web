@@ -26,7 +26,7 @@ const results = await client.index("movies").search({
 results = client.index("movies").search(
   query="space opera with jedi",
   limit=5,
-  reranking=true
+  reranking=True
 )
 `,
       },
@@ -108,9 +108,9 @@ const results = await client.index("products").search({
         code: `
 index.upsert(
   documents=[{
-    id: "headphones-0",
-    content: { description: "Noise cancelling wireless headphones" },
-    metadata: { inStock: true, price: 299 },
+    "id": "headphones-0",
+    "content": {"description": "Noise cancelling wireless headphones"},
+    "metadata": {"inStock": True, "price": 299},
   }]
 )
 

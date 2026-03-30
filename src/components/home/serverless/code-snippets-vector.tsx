@@ -12,7 +12,8 @@ const data: CodeSnippetsData = [
         language: "js",
         code: `
 import { Index } from "@upstash/vector";
-const index = new Index.from_env()
+
+const index = new Index()
 
 const question = "What is Quantum Mechanics?"
 
@@ -26,7 +27,7 @@ const context = await index.query({
 const prompt = \`Question: \${question} - Context: \${JSON.stringify(context)}\`;
 
 const response = await openai.chat.completions.create({
-  model: "gpt-3.5-turbo",
+  model: "gpt-5.4",
   messages: [
     { 
       role: "system", 
@@ -44,6 +45,7 @@ const response = await openai.chat.completions.create({
         language: "py",
         code: `
 from upstash_vector import Index
+
 index = Index.from_env()
 
 question = "What is Quantum Mechanics?" 
@@ -58,7 +60,7 @@ context = index.query(
 prompt = f"Question: {question} - Context: {str(context)}"
 
 response = openai.chat.completions.create(
-    model="gpt-3.5-turbo",
+    model="gpt-5.4",
     messages=[
         {
             "role": "system",
@@ -80,11 +82,10 @@ response = openai.chat.completions.create(
       {
         language: "js",
         code: `
-import { Index } from "@upstash/vector";
 import { SemanticCache } from "@upstash/semantic-cache";
+import { Index } from "@upstash/vector";
 
-const index = new Index();
-const semanticCache = new SemanticCache({ index, minProximity: 0.95 });
+const semanticCache = new SemanticCache({ index: new Index(), minProximity: 0.95 });
 
 await semanticCache.set("Capital of Turkey", "Ankara");
 await semanticCache.set("year in which the Berlin wall fell", "1989");
@@ -126,7 +127,8 @@ result2 = cache.get("what's the year the Berlin wall destroyed?")
         language: "js",
         code: `
 import { Index } from "@upstash/vector";
-const index = new Index.from_env()
+
+const index = new Index()
 
 const documents = [
   { id: "doc1", data: "Upstash Vector is a scalable vector database." },
@@ -144,6 +146,7 @@ const results = await index.query({ data: query, topK: 3 });
         language: "py",
         code: `
 from upstash_vector import Index
+
 index = Index.from_env()
 
 documents = [

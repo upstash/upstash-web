@@ -11,11 +11,12 @@ const data: CodeSnippetsData = [
       {
         language: "js",
         code: `
-import { Box, ClaudeCode } from "@upstash/box"
+import { Box, Agent, ClaudeCode } from "@upstash/box"
 
 const box = await Box.create({
   runtime: "node",
   agent: {
+    provider: Agent.ClaudeCode,
     model: ClaudeCode.Opus_4_6,
     apiKey: process.env.ANTHROPIC_API_KEY,
   },
@@ -36,11 +37,12 @@ console.log(run.result)
       {
         language: "js",
         code: `
-import { Box, ClaudeCode } from "@upstash/box"
+import { Box, Agent, ClaudeCode } from "@upstash/box"
 
 const box = await Box.create({
   runtime: "node",
   agent: {
+    provider: Agent.ClaudeCode,
     model: ClaudeCode.Opus_4_6,
     apiKey: process.env.ANTHROPIC_API_KEY,
   },
@@ -65,12 +67,13 @@ await box.agent.run({
       {
         language: "js",
         code: `
-import { Box, ClaudeCode } from "@upstash/box"
+import { Box, Agent, ClaudeCode } from "@upstash/box"
 import { z } from "zod"
 
 const box = await Box.create({
   runtime: "node",
   agent: {
+    provider: Agent.ClaudeCode,
     model: ClaudeCode.Opus_4_6,
     apiKey: process.env.ANTHROPIC_API_KEY,
   },
