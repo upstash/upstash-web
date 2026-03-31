@@ -13,9 +13,6 @@ type GlobalStore = {
   isHydrated: boolean;
   setIsHydrated: (isHydrated: boolean) => void;
 
-  isInited: boolean;
-  setIsInited: (isInited: boolean) => void;
-
   isTermsUpdateAcknowledged: boolean;
   setIsTermsUpdateAcknowledged: (isTermsUpdateAcknowledged: boolean) => void;
 };
@@ -28,9 +25,6 @@ export const useGlobalStore = create(
 
       isHydrated: false,
       setIsHydrated: (isHydrated) => set({ isHydrated }),
-
-      isInited: false,
-      setIsInited: (isInited: boolean) => set({ isInited }),
 
       isTermsUpdateAcknowledged: false,
       setIsTermsUpdateAcknowledged: (isTermsUpdateAcknowledged) =>
