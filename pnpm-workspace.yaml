@@ -1,0 +1,12 @@
+packages:
+  - "."
+
+minimumReleaseAge: 10080
+blockExoticSubdeps: true
+
+onlyBuiltDependencies:
+  - "@biomejs/biome"
+  - esbuild
+  - node-read-yaml
+  - sharp
+trustPolicy: no-downgrade
