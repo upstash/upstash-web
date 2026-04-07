@@ -1,0 +1,102 @@
+---
+title: "Running Symphony with Upstash Box in Minutes"
+slug: symphony-on-upstash-box
+authors: [alitarik]
+tags: [ai, box, serverless]
+---
+
+<i>
+  It picks up tasks from your backlog, writes the code, and opens a pull
+  request, without any sleep.
+</i>
+
+Did you guess a developer?
+
+The correct answer is Symphony, and today we're showing you how to run it on Upstash Box.
+
+---
+
+## What is Symphony?
+
+[Symphony](https://github.com/openai/symphony) is an open-source orchestrator that connects your Linear project to OpenAI's Codex. It polls your tickets, picks up ones in the `Todo` state, and runs a Codex agent inside a Git repository to implement them end-to-end.
+
+The agent creates a branch, writes the code, runs tests, opens a PR, and moves the ticket through your workflow from `In Progress` to `Human Review`. If a reviewer requests changes, it goes to `Rework` and the agent tries again. When the PR is approved, it lands the merge automatically.
+
+## Why Upstash Box?
+
+Symphony needs a place to live. It's a long-running process that keeps the Linear connection open, maintains a workspace directory per ticket, and builds Elixir from source. That's not a serverless function. It's a computer.
+
+This is exactly what [Upstash Box](https://upstash.com/blog/upstash-box) was built for. Box gives you a persistent cloud computer that:
+
+- **Keeps its filesystem** — the Elixir build, the cloned repo, everything stays between runs
+- **Charges on core CPU usage** — no CPU charges when Symphony is waiting for a ticket
+- **Single source of Management** — all the symphony processes can live in seperate boxes
+- **Advanced Monitoring** — the sdk and the console gives you the tools you need to operate and debug
+
+## Setting it up
+
+We built a CLI that handles everything in one command:
+
+```bash
+npx symphony-box
+```
+
+It prompts you to provide four credentials:
+
+- **Upstash Box API key** — to create and control the Box
+- **OpenAI API key** — used by Codex to write the code
+- **Linear API key** — to poll and update your tickets
+- **GitHub token** — to push branches and open PRs
+
+Then you pick a GitHub repo and a Linear project from your account. That's it.
+
+```bash
+┌ Symphony Box Setup
+◇ Upstash Box API key: ****
+◇ OpenAI API key: ****
+◇ Linear API key: ****
+◇ GitHub token (requires read/write for contents and pull requests): ****
+◇ Select a GitHub repo: upstash/my-repo
+◇ Select a Linear project: Backend
+⠹ Cloning and building Symphony (~5 mins)...
+✓ Done
+
+Symphony is running!
+
+  Box ID: sparkling-fox-12345
+```
+
+Behind the scenes, the CLI:
+
+1. Checks your Linear project for required workflow states (`Rework`, `Human Review`, `Merging`) and offers to create any that are missing
+2. Creates an Upstash Box with your API keys injected as environment variables
+3. Installs system dependencies and Codex on the box
+4. Clones your repo and writes a `WORKFLOW.md` config that tells Symphony how to handle your tickets
+5. Builds Symphony from source and starts it
+
+After setup, Symphony streams its output to your terminal. When you close the terminal, Symphony keeps running on the box.
+
+## The workflow
+
+Once running, Symphony expects tickets to move through these Linear states:
+
+| State          | What happens                                                         |
+| -------------- | -------------------------------------------------------------------- |
+| `Todo`         | Symphony picks it up, moves it to `In Progress`, and starts working  |
+| `In Progress`  | Agent is implementing — writing code, running tests                  |
+| `Human Review` | PR is open and ready for your review                                 |
+| `Rework`       | You requested changes — agent retries from scratch on a fresh branch |
+| `Merging`      | You approved — Symphony lands the PR                                 |
+| `Done`         | Terminal state, no further action                                    |
+
+The `WORKFLOW.md` file controls how the agent behaves inside each ticket. It's a markdown file with YAML frontmatter that configures the Linear connection, the Codex settings, and the agent instructions. The CLI generates it automatically from your project's Linear slug and repo URL.
+
+## Try it
+
+```bash
+npx symphony-box
+```
+
+The source is on [GitHub](https://github.com/alitariksahin/symphony-box). Symphony itself is open source at [openai/symphony](https://github.com/openai/symphony).
+
+We'd love to hear how it works for your repo..
