@@ -165,7 +165,11 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal">CPU Cores / Box</th>
+          <th className="px-0 py-4 text-left font-normal">
+            <Tooltip content="Small (default): 2 cores. Medium: 4 cores. Large: 8 cores.">
+              CPU Cores / Box
+            </Tooltip>
+          </th>
           <Col plan={showFree}>
             <CompareValue>2</CompareValue>
           </Col>
@@ -178,15 +182,19 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal">Memory / Box</th>
+          <th className="px-0 py-4 text-left font-normal">
+            <Tooltip content="Small (default): 4 GB. Medium: 8 GB. Large: 16 GB.">
+              Memory / Box
+            </Tooltip>
+          </th>
           <Col plan={showFree}>
             <CompareValue type="size" suffix="GB">
-              2
+              4
             </CompareValue>
           </Col>
           <Col plan={showPayg} feature>
             <CompareValue type="size" suffix="GB">
-              2
+              4
             </CompareValue>
           </Col>
           <Col plan={showEnterprise}>
@@ -307,7 +315,7 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 py-4 text-left font-normal">
-            <Tooltip content="Billed by actual CPU consumption. For example, using 100% of 2 cores for 1 hour costs $0.2. Using 10% of 1 core for 1 hour costs $0.01. No charge when idle.">
+            <Tooltip content="Billed by actual CPU consumption. For example, using 100% of 2 cores for 1 hour costs $0.2. Using 10% of 1 core for 1 hour costs $0.01. No charge when idle. Pricing scales with box size — medium is x2 and large is x4 the small rate.">
               CPU Price
             </Tooltip>
           </th>

@@ -67,7 +67,7 @@ export default function PricingTable() {
           </div>
           <div className="py-3">
             <p className="text-text-mute">Box Spec</p>
-            <p className="font-semibold">2 CPU, 2GB mem</p>
+            <p className="font-semibold">2 CPU, 4GB mem</p>
           </div>
         </div>
 
