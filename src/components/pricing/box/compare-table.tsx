@@ -315,7 +315,7 @@ export default function CompareTable() {
 
         <tr>
           <th className="px-0 py-4 text-left font-normal">
-            <Tooltip content="Billed by actual CPU consumption. For example, using 100% of 2 cores for 1 hour costs $0.2. Using 10% of 1 core for 1 hour costs $0.01. No charge when idle. Pricing scales with box size — medium is x2 and large is x4 the small rate.">
+            <Tooltip content="Billed by actual CPU consumption. For example, using 100% of 2 cores for 1 hour costs $0.2. Using 10% of 1 core for 1 hour costs $0.01. No charge when idle. Pricing scales with box size: medium is x2 and large is x4 the small rate.">
               CPU Price
             </Tooltip>
           </th>
