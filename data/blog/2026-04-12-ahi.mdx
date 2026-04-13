@@ -115,7 +115,6 @@ agents:
 ahi init      # scaffold the folder structure
 ahi dev       # run an agent locally
 ahi sync      # diff local vs remote, upload only what changed
-ahi console   # open the monitoring dashboard
 ```
 
 There's no deploy step. Each primitive has its own lifecycle:
@@ -127,14 +126,12 @@ There's no deploy step. Each primitive has its own lifecycle:
 
 No build step, no container image, no CI pipeline. Your local folder is the source of truth.
 
-**Console.** An open-source web UI for monitoring your agent servers. See which agents are running, sleeping, what data they've written, when they last ran.
-
 ## Get Started
 
 | Layer | Name | What it is |
 | --- | --- | --- |
 | Architecture | Agent server | The idea — five primitives, no app code |
-| Framework | Ahi | Conventions, CLI, console |
+| Framework | Ahi | Conventions, CLI |
 | Infrastructure | Upstash Box | Containers, storage, scheduling |
 | SDK | @upstash/box | Low-level programmatic access |
 
