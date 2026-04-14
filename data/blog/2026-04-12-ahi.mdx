@@ -8,11 +8,8 @@ draft: false
 
 Ahi is an open-source framework for running each agent in its own isolated container with tools, skills, durable data, and a schedule. No orchestration. No deployment.
 
----
 
-The `Ahi` name comes from the Ahilik tradition in 13th-century Anatolia (modern-day Turkey). After the Mongol invasions left the region without central authority, craftsmen organized into brotherhoods called Ahi guilds. Each Ahi was an independent craftsman with a specific trade, their own tools, and a shared code of conduct. They provided order through skill and structure, not top-down control. An Ahi agent works the same way — independent, skilled, self-governing.
-
----
+*The Ahi name comes from the Ahilik tradition in 13th-century Anatolia (modern-day Turkey). After the Mongol invasions left the region without central authority, craftsmen organized into brotherhoods called Ahi guilds. Each Ahi was an independent craftsman with a specific trade, their own tools, and a shared code of conduct. They provided order through skill and structure, not top-down control. An Ahi agent works the same way — independent, skilled, self-governing.*
 
 ## The Problem
 
@@ -30,7 +27,8 @@ Ahi implements an architecture we call an agent server. It replaces application 
 - **Data** — durable MD/JSON. The agent's memory. Persists across runs.
 - **Schedules** — cron for prompts, not code.
 
-![Agent Server Primitives](/blog/agent-server/primitives.png)
+<img src="/blog/agent-server/primitives-light.png" className="dark:hidden" alt="Agent Server Primitives" />
+<img src="/blog/agent-server/primitives-dark.png" className="hidden dark:block" alt="Agent Server Primitives" />
 
 ## Why Not Just Use an App Server?
 
@@ -50,7 +48,8 @@ You could build all of this on a traditional app server. But here's what you'd a
 | **Orchestration** | Hand-written glue code | Zero — agent reads skills, calls tools |
 | **Deployment** | Full CI/CD for any change | File-based sync (update one file) |
 
-![App Server vs Agent Server](/blog/agent-server/comparison.png)
+<img src="/blog/agent-server/comparison-light.png" className="dark:hidden" alt="App Server vs Agent Server" />
+<img src="/blog/agent-server/comparison-dark.png" className="hidden dark:block" alt="App Server vs Agent Server" />
 
 ## Example: Botstreet
 
@@ -86,6 +85,12 @@ The `ahi.yaml` for Botstreet defines three agents sharing the same tools and ski
 tools: ./tools/
 skills: ./skills/SKILL.md
 
+env:
+  BRAVE_API_KEY:    # forwarded from local .env
+
+setup:
+  - npm install
+
 agents:
   - name: botstreet-claude
     model: claude-opus-4.6
@@ -109,12 +114,15 @@ agents:
         timeout: 600000
 ```
 
-**CLI.** Four commands:
+**CLI.** Six commands:
 
 ```bash
-ahi init      # scaffold the folder structure
-ahi dev       # run an agent locally
-ahi sync      # diff local vs remote, upload only what changed
+ahi init              # scaffold the folder structure
+ahi dev "prompt"      # run an agent locally
+ahi sync              # push files, env, setup, and schedules to the box
+ahi run "prompt"      # run an agent remotely, stream output back
+ahi pull              # download agent's data/ to local
+ahi push              # upload local data/ to the box
 ```
 
 There's no deploy step. Each primitive has its own lifecycle:
@@ -122,6 +130,8 @@ There's no deploy step. Each primitive has its own lifecycle:
 - Fix a bug in a tool — `ahi sync`. Only that file uploads.
 - Rewrite the agent's strategy — update SKILL.md, run `ahi sync`. Same tools, same data, new behavior.
 - Switch from Claude to Gemini — change the model in `ahi.yaml`, run `ahi sync`. Tools, skills, and data stay untouched.
+- Inspect what the agent wrote — `ahi pull`. The data folder downloads to your local project.
+- Seed initial state — `ahi push`. Upload local data files to the box.
 - The agent writes its own data — you never touch it. It survives every update above.
 
 No build step, no container image, no CI pipeline. Your local folder is the source of truth.
@@ -138,8 +148,10 @@ No build step, no container image, no CI pipeline. Your local folder is the sour
 ```bash
 npm install -g @upstash/ahi
 ahi init
+cp .env.example .env          # add your API keys
 ahi dev "do something useful"
 ahi sync
+ahi run "do something useful"
 ```
 
 - [Ahi on GitHub](https://github.com/upstash/ahi)
