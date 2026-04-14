@@ -73,7 +73,7 @@ export default function PricingTable() {
         <div className="w-full px-6 *:border-b *:border-bg-mute">
           <div className="py-3">
             <p className="text-text-mute">Max Records</p>
-            <p className="font-semibold">Unlimited</p>
+            <p className="font-semibold">2M</p>
           </div>
         </div>
 
