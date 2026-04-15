@@ -651,11 +651,16 @@ export default function CompareTable({
             <CompareValue type="number">1</CompareValue>
           </Col>
           <Col plan={showPayg} feature>
-            <CompareValue type="number" after={
-              <Tooltip content="Default quota. Request an increase anytime.">
-                <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
-              </Tooltip>
-            }>10</CompareValue>
+            <CompareValue
+              type="number"
+              after={
+                <Tooltip content="Default quota. Request an increase anytime.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            >
+              10
+            </CompareValue>
           </Col>
           <Col plan={showFixed}>
             {selectedFixed250MB && <CompareValue type="number">2</CompareValue>}
@@ -663,8 +668,12 @@ export default function CompareTable({
             {selectedFixed5GB && <CompareValue type="number">5</CompareValue>}
             {selectedFixed10GB && <CompareValue type="number">10</CompareValue>}
             {selectedFixed50GB && <CompareValue type="number">50</CompareValue>}
-            {selectedFixed100GB && <CompareValue type="number">100</CompareValue>}
-            {selectedFixed500GB && <CompareValue type="number">500</CompareValue>}
+            {selectedFixed100GB && (
+              <CompareValue type="number">100</CompareValue>
+            )}
+            {selectedFixed500GB && (
+              <CompareValue type="number">500</CompareValue>
+            )}
           </Col>
           <Col plan={showEnterprise}>
             <CompareValue type="plain">Custom</CompareValue>
@@ -683,14 +692,21 @@ export default function CompareTable({
             <CompareValue type="size">10K</CompareValue>
           </Col>
           <Col plan={showPayg} feature>
-            <CompareValue type="size" after={
-              <Tooltip content="Default quota. Request an increase anytime.">
-                <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
-              </Tooltip>
-            }>1M</CompareValue>
+            <CompareValue
+              type="size"
+              after={
+                <Tooltip content="Default quota. Request an increase anytime.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            >
+              1M
+            </CompareValue>
           </Col>
           <Col plan={showFixed}>
-            {selectedFixed250MB && <CompareValue type="size">100K</CompareValue>}
+            {selectedFixed250MB && (
+              <CompareValue type="size">100K</CompareValue>
+            )}
             {selectedFixed1GB && <CompareValue type="size">250K</CompareValue>}
             {selectedFixed5GB && <CompareValue type="size">500K</CompareValue>}
             {selectedFixed10GB && <CompareValue type="size">1M</CompareValue>}
@@ -909,6 +925,37 @@ export default function CompareTable({
         {/**/}
 
         <tr>
+          <th className="px-0 text-left font-normal">Multi-Zone HA</th>
+          {/**/}
+          <Col plan={showFree}>
+            <CompareValue type="boolean" valid={false} />
+          </Col>
+          <Col plan={showPayg} feature>
+            <CompareValue
+              after={
+                <Tooltip content="Available with Prod Pack.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            />
+          </Col>
+          <Col plan={showFixed}>
+            <CompareValue
+              after={
+                <Tooltip content="Available with Prod Pack.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            />
+          </Col>
+          <Col plan={showEnterprise}>
+            <CompareValue type="boolean" />
+          </Col>
+        </tr>
+
+        {/**/}
+
+        <tr>
           <th className="px-0 text-left font-normal">Uptime SLA</th>
           {/**/}
           <Col plan={showFree}>
@@ -1095,7 +1142,9 @@ export default function CompareTable({
 
         {/**/}
         <tr>
-          <th className="px-0 text-left font-normal">SAML Single Sign-On (SSO)</th>
+          <th className="px-0 text-left font-normal">
+            SAML Single Sign-On (SSO)
+          </th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" valid={false} />
