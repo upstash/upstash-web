@@ -119,19 +119,19 @@ agents:
 ```bash
 ahi init              # scaffold the folder structure
 ahi dev "prompt"      # run an agent locally
-ahi sync              # push files, env, setup, and schedules to the box
+ahi apply             # apply files, env, setup, and schedules to agent boxes
 ahi run "prompt"      # run an agent remotely, stream output back
-ahi pull              # download agent's data/ to local
-ahi push              # upload local data/ to the box
+ahi pull-data         # download an agent's data/ to local
+ahi push-data         # upload local data/ to the box
 ```
 
 There's no deploy step. Each primitive has its own lifecycle:
 
-- Fix a bug in a tool — `ahi sync`. Only that file uploads.
-- Rewrite the agent's strategy — update SKILL.md, run `ahi sync`. Same tools, same data, new behavior.
-- Switch from Claude to Gemini — change the model in `ahi.yaml`, run `ahi sync`. Tools, skills, and data stay untouched.
-- Inspect what the agent wrote — `ahi pull`. The data folder downloads to your local project.
-- Seed initial state — `ahi push`. Upload local data files to the box.
+- Fix a bug in a tool — `ahi apply`. Only that file updates remotely.
+- Rewrite the agent's strategy — update SKILL.md, run `ahi apply`. Same tools, same data, new behavior.
+- Switch from Claude to Gemini — change the model in `ahi.yaml`, run `ahi apply`. Tools, skills, and data stay untouched.
+- Inspect what the agent wrote — `ahi pull-data`. The data folder downloads to your local project.
+- Seed initial state — `ahi push-data`. Upload local data files to the box.
 - The agent writes its own data — you never touch it. It survives every update above.
 
 No build step, no container image, no CI pipeline. Your local folder is the source of truth.
@@ -150,7 +150,7 @@ npm install -g @upstash/ahi
 ahi init
 cp .env.example .env          # add your API keys
 ahi dev "do something useful"
-ahi sync
+ahi apply
 ahi run "do something useful"
 ```
 
