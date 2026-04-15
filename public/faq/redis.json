@@ -2,47 +2,83 @@
   "faq": [
     {
       "question": "How can I upgrade to pay as you go from free tier?",
-      "answer": "Once you enter your credit card , your database will be upgraded to the pay-as-you-go plan and limits will be updated."
+      "answer": "Once you enter your credit card, your database will be upgraded to the pay-as-you-go plan and limits will be updated."
+    },
+    {
+      "question": "What is included in free tier?",
+      "answer": "Free tier includes 256MB data size and 500K commands per month."
+    },
+    {
+      "question": "Are paid databases' first 256MB data and 500K commands free?",
+      "answer": "No. Once you upgrade to a paid tier, you will be charged for data size and commands according to that plan."
     },
     {
       "question": "How does the budget work?",
-      "answer": "With the Pay As you go plan, you can set a maximum monthly budget for your database so that you won't be charged beyond this chosen limit. We'll keep you informed by sending email notifications once you reach 70% and 90% of your monthly budget. This notifications will let you either adjust your budget limit or upgrade to the Pro tier. Note that if your usage exceeds your monthly budget cap, your database will be rate limited and your cost will not exceed your chosen budget limit."
+      "answer": "Budget is only available for the pay-as-you-go plan. You can set a maximum monthly budget for your database so you won't be charged beyond that limit. We send email notifications when you reach 70% and 90% of your monthly budget so you can adjust the limit or upgrade to a Fixed plan. If your usage exceeds the budget cap, your database will be rate limited and your total cost will not exceed the chosen budget. If you change from a Fixed plan to pay-as-you-go mid-month, your budget only tracks your pay-as-you-go spending."
+    },
+    {
+      "question": "Do Fixed plans have command count pricing or limits?",
+      "answer": "Fixed plans have no command-count billing. You pay for data size, bandwidth, and throughput limits, not per command."
     },
     {
       "question": "Are all Redis commands counted in billing?",
-      "answer": "Operational commands like AUTH, INFO, PING, QUIT, COMMAND will not be charged."
+      "answer": "Operational commands like AUTH, HELLO, SELECT, COMMAND, CONFIG, INFO, PING, RESET, and QUIT are not charged."
+    },
+    {
+      "question": "Are databases faster in higher plans?",
+      "answer": "Ops/sec limits are the same in the initial plans, while higher plans increase throughput and other limits. There is no performance difference between plans as long as you stay within the limits."
     },
     {
       "question": "Are read and write commands same price?",
-      "answer": "Yes. But for Global databases, the write commands are replicated to all read regions in addition to primary region. Replications (write operations) are also counted as commands. For example, if you have 1 primary 1 read region, 100K writes will cost $0.4 ($0.2 x 2)"
+      "answer": "Yes. But for Global databases, the write commands are replicated to all read regions in addition to the primary region. Replications are also counted as commands. For example, if you have one primary and one read region, 100K writes cost $0.4 ($0.2 x 2)."
     },
     {
       "question": "How is the storage cost calculated?",
-      "answer": "The storage cost is charged at a rate of $0.25 per GB total storage. Total storage is determined by adding up the storage at all replicas and regions. Even if you do not access your data, we have to keep it persistent in Cloud Provider’s block storage (eg AWS EBS, S3) for durability. To calculate the total storage cost, we take daily average of your data size and multiply with $0.25 at the end of the month. For instance, if you have 1 GB data in your database throughout month, you will pay $0.25. If you are using your database as a cache; then it is a good practice to set a timeout (EXPIRE) for your keys to minimize the cost."
+      "answer": "For each database, the first 1GB is free. Beyond that, storage is charged at $0.25 per GB of total storage. Total storage is determined by adding up the storage at all replicas and regions. Even if you do not access your data, it still needs to stay persistent in the cloud provider's block storage for durability and high availability. To calculate storage cost, we take the daily average of your total data size across replicas and regions and apply the monthly rate at the end of the month. If you use your database as a cache, setting a timeout with EXPIRE is a good way to minimize cost."
+    },
+    {
+      "question": "What happens when I hit limits on pay-as-you-go plan?",
+      "answer": "We send email notifications when limits are exceeded. We do our best to keep your database running, but we may rate limit depending on the case. Requests above the max request size are rejected with an exception. Collections that exceed the max record size stop accepting new records. Bandwidth and storage do not have hard limits, but you can use a budget limit to avoid unexpected charges."
+    },
+    {
+      "question": "What happens when I hit limits on Fixed plans?",
+      "answer": "We send email notifications when limits are exceeded. If your database hits the bandwidth or storage limits and auto-upgrade is enabled, it upgrades to the next tier. If auto-upgrade is not enabled, the database is rate limited: traffic is blocked for bandwidth cases and write operations are blocked for storage cases. Requests above the max request size are rejected with an exception. Collections that exceed the max record size stop accepting new records."
     },
     {
       "question": "Are there free trials?",
-      "answer": "Yes, we can provide free trials for Pro and Enterprise plans for testing and PoC purposes. Email us at sales@upstash.com"
+      "answer": "Yes, we can provide free trials for testing and PoC purposes. Email us at support@upstash.com."
     },
     {
       "question": "How many databases can I create?",
-      "answer": "You can create up to 10 databases for free and beyond this you will be charged $0.5 per database up to 100 databases."
+      "answer": "You can create up to 10 databases for free. Beyond that, you are charged $0.5 per database up to 100 databases. For more than 100 databases, contact support@upstash.com. The charge is calculated based on the number of active databases at the end of the month."
+    },
+    {
+      "question": "What happens if I delete my database after 2-3 days?",
+      "answer": "For Fixed plans, you are charged pro-rata for the days the database was active, even if you did not use it. For pay-as-you-go plans, you are only charged for actual usage during those days."
     },
     {
       "question": "How much is the price for bandwidth?",
-      "answer": "For pay is you go plan, it is free up to monthly bandwidth limit of 200GB. Beyond that, we charge $0.03 for each additional GB data transfer.\nFor Pro and Enterprise plans, it is charged at a rate of $0.03 per GB for all the usage throughout the month up to the plan's limit. Any usage beyond that is charged at a rate of $0.10 per GB. For use cases with high volume, you may consider VPC Peering which minimizes the data transfer cost. Contact us at support@upstash.com for details.\nPrice can change depending on cloud provider's fee for the incoming traffic. $0.03 is when the client is in the same region."
+      "answer": "For pay-as-you-go, monthly bandwidth is free up to 200GB. Beyond that, we charge $0.03 per additional GB. For Fixed plans, bandwidth is included up to your plan's limit. If your database is on the highest Fixed tier and exceeds its allowance, we will reach out with upgrade and Enterprise options. If we cannot reach you and usage continues, we reserve the right to charge bandwidth overages at our cloud provider cost rate. For high-volume use cases, VPC peering can reduce transfer costs. VPC peering requires an Enterprise contract. Contact support@upstash.com for details. Bandwidth pricing depends on the cloud provider's traffic fees, so it may change over time. If it changes, we will notify you by email."
     },
     {
-      "question": "Is there a contract requirement for Pro Plans?",
-      "answer": "There is no requirement for long-term contracts as the minimum term is just one month, and you have the flexibility to cancel anytime. But note that even if you cancel within the month, you will be billed for the minimum term of 1 full month."
+      "question": "Can I purchase Prod Pack for any plan?",
+      "answer": "Yes. You can purchase Prod Pack for any plan except the Free tier. You can enable it from your Upstash dashboard database details page."
     },
     {
-      "question": "How is the Enterprise plan priced?",
-      "answer": "In Enterprise plans, a custom price is set based on specific requirements of the customer. For more information email us at sales@upstash.com"
+      "question": "What is included in Prod Pack?",
+      "answer": "Prod Pack includes uptime SLA, SOC 2 Type 2 report, advanced monitoring with Prometheus, Grafana, and Datadog, high availability for read regions, role-based access control, and encryption at rest."
     },
     {
-      "question": "How is the Professional Support priced?",
-      "answer": "Professional support includes a dedicated service desk along and a Slack/Discord channel with a committed response time SLA. It is $1600 per year + 10% of your monthly bill. Check https://upstash.com/docs/common/help/prosupport for details."
+      "question": "What is included in Enterprise subscription?",
+      "answer": "Enterprise includes all Prod Pack features for all your databases. It also includes dedicated professional support, a dedicated technical account manager, unlimited databases, HIPAA compliance, VPC peering, SSO integration, and custom monthly or annual contract options."
+    },
+    {
+      "question": "How is the Enterprise subscription priced?",
+      "answer": "Enterprise pricing is custom and based on your requirements. For more information, email sales@upstash.com."
+    },
+    {
+      "question": "Do you have the Professional Support plan?",
+      "answer": "Professional support includes a dedicated service desk and a Slack or Discord channel with a committed response time SLA. Check https://upstash.com/docs/common/help/prosupport for details."
     }
   ]
 }
