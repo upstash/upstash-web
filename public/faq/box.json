@@ -2,15 +2,19 @@
   "faq": [
     {
       "question": "What does active CPU hour mean?",
-      "answer": "You are billed based on how much CPU your code actually consumes, measured in core-hours. For example, using 100% of 2 cores for one hour costs $0.2, while using 10% of a single core for one hour costs $0.01. When a box is idle with no CPU usage, no charges apply."
+      "answer": "You are billed based on how much CPU your code actually consumes, measured in core-hours. For example, using 100% of 2 cores for one hour costs $0.2, while using 10% of a single core for one hour costs $0.01. When a standard box is idle with no CPU usage, no charges apply. Keep-alive boxes use fixed monthly pricing by size instead."
     },
     {
       "question": "What happens when a box is idle?",
-      "answer": "After 30 minutes of inactivity, the box is automatically frozen. Storage is preserved, but all running processes are stopped. When a new request comes in, the box wakes up automatically, similar to how AWS Lambda cold-starts on demand. No manual intervention is needed. You are only charged for the CPU time your code actually uses. If the box is idle with no CPU usage, there is no CPU charge. Storage charges still apply at $0.1 per GB per month."
+      "answer": "Standard boxes automatically freeze after inactivity. Storage is preserved, but running processes are stopped until the next request. When a new request comes in, the box wakes up automatically, similar to how AWS Lambda cold-starts on demand. No manual intervention is needed. Keep-alive boxes stay on continuously and use fixed monthly pricing by size instead of auto-pause behavior."
+    },
+    {
+      "question": "How much do Keep Alive boxes cost?",
+      "answer": "Keep Alive boxes are billed with a fixed monthly price by size. This is the only charge for that Keep Alive box, so you are not billed separately for CPU or storage on it. Small costs $8/month, Medium costs $16/month, and Large costs $32/month."
     },
     {
       "question": "What is included in storage billing?",
-      "answer": "Storage is billed at $0.1 per GB per month and includes all data on disk, including snapshots. The maximum storage per box is 10 GB for the Small box type."
+      "answer": "Storage is billed at $0.1 per GB per month and includes all data on disk, including snapshots. Storage limits are 5 GB for Small, 10 GB for Medium, and 20 GB for Large."
     },
     {
       "question": "What are the free tier limits?",
