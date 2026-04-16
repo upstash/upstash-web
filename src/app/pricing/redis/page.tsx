@@ -13,7 +13,6 @@ import PricingTable from "@/components/pricing/redis/pricing-table";
 import { PROD_PACK_SECTION_ID } from "@/constants";
 import { generateFaqSchema } from "@/utils/structured-schema-generators";
 import { PricingRedis } from "@/utils/type";
-import Link from "next/link";
 import { ChangeEvent, useState } from "react";
 
 export default function PricingRedisPage() {
@@ -81,13 +80,6 @@ export default function PricingRedisPage() {
             <PageHeaderDesc className="mt-2 md:text-xl">
               Plans that scale to all sizes.
             </PageHeaderDesc>
-
-            <Link
-              className="text-emerald-950 underline opacity-60 dark:text-emerald-500 dark:opacity-100"
-              href={"https://upstash.com/docs/redis/overall/pricing"}
-            >
-              Check Quotas & FAQ Docs
-            </Link>
           </header>
 
           <div className="mt-12 md:mt-16">
