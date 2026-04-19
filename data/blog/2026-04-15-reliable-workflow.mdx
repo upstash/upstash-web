@@ -1,5 +1,5 @@
 ---
-title: "Making Upstash Workflow And QStash Reliable"
+title: "How We Made QStash And Upstash Workflow Reliable At Scale"
 slug: reliable-workflow
 authors: [sancar]
 tags: [qstash, workflow, serverless]
@@ -200,11 +200,9 @@ That rewrite is substantial enough that it deserves its own post, which we publi
 
 The other example was logging.
 
-Our first implementation used **Redis Streams** and performed linear scans on queries. That was workable initially, but it became a bottleneck very quickly.
+Our first implementation used **SQLite**. But as data volume continued to increase, SQLite became a limiting factor for the kinds of queries and scale we needed to support.
 
-We moved from there to **SQLite**, which improved the situation for a time. But as data volume continued to increase, SQLite also became a limiting factor for the kinds of queries and scale we needed to support.
-
-Eventually, we migrated again, this time to **Elasticsearch**.
+Eventually, we migrated to **Elasticsearch**.
 
 The migrations themselves were not the interesting part. The operational strategy was.
 
