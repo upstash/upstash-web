@@ -62,6 +62,9 @@ So we added a pressure valve.
 
 The key idea was straightforward: when the process is already under significant memory pressure, it should stop pulling in more work that could make the situation worse.
 
+<img src="/blog/reliable-workflow/d1-light.png" className="dark:hidden" alt="Backpressure: memory-aware fetch limit" />
+<img src="/blog/reliable-workflow/d1-dark.png" className="hidden dark:block" alt="Backpressure: memory-aware fetch limit" />
+
 We introduced a goroutine that continuously tracks memory usage and flips the system into a critical state when heap usage crosses a configurable threshold. That threshold is based on the memory limit of the machine, with headroom reserved for overhead the application does not directly control, such as socket buffers, file cache, and runtime internals.
 
 A simplified version of that logic looks like this:
@@ -167,6 +170,9 @@ At some point, that stops being one user’s problem and starts becoming everyon
 ### A host-aware blocker
 
 To contain this, we introduced a **HostBlocker** algorithm.
+
+<img src="/blog/reliable-workflow/d2-light.png" className="dark:hidden" alt="HostBlocker: temporary blocking of unhealthy endpoints" />
+<img src="/blog/reliable-workflow/d2-dark.png" className="hidden dark:block" alt="HostBlocker: temporary blocking of unhealthy endpoints" />
 
 If a user endpoint times out, we do not keep sending requests to it at full speed. Instead, we move that host into a temporary blocked state and wait before retrying. If the timeouts continue, the wait time increases.
 
