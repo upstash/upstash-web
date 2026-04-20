@@ -1,0 +1,95 @@
+---
+title: "Building a really fast virtual filesystem for AI agents"
+slug: redis-virtual-fs
+authors: [josh]
+tags: [redis, ai, search]
+description: "How to build a virtual filesystem on top of Upstash Redis, with Redis Search powering grep for AI agents."
+---
+
+AI agents like Codex or Claude Code are naturally **extremely good at running bash commands**. Searching through filesystems, grepping, getting context through the shell.
+
+So I wanted to try: what if the entire filesystem an AI agent works on lived in Redis instead of on a disk? What if, to the AI agent, it looks like it's using any other filesystem, but actually it's a really fast in-memory store?
+
+Here's how I wanted it to work 👇
+
+<Frame>
+  <img src="/blog/redis-virtual-fs/virtual-fs.png" />
+</Frame>
+
+When the agent runs a grep command (which they are all exceptional at), we intercept it using Vercel's `just-bash` library and translate it to a Redis Search query.
+
+That way, we wouldn't need any sandboxes for read-only access and (in theory) it should be _much faster_. And turns out Mintlify has already done something [similar to this](https://www.mintlify.com/blog/how-we-built-a-virtual-filesystem-for-our-assistant).
+
+---
+
+## The idea
+
+To see if this could work, I split the logic into three pieces
+
+1. **Each file is a Redis JSON document**. We store the path, content, size, timestamps, all together under one key.
+2. **A manifest tracks the directory tree**. One Redis key holds the entire folder structure so `ls` and `tree` never have to scan.
+3. **Redis Search for grepping**. This way `grep` doesn't have to read every file to find a match.
+
+And that's it! With these very few things in place, we can get very close to full parity of a regular (read-only) filesystem, but a lot faster. I decided against implementing writes for now.
+
+---
+
+## The biggest challenge: grepping
+
+Commands like `cat` or `ls` are pretty straightforward. We either read a single file in full or we list a directory structure, both of which are easy to do with Redis. Commands like `sed -n '1,240p'` are a bit more complicated, but we can absolutely make them work using Sorted Sets.
+
+Grepping is a bit different. A normal `grep -R "oauth" /workspace` has to read every file under that directory. In a virtual filesystem that means pulling every document out of Redis just to check if it contains the word. That's really slow and expensive.
+
+But we recently introduced [Upstash Redis Search](https://upstash.com/docs/redis/search/introduction), a rust-based, extremely fast and efficient way to search through Redis data. With Redis Search, we can intercept `grep` before it runs, translate it to a query, and get fast results without fetching files.
+
+A search query looks something like this:
+
+```typescript
+import { Redis } from "@upstash/redis";
+
+const redis = new Redis.fromEnv();
+const index = redis.search.index({ name: "vfs" });
+
+const matches = await index.query({
+  filter: {
+    $must: [
+      { workspaceId: "demo" },
+      { kind: "file" },
+      { content: { $phrase: "oauth" } },
+    ],
+  },
+  select: { path: true },
+});
+```
+
+The agent still sees the same output it would from a normal shell.
+
+---
+
+## Giving an agent a shell
+
+The last piece is wiring this up to [`just-bash`](https://github.com/upstash/just-bash) so an agent can run commands against it. Inspired by [how Mintlify built their assistant's filesystem](https://www.mintlify.com/blog/how-we-built-a-virtual-filesystem-for-our-assistant), we mount a Redis-backed fs adapter at `/workspace` on a `MountableFs`:
+
+```typescript
+import { InMemoryFs, MountableFs } from "just-bash";
+
+const mountableFs = new MountableFs({ base: new InMemoryFs() });
+mountableFs.mount("/workspace", redisFs); // redisFs talks to Upstash
+
+const bash = new Bash({ fs: mountableFs, cwd: "/workspace" });
+```
+
+When the agent runs `cat /workspace/src/index.ts`, that `readFile` call goes straight through to Redis. `grep` is intercepted and redirected to Redis Search.
+
+From the agent's perspective it's just a shell. `ls`, `cat`, `grep`, `find`, all of it works. When we put that into the Vercel AI SDK as a `bash` tool, we have an agent that can explore a codebase that lives entirely in Redis.
+
+---
+
+## How I got the idea
+
+For one, the great article from Mintlify I linked above. And second, most agent sandboxes are heavy. We boot a container, mount a disk, and pay the cost of all that whether the agent touches one file or a thousand.
+
+A virtual filesystem with Redis is always on, globally replicated, durable, and the most expensive operation (searching across files) is the one Redis Search is great at.
+
+Cheers 🙌
+Josh
