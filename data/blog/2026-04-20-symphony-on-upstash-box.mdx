@@ -3,7 +3,6 @@ title: "Running Symphony with Upstash Box in Minutes"
 slug: symphony-on-upstash-box
 authors: [alitarik]
 tags: [ai, box, serverless]
-draft: true
 ---
 
 <i>
@@ -49,7 +48,7 @@ It prompts you to provide four credentials:
 - **Linear API key** — to poll and update your tickets
 - **GitHub token** — to push branches and open PRs
 
-Then you pick a GitHub repo and a Linear project from your account. That's it.
+Then you pick a GitHub repo and a Linear project from your account. Finally, it asks whether you want to keep the box alive for production.
 
 ```bash
 ┌ Symphony Box Setup
@@ -59,6 +58,7 @@ Then you pick a GitHub repo and a Linear project from your account. That's it.
 ◇ GitHub token (requires read/write for contents and pull requests): ****
 ◇ Select a GitHub repo: upstash/my-repo
 ◇ Select a Linear project: Backend
+◇ Keep the box alive for production? (recommended — box stays running even when idle; otherwise it freezes after inactivity) yes
 ⠹ Cloning and building Symphony (~5 mins)...
 ✓ Done
 
@@ -74,8 +74,16 @@ Behind the scenes, the CLI:
 3. Installs system dependencies and Codex on the box
 4. Clones your repo and writes a `WORKFLOW.md` config that tells Symphony how to handle your tickets
 5. Builds Symphony from source and starts it
+6. If you chose keep-alive, registers Symphony as the box's init command so it restarts automatically if the box ever reboots
 
 After setup, Symphony streams its output to your terminal. When you close the terminal, Symphony keeps running on the box.
+
+### Keep-alive vs default
+
+| Mode | Behavior |
+| --- | --- |
+| **Keep-alive** (recommended for production) | Box stays running indefinitely. Symphony is registered as the init command and restarts automatically on reboot. |
+| **Default** | Box freezes after a period of inactivity and resumes on next use. Suitable for development or occasional runs. |
 
 ## The workflow
 
