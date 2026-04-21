@@ -1,19 +1,22 @@
 "use client";
 
+import RedisFaqJson from "@/../public/faq/redis.json";
 import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
 import ProductToggle from "@/components/pricing/product-toggle";
 import CompareTable from "@/components/pricing/redis/compare-table";
 import Enterprise from "@/components/pricing/redis/enterprise";
+import FAQ from "@/components/pricing/redis/faq";
 import ProdPack from "@/components/pricing/redis/prod-pack";
 import PricingTable from "@/components/pricing/redis/pricing-table";
 import { PROD_PACK_SECTION_ID } from "@/constants";
+import { generateFaqSchema } from "@/utils/structured-schema-generators";
 import { PricingRedis } from "@/utils/type";
-import Link from "next/link";
 import { ChangeEvent, useState } from "react";
 
 export default function PricingRedisPage() {
+  const structuredFaqSchema = generateFaqSchema(RedisFaqJson);
   const [selectedPlan, setSelectedPlan] = useState(PricingRedis.Free);
   const [selectedFixed, setSelectedFixed] = useState(PricingRedis.Fixed250MB);
 
@@ -38,6 +41,13 @@ export default function PricingRedisPage() {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: structuredFaqSchema,
+        }}
+      />
+
       <section>
         <Container className="max-w-screen-lg">
           <ProductToggle product={"/redis"} />
@@ -70,13 +80,6 @@ export default function PricingRedisPage() {
             <PageHeaderDesc className="mt-2 md:text-xl">
               Plans that scale to all sizes.
             </PageHeaderDesc>
-
-            <Link
-              className="text-emerald-950 underline opacity-60 dark:text-emerald-500 dark:opacity-100"
-              href={"https://upstash.com/docs/redis/overall/pricing"}
-            >
-              Check Quotas & FAQ Docs
-            </Link>
           </header>
 
           <div className="mt-12 md:mt-16">
@@ -85,6 +88,18 @@ export default function PricingRedisPage() {
               selectedFixed={selectedFixed}
               onChangePlan={onChangePlan}
             />
+          </div>
+        </Container>
+      </section>
+
+      {/* FAQ */}
+      <section className="mt-32 md:mt-40">
+        <Container className="max-w-screen-md">
+          <PageHeaderTitle as="h2" className="mb md:text-4xl">
+            FAQ
+          </PageHeaderTitle>
+          <div className="mt-10">
+            <FAQ />
           </div>
         </Container>
       </section>

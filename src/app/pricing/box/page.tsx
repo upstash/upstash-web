@@ -39,7 +39,7 @@ export default function PricingBoxPage() {
       </section>
 
       {/* Compare Table */}
-      <section className="mt-32 md:mt-40">
+      <section className="mt-16 md:mt-24">
         <Container className="max-w-screen-xl">
           <header>
             <PageHeaderTitle as="h2" className="md:text-4xl">
