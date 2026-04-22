@@ -96,16 +96,22 @@ tags: [announce]
 
 #### Tags
 
-Tags are used to group posts under `/blog/tag/<tag>`. A few conventions:
+Tags group posts under `/blog/tag/<tag>`. Conventions:
 
-- Use lowercase, hyphenated tags (e.g. `aws-lambda`, `semantic-search`, `next.js`).
-- Tag matching in `/blog/tag/[tag]` is case- and whitespace-insensitive (via
-  `normalizeTag` in `src/utils/tags.ts`), so `Vector`, `vector`, and
-  `VECTOR` all resolve to the same tag page. Prefer the normalized form
-  in frontmatter so tags deduplicate correctly in popular-tag counts.
-- Add every topic that applies to the post. For example, an article about
-  Upstash Redis Search should include both `redis` and `search`, so it
-  surfaces under `/blog/tag/redis` and `/blog/tag/search`.
+- Always use **lowercase kebab-case** in frontmatter: `aws-lambda`, not
+  `AWS Lambda` or `awslambda`. Don't wrap tags in quotes.
+- Tag matching is case- and whitespace-insensitive (via `normalizeTag` in
+  `src/utils/tags.ts`), so `Vector`, `vector`, `semantic search` and
+  `semantic-search` resolve to the same page — but please write the
+  normalized form so counts and the popular-tag row dedupe correctly.
+- Add every topic that applies. An article about Upstash Redis Search
+  should include both `redis` and `search`, so it surfaces under
+  `/blog/tag/redis` **and** `/blog/tag/search`. Posts that are about
+  semantic search must carry both `search` and `semantic-search`.
+- Display labels for multi-word or acronym tags live in `TAG_NAMES`
+  (`src/utils/const.ts`). If you introduce a new multi-word tag, add
+  an entry so the pill row renders it nicely (e.g. `"feature-flags":
+  "Feature Flags"`). Single-word tags fall back to CSS `capitalize`.
 
 ```mdx
 ---
@@ -115,6 +121,30 @@ authors: [josh]
 tags: [redis, search]
 ---
 ```
+
+**Canonical tag names** (use these; don't invent variants):
+
+| Canonical | Avoid |
+| --- | --- |
+| `ratelimit` | `rate-limiting`, `ratelimiting`, `rate-limit`, `ratelimiter` |
+| `nextjs` | `next.js`, `NextJS` |
+| `aws-lambda` | `awslambda`, `lambda` |
+| `sveltekit` | `svelte-kit` |
+| `nuxt` | `nuxtjs` |
+| `announcement` | `announce` |
+| `webhook` | `webhooks` |
+| `scheduler` | `schedule`, `scheduling` |
+| `connectors` | `connector` |
+| `cache` | `caching` (keep `semantic-cache` as its own tag) |
+| `authentication` | `authenticatio` |
+| `feature-flags` | `feature, flag` (two separate tags) |
+| `environment-variables` | `environment, variable, env` |
+| `search`, `semantic-search` | single-worded `semantic` alone |
+
+If you ever need to re-run the consolidation (e.g. after importing
+external posts), `scripts/consolidate-blog-tags.mjs` is idempotent —
+it rewrites `tags: [...]` in every `data/blog/*.mdx` according to the
+rules above.
 
 ## Snipsync
 

@@ -91,7 +91,9 @@ function rewriteTags(tags) {
   // 2. Apply multi-tag merges.
   for (const { from, to } of MULTI_MERGES) {
     const have = from.every((t) => out.includes(t));
-    if (!have) continue;
+    if (!have) {
+      continue;
+    }
     out = out.filter((t) => !from.includes(t));
     out.push(to);
   }
@@ -111,13 +113,17 @@ function rewriteTags(tags) {
 function processFile(filePath) {
   const src = fs.readFileSync(filePath, "utf8");
   const fmEnd = src.indexOf("\n---", 4);
-  if (!src.startsWith("---\n") || fmEnd === -1) return null;
+  if (!src.startsWith("---\n") || fmEnd === -1) {
+    return null;
+  }
 
   const fm = src.slice(0, fmEnd);
   const rest = src.slice(fmEnd);
 
   const match = fm.match(TAGS_RE);
-  if (!match) return null;
+  if (!match) {
+    return null;
+  }
 
   const rawTags = match[1]
     .split(",")
@@ -127,7 +133,9 @@ function processFile(filePath) {
 
   const newLine = `tags: [${newTags.join(", ")}]`;
   const newFm = fm.replace(TAGS_RE, newLine);
-  if (newFm === fm) return null;
+  if (newFm === fm) {
+    return null;
+  }
 
   fs.writeFileSync(filePath, newFm + rest);
   return { file: path.basename(filePath), before: rawTags, after: newTags };
@@ -142,7 +150,9 @@ function main() {
   const changes = [];
   for (const f of files) {
     const change = processFile(f);
-    if (change) changes.push(change);
+    if (change) {
+      changes.push(change);
+    }
   }
 
   console.log(`Updated ${changes.length} file(s) in ${BLOG_DIR}`);
