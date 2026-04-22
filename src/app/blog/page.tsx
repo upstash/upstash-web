@@ -6,6 +6,7 @@ import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
 import { BANNED_TAGS } from "@/utils/const";
+import { normalizeTag } from "@/utils/tags";
 import type { Post } from "@content";
 import { countBy, flatten, omit } from "lodash";
 import Link from "next/link";
@@ -15,8 +16,8 @@ export default async function BlogPage() {
   const posts = await getData(10);
 
   const _tags = omit(
-    countBy(flatten(posts.map((post) => post.tags))),
-    BANNED_TAGS,
+    countBy(flatten(posts.map((post) => post.tags.map(normalizeTag)))),
+    BANNED_TAGS.map(normalizeTag),
   );
   const tags = Object.entries(_tags).sort((a, b) => b[1] - a[1]);
 

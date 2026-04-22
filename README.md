@@ -92,6 +92,30 @@ tags: [announce]
 ---
 ```
 
+---
+
+#### Tags
+
+Tags are used to group posts under `/blog/tag/<tag>`. A few conventions:
+
+- Use lowercase, hyphenated tags (e.g. `aws-lambda`, `semantic-search`, `next.js`).
+- Tag matching in `/blog/tag/[tag]` is case- and whitespace-insensitive (via
+  `normalizeTag` in `src/utils/tags.ts`), so `Vector`, `vector`, and
+  `VECTOR` all resolve to the same tag page. Prefer the normalized form
+  in frontmatter so tags deduplicate correctly in popular-tag counts.
+- Add every topic that applies to the post. For example, an article about
+  Upstash Redis Search should include both `redis` and `search`, so it
+  surfaces under `/blog/tag/redis` and `/blog/tag/search`.
+
+```mdx
+---
+title: "A First Look at Upstash Redis Search"
+slug: first-look-at-upstash-redis-search
+authors: [josh]
+tags: [redis, search]
+---
+```
+
 ## Snipsync
 
 We use [snipsync](https://github.com/temporalio/snipsync) to synchronize snippets from other repos (like redis-examples) to the docs, so they are deduplicated.

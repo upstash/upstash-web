@@ -1,4 +1,5 @@
 import cx from "@/utils/cx";
+import { normalizeTag } from "@/utils/tags";
 import type { Post } from "@content";
 import Link from "next/link";
 
@@ -14,7 +15,7 @@ export default function PostTags({ post }: Props) {
       {post.tags.map((tag: string) => (
         <Link
           key={tag}
-          href={`/blog/tag/${tag}`}
+          href={`/blog/tag/${normalizeTag(tag)}`}
           className={cx(
             "rounded-full px-3 py-1 font-medium transition",
             "bg-black/10 dark:bg-white/10",
