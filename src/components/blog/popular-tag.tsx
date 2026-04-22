@@ -1,5 +1,6 @@
 import { TAG_NAMES } from "@/utils/const";
 import cx from "@/utils/cx";
+import { normalizeTag } from "@/utils/tags";
 import Link from "next/link";
 
 export default function BlogPopularTag({ data }: { data: [string, number][] }) {
@@ -22,7 +23,7 @@ export default function BlogPopularTag({ data }: { data: [string, number][] }) {
         return (
           <Link
             key={tag}
-            href={`/blog/tag/${tag}`}
+            href={`/blog/tag/${normalizeTag(tag)}`}
             className={cx(
               "rounded-full bg-opacity-10 px-3 py-2 transition",
               "hover:bg-opacity-20 hover:underline",
