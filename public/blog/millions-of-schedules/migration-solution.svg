@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="500" viewBox="0 0 900 500">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
+    </marker>
+    <marker id="arrow-blue" markerWidth="14" markerHeight="10" refX="14" refY="5" orient="auto">
+      <polygon points="0 0, 14 5, 0 10" fill="#2563eb"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="500" fill="#f8fafc" rx="12"/>
+
+  <!-- Title -->
+  <text x="450" y="38" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="20" font-weight="700" fill="#0f172a">Safe migration: upgrade consumers first, switch producers second</text>
+  <text x="450" y="60" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#475569">Deploy new consumer code everywhere before writing any new-format tasks</text>
+
+  <!-- Phase 1 box -->
+  <rect x="40" y="82" width="380" height="295" rx="12" fill="#f0fdf4" stroke="#86efac" stroke-width="2"/>
+  <text x="230" y="108" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="15" font-weight="700" fill="#15803d">Phase 1 — Deploy new consumers</text>
+
+  <!-- Phase 1 processes -->
+  <!-- P1 -->
+  <rect x="60" y="125" width="155" height="75" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="137" y="146" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="700" fill="#15803d">Process 1</text>
+  <rect x="70" y="152" width="135" height="16" rx="4" fill="#16a34a"/>
+  <text x="137" y="164" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" font-weight="700" fill="white">NEW CODE (consumer)</text>
+  <text x="137" y="191" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#166534">Can handle new tasks</text>
+
+  <!-- P2 -->
+  <rect x="245" y="125" width="155" height="75" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="322" y="146" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="700" fill="#15803d">Process 2</text>
+  <rect x="255" y="152" width="135" height="16" rx="4" fill="#16a34a"/>
+  <text x="322" y="164" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" font-weight="700" fill="white">NEW CODE (consumer)</text>
+  <text x="322" y="191" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#166534">Can handle new tasks</text>
+
+  <!-- P3 -->
+  <rect x="60" y="220" width="155" height="75" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="137" y="241" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="700" fill="#15803d">Process 3</text>
+  <rect x="70" y="247" width="135" height="16" rx="4" fill="#16a34a"/>
+  <text x="137" y="259" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" font-weight="700" fill="white">NEW CODE (consumer)</text>
+  <text x="137" y="285" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#166534">Can handle new tasks</text>
+
+  <!-- P4 -->
+  <rect x="245" y="220" width="155" height="75" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="322" y="241" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="700" fill="#15803d">Process 4</text>
+  <rect x="255" y="247" width="135" height="16" rx="4" fill="#16a34a"/>
+  <text x="322" y="259" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" font-weight="700" fill="white">NEW CODE (consumer)</text>
+  <text x="322" y="285" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#166534">Can handle new tasks</text>
+
+  <!-- Phase 1 note -->
+  <rect x="60" y="308" width="340" height="52" rx="8" fill="#bbf7d0" stroke="#4ade80" stroke-width="1"/>
+  <text x="230" y="328" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="700" fill="#15803d">Old producer still active</text>
+  <text x="230" y="346" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#166534">Cluster behavior is identical to before the rollout</text>
+
+  <!-- Arrow Phase 1 -> Phase 2 -->
+  <line x1="430" y1="230" x2="468" y2="230" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow-blue)"/>
+  <text x="449" y="218" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#2563eb" font-weight="700">then</text>
+  <text x="449" y="248" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#2563eb" font-weight="700">flip</text>
+
+  <!-- Phase 2 box -->
+  <rect x="480" y="82" width="380" height="295" rx="12" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text x="670" y="108" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="15" font-weight="700" fill="#1d4ed8">Phase 2 — Switch writes to new model</text>
+
+  <!-- Phase 2 processes -->
+  <!-- P1 -->
+  <rect x="500" y="125" width="155" height="75" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="577" y="146" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="700" fill="#1d4ed8">Process 1</text>
+  <rect x="510" y="152" width="135" height="16" rx="4" fill="#2563eb"/>
+  <text x="577" y="164" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" font-weight="700" fill="white">NEW PRODUCER</text>
+  <text x="577" y="191" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#1e40af">Writes new task format</text>
+
+  <!-- P2 -->
+  <rect x="685" y="125" width="155" height="75" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="762" y="146" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="700" fill="#1d4ed8">Process 2</text>
+  <rect x="695" y="152" width="135" height="16" rx="4" fill="#2563eb"/>
+  <text x="762" y="164" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" font-weight="700" fill="white">NEW PRODUCER</text>
+  <text x="762" y="191" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#1e40af">Writes new task format</text>
+
+  <!-- P3 -->
+  <rect x="500" y="220" width="155" height="75" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="577" y="241" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="700" fill="#1d4ed8">Process 3</text>
+  <rect x="510" y="247" width="135" height="16" rx="4" fill="#2563eb"/>
+  <text x="577" y="259" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" font-weight="700" fill="white">NEW PRODUCER</text>
+  <text x="577" y="285" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#1e40af">Writes new task format</text>
+
+  <!-- P4 -->
+  <rect x="685" y="220" width="155" height="75" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="762" y="241" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="700" fill="#1d4ed8">Process 4</text>
+  <rect x="695" y="247" width="135" height="16" rx="4" fill="#2563eb"/>
+  <text x="762" y="259" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" font-weight="700" fill="white">NEW PRODUCER</text>
+  <text x="762" y="285" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#1e40af">Writes new task format</text>
+
+  <!-- Phase 2 note -->
+  <rect x="500" y="308" width="340" height="52" rx="8" fill="#bfdbfe" stroke="#60a5fa" stroke-width="1"/>
+  <text x="670" y="328" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="700" fill="#1d4ed8">Any worker can consume new tasks</text>
+  <text x="670" y="346" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#1e40af">No routing tricks or sticky ownership needed</text>
+
+  <!-- Bottom callout -->
+  <rect x="40" y="400" width="820" height="72" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="450" y="424" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="700" fill="#15803d">Safe rollout: the moment a new task appears in the queue, every worker already knows how to handle it</text>
+  <text x="450" y="444" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="12" fill="#166534">Compatible with repartitioning, worker failures, and restarts at any point during the migration</text>
+  <text x="450" y="462" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="12" fill="#166534">No dual-write period, no rollback risk, no sticky shard routing</text>
+</svg>

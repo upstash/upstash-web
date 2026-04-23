@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="500" viewBox="0 0 900 500">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
+    </marker>
+    <marker id="arrow-purple" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#7c3aed"/>
+    </marker>
+    <marker id="arrow-red" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#ef4444"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="500" fill="#f8fafc" rx="12"/>
+
+  <!-- Title -->
+  <text x="450" y="38" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="20" font-weight="700" fill="#0f172a">Rolling migration problem</text>
+  <text x="450" y="60" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#475569">A partially upgraded fleet cannot safely start producing new schedule tasks</text>
+
+  <!-- API Request -->
+  <rect x="30" y="90" width="155" height="60" rx="10" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+  <text x="107" y="113" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="700" fill="#5b21b6">Incoming API</text>
+  <text x="107" y="130" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="700" fill="#5b21b6">request</text>
+  <text x="107" y="145" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#6d28d9">hits any process</text>
+
+  <!-- Arrow to Process 1 -->
+  <line x1="185" y1="120" x2="248" y2="143" stroke="#7c3aed" stroke-width="2" marker-end="url(#arrow-purple)"/>
+
+  <!-- Process 1 - NEW code (green) -->
+  <rect x="250" y="115" width="145" height="100" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+  <text x="322" y="138" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="700" fill="#15803d">Process 1</text>
+  <rect x="262" y="145" width="121" height="18" rx="4" fill="#16a34a"/>
+  <text x="322" y="158" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" font-weight="700" fill="white">NEW CODE</text>
+  <text x="322" y="178" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#15803d">Creates new-format</text>
+  <text x="322" y="194" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#15803d">schedule task</text>
+  <text x="322" y="208" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" font-style="italic" fill="#166534">Just restarted</text>
+
+  <!-- Process 2 - OLD code (red) -->
+  <rect x="430" y="115" width="145" height="100" rx="10" fill="#fef2f2" stroke="#ef4444" stroke-width="2"/>
+  <text x="502" y="138" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="700" fill="#dc2626">Process 2</text>
+  <rect x="442" y="145" width="121" height="18" rx="4" fill="#ef4444"/>
+  <text x="502" y="158" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" font-weight="700" fill="white">OLD CODE</text>
+  <text x="502" y="178" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#dc2626">Does not understand</text>
+  <text x="502" y="194" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#dc2626">new task format</text>
+  <text x="502" y="208" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" font-style="italic" fill="#b91c1c">Still running</text>
+
+  <!-- Process 3 - OLD code (red) -->
+  <rect x="610" y="115" width="145" height="100" rx="10" fill="#fef2f2" stroke="#ef4444" stroke-width="2"/>
+  <text x="682" y="138" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="700" fill="#dc2626">Process 3</text>
+  <rect x="622" y="145" width="121" height="18" rx="4" fill="#ef4444"/>
+  <text x="682" y="158" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" font-weight="700" fill="white">OLD CODE</text>
+  <text x="682" y="178" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#dc2626">Does not understand</text>
+  <text x="682" y="194" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#dc2626">new task format</text>
+  <text x="682" y="208" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" font-style="italic" fill="#b91c1c">Still running</text>
+
+  <!-- Process 4 - OLD code (red) -->
+  <rect x="790" y="115" width="85" height="100" rx="10" fill="#fef2f2" stroke="#ef4444" stroke-width="2"/>
+  <text x="832" y="138" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="700" fill="#dc2626">Process 4</text>
+  <rect x="800" y="145" width="66" height="18" rx="4" fill="#ef4444"/>
+  <text x="833" y="158" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="9" font-weight="700" fill="white">OLD CODE</text>
+  <text x="832" y="177" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#dc2626">Old code</text>
+  <text x="832" y="193" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#dc2626">still running</text>
+
+  <!-- Shared sorted sets box -->
+  <rect x="330" y="310" width="255" height="85" rx="10" fill="#e0f2fe" stroke="#0ea5e9" stroke-width="2"/>
+  <text x="457" y="335" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="700" fill="#0369a1">Shared sorted sets</text>
+  <text x="457" y="355" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#0369a1">Tasks consumed by whoever</text>
+  <text x="457" y="371" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#0369a1">owns the shard at that moment</text>
+  <text x="457" y="387" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" font-style="italic" fill="#0284c7">Owner can change during failures</text>
+
+  <!-- Arrow Process 1 writes new task to sorted sets -->
+  <line x1="322" y1="215" x2="390" y2="308" stroke="#7c3aed" stroke-width="2" marker-end="url(#arrow-purple)"/>
+  <text x="335" y="270" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#7c3aed" font-weight="600">writes new task</text>
+
+  <!-- Arrow sorted sets -> Process 2 (danger) -->
+  <line x1="455" y1="310" x2="500" y2="215" stroke="#ef4444" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrow-red)"/>
+  <text x="488" y="268" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#ef4444" font-weight="600">can land here</text>
+
+  <!-- Arrow sorted sets -> Process 3 (danger) -->
+  <line x1="510" y1="315" x2="660" y2="215" stroke="#ef4444" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrow-red)"/>
+  <text x="618" y="262" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#ef4444" font-weight="600">or here</text>
+
+  <!-- Arrow sorted sets -> Process 4 (danger) -->
+  <line x1="585" y1="313" x2="810" y2="215" stroke="#ef4444" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrow-red)"/>
+  <text x="745" y="255" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#ef4444" font-weight="600">or here</text>
+
+  <!-- Problem callout -->
+  <rect x="40" y="418" width="820" height="58" rx="8" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="450" y="441" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="700" fill="#dc2626">Unsafe rollout: producer switched before every worker can consume the new task type</text>
+  <text x="450" y="461" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="12" fill="#b91c1c">Routing tasks only to the updated process would be fragile — ownership can change during failures or repartitioning</text>
+</svg>
