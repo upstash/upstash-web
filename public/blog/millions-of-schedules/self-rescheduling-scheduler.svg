@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="480" viewBox="0 0 900 480">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#16a34a"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="480" fill="#f8fafc" rx="12"/>
+
+  <!-- Title -->
+  <text x="450" y="42" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="20" font-weight="700" fill="#0f172a">New design: schedules as self-rescheduling tasks</text>
+
+  <!-- Redis Sorted Sets box -->
+  <rect x="40" y="160" width="175" height="140" rx="10" fill="#e0f2fe" stroke="#0ea5e9" stroke-width="2"/>
+  <text x="127" y="185" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="700" fill="#0369a1">Redis Sorted Sets</text>
+  <text x="127" y="205" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#0369a1">Score = delivery time</text>
+  <line x1="60" y1="215" x2="196" y2="215" stroke="#bae6fd" stroke-width="1"/>
+  <text x="127" y="232" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10.5" fill="#0369a1">message tasks</text>
+  <text x="127" y="248" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10.5" fill="#0369a1">schedule tasks</text>
+  <text x="127" y="264" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10.5" fill="#0369a1">future fire times</text>
+  <text x="127" y="284" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" font-style="italic" fill="#0284c7">Durable · Partitioned</text>
+
+  <!-- Workers -->
+  <!-- Worker box (generic) -->
+  <rect x="280" y="130" width="160" height="90" rx="10" fill="#fef9c3" stroke="#ca8a04" stroke-width="2"/>
+  <text x="360" y="155" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="700" fill="#92400e">Worker</text>
+  <text x="360" y="174" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#92400e">Pop due items</text>
+  <text x="360" y="190" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#92400e">Dispatch by kind</text>
+  <text x="360" y="208" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" font-style="italic" fill="#b45309">Stateless · restarts cheap</text>
+
+  <!-- Arrow sorted sets -> worker -->
+  <line x1="215" y1="230" x2="278" y2="195" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="242" y="206" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#64748b">pop due</text>
+
+  <!-- Branch arrows from worker -->
+  <!-- to message task -->
+  <line x1="440" y1="160" x2="508" y2="140" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="474" y="142" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#64748b">KindMessage</text>
+
+  <!-- to schedule task -->
+  <line x1="440" y1="190" x2="508" y2="240" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="474" y="232" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#64748b">KindSchedule</text>
+
+  <!-- Message task box -->
+  <rect x="510" y="90" width="180" height="100" rx="10" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+  <text x="600" y="113" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="700" fill="#5b21b6">Message task</text>
+  <text x="600" y="133" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#5b21b6">Deliver user request</text>
+  <text x="600" y="149" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#5b21b6">to destination URL</text>
+  <text x="600" y="169" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" font-style="italic" fill="#6d28d9">Existing delivery path</text>
+  <text x="600" y="183" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" font-style="italic" fill="#6d28d9">unchanged</text>
+
+  <!-- Schedule task box -->
+  <rect x="510" y="230" width="180" height="130" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+  <text x="600" y="254" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="700" fill="#15803d">Schedule task</text>
+  <text x="600" y="274" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#15803d">1. Load schedule def</text>
+  <text x="600" y="291" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#15803d">2. Publish message</text>
+  <text x="600" y="308" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#15803d">3. Compute next time</text>
+  <text x="600" y="325" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#15803d">4. Enqueue itself again</text>
+  <text x="600" y="347" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" font-style="italic" fill="#166534">Self-perpetuating chain</text>
+
+  <!-- Arrow schedule task re-enqueues back to sorted sets (curved loop) -->
+  <path d="M 510 330 Q 350 400 215 280" stroke="#16a34a" stroke-width="2" stroke-dasharray="6,3" fill="none" marker-end="url(#arrow-green)"/>
+  <text x="355" y="400" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10.5" fill="#16a34a" font-weight="600">enqueue next fire time</text>
+
+  <!-- Arrow message task -> HTTP delivery -->
+  <line x1="690" y1="140" x2="758" y2="140" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- HTTP delivery box -->
+  <rect x="760" y="105" width="110" height="70" rx="10" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
+  <text x="815" y="128" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="700" fill="#334155">HTTP</text>
+  <text x="815" y="145" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="700" fill="#334155">Delivery</text>
+  <text x="815" y="163" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#475569">User endpoint</text>
+
+  <!-- Key benefit callout -->
+  <rect x="40" y="405" width="820" height="52" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="450" y="428" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="700" fill="#15803d">Startup is just: begin polling again — no schedule preload required</text>
+  <text x="450" y="446" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="12" fill="#166534">More schedules = more durable queued state, not more restart work · Same execution model as QStash and Workflow</text>
+</svg>
