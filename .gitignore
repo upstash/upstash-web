@@ -11,3 +11,4 @@ public/workbox*
 .env
 .content-collections
 .contentlayer
+temp

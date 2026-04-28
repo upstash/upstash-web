@@ -1,0 +1,56 @@
+---
+title: "Context7 is Ready for Enterprise"
+slug: context7-enterprise
+authors: [enes]
+tags: [context7, enterprise, on-premise, security, mcp, ai]
+description: "Context7 now ships an on-premise edition with content scanning and moderation, addressing the data privacy and safety concerns that slowed enterprise adoption."
+---
+
+Context7 is a service for LLM agents to provide latest, accurate, and safe documentation via MCP, API, or CLI.
+
+Most developers now write code with the help of an AI agent. Without Context7, those agents rely on the LLM's training data — which is often out of date — leading to hallucinations and incorrect API calls.
+
+Context7 provides the latest and accurate context from trusted documentation repos and websites.
+
+<Frame>
+  <img src="/blog/context7-enterprise/overview.png" />
+</Frame>
+
+Context7 got very fast adoption among developers. Enterprise adoption was slower. Two issues:
+
+1. **Data privacy:** Companies keep their source and documentation private and have strict criteria for sharing with third parties.
+2. **Data safety:** Even for public (open-source) repos, they have a high bar for trusting outside content because of injection and malware threats.
+
+We addressed both. On-premise solves data privacy. Content scanning and content moderation together solve data safety.
+
+## 1. On-premise edition
+
+We ship the full Context7 stack — web dashboard, API server, parser, MCP server, and the private vector database — as Docker containers that run inside the customer's network. Customers connect their own LLM keys, so even parse-time and query-time LLM calls stay within their environment. Source code, documentation, and queries never leave their infrastructure. They can still consume our public catalog of open-source documentation, so private sources stay internal while developers keep access to OSS docs. We never use customer data for training or model improvement, and queries are not stored.
+
+<Frame>
+  <img src="/blog/context7-enterprise/on-premise.png" />
+</Frame>
+
+## 2. Content scanning
+
+We run an LLM-based classifier in two layers to detect and discard suspicious content like prompt injection and malicious snippets before it reaches a developer's tool.
+
+<Frame>
+  <img src="/blog/context7-enterprise/content-scanning.png" />
+</Frame>
+
+## 3. Content moderation
+
+Teams can set up policies to allow or exclude sources as part of their queries. They can apply advanced filters — for example, only accepting GitHub repos with more than 1,000 stars — or provide an explicit list of repos or organizations to trust exclusively.
+
+<Frame>
+  <img src="/blog/context7-enterprise/content-moderation.png" />
+</Frame>
+
+## Compliance & Access Control
+
+Context7 is SOC 2 Type II certified, GDPR/CCPA compliant. SSO (SAML/OIDC) and role-based access control are available on enterprise plans. More at [trust.upstash.com](https://trust.upstash.com).
+
+## Try it first
+
+We help teams decide by offering a 1-month free trial for both cloud and on-premise editions. Reach us at [context7@upstash.com](mailto:context7@upstash.com) — we'll walk through your use case and figure out if Context7 is a good fit for your organization.
