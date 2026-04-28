@@ -262,7 +262,7 @@ export default function FAQ() {
         <AccordionContent>
           Prod Pack includes uptime SLA, SOC 2 Type 2 report, advanced
           monitoring with Prometheus, Grafana, and Datadog, high availability
-          for read regions, role-based access control, and encryption at rest.
+          for read regions, and encryption at rest.
         </AccordionContent>
       </AccordionItem>
 

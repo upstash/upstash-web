@@ -1027,28 +1027,16 @@ export default function CompareTable({
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal">Role based access</th>
+          <th className="px-0 text-left font-normal">ACL</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" valid={false} />
           </Col>
           <Col plan={showPayg} feature>
-            <CompareValue
-              after={
-                <Tooltip content="Available with Prod Pack.">
-                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
-                </Tooltip>
-              }
-            />
+            <CompareValue type="boolean" />
           </Col>
           <Col plan={showFixed}>
-            <CompareValue
-              after={
-                <Tooltip content="Available with Prod Pack.">
-                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
-                </Tooltip>
-              }
-            />
+            <CompareValue type="boolean" />
           </Col>
 
           <Col plan={showEnterprise}>

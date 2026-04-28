@@ -127,9 +127,9 @@ const WHY = [
     title: <>Enterprise-Grade Security</>,
     desc: (
       <>
-        Protect your data with robust encryption, role-based access control
-        (RBAC), and compliance with industry standards like GDPR, SOC 2, HIPAA
-        and ISO 27001.
+        Protect your data with robust encryption, access control lists (ACL),
+        and compliance with industry standards like GDPR, SOC 2, HIPAA and ISO
+        27001.
       </>
     ),
     icon: (
