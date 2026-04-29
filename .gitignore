@@ -8,7 +8,11 @@ public/workbox*
 .DS_Store
 *.local
 .vercel
-.env
 .content-collections
 .contentlayer
 temp
+
+.projects/cache
+.projects/vault
+.env
+.env.local
