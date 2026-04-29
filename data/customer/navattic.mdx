@@ -1,0 +1,42 @@
+---
+company_name: navattic
+company_url: navattic.com
+user_name: Ryan Downing
+user_title: Engineering Lead
+user_photo: navattic-ryan.jpg
+highlight: "Performance and scalability just work, and the QStash DX is our favorite part"
+cover_image: cover-navattic.jpg
+order: 21
+---
+
+Navattic is a no-code product demo platform that helps B2B SaaS teams build interactive demos of their products for marketing sites, sales motions, and onboarding flows. Their engineering team relies on Upstash QStash to power the event-driven backbone of their data pipelines.
+
+Below, Ryan Downing, Engineering Lead at Navattic, shares why they picked Upstash, what changed after adoption, and what working with the team has been like.
+
+#### What does your tech stack look like, and where does Upstash fit in?
+
+We run a modern stack: PlanetScale for our Vitess database, Vercel for our core serverless app, and Cloudflare Workers for edge services. Around the time we first started exploring Upstash, we were also standing up a ClickHouse database managed through Tinybird. The common thread across these choices is that we try to keep our internal DevOps light by adopting tools that make the hard things easy.
+
+Upstash fit right into that philosophy. We had been considering building our own Kafka service to back our event system, but we specifically needed at-least-once delivery guarantees — we were pushing data into ClickHouse while keeping certain fields in sync with PlanetScale. Upstash was a perfect fit: URL groups let us cleanly separate responsibilities across pipelines, and the built-in retries and logging gave us confidence that everything was operating correctly.
+
+#### What were you using before Upstash, and what led you to switch?
+
+We were doing a lot of firefighting with our in-house event system and wanted to rebuild it to scale 10–100x our current load. A self-hosted Kafka setup would have worked, but it was overkill for our use case and would have added significant DevOps overhead. QStash, on the other hand, integrated natively with Vercel, and we saw opportunities to use other features like fan-out to solve adjacent problems on our roadmap.
+
+#### What has changed since adopting Upstash?
+
+Our volume has grown significantly since we adopted Upstash, and we haven't had to re-architect anything to keep up. Performance and scalability have been excellent — honestly, I rarely have to think about either — but the developer experience is my favorite part of working with QStash.
+
+We've built a thin internal wrapper around the Upstash SDK that lets us spin up new URL groups with almost no boilerplate. Today we run multiple data pipelines that previously would have required extensive architecture work and days or weeks of complex implementation. With QStash, the pattern is standardized across every pipeline, and a new one takes just hours to ship using URL groups, flow control, and built-in observability.
+
+<Highlight name="Ryan Downing" title="Engineering Lead" photo="navattic-ryan.jpg">
+  Performance and scalability have been excellent. Honestly, I rarely have to
+  think about either, but the developer experience is my favorite part of
+  working with QStash.
+</Highlight>
+
+#### Anything else you'd like to highlight?
+
+The Upstash team is a pleasure to partner with. We consistently get fast responses, often directly from engineers who provide thoughtful answers and suggestions. They're also genuinely receptive to feedback, no matter the size. Early on, we needed certain types exported from their SDK to improve our developer experience — the SDK was updated later that same day.
+
+Other feedback we've shared has landed in subsequent releases, and it's been great to watch the product mature alongside our usage. We're now using QStash to power our vector embedding pipeline, and we expect it to keep scaling with us as we expand into new use cases.
