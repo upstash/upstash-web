@@ -1,0 +1,49 @@
+---
+slug: upstash-on-stripe-projects
+title: "Upstash on Stripe Projects: Provisioning From the Terminal (or From Your Agent)"
+authors: [burak]
+tags: [redis, qstash, vector, search, stripe, agents]
+description: "Upstash is now available on Stripe Projects. Add a Redis database, a QStash messaging queue, a Vector index, or a Search index from your terminal — without ever opening a dashboard."
+---
+
+**Upstash is now available on [Stripe Projects](https://docs.stripe.com/projects)** — you can spin up Redis, QStash, Vector, or Search straight from your terminal, with credentials piped into your `.env` automatically.
+
+If you've been building with agents, you already know why this matters: the agent can write the code, but the moment it needs a *database*, the loop falls off a cliff. You open a browser, sign up, click around, copy a connection string, paste it back, tell the agent to keep going. It's the most expensive part of the loop, because it's the part the model can't do.
+
+[Stripe Projects](https://docs.stripe.com/projects) fixes that. One CLI, and your agent can provision third-party services the way you'd `npm install` a package:
+
+```bash
+stripe projects add upstash/redis
+```
+
+A Redis database, with credentials already in your `.env`, in seconds. Today Upstash is live on Stripe Projects with **four services**: Redis, QStash, Vector, and Search.
+
+```bash
+stripe projects add upstash/qstash    # messaging & workflow
+stripe projects add upstash/vector    # vector database
+stripe projects add upstash/search    # search
+```
+
+The CLI asks once whether you want **Free** (no payment method, real free tier) or **Pay-as-you-go** (billed through Stripe), provisions the resource, pulls credentials through Stripe's encrypted Secret Store, and writes them to your local `.env`.
+
+## Linking your Upstash account
+
+Depending on whether you've used Upstash before, the first run does one of three things:
+
+- **Brand-new user.** Stripe sends your verified email; Upstash creates an account for you in the background and the CLI prints a one-click link into the dashboard.
+- **Existing Upstash user, first time linking.** Upstash recognizes the email and won't hand credentials to whoever asked — that would be a fun security bug. Instead, the CLI walks you through grabbing a one-time linking token from the console and pasting it back.
+- **Already linked.** No prompts. The CLI does its thing and your `.env` fills in.
+
+After the first link, every subsequent `stripe projects add` is hands-off — exactly what you want when an agent is driving.
+
+## Try it
+
+If you have the Stripe CLI installed:
+
+```bash
+stripe projects add upstash/redis
+```
+
+If you don't, the [Stripe Projects docs](https://docs.stripe.com/projects) walk through installation.
+
+The CLI is great for humans, but it really shines when you point an agent at it and watch the agent do, in one tool call, what used to take a tab and three copy-pastes. That's the whole pitch. Provisioning should be a function call. Now it is.
