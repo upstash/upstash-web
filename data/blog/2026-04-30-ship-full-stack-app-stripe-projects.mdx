@@ -134,12 +134,10 @@ The agent ran `stripe projects init`, two `stripe projects add` commands, wrote 
 
 ```bash
 stripe projects init shorty
-stripe projects add upstash/redis  --config '{"price":"free"}'
-stripe projects add vercel/project --config '{"price":"free"}'
+stripe projects add upstash/redis 
+stripe projects add vercel/project
 npx vercel deploy --prod --token "$VERCEL_TOKEN" --scope "$VERCEL_ORG_ID"
 ```
-
-The `--config '{"price":"free"}'` flag pins both resources to Free tier so the whole demo costs nothing. Drop the flag if you want the CLI to ask interactively, or change `free` to `payg` if you want pay-as-you-go without prompts.
 
 Either path lands in the same place. The whole point of Stripe Projects is that it doesn't matter who's typing — the loop is the same.
 
