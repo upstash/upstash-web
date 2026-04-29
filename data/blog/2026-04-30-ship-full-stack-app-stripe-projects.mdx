@@ -106,7 +106,7 @@ auth0/client      Auth0 — authentication for mobile, web, IoT applications
 privy/app         Auth and wallet functionality for your app
 ```
 
-Pick one, `stripe projects add clerk/auth`, and the credentials land in `.env` next to the rest. Same pattern for queues (`upstash/qstash`, `inngest/app`, `cloudflare/queues`), search (`algolia/application`, `upstash/search`), AI inference (`openrouter/api`, `cloudflare/workers-ai`), analytics (`posthog/analytics`, `mixpanel/analytics`), and so on — 45+ services as of writing, on a single CLI.
+Pick one, `stripe projects add clerk/auth`, and the credentials land in `.env` next to the rest. Same pattern for queues (`upstash/qstash`), search (`upstash/search`), AI inference (`openrouter/api`, `cloudflare/workers-ai`), analytics (`posthog/analytics`, `mixpanel/analytics`), and so on — 45+ services as of writing, on a single CLI.
 
 The point isn't that any one service is novel. It's that every service is provisioned the same way, billed through the same account, and discoverable from the same shell. You go from "I need a queue" to a working queue without leaving the terminal you're already in.
 
