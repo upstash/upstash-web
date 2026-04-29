@@ -122,7 +122,7 @@ The other half of the value: **credentials never leave Stripe's vault.** The age
 
 Everything above came out of one Claude Code prompt:
 
-> Build a URL shortener with Next.js App Router. Use Upstash Redis as the data layer (hash per link, sorted set for recent slugs, atomic INCR for clicks). Rate-limit creation by IP with `@upstash/ratelimit`. Show a list of recent links on the home page with click counts that refresh every second without a page reload (a tiny JSON endpoint + a client-side poller). Provision Upstash Redis and Vercel via `stripe projects add` — pass `--config '{"price":"free"}'` so both land on Free tier. Deploy with the Vercel CLI using the token Stripe Projects writes to `.env`. Smoke-test with a curl loop demonstrating the counter incrementing.
+> Build a URL shortener with Next.js App Router. Use Upstash Redis as the data layer (hash per link, sorted set for recent slugs, atomic INCR for clicks). Rate-limit creation by IP with `@upstash/ratelimit`. Show a list of recent links on the home page with click counts that refresh every second without a page reload (a tiny JSON endpoint + a client-side poller). Provision Upstash Redis and Vercel via stripe projects cli. Make sure to use free tier for resources. Deploy with the Vercel CLI using the token Stripe Projects writes to `.env`. Smoke-test with a curl loop demonstrating the counter incrementing.
 
 The agent ran `stripe projects init`, two `stripe projects add` commands, wrote every file in the repo, deployed to Vercel, and handed back a live URL.
 
