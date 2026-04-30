@@ -1,0 +1,144 @@
+---
+slug: ship-full-stack-app-stripe-projects
+title: "From Prompt to Production: Build a Full-Stack App With Stripe Projects"
+authors: [burak]
+tags: [redis, stripe, vercel, nextjs, agents, tutorial, agentic]
+description: "Build, provision, and deploy a real app with `stripe projects` from one terminal — and reproduce the whole thing from a single Claude Code prompt."
+---
+
+The usual way to start a full-stack app is to open five tabs. One for your hosting provider, one for your data store, one for your cache, one for whatever you're using for auth, and one for the docs you're going to forget anyway. You sign up. You click. You copy connection strings into `.env`. By the time you've stopped clicking, you've written zero lines of code.
+
+[Stripe Projects](https://docs.stripe.com/projects) replaces the clicking with one CLI. We covered the [partner launch](/blog/upstash-on-stripe-projects) recently — this post is the practical sequel. We'll build, provision, and deploy a real app — a URL shortener with live click counters — entirely from the terminal:
+
+```bash
+stripe projects init shorty
+stripe projects add upstash/redis
+stripe projects add vercel/project
+```
+
+That's the whole infrastructure story. No dashboards. No copy-pasted connection strings. The full source is at [`upstash/examples/stripe-projects-url-shortener`](https://github.com/upstash/examples/tree/master/examples/stripe-projects-url-shortener) and the live demo is at [shorty-smoky-six.vercel.app](https://shorty-smoky-six.vercel.app). Both came out of a single Claude Code prompt; which is at the bottom of this post.
+
+## How  `stripe projects`  actually works
+
+Three commands carry most of the weight:
+
+```bash
+stripe projects init <name>          # registers this directory as a Stripe Project
+stripe projects add <provider>/<svc> # provisions a resource and writes its credentials to .env
+stripe projects catalog              # browses the 45+ services across 28 providers available today
+```
+
+Each `add` does the same dance: it asks once whether you want **Free** or **Pay-as-you-go**, calls the partner's API to provision the resource, pulls the credentials through Stripe's encrypted Secret Store, and writes them into your local `.env`. The CLI also caches state in `.projects/state.json` so subsequent commands know what's already provisioned. There's no half-state to repair if you forget which database you spun up two days ago — `stripe projects status` tells you, and `stripe projects open <provider>` deep-links into that provider's dashboard for *this* project so you can poke at metrics, billing, or logs without hunting through their UI:
+
+For agents and CI, every command takes flags that suppress prompts:
+
+```bash
+stripe projects add upstash/redis \
+  --config '{"price":"free"}' \
+  --no-interactive --json --yes --accept-tos
+```
+
+That's the form an agent runs. Same effect, no human in the loop.
+
+## What we're building
+
+A URL shortener that:
+
+- shortens URLs and redirects from `yoursite.vercel.app/abc123`
+- shows a live counter that ticks up on every click, no refresh
+- rate-limits link creation per IP
+
+Two boxes in the architecture:
+
+- **Upstash Redis** owns everything that isn't UI — the link store (durable hash per slug), the recent-links sorted set, the click counter, the rate limiter, the live-poll endpoint.
+- **Vercel** runs the Next.js app at the edge.
+
+The code is small enough that it's not the interesting part of this post. Three files matter:
+
+- `app/[slug]/route.ts` — one Redis read, one fire-and-forget `INCR`, redirect.
+- `app/actions.ts` — the server action that creates a link, gated by `@upstash/ratelimit` against the same Redis.
+- `app/api/counts/route.ts` — a JSON endpoint the home page polls once a second to live-update counters.
+
+```ts
+// lib/redis.ts — wired up explicitly because Stripe Projects writes
+// UPSTASH_REST_URL / UPSTASH_REST_TOKEN, not the SDK's default names.
+import { Redis } from "@upstash/redis";
+
+export const redis = new Redis({
+  url: process.env.UPSTASH_REST_URL!,
+  token: process.env.UPSTASH_REST_TOKEN!,
+});
+```
+
+Read the rest in the [repo](https://github.com/upstash/examples/tree/master/examples/stripe-projects-url-shortener) — it's about 200 lines all-in.
+
+## Deploying
+
+```bash
+stripe projects add vercel/project
+```
+
+This provisions a Vercel project and writes `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` to `.env`. Use those with the Vercel CLI to ship:
+
+```bash
+npx vercel deploy --prod --yes \
+  --token "$VERCEL_TOKEN" --scope "$VERCEL_ORG_ID"
+```
+
+Vercel reads the env vars Stripe Projects already manages, builds, and gives you a production URL. No "go to Vercel, click Settings, paste eight environment variables" detour.
+
+```bash
+SHORT=https://your-app.vercel.app/abc123
+for i in $(seq 1 100); do curl -s -o /dev/null $SHORT; done
+```
+
+Watch the counter tick to 100.
+
+## Want more capability? `stripe projects catalog`
+
+The demo is bare-bones on purpose. Need authentication? Browse the catalog:
+
+```bash
+$ stripe projects search auth
+clerk/auth        Clerk Authentication — drop-in auth for any framework
+workos/auth       WorkOS AuthKit — drop-in authentication with SSO, MFA
+auth0/client      Auth0 — authentication for mobile, web, IoT applications
+privy/app         Auth and wallet functionality for your app
+```
+
+Pick one, `stripe projects add clerk/auth`, and the credentials land in `.env` next to the rest. Same pattern for queues (`upstash/qstash`), search (`upstash/search`), AI inference (`openrouter/api`, `cloudflare/workers-ai`), analytics (`posthog/analytics`, `mixpanel/analytics`), and so on — 45+ services as of writing, on a single CLI.
+
+The point isn't that any one service is novel. It's that every service is provisioned the same way, billed through the same account, and discoverable from the same shell. You go from "I need a queue" to a working queue without leaving the terminal you're already in.
+
+## Why this matters for agents
+
+Here's the thing about coding agents: The model can write the whole app. It can write the schema, the route handlers, the rate limiter, the deploy script, the polling client. What it can't do — what it has *never* been able to do — is reach across the network and create a database. So the agent generates code, runs into "I need a Redis instance," and the loop stalls. The human goes to upstash.com, signs up, copies a connection string, pastes it back, says "ok continue." Five minutes of human-in-the-loop in the middle of an otherwise hands-off run.
+
+`stripe projects add` removes that cliff. Provisioning is now a function call. The agent writes the code, runs `stripe projects add upstash/redis`, reads the credentials it just got, and keeps going. The loop closes inside the terminal.
+
+The other half of the value: **credentials never leave Stripe's vault.** The agent doesn't paste keys into a chat. You don't have a connection string sitting in your scrollback. The CLI hydrates `.env` locally and Vercel reads from the same vault at build time — your secrets touch your filesystem and the deploy target, nothing else.
+
+## Reproduce this from one prompt
+
+Everything above came out of one Claude Code prompt:
+
+> Build a URL shortener with Next.js App Router. Use Upstash Redis as the data layer (hash per link, sorted set for recent slugs, atomic INCR for clicks). Rate-limit creation by IP with `@upstash/ratelimit`. Show a list of recent links on the home page with click counts that refresh every second without a page reload (a tiny JSON endpoint + a client-side poller). Provision Upstash Redis and Vercel via stripe projects cli. Make sure to use free tier for resources. Deploy with the Vercel CLI using the token Stripe Projects writes to `.env`. Smoke-test with a curl loop demonstrating the counter incrementing.
+
+The agent ran `stripe projects init`, two `stripe projects add` commands, wrote every file in the repo, deployed to Vercel, and handed back a live URL.
+
+## Two ways to ship this app
+
+**LLM-driven.** Open Claude Code in an empty directory, paste the prompt, approve the `stripe projects add` commands when they pop up (or dangerously skip!). You'll have a deployed URL shortener in about ten minutes, and you'll never leave the terminal.
+
+**Hands-on.** Clone [`upstash/examples/stripe-projects-url-shortener`](https://github.com/upstash/examples/tree/master/examples/stripe-projects-url-shortener), then:
+
+```bash
+stripe projects init shorty
+stripe projects add upstash/redis 
+stripe projects add vercel/project
+npx vercel deploy --prod --token "$VERCEL_TOKEN" --scope "$VERCEL_ORG_ID"
+```
+
+Either path lands in the same place. The whole point of Stripe Projects is that it doesn't matter who's typing — the loop is the same.
+
+If you don't have the CLI yet, the [Stripe Projects docs](https://docs.stripe.com/projects) cover installation. After that, `stripe projects add upstash/redis` in any directory is enough to see how the credentials end up in `.env`. Everything else composes on top of that one command.
