@@ -6,6 +6,7 @@ import { LogoGail } from "../customers/logo-gail";
 import { LogoHumata } from "../customers/logo-humata";
 import { LogoMaker } from "../customers/logo-maker";
 import { LogoMarkprompt } from "../customers/logo-markprompt";
+import { LogoNavattic } from "../customers/logo-navattic";
 import { LogoNiftykit } from "../customers/logo-niftykit";
 import { LogoOpenart } from "../customers/logo-openart";
 import { LogoPaulSmith } from "../customers/logo-paul-smith";
@@ -21,6 +22,7 @@ const blogLogos = {
   humata: LogoHumata,
   maker: LogoMaker,
   markprompt: LogoMarkprompt,
+  navattic: LogoNavattic,
   openart: LogoOpenart,
   niftykit: LogoNiftykit,
   tfashion: LogoTFashion,
