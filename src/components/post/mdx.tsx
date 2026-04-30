@@ -5,7 +5,7 @@ import cx from "@/utils/cx";
 import { MDXContent } from "@content-collections/mdx/react";
 import { IconCheck, IconCopy } from "@tabler/icons-react";
 import Image from "next/image";
-import { ComponentProps, useEffect, useRef, useState } from "react";
+import { ComponentProps, ReactNode, useEffect, useRef, useState } from "react";
 import ExpandableCode from "./expandable-code";
 import PostNote from "./note";
 import { MuxVideoPlayer } from "./mux-video-player";
@@ -84,7 +84,7 @@ function FullWidth(props: ComponentProps<"div">) {
 }
 
 function Highlight(props: {
-  children: string;
+  children: ReactNode;
   photo: string;
   name: string;
   title: string;
@@ -102,16 +102,17 @@ function Highlight(props: {
           />
         )}
 
-        <p
+        <div
           className={cx(
             "text-xl font-medium",
             "bg-gradient-to-br bg-clip-text text-transparent",
             "from-primary-text to-text",
             "dark:from-white dark:to-emerald-300",
+            "[&_p]:m-0",
           )}
         >
           {props.children}
-        </p>
+        </div>
 
         {(props.name || props.title) && (
           <div className="">
