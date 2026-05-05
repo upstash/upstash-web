@@ -10,7 +10,7 @@ export async function GET(_req: NextRequest) {
     );
   }
 
-  const upstream = await fetch(`${UPSTASH_BACKEND_URL}/v2/agent/start`, {
+  const upstream = await fetch(`${UPSTASH_BACKEND_URL}/v2/agent/redis/start`, {
     method: "GET",
     cache: "no-store",
   });
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
 
   const idempotencyKey = req.headers.get("Idempotency-Key");
 
-  const upstream = await fetch(`${UPSTASH_BACKEND_URL}/v2/agent/start`, {
+  const upstream = await fetch(`${UPSTASH_BACKEND_URL}/v2/agent/redis/start`, {
     method: "POST",
     headers: idempotencyKey ? { "Idempotency-Key": idempotencyKey } : {},
     cache: "no-store",

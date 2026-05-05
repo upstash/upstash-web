@@ -14,7 +14,7 @@ export async function GET(
   }
 
   const upstream = await fetch(
-    `${UPSTASH_BACKEND_URL}/v2/agent/metrics/${params.id}`,
+    `${UPSTASH_BACKEND_URL}/v2/agent/redis/metrics/${params.id}`,
     {
       method: "GET",
       cache: "no-store",
