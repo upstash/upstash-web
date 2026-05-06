@@ -1,46 +1,59 @@
-"use client"
+"use client";
 
 import Button from "@/components/button";
+import {
+  QSTASH_FIXED_PLANS,
+  QSTASH_FREE_PLAN,
+  QSTASH_PAYG_PLAN,
+} from "@/data/pricing/qstash";
 import { PricingPlans } from "@/utils/type";
 import * as React from "react";
 import { ChangeEvent, useState } from "react";
 
+const PRICING_PLANS_TO_FIXED_ID: Record<string, string> = {
+  [PricingPlans.Pro1M]: "fixed-1m",
+  [PricingPlans.Pro10M]: "fixed-10m",
+};
+
+const FIXED_PLAN_BY_ID = Object.fromEntries(
+  QSTASH_FIXED_PLANS.map((p) => [p.id, p])
+);
+
 export default function PricingTable() {
   const [selectedFixed, setSelectedFixed] = useState(PricingPlans.Pro1M);
-  
-  const showFixed1M = selectedFixed === PricingPlans.Pro1M;
-  const showFixed10M = selectedFixed === PricingPlans.Pro10M;
-  
+
   const onChangePlan = (event: ChangeEvent<HTMLSelectElement>) => {
-    const value = event.target.value as PricingPlans;
-    setSelectedFixed(value);
+    setSelectedFixed(event.target.value as PricingPlans);
   };
+
+  const fixedPlan =
+    FIXED_PLAN_BY_ID[PRICING_PLANS_TO_FIXED_ID[selectedFixed]] ??
+    QSTASH_FIXED_PLANS[0];
+
   return (
     <div className="grid gap-6 md:grid-cols-3">
-      {/**/}
-
       {/* FREE */}
-
       <div className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
         <div className="grow">
           <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
-            Free
+            {QSTASH_FREE_PLAN.name}
           </h4>
-
-          <h5 className="text-2xl font-semibold">$0</h5>
-          <p className="text-text-mute">-</p>
+          <h5 className="text-2xl font-semibold">
+            {QSTASH_FREE_PLAN.priceDisplay}
+          </h5>
+          <p className="text-text-mute">{QSTASH_FREE_PLAN.priceSubtext}</p>
         </div>
 
         <div className="grow">
           <div className="text-balance rounded-lg bg-bg-mute px-3 py-2 text-sm text-primary-text dark:text-text-mute">
-            Perfect for prototypes and hobby projects.
+            {QSTASH_FREE_PLAN.description}
           </div>
         </div>
 
         <div className="w-full px-6 *:border-b *:border-bg-mute">
           <div className="py-3">
             <p className="text-text-mute">Messages per Day</p>
-            <p className="font-semibold">1,000</p>
+            <p className="font-semibold">{QSTASH_FREE_PLAN.maxMessagesPerDay}</p>
           </div>
         </div>
 
@@ -54,27 +67,29 @@ export default function PricingTable() {
       </div>
 
       {/* PAYG */}
-
       <div className="flex flex-col items-center gap-4 rounded-4xl border-2 border-primary bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
         <div className="grow">
           <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
-            Pay as you go
+            {QSTASH_PAYG_PLAN.name}
           </h4>
-
-          <h5 className="text-2xl font-semibold">$1</h5>
-          <p className="text-sm text-text-mute">per 100K messages</p>
+          <h5 className="text-2xl font-semibold">
+            {QSTASH_PAYG_PLAN.priceDisplay}
+          </h5>
+          <p className="text-sm text-text-mute">
+            {QSTASH_PAYG_PLAN.priceSubtext}
+          </p>
         </div>
 
         <div className="grow">
           <div className="text-balance rounded-lg bg-bg-mute px-3 py-2 text-sm text-primary-text dark:text-text-mute">
-            For use cases with bursting traffic.
+            {QSTASH_PAYG_PLAN.description}
           </div>
         </div>
 
         <div className="w-full px-6 *:border-b *:border-bg-mute">
           <div className="py-3">
             <p className="text-text-mute">Messages per Day</p>
-            <p className="font-semibold">Unlimited</p>
+            <p className="font-semibold">{QSTASH_PAYG_PLAN.maxMessagesPerDay}</p>
           </div>
         </div>
 
@@ -88,7 +103,6 @@ export default function PricingTable() {
       </div>
 
       {/* Fixed */}
-
       <div className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
         <div className="grow">
           <h4 className="mb-4 text-xl font-semibold text-primary-text">
@@ -103,32 +117,24 @@ export default function PricingTable() {
           </h4>
 
           <h5 className="flex items-baseline justify-center text-2xl font-semibold">
-            {showFixed1M && <>$180</>}
-            {showFixed10M && <>$420</>}
+            {fixedPlan.priceDisplay}
             <span className="ml-1 text-base font-normal text-text-mute">
-              / month
+              {fixedPlan.priceSubtext}
             </span>
           </h5>
-
-          <p className="text-sm text-text-mute">
-            -
-          </p>
+          <p className="text-sm text-text-mute">-</p>
         </div>
 
         <div className="grow">
           <div className="text-balance rounded-lg bg-bg-mute px-3 py-2 text-sm text-primary-text dark:text-text-mute">
-            For businesses with consistent high-capacity loads and predictable
-            costs.
+            {fixedPlan.description}
           </div>
         </div>
 
         <div className="w-full px-6 *:border-b *:border-bg-mute">
           <div className="py-3">
             <p className="text-text-mute">Messages per Day</p>
-            <p className="font-semibold">
-              {showFixed1M && <>1M messages</>}
-              {showFixed10M && <>10M messages</>}
-            </p>
+            <p className="font-semibold">{fixedPlan.maxMessagesPerDay}</p>
           </div>
         </div>
 

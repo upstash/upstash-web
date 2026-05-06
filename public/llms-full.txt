@@ -1,0 +1,134 @@
+# Upstash
+
+> Serverless data platform — Redis, Vector Search, QStash (message queues), Workflow, Search, and Box (compute). Fully managed, pay-per-use, no idle costs.
+> Website: https://upstash.com
+> Console: https://console.upstash.com
+
+---
+
+## Pricing Pages
+
+### Redis
+- [Pricing (UI)](https://upstash.com/pricing/redis): Interactive pricing page with plan cards and comparison table
+- [Pricing (Markdown)](https://upstash.com/pricing/redis.md): Machine-readable full pricing — plans, limits, feature matrix, and FAQ
+
+**Quick reference:**
+- Free: $0, 256 MB data, 500K commands/month
+- Pay as You Go: $0.20 per 100K commands, 100 GB data, unlimited bandwidth
+- Fixed 250MB: $10/month (+$5/read region), 250 MB data, 50 GB bandwidth
+- Fixed 1GB: $20/month (+$10/read region), 1 GB data, 100 GB bandwidth
+- Fixed 5GB: $100/month (+$50/read region), 5 GB data, 500 GB bandwidth
+- Fixed 10GB: $200/month (+$100/read region), 10 GB data, 1 TB bandwidth
+- Fixed 50GB: $400/month (+$200/read region), 50 GB data, 5 TB bandwidth
+- Fixed 100GB: $800/month (+$400/read region), 100 GB data, 10 TB bandwidth
+- Fixed 500GB: $1500/month (+$750/read region), 500 GB data, 20 TB bandwidth
+- Enterprise: Custom pricing — contact sales@upstash.com
+
+### QStash
+- [Pricing (UI)](https://upstash.com/pricing/qstash): Interactive pricing page
+- [Pricing (Markdown)](https://upstash.com/pricing/qstash.md): Machine-readable full pricing
+
+**Quick reference:**
+- Free: $0, 1,000 messages/day
+- Pay as You Go: $1 per 100K messages, unlimited messages/day (retries are free)
+- Fixed 1M: $180/month, 1M messages/day, 1 TB bandwidth
+- Fixed 10M: $420/month, 10M messages/day, 5 TB bandwidth
+- Enterprise: Custom — contact sales@upstash.com
+
+### Vector
+- [Pricing (UI)](https://upstash.com/pricing/vector): Interactive pricing page
+- [Pricing (Markdown)](https://upstash.com/pricing/vector.md): Machine-readable full pricing
+
+**Quick reference:**
+- Free: $0, 200M vectors×dimensions, 10K daily queries, 1 GB total data
+- Pay as You Go: $0.40 per 100K requests + $0.25/GB storage, 2B vectors×dims, unlimited queries, 50 GB data
+- Fixed: $60/month, 2B vectors×dims, 1M daily queries, 50 GB data
+- Pro: Contact us, 100B vectors×dims, unlimited queries, 1 TB data, 99.99% SLA
+
+### Workflow
+- [Pricing (UI)](https://upstash.com/pricing/workflow): Interactive pricing page
+- [Pricing (Markdown)](https://upstash.com/pricing/workflow.md): Machine-readable full pricing
+
+**Quick reference (built on QStash, billed by steps):**
+- Free: $0, 1,000 steps/day
+- Pay as You Go: $1 per 100K steps
+- Fixed 1M: $180/month, 1M steps/day
+- Fixed 10M: $420/month, 10M steps/day
+- Enterprise: Custom — contact sales@upstash.com
+
+### Search
+- [Pricing (UI)](https://upstash.com/pricing/search): Interactive pricing page
+- [Pricing (Markdown)](https://upstash.com/pricing/search.md): Machine-readable full pricing
+
+**Quick reference:**
+- Free: $0, 20K queries/month, 200K records
+- Pay as You Go: $0.05 per 1K requests, unlimited queries, 2M records
+- Pro: Coming Soon
+
+### Box
+- [Pricing (UI)](https://upstash.com/pricing/box): Interactive pricing page
+- [Pricing (Markdown)](https://upstash.com/pricing/box.md): Machine-readable full pricing
+
+**Quick reference (serverless compute, AWS us-east-1):**
+- Free: $0, 10 concurrent boxes, 5 CPU hours/month, $1 LLM budget
+- Pay as You Go (usage): Small $0.10, Medium $0.20, Large $0.40 per active CPU hour + $0.10/GB/month storage
+- Pay as You Go (keep-alive): Small $8, Medium $16, Large $32/month
+- Enterprise: Custom — contact sales@upstash.com
+
+---
+
+## Prod Pack Add-on (Redis, QStash, Workflow)
+
+Available on all paid plans. Includes:
+- Uptime SLA
+- SOC 2 Type 2 compliance report
+- Advanced monitoring: Prometheus, Grafana, Datadog, New Relic
+- Multi-Zone high availability (Redis)
+- Role-based access control (ACL)
+- Encryption at rest
+
+Enable from the database/resource details page in the Upstash console.
+
+---
+
+## Enterprise
+
+For high-volume, compliance-sensitive, or custom-contract workloads across all products:
+- All Prod Pack features for all resources
+- Dedicated professional support + technical account manager
+- Unlimited databases/resources
+- HIPAA compliance
+- VPC peering / AWS PrivateLink
+- SAML SSO
+- Custom monthly or annual contracts
+- Access logging (Redis)
+
+Contact: support@upstash.com
+More info: https://upstash.com/enterprise
+
+---
+
+## Support
+
+- Community: Discord and GitHub discussions
+- Email support: Available on all paid plans — support@upstash.com
+- Professional Support (SLA): https://upstash.com/docs/common/help/prosupport
+- Dedicated Slack channel: Enterprise only
+
+---
+
+## Documentation
+
+- [Full Docs](https://upstash.com/docs)
+- [Redis Docs](https://upstash.com/docs/redis/overall/getstarted)
+- [QStash Docs](https://upstash.com/docs/qstash/overall/getstarted)
+- [Vector Docs](https://upstash.com/docs/vector/overall/getstarted)
+- [Workflow Docs](https://upstash.com/docs/workflow/getstarted)
+- [Box Docs](https://upstash.com/docs/box/overall/quickstart)
+
+---
+
+## Contact
+
+- Support: support@upstash.com
+- Status page: https://status.upstash.com

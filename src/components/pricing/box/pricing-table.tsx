@@ -1,58 +1,43 @@
 import Button from "@/components/button";
+import {
+  BOX_ENTERPRISE_PLAN,
+  BOX_FREE_PLAN,
+  BOX_PAYG_PLAN,
+  BOX_SIZES,
+} from "@/data/pricing/box";
+import * as React from "react";
 
-const BOX_SIZES = {
-  small: {
-    label: "Small",
-    cpu: "2 CPU",
-    memory: "4 GB RAM",
-    storage: "5 GB storage",
-    usagePrice: "$0.10",
-  },
-  medium: {
-    label: "Medium",
-    cpu: "4 CPU",
-    memory: "8 GB RAM",
-    storage: "10 GB storage",
-    usagePrice: "$0.20",
-  },
-  large: {
-    label: "Large",
-    cpu: "8 CPU",
-    memory: "16 GB RAM",
-    storage: "20 GB storage",
-    usagePrice: "$0.40",
-  },
-} as const;
+const defaultSize = BOX_SIZES[0];
 
 export default function PricingTable() {
-  const selectedSpec = BOX_SIZES.small;
-
   return (
     <div className="grid gap-6 md:grid-cols-3">
+      {/* FREE */}
       <div className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
         <div className="grow">
           <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
-            Free
+            {BOX_FREE_PLAN.name}
           </h4>
-
-          <h5 className="text-2xl font-semibold">$0</h5>
+          <h5 className="text-2xl font-semibold">
+            {BOX_FREE_PLAN.priceDisplay}
+          </h5>
           <p className="text-text-mute">-</p>
         </div>
 
         <div className="grow">
           <div className="text-balance rounded-lg bg-bg-mute px-3 py-2 text-sm text-primary-text dark:text-text-mute">
-            Perfect for prototypes and hobby projects.
+            {BOX_FREE_PLAN.description}
           </div>
         </div>
 
         <div className="w-full px-6 *:border-b *:border-bg-mute">
           <div className="py-3">
             <p className="text-text-mute">Concurrent Boxes</p>
-            <p className="font-semibold">10</p>
+            <p className="font-semibold">{BOX_FREE_PLAN.maxConcurrentBoxes}</p>
           </div>
           <div className="py-3">
             <p className="text-text-mute">CPU Hours / Month</p>
-            <p className="font-semibold">5</p>
+            <p className="font-semibold">{BOX_FREE_PLAN.cpuHoursPerMonth}</p>
           </div>
         </div>
 
@@ -65,20 +50,21 @@ export default function PricingTable() {
         </div>
       </div>
 
+      {/* PAYG */}
       <div className="flex flex-col items-center gap-4 rounded-4xl border-2 border-primary bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
         <div className="grow text-center">
           <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
-            Pay as you go
+            {BOX_PAYG_PLAN.name}
           </h4>
-
-          <h5 className="text-2xl font-semibold">{selectedSpec.usagePrice}</h5>
+          <h5 className="text-2xl font-semibold">
+            ${defaultSize.cpuHourPrice.toFixed(2)}
+          </h5>
           <p className="text-sm text-text-mute">per active CPU hour</p>
         </div>
 
         <div className="grow">
           <div className="text-balance rounded-lg bg-bg-mute px-3 py-2 text-sm text-primary-text dark:text-text-mute">
-            Pay only when your box is active. Choose the size that matches your
-            workload.
+            {BOX_PAYG_PLAN.description}
           </div>
         </div>
 
@@ -86,12 +72,12 @@ export default function PricingTable() {
           <div className="py-3">
             <p className="text-text-mute">Resources</p>
             <p className="font-semibold">
-              {selectedSpec.cpu}, {selectedSpec.memory}
+              {defaultSize.cpu}, {defaultSize.memory}
             </p>
           </div>
           <div className="py-3">
             <p className="text-text-mute">Included Storage</p>
-            <p className="font-semibold">{selectedSpec.storage}</p>
+            <p className="font-semibold">{defaultSize.storage}</p>
           </div>
         </div>
 
@@ -104,31 +90,36 @@ export default function PricingTable() {
         </div>
       </div>
 
+      {/* Enterprise */}
       <div className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
         <div className="grow">
           <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
-            Enterprise
+            {BOX_ENTERPRISE_PLAN.name}
           </h4>
-
-          <h5 className="text-2xl font-semibold">Custom</h5>
-          <p className="text-sm text-text-mute">contact us</p>
+          <h5 className="text-2xl font-semibold">
+            {BOX_ENTERPRISE_PLAN.priceDisplay}
+          </h5>
+          <p className="text-sm text-text-mute">
+            {BOX_ENTERPRISE_PLAN.priceSubtext}
+          </p>
         </div>
 
         <div className="grow">
           <div className="text-balance rounded-lg bg-bg-mute px-3 py-2 text-sm text-primary-text dark:text-text-mute">
-            For teams that need custom limits, regional requirements, or
-            dedicated support.
+            {BOX_ENTERPRISE_PLAN.description}
           </div>
         </div>
 
         <div className="w-full px-6 *:border-b *:border-bg-mute">
           <div className="py-3">
             <p className="text-text-mute">Box Sizes</p>
-            <p className="font-semibold">Small, Medium, Large</p>
+            <p className="font-semibold">
+              {BOX_SIZES.map((s) => s.label).join(", ")}
+            </p>
           </div>
           <div className="py-3">
             <p className="text-text-mute">Limits</p>
-            <p className="font-semibold">Custom</p>
+            <p className="font-semibold">{BOX_ENTERPRISE_PLAN.maxConcurrentBoxes}</p>
           </div>
         </div>
 
