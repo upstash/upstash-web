@@ -3,7 +3,9 @@ import { DateTime } from "luxon";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function PostGridCard({ data }: { data: Post }) {
+export type PostCardData = Pick<Post, "slug" | "title" | "date" | "authorsData">;
+
+export default function PostGridCard({ data }: { data: PostCardData }) {
   const { title, slug, date, authorsData } = data;
 
   return (

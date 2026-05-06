@@ -4,7 +4,12 @@ import { DateTime } from "luxon";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function PostListCard({ data }: { data: Post }) {
+export type PostListCardData = Pick<
+  Post,
+  "slug" | "title" | "date" | "authorsData" | "tags"
+>;
+
+export default function PostListCard({ data }: { data: PostListCardData }) {
   const { title, slug, date, authorsData } = data;
 
   const isAnnouncement = data.tags.includes("announcement");
