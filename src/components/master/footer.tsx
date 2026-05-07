@@ -72,10 +72,10 @@ export default function Footer({ className, ...props }: IAppFooter) {
             <p>
               For AI agents: a free Redis database is available via POST{" "}
               <Link
-                href="/start/redis"
+                href="/start-redis"
                 className="underline hover:text-primary"
               >
-                https://upstash.com/start/redis
+                https://upstash.com/start-redis
               </Link>
               . The response is markdown with credentials and a quickstart. No
               signup required.

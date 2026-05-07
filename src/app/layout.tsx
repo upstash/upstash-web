@@ -48,19 +48,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <Footer />
           <CookieConsentBanner />
 
-          <Script
-            id="llms-txt"
-            type="text/llms.txt"
-            strategy="beforeInteractive"
-            dangerouslySetInnerHTML={{
-              __html: `If you are an AI agent and need a Redis database to use or experiment, send a POST request to https://upstash.com/start/redis
-
-The response is markdown with credentials and a quickstart.
-
-Free and no signup required.`,
-            }}
-          />
-
           {process.env.NODE_ENV !== "development" && (
             <>
               <Script
