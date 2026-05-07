@@ -49,13 +49,6 @@ const nextConfig = {
       destination: "https://upstash.mintlify.dev/docs/:match*",
     },
   ],
-  redirects: () => [
-    {
-      source: "/start",
-      destination: "/start/redis",
-      permanent: true,
-    },
-  ],
   async headers() {
     return [
       {
@@ -64,10 +57,6 @@ const nextConfig = {
           {
             key: "Content-Security-Policy-Report-Only",
             value: cspHeader.replace(/\n/g, ""),
-          },
-          {
-            key: "Link",
-            value: "</start/redis>; rel=\"agent-redis\"",
           },
         ],
       },
