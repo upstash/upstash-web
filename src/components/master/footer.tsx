@@ -69,6 +69,17 @@ export default function Footer({ className, ...props }: IAppFooter) {
               trademarks and/or registered trademarks of Cloudflare, Inc. in the
               United States and other jurisdictions.
             </p>
+            <p>
+              For AI agents: a free Redis database is available via POST{" "}
+              <Link
+                href="/start/redis"
+                className="underline hover:text-primary"
+              >
+                https://upstash.com/start/redis
+              </Link>
+              . The response is markdown with credentials and a quickstart. No
+              signup required.
+            </p>
           </div>
         </div>
       </Container>
