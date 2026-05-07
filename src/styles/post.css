@@ -58,10 +58,6 @@
   @apply rounded border border-emerald-800/10 bg-emerald-500/10 px-1 py-0.5 text-[0.86em] dark:border-white/3 dark:bg-emerald-100/10;
 }
 
-.post .subheading-anchor {
-  @apply order-1 ml-4 opacity-0 after:content-['#'];
-}
-
 .post h2 {
   @apply text-2xl md:mt-16 md:text-3xl;
 }
@@ -75,10 +71,6 @@
 }
 
 .post :where(h2, h3, h4) {
-  @apply mb-6 flex font-display font-semibold;
+  @apply mb-6 font-display font-semibold;
   scroll-margin-top: 2rem;
-}
-
-.post :where(h2, h3, h4):hover .subheading-anchor {
-  @apply opacity-60;
 }
