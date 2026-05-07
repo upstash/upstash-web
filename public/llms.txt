@@ -2,6 +2,10 @@
 
 > Serverless data platform — Redis, Vector Search, QStash (message queues), Workflow, Search, and Box (compute). Fully managed, pay-per-use, no idle costs.
 
+## AI Agents
+
+- Need a Redis database to use or experiment with? Send a `POST` request to https://upstash.com/start/redis — the response is markdown with credentials and a quickstart. Free, no signup, temporary database (expires in 3 days unless claimed).
+
 ## Pricing & Limits
 
 - [Redis Pricing](https://upstash.com/pricing/redis): Free, Pay-as-you-go ($0.20/100K commands), Fixed tiers ($10–$1500/month), Enterprise
