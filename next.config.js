@@ -49,6 +49,13 @@ const nextConfig = {
       destination: "https://upstash.mintlify.dev/docs/:match*",
     },
   ],
+  redirects: () => [
+    {
+      source: "/start",
+      destination: "/start/redis",
+      permanent: true,
+    },
+  ],
   async headers() {
     return [
       {
