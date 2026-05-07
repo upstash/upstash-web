@@ -11,6 +11,7 @@ public/workbox*
 .content-collections
 .contentlayer
 temp
+tsconfig.tsbuildinfo
 
 .projects/cache
 .projects/vault

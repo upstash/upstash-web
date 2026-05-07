@@ -64,6 +64,77 @@ const nextConfig = {
           },
         ],
       },
+      {
+        // Advertise the LLM-friendly index on every page
+        source: "/(.*)",
+        headers: [
+          {
+            key: "Link",
+            value:
+              '<https://upstash.com/llms.txt>; rel="alternate"; type="text/plain"; title="LLM-friendly content index"',
+          },
+        ],
+      },
+      {
+        source: "/pricing/redis",
+        headers: [
+          {
+            key: "Link",
+            value:
+              '<https://upstash.com/pricing/redis.md>; rel="alternate"; type="text/markdown"; title="Redis Pricing (Markdown)"',
+          },
+        ],
+      },
+      {
+        source: "/pricing/qstash",
+        headers: [
+          {
+            key: "Link",
+            value:
+              '<https://upstash.com/pricing/qstash.md>; rel="alternate"; type="text/markdown"; title="QStash Pricing (Markdown)"',
+          },
+        ],
+      },
+      {
+        source: "/pricing/vector",
+        headers: [
+          {
+            key: "Link",
+            value:
+              '<https://upstash.com/pricing/vector.md>; rel="alternate"; type="text/markdown"; title="Vector Pricing (Markdown)"',
+          },
+        ],
+      },
+      {
+        source: "/pricing/workflow",
+        headers: [
+          {
+            key: "Link",
+            value:
+              '<https://upstash.com/pricing/workflow.md>; rel="alternate"; type="text/markdown"; title="Workflow Pricing (Markdown)"',
+          },
+        ],
+      },
+      {
+        source: "/pricing/search",
+        headers: [
+          {
+            key: "Link",
+            value:
+              '<https://upstash.com/pricing/search.md>; rel="alternate"; type="text/markdown"; title="Search Pricing (Markdown)"',
+          },
+        ],
+      },
+      {
+        source: "/pricing/box",
+        headers: [
+          {
+            key: "Link",
+            value:
+              '<https://upstash.com/pricing/box.md>; rel="alternate"; type="text/markdown"; title="Box Pricing (Markdown)"',
+          },
+        ],
+      },
     ];
   },
 };

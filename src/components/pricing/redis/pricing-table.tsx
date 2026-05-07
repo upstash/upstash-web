@@ -1,9 +1,27 @@
 "use client";
 
 import Button from "@/components/button";
+import {
+  REDIS_FIXED_PLANS,
+  REDIS_FREE_PLAN,
+  REDIS_PAYG_PLAN,
+} from "@/data/pricing/redis";
 import { PricingRedis } from "@/utils/type";
 import * as React from "react";
 import { ChangeEvent } from "react";
+
+const FIXED_PLAN_BY_ID: Record<string, (typeof REDIS_FIXED_PLANS)[number]> =
+  Object.fromEntries(REDIS_FIXED_PLANS.map((p) => [p.id, p]));
+
+const PRICING_REDIS_TO_FIXED_ID: Record<string, string> = {
+  [PricingRedis.Fixed250MB]: "fixed-250mb",
+  [PricingRedis.Fixed1GB]: "fixed-1gb",
+  [PricingRedis.Fixed5GB]: "fixed-5gb",
+  [PricingRedis.Fixed10GB]: "fixed-10gb",
+  [PricingRedis.Fixed50GB]: "fixed-50gb",
+  [PricingRedis.Fixed100GB]: "fixed-100gb",
+  [PricingRedis.Fixed500GB]: "fixed-500gb",
+};
 
 export default function PricingTable({
   selectedFixed,
@@ -12,45 +30,38 @@ export default function PricingTable({
   selectedFixed: PricingRedis;
   onChangePlan: (event: ChangeEvent<HTMLSelectElement>) => void;
 }) {
-  const showFixed250MB = selectedFixed === PricingRedis.Fixed250MB;
-  const showFixed1GB = selectedFixed === PricingRedis.Fixed1GB;
-  const showFixed5GB = selectedFixed === PricingRedis.Fixed5GB;
-  const showFixed10GB = selectedFixed === PricingRedis.Fixed10GB;
-  const showFixed50GB = selectedFixed === PricingRedis.Fixed50GB;
-  const showFixed100GB = selectedFixed === PricingRedis.Fixed100GB;
-  const showFixed500GB = selectedFixed === PricingRedis.Fixed500GB;
+  const fixedPlan =
+    FIXED_PLAN_BY_ID[PRICING_REDIS_TO_FIXED_ID[selectedFixed]] ??
+    REDIS_FIXED_PLANS[0];
 
   return (
     <div className="grid gap-6 md:grid-cols-3">
-      {/**/}
-
       {/* FREE */}
-
       <div className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
         <div className="grow min-h-[120px]">
           <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
-            Free
+            {REDIS_FREE_PLAN.name}
           </h4>
-
-          <h5 className="text-2xl font-semibold">$0</h5>
-          <p className="text-sm text-text-mute">-</p>
+          <h5 className="text-2xl font-semibold">
+            {REDIS_FREE_PLAN.priceDisplay}
+          </h5>
+          <p className="text-sm text-text-mute">{REDIS_FREE_PLAN.priceSubtext}</p>
         </div>
 
         <div className="grow">
           <div className="text-balance rounded-lg bg-bg-mute px-3 py-2 text-sm text-primary-text dark:text-text-mute">
-            Perfect for prototypes and hobby projects.
+            {REDIS_FREE_PLAN.description}
           </div>
         </div>
 
         <div className="w-full px-6 *:border-b *:border-bg-mute">
           <div className="py-3">
             <p className="text-text-mute">Data Size</p>
-            <p className="font-semibold">256 MB</p>
+            <p className="font-semibold">{REDIS_FREE_PLAN.dataSize}</p>
           </div>
-
           <div className="py-3">
             <p className="text-text-mute">Monthly Commands</p>
-            <p className="font-semibold">500 K</p>
+            <p className="font-semibold">{REDIS_FREE_PLAN.monthlyCommands}</p>
           </div>
         </div>
 
@@ -64,32 +75,33 @@ export default function PricingTable({
       </div>
 
       {/* PAYG */}
-
       <div className="flex flex-col items-center gap-4 rounded-4xl border-2 border-primary bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
         <div className="grow min-h-[120px]">
           <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
-            Pay as you go
+            {REDIS_PAYG_PLAN.name}
           </h4>
-
-          <h5 className="text-2xl font-semibold">$0.2</h5>
-          <p className="text-sm text-text-mute">per 100K commands</p>
+          <h5 className="text-2xl font-semibold">
+            {REDIS_PAYG_PLAN.priceDisplay}
+          </h5>
+          <p className="text-sm text-text-mute">
+            {REDIS_PAYG_PLAN.priceSubtext}
+          </p>
         </div>
 
         <div className="grow">
           <div className="text-balance rounded-lg bg-bg-mute px-3 py-2 text-sm text-primary-text dark:text-text-mute">
-            Flexible pricing for variable traffic.
+            {REDIS_PAYG_PLAN.description}
           </div>
         </div>
 
         <div className="w-full px-6 *:border-b *:border-bg-mute">
           <div className="py-3">
             <p className="text-text-mute">Data Size</p>
-            <p className="font-semibold">100 GB</p>
+            <p className="font-semibold">{REDIS_PAYG_PLAN.dataSize}</p>
           </div>
-
           <div className="py-3">
             <p className="text-text-mute">Monthly Bandwidth</p>
-            <p className="font-semibold">Unlimited</p>
+            <p className="font-semibold">{REDIS_PAYG_PLAN.maxBandwidth}</p>
           </div>
         </div>
 
@@ -103,7 +115,6 @@ export default function PricingTable({
       </div>
 
       {/* Fixed */}
-
       <div className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
         <div className="grow min-h-[120px]">
           <h4 className="mb-4 text-xl font-semibold text-primary-text">
@@ -123,61 +134,32 @@ export default function PricingTable({
           </h4>
 
           <h5 className="flex items-baseline justify-center text-2xl font-semibold">
-            {showFixed250MB && <>$10</>}
-            {showFixed1GB && <>$20</>}
-            {showFixed5GB && <>$100</>}
-            {showFixed10GB && <>$200</>}
-            {showFixed50GB && <>$400</>}
-            {showFixed100GB && <>$800</>}
-            {showFixed500GB && <>$1500</>}
+            {fixedPlan.priceDisplay}
             <span className="ml-1 text-base font-normal text-text-mute">
-              / month
+              {fixedPlan.priceSubtext}
             </span>
           </h5>
 
           <p className="text-sm text-text-mute">
-            {showFixed250MB && <>$5</>}
-            {showFixed1GB && <>$10</>}
-            {showFixed5GB && <>$50</>}
-            {showFixed10GB && <>$100</>}
-            {showFixed50GB && <>$200</>}
-            {showFixed100GB && <>$400</>}
-            {showFixed500GB && <>$750</>} ✕ read regions
+            ${fixedPlan.readRegionPrice} ✕ read regions
           </p>
           <p className="text-sm text-text-mute">No per-command pricing</p>
         </div>
 
         <div className="grow">
           <div className="text-balance rounded-lg bg-bg-mute px-3 py-2 text-sm text-primary-text dark:text-text-mute">
-            For consistent loads with predictable costs.
+            {fixedPlan.description}
           </div>
         </div>
 
         <div className="w-full px-6 *:border-b *:border-bg-mute">
           <div className="py-3">
             <p className="text-text-mute">Data Size</p>
-            <p className="font-semibold">
-              {showFixed250MB && <>250 MB</>}
-              {showFixed1GB && <>1 GB</>}
-              {showFixed5GB && <>5 GB</>}
-              {showFixed10GB && <>10 GB</>}
-              {showFixed50GB && <>50 GB</>}
-              {showFixed100GB && <>100 GB</>}
-              {showFixed500GB && <>500 GB</>}
-            </p>
+            <p className="font-semibold">{fixedPlan.dataSize}</p>
           </div>
-
           <div className="py-3">
             <p className="text-text-mute">Monthly Bandwidth</p>
-            <p className="font-semibold">
-              {showFixed250MB && <>50GB</>}
-              {showFixed1GB && <>100GB</>}
-              {showFixed5GB && <>500GB</>}
-              {showFixed10GB && <>1TB</>}
-              {showFixed50GB && <>5TB</>}
-              {showFixed100GB && <>10TB</>}
-              {showFixed500GB && <>20TB</>}
-            </p>
+            <p className="font-semibold">{fixedPlan.maxBandwidth}</p>
           </div>
         </div>
 

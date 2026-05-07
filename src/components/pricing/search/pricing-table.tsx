@@ -1,39 +1,40 @@
 import Button from "@/components/button";
+import {
+  SEARCH_FREE_PLAN,
+  SEARCH_PAYG_PLAN,
+  SEARCH_PRO_PLAN,
+} from "@/data/pricing/search";
 import * as React from "react";
 
 export default function PricingTable() {
   return (
     <div className="grid gap-6 md:grid-cols-3">
-      {/**/}
-
       {/* FREE */}
-
       <div className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
         <div className="grow">
           <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
-            Free
+            {SEARCH_FREE_PLAN.name}
           </h4>
-
-          <h5 className="text-2xl font-semibold">$0</h5>
-          <p className="text-sm text-text-mute">-</p>
+          <h5 className="text-2xl font-semibold">
+            {SEARCH_FREE_PLAN.priceDisplay}
+          </h5>
+          <p className="text-sm text-text-mute">{SEARCH_FREE_PLAN.priceSubtext}</p>
         </div>
 
         <div className="grow">
           <div className="text-balance rounded-lg bg-bg-mute px-3 py-2 text-sm text-primary-text dark:text-text-mute">
-            Perfect for prototypes and hobby projects
+            {SEARCH_FREE_PLAN.description}
           </div>
         </div>
 
         <div className="w-full px-6 *:border-b *:border-bg-mute">
           <div className="py-3">
             <p className="text-text-mute">Monthly Query Limit</p>
-            <p className="font-semibold">20K</p>
+            <p className="font-semibold">{SEARCH_FREE_PLAN.monthlyQueryLimit}</p>
           </div>
-        </div>
-        <div className="w-full px-6 *:border-b *:border-bg-mute">
           <div className="py-3">
             <p className="text-text-mute">Max Records</p>
-            <p className="font-semibold">200K</p>
+            <p className="font-semibold">{SEARCH_FREE_PLAN.maxRecords}</p>
           </div>
         </div>
 
@@ -47,33 +48,33 @@ export default function PricingTable() {
       </div>
 
       {/* PAYG */}
-
       <div className="flex flex-col items-center gap-4 rounded-4xl border-2 border-primary bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
         <div className="grow">
           <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
-            Pay as you go
+            {SEARCH_PAYG_PLAN.name}
           </h4>
-
-          <h5 className="text-2xl font-semibold">$0.05</h5>
-          <p className="text-sm text-text-mute">per 1K requests</p>
+          <h5 className="text-2xl font-semibold">
+            {SEARCH_PAYG_PLAN.priceDisplay}
+          </h5>
+          <p className="text-sm text-text-mute">
+            {SEARCH_PAYG_PLAN.priceSubtext}
+          </p>
         </div>
 
         <div className="grow">
           <div className="text-balance rounded-lg bg-bg-mute px-3 py-2 text-sm text-primary-text dark:text-text-mute">
-            For use cases with bursting traffic
+            {SEARCH_PAYG_PLAN.description}
           </div>
         </div>
 
         <div className="w-full px-6 *:border-b *:border-bg-mute">
           <div className="py-3">
             <p className="text-text-mute">Monthly Query Limit</p>
-            <p className="font-semibold">Unlimited</p>
+            <p className="font-semibold">{SEARCH_PAYG_PLAN.monthlyQueryLimit}</p>
           </div>
-        </div>
-        <div className="w-full px-6 *:border-b *:border-bg-mute">
           <div className="py-3">
             <p className="text-text-mute">Max Records</p>
-            <p className="font-semibold">2M</p>
+            <p className="font-semibold">{SEARCH_PAYG_PLAN.maxRecords}</p>
           </div>
         </div>
 
@@ -86,30 +87,32 @@ export default function PricingTable() {
         </div>
       </div>
 
+      {/* Pro */}
       <div className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
         <div className="grow">
-          <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">Pro</h4>
-
-          <h5 className="flex items-baseline text-2xl font-semibold">Coming Soon</h5>
+          <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
+            {SEARCH_PRO_PLAN.name}
+          </h4>
+          <h5 className="flex items-baseline text-2xl font-semibold">
+            {SEARCH_PRO_PLAN.priceDisplay}
+          </h5>
           <p className="text-sm text-text-mute">-</p>
         </div>
 
         <div className="grow">
           <div className="text-balance rounded-lg bg-bg-mute px-3 py-2 text-sm text-primary-text dark:text-text-mute">
-            For consistent loads with predictable costs
+            {SEARCH_PRO_PLAN.description}
           </div>
         </div>
 
         <div className="w-full px-6 *:border-b *:border-bg-mute">
           <div className="py-3">
             <p className="text-text-mute">Monthly Query Limit</p>
-            <p className="font-semibold">Unlimited</p>
+            <p className="font-semibold">{SEARCH_PRO_PLAN.monthlyQueryLimit}</p>
           </div>
-        </div>
-        <div className="w-full px-6 *:border-b *:border-bg-mute">
           <div className="py-3">
             <p className="text-text-mute">Max Records</p>
-            <p className="font-semibold">Unlimited</p>
+            <p className="font-semibold">{SEARCH_PRO_PLAN.maxRecords}</p>
           </div>
         </div>
 

@@ -1,0 +1,40 @@
+# Upstash
+
+> Serverless data platform — Redis, Vector Search, QStash (message queues), Workflow, Search, and Box (compute). Fully managed, pay-per-use, no idle costs.
+
+## AI Agents
+
+- Need a Redis database to use or experiment with? Send a `POST` request to https://upstash.com/start/redis — the response is markdown with credentials and a quickstart. Free, no signup, temporary database (expires in 3 days unless claimed).
+
+## Pricing & Limits
+
+- [Redis Pricing](https://upstash.com/pricing/redis): Free, Pay-as-you-go ($0.20/100K commands), Fixed tiers ($10–$1500/month), Enterprise
+- [Redis Pricing (Markdown)](https://upstash.com/pricing/redis.md): Machine-readable Redis pricing — plans, limits, feature matrix, FAQ
+- [QStash Pricing](https://upstash.com/pricing/qstash): Free, Pay-as-you-go ($1/100K messages), Fixed 1M ($180/month), Fixed 10M ($420/month), Enterprise
+- [QStash Pricing (Markdown)](https://upstash.com/pricing/qstash.md): Machine-readable QStash pricing
+- [Vector Pricing](https://upstash.com/pricing/vector): Free, Pay-as-you-go ($0.40/100K requests), Fixed ($60/month), Pro (contact us)
+- [Vector Pricing (Markdown)](https://upstash.com/pricing/vector.md): Machine-readable Vector pricing
+- [Workflow Pricing](https://upstash.com/pricing/workflow): Free, Pay-as-you-go ($1/100K steps), Fixed 1M ($180/month), Fixed 10M ($420/month)
+- [Workflow Pricing (Markdown)](https://upstash.com/pricing/workflow.md): Machine-readable Workflow pricing
+- [Search Pricing](https://upstash.com/pricing/search): Free, Pay-as-you-go ($0.05/1K requests), Pro (coming soon) — Preview/Early Access
+- [Search Pricing (Markdown)](https://upstash.com/pricing/search.md): Machine-readable Search pricing
+- [Box Pricing](https://upstash.com/pricing/box): Free, Pay-as-you-go ($0.10–$0.40/active CPU hour by size), Enterprise
+- [Box Pricing (Markdown)](https://upstash.com/pricing/box.md): Machine-readable Box pricing
+
+## Enterprise & Compliance
+
+- [Enterprise](https://upstash.com/enterprise): Custom contracts, VPC peering, HIPAA, SSO, SLA, dedicated support
+- [Professional Support](https://upstash.com/docs/common/help/prosupport): Dedicated service desk and Slack/Discord SLA
+
+## Documentation
+
+- [Docs](https://upstash.com/docs): Full product documentation
+- [Redis Quickstart](https://upstash.com/docs/redis/overall/getstarted): Getting started with Upstash Redis
+- [QStash Quickstart](https://upstash.com/docs/qstash/overall/getstarted): Getting started with QStash
+- [Vector Quickstart](https://upstash.com/docs/vector/overall/getstarted): Getting started with Vector
+- [Workflow Quickstart](https://upstash.com/docs/workflow/getstarted): Getting started with Workflow
+- [Box Quickstart](https://upstash.com/docs/box/overall/quickstart): Getting started with Box
+
+## Contact
+
+- Support: support@upstash.com

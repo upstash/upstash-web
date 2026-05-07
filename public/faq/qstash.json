@@ -1,16 +1,20 @@
 {
   "faq": [
     {
-      "question": "How are the messages priced? Are retries free?",
-      "answer": "The only thing you are charged for are messages whereas retries are free. Below are some message examples: Publish to single API endpoint. Here you would be charged for 1 message."
+      "question": "How are messages priced? Are retries free?",
+      "answer": "Each delivery attempt counts as one message. The initial delivery counts as one message, and each retry is counted as an additional message. The same rules apply to topics and schedules: publishing to a topic is billed once per subscribed endpoint, and scheduled messages are billed once for each time the schedule triggers. In short, one delivery attempt to one endpoint equals one billed message. Example: QStash sends a message to your endpoint, but the endpoint returns an error. QStash retries the delivery and it succeeds. Since there were two delivery attempts, the message is billed as 2 messages."
     },
     {
-      "question": "What happens when we hit daily max messages limit?",
-      "answer": "QStash API starts to return exceptions."
+      "question": "What happens if we exceed the \"Messages per Day\" or \"Monthly Bandwidth\" limit?",
+      "answer": "These are soft limits and apply only if you consistently exceed your quota. Short or occasional spikes will NOT immediately block your requests. If usage continues to exceed the limit, we will contact you to discuss an upgrade (Fixed 1M to Fixed 10M, or Fixed 10M to a custom Enterprise plan). If we are unable to reach you and limits are still exceeded over time, the API may start returning 429 rate limit errors."
     },
     {
-      "question": "How is the Max Message Size Limit applied?",
-      "answer": "If the body send to QStash is larger than the limit, the endpoint returns http 412 error stating that quota is exceeded. When /v2/batch endpoint is used, each request body is subjected to the quota on its own. When the response of called endpoint is larger than the limit, the message is trimmed after the limit. And stored in the DLQ/Events as trimmed."
+      "question": "How is the Max Message Size limit applied?",
+      "answer": "The size limit applies to both requests and responses. Request body: if the request body sent to QStash exceeds the limit, the API returns an HTTP 412 error. When using the /v2/batch endpoint, each request in the batch is checked individually. Response body: if the response from your endpoint exceeds the limit, it is trimmed and stored only for logging and debugging purposes (DLQ/Events)."
+    },
+    {
+      "question": "Is there a rate limit?",
+      "answer": "There is no requests-per-second (RPS) limit for message delivery APIs such as Publish, Enqueue, and Batch. APIs used for observability and management (such as logs and DLQ) do have RPS limits, and exceeding them returns a 429 Too Many Requests error. Since message delivery APIs do not have an RPS limit, QStash enforces a Max Parallelism limit: QStash accepts all message publish requests, but if the publish rate is too high, QStash slows down delivery by limiting how many messages are sent in parallel. Additional messages are queued and delivered later, but they are not lost."
     }
   ]
 }
