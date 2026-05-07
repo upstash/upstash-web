@@ -58,6 +58,10 @@ const nextConfig = {
             key: "Content-Security-Policy-Report-Only",
             value: cspHeader.replace(/\n/g, ""),
           },
+          {
+            key: "Link",
+            value: "</start/redis>; rel=\"agent-redis\"",
+          },
         ],
       },
     ];
