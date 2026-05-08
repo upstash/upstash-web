@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-const CONSOLE_REDIS_START_PATH = "/start/redis";
+const CONSOLE_REDIS_START_PATH = "/start-redis";
 const UPSTASH_CONSOLE_URL = process.env.UPSTASH_CONSOLE_URL;
 
 export async function GET(
