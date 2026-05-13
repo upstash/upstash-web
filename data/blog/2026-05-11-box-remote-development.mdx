@@ -1,0 +1,115 @@
+---
+slug: box-remote-development
+title: "Remote Development with Upstash Box"
+authors: [alitarik]
+tags: [box, ai, devtools]
+description: "Remote development is having a moment. Here's why it matters and how Upstash Box makes it work for the way people actually build today."
+---
+
+Remote development isn't new, but AI coding agents have made a strong case for it being the default. Local machines accumulate state, go to sleep, and are a risky place to let an agent run loose. A remote box solves all three.
+
+[Upstash Box](/blog/upstash-box) is a persistent cloud computer you can SSH into, run a dev server on, and share with anyone via a public URL. The agent gets a real machine to work in. You get full access to that same machine.
+
+---
+
+## What's New
+
+When we launched Box, it already had everything an agent needs to do real work: a persistent filesystem, a full shell, git operations, snapshots, and a built-in coding agent you could prompt directly. The gap was on the human side. The box was doing the work but you couldn't really be in it. You sent a prompt and waited for a result.
+
+Three additions close that gap:
+
+**SSH access** - every box is a real Linux machine you can connect to directly, from any terminal, on any device, from anywhere.
+
+```bash
+ssh <box-id>@us-east-1.box.upstash.com
+```
+
+**Port forwarding** - bring any port from the box to your local browser. The dev server running inside the box appears on `localhost` as if it were local.
+
+```bash
+ssh -L 3000:127.0.0.1:3000 <box-id>@us-east-1.box.upstash.com
+```
+
+**Public URLs** - share the running app with anyone without SSH. One link, opens in any browser. Every box gets a URL in the format `https://<box-id>-<port>.preview.box.upstash.com`.
+
+Now let's look at where this actually makes a difference.
+
+---
+
+## A Linux computer with an agent inside
+
+Once you SSH into a box, it's just a computer. You can install packages, set up runtimes, configure tools, clone repos, run servers, everything you'd do when setting up a local dev environment. The setup process is the same, it just happens on the box instead of your machine.
+
+```bash
+apt-get install -y python3-pip
+pip install numpy pandas
+
+python3 script.py
+```
+
+What's different is the agent. It's already there, configured, and has access to the same filesystem you're working in. You can do the setup yourself, hand something off to the agent mid-task, or let it handle the whole thing while you watch. Both of you are working on the same machine.
+
+---
+
+## A clean environment on demand
+
+Local machines accumulate state. Every project leaves something behind: a global package, a background service, a config file that affects the next thing you build. A box starts clean every time. When you're done, delete it. The next one starts from zero.
+
+This is especially useful for trying something quickly. Found an interesting open source project? A coworker shared a script to test? A library you want to evaluate before adding it as a dependency?
+
+```bash
+ssh <box-id>@us-east-1.box.upstash.com
+
+git clone https://github.com/some-project
+cd some-project
+npm install && npm run dev
+```
+
+Forward the port, see it running, close the box. Your machine never touched it, including any install-time scripts the package runs. This matters a lot given recent npm and pip supply chain incidents.
+
+---
+
+## A safe place for agents to work
+
+AI coding agents need a real environment. They clone repos, install packages, run servers, execute shell commands. Giving them your local machine works, but it means every mistake they make lands on your filesystem.
+
+A box is the right place for an agent to work. It has everything it needs and the blast radius is contained. You review the result and pull back what you want.
+
+```bash
+box create \
+  --agent-harness claude-code \
+  --agent-model anthropic/claude-sonnet-4-6 \
+  --git-token $GITHUB_TOKEN
+```
+
+Then prompt the agent to clone the repo, build the feature, and start the dev server. Connect with port forwarding and open `localhost:3000`. You're looking at the running app, not a diff. Tell the agent what's off. It fixes it while you're still in the browser.
+
+---
+
+## Sharing a running app instead of a branch
+
+The usual way to share work in progress is a branch. The other person checks it out, installs dependencies, gets the server running. That's 10 minutes for a 30-second look.
+
+A public URL removes that entirely. The app is already running on `https://<box-id>-3000.preview.box.upstash.com`. Send the link and a designer, a PM, a client opens it in their browser and sees the real thing. No setup, no branch, no "what Node version do you have." When you're done, delete the box.
+
+---
+
+## Onboarding with a snapshot instead of a guide
+
+Setup guides go stale, break across operating systems, and reliably eat the first day of a new hire. A box snapshot sidesteps all of that.
+
+Snapshot the environment once it's working:
+
+```bash
+box_abc123> snapshot onboarding-may-2026
+```
+
+The next person restores from the snapshot and SSH-es into a machine that's already configured and running. Their first task is writing code.
+
+---
+
+## Try it with a Next.js app
+
+The quickest way to see this in action is the [remote development guide](https://upstash.com/docs/box/guides/remote-development). It walks through creating a box, connecting over SSH with port forwarding, and running a Next.js dev server that appears on `localhost:3000` as if it were local.
+
+From there the rest of the workflows above are one step away.
