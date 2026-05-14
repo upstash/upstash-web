@@ -131,6 +131,18 @@ const nextConfig = {
           },
         ],
       },
+      {
+        source: "/blog",
+        headers: [
+          { key: "Vary", value: "Accept" },
+        ],
+      },
+      {
+        source: "/blog/:slug",
+        headers: [
+          { key: "Vary", value: "Accept" },
+        ],
+      },
     ];
   },
 };

@@ -133,6 +133,9 @@ export async function generateMetadata({
     description,
     alternates: {
       canonical: `/blog/${post.slug}`,
+      types: {
+        "text/markdown": `/api/blog/${post.slug}/markdown`,
+      },
     },
     openGraph: {
       type: "article",
