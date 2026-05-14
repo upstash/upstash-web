@@ -16,6 +16,9 @@ export const metadata: Metadata = {
   description,
   alternates: {
     canonical: "/blog",
+    types: {
+      "text/markdown": "/blog.md",
+    },
   },
   openGraph: {
     title,
