@@ -134,7 +134,7 @@ export async function generateMetadata({
     alternates: {
       canonical: `/blog/${post.slug}`,
       types: {
-        "text/markdown": `/api/blog/${post.slug}/markdown`,
+        "text/markdown": `/blog/${post.slug}.md`,
       },
     },
     openGraph: {

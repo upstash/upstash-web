@@ -7,6 +7,8 @@ function isBlogPath(pathname: string): boolean {
   return pathname === "/blog" || /^\/blog\/[^/]+$/.test(pathname);
 }
 
+const BLOG_MD_POST = /^\/blog\/([^/]+)\.md$/;
+
 export function middleware(request: NextRequest) {
   if (request.nextUrl.hostname === "developer.upstash.com") {
     return NextResponse.redirect(
@@ -16,6 +18,23 @@ export function middleware(request: NextRequest) {
   }
 
   const pathname = request.nextUrl.pathname;
+
+  // Explicit `.md` URLs (e.g. /blog.md, /blog/foo.md) always serve Markdown,
+  // regardless of Accept header. This is the conventional pattern (GitHub,
+  // llms.txt, etc.) and gives us distinct cache keys without Vary headaches.
+  if (pathname === "/blog.md") {
+    return NextResponse.rewrite(new URL("/api/blog/markdown", request.url));
+  }
+  const mdPost = pathname.match(BLOG_MD_POST);
+  if (mdPost) {
+    return NextResponse.rewrite(
+      new URL(
+        `/api/blog/${encodeURIComponent(mdPost[1])}/markdown`,
+        request.url,
+      ),
+    );
+  }
+
   const accept = request.headers.get("accept") ?? "";
 
   if (isBlogPath(pathname) && accept) {

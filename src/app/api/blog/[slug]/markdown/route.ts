@@ -23,6 +23,7 @@ export async function GET(
     headers: {
       "Content-Type": "text/markdown; charset=utf-8",
       Vary: "Accept",
+      "X-Robots-Tag": "noindex",
       "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
     },
   });
