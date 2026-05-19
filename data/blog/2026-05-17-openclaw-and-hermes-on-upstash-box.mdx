@@ -1,0 +1,75 @@
+---
+slug: openclaw-and-hermes-on-upstash-box
+title: "Running OpenClaw and Hermes on Upstash Box"
+authors: [alitarik]
+tags: [ai, box, serverless]
+---
+
+AI infrastructure is moving fast. New gateways, new agent frameworks, new runtimes. The hard part is no longer finding the right tool. It's finding a stable place to run it.
+
+Today we're publishing setup guides for running [OpenClaw](https://docs.openclaw.ai) and [Hermes](https://github.com/NousResearch/hermes-agent) on Box, two tools that make a lot more sense in a persistent cloud environment than on a local machine or a traditional server.
+
+---
+
+## The tools
+
+[OpenClaw](https://docs.openclaw.ai) is an AI gateway that centralizes your LLM provider connections behind a single interface. It runs as a background service with a web dashboard for managing your routing and configuration. You set it up once and leave it running.
+
+[Hermes](https://github.com/NousResearch/hermes-agent) is an open-source agent framework from Nous Research. It's resource-intensive and needs a real machine with enough CPU and memory to install and run well.
+
+---
+
+## Why not local
+
+The easy path is running these on your own machine, but it comes with real limitations.
+
+Your laptop goes to sleep and OpenClaw's gateway goes offline with it. Hermes gets interrupted mid-task. Every time your machine restarts you're back to setup again.
+
+There's also the matter of security. OpenClaw manages your LLM provider API keys and Hermes runs agent tasks autonomously. Giving them your own machine means any mistake they make lands directly on your filesystem. And you can't reach a local machine from another device without jumping through extra hoops.
+
+---
+
+## Why not a traditional server
+
+A cloud VM is the obvious alternative and it does solve the persistence problem, but it comes with its own overhead.
+
+You pay for the server around the clock whether OpenClaw is handling requests or Hermes is idle. You manage the machine yourself, updates, security, disk space, all of it. Hermes needs a larger instance to run well which means you're overpaying whenever it's not actively doing anything.
+
+For tools you just want running, that overhead adds up fast.
+
+---
+
+## Why Box
+
+Box is a persistent cloud computer that bills on active CPU usage, not uptime. It stays available, accessible from anywhere over SSH, and when your tools are idle you're not paying for a running server.
+
+### OpenClaw
+
+OpenClaw needs to be always on since requests can come in at any time. On Box you enable keep-alive and the box stays running between sessions, just like a server would.
+
+The dashboard is accessible through the SSH connection so there's nothing publicly exposed. You open it in your browser as if it were running on your own machine, but it's actually running securely on the box, no public IP or firewall rules needed.
+
+Your API keys are configured once during setup and stay inside the box's isolated environment. Nothing outside the box can reach them. When OpenClaw is waiting between requests it's barely using any compute so the cost stays low.
+
+You can also use the box to run bots on top of OpenClaw. Because the box stays on, those bots are up and reachable around the clock without any babysitting.
+
+### Hermes
+
+Hermes needs more resources. The install process alone pulls substantial dependencies and the agent needs real compute to run without slowing down. Box lets you pick the right size, we recommend Medium (4 CPU, 8 GB RAM), so it has the headroom it needs.
+
+You install Hermes once and it stays. The next time you connect, everything is exactly where you left it. The box holds its state between sessions until you decide to delete it.
+
+Hermes runs agent tasks that execute code and interact with the system, so isolation matters. If something goes wrong during a run the damage is contained to the box and your own machine is never involved.
+
+The same goes for any bots or automations you build with Hermes. Once they're running on the box they stay running, no local machine to keep awake and no process that disappears when you close your laptop.
+
+If you ever want a clean copy of the setup ready to spin up again later, Box snapshots let you capture the environment at any point and restore from it instantly.
+
+---
+
+## Set it up
+
+Both setups run entirely inside the box. If you haven't created one yet, the [Box quickstart](https://upstash.com/docs/box/overall/quickstart) takes about a minute.
+
+- [OpenClaw on Upstash Box](https://upstash.com/docs/box/guides/openclaw-setup)
+- [Hermes on Upstash Box](https://upstash.com/docs/box/guides/hermes-setup)
