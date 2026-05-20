@@ -18,8 +18,10 @@ const PRICING_MD_PRODUCTS = [
   "box",
 ] as const;
 
+const PRICING_DEFAULT_PRODUCT = "redis";
+
 const PRICING_PATH = new RegExp(
-  `^/pricing/(${PRICING_MD_PRODUCTS.join("|")})$`,
+  `^/pricing(?:/(${PRICING_MD_PRODUCTS.join("|")}))?$`,
 );
 
 function unacceptableResponse(): NextResponse {
@@ -91,8 +93,9 @@ export function middleware(request: NextRequest) {
     }
 
     if (decision === "markdown") {
+      const product = pricingMatch[1] ?? PRICING_DEFAULT_PRODUCT;
       return NextResponse.rewrite(
-        new URL(`/pricing/${pricingMatch[1]}.md`, request.url),
+        new URL(`/pricing/${product}.md`, request.url),
       );
     }
   }
