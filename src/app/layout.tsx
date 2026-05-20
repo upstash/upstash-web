@@ -64,6 +64,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                           gtag('config', 'G-QW5KRSTDM0');`,
                 }}
               />
+              <Script
+                id="promptwatch"
+                strategy="afterInteractive"
+                src="https://ingest.promptwatch.com/js/client.min.js"
+                data-project-id="0ef1db08-c833-4ebc-b064-4b52f3bfa233"
+              />
             </>
           )}
         </body>
