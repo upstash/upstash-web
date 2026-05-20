@@ -6,6 +6,11 @@ authors:
 tags: [llm, ai]
 ---
 
+<Note>
+  I wrote an updated 2026 version of this article for Vercel AI SDK v6 over
+  at [xadd.dev](https://www.xadd.dev/builds/how-do-you-store-vercel-ai-sdk-chat-history-in-redis)!
+</Note>
+
 In 2023,[ Vercel introduced the first version of their AI SDK](https://vercel.com/blog/introducing-the-vercel-ai-sdk). In their words, it started as:
 
 _"An interoperable, streaming-enabled, edge-ready software development kit for AI apps built with React and Svelte."_
@@ -51,22 +56,21 @@ The AI SDK's default behavior saves messages in memory. This works super well fo
 - Going back to previous chats
 - Sharing conversations with others
 
-Luckily, the AI SDK v5 makes saving chat messages extremely easy for us. They have absolutely cooked with this release.
----
+## Luckily, the AI SDK v5 makes saving chat messages extremely easy for us. They have absolutely cooked with this release.
 
 ## Step 1: Reducing network traffic
 
 Because messages are kept in memory by default, the AI SDK sends the entire message history along for each chat request.
 
-The longer the chat, the longer the array of messages we transmit for each request to our backend. Every. single. message. gets sent along for every request. 
+The longer the chat, the longer the array of messages we transmit for each request to our backend. Every. single. message. gets sent along for every request.
 
 With our approach, we only need to send the current message with our request. The rest of our chat history is tracked entirely server-side.
 
 ```typescript title="app/page.tsx"
-"use client"
+"use client";
 
-import { useChat } from "@ai-sdk/react"
-import { DefaultChatTransport } from "ai"
+import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport } from "ai";
 
 const { sendMessage, messages } = useChat({
   // ...
@@ -118,7 +122,9 @@ const redis = new Redis({
 
 To get these credentials, create a Redis database on Upstash and paste your credentials to your `.env` file:
 
-<Frame><img src="/blog/ai-sdk-chat-history/redis-credentials.png" /></Frame>
+<Frame>
+  <img src="/blog/ai-sdk-chat-history/redis-credentials.png" />
+</Frame>
 
 And we're ready to load our existing history in our API route:
 
@@ -260,23 +266,23 @@ To load our initial messages, we'll do a slight refactor of our existing code. W
 For example, our main page could look like this:
 
 ```tsx title="app/chat/page.tsx"
-import { Redis } from "@upstash/redis"
-import { UIMessage } from "ai"
-import { Chat } from "./components/chat"
+import { Redis } from "@upstash/redis";
+import { UIMessage } from "ai";
+import { Chat } from "./components/chat";
 
 const redis = new Redis({
   token: process.env.UPSTASH_REDIS_REST_TOKEN,
   url: process.env.UPSTASH_REDIS_REST_URL,
-})
+});
 
 export default async function Home() {
   // 👇 you'd normally use an id from the query params here
   // e.g. http://localhost:3000/chat?id=my-chat
 
   // for simplicity, we're using a hardcoded id
-  const messages = await redis.get<UIMessage[]>(`chat:history:my-chat`)
+  const messages = await redis.get<UIMessage[]>(`chat:history:my-chat`);
 
-  return <Chat initialMessages={messages ?? []} />
+  return <Chat initialMessages={messages ?? []} />;
 }
 ```
 
