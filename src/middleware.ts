@@ -9,6 +9,32 @@ function isBlogPath(pathname: string): boolean {
 
 const BLOG_MD_POST = /^\/blog\/([^/]+)\.md$/;
 
+const PRICING_MD_PRODUCTS = [
+  "redis",
+  "qstash",
+  "vector",
+  "workflow",
+  "search",
+  "box",
+] as const;
+
+const PRICING_PATH = new RegExp(
+  `^/pricing/(${PRICING_MD_PRODUCTS.join("|")})$`,
+);
+
+function unacceptableResponse(): NextResponse {
+  return new NextResponse(
+    "Not Acceptable\n\nAvailable representations:\n- text/html\n- text/markdown\n",
+    {
+      status: 406,
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        Vary: "Accept",
+      },
+    },
+  );
+}
+
 export function middleware(request: NextRequest) {
   if (request.nextUrl.hostname === "developer.upstash.com") {
     return NextResponse.redirect(
@@ -41,16 +67,7 @@ export function middleware(request: NextRequest) {
     const decision = negotiate(accept);
 
     if (decision === "unacceptable") {
-      return new NextResponse(
-        "Not Acceptable\n\nAvailable representations:\n- text/html\n- text/markdown\n",
-        {
-          status: 406,
-          headers: {
-            "Content-Type": "text/plain; charset=utf-8",
-            Vary: "Accept",
-          },
-        },
-      );
+      return unacceptableResponse();
     }
 
     if (decision === "markdown") {
@@ -62,6 +79,21 @@ export function middleware(request: NextRequest) {
               request.url,
             );
       return NextResponse.rewrite(markdownUrl);
+    }
+  }
+
+  const pricingMatch = pathname.match(PRICING_PATH);
+  if (pricingMatch && accept) {
+    const decision = negotiate(accept);
+
+    if (decision === "unacceptable") {
+      return unacceptableResponse();
+    }
+
+    if (decision === "markdown") {
+      return NextResponse.rewrite(
+        new URL(`/pricing/${pricingMatch[1]}.md`, request.url),
+      );
     }
   }
 
