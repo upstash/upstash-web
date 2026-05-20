@@ -12,7 +12,12 @@ We built the easiest way to spin up a Redis database for your AI agents. You don
 curl -X POST https://upstash.com/start-redis
 ```
 
-<Frame><img src='/blog/redis-for-agents/redis-for-agents.png' alt='Free Redis databases for AI agents in one HTTP request' /></Frame>
+<Frame>
+  <img
+    src="/blog/redis-for-agents/redis-for-agents.png"
+    alt="Free Redis databases for AI agents in one HTTP request"
+  />
+</Frame>
 
 The response is a small markdown document with a fresh Redis endpoint, a token, and a quickstart your agent can read and follow on its own. The same call that creates the database also tells the agent how to use it.
 
@@ -33,6 +38,12 @@ To keep this database alive, share the console URL with the user
 (they can view usage and click Claim to take ownership):
 https://upstash.com/start-redis/console/2a550d60-a387-43b3-8f99-5e361a7b4881
 ```
+
+## We also shipped an agent skill for this
+
+If you're building with agents and don't want to teach them the endpoint by hand, we ship a [skill](https://github.com/upstash/skills/blob/main/skills/upstash/upstash-redis-start/overview.md) that does it for you. It's a markdown spec (Claude/Codex-style) that tells the agent when to call `start-redis`, how to parse the markdown response, which body-style REST commands to use for memory/queue/recall patterns, and that the console URL needs to be surfaced back to you.
+
+Drop the skill into your agent's project and the next time it needs Redis, it'll provision its own database, write to it, and hand you back the console URL.
 
 ## Testing the new database
 
@@ -81,12 +92,6 @@ This is storage an agent can give itself in the middle of a tool call, so you do
 - **Ranked recall.** `ZADD memories <timestamp> <event>` to log, `ZREVRANGE memories 0 9` to get the ten most recent. Swap the score for a relevance score and you have a small recent-first memory store for the agent.
 
 When the agent is done, you get a console URL you can claim to keep the database. If you don't, it's gone in three days. Either way the agent didn't block on a signup flow to get started.
-
-## We also shipped an agent skill for this
-
-If you're building with agents and don't want to teach them the endpoint by hand, we ship a [skill](https://github.com/upstash/skills/blob/main/skills/upstash/upstash-redis-start/overview.md) that does it for you. It's a markdown spec (Claude/Codex-style) that tells the agent when to call `start-redis`, how to parse the markdown response, which body-style REST commands to use for memory/queue/recall patterns, and that the console URL needs to be surfaced back to you.
-
-Drop the skill into your agent's project and the next time it needs Redis, it'll provision its own database, write to it, and hand you back the console URL.
 
 ## Every DB includes metrics and a way to claim
 
