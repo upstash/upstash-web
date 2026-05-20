@@ -21,7 +21,7 @@ QStash is a powerful and versatile HTTP-based messaging and scheduling service d
 
 We might need to send more messages than the QStash quota in some use cases. Exceeding the limits can cause exceptions and failure in sending messages.
 
-You can check the limits of QStash from the [docs](https://upstash.com/pricing/QStash).
+You can check the limits of QStash from the [docs](https://upstash.com/pricing/qstash).
 
 To overcome this problem, we can use Upstash Kafka with an HTTP connector to mimic QStash since the throughput limit is unlimited in Upstash Kafka.
 
@@ -114,7 +114,7 @@ We can use this domain in the Kafka HTTP connector.
 
 Now, we are going to create a Kafka topic, an HTTP connector attached to that topic.
 
-First, let’s go to the [Upstash console](https://console.upstash.com/login) and create a Kafka cluster.
+First, let’s go to the [Upstash console](https://console.upstash.com/auth/sign-in) and create a Kafka cluster.
 
 We can create the Kafka cluster by following the [Kafka docs](https://upstash.com/docs/kafka).
 
