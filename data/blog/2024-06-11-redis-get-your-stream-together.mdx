@@ -31,7 +31,7 @@ For the new ordered-delivery support, we decided to use Redis Streams (our own h
 
 ### Story
 
-In QStash, you can retrieve your queue and check the `lag` with the following [API](https://upstash.com/docs/qstash/api/queues/get). One of our careful users reported that this lag value is not correct. QStash lag and Redis Stream lag are not the same. In the initial release of the queue, we provided the stream lag as it is. This is on us; we should have been more careful. Let me try to show the difference.
+In QStash, you can retrieve your queue and check the `lag` with the following [API](https://upstash.com/docs/qstash/api-reference/queues/get-a-queue). One of our careful users reported that this lag value is not correct. QStash lag and Redis Stream lag are not the same. In the initial release of the queue, we provided the stream lag as it is. This is on us; we should have been more careful. Let me try to show the difference.
 
 A stream is a series of items with incremental IDs. There can be multiple consumer groups consuming from this stream. Each consumer group consumes the same items in the stream and keeps track of its own delivered and pending items.
 
