@@ -1,0 +1,112 @@
+---
+title: "Free Redis databases for AI agents, in one HTTP request"
+slug: redis-database-for-agents
+authors: [josh]
+tags: [redis, ai]
+description: "POST https://upstash.com/start-redis returns a free Upstash Redis database. No signup and no API key needed. Perfect for AI agents."
+---
+
+Most free tier signup flows are built for humans clicking through a dashboard. So we built the simplest thing that could possibly work:
+
+```bash
+curl -X POST https://upstash.com/start-redis
+```
+
+That's the easiest way to create a Redis database. You don't need an account or an API key. You (or an agent) can just do it from your terminal right now.
+
+The response is a small markdown document with a fresh Redis endpoint, a token, and a quickstart your agent can read and follow on its own.
+
+---
+
+## Get a Redis database in 2 seconds
+
+Here is an example response from the endpoint (I trimmed it a bit for length):
+
+```markdown
+# Your Redis is ready
+
+**Database ID:** 2a550d60-a387-43b3-8f99-5e361a7b4881
+**Endpoint:** https://glad-crayfish-131416.upstash.io
+**Token:** gQAAAAAAAgFYAQIgcDExNmM0NTY0NTM2...
+**Metrics:** https://upstash.com/start-redis/metrics/2a550d60-...
+**Expires:** 2026-05-23 (3 days from creation).
+
+To keep this database alive, share the console URL with the user
+(they can view usage and click Claim to take ownership):
+https://upstash.com/start-redis/console/2a550d60-a387-43b3-8f99-5e361a7b4881
+```
+
+---
+
+## Testing the new database
+
+Try to hit the endpoint with a `SET` and `GET` over the [body-style REST API](https://upstash.com/docs/redis/features/restapi):
+
+```bash
+curl https://glad-crayfish-131416.upstash.io \
+  -H "Authorization: Bearer gQAAAAAA..." \
+  -d '["SET","hello","world","EX","60"]'
+# {"result":"OK"}
+
+curl https://glad-crayfish-131416.upstash.io \
+  -H "Authorization: Bearer gQAAAAAA..." \
+  -d '["GET","hello"]'
+# {"result":"world"}
+```
+
+With the body-style format (`-d '["CMD","arg1","arg2"]'`) we avoid URL-encoding the payload, which matters when the value is a JSON blob with quotes and braces in it (this is the form an agent will use 90% of the time).
+
+---
+
+## Using it from the TypeScript SDK
+
+If the agent is writing code instead of curl, the `@upstash/redis` client takes the same URL and token:
+
+```tsx
+import { Redis } from "@upstash/redis";
+
+// url and token from the POST response above
+const redis = new Redis({
+  url: "https://glad-crayfish-131416.upstash.io",
+  token: "gQAAAAAAAgFYAQIgcDExNmM0NTY0NTM2...",
+});
+
+await redis.set("hello", "world");
+console.log(await redis.get("hello"));
+```
+
+It's the same way you'd use any other Upstash Redis database. The only thing different is how you got the URL and token.
+
+---
+
+## What it's for
+
+With this way to easily create a new db, we want to make experimentation very easy. If you have an idea and want to start building, it's by far the easiest way to get started. Store some data. Load-test the database. Whatever, and if you decide to keep the data later on, you can always claim it as yours in the dashboard.
+
+Some other examples:
+
+- **Short-term memory across tool calls.** `SET session:abc '{...}' EX 3600` to save state between steps without bloating a prompt with it.
+- **Chat history (e.g. with AI SDK).** `LPUSH chat:user123 '{...}'` per turn, `LRANGE chat:user123 0 20` to recall the last 20.
+- **Sub-agent work queues.** Producer agent `LPUSH`es tasks, worker agents `RPOP` them. A queue that works perfectly even in serverless.
+- **Ranked recall.** `ZADD memories <timestamp> <event>` to log, `ZREVRANGE memories 0 9` to get the ten most recent. Swap the score for a relevance score and you have a temu-version vector recall over short windows.
+
+---
+
+## Every DB includes metrics and a way to claim
+
+A few details that might be useful once an agent runs this in a loop, not as a one-off:
+
+- **Idempotent re-fetch.** If the agent loses the token mid-run, POST again with `Idempotency-Key: <database-id>` and you get the same database back. The endpoint returns the existing credentials instead of provisioning a new one.
+- **A metrics endpoint.** `GET /start-redis/metrics/<id>` returns a small JSON doc with `uptime_seconds`, `commands_total`, `keys`, `memory_bytes`, and `bytes_in`/`bytes_out`. Useful both for the agent (to check whether its writes succeeded) and for the you running the agent (to see what it's been doing).
+- **A console URL.** The response includes `upstash.com/start-redis/console/<id>`. We tell your agent to give this URL to you. You can open it, watch the keys appear in real time, and click Claim to attach the database to your Upstash account. After claiming, it's a normal Upstash Redis database with no expiration and the full free-tier quota.
+- **3-day expiry by default.** Unclaimed databases auto-delete after three days. Claim anything worth keeping!
+
+---
+
+## A note on data
+
+There is no user account behind the database until it's claimed, so while a database is unclaimed, anyone with it's ID can claim, view or edit its data. Keep personal information, production secrets, and customer data out of it. Please claim a database before writing anything sensitive.
+
+## Try it
+
+The endpoint is live now. We'd love to hear what you build! Cheers
