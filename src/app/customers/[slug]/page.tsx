@@ -16,7 +16,7 @@ type Props = {
 
 export async function generateStaticParams(): Promise<Props["params"][]> {
   return allCustomers
-    .filter((customer) => !customer.draft)
+    .filter((customer) => !customer.draft && !customer.no_article)
     .map((customer) => ({
       slug: customer.slug,
     }));

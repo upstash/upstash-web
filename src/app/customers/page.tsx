@@ -37,16 +37,17 @@ export default function CustomerPage() {
           <div className="grid gap-8 md:grid-cols-2">
             {customers.map((customer) => {
               const Logo = getBlogLogo(customer.slug);
-              return (
-                <Link
-                  key={customer.slug}
-                  className={cx(
-                    "group relative flex flex-col items-center gap-6 p-10 transition md:p-16",
-                    "overflow-hidden rounded-4xl border-4 border-bg-mute",
+
+              const cardClassName = cx(
+                "group relative flex flex-col items-center gap-6 p-10 transition md:p-16",
+                "overflow-hidden rounded-4xl border-4 border-bg-mute",
+              );
+
+              const content = (
+                <>
+                  {!customer.no_article && (
+                    <span className="absolute inset-0 bg-gradient-to-br hover:from-emerald-500/20 hover:to-emerald-500/0" />
                   )}
-                  href={`/customers/${customer.slug}`}
-                >
-                  <span className="absolute inset-0 bg-gradient-to-br hover:from-emerald-500/20 hover:to-emerald-500/0" />
 
                   <Logo className="h-9 max-w-[150px] object-contain text-black dark:text-white" />
 
@@ -65,14 +66,39 @@ export default function CustomerPage() {
                     </p>
                   </div>
 
-                  <div className="mt-auto grid h-10 group-hover:hidden">
-                    <span className="opacity-80">{customer.user_name}</span>
-                    <span className="opacity-40">{customer.user_title}</span>
-                  </div>
+                  {customer.no_article ? (
+                    <div className="mt-auto grid h-10">
+                      <span className="opacity-80">{customer.user_name}</span>
+                      <span className="opacity-40">{customer.user_title}</span>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="mt-auto grid h-10 group-hover:hidden">
+                        <span className="opacity-80">{customer.user_name}</span>
+                        <span className="opacity-40">{customer.user_title}</span>
+                      </div>
 
-                  <div className="mt-auto hidden h-10 group-hover:block">
-                    <Button variant="primary">Read more</Button>
-                  </div>
+                      <div className="mt-auto hidden h-10 group-hover:block">
+                        <Button variant="primary">Read more</Button>
+                      </div>
+                    </>
+                  )}
+                </>
+              );
+
+              // Card-only customers (no_article) have no dedicated page, so
+              // they render as a plain, non-clickable div.
+              return customer.no_article ? (
+                <div key={customer.slug} className={cardClassName}>
+                  {content}
+                </div>
+              ) : (
+                <Link
+                  key={customer.slug}
+                  className={cardClassName}
+                  href={`/customers/${customer.slug}`}
+                >
+                  {content}
                 </Link>
               );
             })}

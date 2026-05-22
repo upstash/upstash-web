@@ -4,8 +4,8 @@ import { LogoDropee } from "../customers/logo-dropee";
 import { LogoDubsh } from "../customers/logo-dubsh";
 import { LogoGail } from "../customers/logo-gail";
 import { LogoHumata } from "../customers/logo-humata";
+import { LogoJuicebox } from "../customers/logo-juicebox";
 import { LogoMaker } from "../customers/logo-maker";
-import { LogoMarkprompt } from "../customers/logo-markprompt";
 import { LogoNavattic } from "../customers/logo-navattic";
 import { LogoNiftykit } from "../customers/logo-niftykit";
 import { LogoOpenart } from "../customers/logo-openart";
@@ -21,7 +21,7 @@ const blogLogos = {
   dropee: LogoDropee,
   humata: LogoHumata,
   maker: LogoMaker,
-  markprompt: LogoMarkprompt,
+  juicebox: LogoJuicebox,
   navattic: LogoNavattic,
   openart: LogoOpenart,
   niftykit: LogoNiftykit,

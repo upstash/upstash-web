@@ -17,11 +17,12 @@ export const customers = defineCollection({
     company_url: z.string(),
     user_name: z.string(),
     user_title: z.string(),
-    user_photo: z.string(),
+    user_photo: z.string().optional(),
     highlight: z.string(),
-    cover_image: z.string(),
+    cover_image: z.string().optional(),
     draft: z.boolean().optional(),
     order: z.number().optional(),
+    no_article: z.boolean().optional(),
   }),
   transform: async (doc, ctx) => {
     const mdx = await compileMDX(ctx, doc);
