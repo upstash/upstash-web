@@ -443,4 +443,10 @@ export const authors: Record<
     title: "Founder @Streamlined",
     image: "adamskjervold.png",
   },
+  dominik: {
+    name: "Dominik Koch",
+    title: "Founder of Notra (Guest Author)",
+    url: "https://x.com/dominikkoch",
+    image: "dominik.jpeg",
+  },
 };

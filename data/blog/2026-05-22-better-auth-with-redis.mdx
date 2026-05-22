@@ -1,0 +1,150 @@
+---
+title: "Speed up your auth with Upstash and Better Auth"
+slug: better-auth-with-redis
+authors: [dominik]
+tags: [redis]
+description: "Learn how to use Upstash Redis with Better Auth as secondary storage."
+---
+
+Better Auth provides a great way for you to roll your own auth. But storing everything in the database is not always a great idea.
+
+Sessions, rate limits, OTP attempts, password reset tokens. A lot of auth data is short-lived by design. You need it now, then you want it gone.
+
+Redis is a better place for that kind of data than your primary database. With Upstash, you get Redis over HTTP, so it works well in serverless apps and fits neatly into Better Auth's secondary storage API.
+
+---
+
+## Background
+
+Upstash is a sponsor of my company [Notra](https://www.usenotra.com), an open source project that helps turn shipped work into ready-to-publish content.
+
+At Notra we use Upstash Redis for session storage, rate limiting, and other auth-related data.
+
+It's a great way we take load off of our main database (Postgres) and make our infra much faster and more scalable, especially with the large AI workloads we run.
+
+---
+
+## Prerequisites
+
+If you don't have a Redis instance hosted on Upstash you can create one in the [Upstash Console](https://console.upstash.com/).
+
+```typescript title="redis.ts"
+import { Redis } from "@upstash/redis";
+
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
+```
+
+
+## Use Upstash as Better Auth secondary storage
+
+Better Auth has a `secondaryStorage` option for short-lived auth data. Point it at Upstash Redis and Better Auth can read, write, and delete temporary records without touching your main database.
+
+```typescript title="auth.ts"
+import { betterAuth } from "better-auth";
+import { redis } from "./redis";
+
+export const auth = betterAuth({
+  // ...other options
+  secondaryStorage: {
+    get: async (key) => await redis.get(key),
+    set: async (key, value, ttl) => {
+      if (ttl) {
+        await redis.set(key, value, { ex: ttl });
+      } else {
+        await redis.set(key, value);
+      }
+    },
+    delete: async (key) => {
+      await redis.del(key);
+    },
+  },
+});
+```
+
+Better Auth uses secondary storage for session data, rate limit counters, and other temporary records. This is the stuff you do not want hammering Postgres on every sign-in attempt.
+
+One small production detail: make Redis optional during local setup if your team does not always have Upstash env vars configured.
+
+```typescript
+const redis =
+  process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
+    ? new Redis({
+        url: process.env.UPSTASH_REDIS_REST_URL,
+        token: process.env.UPSTASH_REDIS_REST_TOKEN,
+      })
+    : null;
+
+export const auth = betterAuth({
+  // ...other options
+  secondaryStorage: redis
+    ? {
+        get: async (key) => await redis.get(key),
+        set: async (key, value, ttl) => {
+          if (ttl) {
+            await redis.set(key, value, { ex: ttl });
+          } else {
+            await redis.set(key, value);
+          }
+        },
+        delete: async (key) => {
+          await redis.del(key);
+        },
+      }
+    : undefined,
+});
+```
+
+## Store rate limits in Redis too
+
+Better Auth also allows you to rate limit your auth endpoints and store their rate limit counters in Upstash Redis. This is a great way to keep rate limiting out of your database which is especially helpful when you already use `@upstash/ratelimit` in your app.
+
+```typescript title="auth.ts"
+export const auth = betterAuth({
+  // ...other options
+  rateLimit: {
+    enabled: true,
+    window: 60,
+    max: 100,
+    storage: "secondary-storage",
+    customRules: {
+      "/sign-in/email": {
+        window: 60,
+        max: 5,
+      },
+      "/sign-up/email": {
+        window: 60,
+        max: 5,
+      },
+      "/forget-password": {
+        window: 60,
+        max: 3,
+      },
+      "/email-otp/*": {
+        window: 60,
+        max: 5,
+      },
+    },
+  },
+});
+```
+
+You can still (and probably should) use `@upstash/ratelimit` elsewhere in your app for product-specific limits, like imports, expensive API calls, or command palette actions. Better Auth's built-in rate limiter is the right place for auth endpoints because it already knows the route patterns it is protecting.
+
+## Keep database sessions when migrating a live app
+
+If your app already has users, do not flip session storage to Redis without thinking about existing sessions. Better Auth's docs call out two session flags that matter when `secondaryStorage` is enabled:
+
+```typescript
+export const auth = betterAuth({
+  // ...other options
+  session: {
+    storeSessionInDatabase: true,
+    preserveSessionInDatabase: true,
+  },
+});
+```
+
+For a brand-new app, Redis-only sessions may be fine. If you already have users, keep in-database sessions enabled when adding secondary storage so existing sessions can continue to work and users don't get logged out.
