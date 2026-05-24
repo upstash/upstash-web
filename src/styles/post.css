@@ -48,7 +48,7 @@
 }
 
 .post hr {
-  @apply my-10 border-b border-emerald-950/15 md:my-20 dark:border-white/15;
+  @apply my-10 border-b border-emerald-950/[0.08] md:my-20 dark:border-white/[0.08];
 }
 
 .post > img,
