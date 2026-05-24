@@ -1,22 +1,22 @@
-@media (prefers-color-scheme: dark) {
-  [data-rehype-pretty-code-figure] > [data-theme="light"] {
-    display: none;
-  }
+/* dual-theme: bind shiki CSS variables to actual color */
+
+[data-rehype-pretty-code-figure] code span {
+  color: var(--shiki-light);
 }
-@media (prefers-color-scheme: light), (prefers-color-scheme: no-preference) {
-  [data-rehype-pretty-code-figure] > [data-theme="dark"] {
-    display: none;
+@media (prefers-color-scheme: dark) {
+  [data-rehype-pretty-code-figure] code span {
+    color: var(--shiki-dark);
   }
 }
 
 /* - */
 
 [data-rehype-pretty-code-figure] {
-  @apply relative overflow-hidden rounded-xl bg-emerald-900/5 text-sm dark:bg-white/5;
+  @apply relative -mx-5 overflow-hidden rounded-xl bg-emerald-900/5 font-mono text-[0.85rem] leading-relaxed md:-mx-6 dark:bg-white/[0.04];
 }
 
 [data-rehype-pretty-code-figure] pre {
-  @apply overflow-x-auto py-4;
+  @apply overflow-x-auto py-5;
 }
 
 [data-rehype-pretty-code-figure] code {
@@ -26,27 +26,29 @@
 }
 
 [data-rehype-pretty-code-figure] [data-line] {
-  @apply inline-block border-l-4 border-transparent px-4 py-1;
+  @apply inline-block border-l-4 border-transparent px-4 py-0.5 md:px-5;
 }
 
 [data-rehype-pretty-code-figure] [data-line-numbers] > [data-line]::before {
-  @apply mr-4 inline-block w-4 select-none text-right text-white/10;
+  @apply mr-4 inline-block w-4 select-none text-right text-white/20;
   counter-increment: line;
   content: counter(line);
 }
 
 [data-rehype-pretty-code-figure] [data-highlighted-line] {
-  @apply border-emerald-800 bg-emerald-200/10 dark:border-emerald-800 dark:bg-emerald-200/10;
+  border-color: color-mix(in oklch, var(--color-primary) 60%, transparent);
+  background-color: color-mix(in oklch, var(--color-primary) 6%, transparent);
 }
 
 [data-rehype-pretty-code-figure] [data-word-line] {
-  @apply rounded-md bg-slate-300 bg-opacity-10 p-1;
+  @apply rounded px-1;
+  background-color: rgb(255 255 255 / 0.08);
 }
 
 /* code title */
 
 [data-rehype-pretty-code-title] {
-  @apply border-b border-b-emerald-950/10 px-6 py-3 text-emerald-900/80 dark:border-b-white/3 dark:text-white/60;
+  @apply border-b border-white/5 px-5 py-4 font-mono text-xs text-text-mute md:px-6 md:py-5;
 }
 
 [data-rehype-pretty-code-title] + pre {

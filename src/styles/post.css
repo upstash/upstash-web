@@ -1,18 +1,27 @@
+.post {
+  color: rgb(2 44 34 / 0.78);
+}
+@media (prefers-color-scheme: dark) {
+  .post {
+    color: rgb(236 253 245 / 0.78);
+  }
+}
+
 .post > * {
   @apply mb-10;
 }
 
 .post b,
 .post strong {
-  @apply font-semibold;
+  @apply font-semibold text-text;
 }
 
 .post a {
-  @apply font-medium text-emerald-600 hover:underline dark:text-emerald-400;
+  @apply font-medium text-text underline decoration-text-mute underline-offset-2 transition hover:decoration-text;
 }
 
 .post blockquote {
-  @apply rounded-xl bg-emerald-700/10 p-4 md:p-6 dark:bg-white/5;
+  @apply -mx-5 rounded-xl bg-emerald-700/10 p-5 md:-mx-6 md:p-6 dark:bg-white/5;
 }
 
 .post ul,
@@ -40,6 +49,27 @@
 
 .post hr {
   @apply my-10 border-b border-zinc-900 md:my-20;
+}
+
+.post > img,
+.post > p > img,
+.post > video,
+.post > p > video {
+  @apply -mx-5 block w-[calc(100%_+_2.5rem)] max-w-none rounded-xl md:-mx-6 md:w-[calc(100%_+_3rem)];
+}
+
+.post > img[data-zoomable],
+.post > p > img[data-zoomable] {
+  @apply cursor-zoom-in;
+}
+
+.post [data-image-caption] {
+  @apply -mx-5 mt-1.5 block text-center text-sm leading-6 text-text-mute md:-mx-6;
+}
+
+.post > img:has(+ [data-image-caption]),
+.post > p:has(> img + [data-image-caption]) {
+  @apply mb-4;
 }
 
 .post table tr {
@@ -70,7 +100,7 @@
   @apply text-lg md:text-xl;
 }
 
-.post :where(h2, h3, h4) {
-  @apply mb-6 font-display font-semibold;
+.post :where(h1, h2, h3, h4) {
+  @apply mb-6 font-display font-semibold text-text;
   scroll-margin-top: 2rem;
 }

@@ -1,11 +1,11 @@
-import Bg from "@/components/bg";
-import PostGridCard from "@/components/blog/grid-item";
+import PostCard from "@/components/blog/post-card";
 import Container from "@/components/container";
-import PageHeaderTitle from "@/components/page-header-title";
-import type { Post } from "@content";
+import { authors } from "@/utils/authors";
 import { uniq } from "lodash";
 import Link from "next/link";
-import { getData } from "../../utils/helpers";
+import { extractExcerpt, getData } from "../../utils/helpers";
+
+const COLS = 3;
 
 type Props = {
   params: {
@@ -15,8 +15,8 @@ type Props = {
 
 export async function generateStaticParams(): Promise<Props["params"][]> {
   const posts = await getData();
-  const authors = uniq(posts.flatMap((post) => post.authors));
-  return authors.map((author) => ({ author }));
+  const usernames = uniq(posts.flatMap((post) => post.authors));
+  return usernames.map((author) => ({ author }));
 }
 
 export async function generateMetadata({
@@ -24,55 +24,75 @@ export async function generateMetadata({
 }: {
   params: Props["params"];
 }) {
-  const description = `Read all blog posts by ${params.author} on the Upstash blog. Tutorials, guides, and insights on serverless technologies.`;
+  const displayName = authors[params.author]?.name ?? params.author;
+  const description = `Read all blog posts by ${displayName} on the Upstash blog. Tutorials, guides, and insights on serverless technologies.`;
   return {
-    title: `${params.author}'s Posts`,
+    title: `${displayName}'s Posts`,
     description,
     alternates: {
       canonical: `/blog/author/${params.author}`,
     },
     openGraph: {
-      title: `${params.author}'s Posts | Upstash Blog`,
+      title: `${displayName}'s Posts | Upstash Blog`,
       description,
       url: `/blog/author/${params.author}`,
     },
     twitter: {
       card: "summary_large_image",
-      title: `${params.author}'s Posts | Upstash Blog`,
+      title: `${displayName}'s Posts | Upstash Blog`,
       description,
     },
   };
 }
 
-export default async function BlogPage({ params: { author } }: Props) {
+export default async function BlogAuthorPage({ params: { author } }: Props) {
   const posts = await getData();
   const postsByAuthor = posts.filter((post) => post.authors.includes(author));
+  const displayName = authors[author]?.name ?? author;
+  const fillers = (COLS - (postsByAuthor.length % COLS)) % COLS;
 
   return (
     <main className="relative z-0">
-      <Bg />
+      <Container className="pt-16 md:pt-24">
+        <div className="w-fit py-10 pl-7 pr-10 text-white md:pl-10 md:pr-20">
+          <h1 className="font-display text-4xl font-semibold leading-[1.1] tracking-tight md:text-5xl">
+            Articles by {displayName}.
+          </h1>
+        </div>
 
-      <header className="py-12 text-center md:py-24">
-        <PageHeaderTitle>
-          <span className="font-medium opacity-40">blog/author/</span>
-          <span className="font-bold">{author}</span>
-        </PageHeaderTitle>
-        <div className="mt-4">
-          <Link className="text-primary-text hover:underline" href="/blog">
-            Back to all posts
+        <div className="mb-6 pl-7 md:pl-10">
+          <Link
+            href="/blog"
+            className="font-mono text-sm tracking-tight text-[rgb(236_253_245_/_0.58)] hover:text-white"
+          >
+            ← Back to all posts
           </Link>
         </div>
-      </header>
 
-      <section>
-        <Container>
-          <div className="grid gap-4 md:grid-cols-2 md:gap-8">
-            {postsByAuthor.map((post: Post) => {
-              return <PostGridCard key={post.slug} data={post} />;
-            })}
+        <div className="bg-white/10 p-px">
+          <div className="grid gap-px md:grid-cols-2 lg:grid-cols-3">
+            {postsByAuthor.map((post) => (
+              <PostCard
+                key={post.slug}
+                data={{
+                  slug: post.slug,
+                  title: post.title,
+                  tags: post.tags,
+                  date: post.date,
+                  authorsData: post.authorsData,
+                  description: post.description,
+                  excerpt: post.description
+                    ? undefined
+                    : extractExcerpt(post.content),
+                }}
+              />
+            ))}
+            {Array.from({ length: fillers }).map((_, i) => (
+              <div key={`filler-${i}`} className="bg-bg" aria-hidden />
+            ))}
           </div>
-        </Container>
-      </section>
+        </div>
+      </Container>
     </main>
   );
 }

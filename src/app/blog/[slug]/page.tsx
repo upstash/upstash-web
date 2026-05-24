@@ -1,11 +1,9 @@
-import Bg from "@/components/bg";
 import Container from "@/components/container";
-import PageBodyGradient from "@/components/page-body-gradient";
-import Clap from "@/components/post/claps";
 import PostHeader from "@/components/post/header";
 import { Mdx } from "@/components/post/mdx";
 import OtherPostCard from "@/components/post/other-post";
 import PostTags from "@/components/post/tags";
+import { IconBookmark } from "@tabler/icons-react";
 import { SITE_URL } from "@/utils/const";
 import { generateBlogSchema } from "@/utils/structured-schema-generators";
 import type { Post } from "@content";
@@ -85,33 +83,31 @@ export default async function BlogPage({ params }: Props) {
           __html: structuredBlogSchema,
         }}
       />
-      <Bg />
-
       <article>
-        {/* Header */}
         <PostHeader post={post} />
 
-        {/* Body */}
-        <div className="relative z-0 pt-10">
-          <PageBodyGradient isBlogPage />
-
+        <div className="relative z-0 pt-12 md:pt-16">
           <Container className="max-w-screen-md">
-            {/* content */}
+            {post.description && (
+              <div className="-mx-5 mb-10 rounded-2xl bg-emerald-900/5 p-5 md:-mx-6 md:p-6 dark:bg-white/[0.04]">
+                <div className="mb-3 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-wider text-primary">
+                  <IconBookmark size={16} stroke={2} />
+                  Summary
+                </div>
+                <p className="text-text">{post.description}</p>
+              </div>
+            )}
+
             <Mdx code={post.mdx} />
 
-            {/* Tags- */}
             <PostTags post={post} />
 
-            {/* Other Post */}
             <div className="mt-10 grid gap-4 md:grid-cols-2 md:gap-8">
               <OtherPostCard post={nextPost} align="left" />
               <OtherPostCard post={prevPost} align="right" />
             </div>
           </Container>
         </div>
-
-        {/* Claps */}
-        <Clap tweet={post.tweet} />
       </article>
     </main>
   );

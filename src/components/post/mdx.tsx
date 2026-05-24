@@ -1,11 +1,11 @@
 "use client";
 
-import PostTOC from "@/components/post/toc";
 import cx from "@/utils/cx";
 import { MDXContent } from "@content-collections/mdx/react";
 import { IconCheck, IconCopy } from "@tabler/icons-react";
 import Image from "next/image";
-import { ComponentProps, ReactNode, useEffect, useRef, useState } from "react";
+import { ComponentProps, MouseEvent, ReactNode, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import ExpandableCode from "./expandable-code";
 import PostNote from "./note";
 import { MuxVideoPlayer } from "./mux-video-player";
@@ -16,10 +16,115 @@ interface MdxProps {
 }
 
 export function Mdx({ code }: MdxProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [zoomedImage, setZoomedImage] = useState<{
+    src: string;
+    alt: string;
+  } | null>(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const images = container.querySelectorAll<HTMLImageElement>(
+      ".post > img, .post > p > img",
+    );
+    images.forEach((img) => {
+      if (img.dataset.zoomable === "") return;
+      img.dataset.zoomable = "";
+
+      const alt = img.alt?.trim();
+      if (
+        alt &&
+        !img.nextElementSibling?.hasAttribute?.("data-image-caption")
+      ) {
+        const caption = document.createElement("span");
+        caption.setAttribute("data-image-caption", "");
+        caption.textContent = alt;
+        img.parentElement?.insertBefore(caption, img.nextSibling);
+      }
+    });
+  }, [code]);
+
+  useEffect(() => {
+    if (!zoomedImage) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setZoomedImage(null);
+      }
+    }
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [zoomedImage]);
+
+  function handleClick(event: MouseEvent<HTMLDivElement>) {
+    const image = (event.target as Element).closest<HTMLImageElement>(
+      "img[data-zoomable]",
+    );
+    if (!image || !event.currentTarget.contains(image)) return;
+
+    setZoomedImage({
+      src: image.getAttribute("src") || image.currentSrc || image.src,
+      alt: image.alt,
+    });
+  }
+
   return (
-    <div className="post leading-p">
-      <MDXContent code={code} components={{ ...components }} />
-    </div>
+    <>
+      <div ref={containerRef} className="post leading-p" onClick={handleClick}>
+        <MDXContent code={code} components={{ ...components }} />
+      </div>
+      {zoomedImage &&
+        createPortal(
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label={zoomedImage.alt || "Expanded image"}
+            className="fixed inset-0 z-50 flex cursor-zoom-out items-center justify-center bg-zinc-950/90 p-4 backdrop-blur-sm sm:p-8"
+            onClick={() => setZoomedImage(null)}
+          >
+            <button
+              type="button"
+              aria-label="Close expanded image"
+              className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white ring-1 ring-white/20 transition hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              onClick={() => setZoomedImage(null)}
+            >
+              <CloseIcon className="h-5 w-5" />
+            </button>
+            <img
+              src={zoomedImage.src}
+              alt={zoomedImage.alt}
+              className="max-h-[92vh] max-w-[96vw] rounded-lg object-contain shadow-2xl"
+              onClick={(event) => event.stopPropagation()}
+            />
+          </div>,
+          document.body,
+        )}
+    </>
+  );
+}
+
+function CloseIcon(props: ComponentProps<"svg">) {
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.8}
+      strokeLinecap="round"
+      aria-hidden="true"
+      {...props}
+    >
+      <path d="m4 4 8 8M12 4l-8 8" />
+    </svg>
   );
 }
 
@@ -40,7 +145,7 @@ function CopyFeaturePre(props: ComponentProps<"pre">) {
     <div
       {...(props as ComponentProps<"div">)}
       ref={containerRef}
-      className="relative"
+      className="group/code relative"
     >
       <button
         onClick={() => {
@@ -50,16 +155,19 @@ function CopyFeaturePre(props: ComponentProps<"pre">) {
           setHasCopied(true);
         }}
         className={cx(
-          "absolute right-5 top-5",
-          "flex items-center justify-center p-2",
-          "cursor-pointer rounded-md bg-white/5",
-          hasCopied ? "text-primary" : "text-white/60",
+          "absolute right-3 top-3 z-10",
+          "flex items-center justify-center rounded-md p-1.5",
+          "cursor-pointer bg-white/[0.06]",
+          "opacity-0 transition group-hover/code:opacity-100",
+          "hover:bg-white/[0.12]",
+          hasCopied ? "text-primary opacity-100" : "text-text-mute",
         )}
+        aria-label="Copy code"
       >
         {hasCopied ? (
-          <IconCheck size={16} stroke={2} />
+          <IconCheck size={14} stroke={2} />
         ) : (
-          <IconCopy size={16} stroke={2} />
+          <IconCopy size={14} stroke={2} />
         )}
       </button>
       <pre {...props} className="" />
@@ -76,7 +184,16 @@ function table(props: ComponentProps<"table">) {
 }
 
 function img(props: ComponentProps<"img">) {
-  return <img className="mx-auto block rounded-xl" {...props} alt={props.alt || ""} />;
+  return (
+    <img
+      {...props}
+      alt={props.alt || ""}
+      className={cx(
+        "-mx-5 block w-[calc(100%_+_2.5rem)] max-w-none rounded-xl md:-mx-6 md:w-[calc(100%_+_3rem)]",
+        props.className,
+      )}
+    />
+  );
 }
 
 function FullWidth(props: ComponentProps<"div">) {
@@ -125,12 +242,17 @@ function Highlight(props: {
   );
 }
 
+function NavOrNull(props: ComponentProps<"nav">) {
+  if (props.className?.includes("toc")) return null;
+  return <nav {...props} />;
+}
+
 const components = {
   table,
   img,
   FullWidth,
   Highlight,
-  nav: PostTOC,
+  nav: NavOrNull,
   Note: PostNote,
   ExpandableCode,
   pre: CopyFeaturePre,

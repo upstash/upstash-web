@@ -111,13 +111,11 @@ export const posts = defineCollection({
         [
           rehypePrettyCode,
           {
-            theme: "poimandres",
-            // transformers: [
-            //   transformerCopyButton({
-            //     visibility: "always",
-            //     feedbackDuration: 3_000,
-            //   }),
-            // ],
+            theme: {
+              dark: "github-dark-default",
+              light: "github-light-default",
+            },
+            keepBackground: false,
           },
         ],
       ],

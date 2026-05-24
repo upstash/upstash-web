@@ -1,52 +1,46 @@
-import Bg from "@/components/bg";
-import PopularTag from "@/components/blog/popular-tag";
-import BlogSearch from "@/components/blog/search";
+import PostCard from "@/components/blog/post-card";
 import Container from "@/components/container";
-import PageHeaderDesc from "@/components/page-header-desc";
-import PageHeaderTitle from "@/components/page-header-title";
-import { BANNED_TAGS } from "@/utils/const";
-import { normalizeTag } from "@/utils/tags";
-import { countBy, flatten, omit } from "lodash";
-import { getData } from "./utils/helpers";
+import { extractExcerpt, getData } from "./utils/helpers";
+
+const COLS = 3;
 
 export default async function BlogPage() {
   const posts = await getData();
-
-  const _tags = omit(
-    countBy(flatten(posts.map((post) => post.tags.map(normalizeTag)))),
-    BANNED_TAGS.map(normalizeTag),
-  );
-  const tags = Object.entries(_tags).sort((a, b) => b[1] - a[1]);
-
-  const searchPosts = posts.map(
-    ({ slug, title, description, tags, date, authorsData }) => ({
-      slug,
-      title,
-      description,
-      tags,
-      date,
-      authorsData,
-    }),
-  );
+  const fillers = (COLS - (posts.length % COLS)) % COLS;
 
   return (
     <main className="relative z-0">
-      <Bg />
+      <Container className="pt-16 md:pt-24">
+        <div className="w-fit py-10 pl-7 pr-10 text-white md:pl-10 md:pr-20">
+          <h1 className="font-display text-4xl font-semibold leading-[1.1] tracking-tight md:text-5xl">
+            Latest blog articles.
+          </h1>
+        </div>
 
-      <header className="pt-10 text-center md:pt-20">
-        <Container>
-          <PageHeaderTitle>Blog</PageHeaderTitle>
-          <PageHeaderDesc className="mt-2">
-            Articles and tutorials from Upstash and community.
-          </PageHeaderDesc>
-
-          <div className="mt-10">
-            <PopularTag data={tags.slice(0, 12)} />
+        <div className="bg-white/10 p-px">
+          <div className="grid gap-px md:grid-cols-2 lg:grid-cols-3">
+            {posts.map((post) => (
+              <PostCard
+                key={post.slug}
+                data={{
+                  slug: post.slug,
+                  title: post.title,
+                  tags: post.tags,
+                  date: post.date,
+                  authorsData: post.authorsData,
+                  description: post.description,
+                  excerpt: post.description
+                    ? undefined
+                    : extractExcerpt(post.content),
+                }}
+              />
+            ))}
+            {Array.from({ length: fillers }).map((_, i) => (
+              <div key={`filler-${i}`} className="bg-bg" aria-hidden />
+            ))}
           </div>
-
-          <BlogSearch posts={searchPosts} />
-        </Container>
-      </header>
+        </div>
+      </Container>
     </main>
   );
 }
