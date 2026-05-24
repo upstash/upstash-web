@@ -5,7 +5,10 @@ import OtherPostCard from "@/components/post/other-post";
 import PostTags from "@/components/post/tags";
 import { IconBookmark } from "@tabler/icons-react";
 import { SITE_URL } from "@/utils/const";
-import { generateBlogSchema } from "@/utils/structured-schema-generators";
+import {
+  generateBlogSchema,
+  generateBreadcrumbSchema,
+} from "@/utils/structured-schema-generators";
 import type { Post } from "@content";
 import { allPosts } from "@content";
 import { notFound } from "next/navigation";
@@ -58,6 +61,9 @@ export default async function BlogPage({ params }: Props) {
   }
 
   const isoDatePublished = new Date(post.date).toISOString();
+  const isoDateModified = post.updated
+    ? new Date(post.updated).toISOString()
+    : undefined;
   const postUrl = `${SITE_URL}/blog/${post.slug}`;
 
   const structuredBlogSchema = generateBlogSchema({
@@ -66,11 +72,21 @@ export default async function BlogPage({ params }: Props) {
       post.description ||
       "Articles and tutorials on serverless technologies from Upstash and community",
     keywords: post.tags,
-    authorName: post.authorsData[0].name,
-    authorUrl: post.authorsData[0].url || "",
+    authors: post.authorsData.map((a) => ({ name: a.name, url: a.url })),
     datePublished: isoDatePublished,
+    dateModified: isoDateModified,
     url: postUrl,
     image: `${SITE_URL}/blog/${post.slug}/opengraph-image`,
+    wordCount: post.wordCount,
+    readingTimeMinutes: post.readingTimeMinutes,
+  });
+
+  const structuredBreadcrumbSchema = generateBreadcrumbSchema({
+    items: [
+      { name: "Home", url: SITE_URL },
+      { name: "Blog", url: `${SITE_URL}/blog` },
+      { name: post.title, url: postUrl },
+    ],
   });
 
   const { nextPost, prevPost } = getAdjacentPosts(allPosts, indexOfPost);
@@ -81,6 +97,12 @@ export default async function BlogPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: structuredBlogSchema,
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: structuredBreadcrumbSchema,
         }}
       />
       <article>
@@ -124,13 +146,23 @@ export async function generateMetadata({
   const description =
     post.description ||
     "Articles and tutorials on serverless technologies from Upstash and community";
+  const publishedTime = new Date(post.date).toISOString();
+  const modifiedTime = post.updated
+    ? new Date(post.updated).toISOString()
+    : publishedTime;
   return {
     title,
     description,
+    keywords: post.tags,
+    authors: post.authorsData.map((a) => ({
+      name: a.name,
+      ...(a.url ? { url: a.url } : {}),
+    })),
     alternates: {
       canonical: `/blog/${post.slug}`,
       types: {
         "text/markdown": `/blog/${post.slug}.md`,
+        "application/rss+xml": "/blog/feed.xml",
       },
     },
     openGraph: {
@@ -138,12 +170,22 @@ export async function generateMetadata({
       title,
       description,
       url: `${SITE_URL}/blog/${post.slug}`,
+      publishedTime,
+      modifiedTime,
+      authors: post.authorsData.map((a) => a.name),
+      tags: post.tags,
     },
 
     twitter: {
       card: "summary_large_image",
       title,
       description,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      "max-snippet": -1,
+      "max-image-preview": "large",
     },
   };
 }

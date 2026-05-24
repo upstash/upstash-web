@@ -18,6 +18,7 @@ export const metadata: Metadata = {
     canonical: "/blog",
     types: {
       "text/markdown": "/blog.md",
+      "application/rss+xml": "/blog/feed.xml",
     },
   },
   openGraph: {
