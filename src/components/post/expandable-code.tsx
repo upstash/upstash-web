@@ -1,6 +1,5 @@
 "use client";
 
-import { IconArrow } from "@/components/post/toc";
 import cx from "@/utils/cx";
 import { HTMLProps, useState } from "react";
 
@@ -72,3 +71,18 @@ Toc.Summary = function TocSummary({
     </summary>
   );
 };
+
+function IconArrow({ className }: { className?: string }) {
+  return (
+    <svg
+      className={cx("shrink-0 transition", className)}
+      width={24}
+      viewBox="0 0 24 24"
+      role="img"
+      aria-label="arrow-right"
+      fill="currentColor"
+    >
+      <path d="M10 17l5-5-5-5v10z"></path>
+    </svg>
+  );
+}
