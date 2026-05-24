@@ -97,6 +97,7 @@ export const posts = defineCollection({
     image: z.string().optional(),
     tweet: z.string().optional(),
     draft: z.boolean().optional(),
+    updated: z.string().optional(),
   }),
   transform: async (doc, ctx) => {
     const mdx = await compileMDX(ctx, doc, {
@@ -112,13 +113,11 @@ export const posts = defineCollection({
         [
           rehypePrettyCode,
           {
-            theme: "poimandres",
-            // transformers: [
-            //   transformerCopyButton({
-            //     visibility: "always",
-            //     feedbackDuration: 3_000,
-            //   }),
-            // ],
+            theme: {
+              dark: "github-dark-default",
+              light: "github-light-default",
+            },
+            keepBackground: false,
           },
         ],
       ],
@@ -136,15 +135,27 @@ export const posts = defineCollection({
     const readingTime = rt(doc.content) as ReadTimeResults;
     const date = doc._meta.fileName.substring(-1, 10);
 
+    const wordCount = countWords(doc.content);
+    const readingTimeMinutes = Math.max(1, Math.ceil(wordCount / 220));
+
     return {
       ...doc,
       mdx,
       date,
       readingTime: readingTime.text,
+      readingTimeMinutes,
+      wordCount,
       authorsData,
     };
   },
 });
+
+function countWords(markdown: string): number {
+  const withoutCode = markdown.replace(/```[\s\S]*?```/g, " ");
+  const withoutTags = withoutCode.replace(/<\/?[A-Za-z][^>]*>/g, " ");
+  const words = withoutTags.match(/[A-Za-z0-9][A-Za-z0-9'-]*/g);
+  return words?.length ?? 0;
+}
 
 export default defineConfig({
   collections: [customers, jobs, glossary, posts],

@@ -9,6 +9,27 @@ function isBlogPath(pathname: string): boolean {
 
 const BLOG_MD_POST = /^\/blog\/([^/]+)\.md$/;
 
+const AI_BOT_REGEX =
+  /GPTBot|OAI-SearchBot|ChatGPT-User|ClaudeBot|Claude-User|Claude-SearchBot|claude-code|PerplexityBot|Perplexity-User|Google-Extended|GoogleOther|Google-CloudVertexBot|Google-NotebookLM|Amazonbot|CCBot|Applebot|Applebot-Extended|meta-externalagent|Meta-ExternalAgent|DuckAssistBot|MistralAI-User|Bytespider|cohere-ai|Diffbot|AI2Bot/i;
+
+function markdownAlternateLink(pathname: string): string {
+  return `<${pathname}.md>; rel="alternate"; type="text/markdown", <${pathname}>; rel="canonical"`;
+}
+
+function applyBlogHtmlHeaders(
+  response: NextResponse,
+  pathname: string,
+  aiAgent: string | null,
+): NextResponse {
+  response.headers.append("Vary", "Accept");
+  response.headers.set("x-content-bucket", "html");
+  if (pathname !== "/blog") {
+    response.headers.set("Link", markdownAlternateLink(pathname));
+  }
+  if (aiAgent) response.headers.set("x-ai-agent", aiAgent);
+  return response;
+}
+
 const PRICING_MD_PRODUCTS = [
   "redis",
   "qstash",
@@ -46,21 +67,32 @@ export function middleware(request: NextRequest) {
   }
 
   const pathname = request.nextUrl.pathname;
+  const userAgent = request.headers.get("user-agent") ?? "";
+  const aiAgentMatch = userAgent.match(AI_BOT_REGEX);
+  const aiAgent = aiAgentMatch ? aiAgentMatch[0] : null;
 
   // Explicit `.md` URLs (e.g. /blog.md, /blog/foo.md) always serve Markdown,
   // regardless of Accept header. This is the conventional pattern (GitHub,
   // llms.txt, etc.) and gives us distinct cache keys without Vary headaches.
   if (pathname === "/blog.md") {
-    return NextResponse.rewrite(new URL("/api/blog/markdown", request.url));
+    const res = NextResponse.rewrite(new URL("/api/blog/markdown", request.url));
+    res.headers.set("Vary", "Accept");
+    res.headers.set("x-content-bucket", "md");
+    if (aiAgent) res.headers.set("x-ai-agent", aiAgent);
+    return res;
   }
   const mdPost = pathname.match(BLOG_MD_POST);
   if (mdPost) {
-    return NextResponse.rewrite(
+    const res = NextResponse.rewrite(
       new URL(
         `/api/blog/${encodeURIComponent(mdPost[1])}/markdown`,
         request.url,
       ),
     );
+    res.headers.set("Vary", "Accept");
+    res.headers.set("x-content-bucket", "md");
+    if (aiAgent) res.headers.set("x-ai-agent", aiAgent);
+    return res;
   }
 
   const accept = request.headers.get("accept") ?? "";
@@ -80,7 +112,11 @@ export function middleware(request: NextRequest) {
               `/api/blog/${encodeURIComponent(pathname.slice("/blog/".length))}/markdown`,
               request.url,
             );
-      return NextResponse.rewrite(markdownUrl);
+      const res = NextResponse.rewrite(markdownUrl);
+      res.headers.set("Vary", "Accept");
+      res.headers.set("x-content-bucket", "md");
+      if (aiAgent) res.headers.set("x-ai-agent", aiAgent);
+      return res;
     }
   }
 
@@ -103,15 +139,18 @@ export function middleware(request: NextRequest) {
   const queryParams = request.nextUrl.searchParams;
   const affiliateCode = queryParams.get(AFFILIATE_CODE);
 
+  const response = NextResponse.next();
   if (affiliateCode) {
-    const response = NextResponse.next();
     response.cookies.set(AFFILIATE_CODE, affiliateCode, {
       httpOnly: true,
       secure: true,
       sameSite: true,
     });
-    return response;
   }
+  if (isBlogPath(pathname)) {
+    return applyBlogHtmlHeaders(response, pathname, aiAgent);
+  }
+  if (affiliateCode) return response;
 }
 
 export const config = {

@@ -9,7 +9,7 @@ import Header from "@/components/master/header";
 import HeaderMobile from "@/components/master/header-mobile";
 import { SITE_URL } from "@/utils/const";
 import cx from "@/utils/cx";
-import { Inter, Inter_Tight } from "next/font/google";
+import { Inter, Inter_Tight, JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
 import { ReactNode, Suspense } from "react";
 
@@ -23,11 +23,21 @@ const fontDisplay = Inter_Tight({
   subsets: ["latin"],
 });
 
+const fontMono = JetBrains_Mono({
+  variable: "--font-mono",
+  subsets: ["latin"],
+});
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="en"
-      className={cx(fontText.variable, fontDisplay.variable, "scroll-smooth")}
+      className={cx(
+        fontText.variable,
+        fontDisplay.variable,
+        fontMono.variable,
+        "scroll-smooth",
+      )}
       suppressHydrationWarning
     >
       <IntercomWrapper>

@@ -72,6 +72,16 @@ const nextConfig = {
         ],
       },
       {
+        // Blog HTML responses are content-negotiated against text/markdown,
+        // so caches must differentiate by Accept.
+        source: "/blog",
+        headers: [{ key: "Vary", value: "Accept" }],
+      },
+      {
+        source: "/blog/:slug",
+        headers: [{ key: "Vary", value: "Accept" }],
+      },
+      {
         source: "/pricing/redis",
         headers: [
           {
