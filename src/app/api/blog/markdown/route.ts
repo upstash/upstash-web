@@ -1,6 +1,6 @@
 import { renderIndex } from "@/lib/blog-markdown";
 
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 export async function GET(): Promise<Response> {
   return new Response(renderIndex(), {
