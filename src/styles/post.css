@@ -1,5 +1,5 @@
 .post {
-  color: rgb(2 44 34 / 0.78);
+  color: rgb(2 44 34 / 0.84);
 }
 @media (prefers-color-scheme: dark) {
   .post {
@@ -48,7 +48,7 @@
 }
 
 .post hr {
-  @apply my-10 border-b border-zinc-900 md:my-20;
+  @apply my-10 border-b border-emerald-950/15 md:my-20 dark:border-white/15;
 }
 
 .post > img,
@@ -85,7 +85,7 @@
 }
 
 .post code:not(pre > code) {
-  @apply rounded border border-emerald-800/10 bg-emerald-500/10 px-1 py-0.5 text-[0.86em] dark:border-white/3 dark:bg-emerald-100/10;
+  @apply rounded border border-zinc-900/10 bg-zinc-950/[0.04] px-1 py-0.5 text-[0.86em] dark:border-white/3 dark:bg-emerald-100/10;
 }
 
 .post h2 {

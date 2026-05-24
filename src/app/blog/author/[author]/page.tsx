@@ -54,7 +54,7 @@ export default async function BlogAuthorPage({ params: { author } }: Props) {
   return (
     <main className="relative z-0">
       <Container className="pt-16 md:pt-24">
-        <div className="w-fit py-10 pl-7 pr-10 text-white md:pl-10 md:pr-20">
+        <div className="w-fit py-10 pl-7 pr-10 text-text md:pl-10 md:pr-20">
           <h1 className="font-display text-4xl font-semibold leading-[1.1] tracking-tight md:text-5xl">
             Articles by {displayName}.
           </h1>
@@ -63,13 +63,13 @@ export default async function BlogAuthorPage({ params: { author } }: Props) {
         <div className="mb-6 pl-7 md:pl-10">
           <Link
             href="/blog"
-            className="font-mono text-sm tracking-tight text-[rgb(236_253_245_/_0.58)] hover:text-white"
+            className="font-mono text-sm tracking-tight text-text-mute hover:text-text"
           >
             ← Back to all posts
           </Link>
         </div>
 
-        <div className="bg-white/10 p-px">
+        <div className="bg-emerald-950/10 p-px dark:bg-white/10">
           <div className="grid gap-px md:grid-cols-2 lg:grid-cols-3">
             {postsByAuthor.map((post) => (
               <PostCard

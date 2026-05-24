@@ -29,7 +29,7 @@ export default function PostCard({ data }: { data: PostCardData }) {
     >
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-white/[0.03] opacity-0 group-hover:opacity-100"
+        className="pointer-events-none absolute inset-0 bg-emerald-900/[0.04] opacity-0 group-hover:opacity-100 dark:bg-white/[0.03]"
       />
       <div className="relative flex h-full flex-col p-7 md:p-10">
         <h3 className="mb-5 font-display text-xl font-semibold leading-tight md:text-2xl">
@@ -37,12 +37,12 @@ export default function PostCard({ data }: { data: PostCardData }) {
         </h3>
 
         {summary && (
-          <p className="mb-10 line-clamp-3 text-[rgb(2_44_34_/_0.58)] group-hover:text-white dark:text-[rgb(236_253_245_/_0.58)]">
+          <p className="mb-10 line-clamp-3 text-[rgb(2_44_34_/_0.66)] group-hover:text-text dark:text-[rgb(236_253_245_/_0.58)] dark:group-hover:text-white">
             {summary}
           </p>
         )}
 
-        <div className="mt-auto flex items-center justify-between gap-4 font-mono text-sm tracking-tight text-[rgb(2_44_34_/_0.58)] dark:text-[rgb(236_253_245_/_0.58)]">
+        <div className="mt-auto flex items-center justify-between gap-4 font-mono text-sm tracking-tight text-[rgb(2_44_34_/_0.66)] dark:text-[rgb(236_253_245_/_0.58)]">
           {authorsData.length > 0 ? (
             <div className="flex min-w-0 items-center gap-2.5">
               <div className="flex shrink-0 -space-x-2">
@@ -57,14 +57,17 @@ export default function PostCard({ data }: { data: PostCardData }) {
                   />
                 ))}
               </div>
-              <span className="truncate group-hover:text-white">
+              <span className="truncate group-hover:text-text dark:group-hover:text-white">
                 {authorLabel}
               </span>
             </div>
           ) : (
             <span />
           )}
-          <time dateTime={date} className="shrink-0 group-hover:text-white">
+          <time
+            dateTime={date}
+            className="shrink-0 group-hover:text-text dark:group-hover:text-white"
+          >
             {DateTime.fromISO(date).toFormat("LLL dd, yyyy")}
           </time>
         </div>

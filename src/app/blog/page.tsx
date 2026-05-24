@@ -11,13 +11,13 @@ export default async function BlogPage() {
   return (
     <main className="relative z-0">
       <Container className="pt-16 md:pt-24">
-        <div className="w-fit py-10 pl-7 pr-10 text-white md:pl-10 md:pr-20">
+        <div className="w-fit py-10 pl-7 pr-10 text-text md:pl-10 md:pr-20">
           <h1 className="font-display text-4xl font-semibold leading-[1.1] tracking-tight md:text-5xl">
             Latest blog articles.
           </h1>
         </div>
 
-        <div className="bg-white/10 p-px">
+        <div className="bg-emerald-950/10 p-px dark:bg-white/10">
           <div className="grid gap-px md:grid-cols-2 lg:grid-cols-3">
             {posts.map((post) => (
               <PostCard
