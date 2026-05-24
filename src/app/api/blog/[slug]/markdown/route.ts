@@ -4,12 +4,6 @@ import { SITE_URL } from "@/utils/const";
 
 export const dynamic = "force-dynamic";
 
-export async function generateStaticParams() {
-  return allPosts
-    .filter((post) => !post.draft)
-    .map((post) => ({ slug: post.slug }));
-}
-
 export async function GET(
   _request: Request,
   { params }: { params: { slug: string } },
