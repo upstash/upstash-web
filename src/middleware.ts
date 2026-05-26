@@ -4,7 +4,7 @@ import { AFFILIATE_CODE } from "./constants";
 import { negotiate } from "@/lib/accept";
 
 function isBlogPath(pathname: string): boolean {
-  return pathname === "/blog" || /^\/blog\/[^/]+$/.test(pathname);
+  return pathname === "/blog" || /^\/blog\/[^/.]+$/.test(pathname);
 }
 
 const BLOG_MD_POST = /^\/blog\/([^/]+)\.md$/;
