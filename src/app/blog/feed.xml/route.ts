@@ -15,12 +15,24 @@ function escapeXml(value: string): string {
     .replace(/"/g, "&quot;");
 }
 
+function cdata(value: string): string {
+  return value.replaceAll("]]>", "]]]]><![CDATA[>");
+}
+
+function absolutizeHtmlUrls(html: string): string {
+  return html.replace(
+    /\b(href|src)="\/([^"]*)"/g,
+    (_match, attribute: string, path: string) =>
+      `${attribute}="${SITE_URL}/${path}"`,
+  );
+}
+
 async function markdownToHtml(markdown: string): Promise<string> {
   const file = await remark()
     .use(remarkGfm)
     .use(remarkHtml, { sanitize: false })
     .process(sanitizeMdx(markdown));
-  return String(file);
+  return absolutizeHtmlUrls(String(file));
 }
 
 export async function GET(): Promise<Response> {
@@ -41,13 +53,13 @@ export async function GET(): Promise<Response> {
         "Articles and tutorials on serverless technologies from Upstash and community";
       return `
     <item>
-      <title><![CDATA[${post.title}]]></title>
+      <title><![CDATA[${cdata(post.title)}]]></title>
       <link>${url}</link>
       <guid isPermaLink="true">${url}</guid>
       <pubDate>${new Date(post.date).toUTCString()}</pubDate>
-      <description><![CDATA[${description}]]></description>
-      <content:encoded><![CDATA[${html}]]></content:encoded>
-      <dc:creator><![CDATA[${author}]]></dc:creator>
+      <description><![CDATA[${cdata(description)}]]></description>
+      <content:encoded><![CDATA[${cdata(html)}]]></content:encoded>
+      <dc:creator><![CDATA[${cdata(author)}]]></dc:creator>
       ${post.tags.map((tag) => `<category>${escapeXml(tag)}</category>`).join("")}
     </item>`;
     }),

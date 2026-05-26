@@ -17,6 +17,44 @@
 
 [data-rehype-pretty-code-figure] pre {
   @apply overflow-x-auto py-5;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(2 44 34 / 0.2) transparent;
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-rehype-pretty-code-figure] pre {
+    scrollbar-color: rgb(255 255 255 / 0.15) transparent;
+  }
+}
+
+[data-rehype-pretty-code-figure] pre::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+[data-rehype-pretty-code-figure] pre::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+[data-rehype-pretty-code-figure] pre::-webkit-scrollbar-thumb {
+  background-color: rgb(2 44 34 / 0.18);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+[data-rehype-pretty-code-figure] pre::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(2 44 34 / 0.3);
+  background-clip: padding-box;
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-rehype-pretty-code-figure] pre::-webkit-scrollbar-thumb {
+    background-color: rgb(255 255 255 / 0.15);
+  }
+  [data-rehype-pretty-code-figure] pre::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(255 255 255 / 0.25);
+  }
 }
 
 [data-rehype-pretty-code-figure] code {
