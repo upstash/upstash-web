@@ -1,58 +1,77 @@
 import cx from "@/utils/cx";
 import { ReactNode, SVGProps } from "react";
 
+type NoteType = "tip" | "info" | "caution" | "danger";
+
 export default function PostNote({
   children,
   type,
   title,
 }: {
   children: ReactNode;
-  type?: "tip" | "info" | "caution" | "danger";
+  type?: NoteType;
   title?: string;
 }) {
-  const style = {
+  const wrapperStyle = {
     caution:
-      "border-orange-800/10 bg-orange-500/10 text-orange-700 " +
-      "dark:bg-orange-500/20 dark:text-orange-200 dark:border-orange-500/10",
+      "bg-orange-500/10 text-orange-800 dark:bg-orange-500/15 dark:text-orange-100",
     danger:
-      "border-red-800/10 bg-red-500/10 text-red-700 " +
-      "dark:bg-red-500/20 dark:text-red-200 dark:border-red-500/10",
+      "bg-red-500/10 text-red-800 dark:bg-red-500/15 dark:text-red-100",
+  };
+
+  const labelStyle = {
+    caution: "text-orange-700 dark:text-orange-300",
+    danger: "text-red-700 dark:text-red-300",
   };
 
   const icon = {
+    tip: <PostNoteInfo />,
+    info: <PostNoteInfo />,
     caution: <PostNoteCaution />,
     danger: <PostNoteDanger />,
   };
 
+  const defaultLabel: Record<NoteType, string> = {
+    tip: "Tip",
+    info: "Note",
+    caution: "Caution",
+    danger: "Warning",
+  };
+
+  const label = title ?? defaultLabel[type ?? "info"];
+
   return (
     <div
       className={cx(
-        "flex items-start gap-4 rounded-xl border p-5 md:p-6",
-        "border-emerald-900/10 bg-emerald-800/5 text-emerald-900",
-        "dark:border-emerald-500/10 dark:bg-emerald-700/20 dark:text-emerald-50",
-        type && style[type],
+        "-mx-5 my-6 rounded-2xl p-5 md:-mx-6 md:p-6",
+        "bg-emerald-900/5 text-text dark:bg-white/[0.04]",
+        type && wrapperStyle[type],
       )}
     >
-      <span className="text-2xl">
-        {(type && icon[type]) || <PostNoteDefault />}
-      </span>
-
-      <div className="-mt-0.5">
-        {title && <h6 className="mb-1 font-display font-semibold">{title}</h6>}
-        {children}
+      <div
+        className={cx(
+          "mb-3 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-wider",
+          "text-primary",
+          type && labelStyle[type],
+        )}
+      >
+        {icon[type ?? "info"]}
+        {label}
       </div>
+      <div>{children}</div>
     </div>
   );
 }
 
-function PostNoteDefault(props: SVGProps<SVGSVGElement>) {
+function PostNoteInfo(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
+      aria-hidden="true"
       xmlns="http://www.w3.org/2000/svg"
-      width="1em"
-      height="1em"
+      width="14"
+      height="14"
       viewBox="0 0 24 24"
-      strokeWidth="1.5"
+      strokeWidth="2.5"
       stroke="currentColor"
       fill="none"
       strokeLinecap="round"
@@ -69,11 +88,12 @@ function PostNoteDefault(props: SVGProps<SVGSVGElement>) {
 function PostNoteCaution(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
+      aria-hidden="true"
       xmlns="http://www.w3.org/2000/svg"
-      width="1em"
-      height="1em"
+      width="14"
+      height="14"
       viewBox="0 0 24 24"
-      strokeWidth="1.5"
+      strokeWidth="2.5"
       stroke="currentColor"
       fill="none"
       strokeLinecap="round"
@@ -89,11 +109,12 @@ function PostNoteCaution(props: SVGProps<SVGSVGElement>) {
 function PostNoteDanger(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
+      aria-hidden="true"
       xmlns="http://www.w3.org/2000/svg"
-      width="1em"
-      height="1em"
+      width="14"
+      height="14"
       viewBox="0 0 24 24"
-      strokeWidth="1.5"
+      strokeWidth="2.5"
       stroke="currentColor"
       fill="none"
       strokeLinecap="round"
