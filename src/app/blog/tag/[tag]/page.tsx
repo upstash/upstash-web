@@ -1,13 +1,12 @@
-import Bg from "@/components/bg";
-import PostGridCard from "@/components/blog/grid-item";
+import PostCard from "@/components/blog/post-card";
 import Container from "@/components/container";
-import PageHeaderTitle from "@/components/page-header-title";
 import { normalizeTag, normalizeTagParam } from "@/utils/tags";
-import type { Post } from "@content";
 import { uniq } from "lodash";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getData } from "../../utils/helpers";
+import { extractExcerpt, getData } from "../../utils/helpers";
+
+const COLS = 3;
 
 type Props = {
   params: {
@@ -47,7 +46,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function BlogPage({ params: { tag } }: Props) {
+export default async function BlogTagPage({ params: { tag } }: Props) {
   const normalized = normalizeTagParam(tag);
   const posts = await getData();
   const postsWithTag = posts.filter((post) =>
@@ -58,31 +57,50 @@ export default async function BlogPage({ params: { tag } }: Props) {
     notFound();
   }
 
+  const fillers = (COLS - (postsWithTag.length % COLS)) % COLS;
+
   return (
     <main className="relative z-0">
-      <Bg />
+      <Container className="pt-16 md:pt-24">
+        <div className="w-fit py-10 pl-7 pr-10 text-text md:pl-10 md:pr-20">
+          <h1 className="font-display text-4xl font-semibold leading-[1.1] tracking-tight md:text-5xl">
+            Articles tagged {normalized}.
+          </h1>
+        </div>
 
-      <header className="py-12 text-center md:py-24">
-        <PageHeaderTitle>
-          <span className="font-medium opacity-40">blog/tag/</span>
-          <span className="font-bold">{normalized}</span>
-        </PageHeaderTitle>
-        <div className="mt-4">
-          <Link className="text-primary-text hover:underline" href="/blog">
-            Back to all posts
+        <div className="mb-6 pl-7 md:pl-10">
+          <Link
+            href="/blog"
+            className="font-mono text-sm tracking-tight text-text-mute hover:text-text"
+          >
+            ← Back to all posts
           </Link>
         </div>
-      </header>
 
-      <section>
-        <Container>
-          <div className="grid gap-4 md:grid-cols-2 md:gap-8">
-            {postsWithTag.map((post: Post) => {
-              return <PostGridCard key={post.slug} data={post} />;
-            })}
+        <div className="bg-emerald-950/10 p-px dark:bg-white/10">
+          <div className="grid gap-px md:grid-cols-2 lg:grid-cols-3">
+            {postsWithTag.map((post) => (
+              <PostCard
+                key={post.slug}
+                data={{
+                  slug: post.slug,
+                  title: post.title,
+                  tags: post.tags,
+                  date: post.date,
+                  authorsData: post.authorsData,
+                  description: post.description,
+                  excerpt: post.description
+                    ? undefined
+                    : extractExcerpt(post.content),
+                }}
+              />
+            ))}
+            {Array.from({ length: fillers }).map((_, i) => (
+              <div key={`filler-${i}`} className="bg-bg" aria-hidden />
+            ))}
           </div>
-        </Container>
-      </section>
+        </div>
+      </Container>
     </main>
   );
 }
