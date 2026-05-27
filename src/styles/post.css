@@ -72,16 +72,28 @@
   @apply mb-4;
 }
 
-.post table tr {
-  @apply border-t;
+.post table {
+  margin: 0;
+}
+
+.post table thead tr {
+  @apply border-b border-emerald-950/10 dark:border-white/10;
+}
+
+.post table tbody tr {
+  @apply border-t border-emerald-950/[0.06] dark:border-white/[0.06];
+}
+
+.post table tbody tr:first-child {
+  @apply border-t-0;
 }
 
 .post table th {
-  @apply whitespace-nowrap border px-2 py-2 font-semibold;
+  @apply px-4 py-3 text-left align-bottom font-semibold text-text;
 }
 
 .post table td {
-  @apply border px-2 py-2;
+  @apply px-4 py-3 align-top;
 }
 
 .post code:not(pre > code) {
