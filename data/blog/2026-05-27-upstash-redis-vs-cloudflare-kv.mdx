@@ -1,0 +1,265 @@
+---
+title: "Upstash Redis vs Cloudflare KV: Features, Performance & Pricing in 2026"
+slug: upstash-redis-vs-cloudflare-kv
+authors: [josh]
+tags: [redis, ai]
+description: "The 2026 Upstash Redis vs. Cloudflare KV comparison. Features, limitations, pricing and performance."
+---
+
+<Summary>
+**Use Cloudflare Workers KV** when you have a small set of rarely changing values (config, feature flags, static assets) that get read a lot from inside Workers.
+
+**Use Upstash Redis** when you need fast reads & writes, Redis data types (lists, sorted sets, streams, hashes, pub/sub), access from outside Workers, or predictable read latency the first time a key is read in a region
+</Summary>
+
+## Quick summary
+
+- **Cloudflare KV is eventually consistent** with up to 60 seconds of propagation between regions, and limits writes to the same key to 1 per second on every plan ([Cloudflare KV limits](https://developers.cloudflare.com/kv/platform/limits/)).
+- **Upstash Redis actively replicates** data from the primary to every read region
+- KV is a key-value store with five operations: get, put, delete, list, and getWithMetadata. Upstash supports all Redis commands including sorted sets, streams, hashes, pub/sub, and Lua scripting.
+- **Cloudflare KV is $0.50 per million reads and $5.00 per million writes** ([Cloudflare KV pricing](https://developers.cloudflare.com/kv/platform/pricing/)). **Upstash pay-as-you-go is $0.20 per 100K commands** (so $2.00 per million). Fixed monthly plans start at $10 for unlimited commands
+- KV works best inside the Cloudflare ecosystem (Workers, Pages, the REST API). Upstash supports both the Redis protocol and HTTPS, so the same database works from Workers, Vercel, AWS Lambda, a Node server, etc.
+
+## What is the difference between Upstash Redis and Cloudflare KV?
+
+**Cloudflare KV** is a pull-based cache in front of a small set of central data stores. Writes go to the central tier, and reads pull data into a regional cache the first time a Worker in that region asks for it. Cloudflare's own docs describe this as a [hybrid push/pull replication that is optimized for high-read applications](https://developers.cloudflare.com/kv/concepts/how-kv-works/), where the first read from a cold region goes all the way back to the central store.
+
+![Passive replication on Cloudflare KV](/blog/redis-vs-cloudflare-kv/cloudflare-kv-passive-replication.png)
+
+**Upstash Redis** takes the opposite approach: active replication. A write goes to the primary region and gets pushed to every read region you turned on (regions like us-east-1, us-west-1, eu-west-1, ap-southeast-1, sa-east-1, and others). Every region holds the full dataset. There is no "cold region" for reads.
+
+![Active replication on Upstash Redis](/blog/redis-vs-cloudflare-kv/upstash-redis-active-replication.png)
+
+## How do latencies compare in a real benchmark?
+
+I deployed a Cloudflare Worker that calls KV through the binding and Upstash through the official `@upstash/redis/cloudflare` client (HTTPS REST), then ran four scenarios: 5 runs × 30 samples = 150 samples per metric, all served from Cloudflare's Washington DC data center (IAD).
+
+I called both stores from the same Worker on the same request. The Upstash database was global-replicated with us-east-1 as the primary region.
+
+![Cloudflare KV vs. Upstash Redis performance - lower is better](/blog/redis-vs-cloudflare-kv/performance-benchmark.png)
+
+| Scenario | KV p50 | KV p99 | Upstash p50 | Upstash p99 | Winner |
+| --- | --- | --- | --- | --- | --- |
+| Hot read | 2.6 ms | 5.8 ms | 5.6 ms | 8.8 ms | KV, about 2× faster |
+| Cold read | 30.6 ms | 45.6 ms | 6.8 ms | 28.2 ms | Upstash, about 4.5× faster |
+| Single write | 171.8 ms | 253.2 ms | 6.2 ms | 8.6 ms | Upstash, about 28× faster |
+| Read-after-write | 176.2 ms | 260.6 ms | 24.8 ms | 37.0 ms | Upstash, about 7× faster |
+
+**Cloudflare KV is faster on hot-key reads.** A Worker reading a key that's already in the regional cache only does an in-memory lookup, and doesn't need another network call. As soon as the cache is cold or there's a write, KV has to go to the central data store, which takes 30 ms for a cold read and 170+ ms for a write.
+
+Upstash makes one HTTPS request to the nearest region for every operation, which is about 6 ms from IAD to us-east-1, with no big difference between reads and writes. In all other scenarios, it's faster than KV.
+
+These numbers line up with other published benchmarks like the [Deno benchmark across five serverless KV stores](https://deno.com/blog/comparing-deno-kv). They ranked Upstash Redis first and Cloudflare Workers KV last on global latency. It said the reason was KV's heavy caching and eventual consistency. Those hurt latency when you read shortly after a write.
+
+Cloudflare KV is fast when the same key gets read a lot in the same region over many seconds. It is slow on the first read in a region (for the reason I illustrated above), and a lot slower on writes.
+
+## What does each store cost per million operations?
+
+Paid Cloudflare Workers KV charges $0.50 per million reads, $5.00 per million writes, $5.00 per million deletes, $5.00 per million list requests, and $0.50 per GB-month for storage above the first GB. There is no charge for egress.
+
+Upstash Redis pay-as-you-go is $0.20 per 100,000 commands with the same price for reads and writes, plus $0.25 per GB-month for storage. Bandwidth is free on pay-as-you-go. Upstash also has fixed plans starting at $10/month for 250 MB with no per-command charges, which is cheaper than both KV and pay-as-you-go once you're above a few million commands per month.
+
+A read-heavy workload at 100M reads and 1M writes per month, with 1 GB of data:
+
+| Cost line | Cloudflare KV | Upstash Fixed 1GB |
+| --- | --- | --- |
+| Reads | $50.00 | included |
+| Writes | $5.00 | included |
+| Storage (1 GB) | $0.00 | included |
+| Plan fee | $0.00 | $20.00 |
+| **Total** | **$55.00** | **$20.00** |
+
+A write-heavier workload at 10M reads and 10M writes per month, still with 1 GB of data, on the same Upstash Fixed 1GB plan:
+
+| Cost line | Cloudflare KV | Upstash Fixed 1GB |
+| --- | --- | --- |
+| Reads | $5.00 | included |
+| Writes | $50.00 | included |
+| Storage (1 GB) | $0.00 | included |
+| Plan fee | $0.00 | $20.00 |
+| **Total** | **$55.00** | **$20.00** |
+
+The break-even point on a Fixed 1GB plan is about 10M commands per month: at $20 flat, it matches $0.20 per 100K on pay-as-you-go. Past that, Fixed is cheaper. KV's per-read pricing catches up once the dataset is large enough to need a bigger Upstash Fixed tier (10 GB at $200/month, 50 GB at $400/month).
+
+## What about write throughput and the 1-write-per-second limit?
+
+Cloudflare KV is limited to 1 write per second to the same key on every plan ([Cloudflare KV limits](https://developers.cloudflare.com/kv/platform/limits/)). This limit means KV isn't great for write-heavy use cases. Writes to different keys are unlimited on paid, 1,000/day on free and I don't think there is a way to raise the per-key limit.
+
+So we can't use KV for any workload where one key changes often:
+
+- Counters and view tallies
+- Rate limiting buckets keyed by IP or user
+- Live leaderboards
+- Session state that updates on every request
+- Job queues
+- Anything that writes to the same key many times per second
+
+Upstash Redis has no per-key write limit. The limit is the plan's commands per second (10,000/sec on free, pay-as-you-go, and fixed plans up to enterprise). Writing to one hot key many times per second is exactly what Redis was built for. Commands like INCR, ZADD, LPUSH, XADD, and HSET all run in microseconds against a single key.
+
+Cloudflare's own KV guidance explicitly says: "If you have a write-heavy Redis-type workload where you are updating the same key tens or hundreds of times per second, KV will not be an ideal fit," and they point at Durable Objects or a different store.
+
+## Which APIs and data structures does each one support?
+
+Cloudflare KV has five operations on a binding:
+
+```tsx id="code-d1tadil7"
+env.MY_NAMESPACE.get(key, options)
+env.MY_NAMESPACE.getWithMetadata(key, options)
+env.MY_NAMESPACE.put(key, value, options)
+env.MY_NAMESPACE.delete(key)
+env.MY_NAMESPACE.list({ prefix, limit, cursor })
+```
+
+Values are opaque blobs up to 25 MiB. Keys are up to 512 bytes. Each key can carry up to 1024 bytes of metadata.
+
+Upstash supports almost all Redis commands. The data structures available out of the box:
+
+- Strings (GET, SET, INCR, GETRANGE)
+- Hashes (HSET, HGET, HINCRBY, HSCAN)
+- Lists (LPUSH, RPOP, LRANGE, BLPOP)
+- Sets (SADD, SMEMBERS, SINTER)
+- Sorted sets (ZADD, ZRANGEBYSCORE, ZINCRBY)
+- Streams (XADD, XREAD, consumer groups)
+- Bitmaps and HyperLogLog
+- Pub/Sub
+- Geospatial indexes
+- Lua scripting with EVAL
+- Pipelines and MULTI/EXEC transactions
+
+But to be fair, KV is a small store on purpose and doesn't try to compete on features. It was never meant as a replacement for Redis in any way. I find it really nice to use on simple use cases with "dumb" logic that should just work.
+
+## How does each handle consistency?
+
+Both are eventually consistent, but the time scales are different.
+
+Cloudflare KV writes show up in the region they were made in almost immediately and propagate to other regions within 60 seconds ([Cloudflare KV consistency](https://developers.cloudflare.com/kv/concepts/how-kv-works/)). Negative lookups are cached too, so a key you just created might not show up in other regions for up to 60 seconds. To get write-after-write consistency, the docs recommend routing writes through a Durable Object.
+
+Upstash Redis replicates writes from the primary to every read region asynchronously, so there's a short window where a read replica may still serve the old value. A read from the same region as the write always sees the new value right away.
+
+For reads from a different region than the write, the Upstash TypeScript SDK tracks a sync token after every write and sends it on the next read, so the read replica catches up before answering. If you reuse the same `Redis` instance, it's automatic ([Read Your Writes docs](https://upstash.com/docs/redis/howto/readyourwrites)):
+
+```tsx id="code-q7wnuos9"
+import { Redis } from "@upstash/redis/cloudflare";
+
+const redis = Redis.fromEnv(env);
+
+await redis.set("user:42", "alice");
+const value = await redis.get<string>("user:42"); // always sees "alice"
+```
+
+If the read happens in a different handler or request, use `redis.readYourWritesSyncToken` after the write, hand it back to the caller, and re-attach it on the new client before the read:
+
+```tsx id="code-4m88t2o3"
+// request 1: write, then send the token back to the caller
+await redis.set("user:42", "alice");
+const token = redis.readYourWritesSyncToken;
+
+// request 2: caller sends the token back, attach it before the read
+const separate_redis = Redis.fromEnv(env);
+separate_redis.readYourWritesSyncToken = token;
+const value = await separate_redis.get<string>("user:42"); // guaranteed to see "alice"
+```
+
+## Can you call either one from outside Cloudflare Workers?
+
+Cloudflare KV works inside Workers and Pages Functions via the binding, or from anywhere via the [Cloudflare REST API](https://developers.cloudflare.com/api/resources/kv/). The REST API sits behind Cloudflare's [global API rate limit of 1,200 requests per 5 minutes per user](https://developers.cloudflare.com/fundamentals/api/reference/limits/)  (abt. 4 requests per second). I think KV is most useful from inside Workers.
+
+Upstash Redis supports two endpoints for every database:
+
+1. The standard Redis protocol on port 6379 with TLS, so any Redis client (redis-cli, ioredis, go-redis, jedis) works
+2. An HTTPS REST endpoint, so environments that cannot open TCP connections (browser, Cloudflare Workers without sockets, Vercel serverless, AWS Lambda) can use it
+
+## What does the code look like?
+
+A minimal rate limiter on top of Upstash Redis from inside a Cloudflare Worker:
+
+```tsx id="code-ze1wi4st"
+import { Redis } from "@upstash/redis/cloudflare";
+
+export interface Env {
+  UPSTASH_REDIS_REST_URL: string;
+  UPSTASH_REDIS_REST_TOKEN: string;
+}
+
+export default {
+  async fetch(req: Request, env: Env): Promise<Response> {
+    const redis = Redis.fromEnv(env);
+    const ip = req.headers.get("cf-connecting-ip") ?? "anon";
+    const hits = await redis.incr(`hits:${ip}`);
+    await redis.expire(`hits:${ip}`, 60);
+    return new Response(`hits in last minute: ${hits}`);
+  },
+};
+```
+
+The equivalent on KV does not really exist, because INCR against a single key on every request would hit the 1 write/sec limit almost immediately. A KV-only version has to use a different key per time bucket (per-minute or per-IP-per-minute) and accept that the count will be off and out of date.
+
+Here is what a read-mostly config store looks like on KV:
+
+```tsx id="code-0ek30a3i"
+export interface Env {
+  CONFIG: KVNamespace;
+}
+
+export default {
+  async fetch(req: Request, env: Env): Promise<Response> {
+    const url = new URL(req.url);
+    const key = url.pathname.slice(1) || "default";
+
+    let value = await env.CONFIG.get(key, { cacheTtl: 300 });
+    if (value === null) {
+      value = `built-at-${Date.now()}`;
+      await env.CONFIG.put(key, value, { expirationTtl: 3600 });
+    }
+    return new Response(value);
+  },
+};
+```
+
+This is exactly the shape KV is good at: rare writes, lots of reads, and a long cacheTtl that keeps the edge cache alive longer than the default 60 seconds.
+
+## When should you use Cloudflare KV over Upstash Redis?
+
+Use KV when:
+
+- Your code runs only on Cloudflare Workers or Pages.
+- The same value gets read many times between writes (e.g. config, feature flags, A/B variants, redirect maps, static assets, allow/deny lists).
+- A single key changes no more than once per second.
+- You can tolerate up to 60 seconds of cross-region inconsistency after a write.
+- Read pricing matters more than feature set.
+
+Choose Upstash Redis when:
+
+- You need Redis data structures: lists, sorted sets, hashes, streams, pub/sub.
+- The same key gets written more than once per second (rate limiters, counters, queues, leaderboards, session state).
+- You want fast cross-region replication with a read-your-writes guarantee
+- Your application talks to the same data from outside Cloudflare
+- You want fast first-read latency in every region
+
+Quick note on Upstash: You can create a free Redis database for your AI agents or for experiments by just sending a POST request to [https://upstash.com/start-redis](https://upstash.com/start-redis). No signup or API key needed, you can just do it in the terminal right now and get a fresh Redis database.
+
+## FAQ
+
+### Is Upstash Redis faster than Cloudflare KV?
+
+Yes, for most reads, writes, and read-after-write. In my benchmark above, Upstash was 4× to 28× faster than KV. For hot reads of the same key in the same region, KV is faster at p50 latency by about 3 ms (2.6 vs 5.6 ms) because the value is sitting in the local KV cache.
+
+### Can I use Upstash Redis as a drop-in replacement for KV?
+
+Yes, for any read, write, or delete pattern. The Upstash Redis client supports GET, SET, DEL, and SCAN, which cover everything KV does. You'll get faster write latency and no per-key write limit.
+
+### Can I use KV for rate limiting?
+
+Not for any rate limiter keyed on something high-traffic like a user ID or IP because of the 1 write/sec per key limit. KV-based rate limiters work when the key is a time bucket (for example, the current minute), and even then the data is up to 60 seconds out of date in other regions. Use Upstash Redis or Durable Objects for rate limiting instead.
+
+### Does Upstash work inside Cloudflare Workers without sockets?
+
+Yes. The Upstash Redis client uses the HTTPS REST endpoint by default, so it works inside Workers without the nodejs\_compat flag or socket support.
+
+### Which one supports TTLs?
+
+Both. KV takes either an absolute Unix timestamp (expiration) or seconds from now (expirationTtl) when you write a key. Upstash supports EX, PX, EXAT, and PXAT on SET, plus EXPIRE, PEXPIRE, and EXPIREAT on any key.
+
+### Is there a free tier on each?
+
+Yes. Cloudflare's free Workers plan includes 100,000 KV reads/day, 1,000 writes/day, and 1 GB of storage. Upstash's free plan includes 500,000 commands/month and 256 MB of storage on a single database.
