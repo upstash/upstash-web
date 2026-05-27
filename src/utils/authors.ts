@@ -399,7 +399,7 @@ export const authors: Record<
     image: "josh.png",
   },
   shannon: {
-    name: "Shannon",
+    name: "Shannon Rumsey",
     title: "Engineer @Context7",
     image: "shannon.jpeg",
   },
