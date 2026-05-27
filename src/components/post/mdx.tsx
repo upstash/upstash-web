@@ -8,6 +8,7 @@ import { ComponentProps, MouseEvent, ReactNode, useEffect, useRef, useState } fr
 import { createPortal } from "react-dom";
 import ExpandableCode from "./expandable-code";
 import PostNote from "./note";
+import PostSummary from "./summary";
 import { MuxVideoPlayer } from "./mux-video-player";
 import { Frame } from "./frame";
 
@@ -177,8 +178,8 @@ function CopyFeaturePre(props: ComponentProps<"pre">) {
 
 function table(props: ComponentProps<"table">) {
   return (
-    <div className="overflow-auto">
-      <table className="max-w-fit" {...props} />
+    <div className="-mx-5 overflow-x-auto rounded-2xl bg-emerald-900/5 md:-mx-6 dark:bg-white/[0.04]">
+      <table className="w-full border-collapse" {...props} />
     </div>
   );
 }
@@ -254,6 +255,7 @@ const components = {
   Highlight,
   nav: NavOrNull,
   Note: PostNote,
+  Summary: PostSummary,
   ExpandableCode,
   pre: CopyFeaturePre,
   Video: MuxVideoPlayer,
