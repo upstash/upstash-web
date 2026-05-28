@@ -426,12 +426,11 @@ export const REDIS_PROD_PACK = {
     "Prod Pack is an add-on available for any paid plan (Pay as You Go or Fixed). Enable it from your database details page in the Upstash console.",
   features: [
     "Uptime SLA",
+    "Multi-Zone High Availability (regions deployed across multiple availability zones, with automatic same-region failover if a zone or replica fails)",
     "SOC 2 Type 2 report",
     "Advanced monitoring (Prometheus, Grafana, Datadog, New Relic)",
-    "High availability for read regions",
     "Role-based access control",
     "Encryption at rest",
-    "Multi-Zone HA",
   ],
 };
 
