@@ -66,7 +66,7 @@
     },
     {
       "question": "What is included in Prod Pack?",
-      "answer": "Prod Pack includes uptime SLA, SOC 2 Type 2 report, advanced monitoring with Prometheus, Grafana, and Datadog, high availability for read regions, role-based access control, and encryption at rest."
+      "answer": "Prod Pack includes uptime SLA, SOC 2 Type 2 report, advanced monitoring with Prometheus, Grafana, and Datadog, multi-zone high availability, role-based access control, and encryption at rest."
     },
     {
       "question": "What is included in Enterprise subscription?",
