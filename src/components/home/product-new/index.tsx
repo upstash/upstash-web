@@ -1,5 +1,6 @@
 import Button from "@/components/button";
 import Container from "@/components/container";
+import CopyButton from "@/components/copy-button";
 import HomeHeroProducts from "@/components/home/hero/hero-products";
 import { HeroTabQStash } from "@/components/home/hero/hero-tab-qstash";
 import { HeroTabRedis } from "@/components/home/hero/hero-tab-redis";
@@ -8,8 +9,12 @@ import { HeroTabWorkflow } from "@/components/home/hero/hero-tab-workflow";
 import cx from "@/utils/cx";
 import { Product } from "@/utils/type";
 import { IconArrowUpRight, IconNotes, IconPlus } from "@tabler/icons-react";
+import Link from "next/link";
 import React, { useState } from "react";
 import { HeroTabBox } from "../hero/hero-tab-box";
+
+const UPSTASH_SKILL_COMMAND =
+  "npx skills add https://github.com/upstash/skills --skill upstash";
 
 const taglines = {
   [Product.REDIS]: {
@@ -53,6 +58,13 @@ const HeroProductTagline = ({ activeProduct }: { activeProduct: Product }) => {
         {title}
       </h2>
       <div className="xs:flex-row flex flex-col justify-center gap-3">
+        {activeProduct === Product.REDIS && (
+          <Link href="/redis">
+            <Button variant={"default"} className="h-[42px] px-5">
+              Learn more
+            </Button>
+          </Link>
+        )}
         <a href={docsLink} target="_blank">
           <Button variant={"defaultDark"} className="h-[42px] px-5">
             Documentation
@@ -78,6 +90,21 @@ const HeroProductTagline = ({ activeProduct }: { activeProduct: Product }) => {
             )}
           </Button>
         </a>
+      </div>
+
+      <div className="mt-3 flex w-full flex-col items-center gap-2">
+        <div className="flex w-fit max-w-full items-center gap-3 overflow-x-auto rounded-xl bg-bg-mute py-2 pl-4 pr-6">
+          <code className="whitespace-nowrap font-mono text-xs text-text md:text-sm">
+            {UPSTASH_SKILL_COMMAND}
+          </code>
+          <CopyButton
+            code={UPSTASH_SKILL_COMMAND}
+            className="shrink-0 text-text-mute hover:text-primary"
+          />
+        </div>
+        <span className="text-xs text-text-mute">
+          Add the Upstash skill to your AI coding agent
+        </span>
       </div>
     </div>
   );

@@ -12,7 +12,7 @@ module.exports = {
       return { loc: path, changefreq: "daily", priority: 1.0, lastmod: new Date().toISOString() };
     }
 
-    if (["/pricing", "/enterprise", "/contact", "/about"].includes(path)) {
+    if (["/pricing", "/redis", "/enterprise", "/contact", "/about"].includes(path)) {
       return { loc: path, changefreq: "weekly", priority: 0.9, lastmod: new Date().toISOString() };
     }
 
