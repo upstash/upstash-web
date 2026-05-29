@@ -1,10 +1,6 @@
 {
   "redirects": [
     {
-      "source": "/redis",
-      "destination": "https://upstash.com/docs/redis"
-    },
-    {
       "source": "/qstash",
       "destination": "https://upstash.com/docs/qstash"
     },
