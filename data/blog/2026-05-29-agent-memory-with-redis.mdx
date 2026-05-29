@@ -1,0 +1,227 @@
+---
+title: "Extremely fast agent memory with virtual markdown"
+slug: long-term-agent-memory-in-redis
+authors: [josh]
+tags: [redis, ai]
+description: "A virtual markdown file is the perfect interface for AI agent memory. No third-party tools needed, AI SDK v6 and Redis."
+---
+
+<Summary>
+We give our AI SDK agent a **virtual Markdown file** it can read, grep, and edit, and keep that file in Redis. The agent edits its own memory with the same tools coding agents were trained on and are extremely good at natively. This is extremely fast, cheap, simple and works super well for me.
+</Summary>
+
+## Demo
+
+<Frame>
+  <Video id="mLt5TSqSXZvJBwrr3ggG6nlaRw4xYaTRjTX5HziscD00" />
+</Frame>
+
+## Quick Summary
+
+- The agent's entire memory is one virtual Markdown file
+- Reading, searching, and editing files is what agents already do best, so this kind of memory is very natural to them
+- The same pattern scales as much as you need, e.g. split memory into dated daily notes, one Redis key each, with the same tools
+- Every memory operation in our demo is logged to a Redis list and streamed to the browser with [Upstash Realtime](https://upstash.com/), so we watch the file change as the agent thinks
+
+## Why does a Markdown file work so well as agent memory?
+
+**A virtual markdown file** means that the agent thinks it's interacting with a normal markdown file on disk, but in reality, it's operating against an extremely fast in-memory Redis string.
+
+I got this idea from the [OpenClaw memory model](https://docs.openclaw.ai/concepts/memory), where an agent keeps durable facts in a `MEMORY.md` file it loads at the start of every session. This demo takes that model and puts the file in Redis instead of on local disk so it's a lot faster and available everywhere via HTTP (no sandbox needed).
+
+![The OpenClaw memory approach](/blog/agent-memory-with-redis/openclaw-memory-approach.png)
+
+Also, reading, searching, and editing files is what agents are incredible at by default. A coding agent has been trained so much on opening files, grepping for a phrase, and changing text. Those are the same primitives we use for our memory: load what you know about a user, search for one fact, update it. We hand the model a job it already does well, in a format it knows perfectly.
+
+![Agent gets the MEMORY.md (which is just a Redis string)](/blog/agent-memory-with-redis/agent-reads-memory-from-redis.png)
+
+A Markdown file also keeps everything in the open. There is no retrieval step to tune or separate index to keep in sync. The file is the memory, so what the model knows is exactly what is in the file. When the agent gets a fact wrong, we can open the file and see the bad line.
+
+## What does the memory file look like?
+
+When the file does not exist yet, the agent starts from a seed with four empty headings. The seed is plain Markdown:
+
+```markdown
+# MEMORY.md
+
+> This is my long-term memory. I read it at the start of a conversation and write durable facts here so I don't forget them between sessions.
+
+## User
+
+## Preferences
+
+## Projects
+
+## Facts
+```
+
+As we talk to the agent, it fills in bullets under the right heading. Tell it your name and it adds a line under `## User`. Tell it you switched from Redis to Postgres and it edits the existing bullet under `## Projects` . The goal is to just make it stupid simple.
+
+## How does the agent read and write its memory?
+
+The agent gets five tools, defined with the [AI SDK](https://ai-sdk.dev/) and validated with Zod. Each one maps to a function that reads or writes the Redis string. Here is the read tool and the edit tool:
+
+```tsx
+import { tool } from "ai";
+import { z } from "zod";
+import { readMemory, editMemory } from "@/lib/memory";
+
+const tools = {
+  read_memory: tool({
+    description:
+      "Read the full contents of MEMORY.md, your long-term memory file. " +
+      "Always do this at the start of a conversation before answering.",
+    inputSchema: z.object({
+      lineNumbers: z.boolean().optional(),
+    }),
+    execute: async ({ lineNumbers }) => readMemory({ lineNumbers }),
+  }),
+
+  edit_memory: tool({
+    description:
+      "Find-and-replace a unique snippet inside MEMORY.md. The oldString " +
+      "must match the file exactly (read it first).",
+    inputSchema: z.object({
+      oldString: z.string(),
+      newString: z.string(),
+      replaceAll: z.boolean().optional(),
+    }),
+    execute: async ({ oldString, newString, replaceAll }) =>
+      editMemory(oldString, newString, replaceAll),
+  }),
+};
+```
+
+The other three tools follow the same shape: `grep_memory` searches the file with a regex, `append_memory` adds a block to the end, and `write_memory` overwrites the whole thing for big restructures. You can see them in the [open-source repository here](https://github.com/upstash/agent-memory). Our system prompt tells the agent to read the file first, keep one fact per bullet, and edit existing lines instead of duplicating them.
+
+## How do we store the file in Redis?
+
+The whole file is one Upstash Redis string. Yep. A virtual markdown file is just a string :D
+Reading memory is a single `GET`, and writing it is a single `SET`. There is no schema and no second round trip.
+
+```tsx
+import { Redis } from "@upstash/redis";
+
+export const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
+```
+
+The read function seeds the file lazily. If the key is missing, it writes the seed and returns it, so the first read always gets a valid file back:
+
+```tsx
+const FILE_KEY = "memory:MEMORY.md";
+
+export async function getRaw(): Promise<string> {
+  const value = await redis.get<string>(FILE_KEY);
+  if (value == null) {
+    await redis.set(FILE_KEY, SEED);
+    return SEED;
+  }
+  return value;
+}
+```
+
+Because the file stays small, a full read on every turn is cheap. The `@upstash/redis` client talks to Redis over HTTPS, so the same code runs in serverless and edge functions where you cannot hold a long-lived TCP connection.
+
+## A cool trick we do with the edit tool
+
+A find-and-replace is dangerous if the snippet appears more than once. The edit function counts how many times the old string exists in the memory. If the snippet is missing or appears more than once, it throws instead of writing:
+
+```tsx
+export async function editMemory(
+  oldString: string,
+  newString: string,
+  replaceAll = false,
+): Promise<string> {
+  const current = await getRaw();
+
+  const occurrences = current.split(oldString).length - 1;
+  if (occurrences === 0) {
+    throw new Error("oldString not found. Read the file first.");
+  }
+  if (occurrences > 1 && !replaceAll) {
+    throw new Error(
+      `oldString appears ${occurrences} times. Pass replaceAll:true ` +
+      `or include more surrounding context to make it unique.`,
+    );
+  }
+
+  const next = replaceAll
+    ? current.split(oldString).join(newString)
+    : current.replace(oldString, newString);
+
+  await redis.set(FILE_KEY, next);
+  return `Replaced ${occurrences} occurrence(s).`;
+}
+```
+
+The error message is written for the agent, not for a human. When the edit fails because the snippet is not unique, the model reads the error, grabs more surrounding text, and tries again. Coding agents use the same check in their own file-editing tools. It stops the agent from overwriting the wrong line.
+
+## We can watch the memory edits in real-time
+
+This is my favorite part of the demo. Every operation gets recorded to a Redis list and pushed to the browser, so the `MEMORY.md` panel updates in real-time as the agent writes to it.
+
+Two things happen on every change. First, an entry goes into an oplog, a Redis list limited to 200 items with `LPUSH` and `LTRIM`. Second, the new content is broadcast over [Upstash Realtime](https://upstash.com/), which is built on Redis Streams and Pub/Sub:
+
+```tsx
+async function record(op: Op, summary: string, bytes: number): Promise<void> {
+  const entry = { id: crypto.randomUUID(), ts: Date.now(), op, summary, bytes };
+  await redis.lpush(OPLOG_KEY, JSON.stringify(entry));
+  await redis.ltrim(OPLOG_KEY, 0, OPLOG_MAX - 1);
+  await realtime.emit("oplog.appended", entry);
+}
+```
+
+The realtime channel is typed with a Zod schema, so both the server and the browser know the TypeScript type of each event:
+
+```tsx
+import { Realtime } from "@upstash/realtime";
+import z from "zod/v4";
+import { redis } from "./redis";
+
+const schema = {
+  memory: {
+    changed: z.object({ content: z.string(), bytes: z.number() }),
+  },
+  oplog: {
+    appended: z.object({
+      id: z.string(),
+      ts: z.number(),
+      op: z.enum(["read", "write", "append", "edit", "grep", "reset"]),
+      summary: z.string(),
+      bytes: z.number(),
+    }),
+  },
+};
+
+export const realtime = new Realtime({ schema, redis });
+```
+
+On the client, a single hook subscribes to both events and updates the UI. The memory panel flashes when the file changes, and a feed below it shows reads, searches, and writes as they happen. This gives us a clear view of what the agent is doing, so we see all memory edits/reads/greps in real time.
+
+## How far can we take this pattern?
+
+As much as we need. The single `MEMORY.md` file is the simple but extremely powerful starting point. The [OpenClaw memory model](https://docs.openclaw.ai/concepts/memory) it is based on splits memory across more files: a compact `MEMORY.md` for durable facts, plus dated daily notes like `memory/2026-05-29.md` for running context. The agent loads today's and yesterday's notes automatically, and over time it distills the useful parts back into `MEMORY.md` and deletes stale entries.
+
+The Redis version grows to that without changing how it works. Each note is another string key, like `memory:2026-05-29.md`, and the agent uses the same read, grep, and edit tools across all of them. You can add a tool that lists keys by date, or one that searches across every note at once. The storage stays simple: strings in Redis. The logic stays in the agent, which decides what to write and where.
+
+This is why I think file-shaped memory is the best format for agents. The interface never changes as we grow it. One file or a thousand dated notes, it is still read, search, and edit in a very memory-friendly way. File systems are what agents are already exceptional at.
+
+## A few questions & answers
+
+**Does the agent read the whole file on every message?**
+It reads the file once at the start of a conversation, and uses grep to check specific facts after that. Because the file is small and curated, a full read is a single Redis `GET` and is very cheap.
+
+**What happens if two writes race?**
+Each write is a single `SET` that replaces the whole string, so the last write wins. For a single-user demo this is fine. If we expect concurrent edits, we can wrap the read-modify-write in a Lua script, or use optimistic locking with `WATCH`. Redis is a powerful tool!
+
+**Why Redis instead of a regular file on disk?**
+A file on disk does not work well with serverless and is not shared across function invocations. A Redis string persists, is extremely fast, cheap and reachable from anywhere.
+
+**Can I use any AI model?**
+Yes. The demo uses Claude Sonnet through the AI SDK, but the tools are model-agnostic. Any model with tool calling can read and edit the file the same way.
+
+**Where do I get the code?**
+The full [open-source repository is here](https://github.com/upstash/agent-memory). Add your Anthropic key and Upstash Redis credentials, run `bun dev`, and open localhost to watch the memory update live.
