@@ -26,9 +26,12 @@ export default function CopyArticleButton({
   markdownUrl,
 }: Props) {
   const [copied, setCopied] = useState(false);
+  const [copying, setCopying] = useState(false);
   const [open, setOpen] = useState(false);
 
   async function copyMarkdown() {
+    if (copying) return;
+    setCopying(true);
     try {
       const res = await fetch(`/blog/${slug}.md`);
       const text = await res.text();
@@ -37,6 +40,8 @@ export default function CopyArticleButton({
       window.setTimeout(() => setCopied(false), COPY_RESET_MS);
     } catch {
       // clipboard or fetch blocked — fail silently
+    } finally {
+      setCopying(false);
     }
   }
 
@@ -60,7 +65,7 @@ export default function CopyArticleButton({
         ) : (
           <>
             <IconCopy size={14} stroke={1.75} />
-            Copy article
+            {copying ? "Copying..." : "Copy article"}
           </>
         )}
       </button>
