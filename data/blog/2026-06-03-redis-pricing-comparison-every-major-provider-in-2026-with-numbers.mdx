@@ -8,9 +8,9 @@ publishedAt: "2026-06-03T13:00:00Z"
 ---
 
 <Summary>
-The hardest part of comparing Redis pricing is that most of the big providers charge for one of four very different things. We can't really compare a price like "$0.049 per GiB-hour" to "$0.20 per 100,000 commands" until we know how our app uses Redis.
+What you pay for Redis depends on which billing model fits your traffic. Per-request pricing (Upstash) costs almost nothing when traffic is spiky or low and scales to zero. A fixed instance (ElastiCache, Memorystore, also Upstash, Redis Cloud, and the rest) is cheaper once traffic is steady and high.
 
-**So later in this article I calculated the price of five example workloads on every provider, instead of just listing rates.**
+**Below I compare 9 Redis providers and their pricing on example workloads.**
 </Summary>
 
 I categorized all Redis pricing into four billing models:
@@ -156,7 +156,6 @@ I worked out the figures below from each provider's published unit prices. Also 
 
 | Provider | Monthly cost |
 | --- | --- |
-| Redis Cloud Flex 1 GB | $5.00 |
 | Upstash pay-as-you-go | $10.00 |
 | AWS ElastiCache cache.t4g.micro | $12.41 |
 | DigitalOcean Valkey 1 GiB | $15.00 |
