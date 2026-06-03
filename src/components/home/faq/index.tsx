@@ -1,5 +1,6 @@
 import Bg from "@/components/bg";
 import Container from "@/components/container";
+import FaqAccordion from "@/components/faq-accordion";
 import { HOME_FAQ } from "@/components/home/faq/faq-data";
 import PageHeaderTitle from "@/components/page-header-title";
 import { generateFaqSchema } from "@/utils/structured-schema-generators";
@@ -21,15 +22,8 @@ export default function HomeFaq() {
           Frequently asked questions
         </PageHeaderTitle>
 
-        <div className="mt-10 divide-y divide-bg-mute md:mt-14">
-          {HOME_FAQ.map(({ question, answer }, index) => (
-            <div key={index} className="py-6">
-              <h3 className="font-display text-lg font-semibold md:text-xl">
-                {question}
-              </h3>
-              <p className="mt-2 text-text-mute">{answer}</p>
-            </div>
-          ))}
+        <div className="mt-10 md:mt-14">
+          <FaqAccordion items={HOME_FAQ} />
         </div>
       </Container>
     </section>
