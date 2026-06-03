@@ -1,3 +1,4 @@
+import SeoPlanData from "@/components/pricing/redis/seo-plan-data";
 import { Metadata } from "next";
 import { ReactNode } from "react";
 
@@ -10,6 +11,9 @@ export const metadata: Metadata = {
   description,
   alternates: {
     canonical: "/pricing/redis",
+    types: {
+      "text/markdown": "/pricing/redis.md",
+    },
   },
   openGraph: {
     type: "website",
@@ -29,5 +33,10 @@ export default function PricingRedisLayout({
 }: {
   children: ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      <SeoPlanData />
+    </>
+  );
 }
