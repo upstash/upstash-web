@@ -1,0 +1,299 @@
+---
+title: "Upstash Redis vs Valkey: Features, Performance & Pricing in 2026"
+slug: upstash-redis-vs-valkey
+authors: [arda]
+tags: [redis]
+description: "The 2026 Upstash Redis vs. Valkey comparison. The fork, the hosting options, architecture, pricing and when to pick which."
+---
+
+<Summary>
+**Use ElastiCache for Valkey** when your whole stack already lives in one AWS region and VPC, you want microsecond TCP reads from EC2/Lambda in the same network, and you're fine running (and paying for) an always-on cache.
+
+**Use Upstash Redis** when you want a serverless, globally replicated, HTTPS-native database you can call from anywhere (Workers, Vercel, Lambda, the browser), pay per request with a real free tier, and never size, patch, or fail over a node.
+</Summary>
+
+## Quick summary
+
+- **Valkey is a fork of Redis, not a hosted product.** When Redis relicensed away from open source in 2024, the community forked Redis 7.2 into Valkey under the Linux Foundation (BSD-3). To actually *use* it as a service you pick a managed host — the biggest is **AWS ElastiCache for Valkey** — so that's what we compare Upstash against here.
+- **Provisioned vs serverless.** ElastiCache gives you nodes (or a serverless cache) inside a VPC. You choose instance sizes, replicas, and shards, and you pay by the hour whether or not traffic arrives. Upstash has no nodes: you get an endpoint, pay per command, and it scales to zero.
+- **TCP-in-a-VPC vs HTTPS-everywhere.** ElastiCache is reachable over the Redis protocol from inside its VPC. Upstash exposes both the Redis protocol *and* an HTTPS REST endpoint, so the same database works from a Cloudflare Worker, the edge, or a browser.
+- **Pricing shape is the real difference.** ElastiCache for Valkey serverless is **$0.084 per GB-hour of storage + $0.0023 per million ECPUs** ([ElastiCache pricing](https://aws.amazon.com/elasticache/pricing/)). A small node-based cache with a replica runs hundreds of dollars a month, always on. Upstash is **$0.20 per 100K commands** pay-as-you-go, fixed plans from **$10/month**, and a free tier ([Upstash pricing](https://upstash.com/pricing/redis)).
+
+## What is the difference between Valkey and Redis?
+
+In March 2024, Redis Ltd. [moved Redis from the BSD-3 license to SSPL/RSALv2](https://www.theregister.com/2024/03/22/redis_changes_license/) — no longer open source by the OSI definition. Within days, a group of core contributors and cloud providers (AWS, Google Cloud, Oracle, Ericsson, Snap) forked the last open-source release, Redis 7.2.4, into **Valkey**, and [regrouped under the Linux Foundation](https://www.linuxfoundation.org/press/linux-foundation-launches-open-source-valkey-community) to keep it under BSD-3. Valkey is "the Redis that stayed open."
+
+Two years on, the projects have genuinely diverged but are still ~90% command-compatible:
+
+- **Valkey** optimized the engine. Valkey 8.x added multi-threaded I/O and memory work; published numbers put it around 8% more ops/sec, ~22% lower p99 latency, and ~20% less memory than Redis OSS, which is why ElastiCache for Valkey lists ~20% lower prices than ElastiCache for Redis ([Valkey 8.1 GA notes](https://valkey.io/blog/valkey-8-1-0-ga/), [AWS](https://aws.amazon.com/blogs/database/amazon-elasticache-version-8-0-for-valkey-brings-faster-scaling-and-improved-memory-efficiency/)).
+- **Redis 8** went the other direction and pulled features into core: JSON, time series, probabilistic structures, vector search, and semantic caching.
+
+On raw distribution, Valkey has surpassed **100 million Docker pulls (up 17× year over year)** as of its two-year mark in May 2026. Pulls aren't deployments, but they're the closest thing to a vendor-neutral adoption signal, and the trajectory is steep ([Valkey turns two, AWS](https://aws.amazon.com/blogs/database/valkey-turns-two/)).
+
+The important framing for this post: **Valkey is an engine, Upstash is a service.** Comparing them directly is a category error. The fair comparison is Upstash against a *managed* Valkey — and the one most people reach for is AWS ElastiCache for Valkey.
+
+## What is ElastiCache for Valkey, and how is it different from Upstash?
+
+**ElastiCache for Valkey** is AWS's managed Valkey. It comes in two flavors:
+
+- **Node-based:** you pick instance types (e.g. `cache.r7g.large`), a number of replicas for failover, and shards if you want cluster mode. It lives in your VPC and you pay by the hour, 24/7, regardless of traffic.
+- **Serverless:** AWS manages capacity for you and bills on data stored (GB-hours) and compute consumed (ECPUs), with a 100 MB minimum.
+
+Either way, ElastiCache is a piece of *infrastructure inside your AWS network*. It's fastest when your application runs in the same region and VPC, talking to it over the Redis protocol on a private endpoint.
+
+**Upstash Redis** is the opposite design: a serverless database with a public HTTPS endpoint (and a Redis-protocol endpoint), global replication you toggle per region, per-request pricing, and nothing to size or operate. There's no VPC to peer, no node to patch, no failover to configure.
+
+The rest of this comparison is really about what falls out of that one difference: *managed infrastructure in a VPC* vs *a serverless API you call from anywhere*.
+
+## Upstash Redis vs ElastiCache for Valkey at a glance
+
+**Deploy & scale**
+
+| Capability | Upstash Redis | ElastiCache for Valkey |
+| --- | --- | --- |
+| Serverless, no nodes to size | ✓ | Serverless mode only |
+| Scales to zero | ✓ | — (metered minimum, or always-on nodes) |
+| Provisioned node sizing / shards | not needed | ✓ (node-based) |
+| Global multi-region | ✓ (14 AWS / 4 GCP regions, unlimited read replicas) | Global Datastore, node-based only, up to 2 secondaries |
+| Single-region by default | optional | ✓ |
+
+**Connect**
+
+| Capability | Upstash Redis | ElastiCache for Valkey |
+| --- | --- | --- |
+| Redis protocol (TCP + TLS) | ✓ | ✓ |
+| HTTPS REST endpoint | ✓ | — |
+| Callable from edge / Workers / browser | ✓ | — (needs VPC + sockets) |
+| Public endpoint | ✓ | — (VPC-private) |
+
+**Operate**
+
+| Capability | Upstash Redis | ElastiCache for Valkey |
+| --- | --- | --- |
+| Capacity planning / node sizing | none | none on Serverless; required on node-based |
+| Engine patching & maintenance windows | fully managed | you manage |
+| Failover configuration | built-in | replicas you configure |
+| AWS-native integration (IAM, VPC, CloudWatch) | — | ✓ |
+
+**Price**
+
+| Capability | Upstash Redis | ElastiCache for Valkey |
+| --- | --- | --- |
+| Per-request pricing | ✓ ($0.20 / 100K commands) | — |
+| Capacity pricing (GB-hour / node-hour) | — | ✓ |
+| Free tier | ✓ (256 MB, 500K commands/mo) | — |
+| Monthly floor | $0 (scales to zero) | ~$6/mo serverless, or node-hours |
+
+**Data & commands**
+
+| Capability | Upstash Redis | ElastiCache for Valkey |
+| --- | --- | --- |
+| Core types (strings, hashes, lists, sets, sorted sets, streams) | ✓ | ✓ |
+| Pub/Sub, Lua scripting, transactions, pipelines | ✓ | ✓ |
+| Bitmaps, HyperLogLog, geospatial | ✓ | ✓ |
+| Search extension | ✓ (`@upstash/redis`) | Valkey Search module |
+
+## How do they compare on latency?
+
+I want to be honest about why there's no single head-to-head benchmark table here like in our [Cloudflare KV comparison](https://upstash.com/blog/upstash-redis-vs-cloudflare-kv): the two don't share an access model, so a fair apples-to-apples run is hard to construct.
+
+- **ElastiCache for Valkey** is reachable over **TCP from inside its VPC**. From an EC2 instance or Lambda in the same region/AZ, a `GET` is a sub-millisecond in-memory hop — about as fast as Redis gets. But you cannot reach it from a Cloudflare Worker, a browser, or a serverless function in another cloud without VPC peering and socket support. Cross-region means you run a second cluster and replicate it yourself (Global Datastore).
+- **Upstash Redis** makes one **HTTPS request to the nearest region** for every operation — a few milliseconds from a co-located client, and consistent reads/writes because there's no central write tier and no cold-region penalty. The same database answers from Workers, Vercel, Lambda, or the browser, and global replication is a checkbox.
+
+So the latency story is conditional:
+
+| Scenario | Winner | Why |
+| --- | --- | --- |
+| Client in the same VPC/AZ as the cache | **ElastiCache** | Private TCP, in-memory lookup, sub-ms |
+| Client at the edge / in Workers / in the browser | **Upstash** | ElastiCache isn't reachable; Upstash answers over HTTPS |
+| Multi-region reads | **Upstash** | Toggle read regions; ElastiCache needs you to run + replicate clusters |
+| Serverless functions with cold connections | **Upstash** | Stateless HTTPS; no TCP pool to warm against a VPC cache |
+
+If your code lives next to the cache in one AWS region, ElastiCache wins on raw latency. The moment your code is *not* in that VPC — edge, multi-cloud, browser, or just multi-region — Upstash wins by being reachable at all.
+
+## What does each one cost?
+
+This is where the two models diverge hardest — and where you can't just compare unit prices. Upstash bills **per command**; ElastiCache for Valkey bills **per GB-hour of capacity plus ECPUs** (or per node-hour). To put them on common footing, normalize to a concrete workload and compute each bill:
+
+1. **How much data you store** (GB) — drives ElastiCache's GB-hours and the Upstash storage line.
+2. **How many commands per month** — drives Upstash's per-command cost and ElastiCache's ECPUs.
+3. **Average value size** — the sneaky one. ElastiCache serverless charges **1 ECPU per KB per command**, so a 4 KB value costs 4× the ECPUs of a 1 KB value. Upstash counts the command regardless of size.
+
+The other thing the unit prices hide is the **floor**: ElastiCache serverless meters a minimum (≈$6/month for Valkey at its 100 MB floor; node-based has no scale-to-zero at all — you pay for the node 24/7), while Upstash's free tier and pay-as-you-go scale to **zero**. So the comparison flips on traffic shape: serverless/per-command wins for spiky or low-to-medium traffic, node-based wins for steady high throughput. Published ElastiCache-serverless figures bear this out — a ~4 GB cache lands around [$360/month on serverless vs ~$230/month on on-demand nodes](https://www.dragonflydb.io/guides/what-you-need-to-know-about-elasticache-serverless) (Redis OSS numbers; Valkey runs ~20–33% lower).
+
+**ElastiCache for Valkey** charges for capacity you provision, not requests you make:
+
+- *Node-based:* always-on instances billed by the hour. A small `cache.t4g.medium` (3 GiB) is **$0.052/hr (~$38/month)**; a memory-optimized `cache.r7g.xlarge` (26 GiB) is **$0.3496/hr (~$255/month)** ([ElastiCache pricing](https://aws.amazon.com/elasticache/pricing/)). You'll usually run **at least two** (primary + replica) for failover, so double it — and you pay it whether traffic is 0 or 50k rps. (One-/three-year reserved nodes cut this up to ~55% for steady workloads.)
+- *Serverless:* **$0.084 per GB-hour** of stored data (≈**$61/GB-month**, billed continuously from the moment the cache is "Available" until you delete it) plus **$0.0023 per million ECPUs** ([ElastiCache pricing](https://aws.amazon.com/elasticache/pricing/)). Valkey's floor is 100 MB (~$6/month). Note: Global Datastore (cross-region) is **node-based only** — not available on Serverless ([AWS deployment docs](https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/WhatIs.deployment.html)).
+
+**Upstash Redis** charges for what you use ([Upstash pricing](https://upstash.com/pricing/redis)):
+
+- *Pay-as-you-go:* **$0.20 per 100K commands** (reads and writes priced the same) + **$0.25/GB-month** storage; bandwidth free; scales to **zero**.
+- *Fixed plans:* flat monthly, no per-command charge — **250MB $10, 1GB $20, 5GB $100, 10GB $200, 50GB $400, 100GB $800**, each up to 10,000 commands/sec.
+- *Free tier:* 256 MB and 500K commands/month.
+
+One thing the bare node price hides: **every Upstash paid plan already includes replication and automatic failover** ([Upstash replication docs](https://upstash.com/docs/redis/features/replication)) — multiple replicas, so if one fails another keeps serving. That makes a single $38 `cache.t4g.medium` and a $20 Upstash plan apples-to-oranges: the lone node is a single point of failure. To match the HA you get on the $20 Upstash database you'd run a node *plus a replica* (~$76/month for `t4g.medium`) and still own the failover configuration yourself.
+
+Because the two price on different axes, the only honest comparison is per-workload. Here are three, using the AWS rates above ($0.084/GB-hr, $0.0023/M ECPU, ~1 ECPU per request for values up to 1 KB) against Upstash's published pricing.
+
+**Scenario 1 — spiky traffic + many environments (Upstash wins big)**
+
+An early-stage SaaS: prod does ~5M commands/month (busy by day, near-idle at night), 300 MB hot data, plus a staging and three preview environments that sit idle ~95% of the time.
+
+| Cost line | Upstash (PAYG) | ElastiCache for Valkey (Serverless) |
+| --- | --- | --- |
+| Prod commands | 5M → $10.00 | 5M ECPUs → $0.01 |
+| Prod storage | 0.3 GB → ~$0.08 | 0.3 GB → ~$18.40 |
+| 4 idle non-prod envs | ~$0 (no traffic) | floor ~$6 each → ~$24.00 |
+| **Total** | **~$10/mo** | **~$42/mo** |
+
+The prod line barely matters. The gap is that AWS can't idle to zero — every non-prod cache bills 24/7, while Upstash PAYG drops to pennies when traffic stops. The more environments and the burstier the load, the wider the gap.
+
+**Scenario 2 — steady mid-throughput (Upstash Fixed wins)**
+
+A production cache at a steady 2,500 req/s with an 8 GB working set, single region — well under the 10K req/s Fixed ceiling.
+
+| Cost line | Upstash (Fixed 10GB) | ElastiCache for Valkey (Serverless) |
+| --- | --- | --- |
+| Storage | included | 8 GB × $61 → ~$490.56 |
+| Commands / throughput | included | ~6.57B req → ~$15.11 |
+| **Total** | **$200/mo flat** | **~$506/mo** |
+
+A flat plan wins ~2.5×, and the bill doesn't move with volume. AWS storage alone ($490) is more than twice the entire Upstash bill — a non-trivial working set on per-GB-hour storage is expensive no matter how efficient your access pattern.
+
+**Scenario 3 — ultra-high sustained RPS, all-in on AWS (ElastiCache wins — on fit)**
+
+40,000 req/s sustained, 25 GB, a team already running Lambda + RDS in the same VPC in us-east-1, with a single-vendor procurement requirement. ElastiCache for Valkey serverless works out to `25 GB × $61 + 105B req × $0.0023/M ≈` **~$1,775/mo**, fully self-serve.
+
+This is genuinely AWS's lane — but on **fit**, not sticker price. At 40K sustained req/s you're past Upstash's self-serve 10K req/s ceiling, so the Upstash side is an enterprise/committed deal, not the list rate, and the comparison becomes a negotiated number. The deciding factors are architectural: same VPC and region, IAM auth, one bill, one vendor for compliance and procurement. The counter-pull even here: Global Datastore is node-based only and there's no HTTP/REST path, so if "high scale" also means *global* or *edge*, the AWS-native advantage narrows fast.
+
+**The through-line:** Upstash wins decisively on idle economics (PAYG) and predictable mid-scale (Fixed); ElastiCache wins on single-region ultra-high RPS inside an all-AWS architecture — and even that's a fit/procurement story, not a "can't compete on price" one.
+
+## Which APIs and data structures does each support?
+
+Both speak Redis, so the data structures are familiar on either side — strings, hashes, lists, sets, sorted sets, streams, bitmaps, HyperLogLog, pub/sub, geospatial, Lua scripting, pipelines, and transactions.
+
+The differences are at the edges:
+
+- **Valkey** tracks the open-source Redis command set plus its own additions; it deliberately doesn't ship Redis Ltd.'s proprietary modules. If you depend on Redis 8's built-in JSON/vector/time-series modules, that's a Redis-the-product feature, not something Valkey or ElastiCache-for-Valkey gives you.
+- **Upstash** supports almost all Redis commands over both the Redis protocol and HTTPS REST, and adds serverless-friendly extensions (e.g. a search extension on `@upstash/redis`). The HTTPS API is the part ElastiCache simply doesn't have.
+
+## Where can each one run?
+
+This is the practical dealbreaker for a lot of teams.
+
+**ElastiCache for Valkey** runs where your AWS network runs:
+
+- Reachable from EC2, ECS, EKS, and Lambda **inside the same VPC** over the Redis protocol.
+- Reaching it from outside the VPC needs VPC peering, a transit setup, or a bastion — there's no public HTTPS endpoint.
+- It needs a TCP socket, so environments without raw sockets (Cloudflare Workers, the browser) can't talk to it directly.
+
+**Upstash Redis** runs everywhere a client can make an HTTPS call:
+
+1. The standard **Redis protocol** on port 6379 with TLS — any Redis client (`redis-cli`, `ioredis`, `go-redis`, `jedis`) works.
+2. An **HTTPS REST endpoint**, so Cloudflare Workers, Vercel serverless, AWS Lambda, edge runtimes, and even browsers can use the same database with no socket support.
+
+### Is it single-region or global?
+
+Both *can* go multi-region, but the model is different.
+
+**ElastiCache for Valkey** offers [Global Datastore](https://aws.amazon.com/blogs/database/build-a-multi-region-session-store-with-amazon-elasticache-for-valkey-global-datastore/): one primary region replicates to **up to two** secondary regions with sub-second replication, and a secondary can be promoted to primary in under a minute for disaster recovery. But each region is a **full cluster you provision and pay for**, writes only go to the primary region, and secondaries are read-only. Global is something you architect and operate.
+
+**Upstash Redis** makes global a **checkbox**: you toggle read regions on a single database, every region holds the full dataset and answers reads locally, and the SDK gives you read-your-writes across regions. Databases can run in **14 AWS regions and 4 GCP regions**, and you can add **as many read replicas as you like** — there's no two-secondary cap and no per-region cluster to size or wire together ([Upstash global database docs](https://upstash.com/docs/redis/features/globaldatabase)).
+
+## What about operations?
+
+**ElastiCache** is managed, but it's still infrastructure you make decisions about: instance family and size, number of replicas, cluster mode and shard count, maintenance windows and engine version upgrades, failover behavior, and scaling events that can require resizing. AWS handles the undifferentiated heavy lifting; you still own the topology.
+
+**Upstash** has no topology to own. You create a database, optionally tick read regions, and that's it — no sizing, no patching, no failover configuration, no scaling events. It's the serverless trade: less control, far less to operate.
+
+## What does the code look like?
+
+A rate limiter on Upstash in a Next.js route handler — HTTPS, no socket, no VPC, runs on any host (Vercel, your own Node server, the edge):
+
+```tsx id="code-upstash-ratelimit"
+// app/api/ping/route.ts
+import { Redis } from "@upstash/redis";
+import { headers } from "next/headers";
+
+const redis = Redis.fromEnv(); // UPSTASH_REDIS_REST_URL / _TOKEN
+
+export async function GET() {
+  const ip = (await headers()).get("x-forwarded-for") ?? "anon";
+  const hits = await redis.incr(`hits:${ip}`);
+  await redis.expire(`hits:${ip}`, 60);
+  return Response.json({ hits });
+}
+```
+
+The equivalent on ElastiCache for Valkey uses a standard Redis client over TCP — the same code you'd write against Redis OSS — but it only works when the Next.js server runs **inside the same VPC** as the cluster (e.g. on ECS/EC2, not a typical serverless deploy):
+
+```tsx id="code-valkey-ratelimit"
+// app/api/ping/route.ts
+import { createClient } from "redis"; // node-redis / iovalkey, etc.
+import { headers } from "next/headers";
+
+const client = createClient({ url: process.env.VALKEY_URL });
+await client.connect(); // needs a TCP route into the VPC
+
+export async function GET() {
+  const ip = (await headers()).get("x-forwarded-for") ?? "anon";
+  const hits = await client.incr(`hits:${ip}`);
+  await client.expire(`hits:${ip}`, 60);
+  return Response.json({ hits });
+}
+```
+
+Both are trivially fine for INCR-heavy workloads — Valkey *is* Redis, so the write-heavy patterns that break a key-value cache work great on either. The difference isn't the code, it's the deployment: the first runs anywhere with nothing to provision; the second needs the app to sit inside a VPC with a network path to a running cluster.
+
+## When should you use ElastiCache for Valkey over Upstash Redis?
+
+Use **ElastiCache for Valkey** when:
+
+- Your application runs in a single AWS region and VPC, and the cache lives right next to it.
+- You want the lowest possible same-AZ TCP latency and have steady, high throughput to justify always-on nodes.
+- You're standardizing on open-source Valkey across your AWS estate and want AWS-native integration (IAM, VPC, CloudWatch).
+- You're cost-optimizing a large, predictable workload where reserved node hours beat per-request pricing.
+
+Choose **Upstash Redis** when:
+
+- Your code runs at the edge, in serverless functions, across multiple clouds, or in the browser — anywhere outside one VPC.
+- You want global replication and read-your-writes without running and syncing clusters yourself.
+- You don't want to size, patch, fail over, or pay for idle capacity.
+- Your traffic is spiky or low-to-medium and per-request pricing (with a free tier) beats always-on nodes.
+
+Quick note on Upstash: you can create a free Redis database for your AI agents or experiments by sending a POST request to [https://upstash.com/start-redis](https://upstash.com/start-redis). No signup or API key needed — run it in your terminal right now and get a fresh Redis database.
+
+## FAQ
+
+### Is Valkey the same as Redis?
+
+Almost. Valkey is a fork of the last open-source Redis (7.2), kept open under the Linux Foundation. It's ~90% command-compatible and a near-drop-in replacement, but it doesn't include Redis Ltd.'s proprietary modules, and the two have started to diverge — Valkey on engine performance, Redis on built-in modules.
+
+### Why compare Upstash to ElastiCache for Valkey instead of "Valkey"?
+
+Because Valkey is an open-source engine, not a service. To use it in production you pick a managed host, and AWS ElastiCache for Valkey is the most common one. Other managed options include Google Cloud Memorystore for Valkey and Aiven for Valkey.
+
+### Can I call ElastiCache for Valkey from a Cloudflare Worker or the browser?
+
+Not directly. ElastiCache has no public HTTPS endpoint and needs a TCP socket inside its VPC. Upstash exposes an HTTPS REST endpoint, so it works from Workers, the edge, and browsers without sockets.
+
+### Is Upstash faster than ElastiCache for Valkey?
+
+It depends where your code runs. From a client in the same VPC/AZ, ElastiCache's private TCP path is faster (sub-millisecond). From the edge, another region, or another cloud, Upstash wins because it's reachable over HTTPS and ElastiCache typically isn't.
+
+### Which is cheaper?
+
+For spiky, low-to-medium, or globally distributed traffic, Upstash is usually much cheaper — per-request pricing, a free tier, and scale-to-zero versus always-on nodes (hundreds of dollars/month with a replica) or storage-dominated serverless GB-hours. For large, steady, single-region throughput, a reserved ElastiCache node can win.
+
+### Does Valkey support global / multi-region deployment?
+
+Yes, via ElastiCache for Valkey Global Datastore — a primary region replicates to up to two read-only secondary regions, with promotion for disaster recovery. The difference from Upstash is operational: you run and pay for a full cluster in each region and writes stay in the primary region, whereas Upstash makes read regions a toggle on one database with read-your-writes across them.
+
+### How do you compare the two pricing models?
+
+Pick a workload — GB stored, commands per month, and average value size — then compute each bill. Upstash is per command (plus storage); ElastiCache serverless is GB-hours plus ECPUs (1 ECPU per KB per command), or fixed node-hours. The decision usually comes down to traffic shape: per-command and serverless win for spiky or low-to-medium traffic and scale to zero; node-based clusters win for steady high throughput.
+
+### Do both support TTLs and the same data structures?
+
+Yes. Both speak Redis, so EX/PX/EXAT/PXAT on SET, EXPIRE, and the full set of strings, hashes, lists, sets, sorted sets, streams, pub/sub, and Lua scripting work on either.
