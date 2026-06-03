@@ -21,6 +21,7 @@
     "@rehype-pretty/transformers": "^0.13.2",
     "@tabler/icons-react": "^3.29.0",
     "@upstash/claps": "^1.0.0-beta.5",
+    "@vercel/analytics": "^2.0.1",
     "@vercel/functions": "^1.5.1",
     "@vercel/og": "^0.6.5",
     "class-variance-authority": "^0.7.1",
