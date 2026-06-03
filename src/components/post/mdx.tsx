@@ -204,6 +204,7 @@ function img({ src, alt, width, height, className, ...rest }: ComponentProps<"im
       <Image
         src={src}
         alt={alt || ""}
+        title={rest.title}
         width={w}
         height={h}
         sizes="(max-width: 768px) 100vw, 768px"
