@@ -1,0 +1,291 @@
+---
+title: "Building Subagents in the Vercel AI SDK v6"
+slug: subagents-in-ai-sdk-v6
+authors: [josh]
+tags: [ai, redis]
+description: "How to build subagents in the AI SDK v6 with ToolLoopAgent, and how to share state between them using Upstash Redis."
+---
+
+**A subagent in the AI SDK v6 is one agent wrapped inside a `tool()` so another agent can call it.** The parent agent treats the subagent like any other tool: it sends a prompt, gets back text, and decides what to do next.
+
+I find them to be the single most useful pattern to **avoid context bloat**. No matter how large their task or own context load is, they only return the most important information from their process back to the main agent.
+
+![Subagents take care of context-intensive tasks (e.g. research)](/blog/subagents-ai-sdk-v6/subagents-return-summary.png)
+
+## The new v6 ToolLoopAgent
+
+Before v6, building a multi-agent setup meant chaining `generateText` calls and passing messages between them. The functions to generate or stream text were independant primitives:
+
+![In v5, generateText and streamText are primitives](/blog/subagents-ai-sdk-v6/v5-primitives.png)
+
+In v6, an agent is its own class we can now call functions on. We define it once with a model, instructions, and tools, then call `generate` or `stream` on it:
+
+![New: tools, prompts etc. move to a single class](/blog/subagents-ai-sdk-v6/v6-toolloopagent.png)
+
+The class is `ToolLoopAgent`. The name describes what it does: it runs the model, executes any tool calls, feeds the results back, and loops until a stop condition fires.
+
+```tsx id="code-u43cd4my"
+import { anthropic } from "@ai-sdk/anthropic";
+import { stepCountIs, ToolLoopAgent } from "ai";
+
+const agent = new ToolLoopAgent({
+  model: anthropic("claude-sonnet-4-6"),
+  instructions: "You are a research agent. Answer the task autonomously.",
+  tools: {
+    /* ... */
+  },
+  stopWhen: stepCountIs(10),
+});
+
+const result = await agent.generate({ prompt: "Summarize the latest on X." });
+console.log(result.text);
+```
+
+## A subagent is just a tool
+
+A subagent is a `ToolLoopAgent` that a parent agent calls through a `tool()`. The tool's execute function runs the subagent and returns its text.
+
+```tsx id="code-szh5etz2"
+import { anthropic } from "@ai-sdk/anthropic";
+import { stepCountIs, tool, ToolLoopAgent } from "ai";
+import { z } from "zod";
+
+const researchSubagent = new ToolLoopAgent({
+  model: anthropic("claude-sonnet-4-6"),
+  instructions: "You are a focused research subagent. Return only a summary.",
+  stopWhen: stepCountIs(10),
+});
+
+const researchTool = tool({
+  description: "Delegate a research task to a subagent.",
+  inputSchema: z.object({ prompt: z.string() }),
+  execute: async ({ prompt }, { abortSignal }) => {
+    const result = await researchSubagent.generate({ prompt, abortSignal });
+    return result.text;
+  },
+});
+
+const parentAgent = new ToolLoopAgent({
+  model: anthropic("claude-sonnet-4-6"),
+  instructions: "Delegate research, then synthesize an answer.",
+  tools: { research: researchTool },
+  stopWhen: stepCountIs(10),
+});
+```
+
+Two details are important here.
+
+First, the tool field is `inputSchema`, not `parameters`. Earlier AI SDK versions used `parameters`; v5 renamed it to `inputSchema` to align with the Model Context Protocol, and v6 keeps that name.
+
+Second, the `execute` function takes `abortSignal` from its second argument and passes it into the subagent. If the parent request is cancelled, that cancellation reaches the subagent too. Without it, a cancelled request leaves subagents running in the background, still using tokens.
+
+---
+
+### Controlling the subagent output
+
+By default, the parent receives whatever the subagent tool returns. A research subagent might run ten steps and produce a lot of text, and we may not want all of that landing back in the parent's context window.
+
+With `toModelOutput`, we can decouple what the tool returns from what gets passed into the parent model. It's like a separate parsing step.
+
+```tsx id="code-6k0yc3hd"
+const researchTool = tool({
+  description: "Delegate a research task to a subagent.",
+  inputSchema: z.object({ prompt: z.string() }),
+  execute: async ({ prompt }, { abortSignal }) => {
+    const result = await researchSubagent.generate({ prompt, abortSignal });
+    return result.text;
+  },
+  toModelOutput: ({ output }) => ({ type: "text", value: output }),
+});
+```
+
+This way the **parent's context stays small while the subagent can consume an almost arbitrary amount of tokens**, just bounded by it's context limit. Because either way, it will not bloat our parent.
+
+This patterns is also super useful for keeping the parent's token count low as the number of subagents grows.
+
+## Creating a stop condition
+
+A `ToolLoopAgent` keeps looping until a `StopCondition` tells it to stop. The default is `stepCountIs(20)`, so an agent with no `stopWhen`will run up to 20 steps:
+
+```tsx id="code-8k95l5wd"
+import { anthropic } from "@ai-sdk/anthropic";
+import { hasToolCall, stepCountIs, type StopCondition } from "ai";
+
+// custom stop condition
+const stopAfterAnyToolUse: StopCondition<any, any> = ({ steps }) =>
+  steps.some((step) => step.toolCalls.length > 0);
+
+const agent = new ToolLoopAgent({
+  model: anthropic("claude-sonnet-4-6"),
+  stopWhen: [stepCountIs(10), hasToolCall("done"), stopAfterAnyToolUse],
+});
+```
+
+We can pass an array of conditions, and the loop stops when any one of them is true. `stepCountIs(n)` caps the step count, `hasToolCall(name)` stops once the agent uses any tool, and a custom function gets the full `steps` array so we can stop on anything we can compute from it, like a token budget.
+
+By the way, `prepareStep` runs before every step and lets us change the model, the tools, or the messages for that step:
+
+```tsx id="code-jskxpbnr"
+const agent = new ToolLoopAgent({
+  model: anthropic("claude-sonnet-4-6"),
+  tools: { research: researchTool, done: doneTool },
+  prepareStep: ({ stepNumber }) => ({
+    toolChoice: stepNumber > 8 ? { type: "tool", toolName: "done" } : "auto",
+  }),
+});
+```
+
+This one forces the agent toward a `done` tool as it nears its step limit, instead of letting it stall.
+
+## The isolation problem
+
+A subagent invocation starts with a fresh context window every time. The subagents docs call context isolation a feature, and for a single delegated task it is. The subagent doesn't load the parent's full history, and the parent shouldn't know about the subagent's intermediate steps.
+
+The isolation goes both ways. But in two cases it kinda gets in the way:
+
+- **Parallel subagents.** The main agent runs three research subagents at once and none of them can see what the others found. If two should avoid duplicating work, there's no way for them to coordinate.
+- **Separate requests.** In serverless, each HTTP request can be a cold start. Anything a subagent held in memory on the last request is gone. The orchestrator on the second request doesn't know what the subagents did on the first request.
+
+![Parallel subagents cannot talk to each other.](/blog/subagents-ai-sdk-v6/parallel-subagents-isolated.png)
+
+Moving the shared state out of process fixes both problems. The [official memory docs](https://ai-sdk.dev/docs/agents/memory) point at hosted memory services for this, but for short-lived agent state we use Redis. It works with HTTP and the key expiry handles cleanup automatically.
+
+## Sharing state across subagents with Redis
+
+A pattern I really like is a "shared scratchpad". It's one Redis string keyed by the current message id. Each subagent gets two tools: one to read what the others have already written, and one to append its own findings. We pass the same mocked message id to every subagent so they all point at the same key.
+
+```tsx id="code-z6rzrrzj"
+import { redis } from "@/lib/redis";
+import { anthropic } from "@ai-sdk/anthropic";
+import { stepCountIs, tool, ToolLoopAgent } from "ai";
+import { z } from "zod";
+
+function createNoteTools(messageId: string) {
+  return {
+    readNotes: tool({
+      description: "Read what the other subagents have found so far.",
+      inputSchema: z.object({}),
+      execute: async () => {
+        return (await redis.get<string>(`notes:${messageId}`)) ?? "(empty)";
+      },
+    }),
+    appendToNotes: tool({
+      description: "Append your findings to the shared notes.",
+      inputSchema: z.object({ findings: z.string() }),
+      execute: async ({ findings }) => {
+        await redis.append(`notes:${messageId}`, `\n${findings}`);
+        return "Appended.";
+      },
+    }),
+  };
+}
+
+// this comes from the ai sdk
+const EXAMPLE_MESSAGE_ID = "example-run-001";
+
+const researchSubagent = new ToolLoopAgent({
+  model: anthropic("claude-sonnet-4-6"),
+  instructions: `You are a research subagent. Read your notes to see what others found, then append your research.`,
+  tools: createNoteTools(EXAMPLE_MESSAGE_ID),
+  stopWhen: stepCountIs(10),
+});
+
+const parent = new ToolLoopAgent({
+  model: anthropic("claude-sonnet-4-6"),
+  instructions: `Start three research subagents in parallel on these topics: 1. Serverless databases  2. Edge computing  3. AI inference costs.`,
+  tools: {
+    subagent: tool({
+      description: "Run a research subagent on a topic.",
+      inputSchema: z.object({ topic: z.string() }),
+      execute: async ({ topic }, { abortSignal }) => {
+        const result = await researchSubagent.generate({
+          prompt: `Research this topic: ${topic}`,
+          abortSignal,
+        });
+        return result.text;
+      },
+    }),
+    readNotes: createNoteTools(EXAMPLE_MESSAGE_ID).readNotes,
+  },
+  stopWhen: stepCountIs(10),
+});
+
+const result = await parent.generate({ prompt: "Start the research." });
+```
+
+Each subagent runs in isolation but writes into the same Redis string. The parent kicks off the three subagents, and once they finish it calls `readNotes` itself to pull the full notes before synthesizing. Anthropic's [orchestrator-workers pattern](https://www.anthropic.com/research/building-effective-agents) is the same shape: a central agent splits the work, workers run it, the central agent synthesizes.
+
+One note: this works because research subtopics are independent. If subagent B needs what subagent A found, we can't fan them out in parallel. We run them in sequence, or have the parent make a second round of calls after reading the first round's results from Redis.
+
+This patterns also allows us to implement a mechanism for the main agent to follow up (e.g. "keep chating") to research subagents. Because they keep their own message history and state, if the main model is unhappy or wants to follow up, we could simply pass the conversation ID into the research agent and it automatically can read and interact with previous notes.
+
+## Persisting message history across requests
+
+The second use of Redis is saving message history. The AI SDK's `useChat` works with `UIMessage[]`. We save that array to Redis at the end of a request and load it at the start of the next one.
+
+```tsx id="code-rwe2te77"
+import { Redis } from "@upstash/redis";
+import type { UIMessage } from "ai";
+
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
+
+async function saveHistory(sessionId: string, messages: UIMessage[]) {
+  await redis.set(`chat:${sessionId}`, messages, { ex: 86_400 });
+}
+
+async function loadHistory(sessionId: string) {
+  const messages = await redis.get<UIMessage[]>(`chat:${sessionId}`);
+  return messages ?? [];
+}
+```
+
+## Streaming subagent progress to the UI
+
+If a subagent runs for a while, we want to show the user it is working instead of "freezing" the UI until it finishes. A tool's `execute` can be an async generator. Each value it yields becomes a partial tool result that the client can render before the final chunk arrives.
+
+```tsx id="code-ftkvudsr"
+import { readUIMessageStream, tool } from "ai";
+import { z } from "zod";
+
+const streamingResearchTool = tool({
+  description: "Delegate research to a streaming subagent.",
+  inputSchema: z.object({ prompt: z.string() }),
+  async *execute({ prompt }, { abortSignal }) {
+    const result = await researchSubagent.stream({ prompt, abortSignal });
+
+    for await (const message of readUIMessageStream({
+      stream: result.toUIMessageStream(),
+    })) {
+      yield message;
+    }
+  },
+});
+```
+
+The streamed result exposes a UI message stream. The `readUIMessageStream` helper turns that into an async iterable, where each value is the full message built up so far. The generator yields each update, and the client can now render the subagent's progress in real time.
+
+## When to use a subagent and when not to
+
+Subagents add a layer of complexity. Every level of delegation is another model running its own loop. A single `ToolLoopAgent` with a good set of tools handles most tasks, and it is cheaper and easier to debug.
+
+But on the other hand, I find subagents to be the single most useful tool to avoid context bloat. By splitting my research and code verification into separate subagents for a project I'm building, the main model's output has become _significantly_ better.
+
+So I'd add a subagent when one of these is true:
+
+| Situation                                       | Single agent                            | Subagent                                              |
+| ----------------------------------------------- | --------------------------------------- | ----------------------------------------------------- |
+| One task, a handful of tools                    | Cheaper, easier to debug. Wins          | Overkill                                              |
+| Work that fans out into independent subtasks    | Context bloat                           | Wins. Run them in parallel, isolate each context.     |
+| One subtask needs a different model or tool set | Awkward to switch mid-loop              | Wins. Each subagent has its own model and tools.      |
+| Exploration that would blow the context window  | Hits the model's limit or context bloat | Wins. `toModelOutput` keeps the parent's context smal |
+
+## Recap
+
+- A subagent is a `ToolLoopAgent` wrapped in a `tool()`; the parent calls it like any tool.
+- Pass the `abortSignal` through so cancellation can reach the subagent.
+- Subagent contexts are isolated by design
+- With a shared Redis string keyed by a mocked message id, we can give parallel subagents a "scratchpad", and save `UIMessage[]` to Redis to persist message history.
+- I'd add subagents when work is parallel, needs isolated context, or needs a different model; otherwise a single agent is the right default.
