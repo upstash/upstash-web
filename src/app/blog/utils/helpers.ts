@@ -6,7 +6,9 @@ export async function getData(count?: number): Promise<Post[]> {
   const posts = allPosts
     .filter((post) => !post.draft)
     .sort((a, b) => {
-      return DateTime.fromISO(a.date) > DateTime.fromISO(b.date) ? -1 : 1;
+      const aTime = DateTime.fromISO(a.publishedAt ?? a.date).toMillis();
+      const bTime = DateTime.fromISO(b.publishedAt ?? b.date).toMillis();
+      return bTime - aTime;
     });
 
   if (count) {
