@@ -3,6 +3,7 @@
 import "../styles/home.css";
 import { ParsedUrlQueryInput } from "querystring";
 import HomeCommunity from "@/components/home/community";
+import HomeFaq from "@/components/home/faq";
 import HomeFast from "@/components/home/fast";
 import HomeHero from "@/components/home/hero";
 import HomeHeroCustomer from "@/components/home/hero/hero-customer";
@@ -28,6 +29,7 @@ export default function Home({
       <HomeHeroCustomer />
       {/* TODO: Enterprise */}
       <HomeCommunity />
+      <HomeFaq />
     </main>
   );
 }
