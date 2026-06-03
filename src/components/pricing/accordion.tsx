@@ -74,18 +74,22 @@ const AccordionContent = React.forwardRef(
     const { children, className } = props;
 
     return (
+      // forceMount keeps the answer in the DOM (and server HTML) even while
+      // collapsed, so crawlers index it and it matches the FAQPage structured
+      // data. The grid-rows trick animates height without unmounting content.
       <Accordion.Content
+        forceMount
         className={cx(
-          "faq-body",
-          "data-[state=open]:animate-slideDown",
-          "data-[state=closed]:animate-slideUp",
-          "overflow-hidden",
+          "faq-body grid overflow-hidden transition-all duration-300 ease-out",
+          "data-[state=closed]:grid-rows-[0fr] data-[state=open]:grid-rows-[1fr]",
           className,
         )}
         {...props}
         ref={forwardedRef}
       >
-        <span className="block space-y-4 px-6 pb-6">{children}</span>
+        <span className="block min-h-0 overflow-hidden">
+          <span className="block space-y-4 px-6 pb-6">{children}</span>
+        </span>
       </Accordion.Content>
     );
   },
