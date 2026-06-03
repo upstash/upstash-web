@@ -22,7 +22,7 @@ export default function RelatedRedis() {
           Looking for a managed Redis database?
         </span>
         <span className="mt-1 block text-text-mute">
-          Upstash runs Redis as a serverless database — create one in seconds and
+          Upstash runs Redis as a serverless database - create one in seconds and
           pay only per request. Explore Upstash Redis →
         </span>
       </span>
