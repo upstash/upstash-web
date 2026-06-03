@@ -7,6 +7,7 @@ import rt, { ReadTimeResults } from "reading-time";
 import rehypePrettyCode from "rehype-pretty-code";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
+import { remarkImageDimensions } from "./src/lib/remark-image-dimensions";
 
 export const customers = defineCollection({
   name: "Customer",
@@ -98,10 +99,11 @@ export const posts = defineCollection({
     tweet: z.string().optional(),
     draft: z.boolean().optional(),
     updated: z.string().optional(),
+    publishedAt: z.string().optional(),
   }),
   transform: async (doc, ctx) => {
     const mdx = await compileMDX(ctx, doc, {
-      remarkPlugins: [remarkGfm],
+      remarkPlugins: [remarkGfm, remarkImageDimensions],
       rehypePlugins: [
         rehypeSlug,
         [

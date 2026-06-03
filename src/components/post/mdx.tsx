@@ -73,7 +73,11 @@ export function Mdx({ code }: MdxProps) {
     if (!image || !event.currentTarget.contains(image)) return;
 
     setZoomedImage({
-      src: image.getAttribute("src") || image.currentSrc || image.src,
+      src:
+        image.getAttribute("data-zoom-src") ||
+        image.getAttribute("src") ||
+        image.currentSrc ||
+        image.src,
       alt: image.alt,
     });
   }
@@ -184,17 +188,32 @@ function table(props: ComponentProps<"table">) {
   );
 }
 
-function img(props: ComponentProps<"img">) {
-  return (
-    <img
-      {...props}
-      alt={props.alt || ""}
-      className={cx(
-        "-mx-5 block w-[calc(100%_+_2.5rem)] max-w-none rounded-xl md:-mx-6 md:w-[calc(100%_+_3rem)]",
-        props.className,
-      )}
-    />
+function img({ src, alt, width, height, className, ...rest }: ComponentProps<"img">) {
+  const classes = cx(
+    "-mx-5 block h-auto w-[calc(100%_+_2.5rem)] max-w-none rounded-xl md:-mx-6 md:w-[calc(100%_+_3rem)]",
+    className,
   );
+
+  const w = Number(width);
+  const h = Number(height);
+
+  // next/image needs intrinsic dimensions; the remark-image-dimensions plugin
+  // injects them at build time. Without them (e.g. gif/svg), fall back to <img>.
+  if (typeof src === "string" && w > 0 && h > 0) {
+    return (
+      <Image
+        src={src}
+        alt={alt || ""}
+        width={w}
+        height={h}
+        sizes="(max-width: 768px) 100vw, 768px"
+        className={classes}
+        data-zoom-src={src}
+      />
+    );
+  }
+
+  return <img {...rest} src={src} alt={alt || ""} className={classes} />;
 }
 
 function FullWidth(props: ComponentProps<"div">) {
