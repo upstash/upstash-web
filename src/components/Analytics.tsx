@@ -1,6 +1,7 @@
 "use client";
 
 import { GTM_ID, pageview } from "@/lib/google/gtm";
+import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
 import { usePathname, useSearchParams } from "next/navigation";
 import Script from "next/script";
 import { useEffect } from "react";
@@ -38,6 +39,8 @@ export default function Analytics() {
   `,
         }}
       />
+
+      <VercelAnalytics />
     </>
   );
 }
