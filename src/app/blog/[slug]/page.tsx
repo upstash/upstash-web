@@ -2,6 +2,7 @@ import Container from "@/components/container";
 import PostHeader from "@/components/post/header";
 import { Mdx } from "@/components/post/mdx";
 import OtherPostCard from "@/components/post/other-post";
+import RelatedRedis from "@/components/post/related-redis";
 import PostTags from "@/components/post/tags";
 import { SITE_URL } from "@/utils/const";
 import {
@@ -90,6 +91,8 @@ export default async function BlogPage({ params }: Props) {
 
   const { nextPost, prevPost } = getAdjacentPosts(allPosts, indexOfPost);
 
+  const isRedisPost = post.tags?.some((tag) => tag.toLowerCase() === "redis");
+
   return (
     <main className="relative z-0">
       <script
@@ -110,6 +113,8 @@ export default async function BlogPage({ params }: Props) {
         <div className="relative z-0 pt-12 md:pt-16">
           <Container className="max-w-screen-md">
             <Mdx code={post.mdx} />
+
+            {isRedisPost && <RelatedRedis />}
 
             <PostTags post={post} />
 
