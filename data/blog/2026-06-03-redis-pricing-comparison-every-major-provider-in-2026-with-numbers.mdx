@@ -1,0 +1,294 @@
+---
+title: "Redis Pricing Compared: Every Major Provider in 2026 (With Real Numbers)"
+slug: redis-pricing-comparison-every-major-provider-in-2026-with-numbers
+authors: [josh]
+tags: []
+description: "Redis pricing compared across Upstash, AWS ElastiCache, MemoryDB, Redis Cloud, Google Memorystore, Azure, DigitalOcean, and Aiven, with real numbers and example cost scenarios."
+publishedAt: "2026-06-03T13:00:00Z"
+---
+
+<Summary>
+The hardest part of comparing Redis pricing is that most of the big providers charge for one of four very different things. We can't really compare a price like "$0.049 per GiB-hour" to "$0.20 per 100,000 commands" until we know how our app uses Redis.
+
+**So later in this article I calculated the price of five example workloads on every provider, instead of just listing rates.**
+</Summary>
+
+I categorized all Redis pricing into four billing models:
+
+- **Per node-hour** (AWS ElastiCache, AWS MemoryDB, Azure Cache for Redis, DigitalOcean): we rent a fixed-size server by the hour. We pay for it whether it's busy or idle, and each extra copy is another full server on the bill.
+- **Per GiB-hour provisioned** (Google Memorystore): we pay for the capacity we reserve, used or not, charged by the hour.
+- **Per usable GB** (Redis Cloud): we pay for the memory we use, but high availability doubles that memory and Active-Active multiplies it again.
+- **Per request** (Upstash): we pay per command plus storage. When there's not much traffic we pay almost nothing, and if traffic grows, we can switch to a fixed plan.
+
+**Each model is bad at something.** Per-node pricing kinda wastes money when there aren't many requests being processed. Per-request pricing gets pretty expensive when traffic stays high.
+
+So I think knowing which one fits your traffic matters more than any single price on this page.
+
+Side note: in March 2024 Redis Inc. changed the Redis license, and a fork called Valkey appeared days later under the Linux Foundation. AWS, Google, DigitalOcean, and Aiven now run Valkey, which use the same API as Redis but is not Redis. I'll cover what that means for your bill near the end.
+
+I checked all prices below against official pricing pages in June 2026, so check the current numbers before you commit, because providers might change them.
+
+## Every major Redis provider at a glance
+
+| Provider | Engine | Billing model | Entry price | Free tier | Best for |
+| --- | --- | --- | --- | --- | --- |
+| Upstash | Redis-compatible | Per request + storage or fixed plan w/ unlimited commands | $0 | 256 MB, 500K commands/mo | Serverless, scaling, high-frequency workloads |
+| AWS ElastiCache | Valkey / Redis OSS | Per node-hour | \~$12/mo (cache.t4g.micro) | None (12-mo trial only) | High sustained throughput on AWS |
+| AWS MemoryDB | Valkey / Redis OSS | Per node-hour + per GB written | \~$315/mo | None | Redis as a durable primary database |
+| Redis Cloud | Redis 8 | Per usable GB | $0 (30 MB) | 30 MB | Redis modules, Active-Active |
+| Google Memorystore | Redis / Valkey | Per GiB-hour provisioned | \~$36/mo (1 GiB Basic) | None | GCP stacks |
+| Azure Cache for Redis | Redis OSS | Per SKU-hour | \~$16/mo (C0 Basic) | None | Azure stacks |
+| DigitalOcean | Valkey | Per node-month | $15/mo (1 GiB) | None | Simple, flat, predictable bills |
+| Aiven | Valkey | Per plan (VM-based) | $0 | 1 GB | Multi-cloud portability |
+| Railway | Redis (self-deployed) | Usage-based (RAM/vCPU/egress) | $5/mo plan + usage | $5 trial credit | Redis next to your app on one platform |
+
+**Only&#32;[Upstash](https://upstash.com/pricing/redis),&#32;[Aiven](https://aiven.io/valkey),&#32;[Railway](https://railway.com/pricing)&#32;and&#32;[Redis Cloud](https://redis.io/pricing/)&#32;offer a free tier you can run indefinitely with no card.** The AWS free tier covers 750 hours of a `cache.t3.micro` node for the first 12 months and excludes ElastiCache Serverless. Google, Azure, MemoryDB, and DigitalOcean have no free tier at all.
+
+Railway is a bit different: it doesn't sell a managed Redis tier, so you deploy Redis yourself and pay for the computing power it uses.
+
+## The providers in detail
+
+### Upstash
+
+Upstash has two billing models: Pay-as-you go and fixed plans.
+
+Pay-as-you-go databases charge per command and per GB of storage. The free tier covers 256 MB and 500,000 commands a month. [Pay-as-you-go](https://upstash.com/pricing/redis) is $0.20 per 100,000 commands plus $0.25 per GB-month of storage beyond the first 1 GB, which is free, and there's no bandwidth charge.
+
+There are also fixed plans, a flat monthly price with unlimited commands. This is especially useful for workloads with a lot of commands. Here are the plans:
+
+| Fixed plan | Price/mo | Size | Bandwidth | Read replica/region |
+| --- | --- | --- | --- | --- |
+| 250 MB | $10 | 250 MB | 50 GB | $5 |
+| 1 GB | $20 | 1 GB | 100 GB | $10 |
+| 5 GB | $100 | 5 GB | 500 GB | $50 |
+| 10 GB | $200 | 10 GB | 1 TB | $100 |
+| 50 GB | $400 | 50 GB | 5 TB | $200 |
+| 100 GB | $800 | 100 GB | 10 TB | $400 |
+| 500 GB | $1,500 | 500 GB | — | $750 |
+
+A read replica in another region costs about half the plan price, so serving reads from several regions roughly multiplies the bill by how many regions you use.
+
+![Upstash Free, Pay as You Go, and Fixed plans as of June 2026](https://cdn.contentport.io/chat/Sw016rSl6asUNtj0EpHf3DiBcD0ot3sQ/aauUsSx9UNOwaV4-H1Y7I.png)
+
+The pay-as-you-go model works well when traffic is low or spiky, because idle time costs nothing but storage.
+
+It gets expensive when traffic is both high and steady. At 100 million commands a month, pay-as-you-go runs $200; the $20 fixed 1 GB plan handles the same traffic for a flat $20. That's what the fixed plans are for.
+
+Upstash is also the only provider here with a REST API, so it works from environments that can't open a Redis TCP connection: Cloudflare Workers, Vercel, and similar.
+
+The REST API lets you do one nice thing: a POST request to `https://upstash.com/start-redis` returns a live database endpoint and token with no login and no API key.
+
+The database it creates is temporary and expires three days after you create it unless you claim it into an account, so it's good for prototypes and quick tests you could do right now.
+
+### AWS ElastiCache
+
+[ElastiCache](https://aws.amazon.com/elasticache/pricing/) rents nodes by the hour. A `cache.t4g.micro` costs about $12/mo on-demand; an `r7g.xlarge` is roughly $319/mo ($0.437/hr). One-year reserved nodes cost around 40% less.
+
+Two things can make ElastiCache more expensive. High availability means deploying a second node, so an HA (high availability) pair doubles the node cost. And cross-AZ data transfer between your app and the cache is $0.01/GB, counted in both directions. AWS prices [ElastiCache for Valkey](https://aws.amazon.com/blogs/database/reduce-your-amazon-elasticache-costs-by-up-to-60-with-valkey-and-cudos/) about 20% below Redis OSS on nodes, and the Valkey serverless minimum is 100 MB (\~$6/mo) versus 1 GB for Redis OSS.
+
+![AWS ElastiCache Pricing for Valkey](https://cdn.contentport.io/chat/Sw016rSl6asUNtj0EpHf3DiBcD0ot3sQ/wx012H5gkmjAc1TMHLhlg.png)
+
+ElastiCache is a good pick for constant, high-throughput caching when you're already on AWS and can buy reserved nodes. It has no public endpoint, so it can't serve an edge function directly.
+
+### AWS MemoryDB
+
+[MemoryDB](https://aws.amazon.com/memorydb/pricing/) is built to be a durable primary database, not just a cache, and the price shows it. A `db.r6g.xlarge` is $0.432/hr, about $315/mo per node, and because durability needs a replica, a real two-node cluster starts around $630/mo. On top of the node cost, you pay for data written: Redis OSS is $0.20/GB, while Valkey is free up to 10 TB a month.
+
+![AWS MemoryDB Pricing for Valkey](https://cdn.contentport.io/chat/Sw016rSl6asUNtj0EpHf3DiBcD0ot3sQ/zbkP0s317pslBzotl3ODP.png)
+
+I'd use MemoryDB only when Redis is the main database (which I generally don't do) and I can't afford to lose data when a node fails. For a normal cache, ElastiCache is cheaper.
+
+### Redis Cloud
+
+[Redis Cloud](https://redis.io/pricing/) bills for usable memory rather than provisioned capacity. The free tier is 30 MB, which is only big enough for a demo. Essentials plans are shared and run from about $5/mo to $216/mo for 12 GB. The Pro tier is dedicated and starts at $200/mo, so it's hard to justify for small projects.
+
+Two things drive the cost here. High availability stores a second copy, so it doubles the memory you pay for, and Active-Active geo-replication across two regions multiplies it again. Essentials plans also limit how many operations per second you get, so hitting that limit can push you to a bigger plan than your data needs.
+
+![Redis Cloud Pricing as of June 2026](https://cdn.contentport.io/chat/Sw016rSl6asUNtj0EpHf3DiBcD0ot3sQ/AnR1FrUoUQLdZVslw_JbU.png)
+
+Redis Cloud makes sense when the workload needs Redis-specific modules like RediSearch or RedisJSON, or CRDT-based Active-Active writes across regions. Valkey doesn't have them. Redis Cloud runs licensed Redis 8, not Valkey (because they own Redis, duh).
+
+### Google Memorystore
+
+[Memorystore](https://cloud.google.com/memorystore/docs/redis/pricing) charges per GiB-hour of provisioned capacity, with the rate decreasing as capacity grows. The Basic M1 tier (1–4 GiB) is $0.049/GiB-hr, so a 1 GiB instance is about $36/mo. The Standard tier adds cross-zone replication for HA at a higher rate; a 10 GiB Standard instance runs about $394/mo. Committed-use discounts take 20% off for one year and 40% for three.
+
+![Google Memorystore Pricing as of June 2026](https://cdn.contentport.io/chat/Sw016rSl6asUNtj0EpHf3DiBcD0ot3sQ/kXKzy3sttB35sHy4rhwZy.png)
+
+You pay the full provisioned rate whether the memory is used or not, and there's no free tier. Memorystore makes the most sense when your app runs on GCP, because keeping the cache in the same place avoids cross-region data charges of $0.02–$0.15/GB.
+
+### Azure Cache for Redis
+
+[Azure](https://azure.microsoft.com/en-us/pricing/details/cache/) prices by fixed SKU per hour. Basic C0 (250 MB) is about $16/mo with no SLA and no replication, good only for development. Standard adds a replica for HA and roughly doubles the price; C1 goes from $40/mo Basic to about $101/mo Standard. Premium adds clustering and persistence and starts around $405/mo for 6 GB. Azure is phasing this product out in favor of Azure Managed Redis, whose pricing isn't public yet.
+
+![Azure Cache for Redis Pricing as of June 2026](https://cdn.contentport.io/chat/Sw016rSl6asUNtj0EpHf3DiBcD0ot3sQ/ewpJllRXA4BDwi4lU0HF8.png)
+
+Azure Cache is the obvious choice when you're on Azure with existing commitments and need its compliance certifications.
+
+### DigitalOcean
+
+[DigitalOcean](https://docs.digitalocean.com/products/databases/valkey/details/pricing/) moved from managed Redis to managed Valkey in 2025. Pricing is flat per node per month and the same in every region: 1 GiB is $15/mo, 16 GiB is about $240/mo. High availability adds standby nodes at the primary's price, so an HA setup is at least double. Data transfer isn't charged!
+
+![Valkey DigitalOcean Pricing 2026](https://cdn.contentport.io/chat/Sw016rSl6asUNtj0EpHf3DiBcD0ot3sQ/pTv5twBa8qi569ISWFF5l.png)
+
+DigitalOcean is the right fit if you want a predictable monthly number and no Redis modules to worry about.
+
+### Aiven
+
+[Aiven](https://aiven.io/valkey) runs managed Valkey across AWS, GCP, Azure, and others from one dashboard. That's the reason to use it: you can move between clouds without rewriting anything. There's a real free tier of 1 GB on a single node. Paid plans start at $19/mo for the Hobbyist tier (1 GB, 1 CPU); the Startup tier, with more memory and CPU, starts at $60/mo. The plan fee adds to the infrastructure cost, so the total depends on the cloud and region you pick.
+
+![Aiven Pricing 2026](https://cdn.contentport.io/chat/Sw016rSl6asUNtj0EpHf3DiBcD0ot3sQ/U_8nMcGn151lokqDwTf7I.png)
+
+### Railway
+
+[Railway](https://railway.com/pricing) doesn't sell a managed Redis tier. You deploy Redis as a service from a template and pay for the resources the container uses, billed by the second: about $10 per GB of RAM per month, about $20 per vCPU per month, and $0.05/GB for egress. The Hobby plan is $5/mo and includes $5 of usage; Pro is $20/mo and includes $20.
+
+![Railway Pricing 2026](https://cdn.contentport.io/chat/Sw016rSl6asUNtj0EpHf3DiBcD0ot3sQ/e4m3ZjS_8sEHCFEoxbZaD.png)
+
+A small Redis sized at 1 GB of RAM with a fraction of a vCPU costs somewhere in the low tens per month, but the number changes with the container size and traffic, so it doesn't match the fixed price of the managed services.
+
+Railway is a good fit when Redis should run next to the rest of the app on one platform and you're fine managing it yourself instead of buying a service with an SLA.
+
+## How much does managed Redis cost? Five scenarios
+
+I worked out the figures below from each provider's published unit prices. Also I tried to match storage and node sizes as best as each provider's tiers allow.
+
+### A small production app: 1 GB of data, 5 million commands a month
+
+| Provider | Monthly cost |
+| --- | --- |
+| Redis Cloud Flex 1 GB | $5.00 |
+| Upstash pay-as-you-go | $10.00 |
+| AWS ElastiCache cache.t4g.micro | $12.41 |
+| DigitalOcean Valkey 1 GiB | $15.00 |
+| Azure Cache Basic C0 | $16.06 |
+| Redis Cloud Essentials 1 GB | $18.00 |
+| Aiven Valkey Hobbyist 1 GB | $19.00 |
+| Upstash Fixed 1 GB | $20.00 |
+| Google Memorystore Basic M1 1 GiB | $35.77 |
+
+The Upstash pay-as-you-go is $10 of commands and $0 of storage, since the first 1 GB is free.
+
+Memorystore at $35.77 is the most expensive RAM-only row, mostly because its smallest instance sits in the pricey M1 range.
+
+The Upstash fixed 1 GB plan is $20 because the $10 tier holds 250 MB, not a full gigabyte.
+
+Redis Cloud shows up twice on purpose. Flex at $5 keeps hot keys in RAM and the rest on SSD, so it costs less but reads that fall to SSD have higher latency. Essentials at $18 keeps the whole 1 GB in RAM. For a small all-in-RAM cache, Essentials is the fair comparison against the other RAM rows. Flex is the option if the use case tolerates higher latency.
+
+### A high-traffic API: 100 million commands a month, 1 GB of data
+
+| Provider | Monthly cost |
+| --- | --- |
+| AWS ElastiCache cache.t4g.micro | $12.41 |
+| DigitalOcean Valkey 1 GiB | $15.00 |
+| Azure Cache Basic C0 | $16.06 |
+| Redis Cloud Essentials 1 GB | $18.00 |
+| Aiven Valkey Hobbyist 1 GB | $19.00 |
+| Upstash Fixed 1 GB | $20.00 |
+| Google Memorystore Basic M1 1 GiB | $35.77 |
+
+Every provider in this table charges a flat price, so command volume doesn't change the base cost. So an API with many commands and one with few pay the same on a fixed plan.
+
+One caveat on the metered tiers: 100 million commands a month averages about 38 per second, well under the ops/sec caps on Redis Cloud Essentials and the Azure SKUs, so those hold at their 1 GB price. A bursty workload at the same monthly total could push them up a tier.
+
+I left out bandwidth here because it's almost negligable or included at this scale. At about 500 bytes per command (request plus response, the range for small JSON values and session tokens), 100 million commands have a bandwidth of 50 GB a month:
+
+```tsx id="code-61cgtu9s"
+100,000,000 commands × 500 bytes = 50 GB/month
+```
+
+Here's what each provider charges for that 50 GB:
+
+| Provider | Bandwidth at 50 GB | Why |
+| --- | --- | --- |
+| Upstash Fixed 1 GB | $0 | 100 GB/mo included |
+| Redis Cloud Essentials 1 GB | $0 | 200 GB/mo included |
+| DigitalOcean Valkey | $0 | data transfer included |
+| Google Memorystore | $0 | same-region egress is free |
+| Azure Cache C0 | $0 | cache-to-app traffic in one region isn't billed |
+| AWS ElastiCache | $0 same-AZ / \~$0.50 cross-AZ | $0.01/GB each direction across AZs |
+| Aiven Hobbyist | not published | - |
+
+### A production app with high availability: \~10 GB, sustained load, one region
+
+| Provider | Monthly cost |
+| --- | --- |
+| ElastiCache m7g.xlarge pair, 1-yr reserved | $220.75 |
+| AWS MemoryDB pair (r6g.large ×2) | $315.36 |
+| ElastiCache m7g.xlarge pair, on-demand | $367.92 |
+| Google Memorystore Standard, 10 GiB | $394.20 |
+| Upstash Fixed 10 GB + Prod Pack | $400.00 |
+| Redis Cloud Pro, 10 GB + HA | $454.00 |
+| DigitalOcean Valkey 16 GiB, HA pair | $480.00 |
+| Azure Cache Premium P2, 13 GB | $810.30 |
+
+High availability works differently across the billing models. For the per-node providers HA means a second node, so the cost is at least double a single node. Reserved ElastiCache nodes are the cheapest replicated cache at $221.
+
+DigitalOcean's flat $480 is the easiest to predict.
+
+Azure Premium P2 is the most expensive here because Premium bundles clustering and persistence this workload may not need. The Standard tier is cheaper without them.
+
+MemoryDB is a durable database, with on-disk logs the cache-only rows don't have. A two-node r6g.large cluster is $315.
+
+The two non-node providers price HA differently. Redis Cloud Essentials tops out at a 12 GB plan. [Replication halves the usable dataset](https://redis.io/docs/latest/operate/rc/databases/configuration/high-availability/), so that plan holds only 6 GB. 10 GB usable with HA means Redis Cloud Pro at $454/mo I from from their [pricing calculator](https://redis.io/pricing/calculator/).
+
+Upstash fixed plans include in-zone replicas, but multi-zone HA with an uptime SLA comes with the [Prod Pack add-on](https://upstash.com/pricing/redis) at +$200/mo, so the 10 GB plan costs $400.
+
+One caveat: usable memory is below provisioned memory. AWS [reserves about 25% of a node](https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/redis-memory-management.html) and MemoryDB about 19%, so the m7g.xlarge (12.93 GiB) and r6g.large (13 GiB) nodes here are sized to leave about 10 GB usable. So this table is a rough band.
+
+### An edge or serverless function
+
+ElastiCache, MemoryDB, and Memorystore run inside a private network (VPC) with no public endpoint, so a Cloudflare Worker or Vercel function can't reach them directly. 
+
+Upstash can use both HTTP and TCP, so it's the best option here.
+
+### Enterprise multi-region with Active-Active writes
+
+For writes accepted in multiple regions at once, Redis Cloud Pro is the managed option, using CRDTs to merge concurrent writes. The cost is the catch: HA doubles the memory and a second active region doubles it again, so you're billed for roughly four times the actual data size.
+
+MemoryDB added multi-region in 2024 as a durable alternative. ElastiCache Global Datastore only does Active-Passive, so a single region takes all writes.
+
+## The hidden costs, by provider
+
+| Hidden cost | Where it shows up |
+| --- | --- |
+| HA roughly doubles the bill | Every provider: ElastiCache/MemoryDB/DO add a node; Azure/Google charge a higher HA tier; Redis Cloud doubles billed memory |
+| Cross-AZ data transfer | AWS: $0.01/GB each direction. Google: VM-side egress. DigitalOcean and most Azure plans: included |
+| System-reserved memory | ElastiCache reserves part of each node, so usable memory is below provisioned; Redis Cloud bills usable memory instead |
+| Per-write durability fee | MemoryDB only: $0.20/GB on Redis OSS, free up to 10 TB/mo on Valkey |
+| Cross-region egress | Google $0.02–$0.15/GB; AWS $0.02/GB; DigitalOcean free |
+
+The one that catches people off guard most often is HA. Every entry price above is for a single node, and a production setup almost always runs at least two.
+
+## The Redis license change and what it means for cost
+
+In March 2024 Redis Inc. moved Redis off its open-source BSD license to a source-available license (RSALv2/SSPL). Within days, former maintainers forked the last open version into [Valkey](https://aws.amazon.com/blogs/database/reduce-your-amazon-elasticache-costs-by-up-to-60-with-valkey-and-cudos/) under the Linux Foundation, keeping the BSD license. Redis 8 later added AGPLv3 as an option, which many companies can't use because of its copyleft terms.
+
+Here's what it means for cost. AWS prices ElastiCache for Valkey about 20% under Redis OSS, and Google, DigitalOcean, and Aiven have switched their managed services to Valkey as well. Valkey is compatible with the core Redis commands, so most caching and session workloads move over without changes.
+
+What Valkey does not include is the Redis modules: RediSearch, RedisJSON, RedisTimeSeries. If you depend on those, Redis Cloud is the managed option, and you're paying licensed Redis either way.
+
+## How to choose
+
+- **Upstash** if the app is serverless and/or you want the best-in-class developer experience. Also if you are using an agent to write code (Claude Code, Codex, etc.) they have the easiest time with Upstash. Pay-as-you-go is easy to start or use a fixed plan once command volume is high and steady.
+- **AWS ElastiCache** if the stack is on AWS with steady, high-throughput caching and reserved nodes fit the budget.
+- **AWS MemoryDB** if Redis is the primary database and the workload needs durability and zero-loss failover, and the premium cost is acceptable.
+- **Redis Cloud** if the workload needs Redis modules like RediSearch, or Active-Active writes across regions.
+- **Google Memorystore** if the stack is on GCP, so co-location avoids egress, and committed-use discounts fit the forecast.
+- **Azure Cache for Redis** if the app is on Azure with existing commitments and compliance needs.
+- **DigitalOcean** if you want one flat, predictable number and don't need modules.
+- **Aiven** if portability across clouds is the goal.
+- **Railway** if Redis should run next to the rest of the app on one platform and self-managing the instance is acceptable.
+
+## FAQ
+
+**Is there a free Redis tier?** Upstash (256 MB, 500K commands/mo) and Aiven (1 GB) both offer free tiers with no card and no expiration. Redis Cloud has 30 MB. Google, Azure, MemoryDB, and DigitalOcean have none; AWS offers a 12-month trial node only.
+
+**What's the cheapest managed Redis for a small app?** The Upstash free tier at $0 includes 500,000 commands/mo and doesn't need a credit card. Then pay-as-you-go for $0.20 per 100,000 commands. Or a $12/mo ElastiCache `t4g.micro`.
+
+**Does high availability always cost more?** Yes. Per-node providers add a full replica node, tier-based providers (Azure, Google) charge a higher HA rate, and Redis Cloud doubles the billed memory.
+
+**Is Valkey a drop-in Redis replacement?** For the core command set, yes. For the Redis modules (RediSearch, RedisJSON, RedisTimeSeries), no; those aren't in Valkey core. Upstash Redis also supports Redis Search and Redis JSON.
+
+**ElastiCache or MemoryDB?** ElastiCache for a cache. MemoryDB when Redis is the durable primary database and zero-loss failover is required, at about four times the cost of an on-demand ElastiCache pair.
+
+**Why is Google Memorystore expensive per GB at small sizes?** It bills per GiB provisioned, and the smallest instances fall in the M1 band, its most expensive per-GiB rate.

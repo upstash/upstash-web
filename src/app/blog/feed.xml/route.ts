@@ -39,7 +39,9 @@ export async function GET(): Promise<Response> {
   const posts = allPosts
     .filter((post) => !post.draft)
     .sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+      (a, b) =>
+        new Date(b.publishedAt ?? b.date).getTime() -
+        new Date(a.publishedAt ?? a.date).getTime(),
     )
     .slice(0, 30);
 
@@ -56,7 +58,7 @@ export async function GET(): Promise<Response> {
       <title><![CDATA[${cdata(post.title)}]]></title>
       <link>${url}</link>
       <guid isPermaLink="true">${url}</guid>
-      <pubDate>${new Date(post.date).toUTCString()}</pubDate>
+      <pubDate>${new Date(post.publishedAt ?? post.date).toUTCString()}</pubDate>
       <description><![CDATA[${cdata(description)}]]></description>
       <content:encoded><![CDATA[${cdata(html)}]]></content:encoded>
       <dc:creator><![CDATA[${cdata(author)}]]></dc:creator>
