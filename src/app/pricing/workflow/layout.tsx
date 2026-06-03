@@ -1,3 +1,4 @@
+import SeoPlanData from "@/components/pricing/workflow/seo-plan-data";
 import { Metadata } from "next";
 import { ReactNode } from "react";
 
@@ -10,6 +11,9 @@ export const metadata: Metadata = {
   description,
   alternates: {
     canonical: "/pricing/workflow",
+    types: {
+      "text/markdown": "/pricing/workflow.md",
+    },
   },
   openGraph: {
     type: "website",
@@ -29,5 +33,10 @@ export default function PricingWorkflowLayout({
 }: {
   children: ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      <SeoPlanData />
+    </>
+  );
 }

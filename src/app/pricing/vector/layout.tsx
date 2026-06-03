@@ -1,3 +1,4 @@
+import SeoPlanData from "@/components/pricing/vector/seo-plan-data";
 import { Metadata } from "next";
 import { ReactNode } from "react";
 
@@ -10,6 +11,9 @@ export const metadata: Metadata = {
   description,
   alternates: {
     canonical: "/pricing/vector",
+    types: {
+      "text/markdown": "/pricing/vector.md",
+    },
   },
   openGraph: {
     type: "website",
@@ -29,5 +33,10 @@ export default function PricingVectorLayout({
 }: {
   children: ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      <SeoPlanData />
+    </>
+  );
 }
