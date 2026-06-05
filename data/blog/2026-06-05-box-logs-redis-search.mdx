@@ -46,7 +46,7 @@ Index entries get a seven-day TTL so cleanup is automatic.
 
 ## Sharding across ten indexes
 
-A single Upstash Redis Search index under write load becomes a bottleneck. We shard across ten indexes, named `box-logs:0` through `box-logs:9`.
+Box logs come in at high write volume across many customers simultaneously. To distribute that load, we shard across ten indexes, named `box-logs:0` through `box-logs:9`.
 
 Routing is deterministic: FNV-32a hash of the customer ID, modulo ten. Same customer always hits the same shard. Queries only touch one index. No scatter-gather, no merging results across shards.
 
