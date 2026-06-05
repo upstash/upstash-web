@@ -44,23 +44,6 @@ Index entries get a seven-day TTL so cleanup is automatic.
 
 ---
 
-## Sharding across ten indexes
-
-Box logs come in at high write volume across many customers simultaneously. To distribute that load, we shard across ten indexes, named `box-logs:0` through `box-logs:9`.
-
-Routing is deterministic: FNV-32a hash of the customer ID, modulo ten. Same customer always hits the same shard. Queries only touch one index. No scatter-gather, no merging results across shards.
-
-```go
-func shardIndex(customerID string) int {
-    h := fnv.New32a()
-    h.Write([]byte(customerID))
-    return int(h.Sum32()) % shardCount
-}
-```
-
-Each shard index is created once with a fixed [schema](https://upstash.com/docs/redis/search/schema-definition): `customerId` and `boxId` as keyword fields, `timestamp` as a fast integer field, `level` and `source` as keywords, and `message` as a full-text field.
-
----
 
 ## What the index unlocks
 
