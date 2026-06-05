@@ -1,0 +1,89 @@
+---
+slug: box-logs-redis-search
+title: "How We Power Box Logs with Upstash Redis Search"
+authors: [alitarik]
+tags: [box, redis, serverless]
+description: "Box generates a lot of logs. Here's how we used Upstash Redis Search to make them fast to query without rebuilding our storage layer."
+---
+
+[Box](https://upstash.com/docs/box/overall/quickstart) generates a lot of logs. Every agent run, every shell command, every system event writes a log entry. Early on we stored them in Redis lists and that was fine. The problem is they have no search. If you want to find the line where something went wrong, you have to read everything and filter yourself. At scale that's not a real option.
+
+We needed search. We didn't want to rebuild our storage layer to get it.
+
+---
+
+## What we were working with
+
+Every box has a Redis list that stores its logs in order. When the agent writes a log, we `LPUSH` it. When you open the logs tab, we `LRANGE` it. Simple, consistent, fast.
+
+The list is great for one thing: give me the last N logs for this box. Anything beyond that, filter by level, search the message, narrow to a time range, means reading everything and filtering in memory. With a few hundred logs that's fine. With tens of thousands it falls apart.
+
+---
+
+## Upstash Redis Search as a secondary index
+
+The solution is a double write. Every time a log entry comes in, it goes to two places.
+
+The first write is the same as before: `LPUSH` to the Redis list. This is synchronous, always happens, and stays the source of truth for ordered reads.
+
+The second write goes to an [Upstash Redis Search](https://upstash.com/docs/redis/search/introduction) index as a JSON document. This one is asynchronous. It happens in a background worker pool so it never touches the hot path. If the indexer falls behind, the list still has everything. The search index is best-effort.
+
+```go
+func (c *boxRedisClient) PushLog(boxID, customerID string, entry BoxLogEntry) error {
+    // synchronous: the list always gets it
+    if err := c.pushToList(boxID, entry); err != nil {
+        return err
+    }
+    // async: enqueue for indexing, never block
+    c.indexQueue <- indexTask{boxID: boxID, customerID: customerID, entry: entry}
+    return nil
+}
+```
+
+Index entries get a seven-day TTL so cleanup is automatic.
+
+---
+
+## Sharding across ten indexes
+
+A single Upstash Redis Search index under write load becomes a bottleneck. We shard across ten indexes, named `box-logs:0` through `box-logs:9`.
+
+Routing is deterministic: FNV-32a hash of the customer ID, modulo ten. Same customer always hits the same shard. Queries only touch one index. No scatter-gather, no merging results across shards.
+
+```go
+func shardIndex(customerID string) int {
+    h := fnv.New32a()
+    h.Write([]byte(customerID))
+    return int(h.Sum32()) % shardCount
+}
+```
+
+Each shard index is created once with a fixed [schema](https://upstash.com/docs/redis/search/schema-definition): `customerId` and `boxId` as keyword fields, `timestamp` as a fast integer field, `level` and `source` as keywords, and `message` as a full-text field.
+
+---
+
+## What the index unlocks
+
+Before this, the logs API had one parameter: box ID. After, it has everything a user actually needs.
+
+**Time range filtering** is the most used. Preset filters (last 15 minutes, last hour, last 24 hours, last 7 days) compute a `start_time` fresh on every query. The `timestamp` field is indexed as `I64 FAST` so range queries on it are cheap.
+
+**Level and source filtering** are exact keyword matches. Filtering to errors only or to agent-generated logs only is a single index condition, not a post-scan.
+
+**Full-text search** runs against the message field using the `$smart` operator, which does intelligent matching against the indexed text. You can search for an error string, a function name, anything that appears in a log message.
+
+**Cross-box queries** work the same way. The logs view passes the customer ID to the shard router, hits one index, and gets results from every box that user owns.
+
+All of this is powered by [Upstash Redis Search's querying capabilities](https://upstash.com/docs/redis/search/querying) and comes back paginated with limit and offset. The frontend never touches a full log list again.
+
+![Box logs search interface](/blog/box-logs-redis-search/log-search.png)
+
+---
+
+## One database, two data structures
+
+The part worth calling out: the Redis list and the search indexes live in the same Upstash Redis database. There's no separate search cluster, no second service to operate, no data sync between systems. A log entry lands in a list key and a JSON document in the same place.
+
+This matters operationally. You get ordered storage for free with Redis lists and full-text search on top of it with Upstash Redis Search without adding anything to your stack. The same connection, the same credentials, the same database. The search index is just another set of keys living alongside the lists.
+
+It also means the two stay in sync by design. The list write and the search index write both go to the same Redis instance. If you ever need to rebuild the index, the source data is right there, a `LRANGE` away, in the same database.
