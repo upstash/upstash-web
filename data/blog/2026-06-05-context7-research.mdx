@@ -1,0 +1,74 @@
+---
+title: "How Context7 Researches Its Own Weak Spots"
+slug: context7-research
+authors:
+  - enes
+tags: [ai, context7]
+description: "How Context7 uses coding agents and its benchmark loop to research answers that documentation alone can't give — and gets better the more it is used."
+---
+
+Many people think Context7 is a RAG for documentation. Although this might be technically true, there are many details that make Context7 much better than a basic RAG pipeline. Today I want to talk about the research pipeline which we use to improve our context.
+
+In the first days of Context7, our context was limited to what the project authors added as documentation. The Context7 parser was simply parsing the documentation files inside a project repository.
+
+This was working well for the majority of cases. However, there were cases where this approach had flaws:
+
+- Not all projects have good documentation. In this case, the context gathered from the project is limited by the quality of how it is documented.
+
+- There are questions that need a source code inspection. Documentation does not help with those questions.
+
+Solving the above situation became important as we saw the queries that we failed in our benchmarks. Most of those questions would be easily answered if the agent had access to the project's code base.
+
+We also observed that coding agents are very successful at finding answers by browsing and inspecting. They find the relevant files in a few grep tool calls, then find what they need. So the first solution proposal came:
+
+## First Try: Synchronous Research
+
+In this proposal, we run a sandbox which clones the repository and runs an agent to gather an answer. This works in parallel to our vector search. We combine the answers from two sources: Agent and Vector DB. Then return the response to the client.
+
+![Synchronous research: the query fans out to vector search and an agent in a sandbox, then both are merged into the answer](/blog/context7-research/sync-research.png)
+
+This approach worked really well for hard questions which require more code inspection. In our benchmark set including hard questions the success score increased to 6.5 from 4 (over 10).
+
+We even launched this approach to production in a silent way. However, very soon we started to see drawbacks.
+
+Very high cost: We saw a dramatic increase in the cost. While working on a codebase, agents spend a very high number of output tokens. This makes the per-query cost 30X more compared to the search+reranking approach. We tried to control the cost by running the research pipeline conditionally. But detecting hard questions is another complex task which is not easy without using an LLM. We also tried cheaper models in research, but hallucination is a big risk when you start using a cheaper model.
+
+Very high latency: Cost might be controlled to a degree, and might be reflected in the pricing. But one thing that was uncontrollable was the latency. The Context7 server answers most queries in sub-second time. When research is enabled, this might take up to 3-4 minutes. Even our own benchmark runs started to break. We realized how terrible the experience is while waiting on the MCP server for minutes. This was a no-go for Context7, where DX is the top priority.
+
+So we decided to revert back just in a couple days.
+
+## A better alternative: Asynchronous research, only for hard questions
+
+The hardest part of running research conditionally is knowing _when_ a question is hard enough to be worth it. As we mentioned above, detecting hard questions up front is its own difficult problem — you essentially need an LLM to judge the question before you've even answered it.
+
+But we already had that signal. Context7 continuously evaluates the responses generated for queries — a benchmark step that already runs in our pipeline to improve quality. Every answer is scored. So the trigger for research came for free: instead of building a separate "is this hard?" detector, we just watch for answers that score poorly. The benchmark we already had tells us exactly which queries the documentation failed to answer.
+
+That changes everything. We don't need research to be fast, and we don't need to gate it up front — we let the benchmark point at the weak spots and fix them afterwards, asynchronously, so the user never waits.
+
+When a query/response gets a low score from our benchmark, we start a sandbox (Upstash Box) where we ask an agent to answer the query using the cloned repository. The response is saved into a separate vector index we call dynamic-context. So the next time a similar question comes, dynamic-context helps answer it — with sub-second latency, like any other search hit.
+
+![The self-improving loop: queries are answered and scored by the benchmark; low scores trigger research in an Upstash Box, whose snippets land in dynamic-context and feed future queries](/blog/context7-research/self-improving-loop.png)
+
+### Does it actually work?
+
+The whole approach only pays off if questions repeat — otherwise we'd be researching answers that no one ever asks for again. So the number we care about most is a production one: **today, around 17% of the code snippets we serve come from dynamic-context.** Roughly one in six snippets in our answers is previously-researched content being reused for a recurring question. That is real traffic, not a benchmark — every one of those snippets is a hard question that documentation alone couldn't answer, now answered instantly because we researched a similar question earlier.
+
+The controlled before/after backs this up: on our hard-question set, the benchmark score rises to 6.4 from 4.0 — almost the same gain we got from synchronous research, but without the cost and latency. We'll be upfront that this is our own benchmark, the same loop that decides what to research, so we treat the 17% production utilization as the real proof. The benchmark explains _why_ it works; the production number shows _that_ it works.
+
+This design avoids both problems that killed synchronous research. Because the benchmark decides which questions are worth researching, cost stays controllable — we only pay for the hard ones. And because research runs after the fact, the user never waits: they see the same sub-second latency as any other query. The one real trade-off is that the very first person to ask a hard question still gets the pre-research answer; only the next similar question benefits. Given how often questions repeat, that is a price we are happy to pay.
+
+The harder question is staleness. A code snippet that perfectly answered a query six months ago can drift out of date as the library evolves. So dynamic-context entries are not permanent — each one carries an expiration time, and when it expires we run research again to regenerate the answer against the current state of the repo. The cache heals itself the same way the rest of the system does.
+
+## Feedback to Repo Owners
+
+We generate very useful data using agents. What could be documented better? We save those recommendations and share them with library owners on our website. If you claim and own a repo in Context7, you can check the recommendations under the benchmark tab.
+
+## Future Improvement Ideas
+
+We can add additional tools to generate better answers to the queries. The most obvious candidate is utilizing a web search in addition to repo inspection. The implementation is straightforward, however we have not enabled this yet. Our biggest concern is that once you start consuming the web as context, it gets hard to control outdated or malicious content. Currently, Context7's source unit is GitHub repos and documentation websites, where users can set up policies to filter them for safer usage.
+
+## A Context That Improves Itself
+
+This is what we meant at the start by "more than a basic RAG." A basic RAG pipeline is static: it answers from whatever was indexed, and a weak answer stays weak until someone manually fixes the source. Context7 closes the loop instead. Real usage produces the queries, our benchmark scores the answers, low scores trigger research, and research fills the gap — so the next person who asks something similar gets a better answer. No one has to curate it.
+
+The more Context7 is used, the more it heals its own weak spots, automatically. The 17% of served snippets already coming from dynamic-context is that flywheel turning. That is the real difference: not a smarter one-time index, but a system that gets better the more questions it sees.
