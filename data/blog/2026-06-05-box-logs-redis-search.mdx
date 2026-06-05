@@ -44,23 +44,6 @@ Index entries get a seven-day TTL so cleanup is automatic.
 
 ---
 
-## Sharding across ten indexes
-
-A single Upstash Redis Search index under write load becomes a bottleneck. We shard across ten indexes, named `box-logs:0` through `box-logs:9`.
-
-Routing is deterministic: FNV-32a hash of the customer ID, modulo ten. Same customer always hits the same shard. Queries only touch one index. No scatter-gather, no merging results across shards.
-
-```go
-func shardIndex(customerID string) int {
-    h := fnv.New32a()
-    h.Write([]byte(customerID))
-    return int(h.Sum32()) % shardCount
-}
-```
-
-Each shard index is created once with a fixed [schema](https://upstash.com/docs/redis/search/schema-definition): `customerId` and `boxId` as keyword fields, `timestamp` as a fast integer field, `level` and `source` as keywords, and `message` as a full-text field.
-
----
 
 ## What the index unlocks
 
@@ -72,7 +55,7 @@ Before this, the logs API had one parameter: box ID. After, it has everything a 
 
 **Full-text search** runs against the message field using the `$smart` operator, which does intelligent matching against the indexed text. You can search for an error string, a function name, anything that appears in a log message.
 
-**Cross-box queries** work the same way. The logs view passes the customer ID to the shard router, hits one index, and gets results from every box that user owns.
+**Cross-box queries** work the same way. The logs view queries across every box a user owns in a single request.
 
 All of this is powered by [Upstash Redis Search's querying capabilities](https://upstash.com/docs/redis/search/querying) and comes back paginated with limit and offset. The frontend never touches a full log list again.
 
