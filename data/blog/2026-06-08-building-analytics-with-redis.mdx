@@ -1,0 +1,322 @@
+---
+slug: building-analytics-with-redis
+title: "Building Analytics with Redis"
+authors: [arda]
+tags: [redis, search, analytics]
+description: "Two approaches to building analytics on Upstash Redis: pre-planned counters with bitmaps, and flexible event recording queried with Redis Search."
+---
+
+Most teams reach for a dedicated analytics product the moment they want to count
+something. But if you already run Redis (for caching, sessions, or rate limiting),
+you are sitting on one of the best analytics engines available.
+
+Why Redis?
+
+- **It's already there.** No new vendor, no new pipeline, no nightly ETL job. You
+  write events from the same code that serves your requests.
+- **It's fast.** Counters, sets, and bitmaps are O(1) or close to it. You can
+  increment a metric on every request without thinking about it, and read the
+  result back in single-digit milliseconds.
+- **It's serverless-friendly.** With [Upstash Redis](https://upstash.com/) you talk
+  to it over HTTP, so it works from edge functions, Lambdas, and the browser-facing
+  routes of a Next.js app, exactly where analytics events originate.
+
+There are two broad philosophies for doing analytics on Redis. This post walks
+through both, when to use each, and the tooling we've built to make the second one
+painless.
+
+## Two philosophies
+
+There are two ways to think about this:
+
+1. **Plan ahead.** Decide what you want to measure up front and record it in a
+   compact structure (like a bitmap) built to answer that exact question.
+2. **Record everything.** Capture each event with its metadata, index it with Redis
+   Search, and figure out the questions later.
+
+| | Plan ahead | Record everything |
+| --- | --- | --- |
+| **You decide...** | the questions up front | the questions later |
+| **Storage** | counters, bitmaps, sets | event documents (JSON) |
+| **Cost** | tiny, fixed | grows with event volume |
+| **Querying** | read the counter | filter / aggregate with Redis Search |
+| **Good for** | DAU, funnels, feature usage | ad-hoc product analytics |
+
+<Note>
+You don't have to pick one. Many apps use bitmaps for the handful of metrics they
+watch daily, and event recording for everything they might want to explore later.
+</Note>
+
+## Philosophy 1: Plan ahead
+
+If you know in advance what you want to measure, you can record it in a structure
+that answers that exact question for almost no storage. The classic example is the
+**bitmap**: one bit per user, per day.
+
+### Daily active users with a bitmap
+
+A bitmap is a string where you can flip individual bits by offset. Use the user ID
+as the offset and you get a per-day "did this user show up?" record that costs one
+bit per user, roughly **1.2 MB for 10 million users**.
+
+```ts
+import { Redis } from "@upstash/redis";
+
+const redis = Redis.fromEnv();
+
+// Mark user 1234 as active today
+function markActive(userId: number, day = today()) {
+  return redis.setbit(`active:${day}`, userId, 1);
+}
+
+// How many unique users were active today?
+function dailyActiveUsers(day = today()) {
+  // bitcount accepts a key alone at runtime, but the TS SDK wants an
+  // explicit byte range; 0..-1 covers the whole bitmap.
+  return redis.bitcount(`active:${day}`, 0, -1);
+}
+
+function today() {
+  return new Date().toISOString().slice(0, 10); // "2024-06-15"
+}
+```
+
+`setbit` is O(1) and `bitcount` counts the set bits in one pass. Done.
+
+### Combining days: weekly actives and retention
+
+Because each day is its own bitmap, you can answer questions about *ranges* of days
+with bitwise operations, without storing anything extra.
+
+```ts
+// Weekly active users: OR the last 7 daily bitmaps together
+async function weeklyActiveUsers(days: string[]) {
+  if (days.length === 0) return 0;
+  const [first, ...rest] = days.map((d) => `active:${d}`);
+  await redis.bitop("or", "active:week", first, ...rest);
+  return redis.bitcount("active:week", 0, -1);
+}
+
+// Retention: users active on BOTH day A and day B
+async function retained(dayA: string, dayB: string) {
+  await redis.bitop("and", "tmp:retained", `active:${dayA}`, `active:${dayB}`);
+  return redis.bitcount("tmp:retained", 0, -1);
+}
+```
+
+`OR` gives you "active on any of these days", `AND` gives you "active on all of
+them", the building blocks of retention and funnel analysis. The same idea powers
+feature-adoption flags: keep a bitmap per feature and `AND` it against your active
+users to see adoption.
+
+### When this breaks down
+
+The catch is right there in the name: you have to **plan ahead**. A bitmap answers
+the one question you designed it for. The moment someone asks "okay, but how many of
+those users were on mobile, in Germany, on the new checkout flow?" you're stuck:
+that dimension was never recorded. You'd need to have created a separate bitmap for
+every combination in advance, which doesn't scale.
+
+That's where the second philosophy comes in.
+
+## Philosophy 2: Record events, query later
+
+Instead of deciding the questions up front, record each event as a document with
+whatever metadata you have on hand, index it with
+[Redis Search](https://upstash.com/docs/redis/search/introduction), and ask your
+questions *afterwards*.
+
+The flow is:
+
+1. Write each event as a JSON document under a known key prefix.
+2. Define a search index over that prefix once.
+3. Query and aggregate however you like (filters, ranges, group-bys) without
+   having planned for any specific question.
+
+### Define the index
+
+You define the index a single time. Redis Search then automatically picks up any
+key matching the prefix; there is no separate "insert into index" step.
+
+```ts
+import { Redis, s } from "@upstash/redis";
+
+const redis = Redis.fromEnv();
+
+const events = await redis.search.createIndex({
+  name: "events-idx",
+  prefix: "event:",
+  dataType: "json",
+  existsOk: true,            // don't throw if the index already exists
+  schema: s.object({
+    name: s.keyword(),       // "pageview", "signup", "purchase"
+    path: s.keyword(),       // "/pricing"
+    country: s.keyword(),    // "DE"
+    device: s.keyword(),     // "mobile"
+    amount: s.number("F64"), // for purchase events
+    ts: s.date(),
+  }),
+});
+```
+
+### Record events
+
+Events are just JSON written with a regular Redis command. The index picks them up
+on its own.
+
+```ts
+async function track(event: {
+  name: string;
+  path?: string;
+  country?: string;
+  device?: string;
+  amount?: number;
+}) {
+  const id = crypto.randomUUID();
+  await redis.json.set(`event:${id}`, "$", {
+    ...event,
+    ts: new Date().toISOString(),
+  });
+}
+
+await track({ name: "pageview", path: "/pricing", country: "DE", device: "mobile" });
+await track({ name: "purchase", amount: 49.0, country: "DE", device: "mobile" });
+```
+
+<Note>
+Indexing is asynchronous. In a long-running app you don't need to think about it,
+but in a tight loop, like a script or a test that writes events and immediately
+queries them, call `await events.waitIndexing()` first so the documents you just
+wrote are searchable:
+
+```ts
+await events.waitIndexing();
+```
+</Note>
+
+### Now ask anything
+
+Here's the payoff. None of these queries needed to be anticipated when you recorded
+the events.
+
+```ts
+// How many mobile pageviews from Germany?
+const { count } = await events.count({
+  filter: {
+    $and: [
+      { name: { $eq: "pageview" } },
+      { device: { $eq: "mobile" } },
+      { country: { $eq: "DE" } },
+    ],
+  },
+});
+
+// Total revenue and average order value, broken down by country
+const revenue = await events.aggregate({
+  filter: { name: { $eq: "purchase" } },
+  aggregations: {
+    by_country: {
+      $terms: { field: "country", size: 20 },
+      $aggs: {
+        total: { $avg: { field: "amount" } },
+        orders: { $count: { field: "amount" } },
+      },
+    },
+  },
+});
+
+// Top pages this week
+const topPages = await events.aggregate({
+  filter: { ts: { $gte: "2024-06-10T00:00:00Z" } }, // s.date() expects an RFC 3339 string
+  aggregations: {
+    pages: { $terms: { field: "path", size: 10 } },
+  },
+});
+```
+
+Filters, numeric ranges, date ranges, group-bys (`$terms`), histograms, facets,
+percentiles: all available, all decided at query time. See the
+[querying](https://upstash.com/docs/redis/search/querying) and
+[aggregating](https://upstash.com/docs/redis/search/aggregations) docs for the full
+set.
+
+## The complexity, and a PoC that hides it
+
+The event-recording approach is more flexible, but it does come with moving parts
+that the simple examples above gloss over:
+
+- **Schema management**: keeping the index schema in sync as your events evolve.
+- **Capturing events from the frontend**: you need an endpoint, batching, and a
+  client to send events without slowing down the page.
+- **Sessions and context**: tying events together and attaching shared metadata.
+- **Exploring the data**: a query API is not a dashboard.
+
+To explore how far this can be smoothed over, we built a proof-of-concept SDK,
+[**`@upstash/redis-analytics`**](https://github.com/upstash/redis-analytics), that packages these pieces:
+
+- A **ready-to-use React hook** that auto-creates a session and captures pageviews.
+- A single **backend endpoint** you drop into your app (e.g. a Next.js route).
+- **Middleware** hooks for resolving feature flags and attaching server-side context.
+- A **schema registry** that infers field types from your events and maintains the
+  Redis Search index for you.
+- An **admin dashboard** for exploring captured analytics.
+
+A minimal end-to-end wiring looks like this:
+
+```ts
+// lib/analytics.ts (backend client)
+import { AnalyticsBackendClient } from "@upstash/redis-analytics";
+
+export const analytics = new AnalyticsBackendClient({
+  redis: {
+    url: process.env.UPSTASH_REDIS_REST_URL!,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+  },
+});
+```
+
+```ts
+// app/api/analytics/route.ts (the single endpoint)
+import { analytics } from "@/lib/analytics";
+
+const handler = analytics.getHandler();
+export const POST = handler;
+export const GET = handler;
+```
+
+```tsx
+// frontend (the hook)
+"use client";
+import { createAnalyticsHook } from "@upstash/redis-analytics/react";
+
+const useAnalytics = createAnalyticsHook({ endpoint: "/api/analytics" });
+
+export function BuyButton() {
+  const { captureEvent, sessionId } = useAnalytics();
+  return (
+    <button
+      onClick={() =>
+        captureEvent({
+          sessionId: sessionId!,
+          eventName: "custom:purchase",
+          properties: { productId: "sku-1", amount: 42, currency: "USD" },
+        })
+      }
+    >
+      Buy
+    </button>
+  );
+}
+```
+
+## Which should you use?
+
+- Reach for **bitmaps and counters** when you have a short, stable list of metrics
+  you watch every day. They're nearly free and answer instantly.
+- Reach for **event recording with Redis Search** when you want to explore your data
+  and can't predict every question in advance.
+
+Both run on the Redis you already have. Start with whichever matches the questions
+you have today; you can always add the other later.
+</content>
+</invoke>
