@@ -277,10 +277,10 @@ export default function CompareTable() {
             </Tooltip>
           </th>
           <Col plan={showFree}>
-            <CompareValue>30 minutes</CompareValue>
+            <CompareValue>1 hour</CompareValue>
           </Col>
           <Col plan={showPayg} feature>
-            <CompareValue>1 hour</CompareValue>
+            <CompareValue>6 hours</CompareValue>
           </Col>
           <Col plan={showEnterprise}>
             <CompareValue>Custom</CompareValue>
