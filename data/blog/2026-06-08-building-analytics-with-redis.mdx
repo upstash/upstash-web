@@ -318,5 +318,16 @@ export function BuyButton() {
 
 Both run on the Redis you already have. Start with whichever matches the questions
 you have today; you can always add the other later.
-</content>
-</invoke>
+
+## Read more
+
+- [Agent Analytics](https://github.com/upstash/agent-analytics) applies the event-recording
+  approach from this post to a specific question: when do AI agents like Claude, ChatGPT, and
+  Perplexity cite or visit your site? It captures those requests through Next.js middleware,
+  logs them to Upstash Redis, and surfaces the traffic in a dashboard.
+- [Upstash Ratelimit](https://github.com/upstash/ratelimit-js) is a connectionless, HTTP-based
+  rate limiting library for serverless and edge. It's a good example of how the Redis counters
+  covered here power production features beyond analytics, tracking request counts per
+  identifier to enforce limits with algorithms like sliding window.
+
+
