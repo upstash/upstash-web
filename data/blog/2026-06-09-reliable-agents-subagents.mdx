@@ -162,14 +162,20 @@ agent validates the payload it receives.
 
 ## Watching it run
 
-Every step is a real workflow step, so you can stream what the agents are doing.
-The demo uses [Upstash Realtime](https://upstash.com/docs/workflow/howto/realtime/basic)
-to push each agent's plan, tool calls, and final answer to the browser as they
-happen, so you can watch the orchestrator hand off to the researcher and the
-writer. The UI is in the
-[example app](https://github.com/upstash/workflow-js/tree/main/examples/agent-workflows).
+A long agent run is opaque while it happens, so the demo streams it. Each agent's
+plan, tool calls, and final answer show up in the browser as they run.
 
 ![Live multi-agent run in the demo app](/blog/reliable-agents-subagents.png)
+
+This view comes from [Upstash Realtime](https://upstash.com/docs/realtime/overall/quickstart),
+backed by [Upstash Redis](https://upstash.com/docs/redis). A built-in `log` tool
+lets each agent post short notes, and a workflow middleware emits start, step, and
+finish events (see the
+[Workflow + Realtime guide](https://upstash.com/docs/workflow/howto/realtime/basic)).
+Both go to a channel named after the run id, so every agent shares one feed.
+Realtime keeps the events in Redis streams and pushes them to the browser over
+SSE, where a typed `useRealtime` hook renders them as they arrive. The UI is in
+the [example app](https://github.com/upstash/workflow-js/tree/main/examples/agent-workflows).
 
 ## What's next
 
