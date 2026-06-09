@@ -1,0 +1,150 @@
+---
+slug: box-ai-data-analyst
+title: "Build an AI Data Analyst with Upstash Box"
+authors: [alitarik]
+tags: [box, ai, devtools]
+description: "Drop a CSV into an isolated cloud container, let Claude write and run the Python analysis, download the charts, and ask follow-up questions. No infrastructure to manage."
+---
+
+150+ countries, 15 years of happiness data. We grabbed it from Kaggle, described the analysis we wanted, and had charts in minutes, without setting up a Python environment or installing anything locally.
+
+![Happiness score trends with confidence bands](/blog/box-ai-data-analyst/trends_with_bands.png)
+
+Top and bottom 5 countries by happiness score across 15 years, confidence bands included.
+
+---
+
+## Here's How
+
+We used the [World Happiness Report (2011–2025)](https://www.kaggle.com/datasets/elvisbui/world-happiness-report-2005-2025-panel) from Kaggle.
+[Create the box](https://upstash.com/docs/box/overall/quickstart) and upload the dataset:
+
+```typescript
+import "dotenv/config"
+import fs from "node:fs"
+import { Agent, Box, ClaudeCode } from "@upstash/box"
+
+const box = await Box.create({
+  runtime: "python",
+  agent: {
+    harness: Agent.ClaudeCode,
+    model: ClaudeCode.Sonnet_4_6,
+  },
+})
+
+const csv = fs.readFileSync("world_happiness_report_2005_2025.csv", "utf-8")
+
+await box.files.write({
+  path: "/workspace/home/happiness.csv",
+  content: csv,
+})
+```
+
+That's all the setup. The box is provisioned, the CSV is on its filesystem, and the agent is ready.
+
+---
+
+## The first analysis pass
+
+The prompt describes the columns, flags the missing data before 2019, and asks for three charts:
+
+```typescript
+const analysisPrompt = `
+You have the World Happiness Report dataset (2011–2025) at /workspace/home/happiness.csv.
+
+Columns: year, rank_in_year, country, happiness_score, lower_whisker, upper_whisker,
+explained_log_gdp_per_capita, explained_social_support, explained_healthy_life_expectancy,
+explained_freedom, explained_generosity, explained_corruption, dystopia_plus_residual.
+
+Note: the explained_* columns are empty for years before 2019 — handle that gracefully.
+
+Produce three charts and save each to /workspace/home/:
+
+1. trends.png — Line chart of happiness_score over time (2011–2025) for the
+   top 5 and bottom 5 countries by their 2025 happiness_score.
+2. ranking_2025.png — Horizontal bar chart of the top 15 and bottom 15 countries
+   by 2025 happiness_score.
+3. biggest_movers.png — Bar chart of the 10 countries with the largest rank
+   improvement and 10 with the largest rank decline since their first available year.
+`.trim()
+
+const run = await box.agent.run({ prompt: analysisPrompt })
+console.log(run.result)
+```
+
+The agent installs any missing packages, writes the scripts, runs them, and fixes any errors itself. When it's done, the three charts are on disk.
+
+Downloading them is a single read per file:
+
+```typescript
+for (const [remote, local] of [
+  ["/workspace/home/trends.png",         "happiness_trends.png"],
+  ["/workspace/home/ranking_2025.png",   "happiness_ranking_2025.png"],
+  ["/workspace/home/biggest_movers.png", "happiness_biggest_movers.png"],
+] as const) {
+  const b64 = await box.files.read(remote, { encoding: "base64" })
+  fs.writeFileSync(local, Buffer.from(b64, "base64"))
+}
+```
+
+Here's what came out.
+
+**Trends, top 5 and bottom 5 countries by 2025 score:**
+
+![Happiness score trends 2011–2025](/blog/box-ai-data-analyst/trends.png)
+
+Nordic countries dominate the top. Finland has held first place for years. Afghanistan drops to the bottom after 2021.
+
+**2025 rankings, top 15 and bottom 15:**
+
+![Happiest and least happy countries 2025](/blog/box-ai-data-analyst/ranking_2025.png)
+
+Finland leads at 7.764. Costa Rica is the only non-Nordic country in the top five. Afghanistan sits at 1.446, nearly two full points below the next lowest country.
+
+**Biggest rank movers since first year in the dataset:**
+
+![Countries with the biggest rank changes](/blog/box-ai-data-analyst/biggest_movers.png)
+
+Serbia climbed 88 positions, the biggest jump in the dataset. Most of the improvers are Eastern European and Balkan countries. Jordan fell 65 places; Venezuela, Myanmar, and Lebanon aren't far behind.
+
+---
+
+## The follow-up: multi-turn on the same container
+
+The CSV is already on disk. The three charts are already on disk. The second prompt just asks for a refinement:
+
+```typescript
+const followUpPrompt = `
+Re-open /workspace/home/trends.png.
+Add a shaded confidence band around each line using the lower_whisker and
+upper_whisker columns (alpha=0.15, same color as the line).
+Save the updated chart back to /workspace/home/trends.png.
+`.trim()
+
+const followUp = await box.agent.run({ prompt: followUpPrompt })
+```
+
+The agent finds both the CSV and the earlier chart already on disk and adds the bands.
+
+![Trends chart with confidence bands](/blog/box-ai-data-analyst/trends_with_bands.png)
+
+Finland's band is barely visible, consistent data for years. The bands widen for lower-ranked countries with shorter or patchier survey histories.
+
+---
+
+## Reconnecting later
+
+If you close your terminal and come back later, `Box.get()` wakes the paused container and resumes with the same files and installed packages:
+
+```typescript
+import "dotenv/config"
+import { Box } from "@upstash/box"
+
+const box = await Box.get(process.env.BOX_ID!)
+
+await box.agent.run({
+  prompt: "Filter trends.png to show only European countries and save as trends_europe.png.",
+})
+```
+
+Same pattern works for anything: revisit an analysis, try a different slice, refine a chart before sharing it.
