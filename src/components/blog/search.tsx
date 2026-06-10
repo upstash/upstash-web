@@ -67,7 +67,7 @@ export default function BlogSearch({ posts }: { posts: SearchPost[] }) {
 
       <section className="mt-6 text-left">
         {results.length > 0 ? (
-          <div className="grid gap-4 md:grid-cols-2 md:gap-8">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {results.map((post) => (
               <PostGridCard key={post.slug} data={post} />
             ))}

@@ -76,7 +76,7 @@ export default async function BlogPage({ params: { tag } }: Props) {
 
       <section>
         <Container>
-          <div className="grid gap-4 md:grid-cols-2 md:gap-8">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {postsWithTag.map((post: Post) => {
               return <PostGridCard key={post.slug} data={post} />;
             })}
