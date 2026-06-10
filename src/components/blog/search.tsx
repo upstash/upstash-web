@@ -33,7 +33,7 @@ export default function BlogSearch({ posts }: { posts: SearchPost[] }) {
   const isSearching = trimmed.length > 0;
   const results = isSearching
     ? fuse.search(trimmed).map((r) => r.item)
-    : posts.slice(0, 10);
+    : posts;
 
   return (
     <>
