@@ -7,7 +7,7 @@ import PageHeaderTitle from "@/components/page-header-title";
 import { BANNED_TAGS } from "@/utils/const";
 import { normalizeTag } from "@/utils/tags";
 import { countBy, flatten, omit } from "lodash";
-import { getData } from "./utils/helpers";
+import { extractExcerpt, getData } from "./utils/helpers";
 
 export default async function BlogPage() {
   const posts = await getData();
@@ -19,13 +19,14 @@ export default async function BlogPage() {
   const tags = Object.entries(_tags).sort((a, b) => b[1] - a[1]);
 
   const searchPosts = posts.map(
-    ({ slug, title, description, tags, date, authorsData }) => ({
+    ({ slug, title, description, tags, date, authorsData, content }) => ({
       slug,
       title,
       description,
       tags,
       date,
       authorsData,
+      excerpt: description ? undefined : extractExcerpt(content),
     }),
   );
 
