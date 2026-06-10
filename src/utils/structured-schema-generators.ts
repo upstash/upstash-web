@@ -60,6 +60,57 @@ export const generateBlogSchema = ({
   return JSON.stringify(jsonLd);
 };
 
+export const generateBlogListSchema = ({
+  url,
+  name,
+  description,
+  posts,
+}: {
+  url: string;
+  name: string;
+  description: string;
+  posts: {
+    title: string;
+    url: string;
+    datePublished: string;
+    description: string;
+    authors?: string[];
+  }[];
+}) => {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "@id": `${url}#blog`,
+    url,
+    name,
+    description,
+    inLanguage: "en",
+    publisher: {
+      "@type": "Organization",
+      "@id": "https://upstash.com/#org",
+      name: "Upstash",
+      url: "https://upstash.com",
+    },
+    blogPost: posts.map((post) => ({
+      "@type": "BlogPosting",
+      headline: post.title,
+      url: post.url,
+      datePublished: post.datePublished,
+      description: post.description,
+      ...(post.authors && post.authors.length > 0
+        ? {
+            author: post.authors.map((authorName) => ({
+              "@type": "Person",
+              name: authorName,
+            })),
+          }
+        : {}),
+    })),
+  };
+
+  return JSON.stringify(jsonLd);
+};
+
 export const generateBreadcrumbSchema = ({
   items,
 }: {
