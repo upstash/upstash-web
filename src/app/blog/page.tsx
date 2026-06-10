@@ -1,46 +1,52 @@
-import PostCard from "@/components/blog/post-card";
+import Bg from "@/components/bg";
+import PopularTag from "@/components/blog/popular-tag";
+import BlogSearch from "@/components/blog/search";
 import Container from "@/components/container";
-import { extractExcerpt, getData } from "./utils/helpers";
-
-const COLS = 3;
+import PageHeaderDesc from "@/components/page-header-desc";
+import PageHeaderTitle from "@/components/page-header-title";
+import { BANNED_TAGS } from "@/utils/const";
+import { normalizeTag } from "@/utils/tags";
+import { countBy, flatten, omit } from "lodash";
+import { getData } from "./utils/helpers";
 
 export default async function BlogPage() {
   const posts = await getData();
-  const fillers = (COLS - (posts.length % COLS)) % COLS;
+
+  const _tags = omit(
+    countBy(flatten(posts.map((post) => post.tags.map(normalizeTag)))),
+    BANNED_TAGS.map(normalizeTag),
+  );
+  const tags = Object.entries(_tags).sort((a, b) => b[1] - a[1]);
+
+  const searchPosts = posts.map(
+    ({ slug, title, description, tags, date, authorsData }) => ({
+      slug,
+      title,
+      description,
+      tags,
+      date,
+      authorsData,
+    }),
+  );
 
   return (
     <main className="relative z-0">
-      <Container className="pt-16 md:pt-24">
-        <div className="w-fit py-10 pl-7 pr-10 text-text md:pl-10 md:pr-20">
-          <h1 className="font-display text-4xl font-semibold leading-[1.1] tracking-tight md:text-5xl">
-            Latest blog articles.
-          </h1>
-        </div>
+      <Bg />
 
-        <div className="bg-emerald-950/10 p-px dark:bg-white/10">
-          <div className="grid gap-px md:grid-cols-2 lg:grid-cols-3">
-            {posts.map((post) => (
-              <PostCard
-                key={post.slug}
-                data={{
-                  slug: post.slug,
-                  title: post.title,
-                  tags: post.tags,
-                  date: post.date,
-                  authorsData: post.authorsData,
-                  description: post.description,
-                  excerpt: post.description
-                    ? undefined
-                    : extractExcerpt(post.content),
-                }}
-              />
-            ))}
-            {Array.from({ length: fillers }).map((_, i) => (
-              <div key={`filler-${i}`} className="bg-bg" aria-hidden />
-            ))}
+      <header className="pt-10 text-center md:pt-20">
+        <Container>
+          <PageHeaderTitle>Blog</PageHeaderTitle>
+          <PageHeaderDesc className="mt-2">
+            Articles and tutorials from Upstash and community.
+          </PageHeaderDesc>
+
+          <div className="mt-10">
+            <PopularTag data={tags.slice(0, 12)} />
           </div>
-        </div>
-      </Container>
+
+          <BlogSearch posts={searchPosts} />
+        </Container>
+      </header>
     </main>
   );
 }

@@ -9,6 +9,7 @@ import { createPortal } from "react-dom";
 import ExpandableCode from "./expandable-code";
 import PostNote from "./note";
 import PostSummary from "./summary";
+import PostTOC from "./toc";
 import { MuxVideoPlayer } from "./mux-video-player";
 import { Frame } from "./frame";
 
@@ -263,17 +264,12 @@ function Highlight(props: {
   );
 }
 
-function NavOrNull(props: ComponentProps<"nav">) {
-  if (props.className?.includes("toc")) return null;
-  return <nav {...props} />;
-}
-
 const components = {
   table,
   img,
   FullWidth,
   Highlight,
-  nav: NavOrNull,
+  nav: PostTOC,
   Note: PostNote,
   Summary: PostSummary,
   ExpandableCode,

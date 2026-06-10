@@ -1,4 +1,7 @@
+import Bg from "@/components/bg";
 import Container from "@/components/container";
+import PageBodyGradient from "@/components/page-body-gradient";
+import Clap from "@/components/post/claps";
 import PostHeader from "@/components/post/header";
 import { Mdx } from "@/components/post/mdx";
 import OtherPostCard from "@/components/post/other-post";
@@ -107,10 +110,16 @@ export default async function BlogPage({ params }: Props) {
           __html: structuredBreadcrumbSchema,
         }}
       />
+      <Bg />
+
       <article>
+        {/* Header */}
         <PostHeader post={post} />
 
-        <div className="relative z-0 pt-12 md:pt-16">
+        {/* Body */}
+        <div className="relative z-0 pt-10">
+          <PageBodyGradient isBlogPage />
+
           <Container className="max-w-screen-md">
             <Mdx code={post.mdx} />
 
@@ -124,6 +133,9 @@ export default async function BlogPage({ params }: Props) {
             </div>
           </Container>
         </div>
+
+        {/* Claps */}
+        <Clap tweet={post.tweet} />
       </article>
     </main>
   );
