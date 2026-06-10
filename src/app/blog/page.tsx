@@ -4,10 +4,11 @@ import BlogSearch from "@/components/blog/search";
 import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
-import { BANNED_TAGS } from "@/utils/const";
+import { BANNED_TAGS, SITE_URL } from "@/utils/const";
+import { generateBlogListSchema } from "@/utils/structured-schema-generators";
 import { normalizeTag } from "@/utils/tags";
 import { countBy, flatten, omit } from "lodash";
-import { getData } from "./utils/helpers";
+import { extractExcerpt, getData } from "./utils/helpers";
 
 export default async function BlogPage() {
   const posts = await getData();
@@ -29,8 +30,30 @@ export default async function BlogPage() {
     }),
   );
 
+  // Expose each post's description to crawlers via structured data (not visible
+  // in the UI). Falls back to an auto-generated excerpt when a post has no
+  // frontmatter description.
+  const structuredBlogListSchema = generateBlogListSchema({
+    url: `${SITE_URL}/blog`,
+    name: "Upstash Blog",
+    description: "Articles and tutorials from Upstash and community.",
+    posts: posts.map((post) => ({
+      title: post.title,
+      url: `${SITE_URL}/blog/${post.slug}`,
+      datePublished: new Date(post.publishedAt ?? post.date).toISOString(),
+      description: post.description || extractExcerpt(post.content),
+      authors: post.authorsData.map((author) => author.name),
+    })),
+  });
+
   return (
     <main className="relative z-0">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: structuredBlogListSchema,
+        }}
+      />
       <Bg />
 
       <header className="pt-10 text-center md:pt-20">
