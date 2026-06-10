@@ -2,6 +2,7 @@ import Bg from "@/components/bg";
 import PostGridCard from "@/components/blog/grid-item";
 import Container from "@/components/container";
 import PageHeaderTitle from "@/components/page-header-title";
+import { authors } from "@/utils/authors";
 import type { Post } from "@content";
 import { uniq } from "lodash";
 import Link from "next/link";
@@ -24,21 +25,22 @@ export async function generateMetadata({
 }: {
   params: Props["params"];
 }) {
-  const description = `Read all blog posts by ${params.author} on the Upstash blog. Tutorials, guides, and insights on serverless technologies.`;
+  const displayName = authors[params.author]?.name ?? params.author;
+  const description = `Read all blog posts by ${displayName} on the Upstash blog. Tutorials, guides, and insights on serverless technologies.`;
   return {
-    title: `${params.author}'s Posts`,
+    title: `${displayName}'s Posts`,
     description,
     alternates: {
       canonical: `/blog/author/${params.author}`,
     },
     openGraph: {
-      title: `${params.author}'s Posts | Upstash Blog`,
+      title: `${displayName}'s Posts | Upstash Blog`,
       description,
       url: `/blog/author/${params.author}`,
     },
     twitter: {
       card: "summary_large_image",
-      title: `${params.author}'s Posts | Upstash Blog`,
+      title: `${displayName}'s Posts | Upstash Blog`,
       description,
     },
   };
