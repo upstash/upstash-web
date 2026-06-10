@@ -1,0 +1,313 @@
+---
+slug: agent-incident-workflow
+title: "Automating Incident Triage with the Upstash Workflow Agents API"
+authors:
+  - mehmettokgoz
+tags: [workflow, qstash, agents, ai, grafana, nextjs]
+---
+
+In this blog post, I will build an incident research agent that does the first pass of alert triage automatically, using the Upstash Workflow Agents API, Grafana, and OpenAI on Next.js.
+
+When an alert fires, the on-call engineer does the same dance every time: open the Grafana panel, zoom into the alert window, jump to the logging provider, filter errors by service and time range, check what shipped recently, and skim the code path the stack traces point at. None of this requires much creativity. It's a process that can be automated to help engineers decide faster, especially on systems under high load.
+
+That dance is a good fit for an LLM agent with tools. By the end of this post, a Grafana alert webhook will kick off a workflow that posts a root-cause hypothesis with evidence to Slack, often before a human has opened a dashboard.
+
+Incident triage is just the example here. Nothing in the structure is specific to alerts: a webhook trigger, a set of tools, and an agent task running as durable steps adapt to any agentic use case you want to run reliably in production.
+
+## Project Description
+
+The whole thing is a single workflow with three phases:
+
+1. Gather the initial evidence in parallel: a metrics snapshot from Grafana, error logs from the logging provider (I'll use Humio), and recent deploys from GitHub.
+2. Run a researcher agent that has Grafana, Humio, and GitHub as tools, and let it iterate until it reaches a conclusion.
+3. Post the resulting report to the incident Slack channel.
+
+The point I want to get across is how little orchestration code this takes. An investigation like this is an agent loop made of slow, flaky calls: each iteration is an LLM call plus one or more API calls to Grafana, Humio, or GitHub. Written as a plain API route, you'd need a queue for the long-running parts, retry bookkeeping for every external call, and after all that you'd still hit the serverless timeout on a thorough run.
+
+Written as an Upstash workflow, the endpoint stays a regular Next.js route and all of that comes built in. There's no queue to operate, no scheduler, and no state machine to write. The orchestration is the code you'd naturally write anyway, made durable.
+
+## The Workflow Agents API
+
+The part I don't want to write by hand is the agent loop itself: call the model, let it pick a tool, execute the tool, feed the result back, repeat until the model produces an answer. The Workflow Agents API (a separate package, `@upstash/workflow-agents`) does exactly this. Here is the smallest complete example, a workflow endpoint with a single Wikipedia-equipped agent:
+
+```typescript
+// app/api/research/route.ts
+import { serve } from "@upstash/workflow/nextjs";
+import { agentWorkflow } from "@upstash/workflow-agents";
+import { WikipediaQueryRun } from "@langchain/community/tools/wikipedia_query_run";
+
+export const { POST } = serve<{ topic: string }>(async (context) => {
+  const agents = agentWorkflow(context);
+  const model = agents.openai("gpt-4o");
+
+  const researcher = agents.agent({
+    model,
+    name: "researcher",
+    maxSteps: 5,
+    background: "You are a research agent. Use Wikipedia to verify facts.",
+    tools: {
+      wikiTool: new WikipediaQueryRun({ topKResults: 1 }),
+    },
+  });
+
+  const { text } = await agents
+    .task({ agent: researcher, prompt: `Summarize: ${context.requestPayload.topic}` })
+    .run();
+
+  await context.run("log-result", () => console.log(text));
+});
+```
+
+Three calls to know:
+
+- `agentWorkflow(context)` plugs the Agents API into the workflow's context.
+- `agents.agent()` defines the agent: a model, a `background` string used as the system prompt, a `tools` map (AI SDK or LangChain tools), and a `maxSteps` cap on how many LLM calls it may make.
+- `agents.task()` pairs the agent with a prompt, and `.run()` drives the loop until the agent returns its answer as `text`.
+
+What makes this durable: every LLM call goes through `context.call`, so Upstash Workflow performs the request to OpenAI and your function isn't running while the model thinks. Every tool's `execute` runs inside a `context.run` step, so its result is persisted the moment it completes. The tool body itself stays ordinary code, a plain `fetch` or a database query; the step wrapping happens around it.
+
+A task can also run several agents at once, with a manager LLM delegating between them as if each agent were a tool. A single researcher is enough for this post.
+
+## Setting up the Project
+
+Create a Next.js application and install the dependencies:
+
+```bash
+npx create-next-app@latest incident-researcher
+cd incident-researcher
+npm install @upstash/workflow @upstash/workflow-agents ai zod
+```
+
+Then grab your QStash token from the [Upstash Console](https://console.upstash.com/qstash) and configure the environment:
+
+```bash
+# .env.local
+QSTASH_TOKEN=...
+OPENAI_API_KEY=...
+GRAFANA_URL=...
+GRAFANA_TOKEN=...
+HUMIO_URL=...
+HUMIO_TOKEN=...
+GITHUB_TOKEN=...
+SLACK_WEBHOOK_URL=...
+APP_URL=https://your-app.vercel.app
+```
+
+## The Investigation Tools
+
+The tools are the same ones a human would reach for during triage: run a follow-up metrics query, refine the log search, search the code, read a file, and diff recent changes. They're plain AI SDK tools, defined at module level in the route file, above the handler we'll write in the next section. The helpers they call (`grafanaQuery`, `humioSearch`, and friends) are thin fetch wrappers around each provider's HTTP API, so I'll leave them out of the post.
+
+The first tool lets the agent slice the alerting metric however it wants, for example breaking a latency spike down by handler or pod:
+
+```typescript
+const queryMetrics = tool({
+  description:
+    "Run a follow-up PromQL query through Grafana, e.g. to break a " +
+    "latency spike down by handler or pod.",
+  parameters: z.object({ query: z.string(), from: z.string(), to: z.string() }),
+  execute: async (args) => grafanaQuery(args),
+});
+```
+
+The log tool lets it go beyond the initial snapshot: new filters, wider time windows, or correlating by trace ID. It returns aggregated error signatures and bounded samples, never raw dumps:
+
+```typescript
+const searchLogs = tool({
+  description:
+    "Search Humio for log events. Refine with new filters, wider time " +
+    "windows, or correlation by trace/request ID. Returns aggregated " +
+    "error signatures plus bounded samples.",
+  parameters: z.object({ queryString: z.string(), start: z.string(), end: z.string() }),
+  execute: async (args) => humioSearch(args),
+});
+```
+
+The last three give the agent eyes on the codebase: search for a symbol or error string from the stack traces, read the suspect file, and diff what changed around it recently.
+
+```typescript
+const searchCode = tool({
+  description: "Search the GitHub repository for a symbol, route, or error string.",
+  parameters: z.object({ query: z.string() }),
+  execute: async ({ query }) => githubCodeSearch(query),
+});
+
+const readFile = tool({
+  description: "Read a file (or line range) from the repository.",
+  parameters: z.object({
+    path: z.string(),
+    startLine: z.number().optional(),
+    endLine: z.number().optional(),
+  }),
+  execute: async (args) => githubReadFile(args),
+});
+
+const listRecentChanges = tool({
+  description: "Diff or blame around a file since a given time.",
+  parameters: z.object({ path: z.string(), since: z.string() }),
+  execute: async (args) => githubCompare(args),
+});
+```
+
+When the agent runs, each `execute` is wrapped in a `context.run` step automatically, so every tool call is retried on failure and memoized once it succeeds. Tool failures don't kill the run either: if a Humio query fails permanently after its retries, the error is returned to the agent as a tool result, and the agent can route around it, for example by narrowing the query or relying on the metrics instead.
+
+## The Investigation Workflow
+
+The workflow itself is an HTTP endpoint that receives the alert as `context.requestPayload` and walks through the four steps: gather evidence, define the agent, run the investigation, post the report. Here it is in full, with the five tools from the previous section sitting above it in the same file:
+
+```typescript
+// app/api/incident-researcher/route.ts
+import { serve } from "@upstash/workflow/nextjs";
+import { agentWorkflow } from "@upstash/workflow-agents";
+import { tool } from "ai";
+import { z } from "zod";
+import { queryAlertPanels, grafanaQuery } from "@/lib/grafana";
+import { humioSearch } from "@/lib/humio";
+import { githubCodeSearch, githubReadFile, githubCompare, recentDeploys } from "@/lib/github";
+import { postReport } from "@/lib/slack";
+
+type GrafanaAlert = {
+  fingerprint: string;
+  alertName: string;
+  labels: Record<string, string>;
+  annotations: Record<string, string>;
+  startsAt: string;
+  generatorURL: string;
+};
+
+// ... the five tool definitions from the previous section ...
+
+export const { POST } = serve<GrafanaAlert>(async (context) => {
+  const alert = context.requestPayload;
+  const service = alert.labels.service;
+
+  // 👇 Step 1: gather the initial evidence in parallel
+  const [metrics, logs, deploys] = await Promise.all([
+    context.run("grafana-snapshot", () => queryAlertPanels(alert)),
+    context.run("humio-snapshot", () => humioSearch({ service, around: alert.startsAt })),
+    context.run("recent-deploys", () => recentDeploys(service, alert.startsAt)),
+  ]);
+
+  // 👇 Step 2: define the researcher agent
+  const agents = agentWorkflow(context);
+  const model = agents.openai("gpt-4o");
+
+  const researcher = agents.agent({
+    model,
+    name: "incident-researcher",
+    maxSteps: 10,
+    background:
+      "You are an SRE investigating a production alert. Form a hypothesis, " +
+      "use the tools to test it, and refine until you can explain the alert " +
+      "or rule out the likely causes. Every claim in your final report must " +
+      "cite concrete evidence: a query, a log line, or a commit. Anything " +
+      "you cannot back up, label as speculation. Finish with a confidence " +
+      "level, what you ruled out, and suggested next actions.",
+    tools: { queryMetrics, searchLogs, searchCode, readFile, listRecentChanges },
+  });
+
+  // 👇 Step 3: run the investigation
+  const { text: report } = await agents
+    .task({
+      agent: researcher,
+      prompt: `Alert "${alert.alertName}" fired at ${alert.startsAt} for service "${service}".
+        Annotations: ${JSON.stringify(alert.annotations)}
+        Dashboard: ${alert.generatorURL}
+
+        Initial evidence already gathered:
+        Metrics snapshot: ${JSON.stringify(metrics)}
+        Log error signatures: ${JSON.stringify(logs)}
+        Deploys and merged PRs since shortly before the alert: ${JSON.stringify(deploys)}
+
+        Investigate the root cause.`,
+    })
+    .run();
+
+  // 👇 Step 4: post the report to the incident channel
+  await context.run("post-report", () => postReport(alert, report));
+});
+```
+
+Step by step:
+
+1. The three evidence pulls are `context.run` steps awaited with `Promise.all`, so they run in parallel and each result is saved on its own. `humioSearch` returns error signatures and a few sample stack traces rather than raw logs, which keeps the agent's context small.
+2. The agent is the model, the `background` prompt that sets the investigation style, and the tools from the previous section. `maxSteps: 10` stops an agent that goes down a rabbit hole after ten LLM calls.
+3. The prompt includes the evidence we already gathered, so the agent doesn't waste its first tool calls re-fetching it. `task.run()` drives the loop, and every LLM call and tool execution shows up in the Upstash Console as its own step, retried on its own if it fails.
+4. A final `context.run` step posts the report to Slack, and the run is done.
+
+## The Trigger Endpoint
+
+The last piece is connecting Grafana. A Grafana webhook contact point sends a batch of alerts to a URL you configure, and that URL is a regular Next.js route that triggers the workflow through the Workflow client.
+
+The interesting part is the `workflowRunId`. Grafana re-fires flapping alerts and retries webhooks, but every firing of the same alert carries the same fingerprint. By deriving the run ID from the fingerprint, a duplicate trigger while an investigation is in progress is rejected by QStash, and we get exactly one investigation per alert for free:
+
+```typescript
+// app/api/alerts/grafana/route.ts
+import { Client } from "@upstash/workflow";
+import { NextResponse } from "next/server";
+
+const client = new Client({ token: process.env.QSTASH_TOKEN! });
+
+export async function POST(request: Request) {
+  const payload = await request.json();
+
+  if (payload.status !== "firing") {
+    return NextResponse.json({ ok: true });
+  }
+
+  for (const alert of payload.alerts) {
+    await client.trigger({
+      url: `${process.env.APP_URL}/api/incident-researcher`,
+      body: {
+        fingerprint: alert.fingerprint,
+        alertName: alert.labels.alertname,
+        labels: alert.labels,
+        annotations: alert.annotations,
+        startsAt: alert.startsAt,
+        generatorURL: alert.generatorURL,
+      },
+      workflowRunId: `incident-${alert.fingerprint}`,
+      retries: 3,
+    });
+  }
+
+  return NextResponse.json({ ok: true });
+}
+```
+
+## Testing It Locally
+
+You don't need to deploy to try this out. Upstash Workflow SDK comes with a built-in local development server.
+
+```bash
+QSTASH_DEV=true
+```
+
+Run `npm run dev` and POST a fake alert to the trigger endpoint:
+
+```bash
+curl -X POST http://localhost:3000/api/alerts/grafana \
+  -H "Content-Type: application/json" \
+  -d '{
+    "status": "firing",
+    "alerts": [{
+      "fingerprint": "a1b2c3d4",
+      "labels": { "alertname": "CheckoutAPILatencyHigh", "service": "checkout-api" },
+      "annotations": { "summary": "p99 latency > 2s for 10m" },
+      "startsAt": "2026-06-17T14:32:00Z",
+      "generatorURL": "https://grafana.acme.com/d/abc123?viewPanel=4"
+    }]
+  }'
+```
+
+Then open the Workflow tab in the Upstash Console and watch the run: the three evidence steps, the agent's turns and tool calls one by one, and the Slack post at the end.
+
+## Final Words and Project Improvements
+
+We built an incident researcher that does the mechanical first pass of triage on its own: it gathers evidence, iterates with the same tools an on-call engineer would use, and posts a hypothesis with citations to Slack, all as durable steps that survive timeouts, rate limits, and redeploys. Two directions are worth exploring from here:
+
+- Follow-up agents. A task can run multiple agents, so a second agent could verify the researcher's report against the evidence, or draft the revert PR once a suspect commit is named.
+- Human-in-the-loop input. `context.waitForEvent` pauses the run until a human responds, so a "dig deeper into X" reply in Slack can resume the investigation hours later, and risky actions like a rollback can wait for explicit approval.
+
+And as I said at the start, none of this is specific to incident triage. A trigger, a set of tools, and agent tasks running as durable steps carry over to any agentic workflow you want to run reliably in production. Take the skeleton and swap the tools.
+
+Thanks for reading. If you have any questions or feedback, you can reach us on [Discord](https://upstash.com/discord) or [Twitter](https://twitter.com/upstash).
