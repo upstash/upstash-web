@@ -1,0 +1,202 @@
+---
+slug: reliable-agents-subagents
+title: "Orchestrating Reliable Agents on Upstash Workflow"
+authors: [arda]
+tags: [workflow, agents, llm, qstash, ai-sdk]
+description: "Run durable AI agents on Upstash Workflow with @upstash/workflow-agents, then keep their payloads and token usage in check by splitting work across subagents with an orchestrator-worker setup."
+---
+
+An AI agent is a loop. It calls a model, runs a tool, feeds the result back, and
+calls the model again. The loop is quick to prototype and awkward to run
+reliably on serverless, and it gets more expensive the longer it runs. This post
+covers how [Upstash Workflow](https://upstash.com/docs/workflow) makes that loop
+durable, and how subagents keep it from getting expensive.
+
+There is a working demo behind everything below:
+[`examples/agent-workflows`](https://github.com/upstash/workflow-js/tree/main/examples/agent-workflows)
+in the workflow-js repo.
+
+## Why Upstash Workflow for agents
+
+A multi-agent run has two failure modes on serverless. It can take longer than a
+function is allowed to run, since a multi-step agent often needs minutes while
+functions are measured in seconds. And any single step can fail on a transient
+provider error or a rate limit, which loses the whole run.
+
+[Upstash Workflow](https://upstash.com/docs/workflow) turns the loop into a set
+of checkpointed steps that [QStash](https://upstash.com/docs/qstash) orchestrates.
+Each step you wrap survives across invocations, so the loop is never held open
+inside one function call:
+
+- [`context.run`](https://upstash.com/docs/workflow/steps/run) executes a piece
+  of work once and stores its result. On a retry or resume it replays the stored
+  value instead of running again.
+- [`context.call`](https://upstash.com/docs/workflow/steps/call) hands an HTTP
+  request, such as the call to your model provider, to QStash. Your function
+  returns right away. QStash makes the request, applies retries, timeouts, and
+  [flow control](https://upstash.com/docs/workflow/agents/features), then calls
+  you back with the response. The model call stops counting against your
+  function's runtime, and rate limits become a setting rather than an incident.
+
+So you get agents that resume after failures, avoid function timeouts, and stay
+within provider rate limits, without writing that logic yourself.
+
+## @upstash/workflow-agents
+
+You do not have to wire those primitives into an agent by hand.
+[`@upstash/workflow-agents`](https://www.npmjs.com/package/@upstash/workflow-agents)
+([source](https://github.com/upstash/workflow-agents-js)) takes the
+[AI SDK](https://ai-sdk.dev/) and makes it durable.
+
+The mechanism is small. The package keeps the AI SDK's `generateText` loop, but
+it overrides the model's `fetch` so each model request goes through
+[`context.call`](https://upstash.com/docs/workflow/steps/call), and it wraps each
+tool's `execute` in [`context.run`](https://upstash.com/docs/workflow/steps/run).
+Your model calls and tool executions become durable steps, and you still write
+the agent the way you would with the AI SDK: a model, a system prompt, and a set
+of [tools](https://ai-sdk.dev/docs/foundations/tools).
+
+## The thread keeps growing
+
+Several users reported the same problem. An agent's state is its message history,
+and that history grows with every turn. Because each model call replays the whole
+conversation, two costs climb together as the agent works.
+
+The first is bandwidth. Each durable step carries the accumulated messages
+through QStash, so a longer history means larger workflow payloads on every step.
+The second is tokens. Every model call re-sends the full transcript as input, so
+a twelve-step agent pays for its early messages a dozen times.
+
+For one agent doing one focused job this is fine. It becomes a problem when you
+ask a single agent to research, reason, and write, because its context grows on
+each step and you pay for that growth on every step that follows.
+
+## Subagents and the orchestrator-worker setup
+
+The fix is to split the work instead of holding it in one thread. A small
+orchestrator hands self-contained subtasks to workers, and each worker runs in
+its own context and returns a short result. The orchestrator never sees a
+worker's intermediate reasoning, only its answer, so the main thread stays small.
+
+This is the
+[orchestrator-workers pattern](https://upstash.com/docs/workflow/agents/patterns/orchestrator-workers),
+and it fits Workflow directly. Each agent is its own workflow, and the
+orchestrator delegates with
+[`context.invoke`](https://upstash.com/docs/workflow/features/invoke). A worker's
+long transcript stays inside the worker's own run. It never enters the
+orchestrator's payloads or token count.
+
+## serveAgents
+
+Workflow already lets you serve several workflows from one endpoint with
+[`serveMany`](https://upstash.com/docs/workflow/features/invoke/serveMany). In the
+demo we wrapped it in a small SDK, `defineAgent` and `serveAgents`, so a
+multi-agent system reads like configuration.
+
+You define each agent with its input schema and the agents it may delegate to:
+
+```ts
+const researcher = defineAgent({
+  name: "researcher",
+  description: "Gathers key facts about a topic.",
+  input: z.object({ topic: z.string() }),
+  background: "You are a thorough research assistant…",
+});
+
+const writer = defineAgent({
+  name: "writer",
+  description: "Turns research notes into polished prose.",
+  input: z.object({ brief: z.string() }),
+  background: "You are a skilled writer…",
+});
+
+const orchestrator = defineAgent({
+  name: "orchestrator",
+  description: "Coordinates research and writing.",
+  input: z.object({ request: z.string() }),
+  background: "Delegate to the researcher, then the writer…",
+  subagents: [researcher, writer], // become typed context.invoke tools
+});
+```
+
+`defineAgent` wraps
+[`createWorkflow`](https://upstash.com/docs/workflow/features/invoke/serveMany)
+and the agents runtime, and it turns each entry in `subagents` into a tool that
+delegates through `context.invoke`. You then serve all of them from one route:
+
+```ts
+export const { POST, trigger } = serveAgents({
+  baseUrl: "https://your-app.com/api/agents",
+  agents: [orchestrator, researcher, writer],
+});
+```
+
+One `serveAgents` call gives you a single endpoint where each agent is
+addressable by name and agents can invoke each other. It is what `serveMany`
+already does, written in terms of agents.
+
+## A type-safe trigger
+
+You normally start a workflow with
+[`client.trigger`](https://upstash.com/docs/workflow/basics/client/trigger), which
+takes a URL and an untyped body. Nothing stops you from triggering the wrong
+route or sending the wrong shape.
+
+`serveAgents` returns a `trigger` function that closes that gap. It accepts only
+known agent names, and it validates the input against that agent's
+[Zod](https://zod.dev) schema, at compile time and again at runtime, before
+dispatching:
+
+```ts
+// name is checked, { request } is validated against the orchestrator's schema
+const { workflowRunId } = await trigger("orchestrator", {
+  request: "Explain why the sky is blue.",
+});
+
+// caught at compile time: unknown agent and wrong input shape
+await trigger("orchstrator", { topik: "..." });
+```
+
+The same schema guards both ends. The caller validates before sending, and the
+agent validates the payload it receives.
+
+## Watching it run
+
+A long agent run is opaque while it happens, so the demo streams it. Each agent's
+plan, tool calls, and final answer show up in the browser as they run.
+
+![Live multi-agent run in the demo app](/blog/reliable-agents-subagents.png)
+
+This view comes from [Upstash Realtime](https://upstash.com/docs/realtime/overall/quickstart),
+backed by [Upstash Redis](https://upstash.com/docs/redis). A built-in `log` tool
+lets each agent post short notes, and a workflow middleware emits start, step, and
+finish events (see the
+[Workflow + Realtime guide](https://upstash.com/docs/workflow/howto/realtime/basic)).
+Both go to a channel named after the run id, so every agent shares one feed.
+Realtime keeps the events in Redis streams and pushes them to the browser over
+SSE, where a typed `useRealtime` hook renders them as they arrive. The UI is in
+the [example app](https://github.com/upstash/workflow-js/tree/main/examples/agent-workflows).
+
+## What's next
+
+`defineAgent` and `serveAgents` live in the
+[example repo](https://github.com/upstash/workflow-js/tree/main/examples/agent-workflows)
+for now. They are a thin layer over
+[`@upstash/workflow-agents`](https://www.npmjs.com/package/@upstash/workflow-agents)
+and [`serveMany`](https://upstash.com/docs/workflow/features/invoke/serveMany)
+that you can copy into your own app today. They also point at two changes we are
+considering: an agent-oriented API in the
+[workflow-agents](https://github.com/upstash/workflow-agents-js) package, and the
+type-safe trigger pattern in the core
+[Workflow](https://upstash.com/docs/workflow) package, so that
+[`client.trigger`](https://upstash.com/docs/workflow/basics/client/trigger) and
+`serveMany` get the same checks.
+
+## Links
+
+- Demo: [examples/agent-workflows](https://github.com/upstash/workflow-js/tree/main/examples/agent-workflows)
+- Package: [`@upstash/workflow-agents`](https://www.npmjs.com/package/@upstash/workflow-agents)
+- Patterns: [orchestrator-workers](https://upstash.com/docs/workflow/agents/patterns/orchestrator-workers),
+  [serveMany](https://upstash.com/docs/workflow/features/invoke/serveMany)
+- Steps: [context.run](https://upstash.com/docs/workflow/steps/run),
+  [context.call](https://upstash.com/docs/workflow/steps/call)
