@@ -10,3 +10,6 @@ onlyBuiltDependencies:
   - node-read-yaml
   - sharp
 trustPolicy: no-downgrade
+trustPolicyExclude:
+  - 'semver'
+  - 'undici-types@6.20.0'
