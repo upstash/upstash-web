@@ -17,7 +17,15 @@ export default async function BlogPage() {
     countBy(flatten(posts.map((post) => post.tags.map(normalizeTag)))),
     BANNED_TAGS.map(normalizeTag),
   );
-  const tags = Object.entries(_tags).sort((a, b) => b[1] - a[1]);
+  const sortedTags = Object.entries(_tags).sort((a, b) => b[1] - a[1]);
+
+  // Always surface "context7" among the popular tags, even if its post count
+  // would otherwise place it outside the displayed top tags.
+  const PINNED_TAG = "context7";
+  const tags = [
+    ...sortedTags.filter(([tag]) => tag !== PINNED_TAG).slice(0, 12),
+    ...sortedTags.filter(([tag]) => tag === PINNED_TAG),
+  ];
 
   const searchPosts = posts.map(
     ({ slug, title, description, tags, date, authorsData }) => ({
@@ -64,7 +72,7 @@ export default async function BlogPage() {
           </PageHeaderDesc>
 
           <div className="mt-10">
-            <PopularTag data={tags.slice(0, 12)} />
+            <PopularTag data={tags} />
           </div>
 
           <BlogSearch posts={searchPosts} />
