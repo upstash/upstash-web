@@ -1,0 +1,234 @@
+---
+title: "How Upstash Redis Runs More Commands in Parallel"
+slug: redis-key-based-locking
+authors: [mehmet]
+tags: [redis, serverless]
+description: "A look at how Upstash Redis uses key-based locking to run independent commands in parallel while keeping shared data safe."
+publishedAt: "2026-06-12T13:00:00Z"
+---
+
+Redis' command execution model is one of the reasons it is so predictable. When a command reads or modifies the keyspace, it can assume another command is not
+changing the same data or internal state at the same time.
+
+When we built Upstash Redis, we started from a similar safety model but a different server architecture. Client requests could arrive 
+at the engine concurrently, while the database still needed the same kind of command-level isolation that Redis users expect. 
+
+Our first solution was intentionally simple: use one serialized pipeline around in-memory command execution. That made correctness easy to reason about, 
+but it also meant that a `GET user:1` could wait behind a `SET session:2`, even though the two commands had nothing to do with each other.
+
+Key-based locking changes that. Instead of treating the whole in-memory store as one serialized section, Upstash Redis now locks only the keys
+(or more precisely the key hash slots) a command actually touches. Commands on unrelated keys can run in parallel, up to a limit, while commands that share a key, share a hash slot,
+or need a database-wide boundary still serialize.
+
+We will walk through the execution model behind that change: how original Redis gets isolation from a serialized command path, how earlier Upstash Redis
+had a similar design, and how the current key-based locking mechanism preserves Redis-compatible semantics while allowing independent commands to run concurrently.
+
+
+## How original Redis executes commands
+
+Redis is often described as single threaded. Modern Redis can use background threads and it can use I/O threads around client networking.
+The important part for command semantics is narrower: the command execution path that reads and mutates the keyspace is serialized through the main event loop.
+
+At a high level, Redis waits for client sockets, reads request data from ready clients, parses that data into Redis commands,
+and dispatches complete commands through a single execution path.
+
+When a client sends a command, Redis reads bytes from the socket into the client's query buffer and parses that buffer
+as either inline protocol or RESP multi-bulk protocol. Once a complete command is available, Redis prepares the command arguments
+and performs the checks that need to happen before the command body runs: command lookup, authentication & ACLs, memory checks, transaction handling, etc.
+
+That last step is the core execution point. Whether the command is `GET`, `SET`, `HSET`, `ZADD`, or a more complex command, the command body runs on the
+serialized command execution path. Redis does not take any mutex before a command, and it does not try to run two independent key operations in
+parallel just because their keys are different. The event loop may process many clients, and pipelining can keep the loop busy, but command bodies are entered one at a time.
+
+Lua scripts and Redis Functions follow the same rule. `EVAL` and `EVALSHA` enter Redis like any other command. `FCALL` and `FCALL_RO`
+do the same for registered Redis Functions. Nested Redis operations issued by script or function code run as part of that same invocation.
+From the perspective of other clients, the script or function invocation is still one serialized command.
+
+This makes Redis easy to reason about: while a command is running, no other client command is changing the same data or metadata (expirations etc.).
+This model is a good fit for original Redis because all keys are already in memory, so command execution is mostly about protecting shared in-memory state
+rather than waiting on storage access. The trade-off is equally direct: a long-running command, or simply a hot stream of commands, occupies the single command execution lane.
+Independent keys do not automatically create independent execution capacity.
+
+![Redis command execution flow showing multiple clients moving through socket read, parse, and validation before entering one serialized command execution lane.](/blog/redis-key-based-locking/original-redis.png)
+
+## Earlier Upstash Redis: Single critical section
+
+Upstash Redis is not built around one event-loop thread. Many client requests can reach the command execution layer concurrently.
+In the old design, the server protected in-memory storage with one critical section around the part of a command that touched memory.
+Every command passed through that same section, so the work inside it had to be non-blocking and fast.
+
+Before a command reaches that section, it still goes through a normal network and protocol pipeline. A client connection is handled by the TCP or HTTP server,
+which reads bytes from the socket through a buffered protocol reader. Each request is then parsed into command arguments, such as `SET key value`.
+
+After parsing, the command enters the dispatcher. The dispatcher looks up the command metadata, runs the checks that happen before command execution such as authentication, 
+ACLs, quotas, verifications, then calls the registered handler for that command. Read commands go through the query path, 
+write commands go through the mutation path. In the old single-serialized implementation, those handlers enter the same critical section 
+to access in-memory state & data regardless of command type or key list.
+
+That section protects only the in-memory store, not the whole data set. Upstash Redis uses a hybrid storage model. The full database is stored on disk,
+while memory keeps a resident working set: keys that are hot, recently accessed, or needed by in-flight commands.
+A key can therefore exist in the database even when it is not present in memory.
+
+That adds a step that original Redis does not need. Before a command can read or mutate a key, the engine first has to make sure that key is loaded into the memory store.
+If the entry is already resident, the load step is a no-op. If it is not resident, the engine checks whether the key is known to be missing;
+otherwise it marks the key as loading, loads the record from disk, restores the entry into memory, and only then lets the command body operate on it.
+While a key is being restored, the related command enters a wait phase and leaves the pipeline for other commands to execute.
+
+Writes use the same rule. A write command first makes the target key available in memory, applies the mutation to the in-memory entry,
+and then enqueues the resulting update to the persistence layer. The disk copy remains the durable copy of the database,
+while the memory copy is the fast execution surface used by command handlers.
+
+In practice, the server had concurrency around networking, parsing, persistence, and other background work,
+but not around the in-memory keyspace itself. A `GET` for `user:1`, a `SET` for `user:2`, and an `HSET` for `session:3` could be accepted by different threads,
+but once they needed to read from or mutate the in-memory keyspace, they all had to enter the same critical section.
+
+This model is correct and easy to reason about. It also has the same practical limit as Redis' serialized command execution:
+unrelated keys do not create unrelated execution capacity. A slow command on one key can delay reads and writes for other keys that never touch the same data.
+
+![Earlier Upstash Redis has parallel work around the request pipeline, but all commands pass through the same in-memory execution boundary.](/blog/redis-key-based-locking/upstash-serial.png)
+
+## Current Upstash Redis: Key-based locking
+
+We recently replaced that single critical section with a parallel execution pipeline guarded by key-based locking.
+It still gives command handlers a stable view of the in-memory store. The difference is the scope of each lock. A command that touches `user:1` no longer
+has to exclude a command that touches `user:2`, as long as the two keys map to different hash slots and the database still has parallel execution capacity.
+
+There are two knobs behind this:
+
+- The first is the number of key-hash slots. Upstash Redis does not allocate a separate mutex for every possible key. Instead, it extracts the Redis Cluster style hash tag from the key,
+  hashes that string, and maps the result to a fixed hash slot. The slot count grows with the database resource size: depending on the size it grows from a few slots to a few thousand.
+  More slots reduce accidental contention between unrelated keys. Two different key names can collide into the same slot, and when they do, they share the same lock.
+
+- The second knob is the database-wide parallelism limit. Every command execution consumes a single parallelism permit.
+  Parallelism is the cap on how many command executions can be running inside the locked execution path at the same time. The effective parallelism also follows the database resource size:
+  it varies from a few to tens.
+
+This separation matters: the hash slot count controls how likely two keys are to fight over the same key mutex,
+while the parallelism value controls how many otherwise-independent commands can run at once.
+
+![Key-based locking keeps the request pipeline parallel, lets independent key slots run concurrently, and makes writers wait for readers on the same key slot.](/blog/redis-key-based-locking/upstash-parallel.png)
+
+### Single-key commands
+
+Single-key read commands are the simplest case. A `GET key`, `HGET key field`, or `LRANGE key start stop` enters the query path, asks for a shared read lock for that key,
+and then runs while holding that lock. Because the slot lock is shared, multiple readers for the same key slot can run together.
+
+Single-key write commands use the same shape with an exclusive lock. A `SET`, `INCR`, `HSET`, or similar command first passes the write-side checks,
+then takes the write lock for the key's slot. That write lock excludes readers and writers for the same slot, but it does not exclude commands on other slots.
+
+### Multi-key commands and transactions
+
+Multi-key commands extend the same rule to a set of keys. For read-only multi-key commands, the engine takes shared read locks for all referenced keys' slots.
+For mutating multi-key commands, it takes exclusive write locks for all referenced keys' slots. If multiple input keys map to the same slot, only one slot lock is taken.
+
+This is also how transactions work at `EXEC` time. While the client is inside `MULTI`, commands are queued and their keys are collected.
+The queued commands do not take their final execution locks one by one. When `EXEC` runs, the engine takes an exclusive write lock for the union of the transaction's keys,
+loads those keys if needed, and then executes the queued command callbacks while still holding that lock.
+Two transactions that touch disjoint key sets can therefore run concurrently. Two transactions that share a key, or share a lock slot, serialize.
+Scripts queued inside transactions keep a more conservative path, which we will cover below.
+
+![Multi-key commands acquire every referenced key slot in a stable order. Commands on disjoint slots can run concurrently, while commands sharing a slot wait.](/blog/redis-key-based-locking/upstash-parallel-multi.png)
+
+### Database-wide operations
+
+Some operations cannot be described as a small set of keys. `FLUSHDB` and `FLUSHALL` reset the database, so they take the global exclusive lock. When the global lock is held,
+new key-based operations cannot enter, and the operation waits for existing key-based executions to leave.
+This preserves the old simple rule only for operations that actually need it, instead of imposing that rule on every `GET` and `SET`.
+
+Commands that walk broad database state but do not require exclusive access can use a weaker form of the same mechanism. For example, scan-style work can take an empty read lock.
+That does not lock a particular key slot, but it still consumes a parallelism permit. The command is therefore counted against the database's execution capacity
+without blocking all unrelated key operations.
+
+### Hash tags
+
+Hash tags give applications a way to influence slot selection. Upstash Redis uses the same hash-tag extraction rule as Redis Cluster:
+if a key contains a non-empty substring inside the first matching `{` and `}`, only that substring is hashed for slot selection, or the whole key when no tag is present.
+That means `cart:{42}:items`, `cart:{42}:total`, and `cart:{42}:version` all map through the tag `42`, so they land on the same lock slot.
+This is useful when an application wants a small group of related keys to serialize even when individual commands mention only one of them.
+
+It should be used deliberately, because grouping keys under the same tag also gives up some of the parallelism that key-based locking is designed to create.
+
+### Lua scripts and Redis Functions
+
+Lua scripts and Redis Functions are the hardest commands to lock precisely, because the command's declared key list is not always the same as the keys the script code will actually use.
+A script can build a key name from `ARGV`, branch on data read from Redis, or call different nested commands depending on runtime state.
+
+For that reason, `EVAL`, `EVALSHA`, `EVAL_RO`, `EVALSHA_RO`, `FCALL`, and `FCALL_RO` default to the global lock. This is conservative,
+but it is the only safe default when the engine cannot know the script's complete key set before execution.
+If the engine allowed that script to run under a lock for only the declared keys, and the script later touched an undeclared key, the isolation rule would be broken.
+Under the global lock, dynamic key usage is allowed, because all keys are implicitly protected.
+
+The current implementation also has an opt-in path for scripts and functions that do have a small, known key set. 
+
+A Lua script can include the `allow-key-locking` flag in its shebang line:
+
+```lua
+#!lua flags=allow-key-locking
+
+local current = tonumber(redis.call('GET', KEYS[1]) or "0")
+if current >= tonumber(ARGV[1]) then
+  return 0
+end
+redis.call('INCR', KEYS[1])
+return 1
+```
+
+A Redis Function can register a function with the same flag:
+
+```lua
+#!lua name=locks
+
+local function incr_if_below(keys, args)
+  local current = tonumber(redis.call('GET', keys[1]) or "0")
+  if current >= tonumber(args[1]) then
+    return 0
+  end
+
+  redis.call('INCR', keys[1])
+  return 1
+end
+
+redis.register_function{
+  function_name='incr_if_below',
+  callback=incr_if_below,
+  flags={'allow-key-locking'}
+}
+```
+
+When that flag is present, Upstash Redis locks only the keys passed through the command's key list: the `KEYS` array for `EVAL` and the explicit key list for `FCALL`.
+If the script or function is read-only, the `no-writes` flag can be combined with `allow-key-locking`, and the engine can use shared read locks instead of exclusive write locks.
+
+That opt-in comes with a strict runtime check. When a script or function runs with `allow-key-locking`, every key passed to a nested `redis.call` or `redis.pcall` must exactly
+match one of the declared keys. Computing the string inside the script is allowed only if the final value is still one of those declared keys.
+If the script reaches for a different key, Upstash Redis rejects the nested command with a dynamic-key error.
+
+Database-wide commands such as `FLUSHDB` and `FLUSHALL` are also rejected inside key-locked scripts, because they require the global lock.
+
+There is one important transaction detail for Lua scripts: scripts queued inside `MULTI`/`EXEC` still use the global-lock path, even if the script text declares `allow-key-locking`.
+The script is queued before its flags are used to create a separate lock plan, so the transaction must keep the conservative database-wide boundary.
+If you want script-level key locking to be the concurrency boundary, run the script directly rather than queueing it inside a transaction.
+
+### What changes?
+
+The result is the same Redis-compatible isolation model with a smaller serialization boundary. Command handlers still operate on the resident in-memory store
+after the engine has loaded the required keys from the disk. Commands that need a database-wide boundary still get one.
+
+But ordinary commands no longer treat the whole memory store as one critical section. Independent keys can now be accessed by concurrent client commands,
+up to the hash slot and parallelism limits of the database.
+
+### What about performance?
+
+The honest answer is that the performance gain depends heavily on the shape of the workload, so there is no single number that applies to every database.
+
+Key-based locking helps most when a database receives concurrent commands for many independent keys.
+It does not speed up an individual command, a single `GET` or `SET` is not faster than before. So the benefit shows up as improved throughput and lower tail latency under concurrent load.
+
+We have observed significant throughput increases for workloads spread across many different keys, along with a good drop in tail latency when slow write commands such as `EVAL` or `ZUNIONSTORE` sit in the execution pipeline. For example, the following workloads can benefit heavily:
+
+- Read-heavy workloads using commands in the slow category, such as `ZUNION`, `SINTER`, `SCAN`, etc. Since reads do not block each other at all, read-heavy workloads can be parallelized up to the limits.
+- Workloads with a mix of reads and writes using independent keys. Even slow write commands, such as `SUNIONSTORE` or `ZDIFFSTORE`, do not block reads or other writes on unrelated keys.
+- Workloads that use `EVAL` and `FCALL` with statically declared keys. When their keys don't overlap with each other, or with any other read or write commands, scripts can run concurrently.
+
+At the other end of the spectrum, some workloads see little change, and that is expected. A single hot key, a set of keys intentionally grouped under one hash tag, or heavy use of database-wide operations such as `FLUSHDB` and default Lua scripts will still serialize. The important property is that performance does not get worse for these cases; they see almost the same throughput and latency as before.
+
+We are running benchmarks across representative workloads and will share concrete numbers in a follow-up post later. The practical rule: spread commands across different keys, avoid database-wide commands, and enable the `allow-key-locking` script flag when a script has a known key set.
