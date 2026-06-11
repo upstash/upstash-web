@@ -60,8 +60,14 @@ export default function PricingTable({
             <p className="font-semibold">{REDIS_FREE_PLAN.dataSize}</p>
           </div>
           <div className="py-3">
+            <p className="text-text-mute">Monthly Bandwidth</p>
+            <p className="font-semibold">{REDIS_FREE_PLAN.maxBandwidth}</p>
+          </div>
+          <div className="py-3">
             <p className="text-text-mute">Monthly Commands</p>
-            <p className="font-semibold">{REDIS_FREE_PLAN.monthlyCommands}</p>
+            <p className="font-semibold">
+              {REDIS_FREE_PLAN.monthlyCommands ?? "Unlimited"}
+            </p>
           </div>
         </div>
 
@@ -103,6 +109,12 @@ export default function PricingTable({
             <p className="text-text-mute">Monthly Bandwidth</p>
             <p className="font-semibold">{REDIS_PAYG_PLAN.maxBandwidth}</p>
           </div>
+          <div className="py-3">
+            <p className="text-text-mute">Monthly Commands</p>
+            <p className="font-semibold">
+              {REDIS_PAYG_PLAN.monthlyCommands ?? "Unlimited"}
+            </p>
+          </div>
         </div>
 
         <div>
@@ -143,7 +155,6 @@ export default function PricingTable({
           <p className="text-sm text-text-mute">
             ${fixedPlan.readRegionPrice} ✕ read regions
           </p>
-          <p className="text-sm text-text-mute">No per-command pricing</p>
         </div>
 
         <div className="grow">
@@ -160,6 +171,12 @@ export default function PricingTable({
           <div className="py-3">
             <p className="text-text-mute">Monthly Bandwidth</p>
             <p className="font-semibold">{fixedPlan.maxBandwidth}</p>
+          </div>
+          <div className="py-3">
+            <p className="text-text-mute">Monthly Commands</p>
+            <p className="font-semibold">
+              {fixedPlan.monthlyCommands ?? "Unlimited"}
+            </p>
           </div>
         </div>
 

@@ -4,31 +4,34 @@ export const authors: Record<
     name: string;
     title: string;
     image: string;
-    url?: string;
+    /** Twitter/X handle WITHOUT the leading "@" (e.g. "enesakar"). */
+    twitter?: string;
+    /** Full URL to a personal site/blog/profile (e.g. "https://example.com"). */
+    website?: string;
   }
 > = {
   enes: {
     name: "Enes Akar",
     title: "Co-Founder @Upstash",
-    url: "https://twitter.com/enesakar",
+    twitter: "enesakar",
     image: "enes.png",
   },
   noah: {
     name: "Noah Fischer",
     title: "Software Engineer, Guest Author",
-    url: "https://twitter.com/noahfschr",
+    twitter: "noahfschr",
     image: "noah.jpg",
   },
   mehmet: {
     name: "Mehmet Dogan",
     title: "CTO @Upstash",
-    url: "https://twitter.com/mmdogan",
+    twitter: "mmdogan",
     image: "mehmet.jpg",
   },
   oguzhan: {
     name: "Oguzhan Olguncu",
     title: "Software Engineer @Upstash",
-    url: "https://ogzhanolguncu.com",
+    website: "https://ogzhanolguncu.com",
     image: "oguzhan.jpeg",
   },
   sancar: {
@@ -39,79 +42,79 @@ export const authors: Record<
   geoff: {
     name: "Geoff Rich",
     title: " Svelte core team member (Guest Author)",
-    url: "https://geoffrich.net/",
+    website: "https://geoffrich.net/",
     image: "geoff.jpg",
   },
   rosius: {
     name: "Rosius Ndimofor",
     title: "AWS Serverless Hero (Guest Author)",
-    url: "https://twitter.com/atehrosius",
+    twitter: "atehrosius",
     image: "rosius.png",
   },
   krutie: {
     name: "Krutie Patel",
     title: "NuxtJS Ambassador (Guest Author)",
-    url: "https://mobile.twitter.com/KrutiePatel",
+    twitter: "KrutiePatel",
     image: "krutie.jpeg",
   },
   omer: {
     name: "Omer Aytac",
     title: "Full Stack Developer (Guest Author)",
-    url: "https://mobile.twitter.com/OmerAytac_",
+    twitter: "OmerAytac_",
     image: "omer.png",
   },
   leigh: {
     name: "Leigh Halliday",
     title: "Senior Engineering Manager, Wrapbook (Guest Author)",
-    url: "https://www.youtube.com/user/leighhalliday",
+    website: "https://www.youtube.com/user/leighhalliday",
     image: "leigh.png",
   },
   gabriel: {
     name: "Gabriel Guy",
     title: "Head of Product, Applicaster (Guest Author)",
-    url: "https://twitter.com/gavriguy",
+    twitter: "gavriguy",
     image: "gabriel.png",
   },
   sonke: {
     name: "Sönke Peters",
     title: "Full Stack Web Developer (Guest Author)",
-    url: "https://www.soenkep.com/",
+    website: "https://www.soenkep.com/",
     image: "sonke.jpg",
   },
   kay: {
     name: "Kay Plößer",
     title: "Developer and Author (Guest Author)",
-    url: "https://twitter.com/K4y1s",
+    twitter: "K4y1s",
     image: "kay.jpeg",
   },
   adem: {
     name: "Adem Ilter",
     title: "Designer @Upstash",
-    url: "https://twitter.com/ademilter",
+    twitter: "ademilter",
     image: "adem.jpg",
   },
   ilter: {
     name: "Ilter Kavlak",
     title: "Site Reliability Engineer @Upstash",
-    url: "https://twitter.com/ilterkavlak",
+    twitter: "ilterkavlak",
     image: "ilter.png",
   },
   burak: {
     name: "Burak Yılmaz",
     title: "Site Reliability Engineer @Upstash",
-    url: "https://github.com/yilmaz-burak",
+    website: "https://github.com/yilmaz-burak",
     image: "burak.png",
   },
   andreas: {
     name: "Andreas Thomas",
     title: "Software Engineer @Upstash",
-    url: "https://twitter.com/chronark_",
+    twitter: "chronark_",
     image: "andreas.jpeg",
   },
   vedant: {
     name: "Vedant Atodaria",
     title: "Frontend Engineer (Guest Author)",
-    url: "https://fish.solar/",
+    website: "https://fish.solar/",
     image: "fish.jpeg",
   },
   nihan: {
@@ -152,67 +155,67 @@ export const authors: Record<
   max: {
     name: "Maximilian Kaske",
     title: "Fullstack Developer (Guest Author)",
-    url: "https://twitter.com/mxkaske",
+    twitter: "mxkaske",
     image: "max.jpg",
   },
   menelaos: {
     name: "Menelaos Kotsollaris",
     title: "Staff Software Engineer at Realtor.com (Guest Author)",
-    url: "https://menelaos.dev/",
+    website: "https://menelaos.dev/",
     image: "menelaos.jpeg",
   },
   enesozcan: {
     name: "Enes Ozcan",
     title: "Senior Software Engineer at Zapata Computing (Guest Author)",
-    url: "https://github.com/enozcan",
+    website: "https://github.com/enozcan",
     image: "enesozcan.png",
   },
   tudor: {
     name: "Tudor Zgîmbău",
     title: "Software Engineer (Guest Author)",
-    url: "https://www.linkedin.com/in/tudor-zg%C3%AEmb%C4%83u-a85274234",
+    website: "https://www.linkedin.com/in/tudor-zg%C3%AEmb%C4%83u-a85274234",
     image: "tudor.jpg",
   },
   chillyfish: {
     name: "Chillyfish",
     title: "Full-Stack Engineer (Guest Author)",
-    url: "https://twitter.com/chillyfish_dev",
+    twitter: "chillyfish_dev",
     image: "chillyfish.jpg",
   },
   andreaselia: {
     name: "Andreas Elia",
     title: "Full-Stack Engineer (Guest Author)",
-    url: "https://twitter.com/digitalandreas",
+    twitter: "digitalandreas",
     image: "andreaselia.jpeg",
   },
   bilaltahir: {
     name: "Bilal Tahir",
     title: "Front-end developer (Guest Author)",
-    url: "https://twitter.com/deepwhitman",
+    twitter: "deepwhitman",
     image: "bilaltahir.jpeg",
   },
   thomasCazade: {
     name: "Thomas Cazade",
     title: "Founder of fastsheet (Guest Author)",
-    url: "https://twitter.com/TotomInc",
+    twitter: "TotomInc",
     image: "thomas_cazade.jpeg",
   },
   russTran: {
     name: "Russ Tran",
     title: "Frontend Engineer at JUST.engineer (Guest Author)",
-    url: "https://twitter.com/russdevdotnet",
+    twitter: "russdevdotnet",
     image: "russ_tran.jpeg",
   },
   hosna: {
     name: "Hosna Qasmei",
     title: "Full Stack Developer (Guest Author)",
-    url: "https://twitter.com/hqasmei",
+    twitter: "hqasmei",
     image: "hosna.jpeg",
   },
   fahreddin: {
     name: "Fahreddin Ozcan",
     title: "Software Engineer @Upstash",
-    url: "https://github.com/fahreddinozcan",
+    website: "https://github.com/fahreddinozcan",
     image: "fahreddin.png",
   },
   rishi: {
@@ -298,43 +301,44 @@ export const authors: Record<
   oguzhantasimaz: {
     name: "Oguzhan Tasimaz",
     title: "Software Engineer",
-    url: "https://oguzhantasimaz.com",
+    website: "https://oguzhantasimaz.com",
     image: "oguzhantasimaz.png",
   },
   brighton: {
     name: "Brighton Mboya",
     title: "Software Engineer (Guest Author)",
-    url: "https://twitter.com/brightonmboya",
+    twitter: "brightonmboya",
     image: "brighton.jpg",
   },
   bcelik: {
     name: "Batuhan Celik",
     title: "Software Developer (Guest Author)",
-    url: "https://https://github.com/mbatuhancelik",
+    website: "https://github.com/mbatuhancelik",
     image: "bcelik.jpeg",
   },
   arda: {
     name: "Cahid Arda Oz",
     title: "Software Engineer @Upstash",
-    url: "https://cahidarda.github.io/",
+    twitter: "cahidarda",
+    website: "https://cahidarda.github.io/",
     image: "arda.png",
   },
   anthony: {
     name: "Anthony Accomazzo",
     title: "Co-founder @ Sequin",
-    url: "https://sequin.io/",
+    website: "https://sequin.io/",
     image: "acco.jpg",
   },
   kaanguneyli: {
     name: "Bilge Kaan Güneyli",
     title: "Software Developer (Guest Author)",
-    url: "https://github.com/kaanguneyli",
+    website: "https://github.com/kaanguneyli",
     image: "kaanguneyli.jpg",
   },
   merlin: {
     name: "Merlin Carter",
     title: "Developer Educator (Guest Author)",
-    url: "https://www.linkedin.com/in/merlin-carter-bb303ab2/",
+    website: "https://www.linkedin.com/in/merlin-carter-bb303ab2/",
     image: "merlin.png",
   },
   amit: {
@@ -350,19 +354,19 @@ export const authors: Record<
   cole: {
     name: "Cole Gottdank",
     title: "Co-Founder @ Helicone (Guest Author)",
-    url: "https://helicone.ai",
+    website: "https://helicone.ai",
     image: "cole.jpeg",
   },
   abdullahenes: {
     name: "Abdullah Enes Gules",
     title: "Software Engineer @Upstash",
-    url: "https://www.linkedin.com/in/abdullah-enes-g%C3%BCle%C5%9F/",
+    website: "https://www.linkedin.com/in/abdullah-enes-g%C3%BCle%C5%9F/",
     image: "abdullahenes.jpg",
   },
   ibrahim: {
     name: "Ibrahim Gurses",
     title: "Software Engineer @Peaka (Guest Author)",
-    url: "https://x.com/ibrahimgrses",
+    twitter: "ibrahimgrses",
     image: "ibrahim.png",
   },
   metin: {
@@ -373,19 +377,19 @@ export const authors: Record<
   terryzhang: {
     name: "Terry Zhang",
     title: "Founder&CEO @llamagen.ai (Guest Author)",
-    url: "https://x.com/terrychinaz",
+    twitter: "terrychinaz",
     image: "terryzhang.png",
   },
   yunus: {
     name: "Yunus Emre Ozdemir",
     title: "Software Engineer @Upstash",
-    url: "https://github.com/yunusemreozdemir",
+    website: "https://github.com/yunusemreozdemir",
     image: "yunus.jpg",
   },
   evans: {
     name: "Evansso",
     title: "Software Developer - Guest Author",
-    url: "https://x.com/evansso_",
+    twitter: "evansso_",
     image: "evans.jpg",
   },
   mehmetemin: {
@@ -446,7 +450,21 @@ export const authors: Record<
   dominik: {
     name: "Dominik Koch",
     title: "Founder of Notra (Guest Author)",
-    url: "https://x.com/dominikkoch",
+    twitter: "dominikkoch",
     image: "dominik.jpeg",
   },
 };
+
+/**
+ * Best-effort canonical URL for an author, used for SEO metadata and
+ * structured data. Prefers a personal website, then falls back to the
+ * author's Twitter/X profile.
+ */
+export function authorUrl(author: {
+  twitter?: string;
+  website?: string;
+}): string | undefined {
+  if (author.website) return author.website;
+  if (author.twitter) return `https://x.com/${author.twitter}`;
+  return undefined;
+}

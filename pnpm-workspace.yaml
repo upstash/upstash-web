@@ -4,11 +4,11 @@ packages:
 minimumReleaseAge: 10080
 blockExoticSubdeps: true
 
-onlyBuiltDependencies:
-  - "@biomejs/biome"
-  - esbuild
-  - node-read-yaml
-  - sharp
+allowBuilds:
+  '@biomejs/biome': true
+  esbuild: true
+  node-read-yaml: true
+  sharp: true
 trustPolicy: no-downgrade
 trustPolicyExclude:
   - 'semver'

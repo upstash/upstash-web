@@ -7,6 +7,7 @@ import { Mdx } from "@/components/post/mdx";
 import OtherPostCard from "@/components/post/other-post";
 import RelatedRedis from "@/components/post/related-redis";
 import PostTags from "@/components/post/tags";
+import { authorUrl } from "@/utils/authors";
 import { SITE_URL } from "@/utils/const";
 import {
   generateBlogSchema,
@@ -75,7 +76,10 @@ export default async function BlogPage({ params }: Props) {
       post.description ||
       "Articles and tutorials on serverless technologies from Upstash and community",
     keywords: post.tags,
-    authors: post.authorsData.map((a) => ({ name: a.name, url: a.url })),
+    authors: post.authorsData.map((a) => ({
+      name: a.name,
+      url: authorUrl(a),
+    })),
     datePublished: isoDatePublished,
     dateModified: isoDateModified,
     url: postUrl,
@@ -160,10 +164,13 @@ export async function generateMetadata({
     title,
     description,
     keywords: post.tags,
-    authors: post.authorsData.map((a) => ({
-      name: a.name,
-      ...(a.url ? { url: a.url } : {}),
-    })),
+    authors: post.authorsData.map((a) => {
+      const url = authorUrl(a);
+      return {
+        name: a.name,
+        ...(url ? { url } : {}),
+      };
+    }),
     alternates: {
       canonical: `/blog/${post.slug}`,
       types: {
@@ -195,4 +202,3 @@ export async function generateMetadata({
     },
   };
 }
-
