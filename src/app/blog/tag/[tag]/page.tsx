@@ -1,7 +1,7 @@
 import Bg from "@/components/bg";
 import PostGridCard from "@/components/blog/grid-item";
 import Container from "@/components/container";
-import { TAG_NAMES } from "@/utils/const";
+import PageHeaderTitle from "@/components/page-header-title";
 import { normalizeTag, normalizeTagParam } from "@/utils/tags";
 import type { Post } from "@content";
 import { uniq } from "lodash";
@@ -58,37 +58,23 @@ export default async function BlogPage({ params: { tag } }: Props) {
     notFound();
   }
 
-  const label = TAG_NAMES[normalized as keyof typeof TAG_NAMES] ?? normalized;
-
   return (
     <main className="relative z-0">
       <Bg />
 
-      <header className="pt-16 md:pt-24">
-        <Container className="max-w-screen-md">
-          <div className="mb-8">
-            <Link
-              className="text-sm text-text-mute transition hover:text-primary-text hover:underline"
-              href="/blog"
-            >
-              ← Back to all posts
-            </Link>
-          </div>
-
-          <p className="font-mono text-sm">
-            <span className="opacity-40">blog/tag/</span>
-            <span className="font-semibold text-primary-text">{normalized}</span>
-          </p>
-          <h1 className="mt-2 font-display text-4xl font-bold capitalize !leading-title md:text-5xl">
-            {label}
-          </h1>
-          <p className="mt-3 text-lg opacity-60">
-            {postsWithTag.length} {postsWithTag.length === 1 ? "post" : "posts"}
-          </p>
-        </Container>
+      <header className="py-12 text-center md:py-24">
+        <PageHeaderTitle>
+          <span className="font-medium opacity-40">blog/tag/</span>
+          <span className="font-bold">{normalized}</span>
+        </PageHeaderTitle>
+        <div className="mt-4">
+          <Link className="text-primary-text hover:underline" href="/blog">
+            Back to all posts
+          </Link>
+        </div>
       </header>
 
-      <section className="py-12 md:py-16">
+      <section>
         <Container>
           <div className="grid gap-4 md:grid-cols-2 md:gap-8">
             {postsWithTag.map((post: Post) => {
