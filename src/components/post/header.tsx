@@ -2,6 +2,7 @@ import Container from "@/components/container";
 import CopyArticleButton from "@/components/post/copy-article-button";
 import { SITE_URL } from "@/utils/const";
 import type { Post } from "@content";
+import { IconBrandX, IconWorld } from "@tabler/icons-react";
 import { DateTime } from "luxon";
 import Image from "next/image";
 import Link from "next/link";
@@ -45,6 +46,33 @@ export default function PostHeader({ post }: Props) {
                 {author.name}
               </Link>
               <span className="opacity-60">{author.title}</span>
+
+              {(author.twitter || author.website) && (
+                <div className="mt-2 flex items-center gap-2">
+                  {author.twitter && (
+                    <a
+                      href={`https://x.com/${author.twitter}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${author.name} on X`}
+                      className="opacity-40 transition hover:opacity-100"
+                    >
+                      <IconBrandX size={18} />
+                    </a>
+                  )}
+                  {author.website && (
+                    <a
+                      href={author.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${author.name}'s website`}
+                      className="opacity-40 transition hover:opacity-100"
+                    >
+                      <IconWorld size={18} />
+                    </a>
+                  )}
+                </div>
+              )}
             </div>
           ))}
         </div>
