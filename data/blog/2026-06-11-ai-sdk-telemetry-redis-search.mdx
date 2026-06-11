@@ -18,7 +18,9 @@ This post walks through a small, complete example: wire
 [Vercel AI SDK](https://ai-sdk.dev/) telemetry straight into
 [Upstash Redis Search](https://upstash.com/docs/redis/search/introduction), and
 serve the whole analytics layer (percentiles, token stats, error counts) with
-Upstash Redis Search aggregations. The full source is on GitHub:
+Upstash Redis Search aggregations. There's a live version you can try at
+[ai-sdk-telemetry.vercel.app](https://ai-sdk-telemetry.vercel.app/), and the
+full source is on GitHub:
 [**redis-js/examples/ai-sdk-telemetry**](https://github.com/upstash/redis-js/tree/main/examples/ai-sdk-telemetry).
 
 ## Why collect telemetry at all?
@@ -210,7 +212,8 @@ run.
 With the integration writing events and the index picking them up, you have
 everything you need to read the data back. The example wraps it in a Next.js
 dashboard so you can watch it happen; here is what it looks like with telemetry
-flowing:
+flowing (or try the live version at
+[ai-sdk-telemetry.vercel.app](https://ai-sdk-telemetry.vercel.app/)):
 
 ![The AI SDK telemetry dashboard](/blog/ai-sdk-telemetry-redis-search/dashboard.png)
 
