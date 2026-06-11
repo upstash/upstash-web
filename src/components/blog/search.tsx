@@ -4,6 +4,7 @@ import Button from "@/components/button";
 import cx from "@/utils/cx";
 import { IconSearch, IconX } from "@tabler/icons-react";
 import Fuse, { type IFuseOptions } from "fuse.js";
+import { DateTime } from "luxon";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import PostGridCard, { type PostCardData } from "./grid-item";
@@ -31,7 +32,18 @@ export default function BlogSearch({ posts }: { posts: SearchPost[] }) {
 
   const trimmed = query.trim();
   const isSearching = trimmed.length > 0;
-  const results = isSearching ? fuse.search(trimmed).map((r) => r.item) : posts;
+  // `posts` arrive already sorted newest-first; re-sort search hits (which
+  // come back ranked by relevance) so the latest blogs appear first.
+  const results = isSearching
+    ? fuse
+        .search(trimmed)
+        .map((r) => r.item)
+        .sort(
+          (a, b) =>
+            DateTime.fromISO(b.date).toMillis() -
+            DateTime.fromISO(a.date).toMillis(),
+        )
+    : posts;
 
   return (
     <>
