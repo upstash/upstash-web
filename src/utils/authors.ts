@@ -21,7 +21,7 @@ export const authors: Record<
   },
   mehmet: {
     name: "Mehmet Dogan",
-    title: "CTO @Upstash",
+    title: "Co-Founder @Upstash",
     url: "https://twitter.com/mmdogan",
     image: "mehmet.jpg",
   },
