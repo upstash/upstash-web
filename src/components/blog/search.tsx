@@ -31,41 +31,46 @@ export default function BlogSearch({ posts }: { posts: SearchPost[] }) {
 
   const trimmed = query.trim();
   const isSearching = trimmed.length > 0;
-  const results = isSearching
-    ? fuse.search(trimmed).map((r) => r.item)
-    : posts;
+  const results = isSearching ? fuse.search(trimmed).map((r) => r.item) : posts;
 
   return (
     <>
       <div className="mt-8 flex justify-center">
-        <div className="relative w-full max-w-sm">
+        <div className="relative w-full max-w-md">
           <IconSearch
-            size={16}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400"
+            size={18}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-text-mute"
           />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search posts..."
             className={cx(
-              "w-full rounded-full border border-zinc-200 bg-white py-2.5 pl-10 pr-10",
-              "text-sm text-zinc-900 outline-none placeholder:text-zinc-400",
-              "focus:border-zinc-300 focus:ring-2 focus:ring-zinc-100",
+              "w-full rounded-full border border-black/10 bg-bg-mute py-3 pl-11 pr-10 dark:border-white/10",
+              "text-sm text-text outline-none placeholder:text-text-mute",
+              "focus:border-primary/40 focus:ring-primary/20 transition focus:ring-2",
             )}
           />
           {isSearching && (
             <button
               onClick={() => setQuery("")}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 transition hover:text-zinc-600"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-text-mute transition hover:text-primary-text"
               aria-label="Clear search"
             >
-              <IconX size={14} />
+              <IconX size={16} />
             </button>
           )}
         </div>
       </div>
 
-      <section className="mt-6 text-left">
+      <section className="mt-10 text-left">
+        {isSearching && results.length > 0 && (
+          <p className="mb-6 text-center text-sm text-text-mute">
+            {results.length} {results.length === 1 ? "result" : "results"} for{" "}
+            <span className="font-medium text-text">"{trimmed}"</span>
+          </p>
+        )}
+
         {results.length > 0 ? (
           <div className="grid gap-4 md:grid-cols-2 md:gap-8">
             {results.map((post) => (
@@ -74,9 +79,9 @@ export default function BlogSearch({ posts }: { posts: SearchPost[] }) {
           </div>
         ) : (
           <div className="py-20 text-center">
-            <p className="text-zinc-500">
+            <p className="text-text-mute">
               No posts found for{" "}
-              <span className="font-medium text-zinc-700">"{trimmed}"</span>
+              <span className="font-medium text-text">"{trimmed}"</span>
             </p>
           </div>
         )}

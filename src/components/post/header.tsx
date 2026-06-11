@@ -1,3 +1,4 @@
+import AuthorSocials from "@/components/blog/author-socials";
 import Container from "@/components/container";
 import CopyArticleButton from "@/components/post/copy-article-button";
 import { SITE_URL } from "@/utils/const";
@@ -28,23 +29,34 @@ export default function PostHeader({ post }: Props) {
           {post.title}
         </h1>
 
-        <div className="mt-8 flex flex-col items-center justify-center gap-8 md:flex-row">
+        <div className="mt-10 flex flex-col items-center justify-center gap-4 md:flex-row md:gap-5">
           {post.authorsData.map((author) => (
-            <div key={author.name} className="flex flex-col items-center">
-              <Image
-                width={64}
-                height={64}
-                alt={author.name}
-                src={author.image}
-                className="aspect-square shrink-0 rounded-full object-cover"
-              />
+            <div
+              key={author.name}
+              className="flex items-center gap-3 rounded-2xl bg-bg-mute px-5 py-3 text-left"
+            >
               <Link
                 href={`/blog/author/${author.username}`}
-                className="mt-2 font-medium hover:underline"
+                aria-label={author.name}
               >
-                {author.name}
+                <Image
+                  width={48}
+                  height={48}
+                  alt={author.name}
+                  src={author.image}
+                  className="aspect-square shrink-0 rounded-full object-cover transition hover:opacity-80"
+                />
               </Link>
-              <span className="opacity-60">{author.title}</span>
+              <div className="flex flex-col">
+                <Link
+                  href={`/blog/author/${author.username}`}
+                  className="font-medium hover:text-primary-text hover:underline"
+                >
+                  {author.name}
+                </Link>
+                <span className="text-sm opacity-60">{author.title}</span>
+              </div>
+              <AuthorSocials author={author} className="ml-1" />
             </div>
           ))}
         </div>
