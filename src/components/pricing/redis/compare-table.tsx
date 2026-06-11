@@ -1428,7 +1428,15 @@ export default function CompareTable({
             </CompareValue>
           </Col>
           <Col plan={showFixed}>
-            <CompareValue>No per-command pricing</CompareValue>
+            <CompareValue
+              after={
+                <Tooltip content="Fixed plans can run an unlimited number of commands at no extra charge. Your monthly price is flat regardless of how many commands you process.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            >
+              No per-command pricing
+            </CompareValue>
           </Col>
           <Col plan={showEnterprise}>
             <CompareValue>Custom</CompareValue>
