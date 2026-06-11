@@ -1,0 +1,409 @@
+---
+slug: ai-sdk-telemetry-redis-search
+title: "Collecting AI SDK Telemetry with Upstash Redis Search"
+authors: [arda]
+tags: [redis, search, ai-sdk, telemetry, llm]
+description: "Capture Vercel AI SDK generations and tool calls as JSON in Upstash Redis, then serve latency percentiles, token stats, and error counts entirely with Upstash Redis Search aggregations — no sorted sets, no client-side math."
+---
+
+The moment you put an LLM call in production, you have questions about it. How
+many tokens is each agent burning? Which tool is slow at p99? How often does a
+generation stop because it hit the token cap instead of finishing cleanly? How
+many tool calls are failing? None of these are answerable from your application
+logs in any pleasant way, and "open the model provider's dashboard" stops
+working the moment you have more than one provider or want to see token usage
+for diferent agents.
+
+This post walks through a small, complete example: wire
+[Vercel AI SDK](https://ai-sdk.dev/) telemetry straight into
+[Upstash Redis Search](https://upstash.com/docs/redis/search/introduction), and
+serve the whole analytics layer (percentiles, token stats, error counts) with
+Upstash Redis Search aggregations. The full source is on GitHub:
+[**redis-js/examples/ai-sdk-telemetry**](https://github.com/upstash/redis-js/tree/main/examples/ai-sdk-telemetry).
+
+## Why collect telemetry at all?
+
+A normal HTTP service is mostly uniform: requests cost about the same, succeed
+or fail in obvious ways, and your existing metrics cover them. LLM calls are
+the opposite:
+
+- **Cost is per-call and variable.** Two requests to the same endpoint can
+  differ 50x in token usage. Without recording tokens per call, you can't
+  attribute spend to a feature, a user, or an agent.
+- **Latency is multi-modal.** A generation that calls three tools and loops
+  twice behaves nothing like a one-shot completion. Averages lie here; you want
+  p50/p95/p99 per tool.
+- **"Failure" is fuzzy.** A generation can finish with `stop`, `tool-calls`, or
+  `length`; a tool can throw while the generation still completes. You need to
+  see those outcomes broken down, not collapsed into a single success/error bit.
+
+So you record each generation and each tool call as an event, with the metadata
+you care about, and answer the questions later. (If you've read our
+[Building Analytics with Redis](https://upstash.com/blog/building-analytics-with-redis)
+post, this is the "record everything, query later" philosophy applied to AI
+calls.)
+
+## Telemetry in the AI SDK
+
+The AI SDK has telemetry built in, behind an `experimental_telemetry` option.
+It's based on [OpenTelemetry](https://opentelemetry.io/) and, as the name says,
+experimental: the SDK docs note the API may still change. You turn it on
+per call:
+
+```ts
+import { generateText } from "ai";
+import { openai } from "@ai-sdk/openai";
+
+await generateText({
+  model: openai("gpt-4o-mini"),
+  prompt,
+  experimental_telemetry: {
+    isEnabled: true,
+    functionId: "weather-bot",
+  },
+});
+```
+
+The options you'll reach for most:
+
+| Option | What it does |
+| --- | --- |
+| `isEnabled` | Turns telemetry collection on |
+| `functionId` | Labels the call so you can group by it later |
+| `metadata` | Arbitrary key/value pairs attached to the telemetry |
+| `recordInputs` / `recordOutputs` | Whether prompts/completions are recorded (both on by default; turn off for privacy or payload size) |
+
+By default the SDK emits OpenTelemetry spans (`ai.generateText`,
+`ai.generateText.doGenerate`, `ai.toolCall`, and the `streamText` equivalents).
+If you already run an OTel collector, you can point the SDK at it and be done.
+
+But you don't always want to stand up a collector just to answer "how many
+tokens did `weather-bot` use today?" For that, the AI SDK gives you a lighter
+hook: **telemetry integrations**.
+
+### Telemetry integrations
+
+Instead of wiring callbacks one by one, you implement a `TelemetryIntegration`
+once and pass it through `experimental_telemetry.integrations`. The lifecycle
+methods available in v6 are:
+
+- `onStart`
+- `onStepStart` / `onStepFinish`
+- `onToolCallStart` / `onToolCallFinish`
+- `onFinish`
+
+This is the seam we hook into. We only need two of them: `onToolCallFinish`
+(fires once per tool call, with timing and success) and `onFinish` (fires once
+per generation, with tokens and finish reason).
+
+## Writing telemetry into Redis
+
+The write path is one integration. Each tool call and each generation becomes a
+JSON document under the `ai:event:` prefix:
+
+```ts
+import { bindTelemetryIntegration } from "ai";
+import type {
+  TelemetryIntegration, OnFinishEvent, OnToolCallFinishEvent,
+} from "ai";
+import { Redis } from "@upstash/redis";
+
+const redis = Redis.fromEnv();
+
+// One integration → a JSON doc per tool call and per generation.
+export const redisSearchTelemetry = (): TelemetryIntegration =>
+  bindTelemetryIntegration({
+    onToolCallFinish: (e: OnToolCallFinishEvent) =>
+      redis.json.set(`ai:event:${crypto.randomUUID()}`, "$", {
+        type: "toolCall",
+        toolName: e.toolCall.toolName,
+        success: e.success,
+        durationMs: e.durationMs,
+        ts: new Date().toISOString(),
+      }),
+    onFinish: (e: OnFinishEvent) =>
+      redis.json.set(`ai:event:${crypto.randomUUID()}`, "$", {
+        type: "generation",
+        functionId: e.functionId,
+        model: e.model?.modelId,
+        finishReason: e.finishReason,
+        totalTokens: e.totalUsage.totalTokens,
+        ts: new Date().toISOString(),
+      }),
+  });
+```
+
+`bindTelemetryIntegration` keeps `this` bound when the SDK extracts the hooks as
+bare callbacks. Now any call that includes the integration emits telemetry:
+
+```ts
+await generateText({
+  model: openai("gpt-4o-mini"),
+  prompt,
+  experimental_telemetry: {
+    isEnabled: true,
+    functionId: "weather-bot",
+    integrations: [redisSearchTelemetry()], // one instance per call
+  },
+});
+```
+
+That's the entire write path.
+
+<Note>
+`@upstash/redis` is HTTP-based, so each `json.set` is a round trip. On a hot
+streaming path you don't want to pay that per hook. The
+[example in the repo](https://github.com/upstash/redis-js/tree/main/examples/ai-sdk-telemetry)
+buffers a generation's events and flushes them in a single pipeline at
+`onFinish`: one round trip per generation instead of one per event. The inline
+version above is kept simpler for the post.
+</Note>
+
+### Define the index once
+
+Writing JSON isn't enough on its own. You also need a
+[Upstash Redis Search](https://upstash.com/docs/redis/search/introduction) index over
+the `ai:event:` prefix. You create it a single time; after that the index
+auto-synchronizes, picking up every key written under the prefix. There is
+no separate "insert into index" step.
+
+```ts
+import { Redis, s } from "@upstash/redis";
+
+const redis = Redis.fromEnv();
+
+await redis.search.createIndex({
+  name: "ai-telemetry",
+  prefix: "ai:event:",
+  dataType: "json",
+  existsOk: true,        // safe to call on every boot
+  schema: s.object({
+    type: s.keyword(),   // "generation" | "toolCall"
+    functionId: s.keyword(),
+    model: s.keyword(),
+    toolName: s.keyword(),
+    finishReason: s.keyword(),
+    success: s.boolean(),
+    durationMs: s.number("F64"),
+    totalTokens: s.number("U64"),
+    ts: s.date().fast(), // .fast() is required to orderBy / range-filter a date
+  }),
+});
+```
+
+A few schema choices that matter:
+
+- **Group-by dimensions are `keyword`**, not facet. In this SDK, `$terms` and
+  `$eq`/`$in` accept keyword (and numeric/bool/date) fields; keyword gives you
+  both group-by and exact-match filtering.
+- **Numeric fields are numbers** so they support `$avg`, `$percentiles`,
+  `$stats`, and `$range`.
+- **`ts` is a date** with `.fast()`, which replaces any sorted-set ordering: you
+  sort and window with `orderBy` and date-range filters.
+
+<Note>
+A 30-day TTL on each `ai:event:` key gives you a rolling window that cleans
+itself. Expired keys leave the index automatically, so there's no cleanup job to
+run.
+</Note>
+
+With the integration writing events and the index picking them up, you have
+everything you need to read the data back. The example wraps it in a Next.js
+dashboard so you can watch it happen; here is what it looks like with telemetry
+flowing:
+
+![The AI SDK telemetry dashboard](/blog/ai-sdk-telemetry-redis-search/dashboard.png)
+
+The rest of this post is the read path: the queries behind that dashboard, and
+how the app is put together.
+
+## The queries
+
+Every chart on the dashboard is a single Upstash Redis Search aggregation. Redis does
+the math, so the app does no client-side reduction.
+
+Before reading on the same request you just wrote (a script or a test), call
+`waitIndexing()` once so the documents are searchable. In a long-running app you
+don't need to think about it.
+
+### Latency percentiles per tool
+
+`$percentiles` computes p50/p95/p99 inside Redis, per tool, over successful
+calls only:
+
+```ts
+const index = redis.search.index({ name: "ai-telemetry", schema });
+
+const latency = await index.aggregate({
+  filter: { type: { $eq: "toolCall" }, success: { $eq: true } },
+  aggregations: {
+    by_tool: {
+      $terms: { field: "toolName", size: 20 },
+      $aggs: {
+        p: { $percentiles: { field: "durationMs", percents: [50, 95, 99] } },
+        avg: { $avg: { field: "durationMs" } },
+      },
+    },
+  },
+});
+```
+
+Each bucket comes back with the percentile values and a doc count, which the app
+shapes into one row per tool:
+
+```ts
+[
+  { tool: "getWeather", p50: 41, p95: 92, p99: 98, avg: 53, calls: 120 },
+  { tool: "checkStatus", p50: 38, p95: 74, p99: 79, avg: 47, calls: 36 },
+]
+```
+
+The dashboard renders that as a grouped bar chart, three bars (p50/p95/p99) per
+tool, so a slow tail jumps out immediately.
+
+![Tool latency percentiles chart](/blog/ai-sdk-telemetry-redis-search/latency-chart.png)
+
+### Token stats per agent
+
+`$stats` returns count/min/max/sum/avg in one shot, grouped by `functionId`:
+
+```ts
+const tokens = await index.aggregate({
+  filter: { type: { $eq: "generation" }, ts: { $gte: since } },
+  aggregations: {
+    by_fn: {
+      $terms: { field: "functionId" },
+      $aggs: { tokens: { $stats: { field: "totalTokens" } } },
+    },
+  },
+});
+```
+
+That single aggregation powers both the "tokens per agent" chart and the
+top-line "total tokens" / "avg tokens per generation" stat cards.
+
+![Tokens per agent chart](/blog/ai-sdk-telemetry-redis-search/tokens-chart.png)
+
+### Finish-reason breakdown
+
+A plain `$terms` group-by gives you the distribution of how generations ended
+(`stop` vs `tool-calls` vs `length`):
+
+```ts
+const reasons = await index.aggregate({
+  filter: { type: { $eq: "generation" } },
+  aggregations: {
+    reasons: { $terms: { field: "finishReason", size: 10 } },
+  },
+});
+```
+
+![Finish reasons chart](/blog/ai-sdk-telemetry-redis-search/finish-reasons.png)
+
+### Failed tool calls
+
+Counting failures uses a `$mustNot` paired with a `$must` (a `$mustNot` alone
+only excludes, so it must be anchored to something it includes):
+
+```ts
+const { count } = await index.count({
+  filter: {
+    $and: [
+      {
+        $must: [{ type: { $eq: "toolCall" } }],
+        $mustNot: [{ success: { $eq: true } }],
+      },
+    ],
+  },
+});
+```
+
+### Recent generations, without a sorted set
+
+Because `ts` is an indexed date field, ordering by time is just `orderBy` plus a
+range filter, with no parallel sorted set to maintain:
+
+```ts
+const recent = await index.query({
+  filter: { type: { $eq: "generation" }, ts: { $gte: since } },
+  select: { functionId: true, model: true, totalTokens: true, finishReason: true, ts: true },
+  orderBy: { ts: "DESC" },
+  limit: 10,
+});
+```
+
+Filters, numeric ranges, date ranges, group-bys, percentiles, stats: all
+decided at query time, none of it planned for when you wrote the event. See the
+[querying](https://upstash.com/docs/redis/search/querying) and
+[aggregating](https://upstash.com/docs/redis/search/aggregations) docs for the
+full set.
+
+## How the app works
+
+The example ships a Next.js dashboard so you can see all of this live:
+
+- It **ensures the index exists on load** (`createIndex` with `existsOk: true`),
+  so there's no setup step.
+- A **control panel** lets you run an ad-hoc generation from a prompt, or seed a
+  batch of sample prompts that exercise every finish reason and both event
+  types (a tool call that succeeds, one that throws, a generation capped to hit
+  `length`, and a plain completion).
+- Every chart and stat card is rendered from **one aggregation per request**,
+  run concurrently after a single `waitIndexing()`.
+
+![Run an agent or seed sample data from the dashboard](/blog/ai-sdk-telemetry-redis-search/control-panel.png)
+
+The dashboard also embeds the integration and query snippets inline, so you can
+copy the exact code that produces each chart.
+
+A live version is deployed at
+[ai-sdk-telemetry.vercel.app](https://ai-sdk-telemetry.vercel.app/), or you can
+run it locally in three commands:
+
+```bash
+npm install
+cp .env.example .env   # UPSTASH_REDIS_REST_URL/TOKEN + OPENAI_API_KEY
+npm run dev            # dashboard at http://localhost:3000
+```
+
+## What's missing in v6 (and coming in v7)
+
+There's one sharp edge worth calling out, and it's the reason the integration
+only records the success path.
+
+The v6 `TelemetryIntegration` exposes only success-path hooks; there's no
+`onError`. That has one practical consequence:
+
+- **Tool errors are recorded.** A throwing tool fires `onToolCallFinish` with
+  `success: false`, and the generation still finishes (usually
+  `finishReason: "stop"`). So failed tool calls show up in your telemetry.
+- **LLM-call errors are not.** If the model request itself throws or returns a
+  non-2xx response, `generateText` throws *before* `onFinish` runs. Only
+  `onStart` / `onStepStart` fire, so nothing is written and there's no `error`
+  finish reason to read back.
+
+In other words, in v6 you can see tools failing, but a model call that 500s or
+times out leaves no trace through the integration.
+
+<Note>
+[AI SDK v7](https://ai-sdk.dev/v7/docs/ai-sdk-core/telemetry) reworks telemetry
+integrations into a more granular interface, with separate hooks for the
+language-model call (`onLanguageModelCallStart` / `onLanguageModelCallEnd`) and
+tool execution (`onToolExecutionStart` / `onToolExecutionEnd`), plus `onEnd` and
+an `onAbort` hook for interrupted streams. That gives you more points to observe
+a call than v6's success-path-only hooks. Until the example upgrades, the way to
+capture a failed LLM call today is to wrap `generateText` in a `try/catch` and
+write your own `error` event.
+</Note>
+
+## Wrapping up
+
+The whole thing is small: one telemetry integration on the write path, one
+auto-synchronizing Upstash Redis Search index, and a handful of aggregations on the
+read path. It runs on the Redis you already use for caching or rate limiting,
+with no extra datastore or ETL job to operate, and the 30-day TTL keeps it tidy.
+
+Grab the full example here:
+[**redis-js/examples/ai-sdk-telemetry**](https://github.com/upstash/redis-js/tree/main/examples/ai-sdk-telemetry),
+and read up on what Upstash Redis Search can do in the
+[introduction](https://upstash.com/docs/redis/search/introduction).
