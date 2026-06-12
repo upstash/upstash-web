@@ -32,7 +32,7 @@ I checked all prices below against official pricing pages in June 2026, so check
 
 | Provider | Engine | Billing model | Entry price | Free tier | Best for |
 | --- | --- | --- | --- | --- | --- |
-| Upstash | Redis-compatible | Per request + storage or fixed plan w/ unlimited commands | $0 | 256 MB, 500K commands/mo | Serverless, scaling, high-frequency workloads |
+| Upstash | Redis-compatible | Per request + storage or fixed plan w/ unlimited commands | $0 | 256 MB, 500K commands/mo | Serverless, scaling, high-frequency workloads, with the option of flat predictable bills on fixed plans |
 | AWS ElastiCache | Valkey / Redis OSS | Per node-hour | \~$12/mo (cache.t4g.micro) | None (12-mo trial only) | High sustained throughput on AWS |
 | AWS MemoryDB | Valkey / Redis OSS | Per node-hour + per GB written | \~$315/mo | None | Redis as a durable primary database |
 | Redis Cloud | Redis 8 | Per usable GB | $0 (30 MB) | 30 MB | Redis modules, Active-Active |
@@ -130,7 +130,7 @@ Azure Cache is the obvious choice when you're on Azure with existing commitments
 
 ![Valkey DigitalOcean Pricing 2026](https://cdn.contentport.io/chat/Sw016rSl6asUNtj0EpHf3DiBcD0ot3sQ/pTv5twBa8qi569ISWFF5l.png)
 
-DigitalOcean is the right fit if you want a predictable monthly number and no Redis modules to worry about.
+DigitalOcean is a fit if you want a predictable monthly number and no Redis modules to worry about. Upstash's fixed plans give you the same predictable number with unlimited commands, and add things DigitalOcean doesn't have: an indefinite free tier, a REST API for edge functions, multi-region read replicas, and Redis Search and JSON support, while letting you start on pay-as-you-go and switch to a fixed plan once traffic is steady.
 
 ### Aiven
 
@@ -222,7 +222,7 @@ Here's what each provider charges for that 50 GB:
 
 High availability works differently across the billing models. For the per-node providers HA means a second node, so the cost is at least double a single node. Reserved ElastiCache nodes are the cheapest replicated cache at $221.
 
-DigitalOcean's flat $480 is the easiest to predict.
+Upstash's fixed plans are just as predictable as DigitalOcean's, and cheaper here: the 10 GB plan plus Prod Pack is a flat $400 against DigitalOcean's $480, with multi-region read replicas and a REST endpoint DigitalOcean doesn't offer.
 
 Azure Premium P2 is the most expensive here because Premium bundles clustering and persistence this workload may not need. The Standard tier is cheaper without them.
 
@@ -274,7 +274,7 @@ What Valkey does not include is the Redis modules: RediSearch, RedisJSON, RedisT
 - **Redis Cloud** if the workload needs Redis modules like RediSearch, or Active-Active writes across regions.
 - **Google Memorystore** if the stack is on GCP, so co-location avoids egress, and committed-use discounts fit the forecast.
 - **Azure Cache for Redis** if the app is on Azure with existing commitments and compliance needs.
-- **DigitalOcean** if you want one flat, predictable number and don't need modules.
+- **DigitalOcean** if you want one flat, predictable number and don't need modules, though Upstash's fixed plans give you the same flat number plus a free tier, edge/REST access, and module support.
 - **Aiven** if portability across clouds is the goal.
 - **Railway** if Redis should run next to the rest of the app on one platform and self-managing the instance is acceptable.
 
