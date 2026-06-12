@@ -12,7 +12,7 @@ generation stop because it hit the token cap instead of finishing cleanly? How
 many tool calls are failing? None of these are answerable from your application
 logs in any pleasant way, and "open the model provider's dashboard" stops
 working the moment you have more than one provider or want to see token usage
-for diferent agents.
+for different agents.
 
 This post walks through a small, complete example: wire
 [Vercel AI SDK](https://ai-sdk.dev/) telemetry straight into
@@ -235,7 +235,7 @@ don't need to think about it.
 calls only:
 
 ```ts
-const index = redis.search.index({ name: "ai-telemetry", schema });
+const index = redis.search.index({ name: "ai-telemetry" });
 
 const latency = await index.aggregate({
   filter: { type: { $eq: "toolCall" }, success: { $eq: true } },
@@ -369,8 +369,8 @@ npm run dev            # dashboard at http://localhost:3000
 
 ## What's missing in v6 (and coming in v7)
 
-There's one sharp edge worth calling out, and it's the reason the integration
-only records the success path.
+There's one sharp edge worth calling out: in v6 you can record tool-call failures,
+but language-model request failures don't reach `onFinish`, so they aren't captured.
 
 The v6 `TelemetryIntegration` exposes only success-path hooks; there's no
 `onError`. That has one practical consequence:
