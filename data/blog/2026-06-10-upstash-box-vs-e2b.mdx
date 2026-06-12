@@ -1,0 +1,181 @@
+---
+slug: upstash-box-vs-e2b
+title: "Upstash Box vs E2B: Two Takes on Computers for AI Agents"
+authors: [alitarik]
+tags: [box, ai, serverless]
+description: "Upstash Box and E2B both give AI a sandbox to work in, but they draw the line in different places. A look at where the agent lives, how state persists, isolation, and what each costs."
+---
+
+<Summary>
+**Upstash Box** puts the coding agent *inside* the sandbox. You create a box, hand it a prompt, and a built-in harness (Claude Code, Codex, or OpenCode) drives the shell, filesystem, and git for you. It's built for durable, per-tenant agent environments that sleep when idle and wake up with their state intact.
+
+**E2B** keeps the agent *outside* and gives you a sandbox to run code in, with a Jupyter-based Code Interpreter, Firecracker microVM isolation, and memory-state pause/resume. You bring the orchestration.
+
+Most of the choice comes down to that one line: do you want a computer with an agent already in it, or a clean machine you point your own agent at?
+</Summary>
+
+"Sandbox for AI agents" has become a crowded label, and it hides a real design fork. Some products hand you an isolated machine and assume you've already built the agent that will use it. Others put the agent in the box and hand you the prompt. [Upstash Box](https://upstash.com/docs/box/overall/quickstart) and [E2B](https://e2b.dev) sit on opposite sides of that fork, which makes them easy to confuse and important to tell apart.
+
+Both run untrusted, model-generated code somewhere it can't touch your infrastructure. Past that shared floor, they're built for different jobs. This post walks through where they actually differ (who runs the agent, how a session persists, how each isolates code, and what you pay) without pretending either one wins every row.
+
+---
+
+## Where the agent runs
+
+This is the difference everything else hangs off of.
+
+A **Box ships with the agent inside it.** You pick a harness and a model at creation time, and the box already knows how to give that agent the shell, filesystem, and git. You send a prompt; it reads files, runs commands, reacts to failing tests, and keeps going until the task is done.
+
+```ts
+import { Agent, Box } from "@upstash/box"
+
+const box = await Box.create({
+  runtime: "node",
+  agent: { harness: Agent.ClaudeCode, model: "anthropic/claude-fable-5" },
+  git: { token: process.env.GITHUB_TOKEN },
+})
+
+await box.git.clone({ repo: "github.com/your-org/your-repo" })
+await box.agent.run({ prompt: "Fix the null-token bug in src/auth.ts and add tests" })
+await box.git.createPR({ title: "Fix null token bug", base: "main" })
+```
+
+Clone, fix, test, open a PR, with no tool-call wiring and no agent loop of your own. You can also pin the output to a schema and get a typed result back instead of free text:
+
+```ts
+const { result } = await box.agent.run({
+  prompt: "Analyze /work/report.csv and return the top 10 customers by revenue",
+  responseSchema: z.object({
+    customers: z.array(z.object({ name: z.string(), revenue: z.number() })),
+  }),
+})
+result.customers // typed
+```
+
+**E2B leaves the orchestration to you.** It gives you a first-class way to *execute* code via the [Code Interpreter](https://e2b.dev), a headless Jupyter server inside each sandbox, and templates can bundle agent tooling like Codex, but the agent loop itself stays in your application. Call `runCode()` and state carries across calls: variables, imports, and loaded data stick around between executions. Results come back structured, so a Matplotlib chart returns as a PNG plus extractable data (type, axes, points) you can re-render on the client. It speaks Python, JS/TS, R, Java, and Bash.
+
+Both run agent and harness workloads; they just start from different defaults. Box ships a harness so you can run one in a few lines, but it also exposes raw shell, code execution, and file APIs if you'd rather point your own agent loop at it. E2B leans on its excellent stateful execution and expects you to bring the orchestration, with templates that can bundle agent tooling. So this isn't really one primitive versus another, it's a question of where you want the harness to live and what you're optimizing for around it.
+
+---
+
+## How long a session lives, and what survives
+
+Both products are built around the idea that a sandbox outlives a single request, which already sets them apart from purely ephemeral runners. Where they diverge is *what* survives a nap.
+
+A Box auto-pauses after a plan-dependent idle timeout (free plans around an hour, paid plans longer), releasing its compute while keeping the **filesystem and environment**. Send it new work days or weeks later and it wakes up with its installed packages, file history, and git state right where they were. That's the backbone of the **agent-server** pattern: one durable box per tenant, accumulating context and preferences over time, costing almost nothing while it sleeps. Need it always-on instead, for a dev server or a warm long-running agent? Flip `keepAlive: true` and it stops pausing.
+
+E2B's pause/resume goes one step further on fidelity: it snapshots the **memory state** too (running processes, loaded variables) and brings it back in about a second. If your session holds something expensive in RAM, like a loaded ML model or a parsed dataset, that's a real advantage; a filesystem-only restore would make you rebuild it.
+
+Box's answer to that is **snapshots**, which capture workspace/disk state so you can fan a prepared environment out into many boxes (agent and runtime settings are inherited from the source box or overridden at restore):
+
+```ts
+const base = await Box.create({ runtime: "node" })
+await base.exec.command("npm install -g typescript eslint prettier")
+const snap = await base.snapshot({ name: "toolchain" })
+
+// branch the same prepared state into parallel workers
+const boxes = await Promise.all(tasks.map(() => Box.fromSnapshot(snap.id)))
+```
+
+Different shapes of the same goal: E2B preserves a live session with its memory; Box preserves a reusable starting point you can clone. Pick based on whether your state is *in RAM* or *on disk*.
+
+| | Upstash Box | E2B |
+| --- | --- | --- |
+| Idle behavior | Auto-pause, resumable days/weeks later | Pause/resume on demand |
+| What's preserved | Filesystem + environment (memory via keep-alive staying on) | Filesystem **+ memory state**, ~1s resume |
+| Reusable base state | Snapshots (workspace/disk state), fan-out to N boxes | Templates from Docker images |
+| Always-on option | `keepAlive: true` | Long-lived sessions (24 hr Pro) |
+
+---
+
+## Isolation, secrets, and egress
+
+Here E2B has a structural edge and Box answers with controls one layer up. Both are worth being plain about.
+
+E2B runs each sandbox in a **Firecracker microVM** with its own kernel. That's a stronger blast wall between tenants than container isolation, and it's E2B's primary boundary. If your threat model includes kernel-level escape between untrusted workloads, that matters.
+
+A **Box is an isolated container**, with its own filesystem, process tree, and network namespace, unable to see other boxes, private networks, or cloud metadata. On top of that boundary, Box adds two controls aimed at the failure mode most agent workloads actually hit: untrusted code leaking a credential or calling somewhere it shouldn't.
+
+**Attach Headers** keeps secrets off the container floor. A TLS-intercepting proxy on the host injects your API keys into matching outbound HTTPS requests, so the secret isn't exposed to the container's env vars or files; it's added by the host proxy in transit:
+
+```ts
+const box = await Box.create({
+  runtime: "node",
+  attachHeaders: {
+    "api.stripe.com": { Authorization: "Bearer sk_live_..." },
+    "*.supabase.co": { apikey: "eyJ..." },
+  },
+})
+// the container issues the request; the host adds the secret in transit
+await box.exec.command("curl -s https://api.stripe.com/v1/charges?limit=1")
+```
+
+**Network policy** controls egress and updates on a *running* box, so you can start locked down and open up as the work proceeds. Denied CIDRs always win over allowed ones, and private ranges stay blocked even if you try to allow them:
+
+```ts
+await box.updateNetworkPolicy({
+  mode: "custom",
+  allowedDomains: ["api.github.com", "registry.npmjs.org"],
+})
+```
+
+E2B offers egress controls too (allow rules for domains, CIDRs, and IPs, and deny rules for CIDRs and IPs, with allow taking precedence), and on the deployment side it has options Box doesn't have yet: managed cloud plus enterprise bring-your-own-cloud and self-hosted deployments, with region availability depending on the deployment mode. Box runs on AWS `us-east-1` today. The short version: E2B gives you a harder isolation primitive and more places to put it; Box gives you finer-grained, runtime control over what leaves the box and keeps secrets off the container floor.
+
+---
+
+## What it costs
+
+The billing models reflect the two designs. E2B charges per-second wall-clock for a running sandbox, which is fair for sessions you keep warm. Box charges **active CPU time** and leaves memory free, which suits bursty agent work that spends most of its wall-clock waiting on model inference or a slow API.
+
+| | Upstash Box (Pay as you go) | E2B (Pro) |
+| --- | --- | --- |
+| Platform fee | $0 | $150/mo |
+| CPU | Active only: $0.10/hr (`small`, 2 vCPU), $0.20 (`medium`), $0.40 (`large`) | $0.0504 / vCPU-hr, wall-clock |
+| Memory | Free | $0.0162 / GiB-hr, wall-clock |
+| Storage | $0.10 / GB-month (snapshots included) | included up to plan disk limit (10 GiB Hobby, 20+ GiB Pro) |
+| Continuous runtime | Keep-alive, flat $8 / $16 / $32 per month | up to 24 hr on Pro; paused sandboxes resume later |
+| Free tier | 10 concurrent, 5 CPU-hrs/mo, $1 LLM budget | $100 one-time credit, 20 concurrent, 1 hr max |
+
+Because the agent lives in the box, Box also meters LLM tokens for you, capped at $1/month on Free and a $100/month budget on Pay as you go. Full numbers live on the [Box pricing page](https://upstash.com/pricing/box).
+
+A `small` Box (2 vCPU, 4 GB) against a custom, matched E2B sandbox (2 vCPU, 4 GiB ≈ $0.166/hr wall-clock here), for a task that idles on I/O. These are usage-only figures, excluding E2B's $150/mo Pro base fee:
+
+| Scenario | Wall clock | Active CPU | Upstash Box | E2B |
+| --- | --- | --- | --- | --- |
+| Quick code eval | 10 min | 2 min | ~$0.003 | ~$0.03 |
+| Long task, mostly waiting | 1 hr | 10 min | ~$0.02 | ~$0.17 |
+
+The spread comes from two places: Box doesn't bill the I/O-wait time and doesn't charge for memory, and there's no monthly platform fee on Pay as you go. Run a warm, CPU-bound session for hours and the gap narrows, since wall-clock billing isn't punishing when the CPU is genuinely busy the whole time. Storage is separate for boxes and snapshots you keep around, and negligible for short disposable runs.
+
+---
+
+## Picking one
+
+Both products run agent and harness workloads well, whether you lean on a built-in agent or wire up your own. The deciding factor is usually what you optimize for.
+
+Reach for **E2B** when isolation is the priority. Firecracker microVMs give each tenant its own kernel, and you can self-host or deploy into your own cloud, which is what you want under strict kernel-isolation or data-residency requirements. It's also the stronger pick if you specifically need notebook-style execution with stateful `runCode`, charts and tables out of the box, memory that survives a pause, or a desktop over VNC.
+
+Reach for **Upstash Box** when cost and developer experience matter most. The agent, git, and PR flow are built in, so you have option to ship an agent in a few lines instead of assembling a harness, and a Box stays durable per tenant: it sleeps cheaply and wakes with its state. Active-CPU billing with free memory keeps bursty, I/O-heavy agent work cheap at scale, while secrets stay off the container and egress tightens at runtime.
+
+Plenty of teams will reach for both. They're not the same tool wearing different prices; they weigh isolation, cost, and developer experience differently.
+
+---
+
+## Try Box
+
+```ts
+import { Agent, Box } from "@upstash/box"
+
+const box = await Box.create({
+  runtime: "node",
+  agent: { harness: Agent.ClaudeCode, model: "anthropic/claude-fable-5" },
+})
+
+const run = await box.agent.run({
+  prompt: "Write a /health endpoint in server.js and start it on port 3000",
+})
+
+console.log(run.result)
+```
+
+The free tier is 10 concurrent boxes and 5 CPU-hours a month, no platform fee. The [quickstart](https://upstash.com/docs/box/overall/quickstart) gets you running in a few minutes, and the [use cases](https://upstash.com/docs/box/overall/use-cases) page walks through the agent-server and multi-agent orchestration patterns end to end.
