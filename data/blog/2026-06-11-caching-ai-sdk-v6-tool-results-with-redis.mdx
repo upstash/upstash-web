@@ -1,0 +1,256 @@
+---
+title: "Caching AI SDK v6 tool results with Redis"
+slug: caching-ai-sdk-v6-tool-results-with-redis
+authors: [josh]
+tags: [redis, ai]
+description: "Cache AI SDK v6 tool results in Redis by writing a simple, clean TypeScript wrapper. Working code with Upstash Redis and an example tool."
+publishedAt: "2026-06-11T12:00:00Z"
+---
+
+<Summary>
+For tools like web search, web fetching, weather maps, getting geographical data or many others, caching with Redis can reduce tool call times up to 25x. It's also much cheaper and takes 40 lines of TypeScript in the newest Vercel AI SDK version.
+</Summary>
+
+## The tool we're going to speed up
+
+Here is an example AI SDK v6 web search tool. It works, but every call uses another API credit and takes around 2 seconds.
+
+```tsx id="code-yjhqa6wo"
+import { tool } from "ai";
+import { z } from "zod";
+
+const web_search = tool({
+  description: "Search the web for up-to-date information.",
+  inputSchema: z.object({
+    query: z.string(),
+  }),
+  execute: async ({ query }) => {
+    return await searchTheWeb(query);
+  },
+});
+```
+
+In this article, we'll wrap the `execute` function with a small Redis cache so a repeated query returns from memory in a few milliseconds.
+
+![Tool calling without caching](https://cdn.contentport.io/chat/Sw016rSl6asUNtj0EpHf3DiBcD0ot3sQ/ScFbeASUvO38suqnptG9V.png)
+
+![Tool calling with caching: The tool only needs to run once, we cache its result](https://cdn.contentport.io/chat/Sw016rSl6asUNtj0EpHf3DiBcD0ot3sQ/zCAF2OXHAQ0tXS0k-llhe.png)
+
+## Key takeaways
+
+- **Tool caching is \~25x faster on a repeat query.** This of course depends a lot on the tool itself and how long it takes. But just for testing, I wrapped a Firecrawl-backed web search tool with the cache below. It's uncached call takes 810 ms and a cache hit 32 ms (across 10 runs)
+- **About 40 lines of TypeScript.** Our cache is a single higher-order function around the tool's execute. The tool code stays the same.
+
+## Why cache tool calls instead of LLM responses?
+
+The AI SDK ships a [caching middleware pattern](https://ai-sdk.dev/docs/advanced/caching) that wraps the model itself:
+
+```tsx id="code-0z72g6fx"
+import { Redis } from "@upstash/redis";
+import type { LanguageModelMiddleware } from "ai";
+
+const redis = Redis.fromEnv();
+
+const cache: LanguageModelMiddleware = {
+  specificationVersion: "v3",
+  wrapGenerate: async ({ doGenerate, params }) => {
+    const key = JSON.stringify(params); // 👈 whole prompt, settings, history
+    const cached = await redis.get(key);
+    if (cached) return cached as Awaited<ReturnType<typeof doGenerate>>;
+
+    const result = await doGenerate();
+    await redis.set(key, result, { ex: 60 * 60 });
+    return result;
+  },
+};
+```
+
+The cache key is the entire `params` object: message history, model settings, system prompt, all of it. That works for batch jobs replaying the same prompt, but I found that conversational agents rarely repeat full prompts. Message history, timestamps, and user phrasing all change, so the cache hits almost never.
+
+Tool inputs, on the other hand, repeat a lot. A `web_search` tool gets called with `{ query: "typescript v6" }` fairly often when a user asks about TypeScript because models are quite deterministic in how they write their input queries. A `getUserProfile` tool gets called with the same user ID on every step of a multi-step loop. A `fetchPricing` tool gets called with the same product ID.
+
+Caching at the tool layer is useful even when the LLM cache misses. A web search API like [Tavily charges $0.008 per credit](https://docs.tavily.com/documentation/api-credits) (basic search = 1 credit) and [Exa charges $5 per 1,000 searches](https://exa.ai/pricing). An agent doing 10,000 searches/day on Tavily costs about $80/day just for that tool. If we assume a 25% cache hit rate, we're down to about $60/day, or roughly $600/month saved on a single tool.
+
+## How do I write a Redis cache wrapper?
+
+Let's build the wrapper as a higher-order function: it takes a tool, returns a new tool with the same shape but a wrapped `execute`. On every call the wrapped function hashes the input into a Redis key, checks for a hit, runs the original on miss, and writes the result back with a TTL.
+
+```tsx id="code-0eyuuvnt"
+// lib/cache.ts
+import { Redis } from "@upstash/redis";
+import type { Tool } from "ai";
+
+const redis = Redis.fromEnv();
+
+// we sort object keys so {a:1,b:2} and {b:2,a:1} hash the same.
+function stableStringify(value: unknown): string {
+  if (value === null || typeof value !== "object") return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map(stableStringify).join(",")}]`;
+  const entries = Object.entries(value as Record<string, unknown>).sort(
+    ([a], [b]) => a.localeCompare(b),
+  );
+  return `{${entries
+    .map(([k, v]) => `${JSON.stringify(k)}:${stableStringify(v)}`)
+    .join(",")}}`;
+}
+
+export function cached<T extends Tool>(
+  name: string,
+  toolDef: T,
+  options: { ttlSeconds?: number } = {},
+): T {
+  const original = toolDef.execute;
+  if (!original) return toolDef;
+
+  const ttl = options.ttlSeconds ?? 60 * 60; // 1 hour default
+
+  return {
+    ...toolDef,
+    execute: async (input: unknown, ctx: Parameters<typeof original>[1]) => {
+      const key = `tool:${name}:${stableStringify(input)}`;
+
+      const hit = await redis.get(key);
+      if (hit !== null) return hit;
+
+      const result = await original(
+        input as Parameters<typeof original>[0],
+        ctx,
+      );
+      await redis.set(key, result, { ex: ttl });
+      return result;
+    },
+  } as T;
+}
+```
+
+Quick note, the `ex` option on `set` is a single round-trip with TTL attached (the same as `SET key value EX 3600`), which is faster than `SET` + `EXPIRE`.
+
+## How do I apply it to the web\_search tool?
+
+In just one line. We wrap the tool definition with `cached("web_search", ...)` and export the result. The agent code that consumes the tool does not change at all.
+
+```tsx id="code-d0u67216"
+// tools/web-search.ts
+import { tool } from "ai";
+import { z } from "zod";
+import { cached } from "@/lib/cache";
+
+async function searchTheWeb(query: string) {
+  // any search provider works — firecrawl, tavily, exa, etc.
+  const res = await fetch("https://api.firecrawl.dev/v2/search", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.FIRECRAWL_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ query, limit: 5 }),
+  });
+  if (!res.ok) throw new Error(`web search failed: ${res.status}`);
+  return (await res.json()) as {
+    success: boolean;
+    data: { web: { url: string; title: string; description: string }[] };
+  };
+}
+
+export const web_search = cached(
+  "web_search",
+  tool({
+    description: "Search the web for up-to-date information.",
+    inputSchema: z.object({
+      query: z.string().describe("The search query."),
+    }),
+    execute: async ({ query }) => searchTheWeb(query),
+  }),
+  { ttlSeconds: 60 * 60 },
+);
+```
+
+Drop it into a `ToolLoopAgent` or `streamText` call the same way you would any other tool:
+
+```tsx id="code-3rssaixc"
+import { streamText } from "ai";
+import { anthropic } from "@ai-sdk/anthropic";
+import { web_search } from "@/tools/web-search";
+
+const result = streamText({
+  model: anthropic("claude-sonnet-4-6"),
+  messages,
+  tools: { web_search },
+});
+```
+
+## How do I test if it works?
+
+Let's loop 10 unique queries through the wrapped tool, timing both the cold call and an immediate repeat:
+
+```tsx id="code-ojftmf9f"
+// bench.ts
+import { web_search } from "./tools/web-search";
+
+const ctx = { toolCallId: "bench", messages: [] } as never;
+const misses: number[] = [];
+const hits: number[] = [];
+
+for (let i = 0; i < 10; i++) {
+  const input = { query: `bench query ${Date.now()}-${i}` };
+
+  const t1 = performance.now();
+  await web_search.execute!(input, ctx);
+  misses.push(performance.now() - t1);
+
+  const t2 = performance.now();
+  await web_search.execute!(input, ctx);
+  hits.push(performance.now() - t2);
+}
+
+const median = (xs: number[]) =>
+  [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)];
+
+console.log(`miss median: ${median(misses).toFixed(1)} ms`);
+console.log(`hit  median: ${median(hits).toFixed(1)} ms`);
+```
+
+Running this against live Firecrawl + a fresh Upstash Redis database (not even same region):
+
+```tsx id="code-haw35r7z"
+miss median: 809.6 ms
+hit  median:  32.1 ms
+```
+
+A repeat call goes from \~810 ms (Firecrawl round-trip) to \~32 ms (Upstash REST GET). It's about 25x faster, and the cached call costs zero search credits. A same-region production deployment will see hits in the single-digit milliseconds; the 32 ms above includes \~25-30 ms of cross-region REST round-trip.
+
+In both cases, to the model, it looks like it got the exact same web search result.
+
+## What TTL should I pick?
+
+I asked AI what it thinks and it said this:
+
+| Tool type | Suggested TTL | Why |
+| --- | --- | --- |
+| Web search (general / evergreen queries) | 1 hour to 24 hours | Top results for "what is X" do not change minute-to-minute. |
+| Web search (news, sports scores, prices) | 30–120 seconds | Freshness matters but a chat session is still cacheable. |
+| Public API lookups (weather, exchange rates) | 1–10 minutes | Data drifts but freshness within a chat is fine. |
+| User-scoped reads (profile, settings) | 30–120 seconds | Cheap, but invalidate on writes. |
+| Anything with a write side-effect | Do not cache | Caching `sendEmail` is how you ship bugs. |
+
+For the web search case, 1 hour is a good default. Long enough that "redis vs memcached" hits the cache across different conversations (or in one conversation if you go hard on context compression), and short enough that "openai latest model" stays roughly current.
+
+If you want freshness control per call, add a `maxAgeSeconds` field to the tool input. The model can ask for fresh data when the user explicitly wants it (news, today's weather), and the key naturally splits hot/fresh from regular requests.
+
+## When should I not cache a tool?
+
+Three cases where the wrapper is a bad idea:
+
+- **Tools with side effects.** Anything that writes (create order, send email, post message) must run every time. Caching the response means the side effect happens once and the next call silently returns the cached confirmation without doing the work.
+- **Tools whose output depends on time or randomness.** A `getCurrentTime` tool, a `rollDice` tool, anything stochastic. The cache will pin the first answer forever (or until TTL).
+- **Tools where the input space is effectively unbounded.** If every call has a unique input (a freeform user message embedded as the key), you will fill Redis with garbage you never read. Track the hit ratio for a day before keeping the wrapper on.
+
+For everything else (documentation search, third-party reads, computed analytics), the wrapper adds one Redis round-trip per call (single-digit milliseconds when your function and Redis are in the same region) and saves the underlying latency on every hit. Track the hit ratio with `INCR` counters on hit and miss to see if it pays off.
+
+## How is this different from the AI SDK's caching middleware?
+
+The [`LanguageModelMiddleware` cache](https://ai-sdk.dev/docs/advanced/caching) shown above wraps `doGenerate` and `doStream.` It caches the entire model response keyed by the full request params. That is the right layer when you have idempotent prompts (a daily summary job, a deterministic classification endpoint).
+
+With tool caching, we cache the work *inside* each step of the agent loop, while letting the LLM run normally and pick which tool to call. Both can coexist. For chat agents, tool caching is usually better because a single tool input (a search query, a user ID, a product ID) repeats far more often than a whole conversation prefix.
+
+If you want a packaged version of the same pattern with streaming-tool support and richer key generation, [`@ai-sdk-tools/cache`](https://ai-sdk-tools.dev/cache) implements the same idea with a `createCached({ cache: Redis.fromEnv() })` factory.

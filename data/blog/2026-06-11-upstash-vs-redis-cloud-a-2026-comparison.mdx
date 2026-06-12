@@ -1,0 +1,333 @@
+---
+title: "Upstash vs Redis Cloud: A 2026 comparison"
+slug: upstash-vs-redis-cloud-a-2026-comparison
+authors: [josh]
+tags: [redis]
+description: "Upstash vs Redis Cloud in 2026: Latency & performance benchmarks, pros & cons, use cases, pricing comparison"
+publishedAt: "2026-06-11T12:00:00Z"
+---
+
+<Summary>
+**Pick Upstash if:**
+
+- You run serverless code or want scale-to-zero pricing ($0 idle)
+- You're using agents (Claude Code, Codex) to write code and want a better developer experience
+
+**Pick Redis Cloud if:**
+
+- You want dedicated VMs and don't mind the $200/mo Pro minimum
+- You need the full Redis Stack (TimeSeries, Bloom, etc.) or Active-Active multi-region writes
+</Summary>
+
+## Key takeaways
+
+- Redis Cloud's free tier is 30 MB with a 100 ops/sec cap and 30 concurrent connections (see [Essentials plan docs](https://redis.io/docs/latest/operate/rc/subscriptions/view-essentials-subscription/essentials-plan-details/)). Upstash's free tier covers 500K commands/month and 256 MB
+- Upstash's Fixed plans start at $10/month for 250 MB with no per-command billing and unlimited commands (with a 10,000 cmd/sec ceiling). The same plan costs $5/month on Redis Cloud Essentials but throttles at 1,000 ops/sec.
+- You can get a free Upstash Redis database without any sign-up by making a POST request to [https://upstash.com/start-redis](https://upstash.com/start-redis). It's valid for 72h and you can claim it.
+- Above \~10M commands/month at on pay-as-you-go, it's cheaper to go for a fixed plan on either side
+- Upstash exposes both standard Redis TCP and a [native HTTP API](https://upstash.com/docs/redis/features/restapi), so it works in serverless and normal server environments. Redis Cloud is TCP only and needs a TCP-capable runtime or proxy.
+
+## What is Upstash Redis, and what is Redis Cloud?
+
+**Upstash Redis** is a Redis-compatible database operated by Upstash. You create a database, get a URL and a REST token, and pay per command or get a fixed instance with unlimited commands.
+
+Upstash speaks both the standard Redis protocol over TCP (so ioredis, node-redis, redis-py, and go-redis work unchanged) and HTTP/REST via the @upstash/redis client for serverless runtimes. **The free tier gives you 500K commands and 256 MB.** Pay-as-You-Go charges $0.20 per 100K commands plus $0.25/GB storage and free bandwidth up to 200 GB/month ([upstash.com/pricing](https://upstash.com/pricing)).
+
+![Upstash Redis Pricing](https://cdn.contentport.io/chat/Sw016rSl6asUNtj0EpHf3DiBcD0ot3sQ/ISx4r4Ii2cER_LdVmj1Cd.png)
+
+**Redis Cloud** is the managed Redis service from Redis Inc., the company that ships open-source Redis and Redis Stack. You pick a plan (Free, Essentials, or Pro), a cloud provider (AWS, GCP, Azure), and a memory size.
+
+Essentials runs on **shared infrastructure starting at $5/month for 250 MB**; Pro runs on dedicated VMs starting at $0.014/hr with a $200/month minimum ([redis.io/pricing](https://redis.io/pricing/)). Pro includes Active-Active replication, auto-tiering, and the full Redis Stack module set.
+
+![Redis Cloud Pricing](https://cdn.contentport.io/chat/Sw016rSl6asUNtj0EpHf3DiBcD0ot3sQ/VBz6GuyIsxF6YeaFTZkoc.png)
+
+## How does Upstash pricing compare to Redis Cloud pricing in 2026?
+
+The two pricing models barely overlap, so the cheaper option depends on throughput.
+
+| Metric | Upstash | Redis Cloud |
+| --- | --- | --- |
+| Free tier | 256 MB, 500K commands/month | 30 MB, 100 ops/sec, 30 connections |
+| Cheapest paid plan | $0.20 per 100K commands (PAYG) | $5/month for 250 MB (Essentials) |
+| Storage | $0.25/GB on PAYG | Included in plan size |
+| Bandwidth | First 200 GB/month free, then $0.03/GB | Included, varies by plan |
+| Cheapest unlimited-commands plan | $10/month Fixed 250 MB (no per-command billing) | $5/month Essentials 250 MB (1,000 ops/sec cap) |
+| Fixed/dedicated entry | $10/month for 250 MB | $200/month minimum (Pro) |
+| Modules included | Upstash Search (Rust-based full-text + JSON) | RedisJSON, RediSearch, RedisTimeSeries, RedisBloom on Pro |
+| Max throughput | 16,000 ops/sec, unlimited on Enterprise | 16,000 ops/sec on largest Essentials, unlimited on Pro |
+| Ceiling/cap | $360/month per PAYG database or custom budget | None. You pay for what you provision |
+
+Upstash's [March 2025 pricing update](https://upstash.com/blog/redis-new-pricing) bumped the free tier from 10K commands/day to 500K/month and lifted the PAYG storage cap from 10 GB to 100 GB. At 1 GB and 1M commands/month, Upstash is roughly $2.25 vs Redis Cloud Essentials at $22. Upstash is **about 10× cheaper for the most common use cases**.
+
+## How does latency and performance compare?
+
+I benchmarked from EC2 in us-east-1. Both databases were paid plans with TLS enabled, reached over TCP using the same ioredis client.
+
+I ran three c7i.large hosts in parallel, one per availability zone (us-east-1a, us-east-1b, us-east-1c), at **2,000 sequential ops per workload** after 200 warmup commands.
+
+The full benchmark script and raw per-AZ results are in [this gist](https://gist.github.com/joschan21/c65266e17100311bd472be9ecbe2c167) if you want to reproduce or pick it apart.
+
+### Preface: I did not like Redis Cloud UX
+
+On Redis Cloud, enabling TLS required me to upgrade to a paid plan (so I did), where TLS then shows up as a per-database toggle in the console (every new database defaults to plaintext). Once on, the client also needs the private CA bundle downloaded from the console:
+
+```tsx id="code-rediscloud-tls"
+new Redis(url, { tls: { ca: fs.readFileSync("redis-ca.pem") } });
+```
+
+Every Node/Python/Go service that talks to Redis Cloud has to ship that PEM file alongside the binary, so rotating the CA means redeploying.
+
+On Upstash, TLS is default on every database, also on the free tier.
+
+### My Benchmark Methodology
+
+- **Host:** c7i.large EC2 (Intel Sapphire Rapids, 2 vCPU, 4 GiB, up to 12.5 Gbps), Amazon Linux 2023, Node 22.22.3, ioredis 5.7.0
+- **Region:** us-east-1, three AZs run in parallel against the same two databases
+- **Network path:** public endpoints for both providers, default VPC
+- **Workload:** 200 warmup ops on the live connection, then 2,000 measured sequential ops on a single long-lived TLS connection
+- **Throughput:** after the sequential runs, 200 concurrent GET promises fired through the same client, which ioredis auto-pipelines onto one TCP connection
+
+### p50 latency (ms, median across 3 AZs)
+
+| Workload | Upstash | Redis Cloud |
+| --- | --- | --- |
+| GET | 1.28 | **1.07** |
+| SET | 1.26 | **1.08** |
+| INCR | 1.21 | **1.04** |
+| Pipeline ×10 SETs | 1.28 | **1.10** |
+| Rate-limit (INCR + EXPIRE) | 1.26 | **1.06** |
+
+![Redis Cloud vs. Upstash p50 latency](https://cdn.contentport.io/chat/Sw016rSl6asUNtj0EpHf3DiBcD0ot3sQ/O6BWVfX7zqGvwc-K7yIYA.png)
+
+### p99 latency (ms, median across 3 AZs)
+
+| Workload | Upstash | Redis Cloud |
+| --- | --- | --- |
+| GET | 2.06 | **1.85** |
+| SET | 1.83 | **1.80** |
+| INCR | 1.84 | **1.27** |
+| Pipeline ×10 SETs | 2.05 | **1.58** |
+| Rate-limit (INCR + EXPIRE) | 1.85 | **1.29** |
+
+![Redis Cloud vs. Upstash p99 latency](https://cdn.contentport.io/chat/Sw016rSl6asUNtj0EpHf3DiBcD0ot3sQ/23SH9eDNxiqfLaiZbK_rf.png)
+
+### Concurrent throughput, 200 in-flight GETs through one client
+
+| Provider | us-east-1a | us-east-1b | us-east-1c | Median |
+| --- | --- | --- | --- | --- |
+| Upstash | 48,458 | 108,163 | 74,911 | 74,911 |
+| Redis Cloud | 89,949 | 132,652 | 134,349 | **132,652** |
+
+![Redis Cloud vs. Upstash ops/sec](https://cdn.contentport.io/chat/Sw016rSl6asUNtj0EpHf3DiBcD0ot3sQ/NBIs8UylL2yLI0kWIkQJo.png)
+
+### Benchmark Results
+
+**Redis Cloud is about 1/5th of a millisecond faster on my bench.** p50 sits a consistent 0.15-0.20 ms ahead across all five tests.
+
+p99 is close on plain GET/SET (within 0.05-0.2 ms), and pulls further ahead on INCR, pipelined writes, and the two-op rate-limit pattern (0.5-0.6 ms).
+
+The largest gap is concurrent throughput from a single client: Redis Cloud lands \~77% more ops/sec at the median AZ (132K vs 75K).
+
+From what I can tell, both are well optimized, and Redis Cloud is even better micro-optimized for running on dedicated hardware.
+
+Some notes on this benchmark:
+
+- **The benchmark only tests TCP from a long-running EC2 host.** Upstash is exceptional in serverless runtimes, where Redis Cloud cannot connect at all. If a workload lives in Cloudflare Workers or Vercel, this table is irrelevant. The comparison there is "Upstash REST works" vs "Redis Cloud needs a TCP proxy".
+- **Latency changed a lot by AZ.** Both providers were sub-0.5 ms p50 from us-east-1b and 1.0-1.5 ms from us-east-1a/c, a 2-3× swing depending on which AZ I provisioned my EC2 in.
+- Redis Cloud is in-memory: data lives in RAM, and AOF/snapshot persistence is a setting that's [off by default](https://redis.io/docs/latest/operate/rc/databases/configuration/data-persistence/) and only available for paid tiers. Upstash Redis is tiered: hot keys are in memory, colder keys are on disk, and the engine can switch between them.
+- This is a benchmark to get an idea of performance. It does not reflect a real production use case, in that case I recommend testing both yourself.
+
+## What about features and Redis module support?
+
+This used to be Redis Cloud's biggest lead. Redis Cloud still has more modules, but Upstash closed the two most common ones in 2026 by shipping first-party JSON and Tantivy-backed full-text search inside the same Redis database.
+
+**Upstash now ships:**
+
+- **Upstash Search:** full-text search [built on Rust's Tantivy library](https://upstash.com/docs/redis/search/introduction) (the same engine behind Quickwit and ParadeDB). Writes auto-sync into indexed JSON, Hash, or String keys, and the JSON-based query syntax supports boolean operators, fuzzy matching, phrase queries, and regex.
+- **JSON:** the document API works directly against Redis keys, and indexed JSON fields flow into Search automatically.
+- **Vector:** vector search lives in a separate product, [Upstash Vector](https://upstash.com/docs/vector/overall/getstarted), with its own per-query pricing rather than the same keyspace.
+
+## How do you connect to each from code?
+
+Upstash gives you both TCP and HTTP. For serverless runtimes, the Upstash Redis TypeScript client wraps the REST API and runs anywhere fetch works:
+
+```tsx id="code-qyksx0o6"
+import { Redis } from "@upstash/redis";
+
+// works inside Cloudflare Workers, Vercel Edge, browsers:
+// any runtime that can make an HTTPS request.
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
+
+export async function rateLimit(ip: string, limit = 10, windowSec = 60) {
+  const key = `rl:${ip}`;
+  const count = await redis.incr(key);
+  if (count === 1) await redis.expire(key, windowSec);
+  return { allowed: count <= limit, count };
+}
+```
+
+For Redis Cloud it's easiest to use ioredis or node-redis and a long-lived TCP connection with TLS:
+
+```tsx id="code-2djsztg6"
+import Redis from "ioredis";
+import fs from "node:fs";
+
+// Standard Redis protocol over TCP. Needs a long-lived
+// connection and works in Node/containers, not edge runtimes.
+// Redis Cloud uses a private CA, so the CA bundle from the
+// console has to be loaded into the client.
+const redis = new Redis(process.env.REDIS_URL!, {
+  tls: { ca: fs.readFileSync("redis-ca.pem") },
+  maxRetriesPerRequest: 3,
+});
+
+export async function rateLimit(ip: string, limit = 10, windowSec = 60) {
+  const key = `rl:${ip}`;
+  const [count] = await redis
+    .multi()
+    .incr(key)
+    .expire(key, windowSec, "NX") // only set TTL on first hit
+    .exec()
+    .then((res) => res!.map(([, v]) => v as number));
+  return { allowed: count <= limit, count };
+}
+```
+
+For Upstash Redis Search:
+
+```tsx id="code-n2sq1mw9"
+import { Redis, s } from "@upstash/redis";
+
+const redis = Redis.fromEnv();
+
+export async function setupAndQuery() {
+  // create an index that auto-syncs from any JSON key matching product:*
+  const index = await redis.search.createIndex({
+    name: "products",
+    dataType: "json",
+    prefix: "product:",
+    schema: s.object({
+      name: s.string(),
+      description: s.string(),
+      category: s.string().noTokenize(),
+      price: s.number(),
+    }),
+  });
+
+  // writing the JSON document is enough: Search indexes it automatically
+  await redis.json.set("product:1", "$", {
+    name: "Wireless Headphones",
+    description: "Premium noise-cancelling, 30-hour battery",
+    category: "electronics",
+    price: 199.99,
+  });
+
+  // query against the same Redis keyspace
+  return index.query({
+    filter: { description: "wireless" },
+  });
+}
+```
+
+The Redis Cloud equivalent uses RediSearch commands (FT.CREATE, FT.SEARCH) through the same ioredis connection. Both styles work; the Upstash one works better with serverless functions because it uses the same HTTPS connection as every other command.
+
+## What are the pros and cons of Upstash and Redis Cloud?
+
+**Upstash wins:**
+
+- Scale-to-zero pricing. A database sitting idle costs $0
+- Better UX across the board, easier to set-up, cleaner dashboard with a visual data browser
+- Easier for agents to use, type-check and understand than Redis Cloud
+- Works in serverless runtimes (Cloudflare Workers, Vercel, Fastly Compute) where Redis Cloud cannot connect
+- Fixed plans from $10/month give you unlimited commands (no per-command billing) up to the 16,000 cmd/sec ceiling
+
+![Upstash Dashboard - Data Browser](https://cdn.contentport.io/chat/Sw016rSl6asUNtj0EpHf3DiBcD0ot3sQ/IRvoIyX6OYBags1qXJVuV.png)
+
+**Redis Cloud wins:**
+
+- Full Redis Stack: search, JSON, time-series, Bloom, vector, all in one keyspace
+- Active-Active multi-master replication with CRDTs for multi-region writes
+- Predictable performance on dedicated VMs with up to 99.999% uptime SLA on Pro
+- Tracks Redis OSS versions closely
+
+![Redis Cloud - Data Browser](https://cdn.contentport.io/chat/Sw016rSl6asUNtj0EpHf3DiBcD0ot3sQ/lvW0otdJq03e89c9xZ__O.png)
+
+**Upstash negatives:**
+
+- No native RedisTimeSeries or RedisBloom; vector search lives in a sibling product (Upstash Vector) instead of the same keyspace.
+
+**Redis Cloud negatives:**
+
+- TLS is gated behind a paid Essentials plan, defaults to off on every new database, and requires shipping a private CA bundle with each client (see the TLS UX section).
+- Not usable from serverless runtimes. If you live on Cloudflare Workers, you'll need a TCP proxy or a different store.
+
+## When should you pick Upstash vs Redis Cloud?
+
+**Pick Upstash if any of these are true:**
+
+- You're using an AI agent to write code for you
+- You're deploying to Vercel, Cloudflare Workers, Fastly Compute, Netlify Edge, or any runtime without persistent TCP
+- You want a free tier that's good for a production prototype (500K commands/month ≈ 16K commands/day)
+
+**Pick Redis Cloud if any of these are true:**
+
+- You need RedisTimeSeries (downsampling, aggregation), RedisBloom (Bloom/Cuckoo/CMS/top-k), or vector + text search in one query against the same keyspace
+- You need Active-Active replication with CRDTs for multi-region writes
+- You're already self-hosting Redis OSS
+
+## Can you migrate between them?
+
+Mostly yes. Both speak Redis 7.x command syntax for core data structures, so an RDB dump from one and a restore into the other covers caches, sessions, sorted sets, and streams. The breakages are predictable:
+
+- RedisJSON moves over directly. Upstash supports the same JSON commands against the same keys.
+- RediSearch indexes don't move as easily. Upstash Search uses a different (JSON-based) query syntax, so you re-create the index schema and rewrite query strings, but the data underneath stays.
+- RedisTimeSeries and RedisBloom have no Upstash equivalent in-keyspace. It's better to use an external time-series store.
+- If your app uses Redis admin commands (CLIENT LIST, CONFIG SET, etc.), Upstash restricts most of them by design.
+
+## Which has better developer experience?
+
+To me, Upstash.
+
+**Upstash Redis setup is three steps:** create a database in the console, copy the REST URL and token, install the `@upstash/redis` client.
+
+No instance size, no AOF/RDB persistence choice, no replication topology to pick. The console shows commands/sec, data size, and a browser CLI.
+
+You can also POST to [https://upstash.com/start-redis](https://upstash.com/start-redis) to get a free, agent-ready Redis database without any signup. It has a nicer dashboard, is easier for debugging and I feel more comfortable here.
+
+![Upstash Redis Dashboard](https://cdn.contentport.io/chat/Sw016rSl6asUNtj0EpHf3DiBcD0ot3sQ/ocqZHB2f3jn5hFpmm8Cwv.png)
+
+**Redis Cloud setup is heavier.** You walk through cloud + region + memory size + throughput tier + persistence policy (none, AOF every-write, AOF every-second, snapshot) + replication mode (none, in-zone, multi-AZ) + module enablement + connection limits, then it hands you a TLS endpoint for ioredis.
+
+The console adds RedisInsight (keyspace browser, slow log, profiler), ACLs, VPC peering, PrivateLink, and per-database metrics dashboards. It also logged me out every 5 minutes, which I found really annoying.
+
+![Redis Cloud Dashboard](https://cdn.contentport.io/chat/Sw016rSl6asUNtj0EpHf3DiBcD0ot3sQ/ND7hjOG6ccYjElPD66Vwa.png)
+
+If you want a Redis URL and start building, Upstash is faster. If you need to tune AOF flush policy, set up CIDR allow-lists per database, and run RedisInsight against a slow-log, Redis Cloud is more like what you'd configure on self-hosted Redis OSS.
+
+## FAQ
+
+**Is Upstash running Redis?**
+Upstash runs a Redis-compatible engine written in Go. It uses the Redis protocol and supports the core commands and data structures, plus first-party JSON and a Tantivy-backed search module. Most Redis client libraries (ioredis, redis-py, go-redis, `@upstash/redis`) work with it unchanged.
+
+What's restricted: the cluster/admin command family (CLUSTER, CONFIG, DEBUG, MIGRATE, SHUTDOWN) and a few Redis Stack modules with no Upstash counterpart (time-series, Bloom filters). See the [Upstash compatibility doc](https://upstash.com/docs/redis/overall/rediscompatibility) for the current list.
+
+**Does Redis Cloud have a serverless option?**
+Redis Cloud Essentials is the closest thing: shared infrastructure, fixed monthly price per memory tier, no per-command billing. It's not "serverless" in the scale-to-zero sense: you pay $5/month even at zero traffic.
+
+**Which is cheaper for rate limiting?**
+Upstash. Rate limiting is the canonical serverless Redis workload: small payloads, intermittent traffic. The Upstash free tier (500K commands/month) covers many small apps entirely. The [@upstash/ratelimit](https://github.com/upstash/ratelimit) SDK ships sliding-window, fixed-window, and token-bucket primitives out of the box.
+
+**Can I use Redis Cloud from Cloudflare Workers?**
+Not directly. Workers don't allow raw TCP outbound. You can run a Hyperdrive connection or a TCP proxy, but the simpler answer is Upstash if you use Workers.
+
+**Which one supports vector search?**
+Both. Redis Cloud puts vector inside RediSearch on Pro (one query against the same keyspace as your text and JSON). Upstash splits it out into [Upstash Vector](https://upstash.com/docs/vector/overall/getstarted), a sibling product with its own URL, token, and per-query pricing, separate from Upstash Search and Upstash Redis.
+
+**Does Upstash have full-text search now?**
+Yes. [Upstash Redis Search](https://upstash.com/docs/redis/search/getting-started) is a first-party module shipped inside Upstash Redis, built on the Rust-based Tantivy engine. Writes auto-sync into the index, so you don't run a separate ETL pipeline.
+
+**Does Upstash have an SLA?**
+Yes, via the optional Prod Pack ($200/month per database) which adds the uptime SLA, SOC-2 reporting, PrivateLink, RBAC, and observability integrations on top of any plan. Redis Cloud Pro includes its 99.999% SLA in the base price.
