@@ -54,7 +54,7 @@ result.customers // typed
 
 **E2B leaves the orchestration to you.** It gives you a first-class way to *execute* code via the [Code Interpreter](https://e2b.dev), a headless Jupyter server inside each sandbox, and templates can bundle agent tooling like Codex, but the agent loop itself stays in your application. Call `runCode()` and state carries across calls: variables, imports, and loaded data stick around between executions. Results come back structured, so a Matplotlib chart returns as a PNG plus extractable data (type, axes, points) you can re-render on the client. It speaks Python, JS/TS, R, Java, and Bash.
 
-So the two aren't really competing on the same primitive. Box competes on *the agent is already here*; E2B competes on *the execution environment is excellent and stateful, bring your brain*. If you're assembling your own multi-step agent and mostly need a great REPL with notebook semantics, E2B's interpreter is the stronger tool. If you'd rather not build the harness at all, Box hands you one.
+Both run agent and harness workloads; they just start from different defaults. Box ships a harness so you can run one in a few lines, but it also exposes raw shell, code execution, and file APIs if you'd rather point your own agent loop at it. E2B leans on its excellent stateful execution and expects you to bring the orchestration, with templates that can bundle agent tooling. So this isn't really one primitive versus another, it's a question of where you want the harness to live and what you're optimizing for around it.
 
 ---
 
@@ -151,13 +151,13 @@ The spread comes from two places: Box doesn't bill the I/O-wait time and doesn't
 
 ## Picking one
 
-Skip the feature checklist and answer one question first: **are you building the agent, or do you want one handed to you?**
+Both products run agent and harness workloads well, whether you lean on a built-in agent or wire up your own. The deciding factor is usually what you optimize for.
 
-If you're orchestrating your own multi-step agent and what you need is a great execution environment (stateful notebook semantics, charts and tables out of the box, microVM isolation, memory that survives a pause, maybe a desktop over VNC or a Docker-image template), then **E2B** is built for that, and it's the better fit for kernel-level isolation requirements and for teams that need self-hosted or bring-your-own-cloud deployment.
+Reach for **E2B** when isolation is the priority. Firecracker microVMs give each tenant its own kernel, and you can self-host or deploy into your own cloud, which is what you want under strict kernel-isolation or data-residency requirements. It's also the stronger pick if you specifically need notebook-style execution with stateful `runCode`, charts and tables out of the box, memory that survives a pause, or a desktop over VNC.
 
-If you'd rather not build a harness, and you want a durable per-tenant computer that already knows how to clone a repo, run an agent, and open a PR, that sleeps cheaply and wakes with its state, with secrets kept off the container and egress you can tighten at runtime, then **Upstash Box** is built for that, and the active-CPU billing makes bursty, I/O-heavy agent work cheap to run at scale.
+Reach for **Upstash Box** when cost and developer experience matter most. The agent, git, and PR flow are built in, so you have option to ship an agent in a few lines instead of assembling a harness, and a Box stays durable per tenant: it sleeps cheaply and wakes with its state. Active-CPU billing with free memory keeps bursty, I/O-heavy agent work cheap at scale, while secrets stay off the container and egress tightens at runtime.
 
-Plenty of teams will reach for both: E2B as the execution muscle inside a hand-rolled pipeline, Box as the standing per-user agent. They're not the same tool wearing different prices; they answer different questions.
+Plenty of teams will reach for both. They're not the same tool wearing different prices; they weigh isolation, cost, and developer experience differently.
 
 ---
 
