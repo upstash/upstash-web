@@ -174,22 +174,25 @@ import { Redis, s } from "@upstash/redis";
 
 const redis = Redis.fromEnv();
 
+// Define the schema once and reuse it for both the index and every query.
+export const schema = s.object({
+  type: s.keyword(),   // "generation" | "toolCall"
+  functionId: s.keyword(),
+  model: s.keyword(),
+  toolName: s.keyword(),
+  finishReason: s.keyword(),
+  success: s.boolean(),
+  durationMs: s.number("F64"),
+  totalTokens: s.number("U64"),
+  ts: s.date().fast(), // .fast() is required to orderBy / range-filter a date
+});
+
 await redis.search.createIndex({
   name: "ai-telemetry",
   prefix: "ai:event:",
   dataType: "json",
   existsOk: true,        // safe to call on every boot
-  schema: s.object({
-    type: s.keyword(),   // "generation" | "toolCall"
-    functionId: s.keyword(),
-    model: s.keyword(),
-    toolName: s.keyword(),
-    finishReason: s.keyword(),
-    success: s.boolean(),
-    durationMs: s.number("F64"),
-    totalTokens: s.number("U64"),
-    ts: s.date().fast(), // .fast() is required to orderBy / range-filter a date
-  }),
+  schema,
 });
 ```
 
@@ -232,10 +235,11 @@ don't need to think about it.
 ### Latency percentiles per tool
 
 `$percentiles` computes p50/p95/p99 inside Redis, per tool, over successful
-calls only:
+calls only. Pass the same `schema` from above to `index()` so filters, fields,
+and aggregation results stay fully typed:
 
 ```ts
-const index = redis.search.index({ name: "ai-telemetry" });
+const index = redis.search.index({ name: "ai-telemetry", schema });
 
 const latency = await index.aggregate({
   filter: { type: { $eq: "toolCall" }, success: { $eq: true } },
