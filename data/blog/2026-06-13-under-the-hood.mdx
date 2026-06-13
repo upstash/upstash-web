@@ -1,0 +1,36 @@
+---
+title: "Under the Hood: How Upstash Redis Delivers High Availability with Replicas, Leader Election & Prod Pack Multi-AZ"
+slug: under-the-hood
+authors: [burak]
+tags: [serverless, redis]
+description: "Primary election, multi-zone failover, and exactly when the Prod Pack add-on changes the game for production Redis."
+publishedAt: "2026-06-13T13:38:52.815Z"
+---
+
+# Under the Hood: How Upstash Redis Delivers High Availability with Replicas, Leader Election & Prod Pack Multi-AZ
+
+Running production Redis means caring about what happens the moment a node dies. Upstash gives every paid database primary + replica(s) with automatic failover out of the box. The question is how the election works, when replicas stay in one zone, and when you pay for multi-AZ.
+
+## Single-leader replication + election
+Upstash uses a single leader model. One replica owns every key and handles writes; the others are hot standbys. A lightweight failure detector on each replica watches the leader. When it stops responding, the survivors run a quick election and promote one of themselves. The window is short—requests may briefly queue, then the new leader takes over with no client changes.
+
+In-zone replicas (included) already protect against most hardware hiccups. If the whole zone goes dark, you're down until manual intervention or you enable Prod Pack.
+
+## Prod Pack multi-AZ changes the failure domain
+Prod Pack ($200/mo add-on) spreads those replicas across multiple availability zones inside the same region. A zone failure now just routes traffic to another replica in the same region—no cross-region latency spike, and you keep the 99.99% SLA.
+
+Global databases add another layer: each region runs its own replica set, and leader election happens across regions when the primary region fails.
+
+## When the extra cost is worth it
+If your app is latency-sensitive and even one zone outage would hurt, or you need the contractual SLA, flip the switch. Otherwise the default in-zone replicas are enough for most workloads.
+
+```ts
+import { Redis } from '@upstash/redis'
+
+const redis = Redis.fromEnv()  // reads from nearest replica, writes to leader
+await redis.set('user:1', 'data')
+```
+
+That tiny client works the same whether you're on in-zone replicas or multi-AZ Prod Pack—the routing is invisible.
+
+The takeaway: Upstash's replication and election give you strong defaults; Prod Pack simply shrinks the blast radius when you need it.
