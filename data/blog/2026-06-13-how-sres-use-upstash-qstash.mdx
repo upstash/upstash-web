@@ -1,0 +1,67 @@
+---
+title: "How SREs Use Upstash QStash, Workflow, and Redis to Automate Reliability Without Servers"
+slug: how-sres-use-upstash-qstash
+authors: [burak]
+tags: [serverless, redis, qstash, workflow]
+description: "Ditch cron jobs, manual retries, and always-on infra — here’s the durable, serverless pattern."
+publishedAt: "2026-06-13T12:18:39.780Z"
+---
+
+# How SREs Use Upstash QStash, Workflow, and Redis to Automate Reliability Without Servers
+
+SREs spend too much time babysitting cron jobs, writing retry wrappers, and keeping always-on services alive just to run reliability tasks. Upstash lets you replace all of that with three serverless pieces that already talk to each other.
+
+## The old pain
+A typical reliability loop looks like: schedule a health check, call an API, rate-limit the call, retry on failure, store results. Each piece usually needs a separate queue, a VM, or a Lambda + CloudWatch cron. Failures get lost in logs.
+
+## The Upstash pattern
+1. **Redis** (Ratelimit SDK) protects downstream APIs at the edge.
+2. **QStash** schedules the job and guarantees delivery with built-in retries.
+3. **Workflow** turns the whole sequence into durable steps that pick up exactly where they left off.
+
+No servers, no state machines to manage.
+
+## Tiny working sketch
+```ts
+import { serve } from "@upstash/workflow/nextjs";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+
+const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(5, "10 s"),
+});
+
+export const { POST } = serve(async (context) => {
+  await context.run("check-rate", async () => {
+    const { success } = await ratelimit.limit("health-check");
+    if (!success) throw new Error("rate limited");
+  });
+  const result = await context.call("call-api", {
+    url: "https://api.example.com/health",
+    method: "GET",
+  });
+  await context.run("store", () => Redis.fromEnv().set("last-check", result));
+});
+```
+
+Deploy the route, create a QStash schedule pointing at it, and you’re done. Every step is retried automatically; rate limits are enforced globally; results land in Redis.
+
+## Why this matters for SREs
+- Zero infra to patch or scale.
+- 99.99% uptime SLA on the platform itself.
+- Observability via Datadog integration for the same metrics you already watch.
+
+The result: reliability work that runs itself instead of running your on-call rotation.
+
+## A quick poem
+```
+no cron to babysit
+no lambda to keep warm
+qstash knocks, workflow picks up
+redis logs the storm
+sre sleeps, the system hums
+serverless and true
+```
+
+Bilemiyorum altan... Bilemiyorum
