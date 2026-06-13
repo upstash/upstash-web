@@ -1,0 +1,42 @@
+---
+title: "SRE Guide: Cutting On-Call Toil with Upstash QStash + Workflow Observability"
+slug: sre-guide
+authors: [burak]
+tags: [serverless, qstash, workflow]
+description: "How the April 2026 observability rebuild turns durable HTTP scheduling into first-class SRE tooling."
+image: /blog/sre-guide/cover.png
+publishedAt: "2026-06-13T14:51:09.825Z"
+---
+
+# SRE Guide: Cutting On-Call Toil with Upstash QStash + Workflow Observability
+
+On-call pages at 3 a.m. usually trace back to the same pattern: a background job failed, retried three times, then vanished. Upstash QStash replaces that custom retry logic with durable HTTP scheduling, while Workflow gives step-based execution that survives restarts. The April 2026 observability rebuild added histograms and grouped logs so the same data lands in your existing Prometheus or Datadog dashboards.
+
+## The old way (and why it hurt)
+
+Teams wrote their own exponential backoff, stored message IDs in Redis, and wired alerts to a bespoke DLQ table. When latency spiked, you had to correlate three different log sources. Mean time to detect stayed high because nothing showed step-level histograms.
+
+## New pattern with QStash + Workflow
+
+Publish once. QStash guarantees delivery with built-in retries and a DLQ. Workflow turns the handler into explicit steps so every failure is visible in the console and exported via Prometheus.
+
+```ts
+import { Workflow } from '@upstash/workflow';
+
+const wf = new Workflow();
+
+export const handler = wf.define({
+  async process(ctx) {
+    await ctx.run('fetch', () => fetchData());
+    await ctx.run('transform', () => transform());
+  }
+});
+```
+
+## Observability that fits your stack
+
+The rebuild surfaces upstash.qstash.delivery_latency_seconds histograms and grouped step logs. Drop the exporter into Datadog or scrape the Prometheus endpoint and your existing alert rules now fire on QStash-specific metrics. Dead-lettered messages appear with full context—no extra parsing.
+
+After two weeks the on-call rotation dropped from nightly DLQ hunts to a single weekly review of the histogram p99. One fewer custom retry service to maintain means one fewer thing that can page you.
+
+If your background work already lives behind HTTP endpoints, QStash + Workflow plus the new observability layer is the shortest path from custom toil to standard SRE tooling.
