@@ -107,3 +107,5 @@ const session = await redis.get("session:abc");
 
 
 That's the whole point. When a zone goes dark, the failover promotes the most up-to-date surviving replica, refuses to promote a stale one, reconciles any split view on its own, keeps your reads honest, and the endpoint itself stays reachable through the surviving zone. The boring outage — the one that costs somebody half a day and a postmortem — just doesn't happen.
+
+![](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/img-mqdxx4i8lvv.png)
