@@ -61,7 +61,6 @@ The other half of "never goes down" is the address your client connects to. A Pr
 
 Spreading across zones is great for survival and, on most clouds, has a real traffic cost — every byte that crosses an availability-zone boundary is billed. And some of that is simply unavoidable: keeping a replica alive in another zone means shipping your writes across the boundary to it, which is the whole point of multi-AZ. So the goal isn't to pretend that cost away — it's to make sure you only pay for the cross-zone bytes that genuinely have to be there, and to shrink the ones that do.
 
-![A request looping within its own zone, barely crossing the boundary](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/img-routing.png)
 
 Two touches stand out:
 
