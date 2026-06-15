@@ -1,0 +1,361 @@
+---
+title: "Redis Caching Patterns: A Practical 2026 TypeScript Guide with Examples"
+slug: redis-caching-patterns-2026
+authors: [josh]
+tags: [redis]
+description: "Redis caching patterns compared, with TypeScript code examples."
+---
+
+In this article I want to cover 4 caching patterns and some tips to implement them in production: TTL and eviction, invalidation, and cache stampedes. I ran all the examples in this article on the newest Upstash Redis TypeScript SDK :]
+
+## The four Redis caching patterns at a glance
+
+Four patterns cover almost every caching use case: cache-aside, write-through, write-behind, and read-through. They differ in who writes to the database, when that write happens, and who owns the fetch when a read misses.
+
+| Pattern | Reads | Writes | Freshness | Main risk |
+| --- | --- | --- | --- | --- |
+| Cache-aside | App checks cache, loads DB on a miss, fills cache | App writes DB, deletes the cache key | Can go stale between writes | First read after a write misses |
+| Write-through | App reads from cache | App writes DB and cache together | Cache stays current | Cache churn, two writes per update |
+| Write-behind | App reads from cache | App writes cache, a worker persists to DB later | Cache current, DB lags | Data loss if the cache fails before flush |
+| Read-through | App asks the cache, cache loads DB on a miss | Paired with write-through or write-behind | Depends on the write side | The cache layer must own DB access |
+
+I think cache-aside is a good default for most read-heavy apps. The write-through helps when a read right after a write needs to hit the cache. Write-behind trades durability for write speed and read-through is a code-organization choice that hides the fetch behind a cache object.
+
+## How does the cache-aside pattern work?
+
+In cache-aside, the application checks Redis first. On a miss it queries the database, writes the result back to Redis, and returns it. [AWS calls this the most common caching strategy](https://docs.aws.amazon.com/whitepapers/latest/database-caching-strategies-using-redis/caching-patterns.html), and it's my default.
+
+![The cache-aside pattern illustrated](https://cdn.contentport.io/chat/sYZt6j5tKs9fdzhmaASryuflnLIKibOF/P5a-LTFtWErmmve29-Igs.png)
+
+Here is an example with `@upstash/redis`:
+
+```ts
+import { Redis } from "@upstash/redis";
+
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
+
+const NULL_SENTINEL = "__null__";
+
+async function getUser(id: string) {
+  const key = `user:${id}`;
+  const cached = await redis.get<User | string>(key);
+  if (cached === NULL_SENTINEL) return null;   // known-missing
+  if (cached !== null) return cached as User;   // cache hit
+
+  const row = await db.getUser(id);             // miss, go to DB
+  if (row === null) {
+    await redis.set(key, NULL_SENTINEL, { ex: 30 });
+    return null;
+  }
+  await redis.set(key, row, { ex: 300 });
+  return row;
+}
+```
+
+The `NULL_SENTINEL` line is really useful because if `getUser("99")` finds nothing in the database, the next request for `99` misses the cache again and queries the database again. 
+
+Repeated lookups for an ID that does not exist hit the database every time. With the sentinel, we "remember" that it is null and avoid the extra trip to the main database. We can give it a 30-second TTL so that a row that gets created soon after still shows up quickly.
+
+I ran this with five lookups: two IDs that miss once then repeat, plus a missing ID requested three times. The database got 2 reads. Without the sentinel, each of those three requests would query the database.
+
+On the write side, cache-aside deletes the key instead of updating it:
+
+```ts
+async function updateUser(id: string, data: User) {
+  await db.updateUser(id, data);   // update the database first
+  await redis.del(`user:${id}`);   // then drop the stale cache entry
+}
+```
+
+But the order is important here! [Microsoft's guide to cache-aside](https://learn.microsoft.com/en-us/azure/architecture/patterns/cache-aside) says to update the data store before removing the cache item. If we delete the cache entry first, a read can slip in and refill the cache with the old value before the database write finished. Cache-aside also does not promise consistency: an outside process can change the row, and the cache keeps the old copy until the key expires or we delete it.
+
+The pattern is not as good on write-heavy keys. Every write deletes the entry, so the next read always misses and needs a full database fetch.
+
+## When should you use write-through caching?
+
+Write-through caching is useful when a read right after a write must come from the cache, and your write rate is modest. On every update the application writes the database and the cache together, so the data in the cache is never outdated.
+
+![The write-through pattern illustrated](https://cdn.contentport.io/chat/sYZt6j5tKs9fdzhmaASryuflnLIKibOF/rm0mIuFkc536-aFt-AjIN.png)
+
+Here is what it looks like in code:
+
+```ts
+async function updateUser(id: string, data: User) {
+  const key = `user:${id}`;
+  await db.updateUser(id, data);            // database first
+  try {
+    await redis.set(key, data, { ex: 300 }); // then keep the cache warm
+  } catch {
+    await redis.del(key);                    // on cache error, don't serve stale
+  }
+}
+```
+
+I ran a write followed by a read. The read came from the warm cache with 0 database reads. [AWS pairs write-through with lazy loading almost every time](https://docs.aws.amazon.com/whitepapers/latest/database-caching-strategies-using-redis/caching-patterns.html), which is what the combination above does: write-through keeps hot keys warm, and cache-aside still fills the cache for anything the write path never touched.
+
+The cost is cache churn. [AWS notes that infrequently-requested data also gets written to the cache](https://docs.aws.amazon.com/whitepapers/latest/database-caching-strategies-using-redis/caching-patterns.html), so you store rows nobody reads back. Every update is also two writes instead of one. That is fine until your write rate climbs, at which point the extra cache write starts to matter.
+
+## What is write-behind (write-back) caching?
+
+Write-behind writes to the cache first and persists to the database asynchronously, after a delay. We get the fastest writes, and we can batch many updates into just a few database writes.
+
+![The write-behind pattern illustrated](https://cdn.contentport.io/chat/sYZt6j5tKs9fdzhmaASryuflnLIKibOF/m5M5cepJSD1g_IST7GIzQ.png)
+
+This strategy has four parts: the app writes the cache, the app pushes the change onto a queue, a worker drains the queue, and the worker persists to the database.
+
+```ts
+async function writeBehind(id: string, data: User) {
+  await redis.set(`user:${id}`, data, { ex: 300 });           // cache first
+  await redis.lpush("user:writes", { id, data }); // enqueue the DB write
+}
+```
+
+I queued 100 updates to the same key, then drained the queue with a worker that kept only the latest value per key. And (obviously) the database received 1 write instead of 100. For a counter or a frequently edited document, that turns 100 database writes into 1.
+
+But the biggest risk here is durability, so i'd be careful using this for anything a failed write would be really, really bad for (e.g. banking software).
+
+On serverless, write-behind needs a home for the worker. A function runs and exits, so there is nothing to drain the queue. On Upstash, [QStash](https://upstash.com/docs/qstash/overall/getstarted) is a serverless message queue that's great: we can enqueue the write, and QStash delivers it to an endpoint that writes to the database, with retries on failure.
+
+## What is read-through caching?
+
+In read-through, the application asks the cache and the cache itself loads from the database on a miss. The results is almost the same as cache-aside, the difference is who makes the fetch call.
+
+![The read-throgh pattern illustrated](https://cdn.contentport.io/chat/sYZt6j5tKs9fdzhmaASryuflnLIKibOF/vW-QQKp3uLvla7hQYBm7d.png)
+
+[Hazelcast puts it well](https://hazelcast.com/blog/a-hitchhikers-guide-to-caching-patterns/): read-through moves the job of getting the value from the data store to the cache provider, so our code talks to the cache only. Redis has no native read-through, so in application code we build a thin wrapper that holds the loader:
+
+```ts
+class ReadThroughCache<T> {
+  constructor(
+    private redis: Redis,
+    private loader: (id: string) => Promise<T | null>,
+    private prefix: string,
+    private ttl: number,
+  ) {}
+
+  async get(id: string): Promise<T | null> {
+    const key = `${this.prefix}:${id}`;
+    const cached = await this.redis.get<T>(key);
+    if (cached !== null) return cached;
+    const row = await this.loader(id);      // the cache owns the DB fetch
+    if (row !== null) await this.redis.set(key, row, { ex: this.ttl });
+    return row;
+  }
+}
+
+const users = new ReadThroughCache(redis, db.getUser, "user", 300);
+await users.get("42");
+```
+
+I read the same key three times through this cache. The database received 1 read; the other two results came directly from our cache. The performance is the same as in the cache-aside pattern.
+
+The biggest difference is one place that owns how caching works, instead of the same get-or-load block in multiple places. This also has a small cold-start issue because the first read of any key still needs a full a database fetch.
+
+## How do TTL and eviction work in Redis?
+
+A TTL deletes a key after a set time; eviction is what Redis does when it hits its memory limit with no expired keys to drop. They solve different problems and a cache needs both. You set a TTL with the `EX` option on `SET`:
+
+```ts
+await redis.set("session:abc", data, { ex: 86400 }); // expires in 24h
+```
+
+This way, we set the value and the expiry in one command. Once the TTL passes, the key is gone and a read of it counts as a miss, so cache-aside refills it from the database. To check the time left on a key, [`TTL key`](https://redis.io/docs/latest/commands/ttl/) returns the seconds remaining, `-1` if the key has no expiry, and `-2` if the key is gone.
+
+A good TTL depends on how stale the data can be:
+
+| Data | TTL | Why |
+| --- | --- | --- |
+| User session | 24h | Changes rarely, long-lived |
+| Product listing | 5 min | Short staleness is OK |
+| Inventory count | 30-60s | Wrong numbers cost money |
+| Config flags | hours to days | Changes by hand, rarely |
+
+When many (and i mean many, otherwise don't worry about this) keys share one TTL and get written together, they expire together, and the cache empties in one burst. We can add jitter so the expiry times spread out:
+
+```ts
+function withJitter(base: number, pct: number) {
+  const delta = base * pct;
+  return Math.round(base - delta + Math.random() * delta * 2);
+}
+
+await redis.set(key, value, { ex: withJitter(300, 0.2) }); // 240-360s
+```
+
+Eviction is the other half, and on Upstash Redis it works differently than open-source Redis. [Eviction is off by default, and a full database rejects new writes once it hits its size limit](https://upstash.com/docs/redis/features/eviction). If you use the database as a cache, turn eviction on in the console.
+
+If eviction is on, Upstash uses an algorithm called `optimistic-volatile`. It samples keys at random, picks keys with a TTL first, and falls back to keys without a TTL when it needs more room. A TTL does two jobs on Upstash: it expires stale data, and it makes that key a first candidate for eviction.
+
+## How do you invalidate a Redis cache?
+
+Cache invalidation comes down to three approaches: we can let the TTL expire the key, delete the key when the data changes, or version the key namespace so a single counter invalidates every key at once. With a TTL expiry, we tolerate staleness. The other two give us an easy way to refresh data whenever we need.
+
+Delete-on-write is the simplest and it pairs with cache-aside. When the row changes, we delete the key:
+
+```ts
+await db.updateUser(id, data);
+await redis.del(`user:${id}`);
+```
+
+This gets harder if we want to invalidate many keys at once, like for example every product in a category. We can find all relevant keys pretty easily with `KEYS`, but`&#32;`that command is O(N) over the whole keyspace and Redis runs commands on a single thread.
+
+[`SCAN`](https://upstash.com/docs/redis/sdks/ts/commands/generic/scan) is a safe alternative, because it's a cursor-based iterator that returns a few keys per call without blocking the server.
+
+With version-bumping, we don't need to scan at all. We put a version number in the key and store the current version in its own key:
+
+```ts
+async function readProduct(id: string) {
+  const version = (await redis.get<number>("product:version")) ?? 1;
+  const key = `product:v${version}:${id}`;
+  const cached = await redis.get<Product>(key);
+  if (cached !== null) return cached;
+  const row = await db.getProduct(id);
+  await redis.set(key, row, { ex: 300 });
+  return row;
+}
+
+// retire every product key at once:
+await redis.incr("product:version");
+```
+
+An example key would be `product:v1:7`. After one `INCR`, the next read will produce `product:v2:7`, a miss. The old `v1` keys are orphaned and age out on their own TTL, so a single `INCR` invalidates the whole namespace with no scan and no large delete.
+
+## What is a cache stampede and how do you prevent it?
+
+A cache stampede happens when a frequently read key expires and many requests miss at the same moment, all recomputing the same value and all hitting the database together. [This XFetch paper describes it as a cascading failure](https://cseweb.ucsd.edu/~avattani/papers/cache_stampede.pdf): the concurrent recomputations slow the system, which pulls even more requests into the stampede.
+
+![Illustration of a cache stampede](https://cdn.contentport.io/chat/sYZt6j5tKs9fdzhmaASryuflnLIKibOF/tivdk8R7JGRBb8vCiy98U.png)
+
+One counter to this is a lock, so only one request rebuilds the value. It acquires a lock, and we set the key only if it does not exist (and with an expiry). The other requests wait and then read the value the winner wrote.
+
+```ts
+const RELEASE = `
+if redis.call("get", KEYS[1]) == ARGV[1] then
+  return redis.call("del", KEYS[1])
+else
+  return 0
+end`;
+
+async function getReport(id: string) {
+  const key = `report:${id}`;
+  const cached = await redis.get<Report>(key);
+  if (cached !== null) return cached;
+
+  const lockKey = `lock:${key}`;
+  const token = crypto.randomUUID();
+  const acquired = await redis.set(lockKey, token, { nx: true, px: 5000 });
+
+  if (acquired === null) {
+    for (let i = 0; i < 50; i++) {        // someone else is rebuilding
+      await new Promise((r) => setTimeout(r, 10));
+      const fresh = await redis.get<Report>(key);
+      if (fresh !== null) return fresh;
+    }
+    return null;
+  }
+
+  try {
+    const value = await expensiveRecompute(id);
+    await redis.set(key, value, { ex: 300 });
+    return value;
+  } finally {
+    await redis.eval(RELEASE, [lockKey], [token]);
+  }
+}
+```
+
+The release runs as a Lua script through `redis.eval` so the check and the delete happen as one step. It checks the token matches before deleting, so a request can never delete a lock that another request already took over after the first one's expiry fired.
+
+I sent 20 concurrent requests at an expired key with this lock in place and the expensive mocked recompute ran once. The other 19 waited and read the value the winner cached.
+
+The second counter is probabilistic early expiry, also from [the XFetch paper](https://cseweb.ucsd.edu/~avattani/papers/cache_stampede.pdf). Instead of waiting for the key to expire, each read rolls a dice on whether to refresh early, and the odds rise as the expiry approaches.
+
+We store the value with how long the last recompute took and the absolute expiry time, then refresh when `now - delta * beta * log(random()) >= expiry`. The paper proves the exponential form is optimal, and that `beta` defaults to 1.
+
+```ts
+interface Boxed<T> {
+  value: T;
+  delta: number;   // ms the last recompute took
+  expiry: number;  // absolute unix ms
+}
+
+async function xfetch<T>(
+  key: string,
+  ttlMs: number,
+  recompute: () => Promise<T>,
+  beta = 1,
+): Promise<T> {
+  const box = await redis.get<Boxed<T>>(key);
+  if (box !== null) {
+    const early = Date.now() - box.delta * beta * Math.log(Math.random());
+    if (early < box.expiry) return box.value;  // still fresh enough
+  }
+  const start = Date.now();
+  const value = await recompute();
+  const delta = Date.now() - start;
+  await redis.set(key, { value, delta, expiry: Date.now() + ttlMs }, { px: ttlMs });
+  return value;
+}
+```
+
+I spammed a key with a 200ms TTL across 60 sequential reads. A single read refreshed it early, before it ever hard-expired into a miss. Because the refresh fires while the old value is still served, no request waits and the database sees one recompute.
+
+For low-to-medium traffic, jitter alone is enough. For a hot key that expires under heavy load, the lock or XFetch is great.
+
+## How should you name Redis keys?
+
+A key naming convention keeps your keyspace debuggable and, on a cluster, keeps related keys together. I use `entity:id:subresource`, so a key reads like `user:42:orders`. That makes keys easy to grep, easy to match with `SCAN`, and avoids accidental collisions.
+
+| Bad key | Better key | Why |
+| --- | --- | --- |
+| `user42orders` | `user:42:orders` | Delimited, easy to match and read |
+| `u:42` | `user:42` | Readable is better than a few saved bytes |
+
+## How do you measure cache effectiveness?
+
+The number that matters most is hit rate: `keyspace_hits / (keyspace_hits + keyspace_misses)`. A low hit rate means the cache is doing little, and we are paying its cost for almost none of its benefit.
+
+You can track the same ratio in your own code by counting around the cache call:
+
+```ts
+let hits = 0;
+let misses = 0;
+
+async function cachedGet<T>(key: string): Promise<T | null> {
+  const value = await redis.get<T>(key);
+  if (value !== null) hits++;
+  else misses++;
+  return value;
+}
+
+const hitRate = (hits / (hits + misses)) * 100;
+```
+
+## Which caching pattern should you use?
+
+The cache-aside pattern is the right starting point for most read-heavy apps. It is simple to reason about, and the app keeps working when the cache is down because every miss falls through to the database. Add another pattern when a specific problem calls for it.
+
+| Situation | Pattern |
+| --- | --- |
+| Read-heavy app, baseline | Cache-aside |
+| Reads right after writes must hit the cache | Write-through on top of cache-aside |
+| Very high write rate, some data loss is acceptable | Write-behind with a durable worker |
+| You want the fetch logic in one place | Read-through wrapper |
+| A hot key expiring spikes the database | Add a lock or XFetch |
+
+For most apps I run cache-aside for reads and delete-on-write for invalidation. Jittered TTLs and locks on the few hot keys that cause stampedes become relevant at much, much higher usages. 
+
+On Upstash, cache-aside and write-through fit the HTTP client directly; write-behind needs a durable worker, which is where QStash comes in.
+
+## Common Redis caching mistakes
+
+- **No TTL on cache keys.** Memory fills and eviction starts dropping keys you wanted. Set a TTL on cache entries.
+- **Using the&#32;`KEYS`&#32;command in production.** It blocks the single-threaded server while it scans every key. Use `SCAN`.
+- **No null caching.** Repeated lookups for a missing ID hit the database every time. Cache a short-lived sentinel.
+- **No fallback when the cache is down.** A cache error should log and fall through to the database, not throw.
+- **Stampede on a hot key.** Many requests miss at once and pile onto the database. Jitter the TTL, and add a lock or XFetch for hot keys.
+- **Huge values.** Large blobs slow serialization and eat memory. Store an ID and fetch the detail separately when you can.
+
+Cache-aside with a well chosen TTLs handles most cases!
