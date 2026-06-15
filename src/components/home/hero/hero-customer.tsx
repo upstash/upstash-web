@@ -8,7 +8,6 @@ import { LogoCustomerio } from "@/components/customers/logo-customerio";
 import { LogoDropee } from "@/components/customers/logo-dropee";
 import { LogoDubsh } from "@/components/customers/logo-dubsh";
 import { LogoFly } from "@/components/customers/logo-fly";
-import { LogoGail } from "@/components/customers/logo-gail";
 import { LogoGitbook } from "@/components/customers/logo-gitbook";
 import { LogoHashnode } from "@/components/customers/logo-hashnode";
 import { LogoHumata } from "@/components/customers/logo-humata";
@@ -284,19 +283,6 @@ const customers = [
         for millions of users. Their seamless integration with our serverless
         architecture has made developing new features, like importing entire
         knowledge bases, much simpler.
-      </>
-    ),
-  },
-  {
-    name: "Gail",
-    slug: "gail",
-    icon: <LogoGail height={20} />,
-    quote: (
-      <>
-        We were using Redis before for our cache but we saw great support from
-        the Upstash team when we grew to handle more conversations and had
-        difficulty keeping up with the growth. Upstash was there to help and
-        within a few minutes we had the expanded capacity we needed.
       </>
     ),
   },
