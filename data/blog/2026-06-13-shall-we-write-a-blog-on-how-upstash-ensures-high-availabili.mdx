@@ -61,7 +61,7 @@ Replicas that are still catching up after rejoining are simply not marked ready 
 
 ## Prod Pack Is the Switch That Makes It Multi-AZ
 
-By default, a database can have replicas, but they might all live inside the same availability zone. A single zone failure would take everything offline at once. Multi-AZ is the step beyond that: replicas are spread across different zones within the same region, so when one zone goes dark, the others keep running. On Upstash, you enable multi-AZ for a database with [Prod Pack](https://upstash.com/docs/redis/overall/enterprise).
+By default, a database can have multiple replicas in a region, but they might all live inside the same availability zone. A single zone failure would take everything offline at once. Multi-AZ is the step beyond that: replicas are spread across different zones within the same region, so when one zone goes dark, the others keep running. On Upstash, you enable multi-AZ for a database with [Prod Pack](https://upstash.com/docs/redis/overall/enterprise).
 
 Everything above is the machinery. **[Prod Pack](https://upstash.com/docs/redis/overall/enterprise) is the switch that spreads it across zones.** Without it, both members of the primary pair live in the same zone. With it, the coordinator reshapes the cluster: it spreads the primary pair across zones, bumps from one read replica to two with enforced zone diversity, and flips the DNS to an HA-aware endpoint. No single zone can take down the whole read fleet. A newly placed replica copies the full dataset, catches up on live changes, and only starts answering reads once it's genuinely current. The reshape happens with no hand-migration and no downtime.
 
