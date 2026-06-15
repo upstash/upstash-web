@@ -1,0 +1,154 @@
+---
+title: "AI SDK v7 ships an agent harness. Upstash Box ships the computer it runs on."
+slug: maybe-we-can-write-a-blog-like-how-ai-sdk-v7-agent-harness-w
+authors: [burak]
+tags: [serverless, box]
+description: "How the new HarnessAgent API works, and why a box with a durable agent already inside is the missing half."
+publishedAt: "2026-06-15T22:20:44.063Z"
+---
+
+Picture your AI coding agent at work. It clones a repo, installs dependencies, reads through the build, and starts editing files. Ten minutes of setup, then real progress. The request finishes, the sandbox tears down, and the disk goes with it. Tomorrow the same user comes back to continue, and the agent starts over from an empty filesystem: clone, install, re-derive everything it already knew. The agent didn't forget. The computer underneath it did.
+
+That gap is the subject of this post. AI SDK v7 recently shipped a new harness API, and it's a genuinely nice idea: a clean, provider-agnostic way to drive a coding agent. What it deliberately does *not* give you is the machine that agent runs on, or a way for that machine to remember anything between requests. That second half is the interesting problem, and it's where Upstash Box comes in.
+
+## What an agent harness actually is
+
+A model call is small. You send messages, you get tokens back. An *agent harness* is everything wrapped around that call: a workspace it can read and write, built-in tools, session state, compaction, permission prompts. Claude Code, Codex, and Pi are harnesses. They're full agent runtimes, not just a model behind an API.
+
+The distinction matters because the hard parts of an agent live in the harness, not the model. The model decides *what* to do next. The harness is what makes "edit `src/server.ts`, run the tests, read the failure, try again" a real loop instead of a paragraph of advice. It owns the tool definitions, it owns the turn-by-turn state, and it owns the messy bookkeeping of keeping a long session inside a context window.
+
+Until v7, getting that loop meant one of two things: run one of those CLIs as a subprocess and scrape its output, or rebuild the loop by hand. Neither travels well between agents.
+
+## One interface for every coding agent
+
+What AI SDK v7 adds is a single way to drive any of them: `HarnessAgent`. It's the same trick the SDK has always pulled with models, where you swap providers without rewriting your app, now applied one level up. Write the agent loop once, point it at `claudeCode` or `codex`, keep the same `.generate()` and `.stream()` calls feeding your existing `useChat` UI. (The harness packages are new and currently ship as an experimental, canary-stage API, so expect the surface to keep moving.)
+
+In practice it looks like the model API you already know, just pointed at a harness instead of a raw model:
+
+```ts
+import { HarnessAgent } from "@ai-sdk/harness/agent";
+import { claudeCode } from "@ai-sdk/harness-claude-code";
+import { createVercelSandbox } from "@ai-sdk/sandbox-vercel";
+
+const agent = new HarnessAgent({
+  harness: claudeCode,
+  sandbox: createVercelSandbox({ runtime: "node24" }), // <- you supply the computer
+});
+
+const result = await agent.stream({
+  prompt: "add a /health route and a test for it",
+});
+
+for await (const part of result.fullStream) {
+  // tool calls, file edits, and tokens all stream through here
+  console.log(part);
+}
+```
+
+Swap `claudeCode` for `codex` or `pi` and the rest of the file is unchanged. That's the whole pitch, and it's a good one. The UI, the streaming, the message plumbing all stay put while the agent underneath becomes a swappable part.
+
+The part that's easy to miss is in that `sandbox` field. A harness needs somewhere to run. The agent is going to execute shell commands and edit files, so the SDK keeps that behind a *sandbox provider*. The harness is the brain, the sandbox is the computer. AI SDK gives you the brain and a clean interface, but you bring the computer.
+
+![The AI SDK gives you everything up to the sandbox boundary; the sandbox itself is yours to provide.](/blog/maybe-we-can-write-a-blog-like-how-ai-sdk-v7-agent-harness-w/diagram-c27a55b6df.svg)
+
+This split is the right call from the SDK's side. A sandbox is an infrastructure decision: where it runs, how it's isolated, what it costs, how long it lives. Baking one choice into the SDK would make it wrong for half the people using it. So the boundary is honest. It just means the most consequential piece is the piece you're left holding.
+
+## Why most agent sandboxes forget everything
+
+The usual sandbox is ephemeral. It spins up, the agent does its thing, it tears down, and the filesystem goes with it. Fine for a one-shot "refactor this file" task. Not fine for an agent that's supposed to *remember*: the repo it already cloned, the notes it took last time, the half-finished build from this morning.
+
+That's the scenario from the top of this post, and it's worth being concrete about the cost. Every session starts by re-cloning the repo, re-installing dependencies, and re-deriving whatever the agent figured out last time, because none of it survived. A user who comes back tomorrow to continue the same task is, from the sandbox's point of view, a brand new user with an empty disk. The harness was happy to keep going. The computer underneath it forgot everything.
+
+That's the gap. The harness owns the session in memory, but the disk underneath it usually doesn't survive. You can paper over it (snapshot the workspace to object storage on teardown, restore it on the next boot) but now you're writing a tiny, bug-prone storage layer for something that should just persist. The state that matters is on a filesystem; it should stay on a filesystem.
+
+## Upstash Box: a durable computer with the agent already inside
+
+This is where Box comes in. A Box is a secure, isolated container with a real filesystem, shell, git, and runtime, and it has an agent built in. You don't wire a harness to a sandbox; you create a box and the agent is already sitting inside it.
+
+```ts
+import { Agent, Box } from "@upstash/box";
+
+const box = await Box.create({
+  runtime: "node",
+  agent: {
+    harness: Agent.ClaudeCode, // or Agent.Codex
+    model: "anthropic/claude-opus-4-6",
+    apiKey: process.env.ANTHROPIC_API_KEY,
+  },
+});
+
+await box.agent.run({ prompt: "set up a Next.js app with Tailwind" });
+await box.exec.command("npm run build");
+```
+
+Two things matter here. First, you pick the harness the same way AI SDK lets you (`Agent.ClaudeCode`, `Agent.Codex`), so the mental model carries straight over. It isn't a new abstraction, just the same one living somewhere else. Second, the box has durable storage. Shut it down, bring it back, and the workspace is still there. The `npm install` from yesterday, the cloned repo, the file the agent was halfway through editing: all of it.
+
+Notice what's missing from that snippet, too. There's no sandbox provider to configure, no teardown hook, no snapshot-and-restore dance. The computer and the agent ship together, so the wiring you'd normally write between them isn't there to get wrong.
+
+## Building a stateful Agent Server
+
+That durability unlocks a pattern worth naming: the Agent Server. One long-running box per user or per tenant, keeping its history, context, and files across sessions instead of starting cold every time.
+
+The pattern is straightforward. Keep a mapping from your user id to a box id, get-or-create the box on each request, and let the harness pick up where it left off. A route handler doing exactly that looks like this:
+
+```ts
+import { Agent, Box } from "@upstash/box";
+import { Redis } from "@upstash/redis";
+
+const redis = Redis.fromEnv();
+
+async function getUserBox(userId: string) {
+  const existing = await redis.get<string>(`box:${userId}`);
+  if (existing) {
+    // Reattach to the same durable workspace as last time.
+    return Box.get(existing);
+  }
+
+  const box = await Box.create({
+    runtime: "node",
+    agent: {
+      harness: Agent.ClaudeCode,
+      model: "anthropic/claude-opus-4-6",
+      apiKey: process.env.ANTHROPIC_API_KEY,
+    },
+  });
+  await redis.set(`box:${userId}`, box.id);
+  return box;
+}
+
+export async function POST(req: Request) {
+  const { userId, prompt } = await req.json();
+  const box = await getUserBox(userId);
+
+  const agentStream = await box.agent.stream({ prompt });
+
+  // Forward the agent's text deltas to the client as they arrive.
+  const encoder = new TextEncoder();
+  const body = new ReadableStream<Uint8Array>({
+    async start(controller) {
+      for await (const chunk of agentStream) {
+        if (chunk.type === "text-delta") {
+          controller.enqueue(encoder.encode(chunk.text));
+        }
+      }
+      controller.close();
+    },
+  });
+
+  return new Response(body, {
+    headers: { "Content-Type": "text/plain; charset=utf-8" },
+  });
+}
+```
+
+The first time a user hits this, the handler creates a box and remembers its id in Redis. Every request after that reconnects to the same box, with the same disk, the same git history, and the same agent session. Nothing re-clones, nothing re-installs, and the agent's earlier context is still on the filesystem where it left it.
+
+![Day two reconnects to the same box instead of starting from an empty disk.](/blog/maybe-we-can-write-a-blog-like-how-ai-sdk-v7-agent-harness-w/diagram-72ca7edc50.svg)
+
+The harness gives you the agent abstraction. The durable box gives that agent a memory that outlives a single request. Redis here is just the index that points each user at their box; the actual state (files, installed packages, build artifacts) lives on the box's own disk, which is exactly where an agent expects to find it.
+
+## Wrapping up: stateful agents, far less wiring
+
+AI SDK v7's harness API is the right abstraction for talking to coding agents, and it's worth learning on its own. The provider-swap model is clean, the streaming fits straight into an existing chat UI, and the sandbox boundary is drawn in an honest place.
+
+But it stops at that boundary on purpose, and on the other side of it is the part that actually decides whether an agent feels stateful or amnesiac. For an agent that persists, the easy move is to not assemble a sandbox at all and instead create a Box that already has one inside. Same harness idea, same code shape, with a real computer (and a real memory) attached. That's the difference between an agent that starts over every morning and one that picks up right where it left off.
