@@ -9,100 +9,92 @@ publishedAt: "2026-06-13T22:47:37.492Z"
 
 In May 2026, a cooling failure in a single AWS availability zone in Northern Virginia ([use1-az4](https://www.cnbc.com/2026/05/08/aws-outage-data-center-fanduel-coinbase.html)) put Coinbase into "Cancel Only" mode for seven hours, left FanDuel bettors unable to cash out during an NBA playoff game, and disrupted trading on CME Direct. The root cause, in each case, was the same sentence that shows up in so many postmortems: the database lived in one availability zone, that zone had a bad day, and the product was down for hours. It's the most boring kind of outage and also one of the most avoidable.
 
-Upstash spreads replicas across availability zones so a single zone failure doesn't take you offline. The marketing version of that sentence is easy to write. The interesting part is what actually happens the moment a node disappears — because "just promote a replica" is exactly how you lose data if you do it naively. A replica that's a few seconds behind still answers the phone; promote it carelessly and you've silently thrown away a few seconds of acknowledged writes.
+Upstash spreads replicas across availability zones so a single zone failure doesn't take you offline. The marketing version of that sentence is easy to write. The interesting part is what actually happens the moment a node disappears. "Just promote a replica" is exactly how you lose data if you do it naively. A replica that's a few seconds behind still answers the phone; promote it carelessly and you've silently thrown away a few seconds of acknowledged writes.
 
-So let's walk through how the failover is designed to *not* do that — at the level that actually matters to you as a user.
+So let's walk through how the failover is designed to *not* do that, at the level that actually matters to you as a user.
 
 ## Step one: noticing a member is gone
 
-Here's a detail worth being precise about: the cluster doesn't detect "a zone went down." It detects that a *member* stopped answering. A zone outage is just the case where several members happen to go silent at once — but the mechanism is the same whether you lose one node to a bad disk or a whole rack to a power event.
+Here's a detail worth being precise about: the cluster doesn't detect "a zone went down." It detects that a *member* stopped answering. A zone outage is just the case where several members happen to go silent at once, but the mechanism is the same whether you lose one node to a bad disk or a whole rack to a power event.
 
-The replicas gossip among themselves, each one constantly and quietly checking on its peers. When a node stops responding, the others notice within seconds and treat it as gone. That detection is deliberately a little patient: a momentary network hiccup shouldn't trigger a leadership change, so a blip that doesn't actually alter the cluster is ignored. A genuine failure kicks off the next step — choosing a new primary. React to real failures, don't thrash on noise.
+The replicas gossip among themselves, each one constantly and quietly checking on its peers. When a node stops responding, the others notice and treat it as gone. A background goroutine (`detectConflictsPeriodically`) also runs every 30 seconds to catch any split-brain disagreements independently. A genuine failure kicks off the next step: `TriggerElection()`. React to real failures, don't thrash on noise.
 
-![](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-cea3914b72.svg)
-*Replicas gossip continuously; when the primary stops responding, the survivors confirm with each other and trigger an election.*
+![Periodic peer pings catch a missing primary; `detectConflictsPeriodically` runs every 30 seconds as an independent split-brain check before triggering an election.](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-40b30ad3fe.svg)
 
 ## Electing a primary without losing writes
 
 When a primary genuinely goes away, the surviving replicas hold an election. The rule that matters most is simple: **the replica that has seen the most writes wins.**
 
-Every write a database accepts is stamped with an ever-increasing sequence number. When it's time to choose a new leader, the candidates compare those numbers, and the most up-to-date survivor is promoted. By construction, you fail over to the replica that has the *least* to lose.
+Every write is stamped with an ever-increasing sequence number. `fetchSequences()` gathers the `LastWriteSequence` from every candidate. The most up-to-date survivor is promoted. By construction, you fail over to the replica that has the *least* to lose.
 
-There are a few sensible tiebreakers layered on top. If two replicas are equally caught up, the one that was already the primary is preferred — no point handing off leadership for nothing. Nodes that are in the middle of shutting down are pushed to the back of the line. And if it's still a tie, the winner is chosen in a way that every replica computes identically, so they all independently agree on the same leader without another round of back-and-forth. Only one election runs at a time, so the cluster can't fracture into competing votes.
+There are a few sensible tiebreakers layered on top. If two replicas are equally caught up, the one that was already the primary is preferred (checked via `PrimaryHeadSequence != 0`; no point handing off leadership for nothing). If it's still a tie, the winner is chosen deterministically using the `dbUid` bit so every survivor independently picks the same leader without another round of back-and-forth. If a prior election is already running, the new one reschedules itself after `electionDelay` (3 seconds) rather than racing. Only one election runs at a time, so the cluster can't fracture into competing votes.
 
-![](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-464ef0aeb8.svg)
-*The election algorithm: the most up-to-date replica wins; if no candidate is close enough to the old primary, the cluster pauses writes rather than risking data loss.*
+![`fetchSequences()` gathers write progress from all candidates; `IsInSync` gates promotion, with a deterministic tiebreak so every survivor agrees independently.](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-87996656ad.svg)
 
 ## The safety check: no in-sync replica, no promotion
 
-Here's the part I like most. Before promoting *anyone*, the election asks a blunt question: is there a candidate that's actually close enough to the old primary to be trusted?
+Here's the part I like most. Before promoting *anyone*, the election calls `IsInSync(latestPrimarySeq)`. If every surviving replica fails that test, the election retries up to `noCandidatesMaxRetries = 10` times before pausing writes. It would rather pause briefly than crown a replica that's missing data and pretend nothing happened.
 
-If every surviving replica is too far behind — far enough that promoting it would mean dropping a meaningful amount of acknowledged data — the system refuses to elect a primary at all. It would rather briefly pause writes than crown a replica that's missing data and pretend nothing happened.
-
-That's the deliberate availability-vs-correctness tradeoff, and it's made on purpose rather than left to luck. In practice the pause is rare and short, because the system also works hard to keep replicas caught up in the first place (more on that next). And if a network partition ever produces two replicas that briefly disagree about who's in charge, a periodic background check notices the conflict and reconciles it automatically — the split view doesn't get to linger.
+That's the deliberate availability-vs-correctness tradeoff, made on purpose rather than left to luck. In practice the pause is rare and short, because the system also works hard to keep replicas caught up in the first place (more on that next). And if a network partition ever produces two replicas that briefly disagree about who's in charge, `detectConflictsPeriodically` catches it and calls `TriggerElection()` again automatically: the split view doesn't get to linger.
 
 ## Keeping backups from falling behind in the first place
 
-The safety check only helps if replicas are *usually* in sync — so the primary actively works to keep them there. When a backup starts lagging, the primary applies gentle backpressure: it slows new writes by a tiny, growing amount so the backup has a chance to catch up.
+The safety check only helps if replicas are *usually* in sync, so the primary actively works to keep them there. When a backup starts lagging, `waitReplicationPrimary()` slows new writes by a small, growing amount so the backup has a chance to catch up.
 
-When your replicas are healthy, this costs you nothing — there's no delay at all. It only kicks in when a backup falls behind, and even then it starts as single-digit milliseconds and ramps up smoothly, capped so it never becomes a cliff. The effect is that the gap between primary and backup stays small, which is exactly what makes a fast, lossless failover possible later. A replica that's healing from scratch first copies the full dataset and then switches to streaming live changes; the backpressure ignores those still doing their initial bulk copy.
+The delay starts at single-digit milliseconds for moderate lag, grows to around 44ms at 1 million ops behind, and is hard-capped at 1 second. It only kicks in when a backup falls behind, and ramps smoothly, so there's no cliff. A replica that's still doing its initial full-dataset copy is excluded from this calculation entirely.
 
-![](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-68e7a77168.svg)
-*When a replica falls behind, the primary decides between a full bulk copy and streaming from the update queue — whichever is cheaper given the gap size.*
+When a replica reconnects after falling too far behind, `pushFullRecords()` decides how to catch it up: stream the missing updates from the update queue if they're still available, or fall back to a full bulk copy if the gap is too large or a bulk copy would be cheaper given the database size.
+
+![`pushFullRecords()` streams from the update queue if the gap is small; `mayFallbackToFullSync()` triggers a full bulk copy when that would be cheaper, after which live streaming resumes.](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-c6d781fa16.svg)
 
 ## Read replicas that don't lie to you
 
-Multi-AZ isn't only about surviving failures — those extra replicas serve reads too, which is where a lot of the speed and scale come from. But a backup can be a touch behind the primary, which raises an obvious question: if you write a key and immediately read it back, could a lagging replica hand you a stale answer?
+Multi-AZ isn't only about surviving failures: those extra replicas serve reads too, which is where a lot of the speed and scale come from. But a backup can be a touch behind the primary, which raises an obvious question: if you write a key and immediately read it back, could a lagging replica hand you a stale answer?
 
-No. A replica will only serve a read locally if it has already applied *your* most recent write. If it hasn't caught up to you yet, your read is transparently routed to a replica that has. You get the scale of reading from many replicas without ever getting handed a stale view of data you just wrote.
+No. Before serving a read locally, the proxy calls `canReadLocal()`, which checks three things: that `localReady` is true (initial replication is done and the replica is nearly in sync), that the client isn't mid-transaction, and that the client's own latest write sequence has already been applied locally (`ctx.Exec.Sequence <= engine.LatestEnqueueSequence()`). If any check fails, the read is transparently forwarded to the primary.
 
-Replicas that are still catching up after rejoining simply don't take reads until they're genuinely current. So "read from the nearest replica" never quietly turns into "read something out of date."
+Replicas that are still catching up after rejoining have `localReady = false` and simply don't take reads until they're genuinely current. So "read from the nearest replica" never quietly turns into "read something out of date."
 
-![](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-d02a360f2c.svg)
-*Read-your-writes in action: if the nearest replica hasn't caught up to your write yet, the read is silently forwarded to one that has.*
+![`canReadLocal()` checks both that the replica is in sync and that the client's own writes are already applied before serving locally.](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-eaf294fad8.svg)
 
 ## Prod Pack is the switch that makes it multi-AZ
 
-Everything above is the machinery. **[Prod Pack](https://upstash.com/docs/redis/overall/enterprise) is the switch that spreads it across zones.** A regular database keeps its replicas in a single zone; multi-AZ high availability turns on specifically when Prod Pack is enabled on a database in a region that supports it. That's the differentiator — not a config knob you have to tune, but one flag that changes the shape of your cluster.
+Everything above is the machinery. **[Prod Pack](https://upstash.com/docs/redis/overall/enterprise) is the switch that spreads it across zones.** Without it, both primary-pair members live in the `mainZone`. With it, `applyProdPackChanges()` runs in the coordinator and reshapes the cluster: `adjustReplicasOfDatabase()` moves one primary to a different zone, and `adjustReadReplicasInRegion()` bumps from one read replica to two with enforced zone diversity, so no single zone can take out the entire read fleet. A newly placed replica copies the full dataset, catches up on live changes, and only starts answering reads once it's genuinely current. The reshape happens with no hand-migration and no downtime.
 
-When you flip it on, the backend treats it as a request to *reshape the cluster*, not just set a boolean. It recalculates where your replicas should live and deliberately spreads them across zones: it keeps a replica in the home zone and places at least one in a *different* zone, and when you run multiple read replicas it enforces the same zone diversity on those too — so your secondary read replicas don't all pile into one AZ where a single zone failure could take the whole read fleet with them. A newly added replica doesn't blink into service either; it copies the full dataset, catches up on live changes, and only starts answering reads once it's genuinely current. The reshape rolls out to the running cluster with no hand-migration and no downtime, and there's a deliberate guardrail: routine reconfiguration can add, remove, or relocate read replicas, but it will never silently swap your primary out from under you as a side effect.
+![`applyProdPackChanges()` reshapes primary placement, adds a zone-diverse read replica, flips the DNS CNAME to the `-global-ha` variant, and deploys via agents.](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-56e1c3062b.svg)
 
-![](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-8cd0bc3db3.svg)
-*Enabling [Prod Pack](https://upstash.com/docs/redis/overall/enterprise) reshapes the cluster: replicas are redistributed across zones, each new one copies the full dataset before it starts serving reads.*
-
-The other half of "never goes down" is the address your client connects to. A Prod Pack database doesn't resolve to a single machine in a single zone — its hostname points at a highly-available endpoint that fronts both zones, and each pool is reachable through both a primary-zone address and a separate second-zone (`az2`) address. So if the entry point in one zone becomes unhealthy, the name still resolves to a healthy one in the other zone. The replica set survives the zone loss *and* the front door does too; one without the other isn't enough.
+The other half of "never goes down" is the address your client connects to. With Prod Pack off, your database CNAME resolves to the `-global` pool target. With Prod Pack on, it switches to the `-global-ha` target (or `global-latency-ha.upstash.io` for the shared global pool), which fronts both zones. If one zone's entry point becomes unhealthy, the name still resolves to the other. The replica set survives the zone loss *and* the front door does too; one without the other isn't enough.
 
 ## Zone-aware by design: keeping the cross-AZ bill as low as it can go
 
-Spreading across zones is great for survival and, on most clouds, has a real traffic cost — every byte that crosses an availability-zone boundary is billed. And some of that is simply unavoidable: keeping a replica alive in another zone means shipping your writes across the boundary to it, which is the whole point of multi-AZ. So the goal isn't to pretend that cost away — it's to make sure you only pay for the cross-zone bytes that genuinely have to be there, and to shrink the ones that do.
+Spreading across zones is great for survival and, on most clouds, has a real traffic cost: every byte that crosses an availability-zone boundary is billed. And some of that is simply unavoidable: keeping a replica alive in another zone means shipping your writes across the boundary to it, which is the whole point of multi-AZ. So the goal isn't to pretend that cost away. It's to make sure you only pay for the cross-zone bytes that genuinely have to be there, and to shrink the ones that do.
 
 Two touches stand out:
 
-- **Same-zone routing at the proxy.** Each proxy knows which zone it's in, and when it picks which replica should handle your request it prefers the fast replicas *in its own zone*, only reaching across to another zone when there's no good local option. Most reads end up served by a node sitting in the same AZ as the proxy — lower latency for you, and that read hop doesn't have to cross a zone boundary in the first place.
+- **Same-zone routing at the proxy.** Each proxy knows which zone it's in, and when it picks which replica should handle your request it prefers the fast replicas *in its own zone*, only reaching across to another zone when there's no good local option. Most reads end up served by a node sitting in the same AZ as the proxy: lower latency for you, and that read hop doesn't have to cross a zone boundary in the first place.
 - **Compression only where it pays.** Replication and internal RPC traffic between nodes is compressed *only when the two nodes are in different zones*. Same-zone traffic, where bandwidth is effectively free, skips compression entirely and saves the CPU; cross-zone traffic gets compressed to shrink the bytes that actually cost money. The system spends effort exactly where it changes the bill, and nowhere else.
 
-![](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-3575e9d1c8.svg)
-*Proxies prefer same-zone replicas for reads; replication to the other zone is compressed to keep cross-AZ transfer costs down.*
+![With Prod Pack on, the `-global-ha` CNAME fronts both zones; proxies prefer same-zone replicas, and cross-zone replication is compressed to keep transfer costs down.](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-66ad7b693a.svg)
 
-None of this is something you configure, and none of it claims to make multi-AZ free — the unavoidable cross-zone replication still happens. It's just a data plane that was designed knowing it would run across zones, and that keeps the resulting transfer cost as low as it reasonably can.
+None of this is something you configure, and none of it claims to make multi-AZ free: the unavoidable cross-zone replication still happens. It's just a data plane that was designed knowing it would run across zones, and that keeps the resulting transfer cost as low as it reasonably can.
 
 ## A few of the quality touches, in one place
 
 If you zoom out, the theme is that the boring failure modes were each thought through on purpose:
 
-- Failover picks the most up-to-date survivor by write sequence — never a stale node.
-- If *nothing* is in sync, it pauses rather than silently losing acknowledged writes.
-- Split-brain disagreements are detected and reconciled on their own.
-- Backpressure keeps replicas caught up so failover stays fast and lossless.
-- Read-your-writes holds even when a different replica in a different zone serves the read.
-- Replicas only serve reads once they're genuinely current.
-- Read replicas are placed across zones, not piled into one.
-- The connection endpoint is itself multi-zone, so the front door can't become the single point of failure.
-- Routing prefers same-zone replicas, and only cross-zone traffic is compressed — keeping the unavoidable cross-AZ transfer cost as low as it can be.
+- `fetchSequences()` + `LastWriteSequence` comparison: failover always picks the most up-to-date survivor, never a stale node.
+- If nothing passes `IsInSync`, the election retries then pauses rather than silently losing acknowledged writes.
+- `detectConflictsPeriodically` catches split-brain every 30 seconds and reconciles it with a fresh `TriggerElection()`.
+- `waitReplicationPrimary()` backpressure keeps replicas caught up so failover stays fast and lossless.
+- `canReadLocal()` guarantees read-your-writes even when a different replica in a different zone serves the read.
+- Replicas only flip `localReady = true` once they're genuinely current.
+- `adjustReadReplicasInRegion()` places read replicas across zones, not piled into one.
+- The DNS switches from `-global` to `-global-ha`, so the front door can't become the single point of failure.
+- Proxies route same-zone first, and only cross-zone traffic is compressed, keeping the unavoidable cross-AZ transfer cost as low as it can be.
 
 ## What you actually do
 
-The best part: none of this is your problem. You use Redis like normal, and on a [Prod Pack](https://upstash.com/docs/redis/overall/enterprise) database, multi-AZ high availability is simply on. The failover, the election, the read routing — all of it is invisible from your code. The same three lines run whether you're on one zone or three:
+The best part: none of this is your problem. You use Redis like normal, and on a [Prod Pack](https://upstash.com/docs/redis/overall/enterprise) database, multi-AZ high availability is simply on. The failover, the election, the read routing: all of it is invisible from your code. The same three lines run whether you're on one zone or three:
 
 ```ts
 import { Redis } from "@upstash/redis";
@@ -112,7 +104,7 @@ await redis.set("order:42", "paid");
 await redis.get("order:42"); // same code, now backed by multi-AZ failover
 ```
 
-And because read-your-writes is guaranteed for you, you don't have to reason about replica lag in your app. Write, then read, and you'll see your own write — even if the read happens to be served by a different replica in a different zone:
+And because read-your-writes is guaranteed for you, you don't have to reason about replica lag in your app. Write, then read, and you'll see your own write, even if the read happens to be served by a different replica in a different zone:
 
 ```ts
 await redis.set("session:abc", JSON.stringify({ userId: 7 }));
@@ -122,4 +114,4 @@ await redis.set("session:abc", JSON.stringify({ userId: 7 }));
 const session = await redis.get("session:abc");
 ```
 
-That's the whole point. When a zone goes dark — as it did for AWS's us-east-1 in May 2026, and will again somewhere, for someone, soon — the failover promotes the most up-to-date surviving replica, refuses to promote a stale one, reconciles any split view on its own, keeps your reads honest, and the endpoint itself stays reachable through the surviving zone. The boring outage — the one that cost Coinbase seven hours and a postmortem — just doesn't happen.
+That's the whole point. When a zone goes dark, as it did for AWS's us-east-1 in May 2026 and will again somewhere, for someone, soon: the failover promotes the most up-to-date surviving replica, refuses to promote a stale one, reconciles any split view on its own, keeps your reads honest, and the endpoint itself stays reachable through the surviving zone. The boring outage, the one that cost Coinbase seven hours and a postmortem, just doesn't happen.
