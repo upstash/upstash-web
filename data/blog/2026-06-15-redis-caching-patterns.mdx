@@ -6,18 +6,18 @@ tags: [redis]
 description: "Redis caching patterns compared, with TypeScript code examples."
 ---
 
-In this article I want to cover 4 caching patterns and some tips to implement them in production: TTL and eviction, invalidation, and cache stampedes. I ran all the examples in this article on the newest Upstash Redis TypeScript SDK :]
+## Overview: 4 Great Redis caching patterns
 
-## The four Redis caching patterns at a glance
+There are 4 caching patterns I want to cover in this article. Together, they cover almost any use case I've ever needed caching for :]
 
-Four patterns cover almost every caching use case: cache-aside, write-through, write-behind, and read-through. They differ in who writes to the database, when that write happens, and who owns the fetch when a read misses.
+The patterns are called cache-aside, write-through, write-behind, and read-through. They differ in who writes to the database, when that write happens, and who owns the fetch when a read misses.
 
-| Pattern | Reads | Writes | Freshness | Main risk |
-| --- | --- | --- | --- | --- |
-| Cache-aside | App checks cache, loads DB on a miss, fills cache | App writes DB, deletes the cache key | Can go stale between writes | First read after a write misses |
-| Write-through | App reads from cache | App writes DB and cache together | Cache stays current | Cache churn, two writes per update |
-| Write-behind | App reads from cache | App writes cache, a worker persists to DB later | Cache current, DB lags | Data loss if the cache fails before flush |
-| Read-through | App asks the cache, cache loads DB on a miss | Paired with write-through or write-behind | Depends on the write side | The cache layer must own DB access |
+| Pattern       | Reads                                             | Writes                                          | Freshness                   | Main risk                                 |
+| ------------- | ------------------------------------------------- | ----------------------------------------------- | --------------------------- | ----------------------------------------- |
+| Cache-aside   | App checks cache, loads DB on a miss, fills cache | App writes DB, deletes the cache key            | Can go stale between writes | First read after a write misses           |
+| Write-through | App reads from cache                              | App writes DB and cache together                | Cache stays current         | Cache churn, two writes per update        |
+| Write-behind  | App reads from cache                              | App writes cache, a worker persists to DB later | Cache current, DB lags      | Data loss if the cache fails before flush |
+| Read-through  | App asks the cache, cache loads DB on a miss      | Paired with write-through or write-behind       | Depends on the write side   | The cache layer must own DB access        |
 
 I think cache-aside is a good default for most read-heavy apps. The write-through helps when a read right after a write needs to hit the cache. Write-behind trades durability for write speed and read-through is a code-organization choice that hides the fetch behind a cache object.
 
@@ -42,10 +42,10 @@ const NULL_SENTINEL = "__null__";
 async function getUser(id: string) {
   const key = `user:${id}`;
   const cached = await redis.get<User | string>(key);
-  if (cached === NULL_SENTINEL) return null;   // known-missing
-  if (cached !== null) return cached as User;   // cache hit
+  if (cached === NULL_SENTINEL) return null; // known-missing
+  if (cached !== null) return cached as User; // cache hit
 
-  const row = await db.getUser(id);             // miss, go to DB
+  const row = await db.getUser(id); // miss, go to DB
   if (row === null) {
     await redis.set(key, NULL_SENTINEL, { ex: 30 });
     return null;
@@ -55,7 +55,7 @@ async function getUser(id: string) {
 }
 ```
 
-The `NULL_SENTINEL` line is really useful because if `getUser("99")` finds nothing in the database, the next request for `99` misses the cache again and queries the database again. 
+The `NULL_SENTINEL` line is really useful because if `getUser("99")` finds nothing in the database, the next request for `99` misses the cache again and queries the database again.
 
 Repeated lookups for an ID that does not exist hit the database every time. With the sentinel, we "remember" that it is null and avoid the extra trip to the main database. We can give it a 30-second TTL so that a row that gets created soon after still shows up quickly.
 
@@ -65,8 +65,8 @@ On the write side, cache-aside deletes the key instead of updating it:
 
 ```ts
 async function updateUser(id: string, data: User) {
-  await db.updateUser(id, data);   // update the database first
-  await redis.del(`user:${id}`);   // then drop the stale cache entry
+  await db.updateUser(id, data); // update the database first
+  await redis.del(`user:${id}`); // then drop the stale cache entry
 }
 ```
 
@@ -85,11 +85,11 @@ Here is what it looks like in code:
 ```ts
 async function updateUser(id: string, data: User) {
   const key = `user:${id}`;
-  await db.updateUser(id, data);            // database first
+  await db.updateUser(id, data); // database first
   try {
     await redis.set(key, data, { ex: 300 }); // then keep the cache warm
   } catch {
-    await redis.del(key);                    // on cache error, don't serve stale
+    await redis.del(key); // on cache error, don't serve stale
   }
 }
 ```
@@ -108,7 +108,7 @@ This strategy has four parts: the app writes the cache, the app pushes the chang
 
 ```ts
 async function writeBehind(id: string, data: User) {
-  await redis.set(`user:${id}`, data, { ex: 300 });           // cache first
+  await redis.set(`user:${id}`, data, { ex: 300 }); // cache first
   await redis.lpush("user:writes", { id, data }); // enqueue the DB write
 }
 ```
@@ -140,7 +140,7 @@ class ReadThroughCache<T> {
     const key = `${this.prefix}:${id}`;
     const cached = await this.redis.get<T>(key);
     if (cached !== null) return cached;
-    const row = await this.loader(id);      // the cache owns the DB fetch
+    const row = await this.loader(id); // the cache owns the DB fetch
     if (row !== null) await this.redis.set(key, row, { ex: this.ttl });
     return row;
   }
@@ -166,12 +166,12 @@ This way, we set the value and the expiry in one command. Once the TTL passes, t
 
 A good TTL depends on how stale the data can be:
 
-| Data | TTL | Why |
-| --- | --- | --- |
-| User session | 24h | Changes rarely, long-lived |
-| Product listing | 5 min | Short staleness is OK |
-| Inventory count | 30-60s | Wrong numbers cost money |
-| Config flags | hours to days | Changes by hand, rarely |
+| Data            | TTL           | Why                        |
+| --------------- | ------------- | -------------------------- |
+| User session    | 24h           | Changes rarely, long-lived |
+| Product listing | 5 min         | Short staleness is OK      |
+| Inventory count | 30-60s        | Wrong numbers cost money   |
+| Config flags    | hours to days | Changes by hand, rarely    |
 
 When many (and i mean many, otherwise don't worry about this) keys share one TTL and get written together, they expire together, and the cache empties in one burst. We can add jitter so the expiry times spread out:
 
@@ -248,7 +248,8 @@ async function getReport(id: string) {
   const acquired = await redis.set(lockKey, token, { nx: true, px: 5000 });
 
   if (acquired === null) {
-    for (let i = 0; i < 50; i++) {        // someone else is rebuilding
+    for (let i = 0; i < 50; i++) {
+      // someone else is rebuilding
       await new Promise((r) => setTimeout(r, 10));
       const fresh = await redis.get<Report>(key);
       if (fresh !== null) return fresh;
@@ -277,8 +278,8 @@ We store the value with how long the last recompute took and the absolute expiry
 ```ts
 interface Boxed<T> {
   value: T;
-  delta: number;   // ms the last recompute took
-  expiry: number;  // absolute unix ms
+  delta: number; // ms the last recompute took
+  expiry: number; // absolute unix ms
 }
 
 async function xfetch<T>(
@@ -290,12 +291,16 @@ async function xfetch<T>(
   const box = await redis.get<Boxed<T>>(key);
   if (box !== null) {
     const early = Date.now() - box.delta * beta * Math.log(Math.random());
-    if (early < box.expiry) return box.value;  // still fresh enough
+    if (early < box.expiry) return box.value; // still fresh enough
   }
   const start = Date.now();
   const value = await recompute();
   const delta = Date.now() - start;
-  await redis.set(key, { value, delta, expiry: Date.now() + ttlMs }, { px: ttlMs });
+  await redis.set(
+    key,
+    { value, delta, expiry: Date.now() + ttlMs },
+    { px: ttlMs },
+  );
   return value;
 }
 ```
@@ -308,10 +313,10 @@ For low-to-medium traffic, jitter alone is enough. For a hot key that expires un
 
 A key naming convention keeps your keyspace debuggable and, on a cluster, keeps related keys together. I use `entity:id:subresource`, so a key reads like `user:42:orders`. That makes keys easy to grep, easy to match with `SCAN`, and avoids accidental collisions.
 
-| Bad key | Better key | Why |
-| --- | --- | --- |
-| `user42orders` | `user:42:orders` | Delimited, easy to match and read |
-| `u:42` | `user:42` | Readable is better than a few saved bytes |
+| Bad key        | Better key       | Why                                       |
+| -------------- | ---------------- | ----------------------------------------- |
+| `user42orders` | `user:42:orders` | Delimited, easy to match and read         |
+| `u:42`         | `user:42`        | Readable is better than a few saved bytes |
 
 ## How do you measure cache effectiveness?
 
@@ -337,15 +342,15 @@ const hitRate = (hits / (hits + misses)) * 100;
 
 The cache-aside pattern is the right starting point for most read-heavy apps. It is simple to reason about, and the app keeps working when the cache is down because every miss falls through to the database. Add another pattern when a specific problem calls for it.
 
-| Situation | Pattern |
-| --- | --- |
-| Read-heavy app, baseline | Cache-aside |
-| Reads right after writes must hit the cache | Write-through on top of cache-aside |
-| Very high write rate, some data loss is acceptable | Write-behind with a durable worker |
-| You want the fetch logic in one place | Read-through wrapper |
-| A hot key expiring spikes the database | Add a lock or XFetch |
+| Situation                                          | Pattern                             |
+| -------------------------------------------------- | ----------------------------------- |
+| Read-heavy app, baseline                           | Cache-aside                         |
+| Reads right after writes must hit the cache        | Write-through on top of cache-aside |
+| Very high write rate, some data loss is acceptable | Write-behind with a durable worker  |
+| You want the fetch logic in one place              | Read-through wrapper                |
+| A hot key expiring spikes the database             | Add a lock or XFetch                |
 
-For most apps I run cache-aside for reads and delete-on-write for invalidation. Jittered TTLs and locks on the few hot keys that cause stampedes become relevant at much, much higher usages. 
+For most apps I run cache-aside for reads and delete-on-write for invalidation. Jittered TTLs and locks on the few hot keys that cause stampedes become relevant at much, much higher usages.
 
 On Upstash, cache-aside and write-through fit the HTTP client directly; write-behind needs a durable worker, which is where QStash comes in.
 
