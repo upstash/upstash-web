@@ -7,7 +7,7 @@ description: "A look at the primary-election and replica design behind multi-AZ 
 publishedAt: "2026-06-13T22:47:37.492Z"
 ---
 
-Every few months there's a postmortem that boils down to the same sentence: the database lived in one availability zone, that zone had a bad day, and the product was down for hours. It's the most boring kind of outage and also one of the most avoidable.
+In May 2026, a cooling failure in a single AWS availability zone in Northern Virginia ([use1-az4](https://www.cnbc.com/2026/05/08/aws-outage-data-center-fanduel-coinbase.html)) put Coinbase into "Cancel Only" mode for seven hours, left FanDuel bettors unable to cash out during an NBA playoff game, and disrupted trading on CME Direct. The root cause, in each case, was the same sentence that shows up in so many postmortems: the database lived in one availability zone, that zone had a bad day, and the product was down for hours. It's the most boring kind of outage and also one of the most avoidable.
 
 Upstash spreads replicas across availability zones so a single zone failure doesn't take you offline. The marketing version of that sentence is easy to write. The interesting part is what actually happens the moment a node disappears — because "just promote a replica" is exactly how you lose data if you do it naively. A replica that's a few seconds behind still answers the phone; promote it carelessly and you've silently thrown away a few seconds of acknowledged writes.
 
@@ -63,12 +63,12 @@ Replicas that are still catching up after rejoining simply don't take reads unti
 
 ## Prod Pack is the switch that makes it multi-AZ
 
-Everything above is the machinery. **Prod Pack is the switch that spreads it across zones.** A regular database keeps its replicas in a single zone; multi-AZ high availability turns on specifically when Prod Pack is enabled on a database in a region that supports it. That's the differentiator — not a config knob you have to tune, but one flag that changes the shape of your cluster.
+Everything above is the machinery. **[Prod Pack](https://upstash.com/docs/redis/overall/enterprise) is the switch that spreads it across zones.** A regular database keeps its replicas in a single zone; multi-AZ high availability turns on specifically when Prod Pack is enabled on a database in a region that supports it. That's the differentiator — not a config knob you have to tune, but one flag that changes the shape of your cluster.
 
 When you flip it on, the backend treats it as a request to *reshape the cluster*, not just set a boolean. It recalculates where your replicas should live and deliberately spreads them across zones: it keeps a replica in the home zone and places at least one in a *different* zone, and when you run multiple read replicas it enforces the same zone diversity on those too — so your secondary read replicas don't all pile into one AZ where a single zone failure could take the whole read fleet with them. A newly added replica doesn't blink into service either; it copies the full dataset, catches up on live changes, and only starts answering reads once it's genuinely current. The reshape rolls out to the running cluster with no hand-migration and no downtime, and there's a deliberate guardrail: routine reconfiguration can add, remove, or relocate read replicas, but it will never silently swap your primary out from under you as a side effect.
 
 ![Diagram](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-8cd0bc3db3.svg)
-*Enabling Prod Pack reshapes the cluster: replicas are redistributed across zones, each new one copies the full dataset before it starts serving reads.*
+*Enabling [Prod Pack](https://upstash.com/docs/redis/overall/enterprise) reshapes the cluster: replicas are redistributed across zones, each new one copies the full dataset before it starts serving reads.*
 
 The other half of "never goes down" is the address your client connects to. A Prod Pack database doesn't resolve to a single machine in a single zone — its hostname points at a highly-available endpoint that fronts both zones, and each pool is reachable through both a primary-zone address and a separate second-zone (`az2`) address. So if the entry point in one zone becomes unhealthy, the name still resolves to a healthy one in the other zone. The replica set survives the zone loss *and* the front door does too; one without the other isn't enough.
 
@@ -102,7 +102,7 @@ If you zoom out, the theme is that the boring failure modes were each thought th
 
 ## What you actually do
 
-The best part: none of this is your problem. You use Redis like normal, and on a Prod Pack database, multi-AZ high availability is simply on. The failover, the election, the read routing — all of it is invisible from your code. The same three lines run whether you're on one zone or three:
+The best part: none of this is your problem. You use Redis like normal, and on a [Prod Pack](https://upstash.com/docs/redis/overall/enterprise) database, multi-AZ high availability is simply on. The failover, the election, the read routing — all of it is invisible from your code. The same three lines run whether you're on one zone or three:
 
 ```ts
 import { Redis } from "@upstash/redis";
@@ -122,4 +122,4 @@ await redis.set("session:abc", JSON.stringify({ userId: 7 }));
 const session = await redis.get("session:abc");
 ```
 
-That's the whole point. When a zone goes dark, the failover promotes the most up-to-date surviving replica, refuses to promote a stale one, reconciles any split view on its own, keeps your reads honest, and the endpoint itself stays reachable through the surviving zone. The boring outage — the one that costs somebody half a day and a postmortem — just doesn't happen.
+That's the whole point. When a zone goes dark — as it did for AWS's us-east-1 in May 2026, and will again somewhere, for someone, soon — the failover promotes the most up-to-date surviving replica, refuses to promote a stale one, reconciles any split view on its own, keeps your reads honest, and the endpoint itself stays reachable through the surviving zone. The boring outage — the one that cost Coinbase seven hours and a postmortem — just doesn't happen.
