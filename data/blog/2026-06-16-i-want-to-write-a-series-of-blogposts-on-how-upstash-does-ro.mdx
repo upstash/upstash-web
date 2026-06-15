@@ -1,0 +1,110 @@
+---
+title: "This is How We Roll - Part 1: Pre-Prod Tests"
+slug: i-want-to-write-a-series-of-blogposts-on-how-upstash-does-ro
+authors: [burak]
+tags: [serverless, redis]
+description: "How a permanent multi-region test environment and a DynamoDB gate protect every Upstash product before anything ships to production."
+publishedAt: "2026-06-16T00:00:00.000Z"
+---
+
+Imagine this: you ship a coordinator update with a subtle bug in how it handles DynamoDB writes. Within minutes, customers cannot create Redis databases. But also, Vector indexes will not provision. QStash queues start returning errors. The coordinator is the brain behind all of Upstash's managed products, so one bad build can silently take down everything at once.
+
+This is the scenario that keeps infrastructure teams up at night. Here is how we made it so it basically cannot happen.
+
+## A "Production" Environment That Is Not Production
+
+The first piece of the puzzle is what we call a "dynamic dev" environment. Not a staging environment with a handful of fake services. A real, fully operational Upstash stack, complete with:
+
+- **3 regional clusters** (EU, US, SA), each running a Redis agent, exporters, rest-proxy, and real Redis replica pods
+- **1 origin cluster** running the coordinator and supporting services
+- Real DynamoDB tables, SQS FIFO queues, and Route53 DNS entries, all namespaced per environment
+- Real API and console endpoints for each environment
+
+You can spin one up from scratch, stop it overnight to save cost, and delete it when you are done. But for pre-prod testing, we keep one alive permanently called `main-test`. It never gets torn down. Instead, it gets updated in place every time code lands on master.
+
+![One origin cluster dispatches work to three regional clusters via SQS queues.](/blog/i-want-to-write-a-series-of-blogposts-on-how-upstash-does-ro/diagram-c30fb2e30c.svg)
+
+## Six Images, Two Architectures, Four Clusters
+
+Before any tests can run, the latest code has to actually be running in `main-test`. Every push to master triggers a full image build.
+
+The pipeline kicks off two build jobs in parallel:
+
+- **Redis server image** for the pool and replica pods
+- **Five cloud images** covering the coordinator, agents, and exporters
+
+Each image is built for both **ARM64 and AMD64**, pushed as a multi-arch manifest to ECR, and then deployed across all four clusters. After each deployment, the workflow waits for pod readiness before moving on. If any cluster fails to stabilize, the whole flow stops and Slack fires an alert.
+
+![Six images build in parallel, then roll out to all four clusters before any test is allowed to run.](/blog/i-want-to-write-a-series-of-blogposts-on-how-upstash-does-ro/diagram-2f08d8ef6b.svg)
+
+## The Health Check That Guards Everything Else
+
+Before any images are built, the pipeline runs a quick health check against a permanent Redis database in `main-test`. If the environment is not responding, the whole pipeline stops right there. There is no point running tests against a broken environment, and no point writing a result that reflects infrastructure noise rather than real code behavior.
+
+## Running Real Tests Against a Real Environment
+
+With `main-test` confirmed alive and freshly updated, the test suite fires against the live namespace.
+
+The tests cover a broad range of lifecycle operations: creating databases, verifying backend state, checking DNS resolution, validating replica allocation across regions, making real data calls through live endpoints, scaling operations, teardown, and more. These are just examples of what runs. All of it hits real infrastructure, not mocks.
+
+This matters beyond Redis. The coordinator being exercised here manages all of Upstash's products: Redis, Vector, QStash, and Workflow. A bug in authentication handling, DynamoDB writes, or SQS dispatch will break all of them. The test suite puts the entire control plane through its paces on real infrastructure before any release gets anywhere near production.
+
+## Stamping the Result (Win or Lose)
+
+The final job runs with `if: always()`. It fires whether every test passed or every test failed. Either way, it writes a record to DynamoDB.
+
+Each record stores the commit SHA, the overall status, a timestamp, and a direct URL to the GitHub Actions run that produced it. Status is `"success"` only if all three previous jobs (availability check, image update, test suite) passed. One failure anywhere and it becomes `"failed"`, with a link so any engineer can jump straight to what broke.
+
+The whole pipeline also uses `concurrency: group: master` with `cancel-in-progress: true`, so if a second push lands while tests are still running, the old run gets cancelled and a fresh one starts immediately.
+
+## The Gate
+
+Here is where it gets elegant.
+
+When a version tag is pushed, a workflow links that tag to the commit's test record in DynamoDB. If the commit never ran pre-prod tests, or ran them and failed, the workflow itself fails and the SRE Slack channel gets an alert.
+
+Then, when someone runs `helmfile apply` on the production cluster, a `prepare` event hook fires before Helm does anything at all:
+
+```yaml
+hooks:
+  - events: ["prepare"]
+    showlogs: true
+    command: "bash"
+    args:
+      - "-c"
+      - |
+        AWS_PROFILE="default" RELEASE_TAG={{ .Values.chartVersion }} ./check_flow_entry.sh
+```
+
+The hook queries DynamoDB for that release tag. If the entry is missing, or the status is anything other than `"success"`, it exits 1 and prints the workflow URL:
+
+```bash
+status=$(echo "$result" | jq -r '.Items[0].status.S')
+
+if [ "$status" != "success" ]; then
+  echo "Flow entry status is $status. Please see: $flow_run_url"
+  exit 1
+fi
+```
+
+Helmfile stops. Not a warning. Not a prompt. It stops. Nothing deploys.
+
+## The Only Path to Production
+
+The system is hard to accidentally break through. To get a release into production, every step has to succeed in sequence:
+
+1. Push code to master
+2. `main-test` must be alive and responsive
+3. All six images must build and roll out to four clusters cleanly
+4. The end-to-end test suite must pass
+5. The commit gets tagged
+6. The tagging workflow validates the tag maps to a passing run in DynamoDB
+7. `helmfile apply` fires the prepare hook, which checks DynamoDB one final time
+
+Skip or fail any step, and the deploy stops. Here is what the full journey looks like end to end:
+
+![The automated test pipeline and the SRE shipping flow both converge on the same DynamoDB record.](/blog/i-want-to-write-a-series-of-blogposts-on-how-upstash-does-ro/diagram-ccd8665e1e.svg)
+
+`main-test` is not a toy. It runs real infrastructure across three AWS regions. When it passes, we ship with confidence, knowing the coordinator and every product it backs has been exercised end-to-end before a single production pod restarts.
+
+Next up in this series: how we roll out updates to Redis one replica per region at a time, keeping quorum intact throughout.
