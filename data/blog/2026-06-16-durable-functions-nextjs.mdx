@@ -1,0 +1,158 @@
+---
+title: "How to Add Durable Functions to Your Next.js App"
+slug: durable-functions-nextjs
+authors:
+  - mehmettokgoz
+tags: [workflow, qstash, serverless, nextjs]
+---
+
+Say you have a Next.js API route that calls an LLM, sends an email, and writes to a database. Any of those calls can fail or get rate-limited, and the whole chain can easily outlive your platform's execution limit. When that happens, the request dies and everything that already succeeded is lost.
+
+Durable functions exist to fix this. The idea is simple: persist the result of every completed step, so when something fails halfway through, execution resumes from the last successful step instead of starting over. Completed steps never re-run, failed steps are retried, and the function can sleep for days without holding any compute.
+
+You probably already know the concept. The real question is how to get it into a Next.js app without adopting a whole new runtime, and that's what this post is about. We'll add a durable function to a Next.js app using [Upstash Workflow](https://upstash.com/docs/workflow) and test it locally before deploying.
+
+## Why Upstash Workflow
+
+Most durable execution tools ask a lot from you. You either host an orchestrator and a fleet of workers, or you move your code into someone else's runtime and deploy it their way. Both options mean new infrastructure, new deployment pipelines, and code that no longer lives in your Next.js app.
+
+Upstash Workflow takes a different approach. A durable function is a plain Next.js route handler. Your code stays in your repo, runs on your platform (Vercel, Netlify, wherever), and deploys exactly like the rest of your app. Upstash only handles the orchestration: it calls your endpoint once per step, stores each result, skips completed steps on retry, and applies your retry policy when a step fails.
+
+There is nothing to host and no SDK ceremony beyond wrapping each unit of work in a function call. It's the shortest path from "regular route handler" to "durable function" that I know of.
+
+It's also not an experiment. Workflow is built on [QStash](https://upstash.com/docs/qstash), our messaging platform that processes hundreds of millions of messages every day. If you're curious what it took to get there, we wrote about it in [How We Made QStash and Upstash Workflow Reliable at Scale](https://upstash.com/blog/reliable-workflow).
+
+## Adding a durable function to Next.js
+
+Let's build an order processing flow: charge the customer, create the order record, send a receipt, then wait a week and ask for a review. Impossible in a single serverless invocation, and pretty boring as a durable function. Boring is what we want.
+
+### 1. Install the SDK
+
+```bash
+npm install @upstash/workflow
+```
+
+### 2. Set your environment variables
+
+Create a QStash token in the [Upstash Console](https://console.upstash.com/qstash) and add it to `.env.local`:
+
+```text
+QSTASH_TOKEN="<YOUR_QSTASH_TOKEN>"
+```
+
+### 3. Create the workflow endpoint
+
+Create `app/api/order/route.ts`:
+
+```typescript
+import { serve } from "@upstash/workflow/nextjs";
+import { chargeCustomer, createOrder, sendEmail } from "@/lib/orders";
+
+type OrderPayload = {
+  email: string;
+  cartId: string;
+};
+
+export const { POST } = serve<OrderPayload>(async (context) => {
+  const { email, cartId } = context.requestPayload;
+
+  const payment = await context.run("charge-customer", async () => {
+    return await chargeCustomer(cartId);
+  });
+
+  const orderId = await context.run("create-order", async () => {
+    return await createOrder(cartId, payment.id);
+  });
+
+  await context.run("send-receipt", async () => {
+    await sendEmail(email, `Your order ${orderId} is confirmed.`);
+  });
+
+  // pause for a week without consuming any compute
+  await context.sleep("wait-for-delivery", 60 * 60 * 24 * 7);
+
+  await context.run("send-review-request", async () => {
+    await sendEmail(email, "How was your order? We'd love to hear about it...");
+  });
+});
+```
+
+That's the whole durable function. Each `context.run` is a durable step. If creating the order record fails, only that step is retried. The customer is not charged twice, because the result of the payment step is restored from storage instead of running again. And `context.sleep` pauses the workflow for a week without a single invocation running in the meantime.
+
+Notice there's no state machine, no status column in your database, no queue wiring. You read the function top to bottom and that's what it does.
+
+### 4. Trigger the workflow
+
+Start the workflow from anywhere in your app, for example from your checkout handler.
+
+One detail to get right: the `url` you pass to `trigger` is where Upstash calls your endpoint, so it has to point at wherever your app is actually running. In production that's your deployed URL, but while testing locally it has to be your local address instead. To avoid hardcoding either one, put the base URL in an environment variable:
+
+```text
+APP_BASE_URL="https://your-app.vercel.app"
+```
+
+And use it in the trigger call:
+
+```typescript
+import { Client } from "@upstash/workflow";
+
+const client = new Client({ token: process.env.QSTASH_TOKEN! });
+
+const { workflowRunId } = await client.trigger({
+  url: `${process.env.APP_BASE_URL}/api/order`,
+  body: { email: "jane@example.com", cartId: "cart_42" },
+});
+```
+
+The call returns immediately with a `workflowRunId` you can use to [track or cancel the run](https://upstash.com/docs/workflow/howto/cancel). From here, Upstash drives the function to completion through failures, timeouts, and the week-long sleep.
+
+Beyond `context.run` and `context.sleep`, the context has a few more durable primitives. `context.call` makes HTTP requests (like slow LLM calls) through Upstash's infrastructure so they can take longer than your function's time limit. `context.waitForEvent` pauses the workflow until an external event arrives, which is handy for human approval steps. The [docs](https://upstash.com/docs/workflow/basics/how) explain how these work under the hood.
+
+## Testing it locally
+
+A fair concern with orchestration tools is whether local development becomes painful. Here it's one environment variable. Add this to `.env.local`:
+
+```text
+QSTASH_DEV=true
+APP_BASE_URL="http://localhost:3000"
+```
+
+Note that `APP_BASE_URL` now points at your local app instead of `your-app.vercel.app`. This is exactly why we made it a variable: the same trigger code works in both environments, and the workflow endpoint Upstash calls is always the app you're actually running.
+
+The SDK downloads and connects to a local QStash dev server automatically. No tokens, no signing keys, no cloud round-trips.
+
+If you prefer to manage the server yourself, run it with the CLI:
+
+```bash
+npx @upstash/qstash-cli dev
+```
+
+It prints local credentials to put in your env file:
+
+```text
+QSTASH_URL="http://127.0.0.1:8080"
+QSTASH_TOKEN="<LOCAL_QSTASH_TOKEN>"
+QSTASH_CURRENT_SIGNING_KEY="<LOCAL_CURRENT_SIGNING_KEY>"
+QSTASH_NEXT_SIGNING_KEY="<LOCAL_NEXT_SIGNING_KEY>"
+```
+
+Then start your Next.js app and trigger the workflow against localhost:
+
+```typescript
+import { Client } from "@upstash/workflow";
+
+const client = new Client({ token: process.env.QSTASH_TOKEN ?? "" });
+
+await client.trigger({
+  url: `${process.env.APP_BASE_URL}/api/order`, // resolves to http://localhost:3000/api/order
+  body: { email: "jane@example.com", cartId: "cart_42" },
+});
+```
+
+The dev server behaves like production: steps run as separate invocations, results are persisted, retries work. What you test locally is what runs in production. See the [local development guide](https://upstash.com/docs/workflow/howto/local-development) for more.
+
+## Deploying
+
+Since the durable function is a regular route handler, there's no special deploy step. Ship your app as usual, then set `QSTASH_TOKEN` and `APP_BASE_URL` (your production URL this time) in your project's environment variables. Pricing is per step, pay as you go.
+
+That's all it takes to make a Next.js endpoint durable. If you want to dig deeper, start with the [Next.js quickstart](https://upstash.com/docs/workflow/quickstarts/vercel-nextjs), and reach us on [Discord](https://upstash.com/discord) or [X](https://x.com/upstash) if you have questions.
