@@ -1,0 +1,157 @@
+---
+slug: ask-hackernews-with-vercel-eve
+title: "Adding RAG to a Vercel Eve Agent with Upstash Redis Search"
+description: "How we gave a Vercel Eve agent retrieval-augmented answers by backing it with Upstash Redis Search: pass-through search tools and a system-prompt query reference."
+authors: [arda]
+tags: [redis, search, eve, hackernews, rag]
+---
+
+Vercel recently announced [Eve](https://vercel.com/eve), a framework for building
+agents. We used it to build a demo,
+[Ask HackerNews](https://upstash-hackernews-eve-agent.vercel.app), that answers
+questions about HackerNews from real data.
+
+The agent uses retrieval-augmented generation (RAG). Instead of answering from the
+model's memory, it queries a search index and bases its answer on the results.
+The index is [Upstash Redis Search](https://upstash.com/docs/redis/search/introduction),
+and the data is the HackerNews archive that also powers
+[HackerNews Trends](https://hackernewstrends.com/).
+
+You can ask it things like "top stories about Rust", "what do people say about
+remote work", or "average score of stories vs jobs". The code is on GitHub:
+[`upstash/eve-example`](https://github.com/upstash/eve-example).
+
+![Ask HackerNews landing page](/blog/ask-hackernews-with-vercel-eve/landing.png)
+
+## How the agent is built
+
+[Eve](https://eve.dev/docs) is filesystem-first. You write capabilities as files
+under `agent/`, and Eve runs the model loop, persists each session, and serves the
+agent over HTTP. We scaffolded the project with the Next.js template, which adds a
+chat UI on top of the agent:
+
+```bash
+npx eve@latest init ask-hackernews --channel-web-nextjs
+```
+
+See the [Next.js and Eve guide](https://eve.dev/docs/guides/frontend/nextjs) for
+how the two fit together. Alternatively, you can also create a pure agent with
+`npx eve@latest init my-agent`
+
+The project layout looks like this:
+
+```txt
+agent/
+  agent.ts          # model + runtime config
+  instructions.md   # system prompt + Upstash Redis Search query reference
+  channels/eve.ts   # HTTP channel
+  lib/hn-index.ts   # Upstash Redis client + the `hn` index
+  tools/            # query.ts, count.ts, aggregate.ts
+app/                # Next.js chat UI
+next.config.ts      # withEve(...)
+```
+
+Under the tools directory, there are three tools the agent can use to talk with the
+index: `query`, `count`, and `aggregate`. The next sections cover the data they search
+and how the model drives them.
+
+## The data
+
+The dataset is the same one behind [HackerNews Trends](https://hackernewstrends.com/),
+our dashboard for HackerNews topic trends. Stories, comments, Ask/Show HN posts,
+jobs and polls all live in a single Upstash Redis Search index named `hn`, along
+with their titles, authors, scores and timestamps.
+
+## Upstash Redis Search
+
+[Upstash Redis Search](https://upstash.com/docs/redis/search/introduction) adds
+full-text search and secondary indexes to Upstash Redis. You define a schema over
+your data and query it over HTTP, with filtering, sorting and aggregations.
+
+A few query shapes cover what the agent needs:
+
+```ts
+// Full-text + filter + sort
+await hn.query({
+  filter: { $and: [{ title: { $smart: "postgres" } }, { type: { $eq: "story" } }] },
+  orderBy: { score: "DESC" },
+  limit: 5,
+});
+
+// Count without fetching
+await hn.count({ filter: { by: { $eq: "pg" } } }); // → { count: 10559 }
+
+// Group items by type
+await hn.aggregate({
+  aggregations: { by_type: { $terms: { field: "type" } } },
+});
+```
+
+[`$smart`](https://upstash.com/docs/redis/search/query-operators/field-operators/smart-matching) combines fuzzy, phrase and term matching in one operator, which works
+well for natural-language input. There are more operators (facets, histograms,
+percentiles, highlighting), but the basics handle most questions.
+
+## Letting the model write the queries
+
+We didn't give the agent one fixed "search HackerNews" tool. It has three tools,
+`query`, `count`, and `aggregate`, and each one passes a raw Upstash Redis Search
+options object to the SDK:
+
+```ts
+// agent/tools/query.ts
+export default defineTool({
+  description: "Run an Upstash Redis Search QUERY against the HackerNews index…",
+  inputSchema: z.object({
+    filter: z.any().optional(),
+    select: z.any().optional(),
+    limit: z.number().int().optional(),
+    orderBy: z.any().optional(),
+    /* … */
+  }),
+  async execute(options) {
+    return hn.query(options); // forwarded verbatim
+  },
+});
+```
+
+The query syntax and the index schema are in the agent's system prompt, so the
+model writes its own filters. Ask for the most upvoted stories about Postgres and
+it produces the following filter:
+
+```jsonc
+{
+  "$and": [
+    { "type": { "$eq": "story" } },
+    {
+      "$or": [
+        { "title": { "$eq": "Postgres" } },
+        { "text": { "$eq": "Postgres" } },
+      ]
+    }
+  ]
+}
+```
+
+With the results, the agent is able to produce a correct response:
+
+![A grounded answer with the underlying query tool call](/blog/ask-hackernews-with-vercel-eve/query-turn.png)
+
+## Conclusion
+
+Two things made this easy. [Vercel Eve](https://vercel.com/eve) took care of the
+agent loop, session state, and serving, so the app itself stayed small. And
+[Upstash Redis Search](https://upstash.com/docs/redis/search/introduction) has a
+query language expressive enough to hand straight to the model: full-text,
+keyword and numeric filters, boolean combinators, sorting, and server-side
+aggregations, all behind three generic tools.
+
+The model can tailor the queries to whatever the
+user asks, and every answer stays grounded in real items it can cite. That
+expressive filtering is what makes Upstash Redis Search a strong fit for RAG.
+
+## Try it
+
+The full source, including the agent, the tools, and the chat UI, is at
+[`upstash/eve-example`](https://github.com/upstash/eve-example). To index your own
+data, see the [Upstash Redis Search docs](https://upstash.com/docs/redis/search/introduction)
+and create a database in the [Upstash console](https://console.upstash.com).
