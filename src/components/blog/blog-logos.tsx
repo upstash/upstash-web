@@ -2,7 +2,7 @@ import { LogoBranch } from "../customers/logo-branch";
 import { LogoClickfunnels } from "../customers/logo-clickfunnels";
 import { LogoDropee } from "../customers/logo-dropee";
 import { LogoDubsh } from "../customers/logo-dubsh";
-import { LogoGail } from "../customers/logo-gail";
+import { LogoGitbook } from "../customers/logo-gitbook";
 import { LogoHumata } from "../customers/logo-humata";
 import { LogoJuicebox } from "../customers/logo-juicebox";
 import { LogoMaker } from "../customers/logo-maker";
@@ -23,11 +23,11 @@ const blogLogos = {
   maker: LogoMaker,
   juicebox: LogoJuicebox,
   navattic: LogoNavattic,
+  gitbook: LogoGitbook,
   openart: LogoOpenart,
   niftykit: LogoNiftykit,
   tfashion: LogoTFashion,
   zapier: LogoZapier,
-  gail: LogoGail,
   ["paul-smith"]: LogoPaulSmith,
   clickfunnels: LogoClickfunnels,
   streamlined: LogoStreamlined,
