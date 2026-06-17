@@ -63,6 +63,21 @@ Here is where it gets elegant.
 
 When a version tag is pushed, a workflow links that tag to the commit's test record in DynamoDB. If the commit never ran pre-prod tests, or ran them and failed, the workflow itself fails and the SRE Slack channel gets an alert.
 
+By the time a tag has been pushed and validated, the DynamoDB record for that commit looks something like this:
+
+```json
+{
+  "commit_id":         "a3f8d12b9e1c4f7a2d5e8b0c3f6a9d2e5b8c1f4a",
+  "status":            "success",
+  "timestamp":         "2025-01-15T14:32:07Z",
+  "flow_run_url":      "https://github.com/upstash/upstash-cloud/actions/runs/12345678",
+  "release_tag":       "v4.56.43",
+  "release_timestamp": "2025-01-15T16:45:22Z"
+}
+```
+
+The `commit_id` was written when the CI run finished. The `release_tag` and `release_timestamp` were added later, when the tagging workflow ran and confirmed the status was clean.
+
 Then, when someone runs `helmfile apply` on the production cluster, a `prepare` event hook fires before Helm does anything at all:
 
 ```yaml
@@ -76,7 +91,7 @@ hooks:
         AWS_PROFILE="default" RELEASE_TAG={{ .Values.chartVersion }} ./check_flow_entry.sh
 ```
 
-The hook queries DynamoDB for that release tag. If the entry is missing, or the status is anything other than `"success"`, it exits 1 and prints the workflow URL:
+The hook queries DynamoDB using the `release_tag` as a lookup key. If the entry is missing, or the status is anything other than `"success"`, it exits 1 and prints the workflow URL:
 
 ```bash
 status=$(echo "$result" | jq -r '.Items[0].status.S')
@@ -86,6 +101,8 @@ if [ "$status" != "success" ]; then
   exit 1
 fi
 ```
+
+![The prepare hook queries DynamoDB by release tag before Helm touches a single pod; a missing or failed entry stops the deployment immediately.](/blog/i-want-to-write-a-series-of-blogposts-on-how-upstash-does-ro/diagram-c52dd5b711.svg)
 
 Helmfile stops. Not a warning. Not a prompt. It stops. Nothing deploys.
 
@@ -99,11 +116,11 @@ The system is hard to accidentally break through. To get a release into producti
 4. The end-to-end test suite must pass
 5. The commit gets tagged
 6. The tagging workflow validates the tag maps to a passing run in DynamoDB
-7. `helmfile apply` fires the prepare hook, which checks DynamoDB one final time
+7. `helmfile apply` fires the prepare hook, which queries DynamoDB one final time
 
 Skip or fail any step, and the deploy stops. Here is what the full journey looks like end to end:
 
-![The automated test pipeline and the SRE shipping flow both converge on the same DynamoDB record.](/blog/i-want-to-write-a-series-of-blogposts-on-how-upstash-does-ro/diagram-ccd8665e1e.svg)
+![CI writes the test record, the tagging step links the release tag to it, and helmfile queries that same record by release tag before anything reaches production.](/blog/i-want-to-write-a-series-of-blogposts-on-how-upstash-does-ro/diagram-019e54a3f4.svg)
 
 `main-test` is not a toy. It runs real infrastructure across three AWS regions. When it passes, we ship with confidence, knowing the coordinator and every product it backs has been exercised end-to-end before a single production pod restarts.
 
