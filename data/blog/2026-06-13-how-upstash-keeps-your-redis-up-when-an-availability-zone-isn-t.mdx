@@ -33,6 +33,14 @@ There are a few sensible tiebreakers layered on top. If two replicas are equally
 
 ![The election ranks candidates by how current their writes are; if no replica is close enough to the old primary, writes pause and the process retries rather than risking data loss.](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-5fec4edd11.svg)
 
+There is a harder version of this scenario though: a network partition where both sides of the cluster stay up and keep accepting writes independently, each side believing it is the active primary. When the partition heals, you have two divergent write histories that both genuinely happened.
+
+The conflict check notices both sides have different primaries and fires a fresh election. The winner then does something more than a simple promotion: it pulls the records that were written on the other side during the partition and merges them in. For each key that only one side touched, that write is kept. For any key that both sides wrote during the partition, the version with the more recent modification timestamp wins. For collection types like hashes, the comparison happens at field granularity: if each side updated different fields of the same hash, both field updates survive rather than one side wiping out the other.
+
+This is the one case where an acknowledged write can be lost: if two clients, on opposite sides of a partition, wrote the same key at nearly the same instant, only one of those writes survives the merge. That is the unavoidable tradeoff of letting both sides make progress during a partition rather than stalling one side completely. For the common case (no partition), this merge path never runs. All writes are totally ordered by sequence number and there is nothing to reconcile.
+
+![After a partition heals, the elected winner reconciles divergent writes from the former primary: for any key both sides wrote, the version with the later modification timestamp survives; for collection types like hashes, the comparison and merge happen field by field.](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-41e78bca4d.svg)
+
 ## The Safety Check: No In-Sync Replica, No Promotion
 
 Here's the part I like most. Before promoting *anyone*, the election checks whether each candidate is actually close enough to the old primary to be trusted. If every surviving replica fails that check, the election retries several times before pausing writes. It would rather pause briefly than crown a replica that's missing data and pretend nothing happened.
@@ -89,6 +97,7 @@ If you zoom out, the theme is that the boring failure modes were each thought th
 - Failover always picks the most up-to-date survivor by write sequence: never a stale node.
 - If no replica is current enough, the election retries then pauses rather than silently losing acknowledged writes.
 - A background conflict check runs every 30 seconds and triggers a fresh election the moment it detects split-brain.
+- After a partition heals, divergent writes are reconciled with a last-write-wins merge at field granularity.
 - Write backpressure keeps replicas caught up so failover stays fast and lossless.
 - Read-your-writes is guaranteed even when a different replica in a different zone serves the read.
 - Replicas only start serving reads once they're genuinely current.
