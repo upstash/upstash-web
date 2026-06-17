@@ -29,17 +29,17 @@ When a primary genuinely goes away, the surviving replicas hold an election. The
 
 Every write a database accepts is stamped with an ever-increasing sequence number. The election gathers the latest write progress from every candidate. The most up-to-date survivor is promoted. By construction, you fail over to the replica that has the *least* to lose.
 
-There are a few sensible tiebreakers layered on top. If two replicas are equally caught up, the one that was already the primary is preferred (no point handing off leadership for nothing). If it's still a tie, the winner is chosen deterministically so every survivor independently picks the same leader without another round of back-and-forth. If a prior election is already running, the new one reschedules itself after a short delay rather than racing. Only one election runs at a time, so the cluster can't fracture into competing votes.
+There are a few sensible tiebreakers layered on top. If two replicas are equally caught up, the one that was already the primary is preferred (no point handing off leadership for nothing). If it's still a tie, the winner is chosen deterministically so every survivor independently picks the same leader without another round of back-and-forth. If a prior election is already running, the new one reschedules itself after a 3-second delay rather than racing. Only one election runs at a time, so the cluster can't fracture into competing votes.
 
-![The election ranks candidates by how current their writes are; if no replica is close enough to the old primary, writes pause and the process retries rather than risking data loss.](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-5fec4edd11.svg)
+![The election first checks whether one is already running and reschedules if so; if no replica is current enough, leadership stays vacant and writes are disabled until the next attempt; otherwise the highest-sequence candidate wins, with a deterministic tiebreak for draws.](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-96517375ab.svg)
 
 There is a harder version of this scenario though: a network partition where both sides of the cluster stay up and keep accepting writes independently, each side believing it is the active primary. When the partition heals, you have two divergent write histories that both genuinely happened.
 
-The conflict check notices both sides have different primaries and fires a fresh election. The winner then does something more than a simple promotion: it pulls the records that were written on the other side during the partition and merges them in. For each key that only one side touched, that write is kept. For any key that both sides wrote during the partition, the version with the more recent modification timestamp wins. For collection types like hashes, the comparison happens at field granularity: if each side updated different fields of the same hash, both field updates survive rather than one side wiping out the other.
+The conflict check notices both sides have different primaries and fires a fresh election. The winner then does something more than a simple promotion: it pulls the records that were written on the other side during the partition and merges them in. For each key that only one side touched, that write is kept. For any key that both sides wrote during the partition, the resolution depends on the data type. For scalar keys, the version with the more recent modification timestamp wins. For collection types like hashes, the comparison happens at field granularity: if each side updated different fields of the same hash, both field updates survive rather than one side wiping out the other.
 
-This is the one case where an acknowledged write can be lost: if two clients, on opposite sides of a partition, wrote the same key at nearly the same instant, only one of those writes survives the merge. That is the unavoidable tradeoff of letting both sides make progress during a partition rather than stalling one side completely. For the common case (no partition), this merge path never runs. All writes are totally ordered by sequence number and there is nothing to reconcile.
+This is the one case where an acknowledged write can be lost: if two clients, on opposite sides of a partition, wrote the same scalar key at nearly the same instant, only one of those writes survives the merge. That is the unavoidable tradeoff of letting both sides make progress during a partition rather than stalling one side completely. For the common case (no partition), this merge path never runs. All writes are totally ordered by sequence number and there is nothing to reconcile.
 
-![After a partition heals, the elected winner reconciles divergent writes from the former primary: for any key both sides wrote, the version with the later modification timestamp survives; for collection types like hashes, the comparison and merge happen field by field.](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-41e78bca4d.svg)
+![After a partition heals, the winner reconciles divergent writes three ways: uncontested writes are kept as-is, scalar conflicts resolve by last modification timestamp, and collection types (hashes, sets, etc.) merge field by field so both sides' changes can coexist.](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-47b686dea7.svg)
 
 ## The Safety Check: No In-Sync Replica, No Promotion
 
@@ -55,17 +55,17 @@ The delay starts at single-digit milliseconds for light lag, ramps up smoothly a
 
 When a replica reconnects after falling too far behind, the system decides how to catch it up: stream the missing updates from an in-memory queue if they're still available, or fall back to a full bulk copy if the gap is too large or a bulk copy would be more efficient.
 
-![When a replica falls behind, the system chooses between streaming from the live queue and a full bulk copy, whichever is cheaper, then switches to live streaming once caught up.](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-23564c0a8e.svg)
+![On reconnect the cluster chooses bulk copy or streaming based on gap size and cost; once live, the primary monitors ongoing lag and throttles its own new writes by up to 1 second whenever the replica starts falling behind.](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-7a330e38ba.svg)
 
 ## Read Replicas That Don't Lie to You
 
 Multi-AZ isn't only about surviving failures: those extra replicas serve reads too, which is where a lot of the speed and scale come from. But a backup can be a touch behind the primary, which raises an obvious question: if you write a key and immediately read it back, could a lagging replica hand you a stale answer?
 
-No. Before serving a read locally, the proxy checks three things: that the replica has finished its initial sync and is nearly current, that the client isn't mid-transaction, and that the client's own latest write has already been applied at that replica. If any check fails, the read is transparently forwarded to the primary.
+No. Before serving a read locally, the proxy runs three checks in sequence: the replica must have finished its initial sync and be nearly current; the client must not be mid-transaction (a MULTI block always routes to the primary); and the client's own latest write must already be applied at that replica. All three must pass. If any one fails, the read is transparently forwarded to the primary.
 
 Replicas that are still catching up after rejoining are simply not marked ready for reads until they're genuinely current. So "read from the nearest replica" never quietly turns into "read something out of date."
 
-![Read-your-writes: the proxy checks whether the nearest replica has caught up to the client's own write before serving locally, if not, it transparently routes to the primary.](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-1038876e91.svg)
+![Three sequential checks gate every local read: initial sync complete, no active transaction, and the replica has caught up to the client's own latest write; any failure routes transparently to the primary.](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-86e30ed9bf.svg)
 
 ## Prod Pack Is the Switch That Makes It Multi-AZ
 
@@ -83,10 +83,10 @@ Spreading across zones is great for survival and, on most clouds, has a real tra
 
 Two touches stand out:
 
-- **Same-zone routing at the proxy.** Each proxy knows which zone it's in, and when it picks which replica should handle your request it prefers the fast replicas *in its own zone*, only reaching across to another zone when there's no good local option. Most reads end up served by a node sitting in the same AZ as the proxy: lower latency for you, and that read hop doesn't have to cross a zone boundary in the first place.
+- **Same-zone routing at the proxy.** Each proxy is co-located with a replica, and it routes reads to that local replica when it is ready. If the local replica is not yet ready, the proxy consults the cluster routing table for the current primary address and forwards the request there. The proxy has no awareness of replica types; it just knows whether its local replica is ready, and asks the routing layer where to send traffic otherwise. Most reads end up served by the co-located node: lower latency for you, and that read hop doesn't have to cross a zone boundary in the first place.
 - **Compression only where it pays.** Replication and internal RPC traffic between nodes is compressed *only when the two nodes are in different zones*. Same-zone traffic, where bandwidth is effectively free, skips compression entirely and saves the CPU; cross-zone traffic gets compressed to shrink the bytes that actually cost money. The system spends effort exactly where it changes the bill, and nowhere else.
 
-![With Prod Pack on, the primary pair is split across two AZs in the primary region; read replicas live in a separate read region entirely; each proxy routes reads to its local node, and all cross-zone and cross-region replication traffic is compressed.](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-0a076bbe1a.svg)
+![HA DNS routes to proxies in all zones at once; each proxy routes to its co-located local replica; if the local replica is not ready, the proxy consults the cluster routing table for the current primary address and forwards there (not shown); the primary replicates to other replicas node-to-node.](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-340b5a4fb8.svg)
 
 None of this is something you configure, and none of it claims to make multi-AZ free: the unavoidable cross-zone replication still happens. It's just a data plane that was designed knowing it would run across zones, and that keeps the resulting transfer cost as low as it reasonably can.
 
@@ -103,7 +103,7 @@ If you zoom out, the theme is that the boring failure modes were each thought th
 - Replicas only start serving reads once they're genuinely current.
 - Read replicas are placed across zones, not piled into one.
 - The DNS endpoint is HA-aware, so the front door can't become the single point of failure.
-- Proxies route same-zone first, and only cross-zone traffic is compressed, keeping the unavoidable cross-AZ transfer cost as low as it can be.
+- Each proxy routes to its co-located replica first, and only cross-zone traffic is compressed, keeping the unavoidable cross-AZ transfer cost as low as it can be.
 
 ## What You Actually Do
 
