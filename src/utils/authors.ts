@@ -281,6 +281,7 @@ export const authors: Record<
   yusuf: {
     name: "Yusuf",
     title: "Software Engineer @Upstash",
+    twitter: "ytkimirti",
     image: "yusuf.jpg",
   },
   valon: {
