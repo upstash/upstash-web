@@ -215,6 +215,7 @@ export const authors: Record<
   fahreddin: {
     name: "Fahreddin Ozcan",
     title: "Software Engineer @Upstash",
+    twitter: "f4xreddin",
     website: "https://github.com/fahreddinozcan",
     image: "fahreddin.png",
   },
