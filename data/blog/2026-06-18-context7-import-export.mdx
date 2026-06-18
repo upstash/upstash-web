@@ -1,0 +1,49 @@
+---
+slug: context7-library-import
+title: "Context7 Library Import: Docs for Airgapped Agents"
+description: "How Context7's Library Import feature delivers curated public library documentation to on-premise, internet-restricted AI agents: export from the cloud, import on-prem, and re-embed locally."
+authors: [fahreddin]
+tags: [context7, ai, documentation, enterprise]
+---
+
+AI coding agents are only as good as the information they can reach. Give an agent live access to current documentation and it writes accurate, up-to-date code. But when you cut it off, it falls back on stale training data and guesswork.
+
+Many companies operate their agents exactly this way. For security, compliance or control reasons they block web search and outbound internet access entirely, so the agent runs in an effectively airgapped environment. It's the right setup for these teams, but it comes with a cost: the agent loses its window into the outside world, including the documentation it needs to do its job well.
+
+That's one of the problems we're solving with Context7 On Premise, and we've recently released a new feature called Library Import. It allows you to export curated public library documentation from the cloud and import it into your on-premise agent, so it can continue to write accurate code without needing live internet access.
+
+## What Library Import Does
+
+Library import is built for exactly this situation. You select the public libraries you want in Context7 Cloud, download them as single file and import into your on-premise instance. From then on your agents query that content from your internal network with no connection back to the cloud.
+
+### Exporting from Context7 Cloud
+
+**1. Open the export page.** In the [Context7 Cloud dashboard](https://context7.com), open **More → Export Libraries**.
+
+**2. Select libraries.** Search for libraries by name and click **Add** to put them in your selection. The selection persists while you keep searching, so you can collect libraries from several searches before downloading. Remove one with the **x** on its chip. You can export up to 50 libraries at once.
+
+![Searching and selecting libraries to export](/blog/context7-library-import/export-select.png)
+
+**3. Download the bundle.** Click **Download selected**. Context7 gathers every code and info snippet for the chosen libraries and produces a single `context7-libraries.zip` file.
+
+### Importing on your on-premise install
+
+**1. Transfer the file.** Move `context7-libraries.zip` into your airgapped environment using whatever method your security policy allows.
+
+**2. Open the import page.** In your on-premise dashboard, click **Add Repo**, then choose the **Context7 Export** source.
+
+**3. Upload and import.** Select your `.zip` export (up to 100 MB). To replace libraries that already exist on this install, enable **Overwrite existing libraries**, then click **Import**. Each library is queued as its own job; follow progress under the **Parse Queue** tab while snippets are re-embedded locally.
+
+![Uploading a Context7 export to import](/blog/context7-library-import/import-upload.png)
+
+### After Import
+
+Imported libraries appear in your repository list with an Imported badge and are queryable like any other library.
+
+![Imported badge on a library in the repositories list](/blog/context7-library-import/imported-badge.png)
+
+## Wrapping up
+
+Operating within strict access requirements shouldn't mean your agents go without good documentation. With Context7 On Premise and Library Import, you curate the libraries you trust, bring them across once, and let your agents work against current, high-quality content, entirely inside your own network.
+
+For the full reference, see the [Library Import docs](https://context7.com/docs/enterprise/library-import), and for more on running Context7 in your own environment, see the [Context7 On Premise docs](https://context7.com/docs/enterprise/on-premise).
