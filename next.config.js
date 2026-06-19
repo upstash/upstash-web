@@ -40,6 +40,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "cdn.contentport.io",
       },
+      {
+        protocol: "https",
+        hostname: "miro.medium.com",
+      },
     ],
   },
   rewrites: () => [
