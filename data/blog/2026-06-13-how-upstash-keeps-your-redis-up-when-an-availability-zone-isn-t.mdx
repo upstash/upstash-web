@@ -4,7 +4,7 @@ slug: how-upstash-keeps-your-redis-up-when-an-availability-zone-isn-t
 authors: [burak]
 tags: [redis]
 description: "A Look at the Primary-Election and Replica Design Behind Multi-AZ High Availability."
-publishedAt: "2026-06-13T22:47:37.492Z"
+publishedAt: "2026-06-19T14:00:00.000Z"
 ---
 
 In May 2026, a cooling failure in a single AWS availability zone in Northern Virginia ([use1-az4](https://www.cnbc.com/2026/05/08/aws-outage-data-center-fanduel-coinbase.html)) put Coinbase into "Cancel Only" mode for seven hours, left FanDuel bettors unable to cash out during an NBA playoff game, and disrupted trading on CME Direct. The root cause, in each case, was the same sentence that shows up in so many postmortems: the database lived in one availability zone, that zone had a bad day, and the product was down for hours. It's the most boring kind of outage and also one of the most avoidable.
