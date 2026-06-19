@@ -28,11 +28,11 @@ The distinction that trips most people up: a node is the machine, a replica is t
 
 Here's a detail worth being precise about: the cluster doesn't detect "a zone went down." It detects that a *member* stopped answering. A zone outage is just the case where several members happen to go silent at once, but the mechanism is the same whether you lose one node to a bad disk or a whole rack to a power event.
 
-The replicas gossip among themselves, each one constantly and quietly checking on its peers. When a node stops responding, the others notice and treat it as gone. A separate background check also runs every 30 seconds to catch any split-brain disagreements independently.
+The replicas gossip among themselves, each one constantly and quietly checking on its peers. When a node stops responding, the others notice and treat it as gone. A separate background check also runs periodically to catch any split-brain disagreements independently.
 
 A genuine failure kicks off an election. React to real failures, don't thrash on noise.
 
-![Replicas continuously ping each other; transient blips loop back to monitoring, and only when a majority of survivors independently confirm the loss does an election start, the background check feeds in as a second, independent path to the same confirmation.](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-26293d7944.svg)
+![Replicas continuously ping each other; transient blips loop back to monitoring, and only when a majority of survivors independently confirm the loss does an election start; the background check feeds in as a second, independent path to the same confirmation.](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-c9053f6b0e.svg)
 
 ## Electing a Primary Without Losing Writes
 
@@ -44,17 +44,17 @@ There are a few sensible tiebreakers layered on top:
 
 - If two replicas are equally caught up, the one that was already the primary is preferred. No point handing off leadership for nothing.
 - If it's still a tie, the winner is chosen deterministically so every survivor independently picks the same leader without another round of back-and-forth.
-- If a prior election is already running, the new one reschedules itself after a 3-second delay rather than racing.
+- If a prior election is already running, the new one reschedules itself after a short delay rather than racing.
 
 Only one election runs at a time, so the cluster can't fracture into competing votes.
 
-![The election first checks whether one is already running and reschedules if so; if no replica is current enough, leadership stays vacant and writes are disabled until the next attempt; otherwise the highest-sequence candidate wins, with a deterministic tiebreak for draws.](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-96517375ab.svg)
+![The election first checks whether one is already running and reschedules if so; if no replica is current enough, leadership stays vacant and writes are disabled until the next attempt; otherwise the highest-sequence candidate wins, with a deterministic tiebreak for draws.](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-ef097e9e53.svg)
 
 ## When Both Sides Kept Writing
 
 There is a harder scenario: a network partition where both sides of the cluster stay up and keep accepting writes independently, each side believing it is the active primary. When the partition heals, you have two divergent write histories that both genuinely happened.
 
-The 30-second background conflict check notices both sides have different primaries and fires a fresh election. The winner then does something more than a simple promotion: it pulls the records that were written on the other side during the partition and merges them in.
+The periodic background conflict check notices both sides have different primaries and fires a fresh election. The winner then does something more than a simple promotion: it pulls the records that were written on the other side during the partition and merges them in.
 
 How conflicts are resolved depends on what was written:
 
@@ -82,14 +82,14 @@ The safety check only helps if replicas are *usually* in sync, so the primary ac
 
 A few details worth knowing:
 
-- The delay starts at single-digit milliseconds for light lag and ramps up smoothly as the gap grows.
-- It is hard-capped at 1 second.
+- The delay starts small for light lag and ramps up smoothly as the gap grows.
+- There is a hard cap on how much the delay can grow.
 - It only kicks in when a backup falls behind. There's no cliff.
 - A replica that's still doing its initial full-dataset copy is excluded from this calculation entirely.
 
 When a replica reconnects after falling too far behind, the system picks the cheaper recovery path: stream the missing updates from an in-memory queue if they're still available, or fall back to a full bulk copy if the gap is too large.
 
-![On reconnect the cluster chooses bulk copy or streaming based on gap size and cost; once live, the primary monitors ongoing lag and throttles its own new writes by up to 1 second whenever the replica starts falling behind.](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-7a330e38ba.svg)
+![On reconnect the cluster chooses bulk copy or streaming based on gap size and cost; once live, the primary monitors ongoing lag and throttles its own new writes whenever the replica starts falling behind.](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-7a6d43d679.svg)
 
 ## Read Replicas That Don't Lie to You
 
@@ -131,10 +131,10 @@ The goal isn't to pretend that cost away. It's to make sure you only pay for the
 
 Two touches stand out:
 
-- **Same-zone routing at the proxy.** Each proxy is co-located with a replica, and it routes reads to that local replica when it is ready. If the local replica is not yet ready, the proxy consults the cluster routing table for the current primary address and forwards the request there. The proxy has no awareness of replica types; it just knows whether its local replica is ready, and asks the routing layer where to send traffic otherwise. Most reads end up served by the co-located node: lower latency for you, and that read hop doesn't have to cross a zone boundary in the first place.
+- **Same-zone routing at the proxy.** Each proxy is co-located with a replica, and it routes reads to that local replica when it is ready. If the local replica is not yet ready, the proxy routes to another replica in the same region rather than crossing a region boundary. The proxy has no awareness of replica types; it just knows whether its local replica is ready, and asks the routing layer where to send traffic otherwise. Most reads end up served by the co-located node: lower latency for you, and that read hop doesn't have to cross a zone boundary in the first place.
 - **Compression only where it pays.** Replication and internal RPC traffic between nodes is compressed *only when the two nodes are in different zones*. Same-zone traffic, where bandwidth is effectively free, skips compression entirely and saves the CPU. The system spends effort exactly where it changes the bill, and nowhere else.
 
-![HA DNS routes to proxies in all zones at once; each proxy routes to its co-located local replica; if the local replica is not ready, the proxy consults the cluster routing table for the current primary address and forwards there (not shown); the primary replicates to other replicas node-to-node.](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-340b5a4fb8.svg)
+![HA DNS routes to proxies in all four AZs; each proxy routes to its co-located replica; if the local replica is not ready, the proxy routes to the other replica in the same region (dashed); the primary replicates to all other replicas node-to-node.](/blog/shall-we-write-a-blog-on-how-upstash-ensures-high-availabili/diagram-0868f729bb.svg)
 
 None of this is something you configure, and none of it claims to make multi-AZ free: the unavoidable cross-zone replication still happens. It's just a data plane that was designed knowing it would run across zones, and that keeps the resulting transfer cost as low as it reasonably can.
 
@@ -144,14 +144,14 @@ If you zoom out, the theme is that the boring failure modes were each thought th
 
 - Failover always picks the most up-to-date survivor by write sequence: never a stale node.
 - If no replica is current enough, the election retries then pauses rather than silently losing acknowledged writes.
-- A background conflict check runs every 30 seconds and triggers a fresh election the moment it detects split-brain.
+- A background conflict check runs periodically and triggers a fresh election the moment it detects split-brain.
 - After a partition heals, divergent writes are reconciled with a last-write-wins merge at field granularity.
 - Write backpressure keeps replicas caught up so failover stays fast and lossless.
 - Read-your-writes is guaranteed even when a different replica in a different zone serves the read.
 - Replicas only start serving reads once they're genuinely current.
 - Read replicas are placed across zones, not piled into one.
 - The DNS endpoint is HA-aware, so the front door can't become the single point of failure.
-- Each proxy routes to its co-located replica first, and only cross-zone traffic is compressed, keeping the unavoidable cross-AZ transfer cost as low as it can be.
+- Each proxy routes to its co-located replica first, falls back to another in-region replica if needed, and only cross-zone traffic is compressed, keeping the unavoidable cross-AZ transfer cost as low as it can be.
 
 ## What You Actually Do
 
