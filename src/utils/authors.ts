@@ -103,6 +103,7 @@ export const authors: Record<
     name: "Burak Yılmaz",
     title: "Site Reliability Engineer @Upstash",
     website: "https://github.com/yilmaz-burak",
+    twitter: "zurakbidi",
     image: "burak.png",
   },
   andreas: {
