@@ -1,0 +1,237 @@
+---
+slug: upstash-box-vs-daytona
+title: "Upstash Box vs Daytona: A Comparison of AI Agent Sandboxes"
+authors: [alitarik]
+tags: [box, ai, serverless]
+description: "Upstash Box and Daytona both give AI agents a real computer to work in, and both are containers that keep their state. The difference is where the agent lives and how you pay. A look at the numbers, with a focus on cost and developer experience."
+---
+
+<Summary>
+**Upstash Box** puts the coding agent *inside* the sandbox. You create a box, send it a prompt, and a built-in harness (Claude Code, Codex, OpenCode, or your own) drives the shell, files, and git for you. A box auto-pauses when idle and wakes up later with its state intact. You pay for **active CPU only**, and memory is free.
+
+**Daytona** gives you the sandbox and the integration primitives, and you assemble the agent yourself. You create a sandbox, wire up your own model loop (its docs have guides for OpenCode, Codex, and Claude-style harnesses), and run code in it. It keeps state too (stop, archive, snapshot), and bills **vCPU + memory by wall-clock** with no platform fee.
+
+Both are containers, both persist state, and both run untrusted model code. The fork that matters: do you want a computer with an agent already in it, billed only for the CPU it actually uses, or a plain machine you assemble your own agent on top of? This post focuses on the two things that decide it for most teams: **cost** and **developer experience**.
+</Summary>
+
+If you're building an AI agent that writes and runs code, at some point you need a safe computer to run that code on. [Upstash Box](https://upstash.com/docs/box/overall/quickstart) and [Daytona](https://www.daytona.io) are two options for that. Both give you an isolated container that keeps its state between runs, and on the surface they look alike. But once you start using them, they differ in where the agent runs, how state is kept, how they isolate code, and what you pay. This post compares the two side by side, with real numbers, and pays the most attention to the two things teams care about most: cost and developer experience.
+
+---
+
+## Where the agent runs
+
+This is the main fork, and everything else hangs off it.
+
+A **Box ships with the [agent](https://upstash.com/docs/box/overall/agent) inside it.** You pick a harness and a model when you create the box, and the box already knows how to give that agent the shell, filesystem, and git. You send a prompt; it reads files, runs commands, reacts to failing tests, and keeps going until the task is done.
+
+```ts
+import { Agent, Box } from "@upstash/box"
+
+const box = await Box.create({
+  runtime: "node",
+  agent: { harness: Agent.ClaudeCode, model: "anthropic/claude-fable-5" },
+  git: { token: process.env.GITHUB_TOKEN },
+})
+
+await box.git.clone({ repo: "github.com/your-org/your-repo" })
+await box.agent.run({ prompt: "Fix the null-token bug in src/auth.ts and add tests" })
+await box.git.createPR({ title: "Fix null token bug", base: "main" })
+```
+
+Clone, fix, test, open a PR, with no tool-call wiring and no agent loop of your own. You can also pin the output to a schema and get a typed result back instead of free text:
+
+```ts
+const { result } = await box.agent.run({
+  prompt: "Analyze /work/report.csv and return the top 10 customers by revenue",
+  responseSchema: z.object({
+    customers: z.array(z.object({ name: z.string(), revenue: z.number() })),
+  }),
+})
+result.customers // typed
+```
+
+**Daytona gives you the machine and the integration primitives, and you assemble the agent.** You create a sandbox, then run code or commands in it through the SDK. The agent loop, the tool calls, the model wiring, all of that stays in your application.
+
+```ts
+import { Daytona } from "@daytonaio/sdk"
+
+const daytona = new Daytona()
+const sandbox = await daytona.create()
+
+const res = await sandbox.process.codeRun('print("hello from the sandbox")')
+console.log(res.result)
+```
+
+Daytona's execution surface is strong and flexible: SDKs in five languages, code run natively for Python/JS/TS and through plain commands for anything else, plus a Language Server and a PTY. It also publishes guides for running agents like OpenCode, Codex, and Claude-style harnesses, along with MCP and preview links. What it doesn't ship is a built-in `box.agent.run()`-style harness: Daytona gives you the sandbox and the integration primitives, and you assemble and run the agent process and orchestration yourself.
+
+Box does that work for you. You're running a real coding agent in well under ten lines, and the harness isn't a fixed list: alongside Claude Code, Codex, and OpenCode you can plug in a [custom harness](https://upstash.com/docs/box/overall/custom-agent) (Aider, Gemini CLI, Goose, or your own process) and still get [git](https://upstash.com/docs/box/overall/git), files, logs, and streaming for free. The raw shell, exec, and file APIs are there too if you'd rather drive your own loop, you just don't have to start there.
+
+---
+
+## Feature set side by side
+
+Because Box ships the agent and the workflow around it, a lot of the plumbing you'd normally assemble yourself is already an SDK call. Here are the capabilities that matter most when the goal is to *build an agent*, not just rent a machine:
+
+| Capability | Upstash Box | Daytona |
+| --- | --- | --- |
+| Coding agent built in | Claude Code, Codex, OpenCode, or a custom harness | Assemble your own (guides for OpenCode, Codex, etc.) |
+| Open a pull request | `box.git.createPR(...)` helper | Git ops; PR flow is yours to write |
+| Cron schedules (commands *or* agent prompts) | `box.schedule.exec` / `box.schedule.agent` | Not built in |
+| Public URL with bearer / basic auth | `box.getPublicUrl(port, { bearerToken })` | Preview URLs + custom proxy |
+| Host-side secret injection | Attach Headers | Not available |
+| Runtime egress control | Domain + CIDR rules | CIDR allow-list (tier-gated at runtime) |
+| Reusable base environment | Snapshots, fan-out to N boxes | Snapshots from images + declarative builder |
+| Billing | $0.10 / active core-hour, memory free | vCPU + memory, wall-clock |
+
+Daytona's own strength is breadth on the bring-your-own side. It ships SDKs in five languages (Python, TypeScript, Go, Ruby, Java), a stateful Python code interpreter, desktop automation over VNC, an MCP server, shared volumes between sandboxes, and GPU sandboxes. If you're assembling your own agent platform and want a flexible execution backend, that toolbox is genuinely useful. The trade is that you supply the agent and the workflow yourself; with Box, both come in the box.
+
+---
+
+## How long a session lives, and what survives
+
+Here the two are close, which is part of why they get confused.
+
+A **Box auto-pauses** after an idle timeout, releasing its compute while keeping the **filesystem and environment**. Send it new work weeks later and it resumes with its packages, file history, and git state intact. That's the backbone of the **[agent-server](https://upstash.com/docs/box/overall/use-cases)** pattern: one durable box per tenant, building up context over time, costing almost nothing while it sleeps. Need it [always-on](https://upstash.com/docs/box/overall/keep-alive)? Set `keepAlive: true`.
+
+**Daytona persists too**, through lifecycle states: a sandbox moves Running → Stopped → Archived, and your packages and files survive those transitions. By default it **auto-stops after 15 minutes** of inactivity (configurable).
+
+Both also have a **reusable base** so you don't bootstrap from zero. Box has **[snapshots](https://upstash.com/docs/box/overall/snapshots)** that capture workspace/disk state, so you can fan one prepared environment out into many boxes:
+
+```ts
+const base = await Box.create({ runtime: "node" })
+await base.exec.command("npm install -g typescript eslint prettier")
+const snap = await base.snapshot({ name: "toolchain" })
+
+// branch the same prepared state into parallel workers
+const boxes = await Promise.all(tasks.map(() => Box.fromSnapshot(snap.id)))
+```
+
+Daytona's version is **[snapshots built from container images](https://www.daytona.io/docs/snapshots)** (a Dockerfile, a registry, or its declarative builder), baking in the OS, runtimes, and packages so a new sandbox starts ready. One thing to watch: by default a Daytona snapshot can **deactivate after 2 weeks** of non-use and must be reactivated before you launch from it again, though the inactivity timeout is configurable per organization.
+
+| | Upstash Box | Daytona |
+| --- | --- | --- |
+| Idle behavior | Auto-pause, resumable days/weeks later | Auto-stop after 15 min (configurable) → Stopped → Archived |
+| What's preserved | Filesystem + environment | Filesystem + environment |
+| Reusable base state | Snapshots (workspace/disk), fan-out to N boxes | Snapshots from container images / Dockerfiles / declarative builder |
+| Always-on option | `keepAlive: true` | Configure a long auto-stop interval |
+| Base expiry | Snapshots stay available | Snapshot deactivates after ~2 weeks idle (configurable per org) |
+
+---
+
+## Isolation, secrets, and egress
+
+Box runs each sandbox as its own isolated container, with a separate filesystem, process tree, and network namespace. Daytona's docs describe OCI/Docker-compatible sandboxes with **Sysbox-based isolation** (some of its materials also reference a dedicated kernel), which hardens standard containers (user namespaces, a nested runtime) beyond plain Docker. The practical takeaway: neither is Firecracker-style microVM isolation by default, so if your threat model demands hardware-level separation between untrusted tenants, evaluate that boundary carefully on both.
+
+Both being container-based, the question becomes what each adds on top. **Box layers two controls** aimed at the failure mode agent workloads actually hit: untrusted code leaking a secret, or calling somewhere it shouldn't.
+
+**[Attach Headers](https://upstash.com/docs/box/overall/attach-headers)** keeps secrets off the container floor. A TLS-intercepting proxy on the host injects your API keys into matching outbound HTTPS requests, so the secret never lives in the container's env vars or files; the host adds it in transit:
+
+```ts
+const box = await Box.create({
+  runtime: "node",
+  attachHeaders: {
+    "api.stripe.com": { Authorization: "Bearer sk_live_..." },
+    "*.supabase.co": { apikey: "eyJ..." },
+  },
+})
+// the container issues the request; the host adds the secret in transit
+await box.exec.command("curl -s https://api.stripe.com/v1/charges?limit=1")
+```
+
+**[Network policy](https://upstash.com/docs/box/overall/network-policy)** controls egress and can be updated on a *running* box, so you can start locked down and open up as the work proceeds. Denied ranges always beat allowed ones, and private ranges stay blocked even if you try to allow them:
+
+```ts
+await box.updateNetworkPolicy({
+  mode: "custom",
+  allowedDomains: ["api.github.com", "registry.npmjs.org"],
+})
+```
+
+Daytona has egress controls too, a CIDR allow-list and a block-all switch, and can update them on a running sandbox, though runtime overrides are gated to certain org tiers and permissions. The difference is the grain: Box's network policy takes both **domain and CIDR** rules, so you can allow `api.github.com` by name instead of chasing its IP ranges, while Daytona's allow-list is CIDR-based. And Daytona has no equivalent to Attach Headers, so secrets the agent's code needs generally live in the sandbox's environment, where untrusted code can read them, rather than being injected by the host in transit.
+
+---
+
+## What it costs
+
+This is where the two billing models really diverge, and it's the most interesting table.
+
+Daytona is **pure [pay-as-you-go](https://www.daytona.io/pricing) with no platform fee** and $200 in free credits at signup. It charges for **both vCPU and memory, by wall-clock time**:
+
+- vCPU: **$0.0504 / vCPU-hour**
+- Memory: **$0.0162 / GiB-hour**
+- Storage: **$0.000108 / GiB-hour** (5 GB free)
+
+Box charges **active CPU only, in core-hours**, and leaves **memory free**. The rate is **$0.10 per active core-hour**: by Upstash's own example, running 100% of 2 cores for an hour is $0.20, and 10% of one core for an hour is $0.01. You pay for the cores your code actually burns, nothing while it idles.
+
+| | Upstash Box (Pay as you go) | Daytona (Pay as you go) |
+| --- | --- | --- |
+| Platform fee | $0 | $0 |
+| CPU | $0.10 / active core-hour (only cores actually used) | $0.0504 / vCPU-hr, wall-clock (all allocated vCPU) |
+| Memory | Free | $0.0162 / GiB-hr, wall-clock |
+| Storage | $0.10 / GB-month (snapshots included) | $0.000108 / GiB-hr, 5 GB free |
+| GPU | Not available | H100 $3.95/hr, RTX PRO 6000 $3.03/hr |
+| Free tier | 10 concurrent, 5 CPU-hrs/mo, $1 LLM budget | $200 one-time credits |
+
+Because the agent lives in the box, Box also meters LLM tokens for you, capped at $1/month on Free and a $100/month budget on Pay as you go. Full numbers are on the [Box pricing page](https://upstash.com/pricing/box).
+
+The key difference isn't the platform fee (neither has one here), it's **what gets metered**. Daytona bills every second the sandbox is up, for both vCPU and memory. Box bills only the core-hours your code actually burns, and never bills memory. Agent work spends most of its wall-clock *waiting*, on model inference or a slow API, so this matters a lot.
+
+Take a `small` Box against a matched Daytona sandbox (`daytona-medium`, 2 vCPU / 4 GiB ≈ **$0.166/hr** wall-clock: 2 × $0.0504 + 4 × $0.0162). The formulas are simple, so you can plug in your own usage:
+
+- **Box** = active core-hours × $0.10
+- **Daytona** = wall-clock hours × $0.166
+
+The "Active CPU" column below is core-minutes of real compute, assuming roughly one core busy during that window:
+
+| Scenario | Wall clock | Active CPU | Upstash Box | Daytona |
+| --- | --- | --- | --- | --- |
+| Quick code eval | 10 min | ~2 core-min | ~$0.003 | ~$0.03 |
+| Long task, mostly waiting | 1 hr | ~10 core-min | ~$0.02 | ~$0.17 |
+
+These are illustrative, not quotes. In idle-heavy, I/O-bound agent work like this, Box lands roughly **5–10x cheaper**, because it bills neither the CPU's waiting time nor memory. Saturate both cores for the whole window and Box's figure roughly doubles, narrowing the gap; for a fully CPU-bound run that stays busy every second, it largely closes. The advantage is real but workload-shaped, so it's worth running the formulas on your own numbers.
+
+---
+
+## What each is built for
+
+The feature lists point at different sweet spots.
+
+**Upstash Box shines when the agent *is* the product:**
+
+- **Agent-server per tenant.** Every user gets a durable box that builds up context over time, sleeps for almost nothing between sessions, and wakes intact, hard to do cheaply when you're billed for memory and idle wall-clock.
+- **Multi-agent fan-out.** Spin up boxes for security, code-quality, and architecture review in parallel with `Promise.all`, then a final box posts the combined summary to GitHub, isolated filesystems per agent.
+- **Parallel model evaluation.** Launch N boxes, each running a different model on the same prompt, and score them side by side, cheap because most are waiting on inference, not burning CPU.
+- **[Scheduled agents](https://upstash.com/docs/box/overall/schedules).** A daily "review the last 24h of commits and open issues for regressions" run is one `box.schedule.agent({ cron, prompt })` call, with a per-run budget cap.
+
+**Daytona shines when you've already built the agent and need a backend to run code:** a stateful Python interpreter for AI apps that execute model-written code, VNC desktop access for computer-use agents, and a polyglot exec surface for stacks that aren't TypeScript-first.
+
+---
+
+## Picking one
+
+Reach for **Daytona** if you already have your own agent loop and want a flexible place to run it, especially when you need a GPU inside the sandbox, a polyglot SDK (Python, Go, Ruby, Java), or VNC desktop access. You bring the orchestration; it gives you a solid execution backend.
+
+Reach for **Upstash Box** when you want the agent to live in the sandbox. You can use a built-in harness (Claude Code, Codex, OpenCode) or bring your own, and either way the git, PR, files, and streaming come wired up, so you go from idea to a working agent in a few lines. Secrets stay off the container, and active-CPU-with-free-memory billing makes idle-heavy, I/O-bound agent work, the kind that mostly waits on inference, roughly **5–10x cheaper** than wall-clock billing.
+
+Both are solid choices. Daytona covers the case where the orchestration already lives in your app, while Box fits the broader range of agent workloads, building, running, and persisting the agent itself, and tends to be the easier and cheaper starting point for most teams.
+
+---
+
+## Try Box
+
+```ts
+import { Agent, Box } from "@upstash/box"
+
+const box = await Box.create({
+  runtime: "node",
+  agent: { harness: Agent.ClaudeCode, model: "anthropic/claude-fable-5" },
+})
+
+const run = await box.agent.run({
+  prompt: "Write a /health endpoint in server.js and start it on port 3000",
+})
+
+console.log(run.result)
+```
+
+The free tier is 10 concurrent boxes and 5 CPU-hours a month, with no platform fee. The [quickstart](https://upstash.com/docs/box/overall/quickstart) gets you running in a few minutes, and the [use cases](https://upstash.com/docs/box/overall/use-cases) page walks through the agent-server and multi-agent orchestration patterns end to end.
