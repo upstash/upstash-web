@@ -120,12 +120,12 @@ export default function FAQ() {
       </AccordionItem>
       <AccordionItem value="item-8">
         <AccordionTrigger>
-          Can I run more than 100 concurrent boxes?
+          Can I run more than 1,000 concurrent boxes?
         </AccordionTrigger>
         <AccordionContent>
           <p className="mt-4">
             Yes. The default quota for Pay as you go is{" "}
-            <b>100 concurrent boxes</b>. This is a soft limit that can be
+            <b>1,000 concurrent boxes</b>. This is a soft limit that can be
             increased on request, similar to AWS service quotas. Just contact us
             and we&apos;ll raise your limit.
           </p>

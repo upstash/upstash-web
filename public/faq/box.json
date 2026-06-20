@@ -25,8 +25,8 @@
       "answer": "Each box includes Upstash-provided LLM token usage for the built-in AI agent. On the Free plan, this is capped at $1 per month. On Pay as you go, the cap is $100 per month. After the limit is reached, you can either contact us to increase it or bring your own key (BYOK) for any LLM provider, which is available on all plans."
     },
     {
-      "question": "Can I run more than 100 concurrent boxes?",
-      "answer": "Yes. The default quota for Pay as you go is 100 concurrent boxes. This is a soft limit that can be increased on request, similar to AWS service quotas. Just contact us and we'll raise your limit."
+      "question": "Can I run more than 1,000 concurrent boxes?",
+      "answer": "Yes. The default quota for Pay as you go is 1,000 concurrent boxes. This is a soft limit that can be increased on request, similar to AWS service quotas. Just contact us and we'll raise your limit."
     },
     {
       "question": "Where are boxes hosted?",

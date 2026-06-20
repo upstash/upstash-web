@@ -93,7 +93,7 @@ export const BOX_PAYG_PLAN: BoxPlan = {
   description: "Pay only when your box is active. Choose the size that matches your workload.",
   priceDisplay: "$0.10–$0.40",
   priceSubtext: "per active CPU hour",
-  maxConcurrentBoxes: 100,
+  maxConcurrentBoxes: 1000,
   cpuHoursPerMonth: "Unlimited",
   llmBudgetPerMonth: "$100",
   storagePrice: "$0.10 per GB/month",

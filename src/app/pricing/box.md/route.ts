@@ -56,7 +56,7 @@ function generateMarkdown(): string {
     "",
     "## Pay as You Go",
     "",
-    "- Up to 100 concurrent boxes (default quota, can be increased on request)",
+    "- Up to 1,000 concurrent boxes (default quota, can be increased on request)",
     "- $100 LLM token budget per month",
     "- Bring Your Own Key (BYOK) supported for all LLM providers on all plans",
     "- **Standard boxes:** auto-pause when idle, billed per active CPU hour",
