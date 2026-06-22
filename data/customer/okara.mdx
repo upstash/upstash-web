@@ -1,0 +1,64 @@
+---
+company_name: Okara
+company_url: https://okara.ai
+user_name: Fatima Rizwan
+user_title: Founder, Okara
+user_photo: okara-fatima.jpg
+highlight: "We launched and immediately saw significant demand. Upstash was one of those decisions that we made very quickly because it solved real scaling problems without slowing down the team."
+cover_image: cover-okara.jpg
+order: 11
+---
+
+## Okara uses Upstash Redis, QStash, and Vector to power autonomous marketing agents
+
+Okara uses Upstash to serve more than 100,000 websites.
+
+### About Okara
+
+[Okara](http://okara.ai) is an AI CMO designed for startups and small teams. Instead of hiring a marketing department, customers connect their website and let a team of specialized AI agents handle SEO, GEO, content creation, social media, influencer campaigns, Hacker News promotion, LinkedIn outreach, and more.
+
+Just three months after launch, Okara's platform was already supporting more than 100,000 websites.
+
+Behind the scenes, autonomous agents continuously analyze websites, generate content, coordinate campaigns, and execute growth initiatives on behalf of customers.
+
+### Building an AI CMO requires more than AI
+
+Running autonomous agents at scale creates infrastructure challenges beyond model inference. Agents need shared state, workflow coordination, retries, rate limiting, caching, and ways to keep quality high.
+
+As Okara's adoption accelerated, the team needed infrastructure that could scale alongside the product without creating operational overhead. That's where Upstash came in.
+
+<Highlight name="Fatima Rizwan" title="Founder, Okara" photo="okara-fatima.jpg">
+  We launched and immediately saw significant demand. Upstash was one of those
+  decisions that we made very quickly because it solved real scaling problems
+  without slowing down the team.
+</Highlight>
+
+### Redis for application state and low-latency experiences
+
+Okara uses Upstash Redis across its platform to manage frequently accessed application state, things like session and authentication data and subscription state, and to keep user interactions fast.
+
+Redis provides a low-latency layer that helps maintain responsive experiences while supporting growing traffic and agent activity. And because it's fully managed, the team can focus on product development instead of infrastructure maintenance.
+
+### Orchestrating agent workflows with QStash
+
+Many of Okara's workflows run asynchronously, with work distributed across background jobs that need to execute reliably and recover when something fails. QStash manages this background processing and automatically retries failed tasks, helping agent activity run smoothly as the platform scales.
+
+One feature that proved especially valuable was QStash Flow Control. Agent workflows interact with a range of third-party services, many with strict API rate limits. Rather than building custom throttling systems, Okara uses Flow Control to regulate execution rates and keep workflows moving reliably.
+
+### Using Vector to improve content quality
+
+Content generation is one of the core capabilities of the Okara platform. To keep quality high and reduce duplication across generated content, the team uses Upstash Vector as part of its content pipeline.
+
+The result is a more reliable content generation pipeline without the complexity of managing separate vector infrastructure.
+
+<Highlight name="Adil" title="Engineering Team, Okara">
+  We're using Redis, QStash, and Vector across the platform, and everything has
+  been working great. QStash in particular has been super helpful for managing
+  our background workflows and handling traffic as we've scaled.
+</Highlight>
+
+### Growing without infrastructure overhead
+
+As Okara continues to expand its AI CMO platform, Upstash provides the building blocks behind application state, workflow orchestration, and content intelligence.
+
+For a small team supporting more than 100,000 websites, managed infrastructure means engineers spend less time operating systems and more time building product. By combining Redis, QStash, and Vector, Okara has built a foundation that helps autonomous marketing agents operate reliably at scale.
