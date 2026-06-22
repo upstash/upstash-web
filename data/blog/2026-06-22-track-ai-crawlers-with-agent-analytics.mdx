@@ -1,0 +1,80 @@
+---
+authors: [josh]
+slug: track-ai-crawlers-with-upstash-agent-analytics
+tags: [redis, ai]
+title: Track AI Crawlers on Your Site with Upstash Agent Analytics
+---
+
+Upstash Agent Analytics is an open-source library that records when ChatGPT, Claude, Perplexity, Gemini, and Copilot visit your website. You add it to a Next.js app in a few lines and the AI traffic shows up in your Upstash dashboard. The repo is OSS at [upstash/agent-analytics](https://github.com/upstash/agent-analytics) and MIT licensed.
+
+![](https://cdn.contentport.io/chat/sYZt6j5tKs9fdzhmaASryuflnLIKibOF/mLIqIHx4US-_IrMYn0OpM.png)
+
+## What does it track?
+
+Upstash Agent Analytics reads two request headers, `user-agent` and `referer`, and matches them against five known AI agents. A match records a hit for the page path. A request that matches none of the five is dropped, so normal browser traffic doesn't get collected.
+
+| Provider | Matches when the headers contain |
+| --- | --- |
+| chatgpt | `chatgpt` or `openai` |
+| claude | `claude` or `anthropic` |
+| perplexity | `perplexity` |
+| gemini | `gemini` or `google-extended` |
+| copilot | `copilot` or `bing` |
+
+We only store the provider and the page path. The raw IP and the full user-agent string are left out by design, so the library holds no PII.
+
+## How do you add it to Next.js?
+
+```ts
+// proxy.ts
+import { NextResponse, type NextRequest } from "next/server"
+import { AgentAnalytics } from "@upstash/agent-analytics"
+import { Redis } from "@upstash/redis"
+
+const analytics = new AgentAnalytics({ redis: Redis.fromEnv() })
+
+export const proxy = async (request: NextRequest) => {
+  await analytics.track(request)
+  return NextResponse.next()
+}
+
+export const config = {
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+}
+```
+
+With just this, AI traffic already shows up in your Upstash dashboard under AI Tracking (the three-dot menu at the top).
+
+![](https://cdn.contentport.io/chat/sYZt6j5tKs9fdzhmaASryuflnLIKibOF/rmia8_weSKUnL1CVkqGhj.png)
+
+## How is the data stored?
+
+Each unique provider-and-path pair gets one Redis hash per hour that holds a counter. Every hash has a TTL, 28 days by default. You change it with the `retention` option, and old entries expire on their own.
+
+## Can you query it yourself?
+
+Yes. Beyond the dashboard, the library has a query API built on Redis Search. Call `getIndex()` once at setup to create the search index, then read with `aggregateBy` and `timeseries`.
+
+```ts
+import { AgentAnalytics } from "@upstash/agent-analytics"
+import { Redis } from "@upstash/redis"
+
+const analytics = new AgentAnalytics({
+  redis: Redis.fromEnv(),
+  retention: "7d",
+})
+
+// create the search index once, e.g. at setup
+await analytics.query.getIndex()
+
+const since = new Date(Date.now() - 24 * 3600_000)
+
+// total citations per provider in the last 24 hours
+const byProvider = await analytics.query.aggregateBy({ field: "provider", since })
+// -> { chatgpt: 12, claude: 7, perplexity: 3 }
+
+// one bucket per hour, grouped by provider
+const series = await analytics.query.timeseries({ since, groupBy: "provider" })
+```
+
+The `aggregateBy` sums the counters in a time window and groups them by one dimension. `timeseries` returns one bucket per hour in the window, including empty hours.
