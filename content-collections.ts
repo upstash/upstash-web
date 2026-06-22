@@ -125,14 +125,22 @@ export const posts = defineCollection({
       ],
     });
 
-    const authorsData = doc.authors.map((username) => {
-      const author = authors[username];
-      return {
-        username,
-        ...author,
-        image: `/authors/${author.image}`,
-      };
-    });
+    const authorsData = doc.authors
+      .map((username) => {
+        const author = authors[username];
+        if (!author) {
+          console.warn(
+            `[content-collections] unknown author "${username}" in ${doc._meta.filePath}`,
+          );
+          return null;
+        }
+        return {
+          username,
+          ...author,
+          image: `/authors/${author.image}`,
+        };
+      })
+      .filter((author) => author !== null);
 
     const readingTime = rt(doc.content) as ReadTimeResults;
     const date = doc._meta.fileName.substring(-1, 10);

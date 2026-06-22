@@ -16,6 +16,11 @@ export const authors: Record<
     twitter: "enesakar",
     image: "enes.png",
   },
+  lisa: {
+    name: "Lisa Natsumi",
+    title: "Engineer @Upstash",
+    image: "pp-lisa.jpg",
+  },
   noah: {
     name: "Noah Fischer",
     title: "Software Engineer, Guest Author",

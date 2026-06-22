@@ -29,6 +29,9 @@ const cache = new Map<string, Dimensions | null>();
 
 const SKIP = /\.(gif|svg)(\?|#|$)/i;
 
+// Bound each remote probe so an unreachable/stalled host can't hang the build.
+const FETCH_TIMEOUT_MS = 10_000;
+
 async function getDimensions(src: string): Promise<Dimensions | null> {
   if (cache.has(src)) return cache.get(src) ?? null;
 
@@ -36,11 +39,17 @@ async function getDimensions(src: string): Promise<Dimensions | null> {
   try {
     let buffer: Buffer;
     if (/^https?:\/\//.test(src)) {
-      const res = await fetch(src);
+      const res = await fetch(src, {
+        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+      });
       if (!res.ok) throw new Error(`fetch ${src} -> ${res.status}`);
       buffer = Buffer.from(await res.arrayBuffer());
     } else if (src.startsWith("/")) {
-      buffer = await readFile(path.join(process.cwd(), "public", src));
+      // Markdown image paths can be URL-encoded (e.g. "Untitled%201.png");
+      // decode so they map to the real on-disk filename ("Untitled 1.png").
+      buffer = await readFile(
+        path.join(process.cwd(), "public", decodeURIComponent(src)),
+      );
     } else {
       return null;
     }
