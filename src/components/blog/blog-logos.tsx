@@ -8,6 +8,7 @@ import { LogoJuicebox } from "../customers/logo-juicebox";
 import { LogoMaker } from "../customers/logo-maker";
 import { LogoNavattic } from "../customers/logo-navattic";
 import { LogoNiftykit } from "../customers/logo-niftykit";
+import { LogoOkara } from "../customers/logo-okara";
 import { LogoOpenart } from "../customers/logo-openart";
 import { LogoPaulSmith } from "../customers/logo-paul-smith";
 import { LogoStreamlined } from "../customers/logo-streamlined";
@@ -24,6 +25,7 @@ const blogLogos = {
   juicebox: LogoJuicebox,
   navattic: LogoNavattic,
   gitbook: LogoGitbook,
+  okara: LogoOkara,
   openart: LogoOpenart,
   niftykit: LogoNiftykit,
   tfashion: LogoTFashion,

@@ -13,6 +13,7 @@ import { LogoHashnode } from "@/components/customers/logo-hashnode";
 import { LogoHumata } from "@/components/customers/logo-humata";
 import { LogoMaker } from "@/components/customers/logo-maker";
 import { LogoMidjourney } from "@/components/customers/logo-midjourney";
+import { LogoOkara } from "@/components/customers/logo-okara";
 import { LogoOpenart } from "@/components/customers/logo-openart";
 import { LogoOpenrouter } from "@/components/customers/logo-openrouter";
 import { LogoPaulSmith } from "@/components/customers/logo-paul-smith";
@@ -187,6 +188,18 @@ const customers = [
         At our scale, it's important to use the right tool for the right
         workload. Upstash lets us power low-latency edge use cases globally,
         while still keeping our overall architecture simple and cost-effective.
+      </>
+    ),
+  },
+  {
+    name: "Okara",
+    slug: "okara",
+    icon: <LogoOkara height={30} />,
+    quote: (
+      <>
+        We launched and immediately saw significant demand. Upstash was one of
+        those decisions that we made very quickly because it solved real scaling
+        problems without slowing down the team.
       </>
     ),
   },
