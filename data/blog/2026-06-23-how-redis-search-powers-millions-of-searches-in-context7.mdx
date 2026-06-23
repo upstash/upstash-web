@@ -1,0 +1,81 @@
+---
+title: "How Redis Search Powers Millions of Library Lookups in Context7"
+slug: how-redis-search-powers-context7
+authors: [abdullahenes]
+tags: [context7, redis, search, ai]
+description: "Context7 uses Upstash Redis not just as a cache, but as the primary database and search engine for millions of library lookups. Here's how."
+---
+
+Context7 lets developers — and more recently AI agents — find docs for any library instantly. This is powered by Upstash Redis, more specifically [Redis Search](https://upstash.com/docs/redis/search/introduction), which handles **millions of library lookups per month** for us.
+
+![Context7's primary Redis database usage in June so far](/blog/how-redis-search-powers-context7/commands.png)
+
+## Why Context7 uses Redis Search
+
+Our MCP server has had two tools since day one. Whenever an agent wants to fetch docs for a library, it must first identify the library's ID in Context7. This ID is in `/org/repo` format for GitHub repos but may be different for other types of sources like websites or OpenAPI files — or if the user needs an older version, it may be in `/org/repo/tag` format.
+
+So the agent first queries within the existing library index to find available libraries. Then after resolving a few library IDs, it decides which one to use based on their metadata like GitHub stars, source URLs, trust scores, available snippet counts, etc. These results are also editable via [policies](https://context7.com/docs/howto/policies) to give users more control over what's returned.
+
+This is where we use Redis Search. It's almost certainly used every time you use Context7 unless you have a rule directing your agents to query a specific library ID. That's why we need a fast and reliable search database in order to power hundreds of thousands of requests every day.
+
+## How libraries are stored in Context7
+
+Every library in Context7 is stored directly in Redis as a JSON document. The document contains everything: the library's title, description, source URLs, GitHub stars, trust score, snippet counts, last-updated date, version history, and more.
+
+In order to make these libraries searchable, we create an index over the library keys based on their prefix. This operation is done once and every new library added is automatically indexed. As of writing this, we have over 110,000 libraries indexed.
+
+## All the small details that make search work
+
+### Weights
+
+Not all fields are equally useful for finding the right library, so we assign different weights to different fields of each document. A match in the title is worth more than a match in the description, and a match in the description is worth more than a match in a URL.
+
+Verification and popularity also affect the score. Verified libraries get a small bonus. For popularity, we use a logarithmic score function, so popular libraries get a boost but do not bury other libraries.
+
+### Stemming
+
+Stemming lets the search engine treat "routing", "router", and "routes" as the same token. That's useful for natural language queries, but it causes problems with technical terms — you don't want "redis" stemmed into something that matches "redo".
+
+To get the best of both worlds, we index some fields with stemming, some without stemming and some both with and without stemming.
+
+- **Stemmed** — for natural language queries ("routing docs", "how to install")
+- **Not stemmed** — for exact technical terms ("redis", "pnpm", "qstash")
+
+The schema uses the `.noStem()` flag to control this per-field, all reading from the same field in the document so there is no data duplication.
+
+
+### Prefix matching
+
+When someone types a partial query like "reac", "roblo", or "upst", we run a prefix match on the untokenized title field. This catches libraries where the typed string is a genuine prefix of the name, like "react", "roblox", or "upstash".
+
+### Exact matching
+
+Some fields are indexed as untokenized, unstemmed strings. These are used when we need a precise match rather than a relevance match.
+
+## Policies and the power of filters
+
+So far we talked about how we rank the results for a given query, but we haven't talked about a very powerful feature of Redis Search that we use for our policies: filters. Filters let us exclude libraries based on certain criteria. These policies can be configured in the Context7 dashboard and are applied immediately to all search queries.
+
+There are global source filters that the user can toggle on and off, and there are source specific filters based on source type. For example, a user can exclude all website sourced libraries using global source filters, or they can exclude some websites that don't have enough monthly traffic.
+
+![Source filters](/blog/how-redis-search-powers-context7/source-filters.png)
+
+Policies also support a blocked list to exclude specific libraries, and an exceptions list that bypasses all thresholds regardless of their scores.
+
+All of this runs inside the search query itself. There's no post-filtering in application code.
+
+![Example of a policy with many filters](/blog/how-redis-search-powers-context7/example-policies.png)
+
+In this example, we keep only verified libraries with a trust score of 4 and more, GitHub repos with at least 1,000 stars, and websites with at least 100 referring domains, and we block the `redis-doc` library entirely. The result shows up at the bottom: out of 100,181 libraries, only 22,611 pass. Thanks to the speed of Redis Search, we can immediately show the effect of any policy changes in the number of potential results.
+
+## The Upstash effect: global low latency
+
+![Context7's global read regions](/blog/how-redis-search-powers-context7/regions.png)
+
+To keep latency low for users around the world, we run read replicas across six regions: N. Virginia (primary), N. California, Mumbai, Tokyo, Frankfurt, and London. Reads route to the nearest replica automatically, so a developer in Tokyo gets the same fast lookup as someone in Virginia.
+
+## Conclusion
+
+If you already use Upstash Redis, you can start using Redis Search right away, no extra service to set up. And if you need fast search for your app, Upstash Redis Search is a great choice. We already battle tested it in Context7 for you.
+
+P.S. Since Redis Search is relatively new, most LLMs don't know about it yet. So if you want your agent to write proper Redis Search code, you can use [Context7](https://context7.com) :)
