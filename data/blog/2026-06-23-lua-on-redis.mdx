@@ -1,0 +1,320 @@
+---
+authors: [josh]
+slug: lua-scripting-on-upstash-redis-atomic-operations-over-http
+tags: [redis]
+title: "Lua Scripting on Upstash Redis: Atomic Operations Over HTTP"
+---
+
+I really like Redis. And in this article I want to share one of the most underrated and useful features about Redis I think there is: Lua scripting!
+
+![](https://cdn.bydefault.so/crDt6YszFOxzlt4-WLkDe.png)
+
+its so easy and fast, i honestly can't imagine building without it now. i just wish it was better at time series data 😭
+
+also i swear upstash didnt make me say this](https://cdn.bydefault.so/nNigEAWk7VwUkpz0wIsm-.png)
+
+To make my point: There is a Redis command called `pipeline`. Here is a pipeline that reads a counter and then writes a new value. The two commands go in one round trip, but they are not one atomic step:
+
+```typescript
+const [count] = await redis.pipeline()
+  .get<number>("visits")
+  .set("visits", 100)
+  .exec();
+```
+
+If you batch a GET and a SET into one pipeline call, another client's commands can run in between them. For a read-then-write like "increment this counter only if it's under the limit", that can lead to race conditions.
+
+A Lua script fixes this: Redis runs the whole script as one atomic step, and on Upstash you send that script over plain HTTP.
+
+Between the GET and the SET, another client can change "visits". Your write overwrites theirs, and the update they made is gone.
+
+![](https://cdn.bydefault.so/C13s6BfP4ExALZ3SmVTOF.png)
+
+In this post I want to show how EVAL works over the Upstash REST API, how to run scripts with the Upstash Redis SDK, and two atomic patterns you can ship.
+
+## Why can't I use a pipeline for atomic operations?
+
+A pipeline batches commands to save round trips, but it does not run them atomically and commands from other clients can override yours. So a pipeline is the wrong tool when one command depends on the result of an earlier one.
+
+On Upstash you have two ways to run commands atomically: the transactions API (MULTI/EXEC) and a Lua script (EVAL). They differ on one thing: whether the block can decide what to do based on a value it just read.
+
+Say you want to increment a counter only when it is under 10. With MULTI/EXEC you queue the commands and they all run together when you call exec():
+
+```typescript
+const [count, next] = await redis.multi()
+  .get<number>("count")
+  .incr("count")
+  .exec();
+```
+
+The INCR fires whether the counter was 3 or 300, because exec() does not return the GET reply until the whole block has already run. You cannot read the counter, check it, and then skip the INCR.
+
+A Lua script reads the value, checks it, and writes, all inside one atomic block:
+
+```lua
+local count = tonumber(redis.call('GET', KEYS[1]) or '0')
+if count < 10 then
+  return redis.call('INCR', KEYS[1])
+end
+return count
+```
+
+Running it twelve times against a fresh key, the counter climbs to 10 and then holds:
+
+```text
+1 2 3 4 5 6 7 8 9 10 10 10
+```
+
+The INCR only happens while the counter is under 10, and no other command runs in between.
+
+![](https://cdn.bydefault.so/JMtp6e2GRKkLig1r9IhQy.png)
+
+| Approach | Atomic? | Read a value, then act on it? | Upstash endpoint |
+| --- | --- | --- | --- |
+| Pipeline | No | No | /pipeline |
+| MULTI/EXEC | Yes | No | /multi-exec |
+| Lua (EVAL) | Yes | Yes | a single EVAL call |
+
+## How does EVAL work, and what does it look like over HTTP?
+
+EVAL runs a Lua script on the Redis server as one atomic step. The signature is `EVAL script numkeys [key ...] [arg ...]`. The numkeys count tells Redis how many of the following arguments are key names. Those go into the Lua KEYS table; everything after goes into ARGV. Both tables are 1-indexed.
+
+```bash
+EVAL "return { KEYS[1], KEYS[2], ARGV[1], ARGV[2] }" 2 key1 key2 arg1 arg2
+```
+
+```text
+1) "key1"
+2) "key2"
+3) "arg1"
+4) "arg2"
+```
+
+The numkeys value of 2 means the first two arguments (key1, key2) are keys, and the rest (arg1, arg2) are plain arguments.
+
+On Upstash we send this over HTTP:
+
+```bash
+curl -X POST https://YOUR_URL.upstash.io \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -d '["EVAL", "return ARGV[1]", "0", "hello"]'
+```
+
+That returns `hello`. The script body is just a string in the array. The "0" is numkeys: this script reads no keys.
+
+Inside a script you call Redis with `redis.call()` or `redis.pcall()`. They run the same command; they differ on errors. With redis.call, a runtime error from the command is raised straight back to the client and stops the script. With redis.pcall, the error comes back to your Lua code as a value, so the script can catch it and decide what to do. Use redis.call when an error should abort the script, and redis.pcall when you want to handle the error yourself.
+
+## How do I run a Lua script with the Upstash Redis SDK?
+
+Call `redis.eval(script, keys, args)`. The first argument is the script string, the second is the array of key names, the third is the array of plain arguments. The SDK fills KEYS and ARGV from those two arrays.
+
+```typescript
+import { Redis } from "@upstash/redis";
+
+const redis = Redis.fromEnv();
+
+const script = `
+  local value = redis.call('GET', KEYS[1])
+  return value
+`;
+
+await redis.set("mykey", "Hello");
+const value = await redis.eval(script, ["mykey"], []);
+console.log(value); // "Hello"
+```
+
+You pass keys and args as separate arrays. The SDK derives numkeys from the length of the keys array, so you never count it by hand. The same method exists in the [Python SDK](https://upstash.com/docs/redis/sdks/py/commands/scripts/eval) as `redis.eval(script, keys=[...], args=[...])`.
+
+## What does a Lua script return?
+
+Lua values get converted to Redis reply types when it returns, and the conversion loses information in ways that I didn't expect when I first tried it.
+
+For example, Lua has one number type and no separate integer. Every number you return is truncated to an integer:
+
+```bash
+EVAL "return 3.99" 0
+```
+
+```text
+(integer) 3
+```
+
+A Lua boolean does not come back as a boolean. True becomes the integer 1, and false becomes a nil reply:
+
+```bash
+EVAL "return true" 0
+```
+
+```text
+(integer) 1
+```
+
+```bash
+EVAL "return false" 0
+```
+
+```text
+(nil)
+```
+
+Tables become arrays, but with two catches. The array stops at the first nil, and string keys in an associative table are dropped:
+
+```bash
+EVAL "return { 1, 2, 3.3333, somekey = 'somevalue', 'foo', nil , 'bar' }" 0
+```
+
+```text
+1) (integer) 1
+2) (integer) 2
+3) (integer) 3
+4) "foo"
+```
+
+The float 3.3333 came back as 3, the somekey entry vanished, and "bar" never appeared because the nil before it cut the array short. That is three quiet surprises in one return value! To return a float without losing the decimals, return it as a string:
+
+```bash
+EVAL "return '3.99'" 0
+```
+
+```text
+"3.99"
+```
+
+## What is createScript() and why use it instead of evalsha()?
+
+`redis.createScript(luaCode)` wraps a script so its `exec()` method tries EVALSHA first and falls back to EVAL automatically. Use it instead of calling evalsha() directly, because the Redis script cache can disappear and createScript handles that for you.
+
+Here is the problem it solves. EVALSHA runs a script by its SHA1 hash instead of sending the whole body, which saves bandwidth on a script you call often. But the [Redis script cache is always volatile](https://redis.io/docs/latest/develop/interact/programmability/eval-intro/): it is not persisted, and it can be cleared on a server restart, on failover when a replica takes over, or by SCRIPT FLUSH. When that happens, an EVALSHA for a hash that is no longer cached fails with a NOSCRIPT error.
+
+You can see the full cycle. Load a script, run it by hash, then try a hash that was never loaded:
+
+```bash
+SCRIPT LOAD "return 'cached script'"
+```
+
+```text
+"f5af26a72fa1fa19abfa68a0515df1c8d40bcbb2"
+```
+
+```bash
+EVALSHA f5af26a72fa1fa19abfa68a0515df1c8d40bcbb2 0
+```
+
+```text
+"cached script"
+```
+
+```bash
+EVALSHA ffffffffffffffffffffffffffffffffffffffff 0
+```
+
+```text
+(error) NOSCRIPT No matching script. Please use EVAL.
+```
+
+If you call evalsha() raw, your code has to catch NOSCRIPT and reload the script every time the cache resets. The [@upstash/redis Script class](https://upstash-redis-js.mintlify.app/api/script) does that for you. The first exec() loads and runs the script, later calls run it by hash, and a NOSCRIPT after a cache reset falls back to EVAL on its own:
+
+```typescript
+const incr = redis.createScript<number>(`
+  local current = redis.call('GET', KEYS[1]) or 0
+  local next = current + tonumber(ARGV[1])
+  redis.call('SET', KEYS[1], next)
+  return next
+`);
+
+await incr.exec(["counter"], ["1"]); // EVAL on first call
+await incr.exec(["counter"], ["1"]); // EVALSHA after that
+```
+
+## What are the most useful atomic patterns to build with Lua?
+
+Two patterns cover most of what people use Lua for: a compare-and-set, and a rate limiter. Both need to read a value and then write based on it, which is the gap a pipeline leaves open.
+
+A compare-and-set writes a new value only if the current one matches what you expect. Optimistic locking is built on this pattern.
+
+```typescript
+const compareAndSet = `
+  local current = redis.call('GET', KEYS[1])
+  if current == ARGV[1] then
+    redis.call('SET', KEYS[1], ARGV[2])
+    return 1
+  else
+    return 0
+  end
+`;
+```
+
+Running it against Redis 7.0.15: set the key to oldvalue, then run with expected oldvalue and new value newvalue.
+
+```text
+SET mykey "oldvalue"   => OK
+EVAL ... mykey oldvalue newvalue   => (integer) 1
+GET mykey   => "newvalue"
+EVAL ... mykey oldvalue newvalue   => (integer) 0
+```
+
+The first call returns 1 and the value flips to newvalue. The second call returns 0, because the current value is newvalue now and no longer matches oldvalue. No other client can slip a write between the GET and the SET.
+
+A fixed-window rate limiter increments a counter and sets an expiry on the first hit of the window, all in one atomic step:
+
+```lua
+local r = redis.call("INCRBY", KEYS[1], ARGV[1])
+if r == tonumber(ARGV[1]) then
+  redis.call("PEXPIRE", KEYS[1], ARGV[2])
+end
+return r
+```
+
+The PEXPIRE only fires when the counter equals the increment, which is the first request in a fresh window. Running it twelve times with a limit of 10, an increment of 1, and a 60000 ms window:
+
+```text
+request 1: counter=1 allow
+request 2: counter=2 allow
+...
+request 10: counter=10 allow
+request 11: counter=11 reject
+request 12: counter=12 reject
+PTTL rl:user => 59963
+```
+
+The counter climbs past 10 and your code rejects once it crosses the limit, while the TTL keeps the window expiring on schedule. The [@upstash/ratelimit](https://github.com/upstash/ratelimit-js/blob/main/src/lua-scripts/single.ts) library is built on this pattern, with Lua scripts for fixed window, sliding window, and token bucket.
+
+## When should I use EVAL\_RO instead of EVAL?
+
+Use EVAL\_RO for a script that only reads. It runs Lua the same way EVAL does, but Redis rejects any write command inside it, so it can run on a read replica and a stray write turns into an error instead of a silent change.
+
+Here is the rejection, run against Redis 7.0.15:
+
+```bash
+EVAL_RO "return redis.call('SET', KEYS[1], 'x')" 1 somekey
+```
+
+```text
+(error) ERR Write commands are not allowed from read-only scripts.
+```
+
+The @upstash/redis SDK exposes this as `redis.evalRo(script, keys, args)`, and createScript takes a `{ readonly: true }` option that gives you the same EVALSHA-first behavior with the read-only variants. If a script is meant to be read-only, EVAL\_RO makes Redis enforce that.
+
+## How does Lua compare to MULTI/EXEC on Upstash?
+
+Both run atomically. The split is whether you need to make a decision in the middle.
+
+| Question | MULTI/EXEC | Lua (EVAL) |
+| --- | --- | --- |
+| Atomic execution | Yes | Yes |
+| Read a value and branch on it mid-block | No | Yes |
+| Conditional writes | No | Yes |
+| Script cached server-side | No | Yes, via EVALSHA |
+| Upstash endpoint | /multi-exec | a single EVAL call |
+
+MULTI/EXEC queues a fixed list of commands and runs them as a unit. It can't look at a reply and change course, because the replies don't come back until the whole block runs. So for a plain batch that always runs the same commands, MULTI/EXEC is fine. For anything that reads a value and then decides what to write, Lua is the tool.
+
+A Lua script blocks every other client while it runs. Redis sets a [default script timeout of five seconds](https://redis.io/docs/latest/develop/programmability/), which exists to catch runaway loops, not as a budget to spend. Keep scripts short and let them return fast.
+
+## Recap
+
+- A pipeline on Upstash is not atomic; a Lua script is.
+- EVAL runs Lua server-side in one atomic step; over the REST API you send it as a JSON array.
+- Lua return values get coerced: floats truncate to integers, true becomes 1, false becomes nil, and arrays stop at the first nil.
+- createScript().exec() tries EVALSHA and falls back to EVAL, which handles the volatile script cache for you.
+- Use Lua over MULTI/EXEC whenever you need to read a value and branch on it inside the atomic block.
