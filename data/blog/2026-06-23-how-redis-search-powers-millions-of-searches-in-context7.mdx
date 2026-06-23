@@ -3,7 +3,7 @@ title: "How Redis Search Powers Millions of Library Lookups in Context7"
 slug: how-redis-search-powers-context7
 authors: [abdullahenes]
 tags: [context7, redis, search, ai]
-description: "Context7 uses Upstash Redis not just as a cache, but as the primary database and search engine for millions of library lookups. Here's how."
+description: "Context7 uses Upstash Redis not as a cache, but as the primary database and search engine for millions of library lookups. Here's how."
 ---
 
 Context7 lets developers, and more importantly AI agents, find docs for any library instantly. This is powered by Upstash Redis, specifically [Redis Search](https://upstash.com/docs/redis/search/introduction), which handles **millions of library lookups per month**.
@@ -38,11 +38,10 @@ Stemming lets the search engine treat "routing", "router", and "routes" as the s
 
 To get the best of both worlds, we index some fields with stemming, some without stemming and some both with and without stemming.
 
-- **Stemmed** — for natural language queries ("routing docs", "how to install")
-- **Not stemmed** — for exact technical terms ("redis", "pnpm", "qstash")
+- **Stemmed:** for natural language queries ("routing docs", "how to install")
+- **Not stemmed:** for exact technical terms ("redis", "pnpm", "qstash")
 
 The schema uses the `.noStem()` flag to control this per-field, all reading from the same field in the document so there is no data duplication.
-
 
 ### Prefix matching
 
@@ -56,7 +55,7 @@ Some fields are indexed as untokenized, unstemmed strings. These are used when w
 
 So far we talked about how we rank the results for a given query, but we haven't talked about a very powerful feature of Redis Search that we use for our policies: filters. Filters let us exclude libraries based on certain criteria. These policies can be configured in the Context7 dashboard and are applied immediately to all search queries.
 
-There are global source filters that the user can toggle on and off, and there are source specific filters based on source type. For example, a user can exclude all website sourced libraries using global source filters, or they can exclude some websites that don't have enough monthly traffic.
+There are global source filters that the user can toggle on and off, and there are source-specific filters based on source type. For example, a user can exclude all website-sourced libraries using global source filters, or they can exclude some websites that don't have enough monthly traffic.
 
 ![Source filters](/blog/how-redis-search-powers-context7/source-filters.png)
 
@@ -64,7 +63,7 @@ Policies also support a blocked list to exclude specific libraries, and an excep
 
 <Note>All of this runs inside the search query itself. There's no post-filtering in application code.</Note>
 
-Here is an example of a policy with many filters. We keep only verified libraries with a trust score of 4 and more, GitHub repos with at least 1,000 stars, and websites with at least 100 referring domains, and we block the `redis-doc` library entirely. The result shows up at the bottom: out of 100,181 libraries, only 22,611 pass. Thanks to the speed of Redis Search, we can immediately show the effect of any policy changes in the number of potential results.
+Here is an example of a policy with many filters. We keep only verified libraries with a trust score of 4 or more, GitHub repos with at least 1,000 stars, and websites with at least 100 referring domains, and we block the `redis-doc` library entirely. The result shows up at the bottom: out of 100,181 libraries, only 22,611 pass. Thanks to the speed of Redis Search, we can immediately show the effect of any policy changes in the number of potential results.
 
 ![Example of a policy with many filters](/blog/how-redis-search-powers-context7/example-policies.png)
 
@@ -74,7 +73,7 @@ To keep latency low for users around the world, we add read replicas to other re
 
 ![Context7's global read regions](/blog/how-redis-search-powers-context7/regions.png)
 
-By the way, our [search API](https://context7.com/docs/api-reference/search/search-for-libraries) has two modes: default and fast. The default mode reranks and dedupes the search results using an external service, so it is a bit slower to provide better results. Fast mode skips that step and returns the search results directly. If you want to experience the speed of Redis Search, try the fast mode.
+By the way, our [search API](https://context7.com/docs/api-reference/search/search-for-libraries) has two modes: default and fast. The default mode reranks and dedupes the search results using an external service, so it is a bit slower but gives better results. Fast mode skips that step and returns the search results directly. If you want to experience the speed of Redis Search, try fast mode.
 
 ## Conclusion
 
