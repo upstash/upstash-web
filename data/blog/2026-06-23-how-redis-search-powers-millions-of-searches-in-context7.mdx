@@ -6,25 +6,23 @@ tags: [context7, redis, search, ai]
 description: "Context7 uses Upstash Redis not just as a cache, but as the primary database and search engine for millions of library lookups. Here's how."
 ---
 
-Context7 lets developers — and more recently AI agents — find docs for any library instantly. This is powered by Upstash Redis, more specifically [Redis Search](https://upstash.com/docs/redis/search/introduction), which handles **millions of library lookups per month** for us.
+Context7 lets developers, and more importantly AI agents, find docs for any library instantly. This is powered by Upstash Redis, specifically [Redis Search](https://upstash.com/docs/redis/search/introduction), which handles **millions of library lookups per month**.
 
 ![Context7's primary Redis database usage in June so far](/blog/how-redis-search-powers-context7/commands.png)
 
 ## Why Context7 uses Redis Search
 
-Our MCP server has had two tools since day one. Whenever an agent wants to fetch docs for a library, it must first identify the library's ID in Context7. This ID is in `/org/repo` format for GitHub repos but may be different for other types of sources like websites or OpenAPI files — or if the user needs an older version, it may be in `/org/repo/tag` format.
+Our MCP server has had two tools since day one. Whenever an agent wants to fetch docs for a library, it must first identify the library's ID in Context7. This ID is in `/org/repo` format for GitHub repos but may be different for other types of sources like websites or OpenAPI files. If the user needs an older version, it may be in `/org/repo/tag` format.
 
-So the agent first queries within the existing library index to find available libraries. Then after resolving a few library IDs, it decides which one to use based on their metadata like GitHub stars, source URLs, trust scores, available snippet counts, etc. These results are also editable via [policies](https://context7.com/docs/howto/policies) to give users more control over what's returned.
+So the agent first queries within the existing library index to find available libraries. Then after resolving a few library IDs, it decides which one to use based on their metadata like GitHub stars, source URLs, trust scores, available snippet counts, etc. These results are also editable via [policies](https://context7.com/docs/howto/policies) to give users more control over what's returned. We will talk more about policies later.
 
-This is where we use Redis Search. It's almost certainly used every time you use Context7 unless you have a rule directing your agents to query a specific library ID. That's why we need a fast and reliable search database in order to power hundreds of thousands of requests every day.
-
-Our [search API](https://context7.com/docs/api-reference/search/search-for-libraries) has two modes: default and fast. The default mode reranks the search results using an external service, so it is a bit slower. Fast mode skips that step and returns the search results directly. You can really feel how fast Redis Search is using fast mode.
+This is where we use Redis Search. It's almost certainly used every time you use Context7 unless you have a rule directing your agents to query a specific library ID. That's why we need a fast and reliable search database to power hundreds of thousands of requests every day.
 
 ## How libraries are stored in Context7
 
 Every library in Context7 is stored directly in Redis as a JSON document. The document contains everything: the library's title, description, source URLs, GitHub stars, trust score, snippet counts, last-updated date, version history, and more.
 
-In order to make these libraries searchable, we create an index over the library keys based on their prefix. This operation is done once and every new library added is automatically indexed. As of writing this, we have over 110,000 libraries indexed.
+To make these libraries searchable, we create an index over the library keys based on their prefix. This operation is done once and every new library added is automatically indexed. As of writing this, we have over 110,000 libraries indexed.
 
 ## All the small details that make search work
 
@@ -36,7 +34,7 @@ Verification and popularity also affect the score. Verified libraries get a smal
 
 ### Stemming
 
-Stemming lets the search engine treat "routing", "router", and "routes" as the same token. That's useful for natural language queries, but it causes problems with technical terms — you don't want "redis" stemmed into something that matches "redo".
+Stemming lets the search engine treat "routing", "router", and "routes" as the same token. That's useful for natural language queries, but it causes problems with technical terms. You don't want "redis" stemmed into something that matches "redo".
 
 To get the best of both worlds, we index some fields with stemming, some without stemming and some both with and without stemming.
 
@@ -64,20 +62,22 @@ There are global source filters that the user can toggle on and off, and there a
 
 Policies also support a blocked list to exclude specific libraries, and an exceptions list that bypasses all thresholds regardless of their scores.
 
-All of this runs inside the search query itself. There's no post-filtering in application code.
+<Note>All of this runs inside the search query itself. There's no post-filtering in application code.</Note>
+
+Here is an example of a policy with many filters. We keep only verified libraries with a trust score of 4 and more, GitHub repos with at least 1,000 stars, and websites with at least 100 referring domains, and we block the `redis-doc` library entirely. The result shows up at the bottom: out of 100,181 libraries, only 22,611 pass. Thanks to the speed of Redis Search, we can immediately show the effect of any policy changes in the number of potential results.
 
 ![Example of a policy with many filters](/blog/how-redis-search-powers-context7/example-policies.png)
 
-In this example, we keep only verified libraries with a trust score of 4 and more, GitHub repos with at least 1,000 stars, and websites with at least 100 referring domains, and we block the `redis-doc` library entirely. The result shows up at the bottom: out of 100,181 libraries, only 22,611 pass. Thanks to the speed of Redis Search, we can immediately show the effect of any policy changes in the number of potential results.
-
 ## The Upstash effect: global low latency
+
+To keep latency low for users around the world, we add read replicas to other regions. Reads route to the nearest replica automatically, so a developer in Tokyo gets the same fast lookup as someone in Virginia.
 
 ![Context7's global read regions](/blog/how-redis-search-powers-context7/regions.png)
 
-To keep latency low for users around the world, we run read replicas across six regions: N. Virginia (primary), N. California, Mumbai, Tokyo, Frankfurt, and London. Reads route to the nearest replica automatically, so a developer in Tokyo gets the same fast lookup as someone in Virginia.
+By the way, our [search API](https://context7.com/docs/api-reference/search/search-for-libraries) has two modes: default and fast. The default mode reranks and dedupes the search results using an external service, so it is a bit slower to provide better results. Fast mode skips that step and returns the search results directly. If you want to experience the speed of Redis Search, try the fast mode.
 
 ## Conclusion
 
-If you already use Upstash Redis, you can start using Redis Search right away, no extra service to set up. And if you need fast search for your app, Upstash Redis Search is a great choice. We already battle tested it in Context7 for you.
+If you already use Upstash Redis, you can start using Redis Search right away, no extra service to set up. And if you need fast search for your app, Upstash Redis Search is a great choice. We already battle-tested it in Context7 for you.
 
 P.S. Since Redis Search is relatively new, most LLMs don't know about it yet. So if you want your agent to write proper Redis Search code, you can use [Context7](https://context7.com) :)
