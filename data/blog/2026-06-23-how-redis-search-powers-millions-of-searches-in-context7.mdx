@@ -18,6 +18,8 @@ So the agent first queries within the existing library index to find available l
 
 This is where we use Redis Search. It's almost certainly used every time you use Context7 unless you have a rule directing your agents to query a specific library ID. That's why we need a fast and reliable search database in order to power hundreds of thousands of requests every day.
 
+Our [search API](https://context7.com/docs/api-reference/search/search-for-libraries) has two modes: default and fast. The default mode reranks the search results using an external service, so it is a bit slower. Fast mode skips that step and returns the search results directly. You can really feel how fast Redis Search is using fast mode.
+
 ## How libraries are stored in Context7
 
 Every library in Context7 is stored directly in Redis as a JSON document. The document contains everything: the library's title, description, source URLs, GitHub stars, trust score, snippet counts, last-updated date, version history, and more.
