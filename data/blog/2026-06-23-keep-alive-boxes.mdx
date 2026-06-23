@@ -1,0 +1,116 @@
+---
+slug: keep-alive-boxes
+title: "Keep-Alive Boxes: Always-On Agent Server"
+authors: [alitarik]
+tags: [box, ai, serverless]
+description: "Some agent tasks are quick and throwaway. Others need to keep running. Keep-alive boxes give a long-running agent a real computer that stays on between sessions, with the coding agent already inside, for a flat $8 a month."
+---
+
+<Summary>
+[Upstash Box](/blog/upstash-box) has three kinds of boxes, because not all agent work is the same. **Ephemeral boxes** start fast, run one quick task, and go away. **Default boxes** pause when they are idle and wake up with their state still there, so you only pay for the CPU you use. **Keep-alive boxes** never pause. They stay on all the time, so a long-running agent or server always has a warm machine to run in.
+
+This post is about keep-alive boxes. The idea is simple: an agent that keeps working does not want a sandbox it has to rebuild every time. It wants a computer. Keep-alive boxes give it one, with the coding agent already inside, for a flat **$8 a month**.
+</Summary>
+
+## Three modes, one platform
+
+Not every task needs the same kind of machine, so Box gives you three.
+
+[**Ephemeral boxes**](https://upstash.com/docs/box/overall/ephemeral-box) are for quick, throwaway jobs. Run a snippet, change a file, run one command, then let it delete itself. They are ready right away, and they only let you run commands and work with files, nothing else.
+
+**Default boxes** are the normal mode. They have a full shell, git, snapshots, and a built-in agent. They pause when they go idle and wake up later with everything where you left it, so you only pay for active CPU.
+
+[**Keep-alive boxes**](https://upstash.com/docs/box/overall/keep-alive) are for when the box has to stay on between requests: an always-on server, a warm agent, or a long-running setup that should never have to cold-start. Set `keepAlive: true` and the box stops pausing and just stays on.
+
+The rest of this post is about this third mode: when to use it, and why a keep-alive Box gives you more than a plain persistent VM.
+
+---
+
+## When to use keep-alive
+
+A keep-alive box never pauses, so it is responsive all the time. No wake-up step, no cold start, every request gets an answer right away. It feels like a normal always-on machine, such as an EC2 instance, but with the coding agent already inside. The state stays too: installed packages, the cloned repo, build caches, and running processes are all still there, even days later.
+
+This makes a few things easy:
+
+- **Hosted servers and apps.** Run a dev server, an API, or a web app inside the box. Use `keepAlive` with an `initCommand`, and the box starts the server by itself every time it boots, so it keeps running instead of shutting down between visits.
+- **Long-running agents.** An agent that *lives* in the box, watching a repo, picking up issues, and opening PRs for days, like [Symphony](/blog/symphony-on-upstash-box). Its setup never rebuilds, so the next task starts where the last one stopped.
+- **Warm agents for fast replies.** When a request can come at any time and you do not want to pay a cold start, a keep-alive box is ready right away.
+- **Always-on background work.** A background process, a cron-like loop, or a worker that should keep running on its own, not wait for someone to wake it up.
+
+```ts
+import { Box } from "@upstash/box"
+
+const box = await Box.create({
+  runtime: "node",
+  size: "small",
+  keepAlive: true,
+  initCommand: "npm install && npm run dev",
+})
+```
+
+All of these need the box to stay alive and ready between requests, and a plain virtual machine could do that too. So why use a keep-alive Box instead?
+
+---
+
+## Why a keep-alive box beats a plain persistent VM
+
+A persistent VM stays on, but it is still an empty machine. With Box you also get three things the VM leaves to you: the setup, the agent, and the pricing.
+
+### It is simple to set up and manage
+
+A plain VM is yours to run. You pick an image, set up the OS, open ports, manage SSH keys, keep it patched, and remember to shut it down so it does not bill forever. That is real ops work before you write any agent code.
+
+A Box is one call. `Box.create({ keepAlive: true })` gives you a running machine, and you manage it from the SDK: snapshot it, set an `initCommand`, or delete it, all in code. There is no image to build, no server to patch, and no infrastructure to babysit.
+
+### The agent is already inside
+
+A plain VM gives you a computer, and then you have to add the agent yourself: the harness, the tool loop, and the wiring that lets the model see what happens on the machine. That is a lot of setup before the agent does anything useful.
+
+Box comes with the agent *inside the box*. Pick a built-in harness (Claude Code, Codex, or OpenCode) or bring your own, and the agent already has the shell, the files, and git ready. Nothing to set up.
+
+```ts
+import { Agent, Box } from "@upstash/box"
+
+const box = await Box.create({
+  runtime: "node",
+  size: "small",
+  keepAlive: true,
+  agent: { harness: Agent.ClaudeCode, model: "anthropic/claude-opus-4-8" },
+})
+
+const run = await box.agent.run({
+  prompt: "Watch the repo, triage new issues, and open a PR for the next one.",
+})
+```
+
+### A flat $8 a month
+
+Persistent VMs are usually billed by usage. With an always-on machine, that means you pay while it sits idle, and you have to watch the meter.
+
+Keep-alive boxes have one flat price instead, and it **replaces** usage billing:
+
+| Size | CPU | Memory | Keep-alive price |
+| --- | --- | --- | --- |
+| Small | 2 vCPU | 4 GB | **$8 / month** |
+| Medium | 4 vCPU | 8 GB | $16 / month |
+| Large | 8 vCPU | 16 GB | $32 / month |
+
+Eight dollars a month for an always-on 2 vCPU / 4 GB computer with a coding agent already inside. No usage math, no surprise idle bill. It is cheap enough to leave one running per agent and not think about it.
+
+---
+
+## Match the mode to the job
+
+You do not have to pick one mode for everything: ephemeral for quick jobs, default for normal sessions, and keep-alive when the agent has to stay on. All on one platform, with the agent built in. Most of your work will be short and fits the default box. When something needs to keep running, turn on keep-alive and give it a computer to live in:
+
+```ts
+import { Box } from "@upstash/box"
+
+const box = await Box.create({
+  runtime: "node",
+  size: "small",
+  keepAlive: true,
+})
+```
+
+The [keep-alive docs](https://upstash.com/docs/box/overall/keep-alive) cover init commands, sizes, and lifecycle. The [quickstart](https://upstash.com/docs/box/overall/quickstart) gets you a box in a few minutes. The free tier gives you 10 boxes at once and 5 CPU-hours a month with no platform fee, so you can try it before you turn on keep-alive.
