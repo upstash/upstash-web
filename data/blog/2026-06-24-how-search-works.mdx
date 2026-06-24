@@ -1,0 +1,523 @@
+---
+authors: [metin]
+slug: how-upstash-redis-search-works
+tags: [redis, search]
+title: "How Upstash Redis Search Works?"
+---
+
+Redis is great at storing and serving data quickly, but querying that data has traditionally been the awkward part.
+You can emulate a few simple access patterns with sorted sets, or fall back to scans when you really have to, but neither
+approach feels like a proper query layer. This becomes especially limiting when Redis is used as a primary database,
+which is common with Upstash Redis because it is persistent by default. Upstash Redis Search removes that limitation by
+adding full-text search, strong query operators, and [aggregations](hacker-news-trends-redis-search) on top of Redis data.
+
+This post is not a tour of the user-facing features. Instead, it follows the implementation path of a single update:
+from the moment a Redis command is executed, through the indexing pipeline, until the updated document becomes visible
+to search queries.
+
+### From Redis Command to Search Document
+
+First, let's look at how a search index is created:
+
+```typescript
+import { Redis, s } from "@upstash/redis";
+
+const redis = Redis.fromEnv();
+
+const index = await redis.search.createIndex({
+  name: "products",
+  dataType: "json",
+  prefix: "product:",
+  schema: s.object({
+    name: s.string(),
+    description: s.string(),
+    category: s.string().noTokenize(),
+    price: s.number(),
+  }),
+});
+```
+
+Each search index tracks one or more key prefixes. After an index is created, indexing happens behind the scenes.
+Whenever an insert, update, or delete touches one of the tracked prefixes, the search layer has enough information to
+decide whether that change should be reflected in the index.
+
+```typescript
+await redis.json.set("product:1", "$", {
+  name: "Wireless Headphones",
+  description:
+    "Premium noise-cancelling wireless headphones with 30-hour battery life",
+  category: "electronics",
+  stockCount: 0,
+});
+```
+
+So a command like this is enough for the document to be indexed. There is no separate "send this to search" step.
+
+When this command reaches our execution engine, we first check whether the key associated with the command matches any
+prefix from the existing indexes. A single index can track multiple prefixes, and a single key can match multiple
+indexes. Those indexes might have different schemas or serve different query patterns, so one Redis command can produce
+updates for more than one search index.
+
+After we know that the key belongs to at least one index, we still execute the Redis command first. Only if the command
+succeeds, and only if it appears to change at least one field covered by the index schema, do we move into the indexing
+logic.
+
+Each index has a strict schema that cannot change after index creation. A document, however, does not need to match that
+schema perfectly. To create the index-specific representation, we walk over the schema fields one by one. If the Redis
+value contains a field with the expected name and type, we add it to the search document.
+
+The Redis value may contain extra fields that are not indexed, such as `stockCount` in the example above. It may also be
+missing fields that exist in the schema, such as `price`. Extra fields are ignored. Missing fields are not filled with
+default values; they are simply left out of the search document, which means they are not indexed.
+
+Once this schema-specific document is created, we enqueue it into the indexing pipeline.
+
+### Persisting Index Work Before Returning
+
+The document queue is disk-based, with a small in-memory head represented as a Go channel. When a document is enqueued,
+we first serialize it and write it to the tail of the disk queue. Only after that do we check whether it can also be
+placed directly into the in-memory channel. If the channel has room and no fetcher is currently replaying items from
+disk, we put the document there as well. In that state, the queue is small enough that keeping the active head in memory
+is fine until the next stage consumes it.
+
+![Disk queue and in memory channel storing the same number of items](/blog/how-search-works/disk-queue-not-full.png)
+
+The in-memory channel might be full when we enqueue the document. We do not wait for space to become available. The
+document is already persisted in the disk queue, and the original JSON command is still waiting for its response.
+
+Instead, we start a goroutine whose only job is to read on-disk items starting from the current disk queue sequence and
+push them into the in-memory channel. Since this is background work, it is allowed to block while sending to the channel.
+
+![Disk fetching task waiting for a place in in memory channel](/blog/how-search-works/disk-fetching-before.png)
+
+![Disk fetching task enqueued the item on disk](/blog/how-search-works/disk-fetching-after.png)
+
+If such a goroutine is already running when we write the new document to disk, there is nothing else to start. The same
+task will see later updates and move them into the in-memory channel. Once it reaches the end of the disk queue, it
+exits, and future enqueues can again try to write directly to the in-memory channel.
+
+In other words, the channel is a small buffer for the head of the disk queue. It lets the indexing pipeline avoid a disk
+read for every document while still keeping the durable source of truth on disk.
+
+At this point, the search document reflects the state produced by the successful Redis command, and that document has
+been safely persisted. It has not been indexed yet, but it is now safe to return the command response to the user. The
+indexing work can continue asynchronously.
+
+### Tantivy as the Search Core
+
+Before we continue through the pipeline, it is worth looking at the full-text search engine underneath it.
+
+Upstash Redis Search uses [Tantivy](https://github.com/quickwit-oss/tantivy), a fast, feature-complete, open-source
+full-text search library written in Rust. Tantivy is battle-tested and is used by products such as Quickwit and ParadeDB.
+
+Tantivy is not a complete hosted search product on its own. It is a library that can be used to build a search engine,
+or integrated into an existing system to add full-text search capabilities.
+
+Tantivy splits an index into immutable parts called segments. Each segment contains its own documents and inverted index.
+At query time, Tantivy searches the relevant segments and merges the results.
+
+Each segment is made of immutable files stored through an abstraction called
+[Directory](https://github.com/quickwit-oss/tantivy/blob/main/src/directory/directory.rs).
+
+Tantivy does not require segment files to live on a normal filesystem. Instead, `Directory` provides a filesystem-like
+interface for the operations Tantivy needs: creating files, writing them, reading ranges, and seeking. Tantivy ships with
+implementations backed by [MMAP](https://github.com/quickwit-oss/tantivy/blob/main/src/directory/mmap_directory/) for
+disk files and [memory](https://github.com/quickwit-oss/tantivy/blob/main/src/directory/ram_directory.rs) for tests and
+temporary indexes.
+
+The important point is that Tantivy does not care where the segment files are physically stored. It mostly needs two
+things:
+
+- Writing and flushing segment files once during indexing
+- Being able to seek and read parts of these files during querying
+
+That abstraction creates an interesting opportunity for us. We already have a fast, battle-tested, persistent key-value
+database with global replication. That is the same database we use to power our Redis-compatible frontend and the Redis
+commands you already know.
+
+So we can build a `Directory` implementation on top of that key-value store. Not on top of local files, and not on top
+of an in-memory map, but on top of the replicated storage engine that already powers Upstash Redis.
+
+### Storing Segment Files as Keys
+
+Conceptually, a file is just an identifier for a sequence of pages that contain actual bytes. A file called `upstash.txt` with
+the content `redis`, for example, can be represented in a key-value store with a simple mapping.
+
+![A key holding the content of a file in its value](/blog/how-search-works/pseudo-file.png)
+
+From there, the idea is straightforward: split file content into fixed 8KB pages and store each page of each file as a
+separate key in the database. When Tantivy writes to a file, our `Directory` writes into a page. When the page is full,
+we persist it as a key and continue with the next page.
+
+Reads work the same way in reverse. Tantivy asks for bytes at an offset, and our implementation calculates which page
+contains that offset, reads the corresponding key from the key-value store, and returns the requested bytes.
+
+This design is small, but it becomes powerful when combined with global replication. When Tantivy indexes your documents
+into segments, it creates immutable files. We store those files as keys and replicate them globally. At query time,
+Tantivy walks the known segment files and does what it already does well.
+
+The result is a replicated search engine: index the data once in `us-east-1`, then query it from `eu-west-1`,
+`ap-southeast-1`, or any other region where the data is replicated.
+
+### Bridging Go and Rust
+
+The idea is simple, but the implementation has one important complication: language boundaries.
+
+Tantivy is written in Rust. Our database is written in Go. To create and query Tantivy indexes from the database engine,
+we use cgo and write the Tantivy integration in Rust. That part is manageable on its own, but the `Directory`
+implementation makes the dependency graph more interesting.
+
+The Go side needs Rust because Tantivy lives there. The Rust side needs Go because our `Directory` implementation has to
+read and write bytes through the Go key-value store. In practice, that means Rust calls back into Go while Go is already
+calling into Rust.
+
+To make that easier to see, let's build a tiny counter where the logic lives in Rust and the storage eventually lives in
+Go. It is much smaller than Tantivy, but the shape is the same.
+
+We start with the Rust-side logic and a simple storage abstraction:
+
+```rust
+trait Storage {
+    fn set(&mut self, value: i32);
+    fn get(&self) -> i32;
+}
+
+struct Counter<S: Storage> {
+    storage: S,
+}
+
+impl<S: Storage> Counter<S> {
+    fn new(mut storage: S, initial_value: i32) -> Self {
+        storage.set(initial_value);
+        Self { storage }
+    }
+
+    fn increment(&mut self) -> i32 {
+        let next = self.storage.get() + 1;
+        self.storage.set(next);
+        next
+    }
+
+    fn decrement(&mut self) -> i32 {
+        let next = self.storage.get() - 1;
+        self.storage.set(next);
+        next
+    }
+
+    fn get(&self) -> i32 {
+        self.storage.get()
+    }
+}
+```
+
+Next, we expose a few FFI functions so the counter can be created and used from Go before we introduce Go-backed
+storage.
+
+```rust
+struct RamStorage {
+    value: i32,
+}
+
+impl Storage for RamStorage {
+    fn set(&mut self, value: i32) {
+        self.value = value;
+    }
+
+    fn get(&self) -> i32 {
+        self.value
+    }
+}
+
+pub struct FfiCounter {
+    inner: Counter<RamStorage>,
+}
+
+#[no_mangle]
+pub extern "C" fn counter_new(initial_value: c_int) -> *mut FfiCounter {
+    let counter = FfiCounter {
+        inner: Counter {
+            storage: RamStorage {
+                value: initial_value as i32,
+            },
+        },
+    };
+
+    Box::into_raw(Box::new(counter))
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn counter_free(counter: *mut FfiCounter) {
+    if counter.is_null() {
+        return;
+    }
+
+    drop(Box::from_raw(counter));
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn counter_increment(counter: *mut FfiCounter) -> c_int {
+    match counter.as_mut() {
+        Some(counter) => counter.inner.increment() as c_int,
+        None => 0,
+    }
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn counter_decrement(counter: *mut FfiCounter) -> c_int {
+    match counter.as_mut() {
+        Some(counter) => counter.inner.decrement() as c_int,
+        None => 0,
+    }
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn counter_get(counter: *const FfiCounter) -> c_int {
+    match counter.as_ref() {
+        Some(counter) => counter.inner.get() as c_int,
+        None => 0,
+    }
+}
+```
+
+The Go side can then call the exported Rust functions directly.
+
+```go
+package main
+
+/*
+#cgo LDFLAGS: -L${SRCDIR}/rust/target/release -lcounter -ldl -lpthread -lm
+#include <stdlib.h>
+
+typedef struct Counter Counter;
+
+// Functions exported by Rust and called from Go.
+extern Counter* counter_new(int initial_value);
+extern void counter_free(Counter* counter);
+extern int counter_increment(Counter* counter);
+extern int counter_decrement(Counter* counter);
+extern int counter_get(Counter* counter);
+*/
+import "C"
+
+import "fmt"
+
+func main() {
+	counter := C.counter_new(10)
+	defer C.counter_free(counter)
+
+	fmt.Println("initial:", int(C.counter_get(counter)))
+	fmt.Println("increment:", int(C.counter_increment(counter)))
+	fmt.Println("increment:", int(C.counter_increment(counter)))
+	fmt.Println("decrement:", int(C.counter_decrement(counter)))
+	fmt.Println("final:", int(C.counter_get(counter)))
+}
+```
+
+Before we expose Go storage to Rust, we need to deal with cgo's pointer passing rules.
+
+We cannot store Go pointers in Rust code casually. Go pointers passed into Rust are only implicitly pinned for the
+duration of that call. If Rust stores one and uses it later, the program is outside the safe rules unless that pointer is
+[pinned](https://go.dev/src/runtime/pinner.go) for as long as Rust may hold it. Pinning only the top-level struct is not
+always enough either. Pointers reachable from that struct, including fields and nested fields, also need to be pinned.
+Types such as maps, channels, interfaces, and functions count as pointers in this model, but they cannot be pinned. That
+makes the direct pointer approach too constrained for this use case.
+
+Go 1.17 introduced a useful escape hatch for this: [cgo.Handle](https://pkg.go.dev/runtime/cgo#Handle). A `cgo.Handle`
+lets us pass a Go value through C-compatible code without violating the pointer passing rules. Conceptually, it is an
+integer handle that can be stored on the Rust side. Behind the scenes, Go keeps a map from that handle back to the
+original value.
+
+With that in place, we can create the storage on the Go side, pass its handle to Rust when creating the counter, store
+the handle in Rust, and pass it back into Go whenever Rust needs to call the storage accessors.
+
+First, define the storage struct in Go and expose methods that Rust will call.
+
+```go
+type storage struct {
+	value int32
+}
+
+func (s *storage) set(value int32) {
+	s.value = value
+}
+
+func (s *storage) get() int32 {
+	return s.value
+}
+
+//export storage_set
+func storage_set(storageHandle C.uintptr_t, value C.int) {
+	s := cgo.Handle(storageHandle).Value().(*storage)
+	s.set(int32(value))
+}
+
+//export storage_get
+func storage_get(storageHandle C.uintptr_t) C.int {
+	s := cgo.Handle(storageHandle).Value().(*storage)
+	return C.int(s.get())
+}
+```
+
+Then, define those functions on the Rust side and create a `Storage` implementation that stores the Go handle.
+
+```rust
+unsafe extern "C" {
+    pub unsafe fn storage_set(handle: usize, value: c_int);
+    pub unsafe fn storage_get(handle: usize) -> c_int;
+}
+
+pub struct GoStorage {
+    handle: usize,
+}
+
+impl Storage for GoStorage {
+    fn set(&mut self, value: i32) {
+        unsafe { storage_set(self.handle, value as c_int) }
+    }
+
+    fn get(&self) -> i32 {
+        unsafe { storage_get(self.handle) as i32 }
+    }
+}
+
+pub struct GoFfiCounter {
+    inner: Counter<GoStorage>,
+}
+```
+
+Now the exported Rust functions can use that Go-backed storage implementation.
+
+```rust
+#[no_mangle]
+pub extern "C" fn counter_new(handle: usize, initial_value: c_int) -> *mut GoFfiCounter {
+    let counter = GoFfiCounter {
+        inner: Counter::new(GoStorage { handle }, initial_value),
+    };
+
+    Box::into_raw(Box::new(counter))
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn counter_free(counter: *mut GoFfiCounter) {
+    if counter.is_null() {
+        return;
+    }
+
+    drop(Box::from_raw(counter));
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn counter_increment(counter: *mut GoFfiCounter) -> c_int {
+    match counter.as_mut() {
+        Some(counter) => counter.inner.increment() as c_int,
+        None => 0,
+    }
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn counter_decrement(counter: *mut GoFfiCounter) -> c_int {
+    match counter.as_mut() {
+        Some(counter) => counter.inner.decrement() as c_int,
+        None => 0,
+    }
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn counter_get(counter: *const GoFfiCounter) -> c_int {
+    match counter.as_ref() {
+        Some(counter) => counter.inner.get() as c_int,
+        None => 0,
+    }
+}
+```
+
+Finally, update the Go code to create the storage handle and pass it to Rust.
+
+```go
+func main() {
+	handle := cgo.NewHandle(&storage{})
+	defer handle.Delete()
+
+	counter := C.counter_new(C.uintptr_t(handle), 10)
+	defer C.counter_free(counter)
+
+	fmt.Println("initial:", int(C.counter_get(counter)))
+	fmt.Println("increment:", int(C.counter_increment(counter)))
+	fmt.Println("increment:", int(C.counter_increment(counter)))
+	fmt.Println("decrement:", int(C.counter_decrement(counter)))
+	fmt.Println("final:", int(C.counter_get(counter)))
+}
+```
+
+In this example, replace the Go-side storage with our key-value database, the Rust `Storage` trait with Tantivy's
+`Directory` trait, the counter with Tantivy itself, and the Go code calling the counter with our database engine. That is
+the shape of the integration.
+
+There are plenty of lower-level details around buffers passed between Go and Rust, arrays of pointers such as arrays of
+strings, and extra performance layers such as our page cache for hot data. Those could each be their own post. For this
+one, the counter example is enough to show the core pattern we use to connect Tantivy to our storage engine.
+
+### Writing Documents Into Segments
+
+Let's return to the document we left in the indexing queue. At that point, we had extracted the search document from the
+Redis value, persisted it to the disk queue, and returned the Redis command response to the user.
+
+Each index has a goroutine responsible for index writes and a few maintenance tasks. This goroutine receives documents
+from the in-memory channel and sends them into the Rust side through FFI.
+
+After receiving a document, the goroutine appends it to the currently open segment. Tantivy indexes are made of segments,
+but each document does not become its own segment. For good performance, writes need to be buffered together before the
+segment is finalized.
+
+This is not exactly how Tantivy works by default. Normally, Tantivy starts multiple indexing worker threads, and those
+workers maintain their own open segments. It also starts segment-merging threads that combine smaller segments into
+larger ones according to merge policies, which improves query performance over time.
+
+That model works well when a process owns a small number of indexes. Our database, however, is multitenant by default.
+A single process may host thousands of databases, and each database may contain many search indexes. Spawning multiple
+background indexing and merge threads per index would not scale well in that environment.
+
+Tantivy does not provide a switch to completely disable those background threads; they are part of its design. For our
+use case, the practical path was to fork Tantivy and expose a few internal structs so we could build a writer that fits
+our execution model.
+
+We still wanted to use as much of Tantivy as possible. That lets us keep relying on battle-tested code and keeps the
+fork surface small enough to maintain over time. Fortunately, most of what we needed was possible by making a few
+fundamental methods public and slightly changing some internal pieces.
+
+The result is a fully foreground index writer. It maintains a single open segment and appends documents to it until the
+segment reaches a predefined size. There are no per-index background threads for writing; the work happens on the
+operating system thread where the maintenance goroutine is running.
+
+### Committing Segments
+
+Writing to a segment does not immediately make a document visible in search results. Pending segments need to be
+committed before searchers can see them.
+
+Pending segments are committed in two ways: automatically after a configured amount of time, or explicitly when the user
+requests it. A commit finalizes the segment files and flushes them permanently. After that point, the segment files are
+immutable.
+
+After a commit succeeds, we can also trim the disk-based document queue up to the committed sequence. Documents need to
+stay in the queue until then because a crash during segment writing can leave us in an uncertain state: some files may
+have been written, while others may not. Rather than trying to reason about every partial-write case, we create a new
+segment after recovery and replay the disk queue from the last known commit.
+
+Once the commit is done, the remaining step is to reload the searchers so they can see the new segments. At that point,
+the segment containing our document becomes part of the searchable index, and the document can appear in a query like
+this:
+
+```typescript
+const results = await index.query({
+  filter: { description: "wireless" },
+});
+```
+
+### Closing Thoughts
+
+That is the high-level design behind Upstash Redis Search: Redis commands produce schema-specific search documents,
+those documents are durably queued, Tantivy writes them into replicated segment files backed by our key-value store, and
+commits make the new data visible to searchers.
+
+We are continuing to improve both the performance and the capabilities of this engine. One of the areas we are working
+on now is bringing semantic search capabilities into Tantivy-backed search, so there is more to share soon.
