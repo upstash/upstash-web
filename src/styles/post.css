@@ -41,6 +41,36 @@
   @apply relative pl-6;
 }
 
+/* Table of contents */
+.post .toc {
+  /* keep the sidebar scrollable when it overflows, but hide the scrollbar */
+  scrollbar-width: none; /* Firefox */
+}
+
+.post .toc::-webkit-scrollbar {
+  display: none; /* Chromium / Safari */
+}
+
+.post .toc ol {
+  @apply list-none space-y-2 pl-0;
+}
+
+.post .toc .toc-level-2 {
+  @apply mt-2 pl-3;
+}
+
+.post .toc .toc-item {
+  @apply pl-0;
+}
+
+.post .toc a {
+  @apply block py-0.5 font-normal leading-snug text-text-mute no-underline transition hover:text-text;
+}
+
+.post .toc a[data-active] {
+  @apply text-text;
+}
+
 .post ul > li:before {
   @apply absolute left-0 h-0.5 w-3 rounded-full bg-emerald-800/40 dark:bg-zinc-600;
   content: "";
@@ -114,5 +144,7 @@
 
 .post :where(h1, h2, h3, h4) {
   @apply mb-6 font-display font-semibold text-text;
-  scroll-margin-top: 2rem;
+  /* keep anchor targets clear of the fixed header (grows with the
+     policy banner via --header-offset, set from the actual header height) */
+  scroll-margin-top: calc(var(--header-offset, 5rem) + 1.5rem);
 }
