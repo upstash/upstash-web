@@ -12,7 +12,7 @@ Context7 lets developers, and more importantly AI agents, find docs for any libr
 
 ## Why Context7 uses Redis Search
 
-Our MCP server has had two tools since day one. Whenever an agent wants to fetch docs for a library, it must first identify the library's ID in Context7. This ID is in `/org/repo` format for GitHub repos but may be different for other types of sources like websites or OpenAPI files. If the user needs an older version, it may be in `/org/repo/tag` format.
+Our MCP server has had two tools since day one. Whenever an agent wants to fetch docs for a library, it must first identify the library's ID in Context7. This ID is in `/org/repo` format for GitHub repos but may be different for other types of sources like websites. If the user needs an older version, it may be in `/org/repo/tag` format too.
 
 So the agent first queries within the existing library index to find available libraries. Then after resolving a few library IDs, it decides which one to use based on their metadata like GitHub stars, source URLs, trust scores, available snippet counts, etc. These results are also editable via [policies](https://context7.com/docs/howto/policies) to give users more control over what's returned. We will talk more about policies later.
 
@@ -22,7 +22,7 @@ This is where we use Redis Search. It's almost certainly used every time you use
 
 Every library in Context7 is stored directly in Redis as a JSON document. The document contains everything: the library's title, description, source URLs, GitHub stars, trust score, snippet counts, last-updated date, version history, and more.
 
-To make these libraries searchable, we create an index over the library keys based on their prefix. In code that looks like this:
+To make these libraries searchable, we create an index over the library keys based on their prefix. In code it looks something like this:
 
 ```typescript
 import { Redis, s } from "@upstash/redis";
@@ -34,7 +34,7 @@ await redis.search.createIndex({
     dataType: "json",
     prefix: "library:",
     schema: s.object({
-        id: s.string().noTokenize(), // exact library id, e.g. "/redis/redis-doc"
+        id: s.string().noTokenize(), // exact library id, e.g. "/upstash/context7"
         title: s.string(),
         titleExact: s.string().noStem(), // exact technical terms, no stemming
         description: s.string(),
@@ -94,7 +94,7 @@ Here is an example of a policy with many filters. We keep only verified librarie
 
 The effect of the policy shows up at the bottom: out of 100,181 libraries, only 22,611 pass. Thanks to the speed of Redis Search, we can immediately show the new number.
 
-In code, this filter looks like this:
+In code, this filter could look like this:
 
 ```typescript
 const index = redis.search.index({ name: "libraries" });
