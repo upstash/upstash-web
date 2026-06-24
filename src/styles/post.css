@@ -42,6 +42,15 @@
 }
 
 /* Table of contents */
+.post .toc {
+  /* keep the sidebar scrollable when it overflows, but hide the scrollbar */
+  scrollbar-width: none; /* Firefox */
+}
+
+.post .toc::-webkit-scrollbar {
+  display: none; /* Chromium / Safari */
+}
+
 .post .toc ol {
   @apply list-none space-y-2 pl-0;
 }
