@@ -9,8 +9,6 @@ I really like Redis. And in this article I want to share one of the most underra
 
 ![](https://cdn.bydefault.so/crDt6YszFOxzlt4-WLkDe.png)
 
-its so easy and fast, i honestly can't imagine building without it now. i just wish it was better at time series data 😭
-
 To make my point: There is a Redis command called `pipeline`. Here is a pipeline that reads a counter and then writes a new value. The two commands go in one round trip, but they are not one atomic step:
 
 ```typescript
