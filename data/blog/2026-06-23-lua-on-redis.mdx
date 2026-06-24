@@ -11,12 +11,11 @@ I really like Redis. And in this article I want to share one of the most underra
 
 its so easy and fast, i honestly can't imagine building without it now. i just wish it was better at time series data 😭
 
-also i swear upstash didnt make me say this](https://cdn.bydefault.so/nNigEAWk7VwUkpz0wIsm-.png)
-
 To make my point: There is a Redis command called `pipeline`. Here is a pipeline that reads a counter and then writes a new value. The two commands go in one round trip, but they are not one atomic step:
 
 ```typescript
-const [count] = await redis.pipeline()
+const [count] = await redis
+  .pipeline()
   .get<number>("visits")
   .set("visits", 100)
   .exec();
@@ -41,7 +40,8 @@ On Upstash you have two ways to run commands atomically: the transactions API (M
 Say you want to increment a counter only when it is under 10. With MULTI/EXEC you queue the commands and they all run together when you call exec():
 
 ```typescript
-const [count, next] = await redis.multi()
+const [count, next] = await redis
+  .multi()
   .get<number>("count")
   .incr("count")
   .exec();
@@ -69,11 +69,11 @@ The INCR only happens while the counter is under 10, and no other command runs i
 
 ![](https://cdn.bydefault.so/JMtp6e2GRKkLig1r9IhQy.png)
 
-| Approach | Atomic? | Read a value, then act on it? | Upstash endpoint |
-| --- | --- | --- | --- |
-| Pipeline | No | No | /pipeline |
-| MULTI/EXEC | Yes | No | /multi-exec |
-| Lua (EVAL) | Yes | Yes | a single EVAL call |
+| Approach   | Atomic? | Read a value, then act on it? | Upstash endpoint   |
+| ---------- | ------- | ----------------------------- | ------------------ |
+| Pipeline   | No      | No                            | /pipeline          |
+| MULTI/EXEC | Yes     | No                            | /multi-exec        |
+| Lua (EVAL) | Yes     | Yes                           | a single EVAL call |
 
 ## How does EVAL work, and what does it look like over HTTP?
 
@@ -279,9 +279,9 @@ PTTL rl:user => 59963
 
 The counter climbs past 10 and your code rejects once it crosses the limit, while the TTL keeps the window expiring on schedule. The [@upstash/ratelimit](https://github.com/upstash/ratelimit-js/blob/main/src/lua-scripts/single.ts) library is built on this pattern, with Lua scripts for fixed window, sliding window, and token bucket.
 
-## When should I use EVAL\_RO instead of EVAL?
+## When should I use EVAL_RO instead of EVAL?
 
-Use EVAL\_RO for a script that only reads. It runs Lua the same way EVAL does, but Redis rejects any write command inside it, so it can run on a read replica and a stray write turns into an error instead of a silent change.
+Use EVAL_RO for a script that only reads. It runs Lua the same way EVAL does, but Redis rejects any write command inside it, so it can run on a read replica and a stray write turns into an error instead of a silent change.
 
 Here is the rejection, run against Redis 7.0.15:
 
@@ -293,19 +293,19 @@ EVAL_RO "return redis.call('SET', KEYS[1], 'x')" 1 somekey
 (error) ERR Write commands are not allowed from read-only scripts.
 ```
 
-The @upstash/redis SDK exposes this as `redis.evalRo(script, keys, args)`, and createScript takes a `{ readonly: true }` option that gives you the same EVALSHA-first behavior with the read-only variants. If a script is meant to be read-only, EVAL\_RO makes Redis enforce that.
+The @upstash/redis SDK exposes this as `redis.evalRo(script, keys, args)`, and createScript takes a `{ readonly: true }` option that gives you the same EVALSHA-first behavior with the read-only variants. If a script is meant to be read-only, EVAL_RO makes Redis enforce that.
 
 ## How does Lua compare to MULTI/EXEC on Upstash?
 
 Both run atomically. The split is whether you need to make a decision in the middle.
 
-| Question | MULTI/EXEC | Lua (EVAL) |
-| --- | --- | --- |
-| Atomic execution | Yes | Yes |
-| Read a value and branch on it mid-block | No | Yes |
-| Conditional writes | No | Yes |
-| Script cached server-side | No | Yes, via EVALSHA |
-| Upstash endpoint | /multi-exec | a single EVAL call |
+| Question                                | MULTI/EXEC  | Lua (EVAL)         |
+| --------------------------------------- | ----------- | ------------------ |
+| Atomic execution                        | Yes         | Yes                |
+| Read a value and branch on it mid-block | No          | Yes                |
+| Conditional writes                      | No          | Yes                |
+| Script cached server-side               | No          | Yes, via EVALSHA   |
+| Upstash endpoint                        | /multi-exec | a single EVAL call |
 
 MULTI/EXEC queues a fixed list of commands and runs them as a unit. It can't look at a reply and change course, because the replies don't come back until the whole block runs. So for a plain batch that always runs the same commands, MULTI/EXEC is fine. For anything that reads a value and then decides what to write, Lua is the tool.
 
