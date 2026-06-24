@@ -1,12 +1,12 @@
 ---
-title: "How Redis Search Powers Millions of Library Lookups in Context7"
+title: "How Redis Search Powers Millions of Searches in Context7"
 slug: how-redis-search-powers-context7
 authors: [abdullahenes]
 tags: [context7, redis, search, ai]
-description: "Context7 uses Upstash Redis not as a cache, but as the primary database and search engine for millions of library lookups. Here's how."
+description: "Context7 uses Upstash Redis not as a cache, but as the primary database and search engine for millions of searches a month. Here's how."
 ---
 
-Context7 lets developers, and more importantly AI agents, find docs for any library instantly. This is powered by Upstash Redis, specifically [Redis Search](https://upstash.com/docs/redis/search/introduction), which handles **millions of library lookups per month**.
+Context7 lets developers, and more importantly AI agents, find docs for any library instantly. This is powered by Upstash Redis, specifically [Redis Search](https://upstash.com/docs/redis/search/introduction), which handles **millions of searches per month**.
 
 ![Context7's primary Redis database usage in June so far](/blog/how-redis-search-powers-context7/commands.png)
 
@@ -22,7 +22,32 @@ This is where we use Redis Search. It's almost certainly used every time you use
 
 Every library in Context7 is stored directly in Redis as a JSON document. The document contains everything: the library's title, description, source URLs, GitHub stars, trust score, snippet counts, last-updated date, version history, and more.
 
-To make these libraries searchable, we create an index over the library keys based on their prefix. This operation is done once and every new library added is automatically indexed. As of writing this, we have over 110,000 libraries indexed.
+To make these libraries searchable, we create an index over the library keys based on their prefix. In code that looks like this:
+
+```typescript
+import { Redis, s } from "@upstash/redis";
+
+const redis = Redis.fromEnv();
+
+await redis.search.createIndex({
+    name: "libraries",
+    dataType: "json",
+    prefix: "library:",
+    schema: s.object({
+        id: s.string().noTokenize(), // exact library id, e.g. "/redis/redis-doc"
+        title: s.string(),
+        titleExact: s.string().noStem(), // exact technical terms, no stemming
+        description: s.string(),
+        type: s.string().noTokenize(), // "repo" and "website"
+        verified: s.boolean(),
+        trustScore: s.number("F64"),
+        githubStars: s.number("U64"), // repos only
+        referringDomains: s.number("U64"), // websites only
+    }),
+});
+```
+
+This operation is done once. Because the index is defined over the `library:` prefix, every new document we add later is indexed automatically, with no extra step per library. As of writing this, we have over 110,000 libraries indexed.
 
 ## All the small details that make search work
 
@@ -63,13 +88,38 @@ Policies also support a blocked list to exclude specific libraries, and an excep
 
 <Note>All of this runs inside the search query itself. There's no post-filtering in application code.</Note>
 
-Here is an example of a policy with many filters. We keep only verified libraries with a trust score of 4 or more, GitHub repos with at least 1,000 stars, and websites with at least 100 referring domains, and we block the `redis-doc` library entirely. The result shows up at the bottom: out of 100,181 libraries, only 22,611 pass. Thanks to the speed of Redis Search, we can immediately show the effect of any policy changes in the number of potential results.
+Here is an example of a policy with many filters. We keep only verified libraries with a trust score of 4 or more, GitHub repos with at least 1,000 stars, and websites with at least 100 referring domains, and we block the `redis/redis-doc` library entirely.
 
 ![Example of a policy with many filters](/blog/how-redis-search-powers-context7/example-policies.png)
 
+The effect of the policy shows up at the bottom: out of 100,181 libraries, only 22,611 pass. Thanks to the speed of Redis Search, we can immediately show the new number.
+
+In code, this filter looks like this:
+
+```typescript
+const index = redis.search.index({ name: "libraries" });
+
+const results = await index.query({
+    filter: {
+        $must: [
+            { description: "redis client" },
+            { verified: true },
+            { trustScore: { $gte: 4 } },
+            // stars only apply to repos; websites pass through
+            { $or: [{ type: { $eq: "website" } }, { githubStars: { $gte: 1000 } }] },
+            // referring domains only apply to websites; repos pass through
+            { $or: [{ type: { $eq: "repo" } }, { referringDomains: { $gte: 100 } }] },
+        ],
+        $mustNot: {
+            id: "/redis/redis-doc",
+        },
+    },
+});
+```
+
 ## The Upstash effect: global low latency
 
-To keep latency low for users around the world, we add read replicas to other regions. Reads route to the nearest replica automatically, so a developer in Tokyo gets the same fast lookup as someone in Virginia.
+To keep latency low for users around the world, we add read replicas to other regions. Reads route to the nearest replica automatically, so a developer in Tokyo gets the same fast results as someone in Virginia.
 
 ![Context7's global read regions](/blog/how-redis-search-powers-context7/regions.png)
 
