@@ -1,0 +1,177 @@
+---
+title: "Upstash Redis Search, Now Generally Available"
+slug: upstash-redis-search-generally-available
+authors: [enes]
+tags: [redis, search, announcement]
+description: "Upstash Redis Search is now generally available: full-text search, secondary indexes, filtering, sorting, and aggregations on the hashes, strings, and JSON already in your Redis — no separate search service to run."
+---
+
+Redis is one of the most widely used databases in the world, but for most teams it stops at cache and key-value. The moment they need search, filtering, or ranking, that means a second system to run and keep in sync.
+
+Upstash Redis Search is now generally available. It adds full-text search and secondary indexing to the Redis data you already have, so you can search hashes, strings, and JSON without keeping your own sorted sets in sync or deploying a separate search service.
+
+## What is Upstash Redis Search?
+
+Upstash Redis Search is a module in Upstash Redis. It's been quietly running in production for months — now it's generally available and ready for your most demanding workloads. Once you create an index over a set of keys, every write to those keys is reflected in the index. You query it with the `SEARCH.*` commands or the `@upstash/redis` SDK.
+
+What you get:
+
+- Full-text search: tokenization, stemming, phrase, fuzzy, and regex matching
+- Secondary indexes on fields, so you can filter without maintaining sorted sets yourself
+- Range queries on numbers and dates
+- Sorting and pagination
+- Aggregations (bucket and metric)
+- Result highlighting
+- Custom scoring
+- Automatic sync: the index follows your writes
+- Works on Hashes, strings, and JSON
+
+You define an index with a typed schema. Fields can be:
+
+- `text` — full-text, tokenized and stemmed
+- `keyword` — exact-match strings (categories, IDs, tags)
+- `number` — `f64`, `u64`, or `i64`, with range queries
+- `boolean`
+- `date`
+- `facet` — hierarchical paths for faceted navigation
+
+Number, boolean, and date fields can be marked `fast`, which stores them in a columnar form so they can be used for sorting, scoring, and aggregations.
+
+## Tantivy
+
+The engine under the hood is [Tantivy](https://github.com/quickwit-oss/tantivy), a full-text search library written in Rust (we run a small fork). It's built on the same ideas as Lucene: an inverted index, BM25 scoring, tokenizers, and stemmers.
+
+We picked Tantivy for a few reasons:
+
+- It's a library, not a server. We can run it inside the Redis process instead of operating a separate search cluster next to it. That keeps the operational model the same as the rest of Upstash Redis.
+- It's written in Rust, so there's no garbage collector to pause indexing or queries, and the memory behavior is predictable.
+- Indexing and query performance are good without much tuning, and the feature set (stemming, tokenization, fuzzy, BM25) covers what most search workloads need.
+
+The part worth explaining is how we store the index. Tantivy normally writes its index segments to the local filesystem. We replaced that with our own storage layer: Tantivy's segments are written through the same storage engine that backs Upstash Redis. The Go server talks to the Rust library over FFI, and the Rust side reads and writes "files" that are really pages in our storage.
+
+Two things follow from this:
+
+- The index is persisted and replicated the same way as your Redis data. It survives restarts and follows replication. There's no separate disk or volume to manage.
+- Indexing is asynchronous. Writes go through a queue and are applied to the index in the background, so a `JSON.SET` or `HSET` doesn't block on indexing. When you need to read your own writes, `waitIndexing()` (`SEARCH.WAITINDEXING`) blocks until the queue is drained.
+
+## How does it compare to Upstash Search?
+
+Upstash Search and Upstash Redis Search solve different problems.
+
+Upstash Search is a standalone product built on Upstash Vector. You hand it documents, it creates embeddings, and it returns results by meaning, with optional reranking. It's the tool for semantic search and RAG, where "wireless earbuds" should match "bluetooth headphones."
+
+Upstash Redis Search runs on your existing Redis data structures. It does lexical search: it matches tokens, terms, and filters. It doesn't create embeddings and it doesn't do semantic matching. Reach for it when you want full-text, filtering, sorting, and aggregations over data that already lives in Redis.
+
+If you need both, you can use both. They're separate services. Vector search is also planned for Upstash Redis Search in Q3 2026, which will let you run vector similarity queries on the same data, next to full-text and filters.
+
+## How does it compare to RediSearch (Redis Query Engine)?
+
+RediSearch is Redis's own search module, exposed through `FT.*` commands and bundled into Redis 8, Redis Stack, and Redis Enterprise. The high-level idea is the same: index hashes and JSON, run full-text and filter queries, run aggregations. A few differences are worth knowing:
+
+- Commands. Upstash uses `SEARCH.*`; RediSearch uses `FT.*`. They aren't wire-compatible, so a RediSearch client won't work as-is, and queries and schemas need to be rewritten.
+- Query language. Upstash queries are JSON, for example `{ "price": { "$lte": 100 } }`. RediSearch uses a string DSL, for example `@price:[0 100]`.
+- Aggregations. Upstash uses bucket and metric aggregations (`$terms`, `$range`, `$histogram`, `$avg`, `$percentiles`, and so on), closer in shape to Elasticsearch. RediSearch uses a `GROUPBY` / `REDUCE` / `APPLY` pipeline.
+- Vector and geo. RediSearch has `VECTOR` and `GEO` / `GEOSHAPE` field types. Upstash Redis Search has neither today; until vector support lands, semantic search lives in the separate Upstash Search product.
+- Indexing. Upstash indexing is asynchronous, as described above. RediSearch updates the index inline with the write.
+
+If you depend on vector or geo search in one engine, RediSearch covers that. If you want full-text and structured filtering on Upstash Redis with a JSON query API and no extra service to run, that's what Redis Search is for.
+
+## Examples
+
+Here's the shape of a typical product search. Define an index over string keys:
+
+```ts
+import { Redis, s } from "@upstash/redis";
+
+const redis = Redis.fromEnv();
+
+const products = await redis.search.createIndex({
+  name: "products",
+  dataType: "string",
+  prefix: "product:",
+  schema: s.object({
+    name: s.string(),
+    description: s.string(),
+    brand: s.string().noStem(),
+    category: s.keyword(),
+    price: s.number(),
+    rating: s.number(),
+    inStock: s.boolean(),
+  }),
+});
+```
+
+Write a document the normal way. The index picks it up:
+
+```ts
+await redis.set("product:1", JSON.stringify({
+  name: "Wireless Headphones",
+  description: "Noise-cancelling over-ear headphones",
+  brand: "Acme",
+  category: "electronics",
+  price: 199.99,
+  rating: 4.6,
+  inStock: true,
+}));
+
+await products.waitIndexing();
+```
+
+A full-text query:
+
+```ts
+const results = await products.query({
+  filter: { description: "wireless" },
+});
+```
+
+Full-text with filters, sorting, and pagination. Multiple fields are combined with AND:
+
+```ts
+const results = await products.query({
+  filter: {
+    $must: [
+      { description: "headphones" },
+      { category: { $eq: "electronics" } },
+      { price: { $gte: 50, $lte: 300 } },
+    ],
+    $mustNot: [{ inStock: { $eq: false } }],
+  },
+  orderBy: { field: "rating", direction: "DESC" },
+  limit: 20,
+  offset: 0,
+});
+```
+
+Count matches without fetching them, which is handy for pagination UIs:
+
+```ts
+const total = await products.count({
+  filter: { category: { $eq: "electronics" } },
+});
+```
+
+Average price per category with a bucket aggregation:
+
+```ts
+const stats = await products.aggregate({
+  aggregations: {
+    by_category: {
+      $terms: { field: "category" },
+      $aggs: { avg_price: { $avg: { field: "price" } } },
+    },
+  },
+});
+```
+
+Full walkthroughs are in the docs:
+
+- [E-commerce search](https://upstash.com/docs/redis/search/recipes/e-commerce-search) — catalog with filters, facets, and typo tolerance
+- [Blog search](https://upstash.com/docs/redis/search/recipes/blog-search) — full-text articles with highlighted snippets
+- [User directory](https://upstash.com/docs/redis/search/recipes/user-directory) — searchable directory with autocomplete
+
+## Conclusion
+
+Upstash Redis Search lets you search and filter the data already in your Redis database, without running a separate search system or hand-rolling indexes with sorted sets. It covers full-text and structured search: tokens, filters, ranges, sorting, and aggregations. For semantic search today, use Upstash Search; for lexical search on your Redis data, this is it.
+
+To start: create an index over a key prefix, write hashes or JSON as usual, and query with the SDK or the `SEARCH.*` commands. See the [getting started guide](https://upstash.com/docs/redis/search/getting-started).
