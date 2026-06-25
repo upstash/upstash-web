@@ -1,0 +1,223 @@
+---
+slug: automate-your-work-upstash-box
+title: "Automate Your Work with Upstash Box, One Script at a Time"
+authors: [alitarik]
+tags: [box, ai, python]
+description: "An Upstash Box is a cloud computer with an AI agent already inside it. With a few lines of Python you can convert a file, analyze data, or have several models rewrite your code and open a PR. From three-line scripts to a multi-model coding assistant."
+---
+
+We recently released a Python SDK for [Upstash Box](https://upstash.com/docs/box). The SDK itself is not the interesting part. It's a thin client. What I want to show is what you can do with it.
+
+An Upstash Box is a small cloud computer with built-in ai agents, a real filesystem, a shell, and a runtime. You write one python script, run it, and the box does the work. You don't set up an environment and you don't install anything on your own machine.
+
+The shape is always the same: create a box, do the thing, delete it. The "thing" can be as small as converting a file, or as big as letting several models from different providers rewrite your code and open a pull request. Let's go from small to big.
+
+## Setup
+
+```bash
+pip install upstash-box
+export UPSTASH_BOX_API_KEY=box_...
+```
+
+The SDK ships a synchronous `Box` (used in most examples here) and an asynchronous `AsyncBox` for when you want to run things in parallel.
+
+---
+
+## Easy: convert a CSV to JSON
+
+Sometimes you don't need AI at all. You just want a clean machine to run some code on. Write a file into the box, run a snippet, read the result back.
+
+Filesystem API allows you to upload files or write your own content, here we kept it simple.
+
+```python
+from upstash_box import Box
+
+box = Box.create(runtime="python")
+
+box.files.write(path="people.csv", content="name,age\nAda,36\nLin,29\nSam,41\n")
+# Or upload a real file from disk instead:
+#   box.files.upload([{"path": "./people.csv", "destination": "people.csv"}])
+
+run = box.exec.code(
+    lang="python",
+    code=(
+        "import csv, json\n"
+        "rows = list(csv.DictReader(open('people.csv')))\n"
+        "open('people.json', 'w').write(json.dumps(rows, indent=2))\n"
+        "print(json.dumps(rows))"
+    ),
+)
+
+print(run.result)
+box.delete()
+```
+
+```text
+[{"name": "Ada", "age": "36"}, {"name": "Lin", "age": "29"}, {"name": "Sam", "age": "41"}]
+```
+
+That's the whole program. The box came up, ran the code in a real Python runtime, and the JSON is now printed and also saved as `people.json` inside the box.
+
+---
+
+## Easy: a throwaway machine for code
+
+Need a library you don't want on your laptop? Install it in the box, use it, take the result out, and throw the box away.
+
+```python
+import base64
+from upstash_box import Box
+
+box = Box.create(runtime="python")
+
+# Install whatever you need. It lives in the box, not on your machine.
+box.exec.command("pip install -q 'qrcode[pil]'")
+box.exec.code(
+    lang="python",
+    code="import qrcode; qrcode.make('https://upstash.com/docs/box').save('qr.png')",
+)
+
+# Take the file out: read it as base64 and write it locally.
+png = base64.b64decode(box.files.read("qr.png", encoding="base64"))
+with open("qr.png", "wb") as f:
+    f.write(png)
+
+box.delete()
+```
+
+You get a `qr.png` locally, and `qrcode` never touched your environment. Swap in `pandas`, `ffmpeg`, `playwright`, or a system package with `apt-get`. The box is a full Linux machine, so anything that runs on Linux runs here.
+
+---
+
+## Medium: give the agent a task, get typed data back
+
+Now the agent. You give it a task and a [Pydantic](https://docs.pydantic.dev) schema, and it reads the data, does the work, and returns a validated object. No prompt tricks, no parsing text by hand. By default Upstash manages the model key, so the agent config only needs a harness and a model.
+
+```python
+from pydantic import BaseModel
+from upstash_box import Box, Agent
+
+class TeamInsight(BaseModel):
+    headline: str
+    average_salary: float
+    top_earner: str
+
+box = Box.create(
+    runtime="python",
+    agent={
+        "harness": Agent.CLAUDE_CODE,
+        "model": "anthropic/claude-opus-4-8",
+    },
+)
+
+box.files.write(
+    path="team.csv",
+    content=(
+        "name,department,salary\n"
+        "Ada,Engineering,120000\n"
+        "Lin,Engineering,135000\n"
+        "Sam,Sales,90000\n"
+        "Mia,Sales,105000\n"
+    ),
+)
+# Or upload a real file from disk instead:
+#   box.files.upload([{"path": "./team.csv", "destination": "team.csv"}])
+
+run = box.agent.run(
+    prompt="Analyze team.csv and return the headline insight, the average "
+    "salary across everyone, and the name of the highest-paid person.",
+    response_schema=TeamInsight,
+)
+
+print(run.result)
+box.delete()
+```
+
+```text
+headline='Engineering staff earn ~31% more than Sales on average ($127.5K vs $97.5K)'
+average_salary=112500.0
+top_earner='Lin'
+```
+
+`run.result` is a real `TeamInsight` object, and `run.result.average_salary` is a `float` you can do math with. The agent wrote and ran its own code to get this; you only described the shape you wanted back.
+
+---
+
+## Complex: a coding assistant that opens a PR
+
+This is where having the agent inside the box matters. The box keeps its state, and you can change the model without losing anything. So you can run several models from different providers over the same code, where one writes the change and the rest review and fix it, then finish by opening a pull request.
+
+We use the [OpenCode](https://opencode.ai) harness here, because a single `opencode/` prefix can drive models from several providers (Anthropic, OpenAI, Google). That's what lets us hot-swap between them on the same box.
+
+```python
+import asyncio
+import os
+
+from pydantic import BaseModel
+from upstash_box import AsyncBox, Agent, BoxError
+
+REPO = "https://github.com/your-org/your-repo"
+REPO_DIR = "your-repo"
+WORK_BRANCH = "ai-add-auth"
+TASK = "Add user authentication: a login page, session handling, and protect the main routes."
+
+WRITER_MODEL = "opencode/claude-opus-4-8"
+ASSISTANT_MODELS = ["opencode/gpt-5.5", "opencode/gemini-3.1-pro"]
+
+class Report(BaseModel):
+    summary: str
+    changes_made: bool
+
+async def main() -> None:
+    box = await AsyncBox.create(
+        runtime="node",
+        agent={"harness": Agent.OPEN_CODE, "model": WRITER_MODEL},
+        git={"token": os.environ["GITHUB_TOKEN"]},
+    )
+    async with box:
+        await box.git.clone(repo=REPO)
+        await box.cd(REPO_DIR)
+        await box.exec.command(f"git checkout -b {WORK_BRANCH}")
+
+        # 1. One model writes the change in the working tree (no commit).
+        await box.agent.run(prompt=f"{TASK} Edit the files directly; don't commit.")
+
+        # 2. Models from other providers each review and fix the same diff.
+        reports = []
+        for model in ASSISTANT_MODELS:
+            await box.configure_model(model)  # swap the model, state stays
+            try:
+                run = await box.agent.run(
+                    prompt="Inspect `git diff`. Fix any real bugs or style issues "
+                    "directly, then report what you changed.",
+                    response_schema=Report,
+                )
+                report = run.result
+            except BoxError:
+                run = await box.agent.run(prompt="Summarize what you changed, briefly.")
+                report = Report(summary=run.result.strip(), changes_made=True)
+            reports.append((model, report))
+
+        # 3. Commit everything and open one PR.
+        await box.git.commit(message=f"AI multi-model pass: {TASK}")
+        await box.git.push(branch=WORK_BRANCH)
+        pr = await box.git.create_pr(title=f"AI: {TASK}", base="main",
+                                     body="\n".join(f"- {m}: {r.summary}" for m, r in reports))
+        print("PR:", pr.url)
+
+asyncio.run(main())
+```
+
+Here one box held the whole task. The first model wrote the change, then each of the others took its turn: it looked at the current diff, fixed what it found, and passed the result on, all in the same files and git history. When the rotation finished, the box committed the work and opened a pull request.
+
+What you wrote here is really your own workflow, just in a simple way. There is no orchestration framework and no servers to wire together. The loop, the order of the models, when to commit, when to open the PR, it is all plain Python you can read and change. Box gives you the computer and the agent, and you arrange them however the task needs.
+
+---
+
+## That's the idea
+
+A box is a sandbox and an agent together, a real computer that already knows how to read files, run code, use git, and talk to a model. You just point at it from a script and tell it what to do.
+
+So automating something comes down to one question: can you describe it? Convert this file. Analyze this data. Clone the repo, make this change, have a few models check each other, open the PR. You write it almost the way you would say it, and the script does the rest.
+
+Get an API key from the [Upstash Console](https://console.upstash.com), `pip install upstash-box`, and see how much of your work fits in one script. The [quickstart](https://upstash.com/docs/box/overall/quickstart) is a good place to start.
