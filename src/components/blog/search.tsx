@@ -1,17 +1,15 @@
 "use client";
 
 import Button from "@/components/button";
-import cx from "@/utils/cx";
-import { IconSearch, IconX } from "@tabler/icons-react";
 import Fuse, { type IFuseOptions } from "fuse.js";
 import { DateTime } from "luxon";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import PostGridCard, { type PostCardData } from "./grid-item";
+import SearchInput from "./search-input";
 
 export type SearchPost = PostCardData & {
   description?: string;
-  tags: string[];
 };
 
 export const FUSE_OPTIONS: IFuseOptions<SearchPost> = {
@@ -47,33 +45,7 @@ export default function BlogSearch({ posts }: { posts: SearchPost[] }) {
 
   return (
     <>
-      <div className="mt-8 flex justify-center">
-        <div className="relative w-full max-w-md">
-          <IconSearch
-            size={18}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-text-mute"
-          />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search posts..."
-            className={cx(
-              "w-full rounded-full border border-black/10 bg-bg-mute py-3 pl-11 pr-10 dark:border-white/10",
-              "text-sm text-text outline-none placeholder:text-text-mute",
-              "focus:border-primary/40 focus:ring-primary/20 transition focus:ring-2",
-            )}
-          />
-          {isSearching && (
-            <button
-              onClick={() => setQuery("")}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-text-mute transition hover:text-primary-text"
-              aria-label="Clear search"
-            >
-              <IconX size={16} />
-            </button>
-          )}
-        </div>
-      </div>
+      <SearchInput value={query} onChange={setQuery} />
 
       <section className="mt-10 text-left">
         {isSearching && results.length > 0 && (

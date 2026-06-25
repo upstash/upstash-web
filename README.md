@@ -79,21 +79,6 @@ import { Redis } from '@upstash/redis'
 
 ---
 
-#### Announcing (Confetti)
-
-![](public/readme/announce.png)
-
-```mdx
----
-slug: qstash-announcement
-title: "qStash: Messaging for the Serverless"
-author: enes
-tags: [announce]
----
-```
-
----
-
 #### Tags
 
 Tags group posts under `/blog/tag/<tag>`. Conventions:
