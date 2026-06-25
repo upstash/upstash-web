@@ -1,11 +1,10 @@
 "use client";
 
-import cx from "@/utils/cx";
-import { IconSearch, IconX } from "@tabler/icons-react";
 import Fuse from "fuse.js";
 import { useMemo, useState } from "react";
 import PostListCard from "./list-item";
 import { FUSE_OPTIONS, type SearchPost } from "./search";
+import SearchInput from "./search-input";
 
 function groupByMonth(posts: SearchPost[]): Record<string, SearchPost[]> {
   return posts.reduce(
@@ -15,7 +14,9 @@ function groupByMonth(posts: SearchPost[]): Record<string, SearchPost[]> {
         month: "long",
         year: "numeric",
       });
-      if (!acc[key]) acc[key] = [];
+      if (!acc[key]) {
+        acc[key] = [];
+      }
       acc[key].push(post);
       return acc;
     },
@@ -35,33 +36,7 @@ export default function BlogAllSearch({ posts }: { posts: SearchPost[] }) {
 
   return (
     <>
-      <div className="mt-8 flex justify-center">
-        <div className="relative w-full max-w-sm">
-          <IconSearch
-            size={16}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400"
-          />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search posts..."
-            className={cx(
-              "w-full rounded-full border border-zinc-200 bg-white py-2.5 pl-10 pr-10",
-              "text-sm text-zinc-900 outline-none placeholder:text-zinc-400",
-              "focus:border-zinc-300 focus:ring-2 focus:ring-zinc-100",
-            )}
-          />
-          {isSearching && (
-            <button
-              onClick={() => setQuery("")}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 transition hover:text-zinc-600"
-              aria-label="Clear search"
-            >
-              <IconX size={14} />
-            </button>
-          )}
-        </div>
-      </div>
+      <SearchInput value={query} onChange={setQuery} />
 
       <section className="mt-10 text-left">
         {isSearching ? (
@@ -73,9 +48,9 @@ export default function BlogAllSearch({ posts }: { posts: SearchPost[] }) {
             </div>
           ) : (
             <div className="py-20 text-center">
-              <p className="text-zinc-500">
+              <p className="text-text-mute">
                 No posts found for{" "}
-                <span className="font-medium text-zinc-700">"{trimmed}"</span>
+                <span className="font-medium text-text">"{trimmed}"</span>
               </p>
             </div>
           )
