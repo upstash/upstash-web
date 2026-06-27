@@ -1,0 +1,233 @@
+---
+slug: best-sandbox-providers-for-ai-agents
+title: "The Best Sandbox Providers for AI Agents in 2026: When to Choose Which"
+authors: [alitarik]
+tags: [box, ai, serverless]
+description: "Agent sandboxes are one of the fastest-moving corners of infrastructure right now, and the players don't really compete on the same axis. A field guide to ten of them, what each is best at, and when to reach for it."
+---
+
+<Summary>
+If your AI agent writes and runs code, it needs a real computer to run it on, one that can't touch your own systems when the model does something wrong. That's a sandbox.
+
+A year ago there were only a few. Now there are dozens, and they don't line up neatly. Each one is built around a different strength: cold-start speed, GPU access, strong isolation, edge latency, instant forking, or just getting an agent running fast.
+
+This is not a ranking. It's ten providers worth knowing in 2026, what each is good at, and when to pick it. No tool here wins every case, the right one depends entirely on what you're building.
+</Summary>
+
+"Sandbox for AI agents" went from a niche phrase to a crowded category in about a year. The reason is simple: the moment an agent can run shell commands, you have to decide *where* those commands run. And "on my server" stops being a safe answer the first time a model deletes the wrong files or leaks a key.
+
+What's interesting is how differently the providers answered that. Some treat the sandbox as a security boundary and put everything into isolation. Some treat it as raw compute and chase the lowest cold start or the cheapest GPU. Some put the whole agent inside the box and just hand you a prompt.
+
+They're sold under one label, but they're built for different jobs. So "which one is best" is the wrong question. The right one is "best at *what*."
+
+Here are ten, grouped by what they're built for rather than ranked.
+
+---
+
+## 1. Upstash Box: the agent is already inside
+
+Most sandboxes hand you an isolated machine and assume you've already built the agent that will drive it. [Upstash Box](https://upstash.com/docs/box/overall/quickstart) takes it one step further: the coding agent can live *inside* the sandbox.
+
+You pick a harness (Claude Code, Codex, OpenCode, or your own) and a model when you create the box. It already knows how to give that agent the shell, files, and git. You send a prompt; it does the work.
+
+```ts
+import { Agent, Box } from "@upstash/box"
+
+const box = await Box.create({
+  runtime: "node",
+  agent: { harness: Agent.ClaudeCode, model: "anthropic/claude-opus-4-8" },
+  git: { token: process.env.GITHUB_TOKEN },
+})
+
+await box.git.clone({ repo: "github.com/your-org/your-repo" })
+await box.agent.run({ prompt: "Fix the null-token bug in src/auth.ts and add tests" })
+await box.git.createPR({ title: "Fix null token bug", base: "main" })
+```
+
+Clone, fix, test, open a pull request, with no agent loop of your own to wire up. That's the **developer experience** angle, with first-class SDKs in both TypeScript and Python. You can also pin the output to a schema and get typed data back instead of free text.
+
+If you'd rather bring your own agent, you can. Plug in a custom harness (Aider, Gemini CLI, Goose, or your own process), or skip the built-in agent entirely and drive the raw shell, code, and file APIs from your own loop. Either way you still get git, files, logs, and streaming for free. The built-in agent is a head start, not a requirement.
+
+Because the agent runs inside the box, the platform can see what it does. That's the **observability** angle. Every run records its cost, every box keeps searchable logs, and you get full run history plus a callback for each tool the agent uses. The run *is* the trace.
+
+On **pricing**, Box bills active CPU only and leaves memory free. Agent work spends most of its time waiting on the model, so not paying for that idle time makes it clearly cheaper than wall-clock billing.
+
+The **free plan** is real: ten concurrent boxes, five CPU-hours a month, and a small managed model budget, with no platform fee. A box also auto-pauses when idle and wakes weeks later with its files intact, so a long-lived box per user costs almost nothing between sessions.
+
+**When to use it:** when you care about shipping fast, seeing what the agent does, and not paying for idle time, whether you lean on the built-in agent or point your own loop at the box. The easiest, and usually cheapest, starting point for coding agents and per-user agents.
+
+---
+
+## 2. E2B: the AI-first standard with strong isolation
+
+[E2B](https://e2b.dev) is the one most people picture when they hear "code sandbox for agents," and it helped define the category. Each sandbox runs in a Firecracker microVM with its own kernel, a stronger boundary than plain containers, and it starts fast.
+
+Its real signature is the **Code Interpreter**, a built-in Jupyter server. State survives between calls, so variables and loaded data stick around, and results come back structured, a chart returns as a real image plus its data.
+
+```ts
+import { Sandbox } from "@e2b/code-interpreter"
+
+const sbx = await Sandbox.create()
+await sbx.runCode("x = 21")              // state persists across calls
+const run = await sbx.runCode("print(x * 2)")
+console.log(run.logs.stdout)             // ['42']
+```
+
+It speaks Python, JS/TS, R, Java, and Bash, offers a desktop-over-VNC variant for computer use, can be self-hosted, and is reportedly used across a large share of the Fortune 500. The trade-offs: a monthly platform fee for production limits, a 24-hour session cap, and no GPUs.
+
+**When to use it:** when isolation matters most and you want notebook-style execution with charts and tables out of the box, or a desktop for computer use. The default pick for data-analysis agents and code interpreters at scale.
+
+---
+
+## 3. Daytona: speed and openness
+
+[Daytona](https://www.daytona.io) leads with raw startup speed, advertising sub-90ms cold starts, and pairs it with unlimited session length. The execution surface is its strength: SDKs in five languages (Python, TypeScript, Go, Ruby, Java), a stateful Python interpreter, a VNC desktop, an MCP server, shared volumes, and GPU sandboxes.
+
+```ts
+import { Daytona } from "@daytonaio/sdk"
+
+const daytona = new Daytona()
+const sandbox = await daytona.create()
+const res = await sandbox.process.codeRun('print("hello from the sandbox")')
+console.log(res.result)
+```
+
+Billing is plain pay-as-you-go on vCPU and memory by the second, no platform fee, with $200 in starting credits. You bring the agent loop yourself; Daytona gives you a fast, flexible place to run its code.
+
+**When to use it:** when you already have your own agent and want a quick, flexible, multi-language runner, especially if you need very fast starts, a non-TypeScript SDK, or GPUs without a platform fee.
+
+---
+
+## 4. Modal: the GPU and ML workhorse
+
+[Modal](https://modal.com) came from the serverless-ML world and added sandboxes on top. Its standout is **GPUs**: everything up to H100, H200, and B200, on demand, with no reservations or quotas. It's Python-native, scales to zero when idle, and scales out to thousands of containers when busy.
+
+```python
+import modal
+
+app = modal.App.lookup("agent-sandbox", create_if_missing=True)
+sb = modal.Sandbox.create(app=app, gpu="H100")
+
+p = sb.exec("python", "-c", "import torch; print(torch.cuda.is_available())")
+print(p.stdout.read())
+sb.terminate()
+```
+
+The catch is cost: sandboxes run at a premium over base Modal functions, effective GPU rates sit higher than dedicated GPU providers, and Node.js support is limited.
+
+**When to use it:** when the work is GPU-bound, training, inference, heavy data processing, and you live in Python. If your sandbox needs a GPU right next to the code, Modal is the obvious fit.
+
+---
+
+## 5. Cloudflare Sandboxes: code execution at the edge
+
+[Cloudflare's Sandbox SDK](https://developers.cloudflare.com/sandbox/) runs isolated containers right next to Workers. Its angle is the **ecosystem and the edge**. If your agent already lives in Workers, Durable Objects, and Workers AI, code execution is one binding away.
+
+```ts
+import { getSandbox } from "@cloudflare/sandbox"
+export { Sandbox } from "@cloudflare/sandbox"
+
+export default {
+  async fetch(request, env) {
+    const sandbox = getSandbox(env.Sandbox, "agent-box")
+    const result = await sandbox.exec('python3 -c "print(2 + 2)"')
+    return Response.json({ output: result.stdout })
+  },
+}
+```
+
+It handles commands, files, background processes, and exposed ports. It also ties into Cloudflare's newer primitives for long-running, durable agents, and backs the managed-agent offering built with Anthropic.
+
+**When to use it:** when you're already building on Cloudflare and want code execution that's a Worker binding away, with global edge placement and durable agents.
+
+---
+
+## 6. Vercel Sandbox: for the frontend and codegen crowd
+
+[Vercel Sandbox](https://vercel.com/docs/sandbox) runs untrusted or generated code in Firecracker microVMs. It's aimed at the v0 and AI-SDK generation of apps: code generation, live previews, and experimentation. Sandboxes are persistent by default, start in milliseconds, and can even run Docker inside them.
+
+```ts
+import { Sandbox } from "@vercel/sandbox"
+
+const sandbox = await Sandbox.create()
+const result = await sandbox.runCommand({ cmd: "node", args: ["-e", "console.log(2 + 2)"] })
+console.log(await result.stdout())
+```
+
+Its most notable detail, and the one that fits agents best, is that it bills **active CPU only**. Time spent waiting on the model isn't charged. It runs on Vercel and reads auth from your project, so it's most natural if you already deploy there.
+
+**When to use it:** when you're already on Vercel and the AI SDK and want a sandbox that drops into that stack for generating, running, and previewing code.
+
+---
+
+## 7. Northflank: the full platform with bring-your-own-cloud
+
+[Northflank](https://northflank.com) is the broadest here: not just sandboxes, but databases, APIs, workers, and CI/CD together, under the same isolation.
+
+Its standout is **deployment flexibility**, microVM isolation (Kata and Cloud Hypervisor) plus gVisor, any container image, unlimited sessions, on-demand GPUs (L4, A100, H100, H200), and self-serve bring-your-own-cloud across AWS, GCP, Azure, Oracle, and bare metal. Sandbox compute is among the cheapest in this list.
+
+This is the one you reach for when a sandbox alone isn't enough, when the agent needs a database, a queue, and an API next to it under the same security model. It's a platform first, driven through its API, CLI, and UI rather than a single one-line SDK.
+
+**When to use it:** when you need more than a sandbox, persistent agents next to the services they talk to, or strict data-residency rules that mean running everything in your own cloud.
+
+---
+
+## 8. Runloop: purpose-built for coding agents
+
+[Runloop](https://runloop.ai) is the most coding-agent-focused entry. Its devboxes run on a custom bare-metal hypervisor with two layers of isolation, resume from standby in around 25ms, and keep a standby at zero compute cost.
+
+But the real strength is the **tooling around** the sandbox: Blueprints for reusable templates, built-in benchmarks and evals to measure agent quality, an Agent Gateway that lets the box call models without ever seeing real credentials, and an MCP hub for tools. It carries SOC 2, HIPAA, and GDPR compliance, and has run tens of thousands of concurrent devboxes.
+
+**When to use it:** when coding agents are your core product and you want infrastructure tuned for them, evals, benchmarks, credential-safe model access, and compliance, rather than a general runner you adapt yourself.
+
+---
+
+## 9. Morph Cloud: instant forking for parallel exploration
+
+[Morph Cloud](https://cloud.morph.so) bets on one striking capability, Infinibranch: snapshot, branch, and restore an entire running environment, files, packages, and process state, in under a second. An agent can fork its current state into many copies that each continue from the exact same point, with nothing to reinstall.
+
+```python
+from morphcloud.api import MorphCloudClient
+
+client = MorphCloudClient()
+instance = client.instances.start(snapshot.id)
+
+# fork the live state into parallel copies
+branched = instance.snapshot()
+copies = [client.instances.start(branched.id) for _ in range(4)]
+```
+
+That makes it the natural fit for branch-heavy work other sandboxes handle awkwardly: exploring several solutions at once, parallel test runs, and A/B experiments from one prepared state.
+
+**When to use it:** when your agent needs to branch or explore many paths in parallel from a shared live state, and instant forking is the feature that makes or breaks it.
+
+---
+
+## 10. Fly.io: sandboxing at the infrastructure layer
+
+[Fly.io](https://fly.io/ai) sits one level lower than the rest: it gives you the virtualization, not an agent-shaped wrapper. Its Machines are hardware-isolated Firecracker microVMs that boot any container in under a second. Its persistent variant keeps installed packages and saved files between sessions, so an agent can close today and resume tomorrow.
+
+```bash
+# boot a one-off, hardware-isolated microVM from any image
+fly machine run ghcr.io/your-org/agent-image --rm
+```
+
+You get kernel-level isolation without operating the virtualization stack yourself, in exchange for building more of the agent platform on top. It's the rawest option here, and the most flexible.
+
+**When to use it:** when you want raw, Firecracker-isolated VMs to build your own sandbox or multi-tenant platform on, and you'd rather own the orchestration than adopt someone's opinions.
+
+---
+
+## How to actually choose
+
+The category looks crowded, but the choice usually comes down to a couple of questions.
+
+**Do you want a built-in agent or just a place to run code?** If you want the agent, git, and PR flow already wired up, start with **Upstash Box**. If you've already built your own loop and just need somewhere to run code, almost any provider here fits, including Box, which exposes raw shell and file APIs and lets you bring your own harness.
+
+**What's your hardest constraint?** Strong isolation → **E2B** or **Fly.io**. A GPU in the box → **Modal** or **Northflank**. Cold-start speed → **Daytona**. Instant forking → **Morph**. Your existing ecosystem → **Cloudflare** or **Vercel**. Coding-agent tooling and compliance → **Runloop**. Self-hosting → **Northflank**.
+
+**What does the work spend its time doing?** If it mostly *waits* on the model (most agent work does), active-CPU billing, which **Box** and **Vercel Sandbox** both use, saves real money over wall-clock pricing.
+
+Most teams end up using more than one. These aren't the same tool at different prices; they weigh isolation, cost, speed, and developer experience differently, and the best one is whichever matches the constraint you can't move.
+
+If you're starting fresh and want an agent running in a few minutes, with its cost, logs, and history visible and a free tier you can build on, the [Box quickstart](https://upstash.com/docs/box/overall/quickstart) is a good place to begin.
