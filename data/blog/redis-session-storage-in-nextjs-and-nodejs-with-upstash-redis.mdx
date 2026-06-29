@@ -1,0 +1,302 @@
+---
+authors: [josh]
+slug: redis-session-storage-nextjs-nodejs
+tags: [redis]
+title: Redis Session Storage in Next.js and Node.js with Upstash Redis
+---
+
+With server-side sessions in Redis, we can get sub-millisecond reads, automatic expiry, and we can invalidate a session by just deleting a Redis key. I this article I wanna show you three patterns for session storage:
+
+- a roll-your-own store for Next.js App Router
+- the same pattern with an Express API
+- and Better Auth with Upstash Redis as secondary storage
+
+## Why store sessions in Redis instead of cookies or a database?
+
+Redis stores the session payload server-side and gives you sub-millisecond reads, automatic expiry, and instant revocation. A cookie can hold the session ID, but the data behind it stays in Redis where the client can't see or change it.
+
+There are three options:
+
+- A cookie-only session that stores the data in the browser
+- A database row works, but every authenticated request reads it, and that read adds load to your main database
+- Redis keeps session data in memory keyed by a session ID, with a TTL that removes it when it expires
+
+To revoke a Redis session, we can just delete one key. The next request will read null and the user is automatically logged out.
+
+A signed JWT can't do that on its own, because the token stays valid until it expires (there are workarounds to still make this work, though).
+
+![](https://cdn.bydefault.so/IEUatOZ8v5SlxQzZ6NrvZ.png)
+
+## How does Redis session storage work?
+
+The server gives each client a (randomly generated) session ID in an HttpOnly cookie, and Redis stores the session data under that ID with a TTL (time to live). Every request sends the cookie, the server reads Redis by the ID, and the cookie itself never carries any session data.
+
+1. On login, the server creates a session ID and writes the payload to Redis with an expiry.
+2. It sets the ID in an HttpOnly cookie on the response.
+3. On later requests, the server reads the cookie, looks up the ID in Redis, and gets the session.
+4. On logout, the server deletes the Redis key and clears the cookie.
+
+The cookie contains an ID, nothing else. Someone who steals it still can't read any user data like their email or role inside the session, and we can delete it (and thereby invalidate the user session) on the server-side at any time.
+
+![](https://cdn.bydefault.so/7Sx2KSFzS3EMiwHicsg8n.png)
+
+## Setting up Upstash Redis for session storage
+
+Create a database in the Upstash console, then copy the REST URL and token into your environment. The Upstash Redis client is HTTP-based, so it works in serverless functions and on the edge without a connection pool.
+
+Tip: You can just make a request to https://upstash.com/start-redis to create a free Upstash Redis database with out sign-in or API key required. Great to start fast and you can claim it later.
+
+```ts
+import { Redis } from "@upstash/redis";
+
+const redis = Redis.fromEnv();
+```
+
+## Pattern 1: Roll your own session store (Next.js App Router)
+
+Use the Upstash Redis client directly with the Next.js cookies API. We generate a session ID, write the payload with a TTL, and read it back by ID on each request.
+
+Here is a session module. It stores the session as a JSON value with a 30-minute expiry, refreshes that expiry on every read, and deletes the key on logout.
+
+```ts
+import { Redis } from "@upstash/redis";
+import { randomUUID } from "node:crypto";
+
+const redis = Redis.fromEnv();
+
+const SESSION_TTL_SECONDS = 60 * 30; // 30 minutes
+
+export type SessionData = {
+  userId: string;
+  email: string;
+  createdAt: number;
+};
+
+function sessionKey(sessionId: string) {
+  return `session:${sessionId}`;
+}
+
+export async function createSession(data: Omit<SessionData, "createdAt">) {
+  const sessionId = randomUUID();
+  const payload: SessionData = { ...data, createdAt: Date.now() };
+  await redis.set(sessionKey(sessionId), payload, { ex: SESSION_TTL_SECONDS });
+  return sessionId;
+}
+
+export async function getSession(sessionId: string) {
+  const data = await redis.get<SessionData>(sessionKey(sessionId));
+  if (!data) return null;
+  // Sliding expiration: refresh TTL on read.
+  await redis.expire(sessionKey(sessionId), SESSION_TTL_SECONDS);
+  return data;
+}
+
+export async function destroySession(sessionId: string) {
+  await redis.del(sessionKey(sessionId));
+}
+```
+
+In a Server Action or Route Handler, we tie that session ID to a cookie. In Next.js 16 the cookies function is [async and returns a promise](https://nextjs.org/docs/app/api-reference/functions/cookies):
+
+```ts
+import { cookies } from "next/headers";
+import { createSession } from "@/lib/session";
+
+export async function login(userId: string, email: string) {
+  const sessionId = await createSession({ userId, email });
+  const cookieStore = await cookies();
+  cookieStore.set("sid", sessionId, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 60 * 30,
+    path: "/",
+  });
+}
+```
+
+## Pattern 2: Express / Node.js sessions with Upstash
+
+The session module from Pattern 1 works unchanged in Express, because the Upstash SDK runs in plain Node too. Express reads and writes the session ID cookie with cookie-parser, and the three session functions do the Redis work.
+
+```ts
+import cookieParser from "cookie-parser";
+import express from "express";
+import { createSession, destroySession, getSession } from "./lib/session";
+
+const app = express();
+
+app.use(express.json());
+app.use(cookieParser());
+
+app.post("/login", async (req, res) => {
+  const userId = req.body?.userId ?? "demo-user"; // replace with your verified user
+  const email = req.body?.email ?? "demo@example.com";
+
+  const sessionId = await createSession({ userId, email });
+
+  res.cookie("sid", sessionId, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 1000 * 60 * 30,
+    path: "/",
+  });
+
+  res.status(204).end();
+});
+
+app.get("/me", async (req, res) => {
+  const session = req.cookies.sid ? await getSession(req.cookies.sid) : null;
+  if (!session) {
+    res.status(401).json({ authenticated: false });
+    return;
+  }
+  res.json(session);
+});
+
+app.post("/logout", async (req, res) => {
+  if (req.cookies.sid) await destroySession(req.cookies.sid);
+  res.clearCookie("sid");
+  res.status(204).end();
+});
+```
+
+The login route creates a fresh session ID every time, so a pre-login ID can never be reused. The logout route deletes the Redis key first, then clears the cookie, so the session is gone server-side even if the cookie lingers.
+
+## Pattern 3: Better Auth with Upstash Redis as secondary storage
+
+Better Auth handles login, providers, and sessions, and its secondary storage feature moves session data into a key-value store like Upstash Redis. [Secondary storage holds session data, verification records, and rate limiting counters](https://better-auth.com/docs/concepts/database#secondary-storage), so those short-lived records go to Redis instead of your main database.
+
+![](https://cdn.bydefault.so/s4cyaX5zMw5nA6eHAvwUl.png)
+
+We can give Better Auth an object with three methods: get, set, and delete. The set method takes a ttl in seconds, which maps to the expiry option on the Upstash client.
+
+```ts
+import type { SecondaryStorage } from "better-auth";
+import { Redis } from "@upstash/redis";
+
+const redis = Redis.fromEnv();
+
+export const redisSecondaryStorage: SecondaryStorage = {
+  async get(key) {
+    return (await redis.get<string>(key)) ?? null;
+  },
+  async set(key, value, ttl) {
+    if (ttl) {
+      await redis.set(key, value, { ex: ttl });
+    } else {
+      await redis.set(key, value);
+    }
+  },
+  async delete(key) {
+    await redis.del(key);
+  },
+};
+```
+
+And we pass that object to the betterAuth config. [Once you provide a secondary storage, Better Auth stores the session there instead of the database](https://better-auth.com/docs/concepts/session-management#sessions-in-secondary-storage). The session expires after 7 days by default, which we can adjust with the expiresIn field.
+
+```ts
+import { betterAuth } from "better-auth";
+import { redisSecondaryStorage } from "./redis-secondary-storage";
+
+export const auth = betterAuth({
+  secondaryStorage: redisSecondaryStorage,
+  session: {
+    expiresIn: 60 * 60 * 24 * 7, // 7 days
+  },
+});
+```
+
+If you want the session row to stay in your main database too, [set the storeSessionInDatabase option to true](https://better-auth.com/docs/concepts/session-management#storing-sessions-in-the-database) and Better Auth writes to both.
+
+## How to protect routes using session validation in Next.js Proxy
+
+In Next.js 16, middleware was renamed to Proxy. We put the file at `proxy.ts` and export a function named proxy.
+
+In here we read the session cookie and look it up in Redis before the page renders:
+
+```ts
+import { NextRequest, NextResponse } from "next/server";
+import { getSession } from "./lib/session";
+
+const SESSION_COOKIE_NAME = "sid";
+
+export async function proxy(request: NextRequest) {
+  const sessionId = request.cookies.get(SESSION_COOKIE_NAME)?.value;
+
+  if (!sessionId) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  const session = await getSession(sessionId);
+  if (!session) {
+    const response = NextResponse.redirect(new URL("/login", request.url));
+    response.cookies.delete(SESSION_COOKIE_NAME);
+    return response;
+  }
+
+  const response = NextResponse.next();
+  response.headers.set("x-user-id", session.userId);
+  return response;
+}
+
+export const config = {
+  matcher: ["/dashboard/:path*"],
+};
+```
+
+The matcher limits this to dashboard routes. A request with no cookie or an expired session gets redirected to login, and a stale cookie gets cleared on the redirect response.
+
+## How to handle session expiry, rolling TTL, and revocation
+
+Set a TTL when you create the session, refresh it on each read for a sliding window, and delete the key to revoke. Redis removes an expired key automatically, so a forgotten session expires without any cleanup code.
+
+There are two expiry styles:
+
+- Absolute expiry: the session dies a fixed time after login, no matter the activity. You set the expiry once and never touch it.
+- Sliding expiry: the session dies after a period of no activity. You refresh the expiry on each read to push the deadline forward, which is what the read function above does.
+
+To revoke a session, we can just delete it from Redis. Or to sign a user out everywhere, we can store each session ID under a per-user set and delete them together:
+
+```ts
+import { Redis } from "@upstash/redis";
+
+const redis = Redis.fromEnv();
+
+export async function revokeAllSessions(userId: string) {
+  const ids = await redis.smembers<string[]>(`user-sessions:${userId}`);
+  if (ids.length === 0) return;
+  await redis.del(...ids.map((id) => `session:${id}`));
+  await redis.del(`user-sessions:${userId}`);
+}
+```
+
+A stateless token stays valid until it expires, so "sign out all devices" needs a server-side record like this set.
+
+## Security checklist for Redis-backed sessions in production
+
+Store only an opaque ID in the cookie, set the cookie flags that block theft and cross-site sends, and rotate the ID on login. Keep the session data in Redis behind a TTL.
+
+- Mark the cookie HttpOnly so client JavaScript can't read it.
+- Mark the cookie Secure in production so it only travels over HTTPS.
+- Set SameSite to Lax so the cookie isn't sent on cross-site requests.
+- Put a random ID in the cookie, never the email, role, or any session field.
+- Create a fresh session ID on login so a pre-login ID can't be reused.
+- Delete the Redis key and clear the cookie on logout.
+- Set a TTL on every session so an abandoned one expires.
+
+Every Upstash database runs over TLS, so the connection between your app and Redis is encrypted with no extra config.
+
+## Which session pattern should you choose?
+
+All three patterns use one Upstash database. The difference is how much session logic you write yourself versus how much a library handles.
+
+| Pattern | Best for | Tradeoff |
+| --- | --- | --- |
+| Roll your own | Next.js App Router, full control | You write the session, cookie, and proxy logic yourself |
+| Express routes | Express and Node.js APIs | You wire the cookie and routes by hand |
+| Better Auth | OAuth providers, managed login, secondary storage in Redis | Less control over the session shape and storage |
+
+I use better auth for my projects and really, really like it!!
