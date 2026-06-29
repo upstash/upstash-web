@@ -130,7 +130,7 @@ Azure Cache is the obvious choice when you're on Azure with existing commitments
 
 ![Valkey DigitalOcean Pricing 2026](https://cdn.contentport.io/chat/Sw016rSl6asUNtj0EpHf3DiBcD0ot3sQ/pTv5twBa8qi569ISWFF5l.png)
 
-DigitalOcean is the right fit if you want a predictable monthly number and no Redis modules to worry about.
+So both DigitalOcean and Upstash Redis are a good fit if you want a predictable monthly number and no Redis modules to worry about.
 
 ### Aiven
 
@@ -222,7 +222,7 @@ Here's what each provider charges for that 50 GB:
 
 High availability works differently across the billing models. For the per-node providers HA means a second node, so the cost is at least double a single node. Reserved ElastiCache nodes are the cheapest replicated cache at $221.
 
-DigitalOcean's flat $480 is the easiest to predict.
+All providers with flat pricing (Upstash Redis, Redis Cloud, DigitalOcean) are easy to predict.
 
 Azure Premium P2 is the most expensive here because Premium bundles clustering and persistence this workload may not need. The Standard tier is cheaper without them.
 
@@ -268,13 +268,13 @@ What Valkey does not include is the Redis modules: RediSearch, RedisJSON, RedisT
 
 ## How to choose
 
-- **Upstash** if the app is serverless and/or you want the best-in-class developer experience. Also if you are using an agent to write code (Claude Code, Codex, etc.) they have the easiest time with Upstash. Pay-as-you-go is easy to start or use a fixed plan once command volume is high and steady.
+- **Upstash** if the app is serverless and/or you want the best-in-class developer experience. Also if you are using an agent to write code (Claude Code, Codex, etc.) they have the easiest time with Upstash. Pay-as-you-go is easy to start or use a fixed plan for flat, predictable pricing.
 - **AWS ElastiCache** if the stack is on AWS with steady, high-throughput caching and reserved nodes fit the budget.
 - **AWS MemoryDB** if Redis is the primary database and the workload needs durability and zero-loss failover, and the premium cost is acceptable.
 - **Redis Cloud** if the workload needs Redis modules like RediSearch, or Active-Active writes across regions.
 - **Google Memorystore** if the stack is on GCP, so co-location avoids egress, and committed-use discounts fit the forecast.
 - **Azure Cache for Redis** if the app is on Azure with existing commitments and compliance needs.
-- **DigitalOcean** if you want one flat, predictable number and don't need modules.
+- **DigitalOcean** if you are already familiar with the platform and don't need modules.
 - **Aiven** if portability across clouds is the goal.
 - **Railway** if Redis should run next to the rest of the app on one platform and self-managing the instance is acceptable.
 
