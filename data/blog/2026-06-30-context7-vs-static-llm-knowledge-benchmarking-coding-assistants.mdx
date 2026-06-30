@@ -24,12 +24,12 @@ To answer this, we benchmarked the same language model in an internet-isolated e
 Both systems had the exact same conditions:
 
 * Claude Sonnet 4.5 as the model
-* Identical prompts except for telling LLM to 
-    * "Answer only with your own knowledge. Don't use search or mcp."
+* Identical prompts except for telling the LLM to 
+    * "Answer only with your own knowledge. Don't use search or MCP."
     * "Use Context7 for library documentation."
 * Separate projects to isolate execution environments
 
-The only difference was the documentation access.
+The only difference was access to the documentation.
 
 Questions were specifically selected to target APIs, patterns, and libraries that had changed or were introduced after the model's training cutoff — the exact scenario where static knowledge is most likely to fail.
 
@@ -38,7 +38,7 @@ Questions were specifically selected to target APIs, patterns, and libraries tha
 * No web search
 * No MCP retrieval
 * No internet access
-* Model relied solely on built-in knowledge
+* The model relied solely on built-in knowledge
 
 #### Context7
 
@@ -80,7 +80,7 @@ Each response was evaluated using the following criteria:
 
 ## Overall Results
 
-Across all 50 benchmark questions, the same language model behaved dramatically different depending on whether current documentation was available.
+Across all 50 benchmark questions, the same language model behaved dramatically differently depending on whether current documentation was available.
 
 | Metric                             |    Static LLM |    Context7 |
 | ---------------------------------- | ------------: | ----------: |
@@ -108,7 +108,7 @@ This category covered frequently updated libraries with recent API changes.
 #### Static LLM knowledge
 
 * **80%** of questions relied on legacy APIs or implementation patterns.
-* **20%** generated code that was no longer runnable because removed APIs or obsolete configuration were used.
+* **20%** of the generated code was no longer runnable because removed APIs or obsolete configurations were used.
 * Functional issues appeared in half of the questions.
 
 The dominant failure mode was **stale knowledge**, not hallucination.
@@ -242,7 +242,7 @@ This benchmark evaluates exactly that scenario.
 
 ## Conclusion
 
-Without access to current documentation, LLMs in air-gapped environments will silently fall behind — their knowledge frozen at the model's training cutoff. In the best case they generate code that still runs but no longer follows current best practices, recommended APIs or newly introduced features. In the worst case they lack enough knowledge to answer at all and refuse outright.
+Without access to current documentation, LLMs in air-gapped environments will silently fall behind — their knowledge frozen at the model's training cutoff. In the best case, they generate code that still runs but no longer follows current best practices, recommended APIs or, newly introduced features. In the worst case, they lack enough knowledge to answer at all and refuse outright.
 
 To stay current without Context7, teams would need to manually track library changes, curate documentation, and feed updates into the model themselves. Context7 acts as a hub for up-to-date documentation and releases developers from that work entirely.
 
