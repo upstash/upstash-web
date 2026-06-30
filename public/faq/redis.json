@@ -69,6 +69,14 @@
       "answer": "Prod Pack includes uptime SLA, SOC 2 Type 2 report, advanced monitoring with Prometheus, Grafana, and Datadog, multi-zone high availability, role-based access control, and encryption at rest."
     },
     {
+      "question": "Does enabling multi-zone high availability change my bill?",
+      "answer": "Multi-zone high availability (part of Prod Pack) replicates write commands to the additional zones. Reads still hit a single replica, and command counts per write do not change, so it is only the extra write replication that adds bandwidth. On Fixed plans, commands are never metered, so multi-zone HA adds no command cost; the added write-replication traffic counts toward your plan's included bandwidth. On pay-as-you-go, a write is still billed as a single command no matter how many zones it is replicated to in one region. The impact is on bandwidth, which is free up to 200GB per month and $0.03 per additional GB."
+    },
+    {
+      "question": "What happened to the Pro 2K and Pro 10K plans?",
+      "answer": "Pro 2K and Pro 10K were fixed-throughput dedicated plans, priced at $280/month and $680/month respectively. They are deprecated and have been replaced by pay-as-you-go, Fixed plans, and the Prod Pack add-on. If you are on a Pro plan, you can move to a Fixed plan for predictable pricing and add Prod Pack for multi-zone high availability and the uptime SLA."
+    },
+    {
       "question": "What is included in Enterprise subscription?",
       "answer": "Enterprise includes all Prod Pack features for all your databases. It also includes dedicated professional support, a dedicated technical account manager, unlimited databases, HIPAA compliance, VPC peering, SSO integration, and custom monthly or annual contract options."
     },

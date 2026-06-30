@@ -266,6 +266,50 @@ export default function FAQ() {
         </AccordionContent>
       </AccordionItem>
 
+      <AccordionItem value="item-21">
+        <AccordionTrigger>
+          Does enabling multi-zone high availability change my bill?
+        </AccordionTrigger>
+        <AccordionContent>
+          <p className="mt-4">
+            Multi-zone high availability (part of Prod Pack) replicates write
+            commands to the additional zones. Reads still hit a single replica,
+            and command counts per write do not change, so it is only the extra
+            write replication that adds bandwidth.
+          </p>
+          <p className="mt-4">
+            On Fixed plans, commands are never metered, so multi-zone HA adds no
+            command cost. The added write-replication traffic counts toward your
+            plan&apos;s included bandwidth.
+          </p>
+          <p className="mt-4">
+            On pay-as-you-go, a write is still billed as a single command no
+            matter how many zones it is replicated to. The impact is on
+            bandwidth, which is free up to 200GB per month and $0.03 per
+            additional GB, so a write-heavy database may notice it there.
+          </p>
+        </AccordionContent>
+      </AccordionItem>
+
+      <AccordionItem value="item-22">
+        <AccordionTrigger>
+          What happened to the Pro 2K and Pro 10K plans?
+        </AccordionTrigger>
+        <AccordionContent>
+          <p className="mt-4">
+            Pro 2K and Pro 10K were fixed-throughput dedicated plans, priced at
+            $280/month and $680/month respectively. They are deprecated and have
+            been replaced by pay-as-you-go, Fixed plans, and the Prod Pack
+            add-on.
+          </p>
+          <p className="mt-4">
+            If you are on a Pro plan, you can move to a Fixed plan for
+            predictable pricing and add Prod Pack for multi-zone high
+            availability and the uptime SLA.
+          </p>
+        </AccordionContent>
+      </AccordionItem>
+
       <AccordionItem value="item-18">
         <AccordionTrigger>
           What is included in Enterprise subscription?
