@@ -1,0 +1,251 @@
+---
+authors: [elifnur]
+slug: context7-vs-static-llm-knowledge-benchmarking-coding-assistants
+tags: [ai, llm, mcp, coding-assistants, developer-tools]
+title: "Context7 vs Static LLM Knowledge: Benchmarking Coding Assistants in Air-Gapped Environments"
+---
+
+
+Large language models are trained on a snapshot of the software ecosystem. As documentation evolves, APIs change, and new libraries appear, that knowledge inevitably becomes outdated.
+
+This raises an important question:
+> **How well can a coding assistant stay up to date and accurate without internet access?**
+
+To answer this, we benchmarked the same language model in an internet-isolated environment under two configurations:
+
+* **Static model knowledge only** — no internet access, web search, or documentation retrieval.
+* **Context7** — the same model with access to only Context7.
+
+
+---
+
+## Benchmark setup
+
+Both systems had the exact same conditions:
+
+* Claude Sonnet 4.5 as the model
+* Identical prompts except for telling LLM to 
+    * "Answer only with your own knowledge. Don't use search or mcp."
+    * "Use Context7 for library documentation."
+* Separate projects to isolate execution environments
+
+The only difference was the documentation access.
+
+Questions were specifically selected to target APIs, patterns, and libraries that had changed or were introduced after the model's training cutoff — the exact scenario where static knowledge is most likely to fail.
+
+#### Baseline
+
+* No web search
+* No MCP retrieval
+* No internet access
+* Model relied solely on built-in knowledge
+
+#### Context7
+
+* Same model
+* Same prompts
+* Same isolated environment
+* Only Context7 documentation available
+
+---
+
+## Benchmark categories
+
+The benchmark contains **50 questions** divided into five categories.
+
+| Category            | Purpose                                          |
+| ------------------- | ------------------------------------------------ |
+| Evolving libraries  | Frequently updated libraries with recent API changes |
+| Niche libraries     | Less common libraries with limited documentation   |
+| Popular libraries   | Widely used mainstream libraries           |
+| Unspecified queries | Library name omitted from the prompt               |
+| Multiple libraries  | Projects combining multiple libraries    |
+
+---
+
+## Evaluation metrics
+
+Each response was evaluated using the following criteria:
+
+* **Runnable:** The generated code compiles or executes successfully without syntax, compilation, or runtime errors.
+* **Current documentation compliance:** The response follows the latest official documentation and recommended APIs available at the time of the benchmark.
+* **Legacy APIs / Patterns:** The response relies on deprecated or older APIs, configuration formats, or implementation patterns that are still supported but are no longer the recommended approach.
+* **Removed APIs / Features:** The response uses APIs, models, configuration options, or features that have been removed and are no longer supported by the latest documentation.
+* **Hallucinations:** The response references APIs, configuration options, commands, or behaviors that do not exist in the official documentation.
+* **Functional errors:** The response fails to satisfy one or more explicit requirements of the prompt, even if the generated code is runnable.
+* **Refusals:** The model explicitly declines to answer or states that it does not have sufficient knowledge to provide a reliable response.
+
+
+---
+
+## Overall Results
+
+Across all 50 benchmark questions, the same language model behaved dramatically different depending on whether current documentation was available.
+
+| Metric                             |    Static LLM |    Context7 |
+| ---------------------------------- | ------------: | ----------: |
+| **Questions**                      |            50 |          50 |
+| **Runnable Failures**              |  **13** (26%) |  **1** (2%) |
+| **Current Documentation Failures** | **50** (100%) | **8** (16%) |
+| **Legacy APIs / Patterns**         |        **72** |       **8** |
+| **Removed APIs / Features**        |         **2** |       **0** |
+| **Hallucinated APIs**              |        **10** |       **0** |
+| **Functional Errors**              |        **43** |       **1** |
+| **Refusals**                       |         **8** |       **0** |
+
+The largest difference was not hallucination, it was stale knowledge. The baseline model frequently generated runnable code that relied on outdated APIs and implementation patterns, whereas Context7 generally produced current implementations with only a handful of minor legacy details.
+
+---
+
+## Results by Categories
+
+The failure patterns differed significantly across categories.
+
+### Evolving libraries
+
+This category covered frequently updated libraries with recent API changes.
+
+#### Static LLM knowledge
+
+* **80%** of questions relied on legacy APIs or implementation patterns.
+* **20%** generated code that was no longer runnable because removed APIs or obsolete configuration were used.
+* Functional issues appeared in half of the questions.
+
+The dominant failure mode was **stale knowledge**, not hallucination.
+
+#### Context7
+Context7 generated runnable, up-to-date implementations for all ten questions.
+
+The only minor issue observed was a single response that used the legacy `web_search_preview` tool name instead of the current `web_search` API. Despite this, the generated implementation remained runnable and otherwise reflected the latest documentation.
+
+---
+
+### Niche libraries
+
+This category covered less common libraries with limited documentation, such as Notte, Mastra, Trigger.dev, Inngest, Effect, ElectricSQL, and others.
+
+The failure pattern changed completely. Instead of hallucinating, the baseline model simply lacked sufficient knowledge.
+
+#### Static LLM knowledge
+
+* **80%** of questions resulted in an explicit refusal or acknowledgement of insufficient knowledge.
+* The remaining **20%** produced incomplete and legacy implementations.
+
+Rather than hallucinating unfamiliar APIs, the model generally chose to admit it lacked sufficient knowledge.
+
+#### Context7
+
+Context7 successfully answered every question using imported documentation.
+
+Two generated projects (Encore and Convex) initially failed to run because of project initialization and manually created scaffolding rather than incorrect documentation. Once the projects were initialized correctly, the generated application code required no changes.
+
+This category demonstrates the value of documentation retrieval for ecosystems that receive relatively little representation in model training.
+
+---
+
+### Popular libraries
+Even well-known ecosystems continue to evolve rapidly.
+
+Questions covered projects such as React, Next.js, Astro, Tailwind CSS, Playwright, Django, Cloudflare Workers, and Apple's Foundation Models.
+
+#### Static LLM knowledge
+
+* **80%** of questions relied on outdated guidance.
+* Multiple answers remained runnable while still recommending older APIs.
+* Hallucinated API surfaces appeared for newly introduced frameworks such as Apple's Foundation Models.
+
+This highlights an important distinction:
+> Runnable does not necessarily mean current.
+
+#### Context7
+
+Context7 produced current answers for every evaluated question. No documentation discrepancies were observed.
+
+---
+
+### Unspecified library queries
+These prompts intentionally omitted library names. The model first had to infer the correct ecosystem before answering.
+
+#### Static LLM knowledge
+
+* **70%** of questions relied on outdated documentation.
+* **30%** contained hallucinated APIs or incorrect claims that valid APIs did not exist.
+* Runnable code often still reflected previous versions of the documentation.
+
+
+#### Context7
+
+Context7 consistently resolved the correct library before retrieving documentation.
+
+Nine of the ten responses matched the latest documentation. One response used the legacy `web_search_preview` tool name, but otherwise generated the correct implementation.
+
+---
+
+### Multiple-library integration
+
+This proved to be the most difficult category.
+
+Generating correct solutions required combining multiple independently evolving libraries.
+
+Examples included:
+
+* Next.js + Better Auth
+* React Router + Cloudflare Workers
+* OpenAI Agents SDK + MCP
+* Expo + Supabase
+* And many others
+
+#### Static LLM knowledge
+
+* **60%** of projects failed to run successfully.
+* Every question relied on at least one outdated integration pattern.
+* Many failures resulted from combining libraries that had individually changed since the model's training cutoff.
+
+#### Context7
+
+* **90%** of projects ran successfully without modification.
+* **60%** of responses fully matched the latest documentation.
+* **40%** used minor legacy implementation details while remaining functional.
+
+The remaining differences were comparatively minor. Three responses used slightly older but still functional patterns, such as the legacy tool name, an older Expo Router authentication approach, and a previous Better Auth adapter import path.
+
+In one notable case, the model explicitly acknowledged that Context7 had returned the correct current documentation — yet still generated the legacy pattern. This suggests that deeply ingrained training knowledge can sometimes override retrieved context even when the correct information is available.
+
+---
+
+## Why benchmark air-gapped environments?
+
+Many organizations intentionally deploy AI coding assistants without internet access.
+
+Examples include:
+
+* enterprise development platforms
+* financial institutions
+* government networks
+* defense environments
+* regulated healthcare systems
+* air-gapped CI/CD pipelines
+
+These environments intentionally block outbound internet connections to protect proprietary code, satisfy compliance requirements, or reduce supply-chain risk. As a result, coding assistants cannot retrieve current documentation and must rely entirely on the knowledge learned during training. As libraries evolve, this can lead to:
+
+* outdated APIs
+* deprecated implementation patterns
+* hallucinated interfaces
+* inability to answer questions about newer libraries
+
+Context7 Enterprise supports [importing documentation](https://context7.com/docs/enterprise/library-import) directly into an organization's environment, where it is stored and served locally — allowing documentation retrieval to continue entirely offline without any outbound requests at query time. Imported documentation is also [analyzed for prompt injection attempts and other malicious content](https://context7.com/docs/security/data-safety) before it becomes available to AI assistants. In regulated or high-security environments, this provides an additional safety guarantee: the documentation the model retrieves cannot be used as an attack vector.
+
+This benchmark evaluates exactly that scenario.
+
+---
+
+
+## Conclusion
+
+Without access to current documentation, LLMs in air-gapped environments will silently fall behind — their knowledge frozen at the model's training cutoff. In the best case they generate code that still runs but no longer follows current best practices, recommended APIs or newly introduced features. In the worst case they lack enough knowledge to answer at all and refuse outright.
+
+To stay current without Context7, teams would need to manually track library changes, curate documentation, and feed updates into the model themselves. Context7 acts as a hub for up-to-date documentation and releases developers from that work entirely.
+
+Providing the same model with Context7 documentation substantially reduced all failure modes without requiring internet access — the model could stay current and answer questions it would have otherwise failed.
+
+Context7 extends the model's reasoning with current documentation, including in enterprise and air-gapped environments where live web search is intentionally unavailable.
