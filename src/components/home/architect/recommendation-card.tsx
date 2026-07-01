@@ -22,8 +22,8 @@ const PRODUCT_ICON: Record<
 };
 
 function cost(n: number | null): string {
-  if (n == null) return "Custom";
-  if (n === 0) return "Free";
+  if (n == null) { return "Custom"; }
+  if (n === 0) { return "Free"; }
   return `$${n % 1 === 0 ? n : n.toFixed(2)}`;
 }
 

@@ -2,10 +2,11 @@
 
 import Container from "@/components/container";
 import cx from "@/utils/cx";
-import { IconArrowUp, IconSparkles } from "@tabler/icons-react";
+import { IconArrowUp, IconSparkles, IconX } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Blueprint from "./recommendation-card";
-import { useArchitect } from "./use-architect";
+import { type UiMessage, useArchitect } from "./use-architect";
 
 const EXAMPLES = [
   "RAG chatbot, ~50k requests/day, semantic search over 2M docs, a daily cron, EU + US regions, need SOC-2.",
@@ -13,29 +14,32 @@ const EXAMPLES = [
   "Vector search over 10M embeddings with unlimited queries and 99.9% SLA.",
 ];
 
+const strip = (s?: string) => (s ? s.replace(/\s+/g, " ").trim() : "");
+
 export default function ArchitectSection() {
   const { messages, loading, send, reset } = useArchitect();
   const [input, setInput] = useState("");
+  const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const resultsRef = useRef<HTMLDivElement>(null);
 
   // Avoid hydration mismatch from the persisted store.
   useEffect(() => setMounted(true), []);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: scroll to newest result
-  useEffect(() => {
-    if (messages.length > 0)
-      resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [messages.length, loading]);
+  const hasMessages = mounted && messages.length > 0;
+  const lastUser = [...messages].reverse().find((m) => m.role === "user")?.text;
 
-  const submit = (e?: React.FormEvent) => {
-    e?.preventDefault();
-    const text = input;
+  const submit = () => {
+    const text = strip(input);
+    if (!text) { return; }
     setInput("");
+    setOpen(true);
     void send(text);
   };
 
-  const hasConversation = mounted && messages.length > 0;
+  const runExample = (ex: string) => {
+    setOpen(true);
+    void send(ex);
+  };
 
   return (
     <section className="relative z-0 py-10 md:py-16">
@@ -57,82 +61,201 @@ export default function ArchitectSection() {
           from a plain-text description.
         </p>
 
-        {/* input card with gradient glow */}
-        <form
-          onSubmit={submit}
-          className="mx-auto mt-8 max-w-3xl"
-          aria-label="Describe your project"
-        >
-          <div
-            className={cx(
-              "relative rounded-3xl p-[1.5px] transition",
-              "bg-gradient-to-r from-primary-text/60 via-primary/60 to-amber-500/60",
-              "focus-within:from-primary-text focus-within:via-primary focus-within:to-amber-500",
-              "shadow-[0_8px_40px_-12px] shadow-primary/30",
-            )}
-          >
-            <div className="flex items-end gap-2 rounded-[calc(1.5rem-1.5px)] bg-bg p-2.5">
-              <textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) submit();
-                }}
-                rows={2}
-                placeholder="e.g. RAG chatbot, 50k requests/day, semantic search over 2M docs, EU + US, SOC-2…"
-                className={cx(
-                  "flex-1 resize-none bg-transparent px-3 py-2 text-left text-sm text-text md:text-base",
-                  "placeholder:text-text-mute focus:outline-none",
-                )}
+        <div className="mx-auto mt-8 max-w-3xl">
+          {hasMessages ? (
+            // Collapsed one-liner: shows the last customer message, reopens the modal.
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              className={cx(
+                "group flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3.5 text-left",
+                "transition hover:border-white/25 hover:bg-white/5",
+              )}
+            >
+              <IconSparkles
+                size={18}
+                className="shrink-0 text-primary-text"
               />
-              <button
-                type="submit"
-                disabled={loading || !input.trim()}
-                aria-label="Generate blueprint"
-                className={cx(
-                  "grid size-11 shrink-0 place-items-center rounded-2xl bg-primary text-white transition",
-                  "hover:bg-primary-text disabled:opacity-40",
-                )}
-              >
-                <IconArrowUp size={20} />
-              </button>
+              <span className="min-w-0 flex-1 truncate text-sm text-text-mute">
+                {loading ? "Designing your blueprint…" : strip(lastUser)}
+              </span>
+              <span className="shrink-0 rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-text-mute group-hover:text-text">
+                Continue
+              </span>
+            </button>
+          ) : (
+            <>
+              <PromptInput
+                value={input}
+                onChange={setInput}
+                onSubmit={submit}
+                loading={loading}
+                placeholder="e.g. RAG chatbot, 50k requests/day, semantic search over 2M docs, EU + US, SOC-2…"
+              />
+              <div className="mt-4 flex flex-wrap justify-center gap-2">
+                {EXAMPLES.map((ex) => (
+                  <button
+                    key={ex}
+                    type="button"
+                    onClick={() => runExample(ex)}
+                    disabled={loading}
+                    title={ex}
+                    className={cx(
+                      "max-w-full truncate rounded-full border border-white/10 px-3 py-1.5 text-xs text-text-mute",
+                      "transition hover:border-white/25 hover:bg-white/5 hover:text-text disabled:opacity-40",
+                    )}
+                  >
+                    {ex}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </Container>
+
+      {mounted &&
+        open &&
+        createPortal(
+          <ArchitectModal
+            messages={messages}
+            loading={loading}
+            input={input}
+            setInput={setInput}
+            onSubmit={submit}
+            onClose={() => setOpen(false)}
+            onReset={() => {
+              reset();
+              setOpen(false);
+            }}
+          />,
+          document.body,
+        )}
+    </section>
+  );
+}
+
+/* ─────────────────────────────── modal ─────────────────────────────── */
+
+function ArchitectModal({
+  messages,
+  loading,
+  input,
+  setInput,
+  onSubmit,
+  onClose,
+  onReset,
+}: {
+  messages: UiMessage[];
+  loading: boolean;
+  input: string;
+  setInput: (v: string) => void;
+  onSubmit: () => void;
+  onClose: () => void;
+  onReset: () => void;
+}) {
+  const bodyRef = useRef<HTMLDivElement>(null);
+
+  // Lock page scroll + close on Escape while the modal is open.
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { onClose(); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [onClose]);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: scroll to newest on change
+  useEffect(() => {
+    bodyRef.current?.scrollTo({
+      top: bodyRef.current.scrollHeight,
+      behavior: "smooth",
+    });
+  }, [messages.length, loading]);
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-0 sm:p-4 md:p-6"
+      // biome-ignore lint/a11y/useSemanticElements: custom full-screen overlay; native <dialog> not suitable
+      role="dialog"
+      aria-modal="true"
+      aria-label="Upstash Architect"
+    >
+      {/* backdrop */}
+      <button
+        type="button"
+        aria-label="Close"
+        onClick={onClose}
+        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+      />
+
+      {/* panel */}
+      <div
+        className={cx(
+          "relative flex h-full w-full flex-col overflow-hidden bg-bg text-left",
+          "sm:h-[90vh] sm:max-w-4xl sm:rounded-3xl sm:border sm:border-white/10 sm:shadow-2xl",
+        )}
+      >
+        {/* header */}
+        <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+          <div className="flex items-center gap-2">
+            <IconSparkles size={20} className="text-primary-text" />
+            <div>
+              <div className="font-display font-semibold text-text">
+                Upstash Architect
+              </div>
+              <div className="text-xs text-text-mute">
+                Products, plans & cost from a description
+              </div>
             </div>
           </div>
+          <div className="flex items-center gap-1">
+            {messages.length > 0 && (
+              <button
+                type="button"
+                onClick={onReset}
+                className="rounded-lg px-3 py-1.5 text-xs text-text-mute transition hover:bg-white/5 hover:text-text"
+              >
+                New
+              </button>
+            )}
+            <button
+              type="button"
+              aria-label="Close"
+              onClick={onClose}
+              className="rounded-lg p-2 text-text-mute transition hover:bg-white/5 hover:text-text"
+            >
+              <IconX size={20} />
+            </button>
+          </div>
+        </div>
 
-          {/* example chips */}
-          {!hasConversation && (
-            <div className="mt-4 flex flex-wrap justify-center gap-2">
-              {EXAMPLES.map((ex) => (
-                <button
-                  key={ex}
-                  type="button"
-                  onClick={() => void send(ex)}
-                  disabled={loading}
-                  className={cx(
-                    "max-w-full truncate rounded-full border border-white/10 px-3 py-1.5 text-xs text-text-mute",
-                    "transition hover:border-white/25 hover:bg-white/5 hover:text-text disabled:opacity-40",
-                  )}
-                  title={ex}
-                >
-                  {ex}
-                </button>
-              ))}
-            </div>
-          )}
-        </form>
+        {/* messages */}
+        <div
+          ref={bodyRef}
+          className="flex-1 overflow-y-auto px-4 py-6 md:px-8"
+        >
+          <div className="mx-auto max-w-3xl space-y-6">
+            {messages.length === 0 && (
+              <p className="text-center text-sm text-text-mute">
+                Describe what you're building to get started.
+              </p>
+            )}
 
-        {/* results */}
-        {hasConversation && (
-          <div
-            ref={resultsRef}
-            className="mx-auto mt-8 max-w-3xl space-y-6 scroll-mt-24"
-          >
             {messages.map((m) =>
               m.role === "user" ? (
                 <div key={m.id} className="flex justify-center">
-                  <div className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1.5 text-sm text-text-mute">
-                    <IconSparkles size={14} className="text-primary-text" />
-                    <span className="line-clamp-1 text-left">{m.text}</span>
+                  <div className="inline-flex max-w-full items-center gap-2 rounded-full bg-white/5 px-4 py-1.5 text-sm text-text-mute">
+                    <IconSparkles
+                      size={14}
+                      className="shrink-0 text-primary-text"
+                    />
+                    <span className="truncate">{m.text}</span>
                   </div>
                 </div>
               ) : (
@@ -143,29 +266,100 @@ export default function ArchitectSection() {
                   {m.response ? (
                     <Blueprint data={m.response} />
                   ) : (
-                    <p className="text-left text-sm text-text-mute">{m.text}</p>
+                    <p className="text-sm text-text-mute">{m.text}</p>
                   )}
                 </div>
               ),
             )}
 
             {loading && <LoadingBlueprint />}
-
-            {!loading && (
-              <div className="flex justify-center">
-                <button
-                  type="button"
-                  onClick={reset}
-                  className="rounded-full px-4 py-1.5 text-xs text-text-mute transition hover:bg-white/5 hover:text-text"
-                >
-                  Start over
-                </button>
-              </div>
-            )}
           </div>
+        </div>
+
+        {/* input */}
+        <div className="border-t border-white/10 px-4 py-4 md:px-8">
+          <div className="mx-auto max-w-3xl">
+            <PromptInput
+              value={input}
+              onChange={setInput}
+              onSubmit={onSubmit}
+              loading={loading}
+              autoFocus
+              placeholder="Refine or ask a follow-up…"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────── shared bits ─────────────────────────────── */
+
+function PromptInput({
+  value,
+  onChange,
+  onSubmit,
+  loading,
+  placeholder,
+  autoFocus,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  onSubmit: () => void;
+  loading: boolean;
+  placeholder: string;
+  autoFocus?: boolean;
+}) {
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        onSubmit();
+      }}
+      aria-label="Describe your project"
+    >
+      <div
+        className={cx(
+          "relative rounded-3xl p-[1.5px] transition",
+          "bg-gradient-to-r from-primary-text/60 via-primary/60 to-amber-500/60",
+          "focus-within:from-primary-text focus-within:via-primary focus-within:to-amber-500",
+          "shadow-[0_8px_40px_-12px] shadow-primary/30",
         )}
-      </Container>
-    </section>
+      >
+        <div className="flex items-end gap-2 rounded-[calc(1.5rem-1.5px)] bg-bg p-2.5">
+          <textarea
+            // biome-ignore lint/a11y/noAutofocus: intentional focus when the modal opens
+            autoFocus={autoFocus}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                onSubmit();
+              }
+            }}
+            rows={2}
+            placeholder={placeholder}
+            className={cx(
+              "flex-1 resize-none bg-transparent px-3 py-2 text-left text-sm text-text md:text-base",
+              "placeholder:text-text-mute focus:outline-none",
+            )}
+          />
+          <button
+            type="submit"
+            disabled={loading || !value.trim()}
+            aria-label="Generate blueprint"
+            className={cx(
+              "grid size-11 shrink-0 place-items-center rounded-2xl bg-primary text-white transition",
+              "hover:bg-primary-text disabled:opacity-40",
+            )}
+          >
+            <IconArrowUp size={20} />
+          </button>
+        </div>
+      </div>
+    </form>
   );
 }
 

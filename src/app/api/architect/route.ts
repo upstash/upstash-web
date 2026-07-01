@@ -94,19 +94,34 @@ export async function POST(req: NextRequest) {
     return json(response);
   } catch (err) {
     if (err instanceof SpecValidationError) {
+      // Always log the full failure server-side: message, raw model output, and validation issues.
+      console.error(
+        `[architect] unclear_request (session=${sessionId}): ${err.message}`,
+        "\n  input:",
+        message,
+        "\n  raw:",
+        err.raw,
+        "\n  issues:",
+        err.issues,
+      );
       await auditAppend({
         sessionId,
         message,
         ok: false,
         reason: "spec_validation",
+        raw: typeof err.raw === "string" ? err.raw.slice(0, 2000) : err.raw,
         at: Date.now(),
       });
       return json({ error: "unclear_request" }, 422);
     }
     if (err instanceof Error && err.message === "box_not_configured") {
+      console.error("[architect] llm_unavailable: UPSTASH_BOX_API_KEY not set");
       return json({ error: "llm_unavailable" }, 503);
     }
-    console.error("architect route error", err);
+    console.error(
+      `[architect] internal_error (session=${sessionId}) for input: ${message}`,
+      err,
+    );
     return json({ error: "internal_error" }, 500);
   }
 }

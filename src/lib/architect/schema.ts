@@ -48,7 +48,10 @@ export type WorkloadSpec = z.infer<typeof WorkloadSpec>;
 export class SpecValidationError extends Error {
   constructor(
     message: string,
+    /** The raw model output that failed (text or parsed JSON). */
     public readonly raw?: unknown,
+    /** Zod validation issues, when the failure was a schema mismatch. */
+    public readonly issues?: unknown,
   ) {
     super(message);
     this.name = "SpecValidationError";
