@@ -52,10 +52,20 @@ function ProductCard({ p }: { p: ProductRecommendation }) {
         </div>
       </div>
 
-      {/* reason */}
-      <p className="mt-1.5 line-clamp-2 text-[11px] leading-snug text-text-mute">
-        {p.reason}
-      </p>
+      {/* reason + expandable "why" */}
+      <p className="mt-1.5 text-[11px] leading-snug text-text-mute">{p.reason}</p>
+      {p.reasoning && p.reasoning.length > 0 && (
+        <details className="mt-1 text-[11px] text-text-mute">
+          <summary className="cursor-pointer select-none text-primary-text/80 hover:text-primary-text">
+            Why?
+          </summary>
+          <ul className="mt-1 list-disc space-y-0.5 pl-4 leading-snug">
+            {p.reasoning.map((r) => (
+              <li key={r}>{r}</li>
+            ))}
+          </ul>
+        </details>
+      )}
 
       {/* limits — tight inline chips */}
       {limits.length > 0 && (
@@ -118,6 +128,13 @@ export default function Blueprint({ data }: { data: ChatResponse }) {
           </span>
         </div>
       </div>
+
+      {/* what we understood from the description */}
+      {rec.understood && (
+        <p className="mb-3 rounded-lg bg-white/[0.03] px-3 py-2 text-[11px] text-text-mute">
+          <span className="text-text">Understood:</span> {rec.understood}
+        </p>
+      )}
 
       {/* product grid — denser on wide screens */}
       <div className="grid gap-2 sm:grid-cols-2">

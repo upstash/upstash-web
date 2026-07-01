@@ -60,8 +60,19 @@ export const useArchitect = create<ArchitectStore>((set, get) => ({
         return;
       }
 
-      const response = (await res.json()) as ChatResponse;
-      set({ current: { query: trimmed, response }, loading: false });
+      const data = await res.json();
+      // Demo `clearhistory` command returns a notice, not a blueprint.
+      if (data?.cleared) {
+        set({
+          current: { query: trimmed, error: data.message as string },
+          loading: false,
+        });
+        return;
+      }
+      set({
+        current: { query: trimmed, response: data as ChatResponse },
+        loading: false,
+      });
     } catch {
       set({
         current: { query: trimmed, error: ERROR_TEXT.internal_error },

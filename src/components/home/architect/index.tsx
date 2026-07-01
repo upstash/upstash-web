@@ -148,6 +148,7 @@ export default function ArchitectSection() {
             onSubmit={submit}
             onClose={() => setOpen(false)}
             onNew={newRequest}
+            onPickExample={runExample}
           />,
           document.body,
         )}
@@ -165,6 +166,7 @@ function ArchitectModal({
   onSubmit,
   onClose,
   onNew,
+  onPickExample,
 }: {
   current: UiResult | null;
   loading: boolean;
@@ -173,6 +175,7 @@ function ArchitectModal({
   onSubmit: () => void;
   onClose: () => void;
   onNew: () => void;
+  onPickExample: (ex: string) => void;
 }) {
   // Lock page scroll + close on Escape while the modal is open.
   useEffect(() => {
@@ -271,9 +274,8 @@ function ArchitectModal({
                 {current.error}
               </p>
             ) : (
-              <p className="text-center text-sm text-text-mute">
-                Describe what you're building to get a blueprint.
-              </p>
+              // Empty state (incl. after "New request"): show the templates to pick from.
+              <ExampleCloud loading={loading} onPick={onPickExample} />
             )}
           </div>
         </div>
@@ -326,19 +328,19 @@ function ExampleCloud({
         <div
           ref={ref}
           onScroll={onScroll}
-          className="max-h-36 overflow-y-auto rounded-2xl border border-white/10 bg-white/[0.02] p-3"
+          className="max-h-56 overflow-y-auto rounded-2xl border border-white/10 bg-white/[0.02] p-2"
         >
-          <div className="flex flex-wrap justify-center gap-2 pb-2">
+          {/* One full example per line — readable, not truncated. */}
+          <div className="flex flex-col gap-0.5 pb-6">
             {EXAMPLES.map((ex) => (
               <button
                 key={ex}
                 type="button"
                 onClick={() => onPick(ex)}
                 disabled={loading}
-                title={ex}
                 className={cx(
-                  "max-w-xs truncate rounded-full border border-white/10 px-3 py-1.5 text-xs text-text-mute",
-                  "transition hover:border-white/25 hover:bg-white/5 hover:text-text disabled:opacity-40",
+                  "w-full rounded-lg px-3 py-2 text-left text-sm text-text-mute",
+                  "transition hover:bg-white/5 hover:text-text disabled:opacity-40",
                 )}
               >
                 {ex}

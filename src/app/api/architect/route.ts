@@ -6,6 +6,7 @@ import {
   cacheGet,
   cacheSet,
   checkRateLimit,
+  clearDemoState,
 } from "@/lib/architect/redis";
 import { SpecValidationError } from "@/lib/architect/schema";
 import { citationsFor } from "@/lib/architect/search";
@@ -24,6 +25,12 @@ export const maxDuration = 60;
 const Body = z.object({
   message: z.string().min(1).max(2000),
 });
+
+// Demo-only affordances (the `clearhistory` command) are available on preview
+// deployments and local dev, never in production.
+const IS_DEMO =
+  process.env.VERCEL_ENV === "preview" ||
+  process.env.NODE_ENV === "development";
 
 function clientId(req: NextRequest): string {
   const fwd = req.headers.get("x-forwarded-for");
@@ -50,6 +57,16 @@ export async function POST(req: NextRequest) {
     return json({ error: "bad_request" }, 400);
   }
   const { message } = body;
+
+  // Demo escape hatch (preview / local only): wipe cache + rate-limit keys so the same
+  // prompt can be re-run fresh. Runs before rate-limiting so it works even when limited.
+  if (IS_DEMO && message.trim().toLowerCase() === "clearhistory") {
+    const cleared = await clearDemoState();
+    return json({
+      cleared: true,
+      message: `Cleared ${cleared} key(s) — cache + rate limits reset.`,
+    });
+  }
 
   // 1. Ratelimit.
   const { success } = await checkRateLimit(clientId(req));

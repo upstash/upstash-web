@@ -57,6 +57,20 @@ describe("priceEngine — RAG chatbot worked example (doc §5)", () => {
     const r = product(rag, "Redis");
     expect(r.crossoverNote).toMatch(/beats pay-as-you-go/);
   });
+
+  it("attaches deterministic reasoning to every product", () => {
+    for (const p of rag.products) {
+      expect(Array.isArray(p.reasoning)).toBe(true);
+      expect(p.reasoning?.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("echoes the parsed spec and a human-readable summary", () => {
+    expect(rag.spec.products).toContain("search");
+    expect(rag.understood).toMatch(/50,000 requests\/day/);
+    expect(rag.understood).toMatch(/2,000,000 records/);
+    expect(rag.understood).toMatch(/features: soc2/);
+  });
 });
 
 describe("priceEngine — tier selection", () => {

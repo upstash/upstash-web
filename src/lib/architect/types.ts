@@ -1,6 +1,8 @@
 // Shared types for the Upstash Architect advisor.
 // NONE of the pricing types depend on the LLM — the deterministic engine owns them.
 
+import type { WorkloadSpec } from "./schema";
+
 export interface PlanOption {
   plan: string; // "Free" | "Pay-as-you-go" | "Fixed 250MB" | "Enterprise" | ...
   monthlyCost: number | null; // null = "Custom" / "Coming soon"
@@ -12,7 +14,8 @@ export interface PlanOption {
 export interface ProductRecommendation {
   product: string; // "Redis" | "Vector" | "QStash" | "Search" | "Workflow"
   chosenPlan: string; // cheapest plan whose hard limits fit
-  reason: string; // which limit(s) drove the choice
+  reason: string; // one-line headline: which limit(s) drove the choice
+  reasoning?: string[]; // supporting "why" bullets (role, cost, ruled-out tiers, crossover)
   payAsYouGo: PlanOption | null;
   cheapestFixed: PlanOption | null;
   crossoverNote?: string; // monthly volume where Fixed beats PAYG
@@ -23,6 +26,8 @@ export interface Recommendation {
   products: ProductRecommendation[];
   totalMonthlyLow: number; // cheapest coherent combination (nulls treated as 0 / "custom")
   assumptions: string[];
+  spec: WorkloadSpec; // exactly what was parsed from the free text (auditability)
+  understood: string; // human-readable summary of `spec`
 }
 
 export interface Citation {

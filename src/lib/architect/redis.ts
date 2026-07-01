@@ -65,3 +65,23 @@ export async function auditAppend(entry: Record<string, unknown>): Promise<void>
     // Never let audit logging break a request.
   }
 }
+
+/**
+ * Demo helper: delete all cache + rate-limit keys so a prompt can be re-run fresh.
+ * Only ever invoked from non-production environments (see route.ts). Returns keys removed.
+ */
+export async function clearDemoState(): Promise<number> {
+  if (!redis) { return 0; }
+  let total = 0;
+  for (const match of ["architect:cache:*", "architect:rl:*"]) {
+    let cursor = 0;
+    do {
+      const [next, keys] = await redis.scan(cursor, { match, count: 200 });
+      cursor = Number(next);
+      if (keys.length > 0) {
+        total += await redis.del(...keys);
+      }
+    } while (cursor !== 0);
+  }
+  return total;
+}

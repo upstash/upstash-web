@@ -378,9 +378,79 @@ const PRICERS: Record<string, (s: WorkloadSpec) => ProductRecommendation> = {
   workflow: () => priceWorkflow(),
 };
 
+/** Why each product is in the stack — its role for the workload. */
+const PRODUCT_ROLE: Record<string, string> = {
+  Redis: "In-memory cache, session/state store, counters, and rate-limit backend.",
+  Vector: "Vector similarity search over embeddings.",
+  QStash: "Scheduled jobs and reliable background/message delivery.",
+  Search: "Keyword + semantic search with a built-in embedding model.",
+  Workflow: "Durable, retryable orchestration of multi-step flows.",
+};
+
+/** Deterministic "why" bullets for one product — no LLM, fully auditable. */
+function buildReasoning(p: ProductRecommendation): string[] {
+  const out: string[] = [];
+  const role = PRODUCT_ROLE[p.product];
+  if (role) {
+    out.push(role);
+  }
+
+  const chosen = p.allPlans.find((pl) => pl.plan === p.chosenPlan);
+  if (chosen) {
+    const c = chosen.monthlyCost;
+    out.push(
+      c == null
+        ? `${p.chosenPlan}: custom / Enterprise pricing.`
+        : c === 0
+          ? `${p.chosenPlan}: no cost ($0/mo) — the workload fits its limits.`
+          : `${p.chosenPlan}: ~$${c}/mo at this workload — the cheapest plan whose hard limits fit.`,
+    );
+
+    // Name the cheapest tier we ruled out (transparency on "why not cheaper").
+    const cheaperRuledOut = p.allPlans.find(
+      (pl) =>
+        !pl.fits &&
+        pl.monthlyCost != null &&
+        (c == null || pl.monthlyCost < c),
+    );
+    if (cheaperRuledOut) {
+      out.push(
+        `${cheaperRuledOut.plan} ruled out: it doesn't satisfy the workload's hard limits.`,
+      );
+    }
+  }
+
+  if (p.crossoverNote) {
+    out.push(p.crossoverNote);
+  }
+  return out;
+}
+
+/** Human-readable summary of exactly what was parsed from the free text. */
+function summarizeSpec(spec: WorkloadSpec): string {
+  const parts: string[] = [
+    `${spec.products.length} product${spec.products.length > 1 ? "s" : ""} (${spec.products.join(", ")})`,
+  ];
+  const n = (v: number) => v.toLocaleString("en-US");
+  if (spec.requestsPerDay) { parts.push(`~${n(spec.requestsPerDay)} requests/day`); }
+  if (spec.recordCount) { parts.push(`${n(spec.recordCount)} records`); }
+  if (spec.vectorCount) { parts.push(`${n(spec.vectorCount)} vectors`); }
+  if (spec.dataSizeGB) { parts.push(`${spec.dataSizeGB} GB data`); }
+  if (spec.messagesPerDay) { parts.push(`~${n(spec.messagesPerDay)} messages/day`); }
+  if (spec.regions.length) { parts.push(`regions: ${spec.regions.join(", ")}`); }
+  if (spec.features.length) { parts.push(`features: ${spec.features.join(", ")}`); }
+  if (spec.schedules) {
+    parts.push(`${spec.schedules} scheduled job${spec.schedules > 1 ? "s" : ""}`);
+  }
+  return parts.join(" · ");
+}
+
 /** Map a validated workload spec to per-product plan/limit/cost recommendations. */
 export function priceEngine(spec: WorkloadSpec): Recommendation {
-  const products = spec.products.map((p) => PRICERS[p](spec));
+  const products = spec.products.map((p) => {
+    const rec = PRICERS[p](spec);
+    return { ...rec, reasoning: buildReasoning(rec) };
+  });
 
   const totalMonthlyLow = round(
     products.reduce((sum, p) => {
@@ -399,5 +469,11 @@ export function priceEngine(spec: WorkloadSpec): Recommendation {
     );
   }
 
-  return { products, totalMonthlyLow, assumptions };
+  return {
+    products,
+    totalMonthlyLow,
+    assumptions,
+    spec,
+    understood: summarizeSpec(spec),
+  };
 }
