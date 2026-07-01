@@ -17,6 +17,9 @@ import { z } from "zod";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+// Box spins up a container + runs the agent, which far exceeds Vercel's default 15s limit.
+// 60s works on Hobby and all paid plans; raise toward 300 on Pro/Enterprise if runs need it.
+export const maxDuration = 60;
 
 const Body = z.object({
   message: z.string().min(1).max(2000),

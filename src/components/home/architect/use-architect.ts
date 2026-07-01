@@ -38,6 +38,8 @@ const ERROR_TEXT: Record<string, string> = {
   llm_unavailable:
     "The advisor isn't available right now. Please try again later.",
   bad_request: "Please enter a short description of what you're building.",
+  generation_failed:
+    "The advisor couldn't finish that one. Please try rephrasing or send it again.",
   internal_error: "Something went wrong. Please try again.",
 };
 
