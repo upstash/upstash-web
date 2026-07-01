@@ -75,8 +75,12 @@ export const useArchitect = create<ArchitectStore>()(
 
           if (!res.ok) {
             const body = await res.json().catch(() => ({}));
+            // Prefer the server's authoritative message (e.g. the shared input gate),
+            // falling back to a generic per-code message.
             const text =
-              ERROR_TEXT[body?.error as string] ?? ERROR_TEXT.internal_error;
+              (typeof body?.message === "string" && body.message) ||
+              ERROR_TEXT[body?.error as string] ||
+              ERROR_TEXT.internal_error;
             set((s) => ({
               messages: [
                 ...s.messages,

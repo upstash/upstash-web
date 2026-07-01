@@ -2,7 +2,13 @@
 
 import Container from "@/components/container";
 import cx from "@/utils/cx";
-import { IconArrowUp, IconSparkles, IconX } from "@tabler/icons-react";
+import {
+  IconArrowUp,
+  IconMessage,
+  IconPlus,
+  IconSparkles,
+  IconX,
+} from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Blueprint from "./recommendation-card";
@@ -61,56 +67,63 @@ export default function ArchitectSection() {
           from a plain-text description.
         </p>
 
+        {/* The input keeps the SAME look whether or not there's a conversation, so
+            closing the modal returns to exactly this state. */}
         <div className="mx-auto mt-8 max-w-3xl">
-          {hasMessages ? (
-            // Collapsed one-liner: shows the last customer message, reopens the modal.
-            <button
-              type="button"
-              onClick={() => setOpen(true)}
-              className={cx(
-                "group flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3.5 text-left",
-                "transition hover:border-white/25 hover:bg-white/5",
-              )}
-            >
-              <IconSparkles
-                size={18}
-                className="shrink-0 text-primary-text"
-              />
-              <span className="min-w-0 flex-1 truncate text-sm text-text-mute">
-                {loading ? "Designing your blueprint…" : strip(lastUser)}
-              </span>
-              <span className="shrink-0 rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-text-mute group-hover:text-text">
-                Continue
-              </span>
-            </button>
-          ) : (
-            <>
-              <PromptInput
-                value={input}
-                onChange={setInput}
-                onSubmit={submit}
-                loading={loading}
-                placeholder="e.g. RAG chatbot, 50k requests/day, semantic search over 2M docs, EU + US, SOC-2…"
-              />
-              <div className="mt-4 flex flex-wrap justify-center gap-2">
-                {EXAMPLES.map((ex) => (
-                  <button
-                    key={ex}
-                    type="button"
-                    onClick={() => runExample(ex)}
-                    disabled={loading}
-                    title={ex}
-                    className={cx(
-                      "max-w-full truncate rounded-full border border-white/10 px-3 py-1.5 text-xs text-text-mute",
-                      "transition hover:border-white/25 hover:bg-white/5 hover:text-text disabled:opacity-40",
-                    )}
-                  >
-                    {ex}
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
+          <PromptInput
+            value={input}
+            onChange={setInput}
+            onSubmit={submit}
+            loading={loading}
+            placeholder="e.g. RAG chatbot, 50k requests/day, semantic search over 2M docs, EU + US, SOC-2…"
+          />
+
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+            {hasMessages ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setOpen(true)}
+                  className={cx(
+                    "inline-flex min-w-0 items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-text-mute",
+                    "transition hover:border-white/25 hover:bg-white/5 hover:text-text",
+                  )}
+                  title={strip(lastUser)}
+                >
+                  <IconMessage size={14} className="shrink-0 text-primary-text" />
+                  <span className="max-w-[52vw] truncate sm:max-w-xs">
+                    {loading ? "Designing your blueprint…" : strip(lastUser)}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => reset()}
+                  className={cx(
+                    "inline-flex shrink-0 items-center gap-1.5 rounded-full border border-primary/40 px-3 py-1.5 text-xs font-medium text-primary-text",
+                    "transition hover:bg-primary/10",
+                  )}
+                >
+                  <IconPlus size={14} /> New chat
+                </button>
+              </>
+            ) : (
+              EXAMPLES.map((ex) => (
+                <button
+                  key={ex}
+                  type="button"
+                  onClick={() => runExample(ex)}
+                  disabled={loading}
+                  title={ex}
+                  className={cx(
+                    "max-w-full truncate rounded-full border border-white/10 px-3 py-1.5 text-xs text-text-mute",
+                    "transition hover:border-white/25 hover:bg-white/5 hover:text-text disabled:opacity-40",
+                  )}
+                >
+                  {ex}
+                </button>
+              ))
+            )}
+          </div>
         </div>
       </Container>
 
@@ -219,9 +232,12 @@ function ArchitectModal({
               <button
                 type="button"
                 onClick={onReset}
-                className="rounded-lg px-3 py-1.5 text-xs text-text-mute transition hover:bg-white/5 hover:text-text"
+                className={cx(
+                  "inline-flex items-center gap-1.5 rounded-full border border-primary/40 px-3 py-1.5 text-xs font-medium text-primary-text",
+                  "transition hover:bg-primary/10",
+                )}
               >
-                New
+                <IconPlus size={14} /> New chat
               </button>
             )}
             <button

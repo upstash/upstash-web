@@ -8,6 +8,7 @@ import {
   sessionAppend,
   sessionLoad,
 } from "@/lib/architect/redis";
+import { screenInput } from "@/lib/architect/guard";
 import { SpecValidationError } from "@/lib/architect/schema";
 import { citationsFor } from "@/lib/architect/search";
 import type { ChatResponse } from "@/lib/architect/types";
@@ -57,7 +58,14 @@ export async function POST(req: NextRequest) {
   const { success } = await checkRateLimit(clientId(req));
   if (!success) { return json({ error: "rate_limited" }, 429); }
 
-  // 2. Cache — skip the LLM entirely on repeat/similar requests.
+  // 2. Input gate — shared by web + agent callers. Fail fast (no LLM spend) on
+  // too-short / too-vague / off-topic input. `message` is the authoritative reason.
+  const gate = screenInput(message);
+  if (!gate.ok) {
+    return json({ error: gate.code, message: gate.message }, 422);
+  }
+
+  // 3. Cache — skip the LLM entirely on repeat requests.
   const cached = await cacheGet(message);
   if (cached) { return json(cached); }
 
