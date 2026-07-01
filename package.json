@@ -9,7 +9,8 @@
     "lint": "next lint",
     "lint-fix": "next lint --fix",
     "fmt": "prettier . --write && yarn biome check .",
-    "postbuild": "next-sitemap"
+    "postbuild": "next-sitemap",
+    "test": "vitest run"
   },
   "dependencies": {
     "@jsdevtools/rehype-toc": "^3.0.2",
@@ -20,7 +21,10 @@
     "@radix-ui/react-tooltip": "^1.1.7",
     "@rehype-pretty/transformers": "^0.13.2",
     "@tabler/icons-react": "^3.29.0",
+    "@upstash/box": "^0.5.1",
     "@upstash/claps": "^1.0.0-beta.5",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.38.0",
     "@vercel/analytics": "^2.0.1",
     "@vercel/functions": "^1.5.1",
     "@vercel/og": "^0.6.5",
@@ -49,7 +53,7 @@
     "shiki": "^1.23.1",
     "swr": "^2.2.5",
     "usehooks-ts": "^3.1.0",
-    "zod": "^3.23.8",
+    "zod": "^3.25.76",
     "zustand": "^5.0.1"
   },
   "devDependencies": {
@@ -84,7 +88,8 @@
     "snipsync": "^1.11.0",
     "tailwind-merge": "^1.14.0",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vitest": "^4.1.9"
   },
   "engines": {
     "node": ">=20",
