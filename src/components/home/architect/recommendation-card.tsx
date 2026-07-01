@@ -27,83 +27,82 @@ function cost(n: number | null): string {
   return `$${n % 1 === 0 ? n : n.toFixed(2)}`;
 }
 
-function ProductCard({ p }: { p: ProductRecommendation }) {
+function ProductRow({ p }: { p: ProductRecommendation }) {
   const Icon = PRODUCT_ICON[p.product];
   const chosen = p.allPlans.find((pl) => pl.plan === p.chosenPlan);
   const limits = Object.entries(chosen?.limits ?? {}).slice(0, 4);
   const c = chosen?.monthlyCost ?? null;
 
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3 text-left">
-      {/* header: icon · product/plan · price */}
-      <div className="flex items-center gap-2.5">
-        {Icon && <Icon width={24} className="shrink-0 rounded-md" />}
-        <div className="min-w-0 flex-1">
-          <div className="truncate text-sm font-semibold text-text">
-            {p.product}
-            <span className="ml-1.5 font-normal text-text-mute">
-              {p.chosenPlan}
-            </span>
-          </div>
-        </div>
-        <div className="shrink-0 font-display text-base font-bold text-primary-text">
+    <div className="rounded-xl border border-white/10 bg-white/[0.02] px-3.5 py-3 text-left">
+      {/* clean single line: icon · product · plan · price */}
+      <div className="flex items-center gap-3">
+        {Icon && <Icon width={22} className="shrink-0 rounded-md" />}
+        <span className="font-medium text-text">{p.product}</span>
+        <span className="min-w-0 truncate text-xs text-text-mute">
+          {p.chosenPlan}
+        </span>
+        <span className="ml-auto shrink-0 font-display text-base font-bold text-primary-text">
           {cost(c)}
-          {c ? <span className="text-[10px] text-text-mute">/mo</span> : null}
-        </div>
+          {c ? (
+            <span className="text-[10px] font-normal text-text-mute"> /mo</span>
+          ) : null}
+        </span>
       </div>
 
-      {/* reason + expandable "why" */}
-      <p className="mt-1.5 text-[11px] leading-snug text-text-mute">{p.reason}</p>
-      {p.reasoning && p.reasoning.length > 0 && (
-        <details className="mt-1 text-[11px] text-text-mute">
-          <summary className="cursor-pointer select-none text-primary-text/80 hover:text-primary-text">
-            Why?
-          </summary>
-          <ul className="mt-1 list-disc space-y-0.5 pl-4 leading-snug">
-            {p.reasoning.map((r) => (
-              <li key={r}>{r}</li>
-            ))}
-          </ul>
-        </details>
-      )}
+      {/* full breakdown, one click away — nothing dropped, just tucked */}
+      <details className="mt-2 pl-[34px] text-[11px] text-text-mute">
+        <summary className="cursor-pointer select-none text-primary-text/80 hover:text-primary-text">
+          Details
+        </summary>
+        <div className="mt-2 space-y-2.5">
+          <p className="leading-snug">{p.reason}</p>
 
-      {/* limits — tight inline chips */}
-      {limits.length > 0 && (
-        <div className="mt-2 flex flex-wrap gap-1">
-          {limits.map(([k, v]) => (
-            <span
-              key={k}
-              className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-text-mute"
-            >
-              <span className="text-text">{k}</span> {v}
-            </span>
-          ))}
+          {p.reasoning && p.reasoning.length > 0 && (
+            <ul className="list-disc space-y-0.5 pl-4 leading-snug">
+              {p.reasoning.map((r) => (
+                <li key={r}>{r}</li>
+              ))}
+            </ul>
+          )}
+
+          {limits.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {limits.map(([k, v]) => (
+                <span
+                  key={k}
+                  className="rounded bg-white/5 px-1.5 py-0.5 text-[10px]"
+                >
+                  <span className="text-text">{k}</span> {v}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {(p.payAsYouGo || p.cheapestFixed) && (
+            <div className="flex items-center gap-3">
+              <span>
+                PAYG{" "}
+                <span className="font-medium text-text">
+                  {p.payAsYouGo ? `${cost(p.payAsYouGo.monthlyCost)}/mo` : "—"}
+                </span>
+              </span>
+              <span>
+                Fixed{" "}
+                <span className="font-medium text-text">
+                  {p.cheapestFixed
+                    ? `${cost(p.cheapestFixed.monthlyCost)}/mo`
+                    : "—"}
+                </span>
+              </span>
+            </div>
+          )}
+
+          {p.crossoverNote && (
+            <p className="text-text-mute/80">{p.crossoverNote}</p>
+          )}
         </div>
-      )}
-
-      {/* PAYG vs Fixed — one line */}
-      {(p.payAsYouGo || p.cheapestFixed) && (
-        <div className="mt-2 flex items-center gap-3 border-t border-white/5 pt-2 text-[11px] text-text-mute">
-          <span>
-            PAYG{" "}
-            <span className="font-medium text-text">
-              {p.payAsYouGo ? `${cost(p.payAsYouGo.monthlyCost)}/mo` : "—"}
-            </span>
-          </span>
-          <span>
-            Fixed{" "}
-            <span className="font-medium text-text">
-              {p.cheapestFixed ? `${cost(p.cheapestFixed.monthlyCost)}/mo` : "—"}
-            </span>
-          </span>
-        </div>
-      )}
-
-      {p.crossoverNote && (
-        <p className="mt-1 text-[10px] leading-snug text-text-mute/80">
-          {p.crossoverNote}
-        </p>
-      )}
+      </details>
     </div>
   );
 }
@@ -145,7 +144,7 @@ export default function Blueprint({ data }: { data: ChatResponse }) {
       {/* one product per row */}
       <div className="flex flex-col gap-2">
         {rec.products.map((p) => (
-          <ProductCard key={p.product} p={p} />
+          <ProductRow key={p.product} p={p} />
         ))}
       </div>
 
