@@ -1,0 +1,119 @@
+---
+title: "Stop Your AI API From Burning Your Budget: Rate Limiting with Upstash"
+slug: stop-your-ai-api-from-burning-your-budget-rate-limiting-with-upstash
+authors: [burak]
+tags: [redis]
+description: "How to add serverless rate limiting to any AI-powered API in minutes, and why LLM endpoints need a different approach than regular APIs."
+publishedAt: "2026-07-01T11:42:36.320Z"
+---
+
+# Stop Your AI API From Burning Your Budget: Rate Limiting with Upstash
+
+Rate limiting used to be a boring infrastructure task. Now it's one of the first things you should add to any AI-powered app. A single user running a loop against an unguarded LLM endpoint can spend your entire monthly OpenAI budget in under an hour. The request counts look normal. The bill does not.
+
+The good news: adding rate limiting to a serverless API takes about 20 lines of code with Upstash. Here's how to do it, and how to think about it for AI workloads specifically.
+
+## The Problem with AI Endpoints
+
+For most APIs, "100 requests per minute" is a safe ceiling. For an LLM endpoint where each request sends a 100k-token context, that's a recipe for a surprise invoice. Standard rate limiting is about abuse prevention -- stop bad actors from hammering your server. That still applies, but AI endpoints have a second problem: a single legitimate user running an automation can cost you just as much as a DDoS attack.
+
+The algorithm you pick matters more than you might expect. More on that below.
+
+## Setup
+
+First, create a free Redis database at [console.upstash.com](https://console.upstash.com). Then install the SDK:
+
+```bash
+npm install @upstash/ratelimit @upstash/redis
+```
+
+The `@upstash/ratelimit` package is purpose-built for serverless and edge environments. It uses Upstash's REST API under the hood, so it works in Vercel Edge Functions, Cloudflare Workers, and anywhere else that TCP connections are off the table.
+
+Add two environment variables from the Upstash console:
+
+```
+UPSTASH_REDIS_REST_URL=your_url_here
+UPSTASH_REDIS_REST_TOKEN=your_token_here
+```
+
+## Add Rate Limiting to Next.js Middleware
+
+The best place to enforce limits is in middleware, before your handlers even run:
+
+```ts
+// middleware.ts
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+import { NextRequest, NextResponse } from "next/server";
+
+const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(10, "1 m"),
+});
+
+export async function middleware(req: NextRequest) {
+  const ip = req.headers.get("x-forwarded-for") ?? "anonymous";
+  const { success, remaining, reset } = await ratelimit.limit(ip);
+
+  if (!success) {
+    return new NextResponse("Too many requests", {
+      status: 429,
+      headers: { "Retry-After": String(Math.ceil((reset - Date.now()) / 1000)) },
+    });
+  }
+
+  return NextResponse.next();
+}
+
+export const config = { matcher: "/api/generate" };
+```
+
+`Redis.fromEnv()` picks up your credentials automatically. Rate limit state lives in Redis, so it's consistent across all your serverless instances with no coordination needed.
+
+![The rate limiter runs at the edge before any expensive AI API calls happen.](/blog/write-a-post-about-how-upstash-can-be-used-for-ratelimiting/diagram-d63a6d7195.svg)
+
+## Picking the Right Algorithm
+
+The SDK ships with three algorithms. For AI endpoints, the choice matters more than for typical APIs.
+
+**Fixed Window** is the simplest: allow N requests per window, reset on the clock. The catch is that users can double their effective limit by timing requests right before and right after a reset boundary.
+
+**Sliding Window** is the better default. The window moves with real time, so there's no burst opportunity at the boundary. One extra Redis operation per request, but worth it for stricter enforcement.
+
+**Token Bucket** sounds appealing for AI apps because it allows short bursts. Users accumulate tokens over time and spend one per request. But for LLM cost control this backfires: a user who saves up tokens and fires them all at once can still trigger a big bill in a short window. Sliding window is the safer call.
+
+## Multi-Tier Limits for Freemium Products
+
+If you're building a freemium AI product, you want different limits for free and paid users. The `prefix` option gives you clean namespacing:
+
+```ts
+const freeTier = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.fixedWindow(20, "1 d"),
+  prefix: "rl:free",
+});
+
+const paidTier = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(500, "1 h"),
+  prefix: "rl:paid",
+});
+
+// In your route handler:
+const limiter = user.plan === "paid" ? paidTier : freeTier;
+const { success } = await limiter.limit(user.id);
+```
+
+Two things to notice here. First: use `user.id` as the identifier, not the IP address. IP-based limiting is trivially bypassed, and in serverless environments the IP may not be what you think it is. If you have auth, use it. Second: separate `prefix` values mean your free and paid counters are completely independent in Redis -- no cross-contamination.
+
+## Wrap Up
+
+Upstash Redis with `@upstash/ratelimit` gives you production-grade rate limiting that works anywhere: edge functions, serverless handlers, standard Node.js servers. Setup is one Redis database, two environment variables, and a handful of lines.
+
+For AI products especially: add this before you launch. A rogue loop discovered on billing day costs far more than the 20 minutes this setup takes.
+
+## Try it yourself
+
+**Live demo:** try it right now at [https://enhanced-cicada-07825-3000.preview.box.upstash.com](https://enhanced-cicada-07825-3000.preview.box.upstash.com) — hosted on [Upstash Box](https://upstash.com/box).
+
+The complete, runnable source lives in the [upstash/examples](https://github.com/upstash/examples/tree/main/examples/nextjs-ai-ratelimit-redis) repo.
