@@ -1,113 +1,175 @@
+import IconQStash from "@/components/icon-qstash";
+import IconRedis from "@/components/icon-redis";
+import IconSearch from "@/components/icon-search";
+import IconVector from "@/components/icon-vector";
+import IconWorkflow from "@/components/icon-workflow";
 import type {
   ChatResponse,
   ProductRecommendation,
 } from "@/lib/architect/types";
 import cx from "@/utils/cx";
+import type { SVGProps } from "react";
+
+const PRODUCT_ICON: Record<
+  string,
+  (props: SVGProps<SVGSVGElement>) => JSX.Element
+> = {
+  Redis: IconRedis,
+  Vector: IconVector,
+  QStash: IconQStash,
+  Search: IconSearch,
+  Workflow: IconWorkflow,
+};
 
 function cost(n: number | null): string {
-  if (n == null) { return "Custom"; }
-  if (n === 0) { return "Free"; }
-  return `$${n % 1 === 0 ? n : n.toFixed(2)}/mo`;
+  if (n == null) return "Custom";
+  if (n === 0) return "Free";
+  return `$${n % 1 === 0 ? n : n.toFixed(2)}`;
 }
 
-function ProductRow({ p }: { p: ProductRecommendation }) {
+function ProductCard({ p }: { p: ProductRecommendation }) {
+  const Icon = PRODUCT_ICON[p.product];
   const chosen = p.allPlans.find((pl) => pl.plan === p.chosenPlan);
-  const driverLimits = chosen?.limits ?? {};
+  const limits = Object.entries(chosen?.limits ?? {}).slice(0, 4);
 
   return (
-    <div className="rounded-xl bg-white/5 p-3 text-left">
-      <div className="flex items-baseline justify-between gap-2">
-        <span className="font-semibold text-primary-text">{p.product}</span>
-        <span className="text-sm font-medium text-text">
-          {p.chosenPlan}
-          {chosen ? ` · ${cost(chosen.monthlyCost)}` : ""}
-        </span>
+    <div
+      className={cx(
+        "group relative flex flex-col rounded-2xl p-5 text-left",
+        "border border-white/10 bg-white/[0.02]",
+        "transition hover:border-white/20 hover:bg-white/[0.04]",
+      )}
+    >
+      {/* header */}
+      <div className="flex items-center gap-3">
+        {Icon && <Icon width={32} className="shrink-0 rounded-lg" />}
+        <div className="min-w-0">
+          <div className="font-semibold text-text">{p.product}</div>
+          <div className="text-xs text-text-mute">{p.chosenPlan}</div>
+        </div>
+        <div className="ml-auto text-right">
+          <div className="font-display text-2xl font-bold leading-none text-primary-text">
+            {cost(chosen?.monthlyCost ?? null)}
+          </div>
+          {chosen?.monthlyCost ? (
+            <div className="text-[10px] uppercase tracking-wide text-text-mute">
+              /mo
+            </div>
+          ) : null}
+        </div>
       </div>
 
-      <p className="mt-1 text-xs text-text-mute">{p.reason}</p>
+      <p className="mt-3 text-xs leading-relaxed text-text-mute">{p.reason}</p>
 
-      {Object.keys(driverLimits).length > 0 && (
-        <ul className="mt-2 flex flex-wrap gap-1">
-          {Object.entries(driverLimits).map(([k, v]) => (
+      {/* limits */}
+      {limits.length > 0 && (
+        <ul className="mt-3 flex flex-wrap gap-1.5">
+          {limits.map(([k, v]) => (
             <li
               key={k}
-              className="rounded bg-white/5 px-1.5 py-0.5 text-[11px] text-text-mute"
+              className="rounded-md bg-white/5 px-2 py-1 text-[11px] text-text-mute"
             >
-              {k}: {v}
+              <span className="text-text">{k}</span> {v}
             </li>
           ))}
         </ul>
       )}
 
+      {/* PAYG vs Fixed */}
       {(p.payAsYouGo || p.cheapestFixed) && (
-        <div className="mt-2 grid grid-cols-2 gap-2 text-[11px]">
-          <div className="rounded bg-white/5 px-2 py-1">
-            <div className="text-text-mute">Pay-as-you-go</div>
-            <div className="font-medium text-text">
-              {p.payAsYouGo ? cost(p.payAsYouGo.monthlyCost) : "—"}
+        <div className="mt-4 grid grid-cols-2 gap-2 border-t border-white/5 pt-3">
+          <div>
+            <div className="text-[10px] uppercase tracking-wide text-text-mute">
+              Pay-as-you-go
+            </div>
+            <div className="text-sm font-medium text-text">
+              {p.payAsYouGo ? `${cost(p.payAsYouGo.monthlyCost)}/mo` : "—"}
             </div>
           </div>
-          <div className="rounded bg-white/5 px-2 py-1">
-            <div className="text-text-mute">Cheapest Fixed</div>
-            <div className="font-medium text-text">
-              {p.cheapestFixed ? cost(p.cheapestFixed.monthlyCost) : "—"}
+          <div>
+            <div className="text-[10px] uppercase tracking-wide text-text-mute">
+              Cheapest Fixed
+            </div>
+            <div className="text-sm font-medium text-text">
+              {p.cheapestFixed ? `${cost(p.cheapestFixed.monthlyCost)}/mo` : "—"}
             </div>
           </div>
         </div>
       )}
 
       {p.crossoverNote && (
-        <p className="mt-1.5 text-[11px] text-text-mute">{p.crossoverNote}</p>
+        <p className="mt-2 text-[11px] leading-snug text-text-mute/80">
+          {p.crossoverNote}
+        </p>
       )}
     </div>
   );
 }
 
-export default function RecommendationCard({ data }: { data: ChatResponse }) {
+export default function Blueprint({ data }: { data: ChatResponse }) {
   const { recommendation: rec, citations } = data;
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between text-xs text-text-mute">
-        <span>Recommended stack</span>
-        <span className="font-medium text-primary-text">
-          from {cost(rec.totalMonthlyLow)}
-        </span>
+    <div className="text-left">
+      {/* total banner */}
+      <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
+        <h3 className="font-display text-lg font-semibold text-text">
+          Your Upstash blueprint
+          <span className="ml-2 text-sm font-normal text-text-mute">
+            {rec.products.length} product{rec.products.length > 1 ? "s" : ""}
+          </span>
+        </h3>
+        <div className="text-right">
+          <span className="text-xs text-text-mute">Estimated from </span>
+          <span className="font-display text-xl font-bold text-primary-text">
+            {rec.totalMonthlyLow === 0
+              ? "Free"
+              : `$${rec.totalMonthlyLow}/mo`}
+          </span>
+        </div>
       </div>
 
-      {rec.products.map((p) => (
-        <ProductRow key={p.product} p={p} />
-      ))}
+      {/* product grid */}
+      <div className="grid gap-3 sm:grid-cols-2">
+        {rec.products.map((p) => (
+          <ProductCard key={p.product} p={p} />
+        ))}
+      </div>
 
-      {rec.assumptions.length > 0 && (
-        <details className="text-[11px] text-text-mute">
-          <summary className="cursor-pointer">Assumptions</summary>
-          <ul className="mt-1 list-disc pl-4">
-            {rec.assumptions.map((a) => (
-              <li key={a}>{a}</li>
+      {/* footer */}
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+        {citations.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {citations.map((c) => (
+              <a
+                key={c.url}
+                href={c.url}
+                target="_blank"
+                rel="noreferrer"
+                className={cx(
+                  "rounded-full border border-white/10 px-3 py-1 text-xs",
+                  "text-primary-text transition hover:border-white/25 hover:bg-white/5",
+                )}
+              >
+                {c.title} ↗
+              </a>
             ))}
-          </ul>
-        </details>
-      )}
+          </div>
+        )}
 
-      {citations.length > 0 && (
-        <div className="flex flex-wrap gap-2 pt-1">
-          {citations.map((c) => (
-            <a
-              key={c.url}
-              href={c.url}
-              target="_blank"
-              rel="noreferrer"
-              className={cx(
-                "rounded-full bg-emerald-800/20 px-2 py-0.5 text-[11px]",
-                "text-primary-text hover:bg-emerald-700/30",
-              )}
-            >
-              {c.title} ↗
-            </a>
-          ))}
-        </div>
-      )}
+        {rec.assumptions.length > 0 && (
+          <details className="ml-auto text-[11px] text-text-mute">
+            <summary className="cursor-pointer select-none hover:text-text">
+              Assumptions
+            </summary>
+            <ul className="mt-1 list-disc pl-4 text-left">
+              {rec.assumptions.map((a) => (
+                <li key={a}>{a}</li>
+              ))}
+            </ul>
+          </details>
+        )}
+      </div>
     </div>
   );
 }

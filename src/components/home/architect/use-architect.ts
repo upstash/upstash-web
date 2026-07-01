@@ -10,11 +10,9 @@ export interface UiMessage {
 }
 
 interface ArchitectStore {
-  open: boolean;
   sessionId: string;
   messages: UiMessage[];
   loading: boolean;
-  setOpen: (open: boolean) => void;
   send: (message: string) => Promise<void>;
   reset: () => void;
 }
@@ -46,12 +44,9 @@ const ERROR_TEXT: Record<string, string> = {
 export const useArchitect = create<ArchitectStore>()(
   persist(
     (set, get) => ({
-      open: false,
       sessionId: newSessionId(),
       messages: [],
       loading: false,
-
-      setOpen: (open) => set({ open }),
 
       reset: () => set({ messages: [], sessionId: newSessionId() }),
 

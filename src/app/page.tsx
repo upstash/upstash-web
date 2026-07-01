@@ -2,7 +2,7 @@
 
 import "../styles/home.css";
 import { ParsedUrlQueryInput } from "querystring";
-import ArchitectChatbox from "@/components/home/architect";
+import ArchitectSection from "@/components/home/architect";
 import HomeCommunity from "@/components/home/community";
 import HomeFaq from "@/components/home/faq";
 import HomeFast from "@/components/home/fast";
@@ -23,6 +23,7 @@ export default function Home({
   return (
     <main className="text-center">
       <HomeHero />
+      <ArchitectSection />
       {/* TODO: Redesign */}
       <HomeProductNew />
       <HomeFast />
@@ -31,7 +32,6 @@ export default function Home({
       {/* TODO: Enterprise */}
       <HomeCommunity />
       <HomeFaq />
-      <ArchitectChatbox />
     </main>
   );
 }
