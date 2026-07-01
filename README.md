@@ -1,5 +1,7 @@
 # Upstash
 
+The official website for Upstash.
+
 ## Blog Post Features
 
 ---
