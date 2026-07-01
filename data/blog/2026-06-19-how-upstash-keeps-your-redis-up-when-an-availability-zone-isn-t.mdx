@@ -125,6 +125,10 @@ The other half of "never goes down" is the address your client connects to. With
 
 ## Zone-Aware by Design: Keeping the Cross-AZ Bill as Low as It Can Go
 
+<Note>
+See [Multi-Zone High Availability](https://upstash.com/docs/redis/overall/enterprise#multi-zone-high-availability) for a simple explanation of how multi-zone high availability affects your bill.
+</Note>
+
 Spreading across zones is great for survival and, on most clouds, has a real traffic cost: every byte that crosses an availability-zone boundary is billed. Some of that is simply unavoidable. Keeping a replica alive in another zone means shipping your writes across the boundary to it, which is the whole point of multi-AZ.
 
 The goal isn't to pretend that cost away. It's to make sure you only pay for the cross-zone bytes that genuinely have to be there.

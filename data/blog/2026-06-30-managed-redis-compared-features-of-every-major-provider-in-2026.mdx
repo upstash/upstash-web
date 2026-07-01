@@ -1,0 +1,159 @@
+---
+title: "Managed Redis Hosting Providers in 2026: A Product Comparison"
+slug: managed-redis-compared-features-of-every-major-provider-in-2026
+authors: [arda]
+tags: [redis]
+description: "The best managed Redis hosting providers compared on product, in 2026: Upstash, AWS ElastiCache and MemoryDB, Redis Cloud, Google Memorystore, Azure, DigitalOcean, Aiven, and Railway, across connectivity, global replication, high availability, and built-in search."
+publishedAt: "2026-06-30T13:00:00Z"
+---
+
+<Summary>
+This is a product comparison of the major managed Redis providers in 2026: how you connect, whether it goes global, what's built in, and how much you end up building yourself. For the cost side, see our [pricing comparison](https://upstash.com/blog/redis-pricing-comparison-every-major-provider-in-2026-with-numbers).
+
+On the product side, Upstash Redis stands out on five things:
+
+- **HTTP and TCP.** It's the only provider here with a native HTTP/REST API alongside standard Redis TCP, so it works from edge and serverless runtimes that can't open a socket.
+- **Global read replicas.** Add replicas in other regions from the console and reads get served close to the user.
+- **Plans that match your traffic.** Pay-as-you-go for spiky or starting workloads, Fixed plans for predictable costs on queues and polling, Enterprise above that.
+- **Ready-made libraries.** Rate limiting, realtime, analytics, and agent memory ship as packages you install on top of the standard Redis client.
+- **Built-in search.** [Upstash Redis Search](https://upstash.com/docs/redis/search/introduction) is full-text search inside the same database, with no separate cluster to run.
+</Summary>
+
+We've already published a [pricing comparison of every major Redis provider](https://upstash.com/blog/redis-pricing-comparison-every-major-provider-in-2026-with-numbers). This is the other half: the product. Pricing tells you what a provider costs; this tells you what it's like to build on.
+
+The comparison is grouped around five things:
+
+- **Connectivity** — can you reach it from serverless and edge runtimes, or only from a long-lived server?
+- **Geography** — does it go multi-region, and how?
+- **Availability** — how is high availability set up, and what does it cost you to run?
+- **Capabilities** — search, JSON, and what's built in.
+- **Developer surface** — clients, libraries, and how much you build yourself.
+
+I checked the product details below against each provider's docs in June 2026. These change often, so confirm the current state before you commit.
+
+## Every major Redis provider at a glance
+
+| Provider | Engine | Connectivity | Multi-region | Search / modules | Pattern libraries | HA model |
+| --- | --- | --- | --- | --- | --- | --- |
+| Upstash | Redis-compatible | **HTTP + TCP** | Read replicas, no fixed cap | Upstash Search + JSON, in-keyspace | Ratelimit, Realtime, AgentKit, Analytics | In-zone replicas; multi-AZ + SLA via Prod Pack |
+| AWS ElastiCache | Valkey / Redis OSS | TCP only (in-VPC) | Global Datastore (active-passive, ≤2 secondaries) | None (Valkey core) | None | Replica node, multi-AZ; ≤5 replicas/shard |
+| AWS MemoryDB | Valkey / Redis OSS | TCP only (in-VPC) | Multi-region active-active (≤5) | None (Valkey core) | None | Durable multi-AZ, on-disk log |
+| Redis Cloud | Redis 8 | TCP only | **Active-Active (≤10 regions)** | Full Redis Stack (Search, JSON, TS, Bloom) | None | Replica doubles memory; 99.999% on Pro |
+| Google Memorystore | Redis / Valkey | TCP only (in-VPC) | Cross-region replicas (≤2, Cluster) | None (Valkey core) | None | Cross-zone replica; ≤5 replicas/shard |
+| Azure Cache for Redis | Redis OSS | TCP only | Active geo-replication (≤5, Enterprise) | None on base tiers | None | Replica (Standard+), zones (Premium) |
+| DigitalOcean | Valkey | TCP only | Single region | None (Valkey core) | None | 1 standby, same region |
+| Aiven | Valkey | TCP only | Cross-region read replica | None (Valkey core) | None | Standby + failover |
+| Railway | Redis (self-deployed) | TCP (in-project network) | Single region | Whatever you install | None | You manage it |
+
+The clearest split is connectivity. Every provider speaks Redis over TCP; only Upstash also exposes an HTTP API, which is the difference between working in a Cloudflare Worker and needing a TCP proxy.
+
+The other split is how much sits above the raw client. Most providers give you a connection string and leave the patterns (rate limiting, realtime, analytics) to you.
+
+## What does "connectivity" actually decide?
+
+Redis was designed as a service you reach over a long-lived TCP socket. That assumption is baked into every client and it's fine on an always-on server. It breaks when your code runs somewhere that can't hold a socket open: Cloudflare Workers, Vercel Edge, Fastly Compute, Netlify Edge, browsers.
+
+Upstash exposes a [native HTTP/REST API](https://upstash.com/docs/redis/features/restapi) in addition to TCP. So the same database works two ways:
+
+- From a normal server or container, point `ioredis`, `node-redis`, `redis-py`, or `go-redis` at the TCP endpoint, unchanged.
+- From an edge or serverless runtime, use the HTTP API (or the `@upstash/redis` client that wraps it) over plain `fetch`.
+
+```tsx id="code-upstash-http"
+import { Redis } from "@upstash/redis";
+
+// Runs anywhere fetch works: Cloudflare Workers, Vercel Edge,
+// browsers, lambdas with no persistent connection pool.
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
+
+await redis.set("greeting", "hello");
+```
+
+Every other provider in the table is TCP-only, and they split into two groups. ElastiCache, MemoryDB, and Memorystore live inside a private VPC with no public endpoint, so you connect from inside the same network and reach them from outside through a VPN, peering, or a bastion host. That's good for a locked-down backend and a dealbreaker for an edge function. Azure Cache, DigitalOcean, Aiven, and Redis Cloud do expose public TLS endpoints, so a normal server anywhere can connect, but they're still TCP.
+
+A POST to [https://upstash.com/start-redis](https://upstash.com/start-redis) returns a live database URL and token with no login and no API key. It expires in 72 hours unless you claim it, which is handy for a prototype or for handing an AI agent something to write against immediately.
+
+## How do the providers go global?
+
+There are two kinds of multi-region, and they solve different problems.
+
+**Read replicas in other regions** put copies of your data near users so reads are fast everywhere, while writes still go to one primary. This covers the common case: a global app that reads far more than it writes.
+
+- **Upstash** lets you add read regions from the console, picking from roughly 18 regions with no fixed cap on how many.
+- **AWS ElastiCache Global Datastore** is active-passive (one region takes writes, the rest are read-only) and caps you at 2 secondary regions, so 3 total.
+- **Google Memorystore** (the Redis Cluster product) does cross-region read replicas, up to 2 secondary clusters. **Azure**'s classic Premium tier does a single passive geo-replication pair, so two regions.
+
+**Active-active writes** let every region accept writes at once and merge them. This is harder, and only a couple of providers really do it:
+
+- **Redis Cloud** uses CRDTs to merge concurrent writes across active regions (Active-Active), up to 10 regions. Use it if you need multi-master writes; the cost is that you pay for the data several times over.
+- **AWS MemoryDB** Multi-Region is also active-active, up to 5 regions, and durable on top.
+- **Azure**'s active geo-replication (on the Enterprise / Azure Managed Redis tier) groups up to 5 regions.
+
+A caveat the table hides: every provider except Upstash caps how many regions you can add (2 on ElastiCache and Memorystore, up to 5 on MemoryDB and Azure, up to 10 on Redis Cloud), and several gate cross-region behind a higher tier. Upstash has no fixed cap and lets you add or drop read regions at runtime. DigitalOcean's managed Valkey doesn't do cross-region at all; its single standby stays in the same region.
+
+## How is high availability modeled?
+
+Every serious provider keeps a second copy of your data, but they expose it very differently.
+
+On the per-node providers (ElastiCache, MemoryDB, DigitalOcean), HA is a second node you provision and pay for, roughly doubling the bill. On the tier providers (Azure, Google), it's a higher SKU. On Redis Cloud, the replica doubles the memory you're billed for.
+
+The replicas don't all behave the same. ElastiCache and the cloud tiers do automatic failover to the standby, with the replica also serving reads. MemoryDB is the durable outlier: it commits writes to a multi-AZ transactional log, so a failover loses no acknowledged writes, which is the main reason it costs more than a plain cache. Redis Cloud Pro carries a 99.999% uptime SLA in its base price.
+
+There are ceilings on how far you can replicate in-region, too. ElastiCache, MemoryDB, and Memorystore's Cluster product each top out at 5 read replicas per shard. DigitalOcean is the tightest: managed Valkey allows a single standby node and no read-only replicas.
+
+Upstash handles the in-zone replica for you on Fixed plans without a separate node to manage. For production-grade multi-AZ high availability, the [Prod Pack add-on](https://upstash.com/pricing/redis) (+$200/mo) spreads replicas across availability zones with an uptime SLA, and bundles SOC-2 reporting, PrivateLink, RBAC, and observability integrations on top of any plan.
+
+We wrote up [how Upstash keeps your Redis up when an availability zone isn't](https://upstash.com/blog/how-upstash-keeps-your-redis-up-when-an-availability-zone-isn-t) if you want to see how the failover picks a new primary without dropping acknowledged writes.
+
+Turning on multi-AZ doesn't simply double your bill. It replicates **writes** to the extra replicas, so the only thing it adds is replication bandwidth on writes. Reads still hit a single replica, so they're unaffected, and command counts per write don't change.
+
+- **On Fixed plans**, commands are never metered (unlimited), and that stays true with multi-AZ on. The added write-replication traffic counts toward your plan's included bandwidth.
+- **On Pay-as-you-go**, multi-AZ doesn't change the per-command cost either: a write is still billed as one command no matter how many replicas it lands on. What it does increase is bandwidth, and since PAYG only charges for bandwidth beyond the first 200 GB/month, a write-heavy database can feel it there.
+
+## What's built into the database?
+
+Redis Cloud has the widest set of built-in capabilities. Redis 8 / Redis Stack ships Search, JSON, TimeSeries, Bloom, and vector, all in one keyspace.
+
+AWS, Google, DigitalOcean, and Aiven run **Valkey**, the BSD-licensed fork that appeared after Redis changed its license in 2024. Valkey covers the core Redis commands but not the modules, so search and JSON aren't available on those providers.
+
+Upstash sits in between. It ships [Upstash Redis Search](https://upstash.com/docs/redis/search/introduction), full-text search built into the database: you write a JSON document to a key and it gets indexed automatically, with no separate search service to run or keep in sync. It's [generally available](https://upstash.com/blog/upstash-redis-search-generally-available) and already powers [millions of searches in Context7](https://upstash.com/blog/how-redis-search-powers-millions-of-searches-in-context7). JSON is first-party too.
+
+What Upstash doesn't have in-keyspace is TimeSeries and Bloom, and vector search is a separate product, [Upstash Vector](https://upstash.com/docs/vector/overall/getstarted). So if you need the full module set in a single query, that's Redis Cloud. For full-text search and JSON, Upstash covers it and the Valkey providers don't.
+
+## What do you have to build yourself?
+
+Every provider gives you a Redis client. Redis maintains the official ones ([node-redis](https://github.com/redis/node-redis), [ioredis](https://github.com/redis/ioredis), redis-py, Jedis), and they all work against Upstash too. The difference is the layer above the client: the patterns most teams end up building on Redis. Upstash ships those as packages you install:
+
+- **[@upstash/ratelimit](https://github.com/upstash/ratelimit)** — sliding-window, fixed-window, and token-bucket rate limiting out of the box.
+- **[Upstash Realtime](https://upstash.com/docs/realtime/overall/quickstart)** — type-safe pub/sub for live updates, cursors, and notifications, a serverless alternative to Pusher or Ably.
+- **AgentKit** — wires Upstash Redis into agent stacks for memory and state, with integrations for the [Vercel AI SDK](https://upstash.com/docs/redis/sdks/agentkit/ai-sdk) and the [Eve](https://upstash.com/docs/redis/sdks/agentkit/eve) framework.
+- **[Agent Analytics](https://github.com/upstash/agent-analytics)** — records when AI crawlers like ChatGPT, Claude, and Perplexity hit your site ([how it works](https://upstash.com/blog/track-ai-crawlers-with-agent-analytics)).
+- **[Redis Analytics](https://github.com/upstash/redis-analytics)** — page views, events, and custom metrics backed by Redis.
+
+With the other providers you build these on top of the base client yourself. What they give you instead is tooling around the database rather than the application patterns. Redis Cloud ships RedisInsight, a GUI keyspace browser and profiler, plus the Redis Stack module commands. ElastiCache, MemoryDB, and Memorystore lean on their clouds for the surrounding pieces: IAM auth, CloudWatch or Cloud Monitoring metrics, and VPC-level access control. It's useful, but it's a different layer from rate limiting or realtime.
+
+There's also the AI angle: because Upstash is HTTP-based and type-safe, coding agents like Claude Code and Codex tend to get a working integration on the first try, instead of wiring up a TCP client with a TLS certificate bundle and a connection pool.
+
+## Where does pricing fit in?
+
+A quick note on pricing, since the plan model shapes how you use Upstash. There are three options:
+
+- **Pay-as-you-go** — per command plus storage, and it scales to roughly $0 when idle. Good for spiky, low, or early-stage workloads. The free tier covers 256 MB and 500K commands a month.
+- **Fixed plans** — a flat monthly price with no per-command billing, from $10/mo for 250 MB. This is the one for predictable costs on steady, high-frequency workloads like queues and polling.
+- **Enterprise** — when you outgrow both on throughput, size, or compliance.
+
+Upstash used to offer two fixed-throughput dedicated plans, **Pro 2K** ($280/mo) and **Pro 10K** ($680/mo). Those Upstash plans are deprecated: the [2025 pricing update](https://upstash.com/blog/redis-new-pricing) replaced them with Pay-as-you-go, Fixed plans, and the Prod Pack add-on. Some older comparison articles still list Upstash's Pro plans, so if you come across them, they're out of date.
+
+For the per-node providers (ElastiCache, MemoryDB, DigitalOcean) and tier providers (Azure, Google), you pay for a server whether it's busy or idle, and none of them scale to zero. Our [pricing comparison](https://upstash.com/blog/redis-pricing-comparison-every-major-provider-in-2026-with-numbers) works through that trade-off with real numbers.
+
+## How to choose, by product fit
+
+- **Upstash** if your app is serverless or edge (the HTTP API is the only one that connects there), you want global read replicas without operating nodes, you want rate limiting, realtime, and analytics as ready-made libraries, or you're letting an AI agent write the integration. Pay-as-you-go to start, Fixed for predictable bills, Prod Pack for multi-AZ HA.
+- **Redis Cloud** if you need the full module set (TimeSeries, Bloom, vector + text in one query) or true active-active multi-region writes, and the dedicated-VM pricing is acceptable.
+- **AWS ElastiCache** if you're on AWS with steady, high-throughput caching inside a VPC and reserved nodes fit the budget.
+- **AWS MemoryDB** if Redis is your durable primary database and you can't lose acknowledged writes on failover.
+- **Google Memorystore / Azure Cache** if you're committed to that cloud and want the cache co-located with everything else.
+- **DigitalOcean / Aiven** if you want simple managed Valkey, flat bills (DO) or cross-cloud portability (Aiven), and don't need modules.
+- **Railway** if Redis should run next to the rest of your app on one platform and you're fine self-managing it.
