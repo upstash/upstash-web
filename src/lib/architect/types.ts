@@ -8,7 +8,6 @@ export interface PlanOption {
   monthlyCost: number | null; // null = "Custom" / "Coming soon"
   limits: Record<string, string>;
   fits: boolean; // does this plan satisfy the workload's hard limits?
-  note?: string;
 }
 
 export interface ProductRecommendation {

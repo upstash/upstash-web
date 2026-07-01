@@ -17,14 +17,14 @@ const KEY = {
 
 const CACHE_TTL_SECONDS = 60 * 60 * 24; // 24h
 
-export const isRedisConfigured = Boolean(
+const isRedisConfigured = Boolean(
   process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN,
 );
 
-export const redis = isRedisConfigured ? Redis.fromEnv() : null;
+const redis = isRedisConfigured ? Redis.fromEnv() : null;
 
 /** Sliding-window limiter: 10 requests / minute per identifier (IP or API key). */
-export const ratelimit = redis
+const ratelimit = redis
   ? new Ratelimit({
       redis,
       limiter: Ratelimit.slidingWindow(10, "1 m"),
@@ -41,7 +41,7 @@ export async function checkRateLimit(identifier: string): Promise<{ success: boo
 }
 
 /** Stable cache key: lowercase, trim, collapse whitespace. */
-export function cacheKey(message: string): string {
+function cacheKey(message: string): string {
   return message.toLowerCase().trim().replace(/\s+/g, " ");
 }
 

@@ -85,7 +85,6 @@ function priceRedis(spec: WorkloadSpec): ProductRecommendation {
       Storage: "$0.25/GB (1 GB free)",
       Databases: "up to 100",
     },
-    note: "Budget caps available (pay-as-you-go only).",
   };
   plans.push(payg);
 
@@ -116,7 +115,6 @@ function priceRedis(spec: WorkloadSpec): ProductRecommendation {
     monthlyCost: null,
     fits: true,
     limits: { "Max data": "up to 10 TB", Compliance: "HIPAA, VPC, SSO" },
-    note: "Custom pricing.",
   });
 
   const chosen = chooseCheapest(plans);
@@ -209,7 +207,6 @@ function priceVector(spec: WorkloadSpec): ProductRecommendation {
     monthlyCost: null,
     fits: true,
     limits: { "Max vectors×dims": "100B", "Max dims": "5,000", "Max data": "1 TB" },
-    note: "Custom pricing.",
   });
 
   const chosen = chooseCheapest(plans);
@@ -284,7 +281,6 @@ function priceQStash(spec: WorkloadSpec): ProductRecommendation {
     monthlyCost: null,
     fits: true,
     limits: { "Messages/day": "100M+", Bandwidth: "Unlimited", SSO: "Yes" },
-    note: "Custom pricing.",
   });
 
   const chosen = chooseCheapest(plans);
@@ -345,7 +341,6 @@ function priceSearch(spec: WorkloadSpec): ProductRecommendation {
     monthlyCost: null,
     fits: true,
     limits: { "Queries/mo": "Unlimited", "Max records": "Unlimited" },
-    note: "Coming soon.",
   });
 
   const chosen = chooseCheapest(plans);
