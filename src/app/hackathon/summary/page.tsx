@@ -145,6 +145,7 @@ export default function HackathonSummaryPage() {
             />
 
             <AdminPanel
+              configured={state.configured}
               votingOpen={state.votingOpen}
               unlocked={adminUnlocked}
               password={password}
@@ -411,6 +412,7 @@ function VoterList({
 }
 
 function AdminPanel({
+  configured,
   votingOpen,
   unlocked,
   password,
@@ -419,6 +421,7 @@ function AdminPanel({
   msg,
   onRun,
 }: {
+  configured: boolean;
   votingOpen: boolean;
   unlocked: boolean;
   password: string;
@@ -439,6 +442,24 @@ function AdminPanel({
       }}
     >
       <h3 style={{ fontSize: 15, fontWeight: 700, margin: "0 0 12px" }}>🔒 Admin</h3>
+
+      {!configured ? (
+        <div
+          style={{
+            padding: "10px 14px",
+            borderRadius: 10,
+            marginBottom: 12,
+            background: "rgba(255,180,80,.12)",
+            border: "1px solid rgba(255,180,80,.4)",
+            color: "#ffd9a8",
+            fontSize: 13,
+          }}
+        >
+          ⚠️ Redis isn't reachable from this deployment (UPSTASH_REDIS_REST_URL /
+          _TOKEN missing for this environment). Admin actions will fail until it's
+          set for this environment and redeployed.
+        </div>
+      ) : null}
 
       {!unlocked ? (
         <form
