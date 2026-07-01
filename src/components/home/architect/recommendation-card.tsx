@@ -136,8 +136,8 @@ export default function Blueprint({ data }: { data: ChatResponse }) {
         </p>
       )}
 
-      {/* product grid — denser on wide screens */}
-      <div className="grid gap-2 sm:grid-cols-2">
+      {/* one product per row */}
+      <div className="flex flex-col gap-2">
         {rec.products.map((p) => (
           <ProductCard key={p.product} p={p} />
         ))}

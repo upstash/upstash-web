@@ -107,6 +107,38 @@ describe("priceEngine — tier selection", () => {
     expect(q.chosenPlan).toBe("Fixed 1M");
   });
 
+  it("Vector: capacity is vectors × dimensions, not raw count", () => {
+    // 2M vectors × 1536 dims = 3.07B > 2B PAYG cap → Pro.
+    const big = product(
+      priceEngine(spec({ products: ["vector"], vectorCount: 2_000_000, dimensions: 1536 })),
+      "Vector",
+    );
+    expect(big.chosenPlan).toBe("Pro");
+
+    // 100k × 1536 = 153.6M < 200M → Free.
+    const small = product(
+      priceEngine(spec({ products: ["vector"], vectorCount: 100_000, dimensions: 1536 })),
+      "Vector",
+    );
+    expect(small.chosenPlan).toBe("Free");
+  });
+
+  it("Vector: falls back to recordCount when the count landed in the wrong field", () => {
+    // 500k × 1536 = 768M → exceeds Free (200M), within PAYG (2B).
+    const v = product(
+      priceEngine(spec({ products: ["vector"], recordCount: 500_000 })),
+      "Vector",
+    );
+    expect(v.chosenPlan).toBe("Pay-as-you-go");
+  });
+
+  it("Workflow implies a QStash cost (never $0)", () => {
+    const rec = priceEngine(spec({ products: ["workflow"], requestsPerDay: 5000 }));
+    const q = rec.products.find((p) => p.product === "QStash");
+    expect(q).toBeTruthy(); // QStash added automatically
+    expect(rec.totalMonthlyLow).toBeGreaterThan(0);
+  });
+
   it("totalMonthlyLow sums chosen plans", () => {
     const rec = priceEngine(
       spec({ products: ["search"], requestsPerDay: 50_000, recordCount: 2_000_000 }),

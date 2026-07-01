@@ -31,6 +31,8 @@ export const WorkloadSpec = z.object({
   dataSizeGB: z.number().min(0).max(10_000).default(0),
   /** Vector count (Vector product). */
   vectorCount: z.number().int().min(0).max(100_000_000_000).default(0),
+  /** Embedding dimensions (Vector). Capacity limits are measured as vectors × dimensions. */
+  dimensions: z.number().int().min(0).max(100_000).default(1536),
   /** QStash messages per day. */
   messagesPerDay: z.number().int().min(0).max(100_000_000).default(0),
   /** Deployment regions, e.g. ["eu", "us"]. First is treated as primary. */

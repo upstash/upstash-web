@@ -153,21 +153,28 @@ function priceRedis(spec: WorkloadSpec): ProductRecommendation {
 function priceVector(spec: WorkloadSpec): ProductRecommendation {
   const reqPerMonth = spec.requestsPerDay * DAYS;
   const storage = Math.max(0, spec.dataSizeGB) * 0.25;
-  const needsPro = spec.vectorCount > 2_000_000_000 || spec.dataSizeGB > 50;
+
+  // Upstash Vector meters capacity as vectors × dimensions, not raw vector count.
+  // Fall back to recordCount when the count landed in the wrong field.
+  const count = spec.vectorCount || spec.recordCount;
+  const dims = spec.dimensions || 1536;
+  const capacity = count * dims;
+  const needsPro = capacity > 2_000_000_000 || dims > 3072 || spec.dataSizeGB > 50;
   const plans: PlanOption[] = [];
 
   plans.push({
     plan: "Free",
     monthlyCost: 0,
     fits:
-      spec.vectorCount <= 200_000_000 &&
+      capacity <= 200_000_000 &&
+      dims <= 1536 &&
       spec.requestsPerDay <= 10_000 &&
       spec.dataSizeGB <= 1,
     limits: {
       "Max vectors×dims": "200M",
+      "Max dims": "1,536",
       "Daily queries": "10K",
       "Max data": "1 GB",
-      SLA: "None",
     },
   });
 
@@ -178,8 +185,8 @@ function priceVector(spec: WorkloadSpec): ProductRecommendation {
     limits: {
       Requests: "$0.40 / 100K",
       "Max vectors×dims": "2B",
+      "Max dims": "3,072",
       "Max data": "50 GB",
-      SLA: "99.9%",
     },
   };
   plans.push(payg);
@@ -201,7 +208,7 @@ function priceVector(spec: WorkloadSpec): ProductRecommendation {
     plan: "Pro",
     monthlyCost: null,
     fits: true,
-    limits: { "Max vectors×dims": "100B", "Max data": "1 TB", SLA: "99.99%" },
+    limits: { "Max vectors×dims": "100B", "Max dims": "5,000", "Max data": "1 TB" },
     note: "Custom pricing.",
   });
 
@@ -216,10 +223,10 @@ function priceVector(spec: WorkloadSpec): ProductRecommendation {
     product: "Vector",
     chosenPlan: chosen.plan,
     reason: needsPro
-      ? ">2B vectors or >50 GB requires Pro."
+      ? `Capacity ${(capacity / 1_000_000_000).toFixed(1)}B vectors×dims exceeds 2B (or >3,072 dims / >50 GB) → Pro.`
       : chosen.plan === "Free"
         ? "Workload fits the Free tier."
-        : "Selected the cheapest plan that fits.",
+        : "Selected the cheapest plan that fits the vectors×dims capacity.",
     payAsYouGo: payg,
     cheapestFixed: fixed.fits ? fixed : null,
     crossoverNote,
@@ -315,8 +322,8 @@ function priceSearch(spec: WorkloadSpec): ProductRecommendation {
     limits: {
       "Queries/mo": "20K",
       "Max records": "200K",
-      Indexes: "10",
-      "Total data": "1 GB",
+      Databases: "10",
+      "Indexes/DB": "10,000",
     },
   });
 
@@ -328,6 +335,7 @@ function priceSearch(spec: WorkloadSpec): ProductRecommendation {
       "Queries/mo": "Unlimited",
       "Max records": "2M",
       Price: "$0.05 / 1K requests",
+      Storage: "50 GB",
     },
   };
   plans.push(payg);
@@ -451,6 +459,16 @@ export function priceEngine(spec: WorkloadSpec): Recommendation {
     const rec = PRICERS[p](spec);
     return { ...rec, reasoning: buildReasoning(rec) };
   });
+
+  // Upstash Workflow has no separate billing — it runs on QStash. If the workload implies a
+  // workflow but didn't list QStash, price QStash from the run volume so the total isn't $0.
+  if (spec.products.includes("workflow") && !spec.products.includes("qstash")) {
+    const runs = spec.messagesPerDay || spec.requestsPerDay;
+    const q = priceQStash({ ...spec, messagesPerDay: runs });
+    q.reason =
+      "QStash backs Upstash Workflow — this is the delivery cost of your workflow runs.";
+    products.push({ ...q, reasoning: buildReasoning(q) });
+  }
 
   const totalMonthlyLow = round(
     products.reduce((sum, p) => {
