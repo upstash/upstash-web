@@ -152,3 +152,7 @@ The harness gives you the agent abstraction. The durable box gives that agent a 
 AI SDK v7's harness API is the right abstraction for talking to coding agents, and it's worth learning on its own. The provider-swap model is clean, the streaming fits straight into an existing chat UI, and the sandbox boundary is drawn in an honest place.
 
 But it stops at that boundary on purpose, and on the other side of it is the part that actually decides whether an agent feels stateful or amnesiac. For an agent that persists, the easy move is to not assemble a sandbox at all and instead create a Box that already has one inside. Same harness idea, same code shape, with a real computer (and a real memory) attached. That's the difference between an agent that starts over every morning and one that picks up right where it left off.
+
+## Try it yourself
+
+A complete, runnable example for this post lives in the [upstash/examples](https://github.com/upstash/examples/tree/main/examples/nextjs-durable-agent-with-upstash-box) repo.
