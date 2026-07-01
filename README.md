@@ -1,5 +1,7 @@
 # Upstash
 
+README smoke test for PR verification.
+
 ## Blog Post Features
 
 ---
