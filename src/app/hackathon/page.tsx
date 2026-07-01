@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 
 const ACCENT = "#00e9a3";
-const STORAGE_KEY = "hackathon-voter-id";
+const ID_KEY = "hackathon-voter-id";
+const PW_KEY = "hackathon-voter-pw";
 
 interface Project {
   id: string;
@@ -17,6 +18,7 @@ interface VoterInfo {
   name: string;
   ownProjectId: string | null;
   voted: boolean;
+  registered: boolean;
 }
 interface State {
   configured: boolean;
@@ -27,50 +29,92 @@ interface State {
   votedCount: number;
   totalVoters: number;
   complete: boolean;
-  myBallot: string[] | null;
 }
 
 export default function HackathonVotePage() {
   const [state, setState] = useState<State | null>(null);
   const [voterId, setVoterId] = useState<string | null>(null);
+  const [password, setPassword] = useState<string | null>(null); // set once logged in
   const [selected, setSelected] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
+  const [authBusy, setAuthBusy] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
   const [message, setMessage] = useState<{ kind: "ok" | "err"; text: string } | null>(
     null,
   );
 
-  const load = useCallback(async (vid: string | null) => {
-    const url = vid ? `/api/hackathon/state?voter=${vid}` : "/api/hackathon/state";
-    const res = await fetch(url, { cache: "no-store" });
-    const data: State = await res.json();
-    setState(data);
-    if (vid && data.myBallot) setSelected(data.myBallot);
-    return data;
+  const load = useCallback(async () => {
+    const res = await fetch("/api/hackathon/state", { cache: "no-store" });
+    setState(await res.json());
   }, []);
 
-  // Initial load + restore saved identity.
+  const authenticate = useCallback(
+    async (vid: string, pw: string, silent = false): Promise<boolean> => {
+      setAuthBusy(true);
+      if (!silent) setAuthError(null);
+      try {
+        const res = await fetch("/api/hackathon/auth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ voterId: vid, password: pw }),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          setPassword(pw);
+          sessionStorage.setItem(PW_KEY, pw);
+          setSelected(Array.isArray(data.ballot) ? data.ballot : []);
+          setMessage(null);
+          return true;
+        }
+        if (!silent) setAuthError(data.error ?? "Could not sign in.");
+        return false;
+      } catch {
+        if (!silent) setAuthError("Network error. Try again.");
+        return false;
+      } finally {
+        setAuthBusy(false);
+      }
+    },
+    [],
+  );
+
+  // Initial load + restore saved identity (and re-verify the saved password).
   useEffect(() => {
-    const saved =
-      typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null;
-    setVoterId(saved);
-    load(saved);
-  }, [load]);
+    const savedId =
+      typeof window !== "undefined" ? localStorage.getItem(ID_KEY) : null;
+    const savedPw =
+      typeof window !== "undefined" ? sessionStorage.getItem(PW_KEY) : null;
+    setVoterId(savedId);
+    load();
+    if (savedId && savedPw) authenticate(savedId, savedPw, true);
+  }, [load, authenticate]);
 
   const me = state?.voters.find((v) => v.id === voterId) ?? null;
+  const authed = Boolean(voterId && password);
 
-  const pickName = async (id: string) => {
+  const pickName = (id: string) => {
     setVoterId(id);
-    localStorage.setItem(STORAGE_KEY, id);
-    setMessage(null);
+    localStorage.setItem(ID_KEY, id);
+    setPassword(null);
+    sessionStorage.removeItem(PW_KEY);
     setSelected([]);
-    await load(id);
+    setAuthError(null);
+    setMessage(null);
   };
 
-  const changeName = () => {
+  const logout = () => {
     setVoterId(null);
-    localStorage.removeItem(STORAGE_KEY);
+    setPassword(null);
+    localStorage.removeItem(ID_KEY);
+    sessionStorage.removeItem(PW_KEY);
     setSelected([]);
+    setAuthError(null);
     setMessage(null);
+  };
+
+  const forceReauth = () => {
+    setPassword(null);
+    sessionStorage.removeItem(PW_KEY);
   };
 
   const toggle = (projectId: string) => {
@@ -83,19 +127,25 @@ export default function HackathonVotePage() {
   };
 
   const submit = async () => {
-    if (!voterId) return;
+    if (!voterId || !password) return;
     setSaving(true);
     setMessage(null);
     try {
       const res = await fetch("/api/hackathon/vote", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ voterId, projectIds: selected }),
+        body: JSON.stringify({ voterId, password, projectIds: selected }),
       });
       const data = await res.json();
       if (data.ok) {
-        setMessage({ kind: "ok", text: "Your vote is saved! You can change it any time while voting is open." });
-        await load(voterId);
+        setMessage({
+          kind: "ok",
+          text: "Your vote is saved! You can change it any time while voting is open.",
+        });
+        await load();
+      } else if (res.status === 401) {
+        setMessage({ kind: "err", text: "Session expired — please sign in again." });
+        forceReauth();
       } else {
         setMessage({ kind: "err", text: data.error ?? "Something went wrong." });
       }
@@ -129,9 +179,17 @@ export default function HackathonVotePage() {
           <Notice text="Voting storage isn't configured yet (missing Redis env vars)." />
         ) : !voterId || !me ? (
           <NamePicker voters={state.voters} onPick={pickName} />
+        ) : !authed ? (
+          <AuthPanel
+            voter={me}
+            busy={authBusy}
+            error={authError}
+            onSubmit={(pw) => authenticate(me.id, pw)}
+            onBack={logout}
+          />
         ) : (
           <>
-            <IdentityBar name={me.name} onChange={changeName} />
+            <IdentityBar name={me.name} onChange={logout} />
 
             {!state.votingOpen ? (
               <ClosedState complete={state.complete} />
@@ -204,9 +262,12 @@ function NamePicker({
 }) {
   return (
     <div>
-      <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 14, textAlign: "center" }}>
+      <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 6, textAlign: "center" }}>
         Who are you?
       </h2>
+      <p style={{ textAlign: "center", color: "#9fb8ae", fontSize: 13, marginTop: 0, marginBottom: 16 }}>
+        First time? You'll set a password. After that, log in with it.
+      </p>
       <div
         style={{
           display: "grid",
@@ -239,10 +300,136 @@ function NamePicker({
             }}
           >
             {v.name}
-            {v.voted ? <span style={{ color: ACCENT }}> ✓</span> : null}
+            {v.voted ? (
+              <span style={{ color: ACCENT }} title="Already voted"> ✓</span>
+            ) : v.registered ? (
+              <span style={{ color: "#6f8a80" }} title="Password set"> 🔒</span>
+            ) : (
+              <span style={{ color: "#ffd9a8" }} title="New — set a password"> ✨</span>
+            )}
           </button>
         ))}
       </div>
+    </div>
+  );
+}
+
+function AuthPanel({
+  voter,
+  busy,
+  error,
+  onSubmit,
+  onBack,
+}: {
+  voter: VoterInfo;
+  busy: boolean;
+  error: string | null;
+  onSubmit: (password: string) => void;
+  onBack: () => void;
+}) {
+  const isNew = !voter.registered;
+  const [pw, setPw] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [localErr, setLocalErr] = useState<string | null>(null);
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setLocalErr(null);
+    if (!pw) return;
+    if (isNew && pw !== confirm) {
+      setLocalErr("Passwords don't match.");
+      return;
+    }
+    onSubmit(pw);
+  };
+
+  const inputStyle: React.CSSProperties = {
+    width: "100%",
+    padding: "12px 14px",
+    borderRadius: 12,
+    border: "1px solid rgba(255,255,255,.15)",
+    background: "rgba(0,0,0,.25)",
+    color: "#e7f5ef",
+    fontSize: 15,
+    boxSizing: "border-box",
+  };
+
+  return (
+    <div style={{ maxWidth: 420, margin: "0 auto" }}>
+      <div
+        style={{
+          padding: 24,
+          borderRadius: 18,
+          background: "rgba(255,255,255,.04)",
+          border: "1px solid rgba(255,255,255,.1)",
+        }}
+      >
+        <div style={{ fontSize: 34, textAlign: "center" }}>{isNew ? "✨" : "🔒"}</div>
+        <h2 style={{ fontSize: 22, fontWeight: 800, margin: "8px 0 2px", textAlign: "center" }}>
+          {isNew ? `Welcome, ${voter.name}!` : `Welcome back, ${voter.name}`}
+        </h2>
+        <p style={{ color: "#9fb8ae", fontSize: 13, textAlign: "center", margin: "0 0 18px" }}>
+          {isNew
+            ? "Set a password — you'll use it to vote and to change your vote later."
+            : "Enter your password to vote."}
+        </p>
+
+        <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <input
+            type="password"
+            autoFocus
+            value={pw}
+            onChange={(e) => setPw(e.target.value)}
+            placeholder={isNew ? "Choose a password" : "Your password"}
+            style={inputStyle}
+          />
+          {isNew ? (
+            <input
+              type="password"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              placeholder="Confirm password"
+              style={inputStyle}
+            />
+          ) : null}
+
+          {(localErr || error) ? (
+            <div style={{ color: "#ffb3b3", fontSize: 13 }}>{localErr || error}</div>
+          ) : null}
+
+          <button
+            type="submit"
+            disabled={busy}
+            style={{
+              background: ACCENT,
+              color: "#052018",
+              fontWeight: 800,
+              padding: "12px 18px",
+              borderRadius: 12,
+              border: "none",
+              cursor: busy ? "default" : "pointer",
+              opacity: busy ? 0.6 : 1,
+              fontSize: 15,
+            }}
+          >
+            {busy ? "…" : isNew ? "Set password & continue" : "Log in"}
+          </button>
+        </form>
+      </div>
+      <button
+        onClick={onBack}
+        style={{
+          display: "block",
+          margin: "14px auto 0",
+          background: "transparent",
+          border: "none",
+          color: "#8ba79c",
+          cursor: "pointer",
+          fontSize: 13,
+        }}
+      >
+        ← pick a different name
+      </button>
     </div>
   );
 }
@@ -276,7 +463,7 @@ function IdentityBar({ name, onChange }: { name: string; onChange: () => void })
           fontSize: 13,
         }}
       >
-        Not you? Switch
+        Log out
       </button>
     </div>
   );

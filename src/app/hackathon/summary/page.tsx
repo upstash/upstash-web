@@ -535,7 +535,7 @@ function AdminPanel({
             </button>
           ) : (
             <span style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 13 }}>
-              Sure?
+              Wipe all votes &amp; passwords?
               <button
                 onClick={() => {
                   onRun("reset");

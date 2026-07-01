@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
-import { castVote, verifyPassword } from "@/lib/hackathon/redis";
+import { authenticate } from "@/lib/hackathon/redis";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -9,9 +9,12 @@ export const dynamic = "force-dynamic";
 const Body = z.object({
   voterId: z.string().min(1),
   password: z.string().min(1),
-  projectIds: z.array(z.string()).default([]),
 });
 
+/**
+ * Log in as a voter — or set their password the first time. Returns the voter's
+ * current ballot on success so the voting UI can pre-select their picks.
+ */
 export async function POST(req: NextRequest) {
   let parsed: z.infer<typeof Body>;
   try {
@@ -20,17 +23,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: "Invalid request." }, { status: 400 });
   }
 
-  // A ballot can only be cast/changed by someone who knows this voter's password.
-  if (!(await verifyPassword(parsed.voterId, parsed.password))) {
-    return NextResponse.json(
-      { ok: false, error: "Not logged in. Please sign in again." },
-      { status: 401 },
-    );
-  }
-
-  const result = await castVote(parsed.voterId, parsed.projectIds);
+  const result = await authenticate(parsed.voterId, parsed.password);
   if (!result.ok) {
-    return NextResponse.json(result, { status: 400 });
+    const status = result.error === "Wrong password." ? 401 : 400;
+    return NextResponse.json(result, { status });
   }
   return NextResponse.json(result);
 }
