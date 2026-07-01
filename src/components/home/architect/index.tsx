@@ -82,13 +82,7 @@ export default function ArchitectSection() {
   return (
     <section className="relative z-0 py-10 md:py-16">
       <Container>
-        {/* One unified card so everything reads as a single, inline tool. */}
-        <div
-          className={cx(
-            "mx-auto max-w-3xl rounded-[2rem] border border-white/10 p-6 text-center md:p-10",
-            "bg-gradient-to-b from-white/[0.04] to-white/[0.01] shadow-2xl shadow-black/20",
-          )}
-        >
+        <div className="mx-auto max-w-3xl text-center">
           {/* header */}
           <div className="flex items-center justify-center gap-2.5">
             <span className="grid size-10 place-items-center rounded-2xl bg-primary/15">
