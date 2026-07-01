@@ -1,4 +1,5 @@
 import { extract, isBoxConfigured } from "@/lib/architect/box";
+import { BLOG_BASE, EXAMPLES } from "@/lib/architect/examples";
 import { screenInput } from "@/lib/architect/guard";
 import { priceEngine } from "@/lib/architect/pricing";
 import {
@@ -41,6 +42,36 @@ const json = (data: unknown, status = 200) =>
   NextResponse.json(data, { status });
 
 /**
+ * Self-documentation: how to call the endpoint + the full catalog of example workloads.
+ * Returned on GET and on an empty POST, so an agent can discover how to use it and learn
+ * what kinds of prompts work — without a docs page.
+ */
+function usageDoc() {
+  return {
+    service: "Upstash Architect",
+    description:
+      "Describe a workload in plain text; get recommended Upstash products, the plan limits that apply, and a monthly cost estimate. Same endpoint for humans and agents.",
+    usage: {
+      method: "POST",
+      path: "/api/architect",
+      body: { message: "<free-text description of what you're building>" },
+      returns:
+        "{ recommendation: { products[], totalMonthlyLow, hasCustom, understood, spec, assumptions }, citations[], cached }",
+    },
+    examples: EXAMPLES.map((e) => ({
+      prompt: e.text,
+      product: e.product,
+      blog: `${BLOG_BASE}${e.blog}`,
+    })),
+  };
+}
+
+/** GET /api/architect — returns usage + the example catalog. */
+export function GET() {
+  return json(usageDoc());
+}
+
+/**
  * POST /api/architect — stateless, one-shot advisor. Same pipeline for web + agents.
  *
  *   1. Ratelimit by IP     3. Cache            5. Deterministic pricing engine
@@ -49,14 +80,23 @@ const json = (data: unknown, status = 200) =>
  * Fail-closed at every guard. The LLM never computes cost and never triggers a side effect.
  */
 export async function POST(req: NextRequest) {
-  // 0. Validate the request body.
-  let body: z.infer<typeof Body>;
+  // 0. Parse leniently — an empty request returns the usage doc + example catalog so an
+  // agent can discover how to call it and what workloads it understands.
+  let parsed: unknown;
   try {
-    body = Body.parse(await req.json());
+    parsed = await req.json();
   } catch {
+    parsed = {};
+  }
+  const raw = (parsed as { message?: unknown } | null)?.message;
+  if (typeof raw !== "string" || raw.trim() === "") {
+    return json(usageDoc());
+  }
+  const body = Body.safeParse(parsed);
+  if (!body.success) {
     return json({ error: "bad_request" }, 400);
   }
-  const { message } = body;
+  const { message } = body.data;
 
   // Demo escape hatch (preview / local only): wipe cache + rate-limit keys so the same
   // prompt can be re-run fresh. Runs before rate-limiting so it works even when limited.

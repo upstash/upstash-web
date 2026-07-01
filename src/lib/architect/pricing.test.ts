@@ -98,6 +98,24 @@ describe("priceEngine — tier selection", () => {
     expect(r.chosenPlan).toBe("Enterprise");
   });
 
+  it("HA / uptime-SLA needs a Fixed plan + Prod Pack (like SOC-2)", () => {
+    const r = product(
+      priceEngine(spec({ products: ["redis"], features: ["ha"], dataSizeGB: 0.1 })),
+      "Redis",
+    );
+    expect(r.chosenPlan.startsWith("Fixed")).toBe(true);
+    const chosen = r.allPlans.find((p) => p.plan === r.chosenPlan);
+    expect(chosen?.monthlyCost).toBe(210); // 250MB $10 + Prod Pack $200
+  });
+
+  it("SSO forces Redis to Enterprise", () => {
+    const r = product(
+      priceEngine(spec({ products: ["redis"], features: ["sso"], dataSizeGB: 1 })),
+      "Redis",
+    );
+    expect(r.chosenPlan).toBe("Enterprise");
+  });
+
   it("large QStash volume selects a Fixed tier over PAYG when cheaper", () => {
     const q = product(
       priceEngine(spec({ products: ["qstash"], messagesPerDay: 900_000 })),

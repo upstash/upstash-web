@@ -46,10 +46,13 @@ function priceRedis(spec: WorkloadSpec): ProductRecommendation {
   const cmdsPerMonth = spec.requestsPerDay * DAYS;
   const regionCount = Math.max(1, spec.regions.length);
   const readRegions = regionCount - 1;
-  const needsProdPack = spec.features.includes("soc2");
+  // Prod Pack covers SOC-2 + Multi-Zone HA + uptime SLA. Enterprise-only: HIPAA, VPC, SSO.
+  const needsProdPack =
+    spec.features.includes("soc2") || spec.features.includes("ha");
   const needsEnterprise =
     spec.features.includes("hipaa") ||
     spec.features.includes("vpc") ||
+    spec.features.includes("sso") ||
     spec.dataSizeGB > 500;
   const plans: PlanOption[] = [];
 
@@ -119,9 +122,9 @@ function priceRedis(spec: WorkloadSpec): ProductRecommendation {
 
   const chosen = chooseCheapest(plans);
   const reason = needsEnterprise
-    ? "HIPAA/VPC or >500 GB requires Enterprise."
+    ? "HIPAA / VPC / SSO or >500 GB requires Enterprise."
     : needsProdPack
-      ? "SOC-2 requires a Fixed plan + Prod Pack (compliance not on Free/PAYG)."
+      ? "SOC-2 / HA / uptime SLA needs a Fixed plan + Prod Pack (not on Free/PAYG)."
       : chosen.plan === "Free"
         ? "Workload fits the Free tier."
         : chosen.plan === "Pay-as-you-go"
