@@ -1,0 +1,95 @@
+---
+title: "Per-IP Rate Limiting in a Next.js API Route with Upstash Redis"
+slug: per-ip-rate-limiting-in-a-next-js-api-route-with-upstash-redis
+authors: [burak]
+tags: [redis]
+description: "Protect any route from abuse in five minutes: one sliding-window config, one IP check, done."
+publishedAt: "2026-07-01T09:23:02.931Z"
+---
+
+# Per-IP Rate Limiting in a Next.js API Route with Upstash Redis
+
+Someone will hit your public API from a script. It might be a scraper, a load tester, or a developer who found your endpoint and wanted to see what happens. Without rate limiting, there is nothing between them and your backend.
+
+This post shows the minimal version: one Next.js App Router route that limits each client IP to 5 requests per 10 seconds using `@upstash/ratelimit` backed by Upstash Redis. No middleware, no abstractions, just the thing itself.
+
+## Why Upstash Redis?
+
+Next.js runs serverless. Each invocation is stateless, so you cannot keep counters in memory since they reset between requests. You need a shared store that lives outside the function.
+
+Upstash Redis is a perfect fit: serverless, pay-per-request, and accessible over HTTP so it works on any runtime including edge. You can spin up a free database from the Upstash console in about 30 seconds.
+
+## Setup
+
+```bash
+npm install @upstash/ratelimit @upstash/redis
+```
+
+Add your credentials to `.env.local` (copy them from the Upstash console after creating a database):
+
+```
+UPSTASH_REDIS_REST_URL=https://...
+UPSTASH_REDIS_REST_TOKEN=...
+```
+
+## The Route Handler
+
+Here is the complete file, about 25 lines:
+
+```ts
+// app/api/data/route.ts
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+import { headers } from "next/headers";
+
+const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(5, "10 s"),
+});
+
+export async function GET() {
+  const ip =
+    (await headers()).get("x-forwarded-for")?.split(",")[0].trim() ??
+    "127.0.0.1";
+
+  const { success, limit, remaining, reset } = await ratelimit.limit(ip);
+
+  if (!success) {
+    return Response.json(
+      { error: "Too many requests" },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": Math.ceil((reset - Date.now()) / 1000).toString(),
+        },
+      }
+    );
+  }
+
+  return Response.json(
+    { data: "here is your data" },
+    { headers: { "X-RateLimit-Remaining": remaining.toString() } }
+  );
+}
+```
+
+![Each request is keyed by client IP; Upstash Redis maintains the sliding window count and returns allow or deny in a single round-trip.](/blog/per-ip-rate-limiting-in-a-next-js-api-route-with-upstash-red/diagram-ba97a9e5c7.svg)
+
+A few things worth calling out:
+
+- `slidingWindow(5, "10 s")`: 5 requests per rolling 10-second window per IP. Sliding window avoids the burst-at-boundary problem of fixed windows, where someone can effectively double their request budget by firing at the end of one window and the start of the next.
+- `x-forwarded-for`: behind any proxy (Vercel, Cloudflare, Nginx), the real client IP lives in this header, not on the request object directly. Take the first comma-separated value, trim whitespace, and fall back to `127.0.0.1` for local dev.
+- `Retry-After`: tells clients exactly how many seconds to wait before retrying. Standard HTTP behavior that any well-behaved client can act on automatically.
+- The `ratelimit` object is declared at module level, not inside the handler. This keeps the Redis connection alive across requests on the same warm instance and lets the optional in-memory ephemeral cache (useful under heavy traffic) do its job.
+
+## Wrap Up
+
+That is the whole thing: three imports, one config, one IP read, one limit check. Drop this into any route and have production-grade rate limiting running in under five minutes.
+
+From here you can add `analytics: true` to the `Ratelimit` config to see per-IP traffic visualized in the Upstash console, or move the logic into `middleware.ts` to protect every `/api/*` route in one place. But per-route is the right starting point: it is explicit, easy to tune per endpoint, and straightforward to test in isolation.
+
+## Try it yourself
+
+**Live demo:** try it right now at [https://integral-flea-82622-3000.preview.box.upstash.com](https://integral-flea-82622-3000.preview.box.upstash.com).
+
+The complete, runnable source lives in the [upstash/examples](https://github.com/upstash/examples/tree/main/examples/nextjs-ratelimit-with-redis) repo.
