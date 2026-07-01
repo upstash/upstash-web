@@ -1,0 +1,72 @@
+---
+title: "Rate Limit Each User Differently with Upstash Redis"
+slug: rate-limit-each-user-differently-with-upstash-redis
+authors: [burak]
+tags: [redis]
+description: "One database, three tiers, a few lines of setup: give free users 60 req/min and paid users 500 without touching a dedicated server."
+publishedAt: "2026-07-01T12:51:38.838Z"
+---
+
+# Rate Limit Each User Differently with Upstash Redis
+
+Most rate limiting guides teach you how to stop a single IP from spamming your endpoint. That's the easy case.
+
+The real problem: free-tier users should get 60 requests per minute. Paid users get 500. Internal service accounts should not be blocked at all. None of this should require a dedicated server to maintain counters in memory.
+
+Upstash Redis handles this cleanly.
+
+## One database, multiple limiters
+
+The `@upstash/ratelimit` package lets you spin up multiple rate limiter instances, all backed by the same Redis database. Each limiter gets its own `prefix` key, so counters across tiers never collide.
+
+```ts
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+
+const redis = Redis.fromEnv();
+
+const limiters = {
+  anonymous: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(10, "1 m"), prefix: "rl:anon" }),
+  free:      new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(60, "1 m"), prefix: "rl:free" }),
+  paid:      new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(500, "1 m"), prefix: "rl:paid" }),
+};
+
+// In your middleware or route handler:
+const tier = !userId ? "anonymous" : plan === "paid" ? "paid" : "free";
+const { success, limit, remaining, reset } = await limiters[tier].limit(userId ?? ip);
+
+if (!success) {
+  return new Response("Too Many Requests", {
+    status: 429,
+    headers: { "Retry-After": String(Math.ceil((reset - Date.now()) / 1000)) },
+  });
+}
+```
+
+The resolver logic is the key part. On each request you check whether there is a user ID, and if so, what plan they are on. That picks the limiter. The `Retry-After` header tells clients exactly when they can retry, which is the polite thing to do.
+
+![How each request flows through tier resolution to Upstash and back.](/blog/write-a-post-about-how-upstash-can-be-used-for-ratelimiting/diagram-8b00726d5b.svg)
+
+## Why Upstash specifically
+
+A few things make Upstash the right fit here, not just any Redis:
+
+**HTTP-based, no persistent connections.** The client talks to Upstash over REST, so the same code runs in a Next.js API route, Vercel Edge Middleware, or a Cloudflare Worker without any connection pool config. Standard Redis clients do not work in these environments because they expect a long-lived TCP connection.
+
+**One database, all tiers.** You do not need three Redis instances. The `prefix` on each limiter (`rl:anon`, `rl:free`, `rl:paid`) keeps counters isolated within a single Upstash database.
+
+**Analytics included.** Add `analytics: true` to any limiter and you get a rate limit dashboard in the Upstash Console. You can see which users are approaching their cap, which tier is getting hit the most, and where abuse is concentrated.
+
+For anonymous traffic, also pass `enableProtection: true`. Upstash maintains a daily-refreshed malicious-IP deny list. IPs on that list get blocked before your business logic runs, with `reason: 'denyList'` in the response so you can handle them separately from regular overuse.
+
+## Wrapping up
+
+The pattern is: one Upstash Redis database, one `Ratelimit` instance per tier with a distinct prefix, and a short resolver that picks the right limiter based on who is making the request. That's it.
+
+If your app will ever have different user tiers, set this up from day one. It takes about 20 minutes and saves you from retrofitting access controls later when someone on the free tier finds a way to run up your costs.
+
+## Try it yourself
+
+**Live demo:** try it right now at [https://next-satyr-80430-3000.preview.box.upstash.com](https://next-satyr-80430-3000.preview.box.upstash.com) — hosted on [Upstash Box](https://upstash.com/box).
+
+The complete, runnable source lives in the [upstash/examples](https://github.com/upstash/examples/tree/main/examples/nextjs-tiered-ratelimit-redis) repo.
