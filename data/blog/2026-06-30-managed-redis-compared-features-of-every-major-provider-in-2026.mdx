@@ -16,7 +16,7 @@ On the product side, Upstash Redis stands out on five things:
 - **Global read replicas.** Add replicas in other regions from the console and reads get served close to the user.
 - **Plans that match your traffic.** Pay-as-you-go for spiky or starting workloads, Fixed plans for predictable costs on queues and polling, Enterprise above that.
 - **Ready-made libraries.** Rate limiting, realtime, analytics, and agent memory ship as packages you install on top of the standard Redis client.
-- **Built-in search.** Upstash Search is full-text search inside the same database, with no separate cluster to run.
+- **Built-in search.** [Upstash Redis Search](https://upstash.com/docs/redis/search/introduction) is full-text search inside the same database, with no separate cluster to run.
 </Summary>
 
 We've already published a [pricing comparison of every major Redis provider](https://upstash.com/blog/redis-pricing-comparison-every-major-provider-in-2026-with-numbers). This is the other half: the product. Pricing tells you what a provider costs; this tells you what it's like to build on.
@@ -71,7 +71,7 @@ const redis = new Redis({
 await redis.set("greeting", "hello");
 ```
 
-Every other provider in the table is TCP-only, and they split into two groups. ElastiCache, MemoryDB, and Memorystore live inside a private VPC with no public endpoint, so you connect from inside the same network and reach them from outside through a VPN, peering, or a bastion host. That's good for a locked-down backend and a dealbreaker for an edge function. Azure Cache, DigitalOcean, Aiven, and Redis Cloud do expose public TLS endpoints, so a normal server anywhere can connect, but they're still TCP, so a Cloudflare Worker or a Vercel Edge function can't open the socket.
+Every other provider in the table is TCP-only, and they split into two groups. ElastiCache, MemoryDB, and Memorystore live inside a private VPC with no public endpoint, so you connect from inside the same network and reach them from outside through a VPN, peering, or a bastion host. That's good for a locked-down backend and a dealbreaker for an edge function. Azure Cache, DigitalOcean, Aiven, and Redis Cloud do expose public TLS endpoints, so a normal server anywhere can connect, but they're still TCP.
 
 A POST to [https://upstash.com/start-redis](https://upstash.com/start-redis) returns a live database URL and token with no login and no API key. It expires in 72 hours unless you claim it, which is handy for a prototype or for handing an AI agent something to write against immediately.
 
@@ -118,7 +118,7 @@ Redis Cloud has the widest set of built-in capabilities. Redis 8 / Redis Stack s
 
 AWS, Google, DigitalOcean, and Aiven run **Valkey**, the BSD-licensed fork that appeared after Redis changed its license in 2024. Valkey covers the core Redis commands but not the modules, so search and JSON aren't available on those providers.
 
-Upstash sits in between. It ships [Upstash Search](https://upstash.com/docs/redis/search/introduction), full-text search built into the database: you write a JSON document to a key and it gets indexed automatically, with no separate search service to run or keep in sync. It's [generally available](https://upstash.com/blog/upstash-redis-search-generally-available) and already powers [millions of searches in Context7](https://upstash.com/blog/how-redis-search-powers-millions-of-searches-in-context7). JSON is first-party too.
+Upstash sits in between. It ships [Upstash Redis Search](https://upstash.com/docs/redis/search/introduction), full-text search built into the database: you write a JSON document to a key and it gets indexed automatically, with no separate search service to run or keep in sync. It's [generally available](https://upstash.com/blog/upstash-redis-search-generally-available) and already powers [millions of searches in Context7](https://upstash.com/blog/how-redis-search-powers-millions-of-searches-in-context7). JSON is first-party too.
 
 What Upstash doesn't have in-keyspace is TimeSeries and Bloom, and vector search is a separate product, [Upstash Vector](https://upstash.com/docs/vector/overall/getstarted). So if you need the full module set in a single query, that's Redis Cloud. For full-text search and JSON, Upstash covers it and the Valkey providers don't.
 
