@@ -122,9 +122,15 @@ export default function Blueprint({ data }: { data: ChatResponse }) {
           </span>
         </h3>
         <div className="text-xs text-text-mute">
-          from{" "}
+          {!rec.hasCustom && rec.totalMonthlyLow > 0 && "from "}
           <span className="font-display text-sm font-bold text-primary-text">
-            {rec.totalMonthlyLow === 0 ? "Free" : `$${rec.totalMonthlyLow}/mo`}
+            {rec.hasCustom
+              ? rec.totalMonthlyLow === 0
+                ? "Custom"
+                : `$${rec.totalMonthlyLow}/mo + custom`
+              : rec.totalMonthlyLow === 0
+                ? "Free"
+                : `$${rec.totalMonthlyLow}/mo`}
           </span>
         </div>
       </div>

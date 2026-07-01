@@ -139,6 +139,24 @@ describe("priceEngine — tier selection", () => {
     expect(rec.totalMonthlyLow).toBeGreaterThan(0);
   });
 
+  it("Workflow re-prices QStash on run volume even when qstash was listed with 0 messages", () => {
+    // Runs land in requestsPerDay; qstash present but messagesPerDay=0 must not stay Free.
+    const rec = priceEngine(
+      spec({ products: ["workflow", "qstash"], requestsPerDay: 5000, messagesPerDay: 0 }),
+    );
+    const q = rec.products.find((p) => p.product === "QStash");
+    expect(q?.chosenPlan).toBe("Pay-as-you-go"); // 5000/day > 1000 Free cap
+    expect(rec.totalMonthlyLow).toBeGreaterThan(0);
+  });
+
+  it("flags custom pricing so Pro/Enterprise plans don't read as $0", () => {
+    const rec = priceEngine(
+      spec({ products: ["vector"], vectorCount: 2_000_000, dimensions: 1536 }),
+    );
+    expect(rec.products[0].chosenPlan).toBe("Pro");
+    expect(rec.hasCustom).toBe(true);
+  });
+
   it("totalMonthlyLow sums chosen plans", () => {
     const rec = priceEngine(
       spec({ products: ["search"], requestsPerDay: 50_000, recordCount: 2_000_000 }),

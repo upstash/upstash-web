@@ -24,7 +24,8 @@ export interface ProductRecommendation {
 
 export interface Recommendation {
   products: ProductRecommendation[];
-  totalMonthlyLow: number; // cheapest coherent combination (nulls treated as 0 / "custom")
+  totalMonthlyLow: number; // sum of numeric monthly costs (custom plans excluded)
+  hasCustom: boolean; // a chosen plan has custom pricing (Pro/Enterprise) — total is a floor
   assumptions: string[];
   spec: WorkloadSpec; // exactly what was parsed from the free text (auditability)
   understood: string; // human-readable summary of `spec`

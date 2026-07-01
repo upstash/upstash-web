@@ -1,45 +1,71 @@
 "use client";
 
 import Container from "@/components/container";
+import IconQStash from "@/components/icon-qstash";
+import IconRedis from "@/components/icon-redis";
+import IconSearch from "@/components/icon-search";
+import IconVector from "@/components/icon-vector";
+import IconWorkflow from "@/components/icon-workflow";
 import cx from "@/utils/cx";
 import {
   IconArrowUp,
+  IconArrowUpRight,
   IconChevronDown,
   IconPlus,
   IconSparkles,
   IconX,
 } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
+import type { SVGProps } from "react";
 import { createPortal } from "react-dom";
 import Blueprint from "./recommendation-card";
 import { type UiResult, useArchitect } from "./use-architect";
 
-// Real use cases drawn from the Upstash blog — each is a concrete, priceable workload.
-const EXAMPLES = [
-  "AI chatbot for a Next.js app, ~30k messages/day, chat history stored in Redis.",
-  "RAG assistant over 100k support docs with semantic search and a daily re-index cron.",
-  "Agent memory store in Redis for a coding agent, ~200k reads/day, low latency.",
-  "Edge rate limiting for a public API on Cloudflare Workers, 2M requests/day, sliding window.",
-  "Semantic cache for LLM responses to cut costs, ~100k queries/day.",
-  "Cache Prisma query results in Redis for a SaaS app, ~1M requests/day.",
-  "Session store for Auth.js in a Next.js app, 200k sessions, EU + US regions.",
-  "Virtual waiting room for a ticket drop, spikes to 100k concurrent users.",
-  "Realtime game leaderboard in Redis, ~20k score updates per minute.",
-  "Blog with page-view counters and comments in Redis, ~1M views/month.",
-  "Vector search over 2M image embeddings at 1536 dims for similarity search.",
-  "Schedule and deliver reminder emails with QStash, ~10k messages/day.",
-  "Background job to summarize new articles via QStash, ~2k jobs/day.",
-  "Rate limit outbound emails per user, ~500k messages/month.",
-  "Article recommendation engine using vector similarity over 500k articles.",
-  "Feature flags served from Redis at the edge, ~5M reads/day.",
-  "Distributed lock for a serverless job runner, ~50k lock ops/day.",
-  "Index and vector-search 6M Wikipedia articles with unlimited queries.",
-  "Full-text + semantic product search over 1M docs, ~40k queries/day.",
-  "Durable incident-response workflow with retries, ~5k runs/day.",
-  "Trending Hacker News search over 1M posts, refreshed by an hourly cron.",
-  "AI companion app storing conversation memory for 50k daily active users.",
-  "API key storage and authentication for a public API, ~300k requests/day.",
-  "Run AI data-analysis tasks in isolated sandboxes, ~1k jobs/day.",
+const PRODUCT_ICON: Record<
+  string,
+  (props: SVGProps<SVGSVGElement>) => JSX.Element
+> = {
+  Redis: IconRedis,
+  Vector: IconVector,
+  QStash: IconQStash,
+  Search: IconSearch,
+  Workflow: IconWorkflow,
+};
+
+const BLOG = "https://upstash.com/blog/";
+
+interface Example {
+  text: string;
+  product: keyof typeof PRODUCT_ICON;
+  blog: string;
+}
+
+// Real use cases drawn from the Upstash blog — each links back to its post.
+const EXAMPLES: Example[] = [
+  { text: "AI chatbot for a Next.js app, ~30k messages/day, chat history stored in Redis.", product: "Redis", blog: "ai-chatbot-nextjs" },
+  { text: "RAG assistant over 100k support docs with semantic search and a daily re-index cron.", product: "Search", blog: "add-ai-assistant-to-docs" },
+  { text: "Agent memory store in Redis for a coding agent, ~200k reads/day, low latency.", product: "Redis", blog: "agent-memory-with-redis" },
+  { text: "Edge rate limiting for a public API on Cloudflare Workers, 2M requests/day, sliding window.", product: "Redis", blog: "cloudflare-workers-rate-limiting" },
+  { text: "Semantic cache for LLM responses to cut costs, ~100k queries/day.", product: "Vector", blog: "caching-ai-sdk-v6-tool-results-with-redis" },
+  { text: "Cache Prisma query results in Redis for a SaaS app, ~1M requests/day.", product: "Redis", blog: "caching-prisma-redis" },
+  { text: "Session store for Auth.js in a Next.js app, 200k sessions, EU + US regions.", product: "Redis", blog: "better-auth-with-redis" },
+  { text: "Virtual waiting room for a ticket drop, spikes to 100k concurrent users.", product: "Redis", blog: "cloudflare-workers-waiting-room" },
+  { text: "Realtime game leaderboard in Redis, ~20k score updates per minute.", product: "Redis", blog: "building-analytics-with-redis" },
+  { text: "Blog with page-view counters and comments in Redis, ~1M views/month.", product: "Redis", blog: "blog-comments-nextjs13" },
+  { text: "Vector search over 2M image embeddings at 1536 dims for similarity search.", product: "Vector", blog: "image-similarity-search" },
+  { text: "Schedule and deliver reminder emails with QStash, ~10k messages/day.", product: "QStash", blog: "email-scheduler-qstash" },
+  { text: "Background job to summarize new articles via QStash, ~2k jobs/day.", product: "QStash", blog: "article-summarizer-qstash-python" },
+  { text: "Rate limit outbound emails per user, ~500k messages/month.", product: "Redis", blog: "email-ratelimiting" },
+  { text: "Article recommendation engine using vector similarity over 500k articles.", product: "Vector", blog: "article-recommendation-system" },
+  { text: "Feature flags served from Redis at the edge, ~5M reads/day.", product: "Redis", blog: "feature-flags-with-vercel-and-upstash" },
+  { text: "Distributed lock for a serverless job runner, ~50k lock ops/day.", product: "Redis", blog: "distributed-lock" },
+  { text: "Index and vector-search 6M Wikipedia articles with unlimited queries.", product: "Vector", blog: "indexing-wikipedia" },
+  { text: "Full-text + semantic product search over 1M docs, ~40k queries/day.", product: "Search", blog: "first-look-at-upstash-redis-search" },
+  { text: "Durable incident-response workflow with retries, ~5k runs/day.", product: "Workflow", blog: "how-does-workflow-orchestration-work" },
+  { text: "Trending Hacker News search over 1M posts, refreshed by an hourly cron.", product: "Search", blog: "hacker-news-trends-redis-search" },
+  { text: "AI companion app storing conversation memory for 50k daily active users.", product: "Redis", blog: "ai-companion-app" },
+  { text: "API key storage and authentication for a public API, ~300k requests/day.", product: "Redis", blog: "api-key-generator-upstash-redis" },
+  { text: "Run AI data-analysis tasks in isolated sandboxes, ~1k jobs/day.", product: "QStash", blog: "box-ai-data-analyst" },
 ];
 
 const strip = (s?: string) => (s ? s.replace(/\s+/g, " ").trim() : "");
@@ -75,65 +101,76 @@ export default function ArchitectSection() {
   return (
     <section className="relative z-0 py-10 md:py-16">
       <Container>
-        {/* eyebrow */}
-        <div className="mx-auto mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-text-mute">
-          <IconSparkles size={14} className="text-primary-text" />
-          Upstash Architect
-          <span className="rounded-full bg-primary/20 px-1.5 py-0.5 text-[10px] font-medium text-primary-text">
-            AI
-          </span>
-        </div>
-
-        <h2 className="font-display text-2xl font-bold text-text md:text-4xl">
-          Describe your project. Get an Upstash blueprint.
-        </h2>
-        <p className="mx-auto mt-2 max-w-2xl text-text-mute md:text-lg">
-          Products, plans, every limit, and a monthly cost estimate — generated
-          from a plain-text description.
-        </p>
-
-        {/* The input always keeps the same look, so closing the result returns here. */}
-        <div className="mx-auto mt-8 max-w-3xl">
-          <PromptInput
-            value={input}
-            onChange={setInput}
-            onSubmit={submit}
-            loading={loading}
-            placeholder="e.g. RAG chatbot, 50k requests/day, semantic search over 2M docs, EU + US, SOC-2…"
-          />
-
-          {hasResult ? (
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-              <button
-                type="button"
-                onClick={() => setOpen(true)}
-                className={cx(
-                  "inline-flex min-w-0 items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-text-mute",
-                  "transition hover:border-white/25 hover:bg-white/5 hover:text-text",
-                )}
-                title={strip(current?.query)}
-              >
-                <IconSparkles size={14} className="shrink-0 text-primary-text" />
-                <span className="max-w-[52vw] truncate sm:max-w-xs">
-                  {loading
-                    ? "Designing your blueprint…"
-                    : `View result: ${strip(current?.query)}`}
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={newRequest}
-                className={cx(
-                  "inline-flex shrink-0 items-center gap-1.5 rounded-full border border-primary/40 px-3 py-1.5 text-xs font-medium text-primary-text",
-                  "transition hover:bg-primary/10",
-                )}
-              >
-                <IconPlus size={14} /> New request
-              </button>
-            </div>
-          ) : (
-            <ExampleCloud loading={loading} onPick={runExample} />
+        {/* One unified card so everything reads as a single tool. */}
+        <div
+          className={cx(
+            "mx-auto max-w-3xl rounded-[2rem] border border-white/10 p-6 text-center md:p-10",
+            "bg-gradient-to-b from-white/[0.04] to-white/[0.01] shadow-2xl shadow-black/20",
           )}
+        >
+          {/* prominent header */}
+          <div className="flex items-center justify-center gap-2.5">
+            <span className="grid size-10 place-items-center rounded-2xl bg-primary/15">
+              <IconSparkles size={22} className="text-primary-text" />
+            </span>
+            <span className="font-display text-2xl font-bold text-text md:text-3xl">
+              Upstash Architect
+            </span>
+            <span className="rounded-full bg-primary/20 px-2 py-0.5 text-xs font-semibold text-primary-text">
+              AI
+            </span>
+          </div>
+
+          <h2 className="mt-5 font-display text-lg font-semibold text-text md:text-xl">
+            Describe your project. Get an Upstash blueprint.
+          </h2>
+          <p className="mx-auto mt-1.5 max-w-xl text-sm text-text-mute md:text-base">
+            Products, plans, every limit, and a monthly cost estimate — generated
+            from a plain-text description.
+          </p>
+
+          <div className="mt-6 text-left">
+            <PromptInput
+              value={input}
+              onChange={setInput}
+              onSubmit={submit}
+              loading={loading}
+              placeholder="e.g. RAG chatbot, 50k requests/day, semantic search over 2M docs, EU + US, SOC-2…"
+            />
+
+            {hasResult ? (
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setOpen(true)}
+                  className={cx(
+                    "inline-flex min-w-0 items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-text-mute",
+                    "transition hover:border-white/25 hover:bg-white/5 hover:text-text",
+                  )}
+                  title={strip(current?.query)}
+                >
+                  <IconSparkles size={14} className="shrink-0 text-primary-text" />
+                  <span className="max-w-[52vw] truncate sm:max-w-xs">
+                    {loading
+                      ? "Designing your blueprint…"
+                      : `View result: ${strip(current?.query)}`}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={newRequest}
+                  className={cx(
+                    "inline-flex shrink-0 items-center gap-1.5 rounded-full border border-primary/40 px-3 py-1.5 text-xs font-medium text-primary-text",
+                    "transition hover:bg-primary/10",
+                  )}
+                >
+                  <IconPlus size={14} /> New request
+                </button>
+              </div>
+            ) : (
+              <ExampleCloud loading={loading} onPick={runExample} />
+            )}
+          </div>
         </div>
       </Container>
 
@@ -218,8 +255,10 @@ function ArchitectModal({
       >
         {/* header */}
         <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
-          <div className="flex items-center gap-2">
-            <IconSparkles size={20} className="text-primary-text" />
+          <div className="flex items-center gap-2.5">
+            <span className="grid size-8 place-items-center rounded-xl bg-primary/15">
+              <IconSparkles size={18} className="text-primary-text" />
+            </span>
             <div>
               <div className="font-display font-semibold text-text">
                 Upstash Architect
@@ -274,7 +313,6 @@ function ArchitectModal({
                 {current.error}
               </p>
             ) : (
-              // Empty state (incl. after "New request"): show the templates to pick from.
               <ExampleCloud loading={loading} onPick={onPickExample} />
             )}
           </div>
@@ -328,24 +366,38 @@ function ExampleCloud({
         <div
           ref={ref}
           onScroll={onScroll}
-          className="max-h-56 overflow-y-auto rounded-2xl border border-white/10 bg-white/[0.02] p-2"
+          className="max-h-60 overflow-y-auto rounded-2xl border border-white/10 bg-white/[0.02] p-1.5"
         >
-          {/* One full example per line — readable, not truncated. */}
-          <div className="flex flex-col gap-0.5 pb-6">
-            {EXAMPLES.map((ex) => (
-              <button
-                key={ex}
-                type="button"
-                onClick={() => onPick(ex)}
-                disabled={loading}
-                className={cx(
-                  "w-full rounded-lg px-3 py-2 text-left text-sm text-text-mute",
-                  "transition hover:bg-white/5 hover:text-text disabled:opacity-40",
-                )}
-              >
-                {ex}
-              </button>
-            ))}
+          <div className="flex flex-col pb-6">
+            {EXAMPLES.map((ex) => {
+              const Icon = PRODUCT_ICON[ex.product];
+              return (
+                <div
+                  key={ex.blog}
+                  className="group flex items-center gap-3 rounded-xl px-2.5 py-2 transition hover:bg-white/5"
+                >
+                  {Icon && <Icon width={22} className="shrink-0 rounded-md" />}
+                  <button
+                    type="button"
+                    onClick={() => onPick(ex.text)}
+                    disabled={loading}
+                    className="min-w-0 flex-1 text-left text-sm text-text-mute transition group-hover:text-text disabled:opacity-40"
+                  >
+                    {ex.text}
+                  </button>
+                  <a
+                    href={`${BLOG}${ex.blog}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    title="Read the blog post"
+                    className="inline-flex shrink-0 items-center gap-0.5 rounded-full px-2 py-1 text-[11px] text-text-mute opacity-0 transition hover:bg-white/10 hover:text-primary-text focus:opacity-100 group-hover:opacity-100"
+                  >
+                    Blog <IconArrowUpRight size={13} />
+                  </a>
+                </div>
+              );
+            })}
           </div>
         </div>
 

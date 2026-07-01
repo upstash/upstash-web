@@ -460,19 +460,31 @@ export function priceEngine(spec: WorkloadSpec): Recommendation {
     return { ...rec, reasoning: buildReasoning(rec) };
   });
 
-  // Upstash Workflow has no separate billing — it runs on QStash. If the workload implies a
-  // workflow but didn't list QStash, price QStash from the run volume so the total isn't $0.
-  if (spec.products.includes("workflow") && !spec.products.includes("qstash")) {
-    const runs = spec.messagesPerDay || spec.requestsPerDay;
+  // Upstash Workflow has no separate billing — it runs on QStash. Price QStash from the run
+  // volume (runs may land in requestsPerDay), replacing any under-priced QStash entry, so a
+  // workflow is never shown as $0.
+  if (spec.products.includes("workflow")) {
+    const runs = Math.max(spec.messagesPerDay, spec.requestsPerDay);
     const q = priceQStash({ ...spec, messagesPerDay: runs });
     q.reason =
-      "QStash backs Upstash Workflow — this is the delivery cost of your workflow runs.";
-    products.push({ ...q, reasoning: buildReasoning(q) });
+      "QStash backs Upstash Workflow — the delivery cost of your workflow runs.";
+    const entry = { ...q, reasoning: buildReasoning(q) };
+    const idx = products.findIndex((p) => p.product === "QStash");
+    if (idx >= 0) {
+      products[idx] = entry;
+    } else {
+      products.push(entry);
+    }
   }
 
+  let hasCustom = false;
   const totalMonthlyLow = round(
     products.reduce((sum, p) => {
       const chosen = p.allPlans.find((pl) => pl.plan === p.chosenPlan);
+      // A chosen plan with no numeric price (Pro / Enterprise) → custom; total is a floor.
+      if (chosen && chosen.monthlyCost == null) {
+        hasCustom = true;
+      }
       return sum + (chosen?.monthlyCost ?? 0);
     }, 0),
   );
@@ -490,6 +502,7 @@ export function priceEngine(spec: WorkloadSpec): Recommendation {
   return {
     products,
     totalMonthlyLow,
+    hasCustom,
     assumptions,
     spec,
     understood: summarizeSpec(spec),
