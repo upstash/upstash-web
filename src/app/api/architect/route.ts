@@ -11,6 +11,7 @@ import {
 import { SpecValidationError } from "@/lib/architect/schema";
 import { citationsFor } from "@/lib/architect/search";
 import type { ChatResponse } from "@/lib/architect/types";
+import { BoxError } from "@upstash/box";
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
@@ -117,6 +118,15 @@ export async function POST(req: NextRequest) {
     if (err instanceof Error && err.message === "box_not_configured") {
       console.error("[architect] llm_unavailable: UPSTASH_BOX_API_KEY not set");
       return json({ error: "llm_unavailable" }, 503);
+    }
+    // The Box run itself failed (agent error, max turns, timeout) — upstream/LLM issue,
+    // not our bug. Log it and return a retryable status rather than a 500.
+    if (err instanceof BoxError) {
+      console.error(
+        `[architect] box_run_failed (session=${sessionId}) for input: ${message}`,
+        err,
+      );
+      return json({ error: "generation_failed" }, 503);
     }
     console.error(
       `[architect] internal_error (session=${sessionId}) for input: ${message}`,
