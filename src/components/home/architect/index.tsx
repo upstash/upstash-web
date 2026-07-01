@@ -261,7 +261,7 @@ function ArchitectModal({
               ) : (
                 <div
                   key={m.id}
-                  className="rounded-3xl border border-white/10 bg-white/[0.02] p-5 md:p-6"
+                  className="rounded-2xl border border-white/10 bg-white/[0.02] p-4"
                 >
                   {m.response ? (
                     <Blueprint data={m.response} />
