@@ -9,8 +9,12 @@
  * Redis so display names can change without breaking existing ballots.
  */
 
-/** Max number of distinct projects a single person may vote for. */
-export const MAX_VOTES = 5;
+/**
+ * Total points each person can distribute across projects. Points can be
+ * stacked on a single project (e.g. 3 to one, 2 to another), as long as the
+ * total is at most this and none go to your own project.
+ */
+export const MAX_POINTS = 5;
 
 export interface Project {
   id: string;

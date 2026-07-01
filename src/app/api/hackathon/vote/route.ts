@@ -9,7 +9,8 @@ export const dynamic = "force-dynamic";
 const Body = z.object({
   voterId: z.string().min(1),
   password: z.string().min(1),
-  projectIds: z.array(z.string()).default([]),
+  // projectId -> points allocated. Validated in full server-side (castVote).
+  points: z.record(z.string(), z.number()).default({}),
 });
 
 export async function POST(req: NextRequest) {
@@ -28,7 +29,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const result = await castVote(parsed.voterId, parsed.projectIds);
+  const result = await castVote(parsed.voterId, parsed.points);
   if (!result.ok) {
     return NextResponse.json(result, { status: 400 });
   }

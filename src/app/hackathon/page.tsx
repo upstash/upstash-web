@@ -23,7 +23,7 @@ interface VoterInfo {
 interface State {
   configured: boolean;
   votingOpen: boolean;
-  maxVotes: number;
+  maxPoints: number;
   projects: Project[];
   voters: VoterInfo[];
   votedCount: number;
@@ -31,11 +31,17 @@ interface State {
   complete: boolean;
 }
 
+type Points = Record<string, number>;
+
+function sumPoints(p: Points): number {
+  return Object.values(p).reduce((a, b) => a + b, 0);
+}
+
 export default function HackathonVotePage() {
   const [state, setState] = useState<State | null>(null);
   const [voterId, setVoterId] = useState<string | null>(null);
   const [password, setPassword] = useState<string | null>(null); // set once logged in
-  const [selected, setSelected] = useState<string[]>([]);
+  const [points, setPoints] = useState<Points>({});
   const [saving, setSaving] = useState(false);
   const [authBusy, setAuthBusy] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
@@ -62,7 +68,11 @@ export default function HackathonVotePage() {
         if (data.ok) {
           setPassword(pw);
           sessionStorage.setItem(PW_KEY, pw);
-          setSelected(Array.isArray(data.ballot) ? data.ballot : []);
+          const ballot =
+            data.ballot && typeof data.ballot === "object" && !Array.isArray(data.ballot)
+              ? (data.ballot as Points)
+              : {};
+          setPoints(ballot);
           setMessage(null);
           return true;
         }
@@ -97,7 +107,7 @@ export default function HackathonVotePage() {
     localStorage.setItem(ID_KEY, id);
     setPassword(null);
     sessionStorage.removeItem(PW_KEY);
-    setSelected([]);
+    setPoints({});
     setAuthError(null);
     setMessage(null);
   };
@@ -107,7 +117,7 @@ export default function HackathonVotePage() {
     setPassword(null);
     localStorage.removeItem(ID_KEY);
     sessionStorage.removeItem(PW_KEY);
-    setSelected([]);
+    setPoints({});
     setAuthError(null);
     setMessage(null);
   };
@@ -117,12 +127,24 @@ export default function HackathonVotePage() {
     sessionStorage.removeItem(PW_KEY);
   };
 
-  const toggle = (projectId: string) => {
+  const max = state?.maxPoints ?? 5;
+
+  const inc = (projectId: string) => {
     setMessage(null);
-    setSelected((prev) => {
-      if (prev.includes(projectId)) return prev.filter((x) => x !== projectId);
-      if (prev.length >= (state?.maxVotes ?? 5)) return prev; // hard cap
-      return [...prev, projectId];
+    setPoints((prev) => {
+      if (sumPoints(prev) >= max) return prev; // out of points
+      return { ...prev, [projectId]: (prev[projectId] ?? 0) + 1 };
+    });
+  };
+
+  const dec = (projectId: string) => {
+    setMessage(null);
+    setPoints((prev) => {
+      const next = { ...prev };
+      const cur = next[projectId] ?? 0;
+      if (cur <= 1) delete next[projectId];
+      else next[projectId] = cur - 1;
+      return next;
     });
   };
 
@@ -134,7 +156,7 @@ export default function HackathonVotePage() {
       const res = await fetch("/api/hackathon/vote", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ voterId, password, projectIds: selected }),
+        body: JSON.stringify({ voterId, password, points }),
       });
       const data = await res.json();
       if (data.ok) {
@@ -196,10 +218,11 @@ export default function HackathonVotePage() {
             ) : (
               <VotePanel
                 projects={state.projects}
-                selected={selected}
+                points={points}
                 ownProjectId={me.ownProjectId}
-                maxVotes={state.maxVotes}
-                onToggle={toggle}
+                maxPoints={state.maxPoints}
+                onInc={inc}
+                onDec={dec}
                 onSubmit={submit}
                 saving={saving}
                 message={message}
@@ -225,8 +248,8 @@ function Header() {
         Cast your votes 🗳️
       </h1>
       <p style={{ color: "#9fb8ae", margin: 0 }}>
-        Pick up to <b style={{ color: ACCENT }}>5</b> projects. You can't vote for your
-        own — winners get an e-bike 🚲
+        Spend <b style={{ color: ACCENT }}>5 points</b> — stack them on one project or
+        spread them out. You can't vote for your own — winners get an e-bike 🚲
       </p>
     </div>
   );
@@ -509,26 +532,29 @@ function ClosedState({ complete }: { complete: boolean }) {
 
 function VotePanel({
   projects,
-  selected,
+  points,
   ownProjectId,
-  maxVotes,
-  onToggle,
+  maxPoints,
+  onInc,
+  onDec,
   onSubmit,
   saving,
   message,
   alreadyVoted,
 }: {
   projects: Project[];
-  selected: string[];
+  points: Points;
   ownProjectId: string | null;
-  maxVotes: number;
-  onToggle: (id: string) => void;
+  maxPoints: number;
+  onInc: (id: string) => void;
+  onDec: (id: string) => void;
   onSubmit: () => void;
   saving: boolean;
   message: { kind: "ok" | "err"; text: string } | null;
   alreadyVoted: boolean;
 }) {
-  const remaining = maxVotes - selected.length;
+  const used = sumPoints(points);
+  const remaining = maxPoints - used;
   return (
     <div>
       <div
@@ -549,8 +575,8 @@ function VotePanel({
         }}
       >
         <div style={{ fontWeight: 700 }}>
-          <span style={{ color: ACCENT, fontSize: 20 }}>{selected.length}</span>
-          <span style={{ color: "#9fb8ae" }}> / {maxVotes} selected</span>
+          <span style={{ color: ACCENT, fontSize: 20 }}>{remaining}</span>
+          <span style={{ color: "#9fb8ae" }}> / {maxPoints} points left</span>
           {alreadyVoted ? (
             <span style={{ color: "#9fb8ae", fontWeight: 400 }}> · you've voted</span>
           ) : null}
@@ -598,26 +624,23 @@ function VotePanel({
       >
         {projects.map((p) => {
           const isOwn = p.id === ownProjectId;
-          const isSelected = selected.includes(p.id);
-          const disabledByCap = !isSelected && remaining <= 0;
-          const disabled = isOwn || disabledByCap;
+          const pts = points[p.id] ?? 0;
+          const active = pts > 0;
+          const canInc = !isOwn && remaining > 0;
           return (
-            <button
+            <div
               key={p.id}
-              onClick={() => !isOwn && onToggle(p.id)}
-              disabled={isOwn}
+              onClick={() => canInc && onInc(p.id)}
               style={{
                 textAlign: "left",
                 padding: 16,
                 borderRadius: 16,
-                cursor: isOwn ? "not-allowed" : "pointer",
-                background: isSelected
+                cursor: canInc ? "pointer" : "default",
+                background: active
                   ? "rgba(0,233,163,.14)"
                   : "rgba(255,255,255,.035)",
-                border: `1.5px solid ${
-                  isSelected ? ACCENT : "rgba(255,255,255,.1)"
-                }`,
-                opacity: disabled && !isSelected ? 0.5 : 1,
+                border: `1.5px solid ${active ? ACCENT : "rgba(255,255,255,.1)"}`,
+                opacity: isOwn ? 0.5 : 1,
                 transition: "all .15s",
                 position: "relative",
               }}
@@ -625,28 +648,31 @@ function VotePanel({
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <span style={{ fontSize: 26 }}>{p.emoji}</span>
                 <span style={{ fontWeight: 700, fontSize: 16, flex: 1 }}>{p.name}</span>
-                <span
-                  style={{
-                    width: 22,
-                    height: 22,
-                    borderRadius: 6,
-                    border: `1.5px solid ${isSelected ? ACCENT : "rgba(255,255,255,.3)"}`,
-                    background: isSelected ? ACCENT : "transparent",
-                    color: "#052018",
-                    fontWeight: 900,
-                    fontSize: 14,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
-                  }}
-                >
-                  {isSelected ? "✓" : ""}
-                </span>
+                {active ? (
+                  <span
+                    style={{
+                      minWidth: 26,
+                      height: 26,
+                      padding: "0 6px",
+                      borderRadius: 999,
+                      background: ACCENT,
+                      color: "#052018",
+                      fontWeight: 900,
+                      fontSize: 14,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {pts}
+                  </span>
+                ) : null}
               </div>
-              <p style={{ color: "#9fb8ae", fontSize: 13, margin: "10px 0 0", lineHeight: 1.5 }}>
+              <p style={{ color: "#9fb8ae", fontSize: 13, margin: "10px 0 12px", lineHeight: 1.5 }}>
                 {p.description}
               </p>
+
               {isOwn ? (
                 <span
                   style={{
@@ -663,12 +689,64 @@ function VotePanel({
                 >
                   YOUR PROJECT
                 </span>
-              ) : null}
-            </button>
+              ) : (
+                <div
+                  // stop card's onClick (increment) from firing when using the stepper
+                  onClick={(e) => e.stopPropagation()}
+                  style={{ display: "flex", alignItems: "center", gap: 10 }}
+                >
+                  <Stepper
+                    label="−"
+                    disabled={pts <= 0}
+                    onClick={() => onDec(p.id)}
+                  />
+                  <span style={{ minWidth: 56, textAlign: "center", color: "#9fb8ae", fontSize: 13 }}>
+                    {pts} {pts === 1 ? "point" : "points"}
+                  </span>
+                  <Stepper
+                    label="+"
+                    disabled={remaining <= 0}
+                    onClick={() => onInc(p.id)}
+                  />
+                </div>
+              )}
+            </div>
           );
         })}
       </div>
     </div>
+  );
+}
+
+function Stepper({
+  label,
+  disabled,
+  onClick,
+}: {
+  label: string;
+  disabled: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      style={{
+        width: 34,
+        height: 34,
+        borderRadius: 10,
+        border: `1px solid ${disabled ? "rgba(255,255,255,.12)" : ACCENT}`,
+        background: disabled ? "rgba(255,255,255,.03)" : "rgba(0,233,163,.14)",
+        color: disabled ? "#4f635b" : ACCENT,
+        fontSize: 20,
+        fontWeight: 800,
+        lineHeight: 1,
+        cursor: disabled ? "default" : "pointer",
+        flexShrink: 0,
+      }}
+    >
+      {label}
+    </button>
   );
 }
 

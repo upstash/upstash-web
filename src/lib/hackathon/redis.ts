@@ -2,7 +2,7 @@ import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { Redis } from "@upstash/redis";
 
 import {
-  MAX_VOTES,
+  MAX_POINTS,
   PROJECTS,
   VOTERS,
   isValidProject,
@@ -10,13 +10,16 @@ import {
   ownProjectId,
 } from "./data";
 
+/** A ballot: projectId -> points allocated (each >= 1, total <= MAX_POINTS). */
+export type Ballot = Record<string, number>;
+
 /**
  * Redis-backed storage for hackathon voting. Uses the existing
  * UPSTASH_REDIS_REST_* env vars.
  *
  * Data model (all under the `hackathon:*` namespace):
  *   - `hackathon:open`     string  "1" when voting is open, else "0"/absent
- *   - `hackathon:ballots`  hash    voterId -> JSON array of project ids
+ *   - `hackathon:ballots`  hash    voterId -> JSON object { projectId: points }
  *   - `hackathon:pw`       hash    voterId -> "saltHex:sha256Hex" (per-voter password)
  *
  * Tally is computed on read from the ballots hash. With ~19 voters this is a
@@ -56,41 +59,52 @@ export async function setVotingOpen(open: boolean): Promise<void> {
   await redis.set(KEY.open, open ? "1" : "0");
 }
 
-/** Raw ballots: voterId -> project ids they voted for. */
-export async function getBallots(): Promise<Record<string, string[]>> {
+/** Raw ballots: voterId -> { projectId: points }. */
+export async function getBallots(): Promise<Record<string, Ballot>> {
   if (!redis) return {};
   const raw = (await redis.hgetall<Record<string, unknown>>(KEY.ballots)) ?? {};
-  const out: Record<string, string[]> = {};
+  const out: Record<string, Ballot> = {};
   for (const [voterId, value] of Object.entries(raw)) {
     out[voterId] = normalizeBallotValue(value);
   }
   return out;
 }
 
-export async function getBallot(voterId: string): Promise<string[]> {
-  if (!redis) return [];
+export async function getBallot(voterId: string): Promise<Ballot> {
+  if (!redis) return {};
   const value = await redis.hget<unknown>(KEY.ballots, voterId);
   return normalizeBallotValue(value);
 }
 
 /**
- * The Upstash Redis client auto-deserializes JSON, so a stored array may come
- * back as a real array; older/edge cases may come back as a JSON string. Handle
- * both and drop anything that's no longer a valid project.
+ * The Upstash Redis client auto-deserializes JSON, so a stored ballot may come
+ * back as a real object (or, in edge cases, a JSON string). Handle both, keep
+ * only valid projects with positive integer points, and also accept the legacy
+ * `string[]` shape (each id counted as 1 point) so old data doesn't blow up.
  */
-function normalizeBallotValue(value: unknown): string[] {
-  let arr: unknown = value;
+function normalizeBallotValue(value: unknown): Ballot {
+  let parsed: unknown = value;
   if (typeof value === "string") {
     try {
-      arr = JSON.parse(value);
+      parsed = JSON.parse(value);
     } catch {
-      arr = [];
+      parsed = {};
     }
   }
-  if (!Array.isArray(arr)) return [];
-  return arr.filter(
-    (id): id is string => typeof id === "string" && isValidProject(id),
-  );
+  const out: Ballot = {};
+  if (Array.isArray(parsed)) {
+    for (const id of parsed) {
+      if (typeof id === "string" && isValidProject(id)) out[id] = 1;
+    }
+    return out;
+  }
+  if (parsed && typeof parsed === "object") {
+    for (const [id, pts] of Object.entries(parsed as Record<string, unknown>)) {
+      const n = typeof pts === "number" ? pts : Number(pts);
+      if (isValidProject(id) && Number.isInteger(n) && n > 0) out[id] = n;
+    }
+  }
+  return out;
 }
 
 /* ------------------------------------------------------------------ *
@@ -128,7 +142,7 @@ export interface AuthResult {
   /** True when this call just created the account (first-time password set). */
   created?: boolean;
   error?: string;
-  ballot?: string[];
+  ballot?: Ballot;
 }
 
 /**
@@ -158,7 +172,7 @@ export async function authenticate(
     // HSETNX guards against two "first" registrations racing.
     const created = await redis.hsetnx(KEY.passwords, voterId, value);
     if (created === 1) {
-      return { ok: true, created: true, ballot: [] };
+      return { ok: true, created: true, ballot: {} };
     }
     // Lost the race — fall through to verifying against what got stored.
     const now = await redis.hget<unknown>(KEY.passwords, voterId);
@@ -187,7 +201,7 @@ export async function verifyPassword(
 export interface VoteResult {
   ok: boolean;
   error?: string;
-  ballot?: string[];
+  ballot?: Ballot;
 }
 
 /**
@@ -195,12 +209,13 @@ export interface VoteResult {
  * is the single source of truth:
  *   - voting must be open (closing locks everyone's decision)
  *   - voter must be on the eligible list
- *   - at most MAX_VOTES distinct, valid projects
- *   - cannot vote for your own project
+ *   - each allocation is a positive integer for a real project
+ *   - total points across projects is at most MAX_POINTS
+ *   - cannot allocate points to your own project
  */
 export async function castVote(
   voterId: string,
-  projectIds: string[],
+  points: Ballot,
 ): Promise<VoteResult> {
   if (!redis) return { ok: false, error: "Voting storage is not configured." };
 
@@ -211,23 +226,31 @@ export async function castVote(
     return { ok: false, error: "Voting is not open." };
   }
 
-  const unique = Array.from(new Set(projectIds));
+  const own = ownProjectId(voterId);
+  const clean: Ballot = {};
+  let total = 0;
 
-  if (unique.length > MAX_VOTES) {
-    return { ok: false, error: `You can vote for at most ${MAX_VOTES} projects.` };
-  }
-  for (const id of unique) {
+  for (const [id, rawPts] of Object.entries(points)) {
     if (!isValidProject(id)) {
       return { ok: false, error: `Unknown project: ${id}` };
     }
-  }
-  const own = ownProjectId(voterId);
-  if (own && unique.includes(own)) {
-    return { ok: false, error: "You can't vote for your own project." };
+    if (!Number.isInteger(rawPts) || rawPts < 0) {
+      return { ok: false, error: "Points must be whole numbers." };
+    }
+    if (rawPts === 0) continue; // dropping a project
+    if (id === own) {
+      return { ok: false, error: "You can't vote for your own project." };
+    }
+    clean[id] = rawPts;
+    total += rawPts;
   }
 
-  await redis.hset(KEY.ballots, { [voterId]: JSON.stringify(unique) });
-  return { ok: true, ballot: unique };
+  if (total > MAX_POINTS) {
+    return { ok: false, error: `You can spend at most ${MAX_POINTS} points.` };
+  }
+
+  await redis.hset(KEY.ballots, { [voterId]: JSON.stringify(clean) });
+  return { ok: true, ballot: clean };
 }
 
 export interface Results {
@@ -246,18 +269,19 @@ export interface Results {
  * "everyone has voted".
  */
 export function computeResults(
-  ballots: Record<string, string[]>,
+  ballots: Record<string, Ballot>,
   votingOpen: boolean,
 ): Results {
   const tally: Record<string, number> = {};
   for (const p of PROJECTS) tally[p.id] = 0;
 
   const votedVoterIds: string[] = [];
-  for (const [voterId, ids] of Object.entries(ballots)) {
-    if (!isValidVoter(voterId) || ids.length === 0) continue;
+  for (const [voterId, ballot] of Object.entries(ballots)) {
+    const entries = Object.entries(ballot);
+    if (!isValidVoter(voterId) || entries.length === 0) continue;
     votedVoterIds.push(voterId);
-    for (const id of ids) {
-      if (id in tally) tally[id] += 1;
+    for (const [id, pts] of entries) {
+      if (id in tally) tally[id] += pts;
     }
   }
 

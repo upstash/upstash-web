@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import {
-  MAX_VOTES,
+  MAX_POINTS,
   PROJECTS,
   VOTERS,
   ownProjectId,
@@ -34,7 +34,7 @@ export async function GET() {
   return NextResponse.json({
     configured: isConfigured(),
     votingOpen,
-    maxVotes: MAX_VOTES,
+    maxPoints: MAX_POINTS,
     projects: PROJECTS.map((p) => ({
       id: p.id,
       name: p.name,
