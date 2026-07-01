@@ -1,12 +1,6 @@
 // Shared types for the Upstash Architect advisor.
 // NONE of the pricing types depend on the LLM — the deterministic engine owns them.
 
-export interface ChatTurn {
-  role: "user" | "assistant";
-  content: string;
-  at: number; // epoch ms
-}
-
 export interface PlanOption {
   plan: string; // "Free" | "Pay-as-you-go" | "Fixed 250MB" | "Enterprise" | ...
   monthlyCost: number | null; // null = "Custom" / "Coming soon"

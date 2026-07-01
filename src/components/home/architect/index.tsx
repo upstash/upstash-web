@@ -4,7 +4,7 @@ import Container from "@/components/container";
 import cx from "@/utils/cx";
 import {
   IconArrowUp,
-  IconMessage,
+  IconChevronDown,
   IconPlus,
   IconSparkles,
   IconX,
@@ -12,27 +12,47 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Blueprint from "./recommendation-card";
-import { type UiMessage, useArchitect } from "./use-architect";
+import { type UiResult, useArchitect } from "./use-architect";
 
+// Real use cases drawn from the Upstash blog — each is a concrete, priceable workload.
 const EXAMPLES = [
-  "RAG chatbot, ~50k requests/day, semantic search over 2M docs, a daily cron, EU + US regions, need SOC-2.",
-  "Rate limiter and cache for a Next.js app, ~1M requests/day, single region.",
-  "Vector search over 10M embeddings with unlimited queries and 99.9% SLA.",
+  "AI chatbot for a Next.js app, ~30k messages/day, chat history stored in Redis.",
+  "RAG assistant over 100k support docs with semantic search and a daily re-index cron.",
+  "Agent memory store in Redis for a coding agent, ~200k reads/day, low latency.",
+  "Edge rate limiting for a public API on Cloudflare Workers, 2M requests/day, sliding window.",
+  "Semantic cache for LLM responses to cut costs, ~100k queries/day.",
+  "Cache Prisma query results in Redis for a SaaS app, ~1M requests/day.",
+  "Session store for Auth.js in a Next.js app, 200k sessions, EU + US regions.",
+  "Virtual waiting room for a ticket drop, spikes to 100k concurrent users.",
+  "Realtime game leaderboard in Redis, ~20k score updates per minute.",
+  "Blog with page-view counters and comments in Redis, ~1M views/month.",
+  "Vector search over 2M image embeddings at 1536 dims for similarity search.",
+  "Schedule and deliver reminder emails with QStash, ~10k messages/day.",
+  "Background job to summarize new articles via QStash, ~2k jobs/day.",
+  "Rate limit outbound emails per user, ~500k messages/month.",
+  "Article recommendation engine using vector similarity over 500k articles.",
+  "Feature flags served from Redis at the edge, ~5M reads/day.",
+  "Distributed lock for a serverless job runner, ~50k lock ops/day.",
+  "Index and vector-search 6M Wikipedia articles with unlimited queries.",
+  "Full-text + semantic product search over 1M docs, ~40k queries/day.",
+  "Durable incident-response workflow with retries, ~5k runs/day.",
+  "Trending Hacker News search over 1M posts, refreshed by an hourly cron.",
+  "AI companion app storing conversation memory for 50k daily active users.",
+  "API key storage and authentication for a public API, ~300k requests/day.",
+  "Run AI data-analysis tasks in isolated sandboxes, ~1k jobs/day.",
 ];
 
 const strip = (s?: string) => (s ? s.replace(/\s+/g, " ").trim() : "");
 
 export default function ArchitectSection() {
-  const { messages, loading, send, reset } = useArchitect();
+  const { current, loading, send, reset } = useArchitect();
   const [input, setInput] = useState("");
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  // Avoid hydration mismatch from the persisted store.
   useEffect(() => setMounted(true), []);
 
-  const hasMessages = mounted && messages.length > 0;
-  const lastUser = [...messages].reverse().find((m) => m.role === "user")?.text;
+  const hasResult = mounted && current !== null;
 
   const submit = () => {
     const text = strip(input);
@@ -45,6 +65,11 @@ export default function ArchitectSection() {
   const runExample = (ex: string) => {
     setOpen(true);
     void send(ex);
+  };
+
+  const newRequest = () => {
+    reset();
+    setInput("");
   };
 
   return (
@@ -67,8 +92,7 @@ export default function ArchitectSection() {
           from a plain-text description.
         </p>
 
-        {/* The input keeps the SAME look whether or not there's a conversation, so
-            closing the modal returns to exactly this state. */}
+        {/* The input always keeps the same look, so closing the result returns here. */}
         <div className="mx-auto mt-8 max-w-3xl">
           <PromptInput
             value={input}
@@ -78,52 +102,38 @@ export default function ArchitectSection() {
             placeholder="e.g. RAG chatbot, 50k requests/day, semantic search over 2M docs, EU + US, SOC-2…"
           />
 
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-            {hasMessages ? (
-              <>
-                <button
-                  type="button"
-                  onClick={() => setOpen(true)}
-                  className={cx(
-                    "inline-flex min-w-0 items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-text-mute",
-                    "transition hover:border-white/25 hover:bg-white/5 hover:text-text",
-                  )}
-                  title={strip(lastUser)}
-                >
-                  <IconMessage size={14} className="shrink-0 text-primary-text" />
-                  <span className="max-w-[52vw] truncate sm:max-w-xs">
-                    {loading ? "Designing your blueprint…" : strip(lastUser)}
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => reset()}
-                  className={cx(
-                    "inline-flex shrink-0 items-center gap-1.5 rounded-full border border-primary/40 px-3 py-1.5 text-xs font-medium text-primary-text",
-                    "transition hover:bg-primary/10",
-                  )}
-                >
-                  <IconPlus size={14} /> New chat
-                </button>
-              </>
-            ) : (
-              EXAMPLES.map((ex) => (
-                <button
-                  key={ex}
-                  type="button"
-                  onClick={() => runExample(ex)}
-                  disabled={loading}
-                  title={ex}
-                  className={cx(
-                    "max-w-full truncate rounded-full border border-white/10 px-3 py-1.5 text-xs text-text-mute",
-                    "transition hover:border-white/25 hover:bg-white/5 hover:text-text disabled:opacity-40",
-                  )}
-                >
-                  {ex}
-                </button>
-              ))
-            )}
-          </div>
+          {hasResult ? (
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+              <button
+                type="button"
+                onClick={() => setOpen(true)}
+                className={cx(
+                  "inline-flex min-w-0 items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-text-mute",
+                  "transition hover:border-white/25 hover:bg-white/5 hover:text-text",
+                )}
+                title={strip(current?.query)}
+              >
+                <IconSparkles size={14} className="shrink-0 text-primary-text" />
+                <span className="max-w-[52vw] truncate sm:max-w-xs">
+                  {loading
+                    ? "Designing your blueprint…"
+                    : `View result: ${strip(current?.query)}`}
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={newRequest}
+                className={cx(
+                  "inline-flex shrink-0 items-center gap-1.5 rounded-full border border-primary/40 px-3 py-1.5 text-xs font-medium text-primary-text",
+                  "transition hover:bg-primary/10",
+                )}
+              >
+                <IconPlus size={14} /> New request
+              </button>
+            </div>
+          ) : (
+            <ExampleCloud loading={loading} onPick={runExample} />
+          )}
         </div>
       </Container>
 
@@ -131,16 +141,13 @@ export default function ArchitectSection() {
         open &&
         createPortal(
           <ArchitectModal
-            messages={messages}
+            current={current}
             loading={loading}
             input={input}
             setInput={setInput}
             onSubmit={submit}
             onClose={() => setOpen(false)}
-            onReset={() => {
-              reset();
-              setOpen(false);
-            }}
+            onNew={newRequest}
           />,
           document.body,
         )}
@@ -151,30 +158,30 @@ export default function ArchitectSection() {
 /* ─────────────────────────────── modal ─────────────────────────────── */
 
 function ArchitectModal({
-  messages,
+  current,
   loading,
   input,
   setInput,
   onSubmit,
   onClose,
-  onReset,
+  onNew,
 }: {
-  messages: UiMessage[];
+  current: UiResult | null;
   loading: boolean;
   input: string;
   setInput: (v: string) => void;
   onSubmit: () => void;
   onClose: () => void;
-  onReset: () => void;
+  onNew: () => void;
 }) {
-  const bodyRef = useRef<HTMLDivElement>(null);
-
   // Lock page scroll + close on Escape while the modal is open.
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { onClose(); }
+      if (e.key === "Escape") {
+        onClose();
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => {
@@ -182,14 +189,6 @@ function ArchitectModal({
       window.removeEventListener("keydown", onKey);
     };
   }, [onClose]);
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: scroll to newest on change
-  useEffect(() => {
-    bodyRef.current?.scrollTo({
-      top: bodyRef.current.scrollHeight,
-      behavior: "smooth",
-    });
-  }, [messages.length, loading]);
 
   return (
     <div
@@ -228,18 +227,16 @@ function ArchitectModal({
             </div>
           </div>
           <div className="flex items-center gap-1">
-            {messages.length > 0 && (
-              <button
-                type="button"
-                onClick={onReset}
-                className={cx(
-                  "inline-flex items-center gap-1.5 rounded-full border border-primary/40 px-3 py-1.5 text-xs font-medium text-primary-text",
-                  "transition hover:bg-primary/10",
-                )}
-              >
-                <IconPlus size={14} /> New chat
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={onNew}
+              className={cx(
+                "inline-flex items-center gap-1.5 rounded-full border border-primary/40 px-3 py-1.5 text-xs font-medium text-primary-text",
+                "transition hover:bg-primary/10",
+              )}
+            >
+              <IconPlus size={14} /> New request
+            </button>
             <button
               type="button"
               aria-label="Close"
@@ -251,48 +248,37 @@ function ArchitectModal({
           </div>
         </div>
 
-        {/* messages */}
-        <div
-          ref={bodyRef}
-          className="flex-1 overflow-y-auto px-4 py-6 md:px-8"
-        >
-          <div className="mx-auto max-w-3xl space-y-6">
-            {messages.length === 0 && (
+        {/* result */}
+        <div className="flex-1 overflow-y-auto px-4 py-6 md:px-8">
+          <div className="mx-auto max-w-3xl space-y-4">
+            {current?.query && (
+              <div className="flex justify-center">
+                <div className="inline-flex max-w-full items-center gap-2 rounded-full bg-white/5 px-4 py-1.5 text-sm text-text-mute">
+                  <IconSparkles size={14} className="shrink-0 text-primary-text" />
+                  <span className="truncate">{current.query}</span>
+                </div>
+              </div>
+            )}
+
+            {loading ? (
+              <LoadingBlueprint />
+            ) : current?.response ? (
+              <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+                <Blueprint data={current.response} />
+              </div>
+            ) : current?.error ? (
               <p className="text-center text-sm text-text-mute">
-                Describe what you're building to get started.
+                {current.error}
+              </p>
+            ) : (
+              <p className="text-center text-sm text-text-mute">
+                Describe what you're building to get a blueprint.
               </p>
             )}
-
-            {messages.map((m) =>
-              m.role === "user" ? (
-                <div key={m.id} className="flex justify-center">
-                  <div className="inline-flex max-w-full items-center gap-2 rounded-full bg-white/5 px-4 py-1.5 text-sm text-text-mute">
-                    <IconSparkles
-                      size={14}
-                      className="shrink-0 text-primary-text"
-                    />
-                    <span className="truncate">{m.text}</span>
-                  </div>
-                </div>
-              ) : (
-                <div
-                  key={m.id}
-                  className="rounded-2xl border border-white/10 bg-white/[0.02] p-4"
-                >
-                  {m.response ? (
-                    <Blueprint data={m.response} />
-                  ) : (
-                    <p className="text-sm text-text-mute">{m.text}</p>
-                  )}
-                </div>
-              ),
-            )}
-
-            {loading && <LoadingBlueprint />}
           </div>
         </div>
 
-        {/* input */}
+        {/* input — runs a fresh one-shot request */}
         <div className="border-t border-white/10 px-4 py-4 md:px-8">
           <div className="mx-auto max-w-3xl">
             <PromptInput
@@ -301,10 +287,76 @@ function ArchitectModal({
               onSubmit={onSubmit}
               loading={loading}
               autoFocus
-              placeholder="Refine or ask a follow-up…"
+              placeholder="Describe another project…"
             />
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────── examples ─────────────────────────────── */
+
+function ExampleCloud({
+  loading,
+  onPick,
+}: {
+  loading: boolean;
+  onPick: (ex: string) => void;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [atBottom, setAtBottom] = useState(false);
+
+  const onScroll = () => {
+    const el = ref.current;
+    if (!el) { return; }
+    setAtBottom(el.scrollTop + el.clientHeight >= el.scrollHeight - 8);
+  };
+
+  return (
+    <div className="mt-5">
+      <p className="mb-2 text-xs text-text-mute">
+        Or start from a real use case —{" "}
+        <span className="text-text">{EXAMPLES.length} examples</span> from our
+        blog
+      </p>
+
+      <div className="relative">
+        <div
+          ref={ref}
+          onScroll={onScroll}
+          className="max-h-36 overflow-y-auto rounded-2xl border border-white/10 bg-white/[0.02] p-3"
+        >
+          <div className="flex flex-wrap justify-center gap-2 pb-2">
+            {EXAMPLES.map((ex) => (
+              <button
+                key={ex}
+                type="button"
+                onClick={() => onPick(ex)}
+                disabled={loading}
+                title={ex}
+                className={cx(
+                  "max-w-xs truncate rounded-full border border-white/10 px-3 py-1.5 text-xs text-text-mute",
+                  "transition hover:border-white/25 hover:bg-white/5 hover:text-text disabled:opacity-40",
+                )}
+              >
+                {ex}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Fade + hint make it obvious there's more to scroll; hidden at the bottom. */}
+        {!atBottom && (
+          <>
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 rounded-b-2xl bg-gradient-to-t from-bg to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-1.5 flex items-center justify-center gap-1 text-[10px] text-text-mute">
+              <IconChevronDown size={12} className="animate-bounce" /> scroll for
+              more
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
@@ -381,7 +433,7 @@ function PromptInput({
 
 function LoadingBlueprint() {
   return (
-    <div className="rounded-3xl border border-white/10 bg-white/[0.02] p-5 md:p-6">
+    <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
       <div className="mb-4 flex items-center gap-2 text-sm text-text-mute">
         <span className="inline-flex gap-1">
           <span className="size-2 animate-bounce rounded-full bg-primary [animation-delay:-0.2s]" />

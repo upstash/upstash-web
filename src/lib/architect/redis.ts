@@ -1,6 +1,6 @@
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
-import type { ChatResponse, ChatTurn } from "./types";
+import type { ChatResponse } from "./types";
 
 /**
  * Redis-backed helpers for the Architect: rate limiting, response cache, session
@@ -12,13 +12,10 @@ import type { ChatResponse, ChatTurn } from "./types";
 
 const KEY = {
   cache: (k: string) => `architect:cache:${k}`,
-  session: (id: string) => `architect:session:${id}`,
   audit: "architect:audit",
 } as const;
 
 const CACHE_TTL_SECONDS = 60 * 60 * 24; // 24h
-const SESSION_TTL_SECONDS = 60 * 60 * 12; // 12h
-const SESSION_MAX_TURNS = 20;
 
 export const isRedisConfigured = Boolean(
   process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN,
@@ -57,18 +54,6 @@ export async function cacheGet(message: string): Promise<ChatResponse | null> {
 export async function cacheSet(message: string, value: ChatResponse): Promise<void> {
   if (!redis) { return; }
   await redis.set(KEY.cache(cacheKey(message)), value, { ex: CACHE_TTL_SECONDS });
-}
-
-export async function sessionLoad(id: string): Promise<ChatTurn[]> {
-  if (!redis) { return []; }
-  return (await redis.get<ChatTurn[]>(KEY.session(id))) ?? [];
-}
-
-export async function sessionAppend(id: string, ...turns: ChatTurn[]): Promise<void> {
-  if (!redis) { return; }
-  const history = await sessionLoad(id);
-  const next = [...history, ...turns].slice(-SESSION_MAX_TURNS);
-  await redis.set(KEY.session(id), next, { ex: SESSION_TTL_SECONDS });
 }
 
 /** Append prompt/spec/outcome to a Redis stream for detection & audit (doc §6.8). */

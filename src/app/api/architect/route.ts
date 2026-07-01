@@ -1,14 +1,12 @@
 import { extract, isBoxConfigured } from "@/lib/architect/box";
+import { screenInput } from "@/lib/architect/guard";
 import { priceEngine } from "@/lib/architect/pricing";
 import {
   auditAppend,
   cacheGet,
   cacheSet,
   checkRateLimit,
-  sessionAppend,
-  sessionLoad,
 } from "@/lib/architect/redis";
-import { screenInput } from "@/lib/architect/guard";
 import { SpecValidationError } from "@/lib/architect/schema";
 import { citationsFor } from "@/lib/architect/search";
 import type { ChatResponse } from "@/lib/architect/types";
@@ -22,9 +20,9 @@ export const dynamic = "force-dynamic";
 // 60s works on Hobby and all paid plans; raise toward 300 on Pro/Enterprise if runs need it.
 export const maxDuration = 60;
 
+// One-shot, anonymous: just a description. No sessionId, no conversation state.
 const Body = z.object({
   message: z.string().min(1).max(2000),
-  sessionId: z.string().min(1).max(128),
 });
 
 function clientId(req: NextRequest): string {
@@ -36,11 +34,10 @@ const json = (data: unknown, status = 200) =>
   NextResponse.json(data, { status });
 
 /**
- * POST /api/architect — the orchestrator (doc §3, steps 1–7).
+ * POST /api/architect — stateless, one-shot advisor. Same pipeline for web + agents.
  *
- *   1. Ratelimit by IP        4. Extract spec via Box + validate (kill-switch)
- *   2. Response cache         5. Deterministic pricing engine
- *   3. Session history        6. Citations   7. Persist (cache + session + audit)
+ *   1. Ratelimit by IP     3. Cache            5. Deterministic pricing engine
+ *   2. Input gate          4. Extract via Box  6. Citations   7. Cache + audit
  *
  * Fail-closed at every guard. The LLM never computes cost and never triggers a side effect.
  */
@@ -52,11 +49,13 @@ export async function POST(req: NextRequest) {
   } catch {
     return json({ error: "bad_request" }, 400);
   }
-  const { message, sessionId } = body;
+  const { message } = body;
 
   // 1. Ratelimit.
   const { success } = await checkRateLimit(clientId(req));
-  if (!success) { return json({ error: "rate_limited" }, 429); }
+  if (!success) {
+    return json({ error: "rate_limited" }, 429);
+  }
 
   // 2. Input gate — shared by web + agent callers. Fail fast (no LLM spend) on
   // too-short / too-vague / off-topic input. `message` is the authoritative reason.
@@ -67,48 +66,35 @@ export async function POST(req: NextRequest) {
 
   // 3. Cache — skip the LLM entirely on repeat requests.
   const cached = await cacheGet(message);
-  if (cached) { return json(cached); }
+  if (cached) {
+    return json(cached);
+  }
 
   if (!isBoxConfigured) {
     return json({ error: "llm_unavailable" }, 503);
   }
 
-  // 3. Session history (context only; still untrusted).
-  const history = await sessionLoad(sessionId);
-
   try {
     // 4. Extract → validated WorkloadSpec. Off-schema output throws SpecValidationError.
-    const spec = await extract(message, history);
+    const spec = await extract(message);
 
     // 5. Deterministic recommendation + 6. citations.
     const recommendation = priceEngine(spec);
     const citations = citationsFor(recommendation.products);
     const response: ChatResponse = { recommendation, citations, cached: false };
 
-    // 7. Persist: cache the result, append the turn, audit the outcome.
-    const now = Date.now();
+    // 7. Persist: cache the result + audit the outcome.
     await Promise.all([
       cacheSet(message, response),
-      sessionAppend(
-        sessionId,
-        { role: "user", content: message, at: now },
-        {
-          role: "assistant",
-          content: `Recommended: ${recommendation.products
-            .map((p) => `${p.product} (${p.chosenPlan})`)
-            .join(", ")}`,
-          at: now,
-        },
-      ),
-      auditAppend({ sessionId, message, spec, ok: true, at: now }),
+      auditAppend({ message, spec, ok: true, at: Date.now() }),
     ]);
 
     return json(response);
   } catch (err) {
     if (err instanceof SpecValidationError) {
-      // Always log the full failure server-side: message, raw model output, and validation issues.
+      // Always log the full failure server-side: message, raw model output, and issues.
       console.error(
-        `[architect] unclear_request (session=${sessionId}): ${err.message}`,
+        `[architect] unclear_request: ${err.message}`,
         "\n  input:",
         message,
         "\n  raw:",
@@ -117,7 +103,6 @@ export async function POST(req: NextRequest) {
         err.issues,
       );
       await auditAppend({
-        sessionId,
         message,
         ok: false,
         reason: "spec_validation",
@@ -134,15 +119,12 @@ export async function POST(req: NextRequest) {
     // not our bug. Log it and return a retryable status rather than a 500.
     if (err instanceof BoxError) {
       console.error(
-        `[architect] box_run_failed (session=${sessionId}) for input: ${message}`,
+        `[architect] box_run_failed for input: ${message}`,
         err,
       );
       return json({ error: "generation_failed" }, 503);
     }
-    console.error(
-      `[architect] internal_error (session=${sessionId}) for input: ${message}`,
-      err,
-    );
+    console.error(`[architect] internal_error for input: ${message}`, err);
     return json({ error: "internal_error" }, 500);
   }
 }
