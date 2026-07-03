@@ -62,7 +62,7 @@ We are going to use Next.js's [edge API routes](https://nextjs.org/docs/api-rout
 
 To create a Next.js project run `npx create-next-app@latest <your-app-name>` in the parent directory. After that you can run `npm run dev` to start the development server, `npm run build` to create a production bundle and `npm run start` to start the production server.
 
-Next.js uses the [node](https://nextjs.org/docs/advanced-features/react-18/switchable-runtime) environment for API routes as a default. We can change that in two ways:
+Next.js uses the [node](https://nextjs.org/docs/app/api-reference/edge) environment for API routes as a default. We can change that in two ways:
 
 1. The per-route approach. Add the following export to the desired route:
    ```javascript
@@ -245,7 +245,7 @@ export default function Test() {
 
 #### Adding new data
 
-To add new data to Redis we can use the [HSET]([https://redis.io/commands/hset), [SET](https://redis.io/commands/set/) and [SADD](https://redis.io/commands/sadd/) commands
+To add new data to Redis we can use the [HSET](https://redis.io/commands/hset/), [SET](https://redis.io/commands/set/) and [SADD](https://redis.io/commands/sadd/) commands
 
 ```javascript
 export default async (req) => {

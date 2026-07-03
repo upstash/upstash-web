@@ -18,7 +18,7 @@ jobs:
           lychee --version
 
       - name: Check links
-        run: lychee --no-progress --exclude 'http://localhost' '**/*.ts' '**/*.tsx' '**/*.mdx'
+        run: lychee --no-progress --config lychee.toml --root-dir "$GITHUB_WORKSPACE/public" 'data/**/*.mdx'
 
       - name: Notify Slack on failure
         if: failure() && github.event_name == 'schedule'

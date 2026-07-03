@@ -68,7 +68,7 @@ We define a tool called `translate` with a Zod schema that specifies what parame
 
 When an AI assistant calls this tool, it passes the required parameters enforced by [Zod](https://github.com/colinhacks/zod) (an open-source schema validation library), and our function processes them. In a production environment, you'd replace the placeholder translation with an actual API call to a service like DeepL or Google Translate.
 
-The response format of `content: [{ type: "text", text: translatedText }],` follows the [MCP tool specification](https://spec.modelcontextprotocol.io/specification/2024-11-05/server/tools/) and returns a structure that Claude can use for its responses. This standardized approach allows any MCP-compliant AI use your tool without any custom integration work.
+The response format of `content: [{ type: "text", text: translatedText }],` follows the [MCP tool specification](https://modelcontextprotocol.io/specification/2024-11-05/server/tools) and returns a structure that Claude can use for its responses. This standardized approach allows any MCP-compliant AI use your tool without any custom integration work.
 
 **The same pattern works for any type of tool** - from translation to data analysis, image generation, or even controlling smart home devices.
 

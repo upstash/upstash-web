@@ -32,7 +32,7 @@ Currently, it's non-functional since it's not getting the user's city or storing
 
 Let’s quickly orient ourselves in the project. `src/routes/+page.svelte` corresponds to the page we’ll see at the root route. It receives a `data` prop that includes the list of visits and the city of the current user and a `form` prop that will contain the result of submitting the form.
 
-One cool thing is that the data is submitted via a `<form>`, so it does _not_ need JavaScript to function. When JS is not available, the form will submit as normal and trigger a full page reload. When JS is available, it will update in place instead of reloading. This is accomplished using a [Svelte action](https://svelte.dev/tutorial/actions) called `enhance`, which is included with SvelteKit. Explaining how it works is outside of the scope of this post, but take a look at the [SvelteKit docs on progressive enhancement](https://kit.svelte.dev/docs/form-actions#progressive-enhancement) if you're curious.
+One cool thing is that the data is submitted via a `<form>`, so it does _not_ need JavaScript to function. When JS is not available, the form will submit as normal and trigger a full page reload. When JS is available, it will update in place instead of reloading. This is accomplished using a [Svelte action](https://svelte.dev/docs/svelte/use) called `enhance`, which is included with SvelteKit. Explaining how it works is outside of the scope of this post, but take a look at the [SvelteKit docs on progressive enhancement](https://kit.svelte.dev/docs/form-actions#progressive-enhancement) if you're curious.
 
 ```html
 <form action="/" method="post" use:enhance>

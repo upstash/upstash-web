@@ -93,7 +93,7 @@ In our demo project, we are going to design our database just for storing the lo
 
 In these two tables, there will be two columns: “message” and “time”. The log messages that will be streamed are going to be saved into “message” column and its timestamp will be saved into the “time” column. To keep the demo simple, we are going to work with just this information.
 
-First, let’s create a keyspace in our database. We are going to use CQL “Cassandra Query Language” for doing operations on the database. Here is the [documentation](https://cassandra.apache.org/doc/latest/cassandra/cql/ddl.html) of it.
+First, let’s create a keyspace in our database. We are going to use CQL “Cassandra Query Language” for doing operations on the database. Here is the [documentation](https://cassandra.apache.org/doc/latest/cassandra/developing/cql/ddl.html) of it.
 
 ```
 CREATE KEYSPACE app WITH replication =
@@ -127,7 +127,7 @@ time | message
 (0 rows)
 ```
 
-For more detailed and complex configuration, please check [documentation](https://cassandra.apache.org/doc/latest/cassandra/cql/).
+For more detailed and complex configuration, please check [documentation](https://cassandra.apache.org/doc/latest/cassandra/developing/cql/).
 
 ### **Streaming From Serverless Kafka to Cassandra with Spark**
 

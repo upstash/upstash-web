@@ -9,7 +9,7 @@ Redis is great at storing and serving data quickly, but querying that data has t
 You can emulate a few simple access patterns with sorted sets, or fall back to scans when you really have to, but neither
 approach feels like a proper query layer. This becomes especially limiting when Redis is used as a primary database,
 which is common with Upstash Redis because it is persistent by default. Upstash Redis Search removes that limitation by
-adding full-text search, strong query operators, and [aggregations](hacker-news-trends-redis-search) on top of Redis data.
+adding full-text search, strong query operators, and [aggregations](/blog/hacker-news-trends-redis-search) on top of Redis data.
 
 This post is not a tour of the user-facing features. Instead, it follows the implementation path of a single update:
 from the moment a Redis command is executed, through the indexing pipeline, until the updated document becomes visible
