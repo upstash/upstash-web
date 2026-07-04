@@ -9,7 +9,11 @@ A Bloom filter answers one question (very) fast: **have I seen this item before?
 
 It needs about 9.6 bits per item, so a filter for a million URLs fits in about 1.2 MB. Upstash supports the bitmap commands SETBIT, GETBIT, and BITFIELD, and those are all a Bloom filter needs.
 
-In this article we build one in TypeScript and I wanna show you the hashing, how to calculate the sizing, we'll build a reusable class, and we'll try out the filters false positive rate.
+And bloom filters power some of the fastest software on the web like Vercel domains:
+
+![](https://cdn.bydefault.so/B0pr_UByCZxK75q5JGr6V.png)
+
+In this article you and I will build one in TypeScript and I wanna show you the hashing, how to calculate the sizing, we'll build a reusable class, and we'll try out the filters false positive rate.
 
 ## What is a Bloom filter?
 
