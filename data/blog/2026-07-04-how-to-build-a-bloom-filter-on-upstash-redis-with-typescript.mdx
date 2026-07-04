@@ -1,0 +1,285 @@
+---
+authors: [josh]
+slug: how-to-build-a-bloom-filter-on-upstash-redis-with-typescript
+tags: [redis]
+title: How to Build a Bloom Filter on Upstash Redis with TypeScript
+---
+
+A Bloom filter answers one question (very) fast: **have I seen this item before?&#32;**
+
+It needs about 9.6 bits per item, so a filter for a million URLs fits in about 1.2 MB. Upstash supports the bitmap commands SETBIT, GETBIT, and BITFIELD, and those are all a Bloom filter needs.
+
+In this article we build one in TypeScript and I wanna show you the hashing, how to calculate the sizing, we'll build a reusable class, and we'll try out the filters false positive rate.
+
+## What is a Bloom filter?
+
+A Bloom filter is a probabilistic data structure that tests whether an item is in a set. It gives one of two answers: "definitely not in the set" or "probably in the set". At a 1% false positive rate it needs [fewer than 10 bits per item](https://en.wikipedia.org/wiki/Bloom_filter), no matter how long the items are.
+
+![](https://cdn.bydefault.so/m33br7opfb-nkQTdY1Ky4.png)
+
+A million 50-byte URLs would hold like 50 MB of string data. A Bloom filter that can answer membership questions about them at 1% error takes just 1.2 MB.
+
+Bloom filters help to avoid computationally expensive work. [Google Bigtable, Apache HBase, Cassandra, and PostgreSQL](https://en.wikipedia.org/wiki/Bloom_filter) use them to skip disk lookups for rows that don't exist.
+
+Medium uses one to avoid recommending posts a user already read. Akamai uses one to keep "one-hit-wonders", objects requested only once, out of its disk caches.
+
+## How does a Bloom filter work?
+
+A Bloom filter has two parts: a long row of bits that all start at 0, and a few hash functions.
+
+Say we use 3 hash functions. To add an item, you run it through the 3 hashes, and each hash returns a position in the row, for example 2, 5, and 9. You flip those three bits to 1.
+
+To check an item later, you hash it the same way and look at the same three positions. If even one of those bits is still 0, the item was never added. If all three are 1, the item was probably added.
+
+![](https://cdn.bydefault.so/CBtlTXZcZ0zMqhGP41bb_.png)
+
+"Probably" because other items may have set the same bits. Good sizing keeps that collision case rare, and the false positive rate lets you choose how rare. The guarantee in the other direction is absolute: a 0 bit is proof the item was never added, so a "no" from a Bloom filter is always correct.
+
+## How big should the bit array be?
+
+Two formulas turn "I expect n items and want a false positive rate p" into concrete numbers, both from the [standard Bloom filter math](https://en.wikipedia.org/wiki/Bloom_filter):
+
+```text
+bits:   m = -n * ln(p) / (ln 2)^2
+hashes: k = (m / n) * ln 2
+```
+
+In TypeScript:
+
+```typescript
+export function optimalBits(expectedItems: number, falsePositiveRate: number): number {
+  return Math.ceil(
+    (-expectedItems * Math.log(falsePositiveRate)) / Math.log(2) ** 2,
+  );
+}
+
+export function optimalHashes(bits: number, expectedItems: number): number {
+  return Math.max(1, Math.round((bits / expectedItems) * Math.log(2)));
+}
+```
+
+Running those for a few sizes:
+
+| Expected items | Target error | Bits | Hashes | Key size |
+| --- | --- | --- | --- | --- |
+| 10,000 | 1% | 95,851 | 7 | 12 KB |
+| 100,000 | 1% | 958,506 | 7 | 120 KB |
+| 1,000,000 | 1% | 9,585,059 | 7 | 1.2 MB |
+| 1,000,000 | 0.1% | 14,377,588 | 10 | 1.8 MB |
+
+Two limits matter for the key. Redis limits a string to [512 MB](https://redis.io/docs/latest/commands/setbit/), because SETBIT offsets must stay below 2^32. Upstash limits a single record to [100 MB](https://upstash.com/docs/redis/troubleshooting/max_record_size_exceeded) on the free and pay-as-you-go plans. 100 MB is 800 million bits, which holds about 83 million items at 1%. Past that, the filter has to split across several keys.
+
+## Hashing items with FNV-1a and double hashing
+
+A filter at 1% error needs seven hash functions, which sounds like implementing seven separate hashing algorithms. [Kirsch and Mitzenmacher](https://www.eecs.harvard.edu/~michaelm/postscripts/rsa2008.pdf) proved that two are enough: from two hashes h1 and h2, the values h1 + i\*h2 mod m behave like k independent hash functions with no loss in the asymptotic false positive rate.
+
+For h1 and h2 we use [FNV-1a](https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function), a non-cryptographic hash that takes ten lines and zero dependencies:
+
+```typescript
+const FNV_OFFSET_BASIS = 0xcbf29ce484222325n;
+const FNV_PRIME = 0x100000001b3n;
+const MASK_64 = 0xffffffffffffffffn;
+
+export function fnv1a64(input: string): bigint {
+  let hash = FNV_OFFSET_BASIS;
+
+  for (let i = 0; i < input.length; i += 1) {
+    hash ^= BigInt(input.charCodeAt(i));
+    hash = (hash * FNV_PRIME) & MASK_64;
+  }
+
+  return hash;
+}
+
+export function bloomPositions(item: string, bits: number, hashes: number): number[] {
+  const m = BigInt(bits);
+  const h1 = fnv1a64(item);
+  const h2 = fnv1a64(`${item}\u0000bloom-salt`) | 1n;
+  const positions: number[] = [];
+
+  for (let i = 0; i < hashes; i += 1) {
+    positions.push(Number((h1 + BigInt(i) * h2) % m));
+  }
+
+  return positions;
+}
+```
+
+The second hash comes from the same function with a salt appended. The `| 1n` forces h2 to be odd: if h2 ended up 0, all k positions would land on the same bit and the filter would collapse to a single hash function.
+
+## Adding and checking items with SETBIT and GETBIT
+
+[@upstash/redis](https://www.npmjs.com/package/@upstash/redis) is an HTTP client built for serverless runtimes. Without a pipeline, a command travels as its own HTTPS request, so one add with 7 SETBITs would make 7 round trips. A [pipeline](https://upstash.com/docs/redis/sdks/ts/pipelining/pipeline-transaction) sends multiple commands in a single HTTP request, so add and has each cost one round trip.
+
+![](https://cdn.bydefault.so/9UZUwkfy0sI3AjmryhQyk.png)
+
+```typescript
+import { Redis } from "@upstash/redis";
+
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
+```
+
+The class computes m and k from the expected item count and target error rate, then pipelines the bit operations:
+
+```typescript
+type BloomFilterOptions = {
+  redis: Redis;
+  key: string;
+  expectedItems: number;
+  falsePositiveRate: number;
+};
+
+export class BloomFilter {
+  readonly redis: Redis;
+  readonly key: string;
+  readonly bits: number;
+  readonly hashes: number;
+
+  constructor({ redis, key, expectedItems, falsePositiveRate }: BloomFilterOptions) {
+    this.redis = redis;
+    this.key = key;
+    this.bits = optimalBits(expectedItems, falsePositiveRate);
+    this.hashes = optimalHashes(this.bits, expectedItems);
+  }
+
+  positions(item: string): number[] {
+    return bloomPositions(item, this.bits, this.hashes);
+  }
+
+  async add(item: string): Promise<void> {
+    const pipeline = this.redis.pipeline();
+
+    for (const position of this.positions(item)) {
+      pipeline.setbit(this.key, position, 1);
+    }
+
+    await pipeline.exec();
+  }
+
+  async has(item: string): Promise<boolean> {
+    const pipeline = this.redis.pipeline();
+
+    for (const position of this.positions(item)) {
+      pipeline.getbit(this.key, position);
+    }
+
+    const bits = await pipeline.exec<(0 | 1)[]>();
+    return bits.every((bit) => bit === 1);
+  }
+
+  async addMany(items: readonly string[]): Promise<void> {
+    const pipeline = this.redis.pipeline();
+
+    for (const item of items) {
+      for (const position of this.positions(item)) {
+        pipeline.setbit(this.key, position, 1);
+      }
+    }
+
+    await pipeline.exec();
+  }
+}
+```
+
+Using it looks like this:
+
+```typescript
+const seenUrls = new BloomFilter({
+  redis,
+  key: "seen-urls",
+  expectedItems: 1_000_000,
+  falsePositiveRate: 0.01,
+});
+
+await seenUrls.add("https://example.com/post/42");
+
+await seenUrls.has("https://example.com/post/42"); // true
+await seenUrls.has("https://example.com/post/43"); // false, except the rare collision
+```
+
+There is no setup step. SETBIT on a missing key creates it, and Redis fills new bits with 0, so the first add creates the filter.
+
+## One billed command per add with BITFIELD
+
+A pipeline collapses the round trips but keeps the command count: 7 SETBITs in one pipeline are still 7 billed commands. On pay-as-you-go, Upstash charges [$0.20 per 100K commands](https://upstash.com/docs/redis/overall/pricing). A million adds at 7 SETBITs each is 7 million commands, $14.
+
+BITFIELD gets an add down to one command. It packs several one-bit reads or writes into a single command, and the [Redis docs](https://redis.io/docs/latest/commands/setbit/) recommend exactly this swap: replace multiple SETBIT calls with one BITFIELD call using u1 fields. A million adds become 1 million commands, $2. Fixed plans have [no command-count billing](https://upstash.com/docs/redis/overall/pricing), so there the pipeline version costs the same.
+
+```typescript
+export class BitFieldBloomFilter extends BloomFilter {
+  override async add(item: string): Promise<void> {
+    const bitfield = this.redis.bitfield(this.key);
+
+    for (const position of this.positions(item)) {
+      bitfield.set("u1", position, 1);
+    }
+
+    await bitfield.exec();
+  }
+
+  override async has(item: string): Promise<boolean> {
+    const bitfield = this.redis.bitfield(this.key);
+
+    for (const position of this.positions(item)) {
+      bitfield.get("u1", position);
+    }
+
+    const bits = await bitfield.exec();
+    return bits.every((bit) => bit === 1);
+  }
+}
+```
+
+The chained builder collects the sub-operations, then exec sends them as one BITFIELD command. The reply is an array with one number per sub-operation, in order.
+
+## What false positive rate do you get in practice?
+
+To check the math end to end, I ran the same hashing and position code against a local in-memory bit array standing in for the Redis bitmap. The filter was sized for 10,000 items at a 1% target (95,851 bits, 7 hashes). I inserted 10,000 distinct items, then checked 50,000 items that were never inserted:
+
+```text
+inserted:        10,000 items
+checked:         50,000 non-members
+false positives: 497 (0.994%)
+bits set:        49,689 of 95,851 (51.8%)
+```
+
+497 of the 50,000 never-added items came back "probably present": a 0.994% rate against the 1% target. The set-bit fraction is a good health check too. With well-chosen m and k, [about half of the bits end up set](https://en.wikipedia.org/wiki/Bloom_filter), and this filter landed at 51.8% after being filled to its expected capacity.
+
+## Can you delete items from a Bloom filter?
+
+No. Items share bits, so clearing the k bits of one item can erase evidence of other items and create false negatives, which breaks the one guarantee a Bloom filter makes.
+
+A counting Bloom filter supports deletes by storing a small counter per position instead of a single bit. Adds increment the counters and deletes decrement them, at the price of [3 to 4 times more space](https://en.wikipedia.org/wiki/Bloom_filter).
+
+For dedupe, expiring the whole filter often does the job. One EXPIRE turns "seen ever" into "seen in the last 24 hours":
+
+```typescript
+await redis.expire("seen-urls", 60 * 60 * 24);
+```
+
+The key disappears after a day and the next add starts a fresh, empty filter.
+
+## When a Set or HyperLogLog fits better
+
+| Structure | Question it answers | Memory for 1M 40-byte items | False positives | Deletes |
+| --- | --- | --- | --- | --- |
+| Redis Set (SADD / SISMEMBER) | exact membership | 40 MB of member data alone | none | yes |
+| Bloom filter (SETBIT / BITFIELD) | probable membership | 1.2 MB at 1% error | tunable | no |
+| HyperLogLog (PFADD / PFCOUNT) | estimated unique count | small fixed size | n/a | no |
+
+A plain Redis Set is the right pick when the set is small or when a false positive is unacceptable. It answers exactly, and SREM deletes single members. At 10,000 members the difference against a Bloom filter is a few hundred KB.
+
+HyperLogLog, which Upstash [supports natively](https://upstash.com/docs/redis/overall/compatibility), estimates how many unique items you've added. It can't tell you whether one specific item is present, so it solves a different problem.
+
+![](https://cdn.bydefault.so/cGsUhnbuLXpRK9JS1bB2f.png)
+
+## Recap
+
+- Upstash has no RedisBloom module, so BF.ADD and BF.EXISTS are out. SETBIT, GETBIT, and BITFIELD cover the same ground.
+- Size the filter with m = -n·ln(p)/(ln 2)² and k = (m/n)·ln 2. At 1% error that's about 9.6 bits per item.
+- Two FNV-1a hashes generate all k bit positions through double hashing.
+- Pipeline the k commands into one HTTP request, or use BITFIELD to make each add one billed command.
+- Deletes don't exist. EXPIRE the key for rolling dedupe windows.
