@@ -115,7 +115,7 @@ The second hash comes from the same function with a salt appended. The `| 1n` fo
 
 [@upstash/redis](https://www.npmjs.com/package/@upstash/redis) is an HTTP client built for serverless runtimes. Without a pipeline, a command travels as its own HTTPS request, so one add with 7 SETBITs would make 7 round trips. A [pipeline](https://upstash.com/docs/redis/sdks/ts/pipelining/pipeline-transaction) sends multiple commands in a single HTTP request, so add and has each cost one round trip.
 
-![](https://cdn.bydefault.so/9UZUwkfy0sI3AjmryhQyk.png)
+![](https://cdn.bydefault.so/8xkWiXQ9a8PWDePgAzgYn.png)
 
 ```typescript
 import { Redis } from "@upstash/redis";
@@ -278,7 +278,7 @@ A plain Redis Set is the right pick when the set is small or when a false positi
 
 HyperLogLog, which Upstash [supports natively](https://upstash.com/docs/redis/overall/compatibility), estimates how many unique items you've added. It can't tell you whether one specific item is present, so it solves a different problem.
 
-![](https://cdn.bydefault.so/cGsUhnbuLXpRK9JS1bB2f.png)
+![](https://cdn.bydefault.so/eM_REt8c9Dv47C2efxPvy.png)
 
 ## Recap
 
