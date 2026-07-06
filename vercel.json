@@ -27,6 +27,22 @@
     {
       "source": "/redis-api-compatibility",
       "destination": "https://upstash.com/docs/redis/features/restapi#rest-redis-api-compatibility"
+    },
+    {
+      "source": "/console",
+      "destination": "https://console.upstash.com"
+    },
+    {
+      "source": "/legal/terms",
+      "destination": "/trust/terms.pdf"
+    },
+    {
+      "source": "/blog/nextjs-edge-functions",
+      "destination": "/blog/getstarted-nextjs-edge-with-redis"
+    },
+    {
+      "source": "/context7",
+      "destination": "https://context7.com"
     }
   ]
 }
