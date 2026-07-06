@@ -20,7 +20,8 @@ To cut input tokens:
 
 - Start a fresh session for unrelated work, so old context stops being re-sent.
 - Keep prompt caching intact, so the re-sent prefix bills at a tenth of the price.
-- Cut context bloat: trim the transcript, and pull docs as focused slices with Context7.
+- Trim the transcript so stale content stops riding along.
+- Hand the agent ready-made context instead of making it explore: skills for your own knowledge, Context7 for library docs.
 
 To cut both input and output:
 
@@ -31,13 +32,10 @@ To cut both input and output:
 
 Most agentic work is a little hard reasoning wrapped in a lot of mechanical execution. Planning an approach or reviewing a diff for real bugs is where Fable earns its price; renaming symbols across forty files or running the test suite is not. Keep Fable as the orchestrator and hand the bulk work to Sonnet 5 or Haiku 4.5 subagents. Each runs in its own context window, so the cheap model never touches Fable's expensive context and Fable only sees the result. Delegate ten file edits and those loops run at $2 / $10 instead of $10 / $50.
 
-In Claude Code, three features do this for you.
+In Claude Code, two features do this for you.
 
-[Subagents](https://code.claude.com/docs/en/sub-agents) run on a model you choose: a small Markdown file under `.claude/agents/` whose `model:` field takes a cheap alias like `haiku` or `sonnet`. Ask Claude to create one and it delegates automatically. The built-in [Explore agent](https://code.claude.com/docs/en/sub-agents) is the read-only version, inheriting your main model capped at Opus, so a Fable session already searches on Opus; define your own `Explore` with `model: haiku` to go cheaper.
-
-[Workflows](https://code.claude.com/docs/en/workflows) set the model and effort per stage: run a review's adversarial find stage on a cheap model and reserve Fable for the synthesis that needs judgment.
-
-[Skills](https://code.claude.com/docs/en/skills) load their full instructions only when a task needs them, so the reasoning model carries fewer fixed input tokens each turn.
+- [Subagents](https://code.claude.com/docs/en/sub-agents) run on a model you choose: a small Markdown file under `.claude/agents/` whose `model:` field takes a cheap alias like `haiku` or `sonnet`. Ask Claude to create one and it delegates automatically. The built-in [Explore agent](https://code.claude.com/docs/en/sub-agents) is the read-only version, inheriting your main model capped at Opus, so a Fable session already searches on Opus; define your own `Explore` with `model: haiku` to go cheaper.
+- [Workflows](https://code.claude.com/docs/en/workflows) set the model and effort per stage: run a review's adversarial find stage on a cheap model and reserve Fable for the synthesis that needs judgment.
 
 The intelligence lives in the orchestration. Put Fable there, and push everything else to the cheapest model that can do the job.
 
@@ -68,9 +66,19 @@ Within one long task, two features keep it lean:
 - [Compaction](https://platform.claude.com/docs/en/build-with-claude/compaction) summarizes old history near the context limit. Claude Code runs it automatically and on `/compact`.
 - [Context editing](https://platform.claude.com/docs/en/build-with-claude/context-editing) clears stale tool results and thinking blocks. It is an API/SDK control.
 
+## Write skills instead of making the agent explore
+
+A well-written [skill](https://code.claude.com/docs/en/skills) is a dense, ready-made guide: your project's architecture, its conventions, or a multi-step procedure, written once. The agent reads it on demand instead of grepping through source files or searching the web to reconstruct the same thing, and the full text only enters context when the task calls for it. That trades a long, exploratory trail of tool calls for a single focused read.
+
+Write your own, or pull one from a directory like [skills.sh](https://www.skills.sh), which installs into your agent in a single command:
+
+```bash
+npx skills add upstash/skills
+```
+
 ## Cut input tokens at the source with Context7
 
-The biggest source of context bloat in most agents is documentation retrieval. General web search returns whole pages (navigation, marketing copy, unrelated sections) and dumps them into context, where Fable re-reads them every turn at $10 per million tokens.
+Skills cover your own knowledge; library documentation is the other big source of bloat. Reach for it with general web search and the agent pulls back whole pages (navigation, marketing copy, unrelated sections) and dumps them into context, where Fable re-reads them every turn at $10 per million tokens.
 
 [Context7](https://context7.com) injects version-aware docs as focused slices instead. We [benchmarked it against Claude Code's web search](https://upstash.com/blog/context7-vs-web-search-benchmark) across five query categories ([repo](https://github.com/upstash/context7-efficiency-benchmark)): it cut fresh input tokens by about 99%, which fed through to a 34.56% cost reduction and 36.81% fewer total tokens.
 
@@ -89,6 +97,6 @@ A Fable agent that stays affordable usually looks like this:
 - Fable orchestrates; cheaper subagents (Sonnet 5, Haiku 4.5) do the bulk work in their own context windows.
 - Effort is tuned per task, not pinned to `max`.
 - Tools and system prompt stay frozen so prompt caching holds, and compaction plus context editing keep long runs lean.
-- Context7 supplies docs as focused slices, so context never fills with page-level noise.
+- Skills and Context7 hand the agent ready-made context, so it reads instead of exploring.
 
 None of this limits what Fable can do. It aims the premium at the reasoning only Fable provides, and runs everything else cheaper or keeps it out of context.
