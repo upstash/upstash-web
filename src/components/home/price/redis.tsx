@@ -47,7 +47,7 @@ export default function PriceRedis() {
 
       <PriceHr />
 
-      <PriceButton href="/pricing">More information</PriceButton>
+      <PriceButton href="/pricing/redis">More information</PriceButton>
     </PriceBox>
   );
 }

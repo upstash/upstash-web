@@ -5,7 +5,7 @@ export default function PriceScaleToZero() {
   return (
     <ServerlessBox className="md:col-span-3">
       <header>
-        <ServerlessTitle link="/pricing" title="Pricing">
+        <ServerlessTitle link="/pricing/redis" title="Pricing">
           Price scales to zero
         </ServerlessTitle>
         <ServerlessSummary>

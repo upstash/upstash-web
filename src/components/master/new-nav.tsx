@@ -32,7 +32,7 @@ export default function NewNavigation() {
             "pricing" === segment ? "bg-bg-mute text-primary-text" : "",
           )}
         >
-          <Link href="/pricing">Pricing</Link>
+          <Link href="/pricing/redis">Pricing</Link>
         </NavigationMenu.Link>
       </NavigationMenu.Item>
 

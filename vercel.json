@@ -43,6 +43,10 @@
     {
       "source": "/context7",
       "destination": "https://context7.com"
+    },
+    {
+      "source": "/pricing",
+      "destination": "/pricing/redis"
     }
   ]
 }
