@@ -6,103 +6,89 @@ tags: [ai, claude, agents, context7, cost-optimization]
 description: "Fable 5 is Anthropic's most capable model and priced like it. Here's how to spend it deliberately: model tiering with subagents, effort tuning, prompt caching, and cutting input tokens with Context7."
 ---
 
-Claude Fable 5 is back. Anthropic pulled it on June 12, 2026, three days after announcing it, when Amazon researchers found a jailbreak that let the model identify software vulnerabilities and, in one case, demonstrate an exploit. That was enough for the U.S. government to issue an export-control directive [suspending access](https://www.anthropic.com/news/fable-mythos-access). It [returned on July 1](https://www.anthropic.com/news/redeploying-fable-5) with a new safety classifier. Fable is Anthropic's most capable model, and it is priced like it.
+Claude Fable 5 is back. Anthropic pulled it on June 12, 2026, three days after announcing it, after Amazon researchers found a jailbreak that got the model to identify software vulnerabilities and even demonstrate an exploit, which triggered a U.S. export-control directive [suspending access](https://www.anthropic.com/news/fable-mythos-access). It [returned on July 1](https://www.anthropic.com/news/redeploying-fable-5) with a new safety classifier. Fable is Anthropic's most capable model, and it is priced like it.
 
-Per [Anthropic's pricing](https://platform.claude.com/docs/en/pricing), Fable costs $10 per million input tokens and $50 per million output tokens. That is double Opus 4.8's $5 / $25 and five times Sonnet 5's introductory $2 / $10 ([in effect through August 31, 2026](https://platform.claude.com/docs/en/about-claude/models/overview)). Those API rates are about to matter a lot more. When Fable returned, the Claude subscription included it only up to 50% of weekly usage limits. On July 7, 2026, it leaves the subscription entirely, and after that date, using it means paying these API prices.
+Per [Anthropic's pricing](https://platform.claude.com/docs/en/pricing), Fable costs $10 per million input tokens and $50 per million output, double Opus 4.8's $5 / $25 and five times Sonnet 5's introductory $2 / $10 ([through August 31, 2026](https://platform.claude.com/docs/en/about-claude/models/overview)). Those rates are about to matter more: inside the Claude subscription Fable was capped at 50% of weekly usage limits, and on July 7, 2026 it leaves the subscription entirely. After that, using it means paying the API price.
 
-You should still use Fable where it earns its price. With the subscription cushion gone, though, every token you send it lands on the bill, so a few precautions go a long way. This post walks through the levers that matter, from which model does which work down to how many tokens you feed into context.
+You should still use Fable where it earns its price. But with the subscription cushion gone, every token lands on the bill, so a few precautions go a long way.
 
 ## Where the money goes
 
-Output tokens carry the higher unit price, $50 per million on Fable against $10 for input. But an agentic loop generates far fewer output tokens than it feeds in, and input compounds: the whole conversation is re-sent on every turn, so a ten-step task can process the same context ten times. In [our token benchmark](https://upstash.com/blog/context7-vs-web-search-benchmark), each documentation query processed on the order of 80,000 to 140,000 tokens, only one to three thousand of which were output. Both dimensions cost money, so the levers in this post split into two groups.
+Output tokens carry the higher unit price, $50 per million on Fable against $10 for input. But an agentic loop feeds in far more than it generates: the whole conversation is re-sent on every turn, so a ten-step task reprocesses the same context ten times. In [our token benchmark](https://upstash.com/blog/context7-vs-web-search-benchmark), each documentation query ran 80,000 to 140,000 tokens, only one to three thousand of them output. Both dimensions cost money, so the levers below split in two.
 
 To cut input tokens:
 
-- Start a fresh session for unrelated work, so the previous task's context stops being re-sent on every turn.
-- Keep prompt caching intact, so the re-sent prefix bills at about a tenth of the input price.
-- Cut context bloat: trim the transcript, and pull documentation as focused slices with Context7 instead of whole pages.
+- Start a fresh session for unrelated work, so old context stops being re-sent.
+- Keep prompt caching intact, so the re-sent prefix bills at a tenth of the price.
+- Cut context bloat: trim the transcript, and pull docs as focused slices with Context7.
 
 To cut both input and output:
 
-- Match effort to the task, since effort controls the pricey thinking and output tokens along with how many tool calls the model makes.
+- Match effort to the task; it governs thinking, output, and tool-call spend.
 - Tier your models, so only the work that needs Fable runs on Fable.
-
-The rest of the post covers each of these items one by one.
 
 ## Tier your models: Fable to think, cheaper models to do
 
-Most agentic work is a little hard reasoning wrapped in a lot of mechanical execution. Designing an approach or reviewing a diff for real bugs is where Fable earns its price. Renaming symbols across forty files, running the test suite, and summarizing logs is not, and a cheaper model does it just as well.
-
-Keep Fable as the orchestrator that plans and reviews, and hand the bulk execution to Sonnet 5 or Haiku 4.5 running as subagents. Each subagent works in its own context window, so the cheap model never touches Fable's expensive context and Fable only sees the condensed result. Delegate a fan-out of ten file edits and those loops run at $2 / $10 instead of $10 / $50, with their tool-result noise kept out of Fable's prefix.
+Most agentic work is a little hard reasoning wrapped in a lot of mechanical execution. Planning an approach or reviewing a diff for real bugs is where Fable earns its price; renaming symbols across forty files or running the test suite is not. Keep Fable as the orchestrator and hand the bulk work to Sonnet 5 or Haiku 4.5 subagents. Each runs in its own context window, so the cheap model never touches Fable's expensive context and Fable only sees the result. Delegate ten file edits and those loops run at $2 / $10 instead of $10 / $50.
 
 In Claude Code, three features do this for you.
 
-[Subagents](https://code.claude.com/docs/en/sub-agents) run on a model you choose. A subagent is a small Markdown file under `.claude/agents/` whose `model:` field takes a cheap alias like `haiku` or `sonnet`. Ask Claude to create one, and it delegates automatically when a task matches the subagent's description.
+[Subagents](https://code.claude.com/docs/en/sub-agents) run on a model you choose: a small Markdown file under `.claude/agents/` whose `model:` field takes a cheap alias like `haiku` or `sonnet`. Ask Claude to create one and it delegates automatically. The built-in [Explore agent](https://code.claude.com/docs/en/sub-agents) is the read-only version, inheriting your main model capped at Opus, so a Fable session already searches on Opus; define your own `Explore` with `model: haiku` to go cheaper.
 
-The built-in [Explore agent](https://code.claude.com/docs/en/sub-agents) is the read-only version of this. It inherits your main model, capped at Opus on the Claude API, so a Fable session already searches on Opus. If you want to go cheaper, define your own `Explore` subagent with `model: haiku`.
+[Workflows](https://code.claude.com/docs/en/workflows) set the model and effort per stage: run a review's adversarial find stage on a cheap model and reserve Fable for the synthesis that needs judgment.
 
-[Workflows](https://code.claude.com/docs/en/workflows) set the model and effort per stage. A review workflow can run its adversarial "find" stage on a cheap model in parallel and reserve Fable for the synthesis stage that actually needs judgment.
+[Skills](https://code.claude.com/docs/en/skills) load their full instructions only when a task needs them, so the reasoning model carries fewer fixed input tokens each turn.
 
-[Skills](https://code.claude.com/docs/en/skills) keep the reasoning model's context small. A skill's one-line description sits in context, and its full instructions load only when the task calls for it, so you pay fewer fixed input tokens on every turn.
-
-The intelligence lives in the orchestration. Put Fable there, and push everything downstream to the cheapest model that can do the job.
+The intelligence lives in the orchestration. Put Fable there, and push everything else to the cheapest model that can do the job.
 
 ## Match effort to the task
 
-Fable's [`effort` parameter](https://platform.claude.com/docs/en/build-with-claude/effort) controls how much it thinks and how many tool calls it makes. Higher effort means deeper reasoning and more tokens; `max` and `xhigh` can gather context and deliberate well past what a routine task needs. Anthropic treats effort as [the main lever for cost control](https://platform.claude.com/docs/en/build-with-claude/adaptive-thinking#cost-control) on adaptive-thinking models like Fable.
+Fable's [`effort` parameter](https://platform.claude.com/docs/en/build-with-claude/effort) controls how much it thinks and how many tool calls it makes, and Anthropic treats it as [the main lever for cost control](https://platform.claude.com/docs/en/build-with-claude/adaptive-thinking#cost-control) on adaptive-thinking models. At `max` and `xhigh`, Fable can deliberate well past what a routine task needs.
 
-Do not default to the ceiling. Anthropic notes that [lower effort on Fable still performs well and often exceeds the `xhigh` performance of prior models](https://platform.claude.com/docs/en/build-with-claude/effort#recommended-effort-levels-for-claude-fable-5), and its recommended starting points follow from that: reserve `xhigh` for genuinely hard coding and agentic work, keep `high` as the default for intelligence-sensitive tasks, and drop to `low` or `medium` for routine steps. Reducing effort by one level on a task that already completes correctly costs you nothing.
-
-In Claude Code you set effort with the `/effort` command; on the API it goes in `output_config`.
+So do not default to the ceiling. Anthropic notes that [lower effort on Fable still performs well and often beats the `xhigh` output of prior models](https://platform.claude.com/docs/en/build-with-claude/effort#recommended-effort-levels-for-claude-fable-5): reserve `xhigh` for genuinely hard work, keep `high` for intelligence-sensitive tasks, and drop to `low` or `medium` for routine steps. Dropping a level on a task that already works costs you nothing. Set it with `/effort` in Claude Code, or `output_config` on the API.
 
 ## Keep prompt caching intact
 
-[Prompt caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching) turns repeated context into cache reads that cost about a tenth of the base input price. This matters most on Fable, because the growing context re-sent on every agentic turn is exactly what caching is built to serve cheaply.
+[Prompt caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching) turns repeated context into reads that cost about a tenth of the base input price, which matters most on Fable since its whole prefix is re-sent every turn.
 
-Claude Code sets the caching up for you, so most of the job is not breaking it. The cache keys off a stable prefix: your tools first, then the system prompt, then the conversation so far. Change something early and everything after it is invalidated and re-read at full Fable input price. In day-to-day use, the easiest way to trigger that is to change the tool set mid-task:
+Claude Code sets it up for you, so the job is mostly not breaking it. The cache keys off a stable prefix (tools, then system prompt, then conversation); change something early and everything after is re-read at full price. The easy way to trigger that is changing the tool set mid-task:
 
-- Adding or removing an MCP server changes the available tools and invalidates the whole cache. Set your MCP servers up before you start a task rather than partway through it.
-- Toggling web search on or off mid-session does the same, since it changes the prompt prefix.
-- Switching the model mid-session resets the cache too, because caches are per model. Pick a model for a task and stay on it.
+- Adding or removing an MCP server changes the tools and invalidates the whole cache. Set servers up before you start, not partway through.
+- Toggling web search does the same, since it alters the prefix.
+- Switching models resets the cache too; caches are per model.
 
-Keeping the context lean helps here as well: the shorter the prefix, the less a cache miss costs on the turn it happens.
-
-For the full tier-by-tier breakdown, including what invalidates the cache when you drive Claude Code through its SDK or call the API directly, see Anthropic's [what invalidates the cache](https://platform.claude.com/docs/en/build-with-claude/prompt-caching#what-invalidates-the-cache) reference.
+For the tier-by-tier detail, including SDK and direct-API use, see Anthropic's [what invalidates the cache](https://platform.claude.com/docs/en/build-with-claude/prompt-caching#what-invalidates-the-cache) reference.
 
 ## Trim the context that keeps getting re-read
 
-Caching makes re-reading cheap, but not adding the token in the first place is cheaper still. The simplest version is to not carry context you no longer need: when you move to unrelated work, start a fresh session instead of continuing the old one. In Claude Code that is `/clear`, which drops the previous task's context so none of it is re-sent on the next turn.
+Cheaper than re-reading a token is not adding it at all. When you switch to unrelated work, start a fresh session instead of continuing; in Claude Code that is `/clear`, which drops the old task's context entirely.
 
-Within a single long task, two features cut the volume as it grows. One Claude Code gives you directly; the other is an API-level control.
+Within one long task, two features keep it lean:
 
-- [Compaction](https://platform.claude.com/docs/en/build-with-claude/compaction) summarizes earlier history when the conversation nears the context limit. In Claude Code this runs automatically as you approach the window, and you can trigger it yourself with `/compact` (or `/compact focus on the API changes` to steer what it keeps).
-- [Context editing](https://platform.claude.com/docs/en/build-with-claude/context-editing) is an API/SDK feature. It clears stale tool results and completed thinking blocks out of the transcript as a run gets long.
-
-Both keep the working context lean without losing the thread of the task.
+- [Compaction](https://platform.claude.com/docs/en/build-with-claude/compaction) summarizes old history near the context limit. Claude Code runs it automatically and on `/compact`.
+- [Context editing](https://platform.claude.com/docs/en/build-with-claude/context-editing) clears stale tool results and thinking blocks. It is an API/SDK control.
 
 ## Cut input tokens at the source with Context7
 
-The largest single source of context bloat in most agentic apps is documentation retrieval. When an agent uses general web search to answer a "how do I use library X" question, it pulls back full page-level artifacts (navigation, marketing copy, unrelated sections) and drops all of it into context. On Fable, that noise is re-processed on every following turn at $10 per million tokens.
+The biggest source of context bloat in most agents is documentation retrieval. General web search returns whole pages (navigation, marketing copy, unrelated sections) and dumps them into context, where Fable re-reads them every turn at $10 per million tokens.
 
-[Context7](https://context7.com) is built for exactly this. It searches and injects version-aware documentation directly into the agent's context, returning focused documentation slices instead of whole pages. We [benchmarked it against Claude Code's built-in web search](https://upstash.com/blog/context7-vs-web-search-benchmark) across five categories of documentation queries; the queries and per-run results are in the [benchmark repo](https://github.com/upstash/context7-efficiency-benchmark). The input-token difference was the headline: Context7 cut fresh input tokens by roughly 99% across every category, because it returns a compact slice rather than a page-level dump. That fed through to a 34.56% average cost reduction and a 36.81% reduction in total token usage.
+[Context7](https://context7.com) injects version-aware docs as focused slices instead. We [benchmarked it against Claude Code's web search](https://upstash.com/blog/context7-vs-web-search-benchmark) across five query categories ([repo](https://github.com/upstash/context7-efficiency-benchmark)): it cut fresh input tokens by about 99%, which fed through to a 34.56% cost reduction and 36.81% fewer total tokens.
 
 <Frame>
   <img src="/blog/context7-vs-web-search-benchmark/cost-per-query.png" />
 </Frame>
 
-Those figures were measured with Opus 4.7 as the main model. On Fable, the same input-token reduction is worth more, because Fable weights input at twice Opus's rate and the trimmed context is re-read on every turn of the loop. Cutting documentation noise is one of the biggest savings available on a Fable agent's bill.
+Those numbers used Opus 4.7. On Fable the saving is larger, since input costs twice as much and the trimmed context is re-read every turn.
 
-Context7 is available as an MCP server. [Add it to Claude Code or any MCP-capable agent](https://context7.com) and let the model pull docs through it instead of the open web.
+Context7 runs as an MCP server. [Add it to Claude Code or any MCP-capable agent](https://context7.com) and let the model pull docs through it instead of the open web.
 
 ## Putting it together
 
 A Fable agent that stays affordable usually looks like this:
 
-- Fable orchestrates: it plans, reviews, and makes the calls that need judgment.
-- Cheaper subagents (Sonnet 5, Haiku 4.5) do the bulk execution in their own context windows.
+- Fable orchestrates; cheaper subagents (Sonnet 5, Haiku 4.5) do the bulk work in their own context windows.
 - Effort is tuned per task, not pinned to `max`.
-- The system prompt and tool set stay frozen so prompt caching keeps working.
-- Context editing and compaction keep the transcript lean over long runs.
-- Context7 supplies documentation as focused slices, so the model's context never fills with page-level noise.
+- Tools and system prompt stay frozen so prompt caching holds, and compaction plus context editing keep long runs lean.
+- Context7 supplies docs as focused slices, so context never fills with page-level noise.
 
-None of this limits what Fable can do. It keeps the premium going toward the reasoning only Fable provides, while everything else runs on a cheaper model or never reaches the context in the first place.
+None of this limits what Fable can do. It aims the premium at the reasoning only Fable provides, and runs everything else cheaper or keeps it out of context.
