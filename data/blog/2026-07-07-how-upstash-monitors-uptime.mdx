@@ -1,0 +1,107 @@
+---
+title: "How Upstash Monitors Uptime: Every Replica, Every Minute, From Everywhere"
+slug: how-upstash-monitors-uptime
+authors: [ilter]
+tags: [redis, qstash, sre, devops, monitoring, uptime, oncall]
+description: "Inside the SRE side of Upstash: per-replica uptime checks running from 18 locations worldwide, continuous latency benchmarks, and an end-to-end QStash check wired to a heartbeat. How we find out about problems before you do."
+---
+
+There is a moment every SRE knows. A customer opens a ticket that says "is something wrong with my database?", and your stomach drops, because the honest answer is that you're about to find out together.
+
+We run our monitoring so that this moment doesn't happen. If a customer ever reports an outage before our own systems do, that counts as two failures: an incident and a monitoring gap. The second one gets its own postmortem.
+
+A while back I wrote about [how we monitor 25+ clusters across the globe](https://upstash.com/blog/how-we-scale-upstash): the federated Prometheus setup, the centralized logging, the alert routing that lets a small SRE team keep a multi-cloud platform observable. That post was the view from inside our infrastructure. This one is a deep dive into a single layer of that stack, and it happens to be my favorite: the layer that watches us from *outside*, the way a customer would. What we check, from where, how often, and what happens in the minutes after something breaks.
+
+## Why we watch replicas, not just databases
+
+[Upstash Redis](https://upstash.com/redis) is multitenant and multizone. Each cluster serves many databases, and every database is backed by at least two replicas; with the [Prod Pack](https://upstash.com/docs/redis/overall/enterprise#multi-zone-high-availability) enabled, those replicas are spread across availability zones. We've written before about [what happens when a zone goes down](https://upstash.com/blog/how-upstash-keeps-your-redis-up-when-an-availability-zone-isn-t): the surviving replicas hold an election, the most up-to-date one wins, and your database keeps serving.
+
+That failover machinery is exactly why replica monitoring is easy to get wrong. When one replica out of several dies, the database stays up. Customers notice nothing. Monitoring that only watches the database endpoint notices nothing either. Meanwhile you're running with less redundancy than you promised, and the *next* failure is no longer a non-event.
+
+So the rule we operate by is blunt: a replica going down is an incident, even when no user can tell. Every replica has its own uptime check, and losing any one of them pages the oncall.
+
+## The simplest check that could possibly work
+
+Upstash Redis [speaks HTTP alongside the Redis protocol](https://upstash.com/docs/redis/features/restapi), which turns out to be a gift for monitoring. A health check needs no Redis client, no connection pool, no scripted scenario. It's an HTTPS request to the replica's `/ping` endpoint, and a `200` back means that replica is up and serving its databases exactly the way a real client would be served.
+
+We use [Checkly](https://www.checklyhq.com/) for these checks, and every one of them is defined in Terraform. Each replica gets a small module block:
+
+```hcl
+module "check-eu-central-1-r2" {
+  source = "../modules/checkly_url_monitor"
+
+  name              = "eu-central-1-r2"
+  base_url          = "https://<replica-endpoint>.upstash.io/ping"
+  frequency_minutes = 1
+  locations         = var.default_locations
+  alert_channel_ids = local.default_alert_channel_ids
+}
+```
+
+Checkly calls this approach [monitoring as code](https://www.checklyhq.com/docs/concepts/monitoring-as-code/), and it's the feature that made us commit to the tool: every monitor is defined in our repository, next to the rest of our infrastructure, and a single apply deploys or updates all of them in one go. A new replica joins a cluster, a new block gets added, reviewed, applied. By now the file reads like a census of our fleet: a couple hundred blocks, one per replica, across AWS and GCP regions from Tokyo to São Paulo. Nothing is created by clicking around a dashboard, and nothing exists in the monitoring tool that isn't in git. At two checks that discipline would be a nice-to-have. At two hundred, it's the only way to trust that nobody forgot one.
+
+The parameter doing the most work in that block is `locations`. Upstash Redis serves clients globally, with [replicas placed in the regions closest to their readers](https://upstash.com/docs/redis/features/globaldatabase), so knowing a replica answers from one vantage point isn't knowing much. Every check runs from all of our configured Checkly locations, currently 18 of them, spread across North and South America, Europe, Africa, and Asia-Pacific. When they all get their `200`, the replica is reachable the way users actually reach it: from wherever they are. A routing problem that only affects clients in Singapore *is* an outage to a client in Singapore, so it should look like one to us too.
+
+Each check runs every minute. A failed request is retried after a short backoff before anything alerts, because one dropped packet on the public internet shouldn't page a human. We also keep *slow* and *down* apart: past five seconds a response marks the check degraded, past ten it fails.
+
+Redis isn't the only product in that Terraform file, by the way. [Upstash Vector](https://upstash.com/vector) and [Search](https://upstash.com/docs/search/overall/getstarted) replicas get the same treatment, except their checks go a step further than a ping: they upsert a record and run a query, because for an index, "up" means answering queries, not accepting connections. Hold that thought for the QStash section.
+
+So a check has failed, retried, and failed again. Now come the humans.
+
+## What happens at 3 a.m.
+
+Every check is wired to the same set of alert channels, also defined in Terraform:
+
+- **Opsgenie** pages the oncall on failure. This is the loud one.
+- **Slack** gets failures and recoveries, so the team has context without being woken up.
+- A **separate Slack channel** collects degraded-state notifications. Slowness deserves eyes, not a page, but it also must not drown in a busy alerts channel.
+
+When a replica check fails, the oncall is paged immediately, and we're looking at it within a couple of minutes, whatever the hour. That part is table stakes. The habit worth writing down is what happens at the *end* of an incident: we don't call it resolved when internal dashboards look healthy. We call it resolved when the Checkly check goes green again, from all 18 locations. Internal metrics say the process is running; the external check says a client on the other side of the planet is being served. Only the second is the truth customers experience, so it's the one that closes the incident.
+
+We do have internal monitoring on the clusters, the whole federated Prometheus stack from [the previous post](https://upstash.com/blog/how-we-scale-upstash), and it catches pod-level trouble just fine. But the two answer different questions. Internal monitoring asks "is the software healthy?" The external checks ask "would a customer be served right now, from where they are?" You want both, and when they disagree, the external one wins the argument.
+
+## Up is not the same as fast
+
+A replica that answers its health check in 900 milliseconds is technically up. It is also a problem. Uptime checks are blind to that, so a second, entirely separate layer runs alongside them.
+
+In every region where we run Redis, we also run a small fleet of benchmark clients: containers on their own ECS clusters, deliberately deployed outside the Redis clusters they measure. A benchmark living inside the cluster it measures isn't a client, it's a roommate. One benchmark service per replica, running around the clock, pushing a steady mix of reads and writes over TLS and recording every latency it observes.
+
+This fleet is managed exactly like the Checkly checks: as code. Every benchmark service is a Terraform module block in the same infrastructure repository, so covering a new replica is one more reviewed block and one more apply, and the whole fleet can be updated in a single pass. Two very different monitoring layers, one workflow.
+
+The benchmarks buy us three things:
+
+1. **It pages.** If a replica stops responding entirely, the benchmark alarms fire too. That's our second, independent paging path for uptime, and the independence matters: it shares no vantage points, no infrastructure, and no failure modes with Checkly. A blind spot in one is covered by the other.
+2. **It alerts on degradation.** Latency drifting out of its expected envelope raises internal alerts before it becomes something a user would call an outage.
+3. **It remembers.** The measurements feed historical dashboards, which is where the slow problems live. A regression that ships with a new release, or a noisy neighbor gradually leaning on a multitenant cluster, trips no single alert. It shows up as a trend line bending over days, and the dashboards catch it while it's still a curiosity rather than a page.
+
+During incidents the graphs do one more job: they define "over." After a failover or a fix, we watch the latency curves settle back to baseline before standing down. "The check is green *and* latency is back to baseline" is the full sentence. Half of it isn't enough.
+
+## QStash: when "reachable" isn't the point
+
+For [QStash](https://upstash.com/qstash), our message queue and task scheduler, a health endpoint would be nearly meaningless. QStash's job isn't to answer requests, it's to *deliver messages*. It could accept every publish with a cheerful `200`, deliver none of them, and a ping check would never know.
+
+So the QStash check isn't a ping. It's a Checkly API check that uses QStash the way a customer would: it publishes a real message through the [QStash publish API](https://upstash.com/docs/qstash/api-reference/messages/publish-a-message), and the destination of that message is an [Opsgenie heartbeat](https://support.atlassian.com/opsgenie/docs/add-heartbeats-to-monitor-external-systems/) endpoint. Every delivered message pings the heartbeat and resets its timer. If the heartbeat trick sounds familiar, it's the same pattern we use to watch our own Prometheus instances, where silence itself is the alarm.
+
+One message ends up testing the whole pipeline, and the two ways it can fail are distinguishable:
+
+- **The publish fails.** QStash isn't reachable or isn't accepting requests. The Checkly check goes red and the oncall is paged.
+- **The publish succeeds but the message never arrives.** QStash took the request and didn't deliver. The heartbeat goes silent, Opsgenie notices, and the page goes out.
+
+Either way a human is on it within minutes, and the alert itself says *which half of the user flow* broke, before anyone has opened a dashboard. At the start of an investigation, knowing whether to look at ingestion or delivery is a serious head start.
+
+I also just enjoy that the monitor is a customer. The check exercises the same publish API, the same delivery path, the same retries as real traffic. There is no separate "test mode" that could pass while production fails.
+
+## The whole picture
+
+| Layer | Question it answers | Who it wakes |
+| --- | --- | --- |
+| Checkly per-replica checks (Redis, Vector, Search) | Is every replica serving, from everywhere, right now? | Oncall, via Opsgenie |
+| Internal cluster monitoring | Is the software itself healthy? | Oncall |
+| Continuous latency benchmarks | Is every replica as fast as it should be? | Oncall on failure, internal alerts on drift |
+| QStash end-to-end check | Does the product actually do its job? | Oncall, with the failing half identified |
+
+Each layer covers a blind spot of the others. External checks can't see a slow memory leak. Internal metrics can't see a routing problem in Jakarta. Uptime checks can't see latency, and latency graphs can't tell you a queue is accepting messages and dropping them.
+
+If there's a philosophy underneath, it's short. Watch every replica, not just every database, because redundancy you can't verify isn't redundancy. Watch from where your users are, not from inside your own network. Treat slow as its own signal, distinct from down. Test what the product does, not just whether it answers. And don't declare victory until the outside world agrees with you.
+
+None of this makes outages impossible. Hardware fails, zones have bad days, the internet remains the internet. What it buys is a compressed timeline: minutes from failure to a human on it, a clear signal about what broke, and an unambiguous, client's-eye definition of "fixed." The ticket asking "is something wrong?" should only ever have one answer: "yes, we know, and we're already on it."
