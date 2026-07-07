@@ -132,9 +132,9 @@ export default function HomeAgents() {
 
       <Container>
         <SectionHeader>
-          <SectionHeaderTitle>Built for AI agents</SectionHeaderTitle>
+          <SectionHeaderTitle>Built for AI Agents</SectionHeaderTitle>
           <SectionHeaderSummary>
-            Skills, an MCP server, and a CLI — everything your coding agent
+            Skills, an MCP server, and a CLI: everything your coding agent
             needs to build, manage, and debug Upstash resources
           </SectionHeaderSummary>
         </SectionHeader>
@@ -163,8 +163,8 @@ export default function HomeAgents() {
 
                 <p className="mt-4 text-balance text-text-mute md:text-lg">
                   Packaged instructions covering every Upstash SDK plus the full
-                  CLI reference. Your agent loads only the sections it needs —
-                  no context bloat, no stale docs.
+                  CLI reference. Your agent loads only the sections it needs.
+                  No context bloat, no stale docs.
                 </p>
 
                 <AgentCardLink href="https://upstash.com/docs/agent-resources/skills">
