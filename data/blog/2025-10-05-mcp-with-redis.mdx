@@ -117,7 +117,7 @@ This implementation uses Redis Streams, which are perfect for this use case.
 
 ### A Limitation
 
-There's one important caveat to be aware of: when a tool sends multiple events, the [streamId is set to `_GET_stream`](https://github.com/modelcontextprotocol/typescript-sdk/blob/main/src/server/streamableHttp.ts#L156), and this constant remains the same across different streams and users. This means that if two users are simultaneously using the same tool that sends multiple events, their events could be mixed up in the same stream.
+There's one important caveat to be aware of: when a tool sends multiple events, the [streamId is set to `_GET_stream`](https://github.com/modelcontextprotocol/typescript-sdk/blob/cc70c5e6a9f9b1c15dcba0bdd019a479b81375de/packages/server/src/server/streamableHttp.ts#L1), and this constant remains the same across different streams and users. This means that if two users are simultaneously using the same tool that sends multiple events, their events could be mixed up in the same stream.
 
 I've [opened an issue](https://github.com/modelcontextprotocol/typescript-sdk/issues/1004) about this on the official repository. Depending on the resolution, we may need to adjust the implementation, and I'll update this post accordingly if needed.
 

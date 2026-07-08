@@ -24,8 +24,8 @@ Dub is an open-source link management tool tailored for the evolving needs of mo
     - Planetscale for relational SQL storage
     - Tinybird for time-series analytics data
 
-In this stack, Dub's performance is accelerated further with its strategic database selections: Upstash Redis ensures very fast link retrievals (via key-value pairs): https://github.com/dubinc/dub/blob/main/apps/web/lib/upstash.ts.
-On the automation front, Upstash QStash plays the key role managing cron jobs efficiently https://github.com/dubinc/dub/blob/main/apps/web/app/api/cron/import/short/utils.ts#L164.
+In this stack, Dub's performance is accelerated further with its strategic database selections: [Upstash Redis ensures very fast link retrievals (via key-value pairs)](https://github.com/dubinc/dub/blob/70d36b4e36c7a9d10a99704fd0a4a73697b9e610/apps/web/lib/api/links/cache.ts#L73).
+On the automation front, [Upstash QStash plays the key role managing cron jobs efficiently](https://github.com/dubinc/dub/blob/70d36b4e36c7a9d10a99704fd0a4a73697b9e610/apps/web/lib/api/campaigns/schedule-campaigns.ts#L112).
 
 #### The Upstash Advantage
 

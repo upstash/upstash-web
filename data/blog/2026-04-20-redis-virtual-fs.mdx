@@ -68,7 +68,7 @@ The agent still sees the same output it would from a normal shell.
 
 ## Giving an agent a shell
 
-The last piece is wiring this up to [`just-bash`](https://github.com/upstash/just-bash) so an agent can run commands against it. Inspired by [how Mintlify built their assistant's filesystem](https://www.mintlify.com/blog/how-we-built-a-virtual-filesystem-for-our-assistant), we mount a Redis-backed fs adapter at `/workspace` on a `MountableFs`:
+The last piece is wiring this up to [`just-bash`](https://github.com/vercel-labs/just-bash) so an agent can run commands against it. Inspired by [how Mintlify built their assistant's filesystem](https://www.mintlify.com/blog/how-we-built-a-virtual-filesystem-for-our-assistant), we mount a Redis-backed fs adapter at `/workspace` on a `MountableFs`:
 
 ```typescript
 import { InMemoryFs, MountableFs } from "just-bash";
