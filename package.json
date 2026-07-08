@@ -12,6 +12,7 @@
     "postbuild": "next-sitemap"
   },
   "dependencies": {
+    "@bydefault/vercel": "^0.1.4",
     "@jsdevtools/rehype-toc": "^3.0.2",
     "@mux/mux-player-react": "^3.3.0",
     "@radix-ui/react-navigation-menu": "^1.2.4",
