@@ -35,8 +35,6 @@ if( current_connection_count > HARD_LIMIT ) {
 }
 ```
 
-Note that the max concurrent connection limits listed in the [Upstash docs](/docs/overall/databasetypes) are the soft limits.
-
 ### Ephemeral Connections
 
 After deploying the above algorithm, we have seen a great decrease in the number of rejected connections in all regions. But still if you want to be on the safe side, you can solve the problem on your side too. Instead of reusing the connection, you can open the Redis connection inside the function but also close them whenever you are done with Redis as below:
