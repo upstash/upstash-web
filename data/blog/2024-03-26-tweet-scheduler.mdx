@@ -398,7 +398,7 @@ The code above does the following:
 - Imports the `authClient` created earlier.
 - Exports a `GET` HTTP Handler which responds to incoming GET requests on `/api/auth/callback/twitter`.
 - Destructures `code` query parameter from the callback URL.
-- Creates an authorization URL like earlier as [a hack](https://github.com/twitterdev/twitter-api-typescript-sdk/issues/25#issuecomment-1272391910) to update the internal state created by SDK.
+- Creates an authorization URL like earlier as [a hack](https://github.com/xdevplatform/twitter-api-typescript-sdk/issues/25#issuecomment-1272391910) to update the internal state created by SDK.
 - Calls the `requestAccessToken` function by Twitter SDK to obtain the access and refresh tokens, that will allow you to create tweets over an API.
 - Destructures the `access_token` from the `token` object obtained.
 - Saves the access token value obtained with `twitter_oauth_access_token` as the key in Upstash Redis.

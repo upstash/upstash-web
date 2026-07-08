@@ -13,8 +13,6 @@ Vercel recently launched [Edge Functions](https://vercel.com/features/edge-funct
 
 In this tutorial, we’ll show how to build a small site with SvelteKit that takes full advantage of the edge. The site will show a list of all the cities that have visited the site. We’ll determine the user’s current city using Vercel’s [edge headers](https://vercel.com/docs/concepts/edge-network/headers) and display it on the page, and the user can choose to add their city to the list of visitors.
 
-For a preview of what we’re building, see the [live demo](https://sveltekit-edge-guestbook.vercel.app/).
-
 We’ll be using Upstash Redis® as a data store, since (like SvelteKit) it’s optimized for use with serverless hosting providers. In addition, they allow provisioning a global database that will minimize latency from the deployed function to the database instance.
 
 ## Starter overview
@@ -190,6 +188,6 @@ Push your project to GitHub and [create a new project](https://vercel.com/new) o
 
 ## Wrapping up
 
-Thanks for following along! I hope this post showed how easy it is to deploy a site to the edge using SvelteKit. You can find the final code on [GitHub](https://github.com/geoffrich/sveltekit-edge-guestbook) and the live demo deployed to [Vercel](https://sveltekit-edge-guestbook.vercel.app/). For another example of SvelteKit running on Edge Functions, see [this project from Rich Harris](https://github.com/Rich-Harris/sveltekit-on-the-edge).
+Thanks for following along! I hope this post showed how easy it is to deploy a site to the edge using SvelteKit. You can find the final code on [GitHub](https://github.com/geoffrich/sveltekit-edge-guestbook). For another example of SvelteKit running on Edge Functions, see [this project from Rich Harris](https://github.com/Rich-Harris/sveltekit-on-the-edge).
 
 Have any questions? Reach out on [Twitter](https://twitter.com/geoffrich_). You can also find my other writing about Svelte on [my blog](https://geoffrich.net/).

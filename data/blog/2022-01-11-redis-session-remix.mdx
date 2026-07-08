@@ -26,7 +26,7 @@ Session data is stored on the server. When deploying to a serverless infrastruct
 
 ## How to use Upstash as a session provider in Redis
 
-> This post is based on the [Redis Session Storage Using Upstash Example](https://github.com/remix-run/remix/tree/main/examples/redis-upstash-session) I wrote. Feel free to clone the Remix repo and give it a go.
+> This post is based on the [Redis Session Storage Using Upstash Example](https://github.com/remix-run/remix/tree/e9efffa7e32d1a3ab9a3e04a152e7aaa2627dfb4/examples/redis-upstash-session) I wrote. Feel free to clone the Remix repo and give it a go.
 
 ### Step 1 - Get your Upstash API keys
 
@@ -125,7 +125,7 @@ Each function uses the `REST` Upstash API to interact with Redis Database.
 
 - The passed cookie holds the `cookie expiration date` in a `js Date` format. We use the `expiresToSeconds` function to convert the data to seconds as this is what Redis expects.
 - When setting a cookie, don't forget to set its expiration date. Redis will automatically delete those sessions when they are expired.
-- We use `crypto` to create a unique session id. You can use other alternatives for creating unique ids. I chose this option as its the same being used in the core `createFileSessionStorage` [function](https://github.com/remix-run/remix/blob/main/packages/remix-node/sessions/fileStorage.ts).
+- We use `crypto` to create a unique session id. You can use other alternatives for creating unique ids. I chose this option as its the same being used in the core `createFileSessionStorage` [function](https://github.com/remix-run/remix/blob/e9efffa7e32d1a3ab9a3e04a152e7aaa2627dfb4/packages/remix-node/sessions/fileStorage.ts).
 
 ### Step 3 - use the `createSessionStorage` on your app
 
@@ -167,7 +167,7 @@ Setup the expiration duration according to your business needs. For more info re
 
 Using Remix you can define session usage per route. In the following example we use the `session` on the `routes/index.tsx`. This example only demonstrated how to use the session API. Connecting session to a specific business logic is out of the scope of this post.
 
-> If you are looking for an example on how to use session for authentication see https://github.com/remix-run/remix/tree/main/examples/remix-auth-form
+> If you are looking for an example on how to use session for authentication see https://github.com/remix-run/remix/tree/e9efffa7e32d1a3ab9a3e04a152e7aaa2627dfb4/examples/remix-auth-form
 
 ```tsx
 // routes/index.tsx
@@ -246,6 +246,6 @@ Now when you develop locally you'll use your local file system instead of callin
 
 ## Conclusion
 
-In this post we saw how to use Upstash Redis DB to host our session storage data. Remix API encapsulates the specific session storage implementation really well, making the integration strait forward. If you want to play with the example you can check it out in the Remix source code at https://github.com/remix-run/remix/tree/main/examples/redis-upstash-session
+In this post we saw how to use Upstash Redis DB to host our session storage data. Remix API encapsulates the specific session storage implementation really well, making the integration strait forward. If you want to play with the example you can check it out in the Remix source code at https://github.com/remix-run/remix/tree/e9efffa7e32d1a3ab9a3e04a152e7aaa2627dfb4/examples/redis-upstash-session
 
 Enjoy.

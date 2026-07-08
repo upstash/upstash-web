@@ -75,7 +75,7 @@ export const load = (async (events) => {
 }) satisfies PageServerLoad;
 ```
 
-We use `trpcLoad(events, (t) => t.public.cat.getMany())` to load all the cats. I've written more about the useful `trpcLoad` helper [here](https://chrisjayden.com/articles/optimizing-code-imports-sveltekit-trpc).
+We use `trpcLoad(events, (t) => t.public.cat.getMany())` to load all the cats.
 
 In our `+page.svelte` file, this data is consumed and rendered. The data object gets its properties from the `public.cat.getMany` method which provides us the list of cats. Then, each of these cats are rendered as individual `CatCard.svelte` components passing the cat info as a prop.
 

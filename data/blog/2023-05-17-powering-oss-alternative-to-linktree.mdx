@@ -86,7 +86,7 @@ This is the main folder structure for the project. I have circled in red the fil
 
 This is a high-level diagram of how data is flowing.
 
-- If a user visits [itsmy.fyi/me/slug](http://itsmy.fyi/me/slug) and the response to this
+- If a user visits some page on the website and the response to this
   page is not cached (or is being revalidated), it calls the getUserInfo function which in
   turns retrieves the user json from the Upstash DB
 - If a user create(s), update(s) or delete(s) a GitHub Issue, GitHub triggers a Webhook
@@ -218,7 +218,7 @@ Using Rate Limiting, I am able to expose the profile creation API publicly!
 This allowed me to showcase the benefits of the system i.e. ease of setup of a profile via GUI.
 Literally anyone can create 3 profiles in a week via the website ([itsmy.fyi](https://itsmy.fyi)) itself,
 and for unlimited access to features such as edit profile, create unlimited profiles,
-users are to switch to GitHub way of [creating profile](<https://github.com/rishi-raj-jain/itsmy.fyi/issues/new?assignees=&labels=&template=itsyour.page-profile-data.yml&title=itsmy.fyi+-+{INSERT+NAME}+(Optional)>).
+users are to switch to GitHub way of creating profile.
 We’re able to enforce the rate limit of 3 profiles in a week based on IP address as the key.
 
 ```jsx
@@ -336,7 +336,7 @@ You can do a production build of your app and test it locally using:
 yarn run edgio:build && yarn run edgio:production
 ```
 
-Deploying requires an account on Edgio. [Sign up here for free](https://app.layer0.co/signup).
+Deploying requires an account on Edgio.
 Once you have an account, you can deploy to Edgio by running the following command in the root folder of your project:
 
 ```bash

@@ -25,7 +25,7 @@ await redis.hset("123", {
 
 This will internally be serialized to `hset 123 id 123 name {"first":"andreas"}` and sent to Upstash. Note that objects are serialized automatically and you no longer have to do that yourself.
 
-If you are unsure how a command can be used, typescript will help you if your editor supports intellisense. Also check out the [test](https://github.com/upstash/upstash-redis/tree/main/pkg/commands) that covers everything and can serve as examples.
+If you are unsure how a command can be used, typescript will help you if your editor supports intellisense. Also check out the [test](https://github.com/upstash/redis-js/tree/main/packages/redis/pkg/commands) that covers everything and can serve as examples.
 
 **Here are the most important changes:**
 
