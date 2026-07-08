@@ -35,7 +35,7 @@ You can find the full code for this prototype in the [accompanying GitHub reposi
 To try out the pipeline, you'll need free accounts with both Quix and Upstash. Use the following links if you don't have these accounts already.
 
 * [Upstash signup](https://console.upstash.com/auth/sign-in)
-* [Quix signup](https://quix.io/signup)
+* Quix signup
 
 Both services let you use an existing Google or GitHub account so you can sign up with a few clicks.
 
@@ -48,7 +48,7 @@ You can create the Kafka cluster by following the[ Upstash Kafka docs](https://u
 
 You'll be able to try out this whole process yourself using a Quix template—this basically uses the previously linked GitHub repo to spin up an environment in Quix Cloud. 
 
-To get started, click [this Quix template creation link](https://portal.platform.quix.io/signup?projectName=Continuous%20Vector%20Ingestion%20to%20Upstash&httpsUrl=https://github.com/quixio/template-vector-ingestion-upstash&branchName=tutorial). 
+To get started, create a Quix template.
 
 You'll be prompted to sign up with Quix (if you haven't already), and guided through a wizard to create a project. If you're prompted to “Choose your configuration”, select the “advanced” option.
 
@@ -234,7 +234,7 @@ First, we initialize a Kafka producer. If you've used the Python examples from o
  For example: 
 
 * When you run it in a Quix Cloud Docker container, it automatically detects the Kafka broker address and seamlessly authenticates with Kafka without you having to define any config parameters (like “`bootstrap_servers`” or “`security_protocol`” which you have to define in other libraries)
-* It uses the concept of [Streaming Dataframes](https://quix.io/blog/introducing-streaming-dataframes) which makes it a lot easier to process data, and reuse Pandas code written for static datasets.
+* It uses the concept of streaming dataframes which makes it a lot easier to process data, and reuse Pandas code written for static datasets.
 
 With Quix Streams, we define an application and initial output topic in <code>[main.py](https://github.com/quixio/template-vector-ingestion-upstash/blob/tutorial/Postgres%20CDC/main.py)</code>, like so:
 
@@ -476,9 +476,9 @@ Many large enterprises are already using event based solutions such as Apache Ka
 
 ### Further Resources
 
-For more information on how to set up this architecture with Quix and Upstash, join the [Quix Community Slack](https://quix.io/slack-invite) and start a conversation with the Quix team.
+For more information on how to set up this architecture with Quix and Upstash, join the Quix Community Slack and start a conversation with the Quix team.
 
-* To learn more about the Quix Streams Python library, check out the [introduction](https://quix.io/docs/client-library-intro.html) in the Quix documentation.
-* To see more Quix project template, check out the [Quix template gallery](https://quix.io/templates).
+* To learn more about the Quix Streams Python library, check out the [introduction](https://quix.io/docs/quix-streams/introduction.html) in the Quix documentation.
+* To see more Quix project template, check out the [Quix template gallery](https://github.com/quixio/quix-samples).
 
  And if you'd like to learn more about Upstash and Gen AI, check out the latest [Upstash blog posts](https://upstash.com/blog). As a reminder, you can find all the relevant code in this project's [GitHub repository](https://github.com/quixio/template-vector-ingestion-upstash/tree/tutorial).

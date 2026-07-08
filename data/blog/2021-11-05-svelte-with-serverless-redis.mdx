@@ -108,7 +108,7 @@ async function cacheMovieResponse(
 }
 ```
 
-Each movie ID will be stored under a different key. For example, if we were retrieving information on the movie with [ID 11](https://movie-search-upstash-demo.netlify.app/movie/11), the key would be `movie:11`. The last two arguments to `redis.set` say that we should only cache the data for 24 hours (86400 seconds). We shouldn't cache the data forever—it violates the terms of use, and the data will eventually become stale.
+Each movie ID will be stored under a different key. For example, if we were retrieving information on the movie with ID 11, the key would be `movie:11`. The last two arguments to `redis.set` say that we should only cache the data for 24 hours (86400 seconds). We shouldn't cache the data forever—it violates the terms of use, and the data will eventually become stale.
 
 Note that you need to stringify the JS object before you can store it in the cache. We also catch any exceptions thrown during this operation to make our endpoint more resilient. If we can't cache the data, we should still return the data from the API instead of throwing an unhandled exception.
 
@@ -188,7 +188,7 @@ With these changes, try navigating to a movie's page. When you refresh the page,
 
 Redis can do more than just caching API responses. Let's look at how we can build a route that will redirect the user to a random movie.
 
-This isn't as simple as picking a random number between 1 and 300000 and using that as the movie ID. Not every number in that range will correspond to a movie—for instance, there is no movie with an ID of [1](https://www.themoviedb.org/movie/1) or [1000](https://www.themoviedb.org/movie/1000). It would also be tricky to keep track of what the maximum possible ID is, since that will always be changing as new movies are added. Instead, we'll select random movies using a two step process:
+This isn't as simple as picking a random number between 1 and 300000 and using that as the movie ID. Not every number in that range will correspond to a movie—for instance, there is no movie with an ID of 1 or 1000. It would also be tricky to keep track of what the maximum possible ID is, since that will always be changing as new movies are added. Instead, we'll select random movies using a two step process:
 
 1. When a search query is performed, place all the IDs returned in a [Redis Set](https://redis.io/topics/data-types#sets).
 2. When the `/movie/random` route is requested, retrieve a [random member](https://redis.io/commands/srandmember) of that set and redirect to the corresponding movie detail page.
@@ -271,8 +271,6 @@ That's all there is to it! Now, navigate to [http://localhost:5173/movie/random]
   </nav>
 </header>
 ```
-
-You can see this working in the [live demo](https://movie-search-upstash-demo.netlify.app/movie/random).
 
 ## Wrapping up
 

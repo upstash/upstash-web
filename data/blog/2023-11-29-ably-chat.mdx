@@ -34,7 +34,7 @@ Ably provides these Pub/Sub channels by adding an abstract layer on top of Web S
 
 - Stream the messages/presence/metadata to Kafka
 
-You can visit their [website]([https://ably.com](https://ably.com)) to learn more!
+You can visit their [website](https://ably.com) to learn more!
 
 To utilize this powerful real-time experience hub, we need to create an application on Ably.
 
@@ -56,7 +56,7 @@ This storage will allow users to retrieve the chat history when they join.
 
 Upstash Redis will also allow us to store the chat messages as a sorted list. This will help us to send the messages from the database to the clients without needing to re-sort them.
 
-To create the Upstash Redis database, go to [Upstash Console]([https://console.upstash.com/](https://console.upstash.com/)), log in, and create a Redis database.
+To create the Upstash Redis database, go to [Upstash Console](https://console.upstash.com/), log in, and create a Redis database.
 
 ![](https://lh7-us.googleusercontent.com/QzmJWf_hiEkEh5CMtRbkvtdAIo2YXrSMRTjrFinNKJuBgY9Df8gqAE2-lsX4zD_Bj0fyDZTAAueV3T8lxRQ7_gBu8QUBKKzuKtYRYO7JtJ5uotsbnGdirlhD3ihtYbdrZgOAfYr1fUXuC1np_Q-i_Q)
 
@@ -129,7 +129,7 @@ const ably = new Ably.Realtime(‘<Ably API Key>’);
 
 > **Warning**
 
-Giving API key to the clients is INSECURE. Ably provides a mechanism called “TokenRequest”. Since this is a demo application, we will give the API key directly to the JavaScript file. For further information about client authentication for Ably, please check Ably’s [token docs]([https://ably.com/docs/auth/token?lang=nodejs#token-request](https://ably.com/docs/auth/token?lang=nodejs#token-request)).
+Giving API key to the clients is INSECURE. Ably provides a mechanism called “TokenRequest”. Since this is a demo application, we will give the API key directly to the JavaScript file. For further information about client authentication for Ably, please check Ably’s [token docs](https://ably.com/docs/auth/token?lang=nodejs#token-request).
 
 Now, let's get the Ably channel through which the client will communicate.
 

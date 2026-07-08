@@ -10,7 +10,7 @@ After our last guide on the Upstash blog scored a spot on the **[Bytes newslette
 
 As a Svelte super fan, I'm seeing more and more people jumping on board every day — and it makes me incredibly excited for the future.
 
-One of the tools that’s still flying under the radar is [Lucia](https://lucia-auth.com/).
+One of the tools that’s still flying under the radar is [Lucia](https://v2.lucia-auth.com/).
 
 In this guide I’m going to show you how to get authentication up and running with Lucia. We will be using PlanetScale for our database needs, and Upstash Redis to handle sessions.
 
@@ -29,7 +29,7 @@ What's so awesome about Lucia is how it equips you with everything you need to m
 Think of Lucia as a set of primitives — it’s up to you how you want to structure your code and handle the user experience.
 Lucia has a few key parts that are important to understand:
 
-**[Middleware](https://lucia-auth.com/basics/handle-requests)** allows Lucia to read the request and response for different frameworks and runtime.
+**[Middleware](https://v2.lucia-auth.com/reference/lucia/modules/middleware/)** allows Lucia to read the request and response for different frameworks and runtime.
 
 Here's an example of how you would configure middleware:
 
@@ -46,7 +46,7 @@ export const auth = lucia({
 });
 ```
 
-**[Database adapters](https://lucia-auth.com/database-adapters)** allow Lucia to store and retrieve users and sessions. By providing an adapter Lucia knows how to query for these types. There are 2 types of adapters; regular adapters, and session adapters. In this particular guide we’re going to use a mySQL database hosted on PlanetScale to store our users, and a Redis instance hosted on Upstash to handle sessions.
+**[Database adapters](https://v2.lucia-auth.com/reference/database-adapter/)** allow Lucia to store and retrieve users and sessions. By providing an adapter Lucia knows how to query for these types. There are 2 types of adapters; regular adapters, and session adapters. In this particular guide we’re going to use a mySQL database hosted on PlanetScale to store our users, and a Redis instance hosted on Upstash to handle sessions.
 
 Here's an example of how you would configure a database adapter:
 
@@ -248,7 +248,7 @@ export default {
 } satisfies Config;
 ```
 
-Because we're using the mySQL adapter, Lucia expects our user model to have a specific structure. You can find more information about this in the [docs](https://lucia-auth.com/database-adapters/mysql2).
+Because we're using the mySQL adapter, Lucia expects our user model to have a specific structure. You can find more information about this in the [docs](https://v2.lucia-auth.com/database-adapters/mysql2/).
 
 Place the following code in `src/lib/server/drizzle/schema/index.ts`.
 
@@ -757,6 +757,6 @@ Again Lucia has our back by making it incredibly easy to invalidate sessions. Al
 
 We've successfully created type-safe authentication with Lucia, PlanetScale, and Upstash Redis. And we've only scratched the surface of what Lucia can do.
 
-Again, you can find the repo for this guide [here](https://github.com/upstash/examples) If you want to learn more about Lucia, I highly recommend checking out the [docs](https://lucia-auth.com/).
+Again, you can find the repo for this guide [here](https://github.com/upstash/examples) If you want to learn more about Lucia, I highly recommend checking out the [docs](https://v2.lucia-auth.com/).
 
 Before you move on you should come hang out in the [Upstash Discord](https://discord.gg/hEHsgSHtT7) community — we're having a good ol' time. And also if you want more SvelteKit content, you can find it on my blog [here](https://chrisjayden.com).

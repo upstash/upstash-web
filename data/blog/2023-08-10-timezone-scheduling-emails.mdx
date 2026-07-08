@@ -6,7 +6,7 @@ authors:
 tags: [qstash, emails, scheduler, nextjs, redis, docsly]
 ---
 
-At [docsly](https://docsly.dev), we launched a new feature to send email notifications to users with a summary of all the feedback they received in the last week or month. Sending emails isn't a new problem, but we wanted to provide the best user experience in this regard, so we decided that all emails should be sent in the user's timezone to avoid sending emails at odd hours. We also wanted to give users the ability to choose the frequency with which they want to receive the email. We also wanted to give users the ability to cancel the scheduled email notifications at any time.
+At docsly, we launched a new feature to send email notifications to users with a summary of all the feedback they received in the last week or month. Sending emails isn't a new problem, but we wanted to provide the best user experience in this regard, so we decided that all emails should be sent in the user's timezone to avoid sending emails at odd hours. We also wanted to give users the ability to choose the frequency with which they want to receive the email. We also wanted to give users the ability to cancel the scheduled email notifications at any time.
 
 Implementing this solution was tricky because:
 
@@ -367,4 +367,4 @@ export default async function scheduleSummary(
 
 To summarize, we were able to schedule emails in the user's timezone using Upstash Redis and QStash. We achieved this without storing the user's timezone in our database. We were also able to give users the ability to cancel the scheduled email notifications at any time.
 
-If you're maintaining documentation for your product, you should check out [docsly](https://www.docsly.dev). It's a feedback tool crafted for technical documentation that helps you collect feedback from your users and turn them into actionable insights.
+If you're maintaining documentation for your product, you should check out docsly. It's a feedback tool crafted for technical documentation that helps you collect feedback from your users and turn them into actionable insights.

@@ -118,7 +118,7 @@ Redis Cloud has the widest set of built-in capabilities. Redis 8 / Redis Stack s
 
 AWS, Google, DigitalOcean, and Aiven run **Valkey**, the BSD-licensed fork that appeared after Redis changed its license in 2024. Valkey covers the core Redis commands but not the modules, so search and JSON aren't available on those providers.
 
-Upstash sits in between. It ships [Upstash Redis Search](https://upstash.com/docs/redis/search/introduction), full-text search built into the database: you write a JSON document to a key and it gets indexed automatically, with no separate search service to run or keep in sync. It's [generally available](https://upstash.com/blog/upstash-redis-search-generally-available) and already powers [millions of searches in Context7](https://upstash.com/blog/how-redis-search-powers-millions-of-searches-in-context7). JSON is first-party too.
+Upstash sits in between. It ships [Upstash Redis Search](https://upstash.com/docs/redis/search/introduction), full-text search built into the database: you write a JSON document to a key and it gets indexed automatically, with no separate search service to run or keep in sync. It's [generally available](https://upstash.com/blog/upstash-redis-search-generally-available) and already powers [millions of searches in Context7](https://upstash.com/blog/how-redis-search-powers-context7). JSON is first-party too.
 
 What Upstash doesn't have in-keyspace is TimeSeries and Bloom, and vector search is a separate product, [Upstash Vector](https://upstash.com/docs/vector/overall/getstarted). So if you need the full module set in a single query, that's Redis Cloud. For full-text search and JSON, Upstash covers it and the Valkey providers don't.
 
@@ -129,7 +129,7 @@ Every provider gives you a Redis client. Redis maintains the official ones ([nod
 - **[@upstash/ratelimit](https://github.com/upstash/ratelimit)** — sliding-window, fixed-window, and token-bucket rate limiting out of the box.
 - **[Upstash Realtime](https://upstash.com/docs/realtime/overall/quickstart)** — type-safe pub/sub for live updates, cursors, and notifications, a serverless alternative to Pusher or Ably.
 - **AgentKit** — wires Upstash Redis into agent stacks for memory and state, with integrations for the [Vercel AI SDK](https://upstash.com/docs/redis/sdks/agentkit/ai-sdk) and the [Eve](https://upstash.com/docs/redis/sdks/agentkit/eve) framework.
-- **[Agent Analytics](https://github.com/upstash/agent-analytics)** — records when AI crawlers like ChatGPT, Claude, and Perplexity hit your site ([how it works](https://upstash.com/blog/track-ai-crawlers-with-agent-analytics)).
+- **[Agent Analytics](https://github.com/upstash/agent-analytics)** — records when AI crawlers like ChatGPT, Claude, and Perplexity hit your site ([how it works](https://upstash.com/blog/track-ai-crawlers-with-upstash-agent-analytics)).
 - **[Redis Analytics](https://github.com/upstash/redis-analytics)** — page views, events, and custom metrics backed by Redis.
 
 With the other providers you build these on top of the base client yourself. What they give you instead is tooling around the database rather than the application patterns. Redis Cloud ships RedisInsight, a GUI keyspace browser and profiler, plus the Redis Stack module commands. ElastiCache, MemoryDB, and Memorystore lean on their clouds for the surrounding pieces: IAM auth, CloudWatch or Cloud Monitoring metrics, and VPC-level access control. It's useful, but it's a different layer from rate limiting or realtime.

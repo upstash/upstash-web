@@ -1,0 +1,78 @@
+# Configuration for the lychee link checker (see .github/workflows/link-checker.yml).
+# Root-relative asset links (e.g. /blog/foo.png) are resolved against ./public
+# via the --root-dir flag passed in the workflow.
+
+# Retry/timeout tuning so slow-but-alive hosts don't flap.
+max_retries = 2
+timeout = 20
+
+# Root-relative /docs/* links point at the docs app (Mintlify) hosted at
+# upstash.com/docs, not this repo. --root-dir resolves them to file://…/public/docs/…;
+# this remap (applied after resolution) rewrites them back to the production URL so
+# they're verified live instead of skipped. Sunset /docs/kafka is excluded below,
+# before this remap runs.
+remap = ["^file://.*/public/docs([/?#].*)?$ https://upstash.com/docs$1"]
+
+exclude = [
+  # --- Local / dev-only ---
+  "://localhost",
+  "127\\.0\\.0\\.1",
+
+  # --- Internal page routes that aren't static files in ./public ---
+  # Root-relative links are resolved against ./public via --root-dir, so these
+  # patterns match the resolved file:// URI (scoped to file:// so external links
+  # are never affected). Real asset links keep a file extension (/blog/foo.png,
+  # /blog/x.mp4) and are still verified against ./public.
+  "^file://.*/public/?$",                                        # home (/)
+  "^file://.*/public/blog/[^./?#]+([?#].*)?$",                   # /blog/<post-slug>
+  "^file://.*/public/(contact|pricing|sign-in|sign-up|profile)([/?#]|$)",
+  # Sunset /docs/kafka (excluded before the docs remap so it isn't checked live).
+  "^file://.*/public/docs/kafka([/?#]|$)",
+  # JSX/template-literal fragments in code samples that lychee mis-reads as
+  # relative links, e.g. href={`products/${item.id}`} -> %7B... ('{' encoded).
+  "%7B",
+
+  # --- Hosts that block automated checkers (403 / 429 / 999) ---
+  "://([a-z0-9-]+\\.)?linkedin\\.com",
+  "://([a-z0-9-]+\\.)?npmjs\\.com",
+  "://([a-z0-9-]+\\.)?medium\\.com",
+  "://([a-z0-9-]+\\.)?x\\.com",
+  "://([a-z0-9-]+\\.)?twitter\\.com",
+  "://([a-z0-9-]+\\.)?reddit\\.com",
+  "://([a-z0-9-]+\\.)?openai\\.com",
+  "://([a-z0-9-]+\\.)?hashicorp\\.com",
+  "://news\\.ycombinator\\.com",
+  "://dl\\.acm\\.org",
+  "://dash\\.cloudflare\\.com",
+  "://unsplash\\.com",
+  # Discord blocks automated checkers on invite links and the /discord redirect.
+  "://discord\\.(gg|com)",
+  "upstash\\.com/discord",
+
+  # --- More hosts that block checkers / require auth / are SPAs or API endpoints ---
+  "://console\\.upstash\\.com",              # authenticated SPA console (client-rendered routes)
+  "://qstash\\.upstash\\.io",                # example API endpoints in code samples
+  "://api\\.replicate\\.com",                # API endpoint (requires auth)
+  "://([a-z0-9-]+\\.)?fauna\\.com",          # blocks/times-out automated requests
+  "://([a-z0-9-]+\\.)?statista\\.com",       # SSO redirect loop
+  "://([a-z0-9-]+\\.)?deepseek\\.com",       # blocks bots
+  "://accounts\\.openrouter\\.ai",           # blocks bots
+  "://doordash\\.engineering",               # blocks bots
+  "://([a-z0-9-]+\\.)?brianlovin\\.com",     # rate-limits bots (429)
+  "://([a-z0-9-]+\\.)?paulsmith\\.com",      # rate-limits bots (429)
+  "://ui\\.tinybird\\.co",                   # login redirect
+  "://([a-z0-9-]+\\.)?codeshare\\.io",       # blocks bots (400)
+  "://developer\\.nytimes\\.com",            # closes connection to bots
+  "://console\\.cloud\\.google\\.com",       # auth-gated console
+  "://cloud\\.materialize\\.com",            # auth-gated console
+  "://([a-z0-9-]+\\.)?edg\\.io",             # wildcard-only TLS cert (apex fails)
+  "://([a-z0-9-]+\\.)?postimg\\.cc",         # image host blocks hotlinking/bots
+  "://dashboard\\.clerk\\.com",              # authenticated SPA dashboard
+  "://([a-z0-9-]+\\.)?perplexity\\.ai",      # blocks bots (403)
+  "://azure\\.microsoft\\.com",              # blocks automated requests
+  "://deno\\.land",                          # client-rendered module pages 404 to crawlers
+
+  # --- Discontinued Upstash Kafka (product sunset, permanently removed) ---
+  "://upstash\\.com/docs/kafka",
+  "://upstash\\.com/kafka",
+]

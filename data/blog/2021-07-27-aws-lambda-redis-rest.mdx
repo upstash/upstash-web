@@ -8,8 +8,6 @@ tags: [redis, database, serverless, aws, aws-lambda]
 
 AWS Lambda pioneered serverless space. Many developers think that serverless is the future of development. It gives you the true pay-per-use model, relieves you from the maintenance and scaling of the backend infrastructure. But it also comes with challenges. One of those is its statelessness. You need to keep the state in an external data store. Unfortunately most of the popular data stores are connection based. But as we explained in [this post](https://blog.upstash.com/serverless-database-connections), managing connections can become painful in serverless. That’s why, we have developed a high performance [REST API](/docs/redis/features/restapi) on top of Upstash Redis. In this blog post, I will implement a very basic stateful api (page counter) on AWS Lambda and Upstash Redis® using the REST API.
 
-See the live demo: [https://3jyz1n07o8.execute-api.us-east-1.amazonaws.com/count](https://3jyz1n07o8.execute-api.us-east-1.amazonaws.com/count)
-
 See the code: [https://github.com/upstash/examples/tree/master/examples/aws-lambda-redis-rest](https://github.com/upstash/examples/tree/master/examples/aws-lambda-redis-rest)
 
 ## Project Setup

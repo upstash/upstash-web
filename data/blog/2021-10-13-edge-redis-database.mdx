@@ -32,11 +32,11 @@ We launched Upstash with native Redis® API support. All Redis® clients are sup
 
 ### Edge Caching
 
-Thanks to the REST API, Upstash was accessible from Workers but the latency was not ideal. Some developers tried to use Cloudflare’s own caching to cache Redis® responses. But it was a complex solution. Redis® should be already very fast, so it does not feel good to `cache Redis` somewhere else. That’s why we decided to build [edge caching](/docs/features/edgecaching) where we cache the Redis® REST response at all edge locations. We used CDN providers to cache Redis® responses. This was a substantial improvement at edge latencies, up to 80% performance gain.
+Thanks to the REST API, Upstash was accessible from Workers but the latency was not ideal. Some developers tried to use Cloudflare’s own caching to cache Redis® responses. But it was a complex solution. Redis® should be already very fast, so it does not feel good to `cache Redis` somewhere else. That’s why we decided to build edge caching where we cache the Redis® REST response at all edge locations. We used CDN providers to cache Redis® responses. This was a substantial improvement at edge latencies, up to 80% performance gain.
 
 ### Global Database
 
-Edge caching was a great solution to the global latency problem but it has some drawbacks for some use cases. First of all, it does not support cache invalidation (purge). If the expiration time of the cache is 30 seconds; then there is a 30 seconds window where your clients may read stale data. This can be tolerated by many web use cases but not all. Secondly, edge caching is supported only for REST API. Redis® clients can not benefit from edge caching. So we decided to design a new database type which replicates data to multiple regions. It was very challenging to design it to be highly available and consistent enough. Currently Upstash has a [global database offering](/docs/features/globaldatabase) which replicates your data to 5 different AWS regions (East and West North America, Europe, Asia, South America). Global database is not a cache so it does not have cache-invalidation problems. The writes are replicated instantly to all replicas. For the sake of performance and availability, Global database is designed to be eventually consistent.
+Edge caching was a great solution to the global latency problem but it has some drawbacks for some use cases. First of all, it does not support cache invalidation (purge). If the expiration time of the cache is 30 seconds; then there is a 30 seconds window where your clients may read stale data. This can be tolerated by many web use cases but not all. Secondly, edge caching is supported only for REST API. Redis® clients can not benefit from edge caching. So we decided to design a new database type which replicates data to multiple regions. It was very challenging to design it to be highly available and consistent enough. Currently Upstash has a [global database offering](/docs/common/concepts/global-replication) which replicates your data to 14 different AWS regions (East and West North America, Europe, Asia, South America). Global database is not a cache so it does not have cache-invalidation problems. The writes are replicated instantly to all replicas. For the sake of performance and availability, Global database is designed to be eventually consistent.
 
 ### Edge Caching vs Global Database (or both)
 
@@ -46,7 +46,7 @@ Both Edge caching and Global database are designed to minimize the read latencie
 
 When edge caching is enabled, Upstash fetches the first request from origin then caches it at the edge. If origin is not nearby, then latency will be high. If you want the best latency for all cases; you can use both by enabling Edge Caching on a Global Database.
 
-See [the benchmark application](https://edge-benchmark.vercel.app/) which compares latencies of edge caching and global database.
+See [our latency page](https://latency.upstash.io/) which compares latencies of edge caching and global database.
 
 ### What’s next?
 

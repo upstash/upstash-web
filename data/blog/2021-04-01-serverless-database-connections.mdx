@@ -35,8 +35,6 @@ if( current_connection_count > HARD_LIMIT ) {
 }
 ```
 
-Note that the max concurrent connection limits listed in the [Upstash docs](/docs/overall/databasetypes) are the soft limits.
-
 ### Ephemeral Connections
 
 After deploying the above algorithm, we have seen a great decrease in the number of rejected connections in all regions. But still if you want to be on the safe side, you can solve the problem on your side too. Instead of reusing the connection, you can open the Redis connection inside the function but also close them whenever you are done with Redis as below:
@@ -150,7 +148,7 @@ This issue is quite similar to [the issue](https://github.com/jeremydaly/serverl
 
 ### GraphQL Helps Too
 
-One way to get rid of connection issues to have connectionless API. Upstash supports [GraphQL API](/docs/graphql/aboutgraphqlapi) in addition to Redis protocol. GraphQL is HTTP based so it does not have the connection limit issue. Check the docs for supported commands. Beware that GraphQL API has a latency overhead (about 5msec) over Redis protocol.
+One way to get rid of connection issues to have connectionless API. Upstash supports GraphQL API in addition to Redis protocol. GraphQL is HTTP based so it does not have the connection limit issue. Check the docs for supported commands. Beware that GraphQL API has a latency overhead (about 5msec) over Redis protocol.
 
 ### Conclusion
 

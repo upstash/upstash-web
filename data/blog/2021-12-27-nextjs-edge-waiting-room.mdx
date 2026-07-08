@@ -39,7 +39,7 @@ npm install @upstash/redis
 
 ### Step 2: Implementation
 
-Vercel supports Edge functions via [Next.js middleware](https://nextjs.org/docs/middleware). So we will add \_middleware.ts under `pages/api/`. The middleware code intercepts all requests made to /api. For different configurations see [here](https://vercel.com/docs/concepts/functions/edge-functions#middleware-running-order).
+Vercel supports Edge functions via [Next.js middleware](https://nextjs.org/docs/app/building-your-application/routing/middleware). So we will add \_middleware.ts under `pages/api/`. The middleware code intercepts all requests made to /api. For different configurations see [here](https://vercel.com/docs/concepts/functions/edge-functions#middleware-running-order).
 
 Update `pages/api/_middleware.ts` as below:
 

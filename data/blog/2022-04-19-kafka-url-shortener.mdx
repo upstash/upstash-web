@@ -23,10 +23,6 @@ The demo app has the following structure:
 - Every time you visit a short link, it triggers an event and stores it in Upstash Kafka.
 - We then get the data from Upstash Kafka and analyze it in Materialize in real-time.
 
-A demo of the app can be found here:
-
-[https://cf-url-shortener.bobbyiliev.workers.dev/admin](https://cf-url-shortener.bobbyiliev.workers.dev/admin)
-
 ## Diagram
 
 The following is a diagram of the app structure:
@@ -55,7 +51,7 @@ Once you have all the prerequisites, you can proceed with the following steps:
 - Clone the repository and run the following command:
 
 ```shell
-git clone https://github.com/bobbyiliev/cf-url-shortener.git
+git clone https://github.com/bobbyiliev/cf-url-shortener
 ```
 
 - Access the directory:
@@ -108,7 +104,7 @@ Once you've deployed the CF Worker, you can set up Materialize to analyze the da
 
 Start by creating a new Materialize instance in Materialize Cloud:
 
-- https://materialize.com/docs/cloud/get-started-with-cloud/
+- https://materialize.com/docs/get-started/
 
 Or alternatively, you can install Materialize locally:
 

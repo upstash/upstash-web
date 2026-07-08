@@ -159,7 +159,7 @@ We set up our note creation process so that new notes have a title automatically
 </form>
 ```
 
-The form contains a hidden `action` field used in the endpoint code above. Here the action is `create` and we will use `update` and `delete` later (in other forms). Essentially our `put` function gets the action and request URL using standard APIs. If the action is `create` we make a new note in a **Hashset data structure**. This is a [Redis structure which fits our use case](https://redis.io/docs/data-types/tutorial/) well. We use the current timestamp (as [number of milliseconds since ECMAScript epoch](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTime)) as the element `id`. This works fine for our simple app. The `redis.hset` call takes care of putting the new note to the database for&nbsp;us:
+The form contains a hidden `action` field used in the endpoint code above. Here the action is `create` and we will use `update` and `delete` later (in other forms). Essentially our `put` function gets the action and request URL using standard APIs. If the action is `create` we make a new note in a **Hashset data structure**. This is a [Redis structure which fits our use case](https://redis.io/docs/latest/develop/data-types/) well. We use the current timestamp (as [number of milliseconds since ECMAScript epoch](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTime)) as the element `id`. This works fine for our simple app. The `redis.hset` call takes care of putting the new note to the database for&nbsp;us:
 
 ```ts
 const date = new Date();
