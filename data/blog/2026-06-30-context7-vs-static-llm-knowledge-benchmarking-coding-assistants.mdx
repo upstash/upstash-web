@@ -1,7 +1,8 @@
 ---
 authors: [elifnur]
 slug: context7-vs-static-llm-knowledge-benchmarking-coding-assistants
-tags: [ai, llm, mcp, coding-assistants, developer-tools]
+tags: [ai, llm, mcp, coding-assistants, developer-tools, context7]
+image: context7-vs-static-llm-knowledge/context7_static_llm_overall_comparison.png
 title: "Context7 vs Static LLM Knowledge: Benchmarking Coding Assistants in Air-Gapped Environments"
 ---
 
@@ -82,6 +83,10 @@ Each response was evaluated using the following criteria:
 
 Across all 50 benchmark questions, the same language model behaved dramatically differently depending on whether current documentation was available.
 
+![Overall comparison of Context7 vs Static LLM knowledge](/blog/context7-vs-static-llm-knowledge/context7_static_llm_overall_comparison.png)
+
+The largest difference was not hallucination, it was stale knowledge. The baseline model frequently generated runnable code that relied on outdated APIs and implementation patterns, whereas Context7 generally produced current implementations with only a handful of minor legacy details.
+
 | Metric                             |    Static LLM |    Context7 |
 | ---------------------------------- | ------------: | ----------: |
 | **Questions**                      |            50 |          50 |
@@ -93,7 +98,6 @@ Across all 50 benchmark questions, the same language model behaved dramatically 
 | **Functional Errors**              |        **43** |       **1** |
 | **Refusals**                       |         **8** |       **0** |
 
-The largest difference was not hallucination, it was stale knowledge. The baseline model frequently generated runnable code that relied on outdated APIs and implementation patterns, whereas Context7 generally produced current implementations with only a handful of minor legacy details.
 
 ---
 
@@ -249,3 +253,12 @@ To stay current without Context7, teams would need to manually track library cha
 Providing the same model with Context7 documentation substantially reduced all failure modes without requiring internet access — the model could stay current and answer questions it would have otherwise failed.
 
 Context7 extends the model's reasoning with current documentation, including in enterprise and air-gapped environments where live web search is intentionally unavailable.
+
+---
+
+## Related benchmarks
+
+This benchmark focuses on answer quality in internet-isolated environments. If you're interested in other aspects of documentation retrieval, you may also find these useful:
+
+* [**Context7 vs Claude Code's Web Search: A Token and Cost Benchmark**](https://upstash.com/blog/context7-vs-web-search-benchmark) — compares retrieval cost, token usage, and tool calls.
+* [**Why Web Search Fails AI Agents (and What Context7 Fixes)**](https://upstash.com/blog/c7-vs-web-search) — explains the design differences between curated documentation retrieval and general web search.
