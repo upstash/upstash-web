@@ -84,7 +84,7 @@ const NavItems: {
   },
   {
     name: "Pricing",
-    href: "/pricing",
+    href: "/pricing/redis",
   },
   {
     name: "Customers",
