@@ -6,21 +6,28 @@
 max_retries = 2
 timeout = 20
 
+# Root-relative /docs/* links point at the docs app (Mintlify) hosted at
+# upstash.com/docs, not this repo. --root-dir resolves them to file://…/public/docs/…;
+# this remap (applied after resolution) rewrites them back to the production URL so
+# they're verified live instead of skipped. Sunset /docs/kafka is excluded below,
+# before this remap runs.
+remap = ["^file://.*/public/docs([/?#].*)?$ https://upstash.com/docs$1"]
+
 exclude = [
   # --- Local / dev-only ---
   "://localhost",
   "127\\.0\\.0\\.1",
 
-  # --- Internal links that can't be resolved from this repo ---
+  # --- Internal page routes that aren't static files in ./public ---
   # Root-relative links are resolved against ./public via --root-dir, so these
-  # patterns match the resolved file:// URI (scoped to file:// so external
-  # links are never affected).
-  # /docs/* is served by a separate app (Mintlify), not this codebase.
-  "^file://.*/public/docs([/?#]|$)",
-  # Extensionless Next.js page routes (/, /contact, /pricing/qstash,
-  # /blog/some-post-slug), including any ?query or #fragment. Real asset links
-  # keep a file extension (/blog/foo.png, /blog/x.mp4) and are still verified.
-  "^file://.*/[^./?#]+([?#].*)?$",
+  # patterns match the resolved file:// URI (scoped to file:// so external links
+  # are never affected). Real asset links keep a file extension (/blog/foo.png,
+  # /blog/x.mp4) and are still verified against ./public.
+  "^file://.*/public/?$",                                        # home (/)
+  "^file://.*/public/blog/[^./?#]+([?#].*)?$",                   # /blog/<post-slug>
+  "^file://.*/public/(contact|pricing|sign-in|sign-up|profile)([/?#]|$)",
+  # Sunset /docs/kafka (excluded before the docs remap so it isn't checked live).
+  "^file://.*/public/docs/kafka([/?#]|$)",
   # JSX/template-literal fragments in code samples that lychee mis-reads as
   # relative links, e.g. href={`products/${item.id}`} -> %7B... ('{' encoded).
   "%7B",
@@ -63,6 +70,7 @@ exclude = [
   "://dashboard\\.clerk\\.com",              # authenticated SPA dashboard
   "://([a-z0-9-]+\\.)?perplexity\\.ai",      # blocks bots (403)
   "://azure\\.microsoft\\.com",              # blocks automated requests
+  "://deno\\.land",                          # client-rendered module pages 404 to crawlers
 
   # --- Discontinued Upstash Kafka (product sunset, permanently removed) ---
   "://upstash\\.com/docs/kafka",
