@@ -203,7 +203,7 @@ async loadTasks(): Promise<Task[]> {
 ...
 ```
 
-First, we load the `taskIds`, which are stored in [a Redis Set](https://redis.io/docs/data-types/sets/). Then we use each ID to fetch the corresponding task. [A pipeline](/docs/redis/sdks/javascriptsdk/pipeline) ensures we send all get commands in one request to Upstash.
+First, we load the `taskIds`, which are stored in [a Redis Set](https://redis.io/docs/data-types/sets/). Then we use each ID to fetch the corresponding task. [A pipeline](/docs/redis/sdks/ts/pipelining/pipeline-transaction) ensures we send all get commands in one request to Upstash.
 
 ### Implementing the Projection
 
@@ -212,7 +212,6 @@ Now that the GraphQL resolvers are ready, we must calculate our read state. We n
 The handler of our serverless function is quite simple:
 
 ```ts title="app/projection/route.ts"
-...
 export const POST = validate(async (request: Request) => {
   const offset = await projectionStore.loadOffset()
   const events = await eventStore.loadEvents(offset)
