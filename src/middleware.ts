@@ -1,7 +1,14 @@
-import type { NextRequest } from "next/server";
+import { negotiate } from "@/lib/accept";
+import { Tracker } from "@bydefault/vercel";
+import type { NextFetchEvent, NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { AFFILIATE_CODE } from "./constants";
-import { negotiate } from "@/lib/accept";
+
+const bydefaultToken = process.env.BYDEFAULT_TOKEN;
+
+const tracker = bydefaultToken
+  ? new Tracker({ token: bydefaultToken, exclude: ["/api"] })
+  : null;
 
 function isBlogPath(pathname: string): boolean {
   return pathname === "/blog" || /^\/blog\/[^/.]+$/.test(pathname);
@@ -58,7 +65,11 @@ function unacceptableResponse(): NextResponse {
   );
 }
 
-export function middleware(request: NextRequest) {
+export function middleware(request: NextRequest, event: NextFetchEvent) {
+  if (tracker) {
+    tracker.track(request, event);
+  }
+
   if (request.nextUrl.hostname === "developer.upstash.com") {
     return NextResponse.redirect(
       "https://upstash.com/docs/devops/developer-api",
