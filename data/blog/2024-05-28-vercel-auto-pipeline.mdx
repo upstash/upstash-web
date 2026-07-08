@@ -114,7 +114,7 @@ After adding itself to the active pipeline, the third `GET` also calls `deferExe
 
 This pipeline returns three results in our example, each corresponding to the initial commands. Each command tracks the index of its argument, ensuring it receives the correct result from the batch response.
 
-The code behind the auto-pipelining logic is available [here](https://github.com/upstash/redis-js/blob/main/pkg/auto-pipeline.ts).
+The code behind the auto-pipelining logic is available [here](https://github.com/upstash/redis-js/blob/8cf620974c5b1b1579998ea92f8e311ae1a1267a/packages/redis/pkg/auto-pipeline.ts#L1).
 
 ## Auto-Pipelining in v0.dev
 
