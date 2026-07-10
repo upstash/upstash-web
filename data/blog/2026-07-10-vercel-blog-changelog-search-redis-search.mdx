@@ -1,0 +1,103 @@
+---
+slug: vercel-blog-search-redis-search
+title: "How Search on Vercel's Blog Runs on Upstash Redis Search"
+authors: [arda]
+tags: [redis, search, vercel]
+description: "A look at the search behind Vercel's blog: how the index is built on Upstash Redis Search, how the $smart operator handles relevance, and what else the query engine can do."
+---
+
+Search on [vercel.com/blog](https://vercel.com/blog) covers everything we publish there, from engineering posts and customer stories to changelog entries. When someone types into that search box, they are usually looking for something specific: a feature name, a framework version, a product they saw announced last month. That search runs on [Upstash Redis Search](https://upstash.com/docs/redis/search/introduction), and this post is a look at how it works.
+
+## Picking the right kind of search
+
+We were already working with Upstash on this surface. An earlier version ran on [Upstash Search](https://upstash.com/docs/search/overall/whatisupstashsearch), which enriches documents with LLMs at index time and retrieves with semantic matching, so a query for "wireless earbuds" can find a document about "bluetooth headphones". That is a great fit when users describe what they mean, like in support articles or product catalogs.
+
+Our queries tend to name things exactly. Someone searching the changelog for a version number or an API name wants the entries that literally contain it, ranked first. That is what lexical full-text search is built for, and it is exactly what Upstash Redis Search does: full-text indexing with typo tolerance, phrase matching, and structured filters, running directly on data in Redis. The Upstash team built a demo on our own changelog data so we could see it against real queries, and the source is public at [upstash/search-js/examples/upstash-search-vercel-changelog](https://github.com/upstash/search-js/tree/redis-search/examples/upstash-search-vercel-changelog). You can deploy it yourself with one click.
+
+## The demo
+
+The setup is small. A script pulls entries from [our Atom feed](https://vercel.com/atom) and writes each one as a plain Redis hash. A search index with a schema and a key prefix picks them up automatically:
+
+```ts
+import { s } from "@upstash/redis";
+
+export const SCHEMA = s.object({
+  title: s.string().noStem(),
+  content: s.string(),
+  authors: s.string().noStem(),
+  dateInt: s.number(),
+  updated: s.date(),
+  url: s.string().noTokenize(),
+  kind: s.string().noTokenize(), // "blog" | "changelog"
+});
+```
+
+There is no separate ingestion pipeline. You write hashes with `HSET`, the index tracks every write under its prefix, and the data stays in Redis where the rest of the application can use it.
+
+## From hand-rolled relevance to `$smart`
+
+The interesting part is the query side. The demo predates some of the newer operators, so it builds its own relevance recipe by hand, in [`searchFilters.ts`](https://github.com/upstash/search-js/blob/redis-search/examples/upstash-search-vercel-changelog/src/lib/searchFilters.ts):
+
+```ts
+function buildFieldFilters(fieldName: string, query: string, tokens: string[]) {
+  return [
+    ...tokens.flatMap((token) => [
+      { [fieldName]: { $eq: token, $boost: 10 } },
+      {
+        [fieldName]: {
+          $fuzzy: { value: token, distance: 2, transpositionCostOne: true },
+          $boost: 5,
+        },
+      },
+      { [fieldName]: { $fuzzy: { value: token, distance: 1 }, $boost: 1 } },
+      { [fieldName]: { $regex: `${token}.*`, $boost: 5 } },
+    ]),
+    ...(tokens.length > 1
+      ? [
+          { [fieldName]: { $phrase: query, $boost: 20 } },
+          { [fieldName]: { $phrase: { value: query, slop: 3 }, $boost: 10 } },
+        ]
+      : []),
+  ];
+}
+```
+
+For every token in the query, this generates an exact match, two fuzzy matches at different distances, and a prefix regex, each with its own boost. Multi-word queries add an exact phrase match and a sloppy phrase match on top. It works well: exact hits rank first, typos still match, and partially typed words match as you type.
+
+Upstash Redis Search now ships this whole recipe as a single operator, [`$smart`](https://upstash.com/docs/redis/search/query-operators/field-operators/smart-matching). For a single word it combines exact term, fuzzy, and fuzzy prefix matching. For multiple words it layers exact phrase, sloppy phrase, scattered terms, fuzzy matching, and a fuzzy prefix on the last word for search-as-you-type. The block above collapses to:
+
+```ts
+const filter = {
+  $must: [
+    ...dateAndTypeFilters, // e.g. { dateInt: { $gte: from } }, { kind: { $eq: "changelog" } }
+    {
+      $should: [
+        { title: { $smart: query, $boost: 10 } },
+        { content: { $smart: query } },
+      ],
+    },
+  ],
+};
+
+const results = await index.query({ filter, limit: 20 });
+```
+
+The structured filters stay as plain comparisons: a date range is `$gte`/`$lte` on a number field, the blog/changelog toggle is an `$eq` on a keyword. The top result for an exact query is the document that contains it.
+
+## What we get from Upstash Redis Search
+
+Upstash Redis Search is built into Upstash Redis, with the index living next to the data and queries served by [Tantivy](https://github.com/quickwit-oss/tantivy), a Rust full-text search library, inside the Redis process. That gives it the properties Upstash Redis is known for: queries are fast, and with [global databases](https://upstash.com/docs/redis/features/globaldatabase) the data is replicated close to your users.
+
+Beyond `$smart`, the query engine covers a lot of ground:
+
+- [Sorting by fields](https://upstash.com/docs/redis/search/querying#2-sorting-results). A changelog is often browsed newest-first rather than by relevance, and `orderBy: { dateInt: "DESC" }` on a query is all it takes.
+- Result highlighting, which marks the matched terms in titles and snippets without post-processing.
+- Field selection and pagination with `select`, `limit`, and `offset`, returning only the fields a results page renders.
+- [Aggregations](https://upstash.com/docs/redis/search/aggregations), from counts per category to histograms over time.
+- Score functions that fold numeric fields like recency into ranking when relevance alone isn't the right order.
+
+## It scales past a changelog
+
+Our index is a few thousand documents, which Upstash Redis Search handles without noticing. It goes much further than that. [Hacker News Trends](https://upstash.com/blog/hacker-news-trends-redis-search) indexes 45 million Hacker News posts and comments in a single database and draws its trend lines with date histogram aggregations. [Context7 serves millions of searches a month](https://upstash.com/blog/how-redis-search-powers-context7) on the same engine, using Redis as both primary database and search index.
+
+If your data already lives in Redis, or your users search for exact things by name, Upstash Redis Search is worth a try. The [docs](https://upstash.com/docs/redis/search/introduction) cover the full query language, and the Upstash team is quick to help if you have questions.
