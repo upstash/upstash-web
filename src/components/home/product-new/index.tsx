@@ -1,6 +1,7 @@
 import Button from "@/components/button";
 import Container from "@/components/container";
 import CopyButton from "@/components/copy-button";
+import IconRedis from "@/components/icon-redis";
 import HomeHeroProducts from "@/components/home/hero/hero-products";
 import { HeroTabQStash } from "@/components/home/hero/hero-tab-qstash";
 import { HeroTabRedis } from "@/components/home/hero/hero-tab-redis";
@@ -62,6 +63,7 @@ const HeroProductTagline = ({ activeProduct }: { activeProduct: Product }) => {
           <Link href="/redis">
             <Button variant={"default"} className="h-[42px] px-5">
               Explore Serverless Redis
+              <IconRedis width={20} />
             </Button>
           </Link>
         )}
