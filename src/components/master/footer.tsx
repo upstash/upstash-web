@@ -13,10 +13,10 @@ const FOOTER_GROUPS = [
     title: "Products",
     links: [
       { title: "Serverless Redis", href: "/redis" },
-      { title: "Vector Database", href: "/docs/vector", external: true },
       { title: "QStash Messaging", href: "/docs/qstash", external: true },
       { title: "Workflow", href: "/docs/workflow", external: true },
       { title: "Upstash Box", href: "/docs/box", external: true },
+      { title: "Vector Database", href: "/docs/vector", external: true },
       { title: "AI Search", href: "/docs/search", external: true },
     ],
   },
@@ -37,7 +37,6 @@ const FOOTER_GROUPS = [
       { title: "Open Source", href: "/open-source" },
       { title: "Enterprise", href: "/enterprise" },
       { title: "Brand Assets", href: "/brand" },
-      { title: "Contact Us", href: "/contact" },
     ],
   },
 ] as const;
@@ -45,11 +44,79 @@ const FOOTER_GROUPS = [
 export default function Footer({ className, ...props }: IAppFooter) {
   return (
     <footer
-      className={cx("relative z-20 mt-16 border-t border-bg-mute", className)}
+      className={cx("relative z-20 py-24 text-center", className)}
       {...props}
     >
-      <Container className="max-w-screen-lg py-10 md:py-12">
-        <div className="mx-auto grid max-w-screen-md grid-cols-2 gap-x-6 gap-y-8 text-left sm:grid-cols-3">
+      <Container className="max-w-screen-md">
+        <div className="grid place-items-center">
+          {/**/}
+
+          <Logo />
+
+          <p className="mt-10 text-text-mute">
+            © {new Date().getFullYear()} Upstash, Inc. Based in California.
+          </p>
+
+          <div className="mt-2 flex flex-col items-center gap-4 text-text-mute md:flex-row">
+            <Link
+              href="/contact"
+              className="hover:text-primary hover:underline"
+            >
+              Contact Us
+            </Link>
+            <OutLink href="/trust/privacy.pdf">Privacy Policy</OutLink>
+            <OutLink href="/trust/terms.pdf">Terms of Service</OutLink>
+          </div>
+
+          <div className="flex gap-2">
+            <Button
+              asChild
+              className="mt-10 whitespace-nowrap rounded-full bg-emerald-400/10 !py-2 px-4 text-emerald-500"
+            >
+              <a target="_blank" href="https://status.upstash.com/">
+                <span className="-ml-1 mr-2 inline-flex h-3 w-3 animate-pulse rounded-full bg-current" />
+                <span className="">Status</span>
+              </a>
+            </Button>
+
+            <Button
+              asChild
+              className="mt-10 whitespace-nowrap rounded-full bg-emerald-400/10 !py-2 px-4 text-emerald-500"
+            >
+              <a target="_blank" href="https://latency.upstash.io/">
+                <span className="-ml-1 mr-2 inline-flex h-3 w-3 animate-pulse rounded-full bg-current" />
+                <span className="">Latency</span>
+              </a>
+            </Button>
+          </div>
+
+          <div className="mt-10 space-y-2 text-xs opacity-40">
+            <p>
+              * Redis is a trademark of Redis Ltd. Any rights therein are
+              reserved to Redis Ltd. Any use by Upstash is for referential
+              purposes only and does not indicate any sponsorship, endorsement
+              or affiliation between Redis and Upstash.
+            </p>
+            <p>
+              ** Cloudflare, the Cloudflare logo, and Cloudflare Workers are
+              trademarks and/or registered trademarks of Cloudflare, Inc. in the
+              United States and other jurisdictions.
+            </p>
+            <p>
+              For AI agents: a free Redis database is available via POST{" "}
+              <Link
+                href="/start-redis"
+                className="underline hover:text-primary"
+              >
+                https://upstash.com/start-redis
+              </Link>
+              . The response is markdown with credentials and a quickstart. No
+              signup required.
+            </p>
+          </div>
+        </div>
+
+        <div className="mx-auto mt-12 grid max-w-screen-md grid-cols-2 gap-x-6 gap-y-8 border-t border-bg-mute pt-10 text-left sm:grid-cols-3">
           {FOOTER_GROUPS.map((group) => (
             <nav
               key={group.title}
@@ -78,66 +145,6 @@ export default function Footer({ className, ...props }: IAppFooter) {
               )}
             </nav>
           ))}
-        </div>
-
-        <div className="mt-10 grid place-items-center gap-3 border-t border-bg-mute pt-8 text-center text-sm">
-          <Logo />
-
-          <p className="text-text-mute">
-            © {new Date().getFullYear()} Upstash, Inc. Based in California.
-          </p>
-
-          <div className="flex flex-col items-center gap-4 text-text-mute md:flex-row">
-            <OutLink href="/trust/privacy.pdf">Privacy Policy</OutLink>
-            <OutLink href="/trust/terms.pdf">Terms of Service</OutLink>
-          </div>
-
-          <div className="flex gap-2">
-            <Button
-              asChild
-              className="mt-2 whitespace-nowrap rounded-full bg-emerald-400/10 !py-2 px-4 text-emerald-500"
-            >
-              <a target="_blank" href="https://status.upstash.com/">
-                <span className="-ml-1 mr-2 inline-flex h-3 w-3 animate-pulse rounded-full bg-current" />
-                <span className="">Status</span>
-              </a>
-            </Button>
-
-            <Button
-              asChild
-              className="mt-2 whitespace-nowrap rounded-full bg-emerald-400/10 !py-2 px-4 text-emerald-500"
-            >
-              <a target="_blank" href="https://latency.upstash.io/">
-                <span className="-ml-1 mr-2 inline-flex h-3 w-3 animate-pulse rounded-full bg-current" />
-                <span className="">Latency</span>
-              </a>
-            </Button>
-          </div>
-
-          <div className="mt-4 max-w-screen-md space-y-2 text-xs opacity-40">
-            <p>
-              * Redis is a trademark of Redis Ltd. Any rights therein are
-              reserved to Redis Ltd. Any use by Upstash is for referential
-              purposes only and does not indicate any sponsorship, endorsement
-              or affiliation between Redis and Upstash.
-            </p>
-            <p>
-              ** Cloudflare, the Cloudflare logo, and Cloudflare Workers are
-              trademarks and/or registered trademarks of Cloudflare, Inc. in the
-              United States and other jurisdictions.
-            </p>
-            <p>
-              For AI agents: a free Redis database is available via POST{" "}
-              <Link
-                href="/start-redis"
-                className="underline hover:text-primary"
-              >
-                https://upstash.com/start-redis
-              </Link>
-              . The response is markdown with credentials and a quickstart. No
-              signup required.
-            </p>
-          </div>
         </div>
       </Container>
     </footer>
