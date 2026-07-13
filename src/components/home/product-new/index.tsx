@@ -95,7 +95,7 @@ const HeroProductTagline = ({ activeProduct }: { activeProduct: Product }) => {
       </div>
 
       <div className="mt-3 flex w-full flex-col items-center gap-2">
-        <div className="flex w-fit max-w-full items-center gap-3 overflow-x-auto rounded-xl bg-bg-mute py-2 pl-4 pr-6">
+        <div className="no-scrollbar flex w-fit max-w-full items-center gap-3 overflow-x-auto rounded-xl bg-bg-mute py-2 pl-4 pr-6">
           <code className="whitespace-nowrap font-mono text-xs text-text md:text-sm">
             {UPSTASH_SKILL_COMMAND}
           </code>

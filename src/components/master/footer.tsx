@@ -8,65 +8,86 @@ import { HTMLProps } from "react";
 
 export interface IAppFooter extends HTMLProps<HTMLDivElement> {}
 
+const FOOTER_GROUPS = [
+  {
+    title: "Products",
+    links: [
+      { title: "Serverless Redis", href: "/redis" },
+      { title: "Vector Database", href: "/docs/vector", external: true },
+      { title: "QStash Messaging", href: "/docs/qstash", external: true },
+      { title: "Workflow", href: "/docs/workflow", external: true },
+      { title: "AI Search", href: "/docs/search", external: true },
+      { title: "Redis Pricing", href: "/pricing/redis" },
+    ],
+  },
+  {
+    title: "Resources",
+    links: [
+      { title: "Documentation", href: "/docs", external: true },
+      { title: "Blog", href: "/blog" },
+      { title: "Examples", href: "/examples" },
+      { title: "Customers", href: "/customers" },
+    ],
+  },
+  {
+    title: "Company",
+    links: [
+      { title: "About", href: "/about" },
+      { title: "Careers", href: "/careers" },
+      { title: "Open Source", href: "/open-source" },
+      { title: "Enterprise", href: "/enterprise" },
+      { title: "Brand Assets", href: "/brand" },
+      { title: "Contact Us", href: "/contact" },
+    ],
+  },
+] as const;
+
 export default function Footer({ className, ...props }: IAppFooter) {
   return (
     <footer
-      className={cx("relative z-20 py-24 text-center", className)}
+      className={cx("relative z-20 mt-24 border-t border-bg-mute", className)}
       {...props}
     >
-      <Container className="max-w-screen-md">
-        <div className="grid place-items-center">
-          {/**/}
+      <Container className="max-w-screen-lg py-16 md:py-20">
+        <div className="mx-auto grid max-w-screen-md grid-cols-2 gap-x-6 gap-y-10 text-left sm:grid-cols-3">
+          {FOOTER_GROUPS.map((group) => (
+            <nav
+              key={group.title}
+              aria-label={group.title}
+              className="grid content-start gap-3"
+            >
+              <h5 className="font-display font-semibold">{group.title}</h5>
+              {group.links.map((link) =>
+                "external" in link && link.external ? (
+                  <a
+                    key={link.title}
+                    href={link.href}
+                    className="text-text-mute hover:text-primary hover:underline"
+                  >
+                    {link.title}
+                  </a>
+                ) : (
+                  <Link
+                    key={link.title}
+                    href={link.href}
+                    className="text-text-mute hover:text-primary hover:underline"
+                  >
+                    {link.title}
+                  </Link>
+                ),
+              )}
+            </nav>
+          ))}
+        </div>
 
+        <div className="mt-16 grid place-items-center gap-4 border-t border-bg-mute pt-10 text-center">
           <Logo />
 
-          <nav
-            aria-label="Products"
-            className="mt-10 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-text-mute"
-          >
-            <Link href="/redis" className="hover:text-primary hover:underline">
-              Serverless Redis
-            </Link>
-            <Link
-              href="/pricing/redis"
-              className="hover:text-primary hover:underline"
-            >
-              Redis Pricing
-            </Link>
-            <a
-              href="/docs/vector"
-              className="hover:text-primary hover:underline"
-            >
-              Vector Database
-            </a>
-            <a
-              href="/docs/qstash"
-              className="hover:text-primary hover:underline"
-            >
-              QStash Messaging
-            </a>
-            <a
-              href="/docs/workflow"
-              className="hover:text-primary hover:underline"
-            >
-              Workflow
-            </a>
-            <a href="/docs/search" className="hover:text-primary hover:underline">
-              AI Search
-            </a>
-          </nav>
-
-          <p className="mt-6 text-text-mute">
+          <p className="text-text-mute">
             © {new Date().getFullYear()} Upstash, Inc. Based in California.
           </p>
 
-          <div className="mt-2 flex flex-col items-center gap-4 text-text-mute md:flex-row">
-            <Link
-              href="/contact"
-              className="hover:text-primary hover:underline"
-            >
-              Contact Us
-            </Link>
+          <div className="flex flex-col items-center gap-4 text-text-mute md:flex-row">
             <OutLink href="/trust/privacy.pdf">Privacy Policy</OutLink>
             <OutLink href="/trust/terms.pdf">Terms of Service</OutLink>
           </div>
@@ -74,7 +95,7 @@ export default function Footer({ className, ...props }: IAppFooter) {
           <div className="flex gap-2">
             <Button
               asChild
-              className="mt-10 whitespace-nowrap rounded-full bg-emerald-400/10 !py-2 px-4 text-emerald-500"
+              className="mt-2 whitespace-nowrap rounded-full bg-emerald-400/10 !py-2 px-4 text-emerald-500"
             >
               <a target="_blank" href="https://status.upstash.com/">
                 <span className="-ml-1 mr-2 inline-flex h-3 w-3 animate-pulse rounded-full bg-current" />
@@ -84,7 +105,7 @@ export default function Footer({ className, ...props }: IAppFooter) {
 
             <Button
               asChild
-              className="mt-10 whitespace-nowrap rounded-full bg-emerald-400/10 !py-2 px-4 text-emerald-500"
+              className="mt-2 whitespace-nowrap rounded-full bg-emerald-400/10 !py-2 px-4 text-emerald-500"
             >
               <a target="_blank" href="https://latency.upstash.io/">
                 <span className="-ml-1 mr-2 inline-flex h-3 w-3 animate-pulse rounded-full bg-current" />
@@ -93,7 +114,7 @@ export default function Footer({ className, ...props }: IAppFooter) {
             </Button>
           </div>
 
-          <div className="mt-10 space-y-2 text-xs opacity-40">
+          <div className="mt-6 max-w-screen-md space-y-2 text-xs opacity-40">
             <p>
               * Redis is a trademark of Redis Ltd. Any rights therein are
               reserved to Redis Ltd. Any use by Upstash is for referential
