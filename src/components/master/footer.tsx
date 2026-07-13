@@ -16,16 +16,16 @@ const FOOTER_GROUPS = [
       { title: "Vector Database", href: "/docs/vector", external: true },
       { title: "QStash Messaging", href: "/docs/qstash", external: true },
       { title: "Workflow", href: "/docs/workflow", external: true },
+      { title: "Upstash Box", href: "/docs/box", external: true },
       { title: "AI Search", href: "/docs/search", external: true },
-      { title: "Redis Pricing", href: "/pricing/redis" },
     ],
   },
   {
     title: "Resources",
     links: [
       { title: "Documentation", href: "/docs", external: true },
+      { title: "Pricing", href: "/pricing/redis" },
       { title: "Blog", href: "/blog" },
-      { title: "Examples", href: "/examples" },
       { title: "Customers", href: "/customers" },
     ],
   },
@@ -45,16 +45,16 @@ const FOOTER_GROUPS = [
 export default function Footer({ className, ...props }: IAppFooter) {
   return (
     <footer
-      className={cx("relative z-20 mt-24 border-t border-bg-mute", className)}
+      className={cx("relative z-20 mt-16 border-t border-bg-mute", className)}
       {...props}
     >
-      <Container className="max-w-screen-lg py-16 md:py-20">
-        <div className="mx-auto grid max-w-screen-md grid-cols-2 gap-x-6 gap-y-10 text-left sm:grid-cols-3">
+      <Container className="max-w-screen-lg py-10 md:py-12">
+        <div className="mx-auto grid max-w-screen-md grid-cols-2 gap-x-6 gap-y-8 text-left sm:grid-cols-3">
           {FOOTER_GROUPS.map((group) => (
             <nav
               key={group.title}
               aria-label={group.title}
-              className="grid content-start gap-3"
+              className="grid content-start gap-2 text-sm"
             >
               <h5 className="font-display font-semibold">{group.title}</h5>
               {group.links.map((link) =>
@@ -80,7 +80,7 @@ export default function Footer({ className, ...props }: IAppFooter) {
           ))}
         </div>
 
-        <div className="mt-16 grid place-items-center gap-4 border-t border-bg-mute pt-10 text-center">
+        <div className="mt-10 grid place-items-center gap-3 border-t border-bg-mute pt-8 text-center text-sm">
           <Logo />
 
           <p className="text-text-mute">
@@ -114,7 +114,7 @@ export default function Footer({ className, ...props }: IAppFooter) {
             </Button>
           </div>
 
-          <div className="mt-6 max-w-screen-md space-y-2 text-xs opacity-40">
+          <div className="mt-4 max-w-screen-md space-y-2 text-xs opacity-40">
             <p>
               * Redis is a trademark of Redis Ltd. Any rights therein are
               reserved to Redis Ltd. Any use by Upstash is for referential
