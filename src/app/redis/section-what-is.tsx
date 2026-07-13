@@ -37,6 +37,18 @@ export default function SectionWhatIs() {
             pay only for the requests you make. Databases can be replicated
             across regions for high availability close to your users.
           </p>
+
+          <h3 className="pt-4 font-display text-xl font-semibold text-text">
+            Fully managed Redis, without the servers
+          </h3>
+          <p>
+            Upstash is a <strong>managed Redis</strong> service: provisioning,
+            replication, backups, upgrades, and scaling are all handled for
+            you. Unlike self-hosted Redis or managed Redis offerings billed per
+            instance, there are no nodes to size and no idle capacity to pay
+            for. Your database scales with your traffic and costs nothing when
+            unused.
+          </p>
         </div>
       </Container>
     </section>

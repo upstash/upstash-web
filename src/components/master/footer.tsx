@@ -20,7 +20,43 @@ export default function Footer({ className, ...props }: IAppFooter) {
 
           <Logo />
 
-          <p className="mt-10 text-text-mute">
+          <nav
+            aria-label="Products"
+            className="mt-10 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-text-mute"
+          >
+            <Link href="/redis" className="hover:text-primary hover:underline">
+              Serverless Redis
+            </Link>
+            <Link
+              href="/pricing/redis"
+              className="hover:text-primary hover:underline"
+            >
+              Redis Pricing
+            </Link>
+            <a
+              href="/docs/vector"
+              className="hover:text-primary hover:underline"
+            >
+              Vector Database
+            </a>
+            <a
+              href="/docs/qstash"
+              className="hover:text-primary hover:underline"
+            >
+              QStash Messaging
+            </a>
+            <a
+              href="/docs/workflow"
+              className="hover:text-primary hover:underline"
+            >
+              Workflow
+            </a>
+            <a href="/docs/search" className="hover:text-primary hover:underline">
+              AI Search
+            </a>
+          </nav>
+
+          <p className="mt-6 text-text-mute">
             © {new Date().getFullYear()} Upstash, Inc. Based in California.
           </p>
 
