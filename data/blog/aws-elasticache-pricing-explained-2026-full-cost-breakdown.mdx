@@ -1,0 +1,200 @@
+---
+authors: [josh]
+slug: 2026-07-14-aws-elasticache-pricing-explained-2026-full-cost-breakdown
+tags: [redis]
+title: "AWS ElastiCache Pricing Explained (2026): Full Cost Breakdown with Examples"
+description: AWS ElastiCache Pricing breakdown for 2026 - with example use cases and their cost, including Valkey, Redis OSS and Memcached Pricing
+---
+
+Amazon ElastiCache is AWS's managed in-memory cache. It runs three engines: **Valkey, Redis OSS, and Memcached**, and each of these engines has a different price.
+
+The AWS pricing page lists hourly rates, but the cost also depends on replicas, data transfer between availability zones, backups, and engine version charges on top.
+
+In this guide I want to break down the ElastiCache pricing for 2026 (July) and walks through pricing examples for real use cases.
+
+## How Much Does ElastiCache Cost?
+
+ElastiCache has two pricing models: node-based, where you pay a fixed hourly rate per node, and serverless, where you pay for stored data per GB-hour plus compute units called ECPUs. The cheapest node is a cache.t4g.micro running Valkey at $0.0128 per hour, about $9.34 per month.
+
+![AWS ElastiCache Pricing as of July 2026](https://cdn.bydefault.so/9C_2IrwNQbcNR85ylUfyB.png)
+
+With node-based pricing, we can pick an instance size, and the meter runs whether the cache is busy or idle. With serverless pricing, AWS scales capacity for us and charges the two usage meters, but there is a minimum monthly charge even when the cache holds nothing.
+
+![](https://cdn.bydefault.so/hzrxj0FPz_m_fcEnT24rR.png)
+
+The engine matters as much as the model. AWS prices Valkey [20% below Redis OSS and Memcached on nodes, and about a third below them on serverless](https://aws.amazon.com/elasticache/pricing/). For the rest of this guide I'll show both prices side by side.
+
+## ElastiCache Serverless Pricing: ECPUs and Storage
+
+ElastiCache Serverless charges for two things: data storage per GB-hour and compute in ECPUs.
+
+On Valkey, storage costs [$0.084 per GB-hour and compute costs $0.0023 per million ECPUs](https://aws.amazon.com/elasticache/pricing/); Redis OSS and Memcached cost $0.125 per GB-hour and $0.0034 per million ECPUs.
+
+| Engine | Storage (per GB-hour) | Compute (per million ECPUs) | Minimum metered storage |
+| --- | --- | --- | --- |
+| Valkey | $0.084 | $0.0023 | 100 MB |
+| Redis OSS | $0.125 | $0.0034 | 1 GB |
+| Memcached | $0.125 | $0.0034 | 1 GB |
+
+### What is an ECPU?
+
+An ECPU (ElastiCache Processing Unit) is a serverless billing unit for compute: [each kilobyte of data transferred consumes 1 ECPU](https://aws.amazon.com/elasticache/pricing/). For example, a GET that reads 1 KB consumes 1 ECPU, and a GET that reads 4 KB consumes 4.
+
+Commands that take more vCPU time than a simple GET or SET, like SORT or a Lua script, consume proportionally more.
+
+For reference, this rate is very small. A million 1 KB GETs on Valkey cost $0.0023. The compute meter only gets expensive at sustained high traffic.
+
+![](https://cdn.bydefault.so/_pUA7xWpl_v4OfXGrvl_-.png)
+
+### Minimum storage billing
+
+An empty serverless cache still gets billed. AWS meters at least [100 MB of storage on Valkey and 1 GB on Redis OSS and Memcached](https://aws.amazon.com/elasticache/pricing/), around the clock.
+
+That minimum sets the monthly cost of an idle cache:
+
+```text
+Redis OSS:  1 GB   x $0.125/GB-hr x 730 hrs = $91.25/month
+Valkey:     0.1 GB x $0.084/GB-hr x 730 hrs = $6.13/month
+```
+
+The $91 minimum for an idle Redis OSS cache made some people on [r/aws](https://www.reddit.com/r/aws/comments/185rdpy/absurd_price_for_elasticache_serverless/) very mad by the way:
+
+![r/aws is not happy about serverless pricing](https://cdn.bydefault.so/JmR7MksKbDVP4zvnOS3It.png)
+
+The [Valkey serverless pricing](https://www.reddit.com/r/aws/comments/1onb5h5/valkey_serverless_pricing/), with its 100 MB minimum, brought that same idle cache down to about $6.
+
+## ElastiCache Pricing Per Hour: Node-Based Rates
+
+As an example I'll use the most common us-east-1 region here.
+
+Node-based ElastiCache starts at $0.0128 per hour for a cache.t4g.micro on Valkey and increases with vCPUs and memory. Here are the on-demand rates for popular node types, from the [AWS pricing page](https://aws.amazon.com/elasticache/pricing/):
+
+| Node type | vCPUs | Memory (GiB) | Valkey ($/hr) | Redis OSS / Memcached ($/hr) | Valkey ($/month) |
+| --- | --- | --- | --- | --- | --- |
+| cache.t4g.micro | 2 | 0.50 | $0.0128 | $0.0160 | $9.34 |
+| cache.t4g.small | 2 | 1.37 | $0.0205 | $0.0256 | $14.97 |
+| cache.m7g.large | 2 | 6.38 | $0.1011 | $0.1264 | $73.80 |
+| cache.r7g.large | 2 | 13.07 | $0.1402 | $0.1752 | $102.35 |
+| cache.r7g.xlarge | 4 | 26.32 | $0.2797 | $0.3496 | $204.18 |
+
+Monthly numbers use 730 hours. [AWS recommends reserving 25% of a node's memory](https://cloudprice.net/aws/elasticache) for replication buffers and system overhead though. A cache.r7g.xlarge can hold about 19.7 GiB of data, so price your dataset against 75% of the listed memory.
+
+## Valkey vs Redis OSS vs Memcached: The Engine Price Gap
+
+Valkey is the cheapest engine on ElastiCache: [20% below Redis OSS and Memcached on node-based pricing, and about 33% below on serverless rates](https://aws.amazon.com/elasticache/pricing/). Valkey is the open-source fork of Redis, so the commands and client libraries you already use keep working.
+
+The discount extends to reservations you already own. [Existing Redis OSS reserved nodes apply to Valkey nodes](https://aws.amazon.com/elasticache/pricing/) of the same type in the same region, and the 20% price gap means a reservation that covered 5 Redis OSS nodes covers 6 Valkey nodes.
+
+## Reserved Nodes and Savings Plans: How to Get Discounts
+
+Reserved nodes decrease node prices by [up to 55%](https://aws.amazon.com/elasticache/pricing/) with a 1-year or 3-year commitment, and Database Savings Plans cut serverless prices by [up to 30%](https://aws.amazon.com/elasticache/pricing/) with a 1-year spend commitment.
+
+But of course, you're a lot less flexible and if something goes wrong and the business cannot sustain itself, the commitment does not stop.
+
+| Option | Applies to | Commitment | Max discount |
+| --- | --- | --- | --- |
+| Reserved, no upfront | Nodes | 1 or 3 years | 48.2% |
+| Reserved, partial upfront | Nodes | 1 or 3 years | 52% |
+| Reserved, all upfront | Nodes | 1 or 3 years | 55% |
+| Database Savings Plan | Serverless | 1 year, $/hour spend | 30% |
+
+Reserved discounts flex across node sizes within the same family, so a reservation for one cache.r7g.xlarge can cover two cache.r7g.large nodes instead.
+
+## The Hidden Costs of ElastiCache
+
+Four things can push the real ElastiCache bill above the listed node rate: replicas (each is priced as a full node), cross-AZ data transfer at $0.01 per GiB, backup storage at $0.085 per GiB-month, and extended support surcharges of 80% to 160% on end-of-life Redis OSS versions.
+
+![](https://cdn.bydefault.so/ADtO5tLNOJx1e_vUWPK6D.png)
+
+### Replicas multiply the node price
+
+Each replica bills at the full hourly node rate. A 3-shard cluster with one replica per shard runs 6 nodes, so on cache.r7g.large Valkey nodes that is:
+
+```text
+6 nodes x $0.1402/hr x 730 hrs = $614.08/month
+```
+
+The pricing table shows one node. A cluster with replicas runs more nodes than that.
+
+### Cross-AZ data transfer
+
+Traffic inside one availability zone is free. When your app and the cache node are in different availability zones, or when a primary replicates to a replica in another zone, that traffic bills at [$0.01 per GiB](https://cloudcostwise.io/blog/elasticache-pricing-breakdown), and it shows up under EC2 data transfer on the bill instead of the cache line item.
+
+### Backup storage
+
+Snapshots cost [$0.085 per GiB per month](https://aws.amazon.com/elasticache/pricing/) beyond the free snapshot. Restoring a backup carries no data transfer fee.
+
+### Extended support surcharges
+
+Running a Redis OSS version past its end-of-life date adds a [premium of 80% on the hourly rate for the first two years, then 160% in year three](https://cloudcostwise.io/blog/elasticache-pricing-breakdown). A cache.m5.large at $0.156 per hour becomes $0.281 in years one and two, then $0.406. Upgrading the engine version before the deadline avoids the whole surcharge.
+
+## Some Examples: Calculating ElastiCache Monthly Cost
+
+### Example 1: small production cluster (node-based, Valkey)
+
+One primary plus one replica on cache.m7g.large, multi-AZ:
+
+```text
+2 nodes x $0.1011/hr x 730 hrs = $147.61/month
+```
+
+Add cross-AZ replication traffic at $0.01 per GiB on top. With a 3-year all-upfront reservation at the full 55% discount, the same pair drops to about $66 per month.
+
+### Example 2: busy serverless cache (Redis OSS)
+
+10 GB stored, a steady 50,000 requests per second with payloads under 1 KB:
+
+```text
+Storage: 10 GB x $0.125/GB-hr x 730 hrs                  = $912.50
+Compute: 50,000 req/s x 3,600s = 180M ECPUs/hr
+         180 x $0.0034/M ECPUs x 730 hrs                 = $446.76
+Total                                                     = $1,359.26/month
+```
+
+The same workload on Valkey serverless costs $613.20 for storage and $302.22 for compute, $915.42 in total. Picking the engine saved $443.84 a month before touching any code.
+
+## Does ElastiCache Have a Free Tier?
+
+Yes, but the rules changed on July 15, 2025. [Accounts created before that date](https://aws.amazon.com/elasticache/pricing/) get 750 hours of cache.t3.micro per month free for 12 months, plus 15 GiB of data transfer out. Accounts created after it get $100 in credits instead, plus up to another $100 for activating more AWS services, and the credits work on serverless too.
+
+The old 750-hour model excluded serverless, so on a newer account the credits are the only free path to trying ElastiCache Serverless.
+
+## ElastiCache vs Upstash Redis: Pricing Comparison
+
+[Upstash Redis](https://upstash.com/pricing/redis) has three pricing models:
+
+- pay-as-you-go: $0.20 per 100K commands, the first 1 GB of storage free and $0.25 per GB after that. An idle database costs $0.
+- fixed plans: a flat monthly price with no per-command billing, from $10 (250 MB, 50 GB bandwidth) up to $1,500 (500 GB, 20 TB bandwidth, 16,000 commands per second)
+- enterprise: 100K+ commands per second, data sizes up to 10 TB, and unlimited bandwidth on a custom contract
+
+|  | ElastiCache Serverless (Valkey) | ElastiCache node-based | Upstash Redis |
+| --- | --- | --- | --- |
+| Billing unit | GB-hours + ECPUs | node-hours | commands + storage |
+| Idle monthly cost | $6.13 minimum | $9.34 (cheapest node) | $0 |
+| Free tier | $100-$200 in credits | 750 hrs of t3.micro (older accounts) | 256 MB, 500K commands/month |
+| Fixed-price option | Savings Plan, up to 30% off | reserved nodes, up to 55% off | fixed plans, $10 to $1,500/month |
+
+![Upstash Pricing as of July 2026](https://cdn.bydefault.so/hUqOERGHNZZCnj5IOwQLr.png)
+
+Example for a small workload: a dev cache running 1M commands per month with under 1 GB of data costs $2 on Upstash pay-as-you-go (10 x $0.20), against the $6.13 idle minimum on Valkey serverless and $91.25 on Redis OSS serverless.
+
+For steady production traffic, [fixed plans](https://upstash.com/pricing/redis) fill the same role as reserved nodes: one flat monthly price you can budget for. The difference is the commitment. A reserved node needs a 1-year or 3-year contract (which carries risk), while a fixed plan is easy to cancel anytime.
+
+The 50,000 requests-per-second example above moves about 131 TB per month at 1 KB per request. Upstash easily supports those workloads on an [enterprise plan](https://upstash.com/docs/redis/overall/enterprise): 100K+ commands per second, unlimited bandwidth, dedicated resources, and VPC peering.
+
+That is the tier [Supabase runs on](https://upstash.com/customers/supabase), for example. Supabase compared ElastiCache, Redis Cloud, and DynamoDB before picking Upstash for the caching behind their Edge Functions:
+
+*"At our scale, it's important to use the right tool for the right workload. Upstash lets us power low-latency edge use cases globally, while still keeping our overall architecture simple and cost-effective."*
+*- Lakshan Perera, Engineering Lead at Supabase*
+
+[Zapier](https://upstash.com/customers/zapier) runs its global rate limiting on Upstash Redis, and [ClickFunnels](https://upstash.com/customers/clickfunnels) caches customer data with it behind Cloudflare Workers. More are on the [customers page](https://upstash.com/customers). For a full provider-by-provider breakdown, see our [Redis pricing comparison](https://upstash.com/blog/redis-pricing-comparison-every-major-provider-in-2026-with-numbers).
+
+## TL;DR: ElastiCache Pricing in 2026
+
+- Node-based: $0.0128/hr (cache.t4g.micro, Valkey) to $0.28/hr (cache.r7g.xlarge) and up, per node, replicas billed in full.
+- Serverless: $0.084/GB-hour + $0.0023 per million ECPUs on Valkey; $0.125 and $0.0034 on Redis OSS.
+- Idle serverless minimum: $6.13/month on Valkey, $91.25/month on Redis OSS.
+- Valkey is 20% cheaper on nodes and about 33% cheaper on serverless than Redis OSS.
+- Reserved nodes save up to 55%; Database Savings Plans save up to 30% on serverless.
+- Cross-AZ transfer ($0.01/GiB), backups ($0.085/GiB-month), and extended support surcharges (80% to 160%) add to the bill.
+- [Upstash Redis](https://upstash.com/pricing/redis) covers the full range: $0 idle on pay-as-you-go, fixed plans from $10 to $1,500/month for high-throughput traffic and large production workloads, and enterprise plans for 100K+ commands per second.
