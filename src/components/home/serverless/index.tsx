@@ -9,6 +9,7 @@ import DesignedForTheEdge from "@/components/home/serverless/designed-for-the-ed
 import GlobalLowLatency from "@/components/home/serverless/global-low-latency";
 import HttpRestApi from "@/components/home/serverless/http-rest-api";
 import PriceScaleToZero from "@/components/home/serverless/price-scale-to-zero";
+import SectionViewTracker from "@/components/section-view-tracker";
 import { HOME_SECTIONS } from "@/utils/const";
 
 export default function HomeServerless() {
@@ -17,6 +18,7 @@ export default function HomeServerless() {
       id={HOME_SECTIONS.SERVERLESS}
       className="relative z-10 py-16 md:mt-20 md:py-28"
     >
+      <SectionViewTracker section="serverless" />
       <Bg className="top-32 h-1/2" />
 
       <Container>

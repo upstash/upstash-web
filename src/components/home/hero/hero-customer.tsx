@@ -25,6 +25,7 @@ import {
   SectionHeaderSummary,
   SectionHeaderTitle,
 } from "@/components/home/section-header";
+import SectionViewTracker from "@/components/section-view-tracker";
 import cx from "@/utils/cx";
 import Autoplay from "embla-carousel-autoplay";
 import useEmblaCarousel from "embla-carousel-react";
@@ -57,7 +58,8 @@ export default function HomeHeroCustomer() {
   }, [emblaApi, onSelect]);
 
   return (
-    <section className="relative z-10 py-8 md:py-16">
+    <section data-area="home_customers" className="relative z-10 py-8 md:py-16">
+      <SectionViewTracker section="customers" />
       <Bg />
 
       <Container>

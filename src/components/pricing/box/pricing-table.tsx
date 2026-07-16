@@ -1,3 +1,5 @@
+"use client";
+
 import Button from "@/components/button";
 import {
   BOX_ENTERPRISE_PLAN,
@@ -5,15 +7,28 @@ import {
   BOX_PAYG_PLAN,
   BOX_SIZES,
 } from "@/data/pricing/box";
+import { useTrackHover } from "@/hooks/use-track-hover";
 import * as React from "react";
 
 const defaultSize = BOX_SIZES[0];
 
 export default function PricingTable() {
+  const freeHover = useTrackHover({ product: "box", plan: "free" });
+  const paygHover = useTrackHover({ product: "box", plan: "payg" });
+  const thirdHover = useTrackHover({ product: "box", plan: "enterprise" });
+
   return (
-    <div className="grid gap-6 md:grid-cols-3">
+    <div
+      data-area="pricing_table"
+      data-product="box"
+      className="grid gap-6 md:grid-cols-3"
+    >
       {/* FREE */}
-      <div className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
+      <div
+        data-plan="free"
+        {...freeHover}
+        className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute"
+      >
         <div className="grow">
           <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
             {BOX_FREE_PLAN.name}
@@ -51,7 +66,11 @@ export default function PricingTable() {
       </div>
 
       {/* PAYG */}
-      <div className="flex flex-col items-center gap-4 rounded-4xl border-2 border-primary bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
+      <div
+        data-plan="payg"
+        {...paygHover}
+        className="flex flex-col items-center gap-4 rounded-4xl border-2 border-primary bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute"
+      >
         <div className="grow text-center">
           <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
             {BOX_PAYG_PLAN.name}
@@ -91,7 +110,11 @@ export default function PricingTable() {
       </div>
 
       {/* Enterprise */}
-      <div className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
+      <div
+        data-plan="enterprise"
+        {...thirdHover}
+        className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute"
+      >
         <div className="grow">
           <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
             {BOX_ENTERPRISE_PLAN.name}
@@ -119,7 +142,9 @@ export default function PricingTable() {
           </div>
           <div className="py-3">
             <p className="text-text-mute">Limits</p>
-            <p className="font-semibold">{BOX_ENTERPRISE_PLAN.maxConcurrentBoxes}</p>
+            <p className="font-semibold">
+              {BOX_ENTERPRISE_PLAN.maxConcurrentBoxes}
+            </p>
           </div>
         </div>
 

@@ -85,7 +85,11 @@ export default function CompareTable() {
   }
 
   return (
-    <table className="w-full border-separate border-spacing-x-1 border-spacing-y-0">
+    <table
+      data-area="pricing_compare"
+      data-product="box"
+      className="w-full border-separate border-spacing-x-1 border-spacing-y-0"
+    >
       <colgroup>
         <col className="w-1/2 md:w-1/4" />
         <col className="w-1/2 md:w-1/4" />
@@ -442,14 +446,22 @@ export default function CompareTable() {
           <td className="p-0" />
           <Col plan={showFree} className="py-4">
             <Button asChild variant="primary">
-              <a target="_self" href="https://console.upstash.com">
+              <a
+                target="_self"
+                data-plan="free"
+                href="https://console.upstash.com"
+              >
                 Start Now
               </a>
             </Button>
           </Col>
           <Col plan={showPayg} feature className="py-4">
             <Button asChild variant="primary">
-              <a target="_self" href="https://console.upstash.com">
+              <a
+                target="_self"
+                data-plan="payg"
+                href="https://console.upstash.com"
+              >
                 Start Now
               </a>
             </Button>

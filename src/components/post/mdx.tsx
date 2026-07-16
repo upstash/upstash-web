@@ -1,17 +1,25 @@
 "use client";
 
+import { trackEvent } from "@/lib/analytics";
 import cx from "@/utils/cx";
 import { MDXContent } from "@content-collections/mdx/react";
 import { IconCheck, IconCopy } from "@tabler/icons-react";
 import Image from "next/image";
-import { ComponentProps, MouseEvent, ReactNode, useEffect, useRef, useState } from "react";
+import {
+  ComponentProps,
+  MouseEvent,
+  ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
 import ExpandableCode from "./expandable-code";
+import { Frame } from "./frame";
+import { MuxVideoPlayer } from "./mux-video-player";
 import PostNote from "./note";
 import PostSummary from "./summary";
 import PostTOC from "./toc";
-import { MuxVideoPlayer } from "./mux-video-player";
-import { Frame } from "./frame";
 
 interface MdxProps {
   code: string;
@@ -159,6 +167,12 @@ function CopyFeaturePre(props: ComponentProps<"pre">) {
             containerRef.current?.querySelector("pre")?.textContent;
           navigator.clipboard.writeText(content || "");
           setHasCopied(true);
+          const path = window.location.pathname;
+          trackEvent("copy_code", {
+            slug: path.startsWith("/blog/")
+              ? path.slice("/blog/".length)
+              : path,
+          });
         }}
         className={cx(
           "absolute right-3 top-3 z-10",
@@ -189,7 +203,14 @@ function table(props: ComponentProps<"table">) {
   );
 }
 
-function img({ src, alt, width, height, className, ...rest }: ComponentProps<"img">) {
+function img({
+  src,
+  alt,
+  width,
+  height,
+  className,
+  ...rest
+}: ComponentProps<"img">) {
   const classes = cx(
     "-mx-5 block h-auto w-[calc(100%_+_2.5rem)] max-w-none rounded-xl md:-mx-6 md:w-[calc(100%_+_3rem)]",
     className,

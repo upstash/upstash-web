@@ -1,5 +1,6 @@
 "use client";
 
+import { trackEvent } from "@/lib/analytics";
 import cx from "@/utils/cx";
 import * as Popover from "@radix-ui/react-popover";
 import {
@@ -36,6 +37,7 @@ export default function CopyArticleButton({
       const res = await fetch(`/blog/${slug}.md`);
       const text = await res.text();
       await navigator.clipboard.writeText(text);
+      trackEvent("copy_article", { slug });
       setCopied(true);
       window.setTimeout(() => setCopied(false), COPY_RESET_MS);
     } catch {
@@ -78,18 +80,12 @@ export default function CopyArticleButton({
           <button
             type="button"
             aria-label="Open article actions"
-            className={cx(
-              buttonBase,
-              "px-2 data-[state=open]:text-text",
-            )}
+            className={cx(buttonBase, "px-2 data-[state=open]:text-text")}
           >
             <IconChevronDown
               size={14}
               stroke={1.75}
-              className={cx(
-                "transition-transform",
-                open && "rotate-180",
-              )}
+              className={cx("transition-transform", open && "rotate-180")}
             />
           </button>
         </Popover.Trigger>
@@ -116,6 +112,7 @@ export default function CopyArticleButton({
             <MenuAction
               href={`/blog/${slug}.md`}
               external
+              onClick={() => trackEvent("view_markdown", { slug })}
               icon={<IconFileText size={16} stroke={1.75} />}
               title="View as Markdown"
               description="View this article as plain text"
@@ -123,6 +120,7 @@ export default function CopyArticleButton({
             <MenuAction
               href={chatgptHref}
               external
+              onClick={() => trackEvent("open_in_chatgpt", { slug })}
               icon={<IconBrandOpenai size={16} stroke={1.75} />}
               title="Open in ChatGPT"
               description="Ask questions about this article"
@@ -130,6 +128,7 @@ export default function CopyArticleButton({
             <MenuAction
               href={claudeHref}
               external
+              onClick={() => trackEvent("open_in_claude", { slug })}
               icon={<ClaudeMark className="size-4" />}
               title="Open in Claude"
               description="Ask questions about this article"
@@ -206,6 +205,7 @@ function MenuAction({
         href={href}
         target={external ? "_blank" : undefined}
         rel={external ? "noopener noreferrer" : undefined}
+        onClick={onClick}
         className={rowClasses}
       >
         {inner}

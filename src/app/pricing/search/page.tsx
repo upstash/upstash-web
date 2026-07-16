@@ -6,6 +6,7 @@ import ProductToggle from "@/components/pricing/product-toggle";
 import CompareTable from "@/components/pricing/search/compare-table";
 import FAQ from "@/components/pricing/search/faq";
 import PricingTable from "@/components/pricing/search/pricing-table";
+import TextSelectTracker from "@/components/pricing/text-select-tracker";
 import { generateFaqSchema } from "@/utils/structured-schema-generators";
 
 export default function PricingSearchPage() {
@@ -23,6 +24,7 @@ export default function PricingSearchPage() {
       <section>
         <Container className="max-w-screen-lg">
           <ProductToggle product={"/search"} />
+          <TextSelectTracker product="search" />
 
           <div className="mt-12 md:mt-20">
             <PricingTable />

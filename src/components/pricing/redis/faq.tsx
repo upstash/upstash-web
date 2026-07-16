@@ -1,5 +1,6 @@
 "use client";
 
+import { trackEvent } from "@/lib/analytics";
 import * as Accordion from "@radix-ui/react-accordion";
 import * as React from "react";
 import {
@@ -10,14 +11,23 @@ import {
 
 export default function FAQ() {
   return (
-    <Accordion.Root className="faq" type="single" collapsible>
+    <Accordion.Root
+      className="faq"
+      type="single"
+      collapsible
+      onValueChange={(value) => {
+        if (value) {
+          trackEvent("faq_open", { product: "redis", question: value });
+        }
+      }}
+    >
       <AccordionItem value="item-1">
         <AccordionTrigger>
           How can I upgrade to pay as you go from free tier?
         </AccordionTrigger>
         <AccordionContent>
-          Once you enter your credit card, your database will be upgraded to
-          the pay-as-you-go plan and limits will be updated.
+          Once you enter your credit card, your database will be upgraded to the
+          pay-as-you-go plan and limits will be updated.
         </AccordionContent>
       </AccordionItem>
 
@@ -33,8 +43,8 @@ export default function FAQ() {
           Are paid databases&apos; first 256MB data and 500K commands free?
         </AccordionTrigger>
         <AccordionContent>
-          No. Once you upgrade to a paid tier, you will be charged for data
-          size and commands according to that plan.
+          No. Once you upgrade to a paid tier, you will be charged for data size
+          and commands according to that plan.
         </AccordionContent>
       </AccordionItem>
 
@@ -82,7 +92,9 @@ export default function FAQ() {
       </AccordionItem>
 
       <AccordionItem value="item-7">
-        <AccordionTrigger>Are databases faster in higher plans?</AccordionTrigger>
+        <AccordionTrigger>
+          Are databases faster in higher plans?
+        </AccordionTrigger>
         <AccordionContent>
           Ops/sec limits are the same in the initial plans, while higher plans
           increase throughput and other limits. There is no performance
@@ -97,8 +109,8 @@ export default function FAQ() {
         <AccordionContent>
           Yes. But for Global databases, the write commands are replicated to
           all read regions in addition to the primary region. Replications are
-          also counted as commands. For example, if you have one primary and
-          one read region, 100K writes cost $0.4 ($0.2 x 2).
+          also counted as commands. For example, if you have one primary and one
+          read region, 100K writes cost $0.4 ($0.2 x 2).
         </AccordionContent>
       </AccordionItem>
 
@@ -133,9 +145,9 @@ export default function FAQ() {
         </AccordionTrigger>
         <AccordionContent>
           <p className="mt-4">
-            We send email notifications when limits are exceeded. We do our
-            best to keep your database running, but we may rate limit depending
-            on the case.
+            We send email notifications when limits are exceeded. We do our best
+            to keep your database running, but we may rate limit depending on
+            the case.
           </p>
           <ul className="mt-4 list-disc space-y-2 pl-6">
             <li>
@@ -185,8 +197,8 @@ export default function FAQ() {
       <AccordionItem value="item-12">
         <AccordionTrigger>Are there free trials?</AccordionTrigger>
         <AccordionContent>
-          Yes, we can provide free trials for testing and PoC purposes. Email
-          us at <a href="mailto:support@upstash.com">support@upstash.com</a>.
+          Yes, we can provide free trials for testing and PoC purposes. Email us
+          at <a href="mailto:support@upstash.com">support@upstash.com</a>.
         </AccordionContent>
       </AccordionItem>
 
@@ -229,8 +241,8 @@ export default function FAQ() {
           <p className="mt-4">
             For Fixed plans, bandwidth is included up to your plan&apos;s limit.
             If your database is on the highest Fixed tier and exceeds its
-            allowance, we will reach out with upgrade and Enterprise options.
-            If we cannot reach you and usage continues, we reserve the right to
+            allowance, we will reach out with upgrade and Enterprise options. If
+            we cannot reach you and usage continues, we reserve the right to
             charge bandwidth overages at our cloud provider cost rate.
           </p>
           <p className="mt-4">
@@ -252,8 +264,8 @@ export default function FAQ() {
           Can I purchase Prod Pack for any plan?
         </AccordionTrigger>
         <AccordionContent>
-          Yes. You can purchase Prod Pack for any plan except the Free tier.
-          You can enable it from your Upstash dashboard database details page.
+          Yes. You can purchase Prod Pack for any plan except the Free tier. You
+          can enable it from your Upstash dashboard database details page.
         </AccordionContent>
       </AccordionItem>
 

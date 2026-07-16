@@ -1,16 +1,31 @@
+"use client";
+
 import Button from "@/components/button";
 import {
   SEARCH_FREE_PLAN,
   SEARCH_PAYG_PLAN,
   SEARCH_PRO_PLAN,
 } from "@/data/pricing/search";
+import { useTrackHover } from "@/hooks/use-track-hover";
 import * as React from "react";
 
 export default function PricingTable() {
+  const freeHover = useTrackHover({ product: "search", plan: "free" });
+  const paygHover = useTrackHover({ product: "search", plan: "payg" });
+  const thirdHover = useTrackHover({ product: "search", plan: "pro" });
+
   return (
-    <div className="grid gap-6 md:grid-cols-3">
+    <div
+      data-area="pricing_table"
+      data-product="search"
+      className="grid gap-6 md:grid-cols-3"
+    >
       {/* FREE */}
-      <div className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
+      <div
+        data-plan="free"
+        {...freeHover}
+        className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute"
+      >
         <div className="grow">
           <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
             {SEARCH_FREE_PLAN.name}
@@ -18,7 +33,9 @@ export default function PricingTable() {
           <h5 className="text-2xl font-semibold">
             {SEARCH_FREE_PLAN.priceDisplay}
           </h5>
-          <p className="text-sm text-text-mute">{SEARCH_FREE_PLAN.priceSubtext}</p>
+          <p className="text-sm text-text-mute">
+            {SEARCH_FREE_PLAN.priceSubtext}
+          </p>
         </div>
 
         <div className="grow">
@@ -30,7 +47,9 @@ export default function PricingTable() {
         <div className="w-full px-6 *:border-b *:border-bg-mute">
           <div className="py-3">
             <p className="text-text-mute">Monthly Query Limit</p>
-            <p className="font-semibold">{SEARCH_FREE_PLAN.monthlyQueryLimit}</p>
+            <p className="font-semibold">
+              {SEARCH_FREE_PLAN.monthlyQueryLimit}
+            </p>
           </div>
           <div className="py-3">
             <p className="text-text-mute">Max Records</p>
@@ -48,7 +67,11 @@ export default function PricingTable() {
       </div>
 
       {/* PAYG */}
-      <div className="flex flex-col items-center gap-4 rounded-4xl border-2 border-primary bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
+      <div
+        data-plan="payg"
+        {...paygHover}
+        className="flex flex-col items-center gap-4 rounded-4xl border-2 border-primary bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute"
+      >
         <div className="grow">
           <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
             {SEARCH_PAYG_PLAN.name}
@@ -70,7 +93,9 @@ export default function PricingTable() {
         <div className="w-full px-6 *:border-b *:border-bg-mute">
           <div className="py-3">
             <p className="text-text-mute">Monthly Query Limit</p>
-            <p className="font-semibold">{SEARCH_PAYG_PLAN.monthlyQueryLimit}</p>
+            <p className="font-semibold">
+              {SEARCH_PAYG_PLAN.monthlyQueryLimit}
+            </p>
           </div>
           <div className="py-3">
             <p className="text-text-mute">Max Records</p>
@@ -88,7 +113,11 @@ export default function PricingTable() {
       </div>
 
       {/* Pro */}
-      <div className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
+      <div
+        data-plan="pro"
+        {...thirdHover}
+        className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute"
+      >
         <div className="grow">
           <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
             {SEARCH_PRO_PLAN.name}

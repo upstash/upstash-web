@@ -6,6 +6,7 @@ import {
   SectionHeaderTitle,
 } from "@/components/home/section-header";
 import Icon, { ICON_NAMES } from "@/components/icon";
+import SectionViewTracker from "@/components/section-view-tracker";
 import { IconBrandX } from "@tabler/icons-react";
 import React from "react";
 import {
@@ -18,6 +19,7 @@ import {
 export default function HomeCommunity() {
   return (
     <section className="relative z-10 py-8 md:py-16">
+      <SectionViewTracker section="community" />
       <Bg />
 
       <Container>

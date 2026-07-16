@@ -61,6 +61,47 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           {process.env.NODE_ENV !== "development" && (
             <>
               <Script
+                id="ga-consent"
+                strategy="beforeInteractive"
+                dangerouslySetInnerHTML={{
+                  __html: `window.dataLayer = window.dataLayer || [];
+                          function gtag(){ dataLayer.push(arguments); }
+                          window.gtag = window.gtag || gtag;
+                          var consent = 'pending';
+                          try {
+                            var stored = JSON.parse(localStorage.getItem('global-store'));
+                            if (stored && stored.state && stored.state.cookieConsent) {
+                              consent = stored.state.cookieConsent;
+                            }
+                          } catch (e) {}
+                          if (consent === 'granted') {
+                            gtag('consent', 'default', {
+                              analytics_storage: 'granted',
+                              ad_storage: 'granted',
+                              ad_user_data: 'granted',
+                              ad_personalization: 'granted',
+                              wait_for_update: 500
+                            });
+                          } else {
+                            gtag('consent', 'default', {
+                              analytics_storage: 'denied',
+                              ad_storage: 'denied',
+                              ad_user_data: 'denied',
+                              ad_personalization: 'denied',
+                              region: ['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SK','SI','ES','SE','IS','LI','NO','GB','CH'],
+                              wait_for_update: 500
+                            });
+                            gtag('consent', 'default', {
+                              analytics_storage: 'granted',
+                              ad_storage: 'granted',
+                              ad_user_data: 'granted',
+                              ad_personalization: 'granted',
+                              wait_for_update: 500
+                            });
+                          }`,
+                }}
+              />
+              <Script
                 strategy="afterInteractive"
                 src={`https://www.googletagmanager.com/gtag/js?id=G-QW5KRSTDM0`}
               />
@@ -70,6 +111,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 dangerouslySetInnerHTML={{
                   __html: ` window.dataLayer = window.dataLayer || [];
                           function gtag(){ dataLayer.push(arguments); }
+                          window.gtag = window.gtag || gtag;
                           gtag('js', new Date());
                           gtag('config', 'G-QW5KRSTDM0');`,
                 }}

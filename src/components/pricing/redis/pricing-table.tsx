@@ -6,6 +6,7 @@ import {
   REDIS_FREE_PLAN,
   REDIS_PAYG_PLAN,
 } from "@/data/pricing/redis";
+import { useTrackHover } from "@/hooks/use-track-hover";
 import { PricingRedis } from "@/utils/type";
 import * as React from "react";
 import { ChangeEvent } from "react";
@@ -34,18 +35,32 @@ export default function PricingTable({
     FIXED_PLAN_BY_ID[PRICING_REDIS_TO_FIXED_ID[selectedFixed]] ??
     REDIS_FIXED_PLANS[0];
 
+  const freeHover = useTrackHover({ product: "redis", plan: "free" });
+  const paygHover = useTrackHover({ product: "redis", plan: "payg" });
+  const thirdHover = useTrackHover({ product: "redis", plan: fixedPlan.id });
+
   return (
-    <div className="grid gap-6 md:grid-cols-3">
+    <div
+      data-area="pricing_table"
+      data-product="redis"
+      className="grid gap-6 md:grid-cols-3"
+    >
       {/* FREE */}
-      <div className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
-        <div className="grow min-h-[120px]">
+      <div
+        data-plan="free"
+        {...freeHover}
+        className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute"
+      >
+        <div className="min-h-[120px] grow">
           <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
             {REDIS_FREE_PLAN.name}
           </h4>
           <h5 className="text-2xl font-semibold">
             {REDIS_FREE_PLAN.priceDisplay}
           </h5>
-          <p className="text-sm text-text-mute">{REDIS_FREE_PLAN.priceSubtext}</p>
+          <p className="text-sm text-text-mute">
+            {REDIS_FREE_PLAN.priceSubtext}
+          </p>
         </div>
 
         <div className="grow">
@@ -81,8 +96,12 @@ export default function PricingTable({
       </div>
 
       {/* PAYG */}
-      <div className="flex flex-col items-center gap-4 rounded-4xl border-2 border-primary bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
-        <div className="grow min-h-[120px]">
+      <div
+        data-plan="payg"
+        {...paygHover}
+        className="flex flex-col items-center gap-4 rounded-4xl border-2 border-primary bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute"
+      >
+        <div className="min-h-[120px] grow">
           <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
             {REDIS_PAYG_PLAN.name}
           </h4>
@@ -127,8 +146,12 @@ export default function PricingTable({
       </div>
 
       {/* Fixed */}
-      <div className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
-        <div className="grow min-h-[120px]">
+      <div
+        data-plan={fixedPlan.id}
+        {...thirdHover}
+        className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute"
+      >
+        <div className="min-h-[120px] grow">
           <h4 className="mb-4 text-xl font-semibold text-primary-text">
             <select
               className="w-auto rounded-xl bg-bg-mute px-4 py-1 font-bold"

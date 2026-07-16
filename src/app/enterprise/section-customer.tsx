@@ -6,12 +6,14 @@ import { LogoPaulSmith } from "@/components/customers/logo-paul-smith";
 import { LogoSupabase } from "@/components/customers/logo-supabase";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
+import SectionViewTracker from "@/components/section-view-tracker";
 import cx from "@/utils/cx";
 
 export default function SectionCustomer() {
   return (
     <section className="relative py-10 md:py-24">
       <Bg className="opacity-20" />
+      <SectionViewTracker section="enterprise_customer" />
 
       <Container>
         <div>

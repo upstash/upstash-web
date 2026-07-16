@@ -3,6 +3,7 @@
 import Button from "@/components/button";
 import Tooltip from "@/components/tooltip";
 import useIsMobile from "@/hooks/use-is-mobile";
+import { trackEvent } from "@/lib/analytics";
 import cx from "@/utils/cx";
 import { PricingPlans } from "@/utils/type";
 import { IconInfoCircle } from "@tabler/icons-react";
@@ -48,7 +49,11 @@ export default function CompareTable() {
   }
 
   return (
-    <table className="w-full border-separate border-spacing-x-1 border-spacing-y-0">
+    <table
+      data-area="pricing_compare"
+      data-product="workflow"
+      className="w-full border-separate border-spacing-x-1 border-spacing-y-0"
+    >
       <colgroup>
         <col className="w-1/1 md:w-1/5" />
         <col className="w-1/1 md:w-1/5" />
@@ -172,9 +177,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal">
-            Max Steps per Day
-          </th>
+          <th className="px-0 py-4 text-left font-normal">Max Steps per Day</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="number">1000</CompareValue>
@@ -183,32 +186,32 @@ export default function CompareTable() {
             <CompareValue>Unlimited</CompareValue>
           </Col>
           <Col plan={showFixed1}>
-              <CompareValue
-                type="size"
-                suffix="M"
-                className="border-b-0"
-                after={
-                  <Tooltip content="We'll reach out for an upgrade if the quota is exceeded consistently.">
-                    <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
-                  </Tooltip>
-                }
-              >
-                1
-              </CompareValue>
+            <CompareValue
+              type="size"
+              suffix="M"
+              className="border-b-0"
+              after={
+                <Tooltip content="We'll reach out for an upgrade if the quota is exceeded consistently.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            >
+              1
+            </CompareValue>
           </Col>
           <Col plan={showFixed10}>
-              <CompareValue
-                type="size"
-                suffix="M"
-                className="border-b-0"
-                after={
-                  <Tooltip content="We'll reach out for an upgrade if the quota is exceeded consistently.">
-                    <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
-                  </Tooltip>
-                }
-              >
-                10
-              </CompareValue>
+            <CompareValue
+              type="size"
+              suffix="M"
+              className="border-b-0"
+              after={
+                <Tooltip content="We'll reach out for an upgrade if the quota is exceeded consistently.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            >
+              10
+            </CompareValue>
           </Col>
         </tr>
 
@@ -240,32 +243,32 @@ export default function CompareTable() {
             </CompareValue>
           </Col>
           <Col plan={showFixed1}>
-              <CompareValue
-                type="size"
-                suffix="TB"
-                className="border-b-0"
-                after={
-                  <Tooltip content="We'll reach out for an upgrade if the quota is exceeded consistently.">
-                    <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
-                  </Tooltip>
-                }
-              >
-                1
-              </CompareValue>
+            <CompareValue
+              type="size"
+              suffix="TB"
+              className="border-b-0"
+              after={
+                <Tooltip content="We'll reach out for an upgrade if the quota is exceeded consistently.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            >
+              1
+            </CompareValue>
           </Col>
           <Col plan={showFixed10}>
-              <CompareValue
-                type="size"
-                suffix="TB"
-                className="border-b-0"
-                after={
-                  <Tooltip content="We'll reach out for an upgrade if the quota is exceeded consistently.">
-                    <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
-                  </Tooltip>
-                }
-              >
-                5
-              </CompareValue>
+            <CompareValue
+              type="size"
+              suffix="TB"
+              className="border-b-0"
+              after={
+                <Tooltip content="We'll reach out for an upgrade if the quota is exceeded consistently.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            >
+              5
+            </CompareValue>
           </Col>
         </tr>
 
@@ -287,7 +290,7 @@ export default function CompareTable() {
             <CompareValue type="number">1000</CompareValue>
           </Col>
         </tr>
-        
+
         <tr>
           <th className="px-0 py-4 text-left font-normal">
             <Tooltip content="Excess steps will be delayed until old steps finish. They will not be rejected.">
@@ -335,7 +338,9 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal">Max Sleep Duration</th>
+          <th className="px-0 py-4 text-left font-normal">
+            Max Sleep Duration
+          </th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue>7 days</CompareValue>
@@ -405,7 +410,7 @@ export default function CompareTable() {
             <CompareValue>14 days</CompareValue>
           </Col>
         </tr>
-      
+
         <tr>
           <th className="px-0 text-left font-normal">Uptime SLA</th>
           {/**/}
@@ -478,28 +483,44 @@ export default function CompareTable() {
           <td className="p-0" />
           <Col plan={showFree} className="py-4">
             <Button asChild variant="primary">
-              <a target="_self" href="https://console.upstash.com/workflow">
+              <a
+                target="_self"
+                data-plan="free"
+                href="https://console.upstash.com/workflow"
+              >
                 Start Now
               </a>
             </Button>
           </Col>
           <Col plan={showPayg} feature className="py-4">
             <Button asChild variant="primary">
-              <a target="_self" href="https://console.upstash.com/workflow">
+              <a
+                target="_self"
+                data-plan="payg"
+                href="https://console.upstash.com/workflow"
+              >
                 Start Now
               </a>
             </Button>
           </Col>
           <Col plan={showFixed1} className="py-4">
             <Button asChild variant="primary">
-              <a target="_self" href="https://console.upstash.com/workflow">
+              <a
+                target="_self"
+                data-plan="fixed-1m"
+                href="https://console.upstash.com/workflow"
+              >
                 Start Now
               </a>
             </Button>
           </Col>
           <Col plan={showFixed10} className="py-4">
             <Button asChild variant="primary">
-              <a target="_self" href="https://console.upstash.com/workflow">
+              <a
+                target="_self"
+                data-plan="fixed-10m"
+                href="https://console.upstash.com/workflow"
+              >
                 Start Now
               </a>
             </Button>
@@ -510,10 +531,20 @@ export default function CompareTable() {
   );
 }
 
-function MobileSelectCol({ ...props }: React.ComponentProps<"select">) {
+function MobileSelectCol({
+  onChange,
+  ...props
+}: React.ComponentProps<"select">) {
   return (
     <select
       className="mb-2 bg-white px-4 py-2 font-semibold md:hidden"
+      onChange={(event) => {
+        trackEvent("pricing_compare_select", {
+          product: "workflow",
+          plan: event.target.value,
+        });
+        onChange?.(event);
+      }}
       {...props}
     >
       <option value={PricingPlans.Free}>Free</option>
