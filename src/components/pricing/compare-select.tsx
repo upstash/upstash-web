@@ -1,3 +1,4 @@
+import { trackEvent } from "@/lib/analytics";
 import { PricingPlans } from "@/utils/type";
 import * as React from "react";
 import { ChangeEvent, HTMLProps } from "react";
@@ -9,10 +10,11 @@ export default function CompareSelect({
   value,
   onChange = () => {},
   ...props
-}: HTMLProps<HTMLSelectElement> & {
+}: Omit<HTMLProps<HTMLSelectElement>, "onChange"> & {
   value: PricingPlans;
   product: "redis" | "qstash";
   selectedPlans: PricingPlans[];
+  onChange?: (plans: PricingPlans[]) => void;
 }) {
   const onChangeEvent = (
     event: ChangeEvent<HTMLSelectElement>,
@@ -21,11 +23,13 @@ export default function CompareSelect({
     const value = event.target.value as PricingPlans;
     const index = selectedPlans.indexOf(plan);
 
+    trackEvent("pricing_compare_select", { product, plan: value });
+
     if (index === 0) {
-      // return onChange([value, selectedPlans[1]]);
+      return onChange([value, selectedPlans[1]]);
     }
 
-    // return onChange([selectedPlans[0], value]);
+    return onChange([selectedPlans[0], value]);
   };
 
   return (

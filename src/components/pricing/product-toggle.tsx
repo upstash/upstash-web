@@ -6,6 +6,7 @@ import IconRedis from "@/components/icon-redis";
 import IconSearch from "@/components/icon-search";
 import IconVector from "@/components/icon-vector";
 import IconWorkflow from "@/components/icon-workflow";
+import { trackEvent } from "@/lib/analytics";
 import cx from "@/utils/cx";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -34,6 +35,14 @@ export default function ProductToggle({ product }: { product: Product }) {
             <Link
               key={key}
               href={`/pricing${key}`}
+              onClick={() => {
+                if (key !== product) {
+                  trackEvent("pricing_product_switch", {
+                    from: product.slice(1),
+                    to: key.slice(1),
+                  });
+                }
+              }}
               className={cx(
                 "relative flex cursor-pointer select-none items-center gap-0 sm:gap-1",
                 "rounded-lg px-1.5 py-1.5 transition sm:px-3",

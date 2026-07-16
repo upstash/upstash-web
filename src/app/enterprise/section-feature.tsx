@@ -2,6 +2,7 @@ import Bg from "@/components/bg";
 import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
+import SectionViewTracker from "@/components/section-view-tracker";
 import {
   TooltipContent,
   TooltipRoot,
@@ -28,6 +29,7 @@ export default function SectionFeature() {
   return (
     <section className="relative -mt-16 pb-10 md:pb-24">
       <Bg className="opacity-20" />
+      <SectionViewTracker section="enterprise_feature" />
 
       <Container className="max-w-[1700px]">
         <div>

@@ -5,6 +5,7 @@ import Clap from "@/components/post/claps";
 import PostHeader from "@/components/post/header";
 import { Mdx } from "@/components/post/mdx";
 import OtherPostCard from "@/components/post/other-post";
+import ReadTracker from "@/components/post/read-tracker";
 import RelatedRedis from "@/components/post/related-redis";
 import PostTags from "@/components/post/tags";
 import { authorUrl } from "@/utils/authors";
@@ -115,6 +116,8 @@ export default async function BlogPage({ params }: Props) {
         }}
       />
       <Bg />
+
+      <ReadTracker slug={post.slug} />
 
       <article>
         {/* Header */}

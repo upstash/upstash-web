@@ -10,6 +10,7 @@ import Enterprise from "@/components/pricing/redis/enterprise";
 import FAQ from "@/components/pricing/redis/faq";
 import PricingTable from "@/components/pricing/redis/pricing-table";
 import ProdPack from "@/components/pricing/redis/prod-pack";
+import TextSelectTracker from "@/components/pricing/text-select-tracker";
 import { PROD_PACK_SECTION_ID } from "@/constants";
 import { generateFaqSchema } from "@/utils/structured-schema-generators";
 import { PricingRedis } from "@/utils/type";
@@ -51,6 +52,7 @@ export default function PricingRedisPage() {
       <section>
         <Container className="max-w-screen-lg">
           <ProductToggle product={"/redis"} />
+          <TextSelectTracker product="redis" />
 
           <div className="mt-12 md:mt-20">
             <PricingTable

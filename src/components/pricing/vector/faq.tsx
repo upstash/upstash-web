@@ -1,5 +1,6 @@
 "use client";
 
+import { trackEvent } from "@/lib/analytics";
 import * as Accordion from "@radix-ui/react-accordion";
 import * as React from "react";
 import {
@@ -10,7 +11,16 @@ import {
 
 export default function FAQ() {
   return (
-    <Accordion.Root className="faq" type="single" collapsible>
+    <Accordion.Root
+      className="faq"
+      type="single"
+      collapsible
+      onValueChange={(value) => {
+        if (value) {
+          trackEvent("faq_open", { product: "vector", question: value });
+        }
+      }}
+    >
       <AccordionItem value="item-1">
         <AccordionTrigger>
           How can I upgrade to pay as you go from free tier?

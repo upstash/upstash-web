@@ -1,6 +1,7 @@
 import Bg from "@/components/bg";
 import Button from "@/components/button";
 import Container from "@/components/container";
+import SectionViewTracker from "@/components/section-view-tracker";
 import cx from "@/utils/cx";
 import Link from "next/link";
 
@@ -8,6 +9,7 @@ export default function SectionHero() {
   return (
     <section className="relative py-10 md:py-24">
       <Bg className="opacity-20" />
+      <SectionViewTracker section="enterprise_hero" />
 
       <Container className="max-w-screen-lg">
         <div className="grid">

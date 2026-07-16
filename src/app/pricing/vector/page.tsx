@@ -3,6 +3,7 @@ import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
 import ProductToggle from "@/components/pricing/product-toggle";
+import TextSelectTracker from "@/components/pricing/text-select-tracker";
 import CompareTable from "@/components/pricing/vector/compare-table";
 import Enterprise from "@/components/pricing/vector/enterprise";
 import FAQ from "@/components/pricing/vector/faq";
@@ -25,6 +26,7 @@ export default function PricingVectorPage() {
       <section>
         <Container className="max-w-screen-lg">
           <ProductToggle product={"/vector"} />
+          <TextSelectTracker product="vector" />
 
           <div className="mt-12 md:mt-20">
             <PricingTable />

@@ -1,10 +1,11 @@
 "use client";
 
 import Button from "@/components/button";
+import { trackEvent } from "@/lib/analytics";
 import Fuse, { type IFuseOptions } from "fuse.js";
 import { DateTime } from "luxon";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import PostGridCard, { type PostCardData } from "./grid-item";
 import SearchInput from "./search-input";
 
@@ -42,6 +43,20 @@ export default function BlogSearch({ posts }: { posts: SearchPost[] }) {
             DateTime.fromISO(a.date).toMillis(),
         )
     : posts;
+
+  const resultsCount = isSearching ? results.length : 0;
+  useEffect(() => {
+    if (trimmed.length < 2) {
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      trackEvent("blog_search", {
+        query: trimmed.toLowerCase().slice(0, 60),
+        results_count: resultsCount,
+      });
+    }, 800);
+    return () => window.clearTimeout(timer);
+  }, [trimmed, resultsCount]);
 
   return (
     <>

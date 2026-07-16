@@ -8,6 +8,7 @@ import Enterprise from "@/components/pricing/qstash/enterprise";
 import FAQ from "@/components/pricing/qstash/faq";
 import PricingTable from "@/components/pricing/qstash/pricing-table";
 import ProdPack from "@/components/pricing/qstash/prod-pack";
+import TextSelectTracker from "@/components/pricing/text-select-tracker";
 import { PROD_PACK_SECTION_ID } from "@/constants";
 import { generateFaqSchema } from "@/utils/structured-schema-generators";
 
@@ -26,6 +27,7 @@ export default function PricingQStashPage() {
       <section>
         <Container className="max-w-screen-lg">
           <ProductToggle product={"/qstash"} />
+          <TextSelectTracker product="qstash" />
 
           <div className="mt-12 md:mt-20">
             <PricingTable />

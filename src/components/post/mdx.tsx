@@ -1,5 +1,6 @@
 "use client";
 
+import { trackEvent } from "@/lib/analytics";
 import cx from "@/utils/cx";
 import { MDXContent } from "@content-collections/mdx/react";
 import { IconCheck, IconCopy } from "@tabler/icons-react";
@@ -166,6 +167,12 @@ function CopyFeaturePre(props: ComponentProps<"pre">) {
             containerRef.current?.querySelector("pre")?.textContent;
           navigator.clipboard.writeText(content || "");
           setHasCopied(true);
+          const path = window.location.pathname;
+          trackEvent("copy_code", {
+            slug: path.startsWith("/blog/")
+              ? path.slice("/blog/".length)
+              : path,
+          });
         }}
         className={cx(
           "absolute right-3 top-3 z-10",

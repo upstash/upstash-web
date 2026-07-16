@@ -6,6 +6,8 @@ import { HeroTabQStash } from "@/components/home/hero/hero-tab-qstash";
 import { HeroTabRedis } from "@/components/home/hero/hero-tab-redis";
 import { HeroTabVector } from "@/components/home/hero/hero-tab-vector";
 import { HeroTabWorkflow } from "@/components/home/hero/hero-tab-workflow";
+import SectionViewTracker from "@/components/section-view-tracker";
+import { trackEvent } from "@/lib/analytics";
 import cx from "@/utils/cx";
 import { Product } from "@/utils/type";
 import {
@@ -74,6 +76,7 @@ const HeroProductTagline = ({ activeProduct }: { activeProduct: Product }) => {
           </code>
           <CopyButton
             code={UPSTASH_SKILL_COMMAND}
+            eventName="skill_copy"
             className="shrink-0 text-text-mute hover:text-primary"
           />
         </div>
@@ -88,17 +91,27 @@ const HeroProductTagline = ({ activeProduct }: { activeProduct: Product }) => {
 export default function HomeProductNew() {
   const [activeProduct, setActiveProduct] = useState<Product>(Product.REDIS);
 
+  const handleProductChange = (product: Product) => {
+    if (product !== activeProduct) {
+      trackEvent("home_product_switch", { product: product.toLowerCase() });
+    }
+    setActiveProduct(product);
+  };
+
   return (
     <section className="relative z-10 sm:mt-4">
+      <SectionViewTracker section="products" />
       <Container>
         <div className="md:text-ba flex items-end justify-center md:gap-1 lg:gap-2">
           <HomeHeroProducts
             activeProduct={activeProduct}
-            setActiveProduct={setActiveProduct}
+            setActiveProduct={handleProductChange}
           />
         </div>
 
         <div
+          data-area="home_products"
+          data-product={activeProduct.toLowerCase()}
           className={cx(
             "-mx-6 p-6 sm:mx-auto sm:p-8",
             "bg-white shadow sm:rounded-4xl",

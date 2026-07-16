@@ -2,6 +2,7 @@
 
 import Bg from "@/components/bg";
 import Statistic from "@/components/home/fast/statistic";
+import SectionViewTracker from "@/components/section-view-tracker";
 import { HOME_SECTIONS } from "@/utils/const";
 import cx from "@/utils/cx";
 
@@ -11,6 +12,7 @@ export default function Fast() {
       id={HOME_SECTIONS.FAST}
       className="relative -z-10 mt-20 h-[320px] overflow-hidden sm:h-[400px] md:mt-32 xl:h-[500px]"
     >
+      <SectionViewTracker section="fast" />
       <Bg className="!top-24" />
 
       {/* slogan */}
