@@ -48,6 +48,8 @@ exclude = [
   # Discord blocks automated checkers on invite links and the /discord redirect.
   "://discord\\.(gg|com)",
   "upstash\\.com/discord",
+  # GitHub signup pages return 403 to automated checkers (repo links stay checked).
+  "://github\\.com/(join|signup)([/?#]|$)",
 
   # --- More hosts that block checkers / require auth / are SPAs or API endpoints ---
   "://console\\.upstash\\.com",              # authenticated SPA console (client-rendered routes)
