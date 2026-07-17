@@ -90,7 +90,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
 const title = "Upstash: Serverless Data Platform";
 const description =
-  "Upstash is a serverless data platform providing low latency and high scalability for real-time applications. Optimize your data infrastructure with Upstash's managed services for Redis, Vector, QStash, and other key data technologies.";
+  "Upstash is a serverless data platform with fully managed, cloud-hosted Redis — single-digit millisecond latency, global replication, and pay-as-you-go pricing. Plus Vector, Search, and QStash for real-time apps.";
 
 export async function generateMetadata() {
   return {
