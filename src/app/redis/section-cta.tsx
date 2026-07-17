@@ -2,6 +2,7 @@ import Bg from "@/components/bg";
 import Button from "@/components/button";
 import Container from "@/components/container";
 import cx from "@/utils/cx";
+import { IconPlus, IconTag } from "@tabler/icons-react";
 import Link from "next/link";
 
 export default function SectionCta() {
@@ -29,10 +30,14 @@ export default function SectionCta() {
           <Button asChild variant="primary" className="h-[46px] px-6">
             <a href="https://console.upstash.com/redis" target="_blank">
               Create Database
+              <IconPlus size={24} />
             </a>
           </Button>
           <Button asChild variant="default" className="h-[46px] px-6">
-            <Link href="/pricing/redis">View Pricing</Link>
+            <Link href="/pricing/redis">
+              View Pricing
+              <IconTag size={24} />
+            </Link>
           </Button>
         </div>
       </Container>
