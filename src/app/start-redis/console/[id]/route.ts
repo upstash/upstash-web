@@ -1,19 +1,16 @@
+import { UPSTASH_CONSOLE_URL } from "@/utils/const";
 import { NextResponse, type NextRequest } from "next/server";
 
+import { trackEvent } from "../../analytics";
+
 const CONSOLE_REDIS_START_PATH = "/start-redis";
-const UPSTASH_CONSOLE_URL = process.env.UPSTASH_CONSOLE_URL;
 
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: { id: string } },
 ) {
   try {
-    if (!UPSTASH_CONSOLE_URL) {
-      return NextResponse.json(
-        { error: "UPSTASH_CONSOLE_URL is not configured" },
-        { status: 500 },
-      );
-    }
+    trackEvent("start_redis_console", req);
 
     return NextResponse.redirect(
       `${UPSTASH_CONSOLE_URL}${CONSOLE_REDIS_START_PATH}/${params.id}`,

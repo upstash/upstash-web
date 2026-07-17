@@ -1,20 +1,17 @@
+import { UPSTASH_BACKEND_URL } from "@/utils/const";
 import { NextResponse, type NextRequest } from "next/server";
 
-const UPSTASH_BACKEND_URL = process.env.UPSTASH_BACKEND_URL;
+import { clientHeaders, trackEvent } from "./analytics";
 
-export async function GET(_req: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
-    if (!UPSTASH_BACKEND_URL) {
-      return NextResponse.json(
-        { error: "UPSTASH_BACKEND_URL is not configured" },
-        { status: 500 },
-      );
-    }
+    trackEvent("start_redis_get", req);
 
     const upstream = await fetch(
       `${UPSTASH_BACKEND_URL}/v2/agent/redis/start`,
       {
         method: "GET",
+        headers: clientHeaders(req),
         cache: "no-store",
       },
     );
@@ -38,12 +35,7 @@ export async function GET(_req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    if (!UPSTASH_BACKEND_URL) {
-      return NextResponse.json(
-        { error: "UPSTASH_BACKEND_URL is not configured" },
-        { status: 500 },
-      );
-    }
+    trackEvent("start_redis_post", req);
 
     const idempotencyKey = req.headers.get("Idempotency-Key");
 
@@ -51,7 +43,10 @@ export async function POST(req: NextRequest) {
       `${UPSTASH_BACKEND_URL}/v2/agent/redis/start`,
       {
         method: "POST",
-        headers: idempotencyKey ? { "Idempotency-Key": idempotencyKey } : {},
+        headers: {
+          ...clientHeaders(req),
+          ...(idempotencyKey ? { "Idempotency-Key": idempotencyKey } : {}),
+        },
         cache: "no-store",
       },
     );

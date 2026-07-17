@@ -1,5 +1,13 @@
 export const SITE_URL = "https://upstash.com";
 
+export const GA_MEASUREMENT_ID = "G-QW5KRSTDM0";
+
+export const UPSTASH_BACKEND_URL =
+  process.env.UPSTASH_BACKEND_URL ?? "https://api.upstash.com";
+
+export const UPSTASH_CONSOLE_URL =
+  process.env.UPSTASH_CONSOLE_URL ?? "https://console.upstash.com";
+
 export const BANNED_TAGS = [
   "undefined",
   "upstash",
