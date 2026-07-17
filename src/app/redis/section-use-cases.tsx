@@ -68,7 +68,7 @@ const USE_CASES = [
   },
   {
     title: "Search",
-    desc: "Add full-text and vector search to your app with Redis Search.",
+    desc: "Add full-text to your app with Upstash Redis Search.",
     href: "https://upstash.com/docs/redis/search/introduction",
   },
   {
