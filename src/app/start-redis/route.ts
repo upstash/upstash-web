@@ -1,7 +1,9 @@
-import { UPSTASH_BACKEND_URL } from "@/utils/const.server";
 import { NextResponse, type NextRequest } from "next/server";
 
 import { clientHeaders, trackEvent } from "./analytics";
+
+const UPSTASH_BACKEND_URL =
+  process.env.UPSTASH_BACKEND_URL ?? "https://api.upstash.com";
 
 export async function GET(req: NextRequest) {
   try {

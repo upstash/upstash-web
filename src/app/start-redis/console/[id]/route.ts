@@ -1,9 +1,10 @@
-import { UPSTASH_CONSOLE_URL } from "@/utils/const.server";
 import { NextResponse, type NextRequest } from "next/server";
 
 import { trackEvent } from "../../analytics";
 
 const CONSOLE_REDIS_START_PATH = "/start-redis";
+const UPSTASH_CONSOLE_URL =
+  process.env.UPSTASH_CONSOLE_URL ?? "https://console.upstash.com";
 
 export async function GET(
   req: NextRequest,
