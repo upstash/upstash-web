@@ -1,23 +1,22 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-const UPSTASH_BACKEND_URL = process.env.UPSTASH_BACKEND_URL;
+import { clientHeaders, trackEvent } from "../../analytics";
+
+const UPSTASH_BACKEND_URL =
+  process.env.UPSTASH_BACKEND_URL ?? "https://api.upstash.com";
 
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: { id: string } },
 ) {
   try {
-    if (!UPSTASH_BACKEND_URL) {
-      return NextResponse.json(
-        { error: "UPSTASH_BACKEND_URL is not configured" },
-        { status: 500 },
-      );
-    }
+    trackEvent("start_redis_metrics", req);
 
     const upstream = await fetch(
       `${UPSTASH_BACKEND_URL}/v2/agent/redis/metrics/${params.id}`,
       {
         method: "GET",
+        headers: clientHeaders(req),
         cache: "no-store",
       },
     );
