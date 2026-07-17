@@ -3,6 +3,7 @@ import Container from "@/components/container";
 import { Logo } from "@/components/logo";
 import OutLink from "@/components/out-link";
 import cx from "@/utils/cx";
+import { IconArrowUpRight } from "@tabler/icons-react";
 import Link from "next/link";
 import { HTMLProps } from "react";
 
@@ -33,6 +34,16 @@ export default function Footer({ className, ...props }: IAppFooter) {
             </Link>
             <OutLink href="/trust/privacy.pdf">Privacy Policy</OutLink>
             <OutLink href="/trust/terms.pdf">Terms of Service</OutLink>
+            <Link
+              href="/redis"
+              className="group inline-flex items-center gap-1 hover:text-primary hover:underline"
+            >
+              Redis Database
+              <IconArrowUpRight
+                size={16}
+                className="opacity-50 group-hover:opacity-100"
+              />
+            </Link>
           </div>
 
           <div className="flex gap-2">
