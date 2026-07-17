@@ -8,7 +8,12 @@ import { HeroTabVector } from "@/components/home/hero/hero-tab-vector";
 import { HeroTabWorkflow } from "@/components/home/hero/hero-tab-workflow";
 import cx from "@/utils/cx";
 import { Product } from "@/utils/type";
-import { IconArrowUpRight, IconNotes, IconPlus } from "@tabler/icons-react";
+import {
+  IconArrowRight,
+  IconArrowUpRight,
+  IconNotes,
+  IconPlus,
+} from "@tabler/icons-react";
 import Link from "next/link";
 import React, { useState } from "react";
 import { HeroTabBox } from "../hero/hero-tab-box";
@@ -61,7 +66,8 @@ const HeroProductTagline = ({ activeProduct }: { activeProduct: Product }) => {
         {activeProduct === Product.REDIS && (
           <Link href="/redis">
             <Button variant={"default"} className="h-[42px] px-5">
-              Learn more
+              Explore Redis
+              <IconArrowRight size={24} />
             </Button>
           </Link>
         )}
