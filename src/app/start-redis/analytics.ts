@@ -7,12 +7,20 @@ const GA_API_SECRET = process.env.GA_API_SECRET;
 // GA4 truncates event parameter values beyond 100 chars
 const GA_PARAM_VALUE_LIMIT = 100;
 
+// GA4 silently drops events whose name is not 1-40 chars of
+// letters/digits/underscores starting with a letter
+const GA_EVENT_NAME_PATTERN = /^[a-zA-Z][a-zA-Z0-9_]{0,39}$/;
+
 /**
  * Sends an event to GA4 via the Measurement Protocol, fire-and-forget.
- * Event names may only contain letters, digits and underscores.
  */
 export function trackEvent(eventName: string, req: NextRequest) {
   if (!GA_API_SECRET) return;
+
+  if (!GA_EVENT_NAME_PATTERN.test(eventName)) {
+    console.error(`Invalid GA event name, not sending: ${eventName}`);
+    return;
+  }
 
   const userAgent = req.headers.get("user-agent") ?? "unknown";
 
@@ -21,6 +29,7 @@ export function trackEvent(eventName: string, req: NextRequest) {
       `https://www.google-analytics.com/mp/collect?measurement_id=${GA_MEASUREMENT_ID}&api_secret=${GA_API_SECRET}`,
       {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           client_id: crypto.randomUUID(),
           events: [

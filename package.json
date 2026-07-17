@@ -46,6 +46,7 @@
     "react-use-intercom": "^5.4.1",
     "remark": "^15.0.1",
     "remark-html": "^16.0.1",
+    "server-only": "^0.0.1",
     "sharp": "^0.33.5",
     "shiki": "^1.23.1",
     "swr": "^2.2.5",

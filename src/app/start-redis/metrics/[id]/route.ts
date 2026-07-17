@@ -1,4 +1,4 @@
-import { UPSTASH_BACKEND_URL } from "@/utils/const";
+import { UPSTASH_BACKEND_URL } from "@/utils/const.server";
 import { NextResponse, type NextRequest } from "next/server";
 
 import { clientHeaders, trackEvent } from "../../analytics";

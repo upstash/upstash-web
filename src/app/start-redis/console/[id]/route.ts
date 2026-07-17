@@ -1,4 +1,4 @@
-import { UPSTASH_CONSOLE_URL } from "@/utils/const";
+import { UPSTASH_CONSOLE_URL } from "@/utils/const.server";
 import { NextResponse, type NextRequest } from "next/server";
 
 import { trackEvent } from "../../analytics";
