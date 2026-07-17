@@ -18,7 +18,7 @@ const UPSTASH_SKILL_COMMAND =
 
 const taglines = {
   [Product.REDIS]: {
-    title: "Low-latency, serverless key-value store",
+    title: "Low-latency, serverless Redis in the cloud",
     docsLink: "https://upstash.com/docs/redis",
     consoleLink: "https://console.upstash.com/redis",
   },
