@@ -21,12 +21,18 @@
 }
 
 .post blockquote {
-  @apply -mx-5 rounded-xl bg-emerald-700/10 p-5 md:-mx-6 md:p-6 dark:bg-white/5;
+  @apply -mx-5 space-y-4 rounded-xl bg-emerald-700/10 p-5 md:-mx-6 md:p-6 dark:bg-white/5;
 }
 
 .post ul,
 .post ol {
   @apply list-inside space-y-2;
+}
+
+/* pull a list closer to the paragraph that introduces it */
+.post > p:has(+ ul),
+.post > p:has(+ ol) {
+  @apply mb-4;
 }
 
 .post ul {
@@ -78,7 +84,7 @@
 }
 
 .post hr {
-  @apply my-10 border-b border-emerald-950/[0.08] md:my-20 dark:border-white/[0.08];
+  @apply mb-12 mt-2 border-b border-emerald-950/[0.08] md:mb-16 md:mt-6 dark:border-white/[0.08];
 }
 
 .post > img,
