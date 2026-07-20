@@ -50,15 +50,24 @@ export function trackEvent(eventName: string, req: NextRequest) {
 
 /**
  * Headers identifying the original client, to be forwarded to the backend.
+ *
+ * The X-Client-* names are ours, so no edge strips them and /start-redis is unauthenticated.
+ * The shared secret is what lets the backend believe them rather than fall back to our egress.
  */
 export function clientHeaders(req: NextRequest): Record<string, string> {
   const headers: Record<string, string> = {};
+
+  const proxySecret = process.env.UPSTASH_WEB_PROXY_SECRET;
+  if (proxySecret) headers["X-Upstash-Proxy-Secret"] = proxySecret;
 
   const ip = ipAddress(req);
   if (ip) headers["X-Client-IP"] = ip;
 
   const userAgent = req.headers.get("user-agent");
   if (userAgent) headers["X-Client-User-Agent"] = userAgent;
+
+  const origin = req.headers.get("origin") ?? req.headers.get("referer");
+  if (origin) headers["X-Client-Origin"] = origin;
 
   return headers;
 }
