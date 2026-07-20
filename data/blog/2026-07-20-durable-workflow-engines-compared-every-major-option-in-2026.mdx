@@ -1,0 +1,137 @@
+---
+title: "Durable Workflow Engines in 2026: Every Major Option Compared"
+slug: durable-workflow-engines-compared-every-major-option-in-2026
+authors: [arda]
+tags: [workflow, qstash, serverless]
+description: "Durable execution engines compared in 2026: Upstash Workflow, Temporal, Inngest, Trigger.dev, Restate, DBOS, Hatchet, AWS Step Functions, and Cloudflare Workflows, across architecture, retries, long delays, human-in-the-loop events, serverless support, and pricing."
+publishedAt: "2026-07-20T13:00:00Z"
+---
+
+<Summary>
+This is a comparison of the major durable workflow engines of 2026, the tools for multi-step processes with retries, long delays, and state that survives crashes: Upstash Workflow, Temporal, Inngest, Trigger.dev, Restate, DBOS, Hatchet, AWS Step Functions, and Cloudflare Workflows. For single-message background jobs and queues, see our [companion comparison](https://upstash.com/blog/serverless-background-jobs-and-message-queues-every-major-option-in-2026).
+
+Upstash Workflow stands out on four things:
+
+- **Zero infrastructure on both sides.** Steps run inside your existing app as HTTP calls; Upstash holds the state. No workers, no server, no Postgres to operate.
+- **Idle time is free.** A workflow can [sleep](https://upstash.com/docs/workflow/basics/context/sleep) for a month or wait on an event with no compute running anywhere, and [`context.call`](https://upstash.com/docs/workflow/basics/context/call) executes long HTTP requests (up to 12 hours) on Upstash's side, not yours.
+- **Failure handling with resume.** Automatic per-step retries, then a DLQ where you can resume a run from the failed step after shipping a fix, without losing completed steps.
+- **Per-step pricing.** $1 per 100K steps. The bill scales to zero, and there is no monthly platform fee to grow into.
+</Summary>
+
+The moment a background job becomes a chain (call the model, wait for a webhook, sleep 30 days, then charge the card) you have a new problem. Any single step can fail or the process can die between steps, and you need the whole thing to pick up where it left off. That's durable execution, and in 2026 there are at least nine serious tools selling it.
+
+They differ less in features (everyone has retries, sleeps, and events) than in architecture: where your steps run, and what you have to operate to keep them running. That decides your infrastructure bill, your deploy story, and whether the tool works from a serverless app at all. So that's how this comparison is organized.
+
+I checked every claim below against the providers' docs and pricing pages in July 2026. These change often, so confirm the current state before you commit.
+
+## Every major engine at a glance
+
+| Engine | Where your steps run | What you operate | Max sleep | Cloud entry price | Metered on |
+| --- | --- | --- | --- | --- | --- |
+| Upstash Workflow | Your HTTP routes, one call per step | **Nothing** | 1 year PAYG, unlimited Fixed | $0, pay-as-you-go | Steps, $1 per 100K |
+| Inngest | Your app, invoked over HTTP | Nothing (cloud) or self-host server | 1 year (7 days free) | Free tier, then $99/mo Pro | Executions |
+| Trigger.dev | Their managed workers | Nothing (cloud) or self-host | No documented cap | $0 plus usage | Compute-seconds + per-run fee |
+| Temporal | Workers you run | Worker fleet, plus server + DB if self-hosted | Years | Greater of $100/mo or 5% of usage | Actions + storage |
+| Restate | Your services behind the Restate Server | Restate Server (or their cloud) + services | Months to years | Free 100K actions, then $75/mo | Durable actions |
+| DBOS | Inside your own processes | Your processes + Postgres | No documented cap | Library free; Pro $99/mo | Checkpoints |
+| Hatchet | Workers you run | Workers, plus control plane + Postgres if self-hosted | No documented cap | Free 100K runs, then $10/M | Task runs |
+| AWS Step Functions | Lambda / AWS services, wired in JSON | Nothing (AWS) | 1 year (max execution) | 4,000 transitions/mo free | State transitions, $25/M |
+| Cloudflare Workflows | Your Cloudflare Worker | Nothing (Cloudflare) | 365 days | Free tier; $5/mo Workers Paid | Requests + CPU + steps |
+
+The deepest split is the middle column. Four of them (Temporal, Restate, DBOS, Hatchet) assume long-running processes you deploy and keep alive. Three (Step Functions, Cloudflare Workflows, Trigger.dev) run your steps on a specific platform's compute. Two, Inngest and Upstash Workflow, invoke steps inside the app you already have, over HTTP, which is the only model that drops into a serverless codebase with nothing new to run.
+
+## Who runs the steps, and who holds the state?
+
+**The worker-fleet school.** Temporal is the reference point for durable execution, and its docs are precise about the division of labor: the Temporal Service "doesn't execute any of your code". You write workers that poll task queues, and you run them. That stays true on Temporal Cloud: "You run Workers that execute your Workflow and Activity code," deployed on your Kubernetes, VMs, or on-premises. Workflow code must also be deterministic (no direct system time, randomness, or I/O outside activities) because durability comes from replaying event history. In exchange you get the most battle-tested engine here, seven official languages (Go, Java, TypeScript, Python, .NET, PHP, Ruby), and workflows that run for years. Hatchet (MIT-licensed, Postgres-backed) follows the same shape with a task-queue flavor: durable tasks checkpoint to an event log, and your workers — long-running processes — execute them. Restate replaces the polling with a log-based server that sits in front of your services like a reverse proxy and pushes invocations to them; the services themselves stay stateless, and can even be AWS Lambda functions. DBOS goes furthest in the other direction: no server at all, just an MIT-licensed library that checkpoints every step to a Postgres database you point it at.
+
+**The platform school.** AWS Step Functions is a state machine you define in JSON, not code, wiring together Lambda and other AWS services; it's the oldest and most operationally boring option if you live on AWS. Cloudflare Workflows is durable execution built into Workers: real TypeScript with `step.do` and `step.sleep`, but only on Cloudflare's runtime. Trigger.dev deploys your TypeScript tasks to its own managed machines, which is why it has no platform timeout and why it appeared in our [background jobs comparison](https://upstash.com/blog/serverless-background-jobs-and-message-queues-every-major-option-in-2026) too.
+
+**The HTTP school.** Inngest and Upstash Workflow both start from the same observation: if each step is delivered to your app as a separate HTTP request, and the engine memoizes completed step results, then a workflow can be durable while running entirely inside a serverless function. Your app crashes or redeploys mid-run; the engine re-invokes, completed steps are skipped, and execution resumes exactly where it stopped. [Upstash Workflow](https://upstash.com/docs/workflow/basics/how) builds this on QStash, and a workflow is just a route in your app:
+
+```ts
+import { serve } from "@upstash/workflow/nextjs";
+
+export const { POST } = serve<{ userId: string }>(async (context) => {
+  const { userId } = context.requestPayload;
+
+  const user = await context.run("create-user", () => createUser(userId));
+
+  await context.sleep("trial-period", "30d"); // no compute runs for 30 days
+
+  const usage = await context.run("check-usage", () => getUsage(userId));
+
+  if (usage.active) {
+    await context.run("start-subscription", () => startSubscription(userId));
+  }
+});
+```
+
+Deploy it like any other route, on any of the supported platforms: Next.js, Cloudflare Workers, Hono, Express, Astro, SvelteKit, Nuxt, and more in TypeScript, plus FastAPI and Flask in [Python](https://github.com/upstash/workflow-py).
+
+## What does a sleeping workflow cost?
+
+Most workflows spend most of their life waiting: for a timer, a webhook, a slow API. The engines treat that time very differently.
+
+On Upstash Workflow, a [sleep](https://upstash.com/docs/workflow/basics/context/sleep) ends the current request entirely; a new one is scheduled when the delay expires, so a 30-day sleep consumes zero compute and bills as one step. The same applies to [`context.waitForEvent`](https://upstash.com/docs/workflow/basics/context/waitforevent), and to the rarer [`context.call`](https://upstash.com/docs/workflow/basics/context/call): an HTTP request to a third-party API that Upstash executes on your behalf, with response windows up to 12 hours. A 40-minute LLM generation doesn't occupy your Vercel function for 40 minutes; your function isn't running at all.
+
+Inngest works the same way for sleeps (up to a year, and sleeping runs don't count against concurrency), though regular steps still execute inside your functions, subject to your platform's duration limits. Cloudflare Workflows doesn't bill idle time either. Trigger.dev checkpoints waits longer than 5 seconds on its cloud so you don't pay compute for them, a feature its self-hosted version lacks. On the worker-fleet side the timers themselves are cheap, but the economics invert: your workers (Temporal, Hatchet), services (Restate), or processes (DBOS) are running 24/7 whether any workflow is active or not, so idle costs whatever your idle infrastructure costs.
+
+## How long can a workflow live, and how big can it get?
+
+The ceilings differ by orders of magnitude, and they're the kind of thing you discover in production:
+
+- **AWS Step Functions**: Standard executions max out at 1 year, 25,000 history events, and, the one that bites, 256 KiB payloads per state. Express workflows cap at 5 minutes.
+- **Temporal**: event history is limited to 51,200 events or 50 MB per execution, with payloads capped at 2 MB. Long-lived workflows are expected to checkpoint themselves with Continue-As-New — the docs themselves note long histories "may bog down and have performance issues."
+- **Cloudflare Workflows**: sleeps up to 365 days, 1,024 steps per run on the free plan (up to 25,000 on paid), 1 MiB step outputs.
+- **Inngest**: 1,000 steps per run, run length from 30 days (free) to 366 days (Pro), 4 MiB step outputs.
+- **Upstash Workflow**: sleeps up to a year on pay-as-you-go and unlimited on fixed plans, with no documented per-run step cap; message payloads go from 1 MB (free) to 50 MB (fixed plans).
+- **Restate, DBOS, Hatchet**: no hard documented caps. Restate says sleeps can span "months or even years," with the caveat that a paused run pins the deployment version it started on.
+
+## What happens when a step fails?
+
+Everyone retries; the defaults and the aftermath differ. Temporal retries activities indefinitely by default (workflows themselves don't retry). Restate also retries indefinitely until you raise a terminal error. Cloudflare Workflows defaults to 5 retries per step with exponential backoff; Step Functions ships 3 attempts per `Retry` block; Inngest 4 retries with an `onFailure` handler; Trigger.dev 3 attempts with dashboard bulk-replay; Hatchet configurable per task; DBOS guarantees steps run at least once and never re-run after completion.
+
+Upstash Workflow retries each step 3 times by default with exponential backoff, and a run that exhausts retries lands in a [DLQ with three options](https://upstash.com/docs/workflow/howto/failures): **resume** from the failed step (completed steps keep their results), restart from scratch, or re-fire the failure callback. A `failureFunction` in your code receives the error details; the `failureUrl` variant works even when your whole app is down. Resume-from-failure is the practical difference: ship the fix, resume the run, and the 14 steps that already succeeded don't re-execute.
+
+## Waiting for the outside world
+
+Human approvals and webhook callbacks are where workflow engines earn their keep, and every engine has an answer: Temporal has signals and updates, Inngest matches events with CEL expressions, Step Functions pauses on a task token (Standard workflows only), Cloudflare buffers events for `step.waitForEvent` up to a year, Restate suspends on awakeables, DBOS persists `send`/`recv` messages, Trigger.dev waits on tokens, Hatchet races sleeps against events.
+
+Upstash Workflow's version is [`context.waitForEvent`](https://upstash.com/docs/workflow/basics/context/waitforevent) plus `context.notify`: the run suspends and consumes nothing until your code, running anywhere, fires the event, with a configurable timeout. Notifications sent before the workflow reaches the wait are stored and delivered when it gets there, which closes the classic race condition. For third-party webhook providers, `context.createWebhook` mints a URL you can hand to Stripe or Clerk and wait on directly.
+
+## Can it run in a Next.js app on Vercel?
+
+For a serverless codebase, this is the first filter, so here's the honest map:
+
+- **Natively, yes**: Upstash Workflow and Inngest, which are both designed as routes in your app. On Vercel, Inngest steps run inside your functions (up to the 800-second fluid-compute ceiling with streaming); Upstash Workflow's per-step ceiling is the plan's HTTP response duration (15 minutes free, up to 12 hours on fixed plans), and long third-party calls can be offloaded to `context.call` entirely.
+- **Alongside, not inside**: Trigger.dev tasks deploy to Trigger's machines with a separate CLI deploy; your Vercel app just triggers them.
+- **Different platform**: Cloudflare Workflows requires your code on Workers; Step Functions orchestrates AWS services, and its direct HTTP task times out at 60 seconds.
+- **Long-running processes required**: Temporal (its serverless-workers option is pre-release, AWS-Lambda-only, and gated behind a support ticket), DBOS (recovery assumes persistent executors; their serverless answer is DBOS Cloud hosting), and Hatchet, whose docs list "serverless-only runtimes as your primary worker model" under *not a good fit*. Restate is the exception in this group: it can push invocations to services on AWS Lambda, though Vercel isn't documented.
+
+## What does it cost?
+
+The engines meter different units (steps, executions, actions, checkpoints, transitions, task runs), so here's one workload priced through all of them: **1 million five-step workflow runs a month**, single attempts, small payloads. The arithmetic is mine, from each provider's published rates; treat it as order-of-magnitude.
+
+- **Upstash Workflow**: 5 steps × 1M = 5M steps at $1 per 100K → $50, all-in. No platform fee; the free tier covers 1,000 steps/day.
+- **Cloudflare Workflows**: \~5M steps ≈ $36 over the included 500K, within included request and CPU allowances → \~$41 with the $5 Workers Paid plan (step billing takes effect August 10, 2026). Cheapest of the platforms, if your code lives on Workers.
+- **Restate Cloud**: \~6M durable actions → Starter at $75 covers 5M, plus $25 → \~$100, plus the services you run.
+- **Trigger.dev**: $25 in per-run fees plus compute by the second: around $110 plus the $50/mo Pro plan if each run does 5 seconds of work on the smallest machine.
+- **Temporal Cloud**: \~6 actions per run → 6M actions → Essentials covers 1M at $100, plus 5M × $50/M → \~$350, plus storage, plus the worker fleet you operate 24/7.
+- **Inngest**: 6 executions per run (the run plus each step) → 6M → Pro covers 1M at $99, plus 5M × $50/M → \~$349.
+- **DBOS**: 7M checkpoints (one per step plus two per run) → Pro covers 1M at $99, plus 6M × $50/M → \~$399. Or skip the control plane entirely and run the MIT library against your own Postgres for the cost of the database.
+- **AWS Step Functions**: roughly 7 state transitions per run → \~7M × $25/M → \~$175 (retries bill as transitions too).
+- **Hatchet Cloud**: task runs meter at $10/M after the first 100K, so the metering is nearly free; the real costs are the worker fleet you operate and the $500/mo Team plan once you need production limits.
+
+The totals track the architecture split. Worker-fleet engines carry platform floors plus your infrastructure. Platform engines are cheap but lock the compute. The HTTP engines run on compute you already pay for; there, Upstash Workflow's per-step pricing avoids Inngest's jump from free tier to $99/mo. One data point from production: [Streamlined](https://upstash.com/customers/streamlined), after evaluating Inngest, Trigger.dev, and Cloudflare Workflows, moved to Upstash Workflow and cut workflow compute from about $1,500/month to about $40/month while volume grew roughly 10x, largely because idle time and third-party waits stopped billing as compute.
+
+## How to choose
+
+- **Upstash Workflow** if your app is serverless and you want durable multi-step workflows as plain routes (no workers, no Postgres, idle time free, resume-from-failure, [AI agent support](https://upstash.com/docs/workflow/agents/overview), TypeScript and Python) at $1 per 100K steps. It's built on [QStash](https://upstash.com/blog/serverless-background-jobs-and-message-queues-every-major-option-in-2026), so single-message jobs and workflows share one delivery infrastructure and one flow-control layer.
+- **Inngest** if you want the same HTTP model with a heavier event-driven layer on top (fan-out from events, CEL matching, debounce) and the $99/mo step is fine.
+- **Temporal** if workflows are your core business logic at serious scale, you need Go/Java/.NET, and you have the team to run workers and live with determinism rules. It's the deepest engine here, and the most expensive to hold.
+- **Trigger.dev** if the steps themselves are heavy (video, AI inference, long CPU work) and should run on managed machines with no timeout, with Apache-2.0 self-hosting as the exit.
+- **Restate** if you want Temporal-style guarantees with lower latency and a simpler single-binary server, and Lambda-based services appeal.
+- **DBOS** if you're Postgres-centric and want durability as a library in your own process with nothing else to deploy.
+- **Hatchet** if you want an MIT-licensed, Postgres-backed task queue with DAGs and durable tasks, and running workers is natural for you.
+- **AWS Step Functions** if you're wiring AWS services together and want maximum operational maturity over developer ergonomics; mind the 256 KiB payloads.
+- **Cloudflare Workflows** if your stack is already Workers; it's the cheapest managed option and the most platform-bound.
