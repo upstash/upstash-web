@@ -46,7 +46,7 @@ Two splits do most of the work here.
 
 First, only QStash, Cloud Tasks, and SNS deliver a message to an arbitrary HTTP endpoint. SQS, Cloudflare Queues, and Vercel Queues all need a consumer running somewhere — which, if you're on Vercel or another serverless platform, is exactly the queue infrastructure you were trying not to manage. Cloudflare Queues push-delivers only to Cloudflare Workers, and Vercel Queues only to Vercel Functions; from anywhere else, both are pull APIs your own service has to poll. Google Cloud Pub/Sub push subscriptions can also POST to an HTTPS endpoint, but it's a throughput-priced pub/sub system with a fixed, non-configurable backoff, so I'll leave it at this mention.
 
-Second, Inngest and Trigger.dev belong to a different category, durable-function platforms: more capable for multi-step jobs, but you write the jobs in their SDK and take on a second deploy surface. That trade-off is real in both directions, and I'll come back to it.
+Second, Inngest and Trigger.dev belong to a different category, durable-function platforms: more capable for multi-step jobs, but you write the jobs in their SDK and take on a second deploy surface. That trade-off is real in both directions.
 
 ## The push queue, in practice
 
@@ -149,33 +149,7 @@ Elsewhere: Cloud Tasks has real dispatch controls (`maxDispatchesPerSecond`, `ma
 
 QStash also does [deduplication](https://upstash.com/docs/qstash/features/deduplication) at publish time, by explicit ID or by content hash within a 10-minute window, which is the cheap insurance against double-firing producers.
 
-## What does it cost?
-
-A concrete workload: 1 million background jobs a month, small payloads, delivered to an HTTP endpoint.
-
-- **Google Cloud Tasks**: roughly 2 operations per task, so \~2M operations; the first 1M are free and the rest cost about $0.40. Cheapest push queue by far; the price you pay is setup (project, queue, service account, IAM) and no DLQ.
-- **AWS SNS**: 1M publishes (first 1M free) plus 1M HTTP deliveries at $0.60/M after the first 100K free lands around $1. Mind the 256 KB message cap and the 1-hour retry window.
-- **AWS SQS + Lambda**: send/receive/delete makes \~3 requests per message, so \~3M requests ≈ $0.80 after the free million, plus Lambda invocations and compute for the consumer you wrote.
-- **Cloudflare Queues**: \~3 operations per delivery is \~3M operations; with 1M included in the $5/mo Workers Paid plan, about $5.80 total, consumable from Workers.
-- **QStash**: $1 per 100K messages, so $10 on pay-as-you-go, with retries, DLQ, schedules, flow control, and signing included and nothing to deploy. High-volume workloads move to the fixed plans: $180/mo for 1M messages/day, $420/mo for 10M/day ([pricing](https://upstash.com/pricing/qstash)).
-- **Inngest**: 1M simple runs is about 1M executions, which is what the $99/mo Pro plan includes; each step in a function bills as another execution. The free tier's 50K executions/month is generous for side projects, but the next step is $99.
-- **Trigger.dev**: $0.25 per 10K runs is **$25** in invocation fees before compute, which bills per second by machine size, on top of the $50/mo Pro plan for production concurrency.
-
-The cloud primitives are the cheapest per message and the most expensive in assembly and operations. QStash costs a few dollars more per million with the whole delivery pipeline built in. The durable-function platforms sit an order higher because you're paying for compute and orchestration on top of delivery.
-
-Free tiers, since several of these start free: QStash gives 1,000 messages/day, Cloud Tasks 1M operations/month, SQS and SNS 1M requests/month, Cloudflare 10K operations/day, Inngest 50K executions/month, Trigger.dev $5 of monthly usage.
-
 ## What about multi-step workflows?
 
 Everything above is single messages: one job, one delivery, retries until it works. The moment one job becomes a chain (call the LLM, wait for a webhook, then charge the card, with state carried across steps and sleeps in between) you're in durable-workflow territory: Temporal, Inngest, Trigger.dev, Restate, DBOS, Cloudflare Workflows, AWS Step Functions, and [Upstash Workflow](https://upstash.com/docs/workflow/getstarted), which is built on top of QStash and brings the same HTTP-native model to multi-step functions. That category deserves its own comparison, and we wrote one: [Durable Workflow Engines in 2026: Every Major Option Compared](https://upstash.com/blog/durable-workflow-engines-compared-every-major-option-in-2026). For a taste of the model, see [how to add durable functions to a Next.js app](https://upstash.com/blog/durable-functions-nextjs).
 
-## How to choose
-
-- **QStash** if your app is serverless (Next.js on Vercel is the archetype) and you want delivery to plain HTTP routes with retries, a DLQ, long delays, cron, and per-key rate limiting built in, at $1 per 100K messages. It's also the shape AI coding agents integrate correctly on the first try: publish over HTTP, verify a signature, done.
-- **Google Cloud Tasks** if you're on GCP and want the cheapest push-to-HTTP queue, can live without a DLQ, and don't mind the IAM setup.
-- **AWS SNS** if you're on AWS and need fan-out to many subscribers; treat external HTTP endpoints as second-class given the one-hour retry cap.
-- **AWS SQS** if you want strict queue semantics with Lambda consumers inside AWS. It's excellent at that, and simply not a "POST my URL" service.
-- **Cloudflare Queues** if your stack is Workers end to end; remember to configure the DLQ.
-- **Vercel Cron** for scheduled tasks where a missed or duplicate run is acceptable; pair it with (or replace it by) QStash schedules when it isn't. Vercel Queues is still a beta event-streaming system, not a task queue with a DLQ.
-- **Inngest** if your jobs are multi-step functions and you want them running inside your existing serverless deploys with strong flow control; budget for the $99 step after the free tier.
-- **Trigger.dev** if the jobs themselves outgrow serverless (long video/AI processing, heavy CPU) and you want them on managed workers with no platform timeout, or self-hosted under Apache 2.0.
