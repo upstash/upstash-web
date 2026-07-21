@@ -2,6 +2,7 @@
 
 import "../styles/home.css";
 import { ParsedUrlQueryInput } from "querystring";
+import HomeAgents from "@/components/home/agents";
 import HomeCommunity from "@/components/home/community";
 import HomeFaq from "@/components/home/faq";
 import HomeFast from "@/components/home/fast";
@@ -26,6 +27,7 @@ export default function Home({
       <HomeProductNew />
       <HomeFast />
       <HomeServerless />
+      <HomeAgents />
       <HomeHeroCustomer />
       {/* TODO: Enterprise */}
       <HomeCommunity />
