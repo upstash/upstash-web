@@ -88,7 +88,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   );
 }
 
-const title = "Serverless Data Platform — Redis, Vector, Search";
+const title = "Upstash: Serverless Data Platform - Redis, Vector, Search";
 const description =
   "Serverless Redis, Vector and Search databases with low latency and pay-as-you-go pricing. Upstash is the data platform for modern and AI applications — create a Redis database in seconds.";
 
@@ -114,7 +114,7 @@ export async function generateMetadata() {
       url: "/",
       title,
       description,
-      siteName: title,
+      siteName: "Upstash",
       images: "/og-home.jpg",
     },
     twitter: {

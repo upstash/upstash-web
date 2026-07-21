@@ -11,7 +11,7 @@ import { Metadata } from "next";
 
 const title = "Redis Database - Upstash";
 const description =
-  "Upstash is a serverless Redis database with low latency, durable storage, and pay-as-you-go pricing. Create a fully managed Redis database in seconds.";
+  "Upstash is a serverless Redis database with low latency, durable storage, and pay-as-you-go pricing. Create a fully managed Redis database in the cloud in seconds.";
 
 export const metadata: Metadata = {
   title,
