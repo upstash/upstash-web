@@ -1,5 +1,3 @@
-"use client";
-
 import Bg from "@/components/bg";
 import Container from "@/components/container";
 import CopyButton from "@/components/copy-button";
@@ -9,13 +7,7 @@ import {
   SectionHeaderTitle,
 } from "@/components/home/section-header";
 import cx from "@/utils/cx";
-import {
-  IconArrowRight,
-  IconPlugConnected,
-  IconSparkles,
-  IconTerminal2,
-} from "@tabler/icons-react";
-import { motion } from "framer-motion";
+import { IconArrowRight } from "@tabler/icons-react";
 import { ReactNode } from "react";
 
 const UPSTASH_SKILL_COMMAND =
@@ -25,27 +17,15 @@ const CLI_COMMAND = "npm i -g @upstash/cli";
 
 const SKILL_AGENTS = ["Claude Code", "OpenAI Codex", "Cursor"];
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  show: { opacity: 1, y: 0 },
-};
-
 function AgentCard({
-  index,
   className,
   children,
 }: {
-  index: number;
   className?: string;
   children: ReactNode;
 }) {
   return (
-    <motion.div
-      variants={fadeUp}
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.5, delay: index * 0.07 }}
+    <div
       className={cx(
         "group relative flex flex-col overflow-hidden p-6 text-left md:p-8",
         "rounded-3xl border border-black/5 bg-white shadow-sm md:rounded-4xl",
@@ -63,20 +43,7 @@ function AgentCard({
         )}
       />
       <div className="relative z-10 flex h-full flex-col">{children}</div>
-    </motion.div>
-  );
-}
-
-function AgentCardIcon({ children }: { children: ReactNode }) {
-  return (
-    <span
-      className={cx(
-        "bg-primary/10 flex size-12 shrink-0 items-center justify-center rounded-xl",
-        "text-primary-text",
-      )}
-    >
-      {children}
-    </span>
+    </div>
   );
 }
 
@@ -141,17 +108,12 @@ export default function HomeAgents() {
 
         <div className="mt-10 grid gap-4 md:mt-16 md:gap-6 lg:grid-cols-2">
           {/* Skills - featured */}
-          <AgentCard index={0} className="lg:col-span-2">
+          <AgentCard className="lg:col-span-2">
             <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:gap-12">
               <div className="flex flex-col items-start lg:w-1/2">
-                <div className="flex items-center gap-4">
-                  <AgentCardIcon>
-                    <IconSparkles size={26} stroke={1.5} />
-                  </AgentCardIcon>
-                  <h4 className="font-display text-xl font-semibold md:text-2xl">
-                    Skills
-                  </h4>
-                </div>
+                <h4 className="font-display text-xl font-semibold md:text-2xl">
+                  Skills
+                </h4>
 
                 <p className="mt-2 text-text-mute md:mt-3">
                   Packaged instructions covering every Upstash SDK plus the full
@@ -180,21 +142,25 @@ export default function HomeAgents() {
                       {agent}
                     </span>
                   ))}
+                  <span
+                    className={cx(
+                      "rounded-full px-3 py-1 text-sm font-medium",
+                      "border border-dashed border-black/15 text-text-mute",
+                      "dark:border-white/15",
+                    )}
+                  >
+                    and more
+                  </span>
                 </div>
               </div>
             </div>
           </AgentCard>
 
           {/* MCP Server */}
-          <AgentCard index={1}>
-            <div className="flex items-center gap-4">
-              <AgentCardIcon>
-                <IconPlugConnected size={26} stroke={1.5} />
-              </AgentCardIcon>
-              <h4 className="font-display text-xl font-semibold md:text-2xl">
-                MCP Server
-              </h4>
-            </div>
+          <AgentCard>
+            <h4 className="font-display text-xl font-semibold md:text-2xl">
+              MCP Server
+            </h4>
 
             <p className="mt-2 grow text-text-mute md:mt-3">
               Manage and debug your resources straight from your editor: create
@@ -208,15 +174,10 @@ export default function HomeAgents() {
           </AgentCard>
 
           {/* CLI */}
-          <AgentCard index={2}>
-            <div className="flex items-center gap-4">
-              <AgentCardIcon>
-                <IconTerminal2 size={26} stroke={1.5} />
-              </AgentCardIcon>
-              <h4 className="font-display text-xl font-semibold md:text-2xl">
-                CLI
-              </h4>
-            </div>
+          <AgentCard>
+            <h4 className="font-display text-xl font-semibold md:text-2xl">
+              CLI
+            </h4>
 
             <p className="mt-2 grow text-text-mute md:mt-3">
               Full resource management from the terminal or CI/CD, with JSON
