@@ -26,7 +26,7 @@ export default function HomeHero() {
 
         {/* hero subtitle*/}
         <h2 className={cx("mt-2 text-lg md:text-2xl", "text-text-mute")}>
-          Serverless Redis, Vector, and messaging for real-time apps
+          One platform for all your data needs
         </h2>
 
         <div className="mt-6">
