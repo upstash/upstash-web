@@ -127,15 +127,15 @@ function CommandLine({ command }: { command: string }) {
 
 export default function HomeAgents() {
   return (
-    <section className="relative z-10 mt-10 py-16 md:mt-20 md:py-24">
+    <section className="relative z-10 py-16 md:py-24">
       <Bg />
 
       <Container>
         <SectionHeader>
           <SectionHeaderTitle>Built for AI Agents</SectionHeaderTitle>
           <SectionHeaderSummary>
-            Skills, an MCP server, and a CLI: everything your coding agent
-            needs to build, manage, and debug Upstash resources
+            Everything your coding agent needs to build, manage, and debug
+            Upstash resources
           </SectionHeaderSummary>
         </SectionHeader>
 
@@ -144,27 +144,19 @@ export default function HomeAgents() {
           <AgentCard index={0} className="lg:col-span-2">
             <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:gap-12">
               <div className="flex flex-col items-start lg:w-1/2">
-                <div className="flex flex-wrap items-center gap-4">
+                <div className="flex items-center gap-4">
                   <AgentCardIcon>
                     <IconSparkles size={26} stroke={1.5} />
                   </AgentCardIcon>
-                  <h4 className="font-display text-2xl font-semibold md:text-3xl">
+                  <h4 className="font-display text-xl font-semibold md:text-2xl">
                     Skills
                   </h4>
-                  <span
-                    className={cx(
-                      "bg-primary/10 rounded-full px-2.5 py-1",
-                      "text-xs font-semibold uppercase tracking-wide text-primary-text",
-                    )}
-                  >
-                    Recommended
-                  </span>
                 </div>
 
-                <p className="mt-4 text-balance text-text-mute md:text-lg">
+                <p className="mt-2 text-text-mute md:mt-3">
                   Packaged instructions covering every Upstash SDK plus the full
-                  CLI reference. Your agent loads only the sections it needs.
-                  No context bloat, no stale docs.
+                  CLI reference. Your agent loads only the sections it needs. No
+                  context bloat, no stale docs.
                 </p>
 
                 <AgentCardLink href="https://upstash.com/docs/agent-resources/skills">
@@ -204,7 +196,7 @@ export default function HomeAgents() {
               </h4>
             </div>
 
-            <p className="mt-4 grow text-balance text-text-mute">
+            <p className="mt-2 grow text-text-mute md:mt-3">
               Manage and debug your resources straight from your editor: create
               databases, analyze QStash logs, retry failed workflow runs.
               Read-only API keys supported.
@@ -226,7 +218,7 @@ export default function HomeAgents() {
               </h4>
             </div>
 
-            <p className="mt-4 grow text-balance text-text-mute">
+            <p className="mt-2 grow text-text-mute md:mt-3">
               Full resource management from the terminal or CI/CD, with JSON
               output built for scripting and agents.
             </p>

@@ -26,8 +26,8 @@ export default function Home({
       {/* TODO: Redesign */}
       <HomeProductNew />
       <HomeFast />
-      <HomeAgents />
       <HomeServerless />
+      <HomeAgents />
       <HomeHeroCustomer />
       {/* TODO: Enterprise */}
       <HomeCommunity />
