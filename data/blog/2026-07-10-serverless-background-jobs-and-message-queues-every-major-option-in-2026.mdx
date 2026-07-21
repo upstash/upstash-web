@@ -1,0 +1,155 @@
+---
+title: "Serverless Background Jobs and Message Queues in 2026: Major Options Compared"
+slug: serverless-background-jobs-and-message-queues-every-major-option-in-2026
+authors: [arda]
+tags: [qstash, serverless]
+description: "Every major way to run background jobs, message queues, and scheduled tasks from a serverless app in 2026: QStash, Inngest, Trigger.dev, Google Cloud Tasks, AWS SQS and SNS, Cloudflare Queues, and Vercel Cron, compared on HTTP delivery, retries, dead-letter queues, delays, cron, and price."
+publishedAt: "2026-07-10T13:00:00Z"
+---
+
+<Summary>
+This is a comparison of the major ways to run background jobs from a serverless app in 2026: QStash, Inngest, Trigger.dev, Google Cloud Tasks, AWS SQS and SNS, Cloudflare Queues, Vercel Cron and Queues, and the managed cron services, compared on delivery model, retries, dead-letter queues, delays, scheduling, and price.
+
+QStash stands out on five things:
+
+- **It calls your endpoint.** You write a normal HTTP route; QStash delivers messages to it. There's no worker or consumer to deploy and no new runtime.
+- **Retries and a DLQ by default.** Failed deliveries retry with exponential backoff, and exhausted messages land in a [dead-letter queue](https://upstash.com/docs/qstash/features/dlq) you can replay from the console.
+- **Long delays and cron.** Delay a message up to a year on pay-as-you-go (unlimited on fixed plans) and run [cron schedules](https://upstash.com/docs/qstash/features/schedules) against any URL.
+- **Flow control.** Rate-limit and cap the concurrency of outgoing deliveries per key, which is what you want when the receiver is a third-party API or a customer's webhook endpoint.
+- **Per-message pricing.** $1 per 100K messages, and the bill scales to zero when nothing runs.
+</Summary>
+
+The problem shows up in every serverless app eventually: run this work later, retry it if it fails, and do it without a long-lived worker process, because there's nowhere to run one. Send the welcome email, process the upload, sync the CRM, expire the trial in 30 days.
+
+The tools sold for this problem are not one category. They're three different kinds of product wearing the same label:
+
+- **Queues that call your endpoint.** You publish a message with a URL, the service POSTs it to you, retries on failure. QStash, Google Cloud Tasks, AWS SNS.
+- **Queues you consume.** The service holds messages; something you deploy pulls them. AWS SQS, Cloudflare Queues, Vercel Queues.
+- **Platforms that run your code.** You define jobs in their SDK, and they either invoke them through your app step by step (Inngest) or run them on their own machines (Trigger.dev).
+
+Which kind you're buying matters more than any single feature, so that's how this comparison is grouped. I checked every claim below against the providers' docs and pricing pages in July 2026. These change often, so confirm the current state before you commit.
+
+## Every major option at a glance
+
+| Option | Model | Delivers to any URL? | Default retries | DLQ | Max delay | Pricing basis |
+| --- | --- | --- | --- | --- | --- | --- |
+| Upstash QStash | Push queue over HTTP | **Yes** | 3, configurable | Built-in | 7d free / **1 year** PAYG / unlimited Fixed | $1 per 100K messages |
+| Google Cloud Tasks | Push queue over HTTP | Yes | Up to 100 attempts, configurable | None | 30 days | $0.40/M operations after 1M |
+| AWS SNS | Pub/sub push | Yes (public HTTPS only) | 3, max 100 within a **1-hour hard cap** | Via an SQS queue | — | $0.50/M publishes + $0.60/M HTTP deliveries |
+| AWS SQS | Pull queue | No, needs a Lambda or Pipes consumer | Consumer-defined | Native redrive | 15 min | $0.40/M requests (64 KB chunks) |
+| Cloudflare Queues | Pull, or push to Workers | No — push only to Workers, pull elsewhere | 3, max 100 | Optional, off by default | 24 hours | $0.40/M operations after 1M |
+| Vercel Queues (beta) | Durable event log | No — push only to Vercel Functions, poll elsewhere | Until message TTL | None | 7 days | Per operation, regional |
+| Inngest | Durable functions invoked via your app | Runs your functions instead | 4 retries | `onFailure` + replay | `step.sleep` up to 1 year | Pro from $99/mo, metered per execution |
+| Trigger.dev | Tasks run on their infrastructure | Runs your tasks instead | 3 attempts | `onFailure` + bulk replay | Waits, no documented limit | Compute-seconds + $0.25 per 10K runs |
+
+Two splits do most of the work here.
+
+First, only QStash, Cloud Tasks, and SNS deliver a message to an arbitrary HTTP endpoint. SQS, Cloudflare Queues, and Vercel Queues all need a consumer running somewhere — which, if you're on Vercel or another serverless platform, is exactly the queue infrastructure you were trying not to manage. Cloudflare Queues push-delivers only to Cloudflare Workers, and Vercel Queues only to Vercel Functions; from anywhere else, both are pull APIs your own service has to poll. Google Cloud Pub/Sub push subscriptions can also POST to an HTTPS endpoint, but it's a throughput-priced pub/sub system with a fixed, non-configurable backoff, so I'll leave it at this mention.
+
+Second, Inngest and Trigger.dev belong to a different category, durable-function platforms: more capable for multi-step jobs, but you write the jobs in their SDK and take on a second deploy surface. That trade-off is real in both directions.
+
+## The push queue, in practice
+
+With a push queue, the background job is just an HTTP route you already know how to write, deploy, and observe. Publishing to it looks like this with QStash:
+
+```ts
+import { Client } from "@upstash/qstash";
+
+const client = new Client({ token: process.env.QSTASH_TOKEN! });
+
+await client.publishJSON({
+  url: "https://your-app.com/api/process-video",
+  body: { videoId: "vid_123" },
+  retries: 5,
+  delay: 3600, // deliver in an hour
+  failureCallback: "https://your-app.com/api/delivery-failed",
+});
+```
+
+QStash stores the message, delivers it at the right time, retries on failure, and moves it to the DLQ if every retry fails. The receiving side verifies that requests really come from QStash by checking a signature, which in Next.js is a one-line wrapper:
+
+```ts
+import { verifySignatureAppRouter } from "@upstash/qstash/nextjs";
+
+export const POST = verifySignatureAppRouter(async (req: Request) => {
+  const { videoId } = await req.json();
+  // ... do the work
+  return new Response("ok");
+});
+```
+
+The other push options authenticate differently. Cloud Tasks attaches a Google-signed OIDC token your endpoint validates, which is clean but assumes a GCP project, a service account, and three IAM bindings before the first task. SNS requires your endpoint to complete a subscription-confirmation handshake and then verify a certificate-based signature on every message, with SDK helpers doing the heavy lifting.
+
+## What happens when a delivery fails?
+
+This is where the options separate. Failure handling is the whole reason to use a queue instead of `fetch` and hope, so the details matter.
+
+**QStash** retries with exponential backoff: the first retry comes about 12 seconds after a failure, and the gap grows to a cap of 24 hours. The endpoint can push back with a `Retry-After` header, or mark an error [non-retryable](https://upstash.com/docs/qstash/features/retry) so remaining retries are skipped. When retries are exhausted, the message moves to the [DLQ](https://upstash.com/docs/qstash/features/dlq) (kept 7 days on pay-as-you-go, up to 3 months on the larger fixed plan), where you can inspect it and replay it. A `failureCallback` URL gets notified so you can alert.
+
+**AWS SNS** is the one to read carefully. HTTP/S delivery retries only on 5xx and 429 (every other error is final), and the total retry policy for an HTTP endpoint is hard-capped at **3,600 seconds**. If your API is down for more than an hour, retries are over; anything not caught by a DLQ (a separate SQS queue you attach) is gone. AWS-native subscribers (SQS, Lambda) get 23 days of retries; external HTTP endpoints get one hour.
+
+**Google Cloud Tasks** has the strongest retry story among the cloud primitives: up to 100 attempts by default, configurable to unlimited, with tunable backoff. What it lacks is a DLQ: a task that exhausts its attempts is simply deleted, and reconstructing it means digging through logs.
+
+**Cloudflare Queues** retries 3 times by default (up to 100). A DLQ exists but is off by default, and the docs are direct about the consequence: without one, exhausted messages are "deleted permanently."
+
+**Vercel Cron doesn't retry.** The [docs say it plainly](https://vercel.com/docs/cron-jobs/manage-cron-jobs): "Vercel will not retry an invocation if a cron job fails." Delivery is best-effort: a scheduled run can be silently missed on a transient network error, and can occasionally fire twice, so Vercel's own guidance is to design cron handlers as idempotent reconciliation jobs. **Vercel Queues** is different: queue messages [do retry](https://vercel.com/docs/queues/concepts#retries), until the message TTL expires (first 32 attempts at your configured delay, then forced backoff), but there's no dead-letter queue on either product; for queues you detect poison messages in code, for crons you find out from the logs.
+
+**Inngest and Trigger.dev** handle failure at the function level: 4 retries (Inngest) or 3 attempts (Trigger.dev) by default, an `onFailure` hook when retries are exhausted, and dashboard tooling to bulk-replay failed runs after you ship a fix. That replay workflow is a real advantage the raw queues don't offer.
+
+## How long can a job wait?
+
+Delays sound like a detail until you need one. "Send the trial-expiry email in 30 days" or "charge the renewal in a year" are one-line jobs on some of these systems and impossible on others:
+
+- **SQS** message timers cap at **15 minutes**.
+- **Cloudflare Queues** delays cap at **24 hours**.
+- **Vercel Queues** caps at **7 days** (and no more than the message TTL).
+- **Google Cloud Tasks** schedules up to **30 days** ahead.
+- **QStash** delays up to 7 days on the free plan, **1 year** on pay-as-you-go, and without limit on fixed plans, via a [`delay` or `notBefore`](https://upstash.com/docs/qstash/features/delay) on the message.
+- **Inngest** can `step.sleep` up to a year, and **Trigger.dev** waits have no documented cap, but in both cases the wait lives inside a durable function run, not on a standalone message.
+
+If long delays are the workload, the field narrows to three fast.
+
+## Cron without a server
+
+Scheduled tasks are the other half of the background-job problem, and serverless platforms each ship a cron with different fine print:
+
+| Service | Granularity | Retries on failure | Can it call any URL? | Price |
+| --- | --- | --- | --- | --- |
+| QStash Schedules | 1 minute, `CRON_TZ` timezones | Full message retries + DLQ | **Yes** | Billed as messages; 10 schedules free, 1,000 on PAYG |
+| Vercel Cron | Hobby: once/day, fires within a ±59-min window; Pro: 1 minute | [**None**](https://vercel.com/docs/cron-jobs/manage-cron-jobs) | Own deployment path only | Included; runs bill as function usage |
+| Cloudflare Cron Triggers | 1 minute, UTC only | Failure log only | Own Workers only | 5 triggers free, 250 on Paid |
+| Google Cloud Scheduler | Unix-cron | Max **5** retry attempts | Yes, with OIDC | $0.10 per job/month, 3 free per billing account |
+| AWS EventBridge Scheduler | Cron + rate + one-time | 185 attempts over 24h, DLQ | AWS targets; external HTTP needs an API-destination chain with a 5-second response timeout | $1/M invocations after 14M free |
+| Inngest | 1 minute, `TZ=` timezones | Function retries (4 by default) + `onFailure` | Inngest functions in your app, not arbitrary URLs | Included; runs bill as executions |
+| Trigger.dev | 1 minute (no seconds), IANA timezones with DST | Task retries (3 attempts by default) | Trigger.dev tasks on their infrastructure | 10 schedules free, 100 on Hobby, 1,000 on Pro |
+
+Platform crons (Vercel, Cloudflare) are the easiest to turn on and the weakest on failure: Vercel's doesn't retry at all, and on the Hobby plan a "1:00 AM" cron fires anywhere between 1:00 and 1:59. The cloud crons retry but come with ecosystem strings: EventBridge Scheduler natively targets AWS services, and reaching an external URL means wiring a connection, an API destination, and a Secrets Manager secret, with a 5-second timeout on the call. Cloud Scheduler is simple and cheap but tops out at 5 retries.
+
+A [QStash schedule](https://upstash.com/docs/qstash/features/schedules) is just a message published on a cron expression, so every trigger gets the full delivery pipeline: retries, DLQ, callbacks, any URL, IANA timezones via `CRON_TZ`. A common setup on Vercel is to keep the cron logic in your API routes and let QStash trigger them, which closes both the precision and reliability gaps of Hobby-plan crons.
+
+Inngest and Trigger.dev sit in a third group: their crons are solid (timezone-aware, with real retries) but the target has to be code wired into their SDK. An Inngest cron does run in your own app (Inngest calls your serve endpoint on the schedule), just only for functions defined with their SDK; a Trigger.dev cron runs a task on their machines. Neither can be pointed at an existing plain endpoint or a third-party URL the way a QStash schedule can. One Trigger.dev feature deserves a mention: schedules can be created per tenant at runtime, for "every customer picks their own report time" features. QStash covers the same pattern with schedule creation over its REST API.
+
+## Can you rate-limit outgoing deliveries?
+
+This one comes from a specific, common scenario: the jobs call something rate-limited. A third-party API with a 10-requests-per-second cap, a customer's webhook endpoint that falls over under burst, an LLM provider with concurrency limits.
+
+QStash handles this with [flow control](https://upstash.com/docs/qstash/features/flowcontrol) on publish: a key plus a `rate` (calls per period) and/or `parallelism` (max concurrent deliveries). Keys are arbitrary, so "one limit per customer" is just using the customer ID as the key:
+
+```ts
+await client.publishJSON({
+  url: customer.webhookUrl,
+  body: payload,
+  flowControl: { key: customer.id, rate: 10, period: 60, parallelism: 2 },
+});
+```
+
+Messages beyond the limit queue up instead of failing. Combined with retries, the DLQ, and [signed deliveries](https://upstash.com/docs/qstash/howto/signature), this covers most of what dedicated webhook-delivery services sell.
+
+Elsewhere: Cloud Tasks has real dispatch controls (`maxDispatchesPerSecond`, `maxConcurrentDispatches`) but at the queue level, so per-tenant limits mean a queue per tenant. Inngest has the richest per-function controls of the group: keyed concurrency, throttling, rate limiting, debounce. Trigger.dev has keyed concurrency limits but no built-in rate-based limiter. SNS offers an average-rate delivery throttle, and SQS, Cloudflare Queues, and the platform crons leave it to your consumer.
+
+QStash also does [deduplication](https://upstash.com/docs/qstash/features/deduplication) at publish time, by explicit ID or by content hash within a 10-minute window, which is the cheap insurance against double-firing producers.
+
+## What about multi-step workflows?
+
+Everything above is single messages: one job, one delivery, retries until it works. The moment one job becomes a chain (call the LLM, wait for a webhook, then charge the card, with state carried across steps and sleeps in between) you're in durable-workflow territory: Temporal, Inngest, Trigger.dev, Cloudflare Workflows, AWS Step Functions, and [Upstash Workflow](https://upstash.com/docs/workflow/getstarted), which is built on top of QStash and brings the same HTTP-native model to multi-step functions. That category deserves its own comparison, and we wrote one: [Durable Workflow Engines in 2026: Every Major Option Compared](https://upstash.com/blog/durable-workflow-engines-compared-every-major-option-in-2026). For a taste of the model, see [how to add durable functions to a Next.js app](https://upstash.com/blog/durable-functions-nextjs).
+
