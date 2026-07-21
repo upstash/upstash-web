@@ -3,20 +3,27 @@
 import Bg from "@/components/bg";
 import Container from "@/components/container";
 import { LogoBranch } from "@/components/customers/logo-branch";
+import { LogoClay } from "@/components/customers/logo-clay";
 import { LogoClickfunnels } from "@/components/customers/logo-clickfunnels";
+import { LogoCodeRabbit } from "@/components/customers/logo-coderabbit";
+import { LogoCoinbase } from "@/components/customers/logo-coinbase";
 import { LogoCustomerio } from "@/components/customers/logo-customerio";
 import { LogoDropee } from "@/components/customers/logo-dropee";
 import { LogoDubsh } from "@/components/customers/logo-dubsh";
+import { LogoFal } from "@/components/customers/logo-fal";
 import { LogoFly } from "@/components/customers/logo-fly";
 import { LogoGitbook } from "@/components/customers/logo-gitbook";
 import { LogoHashnode } from "@/components/customers/logo-hashnode";
 import { LogoHumata } from "@/components/customers/logo-humata";
 import { LogoMaker } from "@/components/customers/logo-maker";
+import { LogoMeta } from "@/components/customers/logo-meta";
 import { LogoMidjourney } from "@/components/customers/logo-midjourney";
 import { LogoOkara } from "@/components/customers/logo-okara";
 import { LogoOpenart } from "@/components/customers/logo-openart";
+import { LogoOpencode } from "@/components/customers/logo-opencode";
 import { LogoOpenrouter } from "@/components/customers/logo-openrouter";
 import { LogoPaulSmith } from "@/components/customers/logo-paul-smith";
+import { LogoPolymarket } from "@/components/customers/logo-polymarket";
 import { LogoSupabase } from "@/components/customers/logo-supabase";
 import { LogoVercel } from "@/components/customers/logo-vercel";
 import { LogoZapier } from "@/components/customers/logo-zapier";
@@ -29,7 +36,7 @@ import cx from "@/utils/cx";
 import Autoplay from "embla-carousel-autoplay";
 import useEmblaCarousel from "embla-carousel-react";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { ComponentType, SVGProps, useCallback, useEffect, useState } from "react";
 
 export default function HomeHeroCustomer() {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
@@ -135,27 +142,23 @@ export default function HomeHeroCustomer() {
           </div>
         </div>
 
-        {/* CARDS */}
-        <div
-          className={cx(
-            "mt-16 flex flex-wrap justify-center gap-2 rounded-2xl px-4 md:mt-16 md:gap-6",
-          )}
-        >
-          {customers.slice(0, 10).map(({ name, icon, slug }) => {
+        {/* LOGO GRID — 3 rows of 5, testimonials clickable, rest static */}
+        <div className="mx-auto mt-16 grid max-w-[960px] grid-cols-2 gap-2 xs:grid-cols-3 md:mt-24 md:grid-cols-5 md:gap-3">
+          {logos.map(({ name, Logo, slug, h = 24 }) => {
             const cell = (
               <div
                 className={cx(
-                  "group flex h-[72px] w-[180px] flex-col items-center justify-center",
+                  "group flex h-[72px] w-full items-center justify-center px-4",
                   "rounded-2xl bg-bg-mute transition-colors md:rounded-4xl dark:bg-bg-mute",
                   slug &&
                     "transition-all hover:text-primary hover:shadow-sm dark:hover:bg-white",
                 )}
               >
-                {icon}
+                <Logo style={{ height: h }} className="w-auto max-w-full" />
               </div>
             );
             return slug ? (
-              <Link key={name} href={`/customers/${slug}`}>
+              <Link key={name} href={`/customers/${slug}`} aria-label={name}>
                 {cell}
               </Link>
             ) : (
@@ -163,16 +166,47 @@ export default function HomeHeroCustomer() {
             );
           })}
         </div>
-        <Link
-          href={"/customers"}
-          className="block pt-8 text-xl font-semibold underline"
-        >
-          and many more...
-        </Link>
+
+        <div className="mt-8 flex justify-center">
+          <Link
+            href={"/customers"}
+            className="text-lg font-semibold underline underline-offset-4 transition-colors hover:text-primary"
+          >
+            Read case studies →
+          </Link>
+        </div>
       </Container>
     </section>
   );
 }
+
+// Homepage logo wall — 3 rows of 5. `slug` marks a customer story (clickable).
+// Every logo shares one height in the grid; `cn` nudges optical size per logo.
+const logos: {
+  name: string;
+  Logo: ComponentType<SVGProps<SVGSVGElement>>;
+  slug?: string;
+  h?: number;
+}[] = [
+  // Row 1 — immediate, broadly recognizable trust
+  { name: "Meta", Logo: LogoMeta, h: 20 },
+  { name: "Coinbase", Logo: LogoCoinbase, h: 19 },
+  { name: "Vercel", Logo: LogoVercel, h: 22 },
+  { name: "Supabase", Logo: LogoSupabase, slug: "supabase", h: 24 },
+  { name: "Midjourney", Logo: LogoMidjourney, h: 30 },
+  // Row 2 — established companies plus industry variety
+  { name: "Zapier", Logo: LogoZapier, slug: "zapier", h: 24 },
+  { name: "GitBook", Logo: LogoGitbook, slug: "gitbook", h: 23 },
+  { name: "Polymarket", Logo: LogoPolymarket, h: 22 },
+  { name: "Fly.io", Logo: LogoFly, h: 24 },
+  { name: "Paul Smith", Logo: LogoPaulSmith, slug: "paul-smith", h: 22 },
+  // Row 3 — current AI and developer-platform credibility
+  { name: "Clay", Logo: LogoClay, h: 30 },
+  { name: "fal", Logo: LogoFal, h: 24 },
+  { name: "OpenRouter", Logo: LogoOpenrouter, h: 22 },
+  { name: "CodeRabbit", Logo: LogoCodeRabbit, h: 22 },
+  { name: "OpenCode", Logo: LogoOpencode, h: 20 },
+];
 
 const customers = [
   {
