@@ -92,7 +92,7 @@ This is where the options separate. Failure handling is the whole reason to use 
 
 **Cloudflare Queues** retries 3 times by default (up to 100). A DLQ exists but is off by default, and the docs are direct about the consequence: without one, exhausted messages are "deleted permanently."
 
-**Vercel Cron doesn't retry.** The docs say it plainly: "Vercel will not retry an invocation if a cron job fails." Delivery is best-effort: a scheduled run can be silently missed on a transient network error, and can occasionally fire twice, so Vercel's own guidance is to design cron handlers as idempotent reconciliation jobs. **Vercel Queues** retries until the message TTL expires (first 32 attempts at your configured delay, then forced backoff) but explicitly has no dead-letter queue; you detect poison messages in code.
+**Vercel Cron doesn't retry.** The [docs say it plainly](https://vercel.com/docs/cron-jobs/manage-cron-jobs): "Vercel will not retry an invocation if a cron job fails." Delivery is best-effort: a scheduled run can be silently missed on a transient network error, and can occasionally fire twice, so Vercel's own guidance is to design cron handlers as idempotent reconciliation jobs. **Vercel Queues** is different: queue messages [do retry](https://vercel.com/docs/queues/concepts#retries), until the message TTL expires (first 32 attempts at your configured delay, then forced backoff), but there's no dead-letter queue on either product; for queues you detect poison messages in code, for crons you find out from the logs.
 
 **Inngest and Trigger.dev** handle failure at the function level: 4 retries (Inngest) or 3 attempts (Trigger.dev) by default, an `onFailure` hook when retries are exhausted, and dashboard tooling to bulk-replay failed runs after you ship a fix. That replay workflow is a real advantage the raw queues don't offer.
 
@@ -116,7 +116,7 @@ Scheduled tasks are the other half of the background-job problem, and serverless
 | Service | Granularity | Retries on failure | Can it call any URL? | Price |
 | --- | --- | --- | --- | --- |
 | QStash Schedules | 1 minute, `CRON_TZ` timezones | Full message retries + DLQ | **Yes** | Billed as messages; 10 schedules free, 1,000 on PAYG |
-| Vercel Cron | Hobby: once/day, fires within a ±59-min window; Pro: 1 minute | **None** | Own deployment path only | Included; runs bill as function usage |
+| Vercel Cron | Hobby: once/day, fires within a ±59-min window; Pro: 1 minute | [**None**](https://vercel.com/docs/cron-jobs/manage-cron-jobs) | Own deployment path only | Included; runs bill as function usage |
 | Cloudflare Cron Triggers | 1 minute, UTC only | Failure log only | Own Workers only | 5 triggers free, 250 on Paid |
 | Google Cloud Scheduler | Unix-cron | Max **5** retry attempts | Yes, with OIDC | $0.10 per job/month, 3 free per billing account |
 | AWS EventBridge Scheduler | Cron + rate + one-time | 185 attempts over 24h, DLQ | AWS targets; external HTTP needs an API-destination chain with a 5-second response timeout | $1/M invocations after 14M free |
