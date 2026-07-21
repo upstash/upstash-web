@@ -7,7 +7,7 @@ import { IntercomWrapper } from "@/components/intercom-wrapper";
 import Footer from "@/components/master/footer";
 import Header from "@/components/master/header";
 import HeaderMobile from "@/components/master/header-mobile";
-import { SITE_URL } from "@/utils/const";
+import { GA_MEASUREMENT_ID, SITE_URL } from "@/utils/const";
 import cx from "@/utils/cx";
 import { Inter, Inter_Tight, JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
@@ -62,7 +62,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <>
               <Script
                 strategy="afterInteractive"
-                src={`https://www.googletagmanager.com/gtag/js?id=G-QW5KRSTDM0`}
+                src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
               />
               <Script
                 id="ga"
@@ -71,7 +71,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   __html: ` window.dataLayer = window.dataLayer || [];
                           function gtag(){ dataLayer.push(arguments); }
                           gtag('js', new Date());
-                          gtag('config', 'G-QW5KRSTDM0');`,
+                          gtag('config', '${GA_MEASUREMENT_ID}');`,
                 }}
               />
               <Script

@@ -31,11 +31,12 @@ export default function SectionWhatIs() {
             instantly.
           </p>
           <p>
-            <strong>Upstash</strong> runs Redis as a serverless database, so
-            there is nothing to provision and no failover to manage. You create
-            a database in seconds, connect over HTTP or the Redis protocol, and
-            pay only for the requests you make. Databases can be replicated
-            across regions for high availability close to your users.
+            <strong>Upstash</strong> runs Redis as a fully managed, serverless
+            database in the cloud, so there is nothing to provision and no
+            failover to manage. You create a cloud Redis database in seconds,
+            connect over HTTP or the Redis protocol, and pay only for the
+            requests you make. Databases can be replicated across regions for
+            high availability close to your users.
           </p>
         </div>
       </Container>

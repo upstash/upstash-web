@@ -3,7 +3,7 @@ import Button from "@/components/button";
 import Container from "@/components/container";
 import IconRedis from "@/components/icon-redis";
 import cx from "@/utils/cx";
-import { IconNotes, IconPlus } from "@tabler/icons-react";
+import { IconNotes, IconPlus, IconTag } from "@tabler/icons-react";
 import Link from "next/link";
 
 export default function SectionHero() {
@@ -23,16 +23,16 @@ export default function SectionHero() {
           >
             <IconRedis className="size-12 shrink-0 md:size-20" />
             <span>
-              <span className="block">Serverless</span>
-              <span className="block">Redis Database</span>
+              <span className="block">Serverless Redis</span>
+              <span className="block">in the Cloud</span>
             </span>
           </h1>
 
           <p className="mt-6 max-w-2xl text-balance text-lg text-text-mute md:text-2xl">
-            Upstash runs Redis as a fully managed, serverless database with
-            single-digit millisecond latency and durable storage. You pay only
-            for what you use, and there are no servers to run. Connect over HTTP
-            or the standard Redis protocol.
+            Upstash runs Redis in the cloud as a fully managed, serverless
+            database with single-digit millisecond latency and durable storage.
+            You pay only for what you use, and there are no servers to run.
+            Connect over HTTP or the standard Redis protocol (TCP).
           </p>
 
           <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
@@ -51,6 +51,7 @@ export default function SectionHero() {
             <Link href="/pricing/redis">
               <Button variant="default" className="h-[42px] px-5">
                 View Pricing
+                <IconTag size={24} />
               </Button>
             </Link>
           </div>

@@ -13,9 +13,8 @@ This raises an important question:
 > **How well can a coding assistant stay up to date and accurate without internet access?**
 
 To answer this, we benchmarked the same language model in an internet-isolated environment under two configurations:
-
 * **Static model knowledge only** — no internet access, web search, or documentation retrieval.
-* **Context7** — the same model with access to only Context7.
+* **Context7** — the same model with access to only locally served Context7 documentation.
 
 
 ---
@@ -24,7 +23,7 @@ To answer this, we benchmarked the same language model in an internet-isolated e
 
 Both systems had the exact same conditions:
 
-* Claude Sonnet 4.5 as the model
+* Claude Sonnet 4.5 as the model (training data cutoff: July 2025; reliable knowledge cutoff: January 2025)
 * Identical prompts except for telling the LLM to 
     * "Answer only with your own knowledge. Don't use search or MCP."
     * "Use Context7 for library documentation."
@@ -48,16 +47,18 @@ Questions were specifically selected to target APIs, patterns, and libraries tha
 * Same isolated environment
 * Only Context7 documentation available
 
+**How can Context7 work without internet access?** Context7 Enterprise supports [importing documentation](https://context7.com/docs/enterprise/library-import) directly into an organization's environment, where it is stored and served locally. Retrieval happens entirely inside the network — no outbound requests at query time. For this benchmark, all documentation was imported ahead of time, so the Context7 configuration ran just as internet-isolated as the baseline.
+
 ---
 
 ## Benchmark categories
 
-The benchmark contains **50 questions** divided into five categories.
+The benchmark contains **50 questions** divided into five categories. The full question set, including the responses from both configurations and the evaluation notes, is [available as an appendix](/blog/context7-vs-static-llm-knowledge/benchmark-questions.md).
 
 | Category            | Purpose                                          |
 | ------------------- | ------------------------------------------------ |
 | Evolving libraries  | Frequently updated libraries with recent API changes |
-| Niche libraries     | Less common libraries with limited documentation   |
+| Emerging libraries  | Newer or specialized libraries underrepresented in training data |
 | Popular libraries   | Widely used mainstream libraries           |
 | Unspecified queries | Library name omitted from the prompt               |
 | Multiple libraries  | Projects combining multiple libraries    |
@@ -66,7 +67,9 @@ The benchmark contains **50 questions** divided into five categories.
 
 ## Evaluation metrics
 
-Each response was evaluated using the following criteria:
+Each response was evaluated by a separate agent — Claude Code running Opus 4.8 — which compared the generated code against the latest official documentation and ran the generated projects to verify they worked. Note that the evaluating model is different from (and more capable than) the benchmarked model. All verdicts were then reviewed by a human.
+
+Each response was scored on the following criteria:
 
 * **Runnable:** The generated code compiles or executes successfully without syntax, compilation, or runtime errors.
 * **Current documentation compliance:** The response follows the latest official documentation and recommended APIs available at the time of the benchmark.
@@ -98,6 +101,7 @@ The largest difference was not hallucination, it was stale knowledge. The baseli
 | **Functional Errors**              |        **43** |       **1** |
 | **Refusals**                       |         **8** |       **0** |
 
+A note on reading these numbers: this benchmark deliberately measures the failure zone. Questions were selected to target APIs and libraries that changed after the model's training cutoff — so the baseline's 100% documentation-failure rate is expected by construction, not a claim that static models are always wrong. Plenty of everyday tasks touch stable APIs where built-in knowledge works fine. What the benchmark shows is how the model behaves precisely where its knowledge has aged out — and that zone isn't fixed: every library upgrade and every month past the training cutoff moves more of a real codebase into it.
 
 ---
 
@@ -124,9 +128,9 @@ The only minor issue observed was a single response that used the legacy `web_se
 
 ---
 
-### Niche libraries
+### Emerging libraries
 
-This category covered less common libraries with limited documentation, such as Notte, Mastra, Trigger.dev, Inngest, Effect, ElectricSQL, and others.
+This category covered newer or more specialized libraries such as Notte, Mastra, Trigger.dev, Inngest, Effect, ElectricSQL, and others. Most of these are actively maintained and well documented — but they appear far less frequently in training data than mainstream frameworks, so the model has comparatively little built-in knowledge of them.
 
 The failure pattern changed completely. Instead of hallucinating, the baseline model simply lacked sufficient knowledge.
 
@@ -246,7 +250,7 @@ This benchmark evaluates exactly that scenario.
 
 ## Conclusion
 
-Without access to current documentation, LLMs in air-gapped environments will silently fall behind — their knowledge frozen at the model's training cutoff. In the best case, they generate code that still runs but no longer follows current best practices, recommended APIs or, newly introduced features. In the worst case, they lack enough knowledge to answer at all and refuse outright.
+These results come from the slice of development work where static knowledge is weakest — questions chosen because the underlying libraries changed after training. That slice is exactly what grows over time: without access to current documentation, LLMs in air-gapped environments silently fall behind — their knowledge frozen at the training cutoff. In the best case, they generate code that still runs but no longer follows current best practices, recommended APIs, or newly introduced features. In the worst case, they lack enough knowledge to answer at all and refuse outright.
 
 To stay current without Context7, teams would need to manually track library changes, curate documentation, and feed updates into the model themselves. Context7 acts as a hub for up-to-date documentation and releases developers from that work entirely.
 
@@ -262,3 +266,9 @@ This benchmark focuses on answer quality in internet-isolated environments. If y
 
 * [**Context7 vs Claude Code's Web Search: A Token and Cost Benchmark**](https://upstash.com/blog/context7-vs-web-search-benchmark) — compares retrieval cost, token usage, and tool calls.
 * [**Why Web Search Fails AI Agents (and What Context7 Fixes)**](https://upstash.com/blog/c7-vs-web-search) — explains the design differences between curated documentation retrieval and general web search.
+
+---
+
+## Appendix
+
+The complete benchmark material is available for review: [**Benchmark questions and responses**](/blog/context7-vs-static-llm-knowledge/benchmark-questions.md) — all 50 questions with the responses generated by both configurations and the evaluation notes for each.

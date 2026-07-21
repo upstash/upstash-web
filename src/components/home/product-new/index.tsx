@@ -8,7 +8,12 @@ import { HeroTabVector } from "@/components/home/hero/hero-tab-vector";
 import { HeroTabWorkflow } from "@/components/home/hero/hero-tab-workflow";
 import cx from "@/utils/cx";
 import { Product } from "@/utils/type";
-import { IconArrowUpRight, IconNotes, IconPlus } from "@tabler/icons-react";
+import {
+  IconArrowRight,
+  IconArrowUpRight,
+  IconNotes,
+  IconPlus,
+} from "@tabler/icons-react";
 import Link from "next/link";
 import React, { useState } from "react";
 import { HeroTabBox } from "../hero/hero-tab-box";
@@ -18,7 +23,7 @@ const UPSTASH_SKILL_COMMAND =
 
 const taglines = {
   [Product.REDIS]: {
-    title: "Low-latency, serverless Redis in the cloud",
+    title: "Serverless Redis in the cloud with low latency and durable storage",
     docsLink: "https://upstash.com/docs/redis",
     consoleLink: "https://console.upstash.com/redis",
   },
@@ -61,7 +66,8 @@ const HeroProductTagline = ({ activeProduct }: { activeProduct: Product }) => {
         {activeProduct === Product.REDIS && (
           <Link href="/redis">
             <Button variant={"default"} className="h-[42px] px-5">
-              Learn more
+              Explore Redis
+              <IconArrowRight size={24} />
             </Button>
           </Link>
         )}

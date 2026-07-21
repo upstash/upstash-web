@@ -21,6 +21,14 @@
       "destination": "https://upstash.com/docs/vector"
     },
     {
+      "source": "/box",
+      "destination": "https://upstash.com/docs/box"
+    },
+    {
+      "source": "/box/:path*",
+      "destination": "https://upstash.com/docs/box/:path*"
+    },
+    {
       "source": "/edge",
       "destination": "https://upstash.com/docs/redis/features/globaldatabase"
     },

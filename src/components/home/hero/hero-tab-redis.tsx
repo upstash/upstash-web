@@ -66,7 +66,7 @@ export function HeroTabRedis() {
 
       <HeroTabFeatureCont>
         <HeroTabFeatureTitle>
-          Durable, <br className="hidden sm:block" /> Persistent Storage
+          Persistent Redis, <br className="hidden sm:block" /> In-Memory Speed
         </HeroTabFeatureTitle>
         <HeroTabFeatureUl>
           <HeroTabFeatureLi>

@@ -1,5 +1,7 @@
 export const SITE_URL = "https://upstash.com";
 
+export const GA_MEASUREMENT_ID = "G-QW5KRSTDM0";
+
 export const BANNED_TAGS = [
   "undefined",
   "upstash",
