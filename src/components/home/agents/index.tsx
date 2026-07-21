@@ -122,7 +122,7 @@ export default function HomeAgents() {
                 </p>
 
                 <AgentCardLink href="https://upstash.com/docs/agent-resources/skills">
-                  Explore Skills
+                  Explore Upstash Skills
                 </AgentCardLink>
               </div>
 
@@ -169,7 +169,7 @@ export default function HomeAgents() {
             </p>
 
             <AgentCardLink href="https://upstash.com/docs/agent-resources/mcp">
-              Set up MCP
+              Set up the Upstash MCP Server
             </AgentCardLink>
           </AgentCard>
 
@@ -189,7 +189,7 @@ export default function HomeAgents() {
             </div>
 
             <AgentCardLink href="https://upstash.com/docs/agent-resources/cli">
-              Explore the CLI
+              Explore the Upstash CLI
             </AgentCardLink>
           </AgentCard>
         </div>
