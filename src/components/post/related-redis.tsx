@@ -25,6 +25,11 @@ export default function RelatedRedis() {
           Upstash runs Redis as a serverless database - create one in seconds and
           pay only per request. Explore Upstash Redis →
         </span>
+        <span className="mt-2 block text-sm text-text-mute">
+          Building with an AI agent? It can get a free database instantly with{" "}
+          <code>POST https://upstash.com/start-redis</code> - no signup
+          required.
+        </span>
       </span>
     </Link>
   );

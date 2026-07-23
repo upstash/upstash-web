@@ -9,6 +9,8 @@ import cx from "@/utils/cx";
 const INSTALL_COMMAND =
   "npx skills add https://github.com/upstash/skills --skill upstash";
 
+const START_REDIS_COMMAND = "curl -X POST https://upstash.com/start-redis";
+
 export default function SectionSkills() {
   return (
     <section className="relative py-10 md:py-20">
@@ -41,6 +43,31 @@ export default function SectionSkills() {
             View the Upstash skills on GitHub
           </OutLink>
         </div>
+
+        <PageHeaderDesc className="mt-12">
+          Your agent can also create a free Redis database instantly - no
+          signup or authentication required:
+        </PageHeaderDesc>
+
+        <div
+          className={cx(
+            "mx-auto mt-6 flex w-fit max-w-full items-center gap-4 overflow-x-auto",
+            "rounded-2xl border-2 border-bg-mute bg-bg-mute py-4 pl-5 pr-8",
+          )}
+        >
+          <code className="whitespace-nowrap text-left font-mono text-sm text-text md:text-base">
+            {START_REDIS_COMMAND}
+          </code>
+          <CopyButton
+            code={START_REDIS_COMMAND}
+            className="shrink-0 text-text-mute hover:text-primary"
+          />
+        </div>
+
+        <p className="mt-4 text-center text-sm text-text-mute">
+          The response is markdown with credentials and a quickstart. Unclaimed
+          databases are deleted after 3 days.
+        </p>
       </Container>
     </section>
   );

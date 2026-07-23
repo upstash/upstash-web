@@ -26,6 +26,11 @@ export const REDIS_FAQ = [
       "Yes. Upstash Redis is a strong fit for AI agents and agentic development. The HTTP REST API works from any runtime without connection pools, the SDKs are small and easy to call, and you can create a database in seconds and pay only per request. Agents can store short-term and long-term memory, cache results, and coordinate work without any infrastructure setup. You can also add the Upstash skill to your coding agent so it knows how to use Redis correctly.",
   },
   {
+    question: "Can I get a Redis database without signing up?",
+    answer:
+      "Yes. Send a POST request to https://upstash.com/start-redis and you get a free Redis database instantly - no signup or authentication required. The response is markdown with credentials and a quickstart, so AI agents can start using it right away. The database is deleted after 3 days unless you claim it from the console link in the response.",
+  },
+  {
     question: "Is Upstash Redis fully managed?",
     answer:
       "Yes. Upstash handles provisioning, replication, durability, backups, and scaling. You get a global, highly available Redis database without operating any servers.",
