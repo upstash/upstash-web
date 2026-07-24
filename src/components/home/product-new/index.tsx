@@ -17,45 +17,14 @@ import {
 import Link from "next/link";
 import React, { useState } from "react";
 import { HeroTabBox } from "../hero/hero-tab-box";
+import { PRODUCT_TAGLINES } from "./product-features";
+import ProductSeoData from "./product-seo-data";
 
 const UPSTASH_SKILL_COMMAND =
   "npx skills add https://github.com/upstash/skills --skill upstash";
 
-const taglines = {
-  [Product.REDIS]: {
-    title: "Serverless Redis in the cloud with low latency and durable storage",
-    docsLink: "https://upstash.com/docs/redis",
-    consoleLink: "https://console.upstash.com/redis",
-  },
-  [Product.VECTOR]: {
-    title: "Serverless Vector database for high-performance search at scale",
-    docsLink: "https://upstash.com/docs/vector",
-    consoleLink: "https://console.upstash.com/vector",
-  },
-  [Product.QSTASH]: {
-    title: "Serverless messaging and scheduling via HTTP",
-    docsLink: "https://upstash.com/docs/qstash",
-    consoleLink: "https://console.upstash.com/qstash",
-  },
-  [Product.WORKFLOW]: {
-    title: "Durable, reliable and performant serverless functions",
-    docsLink: "https://upstash.com/docs/workflow",
-    consoleLink: "https://console.upstash.com/workflow",
-  },
-  [Product.SEARCH]: {
-    title: "Serverless AI search at scale",
-    docsLink: "https://upstash.com/docs/search",
-    consoleLink: "https://console.upstash.com/search",
-  },
-  [Product.BOX]: {
-    title: "Secure cloud containers for AI agents",
-    docsLink: "https://upstash.com/docs/box",
-    consoleLink: "https://console.upstash.com/box",
-  },
-} as const;
-
 const HeroProductTagline = ({ activeProduct }: { activeProduct: Product }) => {
-  const { title, docsLink, consoleLink } = taglines[activeProduct];
+  const { title, docsLink, consoleLink } = PRODUCT_TAGLINES[activeProduct];
 
   return (
     <div className="mb-8 flex flex-col items-center gap-4 py-4">
@@ -145,6 +114,8 @@ export default function HomeProductNew() {
             {activeProduct === Product.BOX && <HeroTabBox />}
           </div>
         </div>
+
+        <ProductSeoData />
       </Container>
     </section>
   );
