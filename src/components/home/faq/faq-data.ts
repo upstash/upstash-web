@@ -28,7 +28,7 @@ export const HOME_FAQ = [
       "Yes. Upstash Redis is API-compatible with Redis and works with standard Redis clients over the Redis protocol, as well as a built-in HTTP REST API that works from serverless and edge runtimes without connection pooling.",
   },
   {
-    question: "Can I get an Upstash database without authentication?",
+    question: "Can I get an Upstash Redis database without authentication?",
     answer:
       "Yes. A free Redis database is available via a POST request to https://upstash.com/start-redis - no signup or API key required. The response is markdown with credentials and a quickstart, designed for AI agents. The database can later be claimed into an account from the console link in the response.",
   },

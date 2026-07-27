@@ -23,7 +23,9 @@ export default function RelatedRedis() {
         </span>
         <span className="mt-1 block text-text-mute">
           Building with an AI agent? It can create a free database instantly with
-          a POST to upstash.com/start-redis - no signup required.
+          a POST to{" "}
+          <code className="font-mono">https://upstash.com/start-redis</code> - no
+          signup required.
         </span>
         <span className="mt-2 block text-text-mute">
           Upstash runs Redis as a serverless database - create one in seconds and
