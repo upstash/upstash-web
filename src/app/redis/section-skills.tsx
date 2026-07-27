@@ -18,25 +18,13 @@ export default function SectionSkills() {
 
       <Container className="max-w-screen-md">
         <PageHeaderTitle as="h2">Build Redis with your AI agent</PageHeaderTitle>
+
         <PageHeaderDesc className="mt-3">
           Install the Upstash skill so Claude Code, Cursor, and other coding
           agents know how to build with Upstash Redis and every Upstash SDK.
         </PageHeaderDesc>
 
-        <div
-          className={cx(
-            "mx-auto mt-10 flex w-fit max-w-full items-center gap-4 overflow-x-auto",
-            "rounded-2xl border-2 border-bg-mute bg-bg-mute py-4 pl-5 pr-8",
-          )}
-        >
-          <code className="whitespace-nowrap text-left font-mono text-sm text-text md:text-base">
-            {INSTALL_COMMAND}
-          </code>
-          <CopyButton
-            code={INSTALL_COMMAND}
-            className="shrink-0 text-text-mute hover:text-primary"
-          />
-        </div>
+        <CommandBlock className="mt-8" command={INSTALL_COMMAND} />
 
         <div className="mt-6 flex justify-center">
           <OutLink href="https://github.com/upstash/skills">
@@ -44,31 +32,42 @@ export default function SectionSkills() {
           </OutLink>
         </div>
 
-        <PageHeaderDesc className="mt-12">
-          Your agent can also create a free Redis database instantly - no
-          signup or authentication required:
+        <PageHeaderDesc className="mt-14 text-pretty">
+          Your agent can also create a free Redis database instantly with the{" "}
+          <code className="font-mono">start-redis</code> endpoint - no signup or
+          authentication required. It
+          gets back credentials and a quickstart in markdown, and unclaimed
+          databases are deleted after 3 days.
         </PageHeaderDesc>
 
-        <div
-          className={cx(
-            "mx-auto mt-6 flex w-fit max-w-full items-center gap-4 overflow-x-auto",
-            "rounded-2xl border-2 border-bg-mute bg-bg-mute py-4 pl-5 pr-8",
-          )}
-        >
-          <code className="whitespace-nowrap text-left font-mono text-sm text-text md:text-base">
-            {START_REDIS_COMMAND}
-          </code>
-          <CopyButton
-            code={START_REDIS_COMMAND}
-            className="shrink-0 text-text-mute hover:text-primary"
-          />
-        </div>
-
-        <p className="mt-4 text-center text-sm text-text-mute">
-          The response is markdown with credentials and a quickstart. Unclaimed
-          databases are deleted after 3 days.
-        </p>
+        <CommandBlock className="mt-8" command={START_REDIS_COMMAND} />
       </Container>
     </section>
+  );
+}
+
+function CommandBlock({
+  command,
+  className,
+}: {
+  command: string;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cx(
+        "mx-auto flex w-fit max-w-full items-center gap-4 overflow-x-auto",
+        "rounded-2xl border-2 border-bg-mute bg-bg-mute py-4 pl-5 pr-8",
+        className,
+      )}
+    >
+      <code className="whitespace-nowrap text-left font-mono text-sm text-text md:text-base">
+        {command}
+      </code>
+      <CopyButton
+        code={command}
+        className="shrink-0 text-text-mute hover:text-primary"
+      />
+    </div>
   );
 }
