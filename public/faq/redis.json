@@ -9,6 +9,10 @@
       "answer": "Free tier includes 256MB data size and 500K commands per month."
     },
     {
+      "question": "Can I get a free Redis database without signing up?",
+      "answer": "Yes. Send a POST request to https://upstash.com/start-redis and you get a free Redis database instantly, with no signup, credit card, or API key. The response is markdown with credentials and a quickstart, so AI agents can start using it right away. The database is deleted after 3 days unless you claim it into your account from the console link in the response. Once claimed, it follows the pricing on this page."
+    },
+    {
       "question": "Are paid databases' first 256MB data and 500K commands free?",
       "answer": "No. Once you upgrade to a paid tier, you will be charged for data size and commands according to that plan."
     },
