@@ -182,24 +182,27 @@ But the real strength is the **tooling around** the sandbox: Blueprints for reus
 
 ---
 
-## 9. Morph Cloud: instant forking for parallel exploration
+## 9. Freestyle: full Linux VMs for long-running agents
 
-[Morph Cloud](https://cloud.morph.so) bets on one striking capability, Infinibranch: snapshot, branch, and restore an entire running environment, files, packages, and process state, in under a second. An agent can fork its current state into many copies that each continue from the exact same point, with nothing to reinstall.
+[Freestyle](https://www.freestyle.sh) is the opposite of the quick "run this snippet" sandboxes: it gives your agent a full, hardware-virtualized Linux VM with its own kernel, nested virtualization (Docker, even KVM inside the VM), and full Linux networking with real root access.
 
-```python
-from morphcloud.api import MorphCloudClient
+It is also built to run for a long time. VMs are persistent, cost nothing while paused, and resume in under 100ms. Snapshots capture the full machine state, and a running VM can be forked in milliseconds without pausing it, so taking snapshots often is cheap. VMs can go up to 64 GB of RAM on demand.
 
-client = MorphCloudClient()
-instance = client.instances.start(snapshot.id)
+```ts
+import { freestyle } from "freestyle";
 
-# fork the live state into parallel copies
-branched = instance.snapshot()
-copies = [client.instances.start(branched.id) for _ in range(4)]
+const { vm } = await freestyle.vms.create();
+
+const result = await vm.exec({ command: "uname -a" });
+console.log(result.stdout);
+
+// grow the same VM as the task grows
+await vm.resize({ cpu: 8, memory: 16, storage: 80 });
 ```
 
-That makes it the natural fit for branch-heavy work other sandboxes handle awkwardly: exploring several solutions at once, parallel test runs, and A/B experiments from one prepared state.
+It also comes with Freestyle Git, an API-first git layer with webhooks and GitHub sync that can clone directly into a VM.
 
-**When to use it:** when your agent needs to branch or explore many paths in parallel from a shared live state, and instant forking is the feature that makes or breaks it.
+**When to use it:** when your agent runs for a long time and needs a real computer, root, its own kernel, Docker, custom networking, rather than a short-lived code runner.
 
 ---
 
@@ -224,7 +227,7 @@ The category looks crowded, but the choice usually comes down to a couple of que
 
 **Do you want a built-in agent or just a place to run code?** If you want the agent, git, and PR flow already wired up, start with **Upstash Box**. If you've already built your own loop and just need somewhere to run code, almost any provider here fits, including Box, which exposes raw shell and file APIs and lets you bring your own harness.
 
-**What's your hardest constraint?** Strong isolation → **E2B** or **Fly.io**. A GPU in the box → **Modal** or **Northflank**. Cold-start speed → **Daytona**. Instant forking → **Morph**. Your existing ecosystem → **Cloudflare** or **Vercel**. Coding-agent tooling and compliance → **Runloop**. Self-hosting → **Northflank**.
+**What's your hardest constraint?** Strong isolation → **E2B** or **Fly.io**. A GPU in the box → **Modal** or **Northflank**. Cold-start speed → **Daytona**. A long-lived VM with root → **Freestyle**. Your existing ecosystem → **Cloudflare** or **Vercel**. Coding-agent tooling and compliance → **Runloop**. Self-hosting → **Northflank**.
 
 **What does the work spend its time doing?** If it mostly *waits* on the model (most agent work does), active-CPU billing, which **Box** and **Vercel Sandbox** both use, saves real money over wall-clock pricing.
 
