@@ -9,7 +9,7 @@ import { REDIS_FAQ } from "@/app/redis/faq";
 import { generateFaqSchema } from "@/utils/structured-schema-generators";
 import { Metadata } from "next";
 
-const title = "Redis Database - Upstash";
+const title = "Redis Database";
 const description =
   "Upstash is a serverless Redis database with low latency, durable storage, and pay-as-you-go pricing. Create a fully managed Redis database in the cloud in seconds.";
 
@@ -29,13 +29,13 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    title,
+    title: `${title} | Upstash`,
     description,
     url: "/redis",
   },
   twitter: {
     card: "summary_large_image",
-    title,
+    title: `${title} | Upstash`,
     description,
   },
 };

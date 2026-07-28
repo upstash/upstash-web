@@ -1,5 +1,49 @@
+import type { ProductFeatureGroup } from "@/components/home/product-new/product-features";
 import cx from "@/utils/cx";
+import { IconCircle1, IconCircle2, IconCircle3 } from "@tabler/icons-react";
 import React from "react";
+
+const BULLET_ICONS = [IconCircle1, IconCircle2, IconCircle3];
+
+/**
+ * Renders a product's feature groups from the shared PRODUCT_FEATURES data.
+ * Used by every hero-tab-*.tsx so the visible tab and the sr-only crawlable
+ * mirror (product-seo-data.tsx) stay in sync from one source of truth.
+ */
+export function HeroTabFeatures({ groups }: { groups: ProductFeatureGroup[] }) {
+  return (
+    <>
+      {groups.map((group, groupIndex) => (
+        <HeroTabFeatureCont key={groupIndex}>
+          <HeroTabFeatureTitle>
+            {group.title.map((line, lineIndex) =>
+              lineIndex === 0 ? (
+                <React.Fragment key={lineIndex}>{line} </React.Fragment>
+              ) : (
+                <React.Fragment key={lineIndex}>
+                  <br className="hidden sm:block" /> {line}
+                </React.Fragment>
+              ),
+            )}
+          </HeroTabFeatureTitle>
+          <HeroTabFeatureUl>
+            {group.bullets.map((bullet, bulletIndex) => {
+              const Icon = BULLET_ICONS[bulletIndex] ?? IconCircle3;
+              return (
+                <HeroTabFeatureLi key={bulletIndex}>
+                  <HeroTabFeatureBullet>
+                    <Icon stroke={1.5} />
+                  </HeroTabFeatureBullet>
+                  {bullet}
+                </HeroTabFeatureLi>
+              );
+            })}
+          </HeroTabFeatureUl>
+        </HeroTabFeatureCont>
+      ))}
+    </>
+  );
+}
 
 export function HeroTabFeatureCont({
   className,
