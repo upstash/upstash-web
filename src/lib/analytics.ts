@@ -38,13 +38,17 @@ const onceKeys = new Set<string>();
  * false afterwards. The key set resets when the pathname changes.
  */
 export function oncePerPageview(key: string): boolean {
-  if (typeof window === "undefined") { return false; }
+  if (typeof window === "undefined") {
+    return false;
+  }
   const path = window.location.pathname;
   if (path !== oncePath) {
     oncePath = path;
     onceKeys.clear();
   }
-  if (onceKeys.has(key)) { return false; }
+  if (onceKeys.has(key)) {
+    return false;
+  }
   onceKeys.add(key);
   return true;
 }

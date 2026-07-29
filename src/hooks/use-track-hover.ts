@@ -21,11 +21,17 @@ export function useTrackHover({
       enteredAtRef.current = Date.now();
     },
     onPointerLeave: () => {
-      if (enteredAtRef.current === null) { return; }
+      if (enteredAtRef.current === null) {
+        return;
+      }
       const ms = Date.now() - enteredAtRef.current;
       enteredAtRef.current = null;
-      if (ms < MIN_DWELL_MS) { return; }
-      if (!oncePerPageview(`pricing_plan_hover:${product}:${plan}`)) { return; }
+      if (ms < MIN_DWELL_MS) {
+        return;
+      }
+      if (!oncePerPageview(`pricing_plan_hover:${product}:${plan}`)) {
+        return;
+      }
       trackEvent("pricing_plan_hover", { product, plan, ms: Math.round(ms) });
     },
   };

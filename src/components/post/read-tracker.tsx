@@ -24,7 +24,9 @@ function getReadSlugs(): string[] {
 export default function ReadTracker({ slug }: { slug: string }) {
   useEffect(() => {
     const readSlugs = getReadSlugs();
-    if (readSlugs.includes(slug)) { return; }
+    if (readSlugs.includes(slug)) {
+      return;
+    }
 
     let visibleSince: number | null =
       document.visibilityState === "visible" ? Date.now() : null;
@@ -42,7 +44,9 @@ export default function ReadTracker({ slug }: { slug: string }) {
     };
 
     const check = () => {
-      if (fired || !hasScrolled || totalVisibleMs() < MIN_VISIBLE_MS) { return; }
+      if (fired || !hasScrolled || totalVisibleMs() < MIN_VISIBLE_MS) {
+        return;
+      }
       fired = true;
       cleanup();
       try {

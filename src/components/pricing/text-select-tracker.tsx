@@ -17,7 +17,9 @@ export default function TextSelectTracker({ product }: { product: string }) {
         try {
           const selection = window.getSelection();
           const text = selection?.toString().trim() ?? "";
-          if (text.length < 3) { return; }
+          if (text.length < 3) {
+            return;
+          }
 
           const anchorNode = selection?.anchorNode;
           const anchorElement =
