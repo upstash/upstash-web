@@ -78,18 +78,12 @@ export default function CopyArticleButton({
           <button
             type="button"
             aria-label="Open article actions"
-            className={cx(
-              buttonBase,
-              "px-2 data-[state=open]:text-text",
-            )}
+            className={cx(buttonBase, "px-2 data-[state=open]:text-text")}
           >
             <IconChevronDown
               size={14}
               stroke={1.75}
-              className={cx(
-                "transition-transform",
-                open && "rotate-180",
-              )}
+              className={cx("transition-transform", open && "rotate-180")}
             />
           </button>
         </Popover.Trigger>

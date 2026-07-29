@@ -18,7 +18,9 @@ export default function PricingTable() {
           <h5 className="text-2xl font-semibold">
             {VECTOR_FREE_PLAN.priceDisplay}
           </h5>
-          <p className="text-sm text-text-mute">{VECTOR_FREE_PLAN.priceSubtext}</p>
+          <p className="text-sm text-text-mute">
+            {VECTOR_FREE_PLAN.priceSubtext}
+          </p>
         </div>
 
         <div className="grow">

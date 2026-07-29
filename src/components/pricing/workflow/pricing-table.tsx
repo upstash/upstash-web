@@ -16,7 +16,7 @@ const PRICING_PLANS_TO_FIXED_ID: Record<string, string> = {
 };
 
 const FIXED_PLAN_BY_ID = Object.fromEntries(
-  WORKFLOW_FIXED_PLANS.map((p) => [p.id, p])
+  WORKFLOW_FIXED_PLANS.map((p) => [p.id, p]),
 );
 
 export default function PricingTable() {

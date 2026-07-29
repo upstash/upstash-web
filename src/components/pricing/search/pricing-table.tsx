@@ -18,7 +18,9 @@ export default function PricingTable() {
           <h5 className="text-2xl font-semibold">
             {SEARCH_FREE_PLAN.priceDisplay}
           </h5>
-          <p className="text-sm text-text-mute">{SEARCH_FREE_PLAN.priceSubtext}</p>
+          <p className="text-sm text-text-mute">
+            {SEARCH_FREE_PLAN.priceSubtext}
+          </p>
         </div>
 
         <div className="grow">
@@ -30,7 +32,9 @@ export default function PricingTable() {
         <div className="w-full px-6 *:border-b *:border-bg-mute">
           <div className="py-3">
             <p className="text-text-mute">Monthly Query Limit</p>
-            <p className="font-semibold">{SEARCH_FREE_PLAN.monthlyQueryLimit}</p>
+            <p className="font-semibold">
+              {SEARCH_FREE_PLAN.monthlyQueryLimit}
+            </p>
           </div>
           <div className="py-3">
             <p className="text-text-mute">Max Records</p>
@@ -70,7 +74,9 @@ export default function PricingTable() {
         <div className="w-full px-6 *:border-b *:border-bg-mute">
           <div className="py-3">
             <p className="text-text-mute">Monthly Query Limit</p>
-            <p className="font-semibold">{SEARCH_PAYG_PLAN.monthlyQueryLimit}</p>
+            <p className="font-semibold">
+              {SEARCH_PAYG_PLAN.monthlyQueryLimit}
+            </p>
           </div>
           <div className="py-3">
             <p className="text-text-mute">Max Records</p>

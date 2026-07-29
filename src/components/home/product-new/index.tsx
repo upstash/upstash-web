@@ -31,7 +31,7 @@ const HeroProductTagline = ({ activeProduct }: { activeProduct: Product }) => {
       <h2 className="text-2xl font-medium text-emerald-800 dark:text-text">
         {title}
       </h2>
-      <div className="xs:flex-row flex flex-col justify-center gap-3">
+      <div className="flex flex-col justify-center gap-3 xs:flex-row">
         {activeProduct === Product.REDIS && (
           <Link href="/redis">
             <Button variant={"default"} className="h-[42px] px-5">

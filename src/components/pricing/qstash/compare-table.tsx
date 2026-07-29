@@ -207,39 +207,39 @@ export default function CompareTable() {
             <CompareValue>Unlimited</CompareValue>
           </Col>
           <Col plan={showFixed1}>
-              <CompareValue
-                type="size"
-                suffix="M"
-                className="border-b-0"
-                after={
-                  <Tooltip content="We'll reach out for an upgrade if the quota is exceeded consistently.">
-                    <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
-                  </Tooltip>
-                }
-              >
-                1
-              </CompareValue>
+            <CompareValue
+              type="size"
+              suffix="M"
+              className="border-b-0"
+              after={
+                <Tooltip content="We'll reach out for an upgrade if the quota is exceeded consistently.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            >
+              1
+            </CompareValue>
           </Col>
           <Col plan={showFixed10}>
-              <CompareValue
-                type="size"
-                suffix="M"
-                className="border-b-0"
-                after={
-                  <Tooltip content="We'll reach out for an upgrade if the quota is exceeded consistently.">
-                    <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
-                  </Tooltip>
-                }
-              >
-                10
-              </CompareValue>
+            <CompareValue
+              type="size"
+              suffix="M"
+              className="border-b-0"
+              after={
+                <Tooltip content="We'll reach out for an upgrade if the quota is exceeded consistently.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            >
+              10
+            </CompareValue>
           </Col>
           <Col plan={showEnterprise}>
             <CompareValue type="plain">100M+</CompareValue>
           </Col>
         </tr>
 
-         {/*MAX MONTHLY BANDWIDTH*/}
+        {/*MAX MONTHLY BANDWIDTH*/}
         <tr>
           <th className="px-0 text-left font-normal">
             <Tooltip content="The max total data size going out from QStash to user endpoints per month.">
@@ -267,32 +267,32 @@ export default function CompareTable() {
             </CompareValue>
           </Col>
           <Col plan={showFixed1}>
-              <CompareValue
-                type="size"
-                suffix="TB"
-                className="border-b-0"
-                after={
-                  <Tooltip content="We'll reach out for an upgrade if the quota is exceeded consistently.">
-                    <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
-                  </Tooltip>
-                }
-              >
-                1
-              </CompareValue>
+            <CompareValue
+              type="size"
+              suffix="TB"
+              className="border-b-0"
+              after={
+                <Tooltip content="We'll reach out for an upgrade if the quota is exceeded consistently.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            >
+              1
+            </CompareValue>
           </Col>
           <Col plan={showFixed10}>
-              <CompareValue
-                type="size"
-                suffix="TB"
-                className="border-b-0"
-                after={
-                  <Tooltip content="We'll reach out for an upgrade if the quota is exceeded consistently">
-                    <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
-                  </Tooltip>
-                }
-              >
-                5
-              </CompareValue>
+            <CompareValue
+              type="size"
+              suffix="TB"
+              className="border-b-0"
+              after={
+                <Tooltip content="We'll reach out for an upgrade if the quota is exceeded consistently">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            >
+              5
+            </CompareValue>
           </Col>
           <Col plan={showEnterprise}>
             <CompareValue>Unlimited</CompareValue>
@@ -700,7 +700,9 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 text-left font-normal">SAML Single Sign-On (SSO)</th>
+          <th className="px-0 text-left font-normal">
+            SAML Single Sign-On (SSO)
+          </th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="boolean" valid={false} />

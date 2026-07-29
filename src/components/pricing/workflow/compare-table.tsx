@@ -172,9 +172,7 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal">
-            Max Steps per Day
-          </th>
+          <th className="px-0 py-4 text-left font-normal">Max Steps per Day</th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue type="number">1000</CompareValue>
@@ -183,32 +181,32 @@ export default function CompareTable() {
             <CompareValue>Unlimited</CompareValue>
           </Col>
           <Col plan={showFixed1}>
-              <CompareValue
-                type="size"
-                suffix="M"
-                className="border-b-0"
-                after={
-                  <Tooltip content="We'll reach out for an upgrade if the quota is exceeded consistently.">
-                    <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
-                  </Tooltip>
-                }
-              >
-                1
-              </CompareValue>
+            <CompareValue
+              type="size"
+              suffix="M"
+              className="border-b-0"
+              after={
+                <Tooltip content="We'll reach out for an upgrade if the quota is exceeded consistently.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            >
+              1
+            </CompareValue>
           </Col>
           <Col plan={showFixed10}>
-              <CompareValue
-                type="size"
-                suffix="M"
-                className="border-b-0"
-                after={
-                  <Tooltip content="We'll reach out for an upgrade if the quota is exceeded consistently.">
-                    <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
-                  </Tooltip>
-                }
-              >
-                10
-              </CompareValue>
+            <CompareValue
+              type="size"
+              suffix="M"
+              className="border-b-0"
+              after={
+                <Tooltip content="We'll reach out for an upgrade if the quota is exceeded consistently.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            >
+              10
+            </CompareValue>
           </Col>
         </tr>
 
@@ -240,32 +238,32 @@ export default function CompareTable() {
             </CompareValue>
           </Col>
           <Col plan={showFixed1}>
-              <CompareValue
-                type="size"
-                suffix="TB"
-                className="border-b-0"
-                after={
-                  <Tooltip content="We'll reach out for an upgrade if the quota is exceeded consistently.">
-                    <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
-                  </Tooltip>
-                }
-              >
-                1
-              </CompareValue>
+            <CompareValue
+              type="size"
+              suffix="TB"
+              className="border-b-0"
+              after={
+                <Tooltip content="We'll reach out for an upgrade if the quota is exceeded consistently.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            >
+              1
+            </CompareValue>
           </Col>
           <Col plan={showFixed10}>
-              <CompareValue
-                type="size"
-                suffix="TB"
-                className="border-b-0"
-                after={
-                  <Tooltip content="We'll reach out for an upgrade if the quota is exceeded consistently.">
-                    <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
-                  </Tooltip>
-                }
-              >
-                5
-              </CompareValue>
+            <CompareValue
+              type="size"
+              suffix="TB"
+              className="border-b-0"
+              after={
+                <Tooltip content="We'll reach out for an upgrade if the quota is exceeded consistently.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            >
+              5
+            </CompareValue>
           </Col>
         </tr>
 
@@ -287,7 +285,7 @@ export default function CompareTable() {
             <CompareValue type="number">1000</CompareValue>
           </Col>
         </tr>
-        
+
         <tr>
           <th className="px-0 py-4 text-left font-normal">
             <Tooltip content="Excess steps will be delayed until old steps finish. They will not be rejected.">
@@ -335,7 +333,9 @@ export default function CompareTable() {
         </tr>
 
         <tr>
-          <th className="px-0 py-4 text-left font-normal">Max Sleep Duration</th>
+          <th className="px-0 py-4 text-left font-normal">
+            Max Sleep Duration
+          </th>
           {/**/}
           <Col plan={showFree}>
             <CompareValue>7 days</CompareValue>
@@ -405,7 +405,7 @@ export default function CompareTable() {
             <CompareValue>14 days</CompareValue>
           </Col>
         </tr>
-      
+
         <tr>
           <th className="px-0 text-left font-normal">Uptime SLA</th>
           {/**/}

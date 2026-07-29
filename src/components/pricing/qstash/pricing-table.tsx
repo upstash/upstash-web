@@ -16,7 +16,7 @@ const PRICING_PLANS_TO_FIXED_ID: Record<string, string> = {
 };
 
 const FIXED_PLAN_BY_ID = Object.fromEntries(
-  QSTASH_FIXED_PLANS.map((p) => [p.id, p])
+  QSTASH_FIXED_PLANS.map((p) => [p.id, p]),
 );
 
 export default function PricingTable() {
@@ -53,7 +53,9 @@ export default function PricingTable() {
         <div className="w-full px-6 *:border-b *:border-bg-mute">
           <div className="py-3">
             <p className="text-text-mute">Messages per Day</p>
-            <p className="font-semibold">{QSTASH_FREE_PLAN.maxMessagesPerDay}</p>
+            <p className="font-semibold">
+              {QSTASH_FREE_PLAN.maxMessagesPerDay}
+            </p>
           </div>
         </div>
 
@@ -89,7 +91,9 @@ export default function PricingTable() {
         <div className="w-full px-6 *:border-b *:border-bg-mute">
           <div className="py-3">
             <p className="text-text-mute">Messages per Day</p>
-            <p className="font-semibold">{QSTASH_PAYG_PLAN.maxMessagesPerDay}</p>
+            <p className="font-semibold">
+              {QSTASH_PAYG_PLAN.maxMessagesPerDay}
+            </p>
           </div>
         </div>
 

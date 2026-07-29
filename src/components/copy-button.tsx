@@ -32,7 +32,6 @@ export default function CopyButton({ code, className, ...props }: Props) {
       {...props}
     >
       {hasCopied ? (
-       
         <Icon icon={ICON_NAMES.Clipboard} />
       ) : (
         <Icon icon={ICON_NAMES.Clipboard} />

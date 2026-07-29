@@ -119,7 +119,9 @@ export default function PricingTable() {
           </div>
           <div className="py-3">
             <p className="text-text-mute">Limits</p>
-            <p className="font-semibold">{BOX_ENTERPRISE_PLAN.maxConcurrentBoxes}</p>
+            <p className="font-semibold">
+              {BOX_ENTERPRISE_PLAN.maxConcurrentBoxes}
+            </p>
           </div>
         </div>
 
