@@ -5,8 +5,6 @@ tags: [redis,qstash]
 title: "Local replicated cache with Redis"
 ---
 
-# Local replicated cache with Redis
-
 **TLDR:** QStash needs hot data (user records, quotas, plan limits, API keys) available with zero network cost, even though Redis is the real source of truth. The fix is a local in-memory cache in every process, kept fresh by invalidations delivered over a Redis stream instead of a plain TTL. Getting there safely took six steps: a basic TTL cache, pub/sub invalidation, a durable stream, trimming that stream without losing entries, closing a race between a read and an invalidation, and finally forcing reads to the primary so a lagging replica can't undo everything else. The full, working implementation is open source at [github.com/sancar/replicatedCache](https://github.com/sancar/replicatedCache).
 
 ## The need
