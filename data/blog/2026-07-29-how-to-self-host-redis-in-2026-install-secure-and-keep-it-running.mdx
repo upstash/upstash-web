@@ -96,7 +96,7 @@ This is actually quite important because people specifically try to exploit open
 
 Attackers [scan for exposed Redis servers](https://heimdalsecurity.com/blog/a-new-malware-exploits-a-critical-vulnerability-on-redis-servers/), exploit them to pull a backdoor onto the machine, and then hide their traffic by imitating normal Redis cluster communication on the same port.
 
-![](https://cdn.bydefault.so/5wIUHmc3m_Y5rP002gu9H.png)
+![](https://cdn.bydefault.so/_YFdJyuVQOrwNaStmFtD6.png)
 
 [Aquasec](https://www.aquasec.com/wp-content/uploads/2024/01/Picture1-Dec-01-2022-08-54-06-5326-AM.png) has a great article on this exploit, I also got this image from them.
 
@@ -288,10 +288,10 @@ But things like automatic failover mean more servers, and every one of them need
 
 [Upstash Redis](https://upstash.com/docs/redis/overall/getstarted) is our version of that tradeoff, with both pay-as-you-go pricing and high-throughput fixed tiers to scale.
 
-The [free tier](https://upstash.com/pricing/redis) includes 256 MB and 500K commands per month. Pay-as-you-go costs $0.20 per 100K commands plus $0.25 per GB-month of storage and scales to zero, and fixed plans start at $10 per month. 
+The [free tier](https://upstash.com/pricing/redis) includes 256 MB and 500K commands per month. Pay-as-you-go costs $0.20 per 100K commands plus $0.25 per GB-month of storage and scales to zero, and fixed plans start at $10 per month.
 
 Paid plans include replication and automatic failover, the step that self-hosting makes more complicated to do. There is also a [REST API](https://upstash.com/blog/redis-pricing-comparison-every-major-provider-in-2026-with-numbers), so it works from runtimes that cannot open a TCP connection, like Cloudflare Workers.
 
-I think self-hosting Redis is a good setup. The software is free again under AGPLv3, one node doesn't take long to set up, and everything on this page is standard configuration. 
+I think self-hosting Redis is a good setup. The software is free again under AGPLv3, one node doesn't take long to set up, and everything on this page is standard configuration.
 
 I hope you learned a lot in this article! Let me know how it goes, and do check out Upstash if you ever want to use a super robust, fast hosted Redis that can handle hundreds of thousands of commands per second with full replication, failover, etc. :]
