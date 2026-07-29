@@ -8,38 +8,48 @@ declare global {
   }
 }
 
-const seen = new Set<string>();
-const MAX_REPORTS_PER_PAGELOAD = 10;
+function toOrigin(uri: string) {
+  try {
+    return new URL(uri).origin;
+  } catch {
+    return uri;
+  }
+}
+
+const MAX_REPORTED_VIOLATIONS_PER_PAGELOAD = 30;
 
 /**
- * Reports enforced CSP violations to GA4 as `exception` events with
- * error_name "csp_violation", the same schema the console uses for
- * client errors (upstash-console-v2#1410), so both properties are
- * queryable the same way. Deduped per (directive, blocked origin) and
- * capped per pageload so a misbehaving extension can't flood analytics.
+ * Reports enforced CSP violations to GA4 as `csp_violation` events,
+ * mirroring the console's reporter (upstash-console-v2#1413): same event
+ * name and directive/blocked_origin/source_origin params, so both
+ * properties are queryable the same way. Deduped per directive+origin
+ * and capped per pageload so a misbehaving extension can't flood
+ * analytics.
  */
 export function CspViolationReporter() {
   useEffect(() => {
-    const onViolation = (e: SecurityPolicyViolationEvent) => {
-      let blocked = e.blockedURI;
-      try {
-        blocked = new URL(e.blockedURI).origin;
-      } catch {}
-      const key = `${e.effectiveDirective} ${blocked}`;
-      if (seen.has(key) || seen.size >= MAX_REPORTS_PER_PAGELOAD) return;
+    const seen = new Set<string>();
+
+    const onViolation = (event: SecurityPolicyViolationEvent) => {
+      if (/^(?:chrome|moz|safari)-extension/.test(event.blockedURI)) return;
+
+      const blockedOrigin = toOrigin(event.blockedURI);
+      const key = `${event.effectiveDirective}:${blockedOrigin}`;
+      if (seen.has(key) || seen.size >= MAX_REPORTED_VIOLATIONS_PER_PAGELOAD)
+        return;
       seen.add(key);
-      window.gtag?.("event", "exception", {
-        error_name: "csp_violation",
-        directive: e.effectiveDirective,
-        blocked_uri: blocked.slice(0, 100),
-        source_file: (e.sourceFile ?? "").slice(0, 100),
-        page: window.location.pathname,
-        fatal: false,
+
+      window.gtag?.("event", "csp_violation", {
+        directive: event.effectiveDirective,
+        blocked_origin: blockedOrigin,
+        source_origin: event.sourceFile ? toOrigin(event.sourceFile) : undefined,
       });
     };
+
     document.addEventListener("securitypolicyviolation", onViolation);
-    return () =>
+    return () => {
       document.removeEventListener("securitypolicyviolation", onViolation);
+    };
   }, []);
 
   return null;
