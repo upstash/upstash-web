@@ -1,0 +1,225 @@
+---
+authors: [sancar]
+slug: replicated-cache-backed-by-redis
+tags: [redis,qstash]
+title: "Local replicated cache with Redis"
+---
+
+# Local replicated cache with Redis
+
+**TLDR:** QStash needs hot data (user records, quotas, plan limits, API keys) available with zero network cost, even though Redis is the real source of truth. The fix is a local in-memory cache in every process, kept fresh by invalidations delivered over a Redis stream instead of a plain TTL. Getting there safely took six steps: a basic TTL cache, pub/sub invalidation, a durable stream, trimming that stream without losing entries, closing a race between a read and an invalidation, and finally forcing reads to the primary so a lagging replica can't undo everything else. The full, working implementation is open source at [github.com/sancar/replicatedCache](https://github.com/sancar/replicatedCache).
+
+## The need
+
+QStash is a message queue and scheduler. It runs as a fleet of processes, all leaning on Upstash Redis to stay in sync. And to be clear, Redis isn't a cache for us here — it's persisted to disk, so it's the actual source of truth. Every process reads its state from it.
+
+The trouble is that some of that state sits directly on the hot path of *every single request*. Before we accept a publish, we need to check the user record, the quota, the plan limits, the API keys. And this data has two properties that make it interesting: it's read constantly, and it almost never changes. Someone's plan might change twice a year, tops. But their quota gets checked on every request they make.
+
+Paying a network round trip for something that changes twice a year is a bad deal. The obvious fix is to just keep it in memory in each process. The obvious problem with *that* is: what happens on the upgrade? The moment a plan changes, every process is still sitting there holding the old one, blissfully unaware.
+
+Now, we don't need every process to agree instantly — if a plan upgrade takes a second to propagate, nobody's going to notice or care. Eventual consistency is fine. But "eventual" needs to mean seconds, not "whenever the TTL happens to expire," and it needs to survive a process restarting or dropping its connection for a moment.
+
+So the goal became: a cache that lives in every process, backed by Redis, with real invalidation.
+
+Here's how it got built, one problem at a time. The full implementation lives in the [`replicatedCache`](https://github.com/sancar/replicatedCache) repo, one commit per step; in QStash itself it's `pkg/cache/replicated.go`, with its two structures sitting right alongside.
+
+## Step 1: a local cache in front of Redis
+
+*Commit [`05c5316`](https://github.com/sancar/replicatedCache/commit/05c5316) — Step 1: local TTL cache in front of Redis*
+
+The first version is the one everybody writes first. A map with a TTL on each entry, and a read that checks the map before it ever bothers Redis:
+
+```go
+func (c *replicatedCache[T]) Get(ctx context.Context, key string, get getFn[T]) (*T, error) {
+	if value, found := c.cache.Get(key); found {
+		return value, nil
+	}
+	value, err := get(ctx, c.client, valueKey(c.name, key))
+	if err != nil {
+		return nil, err
+	}
+	// nil is cached too: a key that does not exist is an answer worth keeping.
+	c.cache.Set(key, value)
+	return value, nil
+}
+```
+
+Two decisions snuck in here that end up sticking around for the whole ride.
+
+First: `Get` takes the read as a function. The core doesn't know or care whether the thing behind a key is a string, a set, or something else entirely — it just knows how to cache. Whatever sits on top decides how to actually read and write. That's why `ReplicatedKeyValue` and `ReplicatedKeySet` end up being about eighty lines each: all the hard stuff is shared.
+
+Second: a missing key gets cached too, as `nil`. Lookups for things that don't exist are more common than you'd think — an unknown API key, a user with no custom quota set — and if misses aren't cached, they become the one lookup that *always* pays the network tax.
+
+The crack in this design shows up the instant a value changes, because nothing tells any process about it. The staleness window is just the TTL, and the TTL puts you in a lose-lose spot. Set it short, and processes are hammering Redis constantly — the exact cost we were trying to dodge. Set it long, and someone who just upgraded is stuck on the free plan for ten minutes. There's no sweet spot, because the TTL is answering the wrong question. It measures time since the read, not time since the write.
+
+## Step 2: tell everyone about the write
+
+*Commit [`1f06078`](https://github.com/sancar/replicatedCache/commit/1f06078) — Step 2: invalidate over Redis pub/sub*
+
+The write already knows what changed — so why not just say so? Redis pub/sub is sitting right there: every write publishes the key it touched, and every process listens for it.
+
+```go
+func (c *replicatedCache[T]) UpdateAndInvalidate(ctx context.Context, key string, update updateFn) error {
+	_, err := c.client.Pipelined(ctx, func(pipe redis.Pipeliner) error {
+		update(ctx, pipe, valueKey(c.name, key))
+		c.signal(ctx, pipe, key)
+		return nil
+	})
+	return err
+}
+```
+
+The order inside that pipeline isn't just tidiness — it's load-bearing. The signal has to go out *after* the write it's announcing. Flip it, and there's a window where a process gets the invalidation, evicts, immediately re-reads a value the write hasn't landed yet, and caches the stale one right back — with no further signal ever coming to fix it, because the signal already fired. Now that stale value is stuck for a full TTL. Announcing a change before you've actually made it is always wrong, it's just really easy to type in the wrong order without thinking about it.
+
+With this in place, staleness is bounded by delivery latency instead of the TTL, and the TTL can finally go back to being what it should've been all along: a backstop.
+
+Then a deploy happens. Pub/sub is fire-and-forget — Redis delivers to whoever's connected at that exact instant and then forgets the message ever existed. A process that's restarting, mid-deploy, or just briefly disconnected doesn't get a retry. It gets nothing, and worse, it never even finds out it missed something. It just keeps serving a stale value until the TTL finally bails it out — which is exactly the failure we were trying to kill, just now happening rarely and unpredictably instead of constantly and predictably. Arguably that's *worse*: nobody enjoys debugging a rare bug at 3am.
+
+## Step 3: make the invalidations durable
+
+*Commit [`0a723c7`](https://github.com/sancar/replicatedCache/commit/0a723c7) — Step 3: durable invalidations on a Redis stream*
+
+The fix is to stop treating invalidations as messages and start treating them as a log. A Redis stream keeps its entries around, and a reader just keeps a cursor into it:
+
+```go
+func (c *replicatedCache[T]) iterate(ctx context.Context) error {
+	result, err := c.client.XRead(ctx, &redis.XReadArgs{
+		Streams: []string{c.stream, c.cursor},
+		Count:   100,
+		Block:   0,
+	}).Result()
+	...
+	for _, msg := range result[0].Messages {
+		c.cache.Remove(key)
+		c.cursor = msg.ID
+	}
+	return nil
+}
+```
+
+A process that vanished for thirty seconds comes back, picks up right where its cursor left off, and finds every invalidation it missed still patiently waiting for it. Nothing's lost, and nothing needs a speculative re-read. A brand new process just starts its cursor at `0` and replays whatever's in the stream against an empty cache — which, conveniently, is a total no-op.
+
+The same commit also makes the write and its signal atomic. `Pipelined` becomes `TxPipelined`, so `SET` and `XADD` happen together inside one `MULTI`/`EXEC`. Without that guarantee, a connection dying between the two would leave Redis holding a brand new value that nobody was ever told about — the one failure mode this whole design has no recovery from, because every process is happily convinced its copy is still current.
+
+There's one catch though, and it's less of a bug and more of a slow leak: the stream is append-only and nobody's cleaning it up. A service writing a few thousand invalidations a day just... accumulates them, forever, until the invalidation log is bigger than the data it's meant to invalidate.
+
+## Step 4: trim to the slowest reader
+
+*Commit [`d1dd862`](https://github.com/sancar/replicatedCache/commit/d1dd862) — Step 4: trim the stream up to the slowest reader*
+
+Trimming by length (`XTRIM MAXLEN 10000`) is the tempting one-liner fix, and it's also unsafe. Length says nothing about who's actually read what. A process that's behind loses the entries it hasn't seen yet — and here's the nasty part — it never even finds out. It just resumes from a cursor that no longer exists and cheerfully keeps serving values that were invalidated while it wasn't looking.
+
+So instead, processes publish their own progress, and the stream only gets trimmed to the *minimum* of everyone's progress:
+
+```go
+// trim removes the invalidations every group has already read.
+func (c *replicatedCache[T]) trim(ctx context.Context) error {
+	markers, err := c.client.HGetAll(ctx, c.markers).Result()
+	...
+	return c.client.XTrimMinID(ctx, c.stream, minID).Err()
+}
+```
+
+Two details are doing most of the work here.
+
+The marker gets registered in the constructor, before the cache has served a single read. Trim keeps everything at or above the lowest marker, so from the moment a process exists, it's already pinning the stream at `0` — nothing it might still need can get swept away underneath it. Register the marker any later, say after the first `Get`, and you open a window where a fresh process caches a value right before the invalidation for it gets trimmed out from under it.
+
+And the marker key belongs to a *group*, not an individual process. If every process had its own marker, a process that died without cleaning up would pin the stream at its last position forever — and the unbounded growth problem is right back. A group is just a set of interchangeable processes, typically one deployment; members overwrite each other's marker, so the marker set stays small and bounded. There's a real cost to this: the group marker reflects whoever wrote last, not the true minimum, so a process lagging badly behind its own siblings could in theory have an entry trimmed before it reads it. But with a trim period measured in hours against replication lag measured in milliseconds — and the TTL still sitting underneath as a backstop — that's a trade we're perfectly happy making.
+
+## Step 5: the race between a read and an invalidation
+
+*Commit [`985f1c9`](https://github.com/sancar/replicatedCache/commit/985f1c9) — Step 5: do not cache a value an invalidation raced*
+
+Everything up to this point is about invalidations *reaching* a process. This last one is about an invalidation showing up at the worst possible instant, mid-flight, inside one.
+
+A `Get` misses locally and goes to Redis. While that read is in flight, the invalidation goroutine processes an invalidation for that exact same key. It calls `Remove` — and removes nothing, because the entry isn't in the local cache yet. The in-flight read then comes back with a value the write already replaced, and `Get` happily tucks it away. No signal is left over to fix it later. The stale value is now pinned for a full TTL, and ironically it's pinned by the very mechanism that was supposed to prevent exactly this.
+
+It's a tiny window, but it's guaranteed to happen: hot keys are, by definition, exactly the ones with reads in flight at the moment a write lands.
+
+The fix doesn't need a lock. The cursor already tells us whether anything happened while we were off reading:
+
+```go
+	// Where we stand in the invalidation stream before the read.
+	cursor := c.loadCursor()
+
+	value, err := get(ctx, c.client, valueKey(c.name, key))
+	if err != nil {
+		return nil, err
+	}
+
+	c.cache.Set(key, value)
+	if c.loadCursor() != cursor {
+		c.cache.Remove(key)
+	}
+	return value, nil
+```
+
+If the cursor moved while we were reading, some invalidation may have concerned this key, and its eviction attempt may well have been the no-op from earlier — so we just throw out what we caught. Yes, this over-evicts: most cursor movement has nothing to do with this particular key. That's fine. The penalty is one extra round trip to Redis, and the alternative is a stale value hanging around for a full TTL. `Get` still returns the value it read, which is a perfectly legitimate answer for the instant that read actually happened.
+
+What makes all of this sound is one ordering rule in the invalidation loop, fixed in this same commit:
+
+```go
+		// The cursor must advance before the eviction, never after.
+		c.cursor.Store(msg.ID)
+		c.cache.Remove(key)
+```
+
+`Get` is relying on "the eviction already ran" implying "the cursor already moved." Flip the order — evict first, store the cursor after — and there's an interleaving where the eviction no-ops, `Get` reads an unmoved cursor, and the stale value gets cached anyway. Two lines. One order. The entire guarantee rests on it.
+
+## Step 6: read from the primary, not from a replica
+
+*Commit [`0779e71`](https://github.com/sancar/replicatedCache/commit/0779e71) — Step 6: read from the primary, not from a lagging replica*
+
+There's an assumption quietly propping up everything so far: that when a process goes to Redis, it gets the *current* value. Turn on read replicas, and that stops being true. Upstash replicates asynchronously — a write is acknowledged the moment the primary has it, and only travels out to the replicas afterward — so a read served by a replica might be answering from a moment slightly in the past.
+
+Normally that's fine — it's the trade every read replica setup makes. It's not fine here, though, because of exactly how the read gets triggered. Walk through the sequence:
+
+1. A process writes the new plan. `SET` and `XADD` land together on the primary.
+2. Another process reads that invalidation off the stream and evicts its local entry.
+3. That process misses locally on its very next request and goes to Redis.
+4. The read gets routed to a replica that hasn't caught up to step 1 yet, and hands back the *old* plan.
+5. It caches the old plan — and the invalidation that would've corrected it has already been consumed back in step 2.
+
+The responses show up out of order relative to the invalidation: the "this changed" signal actually overtakes the change itself. And unlike ordinary replica lag, which quietly fixes itself on the next read, this one gets latched into the local cache until the TTL bails it out. Everything built across steps 2 through 5 gets undone by this last hop.
+
+Redis already gives us the distinction we need, though. A script that *might* write can never be run on a read-only replica — it has to go to the primary. So making the read a script, run through `EVAL`, is enough to pin it there:
+
+```go
+// getScript reads the authoritative value for a cache key. KEYS[1] is the value
+// key; the reply is the value, or false when the key does not exist.
+var getScript = redis.NewScript(`return redis.call('GET', KEYS[1])`)
+```
+
+```go
+result, err := getScript.Run(ctx, client, []string{key}).Result()
+```
+
+Notice what's conspicuously *not* here: `EVAL_RO`. That exists precisely to let read-only scripts get served by replicas — which is the exact behavior we're trying to avoid. Marking the script `no-writes` would land you in the same trap. The script has to *look like* a potential writer to Redis, and that single `GET` sitting inside isn't a workaround — it *is* the whole script.
+
+`ReplicatedKeySet` gets the same treatment with `SMEMBERS`. In QStash the script also carries an Upstash-specific flag on its shebang line; the standalone version skips it, since it doesn't change the routing at all.
+
+There's a real cost here: a script call is more work for Redis than a bare `GET`, and reads no longer spread across replicas. But both of those costs get paid once per key per process, and only on the miss path — which is exactly the path this whole design is built to make rare.
+
+## What it buys
+
+Reads of hot metadata are now local. Writes go to Redis exactly once and reach every process within milliseconds. The TTL is still there, but now it's a backstop for whatever the invalidation path can't cover, not the actual mechanism doing the work.
+
+The core stayed generic through all of this, which is why `ReplicatedKeyValue` and `ReplicatedKeySet` are so thin: one says "this is a JSON blob, read with `GET`, written with `SET`," the other says "this is a set, read with `SMEMBERS`, written with `SADD`/`SREM`." Durability, trimming, the race condition — all of it got solved exactly once, in the core, and both structures inherited it for free.
+
+## Closing
+
+Which brings us back to where we started: the user record, the quota, the plan limits, the API keys — read on every single request, written maybe twice a year. In QStash they now just live in memory in every process, and a write reaches all of them within milliseconds:
+
+```go
+users, err := cache.NewReplicatedKeyValue[User](
+	ctx, logger, client, time.Minute, "users", "api",
+	cache.NewJSONSerializer[User](),
+)
+
+user, err := users.Get(ctx, userID)          // local, no network
+err = users.Set(ctx, userID, upgradedUser)   // writes Redis, invalidates everyone
+```
+
+Six steps, and each one exists purely because the step before it wasn't enough: a TTL answering the wrong question, a publish nobody's guaranteed to hear, a log that grows without bound, a trim that has to know who's falling behind, a read that has to notice it got overtaken, and a replica that answers from the past.
+
+The code for all six steps, plus tests that run against miniredis so you don't need a live Redis to try it, is at [github.com/sancar/replicatedCache](https://github.com/sancar/replicatedCache). If you've got questions or ideas about any of this, reach out at [upstash.com/contact](https://upstash.com/contact).
