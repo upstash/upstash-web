@@ -3,6 +3,7 @@ import "../styles/globals.css";
 import "../styles/prism.css";
 import Analytics from "@/components/Analytics";
 import { CookieConsentBanner } from "@/components/cookie-consent-banner";
+import { CspViolationReporter } from "@/components/csp-violation-reporter";
 import { IntercomWrapper } from "@/components/intercom-wrapper";
 import Footer from "@/components/master/footer";
 import Header from "@/components/master/header";
@@ -57,6 +58,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           {children}
           <Footer />
           <CookieConsentBanner />
+          <CspViolationReporter />
 
           {process.env.NODE_ENV !== "development" && (
             <>
