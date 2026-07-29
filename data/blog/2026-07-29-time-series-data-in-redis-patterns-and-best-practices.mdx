@@ -1,0 +1,221 @@
+---
+authors: [josh]
+slug: time-series-data-in-redis-patterns-and-best-practices
+tags: [redis]
+title: "Time Series Data in Redis: How We Search 18 Years of Hacker News in Milliseconds"
+---
+
+Our project [hackernewstrends.com](https://hackernewstrends.com/) shows how often Hacker News talked about a term over time, like Google Trends for HN.
+
+If we type in openai vs anthropic for example, we get two trend lines drawn over every post and comment since Hacker News [launched in February 2007](https://en.wikipedia.org/wiki/Hacker_News).
+
+![](https://cdn.bydefault.so/ls4f_zSejk-TtlBkNMx1r.png)
+
+Behind it is a single Upstash Redis database holding [45 million posts and comments](https://upstash.com/blog/hacker-news-trends-redis-search), stored as plain hashes. Full-text queries over that dataset return in milliseconds, and the code is open source at [upstash/hacker-trends](https://github.com/upstash/hacker-trends).
+
+We teased it on our Twitter a while ago:
+
+![](https://cdn.bydefault.so/4WFJ0JPJiiaJdu7F5_-pS.png)
+
+In this post we want to look at how Redis time series data works at scale, and how to make it extremely fast using Upstash.
+
+We'll look at the "classic" options first (sorted sets, streams, the RedisTimeSeries module), and then I want to show you the approach Hacker Trends uses, where each data point is a full document we can search and bucket by date.
+
+## How is time series data stored in Redis?
+
+Redis has four "common" ways to store time series data: lists, sorted sets with the timestamp as the score, streams with time-based entry IDs, and the RedisTimeSeries module.
+
+They differ in how they handle range queries, duplicate values, and aggregations.
+
+| Approach | Range query by time | Duplicate values | Aggregations |
+| --- | --- | --- | --- |
+| List | No, fetch all and filter | Fine | Client-side |
+| Sorted set | ZRANGE by score | Overwrite each other | Client-side |
+| Stream | XRANGE by entry ID | Fine | Client-side |
+| RedisTimeSeries module | TS.RANGE | Fine | Built-in (avg, min, max...) |
+
+Lists are the least useful of these. There is no way to jump to a date without fetching the whole list, and correcting one old value means rewriting the list. The other three deserve a closer look.
+
+### Sorted sets: the timestamp is the score
+
+A sorted set stores members ordered by a numeric score. Put the timestamp in the score and Redis keeps the series sorted for free, with range queries by score:
+
+```ts
+import { Redis } from "@upstash/redis";
+
+const redis = Redis.fromEnv();
+
+const ts = new Date("2025-01-01").getTime();
+await redis.zadd("stock:AAPL", { score: ts, member: "180.50" });
+
+const start = new Date("2025-01-01").getTime();
+const end = new Date("2025-01-10").getTime();
+
+const prices = await redis.zrange("stock:AAPL", start, end, {
+  byScore: true,
+  withScores: true,
+});
+```
+
+Sorted set members are unique. If the same value shows up at two timestamps, the second ZADD only moves the existing member to the new score. The first data point is gone. The [common workaround](https://upstash.com/blog/redis-timeseries) is a composite member like `${timestamp}:180.50`, which keeps members unique but forces you to parse every value you read back.
+
+### Streams: an append-only log with time IDs
+
+A Redis stream is an append-only log. Passing an asterisk as the ID makes Redis stamp each entry with the current time, and XRANGE queries by time range come built in:
+
+```ts
+import { Redis } from "@upstash/redis";
+
+const redis = Redis.fromEnv();
+
+await redis.xadd("stock:AAPL:stream", "*", {
+  price: "180.50",
+  volume: "1000000",
+});
+
+const entries = await redis.xrange("stock:AAPL:stream", "-", "+");
+```
+
+Entries can hold multiple fields, duplicates are fine, and on Upstash Redis streams [only load the entries a query touches into memory](https://upstash.com/blog/redis-timeseries), while lists and sorted sets load the whole structure. That makes streams the best fit on Upstash Redis when the series is numeric readings you append and scan by range.
+
+What streams lack is aggregation. Asking "how many entries per month match a condition" means reading the range back and counting client-side.
+
+### The RedisTimeSeries module
+
+RedisTimeSeries is a Redis module built for numeric series. It adds commands for inserting samples and querying ranges with built-in aggregations:
+
+```text
+TS.CREATE stock:AAPL LABELS symbol AAPL
+TS.ADD stock:AAPL 1640995200000 180.50
+TS.RANGE stock:AAPL - + AGGREGATION avg 86400000
+```
+
+It solves the numeric case well, with two limits that matter here. It is a module, so it is [not available on Upstash Redis](https://upstash.com/blog/redis-timeseries) or other platforms that run without modules.
+
+And a sample is one number per timestamp. A Hacker News post has a title, a body, an author, a type, and an upvote count. None of that fits in a sample, so there is no way to ask RedisTimeSeries "how many posts mentioned rust each month", so it's not super useful for us in the first place.
+
+## Time series as searchable documents
+
+Hacker Trends treats each data point as a document: a plain Redis hash with text and numeric fields, indexed by [Upstash Redis Search](https://upstash.com/docs/redis/search/introduction). The index handles both full-text matching and date-based aggregations, so the trend line and the search box run on the same data.
+
+Ingestion is a plain HSET per item. A small script runs daily in GitHub Actions, reads the monthly Parquet dumps from the [Hacker News dataset on BigQuery](https://upstash.com/blog/hacker-news-trends-redis-search), and writes each post and comment as a hash:
+
+```ts
+await redis.hset(`hn:${item.id}`, {
+  title: item.title,        // headline (empty for comments)
+  text:  item.text,         // body, HTML stripped
+  by:    item.by,           // author handle
+  type:  typeName,          // story | comment | poll | job
+  time:  isoTimestamp,      // ISO 8601
+  score: item.score,        // upvotes (0 for comments)
+  ndesc: item.descendants,  // comment count
+});
+```
+
+The writes go over the [REST API](https://upstash.com/docs/redis/features/restapi), so the same script runs from a GitHub Action, a serverless function, or a laptop with no connection to keep alive.
+
+![](https://cdn.bydefault.so/uAtuL8LC38dKJrtr8aWf0.png)
+
+We only create the index once, with a schema and a key prefix. From then on, any hash written under that prefix gets indexed automatically:
+
+```ts
+import { Redis, s } from "@upstash/redis";
+
+const redis = Redis.fromEnv();
+
+const schema = s.object({
+  title: s.string(),         // full-text searchable
+  text:  s.string(),
+  by:    s.keyword(),        // exact match, good for filters
+  type:  s.keyword(),
+  time:  s.date().fast(),    // ISO date, histogram-ready
+  score: s.number("F64"),
+  ndesc: s.number("F64"),
+});
+
+await redis.search.createIndex({
+  name: "hn",
+  dataType: "hash",
+  prefix: "hn:",
+  schema,
+});
+```
+
+The one field doing time series work is the date field. Marking it with `.fast()` makes it sortable and usable in a date histogram, which is what turns a pile of documents into a series. The full list of field types is in the Upstash [schema docs](https://upstash.com/docs/redis/search/schema-definition).
+
+## Drawing a trend line with a date histogram
+
+A trend line is one aggregate query: how many documents matched the term, grouped into 30-day buckets over the time field. Upstash Redis Search runs this with a [date histogram aggregation](https://upstash.com/docs/redis/search/aggregations):
+
+```ts
+const hn = redis.search.index({ name: "hn" });
+
+const { by_month } = await hn.aggregate({
+  filter: { title: { $eq: "rust" } },
+  aggregations: {
+    by_month: { $dateHistogram: { field: "time", fixedInterval: "30d" } },
+  },
+});
+
+// by_month.buckets -> [{ key, keyAsString, docCount }, ...]
+```
+
+Each bucket has a key (the month) and a docCount (how many documents matched). Plot docCount over key and the trend line is done. This runs live, and the query hits the [same Redis database directly, without a separate analytics pipeline](https://upstash.com/blog/hacker-news-trends-redis-search).
+
+![](https://cdn.bydefault.so/m6W42mv_qgzHKedp1fP2e.png)
+
+This approach is MUCH better than the classic ones we talked about above.
+
+A sorted set or stream could store the same 45 million items, but counting monthly mentions of one word would mean scanning the text of every item client-side. Here the index does the matching and the bucketing in one command and entirely on the Redis-side.
+
+## Keeping queries fast over 45M documents
+
+Three decisions in the [hacker-trends repo](https://github.com/upstash/hacker-trends) matter for anyone building on this pattern: exact matching, a custom score function, and caching.
+
+First, matching. By default, the Upstash Redis SDK uses smart matching for search, which combines phrase, prefix, and fuzzy matching.
+
+That is great for a typo-tolerant search box, but not good for counting at scale. On short words the fuzzy expansion is loose: in this dataset, "redis" matches [216k titles and 5.8M comments under smart matching, versus 3k titles and 35k comments as an exact token](https://github.com/upstash/hacker-trends).
+
+So we use every filter with the `$eq` operator, which still matches the whole word anywhere in the field.
+
+Second, ranking. Plain BM25 (the standard text-relevance score) can rank a low-upvote post titled "Bitcoin" above the threads people argued about for days. Hacker Trends [blends BM25 with popularity](https://upstash.com/blog/hacker-news-trends-redis-search) using a log-based score function, so a 1000-upvote story counts more while lower-upvote posts still show up too:
+
+```ts
+const typedIndex = redis.search.index({ name: "hn", schema });
+
+const results = await typedIndex.query({
+  filter: {
+    $and: [
+      { $or: [{ title: { $eq: "rust" } }, { text: { $eq: "rust" } }] },
+      { time: { $gte: "2024-08-01", $lt: "2024-09-01" } },
+    ],
+  },
+  limit: 30,
+  scoreFunc: {
+    fields: [
+      { field: "score", modifier: "log1p", factor: 50 },
+      { field: "ndesc", modifier: "log1p", factor: 30 },
+    ],
+    combineMode: "sum",
+    scoreMode: "sum",
+  },
+});
+```
+
+That computes score = BM25 + 50 × log(1 + upvotes) + 30 × log(1 + comments) inside Redis, with no post-processing in the app.
+
+Third, caching. A live aggregate over the full index takes [about 600 ms](https://github.com/upstash/hacker-trends) for a typical term, and common terms like "ai" bucket millions of documents. So we put two caches in front: a CDN cache (one hour per query) that serves repeats in [about 50 ms](https://github.com/upstash/hacker-trends), and a server-side Redis cache keyed by the normalized query params, so a repeated query skips the aggregate entirely.
+
+The Redis holding 45M documents also has its own result cache.
+
+![](https://cdn.bydefault.so/gVn3EQWJBEiAKawS3zEzy.png)
+
+Also, Upstash Redis runs in [20+ regions](https://upstash.com/docs/redis/features/globaldatabase), and adding read regions serves search and aggregate queries from the region closest to each user.
+
+## Summary
+
+- Sorted sets give range queries by timestamp but overwrite duplicate values.
+- Streams are the best classic structure on Upstash Redis: time-ordered, duplicate-safe, and memory-efficient, with aggregation left to the client.
+- Upstash Redis Search stores each data point as a hash and answers full-text plus date-histogram queries in one command.
+
+The whole project is at [upstash/hacker-trends](https://github.com/upstash/hacker-trends), and the [Upstash Redis Search docs](https://upstash.com/docs/redis/search/introduction) cover everything used here. You can also try it live at [hackernewstrends.com](https://hackernewstrends.com/)! 👀
