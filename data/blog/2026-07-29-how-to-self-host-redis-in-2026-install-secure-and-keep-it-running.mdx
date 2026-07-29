@@ -1,0 +1,297 @@
+---
+authors: [josh]
+slug: how-to-self-host-redis-in-2026
+tags: [redis]
+title: "How to Self-Host Redis in 2026: Install, Secure, and Keep It Running"
+---
+
+Redis is one of the easiest databases to run yourself. It is a single server process with one config file, and it runs fine on a small VPS.
+
+In this quick guide I want to show you how to install, secure, and run Redis 8 yourself.
+
+## Is self-hosting Redis still free?
+
+Yes. Since [Redis 8.0 in May 2025](https://redis.io/blog/agplv3/), Redis is offered under the AGPLv3, an open source license approved by the Open Source Initiative, next to the source-available SSPLv1 and RSALv2 licenses. You pick whichever of the three fits you, and self-hosting under AGPLv3 is completely free.
+
+But I think it's important to know that the license changed twice in two years. In March 2024, Redis Ltd. moved Redis from the fairly permissive BSD license to SSPL, which the Open Source Initiative does not consider open source.
+
+They got a LOT of criticism for this change:
+
+![](https://cdn.bydefault.so/-SGe9mqCDlr2sHlXkLpVd.png)
+
+And personally I think it's super scummy. As a response to essentially going closed-source, people forked Redis into [Valkey](https://upstash.com/blog/upstash-redis-vs-valkey).
+
+Anyway, let's see how to self-host Redis.
+
+## Installing Redis 8 on Ubuntu 24.04
+
+Let's first add Redis:
+
+```bash
+sudo apt-get install lsb-release curl gpg
+curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
+sudo chmod 644 /usr/share/keyrings/redis-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
+sudo apt-get update
+sudo apt-get install redis
+```
+
+These are the commands from the [official install docs](https://redis.io/docs/latest/operate/oss_and_stack/install/install-stack/apt/). The package registers a systemd service, so one command makes Redis start on boot and restart on crashes:
+
+```bash
+sudo systemctl enable redis-server
+sudo systemctl start redis-server
+```
+
+A quick check that it runs:
+
+```bash
+redis-cli ping
+```
+
+That returns PONG. The current release line looks like this:
+
+```text
+$ redis-server --version
+Redis server v=8.8.1 sha=77b6c308:0 malloc=jemalloc-5.3.0 bits=64 build=72864e4784506ff6
+```
+
+The config file for the apt install is at /etc/redis/redis.conf, and everything below happens in that file.
+
+## Running Redis 8 with Docker Compose
+
+The official redis:8 image needs three additions: a volume mounted at /data, our own redis.conf, and a restart policy. A compose file with all three:
+
+```yaml
+services:
+  redis:
+    image: redis:8
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis-data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
+    restart: unless-stopped
+volumes:
+  redis-data:
+```
+
+And a minimal redis.conf next to it:
+
+```text
+requirepass use-a-long-random-password
+appendonly yes
+maxmemory 256mb
+maxmemory-policy allkeys-lru
+```
+
+Redis writes its data to /data inside the container, so the named volume keeps it across container rebuilds. The ports line publishes Redis on the host's localhost only. Apps on the same machine can connect, the internet cannot.
+
+## Locking down a self-hosted Redis
+
+A Redis server open to the internet on its default port 6379 gets found by scanners and attacked. But we can fix this with a little work on the config, e.g. binding to private addresses, keeping protected mode on, setting a password, and disabling the commands we dont use.
+
+This is actually quite important because people specifically try to exploit open Redis instances. For example the [Redigo malware](https://www.aquasec.com/blog/redigo-redis-backdoor-malware/) targeted Redis servers that researchers could find on Shodan with port 6379 open.
+
+Attackers [scan for exposed Redis servers](https://heimdalsecurity.com/blog/a-new-malware-exploits-a-critical-vulnerability-on-redis-servers/), exploit them to pull a backdoor onto the machine, and then hide their traffic by imitating normal Redis cluster communication on the same port.
+
+![](https://cdn.bydefault.so/5wIUHmc3m_Y5rP002gu9H.png)
+
+[Aquasec](https://www.aquasec.com/wp-content/uploads/2024/01/Picture1-Dec-01-2022-08-54-06-5326-AM.png) has a great article on this exploit, I also got this image from them.
+
+So let's do the network side first in redis.conf:
+
+```text
+bind 127.0.0.1 10.0.0.5
+protected-mode yes
+```
+
+The bind line lists the loopback address and, if other servers need access, a private network interface. No public IP. Protected mode is on by default, and there is no reason to turn it off.
+
+Next, let's do authentication. The simplest form is one shared password, which the [Redis security docs](https://redis.io/docs/latest/operate/oss_and_stack/management/security/) call the "legacy method":
+
+```text
+requirepass use-a-long-random-password
+```
+
+Redis also has ACLs, access control lists, which define named users with their own passwords and permissions grouped in categories like @read and @write. For one app talking to one Redis, requirepass is enough. Once several services share the instance, ACLs let you give each one only the commands it needs.
+
+The last layer is disabling commands that can wipe or reconfigure the server:
+
+```text
+rename-command CONFIG ""
+rename-command FLUSHALL ""
+rename-command DEBUG ""
+```
+
+This still works in Redis 8. Here is a server with the config above, first without the password, then with it:
+
+```text
+$ redis-cli PING
+NOAUTH Authentication required.
+
+$ REDISCLI_AUTH=use-a-long-random-password redis-cli PING
+PONG
+
+$ REDISCLI_AUTH=use-a-long-random-password redis-cli CONFIG GET maxmemory
+ERR unknown command 'CONFIG', with args beginning with: 'GET' 'maxmemory'
+```
+
+Even authenticated clients cannot touch CONFIG anymore. Since redis.conf now holds a password, we can tighten its permissions too:
+
+```bash
+sudo chmod 640 /etc/redis/redis.conf
+sudo chown redis:redis /etc/redis/redis.conf
+```
+
+## Making data survive restarts
+
+Redis keeps all data in memory and offers two ways to write it to disk: RDB snapshots and the append-only file, AOF. The default is snapshots only, which can lose everything since the last snapshot. Turning AOF on shrinks the possible loss to about one second.
+
+A fresh Redis 8 shows the defaults:
+
+```text
+$ redis-cli CONFIG GET save
+save
+3600 1 300 100 60 10000
+
+$ redis-cli CONFIG GET appendonly
+appendonly
+no
+```
+
+The save line reads in pairs: snapshot after 3600 seconds if at least 1 key changed, after 300 seconds if 100 keys changed, after 60 seconds if 10,000 keys changed. A crash between snapshots loses those writes.
+
+AOF instead logs every write command to a file. The [appendfsync setting](https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/) controls how often that file is flushed to disk:
+
+| Setting | What it does | What a crash can lose |
+| --- | --- | --- |
+| always | flush on every command | close to nothing, but slow |
+| everysec (default) | flush once per second | up to one second of writes |
+| no | the OS decides, on Linux about every 30 seconds | up to about 30 seconds |
+
+Turning it on is one line:
+
+```text
+appendonly yes
+```
+
+![](https://cdn.bydefault.so/q9i_BlZQuXPIDqrioALRn.png)
+
+Since Redis can [run RDB and AOF together](https://www.dragonflydb.io/guides/redis-persistence-3-technical-approaches), the AOF file starts with a compact RDB snapshot as its base and appends only newer commands. That setting, aof-use-rdb-preamble, defaults to yes in Redis 8. On disk it shows up as a folder:
+
+```text
+appendonly.aof.1.base.rdb
+appendonly.aof.1.incr.aof
+appendonly.aof.manifest
+```
+
+Here is the whole point of AOF in four commands. Set a key, shut the server down completely, start it again, and read the key back:
+
+```text
+$ REDISCLI_AUTH=use-a-long-random-password redis-cli SET blog:key survived-restart
+OK
+
+$ REDISCLI_AUTH=use-a-long-random-password redis-cli SHUTDOWN
+
+$ redis-server /etc/redis/redis.conf
+
+$ REDISCLI_AUTH=use-a-long-random-password redis-cli GET blog:key
+survived-restart
+```
+
+## Setting a memory limit before it matters
+
+A fresh Redis has no memory limit:
+
+```text
+$ redis-cli CONFIG GET maxmemory
+maxmemory
+0
+
+$ redis-cli CONFIG GET maxmemory-policy
+maxmemory-policy
+noeviction
+```
+
+Zero means unlimited, so Redis would grow with our data until the operating system runs out of memory and kills the process. We can prevent that with two lines in redis.conf:
+
+```text
+maxmemory 256mb
+maxmemory-policy allkeys-lru
+```
+
+The policy decides what happens when the limit is hit. The main options:
+
+| Policy | When memory is full, Redis... |
+| --- | --- |
+| noeviction | rejects new writes with an error |
+| allkeys-lru | deletes the least recently used keys, any key |
+| volatile-lru | deletes the least recently used keys among those with a TTL |
+| allkeys-lfu | deletes the least frequently used keys, any key |
+| volatile-ttl | deletes keys with a TTL, shortest remaining time first |
+
+A TTL is a time to live, an expiration you set on a key. For a cache, allkeys-lru is the natural pick: old entries drop out and the app fetches them again on demand. For data you cannot recompute, like sessions or queues, noeviction with an alert on memory use is safer than silently deleting keys.
+
+## Monitoring, backups, and keeping it running
+
+The systemd service from the apt install handles restarts and reboots, and in Docker the restart policy does the same job. What remains is watching the server and copying backups off the machine.
+
+For a live view, redis-cli ships two flags. The first prints one stats line per second:
+
+```text
+$ redis-cli --stat
+------- data ------ --------------------- load -------------------- - child -
+keys       mem      clients blocked requests            connections
+1          814.96K  1       0       3 (+0)              2
+1          830.07K  1       0       4 (+1)              2
+```
+
+The second measures latency continuously:
+
+```text
+$ redis-cli --latency
+0 1 0.02 101
+```
+
+The four numbers are minimum, maximum, and average latency in milliseconds, then the sample count. For everything else, running the info command in redis-cli returns memory use, connected clients, persistence state, and replication status in one dump.
+
+Backups are built in. Triggering BGSAVE writes a fresh snapshot in the background, and the persistence info confirms it worked:
+
+```text
+$ redis-cli BGSAVE
+Background saving started
+
+$ redis-cli INFO persistence | grep rdb_last_bgsave_status
+rdb_last_bgsave_status:ok
+```
+
+Once the status reads ok, copy dump.rdb from the data directory (/var/lib/redis on the apt install) to somewhere off the server. For a single node, a cron job that triggers BGSAVE and uploads the file to object storage covers backups.
+
+## When one server is not enough
+
+A single Redis node is a single point of failure. The simplest protection built into the open source server is replication: one config line on a second server, replicaof, pointing at the primary. The replica holds a full live copy of the data. If the primary dies, you can promote the replica, but you do it by hand.
+
+| Setup | Adds | Good when |
+| --- | --- | --- |
+| Single node + backups | nothing, simplest | a cache, or downtime is acceptable |
+| Primary + replica | a live copy, manual failover | you want a warm standby |
+
+For a cache, a single node plus the backup cron from the last section is a fine place to stop. Losing the node means restoring from the last snapshot and warming the cache back up. For data that has to stay up through a dead server, automatic failover is the next step, and setting that up takes more than an afternoon.
+
+## What self-hosting costs, and when managed is worth it
+
+One self-hosted Redis node is cheap: a small VPS plus the setup on this page. It's really not that difficult and I feel like especially with AI, it has gotten easy to maintain.
+
+But things like automatic failover mean more servers, and every one of them needs the same hardening, upgrades, monitoring, and backup care. Someone has to respond when the primary goes down and I would personally much rather pay someone to do it for me than maintain my own infra at scale.
+
+[Upstash Redis](https://upstash.com/docs/redis/overall/getstarted) is our version of that tradeoff, with both pay-as-you-go pricing and high-throughput fixed tiers to scale.
+
+The [free tier](https://upstash.com/pricing/redis) includes 256 MB and 500K commands per month. Pay-as-you-go costs $0.20 per 100K commands plus $0.25 per GB-month of storage and scales to zero, and fixed plans start at $10 per month. 
+
+Paid plans include replication and automatic failover, the step that self-hosting makes more complicated to do. There is also a [REST API](https://upstash.com/blog/redis-pricing-comparison-every-major-provider-in-2026-with-numbers), so it works from runtimes that cannot open a TCP connection, like Cloudflare Workers.
+
+I think self-hosting Redis is a good setup. The software is free again under AGPLv3, one node doesn't take long to set up, and everything on this page is standard configuration. 
+
+I hope you learned a lot in this article! Let me know how it goes, and do check out Upstash if you ever want to use a super robust, fast hosted Redis that can handle hundreds of thousands of commands per second with full replication, failover, etc. :]
