@@ -13,3 +13,24 @@ trustPolicy: no-downgrade
 trustPolicyExclude:
   - 'semver'
   - 'undici-types@6.20.0'
+  - '@octokit/endpoint@9.0.6'
+  - '@octokit/plugin-paginate-rest@9.2.2'
+  - 'fast-xml-parser@4.5.7'
+minimumReleaseAgeExclude:
+  - brace-expansion
+  - mdast-util-to-hast@13.2.1
+  - picomatch@2.3.2
+  - js-yaml@3.15.0
+  - js-yaml@4.3.0
+overrides:
+  undici-types@6.21.0: 6.20.0
+  '@octokit/plugin-paginate-rest@<9.2.2': ^9.2.2
+  '@octokit/request@<8.4.1': ^8.4.1
+  '@octokit/request-error@<5.1.1': ^5.1.1
+  esbuild@<=0.24.2: ^0.25.0
+  fast-xml-parser@<5.7.0: ^5.7.0
+  glob@>=10.2.0 <10.5.0: ^10.5.0
+  on-headers@<1.1.0: ^1.1.0
+  postcss@<8.5.18: ^8.5.18
+  serialize-javascript@<7.0.5: ^7.0.5
+  uuid@<11.1.1: ^11.1.1
