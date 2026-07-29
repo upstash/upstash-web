@@ -19,17 +19,15 @@ function getLinkArea(anchor: HTMLAnchorElement) {
   return window.location.pathname;
 }
 
-function onDocumentClick(event: MouseEvent) {
+function findAnchor(event: Event): HTMLAnchorElement | null {
   const target = event.target;
   if (!(target instanceof Element)) {
-    return;
+    return null;
   }
+  return target.closest<HTMLAnchorElement>("a[href]");
+}
 
-  const anchor = target.closest<HTMLAnchorElement>("a[href]");
-  if (!anchor) {
-    return;
-  }
-
+function trackAnchor(anchor: HTMLAnchorElement) {
   const href = anchor.getAttribute("href") ?? "";
   const area = getLinkArea(anchor);
 
@@ -53,8 +51,13 @@ function onDocumentClick(event: MouseEvent) {
     ...(product ? { product } : {}),
     ...(plan ? { plan } : {}),
   });
+}
 
-  // Append the affiliate code to console links before navigation
+// Append the affiliate code to console links before navigation
+function appendAffiliateCode(anchor: HTMLAnchorElement) {
+  if (!anchor.href.includes("console.upstash.com")) {
+    return;
+  }
   try {
     const affiliateCode = sessionStorage.getItem(AFFILIATE_CODE);
     if (affiliateCode) {
@@ -69,10 +72,47 @@ function onDocumentClick(event: MouseEvent) {
   }
 }
 
+function onDocumentClick(event: MouseEvent) {
+  const anchor = findAnchor(event);
+  if (!anchor) {
+    return;
+  }
+  trackAnchor(anchor);
+  appendAffiliateCode(anchor);
+}
+
+// Middle clicks fire auxclick, not click. Track them too since they
+// open the link in a new tab.
+function onDocumentAuxClick(event: MouseEvent) {
+  if (event.button !== 1) {
+    return;
+  }
+  const anchor = findAnchor(event);
+  if (!anchor) {
+    return;
+  }
+  trackAnchor(anchor);
+}
+
+// Rewrite the href before any navigation can start, so middle clicks and
+// right click > "Open in new tab" also carry the affiliate code.
+function onDocumentPointerDown(event: PointerEvent) {
+  const anchor = findAnchor(event);
+  if (anchor) {
+    appendAffiliateCode(anchor);
+  }
+}
+
 export default function Analytics() {
   useEffect(() => {
     document.addEventListener("click", onDocumentClick, true);
-    return () => document.removeEventListener("click", onDocumentClick, true);
+    document.addEventListener("auxclick", onDocumentAuxClick, true);
+    document.addEventListener("pointerdown", onDocumentPointerDown, true);
+    return () => {
+      document.removeEventListener("click", onDocumentClick, true);
+      document.removeEventListener("auxclick", onDocumentAuxClick, true);
+      document.removeEventListener("pointerdown", onDocumentPointerDown, true);
+    };
   }, []);
 
   return <VercelAnalytics />;
