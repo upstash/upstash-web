@@ -13,10 +13,8 @@ export function generateStaticParams(): Params[] {
   return usernames.map((author) => ({ author }));
 }
 
-export async function GET(
-  _request: Request,
-  { params }: { params: Params },
-): Promise<Response> {
+export async function GET(_request: Request, props: { params: Promise<Params> }): Promise<Response> {
+  const params = await props.params;
   const { author } = params;
   const displayName = authors[author]?.name ?? author;
   const posts = publishedPosts().filter((post) =>

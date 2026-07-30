@@ -5,10 +5,8 @@ import { clientHeaders, trackEvent } from "../../analytics";
 const UPSTASH_BACKEND_URL =
   process.env.UPSTASH_BACKEND_URL ?? "https://api.upstash.com";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } },
-) {
+export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     trackEvent("start_redis_metrics", req);
 

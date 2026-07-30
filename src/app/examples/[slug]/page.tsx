@@ -9,9 +9,9 @@ import markdownToHtml from "../../../utils/markdownToHtml";
 import { getData, type Example } from "../get-data";
 
 type Props = {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 };
 
 const LanguagesLabel = {
@@ -24,7 +24,7 @@ const LanguagesLabel = {
   elixir: "Elixir",
 };
 
-export async function generateStaticParams(): Promise<Props["params"][]> {
+export async function generateStaticParams(): Promise<Awaited<Props["params"]>[]> {
   const examples: Example[] = await getData();
 
   return examples.map((item) => ({
@@ -32,11 +32,12 @@ export async function generateStaticParams(): Promise<Props["params"][]> {
   }));
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Props["params"];
-}) {
+export async function generateMetadata(
+  props: {
+    params: Promise<Props["params"]>;
+  }
+) {
+  const params = await props.params;
   const examples: Example[] = await getData();
   const example = examples.find((item) => item.slug === params.slug);
 
@@ -67,7 +68,8 @@ export async function generateMetadata({
   };
 }
 
-export default async function BlogPage({ params }: Props) {
+export default async function BlogPage(props: Props) {
+  const params = await props.params;
   const examples: Example[] = await getData();
   const example = examples.find((item) => item.slug === params.slug);
 
