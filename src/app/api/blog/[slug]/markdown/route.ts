@@ -4,10 +4,8 @@ import { SITE_URL } from "@/utils/const";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(
-  _request: Request,
-  { params }: { params: { slug: string } },
-): Promise<Response> {
+export async function GET(_request: Request, props: { params: Promise<{ slug: string }> }): Promise<Response> {
+  const params = await props.params;
   const post = allPosts.find((p) => p.slug === params.slug && !p.draft);
 
   if (!post) {

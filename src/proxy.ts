@@ -65,7 +65,7 @@ function unacceptableResponse(): NextResponse {
   );
 }
 
-export function middleware(request: NextRequest, event: NextFetchEvent) {
+export function proxy(request: NextRequest, event: NextFetchEvent) {
   if (tracker) {
     tracker.track(request, event);
   }

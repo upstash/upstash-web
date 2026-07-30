@@ -23,6 +23,8 @@ minimumReleaseAgeExclude:
   - js-yaml@3.15.0
   - js-yaml@4.3.0
 overrides:
+  'next@<16': ^16.2.11
+  sharp@<0.35.0: ^0.35.0
   undici-types@6.21.0: 6.20.0
   '@octokit/plugin-paginate-rest@<9.2.2': ^9.2.2
   '@octokit/request@<8.4.1': ^8.4.1

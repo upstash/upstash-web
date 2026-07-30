@@ -4,10 +4,10 @@ import useIntersectionObserver from "@/hooks/use-intersection-observer";
 import cx from "@/utils/cx";
 import createGlobe from "cobe";
 import { useEffect, useRef, useState } from "react";
-import { useSpring } from "react-spring";
+import { useSpring } from "@react-spring/web";
 
 export default function GlobeClient() {
-  const divRef = useRef<any>();
+  const divRef = useRef<any>(null);
   const entry = useIntersectionObserver(divRef, {});
   const isVisible = !!entry?.isIntersecting;
   const [showGlobe, setShowGlobe] = useState(false);
@@ -50,7 +50,7 @@ export default function GlobeClient() {
 }
 
 const GlobeAnimation = () => {
-  const canvasRef = useRef<any>();
+  const canvasRef = useRef<any>(null);
 
   const [{ r }] = useSpring(() => ({
     r: 0,

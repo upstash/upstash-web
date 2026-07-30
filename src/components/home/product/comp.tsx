@@ -10,7 +10,7 @@ export function ProductBox({
 }: HTMLProps<HTMLDivElement> & {
   product: Product;
 }) {
-  const childs = Children.map(children, (child: ReactElement) => {
+  const childs = Children.map(children, (child: ReactElement<any>) => {
     return cloneElement(child, {
       ...child.props,
       product,
@@ -54,7 +54,7 @@ export function ProductFeature({
 }: HTMLProps<HTMLUListElement> & {
   product?: Product;
 }) {
-  const childs = Children.map(children, (child: ReactElement) => {
+  const childs = Children.map(children, (child: ReactElement<any>) => {
     return cloneElement(child, {
       ...child.props,
       product,

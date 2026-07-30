@@ -9,12 +9,12 @@ import type { Job } from "@content";
 import { notFound } from "next/navigation";
 
 type Props = {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 };
 
-export async function generateStaticParams(): Promise<Props["params"][]> {
+export async function generateStaticParams(): Promise<Awaited<Props["params"]>[]> {
   return allJobs
     .filter((job) => !job.draft)
     .map((job) => ({
@@ -22,11 +22,12 @@ export async function generateStaticParams(): Promise<Props["params"][]> {
     }));
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Props["params"];
-}) {
+export async function generateMetadata(
+  props: {
+    params: Promise<Props["params"]>;
+  }
+) {
+  const params = await props.params;
   const job = allJobs.find((job: Job) => job.slug === params.slug) as Job;
   const title = job.title;
   const description = job.summary;
@@ -58,7 +59,8 @@ export async function generateMetadata({
   };
 }
 
-export default async function BlogPage({ params }: Props) {
+export default async function BlogPage(props: Props) {
+  const params = await props.params;
   const slug = params?.slug;
   const job = allJobs.find((job) => job.slug === slug);
 
