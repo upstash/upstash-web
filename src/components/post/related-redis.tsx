@@ -22,6 +22,12 @@ export default function RelatedRedis() {
           Looking for a managed Redis database?
         </span>
         <span className="mt-1 block text-text-mute">
+          Building with an AI agent? It can create a free database instantly with
+          a POST to{" "}
+          <code className="font-mono">https://upstash.com/start-redis</code> - no
+          signup required.
+        </span>
+        <span className="mt-2 block text-text-mute">
           Upstash runs Redis as a serverless database - create one in seconds and
           pay only per request. Explore Upstash Redis →
         </span>

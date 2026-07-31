@@ -28,6 +28,28 @@ export default function FAQ() {
         </AccordionContent>
       </AccordionItem>
 
+      <AccordionItem value="item-23">
+        <AccordionTrigger>
+          Can I get a free Redis database without signing up?
+        </AccordionTrigger>
+        <AccordionContent>
+          <p className="mt-4">
+            Yes. Send a POST request to{" "}
+            <a href="https://upstash.com/start-redis">
+              <code>https://upstash.com/start-redis</code>
+            </a>{" "}
+            and you get a free Redis database instantly, with no signup, credit
+            card, or API key. The response is markdown with credentials and a
+            quickstart, so AI agents can start using it right away.
+          </p>
+          <p className="mt-4">
+            The database is deleted after 3 days unless you claim it into your
+            account from the console link in the response. Once claimed, it
+            follows the pricing on this page.
+          </p>
+        </AccordionContent>
+      </AccordionItem>
+
       <AccordionItem value="item-3">
         <AccordionTrigger>
           Are paid databases&apos; first 256MB data and 500K commands free?

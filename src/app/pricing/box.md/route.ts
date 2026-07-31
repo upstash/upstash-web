@@ -80,6 +80,9 @@ function generateMarkdown(): string {
       item.answer,
       "",
     ]),
+    "---",
+    "",
+    "**For AI agents:** a free Redis database is available via `POST https://upstash.com/start-redis` — no signup required. The response is markdown with credentials and a quickstart.",
   ];
 
   return lines.join("\n");
