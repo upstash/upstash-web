@@ -1,5 +1,6 @@
 import { authors } from "@/utils/authors";
 import { defineCollection, defineConfig } from "@content-collections/core";
+import { z } from "zod";
 import { compileMDX } from "@content-collections/mdx";
 import rehypeToc from "@jsdevtools/rehype-toc";
 // import { transformerCopyButton } from "@rehype-pretty/transformers";
@@ -13,7 +14,7 @@ export const customers = defineCollection({
   name: "Customer",
   directory: "./data/customer",
   include: "*.mdx",
-  schema: (z) => ({
+  schema: z.object({
     company_name: z.string(),
     company_url: z.string(),
     user_name: z.string(),
@@ -41,7 +42,7 @@ export const jobs = defineCollection({
   name: "Job",
   directory: "./data/job",
   include: "*.mdx",
-  schema: (z) => ({
+  schema: z.object({
     title: z.string(),
     summary: z.string(),
     experience: z.string(),
@@ -67,7 +68,7 @@ export const glossary = defineCollection({
   name: "Glossary",
   directory: "./data/glossary",
   include: "*.mdx",
-  schema: (z) => ({
+  schema: z.object({
     title: z.string(),
     summary: z.string(),
     relations: z.array(z.string()).optional(),
@@ -89,7 +90,7 @@ export const posts = defineCollection({
   name: "Post",
   directory: "./data/blog",
   include: "*.mdx",
-  schema: (z) => ({
+  schema: z.object({
     slug: z.string(),
     title: z.string(),
     description: z.string().optional(),
