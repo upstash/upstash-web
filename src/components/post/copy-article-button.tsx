@@ -166,7 +166,7 @@ function MenuAction({
   title: React.ReactNode;
   description: string;
   href?: string;
-  onClick: () => void;
+  onClick?: () => void;
   external?: boolean;
 }) {
   const inner = (
