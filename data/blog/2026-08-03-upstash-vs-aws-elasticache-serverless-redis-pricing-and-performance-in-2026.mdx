@@ -102,15 +102,19 @@ The free tiers differ in kind. Upstash's free tier is permanent: 256 MB and 500,
 
 ## Which is cheaper at high, steady traffic?
 
-It depends on where the traffic runs. ElastiCache node pricing ignores command volume, so an in-VPC app pushing 100 million commands a month through one t4g.micro pays $9.34. An Upstash Fixed plan is flat too: $20 a month covers unlimited commands at up to 10,000 per second.
+ElastiCache node pricing ignores command volume, so an in-VPC app using 100 million commands a month through one node is still billed at the flat node price. An Upstash Fixed plans are flat too: $20 a month covers unlimited commands at up to 10,000 per second.
 
 | Scenario | ElastiCache | Upstash |
 | --- | --- | --- |
-| 100M commands/month, 1 GB data, clients in-VPC | $9.34 (t4g.micro, Valkey) | $20 (Fixed 1GB) |
+| 100M commands/month, 1 GB data | $14.97 (t4g.small, Valkey, single node) | $20 (Fixed 1GB) |
 | \~10 GB with multi-AZ high availability | [$367.92 on-demand, $220.75 reserved](https://upstash.com/blog/redis-pricing-comparison-every-major-provider-in-2026-with-numbers) (2 × m7g.xlarge) | $400 (Fixed 10GB + Prod Pack) |
 | 50,000 requests/sec, 10 GB, serverless billing | [$915.42 Valkey, $1,359.26 Redis OSS](https://upstash.com/blog/aws-elasticache-pricing-explained-2026-full-cost-breakdown) | Enterprise, custom price |
 
-Clients already inside a VPC is ElastiCache node pricing's best case. If you're already on AWS infrastructure, I think ElastiCache is very good option.
+Two things I wanna add for ElastiCache's $14.97. It is a single node with no failover, and [Multi-AZ high availability needs at least one read replica](https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/AutoFailover.html) billed at the full node rate, so the price doubles to $29.94. 
+
+And t4g nodes are [burstable](https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/CacheNodes.SupportedTypes.html): a t4g.small runs at 20% CPU per vCPU and spends credits (💀) to go above it. When your credits run out, AWS lowers the node back to the baseline, so CPU-heavy commands under steady high traffic get a lot slower.
+
+ElastiCache node pricing is alright when clients already run inside a VPC. If you're already on AWS infrastructure, I think ElastiCache is a good option.
 
 But once the workload is higher or unpredictable, 50,000 requests per second on ElastiCache Serverless would be $915 to $1,359 a month, while Upstash covers 16,000 commands per second and 10 TB of bandwidth for a flat $800 and moves past that on Enterprise.
 
