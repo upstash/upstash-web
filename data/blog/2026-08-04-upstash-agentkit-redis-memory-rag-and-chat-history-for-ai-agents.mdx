@@ -80,13 +80,13 @@ const hits = await history.searchChats({ userId, query: "headphones", target: "b
 // client: useChat({ id: chatId, messages: chat?.messages ?? [] })
 ```
 
-Each chat is stored at agentkit:chat:<userId>:<sessionId>, so two users can never collide on the same session id. saveChat overwrites the whole message array on every save, which matches how useChat posts the full conversation each turn. You can pass a ttlSeconds option to expire old chats automatically.
+Each chat is stored at `agentkit:chat:<userId>:<sessionId>`, so two users can never collide on the same session id. saveChat overwrites the whole message array on every save, which matches how useChat posts the full conversation each turn. You can pass a ttlSeconds option to expire old chats automatically.
 
 ![](https://cdn.bydefault.so/drawing-qxmGofs-hNOO-Ax1cENm8.png)
 
 ## Long-term memory as tools
 
-createMemoryTools gives the model two tools, recall\_memory and save\_memory, so the model itself decides what to remember about a user and when to look it up. Memories are stored per user at agentkit:memory:<userId>:<id> and recalled with fuzzy search.
+createMemoryTools gives the model two tools, recall\_memory and save\_memory, so the model itself decides what to remember about a user and when to look it up. Memories are stored per user at `agentkit:memory:<userId>:<id>` and recalled with fuzzy search.
 
 ```ts
 import { createMemoryTools } from "@upstash/agentkit-ai-sdk";
