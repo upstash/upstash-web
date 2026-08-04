@@ -1,0 +1,160 @@
+---
+authors: [josh]
+slug: redis-cloud-pricing-in-2026-plans-costs-and-real-examples
+title: "Redis Cloud Pricing in 2026: Plans, Costs, and Real Examples"
+---
+
+Redis Cloud is a managed Redis service from Redis Inc., and it can cost anywhere from $0 to thousands of dollars a month depending on which plan you pick and which options you turn on. 
+
+When I first used it, I was confused by the pricing. The pricing page shows three plans, but a lot of what shows up on the bill (throughput limits, replication, the $200 Pro minimum) was not very clear to me. So I want to clear it up in this article.
+
+![](https://cdn.bydefault.so/EZ8djQVHtD2d4FHRpBJib.png)
+
+## What are Redis Cloud's pricing plans?
+
+Redis Cloud has three plans: 
+
+- Free ($0, 30 MB)
+- Essentials (shared infrastructure, from [$0.007/hour, so $5/month](https://redis.io/pricing/) for 250 MB)
+- Pro (dedicated infrastructure, from $0.014/hour with a $200/month minimum). 
+
+Essentials includes 250 MB to 100 GB and the Pro plan has no memory limit.
+
+| Plan | Price | Memory | Infrastructure | Uptime SLA |
+| --- | --- | --- | --- | --- |
+| Free | $0 | 30 MB | Shared | Best effort |
+| Essentials | From $5/month | 250 MB to 100 GB | Shared | Up to 99.99% |
+| Pro | From $200/month | Unlimited | Dedicated | Up to 99.999% |
+
+All three run on AWS, Azure, and GCP. [Pro annual plans run on AWS and GCP only](https://redis.io/pricing/), so Azure users stay on on-demand billing. 
+
+In Pro, they add the features Essentials doesn't have like multiple databases per subscription, Active-Active multi-region writes, auto-tiering, and private connectivity.
+
+![Redis Cloud pricing as of August 2026](https://cdn.bydefault.so/dQ648ewBWyUOjosbzUJxI.png)
+
+## Is Redis Cloud free?
+
+Yes. The Free plan is a 30 MB Essentials database that costs $0 forever, with no credit card required. But it comes with hard limits: [100 operations per second, 30 concurrent connections, 5 GB of monthly bandwidth](https://redis.io/docs/latest/operate/rc/subscriptions/view-essentials-subscription/essentials-plan-details/), and a single database.
+
+The free plan also [does not support replication](https://redis.io/docs/latest/operate/rc/databases/configuration/high-availability/), so there is no failover if the underlying node dies. Redis describes it as designed for learning and test projects and at 100 operations per second, even a small production app will hit the ceiling.
+
+## Redis Cloud Essentials pricing by tier
+
+Essentials is the shared, fixed-price tier. You pick a database size between 250 MB and 12 GB (RAM only), and each size comes with its own connection, bandwidth, and throughput limits. Redis updated these tables in [December 2025](https://redis.io/docs/latest/operate/rc/subscriptions/view-essentials-subscription/essentials-plan-details/):
+
+| DB size | Connections | Monthly bandwidth | Max throughput |
+| --- | --- | --- | --- |
+| 250 MB | 256 | 100 GB | 1,000 ops/sec |
+| 1 GB | 1,024 | 200 GB | 2,000 ops/sec |
+| 2.5 GB | 2,500 | 400 GB | 4,000 ops/sec |
+| 5 GB | 5,000 | 800 GB | 8,000 ops/sec |
+| 12 GB | 10,000 | 2,000 GB | 16,000 ops/sec |
+
+But there are some details here, e.g. the database size includes replication, so a 1 GB plan with high availability gives us [512 MB of usable data](https://redis.io/docs/latest/operate/rc/databases/configuration/sizing/). The throughput numbers assume 1 KiB requests; bigger values use up the same budget faster. And the [bandwidth allowance applies to the whole plan](https://redis.io/docs/latest/operate/rc/subscriptions/view-essentials-subscription/essentials-plan-details/), so all databases in it share the limit.
+
+## Redis Cloud Essentials with Redis Flex
+
+Redis Flex is the cheaper Essentials variant that keeps [10% of your data in RAM and the rest on SSD](https://redis.io/pricing/calculator/). It goes up to 100 GB per database, but each tier allows a lot less throughput than the RAM-only plan of the same size:
+
+| DB size | Connections | Monthly bandwidth | Max throughput |
+| --- | --- | --- | --- |
+| 1 GB | 1,024 | 50 GB | 200 ops/sec |
+| 5 GB | 5,000 | 200 GB | 1,000 ops/sec |
+| 12 GB | 10,000 | 500 GB | 2,400 ops/sec |
+| 25 GB | 10,000 | 1,000 GB | 5,000 ops/sec |
+| 100 GB | 10,000 | 4,000 GB | 20,000 ops/sec |
+
+The tradeoff for this cheaper price is performance. A 1 GB Flex database allows 200 ops/sec, while the regular 1 GB plan allows 2,000. Flex also [does not support Active-Active or Redis Search](https://redis.io/pricing/calculator/). It might be alright for large datasets with little traffic, but I'd keep data in S3 and not an in-memory database in that case.
+
+## How does Redis Cloud Pro pricing work?
+
+Pro is the dedicated tier: your databases run in their own VPC, memory is unlimited, and pricing is pay-as-you-go based on the dataset size, throughput, and availability options you configure in the [pricing calculator](https://redis.io/pricing/calculator/). 
+
+![The Redis Cloud Pricing Calculator as of August 2026](https://cdn.bydefault.so/Z9k3UoSrcW3ihtdi7wHyP.png)
+
+I found their [pricing calculator](https://redis.io/pricing/calculator/) to be the easiest way to see what a plan would cost. In the example above I put in 
+
+- 10 GB storage 
+- 2,000 ops/sec
+- high availability
+- AWS Frankfurt region
+
+The price for Pro is at $0.752/hour ($549/month). The Essentials quote is $240/month.
+
+## The costs that are easy to miss
+
+Four things move a Redis Cloud bill beyond the listed tier price: high availability doubles billed memory, Active-Active multiplies it up to 4x, data transfer switches to usage-based billing on annual plans, and support beyond basic response times is a separate paid tier.
+
+**High availability doubles your memory.** For both Essentials and Pro, [replication requires a memory limit twice the size of your dataset](https://redis.io/docs/latest/operate/rc/databases/configuration/high-availability/). 512 MB of data needs a 1 GB plan. Multi-AZ replication [costs about 2x the single-node price](https://redis.io/pricing/calculator/).
+
+**Active-Active stacks on top.** Active-Active geo-replication [also doubles memory, and the effect is cumulative with replication](https://redis.io/docs/latest/operate/rc/databases/configuration/sizing/), so the memory you pay for can reach 4x your data size. Active-Active databases also start evicting keys when any instance hits 80% of its memory limit, and each instance reserves two replication backlogs at 1% of the database size each.
+
+![How replication multiplies billed memory](https://cdn.bydefault.so/drawing-ycS8i98lhPiSgsm4Tpqvf.png)
+
+**Data transfer terms change with your plan.** On Free, Essentials, and on-demand Pro, transfer is [included in the price but limited](https://redis.io/pricing/). On annual Pro plans, it is usage-based. Inbound transfer is typically free, while [outbound transfer can incur charges](https://redis.io/pricing/calculator/) depending on region and volume.
+
+**Support is tiered.** Paid plans include support, but response times depend on the package: the [Developer tier answers a P1 in 8 business hours, Business in 1 hour, Enterprise in 30 minutes](https://redis.io/legal/cloud-support-policy/). A technical account manager only comes with Enterprise support at $20,000+ per year in support spend. And if you run out of prepaid credits, your account reverts to Basic support automatically.
+
+## What will you pay? Three examples
+
+A small 1 GB app costs $18/month on Essentials, a 10 GB production database with high availability costs $549/month on Pro, and a multi-region Active-Active setup bills you for about four times your data size. Here is how those numbers come together:
+
+| Scenario | Plan | Monthly cost |
+| --- | --- | --- |
+| Side project, 1 GB, a few million commands | Essentials 1 GB | [$18](https://upstash.com/blog/redis-pricing-comparison-every-major-provider-in-2026-with-numbers) |
+| Production cache, 10 GB with HA | Pro | $549 |
+| Multi-region, 10 GB, Active-Active in 2 regions | Pro | Billed for \~40 GB of memory |
+
+The $18 figure comes from Redis's calculator and the $549 is the calculator quote I showed above. The third row is the memory from Redis's sizing docs for a 10 GB dataset: HA doubles it to 20 GB, and a second active region doubles it again to 40 GB.
+
+## How does Redis Cloud pricing compare to Upstash Redis?
+
+[Upstash Redis](https://upstash.com/redis) lets you pick the billing model: fixed plans with unlimited commands from [$10 to $1,500 per month](https://upstash.com/pricing/redis), or pay-as-you-go starting at $0. 
+
+Redis Cloud has one model, the provisioned memory tier, and the fixed plans beat it on throughput per dollar: Fixed 1GB costs $20/month and allows [10,000 commands per second](https://upstash.com/pricing/redis), five times the 2,000 ops/sec limit on the $18 Essentials tier of the same size.
+
+![Upstash Redis pricing as of August 2026](https://cdn.bydefault.so/IucFjXsAXJpctV0oQkBV7.png)
+
+|  | Redis Cloud | Upstash Redis |
+| --- | --- | --- |
+| Billing model | Per memory tier | Fixed plans or pay-as-you-go |
+| Free tier | 30 MB, 100 ops/sec | [256 MB, 500K commands/month](https://upstash.com/pricing/redis) |
+| Cheapest paid | $5/month (250 MB, 1,000 ops/sec) | $0 on pay-as-you-go |
+| Idle database | Full tier price | $0 on pay-as-you-go |
+| High availability | 2x billed memory | Prod Pack, flat $200/month |
+| Max size | 50 TB (Pro) | 500 GB fixed plans, unlimited on Enterprise |
+| Throughput | Up to 16,000 ops/sec on Essentials, custom on Pro | 16,000 commands/sec on fixed plans, [100,000+ on Enterprise](https://upstash.com/docs/redis/overall/enterprise) |
+
+Upstash's fixed plans scale up from there: the 100GB and 500GB plans allow [16,000 commands per second](https://upstash.com/pricing/redis), and [Enterprise goes past 100,000](https://upstash.com/docs/redis/overall/enterprise) with dedicated resources.
+
+Pay-as-you-go covers the low end: [$0.20 per 100K commands plus $0.25 per GB of storage](https://upstash.com/pricing/redis), with the first GB of storage free. A database with no traffic costs nothing. Take a small app with 1 GB of data and 1M commands a month:
+
+- Commands: 10 x $0.20 = $2.00
+- Storage: 1 GB is within the free first GB, so $0
+- Total: $2 a month
+
+The same app on Redis Cloud needs the 1 GB Essentials plan, which costs $18 a month whether the app sends 1M commands or none. Essentials bills the provisioned gigabyte, and pay-as-you-go bills the traffic.
+
+## When is Redis Cloud the better choice?
+
+Redis Cloud is great if you need the Redis Stack module set (e.g. bloom filters) and Active-Active multi-region writes. If your workload depends on one of those, the pricing comparison above matters less than the capability.
+
+Redis Cloud has the full Redis Stack: RediSearch, RedisJSON, RedisTimeSeries, and RedisBloom. RedisJSON data [migrates directly to Upstash](https://upstash.com/blog/upstash-vs-redis-cloud-a-2026-comparison), and search workloads have Upstash Redis Search as an equivalent, but TimeSeries and Bloom have no Upstash counterpart.
+
+## FAQ
+
+### Is Redis Cloud free?
+
+Yes, the Free plan gives you one 30 MB database at $0 with no credit card. It is limited to 100 operations per second and 30 connections, and has no replication, so it fits learning and testing.
+
+### How much does Redis Cloud cost per month?
+
+Between $0 and $216/month on the shared Essentials tiers (30 MB free, $5 for 250 MB, $216 for 12 GB), and from $200/month upward on Pro, where the price depends on dataset size, throughput, and availability options.
+
+### Does high availability double Redis Cloud's price?
+
+Yes. Replication requires a memory limit twice your dataset size on both Essentials and Pro, so a highly available database bills for double the memory. With Active-Active geo-replication on top, billed memory can reach four times your data size.
+
+### Does Redis Cloud charge for data transfer?
+
+On Free, Essentials, and on-demand Pro plans, data transfer is included in the price but limited (each Essentials tier has a monthly bandwidth allowance). On annual Pro plans, data transfer is billed by usage. Inbound transfer is typically free; outbound may cost extra depending on region and volume.
