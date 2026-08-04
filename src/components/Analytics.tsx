@@ -29,25 +29,15 @@ function findAnchor(event: Event): HTMLAnchorElement | null {
 
 function trackAnchor(anchor: HTMLAnchorElement) {
   const href = anchor.getAttribute("href") ?? "";
-  const area = getLinkArea(anchor);
-
-  trackEvent("link_click", {
-    link_url: href,
-    link_text: (anchor.textContent ?? "").trim().slice(0, 100),
-    link_area: area,
-  });
-
-  if (!href.includes("console.upstash.com")) {
-    return;
-  }
-
   const product = anchor
     .closest("[data-product]")
     ?.getAttribute("data-product");
   const plan = anchor.closest("[data-plan]")?.getAttribute("data-plan");
 
-  trackEvent("console_click", {
-    area,
+  trackEvent("link_click", {
+    link_url: href,
+    link_text: (anchor.textContent ?? "").trim().slice(0, 100),
+    link_area: getLinkArea(anchor),
     ...(product ? { product } : {}),
     ...(plan ? { plan } : {}),
   });

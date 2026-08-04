@@ -9,6 +9,32 @@ import {
   AccordionTrigger,
 } from "../accordion";
 
+const QUESTIONS: Record<string, string> = {
+  "item-1": "How can I upgrade to pay as you go from free tier?",
+  "item-2": "What is included in free tier?",
+  "item-23": "Can I get a free Redis database without signing up?",
+  "item-3": "Are paid databases' first 256MB data and 500K commands free?",
+  "item-4": "How does the budget work?",
+  "item-5": "Do Fixed plans have command count pricing or limits?",
+  "item-6": "Are all Redis commands counted in billing?",
+  "item-7": "Are databases faster in higher plans?",
+  "item-8": "Are read and write commands same price?",
+  "item-9": "How is the storage cost calculated?",
+  "item-10": "What happens when I hit limits on pay-as-you-go plan?",
+  "item-11": "What happens when I hit limits on Fixed plans?",
+  "item-12": "Are there free trials?",
+  "item-13": "How many databases can I create?",
+  "item-14": "What happens if I delete my database after 2-3 days?",
+  "item-15": "How much is the price for bandwidth?",
+  "item-16": "Can I purchase Prod Pack for any plan?",
+  "item-17": "What is included in Prod Pack?",
+  "item-21": "Does enabling multi-zone high availability change my bill?",
+  "item-22": "What happened to the Pro 2K and Pro 10K plans?",
+  "item-18": "What is included in Enterprise subscription?",
+  "item-19": "How is the Enterprise subscription priced?",
+  "item-20": "Do you have the Professional Support plan?",
+};
+
 export default function FAQ() {
   return (
     <Accordion.Root
@@ -17,7 +43,10 @@ export default function FAQ() {
       collapsible
       onValueChange={(value) => {
         if (value) {
-          trackEvent("faq_open", { product: "redis", question: value });
+          trackEvent("faq_open", {
+            product: "redis",
+            question: QUESTIONS[value] ?? value,
+          });
         }
       }}
     >

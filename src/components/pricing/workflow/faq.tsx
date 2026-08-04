@@ -9,6 +9,15 @@ import {
   AccordionTrigger,
 } from "../accordion";
 
+const QUESTIONS: Record<string, string> = {
+  "item-1": "What is a step?",
+  "item-2":
+    'What happens when we hit "Steps per Day" or "Monthly Bandwidth" limit?',
+  "item-3": "What happens when we hit daily max steps limit?",
+  "item-4": "Is there a rate limit ?",
+  "item-5": "How is the Max Message Size Limit applied?",
+};
+
 export default function FAQ() {
   return (
     <Accordion.Root
@@ -17,7 +26,10 @@ export default function FAQ() {
       collapsible
       onValueChange={(value) => {
         if (value) {
-          trackEvent("faq_open", { product: "workflow", question: value });
+          trackEvent("faq_open", {
+            product: "workflow",
+            question: QUESTIONS[value] ?? value,
+          });
         }
       }}
     >

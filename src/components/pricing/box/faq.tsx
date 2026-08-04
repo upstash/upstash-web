@@ -9,6 +9,18 @@ import {
   AccordionTrigger,
 } from "../accordion";
 
+const QUESTIONS: Record<string, string> = {
+  "item-2": 'What does "active CPU hour" mean?',
+  "item-3": "What happens when a box is idle?",
+  "item-4": "How much do Keep Alive boxes cost?",
+  "item-5": "What is included in storage billing?",
+  "item-6": "What are the free tier limits?",
+  "item-7": "How does LLM token usage work?",
+  "item-8": "Can I run more than 1,000 concurrent boxes?",
+  "item-9": "Where are boxes hosted?",
+  "item-10": "Can I use my own Docker container?",
+};
+
 export default function FAQ() {
   return (
     <Accordion.Root
@@ -17,7 +29,10 @@ export default function FAQ() {
       collapsible
       onValueChange={(value) => {
         if (value) {
-          trackEvent("faq_open", { product: "box", question: value });
+          trackEvent("faq_open", {
+            product: "box",
+            question: QUESTIONS[value] ?? value,
+          });
         }
       }}
     >

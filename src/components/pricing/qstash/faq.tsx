@@ -9,6 +9,14 @@ import {
   AccordionTrigger,
 } from "../accordion";
 
+const QUESTIONS: Record<string, string> = {
+  "item-1": "How are messages priced? Are retries free?",
+  "item-2":
+    "What happens if we exceed the “Messages per Day” or “Monthly Bandwidth” limit?",
+  "item-3": "How is the Max Message Size limit applied?",
+  "item-4": "Is there a rate limit?",
+};
+
 export default function FAQ() {
   return (
     <Accordion.Root
@@ -17,7 +25,10 @@ export default function FAQ() {
       collapsible
       onValueChange={(value) => {
         if (value) {
-          trackEvent("faq_open", { product: "qstash", question: value });
+          trackEvent("faq_open", {
+            product: "qstash",
+            question: QUESTIONS[value] ?? value,
+          });
         }
       }}
     >

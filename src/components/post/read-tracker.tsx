@@ -3,31 +3,15 @@
 import { trackEvent } from "@/lib/analytics";
 import { useEffect } from "react";
 
-const STORAGE_KEY = "upstash_read_posts";
 const MIN_VISIBLE_MS = 10_000;
-const MAX_STORED_SLUGS = 500;
-
-function getReadSlugs(): string[] {
-  try {
-    const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]");
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
 
 /**
  * Fires `blog_read` after the post has been visible for 10s cumulative
- * AND the user has scrolled at least once. Fires once per post per user
- * (deduped via localStorage).
+ * AND the user has scrolled at least once. Fires once per mount; unique
+ * readers are deduped at query time via user_pseudo_id in BigQuery.
  */
 export default function ReadTracker({ slug }: { slug: string }) {
   useEffect(() => {
-    const readSlugs = getReadSlugs();
-    if (readSlugs.includes(slug)) {
-      return;
-    }
-
     let visibleSince: number | null =
       document.visibilityState === "visible" ? Date.now() : null;
     let accumulatedMs = 0;
@@ -49,14 +33,6 @@ export default function ReadTracker({ slug }: { slug: string }) {
       }
       fired = true;
       cleanup();
-      try {
-        const next = [...getReadSlugs().filter((s) => s !== slug), slug].slice(
-          -MAX_STORED_SLUGS,
-        );
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      } catch {
-        // localStorage unavailable, still fire the event
-      }
       trackEvent("blog_read", { slug });
     };
 
