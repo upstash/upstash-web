@@ -17,9 +17,7 @@ With ElastiCache we pick node types, replica counts, subnets, and security group
 
 ## How much throughput can Upstash Redis handle?
 
-Upstash Redis handles [16,000 commands per second on the Fixed 100GB and 500GB plans](https://upstash.com/pricing/redis). 
-
-Enterprise plans go beyond [100,000 commands per second](https://upstash.com/docs/redis/overall/enterprise) with dedicated resources.
+Upstash Redis handles [16,000 commands per second on the Fixed 100GB and 500GB plans](https://upstash.com/pricing/redis). Enterprise plans go [100,000+ commands per second](https://upstash.com/docs/redis/overall/enterprise) with dedicated resources.
 
 I checked the limits from a Node.js client in the same AWS region as the database. Sequential PING commands came back with a median of 1.54 ms. Normal GETs with 32 concurrent workers ran at 4,735 requests per second with a median of 5.89 ms. 
 
@@ -36,7 +34,7 @@ Rate limits: 0  Request errors: 0  Command errors: 0
 
 ![](https://cdn.bydefault.so/6fnJb-9T0fWgPIaTJ5m0x.png)
 
-The same pipelined load pushed from the Virginia client against a second database in Frankfurt held above 10,300 commands per second across 680,000 commands, again with zero 429 errors. This is really nice.
+The same pipelined load pushed from the Virginia client against a second database in Frankfurt held above 10,300 commands per second at concurrency 16, 32, and 64, again with zero 429 errors. This is really nice.
 
 In every run, requests past the plan limit waited a bit longer instead of failing.
 
@@ -70,19 +68,33 @@ ElastiCache bills per node-hour, or on Serverless per GB-hour of storage plus co
 
 The common on-demand nodes in us-east-1:
 
-| Node type | vCPUs | Memory | Valkey $/hour | About $/month |
-| --- | --- | --- | --- | --- |
-| cache.t4g.micro | 2 | 0.5 GiB | $0.0128 | $9.34 |
-| cache.t4g.small | 2 | 1.37 GiB | $0.0205 | $14.97 |
-| cache.m7g.large | 2 | 6.38 GiB | $0.1011 | $73.80 |
-| cache.r7g.large | 2 | 13.07 GiB | $0.1402 | $102.35 |
-| cache.r7g.xlarge | 4 | 26.32 GiB | $0.2797 | $204.18 |
+| Node type | vCPUs | Memory | Valkey $/hour | Redis OSS $/hour | Valkey, about $/month |
+| --- | --- | --- | --- | --- | --- |
+| cache.t4g.micro | 2 | 0.5 GiB | $0.0128 | $0.016 | $9.34 |
+| cache.t4g.small | 2 | 1.37 GiB | $0.0256 | $0.032 | $18.69 |
+| cache.m7g.large | 2 | 6.38 GiB | $0.1264 | $0.158 | $92.27 |
+| cache.r7g.large | 2 | 13.07 GiB | $0.1752 | $0.219 | $127.90 |
+| cache.r7g.xlarge | 4 | 26.32 GiB | $0.3496 | $0.437 | $255.21 |
 
-AWS prices [Valkey 20% below Redis OSS on nodes](https://upstash.com/blog/aws-elasticache-pricing-explained-2026-full-cost-breakdown), and about a third below on Serverless. On Serverless, [each kilobyte transferred consumes one ECPU](https://aws.amazon.com/elasticache/pricing/): a read of 3.2 KB costs 3.2 ECPUs. The idle minimums come from minimum metered storage: Redis OSS meters at least 1 GB, so 1 GB × $0.125 per GB-hour × 730 hours = $91.25 a month for an empty cache. 
+But important, EU regions cost more! In Frankfurt (eu-central-1) a Valkey 
+
+- t4g.small is [$0.0288 per hour](https://aws.amazon.com/elasticache/pricing/), about $21.02 a month, and 
+- r7g.xlarge is $0.42 per hour, about $306.60 a month. 
+
+And Redis OSS is even more expensive than Valkey, e.g. Redis in Frankfurt runs the same t4g.small at $0.036 per hour, about $26.28 a month.
+
+This is because AWS prices [Valkey 20% below Redis OSS on nodes](https://upstash.com/blog/aws-elasticache-pricing-explained-2026-full-cost-breakdown), and about a third below on Serverless. On Serverless, [each kilobyte transferred costs one ECPU](https://aws.amazon.com/elasticache/pricing/) (ElastiCache Processing Unit, AWS's billing unit for Serverless), so for example a read of 3.2 KB costs 3.2 ECPUs. 
+
+There are also minimum charges, even for an empty cache:
+
+- Redis OSS meters at least 1 GB of storage
+- In us-east-1: 1 GB × $0.125 per GB-hour × 730 hours = $91.25 a month
+- In Frankfurt: 1 GB × $0.151 per GB-hour × 730 hours = $110.23 a month
+- Valkey's minimum is only 100 MB, so an empty cache is $6.13 a month in us-east-1 and $7.37 in Frankfurt
 
 ![People on Reddit are not happy about ElastiCache pricing :/](https://cdn.bydefault.so/hIAwRd9oKo_sNkfmlDsiH.png)
 
-The quiet costs add up too. Replicas bill as full nodes. Cross-AZ traffic costs $0.01 per GiB in each direction, backups cost $0.085 per GiB-month, and running an end-of-life Redis OSS version adds an [extended support surcharge of 80%, rising to 160% in year three](https://aws.amazon.com/elasticache/pricing/). 
+Replicas are also charged as full nodes and cross-AZ traffic costs $0.01 per GiB in or out, charged on the EC2 side, backups cost $0.085 per GiB-month, and running an end-of-life Redis OSS version adds an [extended support surcharge of 80%, rising to 160% in year three](https://aws.amazon.com/elasticache/pricing/). 
 
 Reserved nodes discount up to [55% with all-upfront payment](https://aws.amazon.com/elasticache/pricing/). Some cluster examples are in our [full ElastiCache pricing breakdown](https://upstash.com/blog/aws-elasticache-pricing-explained-2026-full-cost-breakdown).
 
@@ -102,15 +114,15 @@ The free tiers differ in kind. Upstash's free tier is permanent: 256 MB and 500,
 
 ## Which is cheaper at high, steady traffic?
 
-ElastiCache node pricing ignores command volume, so an in-VPC app using 100 million commands a month through one node is still billed at the flat node price. An Upstash Fixed plans are flat too: $20 a month covers unlimited commands at up to 10,000 per second.
+ElastiCache node pricing ignores command volume, so an in-VPC app using 100 million commands a month through one node is still billed at the flat node price. Upstash Fixed plans are flat too: $20 a month covers unlimited commands at up to 10,000 per second.
 
 | Scenario | ElastiCache | Upstash |
 | --- | --- | --- |
-| 100M commands/month, 1 GB data | $14.97 (t4g.small, Valkey, single node) | $20 (Fixed 1GB) |
+| 100M commands/month, 1 GB data | $18.69 (t4g.small, Valkey, single node) | $20 (Fixed 1GB) |
 | \~10 GB with multi-AZ high availability | [$367.92 on-demand, $220.75 reserved](https://upstash.com/blog/redis-pricing-comparison-every-major-provider-in-2026-with-numbers) (2 × m7g.xlarge) | $400 (Fixed 10GB + Prod Pack) |
 | 50,000 requests/sec, 10 GB, serverless billing | [$915.42 Valkey, $1,359.26 Redis OSS](https://upstash.com/blog/aws-elasticache-pricing-explained-2026-full-cost-breakdown) | Enterprise, custom price |
 
-Two things I wanna add for ElastiCache's $14.97. It is a single node with no failover, and [Multi-AZ high availability needs at least one read replica](https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/AutoFailover.html) billed at the full node rate, so the price doubles to $29.94. 
+Two things I wanna add for ElastiCache's $18.69. It is a single node with no failover, and [Multi-AZ high availability needs at least one read replica](https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/AutoFailover.html) billed at the full node rate, so the price doubles to $37.38. 
 
 And t4g nodes are [burstable](https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/CacheNodes.SupportedTypes.html): a t4g.small runs at 20% CPU per vCPU and spends credits (💀) to go above it. When your credits run out, AWS lowers the node back to the baseline, so CPU-heavy commands under steady high traffic get a lot slower.
 
@@ -130,7 +142,7 @@ The REST API is also request-based rather than connection-based, so AWS Lambda f
 
 Upstash replicates to read regions you pick from [18 regions across AWS and GCP](https://upstash.com/docs/redis/features/globaldatabase), with no fixed limit on how many. ElastiCache Global Datastore is active-passive and allows [at most two secondary regions](https://upstash.com/blog/managed-redis-compared-features-of-every-major-provider-in-2026), so writes go through one primary region.
 
-In my tests i got [reads under 1 ms and writes under 5 ms from the same region](https://upstash.com/docs/common/concepts/global-replication) at the 99th percentile, and reads and writes under 50 ms from the same continent. You can run the read test yourself at [latency.upstash.com](https://latency.upstash.com/). Each read region costs half the Fixed plan's monthly price, and on pay-as-you-go a write bills once per region it replicates to, so 100,000 writes with one read region cost $0.40.
+Upstash's own tests show [reads under 1 ms and writes under 5 ms from the same region](https://upstash.com/docs/common/concepts/global-replication) at the 99th percentile, and reads and writes under 50 ms from the same continent. You can run the read test yourself at [latency.upstash.com](https://latency.upstash.com/). Each read region costs half the Fixed plan's monthly price, and on pay-as-you-go a write bills once per region it replicates to, so 100,000 writes with one read region cost $0.40.
 
 ![Live latency chart on latency.upstash.com](https://cdn.bydefault.so/image-fD5PT2DtC4PEEJzeq1IyC.png)
 
@@ -147,11 +159,11 @@ ElastiCache is better when everything runs inside one AWS VPC and you have someo
 |  | Upstash Redis | AWS ElastiCache |
 | --- | --- | --- |
 | Billing | Per command, or flat $10 to $1,500/month | Per node-hour, or metered Serverless |
-| Idle cost | $0 | $6.13 to $9.34 minimum |
+| Idle cost | $0 | $6.13 to $91.25 minimum, depending on engine |
 | Throughput | High sustained, 16,000 commands/sec on Fixed, 100,000+ on dedicated nodes | Also high sustained on dedicated nodes |
 | Access | HTTPS from anywhere, plus TCP | TCP inside your VPC |
 | Free tier | 256 MB, 500K commands/month, permanent | $100 to $200 in credits |
-| Global replication | 18 read regions, no fixed limit | Active-passive, 2 secondary regions max |
+| Global replication | Read regions picked from 18 regions, no fixed limit | Active-passive, 2 secondary regions max |
 | Setup | Create database, get URL and token | VPC, subnets, security groups, node sizing |
 
 Supabase [compared ElastiCache, Redis Cloud, and DynamoDB](https://upstash.com/customers/supabase) before picking Upstash for its global edge caching, global replication, the REST API, and predictable cost at high bandwidth. 
