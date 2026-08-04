@@ -1,0 +1,253 @@
+---
+authors: [arda]
+title: "Upstash AgentKit: Redis Memory, RAG, and Chat History for AI Agents"
+slug: upstash-agentkit-redis-memory-rag-and-chat-history-for-ai-agents
+tags: [redis, agents, vercel, eve]
+---
+
+## What is Upstash AgentKit?
+
+[Upstash AgentKit](https://github.com/upstash/agentkit) is a set of TypeScript packages that give AI agents long-term memory, searchable chat history, RAG, tool caching, and rate limiting, all stored in Upstash Redis. It ships adapters for the Vercel AI SDK and for Eve, Vercel's agent framework.
+
+The search-based features (memory recall, chat history search, RAG) run on [Upstash Redis Search](https://upstash.com/docs/redis/search/introduction) and its smart fuzzy matching, so RAG works without a separate vector database. Your agent's state and its search index stay in the same Redis database.
+
+Every primitive follows the same pattern: you call one factory function, it defaults to reading your Redis credentials from environment variables, and it creates its search index on first use.
+
+![](https://cdn.bydefault.so/drawing-Ld1jsyrp77uEcRb_SLXDC.png)
+
+## The four packages
+
+AgentKit is [four npm packages](https://github.com/upstash/agentkit). You install the adapter for the framework you use, and it pulls in the core.
+
+| Package | Role |
+| --- | --- |
+| `@upstash/agentkit-sdk` | Core, framework-agnostic primitives |
+| `@upstash/agentkit-ai-sdk` | Adapter for the Vercel AI SDK |
+| `@upstash/agentkit-eve` | Adapter for Eve, as per-file building blocks |
+| `@upstash/agentkit-eve-extension` | The same features as one mountable Eve extension file |
+
+The [AI SDK adapter](https://upstash.com/docs/redis/sdks/agentkit/ai-sdk) exposes five imports: createChatHistory, createMemoryTools, createSearchTools, createRateLimit, and cachedTools. Each one plugs into generateText or streamText. The Redis client defaults to Redis.fromEnv(), so with UPSTASH\_REDIS\_REST\_URL and UPSTASH\_REDIS\_REST\_TOKEN set, you import from this one package and nothing else.
+
+```bash
+npm install @upstash/agentkit-ai-sdk @upstash/redis ai
+```
+
+## Chat history that survives the request
+
+The AI SDK's useChat hook keeps messages in client state, so a page refresh clears them. createChatHistory stores each chat as one JSON document in Redis, keyed per user, and indexes it for search.
+
+```ts
+// app/api/chat/route.ts
+import { convertToModelMessages, createUIMessageStreamResponse, streamText, toUIMessageStream } from "ai";
+import { createChatHistory } from "@upstash/agentkit-ai-sdk";
+
+const history = createChatHistory();
+
+export async function POST(req: Request) {
+  const userId = await getSessionUserId(req); // your auth session, never a client-sent id
+  const { id: chatId, messages } = await req.json(); // useChat posts its chat id + the full transcript
+
+  const result = streamText({ model, messages: convertToModelMessages(messages) });
+
+  return createUIMessageStreamResponse({
+    stream: toUIMessageStream({
+      stream: result.stream,
+      originalMessages: messages,
+      onFinish: ({ messages }) =>
+        history.saveChat({ userId, sessionId: chatId, messages, title: "New chat" }),
+    }),
+  });
+}
+```
+
+Loading a chat back, listing a user's chats for a sidebar, and fuzzy-searching across everything the user or the model ever said are each one call:
+
+```ts
+const chat = await history.getChat({ userId, sessionId: chatId }); // full transcript, or null
+const chats = await history.listChats({ userId, limit: 50 }); // summaries, no messages
+const hits = await history.searchChats({ userId, query: "headphones", target: "both", limit: 20 });
+// client: useChat({ id: chatId, messages: chat?.messages ?? [] })
+```
+
+Each chat is stored at `agentkit:chat:<userId>:<sessionId>`, so two users can never collide on the same session id. saveChat overwrites the whole message array on every save, which matches how useChat posts the full conversation each turn. You can pass a ttlSeconds option to expire old chats automatically.
+
+![](https://cdn.bydefault.so/drawing-qxmGofs-hNOO-Ax1cENm8.png)
+
+## Long-term memory as tools
+
+createMemoryTools gives the model two tools, recall\_memory and save\_memory, so the model itself decides what to remember about a user and when to look it up. Memories are stored per user at `agentkit:memory:<userId>:<id>` and recalled with fuzzy search.
+
+```ts
+import { createMemoryTools } from "@upstash/agentkit-ai-sdk";
+import { generateText, stepCountIs } from "ai";
+
+const tools = createMemoryTools({ userId });
+
+await generateText({ model, tools, stopWhen: stepCountIs(5), prompt: "What do you know about me?" });
+```
+
+You can tune topK (how many memories a recall returns) and minScore (a relevance floor based on BM25, the classic keyword-ranking function), or rename the tools with recallToolName and saveToolName.
+
+## RAG without a vector database
+
+createSearchTools turns a Redis Search index into three agent tools: search, aggregate, and count. You describe your documents with a schema, and the model queries them itself. This is how AgentKit does RAG: retrieval runs over your own documents through full-text search instead of embeddings.
+
+```ts
+import { s } from "@upstash/redis";
+import { createSearchTools } from "@upstash/agentkit-ai-sdk";
+import { generateText, stepCountIs } from "ai";
+
+const schema = s.object({ name: s.string(), age: s.number(), city: s.string().noTokenize() });
+const tools = createSearchTools({ schema, indexName: "users" });
+
+await generateText({ model, tools, stopWhen: stepCountIs(5), prompt: "How many users named Ada live in London?" });
+```
+
+Redis Search is built on [Tantivy](https://upstash.com/docs/redis/search/introduction), a Rust search library, and when a query gives a plain value for a text field it applies [smart matching](https://upstash.com/docs/redis/search/querying): term search for single words, and a mix of phrase, term, and fuzzy matching for multi-word values. Typos in the model's queries still find the right documents.
+
+## Rate limiting and tool caching
+
+createRateLimit returns a configured [Upstash Ratelimit](https://upstash.com/docs/redis/sdks/ratelimit-ts/overview) you call before the model runs. Passing the user id as the identifier throttles per user:
+
+```ts
+import { createRateLimit, Ratelimit } from "@upstash/agentkit-ai-sdk";
+
+const ratelimit = createRateLimit({ limiter: Ratelimit.slidingWindow(20, "1 m") });
+
+const { success } = await ratelimit.limit(userId);
+if (!success) throw new Error("rate limited"); // or return a 429 from your route
+```
+
+cachedTools wraps a map of AI SDK tools and memoizes each result in Redis, keyed by the tool name and a hash of its arguments. A deterministic tool like a weather lookup runs once per unique input instead of on every turn:
+
+```ts
+import { z } from "zod";
+import { generateText, tool } from "ai";
+import { cachedTools } from "@upstash/agentkit-ai-sdk";
+
+const tools = cachedTools(
+  {
+    getWeather: tool({
+      description: "Get the weather for a city",
+      inputSchema: z.object({ city: z.string() }),
+      execute: async ({ city }) => fetchWeather(city),
+    }),
+  },
+  { userId },
+);
+
+await generateText({ model, tools, prompt: "What's the weather in Paris?" });
+```
+
+## The userId rule
+
+Every AgentKit primitive takes a userId, and that one value is the whole tenant boundary. It must be non-empty, may not contain a colon, and has to come from a verified server-side auth source: the user id from Clerk, Auth.js, Supabase Auth, or whatever session your route already trusts. A client-supplied header, query param, or body field is never safe here, because whoever controls the userId reads that user's chats and memories.
+
+Because every Redis key embeds the userId, a chat or memory saved under one user can't be read or overwritten under another. There is no extra access-control layer to configure.
+
+## AgentKit in Eve
+
+[Eve](https://vercel.com/blog/introducing-eve) is Vercel's open-source agent framework, in public preview. An Eve agent is a directory: instructions.md for the system prompt, tools/ for what it can do, channels/ for where users reach it, schedules/ for when it acts on its own. Vercel says agents now trigger [around 29% of deployments](https://vercel.com/blog/introducing-eve) on their platform, up from under 3% a year earlier, and Eve is the framework they run their own agents on.
+
+![](https://cdn.bydefault.so/image-I_6SIscmRF-alHQ1GY4Zy.png)
+
+*An Eve agent is a directory, from Vercel's launch post*
+
+[Two AgentKit packages](https://upstash.com/docs/redis/sdks/agentkit/eve) target Eve. The extension adds memory, searchable chat history, and RAG to the agent from one file in agent/extensions/.
+
+```bash
+npm install @upstash/agentkit-eve-extension
+```
+
+```ts
+// agent/extensions/agentkit.ts
+import agentkit from "@upstash/agentkit-eve-extension";
+
+export default agentkit();
+```
+
+The filename supplies the namespace, so the agent gets tools named agentkit\_\_recall\_memory, agentkit\_\_save\_memory, and with chat history enabled, agentkit\_\_search\_chat\_history and agentkit\_\_read\_chat\_history. The userId defaults to Eve's verified session auth chain, so tenant isolation works without configuration. One config object tunes everything:
+
+![](https://cdn.bydefault.so/drawing-M5vm9rToJDw8fd0N6WDWe.png)
+
+```ts
+import { s } from "@upstash/redis";
+import agentkit from "@upstash/agentkit-eve-extension";
+
+export default agentkit({
+  memory: { topK: 5, minScore: 1 },
+  chatHistory: { ttlSeconds: 60 * 60 * 24 * 30 },
+  search: {
+    schema: s.object({ title: s.string(), author: s.string().noTokenize(), year: s.number() }),
+    indexName: "books",
+  },
+});
+```
+
+Chat history matters more in Eve than in the AI SDK, because Eve prunes its own workflow store after a run completes. Redis becomes the durable record of past conversations, and the agent can search them itself.
+
+![](https://cdn.bydefault.so/tweet-JEUGfj1KkvvFMtFtll5Er.png)
+
+## When you need the per-file Eve package
+
+`@upstash/agentkit-eve` offers the same building blocks as individual tool files, plus two things an Eve extension can't contribute: rate limiting and a sandbox backend.
+
+Rate limiting in Eve hooks into the channel's auth chain. Eve runs each turn as two authenticated requests, a POST that invokes the model and a GET that opens the reply stream. createRateLimitAuth counts only the POSTs, so one turn costs one token and a sliding window of 20 per minute really means 20 turns:
+
+```ts
+// agent/channels/eve.ts
+import { createRateLimitAuth, Ratelimit } from "@upstash/agentkit-eve";
+import { localDev, vercelOidc } from "eve/channels/auth";
+import { eveChannel } from "eve/channels/eve";
+
+export default eveChannel({
+  auth: [
+    createRateLimitAuth({
+      limiter: Ratelimit.slidingWindow(20, "1 m"),
+      identifier: (req) => req.headers.get("x-forwarded-for") ?? "anonymous",
+    }),
+    localDev(),
+    vercelOidc(),
+  ],
+});
+```
+
+The sandbox backend runs Eve's code execution on [Upstash Box](https://upstash.com/docs/box/overall/quickstart) instead of Vercel Sandbox:
+
+```ts
+// agent/sandbox.ts
+import { defineSandbox } from "eve/sandbox";
+import { upstash } from "@upstash/agentkit-eve/sandbox";
+
+export default defineSandbox({
+  backend: upstash({ runtime: "node", size: "medium" }),
+  revalidationKey: () => "repo-bootstrap-v1",
+  async bootstrap({ use }) {
+    const sandbox = await use({ networkPolicy: "allow-all" }); // open egress to install packages
+    await sandbox.run({ command: "apt-get install -y jq" });
+  },
+  async onSession({ use }) {
+    await use(); // inherits the secure deny-all default
+  },
+});
+```
+
+The sandbox runs untrusted, model-generated code, so network access is deny-all by default and you open egress per phase, as the bootstrap example does for package installs. Anything you pass as env to the backend is readable by code inside the box.
+
+Eve snapshots each tool file and resolves only package imports from it, so a tool file can't import from another file in agent/. You repeat config like the search schema in each tool file instead of sharing a module.
+
+## What it costs
+
+AgentKit itself is MIT-licensed and free. You pay for the Redis database behind it, and [Upstash Redis pricing](https://upstash.com/pricing/redis) starts at a free tier with 256 MB of storage and 500K commands a month. Pay-as-you-go is $0.20 per 100K commands.
+
+![](https://cdn.bydefault.so/image-7uMgIFNogWu6pPr69njgK.png)
+
+*Upstash Redis pricing plans*
+
+The free tier allows one Redis Search index per database, and chat history, agent memory, and each search-tools schema create their own index. Combining several AgentKit features on one free database can hit that limit, while pay-as-you-go allows ten indexes.
+
+## Where to start
+
+The repo has runnable example apps under [examples/](https://github.com/upstash/agentkit): an AI SDK demo, an Eve demo, and an Eve agent that mounts the extension. You can get a free Redis database from the [Upstash console](https://console.upstash.com/), or grab one instantly with no signup by sending a POST request to [upstash.com/start-redis](https://upstash.com/start-redis); it stays up for 3 days unless you claim it.
+
+For a look at how the memory pattern works without the library, the [agent memory tutorial](https://upstash.com/docs/redis/tutorials/agent_memory) builds the same two-tier design by hand with plain Redis commands.
