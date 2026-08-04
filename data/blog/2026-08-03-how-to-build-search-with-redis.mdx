@@ -1,0 +1,196 @@
+---
+authors: [josh]
+slug: how-to-build-search-on-redis
+tags: [redis]
+title: How to Build (Extremely Fast) Full-Text Search with Redis in 2026
+---
+
+The fastest way to build full-text search with Redis is [Upstash Redis Search](https://upstash.com/docs/redis/search/introduction): create an index with a typed schema, write JSON like you always do, and query with fuzzy matching, filters, and aggregations over HTTP. 
+
+In this guide we will build product search that way, end to end with real output, then take a look at two other options: sorted-set autocomplete and the FT.\* commands on self-hosted Redis 8.
+
+![3 ways to build extremely fast search on Redis](https://cdn.bydefault.so/D0vGlaCAsEWOXy4A3IUEC.png)
+
+## Building search with Upstash Redis Search
+
+Upstash Redis Search adds [full-text search and secondary indexes](https://upstash.com/blog/upstash-redis-search-generally-available) to data already in your Redis database: tokenization, stemming, phrase, fuzzy and regex matching, range queries, sorting, aggregations, and highlighting, on hashes, strings, and JSON. 
+
+The `@upstash/redis` SDK gives it a typed API with a schema builder. It's a really, really good developer experience and also now generally available:
+
+![](https://cdn.bydefault.so/PVcs23_8hAhvP-YzAuJon.png)
+
+For example, here is a product catalog end to end:
+
+```ts
+import { Redis, s } from "@upstash/redis";
+
+const redis = Redis.fromEnv();
+
+const productSchema = s.object({
+  name: s.string(),
+  price: s.number(),
+  inStock: s.boolean(),
+});
+
+const index = await redis.search.createIndex({
+  name: "products",
+  dataType: "json",
+  prefix: "product:",
+  schema: productSchema,
+});
+
+await redis.json.set("product:1", "$", { name: "Mechanical Keyboard", price: 89, inStock: true });
+await redis.json.set("product:2", "$", { name: "Wireless Mouse", price: 49, inStock: true });
+await redis.json.set("product:3", "$", { name: "Gaming Monitor", price: 199, inStock: false });
+await redis.json.set("product:4", "$", { name: "Keyboard Cover", price: 19, inStock: false });
+
+await index.waitIndexing();
+```
+
+Upstash Redis Search indexes writes asynchronously in the background for better performance, so a query fired immediately after a write can miss it. The waitIndexing call blocks until pending updates are visible; it belongs in tests and setup scripts, [never after every write](https://upstash.com/docs/redis/search/command-reference).
+
+![](https://cdn.bydefault.so/drawing-L2WdHK-1eQUPXBFEPDpBC.png)
+
+A full-text query on the name field:
+
+```ts
+const fullText = await index.query({
+  filter: { name: "keyboard" },
+});
+```
+
+```text
+[
+  { "key": "product:1", "score": 3.386, "data": { "name": "Mechanical Keyboard", "price": 89, "inStock": true } },
+  { "key": "product:4", "score": 3.386, "data": { "name": "Keyboard Cover", "price": 19, "inStock": false } }
+]
+```
+
+Typo tolerance with a fuzzy operator finds the same two products from the misspelling "keybord":
+
+```ts
+const fuzzy = await index.query({
+  filter: { name: { $fuzzy: { value: "keybord", distance: 1 } } },
+});
+```
+
+Filters combine with an implicit AND, and results can sort on any field:
+
+```ts
+const affordableAndInStock = await index.query({
+  filter: { price: { $lte: 100 }, inStock: true },
+  orderBy: { price: "ASC" },
+});
+```
+
+```text
+[
+  { "key": "product:2", "data": { "name": "Wireless Mouse", "price": 49, "inStock": true } },
+  { "key": "product:1", "data": { "name": "Mechanical Keyboard", "price": 89, "inStock": true } }
+]
+```
+
+Counts and aggregations run server-side:
+
+```ts
+const inStockCount = await index.count({ filter: { inStock: true } });
+// { "count": 2 }
+
+const averagePrice = await index.aggregate({
+  aggregations: { averagePrice: { $avg: { field: "price" } } },
+});
+// { "averagePrice": { "value": 89 } }
+```
+
+Every SEARCH.\* command also works over plain HTTP through the [REST API](https://upstash.com/docs/redis/search/command-reference), which matters on platforms like Vercel or Cloudflare Workers where a raw TCP Redis connection is not available. 
+
+The [query DSL](https://upstash.com/docs/redis/search/querying) has more operators than shown here: phrase matching with slop, regex, boosting, and should/must/mustNot boolean logic. The [e-commerce recipe](https://upstash.com/docs/redis/search/recipes/e-commerce-search) shows a fuller catalog with facets and pagination.
+
+## Semantic search with Upstash Search
+
+Upstash Search is a separate hosted product that [combines full-text and semantic search](https://upstash.com/docs/search/overall/whatisupstashsearch) in one query. We upsert documents as plain JSON, Upstash handles the embeddings, and a semanticWeight parameter blends the two modes: 1 is pure semantic, 0 is pure full-text, 0.5 is hybrid. It ships with [@upstash/search for TypeScript](https://upstash.com/docs/search/sdks/ts/getting-started) and a Python SDK, plus a [prebuilt search bar component](https://upstash.com/docs/search/tutorials/buildsearchbar) for React.
+
+Keyword search over data already in Redis goes to Upstash Redis Search, and semantic or hybrid search over documents goes to Upstash Search. Vector fields in Upstash Redis Search are [planned for Q3 2026](https://upstash.com/docs/redis/search/introduction); until then, Upstash Search covers the semantic side. The [pricing](https://upstash.com/docs/search/overall/pricing) starts free at 20K queries and 200K records per month.
+
+![Upstash Search pricing as of August 2026](https://cdn.bydefault.so/8UwXb27Rh5VGmZaq0boyN.png)
+
+## Autocomplete with a plain sorted set
+
+An autocomplete box does not need a search engine at all. A sorted set where every member has score 0 works as a prefix index: when scores are equal, Redis [orders members byte-by-byte](https://redis.antirez.com/fundamental/lexicographic-sorted-sets.html), so a lexicographic range query returns everything starting with a prefix in O(log N + M) time.
+
+```ts
+import { Redis } from "@upstash/redis";
+
+const redis = Redis.fromEnv();
+
+await redis.zadd(
+  "autocomplete",
+  { score: 0, member: "redis" },
+  { score: 0, member: "redlock" },
+  { score: 0, member: "redsocks" },
+  { score: 0, member: "reduce" },
+  { score: 0, member: "rabbit" },
+);
+
+const prefix = "red";
+const matches = await redis.zrange(
+  "autocomplete",
+  `[${prefix}`,
+  `[${prefix}\xff`,
+  { byLex: true },
+);
+
+console.log(matches);
+```
+
+Output:
+
+```text
+[ "redis", "redlock", "redsocks", "reduce" ]
+```
+
+The range ends at the prefix followed by the byte 0xff, so "rabbit" falls outside it. We wrote a longer version of this pattern, with popularity ranking on top, in our [autocomplete with Redis tutorial](https://upstash.com/blog/redis-autocomplete-popularity-ranking). It skips ranking, stemming, and typo tolerance. That's why the product catalog above uses a search index instead.
+
+## Full-text search on self-hosted Redis: FT.CREATE and FT.SEARCH
+
+On self-hosted Redis, full-text search comes from the Redis Query Engine, the module formerly called RediSearch, bundled into Redis Open Source since Redis 8 went [GA (general availability) in May 2025](https://redis.io/blog/redis-8-ga/). One FT.CREATE command defines an index over a key prefix, and the Redis Query Engine indexes every matching write:
+
+```text
+FT.CREATE idx ON HASH PREFIX 1 blog: SCHEMA title TEXT SORTABLE category TAG
+
+HSET blog:1 title "How to build search with Redis" category tutorial
+HSET blog:2 title "Optimized Redis indexing techniques" category performance
+
+FT.SEARCH idx "@title: redis"
+```
+
+The query returns both posts. Fuzzy matching wraps the term in percent signs, one pair per point of allowed [Levenshtein distance](https://redis.io/docs/latest/develop/ai/search-and-query/query/full-text/), so "%optamized%" still finds the second post. The same command family does [vector search](https://redis.io/docs/latest/develop/ai/search-and-query/vectors/) with a VECTOR HNSW field and a KNN query under DIALECT 2, and in clustered databases [documents must share a shard with their index](https://redis.io/docs/latest/commands/ft.create/).
+
+Upstash Redis Search and the Redis Query Engine are [separate implementations](https://upstash.com/docs/redis/search/command-reference), so here is how they map to each other:
+
+|  | Upstash Redis Search | Redis Query Engine |
+| --- | --- | --- |
+| Command prefix | SEARCH.\* | FT.\* |
+| Engine | Tantivy (Rust) | RediSearch (C) |
+| Query syntax | JSON filters | String DSL |
+| Aggregations | Bucket and metric, Elasticsearch-style | GROUPBY / REDUCE / APPLY pipeline |
+| Indexing | Asynchronous | Inline with the write |
+| Vector and geo fields | Planned (vector in Q3 2026) | VECTOR, GEO, GEOSHAPE |
+| Hosting | Serverless, HTTP/REST included | Self-hosted or Redis Cloud |
+
+## Which one should you use?
+
+| Option | Best for | Typo tolerance | Vector search | Hosting |
+| --- | --- | --- | --- | --- |
+| Upstash Redis Search (SEARCH.\*) | Full-text, high performance & best developer experience | Yes | Planned Q3 2026 | Upstash |
+| Upstash Search | Semantic + hybrid search | Yes | Yes (managed embeddings) | Upstash |
+| Sorted sets | Autocomplete, prefix lookup | No | No | Any Redis |
+| Redis Query Engine (FT.\*) | Full-text + vector, self-hosted | Yes | Yes | Self-hosted Redis 8, Redis Cloud |
+
+I like Upstash Redis Search a lot, because the index syncs with writes automatically and there is no second system to run as I did with Redis before this release. A sorted set is good for the case where the feature is just an autocomplete box, and the Redis Query Engine covers self-hosted Redis 8. 
+
+When the queries are natural-language questions instead of keywords, Upstash Search handles the embedding side.
+
+On the [free tier](https://upstash.com/docs/redis/overall/pricing) Upstash Redis Search allows 1 index with 10K documents. Pay-as-you-go raises that to 10 indexes and 1M documents each, billed at [$0.20 per 100K commands](https://upstash.com/docs/redis/overall/pricing). 
+
+It's super easy to get started and you can always try it for free on a temporary Redis database by making a POST request to https://upstash.com/start-redis. You don't even need auth or sign-in, just works via the POST request and you can claim the database later.

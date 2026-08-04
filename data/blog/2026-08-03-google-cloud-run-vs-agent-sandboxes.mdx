@@ -1,0 +1,242 @@
+---
+slug: google-cloud-run-vs-agent-sandboxes
+title: "Google Cloud Run vs Agent Sandboxes: Where They Differ and Which One to Pick"
+authors: [alitarik]
+tags: [box, ai, serverless]
+description: "Google Cloud Run added a sandbox mode for untrusted AI code. It works very differently from a purpose-built agent sandbox like Upstash Box: one runs snippets inside a service you already deploy, the other gives the agent a durable computer of its own. A side-by-side look at architecture, state, security, agents, and cost."
+---
+
+<Summary>
+**Google Cloud Run sandboxes** (public preview, July 2026) add a code executor *inside* your existing Cloud Run service. A `sandbox` binary starts isolated processes that see a read-only copy of your container, share its CPU and memory, and are thrown away when they finish by default. Locked-down defaults, no extra fee, no new vendor. If you already run services on Cloud Run and need to execute model-written snippets safely, it fits into what you have.
+
+**Upstash Box** is a sandbox as a product. A box is a durable computer with a coding agent inside it (Claude Code, Codex, OpenCode, or your own harness), created with one API call from anywhere. It keeps its filesystem across sessions, auto-pauses when idle, hands out authenticated public URLs, opens PRs, runs on schedules, and bills only active CPU with memory free.
+
+The fork: one is a code-execution feature attached to a platform you already operate, the other is the computer your agent lives in. Snippets inside an app you already run on GCP? Cloud Run covers it. An agent that works on something over time (a repo, a workspace, a tenant)? That needs a computer that remembers, which is what Box is built as. This post walks the differences one by one: architecture, state, security, agents, and cost.
+</Summary>
+
+At Next '26, Google added sandboxes to Cloud Run, and the [public preview](https://cloud.google.com/blog/topics/developers-practitioners/google-cloud-run-sandboxes-are-in-public-preview/) landed in July 2026, aimed at agents, sandboxes, and vibe-coded apps. So now a big-cloud feature sits next to a category that purpose-built products have served so far, and it turns out the two sides mean different things by the same word.
+
+This post compares the two designs side by side, using [Upstash Box](https://upstash.com/docs/box/overall/quickstart) as the purpose-built sandbox. Both run untrusted, model-generated code behind an extra isolation boundary, away from your systems and secrets. Past that shared floor, they are built for different jobs, and the differences sit deep in the design, not on the surface.
+
+---
+
+## Two different shapes
+
+The biggest difference is not a feature. It's where the sandbox lives.
+
+**A Cloud Run sandbox lives inside your own service.** You deploy a Cloud Run service with a flag, and a `sandbox` binary is mounted into your container. Your application code then calls it as a subprocess:
+
+```bash
+gcloud beta run deploy my-agent-service \
+  --image=gcr.io/my-project/agent-image \
+  --sandbox-launcher
+```
+
+```python
+import subprocess
+
+def run_untrusted_code(llm_code: str):
+    with open("/tmp/generated_script.py", "w") as f:
+        f.write(llm_code)
+
+    result = subprocess.run(
+        ["/usr/local/gcp/bin/sandbox", "do", "--", "python3", "/tmp/generated_script.py"],
+        capture_output=True, text=True, timeout=10,
+    )
+    return result.stdout
+```
+
+The sandbox runs *inside the same instance as your container*, sharing its CPU and memory. It sees a read-only view of your container's filesystem (so it can use whatever packages you installed) and writes to a temporary memory layer that disappears when it exits.
+
+Note what this expects from you: a GCP project, billing, IAM roles, a container image, and a service to deploy. The sandbox is a capability *of that service*. If you already work in that world, it's one flag away. If you don't, the sandbox comes with the rest of GCP attached.
+
+**A Box lives on its own.** It is not attached to any service you run. You create it from anywhere (a Next.js route, a script, a cron job) and it's a full computer with its own filesystem, shell, network stack, and optional agent:
+
+```ts
+import { Agent, Box } from "@upstash/box"
+
+const box = await Box.create({
+  runtime: "node",
+  agent: { harness: Agent.ClaudeCode, model: "anthropic/claude-fable-5" },
+  git: { token: process.env.GITHUB_TOKEN },
+})
+
+await box.git.clone({ repo: "github.com/your-org/your-repo" })
+await box.agent.run({ prompt: "Fix the null-token bug in src/auth.ts and add tests" })
+await box.git.createPR({ title: "Fix null token bug", base: "main" })
+```
+
+This shape difference explains almost everything else in this post. Cloud Run's sandbox is a hardened subprocess: it protects a service you were already running. A box is infrastructure: a machine that exists on its own, with its own lifecycle, identity, and state. The setup gap follows directly: a container deploy on one side, an API key on the other.
+
+---
+
+## What survives
+
+Cloud Run sandboxes are **ephemeral by default**. With `sandbox do`, the write layer lives in memory, and when the sandbox exits, everything it wrote is gone. The CLI does give you ways to keep state around: `sandbox run` starts a named sandbox that accepts later `sandbox exec` calls, `sandbox fork` clones a sandbox's state, and you can carry files through tar archives or bind mounts:
+
+```bash
+sandbox do --write --export-tar=/tmp/work.tar \
+  -- /bin/bash -c "echo 'task-complete' > /tmp/work/status.txt"
+
+sandbox do --write --import-tar=/tmp/work.tar \
+  -- /bin/bash -c "cat /tmp/work/status.txt"
+```
+
+The catch is where all of that state lives: inside a Cloud Run service instance. Instances get replaced when the service scales, deploys, or restarts, and sandbox state goes with them. State that survives instance replacement means an external layer you build and manage yourself: Cloud Storage mounts, a database, tar archives on your side. That's fine for a code interpreter: run a snippet, get the output, forget. But agents collect things over time (cloned repos, installed dependencies, half-finished work, context), so on Cloud Run you end up building and operating your own persistence layer around the executor.
+
+A **Box persists by default**. When idle, it [auto-pauses](https://upstash.com/docs/box/overall/how-it-works): compute is released, but the filesystem, installed packages, and git state stay in place. Send it work weeks later and it wakes up where it left off. Need it always-on? Set [`keepAlive: true`](https://upstash.com/docs/box/overall/keep-alive). Need a reusable base? [Snapshots](https://upstash.com/docs/box/overall/snapshots) capture a prepared environment and branch it into N parallel boxes:
+
+```ts
+const base = await Box.create({ runtime: "node" })
+await base.exec.command("npm install -g typescript eslint prettier")
+const snap = await base.snapshot({ name: "toolchain" })
+
+const boxes = await Promise.all(tasks.map(() => Box.fromSnapshot(snap.id)))
+```
+
+And when you really do want the throwaway model, [`EphemeralBox`](https://upstash.com/docs/box/overall/ephemeral-box) gives you an instant-start, auto-expiring sandbox with just exec and files. Ephemeral is a choice, not the only mode.
+
+| | Cloud Run sandboxes | Upstash Box |
+| --- | --- | --- |
+| Default lifetime | Ends with the command; named sandboxes live while the host instance does | Persists; auto-pauses when idle |
+| State carry-over | Tar sync, bind mounts, fork; durable state needs external storage | Automatic (pause/resume), plus snapshots |
+| Reusable base | Your service's container image | Snapshots, branch into N boxes |
+| Always-on | Detached sandboxes, tied to the host instance's lifecycle | `keepAlive: true` |
+| Throwaway mode | The default | `EphemeralBox` with a TTL |
+
+This is the gap that matters most for agent products. Agent workloads are moving toward long-lived context: a per-tenant workspace that builds up repos, dependencies, and history across sessions. One design has that as its default behavior; the other ties state to a service instance and leaves the durable part for you to build.
+
+---
+
+## Security and isolation
+
+Cloud Run's sandbox defaults are strict, in an all-or-nothing way. Sandboxes don't inherit the host service's environment variables (you can pass values in with `--env`, but the sandboxed code can read those), can't reach the GCP metadata server, and have **zero outbound network access** unless you pass `--allow-egress`, which opens all outbound traffic at once. The filesystem is read-only, with the memory layer for writes. So it's locked down by default, but rough when you need to open up: the sandbox CLI has no domain allowlist, so saying "this sandbox may call the npm registry and nothing else" means building VPC routing and firewall rules at the service level.
+
+Box starts from the same threat model but gives you finer control. Each box is an isolated container with its own filesystem, process tree, and network namespace; boxes can't see each other, and private ranges and metadata services are unreachable. On top of that, two controls target the specific ways agent workloads leak:
+
+**[Attach Headers](https://upstash.com/docs/box/overall/attach-headers)** keeps secrets out of the container completely. A TLS-intercepting proxy on the host injects API keys into matching outbound HTTPS requests, so untrusted code can *use* a credential without ever being able to *read* it:
+
+```ts
+const box = await Box.create({
+  runtime: "node",
+  attachHeaders: {
+    "api.stripe.com": { Authorization: "Bearer sk_live_..." },
+  },
+})
+// the container makes the request; the host adds the secret in transit
+```
+
+**[Network policy](https://upstash.com/docs/box/overall/network-policy)** controls egress by **domain or CIDR**, and can be updated on a *running* box. You can allow `api.github.com` and `registry.npmjs.org` by name and nothing else, then open up or lock down as the work goes on. Denied ranges always beat allowed ones, and private ranges stay blocked even if you try to allow them:
+
+```ts
+await box.updateNetworkPolicy({
+  mode: "custom",
+  allowedDomains: ["api.github.com", "registry.npmjs.org"],
+})
+```
+
+| | Cloud Run sandboxes | Upstash Box |
+| --- | --- | --- |
+| Isolation | Process sandboxing inside your service instance | Container: own fs, process tree, network namespace |
+| Host env vars | Not inherited; explicit `--env` values are readable inside | Your choice; Attach Headers keeps secrets off-box |
+| Metadata server | Blocked | Blocked |
+| Private networks | Depends on your VPC and egress setup | Blocked by platform policy |
+| Egress | Blocked by default; opt-in opens all traffic, no domain allowlist | Policy per domain/CIDR, updatable at runtime |
+| Secret injection in transit | Not available | Attach Headers |
+
+For a snippet runner, all-or-nothing is fine: most snippets need no network at all. For a working agent that must reach GitHub, npm, and one internal API but nothing else, the difference between a switch and a policy is the difference between "open everything" and real least privilege.
+
+---
+
+## Where's the agent?
+
+Cloud Run sandboxes execute code. The agent that decides *what* code to run stays in your application: you write the model loop, the tool calls, the retry logic, and the orchestration, then call `sandbox do` for the dangerous parts. Google's Agent Development Kit ships a `CloudRunSandboxCodeExecutor` if you build your agent in that framework, which is a natural path if your stack is already Google-centric.
+
+A **Box ships with the agent inside**. You pick a harness at creation (Claude Code, Codex, OpenCode, or a [custom harness](https://upstash.com/docs/box/overall/custom-agent) like Aider or Pi), and the box wires it to the shell, filesystem, and [git](https://upstash.com/docs/box/overall/git) for you. Prompt in, work happens, structured result out:
+
+```ts
+const { result } = await box.agent.run({
+  prompt: "Analyze /work/report.csv and return the top 10 customers by revenue",
+  responseSchema: z.object({
+    customers: z.array(z.object({ name: z.string(), revenue: z.number() })),
+  }),
+})
+result.customers // typed
+```
+
+Around the agent, the workflow pieces are SDK calls too: `box.git.createPR(...)`, [scheduled agent runs](https://upstash.com/docs/box/overall/schedules) with `box.schedule.agent({ cron, prompt })`, streaming logs, and run history. The raw shell, exec, and file APIs are all there if you'd rather drive your own loop; you just don't have to start there.
+
+One more gap worth naming, given the vibe-coded-apps pitch: Cloud Run has no native per-sandbox public URL or port-publishing API, so there's no URL to hand out for a dev server running inside a sandbox. The core loop of vibe coding is *looking at the running app*. A box hands you exactly that:
+
+```ts
+const publicUrl = await box.getPublicURL(3000, { bearerToken: true })
+console.log(publicUrl.url)
+// → https://{BOX_ID}-3000.preview.box.upstash.com
+```
+
+---
+
+## What it costs
+
+Google's framing is that sandboxes add **no extra cost**, because they run on the CPU and memory your Cloud Run service already has. That's true as far as it goes: there is no sandbox surcharge. The cost is the Cloud Run service itself. With the default request-based billing, you pay for the allocated CPU and memory while the service handles a request, and a long agent call is one long request: the meter runs the whole time, including the minutes spent waiting on a model. With instance-based billing, you pay for the instance's whole lifecycle instead. Either way, sandboxes share the host container's allocation, so you size the service for your app plus every sandbox that may run at the same time.
+
+Box meters differently: **active CPU only**, at **$0.10 per active core-hour**. Memory has no separate charge, and a paused box costs no active compute at all. Boxes with `keepAlive` use fixed monthly pricing instead. Agent workloads spend most of their wall-clock waiting on model inference or slow APIs, which is exactly the time Box does not bill.
+
+| | Cloud Run sandboxes | Upstash Box |
+| --- | --- | --- |
+| Pricing model | Cloud Run service billing: allocated vCPU + memory, per request or per instance | $0.10 / active core-hour; no separate memory charge |
+| Idle cost | Billed while a request or instance is active, even when waiting | Paused boxes: no active compute charges |
+| Sandbox charge | None on top of the service | Included in Box pricing |
+| Free tier | GCP free tier / credits | 10 concurrent boxes, 5 CPU-hrs/mo |
+
+Which one is cheaper depends on the workload, so run your own numbers. Short, bursty executions inside a service you already run, with high concurrency or committed-use discounts, can come out cheaper on Cloud Run. But for the shape agent work usually has (long sessions that mostly wait, with a workspace worth keeping), paying only for active CPU tends to come out ahead. Full numbers are on the [Box pricing page](https://upstash.com/pricing/box).
+
+---
+
+## What each is built for
+
+**Cloud Run sandboxes fit when you're already on GCP and the sandbox is a feature of a service you run there:**
+
+- An LLM code interpreter inside an existing Cloud Run app: run model-written Python, R, or SQL and return the output.
+- Running user-submitted plugins or webhooks that were never trustworthy.
+- ADK-based agents that need a safe `code_executor` without leaving the Google stack.
+- Teams whose buying rule is "it has to be on our GCP bill."
+
+**Box fits when the agent itself is what you're building:**
+
+- **Agent-server per tenant.** Every user gets a durable box that builds up context, sleeps for almost nothing between sessions, and wakes up with everything in place. On an ephemeral executor, you'd build the state layer and lifecycle management for this yourself.
+- **Autonomous coding.** Clone, fix, test, and open a PR in a few SDK calls, with the harness already wired.
+- **Vibe-coded app previews.** Run the generated app and hand the user a live, auth-protected URL.
+- **Multi-agent fan-out.** Snapshot one prepared environment, branch it into parallel workers, collect structured results.
+- **[Scheduled agents](https://upstash.com/docs/box/overall/schedules).** A daily "review the last 24h of commits" run is one API call.
+
+---
+
+## Picking one
+
+Reach for **Cloud Run sandboxes** if your infrastructure already lives on Google Cloud, you have a deployed service that needs to run model-written snippets, and snippet-style execution is all you need. Inside that boundary it does its job, and since it's in preview, it will probably grow. The strongest reason to choose it is that you're already there.
+
+Reach for **Upstash Box** for the wider set of agent workloads: anything where the agent works on something over time, needs its results to survive, serves a preview, opens a PR, or runs on a schedule. The agent comes wired in (or bring your own harness), state persists by default, secrets stay off the container, egress is a policy rather than a switch, and billing ignores the hours an agent spends waiting on a model. You go from an API key to a working agent in a few lines, with no cloud project, image, or deploy in between.
+
+Put simply: one adds safe code execution to the platform you already operate. The other is the computer you'd design for an agent if you started from the agent. For most teams building agent products, the second is the shorter path, and usually the cheaper one.
+
+---
+
+## Try Box
+
+```ts
+import { Agent, Box } from "@upstash/box"
+
+const box = await Box.create({
+  runtime: "node",
+  agent: { harness: Agent.ClaudeCode, model: "anthropic/claude-fable-5" },
+})
+
+const run = await box.agent.run({
+  prompt: "Write a /health endpoint in server.js and start it on port 3000",
+})
+
+console.log(run.result)
+```
+
+The free tier is 10 concurrent boxes and 5 CPU-hours a month, with no platform fee. The [quickstart](https://upstash.com/docs/box/overall/quickstart) gets you running in a few minutes, and the [use cases](https://upstash.com/docs/box/overall/use-cases) page walks through the agent-server and multi-agent patterns end to end.

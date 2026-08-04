@@ -1,0 +1,303 @@
+---
+authors: [josh]
+slug: running-claude-code-in-a-remote-sandbox-with-upstash-box
+tags: [box]
+title: How to Run Claude Code in a Remote Sandbox in 2026 (With Code Examples and Costs)
+---
+
+Claude Code is awesome.
+
+We can give it a prompt with the -p flag, turn off the permission prompts, and it edits files, runs shell commands, and commits code on its own. On a laptop, it can do anything a user account can: your files, your shell, every credential in your home directory: 
+
+```bash
+claude -p "Create an example.md file" --dangerously-skip-permissions
+```
+
+A remote sandbox gives the agent its own computer instead.
+
+In this post I wanna show you two ways to run Claude Code inside a secure, isolated sandbox: through the built-in Claude Code harness in the Upstash Box SDK (very easy to get started!), and by using the raw Claude CLI.
+
+## Why run Claude Code in a sandbox?
+
+A sandbox lets Claude Code run with permission prompts turned off while everything it does stays inside an isolated container. Skip-permissions sessions belong [inside a container, a VM, or a sandbox runtime](https://code.claude.com/docs/en/sandbox-environments), so that file tools, MCP (Model Context Protocol) servers, and hooks are inside the boundary too.
+
+This is what Anthropic recommends:
+
+![image](https://cdn.bydefault.so/Cy3bA7UEze9aGfB8tmu5w.png)
+
+I found intereresting that on average, Claude Code users approve [93% of permission prompts](https://www.anthropic.com/engineering/claude-code-auto-mode). That is why so many people (and myself included) run `--dangerously-skip-permission` because it's just easier. 
+
+Inside Anthropic itself, agents have [deleted remote git branches from a misinterpreted instruction, uploaded an engineer's GitHub auth token to an internal compute cluster, and attempted migrations against a production database](https://www.anthropic.com/engineering/claude-code-auto-mode) 💀
+
+Mistakes are only half of the risk. An agent that reads untrusted content (a cloned repo, a web page) and can make network requests can be tricked into leaking anything it can read. Simon Willison calls this the [lethal trifecta](https://simonwillison.net/2025/Oct/22/living-dangerously-with-claude/): private data, untrusted content, and a way to communicate out. His conclusion is that "The only solution that's credible is to run coding agents in a sandbox," and the best sandboxes run on someone else's computer.
+
+Also found this gem, in July 2025, Replit's coding agent deleted a company's production database during an explicit code freeze. So an agent with real permissions and no boundary can do a lot of damage.
+
+![image](https://cdn.bydefault.so/0ErrTZ7oFMG9XbRo9rhZx.png)
+
+## What is Upstash Box?
+
+Upstash Box is a cloud computer for agents: an isolated container with its own filesystem, shell, network, and git access, with Claude Code built in as an agent harness. We can create a box from the TypeScript SDK, send it a prompt, and get a typed result back. 
+
+Each box is its own container with an independent filesystem, process tree, and network. Boxes [cannot reach each other, private networks, or cloud metadata services](https://upstash.com/docs/box/overall/security). When a box is idle it pauses, and you can resume it [days or weeks later](https://upstash.com/docs/box/overall/how-it-works) with files, installed packages, and git history intact.
+
+Boxes come in three sizes:
+
+- small (2 vCPU, 4 GB RAM)
+- medium (4 vCPU, 8 GB)
+- large (8 vCPU, 16 GB)
+
+![image](https://cdn.bydefault.so/jaev7nQs6ZdzKQfLiqirU.png)
+
+## Run Claude Code with the Box SDK
+
+The fastest path is the built-in harness: the box comes with Claude Code wired to its own filesystem, shell, and git. Install the SDK, then set two keys: `UPSTASH_BOX_API_KEY` from the [Upstash console](https://console.upstash.com) and your `ANTHROPIC_API_KEY`.
+
+```bash
+npm install @upstash/box
+```
+
+This is the whole setup. Create a box, tell it which agent and model to use, and give it a task:
+
+```ts
+import { Agent, Box } from "@upstash/box"
+
+const startedAt = Date.now()
+const box = await Box.create({
+  runtime: "node",
+  agent: {
+    harness: Agent.ClaudeCode,
+    model: "anthropic/claude-opus-5",
+  	apiKey: process.env.ANTHROPIC_API_KEY,
+  },
+})
+
+console.log({ boxCreateMs: Date.now() - startedAt })
+
+try {
+  const run = await box.agent.run({
+    prompt:
+      "Create index.js with an HTTP server that returns 'hello from the box' on port 3000.",
+  })
+
+  console.log({ status: run.status, result: run.result, cost: run.cost })
+
+  const check = await box.exec.command(
+    "node index.js >/tmp/server.log 2>&1 & pid=$!; sleep 1; curl -s http://127.0.0.1:3000; kill $pid",
+  )
+
+  console.log({
+    exitCode: check.exitCode,
+    stdout: check.stdout,
+    stderr: check.stderr,
+  })
+} finally {
+  await box.delete()
+}
+```
+
+Here is the output of that run:
+
+```text
+{ boxCreateMs: 2108 }
+{
+  status: 'completed',
+  result: 'Created `index.js` with an HTTP server on port 3000 that responds with "hello from the box".',
+  cost: {
+    inputTokens: 4,
+    outputTokens: 149,
+    cachedInputTokens: 76223,
+    computeMs: 11378,
+    totalUsd: 0.26404125
+  }
+}
+{ exitCode: 0, stdout: 'hello from the box', stderr: '' }
+```
+
+The box was ready in 2.1 seconds. The agent run used 11.4 seconds of compute and $0.26 of Claude tokens, and the curl check confirms the server the agent wrote responds with the right text. The [agent API](https://upstash.com/docs/box/overall/agent) also has a stream method for real-time output, a `maxBudgetUsd` option to limit spend per run, and a timeout option.
+
+## Typed results with a response schema
+
+An agent that returns text is hard to build on. The agent run method takes a `responseSchema` (a Zod v3 schema), and the result comes back parsed and typed. Here the agent reviews a file that's broken on purpose:
+
+```ts
+import { Agent, Box } from "@upstash/box"
+import { z } from "zod"
+
+const box = await Box.create({
+  runtime: "node",
+  agent: {
+    harness: Agent.ClaudeCode,
+    model: "anthropic/claude-opus-4-6",
+    apiKey: process.env.ANTHROPIC_API_KEY,
+  },
+})
+
+try {
+  await box.files.write({
+    path: "math.js",
+    content: "export const add = (a, b) => a - b\n",
+  })
+
+  const run = await box.agent.run({
+    prompt: "Review math.js for correctness.",
+    responseSchema: z.object({
+      summary: z.string(),
+      issues: z.array(z.string()),
+    }),
+  })
+
+  console.log(run.result)
+} finally {
+  await box.delete()
+}
+```
+
+The agent found the bug and returned it in the shape the zod schema defines:
+
+```text
+{
+  summary: 'The file contains a single `add` function that incorrectly uses subtraction (`a - b`) instead of addition (`a + b`).',
+  issues: [
+    "Bug: `add` function on line 1 uses `a - b` (subtraction) instead of `a + b` (addition). The implementation contradicts the function's name and intended purpose."
+  ]
+}
+```
+
+This pattern turns a box into a continuous integration (CI) gate. We also have a [code review agent guide](https://upstash.com/docs/box/guides/code-review-agent) that uses the same schema validation to fail a build when the agent returns a changes-requested verdict.
+
+## Using the raw claude CLI headless
+
+The harness is optional. A plain box is a Linux machine with npm on it, so we can install the Claude Code CLI and run the same headless commands we would run in CI:
+
+```ts
+import { Box } from "@upstash/box"
+
+const box = await Box.create({
+  runtime: "node",
+  env: { ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY! },
+})
+
+try {
+  const install = await box.exec.command(
+    "npm install -g --prefix ~/.local @anthropic-ai/claude-code",
+  )
+  if (install.exitCode !== 0) throw new Error(install.stderr)
+
+  const run = await box.exec.command(
+    'export PATH="$HOME/.local/bin:$PATH"; claude -p "Create hello.txt containing exactly: hello from claude" --output-format json --dangerously-skip-permissions',
+  )
+  console.log(run.stdout)
+} finally {
+  await box.delete()
+}
+```
+
+The node image already ships with a claude binary. Installing it under \~/.local and putting it first on the PATH gets you the newest release instead. The run above returned one JSON object (trimmed here to the useful fields):
+
+```json
+{
+  "is_error": false,
+  "result": "Created `/workspace/home/hello.txt` with the line `hello from claude` (plus a trailing newline).",
+  "session_id": "69dbd05f-7989-45f8-b18d-e90cc7f8cb8c",
+  "total_cost_usd": 0.05428625,
+  "duration_ms": 4912,
+  "num_turns": 2,
+  "permission_denials": []
+}
+```
+
+The dangerously-skip-permissions flag here is the point: it runs inside the box, which is a disposable container. These are some flags that are important for [headless runs](https://code.claude.com/docs/en/headless):
+
+| Flag | What it does |
+| --- | --- |
+| `-p` / `--print` | Run one prompt non-interactively and exit |
+| `--output-format json` | One JSON object with `result`, `session_id`, and `total_cost_usd` |
+| `--output-format stream-json` | Newline-delimited JSON events as they happen |
+| `--bare` | Skips loading hooks, skills, MCP servers, and CLAUDE.md for faster startup; auth comes from `ANTHROPIC_API_KEY` |
+| `--allowedTools "Bash,Read,Edit"` | Auto-approve only the listed tools |
+| `--resume <session_id>` | Continue an earlier session |
+| `--dangerously-skip-permissions` | Skip all permission prompts |
+
+The `session_id` in the JSON output pairs with the resume flag, so a follow-up prompt can continue the same conversation in the same box, with all files still in place.
+
+## Locking down the network
+
+By default a box has full outbound network access. We can change that with a [network policy](https://upstash.com/docs/box/overall/network-policy): a deny-all policy blocks everything, and a custom policy allows only the domains and CIDR ranges (blocks of IP addresses) we list. We can even update the policy on a running box.
+
+A network policy is really useful because a box that can only reach the hosts the job needs, say the Claude API and your git host, has nowhere else to send data even if someone tries to run a prompt injection.
+
+In Upstash Box, environment variables are visible to [all code running in the box](https://upstash.com/docs/box/overall/security), because we often need it to debug the database, act on our behalf, etc. For secrets like a Stripe key that are sensitive and the agent shouldn't know though, we can [attach headers](https://upstash.com/docs/box/overall/attach-headers). 
+
+It's a proxy that injects the header into outbound HTTPS requests to hosts you list, so the secret never exists inside the container at all, in env vars, files, or process memory. It's completely invisible to the agent and any code running in the box.
+
+![image](https://cdn.bydefault.so/mU8fuexrFppW-CEStcN02.png)
+
+## Opening PRs and scheduled runs
+
+With [git configured](https://upstash.com/docs/box/overall/git), the full clone, fix, and pull-request loop is a few SDK calls:
+
+```ts
+import { Agent, Box } from "@upstash/box"
+
+const box = await Box.create({
+  runtime: "node",
+  agent: {
+    harness: Agent.ClaudeCode,
+    model: "anthropic/claude-opus-4-6",
+    apiKey: process.env.ANTHROPIC_API_KEY,
+  },
+  git: { token: process.env.GITHUB_TOKEN },
+})
+
+try {
+ 	 await box.git.clone({
+    repo: "https://github.com/acme/web-app",
+    branch: "main",
+  })
+  await box.cd("web-app")
+  await box.git.exec({ args: ["checkout", "-b", "fix/example"] })
+
+  await box.agent.run({ prompt: "Fix the failing test and verify the fix." })
+  await box.git.commit({ message: "fix: repair failing test" })
+  await box.git.push({ branch: "fix/example" })
+
+  const pr = await box.git.createPR({
+    title: "fix: repair failing test",
+    body: "Fixes the failing test and verifies the change.",
+    base: "main",
+  })
+  console.log(pr.url)
+} finally {
+  await box.delete()
+}
+```
+
+A fine-grained GitHub token with Contents and Pull requests permissions (read and write) is enough.
+
+[Schedules](https://upstash.com/docs/box/overall/schedules) make autonomous runs easy, because a prompt can run on a cron expression, so a box can review yesterday's commits every weekday morning with no server anywhere. And [snapshots](https://upstash.com/docs/box/overall/snapshots) checkpoint the full disk plus agent config to restore later.
+
+## What Upstash Box costs
+
+The [free plan](https://upstash.com/docs/box/overall/pricing) includes 10 concurrent boxes, 5 CPU hours, and $1 of LLM tokens per month. Pay as you go is $0.10 per active CPU hour, and you can bring your own Claude API key on any plan, which is what the examples above do.
+
+Agent runs spend most of their wall clock waiting on the model, and waiting is free: using 100% of both cores for an hour costs [$0.20, while 10% of one core for an hour costs $0.01](https://upstash.com/docs/box/overall/pricing). The quickstart run above billed 11.4 seconds of compute. Storage is $0.10 per GB per month, snapshots included.
+
+![Upstash Box pricing as of August 2026 image](https://cdn.bydefault.so/c76VUyT1A3v8qHI42lEe2.png)
+
+Here is how the setup compares to the two sandboxes people run Claude Code in most often:
+
+|  | Upstash Box | E2B | Daytona |
+| --- | --- | --- | --- |
+| Claude Code | Built-in harness, `box.agent.run()` with typed output | [Pre-built claude template](https://e2b.dev/docs/agents/claude-code), you drive the CLI over shell | You install and wire the CLI yourself |
+| Billing | $0.10 per active CPU hour, memory included | [$0.0504 per vCPU-hour wall clock](https://upstash.com/blog/upstash-box-vs-e2b), plus memory | [$0.0504 per vCPU-hour wall clock](https://upstash.com/blog/upstash-box-vs-daytona), plus memory |
+| Idle behavior | Auto-pauses (1 h free, 6 h paid), full state preserved | Free sandboxes limited to 1 hour | Auto-stops after 15 minutes by default, state kept |
+
+## Quick summary
+
+- Skip-permissions sessions belong inside an isolation boundary, and the incidents above show why.
+- `Box.create()` with the Claude Code harness plus `box.agent.run()` is the entire setup, with the box ready in about 2 seconds.
+- A `responseSchema` turns agent output into typed JSON
+- The raw `claude` CLI works over `box.exec.command()` with the usual headless flags.
+- Network policies and attach headers prevent any data leaks
+- Billing counts active CPU only: $0.10 per hour, with a generous free tier to start.

@@ -78,6 +78,18 @@ export function proxy(request: NextRequest, event: NextFetchEvent) {
   }
 
   const pathname = request.nextUrl.pathname;
+
+  // Linkifiers in chat apps fuse our URLs with trailing prose ("see <url> for
+  // details"), producing 404 paths like "/docs/.../max_requests_limit for
+  // details". No real URL on this site contains whitespace, so strip at the
+  // first space and redirect to the intended page.
+  const junkIndex = pathname.search(/ |%20/);
+  if (junkIndex > 0) {
+    const cleanUrl = request.nextUrl.clone();
+    cleanUrl.pathname = pathname.slice(0, junkIndex);
+    return NextResponse.redirect(cleanUrl, 301);
+  }
+
   const userAgent = request.headers.get("user-agent") ?? "";
   const aiAgentMatch = userAgent.match(AI_BOT_REGEX);
   const aiAgent = aiAgentMatch ? aiAgentMatch[0] : null;

@@ -1,0 +1,155 @@
+---
+authors: [josh]
+slug: upstash-vs-aws-elasticache-serverless-redis-pricing-and-performance-2026
+tags: [redis]
+title: "Upstash vs AWS ElastiCache: Serverless Redis Pricing and Performance in 2026"
+---
+
+Upstash Redis and AWS ElastiCache both provide managed Redis. Almost everything else is different, e.g. how you connect or the pricing structure. 
+
+In this guide I wanna do an up-to-date 2026 comparison with current numbers and a live throughput run to see how both perform.
+
+## What is the difference between Upstash Redis and AWS ElastiCache?
+
+ElastiCache is AWS hosting the Redis OSS or Valkey engine on nodes inside your VPC (virtual private cloud, AWS's private network), billed per node-hour or per metered serverless usage. Upstash is a serverless Redis-compatible database with its own engine, reachable from anywhere over HTTPS or TCP.
+
+With ElastiCache we pick node types, replica counts, subnets, and security groups, and your clients must run inside (or peer with) the VPC. With Upstash we [create a database and get a URL and a token](https://upstash.com/docs/redis/overall/compare) and can just start.
+
+## How much throughput can Upstash Redis handle?
+
+Upstash Redis handles [16,000 commands per second on the Fixed 100GB and 500GB plans](https://upstash.com/pricing/redis). 
+
+Enterprise plans go beyond [100,000 commands per second](https://upstash.com/docs/redis/overall/enterprise) with dedicated resources.
+
+I checked the limits from a Node.js client in the same AWS region as the database. Sequential PING commands came back with a median of 1.54 ms. Normal GETs with 32 concurrent workers ran at 4,735 requests per second with a median of 5.89 ms. 
+
+Pipelined SETs through the [REST pipeline endpoint](https://upstash.com/docs/redis/features/restapi), 100 commands per request and 16 in flight, sustained 16,471 commands per second:
+
+![I can see all commands live in the Upstash Redis dashboard](https://cdn.bydefault.so/vpAKECFQbogBPgBTYyCHS.png)
+
+```text
+PING (20 sequential):  p50=1.54ms
+Plain GET (32 workers, 10s):  47365 requests = 4735.75 req/sec, p50=5.89ms p99=14.32ms
+Pipelined SET (batch 100, 16 in flight, 25s):  412700 commands = 16471.82 commands/sec
+Rate limits: 0  Request errors: 0  Command errors: 0
+```
+
+![](https://cdn.bydefault.so/6fnJb-9T0fWgPIaTJ5m0x.png)
+
+The same pipelined load pushed from the Virginia client against a second database in Frankfurt held above 10,300 commands per second across 680,000 commands, again with zero 429 errors. This is really nice.
+
+In every run, requests past the plan limit waited a bit longer instead of failing.
+
+![](https://cdn.bydefault.so/drawing-Q57jk3H4uyS-7PI-EUw8P.png)
+
+## What does Upstash Redis cost in 2026?
+
+Upstash Redis has a [free tier (256 MB, 500,000 commands per month), pay-as-you-go at $0.20 per 100,000 commands, Fixed plans from $10 to $1,500 per month, and custom-priced Enterprise plans](https://upstash.com/pricing/redis). An idle database on pay-as-you-go costs $0.
+
+The Fixed plans, which bill a flat monthly price with unlimited commands:
+
+| Plan | Monthly price | Max data | Monthly bandwidth | Commands/sec |
+| --- | --- | --- | --- | --- |
+| Fixed 250MB | $10 | 250 MB | 50 GB | 10,000 |
+| Fixed 1GB | $20 | 1 GB | 100 GB | 10,000 |
+| Fixed 5GB | $100 | 5 GB | 500 GB | 10,000 |
+| Fixed 10GB | $200 | 10 GB | 1 TB | 10,000 |
+| Fixed 50GB | $400 | 50 GB | 5 TB | 10,000 |
+| Fixed 100GB | $800 | 100 GB | 10 TB | 16,000 |
+| Fixed 500GB | $1,500 | 500 GB | 20 TB | 16,000 |
+
+Pay-as-you-go adds $0.25 per GB of storage after the first free GB, and bandwidth is free up to 200 GB a month, then $0.03 per GB. For production guarantees, the Prod Pack add-on ($200 per month per database) brings a [99.99% uptime SLA](https://upstash.com/docs/redis/overall/pricing) (service level agreement), multi-zone high availability, encryption at rest, SOC-2 report access, and Prometheus, Grafana, and Datadog integration. 
+
+Enterprise adds the custom limits above plus VPC peering, HIPAA, and SSO.
+
+## What does AWS ElastiCache cost in 2026?
+
+ElastiCache bills per node-hour, or on Serverless per GB-hour of storage plus compute units called ECPUs. The [cheapest node is a cache.t4g.micro running Valkey at $0.0128 per hour](https://aws.amazon.com/elasticache/pricing/), about $9.34 per month. Serverless meters a minimum of $6.13 per month on Valkey and $91.25 on Redis OSS, even when idle.
+
+![](https://cdn.bydefault.so/s0xaOAs6xU-ZHOxCiPPuz.png)
+
+The common on-demand nodes in us-east-1:
+
+| Node type | vCPUs | Memory | Valkey $/hour | About $/month |
+| --- | --- | --- | --- | --- |
+| cache.t4g.micro | 2 | 0.5 GiB | $0.0128 | $9.34 |
+| cache.t4g.small | 2 | 1.37 GiB | $0.0205 | $14.97 |
+| cache.m7g.large | 2 | 6.38 GiB | $0.1011 | $73.80 |
+| cache.r7g.large | 2 | 13.07 GiB | $0.1402 | $102.35 |
+| cache.r7g.xlarge | 4 | 26.32 GiB | $0.2797 | $204.18 |
+
+AWS prices [Valkey 20% below Redis OSS on nodes](https://upstash.com/blog/aws-elasticache-pricing-explained-2026-full-cost-breakdown), and about a third below on Serverless. On Serverless, [each kilobyte transferred consumes one ECPU](https://aws.amazon.com/elasticache/pricing/): a read of 3.2 KB costs 3.2 ECPUs. The idle minimums come from minimum metered storage: Redis OSS meters at least 1 GB, so 1 GB × $0.125 per GB-hour × 730 hours = $91.25 a month for an empty cache. 
+
+![People on Reddit are not happy about ElastiCache pricing :/](https://cdn.bydefault.so/hIAwRd9oKo_sNkfmlDsiH.png)
+
+The quiet costs add up too. Replicas bill as full nodes. Cross-AZ traffic costs $0.01 per GiB in each direction, backups cost $0.085 per GiB-month, and running an end-of-life Redis OSS version adds an [extended support surcharge of 80%, rising to 160% in year three](https://aws.amazon.com/elasticache/pricing/). 
+
+Reserved nodes discount up to [55% with all-upfront payment](https://aws.amazon.com/elasticache/pricing/). Some cluster examples are in our [full ElastiCache pricing breakdown](https://upstash.com/blog/aws-elasticache-pricing-explained-2026-full-cost-breakdown).
+
+## Which is cheaper for a small or idle workload?
+
+Upstash. An idle Upstash database costs $0 on pay-as-you-go, and 5 million commands a month cost $10. Every ElastiCache option bills a minimum whether you send one command or none:
+
+| Option | Cost for an idle month |
+| --- | --- |
+| Upstash free tier | $0 |
+| Upstash pay-as-you-go | $0 |
+| ElastiCache Serverless, Valkey | $6.13 minimum |
+| ElastiCache cache.t4g.micro node, Valkey | $9.34 |
+| ElastiCache Serverless, Redis OSS | $91.25 minimum |
+
+The free tiers differ in kind. Upstash's free tier is permanent: 256 MB and 500,000 commands a month. AWS accounts created after July 15, 2025 get [$100 in credits plus up to $100 more](https://aws.amazon.com/elasticache/pricing/) for activating other AWS services, and the credits run out.
+
+## Which is cheaper at high, steady traffic?
+
+It depends on where the traffic runs. ElastiCache node pricing ignores command volume, so an in-VPC app pushing 100 million commands a month through one t4g.micro pays $9.34. An Upstash Fixed plan is flat too: $20 a month covers unlimited commands at up to 10,000 per second.
+
+| Scenario | ElastiCache | Upstash |
+| --- | --- | --- |
+| 100M commands/month, 1 GB data, clients in-VPC | $9.34 (t4g.micro, Valkey) | $20 (Fixed 1GB) |
+| \~10 GB with multi-AZ high availability | [$367.92 on-demand, $220.75 reserved](https://upstash.com/blog/redis-pricing-comparison-every-major-provider-in-2026-with-numbers) (2 × m7g.xlarge) | $400 (Fixed 10GB + Prod Pack) |
+| 50,000 requests/sec, 10 GB, serverless billing | [$915.42 Valkey, $1,359.26 Redis OSS](https://upstash.com/blog/aws-elasticache-pricing-explained-2026-full-cost-breakdown) | Enterprise, custom price |
+
+Clients already inside a VPC is ElastiCache node pricing's best case. If you're already on AWS infrastructure, I think ElastiCache is very good option.
+
+But once the workload is higher or unpredictable, 50,000 requests per second on ElastiCache Serverless would be $915 to $1,359 a month, while Upstash covers 16,000 commands per second and 10 TB of bandwidth for a flat $800 and moves past that on Enterprise.
+
+## Can you reach ElastiCache from a serverless or edge function?
+
+No. ElastiCache has no public endpoint. Clients connect over TCP from inside the VPC. Edge runtimes like Vercel or Cloudflare Workers [don't allow TCP connections](https://upstash.com/docs/redis/features/restapi), so they can't connect to ElastiCache directly. Upstash uses plain HTTPS through its REST API, which works from Workers, Vercel Edge, and browsers (Upstash also supports TCP btw).
+
+The REST API is also request-based rather than connection-based, so AWS Lambda functions skip connection pool management entirely. Zapier ran into this in production: their rate limiting ran in Vercel edge middleware, which [couldn't open TCP connections to their existing Redis instance](https://upstash.com/customers/zapier), so they moved global rate limiting and malicious IP blocking to Upstash over HTTP.
+
+![](https://cdn.bydefault.so/b2TV6LJfyveAT3XrO1Ztu.png)
+
+## How does global replication compare?
+
+Upstash replicates to read regions you pick from [18 regions across AWS and GCP](https://upstash.com/docs/redis/features/globaldatabase), with no fixed limit on how many. ElastiCache Global Datastore is active-passive and allows [at most two secondary regions](https://upstash.com/blog/managed-redis-compared-features-of-every-major-provider-in-2026), so writes go through one primary region.
+
+In my tests i got [reads under 1 ms and writes under 5 ms from the same region](https://upstash.com/docs/common/concepts/global-replication) at the 99th percentile, and reads and writes under 50 ms from the same continent. You can run the read test yourself at [latency.upstash.com](https://latency.upstash.com/). Each read region costs half the Fixed plan's monthly price, and on pay-as-you-go a write bills once per region it replicates to, so 100,000 writes with one read region cost $0.40.
+
+![Live latency chart on latency.upstash.com](https://cdn.bydefault.so/image-fD5PT2DtC4PEEJzeq1IyC.png)
+
+## Where does ElastiCache win?
+
+On network cost inside AWS, and AWS-native tooling. Same-AZ traffic between EC2 and ElastiCache is [free](https://aws.amazon.com/elasticache/pricing/), and metrics and access control go through CloudWatch and IAM.
+
+If you're on AWS already with a majority of products, I think it makes sense to stay on AWS for Redis/Valkey, too.
+
+## Which should you pick?
+
+ElastiCache is better when everything runs inside one AWS VPC and you have someone to manage nodes. Upstash is better if you're using another runtime to connect, want a better developer experience or are using agents to write your code (see our [Upstash Redis skill!s](https://upstash.com/docs/agent-resources/skills)). Both Upstash and ElastiCache handle extremely high throughput and low latency.
+
+|  | Upstash Redis | AWS ElastiCache |
+| --- | --- | --- |
+| Billing | Per command, or flat $10 to $1,500/month | Per node-hour, or metered Serverless |
+| Idle cost | $0 | $6.13 to $9.34 minimum |
+| Throughput | High sustained, 16,000 commands/sec on Fixed, 100,000+ on dedicated nodes | Also high sustained on dedicated nodes |
+| Access | HTTPS from anywhere, plus TCP | TCP inside your VPC |
+| Free tier | 256 MB, 500K commands/month, permanent | $100 to $200 in credits |
+| Global replication | 18 read regions, no fixed limit | Active-passive, 2 secondary regions max |
+| Setup | Create database, get URL and token | VPC, subnets, security groups, node sizing |
+
+Supabase [compared ElastiCache, Redis Cloud, and DynamoDB](https://upstash.com/customers/supabase) before picking Upstash for its global edge caching, global replication, the REST API, and predictable cost at high bandwidth. 
+
+If your workload looks like that, low-latency reads from many regions and clients that run outside a VPC, the same reasoning applies. If you prefer one busy backend in us-east-1, a reserved ElastiCache node is good too.
