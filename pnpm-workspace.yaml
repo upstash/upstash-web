@@ -27,4 +27,4 @@ overrides:
   '@octokit/plugin-paginate-rest@<9.2.2': ^9.2.2
   '@octokit/request@<8.4.1': ^8.4.1
   '@octokit/request-error@<5.1.1': ^5.1.1
-  postcss@<8.5.18: ^8.5.18
+  postcss@<8.5.23: ^8.5.23

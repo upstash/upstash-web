@@ -69,7 +69,7 @@
     "@types/three": "^0.173.0",
     "autoprefixer": "^10.4.20",
     "encoding": "^0.1.13",
-    "postcss": "^8.5.22",
+    "postcss": "^8.5.23",
     "prettier": "^3.5.0",
     "prettier-plugin-tailwindcss": "^0.6.11",
     "reading-time": "^1.5.0",
