@@ -32,11 +32,7 @@ export async function generateStaticParams(): Promise<Awaited<Props["params"]>[]
   }));
 }
 
-export async function generateMetadata(
-  props: {
-    params: Promise<Props["params"]>;
-  }
-) {
+export async function generateMetadata(props: Props) {
   const params = await props.params;
   const examples: Example[] = await getData();
   const example = examples.find((item) => item.slug === params.slug);

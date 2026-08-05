@@ -20,11 +20,7 @@ export async function generateStaticParams(): Promise<Awaited<Props["params"]>[]
   return authors.map((author) => ({ author }));
 }
 
-export async function generateMetadata(
-  props: {
-    params: Promise<Props["params"]>;
-  }
-) {
+export async function generateMetadata(props: Props) {
   const params = await props.params;
   const displayName = authors[params.author]?.name ?? params.author;
   const description = `Read all blog posts by ${displayName} on the Upstash blog. Tutorials, guides, and insights on serverless technologies.`;

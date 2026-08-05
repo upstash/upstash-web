@@ -146,11 +146,7 @@ export default async function BlogPage(props: Props) {
   );
 }
 
-export async function generateMetadata(
-  props: {
-    params: Promise<Props["params"]>;
-  }
-) {
+export async function generateMetadata(props: Props) {
   const params = await props.params;
   const post = allPosts.find((post: Post) => post.slug === params.slug) as Post;
   if (!post) notFound();

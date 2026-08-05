@@ -71,11 +71,7 @@ export default async function BlogPage(props: Props) {
   );
 }
 
-export async function generateMetadata(
-  props: {
-    params: Promise<Props["params"]>;
-  }
-) {
+export async function generateMetadata(props: Props) {
   const params = await props.params;
   const customer = allCustomers.find(
     (customer) => customer.slug === params.slug,

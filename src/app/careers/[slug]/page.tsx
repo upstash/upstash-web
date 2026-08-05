@@ -22,11 +22,7 @@ export async function generateStaticParams(): Promise<Awaited<Props["params"]>[]
     }));
 }
 
-export async function generateMetadata(
-  props: {
-    params: Promise<Props["params"]>;
-  }
-) {
+export async function generateMetadata(props: Props) {
   const params = await props.params;
   const job = allJobs.find((job: Job) => job.slug === params.slug) as Job;
   const title = job.title;

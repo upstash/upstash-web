@@ -21,11 +21,7 @@ export async function generateStaticParams(): Promise<Awaited<Props["params"]>[]
   return tags.map((tag) => ({ tag }));
 }
 
-export async function generateMetadata(
-  props: {
-    params: Promise<Props["params"]>;
-  }
-) {
+export async function generateMetadata(props: Props) {
   const params = await props.params;
   const tag = normalizeTagParam(params.tag);
   const description = `Browse all Upstash blog posts about ${tag}. Tutorials, guides, and articles on ${tag} for serverless developers.`;
