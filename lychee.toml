@@ -39,6 +39,7 @@ exclude = [
   "://([a-z0-9-]+\\.)?x\\.com",
   "://([a-z0-9-]+\\.)?twitter\\.com",
   "://([a-z0-9-]+\\.)?reddit\\.com",
+  "://([a-z0-9-]+\\.)?stackoverflow\\.com",
   "://([a-z0-9-]+\\.)?openai\\.com",
   "://([a-z0-9-]+\\.)?hashicorp\\.com",
   "://news\\.ycombinator\\.com",
