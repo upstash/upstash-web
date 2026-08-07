@@ -29,14 +29,6 @@ export default function PricingBoxPage() {
           <div className="mt-12 md:mt-20">
             <PricingTable />
           </div>
-
-          <div className="mx-auto mt-8 w-3/4 rounded-xl bg-amber-100 px-6 py-3 text-center text-sm text-amber-800">
-            Upstash Box is in{" "}
-            <span className="font-medium underline underline-offset-2 hover:text-amber-900">
-              Developer Preview
-            </span>
-            ! APIs and pricing may change.
-          </div>
         </Container>
       </section>
 
