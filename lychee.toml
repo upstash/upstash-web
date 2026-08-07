@@ -68,10 +68,6 @@ exclude = [
   "://doordash\\.engineering",               # blocks bots
   "://([a-z0-9-]+\\.)?brianlovin\\.com",     # rate-limits bots (429)
   "://([a-z0-9-]+\\.)?paulsmith\\.com",      # rate-limits bots (429)
-  "://([a-z0-9-]+\\.)?readthedocs\\.io",     # rate-limits bots (429)
-  "://docs\\.scrapy\\.org",                  # readthedocs-hosted, rate-limits bots (429)
-  # One-off demo API endpoints from old posts; long since torn down (502).
-  "://[a-z0-9]+\\.execute-api\\.[a-z0-9-]+\\.amazonaws\\.com",
   "://ui\\.tinybird\\.co",                   # login redirect
   "://([a-z0-9-]+\\.)?codeshare\\.io",       # blocks bots (400)
   "://developer\\.nytimes\\.com",            # closes connection to bots
