@@ -1,8 +1,6 @@
 "use client";
-import { use } from "react";
 
 import "../styles/home.css";
-import { ParsedUrlQueryInput } from "querystring";
 import HomeAgents from "@/components/home/agents";
 import HomeCommunity from "@/components/home/community";
 import HomeFaq from "@/components/home/faq";
@@ -14,13 +12,8 @@ import HomeServerless from "@/components/home/serverless";
 import { useSetAffiliateCodeToSessionStorage } from "@/hooks/use-affiliate-code-session-storage";
 import { IntercomProvider } from "react-use-intercom";
 
-export default function Home(
-  props: {
-    searchParams: Promise<ParsedUrlQueryInput>;
-  }
-) {
-  const searchParams = use(props.searchParams);
-  useSetAffiliateCodeToSessionStorage(searchParams);
+export default function Home() {
+  useSetAffiliateCodeToSessionStorage();
 
   return (
     <main className="text-center">
