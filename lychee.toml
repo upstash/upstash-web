@@ -5,10 +5,6 @@
 # Retry/timeout tuning so slow-but-alive hosts don't flap.
 max_retries = 2
 timeout = 20
-# Default concurrency (128) makes readthedocs-hosted docs sites 429. Throttling
-# plus a longer retry backoff keeps them green; the full run still takes ~1min.
-max_concurrency = 32
-retry_wait_time = 5
 
 # Root-relative /docs/* links point at the docs app (Mintlify) hosted at
 # upstash.com/docs, not this repo. --root-dir resolves them to file://…/public/docs/…;
@@ -68,6 +64,11 @@ exclude = [
   "://doordash\\.engineering",               # blocks bots
   "://([a-z0-9-]+\\.)?brianlovin\\.com",     # rate-limits bots (429)
   "://([a-z0-9-]+\\.)?paulsmith\\.com",      # rate-limits bots (429)
+  # readthedocs rate-limits CI runner IPs (429); docs.scrapy.org is readthedocs-hosted.
+  # Throttling max_concurrency didn't help, the limit is per-IP not per-burst.
+  "://([a-z0-9-]+\\.)?readthedocs\\.io",
+  "://docs\\.scrapy\\.org",
+  "://([a-z0-9-]+\\.)?json\\.org",           # TLS handshake fails against lychee's rustls
   "://ui\\.tinybird\\.co",                   # login redirect
   "://([a-z0-9-]+\\.)?codeshare\\.io",       # blocks bots (400)
   "://developer\\.nytimes\\.com",            # closes connection to bots
