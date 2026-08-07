@@ -69,6 +69,7 @@ exclude = [
   "://([a-z0-9-]+\\.)?readthedocs\\.io",
   "://docs\\.scrapy\\.org",
   "://([a-z0-9-]+\\.)?json\\.org",           # TLS handshake fails against lychee's rustls
+  "://kb\\.iu\\.edu",                        # hangs on CI runner IPs (fast from elsewhere)
   "://ui\\.tinybird\\.co",                   # login redirect
   "://([a-z0-9-]+\\.)?codeshare\\.io",       # blocks bots (400)
   "://developer\\.nytimes\\.com",            # closes connection to bots
