@@ -1,0 +1,278 @@
+---
+authors: [alitarik]
+slug: how-background-coding-agents-keep-working
+tags: [box, ai, devtools]
+title: "How Background Coding Agents Keep Working After You Close Your Laptop: 7 Infrastructure Layers"
+description: Background coding agents need more than a sandbox. Explore the seven infrastructure layers that let them run, recover, stream results, and scale.
+---
+
+Coding agents are moving off our laptops. Cursor's cloud agents [keep working when your laptop is closed](https://cursor.com/blog/cloud-agent-development-environments). OpenAI's Codex [runs each task in its own cloud sandbox](https://openai.com/index/introducing-codex/), preloaded with your repository. Claude Code on the web [runs coding tasks on Anthropic-managed infrastructure](https://www.anthropic.com/news/claude-code-on-the-web). The workflow is the same in all three: hand over a task, close the tab, review a pull request later.
+
+The sandbox is the visible part of that stack, and the smallest. Cursor published a detailed account of what it had to rebuild around the sandbox: [environment pipelines, hibernate and resume, checkpoint and fork for virtual machine images, durable execution, and a separate streaming layer](https://cursor.com/blog/cloud-agent-lessons). This post walks those layers one by one and shows how we approached each of them in [Upstash Box](https://upstash.com/docs/box/overall/how-it-works).
+
+## What makes a coding agent a background agent?
+
+A background agent runs on cloud infrastructure and keeps going after you disconnect. You give it a task, it works in an isolated remote environment, and it reports back with a result or a pull request. Cursor, OpenAI, and Anthropic all ship coding agents that work this way.
+
+The launch posts agree on the shape. Codex processes each task in a separate, isolated environment preloaded with your codebase, and at launch a task typically took [1 to 30 minutes](https://openai.com/index/introducing-codex/). Claude Code web sessions run in [isolated sandboxes with network and filesystem restrictions](https://www.anthropic.com/news/claude-code-on-the-web). Cursor's cloud agents [respond to programmatic triggers](https://cursor.com/blog/cloud-agent-development-environments) and are easier to run in parallel than local ones.
+
+![](https://cdn.bydefault.so/tweet-Q_xkr2WkOXMxpuKKXmg14.png)
+
+A local assistant borrows everything from your machine: the checkout, the dependencies, the running dev server, and you as the retry mechanism. A background agent has to bring all of that itself. That is the product: seven infrastructure layers wrapped around a model.
+
+1. **Isolation**: an isolated execution environment per agent
+2. **Environment**: dependencies and tooling, reproducible on demand
+3. **Idle handling**: waiting without burning money or losing state
+4. **Recoverable execution**: restarting interrupted work without rebuilding
+5. **Triggers**: starting without a human at the keyboard
+6. **Conversation**: streaming output and reporting completion
+7. **Fan-out**: running parallel attempts on the same task
+
+![](https://cdn.bydefault.so/drawing-TRGzGCNuzqf_JZDs7mrv7.png)
+
+## Why is isolation the first layer?
+
+A background agent executes shell commands, installs packages, and runs the code it just wrote, so each agent gets an isolated execution environment of its own. Every provider in this post documents this layer, and it is where they differ least.
+
+Every Upstash Box runs as its own Docker container with an [independent filesystem, process tree, and network stack](https://upstash.com/docs/box/overall/how-it-works). Boxes cannot communicate with each other or access each other's data. You pick the runtime at creation: Node.js, Python, Go, Ruby, or Rust.
+
+Isolation alone gives you a safe empty computer. The remaining layers turn it into an agent that runs unattended.
+
+## Why treat the agent's environment as a build artifact?
+
+Because the environment determines output quality. Cursor found that the single biggest factor in cloud agent output quality is [giving the agent a full development environment](https://cursor.com/blog/cloud-agent-lessons), and OpenAI says Codex [performs best with configured dev environments and reliable testing setups](https://openai.com/index/introducing-codex/). An agent verifies its work by running it, and without your dependencies and test runner it can't.
+
+Cursor's answer is Docker-based: critical dev dependencies go into a [Dockerfile that serves as the starting image](https://cursor.com/blog/cloud-agent-environment) for every cloud agent, image builds are layer-cached, and cache-hit builds run [70% faster](https://cursor.com/blog/cloud-agent-development-environments) after an upgrade to that cache.
+
+On Box, the build artifact is a [snapshot](https://upstash.com/docs/box/overall/snapshots). A snapshot captures the full disk state of the box plus the agent configuration: harness, model, and API key settings. Restoring it gives you a new box with exactly that state. So we clone the repo, install the toolchain, snapshot once, and start every future task from the snapshot instead of paying setup time again. Because a snapshot carries the agent's API key settings into every box restored from it, we treat snapshots like credentials and delete the ones we no longer use.
+
+## How should a background agent handle idle time?
+
+Pause the compute, keep the workspace. Background agents spend wall-clock time waiting: a finished task waits for a human to review the pull request, a scheduled agent waits for its next cron tick. The design question is what the sandbox does during that wait, and providers answer it very differently.
+
+| Runtime | When idle or timed out | What survives |
+| --- | --- | --- |
+| [Upstash Box](https://upstash.com/pricing/box) | Auto-pauses (after 1 hour free, 6 hours paid), wakes on the next request | Files, packages, git history, agent config |
+| [E2B](https://e2b.dev/docs/sandbox/persistence) | Timeout kills the sandbox by default; pausing is opt-in via an option | Filesystem and memory, when paused |
+| [Daytona containers](https://www.daytona.io/docs/en/sandboxes/) | Auto-stops after 15 minutes of inactivity by default | Filesystem; memory is cleared |
+| [Modal](https://modal.com/docs/guide/sandboxes) | Default maximum lifetime of 5 minutes, up to 24 hours | Nothing by default; filesystem only if you snapshot it |
+
+The details matter for agents. Daytona's inactivity timer [counts only external interactions](https://www.daytona.io/docs/en/sandboxes/), so a long-running task with no outside traffic can be stopped mid-process at the 15-minute mark. E2B's pause is the deepest. It [keeps memory as well as disk](https://e2b.dev/docs/sandbox/persistence) and resumes in about 1 second. A sandbox can only stay running for 24 hours on the Pro tier and 1 hour on Hobby.
+
+A standard box pauses automatically when idle, keeps its storage, and wakes on the next request. Paused boxes accrue no active CPU charges: billing is [$0.10 per core-hour of CPU your code consumes](https://upstash.com/pricing/box). Here is the lifecycle on the live API:
+
+```typescript
+import { Box } from "@upstash/box";
+
+const box = await Box.create({ runtime: "node", size: "small" });
+
+await box.exec.command(`
+  printf 'persistent hello\\n' > state.txt
+  npm init -y >/dev/null
+  npm install is-odd --silent
+  nohup node -e 'setInterval(() => {}, 1000)' > background.log 2>&1 &
+  echo $! > background.pid
+`);
+
+await box.pause();
+await box.resume();
+
+const check = await box.exec.command(`
+  printf 'file=%s package=%s process_after_resume=%s\\n' \
+    "$(cat state.txt)" \
+    "$(node -e "console.log(require('is-odd')(7))")" \
+    "$(kill -0 "$(cat background.pid)" 2>/dev/null && echo running || echo stopped)"
+`);
+console.log(check.result.trim());
+```
+
+```text
+file=persistent hello package=true process_after_resume=stopped
+```
+
+The file and the installed npm package came back after the pause. The background process did not. That field shows the limit of pause and resume: state comes back, a running process does not.
+
+For a box that has to stay on, a warm agent or a permanent webhook endpoint, setting `keepAlive: true` [turns off auto-pausing](https://upstash.com/docs/box/overall/keep-alive) and switches billing to a fixed price: [$8 per month for a small box, $16 for medium, $32 for large](https://upstash.com/pricing/box), replacing the CPU and storage charges.
+
+## Do long-running agents need a separate workflow engine?
+
+Cursor's answer was yes: it [migrated its agent loop into Temporal](https://cursor.com/blog/cloud-agent-lessons), a durable workflow engine, because running the loop on the VM exposed it to inference provider outages, pod replacement, and EC2 nodes going down. With the loop in Temporal, Cursor manages pod lifecycles independently and runs agents across runs that stretch over days or weeks.
+
+Box takes a different position: the durable unit is the workspace, and the agent runs inside it. Every box can be created with a built-in harness, Claude Code, Codex, or OpenCode. A box [retains its full state between runs](https://upstash.com/docs/box/overall/how-it-works), so you can send multiple prompts to the same box and the agent picks up exactly where it left off:
+
+```typescript
+import { Agent, Box, ClaudeCode } from "@upstash/box";
+
+const box = await Box.create<Agent.ClaudeCode>({
+  runtime: "node",
+  size: "small",
+  agent: {
+    harness: Agent.ClaudeCode,
+    model: ClaudeCode.Haiku_4_5,
+    apiKey: process.env.ANTHROPIC_API_KEY!,
+  },
+});
+
+const first = await box.agent.run({
+  prompt: "Create hello.txt containing exactly hello, then stop.",
+  options: { maxTurns: 3, maxBudgetUsd: 0.05 },
+});
+console.log("first", first.status, JSON.stringify(first.result), first.cost);
+
+const second = await box.agent.stream({
+  prompt: "Read hello.txt and reply with only its contents.",
+  options: { maxTurns: 2, maxBudgetUsd: 0.03 },
+});
+
+let streamed = "";
+for await (const chunk of second) {
+  if (chunk.type === "text-delta") streamed += chunk.text;
+}
+console.log("second", second.status, JSON.stringify(streamed.trim()));
+```
+
+```text
+first completed "Done." {
+  inputTokens: 15,
+  outputTokens: 165,
+  cachedInputTokens: 76421,
+  computeMs: 4411,
+  totalUsd: 0.01306935
+}
+second completed "hello"
+```
+
+The second prompt ran as a separate agent process, found the file the first one wrote, and answered from it. The checkout and installed packages stayed as they were between the two prompts. Agent runs have [no execution timeout by default](https://upstash.com/docs/box/overall/agent), so a long task isn't cut off mid-run. A `maxRetries` option adds retries with exponential backoff (1s, 2s, 4s, limited to 30s). A retry re-runs the whole prompt on any error, so a task that already produced partial side effects, like a pushed commit or a sent request, should be safe to run twice.
+
+This is a deliberate tradeoff between the two models, and they solve different problems. Temporal keeps one loop alive through machine failure, across many machines, for weeks. Box makes no such guarantee: an in-progress loop dies with its process, and restarting interrupted work safely stays the application's job. What Box makes cheap is the restart itself. The checkout, the installed packages, and the conversation position are all still there, so recovery is re-sending a prompt. For task-scoped background agents, the kind Codex's launch post measured in minutes, that covers the common failure cases without operating a workflow cluster.
+
+## How do you wake, schedule, and notify a background agent?
+
+There are two ways to wake a paused box: an active schedule, which resumes the box and runs its command or prompt inside it, and an SDK operation that needs compute, such as an agent run or a shell command. A public URL adds a third path, inbound HTTP, but only while the box is active. It expires when the box pauses and cannot wake it, so a continuously reachable endpoint needs a keep-alive box. There is one way out: a completion webhook that fires when a run succeeds or fails.
+
+![](https://cdn.bydefault.so/drawing-HKvoiUIt-eD0ftOL6yvuP.png)
+
+Schedules are a property of the box itself. A [schedule](https://upstash.com/docs/box/overall/schedules) takes a five-field UTC cron expression and either a shell command or an agent prompt, with an optional webhook for the result:
+
+```typescript
+import { Box } from "@upstash/box";
+
+const box = await Box.create({ runtime: "node", size: "small" });
+
+const schedule = await box.schedule.exec({
+  cron: "17 3 * * *",
+  command: ["bash", "-lc", "date -u >> scheduled.log"],
+});
+console.log("created", schedule.id, schedule.cron, schedule.status);
+```
+
+```text
+created 59272de3-e589-450c-a79e-528565ba1554 17 3 * * * active
+```
+
+For inbound HTTP, a box can expose any port through an authenticated [public URL](https://upstash.com/docs/box/overall/preview). Creating one through the SDK counts as a compute operation, so it resumes a paused box:
+
+```typescript
+import { execFileSync } from "node:child_process";
+import { Box } from "@upstash/box";
+
+const box = await Box.create({ runtime: "node", size: "small" });
+
+await box.exec.command(`
+  nohup node -e "require('http').createServer((_, res) => res.end('hello from box\\n')).listen(3000, '0.0.0.0')" \
+    > server.log 2>&1 &
+  sleep 1
+`);
+
+const publicURL = await box.getPublicURL(3000, { bearerToken: true });
+console.log("public_url", publicURL.url);
+
+const response = execFileSync(
+  "curl",
+  ["--silent", "-H", `Authorization: Bearer ${publicURL.token}`, publicURL.url],
+  { encoding: "utf8" },
+);
+console.log("curl_response", JSON.stringify(response.trim()));
+```
+
+```text
+public_url https://informed-llama-91095-3000.preview.box.upstash.com
+curl_response "hello from box"
+```
+
+When the caller can't afford a dropped request, a GitHub webhook or a payment event, publish it through [QStash](https://upstash.com/docs/qstash/overall/getstarted) instead of calling the URL directly: it guarantees delivery and retries failed requests automatically.
+
+## What does the conversation layer need?
+
+Two read paths: live output while the agent works, and a completion signal when it stops. Cursor [separated the storage and streaming layer](https://cursor.com/blog/cloud-agent-lessons) from its core agent workflow. Box gives you the split as two methods and a webhook.
+
+Calling `run()` waits and returns the final typed result, useful for a scheduled agent. Calling `stream()` emits output in real time as the agent works, useful for a UI. The second prompt in the earlier example streamed its answer this way. Webhook mode is fire-and-forget: the SDK [returns immediately and posts the completion payload](https://upstash.com/docs/box/overall/agent) to your URL when the run succeeds or fails.
+
+## How do snapshots enable parallel attempts on one task?
+
+One snapshot restores into multiple independent boxes, so several agents can start from the identical prepared state. This is the fan-out pattern behind best-of-N: prepare the environment once, fork it, and run a different attempt in each fork.
+
+![](https://cdn.bydefault.so/drawing-8EE1cJDYqi-o1qdySrFV7.png)
+
+```typescript
+import { Box } from "@upstash/box";
+
+const base = await Box.create({ runtime: "node", size: "small" });
+await base.exec.command(`
+  printf 'shared base state\\n' > base.txt
+  npm init -y >/dev/null
+  npm install left-pad --silent
+`);
+
+const snapshot = await base.snapshot({ name: "fanout-base" });
+
+const startedAt = Date.now();
+const forks = await Promise.all(
+  ["alpha", "beta", "gamma"].map(() =>
+    Box.fromSnapshot(snapshot.id, { size: "small" }),
+  ),
+);
+console.log("fromSnapshot_ms", Date.now() - startedAt);
+
+const outputs = await Promise.all(
+  forks.map(async (fork, index) => {
+    const name = ["alpha", "beta", "gamma"][index];
+    const run = await fork.exec.command(`
+      printf '${name}\\n' > fork.txt
+      printf '%s|left-pad=%s|fork=%s\\n' \
+        "$(cat base.txt)" \
+        "$(node -e "console.log(require('left-pad')('7', 3, '0'))")" \
+        "$(cat fork.txt)"
+    `);
+    return run.result.trim();
+  }),
+);
+console.log(outputs);
+```
+
+```text
+fromSnapshot_ms 2074
+[
+  'shared base state|left-pad=007|fork=alpha',
+  'shared base state|left-pad=007|fork=beta',
+  'shared base state|left-pad=007|fork=gamma'
+]
+```
+
+Three boxes came up from one snapshot in 2,074 ms, each with the base file and the installed package already in place, and each writing its own files without touching the others. From here, best-of-N is the same prompt on three forks with three different models, or three strategies with one model, keeping the best diff. A snapshot [does not carry active schedules](https://upstash.com/docs/box/overall/snapshots) to the new box, so forking doesn't multiply your cron jobs.
+
+## Which layers does Upstash Box cover today?
+
+Each of the seven layers maps to a Box primitive, and Box provides durability at the workspace level instead of through an external workflow engine.
+
+| Layer | What Box provides |
+| --- | --- |
+| Isolation | Each box is its own Docker container: filesystem, process tree, network stack |
+| Environment | `snapshot()` captures disk state plus agent config; `fromSnapshot()` restores it |
+| Idle handling | Auto-pause with storage kept, wake on request; `keepAlive` for always-on |
+| Recoverable execution | Workspace and agent session persist; retries re-run the whole prompt |
+| Triggers | Cron schedules in the box, authenticated public URLs, completion webhooks |
+| Conversation | `agent.run()` for final results, `agent.stream()` for live output |
+| Fan-out | Multiple independent boxes from one snapshot |
+
+Box covers the sandbox, environment, lifecycle, trigger, streaming, and fan-out layers as primitives, and it stops short of Temporal-style workflow durability on purpose: the workspace survives, and safely restarting interrupted work stays your application's job. If you're still choosing a provider, our [sandbox provider comparison](https://upstash.com/blog/best-sandbox-providers-for-ai-agents) covers the wider field. A free account includes [10 concurrent boxes and 5 CPU hours per month](https://upstash.com/pricing/box), enough to try every layer in this post.
