@@ -41,12 +41,12 @@ function getAdjacentPosts(posts: Post[], currentIndex: number) {
 }
 
 type Props = {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 };
 
-export async function generateStaticParams(): Promise<Props["params"][]> {
+export async function generateStaticParams(): Promise<Awaited<Props["params"]>[]> {
   return allPosts
     .filter((post) => !post.draft)
     .map((post) => ({
@@ -54,7 +54,8 @@ export async function generateStaticParams(): Promise<Props["params"][]> {
     }));
 }
 
-export default async function BlogPage({ params }: Props) {
+export default async function BlogPage(props: Props) {
+  const params = await props.params;
   const slug = params?.slug;
 
   const indexOfPost = allPosts.findIndex((post) => post.slug === slug);
@@ -145,11 +146,8 @@ export default async function BlogPage({ params }: Props) {
   );
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Props["params"];
-}) {
+export async function generateMetadata(props: Props) {
+  const params = await props.params;
   const post = allPosts.find((post: Post) => post.slug === params.slug) as Post;
   if (!post) notFound();
   const title = post.title;

@@ -9,22 +9,19 @@ import Link from "next/link";
 import { getData } from "../../utils/helpers";
 
 type Props = {
-  params: {
+  params: Promise<{
     author: string;
-  };
+  }>;
 };
 
-export async function generateStaticParams(): Promise<Props["params"][]> {
+export async function generateStaticParams(): Promise<Awaited<Props["params"]>[]> {
   const posts = await getData();
   const authors = uniq(posts.flatMap((post) => post.authors));
   return authors.map((author) => ({ author }));
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Props["params"];
-}) {
+export async function generateMetadata(props: Props) {
+  const params = await props.params;
   const displayName = authors[params.author]?.name ?? params.author;
   const description = `Read all blog posts by ${displayName} on the Upstash blog. Tutorials, guides, and insights on serverless technologies.`;
   return {
@@ -46,7 +43,13 @@ export async function generateMetadata({
   };
 }
 
-export default async function BlogPage({ params: { author } }: Props) {
+export default async function BlogPage(props: Props) {
+  const params = await props.params;
+
+  const {
+    author
+  } = params;
+
   const posts = await getData();
   const postsByAuthor = posts.filter((post) => post.authors.includes(author));
 
