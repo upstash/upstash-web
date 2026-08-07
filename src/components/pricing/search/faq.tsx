@@ -1,43 +1,16 @@
 "use client";
 
-import { trackEvent } from "@/lib/analytics";
-import * as Accordion from "@radix-ui/react-accordion";
 import * as React from "react";
 import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "../accordion";
-
-const QUESTIONS: Record<string, string> = {
-  "item-1": "Can I use Upstash Search in production?",
-  "item-2": "How can I upgrade to pay as you go from free tier?",
-  "item-3": "What is the max limit (topk) for queries?",
-  "item-4": "In payg billing, what is counted as a query?",
-  "item-5": "What is reranking? When should I use it?",
-  "item-6": "Are search and upsert requests same price?",
-  "item-7": "Are there free trials?",
-  "item-8": "How much is the price for bandwidth?",
-  "item-9": "How many databases can I create?",
-  "item-10": "How many indexes can I create?",
-  "item-11": "How many documents can I create?",
-};
+import FAQRoot from "../faq-root";
 
 export default function FAQ() {
   return (
-    <Accordion.Root
-      className="faq"
-      type="single"
-      collapsible
-      onValueChange={(value) => {
-        if (value) {
-          trackEvent("faq_open", {
-            product: "search",
-            question: QUESTIONS[value] ?? value,
-          });
-        }
-      }}
-    >
+    <FAQRoot product="search">
       <AccordionItem value="item-1">
         <AccordionTrigger>
           Can I use Upstash Search in production?
@@ -138,6 +111,6 @@ export default function FAQ() {
           contact us at <a href="support@upstash.com">support@upstash.com</a>.
         </AccordionContent>
       </AccordionItem>
-    </Accordion.Root>
+    </FAQRoot>
   );
 }

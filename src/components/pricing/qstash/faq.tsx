@@ -1,37 +1,16 @@
 "use client";
 
-import { trackEvent } from "@/lib/analytics";
-import * as Accordion from "@radix-ui/react-accordion";
 import * as React from "react";
 import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "../accordion";
-
-const QUESTIONS: Record<string, string> = {
-  "item-1": "How are messages priced? Are retries free?",
-  "item-2":
-    "What happens if we exceed the “Messages per Day” or “Monthly Bandwidth” limit?",
-  "item-3": "How is the Max Message Size limit applied?",
-  "item-4": "Is there a rate limit?",
-};
+import FAQRoot from "../faq-root";
 
 export default function FAQ() {
   return (
-    <Accordion.Root
-      className="faq"
-      type="single"
-      collapsible
-      onValueChange={(value) => {
-        if (value) {
-          trackEvent("faq_open", {
-            product: "qstash",
-            question: QUESTIONS[value] ?? value,
-          });
-        }
-      }}
-    >
+    <FAQRoot product="qstash">
       <AccordionItem value="item-1">
         <AccordionTrigger>
           How are messages priced? Are retries free?
@@ -189,6 +168,6 @@ export default function FAQ() {
           </ul>
         </AccordionContent>
       </AccordionItem>
-    </Accordion.Root>
+    </FAQRoot>
   );
 }

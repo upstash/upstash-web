@@ -1,38 +1,16 @@
 "use client";
 
-import { trackEvent } from "@/lib/analytics";
-import * as Accordion from "@radix-ui/react-accordion";
 import * as React from "react";
 import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "../accordion";
-
-const QUESTIONS: Record<string, string> = {
-  "item-1": "What is a step?",
-  "item-2":
-    'What happens when we hit "Steps per Day" or "Monthly Bandwidth" limit?',
-  "item-3": "What happens when we hit daily max steps limit?",
-  "item-4": "Is there a rate limit ?",
-  "item-5": "How is the Max Message Size Limit applied?",
-};
+import FAQRoot from "../faq-root";
 
 export default function FAQ() {
   return (
-    <Accordion.Root
-      className="faq"
-      type="single"
-      collapsible
-      onValueChange={(value) => {
-        if (value) {
-          trackEvent("faq_open", {
-            product: "workflow",
-            question: QUESTIONS[value] ?? value,
-          });
-        }
-      }}
-    >
+    <FAQRoot product="workflow">
       <AccordionItem value="item-1">
         <AccordionTrigger>What is a step?</AccordionTrigger>
         <AccordionContent>
@@ -183,6 +161,6 @@ export default function FAQ() {
           </ul>
         </AccordionContent>
       </AccordionItem>
-    </Accordion.Root>
+    </FAQRoot>
   );
 }
