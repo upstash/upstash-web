@@ -1,0 +1,103 @@
+---
+title: "Agent Plugins Explained: How We Built the Context7 Plugin"
+slug: context7-portable-agent-plugin
+authors: [abdullahenes]
+tags: [context7, mcp, ai, agents, plugins, skills]
+description: "Context7 now ships an Agent Plugin, the new vendor-neutral format from AWS, Cursor, Microsoft, OpenAI, and Vercel. A walkthrough of the plugin, the decisions behind it, and what it can't carry yet compared to our client-specific plugins."
+---
+
+Vercel, together with AWS, Cursor, GitHub, Microsoft, and OpenAI, just announced [Agent Plugins](https://vercel.com/blog/introducing-agent-plugins), an open standard for packaging agent extensions. One directory, one manifest, and any compatible client can install it. You can see the [list of compatible clients here](https://agent-plugins.org/compatible-clients).
+
+We built a Context7 plugin for the new format. This post walks through what's inside, the decisions we made building it, and what it can't carry yet compared to the client-specific plugins we already ship.
+
+## The problem: four plugins for one server
+
+Context7 gives agents current, version-specific documentation for any library, so they stop hallucinating APIs from stale training data. It's a single MCP server, but getting it into each coding agent has meant building a separate package every time.
+
+We maintain separate plugins for Claude Code, Cursor, Codex, and Copilot, and they've diverged because of the different capabilities of these clients. Each has its own layout and manifest. The Claude Code plugin ships a `/context7:docs` command and a `docs-researcher` subagent. The Cursor plugin ships an always-on rule instead. The Codex plugin is skills-only.
+
+Agent Plugins fixes exactly this. It sits one layer above MCP: where MCP defines how an agent talks to a tool server at runtime, Agent Plugins defines how you ship that connection, plus the instructions for using it, as one installable folder. The spec, published at [agent-plugins.org](https://agent-plugins.org), covers just two component types, because those are the two that already work across clients: skills and MCP servers. Commands, hooks, and subagents stay client-specific for now.
+
+## What's inside an Agent Plugin
+
+Here is the full layout of the Context7 plugin:
+
+```text
+context7/
+├── plugin.json      # manifest
+├── mcp.json         # MCP server config
+├── skills/
+│   └── context7-mcp/
+│       └── SKILL.md # when and how to fetch docs
+├── LICENSE
+└── README.md
+```
+
+There is no build step and no registry metadata. The file locations are the contract. A client checks for `plugin.json` at the root, reads MCP servers from `mcp.json`, and discovers skills under `skills/`. That's the whole discovery mechanism.
+
+The manifest works a lot like npm's `package.json`. It identifies the plugin and carries the metadata a client shows at install time, and that's all it does. Unlike existing plugin manifests such as Copilot's, which point at their components with fields like `"skills": "skills/"` and `"mcpServers": ".mcp.json"`, no paths to skills or MCP config are declared here. Clients just look in the fixed locations. Here is ours:
+
+```json
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "context7",
+  "version": "1.0.0",
+  "description": "Up-to-date documentation lookup. Pull version-specific documentation and code examples directly from source repositories into your LLM context.",
+  "author": {
+    "name": "Upstash",
+    "email": "context7@upstash.com",
+    "url": "https://upstash.com"
+  },
+  "homepage": "https://context7.com",
+  "repository": "https://github.com/upstash/context7",
+  "license": "MIT",
+  "keywords": ["documentation", "context", "mcp", "library-docs"]
+}
+```
+
+`mcp.json` declares the MCP servers the plugin provides. Ours declares a single remote server, the Context7 server, over streamable HTTP:
+
+```json
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "context7": {
+      "type": "streamable-http",
+      "url": "https://mcp.context7.com/mcp/oauth"
+    }
+  }
+}
+```
+
+Notice the `/oauth` at the end of that URL. That's a decision worth explaining.
+
+## Deciding on auth: everyone gets OAuth
+
+Some of our client-specific plugins support API keys, passed through a header like `"Authorization": "${CONTEXT7_API_KEY}"` that the client fills in from an environment variable at connect time. Agent Plugins doesn't support this. The [spec](https://agent-plugins.org/specification) closes both ways you could ship a key. A plugin can't reference the user's key through a placeholder, because clients never expand `${VAR}` placeholders in `url` or `headers`; the header would arrive at our server as the literal text `${CONTEXT7_API_KEY}`. And a plugin can't include a real key directly, because a plugin is public package data anyone can read, so the spec says plugins "MUST NOT embed credentials or other secrets in `headers`". With API keys off the table, OAuth is what's left, and that's why the plugin points at our OAuth endpoint.
+
+The flow is standard MCP authorization: on first connection the server answers `401`, the client discovers the authorization server, registers itself, and opens a browser for the user to approve access. No key pasted anywhere, tokens stored by the client.
+
+## What the plugin doesn't carry
+
+The current version of the spec makes only skills and MCP servers portable, so parts of our client-specific plugins have no place in this one:
+
+- The `/context7:docs` command, from the Claude Code and Copilot plugins. Commands are not a portable component type.
+- The `docs-researcher` subagent, which fetches docs in a separate context so results don't clutter your main conversation. Agents aren't portable either.
+- The always-on rule from the Cursor plugin. Rules aren't portable either, so the skill's description carries the triggering instructions instead.
+- API key auth, for clients that can't run an OAuth flow.
+
+If you want those, the client-specific plugins are still in the repo. Future versions of the spec may make commands, hooks, and agents portable too.
+
+The spec also says nothing about distribution, sandboxing, permissions, or publisher trust. Those belong to clients and registries. It's a working draft maintained in the open at [github.com/agentplugins/agent-plugins-spec](https://github.com/agentplugins/agent-plugins-spec).
+
+## How to install the Context7 Agent Plugin
+
+The plugin lives in the [Context7 repository](https://github.com/upstash/context7) under `plugins/agent-plugins/context7`. The easiest way to install it is the [plugins CLI](https://github.com/vercel-labs/plugins), which discovers plugins in a repo, detects which agent tools you have installed, and installs into them:
+
+```bash
+npx plugins add upstash/context7
+```
+
+If your client has its own plugin command, pointing it at the plugin directory works too.
+
+If you're building your own plugin, the [plugin author guide](https://agent-plugins.org/plugin-authors) covers the layout, and the `skills-ref` reference tool validates your `SKILL.md` frontmatter before a client ever sees it.
