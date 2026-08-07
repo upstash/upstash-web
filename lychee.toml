@@ -6,6 +6,13 @@
 max_retries = 2
 timeout = 20
 
+# Treat 403/429 as alive. A host that answers with "forbidden" or "rate limited"
+# resolved, handshook and responded, so the link is not dead; it just refused a
+# bot. This is by far the most common failure here and used to need a new entry
+# in the exclude list per host. Genuinely dead links (404/410/5xx, DNS failures,
+# timeouts) still fail the check.
+accept = ["200..=299", "403", "429"]
+
 # Root-relative /docs/* links point at the docs app (Mintlify) hosted at
 # upstash.com/docs, not this repo. --root-dir resolves them to file://…/public/docs/…;
 # this remap (applied after resolution) rewrites them back to the production URL so
@@ -54,6 +61,7 @@ exclude = [
   # --- More hosts that block checkers / require auth / are SPAs or API endpoints ---
   "://console\\.upstash\\.com",              # authenticated SPA console (client-rendered routes)
   "://qstash\\.upstash\\.io",                # example API endpoints in code samples
+  "\\.execute-api\\.[a-z0-9-]+\\.amazonaws\\.com",  # ephemeral demo API endpoints from old posts
   "://api\\.replicate\\.com",                # API endpoint (requires auth)
   "://([a-z0-9-]+\\.)?fauna\\.com",          # blocks/times-out automated requests
   "://([a-z0-9-]+\\.)?statista\\.com",       # SSO redirect loop
@@ -62,6 +70,8 @@ exclude = [
   "://doordash\\.engineering",               # blocks bots
   "://([a-z0-9-]+\\.)?brianlovin\\.com",     # rate-limits bots (429)
   "://([a-z0-9-]+\\.)?paulsmith\\.com",      # rate-limits bots (429)
+  "://([a-z0-9-]+\\.)?json\\.org",           # TLS handshake fails against lychee's rustls
+  "://kb\\.iu\\.edu",                        # hangs on CI runner IPs (fast from elsewhere)
   "://ui\\.tinybird\\.co",                   # login redirect
   "://([a-z0-9-]+\\.)?codeshare\\.io",       # blocks bots (400)
   "://developer\\.nytimes\\.com",            # closes connection to bots
