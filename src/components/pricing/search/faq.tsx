@@ -1,16 +1,16 @@
 "use client";
 
-import * as Accordion from "@radix-ui/react-accordion";
 import * as React from "react";
 import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "../accordion";
+import FAQRoot from "../faq-root";
 
 export default function FAQ() {
   return (
-    <Accordion.Root className="faq" type="single" collapsible>
+    <FAQRoot product="search">
       <AccordionItem value="item-1">
         <AccordionTrigger>
           Can I use Upstash Search in production?
@@ -111,6 +111,6 @@ export default function FAQ() {
           contact us at <a href="support@upstash.com">support@upstash.com</a>.
         </AccordionContent>
       </AccordionItem>
-    </Accordion.Root>
+    </FAQRoot>
   );
 }

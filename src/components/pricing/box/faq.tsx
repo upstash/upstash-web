@@ -1,16 +1,16 @@
 "use client";
 
-import * as Accordion from "@radix-ui/react-accordion";
 import * as React from "react";
 import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "../accordion";
+import FAQRoot from "../faq-root";
 
 export default function FAQ() {
   return (
-    <Accordion.Root className="faq" type="single" collapsible>
+    <FAQRoot product="box">
       <AccordionItem value="item-2">
         <AccordionTrigger>
           What does &quot;active CPU hour&quot; mean?
@@ -148,6 +148,6 @@ export default function FAQ() {
           </p>
         </AccordionContent>
       </AccordionItem>
-    </Accordion.Root>
+    </FAQRoot>
   );
 }

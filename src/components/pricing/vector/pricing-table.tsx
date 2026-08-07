@@ -1,16 +1,31 @@
+"use client";
+
 import Button from "@/components/button";
 import {
   VECTOR_FIXED_PLAN,
   VECTOR_FREE_PLAN,
   VECTOR_PAYG_PLAN,
 } from "@/data/pricing/vector";
+import { useTrackHover } from "@/hooks/use-track-hover";
 import * as React from "react";
 
 export default function PricingTable() {
+  const freeHover = useTrackHover({ product: "vector", plan: "free" });
+  const paygHover = useTrackHover({ product: "vector", plan: "payg" });
+  const thirdHover = useTrackHover({ product: "vector", plan: "fixed" });
+
   return (
-    <div className="grid gap-6 md:grid-cols-3">
+    <div
+      data-area="pricing_table"
+      data-product="vector"
+      className="grid gap-6 md:grid-cols-3"
+    >
       {/* FREE */}
-      <div className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
+      <div
+        data-plan="free"
+        {...freeHover}
+        className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute"
+      >
         <div className="grow">
           <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
             {VECTOR_FREE_PLAN.name}
@@ -46,7 +61,11 @@ export default function PricingTable() {
       </div>
 
       {/* PAYG */}
-      <div className="flex flex-col items-center gap-4 rounded-4xl border-2 border-primary bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
+      <div
+        data-plan="payg"
+        {...paygHover}
+        className="flex flex-col items-center gap-4 rounded-4xl border-2 border-primary bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute"
+      >
         <div className="grow">
           <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
             {VECTOR_PAYG_PLAN.name}
@@ -82,7 +101,11 @@ export default function PricingTable() {
       </div>
 
       {/* Fixed / Pro */}
-      <div className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
+      <div
+        data-plan="fixed"
+        {...thirdHover}
+        className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute"
+      >
         <div className="grow">
           <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
             {VECTOR_FIXED_PLAN.name}

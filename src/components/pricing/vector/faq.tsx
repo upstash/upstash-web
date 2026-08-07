@@ -1,16 +1,16 @@
 "use client";
 
-import * as Accordion from "@radix-ui/react-accordion";
 import * as React from "react";
 import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "../accordion";
+import FAQRoot from "../faq-root";
 
 export default function FAQ() {
   return (
-    <Accordion.Root className="faq" type="single" collapsible>
+    <FAQRoot product="vector">
       <AccordionItem value="item-1">
         <AccordionTrigger>
           How can I upgrade to pay as you go from free tier?
@@ -111,6 +111,6 @@ export default function FAQ() {
           for details.
         </AccordionContent>
       </AccordionItem>
-    </Accordion.Root>
+    </FAQRoot>
   );
 }

@@ -6,6 +6,7 @@ import CompareTable from "@/components/pricing/box/compare-table";
 import FAQ from "@/components/pricing/box/faq";
 import PricingTable from "@/components/pricing/box/pricing-table";
 import ProductToggle from "@/components/pricing/product-toggle";
+import TextSelectTracker from "@/components/pricing/text-select-tracker";
 import { generateFaqSchema } from "@/utils/structured-schema-generators";
 
 export default function PricingBoxPage() {
@@ -23,6 +24,7 @@ export default function PricingBoxPage() {
       <section>
         <Container className="max-w-screen-lg">
           <ProductToggle product={"/box"} />
+          <TextSelectTracker product="box" />
 
           <div className="mt-12 md:mt-20">
             <PricingTable />

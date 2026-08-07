@@ -4,6 +4,7 @@ import Bg from "@/components/bg";
 import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
+import { trackEvent } from "@/lib/analytics";
 import cx from "@/utils/cx";
 import {
   IconBrandDiscord,
@@ -32,7 +33,7 @@ export default function HomePage() {
           </PageHeaderDesc>
         </header>
 
-        <div className="mx-auto mt-20 grid max-w-2xl gap-4">
+        <div data-area="contact" className="mx-auto mt-20 grid max-w-2xl gap-4">
           {/* <Link href="https://calendly.com/upstash" target="_blank">
             <span>
               <b className="text-primary-text">Book</b>{" "}
@@ -43,6 +44,7 @@ export default function HomePage() {
 
           <Link
             onClick={() => {
+              trackEvent("contact_intercom_open");
               showMessages();
             }}
           >

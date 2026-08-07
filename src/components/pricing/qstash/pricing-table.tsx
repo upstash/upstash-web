@@ -6,6 +6,7 @@ import {
   QSTASH_FREE_PLAN,
   QSTASH_PAYG_PLAN,
 } from "@/data/pricing/qstash";
+import { useTrackHover } from "@/hooks/use-track-hover";
 import { PricingPlans } from "@/utils/type";
 import * as React from "react";
 import { ChangeEvent, useState } from "react";
@@ -30,10 +31,22 @@ export default function PricingTable() {
     FIXED_PLAN_BY_ID[PRICING_PLANS_TO_FIXED_ID[selectedFixed]] ??
     QSTASH_FIXED_PLANS[0];
 
+  const freeHover = useTrackHover({ product: "qstash", plan: "free" });
+  const paygHover = useTrackHover({ product: "qstash", plan: "payg" });
+  const thirdHover = useTrackHover({ product: "qstash", plan: fixedPlan.id });
+
   return (
-    <div className="grid gap-6 md:grid-cols-3">
+    <div
+      data-area="pricing_table"
+      data-product="qstash"
+      className="grid gap-6 md:grid-cols-3"
+    >
       {/* FREE */}
-      <div className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
+      <div
+        data-plan="free"
+        {...freeHover}
+        className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute"
+      >
         <div className="grow">
           <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
             {QSTASH_FREE_PLAN.name}
@@ -69,7 +82,11 @@ export default function PricingTable() {
       </div>
 
       {/* PAYG */}
-      <div className="flex flex-col items-center gap-4 rounded-4xl border-2 border-primary bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
+      <div
+        data-plan="payg"
+        {...paygHover}
+        className="flex flex-col items-center gap-4 rounded-4xl border-2 border-primary bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute"
+      >
         <div className="grow">
           <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
             {QSTASH_PAYG_PLAN.name}
@@ -107,7 +124,11 @@ export default function PricingTable() {
       </div>
 
       {/* Fixed */}
-      <div className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute">
+      <div
+        data-plan={fixedPlan.id}
+        {...thirdHover}
+        className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute"
+      >
         <div className="grow">
           <h4 className="mb-4 text-xl font-semibold text-primary-text">
             <select

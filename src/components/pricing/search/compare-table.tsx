@@ -3,6 +3,7 @@
 import Button from "@/components/button";
 import Tooltip from "@/components/tooltip";
 import useIsMobile from "@/hooks/use-is-mobile";
+import { trackEvent } from "@/lib/analytics";
 import cx from "@/utils/cx";
 import { PricingPlans } from "@/utils/type";
 import { IconInfoCircle } from "@tabler/icons-react";
@@ -47,7 +48,11 @@ export default function CompareTable() {
   }
 
   return (
-    <table className="w-full border-separate border-spacing-x-1 border-spacing-y-0">
+    <table
+      data-area="pricing_compare"
+      data-product="search"
+      className="w-full border-separate border-spacing-x-1 border-spacing-y-0"
+    >
       <colgroup>
         <col className="w-1/2 md:w-1/5" />
         <col className="w-1/2 md:w-1/5" />
@@ -454,14 +459,22 @@ export default function CompareTable() {
           <td className="p-0" />
           <Col plan={showFree} className="py-4">
             <Button asChild variant="primary">
-              <a target="_self" href="https://console.upstash.com">
+              <a
+                target="_self"
+                data-plan="free"
+                href="https://console.upstash.com"
+              >
                 Start Now
               </a>
             </Button>
           </Col>
           <Col plan={showPayg} feature className="py-4">
             <Button asChild variant="primary">
-              <a target="_self" href="https://console.upstash.com">
+              <a
+                target="_self"
+                data-plan="payg"
+                href="https://console.upstash.com"
+              >
                 Start Now
               </a>
             </Button>
@@ -479,10 +492,20 @@ export default function CompareTable() {
   );
 }
 
-function MobileSelectCol({ ...props }: React.ComponentProps<"select">) {
+function MobileSelectCol({
+  onChange,
+  ...props
+}: React.ComponentProps<"select">) {
   return (
     <select
       className="mb-2 bg-white px-4 py-2 font-semibold md:hidden"
+      onChange={(event) => {
+        trackEvent("pricing_compare_select", {
+          product: "search",
+          plan: event.target.value,
+        });
+        onChange?.(event);
+      }}
       {...props}
     >
       <option value={PricingPlans.Free}>Free</option>
