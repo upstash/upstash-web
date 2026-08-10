@@ -1,16 +1,16 @@
 "use client";
 
-import * as Accordion from "@radix-ui/react-accordion";
 import * as React from "react";
 import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "../accordion";
+import FAQRoot from "../faq-root";
 
 export default function FAQ() {
   return (
-    <Accordion.Root className="faq" type="single" collapsible>
+    <FAQRoot product="workflow">
       <AccordionItem value="item-1">
         <AccordionTrigger>What is a step?</AccordionTrigger>
         <AccordionContent>
@@ -161,6 +161,6 @@ export default function FAQ() {
           </ul>
         </AccordionContent>
       </AccordionItem>
-    </Accordion.Root>
+    </FAQRoot>
   );
 }

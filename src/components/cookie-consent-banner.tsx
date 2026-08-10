@@ -1,5 +1,6 @@
 "use client";
 
+import { grantAnalyticsConsent } from "@/lib/analytics";
 import { useGlobalStore } from "@/lib/global-store";
 import { useEffect, useState } from "react";
 
@@ -49,6 +50,7 @@ export const CookieConsentBanner = () => {
         <button
           onClick={() => {
             setCookieConsent("granted");
+            grantAnalyticsConsent();
           }}
           className="flex items-center rounded-full bg-white px-3 pb-1 pt-1.5 text-xs transition-colors hover:bg-gray-100"
         >

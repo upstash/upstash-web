@@ -1,16 +1,16 @@
 "use client";
 
-import * as Accordion from "@radix-ui/react-accordion";
 import * as React from "react";
 import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "../accordion";
+import FAQRoot from "../faq-root";
 
 export default function FAQ() {
   return (
-    <Accordion.Root className="faq" type="single" collapsible>
+    <FAQRoot product="qstash">
       <AccordionItem value="item-1">
         <AccordionTrigger>
           How are messages priced? Are retries free?
@@ -168,6 +168,6 @@ export default function FAQ() {
           </ul>
         </AccordionContent>
       </AccordionItem>
-    </Accordion.Root>
+    </FAQRoot>
   );
 }

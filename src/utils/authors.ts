@@ -364,7 +364,7 @@ export const authors: Record<
     name: "Abdullah Enes Gules",
     title: "Software Engineer @Upstash",
     twitter: "abdushbag",
-    website: "https://www.linkedin.com/in/abdullah-enes-gules",
+    website: "https://enesgules.com",
     image: "abdullahenes.png",
   },
   ibrahim: {

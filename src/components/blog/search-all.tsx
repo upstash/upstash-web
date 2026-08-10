@@ -1,7 +1,8 @@
 "use client";
 
+import { trackEvent } from "@/lib/analytics";
 import Fuse from "fuse.js";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import PostListCard from "./list-item";
 import { FUSE_OPTIONS, type SearchPost } from "./search";
 import SearchInput from "./search-input";
@@ -33,6 +34,20 @@ export default function BlogAllSearch({ posts }: { posts: SearchPost[] }) {
   const isSearching = trimmed.length > 0;
   const results = isSearching ? fuse.search(trimmed).map((r) => r.item) : null;
   const grouped = useMemo(() => groupByMonth(posts), [posts]);
+
+  const resultsCount = results?.length ?? 0;
+  useEffect(() => {
+    if (trimmed.length < 2) {
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      trackEvent("blog_search", {
+        query: trimmed.toLowerCase().slice(0, 60),
+        results_count: resultsCount,
+      });
+    }, 800);
+    return () => window.clearTimeout(timer);
+  }, [trimmed, resultsCount]);
 
   return (
     <>

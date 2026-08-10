@@ -4,6 +4,7 @@ import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
 import ProductToggle from "@/components/pricing/product-toggle";
 import ProdPack from "@/components/pricing/qstash/prod-pack";
+import TextSelectTracker from "@/components/pricing/text-select-tracker";
 import CompareTable from "@/components/pricing/workflow/compare-table";
 import Enterprise from "@/components/pricing/workflow/enterprise";
 import FAQ from "@/components/pricing/workflow/faq";
@@ -26,6 +27,7 @@ export default function PricingWorkflowPage() {
       <section>
         <Container className="max-w-screen-lg">
           <ProductToggle product={"/workflow"} />
+          <TextSelectTracker product="workflow" />
 
           <div className="mt-12 md:mt-20">
             <PricingTable />
