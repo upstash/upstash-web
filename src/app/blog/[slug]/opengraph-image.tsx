@@ -13,10 +13,10 @@ export const contentType = "image/png";
 export default async function TwImage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
   try {
-    const slug = params.slug;
+    const { slug } = await params;
 
     const post = await getPostDetails(slug);
 
