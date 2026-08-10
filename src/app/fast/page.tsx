@@ -5,9 +5,7 @@ import { Metadata } from "next";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 
-const Globe = dynamic(() => import("@/components/home/fast/globe2"), {
-  ssr: false,
-});
+const Globe = dynamic(() => import("@/components/home/fast/globe2"));
 
 export const metadata: Metadata = {
   title: "Fast",

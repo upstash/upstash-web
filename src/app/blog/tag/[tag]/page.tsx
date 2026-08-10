@@ -10,22 +10,19 @@ import { notFound } from "next/navigation";
 import { getData } from "../../utils/helpers";
 
 type Props = {
-  params: {
+  params: Promise<{
     tag: string;
-  };
+  }>;
 };
 
-export async function generateStaticParams(): Promise<Props["params"][]> {
+export async function generateStaticParams(): Promise<Awaited<Props["params"]>[]> {
   const posts = await getData();
   const tags = uniq(posts.flatMap((post) => post.tags.map(normalizeTag)));
   return tags.map((tag) => ({ tag }));
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Props["params"];
-}) {
+export async function generateMetadata(props: Props) {
+  const params = await props.params;
   const tag = normalizeTagParam(params.tag);
   const description = `Browse all Upstash blog posts about ${tag}. Tutorials, guides, and articles on ${tag} for serverless developers.`;
   return {
@@ -47,7 +44,13 @@ export async function generateMetadata({
   };
 }
 
-export default async function BlogPage({ params: { tag } }: Props) {
+export default async function BlogPage(props: Props) {
+  const params = await props.params;
+
+  const {
+    tag
+  } = params;
+
   const normalized = normalizeTagParam(tag);
   const posts = await getData();
   const postsWithTag = posts.filter((post) =>

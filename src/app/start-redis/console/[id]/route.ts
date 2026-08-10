@@ -6,10 +6,8 @@ const CONSOLE_REDIS_START_PATH = "/start-redis";
 const UPSTASH_CONSOLE_URL =
   process.env.UPSTASH_CONSOLE_URL ?? "https://console.upstash.com";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } },
-) {
+export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     trackEvent("start_redis_console", req);
 

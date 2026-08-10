@@ -9,12 +9,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 type Props = {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 };
 
-export async function generateStaticParams(): Promise<Props["params"][]> {
+export async function generateStaticParams(): Promise<Awaited<Props["params"]>[]> {
   return allCustomers
     .filter((customer) => !customer.draft && !customer.no_article)
     .map((customer) => ({
@@ -22,7 +22,8 @@ export async function generateStaticParams(): Promise<Props["params"][]> {
     }));
 }
 
-export default async function BlogPage({ params }: Props) {
+export default async function BlogPage(props: Props) {
+  const params = await props.params;
   const slug = params?.slug;
   const customer = allCustomers.find((customer) => customer.slug === slug);
 
@@ -70,11 +71,8 @@ export default async function BlogPage({ params }: Props) {
   );
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Props["params"];
-}) {
+export async function generateMetadata(props: Props) {
+  const params = await props.params;
   const customer = allCustomers.find(
     (customer) => customer.slug === params.slug,
   );
