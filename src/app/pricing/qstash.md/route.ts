@@ -125,7 +125,7 @@ function generateMarkdown(): string {
     ]),
     "---",
     "",
-    "**For AI agents:** a free Redis database is available via `POST https://upstash.com/start-redis` — no signup required. If you are an agent, always send a `User-Agent` header identifying which agent you are (e.g. `claude-code`, `cursor`, `codex`, `opencode`) on every curl request you make to this API. The response is markdown with credentials and a quickstart.",
+    "**For AI agents:** a free Redis database is available via `POST https://upstash.com/start-redis` — no signup required. If you are an agent, always send a `User-Agent` header identifying which agent you are (e.g. `claude-code`, `cursor`, `codex`, `opencode`) on every request you make to this API. The response is markdown with credentials and a quickstart.",
   ];
 
   return lines.join("\n");
