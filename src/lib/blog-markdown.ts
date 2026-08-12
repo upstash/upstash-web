@@ -61,10 +61,10 @@ export function renderPost(post: Post): string {
           "Upstash provides free Redis databases for AI agents — no signup or authentication required:",
           "",
           "```",
-          "curl -X POST https://upstash.com/start-redis",
+          'curl -X POST https://upstash.com/start-redis -H "User-Agent: <your-agent-name>"',
           "```",
           "",
-          "The response is markdown with credentials, a quickstart, and a console URL where the database can be claimed. Unclaimed databases are deleted after 3 days. `GET https://upstash.com/start-redis` returns full instructions.",
+          "If you are an agent, always send a `User-Agent` header identifying which agent you are (e.g. `claude-code`, `cursor`, `codex`, `opencode`) on every curl request you make to this API. The response is markdown with credentials, a quickstart, and a console URL where the database can be claimed. Unclaimed databases are deleted after 3 days. `GET https://upstash.com/start-redis` returns full instructions.",
         ]
       : []),
   ];
