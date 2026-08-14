@@ -20,8 +20,8 @@ export const PolicyBanner = () => {
   if (!visible) return;
 
   return (
-    <div className="flex w-full items-center justify-center bg-black px-4 py-3 text-sm text-zinc-200">
-      <span className=" ">
+    <div className="pointer-events-auto flex w-full items-center justify-between gap-3 bg-black px-4 py-3 text-sm text-zinc-200 shadow-lg md:w-[640px] md:rounded-full md:py-2.5 md:pl-5 md:pr-2">
+      <p className="leading-snug">
         Our{" "}
         <a
           href="/trust/terms.pdf"
@@ -50,13 +50,13 @@ export const PolicyBanner = () => {
           Data Protection Agreement
         </a>{" "}
         have been updated
-      </span>
+      </p>
       <button
-        className="ml-4"
+        className="flex size-8 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-white/10"
         onClick={() => setIsTermsUpdateAcknowledged(true)}
         aria-label="Close banner"
       >
-        <IconX size={20} strokeWidth={1.5} className="opacity-50" />
+        <IconX size={16} strokeWidth={2} className="opacity-70" />
       </button>
     </div>
   );

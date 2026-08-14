@@ -2,6 +2,7 @@
 
 import { grantAnalyticsConsent } from "@/lib/analytics";
 import { useGlobalStore } from "@/lib/global-store";
+import { IconX } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 
 export const CookieConsentBanner = () => {
@@ -36,33 +37,34 @@ export const CookieConsentBanner = () => {
   if (!visible) return;
 
   return (
-    <div className="gap:2 fixed bottom-0 left-0 z-50 flex w-full items-center justify-between bg-emerald-400 py-1.5 pl-4 pr-20 text-sm text-zinc-950 shadow-lg md:bottom-4 md:left-1/2 md:w-[600px] md:-translate-x-1/2 md:gap-4 md:rounded-full md:pr-1.5">
-      <span className="font-normal">
-        We use cookies to improve your experience. Read our
+    <div className="pointer-events-auto flex w-full items-center justify-between gap-3 bg-emerald-400 px-4 py-3 text-sm text-zinc-950 shadow-lg md:w-[640px] md:rounded-full md:py-2 md:pl-5 md:pr-2">
+      <p className="leading-snug">
+        We use cookies to improve your experience. Read our{" "}
         <a
           href="https://upstash.com/trust/privacy.pdf"
-          className="ml-1 underline"
+          className="underline underline-offset-2 hover:no-underline"
         >
           privacy policy.
         </a>
-      </span>
-      <div className="flex items-center gap-2.5">
+      </p>
+      <div className="flex shrink-0 items-center gap-1">
         <button
           onClick={() => {
             setCookieConsent("granted");
             grantAnalyticsConsent();
           }}
-          className="flex items-center rounded-full bg-white px-3 pb-1 pt-1.5 text-xs transition-colors hover:bg-gray-100"
+          className="rounded-full bg-white px-3.5 py-1.5 text-xs font-medium leading-5 transition-colors hover:bg-zinc-100"
         >
-          <p>Accept</p>
+          Accept
         </button>
         <button
           onClick={() => {
             setVisible(false);
           }}
-          className="flex h-6 w-6 items-center justify-center rounded-full transition-colors hover:bg-emerald-500"
+          aria-label="Dismiss"
+          className="flex size-8 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-emerald-500"
         >
-          x
+          <IconX size={16} strokeWidth={2} />
         </button>
       </div>
     </div>
