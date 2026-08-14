@@ -2,6 +2,7 @@ import Button from "@/components/button";
 import Container from "@/components/container";
 import { Logo } from "@/components/logo";
 import OutLink from "@/components/out-link";
+import { PolicyBanner } from "@/components/policy-banner";
 import cx from "@/utils/cx";
 import { IconArrowUpRight } from "@tabler/icons-react";
 import Link from "next/link";
@@ -45,6 +46,8 @@ export default function Footer({ className, ...props }: IAppFooter) {
               />
             </Link>
           </div>
+
+          <PolicyBanner />
 
           <div className="flex gap-2">
             <Button

@@ -37,7 +37,7 @@ export const CookieConsentBanner = () => {
   if (!visible) return;
 
   return (
-    <div className="pointer-events-auto flex w-full items-center justify-between gap-3 bg-emerald-400 px-4 py-3 text-sm text-zinc-950 shadow-lg md:w-[640px] md:rounded-full md:py-2 md:pl-5 md:pr-2">
+    <div className="fixed bottom-0 left-0 z-50 flex w-full items-center justify-between gap-3 bg-emerald-400 px-4 py-3 text-sm text-zinc-950 shadow-lg md:bottom-4 md:left-1/2 md:w-[640px] md:-translate-x-1/2 md:rounded-full md:py-2 md:pl-5 md:pr-2">
       <p className="leading-snug">
         We use cookies to improve your experience. Read our{" "}
         <a

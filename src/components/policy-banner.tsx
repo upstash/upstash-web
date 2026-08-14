@@ -4,6 +4,11 @@ import { useGlobalStore } from "@/lib/global-store";
 import { IconX } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 
+/**
+ * Rendered inline at the bottom of the footer, next to the legal links it is
+ * about — deliberately not a floating overlay, so it never competes with the
+ * cookie consent banner.
+ */
 export const PolicyBanner = () => {
   const {
     isTermsUpdateAcknowledged,
@@ -20,12 +25,12 @@ export const PolicyBanner = () => {
   if (!visible) return;
 
   return (
-    <div className="pointer-events-auto flex w-full items-center justify-between gap-3 bg-black px-4 py-3 text-sm text-zinc-200 shadow-lg md:w-[640px] md:rounded-full md:py-2.5 md:pl-5 md:pr-2">
-      <p className="leading-snug">
+    <div className="mt-4 flex items-center gap-1 rounded-2xl bg-emerald-400/10 py-1.5 pl-4 pr-1.5 text-xs text-text-mute md:rounded-full">
+      <p className="text-balance">
         Our{" "}
         <a
           href="/trust/terms.pdf"
-          className="text-emerald-300 underline hover:text-primary"
+          className="text-emerald-500 underline hover:text-primary"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -34,7 +39,7 @@ export const PolicyBanner = () => {
         ,{" "}
         <a
           href="/trust/privacy.pdf"
-          className="text-emerald-300 underline hover:text-primary"
+          className="text-emerald-500 underline hover:text-primary"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -43,7 +48,7 @@ export const PolicyBanner = () => {
         and{" "}
         <a
           href="/trust/dpa.pdf"
-          className="text-emerald-300 underline hover:text-primary"
+          className="text-emerald-500 underline hover:text-primary"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -52,11 +57,11 @@ export const PolicyBanner = () => {
         have been updated
       </p>
       <button
-        className="flex size-8 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-white/10"
+        className="flex size-6 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-emerald-400/20"
         onClick={() => setIsTermsUpdateAcknowledged(true)}
-        aria-label="Close banner"
+        aria-label="Dismiss notice"
       >
-        <IconX size={16} strokeWidth={2} className="opacity-70" />
+        <IconX size={14} strokeWidth={2} className="opacity-70" />
       </button>
     </div>
   );

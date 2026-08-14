@@ -8,7 +8,6 @@ import { IntercomWrapper } from "@/components/intercom-wrapper";
 import Footer from "@/components/master/footer";
 import Header from "@/components/master/header";
 import HeaderMobile from "@/components/master/header-mobile";
-import { PolicyBanner } from "@/components/policy-banner";
 import { GA_MEASUREMENT_ID, SITE_URL } from "@/utils/const";
 import cx from "@/utils/cx";
 import { Inter, Inter_Tight, JetBrains_Mono } from "next/font/google";
@@ -59,13 +58,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <HeaderMobile />
           {children}
           <Footer />
-
-          {/* stacked bottom banners, so they never overlap each other */}
-          <div className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex flex-col items-center gap-0 md:bottom-4 md:gap-3">
-            <PolicyBanner />
-            <CookieConsentBanner />
-          </div>
-
+          <CookieConsentBanner />
           <CspViolationReporter />
 
           {process.env.NODE_ENV !== "development" && (
