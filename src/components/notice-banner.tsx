@@ -82,20 +82,26 @@ export const NoticeBanner = () => {
         "bg-emerald-400 px-4 py-2.5 text-[13px] text-zinc-950 shadow-lg",
         // mx-auto rather than left-1/2, so shrink-to-fit gets the whole viewport
         // to measure against and the text stays on one line
-        "md:bottom-4 md:mx-auto md:w-fit md:max-w-[min(92vw,760px)]",
+        "md:bottom-4 md:mx-auto md:w-fit md:max-w-[min(94vw,880px)]",
         "md:rounded-3xl md:py-1.5 md:pl-4 md:pr-1.5",
       )}
     >
       <p className="leading-snug">
         {showCookies && showTerms ? (
-          // Folded into one sentence so the banner stays a single line: "updated"
-          // carries the terms notice. All three document names plus the cookie
-          // purpose do not fit on one line at the md breakpoint, so the combined
-          // case links the two that apply to every visitor.
+          // Folded into one sentence so the banner stays a single line:
+          // "updated" carries the terms notice. This is the widest the banner
+          // ever gets (~846px) and is what md:max-w below is sized around; it
+          // wraps to two lines under roughly 900px, where there is genuinely
+          // no room for it.
           <>
             We use cookies to improve your experience. Read our updated{" "}
-            <PolicyLink href="/trust/terms.pdf">Terms</PolicyLink> and{" "}
-            <PolicyLink href="/trust/privacy.pdf">Privacy Policy</PolicyLink>.
+            <PolicyLink href="/trust/terms.pdf">Terms</PolicyLink>,{" "}
+            <PolicyLink href="/trust/privacy.pdf">Privacy Policy</PolicyLink>{" "}
+            and{" "}
+            <PolicyLink href="/trust/dpa.pdf">
+              Data Protection Agreement
+            </PolicyLink>
+            .
           </>
         ) : showTerms ? (
           <>
