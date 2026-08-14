@@ -78,16 +78,26 @@ export const NoticeBanner = () => {
   return (
     <div
       className={cx(
-        "fixed bottom-0 left-0 z-50 flex w-full items-center justify-between gap-3",
-        "bg-emerald-400 px-4 py-3 text-sm text-zinc-950 shadow-lg",
-        "md:bottom-4 md:left-1/2 md:w-[640px] md:-translate-x-1/2 md:py-2 md:pl-5 md:pr-2",
-        // both notices need two lines, so soften the pill instead of stretching it
-        showCookies && showTerms ? "md:rounded-2xl" : "md:rounded-full",
+        "fixed inset-x-0 bottom-0 z-50 flex w-full items-center justify-between gap-2",
+        "bg-emerald-400 px-4 py-2.5 text-[13px] text-zinc-950 shadow-lg",
+        // mx-auto rather than left-1/2, so shrink-to-fit gets the whole viewport
+        // to measure against and the text stays on one line
+        "md:bottom-4 md:mx-auto md:w-fit md:max-w-[min(92vw,760px)]",
+        "md:rounded-3xl md:py-1.5 md:pl-4 md:pr-1.5",
       )}
     >
       <p className="leading-snug">
-        {showCookies && <>We use cookies to improve your experience. </>}
-        {showTerms ? (
+        {showCookies && showTerms ? (
+          // Folded into one sentence so the banner stays a single line: "updated"
+          // carries the terms notice. All three document names plus the cookie
+          // purpose do not fit on one line at the md breakpoint, so the combined
+          // case links the two that apply to every visitor.
+          <>
+            We use cookies to improve your experience. Read our updated{" "}
+            <PolicyLink href="/trust/terms.pdf">Terms</PolicyLink> and{" "}
+            <PolicyLink href="/trust/privacy.pdf">Privacy Policy</PolicyLink>.
+          </>
+        ) : showTerms ? (
           <>
             Our <PolicyLink href="/trust/terms.pdf">Terms</PolicyLink>,{" "}
             <PolicyLink href="/trust/privacy.pdf">Privacy Policy</PolicyLink>{" "}
@@ -95,17 +105,17 @@ export const NoticeBanner = () => {
             <PolicyLink href="/trust/dpa.pdf">
               Data Protection Agreement
             </PolicyLink>{" "}
-            have {showCookies && "also "}been updated
+            have been updated
           </>
         ) : (
           <>
-            Read our{" "}
+            We use cookies to improve your experience. Read our{" "}
             <PolicyLink href="/trust/privacy.pdf">privacy policy.</PolicyLink>
           </>
         )}
       </p>
 
-      <div className="flex shrink-0 items-center gap-1">
+      <div className="flex shrink-0 items-center gap-0.5">
         {showCookies && (
           <button
             onClick={() => {
@@ -113,7 +123,7 @@ export const NoticeBanner = () => {
               grantAnalyticsConsent();
               acknowledgeTerms();
             }}
-            className="rounded-full bg-white px-3.5 py-1.5 text-xs font-medium leading-5 transition-colors hover:bg-zinc-100"
+            className="rounded-full bg-white px-3 py-1 text-xs font-medium leading-5 transition-colors hover:bg-zinc-100"
           >
             Accept
           </button>
@@ -124,9 +134,9 @@ export const NoticeBanner = () => {
             setClosed(true);
           }}
           aria-label="Dismiss"
-          className="flex size-8 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-emerald-500"
+          className="flex size-7 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-emerald-500"
         >
-          <IconX size={16} strokeWidth={2} />
+          <IconX size={15} strokeWidth={2} />
         </button>
       </div>
     </div>
