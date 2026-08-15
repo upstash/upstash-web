@@ -1,0 +1,96 @@
+---
+title: "Rate Limit Different Users Differently: Free, Pro, and Enterprise Tiers with Upstash Redis"
+slug: rate-limit-different-users-differently-free-pro-and-enterprise-tiers
+authors: [burak]
+tags: [redis]
+description: "One Redis database, three rate limiters, and every user gets the limit their plan deserves."
+publishedAt: "2026-07-01T14:18:13.299Z"
+---
+
+# Rate Limit Different Users Differently: Free, Pro, and Enterprise with Upstash Redis
+
+Most rate limiting tutorials show one number: 100 requests per minute, applied the same way to everyone. That works for a first pass, but real products need something more nuanced. Your free users should have tighter limits than your paying customers, and your enterprise clients might need limits an order of magnitude higher.
+
+The good news: `@upstash/ratelimit` makes tiered rate limiting simple. You can have the whole thing running in about 20 lines of code.
+
+## The Problem with One-Size-Fits-All Limits
+
+If your limit is too generous, free users can hammer your API for nothing. Too strict, and paying customers feel like they are being treated poorly. You need different limits for different plans, enforced per user, not just per IP (which is too coarse for authenticated APIs where multiple users share the same office or VPN).
+
+Upstash makes this easy. Each `Ratelimit` instance is just a config object. You can create as many as you want, all backed by a single Redis database.
+
+## Setting Up Per-Tier Limiters
+
+Install the packages:
+
+```bash
+npm install @upstash/ratelimit @upstash/redis
+```
+
+Create one limiter per plan outside your request handler, so the instances are reused across calls:
+
+```ts
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+
+const redis = Redis.fromEnv();
+
+const limiters = {
+  free:       new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(10,   "1 m") }),
+  pro:        new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(100,  "1 m") }),
+  enterprise: new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(1000, "1 m") }),
+};
+```
+
+In your handler or middleware, look up the user's plan and check the right limiter:
+
+```ts
+async function handleRequest(req) {
+  const userId = req.user?.id ?? req.ip;
+  const plan   = req.user?.plan ?? "free";
+
+  const { success, limit, remaining } = await limiters[plan].limit(userId);
+
+  if (!success) {
+    return Response.json(
+      { error: "Rate limit exceeded. Upgrade for higher limits." },
+      { status: 429, headers: { "X-RateLimit-Limit": String(limit), "X-RateLimit-Remaining": "0" } }
+    );
+  }
+  // proceed with the request
+}
+```
+
+`userId` is the key detail here. Upstash tracks counts per identifier, so each user gets their own sliding window bucket, sized for their plan. Two free users do not share a bucket. Each gets their own 10 req/min.
+
+Here is how the request flow looks:
+
+![Each request is routed to its plan-specific limiter before it ever reaches your API handler.](/blog/write-a-post-about-how-upstash-can-be-used-for-ratelimiting/diagram-c45f096439.svg)
+
+## Turning Rate Limit Headers into a UX Feature
+
+Include `X-RateLimit-Limit` and `X-RateLimit-Remaining` in every response. Well-behaved API clients use these to back off before they hit a 429. It also gives your users a nudge: seeing they have used 9 of 10 requests this minute is more motivating than a generic error message that arrives without warning.
+
+## Spotting Upgrade Candidates with Analytics
+
+Add `analytics: true` to your free-tier limiter and Upstash starts tracking requests per identifier in its Rate Limit dashboard at console.upstash.com:
+
+```ts
+free: new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(10, "1 m"),
+  analytics: true, // zero latency impact, enables the dashboard
+}),
+```
+
+Filter for identifiers who are consistently at zero remaining requests. Those are the free users who have outgrown their plan. They are already getting value from your API. They just need a reason to click upgrade.
+
+## Wrapping Up
+
+Three limiters, one Redis database, and you have a proper tiered system. Upstash bills per Redis command (not per server), so adding more limiter configs costs nothing extra. The setup gives you per-user isolation, correct 429 responses with useful headers, and a dashboard that turns rate limit data into upgrade signals.
+
+## Try it yourself
+
+**Live demo:** try it right now at [https://tender-skink-91267-3000.preview.box.upstash.com](https://tender-skink-91267-3000.preview.box.upstash.com) — hosted on [Upstash Box](https://upstash.com/box).
+
+The complete, runnable source lives in the [upstash/examples](https://github.com/upstash/examples/tree/main/examples/nextjs-tiered-ratelimit-redis) repo.
