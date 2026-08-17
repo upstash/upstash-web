@@ -1,7 +1,9 @@
 import Bg from "@/components/bg";
+import Button from "@/components/button";
 import Container from "@/components/container";
 import SectionViewTracker from "@/components/section-view-tracker";
 import cx from "@/utils/cx";
+import { IconArrowUpRight } from "@tabler/icons-react";
 import React from "react";
 
 export default function HomeHero() {
@@ -28,6 +30,14 @@ export default function HomeHero() {
         <h2 className={cx("mt-2 text-lg md:text-2xl", "text-text-mute")}>
           One platform for all your data needs
         </h2>
+
+        <div className="mt-6" data-area="home_hero">
+          <Button asChild variant="primary" className="px-8">
+            <a href="https://console.upstash.com" target="_self">
+              Start for Free <IconArrowUpRight size={24} />
+            </a>
+          </Button>
+        </div>
       </Container>
     </section>
   );
