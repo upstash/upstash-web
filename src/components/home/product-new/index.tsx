@@ -10,13 +10,7 @@ import SectionViewTracker from "@/components/section-view-tracker";
 import { trackEvent } from "@/lib/analytics";
 import cx from "@/utils/cx";
 import { Product } from "@/utils/type";
-import {
-  IconArrowRight,
-  IconArrowUpRight,
-  IconNotes,
-  IconPlus,
-} from "@tabler/icons-react";
-import Link from "next/link";
+import { IconArrowUpRight, IconNotes, IconPlus } from "@tabler/icons-react";
 import React, { useState } from "react";
 import { HeroTabBox } from "../hero/hero-tab-box";
 import { PRODUCT_TAGLINES } from "./product-features";
@@ -34,14 +28,6 @@ const HeroProductTagline = ({ activeProduct }: { activeProduct: Product }) => {
         {title}
       </h2>
       <div className="flex flex-col justify-center gap-3 xs:flex-row">
-        {activeProduct === Product.REDIS && (
-          <Link href="/redis">
-            <Button variant={"default"} className="h-[42px] px-5">
-              Explore Redis
-              <IconArrowRight size={24} />
-            </Button>
-          </Link>
-        )}
         <a href={docsLink} target="_blank">
           <Button variant={"defaultDark"} className="h-[42px] px-5">
             Documentation
@@ -69,20 +55,22 @@ const HeroProductTagline = ({ activeProduct }: { activeProduct: Product }) => {
         </a>
       </div>
 
-      <div className="mt-3 flex w-full flex-col items-center gap-2">
-        <div className="flex w-fit max-w-full items-center gap-3 overflow-x-auto rounded-xl bg-bg-mute py-2 pl-4 pr-6">
-          <code className="whitespace-nowrap font-mono text-xs text-text md:text-sm">
+      <div className="mt-3 flex w-full flex-col items-center">
+        <div
+          className={cx(
+            "flex w-fit max-w-full items-center gap-3 overflow-x-auto",
+            "rounded-xl border border-white/10 bg-pre-bg py-2 pl-4 pr-6",
+          )}
+        >
+          <code className="whitespace-nowrap font-mono text-xs text-zinc-200 md:text-sm">
             {UPSTASH_SKILL_COMMAND}
           </code>
           <CopyButton
             code={UPSTASH_SKILL_COMMAND}
             eventName="skill_copy"
-            className="shrink-0 text-text-mute hover:text-primary"
+            className="shrink-0 text-zinc-400 hover:text-white"
           />
         </div>
-        <span className="text-xs text-text-mute">
-          Add the Upstash skill to your AI coding agent
-        </span>
       </div>
     </div>
   );
