@@ -13,7 +13,7 @@ The interesting part is not the browser. It's where the browser lives.
 <Summary>
   - Add `browser: true` at create time and every box gets a headless Chromium.
   - Read pages, screenshot, and extract schema-validated data off the live DOM.
-  - Drive it three ways: raw Playwright/CDP, single natural-language actions, or a fully autonomous agent.
+  - Drive it two ways: raw Playwright/CDP, or single natural-language actions on the live page.
   - It lives inside a real computer, so you can scrape a page and then process, write, and commit the result without leaving the box.
 </Summary>
 
@@ -38,8 +38,8 @@ const box = await Box.create({
 // Boots Chromium on first use
 const tab = await box.browser.tab.create("https://news.ycombinator.com")
 
-const page = await tab.goto("https://upstash.com/docs")
-console.log(page.title)
+// Capture the page as a PNG, no display needed
+const png = await tab.screenshot()
 ```
 
 Everything is headless. There is no desktop, no VNC, nothing to install. Chromium is provisioned with the box and boots on the first tab.
@@ -67,9 +67,9 @@ Everything is headless. There is no desktop, no VNC, nothing to install. Chromiu
 
 ---
 
-## Three ways to drive it
+## Two ways to drive it
 
-The same browser answers to three levels of control, and you can mix them on the same tab.
+The same browser answers to two levels of control, and you can mix them on the same tab.
 
 **Raw and deterministic.** Point Playwright at the box over CDP and run your existing scripts. No LLM in the loop.
 
@@ -80,24 +80,13 @@ const cdpUrl = await box.browser.cdpUrl()
 const browser = await chromium.connectOverCDP(cdpUrl)
 ```
 
-**One action at a time.** `act()` resolves and executes a single instruction against the live page. Good for flows where your code decides each step.
+**One action at a time.** `observe()` finds the actionable elements on a page and `act()` resolves and executes a single instruction against the live DOM. Good for flows where your code decides each step. A resolved action replays with no LLM, so you can cache the expensive step and reuse it.
 
 ```typescript
-await tab.act("dismiss the cookie banner")
+await tab.act("click the sign-in button")
 ```
 
-**Fully autonomous.** `run()` reads the page, acts, and repeats until the task is done or it hits the step limit. Pass a schema to get structured data back at the end.
-
-```typescript
-import { z } from "zod"
-
-const { data, completed } = await tab.run(
-  "Find the pricing page and summarize the free tier",
-  { schema: z.object({ summary: z.string() }) },
-)
-```
-
-Because they all drive the same tabs, you can script the brittle parts, like login and pagination, with Playwright, then hand the tab to `act` or `run` for the fuzzy parts.
+Because both drive the same tabs, you can script the brittle parts, like login and pagination, with Playwright, then hand the tab to `act` for the fuzzy parts.
 
 ---
 
