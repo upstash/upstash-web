@@ -2,12 +2,12 @@ import "@upstash/claps/style.css";
 import "../styles/globals.css";
 import "../styles/prism.css";
 import Analytics from "@/components/Analytics";
-import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 import { CspViolationReporter } from "@/components/csp-violation-reporter";
 import { IntercomWrapper } from "@/components/intercom-wrapper";
 import Footer from "@/components/master/footer";
 import Header from "@/components/master/header";
 import HeaderMobile from "@/components/master/header-mobile";
+import { NoticeBanner } from "@/components/notice-banner";
 import { GA_MEASUREMENT_ID, SITE_URL } from "@/utils/const";
 import cx from "@/utils/cx";
 import { Inter, Inter_Tight, JetBrains_Mono } from "next/font/google";
@@ -44,7 +44,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <IntercomWrapper>
         <body
           className={cx(
-            "min-h-screen pt-[70px] antialiased md:pt-[80px]",
+            // header height + the 36px SkillsBanner sitting above it
+            "min-h-screen pt-[106px] antialiased md:pt-[116px]",
             "text-sm text-text md:text-base",
             "bg-bg",
           )}
@@ -57,7 +58,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <HeaderMobile />
           {children}
           <Footer />
-          <CookieConsentBanner />
+          <NoticeBanner />
           <CspViolationReporter />
 
           {process.env.NODE_ENV !== "development" && (
