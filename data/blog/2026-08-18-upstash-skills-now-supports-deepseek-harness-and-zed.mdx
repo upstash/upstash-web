@@ -1,0 +1,139 @@
+---
+authors: [arda]
+tags: [redis, skills, mcp, deepseek, zed, plugin, extension]
+title: 'Upstash Skills Now Supports DeepSeek Harness and Zed'
+description: 'Install Upstash Skills in DeepSeek Harness or Zed to give your coding agent guidance for Redis, QStash, Workflow, Vector, and more, with optional MCP access.'
+slug: upstash-skills-now-supports-deepseek-harness-and-zed
+---
+
+The [Upstash Skills](https://github.com/upstash/skills) repository picked up two new integrations this week: a DeepSeek Harness bundle and support for Zed. The DeepSeek Harness bundle installs the skills and the Upstash MCP server in one step. In Zed, the skills install through the Agent Skills CLI, and a new Zed extension adds the MCP server.
+
+Here is how to install each one, plus a quick tour of everything else the repo already works with.
+
+## What are Upstash Agent Skills?
+
+Upstash Skills are packaged instructions and resources that help AI coding agents build with Upstash SDKs: [Redis](https://upstash.com/docs/redis/overall/getstarted), [QStash](https://upstash.com/docs/qstash/overall/getstarted), [Workflow](https://upstash.com/docs/workflow/getstarted), [Vector](https://upstash.com/docs/vector/overall/getstarted), Search, Ratelimit, and Upstash Box.
+
+A skill is a folder with a SKILL.md file and optional supporting files. [Agent Skills](https://agentskills.io/) is an open format, originally developed by Anthropic, and any compatible agent can load a skill when the task calls for it.
+
+The combined skill keeps your agent's context small. Its top-level SKILL.md only lists references to the per-SDK skill files, so the agent loads just the sections that match the task.
+
+![](https://cdn.bydefault.so/drawing-OyU6N__FilD7NWqzuNvdG.png)
+
+The [Upstash Skills docs](https://upstash.com/docs/agent-resources/skills) cover the format and every install path in more detail.
+
+## How do I install Upstash Skills in DeepSeek Harness?
+
+Two commands install the Upstash bundle into [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness), and the bundle brings both the skills and the [Upstash MCP server](https://upstash.com/docs/agent-resources/mcp).
+
+DeepSeek Harness, or dsh, is DeepSeek AI's open-source agent harness, and everything in it is a plugin:
+
+```bash
+# Install into a profile (`web` is the one `dsh web` boots)
+dsh plugin --profile web add github:upstash/skills
+
+# Start the harness
+dsh web
+```
+
+The skills work right away. To connect the MCP server, store your Upstash credentials from inside a session:
+
+```text
+/upstash-login YOUR_EMAIL YOUR_API_KEY
+```
+
+The credentials go to \~/.dsh/.credentials.yaml, and the MCP server connects as soon as both are set.
+
+## How do I use Upstash Skills in Zed?
+
+The Agent Skills CLI installs the skills either globally or into a single project:
+
+```bash
+# Available in every project
+npx skills add upstash/skills --agent zed --global
+
+# Or just this project
+npx skills add upstash/skills --agent zed
+```
+
+Zed loads skills from .agents/skills/ in a project and from \~/.agents/skills/ globally, which is exactly where the CLI writes them. The skills then show up in [Zed's Agent Panel](https://zed.dev/docs/ai/skills), and the agent loads them on its own or when you type /upstash.
+
+## What does the Upstash Redis MCP Server extension for Zed do?
+
+The new extension brings the [Upstash MCP server](https://upstash.com/docs/agent-resources/mcp) to Zed. Your agent can create and manage Redis databases, run Redis commands, and check usage statistics, backups, and logs. It also covers QStash, Workflow, and Box.
+
+The extension is separate from the skills. Zed extensions cannot carry skills, so the extension handles the MCP server and the CLI handles the skills.
+
+The extension hasn't been accepted into the [Zed extension registry](https://github.com/zed-industries/extensions) yet. Once listed, you can install it from Settings, under AI, MCP Servers, Add Server, Install from Extensions. Zed then prompts for your email and API key. The extension passes both through the environment instead of command-line flags, so they stay out of the process list. Read-only API keys work too. The server then disables every tool that would modify state.
+
+Until the listing goes live, you can add the server to your Zed settings by hand:
+
+```json
+{
+  "context_servers": {
+    "upstash": {
+      "command": "npx",
+      "args": ["-y", "@upstash/mcp-server@latest", "--email", "YOUR_EMAIL", "--api-key", "YOUR_API_KEY"]
+    }
+  }
+}
+```
+
+## Which AI coding agents and tools can use Upstash Skills?
+
+The repository works as an Agent Skills repo, a Claude Code plugin, a Cursor plugin, an OpenAI Codex plugin, and a DeepSeek Harness bundle, plus the Zed paths above.
+
+| Tool | How to install |
+| --- | --- |
+| Claude Code | `/plugin marketplace add upstash/skills`, then `/plugin install upstash@upstash` |
+| Cursor | From Customize in the Cursor sidebar, via the [Cursor Marketplace](https://cursor.com/marketplace) |
+| OpenAI Codex | `codex plugin marketplace add upstash/skills`, then `codex plugin add upstash@upstash` |
+| Zed | `npx skills add upstash/skills --agent zed` (add `--global` for all projects) |
+| DeepSeek Harness | `dsh plugin --profile web add github:upstash/skills` |
+| Context7 CLI | `npx ctx7 skills install upstash/skills` |
+| Agent Skills CLI | `npx skills add upstash/skills` |
+
+Claude Code, Cursor, and Zed can also run the MCP server on its own. The [repo README](https://github.com/upstash/skills#mcp-server) has the setup for each.
+
+## Which Upstash products do the skills cover?
+
+Eleven skills ship in the repo: one combined skill plus ten focused ones, one per SDK or tool.
+
+| Skill | What it covers |
+| --- | --- |
+| upstash | Combined skill covering all Upstash SDKs |
+| upstash-box-js | Sandboxed cloud containers with AI agents, shell, filesystem, and git |
+| upstash-box-py | The same containers, from the Python SDK |
+| upstash-cli | The [Upstash CLI](https://upstash.com/docs/agent-resources/cli) and the Developer API from the terminal |
+| upstash-qstash-js | Serverless messaging and scheduling over HTTP endpoints |
+| upstash-ratelimit-js | Rate limiting with the TypeScript SDK |
+| upstash-redis-js | Serverless Redis: caching, sessions, leaderboards |
+| upstash-redis-start | A zero-config, no-signup scratch Redis database for an agent |
+| upstash-search-js | Full-text search quick starts, concepts, and the TypeScript SDK |
+| upstash-vector-js | Vector database features, SDK usage, and framework integrations |
+| upstash-workflow-js | Durable workflows: define, trigger, and manage multi-step processes |
+
+Each skill packages usage triggers, install steps, code examples, and links to reference docs. This is the publishing example an agent gets from the QStash skill:
+
+```typescript
+import { Client } from "@upstash/qstash";
+
+const client = new Client({
+  token: process.env.QSTASH_TOKEN!,
+});
+
+const result = await client.publishJSON({
+  url: "https://my-api.example.com/webhook",
+  body: { event: "user.created", userId: "123" },
+});
+```
+
+If you only work with one product, you can install a single skill instead of the combined one:
+
+```bash
+npx skills add upstash/skills/upstash-qstash-js
+```
+
+## Get started with Upstash Skills
+
+Pick your tool from the table above and run its install command; every path pulls from the same [upstash/skills](https://github.com/upstash/skills) repository. The [skills docs](https://upstash.com/docs/agent-resources/skills) and the [MCP server docs](https://upstash.com/docs/agent-resources/mcp) cover configuration in more detail, and issues and PRs on the repo are welcome.
