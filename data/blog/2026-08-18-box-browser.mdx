@@ -3,7 +3,7 @@ slug: box-browser
 title: "Give Your Box a Browser"
 authors: [alitarik]
 tags: [box, ai, browser]
-description: "Every Upstash Box can now come with its own headless browser. Your agent can scrape a page and act on what it finds, in one place, because the browser lives inside a real computer."
+description: "Every Upstash Box can now come with its own headless browser. Your agent can open a page, verify a flow, and act on what it finds, in one place, because the browser lives inside a real computer."
 ---
 
 Every [Upstash Box](/blog/upstash-box) can now come with its own browser. Create a box with `browser: true` and you get a managed, headless Chromium you control through the SDK. Open tabs, read pages, take screenshots, extract structured data, run AI agents on the live DOM, or connect Playwright straight over CDP.
@@ -12,18 +12,18 @@ The interesting part is not the browser. It's where the browser lives.
 
 <Summary>
   - Add `browser: true` at create time and every box gets a headless Chromium.
-  - Read pages, screenshot, and extract schema-validated data off the live DOM.
+  - Open your app, click through a flow, screenshot, and extract schema-validated data off the live DOM.
   - Drive it two ways: raw Playwright/CDP, or single natural-language actions on the live page.
-  - It lives inside a real computer, so you can scrape a page and then process, write, and commit the result without leaving the box.
+  - It lives inside a real computer, so you can browse a page and then verify, fix, and commit without leaving the box.
 </Summary>
 
 ---
 
 ## A browser wants a computer around it
 
-Cloud browsers are not new. You can rent a headless Chromium from a handful of services, point Playwright at it, and scrape the web. That part is solved.
+Cloud browsers are not new. You can rent a headless Chromium from a handful of services, point Playwright at it, and load a page. That part is solved.
 
-The problem shows up right after. Your agent loads a page, pulls the data it needs, and then what? The data has to go somewhere. It gets cleaned, joined with something else, written to a file, committed to a repo. A browser on its own can't do any of that. So you wire the browser to a second environment that can, and now you are running two things that have to find each other, share credentials, and pass data back and forth.
+The problem shows up right after. Your agent opens a page, sees what is on it, and then what? Something has to happen next. A screenshot gets saved, a failing flow gets traced back to the code, a fix gets written and committed to a repo. A browser on its own can't do any of that. So you wire the browser to a second environment that can, and now you are running two things that have to find each other, share credentials, and pass data back and forth.
 
 A box already is that second environment. It has a full shell, a persistent filesystem, git, and a coding agent, all in one isolated container. Putting the browser inside it means the page you just scraped and the code that acts on it are on the same machine. Nothing to wire up.
 
@@ -35,8 +35,11 @@ const box = await Box.create({
   browser: true,
 })
 
-// Boots Chromium on first use
-const tab = await box.browser.tab.create("https://news.ycombinator.com")
+// Start your app in the box's shell
+await box.exec.command("npm run dev &")
+
+// Open it in the box's browser, boots Chromium on first use
+const tab = await box.browser.tab.create("http://localhost:3000")
 
 // Capture the page as a PNG, no display needed
 const png = await tab.screenshot()
@@ -90,52 +93,43 @@ Because both drive the same tabs, you can script the brittle parts, like login a
 
 ---
 
-## Scrape, then act on it
+## Browse, verify, then act
 
-Here is the part a standalone browser can't do. This box scrapes a page, extracts structured data, writes it to disk, and commits it. Same container, start to finish.
+Here is the part a standalone browser can't do. This box starts an app, opens it in Chromium, walks a flow, and screenshots the result. Same container, start to finish.
 
 ```typescript
 import { Box } from "@upstash/box"
-import { z } from "zod"
 
 const box = await Box.create({ runtime: "node", browser: true })
 
-// 1. Scrape: open the page in the box's browser
-const tab = await box.browser.tab.create("https://news.ycombinator.com")
+// 1. Start the app in the box's shell
+await box.exec.command("npm run dev &")
 
-// 2. Extract: schema-validated data, straight off the live DOM
-const { stories } = await tab.extract(
-  "extract the top 10 stories with their titles and points",
-  z.object({
-    stories: z.array(
-      z.object({ title: z.string(), points: z.number() }),
-    ),
-  }),
-)
+// 2. Open it in the box's browser
+const tab = await box.browser.tab.create("http://localhost:3000")
 
-// 3. Process: it's a real computer, so just write the file
-await box.files.write({
-  path: "data/frontpage.json",
-  content: JSON.stringify(stories, null, 2),
-})
-
-// 4. Commit: git is right there too
-await box.git.commit({ message: "Add today's front page" })
+// 3. Verify: drive the flow and capture what happened
+await tab.act("complete the signup form with a test email and submit")
+const png = await tab.screenshot()
 ```
 
-No second service, no credentials passed between environments, no glue. The browser and the filesystem and git are the same machine.
-
-And the last step can be more than a commit. The box has a coding agent, so you can hand the scraped data to it and let it do the work:
+The verification turned up a bug. The box has a coding agent looking at the same filesystem the app runs from, so it can fix the code and commit, without anything leaving the container:
 
 ```typescript
+// 4. Fix: hand the problem to the agent
 await box.agent.run({
   prompt:
-    "Read data/frontpage.json, keep the stories above 100 points, " +
-    "and write a short markdown digest to digest.md.",
+    "The signup form accepts an empty email and still submits. " +
+    "Add validation and a visible error message.",
 })
+
+// 5. Commit: git is right there too
+await box.git.commit({ message: "Validate email on signup" })
 ```
 
-Scrape with the browser, reason with the agent, ship with git. One box.
+No second service, no data passed between environments, no glue. The browser, the app, the filesystem, and git are the same machine.
+
+Browse with the browser, verify with a real click, fix with the agent, ship with git. One box.
 
 ---
 
@@ -143,6 +137,6 @@ Scrape with the browser, reason with the agent, ship with git. One box.
 
 Create a box with `browser: true`, open a tab, and read a page. That is the whole setup. From there the extraction, the AI actions, and the CDP connection are one call away.
 
-The [browser guide](https://upstash.com/docs/box/overall/browser/overview) walks through each piece. The free tier is enough to try it, so grab an API key from the [Upstash Console](https://console.upstash.com), and see how much of your scraping-and-then-something workflow fits in a single box.
+The [browser guide](https://upstash.com/docs/box/overall/browser/overview) walks through each piece. The free tier is enough to try it, so grab an API key from the [Upstash Console](https://console.upstash.com), and see how much of your browse-verify-and-act workflow fits in a single box.
 
 We'd love to hear what you build. Reach out anytime on [Discord](https://upstash.com/discord).
