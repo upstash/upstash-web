@@ -6,35 +6,6 @@ export const size = {
   height: 630,
 };
 
-const BRAND = "#00E9A3";
-
-const MONTHS = [
-  "JANUARY",
-  "FEBRUARY",
-  "MARCH",
-  "APRIL",
-  "MAY",
-  "JUNE",
-  "JULY",
-  "AUGUST",
-  "SEPTEMBER",
-  "OCTOBER",
-  "NOVEMBER",
-  "DECEMBER",
-];
-
-// post.date is a "YYYY-MM-DD" string taken from the file name
-function formatDate(date: string) {
-  const [year, month, day] = date.split("-").map(Number);
-  const name = MONTHS[month - 1];
-
-  if (!name || !year || !day) {
-    return "";
-  }
-
-  return `${name} ${day}, ${year}`;
-}
-
 // advance widths of Inter Bold, in hundredths of an em, measured from the
 // font file in public/fonts so lines can be broken before satori draws them
 const WIDTH_KEYS =
@@ -297,17 +268,15 @@ async function svgDataUrl(path: string) {
 
 type Post = {
   title: string;
-  date: string;
   // unknown usernames are dropped from authorsData, so it can be empty even
   // when the post lists authors
   authorsData: { name: string; title?: string; image: string }[];
 };
 
 export async function renderPostCard(post: Post) {
-  const [regular, bold, wordmark, mark] = await Promise.all([
+  const [regular, bold, mark] = await Promise.all([
     (await asset("/fonts/Inter-Regular.ttf")).arrayBuffer(),
     (await asset("/fonts/Inter-Bold.ttf")).arrayBuffer(),
-    svgDataUrl("/logo/upstash-dark-bg.svg"),
     svgDataUrl("/logo/upstash-icon-dark-bg.svg"),
   ]);
 
@@ -362,46 +331,11 @@ export async function renderPostCard(post: Post) {
           style={{ position: "absolute", top: -120, right: -210, opacity: 0.1 }}
         />
 
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <img alt="Upstash" src={wordmark} width={124} height={36} />
-          <div
-            style={{
-              width: 1,
-              height: 30,
-              margin: "0 16px",
-              backgroundColor: "rgba(255, 255, 255, 0.22)",
-            }}
-          />
-          <div
-            style={{
-              fontSize: 22,
-              fontWeight: 700,
-              letterSpacing: 3.5,
-              color: "rgba(255, 255, 255, 0.6)",
-            }}
-          >
-            BLOG
-          </div>
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            marginTop: "auto",
-            fontSize: 20,
-            fontWeight: 700,
-            letterSpacing: 2.8,
-            color: BRAND,
-          }}
-        >
-          {formatDate(post.date)}
-        </div>
-
         <div
           style={{
             display: "flex",
             flexDirection: "column",
-            marginTop: 18,
+            marginTop: "auto",
             fontSize: title.fontSize,
             fontWeight: 700,
             lineHeight: 1.1,
