@@ -1,4 +1,3 @@
-import { authors } from "@/utils/authors";
 import { ImageResponse } from "@vercel/og";
 import { baseUrl } from "./og-post-details";
 
@@ -299,8 +298,9 @@ async function svgDataUrl(path: string) {
 type Post = {
   title: string;
   date: string;
-  authors: string[];
-  authorsData: { name: string; title?: string }[];
+  // unknown usernames are dropped from authorsData, so it can be empty even
+  // when the post lists authors
+  authorsData: { name: string; title?: string; image: string }[];
 };
 
 export async function renderPostCard(post: Post) {
@@ -312,10 +312,9 @@ export async function renderPostCard(post: Post) {
   ]);
 
   const author = post.authorsData[0];
-  const authorImage = new URL(
-    `/authors/${authors[post.authors[0]].image}`,
-    baseUrl,
-  ).toString();
+  const authorImage = author
+    ? new URL(author.image, baseUrl).toString()
+    : undefined;
   const title = layoutTitle(post.title);
 
   return new ImageResponse(
@@ -409,8 +408,8 @@ export async function renderPostCard(post: Post) {
             letterSpacing: -1,
           }}
         >
-          {title.lines.map((line) => (
-            <div key={line} style={{ display: "flex" }}>
+          {title.lines.map((line, index) => (
+            <div key={`${index}-${line}`} style={{ display: "flex" }}>
               {line}
             </div>
           ))}
@@ -425,25 +424,31 @@ export async function renderPostCard(post: Post) {
             borderTop: "1px solid rgba(255, 255, 255, 0.12)",
           }}
         >
-          <img
-            alt={author.name}
-            src={authorImage}
-            width={70}
-            height={70}
-            style={{ borderRadius: 999, marginRight: 18 }}
-          />
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <div style={{ fontSize: 27, fontWeight: 700 }}>{author.name}</div>
-            <div
-              style={{
-                marginTop: 3,
-                fontSize: 21,
-                color: "rgba(255, 255, 255, 0.5)",
-              }}
-            >
-              {author.title}
+          {author && authorImage ? (
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <img
+                alt={author.name}
+                src={authorImage}
+                width={70}
+                height={70}
+                style={{ borderRadius: 999, marginRight: 18 }}
+              />
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <div style={{ fontSize: 27, fontWeight: 700 }}>
+                  {author.name}
+                </div>
+                <div
+                  style={{
+                    marginTop: 3,
+                    fontSize: 21,
+                    color: "rgba(255, 255, 255, 0.5)",
+                  }}
+                >
+                  {author.title}
+                </div>
+              </div>
             </div>
-          </div>
+          ) : null}
           <div
             style={{
               marginLeft: "auto",
