@@ -328,7 +328,7 @@ export async function renderPostCard(post: Post) {
           src={mark}
           width={820}
           height={820}
-          style={{ position: "absolute", top: -120, right: -210, opacity: 0.1 }}
+          style={{ position: "absolute", top: -120, right: -210, opacity: 0.033 }}
         />
 
         <div
