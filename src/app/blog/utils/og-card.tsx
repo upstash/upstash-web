@@ -309,7 +309,7 @@ export async function renderPostCard(post: Post) {
             width: 900,
             height: 760,
             backgroundImage:
-              "radial-gradient(circle, rgba(0, 233, 163, 0.22) 0%, rgba(0, 233, 163, 0) 62%)",
+              "radial-gradient(circle, rgba(0, 233, 163, 0.2) 0%, rgba(0, 233, 163, 0) 60%)",
           }}
         />
         <div
@@ -328,7 +328,7 @@ export async function renderPostCard(post: Post) {
           src={mark}
           width={820}
           height={820}
-          style={{ position: "absolute", top: -120, right: -210, opacity: 0.033 }}
+          style={{ position: "absolute", top: -120, right: -210, opacity: 0.06 }}
         />
 
         <div
