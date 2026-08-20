@@ -25,7 +25,9 @@ Cloud browsers are not new. You can rent a headless Chromium from a handful of s
 
 The problem shows up right after. Your agent opens a page, sees what is on it, and then what? Something has to happen next. A screenshot gets saved, a failing flow gets traced back to the code, a fix gets written and committed to a repo. A browser on its own can't do any of that. So you wire the browser to a second environment that can, and now you are running two things that have to find each other, share credentials, and pass data back and forth.
 
-A box already is that second environment. It has a full shell, a persistent filesystem, git, and a coding agent, all in one isolated container. Putting the browser inside it means the page you just scraped and the code that acts on it are on the same machine. Nothing to wire up.
+A box already is that second environment. It has a full shell, a persistent filesystem, git, and a coding agent, all in one isolated container. Putting the browser inside it means the page you just loaded and the code that acts on it are on the same machine. Nothing to wire up.
+
+This matters most when you are not the one watching. On your own laptop the wiring is already free: you have a browser, a terminal, and the repo open side by side. An agent has none of that. It needs to start the app, look at what the page actually did, and change the code with no human in the middle, on twenty branches at once, on machines you are not sitting at.
 
 ```typescript
 import { Box } from "@upstash/box"
@@ -35,8 +37,9 @@ const box = await Box.create({
   browser: true,
 })
 
-// Start your app in the box's shell
-await box.exec.command("npm run dev &")
+// Start your app in the box's shell, then wait for it to listen
+await box.exec.command("nohup npm run dev > dev.log 2>&1 &")
+await box.exec.command("until curl -sf localhost:3000 > /dev/null; do sleep 1; done")
 
 // Open it in the box's browser, boots Chromium on first use
 const tab = await box.browser.tab.create("http://localhost:3000")
@@ -95,35 +98,48 @@ Because both drive the same tabs, you can script the brittle parts, like login a
 
 ## Browse, verify, then act
 
-Here is the part a standalone browser can't do. This box starts an app, opens it in Chromium, walks a flow, and screenshots the result. Same container, start to finish.
+Here is the part a standalone browser can't do. This box starts an app, opens it in Chromium, walks a flow, and checks what actually happened. Same container, start to finish.
 
 ```typescript
 import { Box } from "@upstash/box"
+import { z } from "zod"
 
 const box = await Box.create({ runtime: "node", browser: true })
 
-// 1. Start the app in the box's shell
-await box.exec.command("npm run dev &")
+// 1. Start the app in the box's shell, then wait for it to listen
+await box.exec.command("nohup npm run dev > dev.log 2>&1 &")
+await box.exec.command("until curl -sf localhost:3000 > /dev/null; do sleep 1; done")
 
 // 2. Open it in the box's browser
 const tab = await box.browser.tab.create("http://localhost:3000")
 
-// 3. Verify: drive the flow and capture what happened
-await tab.act("complete the signup form with a test email and submit")
+// 3. Drive the flow with a real click
+await tab.act("submit the signup form with the email field left blank")
 const png = await tab.screenshot()
+
+// 4. Check the result against a schema, off the live DOM
+const check = await tab.extract(
+  "did the form submit, and is a validation error visible?",
+  z.object({
+    submitted: z.boolean(),
+    errorMessage: z.string().nullable(),
+  }),
+)
+// → { submitted: true, errorMessage: null }
 ```
 
-The verification turned up a bug. The box has a coding agent looking at the same filesystem the app runs from, so it can fix the code and commit, without anything leaving the container:
+`submitted: true` with nothing shown to the user is the bug, and the check found it rather than you. The box has a coding agent looking at the same filesystem the app runs from, so it can take that finding, fix the code, and commit, without anything leaving the container:
 
 ```typescript
-// 4. Fix: hand the problem to the agent
+// 5. Fix: hand the finding to the agent
 await box.agent.run({
   prompt:
-    "The signup form accepts an empty email and still submits. " +
-    "Add validation and a visible error message.",
+    `The signup form submitted with an empty email and showed no error ` +
+    `(submitted: ${check.submitted}, errorMessage: ${check.errorMessage}). ` +
+    `Add validation and a visible error message.`,
 })
 
-// 5. Commit: git is right there too
+// 6. Commit: git is right there too
 await box.git.commit({ message: "Validate email on signup" })
 ```
 
