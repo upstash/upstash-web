@@ -1,4 +1,5 @@
 const SITE_URL = process.env.SITE_URL || "https://upstash.com";
+const ASK_EXAMPLES = require("./src/lib/ask-examples.json");
 
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
@@ -38,13 +39,21 @@ module.exports = {
 
     return { loc: path, changefreq: config.changefreq, priority: config.priority, lastmod: new Date().toISOString() };
   },
+  // Example /ask queries so crawlers and agents discover the answer index.
+  // Kept in sync with the markdown/404 hints via src/lib/ask-examples.json.
+  additionalPaths: async () =>
+    ASK_EXAMPLES.map((question) => ({
+      loc: `/ask?q=${question.replace(/ /g, "+")}`,
+      changefreq: "weekly",
+      priority: 0.5,
+    })),
   robotsTxtOptions: {
     additionalSitemaps: ["https://upstash.com/docs/sitemap.xml"],
     policies: [
       { userAgent: "Twitterbot", allow: "/" },
       {
         userAgent: "*",
-        allow: "/",
+        allow: ["/", "/ask", "/ask?*"],
         disallow: [
           "/*?",
           "/*%",
