@@ -53,17 +53,17 @@ const nextConfig = {
   rewrites: () => [
     {
       source: "/docs",
-      destination: "https://upstash.mintlify.dev/docs",
+      destination: "https://upstash-docs.docs7.io/docs",
     },
     {
       source: "/docs/:match*",
-      destination: "https://upstash.mintlify.dev/docs/:match*",
+      destination: "https://upstash-docs.docs7.io/docs/:match*",
     },
   ],
   async headers() {
     return [
       {
-        // Excludes /docs: those responses are proxied from Mintlify, which
+        // Excludes /docs: those responses are proxied from Docs7, which
         // needs its own script/style origins that this policy doesn't cover.
         source: "/((?!docs).*)",
         headers: [
