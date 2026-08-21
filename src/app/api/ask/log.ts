@@ -15,7 +15,7 @@ export function logQuestion(q: string) {
   if (!redis) return;
   waitUntil(
     redis.zincrby(KEY, 1, normalizeQuestion(q)).catch((error) => {
-      console.error("Failed to log /ask question:", error);
+      console.error("Failed to log ask question:", error);
     }),
   );
 }

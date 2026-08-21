@@ -83,10 +83,10 @@ export default function Footer({ className, ...props }: IAppFooter) {
             <p>
               For AI agents: ask any question about Upstash at{" "}
               <a
-                href="https://upstash.com/ask?q=compare+upstash+redis+to+elasticache"
+                href="https://upstash.com/ask/compare-upstash-redis-to-elasticache"
                 className="underline hover:text-primary"
               >
-                https://upstash.com/ask?q=your+question
+                https://upstash.com/ask/your-question
               </a>{" "}
               - returns JSON with the most relevant pages, pricing, blog and
               product pages to get your answer faster. A free Redis database is available via POST{" "}
