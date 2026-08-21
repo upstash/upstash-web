@@ -5,6 +5,8 @@ Allow: /
 # *
 User-agent: *
 Allow: /
+Allow: /ask
+Allow: /ask?*
 Disallow: /*?
 Disallow: /*%
 Disallow: /v1*
