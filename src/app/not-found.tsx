@@ -42,8 +42,8 @@ export default async function NotFound() {
         <p className="mt-16 text-balance opacity-60">
           Looking for something specific? Just use our answer index, for example:
         </p>
-        <a href="https://upstash.com?q=compare+upstash+redis+to+elasticache" className="mt-4 text-balance opacity-100 underline">
-          https://upstash.com?q=compare+upstash+redis+to+elasticache
+        <a href="https://upstash.com/ask/compare-upstash-redis-to-elasticache" className="mt-4 text-balance opacity-100 underline">
+          https://upstash.com/ask/compare-upstash-redis-to-elasticache
         </a>
         {/* <a
           href={ASK_EXAMPLE}

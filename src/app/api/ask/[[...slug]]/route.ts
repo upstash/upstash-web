@@ -1,7 +1,8 @@
 import { Search } from "@upstash/search";
+import { slugToQuestion } from "@/lib/ask";
 import { SITE_URL } from "@/utils/const";
 import { NextResponse, type NextRequest } from "next/server";
-import { logQuestion } from "./log";
+import { logQuestion } from "../log";
 
 const INDEX_NAME = "upstash-site";
 const DEFAULT_LIMIT = 5;
@@ -27,11 +28,18 @@ type Metadata = {
 
 export const dynamic = "force-dynamic";
 
-export async function GET(req: NextRequest) {
-  const q = req.nextUrl.searchParams.get("q")?.trim();
+type Context = { params: Promise<{ slug?: string[] }> };
+
+export async function GET(req: NextRequest, { params }: Context) {
+  // /ask/does-upstash-redis-have-a-rust-sdk -> "does upstash redis have a rust sdk"
+  // (proxy rewrites /ask/<slug> here). `?q=` is kept as a fallback.
+  const { slug } = await params;
+  const q =
+    (slug?.length ? slugToQuestion(slug.join("/")) : "") ||
+    req.nextUrl.searchParams.get("q")?.trim();
   if (!q) {
     return NextResponse.json(
-      { error: "missing q", usage: `${SITE_URL}?q=how+is+qstash+priced` },
+      { error: "missing q", usage: `${SITE_URL}/ask/how-is-qstash-priced` },
       { status: 400 },
     );
   }
