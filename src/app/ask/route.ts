@@ -2,12 +2,6 @@ import { Search } from "@upstash/search";
 import { NextResponse, type NextRequest } from "next/server";
 import { logQuestion } from "./log";
 
-// GET /ask?q=<question>[&limit=5]
-//
-// Answers a natural-language question about upstash.com with the best-matching
-// page passages from the `upstash-site` Upstash Search index (built by
-// crawling the sitemap; one document per page section).
-
 const INDEX_NAME = "upstash-site";
 const DEFAULT_LIMIT = 5;
 const MAX_LIMIT = 20;
@@ -64,8 +58,6 @@ export async function GET(req: NextRequest) {
       query: q,
       limit,
       reranking: true,
-      // The default query enrichment rewrites product names ("upstash box")
-      // into generic phrasing and buries the right pages.
       inputEnrichment: false,
     });
 
