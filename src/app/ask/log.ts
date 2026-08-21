@@ -7,10 +7,10 @@ import { waitUntil } from "@vercel/functions";
 const KEY = "ask:questions";
 const MEMBER_LIMIT = 200;
 
-const redis =
-  process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
-    ? Redis.fromEnv()
-    : null;
+// Own env names: UPSTASH_REDIS_REST_* is already taken by the claps database.
+const url = process.env.UPSTASH_REDIS_SEARCH_DATA_URL;
+const token = process.env.UPSTASH_REDIS_SEARCH_DATA_TOKEN;
+const redis = url && token ? new Redis({ url, token }) : null;
 
 export function normalizeQuestion(q: string): string {
   return q.trim().toLowerCase().replace(/\s+/g, " ").slice(0, MEMBER_LIMIT);
