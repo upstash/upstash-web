@@ -94,6 +94,18 @@ export function proxy(request: NextRequest, event: NextFetchEvent) {
   const aiAgentMatch = userAgent.match(AI_BOT_REGEX);
   const aiAgent = aiAgentMatch ? aiAgentMatch[0] : null;
 
+  // Answer index: upstash.com?q=your+question is served by the /api/ask
+  // handler. Only a non-empty `q` on the root path triggers it; everything
+  // else on "/" is the regular homepage.
+  if (pathname === "/" && request.nextUrl.searchParams.get("q")?.trim()) {
+    const res = NextResponse.rewrite(
+      new URL(`/api/ask${request.nextUrl.search}`, request.url),
+    );
+    res.headers.set("x-content-bucket", "ask");
+    if (aiAgent) res.headers.set("x-ai-agent", aiAgent);
+    return res;
+  }
+
   // Explicit `.md` URLs (e.g. /blog.md, /blog/foo.md) always serve Markdown,
   // regardless of Accept header. This is the conventional pattern (GitHub,
   // llms.txt, etc.) and gives us distinct cache keys without Vary headaches.

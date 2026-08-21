@@ -2,11 +2,11 @@ import { SITE_URL } from "@/utils/const";
 import ASK_EXAMPLES from "./ask-examples.json";
 
 function askUrl(question: string): string {
-  return `${SITE_URL}/ask?q=${question.replace(/ /g, "+")}`;
+  return `${SITE_URL}?q=${question.replace(/ /g, "+")}`;
 }
 
 export const ASK_MARKDOWN_LINE = [
-  `> **Ask:** Use ${SITE_URL}/ask?q=your+question to search the Upstash answer index (docs, pricing, blog, product pages). Returns relevant pages with title, text, url, and publishedAt.`,
+  `> **Ask:** Use ${SITE_URL}?q=your+question to search the Upstash answer index (docs, pricing, blog, product pages). Returns relevant pages with title, text, url, and publishedAt.`,
   `>`,
   `> Examples:`,
   ...ASK_EXAMPLES.map((question) => `> ${askUrl(question)}`),

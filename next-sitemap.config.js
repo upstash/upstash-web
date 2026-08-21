@@ -39,11 +39,11 @@ module.exports = {
 
     return { loc: path, changefreq: config.changefreq, priority: config.priority, lastmod: new Date().toISOString() };
   },
-  // Example /ask queries so crawlers and agents discover the answer index.
+  // Example /?q= queries so crawlers and agents discover the answer index.
   // Kept in sync with the markdown/404 hints via src/lib/ask-examples.json.
   additionalPaths: async () =>
     ASK_EXAMPLES.map((question) => ({
-      loc: `/ask?q=${question.replace(/ /g, "+")}`,
+      loc: `${SITE_URL}?q=${question.replace(/ /g, "+")}`,
       changefreq: "weekly",
       priority: 0.5,
     })),
@@ -53,7 +53,7 @@ module.exports = {
       { userAgent: "Twitterbot", allow: "/" },
       {
         userAgent: "*",
-        allow: ["/", "/ask", "/ask?*"],
+        allow: ["/", "/?q=*"],
         disallow: [
           "/*?",
           "/*%",

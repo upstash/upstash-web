@@ -1,4 +1,5 @@
 import { Search } from "@upstash/search";
+import { SITE_URL } from "@/utils/const";
 import { NextResponse, type NextRequest } from "next/server";
 import { logQuestion } from "./log";
 
@@ -30,7 +31,7 @@ export async function GET(req: NextRequest) {
   const q = req.nextUrl.searchParams.get("q")?.trim();
   if (!q) {
     return NextResponse.json(
-      { error: "missing q", usage: "/ask?q=how+is+qstash+priced" },
+      { error: "missing q", usage: `${SITE_URL}?q=how+is+qstash+priced` },
       { status: 400 },
     );
   }
@@ -76,7 +77,7 @@ export async function GET(req: NextRequest) {
       })),
     });
   } catch (error) {
-    console.error("/ask search failed:", error);
+    console.error("ask search failed:", error);
     return NextResponse.json({ error: "search failed" }, { status: 502 });
   }
 }
