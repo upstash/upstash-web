@@ -1,15 +1,5 @@
 import { SITE_URL } from "@/utils/const";
-
-const ASK_EXAMPLES = [
-  "how is redis priced",
-  "how is upstash box priced",
-  "what is the redis free tier",
-  "compare upstash redis to elasticache",
-  "does upstash support hipaa",
-  "what regions does upstash support",
-  "how to use upstash with vercel",
-  "how to use upstash from cloudflare workers",
-];
+import ASK_EXAMPLES from "./ask-examples.json";
 
 function askUrl(question: string): string {
   return `${SITE_URL}/ask?q=${question.replace(/ /g, "+")}`;

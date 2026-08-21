@@ -74,13 +74,15 @@ const nextConfig = {
         ],
       },
       {
-        // Advertise the LLM-friendly index on every page
+        // Advertise the LLM-friendly index and the /ask answer index on every page
         source: "/(.*)",
         headers: [
           {
             key: "Link",
-            value:
+            value: [
               '<https://upstash.com/llms.txt>; rel="alternate"; type="text/plain"; title="LLM-friendly content index"',
+              '<https://upstash.com/ask?q=your+question>; rel="search"; type="application/json"; title="Upstash answer index"',
+            ].join(", "),
           },
         ],
       },
