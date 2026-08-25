@@ -143,6 +143,14 @@ export function proxy(request: NextRequest, event: NextFetchEvent) {
     }
   }
 
+  if (pathname === "/" && accept && negotiate(accept) === "markdown") {
+    const res = NextResponse.rewrite(new URL("/index.md", request.url));
+    res.headers.set("Vary", "Accept");
+    res.headers.set("x-content-bucket", "md");
+    if (aiAgent) res.headers.set("x-ai-agent", aiAgent);
+    return res;
+  }
+
   const pricingMatch = pathname.match(PRICING_PATH);
   if (pricingMatch && accept) {
     const decision = negotiate(accept);
@@ -172,6 +180,14 @@ export function proxy(request: NextRequest, event: NextFetchEvent) {
   }
   if (isBlogPath(pathname)) {
     return applyBlogHtmlHeaders(response, pathname, aiAgent);
+  }
+  // HTML variants of content-negotiated pages must vary on Accept so caches
+  // never hand the HTML to a client that asked for markdown (or vice versa).
+  if (pathname === "/" || pricingMatch) {
+    response.headers.append("Vary", "Accept");
+    response.headers.set("x-content-bucket", "html");
+    if (aiAgent) response.headers.set("x-ai-agent", aiAgent);
+    return response;
   }
   if (affiliateCode) return response;
 }
