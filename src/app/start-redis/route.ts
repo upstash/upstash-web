@@ -1,5 +1,5 @@
+import { apiError } from "@/lib/api-error";
 import { NextResponse, type NextRequest } from "next/server";
-
 import { clientHeaders, trackEvent } from "./analytics";
 
 const UPSTASH_BACKEND_URL =
@@ -28,9 +28,11 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     console.error("Failed to fetch Redis start info:", error);
-    return new NextResponse(
-      "something went wrong while fetching Redis start info",
-      { status: 500 },
+    return apiError(
+      500,
+      "upstream_unavailable",
+      "Could not fetch the Redis start instructions from the Upstash API.",
+      "Retry after a short delay. If the problem persists, contact support@upstash.com.",
     );
   }
 }
@@ -63,9 +65,11 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error("Failed to start Redis agent:", error);
-    return new NextResponse(
-      "something went wrong while starting the Redis database",
-      { status: 500 },
+    return apiError(
+      500,
+      "upstream_unavailable",
+      "Could not reach the Upstash API to create the Redis database.",
+      "Retry after a short delay. If the problem persists, contact support@upstash.com.",
     );
   }
 }
