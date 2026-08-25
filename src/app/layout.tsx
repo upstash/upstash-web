@@ -8,6 +8,7 @@ import Footer from "@/components/master/footer";
 import Header from "@/components/master/header";
 import HeaderMobile from "@/components/master/header-mobile";
 import { NoticeBanner } from "@/components/notice-banner";
+import SiteSchema from "@/components/site-schema";
 import { GA_MEASUREMENT_ID, SITE_URL } from "@/utils/const";
 import cx from "@/utils/cx";
 import { Inter, Inter_Tight, JetBrains_Mono } from "next/font/google";
@@ -54,6 +55,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <Analytics />
           </Suspense>
 
+          <SiteSchema />
           <Header />
           <HeaderMobile />
           {children}
