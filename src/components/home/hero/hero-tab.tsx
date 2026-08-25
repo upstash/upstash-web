@@ -64,9 +64,9 @@ export function HeroTabFeatureCont({
 export function HeroTabFeatureTitle({
   className,
   ...props
-}: React.ComponentProps<"h4">) {
+}: React.ComponentProps<"h3">) {
   return (
-    <h4
+    <h3
       className={cx(
         "font-display text-lg font-semibold leading-tight sm:text-2xl",
         className,

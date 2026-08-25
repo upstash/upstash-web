@@ -27,9 +27,9 @@ export default function HomeHero() {
         </h1>
 
         {/* hero subtitle*/}
-        <h2 className={cx("mt-2 text-lg md:text-2xl", "text-text-mute")}>
+        <p className={cx("mt-2 text-lg md:text-2xl", "text-text-mute")}>
           One platform for all your data needs
-        </h2>
+        </p>
 
         <div className="mt-6" data-area="home_hero">
           <Button asChild variant="primary" className="px-8">
