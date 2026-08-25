@@ -100,6 +100,9 @@ const nextConfig = {
             value: [
               '<https://upstash.com/llms.txt>; rel="alternate"; type="text/plain"; title="LLM-friendly content index"',
               '<https://upstash.com/ask?q=your+question>; rel="search"; type="application/json"; title="Upstash answer index"',
+              '<https://upstash.com/docs/devops/developer-api/openapi.yaml>; rel="service-desc"; type="application/openapi+yaml"; title="Upstash Developer API (OpenAPI)"',
+              '<https://upstash.com/docs/qstash/openapi.yaml>; rel="service-desc"; type="application/openapi+yaml"; title="QStash REST API (OpenAPI)"',
+              '<https://upstash.com/docs/workflow/openapi.yaml>; rel="service-desc"; type="application/openapi+yaml"; title="Upstash Workflow REST API (OpenAPI)"',
             ].join(", "),
           },
         ],
