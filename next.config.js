@@ -81,7 +81,7 @@ const nextConfig = {
             key: "Link",
             value: [
               '<https://upstash.com/llms.txt>; rel="alternate"; type="text/plain"; title="LLM-friendly content index"',
-              '<https://upstash.com/ask?q=your+question>; rel="search"; type="application/json"; title="Upstash answer index"',
+              '<https://upstash.com/ask/your-question>; rel="search"; type="application/json"; title="Upstash answer index"',
             ].join(", "),
           },
         ],

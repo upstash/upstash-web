@@ -16,6 +16,8 @@ function isBlogPath(pathname: string): boolean {
 
 const BLOG_MD_POST = /^\/blog\/([^/]+)\.md$/;
 
+const ASK_PATH = /^\/ask(?:\/(.*))?$/;
+
 const AI_BOT_REGEX =
   /GPTBot|OAI-SearchBot|ChatGPT-User|ClaudeBot|Claude-User|Claude-SearchBot|claude-code|PerplexityBot|Perplexity-User|Google-Extended|GoogleOther|Google-CloudVertexBot|Google-NotebookLM|Amazonbot|CCBot|Applebot|Applebot-Extended|meta-externalagent|Meta-ExternalAgent|DuckAssistBot|MistralAI-User|Bytespider|cohere-ai|Diffbot|AI2Bot/i;
 
@@ -79,6 +81,28 @@ export function proxy(request: NextRequest, event: NextFetchEvent) {
 
   const pathname = request.nextUrl.pathname;
 
+  const userAgent = request.headers.get("user-agent") ?? "";
+  const aiAgentMatch = userAgent.match(AI_BOT_REGEX);
+  const aiAgent = aiAgentMatch ? aiAgentMatch[0] : null;
+
+  // Answer index: upstash.com/ask/<any-slug> answers the slug as a question
+  // ("/ask/does-upstash-redis-have-a-rust-sdk"). The whole remainder of the
+  // path is the question, so URL-encoded spaces work too - which is why this
+  // runs before the whitespace junk-strip below. Rewritten to the
+  // /api/ask/[[...slug]] handler; the slug travels as a path param because a
+  // route handler still sees the *original* URL/query after a rewrite.
+  // `limit` (and a legacy `q`) pass through untouched on the query string.
+  const askMatch = pathname.match(ASK_PATH);
+  if (askMatch) {
+    const slug = askMatch[1] ? `/${askMatch[1]}` : "";
+    const res = NextResponse.rewrite(
+      new URL(`/api/ask${slug}${request.nextUrl.search}`, request.url),
+    );
+    res.headers.set("x-content-bucket", "ask");
+    if (aiAgent) res.headers.set("x-ai-agent", aiAgent);
+    return res;
+  }
+
   // Linkifiers in chat apps fuse our URLs with trailing prose ("see <url> for
   // details"), producing 404 paths like "/docs/.../max_requests_limit for
   // details". No real URL on this site contains whitespace, so strip at the
@@ -89,10 +113,6 @@ export function proxy(request: NextRequest, event: NextFetchEvent) {
     cleanUrl.pathname = pathname.slice(0, junkIndex);
     return NextResponse.redirect(cleanUrl, 301);
   }
-
-  const userAgent = request.headers.get("user-agent") ?? "";
-  const aiAgentMatch = userAgent.match(AI_BOT_REGEX);
-  const aiAgent = aiAgentMatch ? aiAgentMatch[0] : null;
 
   // Explicit `.md` URLs (e.g. /blog.md, /blog/foo.md) always serve Markdown,
   // regardless of Accept header. This is the conventional pattern (GitHub,
