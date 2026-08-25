@@ -50,16 +50,34 @@ const nextConfig = {
       },
     ],
   },
-  rewrites: () => [
-    {
-      source: "/docs",
-      destination: "https://upstash.mintlify.dev/docs",
-    },
-    {
-      source: "/docs/:match*",
-      destination: "https://upstash.mintlify.dev/docs/:match*",
-    },
-  ],
+  rewrites: () => ({
+    afterFiles: [
+      {
+        source: "/docs",
+        destination: "https://upstash.mintlify.dev/docs",
+      },
+      {
+        source: "/docs/:match*",
+        destination: "https://upstash.mintlify.dev/docs/:match*",
+      },
+    ],
+    // Only reached when no page, route or static file matched: agents that
+    // ask for markdown or JSON get a 404 in that format instead of the HTML
+    // not-found page.
+    fallback: [
+      {
+        source: "/:path*",
+        has: [{ type: "header", key: "accept", value: ".*text/markdown.*" }],
+        destination: "/404.md",
+      },
+      {
+        source: "/:path*",
+        has: [{ type: "header", key: "accept", value: ".*application/json.*" }],
+        missing: [{ type: "header", key: "accept", value: ".*text/html.*" }],
+        destination: "/404.json",
+      },
+    ],
+  }),
   async headers() {
     return [
       {
