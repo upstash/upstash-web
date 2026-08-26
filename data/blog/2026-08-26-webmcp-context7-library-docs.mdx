@@ -1,0 +1,239 @@
+---
+slug: webmcp-context7-library-docs
+title: "Serve Your Library Docs to Browser Agents with WebMCP and Context7"
+description: "Learn how to expose current library documentation to browser agents with a small WebMCP tool backed by Context7."
+authors: [fahreddin]
+tags: [context7, webmcp, ai, documentation]
+draft: true
+---
+
+AI agents can already browse websites by reading the page, finding buttons and filling forms. This works, but it makes the agent infer what a website can do from a user interface designed for people.
+
+[WebMCP](https://github.com/webmachinelearning/webmcp) gives websites another option. A page can register structured tools that browser agents can discover and call. Each tool has a name, a description, an input schema and a JavaScript function that handles the request.
+
+For a library website, one useful tool is documentation search. Instead of asking an agent to scan several pages, we can expose a `query_library_docs` tool and use [Context7](https://context7.com) to retrieve current, relevant documentation in the background.
+
+In this guide, we will build that integration.
+
+## How It Works
+
+The request follows a short path:
+
+1. A browser agent opens your library website.
+2. The page registers a WebMCP documentation tool.
+3. The agent calls the tool with a question.
+4. Your server sends the question to Context7.
+5. Context7 returns relevant documentation and code examples.
+
+![A browser agent calls a WebMCP tool that retrieves current library documentation from Context7](/blog/webmcp-context7-library-docs/architecture.png)
+
+Your website owns the tool and its user experience. Context7 handles documentation ingestion, updates and retrieval.
+
+WebMCP is not a replacement for a regular MCP server. A regular MCP server can be configured directly in an IDE or another agent client. WebMCP tools belong to the open page and use the current browser session. This makes them useful when a person and an agent are working together on the same website.
+
+## Before You Start
+
+You need:
+
+- A library indexed by Context7
+- A Context7 API key
+- A server endpoint in your website
+- A browser with experimental WebMCP support enabled
+
+You can find your Context7 library ID in the URL of its Context7 page. For example, the ID for Next.js is `/vercel/next.js`.
+
+Keep this ID on your server. Your tool is meant to answer questions about your library, so there is no reason to let an agent choose an arbitrary Context7 library ID.
+
+## Create a Context7 Endpoint
+
+First, add a server endpoint that accepts a documentation question and calls the [Context7 API](https://context7.com/docs/api-guide).
+
+The following example uses a Next.js route handler:
+
+```ts
+// app/api/agent/docs/route.ts
+
+const CONTEXT7_LIBRARY_ID = "/acme/acme-sdk";
+
+export async function POST(request: Request) {
+  const body = (await request.json()) as { query?: unknown };
+
+  if (
+    typeof body.query !== "string" ||
+    body.query.length < 1 ||
+    body.query.length > 500
+  ) {
+    return Response.json(
+      { error: "Query must contain between 1 and 500 characters." },
+      { status: 400 },
+    );
+  }
+
+  const url = new URL("https://context7.com/api/v2/context");
+  url.searchParams.set("libraryId", CONTEXT7_LIBRARY_ID);
+  url.searchParams.set("query", body.query);
+  url.searchParams.set("type", "txt");
+
+  const response = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${process.env.CONTEXT7_API_KEY}`,
+    },
+  });
+
+  if (!response.ok) {
+    return Response.json(
+      { error: "Context7 documentation lookup failed." },
+      { status: response.status },
+    );
+  }
+
+  return Response.json({
+    libraryId: CONTEXT7_LIBRARY_ID,
+    context: await response.text(),
+  });
+}
+```
+
+Add your Context7 API key to the server environment:
+
+```bash
+CONTEXT7_API_KEY=ctx7sk_your_key
+```
+
+Do not put the key in client-side code. A WebMCP tool runs in the page, so secrets included in that code can be read by users, browser extensions and other scripts.
+
+## Register the WebMCP Tool
+
+Now register a tool when the page loads:
+
+```js
+const modelContext = document.modelContext;
+
+if (modelContext) {
+  const registration = new AbortController();
+
+  await modelContext.registerTool(
+    {
+      name: "query_library_docs",
+      title: "Search library documentation",
+      description:
+        "Retrieves current documentation and code examples for the Acme SDK.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          query: {
+            type: "string",
+            description:
+              "A specific implementation or API question about the Acme SDK.",
+            minLength: 1,
+            maxLength: 500,
+          },
+        },
+        required: ["query"],
+        additionalProperties: false,
+      },
+      annotations: {
+        readOnlyHint: true,
+        untrustedContentHint: true,
+      },
+      async execute({ query }, { signal }) {
+        const response = await fetch("/api/agent/docs", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ query }),
+          signal,
+        });
+
+        if (!response.ok) {
+          const result = await response.json().catch(() => null);
+          throw new Error(result?.error ?? "Documentation lookup failed.");
+        }
+
+        return response.json();
+      },
+    },
+    { signal: registration.signal },
+  );
+
+  // Call registration.abort() when this page or component is removed.
+}
+```
+
+The feature check keeps the website working in browsers without WebMCP. The regular documentation interface remains available, and supported agents get an additional structured path.
+
+The registration `AbortSignal` removes the tool when the page or component is no longer active. The signal passed to `execute` lets an agent cancel an in-progress request.
+
+## Why the Tool Is Marked as Untrusted
+
+The example uses two WebMCP annotations:
+
+```js
+annotations: {
+  readOnlyHint: true,
+  untrustedContentHint: true,
+}
+```
+
+`readOnlyHint` tells the agent that the tool only reads documentation and does not change application data.
+
+`untrustedContentHint` tells the agent to treat the result as external content. Context7 retrieves documentation from repositories and websites. That content is useful, but it should not be treated as system instructions. This annotation helps agents maintain that trust boundary.
+
+## Make the Tool Page-Aware
+
+You can improve the tool by including information from the page that is already open.
+
+For example, a versioned documentation site can register the library ID for the selected version:
+
+```ts
+const LIBRARY_IDS = {
+  latest: "/acme/acme-sdk",
+  v2: "/acme/acme-sdk/v2.8.0",
+  v1: "/acme/acme-sdk/v1.14.2",
+} as const;
+```
+
+Keep the mapping on the server and accept only known versions. You can also add the current documentation section to the query:
+
+```js
+body: JSON.stringify({
+  query: `Current page: ${location.pathname}\nQuestion: ${query}`,
+}),
+```
+
+This is where WebMCP is especially useful. The page, the user and the agent share the same context.
+
+## Test the Integration
+
+WebMCP is still experimental. In Chrome, you can test locally by enabling:
+
+```text
+chrome://flags/#enable-webmcp-testing
+```
+
+After restarting the browser, open your website and inspect its registered tools with the [Model Context Tool Inspector](https://developer.chrome.com/docs/ai/webmcp/#imitate-agent-chat-with-the-inspector-extension).
+
+Try questions such as:
+
+- How do I authenticate with the Acme SDK?
+- Show me the current pagination API.
+- How can I migrate this example from version 1 to version 2?
+
+Check that the agent selects `query_library_docs`, that the server uses the expected library ID and that cancellation and error responses work correctly.
+
+Before deploying, also add your normal server protections:
+
+- Authentication where needed
+- Rate limiting
+- Input validation
+- Request logging
+- Context7 error and quota handling
+
+## Conclusion
+
+WebMCP gives browser agents a structured way to use features on the current page. Context7 gives those tools access to current, version-specific library documentation.
+
+Together, they let library owners make documentation agent-ready with a small amount of code. The website keeps its normal human interface, browser agents get a reliable documentation tool and the library team does not need to build its own crawling and retrieval system.
+
+WebMCP is still evolving, so treat this integration as a progressive enhancement and follow the [WebMCP repository](https://github.com/webmachinelearning/webmcp) for API changes.
