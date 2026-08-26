@@ -10,7 +10,7 @@ tags: [context7, webmcp, ai, documentation]
 
 Without a site tool, an agent has to read the page, find buttons and fill out forms. It has to infer what the website can do from an interface built for people.
 
-[WebMCP](https://github.com/webmachinelearning/webmcp) gives it a direct path. A website can register structured tools that browser agents discover and call from the page.
+[WebMCP](https://webmachinelearning.github.io/webmcp/) gives it a direct path. A website can register structured tools that browser agents discover and call from the page.
 
 For a library website, that tool could search the docs. Instead of making an agent scan page after page, we can expose a `search_upstash_docs` tool and use [Context7](https://context7.com) to retrieve the right documentation in the background.
 
@@ -50,7 +50,7 @@ Keep this ID on the server. The tool only needs to answer questions about your l
 
 First, add a server endpoint that takes a question and sends it to the [Context7 API](https://context7.com/docs/api-guide).
 
-Install the [Context7 SDK](https://www.npmjs.com/package/@upstash/context7-sdk) and Zod:
+Install the [Context7 TypeScript SDK](https://context7.com/docs/sdks/ts/getting-started) and Zod:
 
 ```bash title="Terminal"
 pnpm add @upstash/context7-sdk zod
@@ -116,6 +116,8 @@ export async function POST(request: Request) {
 }
 ```
 
+The SDK's [`getContext` method](https://context7.com/docs/sdks/ts/commands/get-context) accepts the question and library ID. Passing `{ type: "txt" }` returns a single plain-text result that the tool can send back to the agent.
+
 [Chrome recommends concise WebMCP tool outputs](https://developer.chrome.com/docs/ai/webmcp/secure-tools), with about 1,500 characters per result. The helper keeps the response within that budget and tells the agent to ask a narrower question when needed.
 
 Add your Context7 API key to the server environment:
@@ -128,7 +130,7 @@ The SDK reads `CONTEXT7_API_KEY` from the environment. Keep the key out of clien
 
 ## Register the WebMCP Tool
 
-The tool must be registered by client-side JavaScript after the page loads. In a Next.js application, put it in a [Client Component](https://nextjs.org/docs/app/getting-started/server-and-client-components) at `components/register-upstash-docs-tool.jsx`:
+The [WebMCP Imperative API](https://developer.chrome.com/docs/ai/webmcp/imperative-api) must be called by client-side JavaScript after the page loads. In a Next.js application, put the registration in a [Client Component](https://nextjs.org/docs/app/getting-started/server-and-client-components) at `components/register-upstash-docs-tool.jsx`:
 
 ```jsx title="components/register-upstash-docs-tool.jsx"
 "use client";
@@ -227,33 +229,52 @@ If the tool should only be available in your documentation, render `RegisterUpst
 
 The feature check keeps the website working in browsers without WebMCP. Everyone still gets the normal website. Supported agents also get the structured tool.
 
+The verb-based name and focused description help an agent decide when to call the tool. Chrome's [WebMCP best practices](https://developer.chrome.com/docs/ai/webmcp/best-practices) provide more guidance for names, descriptions and schemas.
+
 The annotations tell compatible agents that this tool only reads data and that its result comes from an external source. They are hints, not authorization checks. The registration `AbortSignal` removes the tool when the page or component is no longer active. The execution signal is passed to `fetch`, so cancelling a tool call also cancels the Context7 request.
 
 ## Test Locally in Chrome
 
-WebMCP is still experimental. You can follow the [official Chrome WebMCP setup guide](https://developer.chrome.com/docs/ai/webmcp/) for current browser requirements and setup instructions.
+WebMCP is still experimental. Chrome's [official WebMCP setup guide](https://developer.chrome.com/docs/ai/webmcp/) lists the current browser requirements and testing tools.
 
-For local development, open this flag in Chrome 149 or later:
+### 1. Enable WebMCP for local development
+
+In Chrome 149 or later, open:
 
 ```text
 chrome://flags/#enable-webmcp-testing
 ```
 
-Set it to **Enabled**, relaunch Chrome, start your local server and open its full URL, including the port. For example:
+Set the flag to **Enabled**, then relaunch Chrome. Restarting the tab is not enough.
+
+Start the Next.js application and open the page in the relaunched browser:
+
+```bash title="Terminal"
+pnpm dev
+```
 
 ```text
 http://localhost:3000
 ```
 
-Run this in DevTools on that page:
+Use the full local URL, including its port. Open DevTools on the application page after it has loaded. The Client Component must hydrate before it can register the tool.
+
+### 2. Verify the browser API and tool registration
+
+Run this in the Console:
 
 ```js
 document.modelContext;
 ```
 
-It should return an object. If it returns `undefined`, make sure you are on your application page rather than a Chrome error page and that Chrome was relaunched after enabling the flag.
+It should return a `ModelContext` object. If it returns `undefined`, check that:
 
-You can discover and invoke the tool directly from DevTools:
+- Chrome is version 149 or later
+- The flag is enabled and Chrome was relaunched
+- DevTools is attached to your application page, not a Chrome error page
+- The page is not opting out of origin isolation
+
+Next, inspect the tools registered by the page:
 
 ```js
 const tools = await document.modelContext.getTools();
@@ -263,25 +284,52 @@ if (!tool) {
   throw new Error("search_upstash_docs is not registered");
 }
 
-await document.modelContext.executeTool(
-  tool,
-  JSON.stringify({ query: "How do I authenticate?" }),
-);
+tool;
 ```
 
-`executeTool` expects the input arguments as a JSON string. You can also inspect registered tools with the [Model Context Tool Inspector](https://developer.chrome.com/docs/ai/webmcp/#imitate-agent-chat-with-the-inspector-extension).
+The result should include the name, description and input schema from the Client Component. If the tool is missing, check the browser console for registration errors and confirm that `RegisterUpstashDocsTool` is rendered by the current layout.
 
-WebMCP also requires an origin-isolated document. Do not disable origin isolation with `document.domain` or an `Origin-Agent-Cluster: ?0` header.
+### 3. Execute the tool
 
-The Chrome flag is only for local development. To make WebMCP available to compatible Chrome clients during the experiment, register your deployed origin for the [WebMCP origin trial](https://developer.chrome.com/origintrials/#/view_trial/4163014905550602241) and add its token to your pages as an `Origin-Trial` response header or meta tag. Chrome's [origin trial setup guide](https://developer.chrome.com/docs/web-platform/origin-trials) explains how to register an origin, add a token and verify it in DevTools.
+Call it directly from the Console:
 
-Try questions such as:
+```js
+const result = await document.modelContext.executeTool(
+  tool,
+  JSON.stringify({ query: "How do I authenticate with Upstash Redis?" }),
+);
+
+console.log(result);
+```
+
+The [Imperative API](https://developer.chrome.com/docs/ai/webmcp/imperative-api) expects the arguments as a valid JSON string. A successful call should return documentation from Context7. An invalid query or failed lookup should return the descriptive error from the endpoint.
+
+For an end-to-end check, use Chrome's [Model Context Tool Inspector](https://developer.chrome.com/docs/ai/webmcp/#imitate-agent-chat-with-the-inspector-extension). It shows the tools registered on the page, validates their schemas, lets you call them manually and accepts natural-language prompts so you can check whether an agent selects the right tool.
+
+Try prompts such as:
 
 - How do I connect to Upstash Redis from Next.js?
 - How do I verify a QStash signature?
 - How do I create an Upstash Workflow endpoint?
 
-Make sure the agent selects `search_upstash_docs`, the server uses the expected library ID, and cancellation and error responses work.
+Confirm that `search_upstash_docs` is selected, the response is relevant and cancellation and error responses work.
+
+### 4. Check the page requirements
+
+WebMCP also requires an origin-isolated document. Do not disable origin isolation with `document.domain` or an `Origin-Agent-Cluster: ?0` header.
+
+The tool is available to the top-level page and same-origin frames by default. If you embed it in a cross-origin frame, you must explicitly allow the `tools` permissions policy for that frame.
+
+### 5. Enable a deployed origin
+
+The testing flag only enables WebMCP in your own browser. To make the feature available to compatible Chrome clients during the experiment:
+
+1. Register the exact deployed origin for the [WebMCP origin trial](https://developer.chrome.com/origintrials/#/view_trial/4163014905550602241).
+2. Add the issued token to every page that registers the tool, either with an `Origin-Trial` response header or an origin-trial meta tag.
+3. Open the deployed page and verify the token in the Application panel of Chrome DevTools.
+4. Track the token's expiry date and renew it when necessary.
+
+Chrome's [origin trial setup guide](https://developer.chrome.com/docs/web-platform/origin-trials) covers token registration, delivery and troubleshooting.
 
 The tool calls a same-origin route and may use the visitor's signed-in session. Treat the endpoint like any other application API. Validate authorization on the server instead of relying on tool annotations or the agent.
 
@@ -301,17 +349,3 @@ WebMCP gives browser agents a structured way to use the current website. Context
 Together, they make a documentation site agent-ready with a small amount of code. People keep the same website, agents get a reliable docs tool, and the library team does not have to build its own crawling and retrieval system.
 
 WebMCP is still experimental, so ship this as a progressive enhancement and follow the [WebMCP repository](https://github.com/webmachinelearning/webmcp) for API changes.
-
-## References
-
-- [Site tools in ChatGPT and Codex](https://learn.chatgpt.com/docs/webmcp)
-- [WebMCP draft specification](https://webmachinelearning.github.io/webmcp/)
-- [WebMCP overview](https://developer.chrome.com/docs/ai/webmcp/)
-- [WebMCP Imperative API](https://developer.chrome.com/docs/ai/webmcp/imperative-api)
-- [WebMCP best practices](https://developer.chrome.com/docs/ai/webmcp/best-practices)
-- [WebMCP tool security](https://developer.chrome.com/docs/ai/webmcp/secure-tools)
-- [Chrome origin trial setup](https://developer.chrome.com/docs/web-platform/origin-trials)
-- [Context7 API guide](https://context7.com/docs/api-guide)
-- [Context7 TypeScript SDK](https://context7.com/docs/sdks/ts/getting-started)
-- [Context7 getContext](https://context7.com/docs/sdks/ts/commands/get-context)
-- [Next.js Server and Client Components](https://nextjs.org/docs/app/getting-started/server-and-client-components)
