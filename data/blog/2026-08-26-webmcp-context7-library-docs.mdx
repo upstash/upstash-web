@@ -229,21 +229,11 @@ The feature check keeps the website working in browsers without WebMCP. Everyone
 
 The annotations tell compatible agents that this tool only reads data and that its result comes from an external source. They are hints, not authorization checks. The registration `AbortSignal` removes the tool when the page or component is no longer active. The execution signal is passed to `fetch`, so cancelling a tool call also cancels the Context7 request.
 
-## Test the Integration
+## Test Locally in Chrome
 
-### Test in ChatGPT
+WebMCP is still experimental. You can follow the [official Chrome WebMCP setup guide](https://developer.chrome.com/docs/ai/webmcp/) for current browser requirements and setup instructions.
 
-Open your website in the built-in browser in the ChatGPT desktop app. Ask ChatGPT Work or Codex a question such as:
-
-> Use the available site tools to find out how I can connect to Upstash Redis from Next.js.
-
-Select **Site tools** in the browser's address bar, then select **Available site tools**. You should see `search_upstash_docs`. After a call, you can review it under **Recently used**.
-
-Site tool availability depends on your account, app version and rollout. If the menu is missing, update the ChatGPT desktop app and check the [current availability notes](https://learn.chatgpt.com/docs/webmcp).
-
-### Test Locally in Chrome
-
-WebMCP is still experimental. For local development, open this flag in Chrome 149 or later:
+For local development, open this flag in Chrome 149 or later:
 
 ```text
 chrome://flags/#enable-webmcp-testing
@@ -283,7 +273,7 @@ await document.modelContext.executeTool(
 
 WebMCP also requires an origin-isolated document. Do not disable origin isolation with `document.domain` or an `Origin-Agent-Cluster: ?0` header.
 
-The Chrome flag is only for local development. To make WebMCP available to compatible Chrome clients during the experiment, register your deployed origin for the [WebMCP origin trial](https://developer.chrome.com/origintrials/#/view_trial/4163014905550602241) and add its token to your pages as an `Origin-Trial` response header or meta tag.
+The Chrome flag is only for local development. To make WebMCP available to compatible Chrome clients during the experiment, register your deployed origin for the [WebMCP origin trial](https://developer.chrome.com/origintrials/#/view_trial/4163014905550602241) and add its token to your pages as an `Origin-Trial` response header or meta tag. Chrome's [origin trial setup guide](https://developer.chrome.com/docs/web-platform/origin-trials) explains how to register an origin, add a token and verify it in DevTools.
 
 Try questions such as:
 
@@ -320,6 +310,7 @@ WebMCP is still experimental, so ship this as a progressive enhancement and foll
 - [WebMCP Imperative API](https://developer.chrome.com/docs/ai/webmcp/imperative-api)
 - [WebMCP best practices](https://developer.chrome.com/docs/ai/webmcp/best-practices)
 - [WebMCP tool security](https://developer.chrome.com/docs/ai/webmcp/secure-tools)
+- [Chrome origin trial setup](https://developer.chrome.com/docs/web-platform/origin-trials)
 - [Context7 API guide](https://context7.com/docs/api-guide)
 - [Context7 TypeScript SDK](https://context7.com/docs/sdks/ts/getting-started)
 - [Context7 getContext](https://context7.com/docs/sdks/ts/commands/get-context)
