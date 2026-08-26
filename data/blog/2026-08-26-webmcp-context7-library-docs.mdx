@@ -37,8 +37,10 @@ You need:
 
 - A library indexed by Context7
 - A Context7 API key
-- A server endpoint in your website
+- A Next.js application using the App Router
 - ChatGPT desktop with site tools available, or Chrome 149 or later for local testing
+
+This guide uses Next.js, but the same browser and server split works with other frameworks.
 
 You can find the library ID in the URL of its Context7 page. We will use `/upstash/docs`, which contains the official documentation for Upstash products.
 
@@ -61,7 +63,21 @@ import { Context7 } from "@upstash/context7-sdk";
 import { z } from "zod";
 
 const CONTEXT7_LIBRARY_ID = "/upstash/docs";
+const MAX_TOOL_OUTPUT_LENGTH = 1_500;
 const context7 = new Context7();
+
+function limitToolOutput(context: string) {
+  const notice =
+    "\n\n[Result truncated. Ask a narrower question for more detail.]";
+
+  if (context.length <= MAX_TOOL_OUTPUT_LENGTH) {
+    return context;
+  }
+
+  return `${context
+    .slice(0, MAX_TOOL_OUTPUT_LENGTH - notice.length)
+    .trimEnd()}${notice}`;
+}
 
 const QuerySchema = z
   .object({
@@ -89,7 +105,7 @@ export async function POST(request: Request) {
 
     return Response.json({
       libraryId: CONTEXT7_LIBRARY_ID,
-      context,
+      context: limitToolOutput(context),
     });
   } catch {
     return Response.json(
@@ -99,6 +115,8 @@ export async function POST(request: Request) {
   }
 }
 ```
+
+[Chrome recommends concise WebMCP tool outputs](https://developer.chrome.com/docs/ai/webmcp/secure-tools), with about 1,500 characters per result. The helper keeps the response within that budget and tells the agent to ask a narrower question when needed.
 
 Add your Context7 API key to the server environment:
 
@@ -110,7 +128,7 @@ The SDK reads `CONTEXT7_API_KEY` from the environment. Keep the key out of clien
 
 ## Register the WebMCP Tool
 
-The tool must be registered by client-side JavaScript after the page loads. In a Next.js application, put it in a Client Component at `components/register-upstash-docs-tool.jsx`:
+The tool must be registered by client-side JavaScript after the page loads. In a Next.js application, put it in a [Client Component](https://nextjs.org/docs/app/getting-started/server-and-client-components) at `components/register-upstash-docs-tool.jsx`:
 
 ```jsx title="components/register-upstash-docs-tool.jsx"
 "use client";
@@ -133,7 +151,7 @@ export function RegisterUpstashDocsTool() {
           name: "search_upstash_docs",
           title: "Search Upstash documentation",
           description:
-            "Retrieves current documentation and code examples for Upstash products.",
+            "Searches current Upstash documentation for implementation guidance and code examples. Use it for questions about Upstash products and SDKs.",
           inputSchema: {
             type: "object",
             properties: {
@@ -209,9 +227,21 @@ If the tool should only be available in your documentation, render `RegisterUpst
 
 The feature check keeps the website working in browsers without WebMCP. Everyone still gets the normal website. Supported agents also get the structured tool.
 
-The annotations tell compatible agents that this tool only reads data and that its result comes from an external source. The registration `AbortSignal` removes the tool when the page or component is no longer active. The execution signal is passed to `fetch`, so cancelling a tool call also cancels the Context7 request.
+The annotations tell compatible agents that this tool only reads data and that its result comes from an external source. They are hints, not authorization checks. The registration `AbortSignal` removes the tool when the page or component is no longer active. The execution signal is passed to `fetch`, so cancelling a tool call also cancels the Context7 request.
 
 ## Test the Integration
+
+### Test in ChatGPT
+
+Open your website in the built-in browser in the ChatGPT desktop app. Ask ChatGPT Work or Codex a question such as:
+
+> Use the available site tools to find out how I can connect to Upstash Redis from Next.js.
+
+Select **Site tools** in the browser's address bar, then select **Available site tools**. You should see `search_upstash_docs`. After a call, you can review it under **Recently used**.
+
+Site tool availability depends on your account, app version and rollout. If the menu is missing, update the ChatGPT desktop app and check the [current availability notes](https://learn.chatgpt.com/docs/webmcp).
+
+### Test Locally in Chrome
 
 WebMCP is still experimental. For local development, open this flag in Chrome 149 or later:
 
@@ -239,6 +269,10 @@ You can discover and invoke the tool directly from DevTools:
 const tools = await document.modelContext.getTools();
 const tool = tools.find(({ name }) => name === "search_upstash_docs");
 
+if (!tool) {
+  throw new Error("search_upstash_docs is not registered");
+}
+
 await document.modelContext.executeTool(
   tool,
   JSON.stringify({ query: "How do I authenticate?" }),
@@ -249,7 +283,7 @@ await document.modelContext.executeTool(
 
 WebMCP also requires an origin-isolated document. Do not disable origin isolation with `document.domain` or an `Origin-Agent-Cluster: ?0` header.
 
-The Chrome flag is only for local development. To make WebMCP available to visitors during the experiment, register your deployed origin for the [WebMCP origin trial](https://developer.chrome.com/origintrials/#/view_trial/4163014905550602241) and add its token to your pages as an `Origin-Trial` response header or meta tag.
+The Chrome flag is only for local development. To make WebMCP available to compatible Chrome clients during the experiment, register your deployed origin for the [WebMCP origin trial](https://developer.chrome.com/origintrials/#/view_trial/4163014905550602241) and add its token to your pages as an `Origin-Trial` response header or meta tag.
 
 Try questions such as:
 
@@ -259,10 +293,12 @@ Try questions such as:
 
 Make sure the agent selects `search_upstash_docs`, the server uses the expected library ID, and cancellation and error responses work.
 
+The tool calls a same-origin route and may use the visitor's signed-in session. Treat the endpoint like any other application API. Validate authorization on the server instead of relying on tool annotations or the agent.
+
 Before deploying, add the usual server protections:
 
-- Authentication where needed
-- Rate limiting
+- Authentication and authorization where needed
+- Rate limiting and abuse protection
 - Input validation
 - Request logging
 - Response caching
@@ -278,9 +314,13 @@ WebMCP is still experimental, so ship this as a progressive enhancement and foll
 
 ## References
 
+- [Site tools in ChatGPT and Codex](https://learn.chatgpt.com/docs/webmcp)
+- [WebMCP draft specification](https://webmachinelearning.github.io/webmcp/)
 - [WebMCP overview](https://developer.chrome.com/docs/ai/webmcp/)
 - [WebMCP Imperative API](https://developer.chrome.com/docs/ai/webmcp/imperative-api)
-- [WebMCP explainer](https://github.com/webmachinelearning/webmcp)
-- [Site tools in ChatGPT and Codex](https://learn.chatgpt.com/docs/webmcp)
+- [WebMCP best practices](https://developer.chrome.com/docs/ai/webmcp/best-practices)
+- [WebMCP tool security](https://developer.chrome.com/docs/ai/webmcp/secure-tools)
 - [Context7 API guide](https://context7.com/docs/api-guide)
 - [Context7 TypeScript SDK](https://context7.com/docs/sdks/ts/getting-started)
+- [Context7 getContext](https://context7.com/docs/sdks/ts/commands/get-context)
+- [Next.js Server and Client Components](https://nextjs.org/docs/app/getting-started/server-and-client-components)
