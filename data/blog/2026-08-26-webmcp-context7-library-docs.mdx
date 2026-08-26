@@ -12,27 +12,24 @@ Without a site tool, an agent has to read the page, find buttons and fill out fo
 
 [WebMCP](https://github.com/webmachinelearning/webmcp) gives it a direct path. A website can register structured tools that browser agents discover and call from the page.
 
-For a library website, that tool could search the docs. Instead of making an agent scan page after page, we can expose a `query_upstash_docs` tool and use [Context7](https://context7.com) to retrieve the right documentation in the background.
+For a library website, that tool could search the docs. Instead of making an agent scan page after page, we can expose a `search_upstash_docs` tool and use [Context7](https://context7.com) to retrieve the right documentation in the background.
 
 Let's build it.
 
 ## How It Works
 
-Here is what happens when an agent calls the tool:
+ChatGPT calls WebMCP tools **site tools**. Here is how the flow works in the ChatGPT desktop app:
 
-1. A browser agent opens your library website.
-2. The page registers a WebMCP documentation tool.
-3. The agent calls the tool with a question.
-4. Your server sends the question to Context7.
-5. Context7 returns relevant documentation and code examples.
+1. The user opens the library website in ChatGPT's built-in browser.
+2. The page registers `search_upstash_docs` as a site tool.
+3. ChatGPT Work or Codex discovers the tool and selects it when it is relevant to the user's request.
+4. The built-in browser checks the tool request before the website carries it out.
+5. The tool sends the question and current page to your server endpoint.
+6. The server asks Context7 for relevant documentation and returns it to the agent.
 
-Your website controls the tool and how it behaves. Context7 handles ingesting, updating and retrieving the documentation.
+The user and agent work with the same live page and signed-in session. Your website defines the available actions, while Context7 handles ingesting, updating and retrieving the documentation behind this tool.
 
-WebMCP tools live in the webpage. A compatible browser runs the page, discovers its tools and makes them available to the agent while the page is open. A plain web fetch does not activate imperative tools because it does not run the page's JavaScript.
-
-The user and agent work with the same live page and signed-in session. This lets a tool use context that the website already has, such as the current documentation page or selected product.
-
-WebMCP does not replace a regular MCP server. A regular MCP server connects an agent directly to a backend and can work without an open webpage. WebMCP complements it by giving an agent structured actions within the website it is currently visiting. A website can support both.
+This is different from a regular MCP server, whose tools can work without an open webpage. WebMCP makes predefined tools available when the agent visits the website. A website can support both approaches.
 
 ## Before You Start
 
@@ -41,7 +38,7 @@ You need:
 - A library indexed by Context7
 - A Context7 API key
 - A server endpoint in your website
-- Chrome 149 or later with experimental WebMCP support enabled
+- ChatGPT desktop with site tools available, or Chrome 149 or later for local testing
 
 You can find the library ID in the URL of its Context7 page. We will use `/upstash/docs`, which contains the official documentation for Upstash products.
 
@@ -66,29 +63,42 @@ import { z } from "zod";
 const CONTEXT7_LIBRARY_ID = "/upstash/docs";
 const context7 = new Context7();
 
-const QuerySchema = z
+const RequestSchema = z
   .object({
     query: z.string().trim().min(1).max(500),
+    page: z
+      .string()
+      .trim()
+      .min(1)
+      .max(500)
+      .regex(/^\/[^\r\n]*$/),
   })
   .strict();
 
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
-  const parsed = QuerySchema.safeParse(body);
+  const parsed = RequestSchema.safeParse(body);
 
   if (!parsed.success) {
     return Response.json(
-      { error: "Query must contain between 1 and 500 characters." },
+      { error: "Invalid documentation search request." },
       { status: 400 },
     );
   }
 
   try {
-    const context = await context7.getContext(
-      parsed.data.query,
-      CONTEXT7_LIBRARY_ID,
-      { type: "txt" },
-    );
+    const queryWithPage =
+      `Current documentation page: ${parsed.data.page}\n` +
+      `Question: ${parsed.data.query}`;
+
+    // Context7 accepts queries up to 500 characters. If the page context
+    // makes the query too long, preserve the user's complete question.
+    const query =
+      queryWithPage.length <= 500 ? queryWithPage : parsed.data.query;
+
+    const context = await context7.getContext(query, CONTEXT7_LIBRARY_ID, {
+      type: "txt",
+    });
 
     return Response.json({
       libraryId: CONTEXT7_LIBRARY_ID,
@@ -113,93 +123,126 @@ The SDK reads `CONTEXT7_API_KEY` from the environment. Keep the key out of clien
 
 ## Register the WebMCP Tool
 
-Now register a tool when the page loads:
+The tool must be registered by client-side JavaScript after the page loads. In a Next.js application, put it in a Client Component at `components/register-upstash-docs-tool.jsx`:
 
-```js title="register-upstash-docs-tool.js"
-const modelContext = document.modelContext;
+```jsx title="components/register-upstash-docs-tool.jsx"
+"use client";
 
-if (modelContext) {
-  const registration = new AbortController();
+import { useEffect } from "react";
 
-  await modelContext.registerTool(
-    {
-      name: "query_upstash_docs",
-      title: "Search Upstash documentation",
-      description:
-        "Retrieves current documentation and code examples for Upstash products.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          query: {
-            type: "string",
-            description:
-              "A specific implementation or API question about an Upstash product.",
-            minLength: 1,
-            maxLength: 500,
+export function RegisterUpstashDocsTool() {
+  useEffect(() => {
+    const registration = new AbortController();
+
+    async function registerTool() {
+      const modelContext = document.modelContext;
+
+      if (!modelContext) {
+        return;
+      }
+
+      await modelContext.registerTool(
+        {
+          name: "search_upstash_docs",
+          title: "Search Upstash documentation",
+          description:
+            "Retrieves current documentation and code examples for Upstash products.",
+          inputSchema: {
+            type: "object",
+            properties: {
+              query: {
+                type: "string",
+                description:
+                  "A specific implementation or API question about an Upstash product.",
+                minLength: 1,
+                maxLength: 500,
+              },
+            },
+            required: ["query"],
+            additionalProperties: false,
+          },
+          annotations: {
+            readOnlyHint: true,
+            untrustedContentHint: true,
+          },
+          async execute({ query }, { signal } = {}) {
+            const response = await fetch("/api/agent/docs", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                query,
+                page: window.location.pathname,
+              }),
+              signal,
+            });
+
+            if (!response.ok) {
+              const result = await response.json().catch(() => null);
+              throw new Error(result?.error ?? "Documentation lookup failed.");
+            }
+
+            const result = await response.json();
+            return result.context;
           },
         },
-        required: ["query"],
-        additionalProperties: false,
-      },
-      annotations: {
-        readOnlyHint: true,
-        untrustedContentHint: true,
-      },
-      async execute({ query }, { signal } = {}) {
-        const response = await fetch("/api/agent/docs", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ query }),
-          signal,
-        });
+        { signal: registration.signal },
+      );
+    }
 
-        if (!response.ok) {
-          const result = await response.json().catch(() => null);
-          throw new Error(result?.error ?? "Documentation lookup failed.");
-        }
+    void registerTool().catch((error) => {
+      if (!registration.signal.aborted) {
+        console.error("Could not register WebMCP tools", error);
+      }
+    });
 
-        return response.json();
-      },
-    },
-    { signal: registration.signal },
-  );
+    return () => registration.abort();
+  }, []);
 
-  // Call registration.abort() when this page or component is removed.
+  return null;
 }
 ```
 
-The feature check keeps the site working in browsers without WebMCP. Everyone still gets the normal documentation site. Supported agents also get the structured tool.
+Render this component from your root layout so the tool is available on every page:
 
-The annotations tell compatible agents that this tool only reads data and that its result comes from an external source. The registration `AbortSignal` removes the tool when the page or component is no longer active.
+```jsx title="app/layout.jsx"
+import { RegisterUpstashDocsTool } from "@/components/register-upstash-docs-tool";
 
-Chrome versions differ in whether they pass the second argument to `execute`, so the example defaults it to an empty object. Browsers that provide the execution signal can still cancel the Context7 request.
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>
+        <RegisterUpstashDocsTool />
+        {children}
+      </body>
+    </html>
+  );
+}
+```
+
+If the tool should only be available in your documentation, render `RegisterUpstashDocsTool` from the docs section's layout instead.
+
+The feature check keeps the website working in browsers without WebMCP. Everyone still gets the normal website. Supported agents also get the structured tool.
+
+The annotations tell compatible agents that this tool only reads data and that its result comes from an external source. The registration `AbortSignal` removes the tool when the page or component is no longer active. The execution signal is passed to `fetch`, so cancelling a tool call also cancels the Context7 request.
 
 ## Make the Tool Page-Aware
 
-WebMCP gets more useful when the tool knows which page is open.
+The two snippets above already make the tool page-aware.
 
-For example, an Upstash documentation page can select a product-specific source:
-
-```ts title="lib/context7-libraries.ts"
-const LIBRARY_IDS = {
-  all: "/upstash/docs",
-  redis: "/websites/upstash_redis",
-  vector: "/websites/upstash_vector",
-  workflow: "/websites/upstash_workflow",
-} as const;
-```
-
-Keep this mapping on the server and accept only known products. You can also include the current page in the query:
+When the agent calls `search_upstash_docs`, the browser-side function reads `window.location.pathname`. If the user is reading `/redis/sdks/ts/commands/get`, the tool sends that path alongside the question:
 
 ```js
 body: JSON.stringify({
-  query: `Current page: ${location.pathname}\nQuestion: ${query}`,
+  query,
+  page: window.location.pathname,
 }),
 ```
 
-Now the agent does not have to explain what it is looking at. The page already provides that context.
+The server validates both values and adds the page path to the Context7 query. The path is a relevance hint, so Context7 can prioritize documentation related to the page the user is viewing. If adding the path would exceed Context7's 500-character query limit, the endpoint sends the complete user question without the path.
+
+The Context7 library ID remains fixed as `/upstash/docs` on the server. The browser and agent never choose it. This keeps the implementation simple and prevents callers from turning the endpoint into a search proxy for unrelated libraries.
 
 ## Test the Integration
 
@@ -227,7 +270,7 @@ You can discover and invoke the tool directly from DevTools:
 
 ```js
 const tools = await document.modelContext.getTools();
-const tool = tools.find(({ name }) => name === "query_upstash_docs");
+const tool = tools.find(({ name }) => name === "search_upstash_docs");
 
 await document.modelContext.executeTool(
   tool,
@@ -247,7 +290,7 @@ Try questions such as:
 - How do I verify a QStash signature?
 - How do I create an Upstash Workflow endpoint?
 
-Make sure the agent selects `query_upstash_docs`, the server uses the expected library ID, and cancellation and error responses work.
+Make sure the agent selects `search_upstash_docs`, the server uses the expected library ID, and cancellation and error responses work.
 
 Before deploying, add the usual server protections:
 
