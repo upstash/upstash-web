@@ -24,7 +24,7 @@ ChatGPT calls WebMCP tools **site tools**. Here is how the flow works in the Cha
 2. The page registers `search_upstash_docs` as a site tool.
 3. ChatGPT Work or Codex discovers the tool and selects it when it is relevant to the user's request.
 4. The built-in browser checks the tool request before the website carries it out.
-5. The tool sends the question and current page to your server endpoint.
+5. The tool sends the question to your server endpoint.
 6. The server asks Context7 for relevant documentation and returns it to the agent.
 
 The user and agent work with the same live page and signed-in session. Your website defines the available actions, while Context7 handles ingesting, updating and retrieving the documentation behind this tool.
@@ -63,42 +63,29 @@ import { z } from "zod";
 const CONTEXT7_LIBRARY_ID = "/upstash/docs";
 const context7 = new Context7();
 
-const RequestSchema = z
+const QuerySchema = z
   .object({
     query: z.string().trim().min(1).max(500),
-    page: z
-      .string()
-      .trim()
-      .min(1)
-      .max(500)
-      .regex(/^\/[^\r\n]*$/),
   })
   .strict();
 
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
-  const parsed = RequestSchema.safeParse(body);
+  const parsed = QuerySchema.safeParse(body);
 
   if (!parsed.success) {
     return Response.json(
-      { error: "Invalid documentation search request." },
+      { error: "Query must contain between 1 and 500 characters." },
       { status: 400 },
     );
   }
 
   try {
-    const queryWithPage =
-      `Current documentation page: ${parsed.data.page}\n` +
-      `Question: ${parsed.data.query}`;
-
-    // Context7 accepts queries up to 500 characters. If the page context
-    // makes the query too long, preserve the user's complete question.
-    const query =
-      queryWithPage.length <= 500 ? queryWithPage : parsed.data.query;
-
-    const context = await context7.getContext(query, CONTEXT7_LIBRARY_ID, {
-      type: "txt",
-    });
+    const context = await context7.getContext(
+      parsed.data.query,
+      CONTEXT7_LIBRARY_ID,
+      { type: "txt" },
+    );
 
     return Response.json({
       libraryId: CONTEXT7_LIBRARY_ID,
@@ -171,10 +158,7 @@ export function RegisterUpstashDocsTool() {
               headers: {
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify({
-                query,
-                page: window.location.pathname,
-              }),
+              body: JSON.stringify({ query }),
               signal,
             });
 
@@ -226,23 +210,6 @@ If the tool should only be available in your documentation, render `RegisterUpst
 The feature check keeps the website working in browsers without WebMCP. Everyone still gets the normal website. Supported agents also get the structured tool.
 
 The annotations tell compatible agents that this tool only reads data and that its result comes from an external source. The registration `AbortSignal` removes the tool when the page or component is no longer active. The execution signal is passed to `fetch`, so cancelling a tool call also cancels the Context7 request.
-
-## Make the Tool Page-Aware
-
-The two snippets above already make the tool page-aware.
-
-When the agent calls `search_upstash_docs`, the browser-side function reads `window.location.pathname`. If the user is reading `/redis/sdks/ts/commands/get`, the tool sends that path alongside the question:
-
-```js
-body: JSON.stringify({
-  query,
-  page: window.location.pathname,
-}),
-```
-
-The server validates both values and adds the page path to the Context7 query. The path is a relevance hint, so Context7 can prioritize documentation related to the page the user is viewing. If adding the path would exceed Context7's 500-character query limit, the endpoint sends the complete user question without the path.
-
-The Context7 library ID remains fixed as `/upstash/docs` on the server. The browser and agent never choose it. This keeps the implementation simple and prevents callers from turning the endpoint into a search proxy for unrelated libraries.
 
 ## Test the Integration
 
