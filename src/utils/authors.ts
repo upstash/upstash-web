@@ -218,7 +218,7 @@ export const authors: Record<
     title: "Software Engineer @Upstash",
     twitter: "f4xreddin",
     website: "https://github.com/fahreddinozcan",
-    image: "fahreddin.png",
+    image: "fahreddin.jpg",
   },
   rishi: {
     name: "Rishi Raj Jain",
