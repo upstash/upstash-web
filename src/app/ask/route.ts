@@ -1,3 +1,4 @@
+import { apiError } from "@/lib/api-error";
 import { Search } from "@upstash/search";
 import { NextResponse, type NextRequest } from "next/server";
 import { logQuestion } from "./log";
@@ -29,9 +30,11 @@ export const dynamic = "force-dynamic";
 export async function GET(req: NextRequest) {
   const q = req.nextUrl.searchParams.get("q")?.trim();
   if (!q) {
-    return NextResponse.json(
-      { error: "missing q", usage: "/ask?q=how+is+qstash+priced" },
-      { status: 400 },
+    return apiError(
+      400,
+      "missing_query",
+      "The `q` query parameter is required.",
+      "Call /ask?q=<your question>, for example /ask?q=how+is+qstash+priced.",
     );
   }
 
@@ -44,9 +47,11 @@ export async function GET(req: NextRequest) {
   const url = process.env.UPSTASH_SEARCH_REST_URL;
   const token = process.env.UPSTASH_SEARCH_REST_TOKEN;
   if (!url || !token) {
-    return NextResponse.json(
-      { error: "search is not configured" },
-      { status: 503 },
+    return apiError(
+      503,
+      "search_unavailable",
+      "The answer index is not available right now.",
+      "Retry later, or browse https://upstash.com/llms.txt and https://upstash.com/docs directly.",
     );
   }
 
@@ -77,6 +82,11 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     console.error("/ask search failed:", error);
-    return NextResponse.json({ error: "search failed" }, { status: 502 });
+    return apiError(
+      502,
+      "search_failed",
+      "The search backend returned an error for this question.",
+      "Retry after a short delay, or rephrase the question.",
+    );
   }
 }

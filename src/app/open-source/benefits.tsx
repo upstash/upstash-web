@@ -1,5 +1,3 @@
-import { ApplyNow } from "./apply-now";
-
 export const Benefits = () => {
   return (
     <>

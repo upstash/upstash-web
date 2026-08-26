@@ -156,6 +156,18 @@ export default function HomePage() {
                 svgURL="logo/workflow-icon.svg"
               />
             </LogoBox>
+            {/*box*/}
+            <LogoBox className="md:col-span-6">
+              <img
+                src="logo/box-icon.svg"
+                alt="Upstash Box icon"
+                className="h-12 md:h-16"
+              />
+              <ActionButtons
+                pngURL="logo/box-icon.png"
+                svgURL="logo/box-icon.svg"
+              />
+            </LogoBox>
             {/**/}
           </div>
         </Container>

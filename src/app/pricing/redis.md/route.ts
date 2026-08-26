@@ -1,3 +1,4 @@
+import { ASK_MARKDOWN_LINE } from "@/lib/ask";
 import {
   REDIS_ALL_PLANS,
   REDIS_ENTERPRISE_PLAN,
@@ -58,6 +59,7 @@ function generateMarkdown(): string {
     "",
     "> **Source:** https://upstash.com/pricing/redis",
     "> **Format:** text/markdown — machine-readable pricing for agents and LLMs",
+    ASK_MARKDOWN_LINE,
     "> **Contact:** sales@upstash.com (Enterprise) · support@upstash.com (Support)",
     "",
     "---",

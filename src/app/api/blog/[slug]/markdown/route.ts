@@ -1,4 +1,5 @@
 import { allPosts } from "@content";
+import { notFoundMarkdown } from "@/lib/ask";
 import { renderPost } from "@/lib/blog-markdown";
 import { SITE_URL } from "@/utils/const";
 
@@ -9,7 +10,10 @@ export async function GET(_request: Request, props: { params: Promise<{ slug: st
   const post = allPosts.find((p) => p.slug === params.slug && !p.draft);
 
   if (!post) {
-    return new Response("Not Found", { status: 404 });
+    return new Response(notFoundMarkdown(), {
+      status: 404,
+      headers: { "Content-Type": "text/markdown; charset=utf-8", Vary: "Accept" },
+    });
   }
 
   const body = renderPost(post);

@@ -1,3 +1,4 @@
+import { ASK_MARKDOWN_LINE } from "@/lib/ask";
 import {
   WORKFLOW_ALL_PLANS,
   WORKFLOW_ENTERPRISE_PLAN,
@@ -21,6 +22,7 @@ function generateMarkdown(): string {
     "",
     "> **Source:** https://upstash.com/pricing/workflow",
     "> **Format:** text/markdown — machine-readable pricing for agents and LLMs",
+    ASK_MARKDOWN_LINE,
     "> **Contact:** sales@upstash.com (Enterprise) · support@upstash.com (Support)",
     "",
     "Upstash Workflow enables durable, serverless workflow execution built on top of QStash.",

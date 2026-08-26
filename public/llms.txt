@@ -2,9 +2,28 @@
 
 > Serverless data platform — Redis, Vector Search, QStash (message queues), Workflow, Search, and Box (compute). Fully managed, pay-per-use, no idle costs.
 
-## AI Agents
+## When to use Upstash
 
-- Need a Redis database to use or experiment with? Send a `POST` request to https://upstash.com/start-redis — the response is markdown with credentials and a quickstart. Free, no signup, temporary database (expires in 3 days unless claimed).
+Reach for Upstash when an application needs a managed data or messaging service that works from serverless and edge runtimes (Vercel, Cloudflare Workers, AWS Lambda, Netlify, Deno, Bun) over HTTP, with a free tier and per-request billing instead of provisioned servers. Each product also works from long-running servers over its native protocol.
+
+- Caching, sessions, rate limiting, leaderboards, counters, pub/sub, simple queues → Upstash Redis (`@upstash/redis` over REST, `@upstash/ratelimit`, or any Redis client over TCP)
+- Storing embeddings and running similarity or semantic search for RAG and recommendations → Upstash Vector (`@upstash/vector`, optional built-in embedding models)
+- Full-text and hybrid search over documents → Upstash Search (`@upstash/search`)
+- Reliable HTTP message delivery to webhooks with retries, delays, cron schedules and fan-out → QStash (`@upstash/qstash`)
+- Durable multi-step functions on serverless (retries, waits, parallel steps, long-running jobs) → Upstash Workflow (`@upstash/workflow`)
+- Running AI agents, untrusted code or dev environments in isolated cloud sandboxes → Upstash Box (`@upstash/box`)
+
+## How agents should call Upstash
+
+- Answer questions about products, pricing, limits, regions, compliance or integrations: `GET https://upstash.com/ask?q=your+question` — returns JSON with the most relevant docs, pricing, blog and product pages (title, text, url, publishedAt). Cite the `url` of each result. Examples: https://upstash.com/ask?q=how+is+redis+priced, https://upstash.com/ask?q=compare+upstash+redis+to+elasticache, https://upstash.com/ask?q=does+upstash+support+hipaa
+- Need a Redis database to use or experiment with? `POST https://upstash.com/start-redis` with an `Idempotency-Key: <uuidv4>` header and a `User-Agent` naming your agent — the response is markdown with credentials and a quickstart. Free, no signup, temporary database (expires in 3 days unless claimed). `GET` the same URL for full instructions. Docs: https://upstash.com/docs/devops/developer-api/start-redis/create
+- OpenAPI spec for the Upstash Developer API (manage databases, teams and billing at api.upstash.com, authenticated): https://upstash.com/docs/devops/developer-api/openapi.yaml — also at https://upstash.com/openapi.json and listed in https://upstash.com/.well-known/api-catalog
+- OpenAPI specs for the product REST APIs: QStash https://upstash.com/docs/qstash/openapi.yaml · Workflow https://upstash.com/docs/workflow/openapi.yaml
+- The homepage, pricing pages and blog pages can be fetched as markdown by sending `Accept: text/markdown`; pricing pages and blog posts also have `.md` URLs (e.g. https://upstash.com/pricing/redis.md, https://upstash.com/blog.md). Unknown paths return a 404 with a markdown body.
+- Errors from these endpoints are JSON with `error`, `code` and `resolution` fields.
+- MCP server for managing Upstash resources from Claude, Cursor and other MCP clients: `npx @upstash/mcp-server` — https://github.com/upstash/mcp-server
+- Reusable agent skills for each SDK: `npx skills add https://github.com/upstash/skills`
+- Programmatic account and database management (authenticated): Developer API — https://upstash.com/docs/devops/developer-api
 
 ## Pricing & Limits
 

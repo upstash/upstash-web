@@ -3,7 +3,6 @@ import Container from "@/components/container";
 import PageBodyGradient from "@/components/page-body-gradient";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
-import { ApplyNow } from "./apply-now";
 import { Benefits } from "./benefits";
 
 const Page = () => {
@@ -69,17 +68,13 @@ const Page = () => {
 
         <Container className="max-w-screen-lg">
           <header>
-            <PageHeaderTitle as="h2">Apply now</PageHeaderTitle>
+            <PageHeaderTitle as="h2">Applications closed</PageHeaderTitle>
             <PageHeaderDesc className="mt-4">
-              Applications are reviewed on a rolling basis. Open until September
-              29th.
+              The open-source program is currently closed and not accepting new
+              applications. Follow us to hear about future openings.
             </PageHeaderDesc>
           </header>
         </Container>
-
-        <div className="mx-auto max-w-lg">
-          <ApplyNow />
-        </div>
       </section>
     </main>
   );

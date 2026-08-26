@@ -43,8 +43,8 @@ export function FastCardTitle({
   children: ReactNode;
 }) {
   return (
-    <h5 className="text-sm opacity-60 md:mt-1 md:text-base" {...props}>
+    <h3 className="text-sm opacity-60 md:mt-1 md:text-base" {...props}>
       {children}
-    </h5>
+    </h3>
   );
 }
