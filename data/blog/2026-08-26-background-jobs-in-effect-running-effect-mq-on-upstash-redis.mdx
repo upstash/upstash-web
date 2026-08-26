@@ -1,0 +1,161 @@
+---
+authors: [arda]
+slug: background-jobs-in-effect-running-effect-mq-on-upstash-redis
+tags: [redis, effect, queue]
+title: "Background Jobs in Effect: Running effect-mq on Upstash Redis"
+---
+
+effect-mq is a new background job library for the Effect ecosystem. You define a job once with a typed payload, enqueue it from your app, and a worker picks it up with retries, timeouts, and scheduling built in. It ships a Redis store, and in this post we run it on [Upstash Redis](https://upstash.com/docs/redis/howto/connect-client).
+
+## What is Effect?
+
+[Effect](https://www.effect.website/) is a TypeScript library that tracks three things in one type: what a computation returns on success, what errors it can fail with, and what dependencies it needs. That type is written as Effect<Success, Error, Requirements>. Here it is with typed errors:
+
+```ts
+import { Data, Effect } from "effect"
+
+class DivisionByZero extends Data.TaggedError("DivisionByZero")<{}> {}
+
+const divide = (a: number, b: number) =>
+  Effect.suspend(() => {
+    if (b === 0) return Effect.fail(new DivisionByZero())
+    return Effect.succeed(a / b)
+  })
+
+const program = divide(10, 0).pipe(
+  Effect.catchTag("DivisionByZero", () => Effect.succeed("Cannot divide by zero"))
+)
+
+console.log(Effect.runSync(program))
+```
+
+## What does effect-mq add?
+
+[effect-mq](https://www.effect-mq.com/guide/introduction) adds durable background jobs to Effect: schema-typed job definitions shared by producers and workers, at-least-once execution, retries with backoff, timeouts, delayed and cron scheduling, deduplication, and a store you can swap between memory, Postgres, and Redis implementations.
+
+A job is a class made with Job.make. The producer side gets enqueue (fire and forget, returns a job id) and execute (enqueue and await the typed result). The worker side gets toLayer, where you register the handler as a plain Effect function:
+
+```ts
+import { Effect, Schema } from "effect"
+import { Job } from "effect-mq"
+
+export class SendEmail extends Job.make("SendEmail", {
+  payload: { to: Schema.String, subject: Schema.String },
+  success: Schema.String,
+  defaults: { attempts: 3, backoff: { type: "exponential", delay: "1 second" } }
+}) {}
+
+export const program = Effect.gen(function* () {
+  const jobId = yield* SendEmail.enqueue({ to: "ada@example.com", subject: "Hello" })
+  const result = yield* SendEmail.execute({ to: "grace@example.com", subject: "Welcome" })
+  return { jobId, result }
+})
+export const SendEmailLive = SendEmail.toLayer((payload) => Effect.succeed(`sent to ${payload.to}`))
+```
+
+The payload and the success value are both schemas, so the producer and the worker share one typed contract. Handlers run as Effect fibers, so a [timeout interrupts the handler](https://www.effect-mq.com/guide/retries-and-timeouts) and a graceful shutdown lets running jobs finish.
+
+Retries follow the job record, so the attempts budget and backoff persist in the store. When a handler fails, the job goes back to the store and any worker can pick up the next attempt. effect-mq handles a crashed worker the same way: each claimed job has a lock and a heartbeat, and a stalled sweep returns the job to the queue after the worker dies.
+
+![](https://cdn.bydefault.so/drawing-YegQ2IT2dFF_PnchMs0_N.png)
+
+The maintainer, Adam Rankin, [built it after wrapping BullMQ with Effect](https://x.com/rankintweets/status/2092409678286197218) and missing the typed control he had elsewhere in the stack.
+
+## How do you run effect-mq on Upstash Redis?
+
+You point effect-mq's Redis store at the TLS (encrypted) connection URL from the Upstash console and provide it as a Layer. Nothing else in the job or worker code changes compared to any other Redis. Our [effect-mq integration documentation](https://upstash.com/docs/redis/integrations/effect-mq) has this setup too.
+
+You create a database in the [Upstash console](https://console.upstash.com) and copy the connection string from the TCP tab of the Connect section on the database page. It looks like this:
+
+```text
+REDIS_URL="rediss://default:UPSTASH_REDIS_PASSWORD@UPSTASH_REDIS_ENDPOINT:6379"
+```
+
+Then you install the packages. effect-mq targets [Effect v4](https://www.effect-mq.com/guide/getting-started), which is still a release candidate, while plain npm install effect gives you the stable v3 line. So both effect and @effect/platform-node need the RC tag:
+
+```sh
+npm install effect-mq effect@rc @effect/platform-node@rc redis
+```
+
+The versions used in this post: effect-mq 0.7.0, effect 4.0.0-rc.112, @effect/platform-node 4.0.0-rc.112, and redis 6.2.1. Here is the whole example, one file with a job, a handler, the Redis store, and a small program:
+
+```ts
+import { NodeRedis, NodeRuntime } from "@effect/platform-node"
+import { Effect, Layer, Schema } from "effect"
+import { Job, Worker } from "effect-mq"
+import { RedisJobStore } from "effect-mq/redis"
+
+class SendEmail extends Job.make("SendEmail", {
+  payload: { to: Schema.String, subject: Schema.String },
+  success: Schema.String,
+  defaults: { attempts: 3, backoff: { type: "exponential", delay: "1 second" } }
+}) {}
+
+const AppLive = SendEmail.toLayer(({ to, subject }) =>
+  Effect.succeed(`Sent "${subject}" to ${to}`)
+).pipe(
+  Layer.provideMerge(Worker.layer()),
+  Layer.provideMerge(
+    RedisJobStore.layer({ prefix: "upstash-demo" }).pipe(
+      Layer.provide(NodeRedis.layer({ url: process.env.REDIS_URL }))
+    )
+  )
+)
+
+const program = Effect.gen(function* () {
+  const result = yield* SendEmail.execute({ to: "ada@example.com", subject: "Hello" })
+  console.log(result)
+})
+
+NodeRuntime.runMain(program.pipe(Effect.provide(AppLive)))
+```
+
+Running it against an Upstash database prints:
+
+```text
+Sent "Hello" to ada@example.com
+```
+
+The RedisJobStore.layer call takes a prefix for the key namespace (default effect-mq) and an optional historyTtl, a time to live that sets how long Redis keeps finished job records before deleting them.
+
+In a real app you would split this file in two: the producer imports the job class and the Redis Layer and calls enqueue from your API routes, while a separate long-running worker process imports the same job class plus the handler Layer.
+
+## Connecting over HTTP
+
+The TCP connection above fits a long-running worker. From serverless and edge functions, where every invocation would open a fresh TLS connection, the [@upstash/redis](https://upstash.com/docs/redis/sdks/ts/overview) SDK is the better fit: it sends commands over HTTP with fetch, so there is no connection to manage.
+
+effect-mq's Redis store only needs a send function for raw commands and a subscribe function for pub/sub wake-ups, and @upstash/redis provides both. The [integration documentation has a ready-made UpstashRedis layer](https://upstash.com/docs/redis/integrations/effect-mq) you can copy into your project. With that file in place, the store swaps in with the REST URL and token from the REST tab of the Connect section:
+
+```ts
+import { RedisJobStore } from "effect-mq/redis"
+import { Layer } from "effect"
+import { UpstashRedis } from "./upstash-redis"
+
+const StoreLive = RedisJobStore.layer({ prefix: "upstash-demo" }).pipe(
+  Layer.provide(
+    UpstashRedis.layer({
+      url: process.env.UPSTASH_REDIS_REST_URL,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN
+    })
+  )
+)
+```
+
+Everything else stays the same: jobs, enqueue, execute, workers, and pub/sub wake-ups all work over HTTP, and running the example above with this store prints the same output. Both clients run the same Lua scripts against the same keys, so you can mix them under one prefix: enqueue over HTTP from serverless functions and run the worker over TCP on a long-running process.
+
+## What to consider before deploying
+
+The Redis store runs [every mutation as one atomic Lua script](https://www.effect-mq.com/storage/redis) and wakes idle workers over pub/sub with a [5 second polling fallback](https://www.effect-mq.com/storage/redis). The worker keeps subscribing, polling, and heartbeating for as long as it runs, so it belongs in a persistent process rather than a short-lived function, over TCP or HTTP alike.
+
+Delivery is at-least-once, so a handler can run more than once for the same job when a worker dies mid-run. The effect-mq documentation [recommends idempotent handlers](https://www.effect-mq.com/guide/introduction), and the idempotencyKey option on Job.make deduplicates enqueues that would create the same work twice.
+
+An idle worker still sends commands to Redis: the pub/sub subscription, the polling fallback every 5 seconds, and a [schedule sweep every 15 seconds by default](https://www.effect-mq.com/storage/redis). On the pay-as-you-go plan those commands bill at [$0.2 per 100K commands](https://upstash.com/docs/redis/overall/pricing), while fixed plans start at $10 per month for 250 MB with no command-count billing. We give the [same advice for BullMQ](https://upstash.com/docs/redis/integrations/bullmq), which also produces steady traffic on an idle queue.
+
+The store documentation recommends setting historyTtl or per-job keep options so finished job records get cleaned up. The list API can walk all jobs for some filters, so it's meant for dashboards rather than large lists of finished jobs. The store targets a [single Redis node](https://www.effect-mq.com/storage/redis), which is what an Upstash database is. Its keys carry no hash tags, so Redis Cluster is out.
+
+## Recap
+
+- Effect tracks success, errors, and dependencies in one type. effect-mq builds jobs, workers, and stores on top of it.
+- effect-mq gives you typed payloads and results, at-least-once delivery, retries, timeouts, and cron scheduling.
+- The Redis store works on Upstash over the TLS TCP URL with NodeRedis.layer, or over HTTP with @upstash/redis.
+- The driver uses Lua scripts and pub/sub, so the worker is a long-lived process, and a fixed plan fits the steady command traffic.
