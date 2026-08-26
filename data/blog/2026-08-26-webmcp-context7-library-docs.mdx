@@ -10,7 +10,7 @@ AI agents can read pages, click buttons and fill out forms. But they still have 
 
 [WebMCP](https://github.com/webmachinelearning/webmcp) gives them a direct path. A website can register structured tools that browser agents discover and call from the page.
 
-For a library website, that tool could search the docs. Instead of making an agent scan page after page, we can expose a `query_library_docs` tool and use [Context7](https://context7.com) to retrieve the right documentation in the background.
+For a library website, that tool could search the docs. Instead of making an agent scan page after page, we can expose a `query_upstash_docs` tool and use [Context7](https://context7.com) to retrieve the right documentation in the background.
 
 Let's build it.
 
@@ -37,7 +37,7 @@ You need:
 - A server endpoint in your website
 - Chrome 149 or later with experimental WebMCP support enabled
 
-You can find the library ID in the URL of its Context7 page. The ID for Next.js, for example, is `/vercel/next.js`.
+You can find the library ID in the URL of its Context7 page. We will use `/upstash/docs`, which contains the official documentation for Upstash products.
 
 Keep this ID on the server. The tool only needs to answer questions about your library, so the agent should not be able to choose a different ID.
 
@@ -45,47 +45,55 @@ Keep this ID on the server. The tool only needs to answer questions about your l
 
 First, add a server endpoint that takes a question and sends it to the [Context7 API](https://context7.com/docs/api-guide).
 
+Install the [Context7 SDK](https://www.npmjs.com/package/@upstash/context7-sdk) and Zod:
+
+```bash title="Terminal"
+pnpm add @upstash/context7-sdk zod
+```
+
 The following example uses a Next.js route handler:
 
 ```ts title="app/api/agent/docs/route.ts"
-const CONTEXT7_LIBRARY_ID = "/acme/acme-sdk";
+import { Context7 } from "@upstash/context7-sdk";
+import { z } from "zod";
+
+const CONTEXT7_LIBRARY_ID = "/upstash/docs";
+const context7 = new Context7();
+
+const QuerySchema = z
+  .object({
+    query: z.string().trim().min(1).max(500),
+  })
+  .strict();
 
 export async function POST(request: Request) {
-  const body = (await request.json()) as { query?: unknown };
+  const body = await request.json().catch(() => null);
+  const parsed = QuerySchema.safeParse(body);
 
-  if (
-    typeof body.query !== "string" ||
-    body.query.length < 1 ||
-    body.query.length > 500
-  ) {
+  if (!parsed.success) {
     return Response.json(
       { error: "Query must contain between 1 and 500 characters." },
       { status: 400 },
     );
   }
 
-  const url = new URL("https://context7.com/api/v2/context");
-  url.searchParams.set("libraryId", CONTEXT7_LIBRARY_ID);
-  url.searchParams.set("query", body.query);
-  url.searchParams.set("type", "txt");
+  try {
+    const context = await context7.getContext(
+      parsed.data.query,
+      CONTEXT7_LIBRARY_ID,
+      { type: "txt" },
+    );
 
-  const response = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${process.env.CONTEXT7_API_KEY}`,
-    },
-  });
-
-  if (!response.ok) {
+    return Response.json({
+      libraryId: CONTEXT7_LIBRARY_ID,
+      context,
+    });
+  } catch {
     return Response.json(
       { error: "Context7 documentation lookup failed." },
-      { status: response.status },
+      { status: 502 },
     );
   }
-
-  return Response.json({
-    libraryId: CONTEXT7_LIBRARY_ID,
-    context: await response.text(),
-  });
 }
 ```
 
@@ -95,13 +103,13 @@ Add your Context7 API key to the server environment:
 CONTEXT7_API_KEY=ctx7sk_your_key
 ```
 
-Keep the API key out of client-side code. WebMCP tools run in the page, where users, browser extensions and other scripts could read it.
+The SDK reads `CONTEXT7_API_KEY` from the environment. Keep the key out of client-side code. WebMCP tools run in the page, where users, browser extensions and other scripts could read it.
 
 ## Register the WebMCP Tool
 
 Now register a tool when the page loads:
 
-```js
+```js title="register-upstash-docs-tool.js"
 const modelContext = document.modelContext;
 
 if (modelContext) {
@@ -109,17 +117,17 @@ if (modelContext) {
 
   await modelContext.registerTool(
     {
-      name: "query_library_docs",
-      title: "Search library documentation",
+      name: "query_upstash_docs",
+      title: "Search Upstash documentation",
       description:
-        "Retrieves current documentation and code examples for the Acme SDK.",
+        "Retrieves current documentation and code examples for Upstash products.",
       inputSchema: {
         type: "object",
         properties: {
           query: {
             type: "string",
             description:
-              "A specific implementation or API question about the Acme SDK.",
+              "A specific implementation or API question about an Upstash product.",
             minLength: 1,
             maxLength: 500,
           },
@@ -166,17 +174,18 @@ Chrome versions differ in whether they pass the second argument to `execute`, so
 
 WebMCP gets more useful when the tool knows which page is open.
 
-For example, a versioned documentation site can register the library ID for the selected version:
+For example, an Upstash documentation page can select a product-specific source:
 
-```ts
+```ts title="lib/context7-libraries.ts"
 const LIBRARY_IDS = {
-  latest: "/acme/acme-sdk",
-  v2: "/acme/acme-sdk/v2.8.0",
-  v1: "/acme/acme-sdk/v1.14.2",
+  all: "/upstash/docs",
+  redis: "/websites/upstash_redis",
+  vector: "/websites/upstash_vector",
+  workflow: "/websites/upstash_workflow",
 } as const;
 ```
 
-Keep this mapping on the server and accept only known versions. You can also include the current page in the query:
+Keep this mapping on the server and accept only known products. You can also include the current page in the query:
 
 ```js
 body: JSON.stringify({
@@ -212,7 +221,7 @@ You can discover and invoke the tool directly from DevTools:
 
 ```js
 const tools = await document.modelContext.getTools();
-const tool = tools.find(({ name }) => name === "query_library_docs");
+const tool = tools.find(({ name }) => name === "query_upstash_docs");
 
 await document.modelContext.executeTool(
   tool,
@@ -228,11 +237,11 @@ The Chrome flag is only for local development. To make WebMCP available to visit
 
 Try questions such as:
 
-- How do I authenticate with the Acme SDK?
-- Show me the current pagination API.
-- How can I migrate this example from version 1 to version 2?
+- How do I connect to Upstash Redis from Next.js?
+- How do I verify a QStash signature?
+- How do I create an Upstash Workflow endpoint?
 
-Make sure the agent selects `query_library_docs`, the server uses the expected library ID, and cancellation and error responses work.
+Make sure the agent selects `query_upstash_docs`, the server uses the expected library ID, and cancellation and error responses work.
 
 Before deploying, add the usual server protections:
 
@@ -257,3 +266,4 @@ WebMCP is still experimental, so ship this as a progressive enhancement and foll
 - [WebMCP Imperative API](https://developer.chrome.com/docs/ai/webmcp/imperative-api)
 - [WebMCP explainer](https://github.com/webmachinelearning/webmcp)
 - [Context7 API guide](https://context7.com/docs/api-guide)
+- [Context7 TypeScript SDK](https://context7.com/docs/sdks/ts/getting-started)
