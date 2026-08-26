@@ -16,7 +16,7 @@ export default function Fast() {
       <Bg className="!top-24" />
 
       {/* slogan */}
-      <h5
+      <h2
         style={{
           animationDuration: "4s",
         }}
@@ -29,7 +29,7 @@ export default function Fast() {
         )}
       >
         Fast Anywhere
-      </h5>
+      </h2>
 
       {/* globe */}
       <img

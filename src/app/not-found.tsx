@@ -4,17 +4,9 @@ import Button from "@/components/button";
 import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
-import { negotiate } from "@/lib/accept";
-import { headers } from "next/headers";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
-export default async function NotFound() {
-  const accept = (await headers()).get("accept") ?? "";
-  if (negotiate(accept) === "markdown") {
-    redirect("/404.md");
-  }
-
+export default function NotFound() {
   return (
     <main className="relative z-0 py-16 text-center md:py-24">
       <Bg />

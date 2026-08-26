@@ -23,7 +23,7 @@ export function SectionHeaderTitle({
   ...props
 }: ISectionHeader) {
   return (
-    <h3
+    <h2
       className={cx(
         "font-display text-4xl font-semibold md:text-5xl",
         className,
@@ -31,7 +31,7 @@ export function SectionHeaderTitle({
       {...props}
     >
       {children}
-    </h3>
+    </h2>
   );
 }
 

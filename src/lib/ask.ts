@@ -24,6 +24,7 @@ export function notFoundMarkdown(): string {
     "Other entry points:",
     "",
     `- ${SITE_URL}/llms.txt`,
+    `- ${SITE_URL}/sitemap.xml`,
     `- ${SITE_URL}/docs`,
     `- ${SITE_URL}/blog.md`,
     "",

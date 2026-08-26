@@ -33,7 +33,7 @@ export function CommunityBoxTitle({
   ...props
 }: HTMLProps<HTMLHeadingElement>) {
   return (
-    <h4
+    <h3
       className={cx(
         "font-display text-xl font-semibold group-hover:text-primary md:text-2xl",
         className,
@@ -41,7 +41,7 @@ export function CommunityBoxTitle({
       {...props}
     >
       {children}
-    </h4>
+    </h3>
   );
 }
 

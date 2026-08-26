@@ -50,16 +50,34 @@ const nextConfig = {
       },
     ],
   },
-  rewrites: () => [
-    {
-      source: "/docs",
-      destination: "https://upstash.mintlify.dev/docs",
-    },
-    {
-      source: "/docs/:match*",
-      destination: "https://upstash.mintlify.dev/docs/:match*",
-    },
-  ],
+  rewrites: () => ({
+    afterFiles: [
+      {
+        source: "/docs",
+        destination: "https://upstash.mintlify.dev/docs",
+      },
+      {
+        source: "/docs/:match*",
+        destination: "https://upstash.mintlify.dev/docs/:match*",
+      },
+    ],
+    // Only reached when no page, route or static file matched: agents that
+    // ask for markdown or JSON get a 404 in that format instead of the HTML
+    // not-found page.
+    fallback: [
+      {
+        source: "/:path*",
+        has: [{ type: "header", key: "accept", value: ".*text/markdown.*" }],
+        destination: "/404.md",
+      },
+      {
+        source: "/:path*",
+        has: [{ type: "header", key: "accept", value: ".*application/json.*" }],
+        missing: [{ type: "header", key: "accept", value: ".*text/html.*" }],
+        destination: "/404.json",
+      },
+    ],
+  }),
   async headers() {
     return [
       {
@@ -82,13 +100,24 @@ const nextConfig = {
             value: [
               '<https://upstash.com/llms.txt>; rel="alternate"; type="text/plain"; title="LLM-friendly content index"',
               '<https://upstash.com/ask?q=your+question>; rel="search"; type="application/json"; title="Upstash answer index"',
+              '<https://upstash.com/docs/devops/developer-api/openapi.yaml>; rel="service-desc"; type="application/openapi+yaml"; title="Upstash Developer API (OpenAPI)"',
+              '<https://upstash.com/docs/qstash/openapi.yaml>; rel="service-desc"; type="application/openapi+yaml"; title="QStash REST API (OpenAPI)"',
+              '<https://upstash.com/docs/workflow/openapi.yaml>; rel="service-desc"; type="application/openapi+yaml"; title="Upstash Workflow REST API (OpenAPI)"',
             ].join(", "),
           },
         ],
       },
       {
-        // Blog HTML responses are content-negotiated against text/markdown,
-        // so caches must differentiate by Accept.
+        // Blog, home and pricing HTML responses are content-negotiated
+        // against text/markdown, so caches must differentiate by Accept.
+        source: "/",
+        headers: [{ key: "Vary", value: "Accept" }],
+      },
+      {
+        source: "/pricing/:product",
+        headers: [{ key: "Vary", value: "Accept" }],
+      },
+      {
         source: "/blog",
         headers: [{ key: "Vary", value: "Accept" }],
       },

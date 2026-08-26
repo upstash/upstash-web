@@ -111,9 +111,9 @@ export default function HomeAgents() {
           <AgentCard className="lg:col-span-2">
             <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:gap-12">
               <div className="flex flex-col items-start lg:w-1/2">
-                <h4 className="font-display text-xl font-semibold md:text-2xl">
+                <h3 className="font-display text-xl font-semibold md:text-2xl">
                   Skills
-                </h4>
+                </h3>
 
                 <p className="mt-2 text-text-mute md:mt-3">
                   Packaged instructions covering every Upstash SDK plus the full
@@ -158,9 +158,9 @@ export default function HomeAgents() {
 
           {/* MCP Server */}
           <AgentCard>
-            <h4 className="font-display text-xl font-semibold md:text-2xl">
+            <h3 className="font-display text-xl font-semibold md:text-2xl">
               MCP Server
-            </h4>
+            </h3>
 
             <p className="mt-2 grow text-text-mute md:mt-3">
               Manage and debug your resources straight from your editor: create
@@ -175,9 +175,9 @@ export default function HomeAgents() {
 
           {/* CLI */}
           <AgentCard>
-            <h4 className="font-display text-xl font-semibold md:text-2xl">
+            <h3 className="font-display text-xl font-semibold md:text-2xl">
               CLI
-            </h4>
+            </h3>
 
             <p className="mt-2 grow text-text-mute md:mt-3">
               Full resource management from the terminal or CI/CD, with JSON

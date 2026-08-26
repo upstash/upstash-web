@@ -30,7 +30,7 @@ export function ServerlessTitle({
   link?: string;
 }) {
   return (
-    <h4
+    <h3
       className={cx(
         "flex items-center gap-2 font-display text-xl font-semibold md:text-2xl",
         className,
@@ -46,7 +46,7 @@ export function ServerlessTitle({
           </Button>
         </span>
       )}
-    </h4>
+    </h3>
   );
 }
 
