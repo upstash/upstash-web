@@ -6,17 +6,17 @@ authors: [fahreddin]
 tags: [context7, webmcp, ai, documentation]
 ---
 
-AI agents can already browse websites by reading the page, finding buttons and filling forms. This works, but it makes the agent infer what a website can do from a user interface designed for people.
+AI agents can read pages, click buttons and fill out forms. But they still have to guess what a website can do from an interface built for people.
 
-[WebMCP](https://github.com/webmachinelearning/webmcp) gives websites another option. A page can register structured tools that browser agents can discover and call. Each tool has a name, a description, an input schema and a JavaScript function that handles the request.
+[WebMCP](https://github.com/webmachinelearning/webmcp) gives them a direct path. A website can register structured tools that browser agents discover and call from the page.
 
-For a library website, one useful tool is documentation search. Instead of asking an agent to scan several pages, we can expose a `query_library_docs` tool and use [Context7](https://context7.com) to retrieve current, relevant documentation in the background.
+For a library website, that tool could search the docs. Instead of making an agent scan page after page, we can expose a `query_library_docs` tool and use [Context7](https://context7.com) to retrieve the right documentation in the background.
 
-In this guide, we will build that integration.
+Let's build it.
 
 ## How It Works
 
-The request follows a short path:
+Here is what happens when an agent calls the tool:
 
 1. A browser agent opens your library website.
 2. The page registers a WebMCP documentation tool.
@@ -24,9 +24,9 @@ The request follows a short path:
 4. Your server sends the question to Context7.
 5. Context7 returns relevant documentation and code examples.
 
-Your website owns the tool and its user experience. Context7 handles documentation ingestion, updates and retrieval.
+Your website controls the tool and how it behaves. Context7 handles ingesting, updating and retrieving the documentation.
 
-WebMCP is not a replacement for a regular MCP server. A regular MCP server can be configured directly in an IDE or another agent client. WebMCP tools belong to the open page and use the current browser session. This makes them useful when a person and an agent are working together on the same website.
+WebMCP does not replace a regular MCP server. You configure a regular MCP server in an IDE or agent client. A WebMCP tool belongs to the open page and can use the current browser session. It is a good fit when a person and an agent are working on the same website.
 
 ## Before You Start
 
@@ -37,13 +37,13 @@ You need:
 - A server endpoint in your website
 - A browser with experimental WebMCP support enabled
 
-You can find your Context7 library ID in the URL of its Context7 page. For example, the ID for Next.js is `/vercel/next.js`.
+You can find the library ID in the URL of its Context7 page. The ID for Next.js, for example, is `/vercel/next.js`.
 
-Keep this ID on your server. Your tool is meant to answer questions about your library, so there is no reason to let an agent choose an arbitrary Context7 library ID.
+Keep this ID on the server. The tool only needs to answer questions about your library, so the agent should not be able to choose a different ID.
 
 ## Create a Context7 Endpoint
 
-First, add a server endpoint that accepts a documentation question and calls the [Context7 API](https://context7.com/docs/api-guide).
+First, add a server endpoint that takes a question and sends it to the [Context7 API](https://context7.com/docs/api-guide).
 
 The following example uses a Next.js route handler:
 
@@ -97,7 +97,7 @@ Add your Context7 API key to the server environment:
 CONTEXT7_API_KEY=ctx7sk_your_key
 ```
 
-Do not put the key in client-side code. A WebMCP tool runs in the page, so secrets included in that code can be read by users, browser extensions and other scripts.
+Keep the API key out of client-side code. WebMCP tools run in the page, where users, browser extensions and other scripts could read it.
 
 ## Register the WebMCP Tool
 
@@ -158,9 +158,9 @@ if (modelContext) {
 }
 ```
 
-The feature check keeps the website working in browsers without WebMCP. The regular documentation interface remains available, and supported agents get an additional structured path.
+The feature check keeps the site working in browsers without WebMCP. Everyone still gets the normal documentation site. Supported agents also get the structured tool.
 
-The registration `AbortSignal` removes the tool when the page or component is no longer active. The signal passed to `execute` lets an agent cancel an in-progress request.
+The registration `AbortSignal` removes the tool when the page or component is no longer active. The signal passed to `execute` also lets the agent cancel a request in progress.
 
 ## Why the Tool Is Marked as Untrusted
 
@@ -173,13 +173,13 @@ annotations: {
 }
 ```
 
-`readOnlyHint` tells the agent that the tool only reads documentation and does not change application data.
+`readOnlyHint` tells the agent that the tool reads documentation but does not change application data.
 
-`untrustedContentHint` tells the agent to treat the result as external content. Context7 retrieves documentation from repositories and websites. That content is useful, but it should not be treated as system instructions. This annotation helps agents maintain that trust boundary.
+`untrustedContentHint` tells the agent to treat the result as external content. Context7 retrieves documentation from repositories and websites. The content is useful, but it is not a set of system instructions. This annotation makes that boundary explicit.
 
 ## Make the Tool Page-Aware
 
-You can improve the tool by including information from the page that is already open.
+WebMCP gets more useful when the tool knows which page is open.
 
 For example, a versioned documentation site can register the library ID for the selected version:
 
@@ -191,7 +191,7 @@ const LIBRARY_IDS = {
 } as const;
 ```
 
-Keep the mapping on the server and accept only known versions. You can also add the current documentation section to the query:
+Keep this mapping on the server and accept only known versions. You can also include the current page in the query:
 
 ```js
 body: JSON.stringify({
@@ -199,7 +199,7 @@ body: JSON.stringify({
 }),
 ```
 
-This is where WebMCP is especially useful. The page, the user and the agent share the same context.
+Now the agent does not have to explain what it is looking at. The page already provides that context.
 
 ## Test the Integration
 
@@ -217,9 +217,9 @@ Try questions such as:
 - Show me the current pagination API.
 - How can I migrate this example from version 1 to version 2?
 
-Check that the agent selects `query_library_docs`, that the server uses the expected library ID and that cancellation and error responses work correctly.
+Make sure the agent selects `query_library_docs`, the server uses the expected library ID, and cancellation and error responses work.
 
-Before deploying, also add your normal server protections:
+Before deploying, add the usual server protections:
 
 - Authentication where needed
 - Rate limiting
@@ -229,8 +229,8 @@ Before deploying, also add your normal server protections:
 
 ## Conclusion
 
-WebMCP gives browser agents a structured way to use features on the current page. Context7 gives those tools access to current, version-specific library documentation.
+WebMCP gives browser agents a structured way to use the current website. Context7 gives those tools current, version-specific library documentation.
 
-Together, they let library owners make documentation agent-ready with a small amount of code. The website keeps its normal human interface, browser agents get a reliable documentation tool and the library team does not need to build its own crawling and retrieval system.
+Together, they make a documentation site agent-ready with a small amount of code. People keep the same website, agents get a reliable docs tool, and the library team does not have to build its own crawling and retrieval system.
 
-WebMCP is still evolving, so treat this integration as a progressive enhancement and follow the [WebMCP repository](https://github.com/webmachinelearning/webmcp) for API changes.
+WebMCP is still experimental, so ship this as a progressive enhancement and follow the [WebMCP repository](https://github.com/webmachinelearning/webmcp) for API changes.
