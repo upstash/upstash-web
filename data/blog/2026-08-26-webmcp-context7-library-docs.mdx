@@ -118,9 +118,10 @@ The SDK reads `CONTEXT7_API_KEY` from the environment. Keep the key out of clien
 The [WebMCP Imperative API](https://developer.chrome.com/docs/ai/webmcp/imperative-api) must be called by client-side JavaScript after the page loads. In a Next.js application, put the registration in a [Client Component](https://nextjs.org/docs/app/getting-started/server-and-client-components) at `components/register-upstash-docs-tool.tsx`. The `webmcp-types` development dependency adds the experimental `document.modelContext` API to TypeScript's browser types.
 
 ```tsx title="components/register-upstash-docs-tool.tsx"
+/// <reference types="webmcp-types" />
+
 "use client";
 
-import type {} from "webmcp-types";
 import { useEffect } from "react";
 
 export function RegisterUpstashDocsTool() {
