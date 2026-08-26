@@ -47,9 +47,7 @@ First, add a server endpoint that takes a question and sends it to the [Context7
 
 The following example uses a Next.js route handler:
 
-```ts
-// app/api/agent/docs/route.ts
-
+```ts title="app/api/agent/docs/route.ts"
 const CONTEXT7_LIBRARY_ID = "/acme/acme-sdk";
 
 export async function POST(request: Request) {
@@ -93,7 +91,7 @@ export async function POST(request: Request) {
 
 Add your Context7 API key to the server environment:
 
-```bash
+```bash title=".env.local"
 CONTEXT7_API_KEY=ctx7sk_your_key
 ```
 
