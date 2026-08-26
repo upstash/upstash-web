@@ -112,7 +112,6 @@ if (modelContext) {
   await modelContext.registerTool(
     {
       name: "query_library_docs",
-      title: "Search library documentation",
       description:
         "Retrieves current documentation and code examples for the Acme SDK.",
       inputSchema: {
@@ -128,10 +127,6 @@ if (modelContext) {
         },
         required: ["query"],
         additionalProperties: false,
-      },
-      annotations: {
-        readOnlyHint: true,
-        untrustedContentHint: true,
       },
       async execute({ query }, { signal }) {
         const response = await fetch("/api/agent/docs", {
@@ -161,21 +156,6 @@ if (modelContext) {
 The feature check keeps the site working in browsers without WebMCP. Everyone still gets the normal documentation site. Supported agents also get the structured tool.
 
 The registration `AbortSignal` removes the tool when the page or component is no longer active. The signal passed to `execute` also lets the agent cancel a request in progress.
-
-## Why the Tool Is Marked as Untrusted
-
-The example uses two WebMCP annotations:
-
-```js
-annotations: {
-  readOnlyHint: true,
-  untrustedContentHint: true,
-}
-```
-
-`readOnlyHint` tells the agent that the tool reads documentation but does not change application data.
-
-`untrustedContentHint` tells the agent to treat the result as external content. Context7 retrieves documentation from repositories and websites. The content is useful, but it is not a set of system instructions. This annotation makes that boundary explicit.
 
 ## Make the Tool Page-Aware
 
@@ -211,6 +191,8 @@ chrome://flags/#enable-webmcp-testing
 
 After restarting the browser, open your website and inspect its registered tools with the [Model Context Tool Inspector](https://developer.chrome.com/docs/ai/webmcp/#imitate-agent-chat-with-the-inspector-extension).
 
+WebMCP also requires an origin-isolated document. Do not disable origin isolation with `document.domain` or an `Origin-Agent-Cluster: ?0` header.
+
 Try questions such as:
 
 - How do I authenticate with the Acme SDK?
@@ -225,6 +207,7 @@ Before deploying, add the usual server protections:
 - Rate limiting
 - Input validation
 - Request logging
+- Response caching
 - Context7 error and quota handling
 
 ## Conclusion
