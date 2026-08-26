@@ -63,21 +63,7 @@ import { Context7 } from "@upstash/context7-sdk";
 import { z } from "zod";
 
 const CONTEXT7_LIBRARY_ID = "/upstash/docs";
-const MAX_TOOL_OUTPUT_LENGTH = 1_500;
 const context7 = new Context7();
-
-function limitToolOutput(context: string) {
-  const notice =
-    "\n\n[Result truncated. Ask a narrower question for more detail.]";
-
-  if (context.length <= MAX_TOOL_OUTPUT_LENGTH) {
-    return context;
-  }
-
-  return `${context
-    .slice(0, MAX_TOOL_OUTPUT_LENGTH - notice.length)
-    .trimEnd()}${notice}`;
-}
 
 const QuerySchema = z
   .object({
@@ -105,7 +91,7 @@ export async function POST(request: Request) {
 
     return Response.json({
       libraryId: CONTEXT7_LIBRARY_ID,
-      context: limitToolOutput(context),
+      context,
     });
   } catch {
     return Response.json(
@@ -117,8 +103,6 @@ export async function POST(request: Request) {
 ```
 
 The SDK's [`getContext` method](https://context7.com/docs/sdks/ts/commands/get-context) accepts the question and library ID. Passing `{ type: "txt" }` returns a single plain-text result that the tool can send back to the agent.
-
-[Chrome recommends concise WebMCP tool outputs](https://developer.chrome.com/docs/ai/webmcp/secure-tools), with about 1,500 characters per result. The helper keeps the response within that budget and tells the agent to ask a narrower question when needed.
 
 Add your Context7 API key to the server environment:
 
