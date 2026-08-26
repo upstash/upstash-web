@@ -35,7 +35,7 @@ You need:
 - A library indexed by Context7
 - A Context7 API key
 - A server endpoint in your website
-- A browser with experimental WebMCP support enabled
+- Chrome 149 or later with experimental WebMCP support enabled
 
 You can find the library ID in the URL of its Context7 page. The ID for Next.js, for example, is `/vercel/next.js`.
 
@@ -112,6 +112,7 @@ if (modelContext) {
   await modelContext.registerTool(
     {
       name: "query_library_docs",
+      title: "Search library documentation",
       description:
         "Retrieves current documentation and code examples for the Acme SDK.",
       inputSchema: {
@@ -128,7 +129,11 @@ if (modelContext) {
         required: ["query"],
         additionalProperties: false,
       },
-      async execute({ query }, { signal }) {
+      annotations: {
+        readOnlyHint: true,
+        untrustedContentHint: true,
+      },
+      async execute({ query }, { signal } = {}) {
         const response = await fetch("/api/agent/docs", {
           method: "POST",
           headers: {
@@ -155,7 +160,9 @@ if (modelContext) {
 
 The feature check keeps the site working in browsers without WebMCP. Everyone still gets the normal documentation site. Supported agents also get the structured tool.
 
-The registration `AbortSignal` removes the tool when the page or component is no longer active. The signal passed to `execute` also lets the agent cancel a request in progress.
+The annotations tell compatible agents that this tool only reads data and that its result comes from an external source. The registration `AbortSignal` removes the tool when the page or component is no longer active.
+
+Chrome versions differ in whether they pass the second argument to `execute`, so the example defaults it to an empty object. Browsers that provide the execution signal can still cancel the Context7 request.
 
 ## Make the Tool Page-Aware
 
@@ -183,15 +190,43 @@ Now the agent does not have to explain what it is looking at. The page already p
 
 ## Test the Integration
 
-WebMCP is still experimental. In Chrome, you can test locally by enabling:
+WebMCP is still experimental. For local development, open this flag in Chrome 149 or later:
 
 ```text
 chrome://flags/#enable-webmcp-testing
 ```
 
-After restarting the browser, open your website and inspect its registered tools with the [Model Context Tool Inspector](https://developer.chrome.com/docs/ai/webmcp/#imitate-agent-chat-with-the-inspector-extension).
+Set it to **Enabled**, relaunch Chrome, start your local server and open its full URL, including the port. For example:
+
+```text
+http://localhost:3000
+```
+
+Run this in DevTools on that page:
+
+```js
+document.modelContext;
+```
+
+It should return an object. If it returns `undefined`, make sure you are on your application page rather than a Chrome error page and that Chrome was relaunched after enabling the flag.
+
+You can discover and invoke the tool directly from DevTools:
+
+```js
+const tools = await document.modelContext.getTools();
+const tool = tools.find(({ name }) => name === "query_library_docs");
+
+await document.modelContext.executeTool(
+  tool,
+  JSON.stringify({ query: "How do I authenticate?" }),
+);
+```
+
+`executeTool` expects the input arguments as a JSON string. You can also inspect registered tools with the [Model Context Tool Inspector](https://developer.chrome.com/docs/ai/webmcp/#imitate-agent-chat-with-the-inspector-extension).
 
 WebMCP also requires an origin-isolated document. Do not disable origin isolation with `document.domain` or an `Origin-Agent-Cluster: ?0` header.
+
+The Chrome flag is only for local development. To make WebMCP available to visitors during the experiment, register your deployed origin for the [WebMCP origin trial](https://developer.chrome.com/origintrials/#/view_trial/4163014905550602241) and add its token to your pages as an `Origin-Trial` response header or meta tag.
 
 Try questions such as:
 
@@ -217,3 +252,10 @@ WebMCP gives browser agents a structured way to use the current website. Context
 Together, they make a documentation site agent-ready with a small amount of code. People keep the same website, agents get a reliable docs tool, and the library team does not have to build its own crawling and retrieval system.
 
 WebMCP is still experimental, so ship this as a progressive enhancement and follow the [WebMCP repository](https://github.com/webmachinelearning/webmcp) for API changes.
+
+## References
+
+- [WebMCP overview](https://developer.chrome.com/docs/ai/webmcp/)
+- [WebMCP Imperative API](https://developer.chrome.com/docs/ai/webmcp/imperative-api)
+- [WebMCP explainer](https://github.com/webmachinelearning/webmcp)
+- [Context7 API guide](https://context7.com/docs/api-guide)
