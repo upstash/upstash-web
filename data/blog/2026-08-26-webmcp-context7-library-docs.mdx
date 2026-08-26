@@ -1,14 +1,16 @@
 ---
 slug: webmcp-context7
-title: "Serve Your Docs with WebMCP and Context7"
-description: "Learn how to expose current library documentation to browser agents with a small WebMCP tool backed by Context7."
+title: "WebMCP Opens Your Website to Agents"
+description: "Open your documentation site to ChatGPT, Codex and other browser agents with WebMCP and Context7."
 authors: [fahreddin]
 tags: [context7, webmcp, ai, documentation]
 ---
 
-AI agents can read pages, click buttons and fill out forms. But they still have to guess what a website can do from an interface built for people.
+[ChatGPT and Codex are adding WebMCP support through site tools](https://help.openai.com/en/articles/20001423-using-site-tools-in-the-chatgpt-desktop-app). In the ChatGPT desktop app's built-in browser, supported accounts can discover and call tools provided by the open page.
 
-[WebMCP](https://github.com/webmachinelearning/webmcp) gives them a direct path. A website can register structured tools that browser agents discover and call from the page.
+Without a site tool, an agent has to read the page, find buttons and fill out forms. It has to infer what the website can do from an interface built for people.
+
+[WebMCP](https://github.com/webmachinelearning/webmcp) gives it a direct path. A website can register structured tools that browser agents discover and call from the page.
 
 For a library website, that tool could search the docs. Instead of making an agent scan page after page, we can expose a `query_upstash_docs` tool and use [Context7](https://context7.com) to retrieve the right documentation in the background.
 
@@ -265,5 +267,6 @@ WebMCP is still experimental, so ship this as a progressive enhancement and foll
 - [WebMCP overview](https://developer.chrome.com/docs/ai/webmcp/)
 - [WebMCP Imperative API](https://developer.chrome.com/docs/ai/webmcp/imperative-api)
 - [WebMCP explainer](https://github.com/webmachinelearning/webmcp)
+- [Site tools in the ChatGPT desktop app](https://help.openai.com/en/articles/20001423-using-site-tools-in-the-chatgpt-desktop-app)
 - [Context7 API guide](https://context7.com/docs/api-guide)
 - [Context7 TypeScript SDK](https://context7.com/docs/sdks/ts/getting-started)
