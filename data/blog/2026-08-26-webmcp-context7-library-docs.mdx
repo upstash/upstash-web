@@ -54,6 +54,7 @@ Install the [Context7 TypeScript SDK](https://context7.com/docs/sdks/ts/getting-
 
 ```bash title="Terminal"
 pnpm add @upstash/context7-sdk zod
+pnpm add -D webmcp-types
 ```
 
 The following example uses a Next.js route handler:
@@ -114,11 +115,12 @@ The SDK reads `CONTEXT7_API_KEY` from the environment. Keep the key out of clien
 
 ## Register the WebMCP Tool
 
-The [WebMCP Imperative API](https://developer.chrome.com/docs/ai/webmcp/imperative-api) must be called by client-side JavaScript after the page loads. In a Next.js application, put the registration in a [Client Component](https://nextjs.org/docs/app/getting-started/server-and-client-components) at `components/register-upstash-docs-tool.jsx`:
+The [WebMCP Imperative API](https://developer.chrome.com/docs/ai/webmcp/imperative-api) must be called by client-side JavaScript after the page loads. In a Next.js application, put the registration in a [Client Component](https://nextjs.org/docs/app/getting-started/server-and-client-components) at `components/register-upstash-docs-tool.tsx`. The `webmcp-types` development dependency adds the experimental `document.modelContext` API to TypeScript's browser types.
 
-```jsx title="components/register-upstash-docs-tool.jsx"
+```tsx title="components/register-upstash-docs-tool.tsx"
 "use client";
 
+import type {} from "webmcp-types";
 import { useEffect } from "react";
 
 export function RegisterUpstashDocsTool() {
@@ -156,7 +158,7 @@ export function RegisterUpstashDocsTool() {
             readOnlyHint: true,
             untrustedContentHint: true,
           },
-          async execute({ query }, { signal } = {}) {
+          async execute({ query }, { signal }) {
             const response = await fetch("/api/agent/docs", {
               method: "POST",
               headers: {
@@ -194,10 +196,11 @@ export function RegisterUpstashDocsTool() {
 
 Render this component from your root layout so the tool is available on every page:
 
-```jsx title="app/layout.jsx"
+```tsx title="app/layout.tsx"
 import { RegisterUpstashDocsTool } from "@/components/register-upstash-docs-tool";
+import type { ReactNode } from "react";
 
-export default function RootLayout({ children }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body>
