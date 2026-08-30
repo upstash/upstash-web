@@ -1,0 +1,44 @@
+{
+  "faq": [
+    {
+      "question": "What is a simple operation and what is an advanced operation?",
+      "answer": "Simple operations are reads: downloading an object, reading its metadata with a HEAD, and the bucket-level GETs. Advanced operations are everything else: uploads, copies, renames, and listing a bucket. The rate is the same whether a read is served from the origin or from the CDN. Deletes are free."
+    },
+    {
+      "question": "Which region should I choose for my bucket?",
+      "answer": "None — there is no region to choose. A bucket is global: every file is replicated to a CDN worldwide, so a reader in Singapore and a reader in Frankfurt are both served from close by without you configuring anything. This also means one rate sheet instead of per-region pricing, and no charge for replication or cross-region transfer."
+    },
+    {
+      "question": "Is a failed request billed?",
+      "answer": "Yes. A request that fails on the caller's side — 404 Not Found, 412 Precondition Failed, 416 Range Not Satisfiable, 429 Too Many Requests — is still counted as an operation and billed at the same rate as a successful one. Requests that fail on our side are not billed."
+    },
+    {
+      "question": "How is storage measured?",
+      "answer": "On the monthly average of your bucket's size, not on its peak. We sample daily and divide by the number of days in the month, so an object stored for one day of a 30-day month costs about a thirtieth of a full month."
+    },
+    {
+      "question": "When am I charged for bandwidth?",
+      "answer": "On every byte that moves in or out of the bucket. Uploads are charged at the same rate as downloads, so writing an object costs storage, one advanced operation and the bandwidth to send it. Requests served from the CDN cache are billed at the same bandwidth rate as requests served from the origin."
+    },
+    {
+      "question": "What happens if I exceed the free tier?",
+      "answer": "Your bucket stops serving requests until the 30-day window rolls over. You are never charged on the free plan. Adding a credit card upgrades you to pay-as-you-go, which removes the caps and bills your usage from the first unit."
+    },
+    {
+      "question": "Does the pay-as-you-go plan include a free allowance?",
+      "answer": "No. The monthly allowance belongs to the free plan only. On pay-as-you-go you are billed from the first byte stored and the first operation made, at $0.02 per GB of storage, $0.02 per GB of bandwidth, $0.30 per 1M simple operations and $4.50 per 1M advanced operations."
+    },
+    {
+      "question": "Is Upstash Blob S3 compatible?",
+      "answer": "Yes. Your bucket token exchanges for temporary S3 credentials, so you can use the AWS SDK, the AWS CLI, or any S3-compatible tool alongside the @upstash/blob SDK."
+    },
+    {
+      "question": "What is the maximum file size?",
+      "answer": "5 TB per object. For files over 100 MB we recommend multipart uploads, where each part counts as a separate advanced operation."
+    },
+    {
+      "question": "Can I serve files publicly?",
+      "answer": "Yes. A public bucket gets its own URL and anyone with a link can read from it; writes still require credentials. Private buckets have no public URL and every read must be signed."
+    }
+  ]
+}
