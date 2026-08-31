@@ -13,10 +13,9 @@ import blobFaqJson from "../../../public/faq/blob.json";
  *   they are on every other object store, so writing an object costs storage
  *   and an advanced operation but no bandwidth.
  *
- * Two things a customer does not expect, so the FAQ says both out loud: a
- * request that fails on the caller's side is still a billed operation (only an
- * unauthenticated 401 and our own failures are free), and every meter rounds
- * up to the next whole billing unit.
+ * A failed request is still a billed operation, which is the one part of this a
+ * customer does not expect and the FAQ says out loud. The only free failures are
+ * a 401 rejected before authentication and anything that breaks on our side.
  */
 
 /** The unit rates, kept apart from their labels so the two cannot drift. */
@@ -70,7 +69,7 @@ export const BLOB_METERS: BlobMeter[] = [
     freeIncluded: "1 GB / month",
     rate: `$${BLOB_RATES.storagePerGb.toFixed(2)} per GB`,
     tooltip:
-      "Measured on the monthly average of your bucket size, not its peak, and rounded up to the next GB.",
+      "Measured on the monthly average of your bucket size, not its peak.",
     showOnCard: true,
   },
   {
