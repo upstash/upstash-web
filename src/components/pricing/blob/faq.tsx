@@ -40,11 +40,13 @@ export default function FAQ() {
       <AccordionItem value="item-3">
         <AccordionTrigger>Is a failed request billed?</AccordionTrigger>
         <AccordionContent>
-          Yes. A request that fails on the caller&apos;s side — 404 Not Found,
-          412 Precondition Failed, 416 Range Not Satisfiable, 429 Too Many
-          Requests — is still counted as an operation and billed at the same
-          rate as a successful one. Requests that fail on our side are not
-          billed.
+          Usually yes. A request that fails on the caller&apos;s side is still
+          counted as an operation and billed at the same rate as a successful
+          one: 404 Not Found, 412 Precondition Failed, 400 Bad Digest, and a 403
+          Access Denied raised after the credentials checked out. Throttling
+          responses, 429 and 503, are billed the same way. Two things are free:
+          a request rejected before authentication with 401 Unauthorized, and
+          any request that fails on our side with a 5xx.
         </AccordionContent>
       </AccordionItem>
 
@@ -61,15 +63,24 @@ export default function FAQ() {
       <AccordionItem value="item-5">
         <AccordionTrigger>When am I charged for bandwidth?</AccordionTrigger>
         <AccordionContent>
-          On every byte that moves in or out of the bucket. Uploads are charged
-          at the same rate as downloads, so writing an object costs storage, one
-          advanced operation and the bandwidth to send it. Requests served from
-          the CDN cache are billed at the same bandwidth rate as requests served
-          from the origin.
+          Only on bytes that leave the bucket. Uploads are free, so writing an
+          object costs storage and one advanced operation but no bandwidth.
+          Downloads are billed at the same rate whether they are served from the
+          CDN cache or from the origin.
         </AccordionContent>
       </AccordionItem>
 
       <AccordionItem value="item-6">
+        <AccordionTrigger>How is usage rounded?</AccordionTrigger>
+        <AccordionContent>
+          Up, to the next whole billing unit, on every meter. 1.1 GB of storage
+          is billed as 2 GB, 1.1 GB of bandwidth as 2 GB, and 1,000,001 simple
+          operations as 2M. The rounding applies once to each meter&apos;s total
+          for the month, not to every request.
+        </AccordionContent>
+      </AccordionItem>
+
+      <AccordionItem value="item-7">
         <AccordionTrigger>
           What happens if I exceed the free tier?
         </AccordionTrigger>
@@ -81,19 +92,20 @@ export default function FAQ() {
         </AccordionContent>
       </AccordionItem>
 
-      <AccordionItem value="item-7">
+      <AccordionItem value="item-8">
         <AccordionTrigger>
           Does the pay-as-you-go plan include a free allowance?
         </AccordionTrigger>
         <AccordionContent>
           No. The monthly allowance belongs to the free plan only. On
           pay-as-you-go you are billed from the first byte stored and the first
-          operation made, at $0.02 per GB of storage, $0.02 per GB of bandwidth,
-          $0.30 per 1M simple operations and $4.50 per 1M advanced operations.
+          operation made, at $0.02 per GB of storage, $0.02 per GB of outbound
+          bandwidth, $0.30 per 1M simple operations and $4.50 per 1M advanced
+          operations.
         </AccordionContent>
       </AccordionItem>
 
-      <AccordionItem value="item-8">
+      <AccordionItem value="item-9">
         <AccordionTrigger>Is Upstash Blob S3 compatible?</AccordionTrigger>
         <AccordionContent>
           Yes. Your bucket token exchanges for temporary S3 credentials, so you
@@ -102,7 +114,7 @@ export default function FAQ() {
         </AccordionContent>
       </AccordionItem>
 
-      <AccordionItem value="item-9">
+      <AccordionItem value="item-10">
         <AccordionTrigger>What is the maximum file size?</AccordionTrigger>
         <AccordionContent>
           5 TB per object. For files over 100 MB we recommend multipart uploads,
@@ -110,7 +122,7 @@ export default function FAQ() {
         </AccordionContent>
       </AccordionItem>
 
-      <AccordionItem value="item-10">
+      <AccordionItem value="item-11">
         <AccordionTrigger>Can I serve files publicly?</AccordionTrigger>
         <AccordionContent>
           Yes. A public bucket gets its own URL and anyone with a link can read

@@ -9,13 +9,14 @@ import blobFaqJson from "../../../public/faq/blob.json";
  *   GETs. Same rate whether the byte came from the origin or the CDN.
  * - Advanced operations: everything else. Uploads, copies, lists, multipart.
  *   Deletes are free.
- * - Bandwidth, on bytes in both directions: an upload is billed like a
- *   download, so writing an object costs storage, an advanced operation and
- *   bandwidth.
+ * - Bandwidth, on bytes served *out* of the bucket only. Uploads are free, as
+ *   they are on every other object store, so writing an object costs storage
+ *   and an advanced operation but no bandwidth.
  *
- * A request that fails on the caller's side (404, 412, 416, 429) is still an
- * operation and is still billed, which is the one part of this a customer does
- * not expect and the FAQ says out loud.
+ * Two things a customer does not expect, so the FAQ says both out loud: a
+ * request that fails on the caller's side is still a billed operation (only an
+ * unauthenticated 401 and our own failures are free), and every meter rounds
+ * up to the next whole billing unit.
  */
 
 /** The unit rates, kept apart from their labels so the two cannot drift. */
@@ -69,7 +70,7 @@ export const BLOB_METERS: BlobMeter[] = [
     freeIncluded: "1 GB / month",
     rate: `$${BLOB_RATES.storagePerGb.toFixed(2)} per GB`,
     tooltip:
-      "Measured on the monthly average of your bucket size, not its peak.",
+      "Measured on the monthly average of your bucket size, not its peak, and rounded up to the next GB.",
     showOnCard: true,
   },
   {
@@ -96,7 +97,7 @@ export const BLOB_METERS: BlobMeter[] = [
     freeIncluded: "First 10 GB",
     rate: `$${BLOB_RATES.bandwidthPerGb.toFixed(2)} per GB`,
     tooltip:
-      "Bytes moved in or out of the bucket. Uploads and downloads are billed alike.",
+      "Bytes served out of the bucket. Uploads are free; you pay only for what leaves.",
     showOnCard: true,
   },
 ];

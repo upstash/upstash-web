@@ -10,7 +10,7 @@
     },
     {
       "question": "Is a failed request billed?",
-      "answer": "Yes. A request that fails on the caller's side — 404 Not Found, 412 Precondition Failed, 416 Range Not Satisfiable, 429 Too Many Requests — is still counted as an operation and billed at the same rate as a successful one. Requests that fail on our side are not billed."
+      "answer": "Usually yes. A request that fails on the caller's side is still counted as an operation and billed at the same rate as a successful one: 404 Not Found, 412 Precondition Failed, 400 Bad Digest, and a 403 Access Denied raised after the credentials checked out. Throttling responses, 429 and 503, are billed the same way. Two things are free: a request rejected before authentication with 401 Unauthorized, and any request that fails on our side with a 5xx."
     },
     {
       "question": "How is storage measured?",
@@ -18,7 +18,11 @@
     },
     {
       "question": "When am I charged for bandwidth?",
-      "answer": "On every byte that moves in or out of the bucket. Uploads are charged at the same rate as downloads, so writing an object costs storage, one advanced operation and the bandwidth to send it. Requests served from the CDN cache are billed at the same bandwidth rate as requests served from the origin."
+      "answer": "Only on bytes that leave the bucket. Uploads are free, so writing an object costs storage and one advanced operation but no bandwidth. Downloads are billed at the same rate whether they are served from the CDN cache or from the origin."
+    },
+    {
+      "question": "How is usage rounded?",
+      "answer": "Up, to the next whole billing unit, on every meter. 1.1 GB of storage is billed as 2 GB, 1.1 GB of bandwidth as 2 GB, and 1,000,001 simple operations as 2M. The rounding applies once to each meter's total for the month, not to every request."
     },
     {
       "question": "What happens if I exceed the free tier?",
@@ -26,7 +30,7 @@
     },
     {
       "question": "Does the pay-as-you-go plan include a free allowance?",
-      "answer": "No. The monthly allowance belongs to the free plan only. On pay-as-you-go you are billed from the first byte stored and the first operation made, at $0.02 per GB of storage, $0.02 per GB of bandwidth, $0.30 per 1M simple operations and $4.50 per 1M advanced operations."
+      "answer": "No. The monthly allowance belongs to the free plan only. On pay-as-you-go you are billed from the first byte stored and the first operation made, at $0.02 per GB of storage, $0.02 per GB of outbound bandwidth, $0.30 per 1M simple operations and $4.50 per 1M advanced operations."
     },
     {
       "question": "Is Upstash Blob S3 compatible?",
