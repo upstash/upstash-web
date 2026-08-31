@@ -26,7 +26,7 @@ function summaryPrice(plan: BlobPlan): string {
 export default function SeoPlanData() {
   return (
     <section className="sr-only">
-      <h2>Upstash Blob pricing — all plans</h2>
+      <h2>Upstash Blob pricing: all plans</h2>
 
       <table>
         <caption>
@@ -64,7 +64,7 @@ export default function SeoPlanData() {
       <ul>
         {BLOB_ALL_PLANS.map((plan) => (
           <li key={plan.id}>
-            {plan.name}: {summaryPrice(plan)} — {plan.description}
+            {plan.name}: {summaryPrice(plan)}. {plan.description}
           </li>
         ))}
       </ul>

@@ -46,7 +46,7 @@ export interface BlobMeter {
   freeIncluded: string;
   /**
    * The pay-as-you-go rate. Pay-as-you-go includes nothing, so this is billed
-   * from the first byte and the first operation — there is deliberately no
+   * from the first byte and the first operation, and there is deliberately no
    * `paygIncluded` counterpart to `freeIncluded`.
    */
   rate: string;

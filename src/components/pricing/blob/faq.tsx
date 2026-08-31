@@ -29,7 +29,7 @@ export default function FAQ() {
           Which region should I choose for my bucket?
         </AccordionTrigger>
         <AccordionContent>
-          None — there is no region to choose. A bucket is global: every file is
+          None. There is no region to choose. A bucket is global: every file is
           replicated to a CDN worldwide, so a reader in Singapore and a reader
           in Frankfurt are both served from close by without you configuring
           anything. This also means one rate sheet instead of per-region

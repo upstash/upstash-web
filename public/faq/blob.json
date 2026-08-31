@@ -6,7 +6,7 @@
     },
     {
       "question": "Which region should I choose for my bucket?",
-      "answer": "None — there is no region to choose. A bucket is global: every file is replicated to a CDN worldwide, so a reader in Singapore and a reader in Frankfurt are both served from close by without you configuring anything. This also means one rate sheet instead of per-region pricing, and no charge for replication or cross-region transfer."
+      "answer": "None. There is no region to choose. A bucket is global: every file is replicated to a CDN worldwide, so a reader in Singapore and a reader in Frankfurt are both served from close by without you configuring anything. This also means one rate sheet instead of per-region pricing, and no charge for replication or cross-region transfer."
     },
     {
       "question": "Is a failed request billed?",
