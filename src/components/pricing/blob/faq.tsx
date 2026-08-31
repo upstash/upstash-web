@@ -38,12 +38,11 @@ export default function FAQ() {
       </AccordionItem>
 
       <AccordionItem value="item-3">
-        <AccordionTrigger>Is a failed request billed?</AccordionTrigger>
+        <AccordionTrigger>How are failed requests billed?</AccordionTrigger>
         <AccordionContent>
-          Yes, with two exceptions: a request rejected before authentication
-          with a 401, and anything that fails on our side with a 5xx. Every
-          other failed request counts as an operation and is billed like a
-          successful one.
+          Requests rejected before authentication with a 401, and requests that
+          fail on our side with a 5xx, are not billed. Everything else counts as
+          an operation, whether it succeeded or not.
         </AccordionContent>
       </AccordionItem>
 
@@ -53,7 +52,8 @@ export default function FAQ() {
           On the monthly average of your bucket&apos;s size, not on its peak. We
           sample daily and divide by the number of days in the month, so an
           object stored for one day of a 30-day month costs about a thirtieth of
-          a full month.
+          a full month. The average is billed as measured, never rounded up to a
+          whole GB, and no other meter rounds up either.
         </AccordionContent>
       </AccordionItem>
 

@@ -9,12 +9,12 @@
       "answer": "None. There is no region to choose. A bucket is global: every file is replicated to a CDN worldwide, so a reader in Singapore and a reader in Frankfurt are both served from close by without you configuring anything. This also means one rate sheet instead of per-region pricing, and no charge for replication or cross-region transfer."
     },
     {
-      "question": "Is a failed request billed?",
-      "answer": "Yes, with two exceptions: a request rejected before authentication with a 401, and anything that fails on our side with a 5xx. Every other failed request counts as an operation and is billed like a successful one."
+      "question": "How are failed requests billed?",
+      "answer": "Requests rejected before authentication with a 401, and requests that fail on our side with a 5xx, are not billed. Everything else counts as an operation, whether it succeeded or not."
     },
     {
       "question": "How is storage measured?",
-      "answer": "On the monthly average of your bucket's size, not on its peak. We sample daily and divide by the number of days in the month, so an object stored for one day of a 30-day month costs about a thirtieth of a full month."
+      "answer": "On the monthly average of your bucket's size, not on its peak. We sample daily and divide by the number of days in the month, so an object stored for one day of a 30-day month costs about a thirtieth of a full month. The average is billed as measured, never rounded up to a whole GB, and no other meter rounds up either."
     },
     {
       "question": "When am I charged for bandwidth?",

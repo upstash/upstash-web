@@ -16,6 +16,10 @@ import blobFaqJson from "../../../public/faq/blob.json";
  * A failed request is still a billed operation, which is the one part of this a
  * customer does not expect and the FAQ says out loud. The only free failures are
  * a 401 rejected before authentication and anything that breaks on our side.
+ *
+ * Every meter is billed as measured. Nothing rounds up to a whole unit, unlike
+ * R2 underneath us, so the fractions are ours to absorb rather than the
+ * customer's to pay.
  */
 
 /** The unit rates, kept apart from their labels so the two cannot drift. */
