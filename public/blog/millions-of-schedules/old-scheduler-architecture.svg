@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="480" viewBox="0 0 900 480">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
+    </marker>
+    <marker id="arrow-red" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#ef4444"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="480" fill="#f8fafc" rx="12"/>
+
+  <!-- Title -->
+  <text x="450" y="42" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="20" font-weight="700" fill="#0f172a">Old design: in-memory cron state on every restart</text>
+
+  <!-- Redis Storage box -->
+  <rect x="40" y="160" width="160" height="100" rx="10" fill="#e0f2fe" stroke="#0ea5e9" stroke-width="2"/>
+  <text x="120" y="188" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="700" fill="#0369a1">Redis Storage</text>
+  <text x="120" y="208" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#0369a1">All schedule</text>
+  <text x="120" y="223" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#0369a1">definitions stored</text>
+  <text x="120" y="238" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#0369a1">durably here</text>
+
+  <!-- Arrow Redis -> Process A -->
+  <line x1="200" y1="190" x2="272" y2="175" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Arrow Redis -> Process B -->
+  <line x1="200" y1="230" x2="272" y2="285" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Process A box -->
+  <rect x="275" y="110" width="170" height="110" rx="10" fill="#fef9c3" stroke="#ca8a04" stroke-width="2"/>
+  <text x="360" y="133" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="700" fill="#92400e">Process A</text>
+  <text x="360" y="153" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#92400e">Startup: load schedules</text>
+  <text x="360" y="169" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#92400e">Build local cron state</text>
+  <text x="360" y="185" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#92400e">Own partition A</text>
+  <text x="360" y="205" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" font-style="italic" fill="#b45309">~minutes to load</text>
+
+  <!-- Process B box -->
+  <rect x="275" y="260" width="170" height="110" rx="10" fill="#fef9c3" stroke="#ca8a04" stroke-width="2"/>
+  <text x="360" y="283" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="700" fill="#92400e">Process B</text>
+  <text x="360" y="303" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#92400e">Startup: load schedules</text>
+  <text x="360" y="319" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#92400e">Build local cron state</text>
+  <text x="360" y="335" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#92400e">Own partition B</text>
+  <text x="360" y="355" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" font-style="italic" fill="#b45309">~minutes to load</text>
+
+  <!-- Arrow Process A -> In-memory cron A -->
+  <line x1="445" y1="165" x2="512" y2="165" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Arrow Process B -> In-memory cron B -->
+  <line x1="445" y1="315" x2="512" y2="315" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- In-memory cron A box -->
+  <rect x="515" y="110" width="165" height="110" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+  <text x="597" y="133" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="700" fill="#15803d">In-memory cron</text>
+  <text x="597" y="153" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#15803d">Active state lives only</text>
+  <text x="597" y="169" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#15803d">inside this process</text>
+  <text x="597" y="189" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" font-style="italic" fill="#166534">Lost on restart</text>
+  <text x="597" y="205" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" font-style="italic" fill="#166534">Must be rebuilt</text>
+
+  <!-- In-memory cron B box -->
+  <rect x="515" y="260" width="165" height="110" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+  <text x="597" y="283" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="700" fill="#15803d">In-memory cron</text>
+  <text x="597" y="303" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#15803d">Active state lives only</text>
+  <text x="597" y="319" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#15803d">inside this process</text>
+  <text x="597" y="339" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" font-style="italic" fill="#166534">Lost on restart</text>
+  <text x="597" y="355" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" font-style="italic" fill="#166534">Must be rebuilt</text>
+
+  <!-- Arrow In-memory cron A -> Publish message -->
+  <line stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Arrow In-memory cron B -> Publish message -->
+  <line stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Publish message box -->
+  <rect x="750" y="200" width="120" height="80" rx="10" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+  <text x="810" y="228" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="700" fill="#5b21b6">Publish</text>
+  <text x="810" y="245" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="700" fill="#5b21b6">Message</text>
+  <text x="810" y="265" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#6d28d9">QStash delivery</text>
+  <text x="810" y="278" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#6d28d9">pipeline</text>
+
+  <!-- Arrow from cron A to publish (curved) -->
+  <path d="M 680 165 Q 720 165 748 225" stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- Arrow from cron B to publish (curved) -->
+  <path d="M 680 315 Q 720 315 748 255" stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- Problem callout -->
+  <rect x="40" y="405" width="820" height="52" rx="8" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="450" y="428" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="700" fill="#dc2626">Problem: restart time scales linearly with schedule count</text>
+  <text x="450" y="446" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="12" fill="#b91c1c">Active execution state only exists after a process has fully rebuilt its local cron — a 17-minute restart at 700K schedules</text>
+</svg>

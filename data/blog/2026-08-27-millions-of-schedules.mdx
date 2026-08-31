@@ -1,0 +1,288 @@
+---
+title: "Optimizing QStash For Millions of Schedules"
+slug: millions-of-schedules
+authors: [sancar]
+tags: [qstash, workflow]
+description: "How we moved schedule execution from in-memory cron state to durable self-rescheduling tasks so Upstash Workflow and QStash could handle millions of schedules without slow restarts."
+---
+
+At the beginning, keeping cron definitions in process memory felt reasonable: load schedules on startup, compute the next run, and keep ticking. That model served us for a while in Upstash Workflow and QStash. Then one customer pushed us well past the workload we had previously seen.
+
+We had been operating with roughly 50K schedules. Within a month, that became 700K, and it kept growing. The immediate problem was not raw execution throughput. It was that our scheduler architecture assumed process memory was the source of truth. Once the number of schedules got large enough, restarts became the bottleneck.
+
+
+<Frame>
+  <img
+    src="/blog/millions-of-schedules/schedules.png"
+    alt="Schedule count growth in Upstash observability"
+  />
+</Frame>
+
+This post is about the changes we made to remove the limit. The interesting part is that QStash was already built around durable external state and stateless workers, so we were able to move schedules onto that same foundation instead of building a second special-purpose system.
+
+## The first failure: restart time
+
+Our previous implementation used [`robfig/cron`](https://github.com/robfig/cron) under the hood.
+
+On restart, each process would:
+
+- load schedule definitions from Redis
+- decide which schedules belonged to that process
+- register them with the cron library
+- keep the in-memory cron state alive
+
+That meant restart time scaled with the number of schedules a process had to load. We need restarts to stay comfortably below a minute so we do not miss executions while a node is coming back.
+
+In one deployment, a restart took **17 minutes** before schedules were fully loaded. That was the point where the architecture stopped being acceptable.
+
+Before rewriting anything, I wanted a minimal benchmark.
+
+```golang
+func TestPerformance(t *testing.T) {
+	c := cron.New(cron.WithLocation(time.UTC))
+
+	start := time.Now()
+	items := 20_000
+
+	for i := 0; i < items; i++ {
+		entryID, err := c.AddFunc("0 22 * * *", func() {
+			// no-op
+		})
+		assert.NoError(t, err)
+
+		// Used by our UI to show the next fire time.
+		next := c.Entry(entryID).Next
+		_ = next
+
+		if i%1_000 == 0 {
+			fmt.Println(time.Since(start), "progress", i)
+		}
+	}
+
+	fmt.Println(items, "crons took", time.Since(start))
+}
+```
+
+The result:
+
+```text
+42.458µs progress 0
+15.330458ms progress 1000
+55.084333ms progress 2000
+120.349125ms progress 3000
+213.631833ms progress 4000
+....
+3.73995025s progress 17000
+4.221970958s progress 18000
+4.700413583s progress 19000
+20000 crons took 5.155882583s
+```
+
+The slowdown was not in `AddFunc`. It was in looking up the next execution time:
+
+```golang
+func (c *Cron) Entry(id EntryID) Entry {
+	for _, entry := range c.Entries() {
+		if id == entry.ID {
+			return entry
+		}
+	}
+	return Entry{}
+}
+```
+
+That is an `O(n)` lookup over all entries, and `Entries()` itself copies the whole list:
+
+```golang
+func (c *Cron) Entries() []Entry {
+	c.runningMu.Lock()
+	defer c.runningMu.Unlock()
+
+	if c.running {
+		replyChan := make(chan []Entry, 1)
+		c.snapshot <- replyChan
+		return <-replyChan
+	}
+
+	return c.entrySnapshot()
+}
+
+func (c *Cron) entrySnapshot() []Entry {
+	entries := make([]Entry, len(c.entries))
+	for i, e := range c.entries {
+		entries[i] = *e
+	}
+	return entries
+}
+```
+
+At this point we had two separate problems:
+
+1. Loading many schedules into a running cron was slow.
+2. Looking up the next fire time for each schedule was slow.
+
+We found [`netresearch/go-cron`](https://github.com/netresearch/go-cron), which already addressed the exact optimizations we were considering. Swapping libraries improved the numbers a lot.
+
+But it still did not solve the real issue.
+
+If startup cost scales with the total number of schedules, then sooner or later we hit the same wall again. Moving from 100K to 1M schedules should not require a different restart strategy every time.
+
+That is the point where a library swap stops being a fix and starts being a delay.
+
+## Why the old design hit a wall
+
+The old scheduler looked roughly like this:
+
+- schedules were stored in Redis, grouped per user
+- on restart, every process fetched schedule definitions
+- each process rebuilt the in-memory scheduler state for the partitions it owned
+- when a cron entry fired, we published the actual message through the existing QStash delivery pipeline
+
+<Frame>
+  <img
+    src="/blog/millions-of-schedules/old-scheduler-architecture.svg"
+    alt="Old scheduler design where each process reloads schedules from Redis into local cron state on restart"
+  />
+</Frame>
+
+This model has a sharp edge: the schedule exists durably in Redis, but its _active execution state_ only exists after some process has reconstructed it locally.
+
+That creates a dependency between restart latency and correctness. As schedule count grows, the amount of work required before the system is "alive" again also grows.
+
+We already had a better primitive in the system.
+
+## Reusing the delivery pipeline
+
+QStash already stores work in Redis sorted sets where the score is the delivery time. Delayed messages are just messages with a future score.
+
+Multiple workers poll these sorted sets, claim due items, and deliver them.
+
+In simplified form, that loop looks like this:
+
+```golang
+func workerLoop(ctx context.Context, shard Shard) {
+	for ctx.Err() == nil {
+		now := time.Now().UnixMilli()
+
+		items := shard.PopDue(now, batchSize)
+		if len(items) == 0 {
+			time.Sleep(idlePollInterval)
+			continue
+		}
+
+		for _, item := range items {
+			switch item.Kind {
+			case KindMessage:
+				deliverMessage(ctx, item.Message)
+			}
+		}
+	}
+}
+```
+
+This pipeline was already durable, externally stored, partitioned, and restart-friendly. So the design question became:
+
+Can a schedule itself be represented as just another durable task?
+
+## The rewrite: schedules as self-rescheduling tasks
+
+The new design is simple in hindsight.
+
+Instead of rebuilding cron state in memory, we store a **schedule task** in the same durable queueing system that already handles delayed delivery.
+
+When a schedule task wakes up, it does two things:
+
+1. publish the actual user message for the current fire
+2. compute the next matching time and enqueue itself again
+
+That turns schedules into a persistent cycle:
+
+```golang
+func handleScheduleTask(ctx context.Context, task ScheduleTask) error {
+	schedule, ok := loadSchedule(ctx, task.ScheduleID)
+	if !ok {
+		// Deleted schedule. Stop the chain.
+		return nil
+	}
+
+	if schedule.Paused {
+		// Paused schedules stay inert until resumed.
+		return nil
+	}
+
+	fireTime := task.FireTime
+
+	if err := publishMessage(ctx, PublishedMessage{
+		Url:         schedule.Destination,
+		Body:        schedule.Body,
+		Headers:     schedule.Headers,
+		ScheduleID:  schedule.ID,
+		ScheduledAt: fireTime,
+	}); err != nil {
+		return err
+	}
+
+	nextTime, ok := nextCronTime(schedule.Cron, fireTime)
+	if !ok {
+		// One-shot schedules end here.
+		return nil
+	}
+
+	return enqueueScheduleTask(ctx, ScheduleTask{
+		ScheduleID: task.ScheduleID,
+		FireTime:   nextTime,
+	}, nextTime)
+}
+```
+
+And the worker loop becomes:
+
+```golang
+func workerLoop(ctx context.Context, shard Shard) {
+	for ctx.Err() == nil {
+		now := time.Now().UnixMilli()
+		items := shard.PopDue(now, batchSize)
+
+		if len(items) == 0 {
+			time.Sleep(idlePollInterval)
+			continue
+		}
+
+		for _, item := range items {
+			switch item.Kind {
+			case KindMessage:
+				deliverMessage(ctx, item.Message)
+			case KindSchedule:
+				if err := handleScheduleTask(ctx, item.ScheduleTask); err != nil {
+					retryScheduleTask(ctx, item.ScheduleTask, err)
+				}
+			}
+		}
+	}
+}
+```
+
+<Frame>
+  <img
+    src="/blog/millions-of-schedules/self-rescheduling-scheduler.svg"
+    alt="New scheduler design where schedule tasks live in Redis sorted sets and re-enqueue themselves after publishing"
+  />
+</Frame>
+
+This changes the operational properties of the system in an important way:
+
+- no process has to preload all schedules on startup
+- restart time is no longer proportional to total schedule count
+- schedule execution uses the same durable delivery path as the rest of the system
+- ownership is naturally transferred by worker partitioning instead of by reconstructing in-memory state
+
+## End
+
+Handling millions of schedules did not require a new scheduler implementation. It required removing the assumption that schedule state belongs in process memory.
+
+Once we did that, the system became much easier to reason about. Schedules are now durable tasks that advance themselves. Restarts are no longer scary. Rolling deployments are manageable. And the product behavior under load is mostly a consequence of the underlying design, not of careful timing or lucky process ownership.
+
+That is the kind of scalability we want in QStash and Workflow: an architecture that keeps the system predictable as load grows.
+
+If you read this far and want more detail on the parts I skipped, reach out to us on [Discord](https://upstash.com/discord) for more.
+
