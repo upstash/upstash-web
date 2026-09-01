@@ -1,0 +1,259 @@
+---
+slug: software-factory-needs-a-sandbox-per-agent
+title: "A Software Factory Needs One Sandbox per Agent"
+authors: [alitarik]
+tags: [box, ai, agents, sandbox]
+description: "A software factory is a system where AI agents pick up real engineering work, write the code, test it, and ship it. The part nobody talks about is where that code runs. It scales only when every agent gets its own isolated sandbox."
+---
+
+The idea of the software factory got a lot of attention this year. It was on my timeline for weeks, and everybody used the term a bit differently.
+
+So what is it? In simple terms, a software factory is a system where AI agents pick up real engineering work, write the code, test it, and ship it. Humans only step in for the judgment calls.
+
+And why so much attention now? Because coding agents got good enough to finish a scoped task from start to end. Once one agent can do that, the obvious next question is how many of them you can run at the same time. The bottleneck moved from writing code to orchestrating the agents that write it.
+
+What people talk about less is where all that generated code actually runs. That is the part I want to write about. Twenty agents on one machine are not twenty workers, they are twenty ways to break the same checkout. A software factory starts to scale on the day every code-running agent gets its own isolated sandbox.
+
+Below I show what that looks like in practice with [Upstash Box](https://upstash.com/docs/box/overall/quickstart). Every snippet is real code, with the output we got when we ran it.
+
+<Summary>
+  - A software factory moves work through triage, implementation, validation, release and monitoring with agents. Humans gate the risky decisions.
+  - The limit is not how many agents you can prompt. It is how many can safely run code at the same time.
+  - Isolation has to cover the filesystem and the network. Snapshots make it cheap to start many workers from one prepared environment.
+  - Every Upstash Box is an isolated container with a shell, git, snapshots, a network policy, typed agent runs and logs.
+</Summary>
+
+---
+
+## What is a software factory?
+
+A software factory is an automated development system. Agents take real work from GitHub, Sentry, CI or Linear, turn it into structured tasks, and move each task through the same steps an engineering team follows: triage, implementation, validation, release, monitoring. A human only joins when a decision needs judgment.
+
+This is bigger than a coding assistant. An assistant helps one engineer write code faster. A factory also automates the handoffs between the steps. A triage agent turns a Sentry error into a task, a coding agent writes the fix, a validation agent runs the tests, a release agent ships it, and a monitoring agent watches what happens in production.
+
+The loop always looks the same. Signals come in from bug reports, customer feedback and monitoring. Agents plan, build, test, review and ship. Production produces new signals, and they go back in. Humans stay in the loop for architecture decisions, breaking changes and active incidents. Autonomy grows slowly, as the team starts to trust the system.
+
+![How a software factory loop works](https://cdn.bydefault.so/drawing-4n-TYhPP4ws7YNbekaQlm.png)
+
+## What is an agent sandbox?
+
+An agent sandbox is a separate execution environment. The agent gets its own filesystem, shell, runtime, network stack and git, isolated from your machine and from the workspaces of the other agents. In Upstash Box, every box is an [isolated container with its own filesystem, process tree and network stack](https://upstash.com/docs/box/overall/how-it-works).
+
+The isolation works in both directions. Boxes cannot talk to each other or observe each other, and code inside a box [cannot reach private networks, cloud metadata services or other internal infrastructure](https://upstash.com/docs/box/overall/security). An agent inside a box can install packages, run builds and execute whatever it just generated. The worst thing it can break is a disposable container.
+
+## Why do coding agents need this?
+
+Because a coding agent runs shell commands with real permissions, on untrusted input. On your laptop it [can do anything your user account can do](https://upstash.com/blog/running-claude-code-in-a-remote-sandbox-with-upstash-box). Read your files, use your shell, touch every credential in your home directory. Prompt injection turns that access into an attack surface, because a malicious issue, README or dependency can steer the agent.
+
+Isolation has to cover the filesystem and the network together. Without network isolation a compromised agent can push sensitive files like your SSH keys out to somewhere else. Without filesystem isolation it can escape the sandbox and get the network back. A sandbox that covers both also kills the permission prompts you otherwise answer all day, because outside the container there is nothing left to protect.
+
+There is also a scaling reason, and for a factory this one is bigger. Agents that share one checkout edit the same files at the same time. One installs a dependency while another one is in the middle of a build, a third one leaves the working tree dirty and then the tests of the first one fail for a reason that has nothing to do with its task. You cannot debug that, and you cannot trust the results either. Give every agent its own workspace and merge at the end, and the interference is simply gone. One shared checkout cannot host a fleet of agents. A fleet of sandboxes can.
+
+## How sandboxes give you parallelism
+
+Parallelism in a factory means independent workspace state, and the sandbox is the unit of that state. Every task gets its own container: its own dependencies, its own dirty files, its own test runs. Nothing an agent does in one box shows up in another one.
+
+The pattern that makes this cheap is snapshot fan-out. You prepare one base environment, take a [snapshot](https://upstash.com/docs/box/overall/snapshots) of its full disk state, then restore as many boxes from it as you have tasks. Every worker starts from the same known good state, already cloned and installed, and reports its result back to the orchestrator.
+
+![Snapshot fan-out: one base environment, many workers](https://cdn.bydefault.so/drawing-u38RwRB3zBiRddRZYlM0F.png)
+
+## Building the execution layer with Upstash Box
+
+Upstash Box is built exactly for this. Every box is a secure, isolated container with an AI agent inside, created with [one SDK call](https://upstash.com/docs/box/overall/quickstart). This is the smallest version. Create a box, run a command in it, delete it.
+
+```typescript
+import { Box } from "@upstash/box"
+
+let box: Box | undefined
+
+try {
+  const startedAt = performance.now()
+  box = await Box.create({ runtime: "node", size: "small" })
+  const createMs = Math.round(performance.now() - startedAt)
+
+  const run = await box.exec.command("node --version")
+  console.log(`Box.create(): ${createMs} ms`)
+  console.log(run.result.trim())
+} finally {
+  await box?.delete()
+}
+```
+
+Output from our run:
+
+```text
+Box.create(): 2102 ms
+v25.9.0
+```
+
+One run, and the box was ready in 2.1 seconds. That is fast enough to treat boxes as disposable. One per task, deleted when the task is done.
+
+### Prepare one environment, fan out many workers
+
+This is the pattern from the previous section, as real code. Set up a base box, snapshot it, then restore three workers in parallel and check that each one already has the dependencies installed.
+
+```typescript
+import { Box } from "@upstash/box"
+
+let base: Box | undefined
+let snapshotId: string | undefined
+const workers: Box[] = []
+
+try {
+  base = await Box.create({ runtime: "node", size: "small" })
+  const setup = await base.exec.command("npm init -y && npm install zod")
+  if (setup.status !== "completed") throw new Error(setup.result)
+
+  const snapshot = await base.snapshot({ name: "factory-base" })
+  snapshotId = snapshot.id
+
+  const startedAt = performance.now()
+  const results = await Promise.all(
+    Array.from({ length: 3 }, async (_, index) => {
+      const worker = await Box.fromSnapshot(snapshot.id, { size: "small" })
+      workers.push(worker)
+      const run = await worker.exec.command(
+        `node -e "const { z } = require('zod'); console.log('worker ${index + 1}: ' + z.string().parse('zod ready'))"`,
+      )
+      if (run.status !== "completed") throw new Error(run.result)
+      return run.result.trim()
+    }),
+  )
+  const restoreMs = Math.round(performance.now() - startedAt)
+
+  console.log(`3 parallel restores: ${restoreMs} ms`)
+  results.forEach((result) => console.log(result))
+} finally {
+  await Promise.allSettled(workers.map((worker) => worker.delete()))
+  try {
+    if (base && snapshotId) await base.deleteSnapshot(snapshotId)
+  } finally {
+    await base?.delete()
+  }
+}
+```
+
+Output from our run:
+
+```text
+3 parallel restores: 4208 ms
+worker 1: zod ready
+worker 2: zod ready
+worker 3: zod ready
+```
+
+Three workers restored, ran and confirmed the install in 4.2 seconds in total. The same call shape works for as many parallel workers as your plan's concurrency limit allows.
+
+### Limit what a worker can reach
+
+The default [network policy](https://upstash.com/docs/box/overall/network-policy) allows all outbound traffic. With a custom policy you limit the box to the hosts the task needs, for example the npm registry and GitHub.
+
+```typescript
+import { Box } from "@upstash/box"
+
+let box: Box | undefined
+
+try {
+  box = await Box.create({
+    runtime: "node",
+    size: "small",
+    networkPolicy: {
+      mode: "custom",
+      allowedDomains: ["registry.npmjs.org", "github.com"],
+    },
+  })
+
+  const allowed = await box.exec.command(
+    "curl -sS -o /dev/null -w '%{http_code}' https://registry.npmjs.org/zod",
+  )
+  const denied = await box.exec.command(
+    "curl -sS --max-time 10 -o /dev/null -w '%{http_code}' https://example.com",
+  )
+
+  console.log(`allowed: ${allowed.status} (${allowed.result.trim()})`)
+  console.log(`denied: ${denied.status} (${denied.result.trim()})`)
+} finally {
+  await box?.delete()
+}
+```
+
+Output from our run:
+
+```text
+allowed: completed (200)
+denied: failed (curl: (35) OpenSSL SSL_connect: SSL_ERROR_SYSCALL in connection to example.com:443)
+```
+
+The npm registry answered with a 200. The request to example.com never connected. This is the network half of the isolation argument from before. Even a fully compromised worker can only talk to the hosts you listed.
+
+### Get typed results out of the agent
+
+A factory needs structured handoffs between the steps, so free text agent output is a problem. Every box can run a [built-in agent](https://upstash.com/docs/box/overall/agent), Claude Code, Codex or OpenCode, with a budget limit, a turn limit and a response schema. The orchestrator gets back validated JSON instead of prose.
+
+```typescript
+import { Agent, Box } from "@upstash/box"
+import { z } from "zod/v3"
+
+let box: Box | undefined
+
+try {
+  box = await Box.create({
+    runtime: "node",
+    size: "small",
+    agent: {
+      harness: Agent.ClaudeCode,
+      model: "anthropic/claude-haiku-4-5",
+      apiKey: process.env.ANTHROPIC_API_KEY!,
+    },
+  })
+
+  const run = await box.agent.run({
+    prompt: "Create /workspace/home/hello.txt containing exactly hi, then confirm completion.",
+    options: { maxTurns: 5, maxBudgetUsd: 0.25 },
+    responseSchema: z.object({
+      created: z.boolean(),
+      content: z.literal("hi"),
+    }),
+  })
+
+  console.log(run.result)
+} finally {
+  await box?.delete()
+}
+```
+
+Output from our run:
+
+```text
+{ created: true, content: 'hi' }
+```
+
+The agent did the work inside its own container and handed back an object that matches the schema. The [code review agent guide](https://upstash.com/docs/box/guides/code-review-agent) goes further with this. The agent reviews a pull request, returns an approved or changes-requested verdict as JSON, and a CI step fails the build on that verdict.
+
+### See what the agents are doing
+
+A factory that runs dozens of boxes has to answer one question fast: what is this worker doing right now? And you should not need SSH for that. The status of a box tells you if it is running or paused. Its [logs and run history](https://upstash.com/docs/box/overall/how-it-works) list everything that was executed, with timestamped output. Every box also has a details page in the Upstash Console. For long running agent tasks you can also get a [webhook](https://upstash.com/docs/box/overall/agent) when the run finishes, instead of polling from the orchestrator.
+
+## What a sandbox does not solve
+
+A sandbox contains the execution. That is all it does. The rest of the factory still needs its own machinery.
+
+**Correctness.** An isolated agent can still write a wrong fix. You need tests, review agents and human gates for architecture decisions, breaking changes and active incidents. The same reasoning makes codebases without a test suite a bad fit for the whole pattern.
+
+**Secrets.** Environment variables are [visible to all code running inside the box](https://upstash.com/docs/box/overall/security), including the agent and everything it executes. Sensitive credentials belong in Attach Headers, which injects them into outbound HTTPS requests without putting them inside the container.
+
+**Egress policy.** Isolation from your own infrastructure is there by default, but outbound internet access is allow-all. Locking workers down to an allowlist, like above, is a decision you have to make yourself.
+
+## What does a fleet of boxes cost?
+
+Upstash Box bills [active CPU hours](https://upstash.com/pricing/box), so the core-hours your code really consumes. Memory is free and storage is $0.10 per GB-month. An idle box pauses and stops billing active CPU, so a worker that waits for a model response costs nothing on that meter. The example from the pricing page: a box that uses [10% of a single core for one hour costs $0.01](https://upstash.com/pricing/box), and the same hour at 100% of two cores costs $0.20.
+
+The free plan gives you 10 concurrent boxes and 5 CPU hours per month. Pay as you go starts at $0.10 per active CPU hour and raises the default limit to 1,000 concurrent boxes.
+
+![Upstash Box plans: Free and Pay as You Go](https://cdn.bydefault.so/image-lXqC7QWCfWrXVg4LOlB7v.png)
+
+## Closing
+
+The interesting limit of a software factory is not how many agents you can prompt. It is how many of them can run code at the same time without stepping on each other. That number is the number of sandboxes you can give them.
+
+Everything above, from one box to a seeded parallel fleet, fits in the free plan while you build the rest of your factory.
