@@ -1,6 +1,6 @@
 # Upstash
 
-> Serverless data platform — Redis, Vector Search, QStash (message queues), Workflow, Search, and Box (compute). Fully managed, pay-per-use, no idle costs.
+> Serverless data platform — Redis, Vector Search, QStash (message queues), Workflow, Search, Box (compute), and Blob (object storage). Fully managed, pay-per-use, no idle costs.
 > Website: https://upstash.com
 > Console: https://console.upstash.com
 
@@ -131,6 +131,7 @@ More info: https://upstash.com/enterprise
 - [Vector Docs](https://upstash.com/docs/vector/overall/getstarted)
 - [Workflow Docs](https://upstash.com/docs/workflow/getstarted)
 - [Box Docs](https://upstash.com/docs/box/overall/quickstart)
+- [Blob Docs](https://upstash.com/docs/blob/overall/quickstart)
 
 ---
 

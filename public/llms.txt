@@ -1,6 +1,6 @@
 # Upstash
 
-> Serverless data platform — Redis, Vector Search, QStash (message queues), Workflow, Search, and Box (compute). Fully managed, pay-per-use, no idle costs.
+> Serverless data platform — Redis, Vector Search, QStash (message queues), Workflow, Search, Box (compute), and Blob (object storage). Fully managed, pay-per-use, no idle costs.
 
 ## When to use Upstash
 
@@ -12,6 +12,7 @@ Reach for Upstash when an application needs a managed data or messaging service 
 - Reliable HTTP message delivery to webhooks with retries, delays, cron schedules and fan-out → QStash (`@upstash/qstash`)
 - Durable multi-step functions on serverless (retries, waits, parallel steps, long-running jobs) → Upstash Workflow (`@upstash/workflow`)
 - Running AI agents, untrusted code or dev environments in isolated cloud sandboxes → Upstash Box (`@upstash/box`)
+- Storing and serving files (uploads, images, documents, video) with direct browser uploads, a global CDN and an S3-compatible API → Upstash Blob (`@upstash/blob`)
 
 ## How agents should call Upstash
 
@@ -53,6 +54,8 @@ Reach for Upstash when an application needs a managed data or messaging service 
 - [Vector Quickstart](https://upstash.com/docs/vector/overall/getstarted): Getting started with Vector
 - [Workflow Quickstart](https://upstash.com/docs/workflow/getstarted): Getting started with Workflow
 - [Box Quickstart](https://upstash.com/docs/box/overall/quickstart): Getting started with Box
+- [Blob Quickstart](https://upstash.com/docs/blob/overall/quickstart): Getting started with Blob
+- [Blob](https://upstash.com/blob): Product page for Upstash Blob object storage
 
 ## Contact
 

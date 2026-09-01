@@ -21,6 +21,7 @@ const SEO_PRODUCTS = [
   Product.QSTASH,
   Product.WORKFLOW,
   Product.BOX,
+  Product.BLOB,
 ] as const;
 
 export default function ProductSeoData() {
