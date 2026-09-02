@@ -112,7 +112,7 @@ export default function Page() {
 import { Bucket } from "@upstash/blob"
 
 const bucket = new Bucket({
-  token: process.env.UPSTASH_BLOB_TOKEN,
+  token: process.env.UPSTASH_BLOB_TOKEN!,
   visibility: "private",
 })
 
