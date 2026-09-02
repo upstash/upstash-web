@@ -41,6 +41,11 @@ export const PRODUCT_TAGLINES: Record<Product, ProductTagline> = {
     docsLink: "https://upstash.com/docs/box",
     consoleLink: "https://console.upstash.com/box",
   },
+  [Product.BLOB]: {
+    title: "Serverless object storage with direct browser uploads and a global CDN",
+    docsLink: "https://upstash.com/docs/blob",
+    consoleLink: "https://console.upstash.com/blob",
+  },
 };
 
 export interface ProductFeatureGroup {
@@ -65,7 +70,8 @@ export const PRODUCT_FEATURES: Record<
   | Product.VECTOR
   | Product.QSTASH
   | Product.WORKFLOW
-  | Product.BOX,
+  | Product.BOX
+  | Product.BLOB,
   ProductFeatureGroup[]
 > = {
   [Product.REDIS]: [
@@ -195,6 +201,32 @@ export const PRODUCT_FEATURES: Record<
         "Serverless, no infrastructure to manage",
         "Scale to hundreds of boxes instantly",
         "Multi-agent orchestration support",
+      ],
+    },
+  ],
+  [Product.BLOB]: [
+    {
+      title: ["Global CDN,", "No Regions"],
+      bullets: [
+        "Every file replicated to a CDN worldwide",
+        "Public buckets get a URL out of the box",
+        "One rate sheet, no cross-region fees",
+      ],
+    },
+    {
+      title: ["Direct Browser", "Uploads"],
+      bullets: [
+        "Bytes go straight to storage, never through your server",
+        "Multipart uploads with pause, resume and retry",
+        "Typed React hooks and server-enforced limits",
+      ],
+    },
+    {
+      title: ["S3 Compatible,", "Simple Billing"],
+      bullets: [
+        "Works with the AWS SDK and any S3 tool",
+        "Public or private buckets with signed URLs",
+        "Pay for storage, operations and egress only",
       ],
     },
   ],

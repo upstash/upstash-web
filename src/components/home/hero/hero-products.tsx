@@ -1,3 +1,4 @@
+import IconBlob from "@/components/icon-blob";
 import IconQStash from "@/components/icon-qstash";
 import IconRedis from "@/components/icon-redis";
 import IconBox from "@/components/icon-box";
@@ -104,6 +105,22 @@ export default function HomeHeroProducts({
           )}
         />
         <span>Box</span>
+      </HomeHeroProductTab>
+
+      <HomeHeroProductTab
+        active={activeProduct === Product.BLOB}
+        onClick={() => {
+          setActiveProduct(Product.BLOB);
+        }}
+        className={cx(activeProduct === Product.BLOB && "text-sky-500")}
+      >
+        <IconBlob
+          className={cx(
+            "hidden w-5 shrink-0 sm:block md:w-6",
+            activeProduct === Product.BLOB && "block",
+          )}
+        />
+        <span>Blob</span>
       </HomeHeroProductTab>
     </>
   );
