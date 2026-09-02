@@ -111,8 +111,11 @@ export default function Page() {
         code: `
 import { Bucket } from "@upstash/blob"
 
-// Token of a private bucket: no public URLs, every read is signed
-const bucket = Bucket.fromEnv()
+// Private bucket: no public URLs, every read is signed
+const bucket = new Bucket({
+  token: process.env.UPSTASH_BLOB_TOKEN!,
+  visibility: "private",
+})
 
 // Short-lived read link
 const { url, expiresAt } = await bucket.signedReadUrl(
