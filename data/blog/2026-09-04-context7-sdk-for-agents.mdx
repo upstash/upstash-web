@@ -1,0 +1,62 @@
+---
+title: "Announcing the Context7 SDK for Agents"
+slug: context7-sdk-for-agents
+authors: [fahreddin]
+tags: [context7, ai, agents, sdk, dev-tools]
+description: "Use the Context7 TypeScript SDK to give AI agents direct access to current, version-specific library documentation."
+---
+
+The Context7 SDK has been available for a while, but we never properly announced it. So here it is: [`@upstash/context7-sdk`](https://www.npmjs.com/package/@upstash/context7-sdk), a typed TypeScript client for giving AI agents direct access to current library documentation.
+
+Context7 is commonly used through MCP. That works well when you want to add Context7 to an existing coding client. But if you're building the agent yourself, you often need more control over when documentation is retrieved, how it is returned, and what reaches the model.
+
+The SDK is for that.
+
+## Two Calls to Better Context
+
+An agent first finds the right library, then asks for documentation using the user's actual question:
+
+```bash
+npm install @upstash/context7-sdk
+```
+
+```typescript
+import { Context7 } from "@upstash/context7-sdk";
+
+const context7 = new Context7({
+  apiKey: process.env.CONTEXT7_API_KEY,
+});
+
+const question = "How do I revalidate a route in Next.js?";
+const libraries = await context7.searchLibrary(question, "next.js");
+const library = libraries[0];
+
+if (!library) {
+  throw new Error("Library not found");
+}
+
+const context = await context7.getContext(question, library.id, {
+  type: "txt",
+});
+
+// Add `context` to your agent's prompt or tool result.
+```
+
+`searchLibrary` resolves a package to the right Context7 library. `getContext` returns documentation ranked for the question, including relevant code examples. Use plain text when the result goes directly to a model, or JSON when your application needs structured snippets and source metadata.
+
+## Built for Agent Workflows
+
+The SDK fits anywhere your application needs documentation programmatically:
+
+- Coding agents that look up APIs before editing code
+- Code generators that support fast-moving frameworks
+- Documentation-aware support agents
+- RAG and evaluation pipelines that need trusted library context
+
+It also includes the HTTP controls long-running agents need, including timeouts, cancellation, retries, `Retry-After` support, custom `fetch`, and response metadata. Authentication is required, and you can provide the key directly or through `CONTEXT7_API_KEY`.
+
+## Try It
+
+Get an API key at [context7.com](https://context7.com), install the package, and give your agent a documentation tool that does not depend on stale model memory or broad web search.
+
+Read the [SDK documentation](https://context7.com/docs/sdks/ts/getting-started) or visit the [Context7 repository](https://github.com/upstash/context7) to get started.
