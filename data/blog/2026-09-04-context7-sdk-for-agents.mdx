@@ -1,0 +1,74 @@
+---
+title: "Announcing the Context7 SDK for Agents"
+slug: context7-sdk-for-agents
+authors: [fahreddin]
+tags: [context7, ai, agents, sdk, dev-tools]
+description: "Use the Context7 TypeScript SDK to give AI agents direct access to current, version-specific library documentation."
+---
+
+The Context7 SDK has been available for a while, but we never properly announced it. So here it is: [`@upstash/context7-sdk`](https://www.npmjs.com/package/@upstash/context7-sdk), a typed TypeScript client for giving AI agents direct access to current library documentation.
+
+Context7 is commonly used through MCP. That works well when you want to add Context7 to an existing coding client. But if you're building the agent yourself, you often need more control over when documentation is retrieved, how it is returned, and what reaches the model.
+
+The SDK is for that.
+
+## Two Calls to Better Context
+
+An agent first finds the right library, then asks for documentation using the user's actual question:
+
+```bash
+npm install @upstash/context7-sdk
+```
+
+```typescript
+import { Context7 } from "@upstash/context7-sdk";
+
+const context7 = new Context7({
+  apiKey: process.env.CONTEXT7_API_KEY,
+});
+
+const question = "How do I revalidate a route in Next.js?";
+const libraries = await context7.searchLibrary(question, "next.js");
+const library = libraries[0];
+
+if (!library) {
+  throw new Error("Library not found");
+}
+
+const context = await context7.getContext(question, library.id, {
+  type: "txt",
+});
+
+// Add `context` to your agent's prompt or tool result.
+```
+
+`searchLibrary` resolves a package to the right Context7 library. `getContext` returns documentation ranked for the question, including relevant code examples. Use plain text when the result goes directly to a model, or JSON when your application needs structured snippets and source metadata.
+
+## Built for Agent Workflows
+
+The SDK fits anywhere your application needs documentation programmatically:
+
+- Coding agents that look up APIs before editing code
+- Code generators that support fast-moving frameworks
+- Documentation-aware support agents
+- RAG and evaluation pipelines that need trusted library context
+
+See complete examples for [Eve](https://github.com/upstash/context7/tree/a81a521389e2bfd9da4c8a1ec97996d76d22ce66/examples/eve), [Vercel AI SDK](https://github.com/upstash/context7/tree/a81a521389e2bfd9da4c8a1ec97996d76d22ce66/examples/ai-sdk), and [LangChain](https://github.com/upstash/context7/tree/a81a521389e2bfd9da4c8a1ec97996d76d22ce66/examples/langchain).
+
+Deploy the Eve example to Vercel:
+
+<a href="https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fupstash%2Fcontext7%2Ftree%2Fmaster%2Fexamples%2Feve&env=CONTEXT7_API_KEY%2COPENAI_API_KEY&envDescription=API%20keys%20for%20Context7%20and%20OpenAI.&project-name=context7-eve-agent&repository-name=context7-eve-agent">
+  <img
+    src="/blog/context7-sdk-for-agents/deploy-with-vercel.svg"
+    alt="Deploy with Vercel"
+    width="103"
+    height="32"
+    className="mx-0 w-[103px] max-w-full rounded-md md:mx-0 md:w-[103px]"
+  />
+</a>
+
+## Try It
+
+Get an API key at [context7.com](https://context7.com), install the package, and give your agent a documentation tool that does not depend on stale model memory or broad web search.
+
+Read the [SDK documentation](https://context7.com/docs/sdks/ts/getting-started) or visit the [Context7 repository](https://github.com/upstash/context7) to get started.
