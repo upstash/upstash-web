@@ -45,7 +45,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <IntercomWrapper>
         <body
           className={cx(
-            // header height + the 36px SkillsBanner sitting above it
+            // header height + the 36px AnnouncementBanner sitting above it
             "min-h-screen pt-[106px] antialiased md:pt-[116px]",
             "text-sm text-text md:text-base",
             "bg-bg",
