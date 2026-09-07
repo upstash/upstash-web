@@ -14,6 +14,12 @@ https://mcp.upstash.com/mcp
 
 Point a client at that URL. Connecting opens a browser consent page where you pick which account it gets, your personal account or one of your teams, and whether the connection is read-only.
 
+![The Upstash consent screen, showing the client asking for access, the account scope picker and the read-only switch](/blog/upstash-remote-mcp-server/consent-screen.png)
+
+Anything you approve is listed under **Account → OAuth Clients**, with the access level it was given, who in the team approved it, and a button to revoke it. Owners and admins can revoke anyone's.
+
+![The OAuth Clients tab in Upstash account settings, listing a connected client with its access level and a revoke button](/blog/upstash-remote-mcp-server/oauth-clients.png)
+
 Claude Code, Claude Desktop and Codex can install the [Upstash plugin](https://github.com/upstash/skills) instead, which brings the server along with the skills. In Claude Code that is two commands:
 
 ```bash
@@ -89,7 +95,7 @@ OAuth takes the credential out of the package. Our plugin manifest is now this, 
 }
 ```
 
-Consent happens in your browser, the grant belongs to one client, and you can see and revoke it in the console under Account → OAuth Clients. Grant a client read-only access and the server refuses every tool that would change something.
+Consent happens in your browser, and the grant belongs to one client. Grant it read-only access and the server refuses every tool that would change something.
 
 ## Still on our list
 
