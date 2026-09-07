@@ -65,7 +65,7 @@ Both still work. The local server is the one to use if you want Box tools, which
 
 A stdio server is a program your client starts on your machine. That works in a terminal or a desktop editor, where there is a machine to start it on.
 
-Claude on the web and Replit run somewhere else. They have no `npx` to spawn and no filesystem of yours to read a key from, so a stdio server is out of reach for them entirely. An HTTP endpoint with OAuth behaves the same way whether the agent runs in your terminal or in a datacenter.
+Plenty of agents run somewhere that is not your machine, Claude on the web and Replit among them. They have no `npx` to spawn and no filesystem of yours to read a key from, so a stdio server is out of reach for them entirely. An HTTP endpoint with OAuth behaves the same way whether the agent runs in your terminal or in a datacenter.
 
 ### Shipping the MCP inside a plugin
 
