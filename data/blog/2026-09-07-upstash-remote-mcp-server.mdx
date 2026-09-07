@@ -12,7 +12,7 @@ We are a little late to this party. Remote MCP servers have been around for a wh
 https://mcp.upstash.com/mcp
 ```
 
-Point a client at that URL. The first tool call opens a browser consent page where you pick which account it gets, your personal account or one of your teams, and whether the connection is read-only.
+Point a client at that URL. Connecting opens a browser consent page where you pick which account it gets, your personal account or one of your teams, and whether the connection is read-only.
 
 Claude Code, Claude Desktop and Codex can install the [Upstash plugin](https://github.com/upstash/skills) instead, which brings the server along with the skills. In Claude Code that is two commands:
 
@@ -96,6 +96,7 @@ Consent happens in your browser, the grant belongs to one client, and you can se
 ## Still on our list
 
 - OAuth in the `upstash` CLI. It still authenticates with a Developer API key, and the same browser consent would work there, leaving one less long-lived key on your machine.
+- Accounts that came in through Vercel or Fly. Those sign in from their provider's dashboard rather than the Upstash console, so there is no console session for the consent page to attach a grant to, and the server cannot reach them yet.
 - Box tools on the remote server, and OAuth in the Box CLI. [Upstash Box](https://upstash.com/docs/box/overall/quickstart) is the one product the local server covers and this one does not, which is the only reason left to reach for stdio.
 - Choosing feature groups at consent time. Today `?features=` lives in the URL, so it scopes what a client asks for rather than what the grant allows. On the consent screen it would sit in the grant itself, next to the account scope and the read-only flag.
 - More tools. Restoring a backup, changing a database's plan or regions, and QStash queues and URL groups are all things you can do in the console but not yet through the server.
