@@ -29,7 +29,7 @@ Claude Code, Claude Desktop and Codex can install the [Upstash plugin](https://g
 
 Claude Desktop installs the same marketplace from **Customize → Plugins**, and Codex from `codex plugin marketplace add`. Clients without a plugin take the URL directly. [Find the setup steps for your client](https://upstash.com/docs/agent-resources/overview).
 
-CI has no browser to run a consent flow in, so the server takes a [Developer API key](https://upstash.com/docs/devops/developer-api/introduction#create-an-api-key) there instead, passed as a header in the form `email:API_KEY`:
+Everything above assumes a browser, and someone in front of it to press Approve. A CI job has neither, so the server also accepts a [Developer API key](https://upstash.com/docs/devops/developer-api/introduction#create-an-api-key) as a header, in the form `email:API_KEY`:
 
 ```bash
 claude mcp add --scope user --transport http upstash https://mcp.upstash.com/mcp \
