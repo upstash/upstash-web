@@ -29,6 +29,15 @@ Claude Code, Claude Desktop and Codex can install the [Upstash plugin](https://g
 
 Claude Desktop installs the same marketplace from **Customize → Plugins**, and Codex from `codex plugin marketplace add`. Clients without a plugin take the URL directly. [Find the setup steps for your client](https://upstash.com/docs/agent-resources/overview).
 
+CI has no browser to run a consent flow in, so the server takes a [Developer API key](https://upstash.com/docs/devops/developer-api/introduction#create-an-api-key) there instead, passed as a header in the form `email:API_KEY`:
+
+```bash
+claude mcp add --scope user --transport http upstash https://mcp.upstash.com/mcp \
+  --header "Authorization: Bearer you@example.com:YOUR_API_KEY"
+```
+
+A read-only key behaves like a read-only grant: the same tools are refused, and the same credentials stay out of the results. What does not carry over is the account scope, since that comes from the key rather than from a consent screen, so a team key acts in its team.
+
 ## Features
 
 ### Available tools
@@ -105,21 +114,4 @@ Consent happens in your browser, and the grant belongs to one client. Grant it r
 - Choosing feature groups at consent time. Today `?features=` lives in the URL, so it scopes what a client asks for rather than what the grant allows. On the consent screen it would sit in the grant itself, next to the account scope and the read-only flag.
 - More tools. Restoring a backup, changing a database's plan or regions, and QStash queues and URL groups are all things you can do in the console but not yet through the server.
 
-## Connecting a client
-
-Add the URL to your client, or install the plugin if you use Claude Code, Claude Desktop or Codex:
-
-```bash
-claude mcp add --scope user --transport http upstash https://mcp.upstash.com/mcp
-```
-
-CI has no browser to run a consent flow in, so the server takes a [Developer API key](https://upstash.com/docs/devops/developer-api/introduction#create-an-api-key) there instead, passed as a header in the form `email:API_KEY`:
-
-```bash
-claude mcp add --scope user --transport http upstash https://mcp.upstash.com/mcp \
-  --header "Authorization: Bearer you@example.com:YOUR_API_KEY"
-```
-
-A read-only key behaves like a read-only grant: the same tools are refused, and the same credentials stay out of the results. What does not carry over is the account scope, since that comes from the key rather than from a consent screen, so a team key acts in its team.
-
-The [docs](https://upstash.com/docs/agent-resources/overview) cover the rest. If something is missing or a tool behaves oddly, tell us on [Discord](https://upstash.com/discord) or open an issue on [GitHub](https://github.com/upstash/skills). It is new, and we would rather hear about it early.
+If something is missing or a tool behaves oddly, tell us on [Discord](https://upstash.com/discord) or open an issue on [GitHub](https://github.com/upstash/skills). It is new, and we would rather hear about it early.
