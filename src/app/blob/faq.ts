@@ -38,11 +38,11 @@ export const BLOB_FAQ = [
   {
     question: "How much does Upstash Blob cost?",
     answer:
-      "Upstash Blob has a free tier with 1 GB of storage and 10 GB of bandwidth per month. Beyond that it is pay as you go: $0.02 per GB stored, $0.02 per GB of outbound bandwidth, $0.30 per million simple operations, and $4.50 per million advanced operations. Uploads and deletes are free. See the pricing page for details.",
+      "The free plan includes 1 GB of storage, 10 GB of bandwidth, 10,000 simple operations, and 2,000 advanced operations per month. Pay as you go is billed from the first unit, with no free allowance: $0.02 per GB stored per month, $0.02 per GB of outbound bandwidth, $0.30 per million simple operations, and $4.50 per million advanced operations. Uploads incur advanced-operation charges but no bandwidth fees; deletes are free. See the pricing page for details.",
   },
   {
     question: "How does Blob fit with the rest of Upstash?",
     answer:
-      "Blob shares your Upstash account, billing, and free tier with Redis, Vector, QStash, Workflow, and Box. A common pattern is to store the file in Blob, then kick off a Workflow or QStash job from the upload completion callback to generate thumbnails, transcribe audio, or index the document in Vector.",
+      "Blob uses the same Upstash account and billing as Redis, Vector, QStash, Workflow, and Box. A common pattern is to store the file in Blob, then kick off a Workflow or QStash job from the upload completion callback to generate thumbnails, transcribe audio, or index the document in Vector.",
   },
 ];

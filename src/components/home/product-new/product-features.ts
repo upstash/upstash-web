@@ -43,7 +43,7 @@ export const PRODUCT_TAGLINES: Record<Product, ProductTagline> = {
   },
   [Product.BLOB]: {
     title: "Serverless file storage for web developers",
-    docsLink: "https://upstash.com/docs/blob",
+    docsLink: "https://upstash.com/docs/blob/overall/quickstart",
     consoleLink: "https://console.upstash.com/blob",
   },
 };
@@ -218,7 +218,7 @@ export const PRODUCT_FEATURES: Record<
       bullets: [
         "Bytes go straight to storage, never through your server",
         "Multipart uploads with pause, resume and retry",
-        "Typed React hooks and server-enforced limits",
+        "Fully typesafe SDK and React hooks",
       ],
     },
     {

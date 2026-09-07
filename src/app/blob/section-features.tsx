@@ -7,10 +7,10 @@ import {
   IconBrandAws,
   IconCloudUpload,
   IconCoin,
+  IconCode,
   IconLock,
   IconPlayerPause,
   IconShieldCheck,
-  IconWebhook,
   IconWorld,
 } from "@tabler/icons-react";
 import React from "react";
@@ -28,9 +28,9 @@ export default function SectionFeatures() {
         </PageHeaderDesc>
 
         <div className="mt-12 grid gap-3 text-left sm:grid-cols-2 md:mt-16 md:gap-4 xl:grid-cols-4">
-          {FEATURES.map(({ title, desc, icon }, index) => (
+          {FEATURES.map(({ title, desc, icon }) => (
             <div
-              key={index}
+              key={title}
               className={cx(
                 "flex flex-col gap-3 p-5 md:p-6",
                 "rounded-3xl border-2 border-bg-mute bg-bg-mute",
@@ -88,13 +88,13 @@ const FEATURES = [
     desc: "Declare size and content type constraints per route. The server stays authoritative and the file picker follows.",
   },
   {
-    icon: <IconWebhook className="size-5" stroke={1.5} />,
-    title: "Completion in your route",
-    desc: "A callback runs in your own route once the object exists. Works on localhost, no tunnel or webhook needed.",
+    icon: <IconCode className="size-5" stroke={1.5} />,
+    title: "Fully typesafe",
+    desc: "TypeScript types connect your upload handler to your React hooks, with autocomplete for options, progress, and results.",
   },
   {
     icon: <IconCoin className="size-5" stroke={1.5} />,
     title: "Simple pricing",
-    desc: "Four meters: storage, operations, and outbound bandwidth. Uploads and deletes are free, and nothing rounds up.",
+    desc: "Pay for storage, simple and advanced operations, and outbound bandwidth. No upload bandwidth fees, deletes are free, and usage never rounds up.",
   },
 ];

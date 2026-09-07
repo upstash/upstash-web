@@ -12,11 +12,11 @@ export default function SectionCode() {
       <Bg className="top-32 h-1/2" />
 
       <Container className="max-w-screen-lg">
-        <PageHeaderTitle as="h2">One SDK, three entrypoints</PageHeaderTitle>
+        <PageHeaderTitle as="h2">Add file uploads to your app</PageHeaderTitle>
         <PageHeaderDesc className="mt-3">
-          Write objects from the server with{" "}
-          <code className="font-mono">@upstash/blob</code>, let browsers upload
-          straight to storage, and drive it from React with typed hooks.
+          Build with the fully typesafe{" "}
+          <code className="font-mono">@upstash/blob</code> SDK. Upload from your
+          server or browser, and track progress with React hooks.
         </PageHeaderDesc>
 
         <div className="mt-12 text-left md:mt-16">

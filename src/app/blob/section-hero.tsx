@@ -36,13 +36,21 @@ export default function SectionHero() {
           </p>
 
           <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
-            <a href="https://console.upstash.com/blob" target="_blank">
+            <a
+              href="https://console.upstash.com/blob"
+              target="_blank"
+              rel="noreferrer"
+            >
               <Button variant="primary" className="h-[42px] px-5">
                 Create Bucket
                 <IconPlus size={24} />
               </Button>
             </a>
-            <a href="https://upstash.com/docs/blob" target="_blank">
+            <a
+              href="https://upstash.com/docs/blob/overall/quickstart"
+              target="_blank"
+              rel="noreferrer"
+            >
               <Button variant="defaultDark" className="h-[42px] px-5">
                 Documentation
                 <IconNotes size={24} />

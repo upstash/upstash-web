@@ -17,11 +17,12 @@ export default function SectionUseCases() {
         </PageHeaderDesc>
 
         <div className="mt-12 grid gap-3 text-left sm:grid-cols-2 md:mt-16 md:grid-cols-3 md:gap-4">
-          {USE_CASES.map(({ title, desc, href }, index) => (
+          {USE_CASES.map(({ title, desc, href }) => (
             <a
-              key={index}
+              key={title}
               href={href}
               target="_blank"
+              rel="noreferrer"
               className={cx(
                 "group flex flex-col gap-2 p-6",
                 "rounded-3xl border-2 border-bg-mute bg-bg-mute",
@@ -49,31 +50,31 @@ const USE_CASES = [
   {
     title: "Avatars & profile images",
     desc: "One object per user at a stable path, served through a versioned URL that changes with the bytes.",
-    href: "https://upstash.com/docs/blob/formulas/overview",
+    href: "https://upstash.com/docs/blob/recipes/avatars",
   },
   {
     title: "Attachments",
     desc: "Chat, ticket, and issue attachments uploaded straight from the browser with a row written when they land.",
-    href: "https://upstash.com/docs/blob/browser/upload-handler",
+    href: "https://upstash.com/docs/blob/recipes/attachments",
   },
   {
     title: "Document libraries",
     desc: "Per-user PDF and file libraries with typed constraints on size and content type.",
-    href: "https://upstash.com/docs/blob/browser/constraints",
+    href: "https://upstash.com/docs/blob/recipes/private-documents",
   },
   {
     title: "Large video uploads",
     desc: "Multi-gigabyte uploads that pause, resume, and retry per part, with cleanup for abandoned parts.",
-    href: "https://upstash.com/docs/blob/browser/large-files",
+    href: "https://upstash.com/docs/blob/recipes/video",
   },
   {
     title: "Private reports & invoices",
     desc: "Files written by your server into a private bucket and read through short-lived signed URLs.",
-    href: "https://upstash.com/docs/blob/overall/signing",
+    href: "https://upstash.com/docs/blob/reference/signing",
   },
   {
     title: "AI-generated media",
     desc: "Store images, audio, and files your agents and models produce, then serve them from the CDN.",
-    href: "https://upstash.com/docs/blob/bucket/writing",
+    href: "https://upstash.com/docs/blob/recipes/ai-images",
   },
 ];

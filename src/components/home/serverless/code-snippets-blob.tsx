@@ -1,4 +1,4 @@
-import { CodeSnippets, CodeSnippetsData } from "./code-snippets";
+import { CodeSnippets, type CodeSnippetsData } from "./code-snippets";
 
 export const CodeSnippetsBlob = () => {
   return <CodeSnippets data={data} codeBodyClassName="h-[420px]" />;
@@ -13,14 +13,13 @@ const data: CodeSnippetsData = [
         code: `
 import { Bucket } from "@upstash/blob"
 
-// Reads UPSTASH_BLOB_TOKEN
 const bucket = Bucket.fromEnv()
 
 const blob = await bucket.put("avatars/me.png", file, {
   contentType: "image/png",
 })
 
-console.log(blob.url)  // served from the global CDN
+console.log(blob.url)  // public buckets: global CDN URL
 
 await bucket.get("avatars/me.png")   // record + ReadableStream body
 await bucket.info("avatars/me.png")  // metadata only
@@ -39,10 +38,12 @@ await bucket.del("avatars/me.png")
 // lib/uploads.ts
 import "server-only"
 import { BlobError, uniquePath, uploadHandler } from "@upstash/blob"
+import { getUser } from "@/lib/auth"
+import { db } from "@/lib/db"
 
 export const uploads = uploadHandler({
   constraints: {
-    maxBytes: "20mb",
+    maxSize: "20mb",
     contentTypes: ["image/*", "application/pdf"],
   },
 
@@ -55,12 +56,19 @@ export const uploads = uploadHandler({
     }
   },
 
-  onUploadComplete: async ({ metadata, url }) => {
-    await db.files.insert({ owner: metadata.owner, url })
+  onUploadComplete: async ({ uploadId, metadata, path, url }) => {
+    // Completion callbacks can be retried: upsert by uploadId.
+    await db.files.upsert({
+      where: { uploadId },
+      create: { uploadId, owner: metadata.owner, path, url },
+      update: {},
+    })
   },
 })
 
 // app/api/upload/route.ts
+import { uploads } from "@/lib/uploads"
+
 export const { GET, POST } = uploads
 `,
       },
@@ -111,8 +119,8 @@ export default function Page() {
         code: `
 import { Bucket } from "@upstash/blob"
 
-// Private bucket: no public URLs, every read is signed
-const bucket = Bucket.fromEnv({ visibility: "private" })
+// Use a bucket marked private in the console
+const bucket = Bucket.fromEnv()
 
 // Short-lived read link
 const { url, expiresAt } = await bucket.signedReadUrl(
@@ -123,13 +131,13 @@ const { url, expiresAt } = await bucket.signedReadUrl(
 // Let a client PUT straight to storage
 const upload = await bucket.signedUploadUrl("u/7/report.pdf", {
   contentType: "application/pdf",
-  size,
+  size: file.size,
 })
 
 await fetch(upload.url, {
   method: "PUT",
   headers: upload.headers,
-  body,
+  body: file,
 })
 `,
       },
