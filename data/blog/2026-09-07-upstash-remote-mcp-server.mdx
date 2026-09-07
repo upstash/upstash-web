@@ -27,11 +27,11 @@ Claude Desktop installs the same marketplace from **Customize → Plugins**, and
 
 ### Available tools
 
-There are 38 tools, and most of them do one of two things.
+There are 38 tools. Most of them either manage a resource or work with the data inside one.
 
-Some manage resources, which is the work you would otherwise open the console for: creating and deleting Redis databases, renaming them, toggling eviction and auto-upgrade, taking backups, reading usage stats, creating Vector indexes and Search databases, reading QStash schedules and logs and the DLQ.
+Managing a resource is the work you would otherwise open the console for: creating and deleting Redis databases, renaming them, toggling eviction and auto-upgrade, taking backups, reading usage stats, creating Vector indexes and Search databases, reading QStash schedules and logs and the DLQ.
 
-The rest work with the data inside those resources. Running Redis commands against a database, publishing QStash messages, querying and upserting vectors and documents, iterating an index, cancelling a workflow run.
+Working with the data is running Redis commands against a database, publishing QStash messages, querying and upserting vectors and documents, iterating an index, cancelling a workflow run.
 
 You do not have to take all 38. Adding `?features=` to the URL scopes the connection to the products you care about, which keeps the tool list short and leaves more of the agent's context for your actual work:
 
@@ -43,7 +43,7 @@ There are three groups: `redis`, `qstash_workflow` and `vector_search`. Products
 
 ### Accessing credentials
 
-That second group needs a word of explanation, because reaching a resource's data normally means holding its REST token. The server fetches that token itself, authorized by your OAuth token, calls the endpoint, and hands back only the result. `redis_run_command` runs without a database password passing through the model.
+The tools that touch your data need a word of explanation, because reaching a resource's data normally means holding its REST token. The server fetches that token itself, authorized by your OAuth token, calls the endpoint, and hands back only the result. `redis_run_command` runs without a database password passing through the model.
 
 Other tools do hand you credentials, on purpose. `redis_get_database`, `index_get` and the create tools return the resource's REST tokens, because an agent that just made you a database usually needs to wire an app up to it. The read-only switch on the consent screen is what turns that off: when the grant is read-only, the server strips the password and both tokens out of every one of those results, and you go to the console for them instead.
 
