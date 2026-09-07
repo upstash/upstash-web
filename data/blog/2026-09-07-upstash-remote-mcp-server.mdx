@@ -96,7 +96,7 @@ Consent happens in your browser, the grant belongs to one client, and you can se
 ## Still on our list
 
 - OAuth in the `upstash` CLI. It still authenticates with a Developer API key, and the same browser consent would work there, leaving one less long-lived key on your machine.
-- Accounts that came in through Vercel or Fly. Those sign in from their provider's dashboard rather than the Upstash console, so there is no console session for the consent page to attach a grant to, and the server cannot reach them yet.
+- Exploring what we can offer accounts that came in through Vercel or Fly. They sign in from their provider's dashboard rather than the Upstash console, so there is no console session for the consent page to hang a grant on, and we are still working out the right shape for it.
 - Box tools on the remote server, and OAuth in the Box CLI. [Upstash Box](https://upstash.com/docs/box/overall/quickstart) is the one product the local server covers and this one does not, which is the only reason left to reach for stdio.
 - Choosing feature groups at consent time. Today `?features=` lives in the URL, so it scopes what a client asks for rather than what the grant allows. On the consent screen it would sit in the grant itself, next to the account scope and the read-only flag.
 - More tools. Restoring a backup, changing a database's plan or regions, and QStash queues and URL groups are all things you can do in the console but not yet through the server.
