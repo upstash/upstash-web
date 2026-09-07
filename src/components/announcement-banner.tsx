@@ -20,7 +20,7 @@ export const AnnouncementBanner = () => {
         Upstash has a remote MCP server
         <span className="hidden sm:inline">
           {" "}
-          — connect your coding agent to your account, nothing to install
+          — connect your coding agent to your account
         </span>
       </span>
       <IconArrowRight
