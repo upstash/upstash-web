@@ -33,13 +33,13 @@ The rest work with the data inside those resources. Running Redis commands again
 
 That second group needs a word of explanation, because those tools reach the data plane, which normally means holding the resource's REST token. The server fetches that token itself, authorized by your OAuth token, then calls the resource endpoint. The token never reaches the agent, so you get `redis_run_command` without handing a database password to a model.
 
-If you only want part of the tool set, scope the connection with a query parameter:
+You do not have to take all 38. Adding `?features=` to the URL scopes the connection to the products you care about, which keeps the tool list short and leaves more of the agent's context for your actual work:
 
 ```text
 https://mcp.upstash.com/mcp?features=redis,qstash_workflow
 ```
 
-The groups are `redis`, `qstash_workflow` and `vector_search`, and each product's own name works too.
+There are three groups: `redis`, `qstash_workflow` and `vector_search`. Products that share an API share a group, which is why QStash and Workflow are one and Vector and Search are another. Each product's own name works as an alias, so `?features=vector` gives you the same tools as `?features=vector_search`. The [feature groups docs](https://upstash.com/docs/agent-resources/mcp#feature-groups) have the rest.
 
 ## What did we have before?
 
@@ -86,6 +86,13 @@ OAuth takes the credential out of the package. Our plugin manifest is now this, 
 ```
 
 Consent happens in your browser, the grant belongs to one client, and you can see and revoke it in the console under Account → OAuth Clients. Grant a client read-only access and the server refuses every tool that would change something.
+
+## What we want to add next
+
+- OAuth in the `upstash` CLI. It still authenticates with a Developer API key, and the same browser consent would work there, leaving one less long-lived key on your machine.
+- Box tools on the remote server, and OAuth in the Box CLI. [Upstash Box](https://upstash.com/docs/box/overall/quickstart) is the one product the local server covers and this one does not, which is the only reason left to reach for stdio.
+- Choosing feature groups at consent time. Today `?features=` lives in the URL, so it scopes what a client asks for rather than what the grant allows. On the consent screen it would sit in the grant itself, next to the account scope and the read-only flag.
+- More tools. Restoring a backup, changing a database's plan or regions, and QStash queues and URL groups are all things you can do in the console but not yet through the server.
 
 ## Try it
 
