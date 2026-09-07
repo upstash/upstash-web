@@ -7,12 +7,12 @@ import { IconArrowRight } from "@tabler/icons-react";
  *
  * "Remote" rather than "hosted": it is the term the MCP ecosystem settled on
  * for a server you connect to over HTTP instead of running yourself, and the
- * docs this links to use it throughout.
+ * announcement post and docs use it throughout.
  */
 export const AnnouncementBanner = () => {
   return (
     <a
-      href="/docs/agent-resources/overview"
+      href="/blog/upstash-remote-mcp-server"
       className="group flex h-9 w-full items-center justify-center gap-1.5 border-b border-emerald-500/20 bg-emerald-50 px-4 text-[13px] leading-none text-emerald-950 transition-colors hover:bg-emerald-100 md:text-sm dark:bg-[#01110d] dark:text-emerald-100 dark:hover:bg-emerald-950"
     >
       <span className="shrink-0 font-medium">New:</span>

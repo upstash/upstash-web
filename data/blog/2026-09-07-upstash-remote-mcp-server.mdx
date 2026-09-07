@@ -1,0 +1,100 @@
+---
+authors: [arda]
+tags: [mcp, redis, qstash, workflow, vector, search, oauth, agents]
+title: "Upstash Has a Remote MCP Server Now"
+description: "Connect any MCP client to your Upstash account over OAuth at mcp.upstash.com/mcp, with no local process and no API keys in your projects."
+slug: upstash-remote-mcp-server
+---
+
+We are a little late to this party. Remote MCP servers have been a thing for a while, and plenty of people asked us for one. It is here now:
+
+```
+https://mcp.upstash.com/mcp
+```
+
+There is nothing to install and nothing to paste. Point a client at that URL, and the first tool call opens a browser consent page where you pick which account it gets — your personal account or one of your teams — and whether the connection is read-only.
+
+In Claude Code and Codex, the [Upstash plugin](https://github.com/upstash/skills) brings the server along with the skills, so one install does both:
+
+```bash
+/plugin marketplace add upstash/skills
+/plugin install upstash@upstash
+```
+
+Every other client takes the URL directly. The [agent resources docs](https://upstash.com/docs/agent-resources/overview) have the exact steps for each one, plus the [MCP server page](https://upstash.com/docs/agent-resources/mcp) for authentication and options.
+
+## What can it do?
+
+38 tools across the products, and they fall into two kinds.
+
+**Managing resources** — the things you would otherwise open the console for. Creating and deleting Redis databases, renaming them, toggling eviction and auto-upgrade, taking backups, reading usage stats. Creating Vector indexes and Search databases. Reading QStash schedules, logs, and the DLQ.
+
+**Working with the data in them** — running Redis commands against a database, publishing QStash messages, querying and upserting vectors and documents, iterating an index, cancelling a workflow run.
+
+The second kind is the part worth explaining. Those tools reach the data plane, which normally needs that specific resource's REST token. The server fetches those tokens itself, using your OAuth token to authorize the fetch, and calls the resource endpoint directly. **The tokens never reach the agent.** You get `redis_run_command` without ever handing a database password to a model.
+
+If you only want part of it, scope the connection with a query parameter:
+
+```
+https://mcp.upstash.com/mcp?features=redis,qstash_workflow
+```
+
+The groups are `redis`, `qstash_workflow`, and `vector_search`, and each product's own name works too.
+
+## What did we have before?
+
+Two things, and both still work.
+
+The [`upstash` CLI](https://upstash.com/docs/agent-resources/cli) has been around the longest. It talks to the Developer API, takes non-interactive commands, and prints JSON, which makes it good in CI and fine for an agent that is already comfortable in a shell.
+
+The [local MCP server](https://github.com/upstash/mcp-server) came later. Your client spawns it with `npx`, it authenticates with your email and a Developer API key, and it covers Redis, QStash, Workflow, and [Upstash Box](https://upstash.com/docs/box/overall/quickstart):
+
+```bash
+npx -y @upstash/mcp-server@latest --email YOUR_EMAIL --api-key YOUR_API_KEY
+```
+
+It is still the one to use if you want Box tools, which the remote server does not carry yet. Going the other way, the remote server covers Vector and Search, which the local one does not.
+
+## What does the remote server actually fix?
+
+Two problems, and the second is the one that pushed us.
+
+### Some clients cannot run a local process at all
+
+A stdio server is a program your client starts on your machine. That assumption holds in a terminal or a desktop editor. It does not hold anywhere else.
+
+Claude on the web, Replit, and every other hosted agent run somewhere that is not your laptop. There is no `npx` to spawn, no filesystem of yours to read a key from, and no way for them to reach a process that only exists locally. For those clients a stdio server is not inconvenient, it is unavailable. An HTTP endpoint with OAuth is the only shape that works, and it is the same shape whether the agent is in your terminal or in a datacenter.
+
+### Shipping a plugin meant shipping a credential problem
+
+The [Agent Plugins](https://agent-plugins.org) standard packages skills and MCP servers as one installable folder, so a single plugin can teach an agent the Upstash SDKs *and* connect it to your account. We [wrote about it](https://upstash.com/blog/context7-portable-agent-plugin) when it landed.
+
+The trouble is that a stdio server needs credentials, and a plugin is public package data. The spec closes both ways you might try to supply them: a plugin cannot embed a real key, because anyone can read it, and it cannot reference yours through a `${VAR}` placeholder, because clients do not expand those — the header arrives as the literal string.
+
+Without a remote server, the only way to bundle the MCP into a plugin was to have every user put a Developer API key in an env file, in every project, and keep it there. That is a lot of long-lived credentials sitting in a lot of repositories for the sake of a convenience.
+
+OAuth removes the credential from the package entirely. Our plugin manifest is now this, and it holds no secret:
+
+```json
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "upstash": {
+      "type": "streamable-http",
+      "url": "https://mcp.upstash.com/mcp"
+    }
+  }
+}
+```
+
+The consent happens in your browser, the grant belongs to one client, and you can see and revoke it in the console under **Account → OAuth Clients**. Grant a client read-only access and the server refuses every tool that would change something, rather than trusting it to behave.
+
+## Try it
+
+Add the URL to your client, or install the plugin if you use Claude Code or Codex:
+
+```bash
+claude mcp add --scope user --transport http upstash https://mcp.upstash.com/mcp
+```
+
+The [docs](https://upstash.com/docs/agent-resources/overview) cover the rest. If something is missing or a tool behaves oddly, tell us on [Discord](https://upstash.com/discord) or open an issue on [GitHub](https://github.com/upstash/skills) — it is new, and we would rather hear about it early.
