@@ -42,7 +42,7 @@ export const PRODUCT_TAGLINES: Record<Product, ProductTagline> = {
     consoleLink: "https://console.upstash.com/box",
   },
   [Product.BLOB]: {
-    title: "Serverless object storage with direct browser uploads and a global CDN",
+    title: "Serverless file storage for web developers",
     docsLink: "https://upstash.com/docs/blob",
     consoleLink: "https://console.upstash.com/blob",
   },

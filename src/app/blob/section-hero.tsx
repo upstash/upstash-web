@@ -23,8 +23,8 @@ export default function SectionHero() {
           >
             <IconBlob className="size-12 shrink-0 md:size-20" />
             <span>
-              <span className="block">Serverless Object Storage</span>
-              <span className="block">with a Global CDN</span>
+              <span className="block">Serverless file storage</span>{" "}
+              <span className="block">for web developers</span>
             </span>
           </h1>
 
