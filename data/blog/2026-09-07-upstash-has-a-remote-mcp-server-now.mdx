@@ -6,7 +6,7 @@ title: "Upstash Has a Remote MCP Server Now"
 description: "Connect any MCP client to your Upstash account over OAuth at mcp.upstash.com/mcp, with no local process and no API keys in your projects."
 ---
 
-We are a little late to this party. Remote MCP servers have been around for a while, and plenty of people asked us for one. It is here now:
+We are a little late to the MCP party but better late than never! Plenty of people asked us for one, so it is here now:
 
 ```text
 https://mcp.upstash.com/mcp
@@ -14,13 +14,13 @@ https://mcp.upstash.com/mcp
 
 ## Connecting a client
 
-Point a client at that URL. Connecting opens a browser consent page where you pick which account it gets, your personal account or one of your teams, and whether the connection is read-only.
+Point a client at that URL. Connecting opens a browser consent page where you pick which account it gets, your personal account or one of your teams and whether the connection is read-only:
 
-![The Upstash consent screen, showing the client asking for access, the account scope picker and the read-only switch](https://cdn.bydefault.so/OXo3kklboTNSSs--I0ti9.png)
+![The Upstash consent screen, showing the client asking for access, the account scope picker and the read-only switch](https://cdn.bydefault.so/gbZG6VuUe-63YHCht7zWz.png)
 
 Every client you approve shows up under **Account → OAuth Clients**, with the access level it was given, who in the team approved it, and a button to revoke it. Owners and admins can revoke anyone's.
 
-![The OAuth Clients tab in Upstash account settings, listing a connected client with its access level and a revoke button](https://cdn.bydefault.so/wCqreK4PWTuQZTOkQg_fq.png)
+![The OAuth Clients tab in Upstash account settings, listing a connected client with its access level and a revoke button](https://cdn.bydefault.so/t5YUFM2N4JuhYv99-A5Ps.png)
 
 Claude Code, Claude Desktop and Codex can install the [Upstash plugin](https://github.com/upstash/skills) instead, which brings the server along with the skills. In Claude Code that is two commands:
 
@@ -33,7 +33,7 @@ Claude Desktop installs the same marketplace from **Customize → Plugins**, and
 
 ## No browser? Use an API key
 
-Getting a client connected this way assumes a browser, and someone in front of it to press Approve. A CI job has neither, so the server also accepts a [Developer API key](https://upstash.com/docs/devops/developer-api/introduction#create-an-api-key) as a header, in the form `email:API_KEY`:
+Getting a client connected this way assumes a browser, and someone in front of it to press Approve. Something like a CI job has neither, so the server also accepts a [Developer API key](https://upstash.com/docs/devops/developer-api/introduction#create-an-api-key) as a header, in the form `email:API_KEY`:
 
 ```bash
 claude mcp add --scope user --transport http upstash https://mcp.upstash.com/mcp \
@@ -64,7 +64,7 @@ There are three groups: `redis`, `qstash_workflow` and `vector_search`. Products
 
 The tools that touch your data need a word of explanation, because reaching a resource's data normally means holding its REST token. The server fetches that token itself, authorized by your OAuth token, calls the endpoint, and hands back only the result. `redis_run_command` runs without a database password passing through the model.
 
-![](https://cdn.bydefault.so/drawing-ki7Fkc3lRPYfrMog1is_W.png)
+![](https://cdn.bydefault.so/spVhtFQ_xNq3AAS4FIvQh.png)
 
 Other tools do hand you credentials, on purpose. `redis_get_database`, `index_get` and the create tools return the resource's REST tokens, because an agent that just made you a database usually needs to wire an app up to it. The read-only switch on the consent screen is what turns that off: when the grant is read-only, the server strips the password and both tokens out of every one of those results, and you go to the console for them instead.
 
@@ -75,7 +75,8 @@ The [`upstash` CLI](https://upstash.com/docs/agent-resources/cli) has been aroun
 The [local MCP server](https://github.com/upstash/mcp-server) came later. Your client spawns it with `npx`, it authenticates with your email and a Developer API key, and it covers Redis, QStash, Workflow and [Upstash Box](https://upstash.com/docs/box/overall/quickstart):
 
 ```bash
-npx -y @upstash/mcp-server@latest --email YOUR_EMAIL --api-key YOUR_API_KEY
+npx -y @upstash/mcp-server@latest \
+  --email YOUR_EMAIL --api-key YOUR_API_KEY
 ```
 
 Both still work. The local server is the one to use if you want Box tools, which the remote server does not carry yet. Going the other way, the remote server covers Vector and Search, which the local one does not.
@@ -122,4 +123,4 @@ Consent happens in your browser, and the grant belongs to one client. With read-
 - Choosing feature groups at consent time. Today `?features=` is part of the URL, so it scopes what a client asks for rather than what the grant allows. On the consent screen it would be part of the grant itself, next to the account scope and the read-only flag.
 - More tools. Restoring a backup, changing a database's plan or regions, and QStash queues and URL groups are all things you can do in the console but not yet through the server.
 
-If something is missing or a tool behaves oddly, tell us on [Discord](https://upstash.com/discord) or open an issue on [GitHub](https://github.com/upstash/skills). It is new, and we would rather hear about it early.
+If something is missing or a tool behaves oddly, tell us on [Discord](https://upstash.com/discord) or open an issue on [GitHub](https://github.com/upstash/skills).
