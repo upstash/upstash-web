@@ -3,7 +3,7 @@
 import Container from "@/components/container";
 import Icon, { ICON_NAMES } from "@/components/icon";
 import { Logo } from "@/components/logo";
-import { SkillsBanner } from "@/components/skills-banner";
+import { AnnouncementBanner } from "@/components/announcement-banner";
 import cx from "@/utils/cx";
 import { useMotionValueEvent, useScroll } from "framer-motion";
 import Link from "next/link";
@@ -38,7 +38,7 @@ export default function Header({ className, ...props }: IAppHeader) {
       )}
       {...props}
     >
-      <SkillsBanner />
+      <AnnouncementBanner />
       <Container>
         <div className="flex items-center justify-between py-4">
           <div className="flex">
