@@ -33,7 +33,7 @@ export default function HomeHero() {
         </p>
 
         <div
-          className="mt-6 flex flex-wrap items-center gap-3"
+          className="mt-6 flex flex-wrap items-center justify-center gap-3"
           data-area="home_hero"
         >
           <AgentSetupButton />

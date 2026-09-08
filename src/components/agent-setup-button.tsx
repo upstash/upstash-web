@@ -30,33 +30,33 @@ type SetupOption = {
 const SETUP_OPTIONS: SetupOption[] = [
   {
     id: "prompt",
-    label: "Agent setup prompt",
+    label: "Copy setup prompt",
     summary: "Let your agent install everything",
     value: AGENT_SETUP_PROMPT,
   },
   {
     id: "claude_plugin",
-    label: "Claude plugin",
-    summary: "Skills + remote MCP in one install",
+    label: "Copy Claude plugin install",
+    summary: "Skills + remote MCP in one step",
     value:
       "/plugin marketplace add upstash/skills\n/plugin install upstash@upstash",
   },
   {
     id: "codex_plugin",
-    label: "Codex plugin",
-    summary: "Skills + remote MCP in one install",
+    label: "Copy Codex plugin install",
+    summary: "Skills + remote MCP in one step",
     value:
       "codex plugin marketplace add upstash/skills\ncodex plugin add upstash@upstash",
   },
   {
     id: "mcp_url",
-    label: "Other agents",
-    summary: "Remote MCP URL, OAuth on first use",
+    label: "Copy remote MCP URL",
+    summary: "Any client, OAuth on first use",
     value: "https://mcp.upstash.com/mcp",
   },
   {
     id: "skills",
-    label: "Skills",
+    label: "Copy skills command",
     summary: "Agent Skills CLI, no MCP server",
     value: "npx skills add upstash/skills",
   },
@@ -155,7 +155,7 @@ export default function AgentSetupButton({
                 role="menuitem"
                 onClick={() => onCopy(option)}
                 className={cx(
-                  "flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left transition",
+                  "relative flex w-full items-center rounded-xl px-3 py-2 text-left transition",
                   "hover:bg-bg-mute dark:hover:bg-white/10",
                 )}
               >
@@ -167,12 +167,18 @@ export default function AgentSetupButton({
                     {option.summary}
                   </span>
                 </span>
-                {/* Fixed slot, so the tick never reflows the label. */}
-                <span className="flex size-4 shrink-0 items-center justify-center">
-                  {copiedId === option.id ? (
-                    <IconCheck size={16} className="text-primary" />
-                  ) : undefined}
-                </span>
+                {/* Absolute, so the confirmation never reflows the row. */}
+                {copiedId === option.id ? (
+                  <span
+                    className={cx(
+                      "absolute inset-y-1 right-1 flex items-center gap-1 rounded-lg px-2",
+                      "bg-bg-mute text-xs font-medium text-primary dark:bg-zinc-800",
+                    )}
+                  >
+                    <IconCheck size={14} />
+                    Copied
+                  </span>
+                ) : undefined}
               </button>
             ))}
           </div>,
@@ -201,14 +207,20 @@ export default function AgentSetupButton({
         aria-expanded={open}
         onClick={() => onCopy(PRIMARY_OPTION)}
       >
-        {/* The label never changes, so copying can't resize the button and
-            shift Start for Free next to it — only the icon reacts. */}
-        {copiedId === PRIMARY_OPTION.id ? (
-          <IconCheck size={24} />
-        ) : (
-          <IconSparkles size={24} />
-        )}
-        Set up your agent
+        <IconSparkles size={24} />
+        {/* The confirmation is laid over the label rather than replacing it, so
+            copying can't resize the button and shift Start for Free next to it. */}
+        <span className="relative inline-flex items-center">
+          <span className={cx(copiedId === PRIMARY_OPTION.id && "invisible")}>
+            Set up your agent
+          </span>
+          {copiedId === PRIMARY_OPTION.id ? (
+            <span className="absolute inset-0 flex items-center justify-center gap-1.5">
+              <IconCheck size={20} />
+              Copied
+            </span>
+          ) : undefined}
+        </span>
         <IconChevronDown
           size={20}
           className={cx("transition-transform", open && "rotate-180")}
