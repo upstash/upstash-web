@@ -44,6 +44,8 @@ const PRIMARY_OPTION = SETUP_OPTIONS[0];
 
 const DOCS_URL = "https://upstash.com/docs/agent-resources/overview";
 
+const COPIED_DELAY = 1800;
+
 const MENU_WIDTH = 260;
 const MENU_GAP = 8;
 
@@ -58,14 +60,17 @@ export default function AgentSetupButton({
     top: number;
     left: number;
   }>();
+  const [mounted, setMounted] = React.useState(false);
   const triggerRef = React.useRef<HTMLDivElement>(null);
   const closeTimer = React.useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined,
   );
 
+  React.useEffect(() => setMounted(true), []);
+
   React.useEffect(() => {
     if (!copiedId) return;
-    const timer = setTimeout(() => setCopiedId(null), 1500);
+    const timer = setTimeout(() => setCopiedId(null), COPIED_DELAY);
     return () => clearTimeout(timer);
   }, [copiedId]);
 
@@ -85,6 +90,13 @@ export default function AgentSetupButton({
     setPosition({ top: rect.bottom + MENU_GAP, left });
   }, []);
 
+  // The menu is mounted from the start and hidden with classes rather than
+  // mounted on open, so it transitions both ways without needing a frame at
+  // the start state first — a rAF here would never fire in a background tab.
+  React.useEffect(() => {
+    place();
+  }, [place]);
+
   React.useEffect(() => {
     if (!open) return;
     place();
@@ -95,6 +107,8 @@ export default function AgentSetupButton({
       window.removeEventListener("resize", place);
     };
   }, [open, place]);
+
+  const isPrimaryCopied = copiedId === PRIMARY_OPTION.id;
 
   const onCopy = (option: SetupOption) => {
     copy(option.value);
@@ -114,11 +128,12 @@ export default function AgentSetupButton({
   };
 
   const menu =
-    open && position
+    mounted && position
       ? createPortal(
           <div
             role="menu"
             aria-label="Copy Upstash agent setup"
+            aria-hidden={!open}
             style={{ top: position.top, left: position.left }}
             onMouseEnter={show}
             onMouseLeave={hide}
@@ -126,6 +141,10 @@ export default function AgentSetupButton({
               "fixed z-[999] w-[260px] rounded-2xl p-1 text-left",
               "border border-black/10 bg-white shadow-xl",
               "dark:border-white/10 dark:bg-zinc-900",
+              "origin-top transition duration-150 ease-out motion-reduce:transition-none",
+              open
+                ? "translate-y-0 opacity-100"
+                : "pointer-events-none -translate-y-1 opacity-0",
             )}
           >
             {SETUP_OPTIONS.map((option) => (
@@ -133,6 +152,7 @@ export default function AgentSetupButton({
                 key={option.id}
                 type="button"
                 role="menuitem"
+                tabIndex={open ? 0 : -1}
                 onClick={() => onCopy(option)}
                 className={cx(
                   "relative flex w-full items-center rounded-xl px-3 py-2 text-left transition",
@@ -141,18 +161,22 @@ export default function AgentSetupButton({
                 )}
               >
                 {option.label}
-                {/* Absolute, so the confirmation never reflows the row. */}
-                {copiedId === option.id ? (
-                  <span
-                    className={cx(
-                      "absolute inset-y-1 right-1 flex items-center gap-1 rounded-lg px-2",
-                      "bg-bg-mute text-xs font-medium text-primary dark:bg-zinc-800",
-                    )}
-                  >
-                    <IconCheck size={14} />
-                    Copied
-                  </span>
-                ) : undefined}
+                {/* Absolute so the confirmation never reflows the row, and
+                    always mounted so it can transition in and back out. */}
+                <span
+                  aria-hidden={copiedId !== option.id}
+                  className={cx(
+                    "pointer-events-none absolute inset-y-1 right-1 flex items-center gap-1 rounded-lg px-2",
+                    "bg-bg-mute text-xs font-medium text-primary dark:bg-zinc-800",
+                    "origin-right transition duration-200 ease-out motion-reduce:transition-none",
+                    copiedId === option.id
+                      ? "scale-100 opacity-100"
+                      : "scale-90 opacity-0",
+                  )}
+                >
+                  <IconCheck size={14} />
+                  Copied
+                </span>
               </button>
             ))}
 
@@ -160,6 +184,7 @@ export default function AgentSetupButton({
               role="menuitem"
               href={DOCS_URL}
               target="_blank"
+              tabIndex={open ? 0 : -1}
               className={cx(
                 "mt-1 flex items-center gap-1.5 rounded-xl px-3 py-2 transition",
                 "border-t border-black/5 text-sm font-medium text-primary-text",
@@ -195,19 +220,47 @@ export default function AgentSetupButton({
         aria-expanded={open}
         onClick={() => onCopy(PRIMARY_OPTION)}
       >
-        <IconSparkles size={24} />
-        {/* The confirmation is laid over the label rather than replacing it, so
-            copying can't resize the button and shift Start for Free next to it. */}
+        {/* Both icons and both labels stay mounted and cross-fade, so the
+            button neither resizes nor snaps between states. */}
+        <span className="relative inline-flex size-6 shrink-0 items-center justify-center">
+          <IconSparkles
+            size={24}
+            className={cx(
+              "absolute transition duration-200 ease-out motion-reduce:transition-none",
+              isPrimaryCopied ? "scale-75 opacity-0" : "scale-100 opacity-100",
+            )}
+          />
+          <IconCheck
+            size={24}
+            className={cx(
+              "absolute text-primary transition duration-200 ease-out motion-reduce:transition-none",
+              isPrimaryCopied ? "scale-100 opacity-100" : "scale-75 opacity-0",
+            )}
+          />
+        </span>
         <span className="relative inline-flex items-center">
-          <span className={cx(copiedId === PRIMARY_OPTION.id && "invisible")}>
+          <span
+            className={cx(
+              "transition duration-200 ease-out motion-reduce:transition-none",
+              isPrimaryCopied
+                ? "-translate-y-1 opacity-0"
+                : "translate-y-0 opacity-100",
+            )}
+          >
             Set up your agent
           </span>
-          {copiedId === PRIMARY_OPTION.id ? (
-            <span className="absolute inset-0 flex items-center justify-center gap-1.5">
-              <IconCheck size={20} />
-              Copied
-            </span>
-          ) : undefined}
+          <span
+            aria-hidden={!isPrimaryCopied}
+            className={cx(
+              "pointer-events-none absolute inset-0 flex items-center justify-center",
+              "text-primary transition duration-200 ease-out motion-reduce:transition-none",
+              isPrimaryCopied
+                ? "translate-y-0 opacity-100"
+                : "translate-y-1 opacity-0",
+            )}
+          >
+            Copied
+          </span>
         </span>
         <IconChevronDown
           size={20}
