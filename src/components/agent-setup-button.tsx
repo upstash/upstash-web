@@ -1,10 +1,12 @@
 "use client";
 
+import Button from "@/components/button";
 import { trackEvent } from "@/lib/analytics";
 import cx from "@/utils/cx";
 import { IconCheck, IconChevronDown, IconSparkles } from "@tabler/icons-react";
 import copy from "copy-to-clipboard";
 import * as React from "react";
+import { createPortal } from "react-dom";
 
 /**
  * Kept in sync with the copy-prompt on the docs landing page
@@ -49,7 +51,7 @@ const SETUP_OPTIONS: SetupOption[] = [
   {
     id: "mcp_url",
     label: "Other agents",
-    summary: "Remote MCP server URL, OAuth on first use",
+    summary: "Remote MCP URL, OAuth on first use",
     value: "https://mcp.upstash.com/mcp",
   },
   {
@@ -62,6 +64,9 @@ const SETUP_OPTIONS: SetupOption[] = [
 
 const PRIMARY_OPTION = SETUP_OPTIONS[0];
 
+const MENU_WIDTH = 288;
+const MENU_GAP = 8;
+
 export default function AgentSetupButton({
   className,
 }: {
@@ -69,6 +74,11 @@ export default function AgentSetupButton({
 }) {
   const [open, setOpen] = React.useState(false);
   const [copiedId, setCopiedId] = React.useState<string | null>(null);
+  const [position, setPosition] = React.useState<{
+    top: number;
+    left: number;
+  }>();
+  const triggerRef = React.useRef<HTMLDivElement>(null);
   const closeTimer = React.useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined,
   );
@@ -80,6 +90,31 @@ export default function AgentSetupButton({
   }, [copiedId]);
 
   React.useEffect(() => () => clearTimeout(closeTimer.current), []);
+
+  // The hero sits in its own `z-0` stacking context, so a menu rendered inline
+  // is painted under the product tabs below it however high its z-index. It
+  // goes to the body instead, anchored to the trigger on every open, scroll and
+  // resize.
+  const place = React.useCallback(() => {
+    const rect = triggerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const left = Math.min(
+      rect.left,
+      Math.max(MENU_GAP, window.innerWidth - MENU_WIDTH - MENU_GAP),
+    );
+    setPosition({ top: rect.bottom + MENU_GAP, left });
+  }, []);
+
+  React.useEffect(() => {
+    if (!open) return;
+    place();
+    window.addEventListener("scroll", place, true);
+    window.addEventListener("resize", place);
+    return () => {
+      window.removeEventListener("scroll", place, true);
+      window.removeEventListener("resize", place);
+    };
+  }, [open, place]);
 
   const onCopy = (option: SetupOption) => {
     copy(option.value);
@@ -98,9 +133,57 @@ export default function AgentSetupButton({
     closeTimer.current = setTimeout(() => setOpen(false), 120);
   };
 
+  const menu =
+    open && position
+      ? createPortal(
+          <div
+            role="menu"
+            aria-label="Copy Upstash agent setup"
+            style={{ top: position.top, left: position.left }}
+            onMouseEnter={show}
+            onMouseLeave={hide}
+            className={cx(
+              "fixed z-[999] w-72 rounded-2xl p-1 text-left",
+              "border border-black/10 bg-white shadow-xl",
+              "dark:border-white/10 dark:bg-zinc-900",
+            )}
+          >
+            {SETUP_OPTIONS.map((option) => (
+              <button
+                key={option.id}
+                type="button"
+                role="menuitem"
+                onClick={() => onCopy(option)}
+                className={cx(
+                  "flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left transition",
+                  "hover:bg-bg-mute dark:hover:bg-white/10",
+                )}
+              >
+                <span className="min-w-0 grow">
+                  <span className="block text-sm font-medium text-text">
+                    {option.label}
+                  </span>
+                  <span className="block text-xs text-text-mute">
+                    {option.summary}
+                  </span>
+                </span>
+                {/* Fixed slot, so the tick never reflows the label. */}
+                <span className="flex size-4 shrink-0 items-center justify-center">
+                  {copiedId === option.id ? (
+                    <IconCheck size={16} className="text-primary" />
+                  ) : undefined}
+                </span>
+              </button>
+            ))}
+          </div>,
+          document.body,
+        )
+      : undefined;
+
   return (
     <div
-      className={cx("relative inline-flex", className)}
+      ref={triggerRef}
+      className={cx("inline-flex", className)}
       onMouseEnter={show}
       onMouseLeave={hide}
       onFocus={show}
@@ -111,77 +194,27 @@ export default function AgentSetupButton({
         if (event.key === "Escape") setOpen(false);
       }}
     >
-      <button
-        type="button"
+      <Button
+        variant="default"
+        className="px-6"
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => onCopy(PRIMARY_OPTION)}
-        className={cx(
-          "inline-flex items-center gap-2 rounded-xl px-4 py-2 font-medium transition",
-          "border border-black/10 bg-white/70 text-text backdrop-blur",
-          "hover:border-primary/40 hover:text-primary-text hover:shadow-sm",
-          "dark:border-white/15 dark:bg-white/5 dark:text-white",
-        )}
       >
+        {/* The label never changes, so copying can't resize the button and
+            shift Start for Free next to it — only the icon reacts. */}
         {copiedId === PRIMARY_OPTION.id ? (
-          <IconCheck size={20} className="text-primary" />
+          <IconCheck size={24} />
         ) : (
-          <IconSparkles size={20} className="text-primary" />
+          <IconSparkles size={24} />
         )}
-        {copiedId === PRIMARY_OPTION.id ? "Copied!" : "Set up your agent"}
+        Set up your agent
         <IconChevronDown
-          size={16}
-          className={cx(
-            "opacity-60 transition-transform",
-            open && "rotate-180",
-          )}
+          size={20}
+          className={cx("transition-transform", open && "rotate-180")}
         />
-      </button>
-
-      <div
-        role="menu"
-        aria-label="Copy Upstash agent setup"
-        className={cx(
-          "absolute left-0 top-full z-50 w-72 pt-2 text-left",
-          "transition duration-150",
-          open
-            ? "visible translate-y-0 opacity-100"
-            : "invisible -translate-y-1 opacity-0",
-        )}
-      >
-        <div
-          className={cx(
-            "overflow-hidden rounded-2xl border border-black/10 bg-white p-1 shadow-lg",
-            "dark:border-white/10 dark:bg-zinc-900",
-          )}
-        >
-          {SETUP_OPTIONS.map((option) => (
-            <button
-              key={option.id}
-              type="button"
-              role="menuitem"
-              tabIndex={open ? 0 : -1}
-              onClick={() => onCopy(option)}
-              className={cx(
-                "flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition",
-                "hover:bg-bg-mute dark:hover:bg-white/5",
-              )}
-            >
-              <span className="min-w-0 grow">
-                <span className="block text-sm font-medium text-text">
-                  {option.label}
-                </span>
-                <span className="block text-xs text-text-mute">
-                  {option.summary}
-                </span>
-              </span>
-              {copiedId === option.id ? (
-                <IconCheck size={16} className="shrink-0 text-primary" />
-              ) : undefined}
-            </button>
-          ))}
-        </div>
-      </div>
+      </Button>
+      {menu}
     </div>
   );
 }
