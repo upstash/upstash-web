@@ -1,0 +1,496 @@
+---
+authors: [arda]
+slug: mcp-tasks-in-typescript-durable-long-running-tools-with-redis-and-qstash
+tags: [redis, qstash, mcp, tasks, durability]
+title: "MCP Tasks in TypeScript: Durable Long-Running Tools with Redis and QStash"
+---
+
+The [2026-07-28 MCP spec](https://blog.modelcontextprotocol.io/posts/2026-07-28/) made MCP (Model Context Protocol) stateless. The initialize handshake and the Mcp-Session-Id header are gone, and every request travels on its own, carrying the protocol version, client identity, and capabilities in its `_meta` field. Long-running tools got a new answer too: the Tasks extension, where a tool call returns a task handle and the client polls for the result.
+
+Statelessness has one big consequence for tasks: a `tasks/get` poll can land on any instance of your server, so the server has to write task state to shared storage instead of keeping it in process memory.
+
+If you build MCP servers in TypeScript, the official SDK has no tasks runtime today. So in this post we build a small tasks SDK on top of the official v2 packages. The core is storage-agnostic: a `TaskStore` interface for the record and a `TaskDispatcher` interface for the execution transport, with Upstash Redis and QStash as the backends we implement. Then we run it: complete a task, cancel one mid-flight, and kill the server mid-task to see what survives.
+
+## What are MCP Tasks?
+
+MCP Tasks is an official extension (`io.modelcontextprotocol/tasks`) that lets a server answer a `tools/call` request with a task handle instead of a final result. The client then polls `tasks/get` for status, answers input requests with `tasks/update`, and asks to stop with `tasks/cancel`.
+
+Task creation is server-directed. The client declares support for the extension in its per-request capabilities, and for each tool call the server [either returns a task handle or the normal result](https://github.com/modelcontextprotocol/ext-tasks/blob/main/specification/draft/tasks.md). A task moves through five states: `working`, `input_required`, `completed`, `failed`, and `cancelled`. The last three are terminal. Once a task reaches one of them, its state never changes again.
+
+Tasks started as an experimental part of the 2025-11-25 core spec. [SEP-2663](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2663) pulled them out and re-landed them as an extension with exactly three methods. There is no `tasks/list`, because without sessions a server cannot scope a task list to one caller without leaking the existence of someone else's tasks.
+
+## Does the official TypeScript SDK support Tasks?
+
+No. The v2 TypeScript SDK implements the 2026-07-28 spec, but it ships no tasks runtime. The v1 experimental task APIs were removed in v2, and the [migration guide](https://github.com/modelcontextprotocol/typescript-sdk/blob/main/docs/migration/upgrade-to-v2.md) is blunt about it: no mechanical migration, remove usages.
+
+The removed list includes `TaskStore`, `InMemoryTaskStore`, `registerToolTask`, and the task store constructor options on the server class. Any tasks example you find on the v1 branch runs the old design that SEP-2663 replaced.
+
+Support across the official SDKs is [uneven right now](https://newsletter.victordibia.com/p/mcp-july-2026-update-stateless-core):
+
+| SDK | Tasks runtime |
+| --- | --- |
+| C# | Yes, with a pluggable task store |
+| Rust | Yes, with a task store |
+| TypeScript v2 | No |
+| Python | No, open PR |
+| Go | No |
+
+The v2 SDK does give us the seam we need. It is split into [`@modelcontextprotocol/server`](https://www.npmjs.com/package/@modelcontextprotocol/server), `@modelcontextprotocol/client`, and `@modelcontextprotocol/core`, and the server's low-level `setRequestHandler` accepts custom methods in a three-argument form with your own schemas. That is enough to add `tasks/get` and `tasks/cancel` without forking anything.
+
+## A durable task record and durable work are two different problems
+
+MCP Tasks defines how a client and a server talk about long-running work. It says nothing about where that work runs. Microsoft's Azure team [makes the same point](https://techcommunity.microsoft.com/blog/appsonazureblog/build-durable-long-running-mcp-tasks-on-azure-app-service/4545170): a durable task ID does not automatically make the underlying work durable.
+
+The failure mode is easy to picture. You write the task record to shared storage, then run the work with a fire-and-forget promise in the same process. The process restarts during a deploy. The record survives. The work does not. You now own a perfectly durable record of a task stuck in `working` until its TTL expires.
+
+So the implementation splits into three layers:
+
+1. **The task record.** A small object keyed by task ID that any instance can read and write. This goes in Upstash Redis.
+2. **The execution.** The work has to run to completion even if the process that accepted the tool call dies. QStash [stores each message durably before delivery](https://upstash.com/docs/qstash/howto/publishing) and retries when the endpoint fails, so we publish the work to QStash and let it call us back.
+3. **Polling.** The client hits `tasks/get`, any instance reads Redis. Nothing new needed.
+
+The task schema has a `ttlMs` field, and the draft says the server may discard the task after the TTL (time to live) elapses. Redis [EXPIRE](https://upstash.com/docs/redis/commands/generic/expire) deletes a key automatically after its lifetime, so the retention policy is one command instead of a cleanup job.
+
+![](https://cdn.bydefault.so/drawing-ydu4xLHt7LL_ZU0fvCicz.png)
+
+## Who has built this already
+
+Two projects validate this shape, one per ecosystem:
+
+| Implementation | Language | Runs on | Task state | Execution |
+| --- | --- | --- | --- | --- |
+| [FastMCP tasks](https://gofastmcp.com/servers/tasks) | Python | Anywhere Python runs | Redis or Valkey via Docket | Embedded workers |
+| [durable-mcp-server](https://github.com/mattzcarey/durable-mcp-server) | TypeScript | Cloudflare Workers only | Durable Objects (SQLite) | Durable Object alarms |
+| This post | TypeScript | Any Node host | Pluggable, Upstash Redis here | Pluggable, QStash here |
+
+FastMCP turns a tool into a task by setting task to true on the tool decorator, and configures the backend by URL. The in-memory backend is single-process only; [running more than one worker requires Redis or Valkey](https://gofastmcp.com/servers/tasks). Tool arguments and mid-task answers are [stored as plaintext](https://gofastmcp.com/servers/tasks), so the backend holds sensitive data.
+
+durable-mcp-server takes the same additive approach on top of the official v2 SDK, with Durable Objects as the runtime, so it runs on Cloudflare Workers only. The version below keeps that shape, a single `registerTask` function, and runs on any Node host.
+
+## The wire contract
+
+Everything the client sees is this object, straight from the [draft schema](https://github.com/modelcontextprotocol/ext-tasks/blob/main/specification/draft/tasks.md):
+
+```ts
+type WireTask = {
+  taskId: string;
+  status: "working" | "input_required" | "completed" | "failed" | "cancelled";
+  statusMessage?: string;
+  createdAt: string;
+  lastUpdatedAt: string;
+  ttlMs: number | null; // null means unlimited
+  pollIntervalMs?: number;
+};
+```
+
+The rules that matter for the implementation:
+
+- The creation response from `tools/call` carries `resultType: "task"`. The responses to `tasks/get`, `tasks/update`, and `tasks/cancel` carry `resultType: "complete"`.
+- The server must not return the task handle [until the task is durably created](https://github.com/modelcontextprotocol/ext-tasks/blob/main/specification/draft/tasks.md). A `tasks/get` for the returned ID has to resolve immediately, even from another instance. So the handler writes to the store before it sends the response, never after.
+- Over Streamable HTTP, task method requests set the `Mcp-Name` header to the task ID, so load balancers can route without parsing bodies.
+- A completed task carries its `result` inline. A failed one carries a JSON-RPC error. Cancellation is cooperative: the server acknowledges the intent, and the work may stop later or never.
+
+We skip `tasks/update` in this build to keep the code short. It exists for the client to answer an `input_required` task, and our demo task never asks for input. It would follow the same pattern as the other two methods: one more request handler that writes the client's answer into the task's record, which the handler then reads at a step boundary, the same way it reads the cancelled status.
+
+## The SDK shape: two interfaces
+
+The SDK splits along the two-problems line from earlier. Everything the core needs from storage is a `TaskStore`, and everything it needs from execution is a `TaskDispatcher`. The Upstash implementations come later; a Postgres row plus an advisory worker, or a BullMQ queue, could implement the same contracts without touching the core.
+
+```ts
+// src/types.ts
+export type Task = {
+  taskId: string;
+  status: "working" | "input_required" | "completed" | "failed" | "cancelled";
+  statusMessage?: string;
+  createdAt: string;
+  lastUpdatedAt: string;
+  ttlMs: number | null;
+  pollIntervalMs?: number;
+  result?: Record<string, unknown>;
+  error?: { code: number; message: string; data?: unknown };
+  // internal, stripped before the task goes over the wire
+  name: string;
+  args: unknown;
+  dispatchId?: string;
+};
+
+export interface TaskStore {
+  /** Durably persists the task before resolving. */
+  create(task: Task): Promise<void>;
+  /** Returns the latest durable task state, or null when absent. */
+  get(taskId: string): Promise<Task | null>;
+  /** Durably applies a partial update without extending the original TTL. */
+  update(taskId: string, patch: Partial<Task>): Promise<Task>;
+}
+
+export interface TaskDispatcher {
+  /** Durably accepts an idempotent, at-least-once delivery before resolving. */
+  dispatch(taskId: string): Promise<string | undefined>;
+  /** Idempotently stops pending delivery or retries when possible. */
+  cancel(dispatchId: string): Promise<void>;
+}
+
+export type TaskContext = {
+  update(statusMessage: string): Promise<void>;
+  isCancelled(): Promise<boolean>;
+};
+```
+
+The `Task` type is the wire object plus three internal fields: the tool name and arguments (so the executor has what it needs to run) and the dispatch ID (so cancel can stop pending delivery). The core strips those three before anything goes over the wire.
+
+The interface contracts carry the spec's requirements. A store's create must persist before it resolves, because the tool call cannot return the handle earlier. A dispatcher promises at-least-once delivery, which is why the core guards against redelivery instead of assuming exactly-once.
+
+## The core: createTaskLayer
+
+The core is one factory. It takes a store and a dispatcher and returns two functions: `registerTask`, which turns a tool on the official `McpServer` into a task-returning tool, and `executeTask`, which your delivery endpoint calls to run the work.
+
+```ts
+// src/core.ts
+import { randomUUID } from "node:crypto";
+import { CLIENT_CAPABILITIES_META_KEY, McpServer, ProtocolError } from "@modelcontextprotocol/server";
+import * as z from "zod/v4";
+import type { Task, TaskContext, TaskDispatcher, TaskStore } from "./types.js";
+
+const EXTENSION = "io.modelcontextprotocol/tasks";
+const terminal = new Set<Task["status"]>(["completed", "failed", "cancelled"]);
+
+type LayerOptions = {
+  store: TaskStore;
+  dispatcher: TaskDispatcher;
+  defaults?: { ttlMs?: number | null; pollIntervalMs?: number };
+};
+
+type TaskConfig<Args> = {
+  description: string;
+  inputSchema: z.ZodType<Args>;
+  ttlMs?: number | null;
+  pollIntervalMs?: number;
+};
+
+type Handler = (args: never, context: TaskContext) => Promise<Record<string, unknown>>;
+
+export function createTaskLayer({ store, dispatcher, defaults = {} }: LayerOptions) {
+  const handlers = new Map<string, Handler>();
+  const wired = new WeakSet<McpServer>();
+
+  function registerTask<Args>(
+    server: McpServer,
+    name: string,
+    config: TaskConfig<Args>,
+    handler: (args: Args, context: TaskContext) => Promise<Record<string, unknown>>,
+  ) {
+    handlers.set(name, handler as Handler);
+    wire(server);
+    server.registerTool(name, { description: config.description, inputSchema: config.inputSchema }, async (args, context) => {
+      const envelope = context.mcpReq.envelope as Record<string, unknown> | undefined;
+      const capabilities = envelope?.[CLIENT_CAPABILITIES_META_KEY] as { extensions?: Record<string, unknown> } | undefined;
+      if (!capabilities?.extensions || !(EXTENSION in capabilities.extensions)) {
+        throw new ProtocolError(-32021, "Missing required client capability", {
+          requiredCapabilities: { extensions: { [EXTENSION]: {} } },
+        });
+      }
+      const now = new Date().toISOString();
+      const task: Task = {
+        taskId: randomUUID(), status: "working", statusMessage: "Queued for durable execution",
+        createdAt: now, lastUpdatedAt: now, ttlMs: config.ttlMs ?? defaults.ttlMs ?? 300_000,
+        pollIntervalMs: config.pollIntervalMs ?? defaults.pollIntervalMs ?? 2_000, name, args,
+      };
+      await store.create(task);
+      const dispatchId = await dispatcher.dispatch(task.taskId);
+      const saved = dispatchId ? await store.update(task.taskId, { dispatchId }) : task;
+      return { resultType: "task", ...publicTask(saved) } as never;
+    });
+  }
+
+  function wire(server: McpServer) {
+    if (wired.has(server)) return;
+    wired.add(server);
+    server.server.registerCapabilities({ extensions: { [EXTENSION]: {} } });
+    const params = z.object({ taskId: z.string() });
+    server.server.setRequestHandler("tasks/get", { params }, async ({ taskId }) => ({
+      resultType: "complete", ...publicTask(await required(taskId)),
+    }));
+    server.server.setRequestHandler("tasks/cancel", { params }, async ({ taskId }) => {
+      const task = await required(taskId);
+      if (!terminal.has(task.status)) await store.update(taskId, { status: "cancelled", statusMessage: "Cancelled by client" });
+      if (task.dispatchId) await dispatcher.cancel(task.dispatchId).catch(() => undefined);
+      console.log(`[cancel] task=${taskId} dispatchCancelled=${Boolean(task.dispatchId)}`);
+      return { resultType: "complete" };
+    });
+  }
+
+  async function executeTask(taskId: string) {
+    const task = await required(taskId);
+    if (terminal.has(task.status)) return task;
+    const handler = handlers.get(task.name);
+    if (!handler) throw new Error(`No executor registered for ${task.name}`);
+    console.log(`[execute] task=${taskId} starting`);
+    try {
+      const result = await handler(task.args as never, {
+        update: async statusMessage => { await store.update(taskId, { statusMessage }); },
+        isCancelled: async () => (await store.get(taskId))?.status === "cancelled",
+      });
+      if ((await store.get(taskId))?.status === "cancelled") return;
+      await store.update(taskId, { status: "completed", statusMessage: "Report ready", result });
+      console.log(`[execute] task=${taskId} completed`);
+    } catch (error) {
+      await store.update(taskId, { status: "failed", statusMessage: "Execution failed",
+        error: { code: -32603, message: error instanceof Error ? error.message : String(error) } });
+      throw error;
+    }
+  }
+
+  async function required(taskId: string) {
+    const task = await store.get(taskId);
+    if (!task) throw new ProtocolError(-32602, `Unknown task: ${taskId}`);
+    return task;
+  }
+
+  return { registerTask, executeTask };
+}
+
+function publicTask({ name: _name, args: _args, dispatchId: _dispatchId, ...task }: Task) {
+  return task;
+}
+```
+
+Four details carry the design:
+
+- Since the protocol is stateless, the capability check reads the per-request envelope instead of a session. The SDK lifts the client capabilities out of `_meta` and exposes them under `CLIENT_CAPABILITIES_META_KEY`.
+- The tool callback does its three writes in order: create the record, dispatch the work, return the handle. The store write comes first because of the durable-creation rule.
+- Cancel does two writes on purpose. Flipping the status to `cancelled` is the terminal, idempotent part. Cancelling the dispatch stops pending delivery and future retries. Without that second write, a retry can re-invoke the executor on a task that is already terminal.
+- `executeTask` bails when the task is already terminal. That is the redelivery guard: with at-least-once delivery, the same task ID can arrive twice.
+
+## The Upstash backends
+
+The Redis store is one hash per task with EXPIRE mapped from `ttlMs`. The QStash dispatcher publishes the task ID to your execute endpoint; the [message is stored durably](https://upstash.com/docs/qstash/howto/publishing) before delivery, retried on failure, and [cancellable](https://upstash.com/docs/qstash/api-reference/messages/cancel-a-message) while pending.
+
+```ts
+// src/upstash.ts
+import { Redis } from "@upstash/redis";
+import { Client as QStash } from "@upstash/qstash";
+import { ProtocolError } from "@modelcontextprotocol/server";
+import type { Task, TaskDispatcher, TaskStore } from "./types.js";
+
+export class RedisTaskStore implements TaskStore {
+  constructor(private redis: Redis, private prefix = "mcp-task:") {}
+
+  async create(task: Task) {
+    await this.redis.hset(this.key(task.taskId), { data: JSON.stringify(task) });
+    if (task.ttlMs !== null) await this.redis.expire(this.key(task.taskId), Math.ceil(task.ttlMs / 1000));
+  }
+
+  async get(taskId: string): Promise<Task | null> {
+    const data = await this.redis.hget<string | Task>(this.key(taskId), "data");
+    return data ? (typeof data === "string" ? JSON.parse(data) : data) : null;
+  }
+
+  async update(taskId: string, patch: Partial<Task>) {
+    const task = await this.get(taskId);
+    if (!task) throw new ProtocolError(-32602, `Unknown task: ${taskId}`);
+    const next = { ...task, ...patch, lastUpdatedAt: new Date().toISOString() };
+    await this.redis.hset(this.key(taskId), { data: JSON.stringify(next) });
+    return next;
+  }
+
+  private key(taskId: string) { return this.prefix + taskId; }
+}
+
+export class QStashDispatcher implements TaskDispatcher {
+  constructor(
+    private qstash: QStash,
+    private executeUrl: string,
+    private retries = 5,
+  ) {}
+
+  async dispatch(taskId: string) {
+    const message = await this.qstash.publishJSON({
+      url: this.executeUrl, body: { taskId }, retries: this.retries,
+      retryDelay: "1000", deduplicationId: taskId,
+    });
+    return message.messageId;
+  }
+
+  async cancel(dispatchId: string) {
+    await this.qstash.messages.cancel(dispatchId);
+  }
+}
+```
+
+The `deduplicationId` on the publish matters. QStash delivery is at-least-once, and pinning deduplication to the task ID means a double-submitted tool call cannot enqueue the same task twice.
+
+A swap for another backend touches only this file. A Postgres store is the same three methods over one table with a cleanup job standing in for EXPIRE. A BullMQ dispatcher is an add returning the job ID and a remove for cancel.
+
+## Using it: the whole server
+
+With the SDK in place, a working server is the part a reader would write. Wire a store and a dispatcher into `createTaskLayer`, register a task, and expose two endpoints: the MCP transport and the execute endpoint the dispatcher delivers to. The demo tool is a four-step report generator that takes about ten seconds and checks for cancellation between steps.
+
+```ts
+// server.ts
+import { createServer, type IncomingMessage } from "node:http";
+import { McpServer } from "@modelcontextprotocol/server";
+import { NodeStreamableHTTPServerTransport } from "@modelcontextprotocol/node";
+import { Redis } from "@upstash/redis";
+import { Client as QStash, Receiver } from "@upstash/qstash";
+import * as z from "zod/v4";
+import { createTaskLayer, QStashDispatcher, RedisTaskStore } from "./src/index.js";
+
+const port = Number(process.env.PORT ?? 3000);
+const executeUrl = `http://127.0.0.1:${port}/execute`;
+const qstash = new QStash({ token: process.env.QSTASH_TOKEN!, baseUrl: process.env.QSTASH_URL! });
+const tasks = createTaskLayer({
+  store: new RedisTaskStore(Redis.fromEnv()),
+  dispatcher: new QStashDispatcher(qstash, executeUrl),
+});
+const mcp = new McpServer(
+  { name: "durable-tasks-demo", version: "1.0.0" },
+  { supportedProtocolVersions: ["2026-07-28"] },
+);
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+tasks.registerTask(mcp, "generate_report", {
+  description: "Generate a report in four durable steps",
+  inputSchema: z.object({ topic: z.string() }),
+}, async ({ topic }, task) => {
+  for (let step = 1; step <= 4; step++) {
+    if (await task.isCancelled()) { console.log(`[execute] cancelled before step ${step}`); return {}; }
+    await task.update(`Step ${step}/4: processing ${topic}`);
+    await sleep(2_500);
+  }
+  return { resultType: "complete", content: [{ type: "text", text: `Report complete: ${topic}` }],
+    structuredContent: { report: `A concise report about ${topic}.` } };
+});
+
+const transport = new NodeStreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });
+await mcp.connect(transport);
+const receiver = new Receiver({ currentSigningKey: process.env.QSTASH_CURRENT_SIGNING_KEY!, nextSigningKey: process.env.QSTASH_NEXT_SIGNING_KEY! });
+createServer(async (req, res) => {
+  if (req.url !== "/execute") return transport.handleRequest(req, res);
+  const body = await readBody(req);
+  try {
+    await receiver.verify({ signature: String(req.headers["upstash-signature"] ?? ""), body, url: executeUrl });
+    await tasks.executeTask(JSON.parse(body).taskId);
+    res.writeHead(200).end("ok");
+  } catch (error) { console.error("[execute] delivery failed", error); res.writeHead(500).end("retry"); }
+}).listen(port, () => console.log(`MCP http://127.0.0.1:${port}/mcp`));
+
+async function readBody(req: IncomingMessage) {
+  const chunks: Buffer[] = [];
+  for await (const chunk of req) chunks.push(Buffer.from(chunk));
+  return Buffer.concat(chunks).toString("utf8");
+}
+```
+
+The `Receiver` check verifies the QStash signature on every delivery, so random POSTs to the execute endpoint cannot run tasks. When the executor throws, the endpoint returns a 500 and QStash retries.
+
+## Running it
+
+You need an [Upstash Redis database](https://upstash.com/start-redis) and QStash. For QStash you can develop fully offline: the [local dev server](https://upstash.com/docs/qstash/howto/local-development) is one command and prints the URL, token, and signing keys the server reads from the environment.
+
+```bash
+npx @upstash/qstash-cli dev
+```
+
+The official v2 client's response schemas do not include the task discriminator yet and reject it, so the demo client is a raw JSON-RPC function. It shows what a stateless request looks like now, capabilities and all:
+
+```ts
+async function rpc(method: string, params: Record<string, unknown>) {
+  const headers: Record<string, string> = {
+    "content-type": "application/json",
+    "accept": "application/json, text/event-stream",
+    "mcp-protocol-version": "2026-07-28",
+    "mcp-method": method,
+  };
+  if (method === "tools/call") headers["mcp-name"] = String(params.name);
+  const response = await fetch("http://127.0.0.1:3000/mcp", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params: {
+      ...params,
+      _meta: {
+        "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+        "io.modelcontextprotocol/clientInfo": { name: "tasks-demo", version: "1.0.0" },
+        "io.modelcontextprotocol/clientCapabilities": { extensions: { "io.modelcontextprotocol/tasks": {} } },
+      },
+    } }),
+  });
+  const json = await response.json() as { result?: Record<string, unknown>; error?: unknown };
+  if (json.error) throw new Error(JSON.stringify(json.error));
+  return json.result!;
+}
+```
+
+Calling the tool with the topic "coffee trends" and polling every two seconds produces this (timestamps trimmed):
+
+```text
+created {"resultType":"task","taskId":"0e303b6f-...","status":"working","statusMessage":"Queued for durable execution","ttlMs":300000,"pollIntervalMs":2000}
+poll {"resultType":"complete","taskId":"0e303b6f-...","status":"working","statusMessage":"Step 1/4: processing coffee trends"}
+poll {"resultType":"complete","taskId":"0e303b6f-...","status":"working","statusMessage":"Step 2/4: processing coffee trends"}
+poll {"resultType":"complete","taskId":"0e303b6f-...","status":"working","statusMessage":"Step 3/4: processing coffee trends"}
+poll {"resultType":"complete","taskId":"0e303b6f-...","status":"working","statusMessage":"Step 4/4: processing coffee trends"}
+poll {"resultType":"complete","taskId":"0e303b6f-...","status":"completed","statusMessage":"Report ready","result":{"resultType":"complete","content":[{"type":"text","text":"Report complete: coffee trends"}],"structuredContent":{"report":"A concise report about coffee trends."}}}
+```
+
+The tool call returns with the handle right away, the work runs behind it, and the final poll carries the result inline.
+
+## Cancelling a task mid-flight
+
+Starting a second task and cancelling it three seconds in:
+
+```text
+created {"resultType":"task","taskId":"58437147-...","status":"working","statusMessage":"Queued for durable execution"}
+cancel {"resultType":"complete"}
+after-cancel {"resultType":"complete","taskId":"58437147-...","status":"cancelled","statusMessage":"Cancelled by client"}
+```
+
+And on the server side:
+
+```text
+[execute] task=58437147-... starting
+[cancel] task=58437147-... dispatchCancelled=true
+[execute] cancelled before step 2
+```
+
+All three layers of the cancel show up here. The store flips the status, the dispatcher cancels the pending message, and the handler checks at the next step boundary and stops. That last layer is hard to guarantee. Code that is already running only stops where it checks. The same applies to delivery: a message [already in flight to your endpoint](https://upstash.com/docs/qstash/api-reference/messages/cancel-a-message) may be past the point of cancelling. This is why the spec calls cancellation cooperative.
+
+![](https://cdn.bydefault.so/drawing--6H1bgGkXFwa2ToI1TmHz.png)
+
+When a task has many steps and each one needs its own retry and checkpoint, [Upstash Workflow](https://upstash.com/docs/workflow/getstarted) runs every step as a separate request and retries a failed step without rerunning the earlier ones. That gives you those boundaries for free.
+
+## Killing the server mid-task
+
+The durability claim deserves a hostile test. Start a task, kill the server process with signal 9 while the task is mid-run, restart, and poll again. The QStash delivery that died with the process was redelivered to the new one:
+
+```text
+MCP http://127.0.0.1:3000/mcp
+[execute] task=6be3618b-... starting
+```
+
+And the client's poll picks the task back up mid-progress and rides it to the result:
+
+```text
+poll {"resultType":"complete","taskId":"6be3618b-...","status":"working","statusMessage":"Step 3/4: processing create-only","ttlMs":300000}
+poll {"resultType":"complete","taskId":"6be3618b-...","status":"working","statusMessage":"Step 4/4: processing create-only"}
+poll {"resultType":"complete","taskId":"6be3618b-...","status":"completed","statusMessage":"Report ready","result":{"resultType":"complete","content":[{"type":"text","text":"Report complete: create-only"}],"structuredContent":{"report":"A concise report about create-only."}}}
+```
+
+This is the difference between the two kinds of durable from earlier. Redis alone would have kept the record and lost the work. QStash redelivery is what turned a killed process into a finished task. The redelivered run started from step one, which is fine for an idempotent handler like ours. Per-step checkpointing is the Workflow upgrade path.
+
+## Polling today, push later
+
+The extension is poll-based, and the MCP core team treats that as a starting point. Priority Area 1 on the [official roadmap](https://modelcontextprotocol.io/development/roadmap) is agentic messaging primitives, and the Triggers and Events working group is designing channels and subscriptions for push delivery, including webhooks, so servers can tell clients work has finished "without relying purely on expensive client-side polling." The roadmap describes itself as current thinking rather than a commitment, so nothing here changes what you build today.
+
+![](https://cdn.bydefault.so/tweet-9geMiBPWrgGJRW3kKQMLX.png)
+
+The `ext-tasks` repo labels itself experimental, and its schema and specification directories are both drafts. The wire shapes above match the draft as of early September 2026, and the names may change before Tasks lands in core.
+
+## Recap
+
+| Layer | Interface | What it needs | What we plugged in |
+| --- | --- | --- | --- |
+| Task record | TaskStore | Durable create before the response, TTL cleanup | Upstash Redis hash plus EXPIRE |
+| Execution | TaskDispatcher | At-least-once delivery that retries when a process dies, cancellable while pending | QStash publish to an execute endpoint |
+| Multi-step work | (handler) | Per-step retries and checkpoints | Upstash Workflow |
+| Results | (core) | Client polling | tasks/get reading the store |
+
+The SDK is under 200 lines across three files, and the backends are one file of it. When the TypeScript SDK ships its own tasks runtime with a store interface, the same Redis and QStash classes become implementations of that interface.
