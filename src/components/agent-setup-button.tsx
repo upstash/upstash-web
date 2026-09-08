@@ -3,7 +3,12 @@
 import Button from "@/components/button";
 import { trackEvent } from "@/lib/analytics";
 import cx from "@/utils/cx";
-import { IconCheck, IconChevronDown, IconSparkles } from "@tabler/icons-react";
+import {
+  IconArrowUpRight,
+  IconCheck,
+  IconChevronDown,
+  IconSparkles,
+} from "@tabler/icons-react";
 import copy from "copy-to-clipboard";
 import * as React from "react";
 import { createPortal } from "react-dom";
@@ -19,7 +24,6 @@ export const AGENT_SETUP_PROMPT =
 type SetupOption = {
   id: string;
   label: string;
-  summary: string;
   value: string;
 };
 
@@ -31,40 +35,37 @@ const SETUP_OPTIONS: SetupOption[] = [
   {
     id: "prompt",
     label: "Copy setup prompt",
-    summary: "Let your agent install everything",
     value: AGENT_SETUP_PROMPT,
   },
   {
     id: "claude_plugin",
     label: "Copy Claude plugin install",
-    summary: "Skills + remote MCP in one step",
     value:
       "/plugin marketplace add upstash/skills\n/plugin install upstash@upstash",
   },
   {
     id: "codex_plugin",
     label: "Copy Codex plugin install",
-    summary: "Skills + remote MCP in one step",
     value:
       "codex plugin marketplace add upstash/skills\ncodex plugin add upstash@upstash",
   },
   {
     id: "mcp_url",
     label: "Copy remote MCP URL",
-    summary: "Any client, OAuth on first use",
     value: "https://mcp.upstash.com/mcp",
   },
   {
     id: "skills",
     label: "Copy skills command",
-    summary: "Agent Skills CLI, no MCP server",
     value: "npx skills add upstash/skills",
   },
 ];
 
 const PRIMARY_OPTION = SETUP_OPTIONS[0];
 
-const MENU_WIDTH = 288;
+const DOCS_URL = "https://upstash.com/docs/agent-resources/overview";
+
+const MENU_WIDTH = 260;
 const MENU_GAP = 8;
 
 export default function AgentSetupButton({
@@ -143,7 +144,7 @@ export default function AgentSetupButton({
             onMouseEnter={show}
             onMouseLeave={hide}
             className={cx(
-              "fixed z-[999] w-72 rounded-2xl p-1 text-left",
+              "fixed z-[999] w-[260px] rounded-2xl p-1 text-left",
               "border border-black/10 bg-white shadow-xl",
               "dark:border-white/10 dark:bg-zinc-900",
             )}
@@ -156,17 +157,11 @@ export default function AgentSetupButton({
                 onClick={() => onCopy(option)}
                 className={cx(
                   "relative flex w-full items-center rounded-xl px-3 py-2 text-left transition",
+                  "text-sm font-medium text-text",
                   "hover:bg-bg-mute dark:hover:bg-white/10",
                 )}
               >
-                <span className="min-w-0 grow">
-                  <span className="block text-sm font-medium text-text">
-                    {option.label}
-                  </span>
-                  <span className="block text-xs text-text-mute">
-                    {option.summary}
-                  </span>
-                </span>
+                {option.label}
                 {/* Absolute, so the confirmation never reflows the row. */}
                 {copiedId === option.id ? (
                   <span
@@ -181,6 +176,20 @@ export default function AgentSetupButton({
                 ) : undefined}
               </button>
             ))}
+
+            <a
+              role="menuitem"
+              href={DOCS_URL}
+              target="_blank"
+              className={cx(
+                "mt-1 flex items-center gap-1.5 rounded-xl px-3 py-2 transition",
+                "border-t border-black/5 text-sm font-medium text-primary-text",
+                "hover:bg-bg-mute dark:border-white/10 dark:hover:bg-white/10",
+              )}
+            >
+              See all agent resources
+              <IconArrowUpRight size={16} />
+            </a>
           </div>,
           document.body,
         )
