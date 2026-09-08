@@ -1,6 +1,5 @@
 import Button from "@/components/button";
 import Container from "@/components/container";
-import CopyButton from "@/components/copy-button";
 import HomeHeroProducts from "@/components/home/hero/hero-products";
 import { HeroTabQStash } from "@/components/home/hero/hero-tab-qstash";
 import { HeroTabRedis } from "@/components/home/hero/hero-tab-redis";
@@ -21,9 +20,6 @@ import React, { useState } from "react";
 import { HeroTabBox } from "../hero/hero-tab-box";
 import { PRODUCT_TAGLINES } from "./product-features";
 import ProductSeoData from "./product-seo-data";
-
-const UPSTASH_SKILL_COMMAND =
-  "npx skills add https://github.com/upstash/skills --skill upstash";
 
 const HeroProductTagline = ({ activeProduct }: { activeProduct: Product }) => {
   const { title, docsLink, consoleLink } = PRODUCT_TAGLINES[activeProduct];
@@ -67,22 +63,6 @@ const HeroProductTagline = ({ activeProduct }: { activeProduct: Product }) => {
             )}
           </Button>
         </a>
-      </div>
-
-      <div className="mt-3 flex w-full flex-col items-center gap-2">
-        <div className="flex w-fit max-w-full items-center gap-3 overflow-x-auto rounded-xl bg-bg-mute py-2 pl-4 pr-6">
-          <code className="whitespace-nowrap font-mono text-xs text-text md:text-sm">
-            {UPSTASH_SKILL_COMMAND}
-          </code>
-          <CopyButton
-            code={UPSTASH_SKILL_COMMAND}
-            eventName="skill_copy"
-            className="shrink-0 text-text-mute hover:text-primary"
-          />
-        </div>
-        <span className="text-xs text-text-mute">
-          Add the Upstash skill to your AI coding agent
-        </span>
       </div>
     </div>
   );
