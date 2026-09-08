@@ -46,7 +46,6 @@ const DOCS_URL = "https://upstash.com/docs/agent-resources/overview";
 
 const COPIED_DELAY = 1800;
 
-const MENU_WIDTH = 260;
 const MENU_GAP = 8;
 
 export default function AgentSetupButton({
@@ -59,6 +58,7 @@ export default function AgentSetupButton({
   const [position, setPosition] = React.useState<{
     top: number;
     left: number;
+    width: number;
   }>();
   const [mounted, setMounted] = React.useState(false);
   const triggerRef = React.useRef<HTMLDivElement>(null);
@@ -83,11 +83,12 @@ export default function AgentSetupButton({
   const place = React.useCallback(() => {
     const rect = triggerRef.current?.getBoundingClientRect();
     if (!rect) return;
+    // The menu takes the trigger's width, so it reads as one control.
     const left = Math.min(
       rect.left,
-      Math.max(MENU_GAP, window.innerWidth - MENU_WIDTH - MENU_GAP),
+      Math.max(MENU_GAP, window.innerWidth - rect.width - MENU_GAP),
     );
-    setPosition({ top: rect.bottom + MENU_GAP, left });
+    setPosition({ top: rect.bottom + MENU_GAP, left, width: rect.width });
   }, []);
 
   // The menu is mounted from the start and hidden with classes rather than
@@ -134,11 +135,15 @@ export default function AgentSetupButton({
             role="menu"
             aria-label="Copy Upstash agent setup"
             aria-hidden={!open}
-            style={{ top: position.top, left: position.left }}
+            style={{
+              top: position.top,
+              left: position.left,
+              width: position.width,
+            }}
             onMouseEnter={show}
             onMouseLeave={hide}
             className={cx(
-              "fixed z-[999] w-[260px] rounded-2xl p-1 text-left",
+              "fixed z-[999] rounded-2xl p-1 text-left",
               "border border-black/10 bg-white shadow-xl",
               "dark:border-white/10 dark:bg-zinc-900",
               "origin-top transition duration-150 ease-out motion-reduce:transition-none",
