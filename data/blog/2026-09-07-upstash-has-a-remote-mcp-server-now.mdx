@@ -2,11 +2,13 @@
 authors: [arda]
 slug: upstash-has-a-remote-mcp-server-now
 tags: [mcp, redis, qstash, workflow, vector, search, oauth, agents]
-title: "Upstash Has a Remote MCP Server Now"
-description: "Connect any MCP client to your Upstash account over OAuth at mcp.upstash.com/mcp, with no local process and no API keys in your projects."
+title: "The Upstash MCP Server Is Now Remote"
+description: "Our MCP server is now hosted at mcp.upstash.com/mcp. Connect any client over OAuth, with no local process and no API keys in your projects."
 ---
 
-We are a little late to the MCP party but better late than never! Plenty of people asked us for one, so it is here now:
+Our MCP server has been around for a while, but only as a local one: your client spawned it with `npx`, and you gave it a Developer API key. That works on a laptop and nowhere else.
+
+It is now also hosted, at a URL you connect to over OAuth:
 
 ```text
 https://mcp.upstash.com/mcp
@@ -68,7 +70,7 @@ The tools that touch your data need a word of explanation, because reaching a re
 
 Other tools do hand you credentials, on purpose. `redis_get_database`, `index_get` and the create tools return the resource's REST tokens, because an agent that just made you a database usually needs to wire an app up to it. The read-only switch on the consent screen is what turns that off: when the grant is read-only, the server strips the password and both tokens out of every one of those results, and you go to the console for them instead.
 
-## Previous agent surfaces
+## What about the CLI and the local server?
 
 The [`upstash` CLI](https://upstash.com/docs/agent-resources/cli) has been around the longest. It calls the Developer API, takes non-interactive commands and prints JSON. That makes it good in CI and fine for an agent that is already comfortable in a shell.
 
@@ -81,13 +83,11 @@ npx -y @upstash/mcp-server@latest \
 
 Both still work. The local server is the one to use if you want Box tools, which the remote server does not carry yet. Going the other way, the remote server covers Vector and Search, which the local one does not.
 
-## What the remote server makes possible
+## What being remote unlocks
 
 ### Reaching agents that run somewhere else
 
-A stdio server is a program your client starts on your machine. That works in a terminal or a desktop editor, where there is a machine to start it on.
-
-Plenty of agents run somewhere that is not your machine, Claude on the web and Replit among them. They have no `npx` to spawn and no filesystem of yours to read a key from, so they cannot use a stdio server at all. An HTTP endpoint with OAuth behaves the same way whether the agent runs in your terminal or in a datacenter.
+Plenty of agents run somewhere that is not your machine, Claude on the web and Replit among them. They have no `npx` to spawn and no filesystem of yours to read a key from, so a stdio server is not an option for them at all. An HTTP endpoint with OAuth behaves the same way whether the agent runs in your terminal or in a datacenter.
 
 ### Shipping the MCP inside a plugin
 
