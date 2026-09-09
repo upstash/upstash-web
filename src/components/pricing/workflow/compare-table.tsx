@@ -537,7 +537,7 @@ function MobileSelectCol({
 }: React.ComponentProps<"select">) {
   return (
     <select
-      className="mb-2 bg-white px-4 py-2 font-semibold md:hidden"
+      className="mb-2 bg-white px-4 py-2 font-semibold md:hidden dark:bg-bg-mute"
       onChange={(event) => {
         trackEvent("pricing_compare_select", {
           product: "workflow",

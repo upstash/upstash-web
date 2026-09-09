@@ -79,11 +79,15 @@ export const NoticeBanner = () => {
     <div
       className={cx(
         "fixed inset-x-0 bottom-0 z-50 flex w-full items-center justify-between gap-2",
-        "bg-emerald-400 px-4 py-2.5 text-[13px] text-zinc-950 shadow-lg",
+        "bg-emerald-400 py-2.5 pl-4 text-[13px] text-zinc-950 shadow-lg",
+        // On mobile the banner spans the full width, so the Intercom launcher
+        // (48px, 20px in from the bottom-right corner) sits on top of it.
+        // Reserve that corner so the Accept button is never covered.
+        "pr-20",
         // mx-auto rather than left-1/2, so shrink-to-fit gets the whole viewport
         // to measure against and the text stays on one line
         "md:bottom-4 md:mx-auto md:w-fit md:max-w-[min(94vw,880px)]",
-        "md:rounded-3xl md:py-1.5 md:pl-4 md:pr-1.5",
+        "md:rounded-3xl md:py-1.5 md:pr-1.5",
       )}
     >
       <p className="leading-snug">
