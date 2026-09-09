@@ -96,7 +96,7 @@ export const BLOB_METERS: BlobMeter[] = [
   },
   {
     key: "bandwidth",
-    label: "Bandwidth",
+    label: "Bandwidth (Egress)",
     freeIncluded: "10 GB / month",
     rate: `$${BLOB_RATES.bandwidthPerGb.toFixed(2)} per GB`,
     tooltip:
