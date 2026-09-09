@@ -53,7 +53,8 @@ const AGENT_LOGOS = [
 
 const COPIED_DELAY = 1800;
 
-const MENU_GAP = 4;
+/** Keeps the menu off the viewport edge when the trigger wraps near it. */
+const EDGE_MARGIN = 8;
 
 const MENU_ROW = cx(
   "flex h-11 w-full items-center gap-3 rounded-lg px-3 text-left text-base font-medium",
@@ -139,12 +140,13 @@ export default function AgentSetupButton({
     if (!rect) {
       return;
     }
-    // The menu takes the trigger's width, so it reads as one control.
+    // The menu takes the trigger's width and sits flush under it, so the two
+    // read as one control.
     const left = Math.min(
       rect.left,
-      Math.max(MENU_GAP, window.innerWidth - rect.width - MENU_GAP),
+      Math.max(EDGE_MARGIN, window.innerWidth - rect.width - EDGE_MARGIN),
     );
-    setPosition({ top: rect.bottom + MENU_GAP, left, width: rect.width });
+    setPosition({ top: rect.bottom, left, width: rect.width });
   }, []);
 
   // The menu is mounted from the start and hidden with classes rather than
