@@ -41,8 +41,7 @@ export default function PricingTable() {
           </div>
         </div>
 
-        {/* Included per month. Same four meters as the payg card below, so the
-            two read as a cap against a rate rather than as different lists. */}
+        {/* Free plan limits for the same meters as the payg card below. */}
         <div className="w-full px-6 *:border-b *:border-bg-mute">
           {BLOB_CARD_METERS.map((meter) => (
             <div key={meter.key} className="py-3">
@@ -103,6 +102,12 @@ export default function PricingTable() {
           </Button>
         </div>
       </div>
+
+      <p className="text-center text-sm text-text-mute md:col-span-2">
+        If you exceed the free plan limits, requests stop until the 30-day
+        window resets. Upgrade to Pay as You Go to continue, with all usage
+        billed from the first unit.
+      </p>
     </div>
   );
 }

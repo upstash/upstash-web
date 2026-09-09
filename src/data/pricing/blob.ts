@@ -70,7 +70,7 @@ export const BLOB_METERS: BlobMeter[] = [
   {
     key: "storage",
     label: "Storage",
-    freeIncluded: "1 GB / month",
+    freeIncluded: "1 GB",
     rate: `$${BLOB_RATES.storagePerGb.toFixed(2)} per GB`,
     tooltip:
       "Measured on the monthly average of your bucket size, not its peak.",
@@ -79,7 +79,7 @@ export const BLOB_METERS: BlobMeter[] = [
   {
     key: "simple-ops",
     label: "Simple Operations",
-    freeIncluded: "First 10,000",
+    freeIncluded: "10,000 / month",
     rate: `$${BLOB_RATES.simpleOpsPerMillion.toFixed(2)} per 1M`,
     tooltip:
       "Reads: downloads, HEAD requests and bucket-level GETs. Same rate from origin or CDN.",
@@ -88,7 +88,7 @@ export const BLOB_METERS: BlobMeter[] = [
   {
     key: "advanced-ops",
     label: "Advanced Operations",
-    freeIncluded: "First 2,000",
+    freeIncluded: "2,000 / month",
     rate: `$${BLOB_RATES.advancedOpsPerMillion.toFixed(2)} per 1M`,
     tooltip:
       "Uploads, copies, renames, listings and each multipart part. Deletes are free.",
@@ -97,7 +97,7 @@ export const BLOB_METERS: BlobMeter[] = [
   {
     key: "bandwidth",
     label: "Bandwidth",
-    freeIncluded: "First 10 GB",
+    freeIncluded: "10 GB / month",
     rate: `$${BLOB_RATES.bandwidthPerGb.toFixed(2)} per GB`,
     tooltip:
       "Bytes served out of the bucket. Uploads are free; you pay only for what leaves.",
