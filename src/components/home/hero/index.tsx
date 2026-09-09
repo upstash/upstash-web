@@ -1,3 +1,4 @@
+import AgentSetupButton from "@/components/agent-setup-button";
 import Bg from "@/components/bg";
 import Button from "@/components/button";
 import Container from "@/components/container";
@@ -31,12 +32,16 @@ export default function HomeHero() {
           One platform for all your data needs
         </p>
 
-        <div className="mt-6" data-area="home_hero">
-          <Button asChild variant="primary" className="px-8">
+        <div
+          className="mt-6 flex flex-wrap items-center justify-center gap-4"
+          data-area="home_hero"
+        >
+          <Button asChild variant="primary" className="h-11 px-5">
             <a href="https://console.upstash.com" target="_self">
-              Start for Free <IconArrowUpRight size={24} />
+              Start for Free <IconArrowUpRight size={20} />
             </a>
           </Button>
+          <AgentSetupButton />
         </div>
       </Container>
     </section>
