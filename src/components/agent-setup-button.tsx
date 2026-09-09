@@ -288,7 +288,8 @@ export default function AgentSetupButton({
           aria-expanded={open}
           onClick={() => onCopy(PRIMARY_OPTION)}
           className={cx(
-            "flex h-10 items-center gap-2.5 rounded-[10px] bg-white pl-2.5 pr-[18px]",
+            // Same 20px inset as "Start for Free" beside it.
+            "flex h-10 items-center gap-2.5 rounded-[10px] bg-white px-5",
             "text-base font-medium text-emerald-800 transition hover:bg-emerald-50",
             "dark:bg-zinc-900 dark:text-emerald-400 dark:hover:bg-zinc-800",
           )}
