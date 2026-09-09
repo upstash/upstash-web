@@ -1,0 +1,107 @@
+---
+title: "Introducing Upstash Blob"
+slug: upstash-blob
+authors: [yusuf, ilter]
+tags: [blob, storage, s3, announcement]
+description: "Upstash Blob is object storage for the files your application stores and serves: global, S3-compatible buckets, public or private, with an SDK that keeps your server out of the upload path. Here is what we built and the decisions behind it."
+---
+
+Today we are launching Upstash Blob, object storage for the files your application stores and serves.
+
+Most applications running on Upstash keep their state in three places: keys in Redis, messages in QStash, and files somewhere else. The files were the part we did not offer, so every one of those apps had a bucket from another provider and a few hundred lines of glue between the two. Blob is the bucket, and the SDK is the glue, written once.
+
+<Summary>
+  - A bucket is global and S3-compatible. There is no region to pick, and the AWS SDK works next to ours.
+  - Public buckets serve every object from a CDN. Private buckets serve nothing without a signed link.
+  - Files from a browser go straight to the bucket. Your server authorizes the upload and never touches the bytes.
+  - Free to start: 1 GB of storage and 10 GB of bandwidth a month, no card.
+</Summary>
+
+---
+
+## What we wanted from a bucket
+
+We had a short list. It should be a real bucket, with objects under paths and an S3 API, so nothing you build on it depends on our SDK. It should not ask where to put your data, because the answer for files served to users is always "close to them". And it should know the difference between a product image and an invoice without you writing an access layer.
+
+So a bucket is created with a name, a visibility, and nothing else. Public buckets give every object a URL on the bucket's own hostname, cached at the edge. Private buckets have no public URL at all; every read is a signed link that expires. Both hand you one token, and that token is the whole configuration:
+
+```ts
+import { Bucket } from "@upstash/blob"
+
+const bucket = Bucket.fromEnv()
+
+const blob = await bucket.put("reports/q3.pdf", pdf, { contentType: "application/pdf" })
+blob.url // https://b3f9a2c7d1e4.blob.upstash.io/reports/q3.pdf
+
+const { url } = await bucket.signedReadUrl("invoices/2026-0042.pdf", { expiresIn: "5m" })
+```
+
+The SDK learns whether it is talking to a public or a private bucket from the backend, so the same code runs against both. On a private bucket `url` is simply `undefined`, and objects are stored with `Cache-Control: private` so no shared cache keeps a copy.
+
+The token itself never signs a request. It is exchanged for short-lived credentials scoped to that one bucket, and those are what sign every `put`, `get` and `list`. The SDK does the exchange on first use and refreshes before expiry, so you never see it happen. It is also why S3 compatibility is not a separate mode: `bucket.s3()` hands the same credentials to the AWS SDK or the AWS CLI, for anything we do not wrap. Byte ranges, conditional GETs, delimiters, object tagging, and every tool that already speaks S3.
+
+Underneath, buckets are backed by Cloudflare R2. That is what makes them global without a region selector: a reader in Singapore and a reader in Frankfurt are both served from close by, and there is one rate sheet instead of one per region.
+
+## Where the bytes go
+
+The decision that shaped the SDK most is that no application server should be in the path of a file upload. Not yours, and not ours.
+
+We did build a proxy first. Every byte went through a worker of ours on its way to storage, which is the obvious design, and it let us meter and inspect traffic in one place. Then we measured it against clients talking to storage directly, and the numbers refused to pick a winner. What decided it was the shape of the two systems. A proxy has to scale with the bytes your users upload. A credential service scales with the number of buckets, and an idle bucket costs nothing. We removed the proxy. Today a client fetches a credential once, and after that the bytes go where they are going.
+
+Your server is treated the same way. When a user picks a file in the browser, the browser asks your route to begin. Your route decides whether this user may upload, where the object should go, and signs exactly that. The browser sends the bytes to the bucket, and once the object exists, your route is told what landed. Your code runs at the start and at the end. Nothing of yours reads the bytes.
+
+<img src="/blog/blob/client-upload-light.png" className="dark:hidden" alt="The browser asks your route to begin, your route signs the upload, and the browser sends the bytes straight to Upstash" />
+<img src="/blog/blob/client-upload-dark.png" className="hidden dark:block" alt="The browser asks your route to begin, your route signs the upload, and the browser sends the bytes straight to Upstash" />
+
+That is the whole surface of the upload handler, two callbacks:
+
+```ts
+import { BlobError, uniquePath, uploadHandler } from "@upstash/blob"
+
+export const uploads = uploadHandler({
+  constraints: { maxSize: "20mb", contentTypes: ["image/*", "application/pdf"] },
+
+  onBeforeUpload: async ({ request, file }) => {
+    const user = await getUser(request)
+    if (!user) throw new BlobError("unauthorized")
+    return { path: uniquePath`${user.id}/${file.name}`, metadata: { owner: user.id } }
+  },
+
+  onUploadComplete: async ({ uploadId, path, url, metadata }) => {
+    await db.files.upsert({ uploadId, owner: metadata.owner, path, url })
+    return { path }
+  },
+})
+```
+
+It exports a `GET` and a `POST` that are plain fetch handlers, so it mounts in Next.js, Hono, SvelteKit, Remix or a Cloudflare Worker the same way. On the browser side, `useUpload` from `@upstash/blob/react` gives you `start`, a progress record, and an `accept` string for the input. It is typed from the handler, so a wrong route name does not compile, and whatever `onUploadComplete` returns is exactly what the component receives.
+
+The two callbacks carry more than they show. The browser sends the file's name, type, size and leading bytes with the `begin` request, so a file that is too large, the wrong type, or a `.png` that is really an executable is refused before a byte is uploaded, not after. `onBeforeUpload` runs exactly once per file, because a callback that inserts a row should not run twice. `onUploadComplete` may run again on a network retry, which is why it receives an `uploadId` that is stable across retries, and if it throws, the object is deleted, so a refusal at the end leaves nothing behind.
+
+Keeping servers out of the byte path is also what makes the rest possible. The platform's request body limit stops mattering, because no request body reaches your route. Past 16 MB the browser uploads in parts, with pause, resume and per-part retry. If the tab closes halfway, picking the same file again sends only the parts that are missing. None of that would fit through a proxy.
+
+## Small decisions that add up
+
+A few things in the SDK are the way they are on purpose, and are worth explaining.
+
+`put` overwrites by default. A write you retry after a timeout should not fail because the first attempt actually landed. When overwriting is the wrong thing, you say so: `allowOverwrite: false` refuses if anything is at the path, and `ifUnchanged` with an etag refuses if the object changed since you read it. Both are enforced by storage, so there is no window between the check and the write. `updateJson` builds a read-modify-write loop on top of that and retries on conflict, which turns a JSON object in a bucket into something you can safely update from two places at once.
+
+Paths reject `.` and `..` segments rather than normalizing them. A filename that came from a browser goes through `uniquePath`, which reduces it to a slug with a random suffix, so `../admin/x.png` becomes `x-9fQ2mAe7.png` and can never climb into another directory.
+
+`Cache-Control` is chosen at upload, per object, and every object also carries a `versionedUrl` with its etag on the query. Store an avatar at a stable path with `cache: "immutable"`, save the versioned URL on the user's row, and you have an image that is cached for a year and still changes the moment the user picks a new one. Nothing to invalidate, nothing to delete.
+
+A signed link comes back with `expiresAt`, not just the duration you asked for, because a link cannot outlive the credential that signed it. Cache the link until then, and you never hand out a URL that has already died.
+
+And one thing we deliberately did not build: a query layer. `list` filters by prefix and nothing else. There is no search by owner, type or date, because your application already has a database that does that well, and the row it writes in `onUploadComplete` is the index. The bucket holds the bytes. We think that division is the right one, and the SDK is shaped around it.
+
+## Pricing
+
+We wanted one rate sheet, and no region means we can have one. Pay as you go is **$0.02 per GB** stored per month, **$0.02 per GB** served, $0.30 per million reads and $4.50 per million writes, lists and copies. Uploads cost nothing to transfer, deletes are free, and storage is billed on the monthly average of the bucket rather than its peak. A read served from the CDN costs the same as one served from origin, and nothing rounds up to a whole unit.
+
+The free tier is 1 GB of storage, 10 GB of bandwidth, 10,000 reads and 2,000 writes a month, with no card. The full breakdown is on the [pricing page](https://upstash.com/pricing/blob).
+
+## Try it
+
+Create a bucket in the [Upstash Console](https://console.upstash.com), copy the token, and the [quickstart](https://upstash.com/docs/blob/overall/quickstart) takes you to a working file picker. The [recipes](https://upstash.com/docs/blob/recipes/avatars) go further: avatars, attachments, private documents, exports and video, each wired end to end.
+
+We would like to hear what you build with it, and what gets in your way. Find us on [Discord](https://upstash.com/discord).
