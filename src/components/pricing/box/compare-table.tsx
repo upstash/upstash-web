@@ -482,7 +482,7 @@ export default function CompareTable() {
 function MobilePlanSelect({ ...props }: React.ComponentProps<"select">) {
   return (
     <select
-      className="mb-2 bg-white px-4 py-2 font-semibold md:hidden"
+      className="mb-2 bg-white px-4 py-2 font-semibold md:hidden dark:bg-bg-mute"
       {...props}
     >
       <option value={BoxPlan.Free}>Free</option>
