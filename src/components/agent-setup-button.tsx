@@ -1,13 +1,13 @@
 "use client";
 
-import Button from "@/components/button";
+import { ClaudeLogo, CursorLogo, OpenAILogo } from "@/components/agent-logos";
 import { trackEvent } from "@/lib/analytics";
 import cx from "@/utils/cx";
 import {
   IconArrowUpRight,
   IconCheck,
   IconChevronDown,
-  IconSparkles,
+  IconCopy,
 } from "@tabler/icons-react";
 import copy from "copy-to-clipboard";
 import * as React from "react";
@@ -44,9 +44,61 @@ const PRIMARY_OPTION = SETUP_OPTIONS[0];
 
 const DOCS_URL = "https://upstash.com/docs/agent-resources/overview";
 
+/** The clients the prompt covers, stacked on the trigger like avatars. */
+const AGENT_LOGOS = [
+  { name: "Cursor", Logo: CursorLogo },
+  { name: "Claude", Logo: ClaudeLogo },
+  { name: "OpenAI", Logo: OpenAILogo },
+];
+
 const COPIED_DELAY = 1800;
 
-const MENU_GAP = 8;
+const MENU_GAP = 4;
+
+const MENU_ROW = cx(
+  "flex h-11 w-full items-center gap-3 rounded-lg px-3 text-left text-base font-medium",
+  "text-emerald-800 transition hover:bg-bg-mute",
+  "dark:text-emerald-400 dark:hover:bg-white/10",
+);
+
+/**
+ * Keeps both states mounted and cross-fades them in place, so a row or the
+ * button never resizes or snaps when its label flips to a confirmation.
+ */
+function CrossFade({
+  swapped,
+  alt,
+  className,
+  children,
+}: {
+  swapped: boolean;
+  alt: React.ReactNode;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <span className={cx("relative inline-flex items-center", className)}>
+      <span
+        className={cx(
+          "inline-flex items-center transition duration-200 ease-out motion-reduce:transition-none",
+          swapped ? "opacity-0" : "opacity-100",
+        )}
+      >
+        {children}
+      </span>
+      <span
+        aria-hidden={!swapped}
+        className={cx(
+          "pointer-events-none absolute inset-0 flex items-center",
+          "transition duration-200 ease-out motion-reduce:transition-none",
+          swapped ? "opacity-100" : "opacity-0",
+        )}
+      >
+        {alt}
+      </span>
+    </span>
+  );
+}
 
 export default function AgentSetupButton({
   className,
@@ -69,7 +121,9 @@ export default function AgentSetupButton({
   React.useEffect(() => setMounted(true), []);
 
   React.useEffect(() => {
-    if (!copiedId) return;
+    if (!copiedId) {
+      return;
+    }
     const timer = setTimeout(() => setCopiedId(null), COPIED_DELAY);
     return () => clearTimeout(timer);
   }, [copiedId]);
@@ -82,7 +136,9 @@ export default function AgentSetupButton({
   // resize.
   const place = React.useCallback(() => {
     const rect = triggerRef.current?.getBoundingClientRect();
-    if (!rect) return;
+    if (!rect) {
+      return;
+    }
     // The menu takes the trigger's width, so it reads as one control.
     const left = Math.min(
       rect.left,
@@ -99,7 +155,9 @@ export default function AgentSetupButton({
   }, [place]);
 
   React.useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      return;
+    }
     place();
     window.addEventListener("scroll", place, true);
     window.addEventListener("resize", place);
@@ -133,7 +191,7 @@ export default function AgentSetupButton({
       ? createPortal(
           <div
             role="menu"
-            aria-label="Copy Upstash agent setup"
+            aria-label="Set up your agent"
             aria-hidden={!open}
             style={{
               top: position.top,
@@ -143,61 +201,56 @@ export default function AgentSetupButton({
             onMouseEnter={show}
             onMouseLeave={hide}
             className={cx(
-              "fixed z-[999] rounded-2xl p-1 text-left",
-              "border border-black/10 bg-white shadow-xl",
-              "dark:border-white/10 dark:bg-zinc-900",
+              "fixed z-[999] rounded-xl bg-white p-2 text-left",
+              "shadow-[0_8px_10px_rgba(0,0,0,0.2)]",
+              "dark:bg-zinc-900 dark:shadow-none dark:ring-1 dark:ring-white/10",
               "origin-top transition duration-150 ease-out motion-reduce:transition-none",
               open
                 ? "translate-y-0 opacity-100"
                 : "pointer-events-none -translate-y-1 opacity-0",
             )}
           >
-            {SETUP_OPTIONS.map((option) => (
-              <button
-                key={option.id}
-                type="button"
-                role="menuitem"
-                tabIndex={open ? 0 : -1}
-                onClick={() => onCopy(option)}
-                className={cx(
-                  "relative flex w-full items-center rounded-xl px-3 py-2 text-left transition",
-                  "text-sm font-medium text-text",
-                  "hover:bg-bg-mute dark:hover:bg-white/10",
-                )}
-              >
-                {option.label}
-                {/* Absolute so the confirmation never reflows the row, and
-                    always mounted so it can transition in and back out. */}
-                <span
-                  aria-hidden={copiedId !== option.id}
+            {SETUP_OPTIONS.map((option) => {
+              const isCopied = copiedId === option.id;
+              return (
+                <button
+                  key={option.id}
+                  type="button"
+                  role="menuitem"
+                  tabIndex={open ? 0 : -1}
+                  onClick={() => onCopy(option)}
                   className={cx(
-                    "pointer-events-none absolute inset-y-1 right-1 flex items-center gap-1 rounded-lg px-2",
-                    "bg-bg-mute text-xs font-medium text-primary dark:bg-zinc-800",
-                    "origin-right transition duration-200 ease-out motion-reduce:transition-none",
-                    copiedId === option.id
-                      ? "scale-100 opacity-100"
-                      : "scale-90 opacity-0",
+                    MENU_ROW,
+                    "border-b border-zinc-100 dark:border-white/10",
                   )}
                 >
-                  <IconCheck size={14} />
-                  Copied
-                </span>
-              </button>
-            ))}
+                  <CrossFade
+                    swapped={isCopied}
+                    className="flex-1"
+                    alt={<span className="text-primary">Copied</span>}
+                  >
+                    {option.label}
+                  </CrossFade>
+                  <CrossFade
+                    swapped={isCopied}
+                    alt={<IconCheck size={20} className="text-primary" />}
+                  >
+                    <IconCopy size={20} />
+                  </CrossFade>
+                </button>
+              );
+            })}
 
             <a
               role="menuitem"
               href={DOCS_URL}
               target="_blank"
               tabIndex={open ? 0 : -1}
-              className={cx(
-                "mt-1 flex items-center gap-1.5 rounded-xl px-3 py-2 transition",
-                "border-t border-black/5 text-sm font-medium text-primary-text",
-                "hover:bg-bg-mute dark:border-white/10 dark:hover:bg-white/10",
-              )}
+              className={MENU_ROW}
+              rel="noreferrer"
             >
-              See all agent resources
-              <IconArrowUpRight size={16} />
+              <span className="flex-1">See all agent resources</span>
+              <IconArrowUpRight size={20} />
             </a>
           </div>,
           document.body,
@@ -212,66 +265,59 @@ export default function AgentSetupButton({
       onMouseLeave={hide}
       onFocus={show}
       onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget as Node)) hide();
+        if (!event.currentTarget.contains(event.relatedTarget as Node)) {
+          hide();
+        }
       }}
       onKeyDown={(event) => {
-        if (event.key === "Escape") setOpen(false);
+        if (event.key === "Escape") {
+          setOpen(false);
+        }
       }}
     >
-      <Button
-        variant="default"
-        className="px-6"
-        aria-haspopup="menu"
-        aria-expanded={open}
-        onClick={() => onCopy(PRIMARY_OPTION)}
-      >
-        {/* Both icons and both labels stay mounted and cross-fade, so the
-            button neither resizes nor snaps between states. */}
-        <span className="relative inline-flex size-6 shrink-0 items-center justify-center">
-          <IconSparkles
-            size={24}
-            className={cx(
-              "absolute transition duration-200 ease-out motion-reduce:transition-none",
-              isPrimaryCopied ? "scale-75 opacity-0" : "scale-100 opacity-100",
-            )}
-          />
-          <IconCheck
-            size={24}
-            className={cx(
-              "absolute text-primary transition duration-200 ease-out motion-reduce:transition-none",
-              isPrimaryCopied ? "scale-100 opacity-100" : "scale-75 opacity-0",
-            )}
-          />
-        </span>
-        <span className="relative inline-flex items-center">
-          <span
-            className={cx(
-              "transition duration-200 ease-out motion-reduce:transition-none",
-              isPrimaryCopied
-                ? "-translate-y-1 opacity-0"
-                : "translate-y-0 opacity-100",
-            )}
+      {/* The 2px emerald-to-amber border is the wrapper's gradient showing
+          through a 2px inset, so the inner radius is the outer 12px minus it. */}
+      <span className="inline-flex rounded-xl bg-gradient-to-r from-emerald-400 to-amber-300 p-0.5">
+        <button
+          type="button"
+          aria-haspopup="menu"
+          aria-expanded={open}
+          onClick={() => onCopy(PRIMARY_OPTION)}
+          className={cx(
+            "flex h-10 items-center gap-2.5 rounded-[10px] bg-white pl-2.5 pr-[18px]",
+            "text-base font-medium text-emerald-800 transition hover:bg-emerald-50",
+            "dark:bg-zinc-900 dark:text-emerald-400 dark:hover:bg-zinc-800",
+          )}
+        >
+          <span className="flex items-center" aria-hidden="true">
+            {AGENT_LOGOS.map(({ name, Logo }, index) => (
+              <span
+                key={name}
+                title={name}
+                className={cx(
+                  "flex size-7 items-center justify-center rounded-full border border-emerald-900/30 bg-white",
+                  "dark:border-emerald-400/30 dark:bg-zinc-900",
+                  index > 0 && "-ml-[5px]",
+                )}
+              >
+                <Logo className="size-4" />
+              </span>
+            ))}
+          </span>
+          {/* Both labels stay mounted and cross-fade, so the button neither
+              resizes nor snaps between states. */}
+          <CrossFade
+            swapped={isPrimaryCopied}
+            alt={<span className="text-primary">Copied</span>}
           >
             Set up your agent
-          </span>
-          <span
-            aria-hidden={!isPrimaryCopied}
-            className={cx(
-              "pointer-events-none absolute inset-0 flex items-center justify-center",
-              "text-primary transition duration-200 ease-out motion-reduce:transition-none",
-              isPrimaryCopied
-                ? "translate-y-0 opacity-100"
-                : "translate-y-1 opacity-0",
-            )}
-          >
-            Copied
-          </span>
-        </span>
-        <IconChevronDown
-          size={20}
-          className={cx("transition-transform", open && "rotate-180")}
-        />
-      </Button>
+          </CrossFade>
+          <IconChevronDown
+            size={20}
+            className={cx("transition-transform", open && "rotate-180")}
+          />
+        </button>
+      </span>
       {menu}
     </div>
   );

@@ -33,15 +33,15 @@ export default function HomeHero() {
         </p>
 
         <div
-          className="mt-6 flex flex-wrap items-center justify-center gap-3"
+          className="mt-6 flex flex-wrap items-center justify-center gap-4"
           data-area="home_hero"
         >
-          <AgentSetupButton />
-          <Button asChild variant="primary" className="px-8">
+          <Button asChild variant="primary" className="h-11 px-5">
             <a href="https://console.upstash.com" target="_self">
-              Start for Free <IconArrowUpRight size={24} />
+              Start for Free <IconArrowUpRight size={20} />
             </a>
           </Button>
+          <AgentSetupButton />
         </div>
       </Container>
     </section>
