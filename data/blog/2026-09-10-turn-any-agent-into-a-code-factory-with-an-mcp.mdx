@@ -23,7 +23,7 @@ Install the [Upstash plugin](https://upstash.com/docs/agent-resources/overview).
 
 The [agent setup page](https://upstash.com/docs/agent-resources/overview) has the steps for the other agents.
 
-Connecting opens the OAuth consent page. Pick the account the agent should work in and switch off **read-only**, since opening pull requests is a write.
+The first time the agent connects to the MCP server, your browser opens the OAuth consent page to authorize it. Pick the account the agent should work in and switch off **read-only**, since opening pull requests is a write.
 
 Then tell Box which repositories the agent may touch. In [the Upstash Console](https://console.upstash.com/box?tab=settings), open **Box → Settings → GitHub**, connect your GitHub account and pick the repositories. This installs the Upstash GitHub App on them. Public and private repositories both work, and you never copy a token.
 
@@ -33,7 +33,7 @@ That is the whole setup. Start your agent, give it a task, and read the PRs when
 
 ## What the agent gets
 
-The MCP server provides five crucial components that turn any local/remote agent to a code factory with a remote workspace. Together they cover everything between "here is the task" and "here is the PR".
+The MCP server provides the five components that turn any local or remote agent into a code factory with a remote workspace. Together they cover everything between "here is the task" and "here is the PR".
 
 ![](https://cdn.bydefault.so/drawing-gvfxa_obRt8RfBW0R3NPB.png)
 
@@ -41,7 +41,7 @@ The MCP server provides five crucial components that turn any local/remote agent
 
 **GitHub.** Boxes clone the repositories you connected in settings and can push branches and open pull requests on them. The agent never gets a GitHub token. The App installation belongs to your account, and the box uses it.
 
-**A browser.** Every box can come with a headless Chromium, where the agent checks a preview of its change and screenshots it as proof. A box can also expose a port on a [public URL](https://upstash.com/docs/box/overall/preview), so you can click around the running app yourself while the agent keeps working.
+**A browser.** Every box can come with a headless Chromium, where the agent checks a preview of its change and screenshots it. A box can also expose a port on a [public URL](https://upstash.com/docs/box/overall/preview), so you can click around the running app yourself while the agent keeps working.
 
 **File storage.** Blob gives the agent a bucket and presigned upload URLs. A screenshot goes from the box to Blob, and its public URL goes into the PR description. Here is a [PR opened this way](https://github.com/CahidArda/cahidarda.github.io/pull/29), with the rendered page and the generated Open Graph image embedded as proof.
 
@@ -91,7 +91,7 @@ My part was writing the message and reviewing the PRs. Nothing was cloned, built
 ## Your first PR
 
 1. Install the plugin for [your agent](https://upstash.com/docs/agent-resources/overview).
-2. Approve the OAuth consent, with read-only off.
+2. Connect the agent to the MCP server and approve the OAuth consent it opens, with read-only off.
 3. Connect GitHub and pick your repositories under **Box → Settings → GitHub**.
 4. Give the agent a task. Come back for the PRs.
 
