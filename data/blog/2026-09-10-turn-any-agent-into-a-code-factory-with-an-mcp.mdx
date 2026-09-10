@@ -1,0 +1,107 @@
+---
+authors: [arda]
+slug: turn-any-agent-into-a-code-factory-with-an-mcp
+tags: [mcp, box, blob, redis, qstash, agents, github]
+title: Turning Any Agent Into a Code Factory with an MCP Server
+description: Add one MCP server to any agent, local or remote, and it gets a sandbox with a filesystem, your GitHub repos, a browser, file storage and the Upstash stack. Tell it what to build and come back to the pull requests
+---
+
+Code factory products all start the same way: deploy this, install that, connect your repos, bring an API key for the model. What if the factory was an MCP server instead?
+
+You add it to whatever agent you already have, local or remote, and that agent gains a remote sandbox, your GitHub repos, a browser and the whole Upstash stack. Then you describe the work and come back to the pull requests, with screenshots of the result in the description and a live URL to the running app while it works.
+
+That is what the [Upstash MCP server](https://upstash.com/docs/agent-resources/mcp) turned into. [It went remote](https://upstash.com/blog/upstash-has-a-remote-mcp-server-now) last week, and now [Box](https://upstash.com/docs/box/overall/quickstart) and [Blob](https://upstash.com/docs/blob/overall/quickstart) have joined [Redis](https://upstash.com/docs/redis), [QStash](https://upstash.com/docs/qstash) and [Vector](https://upstash.com/docs/vector) on it. This post covers how to set it up, how the pieces fit, and what it did for us.
+
+## Setup
+
+Install the [Upstash plugin](https://upstash.com/docs/agent-resources/overview). It bundles the remote MCP server and the SDK skills.
+
+In Claude Code:
+
+```bash
+/plugin marketplace add upstash/skills
+/plugin install upstash@upstash
+```
+
+In Codex:
+
+```bash
+codex plugin marketplace add upstash/skills
+codex plugin add upstash@upstash
+```
+
+The [agent setup page](https://upstash.com/docs/agent-resources/overview) has the steps for the other agents.
+
+Connecting opens the OAuth consent page. Pick the account the agent should work in and switch off **read-only**, since opening pull requests is a write.
+
+Then tell Box which repositories the agent may touch. In [the Upstash Console](https://console.upstash.com/box?tab=settings), open **Box → Settings → GitHub**, connect your GitHub account and pick the repositories. This installs the Upstash GitHub App on them. Public and private repositories both work, and you never copy a token.
+
+![The GitHub tab in Box settings, with a connected account and the list of repositories the app can reach](https://cdn.bydefault.so/ZCg_eH6kXZdZ6z7ajNuBP.png)
+
+That is the whole setup. Start your agent, give it a task, and read the PRs when they arrive.
+
+## What the agent gets
+
+The MCP server provides five crucial components that turn any local/remote agent to a code factory with a remote workspace. Together they cover everything between "here is the task" and "here is the PR".
+
+![](https://cdn.bydefault.so/drawing-gvfxa_obRt8RfBW0R3NPB.png)
+
+**A filesystem and a shell.** A Box is a sandboxed container with a shell, git, Node and Python. The agent creates one, clones a repository, builds and tests in it, and deletes it when done. A chat in a browser tab gets a filesystem this way, and Claude Code on your laptop gets extra ones.
+
+**GitHub.** Boxes clone the repositories you connected in settings and can push branches and open pull requests on them. The agent never gets a GitHub token. The App installation belongs to your account, and the box uses it.
+
+**A browser.** Every box can come with a headless Chromium, where the agent checks a preview of its change and screenshots it as proof. A box can also expose a port on a [public URL](https://upstash.com/docs/box/overall/preview), so you can click around the running app yourself while the agent keeps working.
+
+**File storage.** Blob gives the agent a bucket and presigned upload URLs. A screenshot goes from the box to Blob, and its public URL goes into the PR description. Here is a [PR opened this way](https://github.com/CahidArda/cahidarda.github.io/pull/29), with the rendered page and the generated Open Graph image embedded as proof.
+
+![](https://cdn.bydefault.so/drawing-_NssRwh5y27bpfi3TwJ4N.png)
+
+GitHub's CLI can now [attach images to a PR](https://github.blog/changelog/2026-09-01-github-cli-media-in-issues-pull-requests-and-comments/) itself, but it only accepts tokens from running gh auth login or classic personal access tokens. A box authenticates through a GitHub App, so its images go through Blob instead.
+
+**The Upstash stack.** The same server carries the Redis, QStash, Vector and [Search](https://upstash.com/docs/search) tools. When the change needs a cache, a queue or an index, the agent creates the resource, gets the credentials, wires them into the code and tests against the real thing, in the same session and with no detour through the console.
+
+## Why you might want the factory as an MCP server
+
+Hosted factories run the model on their side, so you bring an API key and pay per token. An MCP server attaches to the agent you already pay for. If that is Claude Code or Codex on a subscription, the factory runs on that subscription, and the tokens are the ones you would have spent anyway.
+
+The agent does not have to be a coding agent either. I added the server to my Claude account, and plain Claude chats got more than a Claude Code session: a shell, a repository, Redis and QStash, plus a browser that screenshots the change and a preview URL into the running app, all from a chat window. Codex, Cursor and any other client with MCP support get the same.
+
+![](https://cdn.bydefault.so/tweet-A0175MPJKKDObmTWXZYZJ.png)
+
+The interface keeps changing. A terminal today, a chat window or a Linear ticket tomorrow, another agent after that. The MCP server works the same behind all of them, because the code never ran on that side anyway.
+
+## Why not do everything locally, then
+
+If the agent runs on your laptop anyway, why send the work to a box?
+
+Because one task at a time is fine on a laptop and five are not. Each task needs its own checkout, its own installed packages, its own build output and, if it checks the result, its own browser. Five checkouts, five installs and five Chromium instances are more than a laptop should carry. In boxes they run side by side, and everything is deleted once the PR is open. Your machine stays clean and free for the task you are working on yourself.
+
+![](https://cdn.bydefault.so/pO2SA0fG_bazXwSTEBHK6.png)
+
+Every point in that thread maps onto a box. The computer per agent is the box, the live URL is the public URL, and "give me irrefutable evidence that this works" is a screenshot in Blob, linked from the PR.
+
+The browser is the strongest case. One agent driving a browser on your laptop is fine. I have let a few parallel subagents each open their own browser and watched my machine run out of memory and CPU. In a box each agent gets its own Chromium and none of them touch your machine, so the agent can check the page before it opens a PR.
+
+## Twelve PRs from one message
+
+We recently added three features to Upstash Redis: arrays, vectors and search over streams. Each one needed the same treatment: the TypeScript SDK, the Python SDK, the skills repository and the docs.
+
+I told Claude, in a regular chat on the web, which features to add and which repositories to update. It created a box, cloned the four repositories, read the existing code to match conventions, made the changes, checked each branch's diff against main, and opened the pull requests. Twelve of them, three per repository:
+
+|  | [Vector commands](https://upstash.com/docs/redis/commands/vector/overview) | [Array commands](https://upstash.com/docs/redis/commands/array/overview) | [Search over streams](https://upstash.com/docs/redis/search/streams) |
+| --- | --- | --- | --- |
+| [redis-js](https://github.com/upstash/redis-js) | [#1446](https://github.com/upstash/redis-js/pull/1446) | [#1451](https://github.com/upstash/redis-js/pull/1451) | [#1452](https://github.com/upstash/redis-js/pull/1452) |
+| [redis-py](https://github.com/upstash/redis-py) | [#72](https://github.com/upstash/redis-py/pull/72) | [#73](https://github.com/upstash/redis-py/pull/73) | [#74](https://github.com/upstash/redis-py/pull/74) |
+| [skills](https://github.com/upstash/skills) | [#42](https://github.com/upstash/skills/pull/42) | [#41](https://github.com/upstash/skills/pull/41) | [#40](https://github.com/upstash/skills/pull/40) |
+| [docs](https://github.com/upstash/docs) | [#836](https://github.com/upstash/docs/pull/836) | [#837](https://github.com/upstash/docs/pull/837) | [#838](https://github.com/upstash/docs/pull/838) |
+
+My part was writing the message and reviewing the PRs. Nothing was cloned, built or installed on my machine. Claude itself was not running on my machine either. It was a chat in a browser tab.
+
+## Your first PR
+
+1. Install the plugin for [your agent](https://upstash.com/docs/agent-resources/overview).
+2. Approve the OAuth consent, with read-only off.
+3. Connect GitHub and pick your repositories under **Box → Settings → GitHub**.
+4. Give the agent a task. Come back for the PRs.
+
+The agent you already have is the code factory. It only needed somewhere to work. If something gets in its way, open an issue in the [skills repository](https://github.com/upstash/skills) and we will take a look.
