@@ -67,13 +67,13 @@ The interface keeps changing. A terminal today, a chat window or a Linear ticket
 
 If the agent runs on your laptop anyway, why send the work to a box?
 
-Because one task at a time is fine on a laptop and five are not. Each task needs its own checkout, its own installed packages, its own build output and, if it checks the result, its own browser. Five checkouts, five installs and five Chromium instances are more than a laptop should carry. In boxes they run side by side, and everything is deleted once the PR is open. Your machine stays clean and free for the task you are working on yourself.
+Because one task at a time is fine on a laptop and five are not. Each task needs its own checkout, its own installed packages, its own dev server or build and, if it checks the result, its own browser. Five checkouts, five dev servers and five Chromium instances are more than a laptop should carry, and they all compete for the same ports, memory and CPU. In boxes they run side by side, and everything is deleted once the PR is open. Your machine stays clean and free for the task you are working on yourself.
 
 ![](https://cdn.bydefault.so/pO2SA0fG_bazXwSTEBHK6.png)
 
 Every point in that thread maps onto a box. The computer per agent is the box, the live URL is the public URL, and "give me irrefutable evidence that this works" is a screenshot in Blob, linked from the PR.
 
-The browser is the strongest case. One agent driving a browser on your laptop is fine. I have let a few parallel subagents each open their own browser and watched my machine run out of memory and CPU. In a box each agent gets its own Chromium and none of them touch your machine, so the agent can check the page before it opens a PR.
+The browser is where this shows first. One agent with one dev server and one browser on your laptop is fine. Five agents, each running its own app in dev and driving its own browser against it, are not. I have let a few parallel subagents do exactly that and watched my machine run out of memory and CPU. In a box each agent gets its own app and its own Chromium, and none of them touch your machine, so every agent can check its own page before it opens a PR.
 
 ## Twelve PRs from one message
 
