@@ -42,6 +42,8 @@ const { url } = await bucket.signedReadUrl("invoices/2026-0042.pdf", {
 
 The SDK learns whether it is talking to a public or a private bucket from the backend, so the same code runs against both. On a private bucket `url` is simply `undefined`, and objects are stored with `Cache-Control: private` so no shared cache keeps a copy.
 
+Public objects also carry a `versionedUrl` that changes with their content. Store an avatar at a stable path with `cache: "immutable"` and save its `versionedUrl` on the user's row. The image is cached for a year, but replacing it gives your app a new URL to display immediately, with no cache invalidation or old file to delete. The [avatar recipe](https://upstash.com/docs/blob/recipes/avatars) shows the full flow.
+
 The token itself never signs a request. It is exchanged for short-lived credentials scoped to that one bucket, and those are what sign every `put`, `get` and `list`. The SDK does the exchange on first use and refreshes before expiry, so you never see it happen. It is also why S3 compatibility is not a separate mode: `bucket.s3()` hands the same credentials to the AWS SDK or the AWS CLI, for anything we do not wrap. Byte ranges, conditional GETs, delimiters, object tagging, and every tool that already speaks S3.
 
 Upstash buckets are global without a region selector: a reader in Singapore and a reader in Frankfurt are both served from close by, and there is one rate sheet instead of one per region.
@@ -78,6 +80,8 @@ export const uploads = uploadHandler({
   },
 })
 ```
+
+The row saved in `onUploadComplete` lets your database answer questions like "which files belong to this user?" The bucket holds the bytes; your database indexes the files.
 
 The handler reads `UPSTASH_BLOB_TOKEN` automatically. In Next.js, mounting it takes two lines:
 
@@ -128,20 +132,6 @@ Underneath that small API, files travel directly from the browser to storage. Yo
 <img src="/blog/blob/client-upload-dark.png" data-theme="dark" alt="Upload sequence between Browser, Your API route, and Upstash: the browser requests a signed URL from your route, uploads file bytes directly to Upstash, then asks your route to finish. Your route verifies the stored object with Upstash and returns the upload result. Solid arrows show requests; dashed arrows show responses." />
 
 You start with a short, typed integration that already handles the upload mechanics. Your code stays focused on your product as its file storage needs grow.
-
-## Small decisions that add up
-
-A few things in the SDK are the way they are on purpose, and are worth explaining.
-
-`put` overwrites by default. A write you retry after a timeout should not fail because the first attempt actually landed. When overwriting is the wrong thing, you say so: `allowOverwrite: false` refuses if anything is at the path, and `ifUnchanged` with an etag refuses if the object changed since you read it. Both are enforced by storage, so there is no window between the check and the write. `updateJson` builds a read-modify-write loop on top of that and retries on conflict, which turns a JSON object in a bucket into something you can safely update from two places at once.
-
-Paths reject `.` and `..` segments rather than normalizing them. A filename that came from a browser goes through `uniquePath`, which reduces it to a slug with a random suffix, so `../admin/x.png` becomes `x-9fQ2mAe7.png` and can never climb into another directory.
-
-`Cache-Control` is chosen at upload, per object, and every object also carries a `versionedUrl` with its etag on the query. Store an avatar at a stable path with `cache: "immutable"`, save the versioned URL on the user's row, and you have an image that is cached for a year and still changes the moment the user picks a new one. Nothing to invalidate, nothing to delete.
-
-A signed link comes back with `expiresAt`, not just the duration you asked for, because a link cannot outlive the credential that signed it. Cache the link until then, and you never hand out a URL that has already died.
-
-And one thing we deliberately did not build: a query layer. `list` filters by prefix and nothing else. There is no search by owner, type or date, because your application already has a database that does that well, and the row it writes in `onUploadComplete` is the index. The bucket holds the bytes. We think that division is the right one, and the SDK is shaped around it.
 
 ## Pricing
 
