@@ -31,6 +31,8 @@ Local agents can install the [Upstash plugin](https://upstash.com/docs/agent-res
 
 The [agent setup page](https://upstash.com/docs/agent-resources/overview) has the steps for the other agents.
 
+The plugin also ships a skill, [upstash-box-remote-work](https://github.com/upstash/skills/tree/main/skills/upstash-box-remote-work), that tells the agent when a task belongs in a box and how to run it there end to end: clone, build, preview, screenshot, pull request. It kicks in when you say "use remote work", or when the PR you ask for should come with a screenshot or a preview URL.
+
 The first time the agent connects to the MCP server, your browser opens the OAuth consent page to authorize it. Pick the account the agent should work in and switch off **read-only**, since opening pull requests is a write.
 
 Then tell Box which repositories the agent may touch. In [the Upstash Console](https://console.upstash.com/box?tab=settings), open **Box → Settings → GitHub**, connect your GitHub account and pick the repositories. This installs the Upstash GitHub App on them. Public and private repositories both work, and you never copy a token.
@@ -105,6 +107,6 @@ My part was writing the message and reviewing the PRs. Nothing was cloned, built
 1. Add the MCP or install the plugin for [your agent](https://upstash.com/docs/agent-resources/overview).
 2. Connect the agent to the MCP server and approve the OAuth consent it opens, with read-only off.
 3. Connect GitHub and pick your repositories under **Box → Settings → GitHub**.
-4. Give the agent a task. Come back for the PRs.
+4. Give the agent a task. Say "use remote work", or ask for a screenshot or a preview URL in the PR, and the skill takes it from there. Come back for the PRs.
 
 The agent you already have is the code factory. It only needed somewhere to work. If something gets in its way, open an issue in the [skills repository](https://github.com/upstash/skills) and we will take a look.
