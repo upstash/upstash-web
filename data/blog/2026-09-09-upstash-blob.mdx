@@ -46,21 +46,18 @@ The token itself never signs a request. It is exchanged for short-lived credenti
 
 Upstash buckets are global without a region selector: a reader in Singapore and a reader in Frankfurt are both served from close by, and there is one rate sheet instead of one per region.
 
-## Where the bytes go
+## File uploads without the boilerplate
 
-The decision that shaped the SDK most is that no application server should be in the path of a file upload. Not yours, and not ours.
+The SDK is the biggest reason to choose Upstash Blob. We designed it so adding file uploads means writing the parts that belong to your app: who can upload, what you accept, and what happens when a file arrives. Sensible defaults handle the transport, and **end-to-end type safety** connects your server logic all the way to the component that renders the result.
 
-We did build a proxy first. Every byte went through a worker of ours on its way to storage, which is the obvious design, and it let us meter and inspect traffic in one place. Then we measured it against clients talking to storage directly, and the numbers refused to pick a winner. What decided it was the shape of the two systems. A proxy has to scale with the bytes your users upload. A credential service scales with the number of buckets, and an idle bucket costs nothing. We removed the proxy. Today a client fetches a credential once, and after that the bytes go where they are going.
-
-Your server is treated the same way. When a user picks a file in the browser, the browser asks your route to begin. Your route decides whether this user may upload, where the object should go, and signs exactly that. The browser sends the bytes to the bucket, and once the object exists, your route is told what landed. Your code runs at the start and at the end. Nothing of yours reads the bytes.
-
-<img src="/blog/blob/client-upload-light.png" data-theme="light" alt="Upload sequence between Browser, Your API route, and Upstash: the browser requests a signed URL from your route, uploads file bytes directly to Upstash, then asks your route to finish. Your route verifies the stored object with Upstash and returns the upload result. Solid arrows show requests; dashed arrows show responses." />
-<img src="/blog/blob/client-upload-dark.png" data-theme="dark" alt="Upload sequence between Browser, Your API route, and Upstash: the browser requests a signed URL from your route, uploads file bytes directly to Upstash, then asks your route to finish. Your route verifies the stored object with Upstash and returns the upload result. Solid arrows show requests; dashed arrows show responses." />
-
-That is the whole surface of the upload handler, two callbacks:
+Start with a handler. This one accepts images and PDFs from signed-in users, gives each file a unique path, and saves a database record when it lands. `getUser` and `db` are your app's existing auth and database helpers:
 
 ```ts
+// lib/uploads.ts
+import "server-only"
 import { BlobError, uniquePath, uploadHandler } from "@upstash/blob"
+import { getUser } from "./auth"
+import { db } from "./db"
 
 export const uploads = uploadHandler({
   constraints: { maxSize: "20mb", contentTypes: ["image/*", "application/pdf"] },
@@ -73,16 +70,58 @@ export const uploads = uploadHandler({
 
   onUploadComplete: async ({ uploadId, path, url, metadata }) => {
     await db.files.upsert({ uploadId, owner: metadata.owner, path, url })
-    return { path }
+    return { fileId: uploadId }
   },
 })
 ```
 
-It exports a `GET` and a `POST` that are plain fetch handlers, so it mounts in Next.js, Hono, SvelteKit, Remix or a Cloudflare Worker the same way. On the browser side, `useUpload` from `@upstash/blob/react` gives you `start`, a progress record, and an `accept` string for the input. It is typed from the handler, so a wrong route name does not compile, and whatever `onUploadComplete` returns is exactly what the component receives.
+The handler reads `UPSTASH_BLOB_TOKEN` automatically. In Next.js, mounting it takes two lines:
 
-The two callbacks carry more than they show. The browser sends the file's name, type, size and leading bytes with the `begin` request, so a file that is too large, the wrong type, or a `.png` that is really an executable is refused before a byte is uploaded, not after. `onBeforeUpload` runs exactly once per file, because a callback that inserts a row should not run twice. `onUploadComplete` may run again on a network retry, which is why it receives an `uploadId` that is stable across retries, and if it throws, the object is deleted, so a refusal at the end leaves nothing behind.
+```ts
+// app/api/upload/route.ts
+import { uploads } from "@/lib/uploads"
+export const { GET, POST } = uploads
+```
 
-Keeping servers out of the byte path is also what makes the rest possible. The platform's request body limit stops mattering, because no request body reaches your route. Past 16 MB the browser uploads in parts, with pause, resume and per-part retry. If the tab closes halfway, picking the same file again sends only the parts that are missing. None of that would fit through a proxy.
+Then connect your UI to the handler's type:
+
+```tsx
+"use client"
+import { uploadHooks } from "@upstash/blob/react"
+import type { uploads } from "@/lib/uploads"
+
+const { useUpload } = uploadHooks<typeof uploads>()
+
+export function FilePicker() {
+  const { start, upload, accept } = useUpload()
+
+  return (
+    <>
+      <input
+        type="file"
+        accept={accept}
+        onChange={(e) => start({ file: e.target.files?.[0] })}
+      />
+      {upload?.pending && <progress value={upload.percent} max={100} />}
+      {upload?.status === "error" && <p>{upload.error.message}</p>}
+      {upload?.status === "done" && <p>Saved file {upload.blob.data.fileId}</p>}
+    </>
+  )
+}
+```
+
+That `fileId` is inferred from `onUploadComplete`. Rename it on the server and TypeScript points to the component that needs updating. Add named routes and `useUpload("avatar")` only accepts names your handler defines. For uploads that need extra data, an [input schema](https://upstash.com/docs/blob/uploads/upload-handler#uploadroute) gives you both server validation and a typed `start({ file, input })` call. No duplicate request and response interfaces, code generation, or type assertions to keep the two sides in sync. The client imports only a type, so your server code stays on the server.
+
+The defaults do just as much work. The hook already knows to call `/api/upload`. Its `accept` value comes from your handler's allowed file types, and the server enforces your size and type constraints. Files over 16 MB automatically use multipart uploads, with pause, resume, retries for failed parts, and refreshed upload signatures when they expire. Small and large files expose the same progress and error state to your UI. You can change the defaults when your app needs it; the [upload client](https://upstash.com/docs/blob/uploads/upload-client) and [large-file docs](https://upstash.com/docs/blob/uploads/large-files) cover the controls.
+
+Underneath that small API, files travel directly from the browser to storage. Your handler authorizes the upload and verifies the result, while file bytes bypass your application server and its request body limit:
+
+<img src="/blog/blob/client-upload-light.png" data-theme="light" alt="Upload sequence between Browser, Your API route, and Upstash: the browser requests a signed URL from your route, uploads file bytes directly to Upstash, then asks your route to finish. Your route verifies the stored object with Upstash and returns the upload result. Solid arrows show requests; dashed arrows show responses." />
+<img src="/blog/blob/client-upload-dark.png" data-theme="dark" alt="Upload sequence between Browser, Your API route, and Upstash: the browser requests a signed URL from your route, uploads file bytes directly to Upstash, then asks your route to finish. Your route verifies the stored object with Upstash and returns the upload result. Solid arrows show requests; dashed arrows show responses." />
+
+We care just as much about **agent experience**. A coding agent can read one handler to understand the upload rules and use its inferred types to wire up the UI. A wrong route name, a missing input field, or an outdated result property becomes a compiler error it can fix. The SDK already owns the signing, multipart coordination, and retry logic, so there is less code for an agent to generate and less for you to review and maintain.
+
+Whether you write the code yourself or hand the task to an agent, you start with a short, typed integration that already handles the upload mechanics. Your code stays focused on your product as its file storage needs grow.
 
 ## Small decisions that add up
 
