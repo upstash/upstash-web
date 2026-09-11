@@ -120,10 +120,10 @@ No duplicate request and response interfaces, code generation, or type assertion
 
 The defaults do just as much work. The hook already knows to call `/api/upload`. Its `accept` value comes from your handler's allowed file types, and the server enforces your size and type constraints. Files over 16 MB automatically use multipart uploads, with pause, resume, retries for failed parts, and refreshed upload signatures when they expire. Small and large files expose the same progress and error state to your UI. You can change the defaults when your app needs it; the [upload client](https://upstash.com/docs/blob/uploads/upload-client) and [large-file docs](https://upstash.com/docs/blob/uploads/large-files) cover the controls.
 
-Underneath that small API, files travel directly from the browser to storage. Your handler authorizes the upload and verifies the result, while file bytes bypass your application server and its request body limit:
+Your server authorizes the upload and gives the browser a signed URL. The browser sends the file bytes directly to Upstash, then your server verifies the upload and runs `onUploadComplete`. The file never passes through your server, so its request body limit does not restrict the upload.
 
-<img src="/blog/blob/client-upload-light.png" data-theme="light" alt="Upload sequence between Browser, Your API route, and Upstash: the browser requests a signed URL from your route, uploads file bytes directly to Upstash, then asks your route to finish. Your route verifies the stored object with Upstash and returns the upload result. Solid arrows show requests; dashed arrows show responses." />
-<img src="/blog/blob/client-upload-dark.png" data-theme="dark" alt="Upload sequence between Browser, Your API route, and Upstash: the browser requests a signed URL from your route, uploads file bytes directly to Upstash, then asks your route to finish. Your route verifies the stored object with Upstash and returns the upload result. Solid arrows show requests; dashed arrows show responses." />
+<img src="/blog/blob/client-upload-light.png" data-theme="light" alt="File bytes go directly from the browser to Upstash; your server authorizes and verifies the upload." />
+<img src="/blog/blob/client-upload-dark.png" data-theme="dark" alt="File bytes go directly from the browser to Upstash; your server authorizes and verifies the upload." />
 
 You start with a short, typed integration that already handles the upload mechanics. Your code stays focused on your product as its file storage needs grow.
 
