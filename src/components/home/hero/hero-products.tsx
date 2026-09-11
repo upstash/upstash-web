@@ -140,7 +140,7 @@ function HomeHeroProductTab({
       className={cx(
         "flex grow items-center justify-center text-center sm:grow-0",
         "h-12 sm:px-4 lg:h-16 xl:px-8",
-        "xs:text-[1.2em] font-display text-[1em] font-semibold leading-none text-text-mute lg:text-xl xl:text-2xl",
+        "min-[520px]:text-[1.2em] font-display text-[1em] font-semibold leading-none text-text-mute lg:text-xl xl:text-2xl",
         "rounded-2xl rounded-b-none border-2 border-b-0 border-bg-mute bg-bg dark:border-0 dark:bg-bg-mute",
         active && "border-white bg-white lg:h-20 dark:bg-white/10",
         className,
