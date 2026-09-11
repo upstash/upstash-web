@@ -1,5 +1,8 @@
-import { PRODUCT_FEATURES, PRODUCT_TAGLINES } from "./product-features";
-import { HOME_PRODUCTS } from "./products";
+import { Product } from "@/utils/type";
+import {
+  PRODUCT_FEATURES,
+  PRODUCT_TAGLINES,
+} from "./product-features";
 
 /**
  * Crawlable, screen-reader-only mirror of the non-default product tabs.
@@ -13,22 +16,29 @@ import { HOME_PRODUCTS } from "./products";
  * mirrors content the user can reach by clicking the tabs, so it is not
  * hidden/deceptive.
  */
+const SEO_PRODUCTS = [
+  Product.VECTOR,
+  Product.QSTASH,
+  Product.WORKFLOW,
+  Product.BOX,
+  Product.BLOB,
+] as const;
 
 export default function ProductSeoData() {
   return (
     <section className="sr-only">
-      <h2>Upstash Serverless Data Platform products</h2>
-      {HOME_PRODUCTS.slice(1).map(({ product }) => (
+      <h2>Upstash Serverless Data Platform — products</h2>
+      {SEO_PRODUCTS.map((product) => (
         <article key={product}>
           <h3>
             {product}: {PRODUCT_TAGLINES[product].title}
           </h3>
-          {PRODUCT_FEATURES[product].map((group) => (
-            <div key={group.title.join(" ")}>
+          {PRODUCT_FEATURES[product].map((group, groupIndex) => (
+            <div key={groupIndex}>
               <h4>{group.title.join(" ")}</h4>
               <ul>
-                {group.bullets.map((bullet) => (
-                  <li key={bullet}>{bullet}</li>
+                {group.bullets.map((bullet, bulletIndex) => (
+                  <li key={bulletIndex}>{bullet}</li>
                 ))}
               </ul>
             </div>

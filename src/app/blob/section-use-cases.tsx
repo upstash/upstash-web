@@ -26,7 +26,7 @@ export default function SectionUseCases() {
               className={cx(
                 "group flex flex-col gap-2 p-6",
                 "rounded-3xl border-2 border-bg-mute bg-bg-mute",
-                "hover:border-primary/40 transition hover:bg-white dark:hover:bg-white/5",
+                "transition hover:border-primary/40 hover:bg-white dark:hover:bg-white/5",
               )}
             >
               <h3 className="flex items-center gap-1 font-display text-lg font-semibold">
@@ -70,7 +70,7 @@ const USE_CASES = [
   {
     title: "Private reports & invoices",
     desc: "Files written by your server into a private bucket and read through short-lived signed URLs.",
-    href: "https://upstash.com/docs/blob/recipes/private-documents",
+    href: "https://upstash.com/docs/blob/reference/signing",
   },
   {
     title: "AI-generated media",
