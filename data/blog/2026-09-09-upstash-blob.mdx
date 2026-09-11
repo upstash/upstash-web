@@ -40,7 +40,7 @@ The SDK learns whether it is talking to a public or a private bucket from the ba
 
 The token itself never signs a request. It is exchanged for short-lived credentials scoped to that one bucket, and those are what sign every `put`, `get` and `list`. The SDK does the exchange on first use and refreshes before expiry, so you never see it happen. It is also why S3 compatibility is not a separate mode: `bucket.s3()` hands the same credentials to the AWS SDK or the AWS CLI, for anything we do not wrap. Byte ranges, conditional GETs, delimiters, object tagging, and every tool that already speaks S3.
 
-Underneath, buckets are backed by Cloudflare R2. That is what makes them global without a region selector: a reader in Singapore and a reader in Frankfurt are both served from close by, and there is one rate sheet instead of one per region.
+Upstash buckets are global without a region selector: a reader in Singapore and a reader in Frankfurt are both served from close by, and there is one rate sheet instead of one per region.
 
 ## Where the bytes go
 
@@ -50,8 +50,8 @@ We did build a proxy first. Every byte went through a worker of ours on its way 
 
 Your server is treated the same way. When a user picks a file in the browser, the browser asks your route to begin. Your route decides whether this user may upload, where the object should go, and signs exactly that. The browser sends the bytes to the bucket, and once the object exists, your route is told what landed. Your code runs at the start and at the end. Nothing of yours reads the bytes.
 
-<img src="/blog/blob/client-upload-light.png" className="dark:hidden" alt="The browser asks your route to begin, your route signs the upload, and the browser sends the bytes straight to Upstash" />
-<img src="/blog/blob/client-upload-dark.png" className="hidden dark:block" alt="The browser asks your route to begin, your route signs the upload, and the browser sends the bytes straight to Upstash" />
+<img src="/blog/blob/client-upload-light.png" className="dark:hidden" alt="Upload sequence between Browser, Your API route, and Upstash: the browser requests a signed URL from your route, uploads file bytes directly to Upstash, then asks your route to finish. Your route verifies the stored object with Upstash and returns the upload result. Solid arrows show requests; dashed arrows show responses." />
+<img src="/blog/blob/client-upload-dark.png" className="hidden dark:block" alt="Upload sequence between Browser, Your API route, and Upstash: the browser requests a signed URL from your route, uploads file bytes directly to Upstash, then asks your route to finish. Your route verifies the stored object with Upstash and returns the upload result. Solid arrows show requests; dashed arrows show responses." />
 
 That is the whole surface of the upload handler, two callbacks:
 
