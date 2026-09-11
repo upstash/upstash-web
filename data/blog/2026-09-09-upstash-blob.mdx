@@ -19,38 +19,32 @@ Most applications running on Upstash keep their state in three places: keys in R
 
 ---
 
-## What we wanted from a bucket
+## A bucket for your app's files
 
-We had a short list. It should be a real bucket, with objects under paths and an S3 API, so nothing you build on it depends on our SDK. It should not ask where to put your data, because the answer for files served to users is always "close to them". And it should know the difference between a product image and an invoice without you writing an access layer.
+Create a bucket with a name and choose whether it is public or private. There is no region to select, and your server connects with a single `UPSTASH_BLOB_TOKEN`.
 
-So a bucket is created with a name, a visibility, and nothing else. Public buckets give every object a URL on the bucket's own hostname, cached at the edge. Private buckets have no public URL at all; every read is a signed link that expires. Both hand you one token, and that token is the whole configuration:
+Public buckets are for files your app serves directly, such as avatars and product images. Each object gets a public URL served through a global CDN. Private buckets are for invoices, documents, and other files your app controls access to; you can share them through signed links that expire.
+
+For an image already on your server, storing it in a public bucket takes one call:
 
 ```ts
 import { Bucket } from "@upstash/blob"
 
 const bucket = Bucket.fromEnv()
 
-const blob = await bucket.put("reports/q3.pdf", pdf, {
-  contentType: "application/pdf",
+const blob = await bucket.put("products/shirt.png", image, {
+  contentType: "image/png",
 })
-blob.url // https://b3f9a2c7d1e4.blob.upstash.io/reports/q3.pdf
-
-const { url } = await bucket.signedReadUrl("invoices/2026-0042.pdf", {
-  expiresIn: "5m",
-})
+blob.url // https://b3f9a2c7d1e4.blob.upstash.io/products/shirt.png
 ```
 
-The SDK learns whether it is talking to a public or a private bucket from the backend, so the same code runs against both. On a private bucket `url` is simply `undefined`, and objects are stored with `Cache-Control: private` so no shared cache keeps a copy.
+The bucket is S3-compatible, so you can also [use the AWS SDK](https://upstash.com/docs/blob/bucket/connecting#using-an-s3-client) through `bucket.s3()`.
 
-Public objects also carry a `versionedUrl` that changes with their content. Store an avatar at a stable path with `cache: "immutable"` and save its `versionedUrl` on the user's row. The image is cached for a year, but replacing it gives your app a new URL to display immediately, with no cache invalidation or old file to delete. The [avatar recipe](https://upstash.com/docs/blob/recipes/avatars) shows the full flow.
-
-The token itself never signs a request. It is exchanged for short-lived credentials scoped to that one bucket, and those are what sign every `put`, `get` and `list`. The SDK does the exchange on first use and refreshes before expiry, so you never see it happen. It is also why S3 compatibility is not a separate mode: `bucket.s3()` hands the same credentials to the AWS SDK or the AWS CLI, for anything we do not wrap. Byte ranges, conditional GETs, delimiters, object tagging, and every tool that already speaks S3.
-
-Upstash buckets are global without a region selector: a reader in Singapore and a reader in Frankfurt are both served from close by, and there is one rate sheet instead of one per region.
+That covers files your server already has. When a user selects a file in your app, there is more to handle: checking permissions, showing progress, and recording the result. That is where the upload SDK comes in.
 
 ## File uploads without the boilerplate
 
-The SDK is the biggest reason to choose Upstash Blob. We designed it so adding file uploads means writing the parts that belong to your app: who can upload, what you accept, and what happens when a file arrives. Sensible defaults handle the transport, and **end-to-end type safety** connects your server logic all the way to the component that renders the result.
+The upload SDK lets you define who can upload, what you accept, and what happens when a file arrives. Sensible defaults handle the transport, and **end-to-end type safety** connects your server logic all the way to the component that renders the result.
 
 <img src="/blog/blob/file-upload-light.gif" data-theme="light" alt="Choose a file and watch it upload." />
 <img src="/blog/blob/file-upload-dark.gif" data-theme="dark" alt="Choose a file and watch it upload." />
