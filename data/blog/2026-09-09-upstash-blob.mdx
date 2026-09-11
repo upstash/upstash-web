@@ -111,6 +111,9 @@ export function FilePicker() {
 }
 ```
 
+<img src="/blog/blob/file-upload-light.gif" data-theme="light" alt="File upload demo: choose Report.pdf, watch the upload progress, and see the saved file ID returned by the server." />
+<img src="/blog/blob/file-upload-dark.gif" data-theme="dark" alt="File upload demo: choose Report.pdf, watch the upload progress, and see the saved file ID returned by the server." />
+
 That `fileId` is inferred from `onUploadComplete`. Rename it on the server and TypeScript points to the component that needs updating.
 
 Add named routes and `useUpload("avatar")` only accepts names your handler defines. For uploads that need extra data, an [input schema](https://upstash.com/docs/blob/uploads/upload-handler#uploadroute) gives you both server validation and a typed `start({ file, input })` call.
