@@ -70,6 +70,7 @@ export const uploads = uploadHandler({
 
   onUploadComplete: async ({ uploadId, path, url, metadata }) => {
     await db.files.upsert({ uploadId, owner: metadata.owner, path, url })
+    // Sent to the client as upload.blob.data, with its type inferred end to end.
     return { fileId: uploadId }
   },
 })
