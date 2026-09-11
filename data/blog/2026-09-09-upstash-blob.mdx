@@ -77,7 +77,7 @@ export const uploads = uploadHandler({
 
 The row saved in `onUploadComplete` lets your database answer questions like "which files belong to this user?" The bucket holds the bytes; your database indexes the files.
 
-The handler reads `UPSTASH_BLOB_TOKEN` automatically. In Next.js, mounting it takes two lines:
+In Next.js, mounting it takes two lines:
 
 ```ts
 // app/api/upload/route.ts
