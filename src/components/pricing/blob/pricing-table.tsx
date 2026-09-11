@@ -36,7 +36,7 @@ export default function PricingTable() {
         </div>
 
         <div className="grow">
-          <div className="text-balance rounded-lg bg-bg-mute px-3 py-2 text-sm text-primary-text dark:text-text-mute">
+          <div className="max-w-[30ch] text-balance rounded-lg bg-bg-mute px-3 py-2 text-sm text-primary-text dark:text-text-mute">
             {BLOB_FREE_PLAN.description}
           </div>
         </div>
@@ -80,7 +80,7 @@ export default function PricingTable() {
         </div>
 
         <div className="grow">
-          <div className="text-balance rounded-lg bg-bg-mute px-3 py-2 text-sm text-primary-text dark:text-text-mute">
+          <div className="max-w-[30ch] text-balance rounded-lg bg-bg-mute px-3 py-2 text-sm text-primary-text dark:text-text-mute">
             {BLOB_PAYG_PLAN.description}
           </div>
         </div>
