@@ -6,67 +6,60 @@ export const CodeSnippetsBlob = () => {
 
 const data: CodeSnippetsData = [
   {
-    title: "Upload from the server",
+    title: "Server upload",
+    description:
+      "Install @upstash/blob and set UPSTASH_BLOB_TOKEN on your server. Public buckets return a CDN URL.",
     snippets: [
       {
-        language: "js",
+        language: "ts",
+        filename: "lib/files.ts",
         code: `
+import "server-only"
 import { Bucket } from "@upstash/blob"
 
 const bucket = Bucket.fromEnv()
 
-const blob = await bucket.put("avatars/me.png", file, {
-  contentType: "image/png",
-})
+export async function saveImage(file: File) {
+  const blob = await bucket.put("avatars/me.png", file, {
+    contentType: file.type,
+  })
 
-console.log(blob.url)  // public buckets: global CDN URL
-
-await bucket.get("avatars/me.png")   // record + ReadableStream body
-await bucket.info("avatars/me.png")  // metadata only
-await bucket.list({ prefix: "avatars/", limit: 100 })
-await bucket.del("avatars/me.png")
+  return blob.url // undefined for private buckets
+}
 `,
       },
     ],
   },
   {
-    title: "Direct browser upload",
+    title: "Browser upload",
+    description:
+      "Authorize uploads on your server, then send files straight to storage with the React hook. getUser is your app's authentication helper.",
     snippets: [
       {
-        language: "js",
+        language: "ts",
+        filename: "lib/uploads.ts",
         code: `
-// lib/uploads.ts
 import "server-only"
 import { BlobError, uniquePath, uploadHandler } from "@upstash/blob"
 import { getUser } from "@/lib/auth"
-import { db } from "@/lib/db"
 
 export const uploads = uploadHandler({
   constraints: {
     maxSize: "20mb",
     contentTypes: ["image/*", "application/pdf"],
   },
-
   onBeforeUpload: async ({ request, file }) => {
     const user = await getUser(request)
     if (!user) throw new BlobError("unauthorized")
-    return {
-      path: uniquePath\`\${user.id}/\${file.name}\`,
-      metadata: { owner: user.id },
-    }
-  },
-
-  onUploadComplete: async ({ uploadId, metadata, path, url }) => {
-    // Completion callbacks can be retried: upsert by uploadId.
-    await db.files.upsert({
-      where: { uploadId },
-      create: { uploadId, owner: metadata.owner, path, url },
-      update: {},
-    })
+    return { path: uniquePath\`\${user.id}/\${file.name}\` }
   },
 })
-
-// app/api/upload/route.ts
+`,
+      },
+      {
+        language: "ts",
+        filename: "app/api/upload/route.ts",
+        code: `
 import { uploads } from "@/lib/uploads"
 
 export const { GET, POST } = uploads
@@ -76,9 +69,12 @@ export const { GET, POST } = uploads
   },
   {
     title: "React hook",
+    description:
+      "Use the handler and API route from Browser upload. The hook provides progress, results, and errors.",
     snippets: [
       {
-        language: "js",
+        language: "tsx",
+        filename: "app/upload/page.tsx",
         code: `
 "use client"
 
@@ -93,16 +89,22 @@ export default function Page() {
   return (
     <div>
       <input
+        aria-label="Choose a file to upload"
         type="file"
         accept={accept}
+        disabled={upload?.pending}
         onChange={(e) => start({ file: e.target.files?.[0] })}
       />
-
       {upload?.pending && (
-        <progress value={upload.percent} max={100} />
+        <progress aria-label="Upload progress" value={upload.percent} max={100} />
       )}
       {upload?.status === "done" && (
-        <a href={upload.blob.url}>{upload.blob.path}</a>
+        upload.blob.url
+          ? <a href={upload.blob.url}>{upload.blob.path}</a>
+          : <p>Uploaded {upload.blob.path}</p>
+      )}
+      {upload?.status === "error" && (
+        <p role="alert">{upload.error.message}</p>
       )}
     </div>
   )
@@ -112,49 +114,78 @@ export default function Page() {
     ],
   },
   {
-    title: "Signed URLs",
+    title: "Read & list files",
+    description:
+      "Read file contents and metadata, or list files by prefix. Use the returned cursor to fetch the next page.",
     snippets: [
       {
-        language: "js",
+        language: "ts",
+        filename: "lib/read-files.ts",
         code: `
+import "server-only"
 import { Bucket } from "@upstash/blob"
 
-// Use a bucket marked private in the console
 const bucket = Bucket.fromEnv()
 
-// Short-lived read link
-const { url, expiresAt } = await bucket.signedReadUrl(
-  "private/report.pdf",
-  { downloadAs: "report.pdf" },
-)
+const image = await bucket.get("avatars/me.png")
+console.log(image.body) // ReadableStream
 
-// Let a client PUT straight to storage
-const upload = await bucket.signedUploadUrl("u/7/report.pdf", {
-  contentType: "application/pdf",
-  size: file.size,
+const info = await bucket.info("avatars/me.png")
+console.log(info.size, info.contentType)
+
+const { blobs, cursor } = await bucket.list({
+  prefix: "avatars/",
+  limit: 100,
 })
 
-await fetch(upload.url, {
-  method: "PUT",
-  headers: upload.headers,
-  body: file,
-})
+console.log(blobs.map((blob) => blob.path), cursor)
 `,
       },
     ],
   },
   {
-    title: "Use the S3 API",
+    title: "Signed URLs",
+    description:
+      "Create a private bucket and set its token on your server. Check file ownership before issuing a temporary download link.",
     snippets: [
       {
-        language: "js",
+        language: "ts",
+        filename: "lib/downloads.ts",
         code: `
+import "server-only"
+import { BlobError, Bucket } from "@upstash/blob"
+import { getUser } from "@/lib/auth"
+
+const bucket = Bucket.fromEnv()
+
+export async function downloadReport(request: Request) {
+  const user = await getUser(request)
+  if (!user) throw new BlobError("unauthorized")
+
+  // The path belongs to the authenticated user.
+  return bucket.signedReadUrl(\`reports/\${user.id}.pdf\`, {
+    expiresIn: "5m",
+    downloadAs: "report.pdf",
+  })
+}
+`,
+      },
+    ],
+  },
+  {
+    title: "S3 API",
+    description:
+      "Install @aws-sdk/client-s3 alongside @upstash/blob. The SDK refreshes temporary S3 credentials automatically.",
+    snippets: [
+      {
+        language: "ts",
+        filename: "lib/s3.ts",
+        code: `
+import "server-only"
 import { Bucket } from "@upstash/blob"
 import { S3Client, ListObjectsV2Command } from "@aws-sdk/client-s3"
 
 const bucket = Bucket.fromEnv()
-
-// Temporary S3 credentials, refreshed automatically
 const { endpoint, region, bucket: name, credentials } = bucket.s3()
 
 const s3 = new S3Client({ endpoint, region, credentials })
@@ -163,7 +194,7 @@ const { Contents } = await s3.send(
   new ListObjectsV2Command({ Bucket: name, Prefix: "avatars/" }),
 )
 
-console.log(Contents?.map((o) => o.Key))
+console.log(Contents?.map((object) => object.Key))
 `,
       },
     ],

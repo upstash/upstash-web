@@ -6,8 +6,8 @@ import cx from "@/utils/cx";
 import {
   IconBrandAws,
   IconCloudUpload,
-  IconCoin,
   IconCode,
+  IconCoin,
   IconLock,
   IconPlayerPause,
   IconShieldCheck,
@@ -23,8 +23,8 @@ export default function SectionFeatures() {
       <Container className="max-w-screen-xl">
         <PageHeaderTitle as="h2">Why Upstash Blob</PageHeaderTitle>
         <PageHeaderDesc className="mt-3">
-          Object storage built for serverless apps and the browsers that talk
-          to them.
+          Object storage built for serverless apps and the browsers that talk to
+          them.
         </PageHeaderDesc>
 
         <div className="mt-12 grid gap-3 text-left sm:grid-cols-2 md:mt-16 md:gap-4 xl:grid-cols-4">
@@ -44,9 +44,7 @@ export default function SectionFeatures() {
               >
                 {icon}
               </span>
-              <h3 className="whitespace-nowrap font-display text-lg font-semibold">
-                {title}
-              </h3>
+              <h3 className="font-display text-lg font-semibold">{title}</h3>
               <p className="text-text-mute">{desc}</p>
             </div>
           ))}
