@@ -11,10 +11,10 @@ Today we are launching Upstash Blob, object storage for the files your applicati
 Most applications running on Upstash keep their state in three places: keys in Redis, messages in QStash, and files somewhere else. The files were the part we did not offer, so every one of those apps had a bucket from another provider and a few hundred lines of glue between the two. Blob is the bucket, and the SDK is the glue, written once.
 
 <Summary>
-  - A bucket is global and S3-compatible. There is no region to pick, and the AWS SDK works next to ours.
-  - Public buckets serve every object from a CDN. Private buckets serve nothing without a signed link.
-  - Files from a browser go straight to the bucket. Your server authorizes the upload and never touches the bytes.
-  - Free to start: 1 GB of storage and 10 GB of bandwidth a month, no card.
+  - **Global storage, no region to choose.** Use our SDK or the AWS SDK through an S3-compatible API.
+  - **Public or private, your choice.** Public files are served through a global CDN.
+  - **Files from a browser go straight to the bucket.** Your server authorizes the upload and never touches the bytes.
+  - **Free to start.** Get 1 GB of storage and 10 GB of bandwidth per month. No credit card required.
 </Summary>
 
 ---
