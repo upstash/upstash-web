@@ -111,7 +111,11 @@ export function FilePicker() {
 }
 ```
 
-That `fileId` is inferred from `onUploadComplete`. Rename it on the server and TypeScript points to the component that needs updating. Add named routes and `useUpload("avatar")` only accepts names your handler defines. For uploads that need extra data, an [input schema](https://upstash.com/docs/blob/uploads/upload-handler#uploadroute) gives you both server validation and a typed `start({ file, input })` call. No duplicate request and response interfaces, code generation, or type assertions to keep the two sides in sync. The client imports only a type, so your server code stays on the server.
+That `fileId` is inferred from `onUploadComplete`. Rename it on the server and TypeScript points to the component that needs updating.
+
+Add named routes and `useUpload("avatar")` only accepts names your handler defines. For uploads that need extra data, an [input schema](https://upstash.com/docs/blob/uploads/upload-handler#uploadroute) gives you both server validation and a typed `start({ file, input })` call.
+
+No duplicate request and response interfaces, code generation, or type assertions to keep the two sides in sync. The client imports only a type, so your server code stays on the server.
 
 The defaults do just as much work. The hook already knows to call `/api/upload`. Its `accept` value comes from your handler's allowed file types, and the server enforces your size and type constraints. Files over 16 MB automatically use multipart uploads, with pause, resume, retries for failed parts, and refreshed upload signatures when they expire. Small and large files expose the same progress and error state to your UI. You can change the defaults when your app needs it; the [upload client](https://upstash.com/docs/blob/uploads/upload-client) and [large-file docs](https://upstash.com/docs/blob/uploads/large-files) cover the controls.
 
