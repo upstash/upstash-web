@@ -8,7 +8,7 @@ description: "Upstash Blob is object storage for the files your application stor
 
 Today we are launching Upstash Blob, object storage for the files your application stores and serves.
 
-Most applications running on Upstash keep their state in three places: keys in Redis, messages in QStash, and files somewhere else. The files were the part we did not offer, so every one of those apps had a bucket from another provider and a few hundred lines of glue between the two. Blob is the bucket, and the SDK is the glue, written once.
+Adding file uploads to an app means deciding who can upload, where files go, and how people access them. It also means handling progress, retries, and recording each upload in your database. Upstash Blob gives you the storage and handles the upload details, so adding files to your app takes just a few lines of code.
 
 <Summary>
   - **Global storage, no region to choose.** Use our SDK or the AWS SDK through an S3-compatible API.
