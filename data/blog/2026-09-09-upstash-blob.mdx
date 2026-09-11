@@ -50,8 +50,8 @@ Upstash buckets are global without a region selector: a reader in Singapore and 
 
 The SDK is the biggest reason to choose Upstash Blob. We designed it so adding file uploads means writing the parts that belong to your app: who can upload, what you accept, and what happens when a file arrives. Sensible defaults handle the transport, and **end-to-end type safety** connects your server logic all the way to the component that renders the result.
 
-<img src="/blog/blob/file-upload-light.gif" data-theme="light" alt="File upload demo: choose Report.pdf, watch the upload progress, and see the saved file ID returned by the server." />
-<img src="/blog/blob/file-upload-dark.gif" data-theme="dark" alt="File upload demo: choose Report.pdf, watch the upload progress, and see the saved file ID returned by the server." />
+<img src="/blog/blob/file-upload-light.gif" data-theme="light" alt="Choose a file and watch it upload." />
+<img src="/blog/blob/file-upload-dark.gif" data-theme="dark" alt="Choose a file and watch it upload." />
 
 Start with a handler. This one accepts images and PDFs from signed-in users, gives each file a unique path, and saves a database record when it lands. `getUser` and `db` are your app's existing auth and database helpers:
 
