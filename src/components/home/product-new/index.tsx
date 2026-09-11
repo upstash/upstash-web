@@ -17,6 +17,7 @@ import {
 } from "@tabler/icons-react";
 import Link from "next/link";
 import React, { useState } from "react";
+import { HeroTabBlob } from "../hero/hero-tab-blob";
 import { HeroTabBox } from "../hero/hero-tab-box";
 import { PRODUCT_TAGLINES } from "./product-features";
 import ProductSeoData from "./product-seo-data";
@@ -38,6 +39,14 @@ const HeroProductTagline = ({ activeProduct }: { activeProduct: Product }) => {
             </Button>
           </Link>
         )}
+        {activeProduct === Product.BLOB && (
+          <Link href="/blob">
+            <Button variant={"default"} className="h-[42px] px-5">
+              Explore Blob
+              <IconArrowRight size={24} />
+            </Button>
+          </Link>
+        )}
         <a href={docsLink} target="_blank">
           <Button variant={"defaultDark"} className="h-[42px] px-5">
             Documentation
@@ -52,11 +61,14 @@ const HeroProductTagline = ({ activeProduct }: { activeProduct: Product }) => {
                 ? "Create Index"
                 : activeProduct === Product.BOX
                   ? "Create Box"
-                  : "Upstash Console"}
+                  : activeProduct === Product.BLOB
+                    ? "Create Bucket"
+                    : "Upstash Console"}
             {activeProduct === Product.REDIS ||
             activeProduct === Product.VECTOR ||
             activeProduct === Product.SEARCH ||
-            activeProduct === Product.BOX ? (
+            activeProduct === Product.BOX ||
+            activeProduct === Product.BLOB ? (
               <IconPlus size={24} />
             ) : (
               <IconArrowUpRight size={24} />
@@ -105,6 +117,7 @@ export default function HomeProductNew() {
             {activeProduct === Product.QSTASH && <HeroTabQStash />}
             {activeProduct === Product.WORKFLOW && <HeroTabWorkflow />}
             {activeProduct === Product.BOX && <HeroTabBox />}
+            {activeProduct === Product.BLOB && <HeroTabBlob />}
           </div>
         </div>
 

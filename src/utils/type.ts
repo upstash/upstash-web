@@ -5,6 +5,7 @@ export enum Product {
   WORKFLOW = "Workflow",
   SEARCH = "Search",
   BOX = "Box",
+  BLOB = "Blob",
 }
 
 export enum CodeExample {
