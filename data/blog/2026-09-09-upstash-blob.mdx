@@ -30,10 +30,16 @@ import { Bucket } from "@upstash/blob"
 
 const bucket = Bucket.fromEnv()
 
-const blob = await bucket.put("reports/q3.pdf", pdf, { contentType: "application/pdf" })
-blob.url // https://b3f9a2c7d1e4.blob.upstash.io/reports/q3.pdf
+const blob = await bucket.put("reports/q3.pdf", pdf, {
+  contentType: "application/pdf",
+})
+blob.url
+// https://b3f9a2c7d1e4.blob.upstash.io/reports/q3.pdf
 
-const { url } = await bucket.signedReadUrl("invoices/2026-0042.pdf", { expiresIn: "5m" })
+const { url } = await bucket.signedReadUrl(
+  "invoices/2026-0042.pdf",
+  { expiresIn: "5m" },
+)
 ```
 
 The SDK learns whether it is talking to a public or a private bucket from the backend, so the same code runs against both. On a private bucket `url` is simply `undefined`, and objects are stored with `Cache-Control: private` so no shared cache keeps a copy.
