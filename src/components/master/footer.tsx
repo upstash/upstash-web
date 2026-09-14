@@ -44,6 +44,16 @@ export default function Footer({ className, ...props }: IAppFooter) {
                 className="opacity-50 group-hover:opacity-100"
               />
             </Link>
+            <Link
+              href="/blob"
+              className="group inline-flex items-center gap-1 hover:text-primary hover:underline"
+            >
+              Blob Storage
+              <IconArrowUpRight
+                size={16}
+                className="opacity-50 group-hover:opacity-100"
+              />
+            </Link>
           </div>
 
           <div className="flex gap-2">

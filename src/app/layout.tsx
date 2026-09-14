@@ -154,6 +154,8 @@ export async function generateMetadata() {
       "serverless database",
       "global database",
       "serverless vector",
+      "blob storage",
+      "object storage",
     ],
     openGraph: {
       type: "website",

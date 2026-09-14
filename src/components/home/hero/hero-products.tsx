@@ -1,3 +1,4 @@
+import IconBlob from "@/components/icon-blob";
 import IconQStash from "@/components/icon-qstash";
 import IconRedis from "@/components/icon-redis";
 import IconBox from "@/components/icon-box";
@@ -29,7 +30,7 @@ export default function HomeHeroProducts({
         {
           <IconRedis
             className={cx(
-              "hidden w-5 shrink-0 sm:block md:w-6",
+              "hidden w-5 shrink-0 lg:block md:w-6",
               activeProduct === Product.REDIS && "block",
             )}
           />
@@ -51,7 +52,7 @@ export default function HomeHeroProducts({
       >
         <IconVector
           className={cx(
-            "hidden w-5 shrink-0 sm:block md:w-6",
+            "hidden w-5 shrink-0 lg:block md:w-6",
             activeProduct === Product.VECTOR && "block",
           )}
         />
@@ -67,7 +68,7 @@ export default function HomeHeroProducts({
       >
         <IconQStash
           className={cx(
-            "hidden w-5 shrink-0 sm:block md:w-6",
+            "hidden w-5 shrink-0 lg:block md:w-6",
             activeProduct === Product.QSTASH && "block",
           )}
         />
@@ -83,7 +84,7 @@ export default function HomeHeroProducts({
       >
         <IconWorkflow
           className={cx(
-            "hidden w-5 shrink-0 sm:block md:w-6",
+            "hidden w-5 shrink-0 lg:block md:w-6",
             activeProduct === Product.WORKFLOW && "block",
           )}
         />
@@ -99,11 +100,27 @@ export default function HomeHeroProducts({
       >
         <IconBox
           className={cx(
-            "hidden w-5 shrink-0 sm:block md:w-6",
+            "hidden w-5 shrink-0 lg:block md:w-6",
             activeProduct === Product.BOX && "block",
           )}
         />
         <span>Box</span>
+      </HomeHeroProductTab>
+
+      <HomeHeroProductTab
+        active={activeProduct === Product.BLOB}
+        onClick={() => {
+          setActiveProduct(Product.BLOB);
+        }}
+        className={cx(activeProduct === Product.BLOB && "text-sky-500")}
+      >
+        <IconBlob
+          className={cx(
+            "hidden w-5 shrink-0 lg:block md:w-6",
+            activeProduct === Product.BLOB && "block",
+          )}
+        />
+        <span>Blob</span>
       </HomeHeroProductTab>
     </>
   );
@@ -122,8 +139,8 @@ function HomeHeroProductTab({
       type="button"
       className={cx(
         "flex grow items-center justify-center text-center sm:grow-0",
-        "h-12 sm:px-4 lg:h-16 lg:px-8",
-        "xs:text-[1.2em] font-display text-[1em] font-semibold leading-none text-text-mute lg:text-xl xl:text-2xl",
+        "h-12 sm:px-4 lg:h-16 xl:px-8",
+        "min-[520px]:text-[1.2em] font-display text-[1em] font-semibold leading-none text-text-mute lg:text-xl xl:text-2xl",
         "rounded-2xl rounded-b-none border-2 border-b-0 border-bg-mute bg-bg dark:border-0 dark:bg-bg-mute",
         active && "border-white bg-white lg:h-20 dark:bg-white/10",
         className,

@@ -5,7 +5,7 @@ export const HOME_FAQ = [
   {
     question: "What is Upstash?",
     answer:
-      "Upstash is a serverless data platform. It provides fully managed Redis, Vector, Search, QStash messaging, Workflow, and Box sandboxes, all with per-request pricing and no servers to provision. You create a database in seconds and connect over HTTP or native protocols from any runtime.",
+      "Upstash is a serverless data platform. It provides fully managed Redis, Vector, Search, QStash messaging, Workflow, Box sandboxes, and Blob object storage, all with per-request pricing and no servers to provision. You create a database in seconds and connect over HTTP or native protocols from any runtime.",
   },
   {
     question: "Is Upstash free to use?",
@@ -15,7 +15,7 @@ export const HOME_FAQ = [
   {
     question: "What products does Upstash offer?",
     answer:
-      "Upstash offers serverless Redis, Vector for embeddings and similarity search, Search for full-text and hybrid search, QStash for messaging and scheduling, Workflow for durable serverless functions, and Box for sandboxed cloud containers that run AI agents and code.",
+      "Upstash offers serverless Redis, Vector for embeddings and similarity search, Search for full-text and hybrid search, QStash for messaging and scheduling, Workflow for durable serverless functions, Box for sandboxed cloud containers that run AI agents and code, and Blob for S3-compatible object storage with direct browser uploads.",
   },
   {
     question: "How is Upstash priced?",

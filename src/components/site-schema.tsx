@@ -28,7 +28,7 @@ export default function SiteSchema() {
           url: `${SITE_URL}/logo/upstash-icon-white-bg.png`,
         },
         description:
-          "Upstash is a serverless data platform providing fully managed Redis, Vector, Search, QStash messaging, Workflow and Box sandboxes with per-request pricing.",
+          "Upstash is a serverless data platform providing fully managed Redis, Vector, Search, QStash messaging, Workflow, Box sandboxes and Blob object storage with per-request pricing.",
         email: "support@upstash.com",
         contactPoint: [
           {
@@ -74,7 +74,7 @@ export default function SiteSchema() {
         name: "Upstash",
         url: `${SITE_URL}/`,
         description:
-          "Serverless Redis, Vector, Search, QStash, Workflow and Box. Create a database in seconds, connect over HTTP from any runtime, and pay per request with a free tier to start.",
+          "Serverless Redis, Vector, Search, QStash, Workflow, Box and Blob. Create a database in seconds, connect over HTTP from any runtime, and pay per request with a free tier to start.",
         applicationCategory: "DeveloperApplication",
         operatingSystem: "Any",
         provider: { "@id": `${SITE_URL}/#organization` },

@@ -168,6 +168,18 @@ export default function HomePage() {
                 svgURL="logo/box-icon.svg"
               />
             </LogoBox>
+            {/*blob*/}
+            <LogoBox className="md:col-span-6">
+              <img
+                src="logo/blob-icon.svg"
+                alt="Upstash Blob icon"
+                className="h-12 md:h-16"
+              />
+              <ActionButtons
+                pngURL="logo/blob-icon.png"
+                svgURL="logo/blob-icon.svg"
+              />
+            </LogoBox>
             {/**/}
           </div>
         </Container>
