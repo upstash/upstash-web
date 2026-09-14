@@ -61,17 +61,20 @@ Start with a handler. This one accepts images and PDFs from signed-in users, giv
 ```ts
 // lib/uploads.ts
 import "server-only"
-import { BlobError, uniquePath, uploadHandler } from "@upstash/blob"
+import { BlobError, uploadHandler } from "@upstash/blob"
 import { getUser } from "./auth"
 import { db } from "./db"
 
 export const uploads = uploadHandler({
   constraints: { maxSize: "20mb", contentTypes: ["image/*", "application/pdf"] },
 
-  onBeforeUpload: async ({ request, file }) => {
+  onBeforeUpload: async ({ request }) => {
     const user = await getUser(request)
     if (!user) throw new BlobError("unauthorized")
-    return { path: uniquePath`${user.id}/${file.name}`, metadata: { owner: user.id } }
+    return {
+      path: `${user.id}/${crypto.randomUUID()}`,
+      metadata: { owner: user.id },
+    }
   },
 
   onUploadComplete: async ({ uploadId, path, url, metadata }) => {
