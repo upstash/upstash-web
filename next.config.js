@@ -19,6 +19,9 @@ const cspHeader = `
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  turbopack: {
+    root: __dirname,
+  },
   env: {
     NEXT_PUBLIC_SITE_URL:
       process.env.NODE_ENV === "development"
