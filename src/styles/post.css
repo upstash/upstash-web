@@ -103,6 +103,24 @@
   @apply -mx-5 mt-1.5 block text-center text-sm leading-6 text-text-mute md:-mx-6;
 }
 
+/* Keep theme-specific images and their generated captions in sync. */
+.post img[data-theme="dark"],
+.post img[data-theme="dark"] + [data-image-caption] {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .post img[data-theme="light"],
+  .post img[data-theme="light"] + [data-image-caption] {
+    display: none;
+  }
+
+  .post img[data-theme="dark"],
+  .post img[data-theme="dark"] + [data-image-caption] {
+    display: block;
+  }
+}
+
 .post > img:has(+ [data-image-caption]),
 .post > p:has(> img + [data-image-caption]) {
   @apply mb-4;

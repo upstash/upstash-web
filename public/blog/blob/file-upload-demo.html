@@ -1,0 +1,135 @@
+<!--
+  Animated illustration for file-upload-light.gif and file-upload-dark.gif.
+  Uses the visual style of the Blob recipe demos. No network requests or uploads.
+  Render window.seek(ms) at 20 fps, viewport 600x360, DPR 2.
+  Use ?theme=dark for the dark variant. DURATION is 7600 ms.
+  Encode the PNG frames with:
+  ffmpeg -framerate 20 -i %04d.png -vf "scale=900:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=128:stats_mode=diff[p];[b][p]paletteuse=dither=sierra2_4a" -loop 0 out.gif
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>File upload demo</title>
+  <style>
+    :root {
+      --bg: #f6f7f9; --card: #fff; --border: #e5e7eb; --text: #111827;
+      --muted: #6b7280; --accent: #10b981; --button: #f3f4f6;
+      --selected: #ecfdf5; --success: #047857; --shadow: rgba(0, 0, 0, .15);
+    }
+    html[data-theme="dark"] {
+      --bg: #0b0f14; --card: #131920; --border: #232b35; --text: #e5e7eb;
+      --muted: #8b95a5; --accent: #34d399; --button: #1c242e;
+      --selected: #0f2a22; --success: #6ee7b7; --shadow: rgba(0, 0, 0, .5);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 600px; height: 360px; overflow: hidden; background: var(--bg);
+      color: var(--text); font-family: -apple-system, "Inter", "Segoe UI", system-ui, sans-serif; }
+    #stage { position: relative; width: 600px; height: 360px; }
+    .card { position: absolute; left: 90px; top: 70px; width: 420px; height: 220px;
+      padding: 26px 28px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; }
+    h1 { font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+    .hint { margin-top: 5px; color: var(--muted); font-size: 12px; }
+    .picker { display: flex; align-items: center; gap: 12px; margin-top: 24px; }
+    .button { display: inline-block; border: 1px solid var(--border); border-radius: 8px;
+      padding: 7px 12px; font-size: 12.5px; font-weight: 500; white-space: nowrap;
+      background: var(--button); }
+    .filename { font-size: 12px; color: var(--muted); }
+    .slot { position: relative; margin-top: 22px; height: 38px; }
+    .progress, .done { position: absolute; inset: 0; opacity: 0; }
+    .track { height: 6px; width: 100%; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .fill { width: 0; height: 100%; background: var(--accent); border-radius: 3px; }
+    .progress-label { display: flex; justify-content: space-between; margin-top: 8px;
+      color: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+    .done { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+    .check { display: inline-flex; width: 18px; height: 18px; border-radius: 50%;
+      align-items: center; justify-content: center; background: var(--selected); color: var(--success); }
+    .check svg { width: 11px; height: 11px; }
+    code { font: 11.5px ui-monospace, "SF Mono", Menlo, monospace; }
+    .dialog { position: absolute; left: 145px; top: 65px; width: 310px; padding: 18px;
+      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+      box-shadow: 0 24px 60px var(--shadow); opacity: 0; transform-origin: center; }
+    .dialog h2 { font-size: 13px; font-weight: 600; }
+    .file { display: flex; align-items: center; gap: 12px; margin-top: 17px; padding: 13px 10px;
+      border: 1px solid transparent; border-radius: 8px; }
+    .file.selected { background: var(--selected); border-color: var(--accent); }
+    .file svg { width: 25px; height: 30px; color: var(--muted); }
+    .file p { font-size: 12px; font-weight: 500; }
+    .file small { display: block; margin-top: 4px; font-size: 11px; color: var(--muted); }
+    .footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+    .primary { background: var(--accent); border-color: transparent; color: #062c21; }
+    #cursor { position: absolute; left: 0; top: 0; width: 22px; height: 26px;
+      transform-origin: 3px 2px; pointer-events: none; filter: drop-shadow(0 1px 2px rgba(0,0,0,.3)); }
+  </style>
+</head>
+<body>
+  <div id="stage">
+    <div class="card">
+      <h1>Upload a file</h1>
+      <p class="hint">Images and PDFs, up to 20 MB</p>
+      <div class="picker">
+        <div class="button" id="choose">Choose file</div>
+        <span class="filename" id="filename">No file chosen</span>
+      </div>
+      <div class="slot">
+        <div class="progress" id="progress">
+          <div class="track"><div class="fill" id="fill"></div></div>
+          <div class="progress-label"><span id="status">Uploading...</span><span id="percent">0%</span></div>
+        </div>
+        <div class="done" id="done">
+          <span class="check"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m2 6 2.5 2.5L10 3"/></svg></span>
+          <span>Saved file <code>01J8F6K2M9</code></span>
+        </div>
+      </div>
+    </div>
+    <div class="dialog" id="dialog">
+      <h2>Choose a file</h2>
+      <div class="file" id="file">
+        <svg viewBox="0 0 25 30" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 1h11l6 6v22H4zM15 1v7h6M8 14h9M8 18h9M8 22h6"/></svg>
+        <div><p>Report.pdf</p><small>PDF document · 2.1 MB</small></div>
+      </div>
+      <div class="footer"><div class="button">Cancel</div><div class="button primary" id="open">Open</div></div>
+    </div>
+    <svg id="cursor" viewBox="0 0 22 26"><path d="M3 2 L3 20 L7.6 15.6 L10.8 23 L14 21.6 L10.9 14.4 L17.5 14.2 Z" fill="#fff" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/></svg>
+  </div>
+  <script>
+    document.documentElement.dataset.theme = new URLSearchParams(location.search).get('theme') || 'light';
+    const $ = (id) => document.getElementById(id);
+    const clamp = (x) => Math.max(0, Math.min(1, x));
+    const ease = (x) => x < .5 ? 2*x*x : 1 - Math.pow(-2*x + 2, 2)/2;
+    const segment = (t, a, b) => ease(clamp((t-a)/(b-a)));
+    const point = (id) => {
+      const r = $(id).getBoundingClientRect();
+      return [r.left + r.width/2, r.top + r.height/2];
+    };
+    const start = [475, 315], choose = point('choose'), file = point('file'), open = point('open');
+    const moves = [[300, 900, start, choose], [1350, 1900, choose, file],
+      [2150, 2500, file, open], [2850, 3300, open, start]];
+    window.DURATION = 7600;
+    window.seek = (t) => {
+      let position = start;
+      for (const [a, b, from, to] of moves) {
+        if (t < a) break;
+        const p = segment(t, a, b);
+        position = from.map((v, i) => v + (to[i]-v)*p);
+      }
+      const click = Math.max(...[1000, 2000, 2600].map(at => t < at ? 0 : 1-clamp((t-at)/180)));
+      $('cursor').style.transform = `translate(${position[0]-3}px, ${position[1]-2}px) scale(${1-click*.12})`;
+      $('choose').style.transform = `scale(${1 - (t >= 1000 && t < 1150 ? .04 : 0)})`;
+      const dialog = segment(t, 1100, 1300) * (1-segment(t, 2650, 2800));
+      $('dialog').style.opacity = dialog;
+      $('dialog').style.transform = `scale(${.97 + .03*dialog})`;
+      $('file').classList.toggle('selected', t >= 2000);
+      $('open').style.transform = `scale(${1 - (t >= 2600 && t < 2750 ? .04 : 0)})`;
+      $('filename').textContent = t >= 2800 ? 'Report.pdf' : 'No file chosen';
+      $('progress').style.opacity = segment(t, 2800, 2950) * (1-segment(t, 5300, 5450));
+      const percent = Math.min(99, Math.floor(segment(t, 2900, 5050)*100));
+      $('fill').style.width = `${percent}%`;
+      $('percent').textContent = `${percent}%`;
+      $('status').textContent = t >= 5050 ? 'Finishing up...' : 'Uploading...';
+      $('done').style.opacity = segment(t, 5400, 5650);
+    };
+    seek(0);
+  </script>
+</body>
+</html>
