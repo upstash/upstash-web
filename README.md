@@ -1,10 +1,10 @@
-# Upstash
+# UPSTASH
 
-## Blog Post Features
+## BLOG POST FEATURES
 
 ---
 
-#### Note
+#### NOTE
 
 ![](public/readme/note-default.png)
 
@@ -57,7 +57,7 @@
 
 ---
 
-#### Code Block
+#### CODE BLOCK
 
 ![](public/readme/code-title.png)
 
@@ -79,7 +79,7 @@ import { Redis } from '@upstash/redis'
 
 ---
 
-#### Tags
+#### TAGS
 
 Tags group posts under `/blog/tag/<tag>`. Conventions:
 
