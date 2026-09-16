@@ -1,0 +1,409 @@
+---
+title: "Consumer Not Found: Queues for the Serverless World"
+slug: kafka-sqs-qstash-serverless-order-pipeline
+authors: [sancar]
+tags: [qstash, kafka, sqs, serverless]
+description: "Let's build the same order pipeline three times, with Kafka, Amazon SQS, and QStash, and see what it takes to maintain each one when your app is serverless."
+---
+
+<Summary>
+
+In this blog, we will take one very ordinary workload, an `order.placed` event that fans out to four side effects, and build it three times: on Kafka, on Amazon SQS, and on QStash.
+
+Publishing is simple and similar for all three. They mostly differ on the consumer side, in how much it costs to maintain:
+
+- **Kafka** needs a long-lived, stateful consumer group. Serverless functions can't hold one, so you end up deploying a container next to your serverless app. That is exactly the thing you were trying not to run.
+- **SQS** never pushes. Something has to poll it. If your app is on Vercel or Cloudflare, that means an AWS Lambda just to be a consumer, plus IAM, plus an event source mapping, plus a second cloud in your deploy pipeline.
+- **QStash** delivers the message as an HTTP POST to a route you already have. No consumer, no VPC, nothing running when nothing is happening.
+
+Kafka and SQS are not bad tools. They are just from an era where you always had a server to put a consumer on.
+</Summary>
+
+A disclaimer before we start. We build QStash at Upstash, so I am obviously biased. I will still try to be fair, and there is a whole section about when you should pick Kafka or SQS instead. Please reach out to us on [Discord](https://upstash.com/discord) if you think I am missing anything.
+
+The blog is in a few sections if you want to skip some of it:
+
+- [The Workload](#the-workload): What are we building?
+- [Kafka](#implementation-1-kafka), [Amazon SQS](#implementation-2-amazon-sqs), and [QStash](#implementation-3-qstash): The same pipeline, three times.
+- [What's Running When Nothing Is Happening](#whats-running-when-nothing-is-happening): The three side by side.
+- [When Kafka or SQS Is Still the Right Answer](#when-kafka-or-sqs-is-still-the-right-answer): The honest part.
+- [Three Extras](#three-extras-that-come-in-handy-with-qstash): Delays, schedules, and flow control.
+
+## The Workload
+
+Let's take a Next.js store deployed on Vercel. A customer clicks "Pay", the payment is captured, and the checkout route should respond in a few hundred milliseconds. But the order is not really done yet.
+
+For a long time, the usual answer to "do this after the response" was a queue. Kafka if you had a platform team, SQS if you lived on AWS. QStash is the modern replacement for these kinds of use cases. It is built for apps that don't have a server to run a consumer on anymore.
+
+There are four more things to do after checkout, and the customer should not wait for any of them:
+
+| Side effect | Talks to | Why it can't be inline |
+| --- | --- | --- |
+| Receipt email | Resend | Slow, and a failure shouldn't fail checkout |
+| Inventory decrement | Postgres | Must not be lost |
+| Push to warehouse/ERP | Third-party API | Rate-limited, occasionally down for hours |
+| Analytics event | ClickHouse | Fire-and-forget, high volume |
+
+Let's write down the requirements:
+
+1. The checkout response must not wait for any of it.
+2. Every side effect retries independently. A dead ERP API must not block receipt emails.
+3. Failures that exhaust retries have to land somewhere a human can see and replay.
+
+Now let's implement it three times and see what it takes to maintain each one.
+
+## Implementation 1: Kafka
+
+### Producing
+
+Publishing from the checkout route is only a couple of lines, but it already has a problem. `producer.connect()` opens a TCP connection and does a SASL handshake. A serverless function that was frozen after the last invocation may or may not still hold that connection, and a cold start pays the full handshake before the first message goes out. Reusing the connection across invocations is best-effort, not guaranteed.
+
+```ts
+// app/api/checkout/route.ts
+import { Kafka } from "kafkajs";
+
+const kafka = new Kafka({
+  clientId: "storefront",
+  brokers: [process.env.KAFKA_BROKER!],
+  ssl: true,
+  sasl: { mechanism: "scram-sha-512", username: "...", password: "..." },
+});
+
+
+const producer = kafka.producer();
+let connected = false;
+
+export async function POST(req: Request) {
+  const order = await createOrder(await req.json());
+
+  if (!connected) {
+    await producer.connect();
+    connected = true;
+  }
+
+  await producer.send({
+    topic: "orders",
+    messages: [{ key: order.id, value: JSON.stringify(order) }],
+  });
+
+  return Response.json({ orderId: order.id });
+}
+```
+
+### Consuming
+
+This is where it becomes obvious that Kafka can't be serverless. A Kafka consumer is not a function you call. It is a **member of a consumer group**. It gets partitions assigned, holds them, commits offsets, and joins rebalances when the membership changes. All of that assumes a process that stays alive.
+
+```ts
+import { Kafka } from "kafkajs";
+
+const kafka = new Kafka({ /* ... */ });
+const consumer = kafka.consumer({ groupId: "order-side-effects" });
+
+await consumer.connect();
+await consumer.subscribe({ topic: "orders", fromBeginning: false });
+
+await consumer.run({
+  eachMessage: async ({ message }) => {
+    const order = JSON.parse(message.value!.toString());
+
+    // This is the part that hurts. All four side effects run
+    // in one handler, in sequence, on the same partition.
+    await sendReceipt(order);
+    await decrementInventory(order);
+    await pushToErp(order);      // <- the flaky one
+    await trackAnalytics(order);
+
+    // Offset commits after eachMessage returns. If pushToErp throws,
+    // the offset is not committed, and the message is redelivered —
+    // along with sendReceipt and decrementInventory, which already ran.
+  },
+});
+```
+
+There are two consequences I want to spell out:
+
+- **Head-of-line blocking.** Kafka commits offsets per partition, in order. If the ERP push for one order keeps failing, the whole partition is stuck behind it. Every order after it waits, including their receipt emails. The standard fix is a ladder of retry topics (`orders.retry.1m`, `orders.retry.10m`, …) plus a dead-letter topic. Consumers re-publish failures one rung down and wait until each message is due. It works. But now you own a small messaging system on top of your messaging system.
+- **It has to run somewhere.** A consumer group member is a process, and Vercel won't host it. So it goes to ECS, Fly, or Railway. That means a Dockerfile, a health check, and a graceful shutdown so that a deploy doesn't leave partitions stranded until the session timeout expires. Your modern "serverless" app now ships a container, together with the service definition, health checks, and alerts that come with keeping one alive.
+
+<Note type="tip">
+**What about MSK + Lambda?** Good question. An event source mapping lets Lambda poll the topic and call your function per batch, so there is no container to run. There are two catches, though. First, the cluster itself is not serverless the way your app is: MSK Serverless bills per cluster-hour. Second, the mapping features that fix the problems above (retry limits, partial batch responses, on-failure destinations) require provisioned mode, which bills per Event Poller Unit hour.
+</Note>
+
+---
+
+## Implementation 2: Amazon SQS
+
+### Producing
+
+```ts
+// app/api/checkout/route.ts
+import { SNSClient, PublishCommand } from "@aws-sdk/client-sns";
+
+const sns = new SNSClient({ region: "us-east-1" });
+
+export async function POST(req: Request) {
+  const order = await createOrder(await req.json());
+
+  await sns.send(new PublishCommand({
+    TopicArn: process.env.ORDER_TOPIC_ARN,
+    Message: JSON.stringify(order),
+  }));
+
+  return Response.json({ orderId: order.id });
+}
+```
+
+You could call `SendMessage` four times from the checkout route. But the idiomatic AWS way is to put SNS in front. The producer publishes a single event, and each side effect gets its own queue with its own retries, its own DLQ, and its own backlog. This is the standard SNS → SQS fan-out:
+
+```
+SNS topic "orders"
+  ├── SQS receipts        → Lambda → DLQ receipts
+  ├── SQS inventory       → Lambda → DLQ inventory
+  ├── SQS erp             → Lambda → DLQ erp
+  └── SQS analytics       → Lambda → DLQ analytics
+```
+
+So that is four queues, four DLQs, four Lambdas, four event source mappings, and the IAM so that each piece can talk to the next one.
+
+### Consuming
+
+SQS does not push. Nothing happens until something calls `ReceiveMessage`. On AWS, Lambda hides this behind an event source mapping:
+
+```ts
+// lambda/receipts.ts
+import type { SQSEvent, SQSBatchResponse } from "aws-lambda";
+
+export const handler = async (event: SQSEvent): Promise<SQSBatchResponse> => {
+  const batchItemFailures = [];
+
+  for (const record of event.Records) {
+    try {
+      const { Message } = JSON.parse(record.body); // SNS envelope
+      await sendReceipt(JSON.parse(Message));
+    } catch {
+      // Without ReportBatchItemFailures, one bad message in a batch of ten
+      // redelivers all ten. Report only the ones that failed.
+      batchItemFailures.push({ itemIdentifier: record.messageId });
+    }
+  }
+
+  return { batchItemFailures };
+};
+```
+
+And here is the infrastructure for **only one** of the four side effects, in AWS SAM:
+
+```yaml
+ReceiptsDLQ:
+  Type: AWS::SQS::Queue
+  Properties:
+    MessageRetentionPeriod: 1209600 # 14 days
+
+ReceiptsQueue:
+  Type: AWS::SQS::Queue
+  Properties:
+    VisibilityTimeout: 180 # 6 × the function timeout
+    RedrivePolicy:
+      deadLetterTargetArn: !GetAtt ReceiptsDLQ.Arn
+      maxReceiveCount: 5
+
+ReceiptsQueuePolicy:
+  Type: AWS::SQS::QueuePolicy
+  Properties:
+    Queues: [!Ref ReceiptsQueue]
+    PolicyDocument:
+      Statement:
+        - Effect: Allow
+          Principal: { Service: sns.amazonaws.com }
+          Action: sqs:SendMessage
+          Resource: !GetAtt ReceiptsQueue.Arn
+          Condition:
+            ArnEquals: { aws:SourceArn: !Ref OrdersTopic }
+
+ReceiptsSubscription:
+  Type: AWS::SNS::Subscription
+  Properties:
+    TopicArn: !Ref OrdersTopic
+    Protocol: sqs
+    Endpoint: !GetAtt ReceiptsQueue.Arn
+
+ReceiptsFunction:
+  Type: AWS::Serverless::Function
+  Properties:
+    Handler: receipts.handler
+    Runtime: nodejs22.x
+    Timeout: 30
+    Events:
+      Queue:
+        Type: SQS
+        Properties:
+          Queue: !GetAtt ReceiptsQueue.Arn
+          BatchSize: 10
+          FunctionResponseTypes: [ReportBatchItemFailures]
+```
+
+That was one side effect. The pipeline needs four of these, plus the topic.
+
+And here comes the real point:
+
+<Note type="caution">
+Note that the app is on Vercel, and the consumers are on AWS Lambda. Now you deploy to two platforms, manage two sets of credentials, and read logs in two places. And `sendReceipt` either exists twice or moves to a shared package that both deploys import. None of this is because the problem is hard, but because SQS won't call your endpoint.
+</Note>
+
+A couple more things worth mentioning while we are here:
+
+- **Visibility timeout has to outlast the work.** Lambda rejects a mapping if the queue's visibility timeout is shorter than the function timeout. On top of that, AWS recommends at least six times the function timeout, to leave room for retries when the function is throttled. If you cut it close, a message becomes visible again while the first invocation is still working on it. Two receipt emails for one order.
+- **Max delay is 15 minutes.** Keep this in mind. We will come back to it in the last section.
+
+---
+
+## Implementation 3: QStash
+
+### Producing
+
+```ts
+// app/api/checkout/route.ts
+import { Client } from "@upstash/qstash";
+
+const qstash = new Client({ token: process.env.QSTASH_TOKEN! });
+
+export async function POST(req: Request) {
+  const order = await createOrder(await req.json());
+
+  await qstash.batchJSON([
+    { url: `${BASE}/api/jobs/receipt`,   body: order },
+    { url: `${BASE}/api/jobs/inventory`, body: order, retries: 5 },
+    { url: `${BASE}/api/jobs/erp`,       body: order, retries: 5 },
+    { url: `${BASE}/api/jobs/analytics`, body: order, retries: 0 },
+  ]);
+
+  return Response.json({ orderId: order.id });
+}
+```
+
+Fan-out is four entries in an array. The retry policy per destination is just a field. No topic, no subscription, no queue to create beforehand.
+
+### Consuming
+
+Well, there is no consumer. QStash POSTs to the URL, so the "consumer" is just a route in the app you already deployed:
+
+```ts
+// app/api/jobs/erp/route.ts
+import { verifySignatureAppRouter } from "@upstash/qstash/nextjs";
+
+export const POST = verifySignatureAppRouter(async (req: Request) => {
+  const order = await req.json();
+
+  await pushToErp(order);   // throw → non-2xx → QStash retries with backoff
+                            // retries exhausted → message lands in the DLQ
+
+  return Response.json({ ok: true });
+});
+```
+
+That's the whole consumer tier: four routes, about ten lines each, in the same repo and the same deploy as the rest of your app. Nothing new to deploy, nothing to keep alive, one place to read the logs. The endpoints are public URLs, but `verifySignatureAppRouter` rejects any request that is not signed by QStash.
+
+When the retries run out, the message moves to the [dead-letter queue](https://upstash.com/docs/qstash/features/dlq), where it is kept for days to months, depending on your plan. From the console, you can inspect a failed message and republish it (it is treated as a new message and gets its retries again) or delete it. The REST API does the same in bulk, filtered by destination URL, response status, label, or flow-control key. So "replay every ERP push that failed with a 503 during last night's outage" is a single request.
+
+---
+
+## What's Running When Nothing Is Happening
+
+Let's put the three side by side:
+
+| | Kafka | SQS | QStash |
+| --- | --- | --- | --- |
+| Always-on processes | 1 consumer container (+ brokers) | None | None |
+| Places you deploy code | 2 (Vercel + container host) | 2 (Vercel + AWS) | 1 (Vercel) |
+| Infra you maintain | Dockerfile, service definition, topics | SAM template, ~40 lines × 4 | None |
+| Retries and DLQ | Build it (retry topics + DLQ topic) | Configured per queue | Built in, per message |
+
+To be clear, the point of this table is not that QStash has more features. Kafka and SQS both push you into running a consumer tier, either a container or a second cloud full of queues and functions wired together. And a consumer tier is a server, no matter what the billing page calls it.
+
+---
+
+## When Kafka or SQS Is Still the Right Answer
+
+This is the honest part. None of the above makes Kafka or SQS bad tools. They solve problems QStash doesn't even try to solve.
+
+**Kafka**, when you need:
+- A replayable log. QStash delivers a message once, and only keeps failed messages around so you can retry them when your app fails. That is a narrow use case compared to what Kafka offers. Kafka keeps the whole topic and lets a new application read the same log for a completely different purpose.
+- Stream processing: joins, windows, aggregations, ksqlDB or Flink downstream.
+
+**SQS**, when:
+- Everything already lives inside AWS and the consumer is a Lambda anyway. Then SQS is excellent, and very cheap.
+- You want pull semantics on purpose, like a batch worker that drains a backlog on its own schedule.
+
+**QStash** is a task queue for HTTP endpoints. It is not a log. Once a message is delivered, it is done, and there is no rewinding to an offset. There are no consumer groups and no stream processing either. If your events are really a stream (clickstream, CDC, telemetry you will want to replay into a new service next quarter), use a stream. Yes, I am saying this in a QStash blog. We have a stream product too, by the way: [Upstash Redis Streams](https://upstash.com/blog/redis-streams-beyond-memory).
+
+To simplify:
+
+<Note type="info">
+Kafka is a log, SQS is a buffer, QStash is delivery.
+</Note>
+
+Most "we need a queue" moments in a serverless app are the third one.
+
+---
+
+## Three Extras That Come in Handy With QStash
+
+Once the pipeline is on QStash, some requirements that normally need their own infrastructure become just options on the same publish call. I will keep this part short.
+
+### Wait 30 Minutes, Then Nudge
+
+Abandoned cart. Publish a message when checkout starts, and let the handler check whether an order was placed:
+
+```ts
+await qstash.publishJSON({
+  url: `${BASE}/api/jobs/abandoned-cart`,
+  body: { cartId },
+  delay: "30m",
+});
+```
+
+SQS message timers cap at **15 minutes** (told you we would come back to it). Past that, you need EventBridge Scheduler or a Step Functions wait state. Kafka has no notion of delay at all, so you would build a scheduler or a chain of delay topics yourself. QStash can delay a message up to a year on pay-as-you-go, and there is no cap on fixed plans.
+
+### Nightly Reconciliation, No Server
+
+```ts
+await qstash.schedules.create({
+  destination: `${BASE}/api/jobs/reconcile`,
+  cron: "0 3 * * *",
+});
+```
+
+This is the same mechanism as everything above, a signed POST to a route. So cron jobs and queue jobs end up being the same kind of code, in the same place.
+
+### The ERP API Allows 100 Requests/Minute
+
+This is the one that actually shows up in production. It is Black Friday, 4,000 orders come in within ten minutes, and the warehouse API caps you at 100 requests per minute with 5 concurrent connections. The ERP entry in the batch becomes:
+
+```ts
+{
+  url: `${BASE}/api/jobs/erp`,
+  body: order,
+  retries: 5,
+  flowControl: { key: "warehouse-api", rate: 100, period: "1m", parallelism: 5 },
+}
+```
+
+And here is what the other two make you build:
+- Kafka: Your consumer has to throttle itself. In practice, that is a distributed token bucket in Redis, plus `pause()`/`resume()` for backpressure so you don't just fail the messages, plus making sure a throttled handler keeps heartbeating so the group doesn't evict it and trigger a rebalance.
+- SQS: Reserved concurrency on the consumer Lambda limits parallelism but not *rate*. And it is per function, so per-tenant limits mean a queue and a function per tenant.
+- QStash: One field, with a key. If you use a per-tenant key (`warehouse-<tenantId>`), you get per-tenant limits without any extra infrastructure.
+
+You can find the details in the [Flow Control docs](https://upstash.com/docs/qstash/features/flowcontrol).
+
+---
+
+## Wrapping Up
+
+Kafka and SQS were designed for a world where every application had a machine to put a consumer on. Most new applications don't have that machine anymore, and the queue is usually the last piece of infrastructure still insisting on it.
+
+QStash takes the consumer out of the picture. You publish a message, receive an HTTP request, and return a 2xx. Retries, the DLQ, delays, schedules, and flow control are all options on that single call.
+
+If you want to try it, start with the [QStash quickstart](https://upstash.com/docs/qstash/overall/getstarted), or grab a token from the [Upstash Console](https://console.upstash.com).
+
+If you read this far, thanks for your attention. Please join us on [Discord](https://upstash.com/discord) and let us know what you think, especially if you see anything wrong or room for improvement.
