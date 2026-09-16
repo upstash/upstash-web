@@ -7,64 +7,44 @@ description: "Docs7 and Mintlify compared with Google PageSpeed Insights, DebugB
 draft: true
 ---
 
-{/* Results refreshed after the September 16 image optimization deployment. Keep the post in draft for editorial review. */}
-
-{/* benchmark:lead:start */}
-
 **Docs7 won 13 of 16 Google PageSpeed comparisons.** In DebugBear, it led on 5 of 5 pages on mobile and 2 of 4 on desktop. In Pingdom, it loaded faster on 6 of 8 pages.
 
-{/* benchmark:lead:end */}
-
-I tested documentation with images, video, long guides, code examples, and custom components on both platforms. The charts use Google PageSpeed Insights, DebugBear, and Pingdom. Full results, report links, and smaller GTmetrix and WebPageTest samples are at the end.
+I tested documentation with images, video, long guides, code examples, and custom components on both platforms. The charts show the results; full tables and report links are at the end.
 
 ![Pages won in each test](/blog/docs7-vs-mintlify/wins.svg)
 
 ## The size of the gap
 
-{/* benchmark:typical-results:start */}
-
-Across the tested pages, Google's median score was **64 vs. 53.5 on mobile** and **87 vs. 82 on desktop**. Pingdom's median load time was **659 ms vs. 733 ms**. Docs7 is listed first. These are medians across pages; the size of the lead differs by page.
-
-{/* benchmark:typical-results:end */}
+Across the tested pages, Google's median score was **64 vs. 53.5 on mobile** and **87 vs. 82 on desktop**. Pingdom's median load time was **659 ms vs. 733 ms**. Docs7 is listed first.
 
 ![Median scores and load times](/blog/docs7-vs-mintlify/typical-results.svg)
 
-Google and DebugBear report a Performance score out of 100. Higher is better. Pingdom measures load time in milliseconds. Lower is better. A 20-point score lead does not mean a page loads 20% faster.
+Google and DebugBear scores are out of 100; higher is better. Pingdom measures load time in milliseconds; lower is better.
 
 ## Why these pages?
 
-I fixed the page list before running the tests. It includes a short baseline page and pages that add video, screenshots, long text, or components. This lets us compare more than a homepage without filling the test with similar pages.
+I chose the pages before testing to cover different types of documentation.
 
-{/* benchmark:page-selection:start */}
-
-- **Images, 1 page.** A reference page with nine screenshots tests image downloads and layout stability.
-- **Video, 1 page.** An embedded player and a component catalog add more than text to the initial load.
-- **Long guides and steps, 1 page.** A setup guide combines tabs, steps, code, and five screenshots.
-- **Code and API references, 2 pages.** A long reference with 36 code blocks and a short command page with expandable fields test different document sizes.
-- **Custom components, 2 pages.** Cards and custom React components test JavaScript and component rendering.
-- **Diagrams, 1 page.** A Mermaid example turns source code into a diagram.
-
-{/* benchmark:page-selection:end */}
-
-These groups describe the main content on each page. A page can contain several types of component. We measured the initial load, including the video page, without starting playback or scrolling through every image.
+- **Images.** Nine screenshots test image loading and layout stability.
+- **Video.** An embedded player and a custom component catalog.
+- **Guides.** A setup guide with tabs, steps, code, and five screenshots.
+- **API references.** A long page with 36 code blocks and a short page with expandable fields.
+- **Custom components.** Cards, code examples, and a React status badge.
+- **Diagrams.** A Mermaid flowchart.
 
 ## Results by page type
 
-Each bar below shows the median for a group of pages. The counts show how much data is in each group. These are small groups, so the full page results remain useful.
+Each bar shows the median score for a content type.
 
 ![Mobile scores by page content](/blog/docs7-vs-mintlify/google-mobile.svg)
 
 ![Desktop scores by page content](/blog/docs7-vs-mintlify/google-desktop.svg)
 
-{/* benchmark:content-summary:start */}
-
-The lead changes by page and device. On desktop, Mintlify leads for the screenshot reference, long API reference, and generated diagram. Docs7 also has work to do: Google recorded layout shifts on the video page and the long API reference.
-
-{/* benchmark:content-summary:end */}
+Mintlify leads on desktop for the screenshot reference, long API reference, and diagram. Google also recorded layout shifts on the Docs7 video page and long API reference.
 
 ## Open the reports
 
-These screenshots show the desktop results for a page with an embedded video and a custom component catalog. Each screenshot is from a run whose Performance score matches that host's three-run median. Click either image to read it at full size.
+These Google desktop reports match each host's median score for the video and component page. Click an image to see the full-size report.
 
 <div className="grid gap-6 sm:grid-cols-2">
   <figure>
@@ -95,33 +75,25 @@ These screenshots show the desktop results for a page with an embedded video and
 
 ## How we tested
 
-{/* benchmark:test-date:start */}
+We compared **eight page pairs on September 16, 2026**, using the direct Docs7 and Mintlify hosted URLs.
 
-We tested on **September 16, 2026**, using the direct Docs7 and Mintlify hosted URLs. We selected 9 page pairs from the Upstash and Context7 documentation, with 8 pairs included in this post. We excluded the math page: Docs7 rendered the equations, while Mintlify displayed raw math text. The download retains its results and the reason for exclusion.
+- **Google PageSpeed Insights.** Three runs per URL on mobile and desktop, using the median score.
+- **DebugBear.** One run per URL and device from US East. Each chart shows the number of completed pairs.
+- **Pingdom.** One run per URL from San Francisco.
 
-{/* benchmark:test-date:end */}
+Charts show medians across pages or content groups. Each service uses its own test settings, so we keep their results separate.
 
-- Google ran each URL three times on mobile and desktop. We use the median score for each page and device. These are [Lighthouse lab results](https://developers.google.com/speed/docs/insights/v5/about). The reports had no CrUX field data from real visitors.
-- DebugBear tested **mobile and desktop**, from US East. Mobile used 12 Mbps, 70 ms round-trip latency, and 2× CPU throttling. Desktop used 100 Mbps, 2 ms, and no CPU throttling. Its settings differ from Google's, so we keep the results separate. Service errors limited the completed pairs; each chart row shows its own count.
-- Pingdom used San Francisco for every included run. One initial run used London; we excluded it and repeated it from San Francisco. We paused when the service asked us to wait.
-
-For the overview charts, we take the median across the included pages for each host. For the content charts, we do the same within each group. Google uses each page's three-run median as the input. A group's median can fall between two measured scores.
-
-Scores varied between runs. A one-point lead is too small to base a decision on. The download includes every run and each page's score range. Chat and analytics stayed as deployed and did not behave identically across hosts. CDN cache state was not controlled. This is a comparison of deployed sites, including their integrations.
-
-GTmetrix and WebPageTest each reached a free test limit. Their one complete page pair appears below, outside the overview charts. Failed attempts remain in the download. We repeated failed tests, not low scores.
+These are [lab tests](https://developers.google.com/speed/docs/insights/v5/about) of initial page loads. Videos were not played. Chat and analytics stayed as deployed and differed between hosts. Cache state was not controlled, and scores vary between runs.
 
 ## Full results
 
-The tables use content descriptions instead of page titles. Each description links to the tested Docs7 page. Each number links to its original provider report, which identifies the tested URL. The download maps every page to both hosts.
+Page names link to the Docs7 page. Numbers link to the original test reports.
 
 Each cell is **Docs7 / Mintlify**, with the winner in bold.
 
 ### Google PageSpeed Insights
 
-Performance scores out of 100. Higher is better. Each score is the median of three runs; its link opens a run with that score.
-
-{/* benchmark:google-tables:start */}
+Performance scores out of 100. Median of three runs.
 
 | Page content                                                                                       |                                                                                                                                                                                                                                                                                        Mobile |                                                                                                                                                                                                                                                                                         Desktop |
 | -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
@@ -134,13 +106,9 @@ Performance scores out of 100. Higher is better. Each score is the median of thr
 | [Custom React component](https://upstash-context7.docs7.io/docs/docs7/components/react-components) | **[69](https://pagespeed.web.dev/analysis/https-upstash-context7-docs7-io-docs-docs7-components-react-components/ddwh7w3h9z?form_factor=mobile)** / [57](https://pagespeed.web.dev/analysis/https-context7-mintlify-dev-docs-docs7-components-react-components/zew0um0mhg?form_factor=mobile) | **[96](https://pagespeed.web.dev/analysis/https-upstash-context7-docs7-io-docs-docs7-components-react-components/0ncw20iils?form_factor=desktop)** / [85](https://pagespeed.web.dev/analysis/https-context7-mintlify-dev-docs-docs7-components-react-components/bz46xezj4l?form_factor=desktop) |
 | [Generated diagrams](https://upstash-context7.docs7.io/docs/docs7/components/mermaid)              |                   **[72](https://pagespeed.web.dev/analysis/https-upstash-context7-docs7-io-docs-docs7-components-mermaid/5bsgu1z8n5?form_factor=mobile)** / [55](https://pagespeed.web.dev/analysis/https-context7-mintlify-dev-docs-docs7-components-mermaid/ybx0elf6yd?form_factor=mobile) |                   [88](https://pagespeed.web.dev/analysis/https-upstash-context7-docs7-io-docs-docs7-components-mermaid/5bsgu1z8n5?form_factor=desktop) / **[93](https://pagespeed.web.dev/analysis/https-context7-mintlify-dev-docs-docs7-components-mermaid/5wn7smg2uo?form_factor=desktop)** |
 
-{/* benchmark:google-tables:end */}
-
 ### DebugBear
 
-Mobile and desktop Performance scores out of 100. Higher is better. One run per page and device.
-
-{/* benchmark:debugbear-table:start */}
+Performance scores out of 100. One run per page and device.
 
 **Mobile**
 
@@ -161,13 +129,9 @@ Mobile and desktop Performance scores out of 100. Higher is better. One run per 
 | [Long API reference](https://upstash-docs.docs7.io/docs/redis/features/restapi)           |     [65](https://www.debugbear.com/test/website-speed/xQlgK4ek/overview) / [65](https://www.debugbear.com/test/website-speed/iweBpxJj/overview) |
 | [Cards and code](https://upstash-context7.docs7.io/docs/overview)                         | **[87](https://www.debugbear.com/test/website-speed/O9gf4amz/overview)** / [79](https://www.debugbear.com/test/website-speed/cqf5h0PN/overview) |
 
-{/* benchmark:debugbear-table:end */}
-
 ### Pingdom
 
 Load time in milliseconds. Lower is better. One matched run per page.
-
-{/* benchmark:pingdom-table:start */}
 
 | Page content                                                                                       |                                                                               Milliseconds · Docs7 / Mintlify |
 | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------: |
@@ -180,13 +144,9 @@ Load time in milliseconds. Lower is better. One matched run per page.
 | [Custom React component](https://upstash-context7.docs7.io/docs/docs7/components/react-components) |   **[615](https://tools.pingdom.com/#682a8ef3a9c00000)** / [724](https://tools.pingdom.com/#682a8f39e5000000) |
 | [Generated diagrams](https://upstash-context7.docs7.io/docs/docs7/components/mermaid)              |   **[602](https://tools.pingdom.com/#682a90553a400000)** / [677](https://tools.pingdom.com/#682a91dafec00000) |
 
-{/* benchmark:pingdom-table:end */}
-
 ### GTmetrix and WebPageTest
 
-{/* benchmark:limited-tables:start */}
-
-GTmetrix and WebPageTest each completed one matched pair before their free limits stopped further coverage. These results apply only to this page.
+These services each completed one page pair before reaching their free test limits.
 
 **GTmetrix · desktop Performance score, higher is better.** Seattle, unthrottled Chrome.
 
@@ -199,7 +159,5 @@ GTmetrix and WebPageTest each completed one matched pair before their free limit
 | Page content                                                      |                                                                                                                                                                                                                                                                                          Milliseconds · Docs7 / Mintlify |
 | ----------------------------------------------------------------- | -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | [Cards and code](https://upstash-context7.docs7.io/docs/overview) | **[918](https://www.catchpoint.com/webpagetest/results?publicurl=https%3A%2F%2Fpublic.catchpoint.com%2FUI%2FEntry%2FWPTITP%2FARLm-D-E-B2ADnqtjfE4Vzi4AA-N)** / [975](https://www.catchpoint.com/webpagetest/results?publicurl=https%3A%2F%2Fpublic.catchpoint.com%2FUI%2FEntry%2FWPTITP%2FARLr-D-E-B2ADnq.HjfE4Vzi4AA-N) |
-
-{/* benchmark:limited-tables:end */}
 
 [Download all third-party results, page URLs, and report links](/blog/docs7-vs-mintlify/results.json).
