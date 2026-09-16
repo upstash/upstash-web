@@ -7,15 +7,15 @@ description: "Docs7 and Mintlify compared with Google PageSpeed Insights, DebugB
 draft: true
 ---
 
-{/* Refresh the generated blocks and screenshots after the image update is deployed. Keep this post and its PR in draft until the new results are checked. */}
+{/* Results refreshed after the September 16 image optimization deployment. Keep the post in draft for editorial review. */}
 
 {/* benchmark:lead:start */}
 
-**Docs7 won 24 of 30 Google PageSpeed comparisons.** It also led in 10 of 10 DebugBear pairs and loaded faster in 11 of 15 Pingdom pairs.
+**Docs7 won 13 of 16 Google PageSpeed comparisons.** In DebugBear, it led on 5 of 5 pages on mobile and 2 of 4 on desktop. In Pingdom, it loaded faster on 6 of 8 pages.
 
 {/* benchmark:lead:end */}
 
-I tested documentation with images, video, long guides, code examples, and custom components on both platforms. Every performance number below comes from Google PageSpeed Insights, DebugBear, or Pingdom. The full results and original reports are at the end.
+I tested documentation with images, video, long guides, code examples, and custom components on both platforms. The charts use Google PageSpeed Insights, DebugBear, and Pingdom. Full results, report links, and smaller GTmetrix and WebPageTest samples are at the end.
 
 ![Pages won in each test](/blog/docs7-vs-mintlify/wins.svg)
 
@@ -23,7 +23,7 @@ I tested documentation with images, video, long guides, code examples, and custo
 
 {/* benchmark:typical-results:start */}
 
-Across the tested pages, Google's median score was **64 vs. 56 on mobile** and **92 vs. 80 on desktop**, both in Docs7's favor. Pingdom's median load time was **792 ms vs. 1,130 ms**. These are medians across pages, not a claim that every page improved by the same amount.
+Across the tested pages, Google's median score was **64 vs. 53.5 on mobile** and **87 vs. 82 on desktop**. Pingdom's median load time was **659 ms vs. 733 ms**. Docs7 is listed first. These are medians across pages; the size of the lead differs by page.
 
 {/* benchmark:typical-results:end */}
 
@@ -33,16 +33,16 @@ Google and DebugBear report a Performance score out of 100. Higher is better. Pi
 
 ## Why these pages?
 
-A docs homepage tells us little about a long setup guide or an API reference. I chose pages by what they contain, so the test covers the work a documentation site has to do.
+I fixed the page list before running the tests. It includes a short baseline page and pages that add video, screenshots, long text, or components. This lets us compare more than a homepage without filling the test with similar pages.
 
 {/* benchmark:page-selection:start */}
 
-- **Images, 3 pages.** Screenshots and framed images add downloads and can move the layout as they load.
+- **Images, 1 page.** A reference page with nine screenshots tests image downloads and layout stability.
 - **Video, 1 page.** An embedded player and a component catalog add more than text to the initial load.
-- **Long guides and steps, 2 pages.** Long text, accordions, tabs, and setup steps test a larger document.
-- **Code and API references, 4 pages.** Code highlighting, tabbed examples, API fields, and callouts add rendering work.
-- **Custom components, 3 pages.** Cards and custom React components test JavaScript and component rendering.
-- **Diagrams and equations, 2 pages.** Mermaid and LaTeX need specialist rendering libraries.
+- **Long guides and steps, 1 page.** A setup guide combines tabs, steps, code, and five screenshots.
+- **Code and API references, 2 pages.** A long reference with 36 code blocks and a short command page with expandable fields test different document sizes.
+- **Custom components, 2 pages.** Cards and custom React components test JavaScript and component rendering.
+- **Diagrams, 1 page.** A Mermaid example turns source code into a diagram.
 
 {/* benchmark:page-selection:end */}
 
@@ -56,7 +56,11 @@ Each bar below shows the median for a group of pages. The counts show how much d
 
 ![Desktop scores by page content](/blog/docs7-vs-mintlify/google-desktop.svg)
 
-Docs7 leads across all six content groups on mobile. Mintlify leads for long guides, diagrams, and equations on desktop.
+{/* benchmark:content-summary:start */}
+
+The lead changes by page and device. On desktop, Mintlify leads for the screenshot reference, long API reference, and generated diagram. Docs7 also has work to do: Google recorded layout shifts on the video page and the long API reference.
+
+{/* benchmark:content-summary:end */}
 
 ## Open the reports
 
@@ -67,7 +71,7 @@ These screenshots show the desktop results for a page with an embedded video and
     <a href="/blog/docs7-vs-mintlify/google-workflow-docs7.png">
       <img
         src="/blog/docs7-vs-mintlify/google-workflow-docs7.png"
-        alt="Docs7 video and component page: Google desktop Performance score of 98, tested September 15, 2026."
+        alt="Docs7 video and component page: Google desktop Performance score of 65, tested September 16, 2026."
         width="1040"
         height="1170"
         loading="lazy"
@@ -79,7 +83,7 @@ These screenshots show the desktop results for a page with an embedded video and
     <a href="/blog/docs7-vs-mintlify/google-workflow-mintlify.png">
       <img
         src="/blog/docs7-vs-mintlify/google-workflow-mintlify.png"
-        alt="Mintlify video and component page: Google desktop Performance score of 68, tested September 15, 2026."
+        alt="Mintlify video and component page: Google desktop Performance score of 61, tested September 16, 2026."
         width="1040"
         height="1170"
         loading="lazy"
@@ -93,19 +97,19 @@ These screenshots show the desktop results for a page with an embedded video and
 
 {/* benchmark:test-date:start */}
 
-We tested on **September 15, 2026**, using the direct Docs7 and Mintlify hosted URLs. We selected 16 page pairs from the Upstash and Context7 documentation, with 15 pairs included in this post. We excluded 1 page pair because the content did not match. The download retains its results and the reason for exclusion.
+We tested on **September 16, 2026**, using the direct Docs7 and Mintlify hosted URLs. We selected 9 page pairs from the Upstash and Context7 documentation, with 8 pairs included in this post. We excluded the math page: Docs7 rendered the equations, while Mintlify displayed raw math text. The download retains its results and the reason for exclusion.
 
 {/* benchmark:test-date:end */}
 
 - Google ran each URL three times on mobile and desktop. We use the median score for each page and device. These are [Lighthouse lab results](https://developers.google.com/speed/docs/insights/v5/about). The reports had no CrUX field data from real visitors.
-- DebugBear ran each URL once on mobile, from US East, at 12 Mbps and 70 ms round-trip latency with a medium device. Service errors stopped the tests after 10 completed pairs. Its Lighthouse settings differ from Google's, so we keep the results separate.
-- Pingdom ran each pair from the same city. Cities vary between pairs and are listed in the download. We repeated one pair after its first tests used different cities. Only the matched repeat counts.
+- DebugBear tested **mobile and desktop**, from US East. Mobile used 12 Mbps, 70 ms round-trip latency, and 2× CPU throttling. Desktop used 100 Mbps, 2 ms, and no CPU throttling. Its settings differ from Google's, so we keep the results separate. Service errors limited the completed pairs; each chart row shows its own count.
+- Pingdom used San Francisco for every included run. One initial run used London; we excluded it and repeated it from San Francisco. We paused when the service asked us to wait.
 
 For the overview charts, we take the median across the included pages for each host. For the content charts, we do the same within each group. Google uses each page's three-run median as the input. A group's median can fall between two measured scores.
 
 Scores varied between runs. A one-point lead is too small to base a decision on. The download includes every run and each page's score range. Chat and analytics stayed as deployed and did not behave identically across hosts. CDN cache state was not controlled. This is a comparison of deployed sites, including their integrations.
 
-GTmetrix and WebPageTest had too few matched results before their limits to support a comparison. We kept those attempts in the download.
+GTmetrix and WebPageTest each reached a free test limit. Their one complete page pair appears below, outside the overview charts. Failed attempts remain in the download. We repeated failed tests, not low scores.
 
 ## Full results
 
@@ -121,42 +125,41 @@ Performance scores out of 100. Higher is better. Each score is the median of thr
 
 | Page content                                                                                       |                                                                                                                                                                                                                                                                                        Mobile |                                                                                                                                                                                                                                                                                         Desktop |
 | -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| [Screenshot walkthrough](https://upstash-context7.docs7.io/docs/enterprise/security/entra-sso)     |         **[64](https://pagespeed.web.dev/analysis/https-upstash-context7-docs7-io-docs-enterprise-security-entra-sso/y9jul1ikhp?form_factor=mobile)** / [56](https://pagespeed.web.dev/analysis/https-context7-mintlify-dev-docs-enterprise-security-entra-sso/m0kpg2g7pu?form_factor=mobile) |        **[100](https://pagespeed.web.dev/analysis/https-upstash-context7-docs7-io-docs-enterprise-security-entra-sso/y9jul1ikhp?form_factor=desktop)** / [87](https://pagespeed.web.dev/analysis/https-context7-mintlify-dev-docs-enterprise-security-entra-sso/o8ud0p6ess?form_factor=desktop) |
-| [Screenshot reference](https://upstash-docs.docs7.io/docs/redis/howto/metrics-and-charts)          |            **[61](https://pagespeed.web.dev/analysis/https-upstash-docs-docs7-io-docs-redis-howto-metrics-and-charts/vo9tsr6rjq?form_factor=mobile)** / [50](https://pagespeed.web.dev/analysis/https-upstash-mintlify-dev-docs-redis-howto-metrics-and-charts/bl7hx614sg?form_factor=mobile) |            **[92](https://pagespeed.web.dev/analysis/https-upstash-docs-docs7-io-docs-redis-howto-metrics-and-charts/vo9tsr6rjq?form_factor=desktop)** / [81](https://pagespeed.web.dev/analysis/https-upstash-mintlify-dev-docs-redis-howto-metrics-and-charts/oveyd7fa13?form_factor=desktop) |
-| [Image in a frame](https://upstash-docs.docs7.io/docs/redis/features/eviction)                     |                          **[58](https://pagespeed.web.dev/analysis/https-upstash-docs-docs7-io-docs-redis-features-eviction/gpdsvgepo0?form_factor=mobile)** / [48](https://pagespeed.web.dev/analysis/https-upstash-mintlify-dev-docs-redis-features-eviction/jrwh66mcdp?form_factor=mobile) |                          **[95](https://pagespeed.web.dev/analysis/https-upstash-docs-docs7-io-docs-redis-features-eviction/mclz4diu06?form_factor=desktop)** / [80](https://pagespeed.web.dev/analysis/https-upstash-mintlify-dev-docs-redis-features-eviction/jrwh66mcdp?form_factor=desktop) |
-| [Video and component catalog](https://upstash-docs.docs7.io/docs/workflow/getstarted)              |                                  **[57](https://pagespeed.web.dev/analysis/https-upstash-docs-docs7-io-docs-workflow-getstarted/69jvbd4v26?form_factor=mobile)** / [35](https://pagespeed.web.dev/analysis/https-upstash-mintlify-dev-docs-workflow-getstarted/powfx3zyql?form_factor=mobile) |                                  **[98](https://pagespeed.web.dev/analysis/https-upstash-docs-docs7-io-docs-workflow-getstarted/z8hzxge3p1?form_factor=desktop)** / [68](https://pagespeed.web.dev/analysis/https-upstash-mintlify-dev-docs-workflow-getstarted/powfx3zyql?form_factor=desktop) |
-| [Long guide with accordions](https://upstash-context7.docs7.io/docs/resources/all-clients)         |                         **[52](https://pagespeed.web.dev/analysis/https-upstash-context7-docs7-io-docs-resources-all-clients/45fdftsfca?form_factor=mobile)** / [43](https://pagespeed.web.dev/analysis/https-context7-mintlify-dev-docs-resources-all-clients/xhxqcls77c?form_factor=mobile) |                         [76](https://pagespeed.web.dev/analysis/https-upstash-context7-docs7-io-docs-resources-all-clients/qaspmuz1a1?form_factor=desktop) / **[77](https://pagespeed.web.dev/analysis/https-context7-mintlify-dev-docs-resources-all-clients/ecxk7yj7oo?form_factor=desktop)** |
-| [Tabbed setup guide](https://upstash-context7.docs7.io/docs/howto/claiming-libraries)              |                   [64](https://pagespeed.web.dev/analysis/https-upstash-context7-docs7-io-docs-howto-claiming-libraries/0px84f80la?form_factor=mobile) / **[69](https://pagespeed.web.dev/analysis/https-context7-mintlify-dev-docs-howto-claiming-libraries/wkjfv1w1ti?form_factor=mobile)** |                   [79](https://pagespeed.web.dev/analysis/https-upstash-context7-docs7-io-docs-howto-claiming-libraries/i56h3qtvim?form_factor=desktop) / **[90](https://pagespeed.web.dev/analysis/https-context7-mintlify-dev-docs-howto-claiming-libraries/wkjfv1w1ti?form_factor=desktop)** |
-| [API fields and examples](https://upstash-context7.docs7.io/docs/sdks/ts/commands/get-context)     |           **[71](https://pagespeed.web.dev/analysis/https-upstash-context7-docs7-io-docs-sdks-ts-commands-get-context/641poi3hyu?form_factor=mobile)** / [55](https://pagespeed.web.dev/analysis/https-context7-mintlify-dev-docs-sdks-ts-commands-get-context/yl9awon9pn?form_factor=mobile) |           **[90](https://pagespeed.web.dev/analysis/https-upstash-context7-docs7-io-docs-sdks-ts-commands-get-context/zg0opzojft?form_factor=desktop)** / [76](https://pagespeed.web.dev/analysis/https-context7-mintlify-dev-docs-sdks-ts-commands-get-context/rd5inulm2y?form_factor=desktop) |
-| [Long API reference](https://upstash-docs.docs7.io/docs/redis/features/restapi)                    |                            **[81](https://pagespeed.web.dev/analysis/https-upstash-docs-docs7-io-docs-redis-features-restapi/e1ibcorepf?form_factor=mobile)** / [67](https://pagespeed.web.dev/analysis/https-upstash-mintlify-dev-docs-redis-features-restapi/4a6k3q0hv4?form_factor=mobile) |                            **[79](https://pagespeed.web.dev/analysis/https-upstash-docs-docs7-io-docs-redis-features-restapi/ir9449qxg5?form_factor=desktop)** / [71](https://pagespeed.web.dev/analysis/https-upstash-mintlify-dev-docs-redis-features-restapi/r7xdnr8oxp?form_factor=desktop) |
-| [Tabbed code examples](https://upstash-docs.docs7.io/docs/vector/features/filtering)               |                      **[66](https://pagespeed.web.dev/analysis/https-upstash-docs-docs7-io-docs-vector-features-filtering/c1j4pic6l1?form_factor=mobile)** / [45](https://pagespeed.web.dev/analysis/https-upstash-mintlify-dev-docs-vector-features-filtering/lrot53kinu?form_factor=mobile) |                      **[95](https://pagespeed.web.dev/analysis/https-upstash-docs-docs7-io-docs-vector-features-filtering/l3yqlc2prm?form_factor=desktop)** / [73](https://pagespeed.web.dev/analysis/https-upstash-mintlify-dev-docs-vector-features-filtering/kfppvofb9q?form_factor=desktop) |
-| [Code groups and callouts](https://upstash-docs.docs7.io/docs/qstash/features/schedules)           |                      [47](https://pagespeed.web.dev/analysis/https-upstash-docs-docs7-io-docs-qstash-features-schedules/lot8v8ccak?form_factor=mobile) / **[59](https://pagespeed.web.dev/analysis/https-upstash-mintlify-dev-docs-qstash-features-schedules/44x9pzms6f?form_factor=mobile)** |                      **[91](https://pagespeed.web.dev/analysis/https-upstash-docs-docs7-io-docs-qstash-features-schedules/lot8v8ccak?form_factor=desktop)** / [80](https://pagespeed.web.dev/analysis/https-upstash-mintlify-dev-docs-qstash-features-schedules/g2xkcgsx3x?form_factor=desktop) |
-| [Cards and code](https://upstash-context7.docs7.io/docs/overview)                                  |                                                   **[63](https://pagespeed.web.dev/analysis/https-upstash-context7-docs7-io-docs-overview/1spcsenohq?form_factor=mobile)** / [59](https://pagespeed.web.dev/analysis/https-context7-mintlify-dev-docs-overview/hp716dat72?form_factor=mobile) |                                                   **[97](https://pagespeed.web.dev/analysis/https-upstash-context7-docs7-io-docs-overview/bgi8pzasmp?form_factor=desktop)** / [92](https://pagespeed.web.dev/analysis/https-context7-mintlify-dev-docs-overview/hp716dat72?form_factor=desktop) |
-| [Custom React component](https://upstash-context7.docs7.io/docs/docs7/components/react-components) | **[93](https://pagespeed.web.dev/analysis/https-upstash-context7-docs7-io-docs-docs7-components-react-components/8cjcug1cbq?form_factor=mobile)** / [65](https://pagespeed.web.dev/analysis/https-context7-mintlify-dev-docs-docs7-components-react-components/x4wl5gls01?form_factor=mobile) | **[95](https://pagespeed.web.dev/analysis/https-upstash-context7-docs7-io-docs-docs7-components-react-components/83z2fon04l?form_factor=desktop)** / [91](https://pagespeed.web.dev/analysis/https-context7-mintlify-dev-docs-docs7-components-react-components/x4wl5gls01?form_factor=desktop) |
-| [Custom landing page](https://upstash-docs.docs7.io/docs/introduction)                             |                                                **[57](https://pagespeed.web.dev/analysis/https-upstash-docs-docs7-io-docs-introduction/or8ts8ybxt?form_factor=mobile)** / [34](https://pagespeed.web.dev/analysis/https-upstash-mintlify-dev-docs-introduction/6wwmgqk6js?form_factor=mobile) |                                                **[95](https://pagespeed.web.dev/analysis/https-upstash-docs-docs7-io-docs-introduction/6gn5ep00z3?form_factor=desktop)** / [60](https://pagespeed.web.dev/analysis/https-upstash-mintlify-dev-docs-introduction/a9078k22n1?form_factor=desktop) |
-| [Generated diagrams](https://upstash-context7.docs7.io/docs/docs7/components/mermaid)              |                   **[79](https://pagespeed.web.dev/analysis/https-upstash-context7-docs7-io-docs-docs7-components-mermaid/6z59c9gr94?form_factor=mobile)** / [60](https://pagespeed.web.dev/analysis/https-context7-mintlify-dev-docs-docs7-components-mermaid/abaljf5c0p?form_factor=mobile) |                   [67](https://pagespeed.web.dev/analysis/https-upstash-context7-docs7-io-docs-docs7-components-mermaid/r0t01k4gsm?form_factor=desktop) / **[90](https://pagespeed.web.dev/analysis/https-context7-mintlify-dev-docs-docs7-components-mermaid/abaljf5c0p?form_factor=desktop)** |
-| [Math equations](https://upstash-context7.docs7.io/docs/docs7/components/latex)                    |                       **[64](https://pagespeed.web.dev/analysis/https-upstash-context7-docs7-io-docs-docs7-components-latex/4trumdc4ia?form_factor=mobile)** / [59](https://pagespeed.web.dev/analysis/https-context7-mintlify-dev-docs-docs7-components-latex/8ovq916zpq?form_factor=mobile) |                       [87](https://pagespeed.web.dev/analysis/https-upstash-context7-docs7-io-docs-docs7-components-latex/4trumdc4ia?form_factor=desktop) / **[94](https://pagespeed.web.dev/analysis/https-context7-mintlify-dev-docs-docs7-components-latex/12clowcgtr?form_factor=desktop)** |
+| [Screenshot reference](https://upstash-docs.docs7.io/docs/redis/howto/metrics-and-charts)          |            **[56](https://pagespeed.web.dev/analysis/https-upstash-docs-docs7-io-docs-redis-howto-metrics-and-charts/x6s394rl65?form_factor=mobile)** / [52](https://pagespeed.web.dev/analysis/https-upstash-mintlify-dev-docs-redis-howto-metrics-and-charts/ls5wtwy70e?form_factor=mobile) |            [85](https://pagespeed.web.dev/analysis/https-upstash-docs-docs7-io-docs-redis-howto-metrics-and-charts/6aqhd86tun?form_factor=desktop) / **[89](https://pagespeed.web.dev/analysis/https-upstash-mintlify-dev-docs-redis-howto-metrics-and-charts/m5wwmdwg8h?form_factor=desktop)** |
+| [Video and component catalog](https://upstash-docs.docs7.io/docs/workflow/getstarted)              |                                  **[67](https://pagespeed.web.dev/analysis/https-upstash-docs-docs7-io-docs-workflow-getstarted/4yt0l51w1w?form_factor=mobile)** / [38](https://pagespeed.web.dev/analysis/https-upstash-mintlify-dev-docs-workflow-getstarted/45z8vfpo6e?form_factor=mobile) |                                  **[65](https://pagespeed.web.dev/analysis/https-upstash-docs-docs7-io-docs-workflow-getstarted/9rtft5cq8i?form_factor=desktop)** / [61](https://pagespeed.web.dev/analysis/https-upstash-mintlify-dev-docs-workflow-getstarted/0hc2412dk5?form_factor=desktop) |
+| [Tabbed setup guide](https://upstash-context7.docs7.io/docs/howto/claiming-libraries)              |                   **[69](https://pagespeed.web.dev/analysis/https-upstash-context7-docs7-io-docs-howto-claiming-libraries/9n40evbdc2?form_factor=mobile)** / [57](https://pagespeed.web.dev/analysis/https-context7-mintlify-dev-docs-howto-claiming-libraries/ezpoxaaa1z?form_factor=mobile) |                   **[93](https://pagespeed.web.dev/analysis/https-upstash-context7-docs7-io-docs-howto-claiming-libraries/gon58elw99?form_factor=desktop)** / [79](https://pagespeed.web.dev/analysis/https-context7-mintlify-dev-docs-howto-claiming-libraries/ezpoxaaa1z?form_factor=desktop) |
+| [Long API reference](https://upstash-docs.docs7.io/docs/redis/features/restapi)                    |                            **[58](https://pagespeed.web.dev/analysis/https-upstash-docs-docs7-io-docs-redis-features-restapi/gfqt2u9l4f?form_factor=mobile)** / [40](https://pagespeed.web.dev/analysis/https-upstash-mintlify-dev-docs-redis-features-restapi/ob4cp3n309?form_factor=mobile) |                            [61](https://pagespeed.web.dev/analysis/https-upstash-docs-docs7-io-docs-redis-features-restapi/gfqt2u9l4f?form_factor=desktop) / **[70](https://pagespeed.web.dev/analysis/https-upstash-mintlify-dev-docs-redis-features-restapi/7phmlumj5k?form_factor=desktop)** |
+| [Expandable API fields](https://upstash-docs.docs7.io/docs/redis/sdks/ts/commands/string/set)      |      **[58](https://pagespeed.web.dev/analysis/https-upstash-docs-docs7-io-docs-redis-sdks-ts-commands-string-set/dc60p9pgn3?form_factor=mobile)** / [42](https://pagespeed.web.dev/analysis/https-upstash-mintlify-dev-docs-redis-sdks-ts-commands-string-set/nt5o9acbxw?form_factor=mobile) |      **[86](https://pagespeed.web.dev/analysis/https-upstash-docs-docs7-io-docs-redis-sdks-ts-commands-string-set/r81i8oyd4e?form_factor=desktop)** / [69](https://pagespeed.web.dev/analysis/https-upstash-mintlify-dev-docs-redis-sdks-ts-commands-string-set/qtsx64k4ee?form_factor=desktop) |
+| [Cards and code](https://upstash-context7.docs7.io/docs/overview)                                  |                                                   **[61](https://pagespeed.web.dev/analysis/https-upstash-context7-docs7-io-docs-overview/1pt94t745c?form_factor=mobile)** / [57](https://pagespeed.web.dev/analysis/https-context7-mintlify-dev-docs-overview/iw5zmdifaa?form_factor=mobile) |                                                   **[94](https://pagespeed.web.dev/analysis/https-upstash-context7-docs7-io-docs-overview/9y2c82jx59?form_factor=desktop)** / [89](https://pagespeed.web.dev/analysis/https-context7-mintlify-dev-docs-overview/jr0cegfj4c?form_factor=desktop) |
+| [Custom React component](https://upstash-context7.docs7.io/docs/docs7/components/react-components) | **[69](https://pagespeed.web.dev/analysis/https-upstash-context7-docs7-io-docs-docs7-components-react-components/ddwh7w3h9z?form_factor=mobile)** / [57](https://pagespeed.web.dev/analysis/https-context7-mintlify-dev-docs-docs7-components-react-components/zew0um0mhg?form_factor=mobile) | **[96](https://pagespeed.web.dev/analysis/https-upstash-context7-docs7-io-docs-docs7-components-react-components/0ncw20iils?form_factor=desktop)** / [85](https://pagespeed.web.dev/analysis/https-context7-mintlify-dev-docs-docs7-components-react-components/bz46xezj4l?form_factor=desktop) |
+| [Generated diagrams](https://upstash-context7.docs7.io/docs/docs7/components/mermaid)              |                   **[72](https://pagespeed.web.dev/analysis/https-upstash-context7-docs7-io-docs-docs7-components-mermaid/5bsgu1z8n5?form_factor=mobile)** / [55](https://pagespeed.web.dev/analysis/https-context7-mintlify-dev-docs-docs7-components-mermaid/ybx0elf6yd?form_factor=mobile) |                   [88](https://pagespeed.web.dev/analysis/https-upstash-context7-docs7-io-docs-docs7-components-mermaid/5bsgu1z8n5?form_factor=desktop) / **[93](https://pagespeed.web.dev/analysis/https-context7-mintlify-dev-docs-docs7-components-mermaid/5wn7smg2uo?form_factor=desktop)** |
 
 {/* benchmark:google-tables:end */}
 
 ### DebugBear
 
-Mobile Performance scores out of 100. Higher is better. One run per page.
+Mobile and desktop Performance scores out of 100. Higher is better. One run per page and device.
 
 {/* benchmark:debugbear-table:start */}
 
+**Mobile**
+
 | Page content                                                                                       |                                                                                                                  Score / 100 · Docs7 / Mintlify |
 | -------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------: |
-| [Screenshot walkthrough](https://upstash-context7.docs7.io/docs/enterprise/security/entra-sso)     | **[81](https://www.debugbear.com/test/website-speed/XnGCkiNK/overview)** / [76](https://www.debugbear.com/test/website-speed/ylZ8GXAY/overview) |
-| [Video and component catalog](https://upstash-docs.docs7.io/docs/workflow/getstarted)              | **[74](https://www.debugbear.com/test/website-speed/3SV2aABF/overview)** / [67](https://www.debugbear.com/test/website-speed/GIDkk97J/overview) |
-| [Long guide with accordions](https://upstash-context7.docs7.io/docs/resources/all-clients)         | **[74](https://www.debugbear.com/test/website-speed/0qkEt8wy/overview)** / [71](https://www.debugbear.com/test/website-speed/XFsKkO37/overview) |
-| [Tabbed setup guide](https://upstash-context7.docs7.io/docs/howto/claiming-libraries)              | **[85](https://www.debugbear.com/test/website-speed/dCISWMHC/overview)** / [77](https://www.debugbear.com/test/website-speed/k6Bke9f3/overview) |
-| [API fields and examples](https://upstash-context7.docs7.io/docs/sdks/ts/commands/get-context)     | **[89](https://www.debugbear.com/test/website-speed/oYMmMizP/overview)** / [74](https://www.debugbear.com/test/website-speed/Zpf9unOi/overview) |
-| [Cards and code](https://upstash-context7.docs7.io/docs/overview)                                  | **[89](https://www.debugbear.com/test/website-speed/yUZTIzB2/overview)** / [78](https://www.debugbear.com/test/website-speed/xtYoT5vj/overview) |
-| [Custom React component](https://upstash-context7.docs7.io/docs/docs7/components/react-components) | **[83](https://www.debugbear.com/test/website-speed/uKaJtWHh/overview)** / [78](https://www.debugbear.com/test/website-speed/mfzdbQ37/overview) |
-| [Custom landing page](https://upstash-docs.docs7.io/docs/introduction)                             | **[87](https://www.debugbear.com/test/website-speed/Y4s2tf3I/overview)** / [60](https://www.debugbear.com/test/website-speed/54qVmECb/overview) |
-| [Generated diagrams](https://upstash-context7.docs7.io/docs/docs7/components/mermaid)              | **[81](https://www.debugbear.com/test/website-speed/Vq3YIzhV/overview)** / [75](https://www.debugbear.com/test/website-speed/UtqWgdnI/overview) |
-| [Math equations](https://upstash-context7.docs7.io/docs/docs7/components/latex)                    | **[87](https://www.debugbear.com/test/website-speed/FPt4APsi/overview)** / [77](https://www.debugbear.com/test/website-speed/8K3oFqql/overview) |
+| [Screenshot reference](https://upstash-docs.docs7.io/docs/redis/howto/metrics-and-charts)          | **[73](https://www.debugbear.com/test/website-speed/IxNNQxd5/overview)** / [71](https://www.debugbear.com/test/website-speed/V4XKPm4m/overview) |
+| [Video and component catalog](https://upstash-docs.docs7.io/docs/workflow/getstarted)              | **[69](https://www.debugbear.com/test/website-speed/BtrsoYiO/overview)** / [63](https://www.debugbear.com/test/website-speed/E1E6bSC9/overview) |
+| [Long API reference](https://upstash-docs.docs7.io/docs/redis/features/restapi)                    | **[73](https://www.debugbear.com/test/website-speed/MixNUKKK/overview)** / [68](https://www.debugbear.com/test/website-speed/RHdYucLM/overview) |
+| [Cards and code](https://upstash-context7.docs7.io/docs/overview)                                  | **[80](https://www.debugbear.com/test/website-speed/GQ0YOFzk/overview)** / [74](https://www.debugbear.com/test/website-speed/jtUzh3KI/overview) |
+| [Custom React component](https://upstash-context7.docs7.io/docs/docs7/components/react-components) | **[82](https://www.debugbear.com/test/website-speed/fuW0XLDY/overview)** / [75](https://www.debugbear.com/test/website-speed/iFgWL5Qy/overview) |
+
+**Desktop**
+
+| Page content                                                                              |                                                                                                                  Score / 100 · Docs7 / Mintlify |
+| ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------: |
+| [Screenshot reference](https://upstash-docs.docs7.io/docs/redis/howto/metrics-and-charts) | **[82](https://www.debugbear.com/test/website-speed/biHOCm9f/overview)** / [75](https://www.debugbear.com/test/website-speed/5D4aEDpv/overview) |
+| [Video and component catalog](https://upstash-docs.docs7.io/docs/workflow/getstarted)     | [56](https://www.debugbear.com/test/website-speed/4RMRlxtK/overview) / **[57](https://www.debugbear.com/test/website-speed/hjjGHuiG/overview)** |
+| [Long API reference](https://upstash-docs.docs7.io/docs/redis/features/restapi)           |     [65](https://www.debugbear.com/test/website-speed/xQlgK4ek/overview) / [65](https://www.debugbear.com/test/website-speed/iweBpxJj/overview) |
+| [Cards and code](https://upstash-context7.docs7.io/docs/overview)                         | **[87](https://www.debugbear.com/test/website-speed/O9gf4amz/overview)** / [79](https://www.debugbear.com/test/website-speed/cqf5h0PN/overview) |
 
 {/* benchmark:debugbear-table:end */}
 
@@ -168,22 +171,35 @@ Load time in milliseconds. Lower is better. One matched run per page.
 
 | Page content                                                                                       |                                                                               Milliseconds · Docs7 / Mintlify |
 | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------: |
-| [Screenshot walkthrough](https://upstash-context7.docs7.io/docs/enterprise/security/entra-sso)     |   **[663](https://tools.pingdom.com/#68292724b7c00000)** / [793](https://tools.pingdom.com/#682927901bc00000) |
-| [Screenshot reference](https://upstash-docs.docs7.io/docs/redis/howto/metrics-and-charts)          | **[1550](https://tools.pingdom.com/#682930b793400000)** / [1940](https://tools.pingdom.com/#682930edf9c00000) |
-| [Image in a frame](https://upstash-docs.docs7.io/docs/redis/features/eviction)                     | **[1210](https://tools.pingdom.com/#6829337987800000)** / [1470](https://tools.pingdom.com/#682933c1ce400000) |
-| [Video and component catalog](https://upstash-docs.docs7.io/docs/workflow/getstarted)              |   [681](https://tools.pingdom.com/#6829263cc1c00000) / **[625](https://tools.pingdom.com/#682926b4b1c00000)** |
-| [Long guide with accordions](https://upstash-context7.docs7.io/docs/resources/all-clients)         |   [687](https://tools.pingdom.com/#6829281202800000) / **[632](https://tools.pingdom.com/#6829285f93000000)** |
-| [Tabbed setup guide](https://upstash-context7.docs7.io/docs/howto/claiming-libraries)              | **[1010](https://tools.pingdom.com/#682934e8e8c00000)** / [1460](https://tools.pingdom.com/#6829353636c00000) |
-| [API fields and examples](https://upstash-context7.docs7.io/docs/sdks/ts/commands/get-context)     | [1140](https://tools.pingdom.com/#68292edd0b000000) / **[1100](https://tools.pingdom.com/#682930213c400000)** |
-| [Long API reference](https://upstash-docs.docs7.io/docs/redis/features/restapi)                    |  **[839](https://tools.pingdom.com/#682931483fc00000)** / [1430](https://tools.pingdom.com/#68293197e9400000) |
-| [Tabbed code examples](https://upstash-docs.docs7.io/docs/vector/features/filtering)               |  **[509](https://tools.pingdom.com/#682931f6f1c00000)** / [1340](https://tools.pingdom.com/#68293229c2c00000) |
-| [Code groups and callouts](https://upstash-docs.docs7.io/docs/qstash/features/schedules)           |  **[800](https://tools.pingdom.com/#682932f03cc00000)** / [1060](https://tools.pingdom.com/#68293340b3400000) |
-| [Cards and code](https://upstash-context7.docs7.io/docs/overview)                                  |   **[398](https://tools.pingdom.com/#6829255f63800000)** / [572](https://tools.pingdom.com/#682925b7a3c00000) |
-| [Custom React component](https://upstash-context7.docs7.io/docs/docs7/components/react-components) |  **[792](https://tools.pingdom.com/#68292be8c4400000)** / [1650](https://tools.pingdom.com/#68292c79f9800000) |
-| [Custom landing page](https://upstash-docs.docs7.io/docs/introduction)                             |  **[471](https://tools.pingdom.com/#6829305666000000)** / [2110](https://tools.pingdom.com/#6829309aca400000) |
-| [Generated diagrams](https://upstash-context7.docs7.io/docs/docs7/components/mermaid)              |  **[661](https://tools.pingdom.com/#68292cf117c00000)** / [1100](https://tools.pingdom.com/#68292d5dc8800000) |
-| [Math equations](https://upstash-context7.docs7.io/docs/docs7/components/latex)                    | [1260](https://tools.pingdom.com/#68292d9fe6400000) / **[1130](https://tools.pingdom.com/#68292e1528400000)** |
+| [Screenshot reference](https://upstash-docs.docs7.io/docs/redis/howto/metrics-and-charts)          |  **[900](https://tools.pingdom.com/#682a8e3fc3000000)** / [1500](https://tools.pingdom.com/#682a8d59f8400000) |
+| [Video and component catalog](https://upstash-docs.docs7.io/docs/workflow/getstarted)              |  **[688](https://tools.pingdom.com/#682a8d2dcb000000)** / [1280](https://tools.pingdom.com/#682a8cf3ad400000) |
+| [Tabbed setup guide](https://upstash-context7.docs7.io/docs/howto/claiming-libraries)              | [1140](https://tools.pingdom.com/#682a8fbd92c00000) / **[1000](https://tools.pingdom.com/#682a8f7527c00000)** |
+| [Long API reference](https://upstash-docs.docs7.io/docs/redis/features/restapi)                    |   [723](https://tools.pingdom.com/#682a8e9cc0000000) / **[681](https://tools.pingdom.com/#682a8de2e2c00000)** |
+| [Expandable API fields](https://upstash-docs.docs7.io/docs/redis/sdks/ts/commands/string/set)      |   **[630](https://tools.pingdom.com/#682a9328e4000000)** / [742](https://tools.pingdom.com/#682a93568d800000) |
+| [Cards and code](https://upstash-context7.docs7.io/docs/overview)                                  |   **[600](https://tools.pingdom.com/#682a8ad03fc00000)** / [639](https://tools.pingdom.com/#682a8cbc1f800000) |
+| [Custom React component](https://upstash-context7.docs7.io/docs/docs7/components/react-components) |   **[615](https://tools.pingdom.com/#682a8ef3a9c00000)** / [724](https://tools.pingdom.com/#682a8f39e5000000) |
+| [Generated diagrams](https://upstash-context7.docs7.io/docs/docs7/components/mermaid)              |   **[602](https://tools.pingdom.com/#682a90553a400000)** / [677](https://tools.pingdom.com/#682a91dafec00000) |
 
 {/* benchmark:pingdom-table:end */}
+
+### GTmetrix and WebPageTest
+
+{/* benchmark:limited-tables:start */}
+
+GTmetrix and WebPageTest each completed one matched pair before their free limits stopped further coverage. These results apply only to this page.
+
+**GTmetrix · desktop Performance score, higher is better.** Seattle, unthrottled Chrome.
+
+| Page content                                                      |                                                                                                                  Score / 100 · Docs7 / Mintlify |
+| ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------: |
+| [Cards and code](https://upstash-context7.docs7.io/docs/overview) | **[99](https://gtmetrix.com/reports/upstash-context7.docs7.io/9d4TPFRA/)** / [96](https://gtmetrix.com/reports/context7.mintlify.dev/srrUgFEq/) |
+
+**WebPageTest · desktop Largest Contentful Paint, lower is better.** Los Angeles, Chrome, WiFi (240/120 Mbps, 2 ms RTT).
+
+| Page content                                                      |                                                                                                                                                                                                                                                                                          Milliseconds · Docs7 / Mintlify |
+| ----------------------------------------------------------------- | -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| [Cards and code](https://upstash-context7.docs7.io/docs/overview) | **[918](https://www.catchpoint.com/webpagetest/results?publicurl=https%3A%2F%2Fpublic.catchpoint.com%2FUI%2FEntry%2FWPTITP%2FARLm-D-E-B2ADnqtjfE4Vzi4AA-N)** / [975](https://www.catchpoint.com/webpagetest/results?publicurl=https%3A%2F%2Fpublic.catchpoint.com%2FUI%2FEntry%2FWPTITP%2FARLr-D-E-B2ADnq.HjfE4Vzi4AA-N) |
+
+{/* benchmark:limited-tables:end */}
 
 [Download all third-party results, page URLs, and report links](/blog/docs7-vs-mintlify/results.json).
