@@ -9,14 +9,26 @@ node scripts/docs7-benchmark.mjs /path/to/comparison-data.json
 pnpm exec prettier --write data/blog/2026-09-16-docs7-vs-mintlify.mdx public/blog/docs7-vs-mintlify/results.json
 ```
 
-To regenerate from the checked-in data, omit the argument. The input is the existing comparison export with `date`, `sites`, `pages`, `hosted`, `contentFindings`, and `attempts`. Only hosted third-party results are exported. The script updates the marked numeric paragraphs, tables, test date, chart, and JSON. It checks that Google has three runs per host and device and that Pingdom comparisons use the same city.
+Omit the argument to regenerate from the checked-in data. The source export has `date`, `sites`, `pages`, `hosted`, `contentFindings`, and `attempts`. Only hosted third-party results are exported. The script checks that Google has three runs per host and device and that Pingdom comparisons use the same city.
+
+The article puts four static charts before the detailed tables. The script updates the numeric text, page selection counts, tables, charts, and JSON. `pageTypes` maps source pages to reader-facing content descriptions and six content groups. Add a description and group when adding a page. The article combines both documentation projects; source IDs and URLs remain in the data.
+
+The overview medians use one value per page per host. For Google, that input is the page's three-run median. Content charts use the same method within each group. Each provider keeps its own sample size and metric. These aggregates do not measure a typical user's visit and must not be described as field data or percentage speed improvements.
 
 Before publication:
 
-- Check content parity again, including SET. Update exclusions in the source export. Update the prose that explains exclusions and each service's settings and test limits.
-- Replace both Google screenshots. Select the Workflow report whose Performance score equals each host's median; the individual timing metrics need not be medians. Update screenshot alt text and keep the report URL, device, and date visible. The current PNGs are direct browser screenshot crops, captured September 16 from the saved September 15 reports. Their source report links are the Workflow desktop cells in the table and JSON.
-- Read every result claim again. In particular, the prose and chart title assume Docs7 wins most comparisons; the Pingdom example assumes Mintlify wins Workflow. Change the text if the new data changes those outcomes. Inspect any ties in the chart.
-- Preview the post on desktop and mobile. Check author, tables, screenshots, graph, and data link.
-- Update the publication date if needed, remove `draft: true` and the opening editor comment, and mark the PR ready after the results are reviewed.
+- Check content parity again, including SET. Update exclusions in the source export and each service's settings and test limits in the prose.
+- Replace both Google screenshots. Select the video and component catalog page's report whose Performance score equals each host's median. Individual timing metrics need not be medians. Update alt text and keep the report URL, device, and date visible. The PNGs are direct browser crops, captured September 16 from saved September 15 reports. The report links are in the desktop table and JSON.
+- Review the prose after each refresh, especially which content groups Mintlify leads. Check counts, chart scales, and any ties.
+- Preview desktop and mobile. Check all four charts, provider icons, author, tables, image loading, and the data link.
+- Update the publication date if needed, remove `draft: true` and the opening editor comment, and mark the PR ready after review.
 
-The writing follows the direct setup/result structure of [Upstash's Deno benchmark](https://upstash.com/blog/benchmark-with-deno) and the result-first approach of [ClickHouse's ClickStack performance post](https://clickhouse.com/blog/making-clickstack-5x-faster-clickhouse-observability). The measurements and text in this post are our own; the measurements were made by the named external services.
+## Provider images
+
+The graphics embed copies of the providers' own icons. This keeps each SVG self-contained and avoids external image requests. They identify the source of the test; they do not imply endorsement.
+
+- [PageSpeed Insights icon](https://www.gstatic.com/pagespeed/insights/ui/logo/favicon_48.png), linked by the PageSpeed Insights homepage.
+- [DebugBear logo](https://www.debugbear.com/public/landing/logo-white-border.svg), used in its homepage navigation.
+- [Pingdom favicon](https://tools.pingdom.com/favicon.ico), converted to PNG from the 48 px icon.
+
+The writing follows the direct setup/result structure of [Upstash's Deno benchmark](https://upstash.com/blog/benchmark-with-deno) and the result-first approach of [ClickHouse's ClickStack performance post](https://clickhouse.com/blog/making-clickstack-5x-faster-clickhouse-observability). The measurements and text are our own; the measurements were made by the named external services.

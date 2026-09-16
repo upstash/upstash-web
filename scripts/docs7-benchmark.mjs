@@ -21,7 +21,6 @@ assert(
 const pages = input.pages.filter(
   (p) => !excludedPages.some((e) => e.project === p.project && e.page === p.id),
 );
-const names = { upstash: "Upstash", context7: "Context7" };
 const median = (values) => {
   const sorted = [...values].sort((a, b) => a - b);
   const middle = Math.floor(sorted.length / 2);
@@ -126,6 +125,47 @@ writeFileSync(
   )}\n`,
 );
 
+// Describe the content readers will see, rather than internal page titles.
+const pageTypes = {
+  "context7/overview": ["Cards and code", "Custom components"],
+  "context7/entra-sso": ["Screenshot walkthrough", "Images"],
+  "context7/all-clients": [
+    "Long guide with accordions",
+    "Long guides and steps",
+  ],
+  "context7/claiming-libraries": [
+    "Tabbed setup guide",
+    "Long guides and steps",
+  ],
+  "context7/react-components": ["Custom React component", "Custom components"],
+  "context7/mermaid": ["Generated diagrams", "Diagrams and equations"],
+  "context7/latex": ["Math equations", "Diagrams and equations"],
+  "context7/get-context": [
+    "API fields and examples",
+    "Code and API references",
+  ],
+  "upstash/introduction": ["Custom landing page", "Custom components"],
+  "upstash/workflow": ["Video and component catalog", "Video"],
+  "upstash/metrics": ["Screenshot reference", "Images"],
+  "upstash/restapi": ["Long API reference", "Code and API references"],
+  "upstash/filtering": ["Tabbed code examples", "Code and API references"],
+  "upstash/set": ["Expandable API fields", "Code and API references"],
+  "upstash/schedules": ["Code groups and callouts", "Code and API references"],
+  "upstash/eviction": ["Image in a frame", "Images"],
+};
+const contentType = (r) => {
+  const value = pageTypes[`${r.project}/${r.page ?? r.id}`];
+  assert(value, `Describe the new page: ${r.project}/${r.page ?? r.id}`);
+  return value;
+};
+const groupNames = [
+  "Images",
+  "Video",
+  "Long guides and steps",
+  "Code and API references",
+  "Custom components",
+  "Diagrams and equations",
+];
 const scoreLinks = (r) =>
   r.results
     .map((result, i) => {
@@ -134,63 +174,64 @@ const scoreLinks = (r) =>
     })
     .join(" / ");
 const pageLink = (r) =>
-  `[${r.label}](${input.sites[r.project].docs7}${r.path})`;
-const tables = ["context7", "upstash"]
-  .map((project) => {
-    const lines = [
-      `### ${names[project]}`,
-      "",
-      "| Page | Mobile | Desktop |",
-      "| --- | ---: | ---: |",
-    ];
-    for (const m of mobile.filter((r) => r.project === project)) {
-      const d = desktop.find((r) => r.project === project && r.page === m.page);
-      lines.push(`| ${pageLink(m)} | ${scoreLinks(m)} | ${scoreLinks(d)} |`);
-    }
-    return lines.join("\n");
-  })
-  .join("\n\n");
+  `[${contentType(r)[0]}](${input.sites[r.project].docs7}${r.path})`;
+const ordered = (list) =>
+  groupNames.flatMap((group) =>
+    list.filter((r) => contentType(r)[1] === group),
+  );
+const tables = [
+  "| Page content | Mobile | Desktop |",
+  "| --- | ---: | ---: |",
+  ...ordered(mobile).map((m) => {
+    const d = desktop.find((r) => r.project === m.project && r.page === m.page);
+    return `| ${pageLink(m)} | ${scoreLinks(m)} | ${scoreLinks(d)} |`;
+  }),
+].join("\n");
 const serviceTable = (list, metric) =>
   [
-    `| Page | ${metric} · Docs7 / Mintlify |`,
+    `| Page content | ${metric} · Docs7 / Mintlify |`,
     "| --- | ---: |",
-    ...list.map(
-      (r) => `| ${names[r.project]} · ${pageLink(r)} | ${scoreLinks(r)} |`,
-    ),
+    ...ordered(list).map((r) => `| ${pageLink(r)} | ${scoreLinks(r)} |`),
   ].join("\n");
-const find = (list, project, page) => {
-  const result = list.find((r) => r.project === project && r.page === page);
-  assert(result, `Missing ${project}/${page}`);
-  return result;
-};
-const workflow = find(desktop, "upstash", "workflow");
-const introduction = find(desktop, "upstash", "introduction");
-const react = find(mobile, "context7", "react-components");
-const introLoad = find(pingdom, "upstash", "introduction");
-const workflowLoad = find(pingdom, "upstash", "workflow");
-const losses = (list) =>
-  new Intl.ListFormat("en", { type: "conjunction" }).format(
-    list
-      .filter((r) => r.winner === "mintlify")
-      .map((r) => `${names[r.project]}'s ${r.label} page`),
-  );
+const typical = (list) =>
+  [0, 1].map((i) => median(list.map((r) => r.results[i].value)));
+const [mobileD, mobileM] = typical(mobile);
+const [desktopD, desktopM] = typical(desktop);
+const [pingdomD, pingdomM] = typical(pingdom);
 const testDate = new Intl.DateTimeFormat("en-US", {
   dateStyle: "long",
   timeZone: "UTC",
 }).format(new Date(`${input.date}T00:00:00Z`));
-const exclusion = excludedPages.length
-  ? `We excluded ${excludedPages.map((e) => input.pages.find((p) => p.project === e.project && p.id === e.page).label).join(", ")} because of a content mismatch, leaving ${pages.length} page pairs in the tables and win counts.`
-  : `All ${pages.length} page pairs are included in the tables and win counts.`;
+const exclusions = excludedPages.length
+  ? `We excluded ${excludedPages.length} page pair because the content did not match. The download retains its results and the reason for exclusion.`
+  : "All page pairs are included.";
 const blocks = {
-  lead: `**Docs7 won ${wins(mobile) + wins(desktop)} of ${mobile.length + desktop.length} Google PageSpeed comparisons.** It led on ${wins(mobile)} of ${mobile.length} pages on mobile and ${wins(desktop)} of ${desktop.length} on desktop, using the median of three runs for each result.`,
-  "google-intro": `We collected ${sourceRows.filter((r) => r.provider === "google").length} Google results across ${input.pages.length} page pairs, two hosts, two device modes, and three runs. ${exclusion}`,
-  "test-date": `The test date is **${testDate}**. We used the direct hosted URLs for each platform:`,
+  lead: `**Docs7 won ${wins(mobile) + wins(desktop)} of ${mobile.length + desktop.length} Google PageSpeed comparisons.** It also led in ${wins(debugbear)} of ${debugbear.length} DebugBear pairs and loaded faster in ${wins(pingdom)} of ${pingdom.length} Pingdom pairs.`,
+  "typical-results": `Across the tested pages, Google's median score was **${mobileD} vs. ${mobileM} on mobile** and **${desktopD} vs. ${desktopM} on desktop**, both in Docs7's favor. Pingdom's median load time was **${pingdomD} ms vs. ${pingdomM.toLocaleString("en-US")} ms**. These are medians across pages, not a claim that every page improved by the same amount.`,
+  "page-selection": groupNames
+    .map((group) => {
+      const count = pages.filter((p) => contentType(p)[1] === group).length;
+      const reason = {
+        Images:
+          "Screenshots and framed images add downloads and can move the layout as they load.",
+        Video:
+          "An embedded player and a component catalog add more than text to the initial load.",
+        "Long guides and steps":
+          "Long text, accordions, tabs, and setup steps test a larger document.",
+        "Code and API references":
+          "Code highlighting, tabbed examples, API fields, and callouts add rendering work.",
+        "Custom components":
+          "Cards and custom React components test JavaScript and component rendering.",
+        "Diagrams and equations":
+          "Mermaid and LaTeX need specialist rendering libraries.",
+      }[group];
+      return `- **${group}, ${count} ${count === 1 ? "page" : "pages"}.** ${reason}`;
+    })
+    .join("\n"),
+  "test-date": `We tested on **${testDate}**, using the direct Docs7 and Mintlify hosted URLs. We selected ${input.pages.length} page pairs from the Upstash and Context7 documentation, with ${pages.length} pairs included in this post. ${exclusions}`,
   "google-tables": tables,
-  "google-detail": `The Upstash overview scored **${introduction.results[0].value} against ${introduction.results[1].value}** on desktop. Workflow scored **${workflow.results[0].value} against ${workflow.results[1].value}**. On mobile, the custom React component page scored **${react.results[0].value} against ${react.results[1].value}**.\n\nMintlify led on ${losses(mobile)} on mobile. On desktop, it led on ${losses(desktop)}. Those results are in the same tables.`,
-  "other-results": `Docs7 also led in **${wins(debugbear)} of ${debugbear.length} completed DebugBear pairs**, and loaded faster in **${wins(pingdom)} of ${pingdom.length} Pingdom pairs**.`,
-  "debugbear-table": `### DebugBear mobile scores\n\n${serviceTable(debugbear, "Score / 100")}`,
-  "pingdom-table": `### Pingdom load times\n\n${serviceTable(pingdom, "Milliseconds")}`,
-  "pingdom-detail": `Pingdom measured the Upstash overview at **${introLoad.results[0].value} ms on Docs7 and ${introLoad.results[1].value.toLocaleString("en-US")} ms on Mintlify**, or **${Math.round((1 - introLoad.results[0].value / introLoad.results[1].value) * 100)}% less load time**. Workflow went the other way: **${workflowLoad.results[0].value} ms for Docs7 and ${workflowLoad.results[1].value} ms for Mintlify**. A Google score and a Pingdom load time answer different questions, so I have kept both.`,
+  "debugbear-table": serviceTable(debugbear, "Score / 100"),
+  "pingdom-table": serviceTable(pingdom, "Milliseconds"),
 };
 let post = readFileSync(postFile, "utf8");
 for (const [key, content] of Object.entries(blocks)) {
@@ -201,43 +242,156 @@ for (const [key, content] of Object.entries(blocks)) {
 }
 writeFileSync(postFile, post);
 
-// Each row has its own denominator. The graphic does not pool different tools.
-const rowsToDraw = [
-  ["Google · mobile", mobile],
-  ["Google · desktop", desktop],
-  ["DebugBear · mobile", debugbear],
-  ["Pingdom · load time", pingdom],
-];
+// Static SVG charts. Each provider keeps its own metric and test population.
 const orange = "#e86824";
 const green = "#087d56";
-const svg = [
-  `<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="560" viewBox="0 0 1000 560" role="img" aria-labelledby="title desc">
-<title id="title">Docs7 wins most of the page comparisons</title>
-<desc id="desc">${rowsToDraw.map(([label, list]) => `${label}: Docs7 ${wins(list)} of ${list.length}`).join(". ")}. Different settings and sample sizes per service. Google uses median scores from three runs. SET excluded.</desc>
-<rect width="1000" height="560" fill="#faf9f6"/>
-<g font-family="Arial, Helvetica, sans-serif" fill="#202426">
-<text x="48" y="58" font-size="14" letter-spacing="2">DOCS7 VS. MINTLIFY</text>
-<text x="48" y="108" font-size="34" font-weight="700">Pages won, by testing service</text>
-<text x="48" y="142" font-size="16" fill="#60686c">Upstash + Context7 · ${input.date} · initial page loads</text>
-<circle cx="62" cy="183" r="7" fill="${orange}"/><text x="78" y="189" font-size="16">Docs7</text>
-<circle cx="176" cy="183" r="7" fill="${green}"/><text x="192" y="189" font-size="16">Mintlify</text>`,
+const orangeText = "#b84a0b";
+const gray = "#667075";
+const icon = (provider, x, y) => {
+  const extension = provider === "debugbear" ? "svg" : "png";
+  const mime = extension === "svg" ? "image/svg+xml" : "image/png";
+  const data = readFileSync(asset(`${provider}.${extension}`)).toString(
+    "base64",
+  );
+  return `<image href="data:${mime};base64,${data}" x="${x}" y="${y}" width="28" height="28"/>`;
+};
+const escapeXml = (value) =>
+  String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll('"', "&quot;");
+const text = (
+  x,
+  y,
+  value,
+  size = 20,
+  color = "#202426",
+  weight = 400,
+  anchor = "start",
+) =>
+  `<text x="${x}" y="${y}" font-size="${size}" fill="${color}" font-weight="${weight}" text-anchor="${anchor}">${escapeXml(value)}</text>`;
+const legend =
+  () => `<circle cx="40" cy="116" r="7" fill="${orange}"/>${text(56, 123, "Docs7")}
+<circle cx="174" cy="116" r="7" fill="${green}"/>${text(190, 123, "Mintlify")}`;
+const chart = (name, title, subtitle, height, body, footnotes, description) => {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="${height}" viewBox="0 0 640 ${height}" role="img" aria-labelledby="title desc">
+<title id="title">${escapeXml(title)}</title><desc id="desc">${escapeXml(description)}</desc>
+<rect width="640" height="${height}" fill="#faf9f6"/>
+<g font-family="Arial, Helvetica, sans-serif">
+${text(32, 48, title, 30, "#202426", 700)}
+${text(32, 79, subtitle, 18, gray)}
+${legend()}
+${body}
+${footnotes.map((line, i) => text(32, height - 45 + i * 24, line, 16, gray)).join("\n")}
+</g></svg>`;
+  writeFileSync(asset(name), svg);
+};
+const services = [
+  { label: "PageSpeed Insights · mobile", provider: "google", list: mobile },
+  { label: "PageSpeed Insights · desktop", provider: "google", list: desktop },
+  { label: "DebugBear · mobile", provider: "debugbear", list: debugbear },
+  { label: "Pingdom · load time", provider: "pingdom", list: pingdom },
 ];
-for (const [[label, list], i] of rowsToDraw.map((row, i) => [row, i])) {
-  const d = wins(list);
-  const m = list.filter((r) => r.winner === "mintlify").length;
-  const width = 455;
-  const y = 228 + i * 64;
-  svg.push(`<text x="48" y="${y + 23}" font-size="17">${label}</text>
-<rect x="280" y="${y}" width="${width}" height="36" fill="#deded9"/>
-<rect x="280" y="${y}" width="${(width * d) / list.length}" height="36" fill="${orange}"/>
-<rect x="${280 + (width * d) / list.length}" y="${y}" width="${(width * m) / list.length}" height="36" fill="${green}"/>
-<text x="762" y="${y + 25}" font-size="25" font-weight="700">${d} / ${list.length}</text>
-<text x="886" y="${y + 24}" font-size="14" fill="#60686c">Docs7</text>`);
-}
-svg.push(
-  `<text x="48" y="524" font-size="14" fill="#60686c">Google: median of 3. Other services: 1 matched run. SET excluded.</text></g></svg>`,
+chart(
+  "wins.svg",
+  "Who won more pages?",
+  "Page comparisons won in each hosted test",
+  650,
+  services
+    .map(({ label, provider, list }, i) => {
+      const y = 160 + i * 105;
+      const d = wins(list);
+      const m = list.filter((r) => r.winner === "mintlify").length;
+      const ties = list.length - d - m;
+      return `${icon(provider, 32, y - 3)}${text(72, y + 19, label, 21, "#202426", 700)}
+${text(520, y + 20, d, 27, orangeText, 700, "end")}${text(595, y + 20, m, 27, green, 700, "end")}
+<rect x="32" y="${y + 36}" width="576" height="24" fill="#deded9"/>
+<rect x="32" y="${y + 36}" width="${(576 * d) / list.length}" height="24" fill="${orange}"/>
+<rect x="${32 + (576 * d) / list.length}" y="${y + 36}" width="${(576 * m) / list.length}" height="24" fill="${green}"/>
+${text(32, y + 83, `${list.length} matched page pairs${ties ? ` · ${ties} ties shown in gray` : ""}`, 17, gray)}`;
+    })
+    .join("\n"),
+  [
+    "Google: 3 runs per URL. Other services: 1 matched run.",
+    `${input.date} · ${excludedPages.length ? "Content mismatch excluded." : "All pairs included."}`,
+  ],
+  services
+    .map(
+      ({ label, list }) =>
+        `${label}: Docs7 ${wins(list)}, Mintlify ${list.filter((r) => r.winner === "mintlify").length}, from ${list.length} pairs.`,
+    )
+    .join(" "),
 );
-writeFileSync(asset("wins.svg"), svg.join("\n"));
+const pairedBars = (values, y, max, suffix = "") =>
+  values
+    .map((value, i) => {
+      const width = (470 * value) / max;
+      const row = y + i * 35;
+      return `<rect x="32" y="${row}" width="470" height="23" fill="#eeede8"/>
+<rect x="32" y="${row}" width="${width}" height="23" fill="${i === 0 ? orange : green}"/>
+${text(608, row + 20, `${value.toLocaleString("en-US")}${suffix}`, 23, i === 0 ? orangeText : green, 700, "end")}`;
+    })
+    .join("\n");
+chart(
+  "typical-results.svg",
+  "How large was the gap?",
+  "Median result across each service's tested pages",
+  825,
+  services
+    .map(({ label, provider, list }, i) => {
+      const y = 160 + i * 150;
+      const timed = provider === "pingdom";
+      const maximum = timed
+        ? Math.ceil(Math.max(...typical(list)) / 500) * 500
+        : 100;
+      return `${icon(provider, 32, y - 3)}${text(72, y + 19, label, 21, "#202426", 700)}
+${text(32, y + 46, `${list.length} pages · ${timed ? `0–${maximum.toLocaleString("en-US")} ms scale · lower is better` : "0–100 score · higher is better"}`, 17, gray)}
+${pairedBars(typical(list), y + 59, maximum, timed ? " ms" : "")}`;
+    })
+    .join("\n"),
+  [
+    "Google: median of each page's 3-run median.",
+    "Other services: median of one result per page.",
+  ],
+  services
+    .map(
+      ({ label, list }) =>
+        `${label}: Docs7 ${typical(list)[0]}, Mintlify ${typical(list)[1]}.`,
+    )
+    .join(" "),
+);
+for (const [device, list] of [
+  ["mobile", mobile],
+  ["desktop", desktop],
+]) {
+  const grouped = groupNames.map((label) => ({
+    label,
+    list: list.filter((r) => contentType(r)[1] === label),
+  }));
+  chart(
+    `google-${device}.svg`,
+    `Page types on ${device}`,
+    "Google PageSpeed Insights · score out of 100",
+    975,
+    `${icon("google", 572, 26)}${grouped
+      .map(({ label, list: group }, i) => {
+        const y = 159 + i * 126;
+        return `${text(32, y + 15, label, 22, "#202426", 700)}${text(608, y + 15, `${group.length} ${group.length === 1 ? "page" : "pages"}`, 18, gray, 400, "end")}
+${pairedBars(typical(group), y + 30, 100)}`;
+      })
+      .join("\n")}`,
+    [
+      "Median of the per-page medians within each group.",
+      `3 runs per URL · All ${pages.length} included pages · Higher is better`,
+    ],
+    grouped
+      .map(
+        ({ label, list: group }) =>
+          `${label}, ${group.length} pages: Docs7 ${typical(group)[0]}, Mintlify ${typical(group)[1]}.`,
+      )
+      .join(" "),
+  );
+}
 console.log(
-  `Updated ${fileURLToPath(postFile)} and third-party results. Google: ${wins(mobile) + wins(desktop)}/${mobile.length + desktop.length}; DebugBear: ${wins(debugbear)}/${debugbear.length}; Pingdom: ${wins(pingdom)}/${pingdom.length}.`,
+  `Updated ${fileURLToPath(postFile)}, four charts, and third-party results.`,
 );
