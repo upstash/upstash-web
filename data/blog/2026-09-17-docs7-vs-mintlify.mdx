@@ -3,7 +3,7 @@ title: "Docs7 vs. Mintlify: a speed benchmark"
 slug: docs7-vs-mintlify
 authors: [abdullahenes]
 tags: [docs7, context7, performance]
-description: "Docs7 and Mintlify compared across 17 page pairs with Google PageSpeed Insights, DebugBear, Pingdom, and GTmetrix. See scores, timings, and report links."
+description: "Docs7 and Mintlify compared across 17 page pairs with Google PageSpeed Insights, DebugBear, and Pingdom. See scores, timings, and report links."
 updated: "2026-09-17"
 draft: true
 ---
@@ -41,8 +41,6 @@ Each bar shows the average of the page scores in that content group.
 
 ![Google desktop scores by page content, using each page's 10-run median.](/blog/docs7-vs-mintlify/google-desktop.svg)
 
-The release notes pages tied on desktop.
-
 ## Inside one result
 
 These Google desktop results are from the video and component catalog page. Each value is the median of 10 tests.
@@ -55,15 +53,15 @@ We compared **17 page pairs on September 17, 2026**, using the direct Docs7 and 
 
 - Google PageSpeed Insights ran 10 tests per URL on mobile and desktop through its API. We use each page's median score for both hosts, following [Google's guidance on repeated tests and medians](https://github.com/GoogleChrome/lighthouse/blob/main/docs/variability.md#run-lighthouse-multiple-times).
 - Pingdom ran one test per URL from San Francisco.
-- DebugBear ran one test per URL and device from US East. It completed five page pairs per device. GTmetrix completed four desktop pairs from Seattle before the account reached its test limit.
+- DebugBear ran one test per URL and device from US East. It completed five page pairs per device.
 
 The overview and content charts use averages, with equal weight for each page. Each service uses its own test settings, so we keep their results separate.
 
-These are [lab tests](https://developers.google.com/speed/docs/insights/v5/about) of initial page loads. Videos were not played. Chat and analytics stayed as deployed and differed between hosts. Cache state was not controlled, and scores vary between runs.
+These [lab tests](https://developers.google.com/speed/docs/insights/v5/about) measure initial page loads. Scores can vary between runs.
 
 ## Full results
 
-Page names link to Docs7. Results from DebugBear, Pingdom, and GTmetrix link to their reports.
+Page names link to Docs7. DebugBear and Pingdom results link to their reports.
 
 Each cell is **Docs7 / Mintlify**, with the winner in bold.
 
@@ -93,7 +91,7 @@ Performance scores out of 100. Median of 10 distinct runs.
 
 ### DebugBear
 
-Performance scores out of 100. One run per page and device. Service errors stopped further tests.
+Performance scores out of 100. One run per page and device.
 
 **Mobile**
 
@@ -138,14 +136,3 @@ Load time in milliseconds. Lower is better. One run per page.
 | [Collapsible content](https://upstash-context7.docs7.io/docs/docs7/components/accordions)          | **[450](https://tools.pingdom.com/#682ba81f77000000)** / [591](https://tools.pingdom.com/#682ba84a09c00000) |
 | [Nested file tree](https://upstash-context7.docs7.io/docs/docs7/components/tree)                   | [471](https://tools.pingdom.com/#682ba99edd400000) / **[467](https://tools.pingdom.com/#682ba8803f800000)** |
 | [Generated diagrams](https://upstash-context7.docs7.io/docs/docs7/components/mermaid)              | **[574](https://tools.pingdom.com/#682b97f56f800000)** / [664](https://tools.pingdom.com/#682b981bce400000) |
-
-### GTmetrix
-
-Desktop performance score out of 100. Seattle, unthrottled Chrome. One run per page.
-
-| Page content                                                                              |                                                                                                                   Score / 100 · Docs7 / Mintlify |
-| ----------------------------------------------------------------------------------------- | -----------------------------------------------------------------------------------------------------------------------------------------------: |
-| [Screenshot reference](https://upstash-docs.docs7.io/docs/redis/howto/metrics-and-charts) |      **[100](https://gtmetrix.com/reports/upstash-docs.docs7.io/pnmFAXOF/)** / [91](https://gtmetrix.com/reports/upstash.mintlify.dev/kclL0Tnd/) |
-| [Video and component catalog](https://upstash-docs.docs7.io/docs/workflow/getstarted)     |       **[94](https://gtmetrix.com/reports/upstash-docs.docs7.io/T0uAgmxG/)** / [74](https://gtmetrix.com/reports/upstash.mintlify.dev/rhYVTXam/) |
-| [Long API reference](https://upstash-docs.docs7.io/docs/redis/features/restapi)           |       **[99](https://gtmetrix.com/reports/upstash-docs.docs7.io/IXL48qQh/)** / [80](https://gtmetrix.com/reports/upstash.mintlify.dev/IodWhkiH/) |
-| [Cards and code](https://upstash-context7.docs7.io/docs/overview)                         | **[100](https://gtmetrix.com/reports/upstash-context7.docs7.io/SrmxQuVf/)** / [98](https://gtmetrix.com/reports/context7.mintlify.dev/HdBWrIT4/) |
