@@ -51,9 +51,9 @@ On desktop, both hosts scored above 90 in most groups. Images made the largest d
 
 ## Why Docs7 loads faster
 
-Docs7 compiles documentation into static HTML at build time. Cloudflare's [static-asset network](https://developers.cloudflare.com/workers/static-assets/) serves those files, so no application server renders the page on request. The browser receives the content directly, with JavaScript for interactive features.
+The measurements point to work in the browser. The Docs7 build prepares responsive image sizes, sets image dimensions so the layout does not shift, and defers images below the first screen. Docs7 pages also blocked the browser for less time. Across the 17 pages, the median blocking time was 199 ms vs. 389 ms on mobile and 166 ms vs. 228 ms on desktop.
 
-The build also prepares responsive image sizes, sets image dimensions so the layout does not shift, and defers images below the first screen.
+Docs7 also compiles documentation into static HTML at build time, and Cloudflare's [static-asset network](https://developers.cloudflare.com/workers/static-assets/) serves those files. The browser receives the content directly, with JavaScript for interactive features.
 
 The video and component catalog page shows the effect. On desktop, Docs7 showed the largest content sooner and blocked the browser for less time:
 
