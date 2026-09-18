@@ -1,184 +1,76 @@
 ---
-title: "Docs7 vs. Mintlify: a speed benchmark"
+title: "How fast is Docs7? We tested it against Mintlify"
 slug: docs7-vs-mintlify
 authors: [abdullahenes]
 tags: [docs7, context7, performance]
-description: "Docs7 and Mintlify compared across 17 page pairs with Google PageSpeed Insights, DebugBear, and Pingdom. See scores, timings, and report links."
-updated: "2026-09-17"
+description: "We tested 17 matching Upstash and Context7 documentation pages on Docs7 and Mintlify. Docs7 scored higher in 33 of 34 Google comparisons. See the scores, the method, and the full test data."
+updated: "2026-09-18"
 draft: false
 ---
 
-**Docs7 won 33 of 34 Google PageSpeed comparisons, with 1 tie.** DebugBear favored Docs7 on 9 of 9 mobile and 9 of 9 desktop page pairs.
+While we built [Docs7](https://context7.com/docs7), we wanted to know how its pages perform against Mintlify on real documentation, with screenshots, video, and custom components. A fast text-only page would not tell us much.
 
-I tested documentation with images, video, long guides, code examples, and custom components on both platforms. The charts show the results; full tables and report links are at the end.
+We compared 17 pages from the Upstash and Context7 docs on both platforms, with Google PageSpeed Insights and DebugBear. Both hosts got the same page paths and the same test settings. Google tested each URL 10 times per device, and we report the median, not the best run.
 
-![Page wins for Docs7 and Mintlify in Google PageSpeed Insights and DebugBear.](/blog/docs7-vs-mintlify/wins.svg)
+## The results
 
-Google ran **10 tests per URL and device**. The chart above compares page medians. Below, each square compares the same page in the same numbered round. These are repeated tests of 17 page pairs; the two hosts were not always tested at the same time.
+**Docs7 scored higher in 33 of 34 Google comparisons, and one was equal.** Its average score was 80.1 vs. 58.9 on mobile and 94.9 vs. 88.4 on desktop. DebugBear also gave Docs7 the higher score on all 10 page pairs it tested, on both devices.
 
-![Results from all 10 Google test rounds, before taking page medians.](/blog/docs7-vs-mintlify/google-rounds.svg)
+Single runs are noisier than medians. When we compare run by run, 340 pairs in total, Docs7 scored higher in 263, Mintlify in 66, and 11 were equal.
 
-## The size of the gap
+![Average Google and DebugBear scores on mobile and desktop.](/blog/docs7-vs-mintlify/typical-results.svg)
 
-Across the tested pages, Google's average score was **80.1 vs. 58.9 on mobile** and **94.9 vs. 88.4 on desktop**. Docs7 is listed first.
+The difference is largest on mobile. The expandable API fields page scored 85 vs. 46.5, and the long CLI guide scored 89.5 vs. 54. It is smallest on desktop, where the release notes page had the same score on both hosts, 96.5, and two other pages were within one point.
 
-![Average performance scores from Google PageSpeed Insights and DebugBear.](/blog/docs7-vs-mintlify/typical-results.svg)
+Docs7 has slow pages too. The long API reference scored 57 on mobile. That is ahead of Mintlify's 46.5, but it is the lowest Docs7 score in the set.
 
-Google and DebugBear scores are out of 100; higher is better.
+## What we tested
 
-## Page load times
+We used two documentation projects. Each one is available on both platforms:
 
-Pingdom measures full page load time in milliseconds; lower is better. Docs7 loaded faster on **14 of 17 pages from San Francisco**, **5 of 7 from Frankfurt**, and **3 of 3 from Tokyo**.
+- **Upstash:** [Docs7](https://upstash-docs.docs7.io/docs/introduction) and [Mintlify](https://upstash.mintlify.dev/docs/introduction).
+- **Context7:** [Docs7](https://upstash-context7.docs7.io/docs/overview) and [Mintlify](https://context7.mintlify.dev/docs/overview).
 
-![Page load times and page wins from Pingdom, shown separately for each test location.](/blog/docs7-vs-mintlify/pingdom-results.svg)
+We picked pages that stress different parts of a documentation site:
 
-Each location covers its own set of page pairs. Bars show the average of the per-page medians.
+- Images and video test download cost and layout stability.
+- Long API, SDK, and CLI references test large pages and code blocks.
+- Tabs, steps, accordions, diagrams, a file tree, and a custom React component add rendering and JavaScript work.
 
-## Why these pages?
-
-I chose pages to cover different types of documentation, then checked their content on both live sites before testing.
-
-- A reference page with nine screenshots tests image loading and layout stability.
-- A video page combines an embedded player with a custom component catalog.
-- Four guides cover steps, release notes, a long CLI reference, and a setup flow with tabs and images.
-- Five code and API pages cover long references, expandable fields, scheduling, retries, and SDK setup.
-- Cards and a custom React badge test custom components. Separate examples cover tabs, accordions, and a file tree.
-- A Mermaid page tests diagram rendering.
+The [full results on GitHub](https://github.com/upstash/upstash-web/blob/101b417e46df9239e99bd24b0da68ee107594188/benchmarks/docs7-vs-mintlify.md) list all 17 pairs, with links to both the Docs7 and Mintlify URLs in every row.
 
 ## Results by page type
 
-Each bar shows the average of the page scores in that content group.
+Each dot is the average of the page medians in that group, and the line between the two dots shows the difference. Scores are out of 100. Docs7 had the higher score in every group on both devices.
 
-![Google mobile scores by page content, using each page's 10-run median.](/blog/docs7-vs-mintlify/google-mobile.svg)
+![Google scores by page type, on mobile and desktop.](/blog/docs7-vs-mintlify/google-by-page-type.svg)
 
-![Google desktop scores by page content, using each page's 10-run median.](/blog/docs7-vs-mintlify/google-desktop.svg)
+On mobile, the largest differences were on diagrams (88.5 vs. 59.5) and long guides (91 vs. 63.4). Pages with video were the slowest group for Docs7, at 64.5. On desktop, both hosts scored above 90 in most groups, and images made the largest difference, 98 vs. 79.5.
 
-## Inside one result
+## Where Docs7 saves time
 
-These Google desktop results are from the video and component catalog page. Each value is the median of 10 tests.
+Docs7 put the main content on the screen sooner. Google calls this the largest-content paint. Across the 17 pages, the median was 3.3 seconds vs. 9.7 seconds in Google's throttled phone test, and 0.62 seconds vs. 1.02 seconds on desktop.
 
-![Saved Google API results for the video page: Docs7 scores 78 and Mintlify scores 66.5.](/blog/docs7-vs-mintlify/google-workflow-comparison.svg)
+![Median time until content is on the screen, across the 17 pages.](/blog/docs7-vs-mintlify/google-load-times.svg)
 
-## How we tested
+The measurements point to work in the browser. The Docs7 build prepares responsive image sizes, sets image dimensions so the layout does not shift, and defers images below the first screen. Docs7 pages also blocked the browser for less time. Across the 17 pages, the median blocking time was 199 ms vs. 389 ms on mobile and 166 ms vs. 228 ms on desktop.
 
-We compared **17 page pairs on September 17, 2026**, using the direct Docs7 and Mintlify hosted URLs.
+Docs7 also compiles documentation into static HTML at build time, and Cloudflare's [static-asset network](https://developers.cloudflare.com/workers/static-assets/) serves those files. The browser receives the content directly, with JavaScript for interactive features.
 
-- Google PageSpeed Insights ran 10 tests per URL on mobile and desktop through its API, for 680 tests in total. All used Lighthouse 13.4.1. We kept every valid run. We use each page's median score for both hosts, following [Google's guidance on repeated tests and medians](https://github.com/GoogleChrome/lighthouse/blob/main/docs/variability.md#run-lighthouse-multiple-times).
-- Pingdom tested 17 page pairs from San Francisco, 7 from Frankfurt, and 3 from Tokyo. San Francisco has three runs per URL for one pair, two for three pairs, and one for the rest. Frankfurt and Tokyo have one run per URL.
-- DebugBear tested 9 mobile and 9 desktop page pairs from US East. Three mobile and two desktop pairs have two runs per URL; the rest have one.
+Pages with video were the slowest group for Docs7 on both devices. On the video page, the median largest-content paint on mobile was 4.20 seconds on Docs7 vs. 12.91 seconds on Mintlify. Mobile runs on this page varied a lot on both hosts, from 2.9 to 16.5 seconds on Docs7 and from 3.3 to 21.1 seconds on Mintlify.
 
-We combine valid runs for the same URL, device, and location using the median. With two runs, the median is their average. Both hosts have the same run count in each comparison. Charts average the per-page results with equal weight for each page. Services and locations stay separate.
+We do not know how Mintlify works internally, and these tests do not show how much of the difference comes from each design choice.
 
-These [lab tests](https://developers.google.com/speed/docs/insights/v5/about) measure initial page loads. Scores can vary between runs.
+## Method and limits
 
-## Full results
+Google ran all 680 tests on September 17, 2026, using Lighthouse 13.4.1. DebugBear results include follow-up runs on September 18. For repeated tests we use the median on both hosts, following [Google's guidance on repeated runs](https://github.com/GoogleChrome/lighthouse/blob/main/docs/variability.md#run-lighthouse-multiple-times). Every page has equal weight, and we keep devices and services separate.
 
-Page names link to Docs7. Small numbered links beside DebugBear and Pingdom values open each run's report.
+These are lab tests of the first page load on deployed sites. We did not play the videos or measure interaction latency. We did not control cache state, and the paired runs were not always simultaneous.
 
-Each cell is **Docs7 / Mintlify**, with the winner in bold.
+We also ran Pingdom load-time checks from San Francisco, Frankfurt, and Tokyo. Most pages have only one run per URL, which is too thin for a regional speed claim, so those numbers are [in the appendix](https://github.com/upstash/upstash-web/blob/101b417e46df9239e99bd24b0da68ee107594188/benchmarks/docs7-vs-mintlify.md#pingdom-exploratory-load-time-checks) only.
 
-### Google PageSpeed Insights
+## Check the data
 
-Median scores out of 100, from 10 runs per URL and device. [Download all 680 Google measurements as CSV](/blog/docs7-vs-mintlify/google-runs.csv).
+[Read the full results on GitHub](https://github.com/upstash/upstash-web/blob/101b417e46df9239e99bd24b0da68ee107594188/benchmarks/docs7-vs-mintlify.md) for the test settings, run counts, and every DebugBear and Pingdom report link. We also published the [680 Google measurements as CSV](/blog/docs7-vs-mintlify/google-runs.csv), so you can recalculate every Google number in this post.
 
-<div style={{ whiteSpace: "nowrap", fontSize: "0.875rem" }}>
-
-| Page content                                                                                       |          Mobile |         Desktop |
-| -------------------------------------------------------------------------------------------------- | --------------: | --------------: |
-| [Screenshot reference](https://upstash-docs.docs7.io/docs/redis/howto/metrics-and-charts)          |   **69** / 50.5 |   **98** / 79.5 |
-| [Video and component catalog](https://upstash-docs.docs7.io/docs/workflow/getstarted)              |   **64.5** / 50 |   **78** / 66.5 |
-| [Tabbed setup guide](https://upstash-context7.docs7.io/docs/howto/claiming-libraries)              |   **91** / 64.5 |   **97.5** / 93 |
-| [Step-by-step instructions](https://upstash-context7.docs7.io/docs/docs7/components/steps)         |   **91** / 59.5 |   **95** / 87.5 |
-| [Release notes](https://upstash-context7.docs7.io/docs/docs7/components/updates)                   | **92.5** / 75.5 |     96.5 / 96.5 |
-| [Long CLI guide](https://upstash-context7.docs7.io/docs/clients/cli)                               |   **89.5** / 54 |   **96** / 88.5 |
-| [Long API reference](https://upstash-docs.docs7.io/docs/redis/features/restapi)                    |   **57** / 46.5 |   **93** / 86.5 |
-| [Expandable API fields](https://upstash-docs.docs7.io/docs/redis/sdks/ts/commands/string/set)      |   **85** / 46.5 |   **98.5** / 86 |
-| [Scheduling guide](https://upstash-docs.docs7.io/docs/qstash/features/schedules)                   |     **72** / 52 | **94.5** / 91.5 |
-| [Retry guide and formulas](https://upstash-docs.docs7.io/docs/qstash/features/retry)               |   **72.5** / 46 |     **98** / 85 |
-| [SDK setup guide](https://upstash-docs.docs7.io/docs/redis/sdks/ts/getstarted)                     | **62.5** / 57.5 |   **99** / 88.5 |
-| [Cards and code](https://upstash-context7.docs7.io/docs/overview)                                  | **65.5** / 64.5 |     **96** / 93 |
-| [Custom React component](https://upstash-context7.docs7.io/docs/docs7/components/react-components) |   **92** / 75.5 | **95.5** / 90.5 |
-| [Tabbed content](https://upstash-context7.docs7.io/docs/docs7/components/tabs)                     |     **88** / 67 | **92.5** / 91.5 |
-| [Collapsible content](https://upstash-context7.docs7.io/docs/docs7/components/accordions)          |   **90** / 74.5 |   **96** / 95.5 |
-| [Nested file tree](https://upstash-context7.docs7.io/docs/docs7/components/tree)                   |   **91.5** / 58 |   **96** / 91.5 |
-| [Generated diagrams](https://upstash-context7.docs7.io/docs/docs7/components/mermaid)              | **88.5** / 59.5 |     **93** / 91 |
-
-</div>
-
-### DebugBear
-
-Median performance scores out of 100, tested from US East.
-
-**Mobile**
-
-| Page content                                                                                       |                                                                                                                                                                                                                                                                                      Score / 100 · Docs7 / Mintlify |
-| -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| [Screenshot reference](https://upstash-docs.docs7.io/docs/redis/howto/metrics-and-charts)          |   **77** <sup>[1](https://www.debugbear.com/test/website-speed/zRuOKMAd/overview) [2](https://www.debugbear.com/test/website-speed/Yzo2MgN9/overview)</sup> / 72 <sup>[1](https://www.debugbear.com/test/website-speed/ynjOhSqD/overview) [2](https://www.debugbear.com/test/website-speed/DgkPgJ5Y/overview)</sup> |
-| [Video and component catalog](https://upstash-docs.docs7.io/docs/workflow/getstarted)              |                                                                                                                                           **72** <sup>[1](https://www.debugbear.com/test/website-speed/dESPedJL/overview)</sup> / 63 <sup>[1](https://www.debugbear.com/test/website-speed/HYv0g0f5/overview)</sup> |
-| [Tabbed setup guide](https://upstash-context7.docs7.io/docs/howto/claiming-libraries)              |                                                                                                                                           **76** <sup>[1](https://www.debugbear.com/test/website-speed/NNwHZwVe/overview)</sup> / 72 <sup>[1](https://www.debugbear.com/test/website-speed/LypwhBu1/overview)</sup> |
-| [Step-by-step instructions](https://upstash-context7.docs7.io/docs/docs7/components/steps)         |                                                                                                                                           **77** <sup>[1](https://www.debugbear.com/test/website-speed/TYadCHcB/overview)</sup> / 74 <sup>[1](https://www.debugbear.com/test/website-speed/vlFkoSh7/overview)</sup> |
-| [Long API reference](https://upstash-docs.docs7.io/docs/redis/features/restapi)                    |   **73** <sup>[1](https://www.debugbear.com/test/website-speed/NP3UqFhH/overview) [2](https://www.debugbear.com/test/website-speed/eYfLApgS/overview)</sup> / 71 <sup>[1](https://www.debugbear.com/test/website-speed/bDCHIcMD/overview) [2](https://www.debugbear.com/test/website-speed/1Irvw0DA/overview)</sup> |
-| [Expandable API fields](https://upstash-docs.docs7.io/docs/redis/sdks/ts/commands/string/set)      |                                                                                                                                           **75** <sup>[1](https://www.debugbear.com/test/website-speed/aITGEd2e/overview)</sup> / 71 <sup>[1](https://www.debugbear.com/test/website-speed/2ZpkboRz/overview)</sup> |
-| [Cards and code](https://upstash-context7.docs7.io/docs/overview)                                  | **75** <sup>[1](https://www.debugbear.com/test/website-speed/lAkrN33n/overview) [2](https://www.debugbear.com/test/website-speed/JesWDUMA/overview)</sup> / 73.5 <sup>[1](https://www.debugbear.com/test/website-speed/LmPMxXB9/overview) [2](https://www.debugbear.com/test/website-speed/FdvpSNeD/overview)</sup> |
-| [Custom React component](https://upstash-context7.docs7.io/docs/docs7/components/react-components) |                                                                                                                                           **78** <sup>[1](https://www.debugbear.com/test/website-speed/aplQVDYf/overview)</sup> / 72 <sup>[1](https://www.debugbear.com/test/website-speed/5Y8DlZlO/overview)</sup> |
-| [Generated diagrams](https://upstash-context7.docs7.io/docs/docs7/components/mermaid)              |                                                                                                                                           **73** <sup>[1](https://www.debugbear.com/test/website-speed/rZSrBqBA/overview)</sup> / 71 <sup>[1](https://www.debugbear.com/test/website-speed/jPst3vXe/overview)</sup> |
-
-**Desktop**
-
-| Page content                                                                                       |                                                                                                                                                                                                                                                                                      Score / 100 · Docs7 / Mintlify |
-| -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| [Screenshot reference](https://upstash-docs.docs7.io/docs/redis/howto/metrics-and-charts)          | **82** <sup>[1](https://www.debugbear.com/test/website-speed/RyKYQ4bf/overview) [2](https://www.debugbear.com/test/website-speed/i3wi2Kti/overview)</sup> / 70.5 <sup>[1](https://www.debugbear.com/test/website-speed/5zy0bMBm/overview) [2](https://www.debugbear.com/test/website-speed/s1EjZEQx/overview)</sup> |
-| [Video and component catalog](https://upstash-docs.docs7.io/docs/workflow/getstarted)              |                                                                                                                                           **73** <sup>[1](https://www.debugbear.com/test/website-speed/3smk3sjy/overview)</sup> / 60 <sup>[1](https://www.debugbear.com/test/website-speed/knAdDrao/overview)</sup> |
-| [Tabbed setup guide](https://upstash-context7.docs7.io/docs/howto/claiming-libraries)              |                                                                                                                                           **86** <sup>[1](https://www.debugbear.com/test/website-speed/7flcULDC/overview)</sup> / 71 <sup>[1](https://www.debugbear.com/test/website-speed/imO3diFp/overview)</sup> |
-| [Step-by-step instructions](https://upstash-context7.docs7.io/docs/docs7/components/steps)         |                                                                                                                                           **89** <sup>[1](https://www.debugbear.com/test/website-speed/7uxA1TkI/overview)</sup> / 63 <sup>[1](https://www.debugbear.com/test/website-speed/n1G6ry3p/overview)</sup> |
-| [Long API reference](https://upstash-docs.docs7.io/docs/redis/features/restapi)                    | **74** <sup>[1](https://www.debugbear.com/test/website-speed/7ny36dOX/overview) [2](https://www.debugbear.com/test/website-speed/D6JMM1Wv/overview)</sup> / 64.5 <sup>[1](https://www.debugbear.com/test/website-speed/l0RFTueV/overview) [2](https://www.debugbear.com/test/website-speed/ug0UHvRu/overview)</sup> |
-| [Expandable API fields](https://upstash-docs.docs7.io/docs/redis/sdks/ts/commands/string/set)      |                                                                                                                                           **78** <sup>[1](https://www.debugbear.com/test/website-speed/BSuEDAG9/overview)</sup> / 67 <sup>[1](https://www.debugbear.com/test/website-speed/Nmvne2py/overview)</sup> |
-| [Cards and code](https://upstash-context7.docs7.io/docs/overview)                                  |                                                                                                                                           **82** <sup>[1](https://www.debugbear.com/test/website-speed/5xOEzp1W/overview)</sup> / 79 <sup>[1](https://www.debugbear.com/test/website-speed/xDDLzNYW/overview)</sup> |
-| [Custom React component](https://upstash-context7.docs7.io/docs/docs7/components/react-components) |                                                                                                                                           **84** <sup>[1](https://www.debugbear.com/test/website-speed/ATUVY42d/overview)</sup> / 78 <sup>[1](https://www.debugbear.com/test/website-speed/D6XEVSj9/overview)</sup> |
-| [Generated diagrams](https://upstash-context7.docs7.io/docs/docs7/components/mermaid)              |                                                                                                                                           **69** <sup>[1](https://www.debugbear.com/test/website-speed/GZEYcO74/overview)</sup> / 66 <sup>[1](https://www.debugbear.com/test/website-speed/6ZHb9Xnf/overview)</sup> |
-
-### Pingdom
-
-Median load time in milliseconds. Lower is better.
-
-**San Francisco**
-
-| Page content                                                                                       |                                                                                                                                                                                                                                                                                                           Milliseconds · Docs7 / Mintlify |
-| -------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| [Screenshot reference](https://upstash-docs.docs7.io/docs/redis/howto/metrics-and-charts)          |                                                                                                 **762.5** <sup>[1](https://tools.pingdom.com/#682b963869400000) [2](https://tools.pingdom.com/#682be45502000000)</sup> / 852 <sup>[1](https://tools.pingdom.com/#682b96526e800000) [2](https://tools.pingdom.com/#682be46fd7800000)</sup> |
-| [Video and component catalog](https://upstash-docs.docs7.io/docs/workflow/getstarted)              |                                                                                                   690 <sup>[1](https://tools.pingdom.com/#682b961469800000) [2](https://tools.pingdom.com/#682be51f70800000)</sup> / **652** <sup>[1](https://tools.pingdom.com/#682b95df9cc00000) [2](https://tools.pingdom.com/#682be55796000000)</sup> |
-| [Tabbed setup guide](https://upstash-context7.docs7.io/docs/howto/claiming-libraries)              |                                                                                                                                                                                                     **715** <sup>[1](https://tools.pingdom.com/#682b97b4b1000000)</sup> / 835 <sup>[1](https://tools.pingdom.com/#682b979d16400000)</sup> |
-| [Step-by-step instructions](https://upstash-context7.docs7.io/docs/docs7/components/steps)         |                                                                                                                                                                                                     **538** <sup>[1](https://tools.pingdom.com/#682ba73a99c00000)</sup> / 616 <sup>[1](https://tools.pingdom.com/#682ba79055400000)</sup> |
-| [Release notes](https://upstash-context7.docs7.io/docs/docs7/components/updates)                   |                                                                                                                                                                                                     **542** <sup>[1](https://tools.pingdom.com/#682baa56c6000000)</sup> / 612 <sup>[1](https://tools.pingdom.com/#682baa6d86c00000)</sup> |
-| [Long CLI guide](https://upstash-context7.docs7.io/docs/clients/cli)                               |                                                                                                                                                                                                     **234** <sup>[1](https://tools.pingdom.com/#682baaa948c00000)</sup> / 688 <sup>[1](https://tools.pingdom.com/#682baa989ac00000)</sup> |
-| [Long API reference](https://upstash-docs.docs7.io/docs/redis/features/restapi)                    |                                                                                                 **406** <sup>[1](https://tools.pingdom.com/#682b96a95f800000) [2](https://tools.pingdom.com/#682be6a8fc000000)</sup> / 583.5 <sup>[1](https://tools.pingdom.com/#682b967ec6000000) [2](https://tools.pingdom.com/#682be6d357c00000)</sup> |
-| [Expandable API fields](https://upstash-docs.docs7.io/docs/redis/sdks/ts/commands/string/set)      |                                                                                                                                                                                                     **471** <sup>[1](https://tools.pingdom.com/#682b98820bc00000)</sup> / 627 <sup>[1](https://tools.pingdom.com/#682b98a16d000000)</sup> |
-| [Scheduling guide](https://upstash-docs.docs7.io/docs/qstash/features/schedules)                   |                                                                                                                                                                                                     **368** <sup>[1](https://tools.pingdom.com/#682ba83349c00000)</sup> / 698 <sup>[1](https://tools.pingdom.com/#682baac7a3800000)</sup> |
-| [Retry guide and formulas](https://upstash-docs.docs7.io/docs/qstash/features/retry)               |                                                                                                                                                                                                     **432** <sup>[1](https://tools.pingdom.com/#682bac292b000000)</sup> / 505 <sup>[1](https://tools.pingdom.com/#682baaed02800000)</sup> |
-| [SDK setup guide](https://upstash-docs.docs7.io/docs/redis/sdks/ts/getstarted)                     |                                                                                                                                                                                                     **267** <sup>[1](https://tools.pingdom.com/#682bac4c3e800000)</sup> / 608 <sup>[1](https://tools.pingdom.com/#682bac72d8c00000)</sup> |
-| [Cards and code](https://upstash-context7.docs7.io/docs/overview)                                  | **408** <sup>[1](https://tools.pingdom.com/#682b956dc4800000) [2](https://tools.pingdom.com/#682c01c3b0800000) [3](https://tools.pingdom.com/#682c022608000000)</sup> / 764 <sup>[1](https://tools.pingdom.com/#682b95916fc00000) [2](https://tools.pingdom.com/#682c01e5b2c00000) [3](https://tools.pingdom.com/#682c025763800000)</sup> |
-| [Custom React component](https://upstash-context7.docs7.io/docs/docs7/components/react-components) |                                                                                                                                                                                                     **623** <sup>[1](https://tools.pingdom.com/#682b9765b3c00000)</sup> / 754 <sup>[1](https://tools.pingdom.com/#682b978507000000)</sup> |
-| [Tabbed content](https://upstash-context7.docs7.io/docs/docs7/components/tabs)                     |                                                                                                                                                                                                     707 <sup>[1](https://tools.pingdom.com/#682ba7e895000000)</sup> / **566** <sup>[1](https://tools.pingdom.com/#682ba7b7a3400000)</sup> |
-| [Collapsible content](https://upstash-context7.docs7.io/docs/docs7/components/accordions)          |                                                                                                                                                                                                     **450** <sup>[1](https://tools.pingdom.com/#682ba81f77000000)</sup> / 591 <sup>[1](https://tools.pingdom.com/#682ba84a09c00000)</sup> |
-| [Nested file tree](https://upstash-context7.docs7.io/docs/docs7/components/tree)                   |                                                                                                                                                                                                     471 <sup>[1](https://tools.pingdom.com/#682ba99edd400000)</sup> / **467** <sup>[1](https://tools.pingdom.com/#682ba8803f800000)</sup> |
-| [Generated diagrams](https://upstash-context7.docs7.io/docs/docs7/components/mermaid)              |                                                                                                                                                                                                     **574** <sup>[1](https://tools.pingdom.com/#682b97f56f800000)</sup> / 664 <sup>[1](https://tools.pingdom.com/#682b981bce400000)</sup> |
-
-**Frankfurt**
-
-| Page content                                                                                       |                                                                                                       Milliseconds · Docs7 / Mintlify |
-| -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------: |
-| [Screenshot reference](https://upstash-docs.docs7.io/docs/redis/howto/metrics-and-charts)          | **339** <sup>[1](https://tools.pingdom.com/#682be0b5a6400000)</sup> / 681 <sup>[1](https://tools.pingdom.com/#682be0deab400000)</sup> |
-| [Video and component catalog](https://upstash-docs.docs7.io/docs/workflow/getstarted)              | 768 <sup>[1](https://tools.pingdom.com/#682be12c41800000)</sup> / **611** <sup>[1](https://tools.pingdom.com/#682be14948800000)</sup> |
-| [Long API reference](https://upstash-docs.docs7.io/docs/redis/features/restapi)                    | **548** <sup>[1](https://tools.pingdom.com/#682be16212000000)</sup> / 569 <sup>[1](https://tools.pingdom.com/#682be38f10000000)</sup> |
-| [Expandable API fields](https://upstash-docs.docs7.io/docs/redis/sdks/ts/commands/string/set)      | 612 <sup>[1](https://tools.pingdom.com/#682c037286400000)</sup> / **563** <sup>[1](https://tools.pingdom.com/#682c03a372800000)</sup> |
-| [Cards and code](https://upstash-context7.docs7.io/docs/overview)                                  | **206** <sup>[1](https://tools.pingdom.com/#682c0cd61b000000)</sup> / 639 <sup>[1](https://tools.pingdom.com/#682c0d006bc00000)</sup> |
-| [Custom React component](https://upstash-context7.docs7.io/docs/docs7/components/react-components) | **337** <sup>[1](https://tools.pingdom.com/#682c02cdcfc00000)</sup> / 491 <sup>[1](https://tools.pingdom.com/#682c0316d1400000)</sup> |
-| [Generated diagrams](https://upstash-context7.docs7.io/docs/docs7/components/mermaid)              | **197** <sup>[1](https://tools.pingdom.com/#682c02eeb8c00000)</sup> / 521 <sup>[1](https://tools.pingdom.com/#682c0343d4000000)</sup> |
-
-**Tokyo**
-
-| Page content                                                                              |                                                                                                         Milliseconds · Docs7 / Mintlify |
-| ----------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------: |
-| [Screenshot reference](https://upstash-docs.docs7.io/docs/redis/howto/metrics-and-charts) | **1710** <sup>[1](https://tools.pingdom.com/#682be4144f400000)</sup> / 2330 <sup>[1](https://tools.pingdom.com/#682be42e4d400000)</sup> |
-| [Video and component catalog](https://upstash-docs.docs7.io/docs/workflow/getstarted)     |  **922** <sup>[1](https://tools.pingdom.com/#682be4b08f000000)</sup> / 1360 <sup>[1](https://tools.pingdom.com/#682be4f8d0800000)</sup> |
-| [Long API reference](https://upstash-docs.docs7.io/docs/redis/features/restapi)           | **1110** <sup>[1](https://tools.pingdom.com/#682be60dbf400000)</sup> / 2110 <sup>[1](https://tools.pingdom.com/#682be64722c00000)</sup> |
+To host your documentation on Docs7, start at [context7.com/docs7](https://context7.com/docs7).
