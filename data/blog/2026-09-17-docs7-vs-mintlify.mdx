@@ -3,22 +3,24 @@ title: "Docs7 vs. Mintlify: a speed benchmark"
 slug: docs7-vs-mintlify
 authors: [abdullahenes]
 tags: [docs7, context7, performance]
-description: "We tested 17 matching Upstash and Context7 documentation pages on Docs7 and Mintlify. Compare repeated Google scores, DebugBear results, and the full test data."
+description: "We tested 17 matching Upstash and Context7 documentation pages on Docs7 and Mintlify. Docs7 won 33 of 34 Google comparisons. See the scores, the method, and the full test data."
 updated: "2026-09-18"
 draft: false
 ---
 
-Documentation should get you to an answer quickly. As we built Docs7, we wanted to check how its generated pages performed against Mintlify on real documentation, including pages with screenshots, video, and custom components. A fast text-only page would not tell us much about those cases.
+Documentation should get you to an answer quickly. While we built [Docs7](https://context7.com/docs7), we wanted to know how its pages perform against Mintlify on real documentation: pages with screenshots, video, and custom components. A fast text-only page would not tell us much.
 
-I tested **17 matching pages from the Upstash and Context7 docs** using Google PageSpeed Insights, DebugBear, and Pingdom. These services ran the tests on their infrastructure. We kept the same page paths and test settings for each host, repeated the Google tests 10 times per URL and device, and used the median rather than the best run.
+We hosted **17 pages from the Upstash and Context7 docs** on both platforms and tested them with Google PageSpeed Insights and DebugBear. Both hosts got the same page paths and the same test settings. Google tested each URL 10 times per device, and we report the median, not the best run.
 
 ## The results
 
-**Docs7 won 33 of 34 Google page-and-device comparisons, with one tie.** Its average per-page score was **80.1 vs. 58.9 on mobile** and **94.9 vs. 88.4 on desktop**. DebugBear also favored Docs7 on all 10 tested page pairs on each device.
+**Docs7 won 33 of 34 Google comparisons and tied one.** Its average score was **80.1 vs. 58.9 on mobile** and **94.9 vs. 88.4 on desktop**. DebugBear favored Docs7 on all 10 page pairs it tested, on both devices.
 
 ![Average per-page scores and page wins. Docs7 is orange; Mintlify is green.](/blog/docs7-vs-mintlify/typical-results.svg)
 
-Pingdom measured full page load time from San Francisco, Frankfurt, and Tokyo. Most pages still have only one run per URL, so those results are [in the appendix](https://github.com/upstash/upstash-web/blob/101b417e46df9239e99bd24b0da68ee107594188/benchmarks/docs7-vs-mintlify.md#pingdom-exploratory-load-time-checks). They are useful observations, but too thin to support a regional speed claim.
+The gap is widest on mobile. The expandable API fields page scored 85 vs. 46.5, and the long CLI guide scored 89.5 vs. 54. The gap is narrowest on desktop, where Mintlify tied the release notes page at 96.5 and came within one point on two others.
+
+Docs7 has slow pages too. The long API reference scored 57 on mobile. That is ahead of Mintlify's 46.5, but it is the lowest Docs7 score in the set.
 
 ## What we tested
 
@@ -27,36 +29,50 @@ We used two documentation projects, each hosted on both platforms:
 - **Upstash:** [Docs7](https://upstash-docs.docs7.io/docs/introduction) and [Mintlify](https://upstash.mintlify.dev/docs/introduction).
 - **Context7:** [Docs7](https://upstash-context7.docs7.io/docs/overview) and [Mintlify](https://context7.mintlify.dev/docs/overview).
 
-The 7 Upstash pages cover screenshots, a video and component catalog, REST and SDK references, scheduling, and retries. The 10 Context7 pages cover cards, a custom React component, a library setup guide, a CLI guide, diagrams, steps, tabs, accordions, a file tree, and release notes.
+We picked pages that stress different parts of a documentation site:
 
-We chose this set to exercise different parts of a documentation site. Images test download cost and layout stability. Long references test large pages and code blocks. Tabs, diagrams, and custom components add rendering and JavaScript work. These are deployed-site comparisons, not an isolated test of either renderer.
+- **Images and video** test download cost and layout stability.
+- **Long API, SDK, and CLI references** test large pages and code blocks.
+- **Tabs, steps, accordions, diagrams, a file tree, and a custom React component** add rendering and JavaScript work.
 
-The [full page list and results on GitHub](https://github.com/upstash/upstash-web/blob/101b417e46df9239e99bd24b0da68ee107594188/benchmarks/docs7-vs-mintlify.md) link to **both the Docs7 and Mintlify URL in every row**, so you can inspect each pair.
+The [full results on GitHub](https://github.com/upstash/upstash-web/blob/101b417e46df9239e99bd24b0da68ee107594188/benchmarks/docs7-vs-mintlify.md) list all 17 pairs, with links to both the Docs7 and Mintlify URLs in every row.
 
 ## Results by page type
 
-The charts below group the Google results by content. Each bar averages the per-page medians within that group. A score is out of 100; it is not a percentage speed improvement.
+Each bar is the average of the per-page medians in that group. Scores are out of 100. Docs7 led in every group on both devices.
 
 ![Google mobile scores by page type, using 10 runs per URL.](/blog/docs7-vs-mintlify/google-mobile.svg)
 
+On mobile, the largest gaps were on long guides (91 vs. 63.4) and diagrams (88.5 vs. 59.5). Pages with video were the slowest group for Docs7, at 64.5.
+
 ![Google desktop scores by page type, using 10 runs per URL.](/blog/docs7-vs-mintlify/google-desktop.svg)
 
-## Why Docs7 can load faster
+On desktop, both hosts scored above 90 in most groups. Images made the largest difference: 98 vs. 79.5.
 
-Docs7 compiles documentation into static HTML at build time. Cloudflare's [static-asset network](https://developers.cloudflare.com/workers/static-assets/) serves those files, so a request for a documentation page does not need to render the page on an application server. The browser receives the page content directly, with JavaScript for interactive features.
+## Why Docs7 loads faster
 
-We also prepare responsive image sizes during the build, set image dimensions to reserve space, and defer images below the opening content. These choices reduce the work needed to show the first screen. Static delivery is part of the design; the browser's image, layout, and JavaScript work still matters.
+Docs7 compiles documentation into static HTML at build time. Cloudflare's [static-asset network](https://developers.cloudflare.com/workers/static-assets/) serves those files, so no application server renders the page on request. The browser receives the content directly, with JavaScript for interactive features.
 
-The video and component catalog page shows what that means in the measurements. In Google's mobile tests, the median largest-content paint was **4.20 seconds on Docs7 vs. 12.91 seconds on Mintlify**. On desktop, Docs7 showed the largest content sooner and spent less time blocking the browser:
+The build also prepares responsive image sizes, sets image dimensions so the layout does not shift, and defers images below the first screen.
+
+The video and component catalog page shows the effect. On desktop, Docs7 showed the largest content sooner and blocked the browser for less time:
 
 ![Video-page desktop medians. Docs7 shows the largest content at 791 ms vs. 1,102 ms, with 493 ms vs. 682 ms of blocking time.](/blog/docs7-vs-mintlify/google-workflow-comparison.svg)
 
-Mintlify painted the first content slightly earlier in this desktop comparison. The overall score reflects several metrics. These results show where the gap appeared, but do not isolate how much came from each architecture choice or tell us how Mintlify works internally.
+Mintlify painted the first content slightly earlier here, 524 ms vs. 565 ms. On mobile, the median largest-content paint was **4.20 seconds on Docs7 vs. 12.91 seconds on Mintlify**. Mobile runs on this page varied a lot on both hosts: 2.9 to 16.5 seconds on Docs7 and 3.3 to 21.1 seconds on Mintlify.
 
-## Method and full data
+We do not know how Mintlify works internally, and these tests do not show how much of the gap comes from each design choice.
 
-Google ran all **680 tests on September 17, 2026**, using Lighthouse 13.4.1. DebugBear and Pingdom results include follow-up runs on September 18. For repeated tests, we use the median for both hosts, following [Google's guidance on repeated runs](https://github.com/GoogleChrome/lighthouse/blob/main/docs/variability.md#run-lighthouse-multiple-times). Each summary gives every page equal weight and keeps devices, services, and locations separate.
+## Method and limits
 
-These are initial-load lab tests. We did not play the videos or measure interaction latency. Cache state was not controlled, and paired runs were not always simultaneous. Results can vary.
+Google ran all **680 tests on September 17, 2026**, using Lighthouse 13.4.1. DebugBear results include follow-up runs on September 18. For repeated tests we use the median on both hosts, following [Google's guidance on repeated runs](https://github.com/GoogleChrome/lighthouse/blob/main/docs/variability.md#run-lighthouse-multiple-times). Every page has equal weight, and we never pool devices or services.
 
-[Read the full results on GitHub](https://github.com/upstash/upstash-web/blob/101b417e46df9239e99bd24b0da68ee107594188/benchmarks/docs7-vs-mintlify.md) for the 17 page pairs, test settings, run counts, all DebugBear and Pingdom report links, and the [680 Google measurements as CSV](/blog/docs7-vs-mintlify/google-runs.csv).
+These are lab tests of the first page load on deployed sites. We did not play the videos or measure interaction latency. We did not control cache state, and the paired runs were not always simultaneous. Your results can vary.
+
+We also ran Pingdom load-time checks from San Francisco, Frankfurt, and Tokyo. Most pages have only one run per URL, which is too thin for a regional speed claim, so those numbers are [in the appendix](https://github.com/upstash/upstash-web/blob/101b417e46df9239e99bd24b0da68ee107594188/benchmarks/docs7-vs-mintlify.md#pingdom-exploratory-load-time-checks) only.
+
+## Check the data
+
+[Read the full results on GitHub](https://github.com/upstash/upstash-web/blob/101b417e46df9239e99bd24b0da68ee107594188/benchmarks/docs7-vs-mintlify.md) for the test settings, run counts, and every DebugBear and Pingdom report link. The [680 Google measurements are available as CSV](/blog/docs7-vs-mintlify/google-runs.csv), so you can recalculate every Google number in this post.
+
+To host your documentation on Docs7, start at [context7.com/docs7](https://context7.com/docs7).
