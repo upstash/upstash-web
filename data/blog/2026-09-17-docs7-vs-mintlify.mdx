@@ -47,15 +47,15 @@ On mobile, the largest gaps were on diagrams (88.5 vs. 59.5) and long guides (91
 
 ## Why Docs7 loads faster
 
+Docs7 put the main content on the screen sooner. Google calls this the largest-content paint. Across the 17 pages, the median was 3.3 seconds vs. 9.7 seconds in Google's throttled phone test, and 0.62 seconds vs. 1.02 seconds on desktop.
+
+![Median time until the first content and the main content are on the screen, across the 17 pages, on mobile and desktop. Docs7 is orange; Mintlify is green.](/blog/docs7-vs-mintlify/google-load-times.svg)
+
 The measurements point to work in the browser. The Docs7 build prepares responsive image sizes, sets image dimensions so the layout does not shift, and defers images below the first screen. Docs7 pages also blocked the browser for less time. Across the 17 pages, the median blocking time was 199 ms vs. 389 ms on mobile and 166 ms vs. 228 ms on desktop.
 
 Docs7 also compiles documentation into static HTML at build time, and Cloudflare's [static-asset network](https://developers.cloudflare.com/workers/static-assets/) serves those files. The browser receives the content directly, with JavaScript for interactive features.
 
-The video and component catalog page shows the effect. On desktop, Docs7 showed the largest content sooner and blocked the browser for less time:
-
-![Video-page desktop medians. Docs7 shows the largest content at 791 ms vs. 1,102 ms, with 493 ms vs. 682 ms of blocking time.](/blog/docs7-vs-mintlify/google-workflow-comparison.svg)
-
-Mintlify painted the first content earlier here, 524 ms vs. 565 ms. On mobile, the median largest-content paint was 4.20 seconds on Docs7 vs. 12.91 seconds on Mintlify. Mobile runs on this page varied a lot on both hosts, from 2.9 to 16.5 seconds on Docs7 and from 3.3 to 21.1 seconds on Mintlify.
+The video and component catalog page has the lowest desktop scores on both hosts. There, Docs7 showed the main content at 791 ms vs. 1,102 ms and blocked the browser for 493 ms vs. 682 ms. Mintlify painted the first content earlier, 524 ms vs. 565 ms. On mobile, the median largest-content paint was 4.20 seconds on Docs7 vs. 12.91 seconds on Mintlify. Mobile runs on this page varied a lot on both hosts, from 2.9 to 16.5 seconds on Docs7 and from 3.3 to 21.1 seconds on Mintlify.
 
 We do not know how Mintlify works internally, and these tests do not show how much of the gap comes from each design choice.
 
