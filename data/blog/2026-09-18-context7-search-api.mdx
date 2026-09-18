@@ -1,0 +1,38 @@
+---
+title: "Introducing the Context7 Search API"
+slug: context7-search-api
+authors: [fahreddin]
+tags: [context7, api, search, dev-tools]
+description: "Search developer documentation with a question and get relevant, attributed snippets in one REST request."
+draft: true
+---
+
+When someone asks your coding assistant, "How do I revalidate a route in Next.js?", you have a question to search for. A broad web search can point your app to pages, but it still has to find the documentation within those results and pull out the part that answers the question.
+
+Context7 searches developer documentation directly. Until now, an app using its API had to find a library ID before it could query that library's docs. The [Context7 Search API](https://context7.com/docs) starts with the question instead. It searches for relevant documentation and returns snippets with their source libraries in one REST request.
+
+## Search the question
+
+Call `GET https://context7.com/api/v3/search` with the question as `query`. Set `type=json` when your app wants to work with the results:
+
+```bash
+curl -G 'https://context7.com/api/v3/search' \
+  --data-urlencode 'query=How do I revalidate a route in Next.js?' \
+  --data 'type=json'
+```
+
+The response gives you relevant code examples and explanatory documentation, along with where each excerpt came from. Your app can use an excerpt to answer the question and show its source so a developer can check the original docs. For the request above, one result points to the Next.js documentation for revalidating a path in a route handler.
+
+You can try the request without an API key. If your application uses a Context7 API key, send it from your server as a bearer token. For an agent that takes documentation as plain text, use `type=txt` or omit `type`; text is the REST API's default.
+
+## Let the question lead, then add context
+
+You do not need to choose a library before searching. This is useful when a question crosses tools, such as streaming an OpenAI response from a Next.js route, or when your app knows the task but not the right documentation source.
+
+If you already know the stack, give Search a few `library` hints. You can repeat the parameter, such as `library=Next.js&library=OpenAI`, or use a Context7 ID to point to a particular source. Search accepts up to four hints.
+
+For a question tied to a release, add `version=15.4.0` with a Next.js library hint. A version requires at least one library hint; with a single library, it selects that version strictly. You can also add `language=TypeScript` to prefer examples in the language you are using. It remains a preference, so useful prose and other examples can still appear.
+
+The [Context7 TypeScript SDK](https://context7.com/docs/sdks/ts/getting-started) also supports documentation lookup from application code through `searchLibrary()` and `getContext()`. The REST endpoint above gives you the new question-first search in one call.
+
+Start with the question, then add hints when your app knows the stack or release. That keeps documentation search close to the way developers ask for help, while giving your app sources it can show alongside the answer.
