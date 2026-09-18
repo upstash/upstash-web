@@ -6,7 +6,7 @@ import IconVector from "@/components/icon-vector";
 import IconWorkflow from "@/components/icon-workflow";
 import cx from "@/utils/cx";
 import { Product } from "@/utils/type";
-import React from "react";
+import type React from "react";
 
 export default function HomeHeroProducts({
   activeProduct,
@@ -44,22 +44,6 @@ export default function HomeHeroProducts({
       </HomeHeroProductTab>
 
       <HomeHeroProductTab
-        active={activeProduct === Product.VECTOR}
-        onClick={() => {
-          setActiveProduct(Product.VECTOR);
-        }}
-        className={cx(activeProduct === Product.VECTOR && "text-orange-600")}
-      >
-        <IconVector
-          className={cx(
-            "hidden w-5 shrink-0 lg:block md:w-6",
-            activeProduct === Product.VECTOR && "block",
-          )}
-        />
-        <span>Vector</span>
-      </HomeHeroProductTab>
-
-      <HomeHeroProductTab
         active={activeProduct === Product.QSTASH}
         onClick={() => {
           setActiveProduct(Product.QSTASH);
@@ -89,6 +73,22 @@ export default function HomeHeroProducts({
           )}
         />
         <span>Workflow</span>
+      </HomeHeroProductTab>
+
+      <HomeHeroProductTab
+        active={activeProduct === Product.VECTOR}
+        onClick={() => {
+          setActiveProduct(Product.VECTOR);
+        }}
+        className={cx(activeProduct === Product.VECTOR && "text-orange-600")}
+      >
+        <IconVector
+          className={cx(
+            "hidden w-5 shrink-0 lg:block md:w-6",
+            activeProduct === Product.VECTOR && "block",
+          )}
+        />
+        <span>Vector</span>
       </HomeHeroProductTab>
 
       <HomeHeroProductTab
