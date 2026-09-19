@@ -116,7 +116,7 @@ export function Mdx({ code }: MdxProps) {
             <img
               src={zoomedImage.src}
               alt={zoomedImage.alt}
-              className="max-h-[92vh] max-w-[96vw] rounded-lg object-contain shadow-2xl"
+              className="max-h-[92vh] max-w-[96vw] rounded-lg bg-bg object-contain shadow-2xl"
               onClick={(event) => event.stopPropagation()}
             />
           </div>,

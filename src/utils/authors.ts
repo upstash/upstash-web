@@ -362,7 +362,7 @@ export const authors: Record<
   },
   abdullahenes: {
     name: "Abdullah Enes Gules",
-    title: "Software Engineer @Upstash",
+    title: "Software Engineer @Context7",
     twitter: "abdushbag",
     website: "https://enesgules.com",
     image: "abdullahenes.png",
