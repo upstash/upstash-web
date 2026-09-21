@@ -49,7 +49,7 @@ The array closes this gap with one contract: if you know the index, you get the 
 
 The details behind each row:
 
-**Direct access.** `ARGET myarray 47` is a lookup, not a walk. It costs the same at index 47 and at index 47,000,000. For random reads and writes, this makes arrays several times faster than lists in Redis's own benchmarks, and the gap grows with the size of the list.
+**Direct access.** `ARGET myarray 47` is a lookup, not a walk. It costs the same at index 47 and at index 47,000,000. For random reads and writes, this makes arrays much faster than lists.
 
 **Sparse by design.** You can write to index 1,000,000 on an empty key and Redis allocates space for one value, not a million. The index space is split into slices of 4,096 slots, and a slice only exists once something is written into it. An untouched slice costs eight bytes. Gaps are free, so a product ID, a sequence number, or a timestamp bucket can be the index directly.
 
