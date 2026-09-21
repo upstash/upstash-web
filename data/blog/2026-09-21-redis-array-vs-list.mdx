@@ -1,0 +1,169 @@
+---
+title: "Redis Arrays on Upstash: How They Differ from Lists"
+slug: redis-array-vs-list
+authors: [enes]
+tags: [redis, array, data-structures]
+description: "Upstash Redis now supports the Array type from Redis 8.8. Here is why it was needed, how it differs from lists, the new use cases it unlocks, and when to use each one."
+updated: "2026-09-21"
+draft: false
+---
+
+Starting today, Upstash Redis supports the Array data type introduced in Redis 8.8. Array was designed and built by Salvatore Sanfilippo (antirez), the creator of Redis, and all of its commands are available on Upstash now, with support in the TypeScript and Python SDKs.
+
+The first reaction from most Redis users is "Isn't a list already an array?" It is not, and the gap between the two is the reason he decided to build it. This post covers why the array was added, how it differs from a list, what you can build with it that was hard before, and when to use which.
+
+## Why Redis needed an array
+
+Redis has had a blind spot: no data type where the numeric index is part of the data model.
+
+A list looks like an array from the outside. You push items, you read them back in order, and `LINDEX` even lets you ask for item 47. But under the hood a list is a double-ended queue. It is built for adding and removing at the head or the tail. Those operations are O(1). Everything else is a walk. Ask for item 47 and Redis walks 47 steps from the nearest end. Ask for item 50,000 in a list of 100,000 and it walks 50,000 steps, every time.
+
+A list also has no idea of a gap. Every position from 0 to the end holds a value. There is no way to say "slot 47 is intentionally empty." And deleting an item renumbers everything after it.
+
+That is fine when insertion order is the meaning. It breaks down when the number itself is the meaning:
+
+- Line 4,821 of a file is line 4,821, not "the 4,821st item I pushed."
+- Port 47 on a switch is port 47, even if ports 1 to 46 are empty.
+- Step 3 of a workflow is step 3, and the fact that steps 1 and 2 were skipped tells you something.
+- Minute 47 of the hour is a fixed bucket, not a position in a queue.
+
+Each of these can be forced into an existing type, and each workaround costs something:
+
+- **List:** O(N) lookup and no gaps.
+- **Hash with numeric fields:** O(1) lookup, but no range query. "Show me ports 24 to 48" means pulling the whole hash to your app.
+- **Sorted set with the index as score:** range queries work, but the number is metadata, not an address. It cannot tell "never written" from "written then cleared," and it carries a skiplist and a hash table for data that only needs an index.
+
+The array closes this gap with one contract: if you know the index, you get the value, and everything in between costs nothing.
+
+## How an array differs from a list
+
+| | List | Array |
+|---|---|---|
+| What the index means | Position in insertion order | An address in your domain |
+| Read by index | O(N) walk from nearest end | Constant-time lookup |
+| Gaps | Impossible, always dense | Free, sparse by design |
+| Delete in the middle | Shifts everything after it | Leaves the slot empty, nothing moves |
+| Bounded window | `RPUSH` + `LTRIM`, two commands | `ARRING`, one atomic command |
+| Search and aggregate | Fetch the range, do it in your app | `ARGREP` and `AROP` run on the server |
+| Memory per element | Most compact | Slightly more |
+
+The details behind each row:
+
+**Direct access.** `ARGET myarray 47` is a lookup, not a walk. It costs the same at index 47 and at index 47,000,000. In Redis's benchmarks, random reads and writes on a 100K-element array run about five times faster than on a list.
+
+**Sparse by design.** You can write to index 1,000,000 on an empty key and Redis allocates space for one value, not a million. The index space is split into slices of 4,096 slots, and a slice only exists once something is written into it. An untouched slice costs eight bytes. Gaps are free, so a product ID, a sequence number, or a timestamp bucket can be the index directly.
+
+**Stable positions.** Deleting index 5 leaves index 5 empty. Nothing shifts. In a list, removing an item renumbers everything after it, which destroys the meaning you were relying on.
+
+**A real ring buffer.** The classic idiom for "keep the last 200 events" is `RPUSH` followed by `LTRIM`. It works, but it is two commands, and between them the list is briefly too long. `ARRING` does the append and the wrap in one atomic command, at roughly twice the throughput of the list idiom.
+
+**Compute on the server.** `AROP` sums, takes the min or max, counts, or applies bitwise ops over an index range. `ARGREP` searches values with exact match, substring, glob, or regex. Both skip empty regions entirely, so the cost tracks the number of stored elements, not the size of the index space.
+
+## New use cases the array unlocks
+
+This is the part that matters. Each of these was possible before, but only with a scan, a secondary index, or client-side filtering. With an array, each one is a single command.
+
+### 1. Documents addressed by line number
+
+Load a file into an array, one line per index. A code review tool, a log viewer, or a diff engine can then jump to line 4,821 directly and fetch lines 40 to 55 in one call.
+
+```
+ARSET doc:readme 0 "# Project"
+ARSET doc:readme 1 ""
+ARSET doc:readme 2 "## Install"
+
+ARGETRANGE doc:readme 0 2
+```
+
+This is also a natural store for AI agent context. An agent can pull a specific section of a Markdown knowledge base by line range instead of retrieving the whole document, and use `ARGREP` to find the lines that mention a term.
+
+### 2. Sparse slots where empty means something
+
+Think ports on a switch, seats in a venue, or parking bays. Most slots are empty, and the empty ones carry information.
+
+```
+ARSET switch:tor-01 47 "10GbE trunk VLAN 200"
+ARSET switch:tor-01 48 "10GbE trunk VLAN 200"
+ARSET switch:tor-01 96 "1GbE access VLAN 100"
+
+ARGETRANGE switch:tor-01 45 48     # nils for the dark ports
+ARSCAN switch:tor-01 24 48         # only the active ports
+ARCOUNT switch:tor-01              # 3, in O(1)
+```
+
+Empty slots cost nothing to store and nothing to skip. A hash cannot answer "which ports between 24 and 48 are active" without fetching everything.
+
+### 3. Numbered workflow steps with gaps
+
+Step 0 is "received", step 3 is "under review", step 5 is "approved". Steps 1, 2, and 4 never fired. The gap is the signal that this case was handled differently. With a list you would need sentinel values and application logic to interpret them. With an array, `ARSCAN` over the step range shows exactly which steps ran.
+
+### 4. Keep only the last N events
+
+You have many machines, users, or sensors. For each one you want to keep only the most recent events, say the last 200. Older events should drop off on their own so memory never grows.
+
+With a list, this takes two commands per event: push the new one, then trim the list back to 200. Between those two commands the list is briefly too long, and fetching a specific event by number means walking the list.
+
+With an array, it is one command:
+
+```
+ARRING machine:42:events 200 "cpu 14 online"
+ARLASTITEMS machine:42:events 50
+```
+
+Think of a circle with 200 seats. Each new event takes the next seat. When all seats are full, the next event overwrites the oldest one. The size never changes, so the memory cost per machine is fixed and predictable.
+
+You still get direct access. `ARLASTITEMS` returns the newest 50, and `ARGET machine:42:events 47` returns event 47 without walking.
+
+### 5. Server-side search across sparse logs
+
+Store log entries at their sequence number, but only the ones that passed a severity filter. Then find every error without pulling the range to your application.
+
+```
+ARSET log 0 "ok:200"
+ARSET log 2 "err:timeout"
+ARSET log 3 "ok:204"
+ARSET log 5 "err:404"
+
+ARGREP log - + GLOB "err:*" WITHVALUES
+```
+
+`ARGREP` supports exact match, substring, glob, and regex, with `AND` and `OR` to combine predicates. Only matching entries cross the wire, and there is no secondary index to keep in sync.
+
+### 6. Time-bucketed metrics with server-side aggregation
+
+Index by minute, hour, or day bucket. Then ask for the total, the peak, or the number of active buckets in a window.
+
+```
+ARSET metrics:device-01 0 142
+ARSET metrics:device-01 1 98
+ARSET metrics:device-01 5 201
+
+AROP metrics:device-01 0 8300 SUM    # 441
+AROP metrics:device-01 0 8300 MAX    # 201
+AROP metrics:device-01 0 8300 USED   # 3
+```
+
+No running counter in a second key, no consistency problem between the two.
+
+### 7. Stack frames, offsets, and anything else with a natural address
+
+Profilers index frames by depth. Import jobs index rows by line number. Version histories index revisions by number. If your data already has a number attached to each item, the array lets that number be the key without any translation layer.
+
+## When to use which
+
+Ask one question: does the index carry meaning in your domain?
+
+- **Use a list** when insertion order is the meaning. Queues, feeds, job lists, and anything you push and pop from the ends.
+- **Use an array** when position is the meaning. Numbered lines, slots, steps, ports, buckets, and any sequence where slot 47 is slot 47.
+- **Use `ARRING` instead of `RPUSH` + `LTRIM`** when you need both a recency view and access by position, or a fixed memory budget enforced by the data structure.
+- **Keep the list** for a rolling "last N" window if you never look up by position. It is simpler and slightly more compact.
+- **Use a hash** when fields have names, not numbers.
+- **Use a sorted set** when the number is a score you rank by, not an address you look up.
+
+The short version: if you find yourself explaining what index 47 means, you want an array. If the index is an internal detail your app never reasons about, the existing types are still the right tools.
+
+## Try it on Upstash
+
+Array commands are available on Upstash Redis today, with support in the TypeScript and Python SDKs. Start with the [Array commands overview](https://upstash.com/docs/redis/commands/array/overview) in our docs.
+
+For more depth, see Redis's [deep dive into the array type](https://redis.io/blog/diving-deep-into-rediss-new-array-data-type/) and the [design write-up](https://antirez.com/news/164) from its author.
