@@ -1,0 +1,127 @@
+---
+title: "Context7 Search: Safe, Token-Efficient Search for Code"
+slug: context7-search
+authors: [fahreddin, enes]
+tags: [context7, api, search, dev-tools]
+description: "One REST endpoint to search the entire Context7 documentation database. Send a question and get back verified, attributed, token-efficient snippets."
+draft: false
+---
+
+We're opening up the Context7 database.
+
+Context7 indexes documentation from thousands of libraries, frameworks, and APIs. Until today, the only way to use it was a two-step API built for looking up one library at a time. Now there's a single search endpoint. You send a question, and we take care of the rest.
+
+Think of it as **Exa for code**: a search engine built for developers and coding agents, with results you can trust.
+
+## One request
+
+It's a plain GET request, so you can try it right now by clicking this link:
+
+[context7.com/api/v3/search?query=what+is+nextjs](https://context7.com/api/v3/search?query=what+is+nextjs)
+
+From your terminal or your code, it looks just as simple:
+
+```bash
+curl -G 'https://context7.com/api/v3/search' \
+  --data-urlencode 'query=How do I stream an OpenAI response from a Next.js route handler?'
+```
+
+That's it. No library IDs, no setup, and you don't even need an API key to try it (requests without a key are for demos only and are rate-limited by IP address). You get back ready-to-use documentation, and every snippet comes with its library and source:
+
+````md
+Library: /websites/nextjs
+
+### Stream AI responses using AI SDK in route handler
+
+Source: https://nextjs.org/docs/app/api-reference/file-conventions/route
+
+Streams AI-generated content in a Route Handler using the AI SDK with OpenAI.
+
+```typescript
+import { openai } from '@ai-sdk/openai'
+import { StreamingTextResponse, streamText } from 'ai'
+
+export async function POST(req: Request) {
+  const { messages } = await req.json()
+  const result = await streamText({ model: openai('gpt-4-turbo'), messages })
+  return new StreamingTextResponse(result.toAIStream())
+}
+```
+````
+
+The question is about two libraries, but the query doesn't name them. Behind that one call, Context7 picks the relevant libraries, finds matching snippets across them, and reranks everything before returning a compact answer.
+
+## Context7 search vs. web search
+
+General search engines like Google, or even AI search engines, index everything. When you search for code, you get a mix of official docs, GitHub issues, Stack Overflow threads, Reddit posts, and old blog posts. Most of that is useful. But some are outdated, written for a different version, or just wrong. For a coding agent that pastes whatever it finds into its context, it's a real risk.
+
+Context7 is **safe search** for code:
+
+- **Only first-party sources.** We index documentation that product owners publish and maintain: official docs sites, product websites, and API references. There are no forum threads or random answers of unknown quality.
+- **Managed by library owners.** Library owners manage their own libraries in Context7. They decide which version is the latest and how their docs are parsed. In a way, the data is moderated by the people who build the libraries.
+- **Scanned before indexing.** Every snippet and documentation section is checked for malware and prompt injection before it enters the database. General search engines pull content from everywhere, which makes that kind of check very hard for them.
+- **Attributed.** Every result carries its library and source URL, so your app can show where an answer came from and a developer can check the original.
+
+## Built for token efficiency
+
+Agents pay for every token they read. Most search engines hand them full pages, including navigation, ads, and unrelated sections, and the model has to find the useful part.
+
+Context7 returns only the snippets that answer the question, already extracted and cleaned. Each code snippet in the JSON response even reports its token count (`codeTokens`), so you can budget context before you add it to a prompt. You get the answer in as few tokens as possible.
+
+## Hint when you know more
+
+If you know the library or language, pass it as a hint:
+
+```bash
+curl -G 'https://context7.com/api/v3/search' \
+  --data-urlencode 'query=How do I stream an OpenAI response from a route handler?' \
+  --data-urlencode 'library=Next.js' \
+  --data-urlencode 'library=OpenAI' \
+  --data 'language=TypeScript' \
+  --data 'type=json'
+```
+
+- `library`: a library name or Context7 ID. Repeat it for up to four hints.
+- `language`: prefer examples in a given language. It's a preference, not a filter.
+- `version`: ask a specific release, such as `version=15.4.0`. It requires at least one `library` hint.
+- `type`: `txt` (default) for text you can add directly to a prompt, or `json` for structured results.
+
+## From TypeScript
+
+Search is also available in the [Context7 TypeScript SDK](https://context7.com/docs/sdks/ts/getting-started). For real use, always set your Context7 API key and call it from your server. Requests without a key are rate-limited by IP address.
+
+```bash
+npm install @upstash/context7-sdk
+```
+
+```ts
+import { Context7 } from "@upstash/context7-sdk";
+
+const client = new Context7({ apiKey: process.env.CONTEXT7_API_KEY });
+
+const results = await client.search(
+  "How do I stream an OpenAI response from a route handler?",
+  {
+    libraries: ["Next.js", "OpenAI"],
+    language: "TypeScript",
+  }
+);
+
+for (const snippet of results.codeSnippets) {
+  console.log(snippet.libraryId, snippet.codeTitle);
+}
+```
+
+## Search API vs. Context7 API
+
+Use the **Search API** for a quick answer: one request, and Context7 picks the libraries and snippets for you.
+
+It's also the easier API to integrate. One call in, relevant snippets out, so it fits anywhere you need documentation on demand. For example, you can use it as a grounding API for your agents: before the agent writes code, it searches Context7 and grounds its answer in real, up-to-date docs. It also works well as a docs tool in chat apps, IDE plugins, and code review bots.
+
+Use the **Context API** when you need to go deep: choose the exact library, ask follow-up questions, and combine results from several libraries yourself. Agents doing deep research use this flow. It is also the better choice when you know exactly which library you want to search in.
+
+## Try it
+
+[Open this link](https://context7.com/api/v3/search?query=what+is+nextjs), change the query, and check the results. No key needed for a quick demo. For anything real, get an API key from [context7.com](https://context7.com) and read the [docs](https://context7.com/docs).
+
+If you're building a coding agent, an IDE plugin, or a docs assistant, this is the endpoint to use.
