@@ -3,15 +3,17 @@ title: "Context7 Search: A Grounding API for Coding Agents"
 slug: context7-search
 authors: [fahreddin, enes]
 tags: [context7, api, search, dev-tools]
-description: "One REST endpoint to search the entire Context7 documentation database. Send a question and get back verified, attributed, token-efficient snippets."
+description: "Ground your coding agent in official documentation with one REST request. Send a question and get back verified, attributed, token-efficient snippets."
 draft: false
 ---
 
 We're opening up the Context7 database.
 
+Coding agents guess. They call APIs that changed two versions ago, use options that never existed, and copy patterns from an old forum thread. The fix is grounding: before the agent writes code, it searches the real documentation and works from that. Search engines like Exa already play this role for agents on the open web. Context7 Search is the grounding API for code.
+
 Context7 indexes documentation from thousands of libraries, frameworks, and APIs. Until today, the only way to use it was a two-step API built for looking up one library at a time. Now there's a single search endpoint. You send a question, and we take care of the rest.
 
-Think of it as **Exa for code**: a search engine built for developers and coding agents, with results you can trust.
+Think of it as **Exa for code**: a search engine built for coding agents, with results from official docs only.
 
 ## One request
 
