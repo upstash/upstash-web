@@ -1,0 +1,286 @@
+---
+slug: ai-agent-sandbox-providers-compared-2026
+title: "AI Agent Sandboxes Compared: 15 Providers on Isolation, Persistence, Agent Tooling, and Cost (2026)"
+authors: [alitarik]
+tags: [box, ai, agents, sandbox]
+description: "A comparison of 15 AI agent sandboxes in 2026: Upstash Box, E2B, Daytona, Modal, Vercel Sandbox, Cloudflare, Runloop, Blaxel, Namespace, Beam, Tensorlake, Northflank, Freestyle, Fly Sprites, and Koyeb, across isolation, persistence, snapshots, egress, built-in agent tooling, deployment, SDKs, and billing, with a source for every row."
+---
+
+<Summary>
+A side-by-side comparison of 15 AI agent sandboxes in September 2026, checked against each provider's docs and pricing pages (sources at the end).
+
+- **The short answer.** For coding agents and per-user agents that wait on a model most of the time, Upstash Box is the pick: a built-in agent, git-to-PR helpers, a managed browser, cron schedules, secrets kept off the box, active-CPU billing with memory free, no platform fee. Pick something else if you need a separate kernel per tenant, a GPU, or your own cloud.
+- **Billing is the biggest hidden difference.** Most providers bill wall-clock CPU and memory, while Box, Vercel, Cloudflare, Sprites, and Tensorlake meter CPU by actual use and only Box also leaves memory free. An hour of agent work that mostly waits is about $0.017 on Box, and 2.6x to 19x that on the other providers in the worked example below.
+- **Isolation is three designs, not a ranking.** Hardware VMs with their own kernel (E2B, Vercel, Tensorlake, Sprites, Koyeb, Blaxel, Namespace, Kata on Northflank), gVisor's userspace kernel (Modal, Beam), and hardened containers (Box, Daytona by default).
+</Summary>
+
+This post compares 15 popular AI agent sandbox providers side by side, from the same angles for each: capabilities, agent-native features, deployment, developer experience, and cost. Every row has a source at the end.
+
+## At a glance
+
+| Provider | Isolation | Cold start (claimed) | Billing basis | Idle cost | Session cap | What survives a pause | Agent built in |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| **Upstash Box** | Container: own fs, process tree, network namespace | ~2.5s create to first command, ~0.4s resume (measured by us from Europe) | **Active CPU only, memory free** | $0 compute, $0.10/GB-mo storage | None (auto-pause, keep-alive, or 3-day ephemeral TTL) | Filesystem, env, git state | **Yes: Claude Code, Codex, OpenCode, Cursor, custom** |
+| E2B | Firecracker microVM | ~150ms (case study) | Wall-clock vCPU + RAM | $0 paused | 1h Hobby, 24h Pro; pause resets it | Filesystem + memory + processes | No (docs for running agents inside) |
+| Daytona | Container by default; VM and Windows classes | under 90ms | Wall-clock vCPU + RAM | Disk only when stopped | None documented | Filesystem (containers), memory (VMs) | No (guides) |
+| Modal | gVisor (VM option) | Sub-second | Wall-clock, max(request, actual) | No pause state | 24h | Nothing; snapshots instead | No (examples) |
+| Vercel Sandbox | Firecracker microVM | "Milliseconds" | Active CPU + provisioned memory | Snapshot storage $0.08/GB-mo | 45m Hobby, 24h Pro per session; unbounded across sessions | Filesystem, auto-snapshot on stop and auto-resume on the next call | CLIs preinstalled, no run API |
+| Cloudflare Sandbox | Container in its own VM | 1–3s | Active CPU + provisioned memory, while awake | $0 compute; R2 for backups | None; sleeps after 10m idle | Nothing by default; directory backups to R2 | No |
+| Runloop | VM on custom hypervisor | "A few seconds" (docs) | Wall-clock CPU + RAM | Storage only when suspended (Pro plan) | 1h default, configurable | Disk only | Partly: Broker runs and manages an agent process |
+| Blaxel | microVM | ~25ms resume from standby | Memory-based (GB-s) while active | $0 compute, $0.20/GB-mo snapshot | None; 7–30d retention on low tiers | Filesystem + memory + processes | No |
+| Namespace | microVM on own bare metal | 0.8s to agent connected | Wall-clock units (1 vCPU + 2 GB per minute) | Stopped: no units | 3h / 5h / 24h by plan | Filesystem (devbox volumes) | No |
+| Beam | gVisor + runc | 1–3s | Wall-clock CPU + RAM | No pause; billed until TTL | None | Nothing in place; fs and memory snapshots | No |
+| Tensorlake | Firecracker / Cloud Hypervisor | "A few hundred ms" | Active CPU (allocated-vCPU fallback) + RAM + disk | Snapshot storage $0.07/GB-mo | 2h Free, 24h Credits, unlimited Pro | Filesystem + memory + processes | No |
+| Northflank | Kata + Cloud Hypervisor, or gVisor | "Under 1 second" | Wall-clock vCPU + RAM | Volume storage only | None | Filesystem (volumes) | No |
+| Freestyle | KVM Linux VM | ~65ms provision | Wall-clock vCPU + RAM | Storage only | None | Filesystem on stop; memory and processes via snapshot | No |
+| Fly Sprites | Firecracker microVM | 1–2s create; 100–500ms warm wake | Actual CPU and RAM use, while active | $0 compute | None | Filesystem (100 GB); memory while warm | CLIs preinstalled, no run API |
+| Koyeb | microVM on bare metal | under 250ms | Wall-clock per instance size | $0 when scaled to zero | 24h auto-delete max | Nothing (ephemeral) | CLIs preinstalled, no run API |
+
+What each column is telling you:
+
+**Isolation** is three designs, not a ranking: a VM with its own kernel, gVisor's userspace kernel, or a hardened container. Most providers run a VM and a box is a container, so this is where Box is the weaker choice if you need a kernel per tenant.
+
+**Cold start** is what vendors lead with and what matters least, since booting is a fraction of the time a task spends cloning, installing, and calling a model. The figures are not like for like: they mix create-to-first-command, resume-from-standby, and time-until-an-agent-connects, and each is the vendor's own claim except the Box row, which we measured with five runs from Europe.
+
+**Billing basis** is the one that surprises people at scale. Wall-clock charges for every second the sandbox is up, including the minutes it waits on a model; active CPU charges only for what the code burns, and only Box also leaves memory free.
+
+**Idle cost** is what you pay between sessions, usually storage for the saved disk. Providers with no pause state keep charging the full rate until the sandbox is deleted.
+
+**Session cap** is easy to miss until it bites: an hour is fine for a code interpreter, wrong for a long task, and the longer cap is often a paid plan away. Seven of the fifteen, Box included, have no cap at all.
+
+**What survives a pause** decides how you structure a session: filesystem only means restarting processes, memory as well means a loaded model is still there, nothing means starting from a snapshot each time. Box, E2B, Vercel, Blaxel, and Tensorlake are the ones built around pausing and coming back.
+
+**Agent built in** separates platforms that run an agent behind an API you call with a prompt from those that only let you install one. "CLIs preinstalled" is the middle ground; Box and Runloop are the only two on the yes side.
+
+## Capabilities
+
+| Provider | Snapshot / fork | Custom images | Egress control | Built-in tooling |
+| --- | --- | --- | --- | --- |
+| **Upstash Box** | Disk snapshots incl. agent config; fan out to N boxes | Node, Python, Go, Ruby, Rust images; custom Docker images planned | Open default; deny-all; domain + CIDR allow, CIDR deny; changeable on a running box; private ranges always blocked | **Coding agent, headless Chromium with AI actions and recordings, git with `createPR`, cron schedules, authenticated public URLs, PTY sessions, SSH, per-run cost and logs, skills and MCP servers for the agent, remote MCP server, CLI** |
+| E2B | Memory + fs snapshots; `fork()` up to 100 | Any Docker image or Dockerfile | Open default; allow/deny by domain, CIDR, IP (allow wins); runtime updates; header injection (beta) | Code interpreter (Python, JS, R, Java, Bash), Desktop/VNC, cloud browsers, MCP Gateway, git integration, public URLs, webhooks |
+| Daytona | Disk snapshots; VM snapshots with memory; experimental VM fork | Any image, Dockerfile, declarative builder | Restricted on Tiers 1–2, open on 3–4; CIDR (max 10) and domain (max 100) allowlists, block-all | Git, LSP, PTY, MCP server, Computer Use desktop, VNC, SSH, signed preview URLs, audit logs, Windows VMs |
+| Modal | Fs snapshots; memory snapshots alpha | Any registry image or Dockerfile | Open default; block-all, CIDR allowlist, domain allowlist (beta, 443 only) | Tunnels, secrets, OIDC identity; Claude Code and OpenCode as examples |
+| Vercel Sandbox | Persistent by default; disk snapshots; fork from snapshot; 30-day default expiry, configurable to indefinite | Any OCI image via Vercel registry, Dockerfile; managed images | Open default; deny-all; domain + CIDR allow, CIDR deny; live updates; credential brokering | Preinstalled opencode, Claude Code, Codex, pi; preview URLs; per-agent Linux users; persistent Drives (beta); Harbor evals |
+| Cloudflare Sandbox | Directory backups to R2 only | Dockerfile or Docker Hub image, 20 GB disk max | Open default; disable internet; host allow/deny globs and CIDRs; HTTP/HTTPS only; secrets from the Worker | Persistent code interpreter, PTY, preview URLs and tunnels, bucket mounts |
+| Runloop | Disk snapshots, fan-out | Blueprints (Dockerfile on Runloop base), Docker-in-Docker | Unrestricted default; hostname allowlist; deny-all; no CIDR rules | Playwright browser with live view, Ubuntu desktop, tunnels with bearer auth, MCP Hub, Agent Gateways, Broker, PTY, SSH, benchmarks and evals |
+| Blaxel | Memory + disk + process snapshots; fork | Dockerfile that embeds Blaxel's binary; 20+ templates | Domain allow/deny with wildcards; no CIDR; MITM secrets proxy | MCP server per sandbox, codegen tools, preview URLs with custom domains, PTY, browser and Jupyter templates, cron via Batch Jobs |
+| Namespace | Marketing mentions snapshot and clone; no SDK methods | Dockerfile (Linux); managed macOS images | Opt-in policies: BLOCK mode with domain allow rules, secret-header injection (needs deep packet inspection) | SSH, exec, ingress URLs with custom domains, Docker, nested KVM, macOS and Windows machines |
+| Beam | Fs + memory snapshots; fork | Any registry image, Dockerfile | Open default; block-all; CIDR allowlist (max 10); no domain rules | Authenticated port URLs, fs and process APIs, Volumes, S3 mounts |
+| Tensorlake | Fs or memory snapshots; clone from running or suspended | Dockerfile, SDK image builder, any OCI image | Open default; allow/deny by domain, IP, CIDR; air-gap mode | Public URLs, PTY, VNC image, warm pools, durable workflows |
+| Northflank | Snapshot API exists; semantics not documented | Any OCI image | Open default; IP/CIDR/FQDN policies on BYOC only | Public DNS per port, exec API, cron jobs, databases and queues on the same platform |
+| Freestyle | Memory + disk snapshots; fork a running VM without pausing | Base snapshots up to 64 vCPU / 128 GiB; custom snapshots; no Dockerfile base | **Deny-by-default**; allow rules only (CIDR, VM, VPC, port); no domain rules | `style.dev` domains with TLS, forward auth, SSH, PTY, VPCs, WireGuard |
+| Fly Sprites | Disk-only checkpoints, restore in place; no fork | Fixed Ubuntu image | Unrestricted default; optional DNS domain allowlist; private IPs blocked | Preinstalled Claude, Gemini, Codex, Cursor CLIs; private-by-default URL; Connectors credential gateway; hosted remote MCP |
+| Koyeb | None | Any Docker image, private registries | Block-all or IP/CIDR allowlist; open otherwise | Default image with Codex, Gemini, OpenCode CLIs; `expose_port` URLs, TCP proxy |
+
+**Snapshot / fork** makes parallel work cheap: set up once, snapshot, then start ten sandboxes from that state. Whether it carries memory as well as disk decides whether those ten start warm or cold, and Box snapshots are disk-only but keep the agent configuration.
+
+**Custom images** move setup to build time. Most providers take any Docker image or Dockerfile; Box offers per-runtime images plus snapshots today, with custom images planned.
+
+**Egress control** is the column to read closely if the sandbox runs code you did not write. Almost every provider starts open, Freestyle is the only one that starts closed, and Box, E2B, Vercel, and Beam let you change the policy on a running sandbox.
+
+**Built-in tooling** is the gap between a machine and a runtime. Most providers stop at a code interpreter; Box is at the other end, which the next section breaks down.
+
+GPUs inside the sandbox: Modal, Daytona, Beam, Northflank, and Koyeb. Box, E2B, Blaxel, Namespace, and Sprites are CPU-only.
+
+## Agent-native features
+
+A sandbox that only runs commands leaves you to build the agent loop, the git flow, the browser, the scheduler, and the secret handling yourself. These columns are what turn a sandbox into an agent runtime.
+
+| Provider | Run a coding agent with one call | Typed output | Scheduled runs in the sandbox | Secrets kept off the sandbox | Managed browser | Git-to-PR helper | MCP: control / tools |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| **Upstash Box** | **Yes**: `box.agent.run()` with Claude Code, Codex, OpenCode, Cursor, or a custom harness | **Yes** (Zod or Pydantic schema) | **Yes**: `box.schedule.exec` and `box.schedule.agent` on a cron | **Yes**: Attach Headers, injected on the host | **Yes**: headless Chromium, AI actions, recordings, live view, CDP | **Yes**: `git.clone`, `commit`, `push`, `createPR` | Control: yes. Tools: yes |
+| E2B | No (docs for Claude Code, Codex, OpenCode inside) | No | No | Yes: header injection via egress proxy (beta) | Yes: cloud browsers, Desktop/VNC | Git integration, no PR helper | Control: no. Tools: yes (MCP Gateway) |
+| Daytona | No (guides) | No | No | Yes: placeholder substitution in an outbound proxy, with response scrubbing | Computer Use / VNC only | Git ops, no PR helper | Control: yes. Tools: no |
+| Modal | No (examples) | No | No (cron is for Functions) | No | No | No | No |
+| Vercel Sandbox | CLIs preinstalled, no run API | No | No | Yes: credential brokering in the firewall | No | git and gh in image | No |
+| Cloudflare Sandbox | No | No | No (Cron Triggers are separate) | Yes: handlers in the Worker | No | No | No |
+| Runloop | Partly: Broker starts the agent process, orders turns, auto-resumes; you wire the event streams | No | No | Yes: Agent Gateways and MCP Hub | Yes: Playwright with live view | No | Control: yes (CLI MCP server). Tools: yes (MCP Hub) |
+| Blaxel | No | No | Cron via Batch Jobs | Yes: MITM proxy injection | Via templates | No | Control: yes. Tools: no |
+| Namespace | No | No | No | Yes: INJECT rules from Vault (needs deep packet inspection) | No | No | No |
+| Beam | No | No | Platform `@schedule`, not per sandbox | No | No | No | No |
+| Tensorlake | No | No | No | No | VNC image | No | No |
+| Northflank | No | No | Platform cron jobs | No | No | No | No |
+| Freestyle | No | No | No | No | No | No | No |
+| Fly Sprites | CLIs preinstalled, no run API | No | No | Yes: Connectors gateway | No | No | Control: yes (hosted remote MCP). Tools: no |
+| Koyeb | CLIs preinstalled, no run API | No | No | No | No | No | No |
+
+**Run a coding agent with one call** has three levels: you bring the agent, the CLIs are preinstalled and you parse stdout, or the platform runs the process for you. Only Box returns it as a method call with a typed result.
+
+**Typed output** lets one agent's answer feed the next step without a parser in between. Box takes a Zod or Pydantic schema in the SDK and returns a validated object; elsewhere it comes from the agent or framework you run inside.
+
+**Scheduled runs in the sandbox** suit agents that work on a cadence rather than on a request. Only Box has cron inside the sandbox; Blaxel, Beam, and Northflank schedule at the platform level.
+
+**Secrets kept off the sandbox** matters because the obvious approach is the unsafe one: an environment variable is readable by the code the model just wrote. A host-side proxy that injects the credential keeps it out of reach, which Box does with Attach Headers.
+
+**Managed browser** decides whether web work is a feature or a Chromium install you maintain. Box, E2B, and Runloop ship one; Daytona and Tensorlake give you a VNC desktop instead.
+
+**Git-to-PR helper** is the difference between a finished task and a diff sitting in a container. Several providers wrap git operations, but only Box opens the pull request.
+
+**MCP** is two questions in one heading: driving the sandbox from an MCP client, and giving the agent inside MCP tools. Box and Runloop are the only two that do both.
+
+The practical test for this table is how much code a full task takes. Clone, branch, run the agent, commit, push, open the pull request, with the run's cost attached:
+
+```ts
+import { Agent, Box } from "@upstash/box"
+
+const box = await Box.create({
+  runtime: "node",
+  agent: { harness: Agent.ClaudeCode, model: "anthropic/claude-fable-5" },
+  git: { token: process.env.GITHUB_TOKEN },
+  attachHeaders: { "api.stripe.com": { Authorization: `Bearer ${process.env.STRIPE_KEY}` } },
+})
+
+await box.git.clone({ repo: "https://github.com/your-org/your-repo", branch: "main" })
+await box.cd("your-repo")
+await box.git.exec({ args: ["checkout", "-b", "fix/null-token"] })
+
+const run = await box.agent.run({ prompt: "Fix the null-token bug in src/auth.ts and add tests" })
+
+await box.git.commit({ message: "fix: handle null token in auth" })
+await box.git.push({ branch: "fix/null-token" })
+const pr = await box.git.createPR({ title: "Fix null token bug", base: "main" })
+
+console.log(pr.url, run.cost.totalUsd)
+```
+
+On providers without the git and agent helpers, the same flow is your own code around `exec`: shell out to git, stream the agent's output, parse it, then call the GitHub API yourself.
+
+## Deployment
+
+| Provider | Hosting | Regions | Compliance |
+| --- | --- | --- | --- |
+| **Upstash Box** | Managed; SDKs and CLI open source | AWS `us-east-1`; regional requirements on Enterprise | SOC 2 for Upstash Redis on Pro and Enterprise ([trust center](https://trust.upstash.com)); HIPAA covers Redis; both in progress for Box |
+| E2B | Managed on GCP; BYOC on AWS and GCP (Enterprise); Apache-2.0 open core | `us-west1`; EU and APAC on Pro+ | SOC 2 Type II; HIPAA BAA (Enterprise); GDPR DPA |
+| Daytona | Managed shared and dedicated regions; BYOC; open-source repo unmaintained since June 2026 | `us`, `eu` | SOC 2 Type II, HIPAA, GDPR, ISO 27001 |
+| Modal | Managed only | 19 narrow regions plus US/EU/AP; 1.15x–1.75x price multipliers | SOC 2 Type II; HIPAA BAA (Enterprise) |
+| Vercel Sandbox | Managed only; SDK Apache-2.0 | 19–20 regions, `iad1` default | SOC 2 Type II; Vercel-wide ISO 27001, HIPAA BAA, GDPR, PCI |
+| Cloudflare Sandbox | Managed only; SDK Apache-2.0 | "Region: Earth", no selection | Cloudflare-wide SOC 2 Type II, ISO 27001, PCI, HIPAA BAA |
+| Runloop | Managed; Enterprise deploy to VPC | Not documented | SOC 2 Type II, HIPAA, GDPR |
+| Blaxel | Managed; bring-your-own-metal and private VPC interconnect, control plane stays managed | Oregon, Virginia, London, Frankfurt | SOC 2, HIPAA ($250/mo add-on), ISO 27001 |
+| Namespace | Managed on own hardware | Not enumerated; residency on Enterprise | SOC 2 Type 2 |
+| Beam | Managed; BYOC; self-host via Beta9 (AGPL-3.0) | US default; "30+" claimed | SOC 2 Type II; HIPAA BAA (Enterprise); GDPR DPA |
+| Tensorlake | Managed; BYOC on AWS, GCP, Azure, CoreWeave, Nebius, bare metal | Not documented | SOC 2 Type 2; HIPAA BAA on Pro and above |
+| Northflank | Managed; self-serve BYOC on AWS, GCP, Azure, OCI, CoreWeave, Nebius; bring your own Kubernetes | US West/Central/East, EU West, Asia East; 600+ via BYOC | SOC 2 Type 2; HIPAA BAA (Enterprise) |
+| Freestyle | Managed only | Not documented | Not documented |
+| Fly Sprites | Managed only | Nearest Fly region, not selectable | Fly-wide SOC 2 Type 2; HIPAA BAA |
+| Koyeb | Managed only | FRA, WAS, SIN, TYO, PAR, `aws-us-east-1`, SFO | ISO 27001, SOC 2 (Enterprise) |
+
+**Hosting** rules providers out rather than ranking them. For your own cloud account the list is Northflank, E2B (Enterprise), Tensorlake, Beam, Daytona, and Blaxel; Box is managed-only.
+
+**Regions** is the same kind of hard filter. If data has to stay in the EU it is E2B (Pro), Daytona, Modal, Vercel, Blaxel, and Koyeb; Box is `us-east-1` only.
+
+**Compliance** is where you read the scope rather than the badge. Most of these cells describe the parent company's certification, not an audit scoped to the sandbox.
+
+## Developer experience
+
+| Provider | SDKs | Documented framework integrations | Concurrency |
+| --- | --- | --- | --- |
+| **Upstash Box** | TypeScript, Python (sync and async), CLI, remote MCP server | Vercel AI SDK, LangChain Deep Agents, Eve, TanStack, CrewAI and Pydantic AI (custom harness), Herdr, OpenClaw, Hermes | 10 Free; 1,000 Pay-as-you-go (soft); custom Enterprise |
+| E2B | Python, JS/TS, CLI | OpenAI Agents SDK, Vercel AI SDK, LangChain Deep Agents, CrewAI, Mastra, Letta | 20 Hobby, 100 Pro, up to 1,100 |
+| Daytona | TypeScript, Python, Ruby, Go, Java, CLI | OpenAI Agents SDK, LangChain, LangGraph, Vercel AI SDK, Mastra, Google ADK, MCP | vCPU pools 10 → 500 by tier; 4 vCPU / 8 GB per sandbox |
+| Modal | Python; JS/TS and Go (beta) | OpenAI Agents SDK, LangGraph, Claude Managed Agents | 100 Starter, 5,000 Team |
+| Vercel Sandbox | TypeScript, Python, CLI, REST | Vercel AI SDK, LangChain, OpenAI and Anthropic SDKs, TanStack AI, Claude Agent SDK | 10 Hobby, 10,000 Pro |
+| Cloudflare Sandbox | TypeScript only | OpenAI Agents SDK, Codex, Workers AI | 1,500 concurrent vCPU per account |
+| Runloop | Python, TypeScript, CLI | OpenAI Agents SDK and Agents API, OpenCode, Browserbase, Claude Code via Broker | 3 on trial; paid caps not documented |
+| Blaxel | TypeScript, Python, Go, CLI | LangChain/LangGraph, OpenAI Agents SDK, Vercel AI SDK, CrewAI, Mastra, Pydantic AI | 10 Tier 0 up to 100k+ |
+| Namespace | Go, TypeScript, gRPC, CLI | Claude Managed Agents, Cursor Cloud Agents, Devin | 32 / 64 / 160 vCPU pools |
+| Beam | Python, TypeScript (rc), CLI | LangChain example | 30 CPU Developer; 1,000 Team |
+| Tensorlake | Python, TypeScript, CLI | Claude Managed Agents, Harbor, OpenCode | 1 Free, 100 Credits, 1,000 Pro |
+| Northflank | REST, CLI, JavaScript client | Not documented | Unlimited on pay-as-you-go |
+| Freestyle | TypeScript, CLI | Not documented | 10 Free, 40 Hobby, 400 Pro |
+| Fly Sprites | Python, JS/TS, Go, Elixir | OpenAI Agents SDK, Google ADK, TanStack AI, OpenEnv, Claude Managed Agents, Cursor Cloud Agents | 20 to 2,000 active by plan; cold unlimited |
+| Koyeb | Python, JS/TS | Claude Agent SDK, Codex tutorials | 100 CPU Pro; 1,000 Scale |
+
+**SDKs** decide whether the sandbox fits your stack without a REST wrapper of your own. TypeScript and Python are near-universal; Cloudflare is TypeScript-only.
+
+**Documented framework integrations** show how much glue the provider has already written and tested. The Vercel AI SDK, LangChain, and the OpenAI Agents SDK are the common ones; Northflank and Freestyle document none.
+
+**Concurrency** is a plan limit rather than a technical one. Free tiers sit around 10 to 30 and paid ceilings vary by three orders of magnitude.
+
+## Cost
+
+List prices, pay-as-you-go. Many providers have a plan with no monthly fee but gate features behind a paid one: E2B Pro ($150/mo) for 24h sessions, Runloop Pro ($250/mo) for suspend and resume, Namespace Team ($100/mo) for 5h instances, Tensorlake Pro ($250 per cycle, which includes $250 of usage) for the lower rates. Cloudflare needs the $5/mo Workers Paid plan. Freestyle's docs and pricing page disagree on whether persistent VMs need Hobby ($50/mo).
+
+| Provider | Billing basis | CPU | Memory | Free tier | Idle cost |
+| --- | --- | --- | --- | --- | --- |
+| **Upstash Box** | **Active core-hours only** | **$0.10 / $0.20 / $0.40 per active CPU-hour** for small (2 vCPU), medium (4), large (8) | **Free** | 10 boxes, 5 CPU-h/mo, $1 LLM budget, no card | Paused: $0 compute, $0.10/GB-mo storage. Keep-alive flat $8 / $16 / $32 per month |
+| E2B | Wall-clock per second | $0.0504/vCPU-h | $0.0162/GiB-h | $100 one-time credit, 20 concurrent, 1h sessions | Paused: $0 |
+| Daytona | Wall-clock per second | $0.0504/vCPU-h | $0.0162/GiB-h | $200 credit | Stopped: disk only |
+| Modal | Wall-clock, max(request, actual) | ~$0.142 per physical core-h (2 vCPU); 3x its Function rate | ~$0.024/GiB-h | $30/mo credit | No pause state |
+| Vercel Sandbox | Active CPU + provisioned memory | $0.128/active vCPU-h | $0.0212/GB-h | 5 active CPU-h, 420 GB-h, 10 concurrent | Stopped: snapshot storage only |
+| Cloudflare Sandbox | Active CPU + provisioned memory and disk, while awake | $0.072/vCPU-h | $0.009/GiB-h | None on Free plan | Sleeping: $0 compute |
+| Runloop | Wall-clock per second | $0.108/CPU-h | $0.0252/GB-h | $50 trial credit | Suspended: storage only (Pro-only) |
+| Blaxel | Memory-based per second while active | No vCPU line item | $0.0414/GB-h | Up to $200 credit, 10 concurrent | Standby: $0 compute |
+| Namespace | Wall-clock per minute in 1 vCPU + 2 GB units | ~$0.09/unit-h overage, ~$0.06 prepaid | Included in unit | 30-day trial | Stopped: no units |
+| Beam | Wall-clock per second | $0.135 per physical core-h (2 vCPU) | $0.023/GiB-h | $30/mo credit (per Beam's blog) | No pause |
+| Tensorlake | Active CPU (allocated fallback); RAM and disk wall-clock | $0.07/core-h Credits; $0.042 Pro | $0.015/GB-h Credits; $0.009 Pro | 1 sandbox, 1 vCPU / 1 GB, 2h sessions | Suspended: snapshot storage only |
+| Northflank | Wall-clock per second | $0.01667/vCPU-h | $0.00833/GB-h | 2 free services | Scaled to zero: volume only |
+| Freestyle | Wall-clock per second | $0.04032/vCPU-h | $0.0129/GiB-h | 200 vCPU-h, 400 GiB-h per month; persistent VMs listed on Free in the docs, paid-only on the pricing page | Paused: storage only |
+| Fly Sprites | Actual CPU and RAM use, while active | $0.07/CPU-h | $0.04375/GB-h | $30 trial credit | Warm or cold: $0 compute |
+| Koyeb | Wall-clock per instance size | large (4 vCPU / 4 GB) $0.0576/h | Bundled | None for sandboxes | Scaled to zero: $0 |
+
+**CPU** and **memory** are the per-core-hour and per-GB-hour rates, and **billing basis** and **idle cost** repeat from At a glance because they decide whether those rates apply all hour or only to the busy seconds. **Free tier** is usually a one-off credit, not a monthly allowance.
+
+The rate card is the wrong thing to compare. Agent work comes in bursts: the CPU is busy for a few seconds per tool call and idle while the model thinks. What matters is what you pay for the idle time.
+
+**One hour on a 2 vCPU / 4 GB sandbox with about 10 core-minutes of real CPU use**, usage charges only, relative to Box's ~$0.017:
+
+| Provider | Formula | Cost | vs Box |
+| --- | --- | --- | --- |
+| **Upstash Box** (small) | 0.167 core-h × $0.10 | **~$0.017** | 1x |
+| Tensorlake | 0.167 × $0.07 + 4 × $0.015 (Credits); Pro 0.167 × $0.042 + 4 × $0.009; disk extra | ~$0.072 (Credits), ~$0.043 (Pro) | 4.3x, 2.6x |
+| Koyeb (large; the 2 vCPU / 4 GB eco-large is $0.0288/h but not verified for sandboxes) | 1h × $0.0576 | ~$0.058 | 3.5x |
+| Northflank | 2 × $0.01667 + 4 × $0.00833 | ~$0.067 | 4.0x |
+| Cloudflare (standard-3, 2 vCPU / 8 GiB / 16 GB; custom shapes need 3 GiB per vCPU) | 0.167 × $0.072 + 8 × $0.009 + 16 × $0.000252 | ~$0.088 | 5.3x |
+| Vercel Sandbox | 0.167 × $0.128 + 4 × $0.0212 | ~$0.106 | 6.4x |
+| Freestyle | 2 × $0.04032 + 4 × $0.0129 | ~$0.132 | 7.9x |
+| E2B, Daytona | 2 × $0.0504 + 4 × $0.0162 | ~$0.166 | 9.9x |
+| Blaxel | 4 × $0.0414 if kept active; less with auto-standby | up to ~$0.166 | up to 9.9x |
+| Namespace | 2 units × 60 min × $0.0015 | ~$0.18 | 10.8x |
+| Fly Sprites | 0.167 × $0.07 + 4 × $0.04375 if all 4 GB are in use | ~$0.187 | 11.2x |
+| Beam | 1 physical core × $0.135 + 4 × $0.023 | ~$0.227 | 13.6x |
+| Modal | 1 physical core × $0.142 + 4 × $0.024 | ~$0.238 | 14.3x |
+| Runloop | 2 × $0.108 + 4 × $0.0252 | ~$0.317 | 19.0x |
+
+Examples, not quotes. Storage is excluded except where shown, as are egress and creation fees.
+
+The spread is workload-shaped, so run the formulas on your own numbers before trusting the order. The more time the agent spends waiting on a model, the wider the gap between the two billing models gets. Saturate the CPU for the full hour and it mostly closes: Box, for instance, rises to about $0.20 and lands mid-table. A second thing the table hides is what you pay for the model itself, which every provider here leaves to you except Box, which meters it and includes a small monthly budget.
+
+## How to choose
+
+Start with Upstash Box if you are building a coding agent, a per-user agent that lives for weeks, or any agent loop that waits on a model most of the time. It is the only row with every agent-native column filled in, it bills active CPU with memory free, and the free tier needs no card. Move to another provider when one of these applies:
+
+1. **A separate kernel per untrusted tenant.** E2B, Vercel, Tensorlake, Freestyle, or Sprites. Modal and Beam use gVisor, a userspace kernel on a shared host kernel. Box and Daytona containers do not give you a separate kernel.
+2. **A GPU in the sandbox.** Modal, Daytona, Beam, Northflank, or Koyeb.
+3. **Your own cloud.** Northflank, E2B (Enterprise), Tensorlake, Beam, Daytona, or Blaxel (bring-your-own-metal).
+4. **State that must survive in RAM.** E2B, Blaxel, Tensorlake, or Freestyle.
+5. **The sandbox has to live inside your platform.** Vercel Sandbox, Cloudflare, or Modal.
+6. **Evals and compliance built in for coding agents.** Runloop.
+7. **The cheapest wall-clock compute with your own agent.** Northflank or Koyeb.
+
+## Try Box
+
+```ts
+import { Agent, Box } from "@upstash/box"
+
+const box = await Box.create({
+  runtime: "node",
+  agent: { harness: Agent.ClaudeCode, model: "anthropic/claude-fable-5" },
+})
+
+const run = await box.agent.run({
+  prompt: "Write a /health endpoint in server.js and start it on port 3000",
+})
+
+console.log(run.result, run.cost.totalUsd)
+```
+
+The free tier is 10 concurrent boxes, 5 CPU-hours a month, and a $1 model budget, with no card and no platform fee. The [quickstart](https://upstash.com/docs/box/overall/quickstart) takes a few minutes.
+
+## Sources
+
+Checked in September 2026. Compliance cells repeat what the provider states.
+
+[Upstash Box](https://upstash.com/docs/box/overall/how-it-works) ([pricing](https://upstash.com/pricing/box)) · [E2B](https://e2b.dev/pricing) ([persistence](https://docs.e2b.dev/sandbox/persistence), [egress](https://docs.e2b.dev/network/internet-access)) · [Daytona](https://www.daytona.io/pricing) ([isolation](https://www.daytona.io/docs/en/isolation/), [persistence](https://www.daytona.io/docs/en/persistence/)) · [Modal](https://modal.com/pricing) ([sandboxes](https://modal.com/docs/guide/sandboxes), [networking](https://modal.com/docs/guide/sandbox-networking)) · [Vercel Sandbox](https://vercel.com/docs/sandbox/pricing) ([concepts](https://vercel.com/docs/sandbox/concepts), [firewall](https://vercel.com/docs/sandbox/concepts/firewall)) · [Cloudflare](https://developers.cloudflare.com/containers/pricing/) ([limits](https://developers.cloudflare.com/containers/platform-details/limits/), [outbound](https://developers.cloudflare.com/sandbox/guides/outbound-traffic/)) · [Runloop](https://runloop.ai/pricing) ([lifecycle](https://docs.runloop.ai/docs/devboxes/lifecycle), [Broker](https://docs.runloop.ai/docs/axons/broker), [CLI](https://docs.runloop.ai/docs/tools/rl-cli)) · [Blaxel](https://blaxel.ai/pricing) ([overview](https://docs.blaxel.ai/Sandboxes/Overview), [bring-your-own-metal](https://blaxel.ai/blog/best-sandbox-platforms-regulated-industries), [Baseten](https://www.baseten.co/blog/blaxel-is-joining-baseten-to-build-the-future-of-agentic-cloud/)) · [Namespace](https://namespace.so/pricing) ([egress policy](https://namespace.so/docs/security/egress-policy)) · [Beam](https://www.beam.cloud/pricing) ([security](https://docs.beam.cloud/v2/security/security)) · [Tensorlake](https://www.tensorlake.ai/pricing) ([lifecycle](https://docs.tensorlake.ai/sandboxes/lifecycle)) · [Northflank](https://northflank.com/pricing) ([sandboxes](https://northflank.com/docs/v1/application/sandboxes/sandboxes-on-northflank)) · [Freestyle](https://www.freestyle.sh/pricing) ([limits](https://www.freestyle.sh/docs/vms/pricing-and-limits)) · [Fly Sprites](https://fly.io/learn/ai-sandbox-pricing/) ([lifecycle](https://docs.sprites.dev/concepts/lifecycle/)) · [Koyeb](https://www.koyeb.com/pricing) ([sandboxes](https://www.koyeb.com/docs/sandboxes), [instances](https://www.koyeb.com/docs/reference/instances))
+
+If a cell is out of date, [open an issue](https://github.com/upstash/box/issues) or tell us on [X](https://x.com/upstash). Providers ship changes every week, and we would rather fix a row than argue about it.
