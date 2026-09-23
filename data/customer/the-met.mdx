@@ -1,0 +1,33 @@
+---
+company_name: The Met
+company_url: https://www.metmuseum.org/
+user_name: The Metropolitan Museum of Art
+user_title: Online collection
+highlight: "A dedicated Upstash Redis cache supports normalized query embeddings for The Met's online collection search."
+cover_image: cover-the-met.jpg
+order: 9
+---
+
+# How The Met uses Upstash Redis to cache embeddings for semantic search
+
+_A dedicated Upstash Redis cache supports normalized query embeddings for The Met's online collection search._
+
+### About The Met
+
+The Metropolitan Museum of Art presents more than 5,000 years of art from around the world. Nearly 500,000 works are available through its online collection, helping people explore art across time and cultures.
+
+### More control over caching
+
+The Met's primary website runs on Next.js and Vercel. At the scale of its online collection, caching is an important part of the web architecture. The team was already using Vercel's data cache, but wanted greater visibility and more direct control over workloads with different caching requirements.
+
+### Caching query embeddings with Upstash Redis
+
+When developing semantic search, The Met's web team identified a specific need: caching normalized query embeddings so they could be reused without placing this workload in the site's broader application cache.
+
+The Met uses Upstash Redis as a dedicated cache behind the feature. This keeps the embeddings workload separate from other caching responsibilities while fitting into the site's existing Next.js and Vercel architecture.
+
+### Supporting the live search experience
+
+The [semantic search experience](https://www.metmuseum.org/perspectives/introducing-semantic-search-at-the-met) is now live in The Met's online collection. Upstash Redis provides a focused caching layer for the query-embedding workflow and gives the web team clearer visibility into this part of the application.
+
+_Publication note: This article describes a technical implementation and does not constitute an endorsement by The Metropolitan Museum of Art._

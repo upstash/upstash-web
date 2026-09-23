@@ -14,6 +14,7 @@ import { LogoPaulSmith } from "../customers/logo-paul-smith";
 import { LogoStreamlined } from "../customers/logo-streamlined";
 import { LogoSupabase } from "../customers/logo-supabase";
 import { LogoTFashion } from "../customers/logo-tfashion";
+import { LogoTheMet } from "../customers/logo-the-met";
 import { LogoZapier } from "../customers/logo-zapier";
 
 const blogLogos = {
@@ -33,6 +34,7 @@ const blogLogos = {
   ["paul-smith"]: LogoPaulSmith,
   clickfunnels: LogoClickfunnels,
   streamlined: LogoStreamlined,
+  ["the-met"]: LogoTheMet,
   supabase: LogoSupabase,
 } as const;
 
