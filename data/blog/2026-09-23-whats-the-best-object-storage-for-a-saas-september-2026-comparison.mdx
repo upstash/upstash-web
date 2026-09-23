@@ -1,0 +1,182 @@
+---
+authors: [josh]
+slug: whats-the-best-object-storage-for-a-saas-september-2026-comparison
+tags: [blob]
+title: What's the best object storage for a SaaS? (September 2026 Comparison)
+description: A comparison of Cloudflare R2, AWS S3, and Upstash Blob for SaaS use cases.
+---
+
+If you deploy your SaaS to a serverless platform (e.g. Vercel), Upstash Blob is a good default for storing images, videos, and any other file. It includes a global CDN, private buckets with signed URLs and it supports the S3 API. 
+
+If your users download terabytes a month, Cloudflare R2 is cheaper because egress is free. S3 is a good fit if your team already runs on AWS.
+
+To compare the options, let's see some examples!
+
+## What makes storage expensive?
+
+Usually, most storage cost comes from egress (the bytes your users download) and from the number of requests.
+
+For example, let's say your app stores 50 GB and your users download 500 GB a month. S3 charges [$0.023/GB for storage and $0.09/GB for egress](https://aws.amazon.com/s3/pricing/), with the first 100 GB of egress free each month:
+
+```text
+Storage: 50 GB × $0.023          = $1.15
+Egress:  (500 − 100) GB × $0.09  = $36.00
+```
+
+Egress costs 31 times more than storage here!
+
+Or on Cloudflare, hosting 100,000 objects of about 100 KB, read 10 million times a day would[ costs $104.40 a month on R2](https://developers.cloudflare.com/r2/pricing/), all of it from read requests. The 10 GB of storage is included within the free tier.
+
+Storage and egress prices also vary a lot between providers. [R2 charges $0.015/GB for storage and nothing for egress](https://developers.cloudflare.com/r2/pricing/). S3 charges less than twice that for storage and $0.09/GB to download. So a low storage rate doesn't tell you much until you know how often your files get downloaded.
+
+![Cloudflare R2 pricing as of September 2026](https://cdn.bydefault.so/image-U3Z4XJvtr40g4i4nKE6m_.png)
+
+## What should you compare besides price?
+
+To get a good estimate on how much storage will cost, we need to look at Egress, request pricing and how much the free tier includes. 
+
+Also CDN, regions, S3 compatibility, access control and upload tooling decide how much work you need to do yourself:
+
+1. **Egress rate.** It ranges from $0/GB on R2 to $0.09/GB on S3, usually the most expensive for a project with many downloads.
+2. **Request pricing.** Writes are a lot more expensive than reads. [Upstash Blob charges $4.50 per million uploads and lists, and $0.30 per million reads](https://upstash.com/pricing/blob). An app that saves many small files pays mostly for writes.
+3. **Free tier.** The [Upstash Blob free plan](https://upstash.com/pricing/blob) gives 1 GB of storage and 10 GB of bandwidth a month. 
+4. **CDN.** Files load fast worldwide only if a CDN caches them. Upstash Blob serves public files through a fast, global CDN at no extra fee. On S3 you add CloudFront yourself. [Vercel Blob doesn't cache files over 512 MB](https://vercel.com/docs/vercel-blob/usage-and-pricing), so those files cost origin transfer on every download.
+5. **Regions.** S3 prices and latency depend on the region you pick. An [Upstash Blob bucket has no region](https://upstash.com/blob) (because it's globally distributed by default): one global bucket, one rate sheet, and no cross-region transfer fees.
+6. **S3 compatibility.** If a provider supports the S3 API, you can switch later with the AWS SDK, the AWS CLI or any S3 tool. S3 and R2 support it natively, and Upstash Blob hands out temporary S3 credentials for the same bucket.
+7. **Access control.** Tenant files need signed URLs: short-lived links that work for one file and one action. Private buckets should have no public URL at all.
+8. **Uploads.** On serverless functions, you can only send very limited request body sizes, so it's better to upload files from the browser with a presigned URL. Some SDKs sign these uploads and split big files for you. With others you write that code yourself. [This post on file uploads in React](https://upstash.com/blog/file-uploads-in-a-react-app-what-to-use-and-pricing-breakdown-2026) covers that flow in detail.
+
+## How should a multi-tenant SaaS organize its files?
+
+A multi-tenant SaaS works best with one bucket and one path prefix per tenant, like `tenants/acme/`. Your server picks the path from the logged-in session, and users read files through short-lived signed URLs.
+
+AWS describes the same [shared-bucket, prefix-per-tenant pattern for S3](https://aws.amazon.com/blogs/storage/design-patterns-for-multi-tenant-access-control-on-amazon-s3/), with a policy that limits each tenant to its own prefix. This layout works on any provider, because a prefix is just part of the file's name.
+
+A separate bucket per tenant keeps each customer fully isolated and gives you a separate cost line for each one. But you'll run into limits. [S3 gives each account 2,000 free buckets and then charges $0.02 per extra bucket a month](https://aws.amazon.com/s3/pricing/). [Vercel Blob allows 100 stores on Hobby and 1,000 on Enterprise](https://vercel.com/docs/vercel-blob/usage-and-pricing). You can create as many prefixes as you want.
+
+![](https://cdn.bydefault.so/drawing-x48rIxyC6RSg54MGfzcly.png)
+
+On Upstash Blob, the server builds the path, uploads a file, lists one tenant's files, and creates a signed read link:
+
+```typescript
+import { Bucket } from "@upstash/blob";
+const bucket = Bucket.fromEnv();
+
+function tenantPath(tenantId: string, fileName: string) {
+  return `tenants/${tenantId}/${fileName}`;
+}
+
+const run = crypto.randomUUID().slice(0, 8);
+const path = tenantPath("acme", `${run}/invoice-001.pdf`);
+try {
+  await bucket.put(path, "Acme invoice 001 (demo text)", { contentType: "text/plain" });
+  const page = await bucket.list({ prefix: tenantPath("acme", `${run}/`) });
+  console.log("Keys:", page.blobs.map((blob) => blob.path));
+  const { expiresAt } = await bucket.signedReadUrl(path, { expiresIn: "5m" });
+  console.log("expiresAt:", expiresAt.toISOString());
+} finally {
+  await bucket.del(path);
+}
+```
+
+If we run it on a live bucket, we get the key and the link's expiry time:
+
+```text
+Keys: [ 'tenants/acme/1b209fa0/invoice-001.pdf' ]
+expiresAt: 2026-09-23T08:39:49.107Z
+```
+
+A list call can only filter by prefix. You can't ask the bucket for "files owned by user 7" or "files from last week". That's why it's a good idea to [keep our own table of which tenant owns which path](https://upstash.com/docs/blob/bucket/reading) and only use the bucket to store the files.
+
+Also to illustrate a tenant boundary, what happens if we take a signed link for one tenant's invoice and changed the path in the URL to another tenant's file?
+
+On Upstash Blob (as we'd expect), the request is denied:
+
+```text
+Signed GET: 200; body: Acme invoice 001 (demo text)
+Swapped-path GET: 403
+Bucket: public
+Unsigned GET: 200
+```
+
+Now, the test bucket was public, so the URL without a signature still returned the file. [A private bucket has no public URL](https://upstash.com/blob), so every read needs a signed link from your server. You can choose between a public or private bucket when creating one, and tenant documents should definitely (!) go in a private one. Public buckets are good for avatars and product images, anything other people are allowed to see.
+
+![](https://cdn.bydefault.so/drawing-buXFtnNiR-pgoRhlAouzs.png)
+
+Browser uploads work the same way. [Each presigned URL covers one object, one method, one set of headers and a few minutes](https://upstash.com/docs/blob/reference/signing). Your server's upload handler picks the path, so a browser can't write into another tenant's prefix. The SDK also refuses any path with a `..` segment to block path-traversal attempts.
+
+## How do Upstash Blob, R2, S3 and Vercel Blob compare?
+
+Cloudflare R2 is the cheapest of the four, because egress is free there. Upstash Blob costs a bit more and adds a CDN, signed uploads and one global bucket. S3 costs the most once users download a lot. Vercel Blob's rates are higher than Upstash Blob's on every line.
+
+| Provider | Storage per GB | Egress per GB | Writes per 1M | Reads per 1M | Free each month |
+| --- | --- | --- | --- | --- | --- |
+| [Upstash Blob](https://upstash.com/pricing/blob) | $0.02 | $0.02 | $4.50 | $0.30 | 1 GB storage, 10 GB bandwidth (free plan only) |
+| [Cloudflare R2](https://developers.cloudflare.com/r2/pricing/) | $0.015 | $0 | $4.50 | $0.36 | 10 GB storage, 1M writes, 10M reads |
+| [AWS S3 Standard](https://aws.amazon.com/s3/pricing/) | $0.023 | $0.09 | $5.00 | $0.40 | 100 GB egress |
+| [Vercel Blob](https://vercel.com/docs/vercel-blob/usage-and-pricing) | $0.023 | $0.05 | $5.00 | $0.40 | 1 GB storage, 10 GB transfer (Hobby) |
+
+Upstash Blob counts uploads, copies and lists as writes, and downloads and HEAD requests as reads. Deletes are free.
+
+![Upstash Blob pricing as of Setember 2026](https://cdn.bydefault.so/image-zvooClxz9tNkGNOtBeWEB.png)
+
+Rates are easier to compare on a real workload, so let's see some examples.
+
+Example 1: A document SaaS stores 200 GB and serves 300 GB a month, with 1 million uploads and 10 million reads:
+
+```text
+Upstash Blob: 4.00 storage + 6.00 egress + 4.50 writes + 3.00 reads   = $17.50
+R2:           2.85 storage (190 GB billed) + 0 + 0 + 0 (free tier)    =  $2.85
+S3:           4.60 storage + 18.00 egress (200 GB billed) + 5.00 + 4.00 = $31.60
+```
+
+Example 2: A media SaaS stores 1 TB and serves 10 TB a month, with 2 million uploads and 50 million reads:
+
+```text
+Upstash Blob: 20.00 + 200.00 egress + 9.00 + 15.00             = $244.00
+R2:           14.85 + 0 egress + 4.50 (1M billed) + 14.40 (40M) =  $33.75
+S3:           23.00 + 891.00 egress (9,900 GB) + 10.00 + 20.00  = $944.00
+```
+
+R2 is the cheapest for both apps. In the document SaaS, most of the $14.65 gap comes from R2's free tier covering all the requests. In the media SaaS, $200 of the $210.25 gap is egress. S3 costs the most in both, because it charges egress on every download past the free 100 GB.
+
+![AWS S3 vs. Upstash Blob vs. Cloudflare R2](https://cdn.bydefault.so/image-WmxgqJ5AXkGeSlFdqnM8V.png)
+
+Upstash Blob supports the S3 API, so you can use the AWS SDK with any Upstash bucket. This also means you can move to and from another provider with standard S3 tools:
+
+```typescript
+import { Bucket } from "@upstash/blob";
+import { S3Client, ListObjectsV2Command } from "@aws-sdk/client-s3";
+const bucket = Bucket.fromEnv();
+const s3cfg = bucket.s3();
+const s3 = new S3Client({ endpoint: s3cfg.endpoint, region: s3cfg.region, credentials: s3cfg.credentials });
+const path = `tenants/acme/${crypto.randomUUID().slice(0, 8)}/temp.txt`;
+try {
+  await bucket.put(path, "S3 listing demo", { contentType: "text/plain" });
+  const page = await s3.send(new ListObjectsV2Command({ Bucket: s3cfg.bucket, Prefix: "tenants/", MaxKeys: 5 }));
+  console.log("Keys:", (page.Contents ?? []).map((object) => object.Key));
+  console.log("KeyCount:", page.KeyCount);
+} finally {
+  s3.destroy();
+  await bucket.del(path);
+}
+```
+
+The file we wrote with the Upstash SDK shows up when we list with the AWS SDK:
+
+```text
+Keys: [ 'tenants/acme/7afb02f9/temp.txt' ]
+KeyCount: 1
+```
+
+## Which object storage should you use?
+
+it depends on how much your users download and how much of the setup (CDN, upload signing) you want to handle yourself!
+
+- **If downloads are your biggest cost:** Cloudflare R2 is the cheapest fit. Video, large media and public datasets pay $0 egress there, and R2 cost $33.75 against $244 on Upstash Blob in the 10 TB example.
+- **You run Next.js or another serverless stack and store user uploads, tenant documents or AI-generated files:** Upstash Blob is a good fit. It serves public files from a global CDN and keeps private files behind signed reads. Its SDK signs browser uploads, and one bucket serves every region. Pay-as-you-go starts at $0.02/GB.
+- **Your team already runs on AWS:** S3 with CloudFront in front is a good fit. [IAM (AWS's permission system) policies can lock each tenant to its own prefix](https://aws.amazon.com/blogs/apn/partitioning-and-isolating-multi-tenant-saas-data-with-amazon-s3/), so tenant isolation fits the tools your team already uses.
+
+Whichever one you pick, the tenant layout from earlier works the same way (one bucket, a prefix per tenant, and short-lived signed URLs). Because all three support the S3 API, you can copy a bucket to another provider later with standard S3 tools.
+
+[This guide to file uploads in a React app](https://upstash.com/blog/file-uploads-in-a-react-app-what-to-use-and-pricing-breakdown-2026) walks through building the upload flow, from the browser straight to storage, step by step.
