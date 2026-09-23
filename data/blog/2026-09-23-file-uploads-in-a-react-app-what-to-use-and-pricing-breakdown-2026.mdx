@@ -1,0 +1,208 @@
+---
+authors: [josh]
+slug: file-uploads-in-a-react-app-what-to-use-and-pricing-breakdown-2026
+tags: [blob]
+title: "File uploads in a React app: What to use and pricing breakdown (2026)"
+description: "Best ways to upload files in React (2026): Which providers make sense, architecture decisions, pricing and more."
+---
+
+For file uploads in a React app, the best setup is a service where the browser uploads files straight to storage. Your server signs a short-lived permission, and the browser uses it to send the file directly to storage. [Upstash Blob](https://upstash.com/blob) does this with one server handler and one React hook, and costs $0.02 per GB stored and $0.02 per GB served.
+
+Where the file bytes go matters more than which library draws the drop zone. When the browser sends them straight to storage, the choice comes down to how much of the upload flow you want to build yourself and what you pay per GB.
+
+## Why can't you just send the file to your API route?
+
+If you deploy your app to a serverless platform (e.g. Vercel), your API route can only take a small request body, and a video or a large photo goes over that limit fast. A Vercel Function accepts [at most 4.5 MB in the request body](https://vercel.com/docs/functions/limitations). AWS Lambda stops at [6 MB](https://upstash.com/docs/blob/uploads/upload-handler).
+
+The simplest upload form puts the file in a `FormData`, sends it to `/api/upload`, and lets the route write it to storage. It works on your laptop with a small test image. In production, a screen recording goes over the limit, and the platform rejects the request.
+
+But even if a file is within the limits, it's quite expensive. When the file goes through your server, your function receives every byte and then sends every byte again to storage. You pay for that time, and a 2 GB video can't go through a function at all.
+
+A better way is for the browser to send the file straight to storage. Your server still decides who can upload what, but its only job is to sign a short-lived permission:
+
+![](https://cdn.bydefault.so/drawing-lm5i3Vtj-P80lRQDp58YF.png)
+
+## How do direct-to-storage uploads work?
+
+In a direct upload, your server checks the request and signs a short-lived URL, then the browser uses that URL to send the file straight to storage. When the upload finishes, your server gets a callback so it can save the file in your database.
+
+With [Upstash Blob](https://upstash.com/blob), you write one handler on the server and one hook in React. Here's a Next.js App Router setup based on the [quickstart](https://upstash.com/docs/blob/overall/quickstart). It uses one secret, `UPSTASH_BLOB_TOKEN`, which stays on the server.
+
+In the handler, you set which files the route accepts and where each file goes:
+
+```ts
+// lib/uploads.ts
+import "server-only";
+import { uniquePath, uploadHandler } from "@upstash/blob";
+
+export const uploads = uploadHandler({
+  constraints: { maxSize: "20mb", contentTypes: ["image/*", "application/pdf"] },
+  onBeforeUpload: ({ file }) => ({ path: uniquePath`uploads/${file.name}` }),
+  onUploadComplete: ({ path, url }) => console.log({ path, url }),
+});
+```
+
+`onBeforeUpload` runs before anything is signed, so this is where you check the session and block users who shouldn't upload. `onUploadComplete` runs once the file is in storage. It [can run more than once](https://upstash.com/docs/blob/uploads/upload-handler) if the browser retries, so an upsert is the safe way to write to your database.
+
+The route file mounts the handler:
+
+```ts
+// app/api/upload/route.ts
+import { uploads } from "@/lib/uploads";
+
+export const { GET, POST } = uploads;
+```
+
+The hooks take the handler's type, so the client knows what the server allows:
+
+```ts
+// lib/upload-hooks.ts
+"use client";
+
+import { uploadHooks } from "@upstash/blob/react";
+import type { uploads } from "./uploads";
+
+export const { useUpload } = uploadHooks<typeof uploads>();
+```
+
+And the component picks a file, starts the upload, and shows progress:
+
+```tsx
+// app/upload-form.tsx
+"use client";
+
+import { useUpload } from "@/lib/upload-hooks";
+
+export default function UploadForm() {
+  const { start, upload, accept } = useUpload();
+  return (
+    <>
+      <input type="file" accept={accept}
+        onChange={(e) => start({ file: e.target.files?.[0] })} />
+      {upload && <>
+        <progress aria-label="Upload progress" value={upload.percent} max={100} />
+        <p>{upload.percent}%, {upload.status}</p>
+      </>}
+      {upload?.status === "done" && (
+        upload.blob.url
+          ? <a href={upload.blob.url}>{upload.blob.url}</a>
+          : <p>Uploaded: {upload.blob.path} (private; no public URL)</p>
+      )}
+      {upload?.status === "error" && <p>{upload.error.message}</p>}
+    </>
+  );
+}
+```
+
+Large files work with the same code. Past 16 MB, the SDK [cuts the file into parts](https://upstash.com/docs/blob/uploads/large-files) and uploads four at a time. A failed part retries automatically, and if the signature expires mid-upload, the SDK gets a new one. If the user closes the tab and picks the same file again, the upload continues where it stopped. One object can be up to [5 TB](https://upstash.com/blob).
+
+A large file takes this path:
+
+![](https://cdn.bydefault.so/drawing-kgUBBiJ05vYmpwIX7piFn.png)
+
+## What does the React side of an upload need?
+
+A React upload UI needs a progress bar, a drop zone, file type and size checks, and a way to recover when a large upload fails halfway. Some upload services include these, while with raw object storage like S3 or R2 you build all four yourself.
+
+| Piece | What it needs | Upstash Blob | Raw S3 or R2 |
+| --- | --- | --- | --- |
+| Progress | Bytes sent, a status, pause and cancel | `useUpload` returns percent, status, and pause, resume, cancel, retry | You track upload progress yourself |
+| Drag and drop | A drop target that hands over a `File` | Pair the hook with react-dropzone | Same, react-dropzone |
+| Type and size checks | Checks in the browser and again on the server | Declared once on the server, the picker follows | You write both sides |
+| Large files | Parts, retries, resume | Automatic past 16 MB | You build multipart or use a library like Uppy |
+
+For drag and drop, [react-dropzone](https://www.npmjs.com/package/react-dropzone) works with any backend. It gives you the dropped file, and you pass it to the same `start` function from the upload hook:
+
+```tsx
+// app/drop-zone.tsx
+"use client";
+
+import { useDropzone } from "react-dropzone";
+import { useUpload } from "@/lib/upload-hooks";
+
+export default function DropZone() {
+  const { start, upload } = useUpload();
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop: ([file]) => start({ file }),
+  });
+  return (
+    <div {...getRootProps()}>
+      <input {...getInputProps()} />
+      <p>{isDragActive ? "Drop it" : "Drop a file here"}</p>
+      {upload && <progress value={upload.percent} max={100} />}
+    </div>
+  );
+}
+```
+
+File checks have to run in two places. The browser check gives the user a fast error, but anyone can skip it by editing the page. With Upstash Blob, the route's size and type limits [are sent to the client as JSON](https://upstash.com/docs/blob/uploads/constraints), so the file picker only offers allowed types and rejects a file that's too big before any request goes out. The server checks again before it signs anything. The browser also sends the file's first bytes, and the server refuses the file when those bytes clearly don't match the declared type.
+
+Even with those checks, every uploaded file is still untrusted. The byte check catches honest mistakes, but a client can send a clean sample and [then upload something else](https://upstash.com/docs/blob/uploads/constraints#byte-sniffing). Nothing in the flow scans for malware.
+
+## Which file upload service should you use?
+
+For most React and Next.js apps, a managed upload service with a React SDK fits best. Upstash Blob gives you typed hooks, automatic multipart and a global CDN. Raw storage like Cloudflare R2 costs less when you serve a lot of data, but you build the upload flow yourself.
+
+- **Managed upload services** give you storage plus the upload flow: a server handler, React components or hooks, and a CDN. Upstash Blob, UploadThing and Vercel Blob are here.
+- **Raw object storage** gives you buckets and presigned URLs. Cloudflare R2, AWS S3 and Bunny Storage are here, and the React side is yours to build and maintain.
+- **Media platforms** store files and also resize, crop and convert them. Cloudinary is the main one here.
+
+Here's a small overview:
+
+![](https://cdn.bydefault.so/drawing-4erpONTEHLmvVULIxKq5x.png)
+
+| Service | Type | What you get |
+| --- | --- | --- |
+| [Upstash Blob](https://upstash.com/blob) | Managed | S3-compatible storage, typed React hooks, automatic multipart, files up to 5 TB, a CDN for public buckets |
+| [UploadThing](https://uploadthing.com/pricing) | Managed | Storage, a server file router, and ready-made upload button and dropzone components |
+| [Vercel Blob](https://vercel.com/docs/vercel-blob/usage-and-pricing) | Managed | Storage with client uploads, files up to 5 TB, caching only for files up to 512 MB |
+| [Cloudflare R2](https://developers.cloudflare.com/r2/pricing/) | Raw storage | S3 API storage with free egress |
+| AWS S3 | Raw storage | S3 storage, with CloudFront added separately as the CDN |
+| Bunny Storage | Raw storage | Storage with Bunny's CDN billed on top |
+| Cloudinary | Media platform | Storage plus image and video transformations, paid in credits |
+
+- **A React or Next.js app that needs uploads working today:** Upstash Blob. You write the handler and the hook from the section above, and progress, retries and large files just work.
+- **An app that serves terabytes a month and has time to build the UI:** Cloudflare R2. It has [no egress fees at all](https://developers.cloudflare.com/r2/pricing/), and at high traffic nothing else here comes close on cost.
+- **An app that needs image or video resizing on the fly:** Cloudinary. None of the storage options transform media.
+- **A small app with a fixed amount of storage:** UploadThing. Its flat plans make the monthly bill easy to predict, and it ships ready-made upload button and dropzone components.
+- **An app that runs fully on Vercel:** Vercel Blob works, but it charges more than twice as much per GB served as Upstash Blob.
+
+## How much do file uploads cost?
+
+File upload costs depend on what you pay per GB stored each month and what you pay per GB your users download (egress). Upstash Blob charges [$0.02 for each](https://upstash.com/pricing/blob), Vercel Blob charges $0.023 and $0.05 respectively, and Cloudflare R2 charges $0.015 with free egress.
+
+| Service | Storage per GB-month | Egress per GB | Free tier |
+| --- | --- | --- | --- |
+| [Upstash Blob](https://upstash.com/pricing/blob) | $0.02 | $0.02, CDN included | 1 GB storage, 10 GB bandwidth, no credit card |
+| [Vercel Blob](https://vercel.com/docs/vercel-blob/usage-and-pricing) | $0.023 | $0.05 | 1 GB storage, 10 GB transfer on Hobby |
+| [Cloudflare R2](https://developers.cloudflare.com/r2/pricing/) | $0.015 | Free | Not covered here |
+| [AWS S3](https://aws.amazon.com/s3/pricing) + CloudFront | $0.023 in us-east-1 | [$0.085](https://blog.blazingcdn.com/en-us/what-is-the-price-per-gb-of-aws-cloudfront-cdn) for the first 10 TB, US and EU | Not covered here |
+| [UploadThing](https://uploadthing.com/pricing) | Flat plans: 100 GB for $10, 250 GB for $25, then $0.08 per GB | No per-GB charge on the pricing page | 2 GB |
+| [Cloudinary](https://cloudinary.com/documentation/billing_and_plans) | 1 credit per GB | 1 credit per GB | 25 credits a month |
+
+Upstash Blob also charges per request: $0.30 per million simple operations and $4.50 per million advanced ones. Uploads count as advanced operations but use free bandwidth, and deletes are free. Upstash bills storage on the average bucket size over the month.
+
+Here is the Upstash Blob pricing page:
+
+![](https://cdn.bydefault.so/image-ChT4MeBqaBd7lKg0DpN1K.png)
+
+Take an app that stores 100 GB and serves 1 TB (1,000 GB) of downloads in a month. On the four services that bill per GB, that app costs:
+
+```text
+Upstash Blob:        100 × $0.02  + 1,000 × $0.02  = $22.00
+Cloudflare R2:       100 × $0.015 + 1,000 × $0     = $1.50
+Vercel Blob:         100 × $0.023 + 1,000 × $0.05  = $52.30
+AWS S3 + CloudFront: 100 × $0.023 + 1,000 × $0.085 = $87.30
+```
+
+These figures only cover storage and egress. Request charges are extra on all four, and Vercel can also bill edge requests on cache misses.
+
+![](https://cdn.bydefault.so/image-CrOU8QEzuklOsF_TM88Zp.png)
+
+R2 is by far the cheapest because egress is free. In exchange, you write presigned URLs, progress, multipart and retries yourself. Upstash Blob costs less than half of Vercel Blob and about a quarter of S3 with CloudFront, and it includes the upload flow.
+
+UploadThing's $10 plan covers exactly 100 GB of storage, so it's cheap for this app. Past 250 GB it charges $0.08 per GB stored, four times Upstash Blob's rate:
+
+![](https://cdn.bydefault.so/image-GoBGELe7nGFUbe4hGEvrV.png)
+
+Cloudinary is in a different price range. At one credit per GB, this app uses 1,100 credits a month (100 for storage plus 1,000 for bandwidth), compared to 25 on the free plan. It's worth paying for if you need its image and video transformations.
