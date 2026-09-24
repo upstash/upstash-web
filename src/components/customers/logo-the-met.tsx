@@ -1,8 +1,16 @@
-export const LogoTheMet = (props: React.SVGProps<SVGSVGElement>) => (
+import cx from "@/utils/cx";
+
+// Stacked square logotype: scale it up so it matches the wide wordmarks,
+// with negative margin so the card layout stays aligned.
+export const LogoTheMet = ({
+  className,
+  ...props
+}: React.SVGProps<SVGSVGElement>) => (
   <svg
     viewBox="0 0 151.2 150.6"
     fill="currentColor"
     xmlns="http://www.w3.org/2000/svg"
+    className={cx(className, "-my-2.5 h-14")}
     {...props}
   >
     <path d="M82.8,69.2v-1.6c-5.1,0-9.4-1.9-9.4-10.4V35.4h26.1v22.1c0,8.7-4.7,10-9.4,10v1.7h54.3l3-21.9h-1.2 c-2.9,8.3-11.1,19.7-23.6,19.7h-11.1V35.3c12.6,0.2,16.2,7.2,18.3,15.5h1.4L127,17.5h-1.2c-0.4,7.9-1.2,15.5-14.3,15.5V2.3h8.4 c12.5,0,20.7,11.4,23.6,19.7h1.2l-3-21.9H90.2v1.7c4.7,0,9.4,1.3,9.4,10v21.4H73.5V12c0-8.5,4.3-10.4,9.4-10.4V0H6.7l-3,21.9H5 C7.9,13.6,18.7,1.6,28.2,1.6v55.5c0,7.7-6.1,10.4-11.2,10.4v1.6h23.1V1.6c15.6,0,21.1,7.6,21.4,18.2v37.3c0,7.7-6.1,10.4-11.2,10.4 v1.6H82.8z" />
