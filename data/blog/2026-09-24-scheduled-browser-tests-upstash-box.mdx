@@ -1,0 +1,169 @@
+---
+slug: scheduled-browser-tests-upstash-box
+title: "Automated Browser Testing on a Schedule with Upstash Box"
+authors: [alitarik]
+tags: [box, ai, browser]
+description: "Some tests need a real browser, a shell, a git checkout, and a place to store results. An Upstash Box with a browser and a cron schedule gives you all of that in one machine. It wakes up, runs the test, and pauses again. This is how we set it up, and how we use it to test Docs7 against real Mintlify repositories every night."
+---
+
+Some tests do not fit into CI. They need a real browser. They run for a long time. They depend on repositories or services outside your project. And when they find a problem, they should report it with evidence, not only with a red mark in a pipeline.
+
+If you run this kind of test on your laptop, it runs only when someone remembers. If you run it on a VM, you pay for a machine that works fifteen minutes a day.
+
+An [Upstash Box](https://upstash.com/docs/box/overall/quickstart) with `browser: true` and a [schedule](https://upstash.com/docs/box/overall/schedules) is the third option. It is a full computer with Chromium inside. It wakes up on a cron expression, does the work, and pauses again. It does not matter whether you test your own application, a release candidate, a live site, or content produced by other people. The setup is the same. This post shows it: what goes into the box, how the test uses the browser, where the results are stored, and at the end, how we use it for Docs7.
+
+<Summary>
+  - A box with a browser is a complete test machine: shell, git, Chromium, filesystem. A cron schedule wakes it up, the test runs, the box pauses. You pay only for the minutes it works.
+  - Run Playwright inside the box against the box's own Chromium. No tunnel, no API key in the test. Screenshots are saved on the same disk.
+  - Keep results outside the box: Blob for screenshots, Redis for state, GitHub for issues. The box can be deleted; the results stay.
+  - The same setup works for nightly regression runs of your own app, synthetic checks on a live site, staging versus production, and content checks.
+  - We use it to test Docs7 against public Mintlify repositories every night and to turn the differences into issues.
+</Summary>
+
+---
+
+## What a scheduled test needs
+
+A browser test needs five things: a place to run commands, a browser that renders the page like a real user sees it, the code or content under test, a place to keep the results after the machine is gone, and something that starts the test on time.
+
+A box gives you the first three when you create it. Chromium comes with `browser: true`. Installing your tools is a shell command. Take a snapshot when the setup is done, so you can restore it instead of building it again.
+
+```typescript
+import { Box } from "@upstash/box"
+
+const box = await Box.create({ runtime: "node", size: "medium", browser: true })
+
+// Install once. Everything stays in the box, not on your machine.
+await box.exec.command("npm i -g the-tool-under-test")
+await box.exec.command("npm i playwright-core")
+await box.exec.command("sudo apt-get install -y fonts-noto-cjk")
+
+// Keep a copy of the finished environment.
+await box.snapshot({ name: "test-base" })
+```
+
+The fifth thing is a schedule. It runs a command inside the box on a cron expression. A paused box wakes up for it.
+
+```typescript
+await box.schedule.exec({
+  cron: "0 3 * * *",                       // 03:00 UTC, every night
+  command: ["bash", "-c", "cd ~/suite && bash run.sh >> logs/nightly.log 2>&1"],
+  timeout: 2 * 60 * 60 * 1000,             // stop after two hours
+})
+```
+
+This is the whole infrastructure. A standard box pauses when it is idle, and a paused box is free. A nightly run that keeps a medium box busy for one hour costs about twenty cents. The rest of this post is about what the command does.
+
+---
+
+## What people run this way
+
+The command can be any test that needs a browser and time. Some common shapes:
+
+- **Your own implementation, every night.** Start the app from the branch you are working on, click through the flows that matter, and compare the result with the last release. This catches the regression before the release, not after.
+- **Critical flows on a live site.** Sign-up, login, search, checkout. Run them against production every hour, take a screenshot at each step, and open an issue when a step fails. This is a synthetic monitor, but with a full machine behind it, so it can also read logs or call an API when something looks wrong.
+- **Staging against production.** Same pages on both, same questions, and a diff of what changed. Useful before a deploy, and useful the morning after one.
+- **Content checks.** Broken links, missing anchors, images that do not load, console errors, pages that render an error instead of content. A docs site or a marketing site changes every day, and nobody clicks through all of it.
+- **Compatibility with an external format or service.** If your product renders, imports or integrates content that other people produce, test it against real examples from public repositories instead of your own fixtures. That is what we do for Docs7, below.
+- **Long-running checks that CI cannot afford.** Anything that takes thirty minutes, needs a large dependency install, or needs to stay alive between steps. The box keeps the environment; you keep the pipeline short.
+
+All of these have the same skeleton: start something, open it in the browser, ask questions about the page, store the answers, and report. The next sections cover each of those steps.
+
+---
+
+## Playwright inside the box
+
+A box has a `cdpUrl()` that you can connect to from anywhere. That is the right choice when the driver is your laptop or a CI job. For a scheduled test, the driver is the box itself. So the simplest way is to start Playwright against the local Chromium binary.
+
+```typescript
+import { chromium } from "playwright-core"
+
+const browser = await chromium.launch({
+  executablePath: "/usr/bin/chromium",
+  args: ["--no-sandbox", "--disable-dev-shm-usage"],
+})
+const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } })
+const page = await context.newPage()
+
+page.on("pageerror", (e) => errors.push(String(e.message)))
+await page.goto("http://127.0.0.1:3000/", { waitUntil: "networkidle" })
+await page.screenshot({ path: "shots/home.png" })
+```
+
+This gives you three things. The test does not need any credential, because nothing leaves the machine. Screenshots are written to the disk where the test runs, so uploading them later is a simple loop over a folder. And you control the viewport. This matters more than it sounds: the default viewport is narrow enough to switch many sites into their mobile layout, and then your test reports elements that are hidden on purpose.
+
+Playwright is the deterministic path. For a test that has to give the same answer every night, deterministic is what you want. The box browser also has [`act()` and `extract()`](https://upstash.com/docs/box/overall/browser/ai-actions) for the parts that are hard to script, like "find the login form on this page". They work on the same tabs, so you can mix them.
+
+---
+
+## Compare against a reference, not against your expectations
+
+Assertions like "the button is blue" break every time the design changes. The tests that live longest do not describe how a page should look. They describe what a reference does. The reference can be the previous release, the production deployment while you test staging, or another implementation of the same format. Run both on the same input, on two ports, and ask both the same questions.
+
+```typescript
+const PROBE = `(() => ({
+  title: document.title,
+  headings: [...document.querySelectorAll("main h2, main h3")].map(h => h.id),
+  navigation: [...document.querySelectorAll("nav a[href]")].map(a => a.getAttribute("href")),
+  links: [...document.querySelectorAll("main a[href]")].map(a => a.getAttribute("href")),
+  brokenImages: [...document.querySelectorAll("main img")].filter(i => i.complete && !i.naturalWidth).length,
+}))()`
+
+const ours = await pageA.evaluate(PROBE)     // the thing under test
+const theirs = await pageB.evaluate(PROBE)   // the reference
+
+const missing = theirs.headings.filter((id) => !ours.headings.includes(id))
+```
+
+Structural facts are easy to compare: headings, navigation order, link targets, image counts, console errors. Pixels are not. Two builds with different fonts and spacing will never match pixel by pixel, and a pixel diff would flag every page every night. Take screenshots as evidence for a human, and run the assertions on the DOM.
+
+One rule keeps this honest: a difference counts only when the reference renders the page correctly and the thing under test does not. If both fail, the input is broken, not your code. Log it, do not file it.
+
+---
+
+## Results that outlive the box
+
+A box is disposable by design. The test results should not be. Three services store the three kinds of output.
+
+**Screenshots go to Blob.** The SDK uploads a folder of PNG files in a few lines and returns permanent public URLs. That is what an issue body needs.
+
+```typescript
+import { Bucket } from "@upstash/blob"
+
+const bucket = Bucket.fromEnv()  // UPSTASH_BLOB_TOKEN
+for (const file of fs.readdirSync("shots")) {
+  const blob = await bucket.put(`nightly/${date}/${file}`, fs.readFileSync(`shots/${file}`), {
+    contentType: "image/png",
+    cache: "immutable",
+  })
+  evidence[file] = blob.url
+}
+```
+
+**State goes to Redis.** The queue of things to test, what was tested and when, and one record per run. The most useful key is the fingerprint map. Every failure gets a stable id made from the check name and a failure class, for example `NAVIGATION/missing-entry`, and Redis remembers which issue number belongs to it. This is what stops the second night from filing the first night's bug again.
+
+**Issues go to GitHub, from inside the box.** A `box git clone` of the target repository puts the account's GitHub credential into the box, and `gh` is already installed. So the last step of the run can list the open issues, match them by a marker in the body, comment on the ones it already knows, and create the rest. Set a limit. A few new issues per night is enough. A bot that opens twenty issues in one night gets muted.
+
+---
+
+## The easiest way to set this up
+
+You do not have to write any of this by hand. Connect your editor or coding agent to the [Upstash MCP server](https://upstash.com/docs/box/guides/remote-development) and describe the test in plain words: what to start, which pages to open, what to compare, where to send the results, and when to run it. The agent creates the box, installs the tools, writes the test script, opens pages in the box browser to check its own work, creates the schedule, and pauses the box when it is done.
+
+Debugging works the same way. When a run fails at three in the morning, the box's system log and the run history are one tool call each, and the agent can open the failing page in the box browser and look at it. No SSH, no local setup, nothing installed on your machine. The whole Docs7 test below was built like this.
+
+---
+
+## How we use it: Docs7 and Mintlify
+
+[Docs7](https://context7.com/docs7) renders the Mintlify content format. So the compatibility question is not "does our own fixture pass" but "does a real Mintlify site render the same way". The nightly test answers that question one repository at a time.
+
+A queue in Redis holds public repositories that contain a Mintlify `docs.json`. Every night the box picks the next one, starts Docs7 and Mintlify's own local preview side by side, walks the same pages on both, and compares what each one renders. Differences are fingerprinted, screenshot pairs are uploaded, and the last step files new issues or comments on existing ones.
+
+This gives the Docs7 team a steady stream of real compatibility gaps, each with a reproduction and a screenshot, found on content that nobody picked by hand. Some are bugs to fix, some are differences to document in the migration guide. Both are useful, and both arrive every morning without anyone running anything.
+
+---
+
+## Try it
+
+A box with a browser, a schedule, and the SDK calls for Blob and Redis is everything a nightly browser test needs. The [Box quickstart](https://upstash.com/docs/box/overall/quickstart) gives you a box. [Browser](https://upstash.com/docs/box/overall/browser/overview), [schedules](https://upstash.com/docs/box/overall/schedules) and [snapshots](https://upstash.com/docs/box/overall/snapshots) are one page each. If you do not want to write the harness by hand, connect your editor to the [Upstash MCP server](https://upstash.com/docs/box/guides/remote-development) and describe the test. That is how this one was built.
