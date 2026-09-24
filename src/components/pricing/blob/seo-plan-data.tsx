@@ -32,7 +32,7 @@ export default function SeoPlanData() {
         <caption>
           Billed resources. The Free column is what the plan includes each
           month; the Pay as You Go column is the rate, billed from the first
-          unit with no included allowance.
+          unit except egress, which is free up to 1 TB a month.
         </caption>
         <thead>
           <tr>
@@ -72,8 +72,8 @@ export default function SeoPlanData() {
       <p>
         The free plan&apos;s monthly amounts are hard caps: past them the bucket
         stops serving requests until the 30-day window rolls over, and the free
-        plan is never charged. Pay as You Go includes no free allowance and is
-        billed from the first byte and the first operation.
+        plan is never charged. Pay as You Go bills from the first byte and the
+        first operation, except egress, which is free up to 1 TB a month.
       </p>
 
       <p>

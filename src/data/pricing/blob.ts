@@ -11,7 +11,8 @@ import blobFaqJson from "../../../public/faq/blob.json";
  *   Deletes are free.
  * - Bandwidth, on bytes served *out* of the bucket only. Uploads are free, as
  *   they are on every other object store, so writing an object costs storage
- *   and an advanced operation but no bandwidth.
+ *   and an advanced operation but no bandwidth. On pay-as-you-go, egress is
+ *   free up to `BLOB_FREE_EGRESS` a month and billed past it.
  *
  * A failed request is still a billed operation, which is the one part of this a
  * customer does not expect and the FAQ says out loud. The only free failures are
@@ -29,6 +30,9 @@ export const BLOB_RATES = {
   simpleOpsPerMillion: 0.3,
   advancedOpsPerMillion: 4.5,
 } as const;
+
+/** Monthly egress that pay-as-you-go includes at no charge. */
+export const BLOB_FREE_EGRESS = "1 TB";
 
 /**
  * The one thing about Blob that belongs on a *pricing* page rather than a
@@ -48,11 +52,12 @@ export interface BlobMeter {
    */
   freeIncluded: string;
   /**
-   * The pay-as-you-go rate. Pay-as-you-go includes nothing, so this is billed
-   * from the first byte and the first operation, and there is deliberately no
-   * `paygIncluded` counterpart to `freeIncluded`.
+   * The pay-as-you-go rate, billed from the first byte and the first operation
+   * unless `paygIncluded` is set.
    */
   rate: string;
+  /** What pay-as-you-go includes before `rate` applies. Only egress has one. */
+  paygIncluded?: string;
   tooltip: string;
   /**
    * Whether the plan cards show this meter. The compare table always shows all
@@ -99,8 +104,9 @@ export const BLOB_METERS: BlobMeter[] = [
     label: "Bandwidth (Egress)",
     freeIncluded: "10 GB / month",
     rate: `$${BLOB_RATES.bandwidthPerGb.toFixed(2)} per GB`,
+    paygIncluded: `${BLOB_FREE_EGRESS} / month`,
     tooltip:
-      "Bytes served out of the bucket. Uploads are free; you pay only for what leaves.",
+      "Bytes served out of the bucket. Uploads are free, and on pay as you go the first 1 TB out each month is free too.",
     showOnCard: true,
   },
 ];
@@ -137,8 +143,14 @@ export const BLOB_ALL_PLANS: BlobPlan[] = [BLOB_FREE_PLAN, BLOB_PAYG_PLAN];
 /** The subset the plan cards render; see `showOnCard`. */
 export const BLOB_CARD_METERS = BLOB_METERS.filter((meter) => meter.showOnCard);
 
+/** A payg meter as one line, allowance first when it has one. */
+export const blobPaygValue = (meter: BlobMeter) =>
+  meter.paygIncluded
+    ? `Free up to ${meter.paygIncluded}, then ${meter.rate}`
+    : meter.rate;
+
 /** What a meter shows for a given plan: a cap on free, a rate on payg. */
 export const blobMeterValue = (meter: BlobMeter, plan: BlobPlan) =>
-  plan.type === "free" ? meter.freeIncluded : meter.rate;
+  plan.type === "free" ? meter.freeIncluded : blobPaygValue(meter);
 
 export const BLOB_FAQ = blobFaqJson.faq;
