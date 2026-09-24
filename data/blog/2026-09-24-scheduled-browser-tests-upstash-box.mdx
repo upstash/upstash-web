@@ -10,13 +10,14 @@ Some tests do not fit into CI. They need a real browser. They run for a long tim
 
 If you run this kind of test on your laptop, it runs only when someone remembers. If you run it on a VM, you pay for a machine that works fifteen minutes a day.
 
-An [Upstash Box](https://upstash.com/docs/box/overall/quickstart) with `browser: true` and a [schedule](https://upstash.com/docs/box/overall/schedules) is the third option. It is a full computer with Chromium inside. It wakes up on a cron expression, does the work, and pauses again. This post shows the setup: what goes into the box, how the test uses the browser, where the results are stored, and how we use it for Docs7.
+An [Upstash Box](https://upstash.com/docs/box/overall/quickstart) with `browser: true` and a [schedule](https://upstash.com/docs/box/overall/schedules) is the third option. It is a full computer with Chromium inside. It wakes up on a cron expression, does the work, and pauses again. It does not matter whether you test your own application, a release candidate, a live site, or content produced by other people. The setup is the same. This post shows it: what goes into the box, how the test uses the browser, where the results are stored, and at the end, how we use it for Docs7.
 
 <Summary>
   - A box with a browser is a complete test machine: shell, git, Chromium, filesystem. A cron schedule wakes it up, the test runs, the box pauses. You pay only for the minutes it works.
   - Run Playwright inside the box against the box's own Chromium. No tunnel, no API key in the test. Screenshots are saved on the same disk.
   - Keep results outside the box: Blob for screenshots, Redis for state, GitHub for issues. The box can be deleted; the results stay.
-  - We use this setup to test Docs7 against public Mintlify repositories every night and to turn the differences into issues.
+  - The same setup works for nightly regression runs of your own app, synthetic checks on a live site, staging versus production, and content checks.
+  - We use it to test Docs7 against public Mintlify repositories every night and to turn the differences into issues.
 </Summary>
 
 ---
@@ -55,6 +56,21 @@ This is the whole infrastructure. A standard box pauses when it is idle, and a p
 
 ---
 
+## What people run this way
+
+The command can be any test that needs a browser and time. Some common shapes:
+
+- **Your own implementation, every night.** Start the app from the branch you are working on, click through the flows that matter, and compare the result with the last release. This catches the regression before the release, not after.
+- **Critical flows on a live site.** Sign-up, login, search, checkout. Run them against production every hour, take a screenshot at each step, and open an issue when a step fails. This is a synthetic monitor, but with a full machine behind it, so it can also read logs or call an API when something looks wrong.
+- **Staging against production.** Same pages on both, same questions, and a diff of what changed. Useful before a deploy, and useful the morning after one.
+- **Content checks.** Broken links, missing anchors, images that do not load, console errors, pages that render an error instead of content. A docs site or a marketing site changes every day, and nobody clicks through all of it.
+- **Compatibility with an external format or service.** If your product renders, imports or integrates content that other people produce, test it against real examples from public repositories instead of your own fixtures. That is what we do for Docs7, below.
+- **Long-running checks that CI cannot afford.** Anything that takes thirty minutes, needs a large dependency install, or needs to stay alive between steps. The box keeps the environment; you keep the pipeline short.
+
+All of these have the same skeleton: start something, open it in the browser, ask questions about the page, store the answers, and report. The next sections cover each of those steps.
+
+---
+
 ## Playwright inside the box
 
 A box has a `cdpUrl()` that you can connect to from anywhere. That is the right choice when the driver is your laptop or a CI job. For a scheduled test, the driver is the box itself. So the simplest way is to start Playwright against the local Chromium binary.
@@ -82,7 +98,7 @@ Playwright is the deterministic path. For a test that has to give the same answe
 
 ## Compare against a reference, not against your expectations
 
-The tests that live longest do not describe how a page should look. They describe what a reference does. The reference can be the previous release, a staging deployment, or another implementation of the same format. Run both on the same input, on two ports, and ask both the same questions.
+Assertions like "the button is blue" break every time the design changes. The tests that live longest do not describe how a page should look. They describe what a reference does. The reference can be the previous release, the production deployment while you test staging, or another implementation of the same format. Run both on the same input, on two ports, and ask both the same questions.
 
 ```typescript
 const PROBE = `(() => ({
