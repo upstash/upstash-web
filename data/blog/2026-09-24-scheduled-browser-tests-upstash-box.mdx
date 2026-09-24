@@ -6,7 +6,7 @@ tags: [box, ai, browser]
 description: "Some tests need a real browser, a shell, a git checkout, and a place to store results. An Upstash Box with a browser and a cron schedule gives you all of that in one machine. It wakes up, runs the test, and pauses again. This is how we set it up, and how we use it to test Docs7 against real Mintlify repositories every night."
 ---
 
-Some tests do not fit into CI. They need a real browser. They take twenty minutes. They clone another project's repository, compare two running servers, and when they find a problem they should open an issue with a screenshot.
+Some tests do not fit into CI. They need a real browser. They run for a long time. They depend on repositories or services outside your project. And when they find a problem, they should report it with evidence, not only with a red mark in a pipeline.
 
 If you run this kind of test on your laptop, it runs only when someone remembers. If you run it on a VM, you pay for a machine that works fifteen minutes a day.
 
@@ -16,7 +16,7 @@ An [Upstash Box](https://upstash.com/docs/box/overall/quickstart) with `browser:
   - A box with a browser is a complete test machine: shell, git, Chromium, filesystem. A cron schedule wakes it up, the test runs, the box pauses. You pay only for the minutes it works.
   - Run Playwright inside the box against the box's own Chromium. No tunnel, no API key in the test. Screenshots are saved on the same disk.
   - Keep results outside the box: Blob for screenshots, Redis for state, GitHub for issues. The box can be deleted; the results stay.
-  - We use this setup to test Docs7 against public Mintlify repositories every night. Each night it picks one repository, compares the two renderers, and opens issues for the differences it finds.
+  - We use this setup to test Docs7 against public Mintlify repositories every night and to turn the differences into issues.
 </Summary>
 
 ---
@@ -70,36 +70,36 @@ const context = await browser.newContext({ viewport: { width: 1440, height: 1000
 const page = await context.newPage()
 
 page.on("pageerror", (e) => errors.push(String(e.message)))
-await page.goto("http://127.0.0.1:3341/getting-started", { waitUntil: "networkidle" })
-await page.screenshot({ path: "shots/getting-started.png" })
+await page.goto("http://127.0.0.1:3000/", { waitUntil: "networkidle" })
+await page.screenshot({ path: "shots/home.png" })
 ```
 
-This gives you three things. The test does not need any credential, because nothing leaves the machine. Screenshots are written to the disk where the test runs, so uploading them later is a simple loop over a folder. And you control the viewport. This matters more than it sounds: the default viewport is narrow enough to switch most sites into their mobile layout, and then your test reports a missing sidebar that is not missing.
+This gives you three things. The test does not need any credential, because nothing leaves the machine. Screenshots are written to the disk where the test runs, so uploading them later is a simple loop over a folder. And you control the viewport. This matters more than it sounds: the default viewport is narrow enough to switch many sites into their mobile layout, and then your test reports elements that are hidden on purpose.
 
-Playwright is the deterministic path. For a test that has to give the same answer every night, deterministic is what you want. The box browser also has [`act()` and `extract()`](https://upstash.com/docs/box/overall/browser/ai-actions) for the parts that are hard to script, like "find the login form on this page". They work on the same tabs, so you can mix them. For our nightly test we stayed fully scripted, because a failure on Tuesday must mean the same thing as a failure on Monday.
+Playwright is the deterministic path. For a test that has to give the same answer every night, deterministic is what you want. The box browser also has [`act()` and `extract()`](https://upstash.com/docs/box/overall/browser/ai-actions) for the parts that are hard to script, like "find the login form on this page". They work on the same tabs, so you can mix them.
 
 ---
 
 ## Compare against a reference, not against your expectations
 
-The tests that live longest do not describe how a page should look. They describe what a reference implementation does. If you build something that has to be compatible with an existing tool, run both on the same input, on two ports, and ask both the same questions.
+The tests that live longest do not describe how a page should look. They describe what a reference does. The reference can be the previous release, a staging deployment, or another implementation of the same format. Run both on the same input, on two ports, and ask both the same questions.
 
 ```typescript
 const PROBE = `(() => ({
-  h1: document.querySelector("main h1")?.textContent.trim(),
-  headingIds: [...document.querySelectorAll("main h2, main h3")].map(h => h.id),
-  sidebar: [...document.querySelectorAll("nav a[href]")].map(a => a.getAttribute("href")),
+  title: document.title,
+  headings: [...document.querySelectorAll("main h2, main h3")].map(h => h.id),
+  navigation: [...document.querySelectorAll("nav a[href]")].map(a => a.getAttribute("href")),
   links: [...document.querySelectorAll("main a[href]")].map(a => a.getAttribute("href")),
   brokenImages: [...document.querySelectorAll("main img")].filter(i => i.complete && !i.naturalWidth).length,
 }))()`
 
-const ours = await pageA.evaluate(PROBE)     // the thing under test, port 3341
-const theirs = await pageB.evaluate(PROBE)   // the reference, port 4341
+const ours = await pageA.evaluate(PROBE)     // the thing under test
+const theirs = await pageB.evaluate(PROBE)   // the reference
 
-const missingAnchors = theirs.headingIds.filter((id) => !ours.headingIds.includes(id))
+const missing = theirs.headings.filter((id) => !ours.headings.includes(id))
 ```
 
-Structural facts are easy to compare: heading ids, sidebar order, link targets, image counts, console errors. Pixels are not. Two renderers with different fonts and spacing will never match pixel by pixel, and a pixel diff would flag every page every night. Take screenshots as evidence for a human, and run the assertions on the DOM.
+Structural facts are easy to compare: headings, navigation order, link targets, image counts, console errors. Pixels are not. Two builds with different fonts and spacing will never match pixel by pixel, and a pixel diff would flag every page every night. Take screenshots as evidence for a human, and run the assertions on the DOM.
 
 One rule keeps this honest: a difference counts only when the reference renders the page correctly and the thing under test does not. If both fail, the input is broken, not your code. Log it, do not file it.
 
@@ -124,9 +124,9 @@ for (const file of fs.readdirSync("shots")) {
 }
 ```
 
-**State goes to Redis.** The queue of things to test, what was tested and when, and one record per run. The most useful key is the fingerprint map. Every failure gets a stable id made from the check name and a failure class, for example `HEADING-IDS/punctuation-stripped`, and Redis remembers which issue number belongs to it. This is what stops the second night from filing the first night's bug again.
+**State goes to Redis.** The queue of things to test, what was tested and when, and one record per run. The most useful key is the fingerprint map. Every failure gets a stable id made from the check name and a failure class, for example `NAVIGATION/missing-entry`, and Redis remembers which issue number belongs to it. This is what stops the second night from filing the first night's bug again.
 
-**Issues go to GitHub, from inside the box.** A `box git clone` of the target repository puts the account's GitHub credential into the box, and `gh` is already installed. So the last step of the run can list the open issues, match them by a marker in the body, comment on the ones it already knows, and create the rest. Set a limit. Three new issues per night is enough. A bot that opens twenty issues in one night gets muted.
+**Issues go to GitHub, from inside the box.** A `box git clone` of the target repository puts the account's GitHub credential into the box, and `gh` is already installed. So the last step of the run can list the open issues, match them by a marker in the body, comment on the ones it already knows, and create the rest. Set a limit. A few new issues per night is enough. A bot that opens twenty issues in one night gets muted.
 
 ---
 
@@ -140,7 +140,7 @@ Everything above was built and debugged from an editor session through the [Upst
 
 [Docs7](https://context7.com/docs7) renders the Mintlify content format. So the compatibility question is not "does our own fixture pass" but "does a real Mintlify site render the same way". The nightly test answers that question one repository at a time.
 
-A queue in Redis holds public repositories that contain a Mintlify `docs.json`, sorted by stars. Every night the box picks the next one, clones it at the current commit, starts `docs7 dev` on one port and Mintlify's own `mint dev` on another port, and walks the same pages on both: sidebar order, active item, heading ids, table of contents, every internal link and anchor, images, code blocks, console errors, theme, fonts, the repository's own custom CSS, and the generated `llms.txt`. About three hundred pages fit into the forty-minute budget. Differences are fingerprinted, screenshot pairs are uploaded, and the last step files new issues or comments on existing ones.
+A queue in Redis holds public repositories that contain a Mintlify `docs.json`. Every night the box picks the next one, starts Docs7 and Mintlify's own local preview side by side, walks the same pages on both, and compares what each one renders. Differences are fingerprinted, screenshot pairs are uploaded, and the last step files new issues or comments on existing ones.
 
 This gives the Docs7 team a steady stream of real compatibility gaps, each with a reproduction and a screenshot, found on content that nobody picked by hand. Some are bugs to fix, some are differences to document in the migration guide. Both are useful, and both arrive every morning without anyone running anything.
 
