@@ -131,7 +131,7 @@ export default function CompareTable() {
 
         {/* One row per billed meter. The free column is what the plan includes
             each month; the pay-as-you-go column is the rate, billed from the
-            first unit, because pay-as-you-go includes nothing. */}
+            first unit except egress, which is free up to 1 TB. */}
         {BLOB_METERS.map((meter) => (
           <tr key={meter.key}>
             <th className="px-0 text-left font-normal">

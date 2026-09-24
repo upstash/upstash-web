@@ -85,7 +85,7 @@ export default function PricingTable() {
           </div>
         </div>
 
-        {/* Rates, billed from the first unit: payg includes no free allowance. */}
+        {/* Rates, billed from the first unit except egress, free up to 1 TB. */}
         <div className="w-full px-6 *:border-b *:border-bg-mute">
           {BLOB_CARD_METERS.map((meter) => (
             <div key={meter.key} className="py-3">

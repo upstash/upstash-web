@@ -38,7 +38,7 @@ export const BLOB_FAQ = [
   {
     question: "How much does Upstash Blob cost?",
     answer:
-      "The free plan includes 1 GB of storage, 10 GB of bandwidth, 10,000 simple operations, and 2,000 advanced operations per month. Pay as you go is billed from the first unit, with no free allowance: $0.02 per GB stored per month, $0.02 per GB of outbound bandwidth, $0.30 per million simple operations, and $4.50 per million advanced operations. Uploads incur advanced-operation charges but no bandwidth fees; deletes are free. See the pricing page for details.",
+      "Egress is free up to 1 TB a month on every plan. The free plan includes 1 GB of storage, 10,000 simple operations, and 2,000 advanced operations per month. Pay as you go is billed from the first unit: $0.02 per GB stored per month, $0.30 per million simple operations, $4.50 per million advanced operations, and $0.02 per GB of egress past 1 TB. Uploads incur advanced-operation charges but no bandwidth fees; deletes are free. See the pricing page for details.",
   },
   {
     question: "How does Blob fit with the rest of Upstash?",

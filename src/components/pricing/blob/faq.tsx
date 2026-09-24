@@ -60,10 +60,10 @@ export default function FAQ() {
       <AccordionItem value="item-5">
         <AccordionTrigger>When am I charged for bandwidth?</AccordionTrigger>
         <AccordionContent>
-          Only on bytes that leave the bucket. Uploads are free, so writing an
-          object costs storage and one advanced operation but no bandwidth.
-          Downloads are billed at the same rate whether they are served from the
-          CDN cache or from the origin.
+          Only past 1 TB of egress a month. Uploads are always free, and the
+          first 1 TB of egress each month is free on every plan. On
+          pay-as-you-go, egress past 1 TB is $0.02 per GB, the same whether it
+          is served from the CDN cache or from the origin.
         </AccordionContent>
       </AccordionItem>
 
@@ -84,11 +84,10 @@ export default function FAQ() {
           Does the pay-as-you-go plan include a free allowance?
         </AccordionTrigger>
         <AccordionContent>
-          No. The monthly allowance belongs to the free plan only. On
-          pay-as-you-go you are billed from the first byte stored and the first
-          operation made, at $0.02 per GB of storage, $0.02 per GB of outbound
-          bandwidth, $0.30 per 1M simple operations and $4.50 per 1M advanced
-          operations.
+          Only for egress, which is free up to 1 TB a month. Everything else is
+          billed from the first byte stored and the first operation made, at
+          $0.02 per GB of storage, $0.30 per 1M simple operations and $4.50 per
+          1M advanced operations. Egress past 1 TB is $0.02 per GB.
         </AccordionContent>
       </AccordionItem>
 
