@@ -30,6 +30,12 @@ const fontMono = JetBrains_Mono({
   subsets: ["latin"],
 });
 
+// Context7 Ask for upstash.com: the search link agents follow, and the note
+// that tells them how to call it.
+const ASK_ENDPOINT =
+  "https://context7.com/api/v2/ask?siteKey=ask_4cf2adc7846aa874f833b068";
+const ASK_NOTE = `This site publishes a search endpoint at ${ASK_ENDPOINT}. Append &query=<URL-encoded question> to receive matching excerpts from this site's pages with their URLs. If nothing matches, the response says so.`;
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
@@ -42,6 +48,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       )}
       suppressHydrationWarning
     >
+      <head>
+        <link
+          rel="search"
+          type="text/plain"
+          href={ASK_ENDPOINT}
+          title="Search upstash.com"
+        />
+        <meta name="context7-ask" content={ASK_NOTE} />
+      </head>
       <IntercomWrapper>
         <body
           className={cx(
