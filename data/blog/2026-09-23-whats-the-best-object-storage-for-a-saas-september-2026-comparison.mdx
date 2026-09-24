@@ -126,16 +126,16 @@ Example 1: A document SaaS stores 200 GB and serves 300 GB a month, with 1 milli
 
 ```text
 Upstash Blob: 4.00 storage + 0 egress (under 1 TB) + 4.50 writes + 3.00 reads = $11.50
-R2:           2.85 storage (190 GB billed) + 0 + 0 + 0 (free tier)    =  $2.85
-S3:           4.60 storage + 18.00 egress (200 GB billed) + 5.00 + 4.00 = $31.60
+R2:           2.85 storage (190 GB billed) + 0 + 0 + 0 (free tier)            =  $2.85
+S3:           4.60 storage + 18.00 egress (200 GB billed) + 5.00 + 4.00       = $31.60
 ```
 
 Example 2: A media SaaS stores 1 TB and serves 10 TB a month, with 2 million uploads and 50 million reads:
 
 ```text
 Upstash Blob: 20.00 + 180.00 egress (9,000 GB billed) + 9.00 + 15.00 = $224.00
-R2:           14.85 + 0 egress + 4.50 (1M billed) + 14.40 (40M) =  $33.75
-S3:           23.00 + 891.00 egress (9,900 GB) + 10.00 + 20.00  = $944.00
+R2:           14.85 + 0 egress + 4.50 (1M billed) + 14.40 (40M)      =  $33.75
+S3:           23.00 + 891.00 egress (9,900 GB) + 10.00 + 20.00       = $944.00
 ```
 
 R2 is the cheapest for both apps. In the document SaaS, most of the $8.65 gap comes from R2's free tier covering all the requests. In the media SaaS, $180 of the $190.25 gap is egress past Upstash Blob's free 1 TB. S3 costs the most in both, because it charges egress on every download past the free 100 GB.
