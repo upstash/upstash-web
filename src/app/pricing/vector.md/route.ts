@@ -1,3 +1,4 @@
+import { ASK_MARKDOWN_LINE } from "@/lib/ask";
 import {
   VECTOR_ALL_PLANS,
   VECTOR_FAQ,
@@ -12,6 +13,7 @@ function generateMarkdown(): string {
     "",
     "> **Source:** https://upstash.com/pricing/vector",
     "> **Format:** text/markdown — machine-readable pricing for agents and LLMs",
+    ASK_MARKDOWN_LINE,
     "> **Contact:** sales@upstash.com (Enterprise) · support@upstash.com (Support)",
     "",
     "Upstash Vector is a serverless vector database for AI and similarity search workloads.",

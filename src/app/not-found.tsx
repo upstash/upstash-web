@@ -1,4 +1,5 @@
 import Bg from "@/components/bg";
+import { SITE_URL } from "@/utils/const";
 import Button from "@/components/button";
 import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
@@ -30,6 +31,18 @@ export default function NotFound() {
           </Button>
         </div>
 
+        <p className="mt-16 text-balance opacity-60">
+          Looking for something specific? Just use our answer index, for example:
+        </p>
+        <a href="https://upstash.com/ask?q=compare+upstash+redis+to+elasticache" className="mt-4 text-balance opacity-100 underline">
+          https://upstash.com/ask?q=compare+upstash+redis+to+elasticache
+        </a>
+        {/* <a
+          href={ASK_EXAMPLE}
+          className="mt-2 inline-block font-mono text-sm underline opacity-60 hover:opacity-100"
+        >
+          {ASK_URL}
+        </a> */}
       </Container>
     </main>
   );

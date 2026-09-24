@@ -1,4 +1,4 @@
-import { notFoundMarkdown } from "@/lib/not-found-markdown";
+import { notFoundMarkdown } from "@/lib/ask";
 
 export const dynamic = "force-dynamic";
 

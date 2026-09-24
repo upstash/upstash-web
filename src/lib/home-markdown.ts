@@ -1,3 +1,4 @@
+import { ASK_MARKDOWN_LINE } from "@/lib/ask";
 import { SITE_URL } from "@/utils/const";
 
 /**
@@ -10,6 +11,7 @@ export function renderHome(): string {
     "",
     `> **Source:** ${SITE_URL}/`,
     "> **Format:** text/markdown — machine-readable homepage for agents and LLMs",
+    ASK_MARKDOWN_LINE,
     "",
     "Upstash is a serverless data platform: fully managed Redis, Vector, Search, QStash (messaging), Workflow, Box (sandboxed compute) and Blob (object storage), all with per-request pricing, a free tier and no servers to provision. Every product is reachable over HTTP from serverless and edge runtimes (Vercel, Cloudflare Workers, AWS Lambda, Deno, Bun) as well as from traditional servers.",
     "",
@@ -31,6 +33,7 @@ export function renderHome(): string {
     "",
     "## For AI agents",
     "",
+    `- Ask a question about Upstash (JSON): ${SITE_URL}/ask?q=your+question`,
     `- Create a free, temporary Redis database without signup: \`POST ${SITE_URL}/start-redis\` (send \`Idempotency-Key: <uuidv4>\` and a \`User-Agent\` naming your agent). \`GET\` the same URL for instructions.`,
     `- OpenAPI spec for the Upstash Developer API (authenticated; manage databases, teams and billing): ${SITE_URL}/docs/devops/developer-api/openapi.yaml`,
     `- LLM-friendly site index: ${SITE_URL}/llms.txt (full version: ${SITE_URL}/llms-full.txt)`,

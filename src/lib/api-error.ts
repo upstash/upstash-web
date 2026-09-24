@@ -19,6 +19,6 @@ export function notFoundJson(path: string): NextResponse {
     404,
     "not_found",
     `No resource exists at ${path}.`,
-    `See ${SITE_URL}/openapi.json for available endpoints.`,
+    `See ${SITE_URL}/openapi.json for available endpoints, or search the site with ${SITE_URL}/ask?q=your+question.`,
   );
 }
