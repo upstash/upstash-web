@@ -1,4 +1,3 @@
-import { ASK_MARKDOWN_LINE } from "@/lib/ask";
 import type { Post } from "@content";
 import { allPosts } from "@content";
 import { SITE_URL } from "@/utils/const";
@@ -13,7 +12,6 @@ export function renderIndex(): string {
     "",
     `> **Source:** ${SITE_URL}/blog`,
     "> **Format:** text/markdown — machine-readable blog index for agents and LLMs",
-    ASK_MARKDOWN_LINE,
     "",
     "---",
     "",
@@ -48,7 +46,6 @@ export function renderPost(post: Post): string {
     `> **Reading time:** ${post.readingTime}`,
     `> **Tags:** ${post.tags.join(", ")}`,
     "> **Format:** text/markdown — machine-readable content for agents and LLMs",
-    ASK_MARKDOWN_LINE,
     "",
     ...(post.description ? [post.description, ""] : []),
     "---",
