@@ -22,7 +22,7 @@ export default function SectionCta() {
         </h2>
 
         <p className="mx-auto mt-4 max-w-xl text-balance text-lg text-text-mute md:text-xl">
-          Start on the free tier with 1 GB of storage and free egress up to 1 TB.
+          Start on the free tier with 1 GB of storage and 10 GB of bandwidth.
           No credit card required.
         </p>
 

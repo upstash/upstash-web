@@ -95,6 +95,6 @@ const FEATURES = [
   {
     icon: <IconCoin className="size-5" stroke={1.5} />,
     title: "Simple pricing",
-    desc: "Egress is free up to 1 TB a month. Pay for storage and operations only. Uploads and deletes are free, and usage never rounds up.",
+    desc: "Egress is free up to 1 TB a month on pay as you go. Pay for storage and operations only. Uploads and deletes are free, and usage never rounds up.",
   },
 ];

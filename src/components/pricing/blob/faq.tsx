@@ -60,10 +60,10 @@ export default function FAQ() {
       <AccordionItem value="item-5">
         <AccordionTrigger>When am I charged for bandwidth?</AccordionTrigger>
         <AccordionContent>
-          Only past 1 TB of egress a month. Uploads are always free, and the
-          first 1 TB of egress each month is free on every plan. On
-          pay-as-you-go, egress past 1 TB is $0.02 per GB, the same whether it
-          is served from the CDN cache or from the origin.
+          Only on bytes that leave the bucket, and on pay-as-you-go only past
+          the first 1 TB each month. Uploads are always free. Egress past 1 TB
+          is $0.02 per GB, the same whether it is served from the CDN cache or
+          from the origin. The free plan includes 10 GB of egress a month.
         </AccordionContent>
       </AccordionItem>
 

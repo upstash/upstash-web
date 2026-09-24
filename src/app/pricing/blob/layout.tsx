@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 
 const title = "Blob Pricing";
 const description =
-  "Upstash Blob pricing. Free egress up to 1 TB a month. Free tier with 1 GB storage, then pay as you go at $0.02 per GB stored.";
+  "Upstash Blob pricing. Free tier with 1 GB storage and 10 GB bandwidth, then pay as you go at $0.02 per GB stored with free egress up to 1 TB a month.";
 
 export const metadata: Metadata = {
   title,

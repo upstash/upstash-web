@@ -11,8 +11,8 @@ import blobFaqJson from "../../../public/faq/blob.json";
  *   Deletes are free.
  * - Bandwidth, on bytes served *out* of the bucket only. Uploads are free, as
  *   they are on every other object store, so writing an object costs storage
- *   and an advanced operation but no bandwidth. Egress is free up to
- *   `BLOB_FREE_EGRESS` a month on both plans; pay-as-you-go bills past it.
+ *   and an advanced operation but no bandwidth. On pay-as-you-go, egress is
+ *   free up to `BLOB_FREE_EGRESS` a month and billed past it.
  *
  * A failed request is still a billed operation, which is the one part of this a
  * customer does not expect and the FAQ says out loud. The only free failures are
@@ -31,7 +31,7 @@ export const BLOB_RATES = {
   advancedOpsPerMillion: 4.5,
 } as const;
 
-/** Monthly egress that costs nothing, on free and pay-as-you-go alike. */
+/** Monthly egress that pay-as-you-go includes at no charge. */
 export const BLOB_FREE_EGRESS = "1 TB";
 
 /**
@@ -100,10 +100,10 @@ export const BLOB_METERS: BlobMeter[] = [
   {
     key: "bandwidth",
     label: "Bandwidth (Egress)",
-    freeIncluded: `Free up to ${BLOB_FREE_EGRESS} / month`,
+    freeIncluded: "10 GB / month",
     rate: `Free up to ${BLOB_FREE_EGRESS} / month, then $${BLOB_RATES.bandwidthPerGb.toFixed(2)} per GB`,
     tooltip:
-      "Bytes served out of the bucket. Uploads are always free, and the first 1 TB out each month is free too.",
+      "Bytes served out of the bucket. Uploads are free, and on pay as you go the first 1 TB out each month is free too.",
     showOnCard: true,
   },
 ];

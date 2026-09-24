@@ -37,9 +37,9 @@ To get a good estimate on how much storage will cost, we need to look at Egress,
 
 Also CDN, regions, S3 compatibility, access control and upload tooling decide how much work you need to do yourself:
 
-1. **Egress rate.** It ranges from $0/GB on R2 to $0.09/GB on S3, and Upstash Blob serves the first 1 TB a month for free. Egress is usually the most expensive for a project with many downloads.
+1. **Egress rate.** It ranges from $0/GB on R2 to $0.09/GB on S3, and Upstash Blob pay-as-you-go serves the first 1 TB a month for free. Egress is usually the most expensive for a project with many downloads.
 2. **Request pricing.** Writes are a lot more expensive than reads. [Upstash Blob charges $4.50 per million uploads and lists, and $0.30 per million reads](https://upstash.com/pricing/blob). An app that saves many small files pays mostly for writes.
-3. **Free tier.** The [Upstash Blob free plan](https://upstash.com/pricing/blob) gives 1 GB of storage and 1 TB of egress a month. 
+3. **Free tier.** The [Upstash Blob free plan](https://upstash.com/pricing/blob) gives 1 GB of storage and 10 GB of bandwidth a month. 
 4. **CDN.** Files load fast worldwide only if a CDN caches them. Upstash Blob serves public files through a fast, global CDN at no extra fee. On S3 you add CloudFront yourself. [Vercel Blob doesn't cache files over 512 MB](https://vercel.com/docs/vercel-blob/usage-and-pricing), so those files cost origin transfer on every download.
 5. **Regions.** S3 prices and latency depend on the region you pick. An [Upstash Blob bucket has no region](https://upstash.com/blob) (because it's globally distributed by default): one global bucket, one rate sheet, and no cross-region transfer fees.
 6. **S3 compatibility.** If a provider supports the S3 API, you can switch later with the AWS SDK, the AWS CLI or any S3 tool. S3 and R2 support it natively, and Upstash Blob hands out temporary S3 credentials for the same bucket.
@@ -111,7 +111,7 @@ Cloudflare R2 is the cheapest of the four, because egress is free there. Upstash
 
 | Provider | Storage per GB | Egress per GB | Writes per 1M | Reads per 1M | Free each month |
 | --- | --- | --- | --- | --- | --- |
-| [Upstash Blob](https://upstash.com/pricing/blob) | $0.02 | $0 up to 1 TB, then $0.02 | $4.50 | $0.30 | 1 TB egress on every plan, 1 GB storage on free |
+| [Upstash Blob](https://upstash.com/pricing/blob) | $0.02 | $0 up to 1 TB, then $0.02 | $4.50 | $0.30 | 1 GB storage, 10 GB bandwidth (free plan); 1 TB egress (pay as you go) |
 | [Cloudflare R2](https://developers.cloudflare.com/r2/pricing/) | $0.015 | $0 | $4.50 | $0.36 | 10 GB storage, 1M writes, 10M reads |
 | [AWS S3 Standard](https://aws.amazon.com/s3/pricing/) | $0.023 | $0.09 | $5.00 | $0.40 | 100 GB egress |
 | [Vercel Blob](https://vercel.com/docs/vercel-blob/usage-and-pricing) | $0.023 | $0.05 | $5.00 | $0.40 | 1 GB storage, 10 GB transfer (Hobby) |
