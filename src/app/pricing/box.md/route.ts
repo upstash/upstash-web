@@ -1,4 +1,3 @@
-import { ASK_MARKDOWN_LINE } from "@/lib/ask";
 import {
   BOX_ALL_PLANS,
   BOX_FAQ,
@@ -14,7 +13,6 @@ function generateMarkdown(): string {
     "",
     "> **Source:** https://upstash.com/pricing/box",
     "> **Format:** text/markdown — machine-readable pricing for agents and LLMs",
-    ASK_MARKDOWN_LINE,
     "> **Contact:** sales@upstash.com (Enterprise) · support@upstash.com (Support)",
     "",
     "Upstash Box is a serverless compute platform. Standard boxes auto-pause when idle (no CPU charges).",

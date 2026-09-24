@@ -1,4 +1,3 @@
-import { ASK_MARKDOWN_LINE } from "@/lib/ask";
 import {
   SEARCH_ALL_PLANS,
   SEARCH_FAQ,
@@ -14,7 +13,6 @@ function generateMarkdown(): string {
     "",
     "> **Source:** https://upstash.com/pricing/search",
     "> **Format:** text/markdown — machine-readable pricing for agents and LLMs",
-    ASK_MARKDOWN_LINE,
     "> **Contact:** support@upstash.com",
     "",
     `> **Note:** ${SEARCH_NOTE}`,

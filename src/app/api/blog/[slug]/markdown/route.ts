@@ -1,5 +1,5 @@
 import { allPosts } from "@content";
-import { notFoundMarkdown } from "@/lib/ask";
+import { notFoundMarkdown } from "@/lib/not-found-markdown";
 import { renderPost } from "@/lib/blog-markdown";
 import { SITE_URL } from "@/utils/const";
 
