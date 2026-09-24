@@ -62,7 +62,9 @@ export default function CustomerPage() {
                         "dark:from-white dark:to-emerald-300",
                       )}
                     >
-                      “ {customer.highlight} ”
+                      {customer.user_name
+                        ? `“ ${customer.highlight} ”`
+                        : customer.highlight}
                     </p>
                   </div>
 

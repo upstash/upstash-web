@@ -17,8 +17,8 @@ export const customers = defineCollection({
   schema: z.object({
     company_name: z.string(),
     company_url: z.string(),
-    user_name: z.string(),
-    user_title: z.string(),
+    user_name: z.string().optional(),
+    user_title: z.string().optional(),
     user_photo: z.string().optional(),
     highlight: z.string(),
     cover_image: z.string().optional(),
