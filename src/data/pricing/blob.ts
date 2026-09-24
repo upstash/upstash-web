@@ -52,10 +52,12 @@ export interface BlobMeter {
    */
   freeIncluded: string;
   /**
-   * The pay-as-you-go rate, billed from the first byte and the first operation.
-   * The one exception is egress, whose free allowance is folded into the rate.
+   * The pay-as-you-go rate, billed from the first byte and the first operation
+   * unless `paygIncluded` is set.
    */
   rate: string;
+  /** What pay-as-you-go includes before `rate` applies. Only egress has one. */
+  paygIncluded?: string;
   tooltip: string;
   /**
    * Whether the plan cards show this meter. The compare table always shows all
@@ -101,7 +103,8 @@ export const BLOB_METERS: BlobMeter[] = [
     key: "bandwidth",
     label: "Bandwidth (Egress)",
     freeIncluded: "10 GB / month",
-    rate: `Free up to ${BLOB_FREE_EGRESS} / month, then $${BLOB_RATES.bandwidthPerGb.toFixed(2)} per GB`,
+    rate: `$${BLOB_RATES.bandwidthPerGb.toFixed(2)} per GB`,
+    paygIncluded: `${BLOB_FREE_EGRESS} / month`,
     tooltip:
       "Bytes served out of the bucket. Uploads are free, and on pay as you go the first 1 TB out each month is free too.",
     showOnCard: true,
@@ -140,8 +143,14 @@ export const BLOB_ALL_PLANS: BlobPlan[] = [BLOB_FREE_PLAN, BLOB_PAYG_PLAN];
 /** The subset the plan cards render; see `showOnCard`. */
 export const BLOB_CARD_METERS = BLOB_METERS.filter((meter) => meter.showOnCard);
 
+/** A payg meter as one line, allowance first when it has one. */
+export const blobPaygValue = (meter: BlobMeter) =>
+  meter.paygIncluded
+    ? `Free up to ${meter.paygIncluded}, then ${meter.rate}`
+    : meter.rate;
+
 /** What a meter shows for a given plan: a cap on free, a rate on payg. */
 export const blobMeterValue = (meter: BlobMeter, plan: BlobPlan) =>
-  plan.type === "free" ? meter.freeIncluded : meter.rate;
+  plan.type === "free" ? meter.freeIncluded : blobPaygValue(meter);
 
 export const BLOB_FAQ = blobFaqJson.faq;

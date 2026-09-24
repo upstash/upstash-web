@@ -2,7 +2,7 @@
 
 import Button from "@/components/button";
 import Tooltip from "@/components/tooltip";
-import { BLOB_METERS } from "@/data/pricing/blob";
+import { BLOB_METERS, blobPaygValue } from "@/data/pricing/blob";
 import useIsMobile from "@/hooks/use-is-mobile";
 import { trackEvent } from "@/lib/analytics";
 import cx from "@/utils/cx";
@@ -151,7 +151,7 @@ export default function CompareTable() {
               <CompareValue>{meter.freeIncluded}</CompareValue>
             </Col>
             <Col plan={showPayg} feature>
-              <CompareValue>{meter.rate}</CompareValue>
+              <CompareValue>{blobPaygValue(meter)}</CompareValue>
             </Col>
           </tr>
         ))}

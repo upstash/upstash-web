@@ -85,12 +85,23 @@ export default function PricingTable() {
           </div>
         </div>
 
-        {/* Rates, billed from the first unit except egress, free up to 1 TB. */}
+        {/* Rates, billed from the first unit. Egress leads with its free
+            allowance and drops the rate to a note under it. */}
         <div className="w-full px-6 *:border-b *:border-bg-mute">
           {BLOB_CARD_METERS.map((meter) => (
             <div key={meter.key} className="py-3">
               <p className="text-text-mute">{meter.label}</p>
-              <p className="font-semibold">{meter.rate}</p>
+              {meter.paygIncluded ? (
+                <>
+                  <p className="font-semibold">
+                    <span className="text-primary-text">Free</span> up to{" "}
+                    {meter.paygIncluded}
+                  </p>
+                  <p className="text-sm text-text-mute">then {meter.rate}</p>
+                </>
+              ) : (
+                <p className="font-semibold">{meter.rate}</p>
+              )}
             </div>
           ))}
         </div>
