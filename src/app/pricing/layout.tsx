@@ -21,11 +21,13 @@ export const metadata: Metadata = {
     title,
     description,
     url: "/pricing",
+    images: "/og-home.jpg",
   },
   twitter: {
     card: "summary_large_image",
     title,
     description,
+    images: "/og-home.jpg",
   },
 };
 
