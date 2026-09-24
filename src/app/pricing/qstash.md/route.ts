@@ -1,4 +1,3 @@
-import { ASK_MARKDOWN_LINE } from "@/lib/ask";
 import {
   QSTASH_ALL_PLANS,
   QSTASH_ENTERPRISE_PLAN,
@@ -33,7 +32,6 @@ function generateMarkdown(): string {
     "",
     "> **Source:** https://upstash.com/pricing/qstash",
     "> **Format:** text/markdown — machine-readable pricing for agents and LLMs",
-    ASK_MARKDOWN_LINE,
     "> **Contact:** sales@upstash.com (Enterprise) · support@upstash.com (Support)",
     "",
     "QStash is a serverless message queue and scheduler. You are only charged for messages — retries are free.",

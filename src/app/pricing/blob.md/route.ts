@@ -5,7 +5,6 @@ import {
   BLOB_METERS,
   blobMeterValue,
 } from "@/data/pricing/blob";
-import { ASK_MARKDOWN_LINE } from "@/lib/ask";
 
 export const dynamic = "force-static";
 
@@ -15,7 +14,6 @@ function generateMarkdown(): string {
     "",
     "> **Source:** https://upstash.com/pricing/blob",
     "> **Format:** text/markdown, machine-readable pricing for agents and LLMs",
-    ASK_MARKDOWN_LINE,
     "> **Contact:** support@upstash.com",
     "",
     `> **${BLOB_GLOBAL_NOTE}**`,
