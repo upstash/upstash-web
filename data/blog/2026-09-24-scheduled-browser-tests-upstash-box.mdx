@@ -146,9 +146,11 @@ for (const file of fs.readdirSync("shots")) {
 
 ---
 
-## Building it without SSH
+## The easiest way to set this up
 
-Everything above was built and debugged from an editor session through the [Upstash MCP server](https://upstash.com/docs/box/guides/remote-development): create the box, run commands, open a page in the box browser and look at it, create the schedule, mint the upload URLs, pause the box. When a run failed at three in the morning, reading the box's system log and the run history was one tool call each. The box is the machine. MCP is the keyboard.
+You do not have to write any of this by hand. Connect your editor or coding agent to the [Upstash MCP server](https://upstash.com/docs/box/guides/remote-development) and describe the test in plain words: what to start, which pages to open, what to compare, where to send the results, and when to run it. The agent creates the box, installs the tools, writes the test script, opens pages in the box browser to check its own work, creates the schedule, and pauses the box when it is done.
+
+Debugging works the same way. When a run fails at three in the morning, the box's system log and the run history are one tool call each, and the agent can open the failing page in the box browser and look at it. No SSH, no local setup, nothing installed on your machine. The whole Docs7 test below was built like this.
 
 ---
 
