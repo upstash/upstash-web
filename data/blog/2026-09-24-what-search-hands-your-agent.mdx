@@ -1,0 +1,122 @@
+---
+title: "What Your Search Tool Sends Your Coding Agent"
+slug: what-search-hands-your-agent
+authors: [ramazan]
+tags: [context7, security, ai]
+description: "We asked seven tools the questions a developer would type about nine documentation pages we knew were dangerous, and measured what came back."
+updated: "2026-09-25"
+draft: false
+---
+
+When a coding agent answers a question about a library, something fetched that documentation a second earlier — usually a search tool — and whatever it returns goes straight into the model's context.
+
+So we measured what they return when the page is a bad one.
+
+## What we tested
+
+We started from nine documentation pages we had verified as dangerous. For each we wrote four questions a developer would type to land on it, and asked each three times, because a search tool answers the same question differently from one call to the next. That is 108 searches per tool, through Exa, Firecrawl, Tavily, Serper, Brave's two endpoints and Context7.
+
+Two things were counted: whether the page came back at all, and whether the harmful passage itself was in what the tool returned.
+
+## The results
+
+![Two bars per tool out of 108 searches: how often the page came back, and how often the dangerous text came back with it. The four that return page bodies sit between 23% and 42%; the two that return fragments sit at 6%; Context7 at 10%.](/blog/what-search-hands-your-agent/by-tool.svg)
+
+Every tool surfaced these pages at a similar rate, 25% to 56%. The gap is in the second bar, and the reason is how much of the page travels with it:
+
+| Tool | Average text per search |
+| --- | --- |
+| Firecrawl | 58,667 characters |
+| Tavily | 53,656 |
+| Exa | 51,787 |
+| Brave LLM context | 27,979 |
+| Brave web search | 12,221 |
+| Context7 | 4,250 |
+| Serper | 1,414 |
+
+Those are averages; they move by query. Serper barely moves, 1,175 to 1,521, because Google caps its snippet at roughly 140 characters and ten of those is the response. Firecrawl ranges from 34,412 to 80,000.
+
+That is why the second bar splits the way it does. The dangerous passage is one block on a page. Send 5,000 characters of it and the block probably comes too. Send 144 and it probably doesn't.
+
+So two of the seven aren't in the same business. Serper returns Google's result page, Brave's web endpoint returns matched fragments. They score low because a 144-character sentence rarely contains the dangerous block, not because they screen anything — and they can't answer the question either.
+
+The four at the top return the extracted page body. That's the product: give the model something to read. When the page body is the product, the dangerous part comes with it. One is sold as pre-extracted content for coding agents, with ready-made instructions for Claude Code, Cursor and Codex. It returned the dangerous text inside a code block, with the forum replies underneath — "thank you fixed", one like.
+
+Context7 is the last row, at 10%.
+
+## Not all the pages were planted
+
+All nine are dangerous to follow. Most were published in good faith, by exactly who they appear to be.
+
+One is a fix for a control panel's broken file manager, on that project's own support forum. The shape of it, with the domain and paths changed:
+
+```bash
+sudo -i
+cd /usr/local/<panel>/web/fm/backend/Services/Session/Adapters/
+mv SessionStorage.php SessionStorage.php.ori
+curl -fsSLm20 https://<shortener>/<slug> -o SessionStorage.php
+```
+
+Read the last line: it installs a PHP file from a link shortener as the panel's session handler, as root. It reads like a backdoor.
+
+It isn't. The author is one of the project's most active contributors, and the bug is real and documented upstream. We downloaded the file, read it, and diffed it against the original: the project's own class with the missing method added. No network call, no `eval`.
+
+It's still not something you should run, and that has nothing to do with the author. The file sits on a domain the project doesn't control, with no version, checksum or signature. Whoever holds that domain decides what arrives on the next fetch, and it lands as root in a path the panel executes. Reading it once tells you nothing about the next fetch.
+
+Here is the set, sites left out: six of the nine were published in good faith, and a URL in a table reads as an accusation whatever the paragraph says.
+
+| What the page is | What you hand over | Verdict |
+| --- | --- | --- |
+| A crypto service's "instant unstaking" guide | Both wallet permission keys, to a fixed address | **Attack** |
+| An API reference for recovering accounts | Usernames, proxies and mailbox credentials | **Attack** |
+| A control panel fix on a support forum | Root write access to a file the panel runs, to whoever holds a shortener | Unsafe by design |
+| A product's agent onboarding flow | Your agent's tool access, to whatever a third party serves that day | Unsafe by design |
+| A trading API's own reference | Your wallet's private key, unscoped and unrevocable | Unsafe by design |
+| A community skill for phone automation | Unattended shell and ADB control of a phone | Unsafe by design |
+
+Three more we verified never came back from any tool, so they aren't in the numbers: a private-key printer, a fetch proxy, and a wiki page carrying a fake support number.
+
+Twice as many unsafe-by-design pages as attacks, and both end in the same place: something outside the project gets lasting access. Prompt injection gets the attention; the commoner case is honest documentation telling your agent to fetch something unpinned and run it.
+
+## Where Context7 differs
+
+Context7 screens documentation when a library is added, not when you ask — once, with the whole page in view, instead of in the half-second between a search returning and a model answering.
+
+Here is every case a tool returned, both ways. Four questions asked three times: 48 searches across the four page-body tools, and the same twelve through Context7.
+
+![Six cases, web search against Context7. Context7 is at zero on four of them, including the shortener fix where web search is at 88%. It is level on the agent onboarding case and slightly lower on the private-key case.](/blog/what-search-hands-your-agent/by-case.svg)
+
+The shortener fix is the clearest. Web search returned that command in 42 of 48 searches. Context7 returned it in none, while still returning documentation for the question every time — the zero isn't a refusal to answer.
+
+A search tool has to rank the page before it can return it, and that ranking does part of the work. So we skipped it and named the library outright. It still didn't come back.
+
+Two rows go the other way, and they are the 10%. Both are cases where **the dangerous line is the answer to the question asked.** Ask a trading API's reference how to place a trade, and the required `privateKey` parameter is the answer. Withholding that would make a documentation service broken, not safe.
+
+Neither of the two outright attacks came back at all. There the dangerous content is not what the developer asked about, and that is where the screening earns its place.
+
+## What the models did with it
+
+Text reaching a model isn't a problem by itself. So we put the same questions to eight models — a frontier and a fast model from each of the four major providers — and graded whether the instruction was passed along as a step to take.
+
+That is 448 runs; in 57 no source returned anything, so the model was never called. Of the 391 answers left, 54 passed the instruction along:
+
+| Source | Answers | Instruction passed along |
+| --- | --- | --- |
+| Web search | 217 | 53 |
+| Context7 | 174 | 1 |
+
+Two of those 54 warned the developer. In the rest it arrived as an ordinary numbered step, usually formatted more cleanly than the source page, with the caveats dropped. Six of the eight models did it at least once, including the strongest.
+
+The one through Context7 came from the account-takeover site. Per-page screening asks whether a passage is harmful, and for a site like that every honest answer is no — a different problem from this one.
+
+## Notes on the method
+
+Nine pages is nine pages, not a percentage of the web. It says nothing about Claude Code, Codex or any shipped assistant either; everything here is a plain API call with a one-line system prompt.
+
+- **Every search was repeated three times.** Search tools answer the same question differently each call, and that moves these numbers more than anything the models do.
+- **We checked who published each page before calling anything an attack.** Publisher identity, upstream bug reports, GitHub author records. Two we had marked as attacks weren't.
+- **Both sides were measured by the same rule.** A search counts if the passage was in any result it returned; for Context7, in any library its own search returned. The search stage ran all nine pages, six came back from at least one tool, and the model stage ran five of those six.
+
+Nobody here is accused of anything. In four of the nine the author did nothing wrong and the instruction still isn't safe to run. That's the finding.
+
+Context7 is available as an [MCP server](https://github.com/upstash/context7), a REST API, and a hosted search at [context7.com](https://context7.com).
