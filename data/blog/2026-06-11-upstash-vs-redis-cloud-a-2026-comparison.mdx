@@ -21,7 +21,7 @@ publishedAt: "2026-06-11T13:00:00Z"
 
 ## Key takeaways
 
-- Redis Cloud's free tier is 30 MB with a 100 ops/sec cap and 30 concurrent connections (see [Essentials plan docs](https://redis.io/docs/latest/operate/rc/subscriptions/view-essentials-subscription/essentials-plan-details/)). Upstash's free tier covers 500K commands/month and 256 MB
+- Redis Cloud's free tier is 30 MB with a 100 ops/sec cap and 30 concurrent connections (see [Essentials plan docs](https://redis.io/docs/latest/operate/rc/subscriptions/view-essentials-subscription/essentials-plan-details/)). Upstash's free tier covers 500K commands/month and 250 MB
 - Upstash's Fixed plans start at $10/month for 250 MB with no per-command billing and unlimited commands (with a 10,000 cmd/sec ceiling). The same plan costs $5/month on Redis Cloud Essentials but throttles at 1,000 ops/sec.
 - You can get a free Upstash Redis database without any sign-up by making a POST request to [https://upstash.com/start-redis](https://upstash.com/start-redis). It's valid for 72h and you can claim it.
 - Above \~10M commands/month at on pay-as-you-go, it's cheaper to go for a fixed plan on either side
@@ -31,9 +31,9 @@ publishedAt: "2026-06-11T13:00:00Z"
 
 **Upstash Redis** is a Redis-compatible database operated by Upstash. You create a database, get a URL and a REST token, and pay per command or get a fixed instance with unlimited commands.
 
-Upstash speaks both the standard Redis protocol over TCP (so ioredis, node-redis, redis-py, and go-redis work unchanged) and HTTP/REST via the @upstash/redis client for serverless runtimes. **The free tier gives you 500K commands and 256 MB.** Pay-as-You-Go charges $0.20 per 100K commands plus $0.25/GB storage and free bandwidth up to 200 GB/month ([upstash.com/pricing](https://upstash.com/pricing)).
+Upstash speaks both the standard Redis protocol over TCP (so ioredis, node-redis, redis-py, and go-redis work unchanged) and HTTP/REST via the @upstash/redis client for serverless runtimes. **The free tier gives you 500K commands and 250 MB.** Pay-as-You-Go charges $0.20 per 100K commands plus $0.25/GB storage and free bandwidth up to 200 GB/month ([upstash.com/pricing](https://upstash.com/pricing)).
 
-![Upstash Redis Pricing](https://cdn.contentport.io/chat/Sw016rSl6asUNtj0EpHf3DiBcD0ot3sQ/ISx4r4Ii2cER_LdVmj1Cd.png)
+See the [current Upstash Redis pricing](https://upstash.com/pricing/redis) for plan limits and prices.
 
 **Redis Cloud** is the managed Redis service from Redis Inc., the company that ships open-source Redis and Redis Stack. You pick a plan (Free, Essentials, or Pro), a cloud provider (AWS, GCP, Azure), and a memory size.
 
@@ -47,7 +47,7 @@ The two pricing models barely overlap, so the cheaper option depends on throughp
 
 | Metric | Upstash | Redis Cloud |
 | --- | --- | --- |
-| Free tier | 256 MB, 500K commands/month | 30 MB, 100 ops/sec, 30 connections |
+| Free tier | 250 MB, 500K commands/month | 30 MB, 100 ops/sec, 30 connections |
 | Cheapest paid plan | $0.20 per 100K commands (PAYG) | $5/month for 250 MB (Essentials) |
 | Storage | $0.25/GB on PAYG | Included in plan size |
 | Bandwidth | First 200 GB/month free, then $0.03/GB | Included, varies by plan |
