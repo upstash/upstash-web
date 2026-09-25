@@ -81,7 +81,7 @@ The rest of this comparison is really about what falls out of that one differenc
 | --- | --- | --- |
 | Per-request pricing | ✓ ($0.20 / 100K commands) | — |
 | Capacity pricing (GB-hour / node-hour) | — | ✓ |
-| Free tier | ✓ (256 MB, 500K commands/mo) | — |
+| Free tier | ✓ (250 MB, 500K commands/mo) | — |
 | Monthly floor | $0 (scales to zero) | ~$6/mo serverless, or node-hours |
 
 **Data & commands**
@@ -130,7 +130,7 @@ The other thing the unit prices hide is the **floor**: ElastiCache serverless me
 
 - *Pay-as-you-go:* **$0.20 per 100K commands** (reads and writes priced the same) + **$0.25/GB-month** storage; bandwidth free; scales to **zero**.
 - *Fixed plans:* flat monthly, no per-command charge: **250MB $10, 1GB $20, 5GB $100, 10GB $200, 50GB $400, 100GB $800**, each up to 10,000 commands/sec.
-- *Free tier:* 256 MB and 500K commands/month.
+- *Free tier:* 250 MB and 500K commands/month.
 
 One thing the bare node price hides: **every Upstash paid plan already includes replication and automatic failover** ([Upstash replication docs](https://upstash.com/docs/redis/features/replication)): multiple replicas, so if one fails another keeps serving. That makes a single $38 `cache.t4g.medium` and a $20 Upstash plan apples-to-oranges: the lone node is a single point of failure. To match the HA you get on the $20 Upstash database you'd run a node *plus a replica* (~$76/month for `t4g.medium`) and still own the failover configuration yourself.
 

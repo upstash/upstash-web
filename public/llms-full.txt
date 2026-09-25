@@ -19,7 +19,7 @@
 - [Pricing (Markdown)](https://upstash.com/pricing/redis.md): Machine-readable full pricing — plans, limits, feature matrix, and FAQ
 
 **Quick reference:**
-- Free: $0, 256 MB data, 500K commands/month
+- Free: $0, 250 MB data, 500K commands/month
 - Pay as You Go: $0.20 per 100K commands, 100 GB data, unlimited bandwidth
 - Fixed 250MB: $10/month (+$5/read region), 250 MB data, 50 GB bandwidth
 - Fixed 1GB: $20/month (+$10/read region), 1 GB data, 100 GB bandwidth
