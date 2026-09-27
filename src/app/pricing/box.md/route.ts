@@ -27,7 +27,7 @@ function generateMarkdown(): string {
     "|------|-------|-----------------|-----------------|-----------------|",
     ...BOX_ALL_PLANS.map(
       (p: BoxPlan) =>
-        `| ${p.name} | ${p.priceDisplay} | ${p.maxConcurrentBoxes} | ${p.cpuHoursPerMonth} | ${p.llmBudgetPerMonth} |`
+        `| ${p.name} | ${p.priceDisplay} | ${p.maxConcurrentBoxes} | ${p.cpuHoursPerMonth} | ${p.llmBudgetPerMonth} |`,
     ),
     "",
     "---",
@@ -38,7 +38,7 @@ function generateMarkdown(): string {
     "|------|------|--------|------|-------------|-----------------|",
     ...BOX_SIZES.map(
       (s) =>
-        `| ${s.label} | ${s.cpu} | ${s.memory} | ${s.storage} | $${s.cpuHourPrice}/active CPU hour | $${s.keepAlivePrice}/month |`
+        `| ${s.label} | ${s.cpu} | ${s.memory} | ${s.storage} | $${s.cpuHourPrice}/active CPU hour | $${s.keepAlivePrice}/month |`,
     ),
     "",
     "**Storage:** $0.10 per GB/month (billed separately on Pay as You Go)",
@@ -60,7 +60,23 @@ function generateMarkdown(): string {
     "- $100 LLM token budget per month",
     "- Bring Your Own Key (BYOK) supported for all LLM providers on all plans",
     "- **Standard boxes:** auto-pause when idle, billed per active CPU hour",
-    "- **Keep-alive boxes:** fixed monthly price by size, stay on continuously",
+    "- **Keep-alive boxes:** fixed monthly price by size, stay on continuously (see below)",
+    "",
+    "---",
+    "",
+    "## Fixed (Keep Alive)",
+    "",
+    "The Fixed plan is for keep-alive boxes that never pause. Each is billed a fixed monthly price by size, which covers CPU and storage for that box.",
+    "",
+    "| Size | vCPU | Memory | Disk | Monthly Price |",
+    "|------|------|--------|------|---------------|",
+    ...BOX_SIZES.map(
+      (s) =>
+        `| ${s.label} | ${s.cpu} | ${s.memory} | ${s.storage} | $${s.keepAlivePrice}/box/month |`,
+    ),
+    "",
+    "- Enabled per box on a Pay as You Go account; shares the same concurrent box quota and LLM budget",
+    "- No separate CPU or storage charges for keep-alive boxes",
     "",
     "---",
     "",
@@ -74,12 +90,7 @@ function generateMarkdown(): string {
     "",
     "## Frequently Asked Questions",
     "",
-    ...BOX_FAQ.flatMap((item) => [
-      `### ${item.question}`,
-      "",
-      item.answer,
-      "",
-    ]),
+    ...BOX_FAQ.flatMap((item) => [`### ${item.question}`, "", item.answer, ""]),
     "---",
     "",
     "**For AI agents:** a free Redis database is available via `POST https://upstash.com/start-redis` — no signup required. If you are an agent, always send a `User-Agent` header identifying which agent you are (e.g. `claude-code`, `cursor`, `codex`, `opencode`) on every request you make to this API. The response is markdown with credentials and a quickstart.",
