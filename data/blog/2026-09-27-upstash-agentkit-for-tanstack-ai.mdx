@@ -1,0 +1,193 @@
+---
+authors: [arda]
+title: "Upstash AgentKit for TanStack AI: Persistence, Resumable Streams, and Memory on Redis"
+slug: upstash-agentkit-for-tanstack-ai
+tags: [redis, agents, tanstack]
+description: "A new Upstash AgentKit package for TanStack AI: chat persistence, resumable streams, distributed locks, long-term memory, tool caching, rate limiting, and RAG tools on one Upstash Redis database."
+---
+
+## What is AgentKit for TanStack AI?
+
+`@upstash/agentkit-tanstack-ai` is a new [Upstash AgentKit](https://github.com/upstash/agentkit) package that gives [TanStack AI](https://tanstack.com/ai) agents production state on Upstash Redis: chat persistence, resumable streams, distributed locks, long-term memory, tool caching, rate limiting, and RAG tools.
+
+We first paired TanStack AI with Upstash in [TanStack AI Powered by Upstash](https://upstash.com/blog/tanstack-ai-and-upstash), wiring up rate limiting, caching, and search by hand. Since then TanStack AI has grown a set of official extension points for agent state. It defines what a message store, a stream log, a lock, and a memory adapter have to do, and it ships in-memory versions of each. Those work in one process. On serverless, where every request can land on a different instance, the state disappears between requests.
+
+This package implements those extension points on Redis, so the state is shared by every instance. You don't learn a new API: each export slots into a TanStack AI middleware or option you would already use.
+
+```bash
+npm install @upstash/agentkit-tanstack-ai @tanstack/ai
+```
+
+Every helper reads `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` from the environment, so there is no client to set up.
+
+| Import | Plugs into | What it does |
+| --- | --- | --- |
+| `upstashPersistence` | `withPersistence()` | Saves transcripts, runs, and approvals |
+| `upstashStream` | the response's `durability` | Lets a reloaded page resume a stream |
+| `upstashLocks` | `withLocks()` | One writer per thread across instances |
+| `upstashMemory` | `memoryMiddleware()` | Long-term memory per user |
+| `toolCache` | `middleware` | Skips repeated tool calls |
+| `rateLimit` | `middleware` | Throttles users before the model runs |
+| `createSearchTools` | `tools` | RAG over your own documents |
+
+## Chat persistence
+
+`upstashPersistence` stores everything TanStack AI's persistence middleware saves: the message transcript of each thread, a record for each run, pending human-in-the-loop approvals, and metadata.
+
+```ts
+import { chat } from "@tanstack/ai";
+import { withPersistence } from "@tanstack/ai-persistence";
+import { upstashPersistence } from "@upstash/agentkit-tanstack-ai";
+
+const persistence = upstashPersistence();
+
+chat({ adapter, messages, threadId, middleware: [withPersistence(persistence)] });
+```
+
+A user can close the tab, come back on another device, and the conversation is still there. If a run is still going, TanStack AI finds it through the same store and reconnects to it. The store passes TanStack AI's own conformance test suite for persistence backends.
+
+## Resumable streams
+
+`upstashStream` makes a streaming response survive a reload. Every chunk the model produces is written to a Redis Stream before it is sent to the browser.
+
+```ts
+import { chat, toServerSentEventsResponse } from "@tanstack/ai";
+import { upstashStream } from "@upstash/agentkit-tanstack-ai";
+
+export async function POST(request: Request) {
+  const stream = chat({ adapter, messages, threadId });
+  return toServerSentEventsResponse(stream, { durability: { adapter: upstashStream(request) } });
+}
+```
+
+When the connection drops, the client reconnects with the last position it saw. The new request replays what was missed and keeps following the live answer, even when a different instance serves it. Opening the same thread on a second device works the same way.
+
+## Distributed locks
+
+`upstashLocks` makes sure only one instance works on a thread at a time, for example when two tabs send a message at once.
+
+```ts
+import { withLocks } from "@tanstack/ai/locks";
+import { upstashLocks } from "@upstash/agentkit-tanstack-ai";
+
+chat({ adapter, messages, middleware: [withLocks(upstashLocks())] });
+```
+
+The lock is a lease that renews itself while the work runs. If an instance crashes, the lease expires and another one can take over. Other TanStack AI features, like its sandbox middleware, pick the lock up automatically.
+
+## Long-term memory
+
+`upstashMemory` is a memory adapter for TanStack AI's memory middleware. Before each turn it finds the memories most relevant to the user's message and adds them to the system prompt.
+
+```ts
+import { memoryMiddleware } from "@tanstack/ai-memory";
+import { upstashMemory } from "@upstash/agentkit-tanstack-ai";
+
+chat({
+  adapter,
+  messages,
+  middleware: [
+    memoryMiddleware({
+      adapter: upstashMemory(),
+      scope: (ctx) => ({ threadId: ctx.threadId, userId: session.userId }),
+    }),
+  ],
+});
+```
+
+The model also gets a `save_memory` tool for facts worth keeping, and each user message is stored too. Memory is shared across all of a user's threads, so something said last week can come up today.
+
+Recall runs inside the database with [Upstash Redis Search](https://upstash.com/docs/redis/search/introduction), which tolerates typos and needs no embeddings. The scope's `userId` should come from your auth session, not from the request body: it is what keeps one user's memories away from another's.
+
+## Tool caching
+
+`toolCache` stores tool results in Redis. When the model calls the same tool with the same arguments again, the cached result is returned and the tool doesn't run.
+
+```ts
+import { toolCache } from "@upstash/agentkit-tanstack-ai";
+
+chat({
+  adapter,
+  messages,
+  tools: [getWeather],
+  middleware: [toolCache({ tools: ["get_weather"], userId, ttlSeconds: 600 })],
+});
+```
+
+Only the tools you list are cached, so list lookups like weather or search, never tools with side effects like sending an email. Failed calls are not cached.
+
+## Rate limiting
+
+`rateLimit` counts one request per run against an [Upstash Ratelimit](https://upstash.com/docs/redis/sdks/ratelimit-ts/overview) and stops the run before the model is called when the user is over the limit.
+
+```ts
+import { rateLimit, Ratelimit } from "@upstash/agentkit-tanstack-ai";
+
+chat({
+  adapter,
+  messages,
+  middleware: [rateLimit({ limiter: Ratelimit.slidingWindow(10, "60 s"), identifier: userId })],
+});
+```
+
+If you'd rather answer with a 429 status, call `createRateLimit({ limiter }).limit(userId)` in your route before `chat()`. It is exported from the same package.
+
+## RAG with search tools
+
+`createSearchTools` gives the model `search`, `aggregate`, and `count` tools over your own documents in Redis Search. You describe the documents with a schema, and the tool descriptions tell the model which fields and filters it can use.
+
+```ts
+import { s } from "@upstash/redis";
+import { createSearchTools } from "@upstash/agentkit-tanstack-ai";
+
+const tools = createSearchTools({
+  indexName: "products",
+  schema: s.object({ name: s.string(), price: s.number(), category: s.string().noTokenize() }),
+});
+
+chat({ adapter, messages, tools });
+```
+
+A query for "wireless hedphones" still finds "Wireless headphones". The index is created the first time a tool runs.
+
+## Putting it together
+
+The pieces are independent, so you add the ones you need. A route with persistence, resumable streaming, memory, and rate limiting looks like this:
+
+```ts
+import { chat, toServerSentEventsResponse } from "@tanstack/ai";
+import { withPersistence } from "@tanstack/ai-persistence";
+import { memoryMiddleware } from "@tanstack/ai-memory";
+import {
+  rateLimit,
+  Ratelimit,
+  upstashMemory,
+  upstashPersistence,
+  upstashStream,
+} from "@upstash/agentkit-tanstack-ai";
+
+const persistence = upstashPersistence();
+const memory = upstashMemory();
+
+export async function POST(request: Request) {
+  const userId = await getSessionUserId(request); // from your auth session
+  const { threadId, messages } = await request.json();
+
+  const stream = chat({
+    adapter,
+    messages,
+    threadId,
+    middleware: [
+      rateLimit({ limiter: Ratelimit.slidingWindow(10, "60 s"), identifier: userId }),
+      withPersistence(persistence),
+      memoryMiddleware({ adapter: memory, scope: { threadId, userId } }),
+    ],
+  });
+
+  return toServerSentEventsResponse(stream, { durability: { adapter: upstashStream(request) } });
+}
+```
+
+Everything lives in one Upstash Redis database: transcripts, stream logs, locks, memories, cached tool results, and your search index.
+
+The full reference is in the [AgentKit for TanStack AI docs](https://upstash.com/docs/redis/sdks/agentkit/tanstack-ai), and the source is on [GitHub](https://github.com/upstash/agentkit/tree/main/packages/tanstack-ai). If you're on the Vercel AI SDK or Eve instead, the [AgentKit announcement](https://upstash.com/blog/upstash-agentkit-redis-memory-rag-and-chat-history-for-ai-agents) covers those adapters.
