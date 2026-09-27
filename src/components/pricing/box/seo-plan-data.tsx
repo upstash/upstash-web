@@ -1,4 +1,9 @@
-import { BOX_ALL_PLANS, BOX_PAYG_PLAN, BOX_SIZES } from "@/data/pricing/box";
+import {
+  BOX_ALL_PLANS,
+  BOX_KEEPALIVE_PLAN,
+  BOX_PAYG_PLAN,
+  BOX_SIZES,
+} from "@/data/pricing/box";
 
 /**
  * Crawlable, screen-reader-only mirror of the full pricing data.
@@ -79,7 +84,9 @@ export default function SeoPlanData() {
 
       <h3>Pay as You Go — pricing details</h3>
       <ul>
-        <li>Price: {BOX_PAYG_PLAN.priceDisplay} {BOX_PAYG_PLAN.priceSubtext}</li>
+        <li>
+          Price: {BOX_PAYG_PLAN.priceDisplay} {BOX_PAYG_PLAN.priceSubtext}
+        </li>
         <li>
           Concurrent boxes:{" "}
           {typeof BOX_PAYG_PLAN.maxConcurrentBoxes === "number"
@@ -97,6 +104,24 @@ export default function SeoPlanData() {
         {BOX_PAYG_PLAN.keepAlivePricing !== null ? (
           <li>Keep-alive pricing: {BOX_PAYG_PLAN.keepAlivePricing}</li>
         ) : null}
+      </ul>
+
+      <h3>Fixed (Keep Alive) — pricing details</h3>
+      <ul>
+        <li>
+          Price: {BOX_KEEPALIVE_PLAN.priceDisplay}{" "}
+          {BOX_KEEPALIVE_PLAN.priceSubtext}
+        </li>
+        {BOX_KEEPALIVE_PLAN.keepAlivePricing !== null ? (
+          <li>By size: {BOX_KEEPALIVE_PLAN.keepAlivePricing}</li>
+        ) : null}
+        {BOX_KEEPALIVE_PLAN.cpuHourPricing !== null ? (
+          <li>CPU: {BOX_KEEPALIVE_PLAN.cpuHourPricing}</li>
+        ) : null}
+        {BOX_KEEPALIVE_PLAN.storagePrice !== null ? (
+          <li>Storage: {BOX_KEEPALIVE_PLAN.storagePrice}</li>
+        ) : null}
+        <li>Idle timeout: none, boxes stay on continuously</li>
       </ul>
 
       <p>

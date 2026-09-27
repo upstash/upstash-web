@@ -14,7 +14,7 @@ export interface BoxSize {
 export interface BoxPlan {
   id: string;
   name: string;
-  type: "free" | "payg" | "enterprise";
+  type: "free" | "payg" | "keepalive" | "enterprise";
   description: string;
   priceDisplay: string;
   priceSubtext: string;
@@ -43,7 +43,7 @@ export const BOX_SIZES: BoxSize[] = [
     memory: "4 GB RAM",
     storage: "5 GB",
     storageLimit: "5 GB",
-    cpuHourPrice: 0.10,
+    cpuHourPrice: 0.1,
     keepAlivePrice: 8,
   },
   {
@@ -53,7 +53,7 @@ export const BOX_SIZES: BoxSize[] = [
     memory: "8 GB RAM",
     storage: "10 GB",
     storageLimit: "10 GB",
-    cpuHourPrice: 0.20,
+    cpuHourPrice: 0.2,
     keepAlivePrice: 16,
   },
   {
@@ -63,7 +63,7 @@ export const BOX_SIZES: BoxSize[] = [
     memory: "16 GB RAM",
     storage: "20 GB",
     storageLimit: "20 GB",
-    cpuHourPrice: 0.40,
+    cpuHourPrice: 0.4,
     keepAlivePrice: 32,
   },
 ];
@@ -90,15 +90,37 @@ export const BOX_PAYG_PLAN: BoxPlan = {
   id: "payg",
   name: "Pay as You Go",
   type: "payg",
-  description: "Pay only when your box is active. Choose the size that matches your workload.",
+  description:
+    "Pay only when your box is active. Choose the size that matches your workload.",
   priceDisplay: "$0.10–$0.40",
   priceSubtext: "per active CPU hour",
   maxConcurrentBoxes: 1000,
   cpuHoursPerMonth: "Unlimited",
   llmBudgetPerMonth: "$100",
   storagePrice: "$0.10 per GB/month",
-  cpuHourPricing: "Small: $0.10, Medium: $0.20, Large: $0.40 per active CPU hour",
-  keepAlivePricing: "Small: $8, Medium: $16, Large: $32 per month (fixed, replaces usage billing)",
+  cpuHourPricing:
+    "Small: $0.10, Medium: $0.20, Large: $0.40 per active CPU hour",
+  keepAlivePricing:
+    "Available per box at a fixed monthly price. See the Fixed plan.",
+  communitySupport: true,
+  emailSupport: true,
+  dedicatedSupport: false,
+};
+
+export const BOX_KEEPALIVE_PLAN: BoxPlan = {
+  id: "keepalive",
+  name: "Fixed",
+  type: "keepalive",
+  description:
+    "Keep-alive boxes that never pause. One fixed monthly price per box, no separate CPU or storage charges.",
+  priceDisplay: "$8–$32",
+  priceSubtext: "per box / month",
+  maxConcurrentBoxes: 1000,
+  cpuHoursPerMonth: "Unlimited",
+  llmBudgetPerMonth: "$100",
+  storagePrice: "Included",
+  cpuHourPricing: "Included in the fixed monthly price",
+  keepAlivePricing: "Small: $8, Medium: $16, Large: $32 per box / month",
   communitySupport: true,
   emailSupport: true,
   dedicatedSupport: false,
@@ -108,7 +130,8 @@ export const BOX_ENTERPRISE_PLAN: BoxPlan = {
   id: "enterprise",
   name: "Enterprise",
   type: "enterprise",
-  description: "For teams that need custom limits, regional requirements, or dedicated support.",
+  description:
+    "For teams that need custom limits, regional requirements, or dedicated support.",
   priceDisplay: "Custom",
   priceSubtext: "contact us",
   maxConcurrentBoxes: "Custom",
@@ -125,6 +148,7 @@ export const BOX_ENTERPRISE_PLAN: BoxPlan = {
 export const BOX_ALL_PLANS: BoxPlan[] = [
   BOX_FREE_PLAN,
   BOX_PAYG_PLAN,
+  BOX_KEEPALIVE_PLAN,
   BOX_ENTERPRISE_PLAN,
 ];
 
