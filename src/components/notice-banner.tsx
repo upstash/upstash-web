@@ -99,8 +99,9 @@ export const NoticeBanner = () => {
           // no room for it.
           <>
             We use cookies to improve your experience. Read our updated{" "}
-            <PolicyLink href="/trust/terms">Terms</PolicyLink>,{" "}
-            <PolicyLink href="/trust/privacy">Privacy Policy</PolicyLink> and{" "}
+            <PolicyLink href="/trust/terms.pdf">Terms</PolicyLink>,{" "}
+            <PolicyLink href="/trust/privacy.pdf">Privacy Policy</PolicyLink>{" "}
+            and{" "}
             <PolicyLink href="/trust/dpa.pdf">
               Data Protection Agreement
             </PolicyLink>
@@ -108,8 +109,9 @@ export const NoticeBanner = () => {
           </>
         ) : showTerms ? (
           <>
-            Our <PolicyLink href="/trust/terms">Terms</PolicyLink>,{" "}
-            <PolicyLink href="/trust/privacy">Privacy Policy</PolicyLink> and{" "}
+            Our <PolicyLink href="/trust/terms.pdf">Terms</PolicyLink>,{" "}
+            <PolicyLink href="/trust/privacy.pdf">Privacy Policy</PolicyLink>{" "}
+            and{" "}
             <PolicyLink href="/trust/dpa.pdf">
               Data Protection Agreement
             </PolicyLink>{" "}
@@ -118,7 +120,7 @@ export const NoticeBanner = () => {
         ) : (
           <>
             We use cookies to improve your experience. Read our{" "}
-            <PolicyLink href="/trust/privacy">privacy policy.</PolicyLink>
+            <PolicyLink href="/trust/privacy.pdf">privacy policy.</PolicyLink>
           </>
         )}
       </p>
