@@ -18,13 +18,15 @@ This package implements those extension points on Redis, so the state is shared 
 npm install @upstash/agentkit-tanstack-ai @tanstack/ai
 ```
 
+Persistence and memory live on their own entry points, `@upstash/agentkit-tanstack-ai/persistence` and `@upstash/agentkit-tanstack-ai/memory`, so you only install TanStack's persistence or memory package when you use them.
+
 Every helper reads `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` from the environment, so there is no client to set up.
 
 | Import | Plugs into | What it does |
 | --- | --- | --- |
 | `upstashPersistence` | `withPersistence()` | Saves transcripts, runs, and approvals |
 | `upstashStream` | the response's `durability` | Lets a reloaded page resume a stream |
-| `upstashLocks` | `withLocks()` | One writer per thread across instances |
+| `upstashLocks` | `withLocks()` | Distributed locks for middleware like sandboxes |
 | `upstashMemory` | `memoryMiddleware()` | Long-term memory per user |
 | `toolCache` | `middleware` | Skips repeated tool calls |
 | `rateLimit` | `middleware` | Throttles users before the model runs |
@@ -37,7 +39,7 @@ Every helper reads `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` from 
 ```ts
 import { chat } from "@tanstack/ai";
 import { withPersistence } from "@tanstack/ai-persistence";
-import { upstashPersistence } from "@upstash/agentkit-tanstack-ai";
+import { upstashPersistence } from "@upstash/agentkit-tanstack-ai/persistence";
 
 const persistence = upstashPersistence();
 
@@ -64,7 +66,7 @@ When the connection drops, the client reconnects with the last position it saw. 
 
 ## Distributed locks
 
-`upstashLocks` makes sure only one instance works on a thread at a time, for example when two tabs send a message at once.
+`upstashLocks` gives TanStack AI's middleware a lock that works across instances. TanStack AI uses it for steps that must not run twice, like setting up a sandbox: when two requests for the same thread arrive at once, only one of them creates the sandbox.
 
 ```ts
 import { withLocks } from "@tanstack/ai/locks";
@@ -73,7 +75,7 @@ import { upstashLocks } from "@upstash/agentkit-tanstack-ai";
 chat({ adapter, messages, middleware: [withLocks(upstashLocks())] });
 ```
 
-The lock is a lease that renews itself while the work runs. If an instance crashes, the lease expires and another one can take over. Other TanStack AI features, like its sandbox middleware, pick the lock up automatically.
+`withLocks` only provides the lock, it doesn't lock whole chat turns. TanStack AI's sandbox middleware picks it up automatically, and your own middleware can use it for any step that must run once. Each lock is a lease that renews itself while the work runs, so if an instance crashes, the lease expires and another one can take over.
 
 ## Long-term memory
 
@@ -81,7 +83,7 @@ The lock is a lease that renews itself while the work runs. If an instance crash
 
 ```ts
 import { memoryMiddleware } from "@tanstack/ai-memory";
-import { upstashMemory } from "@upstash/agentkit-tanstack-ai";
+import { upstashMemory } from "@upstash/agentkit-tanstack-ai/memory";
 
 chat({
   adapter,
@@ -158,13 +160,9 @@ The pieces are independent, so you add the ones you need. A route with persisten
 import { chat, toServerSentEventsResponse } from "@tanstack/ai";
 import { withPersistence } from "@tanstack/ai-persistence";
 import { memoryMiddleware } from "@tanstack/ai-memory";
-import {
-  rateLimit,
-  Ratelimit,
-  upstashMemory,
-  upstashPersistence,
-  upstashStream,
-} from "@upstash/agentkit-tanstack-ai";
+import { rateLimit, Ratelimit, upstashStream } from "@upstash/agentkit-tanstack-ai";
+import { upstashPersistence } from "@upstash/agentkit-tanstack-ai/persistence";
+import { upstashMemory } from "@upstash/agentkit-tanstack-ai/memory";
 
 const persistence = upstashPersistence();
 const memory = upstashMemory();
