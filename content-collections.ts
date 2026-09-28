@@ -94,7 +94,8 @@ export const trust = defineCollection({
     title: z.string(),
     description: z.string(),
     updated: z.string().optional(),
-    pdf: z.string(),
+    // documents without a PDF version (e.g. the vulnerability disclosure policy) leave it out
+    pdf: z.string().optional(),
   }),
   transform: async (doc, ctx) => {
     const mdx = await compileMDX(ctx, doc, {

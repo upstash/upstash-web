@@ -79,15 +79,17 @@ export default async function TrustDocPage(props: Props) {
 
             <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-text-mute">
               {doc.updated && <span>{doc.updated}</span>}
-              <a
-                href={doc.pdf}
-                target="_blank"
-                className="inline-flex items-center gap-1 hover:text-primary hover:underline"
-                rel="noreferrer"
-              >
-                <IconFileTypePdf size={18} />
-                Download PDF
-              </a>
+              {doc.pdf && (
+                <a
+                  href={doc.pdf}
+                  target="_blank"
+                  className="inline-flex items-center gap-1 hover:text-primary hover:underline"
+                  rel="noreferrer"
+                >
+                  <IconFileTypePdf size={18} />
+                  Download PDF
+                </a>
+              )}
             </div>
           </Container>
         </header>
