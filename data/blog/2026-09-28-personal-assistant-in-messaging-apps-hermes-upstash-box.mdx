@@ -1,0 +1,134 @@
+---
+slug: personal-assistant-in-messaging-apps-hermes-upstash-box
+title: "Setting Up a Personal Assistant in Your Messaging Apps with Hermes and Upstash Box"
+authors: [alitarik]
+tags: [ai, box, agents]
+description: "Hermes is an open-source agent from Nous Research that you can talk to from WhatsApp, Telegram, Slack, Discord and more. This post runs it on an Upstash Box so it stays online, then walks through connecting WhatsApp as an example. Every other messaging app follows the same flow."
+---
+
+The best place for an AI assistant is the app you already have open all day. You don't need a new tab or a new app. You send a message, the way you would to a friend, and the answer comes back in the same chat.
+
+[Hermes](https://github.com/NousResearch/hermes-agent) makes this easy. It is an open-source agent from Nous Research with a built-in **messaging gateway**. One process connects the agent to WhatsApp, Telegram, Slack, Discord, Signal and a long list of other apps. The agent behind it has a shell, files, memory, skills and scheduled tasks, so it can do real work, not only chat.
+
+What it needs is a computer that is always on. This post runs Hermes on an [Upstash Box](https://upstash.com/docs/box/overall/quickstart) and connects it to WhatsApp. At the end, you have an assistant in your pocket that keeps running when your laptop is closed.
+
+<Summary>
+  - Hermes runs one gateway process that connects the agent to your messaging apps. You chat with it like with any other contact.
+  - A keep-alive Medium box gives it an always-on, isolated machine for a flat $16 a month. An init script restarts the gateway after a crash.
+  - WhatsApp setup is one command: `hermes whatsapp`. Scan a QR code with your phone and the box becomes a linked device.
+  - Telegram, Slack, Discord, Signal and the rest follow the same flow: enable the platform, give it a token or pair it, set an allowlist, restart the gateway.
+</Summary>
+
+---
+
+## Why a box
+
+An assistant in a messaging app is only useful if it answers. On your laptop, it stops when the lid closes. On a VM, you take care of a server: updates, disk, security, a process manager.
+
+A box sits between the two. It is a full Linux machine that you create in a minute and reach over SSH. With **keep-alive**, it never pauses, and a Medium box (4 vCPU, 8 GB RAM) costs a fixed $16 a month. Hermes has a large install, so Medium is the size we recommend.
+
+Isolation matters here too. Hermes runs shell commands and edits files for you. On a box, anything it does stays inside the box. Your own machine, your SSH keys and your browser sessions are never involved.
+
+---
+
+## 1. Create a box and install Hermes
+
+In the [Upstash Console](https://console.upstash.com/box), create a box with size **Medium** and **Keep alive** turned on. Then connect to it. The username is the box name, and the password is your Box API key.
+
+```bash
+ssh <box-name>@us-east-1.box.upstash.com
+```
+
+Install Hermes:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash
+```
+
+At the end, a setup wizard starts. Some tips for running it on a box:
+
+- Choose **Full setup**. Quick Setup logs in with a browser, and the box does not have one on your screen.
+- For the provider, pick **Anthropic** to use your Claude Code subscription or an Anthropic API key. OpenRouter, OpenAI and many other providers work too.
+- For the terminal backend, keep **Local**. The box is already the sandbox.
+- Under messaging platforms, enable **WhatsApp** and enter the numbers allowed to talk to it, with the country code and without `+`. Don't leave the allowlist empty.
+
+Run `source ~/.bashrc`, then `hermes` to check that the model answers.
+
+---
+
+## 2. Connect WhatsApp
+
+Hermes connects to WhatsApp the same way WhatsApp Web does: the box becomes a **linked device** on a WhatsApp account. There are two ways to use it:
+
+- **Self-chat.** Use your own number and talk to Hermes in the chat with yourself. This is the fastest way to try it.
+- **Bot.** Give Hermes its own number (a second SIM or eSIM). Other people can message it, and it looks like any other contact.
+
+Start the pairing wizard:
+
+```bash
+hermes whatsapp
+```
+
+It asks for the mode, installs the bridge, and prints a QR code in your terminal. On your phone, open WhatsApp, go to **Settings → Linked devices → Link a device**, and scan it. If the QR code looks broken, make the terminal window wider and run the command again.
+
+---
+
+## 3. Start the gateway
+
+```bash
+hermes gateway run > ~/gateway.log 2>&1 &
+tail -f ~/gateway.log
+```
+
+When the log shows that WhatsApp is connected, send "hi". The answer comes back in the same chat.
+
+---
+
+## 4. Keep it running
+
+A keep-alive box never pauses, but a process can still crash or the box can restart. In the Console, open the box settings and set this as the **init script**:
+
+```bash
+hermes gateway run > gateway.log 2>&1 &
+```
+
+The init script runs every time the box starts. We tested it by killing the box's main process: the box came back in about 30 seconds with the home directory intact, and the init script started the gateway again. The WhatsApp session lives in `~/.hermes/platforms/whatsapp/session` inside that home directory, so you don't scan the QR code again.
+
+---
+
+## Every other app works the same way
+
+WhatsApp is one platform of many. The gateway also supports **Telegram, Slack, Discord, Signal, Matrix, Mattermost, Microsoft Teams, Google Chat, LINE, email, SMS, iMessage (through BlueBubbles), WeChat, Feishu, DingTalk** and more. The flow is the same for each:
+
+1. **Enable the platform.** Run `hermes gateway setup` and select it.
+2. **Connect the account.** WhatsApp pairs as a linked device with a QR code, and Signal runs through a `signal-cli` daemon. Telegram, Discord and Slack use a bot token that you create in the app: BotFather for Telegram, the Developer Portal for Discord, a Slack app for Slack.
+3. **Set an allowlist.** Each platform has its own, for example `TELEGRAM_ALLOWED_USERS` or `DISCORD_ALLOWED_USERS`.
+4. **Restart the gateway.** One gateway process serves all enabled platforms at the same time.
+
+For example, Telegram only needs two lines in `~/.hermes/.env`:
+
+```bash
+TELEGRAM_BOT_TOKEN=123456:ABC-your-token
+TELEGRAM_ALLOWED_USERS=your-telegram-user-id
+```
+
+Because it is one agent behind every app, it has the same memory and skills everywhere. You can start a task from Slack at work and ask about it from WhatsApp in the evening.
+
+---
+
+## What to do with it
+
+Some ideas that work well from a chat:
+
+- **Scheduled briefings.** Ask it to send you a summary every morning. Hermes has its own cron and delivers the result to the chat.
+- **Research on the go.** Send a link or a question from your phone and get a summary back while you do something else.
+- **Small jobs on a real machine.** It has a shell, so it can clone a repository, run a script, or check a log and report back.
+- **Voice notes and images.** Send a photo and it reads it. Turn on speech-to-text with `hermes tools` and it transcribes voice messages too.
+
+---
+
+## Set it up
+
+- [Box quickstart](https://upstash.com/docs/box/overall/quickstart)
+- [Hermes on Upstash Box](https://upstash.com/docs/box/guides/hermes-setup)
+- [Hermes messaging docs](https://hermes-agent.nousresearch.com/docs/user-guide/messaging/whatsapp)
