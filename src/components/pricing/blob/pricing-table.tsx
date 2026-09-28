@@ -3,6 +3,7 @@
 import Button from "@/components/button";
 import {
   BLOB_CARD_METERS,
+  BLOB_FREE_EGRESS,
   BLOB_FREE_PLAN,
   BLOB_PAYG_PLAN,
 } from "@/data/pricing/blob";
@@ -85,8 +86,8 @@ export default function PricingTable() {
           </div>
         </div>
 
-        {/* Rates, billed from the first unit. Egress leads with its free
-            allowance and drops the rate to a note under it. */}
+        {/* Rates, billed from the first unit. Egress strikes its rate and
+            shows the free allowance in its place. */}
         <div className="w-full px-6 *:border-b *:border-bg-mute">
           {BLOB_CARD_METERS.map((meter) => (
             <div key={meter.key} className="py-3">
@@ -94,10 +95,13 @@ export default function PricingTable() {
               {meter.paygIncluded ? (
                 <>
                   <p className="font-semibold">
-                    <span className="text-primary-text">Free</span> up to{" "}
-                    {meter.paygIncluded}
+                    <span className="mr-2 font-normal text-text-mute line-through">
+                      {meter.rate}
+                    </span>
+                    <span className="text-primary-text">$0</span> up to{" "}
+                    {BLOB_FREE_EGRESS}
                   </p>
-                  <p className="text-sm text-text-mute">then {meter.rate}</p>
+                  <p className="text-sm text-text-mute">every month</p>
                 </>
               ) : (
                 <p className="font-semibold">{meter.rate}</p>
