@@ -1,0 +1,5 @@
+Contact: mailto:security@upstash.com
+Expires: 2027-09-29T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://upstash.com/.well-known/security.txt
+Policy: https://upstash.com/trust/vulnerability-disclosure
