@@ -54,7 +54,7 @@
     },
     {
       "source": "/legal/terms",
-      "destination": "/trust/terms.pdf"
+      "destination": "/trust/terms"
     },
     {
       "source": "/blog/nextjs-edge-functions",

@@ -86,6 +86,31 @@ export const glossary = defineCollection({
   },
 });
 
+export const trust = defineCollection({
+  name: "TrustDoc",
+  directory: "./data/trust",
+  include: "*.mdx",
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    updated: z.string().optional(),
+    pdf: z.string(),
+  }),
+  transform: async (doc, ctx) => {
+    const mdx = await compileMDX(ctx, doc, {
+      remarkPlugins: [remarkGfm],
+      rehypePlugins: [rehypeSlug],
+    });
+    const slug = doc._meta.path;
+
+    return {
+      ...doc,
+      mdx,
+      slug,
+    };
+  },
+});
+
 export const posts = defineCollection({
   name: "Post",
   directory: "./data/blog",
@@ -169,5 +194,5 @@ function countWords(markdown: string): number {
 }
 
 export default defineConfig({
-  collections: [customers, jobs, glossary, posts],
+  collections: [customers, jobs, glossary, trust, posts],
 });

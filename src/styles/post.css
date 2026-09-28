@@ -172,3 +172,21 @@
      policy banner via --header-offset, set from the actual header height) */
   scroll-margin-top: calc(var(--header-offset, 5rem) + 1.5rem);
 }
+
+/* Trust & legal documents: many short numbered clauses, so tighter rhythm
+   than blog posts */
+.legal .post > * {
+  @apply mb-5;
+}
+
+.legal .post h2 {
+  @apply mt-12 md:mt-14;
+}
+
+.legal .post h3 {
+  @apply mt-8;
+}
+
+.legal .post :where(h2, h3, h4) {
+  @apply mb-4;
+}

@@ -1,7 +1,6 @@
 import Button from "@/components/button";
 import Container from "@/components/container";
 import { Logo } from "@/components/logo";
-import OutLink from "@/components/out-link";
 import cx from "@/utils/cx";
 import { IconArrowUpRight } from "@tabler/icons-react";
 import Link from "next/link";
@@ -32,8 +31,18 @@ export default function Footer({ className, ...props }: IAppFooter) {
             >
               Contact Us
             </Link>
-            <OutLink href="/trust/privacy.pdf">Privacy Policy</OutLink>
-            <OutLink href="/trust/terms.pdf">Terms of Service</OutLink>
+            <Link
+              href="/trust/privacy"
+              className="hover:text-primary hover:underline"
+            >
+              Privacy Policy
+            </Link>
+            <Link
+              href="/trust/terms"
+              className="hover:text-primary hover:underline"
+            >
+              Terms of Service
+            </Link>
             <Link
               href="/redis"
               className="group inline-flex items-center gap-1 hover:text-primary hover:underline"
