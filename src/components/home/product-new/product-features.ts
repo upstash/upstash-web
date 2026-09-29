@@ -226,7 +226,7 @@ export const PRODUCT_FEATURES: Record<
       bullets: [
         "Works with the AWS SDK and any S3 tool",
         "Public or private buckets with signed URLs",
-        "Pay for storage, operations and egress only",
+        "1 TB of free egress a month on pay as you go",
       ],
     },
   ],

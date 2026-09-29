@@ -6,7 +6,7 @@ title: "File uploads in a React app: What to use and pricing breakdown (2026)"
 description: "Best ways to upload files in React (2026): Which providers make sense, architecture decisions, pricing and more."
 ---
 
-For file uploads in a React app, the best setup is a service where the browser uploads files straight to storage. Your server signs a short-lived permission, and the browser uses it to send the file directly to storage. [Upstash Blob](https://upstash.com/blob) does this with one server handler and one React hook, and costs $0.02 per GB stored and $0.02 per GB served.
+For file uploads in a React app, the best setup is a service where the browser uploads files straight to storage. Your server signs a short-lived permission, and the browser uses it to send the file directly to storage. [Upstash Blob](https://upstash.com/blob) does this with one server handler and one React hook, and costs $0.02 per GB stored, with egress free up to 1 TB a month.
 
 Where the file bytes go matters more than which library draws the drop zone. When the browser sends them straight to storage, the choice comes down to how much of the upload flow you want to build yourself and what you pay per GB.
 
@@ -165,15 +165,15 @@ Here's a small overview:
 - **An app that serves terabytes a month and has time to build the UI:** Cloudflare R2. It has [no egress fees at all](https://developers.cloudflare.com/r2/pricing/), and at high traffic nothing else here comes close on cost.
 - **An app that needs image or video resizing on the fly:** Cloudinary. None of the storage options transform media.
 - **A small app with a fixed amount of storage:** UploadThing. Its flat plans make the monthly bill easy to predict, and it ships ready-made upload button and dropzone components.
-- **An app that runs fully on Vercel:** Vercel Blob works, but it charges more than twice as much per GB served as Upstash Blob.
+- **An app that runs fully on Vercel:** Vercel Blob works, but it charges $0.05 per GB served, while Upstash Blob serves the first 1 TB a month for free.
 
 ## How much do file uploads cost?
 
-File upload costs depend on what you pay per GB stored each month and what you pay per GB your users download (egress). Upstash Blob charges [$0.02 for each](https://upstash.com/pricing/blob), Vercel Blob charges $0.023 and $0.05 respectively, and Cloudflare R2 charges $0.015 with free egress.
+File upload costs depend on what you pay per GB stored each month and what you pay per GB your users download (egress). Upstash Blob charges [$0.02 per GB stored and nothing for the first 1 TB of egress a month](https://upstash.com/pricing/blob), Vercel Blob charges $0.023 and $0.05 respectively, and Cloudflare R2 charges $0.015 with free egress.
 
 | Service | Storage per GB-month | Egress per GB | Free tier |
 | --- | --- | --- | --- |
-| [Upstash Blob](https://upstash.com/pricing/blob) | $0.02 | $0.02, CDN included | 1 GB storage, 10 GB bandwidth, no credit card |
+| [Upstash Blob](https://upstash.com/pricing/blob) | $0.02 | Free up to 1 TB a month, then $0.02, CDN included | 1 GB storage, 10 GB bandwidth, no credit card |
 | [Vercel Blob](https://vercel.com/docs/vercel-blob/usage-and-pricing) | $0.023 | $0.05 | 1 GB storage, 10 GB transfer on Hobby |
 | [Cloudflare R2](https://developers.cloudflare.com/r2/pricing/) | $0.015 | Free | Not covered here |
 | [AWS S3](https://aws.amazon.com/s3/pricing) + CloudFront | $0.023 in us-east-1 | [$0.085](https://blog.blazingcdn.com/en-us/what-is-the-price-per-gb-of-aws-cloudfront-cdn) for the first 10 TB, US and EU | Not covered here |
@@ -189,7 +189,7 @@ Here is the Upstash Blob pricing page:
 Take an app that stores 100 GB and serves 1 TB (1,000 GB) of downloads in a month. On the four services that bill per GB, that app costs:
 
 ```text
-Upstash Blob:        100 × $0.02  + 1,000 × $0.02  = $22.00
+Upstash Blob:        100 × $0.02  + 1,000 × $0     = $2.00
 Cloudflare R2:       100 × $0.015 + 1,000 × $0     = $1.50
 Vercel Blob:         100 × $0.023 + 1,000 × $0.05  = $52.30
 AWS S3 + CloudFront: 100 × $0.023 + 1,000 × $0.085 = $87.30
@@ -199,7 +199,7 @@ These figures only cover storage and egress. Request charges are extra on all fo
 
 ![](https://cdn.bydefault.so/image-CrOU8QEzuklOsF_TM88Zp.png)
 
-R2 is by far the cheapest because egress is free. In exchange, you write presigned URLs, progress, multipart and retries yourself. Upstash Blob costs less than half of Vercel Blob and about a quarter of S3 with CloudFront, and it includes the upload flow.
+R2 and Upstash Blob are the cheapest because neither charges for this much egress: R2 never does, and Upstash Blob serves the first 1 TB a month for free. On R2 you write presigned URLs, progress, multipart and retries yourself, while Upstash Blob includes the upload flow for 50 cents more.
 
 UploadThing's $10 plan covers exactly 100 GB of storage, so it's cheap for this app. Past 250 GB it charges $0.08 per GB stored, four times Upstash Blob's rate:
 
