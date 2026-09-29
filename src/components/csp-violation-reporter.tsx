@@ -18,6 +18,10 @@ function toOrigin(uri: string) {
 
 const MAX_REPORTED_VIOLATIONS_PER_PAGELOAD = 30;
 
+// GA4 pings the visitor's local google.<ccTLD> for ad-audience cookie
+// matching. CSP cannot wildcard a TLD, so these are blocked on purpose.
+const GOOGLE_CCTLD_ORIGIN = /^https:\/\/www\.google\.(?:com?\.)?[a-z]{2}$/;
+
 /**
  * Reports enforced CSP violations to GA4 as `csp_violation` events,
  * mirroring the console's reporter (upstash-console-v2#1413): same event
@@ -34,6 +38,7 @@ export function CspViolationReporter() {
       if (/^(?:chrome|moz|safari)-extension/.test(event.blockedURI)) return;
 
       const blockedOrigin = toOrigin(event.blockedURI);
+      if (GOOGLE_CCTLD_ORIGIN.test(blockedOrigin)) return;
       const key = `${event.effectiveDirective}:${blockedOrigin}`;
       if (seen.has(key) || seen.size >= MAX_REPORTED_VIOLATIONS_PER_PAGELOAD)
         return;
