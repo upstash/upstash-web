@@ -1,4 +1,5 @@
 import { SITE_URL } from "@/utils/const";
+import { ASK_MARKDOWN_LINE } from "@/lib/context7-ask";
 
 /**
  * Markdown representation of the homepage, served when a client asks for
@@ -31,6 +32,7 @@ export function renderHome(): string {
     "",
     "## For AI agents",
     "",
+    `- ${ASK_MARKDOWN_LINE}`,
     `- Create a free, temporary Redis database without signup: \`POST ${SITE_URL}/start-redis\` (send \`Idempotency-Key: <uuidv4>\` and a \`User-Agent\` naming your agent). \`GET\` the same URL for instructions.`,
     `- OpenAPI spec for the Upstash Developer API (authenticated; manage databases, teams and billing): ${SITE_URL}/docs/devops/developer-api/openapi.yaml`,
     `- LLM-friendly site index: ${SITE_URL}/llms.txt (full version: ${SITE_URL}/llms-full.txt)`,

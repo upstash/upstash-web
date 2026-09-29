@@ -9,6 +9,7 @@ import {
   type FeatureAvailability,
   type RedisPlan,
 } from "@/data/pricing/redis";
+import { ASK_MARKDOWN_LINE } from "@/lib/context7-ask";
 
 export const dynamic = "force-static";
 
@@ -61,6 +62,8 @@ function generateMarkdown(): string {
     "> **Contact:** sales@upstash.com (Enterprise) · support@upstash.com (Support)",
     "",
     "---",
+    "",
+    ASK_MARKDOWN_LINE,
     "",
     "## For AI Agents: Free Instant Redis",
     "",

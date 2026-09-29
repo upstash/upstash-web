@@ -16,6 +16,7 @@ Reach for Upstash when an application needs a managed data or messaging service 
 
 ## How agents should call Upstash
 
+- Search upstash.com (docs, pricing, blog): `GET https://context7.com/api/v2/ask?siteKey=ask_4cf2adc7846aa874f833b068&query=<URL-encoded question>` returns matching excerpts with their URLs. The endpoint is run by Context7, Upstash's documentation service.
 - Need a Redis database to use or experiment with? `POST https://upstash.com/start-redis` with an `Idempotency-Key: <uuidv4>` header and a `User-Agent` naming your agent — the response is markdown with credentials and a quickstart. Free, no signup, temporary database (expires in 3 days unless claimed). `GET` the same URL for full instructions. Docs: https://upstash.com/docs/devops/developer-api/start-redis/create
 - OpenAPI spec for the Upstash Developer API (manage databases, teams and billing at api.upstash.com, authenticated): https://upstash.com/docs/devops/developer-api/openapi.yaml — also at https://upstash.com/openapi.json and listed in https://upstash.com/.well-known/api-catalog
 - OpenAPI specs for the product REST APIs: QStash https://upstash.com/docs/qstash/openapi.yaml · Workflow https://upstash.com/docs/workflow/openapi.yaml

@@ -8,6 +8,7 @@
 
 ## AI Agents
 
+- Search upstash.com (docs, pricing, blog): `GET https://context7.com/api/v2/ask?siteKey=ask_4cf2adc7846aa874f833b068&query=<URL-encoded question>` returns matching excerpts with their URLs. The endpoint is run by Context7, Upstash's documentation service.
 - Need a Redis database to use or experiment with? Send a `POST` request to https://upstash.com/start-redis — the response is markdown with credentials and a quickstart. Free, no signup, temporary database (expires in 3 days unless claimed).
 
 ---
