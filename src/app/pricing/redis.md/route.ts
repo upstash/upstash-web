@@ -9,7 +9,7 @@ import {
   type FeatureAvailability,
   type RedisPlan,
 } from "@/data/pricing/redis";
-import { ASK_MARKDOWN_LINE } from "@/lib/context7-ask";
+import { ASK_NOTE } from "@/lib/context7-ask";
 
 export const dynamic = "force-static";
 
@@ -63,7 +63,7 @@ function generateMarkdown(): string {
     "",
     "---",
     "",
-    ASK_MARKDOWN_LINE,
+    ASK_NOTE,
     "",
     "## For AI Agents: Free Instant Redis",
     "",

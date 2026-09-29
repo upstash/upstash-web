@@ -1,7 +1,7 @@
 import type { Post } from "@content";
 import { allPosts } from "@content";
 import { SITE_URL } from "@/utils/const";
-import { ASK_MARKDOWN_LINE } from "@/lib/context7-ask";
+import { ASK_NOTE } from "@/lib/context7-ask";
 
 export function renderIndex(): string {
   const published = allPosts
@@ -18,7 +18,7 @@ export function renderIndex(): string {
     "",
     `${published.length} articles on serverless databases, Redis, QStash, Vector, and more.`,
     "",
-    ASK_MARKDOWN_LINE,
+    ASK_NOTE,
     "",
     "## Articles",
     "",
@@ -73,7 +73,7 @@ export function renderPost(post: Post): string {
     "",
     "---",
     "",
-    ASK_MARKDOWN_LINE,
+    ASK_NOTE,
   ];
 
   return lines.join("\n");

@@ -1,5 +1,5 @@
 import { SITE_URL } from "@/utils/const";
-import { ASK_MARKDOWN_LINE } from "@/lib/context7-ask";
+import { ASK_NOTE } from "@/lib/context7-ask";
 
 export function notFoundMarkdown(): string {
   return [
@@ -7,7 +7,7 @@ export function notFoundMarkdown(): string {
     "",
     "This page does not exist.",
     "",
-    ASK_MARKDOWN_LINE,
+    ASK_NOTE,
     "",
     "Entry points:",
     "",
