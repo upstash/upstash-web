@@ -3,7 +3,6 @@
 import Button from "@/components/button";
 import {
   BLOB_CARD_METERS,
-  BLOB_FREE_EGRESS,
   BLOB_FREE_PLAN,
   BLOB_PAYG_PLAN,
 } from "@/data/pricing/blob";
@@ -98,9 +97,7 @@ export default function PricingTable() {
                     <span className="text-primary-text">Free</span> up to{" "}
                     {meter.paygIncluded}
                   </p>
-                  <p className="text-sm">
-                    {meter.rate} after {BLOB_FREE_EGRESS}
-                  </p>
+                  <p className="text-sm">then {meter.rate}</p>
                 </>
               ) : (
                 <p className="font-semibold">{meter.rate}</p>
