@@ -1,0 +1,134 @@
+---
+authors: [alitarik]
+slug: ai-sandbox-pricing-active-cpu-vs-wall-clock
+tags: [box, ai, agents, sandbox]
+title: "CPU-Hour vs Wall-Clock Pricing for Sandboxes: Which One Costs Less?"
+description: Compare active CPU and wall-clock billing for AI sandboxes, with provider rates, worked examples, and break-even calculations for agent workloads.
+---
+
+A lower CPU rate on a pricing page doesn't always mean you'll pay less for a sandbox. Some providers charge for every second the sandbox runs, based on how many CPUs it has. Others only charge for the CPU time your code uses.
+
+If your agent spends a lot of its time waiting on the model, the difference can be big. For example, a 2 vCPU, 4 GB sandbox that runs for one hour and does 10 core-minutes of CPU work costs about $0.017 in CPU and memory on Upstash Box pay as you go, and $0.166 on E2B. How much you save depends on how busy the CPU is, whether the provider charges for memory, and how long the sandbox stays running. Upstash Box offers active CPU billing for pay-as-you-go boxes and a fixed rate for keep-alive boxes.
+
+## What is the difference between CPU-hour and wall-clock pricing?
+
+With CPU-hour pricing, you pay for the time your code keeps the CPU busy. With wall-clock pricing (sometimes called clock-hour pricing), you pay for every minute the sandbox is running, whether the CPU is working or waiting.
+
+In this article I measure CPU use in core-minutes. One core that's fully busy for one minute is one core-minute, so two cores busy for five minutes use 10 core-minutes.
+
+Let's say a 2 vCPU sandbox runs for one hour. Its code runs in a few short bursts that add up to 10 core-minutes. For the rest of the hour, it waits for the model to answer or for a network call to return. A CPU-hour meter counts 10 active core-minutes. A wall-clock meter counts 120 vCPU-minutes (all 60 minutes on both vCPUs).
+
+Here is the same hour on both meters:
+
+![](https://cdn.bydefault.so/drawing-S-uiHB1hXqM7wyxOpGdWK.png)
+
+In late 2025 Cloudflare [moved to billing only active CPU](https://developers.cloudflare.com/changelog/post/2025-11-21-new-cpu-pricing/) for its containers, instead of billing CPU for the whole time a container ran. The rate stayed the same at $0.00002 per vCPU-second, and only the meter changed. For one hour on 1 vCPU at 20% average use, the CPU charge dropped from $0.072 to $0.0144.
+
+## Which sandbox providers bill CPU time, and which bill wall-clock time?
+
+E2B, Daytona, Modal and Upstash Box keep-alive charge for CPU and memory on wall-clock time. Upstash Box pay as you go, Vercel Sandbox and Cloudflare Sandbox only charge for CPU while it's busy, and Fly Sprites charge for both CPU and memory by how much you use. These are their CPU and memory rates as of September 2026. Storage, network, plan fees and credits are left out, and Vercel's rates are for its default `iad1` region, since its prices vary by region:
+
+| Provider | CPU meter | CPU rate | Memory |
+| --- | --- | --- | --- |
+| [Upstash Box](https://upstash.com/pricing/box) (pay as you go) | Active CPU | $0.10 per active CPU hour (small box) | Free |
+| [Upstash Box - Keep-alive](https://upstash.com/docs/box/overall/keep-alive) (fixed) | Wall-clock | $8 per month for a small box (2 vCPU), about $0.011 per hour | Included |
+| [Vercel Sandbox](https://vercel.com/docs/sandbox/pricing) | Active CPU | $0.128 per active CPU hour | $0.0212 per GB-hour, wall-clock |
+| [Cloudflare Sandbox](https://developers.cloudflare.com/containers/platform/pricing/) | Active CPU | $0.072 per vCPU-hour | $0.009 per GiB-hour, wall-clock |
+| [Fly Sprites](https://sprites.dev/pricing) | CPU used | $0.07 per CPU-hour | $0.04375 per GB-hour used |
+| [E2B](https://e2b.dev/pricing) | Wall-clock | $0.0504 per vCPU-hour | $0.0162 per GiB-hour, wall-clock |
+| [Daytona](https://www.daytona.io/pricing) | Wall-clock | $0.0504 per vCPU-hour | $0.0162 per GiB-hour, wall-clock |
+| [Modal Sandboxes](https://modal.com/pricing) | Wall-clock, or actual use if higher | $0.1419 per physical core-hour (2 vCPU) | $0.024 per GiB-hour |
+
+E2B's $0.0504 looks like less than half of Vercel's $0.128. But E2B charges that rate for every second the sandbox is up, while Vercel only charges for the seconds a process is using the CPU. So the hourly rates alone don't tell you which bill will be lower.
+
+Memory is often billed on wall-clock time too, even when CPU isn't. Vercel and Cloudflare stop charging for CPU while your code waits, but they keep charging for memory as long as the sandbox is alive. Box is the only provider in the table where memory is free.
+
+## When does CPU-hour pricing save money for AI agents?
+
+CPU-hour pricing saves money when an agent spends long stretches waiting, because waiting adds no CPU charge. Memory and other charges may still add up. The model runs on the LLM provider's servers, so the sandbox sits idle while the model thinks. When the model asks for a tool call, the sandbox runs code for a few seconds. Then it waits again, for the next model reply, an API response, or a person to answer. On active CPU billing, time spent [waiting on network requests or AI model calls](https://vercel.com/docs/sandbox/pricing) doesn't count.
+
+This is one turn of that loop, with the steps where the sandbox CPU does work:
+
+![](https://cdn.bydefault.so/drawing-i6f6--Jwlq2ltflU9ehGR.png)
+
+Some agents wait much longer than a model call. An assistant that books a meeting or watches a flight price can wait hours for a reply. A wall-clock sandbox left running charges you for the whole time. Pausing between tasks changes that. E2B, for example, can [pause a sandbox and resume it later](https://docs.e2b.dev/sandbox/persistence), and [paused sandboxes are not billed](https://e2b.dev/docs/faq/paused-sandboxes-concurrency) for compute.
+
+## Where is the break-even point?
+
+The break-even point depends on the provider, because CPU rates and memory charges differ. For a 2 vCPU, 4 GB sandbox that runs the full hour, Box pay as you go is cheaper than E2B and Daytona until both cores are about 83% busy on average. Vercel breaks even with them at about 32%.
+
+To find the break-even point, set the two bills equal. A wall-clock sandbox costs the same every hour. A CPU-hour sandbox costs its rate, times its number of cores, times how much of the time they're busy, plus any memory it bills on wall-clock time:
+
+```text
+wall-clock cost per hour = (vCPUs x CPU rate) + (GB x memory rate)
+CPU-hour cost per hour = (cores x busy share x active CPU rate) + memory cost per hour
+
+break-even busy share =
+  (wall-clock cost per hour - CPU-hour plan's memory cost per hour)
+  / (cores x active CPU rate)
+```
+
+For a 2 vCPU, 4 GB sandbox, that works out to:
+
+```text
+E2B or Daytona, per hour:  (2 x $0.0504) + (4 x $0.0162) = $0.1656
+Box, per hour at 100% busy: 2 x $0.10 = $0.20
+
+break-even busy share = ($0.1656 - $0) / $0.20 = 82.8%
+```
+
+Vercel charges for memory on wall-clock time, so it breaks even with E2B much earlier. Memory costs 4 x $0.0212 = $0.0848 an hour no matter what. That leaves $0.0808 for CPU, and $0.0808 / (2 x $0.128) = 31.6%. So once the CPU is busy more than about a third of the time, E2B is cheaper than Vercel for this size.
+
+Here are the CPU and memory costs for one hour on the same 2 vCPU, 4 GB sandbox, kept running the whole hour:
+
+| Provider | Bursty agent hour (10 core-minutes busy) | Saturated hour (both cores busy) |
+| --- | --- | --- |
+| Upstash Box (pay as you go) | $0.017 | $0.20 |
+| Upstash Box - Keep-alive (fixed) | $0.011 | $0.011 |
+| Vercel Sandbox | $0.106 | $0.341 |
+| E2B or Daytona | $0.166 | $0.166 |
+
+In the bursty hour, Box pay as you go costs about a tenth of what E2B does. In the saturated hour, Box pay as you go costs $0.20 and E2B costs $0.166, and Vercel costs about twice as much as E2B. If a box stays busy over time, the keep-alive plan may cost less. I work out the monthly break-even in the Box section below.
+
+Here's what the bursty agent hour costs on the main providers, counting CPU and memory only:
+
+![](https://cdn.bydefault.so/image-ggK8HqAmDRPsIY5C-l0SO.png)
+
+## Which pricing model fits which workload?
+
+CPU-hour pricing fits work that comes in bursts with waiting in between. Wall-clock pricing fits work that keeps the CPU busy for most of the time the sandbox runs. What decides it is how busy the CPU is while the job runs:
+
+| Workload | CPU pattern | Better fit |
+| --- | --- | --- |
+| Coding agent or tool-calling agent | Seconds of work between model calls | CPU-hour |
+| Personal assistant agent | Waits hours for people and events | CPU-hour, or pause between tasks |
+| Quick code eval for an LLM answer | Can be light or busy the whole time | Depends on how busy the CPU is |
+| Build, test run or data job | Keeps all cores busy until it ends | Wall-clock, if the rate is lower |
+| Dev server or app with a public URL | Must answer at any time | Needs always-on support, so compare prices separately |
+| Warm agent for low-latency replies | Must skip cold starts | Needs always-on support, so compare prices separately |
+
+Always-on is a separate question from the meter. Each provider decides whether its sandboxes pause when idle, so compare that apart from the price.
+
+## How does Upstash Box price bursty and always-on workloads?
+
+Upstash Box charges pay-as-you-go boxes for each active CPU hour, which suits agents that work in bursts. Keep-alive boxes have a fixed rate, which works like wall-clock pricing for boxes that have to stay on.
+
+Here are the [rates for each box size](https://upstash.com/pricing/box):
+
+| Size | Resources | Pay as you go | Keep-alive |
+| --- | --- | --- | --- |
+| Small | 2 vCPU, 4 GB RAM, 5 GB disk | $0.10 per active CPU hour | $8 per month |
+| Medium | 4 vCPU, 8 GB RAM, 10 GB disk | $0.20 per active CPU hour | $16 per month |
+| Large | 8 vCPU, 16 GB RAM, 20 GB disk | $0.40 per active CPU hour | $32 per month |
+
+Pay as you go measures the CPU your code uses in core-hours. Using 100% of both cores on a small box for an hour costs $0.20, and using 10% of one core for an hour costs $0.01. Memory is free, and storage costs $0.10 per GB per month (snapshots included). When a box has no running commands, it pauses after an [idle timeout of 6 hours](https://upstash.com/pricing/box) on pay as you go. A paused box keeps its files and wakes up on the next request.
+
+Keep-alive boxes never pause. Their rate covers CPU and storage. For a small box, $8 / 730 hours comes to about $0.011 per hour. That's about a fifteenth of E2B's $0.166 an hour for the same 2 vCPU, 4 GB allocation. You can turn it on with the `keepAlive` option when you [create a box](https://upstash.com/docs/box/overall/keep-alive), and it can run a startup command like `npm run dev` every time it starts.
+
+Ignoring storage charges, both modes cost the same on a small box at 80 active core-hours a month ($8 / $0.10 = 80). A small box that runs all month has 2 x 730 = 1,460 core-hours. So keep-alive is cheaper once a box stays on and keeps its cores more than about 5.5% busy on average. Below that, pay as you go is cheaper, and the box can auto-pause after its idle timeout. Keep-alive includes storage and pay as you go does not, so with storage counted, the switch point comes a little earlier.
+
+Here's which workloads fit each mode:
+
+![](https://cdn.bydefault.so/drawing-zkzz-wj2kWhgd8Xoz-GvH.png)
+
+Each box has its own mode, and the [Box quickstart](https://upstash.com/docs/box/overall/quickstart) shows how to create one.
