@@ -28,10 +28,12 @@ Egress costs the same whether a file comes from the CDN cache or from the origin
 | Service | Free egress per month | After that |
 | --- | --- | --- |
 | Upstash Blob (pay as you go) | 1 TB | $0.02 per GB |
-| AWS S3 | [100 GB, shared across all AWS services](https://www.cloudzero.com/blog/s3-pricing/) | $0.09 per GB |
-| Vercel Blob | [10 GB on Hobby, 100 GB on Pro](https://vercel.com/blog/vercel-blob-now-generally-available) | [$0.05 per GB](https://vercel.com/docs/vercel-blob/usage-and-pricing) |
+| AWS S3 | [100 GB, shared across all AWS services](https://aws.amazon.com/ec2/pricing/on-demand/) | [$0.09 per GB](https://aws.amazon.com/s3/pricing/) |
+| Vercel Blob | [10 GB on Hobby, part of Flat Rate CDN on Pro](https://vercel.com/pricing) | [$0.05 per GB on demand](https://vercel.com/docs/vercel-blob/usage-and-pricing) |
 
-For example, let's say your app serves 1,000 GB of files in a month. On Upstash Blob, that bandwidth costs $0. On S3, you pay for the 900 GB past the free tier: 900 × $0.09 = $81. On Vercel Blob Pro, it's 900 × $0.05 = $45.
+For example, let's say your app serves 1,000 GB of files in a month. On Upstash Blob, that bandwidth costs $0. On S3, you pay for the 900 GB past the free tier: 900 × $0.09 = $81.
+
+![](https://cdn.bydefault.so/image-WnDvzH6CI8Px_iL1zxdsv.png)
 
 With Upstash Blob, you get browser uploads and a CDN through one typed SDK, and bandwidth is free up to a terabyte. It also uses the same account and bill as Upstash Redis, QStash and Workflow. For example, a common setup stores the file in Blob, then starts a Workflow job from the upload callback to make thumbnails or index the document.
 
