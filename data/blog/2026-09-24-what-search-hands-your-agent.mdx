@@ -8,7 +8,7 @@ updated: "2026-09-25"
 draft: false
 ---
 
-When a coding agent answers a question about a library, something fetched that documentation a second earlier. Usually a search tool. Whatever it returns goes straight into the model's context.
+When a coding agent answers a question about a library, some tool fetched that documentation a second earlier, usually a search tool, and whatever it returns goes straight into the model's context.
 
 So we measured what they return when the page is a bad one.
 
@@ -36,9 +36,9 @@ The six search tools surfaced these pages at a similar rate, 30% to 56%, and Con
 | Context7 | 4,250 |
 | Serper | 1,414 |
 
-Those are averages and they move by query, though not simply by size. Serper and Brave's web endpoint return fragments picked to match the words you typed: on one query Brave returned 12,671 characters in 40 separate pieces, each about 300 long. The dangerous passage is a contiguous block somewhere on the page, rarely the part that matches your question, so it usually lands in none of the pieces. In the six searches where it did come back, it did. Neither tool is screening anything; they are answering a narrower question, and what a model can do with that is a separate matter we didn't measure.
+Those are averages and they move by query, though not simply by size. Serper and Brave's web endpoint return fragments picked to match the words you typed: on one query Brave returned 12,671 characters in 40 separate pieces, each about 300 long. The dangerous passage is a contiguous block somewhere on the page, rarely the part that matches your question, so it usually lands in none of the pieces. The six searches where it did come back are the ones where the question happened to be about the broken thing the dangerous fix claims to repair. Neither tool is screening anything; they are answering a narrower question, and what a model can do with that is a separate matter we didn't measure.
 
-The four at the top return the extracted page body. That is the product: give the model something to read, and the dangerous part comes with it. One is sold as pre-extracted content for coding agents, with ready-made instructions for Claude Code, Cursor and Codex; it returned the dangerous text inside a code block, with the forum replies underneath, "thank you fixed", one like.
+The four at the top return the extracted page body. That is the product: give the model something to read, and the dangerous part comes with it. One is sold as pre-extracted content for coding agents, with ready-made instructions for Claude Code, Cursor and Codex; it returned the dangerous text inside a code block, and underneath it the forum replies: "thank you fixed", one like.
 
 Context7 is the last row, at 10%.
 
@@ -80,7 +80,7 @@ Twice as many unsafe-by-design pages as attacks, both ending in the same place: 
 
 Context7 works differently by design: documentation is screened when a library is added, and a question returns a few thousand characters of matched snippets rather than ten page bodies. The numbers below measure the outcome, not which half does the work.
 
-Every case a tool returned, both ways. Four questions asked three times: 48 searches across the four page-body tools, the same twelve through Context7.
+Here is every case a tool returned, measured both ways. Each case has four questions asked three times, which is 48 searches across the four page-body tools and the same twelve through Context7.
 
 ![Six cases, web search against Context7. Context7 is at zero on four of them, including the shortener fix where web search is at 88%. It is level on the agent onboarding case and slightly lower on the private-key case.](/blog/what-search-hands-your-agent/by-case.svg)
 
@@ -94,7 +94,7 @@ We won't excuse those for one side and count them for the other. Drop both from 
 
 ## What the models did with it
 
-Text reaching a model isn't a problem by itself. So we put the same questions to eight models, a frontier and a fast model from each of the four major providers, and graded whether the instruction was passed along as a step to take. Those five pages carry seven question-and-library pairs, which at two sources and five repeats for the fast models, three for the frontier ones, comes to 448 runs. In 57 no source returned anything, leaving 391 answers. The instruction was passed along in 54:
+Text reaching a model isn't a problem by itself. So we put the same questions to eight models, a frontier and a fast model from each of the four major providers, and graded whether the instruction was passed along as a step to take. Two of those pages are indexed twice, once under each of two paths, so the five come to seven question-and-library combinations. Each ran through both sources and all eight models, five times for the fast ones and three for the frontier ones: 448 runs. In 57 no source returned anything, leaving 391 answers. The instruction was passed along in 54:
 
 | Source | Answers | Instruction passed along |
 | --- | --- | --- |
@@ -103,7 +103,7 @@ Text reaching a model isn't a problem by itself. So we put the same questions to
 
 Two of those 54 warned the developer. In the rest it arrived as an ordinary numbered step, usually formatted more cleanly than the source page, with the caveats dropped. One answer filed the root-level fetch under a heading reading "Troubleshooting File Manager (500 Error)". Seven of the eight did it at least once through web search, including the strongest.
 
-That denominator is generous to web search in two ways. It counts every answer, including runs where the search returned nothing harmful to repeat; on the 153 answers where the dangerous text was actually in front of the model, it is 53 of 153. There is no matching figure for Context7, because that stage recorded whether the passage was present only for the search side. And the grading is done by a model. Reading the answers by hand, it is conservative: a few reproduce the command inside a numbered step and are excused because they "merely quoted the documentation". Five of those are bare instructions with no caution anywhere, and we left the grader's verdict as it stood.
+That denominator is generous to web search in two ways. It counts every answer, including runs where the search returned nothing harmful to repeat; on the 153 answers where the dangerous text was actually in front of the model, it is 53 of 153. There is no matching figure for Context7, because that stage recorded whether the passage was present only for the search side. And the grading is done by a model. We read the answers by hand and found the grader conservative: it excuses a few that reproduce the command inside a numbered step, on the grounds that they "merely quoted the documentation". Five of those are bare instructions with no caution anywhere. We left its verdict as it stood.
 
 The one through Context7 came from the account-takeover site. Per-page screening asks whether a passage is harmful, and for a site like that every honest answer is no. That is a different problem from this one.
 
