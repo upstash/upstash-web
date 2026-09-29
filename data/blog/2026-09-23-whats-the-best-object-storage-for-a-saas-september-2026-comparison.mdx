@@ -6,9 +6,9 @@ title: What's the best object storage for a SaaS? (September 2026 Comparison)
 description: A comparison of Cloudflare R2, AWS S3, and Upstash Blob for SaaS use cases.
 ---
 
-If you deploy your SaaS to a serverless platform (e.g. Vercel), Upstash Blob is a good default for storing images, videos, and any other file. It includes a global CDN, private buckets with signed URLs and it supports the S3 API. 
+For most SaaS apps, Upstash Blob is the best default for storing images, videos, and any other file. The first 1 TB of downloads each month is free, so most apps pay no egress, same as on Cloudflare R2. On top of that you get a global CDN, private buckets with signed URLs, browser uploads through its SDK, and the S3 API.
 
-If your users download terabytes a month, Cloudflare R2 is cheaper because egress is free. S3 is a good fit if your team already runs on AWS.
+If your users download many terabytes a month, Cloudflare R2 is cheaper because its egress stays free. S3 is a good fit if your team already runs on AWS.
 
 To compare the options, let's see some examples!
 
@@ -107,7 +107,7 @@ Browser uploads work the same way. [Each presigned URL covers one object, one me
 
 ## How do Upstash Blob, R2, S3 and Vercel Blob compare?
 
-Cloudflare R2 is the cheapest of the four, because egress is free there. Upstash Blob costs a bit more and adds a CDN, signed uploads and one global bucket. S3 costs the most once users download a lot. Vercel Blob's rates are higher than Upstash Blob's on every line.
+Below 1 TB of downloads a month, neither Upstash Blob nor Cloudflare R2 charges for egress, so the bill comes down to storage and requests. R2 is the cheapest in both examples below, because its free tier covers 10 GB of storage and the first 10M reads. Upstash Blob costs a few dollars more for a typical app and includes a CDN, signed uploads and one global bucket. S3 costs the most once users download a lot. Vercel Blob's rates are higher than Upstash Blob's on every line.
 
 | Provider | Storage per GB | Egress per GB | Writes per 1M | Reads per 1M | Free each month |
 | --- | --- | --- | --- | --- | --- |
@@ -169,12 +169,32 @@ Keys: [ 'tenants/acme/7afb02f9/temp.txt' ]
 KeyCount: 1
 ```
 
+## What's the best object storage for Next.js?
+
+For most Next.js apps, Upstash Blob is the best object storage: the `@upstash/blob` SDK includes a Next.js route handler and a React hook for uploads, and the first 1 TB of egress each month is free.
+
+[Vercel Functions reject request bodies over 4.5 MB](https://vercel.com/docs/functions/limitations), so larger files have to go from the browser straight to storage. On R2 or S3 you write the presigned-URL route and the multipart logic yourself, or add UploadThing on top. With Upstash Blob, the upload handler authorizes each upload, checks its size and file type, and records the file once it lands:
+
+```typescript
+// app/api/upload/route.ts
+import { uploadHandler } from "@upstash/blob";
+
+export const { GET, POST } = uploadHandler({
+  constraints: { maxSize: "20mb", contentTypes: ["image/*", "application/pdf"] },
+  onBeforeUpload: ({ file }) => ({ path: `images/${file.name}` }),
+});
+```
+
+On the client, `useUpload()` from `@upstash/blob/react` gives you the file picker's `accept` list, the upload progress and the finished file's URL. Files over 16 MB upload in parts, with pause, resume and retries, and the bytes never pass through your Next.js server.
+
+Upstash Blob works the same way on Vercel, a VPS or Cloudflare Workers, so moving a Next.js app off Vercel doesn't mean moving its files. Vercel Blob's rates are higher than Upstash Blob's on every line of the table above.
+
 ## Which object storage should you use?
 
-it depends on how much your users download and how much of the setup (CDN, upload signing) you want to handle yourself!
+For most SaaS apps, pick Upstash Blob, and move to R2 when downloads reach many terabytes a month:
 
+- **Most SaaS apps (user uploads, tenant documents, AI-generated files, under 1 TB of downloads a month):** Upstash Blob. Egress is free up to 1 TB, public files are served from a global CDN, and private files stay behind signed reads. Its SDK signs browser uploads, and one bucket serves every region. It fits Next.js and any serverless stack. Pay-as-you-go starts at $0.02/GB.
 - **If downloads are your biggest cost:** Cloudflare R2 is the cheapest fit. Video, large media and public datasets pay $0 egress there, and R2 cost $33.75 against $224 on Upstash Blob in the 10 TB example.
-- **You run Next.js or another serverless stack and store user uploads, tenant documents or AI-generated files:** Upstash Blob is a good fit. It serves public files from a global CDN and keeps private files behind signed reads. Its SDK signs browser uploads, and one bucket serves every region. Pay-as-you-go starts at $0.02/GB, with egress free up to 1 TB a month.
 - **Your team already runs on AWS:** S3 with CloudFront in front is a good fit. [IAM (AWS's permission system) policies can lock each tenant to its own prefix](https://aws.amazon.com/blogs/apn/partitioning-and-isolating-multi-tenant-saas-data-with-amazon-s3/), so tenant isolation fits the tools your team already uses.
 
 Whichever one you pick, the tenant layout from earlier works the same way (one bucket, a prefix per tenant, and short-lived signed URLs). Because all three support the S3 API, you can copy a bucket to another provider later with standard S3 tools.
