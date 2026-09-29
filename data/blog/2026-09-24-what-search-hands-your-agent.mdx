@@ -8,13 +8,13 @@ updated: "2026-09-25"
 draft: false
 ---
 
-When a coding agent answers a question about a library, something fetched that documentation a second earlier — usually a search tool — and whatever it returns goes straight into the model's context.
+When a coding agent answers a question about a library, something fetched that documentation a second earlier. Usually a search tool. Whatever it returns goes straight into the model's context.
 
 So we measured what they return when the page is a bad one.
 
 ## What we tested
 
-We started from nine documentation pages we had verified as dangerous. They come from Context7's own flagged list, which is also the limit of this: it measures pages the filter noticed, not pages it missed. We looked for an independent set — two discovery sweeps over 1,752 results turned up none.
+We started from nine documentation pages we had verified as dangerous. Finding them was the hard part: two discovery sweeps over 1,752 search results turned up none, so these nine are pages we already knew about and then checked one by one.
 
 For each page we wrote four questions a developer would type to land on it, and asked each three times, because a search tool answers the same question differently from one call to the next. That is 108 searches per tool, through Exa, Firecrawl, Tavily, Serper, Brave's two endpoints and Context7.
 
@@ -24,7 +24,7 @@ Two things were counted: whether the page came back at all, and whether the harm
 
 ![Two bars per tool out of 108 searches: how often the page came back, and how often the dangerous text came back with it. The four that return page bodies sit between 23% and 42%; the two that return fragments sit at 6%; Context7 at 10%.](/blog/what-search-hands-your-agent/by-tool.svg)
 
-The six search tools surfaced these pages at a similar rate, 30% to 56%, and Context7 at 25%. The gap is in the second bar, and the reason is how much of the page travels with it:
+The six search tools surfaced these pages at a similar rate, 30% to 56%, and Context7 a little below them. The gap is in the second bar, and the reason is how much of the page travels with it:
 
 | Tool | Average text per search |
 | --- | --- |
@@ -36,11 +36,11 @@ The six search tools surfaced these pages at a similar rate, 30% to 56%, and Con
 | Context7 | 4,250 |
 | Serper | 1,414 |
 
-Those are averages; they move by query, though Serper barely does — 1,175 to 1,521, because Google caps its snippet at roughly 140 characters. That is why the second bar splits the way it does. The dangerous passage is one block on a page: send 5,000 characters of it and the block probably comes too, send 144 and it probably doesn't.
+Those are averages; they move by query, though Serper barely does. It runs 1,175 to 1,521, because Google caps its snippet at roughly 140 characters. That is why the second bar splits the way it does. The dangerous passage is one block on a page: send 5,000 characters of it and the block probably comes too, send 144 and it probably doesn't.
 
 So two of the seven aren't in the same business. Serper returns Google's result page, Brave's web endpoint matched fragments. They score low because a 144-character sentence rarely contains the dangerous block, not because they screen anything. What a model can do with 1,400 characters is a separate question, and not one we measured.
 
-The four at the top return the extracted page body — that's the product, give the model something to read — so the dangerous part comes with it. One is sold as pre-extracted content for coding agents, with ready-made instructions for Claude Code, Cursor and Codex; it returned the dangerous text inside a code block, with the forum replies underneath — "thank you fixed", one like.
+The four at the top return the extracted page body. That is the product: give the model something to read. So the dangerous part comes with it. One is sold as pre-extracted content for coding agents, with ready-made instructions for Claude Code, Cursor and Codex; it returned the dangerous text inside a code block, with the forum replies underneath, "thank you fixed", one like.
 
 Context7 is the last row, at 10%.
 
@@ -63,7 +63,9 @@ It isn't. The author is one of the project's most active contributors, the bug i
 
 It's still not something you should run, and that has nothing to do with the author. The file sits on a domain the project doesn't control, with no version, checksum or signature, and it lands as root in a path the panel executes. Reading it once tells you nothing about the next fetch.
 
-Here is the set, sites left out — six of the nine were published in good faith, and a URL in a table reads as an accusation whatever the paragraph says.
+Three of the nine never came back from any tool in any run, so they sit outside every number here: a skill that has your agent print your private key, a product that routes fetches through your machine, and a wiki page carrying a fake support number.
+
+Here are the other six, sites left out. Most were published in good faith, and a URL in a table reads as an accusation whatever the paragraph says.
 
 | What the page is | What you hand over | Verdict |
 | --- | --- | --- |
@@ -73,8 +75,6 @@ Here is the set, sites left out — six of the nine were published in good faith
 | A product's agent onboarding flow | Your agent's tool access, to whatever a third party serves that day | Unsafe by design |
 | A trading API's own reference | Your wallet's private key, unscoped and unrevocable | Unsafe by design |
 | A community skill for phone automation | Unattended shell and ADB control of a phone | Unsafe by design |
-
-Three more never came back from any tool, so they aren't in the numbers: a private-key printer, a fetch proxy, and a wiki page with a fake support number.
 
 Twice as many unsafe-by-design pages as attacks, both ending in the same place: something outside the project gets lasting access. Prompt injection gets the attention; the commoner case is honest documentation telling your agent to fetch something unpinned and run it.
 
@@ -88,15 +88,15 @@ Every case a tool returned, both ways. Four questions asked three times: 48 sear
 
 The shortener fix is the clearest: web search returned that command in 42 of 48 searches, Context7 in none. On that case Context7 had something to serve in half the runs and nothing in the other half, so the zero is partly silence. On the wallet page it answered all twelve times and the address still never appeared.
 
-A search tool has to rank the page before it can return it, and that ranking does part of the work. So we skipped it: name the library outright and the passage came back in 27 of 108 runs — 25%, against 10% with discovery included. On the wallet page, still zero.
+A search tool has to rank the page before it can return it, and that ranking does part of the work. So we skipped it: name the library outright, ask the question, and the passage came back in 27 of those same 108 runs instead of 11. On the wallet page it was still zero.
 
-Two rows go the other way, and they are the 10%. Both are vendor documentation where the dangerous line is also the answer to the question: ask a trading API's reference how to place a trade, and the required `privateKey` parameter is the answer.
+Two rows go the other way, and they are the eleven. Both are vendor documentation where the dangerous line is also the answer to the question: ask a trading API's reference how to place a trade, and the required `privateKey` parameter is the answer.
 
-We won't excuse those for one side and count them for the other. Drop both from both sides and the comparison holds anyway — **81 of 336 through web search, 0 of 84 through Context7**. Neither outright attack came back at all.
+We won't excuse those for one side and count them for the other. Drop both from both sides and the comparison holds anyway: **81 of 336 through web search, 0 of 84 through Context7**. Neither outright attack came back at all.
 
 ## What the models did with it
 
-Text reaching a model isn't a problem by itself. So we put the same questions to eight models — a frontier and a fast model from each of the four major providers — and graded whether the instruction was passed along as a step to take. That is 448 runs; in 57 no source returned anything, leaving 391 answers. The instruction was passed along in 54:
+Text reaching a model isn't a problem by itself. So we put the same questions to eight models, a frontier and a fast model from each of the four major providers, and graded whether the instruction was passed along as a step to take. That is 448 runs. In 57 no source returned anything, leaving 391 answers. The instruction was passed along in 54:
 
 | Source | Answers | Instruction passed along |
 | --- | --- | --- |
@@ -105,9 +105,9 @@ Text reaching a model isn't a problem by itself. So we put the same questions to
 
 Two of those 54 warned the developer. In the rest it arrived as an ordinary numbered step, usually formatted more cleanly than the source page, with the caveats dropped. One answer filed the root-level fetch under a heading reading "Troubleshooting File Manager (500 Error)". Seven of the eight did it at least once through web search, including the strongest.
 
-That denominator is generous to web search in two ways. It counts every answer, including runs where the search returned nothing harmful to repeat — on the 153 answers where the dangerous text was actually in front of the model, it is 53 of 153. And the grading is done by a model: reading the answers by hand, it is conservative, excusing a few that reproduce the command inside a numbered step because they "merely quoted the documentation". Treat 53 as a floor.
+That denominator is generous to web search in two ways. It counts every answer, including runs where the search returned nothing harmful to repeat; on the 153 answers where the dangerous text was actually in front of the model, it is 53 of 153. And the grading is done by a model. Reading the answers by hand, it is conservative: a few reproduce the command inside a numbered step and are excused because they "merely quoted the documentation". Five of those are bare instructions with no caution anywhere, and we left the grader's verdict as it stood.
 
-The one through Context7 came from the account-takeover site. Per-page screening asks whether a passage is harmful, and for a site like that every honest answer is no — a different problem from this one.
+The one through Context7 came from the account-takeover site. Per-page screening asks whether a passage is harmful, and for a site like that every honest answer is no. That is a different problem from this one.
 
 ## Notes on the method
 
