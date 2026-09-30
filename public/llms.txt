@@ -25,7 +25,7 @@ This site has a search endpoint: https://context7.com/api/v2/ask?siteKey=ask_4cf
 - OpenAPI specs for the product REST APIs: QStash https://upstash.com/docs/qstash/openapi.yaml · Workflow https://upstash.com/docs/workflow/openapi.yaml
 - The homepage, pricing pages and blog pages can be fetched as markdown by sending `Accept: text/markdown`; pricing pages and blog posts also have `.md` URLs (e.g. https://upstash.com/pricing/redis.md, https://upstash.com/blog.md). Unknown paths return a 404 with a markdown body.
 - Errors from these endpoints are JSON with `error`, `code` and `resolution` fields.
-- MCP server for managing Upstash resources from Claude, Cursor and other MCP clients: `npx @upstash/mcp-server` — https://github.com/upstash/mcp-server
+- Remote MCP server for managing Upstash resources (Redis, QStash, Workflow, Vector, Search, Box, Blob) from Claude, Cursor, Codex and other MCP clients: `https://mcp.upstash.com/mcp` (streamable HTTP, OAuth or an `email:API_KEY` header) — https://upstash.com/docs/agent-resources/mcp. Also declared in https://upstash.com/.well-known/integrations.json
 - Reusable agent skills for each SDK: `npx skills add https://github.com/upstash/skills`
 - Programmatic account and database management (authenticated): Developer API — https://upstash.com/docs/devops/developer-api
 
