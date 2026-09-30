@@ -1,6 +1,7 @@
 import Button from "@/components/button";
 import Container from "@/components/container";
 import { Logo } from "@/components/logo";
+import { ASK_NOTE } from "@/lib/context7-ask";
 import OutLink from "@/components/out-link";
 import cx from "@/utils/cx";
 import { IconArrowUpRight } from "@tabler/icons-react";
@@ -90,6 +91,7 @@ export default function Footer({ className, ...props }: IAppFooter) {
               trademarks and/or registered trademarks of Cloudflare, Inc. in the
               United States and other jurisdictions.
             </p>
+            <p>For AI agents: {ASK_NOTE}</p>
             <p>
               For AI agents: a free Redis database is available via POST{" "}
               <Link
