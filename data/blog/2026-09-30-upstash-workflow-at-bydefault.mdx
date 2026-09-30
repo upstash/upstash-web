@@ -1,0 +1,421 @@
+---
+authors: [josh]
+slug: upstash-workflow-at-bydefault
+tags: [workflow]
+title: "How We Use Upstash Workflow at ByDefault: Rate Limits, Retries and Durable AI Chats"
+---
+
+In this article, I want to talk how Upstash Workflow makes our business so, so much more reliable. How we use the built-in parallelism and flow-control to run our business, and how automatic retries have saved us from massive load spikes.
+
+Since using Workflow, it has become a very important part of our infrastructure.
+
+For context, [ByDefault](https://bydefault.so) (where we use Workflow) is a studio for writing blog articles that AI search engines quote. We also track how ChatGPT, Claude, Gemini and other assistants rank your business, what they search for, and how one can get recommended by them. 
+
+Running this business involves long AI calls and third-party APIs with strict limits, and Upstash Workflow runs almost all of this work for us.
+
+You enter prompts you want to rank for (we use it for Upstash, too), and see who AI recommends, what it searches, and where you or competitors are ranked.
+
+![](https://cdn.bydefault.so/5ntrhvw0u8XzaxzdxZ1e8.png)
+
+Usually, people track anywhere from 20-40 prompts here. But one day, a customer signed up and decided to run almost 500 prompts at once (way more than we expected anyone to ever enter).
+
+As soon as they entered their 500 prompts, it pushed us (very far) past our Claude limit of 30 web searches per second. But Upstash Workflow retried them under flow control and automatically retried all failed calls after 2 minutes. It was insanely helpful, more on this below.
+
+We also use it to keep chats with our writing agent alive when a function times out or you close the tab. 
+
+In this article I wanna show you some (simplified) production code of how we use Upstash Workflow, where it's helping us, and why it gives us so much peace of mind.
+
+## What does ByDefault use Upstash Workflow for?
+
+We use [Upstash Workflow](https://upstash.com/docs/workflow/getstarted) for every job at ByDefault that runs longer than one request or uses an API that can fail (which is almost all of them, especially Anthropic API 💀).
+
+We have 12 workflow endpoints in our Next.js app today, plus one on a Cloudflare Worker.
+
+- **Prompt tracking.** Customers add the questions their buyers ask AI assistants. Every morning at 06:00 UTC a dispatcher starts one workflow per organization, 30 seconds apart. Each run asks up to eight assistants (ChatGPT, Claude, Gemini, Google AI Overviews, Claude Code, Codex, Cursor and OpenCode) and checks if the brand shows up in the answer. New prompts run right away instead of waiting for the next morning.
+- **Public reports.** A daily run at 03:00 UTC answers a fixed set of prompts for our "State of AI Search" report and republishes it.
+- **The writing agent.** We have an agent that writes blog articles to rank in AI with long-running research steps. Every step is a workflow run.
+- **Content gap scans.** A workflow finds keyword gaps against your competitors, then runs a research agent with a checkpoint after each model step.
+- **Observability.** A daily health check posts broken answers and stuck runs to Discord. It also lets us know that on most days, everything is alright.
+
+This is what our Upstash dashboard for the schedules looks like:
+
+![](https://cdn.bydefault.so/KbqCkYsxrGpEfcoPbkpC2.png)
+
+We start the daily jobs from QStash schedules in the Upstash console. Every workflow has a failure handler that posts to our Discord.
+
+## What happened when one customer added almost 500 prompts at once?
+
+As it turns out, when you suddenly get a load 10x of what you'd expect normally, some things fail. To be fair, we should have tested this case beforehand, and we've long upgraded the infra to handle these loads.
+
+But when it happened, we went (WAY) past our web search limit of 30 searches per second, and about 0.5%-1% of runs failed with a rate limit error. Upstash Workflow retried every one of them automatically, and the customer got all their answers.
+
+Some boxes (the sandboxes where our coding agents run) also failed under the load. That was about 0.3% of runs.
+
+Each run was a workflow call with retries turned on. Workflow waited until the burst had passed, then retried the failed calls. They went through on the next try and the problem just kinda... solved itself for the moment. This was a huge relief for us.
+
+![](https://cdn.bydefault.so/drawing-TUy1reM2hgqI1BHzkfRsl.png)
+
+## How do retries and flow control handle a rate limit spike?
+
+[Flow control](https://upstash.com/docs/workflow/features/flow-control) queues extra calls, and retries handle the ones that still fail. With parallelism, we can limit how many calls run at once and our rate limit sets how many runs can start per second.
+
+We make one `context.call` to our own endpoint for each prompt and assistant pair in a run. Each assistant has its own flow-control key and limits because each has a different bottleneck. Here's a simpler version:
+
+```ts
+import { serve } from '@upstash/workflow/nextjs';
+
+const limits = {
+  claude: { parallelism: 12 },
+  chatgpt: { parallelism: 50 },
+  gemini: { parallelism: 25 },
+  cursor: { parallelism: 60, rate: 1, period: 1 },
+} as const;
+
+type Assistant = keyof typeof limits;
+type Payload = { prompts: Record<string, string>; assistant: Assistant };
+const baseUrl = process.env.WORKFLOW_BASE_URL!;
+
+export const { POST } = serve<Payload>(async (context) => {
+  const { prompts, assistant, ids } = await context.run('plan', () => {
+    const { prompts, assistant } = context.requestPayload;
+    if (!(assistant in limits)) throw new Error('Unknown assistant');
+    return { prompts, assistant, ids: Object.keys(prompts) };
+  });
+  
+  await Promise.all(ids.map((id) =>
+    context.call(`prompt:${id}:${assistant}`, {
+      url: `${baseUrl}/api/provider/run-assistant`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, assistant, prompt: prompts[id] }),
+      retries: 2,
+      retryDelay: '120000',
+      timeout: '800s',
+      flowControl: { key: `prompt-run-${assistant}`, ...limits[assistant] },
+    }),
+  ));
+}, { baseUrl });
+```
+
+Cursor limits how fast one API key can start agents, so we set its rate to one start per second. For the others, we only limit how many run at once. Upstash makes the HTTP request for each `context.call`, so our function doesn't wait on a slow answer. One call can run for [up to 12 hours](https://upstash.com/docs/workflow/steps/call). Retries on `context.call` [default to 0](https://upstash.com/docs/workflow/steps/call), so we set them on every call.
+
+To see how much each setting helped, we ran a burst test on the [local QStash dev server](https://upstash.com/docs/qstash/howto/local-development). A mock API returned a 500 for the 31st request in any rolling second, like our Claude search limit. Each run fired 300 calls with 2 retries, 10 seconds apart:
+
+| Setup | First tries that failed | Calls lost after retries | Peak requests in one second | Time to finish |
+| --- | --- | --- | --- | --- |
+| No flow control | 104 | 40 | 99 | 37.6 s |
+| Parallelism 12, API answers instantly | 92 | 32 | 82 | 41.9 s |
+| Parallelism 12, API takes 5 s | 0 | 0 | 12 | 131.5 s |
+| Rate 25 per second | 31 | 0 | 47 | 27.2 s |
+
+![](https://cdn.bydefault.so/image-atpLV2AtVHveqZRq4bTSt.png)
+
+A parallelism limit only helps with slow calls. When the API answered instantly, 12 calls at a time still reached 82 requests in one second. Each finished call made room for the next one. With a 5-second API, closer to a real Claude answer with web search, the same limit never passed 12 per second.
+
+The rate setting got all 300 calls through fastest, though 31 still failed on the first try. Rate [counts starts per time window](https://upstash.com/docs/workflow/features/flow-control/rate-period), so two windows back to back can put up to 50 calls in one rolling second. Retries picked up all 31, and none were lost.
+
+## How do we make a failure retryable when the API returns 200?
+
+Our endpoint returns a 500 when every web search in a Claude answer fails, so Workflow can retry the call. QStash sees a throttled search inside a 200 as success and doesn't retry it.
+
+The AI SDK reports a rejected Anthropic web search as a `tool-error` part and a successful one as a `tool-result`. So we count both to choose the status code.
+
+```ts
+import { anthropic } from '@ai-sdk/anthropic';
+import { generateText } from 'ai';
+
+export const maxDuration = 800;
+
+export async function POST(request: Request): Promise<Response> {
+  const { prompt, assistant } = await request.json();
+  
+  if (assistant !== 'claude' || typeof prompt !== 'string')
+    return Response.json({ error: 'This example implements Claude only' }, { status: 400 });
+  
+  try {
+    const result = await generateText({
+      model: anthropic('claude-haiku-4-5'), prompt, maxRetries: 0,
+      tools: { web_search: anthropic.tools.webSearch_20250305({ maxUses: 3 }) },
+    });
+
+    const searches = result.steps.flatMap((step) => step.content).filter((part) =>
+      (part.type === 'tool-error' || part.type === 'tool-result') &&
+      part.toolName === 'web_search');
+      
+    const errors = searches.flatMap((part) =>
+      part.type === 'tool-error' ? [part.error] : []);
+      
+    const succeeded = searches.filter((part) => part.type === 'tool-result').length;
+    
+    if (errors.length > 0 && succeeded === 0)
+      return Response.json({ errors, succeeded }, { status: 500 });
+    
+    return Response.json({ answer: result.text, failed: errors.length, succeeded });
+  } catch {
+    return Response.json({ error: 'Provider request failed' }, { status: 500 });
+  }
+}
+```
+
+For example:
+
+```text
+failed: HTTP 500 {"errors":[{"type":"web_search_tool_result_error","errorCode":"too_many_requests"}],"succeeded":0}
+mixed: HTTP 200 {"answer":"Example answer","failed":1,"succeeded":1}
+succeeded: HTTP 200 {"answer":"Example answer","failed":0,"succeeded":1}
+no-search: HTTP 200 {"answer":"Example answer","failed":0,"succeeded":0}
+```
+
+## How do we make AI chats durable with Workflow?
+
+Each message you send to our writing agent starts one workflow run, and every model step inside it is a checkpoint. If a function crashes or times out, the run continues from the last finished step. You can close the browser and the agent keeps writing your draft.
+
+During a turn, the agent may research, call tools, edit the article or ask you a question. Our functions have a `maxDuration` of 800 seconds, which a long turn could exceed. Workflow runs each step in its own request and saves the result. A retry reuses the results of finished steps.
+
+```ts
+import { serve } from '@upstash/workflow/nextjs';
+import { Redis } from '@upstash/redis';
+import { anthropic } from '@ai-sdk/anthropic';
+import {
+  streamText,
+  toUIMessageStream,
+  isStepCount,
+  type ModelMessage,
+  type UIMessageChunk,
+} from 'ai';
+
+const redis = Redis.fromEnv();
+const MAX_STEPS = 60;
+
+type Payload = { turnId: string; prompt: string };
+
+export const maxDuration = 800;
+
+export const { POST } = serve<Payload>(
+  async (context) => {
+    const { turnId, prompt } = await context.run('prepare', () => context.requestPayload);
+
+    const key = `chat:stream:${turnId}`;
+    const state = `chat:turn:${turnId}`;
+
+    let done = false;
+
+    for (let i = 0; i < MAX_STEPS && !done; i++) {
+      ({ done } = await context.run(`step-${i}`, async () => {
+        const saved = await redis.get<{ done: boolean }>(`${state}:step:${i}`);
+        if (saved) return saved;
+
+        const messages =
+          (await redis.get<ModelMessage[]>(`${state}:messages`)) ??
+          [{ role: 'user' as const, content: prompt }];
+
+        // run exactly one model step
+        const result = streamText({
+          model: anthropic('claude-opus-5-5'),
+          messages,
+          maxRetries: 0,
+          stopWhen: isStepCount(1),
+          tools: {
+            web_search: anthropic.tools.webSearch_20250305({ maxUses: 3 }),
+          },
+        });
+
+        // buffer the step's UI chunks
+        const chunks: UIMessageChunk[] = [];
+        const reader = toUIMessageStream({
+          stream: result.fullStream,
+          sendStart: i === 0,
+          sendFinish: false,
+        }).getReader();
+
+        for (let item = await reader.read(); !item.done; item = await reader.read()) {
+          if (item.value.type === 'error') throw new Error(item.value.errorText);
+          chunks.push(item.value);
+        }
+
+        const done = (await result.finishReason) === 'stop';
+        const response = await result.response;
+
+        // commit chunks and state together
+        const tx = redis.multi();
+        for (const chunk of chunks) {
+          tx.rpush(key, JSON.stringify(chunk));
+          tx.publish(key, JSON.stringify(chunk));
+        }
+        tx.set(`${state}:messages`, [...messages, ...response.messages]);
+        tx.set(`${state}:step:${i}`, { done });
+        await tx.exec();
+
+        return { done };
+      }));
+    }
+
+    if (!done) throw new Error('Model step budget exhausted');
+
+    await context.run('finalize', () => redis.set(`${state}:status`, 'finished'));
+  },
+  {
+    failureFunction: async ({ context }) => {
+      await redis.set(`chat:turn:${context.requestPayload.turnId}:status`, 'error');
+    },
+  },
+);
+```
+
+We save every UI chunk from the model to a Redis list for that turn and publish it on a Redis channel with the same name. A chunk's position in the list is its sequence number, so the browser always knows how far it got.
+
+![](https://cdn.bydefault.so/drawing-IrQ9CTT7X9wFxGgarVfqi.png)
+
+This version saves a whole model step at once, so a retry won't leave half a step in the list. You see the text only after the step finishes. In production we push chunks as they arrive. When a step retries, we trim the list back to where it started and send a rewind message. The browser then drops the partial text and plays the step again.
+
+When the agent asks you a question, the run waits on `context.waitForEvent` for up to 3 days. Answering the question sends the event, and the same run carries on from that step.
+
+On reconnect, the browser asks a small stream route for everything after the last sequence number it saw:
+
+```ts
+import { Redis } from '@upstash/redis';
+import { setTimeout as sleep } from 'node:timers/promises';
+
+const redis = Redis.fromEnv();
+const PAGE_SIZE = 100;
+
+export const maxDuration = 60;
+
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ turnId: string }> },
+) {
+  const { turnId } = await params;
+
+  let seq = Number(new URL(request.url).searchParams.get('fromSeq') ?? 0);
+  if (!Number.isSafeInteger(seq) || seq < 0) {
+    return new Response('Invalid fromSeq', { status: 400 });
+  }
+
+  const encoder = new TextEncoder();
+  const deadline = Date.now() + 50_000;
+  let cancelled = false;
+
+  const send = (controller: ReadableStreamDefaultController<Uint8Array>, text: string) =>
+    controller.enqueue(encoder.encode(text));
+
+  const body = new ReadableStream<Uint8Array>({
+    async start(controller) {
+      try {
+        while (!cancelled && !request.signal.aborted && Date.now() < deadline) {
+          // Read the status first, so a turn that just finished doesn't lose its last chunks.
+          const status = await redis.get<string>(`chat:turn:${turnId}:status`);
+          const chunks = await redis.lrange<unknown>(
+            `chat:stream:${turnId}`,
+            seq,
+            seq + PAGE_SIZE - 1,
+          );
+
+          if (cancelled || request.signal.aborted) break;
+
+          for (const chunk of chunks) {
+            send(controller, `id: ${seq}\ndata: ${JSON.stringify({ seq, chunk })}\n\n`);
+            seq++;
+          }
+
+          const caughtUp = chunks.length < PAGE_SIZE;
+
+          if (caughtUp && (status === 'finished' || status === 'error')) {
+            send(controller, `event: end\ndata: ${JSON.stringify({ status })}\n\n`);
+            break;
+          }
+
+          if (caughtUp) {
+            await sleep(500, undefined, { signal: request.signal });
+          }
+        }
+
+        if (!cancelled) controller.close();
+      } catch (error) {
+        if (!cancelled) controller.error(error);
+      }
+    },
+    cancel() {
+      cancelled = true;
+    },
+  });
+
+  return new Response(body, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache, no-transform',
+    },
+  });
+}
+```
+
+This route polls the list every half second to keep the example short. A live reader can get new chunks by listening on the Redis channel instead. [Upstash Realtime](https://upstash.com/blog/realtime-ai-sdk) handles the same replay on reconnect in a library.
+
+## Which Workflow limits did we hit, and how did we work around them?
+
+The same customer also hit QStash's limit of 10,000 entries per workflow run. Their run needed about 12,800, so we split big runs into child workflows. Each change we made came from a real failure.
+
+1. **We split big fan-outs into child workflows.** Each `context.call` writes about four entries: the plan, the call, the callback and the result. That customer's 456 prompts across 6 assistants needed about 3,200 calls, and the run died partway through. Now the parent run cuts the prompts into slices and starts each slice with `context.invoke`. Every child run gets its own entry budget, and the parent keeps only a few dozen steps of its own.
+2. **We use a flat retry delay.** By default, QStash backs off [exponentially](https://upstash.com/docs/workflow/features/retries): about 12 seconds, then 2.5 minutes, then 30 minutes. With that default, a provider having a bad day kept a whole organization's run open for half an hour. A flat 2 minutes fits our daily job better. `retryDelay` takes milliseconds as a string (`'120000'`), while `timeout` needs a unit (`'800s'`).
+3. **Retries wait in the same queue.** A retried call goes back into its flow-control key, so a wave of retries waits its turn instead of hitting the provider all at once.
+4. **We poll with `context.sleep`, but not too often.** Sleeping costs nothing while the run waits. Each check still becomes a step that every later wake replays, though. We check a provider batch after 1, 2 and 5 minutes, then every 10 minutes for up to 3 hours, which is about 20 checks.
+5. **Failures go to Discord.** Each workflow's `failureFunction` posts the workflow name and the failed response to our Discord.
+
+![](https://cdn.bydefault.so/drawing-P2a3XUR8buP17DT7XVTYX.png)
+
+```ts
+import { createWorkflow, serveMany } from '@upstash/workflow/nextjs';
+import { Redis } from '@upstash/redis';
+
+const redis = Redis.fromEnv();
+const SLICE_SIZE = 100;
+
+type Payload = { ids: string[] };
+
+// Child: handles one slice of prompt ids.
+const child = createWorkflow<Payload, number>(async (context) => {
+  const ids = await context.run('plan', () => context.requestPayload.ids);
+
+  await context.run('record-slice', async () => {
+    const [first, ...rest] = ids;
+    if (first !== undefined) {
+      await redis.sadd('processed:prompt-ids', first, ...rest);
+    }
+  });
+
+  return ids.length;
+});
+
+// Parent: splits the ids into slices and runs one child per slice.
+const parent = createWorkflow<Payload, void>(async (context) => {
+  const slices = await context.run('plan', () => {
+    const ids = context.requestPayload.ids;
+    const count = Math.ceil(ids.length / SLICE_SIZE);
+
+    return Array.from({ length: count }, (_, i) =>
+      ids.slice(i * SLICE_SIZE, (i + 1) * SLICE_SIZE),
+    );
+  });
+
+  const results = await Promise.all(
+    slices.map((ids, i) =>
+      context.invoke(`slice:${i}`, {
+        workflow: child,
+        body: { ids },
+        retries: 3,
+        retryDelay: '120000',
+      }),
+    ),
+  );
+
+  if (results.some((result) => result.isFailed || result.isCanceled)) {
+    throw new Error('A child workflow failed');
+  }
+});
+
+// Mount at app/api/workflow/[workflowId]/route.ts.
+// Trigger /api/workflow/parent; invoke calls the sibling /api/workflow/child.
+export const { POST } = serveMany({ parent, child });
+```
+
+In production, the child runs make the `context.call` fan-out. The parent handles the billing checks and batch polling.
