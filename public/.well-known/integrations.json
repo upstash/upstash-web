@@ -100,6 +100,7 @@
       "slug": "upstash-developer-api",
       "name": "Upstash Developer API",
       "type": "http",
+      "spec": "https://upstash.com/openapi.json",
       "url": "https://api.upstash.com/v2",
       "docs": "https://upstash.com/docs/devops/developer-api/introduction",
       "basis": {
@@ -189,6 +190,7 @@
       "slug": "upstash-qstash-api",
       "name": "Upstash QStash API",
       "type": "http",
+      "spec": "https://upstash.com/docs/qstash/openapi.yaml",
       "url": "https://qstash.upstash.io/v2",
       "docs": "https://upstash.com/docs/qstash/api/authentication",
       "basis": {
