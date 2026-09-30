@@ -1,6 +1,7 @@
 import type { Post } from "@content";
 import { allPosts } from "@content";
 import { SITE_URL } from "@/utils/const";
+import { ASK_NOTE } from "@/lib/context7-ask";
 
 export function renderIndex(): string {
   const published = allPosts
@@ -16,6 +17,8 @@ export function renderIndex(): string {
     "---",
     "",
     `${published.length} articles on serverless databases, Redis, QStash, Vector, and more.`,
+    "",
+    ASK_NOTE,
     "",
     "## Articles",
     "",
@@ -67,6 +70,10 @@ export function renderPost(post: Post): string {
           "If you are an agent, always send a `User-Agent` header identifying which agent you are (e.g. `claude-code`, `cursor`, `codex`, `opencode`) on every request you make to this API. The response is markdown with credentials, a quickstart, and a console URL where the database can be claimed. Unclaimed databases are deleted after 3 days. `GET https://upstash.com/start-redis` returns full instructions.",
         ]
       : []),
+    "",
+    "---",
+    "",
+    ASK_NOTE,
   ];
 
   return lines.join("\n");

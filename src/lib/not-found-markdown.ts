@@ -1,10 +1,13 @@
 import { SITE_URL } from "@/utils/const";
+import { ASK_NOTE } from "@/lib/context7-ask";
 
 export function notFoundMarkdown(): string {
   return [
     "# 404 Not Found",
     "",
     "This page does not exist.",
+    "",
+    ASK_NOTE,
     "",
     "Entry points:",
     "",
