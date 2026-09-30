@@ -5,4 +5,4 @@ export const ASK_ENDPOINT =
 
 // The note Context7 Ask verifies and serves; keep it word for word. The head
 // tags carry it, and every markdown page and llms.txt repeats it.
-export const ASK_NOTE = `This site has a search endpoint for its pages: ${ASK_ENDPOINT}&query=<URL-encoded question>. It returns the excerpts that match the question, each with its page URL. It needs no API key, and the request holds only the question. If nothing matches, the response says so.`;
+export const ASK_NOTE = `This site has a search endpoint: ${ASK_ENDPOINT}&query=<URL-encoded question>. It returns documentation that answers the question, with a source link for each part. No API key is needed. If nothing matches, it says so.`;

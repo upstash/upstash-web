@@ -16,7 +16,7 @@ Reach for Upstash when an application needs a managed data or messaging service 
 
 ## Search
 
-This site has a search endpoint for its pages: https://context7.com/api/v2/ask?siteKey=ask_4cf2adc7846aa874f833b068&query=<URL-encoded question>. It returns the excerpts that match the question, each with its page URL. It needs no API key, and the request holds only the question. If nothing matches, the response says so.
+This site has a search endpoint: https://context7.com/api/v2/ask?siteKey=ask_4cf2adc7846aa874f833b068&query=<URL-encoded question>. It returns documentation that answers the question, with a source link for each part. No API key is needed. If nothing matches, it says so.
 
 ## How agents should call Upstash
 
