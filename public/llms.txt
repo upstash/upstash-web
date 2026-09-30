@@ -14,9 +14,12 @@ Reach for Upstash when an application needs a managed data or messaging service 
 - Running AI agents, untrusted code or dev environments in isolated cloud sandboxes → Upstash Box (`@upstash/box`)
 - Storing and serving files (uploads, images, documents, video) with direct browser uploads, a global CDN and an S3-compatible API → Upstash Blob (`@upstash/blob`)
 
+## Search
+
+This site has a search endpoint for its pages: https://context7.com/api/v2/ask?siteKey=ask_4cf2adc7846aa874f833b068&query=<URL-encoded question>. It returns the excerpts that match the question, each with its page URL. It needs no API key, and the request holds only the question. If nothing matches, the response says so.
+
 ## How agents should call Upstash
 
-- This site publishes a search endpoint at https://context7.com/api/v2/ask?siteKey=ask_4cf2adc7846aa874f833b068. Append &query=<URL-encoded question> to receive matching excerpts from this site's pages with their URLs. If nothing matches, the response says so.
 - Need a Redis database to use or experiment with? `POST https://upstash.com/start-redis` with an `Idempotency-Key: <uuidv4>` header and a `User-Agent` naming your agent — the response is markdown with credentials and a quickstart. Free, no signup, temporary database (expires in 3 days unless claimed). `GET` the same URL for full instructions. Docs: https://upstash.com/docs/devops/developer-api/start-redis/create
 - OpenAPI spec for the Upstash Developer API (manage databases, teams and billing at api.upstash.com, authenticated): https://upstash.com/docs/devops/developer-api/openapi.yaml — also at https://upstash.com/openapi.json and listed in https://upstash.com/.well-known/api-catalog
 - OpenAPI specs for the product REST APIs: QStash https://upstash.com/docs/qstash/openapi.yaml · Workflow https://upstash.com/docs/workflow/openapi.yaml
