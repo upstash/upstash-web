@@ -136,7 +136,11 @@ If you'd rather answer with a 429 status, call `createRateLimit({ limiter }).lim
 
 ## RAG with search tools
 
-`createSearchTools` gives the model `search`, `aggregate`, and `count` tools over your own documents in Redis Search. You describe the documents with a schema, and the tool descriptions tell the model which fields and filters it can use.
+`createSearchTools` gives the model `search`, `aggregate`, and `count` tools over your own documents in Redis Search. You describe the documents with a schema, and the tool descriptions tell the model which fields and filters it can use. The schema builder `s` comes from `@upstash/redis`, so install it if your app doesn't have it yet:
+
+```bash
+npm install @upstash/redis
+```
 
 ```ts
 import { s } from "@upstash/redis";
@@ -150,7 +154,7 @@ const tools = createSearchTools({
 chat({ adapter, messages, tools });
 ```
 
-A query for "wireless hedphones" still finds "Wireless headphones". The index is created the first time a tool runs.
+A query for "wireless hedphones" can still find "Wireless headphones". The index is created the first time a tool runs.
 
 ## Putting it together
 
