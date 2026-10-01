@@ -15,6 +15,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import ExpandableCode from "./expandable-code";
+import { BenchmarkChart } from "./benchmark-chart";
 import { Frame } from "./frame";
 import { MuxVideoPlayer } from "./mux-video-player";
 import PostNote from "./note";
@@ -286,6 +287,7 @@ function Highlight(props: {
 }
 
 const components = {
+  BenchmarkChart,
   table,
   img,
   FullWidth,

@@ -1,0 +1,97 @@
+.figure {
+  padding: 24px;
+  border: 1px solid color-mix(in srgb, var(--color-text) 12%, transparent);
+  border-radius: 16px;
+  background: var(--color-bg-mute);
+  color: var(--color-text);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.caption {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 24px;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.description,
+.detail {
+  color: var(--color-text-mute);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.label {
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.values {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+
+.value {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+}
+
+.value dd {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 64px;
+  gap: 8px;
+  align-items: center;
+  margin: 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.track {
+  display: block;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--color-text) 8%, transparent);
+}
+
+.docs7,
+.mintlify {
+  display: block;
+  height: 100%;
+}
+
+.docs7 {
+  background: #ea580c;
+}
+
+.mintlify {
+  background: #0fa76f;
+}
+
+.detail {
+  margin-top: 10px;
+  font-size: 12px;
+}
+
+@media (max-width: 639px) {
+  .figure {
+    padding: 20px;
+  }
+
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

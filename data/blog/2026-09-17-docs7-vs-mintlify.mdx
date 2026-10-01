@@ -4,13 +4,17 @@ slug: docs7-vs-mintlify
 authors: [abdullahenes]
 tags: [docs7, context7, performance]
 description: "We tested 17 matching Upstash and Context7 documentation pages on Docs7 and Mintlify. Docs7 scored higher in 33 of 34 Google comparisons. See the scores, the method, and the full test data."
-updated: "2026-09-18"
+updated: "2026-10-01"
 draft: false
 ---
 
-We built [Docs7](https://context7.com/docs7), so you should not take our word for how fast it is. The Upstash and Context7 docs are live on both Docs7 and Mintlify, with the same content at the same paths. That makes a fair test easy, and we let Google PageSpeed Insights and DebugBear do the measuring.
+## Why we ran this benchmark
 
-We picked 17 pages and left out the easy ones. Plain text is fast anywhere, so these pages have screenshots, video, long API references, and custom components. Google tested every URL 10 times on mobile and 10 times on desktop, with the same settings for both hosts. All the numbers below are medians.
+Documentation must load quickly when you need an API detail or a setup step. We built [Docs7](https://context7.com/docs7) to serve documentation as static files through a CDN. We wanted to measure how that design performs on real pages with images, video, code, and interactive components.
+
+We tested 17 matching pages from the Upstash and Context7 documentation sites on Docs7 and Mintlify. Google PageSpeed Insights measured mobile and desktop performance over repeated runs. DebugBear provided a second set of performance scores. Pingdom measured load times from three locations.
+
+We compared the same page paths with the same test settings on both hosts. We kept services, devices, and locations separate, and used the median when we had repeated runs. The summaries below give each page equal weight. This is our own product comparison, so we include both site links and the full results for you to check.
 
 ## The results
 
@@ -18,15 +22,73 @@ We picked 17 pages and left out the easy ones. Plain text is fast anywhere, so t
 
 Single runs are noisier than medians. When we compare run by run, 340 pairs in total, Docs7 scored higher in 263, Mintlify in 66, and 11 were equal.
 
-![Average Google and DebugBear scores on mobile and desktop.](/blog/docs7-vs-mintlify/typical-results.svg)
+<BenchmarkChart
+  title="Performance scores"
+  description="Average of the per-page medians."
+  unit="score"
+  rows={[
+    {
+      label: "Google · mobile",
+      docs7: 80.1,
+      mintlify: 58.9,
+      detail: "17 pairs · 10 runs per URL",
+    },
+    {
+      label: "Google · desktop",
+      docs7: 94.9,
+      mintlify: 88.4,
+      detail: "17 pairs · 10 runs per URL",
+    },
+    {
+      label: "DebugBear · mobile",
+      docs7: 75.6,
+      mintlify: 71.3,
+      detail: "10 pairs · 1–2 runs per URL",
+    },
+    {
+      label: "DebugBear · desktop",
+      docs7: 80.7,
+      mintlify: 69,
+      detail: "10 pairs · 1–2 runs per URL",
+    },
+  ]}
+/>
 
-The difference is largest on mobile. The expandable API fields page scored 85 vs. 46.5, and the long CLI guide scored 89.5 vs. 54. It is smallest on desktop, where the release notes page had the same score on both hosts, 96.5, and two other pages were within one point.
+Pingdom recorded lower Docs7 load times on 14 of 17 San Francisco pairs, 5 of 7 Frankfurt pairs, and all 3 Tokyo pairs. Mintlify was faster on the other five pairs. Most pairs have only one run per URL, so these checks do not establish a stable regional ranking.
+
+<BenchmarkChart
+  title="Pingdom load times"
+  description="Average of the per-page medians within each location. Most pairs have one run."
+  unit="ms"
+  rows={[
+    {
+      label: "San Francisco",
+      docs7: 509,
+      mintlify: 652,
+      detail: "17 pairs · 1–3 runs per URL",
+    },
+    {
+      label: "Frankfurt",
+      docs7: 431,
+      mintlify: 576,
+      detail: "7 pairs · 1–2 runs per URL",
+    },
+    {
+      label: "Tokyo",
+      docs7: 1247,
+      mintlify: 1933,
+      detail: "3 pairs · 1 run per URL",
+    },
+  ]}
+/>
+
+The Google score difference is largest on mobile. The expandable API fields page scored 85 vs. 46.5, and the long CLI guide scored 89.5 vs. 54. It is smallest on desktop, where the release notes page had the same score on both hosts, 96.5, and two other pages were within one point.
 
 Docs7 has slow pages too. The long API reference scored 57 on mobile. That is ahead of Mintlify's 46.5, but it is the lowest Docs7 score in the set.
 
 ## What we tested
 
-We used two documentation projects. Each one is available on both platforms:
+We used 7 Upstash pages and 10 Context7 pages. Each project is available on both platforms:
 
 - **Upstash:** [Docs7](https://upstash-docs.docs7.io/docs/introduction) and [Mintlify](https://upstash.mintlify.dev/docs/introduction).
 - **Context7:** [Docs7](https://upstash-context7.docs7.io/docs/overview) and [Mintlify](https://context7.mintlify.dev/docs/overview).
@@ -41,21 +103,141 @@ The [full results on GitHub](https://github.com/upstash/upstash-web/blob/101b417
 
 ## Results by page type
 
-Each dot is the average of the page medians in that group, and the line between the two dots shows the difference. Scores are out of 100. Docs7 had the higher score in every group on both devices.
+Each value is the average of the page medians in that group. Scores are out of 100. Docs7 had the higher score in every group on both devices.
 
-![Google scores by page type, on mobile and desktop.](/blog/docs7-vs-mintlify/google-by-page-type.svg)
+<BenchmarkChart
+  title="Scores by page type"
+  description="Google scores, averaged within each group."
+  unit="score"
+  rows={[
+    {
+      label: "Images · mobile",
+      docs7: 69.0,
+      mintlify: 50.5,
+      detail: "10 runs per URL",
+    },
+    {
+      label: "Images · desktop",
+      docs7: 98.0,
+      mintlify: 79.5,
+      detail: "10 runs per URL",
+    },
+    {
+      label: "Video · mobile",
+      docs7: 64.5,
+      mintlify: 50.0,
+      detail: "10 runs per URL",
+    },
+    {
+      label: "Video · desktop",
+      docs7: 78.0,
+      mintlify: 66.5,
+      detail: "10 runs per URL",
+    },
+    {
+      label: "Long guides and steps · mobile",
+      docs7: 91.0,
+      mintlify: 63.4,
+      detail: "10 runs per URL",
+    },
+    {
+      label: "Long guides and steps · desktop",
+      docs7: 96.2,
+      mintlify: 91.4,
+      detail: "10 runs per URL",
+    },
+    {
+      label: "Code and API references · mobile",
+      docs7: 69.8,
+      mintlify: 49.7,
+      detail: "10 runs per URL",
+    },
+    {
+      label: "Code and API references · desktop",
+      docs7: 96.6,
+      mintlify: 87.5,
+      detail: "10 runs per URL",
+    },
+    {
+      label: "Custom components · mobile",
+      docs7: 78.8,
+      mintlify: 70.0,
+      detail: "10 runs per URL",
+    },
+    {
+      label: "Custom components · desktop",
+      docs7: 95.8,
+      mintlify: 91.8,
+      detail: "10 runs per URL",
+    },
+    {
+      label: "Interactive components · mobile",
+      docs7: 89.8,
+      mintlify: 66.5,
+      detail: "10 runs per URL",
+    },
+    {
+      label: "Interactive components · desktop",
+      docs7: 94.8,
+      mintlify: 92.8,
+      detail: "10 runs per URL",
+    },
+    {
+      label: "Diagrams · mobile",
+      docs7: 88.5,
+      mintlify: 59.5,
+      detail: "10 runs per URL",
+    },
+    {
+      label: "Diagrams · desktop",
+      docs7: 93.0,
+      mintlify: 91.0,
+      detail: "10 runs per URL",
+    },
+  ]}
+/>
 
 On mobile, the largest differences were on diagrams (88.5 vs. 59.5) and long guides (91 vs. 63.4). Pages with video were the slowest group for Docs7, at 64.5. On desktop, both hosts scored above 90 in most groups, and images made the largest difference, 98 vs. 79.5.
 
 ## Where Docs7 saves time
 
-Docs7 put the main content on the screen sooner. Google calls this the largest-content paint. Across the 17 pages, the median was 3.3 seconds vs. 9.7 seconds in Google's throttled phone test, and 0.62 seconds vs. 1.02 seconds on desktop.
+Docs7 put the main content on the screen sooner. Google measures this with Largest Contentful Paint, or LCP. Across the 17 pages, the median was 3.3 seconds vs. 9.7 seconds in Google's throttled phone test, and 0.62 seconds vs. 1.02 seconds on desktop.
 
-![Median time until content is on the screen, across the 17 pages.](/blog/docs7-vs-mintlify/google-load-times.svg)
+<BenchmarkChart
+  title="Time until content appears"
+  description="Median of the 17 per-page medians. Google, 10 runs per URL."
+  unit="s"
+  rows={[
+    {
+      label: "Main content · mobile",
+      docs7: 3.3,
+      mintlify: 9.7,
+      detail: "Largest Contentful Paint",
+    },
+    {
+      label: "Main content · desktop",
+      docs7: 0.62,
+      mintlify: 1.02,
+      detail: "Largest Contentful Paint",
+    },
+    {
+      label: "First content · mobile",
+      docs7: 1.2,
+      mintlify: 1.85,
+      detail: "First Contentful Paint",
+    },
+    {
+      label: "First content · desktop",
+      docs7: 0.32,
+      mintlify: 0.51,
+      detail: "First Contentful Paint",
+    },
+  ]}
+/>
 
 The measurements point to work in the browser. The Docs7 build prepares responsive image sizes, sets image dimensions so the layout does not shift, and defers images below the first screen. Docs7 pages also blocked the browser for less time. Across the 17 pages, the median blocking time was 199 ms vs. 389 ms on mobile and 166 ms vs. 228 ms on desktop.
 
-Docs7 also compiles documentation into static HTML at build time, and Cloudflare's [static-asset network](https://developers.cloudflare.com/workers/static-assets/) serves those files. The browser receives the content directly, with JavaScript for interactive features.
+Docs7 compiles documentation into static HTML at build time. Cloudflare's [static-asset network](https://developers.cloudflare.com/workers/static-assets/) serves the generated files through its CDN. The page content does not need to be rendered on a server for each visit. The browser receives HTML with the content already in it, then uses JavaScript for interactive features. This moves page rendering to the build and reduces work on the request path.
 
 Pages with video were the slowest group for Docs7 on both devices. On the video page, the median largest-content paint on mobile was 4.20 seconds on Docs7 vs. 12.91 seconds on Mintlify. Mobile runs on this page varied a lot on both hosts, from 2.9 to 16.5 seconds on Docs7 and from 3.3 to 21.1 seconds on Mintlify.
 
@@ -67,7 +249,7 @@ Google ran all 680 tests on September 17, 2026, using Lighthouse 13.4.1. DebugBe
 
 These are lab tests of the first page load on deployed sites. We did not play the videos or measure interaction latency. We did not control cache state, and the paired runs were not always simultaneous.
 
-We also ran Pingdom load-time checks from San Francisco, Frankfurt, and Tokyo. Most pages have only one run per URL, which is too thin for a regional speed claim, so those numbers are [in the appendix](https://github.com/upstash/upstash-web/blob/101b417e46df9239e99bd24b0da68ee107594188/benchmarks/docs7-vs-mintlify.md#pingdom-exploratory-load-time-checks) only.
+Pingdom measures load time, not a Lighthouse performance score. Its location samples contain different page sets. Compare the two hosts within each location, not one location against another. The [appendix](https://github.com/upstash/upstash-web/blob/101b417e46df9239e99bd24b0da68ee107594188/benchmarks/docs7-vs-mintlify.md#pingdom-exploratory-load-time-checks) includes each page pair, run count, and report link.
 
 ## Check the data
 
