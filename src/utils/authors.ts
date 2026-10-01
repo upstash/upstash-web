@@ -457,6 +457,11 @@ export const authors: Record<
     twitter: "dominikkoch",
     image: "dominik.jpeg",
   },
+  ramazan: {
+    name: "Ramazan Onur Acar",
+    title: "Software Engineer @Upstash",
+    image: "ramazan.jpeg",
+  }
 };
 
 /**
