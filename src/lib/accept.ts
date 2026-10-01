@@ -24,17 +24,19 @@ function parseAccept(header: string): AcceptEntry[] {
     .sort((a, b) => b.q - a.q);
 }
 
-function qFor(entries: AcceptEntry[], ...types: string[]): number {
-  for (const { type, q } of entries) {
-    if (types.includes(type)) return q;
-  }
+/** `position` is the entry's index in the header; -1 when matched via wildcard. */
+type Preference = { q: number; position: number };
+
+function preferenceFor(entries: AcceptEntry[], type: string): Preference {
+  const position = entries.findIndex((entry) => entry.type === type);
+  if (position !== -1) return { q: entries[position].q, position };
   const textWildcard = entries.find((e) => e.type === "text/*");
-  if (textWildcard && types.every((t) => t.startsWith("text/"))) {
-    return textWildcard.q;
+  if (textWildcard && type.startsWith("text/")) {
+    return { q: textWildcard.q, position: -1 };
   }
   const wildcard = entries.find((e) => e.type === "*/*");
-  if (wildcard) return wildcard.q;
-  return 0;
+  if (wildcard) return { q: wildcard.q, position: -1 };
+  return { q: 0, position: -1 };
 }
 
 /**
@@ -51,9 +53,18 @@ export function negotiate(accept: string): Negotiation {
   );
   if (!hasSupported) return "unacceptable";
 
-  const markdownQ = qFor(entries, "text/markdown");
-  if (markdownQ === 0) return "html";
+  const markdown = preferenceFor(entries, "text/markdown");
+  if (markdown.q === 0) return "html";
 
-  const htmlQ = qFor(entries, "text/html");
-  return markdownQ > htmlQ ? "markdown" : "html";
+  const html = preferenceFor(entries, "text/html");
+  if (markdown.q > html.q) return "markdown";
+  if (markdown.q < html.q) return "html";
+
+  // Equal q: prefer the type the client listed first, and an explicit type
+  // over a wildcard match. Agents send e.g. "text/markdown, text/html, */*"
+  // (Claude Code WebFetch) and get markdown, as they do from Mintlify; browsers
+  // never list text/markdown explicitly, so they keep getting HTML.
+  if (markdown.position === -1) return "html";
+  if (html.position === -1) return "markdown";
+  return markdown.position < html.position ? "markdown" : "html";
 }
