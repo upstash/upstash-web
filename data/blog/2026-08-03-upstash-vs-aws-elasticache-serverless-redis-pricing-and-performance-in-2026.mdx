@@ -42,7 +42,7 @@ In every run, requests past the plan limit waited a bit longer instead of failin
 
 ## What does Upstash Redis cost in 2026?
 
-Upstash Redis has a [free tier (256 MB, 500,000 commands per month), pay-as-you-go at $0.20 per 100,000 commands, Fixed plans from $10 to $1,500 per month, and custom-priced Enterprise plans](https://upstash.com/pricing/redis). An idle database on pay-as-you-go costs $0.
+Upstash Redis has a [free tier (250 MB, 500,000 commands per month), pay-as-you-go at $0.20 per 100,000 commands, Fixed plans from $10 to $1,500 per month, and custom-priced Enterprise plans](https://upstash.com/pricing/redis). An idle database on pay-as-you-go costs $0.
 
 The Fixed plans, which bill a flat monthly price with unlimited commands:
 
@@ -110,7 +110,7 @@ Upstash. An idle Upstash database costs $0 on pay-as-you-go, and 5 million comma
 | ElastiCache cache.t4g.micro node, Valkey | $9.34 |
 | ElastiCache Serverless, Redis OSS | $91.25 minimum |
 
-The free tiers differ in kind. Upstash's free tier is permanent: 256 MB and 500,000 commands a month. AWS accounts created after July 15, 2025 get [$100 in credits plus up to $100 more](https://aws.amazon.com/elasticache/pricing/) for activating other AWS services, and the credits run out.
+The free tiers differ in kind. Upstash's free tier is permanent: 250 MB and 500,000 commands a month. AWS accounts created after July 15, 2025 get [$100 in credits plus up to $100 more](https://aws.amazon.com/elasticache/pricing/) for activating other AWS services, and the credits run out.
 
 ## Which is cheaper at high, steady traffic?
 
@@ -162,7 +162,7 @@ ElastiCache is better when everything runs inside one AWS VPC and you have someo
 | Idle cost | $0 | $6.13 to $91.25 minimum, depending on engine |
 | Throughput | High sustained, 16,000 commands/sec on Fixed, 100,000+ on dedicated nodes | Also high sustained on dedicated nodes |
 | Access | HTTPS from anywhere, plus TCP | TCP inside your VPC |
-| Free tier | 256 MB, 500K commands/month, permanent | $100 to $200 in credits |
+| Free tier | 250 MB, 500K commands/month, permanent | $100 to $200 in credits |
 | Global replication | Read regions picked from 18 regions, no fixed limit | Active-passive, 2 secondary regions max |
 | Setup | Create database, get URL and token | VPC, subnets, security groups, node sizing |
 

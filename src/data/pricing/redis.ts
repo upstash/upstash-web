@@ -137,7 +137,7 @@ export const REDIS_FREE_PLAN: RedisPlan = {
   requestPrice: "Free",
   storagePrice: "Free",
   bandwidthPrice: "Free",
-  dataSize: "256 MB",
+  dataSize: "250 MB",
   monthlyCommands: "500K",
   maxBandwidth: "10 GB",
   maxBandwidthNote: null,
