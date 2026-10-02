@@ -7,3 +7,324 @@ description: Benchmarking Context7 and Exa and Exa Code
 draft: "true"
 ---
 
+If you build a coding agent with the Vercel AI SDK, it needs a search tool that returns the current docs for the library it writes code against. Context7 Search is the better fit for that, and Exa is great for everything outside official docs.
+
+We ran the same 10 coding questions through Context7 Search, Exa search and exa-code, and added both tools to AI SDK agents to see when each one works better.
+
+## Which search tool should a coding agent use for grounding?
+
+For library docs and code examples, a docs-only search API like [Context7 Search](https://upstash.com/blog/context7-search) is the better tool for grounding. A general web search tool like Exa is still useful next to it for things official docs don't cover, like GitHub issues, changelogs and blog posts.
+
+Coding agents write code against APIs that keep changing. For example, AI SDK 7 renamed the `stepCountIs` helper to `isStepCount` and deprecated the old name. When we asked Exa how to stop a tool loop after five steps, its top result was the AI SDK v5 reference page for the old name. Context7 returned the current docs page with `isStepCount(5)`.
+
+A good search tool for a coding agent returns current docs from a trusted source in as few tokens as possible:
+
+- **Which version it returns.** Context7 takes a version hint, and library owners decide which version is the latest. A web index has every version of a page that ever existed.
+- **Where the text comes from.** Context7 only indexes [first-party sources](https://upstash.com/blog/context7-search) like official docs sites and API references, and it scans each snippet for malware and prompt injection before indexing it. Web search also returns forum threads, Reddit posts and old blog posts.
+- **How many tokens it adds.** Each result goes into the model's context and stays there for the rest of the loop. In our test, Context7 returned a median of 1,914 tokens per search. Exa's AI SDK tool with default settings returned 9,024.
+
+In a separate benchmark of 100 queries against Claude Code's built-in web search, Context7 [cut the average cost per query by 34.56%](https://upstash.com/blog/context7-vs-web-search-benchmark), from $0.22 to $0.14.
+
+![](https://cdn.bydefault.so/image-zGSqcCp6Pk4fNMQ-uaK97.png)
+
+## What is the Context7 Search API?
+
+The Context7 Search API is a single GET request that searches official library docs and returns code snippets you can paste straight into a prompt. Each snippet includes its library and source URL, so the agent can cite where the code came from.
+
+Before this endpoint, Context7 had a [two-step API](https://upstash.com/blog/new-context7). The agent first had to resolve a library ID, and then ask that library a question. With the Search API, the agent sends a plain question and Context7 finds the right libraries. That works well in a tool-calling loop, because the model writes a single string.
+
+![](https://cdn.bydefault.so/drawing-EMVOp6M4i0rY4gx6hOZIY.png)
+
+Here's an example in TypeScript:
+
+```ts
+const apiKey = process.env.CONTEXT7_API_KEY;
+if (!apiKey) throw new Error('Missing CONTEXT7_API_KEY');
+
+const url = new URL('https://context7.com/api/v3/search');
+url.searchParams.set('query', 'In the latest Vercel AI SDK, how do I stop a generateText tool loop after five steps?');
+url.searchParams.set('library', 'ai sdk');
+const response = await fetch(url, {
+  headers: { Authorization: `Bearer ${apiKey}` },
+});
+const text = await response.text();
+if (response.status === 404 && text.includes('no_documentation_found')) {
+  console.log('No documentation found.');
+} else {
+  if (!response.ok) throw new Error(`Context7 HTTP ${response.status}`);
+  console.log(text.split('\n').slice(0, 25).join('\n'));
+}
+```
+
+It returned the current AI SDK reference page first:
+
+```text
+Library: /websites/ai-sdk_dev
+
+### Stopping Tool Loop by Step Count in generateText
+
+Source: https://ai-sdk.dev/docs/reference/ai-sdk-core/is-step-count
+
+Sets a stop condition to terminate execution after a specific number of completed steps.
+```
+
+The snippet under that heading uses the new helper name:
+
+```typescript
+import { generateText, isStepCount } from 'ai';
+__PROVIDER_IMPORT__;
+
+const result = await generateText({
+  model: __MODEL__,
+  tools: {
+    // your tools
+  },
+  // Stop after 5 steps
+  stopWhen: isStepCount(5),
+});
+```
+
+When nothing matches, the API returns a 404 with `no_documentation_found`. The code above treats that as an empty result, so the agent can move on instead of crashing.
+
+Next to the query, the [Search API](https://context7.com/docs/search-api) accepts optional hints that narrow down the results:
+
+| Parameter | What it does |
+| --- | --- |
+| `query` | The question in plain words. Required. |
+| `library` | A library name or Context7 ID. You can pass up to four. |
+| `version` | A version like `15.4.0`. It needs at least one `library` hint. |
+| `language` | A preferred language. Results in other languages can still show up. |
+| `type` | `txt` (the default) returns text for a prompt. `json` returns structured results. |
+
+The JSON results include a token count for each code snippet, so your app can check the size of a snippet before adding it to the prompt. The TypeScript SDK returns JSON by default:
+
+```ts
+import { Context7 } from '@upstash/context7-sdk';
+
+const apiKey = process.env.CONTEXT7_API_KEY;
+if (!apiKey) throw new Error('Missing CONTEXT7_API_KEY');
+const client = new Context7({ apiKey, retry: false });
+const result = await client.search(
+  'In the latest Vercel AI SDK, how do I stop a generateText tool loop after five steps?',
+  { libraries: ['ai sdk'] },
+);
+console.log(JSON.stringify(result.codeSnippets.slice(0, 3).map(
+  ({ libraryId, codeTitle, codeTokens }) => ({ libraryId, codeTitle, codeTokens }),
+), null, 2));
+```
+
+```text
+[
+  {
+    "libraryId": "/websites/ai-sdk_dev",
+    "codeTitle": "Stopping Tool Loop by Step Count in generateText",
+    "codeTokens": 94
+  },
+  {
+    "libraryId": "/vercel/ai",
+    "codeTitle": "Enable multi-step tool calls with generateText and isStepCount",
+    "codeTokens": 230
+  },
+  {
+    "libraryId": "/websites/ai-sdk_dev",
+    "codeTitle": "Controlling generation steps with stopWhen in AI SDK 5.0",
+    "codeTokens": 175
+  }
+]
+```
+
+Search calls count as regular [Context7 API calls](https://context7.com/plans). The free plan includes 1,000 calls a month. Pro includes 5,000 calls per seat each month, and after that costs $5 per 1,000 calls.
+
+## How do I add Context7 to a Vercel AI SDK agent?
+
+The easiest way is to wrap the Context7 Search API in an AI SDK `tool()` and pass it to `generateText` or `streamText`. The model writes a query, the tool returns doc snippets as text, and the model answers using them.
+
+Here's an agent with a single `searchDocs` tool that stops after at most five steps:
+
+```ts
+import { generateText, isStepCount, tool } from 'ai';
+import { anthropic } from '@ai-sdk/anthropic';
+import { Context7, Context7Error } from '@upstash/context7-sdk';
+import { z } from 'zod';
+
+const apiKey = process.env.CONTEXT7_API_KEY;
+if (!apiKey) throw new Error('Missing CONTEXT7_API_KEY');
+const client = new Context7({ apiKey, retry: false });
+const searchDocs = tool({
+  description: 'Search library/API documentation with Context7.',
+  inputSchema: z.object({ query: z.string(), library: z.string().optional() }),
+  execute: async ({ query, library }) => {
+    try {
+      const text = await client.search(query, {
+        libraries: library ? [library] : undefined,
+        type: 'txt',
+      });
+      return text.trim() || 'No documentation found.';
+    } catch (error) {
+      if (error instanceof Context7Error && error.status === 404 &&
+          error.code === 'no_documentation_found') return 'No documentation found.';
+      throw error;
+    }
+  },
+});
+
+const result = await generateText({
+  model: anthropic('claude-sonnet-5'),
+  instructions: 'Use searchDocs before answering. Give a concise answer for the specified library version.',
+  tools: { searchDocs },
+  stopWhen: isStepCount(5),
+  maxOutputTokens: 800,
+  maxRetries: 0,
+  prompt: 'How do I keep the previous page visible while the next one loads in TanStack Query v5? Show code.',
+});
+result.steps.forEach((step, i) => console.log(`Step ${i + 1}:`, JSON.stringify(
+  step.toolCalls.map(({ toolName, input }) => ({ toolName, input })),
+)));
+console.log('Answer:\n' + result.text.trim().split('\n').slice(0, 15).join('\n'));
+```
+
+The model ran two searches in parallel in step one, then answered in step two:
+
+```text
+Step 1: [{"toolName":"searchDocs","input":{"query":"keep previous data placeholderData v5","library":"tanstack query"}},{"toolName":"searchDocs","input":{"query":"keepPreviousData function usePlaceholderData"}}]
+Step 2: []
+Answer:
+## Keeping previous page data visible in TanStack Query v5
+
+In v5, the old `keepPreviousData` **option** (and `isPreviousData` flag) was removed. Instead, you use the `placeholderData` option and pass it the `keepPreviousData` **function** exported by the library. This tells the query to keep showing the last successful data while the new query key (e.g. a new page number) is fetching, instead of resetting to `undefined`.
+```
+
+TanStack Query v5 removed the `keepPreviousData` option, and the agent got the v5 way right on the first try.
+
+If you need to dig deeper into one library, the [`@upstash/context7-tools-ai-sdk`](https://context7.com/docs/agentic-tools/ai-sdk/getting-started) package gives you two ready-made tools, `resolveLibraryId()` and `queryDocs()`. The model first finds the library ID, then asks that library its question. When we asked the same model how to stop a tool loop after five steps, it called `resolveLibraryId` with "Vercel AI SDK", then `queryDocs` on `/vercel/ai`, and answered with `stopWhen: isStepCount(5)`. The package also includes a prebuilt `Context7Agent` that runs both steps for you.
+
+## Context7 vs Exa on the same coding questions
+
+We sent the same 10 coding questions to Context7 Search and to two Exa endpoints. All three found the current API name every time. Context7 returned 2.6 to 4.7 times fewer tokens per search, but Exa was faster.
+
+![](https://cdn.bydefault.so/image-kMXUbi4TOfGtjtdJoyaTf.png)
+
+Each question is about a library that changed its API in a recent major version, like AI SDK 7, Next.js 15, Tailwind CSS v4, Zod 4, React 19 and TanStack Query v5. For each one, we picked the current API name that a correct answer needs (like `isStepCount`, `@theme` or `useActionState`) and checked if it showed up in what the tool returned. We ran each question twice per tool.
+
+We set up each tool the way an AI SDK developer would use it:
+
+- **Context7 Search**: the plain-text Search API, called with the query alone.
+- **Exa search**: the `webSearch()` tool from `@exalabs/ai-sdk` with its defaults, which return 10 results with up to 3,000 characters of text each.
+- **Exa code**: Exa's code context endpoint (the API behind exa-code) with a 5,000-token budget.
+
+We counted tokens with the o200k tokenizer on the exact string each tool passes to the model:
+
+| Tool | Current API found | Median tokens per search | Median latency | Price per 1,000 calls |
+| --- | --- | --- | --- | --- |
+| Context7 Search | 10 of 10 | 1,914 | 3,980 ms | $5 (1,000 free each month) |
+| Exa search | 10 of 10 | 9,024 | 1,008 ms | $7 |
+| Exa code | 10 of 10 | 4,946 | 487 ms | $7 (cost the API reported, no published price) |
+
+Exa search returned 9,024 / 1,914 = 4.7 times more tokens than Context7, and Exa code 4,946 / 1,914 = 2.6 times more. In an agent loop, those tokens stay in the context for every step after the search, so you pay for them again on each step.
+
+![](https://cdn.bydefault.so/drawing-F0aWL58npGu9BGOoJ2J9R.png)
+
+Context7 was the slowest of the three, about three seconds behind Exa search per call. That gap matters more in a chat UI where a person waits on each search than in a coding agent that runs in the background.
+
+Context7 returned fewer tokens than both Exa endpoints on all 10 questions:
+
+| Question | Context7 | Exa search | Exa code |
+| --- | --- | --- | --- |
+| AI SDK: stop a tool loop after 5 steps | 2,147 | 7,703 | 4,949 |
+| AI SDK: define a tool with a Zod schema | 1,920 | 7,667 | 4,982 |
+| Next.js 15: read cookies in a server component | 1,944 | 7,488 | 5,011 |
+| Tailwind v4: custom theme colors | 1,914 | 9,956 | 4,495 |
+| Zod 4: custom min-length error | 1,076 | 10,097 | 4,327 |
+| React 19: form action state | 2,097 | 8,575 | 5,008 |
+| TanStack Query v5: cache lifetime | 1,285 | 9,062 | 2,120 |
+| TanStack Query v5: keep the previous page | 3,183 | 9,024 | 5,026 |
+| Zod 4: TypeScript enums | 970 | 10,295 | 4,943 |
+| Tailwind v4: Vite setup | 874 | 9,109 | 4,920 |
+
+For the AI SDK question, Exa search and Exa code both returned the AI SDK v5 reference page for `stepCountIs` as their top result, even though that name is deprecated in AI SDK 7. Exa code also returned that page as broken-up text with line numbers mixed in. Context7's top result came from the main branch of the AI SDK docs and used `isStepCount(5)`.
+
+So all three tools passed our check. They differ in how much text the model has to read to find the answer, and if the first thing it reads is up to date.
+
+## When is Exa the better search tool for a coding agent?
+
+Exa is the better tool when the answer isn't in the official docs, for example in GitHub issues, release notes posts, blog posts, forum threads and recent news. Context7 only indexes first-party docs, so it won't have a bug report filed last week.
+
+Exa's search runs over [a web index of more than 1B pages](https://exa.ai/blog/exa-code), and exa-code adds a code-example index built from GitHub. Exa search costs [$7 per 1,000 searches](https://exa.ai/docs/admin/pricing) with text included, and both Exa endpoints answered faster than Context7 in our test.
+
+![](https://cdn.bydefault.so/drawing-ruXYFoebHDsFUxjqMN4rw.png)
+
+One coding agent can use both tools, with instructions that say which tool handles which kind of question:
+
+```ts
+import { generateText, isStepCount, tool } from 'ai';
+import { anthropic } from '@ai-sdk/anthropic';
+import { Context7, Context7Error } from '@upstash/context7-sdk';
+import { z } from 'zod';
+import { webSearch } from '@exalabs/ai-sdk';
+
+const apiKey = process.env.CONTEXT7_API_KEY;
+if (!apiKey) throw new Error('Missing CONTEXT7_API_KEY');
+const client = new Context7({ apiKey, retry: false });
+const searchDocs = tool({
+  description: 'Search library/API documentation with Context7.',
+  inputSchema: z.object({ query: z.string(), library: z.string().optional() }),
+  execute: async ({ query, library }) => {
+    try {
+      const text = await client.search(query, {
+        libraries: library ? [library] : undefined,
+        type: 'txt',
+      });
+      return text.trim() || 'No documentation found.';
+    } catch (error) {
+      if (error instanceof Context7Error && error.status === 404 &&
+          error.code === 'no_documentation_found') return 'No documentation found.';
+      throw error;
+    }
+  },
+});
+
+const result = await generateText({
+  model: anthropic('claude-sonnet-5'),
+  instructions: 'Use searchDocs for library/API docs; use webSearch for GitHub issues, changelogs, blog posts, and news. Consult both for this question. Keep the final answer under 150 words.',
+  tools: { searchDocs, webSearch: webSearch() },
+  stopWhen: isStepCount(5),
+  maxOutputTokens: 800,
+  maxRetries: 0,
+  prompt: 'Our app uses Tailwind CSS v4 with Vite. How do I set custom theme colors, and what changed in the latest Tailwind release?',
+});
+result.steps.forEach((step, i) => console.log(`Step ${i + 1}:`, JSON.stringify(
+  step.toolCalls.map(({ toolName, input }) => ({ toolName, input })),
+)));
+console.log('Finish reason:', result.finishReason);
+console.log('Answer:\n' + result.text.trim().split('\n').slice(0, 10).join('\n'));
+```
+
+The model sent the docs question to Context7 and the release question to Exa, both in the first step:
+
+```text
+Step 1: [{"toolName":"searchDocs","input":{"query":"Tailwind CSS v4 theme customization colors Vite","library":"tailwindcss"}},{"toolName":"webSearch","input":{"query":"Tailwind CSS latest release changelog"}}]
+Step 2: []
+Finish reason: stop
+Answer:
+## Setting custom theme colors (Tailwind v4 + Vite)
+
+With v4's CSS-first config, you define colors directly in your CSS using `@theme`, no `tailwind.config.js` needed. In your main CSS file (imported via `@tailwindcss/vite`):
+```
+
+The `@exalabs/ai-sdk` package lists AI SDK 6 as its peer dependency, so on AI SDK 7 you need to install it with `npm install @exalabs/ai-sdk --legacy-peer-deps`. It still ran without errors in this agent.
+
+## How do Context7 Search, Exa search and exa-code compare?
+
+For a Vercel AI SDK coding agent, Context7 Search is the smaller, docs-only option with a version hint, and Exa is the faster option that covers the whole web:
+
+| Tool | What it searches | Median tokens (our test) | Median latency (our test) | Price | AI SDK |
+| --- | --- | --- | --- | --- | --- |
+| Context7 Search | First-party library docs, with a version hint | 1,914 | 3,980 ms | [1,000 free calls a month](https://context7.com/plans), Pro adds $5 per 1,000 calls after 5,000 included | `@upstash/context7-tools-ai-sdk` or a custom tool |
+| Exa search | [1B+ web pages](https://exa.ai/blog/exa-code) | 9,024 | 1,008 ms | [$7 per 1,000 searches](https://exa.ai/docs/admin/pricing), $20 signup credit plus $10 a month free | `@exalabs/ai-sdk` |
+| exa-code | Code examples from GitHub and Exa's web index | 4,946 | 487 ms | No published price, $0.007 per call in our test | Custom tool |
+
+All three also have an MCP server, so you can use the same search in any MCP client.
+
+For a coding agent that writes code against libraries, we think Context7 Search is the better default, because the model gets current, first-party snippets in a fraction of the tokens. Exa search is still useful next to it for GitHub issues, release news and anything else outside the official docs.
+
+The code above runs with a Context7 API key, which you can get from the [Context7 dashboard](https://context7.com/dashboard).
