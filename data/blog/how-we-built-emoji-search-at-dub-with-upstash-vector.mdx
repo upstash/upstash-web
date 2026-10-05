@@ -1,0 +1,117 @@
+---
+{}
+---
+
+Dub's emoji picker used to only match emojis by name. We wanted it to also find emoji by meaning, so you can type what you mean even if those words aren't in the emoji's name. On our first try, we used Jev, a decision model from TypeSafe AI, as a fallback for when the name search found nothing.
+
+Jev is [about 100 times faster and more efficient than LLMs](https://typesafe.ai/blog/introducing-system-one-models-and-jev). But when the use case allows it, a good old vector database is hard to beat. So before we [shipped the feature](https://github.com/dubinc/dub/pull/4573), we replaced Jev with a single Upstash Vector index.
+
+## Why did we move off Jev?
+
+Jev needs every option in the request, so each search sent our whole emoji list again. Our list has 1,941 emoji, and we paid for all of them on every search.
+
+You give Jev some text and a set of questions, and it [scores each question against the text in parallel](https://docs.typesafe.ai/concepts/system-one). You send the full list of options with every call.
+
+We started by asking Jev to score every emoji against the user's query. The whole catalog was [too big for one request](https://github.com/dubinc/dub/commit/1d2fd9263f52d5f29332741a1af561a75ab6ff6a), so we split it into chunks and sent them all at once.
+
+It worked, but the cost grew with the number of emoji times the number of searches. Sending the whole catalog to Jev on every search used a lot of input tokens. So we moved it to a simple vector index on Upstash Vector:
+
+![](https://cdn.bydefault.so/tweet-lg6i4JtE62CM7vBOYplMH.png)
+
+## Why is a vector index cheaper?
+
+With a vector index, we do the work for each emoji once, when we seed the database, instead of on every search.
+
+With Jev, each search scored all 1,941 emoji from scratch. With Upstash Vector, we turn each emoji into a vector one time and store it. A search then embeds only the short query and looks up the closest stored vectors. The emoji list never changes, so the stored vectors stay valid.
+
+Here's the flow:
+
+![](https://cdn.bydefault.so/drawing-KoBpsLEHp0rNwdopXCT_B.png)
+
+## How did we load the emoji?
+
+We wrote a seed script that runs once. It reads the emoji list from emojibase, turns each emoji into a line of text, and upserts it in batches of 500.
+
+We created the index with a [built-in embedding model](https://upstash.com/docs/vector/features/embeddingmodels). That way Upstash Vector embeds the text for us, and we never call an embedding API ourselves. Here's a simplified version of our seed script:
+
+```ts
+import { Index } from "@upstash/vector"
+type Emoji = {
+  hexcode: string
+  label: string
+  tags?: string[]
+  emoji: string
+}
+
+// load the emoji data
+const url = "https://cdn.jsdelivr.net/npm/emojibase-data@16.0.3/en/data.json"
+const response = await fetch(url)
+const emojis: Emoji[] = await response.json()
+
+// format emoji data
+const records = emojis.map((e) => ({
+  id: e.hexcode,
+  data: `${e.label} (${(e.tags ?? []).join(", ")})`,
+  metadata: { emoji: e.emoji },
+}))
+
+// upsert the emoji data
+const index = Index.fromEnv()
+for (let i = 0; i < records.length; i += 500) {
+  await index.upsert(records.slice(i, i + 500))
+}
+```
+
+For the T-Rex emoji, the script builds this record:
+
+```json
+{
+  "id": "1F996",
+  "data": "T-Rex (dinosaur, rex, t, t-rex, tyrannosaurus)",
+  "metadata": {
+    "emoji": "🦖"
+  }
+}
+```
+
+The tags give a search more words to match. Someone typing "dinosaur" has something to hit, even though the emoji is called "T-Rex".
+
+## How do we search it?
+
+A search is one query call with the raw text. Upstash Vector embeds the query with the same model and returns the closest emoji, each with a score. Here's a simplified version of our search function:
+
+```ts
+import { Index } from "@upstash/vector"
+const index = Index.fromEnv()
+
+export async function searchEmojis(query: string) {
+  const hits = await index.query<{ emoji: string }>({
+    data: query,
+    topK: 18,
+    includeMetadata: true,
+  })
+  return hits
+    .filter((hit) => hit.score >= 0.45)
+    .map((hit) => hit.metadata?.emoji)
+}
+```
+
+We return up to 18 emoji and drop anything that scores under 0.45, so weak matches don't fill the list.
+
+The picker still tries a plain name match first. It only calls our search route when that finds nothing. The route checks the session and limits each user to [30 searches per 10 seconds](https://github.com/dubinc/dub/pull/4573/files) with [Upstash Ratelimit](https://upstash.com/docs/redis/sdks/ratelimit-ts/features). On the client, we wait until the user stops typing and cache answers in memory.
+
+## What does it cost?
+
+Since the switch, our emoji search costs are nearly negligible. A list this small fits in the Upstash Vector free tier, which allows [10,000 queries and updates per day](https://upstash.com/docs/vector/overall/pricing). Each search is one query.
+
+Past the free tier, Upstash Vector charges per plan:
+
+| Plan | Price | Daily query and update limit |
+| --- | --- | --- |
+| Free | $0 | 10K |
+| Pay as You Go | [$0.40 per 100K requests](https://upstash.com/docs/vector/overall/pricing), plus $0.25 per GB stored | Unlimited |
+| Fixed | $60 per month | 1M |
+
+On Pay as You Go, a million searches comes to 10 × $0.40 = $4.
+
+The same setup works for any small list that rarely changes. All it takes is a [Vector index](https://upstash.com/docs/vector/overall/getstarted) with an embedding model, one run of the seed script, and the search function.
