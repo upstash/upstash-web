@@ -326,6 +326,13 @@ export const authors: Record<
     website: "https://cahidarda.github.io/",
     image: "arda.png",
   },
+  steventey: {
+    name: "Steven Tey",
+    title: "Founder & CEO @Dub",
+    twitter: "steventey",
+    website: "https://steventey.com/",
+    image: "steventey.jpg",
+  },
   anthony: {
     name: "Anthony Accomazzo",
     title: "Co-founder @ Sequin",
