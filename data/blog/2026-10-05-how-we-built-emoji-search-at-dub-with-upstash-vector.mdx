@@ -1,5 +1,9 @@
 ---
-{}
+slug: how-we-built-emoji-search-at-dub-with-upstash-vector
+title: "How We Built Emoji Search at Dub with Upstash Vector"
+description: How Dub replaced a per-search model call with a single Upstash Vector index to find emoji by meaning, for nearly zero cost.
+authors: [steventey, arda]
+tags: [vector, ai, search]
 ---
 
 Dub's emoji picker used to only match emojis by name. We wanted it to also find emoji by meaning, so you can type what you mean even if those words aren't in the emoji's name. On our first try, we used Jev, a decision model from TypeSafe AI, as a fallback for when the name search found nothing.
