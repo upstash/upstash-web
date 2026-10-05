@@ -42,7 +42,7 @@ const SETUP_OPTIONS: SetupOption[] = [
   {
     id: "command",
     label: "Copy setup command",
-    value: "npx upstash setup",
+    value: "npx upstash",
   },
 ];
 
