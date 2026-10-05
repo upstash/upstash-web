@@ -330,7 +330,7 @@ export const authors: Record<
     name: "Steven Tey",
     title: "Founder & CEO @Dub",
     twitter: "steventey",
-    website: "https://github.com/steven-tey",
+    website: "https://steventey.com/",
     image: "steventey.jpg",
   },
   anthony: {
