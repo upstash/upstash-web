@@ -14,7 +14,7 @@ Jev is [about 100 times faster and more efficient than LLMs](https://typesafe.ai
 
 Jev needs every option in the request, so each search sent our whole emoji list again. Our list has 1,941 emoji, and we paid for all of them on every search.
 
-You give Jev some text and a set of questions, and it [scores each question against the text in parallel](https://docs.typesafe.ai/concepts/system-one). You send the full list of options with every call.
+You give Jev some text and a set of questions, and it [scores each question against the text in parallel](https://docs.typesafe.ai/primitives/choice). You send the full list of options with every call.
 
 We started by asking Jev to score every emoji against the user's query. The whole catalog was [too big for one request](https://github.com/dubinc/dub/commit/1d2fd9263f52d5f29332741a1af561a75ab6ff6a), so we split it into chunks and sent them all at once.
 
