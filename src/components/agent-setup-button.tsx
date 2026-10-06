@@ -24,7 +24,7 @@ export const AGENT_SETUP_PROMPT =
 
 type SetupOption = {
   id: string;
-  label: string;
+  label: React.ReactNode;
   value: string;
 };
 
@@ -36,7 +36,8 @@ type SetupOption = {
 const SETUP_OPTIONS: SetupOption[] = [
   {
     id: "command",
-    label: "Copy setup command",
+    // The command itself, so the reader sees what they are copying.
+    label: <code className="font-mono">npx upstash</code>,
     value: "npx upstash",
   },
   {
