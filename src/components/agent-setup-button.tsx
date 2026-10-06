@@ -35,14 +35,14 @@ type SetupOption = {
  */
 const SETUP_OPTIONS: SetupOption[] = [
   {
-    id: "prompt",
-    label: "Copy setup prompt",
-    value: AGENT_SETUP_PROMPT,
-  },
-  {
     id: "command",
     label: "Copy setup command",
     value: "npx upstash",
+  },
+  {
+    id: "prompt",
+    label: "Copy setup prompt",
+    value: AGENT_SETUP_PROMPT,
   },
 ];
 
