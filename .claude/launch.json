@@ -1,0 +1,22 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "upstash-web",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "dev"
+      ],
+      "port": 3000
+    },
+    {
+      "name": "context7-docs",
+      "runtimeExecutable": "docs7",
+      "runtimeArgs": [
+        "dev",
+        "/Users/enes/dev/context7-projects/context7/docs"
+      ],
+      "port": 3333
+    }
+  ]
+}
