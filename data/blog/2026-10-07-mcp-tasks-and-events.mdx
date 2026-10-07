@@ -84,7 +84,7 @@ So if you return a native task today, almost no client will accept it. Long-runn
 
 ## Our approach: @upstash/mcp-tasks
 
-`@upstash/mcp-tasks` is part of [Upstash AgentKit](https://github.com/upstash/agentkit/tree/main/packages/mcp-tasks). It gives you the same idea as Tasks, delivered as **ordinary MCP tools**, so it works in every client right now.
+`@upstash/mcp-tasks` is part of [Upstash AgentKit](https://github.com/upstash/agentkit/tree/main/packages/mcp-tasks). It gives you the same idea as Tasks, delivered as **ordinary MCP tools**, so it works in every client right now. The [MCP Tasks docs](https://upstash.com/docs/redis/sdks/agentkit/mcp-tasks) have the full setup.
 
 A task tool answers immediately with a task ID. Two shared tools, `task_status` and `task_cancel`, let the model check on it and stop it. The task record lives in Upstash Redis, and the work runs through QStash or Upstash Workflow, so it survives the process that accepted the call. It isn't bound by your function's time limit or the client's tool timeout either.
 
@@ -159,7 +159,8 @@ If you run on Cloudflare, the equivalent building blocks are Durable Objects for
 
 ## Try it
 
-- **Package and docs:** [`packages/mcp-tasks`](https://github.com/upstash/agentkit/tree/main/packages/mcp-tasks)
+- **Docs:** [MCP Tasks](https://upstash.com/docs/redis/sdks/agentkit/mcp-tasks), with a three-file quickstart and every option
+- **Package:** [`packages/mcp-tasks`](https://github.com/upstash/agentkit/tree/main/packages/mcp-tasks)
 - **Demo:** [`examples/mcp-tasks-demo`](https://github.com/upstash/agentkit/tree/main/examples/mcp-tasks-demo), a Next.js app that runs the same tool on QStash and on Workflow, with a live wire log.
 - **Specs:** the [Tasks extension](https://modelcontextprotocol.io/extensions/tasks/overview) and [OpenAI's MCP Events guide](https://developers.openai.com/plugins/build/mcp-events).
 
