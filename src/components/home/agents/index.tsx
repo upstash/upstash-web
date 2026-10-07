@@ -13,7 +13,7 @@ import { ReactNode } from "react";
 const UPSTASH_SKILL_COMMAND =
   "npx skills add https://github.com/upstash/skills --skill upstash";
 
-const CLI_COMMAND = "npm i -g @upstash/cli";
+const CLI_COMMAND = "npm i -g upstash";
 
 const SKILL_AGENTS = ["Claude Code", "OpenAI Codex", "Cursor"];
 
