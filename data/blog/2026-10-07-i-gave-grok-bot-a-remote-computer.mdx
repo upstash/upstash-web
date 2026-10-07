@@ -1,0 +1,181 @@
+---
+slug: i-gave-grok-bot-a-remote-computer
+title: "I Gave Grok Bot a Remote Computer"
+authors: [alitarik]
+tags: [box, mcp, ai, agents, blob]
+description: "One MCP connection gave my assistant an Upstash Box: a cloud computer with git, preview URLs, schedules and storage. Now I can drive all of it by voice from my phone."
+---
+
+Most AI assistants can talk about code. Fewer can run it. Almost none have their own computer they can come back to tomorrow.
+
+I wanted to see what happens when I give my assistant one. So I connected Grok Bot to [Upstash Box](https://upstash.com/docs/box/overall/quickstart) through the [Upstash MCP server](https://upstash.com/docs/agent-resources/mcp). Then I mostly stopped typing and started talking to it.
+
+The interesting part is not that an assistant can write a snake game. It's that it has somewhere to *run* it, and it hands you a URL you can open anywhere.
+
+<Summary>
+  - Setup took one sentence. I told Grok Bot to set up the Upstash MCP server, logged in with OAuth, and that was it.
+  - The assistant now has a real machine: shell, persistent filesystem, git, public preview URLs, cron schedules, snapshots.
+  - Connections stack. Slack + Linear + GitHub + Box + Blob turns "a message came in" into "a PR is open with screenshots".
+  - Voice makes it mobile. I can be outside, get a Slack ping, and tell Grok Bot what to do with the Box from my phone.
+</Summary>
+
+---
+
+## The setup was one sentence
+
+I opened Grok Bot and said, more or less:
+
+```text
+Set up the Upstash MCP server.
+```
+
+It added the remote server:
+
+```text
+https://mcp.upstash.com/mcp
+```
+
+I went through the OAuth flow in the browser, and the tools showed up. That's the whole setup.
+
+If you only care about the agent side, you can scope it to Box and Blob with a feature group:
+
+```text
+https://mcp.upstash.com/mcp?features=box,blob
+```
+
+If you'd rather run it locally, there's `@upstash/mcp-server`. It takes your Upstash email and API key, and Box needs its own Box API key from the console. The remote OAuth version is the easier one, and it's what I use.
+
+## What "a remote computer" actually means
+
+Once the MCP is connected, Grok Bot gets everything Box has. These are the same primitives we use for serious background agent workflows:
+
+- **A sandboxed cloud container.** A real shell, so it can install packages, run tests, start servers.
+- **A persistent filesystem.** Close the conversation and come back tomorrow. The files are still there. You can pause a box and resume it later.
+- **Git with GitHub.** Clone repos, commit, push, open PRs. Auth goes through the GitHub App you link in the Upstash Console, so **the agent never holds a GitHub token**. I like that a lot.
+- **Public preview URLs.** Start something on a port and you get a URL anyone can open.
+- **Schedules.** Cron jobs that run either a shell command or an agent prompt.
+- **Snapshots.** Save a known-good state and start from it again.
+- **Optional headless Chromium.** The box can open its own pages and take screenshots.
+
+My laptop doesn't have to stay on, and the assistant doesn't run in my terminal. It works on its own machine, and I check in on it.
+
+## Story time: the snake game
+
+This is the first thing I tried after setup, and it's what sold me.
+
+I asked Grok Bot to build a snake game and give me the URL. That was the full prompt.
+
+It created a box called `snake-demo-1007`, wrote the game, started a server on port 8080, and opened a public preview:
+
+```text
+https://stirring-opossum-60343-8080.preview.box.upstash.com/snake.html
+```
+
+I opened the link. Snake was running.
+
+A snake game is a toy, I know. What matters is the loop. I asked for an outcome, not for code. The assistant had a machine to build it on, a way to serve it, and a link to give back. No "copy this into a file and run `npx serve`." I just got a URL.
+
+Since the box persists, I can come back later and say "make the snake faster" or "add a high score." It picks up in the same filesystem with the same server.
+
+## Clone a repo and let it look around
+
+The next obvious step was real code.
+
+Any repo the GitHub App can access, Grok Bot can clone into the Box:
+
+```text
+Clone our docs repo into my Upstash Box, install dependencies,
+run the build, and tell me if anything is broken.
+```
+
+It runs the commands on the Box, not on my machine. It reads the output and reports back. If something fails, it's already sitting in the repo and can try a fix.
+
+This is also a nice way to just *understand* a codebase. "Clone this, find where we handle rate limiting, explain it to me." The assistant can grep, run things, and check its answer against the actual code instead of guessing.
+
+## Chaining connections: Slack → Linear → Box → PR
+
+This is where it starts to feel different.
+
+Grok Bot isn't only connected to Upstash. It can also have Slack and Linear connections. Put all of them in one session and a single instruction covers the whole flow:
+
+```text
+Check the latest message in #bugs. Open a Linear ticket for it.
+Clone the repo to my Upstash Box, implement the fix, and open a PR
+that links the ticket.
+```
+
+Every step uses a tool the assistant already has:
+
+1. Read the Slack message.
+2. Create the Linear issue.
+3. Create a box (or reuse one) and clone the repo.
+4. Make the change and run the tests in the box.
+5. Commit, push, and open the PR through the GitHub App.
+
+I'm still the one reviewing and merging. But the boring middle part (turn the message into a ticket, the ticket into a branch, the branch into a PR) is done before I've finished reading the thread.
+
+## Screenshots in the PR, via Blob
+
+Frontend PRs without screenshots are annoying to review. So I wanted the agent to attach them.
+
+There's a catch. With GitHub App auth, the agent can't always attach images to a PR the way you would with the `gh` CLI. So we go around it with [Upstash Blob](https://upstash.com/docs/blob/overall/quickstart):
+
+1. Run the app in the Box.
+2. Use the box's headless Chromium to screenshot the page.
+3. Upload the screenshot to Blob through a presigned URL.
+4. Put the public Blob URL in the PR body as a markdown image.
+
+That's one of the examples in our [MCP docs](https://upstash.com/docs/agent-resources/mcp), and it's a good test prompt:
+
+```text
+Run the app in a Box, screenshot the home page,
+upload it to Blob and open a PR with the image.
+```
+
+You can turn that into a reusable skill so you don't have to spell it out every time. Then "open a PR" for a UI change means "open a PR with before/after screenshots," and the reviewer sees the change without checking anything out.
+
+## Bots reviewing bots
+
+A Box isn't tied to one assistant. Another agent can connect to the same box, see the same files and the same branch, and review the PR.
+
+So you get a loop:
+
+- Grok Bot implements and opens the PR.
+- A second bot connects to the same Box, reads the diff, runs the tests, and leaves review comments.
+- Grok Bot picks up the comments, re-implements, and pushes again.
+
+They talk through the PR, which is where humans talk too. When I check in, I can see the full history of what one asked and how the other answered. When it looks right, I merge.
+
+The Box matters here because both agents share the same state. Nobody has to say "works on my machine," because it's the same machine.
+
+## The best part: I do this from my phone
+
+I've left this for last because it's my favorite part.
+
+I talk to Grok Bot by voice. Grok Bot is the one holding the connections, and the Box lives in the cloud, so none of this needs my laptop. **The whole stack is reachable from my phone.**
+
+Here's the scenario that sold me on the phone part. You're outside and a Slack ping comes in about a bug. Before, that meant "I'll look at it when I get home." Now you pull out your phone and say:
+
+> "Open a Linear ticket for that, clone the repo to my box, fix it, and open a PR with screenshots."
+
+Then you put the phone back in your pocket. When you look again, there's a ticket, a branch, a PR and a preview URL you can tap to check the fix.
+
+Voice works because the instructions are short. You're not dictating code. You're saying what you want done, and the assistant has a real computer to do it on.
+
+## What I'd tell you before you try it
+
+- **Start with something that returns a URL.** A snake game, a small dashboard, anything. Seeing the preview link is what makes it click.
+- **Link the GitHub App in the console first.** Then clone and PR just work, and you never hand the agent a token.
+- **Name your boxes.** `snake-demo-1007` is easy to find again. Persistence is only useful if you remember which box is which.
+- **Write the screenshot flow down as a skill.** You'll use it on every UI PR.
+- **Use schedules for recurring checks.** A cron that runs an agent prompt every morning is a cheap way to get a daily report without thinking about it.
+
+## Try it
+
+Connect the Upstash MCP server (`https://mcp.upstash.com/mcp`), log in with OAuth, and ask your assistant to build something and send you the URL.
+
+- [MCP docs](https://upstash.com/docs/agent-resources/mcp)
+- [Box quickstart](https://upstash.com/docs/box/overall/quickstart)
+- Create a box and link GitHub in the [Upstash Console](https://console.upstash.com)
+
+If you build something fun with it (or get two bots arguing in a PR), come show us on [Discord](https://upstash.com/discord).
