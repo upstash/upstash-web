@@ -106,25 +106,13 @@ Every step uses a tool the assistant already has:
 
 I'm still the one reviewing and merging. But the boring middle part (turn the message into a ticket, the ticket into a branch, the branch into a PR) is done before I've finished reading the thread.
 
-## Screenshots in the PR, via Blob
+## Screenshots in the PR, with the remote-work skill
 
-Frontend PRs without screenshots are annoying to review. So I wanted the agent to attach them.
+Frontend PRs without screenshots are annoying to review. I don't want to spell out "clone, build, open a preview, screenshot, upload, open the PR" every time either.
 
-There's a catch. With GitHub App auth, the agent can't always attach images to a PR the way you would with the `gh` CLI. So we go around it with [Upstash Blob](https://upstash.com/docs/blob/overall/quickstart):
+That's what the [upstash-box-remote-work](https://github.com/upstash/skills/tree/main/skills/upstash-box-remote-work) skill in [upstash/skills](https://github.com/upstash/skills) is for. It ships with the Upstash plugin and tells the agent when a task belongs in a Box and how to run it end to end: clone, build, preview, screenshot, pull request. Say "use remote work", or ask for a screenshot or a preview URL in the PR, and the skill takes it from there.
 
-1. Run the app in the Box.
-2. Use the box's headless Chromium to screenshot the page.
-3. Upload the screenshot to Blob through a presigned URL.
-4. Put the public Blob URL in the PR body as a markdown image.
-
-That's one of the examples in our [MCP docs](https://upstash.com/docs/agent-resources/mcp), and it's a good test prompt:
-
-```text
-Run the app in a Box, screenshot the home page,
-upload it to Blob and open a PR with the image.
-```
-
-You can turn that into a reusable skill so you don't have to spell it out every time. Then "open a PR" for a UI change means "open a PR with before/after screenshots," and the reviewer sees the change without checking anything out.
+Under the hood it still uses Box for the work and [Blob](https://upstash.com/docs/blob/overall/quickstart) for the images, so reviewers get markdown screenshots in the PR body without checking anything out. I just don't have to write the loop myself.
 
 ## Bots reviewing bots
 
