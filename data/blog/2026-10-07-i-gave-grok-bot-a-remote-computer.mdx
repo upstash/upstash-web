@@ -6,11 +6,9 @@ tags: [box, mcp, ai, agents, blob]
 description: "One MCP connection gave my assistant an Upstash Box: a cloud computer with git, preview URLs, schedules and storage. Now I can drive all of it by voice from my phone."
 ---
 
-Most AI assistants can talk about code. Fewer can run it. Almost none have their own computer they can come back to tomorrow.
+Most assistants stop at suggestions. They draft code in chat, and you still have to copy it somewhere, run it, and keep the environment alive yourself.
 
-I wanted to see what happens when I give my assistant one. So I connected Grok Bot to [Upstash Box](https://upstash.com/docs/box/overall/quickstart) through the [Upstash MCP server](https://upstash.com/docs/agent-resources/mcp). Then I mostly stopped typing and started talking to it.
-
-The interesting part is not that an assistant can write a snake game. It's that it has somewhere to *run* it, and it hands you a URL you can open anywhere.
+I wanted the opposite: ask for an outcome and get a result that already lives on a real machine. So I connected Grok Bot to [Upstash Box](https://upstash.com/docs/box/overall/quickstart) through the [Upstash MCP server](https://upstash.com/docs/agent-resources/mcp). Box is the remote computer. MCP is how Grok Bot drives it. After that setup, I mostly talked — and Grok Bot built, ran, and linked work from the Box, not from my laptop.
 
 <Summary>
   - Setup took one sentence. I told Grok Bot to set up the Upstash MCP server, logged in with OAuth, and that was it.
