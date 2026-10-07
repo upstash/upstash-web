@@ -162,9 +162,17 @@ Need more time than one function invocation allows? Swap `QStashDispatcher` for 
 
 `/events` is the server side of MCP Events. You define an event with a typed payload, register it on your server, and emit it from wherever the change happens. The toolkit serves `events/list`, `events/subscribe` and `events/unsubscribe`, verifies each callback with a signed challenge, stores subscriptions in Redis with their signing secrets encrypted, and hands every delivery to QStash, which retries failed webhooks with backoff.
 
+<Frame>
+  <img
+    src="/blog/mcp-tasks-and-events/upstash-events.svg"
+    alt="Architecture: ChatGPT subscribes through the MCP server, which stores the subscription in Upstash Redis; on emit the server finds matching subscriptions in Redis and publishes one QStash message each; QStash calls the server's /api/events route with retries, which signs and POSTs the webhook to ChatGPT"
+  />
+</Frame>
+
+QStash can't send the webhook to ChatGPT itself. Each attempt needs a fresh signature made with the subscriber's secret, and a `410` from the host means "delete this subscription", not "retry". So QStash calls a small route on your server, and that route signs and sends the webhook. QStash handles the retries and backoff.
+
 ```ts
-import { createEventLayer } from "@upstash/mcp-toolkit/events";
-import { QStashDelivery, RedisSubscriptionStore } from "@upstash/mcp-toolkit/events/upstash";
+import { createEventLayer, QStashDelivery, RedisSubscriptionStore } from "@upstash/mcp-toolkit/events";
 import * as z from "zod";
 
 export const events = createEventLayer({

@@ -5,7 +5,7 @@
   </defs>
   <rect width="900" height="440" fill="#f8fafc" rx="12"/>
   <g font-family="Inter, system-ui, sans-serif">
-    <text x="450" y="40" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a">@upstash/mcp-tasks: the same idea as plain tools</text>
+    <text x="450" y="40" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a">@upstash/mcp-toolkit/tasks: the same idea as plain tools</text>
 
     <rect x="40" y="150" width="170" height="90" rx="10" fill="#e0e7ff" stroke="#6366f1" stroke-width="2"/>
     <text x="125" y="185" text-anchor="middle" font-size="14" font-weight="700" fill="#3730a3">Model</text>
