@@ -37,14 +37,6 @@ https://mcp.upstash.com/mcp
 
 I went through the OAuth flow in the browser, and the tools showed up. That's the whole setup.
 
-If you only care about the agent side, you can scope it to Box and Blob with a feature group:
-
-```text
-https://mcp.upstash.com/mcp?features=box,blob
-```
-
-If you'd rather run it locally, there's `@upstash/mcp-server`. It takes your Upstash email and API key, and Box needs its own Box API key from the console. The remote OAuth version is the easier one, and it's what I use.
-
 ## What "a remote computer" actually means
 
 Once the MCP is connected, Grok Bot gets everything Box has. These are the same primitives we use for serious background agent workflows:
