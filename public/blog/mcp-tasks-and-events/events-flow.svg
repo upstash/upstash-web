@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="500" viewBox="0 0 900 500">
+  <defs>
+    <marker id="a" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#475569"/></marker>
+    <marker id="o" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#ea580c"/></marker>
+  </defs>
+  <rect width="900" height="500" fill="#f8fafc" rx="12"/>
+  <g font-family="Inter, system-ui, sans-serif">
+    <text x="450" y="40" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a">MCP Events: the server wakes the agent</text>
+
+    <rect x="60" y="62" width="190" height="44" rx="10" fill="#e0e7ff" stroke="#6366f1" stroke-width="2"/>
+    <text x="155" y="89" text-anchor="middle" font-size="14" font-weight="700" fill="#3730a3">Agent host (ChatGPT)</text>
+    <rect x="355" y="62" width="190" height="44" rx="10" fill="#dcfce7" stroke="#10b981" stroke-width="2"/>
+    <text x="450" y="89" text-anchor="middle" font-size="14" font-weight="700" fill="#065f46">MCP server</text>
+    <rect x="650" y="62" width="190" height="44" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+    <text x="745" y="89" text-anchor="middle" font-size="14" font-weight="700" fill="#334155">Your app</text>
+
+    <line x1="155" y1="106" x2="155" y2="440" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5 5"/>
+    <line x1="450" y1="106" x2="450" y2="440" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5 5"/>
+    <line x1="745" y1="106" x2="745" y2="440" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5 5"/>
+
+    <line x1="157" y1="146" x2="446" y2="146" stroke="#475569" stroke-width="2" marker-end="url(#a)"/>
+    <text x="302" y="130" text-anchor="middle" font-size="12.5" fill="#0f172a">events/subscribe</text>
+    <text x="302" y="141" text-anchor="middle" font-size="11" fill="#475569">event, filters, callback URL, secret</text>
+
+    <line x1="448" y1="190" x2="159" y2="190" stroke="#475569" stroke-width="2" marker-end="url(#a)"/>
+    <text x="302" y="182" text-anchor="middle" font-size="12.5" fill="#0f172a">signed challenge → echoed back</text>
+
+    <line x1="448" y1="232" x2="159" y2="232" stroke="#475569" stroke-width="2" marker-end="url(#a)"/>
+    <text x="302" y="224" text-anchor="middle" font-size="12.5" fill="#0f172a">{ id, refreshBefore }</text>
+
+    <rect x="370" y="256" width="160" height="34" rx="8" fill="#e0f2fe" stroke="#0ea5e9" stroke-width="1.5"/>
+    <text x="450" y="278" text-anchor="middle" font-size="12" font-weight="700" fill="#0369a1">subscription stored</text>
+
+    <line x1="743" y1="330" x2="454" y2="330" stroke="#475569" stroke-width="2" marker-end="url(#a)"/>
+    <text x="598" y="322" text-anchor="middle" font-size="12.5" fill="#0f172a">something happens (new comment)</text>
+
+    <line x1="448" y1="372" x2="159" y2="372" stroke="#ea580c" stroke-width="2.5" marker-end="url(#o)"/>
+    <text x="302" y="364" text-anchor="middle" font-size="12.5" font-weight="700" fill="#9a3412">POST callback · signed event</text>
+
+    <rect x="62" y="392" width="186" height="40" rx="8" fill="#ffedd5" stroke="#fb923c" stroke-width="1.5"/>
+    <text x="155" y="409" text-anchor="middle" font-size="12" font-weight="700" fill="#9a3412">agent wakes and acts</text>
+    <text x="155" y="424" text-anchor="middle" font-size="11" fill="#9a3412">on the user's instructions</text>
+
+    <text x="450" y="474" text-anchor="middle" font-size="13" fill="#475569">No cron, no polling, no one typing a message. The subscription is refreshed before it expires.</text>
+  </g>
+</svg>

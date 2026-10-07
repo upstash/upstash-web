@@ -1,0 +1,166 @@
+---
+authors: [arda]
+title: "MCP Tasks and Events, Explained: Long-Running Tools and Agents That Wake Up"
+slug: mcp-tasks-and-events
+tags: [mcp, agents, qstash, redis, serverless]
+description: "How the MCP Tasks extension and the draft MCP Events spec work, which clients support them today, and how @upstash/mcp-tasks gives you durable long-running tools that work in every client now."
+---
+
+Agents built on MCP have two blind spots.
+
+The first is **time**. A tool call is a request that waits for a response. If the work takes a few minutes, something gives up first: the client's tool timeout, your serverless function's limit, or the user's patience.
+
+The second is **initiative**. Most agents only act when someone messages them or a cron job fires. Nothing tells them "the thing you were waiting for just happened."
+
+MCP now has an answer to each: **Tasks** for work that takes a while, and **Events** for waking an agent up. This post explains how both work, where client support stands as of October 2026, and how we're shipping long-running tools today with `@upstash/mcp-tasks`.
+
+## MCP Tasks: answer now, finish later
+
+Tasks shipped with the [2026-07-28 MCP specification](https://blog.modelcontextprotocol.io/posts/2026-07-28/) as an official extension, `io.modelcontextprotocol/tasks`.
+
+Instead of making the client wait, a server answers a `tools/call` right away with a task handle. The work continues in the background, and the client polls `tasks/get` until the task is done.
+
+<Frame>
+  <img
+    src="/blog/mcp-tasks-and-events/tasks-flow.svg"
+    alt="Sequence diagram: the client calls a tool, gets a task handle immediately, polls tasks/get, and finally receives the completed result"
+  />
+</Frame>
+
+A few details make this work:
+
+- **The client opts in.** It declares the tasks extension in its capabilities. A server must never hand a task to a client that didn't, because that client wouldn't know what to do with it.
+- **The server sets the pace.** Each task carries a `pollIntervalMs`, so the client knows how often to ask.
+- **States are simple.** A task is `working`, `input_required`, `completed`, `failed` or `cancelled`, and the last three never change again.
+- **The client polls, not the model.** The model only sees the final result, so a ten-minute job costs it no extra turns.
+
+## MCP Events: the server wakes the agent
+
+Events are newer and still a draft, incubated by the MCP [Triggers & Events Working Group](https://github.com/modelcontextprotocol/experimental-ext-triggers-events). OpenAI already supports the webhook flavor in ChatGPT, documented in their [MCP Events guide](https://developers.openai.com/plugins/build/mcp-events).
+
+The idea: the user tells the agent what to watch ("new review comments on this doc") and what to do about it. The host subscribes through your MCP server and hands over a callback URL and a signing secret. When something matching happens, your server POSTs a signed event to that URL, and the agent wakes up and acts.
+
+<Frame>
+  <img
+    src="/blog/mcp-tasks-and-events/events-flow.svg"
+    alt="Sequence diagram: the agent host subscribes to an event, the MCP server verifies the callback and stores the subscription, then posts a signed event when the app reports a change"
+  />
+</Frame>
+
+What a server has to implement:
+
+- `events/list`, `events/subscribe` and `events/unsubscribe`, on the same endpoint as your tools.
+- A one-time signed challenge to verify the callback URL before sending real data.
+- Deliveries signed with [Standard Webhooks](https://www.standardwebhooks.com/) and retried with backoff, keeping the same event ID across retries so the host can drop duplicates.
+- Subscription storage that survives restarts, with an expiry the host refreshes.
+
+## Tasks vs Events
+
+They solve opposite problems, and they compose well.
+
+| | Tasks | Events |
+| --- | --- | --- |
+| Who starts it | The client calls a tool | Something happens in the world |
+| How many results | One call, one result | Zero to many deliveries |
+| Lifetime | Ends in a final state | Open-ended, refreshed until cancelled |
+| Direction | The client pulls (`tasks/get`) | The server pushes (webhook) |
+| Typical use | Reports, crawls, migrations, builds | New messages, comments, failed jobs |
+
+A task answers "I asked, tell me when it's done." An event answers "wake me when X happens." Put together, a `task.completed` event would remove polling from tasks entirely, and webhook-style task completion is exactly what the Triggers & Events Working Group's charter takes on.
+
+## Who supports what today
+
+This is the catch. As of October 7, 2026:
+
+| | Tasks | Events |
+| --- | --- | --- |
+| ChatGPT | — | ✅ Webhooks, in Work chats |
+| Codex | ❌ ([feature request](https://github.com/openai/codex/issues/48617)) | Only for OpenAI's own connectors |
+| Claude Code | ❌ ([feature request](https://github.com/anthropics/claude-code/issues/52137)) | ❌ |
+| Cursor, OpenCode | ❌ | ❌ |
+| Official SDKs | Rust and C# implement it; TypeScript and Python have it on their roadmaps | None yet |
+
+So if you return a native task today, almost no client will accept it. Long-running work is still a real problem, though, and you can't wait for every client to catch up.
+
+## Our approach: @upstash/mcp-tasks
+
+`@upstash/mcp-tasks` is part of [Upstash AgentKit](https://github.com/upstash/agentkit/tree/main/packages/mcp-tasks). It gives you the same idea as Tasks, delivered as **ordinary MCP tools**, so it works in every client right now.
+
+A task tool answers immediately with a task ID. Two shared tools, `task_status` and `task_cancel`, let the model check on it and stop it. The task record lives in Upstash Redis, and the work runs through QStash or Upstash Workflow, so it survives the process that accepted the call. It isn't bound by your function's time limit or the client's tool timeout either.
+
+<Frame>
+  <img
+    src="/blog/mcp-tasks-and-events/upstash-tasks.svg"
+    alt="Architecture: the model starts a task through the MCP server, which records it in Upstash Redis and dispatches it to QStash or Workflow; the execute endpoint runs the handler and writes progress and the result back to Redis, which task_status returns"
+  />
+</Frame>
+
+```ts
+import { McpServer } from "@modelcontextprotocol/server";
+import { createTaskLayer } from "@upstash/mcp-tasks";
+import { QStashDispatcher, RedisTaskStore } from "@upstash/mcp-tasks/upstash";
+import * as z from "zod";
+
+export const tasks = createTaskLayer({
+  store: new RedisTaskStore(),
+  dispatcher: new QStashDispatcher({ url: `${process.env.APP_URL}/api/execute` }),
+});
+
+export function createServer() {
+  const server = new McpServer({ name: "reports", version: "1.0.0" });
+
+  tasks.registerTask(
+    server,
+    "generate_report",
+    { description: "Generates a report on a topic.", inputSchema: z.object({ topic: z.string() }) },
+    async ({ topic }, task) => {
+      await task.update("Researching sources");
+      return { content: [{ type: "text", text: await writeReport(topic) }] };
+    },
+  );
+
+  return server;
+}
+```
+
+Then one line for the endpoint QStash delivers to. Signature checks and retry status codes are handled for you:
+
+```ts
+// app/api/execute/route.ts
+export const POST = tasks.createExecuteHandler();
+```
+
+From the model's side, it looks like this:
+
+1. It calls `generate_report` and gets back a `taskId` plus a sentence telling it to call `task_status` in about two seconds.
+2. `task_status` returns progress while the task is working: "Researching sources".
+3. Once the task completes, `task_status` returns the report itself, exactly as if the tool had run synchronously.
+
+Because the model drives these tools directly, two options matter in production:
+
+- **`principal`** scopes every task to the user who started it. Another user's task ID reads as unknown.
+- **`idempotencyKey`** turns an agent's retry into a read of the existing task, instead of starting the job twice.
+
+Need more time than one function invocation allows? Swap `QStashDispatcher` for `WorkflowDispatcher`. Each step then runs as its own invocation, replayed from a journal, so a task can run for as long as it needs.
+
+## The native path
+
+Polling through tools costs the model a few turns. The native extension doesn't, which is why it's the right long-term shape.
+
+The package is built so moving there won't require a rewrite. The task record and the execution transport sit behind two small interfaces, a `TaskStore` and a `TaskDispatcher`, and the tools are just one surface on top of them. The task object already has the same shape as the extension's. Once clients declare `io.modelcontextprotocol/tasks`, a native adapter can serve the same records over `tasks/get` to those clients, and keep the tools for everyone else.
+
+Events follow the same pattern. A subscription is a Redis record with an expiry, and a delivery is a signed, retried webhook, which is QStash's job. A `task.completed` event on top of the same store would let ChatGPT skip polling today.
+
+## Where Cloudflare fits
+
+If you run on Cloudflare, the equivalent building blocks are Durable Objects for the record and Cloudflare Workflows for the work. Cloudflare's Agents SDK [moved to the stateless 2026-07-28 spec](https://developers.cloudflare.com/changelog/post/2026-07-27-agents-sdk-v0.20.0-mcp-sdk-v2/) with `createMcpHandler` and deprecated `McpAgent`, but its docs don't yet ship a Tasks or Events runtime. You'd assemble that part yourself.
+
+`@upstash/mcp-tasks` targets the other common setup: an MCP server on Vercel or any serverless platform, built on the official TypeScript SDK, where Redis and QStash are the natural pieces. The two interfaces are deliberately small, so a Durable Objects store could plug in later.
+
+## Try it
+
+- **Package and docs:** [`packages/mcp-tasks`](https://github.com/upstash/agentkit/tree/main/packages/mcp-tasks)
+- **Demo:** [`examples/mcp-tasks-demo`](https://github.com/upstash/agentkit/tree/main/examples/mcp-tasks-demo), a Next.js app that runs the same tool on QStash and on Workflow, with a live wire log.
+- **Specs:** the [Tasks extension](https://modelcontextprotocol.io/extensions/tasks/overview) and [OpenAI's MCP Events guide](https://developers.openai.com/plugins/build/mcp-events).
+
+If you build something with it, or want Events support next, let us know on [X](https://x.com/upstash) or [GitHub](https://github.com/upstash/agentkit/issues).

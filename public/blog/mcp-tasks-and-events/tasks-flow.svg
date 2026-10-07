@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="470" viewBox="0 0 900 470">
+  <defs>
+    <marker id="a" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#475569"/></marker>
+    <marker id="g" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#059669"/></marker>
+  </defs>
+  <rect width="900" height="470" fill="#f8fafc" rx="12"/>
+  <g font-family="Inter, system-ui, sans-serif">
+    <text x="450" y="40" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a">MCP Tasks: answer now, finish later</text>
+
+    <rect x="90" y="62" width="180" height="44" rx="10" fill="#e0e7ff" stroke="#6366f1" stroke-width="2"/>
+    <text x="180" y="89" text-anchor="middle" font-size="14" font-weight="700" fill="#3730a3">MCP client</text>
+    <rect x="630" y="62" width="180" height="44" rx="10" fill="#dcfce7" stroke="#10b981" stroke-width="2"/>
+    <text x="720" y="89" text-anchor="middle" font-size="14" font-weight="700" fill="#065f46">MCP server</text>
+
+    <line x1="180" y1="106" x2="180" y2="420" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5 5"/>
+    <line x1="720" y1="106" x2="720" y2="420" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5 5"/>
+
+    <rect x="732" y="178" width="132" height="200" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="798" y="270" text-anchor="middle" font-size="12" font-weight="700" fill="#92400e">work runs</text>
+    <text x="798" y="287" text-anchor="middle" font-size="12" font-weight="700" fill="#92400e">in the background</text>
+
+    <line x1="182" y1="138" x2="716" y2="138" stroke="#475569" stroke-width="2" marker-end="url(#a)"/>
+    <text x="450" y="130" text-anchor="middle" font-size="13" fill="#0f172a">tools/call  (client declares the tasks extension)</text>
+
+    <line x1="718" y1="178" x2="184" y2="178" stroke="#475569" stroke-width="2" marker-end="url(#a)"/>
+    <text x="450" y="170" text-anchor="middle" font-size="13" fill="#0f172a">resultType "task" · taskId · status: working</text>
+
+    <line x1="182" y1="232" x2="716" y2="232" stroke="#475569" stroke-width="2" marker-end="url(#a)"/>
+    <text x="450" y="224" text-anchor="middle" font-size="13" fill="#0f172a">tasks/get { taskId }</text>
+    <line x1="718" y1="266" x2="184" y2="266" stroke="#475569" stroke-width="2" marker-end="url(#a)"/>
+    <text x="450" y="258" text-anchor="middle" font-size="13" fill="#0f172a">status: working · "Step 2/4"</text>
+
+    <line x1="182" y1="320" x2="716" y2="320" stroke="#475569" stroke-width="2" marker-end="url(#a)"/>
+    <text x="450" y="312" text-anchor="middle" font-size="13" fill="#0f172a">tasks/get { taskId }</text>
+    <line x1="718" y1="356" x2="184" y2="356" stroke="#059669" stroke-width="2.5" marker-end="url(#g)"/>
+    <text x="450" y="348" text-anchor="middle" font-size="13" font-weight="700" fill="#065f46">status: completed · result</text>
+
+    <text x="450" y="448" text-anchor="middle" font-size="13" fill="#475569">The client polls at the server's suggested interval. The model only sees the final result.</text>
+  </g>
+</svg>
