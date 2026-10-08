@@ -193,6 +193,8 @@ From the model's side, it looks like this:
 
 Because the model drives these tools directly, one option matters most in production: **`principal`** is required and scopes every task to the user who started it. Another user's task ID reads as unknown, and a caller it can't identify is refused. `auth` is the SDK's `AuthInfo`, which your MCP route fills in after verifying the bearer token (`handler.fetch(request, { authInfo })`); the SDK never derives it from headers. Return your user ID from it, not `auth.clientId`, which identifies the OAuth app every ChatGPT user shares. Cookie- or session-based apps can read `request` instead.
 
+Owning a task is not the same as being allowed to touch what it works on, though. The model fills in the arguments, so if a task takes a `workspaceId`, anyone can pass someone else's, and the task (and its result) is still theirs. The handler runs later, in a QStash delivery that carries no user auth, so it can't check this on its own. Two things close the gap: an optional `authorize(args, { principal, auth })` on `tasks.define`, which runs when the tool is called, before anything is queued, and `task.principal` inside the handler, the user who started the task. Never take a user ID from the arguments.
+
 With `QStashDispatcher`, the handler still runs inside one function invocation, and a redelivery starts it over. For longer work, switch to `WorkflowDispatcher`, which runs each step as its own invocation and replays finished steps from a journal. The handler's `task` then also has Workflow's `task.run`, `task.sleep` and `task.call`, inferred from the dispatcher. Wrap the work in `task.run(...)` steps (each is still bound by your function limit). The task record lives for 1 day from creation by default and is never extended, so raise `ttlMs` for work that can take longer.
 
 ### Events with @upstash/mcp-toolkit/events
@@ -265,7 +267,7 @@ Then emit wherever a comment is created:
 await commentCreated.emit({ documentId: "doc_123", text: "Can we add rollout dates?" });
 ```
 
-`emit` is typed by the payload schema, and the payload is the one place an event's values come from: every `input` field must also be a payload field. The event reaches every subscription whose arguments match those values: everyone watching `doc_123`. `authorize` runs again for each subscriber before the delivery goes out, with the event's own `documentId`, so someone who lost access to the document after subscribing stops getting its comments. The callback-URL checks refuse IP addresses and internal host names but don't resolve DNS, so add egress filtering in production, and never turn on `allowInsecureCallbacks` outside local development.
+`emit` is typed by the payload schema, and the payload is the one place an event's values come from: every `input` field must also be a payload field. The event reaches every subscription whose arguments match those values: everyone watching `doc_123`. `authorize` runs again for each subscriber before the delivery goes out, with the event's own `documentId`, so someone who lost access to the document after subscribing stops getting its comments. Each subscription is a webhook per matching emit, so a subscriber can hold at most 8 at a time by default (`maxSubscriptions`), checked before the server sends the verification challenge. The callback-URL checks refuse IP addresses and internal host names but don't resolve DNS, so add egress filtering in production, and never turn on `allowInsecureCallbacks` outside local development.
 
 ## Testing it with ChatGPT
 
