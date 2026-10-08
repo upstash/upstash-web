@@ -74,7 +74,7 @@ This is the catch. As of October 7, 2026, on the client side:
 
 | Client | Tasks | Events |
 | --- | --- | --- |
-| ChatGPT | — | ✅ Webhooks, in Work chats |
+| ChatGPT | ❌ (doesn't declare it, see [our test](#testing-it-with-chatgpt)) | ✅ Webhooks, in Work chats |
 | Codex | ❌ ([feature request](https://github.com/openai/codex/issues/48617)) | Only for OpenAI's own connectors |
 | Claude Code | ❌ ([feature request](https://github.com/anthropics/claude-code/issues/52137)) | ❌ |
 | Cursor, OpenCode | ❌ | ❌ |
@@ -204,6 +204,41 @@ const taskFinished = taskFinishedEvent(events);
 const tasks = createTaskLayer({ store, dispatcher, onSettle: taskFinished.onSettle });
 ```
 
+## Testing it with ChatGPT
+
+We deployed the demo and connected it to ChatGPT as two separate apps: Report Desk for tasks and Deploy Watch for events. Then we logged every JSON-RPC request.
+
+**Tasks.** We asked for a report on Istanbul ferry routes. ChatGPT made two plain tool calls:
+
+```
+tools/call generate_report   → { taskId, status: "working" }
+                               (QStash runs the job for 10 seconds)
+tools/call task_status       → { status: "completed", result }
+```
+
+In the chat, those calls show up as "Generating Istanbul Ferry Routes Report" and "Checking Background Task Status". ChatGPT derives those labels from the tool titles, so they can look like a native feature. They aren't. The capabilities ChatGPT sends on every request include elicitation and its own extensions, but not `io.modelcontextprotocol/tasks`. Tools mode is the only way tasks work in ChatGPT today.
+
+**Events.** We asked ChatGPT to "watch deploy.finished for production" and tell us when a deploy fails. It made these calls:
+
+```
+events/list
+tools/call list_recent_deploys          (context before subscribing)
+events/subscribe deploy.finished        { environment: "production" }
+  → signed challenge to connectors.api.openai.com, echoed back
+```
+
+ChatGPT turned "for production" into a subscription argument on its own. Then we reported three deploys:
+
+| Deploy | Our server | ChatGPT |
+| --- | --- | --- |
+| Staging, failed | Matched no subscription, nothing sent | Nothing |
+| Production, succeeded | Delivered via QStash, `200` | Ran, stayed quiet as the prompt asked |
+| Production, failed | Delivered via QStash, `200` | Posted the failure and emailed us |
+
+So filtering happens in two places. Subscription arguments filter on your server, so the staging deploy never left it. The monitor's prompt filters on ChatGPT's side, so the successful deploy didn't produce a notification. The failure notification arrived about three minutes after delivery. That's fine for deploy alerts but not for anything time critical.
+
+One detail on users: every ChatGPT monitor gets its own callback URL and signing secret. Your server never learns who the ChatGPT user is. It just posts to the stored URL, and OpenAI routes it. What your server does control is who may subscribe to what, through `principal` and `authorize`. The [docs](https://upstash.com/docs/redis/sdks/agentkit/mcp-events#users-and-subscriptions) cover this.
+
 ## The native path
 
 Polling through tools costs the model a few turns. The native extension doesn't, which is why it's the right long-term shape.
@@ -220,7 +255,7 @@ If you run on Cloudflare, the equivalent building blocks are Durable Objects for
 
 - **Docs:** [MCP Tasks](https://upstash.com/docs/redis/sdks/agentkit/mcp-tasks) and [MCP Events](https://upstash.com/docs/redis/sdks/agentkit/mcp-events), each with a quickstart and every option
 - **Package:** [`packages/mcp-toolkit`](https://github.com/upstash/agentkit/tree/main/packages/mcp-toolkit)
-- **Demo:** [`examples/mcp-toolkit-demo`](https://github.com/upstash/agentkit/tree/main/examples/mcp-toolkit-demo), a Next.js app that runs the same tool on QStash and on Workflow, with a live wire log and a `task.finished` webhook.
+- **Demo:** [`examples/mcp-toolkit-demo`](https://github.com/upstash/agentkit/tree/main/examples/mcp-toolkit-demo), a Next.js app with Report Desk (tasks on QStash and Workflow) and Deploy Watch (a `deploy.finished` event), the two servers we tested with ChatGPT.
 - **Specs:** the [Tasks extension](https://modelcontextprotocol.io/extensions/tasks/overview) and [OpenAI's MCP Events guide](https://developers.openai.com/plugins/build/mcp-events).
 
 If you build something with it, let us know on [X](https://x.com/upstash) or [GitHub](https://github.com/upstash/agentkit/issues).
