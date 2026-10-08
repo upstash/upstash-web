@@ -1,0 +1,282 @@
+---
+authors: [enes]
+slug: context7-vs-exa
+tags: [context7, search]
+title: "Context7 vs Exa: Fresher Docs in a Tenth of the Tokens"
+description: We tested Context7 and Exa on 44 API changes from 2026. Context7 returned only current docs in 59% of searches, against 18 to 25% for Exa, in about a tenth of the tokens.
+---
+
+Libraries change their APIs all the time. AI SDK 7 renamed `stepCountIs` to `isStepCount`. Next.js 16 renamed `middleware.ts` to `proxy.ts`. Models still write the old names, so coding agents need a search tool that returns current docs.
+
+We tested Context7 and Exa on 44 API changes from 2026. Context7 returned current docs more often, in about a tenth of the tokens. We build Context7, so we published the [questions, code and results on GitHub](https://github.com/enesakar/context7-vs-exa-benchmark).
+
+## Which search tool returns more up-to-date docs, Context7 or Exa?
+
+Context7. For questions that name the library and its version, 59% of Context7's search responses used only the current API. Exa's AI SDK tool did that in 18% of searches, and Exa's fast search in 25%.
+
+![Share of search responses that used only the current API: Context7 59%, Exa fast search 25%, Exa AI SDK tool 18%](/blog/context7-vs-exa/current-only-payloads.png)
+
+A search response from Exa holds 10 web pages, so it is more likely to mix old and new pages than a Context7 response with a few doc snippets. The per-result numbers tell the same story:
+
+- **Stale results.** 11.1% of Context7's snippets used only the old API, against 20.9% of the pages from Exa's AI SDK tool and 18.9% from Exa's fast search.
+- **Size.** A median Context7 response was 828 tokens. Exa's were 8,629 (AI SDK tool) and 7,609 (fast search), about 10 times more.
+- **Speed.** Exa is faster: 0.3 seconds for fast search and 3.8 seconds for the AI SDK tool, against 4.3 seconds for Context7.
+
+![Median tokens per search response: Context7 828, Exa fast search 7,609, Exa AI SDK tool 8,629](/blog/context7-vs-exa/tokens-per-response.png)
+
+| Setup | Responses with only the current API | Results with only the old API | First result with only the old API | Median tokens | Median latency |
+| --- | --- | --- | --- | --- | --- |
+| Context7 Search | 52 / 88 (59.1%) | 42 / 377 (11.1%) | 10 / 88 | 828 | 4.3 s |
+| Exa, fast search with highlights | 22 / 88 (25.0%) | 166 / 880 (18.9%) | 6 / 88 | 7,609 | 0.3 s |
+| Exa, AI SDK tool defaults | 16 / 88 (18.2%) | 184 / 880 (20.9%) | 4 / 88 | 8,629 | 3.8 s |
+
+Context7's first result was stale-only more often than Exa's. We explain where that comes from [below](#where-do-stale-results-come-from).
+
+## How did we test the search tools?
+
+We collected 44 API renames and removals from 2026 releases of 32 libraries, 28 in JavaScript and 16 in Python. 31 of them shipped in April 2026 or later, and five shipped in the week before the test (SvelteKit 3, LangChain.js MCP adapters 2.0 and Polars 2.0).
+
+For every change we checked:
+
+1. The library's own migration guide, changelog or release notes confirm it.
+2. The old API is deprecated or removed in the latest version.
+3. The old and new names are distinct, so a regex can tell them apart.
+
+Each question names the library and its version, the way an agent that read `package.json` would ask: "How do I add client-side column sorting with TanStack Table v9 in React?"
+We started with 47 questions. Before scoring the cleaned set, we wrote down one rule: drop a question if the library's own current docs page for that feature still shows the old API in a code example. That removed three: the Stripe Node SDK, pnpm and Astro's Cloudflare adapter. With all 47 questions the numbers move by less than four points.
+
+We ran each question twice through three setups:
+
+1. **Context7 Search**, with the question as the only input.
+2. **Exa's AI SDK tool**, `webSearch()` from `@exalabs/ai-sdk` with its defaults: 10 results with up to 3,000 characters of text each.
+3. **Exa fast search with highlights**, the setup [Exa's docs recommend](https://exa.ai/docs/reference/context) for coding questions.
+
+We checked every search response, and every result inside it, for both the new name and the old one:
+
+![How we scored each search result: current-only, mixed, stale-only or neither](/blog/context7-vs-exa/scoring.png)
+
+Tokens were counted with the o200k tokenizer on the exact text each tool passes to the model. The code, the labels for every search and the official docs check are in the [benchmark repo](https://github.com/enesakar/context7-vs-exa-benchmark).
+
+## Where do stale results come from?
+
+Most of Exa's stale results came from GitHub and Stack Overflow, followed by old or third-party copies of official docs:
+
+- **Old snapshots of official docs.** For the Pydantic AI question, Exa returned the official MCP client docs pinned to old commits on GitHub, which still use `MCPServerStdio`.
+- **Archived repos.** For the LangChain question, Exa returned the `langchain-mcp-adapters` repo, which LangChain archived when it moved MCP support into `langchain.mcp`.
+- **Old guides and posts.** A page from the old Polars user guide still teaches `melt()`. A 2024 DEV post and a 2022 Stack Overflow question still use SvelteKit's `$app/stores`.
+- **Unofficial mirrors.** A third-party copy of the Google Gen AI docs still shows Imagen's `generate_images`.
+
+Context7 had misses too. Its whole response used only the old API in 6 of 88 searches, all from three questions:
+
+- **React Native:** it returned pages from the docs' versioned folders for 0.86 and 0.83, which still document `InteractionManager`. Exa was stale here too.
+- **MCP Python SDK:** pages on the MCP protocol site still import `mcp.server.fastmcp`, even though the SDK's own docs use `MCPServer`.
+- **Turborepo:** it returned `turbo-ignore` from Vercel's monorepo source code instead of the Turborepo docs.
+
+Its first result was also stale-only for two questions where first-party files lag behind their own docs. The Braintrust provider page in the AI SDK repo still returns `toDataStreamResponse()`, the AI SDK 4 name, and the `python-genai` README still shows Imagen's `generate_images`. Indexing only first-party sources removes most stale content, but not all of it.
+
+## When is Exa the better search tool?
+
+Exa is faster, and it covers the whole web. That makes it the better tool for content that is not in official docs, like GitHub issues, release announcements and recent news. One agent can use both: Context7 for library docs, and Exa for everything else.
+
+## How does Context7 keep docs current?
+
+Context7 only indexes docs that the library's own team publishes, and the library owner decides which version is the latest. It refreshes the most popular libraries once a day, and only keeps older versions in the index when the owner asks for them.
+
+- **Refresh on request.** When anyone requests a library, Context7 checks when its docs were last updated. If they are older than a threshold, [a background refresh starts](https://context7.com/docs/library-updates). The threshold is 1 day for the top 100 libraries, 15 days for the top 1,000, 30 days for the top 5,000, and 45 days for the rest.
+- **Owner control.** Library owners can [add a GitHub Action that refreshes the docs on every push](https://context7.com/docs/adding-libraries), so a new release is indexed when it ships. Owners also [decide which version is the latest](https://upstash.com/blog/context7-search) and how their docs are parsed.
+- **One version per library by default.** A version analyzer finds docs that cover several versions and [keeps only the newest one](https://upstash.com/blog/context7-quality-and-safety). Older versions stay available only when the owner sets them up.
+- **Official sources.** Context7 indexes official docs sites, product websites and API references, not forum threads or Q&A sites, and every snippet is scanned for prompt injection before it goes in.
+
+A new release reaches the agent through this path:
+
+![How Context7 keeps a library's docs current, from the owner's release to the coding agent](/blog/context7-vs-exa/refresh-flow.png)
+
+The refresh runs in the background, so the request that triggers it still gets the existing docs while the update runs.
+
+The Search API also accepts a `library` and a `version`. With no hint, the Next.js 16 redirect question returned snippets with neither name. With a hint, it returns the `proxy` docs:
+
+```ts
+import { Context7 } from '@upstash/context7-sdk'
+
+const context7 = new Context7({ apiKey: process.env.CONTEXT7_API_KEY })
+
+const result = await context7.search(
+  'How do I redirect requests before they reach a route?',
+  { libraries: ['next.js'], version: '16', type: 'txt' }
+)
+
+console.log(result.split('\n').slice(0, 20).join('\n'))
+```
+
+The first lines it printed:
+
+```text
+Library: /vercel/next.js/v16.2.9
+
+### Redirecting Requests with Next.js Proxy
+
+Source: https://github.com/vercel/next.js/blob/v16.2.9/docs/01-app/03-api-reference/03-file-conventions/proxy.mdx
+
+This snippet demonstrates how to use the `proxy` function to redirect incoming requests to a different URL. The `config` object specifies a matcher to apply this proxy to specific paths, such as all requests under `/about/`.
+
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+
+// This function can be marked `async` if using `await` inside
+export function proxy(request: NextRequest) {
+  return NextResponse.redirect(new URL('/home', request.url))
+}
+```
+
+Version `16` resolved to Next.js 16.2.9, and the source link points to that exact tag.
+
+## How do I add Context7 to an AI SDK coding agent?
+
+The agent needs one tool that calls Context7 Search with the question and an optional library and version. The model fills in the hints when it knows them, and Context7 returns a short text payload it can read directly.
+
+Here's a complete agent with AI SDK 7 and the [Context7 TypeScript SDK](https://context7.com/docs/sdks/ts/getting-started):
+
+```ts
+import { anthropic } from '@ai-sdk/anthropic'
+import { generateText, isStepCount, tool } from 'ai'
+import { Context7, Context7Error } from '@upstash/context7-sdk'
+import { z } from 'zod'
+
+const context7 = new Context7({ apiKey: process.env.CONTEXT7_API_KEY })
+const searchInput = z.object({
+  query: z.string(),
+  library: z.string().optional(),
+  version: z.string().describe('Requires a library hint').optional()
+})
+
+type SearchInput = z.infer<typeof searchInput>
+
+async function searchDocs({ query, library, version }: SearchInput): Promise<string> {
+  try {
+    return await context7.search(query, {
+      libraries: library ? [library] : undefined,
+      version: library ? version : undefined,
+      type: 'txt'
+    })
+  } catch (error) {
+    if (error instanceof Context7Error && error.status === 404) return 'No documentation found. Try another query or version hint.'
+    throw error
+  }
+}
+
+const result = await generateText({
+  model: anthropic('claude-sonnet-5-5'),
+  instructions: 'Use searchDocs before answering. Answer with a short code example using the current API.',
+  prompt: 'How do I make one test run sequentially when concurrency is enabled in Vitest 5?',
+  tools: {
+    searchDocs: tool({
+      description: 'Search library documentation. Library and version hints are optional.',
+      inputSchema: searchInput,
+      execute: searchDocs
+    })
+  },
+  stopWhen: isStepCount(5),
+  maxOutputTokens: 1000
+})
+
+for (const step of result.steps) {
+  console.log(`Step ${step.stepNumber}:`)
+  let toolCalls = 0
+  for (const content of step.content) {
+    if (content.type !== 'tool-call') continue
+    toolCalls++
+    console.log(`${content.toolName} ${JSON.stringify(content.input)}`)
+  }
+  if (!toolCalls) console.log('(no tool calls)')
+}
+
+console.log('Answer:')
+console.log(result.text.split('\n').slice(0, 15).join('\n'))
+```
+
+The tool sends the version only when a library is set, because the Search API needs a library for a version hint. A 404 means Context7 found no docs, so the tool tells the model to try again instead of throwing.
+
+The agent made one search and answered:
+
+```text
+Step 0:
+searchDocs {"query":"run test sequentially when concurrent enabled (test.sequential)","library":"vitest","version":"5"}
+Step 1:
+(no tool calls)
+Answer:
+In Vitest 5, pass `{ concurrent: false }` as a test option. This opts the test out of concurrency, whether it comes from the config or from a parent suite.
+
+import { describe, test } from 'vitest'
+
+// Works even if `sequence.concurrent: true` is set in the config
+test('runs on its own', { concurrent: false }, async () => {
+  // ...
+})
+```
+
+Even though the model put the old name, `test.sequential`, into its own search query, Context7 still returned the Vitest 5 docs, and the answer uses `concurrent: false`.
+
+Each Search API request counts as one API call. The [Free plan includes 1,000 calls a month](https://context7.com/docs/plans-pricing), and Pro costs $10 per seat a month with 2,000 calls per seat, then $5 per 1,000 calls. For comparison, [Exa's search costs $7 per 1,000 requests](https://exa.ai/docs/admin/pricing), so the 88 searches through Exa's AI SDK tool in this test cost $0.62.
+
+## What's next for Context7?
+
+Context7 returned current docs more often than Exa, in about a tenth of the tokens. But it still missed in some cases: old versioned docs, first-party files that lag behind their own docs, and code from the wrong repo.
+
+We're now running a major analysis of Context7's quality, based on what this test found. It focuses on three things:
+
+1. **Freshness:** catch stale pages before they reach your agent, even when they come from first-party sources.
+2. **Version match:** return the docs for the version you ask for.
+3. **Quality:** pick the right library and the most relevant snippets for each question.
+
+We'll fix the misses this test found.
+
+## The 44 questions
+
+Each question named the library and its version, and every setup got the same question.
+
+| Library and version | Old API | New API |
+| --- | --- | --- |
+| Vercel AI SDK 7.0.0 | `result.toUIMessageStreamResponse()` | `createUIMessageStreamResponse(...)` |
+| Vercel AI SDK 7.0.0 | `onFinish` | `onEnd` |
+| Vercel AI SDK 7.0.0 | `result.fullStream` | `result.stream` |
+| MCP Python SDK 2.0.0 | `FastMCP` from `mcp.server.fastmcp` | `MCPServer` |
+| MCP Python SDK 2.0.0 | `streamablehttp_client` | `streamable_http_client` |
+| MCP TypeScript SDK 2.0.0 | `server.tool()` | `server.registerTool()` |
+| MCP TypeScript SDK 2.0.0 | `SSEServerTransport` | Streamable HTTP with `createMcpHandler` |
+| Pydantic AI 2.0.0 | `MCPServerStdio` | `MCPToolset` |
+| Pydantic AI 2.0.0 | `OpenAIModel` | `OpenAIChatModel` |
+| Anthropic Python SDK 1.0.0 | `output_format={...}` | `output_config={...}` |
+| OpenAI Node SDK 6.17.0 | `beta.threads` (Assistants API) | `conversations` and `responses` |
+| Google Gen AI Python SDK 2.14.0 | `generate_images` (Imagen) | `generate_content` or `interactions` with an image model |
+| LangChain 1.4.0 | `MultiServerMCPClient` | `MCPAdapter` from `langchain.mcp` |
+| LangChain.js 2.0.0 | `MultiServerMCPClient` | `MCPAdapter` |
+| Mastra 1.0.0 | `RuntimeContext` | `RequestContext` |
+| Mastra 1.0.0 | `getAgents()` | `listAgents()` |
+| Django 6.1 | `EMAIL_HOST` and other `EMAIL_*` settings | `MAILERS` |
+| Polars 2.0.0 | `melt()` | `unpivot()` |
+| scikit-learn 1.9.0 | `SVC(probability=True)` | `CalibratedClassifierCV(SVC())` |
+| PyTorch 2.14.0 | `profile(use_cuda=True)` | `ProfilerActivity.CUDA` |
+| Starlette (FastAPI) 1.0.0 | `TemplateResponse(name, {"request": request})` | `TemplateResponse(request, name)` |
+| Hugging Face transformers 5.0.0 | `AutoModelForVision2Seq` | `AutoModelForImageTextToText` |
+| Streamlit 1.57.0 | `_get_websocket_headers()` | `st.context.headers` |
+| Hugging Face transformers 5.0.0 | `Trainer(tokenizer=...)` | `Trainer(processing_class=...)` |
+| uv 0.11.0 | `--native-tls` | `--system-certs` |
+| TypeScript 7.0 | `assert { type: "json" }` | `with { type: "json" }` |
+| Firebase JS SDK 12.17.0 | `VertexAIBackend` | `AgentPlatformBackend` |
+| Better Auth 1.7.0 | `oidcProvider()` | `oauthProvider()` |
+| TypeScript 7.0 | `moduleResolution: "node"` | `"nodenext"` or `"bundler"` |
+| Firebase JS SDK 12.18.0 | `getImagenModel()` | `getGenerativeModel()` with image output |
+| Tailwind CSS 4.3.0 | `start-0`, `end-0` | `inset-s-0`, `inset-e-0` |
+| Turborepo 2.9.0 | `npx turbo-ignore` | `turbo query affected` |
+| Vite 8.0.0 | `esbuild.jsxInject` | `oxc.jsxInject` |
+| Playwright 1.58.0 | `launch({ devtools: true })` | `--auto-open-devtools-for-tabs` |
+| SvelteKit 3.0.0 | `$app/stores` | `$app/state` |
+| TanStack Table 9.0.0 | `useReactTable`, `getSortedRowModel` | `useTable`, `createSortedRowModel` |
+| Expo SDK 55 | `expo-av` | `expo-audio` |
+| Expo Router (SDK 56) | imports from `@react-navigation/native` | imports from `expo-router` |
+| React Native 0.87.0 | `InteractionManager` | `requestIdleCallback` |
+| Angular 22.0.0 | `reportProgress` | `reportUploadProgress` |
+| SvelteKit 3.0.0 | `$env/static/private` | `$app/env/private` |
+| Astro 6.0.0 | `z` from `astro:content` | `z` from `astro/zod` |
+| SvelteKit 3.0.0 | `$lib` | `#lib` |
+| Angular 21.2.0 | `ChangeDetectionStrategy.Default` | `ChangeDetectionStrategy.Eager` |
