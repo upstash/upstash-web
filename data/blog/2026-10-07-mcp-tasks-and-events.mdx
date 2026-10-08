@@ -21,10 +21,21 @@ Tasks shipped with the [2026-07-28 MCP specification](https://blog.modelcontextp
 Instead of making the client wait, a server answers a `tools/call` right away with a task handle. The work continues in the background, and the client polls `tasks/get` until the task is done.
 
 <Frame>
-  <img
-    src="/blog/mcp-tasks-and-events/tasks-flow.svg"
-    alt="Sequence diagram: the client calls a tool, gets a task handle immediately, polls tasks/get, and finally receives the completed result"
-  />
+  <picture>
+    <source
+      media="(max-width: 639px)"
+      srcSet="/blog/mcp-tasks-and-events/tasks-flow-mobile.svg"
+      width="360"
+      height="574"
+    />
+    <img
+      src="/blog/mcp-tasks-and-events/tasks-flow.svg"
+      alt="Sequence diagram: the client calls a tool, gets a task handle immediately, polls tasks/get, and finally receives the completed result"
+      width="760"
+      height="504"
+      className="h-auto w-full"
+    />
+  </picture>
 </Frame>
 
 A few details make this work:
@@ -41,10 +52,21 @@ Events are newer and not yet a spec. The design lives as a sketch in the incubat
 The idea: the user tells the agent what to watch ("new review comments on this doc") and what to do about it. The host subscribes through your MCP server and hands over a callback URL and a signing secret. When something matching happens, your server POSTs a signed event to that URL, and the agent wakes up and acts.
 
 <Frame>
-  <img
-    src="/blog/mcp-tasks-and-events/events-flow.svg"
-    alt="Sequence diagram: the agent host subscribes to an event, the MCP server verifies the callback and stores the subscription, then posts a signed event when the app reports a change"
-  />
+  <picture>
+    <source
+      media="(max-width: 639px)"
+      srcSet="/blog/mcp-tasks-and-events/events-flow-mobile.svg"
+      width="360"
+      height="638"
+    />
+    <img
+      src="/blog/mcp-tasks-and-events/events-flow.svg"
+      alt="Sequence diagram: the agent host subscribes to an event, the MCP server verifies the callback and stores the subscription, then posts a signed event when the app reports a change"
+      width="760"
+      height="572"
+      className="h-auto w-full"
+    />
+  </picture>
 </Frame>
 
 What a server has to implement:
@@ -101,10 +123,21 @@ It reads `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` for Redis, `QST
 A task tool answers immediately with a task ID. Two shared tools, `task_status` and `task_cancel`, let the model check on it and stop it. The task record lives in Upstash Redis, and the work runs through QStash or Upstash Workflow, so it survives the process that accepted the call and isn't bound by the client's tool-call timeout.
 
 <Frame>
-  <img
-    src="/blog/mcp-tasks-and-events/upstash-tasks.svg"
-    alt="Architecture: the model starts a task through the MCP server, which records it in Upstash Redis and dispatches it to QStash or Workflow; the execute endpoint runs the handler and writes progress and the result back to Redis, which task_status returns"
-  />
+  <picture>
+    <source
+      media="(max-width: 639px)"
+      srcSet="/blog/mcp-tasks-and-events/upstash-tasks-mobile.svg"
+      width="360"
+      height="642"
+    />
+    <img
+      src="/blog/mcp-tasks-and-events/upstash-tasks.svg"
+      alt="Architecture: the model starts a task through the MCP server, which records it in Upstash Redis and dispatches it to QStash or Workflow; the execute endpoint runs the handler and writes progress and the result back to Redis, which task_status returns"
+      width="840"
+      height="560"
+      className="h-auto w-full"
+    />
+  </picture>
 </Frame>
 
 ```ts
@@ -167,10 +200,21 @@ With `QStashDispatcher`, the handler still runs inside one function invocation, 
 `/events` is the server side of MCP Events. With no finished standard to follow, it tracks what ChatGPT implements: webhook delivery, as described in OpenAI's guide. You define an event with a typed payload, register it on your server, and emit it from wherever the change happens. The toolkit serves the three `events/*` methods, verifies a new callback (or a new secret) with a signed challenge, stores subscriptions in Redis with their signing secrets encrypted, and hands every delivery to QStash.
 
 <Frame>
-  <img
-    src="/blog/mcp-tasks-and-events/upstash-events.svg"
-    alt="Architecture: ChatGPT subscribes through the MCP server, which stores the subscription in Upstash Redis; on emit the server finds matching subscriptions in Redis and publishes one QStash message each; QStash calls the server's /api/events route with retries, which signs and POSTs the webhook to ChatGPT"
-  />
+  <picture>
+    <source
+      media="(max-width: 639px)"
+      srcSet="/blog/mcp-tasks-and-events/upstash-events-mobile.svg"
+      width="360"
+      height="636"
+    />
+    <img
+      src="/blog/mcp-tasks-and-events/upstash-events.svg"
+      alt="Architecture: ChatGPT subscribes through the MCP server, which stores the subscription in Upstash Redis; on emit the server finds matching subscriptions in Redis and publishes one QStash message each; QStash calls the server's /api/events route with retries, which signs and POSTs the webhook to ChatGPT"
+      width="840"
+      height="536"
+      className="h-auto w-full"
+    />
+  </picture>
 </Frame>
 
 QStash can't send the webhook to ChatGPT itself, because each attempt needs a fresh signature made with the subscriber's secret. So QStash calls a small route on your server with retries and backoff, and that route signs and sends the webhook.
