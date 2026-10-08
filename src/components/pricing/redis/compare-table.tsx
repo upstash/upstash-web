@@ -1180,6 +1180,39 @@ export default function CompareTable({
         {/**/}
 
         <tr>
+          <th className="px-0 text-left font-normal">
+            <Tooltip content="Request routing, latency, limits, Lua and keyspace analysis in the Upstash Console.">
+              Insights
+            </Tooltip>
+          </th>
+          {/**/}
+          <Col plan={showFree}>
+            <CompareValue type="boolean" valid={false} />
+          </Col>
+          <Col plan={showPayg} feature>
+            <CompareValue
+              after={
+                <Tooltip content="Available with Prod Pack.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            />
+          </Col>
+          <Col plan={showFixed}>
+            <CompareValue
+              after={
+                <Tooltip content="Available with Prod Pack.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            />
+          </Col>
+          <Col plan={showEnterprise}>
+            <CompareValue type="boolean" />
+          </Col>
+        </tr>
+
+        <tr>
           <th className="px-0 text-left font-normal">Grafana Integration</th>
           {/**/}
           <Col plan={showFree}>

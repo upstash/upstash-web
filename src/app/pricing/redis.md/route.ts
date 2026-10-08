@@ -154,6 +154,7 @@ function generateMarkdown(): string {
     "",
     "**Observability**",
     "",
+    featureRow("Insights", representativePlans, "insights"),
     featureRow("Grafana", representativePlans, "grafana"),
     featureRow("Datadog", representativePlans, "datadog"),
     featureRow("New Relic", representativePlans, "newRelic"),
