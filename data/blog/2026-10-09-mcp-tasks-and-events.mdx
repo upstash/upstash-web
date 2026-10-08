@@ -112,7 +112,7 @@ On the server side it's just as early: OpenAI [announced ChatGPT support on Sept
 npm install @upstash/mcp-toolkit @modelcontextprotocol/server mcp-handler zod
 ```
 
-The Upstash backends come from `@upstash/mcp-toolkit/upstash` and read the usual variables: `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `QSTASH_URL`, `QSTASH_TOKEN`, the two QStash signing keys, and `MCP_EVENTS_SECRET_KEY` for events. `APP_URL` below is your app's public URL.
+The Redis, QStash and Workflow backends come from `@upstash/mcp-toolkit/upstash`.
 
 ### Tasks with @upstash/mcp-toolkit/tasks
 
