@@ -285,8 +285,8 @@ export default function FAQ() {
         <AccordionTrigger>What is included in Prod Pack?</AccordionTrigger>
         <AccordionContent>
           Prod Pack includes uptime SLA, SOC 2 Type 2 report, advanced
-          monitoring with Prometheus, Grafana, and Datadog, multi-zone high
-          availability, and encryption at rest.
+          monitoring with Prometheus, Grafana, and Datadog, Insights in the
+          console, multi-zone high availability, and encryption at rest.
         </AccordionContent>
       </AccordionItem>
 

@@ -1180,6 +1180,55 @@ export default function CompareTable({
         {/**/}
 
         <tr>
+          <th className="px-0 text-left font-normal">
+            <Tooltip
+              label="Insights"
+              content={
+                <>
+                  Request routing, latency, limits, Lua and keyspace analysis in
+                  the Upstash Console.{" "}
+                  <a
+                    href="https://upstash.com/docs/redis/howto/insights"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline underline-offset-2"
+                  >
+                    Learn more
+                  </a>
+                </>
+              }
+            >
+              Insights
+            </Tooltip>
+          </th>
+          {/**/}
+          <Col plan={showFree}>
+            <CompareValue type="boolean" valid={false} />
+          </Col>
+          <Col plan={showPayg} feature>
+            <CompareValue
+              after={
+                <Tooltip content="Available with Prod Pack.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            />
+          </Col>
+          <Col plan={showFixed}>
+            <CompareValue
+              after={
+                <Tooltip content="Available with Prod Pack.">
+                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
+                </Tooltip>
+              }
+            />
+          </Col>
+          <Col plan={showEnterprise}>
+            <CompareValue type="boolean" />
+          </Col>
+        </tr>
+
+        <tr>
           <th className="px-0 text-left font-normal">Grafana Integration</th>
           {/**/}
           <Col plan={showFree}>

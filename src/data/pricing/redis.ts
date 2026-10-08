@@ -58,6 +58,7 @@ export interface RedisPlan {
   hipaa: boolean;
 
   // Observability
+  insights: FeatureAvailability;
   grafana: FeatureAvailability;
   datadog: FeatureAvailability;
   newRelic: FeatureAvailability;
@@ -116,6 +117,7 @@ const PAID_FIXED_BASE: Omit<
   privateLink: false,
   sso: false,
   hipaa: false,
+  insights: "with-prod-pack",
   grafana: "with-prod-pack",
   datadog: "with-prod-pack",
   newRelic: "with-prod-pack",
@@ -169,6 +171,7 @@ export const REDIS_FREE_PLAN: RedisPlan = {
   privateLink: false,
   sso: false,
   hipaa: false,
+  insights: false,
   grafana: false,
   datadog: false,
   newRelic: false,
@@ -223,6 +226,7 @@ export const REDIS_PAYG_PLAN: RedisPlan = {
   privateLink: false,
   sso: false,
   hipaa: false,
+  insights: "with-prod-pack",
   grafana: "with-prod-pack",
   datadog: "with-prod-pack",
   newRelic: "with-prod-pack",
@@ -405,6 +409,7 @@ export const REDIS_ENTERPRISE_PLAN: RedisPlan = {
   privateLink: true,
   sso: true,
   hipaa: true,
+  insights: true,
   grafana: true,
   datadog: true,
   newRelic: true,
@@ -429,6 +434,7 @@ export const REDIS_PROD_PACK = {
     "Multi-Zone High Availability (regions deployed across multiple availability zones, with automatic same-region failover if a zone or replica fails)",
     "SOC 2 Type 2 report",
     "Advanced monitoring (Prometheus, Grafana, Datadog, New Relic)",
+    "Insights in the console (request routing, latency, limits, Lua and keyspace analysis)",
     "Role-based access control",
     "Encryption at rest",
   ],

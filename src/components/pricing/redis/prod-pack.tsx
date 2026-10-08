@@ -21,6 +21,7 @@ export default function PricingTableProductionPack() {
             "SOC-2",
             "Prometheus",
             "Datadog",
+            "Insights",
           ].map((value) => {
             return (
               <li
