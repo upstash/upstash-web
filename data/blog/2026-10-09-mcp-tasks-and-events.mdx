@@ -114,7 +114,7 @@ npm install @upstash/mcp-toolkit @modelcontextprotocol/server mcp-handler zod
 
 `/tasks` and `/events` hold the generic parts; the Redis, QStash and Workflow backends for both come from `@upstash/mcp-toolkit/upstash`, and their clients are installed with the package.
 
-It reads `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` for Redis, `QSTASH_TOKEN`, `QSTASH_CURRENT_SIGNING_KEY` and `QSTASH_NEXT_SIGNING_KEY` for QStash, and `MCP_EVENTS_SECRET_KEY` for events. `APP_URL` in the snippets below is your app's public URL.
+It reads `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` for Redis, `QSTASH_URL`, `QSTASH_TOKEN`, `QSTASH_CURRENT_SIGNING_KEY` and `QSTASH_NEXT_SIGNING_KEY` for QStash, and `MCP_EVENTS_SECRET_KEY` for events. `APP_URL` in the snippets below is your app's public URL.
 
 ### Tasks with @upstash/mcp-toolkit/tasks
 
