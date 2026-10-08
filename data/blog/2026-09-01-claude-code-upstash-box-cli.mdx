@@ -1,0 +1,123 @@
+---
+slug: claude-code-upstash-box-cli
+title: "Your Claude Subscription Just Got a Remote Computer"
+authors: [alitarik]
+tags: [box, ai, cli, skills, claude]
+description: "Install one skill and one CLI, then add four words to any prompt: in upstash box. The Claude you already pay for builds it on a real machine somewhere else, runs it there, and gives you back a live URL."
+---
+
+Claude Code will build almost anything you ask for. What you get back is a folder on your laptop.
+
+Nothing is running yet. To see it you install the dependencies and start a server. To show it to anyone else, you cannot.
+
+So add four words to the end of your prompt instead:
+
+> build a poll for where the team wants lunch, **in upstash box**
+
+You get back a link. Your team votes on it. Nothing was installed on your machine.
+
+The same four words work on almost anything:
+
+> clone my repo, get the tests green, and open a PR, **in upstash box**
+
+> take this CSV and build me a dashboard, **in upstash box**
+
+> run the migration against a copy of the data first, **in upstash box**
+
+Two installs make that sentence work.
+
+```bash
+npm i -g @upstash/box-cli
+export UPSTASH_BOX_API_KEY=box_...
+```
+
+```bash
+/plugin marketplace add upstash/skills
+/plugin install upstash@upstash
+```
+
+Same Claude, same subscription, same monthly bill. It can just do a lot more with it.
+
+<Summary>
+  - The Claude Code you already pay for drives. An [Upstash Box](/blog/upstash-box) is the computer it works on.
+  - The [skill](https://github.com/upstash/skills) teaches it the CLI, so "in upstash box" is all you have to say.
+  - No agent API key and no second model bill. You bring the subscription, we bring the machine.
+  - The box has a shell, a filesystem that persists, git, a browser and public URLs, so the agent keeps going after the first answer.
+</Summary>
+
+---
+
+## Most of the work goes better in a box
+
+Getting a link back is the obvious win. It is not the main one.
+
+Think about what an agent actually does while it works. It installs packages. It runs builds that take five minutes. It tries something, breaks it, and tries again. It leaves servers running on ports. Every one of those costs you something on your own machine: a terminal you cannot use for a while, a dependency you now have forever, a process still listening tonight.
+
+Give it a box and none of that reaches you. The agent gets a whole computer to be messy in, and you get the result.
+
+That is why it becomes a habit. You stop adding "in upstash box" because the task needs a public URL, and start adding it because the work is simply better there.
+
+A box is an isolated container with a shell, a filesystem that survives between sessions, git, a headless browser, and public URLs when you ask for one. The CLI is how an agent in a terminal reaches it. The skill teaches the agent to use that CLI properly on the first try, without you explaining anything.
+
+---
+
+## What happens after you say it
+
+You wrote one sentence. The agent runs about six commands:
+
+```bash
+box create --no-repl --runtime node       # a fresh container, pinned to this folder
+
+box files write server.js - <<'JS'
+const http = require("http")
+const votes = { burgers: 0, sushi: 0, salad: 0 }
+
+http.createServer((req, res) => {
+  const choice = new URL(req.url, "http://x").searchParams.get("vote")
+  if (choice && choice in votes) votes[choice]++
+  res.writeHead(200, { "Content-Type": "text/html" })
+  res.end(render(votes))
+}).listen(3000)
+JS
+
+box exec -- '( node server.js > server.log 2>&1 & )'   # started detached
+box exec -- 'curl -sf localhost:3000 >/dev/null && echo up'
+box public-url 3000
+```
+
+All of it runs inside the box. The last line prints the link.
+
+You do not type any of this. You only read the link at the end.
+
+---
+
+## What else fits the pattern
+
+Once the agent has a computer, those same four words cover a lot of ground.
+
+**It is the fastest way to try an idea.** You do not have to set up a project, install anything, or clean up after. Ask for it, open the link, look at it. If it was a bad idea, delete the box and nothing is left behind. If it was a good one, the box is still there tomorrow with everything on it.
+
+**It can check its own work.** Every box can come with a [headless browser](/blog/box-browser). The agent opens the page it just wrote, takes a screenshot, sees what is broken, and fixes it before you look.
+
+**It can use git properly.** Clone, branch, commit, push, open a pull request. The repo is on the box, not on your disk, so a bad dependency is the box's problem.
+
+**It can do slow and risky work.** Long builds, big installs, destructive migrations. Boxes pause when they go idle and delete with one command.
+
+**It can keep working without you.** Boxes take schedules, so the same workspace wakes up on cron and reports back.
+
+All of it happens in one place. The page it browsed, the repo it cloned, and the server it started are on the same machine, so there is nothing to wire together.
+
+---
+
+## Try it
+
+Install the CLI, install the plugin, get a key from the [Upstash Console](https://console.upstash.com), and add four words to your next prompt. The free tier is enough to get a link back.
+
+```bash
+npm i -g @upstash/box-cli
+export UPSTASH_BOX_API_KEY=box_...
+```
+
+The skills also install in Cursor, Codex, OpenCode and Zed. The [skills repo](https://github.com/upstash/skills) has those, and the [Box docs](https://upstash.com/docs/box/overall/quickstart) cover the rest of what a box can do.
+
+Tell us what you got back. We are on [Discord](https://upstash.com/discord).
