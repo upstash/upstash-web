@@ -14,7 +14,7 @@ import cx from "@/utils/cx";
 import { Inter, Inter_Tight, JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
 import { ReactNode, Suspense } from "react";
-import { ASK_ENDPOINT, ASK_NOTE } from "@/lib/context7-ask";
+import { ASK_NOTE } from "@/lib/context7-ask";
 
 const fontText = Inter({
   variable: "--font-sans",
@@ -43,15 +43,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       )}
       suppressHydrationWarning
     >
-      <head>
-        <link
-          rel="search"
-          type="text/plain"
-          href={ASK_ENDPOINT}
-          title="Search upstash.com"
-        />
-        <meta name="context7-ask" content={ASK_NOTE} />
-      </head>
       <IntercomWrapper>
         <body
           className={cx(
@@ -61,6 +52,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             "bg-bg",
           )}
         >
+          {/* Context7 Ask. Agent fetch tools read the page as text and drop
+           * the head, so the note is in the body; people and screen readers
+           * never see it. Context7 checks it to verify the site. */}
+          <blockquote data-context7-ask aria-hidden="true" className="sr-only">
+            <h2>Search</h2>
+            <p>{ASK_NOTE}</p>
+          </blockquote>
           <Suspense>
             <Analytics />
           </Suspense>
