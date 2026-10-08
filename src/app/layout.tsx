@@ -54,9 +54,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         >
           {/* Context7 Ask. Agent fetch tools read the page as text and drop
            * the head, so the note is in the body; people and screen readers
-           * never see it. Context7 checks it to verify the site. */}
+           * never see it. Context7 checks it to verify the site. A paragraph,
+           * not a heading, so it does not come before the page's own <h1>. */}
           <blockquote data-context7-ask aria-hidden="true" className="sr-only">
-            <h2>Search</h2>
+            <p>
+              <strong>Search</strong>
+            </p>
             <p>{ASK_NOTE}</p>
           </blockquote>
           <Suspense>
