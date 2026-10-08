@@ -1181,7 +1181,23 @@ export default function CompareTable({
 
         <tr>
           <th className="px-0 text-left font-normal">
-            <Tooltip content="Request routing, latency, limits, Lua and keyspace analysis in the Upstash Console.">
+            <Tooltip
+              label="Insights"
+              content={
+                <>
+                  Request routing, latency, limits, Lua and keyspace analysis in
+                  the Upstash Console.{" "}
+                  <a
+                    href="https://upstash.com/docs/redis/howto/insights"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline underline-offset-2"
+                  >
+                    Learn more
+                  </a>
+                </>
+              }
+            >
               Insights
             </Tooltip>
           </th>
