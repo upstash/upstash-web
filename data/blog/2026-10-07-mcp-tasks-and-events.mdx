@@ -341,9 +341,9 @@ So filtering happens in two places. Subscription arguments filter on your server
 
 One detail on users: every ChatGPT monitor gets its own callback URL and signing secret. Your server never learns who the ChatGPT user is. It just posts to the stored URL, and OpenAI routes it. What your server controls is who receives what, through `principal` and `authorize`. The [docs](https://upstash.com/docs/redis/sdks/agentkit/mcp-events#users-and-subscriptions) cover this.
 
-## What's next: the native path, and Cloudflare
+## What's next: the native path
 
-Polling through tools costs the model a few turns; the native extension doesn't, which makes it the right long-term shape. The task record and the execution sit behind two small interfaces, a `TaskStore` and a `TaskDispatcher`, and the task object already has the extension's shape, so once clients declare `io.modelcontextprotocol/tasks` a native adapter can serve the same records over `tasks/get` and keep the tools for everyone else. If you run on Cloudflare, the equivalent pieces are Durable Objects and Cloudflare Workflows; the Agents SDK [moved to the stateless 2026-07-28 spec](https://developers.cloudflare.com/changelog/post/2026-07-27-agents-sdk-v0.20.0-mcp-sdk-v2/) but doesn't ship a Tasks or Events runtime yet, and the same two interfaces would let a Durable Objects store plug in.
+Polling through tools costs the model a few turns; the native extension doesn't, which makes it the right long-term shape. The task record and the execution sit behind two small interfaces, a `TaskStore` and a `TaskDispatcher`, and the task object already has the extension's shape, so once clients declare `io.modelcontextprotocol/tasks` a native adapter can serve the same records over `tasks/get` and keep the tools for everyone else.
 
 ## Try it
 
