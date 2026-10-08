@@ -3,7 +3,7 @@ authors: [arda]
 title: "MCP Tasks and Events, Explained: Long-Running Tools and Agents That Wake Up"
 slug: mcp-tasks-and-events
 tags: [mcp, agents, qstash, redis, serverless]
-description: "How the MCP Tasks extension and the draft MCP Events spec work, which clients and servers support them today, and how @upstash/mcp-toolkit gives you durable long-running tools and webhook events now."
+description: "How the MCP Tasks extension and the proposed MCP Events design work, which clients and servers support them today, and how @upstash/mcp-toolkit gives you durable long-running tools and webhook events now."
 ---
 
 Agents built on MCP have two blind spots.
@@ -36,7 +36,7 @@ A few details make this work:
 
 ## MCP Events: the server wakes the agent
 
-Events are newer and still a draft, incubated by the MCP [Triggers & Events Working Group](https://github.com/modelcontextprotocol/experimental-ext-triggers-events). OpenAI already supports the webhook flavor in ChatGPT, documented in their [MCP Events guide](https://developers.openai.com/plugins/build/mcp-events).
+Events are newer and not yet a spec. The design lives as a sketch in the incubation repo of the MCP [Triggers & Events Working Group](https://github.com/modelcontextprotocol/experimental-ext-triggers-events), and there's no formal proposal (SEP) yet. OpenAI shipped the webhook part of that sketch in ChatGPT anyway, documented in their [MCP Events guide](https://developers.openai.com/plugins/build/mcp-events).
 
 The idea: the user tells the agent what to watch ("new review comments on this doc") and what to do about it. The host subscribes through your MCP server and hands over a callback URL and a signing secret. When something matching happens, your server POSTs a signed event to that URL, and the agent wakes up and acts.
 
@@ -82,7 +82,7 @@ This is the catch. As of October 7, 2026, on the client side:
 
 So if you return a native task today, almost no client will accept it. Long-running work is still a real problem, though, and you can't wait for every client to catch up.
 
-On the server side, Events are even newer. OpenAI announced ChatGPT support on September 29, and the spec is still a draft:
+On the server side, Events are even newer. OpenAI announced ChatGPT support on September 29, and there is no finished spec yet:
 
 | Server | Emits MCP Events? |
 | --- | --- |
@@ -160,7 +160,7 @@ Need more time than one function invocation allows? Swap `QStashDispatcher` for 
 
 ### Events with @upstash/mcp-toolkit/events
 
-`/events` is the server side of MCP Events. You define an event with a typed payload, register it on your server, and emit it from wherever the change happens. The toolkit serves `events/list`, `events/subscribe` and `events/unsubscribe`, verifies each callback with a signed challenge, stores subscriptions in Redis with their signing secrets encrypted, and hands every delivery to QStash, which retries failed webhooks with backoff.
+`/events` is the server side of MCP Events. With no finished standard to follow, it tracks what ChatGPT implements: webhook delivery, as described in OpenAI's guide. You define an event with a typed payload, register it on your server, and emit it from wherever the change happens. The toolkit serves `events/list`, `events/subscribe` and `events/unsubscribe`, verifies each callback with a signed challenge, stores subscriptions in Redis with their signing secrets encrypted, and hands every delivery to QStash, which retries failed webhooks with backoff.
 
 <Frame>
   <img
