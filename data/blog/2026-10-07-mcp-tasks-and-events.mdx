@@ -109,7 +109,7 @@ On the server side, Events are even newer: OpenAI [announced ChatGPT support on 
 `@upstash/mcp-toolkit` is part of [Upstash AgentKit](https://github.com/upstash/agentkit/tree/main/packages/mcp-toolkit). It sits on top of the official MCP TypeScript SDK (`@modelcontextprotocol/server`) and adds two things the SDK doesn't have yet: durable long-running tools (`/tasks`) and the `events/*` methods (`/events`). It uses WebCrypto only, so it runs on Node and edge runtimes.
 
 ```bash
-npm install @upstash/mcp-toolkit @modelcontextprotocol/server
+npm install @upstash/mcp-toolkit @modelcontextprotocol/server zod
 ```
 
 `/tasks` and `/events` hold the generic parts; the Redis, QStash and Workflow backends for both come from `@upstash/mcp-toolkit/upstash`, and their clients are installed with the package.
@@ -223,20 +223,23 @@ QStash can't send the webhook to ChatGPT itself, because each attempt needs a fr
 // lib/events.ts
 import { McpServer } from "@modelcontextprotocol/server";
 import { createEventLayer } from "@upstash/mcp-toolkit/events";
-import { QStashDelivery, RedisSubscriptionStore } from "@upstash/mcp-toolkit/upstash";
+import {
+  QStashDelivery,
+  RedisSubscriptionStore,
+} from "@upstash/mcp-toolkit/upstash";
 import * as z from "zod";
 
 export const events = createEventLayer({
   store: new RedisSubscriptionStore(),
   delivery: new QStashDelivery({ url: `${process.env.APP_URL}/api/events` }),
-  // Encrypts the hosts' signing secrets at rest. Generate with: openssl rand -base64 32
+  // Encrypts hosts' signing secrets. 32+ random bytes: openssl rand -base64 32
   secretKey: process.env.MCP_EVENTS_SECRET_KEY,
   principal, // the same function as for tasks
 });
 
 export const commentCreated = events.define("comment.created", {
   description: "A new review comment was added to a document.",
-  input: z.object({ documentId: z.string() }), // what a subscriber filters on
+  input: z.object({ documentId: z.string() }), // what a subscriber filters on (also payload fields)
   payload: z.object({ documentId: z.string(), text: z.string() }), // what each delivery carries
   // Required. Runs when a host subscribes, and again before every delivery.
   authorize: (args, { principal }) => canRead(principal, args.documentId),
@@ -262,24 +265,7 @@ Then emit wherever a comment is created:
 await commentCreated.emit({ documentId: "doc_123", text: "Can we add rollout dates?" });
 ```
 
-`emit` is typed by the payload schema and reaches every subscription whose arguments match: everyone watching `doc_123`. `authorize` runs again for each subscriber before the delivery goes out, so someone who lost access to the document after subscribing stops getting its comments. For events that belong to one user, like "your export finished", mark the event `personal: true` and emit it with `to: userId`; the types won't let you forget. The callback-URL checks refuse private and internal addresses but don't resolve DNS, so add egress filtering in production, and never turn on `allowInsecureCallbacks` outside local development.
-
-The two halves also connect. Add one line to the task layer from earlier, and a `task.finished` event fires to the task's owner once it completes, fails or is cancelled:
-
-```ts
-import { taskFinishedEvent } from "@upstash/mcp-toolkit/events";
-
-const taskFinished = taskFinishedEvent(events);
-
-export const tasks = createTaskLayer({
-  store: new RedisTaskStore(),
-  dispatcher: new QStashDispatcher({ url: `${process.env.APP_URL}/api/execute` }),
-  principal,
-  onSettle: taskFinished.onSettle,
-});
-```
-
-A host that supports Events can subscribe to it and skip polling. We haven't tested that combination with ChatGPT yet.
+`emit` is typed by the payload schema, and the payload is the one place an event's values come from: every `input` field must also be a payload field. The event reaches every subscription whose arguments match those values: everyone watching `doc_123`. `authorize` runs again for each subscriber before the delivery goes out, with the event's own `documentId`, so someone who lost access to the document after subscribing stops getting its comments. The callback-URL checks refuse IP addresses and internal host names but don't resolve DNS, so add egress filtering in production, and never turn on `allowInsecureCallbacks` outside local development.
 
 ## Testing it with ChatGPT
 
