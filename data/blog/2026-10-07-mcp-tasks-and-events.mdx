@@ -189,6 +189,7 @@ export const commentCreated = events.define("comment.created", {
   description: "A new review comment was added to a document.",
   input: z.object({ documentId: z.string() }), // what a subscriber filters on
   payload: z.object({ documentId: z.string(), text: z.string() }), // what each delivery carries
+  // Required. Runs when a host subscribes, and again before every delivery.
   authorize: (args, { principal }) => canRead(principal, args.documentId),
 });
 
@@ -206,16 +207,13 @@ import { events } from "../../lib/events";
 export const POST = events.createDeliveryHandler();
 ```
 
-Then emit wherever a comment is created, naming who may see it:
+Then emit wherever a comment is created:
 
 ```ts
-await commentCreated.emit(
-  { documentId: "doc_123", text: "Can we add rollout dates?" },
-  { owners: await membersOf("doc_123") },
-);
+await commentCreated.emit({ documentId: "doc_123", text: "Can we add rollout dates?" });
 ```
 
-`emit` is typed by the payload schema and reaches only the named users' subscriptions whose arguments match. Naming the recipients is required, so one user's subscription can never receive another user's events. The callback-URL checks refuse private and internal addresses but don't resolve DNS, so add egress filtering in production, and never turn on `allowInsecureCallbacks` outside local development.
+`emit` is typed by the payload schema and reaches every subscription whose arguments match: everyone watching `doc_123`. `authorize` runs again for each subscriber before the delivery goes out, so someone who lost access to the document after subscribing stops getting its comments. For events that belong to one user, like "your export finished", mark the event `personal: true` and emit it with `to: userId`; the types won't let you forget. The callback-URL checks refuse private and internal addresses but don't resolve DNS, so add egress filtering in production, and never turn on `allowInsecureCallbacks` outside local development.
 
 The two halves also connect. Add one line to the task layer from earlier, and a `task.finished` event fires to the task's owner once it completes, fails or is cancelled:
 
@@ -267,7 +265,7 @@ ChatGPT turned "for production" into a subscription argument on its own. Then we
 
 So filtering happens in two places. Subscription arguments filter on your server, so the staging deploy never left it. The monitor's prompt filters on ChatGPT's side, so the successful deploy didn't produce a notification. The failure notification arrived about three minutes after delivery. That's fine for deploy alerts but not for anything time critical.
 
-One detail on users: every ChatGPT monitor gets its own callback URL and signing secret. Your server never learns who the ChatGPT user is. It just posts to the stored URL, and OpenAI routes it. What your server controls is who receives what, through `principal`, the owners each `emit` names, and `authorize`. The [docs](https://upstash.com/docs/redis/sdks/agentkit/mcp-events#users-and-subscriptions) cover this.
+One detail on users: every ChatGPT monitor gets its own callback URL and signing secret. Your server never learns who the ChatGPT user is. It just posts to the stored URL, and OpenAI routes it. What your server controls is who receives what, through `principal` and `authorize`. The [docs](https://upstash.com/docs/redis/sdks/agentkit/mcp-events#users-and-subscriptions) cover this.
 
 ## What's next: the native path, and Cloudflare
 
