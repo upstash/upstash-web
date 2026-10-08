@@ -228,6 +228,10 @@ Owning a task is not the same as being allowed to touch what it works on, though
 
 With `QStashDispatcher`, the handler still runs inside one function invocation, and a redelivery starts it over. For longer work, switch to `WorkflowDispatcher`, which runs each step as its own invocation and replays finished steps from a journal. The handler's `task` then also has Workflow's `task.run`, `task.sleep` and `task.call`, inferred from the dispatcher. Wrap the work in `task.run(...)` steps (each is still bound by your function limit). The task record lives for 1 day from creation by default and is never extended, so raise `ttlMs` for work that can take longer.
 
+#### What's next: the native path
+
+Polling through tools costs the model a few turns; the native extension doesn't, which makes it the right long-term shape. The task record and the execution sit behind two small interfaces, a `TaskStore` and a `TaskDispatcher`, and the task object already has the extension's shape, so once clients declare `io.modelcontextprotocol/tasks` a native adapter can serve the same records over `tasks/get` and keep the tools for everyone else.
+
 ### Events with @upstash/mcp-toolkit/events
 
 `/events` is the server side of MCP Events. With no finished standard to follow, it tracks what ChatGPT implements: webhook delivery, as described in OpenAI's guide. You define an event with a typed payload, register it on your server, and emit it from wherever the change happens. The toolkit serves the three `events/*` methods, verifies a new callback (or a new secret) with a signed challenge, stores subscriptions in Redis with their signing secrets encrypted, and hands every delivery to QStash.
@@ -249,6 +253,8 @@ With `QStashDispatcher`, the handler still runs inside one function invocation, 
     />
   </picture>
 </Frame>
+
+Why Redis and QStash, on serverless in particular: a function lives for one request, so neither the subscriptions nor a delivery that is still being retried can live inside it. Redis holds the subscriptions where every instance can read them, as plain keys that expire with the subscription plus a sorted set per event, over HTTP with no connection pool to manage, so an emit finds its subscribers in a couple of fast reads. QStash takes the part a function can't do: every delivery is a durable message that is retried with backoff long after the function that emitted it has returned, and one that runs out of retries lands in the dead-letter queue, where you can inspect it and send it again.
 
 QStash can't send the webhook to ChatGPT itself, because each attempt needs a fresh signature made with the subscriber's secret. So QStash calls a small route on your server with retries and backoff, and that route signs and sends the webhook.
 
@@ -340,10 +346,6 @@ ChatGPT turned "for production" into a subscription argument on its own. Then we
 So filtering happens in two places. Subscription arguments filter on your server, so the staging deploy never left it. The monitor's prompt filters on ChatGPT's side, so the successful deploy didn't produce a notification. The failure notification arrived about three minutes after delivery. That's fine for deploy alerts but not for anything time critical.
 
 One detail on users: every ChatGPT monitor gets its own callback URL and signing secret. Your server never learns who the ChatGPT user is. It just posts to the stored URL, and OpenAI routes it. What your server controls is who receives what, through `principal` and `authorize`. The [docs](https://upstash.com/docs/redis/sdks/agentkit/mcp-events#users-and-subscriptions) cover this.
-
-## What's next: the native path
-
-Polling through tools costs the model a few turns; the native extension doesn't, which makes it the right long-term shape. The task record and the execution sit behind two small interfaces, a `TaskStore` and a `TaskDispatcher`, and the task object already has the extension's shape, so once clients declare `io.modelcontextprotocol/tasks` a native adapter can serve the same records over `tasks/get` and keep the tools for everyone else.
 
 ## Try it
 
