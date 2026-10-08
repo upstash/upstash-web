@@ -42,8 +42,8 @@ A few details make this work:
 
 - **The client opts in.** It declares the tasks extension in its capabilities. A server must never hand a task to a client that didn't, because that client wouldn't know what to do with it.
 - **The server sets the pace.** Each task carries a `pollIntervalMs`, so the client knows how often to ask.
-- **States are simple.** A task is `working`, `input_required`, `completed`, `failed` or `cancelled`, and the last three never change again. When a task needs something from the user, it moves to `input_required` and the client answers with `tasks/update`. `tasks/cancel` stops it.
-- **The client polls, not the model.** That lets a host keep the polling out of the model's context, so a ten-minute job doesn't have to cost it extra turns. How much the model sees is up to the host.
+- **States are simple.** A task is `working`, `input_required`, `completed`, `failed` or `cancelled`, and the last three are final.
+- **The client polls, not the model.** A host can keep the polling out of the model's context, so a long job doesn't cost it extra turns.
 
 ## MCP Events: the server wakes the agent
 
@@ -73,7 +73,7 @@ What a server has to implement:
 
 - `events/list`, `events/subscribe` and `events/unsubscribe`, on the same endpoint as your tools.
 - A signed challenge to verify a callback URL before sending it real data.
-- Deliveries signed with [Standard Webhooks](https://www.standardwebhooks.com/) and retried with backoff. Each attempt gets a fresh signature, the event ID stays the same so the host can drop duplicates, and a `410` or `413` from the host is never retried.
+- Deliveries signed with [Standard Webhooks](https://www.standardwebhooks.com/) and retried with backoff.
 - Subscription storage that survives restarts, with an expiry the host refreshes.
 
 ## Tasks vs Events
@@ -102,25 +102,23 @@ This is the catch. As of October 7, 2026:
 | Cursor, OpenCode | ❌ | ❌ |
 | Official SDKs | C# and Rust ship task support; TypeScript and Python don't yet | None yet |
 
-On the server side, Events are even newer: OpenAI [announced ChatGPT support on September 29](https://techcrunch.com/2026/09/29/openai-expands-chatgpts-plugins-with-app-like-interfaces-and-automations/), ChatGPT's own Gmail, Slack and GitHub triggers predate the design, no popular third-party MCP server (Linear, Notion, Stripe, Sentry, …) emits events yet, and community starters like [mcp-events-starter](https://github.com/rohanprichard/mcp-events-starter) are examples to learn from. So almost no client accepts a native task, one client subscribes to events, and almost no servers emit them. If your product has events users care about, this is an early window.
+On the server side it's just as early: OpenAI [announced ChatGPT support on September 29](https://techcrunch.com/2026/09/29/openai-expands-chatgpts-plugins-with-app-like-interfaces-and-automations/), and no popular third-party MCP server emits events yet. If your product has events users care about, this is an early window.
 
 ## Our approach: @upstash/mcp-toolkit
 
-`@upstash/mcp-toolkit` is part of [Upstash AgentKit](https://github.com/upstash/agentkit/tree/main/packages/mcp-toolkit). It sits on top of the official MCP TypeScript SDK (`@modelcontextprotocol/server`) and adds two things the SDK doesn't have yet: durable long-running tools (`/tasks`) and the `events/*` methods (`/events`). It uses WebCrypto only, so it runs on Node and edge runtimes.
+`@upstash/mcp-toolkit` is part of [Upstash AgentKit](https://github.com/upstash/agentkit/tree/main/packages/mcp-toolkit). It sits on top of the official MCP TypeScript SDK and adds the two things it doesn't have yet: long-running tools (`/tasks`) and MCP Events (`/events`).
 
 ```bash
 npm install @upstash/mcp-toolkit @modelcontextprotocol/server mcp-handler zod
 ```
 
-`/tasks` and `/events` hold the generic parts; the Redis, QStash and Workflow backends for both come from `@upstash/mcp-toolkit/upstash`, and their clients are installed with the package.
-
-It reads `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` for Redis, `QSTASH_URL`, `QSTASH_TOKEN`, `QSTASH_CURRENT_SIGNING_KEY` and `QSTASH_NEXT_SIGNING_KEY` for QStash, and `MCP_EVENTS_SECRET_KEY` for events. `APP_URL` in the snippets below is your app's public URL.
+The Upstash backends come from `@upstash/mcp-toolkit/upstash` and read the usual variables: `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `QSTASH_URL`, `QSTASH_TOKEN`, the two QStash signing keys, and `MCP_EVENTS_SECRET_KEY` for events. `APP_URL` below is your app's public URL.
 
 ### Tasks with @upstash/mcp-toolkit/tasks
 
-`/tasks` gives you the same idea as Tasks, delivered as **ordinary MCP tools**, so it works in every client right now. The [MCP Tasks docs](https://upstash.com/docs/redis/sdks/agentkit/mcp-tasks) have the full setup.
+`/tasks` gives you the same idea as Tasks, as **ordinary MCP tools**, so it works in every client today.
 
-A task tool answers immediately with a task ID. Two shared tools, `task_status` and `task_cancel`, let the model check on it and stop it. The task record lives in Upstash Redis, and the work runs through QStash or Upstash Workflow, so it survives the process that accepted the call and isn't bound by the client's tool-call timeout.
+A task tool answers right away with a task ID, and two shared tools, `task_status` and `task_cancel`, check on it and stop it. The record lives in Redis and the work runs on QStash or Upstash Workflow, so it outlives the request and the client's timeout.
 
 <Frame>
   <picture>
@@ -140,7 +138,7 @@ A task tool answers immediately with a task ID. Two shared tools, `task_status` 
   </picture>
 </Frame>
 
-First, who is calling. Two functions, kept in one file so the path is easy to follow: `verifyToken` turns the request's bearer token into the SDK's `AuthInfo`, with your user ID in `extra`, and `principal` reads that user ID back out for the toolkit.
+First, who is calling. `verifyToken` checks the bearer token and puts your user ID in `AuthInfo`, and `principal` reads it back for the toolkit:
 
 ```ts
 // lib/auth.ts
@@ -191,7 +189,7 @@ tasks.define(
 );
 ```
 
-And two routes. The MCP endpoint, where `withMcpAuth` runs `verifyToken` before any tool sees the request:
+Then the MCP route, where `withMcpAuth` runs `verifyToken` on every request:
 
 ```ts
 // app/api/mcp/route.ts
@@ -207,7 +205,7 @@ const authHandler = withMcpAuth(handler, verifyToken, { required: true });
 export { authHandler as GET, authHandler as POST };
 ```
 
-And the endpoint QStash delivers to. Signature checks and retry status codes are handled for you:
+And the route QStash delivers the work to:
 
 ```ts
 // app/api/execute/route.ts
@@ -222,11 +220,11 @@ From the model's side, it looks like this:
 2. `task_status` returns progress while the task is working: "Researching sources".
 3. Once the task completes, `task_status` returns a one-line status followed by the report itself.
 
-Because the model drives these tools directly, one option matters most in production: **`principal`** is required and scopes every task to the user who started it. Another user's task ID reads as unknown, and a caller it can't identify is refused. The chain is the one in `lib/auth.ts`: `withMcpAuth` calls `verifyToken`, the `AuthInfo` it returns reaches the toolkit, and `principal` reads the user ID from it. Nothing is taken from request headers. Return your user ID, not `auth.clientId`, which identifies the OAuth app every ChatGPT user shares.
+`principal` scopes every task to the user who started it: another user's task ID reads as unknown. Return your own user ID, not `auth.clientId`, which every ChatGPT user shares.
 
-Owning a task is not the same as being allowed to touch what it works on, though. The model fills in the arguments, so if a task takes a `workspaceId`, anyone can pass someone else's, and the task (and its result) is still theirs. The handler runs later, in a QStash delivery that carries no user auth, so it can't check this on its own. Two things close the gap: an optional `authorize(args, { principal, auth })` on `tasks.define`, which runs when the tool is called, before anything is queued, and `task.principal` inside the handler, the user who started the task. Never take a user ID from the arguments.
+Owning a task isn't the same as being allowed to touch what it works on. If a task takes a `workspaceId`, the model can pass anyone's. Give `tasks.define` an `authorize` to check the arguments before the task is queued, and use `task.principal` inside the handler.
 
-With `QStashDispatcher`, the handler still runs inside one function invocation, and a redelivery starts it over. For longer work, switch to `WorkflowDispatcher`, which runs each step as its own invocation and replays finished steps from a journal. The handler's `task` then also has Workflow's `task.run`, `task.sleep` and `task.call`, inferred from the dispatcher. Wrap the work in `task.run(...)` steps (each is still bound by your function limit). The task record lives for 1 day from creation by default and is never extended, so raise `ttlMs` for work that can take longer.
+`QStashDispatcher` runs the whole handler in one function invocation. For longer work, switch to `WorkflowDispatcher`: each `task.run(...)` step gets its own invocation, and finished steps aren't repeated on a retry.
 
 #### What's next: the native path
 
@@ -234,7 +232,7 @@ Polling through tools costs the model a few turns; the native extension doesn't,
 
 ### Events with @upstash/mcp-toolkit/events
 
-`/events` is the server side of MCP Events. With no finished standard to follow, it tracks what ChatGPT implements: webhook delivery, as described in OpenAI's guide. You define an event with a typed payload, register it on your server, and emit it from wherever the change happens. The toolkit serves the three `events/*` methods, verifies a new callback (or a new secret) with a signed challenge, stores subscriptions in Redis with their signing secrets encrypted, and hands every delivery to QStash.
+`/events` is the server side of MCP Events, following what ChatGPT implements: webhook delivery. You define an event with a typed payload, register it on your server, and emit it when something happens. The toolkit handles the `events/*` methods, callback verification and signing.
 
 <Frame>
   <picture>
@@ -254,9 +252,9 @@ Polling through tools costs the model a few turns; the native extension doesn't,
   </picture>
 </Frame>
 
-Why Redis and QStash, on serverless in particular: a function lives for one request, so neither the subscriptions nor a delivery that is still being retried can live inside it. Redis holds the subscriptions where every instance can read them, as plain keys that expire with the subscription plus a sorted set per event, over HTTP with no connection pool to manage, so an emit finds its subscribers in a couple of fast reads. QStash takes the part a function can't do: every delivery is a durable message that is retried with backoff long after the function that emitted it has returned, and one that runs out of retries lands in the dead-letter queue, where you can inspect it and send it again.
+Why Redis and QStash? On serverless, nothing survives between requests. Redis keeps the subscriptions where every instance can read them, fast and over HTTP. QStash delivers each event after your function has returned, retries it with backoff, and keeps the ones that keep failing in a dead-letter queue.
 
-QStash can't send the webhook to ChatGPT itself, because each attempt needs a fresh signature made with the subscriber's secret. So QStash calls a small route on your server with retries and backoff, and that route signs and sends the webhook.
+QStash calls a small route on your server, which signs each attempt with the subscriber's secret and sends it to the host.
 
 ```ts
 // lib/events.ts
@@ -271,8 +269,6 @@ import { principal } from "./auth";
 export const events = createEventLayer({
   store: new RedisSubscriptionStore(),
   delivery: new QStashDelivery({ url: `${process.env.APP_URL}/api/events` }),
-  // Encrypts hosts' signing secrets. 32+ random bytes: openssl rand -base64 32
-  secretKey: process.env.MCP_EVENTS_SECRET_KEY,
   principal, // the same function as for tasks
 });
 
@@ -310,7 +306,7 @@ Then emit wherever a comment is created:
 await commentCreated.emit({ documentId: "doc_123", text: "Can we add rollout dates?" });
 ```
 
-`emit` is typed by the payload schema, and the payload is the one place an event's values come from: every `input` field must also be a payload field. The event reaches every subscription whose arguments match those values: everyone watching `doc_123`. `authorize` runs again for each subscriber before the delivery goes out, with the event's own `documentId`, so someone who lost access to the document after subscribing stops getting its comments. Each subscription is a webhook per matching emit, so a subscriber can hold at most 8 at a time by default (`maxSubscriptions`), checked before the server sends the verification challenge. The callback-URL checks refuse IP addresses and internal host names but don't resolve DNS, so add egress filtering in production, and never turn on `allowInsecureCallbacks` outside local development.
+`emit` reaches every subscription that matches the payload, here everyone watching `doc_123`. `authorize` runs again before each delivery, so someone who lost access stops getting comments. Subscription limits and callback URL checks are in the [docs](https://upstash.com/docs/redis/sdks/agentkit/mcp-events).
 
 ## Testing it with ChatGPT
 
@@ -343,15 +339,15 @@ ChatGPT turned "for production" into a subscription argument on its own. Then we
 | Production, succeeded | Delivered via QStash, `200` | Ran, stayed quiet as the prompt asked |
 | Production, failed | Delivered via QStash, `200` | Posted the failure and emailed us |
 
-So filtering happens in two places. Subscription arguments filter on your server, so the staging deploy never left it. The monitor's prompt filters on ChatGPT's side, so the successful deploy didn't produce a notification. The failure notification arrived about three minutes after delivery. That's fine for deploy alerts but not for anything time critical.
+So filtering happens in two places: subscription arguments on your server (the staging deploy never left it), and the monitor's prompt on ChatGPT's side (the successful deploy didn't notify us). The notification came about three minutes after delivery, fine for deploy alerts but not for anything time critical.
 
-One detail on users: every ChatGPT monitor gets its own callback URL and signing secret. Your server never learns who the ChatGPT user is. It just posts to the stored URL, and OpenAI routes it. What your server controls is who receives what, through `principal` and `authorize`. The [docs](https://upstash.com/docs/redis/sdks/agentkit/mcp-events#users-and-subscriptions) cover this.
+Each ChatGPT monitor gets its own callback URL, so your server never learns who the ChatGPT user is. It controls who receives what through `principal` and `authorize`.
 
 ## Try it
 
 - **Docs:** [MCP Tasks](https://upstash.com/docs/redis/sdks/agentkit/mcp-tasks) and [MCP Events](https://upstash.com/docs/redis/sdks/agentkit/mcp-events), each with a quickstart and every option
 - **Package:** [`packages/mcp-toolkit`](https://github.com/upstash/agentkit/tree/main/packages/mcp-toolkit)
-- **Demo:** [`examples/mcp-toolkit-demo`](https://github.com/upstash/agentkit/tree/main/examples/mcp-toolkit-demo), a Next.js app with Report Desk (tasks on QStash and Workflow) and Deploy Watch (a `deploy.finished` event), the two servers we tested with ChatGPT. It needs `MCP_EVENTS_SECRET_KEY` set, and its deploy-report endpoint is unauthenticated on purpose so it's easy to drive; a real server must authenticate it.
+- **Demo:** [`examples/mcp-toolkit-demo`](https://github.com/upstash/agentkit/tree/main/examples/mcp-toolkit-demo), a Next.js app with the two servers we tested with ChatGPT: Report Desk (tasks) and Deploy Watch (events).
 - **Specs:** the [Tasks extension](https://modelcontextprotocol.io/extensions/tasks/overview) and [OpenAI's MCP Events guide](https://developers.openai.com/plugins/build/mcp-events).
 
 If you build something with it, let us know on [X](https://x.com/upstash) or [GitHub](https://github.com/upstash/agentkit/issues).
