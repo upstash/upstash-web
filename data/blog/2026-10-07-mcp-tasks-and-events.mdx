@@ -115,7 +115,7 @@ import * as z from "zod";
 export const tasks = createTaskLayer({
   store: new RedisTaskStore(),
   dispatcher: new QStashDispatcher({ url: `${process.env.APP_URL}/api/execute` }),
-  principal: (auth) => auth?.extra?.userId as string | undefined, // who is calling
+  principal: ({ auth }) => auth?.extra?.userId as string | undefined, // who is calling
 });
 
 // Module scope, so the execute endpoint knows the handler on every instance.
@@ -153,7 +153,7 @@ From the model's side, it looks like this:
 
 Because the model drives these tools directly, two options matter in production:
 
-- **`principal`** is required and scopes every task to the user who started it. Another user's task ID reads as unknown, and a caller it can't identify is refused. It needs auth middleware that fills the request's `authInfo`, and it should return your user ID: `auth.clientId` identifies the OAuth app, which every ChatGPT user shares.
+- **`principal`** is required and scopes every task to the user who started it. Another user's task ID reads as unknown, and a caller it can't identify is refused. `auth` is the SDK's `AuthInfo`, which your MCP route fills in after verifying the bearer token (`handler.fetch(request, { authInfo })`); the SDK never derives it from headers. Return your user ID from it, not `auth.clientId`, which identifies the OAuth app every ChatGPT user shares. Cookie- or session-based apps can read `request` instead.
 - **`idempotencyKey`** turns an agent's retry into a read of the existing task, instead of starting the job twice.
 
 With `QStashDispatcher`, the handler still runs inside one function invocation, and a redelivery starts it over. For longer work, switch to `WorkflowDispatcher`, which runs each step as its own invocation and replays finished steps from a journal. That takes three changes: the `createTaskLayer<WorkflowContext>` type argument, the work wrapped in `task.run(...)` steps (each still bound by your function limit), and a longer `ttlMs`. The default record lifetime is 5 minutes from creation and is never extended, so long work needs more.
@@ -182,7 +182,7 @@ export const events = createEventLayer({
   delivery: new QStashDelivery({ url: `${process.env.APP_URL}/api/events` }),
   // Encrypts the hosts' signing secrets at rest. Generate with: openssl rand -base64 32
   secretKey: process.env.MCP_EVENTS_SECRET_KEY,
-  principal: (auth) => auth?.extra?.userId as string | undefined,
+  principal: ({ auth }) => auth?.extra?.userId as string | undefined,
 });
 
 export const commentCreated = events.define("comment.created", {
@@ -227,7 +227,7 @@ const taskFinished = taskFinishedEvent(events);
 export const tasks = createTaskLayer({
   store: new RedisTaskStore(),
   dispatcher: new QStashDispatcher({ url: `${process.env.APP_URL}/api/execute` }),
-  principal: (auth) => auth?.extra?.userId as string | undefined,
+  principal: ({ auth }) => auth?.extra?.userId as string | undefined,
   onSettle: taskFinished.onSettle,
 });
 ```
