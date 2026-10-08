@@ -109,7 +109,7 @@ On the server side, Events are even newer: OpenAI [announced ChatGPT support on 
 `@upstash/mcp-toolkit` is part of [Upstash AgentKit](https://github.com/upstash/agentkit/tree/main/packages/mcp-toolkit). It sits on top of the official MCP TypeScript SDK (`@modelcontextprotocol/server`) and adds two things the SDK doesn't have yet: durable long-running tools (`/tasks`) and the `events/*` methods (`/events`). It uses WebCrypto only, so it runs on Node and edge runtimes.
 
 ```bash
-npm install @upstash/mcp-toolkit @modelcontextprotocol/server zod
+npm install @upstash/mcp-toolkit @modelcontextprotocol/server mcp-handler zod
 ```
 
 `/tasks` and `/events` hold the generic parts; the Redis, QStash and Workflow backends for both come from `@upstash/mcp-toolkit/upstash`, and their clients are installed with the package.
@@ -140,22 +140,44 @@ A task tool answers immediately with a task ID. Two shared tools, `task_status` 
   </picture>
 </Frame>
 
+First, who is calling. Two functions, kept in one file so the path is easy to follow: `verifyToken` turns the request's bearer token into the SDK's `AuthInfo`, with your user ID in `extra`, and `principal` reads that user ID back out for the toolkit.
+
+```ts
+// lib/auth.ts
+import type { AuthInfo } from "@modelcontextprotocol/server";
+
+// 1. Runs on every MCP request (wired up with withMcpAuth below).
+//    Returning undefined answers 401.
+export async function verifyToken(
+  req: Request,
+  bearerToken?: string,
+): Promise<AuthInfo | undefined> {
+  if (!bearerToken) return undefined;
+  const { sub, client_id } = await verifyJwt(bearerToken); // Clerk, WorkOS, Auth0, your own
+  return { token: bearerToken, clientId: client_id, scopes: [], extra: { userId: sub } };
+}
+
+// 2. The toolkit calls this with the AuthInfo above. Return the user ID, or throw.
+export function principal({ auth }: { auth?: AuthInfo }): string {
+  const userId = auth?.extra?.userId;
+  if (typeof userId !== "string") throw new Error("Not authenticated");
+  return userId;
+}
+```
+
+Then the task layer and a task:
+
 ```ts
 // lib/tasks.ts
-import { McpServer } from "@modelcontextprotocol/server";
 import { createTaskLayer } from "@upstash/mcp-toolkit/tasks";
 import { QStashDispatcher, RedisTaskStore } from "@upstash/mcp-toolkit/upstash";
 import * as z from "zod";
+import { principal } from "./auth";
 
 export const tasks = createTaskLayer({
   store: new RedisTaskStore(),
   dispatcher: new QStashDispatcher({ url: `${process.env.APP_URL}/api/execute` }),
-  // Who is calling: your user ID from the verified token. Throw when there is none.
-  principal: ({ auth }) => {
-    const userId = auth?.extra?.userId;
-    if (typeof userId !== "string") throw new Error("Not authenticated");
-    return userId;
-  },
+  principal,
 });
 
 // Module scope, so the execute endpoint knows the handler on every instance.
@@ -167,20 +189,29 @@ tasks.define(
     return { content: [{ type: "text", text: await writeReport(topic) }] };
   },
 );
-
-// Per request: adds generate_report, task_status and task_cancel.
-export function createServer() {
-  const server = new McpServer({ name: "reports", version: "1.0.0" });
-  tasks.register(server);
-  return server;
-}
 ```
 
-Then one line for the endpoint QStash delivers to. Signature checks and retry status codes are handled for you:
+And two routes. The MCP endpoint, where `withMcpAuth` runs `verifyToken` before any tool sees the request:
+
+```ts
+// app/api/mcp/route.ts
+import { createMcpHandler, withMcpAuth } from "mcp-handler";
+import { verifyToken } from "@/lib/auth";
+import { tasks } from "@/lib/tasks";
+
+const handler = createMcpHandler((server) => {
+  tasks.register(server); // generate_report, task_status and task_cancel
+});
+
+const authHandler = withMcpAuth(handler, verifyToken, { required: true });
+export { authHandler as GET, authHandler as POST };
+```
+
+And the endpoint QStash delivers to. Signature checks and retry status codes are handled for you:
 
 ```ts
 // app/api/execute/route.ts
-import { tasks } from "../../lib/tasks";
+import { tasks } from "@/lib/tasks";
 
 export const POST = tasks.createExecuteHandler();
 ```
@@ -191,7 +222,7 @@ From the model's side, it looks like this:
 2. `task_status` returns progress while the task is working: "Researching sources".
 3. Once the task completes, `task_status` returns a one-line status followed by the report itself.
 
-Because the model drives these tools directly, one option matters most in production: **`principal`** is required and scopes every task to the user who started it. Another user's task ID reads as unknown, and a caller it can't identify is refused. `auth` is the SDK's `AuthInfo`, which your MCP route fills in after verifying the bearer token (`handler.fetch(request, { authInfo })`); the SDK never derives it from headers. Return your user ID from it, not `auth.clientId`, which identifies the OAuth app every ChatGPT user shares. Cookie- or session-based apps can read `request` instead.
+Because the model drives these tools directly, one option matters most in production: **`principal`** is required and scopes every task to the user who started it. Another user's task ID reads as unknown, and a caller it can't identify is refused. The chain is the one in `lib/auth.ts`: `withMcpAuth` calls `verifyToken`, the `AuthInfo` it returns reaches the toolkit, and `principal` reads the user ID from it. Nothing is taken from request headers. Return your user ID, not `auth.clientId`, which identifies the OAuth app every ChatGPT user shares.
 
 Owning a task is not the same as being allowed to touch what it works on, though. The model fills in the arguments, so if a task takes a `workspaceId`, anyone can pass someone else's, and the task (and its result) is still theirs. The handler runs later, in a QStash delivery that carries no user auth, so it can't check this on its own. Two things close the gap: an optional `authorize(args, { principal, auth })` on `tasks.define`, which runs when the tool is called, before anything is queued, and `task.principal` inside the handler, the user who started the task. Never take a user ID from the arguments.
 
@@ -223,13 +254,13 @@ QStash can't send the webhook to ChatGPT itself, because each attempt needs a fr
 
 ```ts
 // lib/events.ts
-import { McpServer } from "@modelcontextprotocol/server";
 import { createEventLayer } from "@upstash/mcp-toolkit/events";
 import {
   QStashDelivery,
   RedisSubscriptionStore,
 } from "@upstash/mcp-toolkit/upstash";
 import * as z from "zod";
+import { principal } from "./auth";
 
 export const events = createEventLayer({
   store: new RedisSubscriptionStore(),
@@ -246,17 +277,23 @@ export const commentCreated = events.define("comment.created", {
   // Required. Runs when a host subscribes, and again before every delivery.
   authorize: (args, { principal }) => canRead(principal, args.documentId),
 });
-
-export function createServer() {
-  const server = new McpServer({ name: "docs", version: "1.0.0" });
-  events.register(server); // events/list, events/subscribe, events/unsubscribe
-  return server;
-}
 ```
+
+Register the events in the same MCP route, next to the tasks, so subscriptions go through the same `withMcpAuth`:
+
+```ts
+// app/api/mcp/route.ts
+const handler = createMcpHandler((server) => {
+  tasks.register(server);
+  events.register(server); // events/list, events/subscribe, events/unsubscribe
+});
+```
+
+And add the route QStash delivers each event to:
 
 ```ts
 // app/api/events/route.ts
-import { events } from "../../lib/events";
+import { events } from "@/lib/events";
 
 export const POST = events.createDeliveryHandler();
 ```
