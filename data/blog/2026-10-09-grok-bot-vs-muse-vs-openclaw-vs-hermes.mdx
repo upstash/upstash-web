@@ -1,0 +1,142 @@
+---
+slug: grok-bot-vs-muse-vs-openclaw-vs-hermes
+title: "Grok Bot vs Muse vs OpenClaw vs Hermes: Personal AI Agents Compared (2026)"
+authors: [alitarik]
+tags: [ai, agents, mcp, box]
+description: "A plain comparison of four personal AI agents people are actually using in 2026: Grok Bot, Meta Muse, OpenClaw and Hermes. What each one is good at, what it costs, and where it runs."
+---
+
+Two months ago "personal AI agent" mostly meant OpenClaw running on someone's Mac mini. Then Grok Bot shipped in August and Meta Muse in September, and Hermes grew into a serious open-source alternative to OpenClaw. So the obvious question now is which one to use.
+
+The four split into two pairs. Grok Bot and Muse are hosted products you sign up for: the vendor runs the computer, decides which models you can use and keeps your data. OpenClaw and Hermes are open-source projects you run yourself: you pick the model and keep the data, and you also keep the machine running. Same problem, very different trade-offs.
+
+<Summary>
+  - Hosted agents (Grok Bot, Muse) are the easiest start. You don't run anything, but you don't pick the model or where your data lives either.
+  - Open-source agents (OpenClaw, Hermes) give you the model choice and the data. You also get the upkeep: a machine, updates, and security.
+  - MCP support is now normal. The difference is who can add a server: you, or only the vendor.
+  - Pick by the job. Errands, computer tasks and "I want to own it" point to different agents.
+</Summary>
+
+---
+
+## The short version
+
+| Agent | Open source | MCP | Where it runs | Entry price |
+| --- | --- | --- | --- | --- |
+| Grok Bot | No | Yes, plugins and custom servers | Hosted cloud computer | Included with paid Cursor or SuperGrok plans |
+| Meta Muse | No | Through Meta's reviewed connector directory | Hosted, US and Canada | Free tier, then $20 or $100 a month |
+| OpenClaw | Yes, MIT | Yes, native | Your own machine or server | Free, you pay for hosting and the model |
+| Hermes Agent | Yes, MIT | Yes, native | Your own machine or server | Free, you pay for hosting and the model |
+
+Prices and availability are as of early October 2026. All of these change fast.
+
+## Hosted agents
+
+### Grok Bot
+
+[Grok Bot](https://docs.x.ai/grok-bot/overview) from SpaceXAI gives you named Bots that each work on a persistent cloud computer with a browser, a filesystem and a terminal. You message them from the desktop or mobile app, and they keep working when your laptop is closed.
+
+What I like:
+
+- **Several Bots, one team.** They run in parallel, message each other and hand tasks over.
+- **Skills from demonstration.** You walk a Bot through a workflow once and it can save it as a skill and run it on a schedule.
+- **Easy MCP.** Connectors install as plugins from the Marketplace, and you can add custom MCP servers too.
+
+What to know:
+
+- **Hosted only.** It runs only on Cursor-hosted cloud computers. No self-hosting, no running it inside your own network.
+- **One computer per user.** All your Bots share the same files, browser sessions and logins. Separate Bots are not separate security boundaries.
+- **No model picker.** The model is managed for you.
+
+Pricing: it's included with every paid individual Cursor plan and Cursor Teams, or with a linked SuperGrok subscription. Usage resets weekly.
+
+Through MCP it can also drive machines outside its own, for example [an Upstash Box used as a second remote computer](https://upstash.com/blog/i-gave-grok-bot-a-remote-computer).
+
+### Meta Muse
+
+[Muse](https://about.fb.com/news/2026/09/introducing-muse-personal-ai-agent/) is Meta's consumer agent. It runs on a dedicated "Muse Secure VM" with its own browser, and you talk to it in the Muse app or in WhatsApp.
+
+What I like:
+
+- **No learning curve.** It's built for errands: email, bookings, shopping, plans.
+- **A thoughtful safety design.** A separate Sentinel agent has to approve anything Muse sends to the internet. Muse can't see your passwords or payment methods, and checkout goes through one-time cards.
+- **Free to start.** Most everyday use is free.
+
+What to know:
+
+- **Limited regions.** It launched in the US and has since reached Canada. No other countries yet.
+- **Locked to Meta's model.** It runs on Muse Spark.
+- **Training is opt-out.** You can opt out of your interactions being used to train Meta's models.
+- **MCP is for developers, not users.** Meta's connector platform accepts MCP servers, but they go through Meta's review before they show up in the directory.
+
+Pricing: free with a weekly limit, then [Power at $20 a month or Maximum at $100 a month](https://www.meta.com/help/subscriptions/1021145227643680/).
+
+## Open-source agents
+
+### OpenClaw
+
+[OpenClaw](https://github.com/openclaw/openclaw) is the one that started this whole wave. It's an open-source personal assistant that runs on your own machine and talks to you through the chat apps you already use: WhatsApp, Telegram, Slack, Discord, iMessage, Signal, Teams and more. One Gateway process connects your model, tools and channels.
+
+It's MIT licensed and sits at over 390k GitHub stars.
+
+What I like:
+
+- **Every channel.** If you want an assistant in your existing chats, nothing else covers as many.
+- **Any model.** You bring your provider.
+- **Huge ecosystem** of skills and community guides.
+- **Native MCP.** You register MCP servers in its config or with the `openclaw mcp` CLI.
+
+What to know:
+
+- **You run it.** The daemon, updates and channel setup are on you.
+- **Tools run on the host by default**, unless you configure sandboxing.
+- **Be careful with skills.** Security researchers found hundreds of [malicious skills on ClawHub](https://labs.cloudsecurityalliance.org/research/csa-research-note-openclaw-clawhub-supply-chain-risk-2026070/) this year. Read what you install.
+
+Where it runs: macOS, Linux or Windows, so a laptop, a Mac mini, a VPS, or a cloud sandbox like Upstash Box ([setup guide](https://upstash.com/docs/box/guides/openclaw-setup)). Since tools run on the host, a machine that isn't your personal one is the safer default.
+
+### Hermes Agent
+
+[Hermes Agent](https://github.com/NousResearch/hermes-agent) from Nous Research is the closest open-source alternative to OpenClaw. It has a terminal UI and a messaging gateway (WhatsApp, Telegram, Slack, Discord, Signal, email and more), its own cron scheduler, memory across sessions, and a learning loop that turns repeated work into skills.
+
+It's MIT licensed with over 250k GitHub stars.
+
+What I like:
+
+- **Any model, easy to switch.** `hermes model` and you're on another provider.
+- **Runs on many backends.** Local, Docker, SSH, Modal, Daytona and more.
+- **MCP both ways.** It connects to MCP servers, and it can also act as one with `hermes mcp serve`.
+- **Cron with delivery.** "Send me a summary every morning" lands in your chat.
+
+What to know:
+
+- **You own the config, secrets and updates.**
+- **The install is big.** It wants a real machine with some memory.
+- **Smaller ecosystem** than OpenClaw, though it's growing fast.
+
+Where it runs: anything from a $5 VPS to a GPU box, plus serverless backends like Modal and Daytona that sleep when idle. It also runs on a cloud sandbox like Upstash Box ([setup guide](https://upstash.com/docs/box/guides/hermes-setup), and a [WhatsApp walkthrough](https://upstash.com/blog/personal-assistant-in-messaging-apps-hermes-upstash-box)).
+
+## Where do the open-source ones run?
+
+This is the question the hosted agents answer for you, and the open-source ones leave to you. A messaging assistant is only useful if it answers, so whatever you pick has to stay on.
+
+- **Your laptop.** Fine for trying it out. It stops when the lid closes, and the agent runs next to your own files and logins.
+- **A Mac mini or home server.** Always on and cheap once you own it, and handy if you want the agent close to your own devices. You maintain the hardware and the network.
+- **A VPS.** Always on and reachable from anywhere. You take on the server: updates, disk, a process manager, firewall rules.
+- **A cloud sandbox.** An isolated Linux machine you don't have to administer, such as Upstash Box, Modal or Daytona. Some sleep when idle, which suits scheduled jobs. For a chat gateway you want one that stays up, like a [keep-alive Box](https://upstash.com/docs/box/overall/keep-alive) with an init script that restarts the gateway.
+
+Whichever you choose, the point is the same: give the agent its own computer instead of yours, and keep its config, memory and sessions somewhere you control.
+
+## How I'd pick
+
+- **Personal errands, no setup, you're in the US or Canada:** Muse.
+- **Computer tasks, several agents working together, you already pay for Cursor or SuperGrok:** Grok Bot.
+- **You want to pick the model and keep the data:** OpenClaw for the most channels and the biggest ecosystem, Hermes for a leaner setup with cron and MCP built in.
+
+Whichever you choose, start with read-only tasks and give it more access as you trust it. Every one of these can send, buy or delete if you let it.
+
+## Links
+
+- [Grok Bot docs](https://docs.x.ai/grok-bot/overview)
+- [Introducing Muse](https://about.fb.com/news/2026/09/introducing-muse-personal-ai-agent/)
+- [OpenClaw](https://github.com/openclaw/openclaw)
+- [Hermes Agent](https://github.com/NousResearch/hermes-agent)
