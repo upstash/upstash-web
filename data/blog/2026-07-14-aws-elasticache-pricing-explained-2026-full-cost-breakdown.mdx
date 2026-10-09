@@ -171,10 +171,10 @@ The old 750-hour model excluded serverless, so on a newer account the credits ar
 | --- | --- | --- | --- |
 | Billing unit | GB-hours + ECPUs | node-hours | commands + storage |
 | Idle monthly cost | $6.13 minimum | $9.34 (cheapest node) | $0 |
-| Free tier | $100-$200 in credits | 750 hrs of t3.micro (older accounts) | 256 MB, 500K commands/month |
+| Free tier | $100-$200 in credits | 750 hrs of t3.micro (older accounts) | 250 MB, 500K commands/month |
 | Fixed-price option | Savings Plan, up to 30% off | reserved nodes, up to 55% off | fixed plans, $10 to $1,500/month |
 
-![Upstash Pricing as of July 2026](https://cdn.bydefault.so/hUqOERGHNZZCnj5IOwQLr.png)
+See the [current Upstash Redis pricing](https://upstash.com/pricing/redis) for plan limits and prices.
 
 Example for a small workload: a dev cache running 1M commands per month with under 1 GB of data costs $2 on Upstash pay-as-you-go (10 x $0.20), against the $6.13 idle minimum on Valkey serverless and $91.25 on Redis OSS serverless.
 

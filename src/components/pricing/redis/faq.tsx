@@ -24,7 +24,7 @@ export default function FAQ() {
       <AccordionItem value="item-2">
         <AccordionTrigger>What is included in free tier?</AccordionTrigger>
         <AccordionContent>
-          Free tier includes 256MB data size and 500K commands per month.
+          Free tier includes 250MB data size and 500K commands per month.
         </AccordionContent>
       </AccordionItem>
 
@@ -52,7 +52,7 @@ export default function FAQ() {
 
       <AccordionItem value="item-3">
         <AccordionTrigger>
-          Are paid databases&apos; first 256MB data and 500K commands free?
+          Are paid databases&apos; first 250MB data and 500K commands free?
         </AccordionTrigger>
         <AccordionContent>
           No. Once you upgrade to a paid tier, you will be charged for data size

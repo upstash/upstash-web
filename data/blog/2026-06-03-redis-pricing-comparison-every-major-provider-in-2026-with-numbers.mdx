@@ -32,7 +32,7 @@ I checked all prices below against official pricing pages in June 2026, so check
 
 | Provider | Engine | Billing model | Entry price | Free tier | Best for |
 | --- | --- | --- | --- | --- | --- |
-| Upstash | Redis-compatible | Per request + storage or fixed plan w/ unlimited commands | $0 | 256 MB, 500K commands/mo | Serverless, scaling, high-frequency workloads |
+| Upstash | Redis-compatible | Per request + storage or fixed plan w/ unlimited commands | $0 | 250 MB, 500K commands/mo | Serverless, scaling, high-frequency workloads |
 | AWS ElastiCache | Valkey / Redis OSS | Per node-hour | \~$12/mo (cache.t4g.micro) | None (12-mo trial only) | High sustained throughput on AWS |
 | AWS MemoryDB | Valkey / Redis OSS | Per node-hour + per GB written | \~$315/mo | None | Redis as a durable primary database |
 | Redis Cloud | Redis 8 | Per usable GB | $0 (30 MB) | 30 MB | Redis modules, Active-Active |
@@ -52,7 +52,7 @@ Railway is a bit different: it doesn't sell a managed Redis tier, so you deploy 
 
 Upstash has two billing models: Pay-as-you go and fixed plans.
 
-Pay-as-you-go databases charge per command and per GB of storage. The free tier covers 256 MB and 500,000 commands a month. [Pay-as-you-go](https://upstash.com/pricing/redis) is $0.20 per 100,000 commands plus $0.25 per GB-month of storage beyond the first 1 GB, which is free, and there's no bandwidth charge.
+Pay-as-you-go databases charge per command and per GB of storage. The free tier covers 250 MB and 500,000 commands a month. [Pay-as-you-go](https://upstash.com/pricing/redis) is $0.20 per 100,000 commands plus $0.25 per GB-month of storage beyond the first 1 GB, which is free, and there's no bandwidth charge.
 
 There are also fixed plans, a flat monthly price with unlimited commands. This is especially useful for workloads with a lot of commands. Here are the plans:
 
@@ -68,7 +68,7 @@ There are also fixed plans, a flat monthly price with unlimited commands. This i
 
 A read replica in another region costs about half the plan price, so serving reads from several regions roughly multiplies the bill by how many regions you use.
 
-![Upstash Free, Pay as You Go, and Fixed plans as of June 2026](https://cdn.contentport.io/chat/Sw016rSl6asUNtj0EpHf3DiBcD0ot3sQ/aauUsSx9UNOwaV4-H1Y7I.png)
+See the [current Upstash Redis pricing](https://upstash.com/pricing/redis) for plan limits and prices.
 
 The pay-as-you-go model works well when traffic is low or spiky, because idle time costs nothing but storage.
 
@@ -280,7 +280,7 @@ What Valkey does not include is the Redis modules: RediSearch, RedisJSON, RedisT
 
 ## FAQ
 
-**Is there a free Redis tier?** Upstash (256 MB, 500K commands/mo) and Aiven (1 GB) both offer free tiers with no card and no expiration. Redis Cloud has 30 MB. Google, Azure, MemoryDB, and DigitalOcean have none; AWS offers a 12-month trial node only.
+**Is there a free Redis tier?** Upstash (250 MB, 500K commands/mo) and Aiven (1 GB) both offer free tiers with no card and no expiration. Redis Cloud has 30 MB. Google, Azure, MemoryDB, and DigitalOcean have none; AWS offers a 12-month trial node only.
 
 **What's the cheapest managed Redis for a small app?** The Upstash free tier at $0 includes 500,000 commands/mo and doesn't need a credit card. Then pay-as-you-go for $0.20 per 100,000 commands. Or a $12/mo ElastiCache `t4g.micro`.
 
