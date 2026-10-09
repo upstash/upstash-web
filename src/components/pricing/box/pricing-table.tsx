@@ -2,11 +2,11 @@
 
 import Button from "@/components/button";
 import {
-  BOX_ENTERPRISE_PLAN,
   BOX_FREE_PLAN,
   BOX_KEEPALIVE_PLAN,
   BOX_PAYG_PLAN,
   BOX_SIZES,
+  type BoxSize,
 } from "@/data/pricing/box";
 import { useTrackHover } from "@/hooks/use-track-hover";
 import * as React from "react";
@@ -17,13 +17,21 @@ export default function PricingTable() {
   const freeHover = useTrackHover({ product: "box", plan: "free" });
   const paygHover = useTrackHover({ product: "box", plan: "payg" });
   const keepAliveHover = useTrackHover({ product: "box", plan: "keepalive" });
-  const enterpriseHover = useTrackHover({ product: "box", plan: "enterprise" });
+  const [paygSizeId, setPaygSizeId] = React.useState<BoxSize["id"]>(
+    defaultSize.id,
+  );
+  const [keepAliveSizeId, setKeepAliveSizeId] = React.useState<BoxSize["id"]>(
+    defaultSize.id,
+  );
+  const paygSize = BOX_SIZES.find((s) => s.id === paygSizeId) ?? defaultSize;
+  const keepAliveSize =
+    BOX_SIZES.find((s) => s.id === keepAliveSizeId) ?? defaultSize;
 
   return (
     <div
       data-area="pricing_table"
       data-product="box"
-      className="grid gap-6 md:grid-cols-2 xl:grid-cols-4"
+      className="grid gap-6 md:grid-cols-3"
     >
       {/* FREE */}
       <div
@@ -74,11 +82,21 @@ export default function PricingTable() {
         className="flex flex-col items-center gap-4 rounded-4xl border-2 border-primary bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute"
       >
         <div className="grow text-center">
-          <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
-            {BOX_PAYG_PLAN.name}
+          <h4 className="mb-4 text-xl font-semibold text-primary-text">
+            <select
+              className="w-auto rounded-xl bg-bg-mute px-4 py-1 font-bold"
+              value={paygSizeId}
+              onChange={(e) => setPaygSizeId(e.target.value as BoxSize["id"])}
+            >
+              {BOX_SIZES.map((size) => (
+                <option key={size.id} value={size.id}>
+                  PAYG {size.label}
+                </option>
+              ))}
+            </select>
           </h4>
           <h5 className="text-2xl font-semibold">
-            ${defaultSize.cpuHourPrice.toFixed(2)}
+            ${paygSize.cpuHourPrice.toFixed(2)}
           </h5>
           <p className="text-sm text-text-mute">per active CPU hour</p>
         </div>
@@ -93,12 +111,12 @@ export default function PricingTable() {
           <div className="py-3">
             <p className="text-text-mute">Resources</p>
             <p className="font-semibold">
-              {defaultSize.cpu}, {defaultSize.memory}
+              {paygSize.cpu}, {paygSize.memory}
             </p>
           </div>
           <div className="py-3">
             <p className="text-text-mute">Included Storage</p>
-            <p className="font-semibold">{defaultSize.storage}</p>
+            <p className="font-semibold">{paygSize.storage}</p>
           </div>
         </div>
 
@@ -118,11 +136,23 @@ export default function PricingTable() {
         className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute"
       >
         <div className="grow text-center">
-          <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
-            {BOX_KEEPALIVE_PLAN.name}
+          <h4 className="mb-4 text-xl font-semibold text-primary-text">
+            <select
+              className="w-auto rounded-xl bg-bg-mute px-4 py-1 font-bold"
+              value={keepAliveSizeId}
+              onChange={(e) =>
+                setKeepAliveSizeId(e.target.value as BoxSize["id"])
+              }
+            >
+              {BOX_SIZES.map((size) => (
+                <option key={size.id} value={size.id}>
+                  {BOX_KEEPALIVE_PLAN.name} {size.label}
+                </option>
+              ))}
+            </select>
           </h4>
           <h5 className="text-2xl font-semibold">
-            ${defaultSize.keepAlivePrice}
+            ${keepAliveSize.keepAlivePrice}
           </h5>
           <p className="text-sm text-text-mute">
             {BOX_KEEPALIVE_PLAN.priceSubtext}
@@ -139,7 +169,7 @@ export default function PricingTable() {
           <div className="py-3">
             <p className="text-text-mute">Resources</p>
             <p className="font-semibold">
-              {defaultSize.cpu}, {defaultSize.memory}
+              {keepAliveSize.cpu}, {keepAliveSize.memory}
             </p>
           </div>
           <div className="py-3">
@@ -152,54 +182,6 @@ export default function PricingTable() {
           <Button asChild variant="primary">
             <a target="_self" href="https://console.upstash.com">
               Start Now
-            </a>
-          </Button>
-        </div>
-      </div>
-
-      {/* Enterprise */}
-      <div
-        data-plan="enterprise"
-        {...enterpriseHover}
-        className="flex flex-col items-center gap-4 rounded-4xl bg-white p-6 shadow sm:gap-6 sm:p-8 dark:border-bg-mute dark:bg-bg-mute"
-      >
-        <div className="grow">
-          <h4 className="mb-4 py-1 text-xl font-bold text-primary-text">
-            {BOX_ENTERPRISE_PLAN.name}
-          </h4>
-          <h5 className="text-2xl font-semibold">
-            {BOX_ENTERPRISE_PLAN.priceDisplay}
-          </h5>
-          <p className="text-sm text-text-mute">
-            {BOX_ENTERPRISE_PLAN.priceSubtext}
-          </p>
-        </div>
-
-        <div className="grow">
-          <div className="text-balance rounded-lg bg-bg-mute px-3 py-2 text-sm text-primary-text dark:text-text-mute">
-            {BOX_ENTERPRISE_PLAN.description}
-          </div>
-        </div>
-
-        <div className="w-full px-6 *:border-b *:border-bg-mute">
-          <div className="py-3">
-            <p className="text-text-mute">Box Sizes</p>
-            <p className="font-semibold">
-              {BOX_SIZES.map((s) => s.label).join(", ")}
-            </p>
-          </div>
-          <div className="py-3">
-            <p className="text-text-mute">Limits</p>
-            <p className="font-semibold">
-              {BOX_ENTERPRISE_PLAN.maxConcurrentBoxes}
-            </p>
-          </div>
-        </div>
-
-        <div>
-          <Button asChild variant="primary">
-            <a target="_self" href="/contact">
-              Contact Us
             </a>
           </Button>
         </div>
