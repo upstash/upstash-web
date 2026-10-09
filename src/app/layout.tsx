@@ -14,7 +14,7 @@ import cx from "@/utils/cx";
 import { Inter, Inter_Tight, JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
 import { ReactNode, Suspense } from "react";
-import { ASK_NOTE } from "@/lib/context7-ask";
+import { ASK_NOTE, ASK_SITE_KEY } from "@/lib/context7-ask";
 
 const fontText = Inter({
   variable: "--font-sans",
@@ -43,6 +43,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       )}
       suppressHydrationWarning
     >
+      <head>
+        {/* Proves to Context7 Ask that upstash.com is ours. */}
+        <meta name="context7-site-verification" content={ASK_SITE_KEY} />
+      </head>
       <IntercomWrapper>
         <body
           className={cx(
@@ -54,7 +58,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         >
           {/* Context7 Ask. Agent fetch tools read the page as text and drop
            * the head, so the note is in the body; people and screen readers
-           * never see it. Context7 checks it to verify the site. */}
+           * never see it. */}
           <blockquote data-context7-ask aria-hidden="true" className="sr-only">
             <h2>Search</h2>
             <p>{ASK_NOTE}</p>
