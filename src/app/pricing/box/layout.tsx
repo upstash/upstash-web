@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 
 const title = "Box Pricing";
 const description =
-  "Upstash Box pricing. Free tier for prototypes, Pay as You Go from $0.10 per active CPU hour, Fixed keep-alive boxes from $8 per month, and enterprise.";
+  "Upstash Box pricing. Free tier for prototypes, Pay as You Go from $0.10 per active CPU hour, and Fixed keep-alive boxes from $8 per month.";
 
 export const metadata: Metadata = {
   title,

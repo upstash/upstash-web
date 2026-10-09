@@ -39,8 +39,6 @@ This site has a search endpoint: https://context7.com/api/v2/ask?siteKey=ask_4cf
 - [Vector Pricing (Markdown)](https://upstash.com/pricing/vector.md): Machine-readable Vector pricing
 - [Workflow Pricing](https://upstash.com/pricing/workflow): Free, Pay-as-you-go ($1/100K steps), Fixed 1M ($180/month), Fixed 10M ($420/month)
 - [Workflow Pricing (Markdown)](https://upstash.com/pricing/workflow.md): Machine-readable Workflow pricing
-- [Search Pricing](https://upstash.com/pricing/search): Free, Pay-as-you-go ($0.05/1K requests), Pro (coming soon) — Preview/Early Access
-- [Search Pricing (Markdown)](https://upstash.com/pricing/search.md): Machine-readable Search pricing
 - [Box Pricing](https://upstash.com/pricing/box): Free, Pay-as-you-go ($0.10–$0.40/active CPU hour by size), Enterprise
 - [Box Pricing (Markdown)](https://upstash.com/pricing/box.md): Machine-readable Box pricing
 

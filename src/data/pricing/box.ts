@@ -14,7 +14,7 @@ export interface BoxSize {
 export interface BoxPlan {
   id: string;
   name: string;
-  type: "free" | "payg" | "keepalive" | "enterprise";
+  type: "free" | "payg" | "keepalive";
   description: string;
   priceDisplay: string;
   priceSubtext: string;
@@ -91,7 +91,7 @@ export const BOX_PAYG_PLAN: BoxPlan = {
   name: "Pay as You Go",
   type: "payg",
   description:
-    "Pay only when your box is active. Choose the size that matches your workload.",
+    "Pay for active time only. Boxes pause when idle.",
   priceDisplay: "$0.10–$0.40",
   priceSubtext: "per active CPU hour",
   maxConcurrentBoxes: 1000,
@@ -112,7 +112,7 @@ export const BOX_KEEPALIVE_PLAN: BoxPlan = {
   name: "Fixed",
   type: "keepalive",
   description:
-    "Keep-alive boxes that never pause. One fixed monthly price per box, no separate CPU or storage charges.",
+    "Always-on boxes. One monthly price, no usage charges.",
   priceDisplay: "$8–$32",
   priceSubtext: "per box / month",
   maxConcurrentBoxes: 1000,
@@ -126,30 +126,10 @@ export const BOX_KEEPALIVE_PLAN: BoxPlan = {
   dedicatedSupport: false,
 };
 
-export const BOX_ENTERPRISE_PLAN: BoxPlan = {
-  id: "enterprise",
-  name: "Enterprise",
-  type: "enterprise",
-  description:
-    "For teams that need custom limits, regional requirements, or dedicated support.",
-  priceDisplay: "Custom",
-  priceSubtext: "contact us",
-  maxConcurrentBoxes: "Custom",
-  cpuHoursPerMonth: "Custom",
-  llmBudgetPerMonth: "Custom",
-  storagePrice: "Custom",
-  cpuHourPricing: "Custom",
-  keepAlivePricing: "Custom",
-  communitySupport: true,
-  emailSupport: true,
-  dedicatedSupport: true,
-};
-
 export const BOX_ALL_PLANS: BoxPlan[] = [
   BOX_FREE_PLAN,
   BOX_PAYG_PLAN,
   BOX_KEEPALIVE_PLAN,
-  BOX_ENTERPRISE_PLAN,
 ];
 
 export const BOX_FAQ = boxFaqJson.faq;

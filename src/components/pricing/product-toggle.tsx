@@ -4,7 +4,6 @@ import IconBlob from "@/components/icon-blob";
 import IconBox from "@/components/icon-box";
 import IconQStash from "@/components/icon-qstash";
 import IconRedis from "@/components/icon-redis";
-import IconSearch from "@/components/icon-search";
 import IconVector from "@/components/icon-vector";
 import IconWorkflow from "@/components/icon-workflow";
 import { trackEvent } from "@/lib/analytics";
@@ -18,7 +17,6 @@ const productConfig = {
   "/vector": { name: "Vector", Icon: IconVector },
   "/qstash": { name: "QStash", Icon: IconQStash },
   "/workflow": { name: "Workflow", Icon: IconWorkflow },
-  "/search": { name: "Search", Icon: IconSearch },
   "/box": { name: "Box", Icon: IconBox },
   "/blob": { name: "Blob", Icon: IconBlob },
 } as const;

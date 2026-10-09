@@ -12,7 +12,6 @@ enum BoxPlan {
   Free = "free",
   PayAsYouGo = "payg",
   KeepAlive = "keepalive",
-  Enterprise = "enterprise",
 }
 
 const BOX_SIZES = {
@@ -57,7 +56,6 @@ export default function CompareTable() {
   const showFree = selectedPlan === BoxPlan.Free;
   const showPayg = selectedPlan === BoxPlan.PayAsYouGo;
   const showKeepAlive = selectedPlan === BoxPlan.KeepAlive;
-  const showEnterprise = selectedPlan === BoxPlan.Enterprise;
   const selectedSpec = BOX_SIZES[selectedSize];
   const keepAliveSpec = BOX_SIZES[selectedKeepAliveSize];
 
@@ -96,11 +94,10 @@ export default function CompareTable() {
       className="w-full border-separate border-spacing-x-1 border-spacing-y-0"
     >
       <colgroup>
-        <col className="w-1/2 md:w-1/5" />
-        <col className="w-1/2 md:w-1/5" />
-        <col className="w-1/2 md:w-1/5" />
-        <col className="w-1/2 md:w-1/5" />
-        <col className="w-1/2 md:w-1/5" />
+        <col className="w-1/2 md:w-1/4" />
+        <col className="w-1/2 md:w-1/4" />
+        <col className="w-1/2 md:w-1/4" />
+        <col className="w-1/2 md:w-1/4" />
       </colgroup>
 
       <thead>
@@ -124,12 +121,6 @@ export default function CompareTable() {
             className="border-b-2 border-b-bg px-0 py-3 text-xs font-medium uppercase tracking-wider text-text-mute"
           >
             Fixed
-          </Col>
-          <Col
-            plan={showEnterprise}
-            className="border-b-2 border-b-bg px-0 py-3 text-xs font-medium uppercase tracking-wider text-text-mute"
-          >
-            Enterprise
           </Col>
         </tr>
 
@@ -208,27 +199,12 @@ export default function CompareTable() {
               </h5>
             </div>
           </Col>
-
-          <Col plan={showEnterprise} className="border-b border-b-bg bg-bg p-0">
-            <div className="flex h-24 flex-col items-center justify-center bg-bg-mute">
-              <h4 className="hidden py-1 text-lg font-bold text-primary-text md:block">
-                Enterprise
-              </h4>
-
-              <MobilePlanSelect
-                onChange={onPlanChange}
-                value={BoxPlan.Enterprise}
-              />
-
-              <h5 className="mt-1 flex items-baseline font-semibold">Custom</h5>
-            </div>
-          </Col>
         </tr>
       </thead>
 
       <tbody>
         <tr>
-          <StickyRow colSpan={isMobile ? 2 : 5}>Capacity</StickyRow>
+          <StickyRow colSpan={isMobile ? 2 : 4}>Capacity</StickyRow>
         </tr>
 
         <tr>
@@ -262,9 +238,6 @@ export default function CompareTable() {
               1000 (default)
             </CompareValue>
           </Col>
-          <Col plan={showEnterprise}>
-            <CompareValue>Custom</CompareValue>
-          </Col>
         </tr>
 
         <tr>
@@ -277,9 +250,6 @@ export default function CompareTable() {
           </Col>
           <Col plan={showKeepAlive}>
             <CompareValue>{keepAliveSpec.cpu}</CompareValue>
-          </Col>
-          <Col plan={showEnterprise}>
-            <CompareValue>Custom</CompareValue>
           </Col>
         </tr>
 
@@ -300,9 +270,6 @@ export default function CompareTable() {
               {keepAliveSpec.memory}
             </CompareValue>
           </Col>
-          <Col plan={showEnterprise}>
-            <CompareValue>Custom</CompareValue>
-          </Col>
         </tr>
 
         <tr>
@@ -322,9 +289,6 @@ export default function CompareTable() {
               {keepAliveSpec.storage}
             </CompareValue>
           </Col>
-          <Col plan={showEnterprise}>
-            <CompareValue>Custom</CompareValue>
-          </Col>
         </tr>
 
         <tr>
@@ -336,9 +300,6 @@ export default function CompareTable() {
             <CompareValue>Unlimited</CompareValue>
           </Col>
           <Col plan={showKeepAlive}>
-            <CompareValue>Unlimited</CompareValue>
-          </Col>
-          <Col plan={showEnterprise}>
             <CompareValue>Unlimited</CompareValue>
           </Col>
         </tr>
@@ -358,9 +319,6 @@ export default function CompareTable() {
           <Col plan={showKeepAlive}>
             <CompareValue>Never (always on)</CompareValue>
           </Col>
-          <Col plan={showEnterprise}>
-            <CompareValue>Custom</CompareValue>
-          </Col>
         </tr>
 
         <tr>
@@ -373,19 +331,9 @@ export default function CompareTable() {
             <CompareValue type="boolean" valid={false} />
           </Col>
           <Col plan={showPayg} feature>
-            <CompareValue
-              type="boolean"
-              after={
-                <Tooltip content="Enable per box. Billed at the fixed monthly price shown in the Fixed column.">
-                  <IconInfoCircle className="ml-1" stroke={1.5} size={24} />
-                </Tooltip>
-              }
-            />
+            <CompareValue type="boolean" valid={false} />
           </Col>
           <Col plan={showKeepAlive}>
-            <CompareValue type="boolean" />
-          </Col>
-          <Col plan={showEnterprise}>
             <CompareValue type="boolean" />
           </Col>
         </tr>
@@ -399,9 +347,6 @@ export default function CompareTable() {
             <CompareValue>Node.js, Python, Go, Ruby, Rust</CompareValue>
           </Col>
           <Col plan={showKeepAlive}>
-            <CompareValue>Node.js, Python, Go, Ruby, Rust</CompareValue>
-          </Col>
-          <Col plan={showEnterprise}>
             <CompareValue>Node.js, Python, Go, Ruby, Rust</CompareValue>
           </Col>
         </tr>
@@ -421,9 +366,6 @@ export default function CompareTable() {
           <Col plan={showKeepAlive}>
             <CompareValue>Coming Soon</CompareValue>
           </Col>
-          <Col plan={showEnterprise}>
-            <CompareValue>Coming Soon</CompareValue>
-          </Col>
         </tr>
 
         <tr>
@@ -441,13 +383,10 @@ export default function CompareTable() {
           <Col plan={showKeepAlive}>
             <CompareValue type="boolean" />
           </Col>
-          <Col plan={showEnterprise}>
-            <CompareValue type="boolean" />
-          </Col>
         </tr>
 
         <tr>
-          <StickyRow colSpan={isMobile ? 2 : 5}>Price</StickyRow>
+          <StickyRow colSpan={isMobile ? 2 : 4}>Price</StickyRow>
         </tr>
 
         <tr>
@@ -462,9 +401,6 @@ export default function CompareTable() {
             <CompareValue>
               {keepAliveSpec.keepAlivePrice} / box per month
             </CompareValue>
-          </Col>
-          <Col plan={showEnterprise}>
-            <CompareValue>Custom</CompareValue>
           </Col>
         </tr>
 
@@ -485,9 +421,6 @@ export default function CompareTable() {
           <Col plan={showKeepAlive}>
             <CompareValue>Included</CompareValue>
           </Col>
-          <Col plan={showEnterprise}>
-            <CompareValue>Custom</CompareValue>
-          </Col>
         </tr>
 
         <tr>
@@ -501,9 +434,6 @@ export default function CompareTable() {
           <Col plan={showKeepAlive}>
             <CompareValue>Included</CompareValue>
           </Col>
-          <Col plan={showEnterprise}>
-            <CompareValue>Custom</CompareValue>
-          </Col>
         </tr>
 
         <tr>
@@ -516,9 +446,6 @@ export default function CompareTable() {
           </Col>
           <Col plan={showKeepAlive}>
             <CompareValue>Included</CompareValue>
-          </Col>
-          <Col plan={showEnterprise}>
-            <CompareValue>Custom</CompareValue>
           </Col>
         </tr>
 
@@ -557,13 +484,6 @@ export default function CompareTable() {
               </a>
             </Button>
           </Col>
-          <Col plan={showEnterprise} className="py-4">
-            <Button asChild variant="primary">
-              <a target="_self" href="/contact">
-                Contact Us
-              </a>
-            </Button>
-          </Col>
         </tr>
       </tbody>
     </table>
@@ -579,7 +499,6 @@ function MobilePlanSelect({ ...props }: React.ComponentProps<"select">) {
       <option value={BoxPlan.Free}>Free</option>
       <option value={BoxPlan.PayAsYouGo}>Pay as you go</option>
       <option value={BoxPlan.KeepAlive}>Fixed</option>
-      <option value={BoxPlan.Enterprise}>Enterprise</option>
     </select>
   );
 }

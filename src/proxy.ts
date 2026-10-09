@@ -42,7 +42,6 @@ const PRICING_MD_PRODUCTS = [
   "qstash",
   "vector",
   "workflow",
-  "search",
   "box",
 ] as const;
 

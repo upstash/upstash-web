@@ -167,16 +167,6 @@ const nextConfig = {
         ],
       },
       {
-        source: "/pricing/search",
-        headers: [
-          {
-            key: "Link",
-            value:
-              '<https://upstash.com/pricing/search.md>; rel="alternate"; type="text/markdown"; title="Search Pricing (Markdown)"',
-          },
-        ],
-      },
-      {
         source: "/pricing/box",
         headers: [
           {
