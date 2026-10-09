@@ -69,6 +69,10 @@
       "destination": "/pricing/redis"
     },
     {
+      "source": "/pricing/search",
+      "destination": "/pricing/redis"
+    },
+    {
       "source": "/openapi.json",
       "destination": "/docs/devops/developer-api/openapi.yaml"
     }

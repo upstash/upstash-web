@@ -20,7 +20,7 @@ export function renderHome(): string {
     "",
     `- **Redis** — Serverless Redis-compatible database for caching, sessions, rate limiting, leaderboards, pub/sub and queues. REST and TCP access. Docs: ${SITE_URL}/docs/redis/overall/getstarted · Pricing: ${SITE_URL}/pricing/redis`,
     `- **Vector** — Vector database for embeddings, similarity search and RAG, with optional built-in embedding models. Docs: ${SITE_URL}/docs/vector/overall/getstarted · Pricing: ${SITE_URL}/pricing/vector`,
-    `- **Search** — Full-text and hybrid search over your documents. Pricing: ${SITE_URL}/pricing/search`,
+    `- **Search** — Full-text and hybrid search over your documents.`,
     `- **QStash** — HTTP message queue and scheduler: deliver to webhooks with retries, delays, cron schedules and fan-out. Docs: ${SITE_URL}/docs/qstash/overall/getstarted · Pricing: ${SITE_URL}/pricing/qstash`,
     `- **Workflow** — Durable, multi-step serverless functions with retries, waits and parallel steps. Docs: ${SITE_URL}/docs/workflow/getstarted · Pricing: ${SITE_URL}/pricing/workflow`,
     `- **Box** — Sandboxed cloud containers for running AI agents and untrusted code. Docs: ${SITE_URL}/docs/box/overall/quickstart · Pricing: ${SITE_URL}/pricing/box`,

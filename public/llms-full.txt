@@ -66,15 +66,6 @@ This site has a search endpoint: https://context7.com/api/v2/ask?siteKey=ask_4cf
 - Fixed 10M: $420/month, 10M steps/day
 - Enterprise: Custom — contact sales@upstash.com
 
-### Search
-- [Pricing (UI)](https://upstash.com/pricing/search): Interactive pricing page
-- [Pricing (Markdown)](https://upstash.com/pricing/search.md): Machine-readable full pricing
-
-**Quick reference:**
-- Free: $0, 20K queries/month, 200K records
-- Pay as You Go: $0.05 per 1K requests, unlimited queries, 2M records
-- Pro: Coming Soon
-
 ### Box
 - [Pricing (UI)](https://upstash.com/pricing/box): Interactive pricing page
 - [Pricing (Markdown)](https://upstash.com/pricing/box.md): Machine-readable full pricing
