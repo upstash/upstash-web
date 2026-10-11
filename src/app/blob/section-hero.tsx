@@ -32,8 +32,8 @@ export default function SectionHero() {
             Upstash Blob is S3-compatible object storage for Next.js and web
             apps. Upload straight from the browser with one route handler and a
             React hook, serve public files from a CDN worldwide, keep private
-            ones behind signed URLs, and get egress free up to 1 TB a month. No
-            regions to pick, no servers to run.
+            ones behind signed URLs, and get 1 TB of free egress a month on
+            pay-as-you-go. No regions to pick, no servers to run.
           </p>
 
           <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">

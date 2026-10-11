@@ -11,7 +11,7 @@ import { Metadata } from "next";
 
 const title = "Blob Storage";
 const description =
-  "Upstash Blob is S3-compatible object storage for Next.js and web apps: direct browser uploads with a React hook, a global CDN, public or private buckets, and free egress up to 1 TB a month.";
+  "Upstash Blob is S3-compatible object storage for Next.js and web apps: direct browser uploads with a React hook, a global CDN, public or private buckets, and 1 TB of free egress a month on pay-as-you-go.";
 
 export const metadata: Metadata = {
   title,
