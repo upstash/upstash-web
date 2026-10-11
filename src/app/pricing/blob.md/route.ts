@@ -13,6 +13,9 @@ function generateMarkdown(): string {
   const lines: string[] = [
     "# Upstash Blob Pricing",
     "",
+    "Upstash Blob pay-as-you-go costs $0.02 per GB stored per month, with egress",
+    "free up to 1 TB a month and $0.02 per GB past that.",
+    "",
     "> **Source:** https://upstash.com/pricing/blob",
     "> **Format:** text/markdown, machine-readable pricing for agents and LLMs",
     "> **Contact:** support@upstash.com",

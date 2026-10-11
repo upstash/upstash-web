@@ -28,6 +28,11 @@ export default function SeoPlanData() {
     <section className="sr-only">
       <h2>Upstash Blob pricing: all plans</h2>
 
+      <p>
+        Upstash Blob pay-as-you-go costs $0.02 per GB stored per month, with
+        egress free up to 1 TB a month and $0.02 per GB past that.
+      </p>
+
       <table>
         <caption>
           Billed resources. The Free column is what the plan includes each

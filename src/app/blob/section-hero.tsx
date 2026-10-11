@@ -29,10 +29,11 @@ export default function SectionHero() {
           </h1>
 
           <p className="mt-6 max-w-2xl text-balance text-lg text-text-mute md:text-2xl">
-            Upstash Blob is S3-compatible object storage for your files. Upload
-            straight from the browser, serve public files from a CDN worldwide,
-            keep private ones behind signed URLs, and pay only for what you
-            store and serve. No regions to pick, no servers to run.
+            Upstash Blob is S3-compatible object storage for Next.js and web
+            apps. Upload straight from the browser with one route handler and a
+            React hook, serve public files from a CDN worldwide, keep private
+            ones behind signed URLs, and get 1 TB of free egress a month on
+            pay-as-you-go. No regions to pick, no servers to run.
           </p>
 
           <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
