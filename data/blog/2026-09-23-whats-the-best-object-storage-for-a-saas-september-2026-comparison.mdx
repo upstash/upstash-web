@@ -194,7 +194,7 @@ Upstash Blob works the same way on Vercel, a VPS or Cloudflare Workers, so movin
 For most SaaS apps, pick Upstash Blob, and move to R2 when downloads reach many terabytes a month:
 
 - **Most SaaS apps (user uploads, tenant documents, AI-generated files, under 1 TB of downloads a month):** Upstash Blob. Egress is free up to 1 TB, public files are served from a global CDN, and private files stay behind signed reads. Its SDK signs browser uploads, and one bucket serves every region. It fits Next.js and any serverless stack. Pay-as-you-go starts at $0.02/GB.
-- **Many terabytes of downloads a month:** Cloudflare R2 is the cheapest fit. Video, large media and public datasets pay $0 egress there; at 10 TB of downloads a month, R2 cost $33.75 against $224 on Upstash Blob.
+- **If downloads are your biggest cost:** Cloudflare R2 is the cheapest fit. Video, large media and public datasets pay $0 egress there; at 10 TB of downloads a month, R2 cost $33.75 against $224 on Upstash Blob.
 - **Your team already runs on AWS:** S3 with CloudFront in front is a good fit. [IAM (AWS's permission system) policies can lock each tenant to its own prefix](https://aws.amazon.com/blogs/apn/partitioning-and-isolating-multi-tenant-saas-data-with-amazon-s3/), so tenant isolation fits the tools your team already uses.
 
 Whichever one you pick, the tenant layout from earlier works the same way (one bucket, a prefix per tenant, and short-lived signed URLs). Because all three support the S3 API, you can copy a bucket to another provider later with standard S3 tools.
