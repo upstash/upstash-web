@@ -141,7 +141,7 @@ Even with those checks, every uploaded file is still untrusted. The byte check c
 
 ## Which file upload service should you use?
 
-For most React and Next.js apps, a managed upload service with a React SDK fits best. Upstash Blob gives you typed hooks, automatic multipart and a global CDN. Raw storage like Cloudflare R2 costs slightly less up to 1 TB of downloads a month and much less past that, but you build the upload flow yourself.
+For most React and Next.js apps, a managed upload service with a React SDK fits best. Upstash Blob gives you typed hooks, automatic multipart and a global CDN. Raw storage like Cloudflare R2 wins on price once downloads pass 1 TB a month, but you build the upload flow yourself.
 
 - **Managed upload services** give you storage plus the upload flow: a server handler, React components or hooks, and a CDN. Upstash Blob, UploadThing and Vercel Blob are here.
 - **Raw object storage** gives you buckets and presigned URLs. Cloudflare R2, AWS S3 and Bunny Storage are here, and the React side is yours to build and maintain.
