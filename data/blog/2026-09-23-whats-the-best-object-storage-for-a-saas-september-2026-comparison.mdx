@@ -107,7 +107,7 @@ Browser uploads work the same way. [Each presigned URL covers one object, one me
 
 ## How do Upstash Blob, R2, S3 and Vercel Blob compare?
 
-Below 1 TB of downloads a month, neither Upstash Blob nor Cloudflare R2 charges for egress, so the bill comes down to storage and requests. R2's free tier covers 10 GB of storage and the first 10M reads, so it comes out a few dollars ahead on small apps. Upstash Blob costs a few dollars more and includes a CDN, signed uploads and one global bucket. S3 costs the most once users download a lot. Vercel Blob's rates are higher than Upstash Blob's on every line.
+Below 1 TB of downloads a month, neither Upstash Blob nor Cloudflare R2 charges for egress, so the bill comes down to storage and requests. R2's free tier covers 10 GB of storage and the first 10M reads, so it comes out a few dollars ahead on small apps. For that difference, Upstash Blob includes a CDN, signed uploads and one global bucket. S3 costs the most once users download a lot. Vercel Blob's rates are higher than Upstash Blob's on every line.
 
 | Provider | Storage per GB | Egress per GB | Writes per 1M | Reads per 1M | Free each month |
 | --- | --- | --- | --- | --- | --- |
