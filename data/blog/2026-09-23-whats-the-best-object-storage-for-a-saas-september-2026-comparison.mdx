@@ -107,7 +107,7 @@ Browser uploads work the same way. [Each presigned URL covers one object, one me
 
 ## How do Upstash Blob, R2, S3 and Vercel Blob compare?
 
-Below 1 TB of downloads a month, neither Upstash Blob nor Cloudflare R2 charges for egress, so the bill comes down to storage and requests. R2's free tier covers 10 GB of storage and the first 10M reads, so it comes out a few dollars ahead on small apps. Past that free tier, Upstash Blob and R2 land within a few dollars of each other under 1 TB of downloads, since Upstash Blob's reads cost less and its storage a bit more. Upstash Blob and includes a CDN, signed uploads and one global bucket. S3 costs the most once users download a lot. Vercel Blob's rates are higher than Upstash Blob's on every line.
+Below 1 TB of downloads a month, neither Upstash Blob nor Cloudflare R2 charges for egress, so the bill comes down to storage and requests. R2's free tier covers 10 GB of storage and the first 10M reads, so it comes out a few dollars ahead on small apps. Upstash Blob costs a few dollars more and includes a CDN, signed uploads and one global bucket. S3 costs the most once users download a lot. Vercel Blob's rates are higher than Upstash Blob's on every line.
 
 | Provider | Storage per GB | Egress per GB | Writes per 1M | Reads per 1M | Free each month |
 | --- | --- | --- | --- | --- | --- |
@@ -138,7 +138,7 @@ R2:           14.85 + 0 egress + 4.50 (1M billed) + 14.40 (40M)      =  $33.75
 S3:           23.00 + 891.00 egress (9,900 GB) + 10.00 + 20.00       = $944.00
 ```
 
-In the document SaaS, most of the $8.65 gap comes from R2's free tier covering all the requests. In the media SaaS, $180 of the $190.25 gap is egress past Upstash Blob's free 1 TB, so past 1 TB of downloads a month R2 is the cheaper choice. S3 costs the most in both, because it charges egress on every download past the free 100 GB.
+In the document SaaS, most of the $8.65 gap comes from R2's free tier covering all the requests. In the media SaaS, $180 of the $190.25 gap is egress past Upstash Blob's free 1 TB, so the gap widens quickly past 1 TB of downloads a month. S3 costs the most in both, because it charges egress on every download past the free 100 GB.
 
 ![AWS S3 vs. Upstash Blob vs. Cloudflare R2](https://cdn.bydefault.so/image-WmxgqJ5AXkGeSlFdqnM8V.png)
 
@@ -194,7 +194,7 @@ Upstash Blob works the same way on Vercel, a VPS or Cloudflare Workers, so movin
 For most SaaS apps, pick Upstash Blob, and move to R2 when downloads reach many terabytes a month:
 
 - **Most SaaS apps (user uploads, tenant documents, AI-generated files, under 1 TB of downloads a month):** Upstash Blob. Egress is free up to 1 TB, public files are served from a global CDN, and private files stay behind signed reads. Its SDK signs browser uploads, and one bucket serves every region. It fits Next.js and any serverless stack. Pay-as-you-go starts at $0.02/GB.
-- **Past 1 TB of downloads a month:** Cloudflare R2 is the cheapest fit. Video, large media and public datasets pay $0 egress there; at 10 TB of downloads a month, R2 cost $33.75 against $224 on Upstash Blob.
+- **Many terabytes of downloads a month:** Cloudflare R2 is the cheapest fit. Video, large media and public datasets pay $0 egress there; at 10 TB of downloads a month, R2 cost $33.75 against $224 on Upstash Blob.
 - **Your team already runs on AWS:** S3 with CloudFront in front is a good fit. [IAM (AWS's permission system) policies can lock each tenant to its own prefix](https://aws.amazon.com/blogs/apn/partitioning-and-isolating-multi-tenant-saas-data-with-amazon-s3/), so tenant isolation fits the tools your team already uses.
 
 Whichever one you pick, the tenant layout from earlier works the same way (one bucket, a prefix per tenant, and short-lived signed URLs). Because all three support the S3 API, you can copy a bucket to another provider later with standard S3 tools.
