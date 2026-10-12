@@ -15,7 +15,7 @@ My project was a Deno Fresh web app. Deno has instant builds and deploys. This m
 Here, I will talk about improving the performance using a skeleton app. It uses the following tooling:
 
 - [`upstash_redis`](https://deno.land/x/upstash_redis): a Deno module for working with Upstash for Redis
-- [Deno Fresh](https://fresh.deno.dev/docs/introduction): a new, production-ready Framework for building server-side rendered (SSR) apps in Deno
+- [Deno Fresh](https://usefresh.dev/docs/introduction): a new, production-ready Framework for building server-side rendered (SSR) apps in Deno
 - serverless logging: we use the console here, but for your deployed app, to access live measurements you will need a service like Logtail
 
 ## Setup
@@ -23,7 +23,7 @@ Here, I will talk about improving the performance using a skeleton app. It uses 
 A key difference between Node and Deno is how you access third-party modules in your code. Deno works with URLs and import maps instead of a `package.json` file. The full URL for `upstash_redis`, for example, is `https://deno.land/x/upstash_redis@v1.20.0`. To get started create a new Deno Fresh app.
 
 ```shell
-deno run -A -r https://fresh.deno.dev upstash-redis-deno-perf
+deno run -A -r https://usefresh.dev upstash-redis-deno-perf
 ```
 
 You can [set up Deno itself on your system with a few Terminal commands](https://rodneylab.com/getting-started-deno-fresh/#clapper-how-do-you-spin-up-a-fresh-fresh-app), if you are trying it for the first time.
