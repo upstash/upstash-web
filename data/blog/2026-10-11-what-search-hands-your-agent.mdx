@@ -3,28 +3,29 @@ title: "What Your Search Tool Sends Your Coding Agent"
 slug: what-search-hands-your-agent
 authors: [ramazan]
 tags: [context7, security, ai]
-description: "We asked seven tools the questions a developer would type about nine documentation pages we knew were dangerous, and measured what came back."
-updated: "2026-09-25"
+description: "Most dangerous docs aren't attacks. They're honest pages telling your agent to fetch something unpinned and run it. We measured how often six search tools pass them on."
 draft: false
 ---
 
 When a coding agent answers a question about a library, some tool fetched that documentation a second earlier, usually a search tool, and whatever it returns goes straight into the model's context.
 
-So we measured what they return when the page is a bad one.
+So we measured what they return when the page is a bad one. We took nine documentation pages we knew were dangerous, asked six tools the questions a developer would type, and checked what came back.
+
+Most of those pages weren't attacks. They were honest documentation telling your agent to fetch something unpinned and run it. Search tools that return whole pages handed the dangerous passage over in 23% to 42% of searches, Context7 in 10%. And when the passage reached a model, the model passed it on as a step to follow in about a third of answers, almost never with a warning.
 
 ## What we tested
 
 We started from nine documentation pages we had verified as dangerous. Finding them was the hard part: two discovery sweeps over 1,752 search results turned up none, so these nine are pages we already knew about and then checked one by one.
 
-For each page we wrote four questions a developer would type to land on it, and asked each three times, because a search tool answers the same question differently from one call to the next. That is 108 searches per tool, through Exa, Firecrawl, Tavily, Serper, Brave's two endpoints and Context7.
+For each page we wrote four questions a developer would type to land on it, and asked each three times, because a search tool answers the same question differently from one call to the next. That is 108 searches per tool, through Exa, Firecrawl, Tavily, Brave's two endpoints and Context7.
 
 Two things were counted: whether the page came back at all, and whether the harmful passage itself was in what the tool returned.
 
 ## The results
 
-![Two bars per tool out of 108 searches: how often the page came back, and how often the dangerous text came back with it. The four that return page bodies sit between 23% and 42%; the two that return fragments sit at 6%; Context7 at 10%.](/blog/what-search-hands-your-agent/by-tool.svg)
+![Two bars per tool out of 108 searches: how often the page came back, and how often the dangerous text came back with it. The four that return page bodies sit between 23% and 42%; the one that returns fragments sits at 6%; Context7 at 10%.](/blog/what-search-hands-your-agent/by-tool.svg)
 
-The six search tools surfaced these pages at a similar rate, 30% to 56%, and Context7 a little below them. The gap is in the second bar, and the reason is how much of the page travels with it:
+The five search tools surfaced these pages at a similar rate, 31% to 56%, and Context7 a little below them. The gap is in the second bar, and the reason is how much of the page travels with it:
 
 | Tool | Average text per search |
 | --- | --- |
@@ -34,9 +35,8 @@ The six search tools surfaced these pages at a similar rate, 30% to 56%, and Con
 | Brave LLM context | 27,979 |
 | Brave web search | 12,221 |
 | Context7 | 4,250 |
-| Serper | 1,414 |
 
-Those are averages and they move by query, though not simply by size. Serper and Brave's web endpoint return fragments picked to match the words you typed: on one query Brave returned 12,671 characters in 40 separate pieces, each about 300 long. The dangerous passage is a contiguous block somewhere on the page, rarely the part that matches your question, so it usually lands in none of the pieces. The six searches where it did come back are the ones where the question happened to be about the broken thing the dangerous fix claims to repair. Neither tool is screening anything; they are answering a narrower question, and what a model can do with that is a separate matter we didn't measure.
+Those are averages and they move by query, though not simply by size. Brave's web endpoint returns fragments picked to match the words you typed: on one query Brave returned 12,671 characters in 40 separate pieces, each about 300 long. The dangerous passage is a contiguous block somewhere on the page, rarely the part that matches your question, so it usually lands in none of the pieces. The six searches where it did come back are the ones where the question happened to be about the broken thing the dangerous fix claims to repair. It isn't screening anything; it is answering a narrower question, and what a model can do with that is a separate matter we didn't measure.
 
 The four at the top return the extracted page body. That is the product: give the model something to read, and the dangerous part comes with it. One is sold as pre-extracted content for coding agents, with ready-made instructions for Claude Code, Cursor and Codex; it returned the dangerous text inside a code block, and underneath it the forum replies: "thank you fixed", one like.
 
@@ -84,26 +84,26 @@ Here is every case a tool returned, measured both ways. Each case has four quest
 
 ![Six cases, web search against Context7. Context7 is at zero on four of them, including the shortener fix where web search is at 88%. It is level on the agent onboarding case and slightly lower on the private-key case.](/blog/what-search-hands-your-agent/by-case.svg)
 
-The shortener fix is the clearest: web search returned that command in 42 of 48 searches, Context7 in none. On that case Context7 had something to serve in half the runs and nothing in the other half, so the zero is partly silence. On the wallet page it answered all twelve times and the address still never appeared.
+The shortener fix is the clearest: web search returned that command in 88% of searches (42 of 48), Context7 in none. On that case Context7 had something to serve in half the runs and nothing in the other half, so the zero is partly silence. On the wallet page it answered all twelve times and the address still never appeared.
 
-A search tool has to rank the page before it can return it, and that ranking does part of the work. So we skipped it: name the library outright, ask the question, and the passage came back in 27 of those same 108 runs instead of 11. On the wallet page it was still zero.
+A search tool has to rank the page before it can return it, and that ranking does part of the work. So we skipped it: name the library outright, ask the question, and the passage came back in 25% of runs instead of 10%. On the wallet page it was still zero.
 
-Two rows are not zero, and they are the eleven: one where Context7 is level with web search, one where it is below. Both are vendor documentation where the dangerous line is also the answer to the question: ask a trading API's reference how to place a trade, and the required `privateKey` parameter is the answer.
+Two rows are not zero, and they account for all of Context7's hits: one where Context7 is level with web search, one where it is below. Both are vendor documentation where the dangerous line is also the answer to the question: ask a trading API's reference how to place a trade, and the required `privateKey` parameter is the answer.
 
-We won't excuse those for one side and count them for the other. Drop both from both sides and the comparison holds anyway: **81 of 336 through web search, 0 of 84 through Context7**. Neither outright attack came back at all.
+We won't excuse those for one side and count them for the other. Drop both from both sides and the comparison holds anyway: **web search returned the dangerous passage in 24% of searches (81 of 336), Context7 in none (0 of 84)**. Neither outright attack came back at all.
 
 ## What the models did with it
 
-Text reaching a model isn't a problem by itself. So we put the same questions to eight models, a frontier and a fast model from each of the four major providers, and graded whether the instruction was passed along as a step to take. Two of those pages are indexed twice, once under each of two paths, so the five come to seven question-and-library combinations. Each ran through both sources and all eight models, five times for the fast ones and three for the frontier ones: 448 runs. In 57 no source returned anything, leaving 391 answers. The instruction was passed along in 54:
+Text reaching a model isn't a problem by itself. So we put the same questions to eight models, a frontier and a fast model from each of the four major providers, and graded whether the instruction was passed along as a step to take. With web search it was, in 24% of answers. With Context7, in under 1%:
 
 | Source | Answers | Instruction passed along |
 | --- | --- | --- |
-| Web search | 217 | 53 |
-| Context7 | 174 | 1 |
+| Web search | 217 | 53 (24%) |
+| Context7 | 174 | 1 (0.6%) |
 
-Two of those 54 warned the developer. In the rest it arrived as an ordinary numbered step, usually formatted more cleanly than the source page, with the caveats dropped. One answer filed the root-level fetch under a heading reading "Troubleshooting File Manager (500 Error)". Seven of the eight did it at least once through web search, including the strongest.
+Only two of those 54 answers warned the developer. In the rest it arrived as an ordinary numbered step, usually formatted more cleanly than the source page, with the caveats dropped. One answer filed the root-level fetch under a heading reading "Troubleshooting File Manager (500 Error)". Seven of the eight did it at least once through web search, including the strongest.
 
-That denominator is generous to web search in two ways. It counts every answer, including runs where the search returned nothing harmful to repeat; on the 153 answers where the dangerous text was actually in front of the model, it is 53 of 153. There is no matching figure for Context7, because that stage recorded whether the passage was present only for the search side. And the grading is done by a model. We read the answers by hand and found the grader conservative: it excuses a few that reproduce the command inside a numbered step, on the grounds that they "merely quoted the documentation". Five of those are bare instructions with no caution anywhere. We left its verdict as it stood.
+That 24% is generous to web search in two ways. It counts every answer, including runs where the search returned nothing harmful to repeat; when the dangerous text was actually in front of the model, it was passed along 35% of the time (53 of 153). There is no matching figure for Context7, because that stage recorded whether the passage was present only for the search side. And the grading is done by a model. We read the answers by hand and found the grader conservative: it excuses a few that reproduce the command inside a numbered step, on the grounds that they "merely quoted the documentation". Five of those are bare instructions with no caution anywhere. We left its verdict as it stood.
 
 The one through Context7 came from the account-takeover site. Per-page screening asks whether a passage is harmful, and for a site like that every honest answer is no. That is a different problem from this one.
 
@@ -113,6 +113,7 @@ Nine pages is nine pages, not a percentage of the web, and it says nothing about
 
 - **Every search was repeated three times.** Search tools answer the same question differently each call, and that moves these numbers more than the models do.
 - **We checked who published each page before calling anything an attack.** Publisher identity, upstream bug reports, GitHub author records. Two we had marked as attacks weren't.
+- **The model stage ran five of the six pages that came back.** Two are indexed under two paths each, which makes seven question-and-library combinations. Each ran through both sources and all eight models, five times for the fast models and three for the frontier ones: 448 runs. In 57 no source returned anything, which leaves the 391 answers in the table.
 - **Both sides were measured by the same rule.** A search counts if the passage was in any result it returned; for Context7, in any library its own search returned. The search stage ran all nine pages, six came back from at least one tool, and the model stage ran five of those six.
 
 What reaches your agent is decided by the tool that fetched it, not by whether anyone meant harm.
