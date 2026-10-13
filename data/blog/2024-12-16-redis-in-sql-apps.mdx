@@ -43,7 +43,7 @@ It’s also important to understand the two primary caching strategies used in a
 Here is a simple diagram that shows how cache-aside works, which might you all have already seen it in somewhere before coming to this blog.
 
 
-![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXelKYmE0InB2W9oGQLdBbiu7u48jfJoFq0y7QTTjF8zXzwMuTDDUTM5REltXA3MHpUuYVQO1gukpBHSl2F_YiPl0yk2qdcN6C_r3u89LCJ6mz0Yj6M2z3BKdWfhhgn5ewNtc8aMug?key=xa7BZ1Ja-5irquLLBMCW-KA3)
+![](/blog/redis-in-sql-apps/image-0e4ad4f3.png)
 
 The advantage of this caching is that the cache size is optimized, and the cache data is reloaded when needed by the users. On the other hand, the disadvantage is that the data won’t be available after the cache cleaned when its TTL is over. At that time, the cache will be reloaded when the user request that data. In this case, that user will have to wait for the query to be done. But of course, the next requests will be able to get the data from the cache again.
 
@@ -52,7 +52,7 @@ In a **write-through** strategy, every write operation to the database is immedi
 Here is a simple diagram of write-through caching:
 
 
-![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXfVBE0a0cp0oWhCOMCNms8D-CNEXVM25Yt58aYUYD5k-kGfPNCXZlOzQeCNjR26qqBNSIfE3q4CbbfxDLQPv7cTMufOONV6Euo5roPjIh1pu_Re2j5fmBUVamMxRq758kDJJDZWDg?key=xa7BZ1Ja-5irquLLBMCW-KA3)
+![](/blog/redis-in-sql-apps/image-bc2e86f1.png)
 
 This strategy ensures data consistency between the cache and the database and none of the requests experience higher latency because the data will be already available without waiting for a request from the user. However, the disadvantage is that the cache contains all the data, even if it is not needed. In addition to that, every write operation will gain latency since the data will be written to the cache as well.
 
@@ -71,14 +71,14 @@ Let’s quickly see how to create global Redis. First, login to the [Upstash con
 After login, we can create a Redis database here. Upstash provides multiple locations to locate read replicas.
 
 
-![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXebRyJQsgRH19FP6dcpWevRrjsAH4la9sb9LmvKo7DMAXbWvPJKR1rwKK46NJhRoUeq88zq-C9EII8TrjwmbEcVeJGXTZZbsqdZ6QElmhr2JBnTLpOC4p8ZPh1UwfGcLV2iaOrxKg?key=xa7BZ1Ja-5irquLLBMCW-KA3)
+![](/blog/redis-in-sql-apps/image-84031271.png)
 
 Once selecting the read locations, you can select your plan and finally create your Redis database. That’s all!
 
 In the console, you can add/remove the regions after creating the database as well.
 
 
-![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXe4DtZjMX6VKfz4LrZbYOKZu039zkbpoz_geHKLIT41ix9py83KYB36w7S6sO420EiYs9f5hw0Ob0IQ6RjbQgXF8fe28eFCoogHhQ65hjkPvDrhFfqQ0YRj138H93KlxBQgNH6lWg?key=xa7BZ1Ja-5irquLLBMCW-KA3)
+![](/blog/redis-in-sql-apps/image-9575b39b.png)
 
 Global Redis databases are mostly used by the applications that are globally distributed and the applications that are running at the edge.
 

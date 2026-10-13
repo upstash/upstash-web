@@ -179,7 +179,7 @@ We have 2 entities. `Users` and `Posts`.
 
 They share a one to many relationship. So one user can have multiple posts,and one post can only belong to one user.
 
-![Screen Shot 2021-11-02 at 07.10.42.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1635833557755/L53KPWS9A.png)
+![Screen Shot 2021-11-02 at 07.10.42.png](/blog/serverless-with-flutter/l53kpws9a-1bf421bd.png)
 
 A user is allowed
 
@@ -193,7 +193,7 @@ A user is allowed
 
 Here's the solutions architectural view
 
-![upstash_arch.jpeg](https://cdn.hashnode.com/res/hashnode/image/upload/v1636975851104/kv8szoq2g.jpeg)
+![upstash_arch.jpeg](/blog/serverless-with-flutter/kv8szoq2g-7e92935c.jpg)
 So let's get Started.
 
 ## Create an Upstash Account
@@ -204,7 +204,7 @@ After creating your account, create an Upstash database.
 
 You are allowed to create only one database in the free tier.
 
-![Screen Shot 2021-10-23 at 15.01.43.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1634997787038/scaXLBfzn.png)
+![Screen Shot 2021-10-23 at 15.01.43.png](/blog/serverless-with-flutter/scaxlbfzn-1e3d2aeb.png)
 Take note of your Redis database endpoint. It should look somehow like this.
 `rediss://:2c9bb162c2444bf7ab689640bb2ead23@gusc1-smashing-bee-30249.upstash.io:00049`
 
@@ -224,13 +224,13 @@ Please install these dependencies before proceeding
 serverless
 ```
 
-![a.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1635142894911/Ix8k3nDRTv.png)
+![a.png](/blog/serverless-with-flutter/ix8k3ndrtv-d17b5b98.png)
 
 Select nodejs HTTP API, give your project a name, and hit `enter`.
 
 Here's the initial structure of my serverless project.
 
-![Screen Shot 2021-10-25 at 07.23.17.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1635143304551/kBddLjgos.png)
+![Screen Shot 2021-10-25 at 07.23.17.png](/blog/serverless-with-flutter/kbddljgos-26ffc455.png)
 
 Inside that folder, initialize a new node project with the command
 
@@ -265,7 +265,7 @@ provider:
 
 Next, Create 2 folders inside your project called `users` and `posts`. Both of these folders would hold lambda functions for their respective use cases.
 
-![Screen Shot 2021-10-25 at 07.40.04.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1635144014866/rXX5zB1gG.png)
+![Screen Shot 2021-10-25 at 07.40.04.png](/blog/serverless-with-flutter/rxx5zb1gg-ec59ddf2.png)
 
 Let's get started creating our API enpoints
 
@@ -361,7 +361,7 @@ Then we can get all user save profile info and return it as a response through t
 const userItem = await client.hgetall(`userItem:${userId}`);
 ```
 
-![Screen Shot 2021-10-27 at 07.36.31.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1635316669730/LeqeO-V3j.png)
+![Screen Shot 2021-10-27 at 07.36.31.png](/blog/serverless-with-flutter/leqeo-v3j-346271bc.png)
 
 Don't forget to update the `serverless.yml` to reflect this endpoint.
 
@@ -537,7 +537,7 @@ updateUser:
 
 We pass in the `userId` as a path parameter `/user/{id}`
 
-![Screen Shot 2021-10-27 at 07.44.09.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1635317080244/JF8UkBZsNl.png)
+![Screen Shot 2021-10-27 at 07.44.09.png](/blog/serverless-with-flutter/jf8ukbzsnl-99e299ff.png)
 
 ## Get User
 
@@ -598,7 +598,7 @@ getUser:
         method: get
 ```
 
-![Screen Shot 2021-10-28 at 20.19.49.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1635487563696/JgNm_aW9m.png)
+![Screen Shot 2021-10-28 at 20.19.49.png](/blog/serverless-with-flutter/jgnm-aw9m-d70f508a.png)
 
 ## List Users
 
@@ -657,7 +657,7 @@ listUsers:
         method: get
 ```
 
-![Screen Shot 2021-10-30 at 08.49.18.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1635580182354/_A4SPsE5p.png)
+![Screen Shot 2021-10-30 at 08.49.18.png](/blog/serverless-with-flutter/a4spse5p-fe380a7b.png)
 
 And that's it for `users` endpoints. You can go ahead and deploy your app, If you haven't done that already.
 
@@ -772,7 +772,7 @@ createPost:
 
 Deploy and test.
 
-![Screen Shot 2021-10-30 at 10.07.22.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1635584856279/SZfhAfbfh.png)
+![Screen Shot 2021-10-30 at 10.07.22.png](/blog/serverless-with-flutter/szfhafbfh-181f2f4d.png)
 
 ## Get Post By Id
 
@@ -833,7 +833,7 @@ Thirdly, we get postReactionCount using the `get` command and a key `postReactio
 
 Deploy and test
 
-![Screen Shot 2021-10-30 at 18.40.58.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1635615687756/XmfXkukXf.png)
+![Screen Shot 2021-10-30 at 18.40.58.png](/blog/serverless-with-flutter/xmfxkukxf-8a0a04f4.png)
 
 ## React to a post
 
@@ -1001,7 +1001,7 @@ reactToPosts:
 
 Deploy and test.
 
-![Screen Shot 2021-10-30 at 19.16.51.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1635618023840/Dq6QkbaGI.png)
+![Screen Shot 2021-10-30 at 19.16.51.png](/blog/serverless-with-flutter/dq6qkbagi-2b7d3b1b.png)
 
 Hit the send button on your API tester(I use PostMan) multiple times and see how the "postReactionCount" toggles between 0 and 1.
 

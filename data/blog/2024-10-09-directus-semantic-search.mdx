@@ -79,7 +79,7 @@ npx directus start
 
 Once the app runs, you can open the admin panel by going to `http://0.0.0.0:8055/admin`. 
 
-![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXd4k9KjzMGxIE5JPyWkwbAp_KHkU3GSAqTgM2m4zSkdGf6EySJoj9fUx8bihVxnmGeMPVDdLYy2RCbtDgU6V_lVvuzYIkE91y9L80TKb5QEI6K7njI4jMnVO1Flslk70veMNDLLpC0plEg_brDu36JGdFam?key=fRetwLkHYMaVOu9inenb-w)
+![](/blog/directus-semantic-search/image-d6f3e0ce.png)
 
 In our example case, we will create a data collection. This data collection will contain data about books, such as titles, authors and summaries, similar to what we did in the [previous blog](https://upstash.com/blog/strapi-semantic-search).
 
@@ -87,13 +87,13 @@ You can click ' Create collection ' to create that data collection. We can name 
 
 The collection was created initially without any field. Now, we can add some fields. Let's start with `title` and `author`.  Both fields will be `String`. 
 
-![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXc1MqygGx3cBBw_ZSEV1tnbTjxiBqBsQNEFsTINxD8L9uc5C-7xQZ27wNSK_z_qf_G6a9nt5umnoKeOfUMrqIvh15YtSdRsKoP8bqfNfRSo0gWRGBDfJnsFHYHwvgwK3-BQrbDI4tknTGOraHwmmondRCri?key=fRetwLkHYMaVOu9inenb-w)
+![](/blog/directus-semantic-search/image-a34147df.png)
 
 In addition to these fields, we will add one more field, `Summary`. This field will contain the short review of the books and will enable us to create vector embeddings from. 
 
 The type of this field will be `Text`.
 
-![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXdndE4IYJ9_e0DT-PpG12YcbvUnqNAVLidQHMvhxoTgJR7K8Phf4PWTP-HP1HyyjDQWEtAUl4fbNaskrC4UUIPyKL1O9C_4CDsFEYqm-qt0QEbxs6L9sc8TPsvaUkYYW-d3x-wqk_GMnUXBcAKfY-8-xm9b?key=fRetwLkHYMaVOu9inenb-w)
+![](/blog/directus-semantic-search/image-e0d47028.png)
 
 Perfect! The collection and its fields are ready. We can reach the books by querying `http://0.0.0.0:8055/items/books`. It should return an empty list for now.
 
@@ -107,7 +107,7 @@ We'll refer to the [Upstash documentation](https://upstash.com/docs/vector/overa
 
 Similar to what we have done in [the previous blog](https://upstash.com/blog/strapi-semantic-search#upstash-vector-setup), we will start by logging into the Upstash Console and creating an Index. In the setup pop-up, we'll configure our vector index using a built-in Upstash Vector embedding model. For this demo, we'll use the **bge-base-en-v1.5** model, which has a vector size of 768. We'll also select the Cosine metric for distance calculation. For more information on metrics, refer to the [Upstash Vector documentation](https://upstash.com/docs/vector/features/similarityfunctions).
 
-![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXfLiD1DW5BjtnZjBWbwijYlLKqyIRBH5LbsnF4-jhZyxQR_fA5aaUQWlOOYNP3teelhrtzGQbgLKtMNCv-L-0aSikaFcac5chbXeClsvgJl4Uga7RWaygib5UMC1bU8j6dibvVafRsM9WnXL-qFv3KJSoM?key=fRetwLkHYMaVOu9inenb-w)
+![](/blog/directus-semantic-search/image-dc5963f6.png)
 
 We will keep the endpoint and token to use in the Directus app later. 
 
@@ -153,7 +153,7 @@ npm run dev
 
 After that, restart the app and check if the extension is shown on the admin UI.
 
-![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXdNbK5_6rKhpNEGZeg9Cw041PnckckQEnpzI0CdLIN-1iLnihOK-s05ZV-Q_23zwpr2uOQmVSgBH-z3sJqnJZD8hiuH7e_aDl1oGzHl0RNYcd2DImH9rc_xmeqr4Kqg5HfJbjaDBOTD8a6i03ipNQ6FzuwS?key=fRetwLkHYMaVOu9inenb-w)
+![](/blog/directus-semantic-search/image-d9698432.png)
 
 Now, we can add the event listener to the extension. We need to create an `index.ts` under the `src` folder in the extension. 
 
@@ -191,15 +191,15 @@ Remember to replace the endpoint and token placeholder with the Upstash Vector e
 
 Now, it is time to test the integration. For this, we will create an item as an example. We can create an item from the `content` tab in the admin panel.
 
-![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXdXvDj19fS4qtN3QwJiCbhuu-FMoOHtXNlDE9SMeNoFDTGfMou--9bIhkf98tYnewTQNOrW1r-p_iYORwe1boZrZAFSmW4SnO1A1qov8ghY10R8e4lDeLVGaiuQuIYJVFWP5Bdgo9MfWo_LvTPhyWq4Dtis?key=fRetwLkHYMaVOu9inenb-w)
+![](/blog/directus-semantic-search/image-0ea0019e.png)
 
 Let's pick a book and write it to the Directus `books` collection. 
 
-![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXfUuWxsYs8TTVzpccQfQrEpd3bGsVwOmalygRwnxE6HBNTYV981aJnnDQl7vyYZORH5hOfBzZl9jnm8JE4WqWRRPdJU5dqDHdveioYouk2NcmzIQqsaWwAxpMgVH2eW9gHH8aWXm0arlHsMx5PGnF4brcVl?key=fRetwLkHYMaVOu9inenb-w)
+![](/blog/directus-semantic-search/image-d4c56ffa.png)
 
 Once we save the new item, we should be able to see the vector representation of the book summary in the data browser tab of the Upstash Vector Index console.
 
-![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXe5azf1A_uIlRXo9zN0NOXLgZ_I9k2rCB92iEzKecfKMpV3X1FX_W1ySDH5Rryjq_uYRoPvvOCdvi3BHzsiR1Lquuov15FaXrRf7ez9tsGVyiBHP0xBhw_47CMpNHA9zqagLvqr8r7OT_g3-HZcmzKNGjP2?key=fRetwLkHYMaVOu9inenb-w)
+![](/blog/directus-semantic-search/image-752d5654.png)
 
 Vector representations of the items in the Directus data collection were needed for semantic search. With this Directus extension, every item will have its embeddings stored in the Upstash Vector automatically. 
 

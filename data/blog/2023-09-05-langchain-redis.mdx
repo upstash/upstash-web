@@ -82,7 +82,7 @@ export default function Home() {
 }
 ```
 
-![Form with input element](https://raw.githubusercontent.com/ap-1/langchain-upstash-redis/main/public/form.png)
+![Form with input element](/blog/langchain-redis/form-8557f286.png)
 
 The Vercel AI SDK exports a useful hook called `useChat`, which makes it very easy to create a conventional user interface for our chat app. It handles streaming chat messages and managing the state of our chat input. To use the hook, we need to tell React that this is a client component by adding the `"use client"` directive at the top of our file. Then, we can destructure a few properties from the `useChat` hook:
 
@@ -215,6 +215,6 @@ Our `latestMessage` object from earlier is used as the prompt for the LLM. We al
 
 That's it! You can now run your app with `npm run dev` and start chatting with your AI. The response will automatically be streamed back to the client we created earlier, and the conversation history will be stored in Upstash Redis.
 
-![AI remembers my name through conversation history](https://raw.githubusercontent.com/ap-1/langchain-upstash-redis/main/public/chat.png)
+![AI remembers my name through conversation history](/blog/langchain-redis/chat-aa498813.png)
 
-![Conversation history being populated in the Upstash Data Browser](https://raw.githubusercontent.com/ap-1/langchain-upstash-redis/main/public/upstash.png)
+![Conversation history being populated in the Upstash Data Browser](/blog/langchain-redis/upstash-c65f66eb.png)

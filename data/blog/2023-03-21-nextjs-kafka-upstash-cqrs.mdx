@@ -55,7 +55,7 @@ This article will only explain the crucial parts of the system. To run the examp
 
 Let’s look at the architecture of the whole system first. Figure 1 illustrates how the Upstash services and our serverless functions work together.
 
-![Figure 1: Serverless CQRS and event store architecture](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/ehfkz9zqb6o4l98q5fy4.png)
+![Figure 1: Serverless CQRS and event store architecture](/blog/nextjs-kafka-upstash-cqrs/ehfkz9zqb6o4l98q5fy4-28eda1ae.png)
 _Figure 1: Serverless CQRS and event store architecture_
 
 The first function handles client requests with a GraphQL API. GraphQL queries handle the reading queries of the CQRS pattern, and GraphQL mutations handle the writing commands.
@@ -349,7 +349,7 @@ QSTASH_NEXT_SIGNING_KEY=...
 3. Fill out the form shown in figure 2
 4. Click “Create”
 
-![Figure 2: Create Database](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/257znciwmil5ir2xts7i.png)
+![Figure 2: Create Database](/blog/nextjs-kafka-upstash-cqrs/257znciwmil5ir2xts7i-57db059f.png)
 _Figure 2: Create Database_
 
 After creating the database, you can scroll down to the “REST API” section and copy the `UPSTASH_REDIS_REST_UR`L and `UPSTASH_REDIS_REST_TOKEN` to the `.env.local` file.
@@ -363,10 +363,10 @@ After creating the database, you can scroll down to the “REST API” section a
 5. Fill out the form shown in figure 4
 6. Click “Create Topic”
 
-![Figure 3: Create cluster](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/hvfdadrgrogy5c0h22ln.png)
+![Figure 3: Create cluster](/blog/nextjs-kafka-upstash-cqrs/hvfdadrgrogy5c0h22ln-af8e8a75.png)
 _Figure 3: Create cluster_
 
-![Figure 4: Create topic](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/i7rqtsrk0bdf6aoz2sf4.png)
+![Figure 4: Create topic](/blog/nextjs-kafka-upstash-cqrs/i7rqtsrk0bdf6aoz2sf4-a733b20d.png)
 _Figure 4: Create topic_
 
 After you created the database, scroll to the “REST API” section and copy the `UPSTASH_KAFKA_URL`, `UPSTASH_KAFKA_USERNAME`, and `UPSTASH_KAFKA_PASSWORD` to your `.env.local` file. Also, add the topic name “events” as `UPSTASH_KAFKA_TOPIC` to this file.
@@ -382,12 +382,12 @@ After you created the database, scroll to the “REST API” section and copy th
 7. Write your projection URL like seen in figure 5
 8. Click “Add”
 
-![Figure 5: Add new topic URL](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/5gfy8ghh1wag2ohj43dc.png)
+![Figure 5: Add new topic URL](/blog/nextjs-kafka-upstash-cqrs/5gfy8ghh1wag2ohj43dc-66e7d75e.png)
 _Figure 5: Add new topic URL_
 
 Copy the `QSTASH_URL`, `QSTASH_TOKEN`, `QSTASH_CURRENT_SIGNING_KEY`, and `QSTASH_NEXT_SIGNING_KEY` from the “Details” tab (seen in figure 6) to your `.env.local` file. Also, add `QSTASH_TOPIC` with “events” to the file.
 
-![Figure 6: QStash credentials](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/2q9ogxyp17hzbqk7q3l8.png)
+![Figure 6: QStash credentials](/blog/nextjs-kafka-upstash-cqrs/2q9ogxyp17hzbqk7q3l8-6c6544f2.png)
 _Figure 6: QStash credentials_
 
 ## Testing the System
@@ -401,7 +401,7 @@ Start the server with the following commands:
 
 If you’re running on GitHub Codespaces, you must make the server's port public, as seen in figure 7, to Apollo GraphQL UI can read the schema from the server.
 
-![Figure 7: Port configuration](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/ubmscbjo15y3yw824rp5.png)
+![Figure 7: Port configuration](/blog/nextjs-kafka-upstash-cqrs/ubmscbjo15y3yw824rp5-b56f6e43.png)
 _Figure 7: Port configuration_
 
 ### Creating a New Task

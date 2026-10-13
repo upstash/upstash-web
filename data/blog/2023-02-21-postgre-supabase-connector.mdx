@@ -46,7 +46,7 @@ There is no need to create any topic for now. Once we have a Kafka cluster, we c
 
 First of all, we need to [sign in](https://app.supabase.com/sign-in) and create new project.
 
-![](https://lh5.googleusercontent.com/z05aRbRaDXlSUaMDHJ5MlTdhSF8fHW6M26jmkPYMKz9ZLiWw1Fuh9DSwanq8t027dUKV-dblP_xGy80bFxhGTsBTskim0yzNEjq0eIt9J5By5Ygi79RE4SNe2ThpJBNc_V1O__cs56Ql1WDaxqrSCkg)
+![](/blog/postgre-supabase-connector/image-45f29c17.png)
 
 While creating project, don’t lose the database password. It will be used while creating Serverless Kafka Connector.
 
@@ -56,11 +56,11 @@ The first will store comments that users have written on posts. Second one will 
 
 We need to enable realtime while creating the table. We can configure column settings. For example, in this post, we are going to set `comment_id` as primary, `comment` column nullable.
 
-![](https://lh3.googleusercontent.com/gP-gb4fzew1QRt67Chyv3qg9-JfOXIu9WFJdJhFcSVPq6xA3sYex0rryKfjN8iaIQgMnzMb7wIluyXn3sK0HE_Q0b6tjnKgZqXSi_EE2ksrgyl1P29pFBj_tliIuO0xJr-hF2BMIPtrdPsph4hXf0f4)
+![](/blog/postgre-supabase-connector/image-8572cf9f.png)
 
 Second table will be `likes` table with `user id`, `post id`. We again need to enable realtime and for this case, we are going to set `user_id` as primary.
 
-![](https://lh6.googleusercontent.com/BZ5gVmzWeU6JCeDb-9hUR2ct1gmOpESBXf56mHXACVso5-XWj-gSqoBLLC8c_xc53kxsISmfcCqHzRi7H9n60A60U9BH-ESDH2NKJLBUfDfXcucXu8_gqqDboz9VrXBbNMuuipcHyam9WKvxWneiVqg)
+![](/blog/postgre-supabase-connector/image-d70d9491.png)
 
 Our database for user activities are ready!
 
@@ -70,11 +70,11 @@ Let’s assume a user both liked and commented on a post.
 
 For `comments` table, we can add the first example row:
 
-![](https://lh3.googleusercontent.com/fegZRL5YZPlO60Zq8M5-y0KLO1LK4-PCtCw_whHcocDKVDyG5XyKuVPnxcmlp8ikwpcaxGe6C44lu9zdibCheEPrHM3GvPoo2hmAi69amGw2bfZC5D9yIxVFIimcOyL4-Of7WJuk4O-jVZKZ286_lao)
+![](/blog/postgre-supabase-connector/image-41a2ac4e.png)
 
 For `likes` table:
 
-![](https://lh3.googleusercontent.com/VA2IdD_lm9S0kG1K9a4ITu5PPrAtw6Uv_aIwuc295XxoHeeE7AlHuYYowpehRX5gdrJ0D7bUPedUj15p5HIqMtCruZIDMKFYM9ztca_cG7MIIqGPB6JRu_pUhCZqiQkoPqYngupANOZw6ykDfO7g57U)
+![](/blog/postgre-supabase-connector/image-1909e264.png)
 
 It is very easy, isn’t it?
 
@@ -90,7 +90,7 @@ You can fill connector name and server name as you wish.
 
 For the rest, we will define which schema and tables we are going to stream from. For our case, schema will be `public`, tables will be `public.Comments,public.Likes`.
 
-![](https://lh6.googleusercontent.com/g7NdFF39-Nvnc0-ThvAce9tCZsRmvFwVHTU990EzOIytVjlL3p9ErlQTVggg9jAnmyT0kb5c2Dzrfpyi6KfFXHupjCd5lHBoc-OeW1sSx_ZBmjlm84fhvLotMT4KcvGdbA_u7r-FXHoO37U0fw-T0eU)
+![](/blog/postgre-supabase-connector/image-945ad5b3.png)
 
 In the last step, we can review Debezium connector settings as JSON. At this step, we should add 2 new property to prevent failures:
 
@@ -136,7 +136,7 @@ To see incoming messages, we need to populate Supabase tables. Go back to Supaba
 
 After we add new row, then we can observe the corresponding topic. Example incoming message:
 
-![](https://lh4.googleusercontent.com/JsrpaL-NGm6qpTSNqTd1gB2KQVugLNkfYoZwo5_fdLR21wn_obx_Xykcv3dZgOMM-Lf0Qvr1_GSff5qkonR-pKQkuAFbMPQjOiuLLw25MotwUk6PfnI8xU_aZsgnZihYb4ZgQ_mwuiCOpYfrNBhGsIA)
+![](/blog/postgre-supabase-connector/image-b650d9d3.png)
 
 ### Consuming Streamed Data from Kafka
 

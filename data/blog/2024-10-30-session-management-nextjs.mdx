@@ -68,7 +68,7 @@ After clicking on next button, we will select the pricing plan. Pay as you go wi
 
 Now, our Redis database is ready. We can see the database endpoint, the password to connect to the database and its port on the Redis dashboard. We will need this information when we want to connect to the database from the web application.
 
-![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXe4aZGFsyJR-GUC-nna-Gi7jlqdi02NUhN5yMbAbpsDNXafij7EuvtKHdXBIZA3r_SyuEQt57V1nMJ9-0LoO6F-rEjDB6032Q7lIw-tLdqWu7JAd9IhY1vkGXVUiFx01CiQsDKs-kdDg5SpVTp7MpMokRCb?key=Wj2CT6AA1M1XZTqemqn9F2xy)
+![](/blog/session-management-nextjs/image-038c92d2.png)
 
 That’s it!
 
@@ -86,7 +86,7 @@ Let’s see how Redis will work within the web application infrastructure:
 
 Here is the sequence diagram of the service and its connection with Redis to visualize the process better:
 
-![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXc6My-5er262jYp-BPPMJS4lz8ahPip9C4wnpElVEEf4S1gMUt7OYdaIUWj55YY6aJRzcHABNJ81maHAatcxt9uJwD6J_btwD4kV8hA5tVlAFNv72QpupIs48Vmlxz0rmXk_oPQWL9uN6RkTG_rtKb4K_o5?key=Wj2CT6AA1M1XZTqemqn9F2xy)
+![](/blog/session-management-nextjs/image-a2c7ce06.png)
 
 If everything is good, we can create a Nextjs app by running the following command in a terminal unless you have a Nextjs app.
 
@@ -218,13 +218,13 @@ Now, we can open the API endpoint, `http://localhost:3000/api/user/noah` on a br
 
 If you right-click and inspect, you will see the session-id set in the cookies by going to the “Application” tab.
 
-![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXcMIEUPDlMQw8sBwMwFZCd40zgtyqagV2EAC33j3q3x3ux5GzuQ9gUe7R8N-FRxtTh-7KChL5RmP7l61LP1pB-irUysIa6ErxL8q-7ZOKq43yoFO1Mq_DjVfI6o3vZnSasjvqIs9ED34fhLn_Rx1CEKN1DG?key=Wj2CT6AA1M1XZTqemqn9F2xy)
+![](/blog/session-management-nextjs/image-ca57d948.png)
 
 We can also check Upstash Redis if the session is created in the database or not. To check it, we should go back to the [Upstash Redis console](https://console.upstash.com/redis), open the Redis database and open the `Data Browser` tab.
 
 The `Data Browser` tab will show the session data as shown below.
 
-![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXf13iNpFZW2SnZZNDn9IKuvNND4SHyqQViAYlQVFwyjrb5bQ-DvCJ-itNMZL4BgmHP1dLCQVpWArKNVbTGrJ6eSykJVgGr8-2SG0IiwLAgSFWx4KonFLfhQ8_aQi2EQcQlPKlpwRObHL6OT-iJdzNUhvU-k?key=Wj2CT6AA1M1XZTqemqn9F2xy)
+![](/blog/session-management-nextjs/image-dc3fe446.png)
 
 ### Conclusion
 

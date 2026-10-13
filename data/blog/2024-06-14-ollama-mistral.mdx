@@ -32,7 +32,7 @@ We will follow the [Upstash documentation](https://upstash.com/docs/vector/overa
 
 Let's login [console](https://console.upstash.com/vector) and click to "Create Index". Creating index is pretty simple. Since the size of the embeds that our Embedding model will produce is 768, we just need to set the dimensions to 768 to make our index compatible.
 
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXfZ1AbevB5AvhP2hyG7eftLLnw82RL6V7bWiLXx4WaoLRjTcSMUsTH3k6VEnHH6HdoiXmFVjyF6FJYliDTKmsfVnT37HNy5cQLnuUfq8_p4VgxbK-p93pLXfAtb66KfT5i3WRnwmOQZyyZjGHAQNFkJLjfE?key=NrpGZ4bIcUWpOi3ktgiYcQ)
+![](/blog/ollama-rag/image-8c50b73c.png)
 
 When we click "Next", we will need to select a payment plan. We can go with the free plan for this demo.
 
@@ -125,7 +125,7 @@ We should also create `.env` file in the root directory of the Nextjs project to
 
 To get Upstash Vector credentials, we should open [Upstash Vector Console](https://console.upstash.com/vector) back, open the Index that we created and copy the `.env` configs under Connect.
 
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXcr8LBg7TJzTbTCvajCJPMiUSkcuzTQT8neql_CzhA_pJ2XcMefW-prdH05KfEFDr2ikwtnG77nPPF1ZAe7lc6_sfLr41q6Dbapj24nRNbwAaaxs3cP6SUiMwawcG_t8kEhC93SFCQUSXvrsjOS5TUZdrLw?key=NrpGZ4bIcUWpOi3ktgiYcQ)
+![](/blog/ollama-rag/image-a4308192.png)
 
 Copy these configurations and paste them into the `.env` file in the project. Also append the following fly.io base url as well.
 
@@ -440,7 +440,7 @@ export function ChatMessageBubble(props: { message: Message, botName?: string, s
 
 Our chatbot application is ready! We can test it by openning `localhost:3001` on any browser.
 
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXfhmyNRSfEzqJgZ02F1feTghgCAxtrs4HYxos5JmdXkU4hu4tZ9Hpm9Q-ZlmGGZb1cYz3M9GJFYTYoyTLcWo26M_e1ybpCd1aOkVF8h29OfWfAYuRHkf7PWvYWklxeTCi9g65noHLc3w7thLsPm4VxtpCVS?key=NrpGZ4bIcUWpOi3ktgiYcQ)
+![](/blog/ollama-rag/image-62b38708.png)
 
 ## Deploy the Chatbot to Fly.io
 

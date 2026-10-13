@@ -22,7 +22,7 @@ Once we get the updates from the Supabase database to the Kafka topic, we can co
 
 Here is the simple flow of the CDC pipeline:
 
-![](https://lh7-us.googleusercontent.com/y5q0ttRWYQlReOln8G8FQf2NO1x6EYFUJskTYwBph7F8VfGU66CURaMioHKfvsXg2_kJyP57QVG87O5k2SQ6kI1pWsKKPtaT8o7ybuH64P8ItgHauSS9_k91so_yoBxhD5T8LLO4U-YpDBf5NWAQ4Q)
+![](/blog/cdc-postgesql-kafka-tinybird/image-1575824b.png)
 
 Creating this pipeline is going to be easier than drawing it!
 
@@ -44,7 +44,7 @@ You can also check my [previous blog post](https://upstash.com/blog/postgre-supa
 
 Let’s [sign in](https://app.supabase.com/sign-in) and create a Supabase project if you haven’t yet.
 
-![](https://lh7-us.googleusercontent.com/-HGb-ptHrvK1JPqT8XFsYdvH46MkVYh54WbAZ_wAjLzL7Nsm4SVMLXMMvDm79ctgZfiukmpOxFTO-dc_NUObqYmQ2-Jw6YC0Xi7iij3K7G3XfZK7uyQTuYPoxjygoayL5Dw8vr6U1ZzeA8LsBhEQjQ)
+![](/blog/cdc-postgesql-kafka-tinybird/image-a64a9178.png)
 
 Don’t forget the password you have chosen here. We will need it later to connect to the Kafka cluster.
 
@@ -52,13 +52,13 @@ Now, we can create a new table from `Table Editor` tab on the right.
 
 In the Table Editor, click `New Table`.
 
-![](https://lh7-us.googleusercontent.com/ePooBNtuD5x93jkfhQkxLWYEV_q4PYxM5a0XoVfEPB21vnReioi8kt_sNHlv1dGEClEv7bq64WuMMzuyWFSJmWdhv7EEPYaEaYw6z7bljP1IL3ZJmRUvFSA-g4ZKviaglwJYWZeyRPXflZucSEdJ4A)
+![](/blog/cdc-postgesql-kafka-tinybird/image-64f654b2.png)
 
 Since this is a demo project showing how to create a CDC pipeline, we will create just one table with a simple structure.
 
 The table will have three columns: `name`, `city` and `country`.
 
-![](https://lh7-us.googleusercontent.com/2NsNwuuw4MMbEg5ZsPZEJKpmxggar7bFeEUPBCpuNhv1Xma6jPv_Wjm9lsQq0G38_3wUwCu_paKuSonGpMEHv_jwAsQ_DRMAg1NCzipcFdqsODCS9Z6zgdl5AKrNt8vm70C3iTnlRAEfXAJy6pUWVg)
+![](/blog/cdc-postgesql-kafka-tinybird/image-043cd495.png)
 
 We need to enable real-time while creating the table.
 
@@ -68,7 +68,7 @@ We can add rows to the table by clicking `Insert` button in Table Editor.
 
 Let’s write some random data as the first row.
 
-![](https://lh7-us.googleusercontent.com/waugobBMPoS1NprYaJ_wR2Pvv2le2RjlvIjRMQp5pz2KWkC5MCeG18MdWbKedX2NntfyZkPi23Y75KKDB1eHnVGtcu87t1xOSbOYQdIS8Qc9Idb1b4QrU8ysr3Z0Io-ZLmN7rSj1cuzD53q27myDIA)
+![](/blog/cdc-postgesql-kafka-tinybird/image-57b685c6.png)
 
 Our PostgreSQL database is up and ready.
 
@@ -86,7 +86,7 @@ Upstash provides a bunch of connector types. The one we need is a `Debezium Sour
 
 To complete the configuration step for the new connector, revisit our Supabase project and open the database settings from the settings tab on the left. We will utilize the host, port, user, project password, and database name in the configuration of the Kafka connector.
 
-![](https://lh7-us.googleusercontent.com/17WcidRFnCDBVXvW-eZ2uZU1mjyP2h-wHy03RIqTUFScwS2uRcMLw60FwNwkJ5bgpb2BDfk588zNi4q9FwW6jYQXBRO-t0iujWQc56sp_47tr_PMTKA69PKRk6YzxF3e6Z3uGSYMc4TlD5V2EkoKmg)
+![](/blog/cdc-postgesql-kafka-tinybird/image-0a4fab46.png)
 
 We can choose any desired names for both the connector and server.
 
@@ -137,7 +137,7 @@ After inserting the new row, we can go back to the Upstash Console and check whe
 
 We should see a big JSON data containing the row's new value. Since the row is new, we will see the previous value as `null`.
 
-![](https://lh7-us.googleusercontent.com/823CiFmIWSiAtde6fvIAyMbG9NI7Oo1JOkTI-IJhgu9VJXZ4GWXUk8sPzoFV7mm_ptq8XjEY0Z7_MM1GftiblKHzXhwwpta3QN0tAchABOgPVdr-SJTUq6zeHhOmDC_y7aJnCFLrfbSB4DeIKdH7vA)
+![](/blog/cdc-postgesql-kafka-tinybird/image-68f3a2f4.png)
 
 ## Tinybird Setup
 
@@ -153,13 +153,13 @@ Let’s first [login](https://ui.tinybird.co/login) to Tinybird.
 
 We should select a region as the next step. Selecting the region closer to the Upstash Kafka cluster would be better.
 
-![](https://lh7-us.googleusercontent.com/1Og3hkuyKc46IYB8lqMfwQKvfMUCtxIWS5aiQWY-VgaAOk3IN1pwFPFqScemQ4_rE-FAOsFXGZmas8EeCUJrBGxPcC66UV33hORueoODhhZUzZFZ_YZnXfY9w0dCyrIp8FneXQ9HdhiRjKvIprglZA)
+![](/blog/cdc-postgesql-kafka-tinybird/image-b40f5400.png)
 
 Once we create the workspace, we will click the `Add Data` button and select Kafka in the following pop-up.
 
 We will use Upstash Kafka cluster credentials in Tinybird to create a connection.
 
-![](https://lh7-us.googleusercontent.com/pNirry4sWfvBni8qcMXADbvspBOzM_KhZ6G4Yp-2aMKGmREFu0_2g1C4agh6ruAJ6U8F1bKENCLnSaG9QpD-3PyYHcGXMP_Jy9cBn7L9Gv7MDZRYqxTximHjaRrpazuXuXIxK37vJI6N5ocn0H-1HQ)
+![](/blog/cdc-postgesql-kafka-tinybird/image-28a080b8.png)
 
 Go back to the Upstash Kafka cluster and copy the fields to Tinybird as follows:
 
@@ -171,15 +171,15 @@ Go back to the Upstash Kafka cluster and copy the fields to Tinybird as follows:
 Lastly, select `SCRAM-SHA-256` as SASL mechanism and click next.
 In the next screen, we should select the topic connected to the Supabase in the previous section.
 
-![](https://lh7-us.googleusercontent.com/WhQoQUKlTP7QusI2mr5WsaowTNjYr6w6huMPfePx_hvC3lFS4QixA11oK_M6da-oNfAhhmRHGjT1sHQwnwaprB_6DwTzts5utjh283SE-wlZyfGJ5nsqpIzKQTIFuOjhl1kP5H_f_YQbUXNhxHdAFQ)
+![](/blog/cdc-postgesql-kafka-tinybird/image-f7ef2ba8.png)
 
 In the next step, we will select `Latest` and click `Next`.
 
-![](https://lh7-us.googleusercontent.com/LqgzrGcYBsbyx053sZjfW4w6WRL7Yor-9ldbHXEId1xaTmcFIkKZ6b9l8qIedxUjFk-pN3HdpmxZg83trjVxPqKMeXaI6XtZw1SZRHpN4HIHHzrXh49sKOrtjWLBzFwkymaSAslRjrHja8_-nuTZOQ)
+![](/blog/cdc-postgesql-kafka-tinybird/image-1f15ea39.png)
 
 In the last step, we can see the data retrieved from the Kafka topic in a table format.
 
-![](https://lh7-us.googleusercontent.com/gTJJeDBGGzruVn4LZvcYF8v6_8Qi4X3QryQe1YWSI3lZab-U19zmk7epPbFvv6SCJbEghZ3LSHOyan5LAXdp3xwW0wzPKm3h8tN6nUt9XAnoPENFHA6cBnCDGaeRKFTJkHcA34f1gP_egotTvowJIw)
+![](/blog/cdc-postgesql-kafka-tinybird/image-74e9e424.png)
 
 You can select the columns you want to retrieve from the Kafka topic to Tinybird.
 
@@ -193,7 +193,7 @@ In our use case, we want to simplify the data and use only 3 columns: `name`, `c
 SELECT payload_after_name as name, payload_after_city as city, payload_after_country as country FROM kafka_ds_254697
 ```
 
-![](https://lh7-us.googleusercontent.com/8ZQXzCMRfAEjKSDXq6eq5bSuoF8LwToxnixRt9CmJs-u-qYfssQQN6vEF05j6UAyWLDS3Yd_CyOMqaLyiUUTEzhFP1sp2y0KgCxmNMYut-R9n52jj3hFVk6M2yDeziGbO3FnRcQ0ltnL52th1NLgZg)
+![](/blog/cdc-postgesql-kafka-tinybird/image-69f074ab.png)
 
 At the end, we can create an API Endpoint from this pipe by clicking on `Create API Endpoint`. You can view and use the API in Swagger by clicking the `Open in Swagger` button.
 

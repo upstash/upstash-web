@@ -41,9 +41,9 @@ Let us start by creating a simple maven project. We will use [Twittered](https:/
 
 First, we need to create user credentials to use Twitter API. Sign up for a developer account at [Twitter Developer Portal](https://developer.twitter.com/en). Sign in to developer console. Give a name to your app. We will use bearer token for credentials.
 
-![](https://i.imgur.com/E2K5cjj.png)
+![](/blog/tweet-kafka/e2k5cjj-f3c801aa.png)
 
-![](https://i.imgur.com/yGAnrcn.png)
+![](/blog/tweet-kafka/yganrcn-de0c2d46.png)
 
 ## Twitter Client Connection and Tweet Search
 
@@ -134,31 +134,31 @@ We have all the parts that we need for our project. Let's build a jar archive co
 
 We need an AWS account. Create AWS Lambda function in AWS UI. We are going to make some configuration. Configure "Handler" parameter as tweetStream.TweetStreamApp::handleRequest.
 
-![](https://i.imgur.com/BuxspZL.png)
+![](/blog/tweet-kafka/buxspzl-0f046aa6.png)
 
 Add environment variables under configuration part.
 
-![](https://i.imgur.com/jrC85t2.png)
+![](/blog/tweet-kafka/jrc85t2-61007b8f.png)
 
 Configure Timeouts: 30 sec, Memory: 512 MB and Ephemeral storage: 512 MB.
 
-![](https://i.imgur.com/tatMLOJ.png)
+![](/blog/tweet-kafka/tatmloj-ebbca7df.png)
 
 Add a schedule rule in Amazon EventBridge to schedule our function every 15 minutes.
 
-![](https://i.imgur.com/srjlDEK.png)
+![](/blog/tweet-kafka/srjldek-ce6b29b2.png)
 
 Add a EventBridge trigger for our lambda function. Pick the schedule rule that we created in the previous step.
 
-![](https://i.imgur.com/gC8lsRB.png)
+![](/blog/tweet-kafka/gc8lsrb-ac5f56f6.png)
 
 Our function will be triggered every 15 minutes now. We can see the logs in CloudWatch.
 
-![](https://i.imgur.com/XHBmsda.png)
+![](/blog/tweet-kafka/xhbmsda-c2200aef.png)
 
 Let's check Upstash console and verify that our Kafka topic is receiving messages.
 
-![](https://i.imgur.com/HNKcTyJ.png)
+![](/blog/tweet-kafka/hnkctyj-9125dd64.png)
 
 Lets write a simple Kafka consumer to verify that we can consume all these tweets.
 
@@ -195,7 +195,7 @@ public static void main(String[] args) throws Exception {
 
 It is working :)
 
-![](https://i.imgur.com/WkKsj4k.png)
+![](/blog/tweet-kafka/wkksj4k-459e4784.png)
 
 ## Conclusion
 

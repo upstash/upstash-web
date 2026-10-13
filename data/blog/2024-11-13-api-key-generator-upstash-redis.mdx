@@ -31,7 +31,7 @@ Key features will include:
 
 This diagram illustrates the interaction between the client, our Cloudflare Worker, and Upstash Redis for both creating and validating API keys. With this overview in mind, let's start building our system.
 
-![https://1wkkahasy6a0u3rf.public.blob.vercel-storage.com/blog/mermaid-diagram-2024-11-08-153609-LjqIaZNv8n7UsRSgACGbmHPfEGYfnt.png](https://1wkkahasy6a0u3rf.public.blob.vercel-storage.com/blog/mermaid-diagram-2024-11-08-153609-LjqIaZNv8n7UsRSgACGbmHPfEGYfnt.png)
+![https://1wkkahasy6a0u3rf.public.blob.vercel-storage.com/blog/mermaid-diagram-2024-11-08-153609-LjqIaZNv8n7UsRSgACGbmHPfEGYfnt.png](/blog/api-key-generator-upstash-redis/image-908d5e2f.png)
 
 ## **Prerequisites**
 
@@ -95,11 +95,11 @@ npm install hono @upstash/redis @upstash/ratelimit @hono/zod-validator zod wrang
 
 1. Log in to your Upstash account and create a new Redis database
 
-![https://1wkkahasy6a0u3rf.public.blob.vercel-storage.com/blog/e639568c-7434-4986-aa6d-738d705e8139-UQ4NIDP70Hsu7hFdZt0n51fXmJQ91s.png](https://1wkkahasy6a0u3rf.public.blob.vercel-storage.com/blog/e639568c-7434-4986-aa6d-738d705e8139-UQ4NIDP70Hsu7hFdZt0n51fXmJQ91s.png)
+![https://1wkkahasy6a0u3rf.public.blob.vercel-storage.com/blog/e639568c-7434-4986-aa6d-738d705e8139-UQ4NIDP70Hsu7hFdZt0n51fXmJQ91s.png](/blog/api-key-generator-upstash-redis/image-719cde64.png)
 
 1. Once created, navigate to the "REST API" section
 
-![https://1wkkahasy6a0u3rf.public.blob.vercel-storage.com/706941d5-30bd-4fc8-8f5a-8c5c209638bd-7EfBnVEoMAL73Y7NizXz1IEbUXLgGM.png](https://1wkkahasy6a0u3rf.public.blob.vercel-storage.com/706941d5-30bd-4fc8-8f5a-8c5c209638bd-7EfBnVEoMAL73Y7NizXz1IEbUXLgGM.png)
+![https://1wkkahasy6a0u3rf.public.blob.vercel-storage.com/706941d5-30bd-4fc8-8f5a-8c5c209638bd-7EfBnVEoMAL73Y7NizXz1IEbUXLgGM.png](/blog/api-key-generator-upstash-redis/image-94997394.png)
 
 1. Copy the `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` in the `.env` section
 
