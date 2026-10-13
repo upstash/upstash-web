@@ -25,6 +25,40 @@
   }
 }
 
+/*
+ * Soft glow behind sections. Painted as a gradient instead of a large
+ * filter: blur(), which Safari 27 renders as visible 512px tiles.
+ * Stops are fitted to the old blur-[90px] ellipse.
+ */
+.section-glow::before {
+  content: "";
+  position: absolute;
+  inset: -35% 0;
+  background: radial-gradient(
+    72% 48.5% at 50% 50%,
+    color-mix(in srgb, var(--color-primary) 100%, transparent) 0%,
+    color-mix(in srgb, var(--color-primary) 97%, transparent) 33%,
+    color-mix(in srgb, var(--color-primary) 92%, transparent) 42%,
+    color-mix(in srgb, var(--color-primary) 83%, transparent) 50%,
+    color-mix(in srgb, var(--color-primary) 71%, transparent) 58%,
+    color-mix(in srgb, var(--color-primary) 51%, transparent) 67%,
+    color-mix(in srgb, var(--color-primary) 29%, transparent) 75%,
+    color-mix(in srgb, var(--color-primary) 16%, transparent) 83%,
+    color-mix(in srgb, var(--color-primary) 6%, transparent) 92%,
+    transparent 100%
+  );
+}
+
+@supports not (color: color-mix(in srgb, red, transparent)) {
+  .section-glow::before {
+    background: radial-gradient(
+      72% 48.5% at 50% 50%,
+      var(--color-primary),
+      transparent
+    );
+  }
+}
+
 @layer base {
   select {
     @apply appearance-none bg-no-repeat !pr-12;
