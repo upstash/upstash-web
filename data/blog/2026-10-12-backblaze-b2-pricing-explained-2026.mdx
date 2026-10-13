@@ -1,0 +1,191 @@
+---
+authors: [josh]
+slug: backblaze-b2-pricing-explained-2026
+tags: [blob]
+title: "Backblaze B2 Pricing Explained (October 2026): Storage, Egress and API Costs vs. Upstash Blob"
+description: Backblaze B2 costs $6.95 per TB a month, with free downloads up to 3x what you store. Here is every line on a B2 bill, and when Upstash Blob's 1 TB of free downloads costs less for app files.
+---
+
+You probably know that Backblaze’s [B2 service](https://www.backblaze.com/cloud-storage/pricing) is billed at $6.95 per Terabyte (TB) per month. You probably also know that there’s no charge for uploads or the majority of API calls. So if you’re using B2 for backups or archives where things generally sit in a bucket, that $6.95 TB/month is pretty much what you’ll pay.
+
+If you’re using B2 to build applications that serve files to users, though, there’s another number you should know: B2 includes free downloads of up to three times your data storage amount, but each Gigabyte (GB) after that costs $0.01. 
+
+So if you’ve got a 20 GB bucket of images, you can serve 60 GB of downloads for free, but if users download 500 GB of images in a month, you’ll be billed for the other 440 GB.
+
+With [Upstash Blob](https://upstash.com/blob), you get [1 TB of free downloads each month](https://upstash.com/pricing/blob), regardless of your storage amount. For the example image app above, it would cost $1.38/month on Upstash Blob instead of $4.47/month on Backblaze B2.
+
+![](https://cdn.bydefault.so/image-H9Jm_sF6vyx-jpAoUyTv-.png)
+
+## How much does Backblaze B2 cost?
+
+Backblaze B2 pricing is $6.95 per TB per month ($0.00695 per GB per month) on a pay-as-you-go model. You get the first 10 GB for free. Downloading is free up to 3x the average data stored, then $0.01 per GB.
+
+![](https://cdn.bydefault.so/image-cuhKl6s1hb0bPy68zt4-7.png)
+
+So for example:
+
+| Item | Price |
+| --- | --- |
+| Storage | $6.95 per TB per month ($0.00695 per GB), billed by the byte-hour |
+| Free storage | First 10 GB |
+| Uploads | Free |
+| Downloads (egress) | Free up to 3x your average monthly storage, then $0.01 per GB |
+| Downloads to partner CDNs | Free (Cloudflare, Fastly, bunny.net and others) |
+| Class A, B and C API calls | Free |
+| Class D calls | First 2,500 a day free, then $0.004 per 10,000 |
+| Minimum file size or storage time | None |
+| B2 Overdrive | From $15 per TB per month with free downloads, for multi-petabyte commitments |
+
+Class A, B and C transactions include pretty much everything an application does - uploading, downloading, copying, listing and deleting objects, while Class D transactions only cover [outbound event notifications](https://www.backblaze.com/cloud-storage/transaction-pricing).
+
+You select a region - US West, US East, EU Central or CA East - when you create a Backblaze B2 account. Although Backblaze B2 pricing is identical across all four regions, you can’t [move an account from one region to another](https://www.backblaze.com/docs/cloud-storage-data-regions); if you want to store data in a different region, you must create a new account in that region.
+
+## How the 3x free egress works
+
+For [B2](https://www.backblaze.com/cloud-storage/pricing), multiply your average storage during the billing month, in byte-hours, by three. That is your free download allowance for the month. Each additional GB is $0.01.
+
+Take a 50 GB bucket that users download 1 TB (1,000 GB) from in a month:
+
+```text
+Free downloads:  3 x 50 GB         = 150 GB
+Paid downloads:  1,000 - 150 GB    = 850 GB x $0.01    = $8.50
+Storage:         50 - 10 free GB   = 40 GB x $0.00695  = $0.28
+Total                                                  = $8.78
+```
+
+Downloads are $8.50 of $8.78 - that's 97% of the total bill. This shows that the advertised price of $6.95/TB is mostly irrelevant to determining price here; the deciding factor is the download frequency of individual files.
+
+![](https://cdn.bydefault.so/image-rVOLA22iJ1kfe3mQLPWke.png)
+
+## B2 vs Upstash Blob for files your users download
+
+Profile pictures, product images, PDFs and exports are written once but read many times. This means that they can exceed the 3x allowance on B2.
+
+On Upstash Blob, the download allowance is not tied to the amount you have stored: you get [1 TB of free downloads every month](https://upstash.com/pricing/blob) on the pay-as-you-go plan.
+
+The two rate sheets side by side:
+
+|  | Backblaze B2 | Upstash Blob |
+| --- | --- | --- |
+| Storage | $0.00695 per GB (first 10 GB free) | $0.02 per GB |
+| Free downloads | 3x what you store | 1 TB a month |
+| Downloads after that | $0.01 per GB | $0.02 per GB |
+| Reads | Free | $0.30 per million |
+| Uploads, copies, lists | Free | $4.50 per million |
+| Deletes | Free | Free |
+| CDN | Bring your own | Global CDN included |
+| Regions | One per account | Global, no region to pick |
+
+![](https://cdn.bydefault.so/image-i0AXEAWEznVOBBvYwZXU8.png)
+
+A little helper script I made:
+
+```ts
+type Month = {
+  storedGB: number
+  downloadedGB: number
+  reads: number
+  uploads: number
+}
+
+// Backblaze B2 pay-as-you-go
+function b2(m: Month) {
+  const storage = Math.max(m.storedGB - 10, 0) * 0.00695
+  const egress = Math.max(m.downloadedGB - 3 * m.storedGB, 0) * 0.01
+  return storage + egress
+}
+
+// Upstash Blob pay-as-you-go
+function upstashBlob(m: Month) {
+  const storage = m.storedGB * 0.02
+  const egress = Math.max(m.downloadedGB - 1000, 0) * 0.02
+  const ops = (m.reads / 1e6) * 0.3 + (m.uploads / 1e6) * 4.5
+  return storage + egress + ops
+}
+
+const workloads: Record<string, Month> = {
+  images: { storedGB: 20, downloadedGB: 500, reads: 2_500_000, uploads: 50_000 },
+  pdfs: { storedGB: 100, downloadedGB: 1000, reads: 500_000, uploads: 20_000 },
+}
+
+for (const [name, m] of Object.entries(workloads)) {
+  console.log(
+    name.padEnd(8),
+    `B2 $${b2(m).toFixed(2)}`.padEnd(12),
+    `Upstash Blob $${upstashBlob(m).toFixed(2)}`,
+  )
+}
+```
+
+```text
+images   B2 $4.47     Upstash Blob $1.38
+pdfs     B2 $7.63     Upstash Blob $2.24
+```
+
+Our (example) image app stores 20 GB of \~200 KB images. Users access them 2.5 million times a month (500 GB downloaded) and upload 50 thousand new images. 
+
+The PDF app stores 100 GB of 2 MB files. Users access them 500 thousand times a month (1 TB downloaded). 
+
+![Cost for an app that stores 100GB and has 1TB of egress](https://cdn.bydefault.so/image-8iiGJ3hOi9emI8z5jEOFy.png)
+
+## Free downloads through Cloudflare take extra setup
+
+B2 [does not charge](https://www.backblaze.com/cloud-storage/pricing) for downloads that go through partner CDNs like Cloudflare, Fastly, or bunny.net. To take advantage of this, your users must download the files through the CDN using your own domain name. If your bucket is public and you’re using Cloudflare, this requires [several steps](https://www.backblaze.com/docs/cloud-storage-deliver-public-backblaze-b2-content-through-cloudflare-cdn):
+
+1. **Make the bucket public.** Your first public bucket requires you to verify your email and have a billing history or pay a small fee by card.
+2. **Add your domain to Cloudflare** and switch to its nameservers.
+3. **Add a proxied CNAME record** that points a subdomain (e.g. `photos.yoursite.com`) to your bucket’s B2 host.
+4. **Add a URL rewrite rule** that adds `/file/your-bucket` to every request path.
+5. **Set the SSL configuration** to ‘Full (Strict)’ and configure cache rules (Cloudflare only caches certain types of files by default).
+
+![](https://cdn.bydefault.so/drawing-lE_fLHULCCs0dgnOD6eSj.png)
+
+An easy mistake to make, and one with serious security implications, is to forget step 4. Your CNAME points to a B2 host that is shared with other customers, each with their own public buckets. Without the rewrite rule, anyone can use your domain name to access files from other customers’ public buckets on the same host.
+
+The process is even more complex for private files. Cloudflare must sign every request it makes to your private bucket, so you must [write and deploy a Cloudflare Worker](https://www.backblaze.com/docs/cloud-storage-deliver-private-backblaze-b2-content-through-cloudflare-cdn) that includes a B2 application key. Cloudflare does not cache signed requests by default, so you must also add a Cache-Control directive to the bucket's info in B2.
+
+None of this is necessary with Upstash Blob. Every file is [replicated to a global CDN](https://upstash.com/pricing/blob), and a public bucket is accessible through its own URL. Reads from a private bucket can be served with [time-limited signed URLs](https://upstash.com/docs/blob/bucket/reading), which the SDK creates for you.
+
+## Uploading from the browser
+
+You can upload files from the browser directly to storage to keep large uploads off your server. Both Blob and B2 support this, but there is a big difference in how much code you need to write.
+
+On B2, you use the S3-compatible API. Your server signs a URL with the AWS SDK, and the browser uploads the file with a PUT request. (B2 [does not support browser uploads with a presigned POST](https://www.backblaze.com/docs/cloud-storage-s3-compatible-api).) You must configure [CORS rules](https://www.backblaze.com/docs/cloud-storage-cross-origin-resource-sharing-rules) on your bucket to allow your site.
+
+Showing upload progress, retrying uploads, and breaking large files into parts are all up to you.
+
+Upstash Blob's SDK has an upload handler for your server and React hooks for the browser. The handler decides who can upload, where each file goes, and which sizes and types are allowed:
+
+```ts
+import "server-only"
+import { uploadHandler } from "@upstash/blob"
+
+export const uploads = uploadHandler({
+  constraints: {
+    maxSize: "20mb",
+    contentTypes: ["image/*", "application/pdf"],
+  },
+  onBeforeUpload: ({ file }) => ({ path: `images/${file.name}` }),
+})
+```
+
+The browser uploads directly to Blob.
+
+By using the `useUpload` hook, you get the following for free:
+
+- Multipart uploads > 16 MB with pause/resume and per part retries
+- File selector that blocks if file size is too big before initiating any request
+- Consistent upload progress updates (whether single PUT request or 200 parts)
+- Typings from the server handler to the client
+
+![](https://cdn.bydefault.so/drawing-FBe7cQsTrjxWjM8m0NAkv.png)
+
+## Which one to pick
+
+B2 is designed for data that sits there. It’s for backups and archives that you write once and rarely read. The cost of storage is low, and the 3x free allowance lets you restore from that backup if you need to.
+
+Upstash Blob is designed for files that your app needs to serve. For images and avatars, PDFs and exports, the terabyte free allowance covers the downloads that B2 charges you for, while the CDN, signed URLs, and browser uploads are included with your bucket.
+
+You can [create a bucket in the console](https://console.upstash.com/blob), then use the [quickstart](https://upstash.com/docs/blob/overall/quickstart) to upload your first file.
+
+If you’d like to see more price examples, check out [AWS S3 pricing explained](https://upstash.com/blog/aws-s3-pricing-explained-2026), or our comparison of [object storage for SaaS applications](https://upstash.com/blog/whats-the-best-object-storage-for-a-saas-september-2026-comparison).
