@@ -19,7 +19,7 @@ const box = await Box.create({
   runtime: "node",
   agent: {
     harness: Agent.ClaudeCode,
-    model: "anthropic/claude-opus-4-6",
+    model: "anthropic/claude-opus-5-5",
     apiKey: process.env.ANTHROPIC_API_KEY,
   },
 })
@@ -41,7 +41,7 @@ box = Box.create(
     runtime="node",
     agent={
         "harness": Agent.CLAUDE_CODE,
-        "model": "anthropic/claude-opus-4-6",
+        "model": "anthropic/claude-opus-5-5",
         "api_key": os.environ["ANTHROPIC_API_KEY"],
     },
 )
@@ -67,7 +67,7 @@ const box = await Box.create({
   runtime: "node",
   agent: {
     harness: Agent.ClaudeCode,
-    model: "anthropic/claude-opus-4-6",
+    model: "anthropic/claude-opus-5-5",
     apiKey: process.env.ANTHROPIC_API_KEY,
   },
   git: { token: process.env.GITHUB_TOKEN },
@@ -93,7 +93,7 @@ box = Box.create(
     runtime="node",
     agent={
         "harness": Agent.CLAUDE_CODE,
-        "model": "anthropic/claude-opus-4-6",
+        "model": "anthropic/claude-opus-5-5",
         "api_key": os.environ["ANTHROPIC_API_KEY"],
     },
     git={"token": os.environ["GITHUB_TOKEN"]},
@@ -124,7 +124,7 @@ const box = await Box.create({
   runtime: "node",
   agent: {
     harness: Agent.ClaudeCode,
-    model: "anthropic/claude-opus-4-6",
+    model: "anthropic/claude-opus-5-5",
     apiKey: process.env.ANTHROPIC_API_KEY,
   },
 })
@@ -159,7 +159,7 @@ box = Box.create(
     runtime="node",
     agent={
         "harness": Agent.CLAUDE_CODE,
-        "model": "anthropic/claude-opus-4-6",
+        "model": "anthropic/claude-opus-5-5",
         "api_key": os.environ["ANTHROPIC_API_KEY"],
     },
 )

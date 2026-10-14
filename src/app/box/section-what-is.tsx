@@ -39,10 +39,7 @@ export default function SectionWhatIs() {
             persists, git with pull requests, a headless browser and cron
             schedules, all driven from the SDK. Boxes pause when idle and bill
             active CPU only, so an agent that spends most of its time waiting on
-            the model costs little to keep around. Boxes are containers rather
-            than virtual machines, run in AWS us-east-1, and don't offer GPUs,
-            so for a separate kernel per untrusted tenant or GPU workloads, a
-            microVM or GPU sandbox is the better fit.
+            the model costs little to keep around.
           </p>
         </div>
       </Container>

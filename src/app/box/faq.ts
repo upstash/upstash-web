@@ -22,6 +22,11 @@ export const BOX_FAQ = [
       "Yes. Create a box with Claude Code as its agent and send it a prompt. It works in the box's own workspace, can clone your repository, run tests and open a pull request, and every run reports what it cost. It keeps working after you close your laptop.",
   },
   {
+    question: "Can I use Box from Claude Code, Cursor or Codex?",
+    answer:
+      "Yes. Add the Upstash MCP server at https://mcp.upstash.com/mcp to Claude Code, Cursor, Codex, OpenCode or any MCP client and sign in with OAuth. Your agent can then create and manage boxes, run commands, use git and open pull requests, publish preview URLs for ports, drive a headless browser and set up schedules, so the work runs on a remote box instead of your laptop.",
+  },
+  {
     question: "Do boxes keep their files between sessions?",
     answer:
       "Yes. A standard box pauses automatically when it is idle. Its storage is preserved, including the cloned repository, installed dependencies and files, but running processes stop until the next request wakes the box. Snapshots save a box's disk so new boxes can start from it.",

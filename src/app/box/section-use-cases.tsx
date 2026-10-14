@@ -73,8 +73,8 @@ const USE_CASES = [
     href: "https://upstash.com/blog/scheduled-browser-tests-upstash-box",
   },
   {
-    title: "Remote development",
-    desc: "SSH into a box, forward its ports to localhost, share a preview URL, and onboard teammates from a snapshot.",
-    href: "https://upstash.com/docs/box/guides/remote-development",
+    title: "Remote work from your coding agent",
+    desc: "Connect Claude Code, Cursor or Codex to the Upstash MCP server and the agent builds, tests and opens pull requests on a box instead of your laptop.",
+    href: "https://upstash.com/docs/agent-resources/mcp",
   },
 ];

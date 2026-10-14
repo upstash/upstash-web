@@ -3,6 +3,7 @@ import SectionCode from "@/app/box/section-code";
 import SectionCta from "@/app/box/section-cta";
 import SectionFeatures from "@/app/box/section-features";
 import SectionHero from "@/app/box/section-hero";
+import SectionMcp from "@/app/box/section-mcp";
 import SectionUseCases from "@/app/box/section-use-cases";
 import SectionWhatIs from "@/app/box/section-what-is";
 import SectionFaq from "@/app/redis/section-faq";
@@ -56,6 +57,7 @@ export default function BoxPage() {
         <SectionHero />
         <SectionFeatures />
         <SectionCode />
+        <SectionMcp />
         <SectionUseCases />
         <SectionWhatIs />
         <SectionFaq items={BOX_FAQ} />

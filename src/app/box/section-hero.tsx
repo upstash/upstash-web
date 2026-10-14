@@ -32,8 +32,9 @@ export default function SectionHero() {
             Upstash Box is a persistent cloud computer with coding agents built
             in. Run Claude Code, Codex or OpenCode in an isolated box, give it a
             browser and a repository, and get results back through an API. The
-            workspace stays between tasks, and you pay only for the CPU your
-            agent actually uses.
+            workspace stays between tasks, you pay only for the CPU your agent
+            actually uses, and your own coding agent can work in a box through
+            the Upstash MCP server.
           </p>
 
           <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
