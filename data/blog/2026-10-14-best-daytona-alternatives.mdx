@@ -3,7 +3,7 @@ slug: best-daytona-alternatives
 title: "The Best Daytona Alternatives for AI Agent Sandboxes in 2026"
 authors: [alitarik]
 tags: [box, ai, agents, sandbox]
-description: "The best Daytona alternatives in 2026 and when to switch: Upstash Box for coding agents with active-CPU billing, E2B and Vercel Sandbox for microVM isolation, Modal for GPUs, plus Tensorlake, Freestyle, Northflank and self-hostable options now that Daytona's core went private."
+description: "The best Daytona alternatives in 2026 and when to switch: Upstash Box for coding agents with active-CPU billing, E2B and Vercel Sandbox for microVM isolation, Modal for GPUs, plus Tensorlake, Northflank and self-hostable options now that Daytona's core went private."
 ---
 
 <Summary>
@@ -14,7 +14,6 @@ Daytona is a fast, flexible place to run AI-generated code: sub-90ms container s
 - **Best if you deploy on Vercel: Vercel Sandbox.**
 - **Best for GPU and Python ML workloads: Modal.**
 - **Best for microVMs with memory snapshots and BYOC: Tensorlake.**
-- **Best for long-running full Linux VMs: Freestyle.**
 - **Best for cheap compute in your own cloud: Northflank.**
 - **Best to self-host: E2B Embed or Beam's Beta9.**
 </Summary>
@@ -98,13 +97,7 @@ Where Daytona is the better pick: Box has no GPUs, no Windows or macOS, SDKs in 
 
 **Switch to it if** you want VM isolation and snapshots that keep memory, without wall-clock CPU billing.
 
-## 6. Freestyle: full Linux VMs
-
-[Freestyle](https://www.freestyle.sh) gives the agent a KVM VM with root, nested virtualization, no session cap, and fork of a running VM without pausing it. Outbound traffic is denied by default.
-
-**Switch to it if** your agent needs a real long-lived machine with Docker inside.
-
-## 7. Northflank: cheapest compute, your own cloud
+## 6. Northflank: cheapest compute, your own cloud
 
 [Northflank](https://northflank.com) has sandboxes on Kata or gVisor, GPUs, the lowest wall-clock rates in our [comparison](/blog/ai-agent-sandbox-providers-compared-2026), and self-serve BYOC on AWS, GCP, Azure and others.
 

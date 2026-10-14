@@ -3,7 +3,7 @@ slug: cloud-computer-for-ai-agents
 title: "Cloud Computers for AI Agents: How to Give an AI Agent Its Own Computer (2026)"
 authors: [alitarik]
 tags: [box, ai, agents, sandbox]
-description: "How to give an AI agent its own computer in the cloud: what an agent computer needs (shell, persistent files, browser, git, isolation, secrets), the three ways to get one, and how Upstash Box, E2B, Daytona, Fly Sprites, Freestyle, Northflank and a plain VM compare."
+description: "How to give an AI agent its own computer in the cloud: what an agent computer needs (shell, persistent files, browser, git, isolation, secrets), the three ways to get one, and how Upstash Box, E2B, Daytona, Fly Sprites, Northflank and a plain VM compare."
 ---
 
 <Summary>
@@ -11,7 +11,7 @@ An AI agent that can only call APIs is limited to what those APIs expose. Give i
 
 - **The short answer.** For a coding agent or a personal agent, use a cloud computer built for agents rather than a plain VM: [Upstash Box](https://upstash.com/docs/box/overall/quickstart) gives each agent an isolated Linux machine with the agent already inside, a headless browser, git-to-PR, cron schedules, and files that survive between sessions, billed for active CPU only.
 - **If the agent clicks through a desktop GUI,** pick a computer-use sandbox with a VNC desktop: E2B Desktop or Daytona Computer Use.
-- **If you want full root on a long-lived VM,** Freestyle or Fly Sprites, or a VM you run yourself if you are ready to own its security.
+- **If you want full root on a long-lived VM,** Fly Sprites, or a VM you run yourself if you are ready to own its security.
 </Summary>
 
 "Give the agent a computer" became the default way to build capable agents this year. Claude Code, Codex and OpenCode are all agents that expect a terminal. Browser agents expect Chromium. Personal agents like OpenClaw and Hermes expect a machine that stays on. The question is no longer whether the agent gets a computer, but which one.
