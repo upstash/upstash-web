@@ -3,13 +3,13 @@ slug: cloud-computer-for-ai-agents
 title: "Cloud Computers for AI Agents: How to Give an AI Agent Its Own Computer (2026)"
 authors: [alitarik]
 tags: [box, ai, agents, sandbox]
-description: "How to give an AI agent its own computer in the cloud: what an agent computer needs (shell, persistent files, browser, git, isolation, secrets), the three ways to get one, and how Upstash Box, E2B, Daytona, Fly Sprites, Northflank and a plain VM compare."
+description: "How to give an AI agent its own computer in the cloud: what it needs, the three ways to get one, and a full walkthrough of a persistent agent workspace that you create, put to work, save, pause and come back to the next day."
 ---
 
 <Summary>
 An AI agent that can only call APIs is limited to what those APIs expose. Give it a computer, a shell, a filesystem, a browser and git, and it can do the work a person would do at a terminal.
 
-- **The short answer.** For a coding agent or a personal agent, use a cloud computer built for agents rather than a plain VM: [Upstash Box](https://upstash.com/docs/box/overall/quickstart) gives each agent an isolated Linux machine with the agent already inside, a headless browser, git-to-PR, cron schedules, and files that survive between sessions, billed for active CPU only.
+- **The short answer.** For a coding agent or a per-user agent, use a cloud computer built for agents rather than a plain VM. [Upstash Box](https://upstash.com/docs/box/overall/quickstart) is a persistent cloud computer with coding agents built in: run an agent, give it a browser and a repository, and get results back through an API.
 - **If the agent has to control desktop applications,** not just web pages, pick a sandbox with a full desktop over VNC: E2B Desktop or Daytona Computer Use.
 - **If you want full root on a long-lived VM,** Fly Sprites, or a VM you run yourself if you are ready to own its security.
 </Summary>
@@ -52,9 +52,13 @@ A laptop has all of this by default. A cloud computer for an agent should too, p
 
 Box's weak spots, plainly: it is a hardened container rather than a VM with its own kernel, it runs in AWS `us-east-1` only, it has no GPUs, and custom Docker images are still planned. If you need a separate kernel per untrusted tenant or a GPU next to the agent, pick from the other rows. Details and sources for every provider are in our [15-provider sandbox comparison](/blog/ai-agent-sandbox-providers-compared-2026).
 
-## Giving an agent a computer with Upstash Box
+## The lifecycle of an agent's computer: create, work, save, pause, return
 
-One call creates the computer, with the agent, the browser and git already set up:
+A cloud computer for an agent is not used once and thrown away. A user starts a project today, comes back tomorrow, and expects the repo, the installed dependencies and the agent's context to still be there. This walkthrough follows one [Upstash Box](https://upstash.com/docs/box/overall/quickstart) through that whole lifecycle.
+
+### 1. Create the computer
+
+One call creates an isolated Linux machine with a coding agent, a headless browser and git credentials set up. Store `box.id` against your user; that is their workspace from now on.
 
 ```ts
 import { Agent, Box, ClaudeCode } from "@upstash/box"
@@ -66,30 +70,79 @@ const box = await Box.create({
   git: { token: process.env.GITHUB_TOKEN },
 })
 
+await saveWorkspace(userId, box.id) // your own database
+```
+
+### 2. Put it to work on a coding task
+
+The agent runs inside the box, so you send a task and get a result back instead of building an agent loop. Pass a Zod schema and the result comes back as typed data, along with what the run cost.
+
+```ts
+import { z } from "zod"
+
 await box.git.clone({ repo: "https://github.com/your-org/your-app" })
 await box.cd("your-app")
 await box.git.exec({ args: ["checkout", "-b", "fix/signup-form"] })
 
 const run = await box.agent.run({
-  prompt: "Start the dev server, open it in the browser, fix the broken signup form, and add a test",
+  prompt: "Fix the broken signup form validation and add a test. Run the test suite before you finish.",
+  responseSchema: z.object({ summary: z.string(), testsPassed: z.boolean() }),
 })
 
-await box.git.commit({ message: "fix: signup form" })
-await box.git.push({ branch: "fix/signup-form" })
-const pr = await box.git.createPR({ title: "Fix signup form", base: "main" })
-
-console.log(pr.url, run.cost.totalUsd)
+if (run.result.testsPassed) {
+  await box.git.commit({ message: "fix: signup form validation" })
+  await box.git.push({ branch: "fix/signup-form" })
+  const pr = await box.git.createPR({ title: "Fix signup form validation", base: "main" })
+  console.log(pr.url, run.cost.totalUsd)
+}
 ```
 
-The agent works in its own Linux machine: it installs packages, runs the dev server, checks the page in Chromium, and edits the code. Then the commit, push and `createPR()` hand the work back as a pull request.
+Use `box.agent.stream()` instead of `run()` to show the agent's progress in your UI as it works.
 
-The same box keeps its files. Leave it and it pauses with storage kept, and the next call wakes it where it left off. For an agent that has to answer at any moment, like a personal assistant on WhatsApp or Telegram, turn pausing off:
+### 3. Check the result in a real browser
+
+Tests pass, but does the page work? The same box has Chromium, so the app the agent just fixed can be opened and checked without a second service:
 
 ```ts
-const assistant = await Box.create({ runtime: "node", keepAlive: true })
+await box.exec.command("nohup npm run dev > dev.log 2>&1 &")
+await box.exec.command("until curl -sf localhost:3000 > /dev/null; do sleep 1; done")
+
+const tab = await box.browser.tab.create("http://localhost:3000/signup")
+await tab.act("type not-an-email into the email field")
+await tab.act("click the sign up button")
+const check = await tab.extract(
+  "Is a validation error shown next to the email field?",
+  z.object({ errorShown: z.boolean(), message: z.string() }),
+)
+const screenshot = await tab.screenshot() // PNG bytes, attach it to the PR or your UI
 ```
 
-And for an agent that works on a cadence, schedule it inside the box:
+### 4. Save a starting point
+
+Once an environment is set up, a snapshot captures its disk: the cloned repo, `node_modules`, build caches and the agent's configuration. New users or parallel workers start from it instead of cloning and installing again.
+
+```ts
+const snapshot = await box.snapshot({ name: "your-app-ready" })
+const workerBox = await Box.fromSnapshot(snapshot.id)
+```
+
+### 5. Pause: automatic for bursty work
+
+When nobody is using the box, it pauses. Files, the repo, installed packages and git state stay on disk; running processes such as the dev server stop. While paused there is no CPU charge, only storage at $0.10 per GB-month. You can also pause right away with `box.pause()`.
+
+### 6. Return the next day
+
+The user comes back. Look up their box and give it the next task; a paused box wakes up on the next call with its workspace as they left it. Restart any servers it needs.
+
+```ts
+const box = await Box.get(await loadWorkspace(userId))
+
+await box.agent.run({ prompt: "Add a password strength meter to the signup form" })
+```
+
+### 7. Work on a schedule
+
+Some agents work on a cadence instead of on request. A schedule runs inside the box on a cron expression and wakes it if it is paused:
 
 ```ts
 await box.schedule.agent({
@@ -98,7 +151,21 @@ await box.schedule.agent({
 })
 ```
 
-The free plan includes 10 concurrent boxes, 5 CPU-hours a month and a $1 monthly model budget, with no card. After that a box bills $0.10 per active CPU-hour for the small size with memory free, and a keep-alive box is a flat $8 a month. Paused boxes pay only for storage, at $0.10 per GB-month. See [Box pricing](https://upstash.com/pricing/box).
+### 8. Or stay on all the time
+
+Bursty work wants auto-pause. An agent that must answer at any moment, like a personal assistant on WhatsApp or Telegram, needs a machine that never sleeps, because its gateway polls for messages from inside the box. A keep-alive box stays on, and `initCommand` starts your process again whenever it boots:
+
+```ts
+const assistant = await Box.create({
+  runtime: "node",
+  keepAlive: true,
+  initCommand: "cd /workspace/home/assistant && npm start",
+})
+```
+
+### What it costs
+
+The free plan includes 10 concurrent boxes, 5 CPU-hours a month and a $1 monthly model budget, with no card. After that a default box bills $0.10 per active CPU-hour for the small size (2 vCPU, 4 GB) with memory free. As an example, an hour in which the agent uses 10 core-minutes of real CPU is about $0.017 in compute. A keep-alive box is a flat $8 a month, and paused boxes pay only for storage. See [Box pricing](https://upstash.com/pricing/box).
 
 ## FAQ
 
