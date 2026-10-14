@@ -1,9 +1,10 @@
 ---
 slug: scheduled-browser-tests-upstash-box
-title: "Automated Browser Testing on a Schedule with Upstash Box"
+title: "Automated Browser Testing on a Schedule with Playwright and Upstash Box"
 authors: [alitarik]
 tags: [box, ai, browser]
 description: "Some tests need a real browser, a shell, a git checkout, and a place to store results. An Upstash Box with a browser and a cron schedule gives you all of that in one machine. It wakes up, runs the test, and pauses again. This is how we set it up, and how we use it to test Docs7 against real Mintlify repositories every night."
+updated: "2026-10-14"
 ---
 
 Some tests do not fit into CI. They need a real browser. They run for a long time. They depend on repositories or services outside your project. And when they find a problem, they should report it with evidence, not only with a red mark in a pipeline.
@@ -167,3 +168,21 @@ This gives the Docs7 team a steady stream of real compatibility gaps, each with 
 ## Try it
 
 A box with a browser, a schedule, and the SDK calls for Blob and Redis is everything a nightly browser test needs. The [Box quickstart](https://upstash.com/docs/box/overall/quickstart) gives you a box. [Browser](https://upstash.com/docs/box/overall/browser/overview), [schedules](https://upstash.com/docs/box/overall/schedules) and [snapshots](https://upstash.com/docs/box/overall/snapshots) are one page each. If you do not want to write the harness by hand, connect your editor to the [Upstash MCP server](https://upstash.com/docs/box/guides/remote-development) and describe the test. That is how this one was built.
+
+## FAQ
+
+### How do I run browser tests on a schedule without a server?
+
+Create an Upstash Box with `browser: true` and add a cron schedule with `box.schedule.exec()`. The paused box wakes up at the scheduled time, runs the test against its own Chromium, saves the results to disk, and pauses again, so you pay only for the minutes it works.
+
+### Can I run Playwright inside an Upstash Box?
+
+Yes. Install `playwright-core` in the box and launch it against the box's own Chromium binary. There is no tunnel and no browser API key in the test, and screenshots land on the same disk as the code.
+
+### Where should my coding agent run tests?
+
+In an isolated sandbox with the repo, a shell and a browser, not on your laptop. A box gives the agent all three, so it can run the unit tests and check the running app in Chromium before it opens a pull request.
+
+### What does a scheduled browser test cost?
+
+A default box bills active CPU only, from $0.10 per active CPU hour, and nothing while paused between runs, so a nightly test that runs for a few minutes costs cents a month.

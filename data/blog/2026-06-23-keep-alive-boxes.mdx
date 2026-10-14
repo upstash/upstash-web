@@ -1,9 +1,10 @@
 ---
 slug: keep-alive-boxes
-title: "Keep-Alive Boxes: Always-On Agent Server"
+title: "Keep-Alive Boxes: Host a Long-Running AI Agent on an Always-On Server"
 authors: [alitarik]
 tags: [box, ai, serverless]
 description: "Some agent tasks are quick and throwaway. Others need to keep running. Keep-alive boxes give a long-running agent a real computer that stays on between sessions, with the coding agent already inside, for a flat $8 a month."
+updated: "2026-10-14"
 ---
 
 <Summary>
@@ -114,3 +115,21 @@ const box = await Box.create({
 ```
 
 The [keep-alive docs](https://upstash.com/docs/box/overall/keep-alive) cover init commands, sizes, and lifecycle. The [quickstart](https://upstash.com/docs/box/overall/quickstart) gets you a box in a few minutes. The free tier gives you 10 boxes at once and 5 CPU-hours a month with no platform fee, so you can try it before you turn on keep-alive.
+
+## FAQ
+
+### What is the best way to host a long-running AI agent?
+
+On a machine that stays on and keeps its state, isolated from your own systems. A keep-alive Upstash Box never pauses, keeps installed packages, the cloned repo and running processes, and has the coding agent already inside, for a flat $8 a month on the small size.
+
+### When should I use keep-alive instead of a default box?
+
+Use keep-alive when every request has to be answered right away: an always-on server, a bot or gateway, or an agent that must never cold-start. Use a default box when work comes in bursts; it pauses when idle and bills only active CPU.
+
+### How much does a keep-alive box cost?
+
+$8 a month for small (2 vCPU, 4 GB), $16 for medium (4 vCPU, 8 GB) and $32 for large (8 vCPU, 16 GB), flat.
+
+### How do I restart my server automatically after a keep-alive box boots?
+
+Set an `initCommand` together with `keepAlive: true`. The box runs it every time it starts, so your dev server, API or agent gateway comes back on its own.
