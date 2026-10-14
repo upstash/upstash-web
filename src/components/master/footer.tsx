@@ -54,6 +54,16 @@ export default function Footer({ className, ...props }: IAppFooter) {
                 className="opacity-50 group-hover:opacity-100"
               />
             </Link>
+            <Link
+              href="/box"
+              className="group inline-flex items-center gap-1 hover:text-primary hover:underline"
+            >
+              AI Agent Sandboxes
+              <IconArrowUpRight
+                size={16}
+                className="opacity-50 group-hover:opacity-100"
+              />
+            </Link>
           </div>
 
           <div className="flex gap-2">

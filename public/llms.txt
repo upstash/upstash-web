@@ -57,6 +57,7 @@ This site has a search endpoint: https://context7.com/api/v2/ask?siteKey=ask_4cf
 - [Box Quickstart](https://upstash.com/docs/box/overall/quickstart): Getting started with Box
 - [Blob Quickstart](https://upstash.com/docs/blob/overall/quickstart): Getting started with Blob
 - [Blob](https://upstash.com/blob): Product page for Upstash Blob object storage
+- [Box](https://upstash.com/box): Product page for Upstash Box, persistent cloud computers for AI agents with coding agents built in
 
 ## Contact
 
