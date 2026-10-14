@@ -1,8 +1,8 @@
+import McpSetupTabs from "@/app/box/mcp-setup-tabs";
 import Bg from "@/components/bg";
 import Container from "@/components/container";
 import PageHeaderDesc from "@/components/page-header-desc";
 import PageHeaderTitle from "@/components/page-header-title";
-import cx from "@/utils/cx";
 import { IconArrowUpRight } from "@tabler/icons-react";
 
 export default function SectionMcp() {
@@ -15,28 +15,14 @@ export default function SectionMcp() {
           Use Box from your coding agent
         </PageHeaderTitle>
         <PageHeaderDesc className="mt-3">
-          Connect Claude Code, Cursor, Codex or OpenCode to the Upstash MCP
+          Connect Claude Code, Codex, Cursor or OpenCode to the Upstash MCP
           server and your agent can create boxes, run commands, open pull
           requests, publish preview URLs and drive a browser, all on a remote
           machine instead of your laptop.
         </PageHeaderDesc>
 
-        <div className="mt-12 grid gap-3 text-left md:mt-16 md:grid-cols-3 md:gap-4">
-          {CLIENTS.map(({ name, file, code }) => (
-            <div
-              key={name}
-              className={cx(
-                "flex min-w-0 flex-col gap-3 p-5 md:p-6",
-                "rounded-3xl border-2 border-bg-mute bg-bg-mute",
-              )}
-            >
-              <h3 className="font-display text-lg font-semibold">{name}</h3>
-              <p className="text-sm text-text-mute">{file}</p>
-              <pre className="overflow-x-auto rounded-xl bg-bg p-4 font-mono text-sm">
-                <code>{code}</code>
-              </pre>
-            </div>
-          ))}
+        <div className="mx-auto mt-12 max-w-screen-md md:mt-16">
+          <McpSetupTabs />
         </div>
 
         <p className="mt-8 text-text-mute">
@@ -60,26 +46,3 @@ export default function SectionMcp() {
     </section>
   );
 }
-
-const CLIENTS = [
-  {
-    name: "Claude Code",
-    file: "Run in your terminal, then /mcp → Authenticate",
-    code: "claude mcp add --scope user --transport http upstash https://mcp.upstash.com/mcp",
-  },
-  {
-    name: "Cursor",
-    file: "~/.cursor/mcp.json",
-    code: `{
-  "mcpServers": {
-    "upstash": { "url": "https://mcp.upstash.com/mcp" }
-  }
-}`,
-  },
-  {
-    name: "Codex",
-    file: "~/.codex/config.toml",
-    code: `[mcp_servers.upstash]
-url = "https://mcp.upstash.com/mcp"`,
-  },
-];
