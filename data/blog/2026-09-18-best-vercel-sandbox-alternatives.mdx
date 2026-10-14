@@ -1,0 +1,226 @@
+---
+slug: best-vercel-sandbox-alternatives
+title: "The Best Vercel Sandbox Alternatives for AI Agents in 2026"
+authors: [alitarik]
+tags: [box, ai, agents, sandbox, vercel]
+description: "The best Vercel Sandbox alternatives in 2026: keep your app on Vercel and run agent work asynchronously in Upstash Box, with memory billed at $0 and an $8/month always-on box, plus E2B, Daytona, Cloudflare Sandbox, Modal, Fly Sprites and Northflank."
+---
+
+<Summary>
+Vercel Sandbox is a good fit if your app already lives on Vercel: Firecracker microVMs, persistence by default, and Claude Code, Codex and opencode preinstalled. Teams look for an alternative when the bill or the limits start to bite: memory is billed for every minute the sandbox runs, sessions stop at 45 minutes on Hobby and 24 hours on Pro, commercial use needs a $20/seat Pro plan, and Vercel's docs say sandboxes are not meant for permanent hosting.
+
+- **Best Vercel Sandbox alternative for managed coding-agent workflows: Upstash Box.** Keep your app on Vercel and run the agent work asynchronously in a box: memory is free, there is no session cap, and an always-on box is a flat $8 a month.
+- **Best for microVM isolation and memory snapshots: E2B.**
+- **Best for GPUs and many SDK languages: Daytona.**
+- **Best if you're on Cloudflare: Cloudflare Sandbox.**
+- **Best for GPU and Python ML workloads: Modal.**
+- **Best for a persistent dev machine per agent: Fly Sprites.**
+- **Best for cheap compute in your own cloud: Northflank.**
+</Summary>
+
+## Why teams look for a Vercel Sandbox alternative
+
+These are from [Vercel's own Sandbox pricing and docs](https://vercel.com/docs/sandbox/pricing):
+
+- **Memory is billed the whole time.** CPU is billed only while active ($0.128 per vCPU-hour), but provisioned memory is billed for every minute the sandbox runs ($0.0212 per GB-hour). For agents that mostly wait on the model, memory ends up being most of the bill.
+- **Session caps.** 45 minutes on Hobby and 24 hours on Pro per session, with a 5-minute default timeout you extend yourself. Persistent sandboxes can stop and resume, but a long-lived agent has to be built around it.
+- **Not for always-on work.** Vercel's docs describe sandboxes as not suitable for permanent hosting, and keeping a 2 vCPU / 4 GB sandbox running for a month costs about $70 in usage.
+- **Commercial use means Pro.** Hobby is for personal, non-commercial use, and Pro is $20 per developer seat per month. You also need a Vercel team and project, and custom images have to go through Vercel's container registry.
+- **No agent API.** The coding agents are preinstalled CLIs. You run them with `runCommand`, stream their output, and parse the result yourself.
+
+## What it costs: Vercel Sandbox vs Upstash Box
+
+Usage charges only, for a 2 vCPU / 4 GB sandbox in `iad1` (Vercel) and a `small` box (2 vCPU / 4 GB) on Upstash Box:
+
+| Workload | Vercel Sandbox | Upstash Box |
+| --- | --- | --- |
+| 1 hour, 10 core-minutes of real CPU (compute estimate) | 0.167 × $0.128 + 4 GB × $0.0212 ≈ **$0.106** | 0.167 core-h × $0.10 ≈ **$0.017** |
+| Always on for a 30-day month, ~5% average CPU | 72 vCPU-h × $0.128 + 2,880 GB-h × $0.0212 ≈ **$70**, plus 24h session restarts | Keep-alive box, flat **$8** |
+| Platform fee for commercial use | $20 per developer seat per month (includes $20 usage credit) | $0 on pay as you go |
+
+The gap comes from memory. Box doesn't bill it at all, and idle CPU while the agent waits on the model costs nothing. Paused boxes pay only for storage, at $0.10 per GB-month. If the CPU is busy the whole hour the gap narrows, since both bill CPU by use. Snapshot storage, creations and data transfer are excluded; see [Box pricing](https://upstash.com/pricing/box) and [Vercel Sandbox pricing](https://vercel.com/docs/sandbox/pricing).
+
+## Vercel Sandbox alternatives compared
+
+| Alternative | Best for | Isolation | Billing | Session cap | Agent built in |
+| --- | --- | --- | --- | --- | --- |
+| **Upstash Box** | **Managed coding-agent workflows** | Container | **Active CPU, memory free** | **None** | **Yes: Claude Code, Codex, OpenCode, Cursor, custom** |
+| E2B | microVM isolation, memory snapshots | Firecracker microVM | Wall-clock vCPU + RAM | 1h Hobby, 24h Pro | No |
+| Daytona | GPUs, five SDK languages | Container by default; VM classes | Wall-clock vCPU + RAM | None by default | No |
+| Cloudflare Sandbox | Apps on Cloudflare Workers | Container in its own VM | Active CPU + provisioned memory, while awake | None; sleeps when idle | No |
+| Modal | GPU and Python ML | gVisor | Wall-clock, max(request, actual) | 24h | No |
+| Fly Sprites | Persistent dev machine per agent | Firecracker microVM | Actual CPU and RAM while active | None | CLIs preinstalled, no run API |
+| Northflank | Cheap compute, your own cloud | Kata or gVisor | Wall-clock vCPU + RAM | None | No |
+
+Vercel Sandbox for reference: Firecracker microVM, active CPU plus provisioned memory, 45m / 24h per session, CLIs preinstalled with no run API.
+
+## 1. Upstash Box: keep your app on Vercel, run the agent work in Box
+
+[Upstash Box](https://upstash.com/docs/box/overall/quickstart) is a persistent cloud computer with coding agents built in. Run an agent, give it a browser and a repository, and get results back through an API.
+
+You don't move off Vercel. Your Next.js app keeps serving users, and agent tasks that take minutes run in a box instead of a function. The pattern is three routes: submit a task and answer right away, receive the result on a webhook, and let the UI ask for the status.
+
+**Setup.** `npm i @upstash/box @upstash/redis`, then add these environment variables to your Vercel project:
+
+- `UPSTASH_BOX_API_KEY`: from the [Upstash Console](https://console.upstash.com)
+- `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`: any Redis database, used here to hold task status
+- `GITHUB_TOKEN`: a token that can clone the repository
+- `APP_URL`: your deployment's public URL, for the webhook
+- `WEBHOOK_SECRET`: any random string
+
+**1. Submit the task and respond immediately.**
+
+```ts
+// app/api/tasks/route.ts
+import { Agent, Box, ClaudeCode } from "@upstash/box"
+import { Redis } from "@upstash/redis"
+
+const redis = Redis.fromEnv()
+
+export async function POST(req: Request) {
+  const { repo, task } = await req.json()
+
+  const box = await Box.create({
+    runtime: "node",
+    agent: { harness: Agent.ClaudeCode, model: ClaudeCode.Sonnet_5 },
+    git: { token: process.env.GITHUB_TOKEN },
+  })
+  await box.git.clone({ repo, folder: "repo" })
+  await box.cd("repo")
+
+  // A webhook run returns at once; the agent keeps working in the box
+  await box.agent.run({
+    prompt: task,
+    webhook: {
+      url: `${process.env.APP_URL}/api/tasks/done`,
+      headers: { "x-webhook-secret": process.env.WEBHOOK_SECRET! },
+    },
+  })
+
+  await redis.set(`task:${box.id}`, { status: "running" })
+  return Response.json({ taskId: box.id }, { status: 202 })
+}
+```
+
+**2. Receive the result when the agent finishes.**
+
+```ts
+// app/api/tasks/done/route.ts
+import type { WebhookPayload } from "@upstash/box"
+import { Redis } from "@upstash/redis"
+
+const redis = Redis.fromEnv()
+
+export async function POST(req: Request) {
+  if (req.headers.get("x-webhook-secret") !== process.env.WEBHOOK_SECRET) {
+    return new Response("unauthorized", { status: 401 })
+  }
+
+  const result = (await req.json()) as WebhookPayload
+  await redis.set(`task:${result.box_id}`, {
+    status: result.status,
+    output: result.output ?? null,
+    error: result.error ?? null,
+  })
+
+  return new Response("ok")
+}
+```
+
+**3. Let the UI check on it.**
+
+```ts
+// app/api/tasks/[id]/route.ts
+import { Redis } from "@upstash/redis"
+
+const redis = Redis.fromEnv()
+
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const task = await redis.get(`task:${id}`)
+  return task ? Response.json(task) : new Response("not found", { status: 404 })
+}
+```
+
+The client posts the task, gets a `taskId` back in milliseconds, and polls `/api/tasks/<taskId>` until the status is `completed` or `failed`. No function waits on the agent, so Vercel's function timeout never comes into play. The box keeps its files afterwards, so a follow-up task for the same user can reuse it with `Box.get(taskId)`.
+
+What else changes compared with Vercel Sandbox:
+
+- **The agent is an API call,** not a CLI you drive with `runCommand`. Runs return typed results with a Zod schema, stream with `agent.stream()`, and report their cost.
+- **Memory is free and idle CPU costs nothing.** A box bills active CPU from $0.10 per active CPU-hour and pauses when idle; storage is $0.10 per GB-month.
+- **No session cap,** and an always-on box is a flat $8 a month with `keepAlive: true`.
+- **Works with the Vercel AI SDK:** give an AI SDK agent a box's shell, files and git as tools, as in [Give AI SDK agents a computer](/blog/vercel-ai-sdk-in-cloud-sandbox).
+
+Where Vercel Sandbox is the better pick: Box is a hardened container rather than a microVM with its own kernel, it runs in `us-east-1` only against Vercel's 19 regions, it has no custom Docker images yet, and it's a separate account and bill rather than part of your Vercel project. The [quickstart](https://upstash.com/docs/box/overall/quickstart) gets a first box running in a few minutes.
+
+## 2. E2B: microVMs with memory snapshots
+
+[E2B](https://e2b.dev) also runs Firecracker microVMs, and its pause keeps memory and running processes, not only files. It adds a stateful Code Interpreter and a VNC desktop. It bills wall-clock vCPU and memory, so it costs more than Vercel for idle-heavy work, and sessions cap at 1 hour on Hobby and 24 hours on the $150/month Pro plan.
+
+**Switch to it if** you want microVM isolation outside Vercel, or memory that survives a pause.
+
+## 3. Daytona: GPUs and five SDK languages
+
+[Daytona](https://www.daytona.io) has GPUs, Windows and macOS sandboxes, and SDKs in TypeScript, Python, Ruby, Go and Java, with no platform fee and $200 in credits. It bills wall-clock and uses containers by default.
+
+**Switch to it if** you need a GPU or a non-JavaScript SDK.
+
+## 4. Cloudflare Sandbox: if you're moving to Workers
+
+[Cloudflare Sandbox](https://developers.cloudflare.com/sandbox/) is the closest match to Vercel's model on another platform: active CPU plus provisioned memory while awake, a Worker binding away from your code. It needs the $5/month Workers Paid plan and is TypeScript-only.
+
+**Switch to it if** your app is moving to Cloudflare.
+
+## 5. Modal: GPUs and Python
+
+[Modal](https://modal.com/docs/guide/sandboxes) runs gVisor sandboxes with the widest GPU range and scales to thousands of them. Sandbox CPU costs about three times Modal's function rate.
+
+**Switch to it if** the work is GPU-bound.
+
+## 6. Fly Sprites: a persistent machine per agent
+
+[Sprites](https://sprites.dev) are Firecracker microVMs with a 100 GB persistent filesystem, agent CLIs preinstalled, and billing for actual CPU and RAM use while active. There is no fork and no run API.
+
+**Switch to it if** you want a long-lived dev machine for an agent CLI.
+
+## 7. Northflank: cheapest compute, your own cloud
+
+[Northflank](https://northflank.com) has the lowest wall-clock rates in our [comparison](/blog/ai-agent-sandbox-providers-compared-2026), no session cap, GPUs, and self-serve BYOC on AWS, GCP, Azure and others. There is no agent tooling.
+
+**Switch to it if** you need to run in your own cloud account.
+
+## When to stay on Vercel Sandbox
+
+Stay if you want one platform and one bill, microVM isolation in 19 regions, credential brokering in the firewall, persistent Drives, and OIDC auth that just works inside your Vercel project. For short code generation and preview runs inside a Vercel app, it's the least setup.
+
+## FAQ
+
+### What is the best alternative to Vercel Sandbox?
+
+For managed coding-agent workflows, Upstash Box: keep your app on Vercel and run agent tasks asynchronously in a box, with memory free, no session cap, and an always-on box for $8 a month. For microVM isolation outside Vercel, pick E2B; for GPUs, Daytona or Modal.
+
+### Why is Vercel Sandbox expensive?
+
+Memory. Vercel bills CPU only while active, but provisioned memory for every minute the sandbox runs. A 2 vCPU / 4 GB sandbox costs about $0.106 for an hour with 10 core-minutes of real work, of which about $0.085 is memory, and about $70 for a month kept running. Upstash Box doesn't bill memory, so the same hour is about $0.017 in compute.
+
+### Can I use an AI sandbox from a Next.js app on Vercel?
+
+Yes. Upstash Box, E2B, Daytona and Modal all have TypeScript SDKs that run in a Vercel function. With Box, set `UPSTASH_BOX_API_KEY` in your project, create a box in a route handler, and start the agent with a webhook run so the route can respond immediately.
+
+### How do I run an AI agent longer than Vercel's function timeout?
+
+Run the agent somewhere else and get the result back asynchronously. With Upstash Box, `box.agent.run()` with a `webhook` returns immediately, the agent keeps working in the box, and Box POSTs the result to your route when it's done.
+
+### Does Vercel Sandbox have a session limit?
+
+Yes: 45 minutes per session on Hobby and 24 hours on Pro, with a 5-minute default timeout. Persistent sandboxes can stop and resume, and Upstash Box has no session cap.
+
+### Can I keep an agent running 24/7 instead of in a Vercel Sandbox?
+
+Yes. Vercel's docs say sandboxes aren't meant for permanent hosting. A keep-alive Upstash Box stays on for a flat $8 a month on the small size (2 vCPU, 4 GB).
+
+Related: [E2B alternatives](/blog/best-e2b-alternatives) · [Daytona alternatives](/blog/best-daytona-alternatives) · [Cloud computers for AI agents](/blog/cloud-computer-for-ai-agents) · [15 sandbox providers compared](/blog/ai-agent-sandbox-providers-compared-2026)
+
+## Sources
+
+Vercel Sandbox details checked against [pricing](https://vercel.com/docs/sandbox/pricing), [concepts](https://vercel.com/docs/sandbox/concepts), [persistent sandboxes](https://vercel.com/docs/sandbox/concepts/persistent-sandboxes), [images](https://vercel.com/docs/sandbox/concepts/images), [regions](https://vercel.com/docs/sandbox/concepts/regions), [authentication](https://vercel.com/docs/sandbox/concepts/authentication) and [Vercel pricing](https://vercel.com/pricing). E2B and Daytona against their pricing pages. Other providers follow our [September 2026 comparison](/blog/ai-agent-sandbox-providers-compared-2026#sources). [Upstash Box pricing](https://upstash.com/pricing/box).

@@ -1,0 +1,178 @@
+---
+slug: best-daytona-alternatives
+title: "The Best Daytona Alternatives for AI Agent Sandboxes in 2026"
+authors: [alitarik]
+tags: [box, ai, agents, sandbox]
+description: "The best Daytona alternatives in 2026: Upstash Box if your TypeScript or Python team wants coding agents with less integration work, plus E2B, Vercel Sandbox, Modal, Tensorlake and Northflank, and when Daytona is still the better choice."
+---
+
+<Summary>
+Daytona is a fast, flexible place to run AI-generated code: sub-90ms container starts (its own claim), SDKs in five languages, GPUs, and Windows and macOS sandboxes. Teams look for an alternative when they hit one of its trade-offs: containers by default rather than VMs, wall-clock billing for vCPU and memory, restricted network access on the lower tiers, building the agent loop themselves, or self-hosting a maintained version, since core development moved to a private codebase in June 2026.
+
+- **Best Daytona alternative for managed coding-agent workflows: Upstash Box.** Less integration work for TypeScript and Python teams: the agent, browser checks and typed results come built in, and memory is free.
+- **Best for microVM isolation and code interpreters: E2B.**
+- **Best if you deploy on Vercel: Vercel Sandbox.**
+- **Best for GPU and Python ML workloads: Modal.**
+- **Best for microVMs with memory snapshots and BYOC: Tensorlake.**
+- **Best for cheap compute in your own cloud: Northflank.**
+- **Best to self-host: E2B Embed or Beam's Beta9.**
+</Summary>
+
+## Why teams look for a Daytona alternative
+
+These come from [Daytona's own pricing and docs](https://www.daytona.io/pricing):
+
+- **Self-hosting means running a frozen version.** Core development moved to a private codebase in June 2026. The open-source repository is archived and gets no further updates or fixes, though the code stays available to use and fork under its license. The managed service continues.
+- **Containers by default.** Sandboxes are containers unless you pick a VM class. That's fine for your own code, a weaker boundary for untrusted tenants.
+- **Wall-clock billing.** $0.0504 per vCPU-hour and $0.0162 per GiB-hour for every second a sandbox runs, including the time an agent waits on the model.
+- **Restricted egress on Tiers 1 and 2.** Full internet access comes at Tier 3 and up.
+- **You bring the agent.** Daytona has guides for the Claude Agent SDK and OpenCode, but no API that runs an agent and returns its result.
+- **Auto-stop after 15 minutes idle** by default. Files survive, but processes don't, so long-lived agents need a longer interval or a restart step.
+
+None of these matter if you want a fast, polyglot runner with GPUs for your own agent loop, which is what Daytona does well.
+
+## Daytona alternatives compared
+
+| Alternative | Best for | Isolation | Billing | GPUs | Agent built in |
+| --- | --- | --- | --- | --- | --- |
+| **Upstash Box** | **Managed coding-agent workflows** | Container | **Active CPU, memory free** | No | **Yes: Claude Code, Codex, OpenCode, Cursor, custom** |
+| E2B | microVM isolation, code interpreters | Firecracker microVM | Wall-clock vCPU + RAM | No | No |
+| Vercel Sandbox | Apps on Vercel | Firecracker microVM | Active CPU + provisioned memory | No | CLIs preinstalled, no run API |
+| Modal | GPU and Python ML | gVisor | Wall-clock, max(request, actual) | Yes | No |
+| Tensorlake | microVMs with memory snapshots, BYOC | Firecracker / Cloud Hypervisor | Active CPU + RAM + disk | No | No |
+| Northflank | Cheap compute, your own cloud | Kata or gVisor | Wall-clock vCPU + RAM | Yes | No |
+
+Daytona for reference: containers by default with VM classes, wall-clock vCPU + RAM, GPUs, no built-in agent.
+
+## 1. Upstash Box: less integration work for coding agents
+
+[Upstash Box](https://upstash.com/docs/box/overall/quickstart) is a persistent cloud computer with coding agents built in. Run an agent, give it a browser and a repository, and get results back through an API.
+
+Daytona gives you a fast, flexible machine and leaves the agent to you, which is the right trade if you are building your own agent platform. If you are a TypeScript or Python team that wants a coding agent to finish tasks inside your product, most of that platform is integration work you'd rather not own. On Box the agent run, its typed result, a browser to check the work, and per-run cost are SDK calls.
+
+A typical task: build a feature, then prove it works in a real browser before anyone reviews it.
+
+```ts
+import { Agent, Box, ClaudeCode } from "@upstash/box"
+import { z } from "zod"
+
+const box = await Box.create({
+  runtime: "node",
+  agent: { harness: Agent.ClaudeCode, model: ClaudeCode.Sonnet_5 },
+  browser: true,
+  git: { token: process.env.GITHUB_TOKEN },
+})
+
+await box.git.clone({ repo: "https://github.com/your-org/your-app" })
+await box.cd("your-app")
+await box.git.exec({ args: ["checkout", "-b", "feat/dark-mode"] })
+
+// 1. The agent builds the feature and reports back in a shape your code can use
+const run = await box.agent.run({
+  prompt: "Add a dark mode toggle to the settings page. Start the dev server on port 3000 when done.",
+  responseSchema: z.object({ summary: z.string(), filesChanged: z.array(z.string()) }),
+})
+
+// 2. Check it in the box's own Chromium, no separate browser service
+const tab = await box.browser.tab.create("http://localhost:3000/settings")
+await tab.act("click the dark mode toggle")
+const page = await tab.extract(
+  "Is the page now using a dark background?",
+  z.object({ isDark: z.boolean() }),
+)
+
+// 3. Only then hand it back as a pull request
+if (page.isDark) {
+  await box.git.commit({ message: "feat: dark mode toggle" })
+  await box.git.push({ branch: "feat/dark-mode" })
+  const pr = await box.git.createPR({ title: "Add dark mode toggle", base: "main", body: run.result.summary })
+  console.log(pr.url, run.cost.totalUsd)
+}
+```
+
+On Daytona the same flow means installing and driving the agent CLI yourself, parsing its output, adding a browser (Computer Use gives you a VNC desktop, not a scripted browser API), and calling git and the GitHub API.
+
+Two operational differences: a box pauses when idle and resumes with its files weeks later, instead of stopping after 15 minutes, and stays on with `keepAlive: true` for a flat $8 a month; and the network is open from the first day, with your own allowlist when you want one. On cost, an hour in which the agent uses 10 core-minutes of CPU is about $0.02 in compute on a small box and about $0.17 on a 2 vCPU / 4 GB Daytona sandbox, because Box doesn't bill memory or idle CPU.
+
+Where Daytona is the better pick: Box has no GPUs, no Windows or macOS, SDKs in TypeScript and Python only, and runs in `us-east-1` only. The [Box vs Daytona comparison](/blog/upstash-box-vs-daytona) goes deeper, and the [quickstart](https://upstash.com/docs/box/overall/quickstart) gets the example above running.
+
+## 2. E2B: microVMs and a code interpreter
+
+[E2B](https://e2b.dev) runs every sandbox in a Firecracker microVM with its own kernel, and pause and resume keeps memory and running processes, not only files. Its Code Interpreter is a stateful Jupyter kernel with structured chart output. The rates match Daytona's, but sessions are capped at 1 hour on Hobby and 24 hours on the $150/month Pro plan, and there are no GPUs.
+
+**Switch to it if** you need a separate kernel per tenant or memory that survives a pause.
+
+## 3. Vercel Sandbox: for apps on Vercel
+
+[Vercel Sandbox](https://vercel.com/docs/sandbox) gives you Firecracker microVMs that are persistent by default, with Claude Code, Codex and opencode preinstalled. It bills active CPU, but memory is billed for the whole time the sandbox runs.
+
+**Switch to it if** your app is already on Vercel and you want microVM isolation inside that platform.
+
+## 4. Modal: GPUs and Python
+
+[Modal](https://modal.com/docs/guide/sandboxes) is the alternative if you use Daytona for its GPUs. It uses gVisor, scales to thousands of sandboxes, and offers the widest GPU range, but sandbox CPU costs about three times Modal's function rate.
+
+**Switch to it if** the work is GPU-bound and you live in Python.
+
+## 5. Tensorlake: microVMs with memory snapshots
+
+[Tensorlake](https://www.tensorlake.ai) runs Firecracker or Cloud Hypervisor VMs with filesystem or memory snapshots, clones from running sandboxes, active-CPU billing, and BYOC on several clouds.
+
+**Switch to it if** you want VM isolation and snapshots that keep memory, without wall-clock CPU billing.
+
+## 6. Northflank: cheapest compute, your own cloud
+
+[Northflank](https://northflank.com) has sandboxes on Kata or gVisor, GPUs, the lowest wall-clock rates in our [comparison](/blog/ai-agent-sandbox-providers-compared-2026), and self-serve BYOC on AWS, GCP, Azure and others.
+
+**Switch to it if** you need to run in your own cloud account, or want databases and services next to the sandboxes.
+
+## Moving from Daytona to Upstash Box
+
+| Daytona (TypeScript SDK) | Upstash Box |
+| --- | --- |
+| `daytona.create()` | `Box.create({ runtime: "node" })` |
+| `sandbox.process.executeCommand("npm test")` | `box.exec.command("npm test")` |
+| `sandbox.fs.uploadFile(...)` | `box.files.write({ path, content })` or `box.files.upload([...])` |
+| `sandbox.git.clone(url, path)` | `box.git.clone({ repo })`, then `box.cd(dir)` |
+| `sandbox.stop()` / `sandbox.start()`, auto-stop after 15 minutes | Automatic pause when idle, resumes on the next call; `keepAlive: true` to never pause |
+| `daytona.get(id)` | `Box.get(id)` |
+| Snapshot images | `box.snapshot()`, then `Box.fromSnapshot(id)` |
+| Driving your own agent loop | `box.agent.run({ prompt })` |
+
+What doesn't carry over: GPUs, Windows and macOS sandboxes, and the Go, Ruby and Java SDKs.
+
+## If you used Daytona to self-host
+
+You can keep running the archived open-source Daytona, but it won't get fixes. Maintained self-hostable options are [E2B Embed](https://e2b.dev/resources/introducing-e2b-embed), E2B's Apache-2.0 runtime for a single machine, and Beam's [Beta9](https://github.com/beam-cloud/beta9) (AGPL-3.0). For your own cloud account with a managed control plane, look at Northflank, Tensorlake, Beam, or E2B's Enterprise BYOC.
+
+## When to stay on Daytona
+
+Stay if you need GPUs, Windows or macOS sandboxes, an SDK in Go, Ruby or Java, a VNC desktop for computer use, or an EU region alongside the US. Its rates have no platform fee, and its SOC 2 Type II report covers the service.
+
+## FAQ
+
+### What is the best alternative to Daytona?
+
+For managed coding-agent workflows, Upstash Box: the agent, browser checks and typed results come built in, so there is less to integrate, and it bills active CPU with memory free. For microVM isolation pick E2B or Vercel Sandbox, for GPUs Modal or Northflank.
+
+### Is Daytona still open source?
+
+Partly. Current core development is private since June 2026, and the open-source repository is archived with no further updates. The archived code remains available to use and fork under its license, and the managed service continues.
+
+### Is there a cheaper alternative to Daytona?
+
+For agents that mostly wait on the model, active-CPU billing is cheaper: an hour of a 2 vCPU / 4 GB sandbox with 10 core-minutes of real CPU is about $0.02 in compute on Upstash Box against about $0.17 on Daytona. For CPU-bound work all hour, Northflank has the lowest wall-clock rates.
+
+### Which Daytona alternative can I self-host?
+
+E2B Embed (Apache-2.0, single machine) and Beam's Beta9 (AGPL-3.0). Northflank, Tensorlake, Beam and E2B Enterprise run in your own cloud account with their control plane.
+
+### Which Daytona alternative has a coding agent built in?
+
+Upstash Box runs Claude Code, Codex, OpenCode, Cursor or a custom harness with one call and returns the result. Vercel Sandbox preinstalls the CLIs without a run API.
+
+Related: [E2B alternatives](/blog/best-e2b-alternatives) · [Vercel Sandbox alternatives](/blog/best-vercel-sandbox-alternatives) · [Cloud computers for AI agents](/blog/cloud-computer-for-ai-agents) · [15 sandbox providers compared](/blog/ai-agent-sandbox-providers-compared-2026)
+
+## Sources
+
+Daytona details checked against [Daytona pricing](https://www.daytona.io/pricing), [sandboxes](https://www.daytona.io/docs/en/sandboxes/), [network limits](https://www.daytona.io/docs/en/network-limits/), [trust center](https://trust.daytona.io) and the [GitHub repository](https://github.com/daytonaio/daytona). E2B against [pricing](https://e2b.dev/pricing) and [BYOC](https://docs.e2b.dev/byoc). Other providers follow our [September 2026 comparison](/blog/ai-agent-sandbox-providers-compared-2026#sources). [Upstash Box pricing](https://upstash.com/pricing/box).

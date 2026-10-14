@@ -1,0 +1,181 @@
+---
+slug: best-e2b-alternatives
+title: "The Best E2B Alternatives for AI Agent Sandboxes in 2026"
+authors: [alitarik]
+tags: [box, ai, agents, sandbox]
+description: "The best E2B alternatives in 2026: Upstash Box if you want managed coding-agent workflows that end in a tested pull request, plus Daytona, Vercel Sandbox, Modal, Tensorlake, Northflank and Fly Sprites, and when E2B is still the better choice."
+---
+
+<Summary>
+E2B is a strong default for running AI-generated code: Firecracker microVMs, a stateful code interpreter, and pause and resume that keeps memory. Teams look for an alternative when they hit one of its limits: the 1-hour session cap on Hobby (24 hours on the $150/month Pro plan), wall-clock billing while the agent waits on the model, no GPUs, BYOC only on Enterprise, or having to build the agent loop themselves.
+
+- **Best E2B alternative for managed coding-agent workflows: Upstash Box.** The agent runs inside the sandbox and the run, its output, git and the pull request are API calls, with no session cap and memory billed at $0.
+- **Best for fast starts, many SDK languages and GPUs: Daytona.**
+- **Best if you deploy on Vercel: Vercel Sandbox.**
+- **Best for GPU and Python ML workloads: Modal.**
+- **Best for microVMs with memory snapshots and BYOC: Tensorlake.**
+- **Best for cheap wall-clock compute in your own cloud: Northflank.**
+- **Best for a persistent personal dev machine: Fly Sprites.**
+</Summary>
+
+## Why teams look for an E2B alternative
+
+These are the limits that come up most, from [E2B's own pricing and docs](https://e2b.dev/pricing):
+
+- **Session caps.** A sandbox can run for 1 hour on Hobby and 24 hours on Pro ($150/month plus usage). Pausing resets the timer, but long agent tasks have to be built around it.
+- **Wall-clock billing.** CPU and memory are billed every second the sandbox runs, including the minutes an agent spends waiting on the model. Pausing stops the meter, but you have to set it up: call `pause()` yourself, or create the sandbox with `lifecycle: { onTimeout: "pause" }` so it pauses instead of being killed when its timeout hits.
+- **No built-in agent.** E2B has excellent guides for running Claude Code, Codex or OpenCode inside a sandbox, but you install the agent, stream its output and parse the result yourself.
+- **No GPUs,** including on BYOC.
+- **BYOC is Enterprise-only,** with a $3,000/month minimum. The open-source E2B Embed runtime is single-machine.
+
+None of these are flaws for a code interpreter, which is what E2B does best. They matter for coding agents that run for hours, for per-user agents that live for weeks, and for anything that needs a GPU.
+
+## E2B alternatives compared
+
+| Alternative | Best for | Isolation | Billing | Session cap | Agent built in |
+| --- | --- | --- | --- | --- | --- |
+| **Upstash Box** | **Managed coding-agent workflows** | Container | **Active CPU, memory free** | **None** | **Yes: Claude Code, Codex, OpenCode, Cursor, custom** |
+| Daytona | Fast starts, SDK languages, GPUs | Container by default; VM classes | Wall-clock vCPU + RAM | None by default | No |
+| Vercel Sandbox | Apps on Vercel | Firecracker microVM | Active CPU + provisioned memory | 45m Hobby, 24h Pro per session | CLIs preinstalled, no run API |
+| Modal | GPU and Python ML | gVisor | Wall-clock, max(request, actual) | 24h | No |
+| Tensorlake | microVMs with memory snapshots, BYOC | Firecracker / Cloud Hypervisor | Active CPU + RAM + disk | 2h Free, 24h Credits, unlimited Pro | No |
+| Northflank | Cheap compute, your own cloud | Kata or gVisor | Wall-clock vCPU + RAM | None | No |
+| Fly Sprites | Persistent dev machine | Firecracker microVM | Actual CPU and RAM while active | None | CLIs preinstalled, no run API |
+
+E2B for reference: Firecracker microVM, wall-clock vCPU + RAM ($0.0504/vCPU-h, $0.0162/GiB-h), 1h / 24h session cap, no built-in agent.
+
+## 1. Upstash Box: managed coding-agent workflows
+
+[Upstash Box](https://upstash.com/docs/box/overall/quickstart) is a persistent cloud computer with coding agents built in. Run an agent, give it a browser and a repository, and get results back through an API.
+
+On E2B, a coding-agent workflow is a sandbox plus code you write around it. You install the agent CLI in a template, start it with `commands.run`, stream and parse its output, decide whether the task succeeded, track what each run cost, run git yourself, and call the GitHub API to open a pull request. Box ships that layer:
+
+| What a coding-agent workflow needs | On E2B | On Upstash Box |
+| --- | --- | --- |
+| Run Claude Code, Codex or OpenCode | Install it in a template, drive it with `commands.run` | `box.agent.run({ prompt })` |
+| Live progress in your UI | Parse the CLI's stdout stream | `box.agent.stream()` |
+| A result your code can act on | Parse free text | `responseSchema` with Zod or Pydantic returns typed data |
+| Know when a long task finishes | Poll or keep a connection open | `webhook` on the run |
+| What the run cost | Track tokens yourself | `run.cost` on every run |
+| Commit, push, open a PR | git via `commands.run`, then the GitHub API | `git.commit`, `git.push`, `git.createPR` |
+
+Here is the whole loop, ending in a pull request only when the agent reports the tests pass:
+
+```ts
+import { Agent, Box, ClaudeCode } from "@upstash/box"
+import { z } from "zod"
+
+const box = await Box.create({
+  runtime: "node",
+  agent: { harness: Agent.ClaudeCode, model: ClaudeCode.Sonnet_5 },
+  git: { token: process.env.GITHUB_TOKEN },
+})
+
+await box.git.clone({ repo: "https://github.com/your-org/your-repo" })
+await box.cd("your-repo")
+await box.git.exec({ args: ["checkout", "-b", "fix/auth-tests"] })
+
+const run = await box.agent.run({
+  prompt: "Fix the failing tests in src/auth. Run the full test suite before you finish.",
+  responseSchema: z.object({ summary: z.string(), testsPassed: z.boolean() }),
+})
+
+if (run.result.testsPassed) {
+  await box.git.commit({ message: "fix: failing auth tests" })
+  await box.git.push({ branch: "fix/auth-tests" })
+  const pr = await box.git.createPR({ title: "Fix auth tests", base: "main", body: run.result.summary })
+  console.log(pr.url, run.cost.totalUsd)
+}
+```
+
+Two more differences matter for long agent work. There is no session cap: a box pauses when idle and resumes with its files, or stays on with `keepAlive: true` for a flat $8 a month. And memory is free: an hour on a small box in which the agent uses 10 core-minutes of CPU is about $0.017 in compute, against about $0.166 for a 2 vCPU / 4 GB E2B sandbox running that hour ([worked example](/blog/ai-agent-sandbox-providers-compared-2026#cost)).
+
+Where E2B is the better pick: Box is a hardened container, not a microVM with its own kernel; its snapshots are disk-only, so memory doesn't survive a pause; it runs in `us-east-1` only; and it has no Jupyter-style code interpreter. The [Box vs E2B comparison](/blog/upstash-box-vs-e2b) goes deeper, and the [quickstart](https://upstash.com/docs/box/overall/quickstart) runs the code above in a few minutes.
+
+## 2. Daytona: fast starts and the widest SDK choice
+
+[Daytona](https://www.daytona.io) has the same per-second rates as E2B, no platform fee, and $200 in free credits. It adds what E2B doesn't have: GPUs, Windows and Linux VM classes, and SDKs in TypeScript, Python, Ruby, Go and Java. Sandboxes have no default session cap and auto-stop after 15 minutes idle, billing only disk while stopped. Its core repository moved to a private codebase in June 2026, so the managed service is the way to use it now.
+
+**Switch to it if** you need GPUs, a non-TypeScript/Python SDK, or Windows sandboxes, and you're happy to bring your own agent.
+
+## 3. Vercel Sandbox: for apps on Vercel
+
+[Vercel Sandbox](https://vercel.com/docs/sandbox) uses Firecracker microVMs like E2B, but bills active CPU plus provisioned memory, keeps sandboxes persistent by default with auto-snapshot on stop, and preinstalls opencode, Claude Code and Codex. Sessions run up to 24 hours on Pro.
+
+**Switch to it if** your app already runs on Vercel and you want microVM isolation without wall-clock billing.
+
+## 4. Modal: GPUs and Python
+
+[Modal](https://modal.com/docs/guide/sandboxes) is the alternative when the sandbox needs a GPU. It uses gVisor, scales to thousands of sandboxes, and has filesystem snapshots. Sandbox CPU costs about three times Modal's function rate, so it's expensive for plain code execution.
+
+**Switch to it if** your agent's code needs a GPU or you already run on Modal.
+
+## 5. Tensorlake: the closest like-for-like swap
+
+[Tensorlake](https://www.tensorlake.ai) is the nearest match to E2B's design: Firecracker or Cloud Hypervisor VMs, filesystem or memory snapshots, clone from a running sandbox, and BYOC on several clouds. It bills active CPU, and the Pro plan removes the session cap.
+
+**Switch to it if** you want E2B's isolation and memory snapshots with active-CPU billing or BYOC below enterprise pricing.
+
+## 6. Northflank: cheapest wall-clock compute, self-serve BYOC
+
+[Northflank](https://northflank.com) is a full platform with sandboxes on Kata or gVisor, no session cap, the lowest wall-clock rates in our comparison, and self-serve BYOC on AWS, GCP, Azure and others. There is no agent tooling; it is driven through its API and CLI.
+
+**Switch to it if** you need to run in your own cloud without an enterprise contract, or want databases and services next to the sandboxes.
+
+## 7. Fly Sprites: a persistent machine per agent
+
+[Sprites](https://sprites.dev) are Firecracker microVMs with a 100 GB persistent filesystem, Claude, Gemini, Codex and Cursor CLIs preinstalled, and billing for actual CPU and RAM while active. There is no fork and no run API.
+
+**Switch to it if** you want a persistent personal dev machine for an agent CLI rather than sandboxes your app creates per task.
+
+## Moving from E2B to Upstash Box
+
+Most E2B code maps one to one. The difference is that on Box you usually replace your own agent loop with `box.agent.run()`.
+
+| E2B (JS SDK) | Upstash Box |
+| --- | --- |
+| `Sandbox.create()` | `Box.create({ runtime: "node" })` |
+| `sbx.commands.run("npm test")` | `box.exec.command("npm test")` |
+| `sbx.files.write(path, content)` | `box.files.write({ path, content })` |
+| `sbx.pause()` / `lifecycle: { onTimeout: "pause" }` | Automatic: a box pauses when idle; `box.pause()` to do it now |
+| `Sandbox.connect(id)` | `Box.get(id)` |
+| Template from a Dockerfile | `box.snapshot()` once, then `Box.fromSnapshot(id)` |
+| Installing and driving Claude Code yourself | `box.agent.run({ prompt })` |
+
+Two things don't carry over: memory snapshots (Box snapshots are disk-only, so restart long-running processes after a resume) and the Jupyter-style code interpreter (run `python` through `box.exec.command` instead).
+
+## When to stay on E2B
+
+Stay if you run a code interpreter or data-analysis agent: the stateful Jupyter kernel with structured chart output is E2B's strength. Stay if you need memory that survives a pause, a desktop over VNC for computer use, or forking a sandbox with its memory. Its isolation, SOC 2 Type II, and framework integrations are among the best in the category.
+
+## FAQ
+
+### What is the best alternative to E2B?
+
+For managed coding-agent workflows, Upstash Box: the agent runs inside the sandbox and the run, its typed result, git and the pull request are API calls, with no session cap and memory free. For GPUs pick Modal or Daytona; for E2B-style microVMs with active-CPU billing, Tensorlake or Vercel Sandbox.
+
+### Is there a cheaper alternative to E2B?
+
+For agents that spend most of their time waiting on the model, yes: active-CPU billing. An hour on a small Upstash Box with 10 core-minutes of real CPU is about $0.017 in compute, against about $0.166 on E2B for a 2 vCPU / 4 GB sandbox. Northflank has the lowest wall-clock rates if the CPU is busy all hour.
+
+### Which E2B alternative has no session limit?
+
+Upstash Box, Daytona (unless you set a TTL), Northflank, Fly Sprites, and Tensorlake on Pro.
+
+### Is there an open-source alternative to E2B?
+
+E2B itself has an Apache-2.0 self-hosted runtime, E2B Embed. Daytona moved core development to a private codebase in June 2026 and its open-source repository is now archived. Beam's runtime, Beta9, is AGPL-3.0. Upstash Box's SDKs and CLI are open source, but the service is managed.
+
+### Which E2B alternative has a coding agent built in?
+
+Upstash Box runs Claude Code, Codex, OpenCode, Cursor or a custom harness with one call. Vercel Sandbox and Fly Sprites preinstall the CLIs without a run API.
+
+### Can I run Claude Code in an E2B alternative?
+
+Yes. On Upstash Box it is built in through `box.agent.run()`. On Vercel Sandbox and Fly Sprites it is preinstalled, and on the others you install it like any CLI.
+
+Related: [Daytona alternatives](/blog/best-daytona-alternatives) · [Vercel Sandbox alternatives](/blog/best-vercel-sandbox-alternatives) · [Cloud computers for AI agents](/blog/cloud-computer-for-ai-agents) · [15 sandbox providers compared](/blog/ai-agent-sandbox-providers-compared-2026)
+
+## Sources
+
+E2B details checked against [E2B pricing](https://e2b.dev/pricing), [persistence](https://docs.e2b.dev/sandbox/persistence), [GPU support](https://docs.e2b.dev/faq/gpu-support), [BYOC](https://docs.e2b.dev/byoc) and the [changelog](https://docs.e2b.dev/changelog). Daytona against [pricing](https://www.daytona.io/pricing), [sandboxes](https://www.daytona.io/docs/en/sandboxes/) and [GitHub](https://github.com/daytonaio/daytona). Other providers follow our [September 2026 comparison](/blog/ai-agent-sandbox-providers-compared-2026#sources), which links each provider's docs and pricing. [Upstash Box pricing](https://upstash.com/pricing/box).
