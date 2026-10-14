@@ -1,8 +1,10 @@
 ---
 slug: openclaw-and-hermes-on-upstash-box
-title: "Running OpenClaw and Hermes on Upstash Box"
+title: "How to Host OpenClaw and Hermes 24/7 on Upstash Box"
 authors: [alitarik]
 tags: [ai, box, serverless]
+description: "How to host OpenClaw or Hermes Agent 24/7 without leaving your laptop on: run either one in an isolated Upstash Box that stays reachable from Telegram, WhatsApp or Slack, with snapshots for a clean restore."
+updated: "2026-10-14"
 ---
 
 AI infrastructure is moving fast. New gateways, new agent frameworks, new runtimes. The hard part is no longer finding the right tool. It's finding a stable place to run it.
@@ -73,3 +75,21 @@ Both setups run entirely inside the box. If you haven't created one yet, the [Bo
 
 - [OpenClaw on Upstash Box](https://upstash.com/docs/box/guides/openclaw-setup)
 - [Hermes on Upstash Box](https://upstash.com/docs/box/guides/hermes-setup)
+
+## FAQ
+
+### How do I host OpenClaw 24/7?
+
+Run it on a machine that never sleeps instead of your laptop or a Mac mini. On Upstash Box you install OpenClaw inside a box by following the [OpenClaw guide](https://upstash.com/docs/box/guides/openclaw-setup), and it stays reachable from your messaging apps while your own computer is off.
+
+### How do I keep Hermes Agent running all the time?
+
+The same way: install it in a box with the [Hermes guide](https://upstash.com/docs/box/guides/hermes-setup). Set `keepAlive: true` so the box never pauses, and an init command can start the gateway again whenever the box boots.
+
+### How much does it cost to keep a personal agent always on?
+
+A keep-alive box is a flat $8 a month for the small size, and it's what a chat assistant needs. Gateways like Telegram's poll for new messages from inside the box, so a box that has paused can't receive a message or wake itself up. Use a default box, which pauses when idle and bills only active CPU, for work you start yourself, not for an assistant that has to answer messages.
+
+### Is it safe to give OpenClaw or Hermes shell access?
+
+Safer in a box than on your own machine. Each box is an isolated container that cannot reach your files, your private network or other boxes, so a bad command is contained to a disposable machine you can restore from a snapshot.

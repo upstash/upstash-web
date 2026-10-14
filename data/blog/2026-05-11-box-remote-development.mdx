@@ -1,9 +1,10 @@
 ---
 slug: box-remote-development
-title: "Remote Development with Upstash Box"
+title: "Remote Development Environments for AI Coding Agents with Upstash Box"
 authors: [alitarik]
 tags: [box, ai, devtools]
-description: "Remote development is having a moment. Here's why it matters and how Upstash Box makes it work for the way people actually build today."
+description: "A remote development environment for AI coding agents: a Linux box with Claude Code, Codex or OpenCode inside, SSH and port forwarding, shareable preview URLs, and snapshots for instant onboarding."
+updated: "2026-10-14"
 ---
 
 Remote development isn't new, but AI coding agents have made a strong case for it being the default. Local machines accumulate state, go to sleep, and are a risky place to let an agent run loose. A remote box solves all three.
@@ -113,3 +114,25 @@ The next person restores from the snapshot and SSH-es into a machine that's alre
 The quickest way to see this in action is the [remote development guide](https://upstash.com/docs/box/guides/remote-development). It walks through creating a box, connecting over SSH with port forwarding, and running a Next.js dev server that appears on `localhost:3000` as if it were local.
 
 From there the rest of the workflows above are one step away.
+
+## FAQ
+
+### What is a remote development environment for AI coding agents?
+
+A Linux machine in the cloud where a coding agent writes and runs code instead of on your laptop. You keep full access to the same machine over SSH, and can forward its ports or share a public URL to the running app.
+
+### Why run coding agents in a remote environment instead of locally?
+
+A local machine goes to sleep, accumulates state, and holds your credentials. A remote box keeps working when your laptop is closed, starts from a clean environment, and limits what a misbehaving agent or a malicious package can reach.
+
+### How do I connect to an Upstash Box?
+
+Over SSH from any terminal: `ssh <box-id>@us-east-1.box.upstash.com`. Add `-L 3000:127.0.0.1:3000` to see a dev server on your own `localhost`, or share `https://<box-id>-<port>.preview.box.upstash.com` with anyone.
+
+### Which coding agents run inside the box?
+
+Claude Code, Codex and OpenCode are built in, along with Cursor and custom harnesses through the SDK. You can also SSH in and run any CLI agent yourself.
+
+### How do I onboard a new developer to the same environment?
+
+Snapshot a box once it is set up and restore new boxes from that snapshot. The next person starts in a machine that is already cloned, installed and configured.

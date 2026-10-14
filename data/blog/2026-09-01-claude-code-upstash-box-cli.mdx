@@ -1,9 +1,10 @@
 ---
 slug: claude-code-upstash-box-cli
-title: "Your Claude Subscription Just Got a Remote Computer"
+title: "Give Claude Code a Remote Computer: Run Its Work in the Cloud with Your Claude Subscription"
 authors: [alitarik]
 tags: [box, ai, cli, skills, claude]
-description: "Install one skill and one CLI, then add four words to any prompt: in upstash box. The Claude you already pay for builds it on a real machine somewhere else, runs it there, and gives you back a live URL."
+description: "Run Claude Code's work in the cloud without a new subscription: install one skill and the Upstash Box CLI, add \"in upstash box\" to a prompt, and Claude builds and runs the project on a remote machine and hands back a live URL."
+updated: "2026-10-14"
 ---
 
 Claude Code will build almost anything you ask for. What you get back is a folder on your laptop.
@@ -121,3 +122,21 @@ export UPSTASH_BOX_API_KEY=box_...
 The skills also install in Cursor, Codex, OpenCode and Zed. The [skills repo](https://github.com/upstash/skills) has those, and the [Box docs](https://upstash.com/docs/box/overall/quickstart) cover the rest of what a box can do.
 
 Tell us what you got back. We are on [Discord](https://upstash.com/discord).
+
+## FAQ
+
+### How do I run Claude Code's work in the cloud?
+
+Install the Upstash Box CLI and the Upstash skill, then add "in upstash box" to a prompt. Claude Code keeps running where you use it, and does the installing, building and serving on a remote box, so your machine stays clean and you get back a live URL. Anthropic's own option is [Claude Code on the web](https://code.claude.com/docs/en/claude-code-on-the-web); to run the Claude Code agent itself inside a sandbox, see [running Claude Code in a remote sandbox](/blog/running-claude-code-in-a-remote-sandbox-with-upstash-box).
+
+### Do I need a separate API key or model subscription?
+
+No. The Claude subscription you already have drives the work. Box only provides the machine, and the free tier is enough to get a link back.
+
+### What can Claude do in the box?
+
+Anything it does on a computer: install packages, run long builds, start servers on ports, clone a repo and open a PR, use a headless browser, and share the result through a public URL. The box keeps its files between sessions.
+
+### Does this work with other agents than Claude Code?
+
+Yes. The skills also install in Cursor, Codex, OpenCode and Zed.

@@ -1,9 +1,10 @@
 ---
 slug: software-factory-needs-a-sandbox-per-agent
-title: "A Software Factory Needs One Sandbox per Agent"
+title: "How to Run Multiple Coding Agents in Parallel: One Sandbox per Agent"
 authors: [alitarik]
 tags: [box, ai, agents, sandbox]
-description: "A software factory is a system where AI agents pick up real engineering work, write the code, test it, and ship it. The part nobody talks about is where that code runs. It scales only when every agent gets its own isolated sandbox."
+description: "How to run multiple AI coding agents in parallel without them breaking each other: give every agent its own isolated sandbox, fan out workers from one snapshot, and lock down egress. Real code and output with Upstash Box."
+updated: "2026-10-14"
 ---
 
 The idea of the software factory got a lot of attention this year. It was on my timeline for weeks, and everybody used the term a bit differently.
@@ -257,3 +258,25 @@ The free plan gives you 10 concurrent boxes and 5 CPU hours per month. Pay as yo
 The interesting limit of a software factory is not how many agents you can prompt. It is how many of them can run code at the same time without stepping on each other. That number is the number of sandboxes you can give them.
 
 Everything above, from one box to a seeded parallel fleet, fits in the free plan while you build the rest of your factory.
+
+## FAQ
+
+### How do I run multiple coding agents in parallel?
+
+Give every agent its own workspace. Git worktrees on one machine separate the files, but the agents still share dependencies, ports, the network and your credentials. A sandbox per agent separates all of it: prepare one environment, snapshot it, and start one box per task from that snapshot with `Box.fromSnapshot()`.
+
+### Can I run several Claude Code agents at the same time?
+
+Yes. Locally you can run each session in its own git worktree, but they all share one machine. On Upstash Box every box can run Claude Code (or Codex, OpenCode, Cursor) through `box.agent.run()`, so ten boxes are ten Claude Code sessions that cannot touch each other's files.
+
+### What is a software factory?
+
+A system where AI agents pick up real engineering work from GitHub, Sentry, CI or Linear, write the code, test it, and ship it, with humans stepping in only for judgment calls like architecture decisions and incidents.
+
+### How many agents can run in parallel on Upstash Box?
+
+10 concurrent boxes on the free plan and 1,000 by default on pay as you go, with higher limits on Enterprise.
+
+### What does running agents in parallel cost?
+
+Box bills active CPU only, from $0.10 per active CPU hour, and memory is free. An agent that waits on the model is not burning CPU, so a fleet of mostly waiting workers costs far less than the same fleet on wall-clock billing.

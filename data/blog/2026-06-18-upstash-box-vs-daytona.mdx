@@ -4,6 +4,7 @@ title: "Upstash Box vs Daytona: A Comparison of AI Agent Sandboxes"
 authors: [alitarik]
 tags: [box, ai, serverless]
 description: "Upstash Box and Daytona both give AI agents a real computer to work in, and both are containers that keep their state. The difference is where the agent lives and how you pay. A look at the numbers, with a focus on cost and developer experience."
+updated: "2026-10-14"
 ---
 
 <Summary>
@@ -169,7 +170,7 @@ Box charges **active CPU only, in core-hours**, and leaves **memory free**. The 
 | CPU | $0.10 / active core-hour (only cores actually used) | $0.0504 / vCPU-hr, wall-clock (all allocated vCPU) |
 | Memory | Free | $0.0162 / GiB-hr, wall-clock |
 | Storage | $0.10 / GB-month (snapshots included) | $0.000108 / GiB-hr, 5 GB free |
-| GPU | Not available | H100 $3.95/hr, RTX PRO 6000 $3.03/hr |
+| GPU | Not available | H100 $2.27/hr, RTX PRO 6000 $1.74/hr (preemptible) |
 | Free tier | 10 concurrent, 5 CPU-hrs/mo, $1 LLM budget | $200 one-time credits |
 
 Because the agent lives in the box, Box also meters LLM tokens for you, capped at $1/month on Free and a $100/month budget on Pay as you go. Full numbers are on the [Box pricing page](https://upstash.com/pricing/box).
@@ -235,3 +236,21 @@ console.log(run.result)
 ```
 
 The free tier is 10 concurrent boxes and 5 CPU-hours a month, with no platform fee. The [quickstart](https://upstash.com/docs/box/overall/quickstart) gets you running in a few minutes, and the [use cases](https://upstash.com/docs/box/overall/use-cases) page walks through the agent-server and multi-agent orchestration patterns end to end.
+
+## FAQ
+
+### What is the difference between Upstash Box and Daytona?
+
+Both run containers that persist state. Box puts the coding agent inside the box and bills active CPU only with memory free. Daytona is a flexible execution backend for your own agent, with SDKs in five languages, VNC desktops and GPUs, billed by wall-clock vCPU and memory.
+
+### Is Upstash Box cheaper than Daytona?
+
+For idle-heavy agent work, roughly 5 to 10 times cheaper: about $0.02 against $0.17 for an hour with 10 core-minutes of real CPU on 2 vCPU and 4 GB. For a CPU-bound run the gap narrows.
+
+### Does Daytona have GPUs?
+
+Yes, preemptible GPUs from an RTX 4090 at $0.57/hr up to a B300 at $4.08/hr. Upstash Box has no GPUs.
+
+### Is Daytona still open source?
+
+Partly. Current core development is private since June 2026, and the open-source repository is archived with no further updates. The archived code remains available to use and fork under its license, and the managed service continues.

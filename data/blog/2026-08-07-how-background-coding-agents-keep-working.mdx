@@ -2,8 +2,9 @@
 authors: [alitarik]
 slug: how-background-coding-agents-keep-working
 tags: [box, ai, devtools]
-title: "How Background Coding Agents Keep Working After You Close Your Laptop: 7 Infrastructure Layers"
-description: Background coding agents need more than a sandbox. Explore the seven infrastructure layers that let them run, recover, stream results, and scale.
+title: "How to Build a Background Coding Agent: 7 Infrastructure Layers"
+description: "How to build a background coding agent that keeps working after you close your laptop: the seven infrastructure layers it needs (isolation, environment, idle handling, recovery, triggers, conversation, fan-out) and how Upstash Box covers each."
+updated: "2026-10-14"
 ---
 
 Coding agents are moving off our laptops. Cursor's cloud agents [keep working when your laptop is closed](https://cursor.com/blog/cloud-agent-development-environments). OpenAI's Codex [runs each task in its own cloud sandbox](https://openai.com/index/introducing-codex/), preloaded with your repository. Claude Code on the web [runs coding tasks on Anthropic-managed infrastructure](https://www.anthropic.com/news/claude-code-on-the-web). The workflow is the same in all three: hand over a task, close the tab, review a pull request later.
@@ -276,3 +277,25 @@ Each of the seven layers maps to a Box primitive, and Box provides durability at
 | Fan-out | Multiple independent boxes from one snapshot |
 
 Box covers the sandbox, environment, lifecycle, trigger, streaming, and fan-out layers as primitives, and it stops short of Temporal-style workflow durability on purpose: the workspace survives, and safely restarting interrupted work stays your application's job. If you're still choosing a provider, our [sandbox provider comparison](https://upstash.com/blog/best-sandbox-providers-for-ai-agents) covers the wider field. A free account includes [10 concurrent boxes and 5 CPU hours per month](https://upstash.com/pricing/box), enough to try every layer in this post.
+
+## FAQ
+
+### What is a background coding agent?
+
+A coding agent you hand a task to and walk away from. It runs on remote infrastructure, keeps working after you close your laptop, and comes back with a result, usually a pull request. Cursor's cloud agents, OpenAI's Codex and Claude Code on the web all work this way.
+
+### How do I build a background coding agent?
+
+Start with an isolated sandbox per task, then add the layers above it: a prepared environment (snapshot), idle handling (pause and resume), recovery, triggers (schedules, webhooks, URLs), a conversation channel (streaming), and fan-out. With Upstash Box most of these are SDK calls: `Box.create()` with a built-in agent, `snapshot()`, `agent.stream()`, cron schedules, and `git.createPR()`.
+
+### Where should a background coding agent run?
+
+In a sandbox that is isolated from your machine and your other agents, keeps its filesystem between sessions, and does not bill while the agent waits on the model. A plain serverless function is too short-lived, and a VM you manage yourself leaves you to build pausing, snapshots and isolation.
+
+### How do I keep a coding agent running while my laptop is closed?
+
+Run the agent on a remote machine instead of your laptop. An Upstash Box keeps the agent session and workspace on its own disk, pauses when idle and resumes with state intact, or stays on all the time with `keepAlive: true`.
+
+### Do I need a workflow engine like Temporal for a background agent?
+
+Not to start. Box keeps the workspace and agent session durable, so a box survives across sessions. Safely restarting a half-finished task is still your application's job; add a workflow engine when you need step-level retries across many services.
