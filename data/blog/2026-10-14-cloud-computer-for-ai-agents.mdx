@@ -1,0 +1,126 @@
+---
+slug: cloud-computer-for-ai-agents
+title: "Cloud Computers for AI Agents: How to Give an AI Agent Its Own Computer (2026)"
+authors: [alitarik]
+tags: [box, ai, agents, sandbox]
+description: "How to give an AI agent its own computer in the cloud: what an agent computer needs (shell, persistent files, browser, git, isolation, secrets), the three ways to get one, and how Upstash Box, E2B, Daytona, Fly Sprites, Freestyle, Northflank and a plain VM compare."
+---
+
+<Summary>
+An AI agent that can only call APIs is limited to what those APIs expose. Give it a computer, a shell, a filesystem, a browser and git, and it can do the work a person would do at a terminal.
+
+- **The short answer.** For a coding agent or a personal agent, use a cloud computer built for agents rather than a plain VM: [Upstash Box](https://upstash.com/docs/box/overall/quickstart) gives each agent an isolated Linux machine with the agent already inside, a headless browser, git-to-PR, cron schedules, and files that survive between sessions, billed for active CPU only.
+- **If the agent clicks through a desktop GUI,** pick a computer-use sandbox with a VNC desktop: E2B Desktop or Daytona Computer Use.
+- **If you want full root on a long-lived VM,** Freestyle or Fly Sprites, or a VM you run yourself if you are ready to own its security.
+</Summary>
+
+"Give the agent a computer" became the default way to build capable agents this year. Claude Code, Codex and OpenCode are all agents that expect a terminal. Browser agents expect Chromium. Personal agents like OpenClaw and Hermes expect a machine that stays on. The question is no longer whether the agent gets a computer, but which one.
+
+## What a cloud computer for an AI agent needs
+
+A laptop has all of this by default. A cloud computer for an agent should too, plus the safety you don't need when you are the only user:
+
+| Need | Why the agent needs it |
+| --- | --- |
+| Shell and filesystem | To install packages, run builds and tests, and execute the code it writes |
+| Files that persist | So it can stop today and continue tomorrow without cloning and installing again |
+| Isolation | So a wrong command or a malicious package can't reach your machine, your network or other users |
+| Egress control and secrets off the machine | So code the model just wrote can't read your API keys or send data anywhere it likes |
+| A browser | To read JavaScript-rendered pages, test the app it built, and fill in forms |
+| Git | To clone a repo, commit, and hand work back as a pull request |
+| Always on, or pause and resume | Always on for a personal agent that answers messages, pause and resume for work that comes in bursts |
+| An API to drive it | So your app can create one computer per user or per task and get results back |
+
+## Three ways to give an agent a computer
+
+**1. Rent a VM.** A VPS on Hetzner, DigitalOcean or EC2 is cheap and familiar. It is also a computer with no agent features: you install the agent, harden SSH, set up a firewall, keep secrets out of reach of generated code, and build per-user provisioning yourself. Fine for one personal agent you trust, hard to run safely for many users.
+
+**2. Use a computer-use sandbox.** E2B Desktop and Daytona's Computer Use give the agent a full graphical desktop over VNC, which is what screenshot-and-click agents need. If your agent works through APIs, a terminal and a headless browser, the desktop is overhead you don't need.
+
+**3. Use a cloud computer built for agents.** An agent sandbox with a persistent filesystem and an SDK: you create a machine per user or per task with one call, and pausing, snapshots, network policy and logs come with it. This is the fit for coding agents, personal agents and per-user agents in a product.
+
+## How the options compare
+
+| Option | Isolation | Files persist | Browser | Agent built in | Billing |
+| --- | --- | --- | --- | --- | --- |
+| **Upstash Box** | Container | **Yes; auto-pause or keep-alive** | **Headless Chromium with AI actions** | **Yes: Claude Code, Codex, OpenCode, Cursor, custom** | **Active CPU, memory free** |
+| E2B | Firecracker microVM | Yes, while paused; 1h / 24h session cap by plan | Desktop/VNC, cloud browsers | No | Wall-clock vCPU + RAM |
+| Daytona | Container by default; VM classes | Yes; disk billed when stopped | Computer Use desktop / VNC | No | Wall-clock vCPU + RAM |
+| Fly Sprites | Firecracker microVM | Yes (100 GB) | No | CLIs preinstalled, no run API | Actual CPU and RAM while active |
+| Freestyle | KVM Linux VM | Yes; memory via snapshot | No | No | Wall-clock vCPU + RAM |
+| Northflank | Kata or gVisor | Yes (volumes) | No | No | Wall-clock vCPU + RAM |
+| Your own VM | Whatever you configure | Yes | You install it | You install it | Fixed monthly |
+
+Box's weak spots, plainly: it is a hardened container rather than a VM with its own kernel, it runs in AWS `us-east-1` only, it has no GPUs, and custom Docker images are still planned. If you need a separate kernel per untrusted tenant or a GPU next to the agent, pick from the other rows. Details and sources for every provider are in our [15-provider sandbox comparison](/blog/ai-agent-sandbox-providers-compared-2026).
+
+## Giving an agent a computer with Upstash Box
+
+One call creates the computer, with the agent, the browser and git already set up:
+
+```ts
+import { Agent, Box, ClaudeCode } from "@upstash/box"
+
+const box = await Box.create({
+  runtime: "node",
+  agent: { harness: Agent.ClaudeCode, model: ClaudeCode.Sonnet_5 },
+  browser: true,
+  git: { token: process.env.GITHUB_TOKEN },
+})
+
+await box.git.clone({ repo: "https://github.com/your-org/your-app" })
+
+const run = await box.agent.run({
+  prompt: "Start the dev server, open it in the browser, fix the broken signup form, and add a test",
+})
+
+console.log(run.result, run.cost.totalUsd)
+```
+
+The agent works in its own Linux machine: it installs packages, runs the dev server, checks the page in Chromium, and edits the code. When it's done, `box.git.createPR()` hands the work back as a pull request.
+
+The same box keeps its files. Leave it and it pauses with storage kept, and the next call wakes it where it left off. For an agent that has to answer at any moment, like a personal assistant on WhatsApp or Telegram, turn pausing off:
+
+```ts
+const assistant = await Box.create({ runtime: "node", keepAlive: true })
+```
+
+And for an agent that works on a cadence, schedule it inside the box:
+
+```ts
+await box.schedule.agent({
+  cron: "0 8 * * *",
+  prompt: "Read yesterday's Sentry errors and open an issue for each new one",
+})
+```
+
+The free plan includes 10 concurrent boxes and 5 CPU-hours a month with no card. After that a box bills $0.10 per active CPU-hour for the small size with memory free, and a keep-alive box is a flat $8 a month. See [Box pricing](https://upstash.com/pricing/box).
+
+## FAQ
+
+### What is a cloud computer for AI agents?
+
+A remote machine an AI agent controls through a shell, a filesystem, a browser and git, the way a person uses a laptop. Unlike a plain VM it is built to be created per user or per task through an API, isolated from your systems, and paused when idle.
+
+### How do I give an AI agent its own computer?
+
+Create one with an agent sandbox SDK and hand it to the agent. With Upstash Box, `Box.create()` returns an isolated Linux machine with a coding agent inside, and `box.agent.run()` gives it a task. You can also run your own agent loop against the box's shell and file APIs.
+
+### Does an AI agent need a desktop, or is a headless computer enough?
+
+Headless is enough for coding agents, browser automation and most personal agents: they use a terminal and a headless browser. A desktop over VNC is only needed for computer-use agents that work by taking screenshots and clicking, where E2B Desktop and Daytona Computer Use fit.
+
+### How much does a cloud computer for an AI agent cost?
+
+It depends on the billing model more than the rate. Agents spend most of their time waiting on the model, so active-CPU billing costs far less than wall-clock billing for the same work. On Upstash Box an hour of mostly idle agent work on a small box is about $0.017.
+
+### Can an AI agent's computer stay on 24/7?
+
+Yes. A keep-alive Upstash Box never pauses, for a flat $8 a month on the small size, and an init command restarts your server or gateway whenever the box boots. Personal agents like [OpenClaw and Hermes](/blog/openclaw-and-hermes-on-upstash-box) run this way.
+
+### Is it safe to let an AI agent run commands on a cloud computer?
+
+Safer than on your laptop, if the machine is isolated. A box is its own container that cannot reach your files, private networks, cloud metadata or other boxes, outbound traffic can be limited to an allowlist, and Attach Headers injects API keys on the host so the agent's code never sees them.
+
+## Sources
+
+Checked in October 2026. Provider details follow our [September 2026 comparison](/blog/ai-agent-sandbox-providers-compared-2026), which links each provider's docs and pricing pages. [Upstash Box docs](https://upstash.com/docs/box/overall/how-it-works) · [Box pricing](https://upstash.com/pricing/box) · [Box browser](/blog/box-browser) · [Keep-alive boxes](/blog/keep-alive-boxes)
