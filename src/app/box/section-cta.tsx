@@ -13,7 +13,7 @@ export default function SectionCta() {
       <Container className="max-w-screen-md">
         <h2
           className={cx(
-            "font-display text-3xl font-bold md:text-5xl",
+            "pb-[0.15em] font-display text-3xl font-bold md:text-5xl",
             "bg-gradient-to-r bg-clip-text text-transparent",
             "from-primary-text via-primary to-sky-500",
           )}

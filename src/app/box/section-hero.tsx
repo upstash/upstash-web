@@ -16,7 +16,7 @@ export default function SectionHero() {
           <h1
             className={cx(
               "flex flex-col items-center gap-4 md:gap-6",
-              "text-center font-display text-4xl font-bold md:text-7xl",
+              "pb-[0.15em] text-center font-display text-4xl font-bold md:text-7xl",
               "bg-gradient-to-r bg-clip-text text-transparent",
               "from-primary-text via-primary to-sky-400",
             )}
