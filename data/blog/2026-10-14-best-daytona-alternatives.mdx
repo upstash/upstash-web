@@ -41,7 +41,6 @@ None of these matter if you want a fast, polyglot runner with GPUs for your own 
 | Vercel Sandbox | Apps on Vercel | Firecracker microVM | Active CPU + provisioned memory | No | CLIs preinstalled, no run API |
 | Modal | GPU and Python ML | gVisor | Wall-clock, max(request, actual) | Yes | No |
 | Tensorlake | microVMs with memory snapshots, BYOC | Firecracker / Cloud Hypervisor | Active CPU + RAM + disk | No | No |
-| Freestyle | Long-running full VMs | KVM VM | Wall-clock vCPU + RAM | No | No |
 | Northflank | Cheap compute, your own cloud | Kata or gVisor | Wall-clock vCPU + RAM | Yes | No |
 
 Daytona for reference: containers by default with VM classes, wall-clock vCPU + RAM, GPUs, no built-in agent.
