@@ -44,7 +44,7 @@ We need accounts for the services:
 
 To get started, we create a new GitHub repository and ensure. We check "Add a README file," so it isn't empty. Since the repository is not empty, GitHub allows us to start a Codespace for it, which comes preconfigured with Node.js and a Git-to-GitHub connection.
 
-![Figure 1: Start Codespace](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/flx6846ai4j45mg2b2ql.png)
+![Figure 1: Start Codespace](/blog/data-leaks-vercel-edge/flx6846ai4j45mg2b2ql-cb98250e.png)
 _Figure 1: Start Codespace_
 
 First, we need to create a new Next.js project and install the Upstash Redis client with the following commands:
@@ -259,13 +259,13 @@ We need to create an Upstash Redis database, to get the credentials for the envi
 
 We can create a new Redis database in [the Upstash Console](https://console.upstash.com/) by clicking the "Create database" button. Figure 2 shows the configuration. For this example, a regional database is enough, but if you have globally distributed users and want to keep the latency low, you can also choose the global type.
 
-![Figure 2: Create a new database](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/bthd55mhipu6wrsg0n4l.png)
+![Figure 2: Create a new database](/blog/data-leaks-vercel-edge/bthd55mhipu6wrsg0n4l-3c771066.png)
 
 _Figure 2: Create a new database_
 
 After the creation, we can find the URL and token required for our environment variables under the REST API category; it looks something like in figure 3.
 
-![Figure 3: Database credentials](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/vlkufon3r7sau63meh3y.png)
+![Figure 3: Database credentials](/blog/data-leaks-vercel-edge/vlkufon3r7sau63meh3y-44305232.png)
 
 _Figure 3: Database credentials_
 
@@ -275,7 +275,7 @@ To create a new Vercel project, [open the New Project page](https://vercel.com/n
 
 We can keep the default configuration and add our environment variables with the Upstash Redis credentials from above. Figure 4 shows Vercel's creation UI for reference.
 
-![Figure 4: Vercel project creation](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/6h1y1jyg5z69dur56oc3.png)
+![Figure 4: Vercel project creation](/blog/data-leaks-vercel-edge/6h1y1jyg5z69dur56oc3-b1df8d1c.png)
 
 _Figure 4: Vercel project creation_
 
@@ -291,7 +291,7 @@ Here we see our `/api/refresh-list` function with a "Run" button to click.
 
 When the function finishes, we navigate to the "Project" tab and click on one of the URLs under "Domain". This will open the website with filtered text in the browser; it should look like in figure 5.
 
-![Figure 5: Filtered website](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/eddtnc968izzu2v9cfph.png)
+![Figure 5: Filtered website](/blog/data-leaks-vercel-edge/eddtnc968izzu2v9cfph-dcebb8f7.png)
 _Figure 5: Filtered website_
 
 If we add `/api/filtered-data` to our URL, we can see that this also works for API responses. They should look like the following example:

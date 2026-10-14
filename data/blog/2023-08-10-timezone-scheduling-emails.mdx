@@ -160,11 +160,11 @@ export default function Home() {
 
 The code above creates a form with a drop-down for users to set their preferred time for receiving daily email summaries. They can schedule or cancel these notifications, and the application communicates with the server using HTTP POST requests. We'll create the HTTP endpoints in the following sections.
 
-![Schedule email form](https://i.imgur.com/ObbzMyd.png)
+![Schedule email form](/blog/timezone-scheduling-emails/obbzmyd-c052dc48.png)
 
 ### Schedule email cron job
 
-![Schedule email flow](https://i.imgur.com/34tRQMZ.png)
+![Schedule email flow](/blog/timezone-scheduling-emails/34trqmz-71fe88ea.png)
 
 Let's start by creating the `POST /api/schedule-cron` route. This route will be used to schedule the email cron job in the user's timezone. We'll use the [QStash](https://upstash.com/docs/qstash) library to schedule the cron job.
 
@@ -305,7 +305,7 @@ export const config = {
 
 ### Cancel scheduled email cron job
 
-![Cancel scheduled email flow](https://i.imgur.com/xvYy7CJ.png)
+![Cancel scheduled email flow](/blog/timezone-scheduling-emails/xvyy7cj-de598df1.png)
 
 Next, let's create the `POST /api/cancel-schedule` route. This route will be used to cancel the scheduled email cron job. We'll use the [QStash](https://upstash.com/docs/qstash) library to cancel the cron job.
 

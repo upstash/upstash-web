@@ -35,7 +35,7 @@ Here are some of the advantages that led us to use Upstash Redis in our example:
 
 In our case, the first step is creating an Upstash account [Console](https://console.upstash.com/auth/sign-in). Secondly, create an Upstash database as you wish. Then, it is ready to go!
 
-**![](https://lh4.googleusercontent.com/Td9jwj8UQ87GKFtzvC7OzzAMhNTfx2VSSJSLnIbHfbPgPYop2kJ5j1fpzHiz42tN6_-LNZrgQ1PmYwPFw6nDfx4dUlkJyNI1tosiELug4gycQaBsxKxhMTQSsr5t0sKzZq6RA2O_)**
+**![](/blog/serverless-react-native/image-f7e04393.png)**
 
 To get familiar, we can do some operations in CLI, which is provided in the Upstash console.
 
@@ -51,7 +51,7 @@ Then we can display all user information with its score.
 ZRANGE Leaderboard 0 -1 WITHSCORES
 ```
 
-**![](https://lh5.googleusercontent.com/ltLwyC-EmQAGahQybD6y1KcIKkWa3hDWXK8gEETW-g_CiB98x2PyWDj1Sg_wBpScSRq-8gwQ4t3f75lF2pNIxT92N37J1cwibpvqV-RS8AaPjiuML1NjTam0H9vJmgxM0zU5CY7T)**
+**![](/blog/serverless-react-native/image-01d0e8fb.png)**
 We can do these operations on AWS Lambda functions with Serverless Framework to connect Redis to the backend of the app.
 
 ### **2 - Create Functions with Serverless Framework**
@@ -203,7 +203,7 @@ For the sake of simplicity, we will only request first name, last name and score
 
 Screen which users submit scores looks like below.
 
-**![](https://lh4.googleusercontent.com/FIRqwt5tR6JLjdao-9AYNc9SmHY0jIUNkkqYgpxRr5yRz1eqhm0A9WbCHCoTZs22g00hptix6Vi8MQac6qcUZ02-jK54naCg5CA1BThH5lycQu78n6rSTLWEBa1rnpLtkTS0OpKk)**
+**![](/blog/serverless-react-native/image-e4a2c3af.png)**
 
 In this screen, when a user enters a score, the application will send a HTTP request to our serverless endpoint
 
@@ -255,13 +255,13 @@ As you can see, the POST request body contains “firstname”, “lastname”, 
 
 If the response that is sent from the backend contains "Score added successfully!", then this means that the request we sent is received and the score is added successfully.
 
-**![](https://lh5.googleusercontent.com/US4YUueJZIIlP-vXNgh5ZNVm70y1sDS6J9JQWZS3lPmQ07-ZR_oWaRD6YTD0VEDTvJty_1MhoQrA2ShIQZqxNMytvcQgdZoc4LI16H3OFszIdKTVw_TdYRVbew0TgN4wC7LW8O6P)**
+**![](/blog/serverless-react-native/image-acdbf87f.png)**
 
 Now, we will design a very simple leaderboard screen. The user can be navigated to the leaderboard screen by clicking the “Go to Leaderboard” button.
 
 Leaderboard screen will look like this.
 
-![](https://lh3.googleusercontent.com/a0WyWXaz0DdRRcI0OAoowqclSBG_h4cqvnTeT4kaTRMvkleq0G7vifLbF6qp-QZc4ggw4UKFCT0_2OZnrFmdq5pv72dQM-SVZUQv8cNWjE9x03pv__PQPxw3VVIYc37kCDvqZdon)
+![](/blog/serverless-react-native/image-1474d108.png)
 
 Sending an HTTP POST request to the following endpoint is the most important thing on this screen.
 

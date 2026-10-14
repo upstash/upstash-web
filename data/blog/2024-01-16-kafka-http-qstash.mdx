@@ -101,12 +101,12 @@ Once we push the project to Github, we can [import](https://vercel.com/import/gi
 Since this is just a test API for the blog, we can keep all the settings as they are and deploy the project.
 
 
-![](https://lh7-us.googleusercontent.com/_a73sCZL9jGbN-b2KnLn3o51agm4Su9gXYRoG5ddOM1LnC1pz3vuLl23v0_B5fGOXGo34M38TpaRRzKDa6eZg-u8xKbJmhGUivdeu-0VZK3tTOR6HbEvCaxtwu1CodfesxD3Unhi4zWP7WLhEpK7EA)
+![](/blog/kafka-http-QStash/image-fbd1dbc5.png)
 
 After the deployment is completed, we can find the domain on the Vercel Dashboard.
 
 
-![](https://lh7-us.googleusercontent.com/E1zaAx4ZrI8_-DBBOQJDmekYFbmx7Z_2BIMQ0GHllkDGz8-I-4uO5mgpVkN69E_dW6KMs_Kw7tw62gJuPqwND-1gq4QFAD3BWXVFUXhfXgpKRGPIvAqgo-mgKUhHEys7AZBQEt9cpK3FBP5TBvPMPw)
+![](/blog/kafka-http-QStash/image-2750f312.png)
 
 We can use this domain in the Kafka HTTP connector.
 
@@ -121,14 +121,14 @@ We can create the Kafka cluster by following the [Kafka docs](https://upstash.co
 Once we have a cluster, we can create a topic which is going to be connected to our Vercel endpoint through HTTP connector.
 
 
-![](https://lh7-us.googleusercontent.com/uM7oZQqizolMjJRqbtGJoFDBwgk58qQJkBXDnd5RH_YJSLAIQpWDNHc7sJhKMEL0fy3BvO3nSHps6qcvopxAMD88OWYe9QoeYE6vpWB3apKfhyLMtRzgqu7dQv8JrMvAlpW8xk3hpe_Q4xCFGcJL3w)
+![](/blog/kafka-http-QStash/image-5d9ff1d8.png)
 
 After the topic is created, we can now create an `Aiven HTTP Connector` under `Connectors` tab.
 
 Let’s fill in the fields as follows.
 
 
-![](https://lh7-us.googleusercontent.com/h_uQrggfBpo84pe423MXollgN6n16SautRCd5CIDCoNQJOHMb0TENecJCEn9_zgh0E9jzArkCcnTL8xIxIkQ4cn6-O9ua-5yISV0btjpX-gsUIS4i43AJFVOmpIxvQiCkz5Yagon53_SsrTMkhN7cQ)
+![](/blog/kafka-http-QStash/image-14451f44.png)
 
 We need to put our HTTP endpoint running on Vercel to the `HTTP URL`. As we mentioned before, we can also have DLQs in this connector.
 
@@ -163,7 +163,7 @@ Any message that we are going to send will create a POST request to the endpoint
 Once we produced the message, we can go back to the Vercel dashboard and see the logs. We should see the logs of the POST request created by the Kafka HTTP connector.
 
 
-![](https://lh7-us.googleusercontent.com/cjh29Ce21cFtWNH8UD89H-zqcwK9z3WwL-73-HKePIklnNXrntF8zO1m0Z8g81Oc6BAYIZ2yajczhKcCb7UHDW2v9y_pBPknOWl2LE7Lkn1dgr5ah3pJmxgy3Yj7PeWtWzq08SFf6SBsy9qiyQkR2w)
+![](/blog/kafka-http-QStash/image-a4cf526b.png)
 
 ## Conclusion
 

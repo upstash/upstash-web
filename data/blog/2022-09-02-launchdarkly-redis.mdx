@@ -33,19 +33,19 @@ The first step is creating a personal or team account in [LaunchDarkly](https://
 
 After signing in, we are going to create a feature flag, that we are going to use.
 
-**![](https://lh4.googleusercontent.com/tRmtajXrFWuOo5QaTVKNU2xlTvdF58KTK1Gsb9z5UnzKNPrv4zpd5BE1syoK2XPpFEx971uMEHBdhJfNDFNsyXdrP7SA6XU7thyW6v02YWBpSeHmeR8s3pGQOTwA15MLJqVdruiXSs0Qd_nkpShPtcwvIn86O2bgyeayVDZY6KyPEwZAC0uGjp3pdA)**
+**![](/blog/launchdarkly-redis/image-d5237164.png)**
 
 To keep things simple in this demo, I am going to create a feature flag with name “test” and this flag will return a boolean value. So, the variations of this flag will be true or false.
 
 Now, if we would like to enable some specific users, we can add those users as targets for variations of the flag.
 
-**![](https://lh4.googleusercontent.com/qT1pfmJVX6m70eB4VtEHGGSIdFkfjN0QHb0JAbdKqLCijE7I5ntio8aituaukZ48gFJT464kvZifeI-sAhl-MhWOdqq8XQ0mwWMpCEvtQVYImAg06tcl3BK9uEAM44U7qwoh5llYePLtakfHFpLIuzvnxV7Ha1RuInpUb0ZgN78qBLNHSJGkAAj3QQ)**
+**![](/blog/launchdarkly-redis/image-876e4a4a.png)**
 
 The users may also be the other development teams in the company. If one of the teams doesn’t want to affect some teams in the same company, then they can prevent them to have the new feature by returning false to those teams.
 
 The other option is creating rules for return values of the feature flag. It is the same logic with an “if” statement.
 
-**![](https://lh5.googleusercontent.com/Rqh3R33XybB2bN8bFaF3qtkpjhjhxS3pQO1NTblMTAzP07VTexeKFY_ih-pbR0Eso_Xoy5wy1KX6IUT5RHL5KSMaWZfRjAEBvss28Yu8eeXKtjJhJvtWR3qSClWGilx4XwmnYQ6hSuAEdcpv_XhxGaMKQhk2ixF3aM4SPKI7_8iqhJDmcht1sdGXug)**
+**![](/blog/launchdarkly-redis/image-a8d114a9.png)**
 
 The example rule in the screenshot above: If the country of the user is USA, then returns true (enable the user to receive that particular feature), else false.
 
@@ -53,7 +53,7 @@ There are lots of options to create rules.
 
 The one way that I most loved to adjust the distribution of the flag was percentage rollout. By this option, we can return true to the specified percentage of the users, and false to others.
 
-**![](https://lh5.googleusercontent.com/Rqh3R33XybB2bN8bFaF3qtkpjhjhxS3pQO1NTblMTAzP07VTexeKFY_ih-pbR0Eso_Xoy5wy1KX6IUT5RHL5KSMaWZfRjAEBvss28Yu8eeXKtjJhJvtWR3qSClWGilx4XwmnYQ6hSuAEdcpv_XhxGaMKQhk2ixF3aM4SPKI7_8iqhJDmcht1sdGXug)**
+**![](/blog/launchdarkly-redis/image-a8d114a9.png)**
 
 ### **LaunchDarkly Java Client Example**
 
@@ -109,7 +109,7 @@ public class ClientSingleton {
 
 The reason I created LaunchDarkly Java client like this is the warning in their docs.
 
-**![](https://lh5.googleusercontent.com/NRxMXZTdPnQy7Ecx0Sb-cdQZ_FXIg1J1QwfzK4Y9ewEfECVW57-qH0ivqoSEkr2_FspCWyn-35gyT37wzN4IBMGSaE4vcGbDsOGhnlffw4uRg6dMgAXzmhKezgkvn1fgnXD7RWBwe1G-Y_FIgxbZz2s3UURoZWZy7CML4FkIEehcLuZWthwzWu1VPw)**
+**![](/blog/launchdarkly-redis/image-96d237d9.png)**
 
 In this blog, I created my API endpoint by using [Spring](https://start.spring.io/) which I feel comfortable with.
 
@@ -186,9 +186,9 @@ ldClient = new LDClient("YOUR_SDK_KEY", config);
 
 When we check our Upstash Redis by using the “Data Browser” tab in the [console](https://console.upstash.com/), we can see the following data.
 
-**![](https://lh6.googleusercontent.com/3LhQtnc_8phZajqPUKTaZqDMjY6kBviPpzyd3yNxl6JziKhETIk_evPi0qiBFGDzo1MG2q6PLq6jTjjFhNvJa0l6jlFtJwWNonAlR8Mnox3GXhQRIQmal2vZshLY2mpJNzV_BTwsnVfO9Xq4B5YlMyKByp8OuD7B2Wm6-hahsO1-JO3UIN0AUhZ_Kg)**
+**![](/blog/launchdarkly-redis/image-7e6f6883.png)**
 
-**![](https://lh3.googleusercontent.com/mcVSRz0wR1k5h1qL4Qw7rpxxyGfLa9Q1ViuZn9hTJ1wpd0Ej7TVONxVpakEt1qF-xK0sQ69ylQwb3Dy7QB6NkxKC3fTllHnKnqcQ9D1kTIiZBhARAIYgsWFxuNiTI3rt3Gman7juQ8X1NMUFm2LEwU9c2-v2ltWAMd6WupYzYysGyjRaDafZXPlpdA)**
+**![](/blog/launchdarkly-redis/image-1522a984.png)**
 
 ### **Conclusion**
 

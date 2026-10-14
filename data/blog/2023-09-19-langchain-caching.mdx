@@ -124,7 +124,7 @@ app.use("*", logger());
 // snip
 ```
 
-![Cloudflare Worker logs](https://raw.githubusercontent.com/ap-1/langchain-qstash/main/assets/logs.png)
+![Cloudflare Worker logs](/blog/langchain-caching/logs-2abd0ed0.png)
 
 ### Connecting QStash to Cloudflare Workers
 
@@ -339,18 +339,18 @@ Upstash provides a [QStash console](https://console.upstash.com/qstash?tab=detai
 }
 ```
 
-![QStash console](https://raw.githubusercontent.com/ap-1/langchain-qstash/main/assets/qstash.png)
+![QStash console](/blog/langchain-caching/qstash-021505cf.png)
 
 ## Conclusion
 
 The Rate Limiting SDK successfully caches the number of calls per identifier:
 
-![Rate limit cached in Upstash Redis](https://raw.githubusercontent.com/ap-1/langchain-qstash/main/assets/ratelimit.png)
+![Rate limit cached in Upstash Redis](/blog/langchain-caching/ratelimit-ff22215e.png)
 
 Likewise, generated content from LangChain successfully gets cached in our Upstash Redis database:
 
-![LLM content cached in Upstash Redis](https://raw.githubusercontent.com/ap-1/langchain-qstash/main/assets/cached.png)
+![LLM content cached in Upstash Redis](/blog/langchain-caching/cached-b437fa85.png)
 
 And finally, the response is logged in our Cloudflare Worker's logs:
 
-![Response logged in Cloudflare Worker logs](https://raw.githubusercontent.com/ap-1/langchain-qstash/main/assets/response.png)
+![Response logged in Cloudflare Worker logs](/blog/langchain-caching/response-8ebff079.png)

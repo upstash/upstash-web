@@ -25,7 +25,7 @@ In our freemium, and most popular plan: Each time a user creates a trip without 
 
 Additionally, freemium users are subject to a rate limit (`fixedWindow`) of 3 requests per 10 seconds, which helps prevent potential attacks on the application.
 
-![freemium-architecture](https://raw.githubusercontent.com/murillo94/upstash-plantripai/main/freemium-architecture.png)
+![freemium-architecture](/blog/plantripai/freemium-architecture-35376991.png)
 
 Regarding the paid plan, users can purchase the product through a payment gateway. Upon successful transaction, the payment gateway's webhook emits a success event, and a key is stored in Redis as a valid key `(redis.set(${licenseKey}, true))`.
 
@@ -33,7 +33,7 @@ When a user with a valid license creates a trip, a random key is still generated
 
 Paid users enjoy a more generous rate limit than freemium users. This enhanced feature is dynamically provided by checking for a valid key in Redis.
 
-![paid-architecture](https://raw.githubusercontent.com/murillo94/upstash-plantripai/main/paid-architecture.png)
+![paid-architecture](/blog/plantripai/paid-architecture-80e7170f.png)
 
 ## Storing the Trip Data
 

@@ -252,7 +252,7 @@ Here we:
 2. Return the cached value if there is one, otherwise get a fresh value from Tinybird.
 3. [Store and set an expiry](https://redis.io/commands/setex/) for the fresh value in the Upstash for Redis cache by calling `redis.set('view-count', value)` then `redis.expire(TTL)`. This sets the value with a **time to live** (**TTL**) value after which the data is considered stale. We set `TTL` to four hours here. For calls to `getTinybirdViews` after that period, we would hit Tinybird for a fresh value.
 
-![Upstash for Redis and Performance API: screen capture shows measures for analytics views and web-mention-likes, duration for each is around 0.29 seconds](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/bltb0cnc5f43q2kq3dql.png)
+![Upstash for Redis and Performance API: screen capture shows measures for analytics views and web-mention-likes, duration for each is around 0.29 seconds](/blog/redis-and-performance-api/bltb0cnc5f43q2kq3dql-9db56eac.png)
 
 Refreshing the page (a couple of times) with Upstash for Redis integrated into both data queries we see things speed up. Here we dropped from just over 2 seconds to around 0.29 seconds. Do not read too much into the numbers here as we are running locally and also we do not have many data points. Try out the service on your own apps to see what kind of gains you can achieve.
 

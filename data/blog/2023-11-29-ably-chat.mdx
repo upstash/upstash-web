@@ -42,7 +42,7 @@ Let’s [create](https://ably.com/sign-up) an Ably account first.
 
 Then, we can create an application by selecting “Live Chat”.
 
-![](https://lh7-us.googleusercontent.com/gpcde5MC1oVQAOWnv0pzBRVw9R05XiK05onb-F8DcfWNI7Yqp0YIZA1oR8Yr0Xnq99fMp5SIHT3JewE-pbnazUzrDJnHxigSt9gwZ8G-U49Nh33lWu4wJY5Q5Cm-yILx7W15aSYa9CmQe2BlSeFj0g)
+![](/blog/ably-chat/image-3623b57d.png)
 
 That’s it!
 
@@ -58,7 +58,7 @@ Upstash Redis will also allow us to store the chat messages as a sorted list. Th
 
 To create the Upstash Redis database, go to [Upstash Console](https://console.upstash.com/), log in, and create a Redis database.
 
-![](https://lh7-us.googleusercontent.com/QzmJWf_hiEkEh5CMtRbkvtdAIo2YXrSMRTjrFinNKJuBgY9Df8gqAE2-lsX4zD_Bj0fyDZTAAueV3T8lxRQ7_gBu8QUBKKzuKtYRYO7JtJ5uotsbnGdirlhD3ihtYbdrZgOAfYr1fUXuC1np_Q-i_Q)
+![](/blog/ably-chat/image-08e051a2.png)
 
 The infrastructure is ready. Now, let’s move on to the architecture of the application.
 
@@ -66,7 +66,7 @@ The infrastructure is ready. Now, let’s move on to the architecture of the app
 
 The design of this chat application is going to be quite straightforward.
 
-![](https://lh7-us.googleusercontent.com/DinqTh36GzO_2RuVU4HVxcqSYZvETcGzJtQr0OFYs7VpNcxaoZQb8SgBEXaF5vwRAHwOonaz7SI6554HK0VxkxshnMoOf0-y9GyyNGzPzFRk3jHNLlY9REyIwn1azoR7qrMX47Ed875LxhRy5ReH5Q)
+![](/blog/ably-chat/image-6be11411.png)
 
 In this demo project, we will create only one Ably channel to keep it simple. Clients are going to publish the messages that they send to that channel. Once a client publishes a message, other clients will immediately receive the message through their channel subscription.
 
@@ -118,7 +118,7 @@ We are going to create Ably channel first. To do that, we need to go back to the
 
 Let’s select “Publish” and “Subscribe” as the capabilities of this API.
 
-![](https://lh7-us.googleusercontent.com/qFQIIegs_bGyGoe6NvwZ4Ng721q0DttK-Uvtg64gStJdILc3P0apzJbKgySq8rgoltJ7-EOV9EbC5_My689BGlcOGmT5-WDq2ADKeWss4b7L0Vry06-7HxsY3y3e8P3lR-pWtq7vKmpuNvmx8srSCg)
+![](/blog/ably-chat/image-b8dac1a7.png)
 
 Now we can create Ably client in the JavaScript file by using the Key given in Ably dashboard.
 
@@ -317,13 +317,13 @@ node server.js
 
 Open `localhost:3000` in your browser. It will ask for a username first.
 
-![](https://lh7-us.googleusercontent.com/VYUAq86Nyx8nAefxXMKQqx031d7Fe6P5r9y2cjRqouKV6ADoSXyYtTcoNkRyCmIpZJi3VrVt_zDsnnARqVU0sNmaQ8RdvP4JpVMnqXUf7-HfT7MZtITxiWLgRXqxXObJeMlm0Yo7oLiFlVfNS5lsJA)
+![](/blog/ably-chat/image-7d45b0a8.png)
 
 Once you enter your username, it will allow you to open the chat.
 
 If you send messages from one tab and open `localhost:3000` in another app using a different username, you can see the messages sent from the previous tab.
 
-![](https://lh7-us.googleusercontent.com/gd3CnDuZ3nrrC0t74qQDlE_9UvNvEofxuR8DpaMEoEX1P29qrYiulGEnUlfZqeFBn3oMADDEmguPXOKJj3ly5mDi_bcQ950G4_pI6SkPagtmNLy2OGzCYPq476eS3MAJOmVf5oE79rIA51hKJzp77g)
+![](/blog/ably-chat/image-0cfb1e42.png)
 
 Thanks to the Upstash Redis, you will retrieve the chat history every time you open the chat application.
 

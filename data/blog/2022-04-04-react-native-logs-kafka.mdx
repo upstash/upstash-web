@@ -28,31 +28,31 @@ The advantages of Upstash Kafka:
 
 To use Upstash Kafka, first thing to do is [login](https://console.upstash.com/auth/sign-in) and connect to [console](https://console.upstash.com/kafka) . As the second step, we need a Kafka cluster to use.
 
-![](https://raw.githubusercontent.com/upstash/kafka-examples/master/react-native-collecting-logs/Screenshots/create%20cluster.png)
+![](/blog/react-native-logs-kafka/create-20cluster-c40c7a53.png)
 
 Name your Kafka cluster, select the region where the cluster will be stored, click the create button, Kafka cluster is ready!
 
 On the second page of the setup, first topic is requested. We can pass this step and create topics later.
 
-![](https://raw.githubusercontent.com/upstash/kafka-examples/master/react-native-collecting-logs/Screenshots/cluster%20created.png)
+![](/blog/react-native-logs-kafka/cluster-20created-f80a1915.png)
 
 Inside the cluster, Upstash provides “Topics” and “Credentials” sections to configure our cluster.
 
 We can create our topics under the “Topics” tab. We can configure its settings while creating it as below.
 
-![](https://raw.githubusercontent.com/upstash/kafka-examples/master/react-native-collecting-logs/Screenshots/create%20topic.png)
+![](/blog/react-native-logs-kafka/create-20topic-fa10dcf3.png)
 
 In this blog, we will work with two different topics. First one is the topic which will contain our error messages. Those error messages will come from mobile app when failures happen. We will name this topic “users.error”. The second topic is “users.purchase”. We will collect the log, which will occur when a user purchases an item from our simple mobile app. To keep our demonstration simple, I created these topics without changing default configurations.
 
-![](https://raw.githubusercontent.com/upstash/kafka-examples/master/react-native-collecting-logs/Screenshots/my%20topics.png)
+![](/blog/react-native-logs-kafka/my-20topics-2981d261.png)
 
 Lastly, we can create new credentials under “Credentials” tab. Since our users will be the producers of logs and errors, we need to create new credentials for “produce only” purpose and permit their access for only the topics with the prefix “users.”.
 
-![](https://raw.githubusercontent.com/upstash/kafka-examples/master/react-native-collecting-logs/Screenshots/new%20cred.png)
+![](/blog/react-native-logs-kafka/new-20cred-dc3efc3f.png)
 
 For more detailed information about credentials, please read [docs](/docs/kafka/credentials).
 
-![](https://raw.githubusercontent.com/upstash/kafka-examples/master/react-native-collecting-logs/Screenshots/my%20creds.png)
+![](/blog/react-native-logs-kafka/my-20creds-dea3dd91.png)
 
 ### **Building React Native App**
 
@@ -76,11 +76,11 @@ SET 1236 22
 
 You can check the data from “Data Browser” tab.
 
-![](https://raw.githubusercontent.com/upstash/kafka-examples/master/react-native-collecting-logs/Screenshots/data%20browser.png)
+![](/blog/react-native-logs-kafka/data-20browser-6f4b7ff3.png)
 
 The screen can be seen below.
 
-![](https://raw.githubusercontent.com/upstash/kafka-examples/master/react-native-collecting-logs/Screenshots/Screenshot_1648580635.png)
+![](/blog/react-native-logs-kafka/screenshot-1648580635-dbeb3fe0.png)
 
 We are going to use [upstash-kafka](https://github.com/upstash/upstash-kafka) library, which is provided by Upstash to communicate with our Kafka cluster via HTTP requests. This is a JavaScript library, and it can be used with React Native.
 
@@ -147,7 +147,7 @@ const res = await p.produce(
 
 sends the log of the successful operation to Kafka and the alert will be like below.
 
-![](https://raw.githubusercontent.com/upstash/kafka-examples/master/react-native-collecting-logs/Screenshots/Screenshot_1648580670.png)
+![](/blog/react-native-logs-kafka/screenshot-1648580670-bb0e8500.png)
 
 If the user clicks on the fourth image, which does not have the price, then error occurs, and the error message is sent to Kafka.
 

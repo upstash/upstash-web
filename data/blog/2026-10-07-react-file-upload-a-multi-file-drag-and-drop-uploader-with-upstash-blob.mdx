@@ -220,7 +220,7 @@ A few details in this component:
 
 When we test this UI with a real bucket, dropping two small PNGs, one 19.6 MB JPEG and a text file at once, we can see the text file was rejected right away, and the small files moved to finishing while the JPEG was still uploading:
 
-![](https://b27353de2921.blob.upstash.io/article-assets/react-file-upload/ui-progress.png)
+![](/blog/react-file-upload-a-multi-file-drag-and-drop-uploader-with-upstash-blob/ui-progress-9c153035.png)
 
 All three photos ended as done, and the album route returned three records. When we replayed the finish request, the count stayed at three, because the callback writes to the same `uploadId` field. Pressing Cancel on the JPEG in a second run moved it to canceled and told the route to abort the upload.
 

@@ -43,7 +43,7 @@ npx create-strapi-app@latest bookstore --quickstart
 
 This command will open a browser page automatically. Once we complete the installation and the form on the browser, we will be able to access to the admin panel of the application.
 
-![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXcAVi3DjVQ5D4bfpjCx6F0PlQ99VlIglUuWM2lbSLyw4eQQz3efC-vQppQ8p1WZiCFN5kNURbsIWdsxddV6Pk6FtwXDi45aQkp3Hz-Z3A7p4PUrE3grAFivDN7RuAo9s2b27HC8SoMq4WxI3Yd9eYltukEKtWP9qAkd_jjBzLOidNE5SUblvvA?key=DP3-DrNAl4OVGPU6ksIo3g)
+![](/blog/strapi-semantic-search/image-518bd0cd.png)
 
 The admin panel runs in [http://localhost:1337/admin](http://localhost:1337/admin) and can be opened when we run `npm run develop` command as well.
 
@@ -51,17 +51,17 @@ Our barebones Strapi application is ready. Now, we will create our first content
 
 To create a bookstore database, let’s go to the Content-Type Builder tab. On this page, we can create a collection type, and name it `book`, since the collection will consist of books.
 
-![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXeCWaz29EEYtFjqG1ZFNubA9-OqZGsi4bqOksDJu6BwmhkWDptNndFKKbP1fLZ01HbH1MiCJWY9ZuPlSr-sERGSDplMxi0R9SSJIfshdfJklKJ-s-yGsljfyMrFJMhQl2FzgnGMgQ24uBBqviQEatNtYbkuS3We5PrMkYI7H0N-0gKHMCfTXCc?key=DP3-DrNAl4OVGPU6ksIo3g)
+![](/blog/strapi-semantic-search/image-b6f74c6e.png)
 
 When we click `continue`, the next step is configuring the attributes of the collection items. In this demo, we will have `name`, `description`, `price` and `author` just to keep the demo simple. Strapi provides a bunch of data types for configuring attributes.
 
-![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXemdxcjZXXfKOW1FzYvO7o9J1vUzvSrXXhiz8BvrOzIuGoANLPv_N__qGe039g0zeVd5J3ysUY2O0x_sJlXy5Np9-dx71NW2bYj5YW1DARAZopa7x1iIAWHVBrlXna-Wdz-JmgkXw3_vwxxtmMAC2X6zbpsdBCNEwHh3I-MWe0-NOvWGGfMeks?key=DP3-DrNAl4OVGPU6ksIo3g)
+![](/blog/strapi-semantic-search/image-8bad7173.png)
 
 In our case, `name` and `author` will be short text, `description` will be long text and the `price` will be number. Once we complete the attribute creation steps, we should click `Save` to create the data collection. When we save our changes, the Strapi application restarts itself to load the changes.
 
 Now, we can go back to the `Content Manager` tab and see the new `book` collection that we have just created.
 
-![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXc-mkwrD2oPu1mzKE8i04Em0OL61duX5qm8uSYF0Gd4hhkDftdpM5MSNxrEE4eddPkPi7AyRiITESqUtVdQSIARSrzAvVQLWFIX2nj3-5H3IfkHG4TJbAf58-ynwdJ9J_EIHLfj5wH7I0HILBz4dtDa9x0hz8S22d3hSEjU-2tg64GArUsep_M?key=DP3-DrNAl4OVGPU6ksIo3g)
+![](/blog/strapi-semantic-search/image-566c385d.png)
 
 Our Strapi application is ready now!
 
@@ -73,7 +73,7 @@ We will follow the [Upstash Documentation]( https://upstash.com/docs/vector/over
 
 First, log in to the [Upstash Console](https://console.upstash.com/vector) and create the Index. In the pop-up that is raised, we will set up our vector index. We should use a built-in embedding model of Upstash Vector. In this demo, we can use `bge-base-en-v1.5` model. The vector size of this model is 768, and we can use `Cosine` metric for distance calculation. You can learn more about the metrics in [Upstash Vector docs](https://upstash.com/docs/vector/features/similarityfunctions).
 
-![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXcNgEM5XA8uHlpvnUWq3NBkhxBrbeQHSbXxdh5NHzloF3Db3z-Td5C1jf55AUdvKEJlSuA207jJtfVX2EqOjAlf20X0IVprem9mIU4lwPB5CJydqc9CipzV-PgPUZ8zxTS_hkzrWv52zo7IMVuwmzyKLbekA3Bsm06yLKIoHYvbshT0CdqQsfA?key=DP3-DrNAl4OVGPU6ksIo3g)
+![](/blog/strapi-semantic-search/image-dc5963f6.png)
 
 Now the vector index is ready. We will need the endpoint and token later when we integrate Upstash Vector with the Strapi application.
 
@@ -138,7 +138,7 @@ Let’s create a new entry from the `Content Manager` tab.
 
 After saving and publishing this entry, we can test by accessing ` [http://localhost:1337/api/books`](http://localhost:1337/api/books%60) on the browser. In addition to that, we should see the vector of this new book entry in our Upstash vector index. We can check it by going back to the Upstash console and opening the `Data Browser` tab.
 
-![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXfuSAGk4nYgEy6AWeFC6e66axvwR7ubDUhuuypMnO1OSeaW_DSWR9Ufd7sSHSEFAHGKBAawlDVMOEyFvpYdSpmcEJl0s_cyGxcewCJSNnNvDgp93YOjYnSc-QKG5FXPHju2eqUbPoflt2UxU2tjLDxnMUARcsXfBU4UZzTwRNRHfjMNuKfQJ9I?key=DP3-DrNAl4OVGPU6ksIo3g)
+![](/blog/strapi-semantic-search/image-db23ef2d.png)
 
 As can be seen above, with the lifecycle manipulation on the Strapi application, there will be a vector for every book that we create in the Strapi collection. For semantic searching among the books, we can put the following code wherever the users do the search calls.
 

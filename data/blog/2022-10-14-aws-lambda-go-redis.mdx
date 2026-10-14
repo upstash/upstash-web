@@ -52,7 +52,7 @@ Before we dive into the code, let's setup our working directory for Go.
 1. [Download Go](https://go.dev/doc/install).
 2. [Create an Upstash Redis account and database](/docs/redis#create-account) in a region of your choosing. Ideally it should be the same AWS region you will deploy your Lambda. I will be using `eu-west-1` (Europe, Ireland) in this article.
 
-![Redis database details](https://dl.lambrospetrou.com/upstash-dburl.jpg)
+![Redis database details](/blog/aws-lambda-go-redis/upstash-dburl-274bdb92.jpg)
 
 After completing the above, we can now create our workspace. For the rest of the article, assume our code is under `~/dev/aws-lambda-upstash-redis`.
 
@@ -390,11 +390,11 @@ make build-server && ./build/server
 
 Now let's do some testing in the browser by visiting [http://localhost:5000/lessons/completed](http://localhost:5000/lessons/completed).
 
-![Demo access denied](https://dl.lambrospetrou.com/upstash-demo-step1.jpg)
+![Demo access denied](/blog/aws-lambda-go-redis/upstash-demo-step1-41b28006.jpg)
 
 We get `403 - Forbidden`, so let's login, by visiting [http://localhost:5000/login?userId=lambros](http://localhost:5000/login?userId=lambros).
 
-![Demo login results](https://dl.lambrospetrou.com/upstash-demo-step2.jpg)
+![Demo login results](/blog/aws-lambda-go-redis/upstash-demo-step2-1794902b.jpg)
 
 We are logged in now, and we automatically got redirected to `/lessons/completed`, but they are empty. So, let's mark a lesson as completed. In the `console` tab inside the devtools of your browser run the following:
 
@@ -420,7 +420,7 @@ Et voila. Everything works fine!
 
 Looking into the Redis database itself using the recently launched online Data Browser also proves that the expected data is there.
 
-![Redis Data Browser](https://dl.lambrospetrou.com/upstash-demo-step3.jpg)
+![Redis Data Browser](/blog/aws-lambda-go-redis/upstash-demo-step3-10e1aacd.jpg)
 
 ## 4. AWS Lambda
 
@@ -535,7 +535,7 @@ Apart from the first [cold start invocation](https://aws.amazon.com/blogs/comput
 
 Below is an example of a hot invocation for the `/login?userId=lambros` endpoint as implemented above:
 
-![AWS Lambda runtime duration](https://dl.lambrospetrou.com/upstash-bench-lambda.jpg)
+![AWS Lambda runtime duration](/blog/aws-lambda-go-redis/upstash-bench-lambda-743c9d19.jpg)
 
 As you can see the total duration of our request was `2.06 ms`. Yes, that's **two milliseconds**, to generate a session ID, write it to Upstash Redis remotely, and return the redirection response.
 
