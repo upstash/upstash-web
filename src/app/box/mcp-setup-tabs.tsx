@@ -65,7 +65,7 @@ export default function McpSetupTabs() {
       <div
         role="tablist"
         aria-label="MCP client"
-        className="no-scrollbar flex h-10 overflow-x-auto bg-zinc-800 px-1 pt-2"
+        className="no-scrollbar flex h-11 gap-1 overflow-x-auto bg-zinc-800 px-3 pt-2 sm:px-4"
       >
         {CLIENTS.map(({ name }, idx) => (
           <button
@@ -78,7 +78,7 @@ export default function McpSetupTabs() {
               setCopied(false);
             }}
             className={cx(
-              "flex h-full shrink-0 items-center whitespace-nowrap px-3 text-[13px] sm:px-5",
+              "flex h-full shrink-0 items-center whitespace-nowrap rounded-t-md px-3 text-[13px] sm:px-5",
               active === idx
                 ? "border-t-2 border-emerald-500 bg-black text-white"
                 : "border-t-2 border-transparent text-white/60 hover:text-white",
