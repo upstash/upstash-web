@@ -23,7 +23,7 @@ E2B is a strong default for running AI-generated code: Firecracker microVMs, a s
 These are the limits that come up most, from [E2B's own pricing and docs](https://e2b.dev/pricing):
 
 - **Session caps.** A sandbox can run for 1 hour on Hobby and 24 hours on Pro ($150/month plus usage). Pausing resets the timer, but long agent tasks have to be built around it.
-- **Wall-clock billing.** CPU and memory are billed every second the sandbox runs, including the minutes an agent spends waiting on the model. Pausing stops the meter, but only if your code pauses it.
+- **Wall-clock billing.** CPU and memory are billed every second the sandbox runs, including the minutes an agent spends waiting on the model. Pausing stops the meter, but you have to set it up: call `pause()` yourself, or create the sandbox with `lifecycle: { onTimeout: "pause" }` so it pauses instead of being killed when its timeout hits.
 - **No built-in agent.** E2B has excellent guides for running Claude Code, Codex or OpenCode inside a sandbox, but you install the agent, stream its output and parse the result yourself.
 - **No GPUs,** including on BYOC.
 - **BYOC is Enterprise-only,** with a $3,000/month minimum. The open-source E2B Embed runtime is single-machine.
@@ -58,7 +58,13 @@ const box = await Box.create({
 })
 
 await box.git.clone({ repo: "https://github.com/your-org/your-repo" })
+await box.cd("your-repo")
+await box.git.exec({ args: ["checkout", "-b", "fix/auth-tests"] })
+
 const run = await box.agent.run({ prompt: "Fix the failing tests in src/auth" })
+
+await box.git.commit({ message: "fix: failing auth tests" })
+await box.git.push({ branch: "fix/auth-tests" })
 const pr = await box.git.createPR({ title: "Fix auth tests", base: "main" })
 
 console.log(pr.url, run.cost.totalUsd)
@@ -67,7 +73,7 @@ console.log(pr.url, run.cost.totalUsd)
 Compared with E2B:
 
 - **No session cap.** A box auto-pauses when idle and wakes with its files, or stays on with `keepAlive: true` for a flat $8 a month.
-- **Active-CPU billing with memory free.** An hour of mostly waiting agent work on a small box is about $0.017, against about $0.166 for a 2 vCPU / 4 GB E2B sandbox running the same hour ([worked example](/blog/ai-agent-sandbox-providers-compared-2026#cost)).
+- **Active-CPU billing with memory free.** An hour on a small box with 10 core-minutes of real CPU is about $0.017 in compute, against about $0.166 for a 2 vCPU / 4 GB E2B sandbox running the same hour. Idle CPU costs nothing; a paused box pays only for storage at $0.10 per GB-month ([worked example](/blog/ai-agent-sandbox-providers-compared-2026#cost)).
 - **More agent tooling built in:** git with `createPR`, a headless browser with AI actions, cron schedules inside the box, typed output with a Zod or Pydantic schema, and secrets injected on the host so the agent's code never sees them.
 
 Where E2B is the better pick: Box is a hardened container, not a microVM with its own kernel; its snapshots are disk-only, so memory doesn't survive a pause; it runs in `us-east-1` only; and it has no Code Interpreter-style Jupyter kernel. See our [Box vs E2B comparison](/blog/upstash-box-vs-e2b) for the details.
@@ -108,6 +114,22 @@ Where E2B is the better pick: Box is a hardened container, not a microVM with it
 
 **Switch to it if** you want a persistent personal dev machine for an agent CLI rather than sandboxes your app creates per task.
 
+## Moving from E2B to Upstash Box
+
+Most E2B code maps one to one. The difference is that on Box you usually replace your own agent loop with `box.agent.run()`.
+
+| E2B (JS SDK) | Upstash Box |
+| --- | --- |
+| `Sandbox.create()` | `Box.create({ runtime: "node" })` |
+| `sbx.commands.run("npm test")` | `box.exec.command("npm test")` |
+| `sbx.files.write(path, content)` | `box.files.write({ path, content })` |
+| `sbx.pause()` / `lifecycle: { onTimeout: "pause" }` | Automatic: a box pauses when idle; `box.pause()` to do it now |
+| `Sandbox.connect(id)` | `Box.get(id)` |
+| Template from a Dockerfile | `box.snapshot()` once, then `Box.fromSnapshot(id)` |
+| Installing and driving Claude Code yourself | `box.agent.run({ prompt })` |
+
+Two things don't carry over: memory snapshots (Box snapshots are disk-only, so restart long-running processes after a resume) and the Jupyter-style code interpreter (run `python` through `box.exec.command` instead).
+
 ## When to stay on E2B
 
 Stay if you run a code interpreter or data-analysis agent: the stateful Jupyter kernel with structured chart output is E2B's strength. Stay if you need memory that survives a pause, a desktop over VNC for computer use, or forking a sandbox with its memory. Its isolation, SOC 2 Type II, and framework integrations are among the best in the category.
@@ -120,7 +142,7 @@ For coding agents and per-user agents, Upstash Box: the agent runs inside the sa
 
 ### Is there a cheaper alternative to E2B?
 
-For agents that spend most of their time waiting on the model, yes: active-CPU billing. Upstash Box costs about $0.017 for an hour of mostly idle work on a small box, against about $0.166 on E2B for a 2 vCPU / 4 GB sandbox. Northflank has the lowest wall-clock rates if the CPU is busy all hour.
+For agents that spend most of their time waiting on the model, yes: active-CPU billing. An hour on a small Upstash Box with 10 core-minutes of real CPU is about $0.017 in compute, against about $0.166 on E2B for a 2 vCPU / 4 GB sandbox. Northflank has the lowest wall-clock rates if the CPU is busy all hour.
 
 ### Which E2B alternative has no session limit?
 

@@ -10,7 +10,7 @@ description: "How to give an AI agent its own computer in the cloud: what an age
 An AI agent that can only call APIs is limited to what those APIs expose. Give it a computer, a shell, a filesystem, a browser and git, and it can do the work a person would do at a terminal.
 
 - **The short answer.** For a coding agent or a personal agent, use a cloud computer built for agents rather than a plain VM: [Upstash Box](https://upstash.com/docs/box/overall/quickstart) gives each agent an isolated Linux machine with the agent already inside, a headless browser, git-to-PR, cron schedules, and files that survive between sessions, billed for active CPU only.
-- **If the agent clicks through a desktop GUI,** pick a computer-use sandbox with a VNC desktop: E2B Desktop or Daytona Computer Use.
+- **If the agent has to control desktop applications,** not just web pages, pick a sandbox with a full desktop over VNC: E2B Desktop or Daytona Computer Use.
 - **If you want full root on a long-lived VM,** Fly Sprites, or a VM you run yourself if you are ready to own its security.
 </Summary>
 
@@ -35,7 +35,7 @@ A laptop has all of this by default. A cloud computer for an agent should too, p
 
 **1. Rent a VM.** A VPS on Hetzner, DigitalOcean or EC2 is cheap and familiar. It is also a computer with no agent features: you install the agent, harden SSH, set up a firewall, keep secrets out of reach of generated code, and build per-user provisioning yourself. Fine for one personal agent you trust, hard to run safely for many users.
 
-**2. Use a computer-use sandbox.** E2B Desktop and Daytona's Computer Use give the agent a full graphical desktop over VNC, which is what screenshot-and-click agents need. If your agent works through APIs, a terminal and a headless browser, the desktop is overhead you don't need.
+**2. Use a desktop sandbox.** E2B Desktop and Daytona's Computer Use give the agent a full graphical desktop over VNC, which an agent needs to operate desktop applications like an office suite or an IDE's GUI. For web pages it isn't needed: a headless browser can also take screenshots, click and type. If your agent works through APIs, a terminal and the web, the desktop is overhead.
 
 **3. Use a cloud computer built for agents.** An agent sandbox with a persistent filesystem and an SDK: you create a machine per user or per task with one call, and pausing, snapshots, network policy and logs come with it. This is the fit for coding agents, personal agents and per-user agents in a product.
 
@@ -67,15 +67,21 @@ const box = await Box.create({
 })
 
 await box.git.clone({ repo: "https://github.com/your-org/your-app" })
+await box.cd("your-app")
+await box.git.exec({ args: ["checkout", "-b", "fix/signup-form"] })
 
 const run = await box.agent.run({
   prompt: "Start the dev server, open it in the browser, fix the broken signup form, and add a test",
 })
 
-console.log(run.result, run.cost.totalUsd)
+await box.git.commit({ message: "fix: signup form" })
+await box.git.push({ branch: "fix/signup-form" })
+const pr = await box.git.createPR({ title: "Fix signup form", base: "main" })
+
+console.log(pr.url, run.cost.totalUsd)
 ```
 
-The agent works in its own Linux machine: it installs packages, runs the dev server, checks the page in Chromium, and edits the code. When it's done, `box.git.createPR()` hands the work back as a pull request.
+The agent works in its own Linux machine: it installs packages, runs the dev server, checks the page in Chromium, and edits the code. Then the commit, push and `createPR()` hand the work back as a pull request.
 
 The same box keeps its files. Leave it and it pauses with storage kept, and the next call wakes it where it left off. For an agent that has to answer at any moment, like a personal assistant on WhatsApp or Telegram, turn pausing off:
 
@@ -92,7 +98,7 @@ await box.schedule.agent({
 })
 ```
 
-The free plan includes 10 concurrent boxes and 5 CPU-hours a month with no card. After that a box bills $0.10 per active CPU-hour for the small size with memory free, and a keep-alive box is a flat $8 a month. See [Box pricing](https://upstash.com/pricing/box).
+The free plan includes 10 concurrent boxes, 5 CPU-hours a month and a $1 monthly model budget, with no card. After that a box bills $0.10 per active CPU-hour for the small size with memory free, and a keep-alive box is a flat $8 a month. Paused boxes pay only for storage, at $0.10 per GB-month. See [Box pricing](https://upstash.com/pricing/box).
 
 ## FAQ
 
@@ -106,11 +112,11 @@ Create one with an agent sandbox SDK and hand it to the agent. With Upstash Box,
 
 ### Does an AI agent need a desktop, or is a headless computer enough?
 
-Headless is enough for coding agents, browser automation and most personal agents: they use a terminal and a headless browser. A desktop over VNC is only needed for computer-use agents that work by taking screenshots and clicking, where E2B Desktop and Daytona Computer Use fit.
+Headless is enough for coding agents, browser automation and most personal agents. A headless browser can take screenshots, click, type and fill in forms on web pages. A desktop over VNC is only needed when the agent has to operate desktop applications, where E2B Desktop and Daytona Computer Use fit.
 
 ### How much does a cloud computer for an AI agent cost?
 
-It depends on the billing model more than the rate. Agents spend most of their time waiting on the model, so active-CPU billing costs far less than wall-clock billing for the same work. On Upstash Box an hour of mostly idle agent work on a small box is about $0.017.
+It depends on the billing model more than the rate. Agents spend most of their time waiting on the model, so active-CPU billing costs far less than wall-clock billing for the same work. On Upstash Box, an hour on a small box with 10 core-minutes of real CPU is about $0.017 in compute; storage for a paused box is billed separately.
 
 ### Can an AI agent's computer stay on 24/7?
 

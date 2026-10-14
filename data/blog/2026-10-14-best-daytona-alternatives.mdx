@@ -3,11 +3,11 @@ slug: best-daytona-alternatives
 title: "The Best Daytona Alternatives for AI Agent Sandboxes in 2026"
 authors: [alitarik]
 tags: [box, ai, agents, sandbox]
-description: "The best Daytona alternatives in 2026 and when to switch: Upstash Box for coding agents with active-CPU billing, E2B and Vercel Sandbox for microVM isolation, Modal for GPUs, plus Tensorlake, Northflank and self-hostable options now that Daytona's core went private."
+description: "The best Daytona alternatives in 2026 and when to switch: Upstash Box for coding agents with active-CPU billing, E2B and Vercel Sandbox for microVM isolation, Modal for GPUs, plus Tensorlake, Northflank and self-hostable options now that Daytona's core development is private."
 ---
 
 <Summary>
-Daytona is a fast, flexible place to run AI-generated code: sub-90ms container starts (its own claim), SDKs in five languages, GPUs, and Windows and macOS sandboxes. Teams look for an alternative when they hit one of its trade-offs: containers by default rather than VMs, wall-clock billing for vCPU and memory, restricted network access on the lower tiers, building the agent loop themselves, or self-hosting, since core development moved to a private codebase in June 2026.
+Daytona is a fast, flexible place to run AI-generated code: sub-90ms container starts (its own claim), SDKs in five languages, GPUs, and Windows and macOS sandboxes. Teams look for an alternative when they hit one of its trade-offs: containers by default rather than VMs, wall-clock billing for vCPU and memory, restricted network access on the lower tiers, building the agent loop themselves, or self-hosting a maintained version, since core development moved to a private codebase in June 2026.
 
 - **Best Daytona alternative for coding agents and per-user agents: Upstash Box.** The agent runs inside the sandbox, and it bills active CPU with memory free.
 - **Best for microVM isolation and code interpreters: E2B.**
@@ -22,7 +22,7 @@ Daytona is a fast, flexible place to run AI-generated code: sub-90ms container s
 
 These come from [Daytona's own pricing and docs](https://www.daytona.io/pricing):
 
-- **Self-hosting is no longer a path forward.** The open-source repository says core development moved to a private codebase in June 2026 and it will receive no further updates; it is now archived on GitHub. The managed service continues.
+- **Self-hosting means running a frozen version.** Core development moved to a private codebase in June 2026. The open-source repository is archived and gets no further updates or fixes, though the code stays available to use and fork under its license. The managed service continues.
 - **Containers by default.** Sandboxes are containers unless you pick a VM class. That's fine for your own code, a weaker boundary for untrusted tenants.
 - **Wall-clock billing.** $0.0504 per vCPU-hour and $0.0162 per GiB-hour for every second a sandbox runs, including the time an agent waits on the model.
 - **Restricted egress on Tiers 1 and 2.** Full internet access comes at Tier 3 and up.
@@ -58,7 +58,13 @@ const box = await Box.create({
 })
 
 await box.git.clone({ repo: "https://github.com/your-org/your-repo" })
+await box.cd("your-repo")
+await box.git.exec({ args: ["checkout", "-b", "chore/upgrade-deps"] })
+
 const run = await box.agent.run({ prompt: "Upgrade the outdated dependencies and fix what breaks" })
+
+await box.git.commit({ message: "chore: upgrade dependencies" })
+await box.git.push({ branch: "chore/upgrade-deps" })
 const pr = await box.git.createPR({ title: "Upgrade dependencies", base: "main" })
 
 console.log(pr.url, run.cost.totalUsd)
@@ -66,7 +72,7 @@ console.log(pr.url, run.cost.totalUsd)
 
 Compared with Daytona:
 
-- **Active-CPU billing with memory free.** An hour with 10 core-minutes of real work costs about $0.02 on a small box and about $0.17 on a 2 vCPU / 4 GB Daytona sandbox, roughly 5 to 10 times less for idle-heavy agent work ([worked example](/blog/upstash-box-vs-daytona)).
+- **Active-CPU billing with memory free.** An hour with 10 core-minutes of real CPU is about $0.02 in compute on a small box and about $0.17 on a 2 vCPU / 4 GB Daytona sandbox. Idle CPU costs nothing, and a paused box pays only for storage at $0.10 per GB-month ([worked example](/blog/upstash-box-vs-daytona)).
 - **Open internet from day one,** with your own allowlist when you want one, changeable on a running box.
 - **Agent tooling built in:** git with `createPR`, a headless browser with AI actions, cron schedules inside the box, typed output with a Zod or Pydantic schema, and secrets injected on the host.
 - **Auto-pause instead of auto-stop.** A box pauses when idle and resumes with its files weeks later, or stays on with `keepAlive: true` for a flat $8 a month.
@@ -103,9 +109,24 @@ Where Daytona is the better pick: Box has no GPUs, no Windows or macOS, SDKs in 
 
 **Switch to it if** you need to run in your own cloud account, or want databases and services next to the sandboxes.
 
+## Moving from Daytona to Upstash Box
+
+| Daytona (TypeScript SDK) | Upstash Box |
+| --- | --- |
+| `daytona.create()` | `Box.create({ runtime: "node" })` |
+| `sandbox.process.executeCommand("npm test")` | `box.exec.command("npm test")` |
+| `sandbox.fs.uploadFile(...)` | `box.files.write({ path, content })` or `box.files.upload([...])` |
+| `sandbox.git.clone(url, path)` | `box.git.clone({ repo })`, then `box.cd(dir)` |
+| `sandbox.stop()` / `sandbox.start()`, auto-stop after 15 minutes | Automatic pause when idle, resumes on the next call; `keepAlive: true` to never pause |
+| `daytona.get(id)` | `Box.get(id)` |
+| Snapshot images | `box.snapshot()`, then `Box.fromSnapshot(id)` |
+| Driving your own agent loop | `box.agent.run({ prompt })` |
+
+What doesn't carry over: GPUs, Windows and macOS sandboxes, and the Go, Ruby and Java SDKs.
+
 ## If you used Daytona to self-host
 
-With Daytona's core private, the self-hostable options are [E2B Embed](https://e2b.dev/resources/introducing-e2b-embed), E2B's Apache-2.0 runtime for a single machine, and Beam's [Beta9](https://github.com/beam-cloud/beta9) (AGPL-3.0). For your own cloud account with a managed control plane, look at Northflank, Tensorlake, Beam, or E2B's Enterprise BYOC.
+You can keep running the archived open-source Daytona, but it won't get fixes. Maintained self-hostable options are [E2B Embed](https://e2b.dev/resources/introducing-e2b-embed), E2B's Apache-2.0 runtime for a single machine, and Beam's [Beta9](https://github.com/beam-cloud/beta9) (AGPL-3.0). For your own cloud account with a managed control plane, look at Northflank, Tensorlake, Beam, or E2B's Enterprise BYOC.
 
 ## When to stay on Daytona
 
@@ -119,11 +140,11 @@ For coding agents and per-user agents, Upstash Box: the agent runs inside the sa
 
 ### Is Daytona still open source?
 
-No longer. Daytona moved core development to a private codebase in June 2026, and the open-source repository receives no further updates and is now archived on GitHub. The managed service continues.
+Partly. Current core development is private since June 2026, and the open-source repository is archived with no further updates. The archived code remains available to use and fork under its license, and the managed service continues.
 
 ### Is there a cheaper alternative to Daytona?
 
-For agents that mostly wait on the model, active-CPU billing is cheaper: about $0.02 on Upstash Box against about $0.17 on Daytona for an hour of a 2 vCPU / 4 GB sandbox with 10 core-minutes of real work. For CPU-bound work all hour, Northflank has the lowest wall-clock rates.
+For agents that mostly wait on the model, active-CPU billing is cheaper: an hour of a 2 vCPU / 4 GB sandbox with 10 core-minutes of real CPU is about $0.02 in compute on Upstash Box against about $0.17 on Daytona. For CPU-bound work all hour, Northflank has the lowest wall-clock rates.
 
 ### Which Daytona alternative can I self-host?
 
