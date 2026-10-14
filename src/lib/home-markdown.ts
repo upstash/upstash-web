@@ -23,7 +23,7 @@ export function renderHome(): string {
     `- **Search** — Full-text and hybrid search over your documents.`,
     `- **QStash** — HTTP message queue and scheduler: deliver to webhooks with retries, delays, cron schedules and fan-out. Docs: ${SITE_URL}/docs/qstash/overall/getstarted · Pricing: ${SITE_URL}/pricing/qstash`,
     `- **Workflow** — Durable, multi-step serverless functions with retries, waits and parallel steps. Docs: ${SITE_URL}/docs/workflow/getstarted · Pricing: ${SITE_URL}/pricing/workflow`,
-    `- **Box** — Sandboxed cloud containers for running AI agents and untrusted code. Docs: ${SITE_URL}/docs/box/overall/quickstart · Pricing: ${SITE_URL}/pricing/box`,
+    `- **Box** — Persistent cloud computers for AI agents, with Claude Code, Codex and OpenCode built in, a headless browser, git and schedules. Product page: ${SITE_URL}/box · Docs: ${SITE_URL}/docs/box/overall/quickstart · Pricing: ${SITE_URL}/pricing/box`,
     `- **Blob** — S3-compatible object storage for files, with direct browser uploads, public or private buckets and CDN delivery. Product page: ${SITE_URL}/blob · Docs: ${SITE_URL}/docs/blob/overall/quickstart · Pricing: ${SITE_URL}/pricing/blob`,
     "",
     "## Pricing",

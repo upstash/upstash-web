@@ -47,6 +47,14 @@ const HeroProductTagline = ({ activeProduct }: { activeProduct: Product }) => {
             </Button>
           </Link>
         )}
+        {activeProduct === Product.BOX && (
+          <Link href="/box">
+            <Button variant={"default"} className="h-[42px] px-5">
+              Explore Box
+              <IconArrowRight size={24} />
+            </Button>
+          </Link>
+        )}
         <a href={docsLink} target="_blank">
           <Button variant={"defaultDark"} className="h-[42px] px-5">
             Documentation

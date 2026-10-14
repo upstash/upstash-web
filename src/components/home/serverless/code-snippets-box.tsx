@@ -1,5 +1,6 @@
+import "prismjs";
 import "prismjs/components/prism-python";
-import { CodeSnippets, CodeSnippetsData } from "./code-snippets";
+import { CodeSnippets, type CodeSnippetsData } from "./code-snippets";
 
 export const CodeSnippetsBox = () => {
   return <CodeSnippets data={data} codeBodyClassName="h-[420px]" />;

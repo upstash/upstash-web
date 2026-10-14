@@ -128,6 +128,7 @@ More info: https://upstash.com/enterprise
 - [Box Docs](https://upstash.com/docs/box/overall/quickstart)
 - [Blob Docs](https://upstash.com/docs/blob/overall/quickstart): S3-compatible file storage, direct browser uploads, and typed React hooks. Includes a Next.js App Router example.
 - [Blob](https://upstash.com/blob): Product page for public and private file storage.
+- [Box](https://upstash.com/box): Product page for persistent cloud computers and sandboxes for AI agents.
 - [Blob Pricing](https://upstash.com/pricing/blob.md): Storage, bandwidth, operation rates, and free-plan limits.
 
 ---
