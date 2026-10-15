@@ -1,0 +1,165 @@
+---
+authors: [alitarik]
+slug: run-coding-agents-in-parallel-with-upstash-box
+tags: [box, ai, agents, sandbox]
+title: How to Run Coding Agents in Parallel in the Cloud (2026)
+description: Run coding agents in parallel with Upstash Box. Clone once, snapshot the repo, and give each agent an isolated sandbox for tests, patches, and PRs.
+---
+
+Running one coding agent on a repo is fine, but running 3 of them on the same checkout gets ugly very fast. One agent might install a new package while another is in the middle of a build. Another agent might leave some dirty files around, causing another agent’s tests to fail.
+
+To give each agent its own task and its own clean copy of the repo, we built the workflow on top of [Upstash Box](https://upstash.com/docs/box/overall/quickstart). It clones the repo once and snapshots it. It then starts one box per task from the snapshot, runs a coding agent (Claude Code in our examples), runs the tests, and keeps each agent's diff before it deletes the boxes.
+
+## Why parallel coding agents collide
+
+Agents on one checkout [edit the same files](https://upstash.com/blog/software-factory-needs-a-sandbox-per-agent) and start competing dev servers and background processes. The file problem can be fixed with Git worktrees, which means each agent is working on a separate folder/branch. Each worktree can also have its own `node_modules`. However, they’re still running on the same machine and will share package caches, global tools, ports, network, etc., as well as anything accessible by your user account. Malicious instructions in an issue, README, or package can steer an agent into misusing that access.
+
+Here is what each setup keeps apart:
+
+| Setup | Files | Processes and ports | Network | Credentials |
+| --- | --- | --- | --- | --- |
+| One shared checkout | Shared | Shared | Shared | Whatever the local process can reach |
+| Git worktrees | Separate | Shared | Shared | Whatever the local process can reach |
+| One Upstash Box per agent | Separate | Separate | Separate | Only what you pass in |
+
+Each box runs in [its own Docker container with its own filesystem, process tree, and network stack](https://upstash.com/docs/box/overall/how-it-works). They can make outbound requests but cannot reach or see other boxes. Two agents can both run `npm install` and start a server on port 3000 without either one noticing.
+
+## What Upstash Box gives each agent
+
+A box is a small Linux container with a coding agent installed. It comes with Claude Code, Codex, and OpenCode [pre-installed](https://upstash.com/docs/box/overall/agent). When creating a box, you can choose the agent, the model, and provide your own API key. A box can run shell commands, read and write files, and [clone, diff, commit, push, and open pull requests](https://upstash.com/docs/box/overall/git) using the GitHub token you provide.
+
+A snapshot is a copy of a box’s disk, plus the agent settings, and can be used to launch new boxes. [Restoring from a snapshot is faster than cloning](https://upstash.com/docs/box/overall/snapshots). Boxes will auto-pause when idle and do not consume any CPU while paused.
+
+The overall setup from the quickstart looks like this:
+
+![](https://cdn.bydefault.so/image-XhDq5nRR5XFl72kKOxZym.png)
+
+## How do you run coding agents in parallel?
+
+To run coding agents in parallel with Upstash Box, snapshot one prepared box, start one box per task from it, and run all the agents at the same time:
+
+1.  We start up a "seed" box with Claude Code, use a GitHub token to authenticate with GitHub, then clone the repository we want to edit. We may also run a command like `npm install` on the seed box. If any of the setup steps fail, we stop before taking a snapshot.
+2.  We take a snapshot of the seed box, then delete it. The snapshot includes the cloned repository as well as the agent's configuration. The GitHub token is passed to the new box during startup.
+3.  Each task is run on a new box created from the snapshot. We run the agent, then run the tests ourselves and read the diff. All tasks run in parallel.
+4.  We save the diff of all tasks that finished, report the ones that failed, then delete all boxes as well as the snapshot.
+
+Here is the flow:
+
+![](https://cdn.bydefault.so/drawing-yjm9u0TCXxEe-iUFiEVMe.png)
+
+In its simplest form, the whole flow is one `Promise.all` over the tasks. This version leaves out the test run, so it only shows the shape of the idea. Cleanup runs even when an agent fails, and successful tasks save their changes as patch files you can `git apply`.
+
+It needs `UPSTASH_BOX_API_KEY`, `ANTHROPIC_API_KEY`, `GITHUB_TOKEN` and `REPO_URL` set.
+
+```typescript
+import { Agent, Box } from '@upstash/box'
+import { writeFile } from 'node:fs/promises'
+const tasks = ['Add clamp(n, min, max) with tests. Do not commit.', 'Validate add() inputs with tests. Do not commit.', 'Document README.md. Do not commit.']
+const seed = await Box.create({ size: 'small', git: { token: process.env.GITHUB_TOKEN! },
+  agent: { harness: Agent.ClaudeCode, model: 'anthropic/claude-haiku-4-5', apiKey: process.env.ANTHROPIC_API_KEY! } })
+let snapshotId: string | undefined
+let workers: Promise<string>[] = []
+try {
+  try {
+    await seed.git.clone({ repo: process.env.REPO_URL!, branch: process.env.BASE_BRANCH ?? 'main', folder: 'repo' })
+    await seed.cd('repo')
+    if (process.env.SETUP_COMMAND && (await seed.exec.command(process.env.SETUP_COMMAND)).exitCode !== 0) throw new Error('Setup failed')
+    snapshotId = (await seed.snapshot({ name: 'parallel-agents' })).id
+  } finally { await seed.delete() }
+  workers = tasks.map(runTask)
+  console.log(await Promise.all(workers))
+} finally {
+  await Promise.allSettled(workers)
+  if (snapshotId) await seed.deleteSnapshot(snapshotId)
+}
+async function runTask(prompt: string, index: number) {
+  const box = await Box.fromSnapshot(snapshotId!)
+  try {
+    await box.cd('repo') // Restores start in /workspace/home.
+    await box.agent.run({ prompt, options: { maxTurns: 10, maxBudgetUsd: 0.3 } })
+    const staged = await box.git.exec({ args: ['add', '--all'] }) // Diff skips untracked files.
+    if (staged.exit_code !== 0) throw new Error('git add failed')
+    const path = `task-${index + 1}.patch`
+    await writeFile(path, await box.git.diff())
+    return path
+  } finally { await box.delete() }
+}
+```
+
+It prints the patch files it saved:
+
+```text
+[ 'task-1.patch', 'task-2.patch', 'task-3.patch' ]
+```
+
+Notice two subtle points: first, a box restored from a snapshot starts out in its home directory, so each task begins by cd-ing into the repo. Second, a git diff doesn’t include new untracked files, so each task stages everything before reading the diff. Without this, an agent that only adds a test file would appear to have done nothing.
+
+We tested the full workflow, including test execution and cleanup, on a small Node repository with three tasks: add a `clamp()` function, validate the inputs of `add()`, and write docs. All three agents completed their tasks and passed their tests. The run took about 41 seconds from creating the seed box to deleting the last box, so that time includes starting the boxes, running the tests and cleanup. It cost $0.232 in Claude Haiku 4.5 tokens.
+
+## Pick the best of several attempts
+
+One option for more difficult tasks is to run the same prompt in multiple boxes and select the best result. Agent-written tests are useful, but a fixed acceptance test provides an independent check. An attempt qualifies only if three things hold:
+
+- This repository's original test suite (which includes tests of `add()`) still passes.
+- After the agent runs, the fixed acceptance test is written into the box, and passes.
+- The patch changes a test file. This is a basic check; we review the tests separately to confirm boundary coverage.
+
+Diff size only breaks ties between attempts that pass. Each attempt is checked on its own, so one broken box doesn't stop the others from being judged.
+
+![](https://cdn.bydefault.so/drawing-Ra8hyHAvFZg9C03YHuY56.png)
+
+It's the same fan-out, with one prompt sent to three boxes. When we ran the clamp task this way, all three attempts passed all of the checks. The three passing attempts produced diffs of 63, 80, and 60 lines. We selected the smallest. The entire run took about 40 seconds.
+
+To avoid losing the output of a successful attempt due to some other failed attempt, collect the results and errors of all attempts first, and then decide on the winning attempt.
+
+## Open a PR from each box
+
+Each box can also open its own pull request before deletion. It uses the box’s [git helpers](https://upstash.com/docs/box/overall/git) to create a branch, commit, push, and open the PR, and you get the PR's URL back. Alternatively, you can ask the agent in the prompt to branch, commit, push, and open the PR itself. This is handy when you don’t know the name of the branch ahead of time. Either way, the PR has to be opened before the box is deleted. The GitHub token needs read and write access to contents and pull requests.
+
+## What separate boxes don't fix
+
+Running agents in separate boxes protects their work from each other *while* they are running, but it doesn't prevent their changes from conflicting when it comes time to merge. In a ten-issue pipeline run, [seven of nine approved PRs hit merge conflicts](https://www.mindstudio.ai/blog/upstash-sandbox-pricing-ai-agents) because each agent started from the same snapshot and added tests to the same shared file. Separating out the merge into its own agent stage cost $6.37 in tokens, more than the four-stage pipeline itself, which cost $3.67. Assigning tasks to agents by file or module can reduce conflicts, but even then, changes in separate files can still conflict with each other.
+
+Environment variables in a box are [visible to all code running inside it](https://upstash.com/blog/software-factory-needs-a-sandbox-per-agent), which includes anything a prompt injection might cause the agent to run. Outbound traffic is also open by default, so it can be useful to use a [network policy](https://upstash.com/docs/box/overall/network-policy) to restrict each box to only the domains it needs, such as GitHub and your package registry.
+
+## How much does it cost to run agents in parallel?
+
+Upstash Box charges $0.10 per active CPU hour for a small box, plus model tokens. A coding agent spends much of its time waiting for the model. A waiting box consumes very little CPU. For example, a box that consumes [10% of one core for one hour costs $0.01](https://upstash.com/blog/software-factory-needs-a-sandbox-per-agent). In one day-long agent pipeline experiment on Box, [sandbox compute came to about one cent, while tokens cost several dollars](https://www.mindstudio.ai/blog/upstash-sandbox-pricing-ai-agents).
+
+The plan you are on sets how many boxes can run at the same time:
+
+|  | Free | Pay as you go |
+| --- | --- | --- |
+| Boxes running at once | 10 | 1,000 (soft limit, can be raised) |
+| CPU hours | 5 per month | No limit |
+| Price per active CPU hour | Included | $0.10 small, $0.20 medium, $0.40 large |
+| Idle timeout | 1 hour | 6 hours |
+| Monthly limit for Upstash-provided LLM usage | $1 | $100 |
+
+Pricing data taken from [Upstash Box pricing page](https://upstash.com/pricing/box). It’s also possible to use your own model key in both plans, as we did. On pay as you go, storage for paused boxes and snapshots costs $0.10 per GB per month. It’s billed until you delete them, so it pays to check that every delete worked.
+
+## When another sandbox fits better
+
+Upstash Box is built for coding agents that spend most of their time waiting on a model: the agents come built in, and you pay for CPU only while the box uses it. Other sandboxes are a better pick for some needs:
+
+| Provider | Isolation | Billing | Pick it when |
+| --- | --- | --- | --- |
+| Upstash Box | Container | Active CPU, $0.10 per hour (small) | You run many coding agents and want them set up for you |
+| E2B | Firecracker microVM | Wall clock, $0.0504 per vCPU hour plus $0.0162 per GiB hour | Each tenant needs its own kernel, or you want to fork a running sandbox |
+| Daytona | Container by default | Wall clock, same rates as E2B | You need a GPU or want to run it in your own cloud |
+
+E2B can [fork a running sandbox into up to 20 copies in one call](https://upstash.com/blog/upstash-box-vs-e2b), and the memory is preserved after a pause, while Box snapshots only preserve the disk and restore boxes with fresh processes. E2B's default limit is 20 running sandboxes on Hobby and 100 on Pro. Box allows 10 running boxes on Free and 1,000 on pay as you go, and both providers can raise their limits on request. For GPU use cases, or Python-first use cases, Modal is also a strong choice. Box only runs in `us-east-1`, so teams that require data to be stored in the EU will need to look elsewhere.
+
+For agents that spend most of their time waiting on the model, billing makes the biggest difference. For example, for an hour of runtime where the agent uses 10 core-minutes of CPU, Box is about [$0.017, compared to about $0.166](https://upstash.com/blog/ai-agent-sandbox-providers-compared-2026) on E2B or Daytona. Box's advantage depends on CPU use, and it can reverse. A small box that keeps both cores busy for a full hour costs [$0.20 on Box](https://upstash.com/blog/software-factory-needs-a-sandbox-per-agent). The same 2 vCPUs and 4 GiB on E2B cost 2 × $0.0504 + 4 × $0.0162 = $0.1656, before storage, tokens and plan fees. For more details, see our comparison of [15 sandbox providers](https://upstash.com/blog/ai-agent-sandbox-providers-compared-2026).
+
+## Run it on your own repo
+
+These are the steps to follow on your own code:
+
+1. Obtain a Box API key from the Upstash Console and follow the [quickstart](https://upstash.com/docs/box/overall/quickstart).
+2. Set up a single box with your repo and installation step, then take a snapshot of it.
+3. Write one prompt per issue. Note that tasks that touch different files are easier to merge.
+4. Create one box per prompt from the snapshot and run the agents at the same time.
+5. Run your own test command in each box, and include a fixed acceptance test for any best-of-N tasks.
+6. Apply the diffs you prefer with `git apply`, or have each box open a PR.
+7. Delete the worker boxes and the snapshot once the diffs are saved or the PRs are open.
