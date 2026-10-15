@@ -22,7 +22,7 @@ So we built it: one box per project. Here is how it works, with the numbers from
 <Summary>
   - One box per project holds the agent, the code, and the dev server. Nothing needs to be kept in sync.
   - Opening the preview of a paused project wakes it in about 2 seconds.
-  - The app is about 500 lines of logic. Only 14 lines use the Box SDK.
+  - The whole app is about 950 lines of TypeScript, UI included. About 15 lines call the Box SDK.
   - A 72-second prompt used 4 seconds of CPU, about $0.0001. The model tokens are the real cost.
 </Summary>
 
@@ -41,7 +41,7 @@ So we built it: one box per project. Here is how it works, with the numbers from
 | Projects that last for weeks | Keep sandboxes running, or rebuild them | Boxes pause when idle and wake on the preview URL |
 | Chat memory | Save and replay the chat | The agent keeps its session in the box |
 
-For comparison, [Open Lovable](https://github.com/firecrawl/open-lovable), the popular open source clone, runs the model on its server. The server parses the generated files and writes them into a sandbox. It has 27 API routes and about 7,400 lines, including its website scraping features. Most of that work disappears when the agent lives in the box.
+For comparison, [Open Lovable](https://github.com/firecrawl/open-lovable), the popular open source clone, runs the model on its server. The server parses the generated files and writes them into a sandbox. Its [27 API routes](https://github.com/firecrawl/open-lovable/tree/806b8072f28afea11fa2b028cac1449eff74c511/app/api) alone are about 6,200 lines, some of them for its website scraping features. Most of that work disappears when the agent lives in the box.
 
 ## How it fits together
 
@@ -56,11 +56,11 @@ One Upstash Box per project
    └─ dev server :5173 ──► public preview URL
 ```
 
-The Next.js app only creates boxes, forwards prompts, and streams the answers. It never touches a project file.
+The Next.js app only creates boxes, forwards prompts, and streams the answers. It never parses model output or copies generated files around.
 
 ## Step 1: Make a template once
 
-Installing React, Vite, and Tailwind takes about a minute, so do it once and save a snapshot:
+New Lovable projects use TanStack Start. We use React and Vite here because a plain Vite dev server is the simplest thing to preview. Installing it takes about a minute, so do it once and save a snapshot:
 
 ```typescript
 const box = await Box.create({ runtime: "node" })
@@ -73,9 +73,11 @@ await box.exec.command("cd /workspace/home/app && git init -q && git add -A && g
 const template = await box.snapshot({ name: "vite-react-tailwind" })
 ```
 
+This is shortened. The [full script](https://github.com/alitariksahin/box-builder/blob/57cacf7973d3a91ca94e1e45f7328f910a67902e/scripts/build-template.ts) also writes the Vite config, adds the Tailwind plugin and its CSS import, and creates a starter `App.tsx`.
+
 Two tips:
 
-- Let Vite accept the preview domain: `allowedHosts: [".preview.box.upstash.com"]` and `hmr: { clientPort: 443 }`. Hot reload then works through the public URL.
+- Let Vite accept the preview domain: `host: true`, `allowedHosts: [".preview.box.upstash.com"]`, and `hmr: { clientPort: 443 }`. Hot reload then works through the public URL.
 - Put the agent's rules in `/workspace/home/CLAUDE.md`. The agent starts there, so it reads them automatically. Ours are short: the app is in `app/`, the dev server is already running, use Tailwind, keep data in localStorage.
 
 ## Step 2: Create a project
@@ -109,13 +111,13 @@ The agent remembers earlier prompts by itself. We told it a secret word in one p
 
 ## Step 4: Versions, restore, and fork
 
-After every prompt we commit the changes in the box, and each chat message shows its version:
+After each run that changes files, we save a commit and show its version on the assistant reply:
 
 ```bash
 git add -A && git commit -qm "<prompt>"
 ```
 
-**Restore** puts the files back to an older commit with `git read-tree -u --reset <sha>` and commits that, so history only moves forward. If `package.json` changed, we run `npm install`. One trick: after a restore, the agent still remembers the newer code, so we add a short note to the next prompt: "The project was restored, read the files again."
+**Restore** puts the files back to an older commit with `git read-tree -u --reset <sha>` and commits that, so history only moves forward. If `package.json` or the lockfile changed, we run `npm install`. One trick: after a restore, the agent still remembers the newer code, so we add a short note to the next prompt: "The project was restored, read the files again."
 
 **Fork** is a snapshot and a new box from it:
 
@@ -146,7 +148,7 @@ All runs used a `small` box (2 vCPU, 4 GB) and Claude Sonnet 5.
 
 **Cost.** The agent spends most of its time waiting for the model, and Box [bills only active CPU](https://upstash.com/blog/ai-sandbox-pricing-active-cpu-vs-wall-clock). One 72-second prompt used 3.98 CPU-seconds, about $0.0001. An idle project is about 100 MB of storage, about $0.01 per month. So 1,000 users with 30 projects each cost about $300 per month while idle.
 
-One limit: the Free plan allows 10 boxes, and paused boxes count. A real product needs Pay as You Go. See [pricing](https://upstash.com/pricing/box).
+Two limits: the Free plan allows 10 boxes, and paused boxes count, so a real product needs Pay as You Go. Pay as You Go allows 1,000 boxes by default. For 30,000 projects, ask for a higher quota. See [pricing](https://upstash.com/pricing/box).
 
 **Redis** stores what the UI needs without waking a box: the project list, chat history, a lock per project so two actions never run at once, and [rate limits](https://upstash.com/docs/redis/sdks/ratelimit-ts/overview) because every prompt costs tokens.
 
@@ -154,11 +156,11 @@ One limit: the Free plan allows 10 boxes, and paused boxes count. A real product
 
 ### How does Lovable work?
 
-You describe an app in chat. A coding agent writes a React, Tailwind, and Vite project, runs it in a sandbox, and shows a live preview. Each change is saved as a version.
+You describe an app in chat. A coding agent writes the project, runs it in a sandbox, and shows a live preview. Each change is saved as a version. New projects use TanStack Start, and [older ones use React and Vite](https://docs.lovable.dev/introduction/faq).
 
 ### Can I build my own Lovable?
 
-Yes. You need a coding agent, a sandbox, a dev server with a public URL, version history, and cheap storage for idle projects. With one Upstash Box per project, the app around them is about 500 lines.
+Yes. You need a coding agent, a sandbox, a dev server with a public URL, version history, and cheap storage for idle projects. With one Upstash Box per project, the whole app is about 950 lines of TypeScript, UI included.
 
 ### What happens to a project when the user leaves?
 
@@ -166,7 +168,7 @@ The box pauses. Files, packages, git history, and the agent's memory stay on dis
 
 ### Which coding agents can I use?
 
-Claude Code, Codex, and OpenCode are built in. Change one line to switch. You can also bring your [own agent](https://upstash.com/docs/box/overall/custom-agent).
+Claude Code, Codex, and OpenCode are built in. To switch, change the harness, the model, and the API key. The rest of the app stays the same. You can also bring your [own agent](https://upstash.com/docs/box/overall/custom-agent).
 
 ## Try it
 
