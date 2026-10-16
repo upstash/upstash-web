@@ -44,7 +44,9 @@ module.exports = {
       { userAgent: "Twitterbot", allow: "/" },
       {
         userAgent: "*",
-        allow: "/",
+        // The docs ask endpoint takes its question as a query string, which
+        // "/*?" would block for every agent fetch tool that honours robots.txt.
+        allow: ["/", "/docs/ask"],
         disallow: [
           "/*?",
           "/*%",
