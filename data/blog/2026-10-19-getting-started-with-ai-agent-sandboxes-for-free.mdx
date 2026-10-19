@@ -1,0 +1,342 @@
+---
+authors: [alitarik]
+slug: getting-started-with-ai-agent-sandboxes-for-free
+tags: [box, ai, agents, sandbox]
+title: "Get Started with AI Agent Sandboxes for Free on Upstash Box"
+description: Set up an AI agent sandbox on Upstash Box’s free tier. Run generated code and Claude Code, manage files, and save snapshots with the TypeScript SDK.
+---
+
+AI agents are much more useful when they can run code, check their answers, and store files for the user between sessions. For example, the agent can clone a repo, then make a pull request. Or it can install whatever packages the task needs. A sandbox gives each agent its own computer on demand. The sandbox is isolated from your laptop or server. You start it with one SDK call. You can run multiple instances, save them, then discard them.
+
+In this guide, we’ll spin up a box on the [Upstash Box](https://upstash.com/docs/box/overall/quickstart) free tier, run some generated code and Claude Code, snapshot it, and then delete it.
+
+## What is an AI agent sandbox?
+
+An AI agent sandbox is an isolated environment where the agent can run the code that it generates. It has its own set of files, a shell, and a network. When the agent breaks something, the damage stays inside the sandbox instead of hitting your machine or other users.
+
+You can think of a sandbox as a disposable machine that you hand over to the agent. The agent can install packages, edit files, and break things, and then you can take the results and throw away the machine.
+
+A sandbox can limit the damage of mistakes, but it can’t undo the impact of everything that leaves the sandbox. Code that runs in the sandbox can read secrets from its environment, and call any service it can reach. Deleting the sandbox can’t undo a leaked API key or API call. Only provide credentials, data, and network access to the agent as needed.
+
+In Upstash Box, each sandbox is called a box, and each box runs in [its own Docker container](https://upstash.com/docs/box/overall/how-it-works) with a separate filesystem and network. Boxes can’t see each other, so you can give one box to each user and their files won’t mix.
+
+![](https://cdn.bydefault.so/drawing-CiDqlb4bROdTzvkBKtKz8.png)
+
+A new box is online by default. If you want your agent to stay offline, you can disable internet access with a [network policy](https://upstash.com/docs/box/overall/network-policy).
+
+## What you can use a sandbox for
+
+Upstash Box is essentially [making a computer for AI](https://upstash.com/docs/box/overall/use-cases). That one idea covers a number of projects:
+
+- **Running LLM-generated code.** A chatbot answers a data question by writing a script. The box runs it and returns the output.
+- **One agent server per user.** Each user gets their own box with files that persist between sessions, isolated from everyone else.
+- **Coding agents.** Claude Code or Codex clones a repo inside the box, makes changes, and opens a pull request. The [code review agent guide](https://upstash.com/docs/box/guides/code-review-agent) builds one end to end.
+- **Parallel agents.** You fan out several boxes, for example one per file in a pull request review, and merge the results.
+- **Browser automation.** A box can run a headless browser for scraping or form filling, covered in the [browser docs](https://upstash.com/docs/box/overall/browser/overview).
+- **Model benchmarks.** Our Context7 team runs boxes in parallel to compare how well different LLMs pull context out of docs.
+
+If your project allows the model to run any code, then you need a sandbox.
+
+## Set up a free Upstash Box account
+
+Setup takes a few minutes:
+
+1. Sign in to the [Upstash Console](https://console.upstash.com/) and create a Box API key. No credit card required.
+2. In your project folder, install the Box SDK and dotenv:
+
+```bash
+npm install @upstash/box dotenv
+```
+
+3. Make a file called `.env` and paste your key into it. The Anthropic key is optional and only used in the bring-your-own-key variant of the agent example:
+
+```text
+UPSTASH_BOX_API_KEY=box_xxxxxxxxxxxxxxxxxxxxxxxx
+ANTHROPIC_API_KEY=sk-ant-xxxxxxxxxxxxxxxx
+```
+
+Since the SDK reads the key from `process.env` but does not load `.env` files automatically, we have to start every script below with `import "dotenv/config"`.
+
+The code snippets in this article are written in TypeScript, and require Node.js 18 or above. Since the SDK is an ESM module, you’ll also need to add `"type": "module"` to your package.json file, or rename your files to `.mts`. If you’re writing Python code, you can instead install `upstash-box` with pip.
+
+Here's what the [free plan](https://upstash.com/pricing/box) gives you:
+
+| Free plan limit | Value |
+| --- | --- |
+| Concurrent boxes | 10 |
+| CPU hours per month | 5 |
+| Size of each box | 2 CPU cores, 4 GB memory, 5 GB storage |
+| Idle timeout | 1 hour |
+| Built-in agent tokens | $1 per month (or bring your own key) |
+| Languages | Node.js, Python, Go, Ruby, Rust |
+
+After you consume the $1 of built-in agent tokens for a month, the agent API will return a 400 error until the next month. If you provide your own Anthropic or OpenAI key, it bypasses the built-in allowance, but you are still subject to your provider's charges and limits.
+
+## Create a box and run your first command
+
+This script creates a Node.js box, runs two shell commands inside it, and deletes it at the end. Save it as `first-command.mts`:
+
+```ts
+import "dotenv/config"
+import { Box } from "@upstash/box"
+
+const box = await Box.create({ runtime: "node" })
+
+try {
+  console.log("Box:", box.id)
+
+  const version = await box.exec.command("node --version")
+  console.log("Version status:", version.status)
+  console.log("Version result:", JSON.stringify(version.result))
+
+  const failure = await box.exec.command("node -e 'process.exit(1)'")
+  console.log("Failure status:", failure.status)
+  console.log("Failure exit code:", failure.exitCode)
+  console.log("Failure result:", JSON.stringify(failure.result))
+} finally {
+  await box.delete()
+  console.log("Box deleted")
+}
+```
+
+Run it with `npx tsx first-command.mts`. Here's what we got:
+
+```text
+Box: optimal-cow-57372
+Version status: completed
+Version result: "v25.9.0\n"
+Failure status: failed
+Failure exit code: 1
+Failure result: ""
+Box deleted
+```
+
+The first command reports the Node.js version inside the box, so what you have installed locally doesn't matter.
+
+The second command exits with code 1, which the SDK reports as `failed` instead of throwing an error. Your code (or agent) can check the status of the command and react accordingly.
+
+The `try/finally` block deletes the box even if some command throws, which helps to stay within the 10 boxes limit while playing with it. The box runs a full Linux shell, so even pipes, `&&` chains, and `sudo apt-get install` commands are available to run in [shell commands](https://upstash.com/docs/box/overall/shell).
+
+## Write files and run code an LLM wrote
+
+Most agent work comes down to two moves: writing files and running code someone else wrote. Here a string stands in for the code an LLM would return, a snippet that prints the first 10 Fibonacci numbers:
+
+```ts
+import "dotenv/config"
+import { Box } from "@upstash/box"
+
+const box = await Box.create({ runtime: "node" })
+
+try {
+  await box.files.write({ path: "message.txt", content: "Hello from Box!" })
+  console.log("File:", await box.files.read("message.txt"))
+
+  // Imagine this code came from an LLM.
+  const code = `const numbers = [0, 1]
+while (numbers.length < 10) {
+  numbers.push(numbers.at(-1) + numbers.at(-2))
+}
+console.log(numbers.join(", "))`
+
+  const run = await box.exec.code({ code, lang: "js", timeout: 10_000 })
+  console.log("Code status:", run.status)
+  console.log("Code exit code:", run.exitCode)
+  console.log("Code result:", JSON.stringify(run.result))
+} finally {
+  await box.delete()
+  console.log("Box deleted")
+}
+```
+
+And here's the result:
+
+```text
+File: Hello from Box!
+Code status: completed
+Code exit code: 0
+Code result: "0, 1, 1, 2, 3, 5, 8, 13, 21, 34\n"
+Box deleted
+```
+
+Relative paths like `message.txt` resolve to `/workspace/home`, the box's working directory. The timeout kills the generated code after 10 seconds, so an infinite loop from the model can't burn your CPU hours.
+
+In a real application, you replace the string with the model's response and return `run.result` to the model or user. The [files API](https://upstash.com/docs/box/overall/files) supports uploading local files, downloading entire folders, listing files, and more.
+
+## Run a coding agent inside the box
+
+While we have so far been driving the code that’s being run, a coding agent can be given a natural language prompt, and then can create files and run code in the box until the task is complete.
+
+![](https://cdn.bydefault.so/drawing-Pvwlcz5BLmhRwVRhS6d1S.png)
+
+Box can start popular coding agents for you, like [Claude Code, Codex, or OpenCode](https://upstash.com/docs/box/overall/agent). You pick the harness and model when you create the box. This example uses Claude Code with Claude Haiku 4.5 on the free plan's built-in tokens, so no model key is needed:
+
+```ts
+import "dotenv/config"
+import { Agent, Box, ClaudeCode } from "@upstash/box"
+
+const box = await Box.create({
+  runtime: "node",
+  agent: {
+    harness: Agent.ClaudeCode,
+    model: ClaudeCode.Haiku_4_5,
+  },
+})
+
+try {
+  const startedAt = Date.now()
+  const run = await box.agent.run({
+    prompt: "Create a file fizzbuzz.js that prints FizzBuzz for 1 to 15, run it, and tell me the output.",
+  })
+  console.log("Agent status:", run.status)
+  console.log("Agent result:", run.result)
+  console.log("Elapsed milliseconds:", Date.now() - startedAt)
+  console.log("Usage and cost:", JSON.stringify(run.cost))
+
+  console.log("fizzbuzz.js:\n" + await box.files.read("fizzbuzz.js"))
+  const proof = await box.exec.command("node fizzbuzz.js")
+  console.log("Proof status:", proof.status)
+  console.log("Proof result:\n" + proof.result)
+} finally {
+  await box.delete()
+  console.log("Box deleted")
+}
+```
+
+Here's what happened (we shortened the FizzBuzz lines):
+
+```text
+Agent status: completed
+Agent result: Done! Here's the output:
+1
+2
+Fizz
+...
+14
+FizzBuzz
+Elapsed milliseconds: 8203
+Usage and cost: {"inputTokens":26,"outputTokens":578,"cachedInputTokens":108082,"computeMs":8203,"totalUsd":0.0564304}
+fizzbuzz.js:
+for (let i = 1; i <= 15; i++) {
+  if (i % 15 === 0) {
+    console.log('FizzBuzz');
+  } else if (i % 3 === 0) {
+    console.log('Fizz');
+  } else if (i % 5 === 0) {
+    console.log('Buzz');
+  } else {
+    console.log(i);
+  }
+}
+
+Proof status: completed
+Proof result:
+1
+2
+Fizz
+...
+Box deleted
+```
+
+This task ran for about 8 seconds, costing under 6 cents of the $1 monthly allowance, and our script then read the file and ran it with a plain shell command. We can see that the agent left some work in the box.
+
+Notice the token counts: about 108K cached input tokens versus 26 fresh ones, on a 15-line task. This size of task would fit the free allowance about 17 times a month, roughly. Larger tasks will cost more.
+
+To use your own model key instead, add `apiKey: process.env.ANTHROPIC_API_KEY` to the agent config. This switches billing to Anthropic, and the built-in allowance is no longer applied.
+
+## Pause, snapshot, and clean up
+
+To get the most out of your free CPU hours, you should make sure your boxes are only running when they have work to do. Box gives you three ways to control when a box runs:
+
+- **Pause and resume.** A paused box releases its compute but keeps its files. On the free plan, a box idle for 1 hour pauses itself and wakes on the next request.
+- **Snapshots.** A snapshot saves the box's files and agent config. You can start any number of new boxes from it, even after the original is gone.
+- **Delete.** Deleting a box frees its slot permanently.
+
+![](https://cdn.bydefault.so/drawing-YVIEPM6obMiFjwCeYyn3c.png)
+
+Let's try all three. This script saves a file, takes a snapshot, pauses and wakes the box, deletes it, and then brings the file back in a brand-new box:
+
+```ts
+import "dotenv/config"
+import { Box } from "@upstash/box"
+
+let snapshotId: string | undefined
+
+try {
+  const box = await Box.create({ runtime: "node" })
+
+  try {
+    console.log("Created status:", (await box.getStatus()).status)
+    await box.files.write({ path: "message.txt", content: "Saved in a snapshot" })
+
+    const snapshot = await box.snapshot({ name: "checkpoint" })
+    snapshotId = snapshot.id
+    console.log("Snapshot status:", snapshot.status)
+    console.log("Box after snapshot:", (await box.getStatus()).status)
+
+    await box.pause()
+    console.log("Paused status:", (await box.getStatus()).status)
+    await box.resume()
+    console.log("Resumed status:", (await box.getStatus()).status)
+  } finally {
+    await box.delete()
+    console.log("Source box deleted")
+  }
+
+  const restored = await Box.fromSnapshot(snapshotId)
+  try {
+    console.log("Restored status:", (await restored.getStatus()).status)
+    console.log("Restored file:", await restored.files.read("message.txt"))
+  } finally {
+    await restored.delete()
+    console.log("Restored box deleted")
+  }
+} finally {
+  if (snapshotId) {
+    const cleanup = await Box.deleteSnapshots({ snapshotIds: [snapshotId] })
+    console.log("Snapshots deleted:", cleanup.deleted)
+  }
+}
+```
+
+The output:
+
+```text
+Created status: idle
+Snapshot status: ready
+Box after snapshot: idle
+Paused status: paused
+Resumed status: idle
+Source box deleted
+Restored status: idle
+Restored file: Saved in a snapshot
+Restored box deleted
+Snapshots deleted: 1
+```
+
+The file survived the snapshot even though its source box was deleted. A running box with no command in progress reports `idle`, so `idle` after resuming means it's ready.
+
+Always pass the snapshot IDs you want to delete. Calling `Box.deleteSnapshots` without `snapshotIds` deletes every snapshot in your account.
+
+If you just want to run one-off commands/files, then you can create an [ephemeral box](https://upstash.com/docs/box/overall/ephemeral-box) instead. This type of Box can only be used for commands and files, and automatically deletes itself after some TTL (time to live) that you specify (up to 3 days).
+
+## When you outgrow the free tier
+
+The free plan stops fitting when you need more than 10 concurrent boxes, more than 5 CPU hours a month, or a box that never sleeps. Upstash Box has two paid plans for that, both on the [pricing page](https://upstash.com/pricing/box):
+
+|  | Free | Pay as you go | Fixed |
+| --- | --- | --- | --- |
+| Price | $0 | $0.10 to $0.40 per active CPU hour | $8 to $32 per box per month |
+| Box sizes | Small (2 vCPU, 4 GB) | Small, Medium, Large (up to 8 vCPU, 16 GB) | Small, Medium, Large |
+| Concurrent boxes | 10 | 1,000 (soft limit) | 1,000 |
+| CPU hours | 5 per month | Unlimited | Unlimited, included |
+| Storage | 5 GB per box, free | $0.10 per GB per month, snapshots included | Included |
+| Idle timeout | 1 hour | 6 hours | Never |
+| LLM token budget | $1 per month | Up to $100 per month | Up to $100 per month |
+
+Our **Pay as you go** pricing model is billed for active CPU, and memory is free. If you use 100% of 2 cores for an hour, it will cost $0.20. It's intended for agents that wake up, perform some activity, and then quiet down, such as those described in this article.
+
+Our **Fixed** price models are for servers that must run continuously, such as an agent server, which must answer user requests any time of day. Each server is charged a flat rate per month that includes its CPU and storage. This model never goes to sleep.
+
+![](https://cdn.bydefault.so/image-_PHDqA3xipLCwwRS5jgVc.png)
+
+The code shown above works on all plans, so you can build on top of free boxes. The only thing you can't do manually on Fixed boxes is pausing. To get more ideas for what you can build on top of boxes, take a look at the [Box use cases](https://upstash.com/docs/box/overall/use-cases) page or the [code review guide](https://upstash.com/docs/box/guides/code-review-agent).
