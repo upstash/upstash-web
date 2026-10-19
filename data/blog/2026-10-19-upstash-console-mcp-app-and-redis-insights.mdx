@@ -3,7 +3,7 @@ authors: [arda]
 title: "The Upstash Console in Your Chat: an MCP App, Stats for Every Product, and Redis Insights for Agents"
 slug: upstash-console-mcp-app-and-redis-insights
 tags: [mcp, agents, redis, qstash, chatgpt]
-description: "The Upstash MCP server now serves the Upstash console as an MCP App, has usage stats for QStash, Workflow, Vector, Search and Blob, and gives agents the same Redis Insights the console shows: anomalies, error counters, traffic and keyspace."
+description: "The Upstash MCP server now serves the Upstash console as an MCP App, has usage stats for QStash, Workflow, Vector, Search and Blob, and gives agents the same Redis Insights the console shows: anomalies, error counters and traffic."
 ---
 
 Ask an agent why your Redis database got slow and it will usually come back with a wall of JSON. The data was right; the format was wrong. Some answers are a chart, a table you scroll through, or a button you press.
@@ -12,7 +12,7 @@ This release of the [Upstash MCP server](https://upstash.com/docs/agent-resource
 
 - it brings **the Upstash console into the conversation**, as an MCP App,
 - it adds **usage stats for every product**, not just Redis and Box,
-- and it gives agents **Redis Insights**, the anomalies, error counters, traffic and keyspace data behind the console's new Insights tab.
+- and it gives agents **Redis Insights**, the anomalies, error counters and traffic data behind the console's new Insights tab.
 
 ## The console, inside the chat
 
@@ -69,19 +69,17 @@ The Upstash console recently got an **Insights** tab for Redis. It goes well bey
 - latency percentiles per region and per replica,
 - **anomalies** that the backend detects for you,
 - counters for the things that go wrong (throttled commands, auth failures, over-size requests, Lua failures and timeouts),
-- where your clients connect from,
-- and a keyspace report built from your backups.
+- and where your clients connect from.
 
-The MCP server now exposes all of it as three read-only tools:
+The MCP server now exposes it as two read-only tools:
 
 - **`redis_get_insights`** returns latency (p50 to p99, read, write, command, Lua and replication), throughput, bandwidth and replication lag for the whole database and per region. It also returns the counters, a comparison of each metric now against the window before it, and the anomalies: when a spike started, its peak, and its size against the baseline.
 - **`redis_get_traffic`** returns the client networks the proxies saw (masked, with the cloud provider and region), the SDKs and runtimes your clients report, how often they retry, and which region each request entered through and was served from. That last part is how you spot a client in Europe talking to a database in Virginia.
-- **`redis_get_backup_analysis`** returns the keyspace of a backup: how many keys of each type, how big they are, the biggest keys, and how many keys have no TTL at all.
 
 <Frame>
   <img
     src="/blog/upstash-console-mcp-app-and-redis-insights/redis-insights.png"
-    alt="The Redis Insights tab in the console MCP App: a latency anomaly at the top, then latency, throughput and replication lag against the previous window, and latency and throughput charts"
+    alt="The Redis Insights tab in the console MCP App: latency, throughput and replication lag against the previous window, then latency and throughput charts"
     width="1280"
     height="1100"
     className="h-auto w-full"
@@ -92,11 +90,10 @@ Say you ask *"sessions-prod got slow last night, what happened?"*. An agent can:
 
 1. call `redis_get_insights` to find the latency anomaly, how big it was against the baseline, and whether throttled commands or Lua timeouts rose at the same time,
 2. call `redis_get_traffic` to check whether that traffic entered through a region far from the database,
-3. call `redis_get_backup_analysis` to look for an oversized key that every request reads,
 
 and then open the Insights tab so you can see it for yourself.
 
-The console's Redis page shows the same data in its Insights tab: anomalies, performance against the previous window, the non-zero counters, traffic, and the keyspace of your latest analyzed backup.
+The console app's Redis page has an Insights tab too: performance against the previous window, the non-zero counters, and traffic.
 
 ## Try it
 
