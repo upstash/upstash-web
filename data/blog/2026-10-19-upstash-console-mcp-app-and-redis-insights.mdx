@@ -1,0 +1,107 @@
+---
+authors: [arda]
+title: "The Upstash Console in Your Chat: an MCP App, Stats for Every Product, and Redis Insights for Agents"
+slug: upstash-console-mcp-app-and-redis-insights
+tags: [mcp, agents, redis, qstash, chatgpt]
+description: "The Upstash MCP server now serves the Upstash console as an MCP App, has usage stats for QStash, Workflow, Vector, Search and Blob, and gives agents the same Redis Insights the console shows: anomalies, error counters, traffic and keyspace."
+---
+
+Ask an agent why your Redis database got slow and it will usually come back with a wall of JSON. The data was right; the format was wrong. Some answers are a chart, a table you scroll through, or a button you press.
+
+This release of the [Upstash MCP server](https://upstash.com/docs/agent-resources/mcp) does three things about that:
+
+- it brings **the Upstash console into the conversation**, as an MCP App,
+- it adds **usage stats for every product**, not just Redis and Box,
+- and it gives agents **Redis Insights**, the anomalies, error counters, traffic and keyspace data behind the console's new Insights tab.
+
+## The console, inside the chat
+
+[MCP Apps](https://github.com/modelcontextprotocol/ext-apps) let an MCP server ship a page that the host renders next to, or inside, the conversation. ChatGPT supports them today. The Upstash MCP server now serves one: the Upstash console.
+
+You don't install anything. Connect the server as usual:
+
+```
+https://mcp.upstash.com/mcp
+```
+
+Then ask something like *"show me my Redis databases"*, or open Upstash from the app sidebar. The console opens with the same layout as console.upstash.com: a product picker, your resources, and tabs for the selected one. You can browse and edit Redis keys, run commands, publish QStash messages, manage schedules, look through logs and the DLQ, browse Vector and Search documents, and manage boxes and Blob buckets.
+
+<Frame>
+  <img
+    src="/blog/upstash-console-mcp-app-and-redis-insights/qstash-stats.png"
+    alt="The Upstash console MCP App on the QStash Stats tab: today's messages, delivered, failed and cost, then messages, failures, cost and bandwidth per day"
+    width="1280"
+    height="900"
+    className="h-auto w-full"
+  />
+</Frame>
+
+A few design choices are worth knowing:
+
+- **The page holds no credentials.** Every read and write is a tool call that the host sends back to the MCP server. OAuth, read-only connections and the server's field allowlists apply to the page exactly as they do to the agent. On a read-only connection, the write buttons don't appear.
+- **Secrets stay out of the model's context.** *Show credentials* fetches a database's tokens only when you open it, keeps them masked until you reveal them, and never passes them to the model.
+- **The agent knows what you're looking at.** As you click around, the page tells the model which database, key or schedule is open. "Why is *this* key so big?" works without you pasting the key name.
+- **The agent can open it for you.** The `upstash_console` tool takes a product, a resource and a tab, so "show me the stats of sessions-prod" lands on exactly that view.
+
+## Stats for every product
+
+Until now the MCP server had usage data for Redis and Box only. It now has a stats tool for every product, and each one has a Stats tab in the console:
+
+| Product | Tool | What you get |
+| --- | --- | --- |
+| Redis | `redis_get_stats` | Throughput, latency, hits and misses, keys, data size and connections over a period, requests per day, this month's cost |
+| QStash and Workflow | `qstash_get_stats` | Messages or runs per day by outcome, failures, cost, bandwidth, global parallelism, DLQ size |
+| Vector and Search | `index_get_stats` | Queries and updates per day against your daily limits, throughput, p99 latency, documents, data size, cost |
+| Blob | `blob_bucket` with `stats` | Storage over time, bandwidth and operations per day, cost per month |
+
+Upstash caches usage figures. The Redis and QStash tools take an optional `refresh` flag that recomputes them first, the same thing the console does when you open a page. On a read-only connection the refresh is skipped, and you get the cached figures with a note saying so.
+
+That makes questions like these one tool call each:
+
+- *"How many QStash messages failed this week, and is it getting worse?"*
+- *"Am I close to my Vector index's daily query limit?"*
+- *"Which Blob bucket is costing me the most this month?"*
+
+## Redis Insights, for agents
+
+The Upstash console recently got an **Insights** tab for Redis. It goes well beyond the usual throughput and latency charts:
+
+- latency percentiles per region and per replica,
+- **anomalies** that the backend detects for you,
+- counters for the things that go wrong (throttled commands, auth failures, over-size requests, Lua failures and timeouts),
+- where your clients connect from,
+- and a keyspace report built from your backups.
+
+The MCP server now exposes all of it as three read-only tools:
+
+- **`redis_get_insights`** returns latency (p50 to p99, read, write, command, Lua and replication), throughput, bandwidth and replication lag for the whole database and per region. It also returns the counters, a comparison of each metric now against the window before it, and the anomalies: when a spike started, its peak, and its size against the baseline.
+- **`redis_get_traffic`** returns the client networks the proxies saw (masked, with the cloud provider and region), the SDKs and runtimes your clients report, how often they retry, and which region each request entered through and was served from. That last part is how you spot a client in Europe talking to a database in Virginia.
+- **`redis_get_backup_analysis`** returns the keyspace of a backup: how many keys of each type, how big they are, the biggest keys, and how many keys have no TTL at all.
+
+<Frame>
+  <img
+    src="/blog/upstash-console-mcp-app-and-redis-insights/redis-insights.png"
+    alt="The Redis Insights tab in the console MCP App: a latency anomaly at the top, then latency, throughput and replication lag against the previous window, and latency and throughput charts"
+    width="1280"
+    height="1100"
+    className="h-auto w-full"
+  />
+</Frame>
+
+Say you ask *"sessions-prod got slow last night, what happened?"*. An agent can:
+
+1. call `redis_get_insights` to find the latency anomaly, how big it was against the baseline, and whether throttled commands or Lua timeouts rose at the same time,
+2. call `redis_get_traffic` to check whether that traffic entered through a region far from the database,
+3. call `redis_get_backup_analysis` to look for an oversized key that every request reads,
+
+and then open the Insights tab so you can see it for yourself.
+
+The console's Redis page shows the same data in its Insights tab: anomalies, performance against the previous window, the non-zero counters, traffic, and the keyspace of your latest analyzed backup.
+
+## Try it
+
+- **Connect:** add `https://mcp.upstash.com/mcp` to ChatGPT, Claude, Cursor or any MCP client. The [MCP server docs](https://upstash.com/docs/agent-resources/mcp) have a snippet for each. The console appears in hosts that support MCP Apps; every other client gets the same tools.
+- **Scope it:** append `?features=redis` (or `qstash`, `vector`, `box`, `blob`, `console`) to the URL to load only the tools you need.
+- **Read-only:** pick *read-only* on the consent page and the agent, and the console, can look but not touch.
+
+If you build something with it, let us know on [X](https://x.com/upstash).
