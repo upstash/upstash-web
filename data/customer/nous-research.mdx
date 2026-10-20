@@ -1,0 +1,49 @@
+---
+company_name: Nous Research
+company_url: https://nousresearch.com
+user_name: Ben Barclay
+user_title: Engineering Lead, Nous Research
+highlight: "Everything's been going really smoothly, it just works."
+cover_image: cover-nous-research.jpg
+order: 5
+draft: true
+---
+
+## How Nous Research uses Upstash to power Nous Portal and Hermes Cloud
+
+Nous Research uses Upstash Redis for caching across Nous Portal and QStash for production cron jobs in Hermes Cloud, and runs its inference API on the Upstash Enterprise plan.
+
+### About Nous Research
+
+[Nous Research](https://nousresearch.com) is an open-source AI lab that trains open language models and builds [Hermes Agent](https://hermes-agent.nousresearch.com), an open-source agent with persistent memory and skills that works across the terminal, desktop, and messaging apps.
+
+[Nous Portal](https://portal.nousresearch.com) is the single account behind Hermes Agent. It gives users hundreds of models through the Nous inference API, hosted tools through the Tool Gateway, and always-on agent hosting through [Hermes Cloud](https://portal.nousresearch.com/cloud), all drawing on one credit balance.
+
+### Caching database lookups
+
+Nous's inference API, Portal, and Tool Gateway each have their own Upstash Redis cache for hot-path database lookups. A shared Upstash Redis database acts as a bus that tells Nous's services about changes to a user's account, such as when it is funded or rate limited.
+
+Before Upstash, Nous used AWS ElastiCache, but as Ben puts it, they "didn't really want to deal with it if we didn't have to."
+
+<Highlight name="Ben Barclay" title="Engineering Lead, Nous Research">
+  By aggressively caching things, we've managed to avoid database issues with
+  the amount of load that our systems are handling.
+</Highlight>
+
+### Production cron jobs with QStash
+
+Hermes Cloud lets users deploy an always-on agent in one click and schedule unattended tasks such as reports, backups, and briefings in plain language. Behind the scenes, Nous uses Upstash QStash for many of Hermes Cloud's production cron job workloads.
+
+### Scaling with Upstash Enterprise
+
+Nous sends billions of commands to Upstash Redis every month. To give its inference API more room to grow, Nous moved that database to the Upstash Enterprise plan, which brings:
+
+- **Higher throughput** for the inference API
+- **Prod Pack**, with an uptime SLA and multi-zone high availability
+- **SAML SSO** for the Nous team
+
+Nothing changed on Nous's side: same endpoints, same code.
+
+<Highlight name="Ben Barclay" title="Engineering Lead, Nous Research">
+  Everything's been going really smoothly, it just works.
+</Highlight>
