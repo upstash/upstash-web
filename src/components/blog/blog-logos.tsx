@@ -3,18 +3,15 @@ import { LogoClickfunnels } from "../customers/logo-clickfunnels";
 import { LogoDropee } from "../customers/logo-dropee";
 import { LogoDubsh } from "../customers/logo-dubsh";
 import { LogoGitbook } from "../customers/logo-gitbook";
-import { LogoHumata } from "../customers/logo-humata";
 import { LogoJuicebox } from "../customers/logo-juicebox";
 import { LogoMaker } from "../customers/logo-maker";
 import { LogoNavattic } from "../customers/logo-navattic";
-import { LogoNiftykit } from "../customers/logo-niftykit";
 import { LogoNousResearch } from "../customers/logo-nous-research";
 import { LogoOkara } from "../customers/logo-okara";
 import { LogoOpenart } from "../customers/logo-openart";
 import { LogoPaulSmith } from "../customers/logo-paul-smith";
 import { LogoStreamlined } from "../customers/logo-streamlined";
 import { LogoSupabase } from "../customers/logo-supabase";
-import { LogoTFashion } from "../customers/logo-tfashion";
 import { LogoTheMet } from "../customers/logo-the-met";
 import { LogoZapier } from "../customers/logo-zapier";
 
@@ -22,15 +19,12 @@ const blogLogos = {
   branch: LogoBranch,
   dub: LogoDubsh,
   dropee: LogoDropee,
-  humata: LogoHumata,
   maker: LogoMaker,
   juicebox: LogoJuicebox,
   navattic: LogoNavattic,
   gitbook: LogoGitbook,
   okara: LogoOkara,
   openart: LogoOpenart,
-  niftykit: LogoNiftykit,
-  tfashion: LogoTFashion,
   zapier: LogoZapier,
   ["paul-smith"]: LogoPaulSmith,
   clickfunnels: LogoClickfunnels,

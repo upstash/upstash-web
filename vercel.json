@@ -71,6 +71,10 @@
     {
       "source": "/openapi.json",
       "destination": "/docs/devops/developer-api/openapi.yaml"
+    },
+    {
+      "source": "/customers/:slug(humata|tfashion|niftykit)",
+      "destination": "/customers"
     }
   ]
 }
