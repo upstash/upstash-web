@@ -27,7 +27,7 @@ export default async function BlogPage(props: Props) {
   const slug = params?.slug;
   const customer = allCustomers.find((customer) => customer.slug === slug);
 
-  if (!customer) {
+  if (!customer || customer.draft || customer.no_article) {
     notFound();
   }
 

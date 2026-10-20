@@ -3,30 +3,35 @@
 import Bg from "@/components/bg";
 import Container from "@/components/container";
 import { LogoBranch } from "@/components/customers/logo-branch";
+import { LogoCircleback } from "@/components/customers/logo-circleback";
 import { LogoClay } from "@/components/customers/logo-clay";
 import { LogoClickfunnels } from "@/components/customers/logo-clickfunnels";
 import { LogoCodeRabbit } from "@/components/customers/logo-coderabbit";
 import { LogoCoinbase } from "@/components/customers/logo-coinbase";
+import { LogoComposio } from "@/components/customers/logo-composio";
 import { LogoCustomerio } from "@/components/customers/logo-customerio";
 import { LogoDropee } from "@/components/customers/logo-dropee";
 import { LogoDubsh } from "@/components/customers/logo-dubsh";
 import { LogoFal } from "@/components/customers/logo-fal";
 import { LogoFly } from "@/components/customers/logo-fly";
 import { LogoGitbook } from "@/components/customers/logo-gitbook";
-import { LogoHashnode } from "@/components/customers/logo-hashnode";
-import { LogoHumata } from "@/components/customers/logo-humata";
 import { LogoMaker } from "@/components/customers/logo-maker";
 import { LogoMeta } from "@/components/customers/logo-meta";
 import { LogoMidjourney } from "@/components/customers/logo-midjourney";
+import { LogoNousResearch } from "@/components/customers/logo-nous-research";
 import { LogoOkara } from "@/components/customers/logo-okara";
 import { LogoOpenart } from "@/components/customers/logo-openart";
 import { LogoOpencode } from "@/components/customers/logo-opencode";
 import { LogoOpenrouter } from "@/components/customers/logo-openrouter";
 import { LogoPaulSmith } from "@/components/customers/logo-paul-smith";
 import { LogoPolymarket } from "@/components/customers/logo-polymarket";
+import { LogoPrivy } from "@/components/customers/logo-privy";
+import { LogoRaindrop } from "@/components/customers/logo-raindrop";
+import { LogoSierra } from "@/components/customers/logo-sierra";
 import { LogoSupabase } from "@/components/customers/logo-supabase";
 import { LogoVercel } from "@/components/customers/logo-vercel";
 import { LogoZapier } from "@/components/customers/logo-zapier";
+import { LogoZoComputer } from "@/components/customers/logo-zo-computer";
 import {
   SectionHeader,
   SectionHeaderSummary,
@@ -150,9 +155,11 @@ export default function HomeHeroCustomer() {
           </div>
         </div>
 
-        {/* LOGO GRID — 3 rows of 5, testimonials clickable, rest static */}
-        <div className="mx-auto mt-16 grid max-w-[960px] grid-cols-2 gap-2 xs:grid-cols-3 md:mt-24 md:grid-cols-5 md:gap-3">
+        {/* LOGO GRID — rows of 6 with a centered last row, testimonials clickable, rest static */}
+        <div className="mx-auto mt-16 flex max-w-[1080px] flex-wrap justify-center gap-2 md:mt-24 md:gap-3">
           {logos.map(({ name, Logo, slug, h = 24 }) => {
+            const item =
+              "w-[calc((100%-8px)/2)] xs:w-[calc((100%-16px)/3)] md:w-[calc((100%-60px)/6)]";
             const cell = (
               <div
                 className={cx(
@@ -166,11 +173,18 @@ export default function HomeHeroCustomer() {
               </div>
             );
             return slug ? (
-              <Link key={name} href={`/customers/${slug}`} aria-label={name}>
+              <Link
+                key={name}
+                href={`/customers/${slug}`}
+                aria-label={name}
+                className={item}
+              >
                 {cell}
               </Link>
             ) : (
-              <div key={name}>{cell}</div>
+              <div key={name} className={item}>
+                {cell}
+              </div>
             );
           })}
         </div>
@@ -188,8 +202,8 @@ export default function HomeHeroCustomer() {
   );
 }
 
-// Homepage logo wall — 3 rows of 5. `slug` marks a customer story (clickable).
-// Every logo shares one height in the grid; `cn` nudges optical size per logo.
+// Homepage logo wall — rows of 6. `slug` marks a customer story (clickable).
+// Every logo shares one height in the grid; `h` nudges optical size per logo.
 const logos: {
   name: string;
   Logo: ComponentType<SVGProps<SVGSVGElement>>;
@@ -202,18 +216,25 @@ const logos: {
   { name: "Vercel", Logo: LogoVercel, h: 22 },
   { name: "Supabase", Logo: LogoSupabase, slug: "supabase", h: 24 },
   { name: "Midjourney", Logo: LogoMidjourney, h: 30 },
-  // Row 2 — established companies plus industry variety
   { name: "Zapier", Logo: LogoZapier, slug: "zapier", h: 24 },
+  // Row 2 — established companies plus industry variety
   { name: "GitBook", Logo: LogoGitbook, slug: "gitbook", h: 23 },
   { name: "Polymarket", Logo: LogoPolymarket, h: 22 },
   { name: "Fly.io", Logo: LogoFly, h: 24 },
   { name: "Paul Smith", Logo: LogoPaulSmith, slug: "paul-smith", h: 22 },
-  // Row 3 — current AI and developer-platform credibility
+  { name: "Sierra", Logo: LogoSierra, h: 26 },
+  { name: "Privy", Logo: LogoPrivy, h: 22 },
+  // Rows 3-4 — current AI and developer-platform credibility
   { name: "Clay", Logo: LogoClay, h: 30 },
   { name: "fal", Logo: LogoFal, h: 24 },
   { name: "OpenRouter", Logo: LogoOpenrouter, h: 22 },
   { name: "CodeRabbit", Logo: LogoCodeRabbit, h: 22 },
   { name: "OpenCode", Logo: LogoOpencode, h: 20 },
+  { name: "Composio", Logo: LogoComposio, h: 22 },
+  { name: "Nous Research", Logo: LogoNousResearch, h: 40 },
+  { name: "Circleback", Logo: LogoCircleback, h: 18 },
+  { name: "Zo Computer", Logo: LogoZoComputer, h: 30 },
+  { name: "Raindrop", Logo: LogoRaindrop, h: 22 },
 ];
 
 const customers = [
@@ -328,20 +349,6 @@ const customers = [
     ),
   },
   {
-    name: "Humata",
-    slug: "humata",
-    icon: <LogoHumata height={32} />,
-    quote: (
-      <>
-        Before Upstash QStash, we struggled with upload reliability and request
-        failures, but with their support, we've achieved over 99.9% reliability
-        for millions of users. Their seamless integration with our serverless
-        architecture has made developing new features, like importing entire
-        knowledge bases, much simpler.
-      </>
-    ),
-  },
-  {
     name: "Maker.co",
     slug: "maker",
     icon: <LogoMaker height={24} />,
@@ -364,10 +371,6 @@ const customers = [
         the future of edge infrastructure together.
       </>
     ),
-  },
-  {
-    name: "Hashnode",
-    icon: <LogoHashnode height={18} />,
   },
   {
     name: "Dropee",
