@@ -18,7 +18,7 @@ import { LogoGitbook } from "@/components/customers/logo-gitbook";
 import { LogoMaker } from "@/components/customers/logo-maker";
 import { LogoMeta } from "@/components/customers/logo-meta";
 import { LogoMidjourney } from "@/components/customers/logo-midjourney";
-import { LogoNousResearch } from "@/components/customers/logo-nous-research";
+import { LogoNousResearchWordmark } from "@/components/customers/logo-nous-research-wordmark";
 import { LogoOkara } from "@/components/customers/logo-okara";
 import { LogoOpenart } from "@/components/customers/logo-openart";
 import { LogoOpencode } from "@/components/customers/logo-opencode";
@@ -231,7 +231,7 @@ const logos: {
   { name: "CodeRabbit", Logo: LogoCodeRabbit, h: 22 },
   { name: "OpenCode", Logo: LogoOpencode, h: 20 },
   { name: "Composio", Logo: LogoComposio, h: 22 },
-  { name: "Nous Research", Logo: LogoNousResearch, h: 22 },
+  { name: "Nous Research", Logo: LogoNousResearchWordmark, h: 22 },
   { name: "Circleback", Logo: LogoCircleback, h: 17 },
   { name: "Zo Computer", Logo: LogoZoComputer, h: 25 },
   { name: "Raindrop", Logo: LogoRaindrop, h: 25 },
