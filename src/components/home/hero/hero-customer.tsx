@@ -222,7 +222,7 @@ const logos: {
   { name: "Polymarket", Logo: LogoPolymarket, h: 22 },
   { name: "Fly.io", Logo: LogoFly, h: 24 },
   { name: "Paul Smith", Logo: LogoPaulSmith, slug: "paul-smith", h: 22 },
-  { name: "Sierra", Logo: LogoSierra, h: 26 },
+  { name: "Sierra", Logo: LogoSierra, h: 30 },
   { name: "Privy", Logo: LogoPrivy, h: 22 },
   // Rows 3-4 — current AI and developer-platform credibility
   { name: "Clay", Logo: LogoClay, h: 30 },
@@ -231,10 +231,10 @@ const logos: {
   { name: "CodeRabbit", Logo: LogoCodeRabbit, h: 22 },
   { name: "OpenCode", Logo: LogoOpencode, h: 20 },
   { name: "Composio", Logo: LogoComposio, h: 22 },
-  { name: "Nous Research", Logo: LogoNousResearch, h: 40 },
-  { name: "Circleback", Logo: LogoCircleback, h: 18 },
+  { name: "Nous Research", Logo: LogoNousResearch, h: 46 },
+  { name: "Circleback", Logo: LogoCircleback, h: 17 },
   { name: "Zo Computer", Logo: LogoZoComputer, h: 30 },
-  { name: "Raindrop", Logo: LogoRaindrop, h: 22 },
+  { name: "Raindrop", Logo: LogoRaindrop, h: 25 },
 ];
 
 const customers = [
