@@ -231,9 +231,9 @@ const logos: {
   { name: "CodeRabbit", Logo: LogoCodeRabbit, h: 22 },
   { name: "OpenCode", Logo: LogoOpencode, h: 20 },
   { name: "Composio", Logo: LogoComposio, h: 22 },
-  { name: "Nous Research", Logo: LogoNousResearch, h: 46 },
+  { name: "Nous Research", Logo: LogoNousResearch, h: 38 },
   { name: "Circleback", Logo: LogoCircleback, h: 17 },
-  { name: "Zo Computer", Logo: LogoZoComputer, h: 30 },
+  { name: "Zo Computer", Logo: LogoZoComputer, h: 25 },
   { name: "Raindrop", Logo: LogoRaindrop, h: 25 },
 ];
 
