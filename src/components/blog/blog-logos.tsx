@@ -8,6 +8,7 @@ import { LogoJuicebox } from "../customers/logo-juicebox";
 import { LogoMaker } from "../customers/logo-maker";
 import { LogoNavattic } from "../customers/logo-navattic";
 import { LogoNiftykit } from "../customers/logo-niftykit";
+import { LogoNousResearch } from "../customers/logo-nous-research";
 import { LogoOkara } from "../customers/logo-okara";
 import { LogoOpenart } from "../customers/logo-openart";
 import { LogoPaulSmith } from "../customers/logo-paul-smith";
@@ -35,6 +36,7 @@ const blogLogos = {
   clickfunnels: LogoClickfunnels,
   streamlined: LogoStreamlined,
   ["the-met"]: LogoTheMet,
+  ["nous-research"]: LogoNousResearch,
   supabase: LogoSupabase,
 } as const;
 
