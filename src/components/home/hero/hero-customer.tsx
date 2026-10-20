@@ -155,11 +155,11 @@ export default function HomeHeroCustomer() {
           </div>
         </div>
 
-        {/* LOGO GRID — rows of 6 with a centered last row, testimonials clickable, rest static */}
+        {/* LOGO GRID — rows of 2/4/6 with a centered last row, testimonials clickable, rest static */}
         <div className="mx-auto mt-16 flex max-w-[1080px] flex-wrap justify-center gap-2 md:mt-24 md:gap-3">
           {logos.map(({ name, Logo, slug, h = 24 }) => {
             const item =
-              "w-[calc((100%-8px)/2)] xs:w-[calc((100%-16px)/3)] md:w-[calc((100%-60px)/6)]";
+              "w-[calc((100%-8px)/2)] sm:w-[calc((100%-24px)/4)] md:w-[calc((100%-36px)/4)] xl:w-[calc((100%-60px)/6)]";
             const cell = (
               <div
                 className={cx(
@@ -202,7 +202,7 @@ export default function HomeHeroCustomer() {
   );
 }
 
-// Homepage logo wall — rows of 6. `slug` marks a customer story (clickable).
+// Homepage logo wall — rows of 6 on desktop. `slug` marks a customer story (clickable).
 // Every logo shares one height in the grid; `h` nudges optical size per logo.
 const logos: {
   name: string;
