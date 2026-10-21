@@ -66,7 +66,9 @@ export const getApiArticles = cache(async (): Promise<KbArticle[]> => {
     // needed the articles render on their first visit instead, and a page
     // already cached keeps its copy until the API answers again.
     console.error(error);
-    await connection();
+    if (process.env.NEXT_PHASE === "phase-production-build") {
+      await connection();
+    }
     throw error;
   }
 });
