@@ -142,7 +142,7 @@ function CloseIcon(props: ComponentProps<"svg">) {
   );
 }
 
-function CopyFeaturePre(props: ComponentProps<"pre">) {
+export function CopyFeaturePre(props: ComponentProps<"pre">) {
   const [hasCopied, setHasCopied] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -195,7 +195,7 @@ function CopyFeaturePre(props: ComponentProps<"pre">) {
   );
 }
 
-function table(props: ComponentProps<"table">) {
+export function table(props: ComponentProps<"table">) {
   return (
     <div className="-mx-5 overflow-x-auto rounded-2xl bg-emerald-900/5 md:-mx-6 dark:bg-white/[0.04]">
       <table className="w-full border-collapse" {...props} />
@@ -203,7 +203,7 @@ function table(props: ComponentProps<"table">) {
   );
 }
 
-function img({
+export function img({
   src,
   alt,
   width,

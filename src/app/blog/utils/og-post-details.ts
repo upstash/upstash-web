@@ -1,6 +1,6 @@
 export const baseUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
-  : "http://localhost:3000";
+  : `http://localhost:${process.env.PORT ?? 3000}`;
 
 export async function getPostDetails(slug: string) {
   const postDataURL = new URL(`/api/get/post-data?slug=${slug}`, baseUrl);
