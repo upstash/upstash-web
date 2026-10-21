@@ -427,6 +427,7 @@ export const REDIS_ALL_PLANS: RedisPlan[] = [
 ];
 
 export const REDIS_PROD_PACK = {
+  monthlyPrice: 200,
   description:
     "Prod Pack is an add-on available for any paid plan (Pay as You Go or Fixed). Enable it from your database details page in the Upstash console.",
   features: [
@@ -435,6 +436,7 @@ export const REDIS_PROD_PACK = {
     "SOC 2 Type 2 report",
     "Advanced monitoring (Prometheus, Grafana, Datadog, New Relic)",
     "Insights in the console (request routing, latency, limits, Lua and keyspace analysis)",
+    "Traffic insights (where clients connect from by network, cloud provider and region; the SDKs, platforms and runtimes they use; and which requests are served cross-region)",
     "Role-based access control",
     "Encryption at rest",
   ],

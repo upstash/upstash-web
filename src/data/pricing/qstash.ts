@@ -185,6 +185,18 @@ export const QSTASH_FIXED_PLANS: QStashPlan[] = [
   },
 ];
 
+export const QSTASH_PROD_PACK = {
+  monthlyPrice: 200,
+  description:
+    "Prod Pack is an add-on available for any paid plan (Pay as You Go or Fixed). It is enabled per QStash region and also covers Upstash Workflow in that region, since Workflow runs on QStash. Enable it from the QStash page in the Upstash console.",
+  features: [
+    "Uptime SLA",
+    "SOC 2 Type 2 report",
+    "Advanced monitoring (Prometheus, Datadog)",
+    "Encryption at rest",
+  ],
+};
+
 export const QSTASH_ENTERPRISE_PLAN: QStashPlan = {
   id: "enterprise",
   name: "Enterprise",

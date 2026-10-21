@@ -1,3 +1,4 @@
+import { REDIS_PROD_PACK } from "@/data/pricing/redis";
 import cx from "@/utils/cx";
 import { IconCircleCheckFilled } from "@tabler/icons-react";
 
@@ -47,7 +48,7 @@ const ProdPackButton = ({ className }: { className?: string }) => {
         className,
       )}
     >
-      +$200/month per database
+      +${REDIS_PROD_PACK.monthlyPrice}/month per database
     </div>
   );
 };

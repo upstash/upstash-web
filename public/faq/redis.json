@@ -66,11 +66,11 @@
     },
     {
       "question": "Can I purchase Prod Pack for any plan?",
-      "answer": "Yes. You can purchase Prod Pack for any plan except the Free tier. You can enable it from your Upstash dashboard database details page."
+      "answer": "Yes. You can purchase Prod Pack for any plan except the Free tier. It costs $200/month per database on top of the plan price. You can enable it from your Upstash dashboard database details page."
     },
     {
       "question": "What is included in Prod Pack?",
-      "answer": "Prod Pack includes uptime SLA, SOC 2 Type 2 report, advanced monitoring with Prometheus, Grafana, and Datadog, Insights in the console, multi-zone high availability, role-based access control, and encryption at rest."
+      "answer": "Prod Pack includes uptime SLA, SOC 2 Type 2 report, advanced monitoring with Prometheus, Grafana, Datadog, and New Relic, Insights in the console, traffic insights (where clients connect from, the SDKs and runtimes they use, and cross-region requests), multi-zone high availability, role-based access control, and encryption at rest."
     },
     {
       "question": "Does enabling multi-zone high availability change my bill?",
