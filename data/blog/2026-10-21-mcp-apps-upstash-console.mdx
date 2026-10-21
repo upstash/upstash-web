@@ -8,11 +8,14 @@ description: What an MCP App is, how hosts render one, and how the Upstash conso
 
 What’s the best way to ask an agent for the keys in your Redis database? If you ask, you’ll get a list of keys, but then what? You’ll probably want to sort, filter, or open one of them, which means another prompt, another wall of text. The data is right, but the presentation is wrong. Some questions are better answered with a scrollable table, a hoverable chart, or a clickable button.
 
-This is where MCP Apps come in. They allow MCP servers to send fully formed pages directly into conversations. We used them to put the [Upstash console](https://console.upstash.com/) into ChatGPT, including Redis keys, QStash schedules, Vector indexes, boxes, and Blob buckets.
+This is where MCP Apps come in. They allow MCP servers to send fully formed pages directly into conversations. We used them to put the [Upstash console](https://console.upstash.com/) into ChatGPT, with most of what you can do there for Redis, QStash, Workflow, Vector, Search, Box and Blob.
 
 ## What is an MCP App?
 
 An MCP App is an interactive HTML page that an MCP server can provide together with a tool. The chat client displays the page inside the conversation, and the user can click, filter and edit in the page, which in turn calls the server’s tools to do the actual work.
+
+![](https://cdn.bydefault.so/image-Mr5wC2DJIN8m1QPYjil_n.png)
+*The Upstash console as an MCP App, opened in the middle of a conversation*
 
 MCP Apps became the [first official MCP extension](https://blog.modelcontextprotocol.io/posts/2026-01-26-mcp-apps/) in January 2026. This means that a server author can write the page once, and it will be rendered in any host that supports them, such as [ChatGPT, Claude and VS Code](https://modelcontextprotocol.io/extensions/apps/overview). Hosts that do not support them still have access to the server’s usual tools.
 
@@ -48,6 +51,9 @@ An MCP App doesn't need its own API or login credentials — the page can reuse 
 ## The Upstash console as an MCP App
 
 The [Upstash MCP server](https://upstash.com/docs/agent-resources/mcp) is available at `https://mcp.upstash.com/mcp` and by default serves the Upstash console as an MCP App. After connecting the MCP server, you can open Upstash from the app sidebar or ask “show me my Redis databases”. The Upstash console is served with the same layout as console.upstash.com; a product picker, your resources, and tabs for the selected one.
+
+![](https://cdn.bydefault.so/image-lENu-ptqA_kw0EWZgYike.png)
+*The same app in full screen*
 
 Here is what you can do in it, per product:
 
