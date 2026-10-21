@@ -25,7 +25,7 @@ export default function Footer({ className, ...props }: IAppFooter) {
             © {new Date().getFullYear()} Upstash, Inc. Based in California.
           </p>
 
-          <div className="mt-2 flex flex-col items-center gap-4 text-text-mute md:flex-row">
+          <div className="mt-4 flex flex-col items-center gap-4 text-text-mute md:flex-row">
             <Link
               href="/contact"
               className="hover:text-primary hover:underline"
@@ -34,6 +34,9 @@ export default function Footer({ className, ...props }: IAppFooter) {
             </Link>
             <OutLink href="/trust/privacy.pdf">Privacy Policy</OutLink>
             <OutLink href="/trust/terms.pdf">Terms of Service</OutLink>
+          </div>
+
+          <div className="mt-4 flex flex-col items-center gap-4 text-text-mute md:flex-row">
             <Link
               href="/redis"
               className="group inline-flex items-center gap-1 hover:text-primary hover:underline"
