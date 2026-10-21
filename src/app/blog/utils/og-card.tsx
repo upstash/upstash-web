@@ -269,11 +269,14 @@ async function svgDataUrl(path: string) {
 type Post = {
   title: string;
   // unknown usernames are dropped from authorsData, so it can be empty even
-  // when the post lists authors
-  authorsData: { name: string; title?: string; image: string }[];
+  // when the post lists authors; the knowledge base's authors may have no
+  // photo or title
+  authorsData: { name: string; title?: string; image?: string | null }[];
 };
 
-export async function renderPostCard(post: Post) {
+// the knowledge base draws its articles' link previews here too, signed with
+// its own address
+export async function renderPostCard(post: Post, site = "upstash.com/blog") {
   const [regular, bold, mark] = await Promise.all([
     (await asset("/fonts/Inter-Regular.ttf")).arrayBuffer(),
     (await asset("/fonts/Inter-Bold.ttf")).arrayBuffer(),
@@ -281,7 +284,7 @@ export async function renderPostCard(post: Post) {
   ]);
 
   const author = post.authorsData[0];
-  const authorImage = author
+  const authorImage = author?.image
     ? new URL(author.image, baseUrl).toString()
     : undefined;
   const title = layoutTitle(post.title);
@@ -358,28 +361,49 @@ export async function renderPostCard(post: Post) {
             borderTop: "1px solid rgba(255, 255, 255, 0.12)",
           }}
         >
-          {author && authorImage ? (
+          {author ? (
             <div style={{ display: "flex", alignItems: "center" }}>
-              <img
-                alt={author.name}
-                src={authorImage}
-                width={70}
-                height={70}
-                style={{ borderRadius: 999, marginRight: 18 }}
-              />
+              {authorImage ? (
+                <img
+                  alt={author.name}
+                  src={authorImage}
+                  width={70}
+                  height={70}
+                  style={{ borderRadius: 999, marginRight: 18 }}
+                />
+              ) : (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: 70,
+                    height: 70,
+                    marginRight: 18,
+                    borderRadius: 999,
+                    backgroundColor: "rgba(0, 233, 163, 0.2)",
+                    fontSize: 30,
+                    fontWeight: 700,
+                  }}
+                >
+                  {author.name.charAt(0).toUpperCase()}
+                </div>
+              )}
               <div style={{ display: "flex", flexDirection: "column" }}>
                 <div style={{ fontSize: 27, fontWeight: 700 }}>
                   {author.name}
                 </div>
-                <div
-                  style={{
-                    marginTop: 3,
-                    fontSize: 21,
-                    color: "rgba(255, 255, 255, 0.5)",
-                  }}
-                >
-                  {author.title}
-                </div>
+                {author.title ? (
+                  <div
+                    style={{
+                      marginTop: 3,
+                      fontSize: 21,
+                      color: "rgba(255, 255, 255, 0.5)",
+                    }}
+                  >
+                    {author.title}
+                  </div>
+                ) : null}
               </div>
             </div>
           ) : null}
@@ -390,7 +414,7 @@ export async function renderPostCard(post: Post) {
               color: "rgba(255, 255, 255, 0.5)",
             }}
           >
-            upstash.com/blog
+            {site}
           </div>
         </div>
       </div>
