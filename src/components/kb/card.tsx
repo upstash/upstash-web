@@ -40,7 +40,8 @@ export function KbCard({ article }: { article: KbArticle }) {
       href={`/kb/${article.slug}`}
       className="hover:ring-primary/30 group flex flex-col rounded-3xl bg-bg-mute p-6 ring-1 ring-transparent transition duration-300 md:p-8"
     >
-      <h3 className="text-balance font-display text-xl font-semibold leading-tight transition group-hover:text-primary-text">
+      {/* Held at three lines, so every card's opening starts level. */}
+      <h3 className="line-clamp-3 min-h-[3lh] text-balance font-display text-xl font-semibold leading-tight transition group-hover:text-primary-text">
         {article.title}
       </h3>
 
