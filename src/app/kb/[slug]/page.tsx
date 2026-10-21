@@ -141,7 +141,7 @@ export default async function KbArticlePage(props: Props) {
       <article>
         {/* On the article's column, so the header and the text share one edge. */}
         <header className="pb-14 pt-16 md:pt-24">
-          <Container className="max-w-screen-md">
+          <Container className="max-w-4xl">
             <nav
               aria-label="Breadcrumb"
               className="flex flex-wrap items-center gap-2 text-sm font-medium text-text-mute"
@@ -183,7 +183,7 @@ export default async function KbArticlePage(props: Props) {
         </header>
 
         <div className="relative z-0">
-          <Container className="max-w-screen-md">
+          <Container className="max-w-4xl">
             <div className="post leading-p">
               <KbMarkdown markdown={article.content} />
             </div>
