@@ -80,12 +80,14 @@ This site has a search endpoint: https://context7.com/api/v2/ask?siteKey=ask_4cf
 
 ## Prod Pack Add-on (Redis, QStash, Workflow)
 
-Available on all paid plans. Includes:
+Available on all paid plans. Price: +$200/month per Redis database, +$200/month per QStash region (covers Workflow in that region). Includes:
 - Uptime SLA
 - SOC 2 Type 2 compliance report
-- Advanced monitoring: Prometheus, Grafana, Datadog, New Relic
+- Advanced monitoring: Prometheus, Datadog (Redis also Grafana, New Relic)
 - Multi-Zone high availability (Redis)
-- Role-based access control (ACL)
+- Insights in the console: request routing, latency, limits, Lua and keyspace analysis (Redis)
+- Traffic insights: client networks, cloud providers and regions, SDKs and runtimes, cross-region requests (Redis)
+- Role-based access control (ACL) (Redis)
 - Encryption at rest
 
 Enable from the database/resource details page in the Upstash console.

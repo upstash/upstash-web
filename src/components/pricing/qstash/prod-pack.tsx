@@ -1,3 +1,4 @@
+import { QSTASH_PROD_PACK } from "@/data/pricing/qstash";
 import cx from "@/utils/cx";
 import { IconCircleCheckFilled } from "@tabler/icons-react";
 
@@ -45,7 +46,7 @@ const ProdPackButton = ({ className }: { className?: string }) => {
         className,
       )}
     >
-      +$200/month
+      +${QSTASH_PROD_PACK.monthlyPrice}/month
     </div>
   );
 };

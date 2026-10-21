@@ -176,6 +176,8 @@ function generateMarkdown(): string {
     "",
     REDIS_PROD_PACK.description,
     "",
+    `**Price:** +$${REDIS_PROD_PACK.monthlyPrice}/month per database, on top of the plan price.`,
+    "",
     "**Included features:**",
     "",
     ...REDIS_PROD_PACK.features.map((f) => `- ${f}`),

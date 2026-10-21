@@ -6,6 +6,7 @@ import {
   WORKFLOW_PAYG_PLAN,
   type WorkflowPlan,
 } from "@/data/pricing/workflow";
+import { QSTASH_PROD_PACK } from "@/data/pricing/qstash";
 import { ASK_NOTE } from "@/lib/context7-ask";
 
 export const dynamic = "force-static";
@@ -83,6 +84,18 @@ function generateMarkdown(): string {
     `| Prometheus | ${WORKFLOW_ALL_PLANS.map((p) => feat(p.prometheus)).join(" | ")} |`,
     `| Datadog | ${WORKFLOW_ALL_PLANS.map((p) => feat(p.datadog)).join(" | ")} |`,
     `| Dedicated support | ${WORKFLOW_ALL_PLANS.map((p) => (p.dedicatedSupport ? "Yes" : "No")).join(" | ")} |`,
+    "",
+    "---",
+    "",
+    "## Prod Pack Add-on",
+    "",
+    QSTASH_PROD_PACK.description,
+    "",
+    `**Price:** +$${QSTASH_PROD_PACK.monthlyPrice}/month per region, on top of the plan price.`,
+    "",
+    "**Included features:**",
+    "",
+    ...QSTASH_PROD_PACK.features.map((f) => `- ${f}`),
     "",
     "---",
     "",
