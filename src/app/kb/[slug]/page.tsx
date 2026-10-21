@@ -3,7 +3,6 @@ import Container from "@/components/container";
 import { formatKbDate, KbAvatar, KbGrid } from "@/components/kb/card";
 import { KbMarkdown } from "@/components/kb/markdown";
 import { TopicIcon } from "@/components/kb/topic-toggle";
-import PageBodyGradient from "@/components/page-body-gradient";
 import {
   getKbArticle,
   getKbArticles,
@@ -140,62 +139,50 @@ export default async function KbArticlePage(props: Props) {
       <Bg />
 
       <article>
-        {/* The blog's post header, under the way back to the index. */}
-        <header className="py-20 text-center">
-          <Container className="max-w-screen-lg">
+        {/* On the article's column, so the header and the text share one edge. */}
+        <header className="pb-14 pt-16 md:pt-24">
+          <Container className="max-w-screen-md">
             <nav
               aria-label="Breadcrumb"
-              className="flex flex-wrap items-center justify-center gap-2 font-medium"
+              className="flex flex-wrap items-center gap-2 text-sm font-medium text-text-mute"
             >
-              <Link
-                href="/kb"
-                className="opacity-60 transition hover:opacity-100"
-              >
+              <Link href="/kb" className="transition hover:text-text">
                 Knowledge Base
               </Link>
               {topic && (
                 <>
-                  <span className="opacity-30">/</span>
+                  <span className="opacity-50">/</span>
                   <Link
                     href={`/kb/topics/${topic.slug}`}
-                    className="flex items-center gap-1.5 opacity-60 transition hover:opacity-100"
+                    className="flex items-center gap-1.5 transition hover:text-text"
                   >
-                    <TopicIcon slug={topic.slug} width={18} />
+                    <TopicIcon slug={topic.slug} width={16} />
                     {topic.name}
                   </Link>
                 </>
               )}
             </nav>
 
-            <h1 className="mx-4 mt-4 text-balance font-display text-4xl font-bold !leading-title md:text-6xl">
+            <h1 className="mt-5 text-balance font-display text-4xl font-bold tracking-tight !leading-title md:text-[52px]">
               {article.title}
             </h1>
 
-            <div className="mt-8 flex flex-col items-center justify-center gap-6 md:flex-row md:gap-8">
+            <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3 text-[15px] text-text-mute">
               {article.authors.map((author) => (
-                <div
-                  key={author.name}
-                  className="flex items-center gap-3 text-left"
-                >
-                  <KbAvatar author={author} size={44} />
-                  <span className="font-medium">{author.name}</span>
+                <div key={author.name} className="flex items-center gap-2.5">
+                  <KbAvatar author={author} size={28} />
+                  <span className="font-medium text-text">{author.name}</span>
                 </div>
               ))}
-            </div>
-
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-2 opacity-40">
               <time dateTime={article.publishedAt}>
                 {formatKbDate(article.publishedAt)}
               </time>
-              <span>·</span>
               <span>{kbReadingMinutes(article)} min read</span>
             </div>
           </Container>
         </header>
 
-        <div className="relative z-0 pt-10">
-          <PageBodyGradient isBlogPage />
-
+        <div className="relative z-0">
           <Container className="max-w-screen-md">
             <div className="post leading-p">
               <KbMarkdown markdown={article.content} />
