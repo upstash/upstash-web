@@ -1,0 +1,95 @@
+---
+authors: [arda]
+slug: mcp-apps-upstash-console
+tags: [mcp, redis, ai, agents]
+title: What Are MCP Apps? The Upstash Console Inside ChatGPT
+description: What an MCP App is, how hosts render one, and how the Upstash console runs as an MCP App in ChatGPT.
+---
+
+What’s the best way to ask an agent for the keys in your Redis database? If you ask, you’ll get a list of keys, but then what? You’ll probably want to sort, filter, or open one of them, which means another prompt, another wall of text. The data is right, but the presentation is wrong. Some questions are better answered with a scrollable table, a hoverable chart, or a clickable button.
+
+This is where MCP Apps come in. They allow MCP servers to send fully formed pages directly into conversations. We used them to put the [Upstash console](https://console.upstash.com/) into ChatGPT, including Redis keys, QStash schedules, Vector indexes, boxes, and Blob buckets.
+
+## What is an MCP App?
+
+An MCP App is an interactive HTML page that an MCP server can provide together with a tool. The chat client displays the page inside the conversation, and the user can click, filter and edit in the page, which in turn calls the server’s tools to do the actual work.
+
+MCP Apps became the [first official MCP extension](https://blog.modelcontextprotocol.io/posts/2026-01-26-mcp-apps/) in January 2026. This means that a server author can write the page once, and it will be rendered in any host that supports them, such as [ChatGPT, Claude and VS Code](https://modelcontextprotocol.io/extensions/apps/overview). Hosts that do not support them still have access to the server’s usual tools.
+
+## How MCP Apps work
+
+An MCP App is two pieces the server already knows how to serve: a tool and a resource. The tool's description carries a pointer to a page, and the page is a resource with a `ui://` address. Here is the pointer, as the spec shows it:
+
+```json
+{
+  "name": "visualize_data",
+  "description": "Visualize data as an interactive chart",
+  "_meta": {
+    "ui": {
+      "resourceUri": "ui://charts/interactive"
+    }
+  }
+}
+```
+
+When the model wants to call a tool, the host:
+
+1. reads the `ui://` address out of the tool description,
+2. fetches the page from the server,
+3. renders the page in a [sandboxed iframe](https://modelcontextprotocol.io/extensions/apps/overview) in the chat window,
+4. opens a message channel with the page.
+
+![](https://cdn.bydefault.so/drawing-ICQOvVTSV5PPrPZp4MXgB.png)
+
+The page can then ask the host to make calls to the server's tools on its behalf, and can update the model with information about user activity. The host is always in the middle, and can prompt the user for confirmation before making any calls.
+
+An MCP App doesn't need its own API or login credentials — the page can reuse the connection that the user has already authorized for the agent.
+
+## The Upstash console as an MCP App
+
+The [Upstash MCP server](https://upstash.com/docs/agent-resources/mcp) is available at `https://mcp.upstash.com/mcp` and by default serves the Upstash console as an MCP App. After connecting the MCP server, you can open Upstash from the app sidebar or ask “show me my Redis databases”. The Upstash console is served with the same layout as console.upstash.com; a product picker, your resources, and tabs for the selected one.
+
+Here is what you can do in it, per product:
+
+| Product | What you can do |
+| --- | --- |
+| Redis | Browse and edit keys, run commands, view stats and Insights, create and delete databases |
+| QStash | Publish messages, manage schedules, read logs and the DLQ, view stats |
+| Workflow | Trigger runs, inspect and cancel them, retry from the DLQ, view stats |
+| Vector and Search | Browse documents by namespace, view stats |
+| Box | View usage and logs, create, pause, resume and delete boxes |
+| Blob | Browse objects, create buckets, delete objects, view stats |
+
+The agent can also open the console for you. Its `upstash_console` tool takes a product, resource and tab, so "show me the stats of sessions-prod" lands on the Stats tab for that database, and you can click around from there.
+
+Here it is inside ChatGPT:
+
+![](https://cdn.bydefault.so/tweet-IiI9jZNw6fHJfCnStJECA.png)
+
+## How the console keeps your credentials safe
+
+Since this page can be used to delete a database, it must handle your keys with care. Thus, the console page is completely free of any credentials. Instead, any read or write operation is a tool call to the MCP server via ChatGPT. The same [OAuth grant](https://upstash.com/docs/agent-resources/mcp) is used as for the agent.
+
+The console page is subject to the same rules as the agent. For example, if the connection is read-only, the console page will hide the write buttons. The database tokens are only fetched when you click to see them, and are never sent to the model.
+
+As you navigate through the console page, it tells the model what you are looking at. Therefore, asking the question “why is this key so big?” works without you having to paste the key name into the chat.
+
+## Analyze your Redis usage
+
+The MCP server also lets you check your Redis database performance. This is based on the [Insights tab](https://upstash.com/docs/redis/howto/insights) we [recently added](https://x.com/upstash/status/2111018067627065655) to the Upstash console. It shows you the traffic, performance and limits of a given database.
+
+![](https://cdn.bydefault.so/image-K0Oc8ns8sf9fxBJshCNm8.png)
+
+*The Performance view of the Insights tab*
+
+The MCP server also contains the same data. The agent can use two tools to read the data, namely `redis_get_insights` and `redis_get_traffic`. Additionally, the console app contains an Insights tab in the Redis page. Thus, if you ask "sessions-prod got slow last night, what happened?", the agent can find the latency spike, determine the traffic origin, and open the Insights tab. Insights is part of [Prod Pack](https://upstash.com/docs/redis/overall/enterprise#prod-pack-features).
+
+## Try it
+
+Add the server to ChatGPT, Claude, Cursor or any MCP client:
+
+```text
+https://mcp.upstash.com/mcp
+```
+
+The [MCP server docs](https://upstash.com/docs/agent-resources/mcp) have a setup snippet for each client. The console shows up in hosts that support MCP Apps, and every other client gets the same tools.
