@@ -10,9 +10,10 @@ export const KB_DESCRIPTION =
 export type KbTopic = { id: string; name: string; slug: string };
 
 // Some articles are blog posts too (published to data/blog through GitHub),
-// under the same slug or, where the blog renamed the file, the same title.
-// The blog is their home: the knowledge base leaves them out and sends
-// their addresses there, so no page here is a copy of one on the blog.
+// under the same slug, the file's name without its date (the blog may give
+// the post another slug and title after it lands) or the same title. The
+// blog is their home: the knowledge base leaves them out and sends their
+// addresses there, so no page here is a copy of one on the blog.
 const titleKey = (title: string) =>
   title
     .toLowerCase()
@@ -21,6 +22,12 @@ const titleKey = (title: string) =>
 
 const blogPosts = allPosts.filter((post) => !post.draft);
 const blogSlugs = new Set(blogPosts.map((post) => post.slug));
+const blogSlugsByFile = new Map(
+  blogPosts.map((post) => [
+    post._meta.path.replace(/^\d{4}-\d{2}-\d{2}-/, ""),
+    post.slug,
+  ]),
+);
 const blogSlugsByTitle = new Map(
   blogPosts.map((post) => [titleKey(post.title), post.slug]),
 );
@@ -28,7 +35,9 @@ const blogSlugsByTitle = new Map(
 const blogSlugOf = (article: KbArticle) =>
   blogSlugs.has(article.slug)
     ? article.slug
-    : (blogSlugsByTitle.get(titleKey(article.title)) ?? null);
+    : (blogSlugsByFile.get(article.slug) ??
+      blogSlugsByTitle.get(titleKey(article.title)) ??
+      null);
 
 // Newest first.
 export const getKbArticles = cache(async () =>
