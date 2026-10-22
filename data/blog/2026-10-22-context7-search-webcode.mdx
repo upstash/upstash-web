@@ -60,13 +60,15 @@ Every setup used the same answer model, so these differences come from the searc
 3. A model writes an answer from those results.
 4. A judge model checks two things separately: do the results contain the expected answer ("answer found"), and is the final answer correct ("correct answer").
 
+![How WebCode scores a search: the judge checks whether the search results contain the expected answer, and separately whether the answer model's reply matches it](/blog/context7-webcode/scoring.png)
+
 There are 307 questions. About 40% of them are about standards and manuals (W3C, IETF, ECMAScript, GNU), and the rest cover libraries and tools from Node.js and Spring Boot to Bazel and LuaTeX.
 
 ## How does a Context7 search work?
 
 A search goes through four steps before the agent sees anything:
 
-![How a Context7 search works: understand the question, pick the library, retrieve snippets, rerank them, and return about five snippets](/blog/context7-webcode/pipeline.png)
+![How a Context7 search works: a model names the spec, Context7 picks the library, retrieves candidate snippets, reranks them, and the agent gets a few short snippets of about 1,000 tokens](/blog/context7-webcode/pipeline.png)
 
 1. **Understand.** A model reads the question and names the products it is about, like "Next.js" or "RFC 9110".
 2. **Pick the library.** Context7 matches those names against more than 100,000 libraries in its index.
