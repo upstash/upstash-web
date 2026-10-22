@@ -118,13 +118,3 @@ curl -G 'https://context7.com/api/v3/search' \
 ```
 
 To use it in an agent, see the [Search API docs](https://context7.com/docs/search-api) or the [TypeScript SDK](https://context7.com/docs/sdks/ts/getting-started). Each search counts as one API call. The [Free plan includes 1,000 calls a month](https://context7.com/docs/plans-pricing), and Pro costs $10 per seat a month with 2,000 calls per seat, then $5 per 1,000 calls. For comparison, [Exa 3.0](https://exa.ai/blog/exa-3) costs $4 per 1,000 searches for Lite and $7 for Auto.
-
-## What's next for Context7 Search?
-
-The remaining misses point to the next fixes:
-
-1. **Speed.** Much of a search's time goes to the first step, where a model reads the question. On busy days that model sometimes takes over 8 seconds, so we're working on a faster fallback.
-2. **Answers outside a product's own docs.** Some answers live in related official docs, like the memory Kamal needs, which is in the Rails guides. We want Context7 to look there when a product's own docs miss.
-3. **The right snippet from the right page.** When Context7 picks the right library, the answer should be in the top results every time.
-
-We'll run WebCode again after each of these and share the results.
