@@ -20,7 +20,7 @@ const BOX_SIZES = {
     label: "Small",
     cpu: "2",
     memory: "4",
-    storage: "5",
+    storage: "10",
     usagePrice: "$0.1",
     keepAlivePrice: "$8",
   },
@@ -29,7 +29,7 @@ const BOX_SIZES = {
     label: "Medium",
     cpu: "4",
     memory: "8",
-    storage: "10",
+    storage: "20",
     usagePrice: "$0.2",
     keepAlivePrice: "$16",
   },
@@ -38,7 +38,7 @@ const BOX_SIZES = {
     label: "Large",
     cpu: "8",
     memory: "16",
-    storage: "20",
+    storage: "30",
     usagePrice: "$0.4",
     keepAlivePrice: "$32",
   },
@@ -276,7 +276,7 @@ export default function CompareTable() {
           <th className="px-0 py-4 text-left font-normal">Max Storage / Box</th>
           <Col plan={showFree}>
             <CompareValue type="size" suffix="GB">
-              5
+              10
             </CompareValue>
           </Col>
           <Col plan={showPayg} feature>
