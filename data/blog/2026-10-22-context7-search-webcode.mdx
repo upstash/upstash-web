@@ -14,6 +14,15 @@ With Context7's results, the model answered 83.1% of the questions correctly, an
 
 We build Context7, so this post explains how we tested, why the results differ, and where Exa is still better.
 
+## What are Exa Lite and Exa Auto?
+
+[Exa 3.0](https://exa.ai/blog/exa-3) comes with two search types, and we tested both:
+
+- **Exa Lite** is the cheaper one, at $4 per 1,000 searches. Exa built it for apps where cost matters most.
+- **Exa Auto** searches the same index but spends more compute on finding and ranking pages, at $7 per 1,000 searches.
+
+Both return 10 web pages per search. With highlights turned on, which Exa recommends for agents, each page comes with the passages Exa thinks are most relevant to the question, instead of the whole page. On WebCode the two scored almost the same, so most numbers below use Lite.
+
 ## How do Context7 and Exa compare on WebCode?
 
 WebCode measures two things for every question. Was the answer in the search results? And did the model that read those results give the correct answer? On its 307 questions:
@@ -63,19 +72,6 @@ Every setup used the same answer model, so these differences come from the searc
 ![How WebCode scores a search: the judge checks whether the search results contain the expected answer, and separately whether the answer model's reply matches it](/blog/context7-webcode/scoring.png)
 
 There are 307 questions. About 40% of them are about standards and manuals (W3C, IETF, ECMAScript, GNU), and the rest cover libraries and tools from Node.js and Spring Boot to Bazel and LuaTeX.
-
-## How does a Context7 search work?
-
-A search goes through four steps before the agent sees anything:
-
-![How a Context7 search works: a model names the spec, Context7 picks the library, retrieves candidate snippets, reranks them, and the agent gets a few short snippets of about 1,000 tokens](/blog/context7-webcode/pipeline.png)
-
-1. **Understand.** A model reads the question and names the products it is about, like "Next.js" or "RFC 9110".
-2. **Pick the library.** Context7 matches those names against more than 100,000 libraries in its index.
-3. **Retrieve.** It searches those libraries for snippets that match the question, by meaning and by exact words.
-4. **Rerank.** A reranking model scores every snippet against the question, and only the best ones are returned.
-
-Because Context7 searches only official docs, and only the libraries the question is about, it can return a few precise snippets instead of many pages.
 
 ## What does a Context7 result look like?
 
