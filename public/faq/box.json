@@ -14,7 +14,7 @@
     },
     {
       "question": "What is included in storage billing?",
-      "answer": "Storage is billed at $0.1 per GB per month and includes all data on disk, including snapshots. Storage limits are 5 GB for Small, 10 GB for Medium, and 20 GB for Large."
+      "answer": "Storage is billed at $0.1 per GB per month and includes all data on disk, including snapshots. Storage limits are 10 GB for Small, 20 GB for Medium, and 30 GB for Large."
     },
     {
       "question": "What are the free tier limits?",

@@ -75,8 +75,8 @@ export default function FAQ() {
         <AccordionContent>
           <p className="mt-4">
             Storage is billed at <b>$0.1 per GB per month</b> and includes all
-            data on disk, including snapshots. Storage limits are <b>5 GB</b>{" "}
-            for Small, <b>10 GB</b> for Medium, and <b>20 GB</b> for Large.
+            data on disk, including snapshots. Storage limits are <b>10 GB</b>{" "}
+            for Small, <b>20 GB</b> for Medium, and <b>30 GB</b> for Large.
           </p>
         </AccordionContent>
       </AccordionItem>
