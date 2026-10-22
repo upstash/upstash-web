@@ -77,24 +77,6 @@ A search goes through four steps before the agent sees anything:
 
 Because Context7 searches only official docs, and only the libraries the question is about, it can return a few precise snippets instead of many pages.
 
-## What did we change to get here?
-
-When we first ran WebCode two weeks ago, Context7 found the answer for 44.6% of the questions. We looked at every miss, grouped the misses by cause, and fixed the causes, not the questions. Every change applies to every search, and all of them are live.
-
-![Context7 Search on WebCode RAG: 44.6% on Oct 7, 56.9% on Oct 12, 78.2% on Oct 15 and 87.1% on Oct 22, against 88.3% for Exa 3.0 Lite](/blog/context7-webcode/progress.png)
-
-**The question was about a standard, not a library.** A question like "what does HTTP status 308 mean" is answered by RFC 9110, not by a library. The first step used to name only libraries and frameworks, so these questions went to blog posts and third-party copies. It now also names specifications, standards and manuals, like "RFC 9110", "ECMA-262" or "GNU Make manual".
-
-**The answer was in a long page, but never returned.** Specs like CSS or HTML are often published as one very long page. We used to keep only one prose snippet per page, so most of a spec could never be returned. Now every section counts on its own. We also give more weight to rare, exact words like `avg_queue` or `HasCustomParsing`, and keep a result that contains the exact term from the question even when its score is low. In our tests, the snippet with the answer reached the top 10 for 90% of the questions, up from 83%.
-
-**The name in the question did not match the library's name.** People write "W3C File API", the spec is titled "File API". People write "Haskell base", and Context7 also has a library called "Base", for a blockchain. Context7 now:
-
-- ignores the publisher in front of a spec name, and treats "Level 3" or "5.42" as editions of the same document;
-- prefers a library that shows the language the question names, so "Haskell base" goes to the Haskell docs;
-- searches a product's other official docs when its main docs do not hold the answer, like the R Introduction manual for a question about R's command line.
-
-**The docs were missing.** For some questions Context7 had no copy of the official docs at all, like several GNU manuals and older W3C drafts. We added them, and they are now available to everyone.
-
 ## What does a Context7 result look like?
 
 Here's a WebCode question that Context7 answered in every run and Exa did not: which address does Prometheus pick for a Scaleway instance?
