@@ -75,19 +75,6 @@ export default function NewNavigation() {
         </NavigationMenu.Link>
       </NavigationMenu.Item>
 
-      <NavigationMenu.Item>
-        <NavigationMenu.Link
-          asChild
-          className={cx(
-            "flex select-none items-center gap-0.5 rounded-full px-3 py-2",
-            "text-text-mute hover:bg-white/5 hover:text-primary-text",
-            "kb" === segment ? "bg-bg-mute text-primary-text" : "",
-          )}
-        >
-          <Link href="/kb">Knowledge Base</Link>
-        </NavigationMenu.Link>
-      </NavigationMenu.Item>
-
       <ItemCompany />
     </NewNavigationRoot>
   );

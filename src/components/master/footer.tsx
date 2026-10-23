@@ -32,12 +32,6 @@ export default function Footer({ className, ...props }: IAppFooter) {
             >
               Contact Us
             </Link>
-            <Link href="/blog" className="hover:text-primary hover:underline">
-              Blog
-            </Link>
-            <Link href="/kb" className="hover:text-primary hover:underline">
-              Knowledge Base
-            </Link>
             <OutLink href="/trust/privacy.pdf">Privacy Policy</OutLink>
             <OutLink href="/trust/terms.pdf">Terms of Service</OutLink>
           </div>
