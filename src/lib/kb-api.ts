@@ -7,9 +7,7 @@ import { cache } from "react";
 // the moment an article is published, changed or taken down. Kept apart
 // from lib/kb so the edge image routes don't bundle the blog's posts.
 
-// ByDefault's staging deployment serves the production data; this moves to
-// www.bydefault.so once the API is there.
-const API_URL = "https://staging.bydefault.so";
+const API_URL = "https://www.bydefault.so";
 const API_KEY = process.env.BYDEFAULT_API_KEY;
 
 export const KB_TAG = "kb";
