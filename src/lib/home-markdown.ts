@@ -36,7 +36,7 @@ export function renderHome(): string {
     `- Create a free, temporary Redis database without signup: \`POST ${SITE_URL}/start-redis\` (send \`Idempotency-Key: <uuidv4>\` and a \`User-Agent\` naming your agent). \`GET\` the same URL for instructions.`,
     `- OpenAPI spec for the Upstash Developer API (authenticated; manage databases, teams and billing): ${SITE_URL}/docs/devops/developer-api/openapi.yaml`,
     `- LLM-friendly site index: ${SITE_URL}/llms.txt (full version: ${SITE_URL}/llms-full.txt)`,
-    `- MCP server for managing Upstash resources: \`npx @upstash/mcp-server\` — https://github.com/upstash/mcp-server`,
+    `- MCP server for managing Upstash resources (Redis, QStash, Workflow, Vector, Search, Box, Blob): \`https://mcp.upstash.com/mcp\`, a remote server you sign in to with OAuth or a Developer API key. Setup: ${SITE_URL}/docs/agent-resources/overview`,
     `- Account and database management API: ${SITE_URL}/docs/devops/developer-api`,
     "",
     "## Links",
