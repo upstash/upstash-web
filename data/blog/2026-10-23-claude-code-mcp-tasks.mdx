@@ -1,0 +1,196 @@
+---
+authors: [arda]
+slug: claude-code-mcp-tasks
+tags: [mcp, agents, ai, qstash]
+title: "MCP Tasks and Elicitations in Claude Code: Long-Running Tools That Can Ask You Things"
+---
+
+Claude Code supports MCP Tasks and MCP Elicitations. The former allows slow tools to return a task id and Claude Code continues working while the server runs the task. The latter allows a tool to pause and ask a question like "Deploy to staging?".
+
+[`@upstash/mcp-toolkit/tasks`](https://upstash.com/docs/redis/sdks/agentkit/mcp-tasks) is a simple way to add tasks to any MCP server, wherever it runs, serverless included. A serverless function can't continue working after sending a response, it has a timeout, and it can't share memory between invocations. Each task is stored in Upstash Redis and executed in a fresh invocation of a serverless function by QStash, which retries when it fails.
+
+## The announcement
+
+David Soria Parra, co-creator of MCP at Anthropic, announced that Claude Code supports MCP Tasks in his keynote at the [AGNTCon + MCPCon North America](https://technologyconference.com/agntcon-mcpcon-north-america-2026-agentic-ai-foundation-flagship-lands-in-san-jose-october-22-23/) conference in San Jose, CA, on October 22, 2026. Pamela Fox of Microsoft shared the news:
+
+![](https://cdn.bydefault.so/tweet-BU-zU5MdJTTbWPCVLghZq.png)
+
+Anthropic’s ClaudeDevs account announced a day later that Tasks and Elicitations are both available in the Claude Code CLI:
+
+![](https://cdn.bydefault.so/tweet-NOSlmZ9VXoMNRsuwj2Ed9.png)
+
+## Elicitations: a tool that asks the user
+
+Elicitation is a question posed by the MCP server to the user, presented as a small form in the terminal by Claude Code. Here is a `deploy` tool asking for confirmation before execution:
+
+![](https://cdn.bydefault.so/image-8rZ23LLGwFunz_SfSElPX.png)
+
+*An elicitation form in Claude Code*
+
+When the user provides their input, Claude Code will then repeat the tool call, this time providing the user's response in `inputResponses`. The server does not need to block on the initial request.
+
+## What MCP Tasks change in a tool call
+
+MCP Tasks shipped with the [2026-07-28 MCP release](https://blog.modelcontextprotocol.io/posts/2026-07-28/) as the [Tasks extension](https://modelcontextprotocol.io/extensions/tasks/overview), which lets servers return a task handle to a slow request. Clients then poll for the result. We explained the protocol in [MCP Tasks: answer now, finish later](https://upstash.com/blog/mcp-tasks-and-events#mcp-tasks-answer-now-finish-later).
+
+Both the client and the server have to support it. When they do, a slow tool answers right away with a task id. The client checks on the task until it's done, then gets the tool's normal result. The client can also cancel the task.
+
+![](https://cdn.bydefault.so/drawing-A353xsmQna1loXl12JYmh.png)
+
+For clients that don't support Tasks, it's just a normal blocking call. Claude Code also [moves a main-conversation MCP tool call that is still running after two minutes to the background](https://code.claude.com/docs/en/mcp). It does this without any change on the server side. The server still has to keep that request open, so it doesn't help with function time limits.
+
+Claude Code sent this tool call to the toolkit server shown in the next section. We cut `_meta` down to the protocol version and the client capabilities, where Claude Code declares the Tasks extension:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "tools/call",
+  "params": {
+    "name": "generate_report",
+    "arguments": { "topic": "Urban beekeeping" },
+    "_meta": {
+      "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+      "io.modelcontextprotocol/clientCapabilities": {
+        "roots": { "listChanged": true },
+        "elicitation": { "form": {}, "url": {} },
+        "extensions": {
+          "io.modelcontextprotocol/tasks": {}
+        }
+      }
+    }
+  }
+}
+```
+
+The server answered right away with a task:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "content": [],
+    "resultType": "task",
+    "taskId": "855bcb4f-6803-4132-8eb7-aa02265caf97",
+    "status": "working",
+    "statusMessage": "Queued",
+    "createdAt": "2026-10-23T20:23:19.471Z",
+    "lastUpdatedAt": "2026-10-23T20:23:19.471Z",
+    "ttlMs": 86400000,
+    "pollIntervalMs": 2000
+  }
+}
+```
+
+Claude Code then called `tasks/get` every 2 seconds until it returned `completed` with the report.
+
+In the terminal, Claude Code says the call is running as a task, keeps working, and quotes the result when the task completes:
+
+![](https://cdn.bydefault.so/image-NpVjbS1-DGI3D6cF3a4xB.png)
+
+*A tool call running as an MCP task in Claude Code*
+
+## Where MCP Tasks and Elicitations work today
+
+MCP Tasks is a public beta in the [Claude Code CLI from v2.1.304](https://code.claude.com/docs/en/mcp#mcp-tasks-for-server-authors). This feature works for interactive terminal sessions, Agent SDK sessions, and GitHub Actions runs. Some tool calls remain as plain tool calls:
+
+- calls from subagents
+- one-shot `claude -p` runs
+- the VS Code extension and the desktop app
+
+A question inside a task is only sent to you if you are in an interactive terminal session. Anthropic has stated that Tasks and Elicitations are [coming to more Claude products soon](https://x.com/ClaudeDevs/status/2113698007892070527). A server can detect whether a client supports Tasks because the client includes the Tasks extension in the capabilities sent along with each tool call.
+
+## Native MCP Tasks with @upstash/mcp-toolkit
+
+[`@upstash/mcp-toolkit/tasks`](https://upstash.com/docs/redis/sdks/agentkit/mcp-tasks) implements the task methods for you. This is a whole MCP server with one slow tool:
+
+```ts
+import { McpTasks } from "@upstash/mcp-toolkit/tasks";
+import { createMcpHandler } from "mcp-handler";
+import * as z from "zod";
+
+const tasks = new McpTasks({ principal: () => "local" });
+
+tasks.registerTask(
+  "generate_report",
+  {
+    description: "Writes a report on a topic.",
+    inputSchema: z.object({ topic: z.string() }),
+  },
+  async ({ topic }) => {
+    // the slow part
+    await new Promise((resolve) => setTimeout(resolve, 10_000));
+    const text = `A report on ${topic}.`;
+    return { content: [{ type: "text", text }] };
+  },
+);
+
+const handler = createMcpHandler((server) => tasks.attach(server));
+export { handler as GET, handler as POST };
+```
+
+The SDK works with any framework.
+
+The same tool handles each client the best way that client can:
+
+- A client that declares the MCP Tasks extension, like Claude Code, gets a native task and polls it by itself.
+- Any other client gets the task id in a normal tool result, plus `task_status` and `task_cancel` to check on the task or stop it.
+
+This server keeps its tasks in memory, so a task is gone when the process restarts. On serverless, the next `tasks/get` can also reach an instance that never saw the task. To fix both, pass a Redis store and a QStash dispatcher. The tasks and the MCP handler stay the same, and one more endpoint receives the work from [QStash](https://upstash.com/docs/qstash/overall/getstarted):
+
+```ts
+import { McpTasks } from "@upstash/mcp-toolkit/tasks";
+import { QStashDispatcher, RedisTaskStore } from "@upstash/mcp-toolkit/upstash";
+
+const tasks = new McpTasks({
+  store: new RedisTaskStore(),
+  dispatcher: new QStashDispatcher({
+    url: "https://your-app.com/api/execute",
+  }),
+  principal: () => "local",
+});
+
+// registerTask(...) and the MCP handler as above, then one more endpoint.
+// QStash delivers each task here: serve POST /api/execute with it.
+export const execute: (request: Request) => Promise<Response> =
+  tasks.createExecuteHandler();
+```
+
+One task is executed in one function invocation. This is because QStash calls the execute endpoint once for each task. If a task can take longer than one invocation, then `WorkflowDispatcher` runs each step on [Upstash Workflow](https://upstash.com/docs/workflow/getstarted) in its own function invocation.
+
+A task can also stop partway and ask the user a question with `task.elicit`. The answer is `accept` with the form's content, typed from the schema, or `decline` or `cancel`:
+
+```ts
+tasks.registerTask(
+  "publish_post",
+  {
+    description: "Publishes a post once the user approves it.",
+    inputSchema: z.object({ title: z.string() }),
+  },
+  async ({ title }, task) => {
+    const answer = await task.elicit({
+      message: `Publish "${title}" now?`,
+      requestedSchema: z.object({ publish: z.boolean() }),
+    });
+    if (answer.action === "accept" && answer.content.publish) {
+      return { content: [{ type: "text", text: "Published." }] };
+    }
+    return { content: [{ type: "text", text: "Not published." }] };
+  },
+);
+```
+
+While the task waits, Claude Code displays the question as a form in interactive sessions, and the task then continues based on the answer. This feature is compatible with both the in-memory default and the `WorkflowDispatcher`, which waits without occupying a function. In contrast, the `QStashDispatcher` executes a task in one invocation, so it cannot wait for an answer.
+
+## Retries and failures
+
+If the task handler throws, the execute endpoint returns an error, and [QStash retries delivery with backoff](https://upstash.com/docs/qstash/features/retry). For `WorkflowDispatcher`, only the failed step is re-run. We killed the app with `kill -9` while a task was in progress and then restarted the app. QStash re-delivered the task and it successfully ran to completion.
+
+If all retries fail, the task is marked as `failed` and stays that way until it expires. One possible extension, not implemented yet, is to allow resuming or restarting a failed task. Both QStash and Upstash Workflow keep failed deliveries in a dead letter queue, which makes this a natural fit. A message in the [QStash DLQ](https://upstash.com/docs/qstash/features/dlq) can be retried, and the [Workflow DLQ](https://upstash.com/docs/workflow/features/dlq) can resume a failed run from the failed step (`client.dlq.resume`) or restart it from the beginning (`client.dlq.restart`).
+
+## Conclusion
+
+MCP Tasks allows a tool to respond with a task id and Claude Code will poll the server until the task is complete. Elicitations allow tools to pause execution until the user responds, even from inside a task.
+
+`@upstash/mcp-toolkit/tasks` allows any MCP server to support tasks. We recommend starting with an in memory task manager using a single MCP endpoint. Later, you can upgrade to Upstash Redis and QStash if your server runs in serverless environment or if you have multiple instances. Claude Code gets native tasks, and any other client can use two tools to poll with a task id. See the [docs](https://upstash.com/docs/redis/sdks/agentkit/mcp-tasks) for details on full setup, and [upstash/agentkit](https://github.com/upstash/agentkit/tree/main/packages/mcp-toolkit) for the source.
