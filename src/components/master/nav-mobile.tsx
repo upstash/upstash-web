@@ -99,6 +99,10 @@ const NavItems: {
     href: "/blog",
   },
   {
+    name: "Knowledge Base",
+    href: "/kb",
+  },
+  {
     name: "About",
     href: "/about",
   },
