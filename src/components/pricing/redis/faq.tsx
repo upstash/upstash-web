@@ -218,8 +218,9 @@ export default function FAQ() {
         <AccordionTrigger>How many databases can I create?</AccordionTrigger>
         <AccordionContent>
           <p className="mt-4">
-            You can create up to 10 databases for free. Beyond that, you are
-            charged $0.5 per database up to 100 databases.
+            A free account can have 1 database. On a paid account, the first 10
+            databases have no per-database charge, and each additional database
+            costs $0.50 per month, up to 100 databases.
           </p>
           <p className="mt-4">
             For more than 100 databases, contact{" "}

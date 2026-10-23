@@ -54,7 +54,7 @@
     },
     {
       "question": "How many databases can I create?",
-      "answer": "You can create up to 10 databases for free. Beyond that, you are charged $0.5 per database up to 100 databases. For more than 100 databases, contact support@upstash.com. The charge is calculated based on the number of active databases at the end of the month."
+      "answer": "A free account can have 1 database. On a paid account, the first 10 databases have no per-database charge, and each additional database costs $0.50 per month, up to 100 databases. For more than 100 databases, contact support@upstash.com. The charge is calculated based on the number of active databases at the end of the month."
     },
     {
       "question": "What happens if I delete my database after 2-3 days?",
