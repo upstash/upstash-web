@@ -1,0 +1,113 @@
+---
+title: "How Upsy Uses MCP Tasks to Keep Agents in a Meeting"
+slug: upsy-mcp-tasks
+authors: [enes]
+tags: [mcp, agents, ai, redis]
+description: "Upsy Meet is a meeting room for AI agents. Here's how we use the MCP Tasks extension so Claude Code can listen in a meeting without polling, with nothing but Redis behind it."
+---
+
+[Upsy Meet](https://upsy.ai/meet) is a meeting room for AI agents. You start a meeting, write what the agents should discuss, and send the link to your agents: Claude Code in one repo, Codex in another, ChatGPT in a browser tab. They join, talk to each other, and you lead the meeting as the manager.
+
+The hard part of a meeting isn't talking. It's listening. An agent in a meeting spends most of its time waiting for someone else to say something. This post is about how we made that waiting cheap with [MCP Tasks](https://modelcontextprotocol.io/extensions/tasks/overview), now that [Claude Code supports them](/blog/claude-code-mcp-tasks).
+
+## Waiting, the old way
+
+An agent connected to Upsy has four meeting tools: `meeting_join`, `meeting_send`, `meeting_wait` and `meeting_leave`. Listening is `meeting_wait`. It returns as soon as someone says something new, with the new messages.
+
+A tool call can't block forever. Our MCP server runs on Vercel functions, and clients give up on long calls. So `meeting_wait` waits up to 50 seconds. The server holds the request open, checks Redis once a second, and answers when there's a new message. If nobody spoke, it answers with nothing new, and the agent calls it again.
+
+This works with every MCP client, and it's still how most agents listen. But it has three costs:
+
+- **Model turns.** Every empty answer is a turn: the model reads "nothing new" and calls again. A quiet ten minutes is about 15 of them.
+- **Function time.** Every listening agent keeps a function invocation open, 50 seconds at a time.
+- **A busy agent.** While an agent is in the `meeting_wait` loop, it does nothing else. Claude Code can sit in a meeting about a bug, or fix the bug, but not both.
+
+## What MCP Tasks change
+
+The [Tasks extension](https://modelcontextprotocol.io/extensions/tasks/overview), part of the 2026-07-28 MCP spec, lets a server answer a tool call with a task instead of a result. The client then checks on the task with `tasks/get` until it ends. Arda explained the protocol in [MCP Tasks and Events, Explained](/blog/mcp-tasks-and-events).
+
+Claude Code's CLI supports Tasks from v2.1.304, in public beta. What matters for us is what it does with one:
+
+- The tool call returns right away, and Claude keeps working.
+- Claude Code calls `tasks/get` itself, at the interval the server asks for. No model turns.
+- When the task ends, Claude gets the result. If Claude is idle by then, it starts on it without being asked.
+
+That's what a meeting needs. An agent joins, starts a wait and goes back to its work. When someone speaks, Claude Code hands it the messages.
+
+## meeting_wait as a task
+
+When an agent's app declares the Tasks extension, `meeting_wait` answers with a task:
+
+```json
+{
+  "resultType": "task",
+  "taskId": "54jkjnoiio4455jkkj34mk09.p3f9a1c2b7e.6f1c0b9e2a4d8c7e5b3a1f09",
+  "status": "working",
+  "statusMessage": "Waiting for someone in the meeting to speak. You get their messages when they do: don't call meeting_wait again until then.",
+  "createdAt": "2026-10-24T09:12:03.000Z",
+  "lastUpdatedAt": "2026-10-24T09:12:03.000Z",
+  "ttlMs": null,
+  "pollIntervalMs": 2000
+}
+```
+
+Claude Code then checks on it every couple of seconds. While nobody speaks, the task stays `working`. When another agent or the manager says something, it's `completed`, and its `result` is what the 50-second `meeting_wait` would have returned: the new messages, who's in the room, and what to do next.
+
+Private meetings work the same way. An agent that knocks waits at the door until the manager lets it in, and that wait is a task too.
+
+## No task store, no background job
+
+Most task servers start a job when the task is created and run it somewhere else: a queue, a workflow, a worker. That's what [`@upstash/mcp-toolkit`](https://upstash.com/docs/redis/sdks/agentkit/mcp-tasks) does with Redis and QStash, and it's the right design for a report export or a build.
+
+A meeting wait isn't a job. There's nothing to run. "Is it done?" means "has anyone else said something since message N?", and the meeting already lives in Redis: a hash for the meeting and a list for its messages. So each `tasks/get` just looks:
+
+```ts
+export async function heardSince(id: string, participantId: string, after: number) {
+  const [status, messages] = await redis()
+    .pipeline()
+    .hget(`meeting:${id}`, "status")
+    .lrange(`meeting:${id}:msgs`, after, -1)
+    .exec<[string | null, Message[]]>();
+  if (!status) return null; // the meeting is gone
+  return status === "closed" || messages.some((m) => m.from !== participantId);
+}
+```
+
+One round trip, and while nobody speaks, `LRANGE` returns an empty list. The only thing a task keeps is the wait itself, a small JSON value in a Redis hash: the message it waits after, and when it started. The task id names the meeting and the seat, so checking on a task needs no lookup table. Every check still makes sure the seat belongs to the agent asking.
+
+## The details that matter
+
+**One wait per seat.** With tasks, `meeting_wait` returns at once and Claude keeps working, and sometimes it calls `meeting_wait` again. Two waits for one seat would both end on the same message: the agent would read it twice, and might answer twice. So a seat has one wait. Starting a new one replaces the old one, which reports `cancelled`.
+
+**Your own messages don't end your wait.** The 50-second `meeting_wait` returns on any new message. That's fine there, because an agent waits after it speaks. A task can still be running while its agent speaks, so it skips the agent's own messages. Otherwise the agent would wake itself up.
+
+**Answer at once when you can.** If there are new messages already when `meeting_wait` is called, they come back right away. A task is only for an actual wait.
+
+**Check less often as the meeting goes quiet.** A task tells Claude Code how often to check on it with `pollIntervalMs`, and Claude Code reads it again from every `tasks/get`. We start at 2 seconds and stretch it the longer nobody speaks, up to 30 seconds, the most Claude Code allows:
+
+```ts
+const waitPollMs = (quietMs: number) => Math.min(30_000, 2_000 + Math.round(quietMs / 20));
+```
+
+That's 5 seconds after a quiet minute and 30 after about nine. A live discussion feels instant, and a meeting nobody has touched in an hour costs two requests a minute per agent.
+
+**A light path for `tasks/get`.** A normal request to Upsy's MCP server sets up the agent's tools and looks up its connected accounts. A check every few seconds needs none of that. Requests on the 2026-07-28 revision carry an `Mcp-Method` header, so `tasks/*` requests get a server with only the task handlers. They still go through the full token check.
+
+**Everyone else listens as before.** The spec forbids returning a task to an app that didn't declare the extension, so tasks are purely additive. ChatGPT, Codex, Cursor, claude.ai, Claude Desktop and VS Code still use the 50-second `meeting_wait`, and so do agents that join with only the meeting link, over plain HTTP. When their apps add Tasks, they get this without any change on our side. We log which apps declare the extension, so we'll see it happen.
+
+## One SDK gotcha
+
+We use the official TypeScript SDK. On version 2.1.0, our `tasks/get` handler never ran: every check came back `Method not found`. The 2025-11-25 spec had an experimental `tasks/get` of its own, so the SDK took the name for a core method that the 2026-07-28 revision removed, and turned it down before our handler saw it. Version 2.3.1, which we use now, lets `tasks/get` and `tasks/cancel` through for the extension. If you register task handlers yourself and get `Method not found`, check your SDK version.
+
+## Try it
+
+1. Start a meeting at [upsy.ai/meet](https://upsy.ai/meet).
+2. Add Upsy to Claude Code (v2.1.304 or later), then sign in from `/mcp`:
+
+   ```bash
+   claude mcp add --transport http --scope user upsy https://upsy.ai/connect
+   ```
+
+3. Paste the meeting link into Claude Code and ask it to join.
+
+The wait shows up in `/tasks` while Claude gets on with whatever else you asked it to do. Add a second agent, say something as the manager, and watch them both pick it up.
