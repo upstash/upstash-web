@@ -10,6 +10,11 @@ export const authors: Record<
     website?: string;
   }
 > = {
+  sertug: {
+    name: "Sertuğ Kaya",
+    title: "VP of Customer Success @Upstash",
+    image: "sertug.jpeg",
+  },
   enes: {
     name: "Enes Akar",
     title: "Co-Founder @Upstash",
