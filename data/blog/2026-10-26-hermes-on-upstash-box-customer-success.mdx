@@ -10,7 +10,7 @@ Grok Bot became a lot of people's go-to assistant for a simple reason: it's righ
 
 That's what I run now. Hermes, the open-source agent from Nous Research, lives on an always-on Upstash Box. I talk to it on Telegram from my phone and through Hermes Desktop at my desk, and both reach the same Hermes with the same memory. Upsy connects it to my work apps. This post is about that setup, and Hermes helped write it.
 
-<Note type="info">[Visual 1: architecture diagram] Phone (Telegram) and laptop (Hermes Desktop) → Hermes on an always-on Box → Upsy → Gmail, Slack, Calendar, Drive, support tools. Side branches: throwaway task Boxes, and Upsy Meet with agents on my laptop. (visual coming)</Note>
+![Phone (Telegram) and laptop (Hermes Desktop) reach Hermes on an always-on Upstash Box, which connects to my apps through Upsy, spins up throwaway Boxes and asks agents on my laptop for help through Upsy Meet](/blog/hermes-on-upstash-box-customer-success/architecture.png)
 
 ## Two ways in: Telegram and Hermes Desktop
 
@@ -20,7 +20,7 @@ At my desk I use Hermes Desktop for longer work: reviewing drafts, reading the f
 
 ## Why I needed this
 
-I come from a technical background. Today I run Customer Success at Upstash, a lean startup. In practice that means one person covering what larger companies give to several teams: watching a large customer base, preparing for customer calls, catching upgrade and churn signals early, following up on support and writing a lot of email.
+I come from a technical background. Today I run Customer Success at Upstash, and we're a lean startup. In practice that means one person covering what larger companies give to several teams: watching a large customer base, preparing for customer calls, catching upgrade and churn signals early, following up on support and writing a lot of email.
 
 There was no realistic version of this job where I did all of it by hand. So I did what an engineer does with a problem that doesn't fit in the hours available: I automated the routine parts and kept the judgment for myself.
 
@@ -51,7 +51,7 @@ When the job needs code, it writes code. When one important customer's usage qui
 
 The rules matter as much as the skills. Hermes drafts; I send. It never emails a customer, changes a plan or touches billing without my approval. It separates what it observed from what it thinks it means, and it tells me when it isn't sure.
 
-<Note type="info">[Visual 2: Telegram screenshot] A morning brief on my phone, redacted. (visual coming)</Note>
+![A morning brief from Hermes on Telegram, customer names blurred](/blog/hermes-on-upstash-box-customer-success/telegram-brief.png)
 
 ## Why not just run it on my laptop?
 
@@ -77,16 +77,13 @@ Two things changed how I think about "an assistant." Both already work today.
 
 **Hermes calls in my laptop agents.** Some things only my laptop can reach. Through Upsy Meet, Hermes can call the agents on my laptop whenever it needs them.
 
-<Note type="info">[Visual 3: Upsy Meet screenshot] Manager, Hermes and Codex in one room, customer name blurred. (visual coming)</Note>
+![Me, Hermes and Codex in one Upsy Meet room](/blog/hermes-on-upstash-box-customer-success/upsy-meet.png)
 
 **Hermes spawns throwaway Boxes for heavy work.** The Box Hermes lives on stays small and boring on purpose. When there's real work to do, like building a tool, testing a change in a repository or running a one-off heavy job, Hermes creates a fresh Box for that task through the Upstash MCP server, does the work there and deletes it afterwards. My always-on assistant never carries a big repository or a messy experiment, and nothing from one task leaks into the next.
 
 ## What I'm trying next
 
 **A marketing bot.** The next thing on the Box is a second Bot in the same Hermes, with its own Telegram chat, memory and skills. Once a week it reads our changes, then sends me proposed posts with an image. I pick, edit and post.
-
-<Note type="info">[Visual: a proposed LinkedIn post arriving on Telegram] (visual coming)</Note>
-
 
 ## How I set it up
 
@@ -107,7 +104,7 @@ hermes mcp add upsy --url https://upsy.ai/connect
 
 Then sign in when Hermes asks. On a Box there is no browser on your screen, so complete the sign-in in your own browser and paste the callback back into the Box terminal.
 
-<Note type="info">[Screenshot: Upsy app list] (visual coming)</Note>
+![Adding apps in Upsy](/blog/hermes-on-upstash-box-customer-success/upsy-apps.png)
 
 **3. Give Hermes the Upstash MCP server, for throwaway Boxes.**
 
@@ -122,8 +119,6 @@ Sign it into an Upstash account with no production resources. The grant covers e
 ```bash
 hermes cron create "0 9 * * *" "Brief me on today's meetings and anything in my inbox that needs me." --name "Morning brief" --deliver telegram
 ```
-
-<Note type="info">[Screenshot: the first brief arriving on Telegram] (visual coming)</Note>
 
 **5. Write down the house rules.** Tell Hermes once what it may do on its own and what needs your approval ("draft emails, never send them," "never change billing"). It remembers across sessions, and that list is what makes it safe to give it real access.
 
