@@ -50,7 +50,7 @@ export default function FAQ() {
         <AccordionContent>
           Yes, we can provide free trials for Pro and Enterprise plans for
           testing and PoC purposes. Email us at{" "}
-          <a href="support@upstash.com">support@upstash.com</a>
+          <a href="mailto:support@upstash.com">support@upstash.com</a>
         </AccordionContent>
       </AccordionItem>
 
@@ -69,7 +69,7 @@ export default function FAQ() {
             GB for all the usage throughout the month. For use cases with high
             volume, you may consider VPC Peering which minimizes the data
             transfer cost. Contact us at{" "}
-            <a href="support@upstash.com">support@upstash.com</a> for details.
+            <a href="mailto:support@upstash.com">support@upstash.com</a> for details.
           </p>
           <p>
             Price can change depending on cloud provider's fee for the incoming
