@@ -6,11 +6,17 @@ tags: [box, agents, ai, mcp]
 description: "How I run Customer Success at a lean startup with Hermes, the open-source agent from Nous Research, living on an always-on Upstash Box and connected to my work apps through Upsy."
 ---
 
-A few weeks ago Ali [gave Grok Bot a remote computer](/blog/i-gave-grok-bot-a-remote-computer). He connected it to an Upstash Box, asked for a snake game and got a live URL back. It's a great demo, and it made me realize I had been doing something bigger with the same building blocks.
+Grok Bot became a lot of people's go-to assistant for a simple reason: it's right there on your phone and on your desktop, with the same conversation in both. I wanted that for my work, plus an assistant that can do the job itself: read my inbox, prepare my customer calls and keep working while my laptop sleeps.
 
-I didn't give my assistant a computer for an afternoon. I gave it a job, a desk that never closes and a set of house rules. This post is about that setup: Hermes, the open-source agent from Nous Research, running on an Upstash Box and connected to my work apps through Upsy. Hermes helped write it.
+That's what I run now. Hermes, the open-source agent from Nous Research, lives on an always-on Upstash Box. I talk to it on Telegram from my phone and through Hermes Desktop at my desk, and both reach the same Hermes with the same memory. Upsy connects it to my work apps. This post is about that setup, and Hermes helped write it.
 
 <Note type="info">[Visual 1: architecture diagram] Phone (Telegram) and laptop (Hermes Desktop) → Hermes on an always-on Box → Upsy → Gmail, Slack, Calendar, Drive, support tools. Side branches: throwaway task Boxes, and Upsy Meet with agents on my laptop. (visual coming)</Note>
+
+## Two ways in: Telegram and Hermes Desktop
+
+On my phone I use Telegram for quick things: "what's on today," "draft a reply to this," "remember this idea." Most of the planning for this post started there.
+
+At my desk I use Hermes Desktop for longer work: reviewing drafts, reading the files Hermes produced, working through the board. Both talk to the same Hermes on the same Box, so a conversation can start on my phone and continue on my laptop.
 
 ## Why I needed this
 
@@ -57,12 +63,6 @@ So Hermes moved to an Upstash Box: a sandboxed Linux machine that stays on and k
 
 On the first morning after the move, the brief came on schedule, and Hermes had a customer call prepped before I opened my laptop.
 
-## Two ways in: Telegram and Hermes Desktop
-
-On my phone I use Telegram for quick things: "what's on today," "draft a reply to this," "remember this idea." Most of the planning for this post started there.
-
-At my desk I use Hermes Desktop for longer work: reviewing drafts, reading the files Hermes produced, working through the board. Both talk to the same Hermes on the same Box, so a conversation can start on my phone and continue on my laptop.
-
 ## One connection to every app: Upsy
 
 An assistant is only as useful as what it can reach. Mine needs Gmail, Slack, Google Calendar, Drive, Docs and our support tools.
@@ -97,7 +97,7 @@ I followed the existing guides for the basics, so I won't repeat them:
 
 These are the steps those guides don't cover.
 
-**1. Pick a size that fits the job.** Over its first ten days my Box used about 3.3 CPU hours in total, and Hermes plus everything around it needs well under 1 GB of memory at rest. A Small Box ($8/month, 2 vCPU, 4 GB) can run an assistant like mine. If you plan to code on the same Box, Medium ($16/month) gives you headroom. With throwaway Boxes for heavy work, you rarely need more.
+**1. Pick a size that fits the job.** Over its first ten days my Box used about 3.3 CPU hours in total, and Hermes plus everything around it needs well under 1 GB of memory at rest. A Small Box ($8/month, 2 vCPU, 4 GB) works for an assistant like mine. I'd still pick Medium ($16/month) as a safe buffer for growth: more skills, more scheduled jobs, more files, or coding on the same Box. With throwaway Boxes for heavy work, you rarely need more.
 
 **2. Connect Upsy.** One command adds every connected app:
 
@@ -129,7 +129,7 @@ hermes cron create "0 9 * * *" "Brief me on today's meetings and anything in my 
 
 ## So, better than Grok Bot?
 
-Ali's post shows how quickly an assistant becomes useful once it has a real machine. Mine shows what happens when you keep going: the machine stays on, the assistant gets your apps, a schedule, house rules, other agents to ask for help and throwaway machines for heavy work. At that point it's doing a job instead of a task.
+Grok Bot won people over by being one tap away on every device. Hermes on a Box gives me that, then keeps going: the machine stays on, and the assistant gets my apps, a schedule, house rules, other agents to ask for help and throwaway machines for heavy work. At that point it's doing a job, not answering questions.
 
 None of it needed anything exotic: a Box, Upsy, a good open-source agent and a few months of teaching it how I like to work. That last part never really ends, and that's the point of an agent that grows with you.
 
