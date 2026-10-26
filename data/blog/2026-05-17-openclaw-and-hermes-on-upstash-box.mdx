@@ -35,7 +35,7 @@ There's also the matter of security. OpenClaw manages your LLM provider API keys
 
 A cloud VM is the obvious alternative and it does solve the persistence problem, but it comes with its own overhead.
 
-You pay for the server around the clock whether OpenClaw is handling requests or Hermes is idle. You manage the machine yourself, updates, security, disk space, all of it. Hermes needs a larger instance to run well which means you're overpaying whenever it's not actively doing anything.
+You pay for the server around the clock whether OpenClaw is handling requests or Hermes is idle. You manage the machine yourself, updates, security, disk space, all of it. You're paying for the full instance even when it's not actively doing anything.
 
 For tools you just want running, that overhead adds up fast.
 
@@ -57,7 +57,7 @@ You can also use the box to run bots on top of OpenClaw. Because the box stays o
 
 ### Hermes
 
-Hermes needs more resources. The install process alone pulls substantial dependencies and the agent needs real compute to run without slowing down. Box lets you pick the right size, we recommend Medium (4 CPU, 8 GB RAM), so it has the headroom it needs.
+Hermes has a bigger install, since it pulls substantial dependencies. The Small size (2 vCPU, 4 GB RAM, 10 GB disk) is enough to run it, and a keep-alive Small box is a flat $8 a month.
 
 You install Hermes once and it stays. The next time you connect, everything is exactly where you left it. The box holds its state between sessions until you decide to delete it.
 
