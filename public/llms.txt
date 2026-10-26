@@ -29,6 +29,10 @@ This site has a search endpoint: https://context7.com/api/v2/ask?siteKey=ask_4cf
 - Reusable agent skills for each SDK: `npx skills add https://github.com/upstash/skills`
 - Programmatic account and database management (authenticated): Developer API — https://upstash.com/docs/devops/developer-api
 
+## Guides (Knowledge Base)
+
+Vendor-neutral guides, comparisons and how-tos from the Upstash team (caching, Redis, queues, object storage, AI agent sandboxes): https://upstash.com/kb. Articles are grouped by topic at https://upstash.com/kb/topics/<topic>. Longer tutorials and announcements are on the blog: https://upstash.com/blog (markdown: https://upstash.com/blog.md).
+
 ## Pricing & Limits
 
 - [Redis Pricing](https://upstash.com/pricing/redis): Free, Pay-as-you-go ($0.20/100K commands), Fixed tiers ($10–$1500/month), Enterprise
