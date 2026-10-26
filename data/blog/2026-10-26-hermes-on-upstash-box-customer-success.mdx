@@ -8,13 +8,13 @@ description: "How I run Customer Success at a lean startup with Hermes, the open
 
 Grok Bot became a lot of people's go-to assistant for a simple reason: it's right there on your phone and on your desktop, with the same conversation in both. I wanted that for my work, plus an assistant that can do the job itself: read my inbox, prepare my customer calls and keep working while my laptop sleeps.
 
-That's what I run now. Hermes, the open-source agent from Nous Research, lives on an always-on Upstash Box. I talk to it on Telegram from my phone and through Hermes Desktop at my desk, and both reach the same Hermes with the same memory. Upsy connects it to my work apps. This post is about that setup, and Hermes helped write it.
+That's what I run now. Hermes, the open-source agent from Nous Research, lives on an always-on Upstash Box. I talk to it in Slack on my phone and through Hermes Desktop at my desk, and both reach the same Hermes with the same memory. Upsy connects it to my work apps. This post is about that setup, and Hermes helped write it.
 
-![Phone (Telegram) and laptop (Hermes Desktop) reach Hermes on an always-on Upstash Box, which connects to my apps through Upsy, spins up throwaway Boxes and asks agents on my laptop for help through Upsy Meet](/blog/hermes-on-upstash-box-customer-success/architecture.png)
+![Phone (Slack) and laptop (Hermes Desktop) reach Hermes on an always-on Upstash Box, which connects to my apps through Upsy, spins up throwaway Boxes and asks agents on my laptop for help through Upsy Meet](/blog/hermes-on-upstash-box-customer-success/architecture.png)
 
-## Two ways in: Telegram and Hermes Desktop
+## Two ways in: Slack and Hermes Desktop
 
-On my phone I use Telegram for quick things: "what's on today," "draft a reply to this," "remember this idea." Most of the planning for this post started there.
+On my phone I use Slack for quick things: "what's on today," "draft a reply to this," "remember this idea." Most of the planning for this post started there.
 
 At my desk I use Hermes Desktop for longer work: reviewing drafts, reading the files Hermes produced, working through the board. Both talk to the same Hermes on the same Box, so a conversation can start on my phone and continue on my laptop.
 
@@ -51,7 +51,7 @@ When the job needs code, it writes code. When one important customer's usage qui
 
 The rules matter as much as the skills. Hermes drafts; I send. It never emails a customer, changes a plan or touches billing without my approval. It separates what it observed from what it thinks it means, and it tells me when it isn't sure.
 
-![A morning brief from Hermes on Telegram, customer names blurred](/blog/hermes-on-upstash-box-customer-success/telegram-brief.png)
+![The morning brief in Slack, my replies and Hermes's drafts. Customer names blurred.](/blog/hermes-on-upstash-box-customer-success/slack-brief.png)
 
 ## Why not just run it on my laptop?
 
@@ -59,7 +59,7 @@ I started that way. It worked until my laptop went to sleep.
 
 An assistant that only works while the lid is open isn't much of an assistant. The morning brief came late or not at all, and meeting prep got skipped.
 
-So Hermes moved to an Upstash Box: a sandboxed Linux machine that stays on and keeps its files. Everything that has to happen on time runs there: scheduled jobs, the Telegram bot I talk to from my phone, and the board. My Mac only runs the Hermes desktop app, which connects to the Box. I can close the lid or get on a plane, and the 9:00 brief still arrives.
+So Hermes moved to an Upstash Box: a sandboxed Linux machine that stays on and keeps its files. Everything that has to happen on time runs there: scheduled jobs, the Slack bot I talk to from my phone, and the board. My Mac only runs the Hermes desktop app, which connects to the Box. I can close the lid or get on a plane, and the 9:00 brief still arrives.
 
 On the first morning after the move, the brief came on schedule, and Hermes had a customer call prepped before I opened my laptop.
 
@@ -83,14 +83,15 @@ Two things changed how I think about "an assistant." Both already work today.
 
 ## What I'm trying next
 
-**A marketing bot.** The next thing on the Box is a second Bot in the same Hermes, with its own Telegram chat, memory and skills. Once a week it reads our changes, then sends me proposed posts with an image. I pick, edit and post.
+**A marketing bot.** The next thing on the Box is a second Bot in the same Hermes, with its own Slack DM, memory and skills. Once a week it reads our changes, then sends me proposed posts with an image. I pick, edit and post.
 
 ## How I set it up
 
 I followed the existing guides for the basics, so I won't repeat them:
 
 - [Host Hermes Agent in a Box and connect from Hermes Desktop](https://upstash.com/docs/box/guides/hermes-setup): create a keep-alive Box, install Hermes, connect the desktop app over SSH.
-- [Setting up a personal assistant in your messaging apps](/blog/personal-assistant-in-messaging-apps-hermes-upstash-box): Telegram, WhatsApp and the gateway init script.
+- [Setting up a personal assistant in your messaging apps](/blog/personal-assistant-in-messaging-apps-hermes-upstash-box): running the Hermes messaging gateway on a Box, with its init script.
+- [Connect Hermes to Slack](https://hermes-agent.nousresearch.com/docs/user-guide/messaging/slack): Hermes runs as a Slack app in Socket Mode, so the Box doesn't need a public URL.
 
 These are the steps those guides don't cover.
 
@@ -117,8 +118,10 @@ Sign it into an Upstash account with no production resources. The grant covers e
 **4. Schedule your first brief.**
 
 ```bash
-hermes cron create "0 9 * * *" "Brief me on today's meetings and anything in my inbox that needs me." --name "Morning brief" --deliver telegram
+hermes cron create "0 9 * * *" "Brief me on today's meetings and anything in my inbox that needs me." --name "Morning brief" --deliver slack:<your-member-id>
 ```
+
+Use your Slack member ID to get the brief as a DM.
 
 **5. Write down the house rules.** Tell Hermes once what it may do on its own and what needs your approval ("draft emails, never send them," "never change billing"). It remembers across sessions, and that list is what makes it safe to give it real access.
 
