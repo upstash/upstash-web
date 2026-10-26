@@ -14,7 +14,6 @@ import {
   type KbArticle,
 } from "@/lib/kb";
 import { SITE_URL } from "@/utils/const";
-import { allPosts } from "@content";
 import {
   generateBlogSchema,
   generateBreadcrumbSchema,
@@ -88,7 +87,7 @@ export default async function KbArticlePage(props: Props) {
       }
     : null;
 
-  // Six more from the same topic, topped up with the latest.
+  // Three more from the same topic, topped up with the latest.
   const articles = await getKbArticles();
   const sameTopic = articles.filter(
     (other) => article.topic && other.topic?.id === article.topic.id,
@@ -99,17 +98,7 @@ export default async function KbArticlePage(props: Props) {
         other.id !== article.id &&
         all.findIndex((o) => o.id === other.id) === i,
     )
-    .slice(0, 6);
-  const blogPosts = topic
-    ? allPosts
-        .filter(
-          (post) =>
-            !post.draft &&
-            post.tags?.some((tag) => tag.toLowerCase() === topic.slug),
-        )
-        .sort((a, b) => b.date.localeCompare(a.date))
-        .slice(0, 3)
-    : [];
+    .slice(0, 3);
   const moreTitle =
     topic && more.every((other) => other.topic?.id === article.topic?.id)
       ? `More on ${topic.name}`
@@ -219,36 +208,6 @@ export default async function KbArticlePage(props: Props) {
             <div className="mt-8">
               <KbGrid articles={more} />
             </div>
-          </Container>
-        </section>
-      )}
-
-      {topic && blogPosts.length > 0 && (
-        <section className="mt-16">
-          <Container>
-            <div className="flex items-baseline justify-between gap-6">
-              <h2 className="font-display text-2xl font-semibold md:text-3xl">
-                {topic.name} on the blog
-              </h2>
-              <Link
-                href={`/blog/tag/${topic.slug}`}
-                className="shrink-0 font-medium text-primary-text hover:underline"
-              >
-                View all
-              </Link>
-            </div>
-            <ul className="mt-8 grid gap-4 md:grid-cols-3 md:gap-8">
-              {blogPosts.map((post) => (
-                <li key={post.slug}>
-                  <Link
-                    href={`/blog/${post.slug}`}
-                    className="block h-full rounded-xl bg-black/5 p-6 font-display text-xl font-medium transition hover:text-primary hover:underline dark:bg-white/5"
-                  >
-                    {post.title}
-                  </Link>
-                </li>
-              ))}
-            </ul>
           </Container>
         </section>
       )}
