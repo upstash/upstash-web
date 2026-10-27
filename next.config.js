@@ -92,20 +92,31 @@ const nextConfig = {
         ],
       },
       {
-        // Advertise the LLM-friendly index, the Context7 Ask search (same
-        // endpoint as src/lib/context7-ask.ts) and the API descriptions on every page
+        // Advertise the LLM-friendly index, the AI Catalog (MCP server card and
+        // skill), the Context7 Ask search (same endpoint as
+        // src/lib/context7-ask.ts) and the API descriptions on every page
         source: "/(.*)",
         headers: [
           {
             key: "Link",
             value: [
               '<https://upstash.com/llms.txt>; rel="alternate"; type="text/plain"; title="LLM-friendly content index"',
+              '<https://upstash.com/.well-known/ai-catalog.json>; rel="ai-catalog"; type="application/ai-catalog+json"',
               '<https://context7.com/api/v2/ask?siteKey=ask_4cf2adc7846aa874f833b068>; rel="search"; type="text/plain"; title="Search upstash.com"',
               '<https://upstash.com/docs/devops/developer-api/openapi.yaml>; rel="service-desc"; type="application/openapi+yaml"; title="Upstash Developer API (OpenAPI)"',
               '<https://upstash.com/docs/qstash/openapi.yaml>; rel="service-desc"; type="application/openapi+yaml"; title="QStash REST API (OpenAPI)"',
               '<https://upstash.com/docs/workflow/openapi.yaml>; rel="service-desc"; type="application/openapi+yaml"; title="Upstash Workflow REST API (OpenAPI)"',
             ].join(", "),
           },
+        ],
+      },
+      {
+        // AI Catalog (Linux Foundation Agent Card WG spec): its own media
+        // type, and readable from browser-based agents on other origins.
+        source: "/.well-known/ai-catalog.json",
+        headers: [
+          { key: "Content-Type", value: "application/ai-catalog+json" },
+          { key: "Access-Control-Allow-Origin", value: "*" },
         ],
       },
       {
