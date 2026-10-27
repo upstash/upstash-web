@@ -21,7 +21,7 @@ We build Context7, so this post first explains how the benchmark works and how w
 1. Each question comes from a detail buried deep in a long documentation page, like a default value in the HAProxy manual or a rule in an RFC. Exa kept only questions that two frontier models could not answer from memory.
 2. The search tool gets the question and returns its results.
 3. An answer model writes an answer from those results, and only from them.
-4. A judge model compares that answer with the expected one: it is correct, wrong, or not attempted (the model said it did not know).
+4. A judge model compares that answer with the expected one. The answer is **correct** if it matches, **wrong** if the model gave an answer that does not match, and **"I don't know"** if the model said the results did not contain the answer.
 
 ![How WebCode scores a search: the search tool returns results, an answer model (DeepSeek V4.1 Flash) answers from them, and a judge (Claude Opus 5.5) marks the answer correct, wrong or "I don't know"](/blog/context7-webcode/scoring.png)
 
@@ -36,7 +36,7 @@ We ran Exa's open-source WebCode harness with one addition, a search adapter tha
 - the same answer model, **DeepSeek V4.1 Flash**, and the same judge model, **Claude Opus 5.5**;
 - three runs per setup, against production, between October 19 and 26, 2026.
 
-For Exa we used its search with highlights, which Exa recommends for agents. For Context7 we called the public Search API with the question as the only input, no library or version hints.
+For Exa we turned on highlights for both search types, Lite and Auto, as Exa recommends for agents. For Context7 we called the public Search API with the question as the only input, no library or version hints.
 
 The judge grades the answer without seeing the search results. In a separate step it reads the search results and marks which of them contain the expected answer; that is how we count the share of useful results below.
 
@@ -54,7 +54,7 @@ Both return 10 web pages per search. With highlights turned on, each page comes 
 On the 307 questions:
 
 - **Correct answers.** About the same: 85.7% with Context7's results, 86.2% with Exa's (Lite and Auto). The runs overlap: Context7 scored between 84.7% and 86.6%, Exa Lite between 85.7% and 86.6%.
-- **Wrong answers.** This is where the two differ most. With Exa's results, the model gave a wrong answer three times as often: 7.3% of the time with Lite and 8.0% with Auto, against 2.3% with Context7. Over the 307 questions, that is about 22 wrong answers with Exa Lite, against 7 with Context7.
+- **Wrong answers.** These are answers the model gave that did not match the expected one; an "I don't know" is not counted as wrong. This is where the two differ most. With Exa's results, the model gave a wrong answer three times as often: 7.3% of the time with Lite and 8.0% with Auto, against 2.3% with Context7. Over the 307 questions, that is about 22 wrong answers with Exa Lite, against 7 with Context7.
 - **Size.** A Context7 response was about 1,050 tokens. Exa's were about 5,000.
 - **Less to read.** About half of Context7's results contained the answer. For Exa, about a third did.
 - **Speed.** Exa is faster: a search took about 0.6 seconds with Lite and 1.3 seconds with Auto, against about 3.7 seconds for Context7.
@@ -77,8 +77,8 @@ With the same answer model, Context7's results led to a third of the wrong answe
 
 A Context7 response is about a fifth as long as an Exa response, and a larger share of it contains the answer: about half of Context7's results did, against about a third of Exa's. With Exa, the model more often has to pick one fact out of many similar ones, and sometimes it picks the wrong one:
 
-- **When the results contained the answer**, the model got it right 98.0% of the time with Context7, and 94.6% with Exa Lite.
-- **When they did not**, the model usually said so with Context7: it declined to answer 89.8% of the time, against 65.5% with Exa Lite, where it more often guessed. For a coding agent, "I don't know" is a cue to search again; a wrong answer ends up in the code.
+- **When the results contained the answer**, the model got it right 98.0% of the time with Context7, 94.6% with Exa Lite and 94.7% with Exa Auto.
+- **When they did not**, the model usually said so with Context7: it declined to answer 89.8% of the time, against 65.5% with Exa Lite and 58.1% with Exa Auto, where it more often guessed. For a coding agent, "I don't know" is a cue to search again; a wrong answer ends up in the code.
 
 Every setup used the same answer model and judge, so these differences come from the search results, not from the models.
 
