@@ -13,6 +13,8 @@ export const AnnouncementBanner = () => {
   return (
     <a
       href="/trust/privacy.pdf"
+      target="_blank"
+      rel="noopener noreferrer"
       className="group flex h-9 w-full items-center justify-center gap-1.5 border-b border-emerald-500/20 bg-emerald-50 px-4 text-[13px] leading-none text-emerald-950 transition-colors hover:bg-emerald-100 md:text-sm dark:bg-[#01110d] dark:text-emerald-100 dark:hover:bg-emerald-950"
     >
       <span className="shrink-0 font-medium">Update:</span>
