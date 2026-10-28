@@ -1,0 +1,63 @@
+---
+authors: [arda]
+slug: step-level-flow-control-and-retries-in-upstash-workflow
+tags: [workflow, qstash]
+title: Step-level flow control and retries in Upstash Workflow
+description: Upstash Workflow now lets you set flow control and retries on a single step with the third argument of context.run, instead of applying them to the whole run.
+---
+
+A workflow run has the same flow control and retry options for each step. For example, if you set a flow control key with parallelism of 3, that flow control will be for the whole workflow run. Retries are the same way. Usually, this is what you want. However, occasionally you might have one step that needs special treatment. For example, you might have one step that charges a customer using a payment API that only allows a few concurrent calls. Before, you could either slow down the entire workflow to make that one step happy, or create a separate workflow for that step and call it using `context.invoke`. Now, you can apply flow control and retry options to an individual step.
+
+## Limit one step's flow control
+
+To limit a single step, pass a flow control config as the third argument of `context.run`:
+
+```typescript
+export const { POST } = serve(async (context) => {
+  await context.run("prepare", () => prepareOrder());
+
+  await context.run(
+    "charge customer",
+    () => chargeCustomer(),
+    {
+      flowControl: { key: "payment-provider", parallelism: 3 },
+    }
+  );
+
+  await context.run("notify", () => notifyUser());
+});
+```
+
+This means that only the `charge customer` step will be limited by the `payment-provider` key. All other steps in the flow will be limited by the flow control settings that were present when the run was kicked off. Note that the key is shared, so there will be at most 3 `charge customer` steps running concurrently across all runs using that key.
+
+Setting flow control for a step within the step config overrides the run’s flow control settings for that step only. This means that the step’s flow control will not count towards the run’s flow control limits as well.
+
+## Set retries on one step
+
+Retries work the same way. Pass `retries` and `retryDelay` as the third argument to change how many times one step retries and how long it waits:
+
+```typescript
+await context.run(
+  "call flaky service",
+  () => callFlakyService(),
+  {
+    retries: 5,
+    retryDelay: "1000",
+  }
+);
+```
+
+Any omitted fields will default to the run's config. Note that you can set `flowControl`, `retries` and `retryDelay` together on the same step.
+
+## See each step's config in the logs
+
+In the QStash workflow logs, we can see the config used for a given step. For example, if we go to a run, click on a step and then click on the Config tab, we can see the flow control key, rate, period, parallelism, retries and retry delay used for that step.
+
+![](https://cdn.bydefault.so/image-n1tj6H8uHrZcvbbCc9g1q.png)
+*The Config tab shows the flow control and retries used in a step.*
+
+## When to use it
+
+This is useful in cases where we need to make one step communicate with a service which is slow or rate-limited. Or we need to make one step retry more often than the rest of the workflow. We can do that by setting the flow control or retries on that step and leaving other steps as they are. To see all the options for flow control and retries, check out the [flow control](https://upstash.com/docs/workflow/features/flow-control) and [retries](https://upstash.com/docs/workflow/features/retries) documentation.
+
+And that’s the entire feature. We added a single argument to `context.run` and allowed individual steps to be executed within their own flow control and retries, with the rest of the workflow running according to the settings that triggered the workflow run in the first place.
