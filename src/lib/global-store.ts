@@ -32,20 +32,16 @@ export const useGlobalStore = create(
     }),
     {
       name: "global-store",
-      version: 2,
+      version: 3,
+      // v3: UK and Swiss visitors used to be granted consent without a banner,
+      // and an automatic grant can't be told from an Accept, so every earlier
+      // grant (and v1's boolean) goes back to pending and is asked again.
       migrate: (state, version) => {
-        if (version === 1) {
-          const stateV1 = state as { cookieConsent: boolean } & Omit<
-            GlobalStore,
-            "cookieConsent"
-          >;
-          return {
-            ...stateV1,
-            cookieConsent:
-              stateV1.cookieConsent === true ? "granted" : "pending",
-          };
+        const persisted = state as GlobalStore;
+        if (version < 3 && persisted.cookieConsent !== "pending-eu") {
+          return { ...persisted, cookieConsent: "pending" };
         }
-        return state as GlobalStore;
+        return persisted;
       },
       onRehydrateStorage: (state) => {
         return () => state.setIsHydrated(true);
