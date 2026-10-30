@@ -23,12 +23,12 @@ Here is a 28-second walkthrough of the flow on [PR #1 in `leoisadev1/box-pr-visu
     controls
     muted
     playsInline
-    aria-label="A pull request gets a visual check: Box Browser opens main and the pull request side by side, finds the clipped button on mobile, and posts a review comment"
+    aria-label="Pull request #1 starts its Visual QA check, the GitHub Actions job runs the inspection in Upstash Box, and a review comment appears with a recording of main and the pull request side by side"
     className="block h-auto w-full"
   />
 </Frame>
 
-The pixel measurements in the video are the real ones from PR #1. The box ID, restore time, and cost shown in it are example values.
+The recording, screenshots, and pixel measurements in the video are the real ones from PR #1. The box ID, snapshot ID, restore time, and cost in it are example values, and the job log shows what box mode prints.
 
 The full source code, GitHub Actions workflow, and captured artifacts are in [`leoisadev1/box-pr-visual-tester`](https://github.com/leoisadev1/box-pr-visual-tester).
 
@@ -101,13 +101,15 @@ In our pull request tester, `tab.act()` opens the checkout modal, Playwright res
 
 On the `/billing/` page of our demo app, clicking **Upgrade Plan** opens the `#checkout` modal. On `main`, the `#checkout` container uses `fixed inset-x-4 top-12` without a height cap or scroll container, and the footer uses a static `<div class="modal-foot">`.
 
-On a `1440x900` desktop monitor, the modal fits with room to spare on both branches:
+On a `390x844` mobile viewport, the modal overflows the screen on `main` and pushes the **Confirm upgrade** button below the bottom edge. Here is the review the tester posted on [PR #1](https://github.com/leoisadev1/box-pr-visual-tester/pull/1#issuecomment-6477831685), with a recording of the flow on both branches and the mobile before-and-after screenshots. `main` is on the left:
 
-![Desktop 1440x900 comparison showing both main and PR #1 passing with 100% button visibility](/blog/visual-qa-pull-requests-upstash-box-browser/desktop-comparison.png)
+![The visual review comment on PR #1: a side-by-side recording of the checkout flow on main and PR #1, then the mobile before-and-after screenshots](/blog/visual-qa-pull-requests-upstash-box-browser/pr-comment.png)
 
-On a `390x844` mobile viewport, the modal overflows the screen on `main` and pushes the **Confirm upgrade** button below the bottom edge:
+On a `1440x900` desktop monitor, the modal fits with room to spare on both branches, which is why this bug survives a review on a laptop. The same comment continues with the desktop screenshots and the measured numbers:
 
-![Mobile 390x844 comparison showing the clipped Confirm upgrade button on main versus the visible button on PR #1](/blog/visual-qa-pull-requests-upstash-box-browser/mobile-regression.png)
+![The rest of the comment: desktop before-and-after screenshots where both branches pass, the verdict, and the DOM metrics table](/blog/visual-qa-pull-requests-upstash-box-browser/pr-comment-details.png)
+
+That run used the repo's local Chromium mode, because the demo repo has no Box key configured yet. It runs the same probe in Chromium on the machine instead of in Box Browser, so the comment carries a rule-based verdict and no cost line. A run inside a Box adds Claude Code's verdict and the run cost.
 
 On `main` at `390x844`, `getBoundingClientRect()` on `#confirm` reports `top: 861.5px` and `bottom: 910px`. The button ends `66px` below the `844px` fold with `0%` of the button visible on screen, so attempting to submit the form times out.
 
@@ -285,7 +287,7 @@ async function inspectBranch(
 }
 ```
 
-Here is the step runner from the repo running against PR #1, with both branches serving on `:3000` and `:3001` and the four viewport checks running against pinned SHAs `846a88c` and `2a94f48`. The demo repo has no Box key configured yet, so this run used the repo's local Chromium mode: the same probe, run in Chromium on the machine instead of in Box Browser. The desktop and mobile comparisons above come from the same run.
+Here is the step runner from the repo running against PR #1, with both branches serving on `:3000` and `:3001` and the four viewport checks running against pinned SHAs `846a88c` and `2a94f48`. The demo repo has no Box key configured yet, so this run used the repo's local Chromium mode: the same probe, run in Chromium on the machine instead of in Box Browser. The recording and screenshots in the comment above come from the same run.
 
 ![Terminal output showing main on port 3000 and PR #1 on port 3001 with mobile and desktop inspection results](/blog/visual-qa-pull-requests-upstash-box-browser/dual-server-terminal.png)
 
@@ -370,17 +372,13 @@ The workflow in the repo splits this into separate steps and falls back to local
 
 ![GitHub Actions workflow run for PR #1 with every step green and the Box restore step skipped](/blog/visual-qa-pull-requests-upstash-box-browser/actions-run.png)
 
-Here is the live comment posted on [`leoisadev1/box-pr-visual-tester#1`](https://github.com/leoisadev1/box-pr-visual-tester/pull/1#issuecomment-6477831685):
-
-![Live GitHub comment on PR #1 showing the before-and-after mobile screenshots, verdict, and DOM metrics table](/blog/visual-qa-pull-requests-upstash-box-browser/pr-comment.png)
-
-Because that run used local Chromium, the comment carries the rule-based verdict and no cost line. A run inside a Box adds Claude Code's verdict and the run cost.
+The comment shown earlier is that output, live on [`leoisadev1/box-pr-visual-tester#1`](https://github.com/leoisadev1/box-pr-visual-tester/pull/1#issuecomment-6477831685). The recording sits in it as a GIF next to a link to the MP4, because GitHub only plays inline video that was uploaded through its own editor and strips `<video>` tags that point anywhere else. In box mode the recording comes from `box.browser.recordings.start()`; in local mode the tester records the mobile flow on both branches with Playwright and stitches the two clips side by side.
 
 ---
 
 ## What a run records
 
-Every call in `box-stages.ts` records the command time and agent spend that `Run.cost` returns, plus the token counts from `tab.act()`. The comment adds those up into one cost line for the run.
+Every call in `box-stages.ts` records the command time and agent spend that `Run.cost` returns, plus the token counts from `tab.act()`. The comment adds those up into one cost line for the run, next to the screenshots and the recording.
 
 Because `box.delete()` runs inside the `finally` block as soon as the comment is posted, nothing keeps running between pull requests. When several coding agents push branches from their worktrees at the same time, each push gets its own Box, runs its browser checks in isolation, posts its screenshots, and deletes itself.
 
