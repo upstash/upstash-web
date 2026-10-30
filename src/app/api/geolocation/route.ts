@@ -34,6 +34,8 @@ const GDPR_COUNTRIES = new Set([
   "SI", // Slovenia
   "ES", // Spain
   "SE", // Sweden
+  "GB", // United Kingdom
+  "CH", // Switzerland
 ]);
 
 const corsHeaders = {
