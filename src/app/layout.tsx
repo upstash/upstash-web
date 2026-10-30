@@ -87,16 +87,17 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                           var consent = 'pending';
                           try {
                             var stored = JSON.parse(localStorage.getItem('global-store'));
-                            if (stored && stored.state && stored.state.cookieConsent) {
+                            // Before v3 a grant may have skipped the banner (see global-store).
+                            if (stored && stored.version >= 3 && stored.state && stored.state.cookieConsent) {
                               consent = stored.state.cookieConsent;
                             }
                           } catch (e) {}
                           if (consent === 'granted') {
                             gtag('consent', 'default', {
                               analytics_storage: 'granted',
-                              ad_storage: 'granted',
-                              ad_user_data: 'granted',
-                              ad_personalization: 'granted',
+                              ad_storage: 'denied',
+                              ad_user_data: 'denied',
+                              ad_personalization: 'denied',
                               wait_for_update: 500
                             });
                           } else {
@@ -110,9 +111,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                             });
                             gtag('consent', 'default', {
                               analytics_storage: 'granted',
-                              ad_storage: 'granted',
-                              ad_user_data: 'granted',
-                              ad_personalization: 'granted',
+                              ad_storage: 'denied',
+                              ad_user_data: 'denied',
+                              ad_personalization: 'denied',
                               wait_for_update: 500
                             });
                           }`,
@@ -130,7 +131,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                           function gtag(){ dataLayer.push(arguments); }
                           window.gtag = window.gtag || gtag;
                           gtag('js', new Date());
-                          gtag('config', '${GA_MEASUREMENT_ID}');`,
+                          gtag('config', '${GA_MEASUREMENT_ID}', { allow_google_signals: false, allow_ad_personalization_signals: false });`,
                 }}
               />
               <Script
